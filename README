@@ -29,12 +29,13 @@ In your terminal window, run:
     bash Anaconda-latest-Linux-x86_64.sh
 
 2)
+conda install -c psi4 psi4 
+conda create -n p4env psi4 -c psi4 # creates enviormental enviorments for psi4
 conda install numpy
 conda install scipy
 conda install matplotlib
-conda install openbabel
-conda install -c psi4 psi4 
-conda create -n p4env psi4 -c psi4 # creates enviormental enviorments for psi4
+conda install -c openbabel openbabel
+
 conda activate p4env # sourcing enviorment
 
 3) 
