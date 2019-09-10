@@ -1,0 +1,28 @@
+###############
+Change history:
+###############
+June 2015
+* HF to kcal unit conversion error (621 instead of 627) corrected
+* ameobna_v2_new_head.prm updated to remove the opbendunit, the opbend force constants now 71.94x bigger than before (changed in valence.py). This is consistent with amoebapro2013.prm and amoeba09.prm.
+July 3, 2015
+Mono Cl vdw parameters updated according to JPCB 2014, 118 (24), pp 6456–6465.
+Can NOT detect multiple Cl and assign the corresponding parameters yet
+
+July 2019
+Using Python3 for easier installation of dependencies via anaconda/miniconda
+--freq to do a frequency QM computation during QM optimization
+--torsppcm to specify PCM of water during QM SP computations for torsion, if molecule is charged, this is on by default
+--sppcm to specify PCM of water during QM SP computation, if molecule is charged, this is on by default
+--toroptpcm to specify PCM of water during QM Opt computations for torsion, if molecule is charged, this is on by default
+--optpcm to specify PCM of water during QM Opt computation, if molecule is charged, this is on by default
+--use_psi4 to specify to use Psi4 for QM SP and Opt rather than Gaussian 09
+--use_psi4SPonly to specify to use Psi4 for QM SP only and use Opt from Gaussian 09, in case they have better optimization algorithm performance
+--dontdotor quit program before spinning torsions
+--dontdotorfit quit program before torsion fitting
+--rotalltors always rotate any torsion that babel considers rotatable
+--onlyrotbnd=idx1,idx2 only rotate specified atom indices
+--torsionrestraint change tinker torsion restraint constant, default force constant is .1
+--foldnum=integer change number of cosine terms in torsion fitting function, default is 3
+--tordatapointsnum=integer change number of data points needed to sample energy/dihedral angle profile for all torsions, default is 12. If too many torsions are being fit to same bond for 12 data points, more datapoints are automatically added
+--dont-tor-qm-opt specifies to not use QM for optimization during torsion spinning, this is by default False so QM Opt is on by default
+--fitrotbnds specifies to make a file with extension .fitrotbnds where there is a column list of rotatable bond indexes that are comma seperated, each bond pair will undergo torsion spinning and fitting
