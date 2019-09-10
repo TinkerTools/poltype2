@@ -4649,7 +4649,6 @@ def CheckRMSPD():
         os.fsync(logfh.fileno())
 
 def CheckBondConnectivity(mol,optmol):
-    # Check structure before and after optimization for any errors
     atomitermol=openbabel.OBMolAtomIter(mol)
     atomiteroptmol=openbabel.OBMolAtomIter(optmol)
     for atm in atomitermol:
