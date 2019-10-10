@@ -1469,10 +1469,12 @@ class Valence:
                     b = mol.GetAtom(ia[1])
                     c = mol.GetAtom(ia[2])
                     angle = mol.GetAngle(a,b,c)
-                    if shoulduseanglep==False:
-                        key2 = 'angle%8d%6d%6d%11.4f%10.4f' % (key1[0], key1[1], key1[2], v[skey][0], angle)
-                    else:
+                    if b.GetHyb()==2 and shoulduseanglep==True: # only for SP2 hyb middle atoms use angp
                         key2 = 'anglep%8d%6d%6d%11.4f%10.4f' % (key1[0], key1[1], key1[2], v[skey][0], angle)
+                    else:
+                        key2 = 'angle%8d%6d%6d%11.4f%10.4f' % (key1[0], key1[1], key1[2], v[skey][0], angle)
+              
+                        
                     key1string = '%d %d %d' % (key1[0], key1[1], key1[2])
                     d.update({key1string : key2})
         x = []
@@ -2467,11 +2469,12 @@ class Valence:
                 for smarts in dic.keys():
                     if checksmarts==smarts:
                         foundmatch=True
-            print('returning here')
+            
             return foundmatch
 
 
         torsunit = .5
+        torkeytoSMILES={}
         d = dict()
         zeroed = False
         for v in vals:
@@ -2502,20 +2505,18 @@ class Valence:
                         else:
                             key2 = 'torsion%6d%6d%6d%6d%11.4f 0.0 1 %10.4f 180.0 2 %10.4f 0.0 3' % (key1[0], key1[1], key1[2], key1[3], v[skey][0]/torsunit, v[skey][1]/torsunit, v[skey][2]/torsunit)
                     key1string = '%d %d %d %d' % (key1[0], key1[1], key1[2], key1[3])
-                    #if key1[0]==19 and key1[1]==20 and key1[2]==21 and key1[3]==29:
-                    #    print('Found it ')
-                    #    print(key1string)
-                    #    print('zeroed',zeroed)
-                    #    print(skey,v[skey])
-                    #    pause=input('pausing...')
-                    self.logfh.write('Torsion parameters '+key2+ ' assigned from SMILES '+skey+'\n')
+                    
+
+                    torkeytoSMILES.update({key1string:skey})
+                    
                     d.update({key1string : key2})
                     zeroed = False
-        x = []
-        #for key in d.keys():
-        #    val=d[key]
-        #    print(key,val)
+        for key1string,key2 in d.items():
+            skey=torkeytoSMILES[key1string]
+            self.logfh.write('Torsion parameters for '+key2+ ' assigned from SMILES '+skey+'\n')
         
+        x = []
+
         for v in dict.values(d):
             x.append(v)
             if(float(v.split()[5]) == 0.0 and float(v.split()[8]) == 0.0 and float(v.split()[11]) == 0.0): self.missed_torsions.append([int(v.split()[1]),int(v.split()[2]),int(v.split()[3]),int(v.split()[4])])
@@ -2625,8 +2626,8 @@ class Valence:
         #    f.write('opbend %s %.5f %d\n' % (opbkey, opbval[0], opbval[1]))
         for x in self.opbguess(opbendvals):
             f.write(x + "\n")
-            
-        for x in self.torguess(mol,dorot,rotbnds):
+        results=self.torguess(mol,dorot,rotbnds)
+        for x in results:
             f.write(x + "\n")
 
         for x in self.pitorguess(mol):

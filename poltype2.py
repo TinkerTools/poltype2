@@ -738,11 +738,9 @@ def copyright ():
     print('''
               Poltype -- Polarizable atom typer of small molecules for the
                                  AMOEBA polarizable force field
-
    Please cite:
    Wu, J.C.; Chattree, G.; Ren, P.Y.; Automation of AMOEBA polarizable force field 
    parameterization for small molecules. Theor Chem Acc. (Accepted).
-
                                   Version 2.0.0 June 2015
  Copyright (c)  Johnny Wu, Gaurav Chattree, Brandon Walker, Matthew Harger and Pengyu Ren 2019
                                       All Rights Reserved
@@ -1054,6 +1052,8 @@ def post_proc_localframes(keyfilename, lfzerox):
             elif len(tmplst) == 4:
                 (keywd,atmidx,lf1,chg) = tmplst
                 lf2 = '0'
+            elif len(tmplst) == 6:
+                (keywd,atmidx,lf1,lf2,lf3,chg) = tmplst
             """
             # If poledit set lf2 to 0, then replace it with the lf2 found in gen_peditin
             if int(lf2) == 0:
