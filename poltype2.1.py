@@ -600,7 +600,7 @@ def initialize ():
             
 
 
-    cmdstr=analyzeexe+' '+'>'+' '+'version.out'
+    cmdstr=analyzeexe+' '+sys.path[0]+r'/'+' '+'water.xyz'+' '+'-k'+' '+'water.key'+' '+'e'+'>'+' '+'version.out'
     try:
         returned_value = subprocess.call(cmdstr, shell=True)
     except:
@@ -1261,7 +1261,7 @@ def is_qm_normal_termination(logfname):
     return False
 
 def gen_opt_str(optimizeoptlist):
-    optstr = "#opt"
+    optstr = "#P opt"
     if optimizeoptlist:
         optstr += "=(" + ','.join(optimizeoptlist) + ")"
     return optstr
@@ -1417,14 +1417,14 @@ def gen_comfile (comfname,numproc,maxmem,chkname,tailfname,mol):
     tmpfh = open(comfname, "a")
     #NOTE: Need to pass parameter to specify basis set
     if ('dma' in comfname):
-        opstr="#MP2/%s Sp Density=MP2 MaxDisk=%s\n" % (dmabasisset, maxdisk)
+        opstr="#P MP2/%s Sp Density=MP2 MaxDisk=%s\n" % (dmabasisset, maxdisk)
     elif ('pop' in comfname):
         opstr="#P HF/%s MaxDisk=%s Pop=SaveMixed\n" % (popbasisset, maxdisk)
     else:
         if sppcm==True:
-            opstr="#%s/%s Sp Density=MP2 SCF=Save Guess=Huckel MaxDisk=%s SCRF=(PCM)\n" % (espmethod,espbasisset, maxdisk)
+            opstr="#P %s/%s Sp Density=MP2 SCF=Save Guess=Huckel MaxDisk=%s SCRF=(PCM)\n" % (espmethod,espbasisset, maxdisk)
         else:
-            opstr="#%s/%s Sp Density=MP2 SCF=Save Guess=Huckel MaxDisk=%s\n" % (espmethod,espbasisset, maxdisk)
+            opstr="#P %s/%s Sp Density=MP2 SCF=Save Guess=Huckel MaxDisk=%s\n" % (espmethod,espbasisset, maxdisk)
 
 
     bset=re.search('(?i)(6-31|aug-cc)\S+',opstr)
@@ -1477,9 +1477,9 @@ def gen_torcomfile (comfname,numproc,maxmem,prevstruct,xyzf):
     else:
 #        operationstr = "#m06L/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s\n" % (torspbasisset, maxdisk)
         if torsppcm==True:
-            operationstr = "#%s/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s SCRF=(PCM)\n" % (torspmethod,torspbasisset, maxdisk)
+            operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s SCRF=(PCM)\n" % (torspmethod,torspbasisset, maxdisk)
         else:       
-            operationstr = "#%s/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s\n" % (torspmethod,torspbasisset, maxdisk)
+            operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s\n" % (torspmethod,torspbasisset, maxdisk)
 
         commentstr = molecprefix + " Rotatable Bond SP Calculation on " + gethostname()   
 

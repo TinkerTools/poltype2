@@ -1438,7 +1438,7 @@ class Valence:
         vals.append(angparamvals2)
         vals.append(angparamvals1)
         analyzeexe = "analyze.x"
-        cmdstr=analyzeexe+' '+'>'+' '+'version.out'
+        cmdstr=analyzeexe+' '+sys.path[0]+r'/'+' '+'water.xyz'+' '+'-k'+' '+'water.key'+' '+'e'+'>'+' '+'version.out'
         try:
             returned_value = subprocess.call(cmdstr, shell=True)
         except:
@@ -1446,14 +1446,15 @@ class Valence:
         temp=open('version.out','r')
         results=temp.readlines()
         temp.close()
-        shoulduseanglep = False
+        latestversion = False
         for line in results:
             if "Version" in line:
-                linesplit=line.split()
-                versionnum=float(linesplit[2])
-                if versionnum>8.7:
-                    shoulduseanglep = True
-                    break
+                if "Version" in line:
+                    linesplit=line.split()
+                    versionnum=float(linesplit[2])
+                    if versionnum>8.7:
+                        shoulduseanglep = True
+                        break
 
         d = dict()
         for v in vals:
