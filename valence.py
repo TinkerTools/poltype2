@@ -1,4 +1,4 @@
-#!/usr/bin/python
+
 
 ##################################################################
 #
@@ -28,6 +28,7 @@
 
 import openbabel
 import math
+import sys
 radian = 57.29577951308232088
 
 class Valence:
