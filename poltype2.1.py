@@ -1,4 +1,4 @@
-#!/usr/bin/python
+
 
 ##################################################################
 #
@@ -600,8 +600,9 @@ def initialize ():
             
 
 
-    cmdstr=analyzeexe+' '+sys.path[0]+r'/'+' '+'water.xyz'+' '+'-k'+' '+'water.key'+' '+'e'+'>'+' '+'version.out'
+    cmdstr=analyzeexe+' '+sys.path[0]+r'/'+' '+'water.xyz'+' '+'-k'+' '+sys.path[0]+r'/'+'water.key'+' '+'e'+'>'+' '+'version.out'
     try:
+        print('Calling: '+cmdstr) 
         returned_value = subprocess.call(cmdstr, shell=True)
     except:
         pass
@@ -616,12 +617,10 @@ def initialize ():
             if versionnum>=8.7:
                 latestversion = True
                 break
-        
-        if(not latestversion):
-            print("Notice: Not latest version of tinker (>=8.7)")
-        else:
-            print('WARNING: Use keyword anglep , not the keyword angle in all key files')
-
+    print('versionnum ',versionnum)   
+    if(not latestversion):
+        print("Notice: Not latest version of tinker (>=8.7)")
+  
     if ("TINKERDIR" in os.environ):
         tinkerdir = os.environ["TINKERDIR"]
         peditexe = os.path.join(tinkerdir,peditexe)

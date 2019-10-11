@@ -1,4 +1,4 @@
-#!/usr/bin/python
+
 
 ##################################################################
 #
@@ -28,6 +28,7 @@
 
 import openbabel
 import math
+import sys
 radian = 57.29577951308232088
 
 class Valence:
@@ -1438,15 +1439,16 @@ class Valence:
         vals.append(angparamvals2)
         vals.append(angparamvals1)
         analyzeexe = "analyze.x"
-        cmdstr=analyzeexe+' '+sys.path[0]+r'/'+' '+'water.xyz'+' '+'-k'+' '+'water.key'+' '+'e'+'>'+' '+'version.out'
+        cmdstr=analyzeexe+' '+sys.path[0]+r'/'+' '+'water.xyz'+' '+'-k'+' '+sys.path[0]+r'/'+'water.key'+' '+'e'+'>'+' '+'version.out'
         try:
+            print('Calling: '+cmdstr)
             returned_value = subprocess.call(cmdstr, shell=True)
         except:
             pass
         temp=open('version.out','r')
         results=temp.readlines()
         temp.close()
-        latestversion = False
+        shoulduseanglep = False
         for line in results:
             if "Version" in line:
                 if "Version" in line:
