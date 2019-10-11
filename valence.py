@@ -1447,6 +1447,7 @@ class Valence:
         temp=open('version.out','r')
         results=temp.readlines()
         temp.close()
+	shoulduseanglep = False
         latestversion = False
         for line in results:
             if "Version" in line:
