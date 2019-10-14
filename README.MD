@@ -1,4 +1,4 @@
-Poltype README
+# Poltype README
 --------------
 
 Poltype is an automatic parameterization tool for the AMOEBA polarizable force field.
@@ -6,7 +6,7 @@ Poltype is an automatic parameterization tool for the AMOEBA polarizable force f
 
 https://biomol.bme.utexas.edu/tinkergpu/index.php/Poltype:Poltype
 
-INSTALLATION:
+## INSTALLATION:
 
 1)
 
@@ -22,13 +22,14 @@ In your terminal window, run:
 
     Miniconda:
 
-    bash Miniconda3-latest-Linux-x86_64.sh
+    ```bash Miniconda3-latest-Linux-x86_64.sh```
 
     Anaconda:
 
-    bash Anaconda-latest-Linux-x86_64.sh
+    ```bash Anaconda-latest-Linux-x86_64.sh```
 
 2)
+```
 conda install -c psi4 psi4 
 conda create -n p4env psi4 -c psi4 # creates enviormental enviorments for psi4
 conda install numpy
@@ -36,17 +37,19 @@ conda install scipy
 conda install matplotlib
 conda install -c openbabel openbabel
 
-conda activate p4env # sourcing enviorment
+conda activate p4env ``` 
 
 3) 
 Create enviorments for Tinker,Gaussian 09,and GDMA
 
+```bash
 export PATH=path_to_tinker_binary:$PATH
 export g09root=path_to_gaussian_binary
 export GAUSS_SCRDIR=path_to_scratch_directory
 export GDMADIR=path_to_gdma_directory
 export PATH=path_to_gdma_directory:$PATH
 export PSI_SCRATCH=path_to_scratch_directory
+```
 
 
 
