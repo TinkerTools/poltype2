@@ -22,18 +22,13 @@ In your terminal window, run:
 
     Miniconda:
 
-
-    ```
     bash Miniconda3-latest-Linux-x86_64.sh
 
-    ```
 
     Anaconda:
 
-    ```
     bash Anaconda-latest-Linux-x86_64.sh
 
-    ```
 
 2)
 
