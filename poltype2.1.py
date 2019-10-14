@@ -2224,7 +2224,8 @@ def gen_peditinfile (mol):
             bisectidxs=idxtobisectidxs[a.GetIdx()]
             f.write(str(a.GetIdx()) + " " + str(localframe1[a.GetIdx() - 1]) + " -" + str(bisectidxs[0])+ " -" + str(bisectidxs[1]) + "\n")
     
-    #f.write("\n")
+    f.write("\n")
+    f.write('A'+'\n')
 
     #Find aromatic carbon, halogens, and bonded hydrogens to correct polarizability
     iteratom = openbabel.OBMolAtomIter(mol)
@@ -2272,9 +2273,6 @@ def gen_peditinfile (mol):
             if (cut_bond):
                 f.write( str(b.GetBeginAtomIdx()) + " " + str(b.GetEndAtomIdx()) + "\n")
 
-    #f.write("\n")
-    f.write("\n")
-    f.write('A'+'\n')
     f.write('\n')
     f.write('\n')
     f.write("N\n")
