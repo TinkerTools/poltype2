@@ -80,7 +80,7 @@ maxdisk = "100GB"
 gausdir = None
 gdmadir = None
 tinkerdir = None
-scratchdir = "/scratch/bdw2292"
+scratchdir = "/scratch"
 paramfname = sys.path[0] + "/amoeba_v2_new.prm"
 paramhead = sys.path[0] + "/amoeba_v2_new_head.prm"
 obdatadir = sys.path[0] + "/datadir"
@@ -600,7 +600,7 @@ def initialize ():
             
 
 
-    cmdstr=analyzeexe+' '+sys.path[0]+r'/'+' '+'water.xyz'+' '+'-k'+' '+sys.path[0]+r'/'+'water.key'+' '+'e'+'>'+' '+'version.out'
+    cmdstr=analyzeexe+' '+sys.path[0]+r'/'+'water.xyz'+' '+'-k'+' '+sys.path[0]+r'/'+'water.key'+' '+'e'+'>'+' '+'version.out'
     try:
         print('Calling: '+cmdstr) 
         returned_value = subprocess.call(cmdstr, shell=True)
@@ -2224,7 +2224,8 @@ def gen_peditinfile (mol):
             bisectidxs=idxtobisectidxs[a.GetIdx()]
             f.write(str(a.GetIdx()) + " " + str(localframe1[a.GetIdx() - 1]) + " -" + str(bisectidxs[0])+ " -" + str(bisectidxs[1]) + "\n")
     
-    #f.write("\n")
+    f.write("\n")
+    f.write('A'+'\n')
 
     #Find aromatic carbon, halogens, and bonded hydrogens to correct polarizability
     iteratom = openbabel.OBMolAtomIter(mol)
@@ -2272,9 +2273,6 @@ def gen_peditinfile (mol):
             if (cut_bond):
                 f.write( str(b.GetBeginAtomIdx()) + " " + str(b.GetEndAtomIdx()) + "\n")
 
-    #f.write("\n")
-    f.write("\n")
-    f.write('A'+'\n')
     f.write('\n')
     f.write('\n')
     f.write("N\n")
