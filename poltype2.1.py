@@ -600,7 +600,7 @@ def initialize ():
             
 
 
-    cmdstr=analyzeexe+' '+sys.path[0]+r'/'+' '+'water.xyz'+' '+'-k'+' '+sys.path[0]+r'/'+'water.key'+' '+'e'+'>'+' '+'version.out'
+    cmdstr=analyzeexe+' '+sys.path[0]+r'/'+'water.xyz'+' '+'-k'+' '+sys.path[0]+r'/'+'water.key'+' '+'e'+'>'+' '+'version.out'
     try:
         print('Calling: '+cmdstr) 
         returned_value = subprocess.call(cmdstr, shell=True)
