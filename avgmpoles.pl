@@ -277,7 +277,7 @@ foreach $typenum (@grp_heads)
                   "$c2[$typeid[$typenum]]","$c3[$typeid[$typenum]]",
                  );
       printf OUT (
-                  "%-9s%6d%5d%5d%5d%17f", "multipole",
+                  "%-9s%7d%7d%7d%7d%17f", "multipole",
                   "$c0",                 "$c1[$typeid[$typenum]]",
                   "$c2[$typeid[$typenum]]","$c3[$typeid[$typenum]]",       "$e11[$typeid[$typenum]]"
                  );
@@ -286,7 +286,7 @@ foreach $typenum (@grp_heads)
       else
       {
       printf OUT (
-                  "%-9s%6d%5d%5d%21.5f", "multipole",
+                  "%-9s%7d%7d%7d%21.5f", "multipole",
                   "$c0",                 "$c1[$typeid[$typenum]]",
                   "$c2[$typeid[$typenum]]",       "$e11[$typeid[$typenum]]"
                  );
