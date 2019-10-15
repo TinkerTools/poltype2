@@ -1927,10 +1927,18 @@ def gen_gdmain(gdmainfname,molecprefix,fname):
     tmpfh.write("Switch 0\n") # v1.3, comment out for v2.2
     tmpfh.write("Limit 2\n")
     tmpfh.write("Punch " + punfname + "\n")
-    tmpfh.write("Radius H 0.65\n") # v1.3, use 0.31 for v2.2
-    tmpfh.write("Radius S 0.80\n") # v1.3, use 0.XX for v2.2
-    tmpfh.write("Radius P 0.75\n") # v1.3, use 0.XX for v2.2
-    tmpfh.write("Radius Cl 1.10\n") # v1.3, use 0.XX for v2.2
+    # original Radius
+    #tmpfh.write("Radius H 0.65\n") # v1.3, use 0.31 for v2.2
+    #tmpfh.write("Radius S 0.80\n") # v1.3, use 0.XX for v2.2
+    #tmpfh.write("Radius P 0.75\n") # v1.3, use 0.XX for v2.2
+    #tmpfh.write("Radius Cl 1.10\n") # v1.3, use 0.XX for v2.2
+
+    # new radius
+    # decided with ratio 
+    tmpfh.write("Radius H 0.60\n") 
+    tmpfh.write("Radius S 0.85\n") 
+    tmpfh.write("Radius P 0.95\n") 
+    tmpfh.write("Radius Cl 1.10\n") 
     tmpfh.write("\n")
     tmpfh.write("Start\n")
     tmpfh.write("\n")
