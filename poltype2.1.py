@@ -2122,7 +2122,7 @@ def gen_peditinfile (mol):
             localframe2[a.GetIdx() - 1] *= -1
             lf2write[a.GetIdx() - 1] *= -1
 
-    print('symmetryclass',symmetryclass)
+
     for a in openbabel.OBMolAtomIter(mol):
         if a.GetValence() == 4:
             aidx=a.GetIdx()
@@ -2171,6 +2171,12 @@ def gen_peditinfile (mol):
                                     lf2write[a.GetIdx() - 1] = 0
     idxtobisecthenzbool={}
     idxtobisectidxs={}
+    iteratomagain = openbabel.OBMolAtomIter(mol)
+    for a in iteratomagain:
+        print('a.GetIdx() ',a.GetIdx())
+        idxtobisecthenzbool[a.GetIdx()]=False
+
+    """
     # now iterate through molecule and search for case like  OP(O)(O)(O) where the three Oxygens on the end need bisector then z
     for a in openbabel.OBMolAtomIter(mol):
         idxtobisecthenzbool[a.GetIdx()]=False
@@ -2202,25 +2208,27 @@ def gen_peditinfile (mol):
                                             bisectidxs.append(idx)
                                     idxtobisectidxs[a.GetIdx()]=bisectidxs
 
+    """
     # now iterate through molecule and search for case N(C)(H)(H), we want this to be a z then bisector N C -H -H
     for a in openbabel.OBMolAtomIter(mol):
         if a.GetValence() == 3 and a.GetAtomicNum()==7:
             hydcount=0
             aliphatcarbcount=0
             hydindexes=[]
+            foundedgecase=False
             for b in openbabel.OBAtomAtomIter(a):
                 bidx=b.GetIdx()
                 if b.GetAtomicNum()==1:
                     hydcount+=1
                     hydindexes.append(b.GetIdx())
-                if b.GetAtomicNum()==6 and b.IsAromatic()==False:
-                    aliphatcarbcount+=1
+                if b.GetAtomicNum()==6 and b.GetHyb()==3:
                     carbidx=b.GetIdx()
-            if hydcount==2 and aliphatcarbcount==1:
+                    foundedgecase=True
+            if hydcount==2 and foundedgecase==True:
                 localframe1[a.GetIdx() - 1]= carbidx # what?
                 idxtobisecthenzbool[a.GetIdx()]=True
                 idxtobisectidxs[a.GetIdx()]=hydindexes
-                   
+                  
     # write out the local frames
     iteratom = openbabel.OBMolAtomIter(mol)
     f = open (peditinfile, 'w')
@@ -2231,6 +2239,8 @@ def gen_peditinfile (mol):
         else:
             bisectidxs=idxtobisectidxs[a.GetIdx()]
             f.write(str(a.GetIdx()) + " " + str(localframe1[a.GetIdx() - 1]) + " -" + str(bisectidxs[0])+ " -" + str(bisectidxs[1]) + "\n")
+    
+
     
     f.write("\n")
     f.write('A'+'\n')

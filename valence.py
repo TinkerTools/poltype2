@@ -1455,7 +1455,7 @@ class Valence:
                 if "Version" in line:
                     linesplit=line.split()
                     versionnum=float(linesplit[2])
-                    if versionnum>8.7:
+                    if versionnum>=8.7:
                         shoulduseanglep = True
                         break
 
