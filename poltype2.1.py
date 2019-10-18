@@ -3080,7 +3080,7 @@ def tor_opt_sp(molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,prevstrctfname
                     else:
                         tmpkeyfh.write('restrain-torsion %d %d %d %d %f\n' % (resa,resb,resc,resd,torsionrestraint))
         tmpkeyfh.close()
-        mincmdstr = minimizeexe+' -k '+tmpkeyfname+' '+torxyzfname+' 0.01'
+        mincmdstr = minimizeexe+' '+torxyzfname+' -k '+tmpkeyfname+' 0.01'
         call_subsystem(mincmdstr)
 
         # generate the com file using *.xyz_2 which has the restraint
@@ -3187,7 +3187,7 @@ def tor_opt_sp(molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,prevstrctfname
             tmpkeyfh.close()
 
             # minimize the structure to the restraint
-            mincmdstr = minimizeexe+' -k '+tmpkeyfname+' '+torxyzfname+' 0.01'
+            mincmdstr = minimizeexe+' '+torxyzfname+' -k '+tmpkeyfname+' 0.01'
             call_subsystem(mincmdstr)
 
             # generate the *.com file using the minimized *.xyz, *.xyz_2
@@ -3745,8 +3745,8 @@ def compute_mm_tor_energy(mol,a,b,c,d,startangle,phase_list = None,keyfile = Non
             mincmdstr=minimizeexe+' '+torxyzfname+' 0.01' # make sure other .xyz files were removed
             alzcmdstr=analyzeexe+' '+torxyzfname+'_'+str(2)+' ed > %s' % toralzfname
         else:
-            mincmdstr=minimizeexe+' -k '+tmpkeyfname+' '+torxyzfname+' 0.01' # make sure other .xyz files were removed
-            alzcmdstr=analyzeexe+' -k '+tmpkeyfname+' '+torxyzfname+'_'+str(2)+' ed > %s' % toralzfname
+            mincmdstr=minimizeexe+' '+torxyzfname+' -k '+tmpkeyfname+' 0.01' # make sure other .xyz files were removed
+            alzcmdstr=analyzeexe+' '+torxyzfname+'_'+str(2)+' -k '+tmpkeyfname+' ed > %s' % toralzfname
         print(mm_tor_count,torxyzfname)
         if not do_tor_qm_opt:
             if postfit==False:
@@ -4802,7 +4802,24 @@ def main():
     obConversion.SetInFormat(inFormat)
     obConversion.ReadFile(mol, molstructfname) 
 
-
+    
+    is2d=True
+    for atom in openbabel.OBMolAtomIter(mol):
+        zcoord=atom.GetZ()
+        if zcoord!=0:
+            is2d=False
+        
+    if is2d==True: # TEST ME
+        molprefix=molstructfname.split('.')[0]
+        newname=molprefix+'_3D'+'.sdf'
+        ext=molstructfname.split('.')[1]
+        cmdstr='babel'+' '+'-i'+ext+' '+molstructfname+' '+'--gen3d'+' '+'-osdf'+' '+'-O'+' '+newname
+        os.system(cmdstr)
+        mol = openbabel.OBMol()
+        inFormat = obConversion.FormatFromExt(newname)
+        obConversion.SetInFormat(inFormat)
+        obConversion.ReadFile(mol,newname) 
+    
     chg=mol.GetTotalCharge()
     print('total charge ',chg)
     if chg!=0:
