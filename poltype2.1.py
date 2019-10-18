@@ -2139,10 +2139,11 @@ def gen_peditinfile (mol):
                 atomindextoremovedipquad[aidx]=True
                 atomtypetospecialtrace[bidx]=True
                 
-                lf2write[b.GetIdx() - 1] = 0
+                
                 for b in openbabel.OBAtomAtomIter(a):
                     bidx=b.GetIdx()
                     atomindextoremovedipquadcross[bidx]=True
+                    lf2write[b.GetIdx() - 1] = 0
 
     #iterate through molecule and search for case such as OP(O)(O)(O) where three of the atoms have the same symmetry class and the fourth atom has a different class. The middle atom is SP3 and the frame needs to be z-only
     for a in openbabel.OBMolAtomIter(mol):
@@ -2173,7 +2174,6 @@ def gen_peditinfile (mol):
     idxtobisectidxs={}
     iteratomagain = openbabel.OBMolAtomIter(mol)
     for a in iteratomagain:
-        print('a.GetIdx() ',a.GetIdx())
         idxtobisecthenzbool[a.GetIdx()]=False
 
     """
@@ -2232,7 +2232,6 @@ def gen_peditinfile (mol):
     # write out the local frames
     iteratom = openbabel.OBMolAtomIter(mol)
     f = open (peditinfile, 'w')
-
     for a in iteratom:
         if idxtobisecthenzbool[a.GetIdx()]==False:
             f.write(str(a.GetIdx()) + " " + str(localframe1[a.GetIdx() - 1]) + " " + str(lf2write[a.GetIdx() - 1]) + "\n")
