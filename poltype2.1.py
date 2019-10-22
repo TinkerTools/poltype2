@@ -2002,6 +2002,59 @@ def is_in_polargroup(mol, smarts, bond, f):
             return True
     return False
 
+def CheckIfAllAtomsSameClass(classlist):
+    allsymm=True
+    if len(classlist)>=1:
+        firstsymm=get_symm_class(classlist[0].GetIdx())
+        for atom in classlist:
+            atomidx=atom.GetIdx()
+            symm=get_symm_class(atomidx)
+            if symm!=firstsymm:
+                allsymm=False
+    else:
+        allsymm=False
+    return allsymm
+
+def RemoveFromList(atomlist,atm):
+    newatmlist=[]
+    idx=atm.GetIdx()
+    for newatm in atomlist:
+        if idx!=newatm.GetIdx():
+            newatmlist.append(newatm)
+    return newatmlist
+
+def RemoveHNeighbs(atomneighbs):
+    atomneighbsnoH=[]
+    for atm in atomneighbs:
+        if atm.GetAtomicNum()!=1:
+            atomneighbsnoH.append(atm)
+    return atomneighbsnoH
+
+
+def AtLeastOneHeavyNeighbNotA(lf1atom,atom):
+    foundatleastoneheavy=False
+    checkneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(lf1atom)]
+    for neighb in checkneighbs:
+        if neighb.GetIdx()!=atom.GetIdx() and neighb.GetAtomicNum()!=1:
+            foundatleastoneheavy=True
+    return foundatleastoneheavy
+
+
+def AtLeastOneHeavyNeighb(atom):
+    foundatleastoneheavy=False
+    checkneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(atom)]
+    for neighb in checkneighbs:
+        if neighb.GetAtomicNum()!=1:
+            foundatleastoneheavy=True
+    return foundatleastoneheavy
+
+
+def GrabHeavyAtomIdx(lf1atom,atom):
+    checkneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(lf1atom)]
+    for neighb in checkneighbs:
+        if neighb.GetIdx()!=atom.GetIdx() and neighb.GetAtomicNum()!=1:
+            return neighb.GetIdx()
+
 # Create file to define local frames for multipole
 def gen_peditinfile (mol):
     """
@@ -2038,7 +2091,12 @@ def gen_peditinfile (mol):
     atomindextoremovedipquad={} # for methane need to make dipole and quadupole on the carbon zeroed out, will return this for post proccesing the keyfile after poledit is run
     atomindextoremovedipquadcross={}
     atomtypetospecialtrace={} # for H on CH4 need to make sure Qxx=Qyy=-1/2*Qzz
+    idxtobisecthenzbool={}
+    idxtobisectidxs={}
+    idxtotrisecbool={}
+    idxtotrisectidxs={}
     # Assign local frame for atom a based on the symmetry classes of the atoms it is bound to
+
     for a in openbabel.OBMolAtomIter(mol):
         # iterate over the atoms that a is bound to
         for b in openbabel.OBAtomAtomIter(a):
@@ -2052,7 +2110,6 @@ def gen_peditinfile (mol):
             # of the above sorted list 'a1'
             localframe1[a.GetIdx() - 1] = a1[0] # highest neighboring symmetry class gets stored as local frame 1
             localframe2[a.GetIdx() - 1] = a1[1] # next highest is 2
-
     # if a is bound to two atoms of the same symmetry class that aren't hydrogens
     # use these two atoms to define the local frame
     for a in openbabel.OBMolAtomIter(mol): # it seems that this case is not handled by above case
@@ -2081,163 +2138,93 @@ def gen_peditinfile (mol):
                 localframe2[a.GetIdx() - 1] = lfb1
             else:
                 localframe2[a.GetIdx() - 1] = lfb2
-
-    # Zero out x-component if more than one possible choice
-    # for x-axis local frame
-    # Note: Zeroed x-components need to be added to LF2 after writing to
-    # poledit in file.
-
-    # lf2write is to write out localframe2 for poledit
-    # Since poledit will zero out x-comp if x-axis(i) = 0
+    print('localframe1 ',localframe1)
+    print('localframe2 ',localframe2)
+    atomiter=openbabel.OBMolAtomIter(mol)
     lf2write = list(localframe2)
-    for a in openbabel.OBMolAtomIter(mol):
-        lf1 = localframe1[a.GetIdx() - 1]
-        lf2 = localframe2[a.GetIdx() - 1]
-
-        # Check LF1 instead if LF2 is not bonded to atom "a"
-        # If a is only bound to one other atom
-        if a.GetValence() == 1:
-            center = mol.GetAtom(localframe1[a.GetIdx() - 1])
-            for b in openbabel.OBAtomAtomIter(center):
-                # lf2 and b are not the same atom, but the same sym class, set lfzerox to true
-                if (lf2 != b.GetIdx() and
-                    (get_symm_class(lf2) == get_symm_class(b.GetIdx()))):
-                    pass
-                    #lfzerox[a.GetIdx() - 1] = True
-        else:
-            for b in openbabel.OBAtomAtomIter(a):
-                # if lf2 and b are not the same atom, but the same sym class, set lf2write to 0. Handles analine case. 
-                if (lf1 != b.GetIdx() and
-                    lf2 != b.GetIdx() and
-                    (get_symm_class(lf2) == get_symm_class(b.GetIdx()))):
-                    lf2write[a.GetIdx() - 1] = 0
-
-    # Define bisectors
-    for a in openbabel.OBMolAtomIter(mol):
-        lfa1 = localframe1[a.GetIdx() - 1]
-        lfa2 = localframe2[a.GetIdx() - 1]
-        if (a.IsConnected(mol.GetAtom(lfa1)) and
-            a.IsConnected(mol.GetAtom(lfa2)) and
-            get_symm_class(lfa1) == get_symm_class(lfa2)):
-            localframe2[a.GetIdx() - 1] *= -1
-            lf2write[a.GetIdx() - 1] *= -1
-
-
-    for a in openbabel.OBMolAtomIter(mol):
-        if a.GetValence() == 4:
-            aidx=a.GetIdx()
-            atype=get_symm_class(aidx)
-            neighbtypelist=[]
-            neighbidxlist=[]
-            for b in openbabel.OBAtomAtomIter(a):
-                bidx=b.GetIdx()
-                btype=get_symm_class(bidx)
-                if btype not in neighbtypelist:
-                    neighbtypelist.append(btype)
-                    neighbidxlist.append(bidx)
-            if len(neighbtypelist)==1 and atype not in neighbtypelist: # then this is like Methane, one type surrounded by four of the same type (different then middle)
-                atomindextoremovedipquad[aidx]=True
-                atomtypetospecialtrace[bidx]=True
-                
-                
-                for b in openbabel.OBAtomAtomIter(a):
-                    bidx=b.GetIdx()
-                    atomindextoremovedipquadcross[bidx]=True
-                    lf2write[b.GetIdx() - 1] = 0
-
-    #iterate through molecule and search for case such as OP(O)(O)(O) where three of the atoms have the same symmetry class and the fourth atom has a different class. The middle atom is SP3 and the frame needs to be z-only
-    for a in openbabel.OBMolAtomIter(mol):
-        if a.GetValence() == 4:
-            idxtosymmnum={}
-            for b in openbabel.OBAtomAtomIter(a):
-                bidx=b.GetIdx()
-                symmclass=get_symm_class(bidx)
-                idxtosymmnum[bidx]=symmclass
-            symset=set(idxtosymmnum.values())
-            if len(symset)==2: # only two classes, now see if three are the same
-                symcls1=list(symset)[0]
-                symcls2=list(symset)[1]
-                counter=collections.Counter(idxtosymmnum.values())
-                if 3 in counter.values(): # then there must also be a 1 and then this is the case we want
-                    for key in counter.keys():
-                        count=counter[key]
-                        if count==3:
-                            pass
-                        elif count==1:
-                            neededclass=key
-                            for idx in idxtosymmnum.keys():
-                                symmnum=idxtosymmnum[idx]
-                                if symmnum==neededclass:
-                                    localframe1[a.GetIdx() - 1]=idx
-                                    lf2write[a.GetIdx() - 1] = 0
-    idxtobisecthenzbool={}
-    idxtobisectidxs={}
-    iteratomagain = openbabel.OBMolAtomIter(mol)
-    for a in iteratomagain:
+    for a in atomiter:
         idxtobisecthenzbool[a.GetIdx()]=False
+        idxtotrisecbool[a.GetIdx()]=False
+    for atom in openbabel.OBMolAtomIter(mol):
+        atomidx=atom.GetIdx()
+        val=atom.GetValence()
+        atomneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(atom)]
+        atomneighbsnoH=RemoveHNeighbs(atomneighbs)
+        lf1=localframe1[atomidx-1]
+        lf2=localframe2[atomidx-1]
+        lf1atom=mol.GetAtom(lf1)
+        lf2atom=mol.GetAtom(lf2)
+        lf1val=lf1atom.GetValence()
+        lf1neighbs=[neighb for neighb in openbabel.OBAtomAtomIter(lf1atom)]
+        lf1neighbsnota=RemoveFromList(lf1neighbs,atom)
+        neighbsnotlf1=RemoveFromList(atomneighbs,lf1atom)
+        if val==1 and CheckIfAllAtomsSameClass(lf1neighbs)==True and lf1val==4: # then this is like H in Methane, we want Z-only
+            print('we are making z-only right here',atomidx)
+            lf2write[atomidx - 1] = 0
+            lfzerox[atomidx - 1]=True
+            atomtypetospecialtrace[atomidx]=True
+            atomindextoremovedipquadcross[atomidx]=True
+        elif CheckIfAllAtomsSameClass(lf1neighbs)==True and AtLeastOneHeavyNeighb(atom)==False and val==4: # then this is like carbon in Methane, we want Z-only
+            print('we are making z-only right here, C methane',atomidx)
+            lf2write[atomidx - 1] = 0
+            lfzerox[atomidx - 1]=True
+            atomindextoremovedipquad[atomidx]=True
+        elif atom.GetAtomicNum()==7 and CheckIfAllAtomsSameClass(atomneighbs)==True: # then this is like Ammonia and we can use a trisector here which behaves like Z-only
+            print('we are using trisector for ammonia',atomidx)
+            idxtotrisecbool[atomidx]=True
+            trisectidxs=[atm.GetIdx() for atm in atomneighbs]
+            print('trisectidxs ',trisectidxs)
+            idxtotrisectidxs[atomidx]=trisectidxs
+            lfzerox[atomidx - 1]=True # need to zero out the x components just like for z-only case
+        elif val==1 and lf1val==3 and CheckIfAllAtomsSameClass(lf1neighbs)==True: # then this is like the H on Ammonia and we can use z-then bisector
+            idxtobisecthenzbool[atomidx]=True
+            bisectidxs=[atm.GetIdx() for atm in lf1neighbsnota]
+            idxtobisectidxs[atomidx]=bisectidxs
+        elif (atom.IsConnected(lf1atom) and  atom.IsConnected(lf2atom) and get_symm_class(lf1) == get_symm_class(lf2)): # then this is like middle propane carbon or oxygen in water
+            print('bisector')
+            localframe2[atomidx - 1] *= -1 #for bisector you just make the index have a negative number, it can be both lfa1,lfa2 negative or just one of them
+            lf2write[atomidx - 1] *= -1
+        elif (atom.IsConnected(lf1atom) and get_symm_class(lf1) == get_symm_class(atomidx)): # this handles, ethane,ethene...., z-only
+            print('we are making z-only right here ethene,ethane')
+            lf2write[atomidx - 1] = 0
+            lfzerox[atomidx - 1]=True
+        elif CheckIfAllAtomsSameClass(atomneighbs)==False and CheckIfAllAtomsSameClass(lf1neighbsnota)==True and CheckIfAllAtomsSameClass(neighbsnotlf1)==True and val!=2 and lf1val!=2: # then this is like CH3PO3, we want z-onlytrisector would also work, also handles Analine
+            print('we are making z-only right here symmetry like Analine',atomidx)
+            lf2write[atomidx - 1] = 0
+            lfzerox[atomidx - 1]=True
+        elif CheckIfAllAtomsSameClass(neighbsnotlf1)==True and CheckIfAllAtomsSameClass(lf1neighbsnota)==False and AtLeastOneHeavyNeighbNotA(lf1atom,atom)==True: # then we can use z-then-x for lf1 and the heavy atom neighbor
+            
+            heavyatomidx=GrabHeavyAtomIdx(lf1atom,atom)
+            print('new z-then-x','heavyatomidx ',heavyatomidx,'atomidx ',atomidx)
+            lf2write[atomidx - 1] = heavyatomidx
+        elif CheckIfAllAtomsSameClass(neighbsnotlf1)==True and CheckIfAllAtomsSameClass(atomneighbs)==False and lf1atom.GetValence()==2: # then we can still use z-then-x 
+            print('new z-then-x special')
+            lf2write[atomidx - 1] = lf1neighbsnota[0].GetIdx() # there is only one atom in this list
+        elif CheckIfAllAtomsSameClass(atomneighbs) and CheckIfAllAtomsSameClass(neighbsnotlf1)==True and CheckIfAllAtomsSameClass(lf1neighbsnota)==True and lf1val==3 and val!=1: # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector
+            print('bisect then z','atomidx ',atomidx)
+            idxtobisecthenzbool[atomidx]=True
+            bisectidxs=[atm.GetIdx() for atm in lf1neighbsnota]
+            idxtobisectidxs[atomidx]=bisectidxs
+            # now make sure neighboring atom (lf1) also is using z-then-bisector
+            localframe1[lf1-1]=atomidx
+            idxtobisecthenzbool[lf1]=True
+            idxtobisectidxs[lf1]=bisectidxs
 
-    """
-    # now iterate through molecule and search for case like  OP(O)(O)(O) where the three Oxygens on the end need bisector then z
-    for a in openbabel.OBMolAtomIter(mol):
-        idxtobisecthenzbool[a.GetIdx()]=False
-        if a.GetValence() == 1:
-            for b in openbabel.OBAtomAtomIter(a): # possibly like the middle P atom
-                bidx=b.GetIdx()
-                if b.GetValence() == 4:
-                    idxtosymmnum={}
-                    for c in openbabel.OBAtomAtomIter(b):
-                        cidx=c.GetIdx()
-                        symmclass=get_symm_class(cidx)
-                        idxtosymmnum[cidx]=symmclass
-                    symset=set(idxtosymmnum.values())
-                    if len(symset)==2: # only two classes, now see if three are the same
-                        symcls1=list(symset)[0]
-                        symcls2=list(symset)[1]
-                        counter=collections.Counter(idxtosymmnum.values())
-                        if 3 in counter.values(): # then there must also be a 1 and then this is the case we want 
-                            for key in counter.keys():
-                                count=counter[key]
-                                if count==3: # class I want but now grab the other two indexes (not a.GetIdx()) for the bisector, make sure localframe1 is now the P atom(for example)
-                                    localframe1[a.GetIdx() - 1]=b.GetIdx()
-                                    idxtobisecthenzbool[a.GetIdx()]=True
-                                    neededclass=key
-                                    bisectidxs=[]
-                                    for idx in idxtosymmnum.keys():
-                                        symmnum=idxtosymmnum[idx]
-                                        if symmnum==neededclass and idx!=a.GetIdx():
-                                            bisectidxs.append(idx)
-                                    idxtobisectidxs[a.GetIdx()]=bisectidxs
-
-    """
-    # now iterate through molecule and search for case N(C)(H)(H), we want this to be a z then bisector N C -H -H
-    for a in openbabel.OBMolAtomIter(mol):
-        if a.GetValence() == 3 and a.GetAtomicNum()==7:
-            hydcount=0
-            aliphatcarbcount=0
-            hydindexes=[]
-            foundedgecase=False
-            for b in openbabel.OBAtomAtomIter(a):
-                bidx=b.GetIdx()
-                if b.GetAtomicNum()==1:
-                    hydcount+=1
-                    hydindexes.append(b.GetIdx())
-                if b.GetAtomicNum()==6 and b.GetHyb()==3:
-                    carbidx=b.GetIdx()
-                    foundedgecase=True
-            if hydcount==2 and foundedgecase==True:
-                localframe1[a.GetIdx() - 1]= carbidx # what?
-                idxtobisecthenzbool[a.GetIdx()]=True
-                idxtobisectidxs[a.GetIdx()]=hydindexes
-                  
+                
     # write out the local frames
     iteratom = openbabel.OBMolAtomIter(mol)
     f = open (peditinfile, 'w')
     for a in iteratom:
-        if idxtobisecthenzbool[a.GetIdx()]==False:
+        if idxtobisecthenzbool[a.GetIdx()]==False and idxtotrisecbool[a.GetIdx()]==False:
             f.write(str(a.GetIdx()) + " " + str(localframe1[a.GetIdx() - 1]) + " " + str(lf2write[a.GetIdx() - 1]) + "\n")
-        else:
+        elif idxtobisecthenzbool[a.GetIdx()]==True and idxtotrisecbool[a.GetIdx()]==False:
             bisectidxs=idxtobisectidxs[a.GetIdx()]
             f.write(str(a.GetIdx()) + " " + str(localframe1[a.GetIdx() - 1]) + " -" + str(bisectidxs[0])+ " -" + str(bisectidxs[1]) + "\n")
+        else:
+            print('we are in this case now')
+            trisecidxs=idxtotrisectidxs[a.GetIdx()]
+            print('trisect idxs are ',trisecidxs)
+            f.write(str(a.GetIdx()) + " -" + str(trisecidxs[0])+ " -" + str(trisecidxs[1]) + " -" + str(trisecidxs[2])+ "\n")
     
 
     
@@ -4833,10 +4820,10 @@ def main():
     if use_psi4==True:
         try:
             import psi4
-            print("Psi4 detected; it will be used as the QM engine")
+            logfh.write("Psi4 detected; it will be used as the QM engine")
             use_psi4 = True
         except:
-            print("Psi4 not detected; attempting to use Gaussian instead")
+            logfh.write("Psi4 not detected; attempting to use Gaussian instead")
             use_psi4 = False
 
 
@@ -4871,7 +4858,6 @@ def main():
     canonicallabel = [ 0 ] * mol.NumAtoms()
     localframe1 = [ 0 ] * mol.NumAtoms()
     localframe2 = [ 0 ] * mol.NumAtoms()
-
     # Finds the symmetry class for each atom
     # For example in the molecule ethanol: CH3-CH2-OH
     # The 3 Hydrogens bound to the first carbon all belong to the same symmetry class
@@ -4879,7 +4865,6 @@ def main():
     # The rest of the atoms all belong to their own individual symmetry classes
     # Many babel tools are used in finding the symmetry classes
     gen_canonicallabels(mol)
-   
     # scaling of multipole values for certain atom types
     # checks if the molecule contains any atoms that should have their multipole values scaled
     scalelist = process_types(mol)
