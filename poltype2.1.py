@@ -2124,6 +2124,8 @@ def gen_peditinfile (mol):
             if len(clstype) > 1:
                 localframe1[a.GetIdx() - 1] = clstype[0]
                 localframe2[a.GetIdx() - 1] = clstype[1]
+    print('localframe1 before ',localframe1)
+    print('localframe2 before',localframe2)
 
     # Find atoms bonded to only one atom
     iteratom = openbabel.OBMolAtomIter(mol)
@@ -2132,11 +2134,13 @@ def gen_peditinfile (mol):
         lfa2 = localframe2[a.GetIdx() - 1]
         lfb1 = localframe1[lfa1 - 1]
         lfb2 = localframe2[lfa1 - 1]
+        
         if a.GetValence() == 1:
+            print('a.GetIdx() ',a.GetIdx(),'lfa1',lfa1,'lfa2',lfa2,'lfb1',lfb1,'lfb2',lfb2)
             # Set lfa2 to the other atom (the atom that isn't 'a') in the local frame of atom 'b'
-            if lfb1 != a.GetIdx():
+            if lfb1 != a.GetIdx() and get_symm_class(lfb1)!=get_symm_class(lfa1): # make sure they are not the same type
                 localframe2[a.GetIdx() - 1] = lfb1
-            else:
+            elif lfb1 == a.GetIdx():
                 localframe2[a.GetIdx() - 1] = lfb2
     print('localframe1 ',localframe1)
     print('localframe2 ',localframe2)
@@ -2169,7 +2173,7 @@ def gen_peditinfile (mol):
             lf2write[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
             atomindextoremovedipquad[atomidx]=True
-        elif atom.GetAtomicNum()==7 and CheckIfAllAtomsSameClass(atomneighbs)==True: # then this is like Ammonia and we can use a trisector here which behaves like Z-only
+        elif atom.GetAtomicNum()==7 and CheckIfAllAtomsSameClass(atomneighbs)==True and val==3: # then this is like Ammonia and we can use a trisector here which behaves like Z-only
             print('we are using trisector for ammonia',atomidx)
             idxtotrisecbool[atomidx]=True
             trisectidxs=[atm.GetIdx() for atm in atomneighbs]
