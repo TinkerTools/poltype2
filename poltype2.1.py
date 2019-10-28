@@ -2124,8 +2124,7 @@ def gen_peditinfile (mol):
             if len(clstype) > 1:
                 localframe1[a.GetIdx() - 1] = clstype[0]
                 localframe2[a.GetIdx() - 1] = clstype[1]
-    print('localframe1 before ',localframe1)
-    print('localframe2 before',localframe2)
+
 
     # Find atoms bonded to only one atom
     iteratom = openbabel.OBMolAtomIter(mol)
@@ -2136,14 +2135,12 @@ def gen_peditinfile (mol):
         lfb2 = localframe2[lfa1 - 1]
         
         if a.GetValence() == 1:
-            print('a.GetIdx() ',a.GetIdx(),'lfa1',lfa1,'lfa2',lfa2,'lfb1',lfb1,'lfb2',lfb2)
             # Set lfa2 to the other atom (the atom that isn't 'a') in the local frame of atom 'b'
             if lfb1 != a.GetIdx() and get_symm_class(lfb1)!=get_symm_class(lfa1): # make sure they are not the same type
                 localframe2[a.GetIdx() - 1] = lfb1
             elif lfb1 == a.GetIdx():
                 localframe2[a.GetIdx() - 1] = lfb2
-    print('localframe1 ',localframe1)
-    print('localframe2 ',localframe2)
+
     atomiter=openbabel.OBMolAtomIter(mol)
     lf2write = list(localframe2)
     for a in atomiter:
@@ -2163,21 +2160,21 @@ def gen_peditinfile (mol):
         lf1neighbsnota=RemoveFromList(lf1neighbs,atom)
         neighbsnotlf1=RemoveFromList(atomneighbs,lf1atom)
         if val==1 and CheckIfAllAtomsSameClass(lf1neighbs)==True and lf1val==4: # then this is like H in Methane, we want Z-only
-            print('we are making z-only right here',atomidx)
+            #print('we are making z-only right here',atomidx)
             lf2write[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
             atomtypetospecialtrace[atomidx]=True
             atomindextoremovedipquadcross[atomidx]=True
         elif CheckIfAllAtomsSameClass(lf1neighbs)==True and AtLeastOneHeavyNeighb(atom)==False and val==4: # then this is like carbon in Methane, we want Z-only
-            print('we are making z-only right here, C methane',atomidx)
+            #print('we are making z-only right here, C methane',atomidx)
             lf2write[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
             atomindextoremovedipquad[atomidx]=True
         elif atom.GetAtomicNum()==7 and CheckIfAllAtomsSameClass(atomneighbs)==True and val==3: # then this is like Ammonia and we can use a trisector here which behaves like Z-only
-            print('we are using trisector for ammonia',atomidx)
+            #print('we are using trisector for ammonia',atomidx)
             idxtotrisecbool[atomidx]=True
             trisectidxs=[atm.GetIdx() for atm in atomneighbs]
-            print('trisectidxs ',trisectidxs)
+            #print('trisectidxs ',trisectidxs)
             idxtotrisectidxs[atomidx]=trisectidxs
             lfzerox[atomidx - 1]=True # need to zero out the x components just like for z-only case
         elif val==1 and lf1val==3 and CheckIfAllAtomsSameClass(lf1neighbs)==True: # then this is like the H on Ammonia and we can use z-then bisector
@@ -2185,27 +2182,27 @@ def gen_peditinfile (mol):
             bisectidxs=[atm.GetIdx() for atm in lf1neighbsnota]
             idxtobisectidxs[atomidx]=bisectidxs
         elif (atom.IsConnected(lf1atom) and  atom.IsConnected(lf2atom) and get_symm_class(lf1) == get_symm_class(lf2)): # then this is like middle propane carbon or oxygen in water
-            print('bisector')
+            #print('bisector')
             localframe2[atomidx - 1] *= -1 #for bisector you just make the index have a negative number, it can be both lfa1,lfa2 negative or just one of them
             lf2write[atomidx - 1] *= -1
         elif (atom.IsConnected(lf1atom) and get_symm_class(lf1) == get_symm_class(atomidx)): # this handles, ethane,ethene...., z-only
-            print('we are making z-only right here ethene,ethane')
+            #print('we are making z-only right here ethene,ethane')
             lf2write[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
         elif CheckIfAllAtomsSameClass(atomneighbs)==False and CheckIfAllAtomsSameClass(lf1neighbsnota)==True and CheckIfAllAtomsSameClass(neighbsnotlf1)==True and val!=2 and lf1val!=2: # then this is like CH3PO3, we want z-onlytrisector would also work, also handles Analine
-            print('we are making z-only right here symmetry like Analine',atomidx)
+            #print('we are making z-only right here symmetry like Analine',atomidx)
             lf2write[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
         elif CheckIfAllAtomsSameClass(neighbsnotlf1)==True and CheckIfAllAtomsSameClass(lf1neighbsnota)==False and AtLeastOneHeavyNeighbNotA(lf1atom,atom)==True: # then we can use z-then-x for lf1 and the heavy atom neighbor
             
             heavyatomidx=GrabHeavyAtomIdx(lf1atom,atom)
-            print('new z-then-x','heavyatomidx ',heavyatomidx,'atomidx ',atomidx)
+            #print('new z-then-x','heavyatomidx ',heavyatomidx,'atomidx ',atomidx)
             lf2write[atomidx - 1] = heavyatomidx
         elif CheckIfAllAtomsSameClass(neighbsnotlf1)==True and CheckIfAllAtomsSameClass(atomneighbs)==False and lf1atom.GetValence()==2: # then we can still use z-then-x 
-            print('new z-then-x special')
+            #print('new z-then-x special')
             lf2write[atomidx - 1] = lf1neighbsnota[0].GetIdx() # there is only one atom in this list
         elif CheckIfAllAtomsSameClass(atomneighbs) and CheckIfAllAtomsSameClass(neighbsnotlf1)==True and CheckIfAllAtomsSameClass(lf1neighbsnota)==True and lf1val==3 and val!=1: # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector
-            print('bisect then z','atomidx ',atomidx)
+            #print('bisect then z','atomidx ',atomidx)
             idxtobisecthenzbool[atomidx]=True
             bisectidxs=[atm.GetIdx() for atm in lf1neighbsnota]
             idxtobisectidxs[atomidx]=bisectidxs
@@ -2225,9 +2222,7 @@ def gen_peditinfile (mol):
             bisectidxs=idxtobisectidxs[a.GetIdx()]
             f.write(str(a.GetIdx()) + " " + str(localframe1[a.GetIdx() - 1]) + " -" + str(bisectidxs[0])+ " -" + str(bisectidxs[1]) + "\n")
         else:
-            print('we are in this case now')
             trisecidxs=idxtotrisectidxs[a.GetIdx()]
-            print('trisect idxs are ',trisecidxs)
             f.write(str(a.GetIdx()) + " -" + str(trisecidxs[0])+ " -" + str(trisecidxs[1]) + " -" + str(trisecidxs[2])+ "\n")
     
 
@@ -2260,7 +2255,8 @@ def gen_peditinfile (mol):
         f.write(str(ia[0]) + " " + str(0.921) + "\n")
 
     #f.write("\n")
-
+    #f.write('\n')
+    f.write('\n')
     #Define polarizable groups by cutting bonds
     iterbond = openbabel.OBMolBondIter(mol)
     for b in iterbond:
@@ -2281,7 +2277,7 @@ def gen_peditinfile (mol):
             if (cut_bond):
                 f.write( str(b.GetBeginAtomIdx()) + " " + str(b.GetEndAtomIdx()) + "\n")
 
-    f.write('\n')
+    #f.write('\n')
     f.write('\n')
     f.write("N\n")
     f.close()
@@ -5023,26 +5019,6 @@ def main():
     else:
         shutil.copy(key4fname,key5fname)
 
-    #If the output format is set to tinker 4, a key_6
-    #is created with parameters in the tinker 4 format
-    if output_format == 4:
-        key5 = open(key5fname)
-        key6 = open(keyfname+"_6","w")
-        for line in key5:
-            if 'polarize' in line:
-                ln = ""
-                for i in range(len(line.split())):
-                    if i != 3:
-                        if i == 1:
-                            ln += line.split()[i] + "                          "
-                        else:
-                            ln += line.split()[i] + "  "
-                ln += "\n"
-                key6.write(ln)
-            else:
-                key6.write(line)
-
-    gen_tinker5_to_4_convert_input(mol, amoeba_conv_spec_fname)
 
 
 
