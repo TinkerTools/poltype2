@@ -2569,7 +2569,7 @@ def get_torlist(mol):
         t3 = bond.GetEndAtom()
         t2idx=t2.GetIdx()
         t3idx=t3.GetIdx()
-        if (bond.IsRotor()) or (str(t2idx) in onlyrotbndlist and str(t3idx) in onlyrotbndlist) or (t2.GetAtomicNum()==6 and t3.GetAtomicNum())==6: #TEMP
+        if (bond.IsRotor()) or (str(t2idx) in onlyrotbndlist and str(t3idx) in onlyrotbndlist):
             skiptorsion = False
             t1,t4 = find_tor_restraint_idx(mol,t2,t3)
             # is the torsion in toromitlist
@@ -2595,8 +2595,6 @@ def get_torlist(mol):
             if str(t2idx) in onlyrotbndlist and str(t3idx) in onlyrotbndlist and onlyrotbnd==True:
                 skiptorsion = False
             if rotalltors==True:
-                skiptorsion=False
-            if t2.GetAtomicNum()==6 and t3.GetAtomicNum()==6: # TEMP
                 skiptorsion=False
 
             rotbndkey = '%d %d' % (t2.GetIdx(), t3.GetIdx())
