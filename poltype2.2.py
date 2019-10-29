@@ -187,10 +187,8 @@ def call_subsystem_externalnode(cmdstr,node,wait=False):
     now = time.strftime("%c",time.localtime())
 
     curdir=os.getcwd()
-    if node=='localhost':
-        cmd=cmdstr
-    else:
-        cmd = 'ssh %s "cd %s;source %s;%s"' %(str(node),curdir,bashrcpath,cmdstr)
+  
+    cmd = 'ssh %s "cd %s;source %s;%s"' %(str(node),curdir,bashrcpath,cmdstr)
     logfh.write(now + " Calling: " + cmd + " on node "+node+"\n")
     logfh.flush()
     os.fsync(logfh.fileno())
@@ -724,6 +722,12 @@ def init_filenames ():
     global scrtmpdir
     global tmpxyzfile
     global tmpkeyfile
+
+
+    if ("GAUSS_SCRDIR" in os.environ):
+        scratchdir = os.environ["GAUSS_SCRDIR"]
+        if not os.path.isdir(scratchdir):
+            os.mkdir(scratchdir)
 
     head, molstructfname = os.path.split(molstructfname)
     molecprefix =  os.path.splitext(molstructfname)[0]
@@ -5221,11 +5225,11 @@ def main():
         cpunodetousableproc={}
         cpunodetousableram={}
         cpunodetousabledisk={}
-        cpunodetousableproc['localhost']=numproc
-        cpunodetousableram['localhost']=maxram
-        cpunodetousabledisk['localhost']=maxdisk
-        cpunodetodiskunit['localhost']='GB'
-        cpunodes=['localhost']
+        cpunodetousableproc[defaultnode]=numproc
+        cpunodetousableram[defaultnode]=maxram
+        cpunodetousabledisk[defaultnode]=maxdisk
+        cpunodetodiskunit[defaultnode]='GB'
+        cpunodes=[defaultnode]
     if (parmtors):
         # torsion scanning
         gen_torsion(optmol,torsionrestraint,cpunodetousableproc,cpunodetousableram,cpunodetousabledisk,cpunodetodiskunit,cpunodes)

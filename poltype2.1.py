@@ -695,6 +695,11 @@ def init_filenames ():
     global tmpxyzfile
     global tmpkeyfile
 
+    if ("GAUSS_SCRDIR" in os.environ):
+        scratchdir = os.environ["GAUSS_SCRDIR"]
+        if not os.path.isdir(scratchdir):
+            os.mkdir(scratchdir)
+
     head, molstructfname = os.path.split(molstructfname)
     molecprefix =  os.path.splitext(molstructfname)[0]
     logfname = assign_filenames ( "logfname" , "-poltype.log")
