@@ -2165,49 +2165,50 @@ def gen_peditinfile (mol):
         lf1neighbsnota=RemoveFromList(lf1neighbs,atom)
         neighbsnotlf1=RemoveFromList(atomneighbs,lf1atom)
         if val==1 and CheckIfAllAtomsSameClass(lf1neighbs)==True and lf1val==4: # then this is like H in Methane, we want Z-only
-            #print('we are making z-only right here',atomidx)
+            print('we are making z-only right here',atomidx)
             lf2write[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
             atomtypetospecialtrace[atomidx]=True
             atomindextoremovedipquadcross[atomidx]=True
         elif CheckIfAllAtomsSameClass(lf1neighbs)==True and AtLeastOneHeavyNeighb(atom)==False and val==4: # then this is like carbon in Methane, we want Z-only
-            #print('we are making z-only right here, C methane',atomidx)
+            print('we are making z-only right here, C methane',atomidx)
             lf2write[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
             atomindextoremovedipquad[atomidx]=True
         elif atom.GetAtomicNum()==7 and CheckIfAllAtomsSameClass(atomneighbs)==True and val==3: # then this is like Ammonia and we can use a trisector here which behaves like Z-only
-            #print('we are using trisector for ammonia',atomidx)
+            print('we are using trisector for ammonia',atomidx)
             idxtotrisecbool[atomidx]=True
             trisectidxs=[atm.GetIdx() for atm in atomneighbs]
             #print('trisectidxs ',trisectidxs)
             idxtotrisectidxs[atomidx]=trisectidxs
             lfzerox[atomidx - 1]=True # need to zero out the x components just like for z-only case
         elif val==1 and lf1val==3 and CheckIfAllAtomsSameClass(lf1neighbs)==True: # then this is like the H on Ammonia and we can use z-then bisector
+            print('z bisector H on amonia ')
             idxtobisecthenzbool[atomidx]=True
             bisectidxs=[atm.GetIdx() for atm in lf1neighbsnota]
             idxtobisectidxs[atomidx]=bisectidxs
         elif (atom.IsConnected(lf1atom) and  atom.IsConnected(lf2atom) and get_symm_class(lf1) == get_symm_class(lf2)): # then this is like middle propane carbon or oxygen in water
-            #print('bisector')
+            print('bisector')
             localframe2[atomidx - 1] *= -1 #for bisector you just make the index have a negative number, it can be both lfa1,lfa2 negative or just one of them
             lf2write[atomidx - 1] *= -1
         elif (atom.IsConnected(lf1atom) and get_symm_class(lf1) == get_symm_class(atomidx)): # this handles, ethane,ethene...., z-only
-            #print('we are making z-only right here ethene,ethane')
+            print('we are making z-only right here ethene,ethane')
             lf2write[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
-        elif CheckIfAllAtomsSameClass(atomneighbs)==False and CheckIfAllAtomsSameClass(lf1neighbsnota)==True and CheckIfAllAtomsSameClass(neighbsnotlf1)==True and val!=2 and lf1val!=2: # then this is like CH3PO3, we want z-onlytrisector would also work, also handles Analine
-            #print('we are making z-only right here symmetry like Analine',atomidx)
+        elif CheckIfAllAtomsSameClass(atomneighbs)==False and CheckIfAllAtomsSameClass(lf1neighbsnota)==True and CheckIfAllAtomsSameClass(neighbsnotlf1)==True and val!=2 and lf1val!=2 and val!=4 and lf1val!=4: # then this is like CH3PO3, we want z-onlytrisector would also work, also handles Analine
+            print('we are making z-only right here symmetry like Analine',atomidx)
             lf2write[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
         elif CheckIfAllAtomsSameClass(neighbsnotlf1)==True and CheckIfAllAtomsSameClass(lf1neighbsnota)==False and AtLeastOneHeavyNeighbNotA(lf1atom,atom)==True: # then we can use z-then-x for lf1 and the heavy atom neighbor
             
             heavyatomidx=GrabHeavyAtomIdx(lf1atom,atom)
-            #print('new z-then-x','heavyatomidx ',heavyatomidx,'atomidx ',atomidx)
+            print('new z-then-x','heavyatomidx ',heavyatomidx,'atomidx ',atomidx)
             lf2write[atomidx - 1] = heavyatomidx
         elif CheckIfAllAtomsSameClass(neighbsnotlf1)==True and CheckIfAllAtomsSameClass(atomneighbs)==False and lf1atom.GetValence()==2: # then we can still use z-then-x 
-            #print('new z-then-x special')
+            print('new z-then-x special')
             lf2write[atomidx - 1] = lf1neighbsnota[0].GetIdx() # there is only one atom in this list
-        elif CheckIfAllAtomsSameClass(atomneighbs) and CheckIfAllAtomsSameClass(neighbsnotlf1)==True and CheckIfAllAtomsSameClass(lf1neighbsnota)==True and lf1val==3 and val!=1: # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector
-            #print('bisect then z','atomidx ',atomidx)
+        elif CheckIfAllAtomsSameClass(atomneighbs)==False and CheckIfAllAtomsSameClass(neighbsnotlf1)==True and CheckIfAllAtomsSameClass(lf1neighbsnota)==True and lf1val==3 and val!=1: # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector
+            print('bisect then z','atomidx ',atomidx)
             idxtobisecthenzbool[atomidx]=True
             bisectidxs=[atm.GetIdx() for atm in lf1neighbsnota]
             idxtobisectidxs[atomidx]=bisectidxs
