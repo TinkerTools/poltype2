@@ -2275,7 +2275,7 @@ def gen_peditinfile (mol):
                 
     # write out the local frames
     iteratom = openbabel.OBMolAtomIter(mol)
-    if not os.path.isfile(peditinfile,'r'):
+    if not os.path.isfile(peditinfile):
         f = open (peditinfile, 'w')
         for a in iteratom:
             if idxtobisecthenzbool[a.GetIdx()]==False and idxtotrisecbool[a.GetIdx()]==False:
