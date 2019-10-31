@@ -1067,6 +1067,7 @@ def post_proc_localframes(keyfilename, lfzerox,atomindextoremovedipquad,atominde
             """
             # manually zero out components of the multipole if they were not done by poledit
             if lfzerox[int(atmidx) - 1]:
+                #print('I AM HERE')
                 tmpmp = list(map(float, lines[ln1+1].split()))
                 tmpmp[0] = 0
                 lines[ln1+1] = '%46.5f %10.5f %10.5f\n' % tuple(tmpmp)
@@ -1079,6 +1080,7 @@ def post_proc_localframes(keyfilename, lfzerox,atomindextoremovedipquad,atominde
                 lines[ln1+4] = '%46.5f %10.5f %10.5f\n' % tuple(tmpmp)
 
             if int(atmidx) in atomindextoremovedipquad.keys():
+                #print('NOW HERE')
                 tmpmp = list(map(float, lines[ln1+1].split()))
                 tmpmp[0] = 0
                 tmpmp[1] = 0
@@ -1098,7 +1100,7 @@ def post_proc_localframes(keyfilename, lfzerox,atomindextoremovedipquad,atominde
                 lines[ln1+4] = '%46.5f %10.5f %10.5f\n' % tuple(tmpmp)
 
             if int(atmidx) in atomindextoremovedipquadcross.keys():
-
+                #print('UP HERE')
                 tmpmp = list(map(float, lines[ln1+3].split()))
                 tmpmp[0] = 0
                 lines[ln1+3] = '%46.5f %10.5f\n' % tuple(tmpmp)
@@ -4938,6 +4940,7 @@ def main():
         call_subsystem(cmdstr)
         # Add header to the key file output by poledit
         prepend_keyfile(keyfname)
+    
     # post process local frames written out by poledit
     post_proc_localframes(keyfname, lfzerox,atomindextoremovedipquad,atomindextoremovedipquadcross)
     # generate the electrostatic potential grid used for multipole fitting
@@ -4958,7 +4961,7 @@ def main():
         avgmpolecmdstr = avgmpolesexe + " " + keyfname + " " + xyzfname + " " + grpfname + " " + key2fname + " " + xyzoutfile + " " + str(prmstartidx)
         call_subsystem(avgmpolecmdstr)
         prepend_keyfile(key2fname)
-
+        
     if espfit:
         # Optimize multipole parameters to QM ESP Grid (*.cube_2)
         # tinker's potential utility is called, with option 6.

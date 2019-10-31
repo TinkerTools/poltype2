@@ -149,6 +149,7 @@ my %atmnumtozthenbisectbool;
 foreach $atmnum ($first .. $last)
 {
    $atmnumtozthenbisectbool{$atmnum} = 0;
+   $atmnumtozthenbisectbool{$typeid[$atmnum]} = 0;
    foreach $linenum (0 .. $#lines)
    {
       $anum = (split ' ', $lines[$linenum])[1];
@@ -179,22 +180,25 @@ foreach $atmnum ($first .. $last)
             print "Content converted c3: $c3[$typeid[$atmnum]]\n";
          }
 
-            $e11[$typeid[$atmnum]] += (split ' ', $lines[$linenum])[5];
+
+            $e11[$typeid[$atmnum]] += (split ' ', $lines[$linenum])[5]; # this goes with if size==6
          }
+
+
          elsif ($size==4) # case where z only c3 is blank
          {
             $e11[$typeid[$atmnum]] += (split ' ', $lines[$linenum])[3]
          }
 
-         else
+         else # 
          {
             $e11[$typeid[$atmnum]] += (split ' ', $lines[$linenum])[4]
          }
 
          $c1[$typeid[$atmnum]] = $typeid[(split ' ', $lines[$linenum])[2]];
          print "Content converted c1: $c1[$typeid[$atmnum]]\n";
-         my $tmpval = (split ' ', $lines[$linenum])[3];
-         my $tmpval2 = (split ' ', $lines[$linenum])[2];
+         my $tmpval = (split ' ', $lines[$linenum])[3]; # this corresponds to C2
+         my $tmpval2 = (split ' ', $lines[$linenum])[2]; # corresponds to C1
          #print "line split ", (split ' ', $lines[$linenum]);
          #print "tmpval2 before ", $tmpval2;
          $c2[$typeid[$atmnum]] = $typeid[(split ' ', $lines[$linenum])[3]];
@@ -252,7 +256,7 @@ foreach $typenum (@grp_heads)
 {
    if ($N[$typeid[$typenum]])
    {
-      $c0 = $typeid[$typenum];
+      $c0 = $typeid[$typenum]; # this is the same as anum in the last for loop
 
       $e11[$typeid[$typenum]] = $e11[$typeid[$typenum]] / $N[$typeid[$typenum]];
       $e21[$typeid[$typenum]] = $e21[$typeid[$typenum]] / $N[$typeid[$typenum]];
@@ -264,8 +268,9 @@ foreach $typenum (@grp_heads)
       $e51[$typeid[$typenum]] = $e51[$typeid[$typenum]] / $N[$typeid[$typenum]];
       $e52[$typeid[$typenum]] = $e52[$typeid[$typenum]] / $N[$typeid[$typenum]];
       $e53[$typeid[$typenum]] = $e53[$typeid[$typenum]] / $N[$typeid[$typenum]];
-      if ($c2[$typeid[$typenum]] < 0)
+      if ($c2[$typeid[$typenum]] < 0 and $atmnumtozthenbisectbool{$typenum} == 0)  # if the C2 is negative due to bisector this is okay (why dont we also make y zero??) not for z-then-bisector or trisector
       {
+         print "About to zero the x dipole and xz quadrupole";
          $e21[$typeid[$typenum]] = 0.0;
          $e51[$typeid[$typenum]] = 0.0;
       }
@@ -299,18 +304,18 @@ foreach $typenum (@grp_heads)
                   "%37s%8.5f%11.5f%11.5f", " ",
                   "$e21[$typeid[$typenum]]",        "0.00000",
                   "$e23[$typeid[$typenum]]"
-                 );
+                 ); # makes the y component of dipole 0 because the dipole vector only needs to be described in a plane (the x and z plane)
       print OUT "\n";
-      printf OUT ("%37s%8.5f", " ", "$e31[$typeid[$typenum]]");
+      printf OUT ("%37s%8.5f", " ", "$e31[$typeid[$typenum]]"); # xx component of quadrupole
       print OUT "\n";
-      printf OUT ("%37s%8.5f%11.5f", " ", "0.000", "$e42[$typeid[$typenum]]");
+      printf OUT ("%37s%8.5f%11.5f", " ", "0.000", "$e42[$typeid[$typenum]]"); # makes the xy component of quadrupole zero
       print OUT "\n";
       printf OUT (
                   "%37s%8.5f%11.5f%11.5f", " ",
                   "$e51[$typeid[$typenum]]",        "0.000",
                   "$e53[$typeid[$typenum]]"
                  );
-      print OUT "\n";
+      print OUT "\n"; # makes the yz component of the quadrupole zero
 
       #print "\t\t\t\t\t$e21[$typenum]  0.000  $e23[$typenum]\n";
       #print "\t\t\t\t\t$e31[$typenum]\n";
