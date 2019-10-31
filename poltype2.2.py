@@ -723,9 +723,8 @@ def init_filenames ():
     global tmpxyzfile
     global tmpkeyfile
 
-
     if ("GAUSS_SCRDIR" in os.environ):
-        scratchdir = os.environ["GAUSS_SCRDIR"]
+        scratchdir = os.environ["GAUSS_SCRDIR"].rstrip('//')
         if not os.path.isdir(scratchdir):
             os.mkdir(scratchdir)
 
@@ -753,7 +752,7 @@ def init_filenames ():
     key5fname = assign_filenames ( "key5fname" , ".key_5")
     xyzoutfile = assign_filenames ( "xyzoutfile" , ".xyz_2")
     valoutfname = assign_filenames ( "valoutfname" , "sp.valout")
-    scrtmpdir = scratchdir + '/Gau-' + molecprefix
+    scrtmpdir = scratchdir.rstrip('//') + '/Gau-' + molecprefix
     tmpxyzfile = 'ttt.xyz'
     tmpkeyfile = 'ttt.key'
 
@@ -1498,14 +1497,23 @@ def gen_comfile (comfname,numproc,maxmem,chkname,tailfname,mol):
     tmpfh = open(comfname, "a")
     #NOTE: Need to pass parameter to specify basis set
     if ('dma' in comfname):
-        opstr="#P MP2/%s Sp Density=MP2 MaxDisk=%s\n" % (dmabasisset, maxdisk)
+        if dmamethod=='MP2':
+            densitystring='MP2'
+        else:
+            densitystring='SCF'
+        opstr="#P %s/%s Sp Density=%s MaxDisk=%s\n" % (dmamethod,dmabasisset, densitystring,maxdisk)
     elif ('pop' in comfname):
         opstr="#P HF/%s MaxDisk=%s Pop=SaveMixed\n" % (popbasisset, maxdisk)
     else:
-        if sppcm==True:
-            opstr="#P %s/%s Sp Density=MP2 SCF=Save Guess=Huckel MaxDisk=%s SCRF=(PCM)\n" % (espmethod,espbasisset, maxdisk)
+        if espmethod=='MP2':
+            densitystring='MP2'
         else:
-            opstr="#P %s/%s Sp Density=MP2 SCF=Save Guess=Huckel MaxDisk=%s\n" % (espmethod,espbasisset, maxdisk)
+            densitystring='SCF'
+        if sppcm==True:
+
+            opstr="#P %s/%s Sp Density=%s SCF=Save Guess=Huckel MaxDisk=%s SCRF=(PCM)\n" % (espmethod,espbasisset, densitystring,maxdisk)
+        else:
+            opstr="#P %s/%s Sp Density=%s SCF=Save Guess=Huckel MaxDisk=%s\n" % (espmethod,espbasisset, densitystring,maxdisk)
 
 
     bset=re.search('(?i)(6-31|aug-cc)\S+',opstr)
@@ -1514,13 +1522,13 @@ def gen_comfile (comfname,numproc,maxmem,chkname,tailfname,mol):
     tmpfh.write(opstr)
     tmpfh.close()
     cmdstr = "tail -n +2 " + tailfname + " | head -n 4 >> " + comfname
-    call_subsystem_externalnode(cmdstr,defaultnode)(cmdstr)
+    os.system(cmdstr)
     cmdstr = "tail -n +6 " + tailfname + " | sed -e's/ .*//' > tmp1.txt"
-    call_subsystem_externalnode(cmdstr,defaultnode)
+    os.system(cmdstr)
     cmdstr = "grep -A " + str(mol.NumAtoms()+4) + " 'Standard orientation' " + gausoptfname + " | tail -n " + str(mol.NumAtoms()) + " | sed -e's/^.* 0 //' > tmp2.txt"
-    call_subsystem_externalnode(cmdstr,defaultnode)
+    os.system(cmdstr)
     cmdstr = "paste tmp1.txt tmp2.txt >> " + comfname
-    call_subsystem_externalnode(cmdstr,defaultnode)
+    os.system(cmdstr)
     if ('dma' in comfname):
         append_basisset(comfname, mol.GetSpacedFormula(), dmabasisset)
     else:
@@ -1683,8 +1691,12 @@ def run_psi4(mol):
     temp.close()
     os.remove(comtmp)
     os.rename(tempname,comtmp)
-    if not os.path.isdir(scrtmpdir):
-        os.mkdir(scrtmpdir)
+    if use_psi4 or use_psi4SPonly:
+        mkdirstr='mkdir '+scratchdir
+        call_subsystem_externalnode(mkdirstr,defaultnode)
+    else:
+        mkdirstr='mkdir '+scrtmpdir
+        call_subsystem_externalnode(mkdirstr,defaultnode)
 
     if use_psi4SPonly==True: # try to use gaussian for opt
 
@@ -1816,10 +1828,14 @@ def run_gaussian(mol):
     title = "\"" + molecprefix + " Gaussian Optimization on " + gethostname() + "\""
     cmdstr = babelexe + " --title " + title + " "+ molstructfname+ " " + comtmp
     call_subsystem_externalnode(cmdstr,defaultnode,True)
-    time.sleep(2)
 
-    assert os.path.getsize(comtmp) > 0, "Error: " + \
-       os.path.basename(babelexe) + " cannot create .com file."
+    if use_psi4 or use_psi4SPonly:
+        mkdirstr='mkdir '+scratchdir
+        call_subsystem_externalnode(mkdirstr,defaultnode)
+    else:
+        mkdirstr='mkdir '+scrtmpdir
+        call_subsystem_externalnode(mkdirstr,defaultnode)
+    
 
     tempname=comtmp.replace('.com','temp.com')
     temp=open(comtmp,'r')
@@ -1944,7 +1960,7 @@ def process_types (mol):
     return scalelist
 
 
-def gen_gdmain(gdmainfname,molecprefix,fname):
+def gen_gdmain(gdmainfname,molecprefix,fname,dmamethod):
     """
     Intent: Generate GDMA input file for the molecule
     Input: 
@@ -1964,7 +1980,7 @@ def gen_gdmain(gdmainfname,molecprefix,fname):
         print(e)
         
         
-    dmamethod='MP2'
+
     #punfname = os.path.splitext(fname)[0] + ".punch"
     punfname = "dma.punch"
 
@@ -1976,12 +1992,16 @@ def gen_gdmain(gdmainfname,molecprefix,fname):
 
     tmpfh.write("Title " + molecprefix + " gdmain\n")
     tmpfh.write("\n")
+    if dmamethod=='MP2':
+        densitystring='MP2'
+    else:
+        densitystring='SCF'
     if use_psi4 or use_psi4SPonly:
         if dmamethod=='MP2':
-            dmamethod='CC' # for some reason fchk outputs CC for MP2 density
-        tmpfh.write("File " + fnamesym  + " density %s\n"%(dmamethod))
+            densitystring='CC' # for some reason fchk outputs CC for MP2 density
+        tmpfh.write("File " + fnamesym  + " density %s\n"%(densitystring))
     else:
-        tmpfh.write("File " + fnamesym  + " density %s\n"%(dmamethod))
+        tmpfh.write("File " + fnamesym  + " density %s\n"%(densitystring))
     tmpfh.write("Angstrom\n")
     tmpfh.write("AU\n")
     tmpfh.write("Multipoles\n")
@@ -2028,7 +2048,7 @@ def run_gdma():
 
     assert os.path.isfile(fckdmafname), "Error: " + fckdmafname + " does not exist."
     gdmainfname = assign_filenames ( "gdmainfname" , ".gdmain")
-    gen_gdmain(gdmainfname,molecprefix,fckdmafname)
+    gen_gdmain(gdmainfname,molecprefix,fckdmafname,dmamethod)
 
     cmdstr = gdmaexe + " < " + gdmainfname + " > " + gdmafname
     call_subsystem_externalnode(cmdstr,defaultnode,True)
@@ -2083,13 +2103,6 @@ def RemoveFromList(atomlist,atm):
         if idx!=newatm.GetIdx():
             newatmlist.append(newatm)
     return newatmlist
-
-def RemoveHNeighbs(atomneighbs):
-    atomneighbsnoH=[]
-    for atm in atomneighbs:
-        if atm.GetAtomicNum()!=1:
-            atomneighbsnoH.append(atm)
-    return atomneighbsnoH
 
 
 def AtLeastOneHeavyNeighbNotA(lf1atom,atom):
@@ -2212,7 +2225,6 @@ def gen_peditinfile (mol):
         atomidx=atom.GetIdx()
         val=atom.GetValence()
         atomneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(atom)]
-        atomneighbsnoH=RemoveHNeighbs(atomneighbs)
         lf1=localframe1[atomidx-1]
         lf2=localframe2[atomidx-1]
         lf1atom=mol.GetAtom(lf1)
@@ -2296,21 +2308,32 @@ def gen_peditinfile (mol):
 
         #Find aromatic carbon, halogens, and bonded hydrogens to correct polarizability
         iteratom = openbabel.OBMolAtomIter(mol)
+        writesection=False
+        lines=[]
         for a in iteratom:
             if (a.GetAtomicNum() == 6 and a.IsAromatic()):
-                f.write(str(a.GetIdx()) + " " + str(1.750) + "\n")
+                lines.append(str(a.GetIdx()) + " " + str(1.750) + "\n")
+                writesection=True
             elif (a.GetAtomicNum() == 9):
-                f.write(str(a.GetIdx()) + " " + str(0.507) + "\n")
+                lines.append(str(a.GetIdx()) + " " + str(0.507) + "\n")
+                writesection=True
             elif (a.GetAtomicNum() == 17):
-                f.write(str(a.GetIdx()) + " " + str(2.500) + "\n")
+                lines.append(str(a.GetIdx()) + " " + str(2.500) + "\n")
+                writesection=True
             elif (a.GetAtomicNum() == 35):
-                f.write(str(a.GetIdx()) + " " + str(3.595) + "\n")
+                lines.append(str(a.GetIdx()) + " " + str(3.595) + "\n")
+                writesection=True
             elif (a.GetAtomicNum() == 1):
                 iteratomatom = openbabel.OBAtomAtomIter(a)
                 for b in iteratomatom:
                     if (b.GetAtomicNum() == 6 and b.IsAromatic()):
-                        f.write(str(a.GetIdx()) + " " + str(0.696) + "\n")
-
+                        lines.append(str(a.GetIdx()) + " " + str(0.696) + "\n")
+                        writesection=True
+        if writesection==True:
+            #f.write("\n")
+            for line in lines:
+                f.write(line)
+            
         # Carboxylate ion O-
         sp = openbabel.OBSmartsPattern()
         openbabel.OBSmartsPattern.Init(sp,'[OD1]~C~[OD1]')
@@ -2318,9 +2341,9 @@ def gen_peditinfile (mol):
         for ia in sp.GetMapList():
             f.write(str(ia[0]) + " " + str(0.921) + "\n")
 
-        #f.write("\n")
+        f.write("\n")
         #f.write('\n')
-        f.write('\n')
+        #f.write('\n')
         #Define polarizable groups by cutting bonds
         iterbond = openbabel.OBMolBondIter(mol)
         for b in iterbond:
@@ -2346,6 +2369,7 @@ def gen_peditinfile (mol):
         f.write("N\n")
         f.close()
     return lfzerox,atomindextoremovedipquad,atomtypetospecialtrace,atomindextoremovedipquadcross
+
 
 def CalculateSymmetry(pmol, frag_atoms, symmetry_classes):
     """
@@ -3074,8 +3098,12 @@ def ExecuteJobsParallel(optinputfilestoinfo,optmol,a,b,c,d,torang,consttorlist,t
                         if os.path.isfile(outputlog): # then we need to wait for this job to finish
                             pass
                         else: # then we need to submit
-                            mkdirstr='mkdir '+scrtmpdir
-                            call_subsystem_externalnode(mkdirstr,node)
+                            if use_psi4 or use_psi4SPonly:
+                                mkdirstr='mkdir '+scratchdir
+                                call_subsystem_externalnode(mkdirstr,node)
+                            else:
+                                mkdirstr='mkdir '+scrtmpdir
+                                call_subsystem_externalnode(mkdirstr,node)
                             time.sleep(1)
                             call_subsystem_externalnode(cmdstr,node)
                     elif len(jobslist)>1: # have all of the logs in jobslist before this one already finished? If so, then can decide to submit new one or not, otherwise must wait
@@ -3085,8 +3113,12 @@ def ExecuteJobsParallel(optinputfilestoinfo,optmol,a,b,c,d,torang,consttorlist,t
                             if os.path.isfile(outputlog): # then we need to wait to submit
                                 pass
                             else:
-                                mkdirstr='mkdir '+scrtmpdir
-                                call_subsystem_externalnode(mkdirstr,node)
+                                if use_psi4 or use_psi4SPonly:
+                                    mkdirstr='mkdir '+scratchdir
+                                    call_subsystem_externalnode(mkdirstr,node)
+                                else:
+                                    mkdirstr='mkdir '+scrtmpdir
+                                    call_subsystem_externalnode(mkdirstr,node)
                                 time.sleep(1)
                                 call_subsystem_externalnode(cmdstr,node)
         logfh.write('Sleeping for %d '%(sleeptime)+' minute '+'\n')     
@@ -3683,8 +3715,11 @@ def gen_esp_grid(mol):
             fckfname = os.path.splitext(fckfname)[0]
 
         assert os.path.isfile(fckfname), "Error: " + fckfname + " does not exist."
-        gencubecmd = cubegenexe + " 0 potential=MP2 " + fckfname + " " + \
-                     qmespfname + " -5 h < " + espgrdfname
+        if espmethod=='MP2':
+            densitystring='MP2'
+        else:
+            densitystring='SCF'
+        gencubecmd = cubegenexe + " 0 potential=%s "%(densitystring) + fckfname + " " + qmespfname + " -5 h < " + espgrdfname
         call_subsystem_externalnode(gencubecmd,defaultnode,True)
 
     # Run potential
@@ -4994,6 +5029,8 @@ def main():
     obConversion.SetInFormat(inFormat)
     obConversion.ReadFile(mol, molstructfname) 
 
+    # Begin log. *-poltype.log
+    logfh = open(logfname,"a")
     
     is2d=True
     for atom in openbabel.OBMolAtomIter(mol):
@@ -5020,8 +5057,6 @@ def main():
         torsppcm=True
         sppcm=True
 
-    # Begin log. *-poltype.log
-    logfh = open(logfname,"a")
     if use_psi4==True:
         try:
             import psi4
@@ -5136,6 +5171,7 @@ def main():
         cmdstr = peditexe + " 1 " + gdmafname +' '+paramhead+ " < " + peditinfile
         call_subsystem_externalnode(cmdstr,defaultnode,True)
         # Add header to the key file output by poledit
+        time.sleep(2)
         prepend_keyfile(keyfname)
     # post process local frames written out by poledit
     post_proc_localframes(keyfname, lfzerox,atomindextoremovedipquad,atomindextoremovedipquadcross)
@@ -5156,6 +5192,7 @@ def main():
         # call avgmpoles.pl
         avgmpolecmdstr = avgmpolesexe + " " + keyfname + " " + xyzfname + " " + grpfname + " " + key2fname + " " + xyzoutfile + " " + str(prmstartidx)
         call_subsystem_externalnode(avgmpolecmdstr,defaultnode,True)
+        time.sleep(2)
         prepend_keyfile(key2fname)
 
     if espfit:

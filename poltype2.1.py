@@ -696,7 +696,7 @@ def init_filenames ():
     global tmpkeyfile
 
     if ("GAUSS_SCRDIR" in os.environ):
-        scratchdir = os.environ["GAUSS_SCRDIR"]
+        scratchdir = os.environ["GAUSS_SCRDIR"].rstrip('//')
         if not os.path.isdir(scratchdir):
             os.mkdir(scratchdir)
 
@@ -724,7 +724,7 @@ def init_filenames ():
     key5fname = assign_filenames ( "key5fname" , ".key_5")
     xyzoutfile = assign_filenames ( "xyzoutfile" , ".xyz_2")
     valoutfname = assign_filenames ( "valoutfname" , "sp.valout")
-    scrtmpdir = scratchdir + '/Gau-' + molecprefix
+    scrtmpdir = scratchdir.rstrip('//') + '/Gau-' + molecprefix
     tmpxyzfile = 'ttt.xyz'
     tmpkeyfile = 'ttt.key'
 
@@ -1417,20 +1417,29 @@ def gen_comfile (comfname,numproc,maxmem,chkname,tailfname,mol):
     optlogfname = os.path.splitext(comfname)[0] + ".log"
     title = "\"" + molecprefix + " Gaussian SP Calculation on " + gethostname() + "\""
     cmdstr = babelexe + " --title " + title + " -i g03 " + gausoptfname + " " + tailfname
-    call_subsystem(cmdstr)
+    call_subsystem_externalnode(cmdstr,defaultnode)
 
     write_com_header(comfname,chkname)
     tmpfh = open(comfname, "a")
     #NOTE: Need to pass parameter to specify basis set
     if ('dma' in comfname):
-        opstr="#P MP2/%s Sp Density=MP2 MaxDisk=%s\n" % (dmabasisset, maxdisk)
+        if dmamethod=='MP2':
+            densitystring='MP2'
+        else:
+            densitystring='SCF'
+        opstr="#P %s/%s Sp Density=%s MaxDisk=%s\n" % (dmamethod,dmabasisset, densitystring,maxdisk)
     elif ('pop' in comfname):
         opstr="#P HF/%s MaxDisk=%s Pop=SaveMixed\n" % (popbasisset, maxdisk)
     else:
-        if sppcm==True:
-            opstr="#P %s/%s Sp Density=MP2 SCF=Save Guess=Huckel MaxDisk=%s SCRF=(PCM)\n" % (espmethod,espbasisset, maxdisk)
+        if espmethod=='MP2':
+            densitystring='MP2'
         else:
-            opstr="#P %s/%s Sp Density=MP2 SCF=Save Guess=Huckel MaxDisk=%s\n" % (espmethod,espbasisset, maxdisk)
+            densitystring='SCF'
+        if sppcm==True:
+
+            opstr="#P %s/%s Sp Density=%s SCF=Save Guess=Huckel MaxDisk=%s SCRF=(PCM)\n" % (espmethod,espbasisset, densitystring,maxdisk)
+        else:
+            opstr="#P %s/%s Sp Density=%s SCF=Save Guess=Huckel MaxDisk=%s\n" % (espmethod,espbasisset, densitystring,maxdisk)
 
 
     bset=re.search('(?i)(6-31|aug-cc)\S+',opstr)
@@ -1890,7 +1899,7 @@ def process_types (mol):
     return scalelist
 
 
-def gen_gdmain(gdmainfname,molecprefix,fname):
+def gen_gdmain(gdmainfname,molecprefix,fname,dmamethod):
     """
     Intent: Generate GDMA input file for the molecule
     Input: 
@@ -1910,7 +1919,7 @@ def gen_gdmain(gdmainfname,molecprefix,fname):
         print(e)
         
         
-    dmamethod='MP2'
+
     #punfname = os.path.splitext(fname)[0] + ".punch"
     punfname = "dma.punch"
 
@@ -1922,12 +1931,16 @@ def gen_gdmain(gdmainfname,molecprefix,fname):
 
     tmpfh.write("Title " + molecprefix + " gdmain\n")
     tmpfh.write("\n")
+    if dmamethod=='MP2':
+        densitystring='MP2'
+    else:
+        densitystring='SCF'
     if use_psi4 or use_psi4SPonly:
         if dmamethod=='MP2':
-            dmamethod='CC' # for some reason fchk outputs CC for MP2 density
-        tmpfh.write("File " + fnamesym  + " density %s\n"%(dmamethod))
+            densitystring='CC' # for some reason fchk outputs CC for MP2 density
+        tmpfh.write("File " + fnamesym  + " density %s\n"%(densitystring))
     else:
-        tmpfh.write("File " + fnamesym  + " density %s\n"%(dmamethod))
+        tmpfh.write("File " + fnamesym  + " density %s\n"%(densitystring))
     tmpfh.write("Angstrom\n")
     tmpfh.write("AU\n")
     tmpfh.write("Multipoles\n")
@@ -1974,7 +1987,7 @@ def run_gdma():
 
     assert os.path.isfile(fckdmafname), "Error: " + fckdmafname + " does not exist."
     gdmainfname = assign_filenames ( "gdmainfname" , ".gdmain")
-    gen_gdmain(gdmainfname,molecprefix,fckdmafname)
+    gen_gdmain(gdmainfname,molecprefix,fckdmafname,dmamethod)
 
     cmdstr = gdmaexe + " < " + gdmainfname + " > " + gdmafname
     call_subsystem(cmdstr)
@@ -3524,8 +3537,11 @@ def gen_esp_grid(mol):
             fckfname = os.path.splitext(fckfname)[0]
 
         assert os.path.isfile(fckfname), "Error: " + fckfname + " does not exist."
-        gencubecmd = cubegenexe + " 0 potential=MP2 " + fckfname + " " + \
-                     qmespfname + " -5 h < " + espgrdfname
+        if espmethod=='MP2':
+            densitystring='MP2'
+        else:
+            densitystring='SCF'
+        gencubecmd = cubegenexe + " 0 potential=%s "%(densitystring) + fckfname + " " + qmespfname + " -5 h < " + espgrdfname
         call_subsystem(gencubecmd,iscritical=True)
 
     # Run potential
