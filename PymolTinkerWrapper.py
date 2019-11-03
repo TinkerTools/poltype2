@@ -160,6 +160,9 @@ def DefineTinkerXYZFilePath(pathtotinkxyz):
     temp=open(tempname,'w')
     temp.write(pathtotinkxyz)
     temp.close()
+    cmd.load(pathtotinkxyz)
+    cmd.show_as('sticks')
+    cmd.bg_color("white")
 
 def ReadTinkerFinalXYZFilePath():
     if os.path.isfile('pathtotinkfinalxyz.txt'):
@@ -268,18 +271,6 @@ def PrintTinkerTotalCharge():
         if 'Total Electric Charge :' in line:
             print(line)
 
-def GrabTinkerPartialCharges(): # FIX ME
-    alzpath=GrabTinkerExecutablePath('analyze')
-    keyfilepath=ReadTinkerFinalKeyFilePath()
-    xyzfilepath=ReadTinkerFinalXYZFilePath()
-    alzoutfilepath=os.getcwd()+'/'+'alz.out'
-    alzcmd=alzpath+' '+xyzfilepath+' '+'-k'+' '+keyfilepath+' '+'m'+' '+'>'+' '+alzoutfilepath
-    CallSubprocess(alzcmd)
-    temp=open(alzoutfilepath,'r')
-    results=temp.readlines()
-    for line in results:
-        pass
-
 
 def PrintTinkerComponentEnergy():
     alzpath=GrabTinkerExecutablePath('analyze')
@@ -316,7 +307,7 @@ def GenerateIndexToCoordsDic():
     return indextocoords
             
 def GenerateIndexToFrameUnitVectors(indextocoords,indextotypenum,indextoconn,indextoframedic):
-    print(indextoframedic) 
+    #print(indextoframedic) 
     indextoframeunitvectors={}
     indextoframeunitvectors['x']={}
     indextoframeunitvectors['y']={}
@@ -342,7 +333,7 @@ def GenerateIndexToFrameUnitVectors(indextocoords,indextotypenum,indextoconn,ind
             indextoframeunitvectors['y'][index]=[0,0,0]
             indextoframeunitvectors['z'][index]=uz
         elif framedef=='z-then-x':
-            print('index ',index,'this is z then x') 
+            #print('index ',index,'this is z then x') 
             mzindex=GrabFirstNeighborIndex(index)
             mxindex=GrabSecondNeighborIndex(index)
             mzcoords=np.array(indextocoords[mzindex])
@@ -352,17 +343,8 @@ def GenerateIndexToFrameUnitVectors(indextocoords,indextotypenum,indextoconn,ind
             mxcoords=np.array(indextocoords[mxindex])
             v=np.array(mxcoords-coords)
             uv=v/np.linalg.norm(v)
-            vx=uv[0]
-            vz=uv[2]
-            zx=uz[0]
-            zz=uz[2]
-            theta=np.arccos(np.dot(uv,uz))
-            alpha=np.pi-theta
-            xz=np.cos(alpha)/(vx*(-zz/zx)+zz)
-            xx=(-xz*zz)/zx
-            x=np.array([xx,0,xz])
-            ux=x/np.linalg.norm(x)
-            uy=np.cross(uz,ux)
+            uy=np.cross(uv,uz)
+            ux=np.cross(uz,uy)
             indextoframeunitvectors['x'][index]=ux
             indextoframeunitvectors['y'][index]=uy
             indextoframeunitvectors['z'][index]=uz
@@ -405,9 +387,10 @@ def GenerateIndexToFrameUnitVectors(indextocoords,indextotypenum,indextoconn,ind
             v3=v2-v1
             disp=v3*.5
             xtemp=disp+v1
-            mag=np.linalg.norm(xtemp)
-            uxtemp=xtemp/mag
-            uy=np.cross(uz,uxtemp)
+            magx=np.linalg.norm(xtemp)
+            uxtemp=xtemp/magx
+            y=np.cross(uz,uxtemp)
+            uy=y/np.linalg.norm(y)
             ux=np.cross(uy,uz)
             indextoframeunitvectors['x'][index]=ux
             indextoframeunitvectors['y'][index]=uy
@@ -510,24 +493,9 @@ def ShowTinkerMultipoleFrame(index):
     cgo_arrow(coords,xcoords,color='red',lab='x')
     cgo_arrow(coords,ycoords,color='blue',lab='y')
     cgo_arrow(coords,zcoords,color='green',lab='z')
+    return xcoords,ycoords,zcoords,coords
 
-def ShowAllTinkerMultipoleFrames():
-    pathtotinkxyz=ReadTinkerFinalXYZFilePath()
-    indextoconn=GenerateIndexToConnectivityDic()
-    indextocoords=GenerateIndexToCoordsDic()
-    indextotypenum=GenerateIndexToTinkerTypeDic()
-    indextoframedic=GenerateIndexToFrameDic()
-    indextoframeunitvectors=GenerateIndexToFrameUnitVectors(indextocoords,indextotypenum,indextoframedic,indextoconn)
-    indextoxstructurecoords,indextoystructurecoords,indextozstructurecoords=GenerateIndexToNewXYZStructures(indextoframeunitvectors,indextocoords)
-    for index in indextocoords.keys():
-        xcoords=indextoxstructurecoords[index]
-        ycoords=indextoystructurecoords[index]
-        zcoords=indextozstructurecoords[index]
-        coords=indextocoords[index]
-        cgo_arrow(coords,xcoords,color='red',lab='x')
-        cgo_arrow(coords,ycoords,color='blue',lab='y')
-        cgo_arrow(coords,zcoords,color='green',lab='z')
-     
+    
 
             
 def GenerateIndexToConnectivityDic():
@@ -713,16 +681,7 @@ def GrabMultipoleParameters(typenumber,prmfilepath,atomindex=None): # if index i
 
     return mpllines
 
-def GrabMinDist(indexlist,indextocoords,referencecoords):
-    temp=[]
-    for index in indexlist:
-        curcoord=indextocoords[index]
-        dist=dist = numpy.linalg.norm(np.array(referencecoords)-np.array(curcoord))
-        temp.append(dist)
-    mindist=temp.min()
-    return mindist
-
-
+ 
 def GrabAllIndexesForType(typenum,indextotypenum):
     print(' typenum ',typenum)
     ls=[]
@@ -735,25 +694,7 @@ def GrabAllIndexesForType(typenum,indextotypenum):
     return ls
 
 
-def CheckForMultipleMultipoleDefs(results,typenumber):
-    hits=[]
-    for lineidx in range(len(results)):
-        line=results[lineidx]
-        if 'multipole' in line:
-            linesplit=line.split()
-            if len(linesplit)>=5:
-                poltype=linesplit[1]
-                if poltype==typenumber:
-                    print('here ',typenumber)
-                    currentneighbs=linesplit[2:-1]
-                    print('current neighbs ',currentneighbs)
-                    lastneighb=currentneighbs[-1]
-                    print(' last neighb ',lastneighb)
-                    hits.append(lastneighb)
-                    print(' hits ',hits)
-    return hits
-
-
+ 
 def CheckMultipoleResult(results,typenumber,lineidx,mpllines,indextotypenum):
     line=results[lineidx]
     if 'multipole' in line:
@@ -781,55 +722,7 @@ def CheckMultipoleResult(results,typenumber,lineidx,mpllines,indextotypenum):
                     return mpllines
     return mpllines
 
-
-
-
-def AddTinkerMultipoleParameters(mpolelines):
-    newkeyname=GenerateNewKeyName()
-    keyfilepath=ReadTinkerKeyFilePath()
-    temp=open(keyfilepath,'r')
-    results=temp.readlines()
-    temp.close()
-    temp=open(newkeyname,'w')
-    lastmpoleidx=0
-    wrote=False
-    for lineidx in range(len(results)):
-        line=results[lineidx]
-        if 'multipole' in line:
-            temp.write(line)
-            if lineidx+5>len(results)-1: # then multipole is last in keyfile rather than other stuff after multipole
-                lastmpoleidx=len(results)-1
-            else:
-                if 'multipole' not in results[lineidx+5]:
-                    lastmpoleidx=lineidx+5
-        else:
-            if lineidx==lastmpoleidx and lineidx!=0 and wrote==False:
-                temp.write('# Multipoles from prm file'+'\n')
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-                for mpoleline in mpolelines:
-                    temp.write(mpoleline)
-                    temp.flush()
-                    os.fsync(temp.fileno())
-                    sys.stdout.flush()
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-                temp.write('# Finished adding multipoles from prm file'+'\n')
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-                wrote=True
-            else:
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-    temp.close()
-    return newkeyname
-    
+   
 
 def PrintTinkerMultipoleParameters(atomindex):
     pathtotinkxyz=ReadTinkerFinalXYZFilePath()
@@ -1359,6 +1252,175 @@ def AddTinkerTorsionParameters(atomindex1,atomindex2,atomindex3,atomindex4,prm1,
                 sys.stdout.flush()
     temp.close()
 
+
+def GrabDipoleVector(atomindex):
+    indextotypenum=GenerateIndexToTinkerTypeDic()
+    typenum=indextotypenum[atomindex]
+    keyfilepath=ReadTinkerFinalKeyFilePath()
+    temp=open(keyfilepath,'r')
+    results=temp.readlines()
+    temp.close()
+    dipolevec=[]
+    for lineidx in range(len(results)):
+        line=results[lineidx]
+        if 'multipole' in line:
+            linesplit=line.split()
+            atomtype=linesplit[1]
+            if atomtype==str(typenum):
+                dipoleline=results[lineidx+1]
+                dipolelinesplit=dipoleline.split()
+                dipolevec.append(float(dipolelinesplit[0]))
+                dipolevec.append(float(dipolelinesplit[1]))
+                dipolevec.append(float(dipolelinesplit[2]))
+    return dipolevec
+
+def IsQxzComponentZero(atomindex):
+    iszero=True
+    indextotypenum=GenerateIndexToTinkerTypeDic()
+    typenum=indextotypenum[atomindex]
+    keyfilepath=ReadTinkerFinalKeyFilePath()
+    temp=open(keyfilepath,'r')
+    results=temp.readlines()
+    temp.close()
+    dipolevec=[]
+    for lineidx in range(len(results)):
+        line=results[lineidx]
+        if 'multipole' in line:
+            linesplit=line.split()
+            atomtype=linesplit[1]
+            if atomtype==str(typenum):
+                lineneeded=results[lineidx+4]
+                lineneededsplit=lineneeded.split()
+                if float(lineneededsplit[0])!=0:
+                    iszero=False
+    return iszero
+
+
+def ShowTinkerQuadrupoleCharges(atomindex):
+    iszero=IsQxzComponentZero(atomindex)
+    xcoords,ycoords,zcoords,coords=ShowTinkerMultipoleFrame(atomindex) 
+    r1,r2,r1name,r2name,uvec=ShowTinkerDipoleCharges(atomindex)
+    cmd.delete(r1name)
+    cmd.delete(r2name)
+    r1disp=r1-coords
+    monopole=GrabMonopoleCharge(atomindex)
+    if iszero==False:
+        disp=np.cross(ycoords,uvec)
+        newr1=r1+.5*disp # negative charge
+        newr2=r1-.5*disp # positive charge
+        r3=newr2-2*r1disp # negative charge
+        r4=newr1-2*r1disp # positive charge
+        newr1name=str(atomindex)+'_'+'FirstNegativeQuadrupoleCharge'
+        newr2name=str(atomindex)+'_'+'FirstPositiveQuadrupoleCharge'
+        r3name=str(atomindex)+'_'+'SecondNegativeQuadrupoleCharge'
+        r4name=str(atomindex)+'_'+'SecondPositiveQuadrupoleCharge'
+        newr1label='-'+str(monopole)
+        newr2label=str(monopole)
+        r3label='-'+str(monopole)
+        r4label=str(monopole)
+        newr1color='blue'
+        newr2color='red'
+        r3color='blue'
+        r4color='red'
+        radius=.05
+        cmd.pseudoatom(newr1name,name=newr1name,b=radius,color=newr1color,label=newr1label,pos=list(newr1))
+        cmd.pseudoatom(newr2name,name=newr2name,b=radius,color=newr2color,label=newr2label,pos=list(newr2))
+        cmd.pseudoatom(r3name,name=r3name,b=radius,color=r3color,label=r3label,pos=list(r3))
+        cmd.pseudoatom(r4name,name=r4name,b=radius,color=r4color,label=r4label,pos=list(r4))
+        r1string='nb_spheres, '+'('+'name'+' '+newr1name+')'
+        r2string='nb_spheres, '+'('+'name'+' '+newr2name+')'
+        r3string='nb_spheres, '+'('+'name'+' '+r3name+')'
+        r4string='nb_spheres, '+'('+'name'+' '+r4name+')'
+        cmd.show(r1string)
+        cmd.show(r2string)
+        cmd.show(r3string)
+        cmd.show(r4string)
+    else: # then axial quadrupole
+        newr1=coords+2*r1disp # negative q
+        newr2=coords-2*r1disp # negative q
+        r3=coords # positive 2q
+        newr1name=str(atomindex)+'_'+'FirstNegativeQuadrupoleCharge'
+        newr2name=str(atomindex)+'_'+'SecondNegativeQuadrupoleCharge'
+        r3name=str(atomindex)+'_'+'PositiveQuadrupoleCharge'
+        newr1label='-'+str(monopole)
+        newr2label='-'+str(monopole)
+        r3label=str(2*monopole)
+        newr1color='blue'
+        newr2color='blue'
+        r3color='red'
+        radius=.05
+        cmd.pseudoatom(newr1name,name=newr1name,b=radius,color=newr1color,label=newr1label,pos=list(newr1))
+        cmd.pseudoatom(newr2name,name=newr2name,b=radius,color=newr2color,label=newr2label,pos=list(newr2))
+        cmd.pseudoatom(r3name,name=r3name,b=radius,color=r3color,label=r3label,pos=list(r3))
+        r1string='nb_spheres, '+'('+'name'+' '+newr1name+')'
+        r2string='nb_spheres, '+'('+'name'+' '+newr2name+')'
+        r3string='nb_spheres, '+'('+'name'+' '+r3name+')'
+        cmd.show(r1string)
+        cmd.show(r2string)
+        cmd.show(r3string)
+        
+        
+        
+    
+    
+
+
+def GrabMonopoleCharge(atomindex):
+    indextotypenum=GenerateIndexToTinkerTypeDic()
+    typenum=indextotypenum[atomindex]
+    keyfilepath=ReadTinkerFinalKeyFilePath()
+    temp=open(keyfilepath,'r')
+    results=temp.readlines()
+    temp.close()
+    dipolevec=[]
+    for lineidx in range(len(results)):
+        line=results[lineidx]
+        if 'multipole' in line:
+            linesplit=line.split()
+            atomtype=linesplit[1]
+            if atomtype==str(typenum):
+                monopole=float(linesplit[-1])
+    return monopole
+
+def ShowTinkerMonopoleCharge(atomindex):
+    monopole=GrabMonopoleCharge(atomindex)
+    lab=str(atomindex)+','+str(monopole)
+    cmd.select("index "+str(atomindex))
+    cmd.label("sele",lab)
+    
+
+def ShowTinkerDipoleVector(atomindex):
+    indextocoords=GenerateIndexToCoordsDic()
+    coords=np.array(indextocoords[atomindex])
+    dipolevec=GrabDipoleVector(atomindex)
+    cgo_arrow(coords,dipolevec,color='black',lab='Dipole')
+
+def ShowTinkerDipoleCharges(atomindex):
+    dipolevec=GrabDipoleVector(atomindex)
+    d=np.array(dipolevec)
+    indextocoords=GenerateIndexToCoordsDic()
+    coords=np.array(indextocoords[atomindex])
+    vec=d-coords
+    uvec=vec/np.linalg.norm(vec)
+    monopole=GrabMonopoleCharge(atomindex)
+    disp=.2
+    r1=disp*uvec+coords
+    r2=-disp*uvec+coords
+    r1name=str(atomindex)+'_'+'PositiveDipoleCharge'
+    r2name=str(atomindex)+'_'+'NegativeDipoleCharge'
+    r1label=str(monopole)
+    r2label='-'+str(monopole)
+    r1color='red'
+    r2color='blue'
+    radius=.05
+    cmd.pseudoatom(r1name,name=r1name,b=radius,color=r1color,label=r1label,pos=list(r1))
+    cmd.pseudoatom(r2name,name=r2name,b=radius,color=r2color,label=r2label,pos=list(r2))
+    r1string='nb_spheres, '+'('+'name'+' '+r1name+')'
+    r2string='nb_spheres, '+'('+'name'+' '+r2name+')'
+    cmd.show(r1string)
+    cmd.show(r2string)
+    return r1,r2,r1name,r2name,uvec
+
 def GrabBondParameters(classnumber1,classnumber2,prmfilepath):
     bondline=None
     temp=open(prmfilepath,'r')
@@ -1577,8 +1639,11 @@ cmd.extend("AddTinkerAngleParameters",AddTinkerAngleParameters)
 cmd.extend("AddTinkerStretchBendParameters",AddTinkerStretchBendParameters)
 cmd.extend("AddTinkerTorsionParameters",AddTinkerTorsionParameters)
 cmd.extend("ShowTinkerMultipoleFrame",ShowTinkerMultipoleFrame)
-cmd.extend("ShowAllTinkerMultipoleFrames",ShowAllTinkerMultipoleFrames)
 cmd.extend("DefineTinkerBINPath",DefineTinkerBINPath)
 cmd.extend("PrintTinkerTotalCharge",PrintTinkerTotalCharge)
 cmd.extend("PrintTinkerComponentEnergy",PrintTinkerComponentEnergy)
 cmd.extend("AssumePoltypeDefaults",AssumePoltypeDefaults)
+cmd.extend("ShowTinkerDipoleCharges",ShowTinkerDipoleCharges)
+cmd.extend("ShowTinkerDipoleVector",ShowTinkerDipoleVector)
+cmd.extend("ShowTinkerQuadrupoleCharges",ShowTinkerQuadrupoleCharges)
+cmd.extend("ShowTinkerMonopoleCharge",ShowTinkerMonopoleCharge)
