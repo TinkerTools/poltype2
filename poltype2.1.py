@@ -313,6 +313,7 @@ def parse_options(argv):
     global torsppcm
     global freq
     global scratchdir
+    global dontdotor
 
 
     try:
@@ -1417,7 +1418,7 @@ def gen_comfile (comfname,numproc,maxmem,chkname,tailfname,mol):
     optlogfname = os.path.splitext(comfname)[0] + ".log"
     title = "\"" + molecprefix + " Gaussian SP Calculation on " + gethostname() + "\""
     cmdstr = babelexe + " --title " + title + " -i g03 " + gausoptfname + " " + tailfname
-    call_subsystem_externalnode(cmdstr,defaultnode)
+    call_subsystem(cmdstr)
 
     write_com_header(comfname,chkname)
     tmpfh = open(comfname, "a")
@@ -2526,6 +2527,14 @@ def get_torlist(mol):
     rotbndlist = {}
 
     iterbond = openbabel.OBMolBondIter(mol)
+    v1 = valence.Valence(output_format,logfname)
+    idxtoclass = []
+    for i in range(mol.NumAtoms()):
+        idxtoclass.append(i+1)
+        v1.setidxtoclass(idxtoclass)
+        # dorot is set as false in valence.py
+    v1.torguess(mol,False,[])
+    missed_torsions = v1.get_mt()
     for bond in iterbond:
         # is the bond rotatable
         t2 = bond.GetBeginAtom()
@@ -2541,14 +2550,8 @@ def get_torlist(mol):
 
             #Check to see if the torsion was found in the look up table or not
             #This decides whether it needs to be scanned for or not
-            v1 = valence.Valence(output_format,logfname)
-            idxtoclass = []
-            for i in range(mol.NumAtoms()):
-                idxtoclass.append(i+1)
-            v1.setidxtoclass(idxtoclass)
-            # dorot is set as false in valence.py
-            v1.torguess(mol,False,[])
-            missed_torsions = v1.get_mt()
+            
+            
             #pause=input('pausing...')
             if(not sorttorsion([t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()]) in missed_torsions):
                 skiptorsion = True
@@ -2596,92 +2599,7 @@ def get_torlist(mol):
 
     return (torlist ,rotbndlist)
 
-def get_torlist2(mol,bondlist,scanlist):
-    """
-    Intent: Find unique rotatable bonds.
-    Input:
-        mol: An openbabel molecule structure
-    Output:
-        torlist: contains list of 4-ples around which torsion scans are done.
-        rotbndlist: contains a hash (indexed by middle 2 atoms surrounding
-            rotatable bond) of lists that contains all possible combinations
-            around each rotatable bond.
-    Referenced By: main
-    Description:
-    1. Iterate over bonds
-        a. Check 'IsRotor()' (is the bond rotatable?)
-        b. Find the atoms 1 and 4 (of the highest possible sym_class) of a possible torsion about atoms t2 and t3 of the rotatable bond (calls find_tor_restraint_idx)
-        c. Check if this torsion is in user provided toromitlist
-        d. Check if this torsion is found in the look up table
-        e. If it neither c nor d are true, then append this torsion to 'rotbndlist' for future torsion scanning
-        f. Find other possible torsions around the bond t2-t3 and repeat steps c through e
-    """
-    torlist = []
-    rotbndlist = {}
-    iterbond = openbabel.OBMolBondIter(mol)
-    v1 = valence.Valence(output_format,logfname)
-    idxtoclass = []
-    for i in range(mol.NumAtoms()):
-        idxtoclass.append(i+1)
-    v1.setidxtoclass(idxtoclass)
-    # dorot is set as false in valence.py
-    v1.torguess(mol,False,[])
-    for bond in iterbond:
-        t2 = bond.GetBeginAtom()
-        t3 = bond.GetEndAtom()
-        # is the bond rotatable
-        if (bond.IsRotor())and( [t2.GetIdx(),t3.GetIdx()] in bondlist or [t3.GetIdx(),t2.GetIdx()] in bondlist):
-            skiptorsion = False
 
-            t1,t4 = find_tor_restraint_idx(mol,t2,t3)
-            # is the torsion in toromitlist
-            if(omittorsion2 and sorttorsion([t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()]) in toromit_list):
-                skiptorsion = True
-            #Check to see if the torsion was found in the look up table or not
-            #This decides whether it needs to be scanned for or not
-
-            test1=([t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()]) in scanlist
-            test2= ([t4.GetIdx(),t3.GetIdx(),t2.GetIdx(),t1.GetIdx()]) in scanlist
-            if test1==False and test2==False:
-                skiptorsion = True
-             
-            sortedtor=sorttorsion(tor)
-            rotbndkey = '%d %d' % (t2.GetIdx(), t3.GetIdx())
-            rotbndlist[rotbndkey] = []
-            if (not skiptorsion):
-                # store the torsion and temporary torsion value found by openbabel in torlist
-                tor = mol.GetTorsion(t1,t2,t3,t4)
-                torlist.append([t1,t2,t3,t4,tor % 360])
-                # store torsion in rotbndlist
-                rotbndlist[rotbndkey].append(get_uniq_rotbnd(
-                        t1.GetIdx(),t2.GetIdx(),
-                        t3.GetIdx(),t4.GetIdx()))
-                # write out rotatable bond to log
-                logfh.write('Rotatable bond found about %s\n' %
-                str(rotbndlist[rotbndkey][0]))
-            else:
-                continue
-            
-            #Find other possible torsions about this rotatable bond
-            iteratomatom = openbabel.OBAtomAtomIter(bond.GetBeginAtom())
-            for iaa in iteratomatom:
-                iteratomatom2 = openbabel.OBAtomAtomIter(bond.GetEndAtom())
-                for iaa2 in iteratomatom2:
-                    a = iaa.GetIdx()
-                    b = t2.GetIdx()
-                    c = t3.GetIdx()
-                    d = iaa2.GetIdx()
-                    skiptorsion = False
-                    tor=[a,b,c,d]
-                    if ((iaa.GetIdx() != t3.GetIdx() and \
-                             iaa2.GetIdx() != t2.GetIdx()) \
-                        and not (iaa.GetIdx() == t1.GetIdx() and \
-                             iaa2.GetIdx() == t4.GetIdx())):
-                        rotbndlist[rotbndkey].append(get_uniq_rotbnd(
-                            iaa.GetIdx(),t2.GetIdx(),
-                            t3.GetIdx(),iaa2.GetIdx()))
-
-    return (torlist ,rotbndlist)
 
 def get_torlist_opt_angle(optmol, torlist):
     tmplist = []
@@ -3315,10 +3233,10 @@ def opbset (smarts, opbval, opbhash, mol):
             opbkey = '%d %d 0 0' % (ib.GetIdx(), ia[1])
             if ib.GetIdx() == ia[0]:
                 if ((opbkey not in opbhash) or (opbhash[opbkey][1] == False)):
-                    opbhash[opbkey] = [opbval, True]
+                    opbhash[opbkey] = [opbval, True,smarts]
             else:
                 if opbkey not in opbhash:
-                    opbhash[opbkey] = [defopbendval, False]
+                    opbhash[opbkey] = [defopbendval, False,smarts]
 
 def gen_valinfile (mol):
     """
@@ -4274,7 +4192,7 @@ def fit_rot_bond_tors(mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict):
         a,b,c,d = tor[0:4]
         # current torsion value
         torang = mol.GetTorsion(a,b,c,d)
-        #print('Fitting Torsions around '+str(b)+'-'+str(c))
+        print('Fitting Torsions around '+str(b)+'-'+str(c))
         # class key; ie symmetry classes key
         clskey = get_class_key(a,b,c,d)
         
@@ -4283,9 +4201,9 @@ def fit_rot_bond_tors(mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict):
 
         rotbndkey = '%d %d' % (b, c)
         initangle = mol.GetTorsion(a,b,c,d)
-        #print(' torprmdict before insert torphase',torprmdict)
+        print(' torprmdict before insert torphase',torprmdict)
         # Identify all torsion parameters involved with current rotatable bond.
-        #print('rotbndlist[rotbndkey] ',rotbndlist[rotbndkey])
+        print('rotbndlist[rotbndkey] ',rotbndlist[rotbndkey])
         for toraboutbnd in rotbndlist[rotbndkey]:
             # toraboutbnd: some torsion about the current rotatable bond (rotbndkey)
             # However, initangle is the current angle for 'tor' not for 'toraboutbnd'
@@ -4323,7 +4241,7 @@ def fit_rot_bond_tors(mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict):
         # max amplitude of function
         max_amp = max(tor_energy_list) - min(tor_energy_list)
         pzero = [ max_amp ] * prmidx
-        #print('torprmdict before removing torsions to prevent overfitting',torprmdict)
+        print('torprmdict before removing torsions to prevent overfitting',torprmdict)
         # Remove parameters while # of parameters > # data points
         while prmidx > len(mm_energy_list):
             dellist= []
@@ -4332,7 +4250,7 @@ def fit_rot_bond_tors(mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict):
                 dellist.append((least_conn_tor,nfold))
             prmidx = del_tor_from_fit(dellist,torprmdict)
         pzero = [ max_amp ] * prmidx
-        #print('torprmdict after removing torsions to prevent overfitting',torprmdict)
+        print('torprmdict after removing torsions to prevent overfitting',torprmdict)
 
         # run leastsq until all the parameter estimates are reasonable
         parm_sanitized = False
@@ -4905,7 +4823,7 @@ def main():
     # Find rotatable bonds for future torsion scans
     (torlist, rotbndlist) = get_torlist(mol)
     torlist = get_torlist_opt_angle(optmol, torlist)
-    #print('torsion list is ',torlist)
+    print('torsion list is ',torlist)
     #print('rotbndlist ',rotbndlist)
     oblist, rotbndlist_forvalence = gen_valinfile(mol)
     #print('rotbndlist_forvalence ',rotbndlist_forvalence)
@@ -4937,8 +4855,9 @@ def main():
                 #print('Angle Increment is greater than 30, so default is 30 ')
         else:
             ang=360/tordatapointsnum
-        rotbndtoanginc[key]=ang
-  
+            ang=30 # TEMP
+        rotbndtoanginc[key]=int(ang)
+    print('rotbndtoanginc',rotbndtoanginc)
     
     # Obtain multipoles from Gaussian fchk file using GDMA
 
@@ -5032,6 +4951,7 @@ def main():
 
     # Torsion scanning then fitting. *.key_5 will contain updated torsions
     # default, parmtors = True
+
     if dontdotor==True:
         sys.exit()
     if (parmtors):

@@ -45,6 +45,19 @@ class Valence:
     def get_mt(self):
         return self.missed_torsions
 
+
+    def CheckAnglePAtomsSubset(self,opbatoms,anglepatoms):
+        l1=[str(i) for i in opbatoms]
+        l2=[str(i) for i in anglepatoms]
+        l1string=','.join(l1)
+        l2string=','.join(l2)
+        self.logfh.write('checking opbatoms '+l1string+' vs '+'anglepatoms '+l2string+'\n')
+        check=True
+        for angpatom in anglepatoms:
+            if angpatom not in opbatoms:
+                check=False
+        return check 
+
     def vdwguess(self, mol):
         #self.idxToClassInit(xyzfname)
         found = []
@@ -1441,8 +1454,7 @@ class Valence:
         analyzeexe = "analyze.x"
         cmdstr=analyzeexe+' '+sys.path[0]+r'/'+' '+'water.xyz'+' '+'-k'+' '+sys.path[0]+r'/'+'water.key'+' '+'e'+'>'+' '+'version.out'
         try:
-            print('Calling: '+cmdstr)
-            returned_value = subprocess.call(cmdstr, shell=True)
+            call_subsystem_externalnode(cmdstr,defaultnode)
         except:
             pass
         temp=open('version.out','r')
@@ -1463,7 +1475,7 @@ class Valence:
         for v in vals:
             for skey in iter(v):
                 openbabel.OBSmartsPattern.Init(self.sp,skey)
-                self.sp.Match(mol)
+                match=self.sp.Match(mol)
                 for ia in self.sp.GetMapList():
                     sortedlist = [self.idxtoclass[ia[0] - 1], self.idxtoclass[ia[1] - 1], self.idxtoclass[ia[2] - 1]]
                     if(mol.GetAtom(ia[0]).GetAtomicNum() > mol.GetAtom(ia[2]).GetAtomicNum()):
@@ -1474,17 +1486,20 @@ class Valence:
                     c = mol.GetAtom(ia[2])
                     angle = mol.GetAngle(a,b,c)
                     if b.GetHyb()==2 and shoulduseanglep==True: # only for SP2 hyb middle atoms use angp
-                        key2 = 'anglep%8d%6d%6d%11.4f%10.4f' % (key1[0], key1[1], key1[2], v[skey][0], angle)
+                        if b.IsInRing() and b.IsAromatic():
+                            key2 = 'anglep%8d%6d%6d%11.4f%10.4f' % (key1[0], key1[1], key1[2], v[skey][0], angle)
+                        else:
+                            key2 = 'angle%8d%6d%6d%11.4f%10.4f' % (key1[0], key1[1], key1[2], v[skey][0], angle)
+              
                     else:
                         key2 = 'angle%8d%6d%6d%11.4f%10.4f' % (key1[0], key1[1], key1[2], v[skey][0], angle)
               
-                        
+                                    
                     key1string = '%d %d %d' % (key1[0], key1[1], key1[2])
                     d.update({key1string : key2})
-        x = []
-        print('angle d ',d)
-        #sortedtuple = sorted(d.items(),key=lambda k: (k.split()[1],k.split()[0],k.split()[2]))
-        #x = [ t[1] for t in sortedtuple ]
+
+        
+
         return list(d.values())
 
     def sbguess(self, mol):
@@ -2479,6 +2494,7 @@ class Valence:
 
         torsunit = .5
         torkeytoSMILES={}
+        torkeytoindexlist={}
         d = dict()
         zeroed = False
         for v in vals:
@@ -2512,12 +2528,23 @@ class Valence:
                     
 
                     torkeytoSMILES.update({key1string:skey})
-                    
+                    torkeytoindexlist[key1string]=ia
                     d.update({key1string : key2})
                     zeroed = False
+        self.logfh.write('****************************************************************************************************'+'\n')
         for key1string,key2 in d.items():
             skey=torkeytoSMILES[key1string]
-            self.logfh.write('Torsion parameters for '+key2+ ' assigned from SMILES '+skey+'\n')
+            indexlist=torkeytoindexlist[key1string]
+            stringlist=[str(i) for i in indexlist]
+            stringindexlist=','.join(stringlist)
+            keysplit=key2.split()
+            first=float(keysplit[5])
+            second=float(keysplit[8])
+            third=float(keysplit[11])
+            if first==0 and second==0 and third==0: # then dont print
+                pass
+            else:
+                self.logfh.write('Torsion parameters for '+key2+ ' assigned from SMILES '+skey+' '+stringindexlist+'\n')
         
         x = []
 
@@ -2534,24 +2561,31 @@ class Valence:
     def opbguess(self, opbendvals):
         x = []
         clsopbvallist = {}
+        keytosmarts={}
         for (opbkey, opbval) in opbendvals:
             opblist = opbkey.split()
-            covlkey = (self.idxtoclass[int(opblist[0])-1], 
-                self.idxtoclass[int(opblist[1]) - 1],
-                int(opblist[2]),
-                int(opblist[3]))
+            covlkey = (self.idxtoclass[int(opblist[0])-1], self.idxtoclass[int(opblist[1]) - 1],int(opblist[2]),int(opblist[3]))
             if ((covlkey not in clsopbvallist) or opbval):
                 clsopbvallist[covlkey] = opbval[0]
+                keytosmarts[covlkey]=opbval[2]
         sortedopbparmlist = sorted([(key, value) for
             (key,value) in clsopbvallist.items()])
         if self.o_f == 5:
             for opbparm in sortedopbparmlist:
                 key=opbparm[0]
-                x.append('opbend %6d%6d%6d%6d%11.4f' % (key[0],key[1],key[2],key[3], opbparm[1]*71.94))
+                smarts=keytosmarts[key]
+                print('smarts ',smarts,'prms',opbparm[1]*71.94)
+                kstring='opbend %6d%6d%6d%6d%11.4f' % (key[0],key[1],key[2],key[3], opbparm[1]*71.94)
+                x.append(kstring)
+                self.logfh.write(kstring+' matched from '+smarts+' has parameters '+str(opbparm[1]*71.94)+'\n')
         else:
             for opbparm in sortedopbparmlist:
                 key=opbparm[0]
-                x.append('opbend %6d%6d%11.4f' % (key[1],key[0],opbparm[1]*71.94))
+                smarts=keytosmarts[key]
+                print('smarts ',smarts,'prms',opbparm[1]*71.94)
+                kstring='opbend %6d%6d%11.4f' % (key[1],key[0],opbparm[1]*71.94)
+                x.append(kstring)
+                logfh.write(kstring+' matched from '+smarts+' has parameters '+str(opbparm[1]*71.94)+'\n')
         return x
 
     def pitorguess(self,mol):

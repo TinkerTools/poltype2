@@ -350,7 +350,6 @@ def GenerateIndexToFrameUnitVectors(indextocoords,indextotypenum,indextoconn,ind
             indextoframeunitvectors['z'][index]=uz
 
         elif framedef=='bisector':
-
             mzindex=GrabFirstNeighborIndex(index)
             mxindex=GrabSecondNeighborIndex(index)
             mzcoords=np.array(indextocoords[mzindex])
@@ -362,11 +361,8 @@ def GenerateIndexToFrameUnitVectors(indextocoords,indextotypenum,indextoconn,ind
             z=disp+v1
             mag=np.linalg.norm(z)
             uz=z/mag
-            mag=np.linalg.norm(v3)
-            ux=v3/mag
-            uy=np.cross(uz,ux)
-            indextoframeunitvectors['x'][index]=ux
-            indextoframeunitvectors['y'][index]=uy
+            indextoframeunitvectors['x'][index]=[0,0,0]
+            indextoframeunitvectors['y'][index]=[0,0,0]
             indextoframeunitvectors['z'][index]=uz
 
 
@@ -400,19 +396,20 @@ def GenerateIndexToFrameUnitVectors(indextocoords,indextotypenum,indextoconn,ind
             mzindex=GrabFirstNeighborIndex(index)
             mxindex=GrabSecondNeighborIndex(index)
             m1index=GrabThirdNeighborIndex(index)
-   
-            mzcoords=np.array(indextocoords[mzindex])
-            mxcoords=np.array(indextocoords[mxindex])
+            mzcoords=indextocoords[mzindex]
+            mxcoords=indextocoords[mxindex]
+            mycoords=indextocoords[m1index]
             v1=np.array(mxcoords-coords)
             v2=np.array(mzcoords-coords)
-            uv1=v1/np.linalg(v1)
-            uv2=v2/np.linalg(v2)
-            uv3=uv2-uv1
-            udisp=v3*.5
-            uz=uv1+udisp
+            v3=np.array(mycoords-coords)
+            diff1=v1-v2
+            udiff1=diff1/np.linalg.norm(diff1)
+            diff2=v2-v3
+            udiff2=diff2/np.linalg.norm(diff2)
+            z=np.cross(udiff1,udiff2) 
             indextoframeunitvectors['x'][index]=[0,0,0]
             indextoframeunitvectors['y'][index]=[0,0,0]
-            indextoframeunitvectors['z'][index]=uz
+            indextoframeunitvectors['z'][index]=z
 
     return indextoframeunitvectors            
 
