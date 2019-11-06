@@ -163,6 +163,7 @@ def DefineTinkerXYZFilePath(pathtotinkxyz):
     cmd.load(pathtotinkxyz)
     cmd.show_as('sticks')
     cmd.bg_color("white")
+    LabelIndexAndTinkerTypeNumbers()
 
 def ReadTinkerFinalXYZFilePath():
     if os.path.isfile('pathtotinkfinalxyz.txt'):
