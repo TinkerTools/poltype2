@@ -165,7 +165,6 @@ onlyrotbnd=False
 toroptpcm=False
 optmaxcycle=400
 optpcm=False
-sppcm=False
 torsppcm=False
 use_psi4=False
 use_psi4SPonly=False
@@ -176,9 +175,9 @@ bashrcpath=None
 diskfrac=.8 # what percent of available disk to use
 ramfrac=.8 # what percent of available RAM to use
 procfrac=.8 # what percent of available processor to use
-numprocallnodes='4'
-maxdiskallnodes='100GB'
-maxmemallnodes='15GB'
+numprocallnodes=None
+maxdiskallnodes=None
+maxmemallnodes=None
 defaultnode=None
 
 
@@ -321,7 +320,6 @@ def parse_options(argv):
     global optpcm
     global use_psi4
     global use_psi4SPonly
-    global sppcm
     global torsppcm
     global freq
     global scratchdir
@@ -334,10 +332,11 @@ def parse_options(argv):
     global maxdiskallnodes
     global maxmemallnodes
     global defaultnode
+    global dontdotor
 
 
     try:
-        opts, xargs = getopt.getopt(argv[1:],'hqn:m:M:a:s:p:d:u:',['defaultnode=','numprocallnodes=','maxdiskallnodes=','maxmemallnodes=','diskfrac=','ramfrac=','procfrac=','torspmethod=','espmethod=','toroptmethod=','freq','torsppcm','sppcm','toroptpcm','use_psi4','use_psi4SPonly','dontdotor','dontdotorfit','optpcm','optmaxcycle=','rotalltors',"onlyrotbnd=","torsionrestraint=","foldnum=","tordatapointsnum=","help","qmonly","optbasisset=","dmabasisset=","popbasisset=","espbasisset=","torspbasisset=","optlog=","dmalog=","esplog=","dmafck=","espfck=","numproc=","maxmem=","maxdisk=","atmidx=","structure=","prefix=","gdmaout=","gbindir=","qm-scratch-dir=","omit-espfit","omit-torsion","test-tor-key=","uniqidx","tinker4format","omit-torsion2","dont-tor-qm-opt","optmethod=","gencomonly","solventname=","fitrotbnds","cpunodelistfilepath=","bashrcpath="])
+        opts, xargs = getopt.getopt(argv[1:],'hqn:m:M:a:s:p:d:u:',['defaultnode=','numprocallnodes=','maxdiskallnodes=','maxmemallnodes=','diskfrac=','ramfrac=','procfrac=','torspmethod=','espmethod=','toroptmethod=','freq','torsppcm','toroptpcm','use_psi4','use_psi4SPonly','dontdotor','dontdotorfit','optpcm','optmaxcycle=','rotalltors',"onlyrotbnd=","torsionrestraint=","foldnum=","tordatapointsnum=","help","qmonly","optbasisset=","dmabasisset=","popbasisset=","espbasisset=","torspbasisset=","optlog=","dmalog=","esplog=","dmafck=","espfck=","numproc=","maxmem=","maxdisk=","atmidx=","structure=","prefix=","gdmaout=","gbindir=","qm-scratch-dir=","omit-espfit","omit-torsion","test-tor-key=","uniqidx","tinker4format","omit-torsion2","dont-tor-qm-opt","optmethod=","gencomonly","solventname=","fitrotbnds","cpunodelistfilepath=","bashrcpath="])
     except Exception as e: 
         print(e)
         usage()
@@ -353,13 +352,13 @@ def parse_options(argv):
         elif o in ("--defaultnode"):
             defaultnode = a
             continue
-        elif o in ("--numprocallnodes"):
+        elif o=="--numprocallnodes":
             numprocallnodes = a
             continue
-        elif o in ("--maxdiskallnodes"):
+        elif o=="--maxdiskallnodes":
             maxdiskallnodes = a
             continue
-        elif o in ("--maxmemallnodes"):
+        elif o=="--maxmemallnodes":
             maxmemallnodes = a
             continue
         elif o in ("--diskfrac"):
@@ -382,9 +381,6 @@ def parse_options(argv):
             continue
         elif o in ("--freq"):
             freq = True
-            continue
-        elif o in ("--sppcm"):
-            sppcm = True
             continue
         elif o in ("--optpcm"):
             optpcm = True
@@ -824,7 +820,7 @@ def load_structfile(structfname):
 
     #return True
 
-def rebuild_bonds(cartmol, refmol):
+def rebuild_bonds_backup(cartmol, refmol):
     molindexlist=[]
     for atom in openbabel.OBMolAtomIter(cartmol):
         molindexlist.append(atom.GetIdx())
@@ -860,6 +856,16 @@ def rebuild_bonds(cartmol, refmol):
         bondorder=bondorderidxdic[(newaidx,newbidx)]
         newmol.AddBond(newaidx,newbidx,bondorder)
 
+
+    return newmol
+
+
+def rebuild_bonds(newmol, refmol):
+    for b in openbabel.OBMolBondIter(refmol):
+        beg = b.GetBeginAtomIdx()
+        end = b.GetEndAtomIdx()
+        if not newmol.GetBond(beg,end):
+            newmol.AddBond(beg,end, b.GetBO(), b.GetFlags())
 
     return newmol
 
@@ -994,6 +1000,8 @@ def prepend_keyfile(keyfilename):
     keyfh = open(keyfilename, "r")
 
     tmpfh.write("parameters " + paramhead + "\n")
+    if optpcm==True or toroptpcm==True or torsppcm==True:
+        tmpfh.write("solvate GK " + "\n")
     tmpfh.write("bondterm none\n")
     tmpfh.write("angleterm none\n")
     tmpfh.write("torsionterm none\n")
@@ -1509,11 +1517,8 @@ def gen_comfile (comfname,numproc,maxmem,chkname,tailfname,mol):
             densitystring='MP2'
         else:
             densitystring='SCF'
-        if sppcm==True:
 
-            opstr="#P %s/%s Sp Density=%s SCF=Save Guess=Huckel MaxDisk=%s SCRF=(PCM)\n" % (espmethod,espbasisset, densitystring,maxdisk)
-        else:
-            opstr="#P %s/%s Sp Density=%s SCF=Save Guess=Huckel MaxDisk=%s\n" % (espmethod,espbasisset, densitystring,maxdisk)
+        opstr="#P %s/%s Sp Density=%s SCF=Save Guess=Huckel MaxDisk=%s\n" % (espmethod,espbasisset, densitystring,maxdisk)
 
 
     bset=re.search('(?i)(6-31|aug-cc)\S+',opstr)
@@ -2845,7 +2850,7 @@ def CreatePsi4ESPInputFile(comfilecoords,mol,molecprefix,a,b,c,d,torang,phaseang
         if len(linesplit)==4 and '#' not in line:
             temp.write(line)
     temp.write('}'+'\n')
-    if sppcm==True or torsppcm==True:
+    if torsppcm==True:
         temp.write('set {'+'\n')
         temp.write(' basis '+espbasisset.lower()+'\n')
         temp.write(' e_convergence 10 '+'\n')
@@ -2896,7 +2901,7 @@ def CreatePsi4DMAInputFile(comfilecoords,comfilename,mol):
         if len(linesplit)==4 and '#' not in line:
             temp.write(line)
     temp.write('}'+'\n')
-    if sppcm==True or torsppcm==True:
+    if torsppcm==True:
         temp.write('set {'+'\n')
         temp.write(' basis '+dmabasisset.lower()+'\n')
         temp.write(' e_convergence 10 '+'\n')
@@ -3493,10 +3498,10 @@ def opbset (smarts, opbval, opbhash, mol):
             opbkey = '%d %d 0 0' % (ib.GetIdx(), ia[1])
             if ib.GetIdx() == ia[0]:
                 if ((opbkey not in opbhash) or (opbhash[opbkey][1] == False)):
-                    opbhash[opbkey] = [opbval, True]
+                    opbhash[opbkey] = [opbval, True,smarts]
             else:
                 if opbkey not in opbhash:
-                    opbhash[opbkey] = [defopbendval, False]
+                    opbhash[opbkey] = [defopbendval, False,smarts]
 
 def gen_valinfile (mol):
     """
@@ -5050,12 +5055,12 @@ def main():
         obConversion.ReadFile(mol,newname) 
     
     chg=mol.GetTotalCharge()
-    print('total charge ',chg)
+
     if chg!=0:
         toroptpcm=True
         optpcm=True
         torsppcm=True
-        sppcm=True
+
 
     if use_psi4==True:
         try:
@@ -5153,7 +5158,7 @@ def main():
                 #print('Angle Increment is greater than 30, so default is 30 ')
         else:
             ang=360/tordatapointsnum
-        rotbndtoanginc[key]=ang
+        rotbndtoanginc[key]=int(ang)
   
     
     # Obtain multipoles from Gaussian fchk file using GDMA
@@ -5232,8 +5237,6 @@ def main():
         # Finds aromatic carbons and associated hydrogens and corrects polarizability
         # Find opbend values using a look up table
         # Outputs a list of rotatable bonds (found in get_torlist) in a form usable by valence.py
-        oblist, rotbndlist_forvalence = gen_valinfile(mol)
-        print('rotbndlist_forvalence type number',rotbndlist_forvalence)
 
         # Map from idx to symm class is made for valence.py
         idxtoclass=[]
@@ -5243,7 +5246,7 @@ def main():
         v.setidxtoclass(idxtoclass)
         dorot = True
         # valence.py method is called to find parameters and append them to the keyfile
-        v.appendtofile(key4fname, optmol, oblist, dorot, rotbndlist_forvalence) 
+        v.appendtofile(key4fname, optmol, dorot,rotbndlist) 
 
 
         
@@ -5264,8 +5267,9 @@ def main():
         cpunodetousableproc={}
         cpunodetousableram={}
         cpunodetousabledisk={}
+        cpunodetodiskunit={}
         cpunodetousableproc[defaultnode]=numproc
-        cpunodetousableram[defaultnode]=maxram
+        cpunodetousableram[defaultnode]=maxmem
         cpunodetousabledisk[defaultnode]=maxdisk
         cpunodetodiskunit[defaultnode]='GB'
         cpunodes=[defaultnode]
