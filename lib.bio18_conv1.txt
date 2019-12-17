@@ -1,0 +1,2554 @@
+
+    # Library for converting PDB to TINKER XYZ.
+
+    # Residues are identified by resname and number of atoms. The TINKER atom 
+    #   types are assigned by looking up the atom name in the library file. 
+    #   If atom names are not unique or do not match, atom types will be
+    #   assigned based on the order of appearance in the library.
+
+    # Continuous atom entries with the same resname are considered one residue.
+    # Two residues can be defined with same name but different numbers of atoms.
+    #   In this case, these two residues must be separated by atom entries with
+    #   a different resname. For example:
+
+    #     atom    1    1 N     NH2
+    #     atom    2    2 H1    NH2
+    #     atom    3    3 H2    NH2
+
+    #     atom    0    0 -     --------
+
+    #     atom    4    4 N     NH2
+    #     atom    5    5 H1    NH2
+    #     atom    6    6 H2    NH2
+    #     atom    7    7 H3    NH2
+
+atom        351   92    Li+       Li+                             3     6.941    0
+atom        352   93    Na+       Na+                            11    22.990    0
+atom        353   94    K+        K+                             19    39.098    0
+atom        354   95    Rb+       Rb+                            37    85.468    0
+atom        355   96    Cs+       Cs+                            55   132.905    0
+atom        356   97    Be+       Be+                             4     9.012    0
+atom        357   98    Mg+       Mg+                            12    24.305    0
+atom        358   99    Ca+       Ca+                            20    40.078    0
+atom        359  100    Zn+       Zn+                            30    65.380    0
+atom        360  101    F-        F-                              9    18.998    0
+atom        361  102    Cl-       Cl-                            17    35.453    0
+atom        362  103    Br-       Br-                            35    79.904    0
+atom        363  104    I-        I-                             53   126.904    0
+
+# atom; `atom type'; `atom class'; `atom name'; `residue name'; ...
+    
+# RESIDUE A 33
+atom  343  343 P     A                      15 31.0000  0
+atom  344  344 O1P   A                       8 16.0000  0
+atom  344  344 O2P   A                       8 16.0000  0
+atom  326  326 O5*   A                       8 16.0000  0
+atom  324  324 C5*   A                       6 12.0000  0
+atom  325  325 1H5*  A                       1  1.0000  0
+atom  325  325 2H5*  A                       1  1.0000  0
+atom  312  312 C4*   A                       6 12.0000  0
+atom  313  313 H4*   A                       1  1.0000  0
+atom  311  311 O4*   A                       8 16.0000  0
+atom  314  314 C1*   A                       6 12.0000  0
+atom  315  315 H1*   A                       1  1.0000  0
+atom  251  251 N9    A                       7 14.0000  0
+atom  248  248 C8    A                       6 12.0000  0
+atom  258  258 H8    A                       1  1.0000  0
+atom  255  255 N7    A                       7 14.0000  0
+atom  250  250 C5    A                       6 12.0000  0
+atom  249  249 C6    A                       6 12.0000  0
+atom  253  253 N6    A                       7 14.0000  0
+atom  260  260 1H6   A                       1  1.0000  0
+atom  260  260 2H6   A                       1  1.0000  0
+atom  257  257 N1    A                       7 14.0000  0
+atom  254  254 C2    A                       6 12.0000  0
+atom  259  259 H2    A                       1  1.0000  0
+atom  256  256 N3    A                       7 14.0000  0
+atom  247  247 C4    A                       6 12.0000  0
+atom  318  318 C3*   A                       6 12.0000  0
+atom  319  319 H3*   A                       1  1.0000  0
+atom  316  316 C2*   A                       6 12.0000  0
+atom  317  317 1H2*  A                       1  1.0000  0
+atom  320  320 O2*   A                       8 16.0000  0
+atom  321  321 2HO*  A                       1  1.0000  0
+atom  322  322 O3*   A                       8 16.0000  0
+
+# RESIDUE C 31
+atom  343  343 P     C                      15 31.0000  0
+atom  344  344 O1P   C                       8 16.0000  0
+atom  344  344 O2P   C                       8 16.0000  0
+atom  326  326 O5*   C                       8 16.0000  0
+atom  324  324 C5*   C                       6 12.0000  0
+atom  325  325 1H5*  C                       1  1.0000  0
+atom  325  325 2H5*  C                       1  1.0000  0
+atom  312  312 C4*   C                       6 12.0000  0
+atom  313  313 H4*   C                       1  1.0000  0
+atom  311  311 O4*   C                       8 16.0000  0
+atom  314  314 C1*   C                       6 12.0000  0
+atom  315  315 H1*   C                       1  1.0000  0
+atom  261  261 N1    C                       7 14.0000  0
+atom  265  265 C6    C                       6 12.0000  0
+atom  271  271 H6    C                       1  1.0000  0
+atom  263  263 C5    C                       6 12.0000  0
+atom  269  269 H5    C                       1  1.0000  0
+atom  267  267 C4    C                       6 12.0000  0
+atom  264  264 N4    C                       7 14.0000  0
+atom  272  272 1H4   C                       1  1.0000  0
+atom  272  272 2H4   C                       1  1.0000  0
+atom  268  268 N3    C                       7 14.0000  0
+atom  266  266 C2    C                       6 12.0000  0
+atom  270  270 O2    C                       8 16.0000  0
+atom  318  318 C3*   C                       6 12.0000  0
+atom  319  319 H3*   C                       1  1.0000  0
+atom  316  316 C2*   C                       6 12.0000  0
+atom  317  317 1H2*  C                       1  1.0000  0
+atom  320  320 O2*   C                       8 16.0000  0
+atom  321  321 2HO*  C                       1  1.0000  0
+atom  322  322 O3*   C                       8 16.0000  0
+
+# RESIDUE G 34
+atom  343  343 P     G                      15 31.0000  0
+atom  344  344 O1P   G                       8 16.0000  0
+atom  344  344 O2P   G                       8 16.0000  0
+atom  326  326 O5*   G                       8 16.0000  0
+atom  324  324 C5*   G                       6 12.0000  0
+atom  325  325 1H5*  G                       1  1.0000  0
+atom  325  325 2H5*  G                       1  1.0000  0
+atom  312  312 C4*   G                       6 12.0000  0
+atom  313  313 H4*   G                       1  1.0000  0
+atom  311  311 O4*   G                       8 16.0000  0
+atom  314  314 C1*   G                       6 12.0000  0
+atom  315  315 H1*   G                       1  1.0000  0
+atom  280  280 N9    G                       7 14.0000  0
+atom  276  276 C8    G                       6 12.0000  0
+atom  286  286 H8    G                       1  1.0000  0
+atom  282  282 N7    G                       7 14.0000  0
+atom  279  279 C5    G                       6 12.0000  0
+atom  274  274 C6    G                       6 12.0000  0
+atom  285  285 O6    G                       8 16.0000  0
+atom  277  277 N1    G                       7 14.0000  0
+atom  284  284 H1    G                       1  1.0000  0
+atom  273  273 C2    G                       6 12.0000  0
+atom  278  278 N2    G                       7 14.0000  0
+atom  287  287 1H2   G                       1  1.0000  0
+atom  287  287 2H2   G                       1  1.0000  0
+atom  283  283 N3    G                       7 14.0000  0
+atom  275  275 C4    G                       6 12.0000  0
+atom  318  318 C3*   G                       6 12.0000  0
+atom  319  319 H3*   G                       1  1.0000  0
+atom  316  316 C2*   G                       6 12.0000  0
+atom  317  317 1H2*  G                       1  1.0000  0
+atom  320  320 O2*   G                       8 16.0000  0
+atom  321  321 2HO*  G                       1  1.0000  0
+atom  322  322 O3*   G                       8 16.0000  0
+
+# RESIDUE U 30
+atom  343  343 P     U                      15 31.0000  0
+atom  344  344 O1P   U                       8 16.0000  0
+atom  344  344 O2P   U                       8 16.0000  0
+atom  326  326 O5*   U                       8 16.0000  0
+atom  324  324 C5*   U                       6 12.0000  0
+atom  325  325 1H5*  U                       1  1.0000  0
+atom  325  325 2H5*  U                       1  1.0000  0
+atom  312  312 C4*   U                       6 12.0000  0
+atom  313  313 H4*   U                       1  1.0000  0
+atom  311  311 O4*   U                       8 16.0000  0
+atom  314  314 C1*   U                       6 12.0000  0
+atom  315  315 H1*   U                       1  1.0000  0
+atom  304  304 N1    U                       7 14.0000  0
+atom  301  301 C6    U                       6 12.0000  0
+atom  310  310 H6    U                       1  1.0000  0
+atom  305  305 C5    U                       6 12.0000  0
+atom  307  307 H5    U                       1  1.0000  0
+atom  302  302 C4    U                       6 12.0000  0
+atom  309  309 O4    U                       8 16.0000  0
+atom  303  303 N3    U                       7 14.0000  0
+atom  306  306 H3    U                       1  1.0000  0
+atom  300  300 C2    U                       6 12.0000  0
+atom  308  308 O2    U                       8 16.0000  0
+atom  318  318 C3*   U                       6 12.0000  0
+atom  319  319 H3*   U                       1  1.0000  0
+atom  316  316 C2*   U                       6 12.0000  0
+atom  317  317 1H2*  U                       1  1.0000  0
+atom  320  320 O2*   U                       8 16.0000  0
+atom  321  321 2HO*  U                       1  1.0000  0
+atom  322  322 O3*   U                       8 16.0000  0
+
+# RESIDUE A3 34
+atom  343  343 P     A3                     15 31.0000  0
+atom  344  344 O1P   A3                      8 16.0000  0
+atom  344  344 O2P   A3                      8 16.0000  0
+atom  326  326 O5*   A3                      8 16.0000  0
+atom  324  324 C5*   A3                      6 12.0000  0
+atom  325  325 1H5*  A3                      1  1.0000  0
+atom  325  325 2H5*  A3                      1  1.0000  0
+atom  312  312 C4*   A3                      6 12.0000  0
+atom  313  313 H4*   A3                      1  1.0000  0
+atom  311  311 O4*   A3                      8 16.0000  0
+atom  314  314 C1*   A3                      6 12.0000  0
+atom  315  315 H1*   A3                      1  1.0000  0
+atom  251  251 N9    A3                      7 14.0000  0
+atom  248  248 C8    A3                      6 12.0000  0
+atom  258  258 H8    A3                      1  1.0000  0
+atom  255  255 N7    A3                      7 14.0000  0
+atom  250  250 C5    A3                      6 12.0000  0
+atom  249  249 C6    A3                      6 12.0000  0
+atom  253  253 N6    A3                      7 14.0000  0
+atom  260  260 1H6   A3                      1  1.0000  0
+atom  260  260 2H6   A3                      1  1.0000  0
+atom  257  257 N1    A3                      7 14.0000  0
+atom  254  254 C2    A3                      6 12.0000  0
+atom  259  259 H2    A3                      1  1.0000  0
+atom  256  256 N3    A3                      7 14.0000  0
+atom  247  247 C4    A3                      6 12.0000  0
+atom  318  318 C3*   A3                      6 12.0000  0
+atom  319  319 H3*   A3                      1  1.0000  0
+atom  316  316 C2*   A3                      6 12.0000  0
+atom  317  317 1H2*  A3                      1  1.0000  0
+atom  320  320 O2*   A3                      8 16.0000  0
+atom  321  321 2HO*  A3                      1  1.0000  0
+atom  346  346 O3*   A3                      8 16.0000  0
+atom  323  323 HO3*  A3                      1  1.0000  0
+
+# RESIDUE A5 31
+atom  327  327 HO5*  A5                      1  1.0000  0
+atom  345  345 O5*   A5                      8 16.0000  0
+atom  324  324 C5*   A5                      6 12.0000  0
+atom  325  325 1H5*  A5                      1  1.0000  0
+atom  325  325 2H5*  A5                      1  1.0000  0
+atom  312  312 C4*   A5                      6 12.0000  0
+atom  313  313 H4*   A5                      1  1.0000  0
+atom  311  311 O4*   A5                      8 16.0000  0
+atom  314  314 C1*   A5                      6 12.0000  0
+atom  315  315 H1*   A5                      1  1.0000  0
+atom  251  251 N9    A5                      7 14.0000  0
+atom  248  248 C8    A5                      6 12.0000  0
+atom  258  258 H8    A5                      1  1.0000  0
+atom  255  255 N7    A5                      7 14.0000  0
+atom  250  250 C5    A5                      6 12.0000  0
+atom  249  249 C6    A5                      6 12.0000  0
+atom  253  253 N6    A5                      7 14.0000  0
+atom  260  260 1H6   A5                      1  1.0000  0
+atom  260  260 2H6   A5                      1  1.0000  0
+atom  257  257 N1    A5                      7 14.0000  0
+atom  254  254 C2    A5                      6 12.0000  0
+atom  259  259 H2    A5                      1  1.0000  0
+atom  256  256 N3    A5                      7 14.0000  0
+atom  247  247 C4    A5                      6 12.0000  0
+atom  318  318 C3*   A5                      6 12.0000  0
+atom  319  319 H3*   A5                      1  1.0000  0
+atom  316  316 C2*   A5                      6 12.0000  0
+atom  317  317 1H2*  A5                      1  1.0000  0
+atom  320  320 O2*   A5                      8 16.0000  0
+atom  321  321 2HO*  A5                      1  1.0000  0
+atom  322  322 O3*   A5                      8 16.0000  0
+
+# RESIDUE C3 32
+atom  343  343 P     C3                     15 31.0000  0
+atom  344  344 O1P   C3                      8 16.0000  0
+atom  344  344 O2P   C3                      8 16.0000  0
+atom  326  326 O5*   C3                      8 16.0000  0
+atom  324  324 C5*   C3                      6 12.0000  0
+atom  325  325 1H5*  C3                      1  1.0000  0
+atom  325  325 2H5*  C3                      1  1.0000  0
+atom  312  312 C4*   C3                      6 12.0000  0
+atom  313  313 H4*   C3                      1  1.0000  0
+atom  311  311 O4*   C3                      8 16.0000  0
+atom  314  314 C1*   C3                      6 12.0000  0
+atom  315  315 H1*   C3                      1  1.0000  0
+atom  261  261 N1    C3                      7 14.0000  0
+atom  265  265 C6    C3                      6 12.0000  0
+atom  271  271 H6    C3                      1  1.0000  0
+atom  263  263 C5    C3                      6 12.0000  0
+atom  269  269 H5    C3                      1  1.0000  0
+atom  267  267 C4    C3                      6 12.0000  0
+atom  264  264 N4    C3                      7 14.0000  0
+atom  272  272 1H4   C3                      1  1.0000  0
+atom  272  272 2H4   C3                      1  1.0000  0
+atom  268  268 N3    C3                      7 14.0000  0
+atom  266  266 C2    C3                      6 12.0000  0
+atom  270  270 O2    C3                      8 16.0000  0
+atom  318  318 C3*   C3                      6 12.0000  0
+atom  319  319 H3*   C3                      1  1.0000  0
+atom  316  316 C2*   C3                      6 12.0000  0
+atom  317  317 1H2*  C3                      1  1.0000  0
+atom  320  320 O2*   C3                      8 16.0000  0
+atom  321  321 2HO*  C3                      1  1.0000  0
+atom  346  346 O3*   C3                      8 16.0000  0
+atom  323  323 HO3*  C3                      1  1.0000  0
+
+# RESIDUE C5 29
+atom  327  327 HO5*  C5                      1  1.0000  0
+atom  345  345 O5*   C5                      8 16.0000  0
+atom  324  324 C5*   C5                      6 12.0000  0
+atom  325  325 1H5*  C5                      1  1.0000  0
+atom  325  325 2H5*  C5                      1  1.0000  0
+atom  312  312 C4*   C5                      6 12.0000  0
+atom  313  313 H4*   C5                      1  1.0000  0
+atom  311  311 O4*   C5                      8 16.0000  0
+atom  314  314 C1*   C5                      6 12.0000  0
+atom  315  315 H1*   C5                      1  1.0000  0
+atom  261  261 N1    C5                      7 14.0000  0
+atom  265  265 C6    C5                      6 12.0000  0
+atom  271  271 H6    C5                      1  1.0000  0
+atom  263  263 C5    C5                      6 12.0000  0
+atom  269  269 H5    C5                      1  1.0000  0
+atom  267  267 C4    C5                      6 12.0000  0
+atom  264  264 N4    C5                      7 14.0000  0
+atom  272  272 1H4   C5                      1  1.0000  0
+atom  272  272 2H4   C5                      1  1.0000  0
+atom  268  268 N3    C5                      7 14.0000  0
+atom  266  266 C2    C5                      6 12.0000  0
+atom  270  270 O2    C5                      8 16.0000  0
+atom  318  318 C3*   C5                      6 12.0000  0
+atom  319  319 H3*   C5                      1  1.0000  0
+atom  316  316 C2*   C5                      6 12.0000  0
+atom  317  317 1H2*  C5                      1  1.0000  0
+atom  320  320 O2*   C5                      8 16.0000  0
+atom  321  321 2HO*  C5                      1  1.0000  0
+atom  322  322 O3*   C5                      8 16.0000  0
+
+# RESIDUE DA 32
+atom  343  343 P     DA                     15 31.0000  0
+atom  344  344 O1P   DA                      8 16.0000  0
+atom  344  344 O2P   DA                      8 16.0000  0
+atom  341  341 O5*   DA                      8 16.0000  0
+atom  337  337 C5*   DA                      6 12.0000  0
+atom  340  340 1H5*  DA                      1  1.0000  0
+atom  340  340 2H5*  DA                      1  1.0000  0
+atom  328  328 C4*   DA                      6 12.0000  0
+atom  336  336 H4*   DA                      1  1.0000  0
+atom  332  332 O4*   DA                      8 16.0000  0
+atom  331  331 C1*   DA                      6 12.0000  0
+atom  334  334 H1*   DA                      1  1.0000  0
+atom  252  252 N9    DA                      7 14.0000  0
+atom  248  248 C8    DA                      6 12.0000  0
+atom  258  258 H8    DA                      1  1.0000  0
+atom  255  255 N7    DA                      7 14.0000  0
+atom  250  250 C5    DA                      6 12.0000  0
+atom  249  249 C6    DA                      6 12.0000  0
+atom  253  253 N6    DA                      7 14.0000  0
+atom  260  260 1H6   DA                      1  1.0000  0
+atom  260  260 2H6   DA                      1  1.0000  0
+atom  257  257 N1    DA                      7 14.0000  0
+atom  254  254 C2    DA                      6 12.0000  0
+atom  259  259 H2    DA                      1  1.0000  0
+atom  256  256 N3    DA                      7 14.0000  0
+atom  247  247 C4    DA                      6 12.0000  0
+atom  329  329 C3*   DA                      6 12.0000  0
+atom  335  335 H3*   DA                      1  1.0000  0
+atom  330  330 C2*   DA                      6 12.0000  0
+atom  333  333 1H2*  DA                      1  1.0000  0
+atom  333  333 2H2*  DA                      1  1.0000  0
+atom  338  338 O3*   DA                      8 16.0000  0
+
+# RESIDUE DC 30
+atom  343  343 P     DC                     15 31.0000  0
+atom  344  344 O1P   DC                      8 16.0000  0
+atom  344  344 O2P   DC                      8 16.0000  0
+atom  341  341 O5*   DC                      8 16.0000  0
+atom  337  337 C5*   DC                      6 12.0000  0
+atom  340  340 1H5*  DC                      1  1.0000  0
+atom  340  340 2H5*  DC                      1  1.0000  0
+atom  328  328 C4*   DC                      6 12.0000  0
+atom  336  336 H4*   DC                      1  1.0000  0
+atom  332  332 O4*   DC                      8 16.0000  0
+atom  331  331 C1*   DC                      6 12.0000  0
+atom  334  334 H1*   DC                      1  1.0000  0
+atom  262  262 N1    DC                      7 14.0000  0
+atom  265  265 C6    DC                      6 12.0000  0
+atom  271  271 H6    DC                      1  1.0000  0
+atom  263  263 C5    DC                      6 12.0000  0
+atom  269  269 H5    DC                      1  1.0000  0
+atom  267  267 C4    DC                      6 12.0000  0
+atom  264  264 N4    DC                      7 14.0000  0
+atom  272  272 1H4   DC                      1  1.0000  0
+atom  272  272 2H4   DC                      1  1.0000  0
+atom  268  268 N3    DC                      7 14.0000  0
+atom  266  266 C2    DC                      6 12.0000  0
+atom  270  270 O2    DC                      8 16.0000  0
+atom  329  329 C3*   DC                      6 12.0000  0
+atom  335  335 H3*   DC                      1  1.0000  0
+atom  330  330 C2*   DC                      6 12.0000  0
+atom  333  333 1H2*  DC                      1  1.0000  0
+atom  333  333 2H2*  DC                      1  1.0000  0
+atom  338  338 O3*   DC                      8 16.0000  0
+
+# RESIDUE DG 33
+atom  343  343 P     DG                     15 31.0000  0
+atom  344  344 O1P   DG                      8 16.0000  0
+atom  344  344 O2P   DG                      8 16.0000  0
+atom  341  341 O5*   DG                      8 16.0000  0
+atom  337  337 C5*   DG                      6 12.0000  0
+atom  340  340 1H5*  DG                      1  1.0000  0
+atom  340  340 2H5*  DG                      1  1.0000  0
+atom  328  328 C4*   DG                      6 12.0000  0
+atom  336  336 H4*   DG                      1  1.0000  0
+atom  332  332 O4*   DG                      8 16.0000  0
+atom  331  331 C1*   DG                      6 12.0000  0
+atom  334  334 H1*   DG                      1  1.0000  0
+atom  281  281 N9    DG                      7 14.0000  0
+atom  276  276 C8    DG                      6 12.0000  0
+atom  286  286 H8    DG                      1  1.0000  0
+atom  282  282 N7    DG                      7 14.0000  0
+atom  279  279 C5    DG                      6 12.0000  0
+atom  274  274 C6    DG                      6 12.0000  0
+atom  285  285 O6    DG                      8 16.0000  0
+atom  277  277 N1    DG                      7 14.0000  0
+atom  284  284 H1    DG                      1  1.0000  0
+atom  273  273 C2    DG                      6 12.0000  0
+atom  278  278 N2    DG                      7 14.0000  0
+atom  287  287 1H2   DG                      1  1.0000  0
+atom  287  287 2H2   DG                      1  1.0000  0
+atom  283  283 N3    DG                      7 14.0000  0
+atom  275  275 C4    DG                      6 12.0000  0
+atom  329  329 C3*   DG                      6 12.0000  0
+atom  335  335 H3*   DG                      1  1.0000  0
+atom  330  330 C2*   DG                      6 12.0000  0
+atom  333  333 1H2*  DG                      1  1.0000  0
+atom  333  333 2H2*  DG                      1  1.0000  0
+atom  338  338 O3*   DG                      8 16.0000  0
+
+# RESIDUE DT 32
+atom  343  343 P     DT                     15 31.0000  0
+atom  344  344 O1P   DT                      8 16.0000  0
+atom  344  344 O2P   DT                      8 16.0000  0
+atom  341  341 O5*   DT                      8 16.0000  0
+atom  337  337 C5*   DT                      6 12.0000  0
+atom  340  340 1H5*  DT                      1  1.0000  0
+atom  340  340 2H5*  DT                      1  1.0000  0
+atom  328  328 C4*   DT                      6 12.0000  0
+atom  336  336 H4*   DT                      1  1.0000  0
+atom  332  332 O4*   DT                      8 16.0000  0
+atom  331  331 C1*   DT                      6 12.0000  0
+atom  334  334 H1*   DT                      1  1.0000  0
+atom  292  292 N1    DT                      7 14.0000  0
+atom  291  291 C6    DT                      6 12.0000  0
+atom  297  297 H6    DT                      1  1.0000  0
+atom  289  289 C5    DT                      6 12.0000  0
+atom  288  288 C7    DT                      6 12.0000  0
+atom  295  295 1H7   DT                      1  1.0000  0
+atom  295  295 2H7   DT                      1  1.0000  0
+atom  295  295 3H7   DT                      1  1.0000  0
+atom  290  290 C4    DT                      6 12.0000  0
+atom  298  298 O4    DT                      8 16.0000  0
+atom  293  293 N3    DT                      7 14.0000  0
+atom  299  299 H3    DT                      1  1.0000  0
+atom  294  294 C2    DT                      6 12.0000  0
+atom  296  296 O2    DT                      8 16.0000  0
+atom  329  329 C3*   DT                      6 12.0000  0
+atom  335  335 H3*   DT                      1  1.0000  0
+atom  330  330 C2*   DT                      6 12.0000  0
+atom  333  333 1H2*  DT                      1  1.0000  0
+atom  333  333 2H2*  DT                      1  1.0000  0
+atom  338  338 O3*   DT                      8 16.0000  0
+
+# RESIDUE G3 35
+atom  343  343 P     G3                     15 31.0000  0
+atom  344  344 O1P   G3                      8 16.0000  0
+atom  344  344 O2P   G3                      8 16.0000  0
+atom  326  326 O5*   G3                      8 16.0000  0
+atom  324  324 C5*   G3                      6 12.0000  0
+atom  325  325 1H5*  G3                      1  1.0000  0
+atom  325  325 2H5*  G3                      1  1.0000  0
+atom  312  312 C4*   G3                      6 12.0000  0
+atom  313  313 H4*   G3                      1  1.0000  0
+atom  311  311 O4*   G3                      8 16.0000  0
+atom  314  314 C1*   G3                      6 12.0000  0
+atom  315  315 H1*   G3                      1  1.0000  0
+atom  280  280 N9    G3                      7 14.0000  0
+atom  276  276 C8    G3                      6 12.0000  0
+atom  286  286 H8    G3                      1  1.0000  0
+atom  282  282 N7    G3                      7 14.0000  0
+atom  279  279 C5    G3                      6 12.0000  0
+atom  274  274 C6    G3                      6 12.0000  0
+atom  285  285 O6    G3                      8 16.0000  0
+atom  277  277 N1    G3                      7 14.0000  0
+atom  284  284 H1    G3                      1  1.0000  0
+atom  273  273 C2    G3                      6 12.0000  0
+atom  278  278 N2    G3                      7 14.0000  0
+atom  287  287 1H2   G3                      1  1.0000  0
+atom  287  287 2H2   G3                      1  1.0000  0
+atom  283  283 N3    G3                      7 14.0000  0
+atom  275  275 C4    G3                      6 12.0000  0
+atom  318  318 C3*   G3                      6 12.0000  0
+atom  319  319 H3*   G3                      1  1.0000  0
+atom  316  316 C2*   G3                      6 12.0000  0
+atom  317  317 1H2*  G3                      1  1.0000  0
+atom  320  320 O2*   G3                      8 16.0000  0
+atom  321  321 2HO*  G3                      1  1.0000  0
+atom  346  346 O3*   G3                      8 16.0000  0
+atom  323  323 HO3*  G3                      1  1.0000  0
+
+# RESIDUE G5 32
+atom  327  327 HO5*  G5                      1  1.0000  0
+atom  345  345 O5*   G5                      8 16.0000  0
+atom  324  324 C5*   G5                      6 12.0000  0
+atom  325  325 1H5*  G5                      1  1.0000  0
+atom  325  325 2H5*  G5                      1  1.0000  0
+atom  312  312 C4*   G5                      6 12.0000  0
+atom  313  313 H4*   G5                      1  1.0000  0
+atom  311  311 O4*   G5                      8 16.0000  0
+atom  314  314 C1*   G5                      6 12.0000  0
+atom  315  315 H1*   G5                      1  1.0000  0
+atom  280  280 N9    G5                      7 14.0000  0
+atom  276  276 C8    G5                      6 12.0000  0
+atom  286  286 H8    G5                      1  1.0000  0
+atom  282  282 N7    G5                      7 14.0000  0
+atom  279  279 C5    G5                      6 12.0000  0
+atom  274  274 C6    G5                      6 12.0000  0
+atom  285  285 O6    G5                      8 16.0000  0
+atom  277  277 N1    G5                      7 14.0000  0
+atom  284  284 H1    G5                      1  1.0000  0
+atom  273  273 C2    G5                      6 12.0000  0
+atom  278  278 N2    G5                      7 14.0000  0
+atom  287  287 1H2   G5                      1  1.0000  0
+atom  287  287 2H2   G5                      1  1.0000  0
+atom  283  283 N3    G5                      7 14.0000  0
+atom  275  275 C4    G5                      6 12.0000  0
+atom  318  318 C3*   G5                      6 12.0000  0
+atom  319  319 H3*   G5                      1  1.0000  0
+atom  316  316 C2*   G5                      6 12.0000  0
+atom  317  317 1H2*  G5                      1  1.0000  0
+atom  320  320 O2*   G5                      8 16.0000  0
+atom  321  321 2HO*  G5                      1  1.0000  0
+atom  322  322 O3*   G5                      8 16.0000  0
+
+# RESIDUE U3 31
+atom  343  343 P     U3                     15 31.0000  0
+atom  344  344 O1P   U3                      8 16.0000  0
+atom  344  344 O2P   U3                      8 16.0000  0
+atom  326  326 O5*   U3                      8 16.0000  0
+atom  324  324 C5*   U3                      6 12.0000  0
+atom  325  325 1H5*  U3                      1  1.0000  0
+atom  325  325 2H5*  U3                      1  1.0000  0
+atom  312  312 C4*   U3                      6 12.0000  0
+atom  313  313 H4*   U3                      1  1.0000  0
+atom  311  311 O4*   U3                      8 16.0000  0
+atom  314  314 C1*   U3                      6 12.0000  0
+atom  315  315 H1*   U3                      1  1.0000  0
+atom  304  304 N1    U3                      7 14.0000  0
+atom  301  301 C6    U3                      6 12.0000  0
+atom  310  310 H6    U3                      1  1.0000  0
+atom  305  305 C5    U3                      6 12.0000  0
+atom  307  307 H5    U3                      1  1.0000  0
+atom  302  302 C4    U3                      6 12.0000  0
+atom  309  309 O4    U3                      8 16.0000  0
+atom  303  303 N3    U3                      7 14.0000  0
+atom  306  306 H3    U3                      1  1.0000  0
+atom  300  300 C2    U3                      6 12.0000  0
+atom  308  308 O2    U3                      8 16.0000  0
+atom  318  318 C3*   U3                      6 12.0000  0
+atom  319  319 H3*   U3                      1  1.0000  0
+atom  316  316 C2*   U3                      6 12.0000  0
+atom  317  317 1H2*  U3                      1  1.0000  0
+atom  320  320 O2*   U3                      8 16.0000  0
+atom  321  321 2HO*  U3                      1  1.0000  0
+atom  346  346 O3*   U3                      8 16.0000  0
+atom  323  323 HO3*  U3                      1  1.0000  0
+
+# RESIDUE U5 28
+atom  327  327 HO5*  U5                      1  1.0000  0
+atom  345  345 O5*   U5                      8 16.0000  0
+atom  324  324 C5*   U5                      6 12.0000  0
+atom  325  325 1H5*  U5                      1  1.0000  0
+atom  325  325 2H5*  U5                      1  1.0000  0
+atom  312  312 C4*   U5                      6 12.0000  0
+atom  313  313 H4*   U5                      1  1.0000  0
+atom  311  311 O4*   U5                      8 16.0000  0
+atom  314  314 C1*   U5                      6 12.0000  0
+atom  315  315 H1*   U5                      1  1.0000  0
+atom  304  304 N1    U5                      7 14.0000  0
+atom  301  301 C6    U5                      6 12.0000  0
+atom  310  310 H6    U5                      1  1.0000  0
+atom  305  305 C5    U5                      6 12.0000  0
+atom  307  307 H5    U5                      1  1.0000  0
+atom  302  302 C4    U5                      6 12.0000  0
+atom  309  309 O4    U5                      8 16.0000  0
+atom  303  303 N3    U5                      7 14.0000  0
+atom  306  306 H3    U5                      1  1.0000  0
+atom  300  300 C2    U5                      6 12.0000  0
+atom  308  308 O2    U5                      8 16.0000  0
+atom  318  318 C3*   U5                      6 12.0000  0
+atom  319  319 H3*   U5                      1  1.0000  0
+atom  316  316 C2*   U5                      6 12.0000  0
+atom  317  317 1H2*  U5                      1  1.0000  0
+atom  320  320 O2*   U5                      8 16.0000  0
+atom  321  321 2HO*  U5                      1  1.0000  0
+atom  322  322 O3*   U5                      8 16.0000  0
+
+# RESIDUE ALA 10
+atom    7    7 N     ALA                     7 14.0000  0
+atom    8    8 CA    ALA                     6 12.0000  0
+atom    9    9 C     ALA                     6 12.0000  0
+atom   11   11 O     ALA                     8 16.0000  0
+atom   13   13 CB    ALA                     6 12.0000  0
+atom   10   10 H     ALA                     1  1.0000  0
+atom   12   12 HA    ALA                     1  1.0000  0
+atom   14   14 HB1   ALA                     1  1.0000  0
+atom   14   14 HB2   ALA                     1  1.0000  0
+atom   14   14 HB3   ALA                     1  1.0000  0
+
+# RESIDUE ARG 24
+atom    7    7 N     ARG                     7 14.0000  0
+atom    8    8 CA    ARG                     6 12.0000  0
+atom    9    9 C     ARG                     6 12.0000  0
+atom   11   11 O     ARG                     8 16.0000  0
+atom  202  202 CB    ARG                     6 12.0000  0
+atom  204  204 CG    ARG                     6 12.0000  0
+atom  206  206 CD    ARG                     6 12.0000  0
+atom  208  208 NE    ARG                     7 14.0000  0
+atom  210  210 CZ    ARG                     6 12.0000  0
+atom  211  211 NH1   ARG                     7 14.0000  0
+atom  211  211 NH2   ARG                     7 14.0000  0
+atom   10   10 H     ARG                     1  1.0000  0
+atom   12   12 HA    ARG                     1  1.0000  0
+atom  203  203 HB1   ARG                     1  1.0000  0
+atom  203  203 HB2   ARG                     1  1.0000  0
+atom  205  205 HG1   ARG                     1  1.0000  0
+atom  205  205 HG2   ARG                     1  1.0000  0
+atom  207  207 HD1   ARG                     1  1.0000  0
+atom  207  207 HD2   ARG                     1  1.0000  0
+atom  209  209 HE    ARG                     1  1.0000  0
+atom  212  212 1HH1  ARG                     1  1.0000  0
+atom  212  212 2HH1  ARG                     1  1.0000  0
+atom  212  212 1HH2  ARG                     1  1.0000  0
+atom  212  212 2HH2  ARG                     1  1.0000  0
+
+# RESIDUE ASH 13
+atom    7    7 N     ASH                     7 14.0000  0
+atom    8    8 CA    ASH                     6 12.0000  0
+atom    9    9 C     ASH                     6 12.0000  0
+atom   11   11 O     ASH                     8 16.0000  0
+atom  141  141 CB    ASH                     6 12.0000  0
+atom  143  143 CG    ASH                     6 12.0000  0
+atom  144  144 OD1   ASH                     8 16.0000  0
+atom  145  145 OD2   ASH                     8 16.0000  0
+atom   10   10 H     ASH                     1  1.0000  0
+atom   12   12 HA    ASH                     1  1.0000  0
+atom  142  142 HB2   ASH                     1  1.0000  0
+atom  142  142 HB3   ASH                     1  1.0000  0
+atom  146  146 HD2   ASH                     1  1.0000  0
+
+# RESIDUE ASN 14
+atom    7    7 N     ASN                     7 14.0000  0
+atom    8    8 CA    ASN                     6 12.0000  0
+atom    9    9 C     ASN                     6 12.0000  0
+atom   11   11 O     ASN                     8 16.0000  0
+atom  147  147 CB    ASN                     6 12.0000  0
+atom  149  149 CG    ASN                     6 12.0000  0
+atom  150  150 OD1   ASN                     8 16.0000  0
+atom  151  151 ND2   ASN                     7 14.0000  0
+atom   10   10 H     ASN                     1  1.0000  0
+atom   12   12 HA    ASN                     1  1.0000  0
+atom  148  148 HB1   ASN                     1  1.0000  0
+atom  148  148 HB2   ASN                     1  1.0000  0
+atom  152  152 1HD2  ASN                     1  1.0000  0
+atom  152  152 2HD2  ASN                     1  1.0000  0
+
+# RESIDUE ASP 12
+atom    7    7 N     ASP                     7 14.0000  0
+atom    8    8 CA    ASP                     6 12.0000  0
+atom    9    9 C     ASP                     6 12.0000  0
+atom   11   11 O     ASP                     8 16.0000  0
+atom  137  137 CB    ASP                     6 12.0000  0
+atom  139  139 CG    ASP                     6 12.0000  0
+atom  140  140 OD1   ASP                     8 16.0000  0
+atom  140  140 OD2   ASP                     8 16.0000  0
+atom   10   10 H     ASP                     1  1.0000  0
+atom   12   12 HA    ASP                     1  1.0000  0
+atom  138  138 HB1   ASP                     1  1.0000  0
+atom  138  138 HB2   ASP                     1  1.0000  0
+
+# RESIDUE COH 2
+atom  237  237 OH    COH                     8 16.0000  0
+atom  238  238 HO    COH                     1  1.0000  0
+
+# RESIDUE CYD 10
+atom    7    7 N     CYD                     7 14.0000  0
+atom   48   48 CA    CYD                     6 12.0000  0
+atom    9    9 C     CYD                     6 12.0000  0
+atom   11   11 O     CYD                     8 16.0000  0
+atom   43   43 CB    CYD                     6 12.0000  0
+atom   49   49 SG    CYD                    16 32.0000  0
+atom   10   10 H     CYD                     1  1.0000  0
+atom   12   12 HA    CYD                     1  1.0000  0
+atom   44   44 HB2   CYD                     1  1.0000  0
+atom   44   44 HB3   CYD                     1  1.0000  0
+
+# RESIDUE CYS 11
+atom    7    7 N     CYS                     7 14.0000  0
+atom    8    8 CA    CYS                     6 12.0000  0
+atom    9    9 C     CYS                     6 12.0000  0
+atom   11   11 O     CYS                     8 16.0000  0
+atom   43   43 CB    CYS                     6 12.0000  0
+atom   45   45 SG    CYS                    16 32.0000  0
+atom   10   10 H     CYS                     1  1.0000  0
+atom   12   12 HA    CYS                     1  1.0000  0
+atom   44   44 HB1   CYS                     1  1.0000  0
+atom   44   44 HB2   CYS                     1  1.0000  0
+atom   46   46 HG    CYS                     1  1.0000  0
+
+# RESIDUE CYX 10
+atom    7    7 N     CYX                     7 14.0000  0
+atom    8    8 CA    CYX                     6 12.0000  0
+atom    9    9 C     CYX                     6 12.0000  0
+atom   11   11 O     CYX                     8 16.0000  0
+atom   43   43 CB    CYX                     6 12.0000  0
+atom   47   47 SG    CYX                    16 32.0000  0
+atom   10   10 H     CYX                     1  1.0000  0
+atom   12   12 HA    CYX                     1  1.0000  0
+atom   44   44 HB2   CYX                     1  1.0000  0
+atom   44   44 HB3   CYX                     1  1.0000  0
+
+# RESIDUE DA3 33
+atom  343  343 P     DA3                    15 31.0000  0
+atom  344  344 O1P   DA3                     8 16.0000  0
+atom  344  344 O2P   DA3                     8 16.0000  0
+atom  341  341 O5*   DA3                     8 16.0000  0
+atom  337  337 C5*   DA3                     6 12.0000  0
+atom  340  340 1H5*  DA3                     1  1.0000  0
+atom  340  340 2H5*  DA3                     1  1.0000  0
+atom  328  328 C4*   DA3                     6 12.0000  0
+atom  336  336 H4*   DA3                     1  1.0000  0
+atom  332  332 O4*   DA3                     8 16.0000  0
+atom  331  331 C1*   DA3                     6 12.0000  0
+atom  334  334 H1*   DA3                     1  1.0000  0
+atom  252  252 N9    DA3                     7 14.0000  0
+atom  248  248 C8    DA3                     6 12.0000  0
+atom  258  258 H8    DA3                     1  1.0000  0
+atom  255  255 N7    DA3                     7 14.0000  0
+atom  250  250 C5    DA3                     6 12.0000  0
+atom  249  249 C6    DA3                     6 12.0000  0
+atom  253  253 N6    DA3                     7 14.0000  0
+atom  260  260 1H6   DA3                     1  1.0000  0
+atom  260  260 2H6   DA3                     1  1.0000  0
+atom  257  257 N1    DA3                     7 14.0000  0
+atom  254  254 C2    DA3                     6 12.0000  0
+atom  259  259 H2    DA3                     1  1.0000  0
+atom  256  256 N3    DA3                     7 14.0000  0
+atom  247  247 C4    DA3                     6 12.0000  0
+atom  329  329 C3*   DA3                     6 12.0000  0
+atom  335  335 H3*   DA3                     1  1.0000  0
+atom  330  330 C2*   DA3                     6 12.0000  0
+atom  333  333 1H2*  DA3                     1  1.0000  0
+atom  333  333 2H2*  DA3                     1  1.0000  0
+atom  347  347 O3*   DA3                     8 16.0000  0
+atom  339  339 HO3*  DA3                     1  1.0000  0
+
+# RESIDUE DA5 30
+atom  342  342 HO5*  DA5                     1  1.0000  0
+atom  348  348 O5*   DA5                     8 16.0000  0
+atom  337  337 C5*   DA5                     6 12.0000  0
+atom  340  340 1H5*  DA5                     1  1.0000  0
+atom  340  340 2H5*  DA5                     1  1.0000  0
+atom  328  328 C4*   DA5                     6 12.0000  0
+atom  336  336 H4*   DA5                     1  1.0000  0
+atom  332  332 O4*   DA5                     8 16.0000  0
+atom  331  331 C1*   DA5                     6 12.0000  0
+atom  334  334 H1*   DA5                     1  1.0000  0
+atom  252  252 N9    DA5                     7 14.0000  0
+atom  248  248 C8    DA5                     6 12.0000  0
+atom  258  258 H8    DA5                     1  1.0000  0
+atom  255  255 N7    DA5                     7 14.0000  0
+atom  250  250 C5    DA5                     6 12.0000  0
+atom  249  249 C6    DA5                     6 12.0000  0
+atom  253  253 N6    DA5                     7 14.0000  0
+atom  260  260 1H6   DA5                     1  1.0000  0
+atom  260  260 2H6   DA5                     1  1.0000  0
+atom  257  257 N1    DA5                     7 14.0000  0
+atom  254  254 C2    DA5                     6 12.0000  0
+atom  259  259 H2    DA5                     1  1.0000  0
+atom  256  256 N3    DA5                     7 14.0000  0
+atom  247  247 C4    DA5                     6 12.0000  0
+atom  329  329 C3*   DA5                     6 12.0000  0
+atom  335  335 H3*   DA5                     1  1.0000  0
+atom  330  330 C2*   DA5                     6 12.0000  0
+atom  333  333 1H2*  DA5                     1  1.0000  0
+atom  333  333 2H2*  DA5                     1  1.0000  0
+atom  338  338 O3*   DA5                     8 16.0000  0
+
+# RESIDUE DC3 31
+atom  343  343 P     DC3                    15 31.0000  0
+atom  344  344 O1P   DC3                     8 16.0000  0
+atom  344  344 O2P   DC3                     8 16.0000  0
+atom  341  341 O5*   DC3                     8 16.0000  0
+atom  337  337 C5*   DC3                     6 12.0000  0
+atom  340  340 1H5*  DC3                     1  1.0000  0
+atom  340  340 2H5*  DC3                     1  1.0000  0
+atom  328  328 C4*   DC3                     6 12.0000  0
+atom  336  336 H4*   DC3                     1  1.0000  0
+atom  332  332 O4*   DC3                     8 16.0000  0
+atom  331  331 C1*   DC3                     6 12.0000  0
+atom  334  334 H1*   DC3                     1  1.0000  0
+atom  262  262 N1    DC3                     7 14.0000  0
+atom  265  265 C6    DC3                     6 12.0000  0
+atom  271  271 H6    DC3                     1  1.0000  0
+atom  263  263 C5    DC3                     6 12.0000  0
+atom  269  269 H5    DC3                     1  1.0000  0
+atom  267  267 C4    DC3                     6 12.0000  0
+atom  264  264 N4    DC3                     7 14.0000  0
+atom  272  272 1H4   DC3                     1  1.0000  0
+atom  272  272 2H4   DC3                     1  1.0000  0
+atom  268  268 N3    DC3                     7 14.0000  0
+atom  266  266 C2    DC3                     6 12.0000  0
+atom  270  270 O2    DC3                     8 16.0000  0
+atom  329  329 C3*   DC3                     6 12.0000  0
+atom  335  335 H3*   DC3                     1  1.0000  0
+atom  330  330 C2*   DC3                     6 12.0000  0
+atom  333  333 1H2*  DC3                     1  1.0000  0
+atom  333  333 2H2*  DC3                     1  1.0000  0
+atom  347  347 O3*   DC3                     8 16.0000  0
+atom  339  339 HO3*  DC3                     1  1.0000  0
+
+# RESIDUE DC5 28
+atom  342  342 HO5*  DC5                     1  1.0000  0
+atom  348  348 O5*   DC5                     8 16.0000  0
+atom  337  337 C5*   DC5                     6 12.0000  0
+atom  340  340 1H5*  DC5                     1  1.0000  0
+atom  340  340 2H5*  DC5                     1  1.0000  0
+atom  328  328 C4*   DC5                     6 12.0000  0
+atom  336  336 H4*   DC5                     1  1.0000  0
+atom  332  332 O4*   DC5                     8 16.0000  0
+atom  331  331 C1*   DC5                     6 12.0000  0
+atom  334  334 H1*   DC5                     1  1.0000  0
+atom  262  262 N1    DC5                     7 14.0000  0
+atom  265  265 C6    DC5                     6 12.0000  0
+atom  271  271 H6    DC5                     1  1.0000  0
+atom  263  263 C5    DC5                     6 12.0000  0
+atom  269  269 H5    DC5                     1  1.0000  0
+atom  267  267 C4    DC5                     6 12.0000  0
+atom  264  264 N4    DC5                     7 14.0000  0
+atom  272  272 1H4   DC5                     1  1.0000  0
+atom  272  272 2H4   DC5                     1  1.0000  0
+atom  268  268 N3    DC5                     7 14.0000  0
+atom  266  266 C2    DC5                     6 12.0000  0
+atom  270  270 O2    DC5                     8 16.0000  0
+atom  329  329 C3*   DC5                     6 12.0000  0
+atom  335  335 H3*   DC5                     1  1.0000  0
+atom  330  330 C2*   DC5                     6 12.0000  0
+atom  333  333 1H2*  DC5                     1  1.0000  0
+atom  333  333 2H2*  DC5                     1  1.0000  0
+atom  338  338 O3*   DC5                     8 16.0000  0
+
+# RESIDUE DG3 34
+atom  343  343 P     DG3                    15 31.0000  0
+atom  344  344 O1P   DG3                     8 16.0000  0
+atom  344  344 O2P   DG3                     8 16.0000  0
+atom  341  341 O5*   DG3                     8 16.0000  0
+atom  337  337 C5*   DG3                     6 12.0000  0
+atom  340  340 1H5*  DG3                     1  1.0000  0
+atom  340  340 2H5*  DG3                     1  1.0000  0
+atom  328  328 C4*   DG3                     6 12.0000  0
+atom  336  336 H4*   DG3                     1  1.0000  0
+atom  332  332 O4*   DG3                     8 16.0000  0
+atom  331  331 C1*   DG3                     6 12.0000  0
+atom  334  334 H1*   DG3                     1  1.0000  0
+atom  281  281 N9    DG3                     7 14.0000  0
+atom  276  276 C8    DG3                     6 12.0000  0
+atom  286  286 H8    DG3                     1  1.0000  0
+atom  282  282 N7    DG3                     7 14.0000  0
+atom  279  279 C5    DG3                     6 12.0000  0
+atom  274  274 C6    DG3                     6 12.0000  0
+atom  285  285 O6    DG3                     8 16.0000  0
+atom  277  277 N1    DG3                     7 14.0000  0
+atom  284  284 H1    DG3                     1  1.0000  0
+atom  273  273 C2    DG3                     6 12.0000  0
+atom  278  278 N2    DG3                     7 14.0000  0
+atom  287  287 1H2   DG3                     1  1.0000  0
+atom  287  287 2H2   DG3                     1  1.0000  0
+atom  283  283 N3    DG3                     7 14.0000  0
+atom  275  275 C4    DG3                     6 12.0000  0
+atom  329  329 C3*   DG3                     6 12.0000  0
+atom  335  335 H3*   DG3                     1  1.0000  0
+atom  330  330 C2*   DG3                     6 12.0000  0
+atom  333  333 1H2*  DG3                     1  1.0000  0
+atom  333  333 2H2*  DG3                     1  1.0000  0
+atom  347  347 O3*   DG3                     8 16.0000  0
+atom  339  339 HO3*  DG3                     1  1.0000  0
+
+# RESIDUE DG5 31
+atom  342  342 HO5*  DG5                     1  1.0000  0
+atom  348  348 O5*   DG5                     8 16.0000  0
+atom  337  337 C5*   DG5                     6 12.0000  0
+atom  340  340 1H5*  DG5                     1  1.0000  0
+atom  340  340 2H5*  DG5                     1  1.0000  0
+atom  328  328 C4*   DG5                     6 12.0000  0
+atom  336  336 H4*   DG5                     1  1.0000  0
+atom  332  332 O4*   DG5                     8 16.0000  0
+atom  331  331 C1*   DG5                     6 12.0000  0
+atom  334  334 H1*   DG5                     1  1.0000  0
+atom  281  281 N9    DG5                     7 14.0000  0
+atom  276  276 C8    DG5                     6 12.0000  0
+atom  286  286 H8    DG5                     1  1.0000  0
+atom  282  282 N7    DG5                     7 14.0000  0
+atom  279  279 C5    DG5                     6 12.0000  0
+atom  274  274 C6    DG5                     6 12.0000  0
+atom  285  285 O6    DG5                     8 16.0000  0
+atom  277  277 N1    DG5                     7 14.0000  0
+atom  284  284 H1    DG5                     1  1.0000  0
+atom  273  273 C2    DG5                     6 12.0000  0
+atom  278  278 N2    DG5                     7 14.0000  0
+atom  287  287 1H2   DG5                     1  1.0000  0
+atom  287  287 2H2   DG5                     1  1.0000  0
+atom  283  283 N3    DG5                     7 14.0000  0
+atom  275  275 C4    DG5                     6 12.0000  0
+atom  329  329 C3*   DG5                     6 12.0000  0
+atom  335  335 H3*   DG5                     1  1.0000  0
+atom  330  330 C2*   DG5                     6 12.0000  0
+atom  333  333 1H2*  DG5                     1  1.0000  0
+atom  333  333 2H2*  DG5                     1  1.0000  0
+atom  338  338 O3*   DG5                     8 16.0000  0
+
+# RESIDUE DT3 33
+atom  343  343 P     DT3                    15 31.0000  0
+atom  344  344 O1P   DT3                     8 16.0000  0
+atom  344  344 O2P   DT3                     8 16.0000  0
+atom  341  341 O5*   DT3                     8 16.0000  0
+atom  337  337 C5*   DT3                     6 12.0000  0
+atom  340  340 1H5*  DT3                     1  1.0000  0
+atom  340  340 2H5*  DT3                     1  1.0000  0
+atom  328  328 C4*   DT3                     6 12.0000  0
+atom  336  336 H4*   DT3                     1  1.0000  0
+atom  332  332 O4*   DT3                     8 16.0000  0
+atom  331  331 C1*   DT3                     6 12.0000  0
+atom  334  334 H1*   DT3                     1  1.0000  0
+atom  292  292 N1    DT3                     7 14.0000  0
+atom  291  291 C6    DT3                     6 12.0000  0
+atom  297  297 H6    DT3                     1  1.0000  0
+atom  289  289 C5    DT3                     6 12.0000  0
+atom  288  288 C7    DT3                     6 12.0000  0
+atom  295  295 1H7   DT3                     1  1.0000  0
+atom  295  295 2H7   DT3                     1  1.0000  0
+atom  295  295 3H7   DT3                     1  1.0000  0
+atom  290  290 C4    DT3                     6 12.0000  0
+atom  298  298 O4    DT3                     8 16.0000  0
+atom  293  293 N3    DT3                     7 14.0000  0
+atom  299  299 H3    DT3                     1  1.0000  0
+atom  294  294 C2    DT3                     6 12.0000  0
+atom  296  296 O2    DT3                     8 16.0000  0
+atom  329  329 C3*   DT3                     6 12.0000  0
+atom  335  335 H3*   DT3                     1  1.0000  0
+atom  330  330 C2*   DT3                     6 12.0000  0
+atom  333  333 1H2*  DT3                     1  1.0000  0
+atom  333  333 2H2*  DT3                     1  1.0000  0
+atom  347  347 O3*   DT3                     8 16.0000  0
+atom  339  339 HO3*  DT3                     1  1.0000  0
+
+# RESIDUE DT5 30
+atom  342  342 HO5*  DT5                     1  1.0000  0
+atom  348  348 O5*   DT5                     8 16.0000  0
+atom  337  337 C5*   DT5                     6 12.0000  0
+atom  340  340 1H5*  DT5                     1  1.0000  0
+atom  340  340 2H5*  DT5                     1  1.0000  0
+atom  328  328 C4*   DT5                     6 12.0000  0
+atom  336  336 H4*   DT5                     1  1.0000  0
+atom  332  332 O4*   DT5                     8 16.0000  0
+atom  331  331 C1*   DT5                     6 12.0000  0
+atom  334  334 H1*   DT5                     1  1.0000  0
+atom  292  292 N1    DT5                     7 14.0000  0
+atom  291  291 C6    DT5                     6 12.0000  0
+atom  297  297 H6    DT5                     1  1.0000  0
+atom  289  289 C5    DT5                     6 12.0000  0
+atom  288  288 C7    DT5                     6 12.0000  0
+atom  295  295 1H7   DT5                     1  1.0000  0
+atom  295  295 2H7   DT5                     1  1.0000  0
+atom  295  295 3H7   DT5                     1  1.0000  0
+atom  290  290 C4    DT5                     6 12.0000  0
+atom  298  298 O4    DT5                     8 16.0000  0
+atom  293  293 N3    DT5                     7 14.0000  0
+atom  299  299 H3    DT5                     1  1.0000  0
+atom  294  294 C2    DT5                     6 12.0000  0
+atom  296  296 O2    DT5                     8 16.0000  0
+atom  329  329 C3*   DT5                     6 12.0000  0
+atom  335  335 H3*   DT5                     1  1.0000  0
+atom  330  330 C2*   DT5                     6 12.0000  0
+atom  333  333 1H2*  DT5                     1  1.0000  0
+atom  333  333 2H2*  DT5                     1  1.0000  0
+atom  338  338 O3*   DT5                     8 16.0000  0
+
+# RESIDUE GLH 16
+atom    7    7 N     GLH                     7 14.0000  0
+atom    8    8 CA    GLH                     6 12.0000  0
+atom    9    9 C     GLH                     6 12.0000  0
+atom   11   11 O     GLH                     8 16.0000  0
+atom  159  159 CB    GLH                     6 12.0000  0
+atom  161  161 CG    GLH                     6 12.0000  0
+atom  163  163 CD    GLH                     6 12.0000  0
+atom  164  164 OE1   GLH                     8 16.0000  0
+atom  165  165 OE2   GLH                     8 16.0000  0
+atom   10   10 H     GLH                     1  1.0000  0
+atom   12   12 HA    GLH                     1  1.0000  0
+atom  160  160 HB1   GLH                     1  1.0000  0
+atom  160  160 HB2   GLH                     1  1.0000  0
+atom  162  162 HG1   GLH                     1  1.0000  0
+atom  162  162 HG2   GLH                     1  1.0000  0
+atom  166  166 HE2   GLH                     1  1.0000  0
+
+# RESIDUE GLN 17
+atom    7    7 N     GLN                     7 14.0000  0
+atom    8    8 CA    GLN                     6 12.0000  0
+atom    9    9 C     GLN                     6 12.0000  0
+atom   11   11 O     GLN                     8 16.0000  0
+atom  167  167 CB    GLN                     6 12.0000  0
+atom  169  169 CG    GLN                     6 12.0000  0
+atom  171  171 CD    GLN                     6 12.0000  0
+atom  172  172 OE1   GLN                     8 16.0000  0
+atom  173  173 NE2   GLN                     7 14.0000  0
+atom   10   10 H     GLN                     1  1.0000  0
+atom   12   12 HA    GLN                     1  1.0000  0
+atom  168  168 HB1   GLN                     1  1.0000  0
+atom  168  168 HB2   GLN                     1  1.0000  0
+atom  170  170 HG1   GLN                     1  1.0000  0
+atom  170  170 HG2   GLN                     1  1.0000  0
+atom  174  174 1HE2  GLN                     1  1.0000  0
+atom  174  174 2HE2  GLN                     1  1.0000  0
+
+# RESIDUE GLU 15
+atom    7    7 N     GLU                     7 14.0000  0
+atom    8    8 CA    GLU                     6 12.0000  0
+atom    9    9 C     GLU                     6 12.0000  0
+atom   11   11 O     GLU                     8 16.0000  0
+atom  153  153 CB    GLU                     6 12.0000  0
+atom  155  155 CG    GLU                     6 12.0000  0
+atom  157  157 CD    GLU                     6 12.0000  0
+atom  158  158 OE1   GLU                     8 16.0000  0
+atom  158  158 OE2   GLU                     8 16.0000  0
+atom   10   10 H     GLU                     1  1.0000  0
+atom   12   12 HA    GLU                     1  1.0000  0
+atom  154  154 HB1   GLU                     1  1.0000  0
+atom  154  154 HB2   GLU                     1  1.0000  0
+atom  156  156 HG1   GLU                     1  1.0000  0
+atom  156  156 HG2   GLU                     1  1.0000  0
+
+# RESIDUE GLY 7
+atom    1    1 N     GLY                     7 14.0000  0
+atom    2    2 CA    GLY                     6 12.0000  0
+atom    3    3 C     GLY                     6 12.0000  0
+atom    5    5 O     GLY                     8 16.0000  0
+atom    4    4 H     GLY                     1  1.0000  0
+atom    6    6 HA1   GLY                     1  1.0000  0
+atom    6    6 HA2   GLY                     1  1.0000  0
+
+# RESIDUE HID 17
+atom    7    7 N     HID                     7 14.0000  0
+atom    8    8 CA    HID                     6 12.0000  0
+atom    9    9 C     HID                     6 12.0000  0
+atom   11   11 O     HID                     8 16.0000  0
+atom  117  117 CB    HID                     6 12.0000  0
+atom  119  119 CG    HID                     6 12.0000  0
+atom  120  120 ND1   HID                     7 14.0000  0
+atom  122  122 CD2   HID                     6 12.0000  0
+atom  124  124 CE1   HID                     6 12.0000  0
+atom  126  126 NE2   HID                     7 14.0000  0
+atom   10   10 H     HID                     1  1.0000  0
+atom   12   12 HA    HID                     1  1.0000  0
+atom  118  118 HB1   HID                     1  1.0000  0
+atom  118  118 HB2   HID                     1  1.0000  0
+atom  121  121 HD1   HID                     1  1.0000  0
+atom  123  123 HD2   HID                     1  1.0000  0
+atom  125  125 HE1   HID                     1  1.0000  0
+
+# RESIDUE HIE 17
+atom    7    7 N     HIE                     7 14.0000  0
+atom    8    8 CA    HIE                     6 12.0000  0
+atom    9    9 C     HIE                     6 12.0000  0
+atom   11   11 O     HIE                     8 16.0000  0
+atom  127  127 CB    HIE                     6 12.0000  0
+atom  129  129 CG    HIE                     6 12.0000  0
+atom  130  130 ND1   HIE                     7 14.0000  0
+atom  131  131 CD2   HIE                     6 12.0000  0
+atom  133  133 CE1   HIE                     6 12.0000  0
+atom  135  135 NE2   HIE                     7 14.0000  0
+atom   10   10 H     HIE                     1  1.0000  0
+atom   12   12 HA    HIE                     1  1.0000  0
+atom  128  128 HB1   HIE                     1  1.0000  0
+atom  128  128 HB2   HIE                     1  1.0000  0
+atom  132  132 HD2   HIE                     1  1.0000  0
+atom  134  134 HE1   HIE                     1  1.0000  0
+atom  136  136 HE2   HIE                     1  1.0000  0
+
+# RESIDUE HIS 18
+atom    7    7 N     HIS                     7 14.0000  0
+atom    8    8 CA    HIS                     6 12.0000  0
+atom    9    9 C     HIS                     6 12.0000  0
+atom   11   11 O     HIS                     8 16.0000  0
+atom  106  106 CB    HIS                     6 12.0000  0
+atom  108  108 CG    HIS                     6 12.0000  0
+atom  109  109 ND1   HIS                     7 14.0000  0
+atom  111  111 CD2   HIS                     6 12.0000  0
+atom  113  113 CE1   HIS                     6 12.0000  0
+atom  115  115 NE2   HIS                     7 14.0000  0
+atom   10   10 H     HIS                     1  1.0000  0
+atom   12   12 HA    HIS                     1  1.0000  0
+atom  107  107 HB1   HIS                     1  1.0000  0
+atom  107  107 HB2   HIS                     1  1.0000  0
+atom  110  110 HD1   HIS                     1  1.0000  0
+atom  112  112 HD2   HIS                     1  1.0000  0
+atom  114  114 HE1   HIS                     1  1.0000  0
+atom  116  116 HE2   HIS                     1  1.0000  0
+
+# RESIDUE HOH 3
+atom  349  349 O     HOH                     8 16.0000  0
+atom  350  350 H     HOH                     1  1.0000  0
+atom  350  350 H     HOH                     1  1.0000  0
+
+# RESIDUE ILE 19
+atom    7    7 N     ILE                     7 14.0000  0
+atom    8    8 CA    ILE                     6 12.0000  0
+atom    9    9 C     ILE                     6 12.0000  0
+atom   11   11 O     ILE                     8 16.0000  0
+atom   25   25 CB    ILE                     6 12.0000  0
+atom   27   27 CG1   ILE                     6 12.0000  0
+atom   29   29 CG2   ILE                     6 12.0000  0
+atom   31   31 CD    ILE                     6 12.0000  0
+atom   10   10 H     ILE                     1  1.0000  0
+atom   12   12 HA    ILE                     1  1.0000  0
+atom   26   26 HB    ILE                     1  1.0000  0
+atom   28   28 1HG1  ILE                     1  1.0000  0
+atom   28   28 2HG1  ILE                     1  1.0000  0
+atom   30   30 1HG2  ILE                     1  1.0000  0
+atom   30   30 2HG2  ILE                     1  1.0000  0
+atom   30   30 3HG2  ILE                     1  1.0000  0
+atom   32   32 HD1   ILE                     1  1.0000  0
+atom   32   32 HD2   ILE                     1  1.0000  0
+atom   32   32 HD3   ILE                     1  1.0000  0
+
+# RESIDUE LEU 19
+atom    7    7 N     LEU                     7 14.0000  0
+atom    8    8 CA    LEU                     6 12.0000  0
+atom    9    9 C     LEU                     6 12.0000  0
+atom   11   11 O     LEU                     8 16.0000  0
+atom   19   19 CB    LEU                     6 12.0000  0
+atom   21   21 CG    LEU                     6 12.0000  0
+atom   23   23 CD1   LEU                     6 12.0000  0
+atom   23   23 CD2   LEU                     6 12.0000  0
+atom   10   10 H     LEU                     1  1.0000  0
+atom   12   12 HA    LEU                     1  1.0000  0
+atom   20   20 HB1   LEU                     1  1.0000  0
+atom   20   20 HB2   LEU                     1  1.0000  0
+atom   22   22 HG    LEU                     1  1.0000  0
+atom   24   24 1HD1  LEU                     1  1.0000  0
+atom   24   24 2HD1  LEU                     1  1.0000  0
+atom   24   24 3HD1  LEU                     1  1.0000  0
+atom   24   24 1HD2  LEU                     1  1.0000  0
+atom   24   24 2HD2  LEU                     1  1.0000  0
+atom   24   24 3HD2  LEU                     1  1.0000  0
+
+# RESIDUE LYD 21
+atom    7    7 N     LYD                     7 14.0000  0
+atom    8    8 CA    LYD                     6 12.0000  0
+atom    9    9 C     LYD                     6 12.0000  0
+atom   11   11 O     LYD                     8 16.0000  0
+atom  192  192 CB    LYD                     6 12.0000  0
+atom  194  194 CG    LYD                     6 12.0000  0
+atom  196  196 CD    LYD                     6 12.0000  0
+atom  198  198 CE    LYD                     6 12.0000  0
+atom  200  200 NZ    LYD                     7 14.0000  0
+atom   10   10 H     LYD                     1  1.0000  0
+atom   12   12 HA    LYD                     1  1.0000  0
+atom  193  193 HB2   LYD                     1  1.0000  0
+atom  193  193 HB3   LYD                     1  1.0000  0
+atom  195  195 HG2   LYD                     1  1.0000  0
+atom  195  195 HG3   LYD                     1  1.0000  0
+atom  197  197 HD2   LYD                     1  1.0000  0
+atom  197  197 HD3   LYD                     1  1.0000  0
+atom  199  199 HE2   LYD                     1  1.0000  0
+atom  199  199 HE3   LYD                     1  1.0000  0
+atom  201  201 HZ1   LYD                     1  1.0000  0
+atom  201  201 HZ2   LYD                     1  1.0000  0
+
+# RESIDUE LYS 22
+atom    7    7 N     LYS                     7 14.0000  0
+atom    8    8 CA    LYS                     6 12.0000  0
+atom    9    9 C     LYS                     6 12.0000  0
+atom   11   11 O     LYS                     8 16.0000  0
+atom  182  182 CB    LYS                     6 12.0000  0
+atom  184  184 CG    LYS                     6 12.0000  0
+atom  186  186 CD    LYS                     6 12.0000  0
+atom  188  188 CE    LYS                     6 12.0000  0
+atom  190  190 NZ    LYS                     7 14.0000  0
+atom   10   10 H     LYS                     1  1.0000  0
+atom   12   12 HA    LYS                     1  1.0000  0
+atom  183  183 HB1   LYS                     1  1.0000  0
+atom  183  183 HB2   LYS                     1  1.0000  0
+atom  185  185 HG1   LYS                     1  1.0000  0
+atom  185  185 HG2   LYS                     1  1.0000  0
+atom  187  187 HD1   LYS                     1  1.0000  0
+atom  187  187 HD2   LYS                     1  1.0000  0
+atom  189  189 HE1   LYS                     1  1.0000  0
+atom  189  189 HE2   LYS                     1  1.0000  0
+atom  191  191 HZ1   LYS                     1  1.0000  0
+atom  191  191 HZ2   LYS                     1  1.0000  0
+atom  191  191 HZ3   LYS                     1  1.0000  0
+
+# RESIDUE MET 17
+atom    7    7 N     MET                     7 14.0000  0
+atom    8    8 CA    MET                     6 12.0000  0
+atom    9    9 C     MET                     6 12.0000  0
+atom   11   11 O     MET                     8 16.0000  0
+atom  175  175 CB    MET                     6 12.0000  0
+atom  177  177 CG    MET                     6 12.0000  0
+atom  179  179 SD    MET                    16 32.0000  0
+atom  180  180 CE    MET                     6 12.0000  0
+atom   10   10 H     MET                     1  1.0000  0
+atom   12   12 HA    MET                     1  1.0000  0
+atom  176  176 HB1   MET                     1  1.0000  0
+atom  176  176 HB2   MET                     1  1.0000  0
+atom  178  178 HG1   MET                     1  1.0000  0
+atom  178  178 HG2   MET                     1  1.0000  0
+atom  181  181 HE1   MET                     1  1.0000  0
+atom  181  181 HE2   MET                     1  1.0000  0
+atom  181  181 HE3   MET                     1  1.0000  0
+
+# RESIDUE NH2 3
+atom  225  225 N     NH2                     7 14.0000  0
+atom  226  226 H1    NH2                     1  1.0000  0
+atom  226  226 H2    NH2                     1  1.0000  0
+
+# RESIDUE ORN 19
+atom    7    7 N     ORN                     7 14.0000  0
+atom    8    8 CA    ORN                     6 12.0000  0
+atom    9    9 C     ORN                     6 12.0000  0
+atom   11   11 O     ORN                     8 16.0000  0
+atom  213  213 CB    ORN                     6 12.0000  0
+atom  215  215 CG    ORN                     6 12.0000  0
+atom  217  217 CD    ORN                     6 12.0000  0
+atom  219  219 NE    ORN                     7 14.0000  0
+atom   10   10 H     ORN                     1  1.0000  0
+atom   12   12 HA    ORN                     1  1.0000  0
+atom  214  214 HB2   ORN                     1  1.0000  0
+atom  214  214 HB3   ORN                     1  1.0000  0
+atom  216  216 HG2   ORN                     1  1.0000  0
+atom  216  216 HG3   ORN                     1  1.0000  0
+atom  218  218 HD2   ORN                     1  1.0000  0
+atom  218  218 HD3   ORN                     1  1.0000  0
+atom  220  220 HE1   ORN                     1  1.0000  0
+atom  220  220 HE2   ORN                     1  1.0000  0
+atom  220  220 HE3   ORN                     1  1.0000  0
+
+# RESIDUE PHE 20
+atom    7    7 N     PHE                     7 14.0000  0
+atom    8    8 CA    PHE                     6 12.0000  0
+atom    9    9 C     PHE                     6 12.0000  0
+atom   11   11 O     PHE                     8 16.0000  0
+atom   61   61 CB    PHE                     6 12.0000  0
+atom   63   63 CG    PHE                     6 12.0000  0
+atom   64   64 CD1   PHE                     6 12.0000  0
+atom   64   64 CD2   PHE                     6 12.0000  0
+atom   66   66 CE1   PHE                     6 12.0000  0
+atom   66   66 CE2   PHE                     6 12.0000  0
+atom   68   68 CZ    PHE                     6 12.0000  0
+atom   10   10 H     PHE                     1  1.0000  0
+atom   12   12 HA    PHE                     1  1.0000  0
+atom   62   62 HB1   PHE                     1  1.0000  0
+atom   62   62 HB2   PHE                     1  1.0000  0
+atom   65   65 HD1   PHE                     1  1.0000  0
+atom   65   65 HD2   PHE                     1  1.0000  0
+atom   67   67 HE1   PHE                     1  1.0000  0
+atom   67   67 HE2   PHE                     1  1.0000  0
+atom   69   69 HZ    PHE                     1  1.0000  0
+
+# RESIDUE PRO 14
+atom   50   50 N     PRO                     7 14.0000  0
+atom   51   51 CA    PRO                     6 12.0000  0
+atom   52   52 C     PRO                     6 12.0000  0
+atom   53   53 O     PRO                     8 16.0000  0
+atom   55   55 CB    PRO                     6 12.0000  0
+atom   57   57 CG    PRO                     6 12.0000  0
+atom   59   59 CD    PRO                     6 12.0000  0
+atom   54   54 HA    PRO                     1  1.0000  0
+atom   56   56 HB1   PRO                     1  1.0000  0
+atom   56   56 HB2   PRO                     1  1.0000  0
+atom   58   58 HG1   PRO                     1  1.0000  0
+atom   58   58 HG2   PRO                     1  1.0000  0
+atom   60   60 HD1   PRO                     1  1.0000  0
+atom   60   60 HD2   PRO                     1  1.0000  0
+
+# RESIDUE SER 11
+atom    7    7 N     SER                     7 14.0000  0
+atom    8    8 CA    SER                     6 12.0000  0
+atom    9    9 C     SER                     6 12.0000  0
+atom   11   11 O     SER                     8 16.0000  0
+atom   33   33 CB    SER                     6 12.0000  0
+atom   35   35 OG    SER                     8 16.0000  0
+atom   10   10 H     SER                     1  1.0000  0
+atom   12   12 HA    SER                     1  1.0000  0
+atom   34   34 HB1   SER                     1  1.0000  0
+atom   34   34 HB2   SER                     1  1.0000  0
+atom   36   36 HG    SER                     1  1.0000  0
+
+# RESIDUE THR 14
+atom    7    7 N     THR                     7 14.0000  0
+atom    8    8 CA    THR                     6 12.0000  0
+atom    9    9 C     THR                     6 12.0000  0
+atom   11   11 O     THR                     8 16.0000  0
+atom   37   37 CB    THR                     6 12.0000  0
+atom   39   39 OG1   THR                     8 16.0000  0
+atom   41   41 CG2   THR                     6 12.0000  0
+atom   10   10 H     THR                     1  1.0000  0
+atom   12   12 HA    THR                     1  1.0000  0
+atom   38   38 HB    THR                     1  1.0000  0
+atom   40   40 HG1   THR                     1  1.0000  0
+atom   42   42 1HG2  THR                     1  1.0000  0
+atom   42   42 2HG2  THR                     1  1.0000  0
+atom   42   42 3HG2  THR                     1  1.0000  0
+
+# RESIDUE TRP 24
+atom    7    7 N     TRP                     7 14.0000  0
+atom    8    8 CA    TRP                     6 12.0000  0
+atom    9    9 C     TRP                     6 12.0000  0
+atom   11   11 O     TRP                     8 16.0000  0
+atom   89   89 CB    TRP                     6 12.0000  0
+atom   91   91 CG    TRP                     6 12.0000  0
+atom   92   92 CD1   TRP                     6 12.0000  0
+atom   94   94 CD2   TRP                     6 12.0000  0
+atom   95   95 NE1   TRP                     7 14.0000  0
+atom   97   97 CE2   TRP                     6 12.0000  0
+atom   98   98 CE3   TRP                     6 12.0000  0
+atom  100  100 CZ2   TRP                     6 12.0000  0
+atom  102  102 CZ3   TRP                     6 12.0000  0
+atom  104  104 CH2   TRP                     6 12.0000  0
+atom   10   10 H     TRP                     1  1.0000  0
+atom   12   12 HA    TRP                     1  1.0000  0
+atom   90   90 HB1   TRP                     1  1.0000  0
+atom   90   90 HB2   TRP                     1  1.0000  0
+atom   93   93 HD1   TRP                     1  1.0000  0
+atom   96   96 HE1   TRP                     1  1.0000  0
+atom   99   99 HE3   TRP                     1  1.0000  0
+atom  101  101 HZ2   TRP                     1  1.0000  0
+atom  103  103 HZ3   TRP                     1  1.0000  0
+atom  105  105 HH2   TRP                     1  1.0000  0
+
+# RESIDUE TYD 20
+atom    7    7 N     TYD                     7 14.0000  0
+atom    8    8 CA    TYD                     6 12.0000  0
+atom    9    9 C     TYD                     6 12.0000  0
+atom   11   11 O     TYD                     8 16.0000  0
+atom   80   80 CB    TYD                     6 12.0000  0
+atom   82   82 CG    TYD                     6 12.0000  0
+atom   83   83 CD1   TYD                     6 12.0000  0
+atom   83   83 CD2   TYD                     6 12.0000  0
+atom   85   85 CE1   TYD                     6 12.0000  0
+atom   85   85 CE2   TYD                     6 12.0000  0
+atom   87   87 CZ    TYD                     6 12.0000  0
+atom   88   88 OH    TYD                     8 16.0000  0
+atom   10   10 H     TYD                     1  1.0000  0
+atom   12   12 HA    TYD                     1  1.0000  0
+atom   81   81 HB2   TYD                     1  1.0000  0
+atom   81   81 HB3   TYD                     1  1.0000  0
+atom   84   84 HD1   TYD                     1  1.0000  0
+atom   84   84 HD2   TYD                     1  1.0000  0
+atom   86   86 HE1   TYD                     1  1.0000  0
+atom   86   86 HE2   TYD                     1  1.0000  0
+
+# RESIDUE TYR 21
+atom    7    7 N     TYR                     7 14.0000  0
+atom    8    8 CA    TYR                     6 12.0000  0
+atom    9    9 C     TYR                     6 12.0000  0
+atom   11   11 O     TYR                     8 16.0000  0
+atom   70   70 CB    TYR                     6 12.0000  0
+atom   72   72 CG    TYR                     6 12.0000  0
+atom   73   73 CD1   TYR                     6 12.0000  0
+atom   73   73 CD2   TYR                     6 12.0000  0
+atom   75   75 CE1   TYR                     6 12.0000  0
+atom   75   75 CE2   TYR                     6 12.0000  0
+atom   77   77 CZ    TYR                     6 12.0000  0
+atom   78   78 OH    TYR                     8 16.0000  0
+atom   10   10 H     TYR                     1  1.0000  0
+atom   12   12 HA    TYR                     1  1.0000  0
+atom   71   71 HB1   TYR                     1  1.0000  0
+atom   71   71 HB2   TYR                     1  1.0000  0
+atom   74   74 HD1   TYR                     1  1.0000  0
+atom   74   74 HD2   TYR                     1  1.0000  0
+atom   76   76 HE1   TYR                     1  1.0000  0
+atom   76   76 HE2   TYR                     1  1.0000  0
+atom   79   79 HH    TYR                     1  1.0000  0
+
+# RESIDUE VAL 16
+atom    7    7 N     VAL                     7 14.0000  0
+atom    8    8 CA    VAL                     6 12.0000  0
+atom    9    9 C     VAL                     6 12.0000  0
+atom   11   11 O     VAL                     8 16.0000  0
+atom   15   15 CB    VAL                     6 12.0000  0
+atom   17   17 CG1   VAL                     6 12.0000  0
+atom   17   17 CG2   VAL                     6 12.0000  0
+atom   10   10 H     VAL                     1  1.0000  0
+atom   12   12 HA    VAL                     1  1.0000  0
+atom   16   16 HB    VAL                     1  1.0000  0
+atom   18   18 1HG1  VAL                     1  1.0000  0
+atom   18   18 2HG1  VAL                     1  1.0000  0
+atom   18   18 3HG1  VAL                     1  1.0000  0
+atom   18   18 1HG2  VAL                     1  1.0000  0
+atom   18   18 2HG2  VAL                     1  1.0000  0
+atom   18   18 3HG2  VAL                     1  1.0000  0
+
+# RESIDUE CALA 11
+atom    7    7 N     CALA                    7 14.0000  0
+atom    8    8 CA    CALA                    6 12.0000  0
+atom  233  233 C     CALA                    6 12.0000  0
+atom  234  234 O     CALA                    8 16.0000  0
+atom   13   13 CB    CALA                    6 12.0000  0
+atom  234  234 OXT   CALA                    8 16.0000  0
+atom   10   10 H     CALA                    1  1.0000  0
+atom   12   12 HA    CALA                    1  1.0000  0
+atom   14   14 HB1   CALA                    1  1.0000  0
+atom   14   14 HB2   CALA                    1  1.0000  0
+atom   14   14 HB3   CALA                    1  1.0000  0
+
+# RESIDUE CARG 25
+atom    7    7 N     CARG                    7 14.0000  0
+atom    8    8 CA    CARG                    6 12.0000  0
+atom  233  233 C     CARG                    6 12.0000  0
+atom  234  234 O     CARG                    8 16.0000  0
+atom  202  202 CB    CARG                    6 12.0000  0
+atom  204  204 CG    CARG                    6 12.0000  0
+atom  206  206 CD    CARG                    6 12.0000  0
+atom  208  208 NE    CARG                    7 14.0000  0
+atom  210  210 CZ    CARG                    6 12.0000  0
+atom  211  211 NH1   CARG                    7 14.0000  0
+atom  211  211 NH2   CARG                    7 14.0000  0
+atom  234  234 OXT   CARG                    8 16.0000  0
+atom   10   10 H     CARG                    1  1.0000  0
+atom   12   12 HA    CARG                    1  1.0000  0
+atom  203  203 HB1   CARG                    1  1.0000  0
+atom  203  203 HB2   CARG                    1  1.0000  0
+atom  205  205 HG1   CARG                    1  1.0000  0
+atom  205  205 HG2   CARG                    1  1.0000  0
+atom  207  207 HD1   CARG                    1  1.0000  0
+atom  207  207 HD2   CARG                    1  1.0000  0
+atom  209  209 HE    CARG                    1  1.0000  0
+atom  212  212 1HH1  CARG                    1  1.0000  0
+atom  212  212 2HH1  CARG                    1  1.0000  0
+atom  212  212 1HH2  CARG                    1  1.0000  0
+atom  212  212 2HH2  CARG                    1  1.0000  0
+
+# RESIDUE CASH 14
+atom    7    7 N     CASH                    7 14.0000  0
+atom    8    8 CA    CASH                    6 12.0000  0
+atom  233  233 C     CASH                    6 12.0000  0
+atom  234  234 O     CASH                    8 16.0000  0
+atom  141  141 CB    CASH                    6 12.0000  0
+atom  143  143 CG    CASH                    6 12.0000  0
+atom  144  144 OD1   CASH                    8 16.0000  0
+atom  145  145 OD2   CASH                    8 16.0000  0
+atom  234  234 OXT   CASH                    8 16.0000  0
+atom   10   10 H     CASH                    1  1.0000  0
+atom   12   12 HA    CASH                    1  1.0000  0
+atom  142  142 HB2   CASH                    1  1.0000  0
+atom  142  142 HB3   CASH                    1  1.0000  0
+atom  146  146 HD2   CASH                    1  1.0000  0
+
+# RESIDUE C	 15
+atom    7    7 N     CASN                    7 14.0000  0
+atom    8    8 CA    CASN                    6 12.0000  0
+atom  233  233 C     CASN                    6 12.0000  0
+atom  234  234 O     CASN                    8 16.0000  0
+atom  147  147 CB    CASN                    6 12.0000  0
+atom  149  149 CG    CASN                    6 12.0000  0
+atom  150  150 OD1   CASN                    8 16.0000  0
+atom  151  151 ND2   CASN                    7 14.0000  0
+atom  234  234 OXT   CASN                    8 16.0000  0
+atom   10   10 H     CASN                    1  1.0000  0
+atom   12   12 HA    CASN                    1  1.0000  0
+atom  148  148 HB1   CASN                    1  1.0000  0
+atom  148  148 HB2   CASN                    1  1.0000  0
+atom  152  152 1HD2  CASN                    1  1.0000  0
+atom  152  152 2HD2  CASN                    1  1.0000  0
+
+# RESIDUE CASP 13
+atom    7    7 N     CASP                    7 14.0000  0
+atom    8    8 CA    CASP                    6 12.0000  0
+atom  233  233 C     CASP                    6 12.0000  0
+atom  234  234 O     CASP                    8 16.0000  0
+atom  137  137 CB    CASP                    6 12.0000  0
+atom  139  139 CG    CASP                    6 12.0000  0
+atom  140  140 OD1   CASP                    8 16.0000  0
+atom  140  140 OD2   CASP                    8 16.0000  0
+atom  234  234 OXT   CASP                    8 16.0000  0
+atom   10   10 H     CASP                    1  1.0000  0
+atom   12   12 HA    CASP                    1  1.0000  0
+atom  138  138 HB1   CASP                    1  1.0000  0
+atom  138  138 HB2   CASP                    1  1.0000  0
+
+# RESIDUE CCYD 11
+atom    7    7 N     CCYD                    7 14.0000  0
+atom   48   48 CA    CCYD                    6 12.0000  0
+atom  233  233 C     CCYD                    6 12.0000  0
+atom  234  234 O     CCYD                    8 16.0000  0
+atom   43   43 CB    CCYD                    6 12.0000  0
+atom   49   49 SG    CCYD                   16 32.0000  0
+atom  234  234 OXT   CCYD                    8 16.0000  0
+atom   10   10 H     CCYD                    1  1.0000  0
+atom   12   12 HA    CCYD                    1  1.0000  0
+atom   44   44 HB2   CCYD                    1  1.0000  0
+atom   44   44 HB3   CCYD                    1  1.0000  0
+
+# RESIDUE CCYS 12
+atom    7    7 N     CCYS                    7 14.0000  0
+atom    8    8 CA    CCYS                    6 12.0000  0
+atom  233  233 C     CCYS                    6 12.0000  0
+atom  234  234 O     CCYS                    8 16.0000  0
+atom   43   43 CB    CCYS                    6 12.0000  0
+atom   45   45 SG    CCYS                   16 32.0000  0
+atom  234  234 OXT   CCYS                    8 16.0000  0
+atom   10   10 H     CCYS                    1  1.0000  0
+atom   12   12 HA    CCYS                    1  1.0000  0
+atom   44   44 HB1   CCYS                    1  1.0000  0
+atom   44   44 HB2   CCYS                    1  1.0000  0
+atom   46   46 HG    CCYS                    1  1.0000  0
+
+# RESIDUE CGLH 17
+atom    7    7 N     CGLH                    7 14.0000  0
+atom    8    8 CA    CGLH                    6 12.0000  0
+atom  233  233 C     CGLH                    6 12.0000  0
+atom  234  234 O     CGLH                    8 16.0000  0
+atom  159  159 CB    CGLH                    6 12.0000  0
+atom  161  161 CG    CGLH                    6 12.0000  0
+atom  163  163 CD    CGLH                    6 12.0000  0
+atom  164  164 OE1   CGLH                    8 16.0000  0
+atom  165  165 OE2   CGLH                    8 16.0000  0
+atom  234  234 OXT   CGLH                    8 16.0000  0
+atom   10   10 H     CGLH                    1  1.0000  0
+atom   12   12 HA    CGLH                    1  1.0000  0
+atom  160  160 HB1   CGLH                    1  1.0000  0
+atom  160  160 HB2   CGLH                    1  1.0000  0
+atom  162  162 HG1   CGLH                    1  1.0000  0
+atom  162  162 HG2   CGLH                    1  1.0000  0
+atom  166  166 HE2   CGLH                    1  1.0000  0
+
+# RESIDUE CGLN 18
+atom    7    7 N     CGLN                    7 14.0000  0
+atom    8    8 CA    CGLN                    6 12.0000  0
+atom  233  233 C     CGLN                    6 12.0000  0
+atom  234  234 O     CGLN                    8 16.0000  0
+atom  167  167 CB    CGLN                    6 12.0000  0
+atom  169  169 CG    CGLN                    6 12.0000  0
+atom  171  171 CD    CGLN                    6 12.0000  0
+atom  172  172 OE1   CGLN                    8 16.0000  0
+atom  173  173 NE2   CGLN                    7 14.0000  0
+atom  234  234 OXT   CGLN                    8 16.0000  0
+atom   10   10 H     CGLN                    1  1.0000  0
+atom   12   12 HA    CGLN                    1  1.0000  0
+atom  168  168 HB1   CGLN                    1  1.0000  0
+atom  168  168 HB2   CGLN                    1  1.0000  0
+atom  170  170 HG1   CGLN                    1  1.0000  0
+atom  170  170 HG2   CGLN                    1  1.0000  0
+atom  174  174 1HE2  CGLN                    1  1.0000  0
+atom  174  174 2HE2  CGLN                    1  1.0000  0
+
+# RESIDUE CGLU 16
+atom    7    7 N     CGLU                    7 14.0000  0
+atom    8    8 CA    CGLU                    6 12.0000  0
+atom  233  233 C     CGLU                    6 12.0000  0
+atom  234  234 O     CGLU                    8 16.0000  0
+atom  153  153 CB    CGLU                    6 12.0000  0
+atom  155  155 CG    CGLU                    6 12.0000  0
+atom  157  157 CD    CGLU                    6 12.0000  0
+atom  158  158 OE1   CGLU                    8 16.0000  0
+atom  158  158 OE2   CGLU                    8 16.0000  0
+atom  234  234 OXT   CGLU                    8 16.0000  0
+atom   10   10 H     CGLU                    1  1.0000  0
+atom   12   12 HA    CGLU                    1  1.0000  0
+atom  154  154 HB1   CGLU                    1  1.0000  0
+atom  154  154 HB2   CGLU                    1  1.0000  0
+atom  156  156 HG1   CGLU                    1  1.0000  0
+atom  156  156 HG2   CGLU                    1  1.0000  0
+
+# RESIDUE CGLY 8
+atom    1    1 N     CGLY                    7 14.0000  0
+atom    2    2 CA    CGLY                    6 12.0000  0
+atom  233  233 C     CGLY                    6 12.0000  0
+atom  234  234 O     CGLY                    8 16.0000  0
+atom  234  234 OXT   CGLY                    8 16.0000  0
+atom    4    4 H     CGLY                    1  1.0000  0
+atom    6    6 HA1   CGLY                    1  1.0000  0
+atom    6    6 HA2   CGLY                    1  1.0000  0
+
+# RESIDUE CHID 18
+atom    7    7 N     CHID                    7 14.0000  0
+atom    8    8 CA    CHID                    6 12.0000  0
+atom  233  233 C     CHID                    6 12.0000  0
+atom  234  234 O     CHID                    8 16.0000  0
+atom  117  117 CB    CHID                    6 12.0000  0
+atom  119  119 CG    CHID                    6 12.0000  0
+atom  120  120 ND1   CHID                    7 14.0000  0
+atom  122  122 CD2   CHID                    6 12.0000  0
+atom  124  124 CE1   CHID                    6 12.0000  0
+atom  126  126 NE2   CHID                    7 14.0000  0
+atom  234  234 OXT   CHID                    8 16.0000  0
+atom   10   10 H     CHID                    1  1.0000  0
+atom   12   12 HA    CHID                    1  1.0000  0
+atom  118  118 HB1   CHID                    1  1.0000  0
+atom  118  118 HB2   CHID                    1  1.0000  0
+atom  121  121 HD1   CHID                    1  1.0000  0
+atom  123  123 HD2   CHID                    1  1.0000  0
+atom  125  125 HE1   CHID                    1  1.0000  0
+
+# RESIDUE CHIE 18
+atom    7    7 N     CHIE                    7 14.0000  0
+atom    8    8 CA    CHIE                    6 12.0000  0
+atom  233  233 C     CHIE                    6 12.0000  0
+atom  234  234 O     CHIE                    8 16.0000  0
+atom  127  127 CB    CHIE                    6 12.0000  0
+atom  129  129 CG    CHIE                    6 12.0000  0
+atom  130  130 ND1   CHIE                    7 14.0000  0
+atom  131  131 CD2   CHIE                    6 12.0000  0
+atom  133  133 CE1   CHIE                    6 12.0000  0
+atom  135  135 NE2   CHIE                    7 14.0000  0
+atom  234  234 OXT   CHIE                    8 16.0000  0
+atom   10   10 H     CHIE                    1  1.0000  0
+atom   12   12 HA    CHIE                    1  1.0000  0
+atom  128  128 HB1   CHIE                    1  1.0000  0
+atom  128  128 HB2   CHIE                    1  1.0000  0
+atom  132  132 HD2   CHIE                    1  1.0000  0
+atom  134  134 HE1   CHIE                    1  1.0000  0
+atom  136  136 HE2   CHIE                    1  1.0000  0
+
+# RESIDUE CHIS 19
+atom    7    7 N     CHIS                    7 14.0000  0
+atom    8    8 CA    CHIS                    6 12.0000  0
+atom  233  233 C     CHIS                    6 12.0000  0
+atom  234  234 O     CHIS                    8 16.0000  0
+atom  106  106 CB    CHIS                    6 12.0000  0
+atom  108  108 CG    CHIS                    6 12.0000  0
+atom  109  109 ND1   CHIS                    7 14.0000  0
+atom  111  111 CD2   CHIS                    6 12.0000  0
+atom  113  113 CE1   CHIS                    6 12.0000  0
+atom  115  115 NE2   CHIS                    7 14.0000  0
+atom  234  234 OXT   CHIS                    8 16.0000  0
+atom   10   10 H     CHIS                    1  1.0000  0
+atom   12   12 HA    CHIS                    1  1.0000  0
+atom  107  107 HB1   CHIS                    1  1.0000  0
+atom  107  107 HB2   CHIS                    1  1.0000  0
+atom  110  110 HD1   CHIS                    1  1.0000  0
+atom  112  112 HD2   CHIS                    1  1.0000  0
+atom  114  114 HE1   CHIS                    1  1.0000  0
+atom  116  116 HE2   CHIS                    1  1.0000  0
+
+# RESIDUE C	 20
+atom    7    7 N     CILE                    7 14.0000  0
+atom    8    8 CA    CILE                    6 12.0000  0
+atom  233  233 C     CILE                    6 12.0000  0
+atom  234  234 O     CILE                    8 16.0000  0
+atom   25   25 CB    CILE                    6 12.0000  0
+atom   27   27 CG1   CILE                    6 12.0000  0
+atom   29   29 CG2   CILE                    6 12.0000  0
+atom   31   31 CD    CILE                    6 12.0000  0
+atom  234  234 OXT   CILE                    8 16.0000  0
+atom   10   10 H     CILE                    1  1.0000  0
+atom   12   12 HA    CILE                    1  1.0000  0
+atom   26   26 HB    CILE                    1  1.0000  0
+atom   28   28 1HG1  CILE                    1  1.0000  0
+atom   28   28 2HG1  CILE                    1  1.0000  0
+atom   30   30 1HG2  CILE                    1  1.0000  0
+atom   30   30 2HG2  CILE                    1  1.0000  0
+atom   30   30 3HG2  CILE                    1  1.0000  0
+atom   32   32 HD1   CILE                    1  1.0000  0
+atom   32   32 HD2   CILE                    1  1.0000  0
+atom   32   32 HD3   CILE                    1  1.0000  0
+
+# RESIDUE CLEU 20
+atom    7    7 N     CLEU                    7 14.0000  0
+atom    8    8 CA    CLEU                    6 12.0000  0
+atom  233  233 C     CLEU                    6 12.0000  0
+atom  234  234 O     CLEU                    8 16.0000  0
+atom   19   19 CB    CLEU                    6 12.0000  0
+atom   21   21 CG    CLEU                    6 12.0000  0
+atom   23   23 CD1   CLEU                    6 12.0000  0
+atom   23   23 CD2   CLEU                    6 12.0000  0
+atom  234  234 OXT   CLEU                    8 16.0000  0
+atom   10   10 H     CLEU                    1  1.0000  0
+atom   12   12 HA    CLEU                    1  1.0000  0
+atom   20   20 HB1   CLEU                    1  1.0000  0
+atom   20   20 HB2   CLEU                    1  1.0000  0
+atom   22   22 HG    CLEU                    1  1.0000  0
+atom   24   24 1HD1  CLEU                    1  1.0000  0
+atom   24   24 2HD1  CLEU                    1  1.0000  0
+atom   24   24 3HD1  CLEU                    1  1.0000  0
+atom   24   24 1HD2  CLEU                    1  1.0000  0
+atom   24   24 2HD2  CLEU                    1  1.0000  0
+atom   24   24 3HD2  CLEU                    1  1.0000  0
+
+# RESIDUE CLYD 22
+atom    7    7 N     CLYD                    7 14.0000  0
+atom    8    8 CA    CLYD                    6 12.0000  0
+atom  233  233 C     CLYD                    6 12.0000  0
+atom  234  234 O     CLYD                    8 16.0000  0
+atom  192  192 CB    CLYD                    6 12.0000  0
+atom  194  194 CG    CLYD                    6 12.0000  0
+atom  196  196 CD    CLYD                    6 12.0000  0
+atom  198  198 CE    CLYD                    6 12.0000  0
+atom  200  200 NZ    CLYD                    7 14.0000  0
+atom  234  234 OXT   CLYD                    8 16.0000  0
+atom   10   10 H     CLYD                    1  1.0000  0
+atom   12   12 HA    CLYD                    1  1.0000  0
+atom  193  193 HB2   CLYD                    1  1.0000  0
+atom  193  193 HB3   CLYD                    1  1.0000  0
+atom  195  195 HG2   CLYD                    1  1.0000  0
+atom  195  195 HG3   CLYD                    1  1.0000  0
+atom  197  197 HD2   CLYD                    1  1.0000  0
+atom  197  197 HD3   CLYD                    1  1.0000  0
+atom  199  199 HE2   CLYD                    1  1.0000  0
+atom  199  199 HE3   CLYD                    1  1.0000  0
+atom  201  201 HZ1   CLYD                    1  1.0000  0
+atom  201  201 HZ2   CLYD                    1  1.0000  0
+
+# RESIDUE CLYS 23
+atom    7    7 N     CLYS                    7 14.0000  0
+atom    8    8 CA    CLYS                    6 12.0000  0
+atom  233  233 C     CLYS                    6 12.0000  0
+atom  234  234 O     CLYS                    8 16.0000  0
+atom  182  182 CB    CLYS                    6 12.0000  0
+atom  184  184 CG    CLYS                    6 12.0000  0
+atom  186  186 CD    CLYS                    6 12.0000  0
+atom  188  188 CE    CLYS                    6 12.0000  0
+atom  190  190 NZ    CLYS                    7 14.0000  0
+atom  234  234 OC1   CLYS                    8 16.0000  0
+atom  234  234 OC2   CLYS                    8 16.0000  0
+atom   10   10 H     CLYS                    1  1.0000  0
+atom   12   12 HA    CLYS                    1  1.0000  0
+atom  183  183 HB1   CLYS                    1  1.0000  0
+atom  183  183 HB2   CLYS                    1  1.0000  0
+atom  185  185 HG1   CLYS                    1  1.0000  0
+atom  185  185 HG2   CLYS                    1  1.0000  0
+atom  187  187 HD1   CLYS                    1  1.0000  0
+atom  187  187 HD2   CLYS                    1  1.0000  0
+atom  189  189 HE1   CLYS                    1  1.0000  0
+atom  189  189 HE2   CLYS                    1  1.0000  0
+atom  191  191 HZ1   CLYS                    1  1.0000  0
+atom  191  191 HZ2   CLYS                    1  1.0000  0
+atom  191  191 HZ3   CLYS                    1  1.0000  0
+
+# RESIDUE CMET 18
+atom    7    7 N     CMET                    7 14.0000  0
+atom    8    8 CA    CMET                    6 12.0000  0
+atom  233  233 C     CMET                    6 12.0000  0
+atom  234  234 O     CMET                    8 16.0000  0
+atom  175  175 CB    CMET                    6 12.0000  0
+atom  177  177 CG    CMET                    6 12.0000  0
+atom  179  179 SD    CMET                   16 32.0000  0
+atom  180  180 CE    CMET                    6 12.0000  0
+atom  234  234 OXT   CMET                    8 16.0000  0
+atom   10   10 H     CMET                    1  1.0000  0
+atom   12   12 HA    CMET                    1  1.0000  0
+atom  176  176 HB1   CMET                    1  1.0000  0
+atom  176  176 HB2   CMET                    1  1.0000  0
+atom  178  178 HG1   CMET                    1  1.0000  0
+atom  178  178 HG2   CMET                    1  1.0000  0
+atom  181  181 HE1   CMET                    1  1.0000  0
+atom  181  181 HE2   CMET                    1  1.0000  0
+atom  181  181 HE3   CMET                    1  1.0000  0
+
+# RESIDUE CNME 6
+atom  227  227 N     CNME                    7 14.0000  0
+atom  229  229 CH3   CNME                    6 12.0000  0
+atom  228  228 H     CNME                    1  1.0000  0
+atom  230  230 H1    CNME                    1  1.0000  0
+atom  230  230 H2    CNME                    1  1.0000  0
+atom  230  230 H3    CNME                    1  1.0000  0
+
+# RESIDUE CORN 20
+atom    7    7 N     CORN                    7 14.0000  0
+atom    8    8 CA    CORN                    6 12.0000  0
+atom  233  233 C     CORN                    6 12.0000  0
+atom  234  234 O     CORN                    8 16.0000  0
+atom  213  213 CB    CORN                    6 12.0000  0
+atom  215  215 CG    CORN                    6 12.0000  0
+atom  217  217 CD    CORN                    6 12.0000  0
+atom  219  219 NE    CORN                    7 14.0000  0
+atom  234  234 OXT   CORN                    8 16.0000  0
+atom   10   10 H     CORN                    1  1.0000  0
+atom   12   12 HA    CORN                    1  1.0000  0
+atom  214  214 HB2   CORN                    1  1.0000  0
+atom  214  214 HB3   CORN                    1  1.0000  0
+atom  216  216 HG2   CORN                    1  1.0000  0
+atom  216  216 HG3   CORN                    1  1.0000  0
+atom  218  218 HD2   CORN                    1  1.0000  0
+atom  218  218 HD3   CORN                    1  1.0000  0
+atom  220  220 HE1   CORN                    1  1.0000  0
+atom  220  220 HE2   CORN                    1  1.0000  0
+atom  220  220 HE3   CORN                    1  1.0000  0
+
+# RESIDUE CPHE 21
+atom    7    7 N     CPHE                    7 14.0000  0
+atom    8    8 CA    CPHE                    6 12.0000  0
+atom  233  233 C     CPHE                    6 12.0000  0
+atom  234  234 O     CPHE                    8 16.0000  0
+atom   61   61 CB    CPHE                    6 12.0000  0
+atom   63   63 CG    CPHE                    6 12.0000  0
+atom   64   64 CD1   CPHE                    6 12.0000  0
+atom   64   64 CD2   CPHE                    6 12.0000  0
+atom   66   66 CE1   CPHE                    6 12.0000  0
+atom   66   66 CE2   CPHE                    6 12.0000  0
+atom   68   68 CZ    CPHE                    6 12.0000  0
+atom  234  234 OXT   CPHE                    8 16.0000  0
+atom   10   10 H     CPHE                    1  1.0000  0
+atom   12   12 HA    CPHE                    1  1.0000  0
+atom   62   62 HB1   CPHE                    1  1.0000  0
+atom   62   62 HB2   CPHE                    1  1.0000  0
+atom   65   65 HD1   CPHE                    1  1.0000  0
+atom   65   65 HD2   CPHE                    1  1.0000  0
+atom   67   67 HE1   CPHE                    1  1.0000  0
+atom   67   67 HE2   CPHE                    1  1.0000  0
+atom   69   69 HZ    CPHE                    1  1.0000  0
+
+# RESIDUE CPRO 15
+atom   50   50 N     CPRO                    7 14.0000  0
+atom   51   51 CA    CPRO                    6 12.0000  0
+atom  233  233 C     CPRO                    6 12.0000  0
+atom  234  234 O     CPRO                    8 16.0000  0
+atom   55   55 CB    CPRO                    6 12.0000  0
+atom   57   57 CG    CPRO                    6 12.0000  0
+atom   59   59 CD    CPRO                    6 12.0000  0
+atom  234  234 OXT   CPRO                    8 16.0000  0
+atom   54   54 HA    CPRO                    1  1.0000  0
+atom   56   56 HB1   CPRO                    1  1.0000  0
+atom   56   56 HB2   CPRO                    1  1.0000  0
+atom   58   58 HG1   CPRO                    1  1.0000  0
+atom   58   58 HG2   CPRO                    1  1.0000  0
+atom   60   60 HD1   CPRO                    1  1.0000  0
+atom   60   60 HD2   CPRO                    1  1.0000  0
+
+# RESIDUE CSER 12
+atom    7    7 N     CSER                    7 14.0000  0
+atom    8    8 CA    CSER                    6 12.0000  0
+atom  233  233 C     CSER                    6 12.0000  0
+atom  234  234 O     CSER                    8 16.0000  0
+atom   33   33 CB    CSER                    6 12.0000  0
+atom   35   35 OG    CSER                    8 16.0000  0
+atom  234  234 OXT   CSER                    8 16.0000  0
+atom   10   10 H     CSER                    1  1.0000  0
+atom   12   12 HA    CSER                    1  1.0000  0
+atom   34   34 HB1   CSER                    1  1.0000  0
+atom   34   34 HB2   CSER                    1  1.0000  0
+atom   36   36 HG    CSER                    1  1.0000  0
+
+# RESIDUE CTHR 15
+atom    7    7 N     CTHR                    7 14.0000  0
+atom    8    8 CA    CTHR                    6 12.0000  0
+atom  233  233 C     CTHR                    6 12.0000  0
+atom  234  234 O     CTHR                    8 16.0000  0
+atom   37   37 CB    CTHR                    6 12.0000  0
+atom   39   39 OG1   CTHR                    8 16.0000  0
+atom   41   41 CG2   CTHR                    6 12.0000  0
+atom  234  234 OXT   CTHR                    8 16.0000  0
+atom   10   10 H     CTHR                    1  1.0000  0
+atom   12   12 HA    CTHR                    1  1.0000  0
+atom   38   38 HB    CTHR                    1  1.0000  0
+atom   40   40 HG1   CTHR                    1  1.0000  0
+atom   42   42 1HG2  CTHR                    1  1.0000  0
+atom   42   42 2HG2  CTHR                    1  1.0000  0
+atom   42   42 3HG2  CTHR                    1  1.0000  0
+
+# RESIDUE CTRP 25
+atom    7    7 N     CTRP                    7 14.0000  0
+atom    8    8 CA    CTRP                    6 12.0000  0
+atom  233  233 C     CTRP                    6 12.0000  0
+atom  234  234 O     CTRP                    8 16.0000  0
+atom   89   89 CB    CTRP                    6 12.0000  0
+atom   91   91 CG    CTRP                    6 12.0000  0
+atom   92   92 CD1   CTRP                    6 12.0000  0
+atom   94   94 CD2   CTRP                    6 12.0000  0
+atom   95   95 NE1   CTRP                    7 14.0000  0
+atom   97   97 CE2   CTRP                    6 12.0000  0
+atom   98   98 CE3   CTRP                    6 12.0000  0
+atom  100  100 CZ2   CTRP                    6 12.0000  0
+atom  102  102 CZ3   CTRP                    6 12.0000  0
+atom  104  104 CH2   CTRP                    6 12.0000  0
+atom  234  234 OXT   CTRP                    8 16.0000  0
+atom   10   10 H     CTRP                    1  1.0000  0
+atom   12   12 HA    CTRP                    1  1.0000  0
+atom   90   90 HB1   CTRP                    1  1.0000  0
+atom   90   90 HB2   CTRP                    1  1.0000  0
+atom   93   93 HD1   CTRP                    1  1.0000  0
+atom   96   96 HE1   CTRP                    1  1.0000  0
+atom   99   99 HE3   CTRP                    1  1.0000  0
+atom  101  101 HZ2   CTRP                    1  1.0000  0
+atom  103  103 HZ3   CTRP                    1  1.0000  0
+atom  105  105 HH2   CTRP                    1  1.0000  0
+
+# RESIDUE CTYD 21
+atom    7    7 N     CTYD                    7 14.0000  0
+atom    8    8 CA    CTYD                    6 12.0000  0
+atom  233  233 C     CTYD                    6 12.0000  0
+atom  234  234 O     CTYD                    8 16.0000  0
+atom   80   80 CB    CTYD                    6 12.0000  0
+atom   82   82 CG    CTYD                    6 12.0000  0
+atom   83   83 CD1   CTYD                    6 12.0000  0
+atom   83   83 CD2   CTYD                    6 12.0000  0
+atom   85   85 CE1   CTYD                    6 12.0000  0
+atom   85   85 CE2   CTYD                    6 12.0000  0
+atom   87   87 CZ    CTYD                    6 12.0000  0
+atom   88   88 OH    CTYD                    8 16.0000  0
+atom  234  234 OXT   CTYD                    8 16.0000  0
+atom   10   10 H     CTYD                    1  1.0000  0
+atom   12   12 HA    CTYD                    1  1.0000  0
+atom   81   81 HB2   CTYD                    1  1.0000  0
+atom   81   81 HB3   CTYD                    1  1.0000  0
+atom   84   84 HD1   CTYD                    1  1.0000  0
+atom   84   84 HD2   CTYD                    1  1.0000  0
+atom   86   86 HE1   CTYD                    1  1.0000  0
+atom   86   86 HE2   CTYD                    1  1.0000  0
+
+# RESIDUE CTYR 22
+atom    7    7 N     CTYR                    7 14.0000  0
+atom    8    8 CA    CTYR                    6 12.0000  0
+atom  233  233 C     CTYR                    6 12.0000  0
+atom  234  234 O     CTYR                    8 16.0000  0
+atom   70   70 CB    CTYR                    6 12.0000  0
+atom   72   72 CG    CTYR                    6 12.0000  0
+atom   73   73 CD1   CTYR                    6 12.0000  0
+atom   73   73 CD2   CTYR                    6 12.0000  0
+atom   75   75 CE1   CTYR                    6 12.0000  0
+atom   75   75 CE2   CTYR                    6 12.0000  0
+atom   77   77 CZ    CTYR                    6 12.0000  0
+atom   78   78 OH    CTYR                    8 16.0000  0
+atom  234  234 OXT   CTYR                    8 16.0000  0
+atom   10   10 H     CTYR                    1  1.0000  0
+atom   12   12 HA    CTYR                    1  1.0000  0
+atom   71   71 HB1   CTYR                    1  1.0000  0
+atom   71   71 HB2   CTYR                    1  1.0000  0
+atom   74   74 HD1   CTYR                    1  1.0000  0
+atom   74   74 HD2   CTYR                    1  1.0000  0
+atom   76   76 HE1   CTYR                    1  1.0000  0
+atom   76   76 HE2   CTYR                    1  1.0000  0
+atom   79   79 HH    CTYR                    1  1.0000  0
+
+# RESIDUE CVAL 17
+atom    7    7 N     CVAL                    7 14.0000  0
+atom    8    8 CA    CVAL                    6 12.0000  0
+atom  233  233 C     CVAL                    6 12.0000  0
+atom  234  234 O     CVAL                    8 16.0000  0
+atom   15   15 CB    CVAL                    6 12.0000  0
+atom   17   17 CG1   CVAL                    6 12.0000  0
+atom   17   17 CG2   CVAL                    6 12.0000  0
+atom  234  234 OXT   CVAL                    8 16.0000  0
+atom   10   10 H     CVAL                    1  1.0000  0
+atom   12   12 HA    CVAL                    1  1.0000  0
+atom   16   16 HB    CVAL                    1  1.0000  0
+atom   18   18 1HG1  CVAL                    1  1.0000  0
+atom   18   18 2HG1  CVAL                    1  1.0000  0
+atom   18   18 3HG1  CVAL                    1  1.0000  0
+atom   18   18 1HG2  CVAL                    1  1.0000  0
+atom   18   18 2HG2  CVAL                    1  1.0000  0
+atom   18   18 3HG2  CVAL                    1  1.0000  0
+
+# RESIDUE NACE 6
+atom  221  221 CH3   NACE                    6 12.0000  0
+atom  223  223 C     NACE                    6 12.0000  0
+atom  224  224 O     NACE                    8 16.0000  0
+atom  222  222 H1    NACE                    1  1.0000  0
+atom  222  222 H2    NACE                    1  1.0000  0
+atom  222  222 H3    NACE                    1  1.0000  0
+
+# RESIDUE NALA 12
+atom  231  231 N     NALA                    7 14.0000  0
+atom    8    8 CA    NALA                    6 12.0000  0
+atom    9    9 C     NALA                    6 12.0000  0
+atom   11   11 O     NALA                    8 16.0000  0
+atom   13   13 CB    NALA                    6 12.0000  0
+atom  232  232 H1    NALA                    1  1.0000  0
+atom  232  232 H2    NALA                    1  1.0000  0
+atom  232  232 H3    NALA                    1  1.0000  0
+atom   12   12 HA    NALA                    1  1.0000  0
+atom   14   14 HB1   NALA                    1  1.0000  0
+atom   14   14 HB2   NALA                    1  1.0000  0
+atom   14   14 HB3   NALA                    1  1.0000  0
+
+# RESIDUE NARG 26
+atom  231  231 N     NARG                    7 14.0000  0
+atom    8    8 CA    NARG                    6 12.0000  0
+atom    9    9 C     NARG                    6 12.0000  0
+atom   11   11 O     NARG                    8 16.0000  0
+atom  202  202 CB    NARG                    6 12.0000  0
+atom  204  204 CG    NARG                    6 12.0000  0
+atom  206  206 CD    NARG                    6 12.0000  0
+atom  208  208 NE    NARG                    7 14.0000  0
+atom  210  210 CZ    NARG                    6 12.0000  0
+atom  211  211 NH1   NARG                    7 14.0000  0
+atom  211  211 NH2   NARG                    7 14.0000  0
+atom  232  232 H1    NARG                    1  1.0000  0
+atom  232  232 H2    NARG                    1  1.0000  0
+atom  232  232 H3    NARG                    1  1.0000  0
+atom   12   12 HA    NARG                    1  1.0000  0
+atom  203  203 HB1   NARG                    1  1.0000  0
+atom  203  203 HB2   NARG                    1  1.0000  0
+atom  205  205 HG1   NARG                    1  1.0000  0
+atom  205  205 HG2   NARG                    1  1.0000  0
+atom  207  207 HD1   NARG                    1  1.0000  0
+atom  207  207 HD2   NARG                    1  1.0000  0
+atom  209  209 HE    NARG                    1  1.0000  0
+atom  212  212 1HH1  NARG                    1  1.0000  0
+atom  212  212 2HH1  NARG                    1  1.0000  0
+atom  212  212 1HH2  NARG                    1  1.0000  0
+atom  212  212 2HH2  NARG                    1  1.0000  0
+
+# RESIDUE NASH 15
+atom  231  231 N     NASH                    7 14.0000  0
+atom    8    8 CA    NASH                    6 12.0000  0
+atom    9    9 C     NASH                    6 12.0000  0
+atom   11   11 O     NASH                    8 16.0000  0
+atom  141  141 CB    NASH                    6 12.0000  0
+atom  143  143 CG    NASH                    6 12.0000  0
+atom  144  144 OD1   NASH                    8 16.0000  0
+atom  145  145 OD2   NASH                    8 16.0000  0
+atom  232  232 H1    NASH                    1  1.0000  0
+atom  232  232 H2    NASH                    1  1.0000  0
+atom  232  232 H3    NASH                    1  1.0000  0
+atom   12   12 HA    NASH                    1  1.0000  0
+atom  142  142 HB2   NASH                    1  1.0000  0
+atom  142  142 HB3   NASH                    1  1.0000  0
+atom  146  146 HD2   NASH                    1  1.0000  0
+
+# RESIDUE NASN 16
+atom  231  231 N     NASN                    7 14.0000  0
+atom    8    8 CA    NASN                    6 12.0000  0
+atom    9    9 C     NASN                    6 12.0000  0
+atom   11   11 O     NASN                    8 16.0000  0
+atom  147  147 CB    NASN                    6 12.0000  0
+atom  149  149 CG    NASN                    6 12.0000  0
+atom  150  150 OD1   NASN                    8 16.0000  0
+atom  151  151 ND2   NASN                    7 14.0000  0
+atom  232  232 H1    NASN                    1  1.0000  0
+atom  232  232 H2    NASN                    1  1.0000  0
+atom  232  232 H3    NASN                    1  1.0000  0
+atom   12   12 HA    NASN                    1  1.0000  0
+atom  148  148 HB1   NASN                    1  1.0000  0
+atom  148  148 HB2   NASN                    1  1.0000  0
+atom  152  152 1HD2  NASN                    1  1.0000  0
+atom  152  152 2HD2  NASN                    1  1.0000  0
+
+# RESIDUE NASP 14
+atom  231  231 N     NASP                    7 14.0000  0
+atom    8    8 CA    NASP                    6 12.0000  0
+atom    9    9 C     NASP                    6 12.0000  0
+atom   11   11 O     NASP                    8 16.0000  0
+atom  137  137 CB    NASP                    6 12.0000  0
+atom  139  139 CG    NASP                    6 12.0000  0
+atom  140  140 OD1   NASP                    8 16.0000  0
+atom  140  140 OD2   NASP                    8 16.0000  0
+atom  232  232 H1    NASP                    1  1.0000  0
+atom  232  232 H2    NASP                    1  1.0000  0
+atom  232  232 H3    NASP                    1  1.0000  0
+atom   12   12 HA    NASP                    1  1.0000  0
+atom  138  138 HB1   NASP                    1  1.0000  0
+atom  138  138 HB2   NASP                    1  1.0000  0
+
+# RESIDUE NCYD 12
+atom  231  231 N     NCYD                    7 14.0000  0
+atom   48   48 CA    NCYD                    6 12.0000  0
+atom    9    9 C     NCYD                    6 12.0000  0
+atom   11   11 O     NCYD                    8 16.0000  0
+atom   43   43 CB    NCYD                    6 12.0000  0
+atom   49   49 SG    NCYD                   16 32.0000  0
+atom  232  232 H1    NCYD                    1  1.0000  0
+atom  232  232 H2    NCYD                    1  1.0000  0
+atom  232  232 H3    NCYD                    1  1.0000  0
+atom   12   12 HA    NCYD                    1  1.0000  0
+atom   44   44 HB2   NCYD                    1  1.0000  0
+atom   44   44 HB3   NCYD                    1  1.0000  0
+
+# RESIDUE NCYS 13
+atom  231  231 N     NCYS                    7 14.0000  0
+atom    8    8 CA    NCYS                    6 12.0000  0
+atom    9    9 C     NCYS                    6 12.0000  0
+atom   11   11 O     NCYS                    8 16.0000  0
+atom   43   43 CB    NCYS                    6 12.0000  0
+atom   45   45 SG    NCYS                   16 32.0000  0
+atom  232  232 H1    NCYS                    1  1.0000  0
+atom  232  232 H2    NCYS                    1  1.0000  0
+atom  232  232 H3    NCYS                    1  1.0000  0
+atom   12   12 HA    NCYS                    1  1.0000  0
+atom   44   44 HB1   NCYS                    1  1.0000  0
+atom   44   44 HB2   NCYS                    1  1.0000  0
+atom   46   46 HG    NCYS                    1  1.0000  0
+
+# RESIDUE NGLH 18
+atom  231  231 N     NGLH                    7 14.0000  0
+atom    8    8 CA    NGLH                    6 12.0000  0
+atom    9    9 C     NGLH                    6 12.0000  0
+atom   11   11 O     NGLH                    8 16.0000  0
+atom  159  159 CB    NGLH                    6 12.0000  0
+atom  161  161 CG    NGLH                    6 12.0000  0
+atom  163  163 CD    NGLH                    6 12.0000  0
+atom  164  164 OE1   NGLH                    8 16.0000  0
+atom  165  165 OE2   NGLH                    8 16.0000  0
+atom  232  232 H1    NGLH                    1  1.0000  0
+atom  232  232 H2    NGLH                    1  1.0000  0
+atom  232  232 H3    NGLH                    1  1.0000  0
+atom   12   12 HA    NGLH                    1  1.0000  0
+atom  160  160 HB1   NGLH                    1  1.0000  0
+atom  160  160 HB2   NGLH                    1  1.0000  0
+atom  162  162 HG1   NGLH                    1  1.0000  0
+atom  162  162 HG2   NGLH                    1  1.0000  0
+atom  166  166 HE2   NGLH                    1  1.0000  0
+
+# RESIDUE NGLN 19
+atom  231  231 N     NGLN                    7 14.0000  0
+atom    8    8 CA    NGLN                    6 12.0000  0
+atom    9    9 C     NGLN                    6 12.0000  0
+atom   11   11 O     NGLN                    8 16.0000  0
+atom  167  167 CB    NGLN                    6 12.0000  0
+atom  169  169 CG    NGLN                    6 12.0000  0
+atom  171  171 CD    NGLN                    6 12.0000  0
+atom  172  172 OE1   NGLN                    8 16.0000  0
+atom  173  173 NE2   NGLN                    7 14.0000  0
+atom  232  232 H1    NGLN                    1  1.0000  0
+atom  232  232 H2    NGLN                    1  1.0000  0
+atom  232  232 H3    NGLN                    1  1.0000  0
+atom   12   12 HA    NGLN                    1  1.0000  0
+atom  168  168 HB1   NGLN                    1  1.0000  0
+atom  168  168 HB2   NGLN                    1  1.0000  0
+atom  170  170 HG1   NGLN                    1  1.0000  0
+atom  170  170 HG2   NGLN                    1  1.0000  0
+atom  174  174 1HE2  NGLN                    1  1.0000  0
+atom  174  174 2HE2  NGLN                    1  1.0000  0
+
+# RESIDUE NGLU 17
+atom  231  231 N     NGLU                    7 14.0000  0
+atom    8    8 CA    NGLU                    6 12.0000  0
+atom    9    9 C     NGLU                    6 12.0000  0
+atom   11   11 O     NGLU                    8 16.0000  0
+atom  153  153 CB    NGLU                    6 12.0000  0
+atom  155  155 CG    NGLU                    6 12.0000  0
+atom  157  157 CD    NGLU                    6 12.0000  0
+atom  158  158 OE1   NGLU                    8 16.0000  0
+atom  158  158 OE2   NGLU                    8 16.0000  0
+atom  232  232 H1    NGLU                    1  1.0000  0
+atom  232  232 H2    NGLU                    1  1.0000  0
+atom  232  232 H3    NGLU                    1  1.0000  0
+atom   12   12 HA    NGLU                    1  1.0000  0
+atom  154  154 HB1   NGLU                    1  1.0000  0
+atom  154  154 HB2   NGLU                    1  1.0000  0
+atom  156  156 HG1   NGLU                    1  1.0000  0
+atom  156  156 HG2   NGLU                    1  1.0000  0
+
+# RESIDUE NGLY 9
+atom  231  231 N     NGLY                    7 14.0000  0
+atom    2    2 CA    NGLY                    6 12.0000  0
+atom    3    3 C     NGLY                    6 12.0000  0
+atom    5    5 O     NGLY                    8 16.0000  0
+atom  232  232 H1    NGLY                    1  1.0000  0
+atom  232  232 H2    NGLY                    1  1.0000  0
+atom  232  232 H3    NGLY                    1  1.0000  0
+atom    6    6 HA1   NGLY                    1  1.0000  0
+atom    6    6 HA2   NGLY                    1  1.0000  0
+
+# RESIDUE NHID 19
+atom  231  231 N     NHID                    7 14.0000  0
+atom    8    8 CA    NHID                    6 12.0000  0
+atom    9    9 C     NHID                    6 12.0000  0
+atom   11   11 O     NHID                    8 16.0000  0
+atom  117  117 CB    NHID                    6 12.0000  0
+atom  119  119 CG    NHID                    6 12.0000  0
+atom  120  120 ND1   NHID                    7 14.0000  0
+atom  122  122 CD2   NHID                    6 12.0000  0
+atom  124  124 CE1   NHID                    6 12.0000  0
+atom  126  126 NE2   NHID                    7 14.0000  0
+atom  232  232 H1    NHID                    1  1.0000  0
+atom  232  232 H2    NHID                    1  1.0000  0
+atom  232  232 H3    NHID                    1  1.0000  0
+atom   12   12 HA    NHID                    1  1.0000  0
+atom  118  118 HB1   NHID                    1  1.0000  0
+atom  118  118 HB2   NHID                    1  1.0000  0
+atom  121  121 HD1   NHID                    1  1.0000  0
+atom  123  123 HD2   NHID                    1  1.0000  0
+atom  125  125 HE1   NHID                    1  1.0000  0
+
+# RESIDUE NHIE 19
+atom  231  231 N     NHIE                    7 14.0000  0
+atom    8    8 CA    NHIE                    6 12.0000  0
+atom    9    9 C     NHIE                    6 12.0000  0
+atom   11   11 O     NHIE                    8 16.0000  0
+atom  127  127 CB    NHIE                    6 12.0000  0
+atom  129  129 CG    NHIE                    6 12.0000  0
+atom  130  130 ND1   NHIE                    7 14.0000  0
+atom  131  131 CD2   NHIE                    6 12.0000  0
+atom  133  133 CE1   NHIE                    6 12.0000  0
+atom  135  135 NE2   NHIE                    7 14.0000  0
+atom  232  232 H1    NHIE                    1  1.0000  0
+atom  232  232 H2    NHIE                    1  1.0000  0
+atom  232  232 H3    NHIE                    1  1.0000  0
+atom   12   12 HA    NHIE                    1  1.0000  0
+atom  128  128 HB1   NHIE                    1  1.0000  0
+atom  128  128 HB2   NHIE                    1  1.0000  0
+atom  132  132 HD2   NHIE                    1  1.0000  0
+atom  134  134 HE1   NHIE                    1  1.0000  0
+atom  136  136 HE2   NHIE                    1  1.0000  0
+
+# RESIDUE NHIS 20
+atom  231  231 N     NHIS                    7 14.0000  0
+atom    8    8 CA    NHIS                    6 12.0000  0
+atom    9    9 C     NHIS                    6 12.0000  0
+atom   11   11 O     NHIS                    8 16.0000  0
+atom  106  106 CB    NHIS                    6 12.0000  0
+atom  108  108 CG    NHIS                    6 12.0000  0
+atom  109  109 ND1   NHIS                    7 14.0000  0
+atom  111  111 CD2   NHIS                    6 12.0000  0
+atom  113  113 CE1   NHIS                    6 12.0000  0
+atom  115  115 NE2   NHIS                    7 14.0000  0
+atom  232  232 H1    NHIS                    1  1.0000  0
+atom  232  232 H2    NHIS                    1  1.0000  0
+atom  232  232 H3    NHIS                    1  1.0000  0
+atom   12   12 HA    NHIS                    1  1.0000  0
+atom  107  107 HB1   NHIS                    1  1.0000  0
+atom  107  107 HB2   NHIS                    1  1.0000  0
+atom  110  110 HD1   NHIS                    1  1.0000  0
+atom  112  112 HD2   NHIS                    1  1.0000  0
+atom  114  114 HE1   NHIS                    1  1.0000  0
+atom  116  116 HE2   NHIS                    1  1.0000  0
+
+# RESIDUE NILE 21
+atom  231  231 N     NILE                    7 14.0000  0
+atom    8    8 CA    NILE                    6 12.0000  0
+atom    9    9 C     NILE                    6 12.0000  0
+atom   11   11 O     NILE                    8 16.0000  0
+atom   25   25 CB    NILE                    6 12.0000  0
+atom   27   27 CG1   NILE                    6 12.0000  0
+atom   29   29 CG2   NILE                    6 12.0000  0
+atom   31   31 CD    NILE                    6 12.0000  0
+atom  232  232 H1    NILE                    1  1.0000  0
+atom  232  232 H2    NILE                    1  1.0000  0
+atom  232  232 H3    NILE                    1  1.0000  0
+atom   12   12 HA    NILE                    1  1.0000  0
+atom   26   26 HB    NILE                    1  1.0000  0
+atom   28   28 1HG1  NILE                    1  1.0000  0
+atom   28   28 2HG1  NILE                    1  1.0000  0
+atom   30   30 1HG2  NILE                    1  1.0000  0
+atom   30   30 2HG2  NILE                    1  1.0000  0
+atom   30   30 3HG2  NILE                    1  1.0000  0
+atom   32   32 HD1   NILE                    1  1.0000  0
+atom   32   32 HD2   NILE                    1  1.0000  0
+atom   32   32 HD3   NILE                    1  1.0000  0
+
+# RESIDUE NLEU 21
+atom  231  231 N     NLEU                    7 14.0000  0
+atom    8    8 CA    NLEU                    6 12.0000  0
+atom    9    9 C     NLEU                    6 12.0000  0
+atom   11   11 O     NLEU                    8 16.0000  0
+atom   19   19 CB    NLEU                    6 12.0000  0
+atom   21   21 CG    NLEU                    6 12.0000  0
+atom   23   23 CD1   NLEU                    6 12.0000  0
+atom   23   23 CD2   NLEU                    6 12.0000  0
+atom  232  232 H1    NLEU                    1  1.0000  0
+atom  232  232 H2    NLEU                    1  1.0000  0
+atom  232  232 H3    NLEU                    1  1.0000  0
+atom   12   12 HA    NLEU                    1  1.0000  0
+atom   20   20 HB1   NLEU                    1  1.0000  0
+atom   20   20 HB2   NLEU                    1  1.0000  0
+atom   22   22 HG    NLEU                    1  1.0000  0
+atom   24   24 1HD1  NLEU                    1  1.0000  0
+atom   24   24 2HD1  NLEU                    1  1.0000  0
+atom   24   24 3HD1  NLEU                    1  1.0000  0
+atom   24   24 1HD2  NLEU                    1  1.0000  0
+atom   24   24 2HD2  NLEU                    1  1.0000  0
+atom   24   24 3HD2  NLEU                    1  1.0000  0
+
+# RESIDUE NLYD 23
+atom  231  231 N     NLYD                    7 14.0000  0
+atom    8    8 CA    NLYD                    6 12.0000  0
+atom    9    9 C     NLYD                    6 12.0000  0
+atom   11   11 O     NLYD                    8 16.0000  0
+atom  192  192 CB    NLYD                    6 12.0000  0
+atom  194  194 CG    NLYD                    6 12.0000  0
+atom  196  196 CD    NLYD                    6 12.0000  0
+atom  198  198 CE    NLYD                    6 12.0000  0
+atom  200  200 NZ    NLYD                    7 14.0000  0
+atom  232  232 H1    NLYD                    1  1.0000  0
+atom  232  232 H2    NLYD                    1  1.0000  0
+atom  232  232 H3    NLYD                    1  1.0000  0
+atom   12   12 HA    NLYD                    1  1.0000  0
+atom  193  193 HB2   NLYD                    1  1.0000  0
+atom  193  193 HB3   NLYD                    1  1.0000  0
+atom  195  195 HG2   NLYD                    1  1.0000  0
+atom  195  195 HG3   NLYD                    1  1.0000  0
+atom  197  197 HD2   NLYD                    1  1.0000  0
+atom  197  197 HD3   NLYD                    1  1.0000  0
+atom  199  199 HE2   NLYD                    1  1.0000  0
+atom  199  199 HE3   NLYD                    1  1.0000  0
+atom  201  201 HZ1   NLYD                    1  1.0000  0
+atom  201  201 HZ2   NLYD                    1  1.0000  0
+
+# RESIDUE NLYS 24
+atom  231  231 N     NLYS                    7 14.0000  0
+atom    8    8 CA    NLYS                    6 12.0000  0
+atom    9    9 C     NLYS                    6 12.0000  0
+atom   11   11 O     NLYS                    8 16.0000  0
+atom  182  182 CB    NLYS                    6 12.0000  0
+atom  184  184 CG    NLYS                    6 12.0000  0
+atom  186  186 CD    NLYS                    6 12.0000  0
+atom  188  188 CE    NLYS                    6 12.0000  0
+atom  190  190 NZ    NLYS                    7 14.0000  0
+atom  232  232 H1    NLYS                    1  1.0000  0
+atom  232  232 H2    NLYS                    1  1.0000  0
+atom  232  232 H3    NLYS                    1  1.0000  0
+atom   12   12 HA    NLYS                    1  1.0000  0
+atom  183  183 HB1   NLYS                    1  1.0000  0
+atom  183  183 HB2   NLYS                    1  1.0000  0
+atom  185  185 HG1   NLYS                    1  1.0000  0
+atom  185  185 HG2   NLYS                    1  1.0000  0
+atom  187  187 HD1   NLYS                    1  1.0000  0
+atom  187  187 HD2   NLYS                    1  1.0000  0
+atom  189  189 HE1   NLYS                    1  1.0000  0
+atom  189  189 HE2   NLYS                    1  1.0000  0
+atom  191  191 HZ1   NLYS                    1  1.0000  0
+atom  191  191 HZ2   NLYS                    1  1.0000  0
+atom  191  191 HZ3   NLYS                    1  1.0000  0
+
+# RESIDUE NMET 19
+atom  231  231 N     NMET                    7 14.0000  0
+atom    8    8 CA    NMET                    6 12.0000  0
+atom    9    9 C     NMET                    6 12.0000  0
+atom   11   11 O     NMET                    8 16.0000  0
+atom  175  175 CB    NMET                    6 12.0000  0
+atom  177  177 CG    NMET                    6 12.0000  0
+atom  179  179 SD    NMET                   16 32.0000  0
+atom  180  180 CE    NMET                    6 12.0000  0
+atom  232  232 H1    NMET                    1  1.0000  0
+atom  232  232 H2    NMET                    1  1.0000  0
+atom  232  232 H3    NMET                    1  1.0000  0
+atom   12   12 HA    NMET                    1  1.0000  0
+atom  176  176 HB1   NMET                    1  1.0000  0
+atom  176  176 HB2   NMET                    1  1.0000  0
+atom  178  178 HG1   NMET                    1  1.0000  0
+atom  178  178 HG2   NMET                    1  1.0000  0
+atom  181  181 HE1   NMET                    1  1.0000  0
+atom  181  181 HE2   NMET                    1  1.0000  0
+atom  181  181 HE3   NMET                    1  1.0000  0
+
+# RESIDUE NORN 21
+atom  231  231 N     NORN                    7 14.0000  0
+atom    8    8 CA    NORN                    6 12.0000  0
+atom    9    9 C     NORN                    6 12.0000  0
+atom   11   11 O     NORN                    8 16.0000  0
+atom  213  213 CB    NORN                    6 12.0000  0
+atom  215  215 CG    NORN                    6 12.0000  0
+atom  217  217 CD    NORN                    6 12.0000  0
+atom  219  219 NE    NORN                    7 14.0000  0
+atom  232  232 H1    NORN                    1  1.0000  0
+atom  232  232 H2    NORN                    1  1.0000  0
+atom  232  232 H3    NORN                    1  1.0000  0
+atom   12   12 HA    NORN                    1  1.0000  0
+atom  214  214 HB2   NORN                    1  1.0000  0
+atom  214  214 HB3   NORN                    1  1.0000  0
+atom  216  216 HG2   NORN                    1  1.0000  0
+atom  216  216 HG3   NORN                    1  1.0000  0
+atom  218  218 HD2   NORN                    1  1.0000  0
+atom  218  218 HD3   NORN                    1  1.0000  0
+atom  220  220 HE1   NORN                    1  1.0000  0
+atom  220  220 HE2   NORN                    1  1.0000  0
+atom  220  220 HE3   NORN                    1  1.0000  0
+
+# RESIDUE NPHE 22
+atom  231  231 N     NPHE                    7 14.0000  0
+atom    8    8 CA    NPHE                    6 12.0000  0
+atom    9    9 C     NPHE                    6 12.0000  0
+atom   11   11 O     NPHE                    8 16.0000  0
+atom   61   61 CB    NPHE                    6 12.0000  0
+atom   63   63 CG    NPHE                    6 12.0000  0
+atom   64   64 CD1   NPHE                    6 12.0000  0
+atom   64   64 CD2   NPHE                    6 12.0000  0
+atom   66   66 CE1   NPHE                    6 12.0000  0
+atom   66   66 CE2   NPHE                    6 12.0000  0
+atom   68   68 CZ    NPHE                    6 12.0000  0
+atom  232  232 H1    NPHE                    1  1.0000  0
+atom  232  232 H2    NPHE                    1  1.0000  0
+atom  232  232 H3    NPHE                    1  1.0000  0
+atom   12   12 HA    NPHE                    1  1.0000  0
+atom   62   62 HB1   NPHE                    1  1.0000  0
+atom   62   62 HB2   NPHE                    1  1.0000  0
+atom   65   65 HD1   NPHE                    1  1.0000  0
+atom   65   65 HD2   NPHE                    1  1.0000  0
+atom   67   67 HE1   NPHE                    1  1.0000  0
+atom   67   67 HE2   NPHE                    1  1.0000  0
+atom   69   69 HZ    NPHE                    1  1.0000  0
+
+# RESIDUE NPRO 16
+atom  239  239 N     NPRO                    7 14.0000  0
+atom  241  241 CA    NPRO                    6 12.0000  0
+atom  242  242 C     NPRO                    6 12.0000  0
+atom  243  243 O     NPRO                    8 16.0000  0
+atom   55   55 CB    NPRO                    6 12.0000  0
+atom   57   57 CG    NPRO                    6 12.0000  0
+atom  245  245 CD    NPRO                    6 12.0000  0
+atom  240  240 H1    NPRO                    1  1.0000  0
+atom  240  240 H2    NPRO                    1  1.0000  0
+atom  244  244 HA    NPRO                    1  1.0000  0
+atom   56   56 HB1   NPRO                    1  1.0000  0
+atom   56   56 HB2   NPRO                    1  1.0000  0
+atom   58   58 HG1   NPRO                    1  1.0000  0
+atom   58   58 HG2   NPRO                    1  1.0000  0
+atom  246  246 HD1   NPRO                    1  1.0000  0
+atom  246  246 HD2   NPRO                    1  1.0000  0
+
+# RESIDUE NSER 13
+atom  231  231 N     NSER                    7 14.0000  0
+atom    8    8 CA    NSER                    6 12.0000  0
+atom    9    9 C     NSER                    6 12.0000  0
+atom   11   11 O     NSER                    8 16.0000  0
+atom   33   33 CB    NSER                    6 12.0000  0
+atom   35   35 OG    NSER                    8 16.0000  0
+atom  232  232 H1    NSER                    1  1.0000  0
+atom  232  232 H2    NSER                    1  1.0000  0
+atom  232  232 H3    NSER                    1  1.0000  0
+atom   12   12 HA    NSER                    1  1.0000  0
+atom   34   34 HB1   NSER                    1  1.0000  0
+atom   34   34 HB2   NSER                    1  1.0000  0
+atom   36   36 HG    NSER                    1  1.0000  0
+
+# RESIDUE NTHR 16
+atom  231  231 N     NTHR                    7 14.0000  0
+atom    8    8 CA    NTHR                    6 12.0000  0
+atom    9    9 C     NTHR                    6 12.0000  0
+atom   11   11 O     NTHR                    8 16.0000  0
+atom   37   37 CB    NTHR                    6 12.0000  0
+atom   39   39 OG1   NTHR                    8 16.0000  0
+atom   41   41 CG2   NTHR                    6 12.0000  0
+atom  232  232 H1    NTHR                    1  1.0000  0
+atom  232  232 H2    NTHR                    1  1.0000  0
+atom  232  232 H3    NTHR                    1  1.0000  0
+atom   12   12 HA    NTHR                    1  1.0000  0
+atom   38   38 HB    NTHR                    1  1.0000  0
+atom   40   40 HG1   NTHR                    1  1.0000  0
+atom   42   42 1HG2  NTHR                    1  1.0000  0
+atom   42   42 2HG2  NTHR                    1  1.0000  0
+atom   42   42 3HG3  NTHR                    1  1.0000  0
+
+# RESIDUE NTRP 26
+atom  231  231 N     NTRP                    7 14.0000  0
+atom    8    8 CA    NTRP                    6 12.0000  0
+atom    9    9 C     NTRP                    6 12.0000  0
+atom   11   11 O     NTRP                    8 16.0000  0
+atom   89   89 CB    NTRP                    6 12.0000  0
+atom   91   91 CG    NTRP                    6 12.0000  0
+atom   92   92 CD1   NTRP                    6 12.0000  0
+atom   94   94 CD2   NTRP                    6 12.0000  0
+atom   95   95 NE1   NTRP                    7 14.0000  0
+atom   97   97 CE2   NTRP                    6 12.0000  0
+atom   98   98 CE3   NTRP                    6 12.0000  0
+atom  100  100 CZ2   NTRP                    6 12.0000  0
+atom  102  102 CZ3   NTRP                    6 12.0000  0
+atom  104  104 CH2   NTRP                    6 12.0000  0
+atom  232  232 H1    NTRP                    1  1.0000  0
+atom  232  232 H2    NTRP                    1  1.0000  0
+atom  232  232 H3    NTRP                    1  1.0000  0
+atom   12   12 HA    NTRP                    1  1.0000  0
+atom   90   90 HB1   NTRP                    1  1.0000  0
+atom   90   90 HB2   NTRP                    1  1.0000  0
+atom   93   93 HD1   NTRP                    1  1.0000  0
+atom   96   96 HE1   NTRP                    1  1.0000  0
+atom   99   99 HE3   NTRP                    1  1.0000  0
+atom  101  101 HZ2   NTRP                    1  1.0000  0
+atom  103  103 HZ3   NTRP                    1  1.0000  0
+atom  105  105 HH2   NTRP                    1  1.0000  0
+
+# RESIDUE NTYD 22
+atom  231  231 N     NTYD                    7 14.0000  0
+atom    8    8 CA    NTYD                    6 12.0000  0
+atom    9    9 C     NTYD                    6 12.0000  0
+atom   11   11 O     NTYD                    8 16.0000  0
+atom   80   80 CB    NTYD                    6 12.0000  0
+atom   82   82 CG    NTYD                    6 12.0000  0
+atom   83   83 CD1   NTYD                    6 12.0000  0
+atom   83   83 CD2   NTYD                    6 12.0000  0
+atom   85   85 CE1   NTYD                    6 12.0000  0
+atom   85   85 CE2   NTYD                    6 12.0000  0
+atom   87   87 CZ    NTYD                    6 12.0000  0
+atom   88   88 OH    NTYD                    8 16.0000  0
+atom  232  232 H1    NTYD                    1  1.0000  0
+atom  232  232 H2    NTYD                    1  1.0000  0
+atom  232  232 H3    NTYD                    1  1.0000  0
+atom   12   12 HA    NTYD                    1  1.0000  0
+atom   81   81 HB2   NTYD                    1  1.0000  0
+atom   81   81 HB3   NTYD                    1  1.0000  0
+atom   84   84 HD1   NTYD                    1  1.0000  0
+atom   84   84 HD2   NTYD                    1  1.0000  0
+atom   86   86 HE1   NTYD                    1  1.0000  0
+atom   86   86 HE2   NTYD                    1  1.0000  0
+
+# RESIDUE NTYR 23
+atom  231  231 N     NTYR                    7 14.0000  0
+atom    8    8 CA    NTYR                    6 12.0000  0
+atom    9    9 C     NTYR                    6 12.0000  0
+atom   11   11 O     NTYR                    8 16.0000  0
+atom   70   70 CB    NTYR                    6 12.0000  0
+atom   72   72 CG    NTYR                    6 12.0000  0
+atom   73   73 CD1   NTYR                    6 12.0000  0
+atom   73   73 CD2   NTYR                    6 12.0000  0
+atom   75   75 CE1   NTYR                    6 12.0000  0
+atom   75   75 CE2   NTYR                    6 12.0000  0
+atom   77   77 CZ    NTYR                    6 12.0000  0
+atom   78   78 OH    NTYR                    8 16.0000  0
+atom  232  232 H1    NTYR                    1  1.0000  0
+atom  232  232 H2    NTYR                    1  1.0000  0
+atom  232  232 H3    NTYR                    1  1.0000  0
+atom   12   12 HA    NTYR                    1  1.0000  0
+atom   71   71 HB1   NTYR                    1  1.0000  0
+atom   71   71 HB2   NTYR                    1  1.0000  0
+atom   74   74 HD1   NTYR                    1  1.0000  0
+atom   74   74 HD2   NTYR                    1  1.0000  0
+atom   76   76 HE1   NTYR                    1  1.0000  0
+atom   76   76 HE2   NTYR                    1  1.0000  0
+atom   79   79 HH    NTYR                    1  1.0000  0
+
+# RESIDUE NVAL 18
+atom  231  231 N     NVAL                    7 14.0000  0
+atom    8    8 CA    NVAL                    6 12.0000  0
+atom    9    9 C     NVAL                    6 12.0000  0
+atom   11   11 O     NVAL                    8 16.0000  0
+atom   15   15 CB    NVAL                    6 12.0000  0
+atom   17   17 CG1   NVAL                    6 12.0000  0
+atom   17   17 CG2   NVAL                    6 12.0000  0
+atom  232  232 H1    NVAL                    1  1.0000  0
+atom  232  232 H2    NVAL                    1  1.0000  0
+atom  232  232 H3    NVAL                    1  1.0000  0
+atom   12   12 HA    NVAL                    1  1.0000  0
+atom   16   16 HB    NVAL                    1  1.0000  0
+atom   18   18 1HG1  NVAL                    1  1.0000  0
+atom   18   18 2HG1  NVAL                    1  1.0000  0
+atom   18   18 3HG1  NVAL                    1  1.0000  0
+atom   18   18 1HG2  NVAL                    1  1.0000  0
+atom   18   18 2HG2  NVAL                    1  1.0000  0
+atom   18   18 3HG2  NVAL                    1  1.0000  0
+
+# RESIDUE CRO
+atom  369  369 N     CRO                    7 14.0067  0
+atom  388  388 H     CRO                    1  1.00794  0
+atom  365  365 CA1   CRO                    6 12.0107  0
+atom  384  384 HA1   CRO                    1  1.00794  0
+atom  364  364 CB1   CRO                    6 12.0107  0
+atom  386  386 HB1   CRO                    1  1.00794  0
+atom  366  366 CG1   CRO                    6 12.0107  0
+atom  385  385 1HG1  CRO                    1  1.00794  0
+atom  385  385 2HG1  CRO                    1  1.00794  0
+atom  385  385 3HG1  CRO                    1  1.00794  0
+atom  381  381 OG1   CRO                    8 15.9994  0
+atom  397  397 HG1   CRO                    1  1.00794  0
+atom  368  368 C1    CRO                    6 12.0107  0
+atom  382  382 N2    CRO                    7 14.0067  0
+atom  375  375 CA2   CRO                    6 12.0107  0
+atom  380  380 CB2   CRO                    6 12.0107  0
+atom  395  395 HB2   CRO                    1  1.00794  0
+atom  378  378 CG2   CRO                    6 12.0107  0
+atom  377  377 CD2   CRO                    6 12.0107  0
+atom  394  394 HD2   CRO                    1  1.00794  0
+atom  379  379 CE2   CRO                    6 12.0107  0
+atom  393  393 HE2   CRO                    1  1.00794  0
+atom  376  376 CZ    CRO                    6 12.0107  0
+atom  383  383 OH    CRO                    8 15.9994  0
+atom  398  398 HH    CRO                    1  1.00794  0
+atom  379  379 CE1   CRO                    6 12.0107  0
+atom  393  393 HE1   CRO                    1  1.00794  0
+atom  377  377 CD1   CRO                    6 12.0107  0
+atom  394  394 HD1   CRO                    1  1.00794  0
+atom  374  374 C22   CRO                    6 12.0107  0
+atom  390  390 O22   CRO                    8 15.9994  0
+atom  370  370 N3    CRO                    7 14.0067  0
+atom  367  367 CA3   CRO                    6 12.0107  0
+atom  387  387 1HA3  CRO                    1  1.00794  0
+atom  387  387 2HA3  CRO                    1  1.00794  0
+atom  371  371 C     CRO                    6 12.0107  0
+atom  389  389 O     CRO                    8 15.9994  0
+
+

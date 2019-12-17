@@ -171,13 +171,13 @@ foreach $atmnum ($first .. $last)
          if ($tmpval3 < 0)
          {
             $c3[$typeid[$atmnum]] = -$typeid[-$tmpval3];
-            print "Content converted c3: $c3[$typeid[$atmnum]]\n";
+            #print "Content converted c3: $c3[$typeid[$atmnum]]\n";
 
          }
          else
          {
             $c3[$typeid[$atmnum]] = $typeid[$tmpval3];
-            print "Content converted c3: $c3[$typeid[$atmnum]]\n";
+            #print "Content converted c3: $c3[$typeid[$atmnum]]\n";
          }
 
 
@@ -196,7 +196,7 @@ foreach $atmnum ($first .. $last)
          }
 
          $c1[$typeid[$atmnum]] = $typeid[(split ' ', $lines[$linenum])[2]];
-         print "Content converted c1: $c1[$typeid[$atmnum]]\n";
+         #print "Content converted c1: $c1[$typeid[$atmnum]]\n";
          my $tmpval = (split ' ', $lines[$linenum])[3]; # this corresponds to C2
          my $tmpval2 = (split ' ', $lines[$linenum])[2]; # corresponds to C1
          #print "line split ", (split ' ', $lines[$linenum]);

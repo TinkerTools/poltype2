@@ -1,10 +1,12 @@
-      ############################
-      ##                        ##
-      ## Force Field Definition ##
-      ##                        ##
-      ############################
 
-forcefield          AMOEBA
+      ##############################
+      ##                          ##
+      ##  Force Field Definition  ##
+      ##                          ##
+      ##############################
+
+
+forcefield              AMOEBA-BIO-2018
 
 bond-cubic              -2.55
 bond-quartic            3.793125
@@ -13,13 +15,11 @@ angle-quartic           0.000056
 angle-pentic            -0.0000007
 angle-sextic            0.000000022
 opbendtype              ALLINGER
-#opbendunit              0.02191418
 opbend-cubic            -0.014
 opbend-quartic          0.000056
 opbend-pentic           -0.0000007
 opbend-sextic           0.000000022
 torsionunit             0.5
-strtorunit              -5.9975
 vdwtype                 BUFFERED-14-7
 radiusrule              CUBIC-MEAN
 radiustype              R-MIN
@@ -27,6 +27,7 @@ radiussize              DIAMETER
 epsilonrule             HHG
 dielectric              1.0
 polarization            MUTUAL
+vdw-12-scale            0.0
 vdw-13-scale            0.0
 vdw-14-scale            1.0
 vdw-15-scale            1.0
@@ -38,7 +39,10 @@ polar-12-scale          0.0
 polar-13-scale          0.0
 polar-14-scale          1.0
 polar-15-scale          1.0
+polar-12-intra          0.0
+polar-13-intra          0.0
 polar-14-intra          0.5
+polar-15-intra          1.0
 direct-11-scale         0.0
 direct-12-scale         1.0
 direct-13-scale         1.0

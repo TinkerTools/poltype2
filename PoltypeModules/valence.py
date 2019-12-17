@@ -25,19 +25,21 @@
 # Boston, MA 02111-1307  USA
 #
 ##################################################################
-
 import openbabel
 import math
 import sys
+import os
 radian = 57.29577951308232088
 
-class Valence:
+class Valence():
     def __init__(self,output_format,logfname):
         self.sp = openbabel.OBSmartsPattern()
-        #for tinker4 format, set o_f to 4, for tinker5 format, set o_f to 5
         self.o_f = output_format
         self.missed_torsions = []
         self.logfh = open(logfname,"a")
+        self.defopbendval = 0.20016677990819662
+
+
 
     def setidxtoclass(self, symmclass):
         self.idxtoclass = symmclass
@@ -51,12 +53,136 @@ class Valence:
         l2=[str(i) for i in anglepatoms]
         l1string=','.join(l1)
         l2string=','.join(l2)
-        self.logfh.write('checking opbatoms '+l1string+' vs '+'anglepatoms '+l2string+'\n')
         check=True
         for angpatom in anglepatoms:
             if angpatom not in opbatoms:
                 check=False
         return check 
+
+
+    def opbset (self,smarts, opbval, opbhash, mol):
+        """
+        Intent: Set out-of-plane bend (opbend) parameters using Smarts Patterns
+        Referenced By: gen_valinfile
+        """
+        opbsetstr = ""
+        sp = openbabel.OBSmartsPattern()
+        openbabel.OBSmartsPattern.Init(sp,smarts)
+        sp.Match(mol)
+        for ia in sp.GetMapList():
+            iteratomatom = openbabel.OBAtomAtomIter(mol.GetAtom(ia[1]))
+            for ib in iteratomatom:
+                opbkey = '%d %d 0 0' % (ib.GetIdx(), ia[1])
+                if ib.GetIdx() == ia[0]:
+                    if ((opbkey not in opbhash) or (opbhash[opbkey][1] == False)):
+                        opbhash[opbkey] = [opbval, True,smarts]
+                else:
+                    if opbkey not in opbhash:
+                        opbhash[opbkey] = [self.defopbendval, False,smarts]
+    
+    def gen_valinfile (self,mol,rotbndlist):
+        """
+        Intent: Find aromatic carbon and bonded hydrogens to correct polarizability
+        Find out-of-plane bend values using a look up table
+        Output a list of rotatable bonds (found in get_torlist) for valence.py
+        Input:
+            mol: OBMol molecule object
+        Output:
+            opbhash.items(): list of opbend values
+            rotbndprmlist: rotatable bonds for valence.py. 
+                           This lets valence.py know to set certain torsions as 0.
+        Referenced By: main
+        Description: -
+        """
+        
+        #Search for structures that require opbend parameters
+        # OP-Bend parameters is between first and second atom in search string
+        opbhash = {}      #Create empty dictionary
+        # 51 54 0 0 amide C(-N)(=O)
+        self.opbset('O=CN', 1.7, opbhash, mol)
+        self.opbset('C(-N)(=O)', 1.0, opbhash, mol)
+        self.opbset('[OX1]=N[Oh1]', 0.2, opbhash, mol)
+        self.opbset('[Oh1]N=[OX1]', 0.2, opbhash, mol)
+    
+        #self.opbset('C-C(O)', 1.7, 1, opbhash, mol)
+    
+        # 37 51 0 0 acetamide [CH3](-C=O)
+        # 37 60 0 0 acetaldehyde [CH3](-C=O)
+        self.opbset('[CH3](-C=O)', 0.590, opbhash, mol)
+        # 37 54 0 0 methylformamide [CH3](-NC=O)
+        self.opbset('[CH3](-NC=O)', 0.180, opbhash, mol)
+    
+        # 52 51 0 0 formamide HC=O
+        self.opbset('[#1]C=O', 1.950, opbhash, mol)
+    
+        # 53 51 0 0 amide O=C
+        # 53 60 0 0 carboxylic acid/aldehyde O=C
+        self.opbset('O=C', 0.650, opbhash, mol)
+    
+        # 54 51 0 0 amide NC=O
+        self.opbset('NC=O', 1.500, opbhash, mol)
+        # 55 54 0 0 amide HN
+        self.opbset('[#1]NC=O', 0.080, opbhash, mol)
+        # 58 60 0 0 carboxylic acid [OH](C=O)
+        self.opbset('[OH](C=O)', 1.500, opbhash, mol)
+        # 61 51 0 0 aldehyde HC=O for 3-formylindole
+        # 61 60 0 0 formic acid/aldehyde HC=O
+        self.opbset('[#1]C=O', 1.950, opbhash, mol)
+        # 76 89 0 0 pyridinium cnc
+        self.opbset('cnc', 0.150, opbhash, mol)
+        # 77 76 0 0 benzene Hc
+        # 79 78 0 0 ethylbenzene/phenol/toluene/p-cresol Hc1aaaaa1
+        self.opbset('[#1]c', 0.210, opbhash, mol)
+    
+        # 80 83 0 0 3-formylindole n1caaa1
+        self.opbset('n1caaa1', 0.200, opbhash, mol)
+        # 83 83 0 0 3-formylindole c1caaa1
+        self.opbset('c1caaa1', 0.200, opbhash, mol)
+        # 84 83 0 0 3-ethylindole [CD4]c1aaaa1
+        self.opbset('[CD4]c1aaaa1', 0.200, opbhash, mol)
+        # 78 88 0 0 benzamidine C(c)(N)(=N)
+        self.opbset('cC(N)(=N)', 0.020, opbhash, mol)
+        # 83 51 0 0 3-formylindole cC=O
+        self.opbset('c[CH]=O', 0.590, opbhash, mol)
+        # 85 51 0 0 3-formylindole O=[CH]c
+        self.opbset('O=[CH]c', 0.650, opbhash, mol)
+        # 86 88 0 0 benzamidine N~[C](~N)(c)
+        self.opbset('[NH1,NH2]-,=[C]([NH1,NH2])(c)', 0.020, opbhash, mol)
+        # 87 86 0 0 benzamidine HN(~C~N)
+        self.opbset('[#1]N(~C~N)', 0.180, opbhash, mol)
+        # 88 78 0 0 benzamidine C(c)(-N)(=N)
+        self.opbset('C(c)(-N)(=N)', 0.100, opbhash, mol)
+        # 88 86 0 0 benzamidine C(~N)(~N)c
+        self.opbset('C(~N)(~N)c', 0.050, opbhash, mol)
+        # 89 76 0 0 pyridinium nc
+        self.opbset('nc', 0.250, opbhash, mol)
+        # 90 89 0 0 Hn
+        self.opbset('[#1]n', 0.150, opbhash, mol)
+        # 30 78 0 0 alkane C - aromatic C [CH2;X4]c
+        # 37 78 0 0 ethylbenzene [CH2;X4]c
+        self.opbset('[CH2;X4]c', 0.200, opbhash, mol)
+        # 35 78 0 0 phenol [OH]c
+        self.opbset('[OH]c', 0.200, opbhash, mol)
+        # 51 83 0 0 [CH](c)=O
+        self.opbset('[CH](c)=O', 0.200, opbhash, mol)
+        # 74 73 0 0 tricyanomethide C(C(C#N)(C#N))#N
+        self.opbset('C(C(C#N)(C#N))#N', 0.200, opbhash, mol)
+        # 76 76 0 0 benzene cc
+        # 78 78 0 0 ethylbenzene cc
+        self.opbset('cc', 0.200, opbhash, mol)
+        #self.opbset('[#6D3][*]', 0.200, opbhash, mol)
+    
+        #print('hash items ',opbhash.items())
+    
+    
+        rotbndprmlist = []
+        for rotbnd in rotbndlist.values():
+            for rotbndprm in rotbnd:
+                rotlist=list(rotbndprm)
+                rotbndprmlist.append(rotlist)
+        return opbhash.items(),rotbndprmlist
+
+
 
     def vdwguess(self, mol):
         #self.idxToClassInit(xyzfname)
@@ -489,16 +615,6 @@ class Valence:
                     else:
                         key2 = 'vdw%10d%8.4f%9.4f' % (key1, v[skey][0], v[skey][1])
                     d.update({key1 : key2})
-                    #self.logfh.write('Vdw parameters '+key2+' assigned from SMILES '+skey+'\n')
-                    #if key1 not in found:
-                        #found.append(key1)
-                        #if(v[skey][2] != dfltred):
-                            #key2 = "vdw\t\t" + key1 + "\t\t\t" + '%f %f %f' % (v[skey][0], v[skey][1], v[skey][2])
-                            #key2 = 'vdw%10d%8.3f%9.3f%6.2f' % (key1, v[skey][0], v[skey][1], v[skey][2])
-                        #else:
-                            #key2 = "vdw\t\t" + key1 + "\t\t\t" + '%f %f' % (v[skey][0], v[skey][1])
-                            #print "lol"
-                        #addToOutString(key2)
         x = []
         for v in dict.values(d):
             x.append(v)
@@ -1453,10 +1569,7 @@ class Valence:
         vals.append(angparamvals1)
         analyzeexe = "analyze.x"
         cmdstr=analyzeexe+' '+sys.path[0]+r'/'+' '+'water.xyz'+' '+'-k'+' '+sys.path[0]+r'/'+'water.key'+' '+'e'+'>'+' '+'version.out'
-        try:
-            call_subsystem_externalnode(cmdstr,defaultnode)
-        except:
-            pass
+        os.system(cmdstr)
         temp=open('version.out','r')
         results=temp.readlines()
         temp.close()
@@ -2497,6 +2610,8 @@ class Valence:
         torkeytoindexlist={}
         d = dict()
         zeroed = False
+        self.logfh.write('****************************************************************************************************'+'\n')
+        indextoneighbidxs=self.FindAllNeighborIndexes(mol)
         for v in vals:
             for skey in iter(v):
                 openbabel.OBSmartsPattern.Init(self.sp,skey)
@@ -2508,6 +2623,13 @@ class Valence:
                     else:
                         sortedlist = [self.idxtoclass[ia[0] - 1], self.idxtoclass[ia[1] - 1], self.idxtoclass[ia[2] - 1], self.idxtoclass[ia[3] - 1]]
                     key1 = self.sorttorsion(sortedlist)
+                    # grab the middle two atoms and find all of their neighbors if those indexes are also within the matched indexes from SMARTS, then this torsion is transferable
+                    firstneighborindexes=indextoneighbidxs[int(ia[1])]
+                    secondneighborindexes=indextoneighbidxs[int(ia[2])]
+                    neighborindexes=firstneighborindexes+secondneighborindexes
+                    check=self.CheckIfNeighborsExistInSMARTMatch(neighborindexes,ia)
+                    if check==False:
+                        zeroed=True
                     if(dorot):
                         for r in rotbnds:
                             sortr = self.sorttorsion([self.idxtoclass[r[0] - 1],self.idxtoclass[r[1] - 1],self.idxtoclass[r[2] - 1],self.idxtoclass[r[3] - 1]])
@@ -2531,7 +2653,7 @@ class Valence:
                     torkeytoindexlist[key1string]=ia
                     d.update({key1string : key2})
                     zeroed = False
-        self.logfh.write('****************************************************************************************************'+'\n')
+        
         for key1string,key2 in d.items():
             skey=torkeytoSMILES[key1string]
             indexlist=torkeytoindexlist[key1string]
@@ -2558,6 +2680,28 @@ class Valence:
         x=list(d.values())
         return x
 
+    def FindAllNeighborIndexes(self,mol):
+        indextoneighbidxs={}
+        for atm in openbabel.OBMolAtomIter(mol):
+            atmidx=atm.GetIdx()
+            iteratomatom = openbabel.OBAtomAtomIter(atm)
+            if atmidx not in indextoneighbidxs.keys():
+                indextoneighbidxs[atmidx]=[]
+            for neighbatm in iteratomatom:
+                neighbatmidx=neighbatm.GetIdx()
+                if neighbatmidx not in indextoneighbidxs[atmidx]:
+                    indextoneighbidxs[atmidx].append(neighbatmidx)
+                
+
+        return indextoneighbidxs
+
+    def CheckIfNeighborsExistInSMARTMatch(self,neighborindexes,smartsindexes):
+        check=True
+        for idx in neighborindexes:
+            if idx not in smartsindexes:
+                check=False
+        return check
+
     def opbguess(self, opbendvals):
         x = []
         clsopbvallist = {}
@@ -2574,7 +2718,6 @@ class Valence:
             for opbparm in sortedopbparmlist:
                 key=opbparm[0]
                 smarts=keytosmarts[key]
-                print('smarts ',smarts,'prms',opbparm[1]*71.94)
                 kstring='opbend %6d%6d%6d%6d%11.4f' % (key[0],key[1],key[2],key[3], opbparm[1]*71.94)
                 x.append(kstring)
                 self.logfh.write(kstring+' matched from '+smarts+' has parameters '+str(opbparm[1]*71.94)+'\n')
@@ -2582,7 +2725,6 @@ class Valence:
             for opbparm in sortedopbparmlist:
                 key=opbparm[0]
                 smarts=keytosmarts[key]
-                print('smarts ',smarts,'prms',opbparm[1]*71.94)
                 kstring='opbend %6d%6d%11.4f' % (key[1],key[0],opbparm[1]*71.94)
                 x.append(kstring)
                 logfh.write(kstring+' matched from '+smarts+' has parameters '+str(opbparm[1]*71.94)+'\n')
@@ -2650,7 +2792,8 @@ class Valence:
             new_sbs.append('strbnd%7d%11.4f%10.4f%10.4f' % (k,v[0],v[1],v[2]))
         return new_sbs[:]
 
-    def appendtofile(self, vf, mol, opbendvals,dorot,rotbnds):
+    def appendtofile(self, vf, mol,dorot,rotbndlist):
+        opbendvals,rotbnds=self.gen_valinfile(mol,rotbndlist)
         f = open(vf, 'a')
         for x in self.vdwguess(mol):
             f.write(x + "\n")
@@ -2660,8 +2803,6 @@ class Valence:
             f.write(x + "\n")
         for x in self.sbguess(mol):
             f.write(x + "\n")
-        #for (opbkey, opbval) in opbendvals:
-        #    f.write('opbend %s %.5f %d\n' % (opbkey, opbval[0], opbval[1]))
         for x in self.opbguess(opbendvals):
             f.write(x + "\n")
         results=self.torguess(mol,dorot,rotbnds)
@@ -2700,3 +2841,4 @@ class Valence:
         #for line in xyzf:
             #self.idxtoclass.update(
                 #{int(line.split()[0]) : int(line.split()[5])})
+
