@@ -1,0 +1,64 @@
+                                     G D M A
+
+                                 by Anthony Stone
+
+                         version 2.2, 11 January 2006
+
+               Distributed Multipoles from Gaussian wavefunctions
+
+
+
+Starting at 10:23:43 on 31 Dec 2019 
+
+ammonia
+
+
+
+Using CC density matrix from file dma.fchk
+
+
+                         Distributed Multipole Analysis
+
+Standard DMA
+
+Positions and radii in angstrom
+Multipole moments in atomic units, ea_0^k for rank k
+
+N          x = -0.022969  y = -0.064323  z =  0.009088
+           Maximum rank =  2   Relative radius =  0.650
+                   Q00  =  -0.185052
+|Q1| =   0.337437  Q10  =  -0.044505  Q11c =   0.112486  Q11s =   0.315008
+|Q2| =   0.897984  Q20  =   0.425562  Q21c =   0.068384  Q21s =   0.191505
+                   Q22c =   0.591309  Q22s =  -0.484020
+
+H          x = -0.336676  y =  0.566884  z =  0.741902
+           Maximum rank =  2   Relative radius =  0.600
+                   Q00  =   0.061684
+|Q1| =   0.192759  Q10  =   0.137498  Q11c =  -0.057902  Q11s =   0.122056
+|Q2| =   0.019165  Q20  =   0.010616  Q21c =  -0.003160  Q21s =  -0.000443
+                   Q22c =   0.013961  Q22s =  -0.007037
+
+H          x = -0.336638  y =  0.339146  z = -0.869933
+           Maximum rank =  2   Relative radius =  0.600
+                   Q00  =   0.061684
+|Q1| =   0.192759  Q10  =  -0.165934  Q11c =  -0.057895  Q11s =   0.079183
+|Q2| =   0.019165  Q20  =   0.008262  Q21c =   0.004986  Q21s =   0.008987
+                   Q22c =   0.012601  Q22s =  -0.005886
+
+H          x =  0.992459  y = -0.012305  z =  0.001762
+           Maximum rank =  2   Relative radius =  0.600
+                   Q00  =   0.061684
+|Q1| =   0.192759  Q10  =  -0.001836  Q11c =   0.192309  Q11s =   0.013023
+|Q2| =   0.019166  Q20  =   0.006260  Q21c =   0.002214  Q21s =   0.002769
+                   Q22c =   0.008368  Q22s =  -0.015670
+
+Total multipoles
+referred to origin at x =   0.000000,  y =    0.000000,  z =    0.000000
+                   Q00  =  -0.000000
+|Q1| =   0.702646  Q10  =  -0.092674  Q11c =   0.234232  Q11s =   0.655941
+|Q2| =   1.932452  Q20  =   0.915811  Q21c =   0.147161  Q21s =   0.412115
+                   Q22c =   1.272490  Q22s =  -1.041601
+
+CPU time used:      0m 0.002s          Total:      0m 0.002s
+
+Finished at 10:23:43 on 31 Dec 2019 

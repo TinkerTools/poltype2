@@ -1,0 +1,18 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.7  June 2019                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2019               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ GETKEY  --  Keyfile Specified on Command Line was not Found
+
+ Tinker is Unable to Continue; Terminating the Current Calculation

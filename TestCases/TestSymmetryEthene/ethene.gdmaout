@@ -1,0 +1,71 @@
+                                     G D M A
+
+                                 by Anthony Stone
+
+                         version 2.2, 11 January 2006
+
+               Distributed Multipoles from Gaussian wavefunctions
+
+
+
+Starting at 10:29:49 on 31 Dec 2019 
+
+ethene
+
+
+
+Using CC density matrix from file dma.fchk
+
+
+                         Distributed Multipole Analysis
+
+Standard DMA
+
+Positions and radii in angstrom
+Multipole moments in atomic units, ea_0^k for rank k
+
+C          x =  0.000006  y =  0.667513  z =  0.000000
+           Maximum rank =  2   Relative radius =  0.650
+                   Q00  =  -0.060303
+|Q1| =   0.076957  Q11c =   0.010014  Q11s =   0.076303
+|Q2| =   0.110337  Q20  =  -0.047441  Q22c =   0.097184  Q22s =  -0.021883
+
+C          x = -0.000006  y = -0.667513  z =  0.000000
+           Maximum rank =  2   Relative radius =  0.650
+                   Q00  =  -0.060302
+|Q1| =   0.076957  Q11c =  -0.010015  Q11s =  -0.076303
+|Q2| =   0.110336  Q20  =  -0.047441  Q22c =   0.097184  Q22s =  -0.021881
+
+H          x = -0.922879  y =  1.237507  z =  0.000000
+           Maximum rank =  2   Relative radius =  0.600
+                   Q00  =   0.030151
+|Q1| =   0.173577  Q11c =  -0.141068  Q11s =   0.101139
+|Q2| =   0.020227  Q20  =  -0.001933  Q22c =   0.006962  Q22s =   0.018892
+
+H          x =  0.922902  y =  1.237492  z =  0.000000
+           Maximum rank =  2   Relative radius =  0.600
+                   Q00  =   0.030151
+|Q1| =   0.173578  Q11c =   0.141070  Q11s =   0.101137
+|Q2| =   0.020227  Q20  =  -0.001932  Q22c =   0.006961  Q22s =  -0.018893
+
+H          x =  0.922878  y = -1.237508  z =  0.000000
+           Maximum rank =  2   Relative radius =  0.600
+                   Q00  =   0.030151
+|Q1| =   0.173578  Q11c =   0.141068  Q11s =  -0.101139
+|Q2| =   0.020227  Q20  =  -0.001933  Q22c =   0.006962  Q22s =   0.018892
+
+H          x = -0.922900  y = -1.237492  z =  0.000000
+           Maximum rank =  2   Relative radius =  0.600
+                   Q00  =   0.030151
+|Q1| =   0.173578  Q11c =  -0.141069  Q11s =  -0.101137
+|Q2| =   0.020227  Q20  =  -0.001933  Q22c =   0.006962  Q22s =  -0.018892
+
+Total multipoles
+referred to origin at x =   0.000000,  y =    0.000000,  z =    0.000000
+                   Q00  =  -0.000000
+|Q1| =   0.000001
+|Q2| =   2.645835  Q20  =  -2.642508  Q22c =  -0.132628  Q22s =   0.000005
+
+CPU time used:      0m 0.004s          Total:      0m 0.004s
+
+Finished at 10:29:49 on 31 Dec 2019 
