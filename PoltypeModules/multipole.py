@@ -3,6 +3,7 @@ import os
 import sys
 import openbabel
 import shutil
+import re
 
 def is_in_polargroup(poltype,mol, smarts, bond, f):
     """
@@ -260,7 +261,6 @@ def gen_peditinfile(poltype,mol):
                         lines.append(str(a.GetIdx()) + " " + str(0.696) + "\n")
                         writesection=True
         if writesection==True:
-            #f.write("\n")
             for line in lines:
                 f.write(line)
             
@@ -271,9 +271,9 @@ def gen_peditinfile(poltype,mol):
         for ia in sp.GetMapList():
             f.write(str(ia[0]) + " " + str(0.921) + "\n")
 
+           
+
         f.write("\n")
-        #f.write('\n')
-        #f.write('\n')
         #Define polarizable groups by cutting bonds
         iterbond = openbabel.OBMolBondIter(mol)
         for b in iterbond:
@@ -351,13 +351,6 @@ def post_proc_localframes(poltype,keyfilename, lfzerox,atomindextoremovedipquad,
                 lf2 = '0'
             elif len(tmplst) == 6:
                 (keywd,atmidx,lf1,lf2,lf3,chg) = tmplst
-            """
-            # If poledit set lf2 to 0, then replace it with the lf2 found in gen_peditin
-            if int(lf2) == 0:
-                #lf2 = localframe2[int(atmidx) - 1]
-                lines[ln1] = '%s %5s %4s %4d %21s\n' % (keywd,
-                    atmidx, lf1, lf2, chg)
-            """
             # manually zero out components of the multipole if they were not done by poledit
             if lfzerox[int(atmidx) - 1]:
                 tmpmp = list(map(float, lines[ln1+1].split()))
@@ -399,7 +392,7 @@ def post_proc_localframes(poltype,keyfilename, lfzerox,atomindextoremovedipquad,
                 tmpmp[0] = 0
                 tmpmp[1] = 0
                 lines[ln1+4] = '%46.5f %10.5f %10.5f\n' % tuple(tmpmp)
-
+            
             if len(tmplst) == 4:
                 linesplit=re.split(r'(\s+)', lines[ln1])
                 newtmplist=linesplit[:len(linesplit)-4]
@@ -449,13 +442,13 @@ def post_process_mpoles(poltype,keyfilename, scalelist):
         if mpolelines > 0:
             mpolelines -= 1
             continue
-        elif 'multipole' in lines[ln1] and len(lines[ln1])==5:
+        elif 'multipole' in lines[ln1] and len(lines[ln1].split())==5:
             (keywd,symcls,lf1,lf2,chg) = lines[ln1].split()
-            newlines.extend(poltype.scale_multipoles(symcls,lines[ln1:ln1+5],scalelist))
+            newlines.extend(scale_multipoles(poltype,symcls,lines[ln1:ln1+5],scalelist))
             mpolelines = 4
-        elif 'multipole' in lines[ln1] and len(lines[ln1])==6:
+        elif 'multipole' in lines[ln1] and len(lines[ln1].split())==6:
             (keywd,symcls,lf1,lf2,lf3,chg) = lines[ln1].split()
-            newlines.extend(poltype.scale_multipoles(symcls,lines[ln1:ln1+5],scalelist))
+            newlines.extend(scale_multipoles(poltype,symcls,lines[ln1:ln1+5],scalelist))
             mpolelines = 4
         else:
             newlines.append(lines[ln1])
@@ -467,9 +460,12 @@ def post_process_mpoles(poltype,keyfilename, scalelist):
 
 def process_types(poltype,mol):
     """
-    Intent: Set up scalelist array for scaling certain multipole values 
+    Intent: Set up scalelist array for scaling certain multipole values
+For alchol, the quadrupole on O and H should be mannually scaled by 0.6. This only applies to OH that connect to sp3 Carbon. Similarly for NH in amine (that connects to a sp3 C), scale the Q by 0.75 or 75%. See JCC 2011 32(5):967-77. 
     """
     scalelist = {}
+    multipole_scale_dict = {}
+
     for atm in openbabel.OBMolAtomIter(mol):
         if symm.get_class_number(poltype,atm.GetIdx()) not in scalelist:
             scalelist[symm.get_class_number(poltype,atm.GetIdx())] = []
@@ -478,13 +474,15 @@ def process_types(poltype,mol):
             scalelist[symm.get_class_number(poltype,atm.GetIdx())].append(None)
             multipole_scale_dict = {}
 
+    multipole_scale_dict['[OH][CX4]'] = [2, 0.6]
+    multipole_scale_dict['[NH2][CX4]'] = [2, 0.75]
     for (sckey, scval) in multipole_scale_dict.items():
         sp = openbabel.OBSmartsPattern()
         openbabel.OBSmartsPattern.Init(sp,sckey)
-        sp.Match(mol)
+        match=sp.Match(mol)
         for ia in sp.GetUMapList():
             scalelist[symm.get_class_number(poltype,ia[0])][scval[0]] = scval[1]
-
+    
     return scalelist
 
 def scale_multipoles(poltype,symmclass, mpolelines,scalelist):
@@ -613,7 +611,7 @@ def gen_gdmain(poltype,gdmainfname,molecprefix,fname,dmamethod):
         densitystring='MP2'
     else:
         densitystring='SCF'
-    if poltype.use_psi4 or poltype.use_psi4SPonly:
+    if poltype.use_gaus==False or poltype.use_gausoptonly==True:
         if poltype.dmamethod=='MP2':
             densitystring='CC' # for some reason fchk outputs CC for MP2 density
         tmpfh.write("File " + fnamesym  + " density %s\n"%(densitystring))

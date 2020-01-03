@@ -111,16 +111,21 @@ def compute_qm_tor_energy(poltype,a,b,c,d,startangle,phase_list = None):
     energy_dict = {}
     for phaseangle in phase_list:
         angle = (startangle + phaseangle) % 360
-        minstrctfname = '%s-sp-%d-%d-%d-%d-%03d.log' % (poltype.molecprefix,a,b,c,d,round(angle))
+        if poltype.use_gaus:
+
+            minstrctfname = '%s-sp-%d-%d-%d-%d-%03d.log' % (poltype.molecprefix,a,b,c,d,round(angle))
+        else:
+            minstrctfname = '%s-sp-%d-%d-%d-%d-%03d_psi4.log' % (poltype.molecprefix,a,b,c,d,round(angle))
+
         if not os.path.exists(minstrctfname): # if optimization failed then SP file will not exist
             tor_energy=None
         else:
-            tmpstrct = opt.load_structfile(poltype,minstrctfname)
+            
             tmpfh = open(minstrctfname, 'r')
             tor_energy = None
-            if poltype.use_psi4 or poltype.use_psi4SPonly:
+            if not poltype.use_gaus:
                 mengi=esp.GrabFinalPsi4Energy(poltype,minstrctfname)
-                tor_energy = float(mengi) * Hartree2kcal_mol
+                tor_energy = float(mengi) * poltype.Hartree2kcal_mol
             else:
                 for line in tmpfh:
                     m = re.search(r'EUMP2 =\s+(\-*\d+\.\d+D\+\d+)',line)
@@ -357,6 +362,8 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename):
         qme_list,qang_list = compute_qm_tor_energy(poltype,a,b,c,d,initangle,anglist)
         mme_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,
         a,b,c,d,initangle,'_postQMOPTprefit',torang,anglist,tmpkey1basename)
+        print('qme_list ',qme_list)
+        print('mme_list ',mme_list)
         # delete members of the list where the energy was not able to be found 
         del_ang_list = find_del_list(poltype,mme_list,mang_list)
         (cls_angle_dict[clskey],cls_mm_engy_dict[clskey])=prune_mme_error(poltype,del_ang_list,cls_angle_dict[clskey],cls_mm_engy_dict[clskey])
@@ -364,6 +371,7 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename):
         del_ang_list = find_del_list(poltype,qme_list,qang_list)
         (cls_angle_dict[clskey],cls_mm_engy_dict[clskey])=prune_qme_error(poltype,del_ang_list,cls_angle_dict[clskey],cls_mm_engy_dict[clskey])
         (mang_list,mme_list,qme_list,qang_list,tor_e_list)=prune_qme_error(poltype,del_ang_list,mang_list,mme_list,qme_list,qang_list,tor_e_list)
+        
         cls_qm_engy_dict[clskey] = [ runsum+eng for runsum,
             eng in zip (cls_qm_engy_dict[clskey], qme_list)]
         cls_mm_engy_dict[clskey] = [ runsum+eng for runsum,
@@ -630,8 +638,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]
         if len(qm_energy_list)<round(prmidx*.5): # then might not be great fit any way, too many QM failed
-            poltype.WriteToLog('Too many QM jobs have failed for '+str(tor))
-            continue
+            raise ValueError('Too many QM jobs have failed for '+str(tor))
+            
         # Parameterize each group of rotatable bond (identified by
         #  atoms restrained during restrained rotation.
         # tor_energy_list is set as qm - mm
@@ -758,6 +766,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
                 return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.subtract(fitfunc_dict[clskey],tor_energy_list),c))))
             result=fmin(RMSD,.5)
             minRMSD=RMSD(result[0])
+           
         figfname = '%s-fit-%d-%d' % (poltype.molecprefix,b,c)
         figfname+='.png'
         fig = plt.figure()
@@ -774,6 +783,11 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         ax.text(0, -0.1, 'FoldNum=%s NumPrms=%s DataPts=%s RMSD(fit,QM-MM1) Wei=%s,Abs=%s'%(str(len(poltype.nfoldlist)),str(numprms),str(len(mm_energy_list)),round(minRMSDW,2),round(minRMSD,2)), transform=ax.transAxes, fontsize=10,verticalalignment='bottom')
         fig.savefig(figfname)
         torgen.write_arr_to_file(poltype,txtfname,[Sx,fitfunc_dict[clskey],tor_energy_list])
+        if float(minRMSD)>poltype.maxtorRMSPD:
+                poltype.WriteToLog('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
+
+                raise ValueError('RMSPD of QM and MM torsion profile is high, RMSPD = ',str(minRMSD))
+
     return write_prm_dict,fitfunc_dict
 
 def write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename):
@@ -848,7 +862,6 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
 
         # get the qm energy profile
         qm_energy_list,qang_list = compute_qm_tor_energy(poltype,a,b,c,d,torang,anglelist)
-        print('qm_energylist out here ',qm_energy_list)
         tmpkeyfname = 'tmp.key'
         shutil.copy(tmpkey1basename, tmpkeyfname)
         # get the original mm energy profile
@@ -860,8 +873,6 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2)=prune_mme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2)
         del_ang_list = find_del_list(poltype,qm_energy_list,qang_list)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2)
-        print('qm_energy after first delete ',qm_energy_list)
-        print('mm2 energy list',mm2_energy_list)
         del_ang_list = find_del_list(poltype,mm2_energy_list,m2ang_list)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2)
         print('second deleteion ',qm_energy_list)
@@ -1017,8 +1028,8 @@ def PostfitMinAlz(poltype,keybasename,keybasepath):
         term,error=opt.is_qm_normal_termination(poltype,outputlog)
         [a,b,c,d,torang,optmol,consttorlist,phaseangle]=poltype.optoutputtotorsioninfo[outputlog]
         if term==True:     
-            if poltype.use_psi4:
-                finalstruct=outputlog.replace('.log','_opt.xyz')
+            if not poltype.use_gaus:
+                finalstruct=outputlog.replace('_psi4.log','_psi4.xyz')
                 cartxyz,torxyzfname=torgen.tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,finalstruct,poltype.torsionrestraint,'_postQMOPTpostfit',keybasename,keybasepath)
             else:
                 cartxyz,torxyzfname=torgen.tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,outputlog,poltype.torsionrestraint,'_postQMOPTpostfit',keybasename,keybasepath)

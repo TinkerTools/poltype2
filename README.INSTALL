@@ -32,6 +32,8 @@ conda activate p4env
 conda install scipy 
 conda install matplotlib 
 conda install -c openbabel openbabel
+conda install git pip
+pip install git+git://github.com/ParmEd/ParmEd.git # sometimes anaconda repo not up to date with GitHub repo
 _________________________________________________________________________________
 
  

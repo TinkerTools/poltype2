@@ -32,10 +32,10 @@ import os
 radian = 57.29577951308232088
 
 class Valence():
-    def __init__(self,output_format,logfname):
+    def __init__(self,versionnum,logfname):
         self.sp = openbabel.OBSmartsPattern()
-        self.o_f = output_format
         self.missed_torsions = []
+        self.versionnum=versionnum
         self.logfh = open(logfname,"a")
         self.defopbendval = 0.20016677990819662
 
@@ -1010,25 +1010,17 @@ class Valence():
                     sortedlist.sort()
                     key1 = sortedlist
                     key1string = '%d %d ' % (key1[0], key1[1])
-#                    if(len(v[skey]) == 2):
                     blen = mol.GetBond(ia[0],ia[1]).GetLength()
                     key2 = 'bond%9d%6d%11.4f%10.4f' % (key1[0], key1[1], v[skey][0], blen)
-#                    else:
-#                        key2 = '#bond%10s%10.6f %s' % (key1string,v[skey][0],"error, parameter not found in amoeba parameters, resorted to tinker's analyze.x parameters")
                     d.update({key1string : key2})
         x = []
         for v in dict.values(d):
             x.append(v)
-        #print('d bond ',d)
-        #sortedtuple = sorted(d.keys(),key=lambda k: (k.split()[0],k.split()[1]))
-        #print('sortedtuple ',sortedtuple)
-        #x = [ t[1] for t in sortedtuple ]
         return x
 
     def angguess(self, mol):
         found = []
         vals = []
-        #dict = ({'[atom a][atom b][atom c]' : angle bend force constant})
 
         angparamvals3 = dict({ \
         #38 37 38 (check) (not sure if this is too vague)
@@ -1567,22 +1559,9 @@ class Valence():
         vals.append(angparamvals3)
         vals.append(angparamvals2)
         vals.append(angparamvals1)
-        analyzeexe = "analyze.x"
-        cmdstr=analyzeexe+' '+sys.path[0]+r'/'+' '+'water.xyz'+' '+'-k'+' '+sys.path[0]+r'/'+'water.key'+' '+'e'+'>'+' '+'version.out'
-        os.system(cmdstr)
-        temp=open('version.out','r')
-        results=temp.readlines()
-        temp.close()
         shoulduseanglep = False
-        latestversion = False
-        for line in results:
-            if "Version" in line:
-                if "Version" in line:
-                    linesplit=line.split()
-                    versionnum=float(linesplit[2])
-                    if versionnum>=8.7:
-                        shoulduseanglep = True
-                        break
+        if self.versionnum>=8.7:
+            shoulduseanglep = True
 
         d = dict()
         for v in vals:
@@ -2032,8 +2011,6 @@ class Valence():
         #sortedtuple = sorted(d.items(), key=lambda k: (k.split()[1],k.split()[0],k.split()[2]))
         #x = [ t[1] for t in sortedtuple ]
         x=list(d.values())
-        if self.o_f == 4:
-            x = self.change_format(mol,x)
         return x
 
     def torguess(self, mol, dorot, rotbnds,checksmarts=None):
@@ -2714,20 +2691,12 @@ class Valence():
                 keytosmarts[covlkey]=opbval[2]
         sortedopbparmlist = sorted([(key, value) for
             (key,value) in clsopbvallist.items()])
-        if self.o_f == 5:
-            for opbparm in sortedopbparmlist:
-                key=opbparm[0]
-                smarts=keytosmarts[key]
-                kstring='opbend %6d%6d%6d%6d%11.4f' % (key[0],key[1],key[2],key[3], opbparm[1]*71.94)
-                x.append(kstring)
-                self.logfh.write(kstring+' matched from '+smarts+' has parameters '+str(opbparm[1]*71.94)+'\n')
-        else:
-            for opbparm in sortedopbparmlist:
-                key=opbparm[0]
-                smarts=keytosmarts[key]
-                kstring='opbend %6d%6d%11.4f' % (key[1],key[0],opbparm[1]*71.94)
-                x.append(kstring)
-                logfh.write(kstring+' matched from '+smarts+' has parameters '+str(opbparm[1]*71.94)+'\n')
+        for opbparm in sortedopbparmlist:
+            key=opbparm[0]
+            smarts=keytosmarts[key]
+            kstring='opbend %6d%6d%6d%6d%11.4f' % (key[0],key[1],key[2],key[3], opbparm[1]*71.94)
+            x.append(kstring)
+            self.logfh.write(kstring+' matched from '+smarts+' has parameters '+str(opbparm[1]*71.94)+'\n')
         return x
 
     def pitorguess(self,mol):
@@ -2794,24 +2763,45 @@ class Valence():
 
     def appendtofile(self, vf, mol,dorot,rotbndlist):
         opbendvals,rotbnds=self.gen_valinfile(mol,rotbndlist)
-        f = open(vf, 'a')
-        for x in self.vdwguess(mol):
-            f.write(x + "\n")
-        for x in self.bondguess(mol):
-            f.write(x + "\n")
-        for x in self.angguess(mol):
-            f.write(x + "\n")
-        for x in self.sbguess(mol):
-            f.write(x + "\n")
-        for x in self.opbguess(opbendvals):
-            f.write(x + "\n")
-        results=self.torguess(mol,dorot,rotbnds)
-        for x in results:
-            f.write(x + "\n")
-
-        for x in self.pitorguess(mol):
-            f.write(x+ "\n")
+        temp=open(vf,'r')
+        results=temp.readlines()
+        temp.close()
+        foundatomblock=False
+        atomline=False
+        wroteout=False
+        tempname=vf.replace('.key','_temp.key')
+        f=open(tempname,'w')
+        for line in results:
+            if 'atom' in line:
+                atomline=True
+                if foundatomblock==False:
+                    foundatomblock=True
+            else:
+                atomline=False
+            if foundatomblock==True and atomline==False and wroteout==False:
+                wroteout=True
+                f.write('\n')
+                for x in self.vdwguess(mol):
+                    f.write(x + "\n")
+                for x in self.bondguess(mol):
+                    f.write(x + "\n")
+                for x in self.angguess(mol):
+                    f.write(x + "\n")
+                for x in self.sbguess(mol):
+                    f.write(x + "\n")
+                for x in self.opbguess(opbendvals):
+                    f.write(x + "\n")
+                results=self.torguess(mol,dorot,rotbnds)
+                for x in results:
+                    f.write(x + "\n")
+                for x in self.pitorguess(mol):
+                    f.write(x+ "\n")
+                f.write('\n')
+            else:
+                f.write(line)
         f.close()
+        os.remove(vf)
+        os.rename(tempname,vf)
 
     def sortfirstlast(self, keylist):
         size = len(keylist)

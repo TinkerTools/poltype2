@@ -2,6 +2,8 @@ import os
 import sys
 from socket import gethostname
 import openbabel
+import re
+import time
 
 def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
     tempread=open(comfilecoords,'r')
@@ -17,9 +19,9 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
         if len(linesplit)==4 and '#' not in line:
             temp.write(line)
     temp.write('}'+'\n')
-    if optpcm==True:
+    if poltype.optpcm==True:
         temp.write('set {'+'\n')
-        temp.write(' basis '+poltype.optbasisset.lower()+'\n')
+        temp.write(' basis '+poltype.optbasisset+'\n')
         temp.write(' e_convergence 10 '+'\n')
         temp.write(' d_convergence 10 '+'\n')
         temp.write(' scf_type pk'+'\n')
@@ -44,9 +46,9 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')
-    temp.write("optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset.lower())+'\n')
+    temp.write("optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
     if poltype.freq==True:
-        temp.write('scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset.lower())+'\n')
+        temp.write('scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
     temp.write('clean()'+'\n')
     temp.close()
     outputname=os.path.splitext(inputname)[0] + '.log'
@@ -66,22 +68,32 @@ def NumberInLine(poltype,line):
     return numinline
 
 
-def GrabFinalPsi4XYZStructure(poltype,logname,filename):
-    finalmarker=False
-    temp=open(logname,'r')
-    results=temp.readlines()
-    temp.close()
-    temp=open(filename,'w')
-    temp.write(str(mol.NumAtoms())+'\n')
-    temp.write('\n')
-    for line in results:
-        if 'Final optimized geometry and' in line:
-            finalmarker=True
-        if finalmarker==True:
-            linesplit=line.split()
-            if len(linesplit)==4 and poltype.NumberInLine(line)==True:
-                temp.write(line.lstrip())
-    temp.close()
+def GrabFinalXYZStructure(poltype,logname,filename):
+    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
+        finalmarker=False
+        temp=open(logname,'r')
+        results=temp.readlines()
+        temp.close()
+        temp=open(filename,'w')
+        temp.write(str(poltype.mol.NumAtoms())+'\n')
+        temp.write('\n')
+        for line in results:
+            if 'Final optimized geometry and' in line:
+                finalmarker=True
+            if finalmarker==True:
+                linesplit=line.split()
+                if len(linesplit)==4 and bool(re.search(r'\d', line))==True and 'point' not in line:
+                    temp.write(line.lstrip())
+        temp.close()
+    else:
+        obConversion = openbabel.OBConversion()
+        tempmol = openbabel.OBMol()
+        inFormat = obConversion.FormatFromExt(logname)
+        obConversion.SetInFormat(inFormat)
+        obConversion.ReadFile(tempmol, logname)
+        obConversion.SetOutFormat('xyz')
+        obConversion.WriteFile(tempmol, filename)
+
 
 def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,mol):
     """
@@ -109,15 +121,15 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,mol):
     else:
         if poltype.freq==True:
             if poltype.optpcm==True:
-                tmpfh.write("%s %s/%s freq Guess=INDO MaxDisk=%s SCRF=(PCM)\n" % (optstr,poltype.optmethod,poltype.optbasisset,maxdisk))
+                optstring= "%s %s/%s freq Guess=INDO MaxDisk=%s SCRF=(PCM)\n" % (optstr,poltype.optmethod,poltype.optbasisset,maxdisk)
             else:
-                tmpfh.write("%s %s/%s freq Guess=INDO MaxDisk=%s\n" % (optstr,poltype.optmethod,poltype.optbasisset,maxdisk))
+                optstring= "%s %s/%s freq Guess=INDO MaxDisk=%s\n" % (optstr,poltype.optmethod,poltype.optbasisset,maxdisk)
         else:
             if poltype.optpcm==True:
-                tmpfh.write("%s %s/%s Guess=INDO MaxDisk=%s SCRF=(PCM)\n" % (optstr,poltype.optmethod,poltype.optbasisset,maxdisk))
+                optstring= "%s %s/%s Guess=INDO MaxDisk=%s SCRF=(PCM)\n" % (optstr,poltype.optmethod,poltype.optbasisset,maxdisk)
             else:
-                tmpfh.write("%s %s/%s Guess=INDO MaxDisk=%s\n" % (optstr,poltype.optmethod,poltype.optbasisset,maxdisk))
-     
+                optstring= "%s %s/%s Guess=INDO MaxDisk=%s\n" % (optstr,poltype.optmethod,poltype.optbasisset,maxdisk)
+    tmpfh.write(optstring)
     commentstr = poltype.molecprefix + " Gaussian SP Calculation on " + gethostname()
     tmpfh.write('\n%s\n\n' % commentstr)
     tmpfh.write('%d %d\n' % (mol.GetTotalCharge(), mol.GetTotalSpinMultiplicity()))
@@ -220,8 +232,9 @@ def CheckRMSD(poltype):
                     if e.isdigit() or e=='.':
                         RMSD+=e
             if float(RMSD)>poltype.maxRMSD:
-                print('Warning: RMSD of QM and MM optimized structures is high, RMSD = ',RMSD)
                 poltype.WriteToLog('Warning: RMSD of QM and MM optimized structures is high, RMSD = '+ RMSD+' Tolerance is '+str(poltype.maxRMSD)+' kcal/mol ')
+
+                raise ValueError('RMSD of QM and MM optimized structures is high, RMSD = ',RMSD)
 
 def StructureMinimization(poltype):
      poltype.WriteToLog("")
@@ -261,15 +274,14 @@ def GeometryOptimization(poltype,mol):
     temp.close()
     os.remove(poltype.comtmp)
     os.rename(tempname,poltype.comtmp)
-    if poltype.use_psi4 or poltype.use_psi4SPonly:
+    if poltype.use_gaus==False or poltype.use_gausoptonly==True:
         mkdirstr='mkdir '+poltype.scratchdir
         poltype.call_subsystem(mkdirstr,True)
     else:
         mkdirstr='mkdir '+poltype.scrtmpdir
         poltype.call_subsystem(mkdirstr,True)
 
-    if poltype.use_psi4SPonly==True or (poltype.use_psi4SPonly==False and poltype.use_psi4==False): # try to use gaussian for opt
-
+    if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt
         term,error=is_qm_normal_termination(poltype,poltype.logoptfname)
         if not term:
             mystruct = load_structfile(poltype,poltype.molstructfname)
@@ -281,23 +293,24 @@ def GeometryOptimization(poltype,mol):
             poltype.call_subsystem(cmdstr,True)
             cmdstr = poltype.formchkexe + " " + poltype.chkoptfname
             poltype.call_subsystem(cmdstr)
-
+        term,error=is_qm_normal_termination(poltype,poltype.logoptfname) 
         optmol =  load_structfile(poltype,poltype.logoptfname)
         optmol=rebuild_bonds(poltype,optmol,mol)
                 
     else:
-        gen_optcomfile(poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol)
+        gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol)
         poltype.WriteToLog("Calling: " + "Psi4 Optimization")
         term,error=is_qm_normal_termination(poltype,poltype.logoptfname)
-        inputname=poltype.CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol)
+        inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol)
         if term==False:
             cmdstr='psi4 '+inputname+' '+poltype.logoptfname
             poltype.call_subsystem(cmdstr,True)
         term,error=is_qm_normal_termination(poltype,poltype.logoptfname) # now grabs final structure when finished with QM if using Psi4
 
-        optmol =  load_structfile(poltype,'optimized.xyz')
+        optmol =  load_structfile(poltype,poltype.logoptfname.replace('.log','.xyz'))
         optmol=rebuild_bonds(poltype,optmol,mol)
 
+    CheckBondConnectivity(poltype,mol,optmol)
     return optmol
 
 
@@ -322,6 +335,7 @@ def load_structfile(poltype,structfname):
         tmpconv.SetInFormat(inFormat)
     tmpmol = openbabel.OBMol()
     tmpconv.ReadFile(tmpmol, structfname)
+
     return tmpmol
 
 def rebuild_bonds(poltype,newmol, refmol):
@@ -340,18 +354,16 @@ def is_qm_normal_termination(poltype,logfname): # needs to handle error checking
     error=False
     term=False
     if os.path.isfile(logfname):
-        if 'psi4' in logfname:
-            for line in open(logfname):
-                if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line:
-                    poltype.GrabFinalPsi4XYZStructure(logfname,logfname.replace('.log','_opt.xyz'))
-                    term=True
-        else:
-            for line in open(logfname):
-                if "Normal termination" in line:
-                    term=True
-                if ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation' in line) and 'DIIS' not in line:
-                    error=True
-
+        for line in open(logfname):
+            if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line:
+                term=True
+      
+            elif "Normal termination" in line:
+                term=True
+            elif ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation' in line) and 'DIIS' not in line:
+                error=True
+    if term==True:
+        GrabFinalXYZStructure(poltype,logfname,logfname.replace('.log','.xyz'))
     return term,error
 
 def is_mm_normal_termination(pooltype,outfile):

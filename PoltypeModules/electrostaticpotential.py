@@ -1,9 +1,12 @@
 from . import optimization as opt
 from . import electrostaticpotential as esp
+from . import torsiongenerator as torgen
 import os
 import sys
 from socket import gethostname
 import re
+import shutil
+import time
 
 def gen_esp_grid(poltype,mol):
     """
@@ -23,14 +26,7 @@ def gen_esp_grid(poltype,mol):
        "(2) Get QM Potential from a Gaussian Cube File"
        Outputs *.cube_2
     """
-    # Create a *.grid file which is an input file for Gaussian CUBEGEN
-    if not os.path.isfile(poltype.espgrdfname):
-        gengridcmd = poltype.potentialexe + " 1 " + poltype.xyzfname+' -k '+poltype.keyfname
-        poltype.call_subsystem(gengridcmd,True)
-        
-    #    shutil.move(xyzoutfile,espgrdfname)
-    # Run CUBEGEN
-    if poltype.use_psi4 or poltype.use_psi4SPonly:
+    if poltype.use_gaus==False or poltype.use_gausoptonly==True:
         temp=open('grid_esp.dat','r')
         results=temp.readlines()
         temp.close()
@@ -72,11 +68,10 @@ def gen_esp_grid(poltype,mol):
         poltype.call_subsystem(genqmpotcmd,True)
         
 
-def CreatePsi4ESPInputFile(poltype,comfilecoords,mol,molecprefix,a,b,c,d,torang,phaseangle,maxdisk,maxmem,numproc,makecube=None):
+def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,numproc,makecube=None):
     tempread=open(comfilecoords,'r')
     results=tempread.readlines()
     tempread.close()
-    comfilename= '%s-sp-%d-%d-%d-%d-%03d.com' % (molecprefix,a,b,c,d,round((torang+phaseangle)%360))
     inputname=comfilename.replace('.com','_psi4.dat')
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
@@ -87,9 +82,9 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,mol,molecprefix,a,b,c,d,torang,
         if len(linesplit)==4 and '#' not in line:
             temp.write(line)
     temp.write('}'+'\n')
-    if torsppcm==True:
+    if poltype.torsppcm==True:
         temp.write('set {'+'\n')
-        temp.write(' basis '+poltype.espbasisset.lower()+'\n')
+        temp.write(' basis '+poltype.espbasisset+'\n')
         temp.write(' e_convergence 10 '+'\n')
         temp.write(' d_convergence 10 '+'\n')
         temp.write(' scf_type pk'+'\n')
@@ -114,9 +109,9 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,mol,molecprefix,a,b,c,d,torang,
     temp.write('set_num_threads(%s)'%(numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')
     temp.write('set freeze_core True'+'\n')
-    temp.write("E, wfn = energy('%s/%s',return_wfn=True)" % (poltype.espmethod.lower(),poltype.espbasisset.lower())+'\n')
+    temp.write("E, wfn = energy('%s/%s',return_wfn=True)" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
     if makecube==True:
-       temp.write('oeprop(wfn,"GRID_ESP")'+'\n')
+       temp.write('oeprop(wfn,"DIPOLE","GRID_ESP")'+'\n')
     temp.write('clean()'+'\n')
     temp.close()
     outputname=os.path.splitext(inputname)[0] + '.log'
@@ -136,9 +131,9 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
         if len(linesplit)==4 and '#' not in line:
             temp.write(line)
     temp.write('}'+'\n')
-    if torsppcm==True:
+    if poltype.torsppcm==True:
         temp.write('set {'+'\n')
-        temp.write(' basis '+poltype.dmabasisset.lower()+'\n')
+        temp.write(' basis '+poltype.dmabasisset+'\n')
         temp.write(' e_convergence 10 '+'\n')
         temp.write(' d_convergence 10 '+'\n')
         temp.write(' scf_type pk'+'\n')
@@ -163,7 +158,7 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')
     temp.write('set freeze_core True'+'\n')
-    temp.write("E, wfn = energy('%s/%s',return_wfn=True)" % (poltype.dmamethod.lower(),poltype.dmabasisset.lower())+'\n')
+    temp.write("E, wfn = energy('%s/%s',return_wfn=True)" % (poltype.dmamethod.lower(),poltype.dmabasisset)+'\n')
     temp.write('gdma(wfn)'+'\n')
     temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
     temp.write('clean()'+'\n')
@@ -192,8 +187,9 @@ def CheckRMSPD(poltype):
             RMSPD=line.split(':')[1].strip()
     temp.close()
     if float(RMSPD)>poltype.maxRMSPD:
-        print('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = ',RMSPD)
-        poltype.WriteToLog('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ') # now report all torsions as bad
+        poltype.WriteToLog('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
+        
+        raise ValueError('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = ',RMSPD)
 
 def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
     """
@@ -269,19 +265,15 @@ def ElectrostaticPotentialComparison(poltype):
 
 
 def SPForDMA(poltype,optmol,mol):
-    if poltype.use_psi4==True or poltype.use_psi4SPonly:
+    if poltype.use_gaus==False or poltype.use_gausoptonly==True:
         if os.path.isfile(poltype.chkdmafname):
             os.remove(poltype.chkdmafname)
 
         gen_comfile(poltype,poltype.comdmafname.replace('.com','_temp.com'),poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkdmafname,poltype.comtmp,mol)
         poltype.WriteToLog("Calling: " + "Psi4 Gradient for DMA")
-        term,error=poltype.is_qm_normal_termination(poltype.logdmafname)
-        if poltype.use_psi4SPonly:
-            save_structfileXYZ(optmol, 'optimized.xyz')
-        inputname=CreatePsi4DMAInputFile(poltype,'optimized.xyz',poltype.comdmafname,mol)
+        term,error=is_qm_normal_termination(poltype,poltype.logdmafname)
+        inputname=CreatePsi4DMAInputFile(poltype,poltype.logoptfname.replace('.log','.xyz'),poltype.comdmafname,mol)
         if term==False:
-            now = time.strftime("%c",time.localtime())
-            poltype.WriteToLog(" Calling: " + "Psi4 GDMA for DMA")
             cmdstr='psi4 '+inputname+' '+poltype.logdmafname
             poltype.call_subsystem(cmdstr,True)
         
@@ -297,12 +289,16 @@ def SPForDMA(poltype,optmol,mol):
             poltype.call_subsystem(cmdstr,True)
 
 def SPForESP(poltype,optmol,mol):
-    if poltype.use_psi4 or poltype.use_psi4SPonly:
-        shutil.copy(poltype.espgrdfname, 'grid.dat') # same as .grid file (x,y,z) coords
-        inputname=CreatePsi4ESPInputFile(poltype,'optimized.xyz',poltype.comespfname,mol,poltype.maxdisk,poltype.maxmem,poltype.numproc,True)
-        if CheckNormalTermPsi4ESP(poltype,poltype.logespfname)==False:
-            poltype.WriteToLog(" Calling: " + "Psi4 Gradient for ESP")
-            cmdstr='psi4 '+poltype.inputname+' '+poltype.logespfname
+    if not os.path.isfile(poltype.espgrdfname):
+        gengridcmd = poltype.potentialexe + " 1 " + poltype.xyzfname+' -k '+poltype.keyfname
+        poltype.call_subsystem(gengridcmd,True)
+    if poltype.use_gaus==False or poltype.use_gausoptonly==True:
+        shutil.copy(poltype.espgrdfname, 'grid.dat') 
+        inputname,outputname=CreatePsi4ESPInputFile(poltype,poltype.logoptfname.replace('.log','.xyz'),poltype.comespfname,mol,poltype.maxdisk,poltype.maxmem,poltype.numproc,True)
+        term,error=is_qm_normal_termination(poltype,outputname)
+        if term==False:
+            poltype.WriteToLog("Calling: " + "Psi4 Gradient for ESP")
+            cmdstr='psi4 '+inputname+' '+outputname
             poltype.call_subsystem(cmdstr,True)
 
     else:
@@ -323,17 +319,13 @@ def is_qm_normal_termination(poltype,logfname): # needs to handle error checking
     error=False
     term=False
     if os.path.isfile(logfname):
-        if 'psi4' in logfname:
-            for line in open(logfname):
-                if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line:
-                    opt.GrabFinalPsi4XYZStructure(poltype,logfname,logfname.replace('.log','_opt.xyz'))
-                    term=True
-        else:
-            for line in open(logfname):
-                if "Normal termination" in line:
-                    term=True
-                if ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation' in line) and 'DIIS' not in line:
-                    error=True
+        for line in open(logfname):
+            if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line:
+                term=True
+            elif "Normal termination" in line:
+                term=True
+            elif ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation' in line) and 'DIIS' not in line:
+                error=True
 
     return term,error
 
@@ -344,5 +336,48 @@ def NormalTerm(poltype,logfname):
 
 def ErrorTerm(poltype,logfname):
     poltype.WriteToLog("ERROR termination: %s" % logfname)
+
+def CheckDipoleMoments(poltype):
+    poltype.WriteToLog("")
+    poltype.WriteToLog("=========================================================")
+    poltype.WriteToLog("QM Dipole moment\n")
+    if poltype.use_gaus==False or poltype.use_gausoptonly==True:
+        temp=open(poltype.logespfname.replace('.log','_psi4.log'),'r')
+        results=temp.readlines()
+        temp.close()
+        for lineidx in range(len(results)):
+            line=results[lineidx]
+            if 'Dipole Moment: [D]' in line:
+                nextline=results[lineidx+1]
+                nextlinesplit=nextline.split()
+                qmdipole=float(nextlinesplit[-1])
+
+    else:
+        grepcmd = 'grep -A7 "Dipole moment" ' + poltype.logespfname+'>'+'QMDipole.txt'
+        poltype.call_subsystem(grepcmd,True)
+        temp=open('QMDipole.txt','r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            if 'Tot=' in line:
+                linesplit=line.split()
+                qmdipole=float(linesplit[-1])
+    poltype.WriteToLog('QM Dipole moment = '+str(qmdipole))    
+    poltype.WriteToLog("")
+    poltype.WriteToLog("=========================================================")
+    poltype.WriteToLog("MM Dipole moment\n")
+    cmd=poltype.analyzeexe + ' ' +  poltype.xyzoutfile + ' em | grep -A11 Charge'+'>'+'MMDipole.txt'
+    poltype.call_subsystem(cmd,True)
+    temp=open('MMDipole.txt','r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        if 'Dipole Moment' in line:
+            linesplit=line.split()
+            mmdipole=float(linesplit[-2])
+    poltype.WriteToLog('MM Dipole moment = '+str(mmdipole))
+    diff=qmdipole-mmdipole
+    if diff>poltype.dipoletol:
+        raise ValueError('Difference of '+str(diff)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)) 
 
 

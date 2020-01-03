@@ -12,13 +12,16 @@ from socket import gethostname
 import re
 import time
 import numpy
+from rdkit.Chem.rdmolfiles import MolFromMol2File
+from rdkit.Chem import rdMolTransforms as rdmt
+from rdkit import Chem
 
 def __init__(poltype):
     PolarizableTyper.__init__(poltype)
     
 def CallJobsSeriallyLocalHost(poltype,listofjobs):
     for job in listofjobs:
-        poltype.call_subprocess(poltype.job,True)
+        poltype.call_subsystem(job,True)
 
 
 def ExecuteOptJobs(poltype,listofstructurestorunQM,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint):
@@ -45,8 +48,8 @@ def TinkerMinimizePostQMOpt(poltype,outputlogs,fullrange,optmol,a,b,c,d,torang,c
     for i in range(len(outputlogs)):
         outputlog=outputlogs[i]
         phaseangle=fullrange[i]
-        if poltype.use_psi4:
-            finalstruct=outputlog.replace('.log','_opt.xyz')
+        if not poltype.use_gaus:
+            finalstruct=outputlog.replace('_psi4.log','_psi4.xyz')
             cartxyz,torxyzfname=tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,finalstruct,torsionrestraint,'_postQMOPTprefit',poltype.key4fname,'../')
         else:
             cartxyz,torxyzfname=tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,outputlog,torsionrestraint,'_postQMOPTprefit',poltype.key4fname,'../')
@@ -61,9 +64,9 @@ def ExecuteSPJobs(poltype,torxyznames,optoutputlogs,fullrange,optmol,a,b,c,d,tor
         torxyzfname=torxyznames[i]
         outputlog=optoutputlogs[i]
         phaseangle=fullrange[i]
-        if poltype.use_psi4:
+        if not poltype.use_gaus:
             finalstruct=outputlog.replace('.log','_opt.xyz')
-            inputname,outputname=esp.CreatePsi4ESPInputFile(poltype,finalstruct,comfilename,optmol,poltype.molecprefix,a,b,c,d,torang,phaseangle)
+            inputname,outputname=CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,poltype.molecprefix,a,b,c,d,torang,phaseangle)
             cmdstr='psi4 '+inputname+' '+outputname
         else:
             inputname,outputname=GenerateTorsionSPInputFileGaus(poltype,torxyzfname,poltype.molecprefix,a,b,c,d,torang,phaseangle,outputlog)
@@ -75,7 +78,7 @@ def ExecuteSPJobs(poltype,torxyznames,optoutputlogs,fullrange,optmol,a,b,c,d,tor
             listofjobs.append(cmdstr)
             outputnames.append(outputname)
 
-    if poltype.use_psi4:
+    if not poltype.use_gaus:
         
         return outputnames,listofjobs,scriptname,poltype.scratchdir
     else:
@@ -97,6 +100,11 @@ def WaitForTermination(poltype,outputlogs):
                     finishedjobs.append(outputlog)
             elif finished==False and error==False:
                 poltype.WriteToLog('Waiting on '+outputlog+' '+'for termination ')
+            else: # this case is finshed=True and error=True because there stupid quotes sometimes have word error in it
+                error=False
+                opt.NormalTerm(poltype,outputlog)
+                finishedjobs.append(outputlog)
+
         string='Sleeping for %d '%(sleeptime)+' minute '
         poltype.WriteToLog(string)
         time.sleep(sleeptime*60) # check logs every minute
@@ -133,13 +141,13 @@ def CreateGausTorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optm
     
 
 def GenerateTorsionOptInputFile(poltype,torxyzfname,molecprefix,a,b,c,d,torang,phaseangle,optmol,consttorlist):
-    if poltype.use_psi4==True and poltype.use_psi4SPonly==False:
-        inputname,outputname=CreatePsi4TorOPTInputFile(poltype,toroptcomfname,toroptcomfname,b,c,consttorlist,optmol)
+    if  poltype.use_gaus==False and poltype.use_gausoptonly==False:
+        inputname,outputname=CreatePsi4TorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optmol,torxyzfname,consttorlist)
         cmdstr='psi4 '+inputname+' '+outputname
     else:
         inputname,outputname=CreateGausTorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optmol,torxyzfname,consttorlist)
         cmdstr='GAUSS_SCRDIR='+poltype.scrtmpdir+' '+poltype.gausexe+' '+inputname
-    if poltype.use_psi4==True and poltype.use_psi4SPonly==False:
+    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
         return inputname,outputname,cmdstr,poltype.scratchdir
     else:
         return inputname,outputname,cmdstr,poltype.scrtmpdir
@@ -157,14 +165,23 @@ def GenerateTorsionSPInputFileGaus(poltype,torxyzfname,molecprefix,a,b,c,d,toran
 def tinker_minimize_angles(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseanglelist,prevstrctfname,torsionrestraint,torang,bondtopology):
     tinkerstructnamelist=[]
     # load prevstruct
-    if poltype.use_psi4:
-        prevstrctfname=prevstrctfname.replace('.log','_opt.xyz')
 
     # create xyz and key and write restraint then minimize, getting .xyz_2
     for phaseangle in phaseanglelist: # we need to send back minimized structure in XYZ (not tinker) format to load for next tinker minimization,but append the xyz_2 tinker XYZ file so that com file can be generated from that 
         prevstruct = opt.load_structfile(poltype,prevstrctfname)
         prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology) # sometimes extra bonds are made when atoms get too close during minimization
-        optmol=opt.rebuild_bonds(poltype,prevstruct,optmol)
+        prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
+        obConversion = openbabel.OBConversion()
+        obConversion.SetInFormat('mol')
+        obConversion.SetOutFormat('mol2')
+        obConversion.WriteFile(prevstruct, 'temp.mol2')
+        rdmol=MolFromMol2File('temp.mol2',True,False)   
+        conf = rdmol.GetConformer()
+        dihedral = optmol.GetTorsion(a,b,c,d)
+        newdihedral=round((dihedral+phaseangle)%360)
+        rdmt.SetDihedralDeg(conf, a-1, b-1, c-1, d-1, newdihedral)
+        print(Chem.MolToMolBlock(rdmol),file=open('tempout.mol','w+'))
+        obConversion.ReadFile(prevstruct, 'tempout.mol')
         prevstrctfname,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,torsionrestraint,prevstruct,torang,'_preQMOPTprefit',poltype.key4fname,'../')
         tinkerstructnamelist.append(newtorxyzfname)
     return tinkerstructnamelist
@@ -172,7 +189,7 @@ def tinker_minimize_angles(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phase
 
 def tinker_minimize_analyze_QM_Struct(poltype,molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,prevstrctfname,torsionrestraint,designatexyz,keybase,keybasepath):
     prevstruct = opt.load_structfile(poltype,prevstrctfname) # this should be a logfile
-    optmol=opt.rebuild_bonds(poltype,prevstruct,optmol)
+    prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
     cartxyz,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,torsionrestraint,prevstruct,torang,designatexyz,keybase,keybasepath)
     tinker_analyze(poltype,newtorxyzfname,keyfname)
     return cartxyz,newtorxyzfname
@@ -184,6 +201,16 @@ def tinker_analyze(poltype,torxyzfname,keyfname):
 
        
 def tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,torsionrestraint,prevstruct,torang,designatexyz,keybase,keybasepath):
+    if 'post' not in designatexyz:    
+        dihedral = optmol.GetTorsion(a,b,c,d)
+        dihedral=round((dihedral+phaseangle)%360)
+        currentdihedral=prevstruct.GetTorsion(a,b,c,d)
+        currentdihedral=round((currentdihedral)%360)
+        diff= numpy.abs(currentdihedral-dihedral)
+        tol=.01
+        if diff>tol and diff!=360:
+            raise ValueError('Difference of '+str(diff)+' is greater than '+str(tol)+' for target dihedral of '+str(dihedral)+' and current dihedral of '+str(currentdihedral))
+
     torxyzfname = '%s-opt-%d-%d-%d-%d' % (molecprefix,a,b,c,d)
     torxyzfname+='-%03d%s.xyz' % (round((torang+phaseangle)%360),designatexyz)
     tmpkeyfname = 'tmp-%d-%d-%d-%d' % (a,b,c,d)
@@ -204,7 +231,7 @@ def tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,t
                 else:
                     tmpkeyfh.write('restrain-torsion %d %d %d %d %f\n' % (resa,resb,resc,resd,torsionrestraint))
     tmpkeyfh.close()
-    mincmdstr = poltype.minimizeexe+' '+torxyzfname+' -k '+tmpkeyfname+' 0.01'+' '+'>'+torminlogfname
+    mincmdstr = poltype.minimizeexe+' '+torxyzfname+' -k '+tmpkeyfname+' 0.001'+' '+'>'+torminlogfname
     term,error=opt.is_mm_normal_termination(poltype,torminlogfname)
     if term==True and error==False:
         pass
@@ -233,14 +260,8 @@ def gen_torsion(poltype,optmol,torsionrestraint):
     """
     if not os.path.isdir('qm-torsion'):
         os.mkdir('qm-torsion')
-    if poltype.use_psi4:
-        cmdstr='cp '+'optimized.xyz'+' '+'qm-torsion/.'
-        poltype.call_subsystem(cmdstr,True)
     os.chdir('qm-torsion')
     files=os.listdir(os.getcwd())
-
-    poltype.gentorsion=True
-    poltype.foundmin=False
     for tor in poltype.torlist:
         
         a,b,c,d = tor[0:4]
@@ -252,11 +273,18 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         counterclock=[i-360 for i in phaselist[int(len(phaselist)/2) :][::-1]]
         consttorlist = list(poltype.torlist)
         consttorlist.remove(tor)
-        prevstrctfname = '%s-opt-%d-%d-%d-%d-%03d.log' % (poltype.molecprefix,a,b,c,d,round(torang % 360))
+        if poltype.use_gaus==False and poltype.use_gausoptonly==False:
+            prevstrctfname = '%s-opt-%d-%d-%d-%d-%03d-opt.xyz' % (poltype.molecprefix,a,b,c,d,round((torang)%360))
+            cmd = 'cp ../%s %s' % (poltype.logoptfname.replace('.log','.xyz'),prevstrctfname)
+            poltype.call_subsystem(cmd,True)
+        else:
+            prevstrctfname = '%s-opt-%d-%d-%d-%d-%03d.log' % (poltype.molecprefix,a,b,c,d,round(torang % 360))
+            # copy *-opt.log found early by Gaussian to 'prevstrctfname'
+            cmd = 'cp ../%s %s' % (poltype.logoptfname,prevstrctfname)
+            poltype.call_subsystem(cmd,True)
+        
+
         minstrctfname = prevstrctfname
-        # copy *-opt.log found early by Gaussian to 'prevstrctfname'
-        cmd = 'cp ../%s %s' % (poltype.logoptfname,prevstrctfname)
-        poltype.call_subsystem(cmd,True)
         prevstrctfname = minstrctfname
         clock=[0]+list(clock)
         bondtopology=GenerateBondTopology(poltype,optmol)
@@ -274,6 +302,10 @@ def gen_torsion(poltype,optmol,torsionrestraint):
             WaitForTermination(poltype,outputlogs)
         else:
             CallJobsSeriallyLocalHost(poltype,listofjobs)
+        if poltype.use_gaus==False and poltype.use_gausoptonly==False: # need to extract final structure from Psi4 log file
+            for outputlog in outputlogs:
+                finished,error=opt.is_qm_normal_termination(poltype,outputlog)
+
         torxyzfnames=TinkerMinimizePostQMOpt(poltype,outputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
         outputlogs,listofjobs,scriptname,scratchdir=ExecuteSPJobs(poltype,torxyzfnames,outputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
         if poltype.externalapi!=None:
@@ -323,7 +355,7 @@ def get_torlist(poltype,mol):
     rotbndlist = {}
 
     iterbond = openbabel.OBMolBondIter(mol)
-    v1 = valence.Valence(poltype.output_format,poltype.logfname)
+    v1 = valence.Valence(poltype.versionnum,poltype.logfname)
     idxtoclass = []
     for i in range(mol.NumAtoms()):
         idxtoclass.append(i+1)
@@ -337,21 +369,21 @@ def get_torlist(poltype,mol):
         t3 = bond.GetEndAtom()
         t2idx=t2.GetIdx()
         t3idx=t3.GetIdx()
-        if (bond.IsRotor()) or (str(t2idx) in poltype.onlyrotbndlist and str(t3idx) in poltype.onlyrotbndlist):
+        t2val=t2.GetValence()
+        t3val=t3.GetValence()
+        if (bond.IsRotor()) or (str(t2idx) in poltype.onlyrotbndlist and str(t3idx) in poltype.onlyrotbndlist) or [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or (poltype.rotalltors and t2val>=2 and t3val>=2):
             skiptorsion = False
             t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
             # is the torsion in toromitlist
 
             if(not torfit.sorttorsion(poltype,[t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()]) in missed_torsions):
                 skiptorsion = True
-
             if [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist:
                 skiptorsion = False # override previous conditions if in list
-            if str(t2idx) in poltype.onlyrotbndlist and str(t3idx) in poltype.onlyrotbndlist and poltype.onlyrotbnd==True:
+            if str(t2idx) in poltype.onlyrotbndlist and str(t3idx) in poltype.onlyrotbndlist:
                 skiptorsion = False
             if poltype.rotalltors==True:
                 skiptorsion=False
-
             rotbndkey = '%d %d' % (t2.GetIdx(), t3.GetIdx())
             rotbndlist[rotbndkey] = []
             if (not skiptorsion):
@@ -489,25 +521,28 @@ def ConvertTinktoXYZ(poltype,filename):
     return filename.replace('.xyz_2','_xyzformat.xyz')
 
 
-def CreatePsi4TorOPTInputFile(poltype,comfilecoords,comfilename,b,c,consttorlist,optmol):
-    tempread=open(comfilecoords,'r')
-    results=tempread.readlines()
-    tempread.close()
-    inputname=comfilename.replace('.com','_psi4.dat')
+def CreatePsi4TorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optmol,torxyzfname,consttorlist):
+    inputname = '%s-opt-%d-%d-%d-%d-%03d_psi4.dat' % (molecprefix,a,b,c,d,round((torang+phaseangle)%360))
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
     temp.write('%d %d\n' % (optmol.GetTotalCharge(),1))
-    for lineidx in range(len(results)):
-        line=results[lineidx]
-        linesplit=line.split()
-        if len(linesplit)==4 and '#' not in line:
-            temp.write(line)
+    iteratom = openbabel.OBMolAtomIter(optmol)
+    etab = openbabel.OBElementTable()
+    if os.path.isfile(torxyzfname):
+        xyzstr = open(torxyzfname,'r')
+        xyzstrl = xyzstr.readlines()
+        i = 0
+        for atm in iteratom:
+            i = i + 1
+            ln = xyzstrl[i]
+            temp.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), float(ln.split()[2]),float(ln.split()[3]),float(ln.split()[4])))
+        xyzstr.close()
     temp.write('}'+'\n')
     # Fix all torsions around the rotatable bond b-c
     temp.write('set optking { '+'\n')
     temp.write('  frozen_dihedral = ("'+'\n')
     firsttor=True
-    for resttors in rotbndlist[' '.join([str(b),str(c)])]:
+    for resttors in poltype.rotbndlist[' '.join([str(b),str(c)])]:
         rta,rtb,rtc,rtd = resttors
         rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
         if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
@@ -521,7 +556,7 @@ def CreatePsi4TorOPTInputFile(poltype,comfilecoords,comfilename,b,c,consttorlist
     # Leave all torsions around other rotatable bonds fixed
     for constangle in consttorlist:
         csa,csb,csc,csd,csangle = constangle
-        for resttors in rotbndlist[' '.join([str(csb),str(csc)])]:
+        for resttors in poltype.rotbndlist[' '.join([str(csb),str(csc)])]:
             rta,rtb,rtc,rtd = resttors
             rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
             if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
@@ -536,7 +571,7 @@ def CreatePsi4TorOPTInputFile(poltype,comfilecoords,comfilename,b,c,consttorlist
 
     if poltype.toroptpcm==True:
         temp.write('set {'+'\n')
-        temp.write(' basis '+poltype.toroptbasisset.lower()+'\n')
+        temp.write(' basis '+poltype.toroptbasisset+'\n')
         temp.write(' e_convergence 10 '+'\n')
         temp.write(' d_convergence 10 '+'\n')
         temp.write(' scf_type pk'+'\n')
@@ -563,10 +598,10 @@ def CreatePsi4TorOPTInputFile(poltype,comfilecoords,comfilename,b,c,consttorlist
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')   
-    temp.write("optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset.lower())+'\n')
+    temp.write("optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
     temp.write('clean()'+'\n')
     temp.close()
-    outputname=comfilename.replace('.com','.log')
+    outputname=inputname.replace('.dat','.log')
     return inputname,outputname
 
 def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
@@ -735,4 +770,55 @@ def write_arr_to_file(poltype,fname, array_list):
             outfh.write("%10.4f" % ele)
         outfh.write("\n")
 
+def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,molecprefix,a,b,c,d,torang,phaseangle,makecube=None):
+    inputname= '%s-sp-%d-%d-%d-%d-%03d_psi4.dat' % (molecprefix,a,b,c,d,round((torang+phaseangle)%360))
+    temp=open(inputname,'w')
+    temp.write('molecule { '+'\n')
+    temp.write('%d %d\n' % (optmol.GetTotalCharge(), 1))
+    iteratom = openbabel.OBMolAtomIter(optmol)
+    etab = openbabel.OBElementTable()
+    if os.path.isfile(torxyzfname):
+        xyzstr = open(torxyzfname,'r')
+        xyzstrl = xyzstr.readlines()
+        i = 0
+        for atm in iteratom:
+            i = i + 1
+            ln = xyzstrl[i]
+            temp.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), float(ln.split()[2]),float(ln.split()[3]),float(ln.split()[4])))
+        xyzstr.close()
+    temp.write('}'+'\n')
+    if poltype.torsppcm==True:
+        temp.write('set {'+'\n')
+        temp.write(' basis '+poltype.espbasisset+'\n')
+        temp.write(' e_convergence 10 '+'\n')
+        temp.write(' d_convergence 10 '+'\n')
+        temp.write(' scf_type pk'+'\n')
+        temp.write(' pcm true'+'\n')
+        temp.write('  pcm_scf_type total '+'\n')
+        temp.write('}'+'\n')
+        temp.write('pcm = {'+'\n')
+        temp.write(' Units = Angstrom'+'\n')
+        temp.write(' Medium {'+'\n')
+        temp.write(' SolverType = IEFPCM'+'\n')
+        temp.write(' Solvent = Water'+'\n')
+        temp.write(' }'+'\n')
+        temp.write(' Cavity {'+'\n')
+        temp.write(' RadiiSet = UFF'+'\n')
+        temp.write(' Type = GePol'+'\n')
+        temp.write(' Scaling = False'+'\n')
+        temp.write(' Area = 0.3'+'\n')
+        temp.write(' Mode = Implicit'+'\n')
+        temp.write(' }'+'\n')
+        temp.write('}'+'\n')
+    temp.write('memory '+poltype.maxmem+'\n')
+    temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
+    temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')
+    temp.write('set freeze_core True'+'\n')
+    temp.write("E, wfn = energy('%s/%s',return_wfn=True)" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
+    if makecube==True:
+       temp.write('oeprop(wfn,"GRID_ESP")'+'\n')
+    temp.write('clean()'+'\n')
+    temp.close()
+    outputname=os.path.splitext(inputname)[0] + '.log'
+    return inputname,outputname
 
