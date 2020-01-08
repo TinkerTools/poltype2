@@ -8,7 +8,7 @@ python /path_to_poltype/poltype.py --unittest
 
 Running POLTYPE
 *Prepare the poltype.ini file as shown below first*
-*Navigate to directory containing poltype.ini*
+*Navigate to directory containing poltype.ini and .sdf file*
 *********************************************
 python /path_to_poltype/poltype.py
 
@@ -150,7 +150,7 @@ ttt.xyz and ttt.key are the resulting structure and parameter files you will nee
 
 If QM and MM molecular dipole moments are too different, a ValueError will be raised.
 
-If QM and MM optimized root mean square potential difference (RMSD) is too high, a ValueError will be raised.
+If QM and MM optimized root mean square difference (RMSD) is too high, a ValueError will be raised.
 
 If QM and MM root mean square potential difference (RMSPD) is too high, a ValueError will be raised.
 

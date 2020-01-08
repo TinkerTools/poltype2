@@ -117,7 +117,7 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,mol):
         optimizeoptlist.insert(0,poltype.gausoptcoords)
     optstr=gen_opt_str(poltype,optimizeoptlist)
     if ('I ' in mol.GetSpacedFormula()):
-        tmpfh.write("%s HF/Gen freq Guess=INDO MaxDisk=%s\n" % (optstr,maxdisk))
+        optstring="%s HF/Gen freq Guess=INDO MaxDisk=%s\n" % (optstr,maxdisk)
     else:
         if poltype.freq==True:
             if poltype.optpcm==True:
@@ -274,7 +274,7 @@ def GeometryOptimization(poltype,mol):
     temp.close()
     os.remove(poltype.comtmp)
     os.rename(tempname,poltype.comtmp)
-    if poltype.use_gaus==False or poltype.use_gausoptonly==True:
+    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
         mkdirstr='mkdir '+poltype.scratchdir
         poltype.call_subsystem(mkdirstr,True)
     else:

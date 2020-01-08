@@ -33,6 +33,10 @@ conda install scipy
 conda install matplotlib 
 conda install -c openbabel openbabel
 conda install git pip
+conda install -c rdkit rdkit
+conda install -c conda-forge mdanalysis
+conda install -c conda-forge svgutils
+conda install -c conda-forge cairosvg
 pip install git+git://github.com/ParmEd/ParmEd.git # sometimes anaconda repo not up to date with GitHub repo
 _________________________________________________________________________________
 

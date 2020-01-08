@@ -5,3 +5,6 @@
 *     Various high symmetry molecules are handles, see Example folder.
 *     Torsion spinning is parallelizable.
 *     Modified Amino Acids can be swapped with canonical amino acids in protein PDBs and parameters can be generated for side chain then automatically stitched together with protein forcefield.
+
+2.0.1
+* Fix bug in scratch directory assignment for Gaussian
