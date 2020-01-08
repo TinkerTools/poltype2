@@ -175,7 +175,7 @@ def tinker_minimize_angles(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phase
         obConversion.SetInFormat('mol')
         obConversion.SetOutFormat('mol2')
         obConversion.WriteFile(prevstruct, 'temp.mol2')
-        rdmol=MolFromMol2File('temp.mol2',True,False)   
+        rdmol=MolFromMol2File('temp.mol2',False,False)   
         conf = rdmol.GetConformer()
         dihedral = optmol.GetTorsion(a,b,c,d)
         newdihedral=round((dihedral+phaseangle)%360)
@@ -634,9 +634,9 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
     else:
 #        operationstr = "#m06L/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s\n" % (torspbasisset, maxdisk)
         if poltype.torsppcm==True:
-            operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s SCRF=(PCM)\n" % (poltype.torspmethod,poltype.torspbasisset, maxdisk)
+            operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s SCRF=(PCM) Pop=NBORead\n" % (poltype.torspmethod,poltype.torspbasisset, maxdisk)
         else:       
-            operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s\n" % (poltype.torspmethod,poltype.torspbasisset, maxdisk)
+            operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s Pop=NBORead\n" % (poltype.torspmethod,poltype.torspbasisset, maxdisk)
 
         commentstr = poltype.molecprefix + " Rotatable Bond SP Calculation on " + gethostname()   
 
@@ -663,6 +663,10 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
         for atm in iteratom:
             tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), atm.x(),atm.y(),atm.z()))
         tmpfh.write('\n')
+
+        tmpfh.write('$nbo bndidx $end'+'\n')
+        tmpfh.write('\n')
+
         tmpfh.close()
 
 def save_structfile(poltype,molstruct, structfname):
@@ -815,8 +819,8 @@ def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,molecprefix
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')
     temp.write('set freeze_core True'+'\n')
     temp.write("E, wfn = energy('%s/%s',return_wfn=True)" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
-    if makecube==True:
-       temp.write('oeprop(wfn,"GRID_ESP")'+'\n')
+    temp.write('oeprop("WIBERG_LOWDIN_INDICES")'+'\n')
+
     temp.write('clean()'+'\n')
     temp.close()
     outputname=os.path.splitext(inputname)[0] + '.log'
