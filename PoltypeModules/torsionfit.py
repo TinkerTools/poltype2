@@ -362,8 +362,6 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename):
         qme_list,qang_list = compute_qm_tor_energy(poltype,a,b,c,d,initangle,anglist)
         mme_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,
         a,b,c,d,initangle,'_postQMOPTprefit',torang,anglist,tmpkey1basename)
-        print('qme_list ',qme_list)
-        print('mme_list ',mme_list)
         # delete members of the list where the energy was not able to be found 
         del_ang_list = find_del_list(poltype,mme_list,mang_list)
         (cls_angle_dict[clskey],cls_mm_engy_dict[clskey])=prune_mme_error(poltype,del_ang_list,cls_angle_dict[clskey],cls_mm_engy_dict[clskey])
@@ -870,14 +868,18 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         mm2_energy_list,m2ang_list,tor_e_list2 = compute_mm_tor_energy(poltype,mol,a,b,c,d,torang,'_postQMOPTpostfit',torang,anglelist,tmpkey2basename)
         # remove angles for which energy was unable to be found
         del_ang_list = find_del_list(poltype,mm_energy_list,mang_list)
+
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2)=prune_mme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2)
         del_ang_list = find_del_list(poltype,qm_energy_list,qang_list)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2)
+
         del_ang_list = find_del_list(poltype,mm2_energy_list,m2ang_list)
+        print('del_ang_list  third',del_ang_list)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2)
-        print('second deleteion ',qm_energy_list)
+        print('mm_energy_list after third delete ',mm_energy_list)
+        print('qm_energy_list after third delete ',qm_energy_list)
+        print('mm2_energy_list after third delete ',mm2_energy_list)
         # normalize profiles
-        print('unnormed qm_energy ',qm_energy_list)
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]
         mm2_energy_list = [en - min(mm2_energy_list) for en in mm2_energy_list]

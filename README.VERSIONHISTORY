@@ -8,3 +8,9 @@
 
 2.0.1
 * Fix bug in scratch directory assignment for Gaussian
+
+2.0.2
+* rdkit does not handle sanitization of some aromatic compounds during torsion spining. This has been turned off.
+
+2.0.3
+* Fix bug that prevented post fitting of multiple torsion in molecule (unittesting only tested for small molecules ~ 1 torsion).
