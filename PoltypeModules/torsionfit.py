@@ -874,11 +874,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2)
 
         del_ang_list = find_del_list(poltype,mm2_energy_list,m2ang_list)
-        print('del_ang_list  third',del_ang_list)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2)
-        print('mm_energy_list after third delete ',mm_energy_list)
-        print('qm_energy_list after third delete ',qm_energy_list)
-        print('mm2_energy_list after third delete ',mm2_energy_list)
         # normalize profiles
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]
@@ -894,7 +890,6 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         # TBC
         ff_list = [aa+bb for (aa,bb) in zip(mm_energy_list,fitfunc_dict[clskey])]
 
-        print('energy list ',qm_energy_list)
         deriv_qm=numpy.gradient(qm_energy_list)
         weight=numpy.add(.6,numpy.absolute(deriv_qm))
         if len(ff_list)==len(mm2_energy_list):

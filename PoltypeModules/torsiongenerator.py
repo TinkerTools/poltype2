@@ -28,17 +28,13 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,fullrange,optmol,a,b,c,d,tora
     listofjobs=[]
     outputlogs=[]
     scriptname='QMOptJobs'+'-'+str(a)+'-'+str(b)+'-'+str(c)+'-'+str(d)
-    poltype.optoutputtotorsioninfo={}
     for i in range(len(listofstructurestorunQM)):
         torxyzfname=listofstructurestorunQM[i]
         phaseangle=fullrange[i]
         inputname,outputlog,cmdstr,scratchdir=GenerateTorsionOptInputFile(poltype,torxyzfname,poltype.molecprefix,a,b,c,d,torang,phaseangle,optmol,consttorlist)
         finished,error=opt.is_qm_normal_termination(poltype,outputlog)
-        if finished==True and error==False:
-            pass
-        else:
-            listofjobs.append(cmdstr)
-            outputlogs.append(outputlog)
+        listofjobs.append(cmdstr)
+        outputlogs.append(outputlog)
         poltype.optoutputtotorsioninfo[outputlog]= [a,b,c,d,torang,optmol,consttorlist,phaseangle]
 
     return outputlogs,listofjobs,scriptname,scratchdir
@@ -89,6 +85,11 @@ def WaitForTermination(poltype,outputlogs):
     sleeptime=.1
     while len(finishedjobs)!=len(outputlogs):
         for outputlog in outputlogs:
+            if os.path.isfile(outputlog):
+                statinfo=os.stat(outputlog)
+                size=statinfo.st_size
+                if size==0:
+                    continue
             finished,error=opt.is_qm_normal_termination(poltype,outputlog)
             if finished==True and error==False: # then check if SP has been submitted or not
                 if outputlog not in finishedjobs:
@@ -231,7 +232,7 @@ def tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,t
                 else:
                     tmpkeyfh.write('restrain-torsion %d %d %d %d %f\n' % (resa,resb,resc,resd,torsionrestraint))
     tmpkeyfh.close()
-    mincmdstr = poltype.minimizeexe+' '+torxyzfname+' -k '+tmpkeyfname+' 0.001'+' '+'>'+torminlogfname
+    mincmdstr = poltype.minimizeexe+' '+torxyzfname+' -k '+tmpkeyfname+' 0.1'+' '+'>'+torminlogfname
     term,error=opt.is_mm_normal_termination(poltype,torminlogfname)
     if term==True and error==False:
         pass
@@ -262,6 +263,8 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         os.mkdir('qm-torsion')
     os.chdir('qm-torsion')
     files=os.listdir(os.getcwd())
+     
+    poltype.optoutputtotorsioninfo={}
     for tor in poltype.torlist:
         
         a,b,c,d = tor[0:4]
@@ -576,7 +579,8 @@ def CreatePsi4TorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optm
         temp.write(' d_convergence 10 '+'\n')
         temp.write(' scf_type pk'+'\n')
         temp.write(' pcm true'+'\n')
-        temp.write('  pcm_scf_type total '+'\n')
+        temp.write(' pcm_scf_type total '+'\n')
+        temp.write(' geom_maxiter '+str(poltype.optmaxcycle)+'\n')
         temp.write('}'+'\n')
         temp.write('pcm = {'+'\n')
         temp.write(' Units = Angstrom'+'\n')
@@ -592,7 +596,12 @@ def CreatePsi4TorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optm
         temp.write(' Mode = Implicit'+'\n')
         temp.write(' }'+'\n')
         temp.write('}'+'\n')
-    
+    else:
+        temp.write('set {'+'\n')
+        temp.write(' geom_maxiter '+str(poltype.optmaxcycle)+'\n')
+        temp.write('}'+'\n')
+
+
 
 
     temp.write('memory '+poltype.maxmem+'\n')
@@ -818,7 +827,7 @@ def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,molecprefix
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')
     temp.write('set freeze_core True'+'\n')
-    temp.write("E, wfn = energy('%s/%s',return_wfn=True)" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
+    temp.write("E, wfn = energy('%s/%s',return_wfn=True)" % (poltype.torspmethod.lower(),poltype.torspbasisset)+'\n')
     temp.write('oeprop("WIBERG_LOWDIN_INDICES")'+'\n')
 
     temp.write('clean()'+'\n')
@@ -826,3 +835,20 @@ def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,molecprefix
     outputname=os.path.splitext(inputname)[0] + '.log'
     return inputname,outputname
 
+def RemoveDuplicateRotatableBondTypes(poltype):
+    tortorotbnd={}
+    for tor in poltype.torlist:
+        classkey=get_class_key(poltype,tor[0],tor[1],tor[2],tor[3])
+        rotbnd=classkey[1]+','+classkey[2]
+        tortorotbnd[tuple(tor)]=rotbnd
+    listofduptors=[]
+    for key,value in tortorotbnd.items():
+        duptors=[k for k,v in tortorotbnd.items() if v == value]
+        if len(duptors)>=2 and duptors not in listofduptors:
+            listofduptors.append(duptors)
+    for dup in listofduptors: # doesnt matter which one is first, just remove duplicates
+        for i in range(len(dup)-1):
+            tor=list(dup[i])
+            if tor in poltype.torlist:
+                poltype.torlist.remove(tor)
+    return poltype.torlist 
