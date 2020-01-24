@@ -1,3 +1,4 @@
+
 HELP
 *********************************************
 python /path_to_poltype/poltype.py --help
@@ -5,6 +6,43 @@ python /path_to_poltype/poltype.py --help
 Unittesting
 *********************************************
 python /path_to_poltype/poltype.py --unittest
+
+
+ttt.xyz and ttt.key are the resulting structure and parameter files you will need.
+
+
+Common Errors
+*********************************************
+
+If QM and MM molecular dipole moments are too different, a ValueError will be raised.
+
+If QM and MM optimized root mean square difference (RMSD) is too high, a ValueError will be raised.
+
+If QM and MM root mean square potential difference (RMSPD) is too high, a ValueError will be raised.
+
+If QM and MM for torsion fitting is too high, a ValueError will be raised. If for some reason you wish to remove an energy pointfrom the fitting, you can locate the corresponding SP QM log file and delete all of the text in it.
+
+If your Tinker version is less than 8.7, a ValueError will be raised.
+
+If POLTYPE crashes, you do not need to delete any quantum data or tinker data, POLTYPE will recognize that the file exists and attempt to continue with it.
+
+If using Gaussian (for example gaussian for optimization as below) and also using the default optimization method wB97X-D,
+Gaussian will complain since it used wB97XD instead. This can be fixed with the appropriate inputs shown below.
+use_gausoptonly
+optmethod=wB97XD
+toroptmethod=wB97XD
+
+
+Less Common Errors
+*********************************************
+If your RMSPD is too high and also you have a molecule of high symmetry, please check frame definitions and alter them as needed using POLEDIT and POTENTIAL command in Tinker to change frames/combine multipoles and refit to electrostatic potential. See Symmetry examples under Examples folder. We believe all symmetry cases are already covered by POLTYPE.
+
+If you are concerned with vdw parameters, you may check again QM dimer (your_molecule-water) structure and energy.
+
+
+
+If there are no python errors as shown above, please read *-poltype.log to traceback and see the last command executed. Check the inputs and outputs for that command and try to run it manually. 
+
 
 Running POLTYPE
 *Prepare the poltype.ini file as shown below first*
@@ -63,7 +101,7 @@ optpcm            specifies to use PCM for geometry optimization.
 optmaxcycle       specifies the number of max cycles or iterations allowed during optimization.
                   Default=400
 optmethod         specifies quantum method for geometry optimziation. 
-                  Default=MP2
+                  Default=wB97XD
 
 Distributed Multipole Analysis (DMA) and Electrostatic Single Point (ESP) Inputs
 ********************************************* 
@@ -106,14 +144,14 @@ fitrotbndslist    specifies poltype to derive torsion parameters for all bonds
                   specified as fitrotbndslist=1 2, 3 4, 5 6
                   Default=[] (empty)
 torspmethod       specifies the SP method used for getting refined multipoles via fitting to quantum potential. 
-                  Default=MP2
+                  Default=wB97XD
 toroptmethod      specifies the opt method used for optimizing the geometry prior to deriving parameters. 
-                  Default=HF
+                  Default=wB97XD
 toroptbasisset    specifies which basis set to use for geometry optimization during torsion parameterization. 
                   Default=6-31G*
 torspbasisset     specifies which basis set to use for SP during torsion parameterization. 
                   Default=6-311++G**
-onlyrotbnd        specifies to only rotate single bond, onlyrotbnd=1,2 . 
+onlyrotbndlist    specifies to only rotate single bond, onlyrotbndlist=1,2 . 
                   Default=[] (empty)
 
 Modified Amino Acids
@@ -142,22 +180,5 @@ atmidx   specifies which number to start poltype type numbers from.
 uniqidx  specifies to use atom indexes as atom type numbers rather than averaging types
          Default=False
 
-
-*********************************************
-Check your results!
-*********************************************
-ttt.xyz and ttt.key are the resulting structure and parameter files you will need.
-
-If QM and MM molecular dipole moments are too different, a ValueError will be raised.
-
-If QM and MM optimized root mean square difference (RMSD) is too high, a ValueError will be raised.
-
-If QM and MM root mean square potential difference (RMSPD) is too high, a ValueError will be raised.
-
-If QM and MM for torsion fitting is too high, a ValueError will be raised.
-
-For molecules of high symmetry, please check frame definitions and alter them as needed using POLEDIT and POTENTIAL command in Tinker to change frames/combine multipoles and refit to electrostatic potential. See Symmetry examples under Examples folder.
-
-If you are concerned with vdw parameters, you may check again QM dimer (your_molecule-water) structure and energy.
 
 

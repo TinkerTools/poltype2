@@ -26,7 +26,8 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
         temp.write(' d_convergence 10 '+'\n')
         temp.write(' scf_type pk'+'\n')
         temp.write(' pcm true'+'\n')
-        temp.write('  pcm_scf_type total '+'\n')
+        temp.write(' pcm_scf_type total '+'\n')
+        temp.write(' geom_maxiter '+str(poltype.optmaxcycle)+'\n')
         temp.write('}'+'\n')
         temp.write('pcm = {'+'\n')
         temp.write(' Units = Angstrom'+'\n')
@@ -42,6 +43,11 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
         temp.write(' Mode = Implicit'+'\n')
         temp.write(' }'+'\n')
         temp.write('}'+'\n')
+    else:
+        temp.write('set {'+'\n')
+        temp.write(' geom_maxiter '+str(poltype.optmaxcycle)+'\n')
+        temp.write('}'+'\n')
+
         
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
@@ -275,11 +281,13 @@ def GeometryOptimization(poltype,mol):
     os.remove(poltype.comtmp)
     os.rename(tempname,poltype.comtmp)
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
-        mkdirstr='mkdir '+poltype.scratchdir
-        poltype.call_subsystem(mkdirstr,True)
+        if not os.path.exists(poltype.scratchdir):
+            mkdirstr='mkdir '+poltype.scratchdir
+            poltype.call_subsystem(mkdirstr,True)
     else:
-        mkdirstr='mkdir '+poltype.scrtmpdir
-        poltype.call_subsystem(mkdirstr,True)
+        if not os.path.exists(poltype.scrtmpdir):
+            mkdirstr='mkdir '+poltype.scrtmpdir
+            poltype.call_subsystem(mkdirstr,True)
 
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt
         term,error=is_qm_normal_termination(poltype,poltype.logoptfname)
@@ -293,7 +301,9 @@ def GeometryOptimization(poltype,mol):
             poltype.call_subsystem(cmdstr,True)
             cmdstr = poltype.formchkexe + " " + poltype.chkoptfname
             poltype.call_subsystem(cmdstr)
-        term,error=is_qm_normal_termination(poltype,poltype.logoptfname) 
+        term,error=is_qm_normal_termination(poltype,poltype.logoptfname)
+        if error and term==False:
+            poltype.RaiseOutputFileError(poltype.logoptfname) 
         optmol =  load_structfile(poltype,poltype.logoptfname)
         optmol=rebuild_bonds(poltype,optmol,mol)
                 
@@ -306,6 +316,8 @@ def GeometryOptimization(poltype,mol):
             cmdstr='psi4 '+inputname+' '+poltype.logoptfname
             poltype.call_subsystem(cmdstr,True)
         term,error=is_qm_normal_termination(poltype,poltype.logoptfname) # now grabs final structure when finished with QM if using Psi4
+        if error and term==False:
+            poltype.RaiseOutputFileError(poltype.logoptfname) 
 
         optmol =  load_structfile(poltype,poltype.logoptfname.replace('.log','.xyz'))
         optmol=rebuild_bonds(poltype,optmol,mol)
