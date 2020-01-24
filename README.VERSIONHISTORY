@@ -28,3 +28,6 @@
 * Now if an external command (for example calling Gaussian, Psi4 etc..) fails, poltype will crash with an error instead of attempting to continue
 * Changing default optmethod and toropmethod to wB97X-D
 * fragmenter not working yet, add dontfrag to poltype.ini files, need to push updates though to keep poltype.py consistent with other changes
+
+2.0.9
+* Default SP for torsion is set back to MP2 for accuracy
