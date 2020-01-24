@@ -20,7 +20,10 @@
 * Previously it was assumed if optimization log file exists, then the rest of quantum (SP) finished as well. This assumption has been removed
 * function for generating SP for torsion was referecing espmethod and espbasisset instead of torspmethod and torspbasisset
 
-2.0.5 (not current version for future)
+2.0.5
+* If RMSPD.txt already existed then this file was not recreated, this is an isssue if the first time created, tinker crashed. This assumption has been removed.
+
+2.0.6 (not current version for future)
 * Now when Tinker version number is not correct a ValueError will be raised
 * Now if an external command (for example calling Gaussian, Psi4 etc..) fails, poltype will crash with an error instead of attempting to continue
 * Changing default optmethod and toropmethod to wB97X-D
