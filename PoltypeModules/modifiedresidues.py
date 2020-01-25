@@ -7,6 +7,7 @@ from MDAnalysis import Universe, Merge
 from MDAnalysis.analysis.align import alignto
 import re
 import numpy
+import shutil
 
 def GenIndexToTypeIndexDic(poltype,tinkxyzfile):
     temp=open(tinkxyzfile,'r')

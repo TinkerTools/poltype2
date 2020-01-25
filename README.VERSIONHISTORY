@@ -29,5 +29,11 @@
 * Changing default optmethod and toropmethod to wB97X-D
 * fragmenter not working yet, add dontfrag to poltype.ini files, need to push updates though to keep poltype.py consistent with other changes
 
-2.0.9
+2.0.7
 * Default SP for torsion is set back to MP2 for accuracy
+
+2.0.8
+* Fragmenter turned off by default
+* anglep not assigned unless middle atom is connected to three atoms to be consistent with TINKER
+* Using relative error for QM and MM Dipole comparison since the MMDipole scales worse for larger molecules
+* Fix bug related to making QM logs blank files and skipping them

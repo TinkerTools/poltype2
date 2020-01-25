@@ -372,7 +372,7 @@ def is_qm_normal_termination(poltype,logfname): # needs to handle error checking
       
             elif "Normal termination" in line:
                 term=True
-            elif ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation' in line) and 'DIIS' not in line:
+            elif ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation' in line or 'galloc:  could not allocate memory' in line) and 'DIIS' not in line:
                 error=True
     if term==True:
         GrabFinalXYZStructure(poltype,logfname,logfname.replace('.log','.xyz'))

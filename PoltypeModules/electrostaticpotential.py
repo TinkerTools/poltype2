@@ -7,6 +7,7 @@ from socket import gethostname
 import re
 import shutil
 import time
+import numpy as np
 
 def gen_esp_grid(poltype,mol):
     """
@@ -169,6 +170,7 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     return inputname
 
 def GrabFinalPsi4Energy(poltype,logname):
+    energy=None
     temp=open(logname,'r')
     results=temp.readlines()
     temp.close()
@@ -184,15 +186,20 @@ def GrabFinalPsi4Energy(poltype,logname):
     return energy
             
 def CheckRMSPD(poltype):
-    temp=open('RMSPD.txt','r')
-    for line in temp.readlines():
-        if 'Root Mean Square Potential Difference :' in line:
-            RMSPD=line.split(':')[1].strip()
-    temp.close()
-    if float(RMSPD)>poltype.maxRMSPD:
-        poltype.WriteToLog('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
-        
-        raise ValueError('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = ',RMSPD)
+    rmspdexists=False
+    if os.path.isfile('RMSPD.txt'):
+        temp=open('RMSPD.txt','r')
+        for line in temp.readlines():
+            if 'Root Mean Square Potential Difference :' in line:
+                RMSPD=line.split(':')[1].strip()
+                rmspdexists=True
+        temp.close()
+        if rmspdexists==True:
+            if float(RMSPD)>poltype.maxRMSPD:
+                poltype.WriteToLog('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
+            
+                raise ValueError('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = ',RMSPD)
+    return rmspdexists
 
 def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
     """
@@ -262,12 +269,13 @@ def ElectrostaticPotentialFitting(poltype):
     poltype.call_subsystem(optmpolecmd,True)
 
 def ElectrostaticPotentialComparison(poltype):
-    poltype.WriteToLog("")
-    poltype.WriteToLog("=========================================================")
-    poltype.WriteToLog("Electrostatic Potential Comparision\n")
-    cmd=poltype.potentialexe + ' 5 ' + poltype.xyzoutfile + ' ' + '-k'+' '+ poltype.key3fname+' '+ poltype.qmesp2fname + ' N > RMSPD.txt'
-    poltype.call_subsystem(cmd,True)
-    CheckRMSPD(poltype)
+    rmspdexists=CheckRMSPD(poltype)
+    if rmspdexists==False:
+        poltype.WriteToLog("")
+        poltype.WriteToLog("=========================================================")
+        poltype.WriteToLog("Electrostatic Potential Comparison\n")
+        cmd=poltype.potentialexe + ' 5 ' + poltype.xyzoutfile + ' ' + '-k'+' '+ poltype.key3fname+' '+ poltype.qmesp2fname + ' N > RMSPD.txt'
+        poltype.call_subsystem(cmd,True)
 
 
 def SPForDMA(poltype,optmol,mol):
@@ -345,7 +353,7 @@ def is_qm_normal_termination(poltype,logfname): # needs to handle error checking
                 term=True
             elif "Normal termination" in line:
                 term=True
-            elif ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation' in line) and 'DIIS' not in line:
+            elif ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation' in line or 'galloc:  could not allocate memory' in line) and 'DIIS' not in line:
                 error=True
 
     return term,error
@@ -398,7 +406,8 @@ def CheckDipoleMoments(poltype):
             mmdipole=float(linesplit[-2])
     poltype.WriteToLog('MM Dipole moment = '+str(mmdipole))
     diff=qmdipole-mmdipole
-    if diff>poltype.dipoletol:
-        raise ValueError('Difference of '+str(diff)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)) 
+    ratio=np.abs(diff/qmdipole)
+    if ratio>poltype.dipoletol:
+        raise ValueError('Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)) 
 
 

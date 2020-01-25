@@ -48,18 +48,7 @@ class Valence():
         return self.missed_torsions
 
 
-    def CheckAnglePAtomsSubset(self,opbatoms,anglepatoms):
-        l1=[str(i) for i in opbatoms]
-        l2=[str(i) for i in anglepatoms]
-        l1string=','.join(l1)
-        l2string=','.join(l2)
-        check=True
-        for angpatom in anglepatoms:
-            if angpatom not in opbatoms:
-                check=False
-        return check 
-
-
+    
     def opbset (self,smarts, opbval, opbhash, mol):
         """
         Intent: Set out-of-plane bend (opbend) parameters using Smarts Patterns
@@ -1563,6 +1552,8 @@ class Valence():
         if self.versionnum>=8.7:
             shoulduseanglep = True
 
+
+
         d = dict()
         for v in vals:
             for skey in iter(v):
@@ -1578,7 +1569,7 @@ class Valence():
                     c = mol.GetAtom(ia[2])
                     angle = mol.GetAngle(a,b,c)
                     if b.GetHyb()==2 and shoulduseanglep==True: # only for SP2 hyb middle atoms use angp
-                        if b.IsInRing() and b.IsAromatic():
+                        if b.IsInRing() and b.IsAromatic() and b.GetValence()==3:
                             key2 = 'anglep%8d%6d%6d%11.4f%10.4f' % (key1[0], key1[1], key1[2], v[skey][0], angle)
                         else:
                             key2 = 'angle%8d%6d%6d%11.4f%10.4f' % (key1[0], key1[1], key1[2], v[skey][0], angle)
@@ -2696,7 +2687,7 @@ class Valence():
             smarts=keytosmarts[key]
             kstring='opbend %6d%6d%6d%6d%11.4f' % (key[0],key[1],key[2],key[3], opbparm[1]*71.94)
             x.append(kstring)
-            self.logfh.write(kstring+' matched from '+smarts+' has parameters '+str(opbparm[1]*71.94)+'\n')
+            #self.logfh.write(kstring+' matched from '+smarts+' has parameters '+str(opbparm[1]*71.94)+'\n')
         return x
 
     def pitorguess(self,mol):

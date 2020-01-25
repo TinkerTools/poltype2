@@ -125,7 +125,10 @@ def compute_qm_tor_energy(poltype,a,b,c,d,startangle,phase_list = None):
             tor_energy = None
             if not poltype.use_gaus:
                 mengi=esp.GrabFinalPsi4Energy(poltype,minstrctfname)
-                tor_energy = float(mengi) * poltype.Hartree2kcal_mol
+                if mengi==None:
+                    tor_energy=None
+                else:
+                    tor_energy = float(mengi) * poltype.Hartree2kcal_mol
             else:
                 for line in tmpfh:
                     m = re.search(r'EUMP2 =\s+(\-*\d+\.\d+D\+\d+)',line)
