@@ -555,8 +555,6 @@ def prepend_keyfile(poltype,keyfilename):
     tmpfh = open(tmpfname, "w")
     keyfh = open(keyfilename, "r")
     tmpfh.write("parameters " + poltype.paramhead + "\n")
-    if poltype.optpcm==True or poltype.toroptpcm==True or poltype.torsppcm==True:
-        tmpfh.write("solvate GK " + "\n")
     
     tmpfh.write("bondterm none\n")
     tmpfh.write("angleterm none\n")

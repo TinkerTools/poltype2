@@ -630,16 +630,7 @@ class PolarizableTyper():
     
             
     def GenerateParameters(self,mol):
-        if self.use_gaus==False:
-            try:
-                import psi4
-                self.WriteToLog("Psi4 detected; it will be used as the QM engine")
-                self.use_gaus = False
-            except:
-                self.WriteToLog("Psi4 not detected; attempting to use Gaussian instead")
-                self.use_gaus = True
-    
-  
+          
         self.WriteToLog("Running on host: " + gethostname())
         # Initializing arrays
         
@@ -747,7 +738,8 @@ class PolarizableTyper():
             dorot = True
             # valence.py method is called to find parameters and append them to the keyfile
             v.appendtofile(self.key4fname, optmol, dorot,self.rotbndlist)
- 
+            if self.totalcharge!=0:
+                torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
         if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False:
 
             self.rdkitmol=rdmolfiles.MolFromMolFile(poltype.molstructfnamemol,sanitize=True,removeHs=False)
@@ -787,6 +779,8 @@ class PolarizableTyper():
         opt.StructureMinimization(self)
         opt.gen_superposeinfile(self)
         opt.CheckRMSD(self)
+        if self.totalcharge!=0:
+            torgen.RemoveStringFromKeyfile(self,self.key5fname,'solvate GK')
         esp.CheckDipoleMoments(self)
         param = parameterfile.AmoebaParameterSet(self.key5fname)
         if self.dontfrag==False and self.isfragjob==True and not os.path.isfile(self.key6fname):

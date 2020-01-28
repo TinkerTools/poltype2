@@ -198,12 +198,19 @@ def tinker_minimize_angles(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phase
         obConversion.SetInFormat('mol')
         obConversion.SetOutFormat('mol2')
         obConversion.WriteFile(prevstruct, 'temp.mol2')
-        rdmol=MolFromMol2File('temp.mol2',False,False)   
+        try:
+            rdmol=MolFromMol2File('temp.mol2',False,False)   
+        except:
+            rdmol=MolFromMol2File('temp.mol2',True,False)
         conf = rdmol.GetConformer()
         dihedral = optmol.GetTorsion(a,b,c,d)
         newdihedral=round((dihedral+phaseangle)%360)
         rdmt.SetDihedralDeg(conf, a-1, b-1, c-1, d-1, newdihedral)
-        print(Chem.MolToMolBlock(rdmol),file=open('tempout.mol','w+'))
+        try:
+            print(Chem.MolToMolBlock(rdmol,kekulize=True),file=open('tempout.mol','w+'))
+        except:
+            print(Chem.MolToMolBlock(rdmol,kekulize=False),file=open('tempout.mol','w+'))
+
         obConversion.ReadFile(prevstruct, 'tempout.mol')
         prevstrctfname,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,torsionrestraint,prevstruct,torang,'_preQMOPTprefit',poltype.key4fname,'../')
         tinkerstructnamelist.append(newtorxyzfname)
@@ -409,7 +416,7 @@ def get_torlist(poltype,mol):
         t3idx=t3.GetIdx()
         t2val=t2.GetValence()
         t3val=t3.GetValence()
-        if (bond.IsRotor()) or (str(t2idx) in poltype.onlyrotbndlist and str(t3idx) in poltype.onlyrotbndlist) or [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or (poltype.rotalltors and t2val>=2 and t3val>=2):
+        if ((bond.IsRotor()) or (str(t2idx) in poltype.onlyrotbndlist and str(t3idx) in poltype.onlyrotbndlist) or [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or (poltype.rotalltors and t2val>=2 and t3val>=2)) and bond.IsInRing()==False and t2.IsInRing()==False and t3.IsInRing()==False:
             skiptorsion = False
             t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
             # is the torsion in toromitlist
@@ -887,3 +894,33 @@ def RemoveDuplicateRotatableBondTypes(poltype):
             if tor in poltype.torlist:
                 poltype.torlist.remove(tor)
     return poltype.torlist 
+
+
+def PrependStringToKeyfile(poltype,keyfilename,string):
+    """
+    Intent: Adds a header to the key file given by 'keyfilename'
+    """
+    tmpfname = keyfilename + "_tmp"
+    tmpfh = open(tmpfname, "w")
+    keyfh = open(keyfilename, "r")
+    tmpfh.write(string+'\n')
+
+    for line in keyfh:
+        tmpfh.write(line)
+    shutil.move(tmpfname, keyfilename)
+
+def RemoveStringFromKeyfile(poltype,keyfilename,string):
+    """
+    Intent: Adds a header to the key file given by 'keyfilename'
+    """
+    tmpfname = keyfilename + "_tmp"
+    tmpfh = open(tmpfname, "w")
+    keyfh = open(keyfilename, "r")
+
+    for line in keyfh:
+        if string in line:
+            pass
+        else:
+            tmpfh.write(line)
+    shutil.move(tmpfname, keyfilename)
+

@@ -37,3 +37,7 @@
 * anglep not assigned unless middle atom is connected to three atoms to be consistent with TINKER
 * Using relative error for QM and MM Dipole comparison since the MMDipole scales worse for larger molecules
 * Fix bug related to making QM logs blank files and skipping them
+
+2.0.9
+* If bond is a ring bond or at least one atom in a bond is a ring atom, cannot spin dihedral angle according to rdkit, so just transfer from database
+* Bug fix with charged molecules, solvate GK was turned on during ESP fitting, this is turned on only during torsion fitting

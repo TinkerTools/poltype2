@@ -292,6 +292,8 @@ def GrabPrmClassToBoundryClassForPrmFile(poltype,listofvalterms,proidxtoligidx,l
         boundclasses=[]
         for proidx in val:
             protype=proidxtotypeidx[proidx]
+            print('proidx',proidx,'protype',protype)
+            print('mincorenumber',mincorenumber,'maxcorenumber ',maxcorenumber)
             if protype<mincorenumber or protype>maxcorenumber:
                 valtype.append(protype)
                 boundclasses.append(prmtypetoprmclass[protype])
@@ -1837,6 +1839,7 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
     proboundidxtoprotype=GrabProBoundIdxToProType(poltype,proboundidxs,proOBmol,modproidxs)
     if check==False:
         ligidxtotypeidx=GenIndexToTypeIndexDic(poltype,poltype.tmpxyzfile)
+        print('ligidxtotypeidx ',ligidxtotypeidx)
     else:
         ligidxtotypeidx=ReadSMARTSToTypeLib(poltype,smarts,modmol)
 
@@ -1883,6 +1886,7 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
 
     torsionligtypestoboundtypesforkey=GrabLigandTypeToBoundryTypeForKeyFile(poltype,listoftorsionsforkey,proidxtoligidx,ligidxtotypeidx,proidxtoprotype,poltype.amoebabioprmpath,modproidxs,mincorenumber,maxcorenumber)
     prmtypetoprmclass=GrabClassNumbersForProtein(poltype,proidxtoprotype,check) # need this for grepping torsion parameters from prm file
+    print('prmtypetoprmclass ',prmtypetoprmclass)
     bondprmclassestoboundclasses=GrabPrmClassToBoundryClassForPrmFile(poltype,listofbondsforprm,proidxtoligidx,ligidxtotypeidx,proidxtoprotype,poltype.amoebabioprmpath,modproidxs,proboundidxtoprotype,prmtypetoprmclass,mincorenumber,maxcorenumber)
     angleprmclassestoboundclasses=GrabPrmClassToBoundryClassForPrmFile(poltype,listofanglesforprm,proidxtoligidx,ligidxtotypeidx,proidxtoprotype,poltype.amoebabioprmpath,modproidxs,proboundidxtoprotype,prmtypetoprmclass,mincorenumber,maxcorenumber)
     torsionprmclassestoboundclasses=GrabPrmClassToBoundryClassForPrmFile(poltype,listoftorsionsforprm,proidxtoligidx,ligidxtotypeidx,proidxtoprotype,poltype.amoebabioprmpath,modproidxs,proboundidxtoprotype,prmtypetoprmclass,mincorenumber,maxcorenumber)

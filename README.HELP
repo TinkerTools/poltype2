@@ -40,8 +40,13 @@ If your RMSPD is too high and also you have a molecule of high symmetry, please 
 If you are concerned with vdw parameters, you may check again QM dimer (your_molecule-water) structure and energy.
 
 
+If there are no python errors as shown above, please read *-poltype.log to traceback and see the last command executed. 
 
-If there are no python errors as shown above, please read *-poltype.log to traceback and see the last command executed. Check the inputs and outputs for that command and try to run it manually. 
+1) First try and run the command from terminal manually to reproduce the error
+
+2) Next have a reference poltype job from the Examples folder that has successfully completed
+
+3) Compare the inputs of the command to the inputs in successful poltype job. Look for anything that might cause the error.
 
 
 Running POLTYPE

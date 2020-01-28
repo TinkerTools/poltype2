@@ -2004,7 +2004,7 @@ class Valence():
         x=list(d.values())
         return x
 
-    def torguess(self, mol, dorot, rotbnds,checksmarts=None):
+    def torguess(self, mol, dorot, rotbnds):
         found = []
         vals = []
 
@@ -2563,16 +2563,7 @@ class Valence():
         vals.append(torvals5)
         vals.append(torparamvals1)
 
-        if checksmarts!=None: # then check in each dictionary key (smartsstring) to see if checksmarts (SMART string to be checked) exists in any dictionary
-            foundmatch=False
-            for dic in vals:
-                for smarts in dic.keys():
-                    if checksmarts==smarts:
-                        foundmatch=True
-            
-            return foundmatch
-
-
+        
         torsunit = .5
         torkeytoSMILES={}
         torkeytoindexlist={}
@@ -2596,7 +2587,16 @@ class Valence():
                     secondneighborindexes=indextoneighbidxs[int(ia[2])]
                     neighborindexes=firstneighborindexes+secondneighborindexes
                     check=self.CheckIfNeighborsExistInSMARTMatch(neighborindexes,ia)
-                    if check==False:
+                    if(len(v[skey]) == 7):
+                        bidx=ia[v[skey][1] - 1] 
+                        cidx=ia[v[skey][2] - 1]
+                    else:
+                        bidx=ia[1]
+                        cidx=ia[2]
+                    b=mol.GetAtom(bidx)
+                    c=mol.GetAtom(cidx)
+                    bond=mol.GetBond(bidx,cidx)
+                    if check==False and bond.IsInRing()==False and b.IsInRing()==False and c.IsInRing()==False:
                         zeroed=True
                     if(dorot):
                         for r in rotbnds:
@@ -2615,7 +2615,6 @@ class Valence():
                         else:
                             key2 = 'torsion%6d%6d%6d%6d%11.4f 0.0 1 %10.4f 180.0 2 %10.4f 0.0 3' % (key1[0], key1[1], key1[2], key1[3], v[skey][0]/torsunit, v[skey][1]/torsunit, v[skey][2]/torsunit)
                     key1string = '%d %d %d %d' % (key1[0], key1[1], key1[2], key1[3])
-                    
 
                     torkeytoSMILES.update({key1string:skey})
                     torkeytoindexlist[key1string]=ia
