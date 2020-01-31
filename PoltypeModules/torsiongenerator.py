@@ -21,7 +21,7 @@ def __init__(poltype):
     
 def CallJobsSeriallyLocalHost(poltype,listofjobs):
     for job in listofjobs:
-        poltype.call_subsystem(job,True)
+        poltype.call_subsystem(job,False)
 
 
 def ExecuteOptJobs(poltype,listofstructurestorunQM,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint):

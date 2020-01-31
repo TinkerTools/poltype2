@@ -41,3 +41,6 @@
 2.0.9
 * If bond is a ring bond or at least one atom in a bond is a ring atom, cannot spin dihedral angle according to rdkit, so just transfer from database
 * Bug fix with charged molecules, solvate GK was turned on during ESP fitting, this is turned on only during torsion fitting
+
+2.1.0
+* If running torsion serially on local host instead of crashing poltype when Gaussian/Psi4 job fails, just continue and attempt to do torsion fitting without that data point
