@@ -8,6 +8,7 @@ import re
 import shutil
 import time
 import numpy as np
+import openbabel
 
 def gen_esp_grid(poltype,mol):
     """
@@ -87,11 +88,12 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
     temp.write('set_num_threads(%s)'%(numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')
     temp.write('set freeze_core True'+'\n')
-    temp.write("E, wfn = energy('%s/%s',return_wfn=True)" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
+    temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
+    temp.write("E, wfn = properties('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
     if makecube==True:
-       temp.write('oeprop(wfn,"DIPOLE","QUADRUPOLE","GRID_ESP","WIBERG_LOWDIN_INDICES")'+'\n')
+       temp.write('oeprop(wfn,"GRID_ESP","WIBERG_LOWDIN_INDICES")'+'\n')
     else:
-       temp.write('oeprop(wfn,"DIPOLE","QUADRUPOLE","WIBERG_LOWDIN_INDICES")'+'\n')
+       temp.write('oeprop(wfn,"WIBERG_LOWDIN_INDICES")'+'\n')
 
     temp.write('clean()'+'\n')
     temp.close()
@@ -116,7 +118,8 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')
     temp.write('set freeze_core True'+'\n')
-    temp.write("E, wfn = energy('%s/%s',return_wfn=True)" % (poltype.dmamethod.lower(),poltype.dmabasisset)+'\n')
+    temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
+    temp.write("E, wfn = energy('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower(),poltype.dmabasisset)+'\n')
     temp.write('gdma(wfn)'+'\n')
     temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
     temp.write('clean()'+'\n')
@@ -320,12 +323,12 @@ def NormalTerm(poltype,logfname):
 def ErrorTerm(poltype,logfname):
     poltype.WriteToLog("ERROR termination: %s" % logfname)
 
-def CheckDipoleMoments(poltype):
+def GrabQMDipoles(poltype,optmol,logname):
     poltype.WriteToLog("")
     poltype.WriteToLog("=========================================================")
     poltype.WriteToLog("QM Dipole moment\n")
     if poltype.use_gaus==False or poltype.use_gausoptonly==True:
-        temp=open(poltype.logespfname.replace('.log','_psi4.log'),'r')
+        temp=open(logname,'r')
         results=temp.readlines()
         temp.close()
         for lineidx in range(len(results)):
@@ -333,18 +336,31 @@ def CheckDipoleMoments(poltype):
             if 'Dipole Moment: [D]' in line:
                 nextline=results[lineidx+1]
                 nextlinesplit=nextline.split()
-                qmdipole=float(nextlinesplit[-1])
+                dipole=np.array([float(nextlinesplit[1]),float(nextlinesplit[3]),float(nextlinesplit[5])])
 
+                
     else:
-        grepcmd = 'grep -A7 "Dipole moment" ' + poltype.logespfname+'>'+'QMDipole.txt'
+        grepcmd = 'grep -A7 "Dipole moment" ' + logname+'>'+'QMDipole.txt'
         poltype.call_subsystem(grepcmd,True)
         temp=open('QMDipole.txt','r')
         results=temp.readlines()
         temp.close()
         for line in results:
-            if 'Tot=' in line:
-                linesplit=line.split()
-                qmdipole=float(linesplit[-1])
+            linesplit=line.split()
+            if 'Tot' in line:
+                dipole=np.array([float(linesplit[1]),float(linesplit[3]),float(linesplit[5])])
+                dipole=ConvertDipoleToCOMFrame(poltype,dipole,optmol)
+    dipole=np.array([round(dipole[0],3),round(dipole[1],3),round(dipole[2],3)])
+    return dipole
+
+
+def CheckDipoleMoments(poltype,optmol):
+    if poltype.use_gaus:
+        logname=poltype.logespfname
+    else:
+        logname=poltype.logespfname.replace('.log','_psi4.log')
+    dipole=GrabQMDipoles(poltype,optmol,logname)
+    qmdipole=round(np.linalg.norm(dipole),3)
     poltype.WriteToLog('QM Dipole moment = '+str(qmdipole))    
     poltype.WriteToLog("")
     poltype.WriteToLog("=========================================================")
@@ -364,4 +380,44 @@ def CheckDipoleMoments(poltype):
     if ratio>poltype.dipoletol:
         raise ValueError('Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)) 
 
+def ConvertDipoleToCOMFrame(poltype,dipole,optmol):
+    nucsum = 0.0
+    masssum=0.0
+    atomiter=openbabel.OBMolAtomIter(optmol)
+    for atom in atomiter:
+        atomicnum=atom.GetAtomicNum()
+        nucsum += atomicnum
+        masssum+=atom.GetAtomicMass()
+    #COC
+    coc_x = 0.0
+    coc_y = 0.0
+    coc_z = 0.0
 
+    com_x = 0.0
+    com_y = 0.0
+    com_z = 0.0
+
+    newatomiter=openbabel.OBMolAtomIter(optmol)
+    for atom in newatomiter:
+        atomicnum=atom.GetAtomicNum()
+        atomicmass=atom.GetAtomicMass()
+        x=atom.GetX()
+        y=atom.GetY()
+        z=atom.GetZ()
+        coc_x = coc_x + x*atomicnum/nucsum
+        coc_y = coc_y + y*atomicnum/nucsum
+        coc_z = coc_z + z*atomicnum/nucsum
+        com_x = com_x + x*atomicmass/masssum
+        com_y = com_y + y*atomicmass/masssum
+        com_z = com_z + z*atomicmass/masssum
+
+    COM=np.array([com_x,com_y,com_z])
+    COC=np.array([coc_x,coc_y,coc_z])
+    debye2eA= 0.20819434
+    # 1 debye = 0.393456 ebohr 
+    bohr_e2debye = 0.393456
+    bohr2A = 0.529177210
+    debye2eA= 0.20819434
+    vec_gaus = poltype.totalcharge*(COC-COM)/bohr2A/bohr_e2debye
+    dipole=-dipole+vec_gaus
+    return dipole

@@ -44,3 +44,6 @@
 
 2.1.0
 * If running torsion serially on local host instead of crashing poltype when Gaussian/Psi4 job fails, just continue and attempt to do torsion fitting without that data point
+
+2.1.1
+* Added TARGET-DIPOLE dipole from ESP QM data to better reproduce MM QM dipole agreement. Gaussian uses center of nuclear charge frame which we convert to center of mass coordinates (Tinker is in COM Frame). Psi4 default is COM frame.

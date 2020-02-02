@@ -664,7 +664,7 @@ class PolarizableTyper():
             cmdstr = self.peditexe + " 1 " + self.gdmafname +' '+self.paramhead+ " < " + self.peditinfile
             self.call_subsystem(cmdstr,True)
             # Add header to the key file output by poledit
-            mpole.prepend_keyfile(self,self.keyfname)
+            mpole.prepend_keyfile(self,self.keyfname,optmol)
         # post process local frames written out by poledit
         mpole.post_proc_localframes(self,self.keyfname, lfzerox,atomindextoremovedipquad,atomindextoremovedipquadcross)
 
@@ -689,10 +689,10 @@ class PolarizableTyper():
         # Atoms that belong to the same symm class will now have only one common multipole definition
         if self.uniqidx:
             shutil.copy(self.keyfname, self.key2fname)
-            mpole.prepend_keyfile(self,self.key2fname)
+            mpole.prepend_keyfile(self,self.key2fname,optmol)
         elif ((not os.path.isfile(self.xyzoutfile) or not os.path.isfile(self.key2fname)) and not self.uniqidx):
-            mpole.AverageMultipoles(self)
-            mpole.prepend_keyfile(self,self.key2fname)    
+            mpole.AverageMultipoles(self,optmol)
+            mpole.prepend_keyfile(self,self.key2fname,optmol)    
         if self.espfit and not os.path.isfile(self.key3fname):
             # Optimize multipole parameters to QM ESP Grid (*.cube_2)
             # tinker's potential utility is called, with option 6.
@@ -781,7 +781,7 @@ class PolarizableTyper():
         opt.CheckRMSD(self)
         if self.totalcharge!=0:
             torgen.RemoveStringFromKeyfile(self,self.key5fname,'solvate GK')
-        esp.CheckDipoleMoments(self)
+        esp.CheckDipoleMoments(self,optmol)
         param = parameterfile.AmoebaParameterSet(self.key5fname)
         if self.dontfrag==False and self.isfragjob==True and not os.path.isfile(self.key6fname):
             wholemolidxtofragidx=frag.ConvertFragIdxToWholeIdx(self,self.molstructfname,torlist,rotbndindextofragindexmap,WBOmatrix)

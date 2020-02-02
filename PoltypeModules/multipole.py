@@ -1,4 +1,6 @@
 from . import symmetry as symm
+from . import electrostaticpotential as esp
+
 import os
 import sys
 import openbabel
@@ -547,7 +549,7 @@ def rm_esp_terms_keyfile(poltype,keyfilename):
     keyfh.close()
     shutil.move(tmpfname, keyfilename)
 
-def prepend_keyfile(poltype,keyfilename):
+def prepend_keyfile(poltype,keyfilename,optmol):
     """
     Intent: Adds a header to the key file given by 'keyfilename'
     """
@@ -562,6 +564,13 @@ def prepend_keyfile(poltype,keyfilename):
     tmpfh.write("vdwterm none\n")
     tmpfh.write("fix-monopole\n")
     tmpfh.write("potential-offset 1.0\n\n")
+    if poltype.use_gaus:
+        logname=poltype.logespfname
+    else:
+        logname=poltype.logespfname.replace('.log','_psi4.log')
+
+    qmdipole=esp.GrabQMDipoles(poltype,optmol,logname)
+    tmpfh.write('TARGET-DIPOLE'+' '+str(qmdipole[0])+' '+str(qmdipole[1])+' '+str(qmdipole[2])+'\n')
     
     for line in keyfh:
         tmpfh.write(line)
@@ -659,13 +668,13 @@ def run_gdma(poltype):
     assert os.path.getsize(poltype.gdmafname) > 0, "Error: " + \
        os.path.basename(poltype.gdmaexe) + " cannot create .gdmaout file."
 
-def AverageMultipoles(poltype):
+def AverageMultipoles(poltype,optmol):
     # gen input file
     gen_avgmpole_groups_file(poltype)
     # call avgmpoles.pl
     avgmpolecmdstr = poltype.avgmpolesexe + " " + poltype.keyfname + " " + poltype.xyzfname + " " + poltype.grpfname + " " + poltype.key2fname + " " + poltype.xyzoutfile + " " + str(poltype.prmstartidx)
     poltype.call_subsystem(avgmpolecmdstr,True)
-    prepend_keyfile(poltype,poltype.key2fname)
+    prepend_keyfile(poltype,poltype.key2fname,optmol)
 
 def gen_avgmpole_groups_file(poltype):
     """

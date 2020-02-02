@@ -8,6 +8,9 @@ from MDAnalysis.analysis.align import alignto
 import re
 import numpy
 import shutil
+import copy
+ob_log_handler = openbabel.OBMessageHandler()
+ob_log_handler.SetOutputLevel(0)
 
 def GenIndexToTypeIndexDic(poltype,tinkxyzfile):
     temp=open(tinkxyzfile,'r')
@@ -30,7 +33,7 @@ def IsItABoundaryAtom(poltype,neighbidxs,modproidxs,proOBmol):
             foundbound=True
     return foundbound
 
-def GrabModifiedResidueProteinIndexes(poltype,modifiedproteinpdbname,knownresiduesymbs):
+def GrabModifiedResidueProteinIndexes(poltype,modifiedproteinpdbname,knownresiduesymbs,totalatomnumber):
     temp=open(modifiedproteinpdbname,'r')
     results=temp.readlines()
     temp.close()
@@ -39,17 +42,21 @@ def GrabModifiedResidueProteinIndexes(poltype,modifiedproteinpdbname,knownresidu
     for line in results:
         if 'ATOM' in line:
             linesplit=line.split()
-            PDBcode=line[17:19+1]
-            resnumber=line[23:26+1]
-            if PDBcode not in knownresiduesymbs:
+            PDBcode=linesplit[3]
+            atomindex=int(linesplit[1])
+            try:
+                resnumber=linesplit[5]
+                int(resnumber)
+            except:
+                resnumber=linesplit[4]
+            if PDBcode not in knownresiduesymbs and atomindex!=totalatomnumber:
                 proatomidx=int(linesplit[1])
                 modproidxs.append(proatomidx)
                 modresnumber=int(resnumber)
                 modresiduelabel=PDBcode
     return modproidxs,modresnumber,modresiduelabel
 
-
-def GrabProteinTypeNumbers(poltype,pdbfilename,knownresiduesymbs,libpath,modproidxtotypenumber):
+def GrabPDBInfo(poltype,pdbfilename):
     # first grab the first residue number, then grab the last residue number
     temp=open(pdbfilename,'r')
     results=temp.readlines()
@@ -74,7 +81,49 @@ def GrabProteinTypeNumbers(poltype,pdbfilename,knownresiduesymbs,libpath,modproi
             proidxtothreelettercode[atomidx]=resname
             proidxtoatomlabel[atomidx]=atomlabel
             proidxtoresnum[atomidx]=resnum
+    return proidxtothreelettercode,proidxtoatomlabel,proidxtoresnum
 
+
+def PreservePDBAtomLabels(poltype,pdbfilename,idxtoatomlabel):
+    tempname=pdbfilename.replace('.pdb','_temp.pdb')
+    ftemp=open(tempname,'w')
+    temp=open(pdbfilename,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        linesplit=re.split(r'(\s+)',line)
+        if 'ATOM' in line:
+            atomidx=int(line[6:10+1].lstrip().rstrip())
+            oldatomlabel=line[12:15+1].lstrip().rstrip()
+            if atomidx in idxtoatomlabel.keys():
+                atomlabel=idxtoatomlabel[atomidx]
+                oldlen=len(oldatomlabel)
+                newlen=len(atomlabel)
+                diff=newlen-oldlen
+                magdiff=numpy.abs(diff)
+                if diff<0:
+                    atomlabel+=magdiff*' '
+                elif diff>0:
+                    space=linesplit[5]
+                    spacelength=len(space)
+                    newlength=spacelength-magdiff
+                    linesplit[5]=space[:newlength]
+                linesplit[4]=atomlabel
+                newline=''.join(linesplit)
+                ftemp.write(newline)
+            else:
+                ftemp.write(line)
+        else:
+            ftemp.write(line)
+    temp.close()
+    ftemp.close()
+    os.remove(pdbfilename)
+    os.rename(tempname,pdbfilename)
+            
+
+def GrabProteinTypeNumbers(poltype,pdbfilename,knownresiduesymbs,libpath,modproidxtotypenumber):
+
+    proidxtothreelettercode,proidxtoatomlabel,proidxtoresnum=GrabPDBInfo(poltype,pdbfilename)
 
     proidxtotypeidx={}
     for proidx in proidxtoatomlabel.keys():
@@ -292,8 +341,6 @@ def GrabPrmClassToBoundryClassForPrmFile(poltype,listofvalterms,proidxtoligidx,l
         boundclasses=[]
         for proidx in val:
             protype=proidxtotypeidx[proidx]
-            print('proidx',proidx,'protype',protype)
-            print('mincorenumber',mincorenumber,'maxcorenumber ',maxcorenumber)
             if protype<mincorenumber or protype>maxcorenumber:
                 valtype.append(protype)
                 boundclasses.append(prmtypetoprmclass[protype])
@@ -975,46 +1022,36 @@ def WriteToPrmFile(poltype,atomdefs,bondprms,angleprms,torsionprms,strbndprms,pi
     os.remove(prmpath)
     os.rename(newprmname,prmpath)
 
-def GenerateFragBabel(poltype,molindexlist,mol):
-    molidxtonewmolidx={}
-    newmol=openbabel.OBMol() # define new OBMol object for the fragment
-    atomlist=[] # list of atom objects from mol object
-    newatomlist=[] # list of blank atom objects for fragment mol object
-    count=1
-    for index in molindexlist: # iterate over indexes in torsion
-        atom=mol.GetAtom(index) # grab the atom object via index number
-        molidx=atom.GetIdx()
-        atomlist.append(atom) # append the atom object to list
-        newatom=newmol.NewAtom()
-        newatom=newatom.Duplicate(atom)
-        newatomlist.append(newatom) # just put into blank atom objects
-        molidxtonewmolidx[molidx]=count
-        count+=1
+def GenerateFragBabel(poltype,molindexlist,pdbname):
+    atomidxstoremove=[]
+    parentindextofragindex={}
+    positiontoparentindex={}
+    pdbmol=openbabel.OBMol()
+    obConversion = openbabel.OBConversion()
+    obConversion.SetInFormat('pdb')
+    obConversion.ReadFile(pdbmol,pdbname)
 
-    bondorderidxdic={} # key=(atom index1 of bond,atom index2 of bond), value=bondorder
-    iterbond = openbabel.OBMolBondIter(mol) # iterator for all bond objects in the molecule
-    for bond in iterbond:
-        a = bond.GetBeginAtom()
-        b = bond.GetEndAtom()
-        aidx=a.GetIdx()
-        bidx=b.GetIdx()
-        if aidx in molindexlist and bidx in molindexlist: # check to make sure we want these atoms
-            newaidx=molindexlist.index(aidx)+1 # new atom indexes are always in the order of atoms added to molecule via newatomlist above, +1 is because python starts at 0, atom indexes start at 1
-            newbidx=molindexlist.index(bidx)+1
-            bondorder=bond.GetBondOrder()
-            bondorderidxdic[(newaidx,newbidx)]=bondorder
+    atomiter=openbabel.OBMolAtomIter(pdbmol)
+    for atom in atomiter:
+        atomidx=atom.GetIdx()
+        if atomidx not in molindexlist:
+            atomidxstoremove.append(atomidx)
+        if atomidx in molindexlist:
+            pos=[atom.GetX(),atom.GetY(),atom.GetZ()]
+            positiontoparentindex[tuple(pos)]=atomidx
 
-        else:
-            continue
-
-    for key in bondorderidxdic: # add back the bond between atoms in original mol object to the fragment mol object
-        key=list(key)
-        newaidx=key[0]
-        newbidx=key[1]
-        bondorder=bondorderidxdic[(newaidx,newbidx)]
-        newmol.AddBond(newaidx,newbidx,bondorder)
-    
-    return newmol,molidxtonewmolidx
+    sortedatomidxstoremove=sorted(atomidxstoremove, reverse=True)
+    for index in sortedatomidxstoremove:
+        atom=pdbmol.GetAtom(index)
+        pdbmol.DeleteAtom(atom)
+    fragiter=openbabel.OBMolAtomIter(pdbmol)
+    for atom in fragiter:
+        atomindex=atom.GetIdx()
+        pos=tuple([atom.GetX(),atom.GetY(),atom.GetZ()])
+        if pos in positiontoparentindex.keys():
+            parentindex=positiontoparentindex[pos]
+            parentindextofragindex[parentindex]=atomindex
+    return pdbmol,parentindextofragindex
 
 
 def NeighboringModResidueAtomIndexes(poltype,modresnumber,modifiedproteinpdbname,modproidxs,proOBmol,proboundidxs):
@@ -1181,17 +1218,24 @@ def GrabKnownResidueSymbs(poltype): # if adding parameters to the library then n
     results=temp.readlines()
     temp.close()
     for line in results:
-        if 'atom' in line:
-            linesplit=line.split()
+
+        linesplit=line.split()
+        if 'atom' in line and len(linesplit)==8 and '+' not in line and '-' not in line:
             resname=linesplit[4]
             if resname[0]=='N' or resname[0]=='C':
                 resname=resname[1:]
-            if resname not in knownresiduesymbs:
+            if resname not in knownresiduesymbs and len(resname)!=0:
                 knownresiduesymbs.append(resname)
 
     return knownresiduesymbs
 
 def MatchCorrectProteinAtomsToCorrespondingHydrogen(poltype,proboundidxs,proOBmol,polOBmol,proidxtoligidx,ligidxtoproidx):
+    atomiter=openbabel.OBMolAtomIter(proOBmol)
+    for atom in atomiter:
+        atomidx=atom.GetIdx()
+        atomatomiter=openbabel.OBAtomAtomIter(atom)
+        for natom in atomatomiter:
+            natomidx=natom.GetIdx()
     addedproatoms=[]
     for proidx in proboundidxs:
         proatom=proOBmol.GetAtom(proidx)
@@ -1208,8 +1252,29 @@ def MatchCorrectProteinAtomsToCorrespondingHydrogen(poltype,proboundidxs,proOBmo
                         proidxtoligidx[proneighbatomidx]=ligneighbidx
                         addedproatoms.append(proneighbatomidx)
     return proidxtoligidx,addedproatoms
+"""
+def MatchCorrectProteinAtomsToCorrespondingHydrogen(poltype,proboundidxs,prordkitmol,polrditmol,proidxtoligidx,ligidxtoproidx):
+    print('total atoms rdkit pro',prordkitmol.GetNumAtoms())
+    addedproatoms=[]
+    for proidxbabel in proboundidxs:
+        proidx=proidxbabel-1
+        proatom=prordkitmol.GetAtomWithIdx(proidx)
+        for proneighbatom in proatom.GetNeighbors():
+            proneighbatomidx=proneighbatom.GetIdx()
+            proneighbatomidxbabel=proneighbatomidx+1
+            if proneighbatomidxbabel not in proidxtoligidx.keys(): # then this must be the atom corresponding to one of the Hydrogens
+                ligidxbabel=proidxtoligidx[proidxbabel]
+                ligidx=ligidxbabel-1
+                ligatom=polrdkitmol.GetAtomWithIdx(ligidx)
+                for ligneighb in ligatom.GetNeighbors():
+                    ligneighbidx=ligneighb.GetIdx()
+                    lligneighbidxbabel=ligneighbidx+1
+                    if ligneighbidxbabel not in proidxtoligidx.values(): # then this is the corresponding added hydrogen
+                        proidxtoligidx[proneighbatomidxbabel]=ligneighbidxbabel
+                        addedproatoms.append(proneighbatomidxbabel)
+    return proidxtoligidx,addedproatoms
 
-
+"""
 def GrabCarbonylCarbonAndAmideNitrogen(poltype,modresnumber,pdbname):
     backboneprobound=[]
     temp=open(pdbname,'r')
@@ -1452,6 +1517,27 @@ def DeleteHydrogensAttachedToBackbone(poltype,molobj,indexlist):
     return molobj 
 
 
+def SwapDictionaryKeys(poltype,refdic,swapdic):
+    newdic={}
+    for key in list(refdic.keys()):
+        if key in swapdic.keys():
+            newkey=swapdic[key]
+            value=refdic[key]
+            newdic[newkey]=value
+    return newdic
+
+def MissingIndexes(poltype,proidxtoatomlabel):
+    missingproidxs=[]
+    minproidx=min(list(proidxtoatomlabel.keys()))
+    maxproidx=max(list(proidxtoatomlabel.keys()))
+    for i in range(minproidx,maxproidx+1):
+        if i not in proidxtoatomlabel.keys():
+            missingproidxs.append(i)
+    return missingproidxs
+
+    
+
+
 def GenerateModifiedProteinPDB(poltype):      
     sidechainindexes=GrabSideChainIndexes(poltype,int(poltype.mutatedresiduenumber),poltype.unmodifiedproteinpdbname)
     atomindexestokeepafter=FindAtomIndexesToKeepAfterMutation(poltype,int(poltype.mutatedresiduenumber),sidechainindexes,poltype.unmodifiedproteinpdbname) # only do this for indexes after residue
@@ -1460,11 +1546,15 @@ def GenerateModifiedProteinPDB(poltype):
     obConversion.SetInFormat('pdb')
     obConversion.SetOutFormat('pdb')
     obConversion.ReadFile(unmodpdbmol,poltype.unmodifiedproteinpdbname)
-    fragmolafter,unmodidxtonewidx=GenerateFragBabel(poltype,atomindexestokeepafter,unmodpdbmol)
+    proidxtothreelettercode,proidxtoatomlabel,proidxtoresnum=GrabPDBInfo(poltype,poltype.unmodifiedproteinpdbname)
+    fragmolafter,unmodidxtonewidx=GenerateFragBabel(poltype,atomindexestokeepafter,poltype.unmodifiedproteinpdbname)
     refname='RefAfter.pdb'
     obConversion.WriteFile(fragmolafter,refname)
-    chainid=GrabChainId(poltype,int(poltype.mutatedresiduenumber),refname)
 
+    proidxtoatomlabel=SwapDictionaryKeys(poltype,proidxtoatomlabel,unmodidxtonewidx)
+    missingproidxs=MissingIndexes(poltype,proidxtoatomlabel)
+    PreservePDBAtomLabels(poltype,refname,proidxtoatomlabel)
+    chainid=GrabChainId(poltype,int(poltype.mutatedresiduenumber),refname)
 
     inFormat = obConversion.FormatFromExt(poltype.mutatedsidechain)
     obConversion.SetInFormat(inFormat)        
@@ -1476,10 +1566,11 @@ def GenerateModifiedProteinPDB(poltype):
     sidechainmol=DeleteHydrogensAttachedToBackbone(poltype,sidechainmol,backboneindexessidechain) # we will use H on backbone from referernce pdb not mutated sidechain pdb
     refmol=openbabel.OBMol()
     obConversion.SetInFormat('pdb')
-    obConversion.ReadFile(refmol,refname)
     
+    obConversion.ReadFile(refmol,refname)
     pdbname='MutatedSideChain.pdb'
     obConversion.WriteFile(sidechainmol,pdbname)
+    
     ModifyAlignmentPDB(poltype,pdbname)
     allindexes=MatchSMARTSToOBMolGrabAllMatches(poltype,backbonesmiles,refmol) 
     pdbindexes=GrabPDBIndexes(poltype,int(poltype.mutatedresiduenumber),poltype.unmodifiedproteinpdbname)
@@ -1503,9 +1594,11 @@ def GenerateModifiedProteinPDB(poltype):
     u = Merge(sc.select_atoms(mergestring),ref.select_atoms('all'))
     u.trajectory.ts.dimensions = ref.trajectory.ts.dimensions
     output=poltype.unmodifiedproteinpdbname.replace('.pdb','_Mutated.pdb')
-    u.atoms.write(output)
+
+    u.atoms.write(output) # this puts modified res on top of PDB but need to move to correct spot
     lines=GrabModifiedResidueLines(poltype,output,int(poltype.mutatedresiduenumber)) # MDAnalysis puts merged lines at top of pdb, need to move them and change chain back to original chain
     lines=ModifyChainIdentifier(poltype,lines,chainid)
+
     MoveModifiedLines(poltype,lines,int(poltype.mutatedresiduenumber),output)
     finalmol=openbabel.OBMol() # need to pass through babel again to change atom indexes
     obConversion.ReadFile(finalmol,output)
@@ -1524,13 +1617,17 @@ def GenerateModifiedProteinPoltypeInput(poltype):
     # first need to generate protein XYZ file from PDB
     # so we have proidxtotypeidx, however since we will be transfering some of the protein parameters near boundary of poltype job and new residue in protein, we need to no which protein indexes correspond to type numbers in original protein parameter file vs what protein indexes will have new type numbers for the new residue
 
-    modproidxs,modresnumber,modresiduelabel=GrabModifiedResidueProteinIndexes(poltype,poltype.modifiedproteinpdbname,knownresiduesymbs) # these indexes need to be excluded when calling pdbxyz.x then added back
     obConversion = openbabel.OBConversion()
     proOBmol = openbabel.OBMol()
     inFormat = obConversion.FormatFromExt(poltype.modifiedproteinpdbname)
     obConversion.SetInFormat(inFormat)
     obConversion.ReadFile(proOBmol,poltype.modifiedproteinpdbname) 
+    totalatomnumber=proOBmol.NumAtoms()
+
     
+    modproidxs,modresnumber,modresiduelabel=GrabModifiedResidueProteinIndexes(poltype,poltype.modifiedproteinpdbname,knownresiduesymbs,totalatomnumber) # these indexes need to be excluded when calling pdbxyz.x then added back
+
+ 
     proboundidxs=FindBoundaryAtomIdxs(poltype,proOBmol,modproidxs)
     # now to reduce the number of atoms needed for QM and paramterization, just only include up to three atoms away starting from boundary atom on modified protein side
 
@@ -1541,9 +1638,8 @@ def GenerateModifiedProteinPoltypeInput(poltype):
     # now need to grab residue number of modified residue, then use that to grab atom indexes of neighboring residues, then add those indexes to modified residue atom indexes and make fragment molecule with those atoms for poltype
 
     # so first step is to identify boundary atoms in a list iterate through all ligand atoms and if it has a neighbor in unmatched list, then it is a boundary atom
-
     choppedfragidxs=modproidxs+modneighbidxs
-    chopmodmol,proidxtoligidx=GenerateFragBabel(poltype,choppedfragidxs,proOBmol) 
+    chopmodmol,proidxtoligidx=GenerateFragBabel(poltype,choppedfragidxs,poltype.modifiedproteinpdbname) 
     obConversion.SetOutFormat("pdb")
     refname='ModifiedRes.pdb'
     obConversion.WriteFile(chopmodmol,refname)
@@ -1551,13 +1647,17 @@ def GenerateModifiedProteinPoltypeInput(poltype):
     obConversion.ReadFile(modmol,refname)
     obConversion.SetOutFormat("mol")
     corename='ModifiedResNoHyd.mol'
-    obConversion.WriteFile(modmol,corename)    
+    obConversion.WriteFile(modmol,corename) 
     time.sleep(2)
     m = Chem.MolFromMolFile(corename,removeHs=False)
     smarts=Chem.MolToSmarts(m)
     check=CheckIfSMARTSInLibrary(poltype,poltype.SMARTSToTypelibpath,smarts)
+    
+    print('proboundidxs',proboundidxs)
     boundaryatomidxs=[proidxtoligidx[i] for i in proboundidxs]
+    print('modresnumber',modresnumber)
     backboneprobound=GrabCarbonylCarbonAndAmideNitrogen(poltype,modresnumber,poltype.modifiedproteinpdbname)
+    print('backboneprobound',backboneprobound)
     backboneligbound=[proidxtoligidx[i] for i in backboneprobound]
     # okay now need to add hydrogens and convert to sdf
     polOBmol = openbabel.OBMol()
@@ -1567,14 +1667,17 @@ def GenerateModifiedProteinPoltypeInput(poltype):
     polOBmol.AddHydrogens()
     molname=refname.replace('.pdb','.sdf')
     obConversion.WriteFile(polOBmol,molname)
+    
+    polrdkitmol=Chem.rdmolfiles.MolFromPDBFile(refname)
+ 
+
     proidxtoligidx= RemoveUnwantedHydrogens(poltype,backboneligbound,polOBmol,proidxtoligidx,refname,obConversion)
     # for the extra hydrogen on the backbone N and the backbone carbonyl carbon we need to add a map from those hydrogen indexes to the corresponding atom that should be in the protein
     
     # first using the carbonyl carbon and backbone N of modprotein indexes indexes iterate over the neighbors and if the neighbor is not already in the dictionary then that must be the atom index that matches to the hydrogen indexes
-    ligidxtoproidx = dict([v,k] for k,v in proidxtoligidx.items())  
+    ligidxtoproidx = dict([v,k] for k,v in proidxtoligidx.items()) 
     proidxtoligidx,addedproatoms=MatchCorrectProteinAtomsToCorrespondingHydrogen(poltype,backboneprobound,proOBmol,polOBmol,proidxtoligidx,ligidxtoproidx)
     ligidxtoproidx = dict([v,k] for k,v in proidxtoligidx.items()) 
-
     return knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check
 
 
@@ -1825,26 +1928,31 @@ def GrabCoreParameters(poltype,key5fname):
         
 def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check):
 
-    
+    print(' about to make XYZ and key')
+    sys.exit() 
     # WARNING, may need to append the bio18 prm file to the end of final key file, for some reason cannot refererence the parameter file with key word parameters
     obConversion = openbabel.OBConversion()
     ligOBmol = openbabel.OBMol()
     inFormat = obConversion.FormatFromExt(molname)
     obConversion.SetInFormat(inFormat)
+    print('about to read ligand')
+    sys.exit()
     obConversion.ReadFile(ligOBmol,molname) 
-
+    sys.exit()
     ligandindexes=set(range(1,ligOBmol.NumAtoms()))
 
     
     proboundidxtoprotype=GrabProBoundIdxToProType(poltype,proboundidxs,proOBmol,modproidxs)
     if check==False:
         ligidxtotypeidx=GenIndexToTypeIndexDic(poltype,poltype.tmpxyzfile)
-        print('ligidxtotypeidx ',ligidxtotypeidx)
+        print('ligidxtotypeidx ',ligidxtotypeidx,'check ',check)
     else:
         ligidxtotypeidx=ReadSMARTSToTypeLib(poltype,smarts,modmol)
-
+        print('ligidxtotypeidx ',ligidxtotypeidx,'check ',check)
     modproidxtotypenumber=AssignNewTypeNumbers(poltype,modproidxs,ligidxtotypeidx,proidxtoligidx) # will try to keep modified residue type numbers as type numbers in poltype job but then for boudnary parts need to assign new type numbers 
+    print('modproidxtotypenumber ',modproidxtotypenumber)
     proidxtoprotype=GrabProteinTypeNumbers(poltype,poltype.modifiedproteinpdbname,knownresiduesymbs,poltype.libpath,modproidxtotypenumber)
+    
     GenerateProteinTinkerXYZFile(poltype,poltype.modifiedproteinpdbname,modproidxtotypenumber,poltype.amoebabioprmpath,proidxtoprotype,knownresiduesymbs)
 
     listoftorsionsforkey,listofbondsforprm,listofanglesforprm,listoftorsionsforprm=GrabAtomsForValenceTermsAcrossBoundary(poltype,ligOBmol,proOBmol,ligidxtoproidx,proboundidxs,boundaryatomidxs,modproidxs) # execlude all cases where only 1 atom is in modproidxs and the others are in protein, seperate those into different lists since those can be transfered from prm file and the others from the key file

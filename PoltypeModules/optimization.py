@@ -191,7 +191,9 @@ def CheckBondConnectivity(poltype,mol,optmol):
     atomitermol=openbabel.OBMolAtomIter(mol)
     atomiteroptmol=openbabel.OBMolAtomIter(optmol)
     for atm in atomitermol:
+       
         atmidxmol=atm.GetIdx()
+        
         atmoptmol=optmol.GetAtom(atmidxmol)
         atmidxoptmol=atmoptmol.GetIdx()
         atmneighbidxlist=[]
@@ -209,11 +211,11 @@ def CheckBondConnectivity(poltype,mol,optmol):
             else:
                 diff=set(atmneighbidxlistoptmol)-set(atmneighbidxlist)
                 idxset='optmol'
-            RaiseConnectivityError(diff,idxset)
+            RaiseConnectivityError(poltype,diff,idxset)
 
 def RaiseConnectivityError(poltype,diff,idxset):
     print('Error! The bond connectivity before and after structure optimization is different')
-    poltype.WriteTolog('Error! The bond connectivity before and after structure optimization is different')
+    poltype.WriteToLog('Error! The bond connectivity before and after structure optimization is different')
     for atmidx in diff:
         print('The atom index '+str(atmidx)+' from structure '+idxset+' does not have the same connectivity before and after structure optimization')
         poltype.WriteToLog('The atom index '+str(atmidx)+' from structure '+idxset+' does not have the same connectivity before and after structure optimization')
