@@ -47,3 +47,6 @@
 
 2.1.1
 * Added TARGET-DIPOLE dipole from ESP QM data to better reproduce MM QM dipole agreement. Gaussian uses center of nuclear charge frame which we convert to center of mass coordinates (Tinker is in COM Frame). Psi4 default is COM frame.
+
+2.1.2
+* Bug fix for TARGET-DIPOLE keyword being used before ESP QM generated

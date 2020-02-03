@@ -689,10 +689,10 @@ class PolarizableTyper():
         # Atoms that belong to the same symm class will now have only one common multipole definition
         if self.uniqidx:
             shutil.copy(self.keyfname, self.key2fname)
-            mpole.prepend_keyfile(self,self.key2fname,optmol)
+            mpole.prepend_keyfile(self,self.key2fname,optmol,True)
         elif ((not os.path.isfile(self.xyzoutfile) or not os.path.isfile(self.key2fname)) and not self.uniqidx):
             mpole.AverageMultipoles(self,optmol)
-            mpole.prepend_keyfile(self,self.key2fname,optmol)    
+            mpole.prepend_keyfile(self,self.key2fname,optmol,True)    
         if self.espfit and not os.path.isfile(self.key3fname):
             # Optimize multipole parameters to QM ESP Grid (*.cube_2)
             # tinker's potential utility is called, with option 6.

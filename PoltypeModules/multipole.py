@@ -549,7 +549,7 @@ def rm_esp_terms_keyfile(poltype,keyfilename):
     keyfh.close()
     shutil.move(tmpfname, keyfilename)
 
-def prepend_keyfile(poltype,keyfilename,optmol):
+def prepend_keyfile(poltype,keyfilename,optmol,dipole=False):
     """
     Intent: Adds a header to the key file given by 'keyfilename'
     """
@@ -568,9 +568,9 @@ def prepend_keyfile(poltype,keyfilename,optmol):
         logname=poltype.logespfname
     else:
         logname=poltype.logespfname.replace('.log','_psi4.log')
-
-    qmdipole=esp.GrabQMDipoles(poltype,optmol,logname)
-    tmpfh.write('TARGET-DIPOLE'+' '+str(qmdipole[0])+' '+str(qmdipole[1])+' '+str(qmdipole[2])+'\n')
+    if dipole==True:
+        qmdipole=esp.GrabQMDipoles(poltype,optmol,logname)
+        tmpfh.write('TARGET-DIPOLE'+' '+str(qmdipole[0])+' '+str(qmdipole[1])+' '+str(qmdipole[2])+'\n')
     
     for line in keyfh:
         tmpfh.write(line)
@@ -674,7 +674,7 @@ def AverageMultipoles(poltype,optmol):
     # call avgmpoles.pl
     avgmpolecmdstr = poltype.avgmpolesexe + " " + poltype.keyfname + " " + poltype.xyzfname + " " + poltype.grpfname + " " + poltype.key2fname + " " + poltype.xyzoutfile + " " + str(poltype.prmstartidx)
     poltype.call_subsystem(avgmpolecmdstr,True)
-    prepend_keyfile(poltype,poltype.key2fname,optmol)
+    prepend_keyfile(poltype,poltype.key2fname,optmol,True)
 
 def gen_avgmpole_groups_file(poltype):
     """

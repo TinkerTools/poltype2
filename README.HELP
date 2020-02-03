@@ -24,6 +24,8 @@ If QM and MM for torsion fitting is too high, a ValueError will be raised. If fo
 
 If your Tinker version is less than 8.7, a ValueError will be raised.
 
+If using modifiedresidues library and a type number for the given atom index and PDB atom label are not found in the library, a ValueError will be raised. 
+
 If POLTYPE crashes, you do not need to delete any quantum data or tinker data, POLTYPE will recognize that the file exists and attempt to continue with it.
 
 If using Gaussian (for example gaussian for optimization as below) and also using the default optimization method wB97X-D,
@@ -46,8 +48,18 @@ If there are no python errors as shown above, please read *-poltype.log to trace
 
 2) Next have a reference poltype job from the Examples folder that has successfully completed
 
-3) Compare the inputs of the command to the inputs in successful poltype job. Look for anything that might cause the error.
+3) Compare the inputs of the command to the inputs in successful poltype job. Look for anything different that might cause the error.
 
+
+Modified Amino Acid Errors:
+Typically errors here that appear as undefined types or missing parameters in the final key files are a result of inconsistency between the atom label and residue label in the input PDB file and the atom label, residue label in the library lib.bio18_conv1.txt used to convert atomlabel, residue label to type numbers.
+
+Delete any atoms at end of PDB not a part of a full residue (like an alpha carbon at the very end).
+
+If the number of expected atoms connected to an atom type are not found, it is possible either the incorrect PDB atom label was used for that protonation state or there is a missing/extra hydrogen.
+
+If restarting poltype job after error delete the ModifiedPrm.prm file in poltype directory before restarting.
+ 
 
 Running POLTYPE
 *Prepare the poltype.ini file as shown below first*

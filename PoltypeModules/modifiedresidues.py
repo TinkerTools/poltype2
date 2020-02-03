@@ -81,7 +81,7 @@ def GrabPDBInfo(poltype,pdbfilename):
             proidxtothreelettercode[atomidx]=resname
             proidxtoatomlabel[atomidx]=atomlabel
             proidxtoresnum[atomidx]=resnum
-    return proidxtothreelettercode,proidxtoatomlabel,proidxtoresnum
+    return proidxtothreelettercode,proidxtoatomlabel,proidxtoresnum,firstresnum,lastresnum
 
 
 def PreservePDBAtomLabels(poltype,pdbfilename,idxtoatomlabel):
@@ -123,7 +123,7 @@ def PreservePDBAtomLabels(poltype,pdbfilename,idxtoatomlabel):
 
 def GrabProteinTypeNumbers(poltype,pdbfilename,knownresiduesymbs,libpath,modproidxtotypenumber):
 
-    proidxtothreelettercode,proidxtoatomlabel,proidxtoresnum=GrabPDBInfo(poltype,pdbfilename)
+    proidxtothreelettercode,proidxtoatomlabel,proidxtoresnum,firstresnum,lastresnum=GrabPDBInfo(poltype,pdbfilename)
 
     proidxtotypeidx={}
     for proidx in proidxtoatomlabel.keys():
@@ -144,8 +144,10 @@ def GrabProteinTypeNumbers(poltype,pdbfilename,knownresiduesymbs,libpath,modproi
             protypeidx=atomlabeltoprotypeidx[atomlabel]
         else:
             protypeidx=0
-        if protypeidx==0 and proidx in modproidxtotypenumber.keys():
+        if proidx in modproidxtotypenumber.keys():
             protypeidx=modproidxtotypenumber[proidx]
+        if protypeidx==0:
+            raise ValueError("Type number for index "+str(proidx)+' '+atomlabel+' was not found')
      
             
         proidxtotypeidx[proidx]=int(protypeidx)
@@ -252,6 +254,7 @@ def GenerateProteinTinkerXYZFile(poltype,modifiedproteinpdbname,modproidxtotypen
         else:
             temp.write(line)
     temp.close()
+    return protinkxyz
 
 def GrabProteinParameterTypeNumbers(poltype,amoebabioprmpath):
     proteinprmtypenumbers=[]
@@ -1546,7 +1549,7 @@ def GenerateModifiedProteinPDB(poltype):
     obConversion.SetInFormat('pdb')
     obConversion.SetOutFormat('pdb')
     obConversion.ReadFile(unmodpdbmol,poltype.unmodifiedproteinpdbname)
-    proidxtothreelettercode,proidxtoatomlabel,proidxtoresnum=GrabPDBInfo(poltype,poltype.unmodifiedproteinpdbname)
+    proidxtothreelettercode,proidxtoatomlabel,proidxtoresnum,firstresnum,lastresnum=GrabPDBInfo(poltype,poltype.unmodifiedproteinpdbname)
     fragmolafter,unmodidxtonewidx=GenerateFragBabel(poltype,atomindexestokeepafter,poltype.unmodifiedproteinpdbname)
     refname='RefAfter.pdb'
     obConversion.WriteFile(fragmolafter,refname)
@@ -1928,29 +1931,21 @@ def GrabCoreParameters(poltype,key5fname):
         
 def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check):
 
-    print(' about to make XYZ and key')
-    sys.exit() 
     # WARNING, may need to append the bio18 prm file to the end of final key file, for some reason cannot refererence the parameter file with key word parameters
     obConversion = openbabel.OBConversion()
     ligOBmol = openbabel.OBMol()
     inFormat = obConversion.FormatFromExt(molname)
     obConversion.SetInFormat(inFormat)
-    print('about to read ligand')
-    sys.exit()
     obConversion.ReadFile(ligOBmol,molname) 
-    sys.exit()
     ligandindexes=set(range(1,ligOBmol.NumAtoms()))
 
     
     proboundidxtoprotype=GrabProBoundIdxToProType(poltype,proboundidxs,proOBmol,modproidxs)
     if check==False:
         ligidxtotypeidx=GenIndexToTypeIndexDic(poltype,poltype.tmpxyzfile)
-        print('ligidxtotypeidx ',ligidxtotypeidx,'check ',check)
     else:
         ligidxtotypeidx=ReadSMARTSToTypeLib(poltype,smarts,modmol)
-        print('ligidxtotypeidx ',ligidxtotypeidx,'check ',check)
     modproidxtotypenumber=AssignNewTypeNumbers(poltype,modproidxs,ligidxtotypeidx,proidxtoligidx) # will try to keep modified residue type numbers as type numbers in poltype job but then for boudnary parts need to assign new type numbers 
-    print('modproidxtotypenumber ',modproidxtotypenumber)
     proidxtoprotype=GrabProteinTypeNumbers(poltype,poltype.modifiedproteinpdbname,knownresiduesymbs,poltype.libpath,modproidxtotypenumber)
     
     GenerateProteinTinkerXYZFile(poltype,poltype.modifiedproteinpdbname,modproidxtotypenumber,poltype.amoebabioprmpath,proidxtoprotype,knownresiduesymbs)
@@ -1994,7 +1989,6 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
 
     torsionligtypestoboundtypesforkey=GrabLigandTypeToBoundryTypeForKeyFile(poltype,listoftorsionsforkey,proidxtoligidx,ligidxtotypeidx,proidxtoprotype,poltype.amoebabioprmpath,modproidxs,mincorenumber,maxcorenumber)
     prmtypetoprmclass=GrabClassNumbersForProtein(poltype,proidxtoprotype,check) # need this for grepping torsion parameters from prm file
-    print('prmtypetoprmclass ',prmtypetoprmclass)
     bondprmclassestoboundclasses=GrabPrmClassToBoundryClassForPrmFile(poltype,listofbondsforprm,proidxtoligidx,ligidxtotypeidx,proidxtoprotype,poltype.amoebabioprmpath,modproidxs,proboundidxtoprotype,prmtypetoprmclass,mincorenumber,maxcorenumber)
     angleprmclassestoboundclasses=GrabPrmClassToBoundryClassForPrmFile(poltype,listofanglesforprm,proidxtoligidx,ligidxtotypeidx,proidxtoprotype,poltype.amoebabioprmpath,modproidxs,proboundidxtoprotype,prmtypetoprmclass,mincorenumber,maxcorenumber)
     torsionprmclassestoboundclasses=GrabPrmClassToBoundryClassForPrmFile(poltype,listoftorsionsforprm,proidxtoligidx,ligidxtotypeidx,proidxtoprotype,poltype.amoebabioprmpath,modproidxs,proboundidxtoprotype,prmtypetoprmclass,mincorenumber,maxcorenumber)
@@ -2039,10 +2033,36 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
         #print('proidxtoprotype ',proidxtoprotype)
         proidxtoprotype=ShiftDictionaryValueTypes(poltype,proidxtoprotype,oldtypetonewtype)
         ligidxtotypeidx=ShiftDictionaryValueTypes(poltype,ligidxtotypeidx,oldtypetonewtype)
+        print('modproidxtotypenumber before',modproidxtotypenumber)
+        modproidxtotypenumber=ShiftDictionaryValueTypes(poltype,modproidxtotypenumber,oldtypetonewtype)
+        print('modproidxtotypenumber after',modproidxtotypenumber)
         # now I need to make a text file that takes parameters and can add to library
         modresiduedic=GrabLibraryInfo(poltype,proidxtoprotype,modresiduelabel,proOBmol)
-        GenerateLibFileToAdd(poltype,modresiduedic,modresiduelabel)
-        GenerateSMARTSToTypeFileToAdd(poltype,modmol,ligidxtotypeidx,smarts)
+        protinkxyz=GenerateProteinTinkerXYZFile(poltype,poltype.modifiedproteinpdbname,modproidxtotypenumber,poltype.amoebabioprmpath,proidxtoprotype,knownresiduesymbs)
+
+        cmdstr=CallAnalyze(poltype,protinkxyz,writekey)
+        poltype.call_subsystem(cmdstr,True)
+        error=ReadAnalyzeOutput(poltype)
+        if error==False:
+            GenerateLibFileToAdd(poltype,modresiduedic,modresiduelabel)
+            GenerateSMARTSToTypeFileToAdd(poltype,modmol,ligidxtotypeidx,smarts)
+        else:
+            raise ValueError(' alz.out for PDB XYZ file and .key_7 have errors')
+
+
+def CallAnalyze(poltype,xyzfile,keyfile):
+    cmdstr=poltype.analyzeexe+' '+xyzfile+' '+'-k'+' '+keyfile+' '+'e'+' > '+'alz.out'
+    return cmdstr
+
+def ReadAnalyzeOutput(poltype):
+    error=False
+    temp=open('alz.out','r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        if 'Tinker is Unable to Continue' in line or 'error' in line or 'Error' in line:
+            error=True
+    return error
 
 def ShiftDictionaryValueTypes(poltype,dictionary,oldtypetonewtype):
     for key,value in dictionary.items():
