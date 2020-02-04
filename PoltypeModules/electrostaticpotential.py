@@ -419,5 +419,8 @@ def ConvertDipoleToCOMFrame(poltype,dipole,optmol):
     bohr2A = 0.529177210
     debye2eA= 0.20819434
     vec_gaus = poltype.totalcharge*(COC-COM)/bohr2A/bohr_e2debye
-    dipole=-dipole+vec_gaus
+    print('COM ',COM)
+    print("COC ",COC)
+    print('vec_gaus',vec_gaus)
+    dipole=dipole-vec_gaus
     return dipole
