@@ -603,7 +603,9 @@ class Valence():
                         key2 = 'vdw%10d%8.4f%9.4f%6.3f' % (key1, v[skey][0], v[skey][1], v[skey][2])
                     else:
                         key2 = 'vdw%10d%8.4f%9.4f' % (key1, v[skey][0], v[skey][1])
+                    string='SOLUTE '+str(key1)+' '+skey+' '+str(v[skey][0])+' '+str(v[skey][0])+'\n'
                     d.update({key1 : key2})
+                    d.update({str(key1)+'_'+'SOLUTE':string})
         x = []
         for v in dict.values(d):
             x.append(v)

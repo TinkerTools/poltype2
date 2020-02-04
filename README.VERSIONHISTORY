@@ -50,3 +50,6 @@
 
 2.1.2
 * Bug fix for TARGET-DIPOLE keyword being used before ESP QM generated
+
+2.1.3
+* Added SOLUTE keyword for GK and DD-COSMO eletrostatic radii
