@@ -56,3 +56,6 @@
 
 2.1.4
 * Check RMSPD root mean square potential difference and raise error before checking dipoles, (previously supposed to do this but there was a bug)
+
+2.1.5
+* TARGET-DIPOLE keyword added in previous version cancels out effects of FIX MONOPOLE used in .key_2 for electrostatic potential fitting, will remove this until TINKER bug is fixed

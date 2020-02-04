@@ -570,7 +570,7 @@ def prepend_keyfile(poltype,keyfilename,optmol,dipole=False):
         logname=poltype.logespfname.replace('.log','_psi4.log')
     if dipole==True:
         qmdipole=esp.GrabQMDipoles(poltype,optmol,logname)
-        tmpfh.write('TARGET-DIPOLE'+' '+str(qmdipole[0])+' '+str(qmdipole[1])+' '+str(qmdipole[2])+'\n')
+        #tmpfh.write('TARGET-DIPOLE'+' '+str(qmdipole[0])+' '+str(qmdipole[1])+' '+str(qmdipole[2])+'\n')
     
     for line in keyfh:
         tmpfh.write(line)
