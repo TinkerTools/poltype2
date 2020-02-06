@@ -59,3 +59,6 @@
 
 2.1.5
 * When extracting dipole from gaussian dipole is flipped in wrong direction, this is fixed
+
+2.1.6
+* Error with generating opt.com file for modifiedresidue library with first poltype run, this has been fixed. Now when poltype finishes,ttt.xyz_2 is deleted so if rerunning ttt.xyz_3 ... isnt created, also *.chk files are deleted if job is successful.
