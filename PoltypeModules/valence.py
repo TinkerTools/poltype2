@@ -69,7 +69,7 @@ class Valence():
                     if opbkey not in opbhash:
                         opbhash[opbkey] = [self.defopbendval, False,smarts]
     
-    def gen_valinfile (self,mol,rotbndlist):
+    def gen_valinfile (self,mol):
         """
         Intent: Find aromatic carbon and bonded hydrogens to correct polarizability
         Find out-of-plane bend values using a look up table
@@ -159,18 +159,18 @@ class Valence():
         # 76 76 0 0 benzene cc
         # 78 78 0 0 ethylbenzene cc
         self.opbset('cc', 0.200, opbhash, mol)
-        #self.opbset('[#6D3][*]', 0.200, opbhash, mol)
-    
+        #self.opbset('[#6D3][*]', 0.200, opbhash, mol)    
         #print('hash items ',opbhash.items())
-    
-    
+        
+        return opbhash.items()
+
+    def RotatableBonds(self,rotbndlist):
         rotbndprmlist = []
         for rotbnd in rotbndlist.values():
             for rotbndprm in rotbnd:
                 rotlist=list(rotbndprm)
                 rotbndprmlist.append(rotlist)
-        return opbhash.items(),rotbndprmlist
-
+        return rotbndprmlist
 
 
     def vdwguess(self, mol):
@@ -2589,6 +2589,7 @@ class Valence():
                     secondneighborindexes=indextoneighbidxs[int(ia[2])]
                     neighborindexes=firstneighborindexes+secondneighborindexes
                     check=self.CheckIfNeighborsExistInSMARTMatch(neighborindexes,ia)
+                    rot=self.CheckIfTorsionIsRotatable(rotbnds,ia)
                     if(len(v[skey]) == 7):
                         bidx=ia[v[skey][1] - 1] 
                         cidx=ia[v[skey][2] - 1]
@@ -2598,7 +2599,7 @@ class Valence():
                     b=mol.GetAtom(bidx)
                     c=mol.GetAtom(cidx)
                     bond=mol.GetBond(bidx,cidx)
-                    if check==False and bond.IsInRing()==False and b.IsInRing()==False and c.IsInRing()==False:
+                    if check==False and bond.IsInRing()==False and b.IsInRing()==False and c.IsInRing()==False and rot==True:
                         zeroed=True
                     if(dorot):
                         for r in rotbnds:
@@ -2648,6 +2649,20 @@ class Valence():
         #x = [ t[1] for t in sortedtuple ]
         x=list(d.values())
         return x
+
+    def CheckIfTorsionIsRotatable(self,rotbnds,ia):
+        rot=False
+        for r in rotbnds:
+            a=r[0]
+            b=r[1]
+            c=r[2]
+            d=r[3]
+            if ia[0]==a and ia[1]==b and ia[2]==c and ia[3]==d:
+                rot=True
+            elif ia[0]==d and ia[1]==c and ia[2]==b and ia[3]==a:
+                rot=True
+        return rot
+
 
     def FindAllNeighborIndexes(self,mol):
         indextoneighbidxs={}
@@ -2754,7 +2769,8 @@ class Valence():
         return new_sbs[:]
 
     def appendtofile(self, vf, mol,dorot,rotbndlist):
-        opbendvals,rotbnds=self.gen_valinfile(mol,rotbndlist)
+        rotbnds=self.RotatableBonds(rotbndlist)
+        opbendvals=self.gen_valinfile(mol)
         temp=open(vf,'r')
         results=temp.readlines()
         temp.close()

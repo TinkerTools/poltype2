@@ -62,3 +62,6 @@
 
 2.1.6
 * Error with generating opt.com file for modifiedresidue library with first poltype run, this has been fixed. Now when poltype finishes,ttt.xyz_2 is deleted so if rerunning ttt.xyz_3 ... isnt created, also *.chk files are deleted if job is successful.
+
+2.1.7
+* Torsion parameters are transfered from database if not in rotatable bond list(bug fix from previous edits of rotatable bond definition and transferable torsion in database)
