@@ -365,6 +365,7 @@ def CheckDipoleMoments(poltype,optmol):
     poltype.WriteToLog("")
     poltype.WriteToLog("=========================================================")
     poltype.WriteToLog("MM Dipole moment\n")
+    torgen.RemoveStringFromKeyfile(poltype,poltype.tmpkeyfile,'solvate')
     cmd=poltype.analyzeexe + ' ' +  poltype.xyzoutfile+' '+'-k'+' '+poltype.tmpkeyfile + ' em | grep -A11 Charge'+'>'+'MMDipole.txt'
     poltype.call_subsystem(cmd,True)
     temp=open('MMDipole.txt','r')

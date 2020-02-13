@@ -65,3 +65,5 @@
 
 2.1.7
 * Torsion parameters are transfered from database if not in rotatable bond list(bug fix from previous edits of rotatable bond definition and transferable torsion in database)
+2.1.8
+* Bug fix, solvate GK term removed from ttt.key for charged molecules to compute dipoles (ESP fitting done in gas phase, quantum done in gas phase)
