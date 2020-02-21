@@ -1,5 +1,4 @@
-
-    # Library for converting PDB to TINKER XYZ.
+library for converting PDB to TINKER XYZ.
 
     # Residues are identified by resname and number of atoms. The TINKER atom 
     #   types are assigned by looking up the atom name in the library file. 
@@ -1395,6 +1394,9 @@ atom   12   12 HA    CALA                    1  1.0000  0
 atom   14   14 HB1   CALA                    1  1.0000  0
 atom   14   14 HB2   CALA                    1  1.0000  0
 atom   14   14 HB3   CALA                    1  1.0000  0
+atom  234  234 OC1   CALA                    8 16.0000  0
+atom  234  234 OC2   CALA                    8 16.0000  0
+
 
 # RESIDUE CARG 25
 atom    7    7 N     CARG                    7 14.0000  0
@@ -1422,6 +1424,8 @@ atom  212  212 1HH1  CARG                    1  1.0000  0
 atom  212  212 2HH1  CARG                    1  1.0000  0
 atom  212  212 1HH2  CARG                    1  1.0000  0
 atom  212  212 2HH2  CARG                    1  1.0000  0
+atom  234  234 OC1   CARG                    8 16.0000  0
+atom  234  234 OC2   CARG                    8 16.0000  0
 
 # RESIDUE CASH 14
 atom    7    7 N     CASH                    7 14.0000  0
@@ -1438,6 +1442,8 @@ atom   12   12 HA    CASH                    1  1.0000  0
 atom  142  142 HB2   CASH                    1  1.0000  0
 atom  142  142 HB3   CASH                    1  1.0000  0
 atom  146  146 HD2   CASH                    1  1.0000  0
+atom  234  234 OC1   CASH                    8 16.0000  0
+atom  234  234 OC2   CASH                    8 16.0000  0
 
 # RESIDUE C	 15
 atom    7    7 N     CASN                    7 14.0000  0
@@ -1455,6 +1461,8 @@ atom  148  148 HB1   CASN                    1  1.0000  0
 atom  148  148 HB2   CASN                    1  1.0000  0
 atom  152  152 1HD2  CASN                    1  1.0000  0
 atom  152  152 2HD2  CASN                    1  1.0000  0
+atom  234  234 OC1   CASN                    8 16.0000  0
+atom  234  234 OC2   CASN                    8 16.0000  0
 
 # RESIDUE CASP 13
 atom    7    7 N     CASP                    7 14.0000  0
@@ -1470,6 +1478,8 @@ atom   10   10 H     CASP                    1  1.0000  0
 atom   12   12 HA    CASP                    1  1.0000  0
 atom  138  138 HB1   CASP                    1  1.0000  0
 atom  138  138 HB2   CASP                    1  1.0000  0
+atom  234  234 OC1   CASP                    8 16.0000  0
+atom  234  234 OC2   CASP                    8 16.0000  0
 
 # RESIDUE CCYD 11
 atom    7    7 N     CCYD                    7 14.0000  0
@@ -1483,6 +1493,8 @@ atom   10   10 H     CCYD                    1  1.0000  0
 atom   12   12 HA    CCYD                    1  1.0000  0
 atom   44   44 HB2   CCYD                    1  1.0000  0
 atom   44   44 HB3   CCYD                    1  1.0000  0
+atom  234  234 OC1   CCYD                    8 16.0000  0
+atom  234  234 OC2   CCYD                    8 16.0000  0
 
 # RESIDUE CCYS 12
 atom    7    7 N     CCYS                    7 14.0000  0
@@ -1497,6 +1509,8 @@ atom   12   12 HA    CCYS                    1  1.0000  0
 atom   44   44 HB1   CCYS                    1  1.0000  0
 atom   44   44 HB2   CCYS                    1  1.0000  0
 atom   46   46 HG    CCYS                    1  1.0000  0
+atom  234  234 OC1   CCYS                    8 16.0000  0
+atom  234  234 OC2   CCYS                    8 16.0000  0
 
 # RESIDUE CGLH 17
 atom    7    7 N     CGLH                    7 14.0000  0
@@ -1516,6 +1530,8 @@ atom  160  160 HB2   CGLH                    1  1.0000  0
 atom  162  162 HG1   CGLH                    1  1.0000  0
 atom  162  162 HG2   CGLH                    1  1.0000  0
 atom  166  166 HE2   CGLH                    1  1.0000  0
+atom  234  234 OC1   CGLH                    8 16.0000  0
+atom  234  234 OC2   CGLH                    8 16.0000  0
 
 # RESIDUE CGLN 18
 atom    7    7 N     CGLN                    7 14.0000  0
@@ -1536,6 +1552,8 @@ atom  170  170 HG1   CGLN                    1  1.0000  0
 atom  170  170 HG2   CGLN                    1  1.0000  0
 atom  174  174 1HE2  CGLN                    1  1.0000  0
 atom  174  174 2HE2  CGLN                    1  1.0000  0
+atom  234  234 OC1   CGLN                    8 16.0000  0
+atom  234  234 OC2   CGLN                    8 16.0000  0
 
 # RESIDUE CGLU 16
 atom    7    7 N     CGLU                    7 14.0000  0
@@ -1554,6 +1572,8 @@ atom  154  154 HB1   CGLU                    1  1.0000  0
 atom  154  154 HB2   CGLU                    1  1.0000  0
 atom  156  156 HG1   CGLU                    1  1.0000  0
 atom  156  156 HG2   CGLU                    1  1.0000  0
+atom  234  234 OC1   CGLU                    8 16.0000  0
+atom  234  234 OC2   CGLU                    8 16.0000  0
 
 # RESIDUE CGLY 8
 atom    1    1 N     CGLY                    7 14.0000  0
@@ -1564,6 +1584,8 @@ atom  234  234 OXT   CGLY                    8 16.0000  0
 atom    4    4 H     CGLY                    1  1.0000  0
 atom    6    6 HA1   CGLY                    1  1.0000  0
 atom    6    6 HA2   CGLY                    1  1.0000  0
+atom  234  234 OC1   CGLY                    8 16.0000  0
+atom  234  234 OC2   CGLY                    8 16.0000  0
 
 # RESIDUE CHID 18
 atom    7    7 N     CHID                    7 14.0000  0
@@ -1584,6 +1606,8 @@ atom  118  118 HB2   CHID                    1  1.0000  0
 atom  121  121 HD1   CHID                    1  1.0000  0
 atom  123  123 HD2   CHID                    1  1.0000  0
 atom  125  125 HE1   CHID                    1  1.0000  0
+atom  234  234 OC1   CHID                    8 16.0000  0
+atom  234  234 OC2   CHID                    8 16.0000  0
 
 # RESIDUE CHIE 18
 atom    7    7 N     CHIE                    7 14.0000  0
@@ -1604,6 +1628,8 @@ atom  128  128 HB2   CHIE                    1  1.0000  0
 atom  132  132 HD2   CHIE                    1  1.0000  0
 atom  134  134 HE1   CHIE                    1  1.0000  0
 atom  136  136 HE2   CHIE                    1  1.0000  0
+atom  234  234 OC1   CHIE                    8 16.0000  0
+atom  234  234 OC2   CHIE                    8 16.0000  0
 
 # RESIDUE CHIS 19
 atom    7    7 N     CHIS                    7 14.0000  0
@@ -1625,8 +1651,10 @@ atom  110  110 HD1   CHIS                    1  1.0000  0
 atom  112  112 HD2   CHIS                    1  1.0000  0
 atom  114  114 HE1   CHIS                    1  1.0000  0
 atom  116  116 HE2   CHIS                    1  1.0000  0
+atom  234  234 OC1   CHIS                    8 16.0000  0
+atom  234  234 OC2   CHIS                    8 16.0000  0
 
-# RESIDUE C	 20
+# RESIDUE CILE	 20
 atom    7    7 N     CILE                    7 14.0000  0
 atom    8    8 CA    CILE                    6 12.0000  0
 atom  233  233 C     CILE                    6 12.0000  0
@@ -1647,6 +1675,8 @@ atom   30   30 3HG2  CILE                    1  1.0000  0
 atom   32   32 HD1   CILE                    1  1.0000  0
 atom   32   32 HD2   CILE                    1  1.0000  0
 atom   32   32 HD3   CILE                    1  1.0000  0
+atom  234  234 OC1   CILE                    8 16.0000  0
+atom  234  234 OC2   CILE                    8 16.0000  0
 
 # RESIDUE CLEU 20
 atom    7    7 N     CLEU                    7 14.0000  0
@@ -1669,6 +1699,8 @@ atom   24   24 3HD1  CLEU                    1  1.0000  0
 atom   24   24 1HD2  CLEU                    1  1.0000  0
 atom   24   24 2HD2  CLEU                    1  1.0000  0
 atom   24   24 3HD2  CLEU                    1  1.0000  0
+atom  234  234 OC1   CLEU                    8 16.0000  0
+atom  234  234 OC2   CLEU                    8 16.0000  0
 
 # RESIDUE CLYD 22
 atom    7    7 N     CLYD                    7 14.0000  0
@@ -1693,6 +1725,8 @@ atom  199  199 HE2   CLYD                    1  1.0000  0
 atom  199  199 HE3   CLYD                    1  1.0000  0
 atom  201  201 HZ1   CLYD                    1  1.0000  0
 atom  201  201 HZ2   CLYD                    1  1.0000  0
+atom  234  234 OC1   CLYD                    8 16.0000  0
+atom  234  234 OC2   CLYD                    8 16.0000  0
 
 # RESIDUE CLYS 23
 atom    7    7 N     CLYS                    7 14.0000  0
@@ -1719,6 +1753,8 @@ atom  189  189 HE2   CLYS                    1  1.0000  0
 atom  191  191 HZ1   CLYS                    1  1.0000  0
 atom  191  191 HZ2   CLYS                    1  1.0000  0
 atom  191  191 HZ3   CLYS                    1  1.0000  0
+atom  234  234 OC1   CLYS                    8 16.0000  0
+atom  234  234 OC2   CLYS                    8 16.0000  0
 
 # RESIDUE CMET 18
 atom    7    7 N     CMET                    7 14.0000  0
@@ -1739,6 +1775,8 @@ atom  178  178 HG2   CMET                    1  1.0000  0
 atom  181  181 HE1   CMET                    1  1.0000  0
 atom  181  181 HE2   CMET                    1  1.0000  0
 atom  181  181 HE3   CMET                    1  1.0000  0
+atom  234  234 OC1   CMET                    8 16.0000  0
+atom  234  234 OC2   CMET                    8 16.0000  0
 
 # RESIDUE CNME 6
 atom  227  227 N     CNME                    7 14.0000  0
@@ -1769,6 +1807,8 @@ atom  218  218 HD3   CORN                    1  1.0000  0
 atom  220  220 HE1   CORN                    1  1.0000  0
 atom  220  220 HE2   CORN                    1  1.0000  0
 atom  220  220 HE3   CORN                    1  1.0000  0
+atom  234  234 OC1   CORN                    8 16.0000  0
+atom  234  234 OC2   CORN                    8 16.0000  0
 
 # RESIDUE CPHE 21
 atom    7    7 N     CPHE                    7 14.0000  0
@@ -1792,6 +1832,8 @@ atom   65   65 HD2   CPHE                    1  1.0000  0
 atom   67   67 HE1   CPHE                    1  1.0000  0
 atom   67   67 HE2   CPHE                    1  1.0000  0
 atom   69   69 HZ    CPHE                    1  1.0000  0
+atom  234  234 OC1   CPHE                    8 16.0000  0
+atom  234  234 OC2   CPHE                    8 16.0000  0
 
 # RESIDUE CPRO 15
 atom   50   50 N     CPRO                    7 14.0000  0
@@ -1809,6 +1851,8 @@ atom   58   58 HG1   CPRO                    1  1.0000  0
 atom   58   58 HG2   CPRO                    1  1.0000  0
 atom   60   60 HD1   CPRO                    1  1.0000  0
 atom   60   60 HD2   CPRO                    1  1.0000  0
+atom  234  234 OC1   CPRO                    8 16.0000  0
+atom  234  234 OC2   CPRO                    8 16.0000  0
 
 # RESIDUE CSER 12
 atom    7    7 N     CSER                    7 14.0000  0
@@ -1823,6 +1867,8 @@ atom   12   12 HA    CSER                    1  1.0000  0
 atom   34   34 HB1   CSER                    1  1.0000  0
 atom   34   34 HB2   CSER                    1  1.0000  0
 atom   36   36 HG    CSER                    1  1.0000  0
+atom  234  234 OC1   CSER                    8 16.0000  0
+atom  234  234 OC2   CSER                    8 16.0000  0
 
 # RESIDUE CTHR 15
 atom    7    7 N     CTHR                    7 14.0000  0
@@ -1840,6 +1886,8 @@ atom   40   40 HG1   CTHR                    1  1.0000  0
 atom   42   42 1HG2  CTHR                    1  1.0000  0
 atom   42   42 2HG2  CTHR                    1  1.0000  0
 atom   42   42 3HG2  CTHR                    1  1.0000  0
+atom  234  234 OC1   CTHR                    8 16.0000  0
+atom  234  234 OC2   CTHR                    8 16.0000  0
 
 # RESIDUE CTRP 25
 atom    7    7 N     CTRP                    7 14.0000  0
@@ -1867,6 +1915,8 @@ atom   99   99 HE3   CTRP                    1  1.0000  0
 atom  101  101 HZ2   CTRP                    1  1.0000  0
 atom  103  103 HZ3   CTRP                    1  1.0000  0
 atom  105  105 HH2   CTRP                    1  1.0000  0
+atom  234  234 OC1   CTRP                    8 16.0000  0
+atom  234  234 OC2   CTRP                    8 16.0000  0
 
 # RESIDUE CTYD 21
 atom    7    7 N     CTYD                    7 14.0000  0
@@ -1890,6 +1940,8 @@ atom   84   84 HD1   CTYD                    1  1.0000  0
 atom   84   84 HD2   CTYD                    1  1.0000  0
 atom   86   86 HE1   CTYD                    1  1.0000  0
 atom   86   86 HE2   CTYD                    1  1.0000  0
+atom  234  234 OC1   CTYD                    8 16.0000  0
+atom  234  234 OC2   CTYD                    8 16.0000  0
 
 # RESIDUE CTYR 22
 atom    7    7 N     CTYR                    7 14.0000  0
@@ -1914,6 +1966,8 @@ atom   74   74 HD2   CTYR                    1  1.0000  0
 atom   76   76 HE1   CTYR                    1  1.0000  0
 atom   76   76 HE2   CTYR                    1  1.0000  0
 atom   79   79 HH    CTYR                    1  1.0000  0
+atom  234  234 OC1   CTYR                    8 16.0000  0
+atom  234  234 OC2   CTYR                    8 16.0000  0
 
 # RESIDUE CVAL 17
 atom    7    7 N     CVAL                    7 14.0000  0
@@ -1933,6 +1987,8 @@ atom   18   18 3HG1  CVAL                    1  1.0000  0
 atom   18   18 1HG2  CVAL                    1  1.0000  0
 atom   18   18 2HG2  CVAL                    1  1.0000  0
 atom   18   18 3HG2  CVAL                    1  1.0000  0
+atom  234  234 OC1   CVAL                    8 16.0000  0
+atom  234  234 OC2   CVAL                    8 16.0000  0
 
 # RESIDUE NACE 6
 atom  221  221 CH3   NACE                    6 12.0000  0
@@ -2552,3 +2608,17 @@ atom  371  371 C     CRO                    6 12.0107  0
 atom  389  389 O     CRO                    8 15.9994  0
 
 
+
+# RESIDUE CNC
+atom  366  366 N     CNC                    7 14.0067  0
+atom  375  375 H     CNC                    1  1.00794  0
+atom  364  364 CA    CNC                    6 12.0107  0
+atom  373  373 HA    CNC                    1  1.00794  0
+atom  367  367 C     CNC                    6 12.0107  0
+atom  374  374 O     CNC                    8 15.9994  0
+atom  372  372 H     CNC                    1  1.00794  0
+atom  372  372 H     CNC                    1  1.00794  0
+atom  365  365 C     CNC                    6 12.0107  0
+atom  370  370 S     CNC                    16 32.065  0
+atom  371  371 C     CNC                    6 12.0107  0
+atom  379  379 N     CNC                    7 14.0067  0

@@ -20,8 +20,16 @@ def __init__(poltype):
     PolarizableTyper.__init__(poltype)
     
 def CallJobsSeriallyLocalHost(poltype,listofjobs):
+    finishedjobs=[]
+    errorjobs=[]
     for job in listofjobs:
-        poltype.call_subsystem(job,False)
+        try:
+            poltype.call_subsystem(job,True)
+            finishedjobs.append(job)
+        except:
+            finishedjobs.append(job)
+            errorjobs.append(job)
+    return finishedjobs,errorjobs
 
 
 def ExecuteOptJobs(poltype,listofstructurestorunQM,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint):
@@ -50,17 +58,18 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,fullrange,optmol,a,b,c,d,tora
 
     return outputlogs,listofjobs,scriptname,scratchdir,jobtooutputlog
 
-def TinkerMinimizePostQMOpt(poltype,outputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint):
+def TinkerMinimizePostQMOpt(poltype,outputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,finishedjobs,errorjobs):
     torxyznames=[]
     for i in range(len(outputlogs)):
         outputlog=outputlogs[i]
-        phaseangle=fullrange[i]
-        if not poltype.use_gaus:
-            finalstruct=outputlog.replace('_psi4.log','_psi4.xyz')
-            cartxyz,torxyzfname=tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,finalstruct,torsionrestraint,'_postQMOPTprefit',poltype.key4fname,'../')
-        else:
-            cartxyz,torxyzfname=tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,outputlog,torsionrestraint,'_postQMOPTprefit',poltype.key4fname,'../')
-        torxyznames.append(torxyzfname)
+        if outputlog in finishedjobs and outputlog not in errorjobs:
+            phaseangle=fullrange[i]
+            if not poltype.use_gaus:
+                finalstruct=outputlog.replace('_psi4.log','_psi4.xyz')
+                cartxyz,torxyzfname=tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,finalstruct,torsionrestraint,'_postQMOPTprefit',poltype.key4fname,'../')
+            else:
+                cartxyz,torxyzfname=tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,outputlog,torsionrestraint,'_postQMOPTprefit',poltype.key4fname,'../')
+            torxyznames.append(torxyzfname)
     return torxyznames
 
 def ExecuteSPJobs(poltype,torxyznames,optoutputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint):
@@ -103,6 +112,7 @@ def ExecuteSPJobs(poltype,torxyznames,optoutputlogs,fullrange,optmol,a,b,c,d,tor
 
 def WaitForTermination(poltype,listofjobs,outputlogs,jobtooutputlog):
     finishedjobs=[]
+    errorjobs=[]
     sleeptime=.1
     while len(finishedjobs)!=len(listofjobs):
         for job in jobtooutputlog.keys():
@@ -121,6 +131,7 @@ def WaitForTermination(poltype,listofjobs,outputlogs,jobtooutputlog):
                 if outputlog not in finishedjobs:
                     opt.ErrorTerm(poltype,outputlog)
                     finishedjobs.append(outputlog)
+                    errorjobs.append(outputlog)
             elif finished==False and error==False:
                 poltype.WriteToLog('Waiting on '+outputlog+' '+'for termination ')
             else: # this case is finshed=True and error=True because there stupid quotes sometimes have word error in it
@@ -132,6 +143,7 @@ def WaitForTermination(poltype,listofjobs,outputlogs,jobtooutputlog):
         poltype.WriteToLog(string)
         time.sleep(sleeptime*60) # check logs every minute
     poltype.WriteToLog('All jobs have terminated ')
+    return finishedjobs,errorjobs
 
 
 def CreateGausTorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optmol,torxyzfname,consttorlist):
@@ -344,21 +356,21 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         if poltype.externalapi!=None:
             if len(listofjobs)!=0:
                 call.CallExternalAPI(poltype,listofjobs,scriptname,scratchdir)
-            WaitForTermination(poltype,listofjobs,outputlogs,jobtooutputlog)
+            finishedjobs,errorjobs=WaitForTermination(poltype,listofjobs,outputlogs,jobtooutputlog)
         else:
-            CallJobsSeriallyLocalHost(poltype,listofjobs)
+            finishedjobs,errorjobs=CallJobsSeriallyLocalHost(poltype,listofjobs)
         if poltype.use_gaus==False and poltype.use_gausoptonly==False: # need to extract final structure from Psi4 log file
             for outputlog in outputlogs:
                 finished,error=opt.is_qm_normal_termination(poltype,outputlog)
 
-        torxyzfnames=TinkerMinimizePostQMOpt(poltype,outputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
+        torxyzfnames=TinkerMinimizePostQMOpt(poltype,outputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,finishedjobs,errorjobs)
         outputlogs,listofjobs,scriptname,scratchdir,jobtooutputlog=ExecuteSPJobs(poltype,torxyzfnames,outputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
         if poltype.externalapi!=None:
             if len(listofjobs)!=0:
                 call.CallExternalAPI(poltype,listofjobs,scriptname,scratchdir)
-            WaitForTermination(poltype,listofjobs,outputlogs,jobtooutputlog)
+            finshedjobs,errorjobs=WaitForTermination(poltype,listofjobs,outputlogs,jobtooutputlog)
         else:
-            CallJobsSeriallyLocalHost(poltype,listofjobs)
+            finishedjobs,errorjobs=CallJobsSeriallyLocalHost(poltype,listofjobs)
     os.chdir('..')
 
 def GenerateBondTopology(poltype,optmol):
