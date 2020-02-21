@@ -882,7 +882,7 @@ def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,molecprefix
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')
     temp.write('set freeze_core True'+'\n')
     temp.write("E, wfn = energy('%s/%s',return_wfn=True)" % (poltype.torspmethod.lower(),poltype.torspbasisset)+'\n')
-    temp.write('oeprop("WIBERG_LOWDIN_INDICES")'+'\n')
+    temp.write('oeprop(wfn,"WIBERG_LOWDIN_INDICES")'+'\n')
 
     temp.write('clean()'+'\n')
     temp.close()

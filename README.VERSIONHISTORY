@@ -70,3 +70,5 @@
 2.1.9
 * Input structure for mutated residues can have hydrogens on back bone now. Bug for finding all transferable torsions is fixed. See Example ModifiedAminoAcid
 * Instead of using babel to predict bonds from PDB via distances a library with SMART strings for amino acids and nucleic acids (residue_connect.txt) is used to match to PDB guess via distances but only keep matched bonds and also bonds connecting residues. The babel guess will sometimes but bonds between sidechains if they are too close to each other in the PDB file so a libarary was needed instead.
+2.2.0
+* PSI4 error for torsion SP quantum jobs computing Wiberg Bond Index, forgot to pass wavefunction to oeprop class

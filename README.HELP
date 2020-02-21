@@ -28,11 +28,6 @@ If using modifiedresidues library and a type number for the given atom index and
 
 If POLTYPE crashes, you do not need to delete any quantum data or tinker data, POLTYPE will recognize that the file exists and attempt to continue with it.
 
-If using Gaussian (for example gaussian for optimization as below) and also using the default optimization method wB97X-D,
-Gaussian will complain since it used wB97XD instead. This can be fixed with the appropriate inputs shown below.
-use_gausoptonly
-optmethod=wB97XD
-toroptmethod=wB97XD
 
 
 Less Common Errors
@@ -50,6 +45,7 @@ If there are no python errors as shown above, please read *-poltype.log to trace
 
 3) Compare the inputs of the command to the inputs in successful poltype job. Look for anything different that might cause the error.
 
+4) Try googling issue such as error in Psi4/Gaussian log file
 
 Modified Amino Acid Errors:
 Typically errors here that appear as undefined types or missing parameters in the final key files are a result of inconsistency between the atom label and residue label in the input PDB file and the atom label, residue label in the library lib.bio18_conv1.txt used to convert atomlabel, residue label to type numbers.
