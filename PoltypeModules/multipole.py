@@ -276,6 +276,8 @@ def gen_peditinfile(poltype,mol):
            
 
         f.write("\n")
+        f.flush()
+        os.fsync(f.fileno())
         #Define polarizable groups by cutting bonds
         iterbond = openbabel.OBMolBondIter(mol)
         for b in iterbond:

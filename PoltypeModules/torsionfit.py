@@ -2,6 +2,7 @@ from . import torsiongenerator as torgen
 from . import symmetry as symm
 from . import optimization as opt
 from . import electrostaticpotential as esp
+from . import fragmenter as frag
 import os
 import sys
 import shutil
@@ -83,6 +84,25 @@ def fitfunc (poltype,parms, x, torprmdict, debug = False):
         offset = parms[-1]
     tor_energy += offset
     return tor_energy
+
+def ExtractWBO(poltype,a,b,c,d,startangle,mol,phase_list=None):
+    WBOarray=[]
+    for phaseangle in phase_list:
+        angle = (startangle + phaseangle) % 360
+        if poltype.use_gaus:
+            minstrctfname = '%s-sp-%d-%d-%d-%d-%03d.log' % (poltype.molecprefix,a,b,c,d,round(angle))
+        else:
+            minstrctfname = '%s-sp-%d-%d-%d-%d-%03d_psi4.log' % (poltype.molecprefix,a,b,c,d,round(angle))
+
+        if os.path.exists(minstrctfname): # if optimization failed then SP file will not exist
+            if poltype.use_gaus:
+                WBOmatrix=frag.GrabWBOMatrixGaussian(poltype,outputlog,mol)
+            else:
+                WBOmatrix=frag.GrabWBOMatrixPsi4(poltype,outputname,mol)
+            WBOvalue=WBOmatrix[b-1,c-1]
+            WBOarray.append(WBOvalue)
+    return WBOarray
+
 
 def compute_qm_tor_energy(poltype,a,b,c,d,startangle,phase_list = None):
     """
@@ -863,6 +883,8 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
 
         # get the qm energy profile
         qm_energy_list,qang_list = compute_qm_tor_energy(poltype,a,b,c,d,torang,anglelist)
+
+        WBOarray=ExtractWBO(poltype,a,b,c,d,initangle,mol,anglist)
         tmpkeyfname = 'tmp.key'
         shutil.copy(tmpkey1basename, tmpkeyfname)
         # get the original mm energy profile
@@ -918,7 +940,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         ax.text(0.05, 1.1, 'RMSD(MM2,QM) Wei=%s,Abs=%s'%(round(minRMSDW,2),round(minRMSD,2)), transform=ax.transAxes, fontsize=12,verticalalignment='top')
         # mm + fit
         line4, =ax.plot(mang_list,ff_list,'md-',label='MM1+Fit')
-
+        line5, =ax.plot(qang_list,WBOarray,'y',label='WBO')
         plt.xlabel('Dihedral Angle')
         plt.ylabel('SP Energy (kcal/mol)')
         plt.legend(handles=[line1,line2,line3,line4],loc='best')
@@ -1026,11 +1048,10 @@ def process_rot_bond_tors(poltype,mol):
 def PostfitMinAlz(poltype,keybasename,keybasepath):
     for outputlog in poltype.optoutputtotorsioninfo.keys():
         term,error=opt.is_qm_normal_termination(poltype,outputlog)
-        [a,b,c,d,torang,optmol,consttorlist,phaseangle]=poltype.optoutputtotorsioninfo[outputlog]
+        [a,b,c,d,torang,optmol,consttorlist,phaseangle,cartxyzname]=poltype.optoutputtotorsioninfo[outputlog]
         if term==True:     
             if not poltype.use_gaus:
-                finalstruct=outputlog.replace('_psi4.log','_psi4.xyz')
-                cartxyz,torxyzfname=torgen.tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,finalstruct,poltype.torsionrestraint,'_postQMOPTpostfit',keybasename,keybasepath)
+                cartxyz,torxyzfname=torgen.tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,cartxyzname,poltype.torsionrestraint,'_postQMOPTpostfit',keybasename,keybasepath)
             else:
                 cartxyz,torxyzfname=torgen.tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,outputlog,poltype.torsionrestraint,'_postQMOPTpostfit',keybasename,keybasepath)
 

@@ -54,12 +54,13 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,fullrange,optmol,a,b,c,d,tora
                 jobtooutputlog[cmdstr]=outputlog
 
         outputlogs.append(outputlog)
-        poltype.optoutputtotorsioninfo[outputlog]= [a,b,c,d,torang,optmol,consttorlist,phaseangle]
-
+        
     return outputlogs,listofjobs,scriptname,scratchdir,jobtooutputlog
 
 def TinkerMinimizePostQMOpt(poltype,outputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,finishedjobs,errorjobs):
     torxyznames=[]
+    finishedoutputlogs=[]
+    cartxyznames=[]
     for i in range(len(outputlogs)):
         outputlog=outputlogs[i]
         if outputlog in finishedjobs and outputlog not in errorjobs:
@@ -70,7 +71,9 @@ def TinkerMinimizePostQMOpt(poltype,outputlogs,fullrange,optmol,a,b,c,d,torang,c
             else:
                 cartxyz,torxyzfname=tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,outputlog,torsionrestraint,'_postQMOPTprefit',poltype.key4fname,'../')
             torxyznames.append(torxyzfname)
-    return torxyznames
+            finishedoutputlogs.append(outputlog)
+            cartxyznames.append(cartxyz)
+    return torxyznames,finishedoutputlogs,cartxyznames
 
 def ExecuteSPJobs(poltype,torxyznames,optoutputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint):
     jobtooutputlog={}
@@ -362,9 +365,14 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         if poltype.use_gaus==False and poltype.use_gausoptonly==False: # need to extract final structure from Psi4 log file
             for outputlog in outputlogs:
                 finished,error=opt.is_qm_normal_termination(poltype,outputlog)
+        print('finishedjobs',finishedjobs)
+        torxyznames,finishedoutputlogs,cartxyznames=TinkerMinimizePostQMOpt(poltype,outputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,finishedjobs,errorjobs)
+        for i in range(len(finishedoutputlogs)):
+            outputlog=finishedoutputlogs[i]
+            cartxyzname=cartxyznames[i] 
+            poltype.optoutputtotorsioninfo[outputlog]= [a,b,c,d,torang,optmol,consttorlist,phaseangle,cartxyzname]
 
-        torxyzfnames=TinkerMinimizePostQMOpt(poltype,outputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,finishedjobs,errorjobs)
-        outputlogs,listofjobs,scriptname,scratchdir,jobtooutputlog=ExecuteSPJobs(poltype,torxyzfnames,outputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
+        outputlogs,listofjobs,scriptname,scratchdir,jobtooutputlog=ExecuteSPJobs(poltype,torxyznames,finishedoutputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
         if poltype.externalapi!=None:
             if len(listofjobs)!=0:
                 call.CallExternalAPI(poltype,listofjobs,scriptname,scratchdir)
@@ -428,7 +436,7 @@ def get_torlist(poltype,mol):
         t3idx=t3.GetIdx()
         t2val=t2.GetValence()
         t3val=t3.GetValence()
-        if ((bond.IsRotor()) or (str(t2idx) in poltype.onlyrotbndlist and str(t3idx) in poltype.onlyrotbndlist) or [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or (poltype.rotalltors and t2val>=2 and t3val>=2)) and bond.IsInRing()==False and t2.IsInRing()==False and t3.IsInRing()==False:
+        if ((bond.IsRotor()) or (str(t2idx) in poltype.onlyrotbndlist and str(t3idx) in poltype.onlyrotbndlist) or [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or (poltype.rotalltors and t2val>=2 and t3val>=2)):
             skiptorsion = False
             t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
             # is the torsion in toromitlist
@@ -836,6 +844,7 @@ def write_arr_to_file(poltype,fname, array_list):
         for ele in cols:
             outfh.write("%10.4f" % ele)
         outfh.write("\n")
+
 
 def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,molecprefix,a,b,c,d,torang,phaseangle,makecube=None):
     inputname= '%s-sp-%d-%d-%d-%d-%03d_psi4.dat' % (molecprefix,a,b,c,d,round((torang+phaseangle)%360))

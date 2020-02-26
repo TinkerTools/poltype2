@@ -91,7 +91,7 @@ def GrabFinalXYZStructure(poltype,logname,filename):
                 if len(linesplit)==4 and bool(re.search(r'\d', line))==True and 'point' not in line:
                     temp.write(line.lstrip())
         temp.close()
-    else:
+    elif poltype.use_gaus==True or poltype.use_gausoptonly==True:
         obConversion = openbabel.OBConversion()
         tempmol = openbabel.OBMol()
         inFormat = obConversion.FormatFromExt(logname)
@@ -178,7 +178,6 @@ def CheckBondConnectivity(poltype,mol,optmol):
     for atm in atomitermol:
        
         atmidxmol=atm.GetIdx()
-        
         atmoptmol=optmol.GetAtom(atmidxmol)
         atmidxoptmol=atmoptmol.GetIdx()
         atmneighbidxlist=[]
@@ -339,7 +338,7 @@ def is_qm_normal_termination(poltype,logfname): # needs to handle error checking
                 term=True
             elif ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation' in line or 'galloc:  could not allocate memory' in line) and 'DIIS' not in line:
                 error=True
-    if term==True:
+    if term==True and 'opt' in logfname:
         GrabFinalXYZStructure(poltype,logfname,logfname.replace('.log','.xyz'))
     return term,error
 

@@ -2599,7 +2599,7 @@ class Valence():
                     b=mol.GetAtom(bidx)
                     c=mol.GetAtom(cidx)
                     bond=mol.GetBond(bidx,cidx)
-                    if check==False and bond.IsInRing()==False and b.IsInRing()==False and c.IsInRing()==False and rot==True:
+                    if check==False and rot==True:
                         zeroed=True
                     if(dorot):
                         for r in rotbnds:
