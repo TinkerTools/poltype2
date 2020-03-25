@@ -2573,6 +2573,7 @@ class Valence():
         zeroed = False
         self.logfh.write('****************************************************************************************************'+'\n')
         indextoneighbidxs=self.FindAllNeighborIndexes(mol)
+        self.logfh.write(str(rotbnds)+'\n')
         for v in vals:
             for skey in iter(v):
                 openbabel.OBSmartsPattern.Init(self.sp,skey)
@@ -2584,21 +2585,27 @@ class Valence():
                     else:
                         sortedlist = [self.idxtoclass[ia[0] - 1], self.idxtoclass[ia[1] - 1], self.idxtoclass[ia[2] - 1], self.idxtoclass[ia[3] - 1]]
                     key1 = self.sorttorsion(sortedlist)
-                    # grab the middle two atoms and find all of their neighbors if those indexes are also within the matched indexes from SMARTS, then this torsion is transferable
-                    firstneighborindexes=indextoneighbidxs[int(ia[1])]
-                    secondneighborindexes=indextoneighbidxs[int(ia[2])]
-                    neighborindexes=firstneighborindexes+secondneighborindexes
-                    check=self.CheckIfNeighborsExistInSMARTMatch(neighborindexes,ia)
-                    rot=self.CheckIfTorsionIsRotatable(rotbnds,ia)
                     if(len(v[skey]) == 7):
+                        aidx=ia[v[skey][0] - 1]
                         bidx=ia[v[skey][1] - 1] 
                         cidx=ia[v[skey][2] - 1]
+                        didx=ia[v[skey][3] - 1]
+
                     else:
+                        aidx=ia[0]
                         bidx=ia[1]
                         cidx=ia[2]
+                        didx=ia[3]
                     b=mol.GetAtom(bidx)
                     c=mol.GetAtom(cidx)
                     bond=mol.GetBond(bidx,cidx)
+
+                    # grab the middle two atoms and find all of their neighbors if those indexes are also within the matched indexes from SMARTS, then this torsion is transferable
+                    firstneighborindexes=indextoneighbidxs[bidx]
+                    secondneighborindexes=indextoneighbidxs[cidx]
+                    neighborindexes=firstneighborindexes+secondneighborindexes
+                    check=self.CheckIfNeighborsExistInSMARTMatch(neighborindexes,ia)
+                    rot=bond.IsRotor()
                     if check==False and rot==True:
                         zeroed=True
                     if(dorot):
@@ -2650,19 +2657,7 @@ class Valence():
         x=list(d.values())
         return x
 
-    def CheckIfTorsionIsRotatable(self,rotbnds,ia):
-        rot=False
-        for r in rotbnds:
-            a=r[0]
-            b=r[1]
-            c=r[2]
-            d=r[3]
-            if ia[0]==a and ia[1]==b and ia[2]==c and ia[3]==d:
-                rot=True
-            elif ia[0]==d and ia[1]==c and ia[2]==b and ia[3]==a:
-                rot=True
-        return rot
-
+    
 
     def FindAllNeighborIndexes(self,mol):
         indextoneighbidxs={}
@@ -2802,8 +2797,8 @@ class Valence():
                 results=self.torguess(mol,dorot,rotbnds)
                 for x in results:
                     f.write(x + "\n")
-                for x in self.pitorguess(mol):
-                    f.write(x+ "\n")
+                #for x in self.pitorguess(mol):
+                #    f.write(x+ "\n")
                 f.write('\n')
             else:
                 f.write(line)

@@ -660,15 +660,14 @@ def run_gdma(poltype):
     if not os.path.isfile(poltype.fckdmafname):
         poltype.fckdmafname = os.path.splitext(poltype.fckdmafname)[0]
 
-    assert os.path.isfile(poltype.fckdmafname), "Error: " + poltype.fckdmafname + " does not exist."
+    assert os.path.isfile(poltype.fckdmafname), "Error: " + poltype.fckdmafname + " does not exist."+' '+os.getcwd()
     poltype.gdmainfname = poltype.assign_filenames ( "gdmainfname" , ".gdmain")
     gen_gdmain(poltype,poltype.gdmainfname,poltype.molecprefix,poltype.fckdmafname,poltype.dmamethod)
 
     cmdstr = poltype.gdmaexe + " < " + poltype.gdmainfname + " > " + poltype.gdmafname
     poltype.call_subsystem(cmdstr,True)
 
-    assert os.path.getsize(poltype.gdmafname) > 0, "Error: " + \
-       os.path.basename(poltype.gdmaexe) + " cannot create .gdmaout file."
+    assert os.path.getsize(poltype.gdmafname) > 0, "Error: " + os.getcwd() +' '+os.path.basename(poltype.gdmaexe) + " cannot create .gdmaout file."
 
 def AverageMultipoles(poltype,optmol):
     # gen input file

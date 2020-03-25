@@ -1,3 +1,10 @@
+RUNNING POLTYPE
+********************************************
+*Need two input files to run: *.ini and *.sdf. The first is poltype controls and the sdf is the molecule.
+*Prepare the poltype.ini and sdf file as shown below
+*Navigate to directory containing poltype.ini and .sdf file, and run:
+
+           python /path_to_poltype/poltype.py
 
 HELP
 *********************************************
@@ -5,8 +12,11 @@ python /path_to_poltype/poltype.py --help
 
 Unittesting
 *********************************************
-python /path_to_poltype/poltype.py --unittest
+Make sure poltypepackage is in PYTHONPATH or you are in parentdirectory of poltypepackage folder.
+python ~/poltypepackage/PoltypeModules/test_poltype.py
+python ~/poltypepackage/PoltypeModules/test_poltype.py --method=test_Fragmenter --examplepath=/home/bdw2292/PoltypeJobs/MOLECULE0DontFrag
 
+In order to test the fragmenter, run POLTYPE with fragmenting option turned off to paramterize the torsion first. 
 
 ttt.xyz and ttt.key are the resulting structure and parameter files you will need.
 
@@ -56,12 +66,6 @@ If the number of expected atoms connected to an atom type are not found, it is p
 
 If restarting poltype job after error delete the ModifiedPrm.prm file in poltype directory before restarting.
  
-
-Running POLTYPE
-*Prepare the poltype.ini file as shown below first*
-*Navigate to directory containing poltype.ini and .sdf file*
-*********************************************
-python /path_to_poltype/poltype.py
 
 Input Structure - SDF File
 *********************************************

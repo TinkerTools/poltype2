@@ -1,6 +1,7 @@
 from . import optimization as opt
 from . import electrostaticpotential as esp
 from . import torsiongenerator as torgen
+from . import apicall as call
 import os
 import sys
 from socket import gethostname
@@ -29,18 +30,14 @@ def gen_esp_grid(poltype,mol):
        Outputs *.cube_2
     """
     if poltype.use_gaus==False or poltype.use_gausoptonly==True:
-        temp=open('grid_esp.dat','r')
-        results=temp.readlines()
-        temp.close()
-        Vvals=[]
-        for line in results:
-            Vvals.append(line.split()[0])
-            
-        poltype.WriteToLog("Calling: " + "Generating CUBE File from PSI4")
-        with open('grid.dat', 'r') as fp:
-            gridpts = fp.readlines()
-        if len(gridpts) != len(Vvals):
-            raise Exception('Dimension error in potential calculation!')
+        Vvals,gridpts=GrabGridData(poltype)
+
+        while len(gridpts) != len(Vvals):
+            time.sleep(60)
+            sys.stdout.flush()
+            poltype.WriteToLog('Waiting to flush system stdout for grid.dat and grid_esp.dat')
+            Vvals,gridpts=GrabGridData(poltype)
+   
         # Generate a "cube" file.  I have no idea what the format should be (it's not a
         # regular cube file) so I reverse engineered one by looking at TINKER source.
         with open(poltype.qmespfname, 'w') as fp:
@@ -57,7 +54,7 @@ def gen_esp_grid(poltype,mol):
         if not os.path.isfile(fckfname):
             fckfname = os.path.splitext(fckfname)[0]
 
-        assert os.path.isfile(fckfname), "Error: " + fckfname + " does not exist."
+        assert os.path.isfile(fckfname), "Error: " + fckfname + " does not exist."+' '+os.getcwd()
         if poltype.espmethod=='MP2':
             densitystring='MP2'
         else:
@@ -68,7 +65,22 @@ def gen_esp_grid(poltype,mol):
     if not os.path.isfile(poltype.qmesp2fname):
         genqmpotcmd = poltype.potentialexe + " 2 " + poltype.qmespfname
         poltype.call_subsystem(genqmpotcmd,True)
+       
+def GrabGridData(poltype):
+    temp=open('grid_esp.dat','r')
+    results=temp.readlines()
+    temp.close()
+    Vvals=[]
+    for line in results:
+        linesplit=line.split()
+        if len(linesplit)!=0:
+            Vvals.append(linesplit[0])
         
+    poltype.WriteToLog("Calling: " + "Generating CUBE File from PSI4")
+    with open('grid.dat', 'r') as fp:
+        gridpts = fp.readlines()
+    return Vvals,gridpts
+
 
 def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,numproc,makecube=None):
     tempread=open(comfilecoords,'r')
@@ -101,10 +113,12 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
     return inputname,outputname
 
 def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
+    poltype.WriteToLog('about to read '+comfilecoords)
     tempread=open(comfilecoords,'r')
     results=tempread.readlines()
     tempread.close()
     inputname=comfilename.replace('.com','_psi4.dat')
+    poltype.WriteToLog('about to make dma input')
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
     temp.write('%d %d\n' % (poltype.totalcharge, 1))
@@ -155,7 +169,7 @@ def CheckRMSPD(poltype):
             if float(RMSPD)>poltype.maxRMSPD:
                 poltype.WriteToLog('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
             
-                raise ValueError('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = ',RMSPD)
+                raise ValueError(os.getcwd()+' '+'Warning: RMSPD of QM and MM optimized structures is high, RMSPD = ',RMSPD)
     return rmspdexists
 
 def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
@@ -173,10 +187,6 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
     Referenced By: run_gaussian
     Description: -
     """
-    optlogfname = os.path.splitext(comfname)[0] + ".log"
-    title = "\"" + poltype.molecprefix + " Gaussian SP Calculation on " + gethostname() + "\""
-    cmdstr = poltype.babelexe + " --title " + title + " -i g03 " + poltype.gausoptfname + " " + tailfname
-    poltype.call_subsystem(cmdstr)
 
     opt.write_com_header(poltype,comfname,chkname,maxdisk,maxmem,numproc)
     tmpfh = open(comfname, "a")
@@ -202,20 +212,18 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
     if ('I ' in mol.GetSpacedFormula()):
         opstr=re.sub(r'(?i)(6-31|aug-cc)\S+',r'Gen',opstr)
     tmpfh.write(opstr)
+    commentstr = poltype.molecprefix + " Gaussian SP Calculation on " + gethostname()
+    tmpfh.write('\n%s\n\n' % commentstr)
+    tmpfh.write('%d %d\n' % (mol.GetTotalCharge(), mol.GetTotalSpinMultiplicity()))
     tmpfh.close()
-    cmdstr = "tail -n +2 " + tailfname + " | head -n 4 >> " + comfname
-    os.system(cmdstr)
-    cmdstr = "tail -n +6 " + tailfname + " | sed -e's/ .*//' > tmp1.txt"
-    os.system(cmdstr)
-    cmdstr = "grep -A " + str(mol.NumAtoms()+4) + " 'Standard orientation' " + poltype.gausoptfname + " | tail -n " + str(mol.NumAtoms()) + " | sed -e's/^.* 0 //' > tmp2.txt"
-    os.system(cmdstr)
-    cmdstr = "paste tmp1.txt tmp2.txt >> " + comfname
-    os.system(cmdstr)
-    cmdstr='rm '+'tmp1.txt'
-    os.system(cmdstr)
-    cmdstr='rm '+'tmp2.txt'
-    os.system(cmdstr)
+
+    iteratombab = openbabel.OBMolAtomIter(mol)
     tmpfh = open(comfname, "a")
+    etab = openbabel.OBElementTable()
+    for atm in iteratombab:
+        tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), atm.x(), atm.y(), atm.z()))
+
+
     tmpfh.write('\n')
     tmpfh.write('$nbo bndidx $end'+'\n')
     tmpfh.write('\n')
@@ -240,29 +248,57 @@ def SPForDMA(poltype,optmol,mol):
         if os.path.isfile(poltype.chkdmafname):
             os.remove(poltype.chkdmafname)
 
-        gen_comfile(poltype,poltype.comdmafname.replace('.com','_temp.com'),poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkdmafname,poltype.comtmp,mol)
+        gen_comfile(poltype,poltype.comdmafname.replace('.com','_temp.com'),poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkdmafname,poltype.comtmp,optmol)
         poltype.WriteToLog("Calling: " + "Psi4 Gradient for DMA")
-        term,error=is_qm_normal_termination(poltype,poltype.logdmafname)
+        term,error=poltype.CheckNormalTermination(poltype.logdmafname)
         inputname=CreatePsi4DMAInputFile(poltype,poltype.logoptfname.replace('.log','.xyz'),poltype.comdmafname,mol)
         if term==False:
-            cmdstr='psi4 '+inputname+' '+poltype.logdmafname
-            poltype.call_subsystem(cmdstr,True)
-            term,error=is_qm_normal_termination(poltype,poltype.logdmafname)
+            cmdstr='cd '+os.getcwd()+' && '+'psi4 '+inputname+' '+poltype.logdmafname
+            jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logdmafname}
+            jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
+            scratchdir=poltype.scratchdir
+            jobtologlistfilenameprefix=os.getcwd()+r'/'+'dmajobtolog'
+            if os.path.isfile(poltype.logdmafname):
+                os.remove(poltype.logdmafname) # if chk point exists just remove logfile, there could be error in it and we dont want WaitForTermination to catch error before job is resubmitted by daemon 
+
+
+            if poltype.externalapi!=None:
+                if len(jobtooutputlog.keys())!=0:
+                    call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
+                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
+            else:
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog.keys(),jobtooutputlog)
+
+            term,error=poltype.CheckNormalTermination(poltype.logdmafname)
             if error:
                 poltype.RaiseOutputFileError(poltype.logdmafname) 
 
         
     else:
-        term,error=is_qm_normal_termination(poltype,poltype.logdmafname)
+        term,error=poltype.CheckNormalTermination(poltype.logdmafname)
         if not term:
             if os.path.isfile(poltype.chkdmafname):
                 os.remove(poltype.chkdmafname)
-            gen_comfile(poltype,poltype.comdmafname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkdmafname,poltype.comtmp,mol)
-            cmdstr = 'GAUSS_SCRDIR=' + poltype.scrtmpdir + ' ' + poltype.gausexe + " " + poltype.comdmafname
+            gen_comfile(poltype,poltype.comdmafname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkdmafname,poltype.comtmp,optmol)
+            cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdir + ' ' + poltype.gausexe + " " + poltype.comdmafname
+            
+            jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logdmafname}
+            jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
+            scratchdir=poltype.scrmpdir
+            jobtologlistfilenameprefix=os.getcwd()+r'/'+'dmajobtolog'
+            if os.path.isfile(poltype.logdmafname):
+                os.remove(poltype.logdmafname)
+            if poltype.externalapi!=None:
+                if len(jobtooutputlog.keys())!=0:
+                    call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
+                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
+            else:
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog.keys(),jobtooutputlog)
+
             poltype.call_subsystem(cmdstr,True)
             cmdstr = poltype.formchkexe + " " + poltype.chkdmafname
             poltype.call_subsystem(cmdstr,True)
-            term,error=is_qm_normal_termination(poltype,poltype.logdmafname)
+            term,error=poltype.CheckNormalTermination(poltype.logdmafname)
             if error:
                 poltype.RaiseOutputFileError(poltype.logdmafname) 
 
@@ -274,54 +310,59 @@ def SPForESP(poltype,optmol,mol):
     if poltype.use_gaus==False or poltype.use_gausoptonly==True:
         shutil.copy(poltype.espgrdfname, 'grid.dat') 
         inputname,outputname=CreatePsi4ESPInputFile(poltype,poltype.logoptfname.replace('.log','.xyz'),poltype.comespfname,mol,poltype.maxdisk,poltype.maxmem,poltype.numproc,True)
-        term,error=is_qm_normal_termination(poltype,outputname)
+        term,error=poltype.CheckNormalTermination(outputname)
         if term==False:
             poltype.WriteToLog("Calling: " + "Psi4 Gradient for ESP")
-            cmdstr='psi4 '+inputname+' '+outputname
-            poltype.call_subsystem(cmdstr,True)
-            term,error=is_qm_normal_termination(poltype,outputname)
+            cmdstr='cd '+os.getcwd()+' && '+'psi4 '+inputname+' '+outputname
+            jobtooutputlog={cmdstr:os.getcwd()+r'/'+outputname}
+            jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
+            scratchdir=poltype.scratchdir
+            jobtologlistfilenameprefix=os.getcwd()+r'/'+'espjobtolog' 
+            if os.path.isfile(outputname):
+                os.remove(outputname)
+
+            if poltype.externalapi!=None:
+                if len(jobtooutputlog.keys())!=0:
+                    call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
+                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
+            else:
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog.keys(),jobtooutputlog)
+
+            term,error=poltype.CheckNormalTermination(outputname)
             if error:
                 poltype.RaiseOutputFileError(outputname) 
 
 
     else:
-        term,error=is_qm_normal_termination(poltype,poltype.logespfname)
+        term,error=poltype.CheckNormalTermination(poltype.logespfname)
         if poltype.espfit and not term:
             if os.path.isfile(poltype.chkespfname):
                 os.remove(poltype.chkespfname)
-            gen_comfile(poltype,poltype.comespfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkespfname,poltype.comtmp,mol)
-            cmdstr = 'GAUSS_SCRDIR=' + poltype.scrtmpdir + ' ' + poltype.gausexe + " " + poltype.comespfname
-            poltype.call_subsystem(cmdstr,True)
+            gen_comfile(poltype,poltype.comespfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkespfname,poltype.comtmp,optmol)
+            cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdir + ' ' + poltype.gausexe + " " + poltype.comespfname
+            jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logespfname}
+            jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
+            scratchdir=poltype.scrtmpdir
+            jobtologlistfilenameprefix=os.getcwd()+r'/'+'espjobtolog'
+            if os.path.isfile(poltype.logespfname):
+                os.remove(poltype.logespfname)
+
+            if poltype.externalapi!=None:
+                if len(jobtooutputlog.keys())!=0:
+                    call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
+                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
+            else:
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog.keys(),jobtooutputlog)
+
             cmdstr = poltype.formchkexe + " " + poltype.chkespfname
             poltype.call_subsystem(cmdstr,True)
-            term,error=is_qm_normal_termination(poltype,poltype.logespfname)
+            term,error=poltype.CheckNormalTermination(poltype.logespfname)
             if error:
                 poltype.RaiseOutputFileError(poltype.logespfname)
 
-def is_qm_normal_termination(poltype,logfname): # needs to handle error checking now
-    """
-    Intent: Checks the *.log file for normal termination
-    """
-    error=False
-    term=False
-    if os.path.isfile(logfname):
-        for line in open(logfname):
-            if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line:
-                term=True
-            elif "Normal termination" in line:
-                term=True
-            elif ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation' in line or 'galloc:  could not allocate memory' in line) and 'DIIS' not in line:
-                error=True
-
-    return term,error
+    sys.stdout.flush()
 
 
-def NormalTerm(poltype,logfname):
-    poltype.WriteToLog("Normal termination: %s" % logfname)
-
-
-def ErrorTerm(poltype,logfname):
-    poltype.WriteToLog("ERROR termination: %s" % logfname)
 
 def GrabQMDipoles(poltype,optmol,logname):
     poltype.WriteToLog("")
@@ -368,6 +409,8 @@ def CheckDipoleMoments(poltype,optmol):
     torgen.RemoveStringFromKeyfile(poltype,poltype.tmpkeyfile,'solvate')
     cmd=poltype.analyzeexe + ' ' +  poltype.xyzoutfile+' '+'-k'+' '+poltype.tmpkeyfile + ' em | grep -A11 Charge'+'>'+'MMDipole.txt'
     poltype.call_subsystem(cmd,True)
+    while not os.path.isfile('MMDipole.txt'):
+        time.sleep(1)
     temp=open('MMDipole.txt','r')
     results=temp.readlines()
     temp.close()
@@ -375,11 +418,11 @@ def CheckDipoleMoments(poltype,optmol):
         if 'Dipole Moment' in line:
             linesplit=line.split()
             mmdipole=float(linesplit[-2])
-    poltype.WriteToLog('MM Dipole moment = '+str(mmdipole))
-    diff=qmdipole-mmdipole
-    ratio=np.abs(diff/qmdipole)
-    if ratio>poltype.dipoletol:
-        raise ValueError('Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)) 
+            poltype.WriteToLog('MM Dipole moment = '+str(mmdipole))
+            diff=qmdipole-mmdipole
+            ratio=np.abs(diff/qmdipole)
+            if ratio>poltype.dipoletol and poltype.surpressdipoleerr==False:
+                raise ValueError('Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)+' '+os.getcwd()) 
 
 def ConvertDipoleToCOMFrame(poltype,dipole,optmol):
     nucsum = 0.0

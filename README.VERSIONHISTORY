@@ -74,3 +74,5 @@
 * PSI4 error for torsion SP quantum jobs computing Wiberg Bond Index, forgot to pass wavefunction to oeprop class
 2.2.1
 * Fix error in -pedit.txt where a space was delayed before being written out to text file causing space to be in wrong place, fixed by flushing system buffer
+2.2.2 
+* Updates to README files as well as fragmenter, torsion libraries, unittesting library.

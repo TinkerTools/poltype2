@@ -29,7 +29,6 @@ After you have conda in your PATH, run the following commands. These will be ins
 _________________________________________________________________________________
 conda create -n p4env -c psi4/label/dev psi4 # this creates environments for psi4 
 conda activate p4env
-conda install -c moldesign moldesign
 conda install scipy 
 conda install matplotlib 
 conda install -c openbabel openbabel

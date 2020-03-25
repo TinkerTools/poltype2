@@ -19,67 +19,61 @@ from rdkit import Chem
 def __init__(poltype):
     PolarizableTyper.__init__(poltype)
     
-def CallJobsSeriallyLocalHost(poltype,listofjobs):
-    finishedjobs=[]
-    errorjobs=[]
-    for job in listofjobs:
-        try:
-            poltype.call_subsystem(job,True)
-            finishedjobs.append(job)
-        except:
-            finishedjobs.append(job)
-            errorjobs.append(job)
-    return finishedjobs,errorjobs
-
 
 def ExecuteOptJobs(poltype,listofstructurestorunQM,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint):
     jobtooutputlog={}
     listofjobs=[]
     outputlogs=[]
-    scriptname='QMOptJobs'+'-'+str(a)+'-'+str(b)+'-'+str(c)+'-'+str(d)
+    jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMOptJobToLog'+'-'+str(a)+'-'+str(b)+'-'+str(c)+'-'+str(d)
     for i in range(len(listofstructurestorunQM)):
         torxyzfname=listofstructurestorunQM[i]
         phaseangle=fullrange[i]
         inputname,outputlog,cmdstr,scratchdir=GenerateTorsionOptInputFile(poltype,torxyzfname,poltype.molecprefix,a,b,c,d,torang,phaseangle,optmol,consttorlist)
-        finished,error=opt.is_qm_normal_termination(poltype,outputlog)
+        finished,error=poltype.CheckNormalTermination(outputlog)
+        if finished==True and 'opt' in outputlog:
+            opt.GrabFinalXYZStructure(poltype,outputlog,outputlog.replace('.log','.xyz'))
+
         if finished==False:
             if os.path.isfile(outputlog):
                 statinfo=os.stat(outputlog)
                 size=statinfo.st_size
                 if size!=0:
                     listofjobs.append(cmdstr)
-                    jobtooutputlog[cmdstr]=outputlog
+                    jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputlog
             else:
                 listofjobs.append(cmdstr)
-                jobtooutputlog[cmdstr]=outputlog
+                jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputlog
+
 
         outputlogs.append(outputlog)
         
-    return outputlogs,listofjobs,scriptname,scratchdir,jobtooutputlog
+    return outputlogs,listofjobs,jobtologlistfilenameprefix,scratchdir,jobtooutputlog
 
-def TinkerMinimizePostQMOpt(poltype,outputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,finishedjobs,errorjobs):
+def TinkerMinimizePostQMOpt(poltype,outputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,finishedjobs,errorjobs,bondtopology):
     torxyznames=[]
     finishedoutputlogs=[]
     cartxyznames=[]
+    finishedphaseangles=[]
     for i in range(len(outputlogs)):
         outputlog=outputlogs[i]
         if outputlog in finishedjobs and outputlog not in errorjobs:
             phaseangle=fullrange[i]
             if not poltype.use_gaus:
                 finalstruct=outputlog.replace('_psi4.log','_psi4.xyz')
-                cartxyz,torxyzfname=tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,finalstruct,torsionrestraint,'_postQMOPTprefit',poltype.key4fname,'../')
+                cartxyz,torxyzfname=tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,finalstruct,torsionrestraint,'_postQMOPTprefit',poltype.key4fname,'../',bondtopology)
             else:
-                cartxyz,torxyzfname=tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,outputlog,torsionrestraint,'_postQMOPTprefit',poltype.key4fname,'../')
+                cartxyz,torxyzfname=tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,outputlog,torsionrestraint,'_postQMOPTprefit',poltype.key4fname,'../',bondtopology)
             torxyznames.append(torxyzfname)
             finishedoutputlogs.append(outputlog)
             cartxyznames.append(cartxyz)
-    return torxyznames,finishedoutputlogs,cartxyznames
+            finishedphaseangles.append(phaseangle)
+    return torxyznames,finishedoutputlogs,cartxyznames,finishedphaseangles
 
 def ExecuteSPJobs(poltype,torxyznames,optoutputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint):
     jobtooutputlog={}
     listofjobs=[]
     outputnames=[]
-    scriptname='QMSPJobs'+'-'+str(a)+'-'+str(b)+'-'+str(c)+'-'+str(d)
+    jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMSPJobToLog'+'-'+str(a)+'-'+str(b)+'-'+str(c)+'-'+str(d)
     for i in range(len(torxyznames)):
         torxyzfname=torxyznames[i]
         outputlog=optoutputlogs[i]
@@ -87,11 +81,11 @@ def ExecuteSPJobs(poltype,torxyznames,optoutputlogs,fullrange,optmol,a,b,c,d,tor
         if not poltype.use_gaus:
             finalstruct=outputlog.replace('.log','_opt.xyz')
             inputname,outputname=CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,poltype.molecprefix,a,b,c,d,torang,phaseangle)
-            cmdstr='psi4 '+inputname+' '+outputname
+            cmdstr='cd '+os.getcwd()+' && '+'psi4 '+inputname+' '+outputname
         else:
             inputname,outputname=GenerateTorsionSPInputFileGaus(poltype,torxyzfname,poltype.molecprefix,a,b,c,d,torang,phaseangle,outputlog)
-            cmdstr = 'GAUSS_SCRDIR='+poltype.scrtmpdir+' '+poltype.gausexe+' '+inputname
-        finished,error=opt.is_qm_normal_termination(poltype,outputname)
+            cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdir+' '+poltype.gausexe+' '+inputname
+        finished,error=poltype.CheckNormalTermination(outputname)
         if finished==True and error==False:
             pass
         else:
@@ -100,53 +94,19 @@ def ExecuteSPJobs(poltype,torxyznames,optoutputlogs,fullrange,optmol,a,b,c,d,tor
                 size=statinfo.st_size
                 if size!=0:
                     listofjobs.append(cmdstr)
-                    jobtooutputlog[cmdstr]=outputname
+                    jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputname
             else:
                 listofjobs.append(cmdstr)
-                jobtooutputlog[cmdstr]=outputname
+                jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputname
 
         outputnames.append(outputname)
 
     if not poltype.use_gaus:
         
-        return outputnames,listofjobs,scriptname,poltype.scratchdir,jobtooutputlog
+        return outputnames,listofjobs,jobtologlistfilenameprefix,poltype.scratchdir,jobtooutputlog
     else:
-        return outputnames,listofjobs,scriptname,poltype.scrtmpdir,jobtooutputlog
+        return outputnames,listofjobs,jobtologlistfilenameprefix,poltype.scrtmpdir,jobtooutputlog
 
-def WaitForTermination(poltype,listofjobs,outputlogs,jobtooutputlog):
-    finishedjobs=[]
-    errorjobs=[]
-    sleeptime=.1
-    while len(finishedjobs)!=len(listofjobs):
-        for job in jobtooutputlog.keys():
-            outputlog=jobtooutputlog[job]
-            if os.path.isfile(outputlog):
-                statinfo=os.stat(outputlog)
-                size=statinfo.st_size
-                if size==0:
-                    continue
-            finished,error=opt.is_qm_normal_termination(poltype,outputlog)
-            if finished==True and error==False: # then check if SP has been submitted or not
-                if outputlog not in finishedjobs:
-                    opt.NormalTerm(poltype,outputlog)
-                    finishedjobs.append(outputlog)
-            elif finished==False and error==True:
-                if outputlog not in finishedjobs:
-                    opt.ErrorTerm(poltype,outputlog)
-                    finishedjobs.append(outputlog)
-                    errorjobs.append(outputlog)
-            elif finished==False and error==False:
-                poltype.WriteToLog('Waiting on '+outputlog+' '+'for termination ')
-            else: # this case is finshed=True and error=True because there stupid quotes sometimes have word error in it
-                error=False
-                opt.NormalTerm(poltype,outputlog)
-                finishedjobs.append(outputlog)
-
-        string='Sleeping for %d '%(sleeptime)+' minute '
-        poltype.WriteToLog(string)
-        time.sleep(sleeptime*60) # check logs every minute
-    poltype.WriteToLog('All jobs have terminated ')
-    return finishedjobs,errorjobs
 
 
 def CreateGausTorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optmol,torxyzfname,consttorlist):
@@ -181,10 +141,10 @@ def CreateGausTorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optm
 def GenerateTorsionOptInputFile(poltype,torxyzfname,molecprefix,a,b,c,d,torang,phaseangle,optmol,consttorlist):
     if  poltype.use_gaus==False and poltype.use_gausoptonly==False:
         inputname,outputname=CreatePsi4TorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optmol,torxyzfname,consttorlist)
-        cmdstr='psi4 '+inputname+' '+outputname
+        cmdstr='cd '+os.getcwd()+' && '+'psi4 '+inputname+' '+outputname
     else:
         inputname,outputname=CreateGausTorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optmol,torxyzfname,consttorlist)
-        cmdstr='GAUSS_SCRDIR='+poltype.scrtmpdir+' '+poltype.gausexe+' '+inputname
+        cmdstr='cd '+os.getcwd()+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdir+' '+poltype.gausexe+' '+inputname
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
         return inputname,outputname,cmdstr,poltype.scratchdir
     else:
@@ -232,9 +192,10 @@ def tinker_minimize_angles(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phase
     return tinkerstructnamelist
 
 
-def tinker_minimize_analyze_QM_Struct(poltype,molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,prevstrctfname,torsionrestraint,designatexyz,keybase,keybasepath):
+def tinker_minimize_analyze_QM_Struct(poltype,molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,prevstrctfname,torsionrestraint,designatexyz,keybase,keybasepath,bondtopology):
     prevstruct = opt.load_structfile(poltype,prevstrctfname) # this should be a logfile
     prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
+    prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology)
     cartxyz,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,torsionrestraint,prevstruct,torang,designatexyz,keybase,keybasepath)
     toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
     term=AnalyzeTerm(poltype,toralzfname)
@@ -267,7 +228,7 @@ def tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,t
         diff= numpy.abs(currentdihedral-dihedral)
         tol=.01
         if diff>tol and diff!=360:
-            raise ValueError('Difference of '+str(diff)+' is greater than '+str(tol)+' for target dihedral of '+str(dihedral)+' and current dihedral of '+str(currentdihedral))
+            raise ValueError('Difference of '+str(diff)+' is greater than '+str(tol)+' for target dihedral of '+str(dihedral)+' and current dihedral of '+str(currentdihedral)+' '+os.getcwd())
 
     torxyzfname = '%s-opt-%d-%d-%d-%d' % (molecprefix,a,b,c,d)
     torxyzfname+='-%03d%s.xyz' % (round((torang+phaseangle)%360),designatexyz)
@@ -290,7 +251,7 @@ def tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,t
                     tmpkeyfh.write('restrain-torsion %d %d %d %d %f\n' % (resa,resb,resc,resd,torsionrestraint))
     tmpkeyfh.close()
     mincmdstr = poltype.minimizeexe+' '+torxyzfname+' -k '+tmpkeyfname+' 0.1'+' '+'>'+torminlogfname
-    term,error=opt.is_mm_normal_termination(poltype,torminlogfname)
+    term,error=poltype.CheckNormalTermination(torminlogfname)
     if term==True and error==False:
         pass
     else:
@@ -354,31 +315,47 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         listofstructurestorunQM.extend(listoftinkertorstructuresclock)
         listofstructurestorunQM.extend(listoftinkertorstructurescounterclock)
         fullrange=list(clock)+list(counterclock)
-        outputlogs,listofjobs,scriptname,scratchdir,jobtooutputlog=ExecuteOptJobs(poltype,listofstructurestorunQM,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
-        
+        outputlogs,listofjobs,jobtologlistfilenameprefix,scratchdir,jobtooutputlog=ExecuteOptJobs(poltype,listofstructurestorunQM,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
+        lognames=[]
+        for job in listofjobs:
+            log=jobtooutputlog[job]
+            lognames.append(os.getcwd()+r'/'+poltype.logfname)
+        jobtolog=dict(zip(listofjobs, lognames)) 
         if poltype.externalapi!=None:
             if len(listofjobs)!=0:
-                call.CallExternalAPI(poltype,listofjobs,scriptname,scratchdir)
-            finishedjobs,errorjobs=WaitForTermination(poltype,listofjobs,outputlogs,jobtooutputlog)
+                call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
+            finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
         else:
-            finishedjobs,errorjobs=CallJobsSeriallyLocalHost(poltype,listofjobs)
-        if poltype.use_gaus==False and poltype.use_gausoptonly==False: # need to extract final structure from Psi4 log file
-            for outputlog in outputlogs:
-                finished,error=opt.is_qm_normal_termination(poltype,outputlog)
-        print('finishedjobs',finishedjobs)
-        torxyznames,finishedoutputlogs,cartxyznames=TinkerMinimizePostQMOpt(poltype,outputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,finishedjobs,errorjobs)
+            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(listofjobs,jobtooutputlog)
+        for outputlog in outputlogs:
+            finished,error=poltype.CheckNormalTermination(outputlog)
+            if finished==True and 'opt' in outputlog:
+                opt.GrabFinalXYZStructure(poltype,outputlog,outputlog.replace('.log','.xyz'))
+                #newoptmol = load_structfile(poltype,outputlog.replace('.log','.xyz'))
+                #CheckBondConnectivity(poltype,newoptmol,optmol)
+
+            if finished==True and error==False and outputlog not in finishedjobs:
+                finishedjobs.append(outputlog) 
+            
+        torxyznames,finishedoutputlogs,cartxyznames,finishedphaseangles=TinkerMinimizePostQMOpt(poltype,outputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,finishedjobs,errorjobs,bondtopology)
         for i in range(len(finishedoutputlogs)):
             outputlog=finishedoutputlogs[i]
             cartxyzname=cartxyznames[i] 
-            poltype.optoutputtotorsioninfo[outputlog]= [a,b,c,d,torang,optmol,consttorlist,phaseangle,cartxyzname]
+            phaseangle=finishedphaseangles[i]
+            poltype.optoutputtotorsioninfo[outputlog]= [a,b,c,d,torang,optmol,consttorlist,phaseangle,cartxyzname,bondtopology]
 
-        outputlogs,listofjobs,scriptname,scratchdir,jobtooutputlog=ExecuteSPJobs(poltype,torxyznames,finishedoutputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
+        outputlogs,listofjobs,jobtologlistfilenameprefix,scratchdir,jobtooutputlog=ExecuteSPJobs(poltype,torxyznames,finishedoutputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
+        lognames=[]
+        for job in listofjobs:
+            log=jobtooutputlog[job]
+            lognames.append(os.getcwd()+r'/'+poltype.logfname)
+        jobtolog=dict(zip(listofjobs, lognames)) 
         if poltype.externalapi!=None:
             if len(listofjobs)!=0:
-                call.CallExternalAPI(poltype,listofjobs,scriptname,scratchdir)
-            finshedjobs,errorjobs=WaitForTermination(poltype,listofjobs,outputlogs,jobtooutputlog)
+                call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
+            finshedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
         else:
-            finishedjobs,errorjobs=CallJobsSeriallyLocalHost(poltype,listofjobs)
+            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(listofjobs,jobtooutputlog)
     os.chdir('..')
 
 def GenerateBondTopology(poltype,optmol):
@@ -428,6 +405,7 @@ def get_torlist(poltype,mol):
         # dorot is set as false in valence.py
     v1.torguess(mol,False,[])
     missed_torsions = v1.get_mt()
+    poltype.WriteToLog('missing torsions '+str(missed_torsions))
     for bond in iterbond:
         # is the bond rotatable
         t2 = bond.GetBeginAtom()
@@ -440,7 +418,7 @@ def get_torlist(poltype,mol):
             skiptorsion = False
             t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
             # is the torsion in toromitlist
-
+            value=torfit.sorttorsion(poltype,[t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()])
             if(not torfit.sorttorsion(poltype,[t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()]) in missed_torsions):
                 skiptorsion = True
             if [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist:

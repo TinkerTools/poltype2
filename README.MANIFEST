@@ -1,46 +1,51 @@
 POLTYPE Files
 *********************************************
-*.sdf           Input structure file.
-*-opt.com       Gaussian input file for geometry optimization.
-*-opt_psi.dat   Psi4 input file for geometry optimization.
-*-opt.log       Gaussian output file for geometry optimization.
-*-opt_psi4.log  Psi4 output file for geometry optimization.
-*-opt.chk       Unreadable electron density from geometry optimization.
-*-opt.fchk      Human readable electron density from geometry optimization.
-*-dma.com       Gaussian input file for QM SP calculation to obtain density for running distributed multipole analysis.
-*-dma_psi4.com  Psi4 input file for QM SP calculation to obtain density for running distributed multipole analysis.
-*-dma.log       Gaussian output file for QM SP calculation to obtain density for running distributed multipole analysis.
-*-dma_psi4.log  Psi4 output file for QM SP calculation to obtain density for running distributed multipole analysis.
-*-dma.chk       Unreadable density for running distributed multipole analysis.
-*-dma.fchk      Human readable density for running distributed multipole analysis.
-*-esp.com       Gaussian input file for QM SP calculation to obtain density for running electrostatic potential fitting.
-*-esp_psi4.dat  Psi4 input file for QM SP calculation to obtain density for running electrostatic potential fitting.
-*-esp.log       Gaussian output file for QM SP calculation to obtain density for running electrostatic potetnial fitting.
-*-esp_psi4.log  Psi4 output file for QM SP calculation to obtain density for running electrostatic potetnial fitting.
-*-esp.chk       Unreadable density for running electrostatic potential fitting.
-*-esp.fchk      Human readable density for running electrostatic potential fitting.
-*.gdmain        Input for GDMA.
-dma.punch       Intermediate file produced from GDMA.
-*.gdmaout       Output from GDMA.
-*.key           First keyfile containing atom indexes, multipoles from GDMA output and polarize terms.
-*.grid          Textfile specifying coordinates of where electrostatic potential will be evaluated.
-*.cube          Potential from QM SP density at specified grid coordinates, in format not recognized by Tinker.
-*.pot           Potential from cube file at specified grid coordinates in Tinker readable format.
-*-peditin.txt   Input for poledit to change frames as specified by POLTYPE.
-RMSPD.txt       Textfile computing the root mean square potential difference between potential from QM and from MM.
-*-groups.txt    Input for amvmpoles.pl to reduce atom typing.
-*.xyz_2         Structure using symmetry types rather than atom index types.
-*.key_2         Second keyfile using same parameters as *.key but with symmetry type numbers rather than atom index types.
-*.key_3         Third keyfile containing multipole parameters from electrostatic potential fitting.
-*.key_4         Fourth key file using same parameters as *.key_3 but also includes valence parameters from database.
-qm-torsion      Folder containing QM,MM optimized structures and SP computations to evaluate energy along dihedral angle.
-*.key_5         Fifth key file using same parameters as *.key_4 but with fitted torsion parameters.
-MMDipole.txt    Contains information on MM dipole.
-QMDipole.txt    Contains information on QM dipole, only written out for Gaussian currently.
-ttt.xyz         Final QM optimized structure.
-ttt.key         Final key file.
-ttt.xyz_2       Final MM optimized structure from QM.
-*-poltype.log   Poltype workflow, computations and external calls are shown in here.
+*.sdf               Input structure file.
+*-opt.com           Gaussian input file for geometry optimization.
+*-opt_psi.dat       Psi4 input file for geometry optimization.
+*-opt.log           Gaussian output file for geometry optimization.
+*-opt_psi4.log      Psi4 output file for geometry optimization.
+*-opt.chk           Unreadable electron density from geometry optimization.
+*-opt.fchk          Human readable electron density from geometry optimization.
+*-dma.com           Gaussian input file for QM SP calculation to obtain density for running distributed multipole analysis.
+*-dma_psi4.com      Psi4 input file for QM SP calculation to obtain density for running distributed multipole analysis.
+*-dma.log           Gaussian output file for QM SP calculation to obtain density for running distributed multipole analysis.
+*-dma_psi4.log      Psi4 output file for QM SP calculation to obtain density for running distributed multipole analysis.
+*-dma.chk           Unreadable density for running distributed multipole analysis.
+*-dma.fchk          Human readable density for running distributed multipole analysis.
+*-esp.com           Gaussian input file for QM SP calculation to obtain density for running electrostatic potential fitting.
+*-esp_psi4.dat      Psi4 input file for QM SP calculation to obtain density for running electrostatic potential fitting.
+*-esp.log           Gaussian output file for QM SP calculation to obtain density for running electrostatic potetnial fitting.
+*-esp_psi4.log      Psi4 output file for QM SP calculation to obtain density for running electrostatic potetnial fitting.
+*-esp.chk           Unreadable density for running electrostatic potential fitting.
+*-esp.fchk          Human readable density for running electrostatic potential fitting.
+*.gdmain            Input for GDMA.
+dma.punch           Intermediate file produced from GDMA.
+*.gdmaout           Output from GDMA.
+*.key               First keyfile containing atom indexes, multipoles from GDMA output and polarize terms.
+*.grid              Textfile specifying coordinates of where electrostatic potential will be evaluated.
+*.cube              Potential from QM SP density at specified grid coordinates, in format not recognized by Tinker.
+*.pot               Potential from cube file at specified grid coordinates in Tinker readable format.
+*-peditin.txt       Input for poledit to change frames as specified by POLTYPE.
+RMSPD.txt           Textfile computing the root mean square potential difference between potential from QM and from MM.
+*-groups.txt        Input for amvmpoles.pl to reduce atom typing.
+*.xyz_2             Structure using symmetry types rather than atom index types.
+*.key_2             Second keyfile using same parameters as *.key but with symmetry type numbers rather than atom index types.
+*.key_3             Third keyfile containing multipole parameters from electrostatic potential fitting.
+*.key_4             Fourth key file using same parameters as *.key_3 but also includes valence parameters from database.
+qm-torsion          Folder containing QM,MM optimized structures and SP computations to evaluate energy along dihedral angle.
+*.key_5             Fifth key file using same parameters as *.key_4 but with fitted torsion parameters.
+MMDipole.txt        Contains information on MM dipole.
+QMDipole.txt        Contains information on QM dipole, only written out for Gaussian currently.
+ttt.xyz             Final QM optimized structure.
+ttt.key             Final key file.
+ttt.xyz_2           Final MM optimized structure from QM.
+*-poltype.log       Poltype workflow, computations and external calls are shown in here.
+residue_connect.txt Topology stored as SMART strings for every NA and AA residue.
+ModifiedResidue.prm Modified residue parameters are added to this paramter file.
+lib.bio18_conv1.txt A library containing a map for PDB records to amoebabio18 paramter types for NA's and AA's.
+SMARTSToTypeLib.txt A text file mapping each atom in the modified residue stored as a SMARTS string to its corresponding atom type. 
+
 
 qm-torsion
 *********************************************
@@ -102,7 +107,8 @@ optimization.py            Handles Gaussian,Psi4 and Tinker minimization.
 electrostaticpotential.py  Handles electrostatic potential fitting and Gaussian, Psi4 SP calculations.
 torsionfit.py              Handles torsion fitting.
 torsiongenerator.py        Handles torsion Gaussian,Psi4 and Tinker minimization, SP and analyze.
-test_poltype.py            Handles unittesting for POLTYPE.
+fragmenter.py              Handles fragmenting parent molecule, paramterizing torsion and transfering paramters to parent.
+test_poltype.py            Handles unittesting for POLTYPE modules.
 
 Examples
 *********************************************
