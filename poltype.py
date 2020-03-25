@@ -26,35 +26,34 @@ import openbabel
 import shutil
 import time
 import getopt
-from PoltypeModules import valence
-from PoltypeModules import torsiongenerator as torgen
-from PoltypeModules import modifiedresidues as modres
-from PoltypeModules import symmetry as symm
-from PoltypeModules import torsionfit as torfit
-from PoltypeModules import optimization as opt
-from PoltypeModules import electrostaticpotential as esp
-from PoltypeModules import multipole as mpole
-from PoltypeModules import fragmenter as frag
+from poltypepackage.PoltypeModules import valence
+from poltypepackage.PoltypeModules import torsiongenerator as torgen
+from poltypepackage.PoltypeModules import modifiedresidues as modres
+from poltypepackage.PoltypeModules import symmetry as symm
+from poltypepackage.PoltypeModules import torsionfit as torfit
+from poltypepackage.PoltypeModules import optimization as opt
+from poltypepackage.PoltypeModules import electrostaticpotential as esp
+from poltypepackage.PoltypeModules import multipole as mpole
+from poltypepackage.PoltypeModules import fragmenter as frag
 from parmed.tinker import parameterfile
 from rdkit.Chem import rdmolfiles
 
 
 class PolarizableTyper():
 
-    def __init__(self,topologylib='residue_connect.txt',poltypepath=os.path.split(sys.argv[0])[0],WBOtol=.01,wholexyz=None,wholemol=None,dontfrag=True,isfragjob=False,dipoletol=.1,externalapi=None,printoutput=False,poltypeini=True,structure=None,prmstartidx=401,numproc=1,maxmem="700MB",maxdisk="100GB",gausdir=None,gdmadir=None,tinkerdir=None,scratchdir="/scratch",paramhead=sys.path[0] + "/amoebabio18_header.prm",babelexe="babel",gausexe='g09',formchkexe='formchk',cubegenexe='cubegen',gdmaexe='gdma',avgmpolesexe=sys.path[0] + "/avgmpoles.pl",peditexe='poledit.x',potentialexe='potential.x',minimizeexe='minimize.x',analyzeexe='analyze.x',superposeexe='superpose.x',defopbendval=0.20016677990819662,Hartree2kcal_mol=627.5095,optbasisset='6-31G*',toroptbasisset='6-31G*',dmabasisset='6-311G**',espbasisset="6-311++G(2d,2p)",torspbasisset="6-311++G**",optmethod='wB97X-D',toroptmethod='wB97X-D',torspmethod='MP2',dmamethod='MP2',espmethod='MP2',qmonly = False,espfit = True,parmtors = True,foldnum=3,foldoffsetlist = [ 0.0, 180.0, 0.0, 0.0, 0.0, 0.0 ],torlist = None,rotbndlist = None,fitrotbndslist=None,maxRMSD=.1,maxRMSPD=1,maxtorRMSPD=2,tordatapointsnum=None,gentorsion=False,gaustorerror=False,torsionrestraint=.1,onlyrotbndlist=None,rotalltors=False,dontdotor=False,dontdotorfit=False,toroptpcm=False,optpcm=False,torsppcm=False,use_gaus=False,use_gausoptonly=False,freq=False,postfit=False,bashrcpath=None,amoebabioprmpath=None,libpath=sys.path[0] + "/lib.bio18_conv1.txt",SMARTSToTypelibpath=sys.path[0]+'/SMARTSToTypeLib.txt',ModifiedResiduePrmPath=sys.path[0]+'/ModifiedResidue.prm',modifiedproteinpdbname=None,unmodifiedproteinpdbname=None,mutatedsidechain=None,mutatedresiduenumber=None,modifiedresiduepdbcode=None,optmaxcycle=400,torkeyfname=None,gausoptcoords='',uniqidx=False ,helpfile=sys.path[0]+'/README.HELP',versionfile=sys.path[0]+'/README.VERSION'): 
+    def __init__(self,readinionly=False,suppressdipoleerr=False,topologylib='residue_connect.txt',poltypepath=os.path.split(__file__)[0],WBOtol=.01,dontfrag=True,isfragjob=False,dipoletol=.1,externalapi=None,printoutput=False,poltypeini=True,structure=None,prmstartidx=401,numproc=1,maxmem="700MB",maxdisk="100GB",gausdir=None,gdmadir=None,tinkerdir=None,scratchdir="/scratch",paramhead=os.path.split(__file__)[0] + "/amoebabio18_header.prm",babelexe="babel",gausexe='g09',formchkexe='formchk',cubegenexe='cubegen',gdmaexe='gdma',avgmpolesexe=sys.path[0] + "/avgmpoles.pl",peditexe='poledit.x',potentialexe='potential.x',minimizeexe='minimize.x',analyzeexe='analyze.x',superposeexe='superpose.x',defopbendval=0.20016677990819662,Hartree2kcal_mol=627.5095,optbasisset='6-31G*',toroptbasisset='6-31G*',dmabasisset='6-311G**',espbasisset="6-311++G(2d,2p)",torspbasisset="6-311++G**",optmethod='wB97X-D',toroptmethod='wB97X-D',torspmethod='MP2',dmamethod='MP2',espmethod='MP2',qmonly = False,espfit = True,parmtors = True,foldnum=3,foldoffsetlist = [ 0.0, 180.0, 0.0, 0.0, 0.0, 0.0 ],torlist = None,rotbndlist = None,fitrotbndslist=None,maxRMSD=.1,maxRMSPD=1,maxtorRMSPD=2,tordatapointsnum=None,gentorsion=False,gaustorerror=False,torsionrestraint=.1,onlyrotbndlist=None,rotalltors=False,dontdotor=False,dontdotorfit=False,toroptpcm=False,optpcm=False,torsppcm=False,use_gaus=False,use_gausoptonly=False,freq=False,postfit=False,bashrcpath=None,amoebabioprmpath=None,libpath=sys.path[0] + "/lib.bio18_conv1.txt",SMARTSToTypelibpath=sys.path[0]+'/SMARTSToTypeLib.txt',ModifiedResiduePrmPath=sys.path[0]+'/ModifiedResidue.prm',modifiedproteinpdbname=None,unmodifiedproteinpdbname=None,mutatedsidechain=None,mutatedresiduenumber=None,modifiedresiduepdbcode=None,optmaxcycle=400,torkeyfname=None,gausoptcoords='',uniqidx=False ,helpfile='README.HELP',versionfile='README.VERSION'): 
+        self.readinionly=readinionly
+        self.suppressdipoleerr=suppressdipoleerr
         self.use_gaus=use_gaus
         self.use_gausoptonly=use_gausoptonly
         self.topologylibpath=poltypepath+r'/'+topologylib
         self.WBOtol=WBOtol
         self.isfragjob=isfragjob
-        self.wholexyz=wholexyz
-        self.wholemol=wholemol
         self.dontfrag=dontfrag
         self.dipoletol=dipoletol
         self.externalapi=externalapi
         self.printoutput=printoutput
         self.poltypepath=poltypepath
-        self.poltypeparentdir=os.path.split(self.poltypepath)[0] 
         self.molstructfname=structure
         self.poltypeini=poltypeini
         self.prmstartidx = prmstartidx
@@ -152,19 +151,14 @@ class PolarizableTyper():
         self.uniqidx=uniqidx
         self.helpfile=helpfile
         self.versionfile=versionfile 
-        opts, xargs = getopt.getopt(sys.argv[1:],'h:u',["help","unittest"])
-
+        opts, xargs = getopt.getopt(sys.argv[1:],'h',["help"])
 
         for o, a in opts:
             if o in ("-h", "--help"):
                 self.copyright()
                 self.usage()
                 sys.exit(2)
-            elif o in("-u","--unittest"):
-                cmdstr='python'+' '+self.poltypeparentdir+'/'+'PoltypeModules/'+'test_poltype.py'
-                os.system(cmdstr)
-                sys.exit()
-        
+                            
         if self.poltypeini==True:
             temp=open(os.getcwd()+r'/'+'poltype.ini','r')
             results=temp.readlines()
@@ -179,9 +173,32 @@ class PolarizableTyper():
                         newline=line
 
                     if "rotalltors" in newline:
-                        self.rotalltors = True
+                        if '=' not in line:
+                            self.rotalltors = True
+                        else:
+                            self.rotalltors=self.GrabBoolValue(a)
+                    elif 'poltypepath' in newline:
+                        self.poltypepath=a
+                    elif 'printoutput' in newline:
+                        if '=' not in line:
+                            self.printoutput=True
+                        else:
+                            self.printoutput=self.GrabBoolValue(a)
+                    elif 'suppressdipoleerr' in newline:
+                        if '=' not in line:
+                            self.suppressdipoleerr=True
+                        else:
+                            self.suppressdipoleerr=self.GrabBoolValue(a)
+                    elif 'isfragjob' in newline:
+                        if '=' not in line:
+                            self.isfragjob=True
+                        else:
+                            self.isfragjob=self.GrabBoolValue(a)
                     elif "dontfrag" in newline:
-                        self.dontfrag=True
+                        if '=' not in line:
+                            self.dontfrag=True
+                        else:
+                            self.dontfrag=self.GrabBoolValue(a)
                     elif "externalapi" in newline:
                         self.externalapi=a
                     elif "gausoptcoords" in newline:
@@ -198,7 +215,7 @@ class PolarizableTyper():
                         self.unmodifiedproteinpdbname = a
                         self.molstructfname='ModifiedRes.sdf'
                     elif "dmamethod" in newline:
-                        self.dmamethod =self.SanitizeQMMethod(a,False)
+                        self.dmamethod =a
                     elif "bashrcpath" in newline:
                         self.bashrcpath = a
                     elif "modifiedproteinpdbname" in newline:
@@ -209,21 +226,46 @@ class PolarizableTyper():
                     elif "structure" in newline:
                         self.molstructfname = a
                     elif "torsppcm" in newline:
-                        self.torsppcm = True
+                        if '=' not in line:
+                            self.torsppcm = True
+                        else: 
+                            self.torsppcm=self.GrabBoolValue(a)
                     elif "freq" in newline:
-                        self.freq = True
+                        if '=' not in line:
+                            self.freq = True
+                        else:
+                            self.freq=self.GrabBoolValue(a)
                     elif "optpcm" in newline and 'tor' not in line:
-                        self.optpcm = True
+                        if '=' not in line:
+                            self.optpcm = True
+                        else:
+                            self.optpcm=self.GrabBoolValue(a)
                     elif "toroptpcm" in newline:
-                        self.optpcm = True
+                        if '=' not in line:
+                            self.optpcm = True
+                        else:
+                            self.optpcm=self.GrabBoolValue(a)
                     elif "use_gaus" in newline and 'opt' not in newline:
-                        self.use_gaus = True
+                        if '=' not in line:
+                            self.use_gaus = True
+                        else:
+                            self.use_gaus=self.GrabBoolValue(a)
                     elif "use_gausoptonly" in newline:
-                        self.use_gausoptonly = True
+                        if '=' not in line:
+                            self.use_gausoptonly = True
+                        else:
+                            self.use_gausoptonly=self.GrabBoolValue(a)
                     elif "dontdotor" in newline:
-                        self.dontdotor = True
+                        if '=' not in line:
+                            self.dontdotor = True
+                        else:
+                            self.dontdotor=self.GrabBoolValue(a)
+
                     elif "dontdotorfit" in newline:
-                        self.dontdotorfit = True
+                        if '=' not in line:
+                            self.dontdotorfit = True
+                        else:
+                            self.dontdotorfit=self.GrabBoolValue(a)
                     elif "optmaxcycle" in newline:
                         self.optmaxcycle = a
                     elif "torsionrestraint" in newline:
@@ -243,13 +285,13 @@ class PolarizableTyper():
                             templist.append(temp)
                         self.fitrotbndslist=templist
                     elif "optmethod" in newline and 'tor' not in newline:
-                        self.optmethod = self.SanitizeQMMethod(a,True)
+                        self.optmethod = a
                     elif "espmethod" in newline and 'tor' not in newline:
-                        self.espmethod = self.SanitizeQMMethod(a,False)
+                        self.espmethod = a
                     elif "torspmethod" in newline:
-                        self.torspmethod = self.SanitizeQMMethod(a,False)
+                        self.torspmethod = a
                     elif "toroptmethod" in newline:
-                        self.toroptmethod = self.SanitizeQMMethod(a,True)
+                        self.toroptmethod = a
                     elif "numproc" in newline:
                         self.numproc = a
                     elif "maxmem" in newline:
@@ -289,9 +331,15 @@ class PolarizableTyper():
                     elif "gbindir" in newline:
                         self.gausdir = a
                     elif "qmonly" in newline:
-                        self.qmonly = True
+                        if '=' not in line:
+                            self.qmonly = True
+                        else:
+                            self.qmonly = self.GrabBoolValue(a)
                     elif "uniqidx" in newline:
-                        self.uniqidx = True
+                        if '=' not in line:
+                            self.uniqidx = True
+                        else:
+                            self.uniqidx=self.GrabBoolValue(a)
                     elif "help" in newline:
                         self.copyright()
                         self.usage()
@@ -301,7 +349,16 @@ class PolarizableTyper():
                     else:
                         print('Unrecognized '+line)
                         self.usage()
+                        print('Unrecognized '+line)
                         sys.exit()
+        self.optmethod=self.SanitizeQMMethod(optmethod,True)                 
+        self.toroptmethod=self.SanitizeQMMethod(toroptmethod,True)                  
+        self.torspmethod=self.SanitizeQMMethod(torspmethod,False)                    
+        self.dmamethod=self.SanitizeQMMethod(dmamethod,False)                      
+        self.espmethod=self.SanitizeQMMethod(espmethod,False)                  
+        if self.readinionly==True:
+            return
+
         self.copyright()
         self.initialize()
         self.init_filenames()
@@ -314,7 +371,12 @@ class PolarizableTyper():
         if not __name__ == '__main__':
             params=self.main()
 
-    
+    def GrabBoolValue(self,value): 
+        if value=='true' or value=='True' or value=='TRUE':
+            boolvalue=True
+        elif value=='false' or value=='False' or value=='FALSE':
+            boolvalue=False
+        return boolvalue
 
     def SanitizeQMMethod(self,method,optmethodbool):
         if method[-1]=='D': # assume DFT, gaussian likes D, PSI4 likes -D
@@ -325,7 +387,7 @@ class PolarizableTyper():
                     method=method.replace('-D','D')
 
             else:
-                if not (self.use_gaus or self.use_gausoptonly) and optmethodbool==True:
+                if not self.use_gaus and not self.use_gausoptonly and optmethodbool==True:
                     method=method.replace('D','-D')
                 if not (self.use_gaus) and optmethodbool==False:
                     method=method.replace('D','-D')
@@ -423,7 +485,7 @@ class PolarizableTyper():
            
         if(not latestversion):
             
-            raise ValueError("Notice: Not latest version of tinker (>=8.7)")
+            raise ValueError("Notice: Not latest version of tinker (>=8.7)"+' '+os.getcwd())
       
         if ("TINKERDIR" in os.environ):
             self.tinkerdir = os.environ["TINKERDIR"]
@@ -526,14 +588,14 @@ class PolarizableTyper():
     
     
     def copyright (self):
-        temp=open(self.versionfile,'r')
+        temp=open(self.poltypepath+r'/'+self.versionfile,'r')
         results=temp.readlines()
         temp.close()
         for line in results:
             print(line)
     
     def usage (self):
-        temp=open(self.helpfile,'r')
+        temp=open(self.poltypepath+r'/'+self.helpfile,'r')
         results=temp.readlines()
         temp.close()
         for line in results:
@@ -561,20 +623,112 @@ class PolarizableTyper():
     
         return mol
     
-    
+    def CallJobsSeriallyLocalHost(self,listofjobs,jobtooutputlog):
+       finishedjobs=[]
+       errorjobs=[]
+       for job in listofjobs:
+           outputlog=jobtooutputlog[job]
+           error=self.call_subsystem(job,wait=True)
+           if error==True:
+               finishedjobs.append(outputlog)
+               errorjobs.append(outputlog)
+               self.WriteToLog('error '+str(job))
+           else:
+               finishedjobs.append(outputlog)
+       return finishedjobs,errorjobs
 
-    def call_subsystem(self,cmdstr,wait=False):
+    def CallJobsLocalHost(self,listofjobs,jobtooutputlog):
+        for job in listofjobs:
+           outputlog=jobtooutputlog[job]
+           self.call_subsystem(job)
+        finishedjobs,errorjobs=self.WaitForTermination(jobtooutputlog)
+        return finishedjobs,errorjobs
+
+
+    def WaitForTermination(self,jobtooutputlog):
+        finishedjobs=[]
+        errorjobs=[]
+        sleeptime=1
+        while len(finishedjobs)!=len(jobtooutputlog.keys()):
+            for job in jobtooutputlog.keys():
+                outputlog=jobtooutputlog[job]
+                if os.path.isfile(outputlog):
+                    statinfo=os.stat(outputlog)
+                    size=statinfo.st_size
+                    if size==0:
+                        continue
+                finished,error=self.CheckNormalTermination(outputlog)
+                if finished==True and error==False: # then check if SP has been submitted or not
+                    if outputlog not in finishedjobs:
+                        self.NormalTerm(outputlog)
+                        finishedjobs.append(outputlog)
+                elif finished==False and error==True:
+                    if outputlog not in finishedjobs:
+                        self.ErrorTerm(outputlog)
+                        finishedjobs.append(outputlog)
+                        errorjobs.append(outputlog)
+                elif finished==False and error==False:
+                    self.WriteToLog('Waiting on '+outputlog+' '+'for termination ')
+                else: # this case is finshed=True and error=True because there stupid quotes sometimes have word error in it                  
+                    if outputlog not in finishedjobs:
+                        error=False
+                        self.NormalTerm(outputlog)
+                        finishedjobs.append(outputlog)
+    
+            string='Sleeping for %d '%(sleeptime)+' minute '
+            self.WriteToLog(string)
+            time.sleep(sleeptime*60) # check logs every minute
+        self.WriteToLog('All jobs have terminated ')
+        return finishedjobs,errorjobs
+
+    def CheckNormalTermination(self,logfname): # needs to handle error checking now
+        """
+        Intent: Checks the *.log file for normal termination
+        """
+        error=False
+        term=False
+        if os.path.isfile(logfname):
+            for line in open(logfname):
+                if 'poltype' in logfname:
+                    if 'Poltype Job Finished' in line:
+                        term=True
+                else:
+                    if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line or "LBFGS  --  Normal Termination due to SmallGrad" in line or "Normal termination" in line:
+                        term=True
+                if ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line:
+                    error=True
+                    self.WriteToLog(line)
+        return term,error
+    
+        
+    def NormalTerm(self,logfname):
+        self.WriteToLog("Normal termination: %s" % logfname)
+    
+    
+    def ErrorTerm(self,logfname):
+        self.WriteToLog("ERROR termination: %s" % logfname)
+
+
+    def call_subsystem(self,cmdstr,wait=False,logfname=None):
         curdir=os.getcwd()
+        error=False
         if self.printoutput==True:
             print("Calling: " + cmdstr)
-        self.WriteToLog(" Calling: " + cmdstr)
-        p = subprocess.Popen(cmdstr, shell=True,stdout=self.logfh, stderr=self.logfh)
-        
-        if p.wait() != 0:
-            self.WriteToLog("ERROR: " + cmdstr)
-            if wait==True:
-                raise ValueError("ERROR: " + cmdstr)
+        self.WriteToLog(" Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
+        if logfname==None:
+            p = subprocess.Popen(cmdstr, shell=True,stdout=self.logfh, stderr=self.logfh)
+        else:
+           loghandle=open(logfname,"a")
+           p = subprocess.Popen(cmdstr, shell=True,stdout=loghandle, stderr=loghandle)
 
+        if wait==True:
+            p.wait()
+            if p.returncode != 0:
+                error=True
+                self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
+                return error
+                raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
+        return error
     def WriteOutLiteratureReferences(self,keyfilename): # to use ParmEd on key file need Literature References delimited for parsing
         temp=open(keyfilename,'r')
         results=temp.readlines()
@@ -603,7 +757,16 @@ class PolarizableTyper():
 
     def RaiseOutputFileError(self,logname):
         raise ValueError('An error occured for '+logname) 
-     
+
+    def WritePoltypeInitializationFile(self,poltypeinput):
+        inifilepath=os.getcwd()+r'/'+'poltype.ini'
+        temp=open(inifilepath,'w')
+        for key,value in poltypeinput.items():
+            line=key+'='+str(value)+'\n'
+            temp.write(line)
+        temp.close()
+        return inifilepath
+
     #POLTYPE BEGINS HERE
     def main(self):
     
@@ -613,13 +776,11 @@ class PolarizableTyper():
             head, self.molstructfname = os.path.split(self.molstructfname)
             self.molecprefix =  os.path.splitext(self.molstructfname)[0]
 
-            assert os.path.isfile(self.molstructfname), "Error: Cannot open " + self.molstructfname
         if self.amoebabioprmpath!=None and (self.modifiedproteinpdbname!=None or self.unmodifiedproteinpdbname!=None): # if already have core parameters in modified prm database then dont regenerate parameters
             if check==False:
                 self.GenerateParameters()
         else:
            params= self.GenerateParameters()
-           self.WriteToLog('Poltype Job Finished'+'\n')
            return params
 
     
@@ -640,6 +801,8 @@ class PolarizableTyper():
         self.mol=mol
     
         # Begin log. *-poltype.log
+        if os.path.isfile(self.logfname):
+            os.remove(self.logfname)
         self.logfh = open(self.logfname,"a")
     
         self.mol=self.CheckIsInput2D(self.mol,obConversion)
@@ -659,6 +822,7 @@ class PolarizableTyper():
         self.localframe2 = [ 0 ] * mol.NumAtoms()
     
         symm.gen_canonicallabels(self,mol)
+
  
         # QM calculations are done here
         # First the molecule is optimized. (-opt) 
@@ -679,6 +843,7 @@ class PolarizableTyper():
         lfzerox,atomindextoremovedipquad,atomtypetospecialtrace,atomindextoremovedipquadcross = mpole.gen_peditinfile(self,mol)
         
         
+        self.WriteToLog('self.paramhead '+self.paramhead)
         if (not os.path.isfile(self.xyzfname) or not os.path.isfile(self.keyfname)):
             # Run poledit
             cmdstr = self.peditexe + " 1 " + self.gdmafname +' '+self.paramhead+ " < " + self.peditinfile
@@ -762,18 +927,18 @@ class PolarizableTyper():
                 torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
         if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False:
 
-            self.rdkitmol=rdmolfiles.MolFromMolFile(poltype.molstructfnamemol,sanitize=True,removeHs=False)
-            WBOmatrix,outputname=frag.GenerateWBOMatrix(poltype,self.rdkitmol,self.logoptfname.replace('.log','.xyz'))
+            self.rdkitmol=rdmolfiles.MolFromMolFile(self.molstructfnamemol,sanitize=True,removeHs=False)
+            WBOmatrix,outputname=frag.GenerateWBOMatrix(self,self.rdkitmol,self.logoptfname.replace('.log','.xyz'))
             highlightbonds=[]
             for tor in self.torlist:
                 rotbnd=[tor[1]-1,tor[2]-1]
                 highlightbonds.append(rotbnd)
             frag.Draw2DMoleculeWithWBO(self,WBOmatrix,self.molstructfname.replace('.sdf',''),self.molstructfnamemol,bondindexlist=highlightbonds)        
-            rotbndindextofragindexmap,rotbndindextofragment,rotbndindextofragmentfile=frag.GenerateFragments(self,self.mol,torlist,WBOmatrix) # returns list of bond indexes that need parent molecule to do torsion scan for (fragment generated was same as the parent0
-            frag.SpawnPoltypeJobsForFragments(self,rotbndindextofragindexmap,rotbndindextofragment,rotbndindextofragmentfile)
+            rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentfragmentsarray,equivalentrotbndindexarrays=frag.GenerateFragments(self,self.mol,torlist,WBOmatrix) # returns list of bond indexes that need parent molecule to do torsion scan for (fragment generated was same as the parent0
+            frag.SpawnPoltypeJobsForFragments(self,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,torlist,equivalentfragmentsarray,equivalentrotbndindexarrays)
 
         if self.dontfrag==False and self.isfragjob==False and not os.path.isfile(self.key5fname):
-            frag.GrabTorsionParametersFromFragments(poltype,torlist) # just dump to key_5 since does not exist for parent molecule
+            frag.GrabTorsionParametersFromFragments(self,torlist,rotbndindextofragmentfilepath) # just dump to key_5 since does not exist for parent molecule
             sys.exit()
 
        
@@ -802,16 +967,26 @@ class PolarizableTyper():
         if self.totalcharge!=0:
             torgen.RemoveStringFromKeyfile(self,self.key5fname,'solvate GK')
         esp.CheckDipoleMoments(self,optmol)
+        self.WriteToLog('Poltype Job Finished'+'\n')
         keyfilecopyname=self.key5fname.replace('.key','_copy.key')
         shutil.copy(self.key5fname,keyfilecopyname)
         torgen.RemoveStringFromKeyfile(self,keyfilecopyname,'SOLUTE')
         torgen.RemoveStringFromKeyfile(self,keyfilecopyname,'TARGET-DIPOLE')
-        os.system('rm *.chk')
-        os.remove(self.tmpxyzfile+'_2') 
+        for fname in os.listdir():
+            if fname.endswith('.chk'):
+                os.remove(fname)
+        if os.path.isdir('qm-torsion'):
+            os.chdir('qm-torsion')
+            for fname in os.listdir():
+                if fname.endswith('.chk'):
+                    os.remove(fname)
+            os.chdir('..')
+        if os.path.isfile(self.tmpxyzfile+'_2'):
+            os.remove(self.tmpxyzfile+'_2') 
         param = parameterfile.AmoebaParameterSet(keyfilecopyname)
-        if self.dontfrag==False and self.isfragjob==True and not os.path.isfile(self.key6fname):
-            wholemolidxtofragidx=frag.ConvertFragIdxToWholeIdx(self,self.molstructfname,torlist,rotbndindextofragindexmap,WBOmatrix)
         return param
+
+
 
 if __name__ == '__main__':
     poltype=PolarizableTyper() 
