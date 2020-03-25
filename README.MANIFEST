@@ -41,9 +41,15 @@ ttt.xyz             Final QM optimized structure.
 ttt.key             Final key file.
 ttt.xyz_2           Final MM optimized structure from QM.
 *-poltype.log       Poltype workflow, computations and external calls are shown in here.
-residue_connect.txt Topology stored as SMART strings for every NA and AA residue.
-ModifiedResidue.prm Modified residue parameters are added to this paramter file.
-lib.bio18_conv1.txt A library containing a map for PDB records to amoebabio18 paramter types for NA's and AA's.
+residue_connect.txt Topology stored as SMART strings for every NA and AA residue. Immediately after # is the reisude
+                    PDB code. The next line is the SMARTS string. The following line is the atom index corresponding to
+                    the SMARTS string. There is a connect block defining bonds and bond order as well.
+ModifiedResidue.prm Modified residue parameters are added to this paramter file. This is originally a copy of 
+                    amoebabio18.prm and new paramters are appended.
+lib.bio18_conv1.txt A library containing a map for PDB records to amoebabio18 paramter types for NA's and AA's. The 
+                    first number after atom is the type number, the second number after atom is the class number. The
+                    matching atom PDB label is after the class number. The residue PDB code is defined after # at the
+                    top of each block in library.
 SMARTSToTypeLib.txt A text file mapping each atom in the modified residue stored as a SMARTS string to its corresponding atom type. 
 
 

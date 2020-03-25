@@ -176,7 +176,8 @@ Modified Amino Acids
 modifiedresiduepdbcode    specifies three letter modified amino acid PDB code. 
                           No default.
 mutatedsidechain          specifies modified amino acid structure (*.sdf) to replace with existing side chain. 
-                          Structure most include immediate backbone for protein alignment. 
+                          Structure most include side chain of modified AA, connecting to Ca, which is connected
+                          to NH2 and COH for protein alignment. 
                           No default.
 mutatedresiduenumber      specifies which amino acid residue will be replaced with mutated side chain. 
                           No default.
