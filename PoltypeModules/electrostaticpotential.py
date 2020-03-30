@@ -1,7 +1,7 @@
-from . import optimization as opt
-from . import electrostaticpotential as esp
-from . import torsiongenerator as torgen
-from . import apicall as call
+import optimization as opt
+import electrostaticpotential as esp
+import torsiongenerator as torgen
+import apicall as call
 import os
 import sys
 from socket import gethostname
@@ -46,7 +46,7 @@ def gen_esp_grid(poltype,mol):
             for xyz,v in zip(gridpts, Vvals):
                 fp.write("%s %s\n" % (xyz.rstrip(), v))
         
-    elif not os.path.isfile(poltype.qmespfname):
+    if not os.path.isfile(poltype.qmespfname):
         fckfname = poltype.fckespfname
         if not poltype.espfit:
             fckfname = poltype.fckdmafname
@@ -134,7 +134,6 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     temp.write('set freeze_core True'+'\n')
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
     temp.write("E, wfn = energy('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower(),poltype.dmabasisset)+'\n')
-    temp.write('gdma(wfn)'+'\n')
     temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
     temp.write('clean()'+'\n')
     temp.close()
@@ -257,7 +256,7 @@ def SPForDMA(poltype,optmol,mol):
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logdmafname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scratchdir
-            jobtologlistfilenameprefix=os.getcwd()+r'/'+'dmajobtolog'
+            jobtologlistfilenameprefix=os.getcwd()+r'/'+'dmajobtolog'+poltype.molstructfname
             if os.path.isfile(poltype.logdmafname):
                 os.remove(poltype.logdmafname) # if chk point exists just remove logfile, there could be error in it and we dont want WaitForTermination to catch error before job is resubmitted by daemon 
 
@@ -284,8 +283,8 @@ def SPForDMA(poltype,optmol,mol):
             
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logdmafname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
-            scratchdir=poltype.scrmpdir
-            jobtologlistfilenameprefix=os.getcwd()+r'/'+'dmajobtolog'
+            scratchdir=poltype.scrtmpdir
+            jobtologlistfilenameprefix=os.getcwd()+r'/'+'dmajobtolog'+poltype.molstructfname
             if os.path.isfile(poltype.logdmafname):
                 os.remove(poltype.logdmafname)
             if poltype.externalapi!=None:
@@ -317,7 +316,7 @@ def SPForESP(poltype,optmol,mol):
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+outputname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scratchdir
-            jobtologlistfilenameprefix=os.getcwd()+r'/'+'espjobtolog' 
+            jobtologlistfilenameprefix=os.getcwd()+r'/'+'espjobtolog'+poltype.molstructfname 
             if os.path.isfile(outputname):
                 os.remove(outputname)
 
@@ -343,7 +342,7 @@ def SPForESP(poltype,optmol,mol):
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logespfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdir
-            jobtologlistfilenameprefix=os.getcwd()+r'/'+'espjobtolog'
+            jobtologlistfilenameprefix=os.getcwd()+r'/'+'espjobtolog'+poltype.molstructfname
             if os.path.isfile(poltype.logespfname):
                 os.remove(poltype.logespfname)
 

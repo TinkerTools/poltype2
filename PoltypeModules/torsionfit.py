@@ -1,8 +1,8 @@
-from . import torsiongenerator as torgen
-from . import symmetry as symm
-from . import optimization as opt
-from . import electrostaticpotential as esp
-from . import fragmenter as frag
+import torsiongenerator as torgen
+import symmetry as symm
+import optimization as opt
+import electrostaticpotential as esp
+import fragmenter as frag
 import os
 import sys
 import shutil

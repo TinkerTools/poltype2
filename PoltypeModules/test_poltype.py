@@ -1,6 +1,6 @@
 import unittest
 import os,sys,inspect
-from poltypepackage import poltype
+import poltype
 import shutil
 from parmed.tinker import parameterfile
 from scipy.optimize import fmin
@@ -9,18 +9,20 @@ import getopt
 
 class TestPoltype(unittest.TestCase):
 
-    def __init__(self, method, examplepath):
+    def __init__(self, method, examplepath,dontremovetestcase):
          super(TestPoltype, self).__init__(method)
          self.examplepath = examplepath
+         self.dontremovetestcase=dontremovetestcase
 
     def MakeTestCasePath(self,testfoldername):
 
         self.poltypemodulepath = os.path.abspath(os.path.join(__file__, os.pardir))
         self.poltypepath=os.path.abspath(os.path.join(self.poltypemodulepath, os.pardir))+r'/'
         self.testcaseparentpath=self.poltypepath+'TestCases'
-        if os.path.isdir(self.testcaseparentpath):
-            shutil.rmtree(self.testcaseparentpath)
-            os.mkdir(self.testcaseparentpath)
+        if not self.dontremovetestcase:
+            if os.path.isdir(self.testcaseparentpath):
+                shutil.rmtree(self.testcaseparentpath)
+                os.mkdir(self.testcaseparentpath)
         os.chdir(self.testcaseparentpath)
         testcasepath=self.testcaseparentpath+'/'+testfoldername
         if not os.path.isdir(testcasepath):
@@ -113,7 +115,8 @@ class TestPoltype(unittest.TestCase):
     def GenericFolderCopy(self,testcasepath):
         head,tail=os.path.split(testcasepath) # remove last folder since it needs to be copied from examples
         os.chdir('..')
-        shutil.rmtree(tail)
+        if not self.dontremovetestcase:
+            shutil.rmtree(tail)
         exampleparentfolder='Examples/'
         if self.examplepath==None:
             raise ValueError('examplepath not defined')
@@ -122,28 +125,38 @@ class TestPoltype(unittest.TestCase):
         newexamplepath=self.poltypepath+exampleparentfolder+examplefoldername
         if not os.path.exists(newexamplepath):
             shutil.copytree(examplepath,newexamplepath)
-        shutil.copytree(examplepath,testcasepath)
-        testcaseqmtorsionpath=testcasepath+r'/'+'qm-torsion'
-        if os.path.exists(testcaseqmtorsionpath):
-            shutil.rmtree(testcaseqmtorsionpath)
+        if not self.dontremovetestcase:
+            shutil.copytree(examplepath,testcasepath)
+            testcaseqmtorsionpath=testcasepath+r'/'+'qm-torsion'
+            if os.path.exists(testcaseqmtorsionpath):
+                shutil.rmtree(testcaseqmtorsionpath)
    
     def GrabTorsions(self,folderpath):
         listoftorsions=[]
         listofqmminusmmtxtfiles=[]
         curdir=os.getcwd()
-        qmtorsionfolderpath=folderpath+'qm-torsion'
+        if folderpath[-1]==r'/':
+            qmtorsionfolderpath=folderpath+'qm-torsion'
+        else:
+            qmtorsionfolderpath=folderpath+r'/'+'qm-torsion'
+
         os.chdir(qmtorsionfolderpath)
         excludedfoldnames=[]
         files=os.listdir()
         for f in files:
-            filenamesplit= f.split('.')
-            if filenamesplit[1]=='txt':
-                if 'fit' in f:
-                    newsplit=filenamesplit[0].split('fit-')
-                    array=newsplit[1].split('-')
-                    torsion=[int(i) for i in array]
-                    listoftorsions.append(torsion)
-                    listofqmminusmmtxtfiles.append(qmtorsionfolderpath+f)
+            if 'txt' in f:
+                filenamesplit= f.split('.')
+                if filenamesplit[1]=='txt':
+                    if 'fit' in f:
+                        print('found file name',f)
+                        newsplit=filenamesplit[0].split('fit-')
+                        print('newsplit',newsplit)
+                        array=newsplit[1].split('-')
+                        print('array',array)
+                        torsion=[int(i) for i in array]
+                        print('torsion array',torsion)
+                        listoftorsions.append(torsion)
+                        listofqmminusmmtxtfiles.append(qmtorsionfolderpath+f)
         os.chdir(curdir)
         return listoftorsions,listofqmminusmmtxtfiles
 
@@ -222,11 +235,13 @@ class TestPoltype(unittest.TestCase):
         testfoldername='TestFragmenter/'+tail
         testcasepath=self.MakeTestCasePath(testfoldername)
         self.GenericFolderCopy(testcasepath)
+        print('testcasepath')
         os.chdir(testcasepath)
         poltype.PolarizableTyper(dontfrag=False,structure=ptype.molstructfname,poltypeini=False,suppressdipoleerr=True,optmethod=ptype.optmethod,toroptmethod=ptype.toroptmethod,espmethod=ptype.espmethod,torspmethod=ptype.torspmethod,dmamethod=ptype.dmamethod,torspbasisset=ptype.torspbasisset,espbasisset=ptype.espbasisset,dmabasisset=ptype.dmabasisset,toroptbasisset=ptype.toroptbasisset,optbasisset=ptype.optbasisset,bashrcpath=ptype.bashrcpath,externalapi=ptype.externalapi,use_gaus=ptype.use_gaus,use_gausoptonly=ptype.use_gausoptonly,isfragjob=False,poltypepath=ptype.poltypepath,numproc=ptype.numproc,maxmem=ptype.maxmem,maxdisk=ptype.maxdisk,printoutput=True)
-        listofparenttorsions,listofparentqmminusmmtxtfiles=self.GrabTorsions(exampleparentfolder+examplefolder) 
+        listofparenttorsions,listofparentqmminusmmtxtfiles=self.GrabTorsions(self.examplepath) 
         for i in range(len(listofparenttorsions)):
             torsion=listofparenttorsions=[i]
+            print('torsion',torsion)
             parentqmminusmmtxtfile=listofparentqmminusmmtxtfiles[i]
             parentrotbnd=str(torsion[1])+' '+str(torsion[2])
             filepath=self.FindFragmentJobPath(parentrotbnd,testcasepath)
@@ -462,14 +477,18 @@ if __name__ == '__main__':
     command_line_param = sys.argv[1:]
     del sys.argv[1:]
     examplepath=None
-    opts, xargs = getopt.getopt(command_line_param,'e:m',["method=","examplepath="])
+    method=None
+    dontremovetestcase=False
+    opts, xargs = getopt.getopt(command_line_param,'e:m',["method=","examplepath=","dontremovetestcase"])
     for o, a in opts:
         if o in ("--examplepath"):
             examplepath=a
         elif o in ("--method"):
             method=a
+        elif o in ("--dontremovetestcase"):
+            dontremovetestcase=True
  
     suite = unittest.TestSuite()
-    suite.addTest(TestPoltype(method,examplepath))
+    suite.addTest(TestPoltype(method,examplepath,dontremovetestcase))
     runner = unittest.TextTestRunner()
     runner.run(suite)

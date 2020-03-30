@@ -1,7 +1,7 @@
-from . import electrostaticpotential as esp
-from . import torsiongenerator as torgen
-from . import optimization as opt
-from . import apicall as call
+import electrostaticpotential as esp
+import torsiongenerator as torgen
+import optimization as opt
+import apicall as call
 from socket import gethostname
 
 import os
@@ -208,7 +208,11 @@ def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog
     return listofjobs,jobtooutputlog,logpath
 
 def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog):
-    finishedjobs,errorjobs=poltype.CallJobsLocalHost(listofjobs,jobtooutputlog)
+    if poltype.externalapi!=None:
+        finishedjobs,errorjobs=poltype.CallJobsLocalHost(listofjobs,jobtooutputlog)
+    else:
+        finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(listofjobs,jobtooutputlog)
+
     return finishedjobs,errorjobs
 
  

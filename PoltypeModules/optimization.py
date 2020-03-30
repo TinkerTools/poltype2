@@ -4,7 +4,7 @@ from socket import gethostname
 import openbabel
 import re
 import time
-from . import apicall as call
+import apicall as call
 
 def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
     tempread=open(comfilecoords,'r')
@@ -263,7 +263,7 @@ def GeometryOptimization(poltype,mol):
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdir
-            jobtologlistfilepathprefix=os.getcwd()+r'/'+'optimizationjobtolog'
+            jobtologlistfilepathprefix=os.getcwd()+r'/'+'optimizationjobtolog'+poltype.molstructfname
             if os.path.isfile(poltype.chkoptfname):
                 os.remove(poltype.logoptfname) # if chk point exists just remove logfile, there could be error in it and we dont want WaitForTermination to catch error before job is resubmitted by daemon 
 
@@ -292,7 +292,7 @@ def GeometryOptimization(poltype,mol):
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scratchdir
-            jobtologlistfilepathprefix=os.getcwd()+r'/'+'optimizationjobtolog'
+            jobtologlistfilepathprefix=os.getcwd()+r'/'+'optimizationjobtolog'+poltype.molstructfname
             if os.path.isfile(poltype.logoptfname):
                 os.remove(poltype.logoptfname)
             if poltype.externalapi!=None:

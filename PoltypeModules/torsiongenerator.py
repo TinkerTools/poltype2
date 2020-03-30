@@ -1,9 +1,9 @@
-from . import symmetry as symm
-from . import optimization as opt
-from . import electrostaticpotential as esp
-from . import valence
-from . import torsionfit as torfit
-from . import apicall as call
+import symmetry as symm
+import optimization as opt
+import electrostaticpotential as esp
+import valence
+import torsionfit as torfit
+import apicall as call
 import os
 import sys
 import openbabel
@@ -24,7 +24,7 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,fullrange,optmol,a,b,c,d,tora
     jobtooutputlog={}
     listofjobs=[]
     outputlogs=[]
-    jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMOptJobToLog'+'-'+str(a)+'-'+str(b)+'-'+str(c)+'-'+str(d)
+    jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMOptJobToLog'+'-'+str(a)+'-'+str(b)+'-'+str(c)+'-'+str(d)+poltype.molstructfname
     for i in range(len(listofstructurestorunQM)):
         torxyzfname=listofstructurestorunQM[i]
         phaseangle=fullrange[i]
@@ -73,7 +73,7 @@ def ExecuteSPJobs(poltype,torxyznames,optoutputlogs,fullrange,optmol,a,b,c,d,tor
     jobtooutputlog={}
     listofjobs=[]
     outputnames=[]
-    jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMSPJobToLog'+'-'+str(a)+'-'+str(b)+'-'+str(c)+'-'+str(d)
+    jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMSPJobToLog'+'-'+str(a)+'-'+str(b)+'-'+str(c)+'-'+str(d)+poltype.molstructfname
     for i in range(len(torxyznames)):
         torxyzfname=torxyznames[i]
         outputlog=optoutputlogs[i]
@@ -326,7 +326,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
                 call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
             finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
         else:
-            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(listofjobs,jobtooutputlog)
+            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(listofjobs,jobtooutputlog,True)
         for outputlog in outputlogs:
             finished,error=poltype.CheckNormalTermination(outputlog)
             if finished==True and 'opt' in outputlog:
@@ -355,7 +355,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
                 call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
             finshedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
         else:
-            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(listofjobs,jobtooutputlog)
+            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(listofjobs,jobtooutputlog,True)
     os.chdir('..')
 
 def GenerateBondTopology(poltype,optmol):

@@ -1,5 +1,5 @@
-from . import symmetry as symm
-from . import electrostaticpotential as esp
+import symmetry as symm
+import electrostaticpotential as esp
 
 import os
 import sys

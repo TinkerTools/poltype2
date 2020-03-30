@@ -4,7 +4,10 @@ RUNNING POLTYPE
 *Prepare the poltype.ini and sdf file as shown below
 *Navigate to directory containing poltype.ini and .sdf file, and run:
 
-           python /path_to_poltype/poltype.py
+python /path_to_poltype/poltype.py
+
+ttt.xyz and ttt.key are the resulting structure and parameter files you will need.
+
 
 HELP
 *********************************************
@@ -12,13 +15,17 @@ python /path_to_poltype/poltype.py --help
 
 Unittesting
 *********************************************
-Make sure poltypepackage is in PYTHONPATH or you are in parentdirectory of poltypepackage folder.
 python ~/poltypepackage/PoltypeModules/test_poltype.py
 python ~/poltypepackage/PoltypeModules/test_poltype.py --method=test_Fragmenter --examplepath=/home/bdw2292/PoltypeJobs/MOLECULE0DontFrag
+python ~/poltypepackage/PoltypeModules/test_poltype.py --method=test_Fragmenter --examplepath=/home/bdw2292/PoltypeJobs/MOLECULE0DontFrag --dontremovetestcase
 
-In order to test the fragmenter, run POLTYPE with fragmenting option turned off to paramterize the torsion first. 
+In order to test the fragmenter, run POLTYPE with fragmenting option turned off(dontfrag) to paramterize the torsion first, then specify the examplepath to that POLTYPE job. Add --dontremovetestcase , if there is an issue with the job and you want to restart without starting from scratch. Use --method flag to specify which POLTYPE test to run from the test_poltype module. 
 
-ttt.xyz and ttt.key are the resulting structure and parameter files you will need.
+
+FAQ
+*********************************************
+Q)If I want to change QM methods/basis set do I need to restart POLTYPE job from scratch?
+A)No, POLTYPE will look for output files from QM (see README.MANIFEST) to see if it needs to perform a job or continue. So you can delete the outputlog file, change your input options and resubmit POLTYPE job.
 
 
 Common Errors
@@ -195,8 +202,4 @@ Atom Typing
 ********************************************* 
 atmidx   specifies which number to start poltype type numbers from. 
          Default=401
-uniqidx  specifies to use atom indexes as atom type numbers rather than averaging types
-         Default=False
-
-
 
