@@ -458,7 +458,7 @@ class PolarizableTyper():
                 
     
     
-        cmdstr=self.analyzeexe+' '+self.poltypepath+r'/'+'water.xyz'+' '+'-k'+' '+self.poltypepath+r'/'+'water.key'+' '+'e'+'>'+' '+'version.out'
+        cmdstr=self.analyzeexe+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+'water.xyz'+' '+'-k'+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+'water.key'+' '+'e'+'>'+' '+'version.out'
         try:
             if self.printoutput==True:
                 print('Calling: '+cmdstr) 
@@ -777,6 +777,9 @@ class PolarizableTyper():
     
             
     def GenerateParameters(self):
+        if os.path.isfile(self.tmpxyzfile+'_2'):
+            os.remove(self.tmpxyzfile+'_2') 
+
         obConversion = openbabel.OBConversion()
         mol = openbabel.OBMol()
         inFormat = obConversion.FormatFromExt(self.molstructfname)
@@ -966,8 +969,6 @@ class PolarizableTyper():
                 if fname.endswith('.chk'):
                     os.remove(fname)
             os.chdir('..')
-        if os.path.isfile(self.tmpxyzfile+'_2'):
-            os.remove(self.tmpxyzfile+'_2') 
         param = parameterfile.AmoebaParameterSet(keyfilecopyname)
         return param
 

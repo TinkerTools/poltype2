@@ -1,6 +1,6 @@
 import symmetry as symm
 import electrostaticpotential as esp
-
+import time
 import os
 import sys
 import openbabel
@@ -555,6 +555,9 @@ def prepend_keyfile(poltype,keyfilename,optmol,dipole=False):
     """
     Intent: Adds a header to the key file given by 'keyfilename'
     """
+    while not os.path.isfile(keyfilename):
+        time.sleep(5)
+        poltype.WriteToLog('Waiting for '+keyfilename)
     tmpfname = keyfilename + "_tmp"
     tmpfh = open(tmpfname, "w")
     keyfh = open(keyfilename, "r")

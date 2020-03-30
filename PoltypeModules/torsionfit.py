@@ -938,8 +938,8 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         # make a plot with different y-axis using second axis object
         line5, =ax2.plot(qang_list,WBOarray,'y',label='WBO')
         ax2.set_ylabel("WBO",color="blue",fontsize=14)
-        ax.xlabel('Dihedral Angle')
-        ax.ylabel('SP Energy (kcal/mol)')
+        ax.set_xlabel('Dihedral Angle')
+        ax.set_ylabel('SP Energy (kcal/mol)')
         plt.legend(handles=[line1,line2,line3,line4,line5],loc='best')
         fig = plt.gcf()
         plt.show()

@@ -113,12 +113,10 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
     return inputname,outputname
 
 def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
-    poltype.WriteToLog('about to read '+comfilecoords)
     tempread=open(comfilecoords,'r')
     results=tempread.readlines()
     tempread.close()
     inputname=comfilename.replace('.com','_psi4.dat')
-    poltype.WriteToLog('about to make dma input')
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
     temp.write('%d %d\n' % (poltype.totalcharge, 1))

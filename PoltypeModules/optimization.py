@@ -237,7 +237,7 @@ def StructureMinimization(poltype):
      poltype.call_subsystem(cmd)
      cmd='cp ' + poltype.key5fname + ' ' + poltype.tmpkeyfile
      poltype.call_subsystem(cmd)
-     cmd = poltype.minimizeexe+' -k '+poltype.tmpkeyfile+' '+poltype.tmpxyzfile+' 0.1'
+     cmd = poltype.minimizeexe+' -k '+poltype.tmpkeyfile+' '+poltype.tmpxyzfile+' 0.1 > Minimizedttt.out'
      poltype.call_subsystem(cmd,True)
 
 
