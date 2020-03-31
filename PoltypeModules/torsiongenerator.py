@@ -38,6 +38,7 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,fullrange,optmol,a,b,c,d,tora
                 statinfo=os.stat(outputlog)
                 size=statinfo.st_size
                 if size!=0:
+                    os.remove(outputlog)
                     listofjobs.append(cmdstr)
                     jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputlog
             else:
@@ -93,6 +94,7 @@ def ExecuteSPJobs(poltype,torxyznames,optoutputlogs,fullrange,optmol,a,b,c,d,tor
                 statinfo=os.stat(outputname)
                 size=statinfo.st_size
                 if size!=0:
+                    os.remove(outputname)
                     listofjobs.append(cmdstr)
                     jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputname
             else:

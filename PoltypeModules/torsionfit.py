@@ -786,7 +786,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         ax = fig.add_subplot(111)
         l1, = ax.plot(Sx,fitfunc_dict[clskey],'r',label='Fit')
         l2, = ax.plot(Sx,tor_energy_list,'b',label='QM-MM1')
-        plt.legend(handles=[l1,l2],loc='best')
+        plt.legend(handles=[l1,l2],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=2)
         numprms=1 # offset parameter incldued with torsion force constant parameters
         for classkey in torprmdict:
            numprms+= len(torprmdict[classkey]['prmdict'].keys())
@@ -940,7 +940,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         ax2.set_ylabel("WBO",color="blue",fontsize=14)
         ax.set_xlabel('Dihedral Angle')
         ax.set_ylabel('SP Energy (kcal/mol)')
-        plt.legend(handles=[line1,line2,line3,line4,line5],loc='best')
+        plt.legend(handles=[line1,line2,line3,line4,line5],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
         fig = plt.gcf()
         plt.show()
         fig.savefig(figfname)
