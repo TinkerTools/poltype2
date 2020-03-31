@@ -473,13 +473,13 @@ class PolarizableTyper():
             if "Version" in line:
                 linesplit=line.split()
                 self.versionnum=float(linesplit[2])
-                if self.versionnum>=8.7 or self.versionnum==8.2:
+                if self.versionnum==8.2:
                     latestversion = True
                     break
            
         if(not latestversion):
             
-            raise ValueError("Notice: Not latest version of tinker (>=8.7 or =8.2)"+' '+os.getcwd())
+            raise ValueError("Notice: Not latest working version of tinker (8.2)"+' '+os.getcwd())
       
         if ("TINKERDIR" in os.environ):
             self.tinkerdir = os.environ["TINKERDIR"]

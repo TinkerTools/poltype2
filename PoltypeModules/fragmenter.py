@@ -117,6 +117,7 @@ def GrabWBOMatrixGaussian(poltype,outputlog,mol):
                 colnum=i+1+currentcolnum
                 value=wborowvalues[i]	
                 WBOmatrix[rownum-1,colnum-1]=float(value)
+    return WBOmatrix
                 
 def GrabWBOMatrixPsi4(poltype,outputlog,mol):
     try:
@@ -146,6 +147,7 @@ def GrabWBOMatrixPsi4(poltype,outputlog,mol):
                 value=float(row[i])
                 colindex=int(colindexrow[i])
                 WBOmatrix[rowindex-1,colindex-1]=value
+    return WBOmatrix
                            
 
  
