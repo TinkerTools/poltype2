@@ -301,6 +301,10 @@ def gen_peditinfile8_7(poltype,mol):
         #f.write('\n')
         f.write('\n')
         f.write("N\n")
+
+        f.flush()
+        os.fsync(f.fileno())
+
         f.close()
     return lfzerox,atomindextoremovedipquad,atomtypetospecialtrace,atomindextoremovedipquadcross
 
@@ -454,65 +458,87 @@ def gen_peditinfile8_2(poltype,mol):
         for a in iteratom:
             if idxtobisecthenzbool[a.GetIdx()]==False and idxtotrisecbool[a.GetIdx()]==False:
                 f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " " + str(lf2write[a.GetIdx() - 1]) + "\n")
+
+                f.flush()
+                os.fsync(f.fileno())
+
             elif idxtobisecthenzbool[a.GetIdx()]==True and idxtotrisecbool[a.GetIdx()]==False:
                 bisectidxs=idxtobisectidxs[a.GetIdx()]
                 f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " -" + str(bisectidxs[0])+ " -" + str(bisectidxs[1]) + "\n")
+
+                f.flush()
+                os.fsync(f.fileno())
+
             else:
                 trisecidxs=idxtotrisectidxs[a.GetIdx()]
                 f.write(str(a.GetIdx()) + " -" + str(trisecidxs[0])+ " -" + str(trisecidxs[1]) + " -" + str(trisecidxs[2])+ "\n")
+
+                f.flush()
+                os.fsync(f.fileno())
+
     
         f.write("\n")
 
-    #Find aromatic carbon, halogens, and bonded hydrogens to correct polarizability
-    iteratom = openbabel.OBMolAtomIter(mol)
-    for a in iteratom:
-        if (a.GetAtomicNum() == 6 and a.IsAromatic()):
-            f.write(str(a.GetIdx()) + " " + str(1.750) + "\n")
-        elif (a.GetAtomicNum() == 9):
-            f.write(str(a.GetIdx()) + " " + str(0.507) + "\n")
-        elif (a.GetAtomicNum() == 17):
-            f.write(str(a.GetIdx()) + " " + str(2.500) + "\n")
-        elif (a.GetAtomicNum() == 35):
-            f.write(str(a.GetIdx()) + " " + str(3.595) + "\n")
-        elif (a.GetAtomicNum() == 1):
-            iteratomatom = openbabel.OBAtomAtomIter(a)
-            for b in iteratomatom:
-                if (b.GetAtomicNum() == 6 and b.IsAromatic()):
-                    f.write(str(a.GetIdx()) + " " + str(0.696) + "\n")
+        f.flush()
+        os.fsync(f.fileno())
 
-    # Carboxylate ion O-
-    sp = openbabel.OBSmartsPattern()
-    openbabel.OBSmartsPattern.Init(sp,'[OD1]~C~[OD1]')
-    sp.Match(mol)
-    for ia in sp.GetMapList():
-        f.write(str(ia[0]) + " " + str(0.921) + "\n")
+        #Find aromatic carbon, halogens, and bonded hydrogens to correct polarizability
+        iteratom = openbabel.OBMolAtomIter(mol)
+        for a in iteratom:
+            if (a.GetAtomicNum() == 6 and a.IsAromatic()):
+                f.write(str(a.GetIdx()) + " " + str(1.750) + "\n")
+            elif (a.GetAtomicNum() == 9):
+                f.write(str(a.GetIdx()) + " " + str(0.507) + "\n")
+            elif (a.GetAtomicNum() == 17):
+                f.write(str(a.GetIdx()) + " " + str(2.500) + "\n")
+            elif (a.GetAtomicNum() == 35):
+                f.write(str(a.GetIdx()) + " " + str(3.595) + "\n")
+            elif (a.GetAtomicNum() == 1):
+                iteratomatom = openbabel.OBAtomAtomIter(a)
+                for b in iteratomatom:
+                    if (b.GetAtomicNum() == 6 and b.IsAromatic()):
+                        f.write(str(a.GetIdx()) + " " + str(0.696) + "\n")
 
-    f.write("\n")
+        # Carboxylate ion O-
+        sp = openbabel.OBSmartsPattern()
+        openbabel.OBSmartsPattern.Init(sp,'[OD1]~C~[OD1]')
+        sp.Match(mol)
+        for ia in sp.GetMapList():
+            f.write(str(ia[0]) + " " + str(0.921) + "\n")
 
-    #Define polarizable groups by cutting bonds
-    iterbond = openbabel.OBMolBondIter(mol)
-    for b in iterbond:
-        if (b.IsRotor()):
-            cut_bond = True
-            # If in this group, then don't cut bond
-            cut_bond = cut_bond and (not is_in_polargroup(mol,'a[CH2][*]', b,f))
-            cut_bond = cut_bond and (not is_in_polargroup(mol,'[#6]O-[#1]', b,f))
-            #cut_bond = cut_bond and (not is_in_polargroup(mol,'[#6][#6]~O', b,f))
-            # Formamide RC=O
-            cut_bond = cut_bond and (not is_in_polargroup(mol,'[*][CH]=O', b,f))
-            # Amide
-            cut_bond = cut_bond and (not is_in_polargroup(mol,'N(C=O)', b,f))
-            cut_bond = cut_bond and (not is_in_polargroup(mol,'C(C=O)', b,f))
-            cut_bond = cut_bond and (not is_in_polargroup(mol,'aN', b,f))
-            cut_bond = cut_bond and (not is_in_polargroup(mol,'O-[*]', b,f))
-            #cut_bond = cut_bond and (not is_in_polargroup(mol,'C[NH2]', b,f))
-            if (cut_bond):
-                f.write( str(b.GetBeginAtomIdx()) + " " + str(b.GetEndAtomIdx()) + "\n")
+        f.write("\n")
 
-    f.write("\n")
-    f.write("\n")
-    f.write("Y\n")
-    f.close()
+        f.flush()
+        os.fsync(f.fileno())
+
+        #Define polarizable groups by cutting bonds
+        iterbond = openbabel.OBMolBondIter(mol)
+        for b in iterbond:
+            if (b.IsRotor()):
+                cut_bond = True
+                # If in this group, then don't cut bond
+                cut_bond = cut_bond and (not is_in_polargroup(poltype,mol,'a[CH2][*]', b,f))
+                cut_bond = cut_bond and (not is_in_polargroup(poltype,mol,'[#6]O-[#1]', b,f))
+                #cut_bond = cut_bond and (not is_in_polargroup(mol,'[#6][#6]~O', b,f))
+                # Formamide RC=O
+                cut_bond = cut_bond and (not is_in_polargroup(poltype,mol,'[*][CH]=O', b,f))
+                # Amide
+                cut_bond = cut_bond and (not is_in_polargroup(poltype,mol,'N(C=O)', b,f))
+                cut_bond = cut_bond and (not is_in_polargroup(poltype,mol,'C(C=O)', b,f))
+                cut_bond = cut_bond and (not is_in_polargroup(poltype,mol,'aN', b,f))
+                cut_bond = cut_bond and (not is_in_polargroup(poltype,mol,'O-[*]', b,f))
+                #cut_bond = cut_bond and (not is_in_polargroup(mol,'C[NH2]', b,f))
+                if (cut_bond):
+                    f.write( str(b.GetBeginAtomIdx()) + " " + str(b.GetEndAtomIdx()) + "\n")
+
+        f.write("\n")
+        f.write("N\n")
+        f.write("N\n")
+
+        f.flush()
+        os.fsync(f.fileno())
+
+        f.close()
     return lfzerox,atomindextoremovedipquad,atomtypetospecialtrace,atomindextoremovedipquadcross
 
 
