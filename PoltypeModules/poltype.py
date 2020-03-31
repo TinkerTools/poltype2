@@ -473,13 +473,13 @@ class PolarizableTyper():
             if "Version" in line:
                 linesplit=line.split()
                 self.versionnum=float(linesplit[2])
-                if self.versionnum>=8.7:
+                if self.versionnum>=8.7 or self.versionnum==8.2:
                     latestversion = True
                     break
            
         if(not latestversion):
             
-            raise ValueError("Notice: Not latest version of tinker (>=8.7)"+' '+os.getcwd())
+            raise ValueError("Notice: Not latest version of tinker (>=8.7 or =8.2)"+' '+os.getcwd())
       
         if ("TINKERDIR" in os.environ):
             self.tinkerdir = os.environ["TINKERDIR"]
@@ -828,8 +828,14 @@ class PolarizableTyper():
             mpole.run_gdma(self)
     
         # Set up input file for poledit
-        # find multipole local frame definitions 
-        lfzerox,atomindextoremovedipquad,atomtypetospecialtrace,atomindextoremovedipquadcross = mpole.gen_peditinfile(self,mol)
+        # find multipole local frame definitions
+        if self.versionnum==8.2:
+            lfzerox,atomindextoremovedipquad,atomtypetospecialtrace,atomindextoremovedipquadcross = mpole.gen_peditinfile8_2(self,mol)
+
+        else:
+            lfzerox,atomindextoremovedipquad,atomtypetospecialtrace,atomindextoremovedipquadcross = mpole.gen_peditinfile8_7(self,mol)
+        
+
         
         
         if (not os.path.isfile(self.xyzfname) or not os.path.isfile(self.keyfname)):

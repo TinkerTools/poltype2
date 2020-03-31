@@ -80,6 +80,8 @@ After the bond block, you can specify formal charge. Just put the total charge o
 
 The following example means there is 1 atom with a formal charge: atom 2 has a +1 charge
 
+For 0 total charge, you do not need to specify CHG line
+
 M  CHG  1   2   1
 
 Most Common Inputs
