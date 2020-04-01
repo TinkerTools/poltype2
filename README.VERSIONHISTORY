@@ -78,3 +78,5 @@
 * Updates to README files as well as fragmenter, torsion libraries, unittesting library.
 2.2.3
 * Bug in TINKER 8.7 POLEDIT.X, POLTYPE now supports TINKER 8.2 and TINKER >=8.7
+2.2.4
+* Bug is okay now, continue using TINKER >=8.7

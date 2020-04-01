@@ -473,13 +473,13 @@ class PolarizableTyper():
             if "Version" in line:
                 linesplit=line.split()
                 self.versionnum=float(linesplit[2])
-                if self.versionnum==8.2:
+                if self.versionnum>=8.7:
                     latestversion = True
                     break
            
         if(not latestversion):
             
-            raise ValueError("Notice: Not latest working version of tinker (8.2)"+' '+os.getcwd())
+            raise ValueError("Notice: Not latest working version of tinker (8.7)"+' '+os.getcwd())
       
         if ("TINKERDIR" in os.environ):
             self.tinkerdir = os.environ["TINKERDIR"]
@@ -655,7 +655,10 @@ class PolarizableTyper():
                         finishedjobs.append(outputlog)
                         errorjobs.append(outputlog)
                 elif finished==False and error==False:
-                    self.WriteToLog('Waiting on '+outputlog+' '+'for termination ')
+                    if os.path.isfile(outputlog):
+                        self.WriteToLog('Waiting on '+outputlog+' '+'to begin')
+                    else:
+                        self.WriteToLog('Waiting on '+outputlog+' '+'for termination ')
                 else: # this case is finshed=True and error=True because there stupid quotes sometimes have word error in it                  
                     if outputlog not in finishedjobs:
                         error=False
@@ -689,6 +692,8 @@ class PolarizableTyper():
                         error=False
                         continue
                     error=True
+                if error==True and term==False:
+                    self.WriteToLog('Error '+line+ 'logpath='+logfname) 
         return term,error
     
         
@@ -829,11 +834,8 @@ class PolarizableTyper():
     
         # Set up input file for poledit
         # find multipole local frame definitions
-        if self.versionnum==8.2:
-            lfzerox,atomindextoremovedipquad,atomtypetospecialtrace,atomindextoremovedipquadcross = mpole.gen_peditinfile8_2(self,mol)
 
-        else:
-            lfzerox,atomindextoremovedipquad,atomtypetospecialtrace,atomindextoremovedipquadcross = mpole.gen_peditinfile8_7(self,mol)
+        lfzerox,atomindextoremovedipquad,atomtypetospecialtrace,atomindextoremovedipquadcross = mpole.gen_peditinfile(self,mol)
         
 
         
