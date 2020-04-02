@@ -483,8 +483,8 @@ For alchol, the quadrupole on O and H should be mannually scaled by 0.6. This on
             scalelist[symm.get_class_number(poltype,atm.GetIdx())].append(None)
             multipole_scale_dict = {}
 
-    multipole_scale_dict['[OH][CX4]'] = [2, 0.6]
-    multipole_scale_dict['[NH2][CX4]'] = [2, 0.75]
+    #multipole_scale_dict['[OH][CX4]'] = [2, 0.6]
+    #multipole_scale_dict['[NH2][CX4]'] = [2, 0.75]
     for (sckey, scval) in multipole_scale_dict.items():
         sp = openbabel.OBSmartsPattern()
         openbabel.OBSmartsPattern.Init(sp,sckey)
