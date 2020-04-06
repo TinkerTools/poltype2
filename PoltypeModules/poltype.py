@@ -36,6 +36,7 @@ import electrostaticpotential as esp
 import multipole as mpole
 import fragmenter as frag
 from parmed.tinker import parameterfile
+from rdkit import Chem
 from rdkit.Chem import rdmolfiles
 
 
@@ -793,6 +794,7 @@ class PolarizableTyper():
         self.molstructfnamemol=self.molstructfname.replace('.sdf','.mol')
         obConversion.WriteFile(mol,self.molstructfnamemol)
         self.mol=mol
+        m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False)
     
         # Begin log. *-poltype.log
         if os.path.isfile(self.logfname):
@@ -815,7 +817,7 @@ class PolarizableTyper():
         self.localframe1 = [ 0 ] * mol.NumAtoms()
         self.localframe2 = [ 0 ] * mol.NumAtoms()
     
-        symm.gen_canonicallabels(self,mol)
+        symm.CalculateSymmetry(self,m)
 
  
         # QM calculations are done here
@@ -910,11 +912,8 @@ class PolarizableTyper():
     
     
             # Map from idx to symm class is made for valence.py
-            idxtoclass=[]
-            for i in range(mol.NumAtoms()):
-                idxtoclass.append(symm.get_class_number(self,i+1))
             v = valence.Valence(self.versionnum,self.logfname)
-            v.setidxtoclass(idxtoclass)
+            v.setidxtoclass(self.idxtosymclass)
             dorot = True
             # valence.py method is called to find parameters and append them to the keyfile
             v.appendtofile(self.key4fname, optmol, dorot,self.rotbndlist)

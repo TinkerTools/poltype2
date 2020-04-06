@@ -42,7 +42,7 @@ class Valence():
 
 
     def setidxtoclass(self, symmclass):
-        self.idxtoclass = symmclass
+        self.idxtosymclass = symmclass
 
     def get_mt(self):
         return self.missed_torsions
@@ -598,7 +598,7 @@ class Valence():
                 self.sp.Match(mol)
                 for ia in self.sp.GetMapList():
                     #key1 = '%d ' % idxtoclass.get(ia[0])
-                    key1 = self.idxtoclass[ia[0] - 1]
+                    key1 = self.idxtosymclass[ia[0]]
                     if(len(v[skey]) == 3):
                         key2 = 'vdw%10d%8.4f%9.4f%6.3f' % (key1, v[skey][0], v[skey][1], v[skey][2])
                     else:
@@ -997,7 +997,7 @@ class Valence():
                 openbabel.OBSmartsPattern.Init(self.sp,skey)
                 self.sp.Match(mol)
                 for ia in self.sp.GetMapList():
-                    sortedlist = [self.idxtoclass[ia[0] - 1], self.idxtoclass[ia[1] - 1]]
+                    sortedlist = [self.idxtosymclass[ia[0]], self.idxtosymclass[ia[1]]]
                     sortedlist.sort()
                     key1 = sortedlist
                     key1string = '%d %d ' % (key1[0], key1[1])
@@ -1562,7 +1562,7 @@ class Valence():
                 openbabel.OBSmartsPattern.Init(self.sp,skey)
                 match=self.sp.Match(mol)
                 for ia in self.sp.GetMapList():
-                    sortedlist = [self.idxtoclass[ia[0] - 1], self.idxtoclass[ia[1] - 1], self.idxtoclass[ia[2] - 1]]
+                    sortedlist = [self.idxtosymclass[ia[0]], self.idxtosymclass[ia[1]], self.idxtosymclass[ia[2]]]
                     if(mol.GetAtom(ia[0]).GetAtomicNum() > mol.GetAtom(ia[2]).GetAtomicNum()):
                         continue
                     key1 = self.sortfirstlast(sortedlist)
@@ -1991,7 +1991,7 @@ class Valence():
                 openbabel.OBSmartsPattern.Init(self.sp,skey)
                 self.sp.Match(mol)
                 for ia in self.sp.GetMapList():
-                    sortedlist = [self.idxtoclass[ia[0] - 1], self.idxtoclass[ia[1] - 1], self.idxtoclass[ia[2] - 1]]
+                    sortedlist = [self.idxtosymclass[ia[0]], self.idxtosymclass[ia[1]], self.idxtosymclass[ia[2]]]
                     if(mol.GetAtom(ia[0]).GetAtomicNum() > mol.GetAtom(ia[2]).GetAtomicNum()):
                         continue
                     key1 = self.sortfirstlast(sortedlist)
@@ -2580,10 +2580,9 @@ class Valence():
                 self.sp.Match(mol)
                 for ia in self.sp.GetMapList():
                     if(len(v[skey]) == 7):
-                        sortedlist = [self.idxtoclass[ia[v[skey][0] - 1] - 1], self.idxtoclass[ia[v[skey][1] - 1] - 1], self.idxtoclass[ia[v[skey][2] - 1] - 1], \
-                        self.idxtoclass[ia[v[skey][3] - 1] - 1]]
+                        sortedlist = [self.idxtosymclass[ia[v[skey][0] - 1]], self.idxtosymclass[ia[v[skey][1] - 1]], self.idxtosymclass[ia[v[skey][2] - 1]], self.idxtosymclass[ia[v[skey][3] - 1]]]
                     else:
-                        sortedlist = [self.idxtoclass[ia[0] - 1], self.idxtoclass[ia[1] - 1], self.idxtoclass[ia[2] - 1], self.idxtoclass[ia[3] - 1]]
+                        sortedlist = [self.idxtosymclass[ia[0]], self.idxtosymclass[ia[1]], self.idxtosymclass[ia[2]], self.idxtosymclass[ia[3]]]
                     key1 = self.sorttorsion(sortedlist)
                     if(len(v[skey]) == 7):
                         aidx=ia[v[skey][0] - 1]
@@ -2610,7 +2609,7 @@ class Valence():
                         zeroed=True
                     if(dorot):
                         for r in rotbnds:
-                            sortr = self.sorttorsion([self.idxtoclass[r[0] - 1],self.idxtoclass[r[1] - 1],self.idxtoclass[r[2] - 1],self.idxtoclass[r[3] - 1]])
+                            sortr = self.sorttorsion([self.idxtosymclass[r[0]],self.idxtosymclass[r[1]],self.idxtosymclass[r[2]],self.idxtosymclass[r[3]]])
                             if(key1 == sortr):
                                 zeroed = True
                                 break
@@ -2687,7 +2686,7 @@ class Valence():
         keytosmarts={}
         for (opbkey, opbval) in opbendvals:
             opblist = opbkey.split()
-            covlkey = (self.idxtoclass[int(opblist[0])-1], self.idxtoclass[int(opblist[1]) - 1],int(opblist[2]),int(opblist[3]))
+            covlkey = (self.idxtosymclass[int(opblist[0])], self.idxtosymclass[int(opblist[1])],int(opblist[2]),int(opblist[3]))
             if ((covlkey not in clsopbvallist) or opbval):
                 clsopbvallist[covlkey] = opbval[0]
                 keytosmarts[covlkey]=opbval[2]
@@ -2716,7 +2715,7 @@ class Valence():
                 openbabel.OBSmartsPattern.Init(self.sp,skey)
                 self.sp.Match(mol)
                 for ia in self.sp.GetMapList():
-                    sortedlist = [self.idxtoclass[ia[v[skey][0] - 1] - 1], self.idxtoclass[ia[v[skey][1] - 1] - 1]]
+                    sortedlist = [self.idxtosymclass[ia[v[skey][0] - 1]], self.idxtosymclass[ia[v[skey][1] - 1]]]
                     sortedlist.sort()
                     key1 = sortedlist
                     key1string = '%d %d ' % (key1[0], key1[1])
@@ -2739,11 +2738,11 @@ class Valence():
             sb3 = int(x.split()[3])
             sbv = float(x.split()[4])
             sbvl = [0.0, 0.0, 0.0]
-            for k in range(len(self.idxtoclass)):
-                if self.idxtoclass[k] == sb1 and mol.GetAtom(k+1).GetAtomicNum() == 1:
+            for k in range(len(self.idxtosymclass)):
+                if self.idxtosymclass[k] == sb1 and mol.GetAtom(k+1).GetAtomicNum() == 1:
                     hydrogen = True
                     break
-                elif self.idxtoclass[k] == sb3 and mol.GetAtom(k+1).GetAtomicNum() == 1:
+                elif self.idxtosymclass[k] == sb3 and mol.GetAtom(k+1).GetAtomicNum() == 1:
                     hydrogen = True
                     break
             if sb2 not in new_sbd:
@@ -2832,6 +2831,6 @@ class Valence():
         #xyzf = open(xyzfname, "r")
         #xyzf.readline()
         #for line in xyzf:
-            #self.idxtoclass.update(
+            #self.idxtosymclass.update(
                 #{int(line.split()[0]) : int(line.split()[5])})
 

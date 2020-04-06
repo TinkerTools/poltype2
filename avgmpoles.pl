@@ -164,8 +164,6 @@ foreach $atmnum ($first .. $last)
          if ($size==6) # case where there is bisector then z, otherwise it is normal
          {
             my $tmpval3 = (split ' ', $lines[$linenum])[4];
-            print "line: $lines[$linenum]\n";
-            print "Content temp c3: $tmpval3\n";
 
             $atmnumtozthenbisectbool{$atmnum} = 1;
          if ($tmpval3 < 0)
@@ -214,7 +212,6 @@ foreach $atmnum ($first .. $last)
          if ($tmpval2 < 0)
          {
             $c1[$typeid[$atmnum]] = -$typeid[-$tmpval2];
-            print "tmpval2", $tmpval2," ", $c1[$typeid[$atmnum]]," ",$c2[$typeid[$atmnum]],"\n";
          }
 
          #$axdef[$typeid[$atmnum]]=(split ' ',$lines[$linenum])[4];

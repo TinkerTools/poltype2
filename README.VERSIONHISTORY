@@ -82,4 +82,5 @@
 * Bug is okay now, continue using TINKER >=8.7
 2.2.5
 * multipole scaling turned off for alcohols
-
+2.2.6
+* fixed symmetry frames bug, added new Symmetry molecules cases to Examples folder, see README.MANIFEST

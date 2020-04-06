@@ -400,11 +400,7 @@ def get_torlist(poltype,mol):
 
     iterbond = openbabel.OBMolBondIter(mol)
     v1 = valence.Valence(poltype.versionnum,poltype.logfname)
-    idxtoclass = []
-    for i in range(mol.NumAtoms()):
-        idxtoclass.append(i+1)
-        v1.setidxtoclass(idxtoclass)
-        # dorot is set as false in valence.py
+    v1.setidxtoclass(poltype.idxtosymclass)
     v1.torguess(mol,False,[])
     missed_torsions = v1.get_mt()
     poltype.WriteToLog('missing torsions '+str(missed_torsions))
@@ -528,13 +524,13 @@ def find_tor_restraint_idx(poltype,mol,b1,b2):
     b1nbridx = list(map(lambda x: x.GetIdx(), iteratomatom))
     del b1nbridx[b1nbridx.index(b2idx)]    # Remove b2 from list
     assert(b1nbridx is not [])
-    maxb1class = max(b1nbridx,key=lambda x: symm.get_symm_class(poltype,x))
+    maxb1class = max(b1nbridx,key=lambda x: poltype.idxtosymclass[x])
 
     iteratomatom = openbabel.OBAtomAtomIter(b2)
     b2nbridx = list(map(lambda x: x.GetIdx(), iteratomatom))
     del b2nbridx[b2nbridx.index(b1idx)]    # Remove b1 from list
     assert(b2nbridx is not [])
-    maxb2class = max(b2nbridx, key= lambda x:symm.get_symm_class(poltype,x))
+    maxb2class = max(b2nbridx, key= lambda x:poltype.idxtosymclass[x])
 
 
     t1 = mol.GetAtom(maxb1class)
@@ -764,10 +760,10 @@ def get_class_key(poltype,a, b, c, d):
     """
     Intent: Given a set of atom idx's, return the class key for the set (the class numbers of the atoms appended together)
     """
-    cla = symm.get_class_number(poltype,a)
-    clb = symm.get_class_number(poltype,b)
-    clc = symm.get_class_number(poltype,c)
-    cld = symm.get_class_number(poltype,d)
+    cla = poltype.idxtosymclass[a]
+    clb = poltype.idxtosymclass[b]
+    clc = poltype.idxtosymclass[c]
+    cld = poltype.idxtosymclass[d]
 
     if ((clb > clc) or (clb == clc and cla > cld)):
         return '%d %d %d %d' % (cld, clc, clb, cla)
@@ -778,10 +774,10 @@ def get_uniq_rotbnd(poltype,a, b, c, d):
     Intent: Return the atom idx's defining a rotatable bond in the order of the class key
     found by 'get_class_key'
     """
-    cla = symm.get_class_number(poltype,a)
-    clb = symm.get_class_number(poltype,b)
-    clc = symm.get_class_number(poltype,c)
-    cld = symm.get_class_number(poltype,d)
+    cla = poltype.idxtosymclass[a]
+    clb = poltype.idxtosymclass[b]
+    clc = poltype.idxtosymclass[c]
+    cld = poltype.idxtosymclass[d]
 
     tmpkey = '%d %d %d %d' % (cla,clb,clc,cld)
     if (get_class_key(poltype,a,b,c,d) == tmpkey):

@@ -135,4 +135,7 @@ SymmetryEthene                          Shows example of Z-only symmetry with th
 SymmetryMethanol                        Shows example of Z-then-x symmetry using immediate neighbors.
 SymmetryAmmonia                         Shows example of trisector symmetry.
 SymmetryAniline                         Shows example of Z-only symmetry using three neighbors (two are same).
+SymmetryDiMethylPhosphate0H             Shows example of bisector frame for P multipole frame.
+SymmetryMethylDihydrogenPhosphate       Shows example of choosing correctly z-then-x for P multipole frame.
+SymmetryDiMethylPhosphate1H             Shows example of z-then-x chosen correctly for all multipole frames.
 
