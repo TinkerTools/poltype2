@@ -32,12 +32,13 @@ import os
 radian = 57.29577951308232088
 
 class Valence():
-    def __init__(self,versionnum,logfname):
+    def __init__(self,versionnum,logfname,dontfrag):
         self.sp = openbabel.OBSmartsPattern()
         self.missed_torsions = []
         self.versionnum=versionnum
         self.logfh = open(logfname,"a")
         self.defopbendval = 0.20016677990819662
+        self.dontfrag=dontfrag
 
 
 
@@ -2573,7 +2574,6 @@ class Valence():
         zeroed = False
         self.logfh.write('****************************************************************************************************'+'\n')
         indextoneighbidxs=self.FindAllNeighborIndexes(mol)
-        self.logfh.write(str(rotbnds)+'\n')
         for v in vals:
             for skey in iter(v):
                 openbabel.OBSmartsPattern.Init(self.sp,skey)
@@ -2605,7 +2605,7 @@ class Valence():
                     neighborindexes=firstneighborindexes+secondneighborindexes
                     check=self.CheckIfNeighborsExistInSMARTMatch(neighborindexes,ia)
                     rot=bond.IsRotor()
-                    if check==False and rot==True:
+                    if (check==False and self.dontfrag==False) and rot==True:
                         zeroed=True
                     if(dorot):
                         for r in rotbnds:

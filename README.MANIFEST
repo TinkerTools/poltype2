@@ -118,6 +118,8 @@ test_poltype.py            Handles unittesting for POLTYPE modules.
 
 Examples
 *********************************************
+ExternalAPIExample                      Example Daemon for jub submission to be used with externalapi command
+                                        and bashrcpath command.
 MethanolTorsionGaus                     Shows example of torsion fitting with various torsion options using Gaussian.
 MethylamineGaus                         Shows example using Gaussian without torsion fitting.
 MethylamineGausOptOnly                  Shows example using Gaussian for optimization but Psi4 for SP.

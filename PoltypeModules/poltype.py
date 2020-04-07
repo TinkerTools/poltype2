@@ -912,7 +912,7 @@ class PolarizableTyper():
     
     
             # Map from idx to symm class is made for valence.py
-            v = valence.Valence(self.versionnum,self.logfname)
+            v = valence.Valence(self.versionnum,self.logfname,self.dontfrag)
             v.setidxtoclass(self.idxtosymclass)
             dorot = True
             # valence.py method is called to find parameters and append them to the keyfile

@@ -329,7 +329,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         lognames=[]
         for job in listofjobs:
             log=jobtooutputlog[job]
-            lognames.append(os.getcwd()+r'/'+poltype.logfname)
+            lognames.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir))+r'/'+poltype.logfname)
         jobtolog=dict(zip(listofjobs, lognames)) 
         fulloutputlogs.extend(outputlogs)
         fulllistofjobs.extend(listofjobs)
@@ -339,7 +339,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
     if poltype.externalapi!=None:
         if len(fulllistofjobs)!=0:
             call.CallExternalAPI(poltype,fulljobtolog,jobtologlistfilenameprefix,scratchdir)
-        finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
+        finishedjobs,errorjobs=poltype.WaitForTermination(fulljobtolog)
     else:
         finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulllistofjobs,fulljobtolog,True)
     for outputlog in fulloutputlogs:
@@ -351,43 +351,36 @@ def gen_torsion(poltype,optmol,torsionrestraint):
 
         if finished==True and error==False and outputlog not in finishedjobs:
             finishedjobs.append(outputlog) 
-
     fulltorxyznames=[]
-    fullfinishedoutputlogs=[]
+    fullfinishedoutputlogsSP=[]
     fullcartxyznames=[]
     fullfinishedphaseangles=[]
-    fulloutputlogs=[]
+    fulloutputlogsSP=[]
     fulllistofjobs=[]
     fulljobtolog={}
     for tor in poltype.torlist:
         a,b,c,d = tor[0:4]
         torang = optmol.GetTorsion(a,b,c,d)
-        key=str(b)+' '+str(c)
-        anginc=poltype.rotbndtoanginc[key]
-        phaselist=range(0,360,anginc)
-        clock=phaselist[1:int(len(phaselist)/2)]
-        counterclock=[i-360 for i in phaselist[int(len(phaselist)/2) :][::-1]]
         consttorlist = list(poltype.torlist)
-        consttorlist.remove(tor)   
+        consttorlist.remove(tor)  
         torxyznames,finishedoutputlogs,cartxyznames,finishedphaseangles=TinkerMinimizePostQMOpt(poltype,fulloutputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,finishedjobs,errorjobs,bondtopology)
-
-        outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteSPJobs(poltype,fulltorxyznames,fullfinishedoutputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
+        fulltorxyznames.extend(torxyznames)
+        fullfinishedoutputlogsSP.extend(finishedoutputlogs)
+        fullcartxyznames.extend(cartxyznames)
+        fullfinishedphaseangles.extend(finishedphaseangles)
+        outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteSPJobs(poltype,fulltorxyznames,fullfinishedoutputlogsSP,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
         lognames=[]
         for job in listofjobs:
            log=jobtooutputlog[job]
-           lognames.append(os.getcwd()+r'/'+poltype.logfname)
+           lognames.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir))+r'/'+poltype.logfname)
         jobtolog=dict(zip(listofjobs, lognames)) 
 
-        fulltorxyznames.extend(torxyznames)
-        fullfinishedoutputlogs.extend(finishedoutputlogs)
-        fullcartxyznames.extend(cartxyznames)
-        fullfinishedphaseangles.extend(finishedphaseangles)
-        fulloutputlogs.extend(outputlogs)
+        fulloutputlogsSP.extend(outputlogs)
         fulllistofjobs.extend(listofjobs)
-        fulljobtolog.update(jobtolog) 
-
-    for i in range(len(fullfinishedoutputlogs)):
-        outputlog=fullfinishedoutputlogs[i]
+        fulljobtolog.update(jobtolog)
+ 
+    for i in range(len(fullfinishedoutputlogsSP)):
+        outputlog=fullfinishedoutputlogsSP[i]
         cartxyzname=fullcartxyznames[i] 
         phaseangle=fullfinishedphaseangles[i]
         poltype.optoutputtotorsioninfo[outputlog]= [a,b,c,d,torang,optmol,consttorlist,phaseangle,cartxyzname,bondtopology]
@@ -439,7 +432,7 @@ def get_torlist(poltype,mol):
     rotbndlist = {}
 
     iterbond = openbabel.OBMolBondIter(mol)
-    v1 = valence.Valence(poltype.versionnum,poltype.logfname)
+    v1 = valence.Valence(poltype.versionnum,poltype.logfname,poltype.dontfrag)
     v1.setidxtoclass(poltype.idxtosymclass)
     v1.torguess(mol,False,[])
     missed_torsions = v1.get_mt()
@@ -453,12 +446,12 @@ def get_torlist(poltype,mol):
         t2val=t2.GetValence()
         t3val=t3.GetValence()
         if ((bond.IsRotor()) or (str(t2idx) in poltype.onlyrotbndlist and str(t3idx) in poltype.onlyrotbndlist) or [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or (poltype.rotalltors and t2val>=2 and t3val>=2)):
-            skiptorsion = False
+            skiptorsion = True
             t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
             # is the torsion in toromitlist
             value=torfit.sorttorsion(poltype,[t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()])
-            if(not torfit.sorttorsion(poltype,[t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()]) in missed_torsions):
-                skiptorsion = True
+            if(torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]]) in missed_torsions):
+                skiptorsion = False
             if [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist:
                 skiptorsion = False # override previous conditions if in list
             if str(t2idx) in poltype.onlyrotbndlist and str(t3idx) in poltype.onlyrotbndlist:
@@ -490,7 +483,6 @@ def get_torlist(poltype,mol):
                     b = t2.GetIdx()
                     c = t3.GetIdx()
                     d = iaa.GetIdx()
-                    skiptorsion = False
                     if ((iaa.GetIdx() != t3.GetIdx() and \
                              iaa2.GetIdx() != t2.GetIdx()) \
                         and not (iaa.GetIdx() == t1.GetIdx() and \
