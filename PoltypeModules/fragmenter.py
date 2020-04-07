@@ -124,7 +124,6 @@ def GrabWBOMatrixPsi4(poltype,outputlog,mol):
         WBOmatrix=numpy.empty((mol.GetNumAtoms(),mol.GetNumAtoms()))
     except:
         WBOmatrix=numpy.empty((mol.NumAtoms(),mol.NumAtoms()))
-
     temp=open(outputlog,'r')
     results=temp.readlines()
     temp.close()
@@ -579,6 +578,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
             os.chdir(fragfoldername)
             rotbndidx=str(tor[1])+'_'+str(tor[2])
             filename=fragfoldername+'.mol'
+
             WriteRdkitMolToMolFile(poltype,fragmol,filename)
             fragmolbabel=ReadMolFileToOBMol(poltype,filename)
             WriteOBMolToXYZ(poltype,fragmolbabel,filename.replace('.mol','_xyzformat.xyz'))
@@ -598,11 +598,13 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         os.chdir(fragfoldername)
         fragrotbndidx=[parentindextofragindex[tor[1]-1],parentindextofragindex[tor[2]-1]]
         highlightbonds.append(fragrotbndidx)
+
+        WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor)
         if WBOdifference<=poltype.WBOtol: # then we consider the fragment good enough to transfer torsion parameters, so make this fragment into .sdf file
             pass
         else:
             fragmol,newindexes,fragWBOmatrix,structfname,WBOdifference,parentindextofragindex=GrowFragmentOut(poltype,parentWBOmatrix,indexes,WBOdifference,tor,fragfoldername)
-        WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor)
+            WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor)
         structfname=structfname.replace('_xyzformat.xyz','.sdf')
         rotbndindextofragment[rotbndidx]=fragmol
         rotbndindextofragmentfilepath[rotbndidx]=os.getcwd()+r'/'+structfname
@@ -649,8 +651,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
             Draw2DMoleculeWithWBO(poltype,fragWBOmatrix,basename+'_Absolute',structfnamemol,bondindexlist=highlightbonds,smirks=fragsmirks)
             Draw2DMoleculeWithWBO(poltype,relativematrix,basename+'_Relative',structfnamemol,bondindexlist=highlightbonds,smirks=fragsmirks)
         os.chdir(curdir)
-
-            
+               
 
     return rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentfragmentsarray,equivalentrotbndindexarrays
 
@@ -813,12 +814,9 @@ def GrowFragmentOut(poltype,parentWBOmatrix,indexes,WBOdifference,tor,fragfolder
         parentWBOvalue=parentWBOmatrix[tor[1]-1,tor[2]-1]
         WBOdifference=numpy.abs(fragmentWBOvalue-parentWBOvalue)
         basename=fragfoldername+'_WBO_'+str(round(WBOdifference,2))
+        WriteOutFragmentInputs(poltype,fragmol,basename,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor)
+
         m=mol_with_atom_index(poltype,fragmol)
-        fragsmirks=rdmolfiles.MolToSmarts(m) 
-        Draw2DMoleculeWithWBO(poltype,fragWBOmatrix,basename+'_Absolute',structfname.replace('_xyzformat.xyz','.mol'),bondindexlist=highlightbonds,smirks=fragsmirks)
-        Draw2DMoleculeWithWBO(poltype,relativematrix,basename+'_Relative',structfname.replace('_xyzformat.xyz','.mol'),bondindexlist=highlightbonds,smirks=fragsmirks)
-        structfnamemol=basename+'.mol'
-        print(Chem.MolToMolBlock(fragmol,kekulize=False),file=open(structfnamemol,'w+'))
         os.chdir('..')
         indexlist=parentindextofragindex.values()
         WBOdifftoparentindextofragindex[WBOdifference]=parentindextofragindex

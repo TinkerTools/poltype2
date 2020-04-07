@@ -187,7 +187,6 @@ def gen_peditinfile(poltype,mol):
             neighbsofneighbwithoutatom=RemoveFromList(poltype,neighbsofneighb,atom)
             sorteduniquetypeneighbsnorepeatofneighbsofneighbwithoutatom=FindUniqueNonRepeatingNeighbors(poltype,neighbsofneighbwithoutatom)
         if val==1 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(atomneighbs[0])])==True and atomneighbs[0].GetValence()==4: # then this is like H in Methane, we want Z-only
-            print('methane H')
             poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
             poltype.localframe2[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
@@ -225,6 +224,12 @@ def gen_peditinfile(poltype,mol):
             poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
             poltype.localframe2[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
+        elif (((val==3) and (highestsymneighbnorepeatval==4 or highestsymneighbnorepeatval==3))) and numhyds<=2 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=3: 
+            poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
+            poltype.localframe2[atomidx - 1] = 0
+            lfzerox[atomidx - 1]=True
+
+
 
         elif ((val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==3) or (val==3 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==4)) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2:  # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector
             idxtobisecthenzbool[atomidx]=True
