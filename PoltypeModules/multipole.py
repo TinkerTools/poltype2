@@ -233,7 +233,7 @@ def gen_peditinfile(poltype,mol):
             print('CH3PO3 Aniline')
             poltype.localframe2[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
-        elif ((val==1 and highestsymneighbnorepeatval==3) or (val==3 and highestsymneighbnorepeatval==1)) and numhyds<=1 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=2: 
+        elif ((val==1 and (highestsymneighbnorepeatval==3)) or ((val==3) and highestsymneighbnorepeatval==1)) and numhyds<=1 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=2: 
             poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
             print('H on bottom ring of Aniline or C connected to that H')
             poltype.localframe2[atomidx - 1] = 0

@@ -11,7 +11,7 @@ def CalculateSymmetry(poltype,m):
     m=mol_with_atom_index(poltype,m)
     smirks=rdmolfiles.MolToSmarts(m)
     correctidxarray=GrabAtomOrder(poltype,smirks)
-    newsmarts=smarts.replace('=','-') # we want atoms with resonance to have same types
+    newsmarts=ParseSMARTSString(poltype,smarts)
     rdkitmol=rdmolfiles.MolFromSmarts(newsmarts)
     m=mol_with_atom_index(poltype,rdkitmol)
     smirks=rdmolfiles.MolToSmarts(m)
@@ -36,6 +36,27 @@ def CalculateSymmetry(poltype,m):
             poltype.idxtosymclass[uniquekey]=symclass
         symclass+=1
 
+def ParseSMARTSString(poltype,smarts):
+    newsmarts=smarts.replace('=','-').replace('@','') # we want atoms with resonance to have same types, remove @ which designates chiral center (if have resonsnance there is no chiral center0
+    # need to remove charges on atoms for example charged oxygen so you can have resonance with other oxygen
+    string=''
+    idxlist=[]
+    for eidx in range(len(newsmarts)):
+        e=newsmarts[eidx]
+        if e.isdigit():
+            eprev=newsmarts[eidx-1]
+            if eprev=='#':
+                enext=newsmarts[eidx+1]
+                if enext=='-':
+                    idxlist.append(eidx+1)
+    for eidx in range(len(newsmarts)):
+        e=newsmarts[eidx]
+        if eidx in idxlist:
+            continue
+        else:
+            string+=e
+    return string
+      
 def GrabAtomOrder(poltype,smirks):
     atomorder=[]
     for i in range(len(smirks)):

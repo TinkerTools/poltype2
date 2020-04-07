@@ -263,7 +263,7 @@ def GeometryOptimization(poltype,mol):
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdir
-            jobtologlistfilepathprefix=os.getcwd()+r'/'+'optimizationjobtolog'+poltype.molstructfname
+            jobtologlistfilepathprefix=os.getcwd()+r'/'+'optimization_jobtolog_'+poltype.molecprefix 
             if os.path.isfile(poltype.chkoptfname):
                 os.remove(poltype.logoptfname) # if chk point exists just remove logfile, there could be error in it and we dont want WaitForTermination to catch error before job is resubmitted by daemon 
 
@@ -292,7 +292,7 @@ def GeometryOptimization(poltype,mol):
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scratchdir
-            jobtologlistfilepathprefix=os.getcwd()+r'/'+'optimizationjobtolog'+poltype.molstructfname
+            jobtologlistfilepathprefix=os.getcwd()+r'/'+'optimization_jobtolog_'+poltype.molecprefix
             if os.path.isfile(poltype.logoptfname):
                 os.remove(poltype.logoptfname)
             if poltype.externalapi!=None:

@@ -254,7 +254,7 @@ def SPForDMA(poltype,optmol,mol):
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logdmafname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scratchdir
-            jobtologlistfilenameprefix=os.getcwd()+r'/'+'dmajobtolog'+poltype.molstructfname
+            jobtologlistfilenameprefix=os.getcwd()+r'/'+'dma_jobtolog_'+poltype.molecprefix
             if os.path.isfile(poltype.logdmafname):
                 os.remove(poltype.logdmafname) # if chk point exists just remove logfile, there could be error in it and we dont want WaitForTermination to catch error before job is resubmitted by daemon 
 
@@ -282,7 +282,7 @@ def SPForDMA(poltype,optmol,mol):
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logdmafname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdir
-            jobtologlistfilenameprefix=os.getcwd()+r'/'+'dmajobtolog'+poltype.molstructfname
+            jobtologlistfilenameprefix=os.getcwd()+r'/'+'dma_jobtolog_'+poltype.molecprefix
             if os.path.isfile(poltype.logdmafname):
                 os.remove(poltype.logdmafname)
             if poltype.externalapi!=None:
@@ -314,7 +314,7 @@ def SPForESP(poltype,optmol,mol):
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+outputname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scratchdir
-            jobtologlistfilenameprefix=os.getcwd()+r'/'+'espjobtolog'+poltype.molstructfname 
+            jobtologlistfilenameprefix=os.getcwd()+r'/'+'esp_jobtolog_'+poltype.molecprefix 
             if os.path.isfile(outputname):
                 os.remove(outputname)
 
@@ -340,7 +340,7 @@ def SPForESP(poltype,optmol,mol):
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logespfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdir
-            jobtologlistfilenameprefix=os.getcwd()+r'/'+'espjobtolog'+poltype.molstructfname
+            jobtologlistfilenameprefix=os.getcwd()+r'/'+'esp_jobtolog_'+poltype.molecprefix
             if os.path.isfile(poltype.logespfname):
                 os.remove(poltype.logespfname)
 

@@ -138,4 +138,7 @@ SymmetryAniline                         Shows example of Z-only symmetry using t
 SymmetryDiMethylPhosphate0H             Shows example of bisector frame for P multipole frame.
 SymmetryMethylDihydrogenPhosphate       Shows example of choosing correctly z-then-x for P multipole frame.
 SymmetryDiMethylPhosphate1H             Shows example of z-then-x chosen correctly for all multipole frames.
+SymmetryTriMethylPhosphate              Shows example of z-only on lone oxygen and for P as well.
+SymmetryMonoMethylPhosphate1H           Shows example of correct z-then-x frame.
+SymmetryMonoMethylPhosphate0H           Shows example of correct z-then-x frame.
 
