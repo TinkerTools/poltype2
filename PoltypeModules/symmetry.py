@@ -8,8 +8,8 @@ from rdkit.Chem import rdmolfiles
 def CalculateSymmetry(poltype,m):
     poltype.idxtosymclass={}
     smarts=rdmolfiles.MolToSmarts(m)
-    m=mol_with_atom_index(poltype,m)
-    smirks=rdmolfiles.MolToSmarts(m)
+    correctm=mol_with_atom_index(poltype,m)
+    smirks=rdmolfiles.MolToSmarts(correctm)
     correctidxarray=GrabAtomOrder(poltype,smirks)
     newsmarts=ParseSMARTSString(poltype,smarts)
     rdkitmol=rdmolfiles.MolFromSmarts(newsmarts)
@@ -28,10 +28,24 @@ def CalculateSymmetry(poltype,m):
             if (correctatomindex1) not in tempidxtosymclass.keys():
                 tempidxtosymclass[correctatomindex1]=[]
             tempidxtosymclass[correctatomindex1].append(correctatomindex2)
-
+    # need to stay consistent with old poltype symmetry assisngment, so sort indexes to assign higher symmetry numbers to more massive atoms
+    atomindextomass={}
+    for idx in correctidxarray:
+        atom=correctm.GetAtomWithIdx(idx-1)
+        atommass=atom.GetMass()
+        atomindextomass[idx]=atommass
+    sortedatomindextomass=sorted(atomindextomass.items(), key=lambda x: x[1])
     symclass=poltype.prmstartidx
-    for key,keylist in tempidxtosymclass.items():
+    uniquekeysalreadyused=[]
+    for item in sortedatomindextomass:
+        index=item[0]
+        keylist=tempidxtosymclass[index]
+   
         uniquekeys=list(set(keylist))
+        if set(keylist) not in uniquekeysalreadyused:
+            uniquekeysalreadyused.append(set(keylist))
+        else: # already assigned
+            continue
         for uniquekey in uniquekeys:
             poltype.idxtosymclass[uniquekey]=symclass
         symclass+=1

@@ -490,7 +490,6 @@ def get_torlist(poltype,mol):
                         rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,
                             iaa.GetIdx(),t2.GetIdx(),
                             t3.GetIdx(),iaa2.GetIdx()))
-
     return (torlist ,rotbndlist)
 
 

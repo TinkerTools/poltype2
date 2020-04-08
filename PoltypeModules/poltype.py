@@ -892,7 +892,7 @@ class PolarizableTyper():
         self.torlist=torgen.RemoveDuplicateRotatableBondTypes(self) # this only happens in very symmetrical molecules
            
         torlist=[i[:4] for i in self.torlist]
-    
+
         self.rotbndtoanginc=torgen.DetermineAngleIncrementForEachTorsion(self,mol,self.rotbndlist)
  
         if not os.path.isfile(self.key4fname):
