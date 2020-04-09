@@ -264,7 +264,7 @@ def SPForDMA(poltype,optmol,mol):
                     call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
             else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog.keys(),jobtooutputlog)
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog)
 
             term,error=poltype.CheckNormalTermination(poltype.logdmafname)
             if error:
@@ -290,7 +290,7 @@ def SPForDMA(poltype,optmol,mol):
                     call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
             else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog.keys(),jobtooutputlog)
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog)
 
             poltype.call_subsystem(cmdstr,True)
             cmdstr = poltype.formchkexe + " " + poltype.chkdmafname
@@ -323,7 +323,7 @@ def SPForESP(poltype,optmol,mol):
                     call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
             else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog.keys(),jobtooutputlog)
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog)
 
             term,error=poltype.CheckNormalTermination(outputname)
             if error:
@@ -349,7 +349,7 @@ def SPForESP(poltype,optmol,mol):
                     call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
             else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog.keys(),jobtooutputlog)
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog)
 
             cmdstr = poltype.formchkexe + " " + poltype.chkespfname
             poltype.call_subsystem(cmdstr,True)

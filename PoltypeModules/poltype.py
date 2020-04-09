@@ -618,16 +618,14 @@ class PolarizableTyper():
     
         return mol
     
-    def CallJobsSeriallyLocalHost(self,listofjobs,jobtooutputlog,skiperrors=False):
-       for job in listofjobs:
-           outputlog=jobtooutputlog[job]
+    def CallJobsSeriallyLocalHost(self,fulljobtooutputlog,skiperrors=False):
+       for job in fulljobtooutputlog.keys():
            self.call_subsystem(job,True,skiperrors)
-       finishedjobs,errorjobs=self.WaitForTermination(jobtooutputlog)
+       finishedjobs,errorjobs=self.WaitForTermination(fulljobtooutputlog)
        return finishedjobs,errorjobs
 
-    def CallJobsLocalHost(self,listofjobs,jobtooutputlog):
-        for job in listofjobs:
-           outputlog=jobtooutputlog[job]
+    def CallJobsLocalHost(self,jobtooutputlog):
+        for job in jobtooutputlog.keys():
            self.call_subsystem(job)
         finishedjobs,errorjobs=self.WaitForTermination(jobtooutputlog)
         return finishedjobs,errorjobs
@@ -637,6 +635,7 @@ class PolarizableTyper():
         finishedjobs=[]
         errorjobs=[]
         sleeptime=1
+        errormessages=[]
         while len(finishedjobs)!=len(jobtooutputlog.keys()):
             for job in jobtooutputlog.keys():
                 outputlog=jobtooutputlog[job]
@@ -645,7 +644,7 @@ class PolarizableTyper():
                     size=statinfo.st_size
                     if size==0:
                         continue
-                finished,error=self.CheckNormalTermination(outputlog)
+                finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages)
                 if finished==True and error==False: # then check if SP has been submitted or not
                     if outputlog not in finishedjobs:
                         self.NormalTerm(outputlog)
@@ -656,7 +655,7 @@ class PolarizableTyper():
                         finishedjobs.append(outputlog)
                         errorjobs.append(outputlog)
                 elif finished==False and error==False:
-                    if os.path.isfile(outputlog):
+                    if not os.path.isfile(outputlog):
                         self.WriteToLog('Waiting on '+outputlog+' '+'to begin')
                     else:
                         self.WriteToLog('Waiting on '+outputlog+' '+'for termination ')
@@ -673,7 +672,7 @@ class PolarizableTyper():
         self.WriteToLog('All jobs have terminated ')
         return finishedjobs,errorjobs
 
-    def CheckNormalTermination(self,logfname): # needs to handle error checking now
+    def CheckNormalTermination(self,logfname,errormessages=None): # needs to handle error checking now
         """
         Intent: Checks the *.log file for normal termination
         """
@@ -694,7 +693,14 @@ class PolarizableTyper():
                         continue
                     error=True
                 if error==True and term==False:
-                    self.WriteToLog('Error '+line+ 'logpath='+logfname) 
+                    message='Error '+line+ 'logpath='+logfname
+                    if errormessages!=None:
+                        if message not in errormessages:
+                            errormessages.append(message)
+                            self.WriteToLog(message) 
+                    else:
+                        self.WriteToLog(message) 
+
         return term,error
     
         

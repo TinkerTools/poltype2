@@ -272,7 +272,7 @@ def GeometryOptimization(poltype,mol):
                     call.CallExternalAPI(poltype,jobtolog,jobtologlistfilepathprefix,scratchdir)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
             else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog.keys(),jobtooutputlog)
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog)
 
             cmdstr = poltype.formchkexe + " " + poltype.chkoptfname
             poltype.call_subsystem(cmdstr)
@@ -300,7 +300,7 @@ def GeometryOptimization(poltype,mol):
                     call.CallExternalAPI(poltype,jobtolog,jobtologlistfilepathprefix,scratchdir)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
             else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog.keys(),jobtooutputlog)
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog)
 
         term,error=poltype.CheckNormalTermination(poltype.logoptfname) # now grabs final structure when finished with QM if using Psi4
         if error and term==False:

@@ -289,6 +289,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
     fulloutputlogs=[]
     fulllistofjobs=[]
     fulljobtolog={}
+    fulljobtooutputlog={}
 
     bondtopology=GenerateBondTopology(poltype,optmol)
     for tor in poltype.torlist:
@@ -334,14 +335,15 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         fulloutputlogs.extend(outputlogs)
         fulllistofjobs.extend(listofjobs)
         fulljobtolog.update(jobtolog) 
+        fulljobtooutputlog.update(jobtooutputlog)
 
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMOptJobToLog'+'_'+poltype.molecprefix
     if poltype.externalapi!=None:
         if len(fulllistofjobs)!=0:
             call.CallExternalAPI(poltype,fulljobtolog,jobtologlistfilenameprefix,scratchdir)
-        finishedjobs,errorjobs=poltype.WaitForTermination(fulljobtolog)
+        finishedjobs,errorjobs=poltype.WaitForTermination(fulljobtooutputlog)
     else:
-        finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulllistofjobs,fulljobtolog,True)
+        finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
     for outputlog in fulloutputlogs:
         finished,error=poltype.CheckNormalTermination(outputlog)
         if finished==True and 'opt' in outputlog:
@@ -358,6 +360,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
     fulloutputlogsSP=[]
     fulllistofjobs=[]
     fulljobtolog={}
+    fulljobtooutputlog={}
     for tor in poltype.torlist:
         a,b,c,d = tor[0:4]
         torang = optmol.GetTorsion(a,b,c,d)
@@ -374,7 +377,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
            log=jobtooutputlog[job]
            lognames.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir))+r'/'+poltype.logfname)
         jobtolog=dict(zip(listofjobs, lognames)) 
-
+        fulljobtooutputlog.update(jobtooutputlog)
         fulloutputlogsSP.extend(outputlogs)
         fulllistofjobs.extend(listofjobs)
         fulljobtolog.update(jobtolog)
@@ -388,9 +391,9 @@ def gen_torsion(poltype,optmol,torsionrestraint):
     if poltype.externalapi!=None:
         if len(fulllistofjobs)!=0:
             call.CallExternalAPI(poltype,fulljobtolog,jobtologlistfilenameprefix,scratchdir)
-        finshedjobs,errorjobs=poltype.WaitForTermination(fulljobtolog)
+        finshedjobs,errorjobs=poltype.WaitForTermination(fulljobtooutputlog)
     else:
-        finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulllistofjobs,fulljobtolog,True)
+        finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
     os.chdir('..')
 
 def GenerateBondTopology(poltype,optmol):
