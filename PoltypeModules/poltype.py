@@ -692,16 +692,21 @@ class PolarizableTyper():
                         error=False
                         continue
                     error=True
-                if error==True and term==False:
+                if error==True:
                     message='Error '+line+ 'logpath='+logfname
                     if errormessages!=None:
                         if message not in errormessages:
                             errormessages.append(message)
-                            self.WriteToLog(message) 
-                    else:
-                        self.WriteToLog(message) 
 
-        return term,error
+            if error==True and term==False:
+                if errormessages!=None:
+                    for message in errormessages:
+                        self.WriteToLog(message) 
+        if errormessages!=None:
+            return term,error,errormessages
+        else:
+            return term,error
+       
     
         
     def NormalTerm(self,logfname):

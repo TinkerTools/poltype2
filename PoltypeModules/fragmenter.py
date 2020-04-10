@@ -830,6 +830,7 @@ def GrowFragmentOut(poltype,parentWBOmatrix,indexes,WBOdifference,tor,fragfolder
         indexes=WBOdifftoindexlist[WBOdifference]
         foldername=WBOdifftofolder[WBOdifference]
         structfname=WBOdifftostructfname[WBOdifference]
+        RemoveTempFolders(poltype)
         os.chdir(foldername)
         fragmol=WBOdifftofragmol[WBOdifference]
         fragWBOmatrix=WBOdifftofragWBOmatrix[WBOdifference]
@@ -837,7 +838,6 @@ def GrowFragmentOut(poltype,parentWBOmatrix,indexes,WBOdifference,tor,fragfolder
     curdir=os.getcwd()
     os.chdir(fragfoldernamepath)
     PlotFragmenterResults(poltype,WBOdiffarray,molarray)
-    RemoveTempFolders(poltype)
     os.chdir(curdir)
     return fragmol,indexes,fragWBOmatrix,structfname,WBOdifference,parentindextofragindex
 
@@ -848,22 +848,18 @@ def GrowPossibleFragmentAtomIndexes(poltype,rdkitmol,indexes):
         aidx=bond.GetBeginAtomIdx()
         bidx=bond.GetEndAtomIdx()
         if (aidx in indexes and bidx not in indexes): # then this means the bond is not already in the fragment but this is one of the bonds just outside of the fragment
-            indexlist=indexes.copy()
-            aromaticindexes=GrabRingAtoms(poltype,rdkitmol.GetAtomWithIdx(aidx))
-            for atmidx in aromaticindexes:
-                if atmidx not in indexlist:
-                    indexlist.append(atmidx)
-            if indexlist not in possiblefragatmidxs:
-                possiblefragatmidxs.append(indexlist)
-
+            idx=bidx
         elif (aidx not in indexes and bidx in indexes):
-            indexlist=indexes.copy()
-            aromaticindexes=GrabRingAtoms(poltype,rdkitmol.GetAtomWithIdx(bidx))
-            for atmidx in aromaticindexes:
-                if atmidx not in indexlist:
-                    indexlist.append(atmidx)
-            if indexlist not in possiblefragatmidxs:
-                possiblefragatmidxs.append(indexlist)
+            idx=aidx
+        else:
+            continue
+        indexlist=indexes.copy()
+        aromaticindexes=GrabRingAtoms(poltype,rdkitmol.GetAtomWithIdx(idx))
+        for atmidx in aromaticindexes:
+            if atmidx not in indexlist:
+                indexlist.append(atmidx)
+        if indexlist not in possiblefragatmidxs:
+            possiblefragatmidxs.append(indexlist)
 
     return possiblefragatmidxs
     
