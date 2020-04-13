@@ -432,7 +432,6 @@ class PolarizableTyper():
         Referenced By: main
         Description: -
         """
-    
         if self.use_gaus:
             if (self.gausdir is not None):
                 if self.which(os.path.join(self.gausdir,"g09")) is not None:
@@ -458,14 +457,13 @@ class PolarizableTyper():
     
                 
     
-    
         cmdstr=self.analyzeexe+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+'water.xyz'+' '+'-k'+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+'water.key'+' '+'e'+'>'+' '+'version.out'
         try:
             if self.printoutput==True:
                 print('Calling: '+cmdstr) 
             returned_value = subprocess.call(cmdstr, shell=True)
         except:
-            pass
+            raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())      
         temp=open('version.out','r')
         results=temp.readlines()
         temp.close()
@@ -721,7 +719,7 @@ class PolarizableTyper():
         curdir=os.getcwd()
         error=False
         if self.printoutput==True:
-            print("Calling: " + cmdstr)
+            print("Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
         self.WriteToLog(" Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
         p = subprocess.Popen(cmdstr, shell=True,stdout=self.logfh, stderr=self.logfh)
 
@@ -905,7 +903,6 @@ class PolarizableTyper():
         torlist=[i[:4] for i in self.torlist]
 
         self.rotbndtoanginc=torgen.DetermineAngleIncrementForEachTorsion(self,mol,self.rotbndlist)
- 
         if not os.path.isfile(self.key4fname):
             shutil.copy(self.key3fname, self.key4fname)
             

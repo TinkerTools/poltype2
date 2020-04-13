@@ -90,7 +90,7 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
     temp.close()
 
 def GrabWBOMatrixGaussian(poltype,outputlog,mol):
-    WBOmatrix=numpy.empty((mol.NumAtoms(),mol.NumAtoms()))
+    WBOmatrix=numpy.empty((mol.GetNumAtoms(),mol.GetNumAtoms()))
     temp=open(outputlog,'r')
     results=temp.readlines()
     temp.close()
@@ -119,11 +119,8 @@ def GrabWBOMatrixGaussian(poltype,outputlog,mol):
                 WBOmatrix[rownum-1,colnum-1]=float(value)
     return WBOmatrix
                 
-def GrabWBOMatrixPsi4(poltype,outputlog,mol):
-    try:
-        WBOmatrix=numpy.empty((mol.GetNumAtoms(),mol.GetNumAtoms()))
-    except:
-        WBOmatrix=numpy.empty((mol.NumAtoms(),mol.NumAtoms()))
+def GrabWBOMatrixPsi4(poltype,outputlog,molecule):
+    WBOmatrix=numpy.empty((molecule.GetNumAtoms(),molecule.GetNumAtoms()))
     temp=open(outputlog,'r')
     results=temp.readlines()
     temp.close()
@@ -799,6 +796,7 @@ def GrowFragmentOut(poltype,parentWBOmatrix,indexes,WBOdifference,tor,fragfolder
         WBOdifftofolder={}
         WBOdifftostructfname={}
         WBOdifftoparentindextofragindex={}
+        print('tor bnd ',tor[1],tor[2],flush=True)
         for fragmolidx in fragmolidxtofragmol.keys():
             fragmol=fragmolidxtofragmol[fragmolidx]
             foldername=fragmolidxtofoldername[fragmolidx]
@@ -808,6 +806,7 @@ def GrowFragmentOut(poltype,parentWBOmatrix,indexes,WBOdifference,tor,fragfolder
             fragWBOmatrix,outputname=GenerateWBOMatrix(poltype,fragmol,structfname)
             reducedparentWBOmatrix=ReduceParentMatrix(poltype,parentindextofragindex,fragWBOmatrix,parentWBOmatrix)
             relativematrix=numpy.subtract(reducedparentWBOmatrix,fragWBOmatrix)
+            print('parentindextofragindex',parentindextofragindex,flush=True)
             fragrotbndidx=[parentindextofragindex[tor[1]-1],parentindextofragindex[tor[2]-1]]
             fragmentWBOvalue=fragWBOmatrix[fragrotbndidx[0],fragrotbndidx[1]]
             parentWBOvalue=parentWBOmatrix[tor[1]-1,tor[2]-1]
