@@ -353,7 +353,7 @@ class PolarizableTyper():
         self.espmethod=self.SanitizeQMMethod(espmethod,False)                  
         if self.readinionly==True:
             return
-
+        self.SanitizeMMExecutables()
         self.copyright()
         self.initialize()
         self.init_filenames()
@@ -423,6 +423,18 @@ class PolarizableTyper():
                     return exe_file
         return None
 
+    def SanitizeMMExecutables(self):
+        includexextension=True
+        try:
+            cmdstr=self.analyzeexe+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+'water.xyz'+' '+'-k'+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+'water.key'+' '+'e'+'>'+' '+'version.out'
+            returned_value = subprocess.call(cmdstr, shell=True)
+
+        except:
+            self.peditexe='poledit'
+            self.potentialexe='potential'
+            self.minimizeexe='minimize'
+            self.analyzeexe='analyze'
+            self.superposeexe='superpose'
 
     def initialize(self):
         """
@@ -482,12 +494,11 @@ class PolarizableTyper():
       
         if ("TINKERDIR" in os.environ):
             self.tinkerdir = os.environ["TINKERDIR"]
-            self.peditexe = os.path.join(tinkerdir,self.peditexe)
-            self.potentialexe = os.path.join(tinkerdir,self.potentialexe)
-            self.valenceexe = os.path.join(tinkerdir,self.valenceexe)
-            self.minimizeexe = os.path.join(tinkerdir,self.minimizeexe)
-            self.analyzeexe = os.path.join(tinkerdir,self.analyzeexe)
-            self.superposeexe = os.path.join(tinkerdir,self.superposeexe)
+            self.peditexe = os.path.join(self.tinkerdir,self.peditexe)
+            self.potentialexe = os.path.join(self.tinkerdir,self.potentialexe)
+            self.minimizeexe = os.path.join(self.tinkerdir,self.minimizeexe)
+            self.analyzeexe = os.path.join(self.tinkerdir,self.analyzeexe)
+            self.superposeexe = os.path.join(self.tinkerdir,self.superposeexe)
     
         if (not self.which(self.analyzeexe)):
             print("ERROR: Cannot find TINKER analyze executable")
