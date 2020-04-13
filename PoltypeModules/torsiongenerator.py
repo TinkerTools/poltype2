@@ -323,8 +323,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         listofstructurestorunQM.extend(listoftinkertorstructurescounterclock)
         fullrange.extend(list(clock))
         fullrange.extend(list(counterclock))
-        outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteOptJobs(poltype,listofstructurestorunQM,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
-    
+        outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteOptJobs(poltype,listoftinkertorstructuresclock+listoftinkertorstructurescounterclock,clock+counterclock,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
 
 
         lognames=[]

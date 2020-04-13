@@ -86,3 +86,5 @@
 * fixed symmetry frames bug, added new Symmetry molecules cases to Examples folder, see README.MANIFEST
 2.2.7
 * Torsion QM jobs parralelized for all torsion as opposed to for a given torsion previously. Example daemon is in Examples folder, see README.MANIFEST.
+2.2.8
+* Fix bug in parralel torsion
