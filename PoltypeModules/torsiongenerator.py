@@ -73,6 +73,7 @@ def ExecuteSPJobs(poltype,torxyznames,optoutputlogs,fullrange,optmol,a,b,c,d,tor
     jobtooutputlog={}
     listofjobs=[]
     outputnames=[]
+    print("lengths",len(torxyznames),len(optoutputlogs),len(fullrange))
     for i in range(len(torxyznames)):
         torxyzfname=torxyznames[i]
         outputlog=optoutputlogs[i]
@@ -370,7 +371,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         fullfinishedoutputlogsSP.extend(finishedoutputlogs)
         fullcartxyznames.extend(cartxyznames)
         fullfinishedphaseangles.extend(finishedphaseangles)
-        outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteSPJobs(poltype,fulltorxyznames,fullfinishedoutputlogsSP,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
+        outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteSPJobs(poltype,torxyznames,finishedoutputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
         lognames=[]
         for job in listofjobs:
            log=jobtooutputlog[job]
