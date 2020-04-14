@@ -291,7 +291,8 @@ def gen_torsion(poltype,optmol,torsionrestraint):
     fulllistofjobs=[]
     fulljobtolog={}
     fulljobtooutputlog={}
-
+    tortodihedralrange={}
+    tortooptoutputlog={}
     bondtopology=GenerateBondTopology(poltype,optmol)
     for tor in poltype.torlist:
         
@@ -325,6 +326,11 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         fullrange.extend(list(clock))
         fullrange.extend(list(counterclock))
         outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteOptJobs(poltype,listoftinkertorstructuresclock+listoftinkertorstructurescounterclock,clock+counterclock,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
+        torstring=''
+        for i in range(len(tor)):
+            torstring+=str(tor[i])
+        tortodihedralrange[torstring]=clock+counterclock
+        tortooptoutputlog[torstring]=outputlogs
 
 
         lognames=[]
@@ -366,7 +372,14 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         torang = optmol.GetTorsion(a,b,c,d)
         consttorlist = list(poltype.torlist)
         consttorlist.remove(tor)  
-        torxyznames,finishedoutputlogs,cartxyznames,finishedphaseangles=TinkerMinimizePostQMOpt(poltype,fulloutputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,finishedjobs,errorjobs,bondtopology)
+        torstring=''
+        for i in range(len(tor)):
+            torstring+=str(tor[i])
+        dihedralrange=tortodihedralrange[torstring]
+        outputlogs=tortooptoutputlog[torstring]
+
+
+        torxyznames,finishedoutputlogs,cartxyznames,finishedphaseangles=TinkerMinimizePostQMOpt(poltype,outputlogs,dihedralrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,finishedjobs,errorjobs,bondtopology)
         fulltorxyznames.extend(torxyznames)
         fullfinishedoutputlogsSP.extend(finishedoutputlogs)
         fullcartxyznames.extend(cartxyznames)

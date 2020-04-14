@@ -47,7 +47,7 @@ class PolarizableTyper():
         self.suppressdipoleerr=suppressdipoleerr
         self.use_gaus=use_gaus
         self.use_gausoptonly=use_gausoptonly
-        self.topologylibpath=poltypepath+r'/'+topologylib
+        self.topologylibpath=os.path.abspath(os.path.join(poltypepath, '..'))+r'/'+topologylib
         self.WBOtol=WBOtol
         self.isfragjob=isfragjob
         self.dontfrag=dontfrag
@@ -870,7 +870,6 @@ class PolarizableTyper():
             mpole.prepend_keyfile(self,self.keyfname,optmol)
         # post process local frames written out by poledit
         mpole.post_proc_localframes(self,self.keyfname, lfzerox,atomindextoremovedipquad,atomindextoremovedipquadcross)
-
         esp.SPForESP(self,optmol,mol) 
             
         # End here if qm calculations were all that needed to be done 

@@ -224,11 +224,10 @@ def gen_peditinfile(poltype,mol):
             poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
             poltype.localframe2[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
-        elif (((val==3) and (highestsymneighbnorepeatval==4 or highestsymneighbnorepeatval==3))) and numhyds<=2 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=3: 
+        elif (((val==3) and (highestsymneighbnorepeatval==4))) and numhyds<=2 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=3: 
             poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
             poltype.localframe2[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
-
 
 
         elif ((val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==3) or (val==3 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==4)) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2:  # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector
@@ -236,13 +235,10 @@ def gen_peditinfile(poltype,mol):
             bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
             idxtobisectidxs[atomidx]=bisectidxs
             # now make sure neighboring atom (lf1) also is using z-then-bisector
-            poltype.localframe1[highestsymneighbnorepeatidx-1]=atomidx
-            idxtobisecthenzbool[highestsymneighbnorepeatidx]=True
-            idxtobisectidxs[highestsymneighbnorepeatidx]=bisectidxs
         else:
             if len(sorteduniquetypeneighbsnorepeat)==1:
                 neighboffirstneighbs=[]
-                for n in openbabel.OBAtomAtomIter(atomneighbs[0]):
+                for n in openbabel.OBAtomAtomIter(highestsymneighbnorepeat):
                     neighboffirstneighbs.append(n)
                 newneighbs=RemoveFromList(poltype,neighboffirstneighbs,atom)
                 newsorteduniquetypeneighbsnorepeat=FindUniqueNonRepeatingNeighbors(poltype,newneighbs)
