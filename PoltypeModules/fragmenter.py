@@ -90,7 +90,10 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
     temp.close()
 
 def GrabWBOMatrixGaussian(poltype,outputlog,mol):
-    WBOmatrix=numpy.empty((mol.GetNumAtoms(),mol.GetNumAtoms()))
+    try:
+        WBOmatrix=numpy.empty((mol.GetNumAtoms(),mol.GetNumAtoms()))
+    except:
+        WBOmatrix=numpy.empty((mol.NumAtoms(),mol.NumAtoms()))
     temp=open(outputlog,'r')
     results=temp.readlines()
     temp.close()

@@ -703,14 +703,16 @@ class PolarizableTyper():
                     error=True
                 if error==True:
                     message='Error '+line+ 'logpath='+logfname
-                    if errormessages!=None:
-                        if message not in errormessages:
-                            errormessages.append(message)
-
+                    
             if error==True and term==False:
                 if errormessages!=None:
-                    for message in errormessages:
+                    if message not in errormessages:
                         self.WriteToLog(message) 
+                        errormessages.append(message)
+                else:
+                    self.WriteToLog(message) 
+
+
         if errormessages!=None:
             return term,error,errormessages
         else:
@@ -871,7 +873,7 @@ class PolarizableTyper():
         # post process local frames written out by poledit
         mpole.post_proc_localframes(self,self.keyfname, lfzerox,atomindextoremovedipquad,atomindextoremovedipquadcross)
         esp.SPForESP(self,optmol,mol) 
-            
+         
         # End here if qm calculations were all that needed to be done 
         if self.qmonly:
             self.WriteToLog("poltype QM-only complete.")

@@ -119,7 +119,6 @@ def compute_qm_tor_energy(poltype,a,b,c,d,startangle,phase_list = None):
             minstrctfname = '%s-sp-%d-%d-%d-%d-%03d.log' % (poltype.molecprefix,a,b,c,d,round(angle))
         else:
             minstrctfname = '%s-sp-%d-%d-%d-%d-%03d_psi4.log' % (poltype.molecprefix,a,b,c,d,round(angle))
-
         if not os.path.exists(minstrctfname): # if optimization failed then SP file will not exist
             tor_energy=None
             WBOvalue=None
@@ -374,7 +373,6 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename):
 
         # find qm, then mm energies of the various torsion values found for 'tor'
         qme_list,qang_list,WBOarray = compute_qm_tor_energy(poltype,a,b,c,d,initangle,anglist)
-        print('lengths check ',len(qme_list),len(qang_list),len(WBOarray))
         mme_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,
         a,b,c,d,initangle,'_postQMOPTprefit',torang,anglist,tmpkey1basename)
         # delete members of the list where the energy was not able to be found 
@@ -382,9 +380,10 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename):
         (cls_angle_dict[clskey],cls_mm_engy_dict[clskey])=prune_mme_error(poltype,del_ang_list,cls_angle_dict[clskey],cls_mm_engy_dict[clskey])
         (mang_list,mme_list,qme_list,qang_list,tor_e_list)=prune_mme_error(poltype,del_ang_list,mang_list,mme_list,qme_list,qang_list,tor_e_list)
         del_ang_list = find_del_list(poltype,qme_list,qang_list)
+
         (cls_angle_dict[clskey],cls_mm_engy_dict[clskey])=prune_qme_error(poltype,del_ang_list,cls_angle_dict[clskey],cls_mm_engy_dict[clskey])
         (mang_list,mme_list,qme_list,qang_list,tor_e_list)=prune_qme_error(poltype,del_ang_list,mang_list,mme_list,qme_list,qang_list,tor_e_list)
-        
+
         cls_qm_engy_dict[clskey] = [ runsum+eng for runsum,
             eng in zip (cls_qm_engy_dict[clskey], qme_list)]
         cls_mm_engy_dict[clskey] = [ runsum+eng for runsum,
@@ -647,6 +646,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         angle_list = cls_angle_dict[clskey]  # Torsion angle for each corresponding energy
         mm_energy_list = cls_mm_engy_dict[clskey]  # MM Energy before fitting to QM torsion energy
         qm_energy_list = cls_qm_engy_dict[clskey]  # QM torsion energy
+        print('mm_energy_list',mm_energy_list)
+        print('qm_energy_list',qm_energy_list)
         # 'normalize'
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]
@@ -889,11 +890,14 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         # remove angles for which energy was unable to be found
         del_ang_list = find_del_list(poltype,mm_energy_list,mang_list)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_mme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
+
         del_ang_list = find_del_list(poltype,qm_energy_list,qang_list)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
-
+        
         del_ang_list = find_del_list(poltype,mm2_energy_list,m2ang_list)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
+        
+
         # normalize profiles
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]
@@ -1039,6 +1043,7 @@ def process_rot_bond_tors(poltype,mol):
         PostfitMinAlz(poltype,tmpkey2basename,'')
     # evaluate the new parameters
     poltype.WriteToLog('about to evalaute_rot_bonds')
+    print('about to evaluate rot bonds',flush=True)
     eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename)
     shutil.copy(tmpkey2basename,'../' + poltype.key5fname)
     os.chdir('..')

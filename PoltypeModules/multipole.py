@@ -185,6 +185,8 @@ def gen_peditinfile(poltype,mol):
             neighbsofneighb=[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbnorepeat)]
             uniqueneighbtypesofhighestsymneighbnorepeat=list(set([poltype.idxtosymclass[b.GetIdx()] for b in neighbsofneighb]))
             neighbsofneighbwithoutatom=RemoveFromList(poltype,neighbsofneighb,atom)
+            uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom=list(set([poltype.idxtosymclass[b.GetIdx()] for b in neighbsofneighbwithoutatom]))
+
             sorteduniquetypeneighbsnorepeatofneighbsofneighbwithoutatom=FindUniqueNonRepeatingNeighbors(poltype,neighbsofneighbwithoutatom)
         if val==1 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(atomneighbs[0])])==True and atomneighbs[0].GetValence()==4: # then this is like H in Methane, we want Z-only
             poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
@@ -230,10 +232,12 @@ def gen_peditinfile(poltype,mol):
             lfzerox[atomidx - 1]=True
 
 
-        elif ((val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==3) or (val==3 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==4)) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2:  # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector
+        elif ((val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==3) or (val==3 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==4)) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1:  # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector
             idxtobisecthenzbool[atomidx]=True
             bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
             idxtobisectidxs[atomidx]=bisectidxs
+            poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
+ 
             # now make sure neighboring atom (lf1) also is using z-then-bisector
         else:
             if len(sorteduniquetypeneighbsnorepeat)==1:
