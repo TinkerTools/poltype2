@@ -398,7 +398,7 @@ class PolarizableTyper():
 
         
     def SanitizeMMExecutables(self):
-        path=self.which(self.analyzeexe)
+        path=self.which(self.peditexe)
         if path==None:
             self.peditexe='poledit.x'
             self.potentialexe='potential.x'
