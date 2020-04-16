@@ -42,7 +42,7 @@ from rdkit.Chem import rdmolfiles
 
 class PolarizableTyper():
 
-    def __init__(self,readinionly=False,suppressdipoleerr=False,topologylib='residue_connect.txt',poltypepath=os.path.split(__file__)[0],WBOtol=.01,dontfrag=True,isfragjob=False,dipoletol=.1,externalapi=None,printoutput=False,poltypeini=True,structure=None,prmstartidx=401,numproc=1,maxmem="700MB",maxdisk="100GB",gausdir=None,gdmadir=None,tinkerdir=None,scratchdir="/scratch",paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/amoebabio18_header.prm",babelexe="babel",gausexe='g09',formchkexe='formchk',cubegenexe='cubegen',gdmaexe='gdma',avgmpolesexe=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/avgmpoles.pl",peditexe='poledit.x',potentialexe='potential.x',minimizeexe='minimize.x',analyzeexe='analyze.x',superposeexe='superpose.x',defopbendval=0.20016677990819662,Hartree2kcal_mol=627.5095,optbasisset='6-31G*',toroptbasisset='6-31G*',dmabasisset='6-311G**',espbasisset="6-311++G(2d,2p)",torspbasisset="6-311++G**",optmethod='wB97X-D',toroptmethod='wB97X-D',torspmethod='MP2',dmamethod='MP2',espmethod='MP2',qmonly = False,espfit = True,parmtors = True,foldnum=3,foldoffsetlist = [ 0.0, 180.0, 0.0, 0.0, 0.0, 0.0 ],torlist = None,rotbndlist = None,fitrotbndslist=None,maxRMSD=.1,maxRMSPD=1,maxtorRMSPD=2,tordatapointsnum=None,gentorsion=False,gaustorerror=False,torsionrestraint=.1,onlyrotbndlist=None,rotalltors=False,dontdotor=False,dontdotorfit=False,toroptpcm=False,optpcm=False,torsppcm=False,use_gaus=False,use_gausoptonly=False,freq=False,postfit=False,bashrcpath=None,amoebabioprmpath=None,libpath=sys.path[0] + "/lib.bio18_conv1.txt",SMARTSToTypelibpath=sys.path[0]+'/SMARTSToTypeLib.txt',ModifiedResiduePrmPath=sys.path[0]+'/ModifiedResidue.prm',modifiedproteinpdbname=None,unmodifiedproteinpdbname=None,mutatedsidechain=None,mutatedresiduenumber=None,modifiedresiduepdbcode=None,optmaxcycle=400,torkeyfname=None,gausoptcoords='',helpfile='README.HELP',versionfile='README.VERSION'): 
+    def __init__(self,readinionly=False,suppressdipoleerr=False,topologylib='residue_connect.txt',poltypepath=os.path.split(__file__)[0],WBOtol=.01,dontfrag=True,isfragjob=False,dipoletol=.1,externalapi=None,printoutput=False,poltypeini=True,structure=None,prmstartidx=401,numproc=1,maxmem="700MB",maxdisk="100GB",gausdir=None,gdmadir=None,tinkerdir=None,scratchdir="/scratch",paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/amoebabio18_header.prm",babelexe="babel",gausexe='g09',formchkexe='formchk',cubegenexe='cubegen',gdmaexe='gdma',avgmpolesexe=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/avgmpoles.pl",peditexe='poledit',potentialexe='potential',minimizeexe='minimize',analyzeexe='analyze',superposeexe='superpose',defopbendval=0.20016677990819662,Hartree2kcal_mol=627.5095,optbasisset='6-31G*',toroptbasisset='6-31G*',dmabasisset='6-311G**',espbasisset="6-311++G(2d,2p)",torspbasisset="6-311++G**",optmethod='wB97X-D',toroptmethod='wB97X-D',torspmethod='MP2',dmamethod='MP2',espmethod='MP2',qmonly = False,espfit = True,parmtors = True,foldnum=3,foldoffsetlist = [ 0.0, 180.0, 0.0, 0.0, 0.0, 0.0 ],torlist = None,rotbndlist = None,fitrotbndslist=None,maxRMSD=.1,maxRMSPD=1,maxtorRMSPD=2,tordatapointsnum=None,gentorsion=False,gaustorerror=False,torsionrestraint=.1,onlyrotbndlist=None,rotalltors=False,dontdotor=False,dontdotorfit=False,toroptpcm=False,optpcm=False,torsppcm=False,use_gaus=False,use_gausoptonly=False,freq=False,postfit=False,bashrcpath=None,amoebabioprmpath=None,libpath=sys.path[0] + "/lib.bio18_conv1.txt",SMARTSToTypelibpath=sys.path[0]+'/SMARTSToTypeLib.txt',ModifiedResiduePrmPath=sys.path[0]+'/ModifiedResidue.prm',modifiedproteinpdbname=None,unmodifiedproteinpdbname=None,mutatedsidechain=None,mutatedresiduenumber=None,modifiedresiduepdbcode=None,optmaxcycle=400,torkeyfname=None,gausoptcoords='',helpfile='README.HELP',versionfile='README.VERSION'): 
         self.readinionly=readinionly
         self.suppressdipoleerr=suppressdipoleerr
         self.use_gaus=use_gaus
@@ -397,44 +397,33 @@ class PolarizableTyper():
         os.fsync(self.logfh.fileno())
 
         
-    def which(self,program,pathlist=os.environ["PATH"]):
-        """
-        Intent: Check if the 'program' is in the user's path
-        Input:
-            program: Program name
-            pathlist: members of the user's path
-        Output:
-           program: path to program
-           exe_file: path to program
-           None: program was not found
-        Referenced By: initialize 
-        Description: -
-        """
+    def SanitizeMMExecutables(self):
+        path=self.which(self.analyzeexe)
+        if path==None:
+            self.peditexe='poledit.x'
+            self.potentialexe='potential.x'
+            self.minimizeexe='minimize.x'
+            self.analyzeexe='analyze.x'
+            self.superposeexe='superpose.x'
+
+    def which(self,program):
         def is_exe(fpath):
-            return os.path.exists(fpath) and os.access(fpath, os.X_OK)
+            try:
+                 return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+            except:
+                 return None
+    
         fpath, fname = os.path.split(program)
         if fpath:
             if is_exe(program):
                 return program
         else:
-            for path in pathlist.split(os.pathsep):
+            for path in os.environ["PATH"].split(os.pathsep):
                 exe_file = os.path.join(path, program)
                 if is_exe(exe_file):
                     return exe_file
+    
         return None
-
-    def SanitizeMMExecutables(self):
-        includexextension=True
-        try:
-            cmdstr=self.analyzeexe+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+'water.xyz'+' '+'-k'+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+'water.key'+' '+'e'+'>'+' '+'version.out'
-            returned_value = subprocess.call(cmdstr, shell=True)
-
-        except:
-            self.peditexe='poledit'
-            self.potentialexe='potential'
-            self.minimizeexe='minimize'
-            self.analyzeexe='analyze'
-            self.superposeexe='superpose'
 
     def initialize(self):
         """
@@ -457,22 +446,13 @@ class PolarizableTyper():
                 else:
                     print("ERROR: Invalid Gaussian directory: ", self.gausdir)
                     sys.exit(1)
-            else:
-                if self.which("g09") is not None:
-                    self.gausexe    = "g09"
-                elif self.which("g03") is not None:
-                    self.gausexe    = "g03"
-                else:
-                    print("ERROR: Cannot find Gaussian executable in $PATH. Please install Gaussian or specify Gaussian directory with --gbindir flag.")
-                    sys.exit(1)
     
     
                 
     
         cmdstr=self.analyzeexe+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+'water.xyz'+' '+'-k'+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+'water.key'+' '+'e'+'>'+' '+'version.out'
         try:
-            if self.printoutput==True:
-                print('Calling: '+cmdstr) 
+            print('Calling: '+cmdstr) 
             returned_value = subprocess.call(cmdstr, shell=True)
         except:
             raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())      
@@ -519,9 +499,6 @@ class PolarizableTyper():
                     os.mkdir(self.scratchdir)
     
     
-            if (not self.which(self.scratchdir)):
-                print("ERROR: Cannot find Gaussian scratch directory")
-                sys.exit(2)
     
     
     
