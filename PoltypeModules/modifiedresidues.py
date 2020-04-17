@@ -688,6 +688,8 @@ def GrabMultipoleFrameDefintions(poltype,key,boundaryatomidxs,ligidxtotypeidx,pr
                             atomtypetoframedef[firstprotype]=protypes
                     else:
                         allprotypelist=[]
+                        print('ligidxtoproidx',ligidxtoproidx)
+                        print('ligidxs',ligidxs)
                         for i in range(len(ligidxs)):
                             ligidx=ligidxs[i]
                             proidx=ligidxtoproidx[ligidx]
