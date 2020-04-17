@@ -890,8 +890,10 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         # remove angles for which energy was unable to be found
         del_ang_list = find_del_list(poltype,mm_energy_list,mang_list)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_mme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
-
+        print('qm_energy_list here',qm_energy_list)
+        print('del_ang_list before',del_ang_list)
         del_ang_list = find_del_list(poltype,qm_energy_list,qang_list)
+        print('del_ang_list after',del_ang_list)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
         
         del_ang_list = find_del_list(poltype,mm2_energy_list,m2ang_list)
@@ -912,7 +914,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         tordifmm_list = [en - min(tordifmm_list) for en in tordifmm_list]
         # TBC
         ff_list = [aa+bb for (aa,bb) in zip(mm_energy_list,fitfunc_dict[clskey])]
-
+        print('qm_energy_list',qm_energy_list)
         deriv_qm=numpy.gradient(qm_energy_list)
         weight=numpy.add(.6,numpy.absolute(deriv_qm))
         if len(ff_list)==len(mm2_energy_list):
@@ -1038,12 +1040,9 @@ def process_rot_bond_tors(poltype,mol):
         write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename)
     else:
         shutil.copy('../' + poltype.torkeyfname,tmpkey2basename)
-    poltype.WriteToLog('postfit min Alz about to run')
     if len(poltype.torlist)!=0:
         PostfitMinAlz(poltype,tmpkey2basename,'')
     # evaluate the new parameters
-    poltype.WriteToLog('about to evalaute_rot_bonds')
-    print('about to evaluate rot bonds',flush=True)
     eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename)
     shutil.copy(tmpkey2basename,'../' + poltype.key5fname)
     os.chdir('..')
@@ -1054,7 +1053,6 @@ def PostfitMinAlz(poltype,keybasename,keybasepath):
         term,error=poltype.CheckNormalTermination(outputlog)
         [a,b,c,d,torang,optmol,consttorlist,phaseangle,cartxyzname,bondtopology]=poltype.optoutputtotorsioninfo[outputlog]
         if term==True:    
-            poltype.WriteToLog('here') 
             if not poltype.use_gaus:
                 cartxyz,torxyzfname=torgen.tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,cartxyzname,poltype.torsionrestraint,'_postQMOPTpostfit',keybasename,keybasepath,bondtopology)
             else:

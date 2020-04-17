@@ -80,7 +80,7 @@ def GrabAtomOrder(poltype,smirks):
             nextchar=smirks[i+1]
         except:
             break
-        if prevchar==':' and e.isdigit() and nextchar!='-' and nextchar!=')' and nextchar!=':' and nextchar!='=':
+        if prevchar==':' and e.isdigit() and nextchar!='/' and nextchar!='-' and nextchar!=')' and nextchar!=':' and nextchar!='=':
             atomindex=GrabAtomIndex(poltype,i,smirks)
             atomorder.append(atomindex)
     return atomorder
