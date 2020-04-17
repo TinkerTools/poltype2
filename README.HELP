@@ -27,6 +27,9 @@ FAQ
 Q)If I want to change QM methods/basis set do I need to restart POLTYPE job from scratch?
 A)No, POLTYPE will look for output files from QM (see README.MANIFEST) to see if it needs to perform a job or continue. So you can delete the outputlog file, change your input options and resubmit POLTYPE job.
 
+Tips
+*********************************************
+If using PSI4 for optimization, it will be much slower than Gaussian optimization. Add keyword "use_gaus" in poltype.ini file.
 
 Common Errors
 *********************************************

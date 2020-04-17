@@ -54,6 +54,6 @@ export GAUSS_SCRDIR=/scratch/your_username/
 export GDMADIR=/opt/gdma-2.2/bin/
 export PATH=/opt/gdma-2.2/bin/gdma:$PATH
 export PSI_SCRATCH=/scratch/your_username/ 
-export PATH=/home/pren/tinker-git/tinker8.2-intel13/source:$PATH
+export PATH=/home/liuchw/Softwares/tinkers/Tinker-latest/source/:$PATH
 _______________________________________________________________
 
