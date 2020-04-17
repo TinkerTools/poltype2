@@ -646,8 +646,6 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         angle_list = cls_angle_dict[clskey]  # Torsion angle for each corresponding energy
         mm_energy_list = cls_mm_engy_dict[clskey]  # MM Energy before fitting to QM torsion energy
         qm_energy_list = cls_qm_engy_dict[clskey]  # QM torsion energy
-        print('mm_energy_list',mm_energy_list)
-        print('qm_energy_list',qm_energy_list)
         # 'normalize'
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]
@@ -828,7 +826,6 @@ def write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename):
 #               torvals == [0.]*len(torvals):
             if clskey in write_prm_dict:
                 torline = ' torsion %7s %4s %4s %4s   ' % (cl[0],cl[1],cl[2],cl[3])
-                print(write_prm_dict[clskey])
                 for (nfold, prm) in write_prm_dict[clskey].items():
                     torline += ' %7.3f %.1f %d' % (prm,poltype.foldoffsetlist[nfold - 1], nfold)
                 torline += '\n'
@@ -869,7 +866,6 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         atmnuma = mol.GetAtom(a).GetAtomicNum()
         atmnumd = mol.GetAtom(d).GetAtomicNum()
 
-
         # clskey
         clskey = torgen.get_class_key(poltype,a, b, c, d)
         if clskey not in fitfunc_dict.keys():
@@ -890,12 +886,8 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         # remove angles for which energy was unable to be found
         del_ang_list = find_del_list(poltype,mm_energy_list,mang_list)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_mme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
-        print('qm_energy_list here',qm_energy_list)
-        print('del_ang_list before',del_ang_list)
         del_ang_list = find_del_list(poltype,qm_energy_list,qang_list)
-        print('del_ang_list after',del_ang_list)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
-        
         del_ang_list = find_del_list(poltype,mm2_energy_list,m2ang_list)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
         
@@ -914,7 +906,6 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         tordifmm_list = [en - min(tordifmm_list) for en in tordifmm_list]
         # TBC
         ff_list = [aa+bb for (aa,bb) in zip(mm_energy_list,fitfunc_dict[clskey])]
-        print('qm_energy_list',qm_energy_list)
         deriv_qm=numpy.gradient(qm_energy_list)
         weight=numpy.add(.6,numpy.absolute(deriv_qm))
         if len(ff_list)==len(mm2_energy_list):

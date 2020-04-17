@@ -69,15 +69,15 @@ def TinkerMinimizePostQMOpt(poltype,outputlogs,fullrange,optmol,a,b,c,d,torang,c
             finishedphaseangles.append(phaseangle)
     return torxyznames,finishedoutputlogs,cartxyznames,finishedphaseangles
 
-def ExecuteSPJobs(poltype,torxyznames,optoutputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint):
+def ExecuteSPJobs(poltype,torxyznames,cartxyznames,optoutputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,outputlogtophaseangle,outputlogtocartxyz):
     jobtooutputlog={}
     listofjobs=[]
     outputnames=[]
-    print("lengths",len(torxyznames),len(optoutputlogs),len(fullrange))
     for i in range(len(torxyznames)):
         torxyzfname=torxyznames[i]
         outputlog=optoutputlogs[i]
         phaseangle=fullrange[i]
+        cartxyzname=cartxyznames[i]
         if not poltype.use_gaus:
             finalstruct=outputlog.replace('.log','_opt.xyz')
             inputname,outputname=CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,poltype.molecprefix,a,b,c,d,torang,phaseangle)
@@ -101,12 +101,13 @@ def ExecuteSPJobs(poltype,torxyznames,optoutputlogs,fullrange,optmol,a,b,c,d,tor
                 jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputname
 
         outputnames.append(outputname)
-
+        outputlogtophaseangle[outputname]=phaseangle
+        outputlogtocartxyz[outputname]=cartxyzname
     if not poltype.use_gaus:
         
-        return outputnames,listofjobs,poltype.scratchdir,jobtooutputlog
+        return outputnames,listofjobs,poltype.scratchdir,jobtooutputlog,outputlogtophaseangle,outputlogtocartxyz
     else:
-        return outputnames,listofjobs,poltype.scrtmpdir,jobtooutputlog
+        return outputnames,listofjobs,poltype.scrtmpdir,jobtooutputlog,outputlogtophaseangle,outputlogtocartxyz
 
 
 
@@ -200,6 +201,7 @@ def tinker_minimize_analyze_QM_Struct(poltype,molecprefix,a,b,c,d,torang,optmol,
     cartxyz,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,torsionrestraint,prevstruct,torang,designatexyz,keybase,keybasepath)
     toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
     term=AnalyzeTerm(poltype,toralzfname)
+    print('toralzfname',toralzfname,'term',term)
     if term==False:
         tinker_analyze(poltype,newtorxyzfname,keyfname,toralzfname)
     return cartxyz,newtorxyzfname
@@ -327,8 +329,9 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         fullrange.extend(list(counterclock))
         outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteOptJobs(poltype,listoftinkertorstructuresclock+listoftinkertorstructurescounterclock,clock+counterclock,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
         torstring=''
-        for i in range(len(tor)):
-            torstring+=str(tor[i])
+        for i in range(len(tor)-1):
+            torstring+=str(tor[i])+'-'
+        torstring=torstring[:-1]
         tortodihedralrange[torstring]=clock+counterclock
         tortooptoutputlog[torstring]=outputlogs
 
@@ -367,14 +370,19 @@ def gen_torsion(poltype,optmol,torsionrestraint):
     fulllistofjobs=[]
     fulljobtolog={}
     fulljobtooutputlog={}
+    tortospoutputlogs={}
+    tortocartxyz={}
+    outputlogtophaseangle={}
+    outputlogtocartxyz={}
     for tor in poltype.torlist:
         a,b,c,d = tor[0:4]
         torang = optmol.GetTorsion(a,b,c,d)
         consttorlist = list(poltype.torlist)
         consttorlist.remove(tor)  
         torstring=''
-        for i in range(len(tor)):
-            torstring+=str(tor[i])
+        for i in range(len(tor)-1):
+            torstring+=str(tor[i])+'-'
+        torstring=torstring[:-1]
         dihedralrange=tortodihedralrange[torstring]
         outputlogs=tortooptoutputlog[torstring]
 
@@ -383,9 +391,11 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         fulltorxyznames.extend(torxyznames)
         fullfinishedoutputlogsSP.extend(finishedoutputlogs)
         fullcartxyznames.extend(cartxyznames)
+        tortocartxyz[torstring]=cartxyznames
         fullfinishedphaseangles.extend(finishedphaseangles)
-        outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteSPJobs(poltype,torxyznames,finishedoutputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
+        outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangle,outputlogtocartxyz=ExecuteSPJobs(poltype,torxyznames,cartxyznames,finishedoutputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,outputlogtophaseangle,outputlogtocartxyz)
         lognames=[]
+        tortospoutputlogs[torstring]=outputlogs
         for job in listofjobs:
            log=jobtooutputlog[job]
            lognames.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir))+r'/'+poltype.logfname)
@@ -394,12 +404,21 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         fulloutputlogsSP.extend(outputlogs)
         fulllistofjobs.extend(listofjobs)
         fulljobtolog.update(jobtolog)
- 
-    for i in range(len(fullfinishedoutputlogsSP)):
-        outputlog=fullfinishedoutputlogsSP[i]
-        cartxyzname=fullcartxyznames[i] 
-        phaseangle=fullfinishedphaseangles[i]
-        poltype.optoutputtotorsioninfo[outputlog]= [a,b,c,d,torang,optmol,consttorlist,phaseangle,cartxyzname,bondtopology]
+    for tor in poltype.torlist:
+        a,b,c,d = tor[0:4]
+        torang = optmol.GetTorsion(a,b,c,d)
+        consttorlist = list(poltype.torlist)
+        consttorlist.remove(tor)
+        torstring=''
+        for i in range(len(tor)-1):
+            torstring+=str(tor[i])+'-'
+        torstring=torstring[:-1]
+        outputlogs=tortospoutputlogs[torstring]
+        for i in range(len(outputlogs)):
+            outputlog=outputlogs[i]
+            cartxyzname=outputlogtocartxyz[outputlog] 
+            phaseangle=outputlogtophaseangle[outputlog]
+            poltype.optoutputtotorsioninfo[outputlog]= [a,b,c,d,torang,optmol,consttorlist,phaseangle,cartxyzname,bondtopology]
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMSPJobToLog'+'_'+poltype.molecprefix
     if poltype.externalapi!=None:
         if len(fulllistofjobs)!=0:
