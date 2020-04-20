@@ -1,6 +1,6 @@
 RUNNING POLTYPE
 ********************************************
-*Need two input files to run: *.ini and *.sdf. The first is poltype controls and the sdf is the molecule.
+*Need two input files to run: *.ini and *.sdf. The ini file sets poltype controls and it specifies the molecule in sdf format to be used.
 *Prepare the poltype.ini and sdf file as shown below
 *Navigate to directory containing poltype.ini and .sdf file, and run:
 
