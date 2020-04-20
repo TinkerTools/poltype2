@@ -201,7 +201,6 @@ def tinker_minimize_analyze_QM_Struct(poltype,molecprefix,a,b,c,d,torang,optmol,
     cartxyz,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,torsionrestraint,prevstruct,torang,designatexyz,keybase,keybasepath)
     toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
     term=AnalyzeTerm(poltype,toralzfname)
-    print('toralzfname',toralzfname,'term',term)
     if term==False:
         tinker_analyze(poltype,newtorxyzfname,keyfname,toralzfname)
     return cartxyz,newtorxyzfname
@@ -296,6 +295,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
     tortodihedralrange={}
     tortooptoutputlog={}
     bondtopology=GenerateBondTopology(poltype,optmol)
+    tortotorang={}
     for tor in poltype.torlist:
         
         a,b,c,d = tor[0:4]
@@ -332,6 +332,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         for i in range(len(tor)-1):
             torstring+=str(tor[i])+'-'
         torstring=torstring[:-1]
+        tortotorang[torstring]=torang
         tortodihedralrange[torstring]=clock+counterclock
         tortooptoutputlog[torstring]=outputlogs
 
@@ -376,13 +377,13 @@ def gen_torsion(poltype,optmol,torsionrestraint):
     outputlogtocartxyz={}
     for tor in poltype.torlist:
         a,b,c,d = tor[0:4]
-        torang = optmol.GetTorsion(a,b,c,d)
         consttorlist = list(poltype.torlist)
         consttorlist.remove(tor)  
         torstring=''
         for i in range(len(tor)-1):
             torstring+=str(tor[i])+'-'
         torstring=torstring[:-1]
+        torang=tortotorang[torstring]
         dihedralrange=tortodihedralrange[torstring]
         outputlogs=tortooptoutputlog[torstring]
 
@@ -393,7 +394,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         fullcartxyznames.extend(cartxyznames)
         tortocartxyz[torstring]=cartxyznames
         fullfinishedphaseangles.extend(finishedphaseangles)
-        outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangle,outputlogtocartxyz=ExecuteSPJobs(poltype,torxyznames,cartxyznames,finishedoutputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,outputlogtophaseangle,outputlogtocartxyz)
+        outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangle,outputlogtocartxyz=ExecuteSPJobs(poltype,torxyznames,cartxyznames,finishedoutputlogs,dihedralrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,outputlogtophaseangle,outputlogtocartxyz)
         lognames=[]
         tortospoutputlogs[torstring]=outputlogs
         for job in listofjobs:
@@ -406,13 +407,13 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         fulljobtolog.update(jobtolog)
     for tor in poltype.torlist:
         a,b,c,d = tor[0:4]
-        torang = optmol.GetTorsion(a,b,c,d)
         consttorlist = list(poltype.torlist)
         consttorlist.remove(tor)
         torstring=''
         for i in range(len(tor)-1):
             torstring+=str(tor[i])+'-'
         torstring=torstring[:-1]
+        torang=tortotorang[torstring]
         outputlogs=tortospoutputlogs[torstring]
         for i in range(len(outputlogs)):
             outputlog=outputlogs[i]
