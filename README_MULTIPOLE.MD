@@ -1,6 +1,6 @@
 ## Multipoles
 
-[Multipole Frames](multipole-frames.png)
+![Multipole Frames](multipole_frames.png)
 
 ### Multipole Parameters
 ```
