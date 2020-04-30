@@ -1,39 +1,32 @@
 import unittest
 import os,sys,inspect
-from poltypepackage import poltype
+import poltype
 import shutil
 from parmed.tinker import parameterfile
 from scipy.optimize import fmin
 import argparse
+import getopt
 
 class TestPoltype(unittest.TestCase):
 
-    def __init__(self,examplepath=None,method=None):
-        self.examplepath=examplepath
-        method=method
-        if sys.argv[1]!=None:
-            self.examplepath=sys.argv[1]
-        if sys.argv[2]!=None:
-            self.method=sys.argv[2]
-
-        methodkeytomethod={'test_Aniline':self.test_Aniline,'test_Ammonia':self.test_Ammonia,'test_Ethene':self.test_Ethene,'test_Acetamide':self.test_Acetamide,'test_Water':self.test_Water,'test_Methane':self.test_Methane,'test_ModifiedAminoAcid':self.test_ModifiedAminoAcid,'test_MethylamineDontDoTor':self.test_MethylamineDontDoTor,'test_MethylamineDontDoTorFit':self.test_MethylamineDontDoTorFit,'test_MethanolFitRotBndsList':self.test_MethanolFitRotBndsList,'test_MethanolOnlyRotBnd':self.test_MethanolOnlyRotBnd,'test_MethanolTorsionGaus':self.test_MethanolTorsionGaus,'test_MethanolTorsion':self.test_MethanolTorsion,'test_MethylamineGeometryOptimizationOptions':self.test_MethylamineGeometryOptimizationOptions,'test_MethylamineDMAESPOptions':self.test_MethylamineDMAESPOptions,'test_MethylaminePsi4SPOnly':self.test_MethylaminePsi4SPOnly,'test_MethylaminePsi4':self.test_MethylaminePsi4,'test_Fragmenter':self.test_Fragmenter,'test_MethylamineCommonInputs':self.test_MethylamineCommonInputs}
-        print('method',method)
-        if method!=None:
-            methodkeytomethod[method]
-            sys.exit()
+    def __init__(self, method, examplepath,dontremovetestcase):
+         super(TestPoltype, self).__init__(method)
+         self.examplepath = examplepath
+         self.dontremovetestcase=dontremovetestcase
 
     def MakeTestCasePath(self,testfoldername):
 
         self.poltypemodulepath = os.path.abspath(os.path.join(__file__, os.pardir))
         self.poltypepath=os.path.abspath(os.path.join(self.poltypemodulepath, os.pardir))+r'/'
         self.testcaseparentpath=self.poltypepath+'TestCases'
-        if os.path.isdir(self.testcaseparentpath):
-            shutil.rmtree(self.testcaseparentpath)
-            os.mkdir(self.testcaseparentpath)
+        if not self.dontremovetestcase:
+            if os.path.isdir(self.testcaseparentpath):
+                shutil.rmtree(self.testcaseparentpath)
+                os.mkdir(self.testcaseparentpath)
         os.chdir(self.testcaseparentpath)
         testcasepath=self.testcaseparentpath+'/'+testfoldername
         if not os.path.isdir(testcasepath):
-            os.mkdir(testcasepath)
+            os.makedirs(testcasepath)
         os.chdir(testcasepath)
         return testcasepath
 
@@ -41,7 +34,7 @@ class TestPoltype(unittest.TestCase):
         exampleparentfolder='Examples/'
         examplekey5fname=examplestructure.replace('.sdf','.key_5')
         examplestructurepath=self.poltypepath+exampleparentfolder+examplefolder+examplestructure
-        examplekeyfilepath=self.poltypepath+exampleparentfolder+examplefolder+examplekey5fname
+        examplekeyfilepath=self.ptypepath+exampleparentfolder+examplefolder+examplekey5fname
         shutil.copy(examplestructurepath,testcasepath+examplestructure)
         return examplekeyfilepath
 
@@ -67,6 +60,12 @@ class TestPoltype(unittest.TestCase):
             exampletheteq=exampleitem.theteq
             self.assertEqual(testtheteq,exampletheteq)
         for key in testparams.stretch_bends.keys():
+            testitem=testparams.stretch_bends[key]
+            exampleitem=exampleparams.stretch_bends[key]
+            testk1=testitem.k1
+            examplek1=exampleitem.k1
+            self.assertEqual(testk1,examplek1)
+            testk2=testitem.k2
             examplek2=exampleitem.k2
             self.assertEqual(testk2,examplek2)
 
@@ -131,6 +130,15 @@ class TestPoltype(unittest.TestCase):
             testcaseqmtorsionpath=testcasepath+r'/'+'qm-torsion'
             if os.path.exists(testcaseqmtorsionpath):
                 shutil.rmtree(testcaseqmtorsionpath)
+        curdir=os.getcwd()
+        os.chdir(testcasepath)
+        files=os.listdir()
+        filestodelete=[]
+        for f in files:
+            if 'key_5' in f:
+                filestodelete.append(f)
+        for f in filestodelete:
+            os.remove(f)
    
     def GrabTorsions(self,folderpath):
         listoftorsions=[]
@@ -172,7 +180,7 @@ class TestPoltype(unittest.TestCase):
 
     def FindFragmentJobPath(self,parentrotbnd,testcasepath):
         curdir=os.getcwd()
-        os.chdir(testcasepath+'/Fragments/')
+        os.chdir(testcasepath+'Fragmenter/')
         fragfolders=os.listdir()
         fragpath=None
         for f in fragfolders:
@@ -187,15 +195,13 @@ class TestPoltype(unittest.TestCase):
 
     def RecursiveFolderSearch(self,foldername,parentrotbnd):
         path=None
-        for root, dirs, files in os.walk(os.getcwd(), topdown=False):
+        for root, dirs, files in os.walk(".", topdown=False):
             for name in dirs:
                path=os.path.join(root, name)
-               path,foundit=self.DoesFolderExistInDirectory(path,foldername)
-               if foundit==True:
-                   if self.ReadTorsionsFile(parentrotbnd,path)==True:
+               if self.DoesFolderExistInDirectory(path,foldername)==True:
+                   if self.ReadTorsionsFile(parentrotbnd)==True:
                        return path
-               else:
-                   continue
+        return path
 
     def DoesFolderExistInDirectory(self,path,foldername):
         curdir=os.getcwd()
@@ -205,15 +211,12 @@ class TestPoltype(unittest.TestCase):
             if f==foldername:
                 foundfoldername=True
         os.chdir(curdir)
-        if foldername in path:
-            foundfoldername=True
-            path=os.path.abspath(os.path.join(path, os.pardir))
-        return path,foundfoldername
+        return foundfoldername
 
-    def ReadTorsionsFile(self,parentrotbnd,path):
+    def ReadTorsionsFile(self,parentrotbnd):
         foundparent=False
-        if os.path.isfile(path+r'/'+'torsions.txt'):
-            temp=open(path+r'/'+'torsions.txt','r')
+        if os.path.isfile('torsions.txt'):
+            temp=open('torsions.txt','r')
             results=temp.readlines()
             temp.close()
             firstline=results[0]
@@ -226,10 +229,7 @@ class TestPoltype(unittest.TestCase):
         os.chdir(filepath)
         dictionary=json.load(open("parentindextofragindex.txt"))
         os.chdir(curdir)
-        newdic={}
-        for key,value in dictionary.items():
-            newdic[int(key)]=int(value)
-        return newdic
+        return dictionary
 
 
     def test_Fragmenter(self):
@@ -242,12 +242,15 @@ class TestPoltype(unittest.TestCase):
         self.GenericFolderCopy(testcasepath)
         os.chdir(testcasepath)
         poltype.PolarizableTyper(dontfrag=False,structure=ptype.molstructfname,poltypeini=False,suppressdipoleerr=True,optmethod=ptype.optmethod,toroptmethod=ptype.toroptmethod,espmethod=ptype.espmethod,torspmethod=ptype.torspmethod,dmamethod=ptype.dmamethod,torspbasisset=ptype.torspbasisset,espbasisset=ptype.espbasisset,dmabasisset=ptype.dmabasisset,toroptbasisset=ptype.toroptbasisset,optbasisset=ptype.optbasisset,bashrcpath=ptype.bashrcpath,externalapi=ptype.externalapi,use_gaus=ptype.use_gaus,use_gausoptonly=ptype.use_gausoptonly,isfragjob=False,poltypepath=ptype.poltypepath,numproc=ptype.numproc,maxmem=ptype.maxmem,maxdisk=ptype.maxdisk,printoutput=True)
-        listofparenttorsions,listofparentqmminusmmtxtfiles=self.GrabTorsions(self.examplepath)
+        listofparenttorsions,listofparentqmminusmmtxtfiles=self.GrabTorsions(self.examplepath) 
         for i in range(len(listofparenttorsions)):
-            torsion=listofparenttorsions[i]
+            torsion=listofparenttorsions=[i]
             parentqmminusmmtxtfile=listofparentqmminusmmtxtfiles[i]
+            print('torsion',torsion)
             parentrotbnd=str(torsion[1])+' '+str(torsion[2])
             filepath=self.FindFragmentJobPath(parentrotbnd,testcasepath)
+            if filepath==None: # kept changing nature of fragmenter and torsion so not every torsion in example exists in fragmenter for this original example
+                continue
             listoffragtorsions,listoffragqmminusmmtxtfiles=self.GrabTorsions(filepath)
             parentindextofragindex=self.ReadDictionaryFromFile(filepath)
             fragrotbnd=str(parentindextofragindex[torsion[1]])+'-'+str(parentindextofragindex[torsion[2]])
@@ -258,6 +261,7 @@ class TestPoltype(unittest.TestCase):
                 rotbnd=str(fragtorsion[1])+' '+str(fragtorsion[2])
                 print('comparing parenttorsion ',parenttorsion,'to fragtorsion ',fragtorsion)
                 print('fragrotbnd',fragrotbnd,'revfragrotbnd',revfragrotbnd,'rotbnd',rotbnd)
+
                 if fragrotbnd==rotbnd or revfragrotbnd==rotbnd:
                     parentanglearray,parentqmminusmmarray=self.GrabArrayData(parentqmminusmmtxtfile)
                     fraganglearray,fragqmminusmmarray=self.GrabArrayData(fragqmminusmmtxtfile)
@@ -424,10 +428,28 @@ class TestPoltype(unittest.TestCase):
         testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='SymmetryMethane/'
         examplestructure='methane.sdf'
+        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
+        self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
+
+    def test_Water(self):
+        print('Testing water symmetry')
+        testcasefolder='TestSymmetryWater/'
+        testcasepath=self.MakeTestCasePath(testcasefolder)
+        examplefolder='SymmetryWater/'
+        examplestructure='water.sdf'
+        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
+        self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
+
+    def test_Acetamide(self):
+        print('Testing acetamide symmetry')
+        testcasefolder='TestSymmetryAcetamide/'
+        testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='SymmetryAcetamide/'
         examplestructure='acetamide.sdf'
         examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
+        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
 
     def test_Ethene(self):
@@ -437,7 +459,7 @@ class TestPoltype(unittest.TestCase):
         examplefolder='SymmetryEthene/'
         examplestructure='ethene.sdf'
         examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
+        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
 
     def test_Ammonia(self):
@@ -447,7 +469,7 @@ class TestPoltype(unittest.TestCase):
         examplefolder='SymmetryAmmonia/'
         examplestructure='ammonia.sdf'
         examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
+        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
 
 
@@ -458,22 +480,27 @@ class TestPoltype(unittest.TestCase):
         examplefolder='SymmetryAniline/'
         examplestructure='aniline.sdf'
         examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
+        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
     
 
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--examplepath')
-    parser.add_argument('--method')
-    ns, args = parser.parse_known_args(namespace=unittest)
-    #args = parser.parse_args()
-    return ns, sys.argv[:1] + args
-
 if __name__ == '__main__':
-    args, argv = parse_args()   # run this first
-    sys.argv[:] = argv       # create cleans argv for main()
-    command_line_param = sys.argv[1]
+    command_line_param = sys.argv[1:]
     del sys.argv[1:]
-    unittest.main(argv=argv)
+    examplepath=None
+    method=None
+    dontremovetestcase=False
+    opts, xargs = getopt.getopt(command_line_param,'e:m',["method=","examplepath=","dontremovetestcase"])
+    for o, a in opts:
+        if o in ("--examplepath"):
+            examplepath=a
+        elif o in ("--method"):
+            method=a
+        elif o in ("--dontremovetestcase"):
+            dontremovetestcase=True
+ 
+    suite = unittest.TestSuite()
+    suite.addTest(TestPoltype(method,examplepath,dontremovetestcase))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
 
