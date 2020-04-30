@@ -468,30 +468,28 @@ def get_torlist(poltype,mol):
     rotbndlist = {}
 
     iterbond = openbabel.OBMolBondIter(mol)
-    v1 = valence.Valence(poltype.versionnum,poltype.logfname,poltype.dontfrag)
+    v1 = valence.Valence(poltype.versionnum,poltype.logfname,poltype.dontfrag,poltype.isfragjob)
     v1.setidxtoclass(poltype.idxtosymclass)
     v1.torguess(mol,False,[])
     missed_torsions = v1.get_mt()
-    poltype.WriteToLog('missing torsions '+str(missed_torsions))
     for bond in iterbond:
+        skiptorsion=True
         # is the bond rotatable
         t2 = bond.GetBeginAtom()
         t3 = bond.GetEndAtom()
         t2idx=t2.GetIdx()
         t3idx=t3.GetIdx()
+        
         t2val=t2.GetValence()
         t3val=t3.GetValence()
-        if ((bond.IsRotor()) or (str(t2idx) in poltype.onlyrotbndlist and str(t3idx) in poltype.onlyrotbndlist) or [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or (poltype.rotalltors and t2val>=2 and t3val>=2)):
-            skiptorsion = True
+        if ((bond.IsRotor()) or [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist or (poltype.rotalltors and t2val>=2 and t3val>=2)):
             t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
             # is the torsion in toromitlist
-            value=torfit.sorttorsion(poltype,[t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()])
-            if(torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]]) in missed_torsions):
+            if(torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]]) in missed_torsions) and len(poltype.onlyrotbndslist)==0:
                 skiptorsion = False
-            if [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist:
+            if [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist:
+                print('skipping')    
                 skiptorsion = False # override previous conditions if in list
-            if str(t2idx) in poltype.onlyrotbndlist and str(t3idx) in poltype.onlyrotbndlist:
-                skiptorsion = False
             if poltype.rotalltors==True:
                 skiptorsion=False
             rotbndkey = '%d %d' % (t2.GetIdx(), t3.GetIdx())
@@ -680,8 +678,7 @@ def CreatePsi4TorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optm
     if poltype.toroptpcm==True:
         temp.write('set {'+'\n')
         temp.write(' basis '+poltype.toroptbasisset+'\n')
-        temp.write(' e_convergence 10 '+'\n')
-        temp.write(' d_convergence 10 '+'\n')
+        temp.write( 'g_convergence GAU_LOOSE'+'\n')
         temp.write(' scf_type pk'+'\n')
         temp.write(' pcm true'+'\n')
         temp.write(' pcm_scf_type total '+'\n')
@@ -704,15 +701,28 @@ def CreatePsi4TorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optm
     else:
         temp.write('set {'+'\n')
         temp.write(' geom_maxiter '+str(poltype.optmaxcycle)+'\n')
+        temp.write( 'g_convergence GAU_LOOSE'+'\n')
         temp.write('}'+'\n')
-
-
 
 
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
-    temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')   
-    temp.write("optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
+    temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')
+    temp.write('for _ in range(1):'+'\n')
+    temp.write('  try:'+'\n')
+    temp.write("    optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
+    if poltype.freq==True:
+        temp.write('    scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
+    temp.write('    break'+'\n')
+    temp.write('  except OptimizationConvergenceError:'+'\n')
+    temp.write('    try:'+'\n')
+    temp.write('      set opt_coordinates cartesian'+'\n')
+    temp.write("      optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
+    if poltype.freq==True:
+        temp.write('      scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
+    temp.write('      break'+'\n')
+    temp.write('    except OptimizationConvergenceError:'+'\n')
+    temp.write('      '+'pass'+'\n')
     temp.write('clean()'+'\n')
     temp.close()
     outputname=inputname.replace('.dat','.log')
@@ -734,9 +744,8 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
     """
     opt.write_com_header(poltype,comfname,os.path.splitext(comfname)[0] + ".chk",maxdisk,maxmem,numproc)
     tmpfh = open(comfname, "a")
+    optimizeoptlist = ["maxcycle=%s"%(poltype.optmaxcycle),'Loose']
 
-    optimizeoptlist = [poltype.gausoptcoords]
-    optimizeoptlist.append("maxcycle=400")
     optstr=opt.gen_opt_str(poltype,optimizeoptlist)
 
     if ('-opt-' in comfname):

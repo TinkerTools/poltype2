@@ -781,7 +781,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
            
         figfname = '%s-fit-%d-%d' % (poltype.molecprefix,b,c)
         figfname+='.png'
-        fig = plt.figure()
+        fig = plt.figure(figsize=(10,10))
         ax = fig.add_subplot(111)
         l1, = ax.plot(Sx,fitfunc_dict[clskey],'r',label='Fit')
         l2, = ax.plot(Sx,tor_energy_list,'b',label='QM-MM1')
@@ -799,10 +799,11 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             RMSD=minRMSDW
         else:
             RMSD=minRMSD
-        #if float(RMSD)>poltype.maxtorRMSPD:
-            #poltype.WriteToLog('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
+        if float(RMSD)>poltype.maxtorRMSPD:
+            poltype.WriteToLog('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
+            if poltype.suppresstorfiterr==False:
 
-            #raise ValueError('RMSPD of QM and MM torsion profile is high, RMSPD = ',str(minRMSD))
+                raise ValueError('RMSPD of QM and MM torsion profile is high, RMSPD = ',str(minRMSD))
 
     return write_prm_dict,fitfunc_dict
 
@@ -920,7 +921,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         # output the profiles as plots
         figfname = "%s-energy-%d-%d" % (poltype.molecprefix,b,c)
         figfname+='.png'
-        fig = plt.figure()
+        fig = plt.figure(figsize=(10,10))
         #fig.subplots_adjust(right=0.75,left=0.05,top=0.95,bottom=0.05)
         ax = fig.add_subplot(111)
         # energy profiles: mm (pre-fit), mm (post-fit), qm

@@ -376,7 +376,6 @@ def post_proc_localframes(poltype,keyfilename, lfzerox,atomindextoremovedipquad,
     tmpfh = open(keyfilename, "w")
     mpolelines = 0
     # iterate over lines in the *.key file
-
     for ln1 in range(len(lines)):
         # skip over the lines containing multipole values
         if mpolelines > 0:

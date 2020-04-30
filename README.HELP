@@ -25,7 +25,7 @@ In order to test the fragmenter, run POLTYPE with fragmenting option turned off(
 
 Input Structure - SDF File
 *********************************************
-After the bond block, you can specify formal charge. Just put the total charge on one atom.
+After the bond block, you can specify the formal charge for each atom. If using the fragmenter (default), you CANNOT just specify total charge on any atom. This is because the fragmenter detects new charge by the difference in valence between parent and fragment and adds or subtracts that difference from the parent formal charge, hence the formal charge on parent atom needs to be correct.
 
 The following example means there is 1 atom with a formal charge: atom 2 has a +1 charge
 
@@ -126,7 +126,7 @@ toroptbasisset    specifies which basis set to use for geometry optimization dur
                   Default=6-31G*
 torspbasisset     specifies which basis set to use for SP during torsion parameterization. 
                   Default=6-311++G**
-onlyrotbndlist    specifies to only rotate single bond, onlyrotbndlist=1,2 . 
+onlyrotbndslist   specifies to only rotate bonds in the list, onlyrotbndlist=1 2, 3 4, 5 6 
                   Default=[] (empty)
 
 Modified Amino Acids

@@ -42,7 +42,9 @@ from rdkit.Chem import rdmolfiles
 
 class PolarizableTyper():
 
-    def __init__(self,readinionly=False,suppressdipoleerr=False,topologylib='residue_connect.txt',poltypepath=os.path.split(__file__)[0],WBOtol=.01,dontfrag=True,isfragjob=False,dipoletol=.1,externalapi=None,printoutput=False,poltypeini=True,structure=None,prmstartidx=401,numproc=1,maxmem="700MB",maxdisk="100GB",gausdir=None,gdmadir=None,tinkerdir=None,scratchdir="/scratch",paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/amoebabio18_header.prm",babelexe="babel",gausexe='g09',formchkexe='formchk',cubegenexe='cubegen',gdmaexe='gdma',avgmpolesexe=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/avgmpoles.pl",peditexe='poledit',potentialexe='potential',minimizeexe='minimize',analyzeexe='analyze',superposeexe='superpose',defopbendval=0.20016677990819662,Hartree2kcal_mol=627.5095,optbasisset='6-31G*',toroptbasisset='6-31G*',dmabasisset='6-311G**',espbasisset="6-311++G(2d,2p)",torspbasisset="6-311++G**",optmethod='wB97X-D',toroptmethod='wB97X-D',torspmethod='MP2',dmamethod='MP2',espmethod='MP2',qmonly = False,espfit = True,parmtors = True,foldnum=3,foldoffsetlist = [ 0.0, 180.0, 0.0, 0.0, 0.0, 0.0 ],torlist = None,rotbndlist = None,fitrotbndslist=None,maxRMSD=.1,maxRMSPD=1,maxtorRMSPD=2,tordatapointsnum=None,gentorsion=False,gaustorerror=False,torsionrestraint=.1,onlyrotbndlist=None,rotalltors=False,dontdotor=False,dontdotorfit=False,toroptpcm=False,optpcm=False,torsppcm=False,use_gaus=False,use_gausoptonly=False,freq=False,postfit=False,bashrcpath=None,amoebabioprmpath=None,libpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/lib.bio18_conv1.txt",SMARTSToTypelibpath=sys.path[0]+'/SMARTSToTypeLib.txt',ModifiedResiduePrmPath=sys.path[0]+'/ModifiedResidue.prm',modifiedproteinpdbname=None,unmodifiedproteinpdbname=None,mutatedsidechain=None,mutatedresiduenumber=None,modifiedresiduepdbcode=None,optmaxcycle=400,torkeyfname=None,gausoptcoords='',helpfile='README.HELP',versionfile='README.VERSION'): 
+    def __init__(self,suppresstorfiterr=False,obminimizeexe='obminimize',readinionly=False,suppressdipoleerr=False,topologylib='residue_connect.txt',poltypepath=os.path.split(__file__)[0],WBOtol=.03,dontfrag=True,isfragjob=False,dipoletol=.1,externalapi=None,printoutput=False,poltypeini=True,structure=None,prmstartidx=401,numproc=1,maxmem="700MB",maxdisk="100GB",gausdir=None,gdmadir=None,tinkerdir=None,scratchdir="/scratch",paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/amoebabio18_header.prm",babelexe="babel",gausexe='g09',formchkexe='formchk',cubegenexe='cubegen',gdmaexe='gdma',avgmpolesexe=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/avgmpoles.pl",peditexe='poledit',potentialexe='potential',minimizeexe='minimize',analyzeexe='analyze',superposeexe='superpose',defopbendval=0.20016677990819662,Hartree2kcal_mol=627.5095,optbasisset='6-31G*',toroptbasisset='6-31G*',dmabasisset='6-311G**',espbasisset="6-311++G(2d,2p)",torspbasisset="6-311+G*",optmethod='wB97X-D',toroptmethod='wB97X-D',torspmethod='MP2',dmamethod='MP2',espmethod='MP2',qmonly = False,espfit = True,parmtors = True,foldnum=3,foldoffsetlist = [ 0.0, 180.0, 0.0, 0.0, 0.0, 0.0 ],torlist = None,rotbndlist = None,fitrotbndslist=None,maxRMSD=.1,maxRMSPD=1,maxtorRMSPD=2,tordatapointsnum=None,gentorsion=False,gaustorerror=False,torsionrestraint=.1,onlyrotbndslist=None,rotalltors=False,dontdotor=False,dontdotorfit=False,toroptpcm=False,optpcm=False,torsppcm=False,use_gaus=False,use_gausoptonly=False,freq=False,postfit=False,bashrcpath=None,amoebabioprmpath=None,libpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/lib.bio18_conv1.txt",SMARTSToTypelibpath=sys.path[0]+'/SMARTSToTypeLib.txt',ModifiedResiduePrmPath=sys.path[0]+'/ModifiedResidue.prm',modifiedproteinpdbname=None,unmodifiedproteinpdbname=None,mutatedsidechain=None,mutatedresiduenumber=None,modifiedresiduepdbcode=None,optmaxcycle=5,torkeyfname=None,gausoptcoords='',helpfile='README.HELP',versionfile='README.VERSION'): 
+        self.suppresstorfiterr=suppresstorfiterr
+        self.obminimizeexe=obminimizeexe
         self.readinionly=readinionly
         self.suppressdipoleerr=suppressdipoleerr
         self.use_gaus=use_gaus
@@ -116,7 +118,7 @@ class PolarizableTyper():
                     temp.append(int(e))
                 templist.append(temp)
             self.fitrotbndslist=templist
-
+            
         self.maxRMSD=maxRMSD
         self.maxRMSPD=maxRMSPD
         self.maxtorRMSPD=maxtorRMSPD
@@ -124,10 +126,19 @@ class PolarizableTyper():
         self.gentorsion=gentorsion
         self.gaustorerror=gaustorerror
         self.torsionrestraint=torsionrestraint
-        if onlyrotbndlist==None:
-            self.onlyrotbndlist=[]
+        if onlyrotbndslist==None:
+            self.onlyrotbndslist=[]
         else:
-            self.onlyrotbndlist=[i.lstrip().rstrip() for i in onlyrotbndlist.split(',')]
+           
+            self.onlyrotbndslist=onlyrotbndslist.split(',')
+            templist=[]
+            for ele in self.onlyrotbndslist:
+                nums=ele.lstrip().rstrip().split()
+                temp=[]
+                for e in nums:
+                    temp.append(int(e))
+                templist.append(temp)
+            self.onlyrotbndslist=templist
         self.rotalltors=rotalltors
         self.dontdotor=dontdotor
         self.dontdotorfit=dontdotorfit
@@ -169,6 +180,8 @@ class PolarizableTyper():
                         linesplit=line.split('=',1)
                         a=linesplit[1].replace('\n','').rstrip().lstrip()
                         newline=linesplit[0]
+                        if a=='None':
+                            continue
                     else:
                         newline=line
 
@@ -199,10 +212,15 @@ class PolarizableTyper():
                             self.dontfrag=True
                         else:
                             self.dontfrag=self.GrabBoolValue(a)
-                    elif "externalapi" in newline:
+                    elif "externalapi" in newline and a!='None':
                         self.externalapi=a
                     elif "gausoptcoords" in newline:
                         self.gausoptcoords = a
+                    elif "suppresstorfiterr" in newline:
+                        if '=' not in line:
+                            self.suppresstorfiterr=True
+                        else:
+                            self.suppresstorfiterr=self.GrabBoolValue(a)
                     elif "toroptbasisset" in newline:
                         self.toroptbasisset = a
                     elif "modifiedresiduepdbcode" in newline:
@@ -216,7 +234,7 @@ class PolarizableTyper():
                         self.molstructfname='ModifiedRes.sdf'
                     elif "dmamethod" in newline:
                         self.dmamethod =a
-                    elif "bashrcpath" in newline:
+                    elif "bashrcpath" in newline and a!='None':
                         self.bashrcpath = a
                     elif "modifiedproteinpdbname" in newline:
                         self.modifiedproteinpdbname = a
@@ -284,6 +302,17 @@ class PolarizableTyper():
                                 temp.append(int(e))
                             templist.append(temp)
                         self.fitrotbndslist=templist
+                    elif "onlyrotbndslist" in newline:
+                        self.onlyrotbndslist=a.split(',')
+                        templist=[]
+                        for ele in self.onlyrotbndslist:
+                            nums=ele.lstrip().rstrip().split()
+                            temp=[]
+                            for e in nums:
+                                temp.append(int(e))
+                            templist.append(temp)
+                        self.onlyrotbndslist=templist
+
                     elif "optmethod" in newline and 'tor' not in newline:
                         self.optmethod = a
                     elif "espmethod" in newline and 'tor' not in newline:
@@ -339,8 +368,6 @@ class PolarizableTyper():
                         self.copyright()
                         self.usage()
                         sys.exit(2)
-                    elif "onlyrotbnd" in newline: # comma seperated list 
-                        self.onlyrotbndlist=[i.lstrip().rstrip() for i in a.split(',')]
                     else:
                         print('Unrecognized '+line)
                         self.usage()
@@ -447,7 +474,9 @@ class PolarizableTyper():
                     print("ERROR: Invalid Gaussian directory: ", self.gausdir)
                     sys.exit(1)
     
-    
+        if self.which('obminimize') is not None:
+            self.obminimizeexe = self.which('obminimize')
+
                 
     
         cmdstr=self.analyzeexe+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+'water.xyz'+' '+'-k'+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+'water.key'+' '+'e'+'>'+' '+'version.out'
@@ -604,17 +633,20 @@ class PolarizableTyper():
     
         return mol
     
-    def CallJobsSeriallyLocalHost(self,fulljobtooutputlog,skiperrors=False):
+    def CallJobsSeriallyLocalHost(self,fulljobtooutputlog,skiperrors):
+       for job in fulljobtooutputlog.keys():
+           temp={}
+           self.call_subsystem(job,True,skiperrors)
+           temp[job]=fulljobtooutputlog[job]
+           finishedjob,errorjob=self.WaitForTermination(temp)
+       finishedjobs,errorjobs=self.WaitForTermination(fulljobtooutputlog)
+       return finishedjobs,errorjobs
+
+    def CallJobsLocalHost(self,fulljobtooutputlog,skiperrors):
        for job in fulljobtooutputlog.keys():
            self.call_subsystem(job,True,skiperrors)
        finishedjobs,errorjobs=self.WaitForTermination(fulljobtooutputlog)
        return finishedjobs,errorjobs
-
-    def CallJobsLocalHost(self,jobtooutputlog):
-        for job in jobtooutputlog.keys():
-           self.call_subsystem(job)
-        finishedjobs,errorjobs=self.WaitForTermination(jobtooutputlog)
-        return finishedjobs,errorjobs
 
 
     def WaitForTermination(self,jobtooutputlog):
@@ -658,6 +690,17 @@ class PolarizableTyper():
         self.WriteToLog('All jobs have terminated ')
         return finishedjobs,errorjobs
 
+    def CycleCount(self,logname):
+        temp=open(logname,'r')
+        results=temp.readlines()
+        temp.close()
+        count=0
+        for line in results:
+            if 'SCF Done:' in line or 'Convergence Check' in line:
+                count+=1
+        return count
+
+
     def CheckNormalTermination(self,logfname,errormessages=None): # needs to handle error checking now
         """
         Intent: Checks the *.log file for normal termination
@@ -666,6 +709,10 @@ class PolarizableTyper():
         term=False
         if os.path.isfile(logfname):
             head,tail=os.path.split(logfname)
+            Ftime=os.path.getmtime(logfname)
+            reltime=time.time()-Ftime
+            htime=reltime*0.000277778
+            updatetime=2 # hours
             for line in open(logfname):
                 if 'poltype' in tail:
                     if 'Poltype Job Finished' in line:
@@ -673,14 +720,22 @@ class PolarizableTyper():
                 else:
                     if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line or "LBFGS  --  Normal Termination due to SmallGrad" in line or "Normal termination" in line:
                         term=True
-                if ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line:
-                    if 'segmentation violation' in line and 'address not mapped to object' not in line:
+                    if ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line:
+                        error=True
+                    if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line:
                         error=False
                         continue
-                    error=True
-                if error==True:
-                    message='Error '+line+ 'logpath='+logfname
-                    
+                    if ('Error termination request processed by link 9999' in line or 'Error termination via Lnk1e in' in line) and 'opt' in logfname:
+                        if self.CycleCount(logfname)>=poltype.optmaxcycle:
+                            term=True
+                            error=False
+
+            if error==True:
+                message='Error '+line+ 'logpath='+logfname
+   
+            if error==False and term==False and htime>=updatetime:
+                error=True
+                message='Error '+'Job died and has not been updated in '+str(updatetime)+' hours'+' last update time = '+str(htime)+' hours'+' logname='+logfname
             if error==True and term==False:
                 if errormessages!=None:
                     if message not in errormessages:
@@ -706,19 +761,15 @@ class PolarizableTyper():
 
 
     def call_subsystem(self,cmdstr,wait=False,skiperrors=False):
-        curdir=os.getcwd()
-        error=False
         if self.printoutput==True:
             print("Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
         self.WriteToLog(" Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
         p = subprocess.Popen(cmdstr, shell=True,stdout=self.logfh, stderr=self.logfh)
-
         if wait==True:
             p.wait()
             if p.returncode != 0 and skiperrors==False:
                 self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
                 raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
-        return error
 
     def WriteOutLiteratureReferences(self,keyfilename): # to use ParmEd on key file need Literature References delimited for parsing
         temp=open(keyfilename,'r')
@@ -909,7 +960,7 @@ class PolarizableTyper():
     
     
             # Map from idx to symm class is made for valence.py
-            v = valence.Valence(self.versionnum,self.logfname,self.dontfrag)
+            v = valence.Valence(self.versionnum,self.logfname,self.dontfrag,self.isfragjob)
             v.setidxtoclass(self.idxtosymclass)
             dorot = True
             # valence.py method is called to find parameters and append them to the keyfile

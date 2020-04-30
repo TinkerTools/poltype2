@@ -32,13 +32,14 @@ import os
 radian = 57.29577951308232088
 
 class Valence():
-    def __init__(self,versionnum,logfname,dontfrag):
+    def __init__(self,versionnum,logfname,dontfrag,isfragjob):
         self.sp = openbabel.OBSmartsPattern()
         self.missed_torsions = []
         self.versionnum=versionnum
         self.logfh = open(logfname,"a")
         self.defopbendval = 0.20016677990819662
         self.dontfrag=dontfrag
+        self.isfragjob=isfragjob
 
 
 
@@ -2605,7 +2606,8 @@ class Valence():
                     neighborindexes=firstneighborindexes+secondneighborindexes
                     check=self.CheckIfNeighborsExistInSMARTMatch(neighborindexes,ia)
                     rot=bond.IsRotor()
-                    if (check==False and self.dontfrag==False) and rot==True:
+                   
+                    if (check==False and self.dontfrag==False and self.isfragjob==False) and rot==True:
                         zeroed=True
                     if(dorot):
                         for r in rotbnds:

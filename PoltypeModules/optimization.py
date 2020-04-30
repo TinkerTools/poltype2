@@ -23,8 +23,7 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
     if poltype.optpcm==True:
         temp.write('set {'+'\n')
         temp.write(' basis '+poltype.optbasisset+'\n')
-        temp.write(' e_convergence 10 '+'\n')
-        temp.write(' d_convergence 10 '+'\n')
+        temp.write( 'g_convergence GAU_LOOSE'+'\n')
         temp.write(' scf_type pk'+'\n')
         temp.write(' pcm true'+'\n')
         temp.write(' pcm_scf_type total '+'\n')
@@ -47,15 +46,30 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
     else:
         temp.write('set {'+'\n')
         temp.write(' geom_maxiter '+str(poltype.optmaxcycle)+'\n')
+        temp.write( 'g_convergence GAU_LOOSE'+'\n')
         temp.write('}'+'\n')
 
         
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')
-    temp.write("optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
+    temp.write('for _ in range(1):'+'\n')
+    temp.write('  try:'+'\n')
+    temp.write("    optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
     if poltype.freq==True:
-        temp.write('scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
+        temp.write('    scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
+
+    temp.write('    break'+'\n')
+    temp.write('  except OptimizationConvergenceError:'+'\n')
+    temp.write('    try:'+'\n')
+    temp.write('      set opt_coordinates cartesian'+'\n')
+    temp.write("      optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
+    if poltype.freq==True:
+        temp.write('      scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
+    temp.write('      break'+'\n')
+    temp.write('    except OptimizationConvergenceError:'+'\n')
+    temp.write('      '+'pass'+'\n')
+
     temp.write('clean()'+'\n')
     temp.close()
     outputname=os.path.splitext(inputname)[0] + '.log'
@@ -77,19 +91,27 @@ def NumberInLine(poltype,line):
 
 def GrabFinalXYZStructure(poltype,logname,filename):
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
-        finalmarker=False
         temp=open(logname,'r')
         results=temp.readlines()
         temp.close()
         temp=open(filename,'w')
         temp.write(str(poltype.mol.NumAtoms())+'\n')
         temp.write('\n')
-        for line in results:
-            if 'Final optimized geometry and' in line:
+        finalmarker=False
+        for lineidx in range(len(results)):
+            line=results[lineidx]
+            if 'Cartesian Geometry' in line:
+                lastidx=lineidx
+        for lineidx in range(len(results)):
+            line=results[lineidx]
+            if 'Cartesian Geometry' in line and lineidx==lastidx:
                 finalmarker=True
-            if finalmarker==True:
+                lengthchange=False
+            if finalmarker==True and lineidx>lastidx:    
                 linesplit=line.split()
-                if len(linesplit)==4 and bool(re.search(r'\d', line))==True and 'point' not in line:
+                if len(linesplit)!=4:
+                    lengthchange=True
+                if len(linesplit)==4 and bool(re.search(r'\d', line))==True and 'point' not in line and lengthchange==False:
                     temp.write(line.lstrip())
         temp.close()
     elif poltype.use_gaus==True or poltype.use_gausoptonly==True:
@@ -102,7 +124,7 @@ def GrabFinalXYZStructure(poltype,logname,filename):
         obConversion.WriteFile(tempmol, filename)
 
 
-def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,mol):
+def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule):
     """
     Intent: Create *.com file for qm opt
     Input:
@@ -119,11 +141,11 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,mol):
     restraintlist = []
     write_com_header(poltype,comfname,chkname,maxdisk,maxmem,numproc)
     tmpfh = open(comfname, "a")
-    optimizeoptlist = ["maxcycle=%s"%(poltype.optmaxcycle)]
+    optimizeoptlist = ["maxcycle=%s"%(poltype.optmaxcycle),'Loose']
     if restraintlist:
         optimizeoptlist.insert(0,poltype.gausoptcoords)
     optstr=gen_opt_str(poltype,optimizeoptlist)
-    if ('I ' in mol.GetSpacedFormula()):
+    if ('I ' in molecule.GetSpacedFormula()):
         optstring="%s HF/Gen freq Guess=INDO MaxDisk=%s\n" % (optstr,maxdisk)
     else:
         if poltype.freq==True:
@@ -139,10 +161,10 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,mol):
     tmpfh.write(optstring)
     commentstr = poltype.molecprefix + " Gaussian OPT Calculation on " + gethostname()
     tmpfh.write('\n%s\n\n' % commentstr)
-    tmpfh.write('%d %d\n' % (mol.GetTotalCharge(), mol.GetTotalSpinMultiplicity()))
+    tmpfh.write('%d %d\n' % (molecule.GetTotalCharge(), molecule.GetTotalSpinMultiplicity()))
     tmpfh.close()
 
-    iteratombab = openbabel.OBMolAtomIter(mol)
+    iteratombab = openbabel.OBMolAtomIter(molecule)
     tmpfh = open(comfname, "a")
     etab = openbabel.OBElementTable()
     for atm in iteratombab:
@@ -243,7 +265,17 @@ def StructureMinimization(poltype):
 
 def GeometryOptimization(poltype,mol):
     poltype.WriteToLog("NEED QM Density Matrix: Executing Gaussian Opt and SP")
-    
+    OBOPTname=poltype.molstructfname.replace('.sdf','_OBOPT.pdb')
+
+    if not os.path.isfile(OBOPTname):
+        cmdstr=poltype.obminimizeexe+' -ff MMFF94 '+poltype.molstructfname +' '+ '>'+ OBOPTname
+        poltype.call_subsystem(cmdstr,True)
+    obConversion = openbabel.OBConversion()
+    OBOPTmol = openbabel.OBMol()
+    inFormat = obConversion.FormatFromExt(OBOPTname)
+    obConversion.SetInFormat(inFormat)
+    obConversion.ReadFile(OBOPTmol,OBOPTname)
+
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
         if not os.path.exists(poltype.scratchdir):
             mkdirstr='mkdir '+poltype.scratchdir
@@ -257,7 +289,7 @@ def GeometryOptimization(poltype,mol):
         term,error=poltype.CheckNormalTermination(poltype.logoptfname)
         if not term:
             mystruct = load_structfile(poltype,poltype.molstructfname)
-            gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol)
+            gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,OBOPTmol)
 
             cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdir + ' ' + poltype.gausexe + " " + poltype.comoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
@@ -266,13 +298,12 @@ def GeometryOptimization(poltype,mol):
             jobtologlistfilepathprefix=os.getcwd()+r'/'+'optimization_jobtolog_'+poltype.molecprefix 
             if os.path.isfile(poltype.chkoptfname):
                 os.remove(poltype.logoptfname) # if chk point exists just remove logfile, there could be error in it and we dont want WaitForTermination to catch error before job is resubmitted by daemon 
-
-            if poltype.externalapi!=None:
+            if poltype.externalapi==None:
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
+            else:
                 if len(jobtooutputlog.keys())!=0:
                     call.CallExternalAPI(poltype,jobtolog,jobtologlistfilepathprefix,scratchdir)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
-            else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog)
 
             cmdstr = poltype.formchkexe + " " + poltype.chkoptfname
             poltype.call_subsystem(cmdstr)
@@ -283,10 +314,10 @@ def GeometryOptimization(poltype,mol):
         optmol=rebuild_bonds(poltype,optmol,mol)
                 
     else:
-        gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol)
+        gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,OBOPTmol)
         poltype.WriteToLog("Calling: " + "Psi4 Optimization")
         term,error=poltype.CheckNormalTermination(poltype.logoptfname)
-        inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol)
+        inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,OBOPTmol)
         if term==False:
             cmdstr='cd '+os.getcwd()+' && '+'psi4 '+inputname+' '+poltype.logoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
@@ -295,21 +326,21 @@ def GeometryOptimization(poltype,mol):
             jobtologlistfilepathprefix=os.getcwd()+r'/'+'optimization_jobtolog_'+poltype.molecprefix
             if os.path.isfile(poltype.logoptfname):
                 os.remove(poltype.logoptfname)
-            if poltype.externalapi!=None:
+            if poltype.externalapi==None:
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
+            else:
                 if len(jobtooutputlog.keys())!=0:
                     call.CallExternalAPI(poltype,jobtolog,jobtologlistfilepathprefix,scratchdir)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
-            else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog)
-
+            
         term,error=poltype.CheckNormalTermination(poltype.logoptfname) # now grabs final structure when finished with QM if using Psi4
         if error and term==False:
             poltype.RaiseOutputFileError(poltype.logoptfname) 
         GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'))
         optmol =  load_structfile(poltype,poltype.logoptfname.replace('.log','.xyz'))
-        optmol=rebuild_bonds(poltype,optmol,mol)
+        optmol=rebuild_bonds(poltype,optmol,OBOPTmol)
     GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'))
-    CheckBondConnectivity(poltype,mol,optmol)
+    CheckBondConnectivity(poltype,OBOPTmol,optmol)
     return optmol
 
 

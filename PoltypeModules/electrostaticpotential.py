@@ -264,7 +264,7 @@ def SPForDMA(poltype,optmol,mol):
                     call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
             else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog)
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
 
             term,error=poltype.CheckNormalTermination(poltype.logdmafname)
             if error:
@@ -290,7 +290,7 @@ def SPForDMA(poltype,optmol,mol):
                     call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
             else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog)
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
 
             poltype.call_subsystem(cmdstr,True)
             cmdstr = poltype.formchkexe + " " + poltype.chkdmafname
@@ -323,7 +323,7 @@ def SPForESP(poltype,optmol,mol):
                     call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
             else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog)
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
 
             term,error=poltype.CheckNormalTermination(outputname)
             if error:
@@ -349,7 +349,7 @@ def SPForESP(poltype,optmol,mol):
                     call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
             else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog)
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
 
             cmdstr = poltype.formchkexe + " " + poltype.chkespfname
             poltype.call_subsystem(cmdstr,True)
@@ -403,6 +403,8 @@ def CheckDipoleMoments(poltype,optmol):
     poltype.WriteToLog("")
     poltype.WriteToLog("=========================================================")
     poltype.WriteToLog("MM Dipole moment\n")
+    while not os.path.exists(poltype.tmpkeyfile):
+        time.sleep(1)
     torgen.RemoveStringFromKeyfile(poltype,poltype.tmpkeyfile,'solvate')
     cmd=poltype.analyzeexe + ' ' +  poltype.xyzoutfile+' '+'-k'+' '+poltype.tmpkeyfile + ' em | grep -A11 Charge'+'>'+'MMDipole.txt'
     poltype.call_subsystem(cmd,True)
