@@ -6,7 +6,6 @@
 
 ### POLTYPE Files
 
-```
 *.sdf               Input structure file.
 *-opt.com           Gaussian input file for geometry optimization.
 *-opt_psi.dat       Psi4 input file for geometry optimization.
@@ -60,8 +59,7 @@ lib.bio18_conv1.txt A library containing a map for PDB records to amoebabio18 pa
 SMARTSToTypeLib.txt A text file mapping each atom in the modified residue stored as a SMARTS string to its corresponding atom type. 
 
 
-qm-torsion
-*********************************************
+### qm-torsion
 *-opt-a-b-c-d_angle_preQMOPTprefit.xyz           Tinker XYZ from previous Gaussian log file,before current QM optimzation                                                   and torsion fitting.
 
 *-opt-a-b-c-d_angle_preQMOPTprefit_xyzformat.xyz Tinker XYZ from previous Gaussian log file,before current QM optimzation                                                   and torsion fitting.
@@ -107,10 +105,9 @@ qm-torsion
 
 *-fit-b-c.png                                    Plot of QM-MM as a function of dihedral angle and the fourier fit.
 *-energy-b-c.png                                 Plot of MM1 (prefit),MM2 (postfit),QM and MM1+Fit as a function of                                                         dihedral angle.
-```
+
 
 ### Poltype Modules
-```
 symmetry.py                Handles detecting symmetry in input molecule.
 modifiedresidues.py        Handles parameterizing new amino acid side chains and stitching parameters from amoebabio18.prm for                        parts of molecule already parameterized.
 
@@ -123,10 +120,8 @@ torsionfit.py              Handles torsion fitting.
 torsiongenerator.py        Handles torsion Gaussian,Psi4 and Tinker minimization, SP and analyze.
 fragmenter.py              Handles fragmenting parent molecule, paramterizing torsion and transfering paramters to parent.
 test_poltype.py            Handles unittesting for POLTYPE modules.
-```
 
 ### Poltype Examples
-```
 ExternalAPIExample                      Example Daemon for jub submission to be used with externalapi command
                                         and bashrcpath command.
 MethanolTorsionGaus                     Shows example of torsion fitting with various torsion options using Gaussian.
@@ -152,4 +147,3 @@ SymmetryDiMethylPhosphate1H             Shows example of z-then-x chosen correct
 SymmetryTriMethylPhosphate              Shows example of z-only on lone oxygen and for P as well.
 SymmetryMonoMethylPhosphate1H           Shows example of correct z-then-x frame.
 SymmetryMonoMethylPhosphate0H           Shows example of correct z-then-x frame.
-```
