@@ -1,5 +1,13 @@
 ## Help
-### RUNNING POLTYPE
+
+* [Running Poltype](#running-poltype)
+* [Unittesting](#unittesting)
+* [Input Structure](#input-structure)
+* [Most Common Inputs](#most-common-inputs)
+
+
+
+### Running POLTYPE
 * Need two input files to run: *.ini and *.sdf. The ini file sets poltype controls and it specifies the molecule in sdf format to be used.
 * Prepare the poltype.ini and sdf file as shown below
 * Navigate to directory containing poltype.ini and .sdf file, and run:
@@ -11,7 +19,7 @@ python /path_to_poltype/poltype.py
 ```ttt.xyz``` and ```ttt.key``` are the resulting structure and parameter files you will need.
 
 
-### HELP
+### Help
 ```shell
 python /path_to_poltype/poltype.py --help
 ```
@@ -27,14 +35,17 @@ In order to test the fragmenter, run POLTYPE with fragmenting option turned off(
 
 
 
-### Input Structure - SDF File
-After the bond block, you can specify the formal charge for each atom. If using the fragmenter (default), you CANNOT just specify total charge on any atom. This is because the fragmenter detects new charge by the difference in valence between parent and fragment and adds or subtracts that difference from the parent formal charge, hence the formal charge on parent atom needs to be correct.
+### Input Structure
+* Use an SDF file format for the input structure.
 
-The following example means there is 1 atom with a formal charge: atom 2 has a +1 charge
+* After the bond block, you can specify the formal charge for each atom. If using the fragmenter (default), you CANNOT just specify total charge on any atom. This is because the fragmenter detects new charge by the difference in valence between parent and fragment and adds or subtracts that difference from the parent formal charge, hence the formal charge on parent atom needs to be correct.
 
-For 0 total charge, you do not need to specify CHG line
+* The following example means there is 1 atom with a formal charge: atom 2 has a +1 charge
 
 M  CHG  1   2   1
+
+* For 0 total charge, you do not need to specify CHG line
+
 
 #### Most Common Inputs
 ```
