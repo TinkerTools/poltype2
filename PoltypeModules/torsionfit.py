@@ -768,12 +768,16 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         Sx = numpy.array(cls_angle_dict[clskey])
         fitfunc_dict[clskey] = fitfunc(poltype,'eval',torgen.rads(poltype,Sx),torprmdict,debug=False)
         deriv_qm=numpy.gradient(tor_energy_list)
-        weight=numpy.add(.6,numpy.absolute(deriv_qm))
+        #weight=numpy.exp(-numpy.array(tor_energy_list)/.6)
+        #weight=numpy.add(.6,numpy.absolute(deriv_qm))
         if len(fitfunc_dict[clskey])==len(tor_energy_list):
-            def RMSDW(c):
-                return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.divide(numpy.subtract(fitfunc_dict[clskey],tor_energy_list),weight),c))))
-            resultW=fmin(RMSDW,.5)
-            minRMSDW=RMSDW(resultW[0])
+            #def RMSDW(c):
+            #    return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.divide(numpy.subtract(fitfunc_dict[clskey],tor_energy_list),weight),c))))
+           # def RMSDW(c):
+            #    return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.multiply(numpy.subtract(fitfunc_dict[clskey],tor_energy_list),weight),c))))
+
+            #resultW=fmin(RMSDW,.5)
+            #minRMSDW=RMSDW(resultW[0])
             def RMSD(c):
                 return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.subtract(fitfunc_dict[clskey],tor_energy_list),c))))
             result=fmin(RMSD,.5)
@@ -792,20 +796,10 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         # plot figure
         string=' , '.join(list(torprmdict.keys()))
         ax.text(0.05, 1.1, 'Torsions Being Fit =%s'%(string), transform=ax.transAxes, fontsize=10,verticalalignment='top')
-        ax.text(0, -0.1, 'FoldNum=%s NumPrms=%s DataPts=%s RMSD(fit,QM-MM1) Wei=%s,Abs=%s'%(str(len(poltype.nfoldlist)),str(numprms),str(len(mm_energy_list)),round(minRMSDW,2),round(minRMSD,2)), transform=ax.transAxes, fontsize=10,verticalalignment='bottom')
+        ax.text(0, -0.1, 'FoldNum=%s NumPrms=%s DataPts=%s RMSD(fit,QM-MM1),Abs=%s'%(str(len(poltype.nfoldlist)),str(numprms),str(len(mm_energy_list)),round(minRMSD,2)), transform=ax.transAxes, fontsize=10,verticalalignment='bottom')
         fig.savefig(figfname)
         torgen.write_arr_to_file(poltype,txtfname,[Sx,fitfunc_dict[clskey],tor_energy_list])
-        if qmbarrier>6: # 6kcal/mol
-            RMSD=minRMSDW
-        else:
-            RMSD=minRMSD
-        if float(RMSD)>poltype.maxtorRMSPD:
-            poltype.WriteToLog('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
-            if poltype.suppresstorfiterr==False:
-
-                raise ValueError('RMSPD of QM and MM torsion profile is high, RMSPD = ',str(minRMSD))
-
-    return write_prm_dict,fitfunc_dict
+        return write_prm_dict,fitfunc_dict
 
 def write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename):
     """
@@ -908,10 +902,11 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         # TBC
         ff_list = [aa+bb for (aa,bb) in zip(mm_energy_list,fitfunc_dict[clskey])]
         deriv_qm=numpy.gradient(qm_energy_list)
-        weight=numpy.add(.6,numpy.absolute(deriv_qm))
+        weight=numpy.exp(-numpy.array(qm_energy_list)/2.5)
         if len(ff_list)==len(mm2_energy_list):
             def RMSDW(c):
-                return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.divide(numpy.subtract(mm2_energy_list,qm_energy_list),weight),c))))
+                return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.multiply(numpy.subtract(mm2_energy_list,qm_energy_list),weight),c))))
+
             resultW=fmin(RMSDW,.5)
             minRMSDW=RMSDW(resultW[0])
             def RMSD(c):
@@ -943,10 +938,21 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         plt.show()
         fig.savefig(figfname)
         txtfname = "%s-energy-%d-%d-%d-%d" % (poltype.molecprefix, a, b, c, d)
+        qmbarrier=max(qm_energy_list)-min(qm_energy_list) 
 
 
         txtfname = "%s-energy-%d-%d-%d-%d.txt" % (poltype.molecprefix, a, b, c, d)
         torgen.write_arr_to_file(poltype,txtfname,[mang_list,mm_energy_list,mm2_energy_list,qm_energy_list,tordif_list])
+        if qmbarrier>6: # 6kcal/mol
+            RMSD=minRMSDW
+        else:
+            RMSD=minRMSD
+        if float(RMSD)>poltype.maxtorRMSPD:
+            poltype.WriteToLog('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
+            if poltype.suppresstorfiterr==False:
+
+                raise ValueError('RMSPD of QM and MM torsion profile is high, RMSPD = ',str(minRMSD))
+
 
 def gen_toromit_list(poltype):
     """
