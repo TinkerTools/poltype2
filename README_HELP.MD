@@ -43,6 +43,9 @@ python ~/poltypepackage/PoltypeModules/test_poltype.py --method=test_Fragmenter 
 python ~/poltypepackage/PoltypeModules/test_poltype.py --method=test_Fragmenter --examplepath=/home/bdw2292/PoltypeJobs/MOLECULE0DontFrag --dontremovetestcase
 ```
 
+* Currently has some bugs do not use
+* Fragmenter library also has bugs for adding hydrogens, dont use
+
 In order to test the fragmenter, run POLTYPE with fragmenting option turned off(dontfrag) to paramterize the torsion first, then specify the examplepath to that POLTYPE job. Add --dontremovetestcase , if there is an issue with the job and you want to restart without starting from scratch. Use --method flag to specify which POLTYPE test to run from the test_poltype module. 
 
 
@@ -196,7 +199,7 @@ Minimal examples are any example folder in Examples/, that contain Symmetry as t
   A)No, POLTYPE will look for output files from QM (see README.MANIFEST) to see if it needs to perform a job or continue. So you can delete the outputlog file, change your input options and resubmit POLTYPE job.
 
 ### Tips
-If using PSI4 for optimization, it will be much slower than Gaussian optimization. Add keyword "use_gaus" in poltype.ini file.
+If using PSI4 for optimization with high number of optmaxcycles (default is 5 very low), it will be much slower than Gaussian optimization. Add keyword "use_gaus" in poltype.ini file.
 
 ### Common Errors
 

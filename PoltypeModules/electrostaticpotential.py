@@ -82,14 +82,14 @@ def GrabGridData(poltype):
     return Vvals,gridpts
 
 
-def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,numproc,makecube=None):
+def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,numproc,charge,makecube=None):
     tempread=open(comfilecoords,'r')
     results=tempread.readlines()
     tempread.close()
     inputname=comfilename.replace('.com','_psi4.dat')
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
-    temp.write('%d %d\n' % (poltype.totalcharge, 1))
+    temp.write('%d %d\n' % (charge, 1))
     for lineidx in range(len(results)):
         line=results[lineidx]
         linesplit=line.split()
@@ -306,7 +306,7 @@ def SPForESP(poltype,optmol,mol):
         poltype.call_subsystem(gengridcmd,True)
     if poltype.use_gaus==False or poltype.use_gausoptonly==True:
         shutil.copy(poltype.espgrdfname, 'grid.dat') 
-        inputname,outputname=CreatePsi4ESPInputFile(poltype,poltype.logoptfname.replace('.log','.xyz'),poltype.comespfname,mol,poltype.maxdisk,poltype.maxmem,poltype.numproc,True)
+        inputname,outputname=CreatePsi4ESPInputFile(poltype,poltype.logoptfname.replace('.log','.xyz'),poltype.comespfname,mol,poltype.maxdisk,poltype.maxmem,poltype.numproc,poltype.totalcharge,True)
         term,error=poltype.CheckNormalTermination(outputname)
         if term==False:
             poltype.WriteToLog("Calling: " + "Psi4 Gradient for ESP")
