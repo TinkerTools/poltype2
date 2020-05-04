@@ -503,6 +503,7 @@ def GenerateFrag(poltype,molindexlist,valtopo,mol):
     res._idxMap=oldindextonewindex
     newindextooldindex={v: k for k, v in oldindextonewindex.items()}
     fragidxswithchangedval=[]
+    fragidxtooriginalformalcharge={}
     for atom in res.GetAtoms():
         atomidx=atom.GetIdx()
         oldindex=newindextooldindex[atomidx]
@@ -514,10 +515,11 @@ def GenerateFrag(poltype,molindexlist,valtopo,mol):
         parentatomformalcharge=parentatom.GetFormalCharge()
         newformalcharge=parentatomformalcharge+diff
         atom.SetFormalCharge(newformalcharge)
-
+        fragidxtooriginalformalcharge[atomidx]=parentatomformalcharge
         if diff!=0:
             fragidxswithchangedval.append(atomidx)
-    return res,oldindextonewindex,fragidxswithchangedval
+
+    return res,oldindextonewindex,fragidxswithchangedval,fragidxtooriginalformalcharge
 
 def GenerateBondTopology(poltype,mol):
     bondtopology=[]
@@ -542,7 +544,7 @@ def GenerateValenceTopology(poltype,mol):
         val=atom.GetValence()
         valtopo[atom.GetIdx()]=val
     return valtopo
-
+'''
 def PreserveBondTopology(poltype,newOBmol,bondtopo,bondsettobondorder,parentidxtofragidx,parentmol,fragidxswithchangedval):
     iterbond=openbabel.OBMolBondIter(parentmol) # iterator for all bond objects in the molecule
     for bond in iterbond:
@@ -574,26 +576,33 @@ def PreserveBondTopology(poltype,newOBmol,bondtopo,bondsettobondorder,parentidxt
                 fragbond.SetBondOrder(bondorder)
 
     return newOBmol 
- 
+''' 
 
 
  
-def HydrateMolecule(poltype,mol,basename,bondtopo,bondsettobondorder,parentidxtofragidx,parentmol,fragidxswithchangedval): # need to use openbabel to do this and convert back to rdkit since rdkit has issues with Sanitization and cannot be turned off for EmbedMolecule function. Rkdit assigns in correct bond order on rings in this case (4). So convert to xyz to remove bad bond order information, then add back parent bond topology, remove any radicals OB assigns before adding hydrogens.
-    OBmol=ConvertRdkitMolToOBMol(poltype,mol)
-    outputname='intermediate2.xyz'
-    WriteOBMolToXYZ(poltype,OBmol,outputname)
-    newOBmol=ReadToOBMol(poltype,outputname)
-    newOBmol=PreserveBondTopology(poltype,newOBmol,bondtopo,bondsettobondorder,parentidxtofragidx,parentmol,fragidxswithchangedval)
-    newname='intermediate3.mol'
-    WriteOBMolToMol(poltype,newOBmol,newname)
-    tempname=RemoveRadicals(poltype,newname)
-    SanitizeAtomBlock(poltype,tempname)
-    finalname='final.mol'
-    cmdstr='babel'+' '+'-imol'+' '+tempname+' '+'-h'+' '+'--gen3D'+' '+'-omol'+' '+'-O'+' '+finalname
-    poltype.call_subsystem(cmdstr,True)
-    hydmol=ReadRdkitMolFromMolFile(poltype,finalname)
+def HydrateMolecule(poltype,mol,basename,bondtopo,bondsettobondorder,parentidxtofragidx,parentmol,fragidxswithchangedval,fragidxtooriginalformalcharge): # need to use openbabel to do this and convert back to rdkit since rdkit has issues with Sanitization and cannot be turned off for EmbedMolecule function. Rkdit assigns in correct bond order on rings in this case (4). So convert to xyz to remove bad bond order information, then add back parent bond topology, remove any radicals OB assigns before adding hydrogens.
+    for atom in mol.GetAtoms():
+        atomidx=atom.GetIdx()
+        originalcharge=fragidxtooriginalformalcharge[atomidx]
+        atom.SetFormalCharge(originalcharge) 
+    hydmol = Chem.AddHs(mol)
+    AllChem.EmbedMolecule(hydmol)
+    #OBmol=ConvertRdkitMolToOBMol(poltype,mol)
+    #outputname='intermediate2.xyz'
+    #WriteOBMolToXYZ(poltype,OBmol,outputname)
+    #newOBmol=ReadToOBMol(poltype,outputname)
+    #newOBmol=PreserveBondTopology(poltype,newOBmol,bondtopo,bondsettobondorder,parentidxtofragidx,parentmol,fragidxswithchangedval)
+    #newname='intermediate3.mol'
+    #WriteOBMolToMol(poltype,newOBmol,newname)
+    #tempname=RemoveRadicals(poltype,newname)
+    #SanitizeAtomBlock(poltype,tempname)
+    #finalname='final.mol'
+    #cmdstr='babel'+' '+'-imol'+' '+tempname+' '+'-h'+' '+'--gen3D'+' '+'-omol'+' '+'-O'+' '+finalname
+    #poltype.call_subsystem(cmdstr,True)
+    #hydmol=ReadRdkitMolFromMolFile(poltype,finalname)
     return hydmol
 
+'''
 def SanitizeAtomBlock(poltype,filename):
     temp=open(filename,'r')
     results=temp.readlines()
@@ -642,6 +651,7 @@ def ConvertOBMolToRdkitMol(poltype,OBmol):
     WriteOBMolToMol(poltype,OBmol,outputname)
     rdkitmol=ReadRdkitMolFromMolFile(poltype,outputname)
     return rdkitmol
+'''
 
 def ConvertRdkitMolToOBMol(poltype,mol):
     outputname='intermediate.mol'
@@ -702,6 +712,11 @@ def GenerateWBOMatrix(poltype,molecule,structfname):
     poltype.espmethod='HF'
     poltype.espbasisset='MINIX'
     charge=Chem.rdmolops.GetFormalCharge(molecule)
+    print('molecule formal charge',charge)
+    for atom in molecule.GetAtoms():
+        atomidx=atom.GetIdx()
+        atomcharge=atom.GetFormalCharge()
+        print('atomidx ',atomidx,'formal charge',atomcharge)
     inputname,outputname=esp.CreatePsi4ESPInputFile(poltype,structfname,poltype.comespfname.replace('.com','_frag.com'),molecule,poltype.maxdisk,poltype.maxmem,poltype.numproc,charge,False)
     finished,error=poltype.CheckNormalTermination(outputname)
     if finished==False and error==False:
@@ -737,19 +752,20 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         if not os.path.isdir(fragfoldername):
             os.mkdir(fragfoldername)
         os.chdir(fragfoldername)
-        fragmol,parentindextofragindex,fragidxswithchangedval=GenerateFrag(poltype,indexes,valtopo,mol)
-        mols.append(fragmol)
+        
+        origfragmol,parentindextofragindex,fragidxswithchangedval,fragidxtooriginalformalcharge=GenerateFrag(poltype,indexes,valtopo,mol)
+        mols.append(origfragmol)
+        fragments=[]
+        fragments.append(origfragmol)
         print('fragfoldername',fragfoldername)
-        for atom in fragmol.GetAtoms():
-            atomidx=atom.GetIdx()
-            atomval=len(atom.GetNeighbors())
-            print('atomidx before hydrating',atomidx,'atomval',atomval)
+        charge=Chem.rdmolops.GetFormalCharge(molecule)
+        print('molecule formal charge before hydrate',charge)
 
-        fragmol=HydrateMolecule(poltype,fragmol,fragfoldername,bondtopo,bondsettobondorder,parentindextofragindex,mol,fragidxswithchangedval)
-        for atom in fragmol.GetAtoms():
+        for atom in origfragmol.GetAtoms():
             atomidx=atom.GetIdx()
-            atomval=len(atom.GetNeighbors())
-            print('atomidx after hydrating',atomidx,'atomval',atomval)
+            atomcharge=atom.GetFormalCharge()
+            print('atom idx before hydrate ',atomidx,'charge ',atomcharge)
+        fragmol=HydrateMolecule(poltype,origfragmol,fragfoldername,bondtopo,bondsettobondorder,parentindextofragindex,mol,fragidxswithchangedval,fragidxtooriginalformalcharge)
 
 
         mols.append(fragmol)
@@ -758,20 +774,18 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         hydindexes=FindAddedHydrogenIndexes(poltype,mols)
         print('hydindexes',hydindexes)
         combindexlist=CombinationsHydIndexes(poltype,hydindexes)
-        print('combindexlist',combindexlist)
-        fragments=MethylateCombinations(poltype,combindexlist,filename)
         fragments.append(fragmol) # append case where all H no CH3 added
+        fragments=MethylateCombinations(poltype,combindexlist,filename,fragments)
         os.chdir('..')
+        fragmoltoWBOmatrices={}
+        fragmoltofragfoldername={}
+        fragmoltobondindexlist={}
         for i in range(len(fragments)):
             fragmol=fragments[i]
             fragfoldername=str(tor[1])+'_'+str(tor[2])+'_Index'+'_'+str(i)
             print('fragfoldername',fragfoldername)
-            for atom in fragmol.GetAtoms():
-                atomidx=atom.GetIdx()
-                atomval=len(atom.GetNeighbors())
-                print('atomidx after combinations',atomidx,'atomval',atomval)
 
-
+            fragmoltofragfoldername[fragmol]=fragfoldername
             if not os.path.isdir(fragfoldername):
                 os.mkdir(fragfoldername)
             os.chdir(fragfoldername)
@@ -788,6 +802,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
             parentWBOvalue=parentWBOmatrix[tor[1]-1,tor[2]-1] # Matrix has 0,0 so need to subtract 1 from babel index
             WBOdifference=round(numpy.abs(fragmentWBOvalue-parentWBOvalue),3)
             rotbndindextoWBOdifference[rotbndidx]=WBOdifference
+            fragmoltoWBOmatrices,fragmoltobondindexlist=WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor,fragmoltoWBOmatrices,fragmoltobondindexlist)
 
             os.chdir('..')
             WBOdifferencetofragWBOmatrix[WBOdifference]=fragWBOmatrix
@@ -801,13 +816,16 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         highlightbonds.append(fragrotbndidx)
         fragpath=os.getcwd() 
         grow=False
-        WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor)
+        fragmoltoWBOmatrices,fragmoltobondindexlist=WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor,fragmoltoWBOmatrices,fragmoltobondindexlist)
+        Draw2DMolculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragfoldername,fragmoltobondindexlist)
         if WBOdifference<=poltype.WBOtol: # then we consider the fragment good enough to transfer torsion parameters, so make this fragment into .sdf file
             pass
         else:
             grow=True
             fragmol,newindexes,fragWBOmatrix,structfname,WBOdifference,parentindextofragindex,fragpath=GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfoldername,bondtopo,bondsettobondorder,valtopo)
-            WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor)
+            fragmoltoWBOmatrices,fragmoltobondindexlist=WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor,fragmoltoWBOmatrices,fragmoltobondindexlist)
+        
+
         structfname=structfname.replace('_xyzformat.xyz','.sdf')
         rotbndindextofragment[rotbndidx]=fragmol
         rotbndindextofragmentfilepath[rotbndidx]=fragpath+r'/'+structfname
@@ -901,21 +919,21 @@ def ReduceParentMatrix(poltype,parentindextofragindex,fragWBOmatrix,parentWBOmat
 
 def CombinationsHydIndexes(poltype,hydindexes):
     combindexlist=[]
-    if hydindexes==None:
-        return combindexlist
     for i in range(len(hydindexes)):
         comb = combinations(hydindexes, i+1)
         combindexlist.append(comb)
     return combindexlist 
 
 
-def MethylateCombinations(poltype,combindexlist,molfilename):
-    fragments=[]
+def MethylateCombinations(poltype,combindexlist,molfilename,fragments):
+    fragmentsmarts=[]
     if combindexlist==[]:
         return fragments
+    j=0
     for comb in combindexlist:
-        fragmolbabel=ReadMolFileToOBMol(poltype,molfilename)
+        i=0
         for idxlist in comb:
+            fragmolbabel=ReadMolFileToOBMol(poltype,molfilename)
             for idx in idxlist:
                 babelidx=idx+1
                 atom=fragmolbabel.GetAtom(babelidx)
@@ -923,25 +941,32 @@ def MethylateCombinations(poltype,combindexlist,molfilename):
                 if convert==False:
                     raise ValueError('Error! could not convert H to methyl '+str(babelidx)+' '+molfilename)
                     
-        outputname=molfilename.replace('.mol','_frombabel.mol')
-        WriteOBMolToMol(poltype,fragmolbabel,outputname)
-        fragmolrdkit=rdmolfiles.MolFromMolFile(outputname)
-        fragments.append(fragmolrdkit)
+            outputname=molfilename.replace('.mol','_frombabel_'+str(j)+'_'+str(i)+'.mol')
+            WriteOBMolToMol(poltype,fragmolbabel,outputname)
+            fragmolrdkit=rdmolfiles.MolFromMolFile(outputname,removeHs=False)
+            fragsmarts=rdmolfiles.MolToSmarts(fragmolrdkit)
+            if fragsmarts not in fragmentsmarts:
+                fragmentsmarts.append(fragsmarts)
+                fragments.append(fragmolrdkit)
+            i+=1
+        j+=1
     return fragments
                 
 
 def FindAddedHydrogenIndexes(poltype,mols):
     hydindexes=[]
-    res=rdFMCS.FindMCS(mols)
-    smarts=res.smartsString    
     hydratedmol=mols[1]
     originalmol=mols[0]
+    smarts=rdmolfiles.MolToSmarts(originalmol)
     matches = hydratedmol.GetSubstructMatches(Chem.MolFromSmarts(smarts))
     firstmatch=matches[0]
     for atom in hydratedmol.GetAtoms():
         atomidx=atom.GetIdx()
         if atomidx not in firstmatch:
             hydindexes.append(atomidx)
+    if len(hydindexes)==0:
+        print('smarts',smarts,'firstmatch',firstmatch)
+    return hydindexes
 
 def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfoldername,bondtopo,bondsettobondorder,valtopo):
     fragfoldernamepath=os.getcwd()
@@ -962,9 +987,11 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
                 os.mkdir(basename)
             os.chdir(basename)
             mols=[]
-            fragmol,parentindextofragindex,fragidxswithchangedval=GenerateFrag(poltype,indexlist,valtopo,mol)
-            mols.append(fragmol)
-            fragmol=HydrateMolecule(poltype,fragmol,basename,bondtopo,bondsettobondorder,parentindextofragindex,mol,fragidxswithchangedval)
+            origfragmol,parentindextofragindex,fragidxswithchangedval,fragidxtooriginalformalcharge=GenerateFrag(poltype,indexlist,valtopo,mol)
+            fragments=[]
+            fragments.append(origfragmol)
+            mols.append(origfragmol)
+            fragmol=HydrateMolecule(poltype,origfragmol,basename,bondtopo,bondsettobondorder,parentindextofragindex,mol,fragidxswithchangedval,fragidxtooriginalformalcharge)
             mols.append(fragmol)
             filename=basename+'.mol'
             WriteRdkitMolToMolFile(poltype,fragmol,filename)
@@ -973,20 +1000,24 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
             WriteOBMolToSDF(poltype,fragmolbabel,filename.replace('.mol','.sdf'))
             hydindexes=FindAddedHydrogenIndexes(poltype,mols)
             combindexlist=CombinationsHydIndexes(poltype,hydindexes)
-            fragments=MethylateCombinations(poltype,combindexlist,filename)
-            fragments.append(fragmol) # include the case where all H are not converted to CH3
+            
+            fragments.append(fragmol) # include the case where all H and no H converted to CH3
+            fragments=MethylateCombinations(poltype,combindexlist,filename,fragments)
             os.chdir('..')
             for i in range(len(fragments)):
                 frag=fragments[i]
                 fragmentlist.append(frag)
                 parentindextofragindexlist.append(parentindextofragindex)
+        fragmoltoWBOmatrices={}
+        fragmoltofragfoldername={}
+        fragmoltobondindexlist={}
         for fragmolidx in range(len(fragmentlist)):
             fragmol=fragmentlist[fragmolidx]
             basename=fragfoldername+'_GrowFragment_'+str(fragmolidx)
             if not os.path .isdir(basename):
                 os.mkdir(basename)
             os.chdir(basename)
-
+            fragmoltofragfoldername[fragmol]=basname
             filename=basename+'.mol'
             WriteRdkitMolToMolFile(poltype,fragmol,filename)
             parentindextofragindex=parentindextofragindexlist[i]
@@ -1018,7 +1049,7 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
             fragmentWBOvalue=fragWBOmatrix[fragrotbndidx[0],fragrotbndidx[1]]
             parentWBOvalue=parentWBOmatrix[tor[1]-1,tor[2]-1]
             WBOdifference=round(numpy.abs(fragmentWBOvalue-parentWBOvalue),3)
-            WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor)
+            fragmoltoWBOmatrices,fragmoltobondindexlist=WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor,fragmoltoWBOmatrices,fragmoltobondindexlist)
 
             m=mol_with_atom_index(poltype,fragmol)
             os.chdir('..')
@@ -1031,6 +1062,7 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
             WBOdifftostructfname[WBOdifference]=structfname
             molarray.append(fragmol)
             WBOdiffarray.append(WBOdifference)
+        Draw2DMolculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragfoldername,fragmoltobondindexlist)
         WBOdifference=min(WBOdifftoindexlist.keys())
         parentindextofragindex=WBOdifftoparentindextofragindex[WBOdifference]
         indexes=WBOdifftoindexlist[WBOdifference]
@@ -1084,12 +1116,8 @@ def GrowPossibleFragmentAtomIndexes(poltype,rdkitmol,indexes):
     return possiblefragatmidxs
     
 
-def WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor):
+def WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor,fragmoltoWBOmatrices,fragmoltobondindexlist):
     highlightbonds=[]
-    for atom in fragmol.GetAtoms():
-        atomidx=atom.GetIdx()
-        atomval=len(atom.GetNeighbors())
-        print('atomidx about to write out',atomidx,'atomval',atomval)
     structfnamemol=fragfoldername+'.mol'
     print(Chem.MolToMolBlock(fragmol,kekulize=False),file=open(structfnamemol,'w+')) 
     tmpconv = openbabel.OBConversion()
@@ -1106,10 +1134,12 @@ def WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWB
     relativematrix=numpy.subtract(reducedparentWBOmatrix,fragWBOmatrix)
     m=mol_with_atom_index(poltype,fragmol)
     fragsmirks=rdmolfiles.MolToSmarts(m) 
-    print('structfnamemol',structfnamemol)
     Draw2DMoleculeWithWBO(poltype,fragWBOmatrix,basename+'_Absolute',structfnamemol,bondindexlist=highlightbonds,smirks=fragsmirks)
     Draw2DMoleculeWithWBO(poltype,relativematrix,basename+'_Relative',structfnamemol,bondindexlist=highlightbonds,smirks=fragsmirks)
-        
+    temp=[reducedparentWBOmatrix,fragWBOmatrix]
+    fragmoltoWBOmatrices[fragmol]=temp 
+    fragmoltobondindexlist[fragmol]=highlightbonds
+    return fragmoltoWBOmatrices,fragmoltobondindexlist
 
 def CheckIfIndexInMatches(poltype,index,indexlist):
     match=True
@@ -1174,6 +1204,10 @@ def FirstPassAtomIndexes(poltype,tor):
                                molindexlist.append(atmidx)
    return molindexlist
 
+def Draw2DMolculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragfoldername,fragmoltobondindexlist):
+    img=Chem.Draw.MolsToGridImage(fragments,molsPerRow=4,subImgSize=(200,200),legends=[fragmoltofragfoldername[frag] for frag in fragments],highlightBondLists=[fragmoltobondindexlist[frag] for frag in fragments])
+    img.save('Fragments.svg')
+
 def Draw2DMoleculeWithWBO(poltype,WBOmatrix,basename,structure,bondindexlist=None,smirks=None):
     mol=rdmolfiles.MolFromMolFile(structure,sanitize=True,removeHs=False)
     mol=mol_with_atom_index(poltype,mol)
@@ -1212,7 +1246,7 @@ def Draw2DMoleculeWithWBO(poltype,WBOmatrix,basename,structure,bondindexlist=Non
             label.rotate(angle,bondcoords[0],bondcoords[1])
             fig.append(label)
     if smirks!=None:
-        label = sg.TextElement(250,375, smirks, size=12, weight="bold")
+        label = sg.TextElement(25,490, smirks, size=12, weight="bold")
         fig.append(label)
     fig.save(basename+'.svg')
     svg_code=fig.to_str()

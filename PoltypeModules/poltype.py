@@ -86,11 +86,6 @@ class PolarizableTyper():
         self.dmabasisset = dmabasisset             
         self.espbasisset = espbasisset         
         self.torspbasisset = torspbasisset
-        self.optmethod=self.SanitizeQMMethod(optmethod,True)                 
-        self.toroptmethod=self.SanitizeQMMethod(toroptmethod,True)                  
-        self.torspmethod=self.SanitizeQMMethod(torspmethod,False)                    
-        self.dmamethod=self.SanitizeQMMethod(dmamethod,False)                      
-        self.espmethod=self.SanitizeQMMethod(espmethod,False)                  
         self.qmonly = qmonly
         self.espfit = espfit
         self.parmtors = parmtors
@@ -373,11 +368,11 @@ class PolarizableTyper():
                         self.usage()
                         print('Unrecognized '+line)
                         sys.exit()
-        self.optmethod=self.SanitizeQMMethod(optmethod,True)                 
-        self.toroptmethod=self.SanitizeQMMethod(toroptmethod,True)                  
-        self.torspmethod=self.SanitizeQMMethod(torspmethod,False)                    
-        self.dmamethod=self.SanitizeQMMethod(dmamethod,False)                      
-        self.espmethod=self.SanitizeQMMethod(espmethod,False)                  
+        self.optmethod=self.SanitizeQMMethod(self.optmethod,True)                 
+        self.toroptmethod=self.SanitizeQMMethod(self.toroptmethod,True)                  
+        self.torspmethod=self.SanitizeQMMethod(self.torspmethod,False)                    
+        self.dmamethod=self.SanitizeQMMethod(self.dmamethod,False)                      
+        self.espmethod=self.SanitizeQMMethod(self.espmethod,False)                  
         if self.readinionly==True:
             return
         self.SanitizeMMExecutables()

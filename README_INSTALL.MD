@@ -30,7 +30,7 @@ conda create -n p4env -c psi4/label/dev psi4
 conda activate p4env
 conda install scipy 
 conda install matplotlib 
-conda install -c openbabel openbabel=2.4.0
+conda install -c openbabel openbabel=2.4.1
 conda install git pip
 conda install -c rdkit rdkit
 conda install -c conda-forge mdanalysis
