@@ -1,12 +1,12 @@
 ## Version History
 
 2.0.0
-*     Poltype is modularized for code organization.
-*     Unittesting is available for maintaining code robustness.
-*     Updated documentation, Examples folder is included.
-*     Various high symmetry molecules are handles, see Example folder.
-*     Torsion spinning is parallelizable.
-*     Modified Amino Acids can be swapped with canonical amino acids in protein PDBs and parameters can be generated for side chain then automatically stitched together with protein forcefield.
+* Poltype is modularized for code organization.
+* Unittesting is available for maintaining code robustness.
+* Updated documentation, Examples folder is included.
+* Various high symmetry molecules are handles, see Example folder.
+* Torsion spinning is parallelizable.
+* Modified Amino Acids can be swapped with canonical amino acids in protein PDBs and parameters can be generated for side chain then automatically stitched together with protein forcefield.
 
 2.0.1
 * Fix bug in scratch directory assignment for Gaussian
@@ -23,7 +23,7 @@
 * function for generating SP for torsion was referecing espmethod and espbasisset instead of torspmethod and torspbasisset
 
 2.0.5
-* If RMSPD.txt already existed then this file was not recreated, this is an isssue if the first time created, tinker crashed. This assumption has been removed.
+* If RMSPD.txt already existed then this file was not recreated, this is an issue if the first time created, tinker crashed. This assumption has been removed.
 
 2.0.6
 * Now when Tinker version number is not correct a ValueError will be raised
@@ -54,7 +54,7 @@
 * Bug fix for TARGET-DIPOLE keyword being used before ESP QM generated
 
 2.1.3
-* Added SOLUTE keyword for GK and DD-COSMO eletrostatic radii
+* Added SOLUTE keyword for GK and DD-COSMO electrostatic radii
 
 2.1.4
 * Check RMSPD root mean square potential difference and raise error before checking dipoles, (previously supposed to do this but there was a bug)
@@ -63,32 +63,44 @@
 * When extracting dipole from gaussian dipole is flipped in wrong direction, this is fixed
 
 2.1.6
-* Error with generating opt.com file for modifiedresidue library with first poltype run, this has been fixed. Now when poltype finishes,ttt.xyz_2 is deleted so if rerunning ttt.xyz_3 ... isnt created, also *.chk files are deleted if job is successful.
+* Error with generating opt.com file for modifiedresidue library with first poltype run, this has been fixed. Now when poltype finishes, ttt.xyz_2 is deleted so if rerunning ttt.xyz_3 ... isn't created, also .chk files are deleted if job is successful.
 
 2.1.7
-* Torsion parameters are transfered from database if not in rotatable bond list(bug fix from previous edits of rotatable bond definition and transferable torsion in database)
+* Torsion parameters are transferred from database if not in rotatable bond list (bug fix from previous edits of rotatable bond definition and transferable torsion in database)
+
 2.1.8
 * Bug fix, solvate GK term removed from ttt.key for charged molecules to compute dipoles (ESP fitting done in gas phase, quantum done in gas phase)
+
 2.1.9
 * Input structure for mutated residues can have hydrogens on back bone now. Bug for finding all transferable torsions is fixed. See Example ModifiedAminoAcid
-* Instead of using babel to predict bonds from PDB via distances a library with SMART strings for amino acids and nucleic acids (residue_connect.txt) is used to match to PDB guess via distances but only keep matched bonds and also bonds connecting residues. The babel guess will sometimes but bonds between sidechains if they are too close to each other in the PDB file so a libarary was needed instead.
+* Instead of using babel to predict bonds from PDB via distances a library with SMART strings for amino acids and nucleic acids (residue_connect.txt) is used to match to PDB guess via distances but only keep matched bonds and also bonds connecting residues. The babel guess will sometimes but bonds between sidechains if they are too close to each other in the PDB file so a library was needed instead.
+
 2.2.0
 * PSI4 error for torsion SP quantum jobs computing Wiberg Bond Index, forgot to pass wavefunction to oeprop class
+
 2.2.1
 * Fix error in -pedit.txt where a space was delayed before being written out to text file causing space to be in wrong place, fixed by flushing system buffer
-2.2.2 
+
+2.2.2
 * Updates to README files as well as fragmenter, torsion libraries, unittesting library.
+
 2.2.3
 * Bug in TINKER 8.7 POLEDIT.X, POLTYPE now supports TINKER 8.2 and TINKER >=8.7
+
 2.2.4
 * Bug is okay now, continue using TINKER >=8.7
+
 2.2.5
 * multipole scaling turned off for alcohols
+
 2.2.6
 * fixed symmetry frames bug, added new Symmetry molecules cases to Examples folder, see README.MANIFEST
+
 2.2.7
-* Torsion QM jobs parralelized for all torsion as opposed to for a given torsion previously. Example daemon is in Examples folder, see README.MANIFEST.
+* Torsion QM jobs parallelized for all torsion as opposed to for a given torsion previously. Example daemon is in Examples folder, see README.MANIFEST.
+
 2.2.8
-* Fix bug in parralel torsion
+* Fix bug in parallel torsion
+
 2.2.9
-* First working version of torsion fragmenter, this is turned on by default. All optimization have maxcycles of 5, since bond and angle degrees of freedom converge more rapidly than conformation. MMFF94 is used in openbable to minimize geometry before QM optimization is done.
+* First working version of torsion fragmenter, this is turned on by default. All optimization have maxcycles of 5, since bond and angle degrees of freedom converge more rapidly than conformation. MMFF94 is used in openbabel to minimize geometry before QM optimization is done.
