@@ -157,6 +157,12 @@ class PolarizableTyper():
         self.gausoptcoords=gausoptcoords
         self.helpfile=helpfile
         self.versionfile=versionfile 
+        self.optmethod=optmethod               
+        self.toroptmethod=toroptmethod               
+        self.torspmethod=torspmethod                   
+        self.dmamethod=dmamethod                    
+        self.espmethod=espmethod                 
+        
         opts, xargs = getopt.getopt(sys.argv[1:],'h',["help"])
 
         for o, a in opts:
