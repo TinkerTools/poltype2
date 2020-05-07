@@ -597,22 +597,15 @@ class PolarizableTyper():
         else:
             return self.molecprefix + suffix
     
+    def printfile(self,filename):
+        with open(os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+filename,'r') as f:
+            print(f.read(), end='')
     
-    def copyright (self):
-        temp=open(os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+self.versionfile,'r')
-        results=temp.readlines()
-        temp.close()
-        for line in results:
-            print(line)
+    def copyright(self):
+        self.printfile(self.versionfile)
     
-    def usage (self):
-        temp=open(os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+self.helpfile,'r')
-        results=temp.readlines()
-        temp.close()
-        for line in results:
-            print(line)
-    
-    
+    def usage(self):
+        self.printfile(self.helpfile)
     
     def CheckIsInput2D(self,mol,obConversion):
         is2d=True
