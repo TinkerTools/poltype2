@@ -938,6 +938,7 @@ def FindAddedHydrogenIndexes(poltype,mols):
 def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfoldername,bondtopo,bondsettobondorder,valtopo,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,fragspath,fragmoltocharge):
     fragfoldernamepath=os.getcwd()
     fragmentsforcomb=[]
+    print('fragfoldername',fragfoldername)
     while not WBOdifference<=poltype.WBOtol:
         WBOdiffarray=[]
         molarray=[]
@@ -1062,6 +1063,7 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
 
 
 def GrowPossibleFragmentAtomIndexes(poltype,rdkitmol,indexes):
+    print('indexes',indexes)
     possiblefragatmidxs=[]
     comblist=[]
     for bond in rdkitmol.GetBonds():
