@@ -954,7 +954,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             poltype.WriteToLog('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
             if poltype.suppresstorfiterr==False:
 
-                raise ValueError('RMSPD of QM and MM torsion profile is high, RMSPD = ',str(minRMSD))
+                raise ValueError('RMSPD of QM and MM torsion profile is high, RMSPD = '+str(minRMSD))
 
 
 def gen_toromit_list(poltype):

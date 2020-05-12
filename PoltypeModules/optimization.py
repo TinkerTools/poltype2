@@ -248,7 +248,7 @@ def CheckRMSD(poltype):
             if float(RMSD)>poltype.maxRMSD:
                 poltype.WriteToLog('Warning: RMSD of QM and MM optimized structures is high, RMSD = '+ RMSD+' Tolerance is '+str(poltype.maxRMSD)+' kcal/mol ')
 
-                raise ValueError(os.getcwd()+' '+'RMSD of QM and MM optimized structures is high, RMSD = ',RMSD)
+                raise ValueError(os.getcwd()+' '+'RMSD of QM and MM optimized structures is high, RMSD = '+str(RMSD))
 
 def StructureMinimization(poltype):
      poltype.WriteToLog("")
