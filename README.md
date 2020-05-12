@@ -1,6 +1,6 @@
-# poltype
+# Poltype2 documentation
 
-POLTYPE AMOEBA parameterization tool
+POLTYPE: AMOEBA parameterization tool
 
 ### [README_INSTALL](README_INSTALL.MD)
 * How to install POLTYPE and dependencies
@@ -16,3 +16,5 @@ POLTYPE AMOEBA parameterization tool
 * Explains multipole frame defintions
 ### [README_TODO](README_TODO.MD)
 * To-do list for POLTYPE
+
+
