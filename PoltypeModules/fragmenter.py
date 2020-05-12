@@ -526,27 +526,24 @@ def AddInputCoordinatesAsDefaultConformer(poltype,m,indextocoordinates):
 
 def GenerateFrag(poltype,molindexlist,mol):
     molindexlist=[i+1 for i in molindexlist]
-    print('molindexlist',molindexlist)
-    print('molindexlistbabel',molindexlist) 
     em = openbabel.OBMol()
     oldindextonewindex={}
     for i,idx in enumerate(molindexlist):
         oldatom=poltype.mol.GetAtom(idx)
         em.AddAtom(oldatom)
         oldindextonewindex[idx]=i+1
-    print('oldindextonewindex',oldindextonewindex)
     atomswithcutbonds=[]
     bonditer=openbabel.OBMolBondIter(poltype.mol)
     for bond in bonditer:
         oendidx = bond.GetEndAtomIdx()
         obgnidx = bond.GetBeginAtomIdx()
-        if oendidx in oldindextonewindex.keys() and obgnidx not in oldindextonewindex.keys() and oendidx in molindexlist:
-            print('oendidx',oendidx)
-            atomswithcutbonds.append(oldindextonewindex[oendidx])
+        if oendidx in oldindextonewindex.keys() and obgnidx not in oldindextonewindex.keys():
+            if oldindextonewindex[oendidx] not in atomswithcutbonds:
+                atomswithcutbonds.append(oldindextonewindex[oendidx])
             continue
-        if oendidx not in oldindextonewindex.keys() and obgnidx in oldindextonewindex.keys() and obgnidx in molindexlist:
-            print('obgnidx',obgnidx)
-            atomswithcutbonds.append(oldindextonewindex[obgnidx])
+        if oendidx not in oldindextonewindex.keys() and obgnidx in oldindextonewindex.keys():
+            if oldindextonewindex[obgnidx] not in atomswithcutbonds:
+                atomswithcutbonds.append(oldindextonewindex[obgnidx])
             continue
         if oendidx not in oldindextonewindex.keys() and obgnidx not in oldindextonewindex.keys():
             continue
@@ -610,11 +607,9 @@ def GenerateFrag(poltype,molindexlist,mol):
         oldindex=rdkitnewindextooldindex[idx]
         atom=poltype.rdkitmol.GetAtomWithIdx(oldindex)
 
-        print('new idx cut',idx+1,'old idx cut',oldindex+1)
         for natom in atom.GetNeighbors():
             natomidx=natom.GetIdx()
-            if natomidx not in rdkitoldindextonewindex.keys(): # then this is atom cut that will be replaced by hydrogen
-                print('natomidx old',natomidx+1)
+            if natomidx not in rdkitoldindextonewindex.keys() and natomidx not in idxstoaddchg: # then this is atom cut that will be replaced by hydrogen
                 idxstoaddchg.append(natomidx)
     rdkithydindexestokeep=[i-1 for i in hydindexestokeep]
     for atom in newmol.GetAtoms():
@@ -628,10 +623,11 @@ def GenerateFrag(poltype,molindexlist,mol):
     print('idxstoaddchg',idxstoaddchg)
     for idx in idxstoaddchg:
         babelidx=idx+1
-        chg=babelidxtochg[babelindex]
+        print('babelidx',babelidx)
+        chg=babelidxtochg[babelidx]
         totchg+=chg
 
-    print('totchg before',totchg)
+    print('totchg after adding extra',totchg)
     totchg=int(round(totchg))
     if totchg!=0: # just put on first atom
         print('total charge being added',totchg)
@@ -751,6 +747,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         if not os.path.isdir(fragfoldername):
             os.mkdir(fragfoldername)
         os.chdir(fragfoldername)
+        print('fragfoldername',fragfoldername)
         fragmol,parentindextofragindex=GenerateFrag(poltype,indexes,mol)
         growfragments=[]
         filename=fragfoldername+'.mol'
@@ -994,11 +991,13 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
         possiblefragatmidxs=GrowPossibleFragmentAtomIndexes(poltype,poltype.rdkitmol,indexes)
         for fragmolidx in range(len(possiblefragatmidxs)):
             indexlist=possiblefragatmidxs[fragmolidx]
+
+            basename=fragfoldername+'_GrowFragment_'+str(fragmolidx)
+            print('basename',basename)
             fragmol,parentindextofragindex=GenerateFrag(poltype,indexlist,mol)
             fragments.append(fragmol) # include the case where all H and no H converted to CH3
             if fragmol not in fragmentsforcomb:
                 fragmentsforcomb.append(fragmol)
-            basename=fragfoldername+'_GrowFragment_'+str(fragmolidx)
             if not os.path .isdir(basename):
                 os.mkdir(basename)
             os.chdir(basename)
