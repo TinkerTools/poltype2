@@ -1,5 +1,27 @@
 ## Installation
 
+### Tinker CPU Installation
+```
+git clone git@github.com:TinkerTools/Tinker.git tinker
+cd tinker
+cd fftw
+./configure --prefix=/path_to_tinkerfolder/fftw/ --enable-openmp --enable-threads
+make -j 8
+make install
+cd ..
+cp ./make/Makefile ./source
+cd source
+```
+* Open Makefile and comment out default operating system (MAC, unless you have mac)
+* Uncomment the default linux installation lines
+* Keep the RENAME line commented out
+```
+make -j 8
+make install
+
+
+* Download GDMA-2.2
+
 * Download POLTYPE
 Make sure to download the ZIP folder from the poltype2 branch, NOT the master branch
 

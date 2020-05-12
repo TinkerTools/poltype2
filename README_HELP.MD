@@ -221,6 +221,7 @@ If using PSI4 for optimization with high number of optmaxcycles (default is 5 ve
 
 ### Less Common Errors
 *********************************************
+* Error! The bond connectivity before and after structure optimization is different. Check to see if hydrogens are other atoms pop off during optimization.
 * If your RMSPD is too high and also you have a molecule of high symmetry, please check frame definitions and alter them as needed using POLEDIT and POTENTIAL command in Tinker to change frames/combine multipoles and refit to electrostatic potential. See Symmetry examples under Examples folder. We believe all symmetry cases are already covered by POLTYPE.
 
 * If you are concerned with vdw parameters, you may check again QM dimer (your_molecule-water) structure and energy.

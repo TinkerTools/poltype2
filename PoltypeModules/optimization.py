@@ -301,7 +301,7 @@ def GeometryOptimization(poltype,mol):
             if os.path.isfile(poltype.chkoptfname):
                 os.remove(poltype.logoptfname) # if chk point exists just remove logfile, there could be error in it and we dont want WaitForTermination to catch error before job is resubmitted by daemon 
             if poltype.externalapi==None:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,True) # have to skip errors because setting optmaxcycle to low number in gaussian causes it to crash
             else:
                 if len(jobtooutputlog.keys())!=0:
                     call.CallExternalAPI(poltype,jobtolog,jobtologlistfilepathprefix,scratchdir)
@@ -340,9 +340,12 @@ def GeometryOptimization(poltype,mol):
             poltype.RaiseOutputFileError(poltype.logoptfname) 
         GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'))
         optmol =  load_structfile(poltype,poltype.logoptfname.replace('.log','.xyz'))
-        optmol=rebuild_bonds(poltype,optmol,OBOPTmol)
+        optmol=rebuild_bonds(poltype,optmol,mol)
+
+
+
     GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'))
-    CheckBondConnectivity(poltype,OBOPTmol,optmol)
+    CheckBondConnectivity(poltype,mol,optmol)
     return optmol
 
 

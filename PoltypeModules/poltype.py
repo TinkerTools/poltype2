@@ -41,7 +41,7 @@ from rdkit.Chem import rdmolfiles,AllChem,rdmolops
 from rdkit.Geometry import Point3D
 class PolarizableTyper():
 
-    def __init__(self,scfmaxiter=300,suppresstorfiterr=False,obminimizeexe='obminimize',readinionly=False,suppressdipoleerr=False,topologylib='residue_connect.txt',poltypepath=os.path.split(__file__)[0],WBOtol=.03,dontfrag=True,isfragjob=False,dipoletol=.1,externalapi=None,printoutput=False,poltypeini=True,structure=None,prmstartidx=401,numproc=1,maxmem="700MB",maxdisk="100GB",gausdir=None,gdmadir=None,tinkerdir=None,scratchdir="/scratch",paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/amoebabio18_header.prm",babelexe="babel",gausexe='g09',formchkexe='formchk',cubegenexe='cubegen',gdmaexe='gdma',avgmpolesexe=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/avgmpoles.pl",peditexe='poledit',potentialexe='potential',minimizeexe='minimize',analyzeexe='analyze',superposeexe='superpose',defopbendval=0.20016677990819662,Hartree2kcal_mol=627.5095,optbasisset='6-31G*',toroptbasisset='6-31G*',dmabasisset='6-311G**',espbasisset="6-311++G(2d,2p)",torspbasisset="6-311+G*",optmethod='wB97X-D',toroptmethod='wB97X-D',torspmethod='MP2',dmamethod='MP2',espmethod='MP2',qmonly = False,espfit = True,parmtors = True,foldnum=3,foldoffsetlist = [ 0.0, 180.0, 0.0, 0.0, 0.0, 0.0 ],torlist = None,rotbndlist = None,fitrotbndslist=None,maxRMSD=.1,maxRMSPD=1,maxtorRMSPD=1.8,tordatapointsnum=None,gentorsion=False,gaustorerror=False,torsionrestraint=.1,onlyrotbndslist=None,rotalltors=False,dontdotor=False,dontdotorfit=False,toroptpcm=False,optpcm=False,torsppcm=False,use_gaus=False,use_gausoptonly=False,freq=False,postfit=False,bashrcpath=None,amoebabioprmpath=None,libpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/lib.bio18_conv1.txt",SMARTSToTypelibpath=sys.path[0]+'/SMARTSToTypeLib.txt',ModifiedResiduePrmPath=sys.path[0]+'/ModifiedResidue.prm',modifiedproteinpdbname=None,unmodifiedproteinpdbname=None,mutatedsidechain=None,mutatedresiduenumber=None,modifiedresiduepdbcode=None,optmaxcycle=5,torkeyfname=None,gausoptcoords='',helpfile='README_HELP.MD',versionfile='README_VERSION.MD'): 
+    def __init__(self,scfmaxiter=300,suppresstorfiterr=False,obminimizeexe='obminimize',readinionly=False,suppressdipoleerr=False,topologylib='residue_connect.txt',poltypepath=os.path.split(__file__)[0],WBOtol=.001,dontfrag=True,isfragjob=False,dipoletol=.1,externalapi=None,printoutput=False,poltypeini=True,structure=None,prmstartidx=401,numproc=1,maxmem="700MB",maxdisk="100GB",gausdir=None,gdmadir=None,tinkerdir=None,scratchdir="/scratch",paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/amoebabio18_header.prm",babelexe="babel",gausexe='g09',formchkexe='formchk',cubegenexe='cubegen',gdmaexe='gdma',avgmpolesexe=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/avgmpoles.pl",peditexe='poledit',potentialexe='potential',minimizeexe='minimize',analyzeexe='analyze',superposeexe='superpose',defopbendval=0.20016677990819662,Hartree2kcal_mol=627.5095,optbasisset='6-31G*',toroptbasisset='6-31G*',dmabasisset='6-311G**',espbasisset="6-311++G(2d,2p)",torspbasisset="6-311+G*",optmethod='wB97X-D',toroptmethod='wB97X-D',torspmethod='MP2',dmamethod='MP2',espmethod='MP2',qmonly = False,espfit = True,parmtors = True,foldnum=3,foldoffsetlist = [ 0.0, 180.0, 0.0, 0.0, 0.0, 0.0 ],torlist = None,rotbndlist = None,fitrotbndslist=None,maxRMSD=.1,maxRMSPD=1,maxtorRMSPD=1.8,tordatapointsnum=None,gentorsion=False,gaustorerror=False,torsionrestraint=.1,onlyrotbndslist=None,rotalltors=False,dontdotor=False,dontdotorfit=False,toroptpcm=False,optpcm=False,torsppcm=False,use_gaus=False,use_gausoptonly=False,freq=False,postfit=False,bashrcpath=None,amoebabioprmpath=None,libpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/lib.bio18_conv1.txt",SMARTSToTypelibpath=sys.path[0]+'/SMARTSToTypeLib.txt',ModifiedResiduePrmPath=sys.path[0]+'/ModifiedResidue.prm',modifiedproteinpdbname=None,unmodifiedproteinpdbname=None,mutatedsidechain=None,mutatedresiduenumber=None,modifiedresiduepdbcode=None,optmaxcycle=5,torkeyfname=None,gausoptcoords='',helpfile='README_HELP.MD',versionfile='README_VERSION.MD'): 
         self.scfmaxiter=scfmaxiter
         self.suppresstorfiterr=suppresstorfiterr
         self.obminimizeexe=obminimizeexe
@@ -92,6 +92,7 @@ class PolarizableTyper():
         self.foldnum=foldnum
         self.nfoldlist =  list(range(1,self.foldnum+1))
         self.foldoffsetlist = foldoffsetlist
+        self.parentdir=os.getcwd()
         if torlist==None:
             self.torlist = []
         else:
@@ -881,7 +882,6 @@ class PolarizableTyper():
         obConversion.ReadFile(mol, self.molstructfname)
     
         self.totalcharge=mol.GetTotalCharge()
-        print('charge',self.totalcharge)
         # Begin log. *-poltype.log
         if os.path.isfile(self.logfname):
             os.remove(self.logfname)
@@ -919,6 +919,7 @@ class PolarizableTyper():
         # This information is used by cubegen
 
         optmol = opt.GeometryOptimization(self,mol)
+        self.mol=optmol
         esp.SPForDMA(self,optmol,mol)
         # Obtain multipoles from Gaussian fchk file using GDMA
     
@@ -1011,11 +1012,8 @@ class PolarizableTyper():
         if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False:
 
             self.rdkitmol=rdmolfiles.MolFromMolFile(self.molstructfnamemol,sanitize=True,removeHs=False)
-            fragmoltocharge={}
-            charge=Chem.rdmolops.GetFormalCharge(self.rdkitmol)
-            fragmoltocharge[self.rdkitmol]=charge
 
-            WBOmatrix,outputname,error=frag.GenerateWBOMatrix(self,self.rdkitmol,self.logoptfname.replace('.log','.xyz'),fragmoltocharge)
+            WBOmatrix,outputname,error=frag.GenerateWBOMatrix(self,self.rdkitmol,self.logoptfname.replace('.log','.xyz'))
             highlightbonds=[]
             for tor in self.torlist:
                 rotbnd=[tor[1]-1,tor[2]-1]

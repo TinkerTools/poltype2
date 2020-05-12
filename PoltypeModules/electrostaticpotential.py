@@ -104,9 +104,9 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
     temp.write("E, wfn = properties('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
     if makecube==True:
-       temp.write('oeprop(wfn,"GRID_ESP","WIBERG_LOWDIN_INDICES")'+'\n')
+       temp.write('oeprop(wfn,"GRID_ESP","WIBERG_LOWDIN_INDICES","MULLIKEN_CHARGES")'+'\n')
     else:
-       temp.write('oeprop(wfn,"WIBERG_LOWDIN_INDICES")'+'\n')
+       temp.write('oeprop(wfn,"WIBERG_LOWDIN_INDICES","MULLIKEN_CHARGES")'+'\n')
 
     temp.write('clean()'+'\n')
     temp.close()

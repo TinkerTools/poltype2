@@ -621,6 +621,9 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
     """
     fitfunc_dict = {}
     write_prm_dict = {}
+    if len(poltype.torlist)==0:
+        return write_prm_dict,fitfunc_dict
+
     # For each rotatable bond 
     for tor in poltype.torlist:
         torprmdict = {}
@@ -1028,12 +1031,10 @@ def process_rot_bond_tors(poltype,mol):
     # and MM (with no rotatable bond torsion parameters)
     # Get QM and MM (pre-fit) energy profiles for torsion parameters
     cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict = get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename)
-
     # if the fit has not been done already
     if poltype.torkeyfname is None:
         # do the fit
-        write_prm_dict,fitfunc_dict = fit_rot_bond_tors(poltype,
-            mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict)
+        write_prm_dict,fitfunc_dict = fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict)
         # write out new keyfile
         write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename)
     else:

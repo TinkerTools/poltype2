@@ -6,3 +6,6 @@
 * Allow 2D dihedral scans to fit a tor-tor coupling term too for torsions that are adjacent to each other. Numerical spline should be used for functional form of tor-tor.
 * Add support for AMOEBA+ parameters
 * Add automated vdw QM surface scan from water probes.
+* Remove the need to install gdma and use gdma built in to Psi4
+* Remove the need to install Tinker CPU independelty and install openmm with conda, then call tinker via openmm instead of command line options
+* Once all depdencies are conda based, add poltype to anaconda to make installation very simple

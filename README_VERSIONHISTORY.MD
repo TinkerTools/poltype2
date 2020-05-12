@@ -104,3 +104,6 @@
 
 2.2.9
 * First working version of torsion fragmenter, this is turned on by default. All optimization have maxcycles of 5, since bond and angle degrees of freedom converge more rapidly than conformation. MMFF94 is used in openbabel to minimize geometry before QM optimization is done.
+
+2.3.0
+* Bug with no torsion to fit but entering fit function causing crash is fixed
