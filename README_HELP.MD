@@ -53,7 +53,7 @@ In order to test the fragmenter, run POLTYPE with fragmenting option turned off(
 ### Input Structure
 * Use an SDF file format for the input structure.
 
-* After the bond block, you can specify the formal charge for each atom. If using the fragmenter (default), you CANNOT just specify total charge on any atom. This is because the fragmenter detects new charge by the difference in valence between parent and fragment and adds or subtracts that difference from the parent formal charge, hence the formal charge on parent atom needs to be correct.
+* After the bond block, you can specify the formal charge for each atom.
 
 * The following example means there is 1 atom with a formal charge: atom 2 has a +1 charge
 
@@ -199,7 +199,7 @@ Minimal examples are any example folder in Examples/, that contain Symmetry as t
   A)No, POLTYPE will look for output files from QM (see README.MANIFEST) to see if it needs to perform a job or continue. So you can delete the outputlog file, change your input options and resubmit POLTYPE job.
 
 ### Tips
-If using PSI4 for optimization with high number of optmaxcycles (default is 5 very low), it will be much slower than Gaussian optimization. Add keyword "use_gaus" in poltype.ini file.
+If using PSI4 for optimization with high number of optmaxcycles (default is 5 very low), it will be much slower than Gaussian optimization. Additionally even if using lower number of optmaxcycles, if your molecule is chated, by default we use PCM and this will significantly slow down PSI4 optimization. Add keyword "use_gaus" in poltype.ini file.
 
 ### Common Errors
 

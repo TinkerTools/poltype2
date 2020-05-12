@@ -275,7 +275,9 @@ def GeometryOptimization(poltype,mol):
     inFormat = obConversion.FormatFromExt(OBOPTname)
     obConversion.SetInFormat(inFormat)
     obConversion.ReadFile(OBOPTmol,OBOPTname)
-
+    charge=poltype.totalcharge
+    OBOPTmol.SetTotalCharge(charge) # for some reason obminimize does not print charge in output PDB
+    
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
         if not os.path.exists(poltype.scratchdir):
             mkdirstr='mkdir '+poltype.scratchdir
