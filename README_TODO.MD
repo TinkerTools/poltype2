@@ -1,3 +1,4 @@
+* [ ] Add math to markdown READMEs
 * [ ] Add TORSION_README.MD to explain torsion fitting plots and how to interpret them.
 * [ ] Remove any file operations done in bash and replace with python language (users different OS)
 * [ ] Allow charged fragment molecules for fragmenter when formal charge on parent detected

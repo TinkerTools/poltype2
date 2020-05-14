@@ -12,7 +12,7 @@
 
 ![Fragment Growth Example Image](Images/FragmentGrowthWithIndex_Bnd_11-8_Index_0.png)
 
-* FragmentGrowthWithIndex_Bnd_b_c_Index_0.png  Tracks the growth of fragment along while attempting to                                                       minimize differences in Wiberg Bond Order between each fragment                                               and the parent until the tolerance threshold is reached. If                                                   WithIndex in name, this means it will show atoms with their                                                   index numbers. If WithoutIndex in name, it will show atoms                                                    without their index numbers.
+* FragmentGrowthWithIndex_Bnd_b_c_Index_0.png  Tracks the growth of fragment along while attempting to                                                       minimize differences in Wiberg Bond Order between each fragment                                               and the parent until the tolerance threshold is reached. If                                                   WithIndex in name, this means it will show atoms with their                                                   index numbers. If WithoutIndex in name, it will show atoms                                                    without their index numbers. The last molecule in image is                                                    the molecule that will be used to derive torsion paramaters                                                   for the parent molecule.
 
 
 

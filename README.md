@@ -14,6 +14,8 @@ POLTYPE: AMOEBA parameterization tool
 * Log of POLTYPE updates
 ### [README_MULTIPOLE](README_MULTIPOLE.MD)
 * Explains multipole frame defintions
+### [README_FRAGMENTER](README_FRAGMENTER.MD)
+* Explains at high level how the fragmenter library works.
 ### [README_TODO](README_TODO.MD)
 * To-do list for POLTYPE
 
