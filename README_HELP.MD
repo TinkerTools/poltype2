@@ -164,6 +164,15 @@ onlyrotbndslist   specifies to only rotate bonds in the list, onlyrotbndlist=1 2
                   Default=[] (empty)
 ```
 
+### Fragmenter
+```
+dontfrag          specifies to not use fragmenter library for torsion.
+                  Default=True (will change to False after testing a few more cases)
+
+WBOtol            Tolerance for relative differences in Wiberg bond order between parent and fragment. Still                    trying to figure out the "best" tolerance.
+                  Default=.001
+```
+
 ### Modified Amino Acids
 ```
 modifiedresiduepdbcode    specifies three letter modified amino acid PDB code. 

@@ -1,3 +1,6 @@
+* [ ] Add TORSION_README.MD to explain torsion fitting plots and how to interpret them.
+* [ ] Remove any file operations done in bash and replace with python language (users different OS)
+* [ ] Allow charged fragment molecules for fragmenter when formal charge on parent detected
 * [ ] Add 6 fold torsion
 * [ ] add weighted torsion for fitting function
 * [ ] Test fragmenter on drugbank database (dont paramterize until the rest of POLTYPE torsion is complete)

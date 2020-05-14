@@ -1309,10 +1309,13 @@ def Draw2DMoleculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragf
         svg2png(bytestring=svg_code,write_to=basename+'.png')
 
 
-def Draw2DMoleculeWithWBO(poltype,WBOmatrix,basename,mol,bondindexlist=None,smirks=None):
+def Draw2DMoleculeWithWBO(poltype,WBOmatrix,basename,mol,bondindexlist=None,smirks=None,imgsize=None):
     mol=mol_with_atom_index(poltype,mol)
     rdDepictor.Compute2DCoords(mol)
-    drawer=rdMolDraw2D.MolDraw2DSVG(500,500)
+    if imgsize==None:
+        drawer=rdMolDraw2D.MolDraw2DSVG(500,500)
+    else:
+        drawer=rdMolDraw2D.MolDraw2DSVG(imgsize,imgsize)
     bondlist=[]
     if bondindexlist is not None:
         for bondindexes in bondindexlist:

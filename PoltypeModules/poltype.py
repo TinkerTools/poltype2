@@ -1018,15 +1018,13 @@ class PolarizableTyper():
             for tor in self.torlist:
                 rotbnd=[tor[1]-1,tor[2]-1]
                 highlightbonds.append(rotbnd)
-            frag.Draw2DMoleculeWithWBO(self,WBOmatrix,self.molstructfname.replace('.sdf',''),self.rdkitmol,bondindexlist=highlightbonds)        
+            frag.Draw2DMoleculeWithWBO(self,WBOmatrix,self.molstructfname.replace('.sdf',''),self.rdkitmol,bondindexlist=highlightbonds,imgsize=1500)        
             rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentfragmentsarray,equivalentrotbndindexarrays=frag.GenerateFragments(self,self.mol,torlist,WBOmatrix) # returns list of bond indexes that need parent molecule to do torsion scan for (fragment generated was same as the parent0
             frag.SpawnPoltypeJobsForFragments(self,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,torlist,equivalentfragmentsarray,equivalentrotbndindexarrays)
 
         if self.dontfrag==False and self.isfragjob==False and not os.path.isfile(self.key5fname):
             frag.GrabTorsionParametersFromFragments(self,torlist,rotbndindextofragmentfilepath) # just dump to key_5 since does not exist for parent molecule
             return
-
-       
                
         # Torsion scanning then fitting. *.key_5 will contain updated torsions
         if os.path.isfile(self.key5fname):
