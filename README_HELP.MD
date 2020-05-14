@@ -82,6 +82,7 @@ numproc=4
 maxmem=20GB
 maxdisk=100GB
 ```
+* All booleans can switch their truth value, i.e., dontfrag=True or dontfrag=False
 
 ####Submitting Quantum Jobs Externally
 ```

@@ -1,39 +1,24 @@
 import electrostaticpotential as esp
 import torsiongenerator as torgen
-import optimization as opt
-import apicall as call
-from socket import gethostname
 
 import os
-import sys
 import numpy
-import time
 import openbabel
 from rdkit import Chem
-from rdkit.Chem import rdmolfiles,rdMolDescriptors
+from rdkit.Chem import rdmolfiles
 import shutil
 from rdkit.Chem import rdDepictor
 from rdkit.Chem.Draw import rdMolDraw2D
 from rdkit.Chem import AllChem
-from rdkit.Chem import Draw
 import svgutils.transform as sg
 from cairosvg import svg2png
-import copy
-from collections import defaultdict
-from rdkit.Chem import rdDepictor
 import matplotlib.pyplot as plt
-from os.path import dirname, abspath      
+from os.path import dirname, abspath
 from itertools import combinations
-from rdkit.Chem import rdFMCS
 import json
 from collections import Counter
-from itertools import combinations
-import re
 from rdkit.Geometry import Point3D
-from rdkit.Chem import rdDistGeom
-from scipy.optimize import fsolve
-import math
-
+import sys # used for terminaing job after fragmenter finishes and troubleshooting
 
 def AssignTotalCharge(poltype,molecule,babelmolecule):
     atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
@@ -48,18 +33,18 @@ def AssignTotalCharge(poltype,molecule,babelmolecule):
             chg=0
         else:
             chg=valtochg[val]
-        
+
         polneighb=False
         if atomnum==6:
             for natom in atom.GetNeighbors():
                 natomicnum=natom.GetAtomicNum()
                 if natomicnum==7 or natomicnum==8 or natomicnum==16:
                     polneighb=True
-            if polneighb==True and val==3:
+            if polneighb and val==3:
                 chg=1
         totchg+=chg
         atom.SetFormalCharge(chg)
-        
+
     return molecule
 
 
@@ -96,7 +81,7 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
                         torkey='%d %d %d %d' % (typea, typeb, typec, typed)
                         if torkey in symmtorlist:
                             torprmdic[torkey]=line
-                
+
     os.chdir(curdir)
     temp=open(poltype.key4fname,'r')
     results=temp.readlines()
@@ -127,7 +112,7 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
 def GrabWBOMatrixGaussian(poltype,outputlog,mol):
     try:
         WBOmatrix=numpy.empty((mol.GetNumAtoms(),mol.GetNumAtoms()))
-    except:
+    except Exception:
         WBOmatrix=numpy.empty((mol.NumAtoms(),mol.NumAtoms()))
     temp=open(outputlog,'r')
     results=temp.readlines()
@@ -138,29 +123,29 @@ def GrabWBOMatrixGaussian(poltype,outputlog,mol):
         line=results[lineidx]
         linesplit=line.split()
         if 'Wiberg bond index matrix' in line:
-            juststartWBOmatrix=True    
-        elif 'Atom' in line and juststartWBOmatrix==True:
+            juststartWBOmatrix=True
+        elif 'Atom' in line and juststartWBOmatrix:
             matcols=len(linesplit)-1
-        elif 'Wiberg bond index, Totals by atom' in line and juststartWBOmatrix==True:
+        elif 'Wiberg bond index, Totals by atom' in line and juststartWBOmatrix:
             return WBOmatrix
-        elif line=='\n' and juststartWBOmatrix==True:
+        elif line=='\n' and juststartWBOmatrix:
             if 'Wiberg bond index matrix' not in results[lineidx-1]:
                 currentcolnum+=matcols
-        elif juststartWBOmatrix==True and 'Atom' not in line and line!='\n' and '--' not in line:
+        elif juststartWBOmatrix and 'Atom' not in line and line!='\n' and '--' not in line:
             rownum=int(linesplit[0].replace('.',''))
             ele=linesplit[1]
             wborowvalues=linesplit[2:]
             wborowvalues=[float(i) for i in wborowvalues]
             for i in range(len(wborowvalues)):
                 colnum=i+1+currentcolnum
-                value=wborowvalues[i]	
+                value=wborowvalues[i]
                 WBOmatrix[rownum-1,colnum-1]=float(value)
     return WBOmatrix
-                
+
 def GrabWBOMatrixPsi4(poltype,outputlog,molecule):
     try:
         WBOmatrix=numpy.empty((molecule.GetNumAtoms(),molecule.GetNumAtoms()))
-    except:
+    except Exception:
         WBOmatrix=numpy.empty((molecule.NumAtoms(),molecule.NumAtoms()))
     temp=open(outputlog,'r')
     results=temp.readlines()
@@ -171,12 +156,12 @@ def GrabWBOMatrixPsi4(poltype,outputlog,molecule):
         line=results[lineidx]
         linesplit=line.split()
         if 'Wiberg Bond Indices' in line:
-            juststartWBOmatrix=True    
-        elif 'Atomic Valences:' in line and juststartWBOmatrix==True:
+            juststartWBOmatrix=True
+        elif 'Atomic Valences:' in line and juststartWBOmatrix:
             return WBOmatrix
-        elif AllIntegers(poltype,line.split())==True and juststartWBOmatrix==True and line!='\n':
+        elif AllIntegers(poltype,line.split()) and juststartWBOmatrix and line!='\n':
             colrowindex=lineidx
-        elif juststartWBOmatrix==True and 'Irrep:' not in line and line!='\n' and AllIntegers(poltype,line.split())==False:
+        elif juststartWBOmatrix and 'Irrep:' not in line and line!='\n' and not AllIntegers(poltype,line.split()):
             row=line.split()[1:]
             colindexrow=results[colrowindex].split()
             rowindex=int(line.split()[0])
@@ -185,9 +170,9 @@ def GrabWBOMatrixPsi4(poltype,outputlog,molecule):
                 colindex=int(colindexrow[i])
                 WBOmatrix[rowindex-1,colindex-1]=value
     return WBOmatrix
-                           
 
- 
+
+
 def AllIntegers(poltype,testlist):
     allintegers=True
     for value in testlist:
@@ -221,12 +206,12 @@ def getIndexPositions(poltype,listOfElements, element):
             indexPos += 1
         except ValueError as e:
             break
- 
+
     return indexPosList
-         
+
 def FindEquivalentRotatableBonds(poltype,equivalentfragmentsarray,rotbndindextofragment):
     equivalentrotbndindexarrays=[]
-    
+
     for array in equivalentfragmentsarray:
         temp=[]
         for fragmol in array:
@@ -254,18 +239,18 @@ def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog
     logpath=os.getcwd()+r'/'+logname
     if os.path.isfile(logpath): # make sure to remove logfile if exists, dont want WaitForTermination to catch previous errors before job is resubmitted
         os.remove(logpath)
-    jobtooutputlog[cmdstr]=logpath    
+    jobtooutputlog[cmdstr]=logpath
     return listofjobs,jobtooutputlog,logpath
 
 def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog):
-    if poltype.externalapi!=None:
+    if poltype.externalapi is not None:
         finishedjobs,errorjobs=poltype.CallJobsLocalHost(jobtooutputlog,True)
     else:
         finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
 
     return finishedjobs,errorjobs
 
- 
+
 def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,torlist,equivalentfragmentsarray,equivalentrotbndindexarrays):
     parentdir=dirname(abspath(os.getcwd()))
     listofjobs=[]
@@ -291,7 +276,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             listofjobs,jobtooutputlog,newlog=FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog)
             logtoconvertidxs[newlog]=[fragmol,tail,wholexyz,wholemol,head]
     else:
-        nonequivalentrotbndidxs=[] 
+        nonequivalentrotbndidxs=[]
         for array in equivalentrotbndindexarrays:
             strfragrotbndindexes=''
             strparentrotbndindexes=''
@@ -341,7 +326,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
     for log in finishedjobs:
         [fragmol,tail,wholexyz,wholemol,filepath]=logtoconvertidxs[log]
         ConvertFragIdxToWholeIdx(poltype,torlist,rotbndindextoparentindextofragindex,fragmol,tail,wholexyz,wholemol,filepath)
-    
+
 def MakeTorsionFileName(poltype,string):
     temp=open('torsions.txt','w')
     temp.write(string+'\n')
@@ -412,13 +397,13 @@ def ConvertFragIdxToWholeIdx(poltype,torlist,rotbndindextoparentindextofragindex
             wholeidxtotypeidx[idx]=typeidx
 
     wholemolidxtofragidx=json.load(open(filepath+r'/'+"parentindextofragindex.txt"))
-    temp={} # convert rdkit to babel 
+    temp={} # convert rdkit to babel
     for key,value in wholemolidxtofragidx.items():
         temp[int(key)+1]=int(value)+1
     fragidxtowholemolidx={v: k for k, v in temp.items()}
     fragsmarts=rdmolfiles.MolToSmarts(fragmol)
     m=mol_with_atom_index(poltype,fragmol)
-    fragsmirks=rdmolfiles.MolToSmarts(m) 
+    fragsmirks=rdmolfiles.MolToSmarts(m)
     fragidxarray=GrabAtomOrder(poltype,fragsmirks)
     classkeytosmilesposarray={}
     for tor in torlist:
@@ -476,7 +461,7 @@ def ConvertFragIdxToWholeIdx(poltype,torlist,rotbndindextoparentindextofragindex
                 valencestring+=']'+','+' '+r'\\'
                 newtemp.write(valencestring+'\n')
         else:
-            temp.write(line)    
+            temp.write(line)
     temp.close()
     newtemp.close()
     return
@@ -488,7 +473,7 @@ def GrabAtomOrder(poltype,smirks):
         prevchar=smirks[i-1]
         try:
             nextchar=smirks[i+1]
-        except:
+        except Exception:
             break
         if prevchar==':' and e.isdigit() and nextchar!='-' and nextchar!=')' and nextchar!=':' and nextchar!='=':
             atomindex=GrabAtomIndex(poltype,i,smirks)
@@ -505,7 +490,7 @@ def GrabAtomIndex(poltype,i,smirks):
         if char==']':
             break
     atomindex=int(''.join(num))
-    return atomindex 
+    return atomindex
 
 def GrabIndexToCoordinates(poltype,mol):
     indextocoordinates={}
@@ -645,7 +630,7 @@ def ReadToOBMol(poltype,filename):
     tmpconv.ReadFile(fragmolbabel,filename)
     return fragmolbabel
 
-     
+
 
 def mol_with_atom_index(poltype,mol):
     atoms = mol.GetNumAtoms()
@@ -673,13 +658,13 @@ def GenerateWBOMatrix(poltype,molecule,structfname):
 
     inputname,outputname=esp.CreatePsi4ESPInputFile(poltype,structfname,poltype.comespfname.replace('.com','_frag.com'),molecule,poltype.maxdisk,poltype.maxmem,poltype.numproc,charge,False)
     finished,error=poltype.CheckNormalTermination(outputname)
-    if finished==False and error==False:
+    if not finished and not error:
         cmdstr='psi4 '+inputname+' '+outputname
         try:
              poltype.call_subsystem(cmdstr,True)
-        except:
+        except Exception:
              error=True
-    if error==False:
+    if not error:
         WBOmatrix=GrabWBOMatrixPsi4(poltype,outputname,molecule)
     poltype.espmethod=curespmethod
     poltype.espbasisset=curspbasisset
@@ -698,13 +683,13 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
     rotbndindextofragWBOmatrix={}
     rotbndindextofragfoldername={}
     rotbndindextoWBOdifference={}
-    
-    for tor in torlist: 
+
+    for tor in torlist:
         WBOdifferencetofragWBOmatrix={}
         WBOdifferencetofoldername={}
         WBOdifferencetofragmol={}
         WBOdifferencetostructfname={}
-        highlightbonds=[] 
+        highlightbonds=[]
         indexes=FirstPassAtomIndexes(poltype,tor)
 
         fragfoldername=str(tor[1])+'_'+str(tor[2])+'_Hydrated'
@@ -734,7 +719,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         WriteOBMolToSDF(poltype,fragmolbabel,filename.replace('.mol','.sdf'))
         structfname=filename.replace('.mol','.sdf')
         fragWBOmatrix,outputname,error=GenerateWBOMatrix(poltype,fragmol,filename.replace('.mol','_xyzformat.xyz'))
-        if error==True:
+        if error:
             os.chdir('..')
             continue
         fragmentWBOvalue=fragWBOmatrix[parentindextofragindex[tor[1]-1],parentindextofragindex[tor[2]-1]] # rdkit is 0 index based so need to subtract 1, babel is 1 indexbased
@@ -759,12 +744,12 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
 
         fragrotbndidx=[parentindextofragindex[tor[1]-1],parentindextofragindex[tor[2]-1]]
         highlightbonds.append(fragrotbndidx)
-        fragpath=os.getcwd() 
+        fragpath=os.getcwd()
         grow=False
         growfragments.append(fragmol)
         fragmoltoWBOmatrices,fragmoltobondindexlist=WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor,fragmoltoWBOmatrices,fragmoltobondindexlist)
         curdir=os.getcwd()
-        os.chdir('..') 
+        os.chdir('..')
         growfragmoltoWBOmatrices=fragmoltoWBOmatrices.copy()
         growfragmoltofragfoldername=fragmoltofragfoldername.copy()
         growfragmoltobondindexlist=fragmoltobondindexlist.copy()
@@ -842,7 +827,6 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
                 Draw2DMoleculeWithWBO(poltype,fragWBOmatrix,basename+'_Absolute',m,bondindexlist=highlightbonds,smirks=fragsmirks)
                 Draw2DMoleculeWithWBO(poltype,relativematrix,basename+'_Relative',m,bondindexlist=highlightbonds,smirks=fragsmirks)
         os.chdir(curdir)
-    sys.exit()
     return rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentfragmentsarray,equivalentrotbndindexarrays
 
 
@@ -865,7 +849,7 @@ def RemoveTempFolders(poltype):
             foldstoremove.append(f)
     for f in foldstoremove:
         shutil.rmtree(f)
-    
+
 
 
 def ReduceParentMatrix(poltype,parentindextofragindex,fragWBOmatrix,parentWBOmatrix):
@@ -885,12 +869,12 @@ def ReduceParentMatrix(poltype,parentindextofragindex,fragWBOmatrix,parentWBOmat
     return reducedparentWBOmatrix
 
 def CombinationsHydIndexes(poltype,hydindexes,fragmol): # only keep combinations of hydrogens that are attachated to heavy atoms that have a formal charge in the parent molecule
-       
+
     combindexlist=[]
     for i in range(len(hydindexes)):
         comb = combinations(hydindexes, i+1)
         combindexlist.append(comb)
-    return combindexlist 
+    return combindexlist
 
 
 def ChargedCombinations(poltype,combindexlist,molfilename,fragments): # only worry about charged combinations where you add hydrogen on atoms that were charged in parent molecule
@@ -900,13 +884,13 @@ def ChargedCombinations(poltype,combindexlist,molfilename,fragments): # only wor
         i=0
         for idxlist in comb:
             idxlist=list(idxlist)
-            fragmolcharged=ReadRdkitMolFromMolFile(poltype,molfilename) 
+            fragmolcharged=ReadRdkitMolFromMolFile(poltype,molfilename)
             fragmolchargededit=Chem.rdchem.EditableMol(fragmolcharged)
             idxlist.sort(reverse=True)
             origcharge=Chem.rdmolops.GetFormalCharge(fragmolcharged)
             for idx in idxlist:
                 fragmolchargededit.RemoveAtom(idx)
-                 
+
             newfragmolcharged=fragmolchargededit.GetMol()
             fragsmartscharged=rdmolfiles.MolToSmarts(newfragmolcharged)
             if fragsmartscharged not in fragmentsmarts:
@@ -917,7 +901,7 @@ def ChargedCombinations(poltype,combindexlist,molfilename,fragments): # only wor
             i+=1
         j+=1
     return fragments,fragmoltocharge
-                
+
 
 def FindAddedHydrogenIndexesRdkit(poltype,mols):
     hydindexes=[]
@@ -941,6 +925,7 @@ def FindAddedHydrogenIndexesRdkit(poltype,mols):
 def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfoldername,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,fragspath):
     fragfoldernamepath=os.getcwd()
     fragmentsforcomb=growfragments.copy()
+    fragmentsforcombwbo=[WBOdifference]
     while not WBOdifference<=poltype.WBOtol:
         WBOdiffarray=[]
         molarray=[]
@@ -987,7 +972,7 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
             os.chdir(foldername)
 
             fragWBOmatrix,outputname,error=GenerateWBOMatrix(poltype,fragmol,structfname)
-            if error==True:
+            if error:
                 os.chdir('..')
                 continue
             reducedparentWBOmatrix=ReduceParentMatrix(poltype,parentindextofragindex,fragWBOmatrix,parentWBOmatrix)
@@ -996,6 +981,7 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
             fragmentWBOvalue=fragWBOmatrix[fragrotbndidx[0],fragrotbndidx[1]]
             parentWBOvalue=parentWBOmatrix[tor[1]-1,tor[2]-1]
             WBOdifference=round(numpy.abs(fragmentWBOvalue-parentWBOvalue),3)
+            fragmentsforcombwbo.append(WBOdifference)
             growfragmoltoWBOmatrices,growfragmoltobondindexlist=WriteOutFragmentInputs(poltype,fragmol,foldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor,growfragmoltoWBOmatrices,growfragmoltobondindexlist)
 
             m=mol_with_atom_index(poltype,fragmol)
@@ -1024,14 +1010,18 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
 
     curdir=os.getcwd()
     os.chdir('..')
-    Draw2DMoleculesWithWBO(poltype,fragmentsforcomb,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,tor,'CombinationsWithIndex')
-    sanitizedfragments=[mol_with_atom_index_removed(poltype,frag) for frag in fragmentsforcomb]
+    wbotofragments = dict(zip(fragmentsforcombwbo[1:], fragmentsforcomb[1:]))
+    sortedwbotofragments={k: v for k, v in sorted(wbotofragments.items(), key=lambda item: item[0],reverse=True)}
+    sorted_list=list(sortedwbotofragments.values())
+    sorted_list.insert(0,fragmentsforcomb[0])
+    Draw2DMoleculesWithWBO(poltype,sorted_list,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,tor,'CombinationsWithIndex')
+    sanitizedfragments=[mol_with_atom_index_removed(poltype,frag) for frag in sorted_list]
     Draw2DMoleculesWithWBO(poltype,sanitizedfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,tor,'CombinationsWithoutIndex')
     os.chdir(curdir)
     os.chdir(fragfoldernamepath)
     PlotFragmenterResults(poltype,WBOdiffarray,molarray)
     os.chdir(curdir)
-    
+
     return fragmol,indexes,fragWBOmatrix,structfname,WBOdifference,parentindextofragindex,fragpath,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist
 
 
@@ -1089,12 +1079,12 @@ def GrowPossibleFragmentAtomIndexes(poltype,rdkitmol,indexes):
         if indexlist not in possiblefragatmidxs:
            possiblefragatmidxs.append(indexlist)
     return possiblefragatmidxs
-    
+
 
 def WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor,fragmoltoWBOmatrices,fragmoltobondindexlist):
     highlightbonds=[]
     structfnamemol=fragfoldername+'.mol'
-    print(Chem.MolToMolBlock(fragmol,kekulize=True),file=open(structfnamemol,'w+')) 
+    print(Chem.MolToMolBlock(fragmol,kekulize=True),file=open(structfnamemol,'w+'))
     tmpconv = openbabel.OBConversion()
     tmpconv.SetInFormat('mol')
     fragmolbabel=openbabel.OBMol()
@@ -1112,7 +1102,7 @@ def WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWB
     Draw2DMoleculeWithWBO(poltype,fragWBOmatrix,basename+'_Absolute',m,bondindexlist=highlightbonds,smirks=fragsmirks)
     Draw2DMoleculeWithWBO(poltype,relativematrix,basename+'_Relative',m,bondindexlist=highlightbonds,smirks=fragsmirks)
     temp=[relativematrix,fragWBOmatrix]
-    fragmoltoWBOmatrices[fragmol]=temp 
+    fragmoltoWBOmatrices[fragmol]=temp
     fragmoltobondindexlist[fragmol]=highlightbonds
     return fragmoltoWBOmatrices,fragmoltobondindexlist
 
@@ -1128,21 +1118,21 @@ def MapSMILESToParent(poltype,mol,smi,temptorlist):
     sp = openbabel.OBSmartsPattern()
     openbabel.OBSmartsPattern.Init(sp,smi)
     match=sp.Match(mol)
-    if match==False:
+    if not match:
         return None,None
     indexlist=[]
     for indexls in sp.GetMapList():
         indexlist.append(indexls)
-    natoms=len(indexlist[0])	
+    natoms=len(indexlist[0])
     for tor in temptorlist:
         foundall=True
         for index in tor:
             match=CheckIfIndexInMatches(index,indexlist)
-            if match==False:
+            if not match:
                 foundall=False
-        if foundall==True:
+        if foundall:
             return str(tor[1])+'_'+str(tor[2]),natoms
-     
+
     return None,None
 
 def FirstPassAtomIndexes(poltype,tor):
@@ -1157,7 +1147,7 @@ def FirstPassAtomIndexes(poltype,tor):
                neighbatomindex=neighbatom.GetIdx()
                if neighbatomindex not in molindexlist:
                    molindexlist.append(neighbatomindex)
-                   if neighbatom.GetIsAromatic()==True:
+                   if neighbatom.GetIsAromatic():
                        aromaticindexes=GrabAromaticAtoms(poltype,neighbatom)
                        newindexes=aromaticindexes
                        for atmidx in newindexes:
@@ -1182,7 +1172,7 @@ def FirstPassAtomIndexes(poltype,tor):
 def Chunks(poltype,lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
-    
+
 def ChunksList(poltype,gen):
     newlst=[]
     for item in gen:
@@ -1212,7 +1202,7 @@ def Draw2DMoleculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragf
         for bondindexes in bondindexlist:
             bond=frag.GetBondBetweenAtoms(bondindexes[0],bondindexes[1])
             bondidx=bond.GetIdx()
-            bondlist.append(bondidx) 
+            bondlist.append(bondidx)
         bondlistoflists.append(bondlist)
     legendslist=[fragmoltofragfoldername[frag] for frag in fragments]
     molsperrow=3
@@ -1232,10 +1222,11 @@ def Draw2DMoleculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragf
         smarts=smarts.replace('@','').replace('H3','').replace('H2','').replace('H','')
         patt = Chem.MolFromSmarts(smarts)
         newfragments.append(firstmol)
+
         for i in range(1,len(fragments)):
             frag=fragments[i]
             frag=mol_with_atom_index_removed(poltype,frag)
-            overlap = frag.GetSubstructMatch(patt) # indexes of fragpatt corresponding to patt SMARTS but need the actual indexes of frag 
+            overlap = frag.GetSubstructMatch(patt) # indexes of fragpatt corresponding to patt SMARTS but need the actual indexes of frag
             atomMap = [(paid,raid) for raid,paid in enumerate(overlap)]
             AllChem.AlignMol(frag,firstmol,atomMap=atomMap)
             newfragments.append(frag)
@@ -1272,7 +1263,7 @@ def Draw2DMoleculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragf
                     endatomdrawcoords=numpy.array(drawer.GetDrawCoords(endidx))
                     atomidxtodrawcoords[begidx]=begatomdrawcoords
                     atomidxtodrawcoords[endidx]=endatomdrawcoords
-            
+
             WBOmatrixlist=fragmoltoWBOmatrices[frag]
             WBOmatrix=WBOmatrixlist[0]
             row=indextorow[j]
@@ -1311,7 +1302,7 @@ def Draw2DMoleculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragf
                     label.rotate(sign*angle,bondcoords[0],bondcoords[1])
 
                     fig.append(label)
-        
+
         basename=basestr+'_'+'Bnd_'+str(tor[1])+'-'+str(tor[2])+'_Index_'+str(i)
         fig.save(basename+'.svg')
         svg_code=fig.to_str()
@@ -1323,11 +1314,11 @@ def Draw2DMoleculeWithWBO(poltype,WBOmatrix,basename,mol,bondindexlist=None,smir
     rdDepictor.Compute2DCoords(mol)
     drawer=rdMolDraw2D.MolDraw2DSVG(500,500)
     bondlist=[]
-    if bondindexlist!=None:
+    if bondindexlist is not None:
         for bondindexes in bondindexlist:
             bond=mol.GetBondBetweenAtoms(bondindexes[0],bondindexes[1])
             bondidx=bond.GetIdx()
-            bondlist.append(bondidx) 
+            bondlist.append(bondidx)
     drawer.DrawMolecule(mol,highlightAtoms=[],highlightBonds=bondlist)
     drawer.FinishDrawing()
     svg = drawer.GetDrawingText().replace('svg:','')
@@ -1345,7 +1336,7 @@ def Draw2DMoleculeWithWBO(poltype,WBOmatrix,basename,mol,bondindexlist=None,smir
                 continue
             wbo=str(round(WBOval,4))
             label = sg.TextElement(bondcoords[0],bondcoords[1], wbo, size=12, weight="bold")
-            array=endatomdrawcoords-begatomdrawcoords 
+            array=endatomdrawcoords-begatomdrawcoords
             if array[1]>=0:
                 pass
             else:
@@ -1363,7 +1354,7 @@ def Draw2DMoleculeWithWBO(poltype,WBOmatrix,basename,mol,bondindexlist=None,smir
                 sign=1
             label.rotate(sign*angle,bondcoords[0],bondcoords[1])
             fig.append(label)
-    if smirks!=None:
+    if smirks is not None:
         label = sg.TextElement(25,490, smirks, size=12, weight="bold")
         fig.append(label)
     fig.save(basename+'.svg')
@@ -1378,10 +1369,10 @@ def GrabAromaticAtoms(poltype,neighbatom):
     while prevringidxlen!=ringidxlen:
         for atmindex in aromaticindexes:
             atm=poltype.rdkitmol.GetAtomWithIdx(atmindex)
-            if (atm.GetIsAromatic()==True) and atmindex not in aromaticindexes:
+            if atm.GetIsAromatic() and atmindex not in aromaticindexes:
                 aromaticindexes.append(atmindex)
             for natm in atm.GetNeighbors():
-                if (natm.GetIsAromatic()==True) and natm.GetIdx() not in aromaticindexes:
+                if natm.GetIsAromatic() and natm.GetIdx() not in aromaticindexes:
                     aromaticindexes.append(natm.GetIdx())
         prevringidxlen=ringidxlen
         ringidxlen=len(aromaticindexes)
@@ -1392,7 +1383,7 @@ def GrabAromaticAtoms(poltype,neighbatom):
 def PlotFragmenterResults(poltype,WBOdiffarray,molarray):
     fig=plt.figure()
     basename='NumberofAtomsVSWBODifference'
-    plt.plot(WBOdiffarray,[m.GetNumAtoms() for m in molarray],'.') 
+    plt.plot(WBOdiffarray,[m.GetNumAtoms() for m in molarray],'.')
     plt.xlabel('WBO Difference')
     plt.ylabel('Number of atoms in fragment')
     fig.savefig(basename+'.png')

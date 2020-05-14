@@ -75,3 +75,8 @@ export PATH=/opt/gdma-2.2/bin/gdma:$PATH
 export PSI_SCRATCH=/scratch/your_username/ 
 export PATH=/home/liuchw/Softwares/tinkers/Tinker-latest/source/:$PATH
 ```
+
+* Now clone the poltype2 branch
+```
+git clone -b poltype2 git@github.com:pren/poltype.git poltype-poltype2
+```

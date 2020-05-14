@@ -1,4 +1,3 @@
-import symmetry as symm
 import electrostaticpotential as esp
 import time
 import os
@@ -6,6 +5,7 @@ import sys
 import openbabel
 import shutil
 import re
+from collections import deque
 
 def is_in_polargroup(poltype,mol, smarts, bond, f):
     """
@@ -24,7 +24,7 @@ def is_in_polargroup(poltype,mol, smarts, bond, f):
     openbabel.OBSmartsPattern.Init(sp,smarts)
     sp.Match(mol)
     for i in sp.GetUMapList():
-        if ((bond.GetBeginAtomIdx() in i) and \
+        if ((bond.GetBeginAtomIdx() in i) and
              (bond.GetEndAtomIdx() in i)):
             return True
     return False
@@ -108,7 +108,7 @@ def GrabIndexesFromUniqueTypeNumber(poltype,nlist,typenum):
 
 
 
-         
+
 def CheckIfNeighbHasSameType(poltype,a,neighbs):
     check=False
     reftype=poltype.idxtosymclass[a.GetIdx()]
@@ -138,15 +138,15 @@ def gen_peditinfile(poltype,mol):
     1. Initialize lfzerox, or local-frame-zero-x-component, array
     2. For each atom a
             a. find the two heaviest atoms that a is bound to
-               (heaviest defined by their symmetry class; 
+               (heaviest defined by their symmetry class;
                the more atoms an atom is bound to, the higher its symmetry class)
                These two atoms define the local frame for atom a
             b. This information is stored in the localframe1 and localframe2 arrays
     3. If atom a is bound to two atoms of the same symm class (that aren't Hydrogens),
        use these two atoms to define the frame
-    4. Find the atoms that are only bound to one atom and define their local frame 
-       based on the local frame of the one atom they are bound to. 
-    5. Zero out the x-component of the local frame if there is more than one choice for the 
+    4. Find the atoms that are only bound to one atom and define their local frame
+       based on the local frame of the one atom they are bound to.
+    5. Zero out the x-component of the local frame if there is more than one choice for the
        x-component
        Note: If the atom is only bound to one atom, then the array lfzerox is altered
        If the atom is bound to more than one atom, then the array poltype.localframe2 is altered
@@ -188,33 +188,33 @@ def gen_peditinfile(poltype,mol):
             uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom=list(set([poltype.idxtosymclass[b.GetIdx()] for b in neighbsofneighbwithoutatom]))
 
             sorteduniquetypeneighbsnorepeatofneighbsofneighbwithoutatom=FindUniqueNonRepeatingNeighbors(poltype,neighbsofneighbwithoutatom)
-        if val==1 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(atomneighbs[0])])==True and atomneighbs[0].GetValence()==4: # then this is like H in Methane, we want Z-only
+        if val==1 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(atomneighbs[0])]) and atomneighbs[0].GetValence()==4: # then this is like H in Methane, we want Z-only
             poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
             poltype.localframe2[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
             atomtypetospecialtrace[atomidx]=True
             atomindextoremovedipquadcross[atomidx]=True
-        elif CheckIfAllAtomsSameClass(poltype,atomneighbs)==True and AtLeastOneHeavyNeighb(poltype,atom)==False and val==4: # then this is like carbon in Methane, we want Z-only
+        elif CheckIfAllAtomsSameClass(poltype,atomneighbs) and not AtLeastOneHeavyNeighb(poltype,atom) and val==4: # then this is like carbon in Methane, we want Z-only
             idxlist=GrabIndexesFromUniqueTypeNumber(poltype,atomneighbs,uniqueneighbtypes[0])
             poltype.localframe1[atomidx-1]=idxlist[0]
             poltype.localframe2[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
             atomindextoremovedipquad[atomidx]=True
-        elif atom.GetAtomicNum()==7 and CheckIfAllAtomsSameClass(poltype,atomneighbs)==True and val==3: # then this is like Ammonia and we can use a trisector here which behaves like Z-only
+        elif atom.GetAtomicNum()==7 and CheckIfAllAtomsSameClass(poltype,atomneighbs) and val==3: # then this is like Ammonia and we can use a trisector here which behaves like Z-only
             idxtotrisecbool[atomidx]=True
             trisectidxs=[atm.GetIdx() for atm in atomneighbs]
             idxtotrisectidxs[atomidx]=trisectidxs
             lfzerox[atomidx - 1]=True # need to zero out the x components just like for z-only case
-        elif val==1 and atomneighbs[0].GetValence()==3 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(atomneighbs[0])])==True: # then this is like the H on Ammonia and we can use z-then bisector
+        elif val==1 and atomneighbs[0].GetValence()==3 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(atomneighbs[0])]): # then this is like the H on Ammonia and we can use z-then bisector
             poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
             idxtobisecthenzbool[atomidx]=True
             bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
             idxtobisectidxs[atomidx]=bisectidxs
-        elif (val==2 and CheckIfAllAtomsSameClass(poltype,atomneighbs)==True) or (val==4 and len(uniqueneighbtypes)==2) and len(sorteduniquetypeneighbsnorepeat)==0:  # then this is like middle propane carbon or oxygen in water
+        elif (val==2 and CheckIfAllAtomsSameClass(poltype,atomneighbs)) or (val==4 and len(uniqueneighbtypes)==2) and len(sorteduniquetypeneighbsnorepeat)==0:  # then this is like middle propane carbon or oxygen in water
             idxlist=GrabIndexesFromUniqueTypeNumber(poltype,atomneighbs,uniqueneighbtypes[0])
             poltype.localframe1[atomidx-1]=-1*idxlist[0]
             poltype.localframe2[atomidx-1]=-1*idxlist[1]
-        elif len(uniqueneighbtypes)==2 and CheckIfNeighbHasSameType(poltype,atom,atomneighbs)==True: # this handles, ethane,ethene...., z-only
+        elif len(uniqueneighbtypes)==2 and CheckIfNeighbHasSameType(poltype,atom,atomneighbs): # this handles, ethane,ethene...., z-only
             poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
             poltype.localframe2[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
@@ -222,11 +222,11 @@ def gen_peditinfile(poltype,mol):
             poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
             poltype.localframe2[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
-        elif ((val==1 and (highestsymneighbnorepeatval==3)) or ((val==3) and highestsymneighbnorepeatval==1)) and numhyds<=1 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=2: 
+        elif ((val==1 and (highestsymneighbnorepeatval==3)) or ((val==3) and highestsymneighbnorepeatval==1)) and numhyds<=1 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=2:
             poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
             poltype.localframe2[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
-        elif (((val==3) and (highestsymneighbnorepeatval==4))) and numhyds<=2 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=3: 
+        elif (((val==3) and (highestsymneighbnorepeatval==4))) and numhyds<=2 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=3:
             poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
             poltype.localframe2[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
@@ -237,7 +237,7 @@ def gen_peditinfile(poltype,mol):
             bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
             idxtobisectidxs[atomidx]=bisectidxs
             poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
- 
+
             # now make sure neighboring atom (lf1) also is using z-then-bisector
         else:
             if len(sorteduniquetypeneighbsnorepeat)==1:
@@ -247,7 +247,7 @@ def gen_peditinfile(poltype,mol):
                 newneighbs=RemoveFromList(poltype,neighboffirstneighbs,atom)
                 newsorteduniquetypeneighbsnorepeat=FindUniqueNonRepeatingNeighbors(poltype,newneighbs)
                 sorteduniquetypeneighbsnorepeat+=newsorteduniquetypeneighbsnorepeat
-            poltype.localframe1[atomidx - 1]=sorteduniquetypeneighbsnorepeat[0] 
+            poltype.localframe1[atomidx - 1]=sorteduniquetypeneighbsnorepeat[0]
             poltype.localframe2[atomidx - 1]=sorteduniquetypeneighbsnorepeat[1]
 
     # write out the local frames
@@ -255,17 +255,17 @@ def gen_peditinfile(poltype,mol):
     if not os.path.isfile(poltype.peditinfile):
         f = open (poltype.peditinfile, 'w')
         for a in iteratom:
-            if idxtobisecthenzbool[a.GetIdx()]==False and idxtotrisecbool[a.GetIdx()]==False:
+            if not idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
                 f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " " + str(poltype.localframe2[a.GetIdx() - 1]) + "\n")
-            elif idxtobisecthenzbool[a.GetIdx()]==True and idxtotrisecbool[a.GetIdx()]==False:
+            elif idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
                 bisectidxs=idxtobisectidxs[a.GetIdx()]
                 f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " -" + str(bisectidxs[0])+ " -" + str(bisectidxs[1]) + "\n")
             else:
                 trisecidxs=idxtotrisectidxs[a.GetIdx()]
                 f.write(str(a.GetIdx()) + " -" + str(trisecidxs[0])+ " -" + str(trisecidxs[1]) + " -" + str(trisecidxs[2])+ "\n")
-    
 
-    
+
+
         f.write("\n")
         f.write('A'+'\n')
 
@@ -292,10 +292,10 @@ def gen_peditinfile(poltype,mol):
                     if (b.GetAtomicNum() == 6 and b.IsAromatic()):
                         lines.append(str(a.GetIdx()) + " " + str(0.696) + "\n")
                         writesection=True
-        if writesection==True:
+        if writesection:
             for line in lines:
                 f.write(line)
-            
+
         # Carboxylate ion O-
         sp = openbabel.OBSmartsPattern()
         openbabel.OBSmartsPattern.Init(sp,'[OD1]~C~[OD1]')
@@ -303,7 +303,7 @@ def gen_peditinfile(poltype,mol):
         for ia in sp.GetMapList():
             f.write(str(ia[0]) + " " + str(0.921) + "\n")
 
-           
+
 
         f.write("\n")
         f.flush()
@@ -345,7 +345,7 @@ def gen_peditinfile(poltype,mol):
 def post_proc_localframes(poltype,keyfilename, lfzerox,atomindextoremovedipquad,atomindextoremovedipquadcross):
     """
     Intent: This method runs after the tinker tool Poledit has run and created an
-    initial *.key file. The local frames for each multipole are "post processed". 
+    initial *.key file. The local frames for each multipole are "post processed".
     Zeroed out x-components of the local frame are set back to their original values
     If certain multipole values were not zeroed out by poltype this method zeroes them out
     Input:
@@ -359,12 +359,12 @@ def post_proc_localframes(poltype,keyfilename, lfzerox,atomindextoremovedipquad,
     Description:
     1. Move the original *.key file to *.keyb
     2. Create new empty file *.key
-    3. Iterate through the lines of *.keyb. 
+    3. Iterate through the lines of *.keyb.
         a. If poledit wrote out the local frame with an x-component missing or as 0
         Then rewrite it with the original x-component (lf2) found in gen_peditin
-        b. If poledit did not zero out the local frame x-component for an atom but 
+        b. If poledit did not zero out the local frame x-component for an atom but
         lfzerox is true, zero out the necessary multipole components manually
-    4.  Write the edited multipole information to *.key 
+    4.  Write the edited multipole information to *.key
     """
     # mv *.key to *.keyb
     tmpfname = keyfilename + "b"
@@ -432,7 +432,7 @@ def post_proc_localframes(poltype,keyfilename, lfzerox,atomindextoremovedipquad,
                 tmpmp[0] = 0
                 tmpmp[1] = 0
                 lines[ln1+4] = '%46.5f %10.5f %10.5f\n' % tuple(tmpmp)
-            
+
             if len(tmplst) == 4:
                 linesplit=re.split(r'(\s+)', lines[ln1])
                 newtmplist=linesplit[:len(linesplit)-4]
@@ -443,7 +443,7 @@ def post_proc_localframes(poltype,keyfilename, lfzerox,atomindextoremovedipquad,
                 templine=''.join(newtmplist)
                 newlines.extend(templine)
                 newlines.extend(lines[ln1+1:ln1+5])
-            else:   
+            else:
                 newlines.extend(lines[ln1:ln1+5])
             mpolelines = 4
         # append any lines unrelated to multipoles as is
@@ -465,7 +465,7 @@ def post_process_mpoles(poltype,keyfilename, scalelist):
         scalelist: structure containing scaling information. Found in process_types
     Output: new *.key file
     Referenced By: main
-    Description: 
+    Description:
     1. Move old keyfile to tmpfname
     2. open an empty key file
     3. iterate through tmpfname scaling the multipoles if necessary
@@ -501,7 +501,7 @@ def post_process_mpoles(poltype,keyfilename, scalelist):
 def process_types(poltype,mol):
     """
     Intent: Set up scalelist array for scaling certain multipole values
-For alchol, the quadrupole on O and H should be mannually scaled by 0.6. This only applies to OH that connect to sp3 Carbon. Similarly for NH in amine (that connects to a sp3 C), scale the Q by 0.75 or 75%. See JCC 2011 32(5):967-77. 
+For alchol, the quadrupole on O and H should be mannually scaled by 0.6. This only applies to OH that connect to sp3 Carbon. Similarly for NH in amine (that connects to a sp3 C), scale the Q by 0.75 or 75%. See JCC 2011 32(5):967-77.
     """
     scalelist = {}
     multipole_scale_dict = {}
@@ -522,7 +522,7 @@ For alchol, the quadrupole on O and H should be mannually scaled by 0.6. This on
         match=sp.Match(mol)
         for ia in sp.GetUMapList():
             scalelist[poltype.idxtosymclass[ia[0]]][scval[0]] = scval[1]
-    
+
     return scalelist
 
 def scale_multipoles(poltype,symmclass, mpolelines,scalelist):
@@ -598,7 +598,7 @@ def prepend_keyfile(poltype,keyfilename,optmol,dipole=False):
     tmpfh = open(tmpfname, "w")
     keyfh = open(keyfilename, "r")
     tmpfh.write("parameters " + poltype.paramhead + "\n")
-    
+
     tmpfh.write("bondterm none\n")
     tmpfh.write("angleterm none\n")
     tmpfh.write("torsionterm none\n")
@@ -609,10 +609,10 @@ def prepend_keyfile(poltype,keyfilename,optmol,dipole=False):
         logname=poltype.logespfname
     else:
         logname=poltype.logespfname.replace('.log','_psi4.log')
-    if dipole==True:
+    if dipole:
         qmdipole=esp.GrabQMDipoles(poltype,optmol,logname)
         tmpfh.write('TARGET-DIPOLE'+' '+str(qmdipole[0])+' '+str(qmdipole[1])+' '+str(qmdipole[2])+'\n')
-    
+
     for line in keyfh:
         tmpfh.write(line)
     shutil.move(tmpfname, keyfilename)
@@ -626,7 +626,7 @@ def rotate_list(poltype,l1):
 def gen_gdmain(poltype,gdmainfname,molecprefix,fname,dmamethod):
     """
     Intent: Generate GDMA input file for the molecule
-    Input: 
+    Input:
         gdmainfname: file name for the gdma input file
         molecprefix: name of the molecule
         fname: file name for the *-dma.fchk file
@@ -639,19 +639,19 @@ def gen_gdmain(poltype,gdmainfname,molecprefix,fname,dmamethod):
     fnamesym = "dma.fchk"
     try:
         os.symlink(fname,fnamesym)
-    except Exception as e: 
+    except Exception as e:
         print(e)
-        
-        
+
+
 
     #punfname = os.path.splitext(fname)[0] + ".punch"
     punfname = "dma.punch"
 
     try:
         tmpfh = open(gdmainfname, "w")
-    except(IOError, (errno, strerror)):
-        print("I/O error({0}): {1}".format(errno, strerror))
-        sys.exit(errno)
+    except IOError as e:
+        print("I/O error({0}): {1}".format(e.errno, e.strerror))
+        sys.exit(e.errno)
 
     tmpfh.write("Title " + molecprefix + " gdmain\n")
     tmpfh.write("\n")
@@ -659,7 +659,7 @@ def gen_gdmain(poltype,gdmainfname,molecprefix,fname,dmamethod):
         densitystring='MP2'
     else:
         densitystring='SCF'
-    if poltype.use_gaus==False or poltype.use_gausoptonly==True:
+    if not poltype.use_gaus or poltype.use_gausoptonly:
         if poltype.dmamethod=='MP2':
             densitystring='CC' # for some reason fchk outputs CC for MP2 density
         tmpfh.write("File " + fnamesym  + " density %s\n"%(densitystring))
@@ -671,10 +671,10 @@ def gen_gdmain(poltype,gdmainfname,molecprefix,fname,dmamethod):
     tmpfh.write("Switch 0\n") # v1.3, comment out for v2.2
     tmpfh.write("Limit 2\n")
     tmpfh.write("Punch " + punfname + "\n")
-    tmpfh.write("Radius H 0.60\n") 
-    tmpfh.write("Radius S 0.85\n") 
-    tmpfh.write("Radius P 0.95\n") 
-    tmpfh.write("Radius Cl 1.10\n") 
+    tmpfh.write("Radius H 0.60\n")
+    tmpfh.write("Radius S 0.85\n")
+    tmpfh.write("Radius P 0.95\n")
+    tmpfh.write("Radius Cl 1.10\n")
     tmpfh.write("\n")
     tmpfh.write("Start\n")
     tmpfh.write("\n")
@@ -687,9 +687,9 @@ def run_gdma(poltype):
     The GDMA program carries out distributed multipole analysis of the wavefunctions
     calculated by Gaussian (using the *-dma.fchk file)
     Input:
-    Output: *.gdmaout is created; this is used as input by poledit, a tinker program 
+    Output: *.gdmaout is created; this is used as input by poledit, a tinker program
     Referenced By: main
-    Description: 
+    Description:
     1. Generates the gdma input file by calling 'gen_gdmain'
     2. Runs the following command: gdma < *.gdmain > *.gdmaout
     """
@@ -722,7 +722,7 @@ def gen_avgmpole_groups_file(poltype):
     Also, symm class labels are altered from 1, 2, 3, ... to 401, 402, ...
     (or some other labeling system dependent on 'prmstartidx')
     Input:
-    Output: 
+    Output:
         *-groups.txt: map from symm group to atom idx
     Referenced By: main
     Description: -
