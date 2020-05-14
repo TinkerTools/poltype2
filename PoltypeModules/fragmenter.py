@@ -842,6 +842,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
                 Draw2DMoleculeWithWBO(poltype,fragWBOmatrix,basename+'_Absolute',m,bondindexlist=highlightbonds,smirks=fragsmirks)
                 Draw2DMoleculeWithWBO(poltype,relativematrix,basename+'_Relative',m,bondindexlist=highlightbonds,smirks=fragsmirks)
         os.chdir(curdir)
+    sys.exit()
     return rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentfragmentsarray,equivalentrotbndindexarrays
 
 
@@ -1220,7 +1221,7 @@ def Draw2DMoleculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragf
     for i in range(len(fragments)):
         frag=fragments[i]
         rdDepictor.Compute2DCoords(frag)
-
+    newfragments=[]
     if len(fragments)>1:
         firstmol=fragments[0]
         editmol=Chem.rdchem.EditableMol(firstmol)
@@ -1230,14 +1231,15 @@ def Draw2DMoleculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragf
         smarts=rdmolfiles.MolToSmarts(newermol)
         smarts=smarts.replace('@','').replace('H3','').replace('H2','').replace('H','')
         patt = Chem.MolFromSmarts(smarts)
-        
+        newfragments.append(firstmol)
         for i in range(1,len(fragments)):
             frag=fragments[i]
             frag=mol_with_atom_index_removed(poltype,frag)
             overlap = frag.GetSubstructMatch(patt) # indexes of fragpatt corresponding to patt SMARTS but need the actual indexes of frag 
             atomMap = [(paid,raid) for raid,paid in enumerate(overlap)]
             AllChem.AlignMol(frag,firstmol,atomMap=atomMap)
-    fragmentchunks=ChunksList(poltype,Chunks(poltype,fragments,molsPerImage))
+            newfragments.append(frag)
+    fragmentchunks=ChunksList(poltype,Chunks(poltype,newfragments,molsPerImage))
     legendschunks=ChunksList(poltype,Chunks(poltype,legendslist,molsPerImage))
     bondlistoflistschunks=ChunksList(poltype,Chunks(poltype,bondlistoflists,molsPerImage))
     for i in range(len(fragmentchunks)):
@@ -1258,15 +1260,7 @@ def Draw2DMoleculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragf
             bondlist=bondlistoflistssublist[j]
             legend=legendssublist[j]
             drawer=rdMolDraw2D.MolDraw2DSVG(imagesize,imagesize)
-            rdDepictor.Compute2DCoords(frag)
             drawer.DrawMolecule(frag,highlightAtoms=[],highlightBonds=bondlist)
-            drawer.FinishDrawing()
-            newsvg = drawer.GetDrawingText().replace('svg:','')
-            newfig = sg.fromstring(newsvg)
-            basename=legend
-            newfig.save(basename+'.svg')
-            newsvg_code=newfig.to_str()
-            svg2png(bytestring=newsvg_code,write_to=basename+'.png')
 
             atomidxtodrawcoords={}
             for bond in frag.GetBonds():
