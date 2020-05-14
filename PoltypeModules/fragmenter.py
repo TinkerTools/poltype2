@@ -34,34 +34,34 @@ from rdkit.Chem import rdDistGeom
 from scipy.optimize import fsolve
 import math
 
-def GrabMullikenChargesFromParent(poltype,lastidx):
-    logname=poltype.logespfname
-    temp=open(poltype.parentdir+r'/'+logname,'r')
-    results=temp.readlines()
-    temp.close()
-    foundmulliken=False
-    idxtochg={}
-    for line in results:
-        linesplit=line.split()
 
-        if poltype.use_gaus==True:
-            if 'Mulliken atomic charges:' in line:
-                foundmulliken=True
-            if foundmulliken==True and len(linesplit)==3 and 'Mulliken' not in line:
-                idx=int(linesplit[0])
-                chg=float(linesplit[-1])
-                idxtochg[idx]=chg
-
+def AssignTotalCharge(poltype,molecule,babelmolecule):
+    atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
+    totchg=Chem.rdmolops.GetFormalCharge(molecule)
+    totchg=0
+    for atom in molecule.GetAtoms():
+        atomidx=atom.GetIdx()
+        atomnum=atom.GetAtomicNum()
+        val=atom.GetExplicitValence()
+        valtochg=atomicnumtoformalchg[atomnum]
+        if val not in valtochg.keys(): # then assume chg=0
+            chg=0
         else:
-            if 'Mulliken Charges: (a.u.)' in line:
-                foundmulliken=True
-            if foundmulliken==True and len(linesplit)==6 and 'Mulliken' not in line:
-                idx=int(linesplit[0])
-                chg=float(linesplit[-1])
-                idxtochg[idx]=chg
-        if lastidx in idxtochg.keys():
-            break
-    return idxtochg
+            chg=valtochg[val]
+        
+        polneighb=False
+        if atomnum==6:
+            for natom in atom.GetNeighbors():
+                natomicnum=natom.GetAtomicNum()
+                if natomicnum==7 or natomicnum==8 or natomicnum==16:
+                    polneighb=True
+            if polneighb==True and val==3:
+                chg=1
+        totchg+=chg
+        atom.SetFormalCharge(chg)
+        
+    return molecule
+
 
 def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfilepath):
     valenceprmlist=[]
@@ -597,43 +597,7 @@ def GenerateFrag(poltype,molindexlist,mol):
         rdkitoldindex=oldindex-1
         rdkitnewindex=newindex-1
         rdkitoldindextonewindex[rdkitoldindex]=rdkitnewindex
-    rdkitnewindextooldindex={v: k for k, v in rdkitoldindextonewindex.items()}
-    babelidxtochg=GrabMullikenChargesFromParent(poltype,poltype.rdkitmol.GetNumAtoms())
-    totchg=0
-    atomswithcutbondsrdkit=[i-1 for i in atomswithcutbonds]
-    idxstoaddchg=[]
-    print('atomswithcutbondsrdkit',atomswithcutbondsrdkit)
-    for idx in atomswithcutbondsrdkit:
-        oldindex=rdkitnewindextooldindex[idx]
-        atom=poltype.rdkitmol.GetAtomWithIdx(oldindex)
-
-        for natom in atom.GetNeighbors():
-            natomidx=natom.GetIdx()
-            if natomidx not in rdkitoldindextonewindex.keys() and natomidx not in idxstoaddchg: # then this is atom cut that will be replaced by hydrogen
-                idxstoaddchg.append(natomidx)
-    rdkithydindexestokeep=[i-1 for i in hydindexestokeep]
-    for atom in newmol.GetAtoms():
-        atomidx=atom.GetIdx()
-        if atomidx not in rdkithydindexestokeep:
-            oldindex=rdkitnewindextooldindex[atomidx]
-            babelindex=oldindex+1
-            chg=babelidxtochg[babelindex]
-            totchg+=chg
-    print('chg before adding extra',totchg)
-    print('idxstoaddchg',idxstoaddchg)
-    for idx in idxstoaddchg:
-        babelidx=idx+1
-        print('babelidx',babelidx)
-        chg=babelidxtochg[babelidx]
-        totchg+=chg
-
-    print('totchg after adding extra',totchg)
-    totchg=int(round(totchg))
-    if totchg!=0: # just put on first atom
-        print('total charge being added',totchg)
-        atom=newmol.GetAtomWithIdx(0)
-        atom.SetFormalCharge(totchg)
-    print('***************************************************') 
+    newmol=AssignTotalCharge(poltype,newmol,nem)
     return newmol,rdkitoldindextonewindex
 
 def ConvertRdkitMolToOBMol(poltype,mol):
@@ -747,11 +711,9 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         if not os.path.isdir(fragfoldername):
             os.mkdir(fragfoldername)
         os.chdir(fragfoldername)
-        print('fragfoldername',fragfoldername)
         fragmol,parentindextofragindex=GenerateFrag(poltype,indexes,mol)
         growfragments=[]
         filename=fragfoldername+'.mol'
-        print('filename',filename)
         WriteRdkitMolToMolFile(poltype,fragmol,filename)
         os.chdir('..')
         fragmoltoWBOmatrices={}
@@ -880,7 +842,6 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
                 Draw2DMoleculeWithWBO(poltype,fragWBOmatrix,basename+'_Absolute',m,bondindexlist=highlightbonds,smirks=fragsmirks)
                 Draw2DMoleculeWithWBO(poltype,relativematrix,basename+'_Relative',m,bondindexlist=highlightbonds,smirks=fragsmirks)
         os.chdir(curdir)
-    sys.exit()
     return rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentfragmentsarray,equivalentrotbndindexarrays
 
 
@@ -993,7 +954,6 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
             indexlist=possiblefragatmidxs[fragmolidx]
 
             basename=fragfoldername+'_GrowFragment_'+str(fragmolidx)
-            print('basename',basename)
             fragmol,parentindextofragindex=GenerateFrag(poltype,indexlist,mol)
             fragments.append(fragmol) # include the case where all H and no H converted to CH3
             if fragmol not in fragmentsforcomb:
