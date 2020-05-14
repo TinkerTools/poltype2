@@ -1,6 +1,11 @@
-* [ ] Add math to markdown READMEs
+* [ ] Fix bug where WithIndex and WithoutIndex.png have no index. Make sure all molecules in image either have      indexes or dont. 
+* [ ] Highlight the atoms that are different from molecule in previoius picture in images with many molecule.
+* [ ] Add math to markdown READMEs (WBO equation)
+* [ ] Add flow diagram for how normal poltype functions. Can add README_POLTYPE.MD
+* [ ] Add arrows to FragmentGrowth images to make it more like flow diagram.
 * [ ] Add TORSION_README.MD to explain torsion fitting plots and how to interpret them.
 * [ ] Remove any file operations done in bash and replace with python language (users different OS)
+* [ ] Fix bugs in modifedresidue.py, also fix bug giving excess charge (small) when starting with neutral           input molecule.
 * [ ] Allow charged fragment molecules for fragmenter when formal charge on parent detected
 * [ ] Add 6 fold torsion
 * [ ] add weighted torsion for fitting function
