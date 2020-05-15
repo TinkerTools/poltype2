@@ -80,3 +80,6 @@ export PATH=/home/liuchw/Softwares/tinkers/Tinker-latest/source/:$PATH
 ```
 git clone -b poltype2 git@github.com:pren/poltype.git poltype-poltype2
 ```
+
+* If you dont have a GitHub account, make one
+* Click the watch button on https://github.com/pren/poltype for important updates

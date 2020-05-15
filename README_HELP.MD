@@ -44,8 +44,7 @@ python ~/poltypepackage/PoltypeModules/test_poltype.py --method=test_Fragmenter 
 ```
 
 * Currently has some bugs do not use
-* Fragmenter library also has bugs for adding hydrogens, dont use
-
+* modifiedresidue library also has some bugs currently
 In order to test the fragmenter, run POLTYPE with fragmenting option turned off(dontfrag) to paramterize the torsion first, then specify the examplepath to that POLTYPE job. Add --dontremovetestcase , if there is an issue with the job and you want to restart without starting from scratch. Use --method flag to specify which POLTYPE test to run from the test_poltype module. 
 
 
@@ -209,13 +208,15 @@ Minimal examples are any example folder in Examples/, that contain Symmetry as t
   A)No, POLTYPE will look for output files from QM (see README.MANIFEST) to see if it needs to perform a job or continue. So you can delete the outputlog file, change your input options and resubmit POLTYPE job.
 
 ### Tips
-If using PSI4 for optimization with high number of optmaxcycles (default is 5 very low), it will be much slower than Gaussian optimization. Additionally even if using lower number of optmaxcycles, if your molecule is chated, by default we use PCM and this will significantly slow down PSI4 optimization. Add keyword "use_gaus" in poltype.ini file.
+* Be careful when changing optimization methods and coordinates without deleting previous XYZ files, DMA and ESP, fchk, cube files, this can cause eletrostaic fitting errors where your grid does not correspond to the potential file from the new coordaintes. 
+* If using PSI4 for optimization with high number of optmaxcycles (default is 5 very low), it will be much slower than Gaussian optimization. Additionally even if using lower number of optmaxcycles, if your molecule is chated, by default we use PCM and this will significantly slow down PSI4 optimization. Add keyword "use_gaus" in poltype.ini file.
 
 ### Common Errors
 
 * If QM and MM molecular dipole moments are too different, a ValueError will be raised.
 
 * If QM and MM optimized root mean square difference (RMSD) is too high, a ValueError will be raised.
+   * If -opt.log coordinates are not the same as .XYZ file coordinates then this is can cause this error.
 
 * If QM and MM root mean square potential difference (RMSPD) is too high, a ValueError will be raised.
 
