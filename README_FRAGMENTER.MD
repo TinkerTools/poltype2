@@ -10,6 +10,8 @@
 
 * If two missing torsions from the parent have the same converged fragment, then only one is chosen to submit the poltype job and both rotatable bonds are spun respectively for that poltype job.
 
+* Bond topology need to be correct for formal charge assignment on fragments in order to get the total charge of the fragment correctly. 
+
 ![Example Molecule Image](Images/ml188.png)
 
 ![Fragment Growth Example Image](Images/FragmentGrowthWithIndex_Bnd_11-8_Index_0.png)

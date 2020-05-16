@@ -194,6 +194,9 @@ class PolarizableTyper():
                             self.rotalltors=self.GrabBoolValue(a)
                     elif 'poltypepath' in newline:
                         self.poltypepath=a
+                    elif 'WBOtol' in newline:
+                        self.WBOtol=float(a)
+
                     elif 'scfmaxiter' in newline:
                         self.scfmaxiter=a
                     elif 'printoutput' in newline:

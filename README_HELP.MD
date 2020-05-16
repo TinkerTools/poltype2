@@ -60,6 +60,9 @@ M  CHG  1   2   1
 
 * For 0 total charge, you do not need to specify CHG line
 
+* Bond topology need to be correct for formal charge assignment on fragments (fragmenter library) in order to get the total charge of the fragment correctly.
+
+* Watch out for any radicals in your input file that can cause multiplicty to be greater than 1.
 
 #### Most Common Inputs
 ```

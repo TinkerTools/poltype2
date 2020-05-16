@@ -1,4 +1,6 @@
 * [ ] Fix unittester.
+* [ ] Allow option to allow users to have correct formal charges assigned in input file and turn off automatic formal charge assignment in fragmenter lib.
+* [ ] If freq option is turned on, need to make sure optimization doesnt stop after default 5 optmaxcycles (need opt to converge)
 * [ ] Use unittester on fragmenter with different WBO tolerances to determine what tolerance is acceptable for a given tolerance in RMSD between parent QM-MM and fragment QM-MM. 
 * [ ] People seem to change optmethod a lot without deleting XYZ files or .cube, fchk files causing RMSPD error. Just auto delete XYZ files (quick to remake). 
 * [ ] Give input option to add hydrogen.
@@ -28,7 +30,7 @@
 * [ ] Allow 2D dihedral scans to fit a tor-tor coupling term too for torsions that are adjacent to each other. Numerical spline should be used for functional form of tor-tor.
 * [ ] Allow user to specify if they want cosine terms for torsion or if they want numerical QM-MM spline (partitioned and then we put error on heaviest torsion)
 * [ ] Add support for AMOEBA+ parameters
-* [ ] Add automated vdw QM surface scan from water probes.
+* [ ] Add automated vdw QM surface scan from water probes. Add this BEFORE torsion fitting, so that you always do torsion last. If user decides to do vdw fitting after key_5 already generated need to remove the key5 then and refit torsion.
 * [ ] Add comments to every function in poltype with the fields below
     Intent: 
     Input:
