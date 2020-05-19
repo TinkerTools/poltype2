@@ -482,13 +482,17 @@ def get_torlist(poltype,mol):
         
         t2val=t2.GetValence()
         t3val=t3.GetValence()
+        ringbond=False
+        if t2.IsInRing()==True and t3.IsInRing()==True:
+            ringbond=True
+        if ringbond==True:
+            continue
         if ((bond.IsRotor()) or [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist or (poltype.rotalltors and t2val>=2 and t3val>=2)):
             t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
             # is the torsion in toromitlist
             if(torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]]) in missed_torsions) and len(poltype.onlyrotbndslist)==0:
                 skiptorsion = False
             if [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist:
-                print('skipping')    
                 skiptorsion = False # override previous conditions if in list
             if poltype.rotalltors==True:
                 skiptorsion=False

@@ -211,6 +211,7 @@ Minimal examples are any example folder in Examples/, that contain Symmetry as t
   A)No, POLTYPE will look for output files from QM (see README.MANIFEST) to see if it needs to perform a job or continue. So you can delete the outputlog file, change your input options and resubmit POLTYPE job.
 
 ### Tips
+* For submitting on node clusers, make sure maxdisk and maxmem are set to the lowest amount available out of all of nodes on cluster otherwise risk diskquota / memory error.
 * Be careful when changing optimization methods and coordinates without deleting previous XYZ files, DMA and ESP, fchk, cube files, this can cause eletrostaic fitting errors where your grid does not correspond to the potential file from the new coordaintes. 
 * If using PSI4 for optimization with high number of optmaxcycles (default is 5 very low), it will be much slower than Gaussian optimization. Additionally even if using lower number of optmaxcycles, if your molecule is chated, by default we use PCM and this will significantly slow down PSI4 optimization. Add keyword "use_gaus" in poltype.ini file.
 
@@ -230,6 +231,8 @@ Minimal examples are any example folder in Examples/, that contain Symmetry as t
 * If using modifiedresidues library and a type number for the given atom index and PDB atom label are not found in the library, a ValueError will be raised. 
 
 * If POLTYPE crashes, you do not need to delete any quantum data or tinker data, POLTYPE will recognize that the file exists and attempt to continue with it.
+
+* Error: segmentation violation, this usually means an issue related to memory (not enough RAM or disk). However since we terminate optimization after few cycles (default 5), Gaussian will throw this error in poltype.log. Poltype will ignore this if it also sees 5 opt cycles completed sucessfully. 
 
 
 

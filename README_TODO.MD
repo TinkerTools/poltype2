@@ -24,6 +24,7 @@
 * [ ] Allow charged fragment molecules for fragmenter when formal charge on parent detected
 * [ ] Add 6 fold torsion
 * [ ] add weighted torsion for fitting function
+* [ ] add z-x-y multipole frame for chiral atoms
 * [ ] Test fragmenter on drugbank database (dont paramterize until the rest of POLTYPE torsion is complete)
 * [ ] Add multiple conformers for multipole fitting
 * [ ] Allow ring torsions to be puckered and obtain QM data for torsion paramterization
