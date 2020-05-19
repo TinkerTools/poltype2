@@ -795,38 +795,39 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
     equivalentrotbndindexarrays=FindEquivalentRotatableBonds(poltype,equivalentfragmentsarray,rotbndindextofragment)
     # now we need to redraw the 2Dimages for any fragments that are equivalent (get multiple torsions from different rotatable bonds around same fragment)
     curdir=os.getcwd()
-    equivalentrotbndindexes=GrabEquivalentRotBndIndexes(poltype,equivalentrotbndindexarrays,rotbndindex)
-    if len(equivalentrotbndindexes)!=0:
-        for bndindexes in equivalentrotbndindexes:
-            highlightbonds=[]
-            for bndindex in bndindexes:
-                parentindextofragindex=rotbndindextoparentindextofragindex[bndindex]
-                indexes=bndindex.split('_')
-                indexes=[int(i) for i in indexes]
-                fragrotbndidx=[parentindextofragindex[indexes[0]-1],parentindextofragindex[indexes[1]-1]]
-                if fragrotbndidx not in highlightbonds:
-                    highlightbonds.append(fragrotbndidx)
-            for bndindex in bndindexes:
-                fragmol=rotbndindextofragment[bndindex]
-                fragmentfilepath=rotbndindextofragmentfilepath[bndindex]
-                head,tail=os.path.split(fragmentfilepath)
-                WBOdifference=rotbndindextoWBOdifference[bndindex]
-                parentindextofragindex=rotbndindextoparentindextofragindex[bndindex]
-                fragWBOmatrix=rotbndindextofragWBOmatrix[bndindex]
-                indexes=bndindex.split('_')
-                indexes=[int(i) for i in indexes]
-                fragfoldername=rotbndindextofragfoldername[bndindex]
-                os.chdir(head)
-                basename=fragfoldername+'_WBO_'+str(round(WBOdifference,3))
-                fragrotbndidx=[parentindextofragindex[indexes[0]-1],parentindextofragindex[indexes[1]-1]]
-                reducedparentWBOmatrix=ReduceParentMatrix(poltype,parentindextofragindex,fragWBOmatrix,parentWBOmatrix)
-                relativematrix=numpy.subtract(reducedparentWBOmatrix,fragWBOmatrix)
-                m=mol_with_atom_index(poltype,fragmol)
-                fragsmirks=rdmolfiles.MolToSmarts(m)
-                structfnamemol=fragfoldername+'.mol'
-                Draw2DMoleculeWithWBO(poltype,fragWBOmatrix,basename+'_Absolute',m,bondindexlist=highlightbonds,smirks=fragsmirks)
-                Draw2DMoleculeWithWBO(poltype,relativematrix,basename+'_Relative',m,bondindexlist=highlightbonds,smirks=fragsmirks)
-        os.chdir(curdir)
+    for rotbndindex in rotbndindextofragment.keys():
+        equivalentrotbndindexes=GrabEquivalentRotBndIndexes(poltype,equivalentrotbndindexarrays,rotbndindex)
+        if len(equivalentrotbndindexes)!=0:
+            for bndindexes in equivalentrotbndindexes:
+                highlightbonds=[]
+                for bndindex in bndindexes:
+                    parentindextofragindex=rotbndindextoparentindextofragindex[bndindex]
+                    indexes=bndindex.split('_')
+                    indexes=[int(i) for i in indexes]
+                    fragrotbndidx=[parentindextofragindex[indexes[0]-1],parentindextofragindex[indexes[1]-1]]
+                    if fragrotbndidx not in highlightbonds:
+                        highlightbonds.append(fragrotbndidx)
+                for bndindex in bndindexes:
+                    fragmol=rotbndindextofragment[bndindex]
+                    fragmentfilepath=rotbndindextofragmentfilepath[bndindex]
+                    head,tail=os.path.split(fragmentfilepath)
+                    WBOdifference=rotbndindextoWBOdifference[bndindex]
+                    parentindextofragindex=rotbndindextoparentindextofragindex[bndindex]
+                    fragWBOmatrix=rotbndindextofragWBOmatrix[bndindex]
+                    indexes=bndindex.split('_')
+                    indexes=[int(i) for i in indexes]
+                    fragfoldername=rotbndindextofragfoldername[bndindex]
+                    os.chdir(head)
+                    basename=fragfoldername+'_WBO_'+str(round(WBOdifference,3))
+                    fragrotbndidx=[parentindextofragindex[indexes[0]-1],parentindextofragindex[indexes[1]-1]]
+                    reducedparentWBOmatrix=ReduceParentMatrix(poltype,parentindextofragindex,fragWBOmatrix,parentWBOmatrix)
+                    relativematrix=numpy.subtract(reducedparentWBOmatrix,fragWBOmatrix)
+                    m=mol_with_atom_index(poltype,fragmol)
+                    fragsmirks=rdmolfiles.MolToSmarts(m)
+                    structfnamemol=fragfoldername+'.mol'
+                    Draw2DMoleculeWithWBO(poltype,fragWBOmatrix,basename+'_Absolute',m,bondindexlist=highlightbonds,smirks=fragsmirks)
+                    Draw2DMoleculeWithWBO(poltype,relativematrix,basename+'_Relative',m,bondindexlist=highlightbonds,smirks=fragsmirks)
+            os.chdir(curdir)
     return rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentfragmentsarray,equivalentrotbndindexarrays
 
 

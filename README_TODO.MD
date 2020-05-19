@@ -4,6 +4,7 @@
 * [ ] Use unittester on fragmenter with different WBO tolerances to determine what tolerance is acceptable for a given tolerance in RMSD between parent QM-MM and fragment QM-MM. 
 * [ ] People seem to change optmethod a lot without deleting XYZ files or .cube, fchk files causing RMSPD error. Just auto delete XYZ files (quick to remake). 
 * [ ] Give input option to add hydrogen.
+* [ ] Make sure gaussian deletes scratch files when job is finished (Psi4 does this).
 * [ ] Fix bug where WithIndex and WithoutIndex.png have no index. Make sure all molecules in image either have indexes or dont. 
 * [ ] Highlight the atoms that are different from molecule in previoius picture in images with many molecule.
 * [ ] Add math to markdown READMEs (WBO equation)
@@ -14,6 +15,7 @@
 * [ ] Remove any file operations done in bash and replace with python language (users different OS)
 * [ ] Add 10% of QM-MM for torsion max_amp restrained fitting
 * [ ] Remove redundant torsion parameter SMART string parameters in current database (valence).
+* [ ] Raise ValueError if final key file has any torsion zeroed out (possible that database had no matches)
 * [ ] For any hydrogen torsion assign prior SMART string and parameters to reduce the amount of parameters needed to fit for rotatable bonds
 * [ ] Add map from Tinker Type Number to SMART string chemical enviornment
 * [ ] Using the above map, autogenerate torsion, vdw ... parameters from .prm file inside poltype. Keep user added parameters in seperate dictionaries. 
