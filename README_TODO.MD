@@ -1,10 +1,12 @@
 * [ ] Fix unittester.
+* [ ] Add documentation about polarization groups.
 * [ ] Allow option to allow users to have correct formal charges assigned in input file and turn off automatic formal charge assignment in fragmenter lib.
 * [ ] If freq option is turned on, need to make sure optimization doesnt stop after default 5 optmaxcycles (need opt to converge)
 * [ ] Use unittester on fragmenter with different WBO tolerances to determine what tolerance is acceptable for a given tolerance in RMSD between parent QM-MM and fragment QM-MM. 
 * [ ] People seem to change optmethod a lot without deleting XYZ files or .cube, fchk files causing RMSPD error. Just auto delete XYZ files (quick to remake). 
 * [ ] Give input option to add hydrogen.
 * [ ] Make sure gaussian deletes scratch files when job is finished (Psi4 does this).
+* [ ] Make sure of key_3 already exist, dont redo fitting of esp.
 * [ ] Fix bug where WithIndex and WithoutIndex.png have no index. Make sure all molecules in image either have indexes or dont. 
 * [ ] Highlight the atoms that are different from molecule in previoius picture in images with many molecule.
 * [ ] Add math to markdown READMEs (WBO equation)

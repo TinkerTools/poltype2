@@ -7,6 +7,7 @@
 ### POLTYPE Files
 
 * .sdf               Input structure file.
+*_OBOPT.pdb          MMFF94 optimization from openbabel.
 * -opt.com           Gaussian input file for geometry optimization.
 * -opt_psi.dat       Psi4 input file for geometry optimization.
 * -opt.log           Gaussian output file for geometry optimization.

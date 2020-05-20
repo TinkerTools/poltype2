@@ -337,7 +337,8 @@ def WriteDictionaryToFile(poltype,dictionary):
     newdic={}
     for key,value in dictionary.items():
         newdic[int(key)]=int(value)
-    json.dump(newdic, open("parentindextofragindex.txt",'w'))
+    with open("parentindextofragindex.txt",'w') as f: 
+        json.dump(newdic, f)
 
 
 def DeleteEquivalentFragments(poltype,equivalentfragmentstodelete):
