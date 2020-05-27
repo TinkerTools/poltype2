@@ -48,7 +48,7 @@ You can install system wide or in your own directory (e.g /home/username/minicon
 After you have conda in your PATH, run the following commands. These will be installed under "/home/username/miniconda3/"
 
 ```shell
-conda create -n p4env -c psi4/label/dev psi4 
+conda create -n p4env -c psi4/label/dev psi4 python=3.6 
 conda activate p4env
 conda install scipy 
 conda install matplotlib 

@@ -1,5 +1,7 @@
 * [ ] Fix unittester.
+* [ ] Before converting fragment to SMARTS/SMIRKS for database, remove any added hydrogens from cut bonds
 * [ ] Add documentation about polarization groups.
+* [ ] Docker contained for Linux OS
 * [ ] Allow option to allow users to have correct formal charges assigned in input file and turn off automatic formal charge assignment in fragmenter lib.
 * [ ] If freq option is turned on, need to make sure optimization doesnt stop after default 5 optmaxcycles (need opt to converge)
 * [ ] Use unittester on fragmenter with different WBO tolerances to determine what tolerance is acceptable for a given tolerance in RMSD between parent QM-MM and fragment QM-MM. 
@@ -42,7 +44,4 @@
     Output: 
     Referenced By: 
     Description 
-* [ ] Remove the need to install gdma and use gdma built in to Psi4
-* [ ] Remove the need to install Tinker CPU independelty and install openmm with conda, then call tinker via openmm instead of command line options
-* [ ] Once all depdencies are conda based, add poltype to anaconda to make installation very simple
 * [ ] After torsion fitting refine initial guess for bond angles, etc with frequencies from valence
