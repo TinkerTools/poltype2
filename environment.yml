@@ -4,7 +4,7 @@ channels:
   - psi4/label/dev
   - rdkit
 dependencies:
-  - python<3.8
+  - python=3.6
   - git
   - matplotlib
   - pip
