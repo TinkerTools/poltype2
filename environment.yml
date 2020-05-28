@@ -1,0 +1,19 @@
+name: poltype
+channels:
+  - conda-forge
+  - psi4/label/dev
+  - rdkit
+dependencies:
+  - python=3.6
+  - git
+  - matplotlib
+  - pip
+  - scipy
+  - cairosvg
+  - mdanalysis
+  - openbabel=2.4.1
+  - svgutils
+  - psi4
+  - rdkit
+  - pip:
+    - git+git://github.com/ParmEd/ParmEd.git
