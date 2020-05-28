@@ -44,8 +44,7 @@ python ~/poltypepackage/PoltypeModules/test_poltype.py --method=test_Fragmenter 
 ```
 
 * Currently has some bugs do not use
-* Fragmenter library also has bugs for adding hydrogens, dont use
-
+* modifiedresidue library also has some bugs currently
 In order to test the fragmenter, run POLTYPE with fragmenting option turned off(dontfrag) to paramterize the torsion first, then specify the examplepath to that POLTYPE job. Add --dontremovetestcase , if there is an issue with the job and you want to restart without starting from scratch. Use --method flag to specify which POLTYPE test to run from the test_poltype module. 
 
 
@@ -53,7 +52,7 @@ In order to test the fragmenter, run POLTYPE with fragmenting option turned off(
 ### Input Structure
 * Use an SDF file format for the input structure.
 
-* After the bond block, you can specify the formal charge for each atom. If using the fragmenter (default), you CANNOT just specify total charge on any atom. This is because the fragmenter detects new charge by the difference in valence between parent and fragment and adds or subtracts that difference from the parent formal charge, hence the formal charge on parent atom needs to be correct.
+* After the bond block, you can specify the formal charge for each atom.
 
 * The following example means there is 1 atom with a formal charge: atom 2 has a +1 charge
 
@@ -61,6 +60,9 @@ M  CHG  1   2   1
 
 * For 0 total charge, you do not need to specify CHG line
 
+* Bond topology need to be correct for formal charge assignment on fragments (fragmenter library) in order to get the total charge of the fragment correctly.
+
+* Watch out for any radicals in your input file that can cause multiplicty to be greater than 1.
 
 #### Most Common Inputs
 ```
@@ -82,6 +84,7 @@ numproc=4
 maxmem=20GB
 maxdisk=100GB
 ```
+* All booleans can switch their truth value, i.e., dontfrag=True or dontfrag=False
 
 ####Submitting Quantum Jobs Externally
 ```
@@ -163,6 +166,15 @@ onlyrotbndslist   specifies to only rotate bonds in the list, onlyrotbndlist=1 2
                   Default=[] (empty)
 ```
 
+### Fragmenter
+```
+dontfrag          specifies to not use fragmenter library for torsion.
+                  Default=True (will change to False after testing a few more cases)
+
+WBOtol            Tolerance for relative differences in Wiberg bond order between parent and fragment. Still                    trying to figure out the "best" tolerance.
+                  Default=.001
+```
+
 ### Modified Amino Acids
 ```
 modifiedresiduepdbcode    specifies three letter modified amino acid PDB code. 
@@ -199,13 +211,16 @@ Minimal examples are any example folder in Examples/, that contain Symmetry as t
   A)No, POLTYPE will look for output files from QM (see README.MANIFEST) to see if it needs to perform a job or continue. So you can delete the outputlog file, change your input options and resubmit POLTYPE job.
 
 ### Tips
-If using PSI4 for optimization with high number of optmaxcycles (default is 5 very low), it will be much slower than Gaussian optimization. Add keyword "use_gaus" in poltype.ini file.
+* For submitting on node clusers, make sure maxdisk and maxmem are set to the lowest amount available out of all of nodes on cluster otherwise risk diskquota / memory error.
+* Be careful when changing optimization methods and coordinates without deleting previous XYZ files, DMA and ESP, fchk, cube files, this can cause eletrostaic fitting errors where your grid does not correspond to the potential file from the new coordaintes. 
+* If using PSI4 for optimization with high number of optmaxcycles (default is 5 very low), it will be much slower than Gaussian optimization. Additionally even if using lower number of optmaxcycles, if your molecule is chated, by default we use PCM and this will significantly slow down PSI4 optimization. Add keyword "use_gaus" in poltype.ini file.
 
 ### Common Errors
 
 * If QM and MM molecular dipole moments are too different, a ValueError will be raised.
 
 * If QM and MM optimized root mean square difference (RMSD) is too high, a ValueError will be raised.
+   * If -opt.log coordinates are not the same as .XYZ file coordinates then this is can cause this error.
 
 * If QM and MM root mean square potential difference (RMSPD) is too high, a ValueError will be raised.
 
@@ -217,10 +232,13 @@ If using PSI4 for optimization with high number of optmaxcycles (default is 5 ve
 
 * If POLTYPE crashes, you do not need to delete any quantum data or tinker data, POLTYPE will recognize that the file exists and attempt to continue with it.
 
+* Error: segmentation violation, this usually means an issue related to memory (not enough RAM or disk). However since we terminate optimization after few cycles (default 5), Gaussian will throw this error in poltype.log. Poltype will ignore this if it also sees 5 opt cycles completed sucessfully. 
+
 
 
 ### Less Common Errors
 *********************************************
+* Error! The bond connectivity before and after structure optimization is different. Check to see if hydrogens are other atoms pop off during optimization.
 * If your RMSPD is too high and also you have a molecule of high symmetry, please check frame definitions and alter them as needed using POLEDIT and POTENTIAL command in Tinker to change frames/combine multipoles and refit to electrostatic potential. See Symmetry examples under Examples folder. We believe all symmetry cases are already covered by POLTYPE.
 
 * If you are concerned with vdw parameters, you may check again QM dimer (your_molecule-water) structure and energy.

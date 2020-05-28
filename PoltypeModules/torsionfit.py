@@ -621,6 +621,9 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
     """
     fitfunc_dict = {}
     write_prm_dict = {}
+    if len(poltype.torlist)==0:
+        return write_prm_dict,fitfunc_dict
+
     # For each rotatable bond 
     for tor in poltype.torlist:
         torprmdict = {}
@@ -799,7 +802,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         ax.text(0, -0.1, 'FoldNum=%s NumPrms=%s DataPts=%s RMSD(fit,QM-MM1),Abs=%s'%(str(len(poltype.nfoldlist)),str(numprms),str(len(mm_energy_list)),round(minRMSD,2)), transform=ax.transAxes, fontsize=10,verticalalignment='bottom')
         fig.savefig(figfname)
         torgen.write_arr_to_file(poltype,txtfname,[Sx,fitfunc_dict[clskey],tor_energy_list])
-        return write_prm_dict,fitfunc_dict
+    return write_prm_dict,fitfunc_dict
 
 def write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename):
     """
@@ -951,7 +954,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             poltype.WriteToLog('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
             if poltype.suppresstorfiterr==False:
 
-                raise ValueError('RMSPD of QM and MM torsion profile is high, RMSPD = ',str(minRMSD))
+                raise ValueError('RMSPD of QM and MM torsion profile is high, RMSPD = '+str(minRMSD))
 
 
 def gen_toromit_list(poltype):
@@ -1028,12 +1031,10 @@ def process_rot_bond_tors(poltype,mol):
     # and MM (with no rotatable bond torsion parameters)
     # Get QM and MM (pre-fit) energy profiles for torsion parameters
     cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict = get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename)
-
     # if the fit has not been done already
     if poltype.torkeyfname is None:
         # do the fit
-        write_prm_dict,fitfunc_dict = fit_rot_bond_tors(poltype,
-            mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict)
+        write_prm_dict,fitfunc_dict = fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict)
         # write out new keyfile
         write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename)
     else:

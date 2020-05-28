@@ -7,6 +7,7 @@
 ### POLTYPE Files
 
 * .sdf               Input structure file.
+*_OBOPT.pdb          MMFF94 optimization from openbabel.
 * -opt.com           Gaussian input file for geometry optimization.
 * -opt_psi.dat       Psi4 input file for geometry optimization.
 * -opt.log           Gaussian output file for geometry optimization.
@@ -107,18 +108,32 @@ RMSPD.txt           Textfile computing the root mean square potential difference
 * -energy-b-c.png                                 Plot of MM1 (prefit),MM2 (postfit),QM and MM1+Fit as a function of                                                         dihedral angle.
 
 
+### Fragmenter
+* valence.prms                   After all fragments have successfully finished their poltype jobs and then                                    parameters have been transfered to the parent, valence.prms will have the                                     correct format for SMART string (of the fragment) and the corresponding                                       torsion parameters that can be added to the valence.py database.
+* structurename.png              2D visualization of input structure with all rotatable bonds with missing                                     torsion parameters shown. Compare this with images of fragments for each                                      highlighted rotatable bond in this image below.
+* Below files are in Fragmenter folder
+* b_c_Index_i.png                b_c are the middle bond indexes of the torsion a_b_c_d from parent molecule                                   and index i refers to the index in a list of possible combinations of                                         hydrated atoms where we only allow atoms with cut bonds to not be hydrated if                                 the parent atom had a formal charge (not currently checking this when                                         hydrating.If there is only Index_0 this indicated no charged formal atoms                                     from parent.The highlighted rotatable bond corresponds to the b_c highlighted                                 bond in structurename.png (in poltype job top directory).
+
+* FragmentGrowthWithIndex_Bnd_b_c_Index_0.png  Tracks the growth of fragment along while attempting to                                                       minimize differences in Wiberg Bond Order between each fragment                                               and the parent until the tolerance threshold is reached. If                                                   WithIndex in name, this means it will show atoms with their                                                   index numbers. If WithoutIndex in name, it will show atoms                                                    without their index numbers. The last molecule in image is                                                    the molecule that will be used to derive torsion paramaters                                                   for the parent molecule.
+
+
+
+* CombintationsWithIndex_Bnd_b_c_Index_0.png   There are different combinations of ways to grow a fragment out                                               and each way is attempted before choosing the minimum                                                         difference in Wiberg bond order between parent bond and                                                       fragment bond. This minimum fragment is added to the                                                          FragmentGrowth image (last fragment on Combinations image).
+
+
+
 ### Poltype Modules
 * symmetry.py                Handles detecting symmetry in input molecule.
-* modifiedresidues.py        Handles parameterizing new amino acid side chains and stitching parameters from amoebabio18.prm for                        parts of molecule already parameterized.
+* modifiedresidues.py        Handles parameterizing new amino acid side chains and stitching parameters from                               amoebabio18.prm for parts of molecule already parameterized.
 
 * multipole.py               Handles multipole frame definitions and GDMA.
-* valence.py                 Database for searching valence parameters via SMART string matching to input molecule.
-* apicall.py                 Handles external calls for QM job submission on clusters. THE FUNCTION CallExternalAPI IN THIS                             MODULE NEEDS TO BE MODIFIED FOR SPECIFIC CLUSTER SUBMISSION METHODS.
+* valence.py                 Database for searching valence parameters via SMART string matching to input                                  molecule.
+* apicall.py                 Handles external calls for QM job submission on clusters. THE FUNCTION                                        CallExternalAPI IN THIS MODULE NEEDS TO BE MODIFIED FOR SPECIFIC CLUSTER                                      SUBMISSION METHODS.
 * optimization.py            Handles Gaussian,Psi4 and Tinker minimization.
 * electrostaticpotential.py  Handles electrostatic potential fitting and Gaussian, Psi4 SP calculations.
 * torsionfit.py              Handles torsion fitting.
 * torsiongenerator.py        Handles torsion Gaussian,Psi4 and Tinker minimization, SP and analyze.
-* fragmenter.py              Handles fragmenting parent molecule, paramterizing torsion and transfering paramters to parent.
+* fragmenter.py              Handles fragmenting parent molecule, paramterizing torsion and transfering                                    paramters to parent.
 * test_poltype.py            Handles unittesting for POLTYPE modules.
 
 ### Poltype Examples

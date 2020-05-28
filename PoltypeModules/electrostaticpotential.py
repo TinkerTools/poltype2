@@ -99,13 +99,14 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
     temp.write('memory '+maxmem+'\n')
     temp.write('set_num_threads(%s)'%(numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')
+    temp.write('set maxiter '+str(poltype.scfmaxiter)+'\n')
     temp.write('set freeze_core True'+'\n')
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
     temp.write("E, wfn = properties('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
     if makecube==True:
-       temp.write('oeprop(wfn,"GRID_ESP","WIBERG_LOWDIN_INDICES")'+'\n')
+       temp.write('oeprop(wfn,"GRID_ESP","WIBERG_LOWDIN_INDICES","MULLIKEN_CHARGES")'+'\n')
     else:
-       temp.write('oeprop(wfn,"WIBERG_LOWDIN_INDICES")'+'\n')
+       temp.write('oeprop(wfn,"WIBERG_LOWDIN_INDICES","MULLIKEN_CHARGES")'+'\n')
 
     temp.write('clean()'+'\n')
     temp.close()
@@ -166,7 +167,7 @@ def CheckRMSPD(poltype):
             if float(RMSPD)>poltype.maxRMSPD:
                 poltype.WriteToLog('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
             
-                raise ValueError(os.getcwd()+' '+'Warning: RMSPD of QM and MM optimized structures is high, RMSPD = ',RMSPD)
+                raise ValueError(os.getcwd()+' '+'Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+str(RMSPD))
     return rmspdexists
 
 def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):

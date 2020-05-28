@@ -2606,8 +2606,10 @@ class Valence():
                     neighborindexes=firstneighborindexes+secondneighborindexes
                     check=self.CheckIfNeighborsExistInSMARTMatch(neighborindexes,ia)
                     rot=bond.IsRotor()
-                   
-                    if (check==False and self.dontfrag==False and self.isfragjob==False) and rot==True:
+                    arobond=False
+                    if b.IsAromatic()==True and c.IsAromatic()==True:
+                        arobond=True
+                    if (check==False and self.dontfrag==False and self.isfragjob==False) and rot==True and arobond==False:
                         zeroed=True
                     if(dorot):
                         for r in rotbnds:

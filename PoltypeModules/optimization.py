@@ -248,7 +248,7 @@ def CheckRMSD(poltype):
             if float(RMSD)>poltype.maxRMSD:
                 poltype.WriteToLog('Warning: RMSD of QM and MM optimized structures is high, RMSD = '+ RMSD+' Tolerance is '+str(poltype.maxRMSD)+' kcal/mol ')
 
-                raise ValueError(os.getcwd()+' '+'RMSD of QM and MM optimized structures is high, RMSD = ',RMSD)
+                raise ValueError(os.getcwd()+' '+'RMSD of QM and MM optimized structures is high, RMSD = '+str(RMSD))
 
 def StructureMinimization(poltype):
      poltype.WriteToLog("")
@@ -275,7 +275,9 @@ def GeometryOptimization(poltype,mol):
     inFormat = obConversion.FormatFromExt(OBOPTname)
     obConversion.SetInFormat(inFormat)
     obConversion.ReadFile(OBOPTmol,OBOPTname)
-
+    charge=poltype.totalcharge
+    OBOPTmol.SetTotalCharge(charge) # for some reason obminimize does not print charge in output PDB
+    
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
         if not os.path.exists(poltype.scratchdir):
             mkdirstr='mkdir '+poltype.scratchdir
@@ -299,7 +301,7 @@ def GeometryOptimization(poltype,mol):
             if os.path.isfile(poltype.chkoptfname):
                 os.remove(poltype.logoptfname) # if chk point exists just remove logfile, there could be error in it and we dont want WaitForTermination to catch error before job is resubmitted by daemon 
             if poltype.externalapi==None:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,True) # have to skip errors because setting optmaxcycle to low number in gaussian causes it to crash
             else:
                 if len(jobtooutputlog.keys())!=0:
                     call.CallExternalAPI(poltype,jobtolog,jobtologlistfilepathprefix,scratchdir)
@@ -338,9 +340,12 @@ def GeometryOptimization(poltype,mol):
             poltype.RaiseOutputFileError(poltype.logoptfname) 
         GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'))
         optmol =  load_structfile(poltype,poltype.logoptfname.replace('.log','.xyz'))
-        optmol=rebuild_bonds(poltype,optmol,OBOPTmol)
+        optmol=rebuild_bonds(poltype,optmol,mol)
+
+
+
     GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'))
-    CheckBondConnectivity(poltype,OBOPTmol,optmol)
+    CheckBondConnectivity(poltype,mol,optmol)
     return optmol
 
 
