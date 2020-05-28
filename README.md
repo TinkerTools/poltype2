@@ -23,6 +23,8 @@ POLTYPE: AMOEBA parameterization tool
 ### [README_TODO](README_TODO.MD)
 * To-do list for POLTYPE
 
+## Poltype Protocol
+
 * Below is a high level flow diagram for Poltype
 
 * Vdw fitting is not yet implemented

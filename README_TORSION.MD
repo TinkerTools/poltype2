@@ -22,9 +22,15 @@
 
 * Below is a plot of QM-MM and the coresponding fit vs dihedral angle
 
+* At the top of the plot, all torsions (in type number format) are shown being fit around rotatable bond
+
 ![QM-MM](Images/QM-MM.png)
 
 * Below is a plot of total QM, MM energies vs dihedral angle
+
+* At the top is the Absolute RMSD between MM2 and QM (Abs=) and a weigted RMSD between MM2 and QM (Wei), where the weight is the form of a boltzman function where w*(QM-MM) and w=1/e^)((QM-MM)/2.5)
+
+* If the RMSD=0 there is a perfect fit between MM2 (post fitting parameters) and QM energy curves
 
 ![Tor Energy](Images/TorEnergy.png)
 

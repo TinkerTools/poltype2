@@ -10,6 +10,8 @@
 * Bottom middle: z-then-x-then-y
 * Bottom right: trisector
 
+* examples of these coordinate systems can be found in README_MANIFEST, see SymmetryExamples
+
 ### Multipole Parameters
 ```
 M1 M2 M3      q
