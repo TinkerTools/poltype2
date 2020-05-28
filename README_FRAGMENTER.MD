@@ -6,6 +6,13 @@
 
 * The fragmenter library implements the Wiberg bond order to have estimates of electron density on rotatable    bonds of interest. The relative Wiberg bond order (WBO) between parent and fragment is used as a cost         function to obtain the best fragment that is smaller than the parent (has relative WBO less than some tolerance)
 
+* A flow diagram is presented below
+
+* parenthesis for atom (e) is if user chooses to fragment with two adjacent torsions rather than just one, where for the atoms a-b-c-d-e, the rotatable bonds would be b-c and c-d. Currently fragmenting with two adjcent rosions is not yet supported. 
+
+![Fragmentation Flow Diagram](Images/FragmentationProtocol.PNG)
+
+
 * An example below identifies missing torsions by highlighting corresponding rotatable bonds. An example of the fragmenting scheme is shown for one of the missing torsions below. A tolerance of .001 was used.
 
 * If two missing torsions from the parent have the same converged fragment, then only one is chosen to submit the poltype job and both rotatable bonds are spun respectively for that poltype job.

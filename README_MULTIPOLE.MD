@@ -1,6 +1,14 @@
 ## Multipoles
 
-![Multipole Frames](Images/Multipole_Frames.png)
+![Multipole Frames](Images/MpoleFrames.PNG)
+
+
+* Top left: bisector
+* Top middle: z-then-x
+* Top right z-only
+* Bottom left: bisector-then-x
+* Bottom middle: z-then-x-then-y
+* Bottom right: trisector
 
 ### Multipole Parameters
 ```
