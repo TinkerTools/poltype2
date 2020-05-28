@@ -20,5 +20,5 @@
 ![Generate Final Modified Protein-NA](Images/GenerateFinalModifiedProteinNAParameters.PNG)
 
 
-![Generate Modified Protein-NA Tinker XYZ](Images/GenerateFinalModifiedProteinNATinkerXYZ.PNG)
+![Generate Modified Protein-NA Tinker XYZ](Images/GenerateModifiedProteinNATinkerXYZ.PNG)
 
