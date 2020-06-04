@@ -1072,4 +1072,3 @@ class PolarizableTyper():
 if __name__ == '__main__':
     poltype=PolarizableTyper() 
     params=poltype.main()
-                                                                                                   
