@@ -1025,7 +1025,6 @@ class PolarizableTyper():
 
         if self.dontfrag==False and self.isfragjob==False and not os.path.isfile(self.key5fname):
             frag.GrabTorsionParametersFromFragments(self,torlist,rotbndindextofragmentfilepath) # just dump to key_5 since does not exist for parent molecule
-            return
                
         # Torsion scanning then fitting. *.key_5 will contain updated torsions
         if os.path.isfile(self.key5fname):
