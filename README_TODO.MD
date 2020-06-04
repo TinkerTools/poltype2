@@ -1,4 +1,8 @@
+* [ ] Add RaiseValue error for when child poltype job has not completed (doesnt have key_5), otherwise people use fragmenter and wont read the parent poltype log that contains all of the errors from any child jobs
+* [ ] For some reason old poltype did not restrain hydrogen torsion on QM (even though MM does) , make sure it is apples to apples
 * [ ] Fix unittester.
+* [ ] Instal theme on GitHub page
+* [ ] Add README_TROUBLESHOOTING page (copy content from README_HELP). 
 * [ ] Before converting fragment to SMARTS/SMIRKS for database, remove any added hydrogens from cut bonds
 * [ ] Add documentation about polarization groups.
 * [ ] Docker contained for Linux OS

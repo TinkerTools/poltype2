@@ -519,16 +519,19 @@ class PolarizableTyper():
         if (not self.which(self.analyzeexe)):
             print("ERROR: Cannot find TINKER analyze executable")
             sys.exit(2)
+            
+            
+            
+        if ("GDMADIR" in os.environ):
+            self.gdmadir = os.environ["GDMADIR"]
+            self.gdmaexe = os.path.join(self.gdmadir,self.gdmaexe)
     
+        if (not self.which(self.gdmaexe)):
+            print("ERROR: Cannot find GDMA executable")
+            sys.exit(2)
+    
+
         if self.use_gaus or self.use_gausoptonly:
-            if ("GDMADIR" in os.environ):
-                self.gdmadir = os.environ["GDMADIR"]
-                self.gdmaexe = os.path.join(self.gdmadir,self.gdmaexe)
-    
-            if (not self.which(self.gdmaexe)):
-                print("ERROR: Cannot find GDMA executable")
-                sys.exit(2)
-    
             if ("GAUSS_SCRDIR" in os.environ):
                 self.scratchdir = os.environ["GAUSS_SCRDIR"]
                 if not os.path.isdir(self.scratchdir):
