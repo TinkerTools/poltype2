@@ -67,7 +67,7 @@ pip install git+git://github.com/ParmEd/ParmEd.git
 
 ```shell      
 export PATH="/opt/software/anaconda/bin:$PATH"
-conda activate p4env
+conda activate poltype
 export g09root=/opt/g09gh/gaussian
 source $g09root/g09/bsd/g09.profile
 export GAUSS_SCRDIR=/scratch/your_username/
