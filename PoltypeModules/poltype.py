@@ -531,7 +531,12 @@ class PolarizableTyper():
         if (not self.which(self.gdmaexe)):
             print("ERROR: Cannot find GDMA executable")
             sys.exit(2)
-    
+
+
+        if (not self.which('psi4')):
+            print("ERROR: Cannot find PSI4 executable")
+            sys.exit(2)
+         
 
         if self.use_gaus or self.use_gausoptonly:
             if ("GAUSS_SCRDIR" in os.environ):

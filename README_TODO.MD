@@ -1,3 +1,5 @@
+* [ ] Fix poltype GUI
+* [ ] Add graph visualization of function calls in poltype
 * [ ] Add RaiseValue error for when child poltype job has not completed (doesnt have key_5), otherwise people use fragmenter and wont read the parent poltype log that contains all of the errors from any child jobs
 * [ ] For some reason old poltype did not restrain hydrogen torsion on QM (even though MM does) , make sure it is apples to apples
 * [ ] Fix unittester.
