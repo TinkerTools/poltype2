@@ -49,21 +49,24 @@ You can install system wide or in your own directory (e.g /home/username/minicon
 After you have conda in your PATH, run the following commands. These will be installed under "/home/username/miniconda3/". You can use the provided `environment.yml` file to create a conda environment named "poltype" with `conda env create -f environment.yml`, or run the following commands:
 
 ```shell
-conda create -n poltype -c psi4/label/dev psi4 python=3.6
+conda create -n poltype -c psi4/label/dev psi4 python=3.6 --yes
 conda activate poltype
-conda install scipy
-conda install matplotlib
-conda install -c conda-forge openbabel=2.4.1
-conda install git pip
-conda install -c rdkit rdkit
-conda install -c conda-forge mdanalysis
-conda install -c conda-forge svgutils
-conda install -c conda-forge cairosvg
-pip install git+git://github.com/ParmEd/ParmEd.git 
+conda install scipy --yes
+conda install matplotlib --yes
+conda install -c conda-forge openbabel=2.4.1 --yes
+conda install git pip --yes
+conda install -c rdkit rdkit --yes
+conda install -c conda-forge mdanalysis --yes
+conda install -c conda-forge svgutils --yes
+conda install -c conda-forge cairosvg --yes
+pip install git+git://github.com/ParmEd/ParmEd.git --yes
 ```
 
 ### Environment var for running POLTYPE:
  Create environments for Tinker,Gaussian 09,and GDMA. Put these in a file and source it before running POLTYPE
+
+* Note do not put source in your default .bashrc profile
+* Note do not keep multiple sources for different purposes (unless necessary) in the same .bashrc source file, this can cause internal conflicts to arise
 
 ```shell      
 export PATH="/opt/software/anaconda/bin:$PATH"
