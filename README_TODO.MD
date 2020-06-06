@@ -1,3 +1,8 @@
+* [ ] Change ttt.xyz and ttt.key to final.xyz and final.key
+* [ ] Add error numbering scheme in help_readme and also in flow diagram to see where errors can occur.
+* [ ] Add error.log, print errors to both error.log and poltype.log
+* [ ] Add top folder with final key/xyz
+* [ ] If key_5 final has an error, rename it to key_5.error (missing torsion)
 * [ ] Fix poltype GUI
 * [ ] Add graph visualization of function calls in poltype
 * [ ] Add RaiseValue error for when child poltype job has not completed (doesnt have key_5), otherwise people use fragmenter and wont read the parent poltype log that contains all of the errors from any child jobs

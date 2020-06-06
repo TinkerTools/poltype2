@@ -59,7 +59,7 @@ conda install -c rdkit rdkit --yes
 conda install -c conda-forge mdanalysis --yes
 conda install -c conda-forge svgutils --yes
 conda install -c conda-forge cairosvg --yes
-pip install git+git://github.com/ParmEd/ParmEd.git --yes
+pip install git+git://github.com/ParmEd/ParmEd.git
 ```
 
 ### Environment var for running POLTYPE:

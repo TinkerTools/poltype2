@@ -386,8 +386,6 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         torang=tortotorang[torstring]
         dihedralrange=tortodihedralrange[torstring]
         outputlogs=tortooptoutputlog[torstring]
-
-
         torxyznames,finishedoutputlogs,cartxyznames,finishedphaseangles=TinkerMinimizePostQMOpt(poltype,outputlogs,dihedralrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,finishedjobs,errorjobs,bondtopology)
         fulltorxyznames.extend(torxyznames)
         fullfinishedoutputlogsSP.extend(finishedoutputlogs)

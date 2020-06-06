@@ -753,7 +753,7 @@ class PolarizableTyper():
                     if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line:
                         error=False
                         continue
-                    if ('Error termination request processed by link 9999' in line or 'Error termination via Lnk1e in' in line) and 'opt' in logfname:
+                    if ('Error termination request processed by link 9999' in line or 'Error termination via Lnk1e in' in line) or ('OptimizationConvergenceError' in line) and 'opt' in logfname:
                         if self.CycleCount(logfname)>=poltype.optmaxcycle:
                             term=True
                             error=False
