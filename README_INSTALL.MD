@@ -46,6 +46,8 @@ You can install system wide or in your own directory (e.g /home/username/minicon
 
 (For Anaconda: `bash Anaconda-latest-Linux-x86_64.sh`. We installed system wide conda: /opt/software/anaconda/)
 
+You may need to run "conda init bash" and then source ~/.bashrc first.
+
 After you have conda in your PATH, run the following commands. These will be installed under "/home/username/miniconda3/". You can use the provided `environment.yml` file to create a conda environment named "poltype" with `conda env create -f environment.yml`, or run the following commands:
 
 ```shell
@@ -55,7 +57,7 @@ conda install scipy --yes
 conda install matplotlib --yes
 conda install -c conda-forge openbabel=2.4.1 --yes
 conda install git pip --yes
-conda install -c rdkit rdkit --yes
+conda install -c conda-forge rdkit --yes
 conda install -c conda-forge mdanalysis --yes
 conda install -c conda-forge svgutils --yes
 conda install -c conda-forge cairosvg --yes
