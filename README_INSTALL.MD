@@ -57,7 +57,7 @@ conda install scipy --yes
 conda install matplotlib --yes
 conda install -c conda-forge openbabel=2.4.1 --yes
 conda install git pip --yes
-conda install -c rdkit rdkit --yes
+conda install -c conda-forge rdkit --yes
 conda install -c conda-forge mdanalysis --yes
 conda install -c conda-forge svgutils --yes
 conda install -c conda-forge cairosvg --yes
