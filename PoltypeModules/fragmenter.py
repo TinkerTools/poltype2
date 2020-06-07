@@ -52,13 +52,19 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
     valenceprmlist=[]
     symmtorlist=[]
     for tor in torlist:
-        symmtorlist.append(torgen.get_class_key(poltype,tor[0],tor[1],tor[2],tor[3]))
+        rotbndindex=str(tor[1])+'_'+str(tor[2])
+        rotkey=rotbndindex.replace('_',' ')
+        tors=poltype.rotbndlist[rotkey]
+        for torsion in tors:
+            symmtorlist.append(torgen.get_class_key(poltype,torsion[0],torsion[1],torsion[2],torsion[3]))
+    print('symmtorlist',symmtorlist)
     torprmdic={}
     curdir=os.getcwd()
     for rotbndindex,fragmentfilepath in rotbndindextofragmentfilepath.items():
         path,filename=os.path.split(fragmentfilepath)
         os.chdir(path)
         filelist=os.listdir(os.getcwd())
+        print('filename',filename)
         for ff in filelist:
             if '.prm' in ff:
                 temp=open(ff,'r')
@@ -79,8 +85,11 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
                         typed=int(linesplit[4])
                         tor=[typea,typeb,typec,typed]
                         torkey='%d %d %d %d' % (typea, typeb, typec, typed)
+                        
                         if torkey in symmtorlist:
                             torprmdic[torkey]=line
+                        else:
+                            print('torkey not in list',torkey)
 
     os.chdir(curdir)
     temp=open(poltype.key4fname,'r')
@@ -99,11 +108,21 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
             if torkey in torprmdic.keys():
                 torline=torprmdic[torkey]
                 temp.write(torline)
+                temp.flush()
+                os.fsync(temp.fileno())
+
             else:
                 temp.write(line)
+                temp.flush()
+                os.fsync(temp.fileno())
+
         else:
             temp.write(line)
+            temp.flush()
+            os.fsync(temp.fileno())
+
     temp.close()
+    
     temp=open('valence.prms','w')
     for line in valenceprmlist:
         temp.write(line)
@@ -366,6 +385,7 @@ def get_class_key(poltype,a, b, c, d,fragidxtotypeidx):
 
 def ConvertFragIdxToWholeIdx(poltype,torlist,rotbndindextoparentindextofragindex,fragmol,fragmentfilename,wholexyz,wholemol,filepath):
     fragmentfileprefix=fragmentfilename.replace('.sdf','')
+    print('fragmentfileprefix',fragmentfileprefix)
     if not os.path.isfile(filepath+r'/'+fragmentfileprefix+'.key_5'):
         return # if POLTYPE job failed, just try to submit the other fragment jobs instead of killing parent job
     temp=open(filepath+r'/'+fragmentfileprefix+'.key_5','r')
@@ -409,18 +429,24 @@ def ConvertFragIdxToWholeIdx(poltype,torlist,rotbndindextoparentindextofragindex
     classkeytosmilesposarray={}
     for tor in torlist:
         rotbndindex=str(tor[1])+'_'+str(tor[2])
+        rotkey=rotbndindex.replace('_',' ')
+        tors=poltype.rotbndlist[rotkey]
         parentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
-        smilesposarray=[]
-        fragtor=[]
-        for index in tor:
-            fragindex=parentindextofragindex[index-1]+1
-            fragtor.append(fragindex)
-            fragidxarraypos=fragidxarray.index(fragindex)
-            smilespos=fragidxarraypos+1
-            smilesposarray.append(smilespos)
+        for torsion in tors:
+            smilesposarray=[]
+            fragtor=[]
+            for index in torsion:
+                fragindex=parentindextofragindex[index-1]+1
+                fragtor.append(fragindex)
+                fragidxarraypos=fragidxarray.index(fragindex)
+                smilespos=fragidxarraypos+1
+                smilesposarray.append(smilespos)
 
-        classkey=get_class_key(poltype,fragtor[0],fragtor[1],fragtor[2],fragtor[3],fragidxtotypeidx)
-        classkeytosmilesposarray[classkey]=smilesposarray
+            classkey=get_class_key(poltype,fragtor[0],fragtor[1],fragtor[2],fragtor[3],fragidxtotypeidx)
+            classkeytosmilesposarray[classkey]=smilesposarray
+
+
+
     p = Chem.MolFromSmarts(fragsmarts)
     diditmatchrdkit=fragmol.HasSubstructMatch(p)
 

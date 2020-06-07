@@ -680,7 +680,7 @@ class PolarizableTyper():
     def WaitForTermination(self,jobtooutputlog):
         finishedjobs=[]
         errorjobs=[]
-        sleeptime=1
+        sleeptime=(1/60)
         errormessages=[]
         while len(finishedjobs)!=len(jobtooutputlog.keys()):
             for job in jobtooutputlog.keys():
@@ -987,7 +987,6 @@ class PolarizableTyper():
         (self.torlist, self.rotbndlist) = torgen.get_torlist(self,mol)
         self.torlist = torgen.get_torlist_opt_angle(self,optmol, self.torlist)
         self.torlist=torgen.RemoveDuplicateRotatableBondTypes(self) # this only happens in very symmetrical molecules
-           
         torlist=[i[:4] for i in self.torlist]
 
         self.rotbndtoanginc=torgen.DetermineAngleIncrementForEachTorsion(self,mol,self.rotbndlist)
@@ -1030,22 +1029,22 @@ class PolarizableTyper():
 
         if self.dontfrag==False and self.isfragjob==False and not os.path.isfile(self.key5fname):
             frag.GrabTorsionParametersFromFragments(self,torlist,rotbndindextofragmentfilepath) # just dump to key_5 since does not exist for parent molecule
-               
-        # Torsion scanning then fitting. *.key_5 will contain updated torsions
-        if os.path.isfile(self.key5fname):
-            self.parmtors=False
-        if self.dontdotor==True:
-            sys.exit()
-        if (self.parmtors):
-            # torsion scanning
-            torgen.gen_torsion(self,optmol,self.torsionrestraint)
-        if (self.parmtors):
-            # torsion fitting
-            if self.dontdotorfit==True:
+        else:          
+            # Torsion scanning then fitting. *.key_5 will contain updated torsions
+            if os.path.isfile(self.key5fname):
+                self.parmtors=False
+            if self.dontdotor==True:
                 sys.exit()
-            torfit.process_rot_bond_tors(self,optmol)
-        else:
-            shutil.copy(self.key4fname,self.key5fname)
+            if (self.parmtors):
+                # torsion scanning
+                torgen.gen_torsion(self,optmol,self.torsionrestraint)
+            if (self.parmtors):
+                # torsion fitting
+                if self.dontdotorfit==True:
+                    sys.exit()
+                torfit.process_rot_bond_tors(self,optmol)
+            else:
+                shutil.copy(self.key4fname,self.key5fname)
         self.WriteOutLiteratureReferences(self.key5fname) 
         # A series of tests are done so you one can see whether or not the parameterization values
         # found are acceptable and to what degree

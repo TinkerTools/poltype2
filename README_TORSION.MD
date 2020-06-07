@@ -10,6 +10,10 @@
 
 * Vibrational torsion scans will help partition the total QM-MM energy around a rotatable bond into UNIQUE parameter solutions for each individual torsion, giving a more accurate vibrational potential energy surface. This feature is not yet implmented in Poltype.
 
+* Currently you still need to check for missing torsion parameters in final key file (could be due to quantum jobs failing/not submitted correctly, or poltype decides the torsion contribution is neglible during fitting (for example some hydrogen torsions contribute small energy to total torsions around rotatable bonds). 
+
+* By default the number of missing torsions x the number of cosine terms (default is three) determine how many quantum points to sample along the dihedral surface , if the number is greater than 12, else 12 is the default. 
+
 ![Torsion Protocol](Images/TorsionProtocol.PNG)
 
 * Below is more detailed flow of how files are generated

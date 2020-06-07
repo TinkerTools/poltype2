@@ -76,6 +76,8 @@ maxdisk           specifies max scratch space used for running quantum jobs.
                   Default=100GB
 ```
 
+* Note for very large molecules initial opt, DMA and ESP may require large amounts of memory if quantum job consistently crashes
+
 #### Most Common Input Example
 __All input arguments are specified in poltype.ini file__
 ```
