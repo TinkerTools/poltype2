@@ -680,7 +680,7 @@ class PolarizableTyper():
     def WaitForTermination(self,jobtooutputlog):
         finishedjobs=[]
         errorjobs=[]
-        sleeptime=(60)
+        sleeptime=(1)
         errormessages=[]
         while len(finishedjobs)!=len(jobtooutputlog.keys()):
             for job in jobtooutputlog.keys():
