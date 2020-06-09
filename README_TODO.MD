@@ -1,3 +1,5 @@
+* [ ] Only update poltype.log if child poltype logs are updated
+* [ ] If fragment is same as parent, skip fragmenter and just do normal poltype
 * [ ] Change ttt.xyz and ttt.key to final.xyz and final.key
 * [ ] Add error numbering scheme in help_readme and also in flow diagram to see where errors can occur.
 * [ ] Add error.log, print errors to both error.log and poltype.log
