@@ -680,7 +680,7 @@ class PolarizableTyper():
     def WaitForTermination(self,jobtooutputlog):
         finishedjobs=[]
         errorjobs=[]
-        sleeptime=(1/60)
+        sleeptime=(60)
         errormessages=[]
         while len(finishedjobs)!=len(jobtooutputlog.keys()):
             for job in jobtooutputlog.keys():
@@ -748,7 +748,7 @@ class PolarizableTyper():
                 else:
                     if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line or "LBFGS  --  Normal Termination due to SmallGrad" in line or "Normal termination" in line:
                         term=True
-                    if ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line:
+                    if ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line and 'except' not in line:
                         error=True
                     if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line:
                         error=False

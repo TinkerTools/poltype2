@@ -362,7 +362,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
             #CheckBondConnectivity(poltype,newoptmol,optmol)
 
         if finished==True and error==False and outputlog not in finishedjobs:
-            finishedjobs.append(outputlog) 
+            finishedjobs.append(outputlog)
     fulltorxyznames=[]
     fullfinishedoutputlogsSP=[]
     fullcartxyznames=[]
