@@ -1,3 +1,4 @@
+* [ ] Auto traceback of NONE variables
 * [ ] Only update poltype.log if child poltype logs are updated
 * [ ] If fragment is same as parent, skip fragmenter and just do normal poltype
 * [ ] Change ttt.xyz and ttt.key to final.xyz and final.key

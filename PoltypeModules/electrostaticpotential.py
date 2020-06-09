@@ -146,7 +146,7 @@ def GrabFinalPsi4Energy(poltype,logname):
     foundfinalenergies=False
     for line in results:
         linesplit=line.split()
-        if 'Energies <====================' in line:
+        if 'Energies <====================' in line or '=> Energetics <=' in line:
             foundfinalenergies=True
         if foundfinalenergies==True and 'Total Energy' in line and 'SCS' not in line:
             energy=float(linesplit[3])

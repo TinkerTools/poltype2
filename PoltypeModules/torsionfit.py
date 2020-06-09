@@ -380,7 +380,6 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename):
         (cls_angle_dict[clskey],cls_mm_engy_dict[clskey])=prune_mme_error(poltype,del_ang_list,cls_angle_dict[clskey],cls_mm_engy_dict[clskey])
         (mang_list,mme_list,qme_list,qang_list,tor_e_list)=prune_mme_error(poltype,del_ang_list,mang_list,mme_list,qme_list,qang_list,tor_e_list)
         del_ang_list = find_del_list(poltype,qme_list,qang_list)
-
         (cls_angle_dict[clskey],cls_mm_engy_dict[clskey])=prune_qme_error(poltype,del_ang_list,cls_angle_dict[clskey],cls_mm_engy_dict[clskey])
         (mang_list,mme_list,qme_list,qang_list,tor_e_list)=prune_qme_error(poltype,del_ang_list,mang_list,mme_list,qme_list,qang_list,tor_e_list)
 
