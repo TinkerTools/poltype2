@@ -433,12 +433,12 @@ class PolarizableTyper():
         
     def SanitizeMMExecutables(self):
         path=self.which(self.peditexe)
-        if path==None:
-            self.peditexe='poledit.x'
-            self.potentialexe='potential.x'
-            self.minimizeexe='minimize.x'
-            self.analyzeexe='analyze.x'
-            self.superposeexe='superpose.x'
+        if path is None:
+            self.peditexe='poledit'
+            self.potentialexe='potential'
+            self.minimizeexe='minimize'
+            self.analyzeexe='analyze'
+            self.superposeexe='superpose'
 
     def which(self,program):
         def is_exe(fpath):
