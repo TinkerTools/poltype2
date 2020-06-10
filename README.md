@@ -1,1 +1,1 @@
-See Poltype2 documentation [here](https://pren.github.io/poltype)
+See POLTYPE2 documentation on this website ==> https://pren.github.io/poltype
