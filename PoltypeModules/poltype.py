@@ -25,6 +25,7 @@ import subprocess
 import openbabel
 import shutil
 import time
+import copy
 import getopt
 import valence
 import torsiongenerator as torgen
@@ -680,8 +681,9 @@ class PolarizableTyper():
     def WaitForTermination(self,jobtooutputlog):
         finishedjobs=[]
         errorjobs=[]
-        sleeptime=1.0
+        sleeptime=30.0
         errormessages=[]
+        outputStatusDict = copy.deepcopy(jobtooutputlog)
         while len(finishedjobs)!=len(jobtooutputlog.keys()):
             for job in jobtooutputlog.keys():
                 outputlog=jobtooutputlog[job]
@@ -704,17 +706,18 @@ class PolarizableTyper():
                     if not os.path.isfile(outputlog):
                         self.WriteToLog('Waiting on '+outputlog+' '+'to begin')
                     else:
-                        self.WriteToLog('Waiting on '+outputlog+' '+'for termination ')
+                        printStr = 'Waiting on '+outputlog+' '+'for termination '
+                        if (printStr != outputStatusDict[job]):
+                          self.WriteToLog(printStr)
+                          outputStatusDict[job] = printStr
                 else: # this case is finshed=True and error=True because there stupid quotes sometimes have word error in it                  
                     if outputlog not in finishedjobs:
                         error=False
                         self.NormalTerm(outputlog)
                         finishedjobs.append(outputlog)
     
-            #string='Sleeping for %d '%(sleeptime)+' minute '
-            #self.WriteToLog(string)
-            time.sleep(sleeptime*60) # check logs every minute
-            self.WriteToLog('**********************************************')
+            time.sleep(sleeptime) # check logs every half minute
+            #self.WriteToLog('**********************************************')
         self.WriteToLog('All jobs have terminated ')
         return finishedjobs,errorjobs
 
