@@ -495,37 +495,40 @@ def get_torlist(poltype,mol):
             if poltype.rotalltors==True:
                 skiptorsion=False
             rotbndkey = '%d %d' % (t2.GetIdx(), t3.GetIdx())
-            rotbndlist[rotbndkey] = []
             if (not skiptorsion):
                 # store the torsion and temporary torsion value found by openbabel in torlist
                 tor = mol.GetTorsion(t1,t2,t3,t4)
                 torlist.append([t1,t2,t3,t4,tor % 360])
                 # store torsion in rotbndlist
+                rotbndlist[rotbndkey] = []
                 rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,
                         t1.GetIdx(),t2.GetIdx(),
                         t3.GetIdx(),t4.GetIdx()))
                 # write out rotatable bond to log
                 poltype.logfh.write('Rotatable bond found about %s\n' %
                 str(rotbndlist[rotbndkey][0]))
+
+
+                #Find other possible torsions about this rotatable bond
+                iteratomatom = openbabel.OBAtomAtomIter(bond.GetBeginAtom())
+                for iaa in iteratomatom:
+                    iteratomatom2 = openbabel.OBAtomAtomIter(bond.GetEndAtom())
+                    for iaa2 in iteratomatom2:
+                        a = iaa.GetIdx()
+                        b = t2.GetIdx()
+                        c = t3.GetIdx()
+                        d = iaa2.GetIdx()
+                        if ((iaa.GetIdx() != t3.GetIdx() and \
+                                 iaa2.GetIdx() != t2.GetIdx()) \
+                            and not (iaa.GetIdx() == t1.GetIdx() and \
+                                 iaa2.GetIdx() == t4.GetIdx())):
+                            rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,
+                                iaa.GetIdx(),t2.GetIdx(),
+                                t3.GetIdx(),iaa2.GetIdx()))
+
             else:
                 continue
             
-            #Find other possible torsions about this rotatable bond
-            iteratomatom = openbabel.OBAtomAtomIter(bond.GetBeginAtom())
-            for iaa in iteratomatom:
-                iteratomatom2 = openbabel.OBAtomAtomIter(bond.GetEndAtom())
-                for iaa2 in iteratomatom2:
-                    a = iaa.GetIdx()
-                    b = t2.GetIdx()
-                    c = t3.GetIdx()
-                    d = iaa.GetIdx()
-                    if ((iaa.GetIdx() != t3.GetIdx() and \
-                             iaa2.GetIdx() != t2.GetIdx()) \
-                        and not (iaa.GetIdx() == t1.GetIdx() and \
-                             iaa2.GetIdx() == t4.GetIdx())):
-                        rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,
-                            iaa.GetIdx(),t2.GetIdx(),
-                            t3.GetIdx(),iaa2.GetIdx()))
     return (torlist ,rotbndlist)
 
 
@@ -841,7 +844,6 @@ def get_class_key(poltype,a, b, c, d):
     clb = poltype.idxtosymclass[b]
     clc = poltype.idxtosymclass[c]
     cld = poltype.idxtosymclass[d]
-
     if ((clb > clc) or (clb == clc and cla > cld)):
         return '%d %d %d %d' % (cld, clc, clb, cla)
     return '%d %d %d %d' % (cla, clb, clc, cld)
@@ -954,9 +956,9 @@ def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,molecprefix
 def RemoveDuplicateRotatableBondTypes(poltype):
     tortorotbnd={}
     for tor in poltype.torlist:
-        classkey=get_class_key(poltype,tor[0],tor[1],tor[2],tor[3])
-        rotbnd=classkey[1]+','+classkey[2]
-        tortorotbnd[tuple(tor)]=rotbnd
+        classkeynew=get_class_key(poltype,tor[0],tor[1],tor[2],tor[3])
+        temp=classkeynew[1]+','+classkeynew[2]
+        tortorotbnd[tuple(tor)]=classkeynew
     listofduptors=[]
     for key,value in tortorotbnd.items():
         duptors=[k for k,v in tortorotbnd.items() if v == value]
@@ -965,9 +967,12 @@ def RemoveDuplicateRotatableBondTypes(poltype):
     for dup in listofduptors: # doesnt matter which one is first, just remove duplicates
         for i in range(len(dup)-1):
             tor=list(dup[i])
+            rotbndkey=str(tor[1])+' '+str(tor[2])
             if tor in poltype.torlist:
                 poltype.torlist.remove(tor)
-    return poltype.torlist 
+            if rotbndkey in poltype.rotbndlist.keys():
+                del poltype.rotbndlist[rotbndkey]
+    return poltype.torlist,poltype.rotbndlist
 
 
 def PrependStringToKeyfile(poltype,keyfilename,string):
