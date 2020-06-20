@@ -211,40 +211,31 @@ def AllIntegers(poltype,testlist):
             allintegers=False
     return allintegers
 
-def FindEquivalentFragments(poltype,fragmentarray):
-    equivalentfragmentsarray=[]
+def FindEquivalentFragments(poltype,fragmentarray,namearray):
+    equivalentnamesarray=[]
+    equivalentnamesarrayset=[]
     smartsarray=[rdmolfiles.MolToSmarts(m) for m in fragmentarray]
     for smartidx in range(len(smartsarray)):
         refsmarts=smartsarray[smartidx]
+        refname=namearray[smartidx]
         reffragment=fragmentarray[smartidx]
         refsmartsmol=Chem.MolFromSmarts(refsmarts)
-        temp=[]
-        temp.append(reffragment)
+        nametemp=[]
+        nametemp.append(refname)
         for anothersmartidx in range(len(smartsarray)):
             if anothersmartidx!=smartidx:
                 smarts=smartsarray[anothersmartidx]
+                name=namearray[anothersmartidx]
                 fragment=fragmentarray[anothersmartidx]
                 smartsmol=Chem.MolFromSmarts(smarts)
                 match = refsmartsmol.HasSubstructMatch(smartsmol)
                 if match==True:
-                    temp.append(fragment)
+                    nametemp.append(name)
 
-        if set(temp) not in equivalentfragmentsarray: 
-            equivalentfragmentsarray.append(set(temp))
-    return equivalentfragmentsarray
-
-def FindEquivalentRotatableBonds(poltype,equivalentfragmentsarray,rotbndindextofragment):
-    equivalentrotbndindexarrays=[]
-
-    for array in equivalentfragmentsarray:
-        temp=[]
-        for fragmol in array:
-            rotbndindex=FindRotatableBond(poltype,fragmol,rotbndindextofragment,temp)
-            if rotbndindex not in temp:
-                temp.append(rotbndindex)
-        if len(temp)!=0:
-            equivalentrotbndindexarrays.append(temp)
-    return equivalentrotbndindexarrays
+        if set(nametemp) not in equivalentnamesarrayset:
+            equivalentnamesarrayset.append(set(nametemp))
+            equivalentnamesarray.append(tuple(set(nametemp)))
+    return equivalentnamesarray
 
 def FindRotatableBond(poltype,fragmol,rotbndindextofragment,temp):
     for rotbndindex in rotbndindextofragment.keys():
@@ -275,7 +266,7 @@ def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog):
     return finishedjobs,errorjobs
 
 
-def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,torlist,equivalentfragmentsarray,equivalentrotbndindexarrays):
+def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,torlist,equivalentrotbndindexarrays):
     parentdir=dirname(abspath(os.getcwd()))
     listofjobs=[]
     jobtooutputlog={}
@@ -283,6 +274,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
     for array in equivalentrotbndindexarrays:
         strfragrotbndindexes=''
         strparentrotbndindexes=''
+        fragrotbnds=[]
         for i in range(len(array)):
             rotbndindex=array[i]
             parentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
@@ -292,9 +284,11 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             rotbndindexes=rotbndindex.split('_')
             parentrotbndindexes=[int(i) for i in rotbndindexes]
             rotbndindexes=[int(i)-1 for i in parentrotbndindexes]
-
             fragrotbndindexes=[equivalentparentindextofragindex[i]+1 for i in rotbndindexes]
-            strfragrotbndindexes+=str(fragrotbndindexes[0])+' '+str(fragrotbndindexes[1])+','
+            fragrotbnd=str(fragrotbndindexes[0])+' '+str(fragrotbndindexes[1])
+            if fragrotbnd not in fragrotbnds:
+                fragrotbnds.append(fragrotbnd)
+                strfragrotbndindexes+=str(fragrotbndindexes[0])+' '+str(fragrotbndindexes[1])+','
             strparentrotbndindexes+=str(parentrotbndindexes[0])+' '+str(parentrotbndindexes[1])+','
         strfragrotbndindexes=strfragrotbndindexes[:-1]
         strparentrotbndindexes=strparentrotbndindexes[:-1]
@@ -459,6 +453,8 @@ def ConvertFragIdxToWholeIdx(poltype,torlist,rotbndindextoparentindextofragindex
 
 def GenerateAllPossibleWholeTorsions(poltype,typea,typeb,typec,typed,fragtypeidxtowholemoltypeidx):
     possiblewholetypeslist=[]
+    print('fragtypeidxtowholemoltypeidx',fragtypeidxtowholemoltypeidx)
+    print('typea',typea,'typeb',typeb,'typec',typec,'typed',typed)
     possibleatypes=fragtypeidxtowholemoltypeidx[typea] 
     possiblebtypes=fragtypeidxtowholemoltypeidx[typeb]
     possiblectypes=fragtypeidxtowholemoltypeidx[typec]
@@ -596,6 +592,7 @@ def GenerateFrag(poltype,molindexlist,mol):
         rdkitoldindextonewindex[rdkitoldindex]=rdkitnewindex
     newmol=AssignTotalCharge(poltype,newmol,nem)
     # also if there are other parts of parent molecule that have same atom type, need to include those parent atom indexes as mapping to fragment atom index with same type 
+    """
     for babindex in molindexlist: # need to do this because some fragments are topologically equivalent but still have different indexes from parent, needed for submitting one job multiple torsion from same fragments (different indexes)
         refsymclass=poltype.idxtosymclass[babindex]
         rdkindex=babindex-1
@@ -605,6 +602,7 @@ def GenerateFrag(poltype,molindexlist,mol):
             rdkitindex=babelindex-1
             if rdkindex!=rdkitindex and refsymclass==symclass and rdkitindex not in rdkitoldindextonewindex.keys():
                 rdkitoldindextonewindex[rdkitindex]=fragindex
+    """
     return newmol,rdkitoldindextonewindex
 
 def ConvertRdkitMolToOBMol(poltype,mol):
@@ -808,21 +806,22 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
     RemoveTempFolders(poltype)
     poltype.rotbndindextofragmentfilepath=rotbndindextofragmentfilepath
     fragmentarray=[]
+    namearray=[]
     for rotbndindex in rotbndindextofragment.keys():
         fragment=rotbndindextofragment[rotbndindex]
         fragmentarray.append(fragment)
-
-    equivalentfragmentsarray=FindEquivalentFragments(poltype,fragmentarray)
-    equivalentrotbndindexarrays=FindEquivalentRotatableBonds(poltype,equivalentfragmentsarray,rotbndindextofragment)
+        namearray.append(rotbndindex)
+    equivalentrotbndindexarrays=FindEquivalentFragments(poltype,fragmentarray,namearray)
+    tempdic=rotbndindextoparentindextofragindex
+    rotbndindextoparentindextofragindex=AddMatchingParentIndexesBetweenFragments(poltype,equivalentrotbndindexarrays,rotbndindextoparentindextofragindex,rotbndindextofragment)
     # now we need to redraw the 2Dimages for any fragments that are equivalent (get multiple torsions from different rotatable bonds around same fragment)
-    
     curdir=os.getcwd()
     for rotbndindex in rotbndindextofragment.keys():
-        equivalentrotbndindexes=GrabEquivalentRotBndIndexes(poltype,equivalentrotbndindexarrays,rotbndindex)
-        if len(equivalentrotbndindexes)!=0:
+        if len(equivalentrotbndindexarrays)!=0:
             bndindextohighlightbonds={}
-            for bndindexes in equivalentrotbndindexes:
+            for bndindexes in equivalentrotbndindexarrays:
                 parenthighlightbonds=[]
+     
                 for bndindex in bndindexes:
                     parentindextofragindex=rotbndindextoparentindextofragindex[bndindex]
                     indexes=bndindex.split('_')
@@ -837,9 +836,10 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
                     for parentrotbndidx in parenthighlightbonds:
                         fragrotbndidx=[]
                         for parentidx in parentrotbndidx:
-                            fragidx=parentindextofragindex[parentidx]
-                            fragrotbndidx.append(fragidx)
-                        if fragrotbndidx not in fraghighlightbonds:
+                            if parentidx in parentindextofragindex.keys():
+                                fragidx=parentindextofragindex[parentidx]
+                                fragrotbndidx.append(fragidx)
+                        if fragrotbndidx not in fraghighlightbonds and len(fragrotbndidx)==2:
                             fraghighlightbonds.append(fragrotbndidx)
                     bndindextohighlightbonds[bndindex]=fraghighlightbonds
                 for bndindex in bndindexes:
@@ -864,21 +864,39 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
                     Draw2DMoleculeWithWBO(poltype,fragWBOmatrix,basename+'_Absolute',m,bondindexlist=highlightbonds,smirks=fragsmirks)
                     Draw2DMoleculeWithWBO(poltype,relativematrix,basename+'_Relative',m,bondindexlist=highlightbonds,smirks=fragsmirks)
             os.chdir(curdir)
-    
-    return rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentfragmentsarray,equivalentrotbndindexarrays
+    sys.exit()    
+    return rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays
 
 
-def GrabEquivalentRotBndIndexes(poltype,equivalentrotbndindexarrays,rotbndindex):
-    equivalentrotbndindexes=[]
-    for ls in equivalentrotbndindexarrays:
-        if rotbndindex in ls:
-            temp=[]
-            for el in ls:
-                if el!=rotbndindex:
-                    temp.append(el)
-            equivalentrotbndindexes.append(temp)
-    return equivalentrotbndindexes
-
+def AddMatchingParentIndexesBetweenFragments(poltype,equivalentrotbndindexarrays,rotbndindextoparentindextofragindex,rotbndindextofragment):
+   newrotbndindextoparentindextofragindex={}
+   for rotbndindexarray in equivalentrotbndindexarrays:
+       for refrotbndindex in rotbndindexarray:
+           reffragment=rotbndindextofragment[refrotbndindex]
+           refparentindextofragindex=rotbndindextoparentindextofragindex[refrotbndindex]
+           reffragindextoparentindex={v: k for k, v in refparentindextofragindex.items()}
+           newrefparentindextofragindex=refparentindextofragindex.copy()
+           for rotbndindex in rotbndindexarray:
+               if rotbndindex!=refrotbndindex:
+                   parentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
+                   fragindextoparentindex={v: k for k, v in parentindextofragindex.items()}
+                   fragment=rotbndindextofragment[rotbndindex]
+                   match = reffragment.HasSubstructMatch(fragment)
+                   if match==True:
+                       atomsinref=reffragment.GetNumAtoms()
+                       atomsinfrag=fragment.GetNumAtoms()
+                       matches=reffragment.GetSubstructMatches(fragment)
+                       for match in matches:
+                           for i in range(len(match)):
+                               matchindex=match[i]
+                               if matchindex in fragindextoparentindex.keys():
+                                   parentindex=fragindextoparentindex[matchindex]
+                                   if parentindex not in newrefparentindextofragindex.keys():
+                                       newrefparentindextofragindex[parentindex]=i
+           newrotbndindextoparentindextofragindex[refrotbndindex]=newrefparentindextofragindex
+           
+   return newrotbndindextoparentindextofragindex
+  
 def RemoveTempFolders(poltype):
     foldstoremove=[]
     folds=os.listdir()
@@ -887,8 +905,6 @@ def RemoveTempFolders(poltype):
             foldstoremove.append(f)
     for f in foldstoremove:
         shutil.rmtree(f)
-
-
 
 def ReduceParentMatrix(poltype,parentindextofragindex,fragWBOmatrix,parentWBOmatrix):
     reducedparentWBOmatrix=numpy.copy(fragWBOmatrix)
@@ -1357,8 +1373,9 @@ def Draw2DMoleculeWithWBO(poltype,WBOmatrix,basename,mol,bondindexlist=None,smir
     if bondindexlist is not None:
         for bondindexes in bondindexlist:
             bond=mol.GetBondBetweenAtoms(bondindexes[0],bondindexes[1])
-            bondidx=bond.GetIdx()
-            bondlist.append(bondidx)
+            if bond!=None:
+                bondidx=bond.GetIdx()
+                bondlist.append(bondidx)
     drawer.DrawMolecule(mol,highlightAtoms=[],highlightBonds=bondlist)
     drawer.FinishDrawing()
     svg = drawer.GetDrawingText().replace('svg:','')
