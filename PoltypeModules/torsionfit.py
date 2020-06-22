@@ -139,10 +139,20 @@ def compute_qm_tor_energy(poltype,a,b,c,d,startangle,phase_list = None):
                     tor_energy = float(mengi) * poltype.Hartree2kcal_mol
             else:
                 for line in tmpfh:
-                    m = re.search(r'EUMP2 =\s+(\-*\d+\.\d+D\+\d+)',line)
-                    if not m is None:
-                        mengi = m.group(1).replace('D+', 'E+')
-                        tor_energy = float(mengi) * poltype.Hartree2kcal_mol
+                    if poltype.torspmethod=='MP2':
+                        m = re.search(r'EUMP2 =\s+(\-*\d+\.\d+D\+\d+)',line)
+                        if not m is None:
+                            mengi = m.group(1).replace('D+', 'E+')
+                            tor_energy = float(mengi) * poltype.Hartree2kcal_mol
+                    else:
+                        if 'HF=' in line:
+                            linesplit=line.split('HF=')
+                            post=linesplit[1]
+                            postsplit=post.split('\\')
+                            result=float(postsplit[0])
+                            tor_energy = result* poltype.Hartree2kcal_mol
+
+
             tmpfh.close()
 
         WBOarray.append(WBOvalue)
