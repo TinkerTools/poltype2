@@ -2607,10 +2607,16 @@ class Valence():
                     check=self.CheckIfNeighborsExistInSMARTMatch(neighborindexes,ia)
                     rot=bond.IsRotor()
                     arobond=False
+                    ringbond=False
+                    if b.IsInRing()==True and c.IsInRing()==True:
+                        ringbond=True
                     if b.IsAromatic()==True and c.IsAromatic()==True:
                         arobond=True
                     if (check==False and self.dontfrag==False and self.isfragjob==False) and rot==True and arobond==False:
-                        zeroed=True
+                         if ringbond==True and self.allownonaromaticringscanning==True:
+                              zeroed=True
+                         elif ringbond==False:
+                             zeroed=True
                     if(dorot):
                         for r in rotbnds:
                             sortr = self.sorttorsion([self.idxtosymclass[r[0]],self.idxtosymclass[r[1]],self.idxtosymclass[r[2]],self.idxtosymclass[r[3]]])
