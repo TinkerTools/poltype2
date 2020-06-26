@@ -714,7 +714,9 @@ def CreatePsi4TorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optm
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')
     temp.write('for _ in range(1):'+'\n')
     temp.write('  try:'+'\n')
-    temp.write("    optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
+    if poltype.toroptpcm==True:
+        temp.write('    set opt_coordinates cartesian'+'\n')
+        temp.write("    optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
     if poltype.freq:
         temp.write('    scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
     temp.write('    break'+'\n')
