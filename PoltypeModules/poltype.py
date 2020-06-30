@@ -305,6 +305,8 @@ class PolarizableTyper():
                         self.torsionrestraint=float(a)
                     elif "foldnum" in newline:
                         self.foldnum=int(a)
+                        self.nfoldlist =  list(range(1,self.foldnum+1))
+
                     elif "tordatapointsnum" in newline:
                         self.tordatapointsnum=int(a)
                     elif "fitrotbndslist" in newline:
@@ -1017,7 +1019,7 @@ class PolarizableTyper():
     
     
             # Map from idx to symm class is made for valence.py
-            v = valence.Valence(self.versionnum,self.logfname,self.dontfrag,self.isfragjob)
+            v = valence.Valence(self.versionnum,self.logfname,self.dontfrag,self.isfragjob,self.allownonaromaticringscanning)
             v.setidxtoclass(self.idxtosymclass)
             dorot = True
             # valence.py method is called to find parameters and append them to the keyfile

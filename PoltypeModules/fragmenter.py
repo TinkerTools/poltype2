@@ -78,6 +78,7 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
                 for line in results:
                     valenceprmlist.append(line)
             if '.key_6' in ff:
+                poltype.WriteToLog('key_6'+ff)
                 temp=open(ff,'r')
                 results=temp.readlines()
                 temp.close()
@@ -267,6 +268,7 @@ def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog):
 
 
 def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,torlist,equivalentrotbndindexarrays):
+    poltype.WriteToLog('about to spawn')
     parentdir=dirname(abspath(os.getcwd()))
     listofjobs=[]
     jobtooutputlog={}
@@ -349,9 +351,11 @@ def get_class_key(poltype,a, b, c, d,fragidxtotypeidx):
 def ConvertFragIdxToWholeIdx(poltype,torlist,rotbndindextoparentindextofragindex,fragmol,fragmentfilename,wholexyz,wholemol,filepath):
     fragmentfileprefix=fragmentfilename.replace('.sdf','')
     if not os.path.isfile(filepath+r'/'+fragmentfileprefix+'.key_5'):
+        poltype.WriteToLog('returning did not find key_5 '+fragmentfileprefix)
         return # if POLTYPE job failed, just try to submit the other fragment jobs instead of killing parent job
 
     if os.path.isfile(filepath+r'/'+fragmentfileprefix+'.key_6'):
+        poltype.WriteToLog('found key_6, returning '+fragmentfileprefix)
         return
     temp=open(filepath+r'/'+fragmentfileprefix+'.key_5','r')
     fragkeyresults=temp.readlines()
@@ -410,6 +414,7 @@ def ConvertFragIdxToWholeIdx(poltype,torlist,rotbndindextoparentindextofragindex
     p = Chem.MolFromSmarts(fragsmarts)
     diditmatchrdkit=fragmol.HasSubstructMatch(p)
     fragtypeidxtowholemoltypeidx={}
+    print('fragidxtowholemolidxbabel',fragidxtowholemolidxbabel)
     for fragidxbabel in fragidxtowholemolidxbabel.keys():
         wholemolidxbabel=fragidxtowholemolidxbabel[fragidxbabel]
         fragtypeidx=fragidxtotypeidx[fragidxbabel]
@@ -418,6 +423,7 @@ def ConvertFragIdxToWholeIdx(poltype,torlist,rotbndindextoparentindextofragindex
         wholemoltypeidx=wholeidxtotypeidx[wholemolidxbabel]
         if wholemoltypeidx not in fragtypeidxtowholemoltypeidx[fragtypeidx]: 
             fragtypeidxtowholemoltypeidx[fragtypeidx].append(wholemoltypeidx)
+        print('fragidxbabel',fragidxbabel,'wholemolidxbabel',wholemolidxbabel,'fragtypeidx',fragtypeidx,'wholemoltypeidx',wholemoltypeidx)
     newtemp=open(filepath+r'/'+'valence.prms','w')
     temp=open(filepath+r'/'+fragmentfileprefix+'.key_6','w')
     for line in fragkeyresults:
@@ -703,7 +709,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
     rotbndindextofragWBOmatrix={}
     rotbndindextofragfoldername={}
     rotbndindextoWBOdifference={}
-
+   
     for tor in torlist:
         WBOdifferencetofragWBOmatrix={}
         WBOdifferencetofoldername={}

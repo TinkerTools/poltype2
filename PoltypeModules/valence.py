@@ -32,7 +32,7 @@ import os
 radian = 57.29577951308232088
 
 class Valence():
-    def __init__(self,versionnum,logfname,dontfrag,isfragjob):
+    def __init__(self,versionnum,logfname,dontfrag,isfragjob,allownonaromaticringscanning):
         self.sp = openbabel.OBSmartsPattern()
         self.missed_torsions = []
         self.versionnum=versionnum
@@ -40,7 +40,7 @@ class Valence():
         self.defopbendval = 0.20016677990819662
         self.dontfrag=dontfrag
         self.isfragjob=isfragjob
-
+        self.allownonaromaticringscanning=allownonaromaticringscanning
 
 
     def setidxtoclass(self, symmclass):
@@ -2614,7 +2614,7 @@ class Valence():
                         arobond=True
                     if (check==False and self.dontfrag==False and self.isfragjob==False) and rot==True and arobond==False:
                          if ringbond==True and self.allownonaromaticringscanning==True:
-                              zeroed=True
+                             zeroed=True
                          elif ringbond==False:
                              zeroed=True
                     if(dorot):

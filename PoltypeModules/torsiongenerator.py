@@ -183,6 +183,7 @@ def tinker_minimize_angles(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phase
         dihedral = optmol.GetTorsion(a,b,c,d)
         newdihedral=round((dihedral+phaseangle)%360)
         rdmt.SetDihedralDeg(conf, a-1, b-1, c-1, d-1, newdihedral)
+        rdmol.UpdatePropertyCache(strict=False)
         try:
             print(Chem.MolToMolBlock(rdmol,kekulize=True),file=open('tempout.mol','w+'))
         except:
@@ -282,6 +283,14 @@ def gen_torsion(poltype,optmol,torsionrestraint):
     if not os.path.isdir('qm-torsion'):
         os.mkdir('qm-torsion')
     os.chdir('qm-torsion')
+    '''
+    cmdstr='rm *.xyz_*'
+    os.system(cmdstr)
+    cmdstr='rm *.out'
+    os.system(cmdstr)
+    cmdstr='rm *.alz'
+    os.system(cmdstr)
+    '''
     files=os.listdir(os.getcwd())
      
     poltype.optoutputtotorsioninfo={}
@@ -466,7 +475,7 @@ def get_torlist(poltype,mol):
     rotbndlist = {}
 
     iterbond = openbabel.OBMolBondIter(mol)
-    v1 = valence.Valence(poltype.versionnum,poltype.logfname,poltype.dontfrag,poltype.isfragjob)
+    v1 = valence.Valence(poltype.versionnum,poltype.logfname,poltype.dontfrag,poltype.isfragjob,poltype.allownonaromaticringscanning)
     v1.setidxtoclass(poltype.idxtosymclass)
     v1.torguess(mol,False,[])
     missed_torsions = v1.get_mt()
@@ -480,11 +489,18 @@ def get_torlist(poltype,mol):
         
         t2val=t2.GetValence()
         t3val=t3.GetValence()
+        ringbond=False
+        if t2.IsInRing()==True and t3.IsInRing()==True:
+            ringbond=True
+
         arobond=False
         if t2.IsAromatic()==True and t3.IsAromatic()==True:
             arobond=True
         if arobond==True:
             continue
+        if ringbond==True and poltype.allownonaromaticringscanning==False:
+            continue
+
         if ((bond.IsRotor()) or [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist or (poltype.rotalltors and t2val>=2 and t3val>=2)):
             t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
             # is the torsion in toromitlist
@@ -716,7 +732,7 @@ def CreatePsi4TorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optm
     temp.write('  try:'+'\n')
     if poltype.toroptpcm==True:
         temp.write('    set opt_coordinates cartesian'+'\n')
-        temp.write("    optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
+    temp.write("    optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
     if poltype.freq:
         temp.write('    scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
     temp.write('    break'+'\n')

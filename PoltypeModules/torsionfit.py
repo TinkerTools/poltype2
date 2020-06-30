@@ -145,11 +145,9 @@ def compute_qm_tor_energy(poltype,a,b,c,d,startangle,phase_list = None):
                             mengi = m.group(1).replace('D+', 'E+')
                             tor_energy = float(mengi) * poltype.Hartree2kcal_mol
                     else:
-                        if 'HF=' in line:
-                            linesplit=line.split('HF=')
-                            post=linesplit[1]
-                            postsplit=post.split('\\')
-                            result=float(postsplit[0])
+                        if 'SCF Done:' in line:
+                            linesplit=line.split()
+                            result=float(linesplit[4])
                             tor_energy = result* poltype.Hartree2kcal_mol
 
 
@@ -677,7 +675,9 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         
 
         # max amplitude of function
+        print('tor_energy_list',tor_energy_list)
         max_amp = max(tor_energy_list) - min(tor_energy_list)
+        print('max_amp',max_amp)
         pzero = [ max_amp ] * prmidx
         #print('torprmdict before removing torsions to prevent overfitting',torprmdict)
         # Remove parameters while # of parameters > # data points
@@ -731,7 +731,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             #p1,covx,idict,msg,ier = optimize.leastsq(errfunc, pzero, args=(rads(numpy.array(angle_list)),torprmdict, tor_energy_list), full_output = True)
             array=optimize.least_squares(errfunc, pzero, jac='2-point', bounds=(-max_amp, max_amp), args=(torgen.rads(poltype,numpy.array(angle_list)),torprmdict, tor_energy_list))
             p1=array['x']
-
+            print('p1',p1)
             # Remove parameters found by least.sq that aren't reasonable; 
             # remove parameters found that are greater than max_amp
             for chkclskey in keylist:
@@ -962,7 +962,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         if float(RMSD)>poltype.maxtorRMSPD:
             poltype.WriteToLog('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
             if poltype.suppresstorfiterr==False:
-
+                print('mm2',mm2_energy_list,'qm',qm_energy_list)
                 raise ValueError('RMSPD of QM and MM torsion profile is high, RMSPD = '+str(minRMSD))
 
 

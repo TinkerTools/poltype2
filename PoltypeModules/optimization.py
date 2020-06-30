@@ -56,7 +56,7 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
     temp.write('  try:'+'\n')
     if poltype.optpcm==True:
         temp.write('    set opt_coordinates cartesian'+'\n')
-        temp.write("    optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
+    temp.write("    optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
     if poltype.freq:
         temp.write('    scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
     temp.write('    break'+'\n')
