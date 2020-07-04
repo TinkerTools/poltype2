@@ -292,7 +292,6 @@ def GeometryOptimization(poltype,mol):
         if not term:
             mystruct = load_structfile(poltype,poltype.molstructfname)
             gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,OBOPTmol)
-
             cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdir + ' ' + poltype.gausexe + " " + poltype.comoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}

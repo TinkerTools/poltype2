@@ -62,19 +62,30 @@ def fitfunc (poltype,parms, x, torprmdict, debug = False):
     offset =[ 0.0 ]* len(x)
     if debug:
         pass
+    clskeytoangletotorenergy={}
+    clskeytoangletotorenergy['angletotorenergy']={}
     for torprmkey in torprmdict.keys():
         torprm=torprmdict[torprmkey]
-        for nfold in torprm['prmdict']:
-            for clsangle, clscnt in torprm['phasedict'].items():
+        for clsangle, clscnt in torprm['phasedict'].items():
+            clskeytoangletotorenergy['angletotorenergy'][clsangle]=[ 0.0 ] * len(x)
+
+    for torprmkey in torprmdict.keys():
+        torprm=torprmdict[torprmkey]
+        #torfitfavorminima=torprm['torfitfavorminima']
+        for clsangle, clscnt in torprm['phasedict'].items():
+            #if torfitfavorminima==True:
+            #    weight=torprm['clsangletoweight'][clsangle]
+            #else:
+            #    weight=1   
+            weight=1  
+            for nfold in torprm['prmdict']:
                 prm = torprm['prmdict'][nfold]
                 if parms is not 'eval':
                     prm = parms[torprm['prmdict'][nfold]]
-                tor_energy += tor_func_term (poltype,
-                    prm, x, nfold, clscnt, torgen.rads(poltype,clsangle),
-                    torgen.rads(poltype,poltype.foldoffsetlist[nfold-1]))
-
+                clskeytoangletotorenergy['angletotorenergy'][clsangle]+=tor_func_term (poltype,prm, x, nfold, clscnt, torgen.rads(poltype,clsangle),torgen.rads(poltype,poltype.foldoffsetlist[nfold-1]))
                 if debug:
                     pass
+            clskeytoangletotorenergy['angletotorenergy'][clsangle]=weight*clskeytoangletotorenergy['angletotorenergy'][clsangle]
 
         if parms is 'eval' and 'offset' in torprm:
             offset = torprm['offset']
@@ -82,6 +93,11 @@ def fitfunc (poltype,parms, x, torprmdict, debug = False):
 
     if parms is not 'eval':
         offset = parms[-1]
+    for torprmkey in torprmdict.keys():
+        torprm=torprmdict[torprmkey]
+        for clsangle, clscnt in torprm['phasedict'].items():
+            tor_energy+=clskeytoangletotorenergy['angletotorenergy'][clsangle]
+
     tor_energy += offset
     return tor_energy
 
@@ -666,6 +682,16 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         #  atoms restrained during restrained rotation.
         # tor_energy_list is set as qm - mm
         tor_energy_list = [qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)]
+        '''
+        torprm=torprmdict[clskey]
+        
+        torprm['clsangletoweight']={}
+        i=0
+        for clsangle, clscnt in torprm['phasedict']:
+            qm_energy=qm_energy_list[i]
+            weight=np.exp(-qm_energy/2.5)
+            torprm['clsangletoweight'][clsangle]=weight
+        '''
         Tx = numpy.arange ( 0.0, 360.0, 30)
         txtfname = "%s-fit-%d-%d-%d-%d.txt" % (poltype.molecprefix, a, b, c, d)
         # create initial fit file, initially it seems to be 2d instead of 3d
@@ -675,9 +701,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         
 
         # max amplitude of function
-        print('tor_energy_list',tor_energy_list)
         max_amp = max(tor_energy_list) - min(tor_energy_list)
-        print('max_amp',max_amp)
         pzero = [ max_amp ] * prmidx
         #print('torprmdict before removing torsions to prevent overfitting',torprmdict)
         # Remove parameters while # of parameters > # data points
@@ -731,7 +755,6 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             #p1,covx,idict,msg,ier = optimize.leastsq(errfunc, pzero, args=(rads(numpy.array(angle_list)),torprmdict, tor_energy_list), full_output = True)
             array=optimize.least_squares(errfunc, pzero, jac='2-point', bounds=(-max_amp, max_amp), args=(torgen.rads(poltype,numpy.array(angle_list)),torprmdict, tor_energy_list))
             p1=array['x']
-            print('p1',p1)
             # Remove parameters found by least.sq that aren't reasonable; 
             # remove parameters found that are greater than max_amp
             for chkclskey in keylist:
@@ -780,16 +803,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         Sx = numpy.array(cls_angle_dict[clskey])
         fitfunc_dict[clskey] = fitfunc(poltype,'eval',torgen.rads(poltype,Sx),torprmdict,debug=False)
         deriv_qm=numpy.gradient(tor_energy_list)
-        #weight=numpy.exp(-numpy.array(tor_energy_list)/.6)
-        #weight=numpy.add(.6,numpy.absolute(deriv_qm))
         if len(fitfunc_dict[clskey])==len(tor_energy_list):
-            #def RMSDW(c):
-            #    return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.divide(numpy.subtract(fitfunc_dict[clskey],tor_energy_list),weight),c))))
-           # def RMSDW(c):
-            #    return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.multiply(numpy.subtract(fitfunc_dict[clskey],tor_energy_list),weight),c))))
-
-            #resultW=fmin(RMSDW,.5)
-            #minRMSDW=RMSDW(resultW[0])
             def RMSD(c):
                 return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.subtract(fitfunc_dict[clskey],tor_energy_list),c))))
             result=fmin(RMSD,.5)
@@ -864,6 +878,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         b. Plot the profiles
     """
     # for each main torsion
+    redofitting=False
     for tor in poltype.torlist:
         a,b,c,d = tor[0:4]
         key=str(b)+' '+str(c)
@@ -962,8 +977,8 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         if float(RMSD)>poltype.maxtorRMSPD:
             poltype.WriteToLog('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
             if poltype.suppresstorfiterr==False:
-                print('mm2',mm2_energy_list,'qm',qm_energy_list)
                 raise ValueError('RMSPD of QM and MM torsion profile is high, RMSPD = '+str(minRMSD))
+                 
 
 
 def gen_toromit_list(poltype):

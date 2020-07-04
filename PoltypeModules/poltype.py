@@ -477,7 +477,7 @@ class PolarizableTyper():
         Referenced By: main
         Description: -
         """
-        if self.use_gaus:
+        if self.use_gaus or self.use_gausoptonly:
             if self.gausdir is None:
                 self.gausdir = ""
             if self.gausexe is None:
@@ -1001,7 +1001,6 @@ class PolarizableTyper():
         self.torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self) # this only happens in very symmetrical molecules
         torlist=[i[:4] for i in self.torlist]
         self.rotbndtoanginc=torgen.DetermineAngleIncrementForEachTorsion(self,mol,self.rotbndlist)
-
         if not os.path.isfile(self.key4fname):
             shutil.copy(self.key3fname, self.key4fname)
             

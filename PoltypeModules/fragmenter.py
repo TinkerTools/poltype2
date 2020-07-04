@@ -94,6 +94,9 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
                         tor=[typea,typeb,typec,typed]
                         torkey='%d %d %d %d' % (typea, typeb, typec, typed)
                         if torkey in symmtorlist:
+                            if '0.0000 0.0 1 0.0000 180.0 2 0.0000 0.0 3' in line:
+                                print('os.getcwd()',os.getcwd(),'ff',ff,line,flush=True)
+                                poltype.WriteToLog('dir '+os.getcwd()+ 'ff '+ff+' '+line)
                             torprmdic[torkey]=line
     os.chdir(curdir)
     temp=open(poltype.key4fname,'r')
@@ -414,7 +417,6 @@ def ConvertFragIdxToWholeIdx(poltype,torlist,rotbndindextoparentindextofragindex
     p = Chem.MolFromSmarts(fragsmarts)
     diditmatchrdkit=fragmol.HasSubstructMatch(p)
     fragtypeidxtowholemoltypeidx={}
-    print('fragidxtowholemolidxbabel',fragidxtowholemolidxbabel)
     for fragidxbabel in fragidxtowholemolidxbabel.keys():
         wholemolidxbabel=fragidxtowholemolidxbabel[fragidxbabel]
         fragtypeidx=fragidxtotypeidx[fragidxbabel]
@@ -423,7 +425,6 @@ def ConvertFragIdxToWholeIdx(poltype,torlist,rotbndindextoparentindextofragindex
         wholemoltypeidx=wholeidxtotypeidx[wholemolidxbabel]
         if wholemoltypeidx not in fragtypeidxtowholemoltypeidx[fragtypeidx]: 
             fragtypeidxtowholemoltypeidx[fragtypeidx].append(wholemoltypeidx)
-        print('fragidxbabel',fragidxbabel,'wholemolidxbabel',wholemolidxbabel,'fragtypeidx',fragtypeidx,'wholemoltypeidx',wholemoltypeidx)
     newtemp=open(filepath+r'/'+'valence.prms','w')
     temp=open(filepath+r'/'+fragmentfileprefix+'.key_6','w')
     for line in fragkeyresults:
@@ -436,21 +437,23 @@ def ConvertFragIdxToWholeIdx(poltype,torlist,rotbndindextoparentindextofragindex
             tor=[typea,typeb,typec,typed]
             torkey='%d %d %d %d' % (typea, typeb, typec, typed)
             #smilesposarray=classkeytosmilesposarray[torkey]
-            possiblewholetypeslist=GenerateAllPossibleWholeTorsions(poltype,typea,typeb,typec,typed,fragtypeidxtowholemoltypeidx)
-            for possiblewholetypes in possiblewholetypeslist:
-                wholetypea,wholetypeb,wholetypec,wholetyped=possiblewholetypes[:]
-                wholemoltypestring=str(wholetypea)+' '+str(wholetypeb)+' '+str(wholetypec)+' '+str(wholetyped)
-                torprmstring=' '.join(linesplit[5:])
-                torstring='torsion '+wholemoltypestring+' '+torprmstring
-                temp.write(torstring+'\n')
-                #valencestring='"'+fragsmarts+'"'+' '+':'+' '+'['+str(smilesposarray[0])+','+str(smilesposarray[1])+','+str(smilesposarray[2])+','+str(smilesposarray[3])+','
-                #torprmlist=linesplit[5:]
-                #prms=torprmlist[0::3]
-                #for prm in prms:
-                #    valencestring+=prm+','
-                #valencestring=valencestring[:-1]
-                #valencestring+=']'+','+' '+r'\\'
-                #newtemp.write(valencestring+'\n')
+            if typea in fragtypeidxtowholemoltypeidx.keys() and typeb in fragtypeidxtowholemoltypeidx.keys() and typec in fragtypeidxtowholemoltypeidx.keys() and typed in fragtypeidxtowholemoltypeidx.keys():
+                
+                possiblewholetypeslist=GenerateAllPossibleWholeTorsions(poltype,typea,typeb,typec,typed,fragtypeidxtowholemoltypeidx)
+                for possiblewholetypes in possiblewholetypeslist:
+                    wholetypea,wholetypeb,wholetypec,wholetyped=possiblewholetypes[:]
+                    wholemoltypestring=str(wholetypea)+' '+str(wholetypeb)+' '+str(wholetypec)+' '+str(wholetyped)
+                    torprmstring=' '.join(linesplit[5:])
+                    torstring='torsion '+wholemoltypestring+' '+torprmstring
+                    temp.write(torstring+'\n')
+                    #valencestring='"'+fragsmarts+'"'+' '+':'+' '+'['+str(smilesposarray[0])+','+str(smilesposarray[1])+','+str(smilesposarray[2])+','+str(smilesposarray[3])+','
+                    #torprmlist=linesplit[5:]
+                    #prms=torprmlist[0::3]
+                    #for prm in prms:
+                    #    valencestring+=prm+','
+                    #valencestring=valencestring[:-1]
+                    #valencestring+=']'+','+' '+r'\\'
+                    #newtemp.write(valencestring+'\n')
         else:
             temp.write(line)
     temp.close()
@@ -459,8 +462,6 @@ def ConvertFragIdxToWholeIdx(poltype,torlist,rotbndindextoparentindextofragindex
 
 def GenerateAllPossibleWholeTorsions(poltype,typea,typeb,typec,typed,fragtypeidxtowholemoltypeidx):
     possiblewholetypeslist=[]
-    print('fragtypeidxtowholemoltypeidx',fragtypeidxtowholemoltypeidx)
-    print('typea',typea,'typeb',typeb,'typec',typec,'typed',typed)
     possibleatypes=fragtypeidxtowholemoltypeidx[typea] 
     possiblebtypes=fragtypeidxtowholemoltypeidx[typeb]
     possiblectypes=fragtypeidxtowholemoltypeidx[typec]
