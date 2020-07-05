@@ -967,8 +967,8 @@ class PolarizableTyper():
             mpole.prepend_keyfile(self,self.keyfname,optmol)
         # post process local frames written out by poledit
         mpole.post_proc_localframes(self,self.keyfname, lfzerox,atomindextoremovedipquad,atomindextoremovedipquadcross)
-        esp.SPForESP(self,optmol,mol) 
          
+        esp.SPForESP(self,optmol,mol) 
         # End here if qm calculations were all that needed to be done 
         if self.qmonly:
             self.WriteToLog("poltype QM-only complete.")
