@@ -342,7 +342,6 @@ def GeometryOptimization(poltype,mol):
         optmol=rebuild_bonds(poltype,optmol,mol)
 
 
-
     GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'))
     CheckBondConnectivity(poltype,mol,optmol)
     return optmol

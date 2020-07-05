@@ -94,9 +94,6 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
                         tor=[typea,typeb,typec,typed]
                         torkey='%d %d %d %d' % (typea, typeb, typec, typed)
                         if torkey in symmtorlist:
-                            if '0.0000 0.0 1 0.0000 180.0 2 0.0000 0.0 3' in line:
-                                print('os.getcwd()',os.getcwd(),'ff',ff,line,flush=True)
-                                poltype.WriteToLog('dir '+os.getcwd()+ 'ff '+ff+' '+line)
                             torprmdic[torkey]=line
     os.chdir(curdir)
     temp=open(poltype.key4fname,'r')
