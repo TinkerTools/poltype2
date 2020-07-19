@@ -203,7 +203,7 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
         else:
             densitystring='SCF'
         
-        opstr="#P %s/%s Sp Density=%s SCF=Save Guess=Huckel MaxDisk=%s Pop=NBORead\n" % (poltype.espmethod,poltype.espbasisset, densitystring,maxdisk)
+        opstr="#P %s/%s Sp Density=%s SCF=Save MaxDisk=%s Pop=NBORead\n" % (poltype.espmethod,poltype.espbasisset, densitystring,maxdisk)
 
 
     bset=re.search('(?i)(6-31|aug-cc)\S+',opstr)
