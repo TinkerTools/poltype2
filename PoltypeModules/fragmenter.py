@@ -581,7 +581,8 @@ def GenerateFrag(poltype,molindexlist,mol):
     outputname='hydrated.mol'
     WriteOBMolToMol(poltype,nem,outputname)
     newmol=rdmolfiles.MolFromMolFile(outputname,removeHs=False)
-
+    print('newmol',newmol)
+    newmol.UpdatePropertyCache(strict=False)
     AllChem.EmbedMolecule(newmol)
     rdkitindextocoordinates={}
     for idx,coords in indextocoordinates.items():

@@ -370,7 +370,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
             #newoptmol = load_structfile(poltype,outputlog.replace('.log','.xyz'))
             #CheckBondConnectivity(poltype,newoptmol,optmol)
 
-        if finished==True and error==False and outputlog not in finishedjobs:
+        if finished==True and outputlog not in finishedjobs:
             finishedjobs.append(outputlog)
     fulltorxyznames=[]
     fullfinishedoutputlogsSP=[]
