@@ -188,28 +188,31 @@ def gen_peditinfile(poltype,mol):
             uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom=list(set([poltype.idxtosymclass[b.GetIdx()] for b in neighbsofneighbwithoutatom]))
 
             sorteduniquetypeneighbsnorepeatofneighbsofneighbwithoutatom=FindUniqueNonRepeatingNeighbors(poltype,neighbsofneighbwithoutatom)
-        if val==1 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(atomneighbs[0])]) and atomneighbs[0].GetValence()==4: # then this is like H in Methane, we want Z-only
-            poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
-            poltype.localframe2[atomidx - 1] = 0
-            lfzerox[atomidx - 1]=True
-            atomtypetospecialtrace[atomidx]=True
-            atomindextoremovedipquadcross[atomidx]=True
-        elif CheckIfAllAtomsSameClass(poltype,atomneighbs) and not AtLeastOneHeavyNeighb(poltype,atom) and val==4: # then this is like carbon in Methane, we want Z-only
-            idxlist=GrabIndexesFromUniqueTypeNumber(poltype,atomneighbs,uniqueneighbtypes[0])
-            poltype.localframe1[atomidx-1]=idxlist[0]
-            poltype.localframe2[atomidx - 1] = 0
-            lfzerox[atomidx - 1]=True
-            atomindextoremovedipquad[atomidx]=True
-        elif atom.GetAtomicNum()==7 and CheckIfAllAtomsSameClass(poltype,atomneighbs) and val==3: # then this is like Ammonia and we can use a trisector here which behaves like Z-only
-            idxtotrisecbool[atomidx]=True
-            trisectidxs=[atm.GetIdx() for atm in atomneighbs]
-            idxtotrisectidxs[atomidx]=trisectidxs
-            lfzerox[atomidx - 1]=True # need to zero out the x components just like for z-only case
-        elif val==1 and atomneighbs[0].GetValence()==3 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(atomneighbs[0])]): # then this is like the H on Ammonia and we can use z-then bisector
-            poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
-            idxtobisecthenzbool[atomidx]=True
-            bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
-            idxtobisectidxs[atomidx]=bisectidxs
+        #
+        # Poledit works, no need special treatment here!
+        #
+        #if val==1 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(atomneighbs[0])]) and atomneighbs[0].GetValence()==4: # then this is like H in Methane, we want Z-only
+        #    poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
+        #    poltype.localframe2[atomidx - 1] = 0
+        #    lfzerox[atomidx - 1]=True
+        #    atomtypetospecialtrace[atomidx]=True
+        #    atomindextoremovedipquadcross[atomidx]=True
+        #elif CheckIfAllAtomsSameClass(poltype,atomneighbs) and not AtLeastOneHeavyNeighb(poltype,atom) and val==4: # then this is like carbon in Methane, we want Z-only
+        #    idxlist=GrabIndexesFromUniqueTypeNumber(poltype,atomneighbs,uniqueneighbtypes[0])
+        #    poltype.localframe1[atomidx-1]=idxlist[0]
+        #    poltype.localframe2[atomidx - 1] = 0
+        #    lfzerox[atomidx - 1]=True
+        #    atomindextoremovedipquad[atomidx]=True
+        #elif atom.GetAtomicNum()==7 and CheckIfAllAtomsSameClass(poltype,atomneighbs) and val==3: # then this is like Ammonia and we can use a trisector here which behaves like Z-only
+        #    idxtotrisecbool[atomidx]=True
+        #    trisectidxs=[atm.GetIdx() for atm in atomneighbs]
+        #    idxtotrisectidxs[atomidx]=trisectidxs
+        #    lfzerox[atomidx - 1]=True # need to zero out the x components just like for z-only case
+        #elif val==1 and atomneighbs[0].GetValence()==3 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(atomneighbs[0])]): # then this is like the H on Ammonia and we can use z-then bisector
+        #    poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
+        #    idxtobisecthenzbool[atomidx]=True
+        #    bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
+        #    idxtobisectidxs[atomidx]=bisectidxs
         elif (val==2 and CheckIfAllAtomsSameClass(poltype,atomneighbs)) or (val==4 and len(uniqueneighbtypes)==2) and len(sorteduniquetypeneighbsnorepeat)==0:  # then this is like middle propane carbon or oxygen in water
             idxlist=GrabIndexesFromUniqueTypeNumber(poltype,atomneighbs,uniqueneighbtypes[0])
             poltype.localframe1[atomidx-1]=-1*idxlist[0]
@@ -231,12 +234,11 @@ def gen_peditinfile(poltype,mol):
             poltype.localframe2[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
 
-
-        elif ((val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==3) or (val==3 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==4)) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1:  # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector
-            idxtobisecthenzbool[atomidx]=True
-            bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
-            idxtobisectidxs[atomidx]=bisectidxs
-            poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
+        #elif ((val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==3) or (val==3 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==4)) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1:  # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector
+        #    idxtobisecthenzbool[atomidx]=True
+        #    bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
+        #    idxtobisectidxs[atomidx]=bisectidxs
+        #    poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
 
             # now make sure neighboring atom (lf1) also is using z-then-bisector
         else:
