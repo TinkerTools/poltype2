@@ -925,7 +925,7 @@ class PolarizableTyper():
         if self.totalcharge!=0:
             self.toroptpcm=True
             self.optpcm=True
-        #    self.torsppcm=True
+            self.torsppcm=True
 
      
         self.WriteToLog("Running on host: " + gethostname())
