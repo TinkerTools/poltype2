@@ -925,7 +925,7 @@ class PolarizableTyper():
         if self.totalcharge!=0:
             self.toroptpcm=True
             self.optpcm=True
-            self.torsppcm=True
+        #    self.torsppcm=True
 
      
         self.WriteToLog("Running on host: " + gethostname())
@@ -1036,7 +1036,7 @@ class PolarizableTyper():
             dorot = True
             # valence.py method is called to find parameters and append them to the keyfile
             v.appendtofile(self.key4fname, optmol, dorot,self.rotbndlist)
-            if self.totalcharge!=0:
+            if self.torsppcm:
                 torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
         if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False:
 
@@ -1075,7 +1075,7 @@ class PolarizableTyper():
         opt.StructureMinimization(self)
         opt.gen_superposeinfile(self)
         opt.CheckRMSD(self)
-        if self.totalcharge!=0:
+        if self.torsppcm:
             torgen.RemoveStringFromKeyfile(self,self.key5fname,'solvate GK')
         esp.CheckDipoleMoments(self,optmol)
         self.WriteToLog('Poltype Job Finished'+'\n')

@@ -10,7 +10,7 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
     tempread=open(comfilecoords,'r')
     results=tempread.readlines()
     tempread.close()
-    inputname=comfilename.replace('.com','_psi4.dat')
+    inputname=comfilename.replace('.com','.psi4')
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
     temp.write('%d %d\n' % (mol.GetTotalCharge(), 1))
@@ -292,7 +292,7 @@ def GeometryOptimization(poltype,mol):
         if not term:
             mystruct = load_structfile(poltype,poltype.molstructfname)
             gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,OBOPTmol)
-            cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdir + ' ' + poltype.gausexe + " " + poltype.comoptfname
+            cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdir + ' ' + poltype.gausexe + " " + poltype.comoptfname 
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdir
