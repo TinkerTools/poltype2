@@ -769,10 +769,8 @@ class PolarizableTyper():
                         term=True
                     if ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line and 'except' not in line:
                         error=True
-                        print('error',line,logfname)
                     if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line:
                         error=False
-                        print('seg violation, address not mapped, waiting',logfname)
                         continue
                     if ('Error termination request processed by link 9999' in line or 'Error termination via Lnk1e in' in line) or ('OptimizationConvergenceError' in line) and 'opt' in logfname:
                         if self.CycleCount(logfname)>=poltype.optmaxcycle:
@@ -908,7 +906,8 @@ class PolarizableTyper():
         inFormat = obConversion.FormatFromExt(self.molstructfname)
         obConversion.SetInFormat(inFormat)
         obConversion.ReadFile(mol, self.molstructfname)
-    
+        
+  
         self.totalcharge=mol.GetTotalCharge()
         # Begin log. *-poltype.log
         if os.path.isfile(self.logfname):
@@ -927,7 +926,7 @@ class PolarizableTyper():
             self.optpcm=True
             self.torsppcm=True
 
-     
+ 
         self.WriteToLog("Running on host: " + gethostname())
         # Initializing arrays
         
@@ -947,7 +946,10 @@ class PolarizableTyper():
         # This information is used by cubegen
 
         optmol = opt.GeometryOptimization(self,mol)
-        self.mol=optmol
+        
+ 
+
+
         esp.SPForDMA(self,optmol,mol)
         # Obtain multipoles from Gaussian fchk file using GDMA
     

@@ -278,6 +278,7 @@ def GeometryOptimization(poltype,mol):
     charge=poltype.totalcharge
     OBOPTmol.SetTotalCharge(charge) # for some reason obminimize does not print charge in output PDB
     
+
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
         if not os.path.exists(poltype.scratchdir):
             mkdirstr='mkdir '+poltype.scratchdir
@@ -313,7 +314,8 @@ def GeometryOptimization(poltype,mol):
             poltype.RaiseOutputFileError(poltype.logoptfname) 
         optmol =  load_structfile(poltype,poltype.logoptfname)
         optmol=rebuild_bonds(poltype,optmol,mol)
-                
+        
+           
     else:
         gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,OBOPTmol)
         poltype.WriteToLog("Calling: " + "Psi4 Optimization")
@@ -375,8 +377,13 @@ def rebuild_bonds(poltype,newmol, refmol):
     for b in openbabel.OBMolBondIter(refmol):
         beg = b.GetBeginAtomIdx()
         end = b.GetEndAtomIdx()
+
         if not newmol.GetBond(beg,end):
             newmol.AddBond(beg,end, b.GetBO(), b.GetFlags())
+        else:
+            newb=newmol.GetBond(beg,end)
+            bondorder=newb.GetBondOrder()
+            newb.SetBondOrder(b.GetBO())
 
     return newmol
 
