@@ -649,7 +649,7 @@ def ConvertTinktoXYZ(poltype,filename):
 
 
 def CreatePsi4TorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optmol,torxyzfname,consttorlist):
-    inputname = '%s-opt-%d-%d-%d-%d-%03d_psi4.dat' % (molecprefix,a,b,c,d,round((torang+phaseangle)%360))
+    inputname = '%s-opt-%d-%d-%d-%d-%03d.psi4' % (molecprefix,a,b,c,d,round((torang+phaseangle)%360))
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
     temp.write('%d %d\n' % (optmol.GetTotalCharge(),1))
@@ -747,7 +747,7 @@ def CreatePsi4TorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optm
     temp.write('      '+'pass'+'\n')
     temp.write('clean()'+'\n')
     temp.close()
-    outputname=inputname.replace('.dat','.log')
+    outputname=inputname.replace('.psi4','.log')
     return inputname,outputname
 
 def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
@@ -919,7 +919,7 @@ def write_arr_to_file(poltype,fname, array_list):
 
 
 def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,molecprefix,a,b,c,d,torang,phaseangle,makecube=None):
-    inputname= '%s-sp-%d-%d-%d-%d-%03d_psi4.dat' % (molecprefix,a,b,c,d,round((torang+phaseangle)%360))
+    inputname= '%s-sp-%d-%d-%d-%d-%03d.psi4' % (molecprefix,a,b,c,d,round((torang+phaseangle)%360))
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
     temp.write('%d %d\n' % (optmol.GetTotalCharge(), 1))
@@ -937,12 +937,11 @@ def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,molecprefix
     temp.write('}'+'\n')
     if poltype.torsppcm==True:
         temp.write('set {'+'\n')
-        temp.write(' basis '+poltype.espbasisset+'\n')
         temp.write(' e_convergence 10 '+'\n')
         temp.write(' d_convergence 10 '+'\n')
         temp.write(' scf_type pk'+'\n')
         temp.write(' pcm true'+'\n')
-        temp.write('  pcm_scf_type total '+'\n')
+        temp.write(' pcm_scf_type total '+'\n')
         temp.write('}'+'\n')
         temp.write('pcm = {'+'\n')
         temp.write(' Units = Angstrom'+'\n')
@@ -957,6 +956,11 @@ def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,molecprefix
         temp.write(' Area = 0.3'+'\n')
         temp.write(' Mode = Implicit'+'\n')
         temp.write(' }'+'\n')
+        temp.write('}'+'\n')
+    else:
+        temp.write('set {'+'\n')
+        temp.write(' e_convergence 10 '+'\n')
+        temp.write(' d_convergence 10 '+'\n')
         temp.write('}'+'\n')
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
