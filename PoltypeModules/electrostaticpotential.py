@@ -394,10 +394,7 @@ def GrabQMDipoles(poltype,optmol,logname):
 
 
 def CheckDipoleMoments(poltype,optmol):
-    if poltype.use_gaus:
-        logname=poltype.logespfname
-    else:
-        logname=poltype.logespfname.replace('.log','_psi4.log')
+    logname=poltype.logespfname
     dipole=GrabQMDipoles(poltype,optmol,logname)
     qmdipole=round(np.linalg.norm(dipole),3)
     poltype.WriteToLog('QM Dipole moment = '+str(qmdipole))    
