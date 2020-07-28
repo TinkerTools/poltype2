@@ -126,11 +126,7 @@ def compute_qm_tor_energy(poltype,a,b,c,d,startangle,phase_list = None):
     WBOarray=[]
     for phaseangle in phase_list:
         angle = (startangle + phaseangle) % 360
-        if poltype.use_gaus:
-
-            minstrctfname = '%s-sp-%d-%d-%d-%d-%03d.log' % (poltype.molecprefix,a,b,c,d,round(angle))
-        else:
-            minstrctfname = '%s-sp-%d-%d-%d-%d-%03d_psi4.log' % (poltype.molecprefix,a,b,c,d,round(angle))
+        minstrctfname = '%s-sp-%d-%d-%d-%d-%03d.log' % (poltype.molecprefix,a,b,c,d,round(angle))
         if not os.path.exists(minstrctfname): # if optimization failed then SP file will not exist
             tor_energy=None
             WBOvalue=None

@@ -607,10 +607,7 @@ def prepend_keyfile(poltype,keyfilename,optmol,dipole=False):
     tmpfh.write("vdwterm none\n")
     tmpfh.write("fix-monopole\n")
     tmpfh.write("potential-offset 1.0\n\n")
-    if poltype.use_gaus:
-        logname=poltype.logespfname
-    else:
-        logname=poltype.logespfname.replace('.log','_psi4.log')
+    logname=poltype.logespfname
     if poltype.fitqmdipole==True and os.path.exists(logname):
         qmdipole=esp.GrabQMDipoles(poltype,optmol,logname)
         tmpfh.write('TARGET-DIPOLE'+' '+str(qmdipole[0])+' '+str(qmdipole[1])+' '+str(qmdipole[2])+'\n')

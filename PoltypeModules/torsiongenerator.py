@@ -59,7 +59,7 @@ def TinkerMinimizePostQMOpt(poltype,outputlogs,fullrange,optmol,a,b,c,d,torang,c
         if outputlog in finishedjobs and outputlog not in errorjobs:
             phaseangle=fullrange[i]
             if not poltype.use_gaus:
-                finalstruct=outputlog.replace('_psi4.log','_psi4.xyz')
+                finalstruct=outputlog.replace('.log','.xyz')
                 cartxyz,torxyzfname=tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,finalstruct,torsionrestraint,'_postQMOPTprefit',poltype.key4fname,'../',bondtopology)
             else:
                 cartxyz,torxyzfname=tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,outputlog,torsionrestraint,'_postQMOPTprefit',poltype.key4fname,'../',bondtopology)
