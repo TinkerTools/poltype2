@@ -234,11 +234,11 @@ def gen_peditinfile(poltype,mol):
             poltype.localframe2[atomidx - 1] = 0
             lfzerox[atomidx - 1]=True
 
-        #elif ((val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==3) or (val==3 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==4)) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1:  # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector
-        #    idxtobisecthenzbool[atomidx]=True
-        #    bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
-        #    idxtobisectidxs[atomidx]=bisectidxs
-        #    poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
+        elif ((val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==3) or (val==3 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==4)) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1:  # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector
+            idxtobisecthenzbool[atomidx]=True
+            bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
+            idxtobisectidxs[atomidx]=bisectidxs
+            poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
 
             # now make sure neighboring atom (lf1) also is using z-then-bisector
         else:
@@ -330,10 +330,11 @@ def gen_peditinfile(poltype,mol):
                 if (cut_bond):
                     f.write( str(b.GetBeginAtomIdx()) + " " + str(b.GetEndAtomIdx()) + "\n")
 
-        #f.write('\n')
         f.write('\n')
+        # DONT do multipole condense
         f.write("N\n")
-        f.write("N\n")
+        # DO zero out multipole components
+        f.write("Y\n")
 
 
         f.flush()
