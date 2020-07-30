@@ -330,10 +330,11 @@ def gen_peditinfile(poltype,mol):
                 if (cut_bond):
                     f.write( str(b.GetBeginAtomIdx()) + " " + str(b.GetEndAtomIdx()) + "\n")
 
-        #f.write('\n')
         f.write('\n')
+        # DONT do multipole condense
         f.write("N\n")
-        f.write("N\n")
+        # DO zero out multipole components
+        f.write("Y\n")
 
 
         f.flush()
