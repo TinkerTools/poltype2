@@ -938,8 +938,7 @@ class PolarizableTyper():
         self.canonicallabel = [ 0 ] * mol.NumAtoms()
         self.localframe1 = [ 0 ] * mol.NumAtoms()
         self.localframe2 = [ 0 ] * mol.NumAtoms()
-    
-        symm.CalculateSymmetry(self,m)
+        symm.gen_canonicallabels(self,mol) 
 
  
         # QM calculations are done here
