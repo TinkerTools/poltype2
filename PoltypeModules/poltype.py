@@ -669,9 +669,6 @@ class PolarizableTyper():
             molprefix=self.molstructfname.split('.')[0]
             newname=molprefix+'_3D'+'.mol'
             poltype.molstructfname=newname
-            formchg=Chem.rdmolops.GetFormalCharge(rdkitmol)
-            for atom in rdkitmol.GetAtoms():
-                atom.SetFormalCharge(0)
 
             rdmolfiles.MolToMolFile(rdkitmol,'test.mol',kekulize=True)
             AllChem.EmbedMolecule(rdkitmol)
