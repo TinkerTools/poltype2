@@ -732,14 +732,11 @@ def gen_avgmpole_groups_file(poltype):
         if symclass not in symclasstoidxlist.keys():
             symclasstoidxlist[symclass]=[]
         symclasstoidxlist[symclass].append(idx)
-    if not os.path.isfile(poltype.grpfname):
-        f = open(poltype.grpfname,"w")
-        for symclass,idxlist in symclasstoidxlist.items():
-            string=str(symclass)+' '
-            for idx in idxlist:
-                string+=str(idx)+' '
-            string+='\n'
-            f.write(string)
-        f.close()
-    else:
-        poltype.WriteToLog("User modified group.txt file is used")
+    f = open(poltype.grpfname,"w")
+    for symclass,idxlist in symclasstoidxlist.items():
+        string=str(symclass)+' '
+        for idx in idxlist:
+            string+=str(idx)+' '
+        string+='\n'
+        f.write(string)
+    f.close()
