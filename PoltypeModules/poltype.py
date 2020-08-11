@@ -422,12 +422,12 @@ class PolarizableTyper():
         if not __name__ == '__main__':
             params=self.main()
 
-    def GrabBoolValue(self,value): 
-        if value=='true' or value=='True' or value=='TRUE':
-            boolvalue=True
-        elif value=='false' or value=='False' or value=='FALSE':
-            boolvalue=False
-        return boolvalue
+    def GrabBoolValue(self, value):
+        if value.lower() == 'true':
+            return True
+        if value.lower() == 'false':
+            return False
+        raise ValueError('Could not convert "{}" into a boolean!'.format(value))
 
     def SanitizeQMMethod(self,method,optmethodbool):
         if method[-1]=='D': # assume DFT, gaussian likes D, PSI4 likes -D
