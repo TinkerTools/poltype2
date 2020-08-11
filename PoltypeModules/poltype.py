@@ -528,8 +528,8 @@ class PolarizableTyper():
                     latestversion = True
                     break
            
-        if(not latestversion):
-            if forcefield.upper() != "AMOEBA+":  #allow old version for AMOEBA+
+        if not latestversion:
+            if self.forcefield.upper() != "AMOEBA+":  #allow old version for AMOEBA+
                 raise ValueError("Notice: Not latest working version of tinker (8.7)"+' '+os.getcwd())
       
         if ("TINKERDIR" in os.environ):
