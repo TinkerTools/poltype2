@@ -36,6 +36,7 @@ import optimization as opt
 import electrostaticpotential as esp
 import multipole as mpole
 import fragmenter as frag
+from packaging import version
 from parmed.tinker import parameterfile
 from rdkit import Chem
 from rdkit.Chem import rdmolfiles,AllChem,rdmolops
@@ -522,12 +523,12 @@ class PolarizableTyper():
         latestversion = False
         for line in results:
             if "Version" in line:
-                linesplit=line.split()
-                self.versionnum=float(linesplit[2])
-                if self.versionnum>=8.7:
+                linesplit = line.split()
+                self.versionnum = float(linesplit[2])
+                if version.parse(self.versionnum) >= version.parse("8.7"):
                     latestversion = True
                     break
-           
+
         if not latestversion:
             if self.forcefield.upper() != "AMOEBA+":  #allow old version for AMOEBA+
                 raise ValueError("Notice: Not latest working version of tinker (8.7)"+' '+os.getcwd())
