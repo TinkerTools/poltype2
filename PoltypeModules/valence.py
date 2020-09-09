@@ -29,6 +29,7 @@ import openbabel
 import math
 import sys
 import os
+from packaging import version
 radian = 57.29577951308232088
 
 class Valence():
@@ -1553,7 +1554,7 @@ class Valence():
         vals.append(angparamvals2)
         vals.append(angparamvals1)
         shoulduseanglep = False
-        if self.versionnum>=8.7:
+        if self.versionnum >= version.parse("8.7"):
             shoulduseanglep = True
 
 
