@@ -1553,11 +1553,7 @@ class Valence():
         vals.append(angparamvals3)
         vals.append(angparamvals2)
         vals.append(angparamvals1)
-        shoulduseanglep = False
-        if self.versionnum >= version.parse("8.7"):
-            shoulduseanglep = True
-
-
+        shoulduseanglep = version.parse(self.versionnum) >= version.parse("8.7")
 
         d = dict()
         for v in vals:
@@ -1578,15 +1574,10 @@ class Valence():
                             key2 = 'anglep%8d%6d%6d%11.4f%10.4f' % (key1[0], key1[1], key1[2], v[skey][0], angle)
                         else:
                             key2 = 'angle%8d%6d%6d%11.4f%10.4f' % (key1[0], key1[1], key1[2], v[skey][0], angle)
-              
                     else:
                         key2 = 'angle%8d%6d%6d%11.4f%10.4f' % (key1[0], key1[1], key1[2], v[skey][0], angle)
-              
-                                    
                     key1string = '%d %d %d' % (key1[0], key1[1], key1[2])
                     d.update({key1string : key2})
-
-        
 
         return list(d.values())
 
