@@ -467,13 +467,23 @@ class PolarizableTyper():
 
         
     def SanitizeMMExecutables(self):
-        path=self.which(self.peditexe)
-        if path is None:
-            self.peditexe='poledit'
-            self.potentialexe='potential'
-            self.minimizeexe='minimize'
-            self.analyzeexe='analyze'
-            self.superposeexe='superpose'
+        self.peditexe=self.SanitizeMMExecutable(self.peditexe)
+        self.potentialexe=self.SanitizeMMExecutable(self.potentialexe)
+        self.minimizeexe=self.SanitizeMMExecutable(self.minimizeexe)
+        self.analyzeexe=self.SanitizeMMExecutable(self.analyzeexe)
+        self.superposeexe=self.SanitizeMMExecutable(self.superposeexe)
+
+    def SanitizeMMExecutable(self, executable):
+        # Try to find Tinker executable with/without suffix
+        if self.tinkerdir is None:
+            self.tinkerdir = os.getenv("TINKERDIR", default="")
+        exe = os.path.join(self.tinkerdir, executable)
+        if self.which(exe) is None:
+            exe = exe[:-2] if exe.endswith('.x') else exe + '.x'
+            if self.which(exe) is None:
+                print("ERROR: Cannot find Tinker {} executable".format(executable))
+                sys.exit(2)
+        return exe
 
     def which(self,program):
         def is_exe(fpath):
@@ -563,10 +573,10 @@ class PolarizableTyper():
             
             
             
-        if ("GDMADIR" in os.environ):
-            self.gdmadir = os.environ["GDMADIR"]
-            self.gdmaexe = os.path.join(self.gdmadir,self.gdmaexe)
-    
+
+        if self.gdmadir is None:
+            self.gdmadir = os.getenv("GDMADIR", default="")
+        self.gdmaexe = os.path.join(self.gdmadir, self.gdmaexe) 
         if (not self.which(self.gdmaexe)):
             print("ERROR: Cannot find GDMA executable")
             sys.exit(2)
@@ -601,6 +611,12 @@ class PolarizableTyper():
             self.scratchdir = os.environ["GAUSS_SCRDIR"].rstrip('//')
             if not os.path.isdir(self.scratchdir):
                 os.mkdir(self.scratchdir)
+
+        else:
+            if ("PSI_SCRATCH" in os.environ):
+                self.scratchdir = os.environ["PSI_SCRATCH"]
+                if not os.path.isdir(self.scratchdir):
+                    os.mkdir(self.scratchdir)
     
         head, self.molstructfname = os.path.split(self.molstructfname)
         self.molecprefix =  os.path.splitext(self.molstructfname)[0]
