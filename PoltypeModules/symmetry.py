@@ -163,7 +163,7 @@ def CreateNewClassVector(poltype,pmol,symmetry_classes, tmp_classes, frag_atoms,
 
 
 def gen_canonicallabels(poltype,mol):
-    poltype.symmetryclass = [ 0 ] * mol.NumAtoms()
+    symmetryclass = [ 0 ] * mol.NumAtoms()
     """
     Intent: Find the symmetry class that each atom belongs to
     Input: 
@@ -185,8 +185,8 @@ def gen_canonicallabels(poltype,mol):
     symmclasslist = []
     mol.FindLargestFragment(frag_atoms)
     CalculateSymmetry(poltype,mol, frag_atoms, symmclasslist)
-    for ii in range(len(poltype.symmetryclass)):
-        poltype.symmetryclass[ii] = symmclasslist[ii][1]
+    for ii in range(len(symmetryclass)):
+        symmetryclass[ii] = symmclasslist[ii][1]
 
     # Collapse terminal atoms of same element to one type
     for a in openbabel.OBMolAtomIter(mol):
@@ -196,22 +196,22 @@ def gen_canonicallabels(poltype,mol):
                     if ((b is not c) and
                         (c.GetValence() == 1) and
                         (b.GetAtomicNum() == c.GetAtomicNum()) and
-                        (poltype.symmetryclass[b.GetIdx()-1] !=
-                            poltype.symmetryclass[c.GetIdx()-1])):
-                        poltype.symmetryclass[c.GetIdx()-1] = \
-                            poltype.symmetryclass[b.GetIdx()-1]
+                        (symmetryclass[b.GetIdx()-1] !=
+                            symmetryclass[c.GetIdx()-1])):
+                        symmetryclass[c.GetIdx()-1] = \
+                            symmetryclass[b.GetIdx()-1]
 
     # Renumber symmetry classes
-    allcls=list(set(poltype.symmetryclass))
+    allcls=list(set(symmetryclass))
     allcls.sort()
-    for ii in range(len(poltype.symmetryclass)):
-        poltype.symmetryclass[ii] = allcls.index(poltype.symmetryclass[ii]) + 1
-    print('poltype.symmetryclass',poltype.symmetryclass)
-    poltype.idxtosymclass={}
-    for i in range(len(poltype.symmetryclass)):
+    for ii in range(len(symmetryclass)):
+        symmetryclass[ii] = allcls.index(symmetryclass[ii]) + 1
+    idxtosymclass={}
+    for i in range(len(symmetryclass)):
         j=i+1
-        symmclass=get_class_number(poltype,j)
-        poltype.idxtosymclass[j]=symmclass
+        symmclass=get_class_number(poltype,j,symmetryclass)
+        idxtosymclass[j]=symmclass
+    return idxtosymclass,symmetryclass
 
 def get_symm_class(poltype,x):
     """
@@ -239,12 +239,12 @@ def getCan(poltype,x):
     else:
         return -1
 
-def get_class_number(poltype,idx):
+def get_class_number(poltype,idx,symmetryclass):
     """
     Intent: Given an atom idx, return the atom's class number
     """
-    maxidx =  max(poltype.symmetryclass)
-    return poltype.prmstartidx + (maxidx - poltype.symmetryclass[idx - 1])
+    maxidx =  max(symmetryclass)
+    return poltype.prmstartidx + (maxidx - symmetryclass[idx - 1])
 
 
 

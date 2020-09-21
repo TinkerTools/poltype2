@@ -20,6 +20,24 @@ def __init__(poltype):
     PolarizableTyper.__init__(poltype)
     
 
+def RemoveCommentsFromKeyFile(poltype,keyfilename):
+    temp=open(keyfilename,'r')
+    results=temp.readlines()
+    temp.close()
+    passedatoms=False
+    tempname='temp.key'
+    newtemp=open(tempname,'w')
+    for line in results:
+        if 'atom' in line:
+            passedatoms=True 
+        if passedatoms==True and '#' in line:
+            continue
+        else:
+            newtemp.write(line)
+    newtemp.close()
+        
+    shutil.move(tempname, keyfilename)
+
 def ExecuteOptJobs(poltype,listofstructurestorunQM,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint):
     jobtooutputlog={}
     listofjobs=[]
@@ -84,7 +102,7 @@ def ExecuteSPJobs(poltype,torxyznames,cartxyznames,optoutputlogs,fullrange,optmo
             cmdstr='cd '+os.getcwd()+' && '+'psi4 '+inputname+' '+outputname
         else:
             inputname,outputname=GenerateTorsionSPInputFileGaus(poltype,torxyzfname,poltype.molecprefix,a,b,c,d,torang,phaseangle,outputlog)
-            cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdir+' '+poltype.gausexe+' '+inputname
+            cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
         finished,error=poltype.CheckNormalTermination(outputname)
         if finished==True and error==False:
             pass
@@ -105,9 +123,9 @@ def ExecuteSPJobs(poltype,torxyznames,cartxyznames,optoutputlogs,fullrange,optmo
         outputlogtocartxyz[outputname]=cartxyzname
     if not poltype.use_gaus:
         
-        return outputnames,listofjobs,poltype.scratchdir,jobtooutputlog,outputlogtophaseangle,outputlogtocartxyz
+        return outputnames,listofjobs,poltype.scrtmpdirpsi4,jobtooutputlog,outputlogtophaseangle,outputlogtocartxyz
     else:
-        return outputnames,listofjobs,poltype.scrtmpdir,jobtooutputlog,outputlogtophaseangle,outputlogtocartxyz
+        return outputnames,listofjobs,poltype.scrtmpdirgau,jobtooutputlog,outputlogtophaseangle,outputlogtocartxyz
 
 
 
@@ -146,11 +164,12 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,molecprefix,a,b,c,d,torang,p
         cmdstr='cd '+os.getcwd()+' && '+'psi4 '+inputname+' '+outputname
     else:
         inputname,outputname=CreateGausTorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optmol,torxyzfname,consttorlist)
-        cmdstr='cd '+os.getcwd()+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdir+' '+poltype.gausexe+' '+inputname
+        cmdstr='cd '+os.getcwd()+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
-        return inputname,outputname,cmdstr,poltype.scratchdir
+        return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4
+
     else:
-        return inputname,outputname,cmdstr,poltype.scrtmpdir
+        return inputname,outputname,cmdstr,poltype.scrtmpdirgau
         
 
 def GenerateTorsionSPInputFileGaus(poltype,torxyzfname,molecprefix,a,b,c,d,torang,phaseangle,prevstrctfname):
@@ -727,7 +746,7 @@ def CreatePsi4TorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optm
 
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
-    temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')
+    temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
     temp.write('for _ in range(1):'+'\n')
     temp.write('  try:'+'\n')
     if poltype.toroptpcm==True:
@@ -964,7 +983,7 @@ def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,molecprefix
         temp.write('}'+'\n')
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
-    temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')
+    temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
     temp.write('set freeze_core True'+'\n')
     temp.write("E, wfn = energy('%s/%s',return_wfn=True)" % (poltype.torspmethod.lower(),poltype.torspbasisset)+'\n')
     temp.write('oeprop(wfn,"WIBERG_LOWDIN_INDICES")'+'\n')

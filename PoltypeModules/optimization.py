@@ -51,21 +51,21 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
 
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
-    temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')
+    temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
     temp.write('for _ in range(1):'+'\n')
     temp.write('  try:'+'\n')
     if poltype.optpcm==True:
         temp.write('    set opt_coordinates cartesian'+'\n')
     temp.write("    optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
     if poltype.freq:
-        temp.write('    scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
+        temp.write('    scf_e,scf_wfn=freq("%s/%s",return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
     temp.write('    break'+'\n')
     temp.write('  except OptimizationConvergenceError:'+'\n')
     temp.write('    try:'+'\n')
     temp.write('      set opt_coordinates cartesian'+'\n')
     temp.write("      optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
     if poltype.freq:
-        temp.write('      scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
+        temp.write('      scf_e,scf_wfn=freq("%s/%s",return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
     temp.write('      break'+'\n')
     temp.write('    except OptimizationConvergenceError:'+'\n')
     temp.write('      '+'pass'+'\n')
@@ -98,21 +98,24 @@ def GrabFinalXYZStructure(poltype,logname,filename):
         temp.write(str(poltype.mol.NumAtoms())+'\n')
         temp.write('\n')
         finalmarker=False
+        lengthchange=None
         for lineidx in range(len(results)):
             line=results[lineidx]
-            if 'Cartesian Geometry' in line:
+            if 'Geometry' in line:
                 lastidx=lineidx
         for lineidx in range(len(results)):
             line=results[lineidx]
-            if 'Cartesian Geometry' in line and lineidx==lastidx:
+            if 'Geometry' in line and lineidx==lastidx:
                 finalmarker=True
-                lengthchange=False
             if finalmarker==True and lineidx>lastidx:    
                 linesplit=line.split()
-                if len(linesplit)!=4:
+                if len(linesplit)!=4 and lengthchange==False:
                     lengthchange=True
-                if len(linesplit)==4 and bool(re.search(r'\d', line))==True and 'point' not in line and lengthchange==False:
+                    break
+                foundfloat=bool(re.search(r'\d', line))
+                if len(linesplit)==4 and foundfloat==True and 'point' not in line:
                     temp.write(line.lstrip())
+                    lengthchange=False
         temp.close()
     elif poltype.use_gaus==True or poltype.use_gausoptonly==True:
         obConversion = openbabel.OBConversion()
@@ -187,7 +190,7 @@ def write_com_header(poltype,comfname,chkfname,maxdisk,maxmem,numproc):
     tmpfh = open(comfname, "w")
     assert tmpfh, "Cannot create file: " + comfname+' '+os.getcwd()
 
-    tmpfh.write('%RWF=' + poltype.scrtmpdir + '/,' + maxdisk + '\n')
+    tmpfh.write('%RWF=' + poltype.scrtmpdirgau + '/,' + maxdisk + '\n')
     tmpfh.write("%Nosave\n")
     tmpfh.write("%Chk=" + os.path.splitext(comfname)[0] + ".chk\n")
     tmpfh.write("%Mem=" + maxmem + "\n")
@@ -279,24 +282,16 @@ def GeometryOptimization(poltype,mol):
     OBOPTmol.SetTotalCharge(charge) # for some reason obminimize does not print charge in output PDB
     
 
-    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
-        if not os.path.exists(poltype.scratchdir):
-            mkdirstr='mkdir '+poltype.scratchdir
-            poltype.call_subsystem(mkdirstr,True)
-    else:
-        if not os.path.exists(poltype.scrtmpdir):
-            mkdirstr='mkdir '+poltype.scrtmpdir
-            poltype.call_subsystem(mkdirstr,True)
-
+    
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt
         term,error=poltype.CheckNormalTermination(poltype.logoptfname)
         if not term:
             mystruct = load_structfile(poltype,poltype.molstructfname)
             gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,OBOPTmol)
-            cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdir + ' ' + poltype.gausexe + " " + poltype.comoptfname 
+            cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + poltype.comoptfname 
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
-            scratchdir=poltype.scrtmpdir
+            scratchdir=poltype.scrtmpdirgau
             jobtologlistfilepathprefix=os.getcwd()+r'/'+'optimization_jobtolog_'+poltype.molecprefix 
             if os.path.isfile(poltype.chkoptfname):
                 os.remove(poltype.logoptfname) # if chk point exists just remove logfile, there could be error in it and we dont want WaitForTermination to catch error before job is resubmitted by daemon 
@@ -325,7 +320,7 @@ def GeometryOptimization(poltype,mol):
             cmdstr='cd '+os.getcwd()+' && '+'psi4 '+inputname+' '+poltype.logoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
-            scratchdir=poltype.scratchdir
+            scratchdir=poltype.scrtmpdirpsi4
             jobtologlistfilepathprefix=os.getcwd()+r'/'+'optimization_jobtolog_'+poltype.molecprefix
             if os.path.isfile(poltype.logoptfname):
                 os.remove(poltype.logoptfname)

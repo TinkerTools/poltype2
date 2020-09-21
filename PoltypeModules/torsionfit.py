@@ -838,7 +838,10 @@ def write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename):
     """
     tmpfh1 = open(tmpkey1basename, "r")
     tmpfh2 = open(tmpkey2basename, "w")
+    fitline="# Fitted torsion" +"\n"
     for line in tmpfh1:
+        if '#' in line:
+            continue
         m = re.search(r'torsion',line)
         if m is None:
             tmpfh2.write(line)
@@ -855,6 +858,7 @@ def write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename):
                 for (nfold, prm) in write_prm_dict[clskey].items():
                     torline += ' %7.3f %.1f %d' % (prm,poltype.foldoffsetlist[nfold - 1], nfold)
                 torline += '\n'
+            tmpfh2.write(fitline)
             tmpfh2.write(torline)
     tmpfh1.close()
     tmpfh2.close()

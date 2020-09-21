@@ -1340,7 +1340,7 @@ class Valence():
         'ccn' : [69.78, 121.0], \
 
         #77 76 89 (check, should I make it n+) (probably not since there is only one [#1]cn)
-        '[#1]cn' : [38.13, 119.0], \
+        ##'[#1]cn' : [38.13, 119.0], \
 
         #35 78 78
         '[O]cc' : [43.16, 120.0], \
@@ -2473,19 +2473,19 @@ class Valence():
         # DB11359H3D
         '[C^3][O^2][c^2][c^2][c^2][c^2][c^2][c^2][O^2]' : [1,2,3,8,0,2.255,0], \
         # DB01440H3D
-        '[O^3][C^3][C^3][C^3][C^2](=[O^2])[O-^2]' : [3,4,5,6,0,0.169,0], \
+        # '[O^3][C^3][C^3][C^3][C^2](=[O^2])[O-^2]' : [3,4,5,6,0,0.169,0], \
         # DB01440H3D
-        '[O^3][C^3][C^3][C^3][C^2](=[O^2])[O-^2]' : [2,3,4,5,3.573,-1.868,2.086], \
+        #'[O^3][C^3][C^3][C^3][C^2](=[O^2])[O-^2]' : [2,3,4,5,3.573,-1.868,2.086], \
         # DB01440H3D
         '[O^3][C^3][C^3][C^3][C^2](=[O^2])[O-^2]' : [1,2,3,4,-0.510,-0.068,3.633], \
         # DB06756H3D
-        '[O-^2][C^2](=[O^2])[C^3][N+^3]([C^3])([C^3])[C^3]' : [2,3,4,5,0,1.550,0], \
+        #'[O-^2][C^2](=[O^2])[C^3][N+^3]([C^3])([C^3])[C^3]' : [2,3,4,5,0,1.550,0], \
         # DB06756H3D
-        '[O-^2][C^2](=[O^2])[C^3][N+^3]([C^3])([C^3])[C^3]' : [2,4,5,6,0,0,-0.073], \
+        #'[O-^2][C^2](=[O^2])[C^3][N+^3]([C^3])([C^3])[C^3]' : [2,4,5,6,0,0,-0.073], \
         # DB09563H3D
-        '[O^3][C^3][C^3][N+^3]([C^3])([C^3])[C^3]' : [1,2,3,4,5.591,-2.523,2.668], \
+        #'[O^3][C^3][C^3][N+^3]([C^3])([C^3])[C^3]' : [1,2,3,4,5.591,-2.523,2.668], \
         # DB09563H3D
-        '[O^3][C^3][C^3][N+^3]([C^3])([C^3])[C^3]' : [2,3,4,5,0,0,0.745], \
+        #'[O^3][C^3][C^3][N+^3]([C^3])([C^3])[C^3]' : [2,3,4,5,0,0,0.745], \
         })
 
         torvals1 = dict({ \
@@ -2563,6 +2563,7 @@ class Valence():
         torsunit = .5
         torkeytoSMILES={}
         torkeytoindexlist={}
+        torkeytosmilesindices={}
         d = dict()
         zeroed = False
         self.logfh.write('****************************************************************************************************'+'\n')
@@ -2582,12 +2583,15 @@ class Valence():
                         bidx=ia[v[skey][1] - 1] 
                         cidx=ia[v[skey][2] - 1]
                         didx=ia[v[skey][3] - 1]
-
+                        smilesindices=[v[skey][0],v[skey][1],v[skey][2],v[skey][3]]
+                        
                     else:
                         aidx=ia[0]
                         bidx=ia[1]
                         cidx=ia[2]
                         didx=ia[3]
+                        smilesindices=[1,2,3,4]
+
                     b=mol.GetAtom(bidx)
                     c=mol.GetAtom(cidx)
                     bond=mol.GetBond(bidx,cidx)
@@ -2629,10 +2633,15 @@ class Valence():
 
                     torkeytoSMILES.update({key1string:skey})
                     torkeytoindexlist[key1string]=ia
+                    torkeytosmilesindices[key1string]=smilesindices
                     d.update({key1string : key2})
                     zeroed = False
-        
+    
+        newdic={}    
         for key1string,key2 in d.items():
+            smilesindices=torkeytosmilesindices[key1string]
+            smilesindices=[str(i) for i in smilesindices]
+            smilesindices=','.join(smilesindices)
             skey=torkeytoSMILES[key1string]
             indexlist=torkeytoindexlist[key1string]
             stringlist=[str(i) for i in indexlist]
@@ -2641,10 +2650,13 @@ class Valence():
             first=float(keysplit[5])
             second=float(keysplit[8])
             third=float(keysplit[11])
-            if first==0 and second==0 and third==0: # then dont print
-                pass
-            else:
-                self.logfh.write('Torsion parameters for '+key2+ ' assigned from SMILES '+skey+' '+stringindexlist+'\n')
+            item=[skey,stringindexlist,smilesindices]
+            newdic[key2]=item
+            #if first==0 and second==0 and third==0: # then dont print
+            #    pass
+            #else:
+                
+            self.logfh.write('Torsion parameters for '+key2+ ' assigned from SMILES '+skey+' from torsion atom indices '+stringindexlist+' with smiles torsion indices '+smilesindices+'\n')
         
         x = []
 
@@ -2656,7 +2668,7 @@ class Valence():
         #print(' sortedtuple ',sortedtuple)
         #x = [ t[1] for t in sortedtuple ]
         x=list(d.values())
-        return x
+        return x,newdic
 
     
 
@@ -2795,9 +2807,20 @@ class Valence():
                     f.write(x + "\n")
                 for x in self.opbguess(opbendvals):
                     f.write(x + "\n")
-                results=self.torguess(mol,dorot,rotbnds)
-                for x in results:
+                values,newdic=self.torguess(mol,dorot,rotbnds)
+                
+                for x in values:
+
+                    transferline='# Transferred Torsion'
+                    item=newdic[x]
+                    transferline+=' assigned from SMARTS '+item[0]+' torsion atom indexes = '+item[1]+' with smiles torsion indices '+item[2]+"\n"
+                    f.write(transferline)
+                    f.flush()
+                    os.fsync(f.fileno())
                     f.write(x + "\n")
+                    f.flush()
+                    os.fsync(f.fileno())
+
                 #for x in self.pitorguess(mol):
                 #    f.write(x+ "\n")
                 f.write('\n')

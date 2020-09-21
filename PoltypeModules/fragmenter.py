@@ -19,6 +19,7 @@ import json
 from collections import Counter
 from rdkit.Geometry import Point3D
 import sys # used for terminaing job after fragmenter finishes and troubleshooting
+import symmetry as symm
 
 def AssignTotalCharge(poltype,molecule,babelmolecule):
     atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
@@ -64,28 +65,31 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
                 symmtorlist.append(fwd)
             if rev not in symmtorlist:
                 symmtorlist.append(rev)
-    torprmdic={}
+    classkeytoparameters={}
     curdir=os.getcwd()
     for rotbndindex,fragmentfilepath in rotbndindextofragmentfilepath.items():
         path,filename=os.path.split(fragmentfilepath)
         os.chdir(path)
+       
+        
         filelist=os.listdir(os.getcwd())
         for ff in filelist:
-            if '.prm' in ff:
+            if '.key_5' in ff:
+                parentindextofragindex=json.load(open("parentindextofragindex.txt"))
+                parentsymclasstofragsymclass=json.load(open("parentsymclasstofragsymclass.txt"))
+                parentindextofragindex=json.load(open("parentindextofragindex.txt"))
+                fragclasskeytoparentclasskey=json.load(open("fragclasskeytoparentclasskey.txt"))
+                classkeytosmartsposarray=json.load(open("classkeytosmartsposarray.txt"))
+                classkeytosmarts=json.load(open("classkeytosmarts.txt"))
+                classkeytotorsionindexes=json.load(open("classkeytotorsionindexes.txt"))
+
                 temp=open(ff,'r')
                 results=temp.readlines()
                 temp.close()
                 for line in results:
-                    valenceprmlist.append(line)
-            if '.key_6' in ff:
-                poltype.WriteToLog('key_6'+ff)
-                temp=open(ff,'r')
-                results=temp.readlines()
-                temp.close()
-                for line in results:
-                    if 'torsion' in line:
-                        poltype.WriteToLog('torsion '+line)
-                        linesplit=line.split()
+                    if 'torsion' in line and '#' not in line:
+                        newline=line.strip()
+                        linesplit=newline.split()
                         typea=int(linesplit[1])
                         typeb=int(linesplit[2])
                         typec=int(linesplit[3])
@@ -93,15 +97,22 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
                         prms=linesplit[5:]
                         tor=[typea,typeb,typec,typed]
                         torkey='%d %d %d %d' % (typea, typeb, typec, typed)
+                        revtorkey='%d %d %d %d' % (typed, typec, typeb, typea)
                         if torkey in symmtorlist:
-                            torprmdic[torkey]=line
+                            if torkey in fragclasskeytoparentclasskey.keys():
+                                classkey=fragclasskeytoparentclasskey[torkey]
+                            elif revtorkey in fragclasskeytoparentclasskey.keys():
+                                classkey=fragclasskeytoparentclasskey[revtorkey]
+                            classkeytoparameters[classkey]=prms
+
     os.chdir(curdir)
     temp=open(poltype.key4fname,'r')
     results=temp.readlines()
     temp.close()
     temp=open(poltype.key5fname,'w')
+    fitline="# Fitted and Transferred from Fragment "
     for line in results:
-        if 'torsion' in line:
+        if 'torsion' in line and '#' not in line:
             linesplit=line.split()
             typea=int(linesplit[1])
             typeb=int(linesplit[2])
@@ -109,36 +120,47 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
             typed=int(linesplit[4])
             tor=[typea,typeb,typec,typed]
             torkey='%d %d %d %d' % (typea, typeb, typec, typed)
-            fwdsplit=torkey.split()        
-            revsplit=fwdsplit[::-1]
-            rev='%d %d %d %d' % (int(revsplit[0]), int(revsplit[1]), int(revsplit[2]), int(revsplit[3]))
-
-            if torkey in torprmdic.keys():
-                torline=torprmdic[torkey]
+            rev='%d %d %d %d' % (typed,typec,typeb,typea)
+            if torkey in classkeytoparameters.keys():
+                prms=classkeytoparameters[torkey]
+                parameters=' '.join(prms)
+                torline='torsion '+torkey+' '+parameters+'\n'
+                smartspos=classkeytosmartsposarray[torkey]
+                smarts=classkeytosmarts[torkey]
+                torsionindexes=classkeytotorsionindexes[torkey]
+                fitline+=' SMARTS '+smarts+' torsion atom indexes = '+torsionindexes+' with smiles torsion indices '+smartspos+"\n"
+                valencestring='# "'+smarts+'"'+' '+':'+' '+'['+smartspos+','
+                newprms=prms[0::3]
+                for prm in newprms:
+                    valencestring+=prm+','
+                valencestring=valencestring[:-1]
+                valencestring+=']'+','+' '+r'\\'+'\n'
+                temp.write(fitline)
+                temp.write(valencestring)
                 temp.write(torline)
-                temp.flush()
-                os.fsync(temp.fileno())
-            elif rev in torprmdic.keys():
-                torline=torprmdic[rev]
+            elif rev in classkeytoparameters.keys():
+                prms=classkeytoparameters[rev]
+                parameters=' '.join(prms)
+                torline='torsion '+torkey+' '+parameters+'\n'
+                smartspos=classkeytosmartsposarray[rev]
+                smarts=classkeytosmarts[rev]
+                torsionindexes=classkeytotorsionindexes[rev]
+                fitline+=' SMARTS '+smarts+' torsion atom indexes = '+torsionindexes+' with smiles torsion indices '+smartspos+"\n"
+                valencestring='# "'+smarts+'"'+' '+':'+' '+'['+smartspos+','
+                newprms=prms[0::3]
+                for prm in newprms:
+                    valencestring+=prm+','
+                valencestring=valencestring[:-1]
+                valencestring+=']'+','+' '+r'\\'+'\n'
+                temp.write(fitline)
+                temp.write(valencestring)
                 temp.write(torline)
-                temp.flush()
-                os.fsync(temp.fileno())
-
 
             else:
                 temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-
         else:
             temp.write(line)
-            temp.flush()
-            os.fsync(temp.fileno())
 
-    temp.close()
-    temp=open('valence.prms','w')
-    for line in valenceprmlist:
-        temp.write(line)
     temp.close()
 
 def GrabWBOMatrixGaussian(poltype,outputlog,mol):
@@ -235,8 +257,29 @@ def FindEquivalentFragments(poltype,fragmentarray,namearray):
 
         if set(nametemp) not in equivalentnamesarrayset:
             equivalentnamesarrayset.append(set(nametemp))
-            equivalentnamesarray.append(tuple(set(nametemp)))
-    return equivalentnamesarray
+            equivalentnamesarray.append(set(nametemp))
+     # need unique way to always order the same way so dont redo QM if list order is different
+        
+    newequivalentnamesarray=[]
+    for array in equivalentnamesarray:
+        firstrotidx=[]
+        secondrotidx=[]
+        newarray=[]
+        for name in array:
+            namesplit=name.split('_')
+            namesplit=[int(i) for i in namesplit]
+            firstrotidx.append(namesplit[0])
+            secondrotidx.append(namesplit[1])
+        firstrotidx,secondrotidx=(list(t) for t in zip(*sorted(zip(firstrotidx, secondrotidx),reverse=True)))
+        firstrotidx=[str(i)+'_' for i in firstrotidx]
+        secondrotidx=[str(i) for i in secondrotidx]    
+        for i in range(len(firstrotidx)):
+            firstrot=firstrotidx[i]
+            secondrot=secondrotidx[i]
+            rotbnd=firstrot+secondrot
+            newarray.append(rotbnd) 
+        newequivalentnamesarray.append(newarray)
+    return newequivalentnamesarray
 
 def FindRotatableBond(poltype,fragmol,rotbndindextofragment,temp):
     for rotbndindex in rotbndindextofragment.keys():
@@ -245,7 +288,7 @@ def FindRotatableBond(poltype,fragmol,rotbndindextofragment,temp):
             return rotbndindex
 
 def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog):
-    poltypeinput={'suppressdipoleerr':'True','optmethod':poltype.optmethod,'toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'onlyrotbndslist':strfragrotbndindexes,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':poltype.numproc,'maxmem':poltype.maxmem,'maxdisk':poltype.maxdisk,'printoutput':True}
+    poltypeinput={'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','optmethod':poltype.optmethod,'toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'onlyrotbndslist':strfragrotbndindexes,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':poltype.numproc,'maxmem':poltype.maxmem,'maxdisk':poltype.maxdisk,'printoutput':True}
     inifilepath=poltype.WritePoltypeInitializationFile(poltypeinput)
     cmdstr='nohup'+' '+'python'+' '+poltype.poltypepath+r'/'+'poltype.py'+' '+'&'
     cmdstr='cd '+os.getcwd()+' && '+cmdstr
@@ -271,7 +314,6 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
     parentdir=dirname(abspath(os.getcwd()))
     listofjobs=[]
     jobtooutputlog={}
-    logtoconvertidxs={}
     for array in equivalentrotbndindexarrays:
         strfragrotbndindexes=''
         strparentrotbndindexes=''
@@ -295,20 +337,73 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         strparentrotbndindexes=strparentrotbndindexes[:-1]
         fragmol=rotbndindextofragment[equivalentrotbndindex]
         fragmentfilepath=rotbndindextofragmentfilepath[equivalentrotbndindex]
+        obConversion = openbabel.OBConversion()
+        fragbabelmol = openbabel.OBMol()
+        inFormat = obConversion.FormatFromExt(fragmentfilepath)
+        obConversion.SetInFormat(inFormat)
+        obConversion.ReadFile(fragbabelmol, fragmentfilepath)
+        fragidxtosymclass,symmetryclass=symm.gen_canonicallabels(poltype,fragbabelmol) 
+
         head,tail=os.path.split(fragmentfilepath)
         os.chdir(head)
         MakeTorsionFileName(poltype,strparentrotbndindexes)
         parentindextofragindex=rotbndindextoparentindextofragindex[equivalentrotbndindex]
-        WriteDictionaryToFile(poltype,parentindextofragindex)
+        tempdic={}
+        for parentindex,fragindex in parentindextofragindex.items():
+            tempdic[parentindex+1]=fragindex+1
+        parentindextofragindex=tempdic
+        parentsymclasstofragsymclass={}
+        for parentindex,fragindex in parentindextofragindex.items():
+            parentsymclass=poltype.idxtosymclass[parentindex]
+            fragsymclass=fragidxtosymclass[fragindex]
+            parentsymclasstofragsymclass[parentsymclass]=fragsymclass
+        WriteDictionaryToFile(poltype,parentsymclasstofragsymclass,"parentsymclasstofragsymclass.txt")
+        WriteDictionaryToFile(poltype,parentindextofragindex,"parentindextofragindex.txt")
+        tempmol=mol_with_atom_index_removed(poltype,fragmol) 
+        fragsmarts=rdmolfiles.MolToSmarts(tempmol)
+        m=mol_with_atom_index(poltype,fragmol)
+        fragsmirks=rdmolfiles.MolToSmarts(m)
+        fragidxarray=GrabAtomOrder(poltype,fragsmirks)
+        classkeytosmartsposarray={}
+        classkeytosmarts={}
+        classkeytotorsionindexes={}
+        fragclasskeytoparentclasskey={}
+        rotkey=rotbndindex.replace('_',' ')
+        tors=poltype.rotbndlist[rotkey]
+        for torsion in tors:
+            smilesposarray=[]
+            fragtor=[]
+            for index in torsion:
+                fragindex=parentindextofragindex[index]
+                fragtor.append(fragindex)
+                fragidxarraypos=fragidxarray.index(fragindex)
+                smilespos=fragidxarraypos+1
+                smilesposarray.append(smilespos)
+            smilesposarray=[str(i) for i in smilesposarray]
+            smilesposstring=','.join(smilesposarray)
+            fragtor=[str(i) for i in fragtor]
+            fragtorstring=[str(i) for i in fragtor]
+            fragtorstring=','.join(fragtorstring)
+            classkey=torgen.get_class_key(poltype,torsion[0], torsion[1], torsion[2], torsion[3])
+            classkeysplit=classkey.split()
+            classkeysplit=[int(i) for i in classkeysplit]
+            fragclasskeysplit=[parentsymclasstofragsymclass[i] for i in classkeysplit]
+            fragclasskeysplit=[str(i) for i in fragclasskeysplit]
+            fragclasskey=' '.join(fragclasskeysplit)
+            fragclasskeytoparentclasskey[fragclasskey]=classkey
+            classkeytosmartsposarray[classkey]=smilesposstring
+            classkeytosmarts[classkey]=fragsmarts
+            classkeytotorsionindexes[classkey]=fragtorstring
+        WriteDictionaryToFile(poltype,fragclasskeytoparentclasskey,"fragclasskeytoparentclasskey.txt")
+        WriteDictionaryToFile(poltype,classkeytosmartsposarray,"classkeytosmartsposarray.txt")
+        WriteDictionaryToFile(poltype,classkeytosmarts,"classkeytosmarts.txt")
+        WriteDictionaryToFile(poltype,classkeytotorsionindexes,"classkeytotorsionindexes.txt")
+
         wholexyz=parentdir+r'/'+poltype.xyzoutfile
         wholemol=parentdir+r'/'+poltype.molstructfname
         listofjobs,jobtooutputlog,newlog=FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog)
-        logtoconvertidxs[newlog]=[fragmol,tail,wholexyz,wholemol,head]
     os.chdir(parentdir)
     finishedjobs,errorjobs=SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog)
-    for log in finishedjobs:
-        [fragmol,tail,wholexyz,wholemol,filepath]=logtoconvertidxs[log]
-        ConvertFragIdxToWholeIdx(poltype,torlist,rotbndindextoparentindextofragindex,fragmol,tail,wholexyz,wholemol,filepath)
 
 def MakeTorsionFileName(poltype,string):
     temp=open('torsions.txt','w')
@@ -316,12 +411,9 @@ def MakeTorsionFileName(poltype,string):
     temp.close()
 
 
-def WriteDictionaryToFile(poltype,dictionary):
-    newdic={}
-    for key,value in dictionary.items():
-        newdic[int(key)]=int(value)
-    with open("parentindextofragindex.txt",'w') as f: 
-        json.dump(newdic, f)
+def WriteDictionaryToFile(poltype,dictionary,filename):
+    with open(filename,'w') as f: 
+        json.dump(dictionary, f)
 
 
 def DeleteEquivalentFragments(poltype,equivalentfragmentstodelete):
@@ -332,149 +424,7 @@ def DeleteEquivalentFragments(poltype,equivalentfragmentstodelete):
             shutil.rmtree(fold)
     os.chdir(curdir)
 
-def get_class_key(poltype,a, b, c, d,fragidxtotypeidx):
-    """
-    Intent: Given a set of atom idx's, return the class key for the set (the class numbers of the atoms appended together)
-    """
-    cla = fragidxtotypeidx[a]
-    clb = fragidxtotypeidx[b]
-    clc = fragidxtotypeidx[c]
-    cld = fragidxtotypeidx[d]
 
-    if ((clb > clc) or (clb == clc and cla > cld)):
-        return '%d %d %d %d' % (cld, clc, clb, cla)
-    return '%d %d %d %d' % (cla, clb, clc, cld)
-
-
-
-def ConvertFragIdxToWholeIdx(poltype,torlist,rotbndindextoparentindextofragindex,fragmol,fragmentfilename,wholexyz,wholemol,filepath):
-    fragmentfileprefix=fragmentfilename.replace('.sdf','')
-    if not os.path.isfile(filepath+r'/'+fragmentfileprefix+'.key_5'):
-        poltype.WriteToLog('returning did not find key_5 '+fragmentfileprefix)
-        return # if POLTYPE job failed, just try to submit the other fragment jobs instead of killing parent job
-
-    if os.path.isfile(filepath+r'/'+fragmentfileprefix+'.key_6'):
-        poltype.WriteToLog('found key_6, returning '+fragmentfileprefix)
-        return
-    temp=open(filepath+r'/'+fragmentfileprefix+'.key_5','r')
-    fragkeyresults=temp.readlines()
-    temp.close()
-    temp=open(wholexyz,'r')
-    wholetttxyzresults=temp.readlines()
-    temp.close()
-    temp=open(filepath+r'/'+'ttt.xyz','r')
-    fragtttxyzresults=temp.readlines()
-    temp.close()
-
-    fragidxtotypeidx={}
-    for lineidx in range(len(fragtttxyzresults)):
-        line=fragtttxyzresults[lineidx]
-        linesplit=line.split()
-        if lineidx!=0:
-            idx=int(linesplit[0])
-            typeidx=int(linesplit[5])
-            fragidxtotypeidx[idx]=typeidx
-
-    wholeidxtotypeidx={}
-    for lineidx in range(len(wholetttxyzresults)):
-        line=wholetttxyzresults[lineidx]
-        linesplit=line.split()
-        if lineidx!=0:
-            idx=int(linesplit[0])
-            typeidx=int(linesplit[5])
-            wholeidxtotypeidx[idx]=typeidx
-    wholemolidxtofragidx=json.load(open(filepath+r'/'+"parentindextofragindex.txt"))
-    temp={} # convert rdkit to babel
-    for key,value in wholemolidxtofragidx.items():
-        temp[int(key)+1]=int(value)+1
-    fragidxtowholemolidxbabel={v: k for k, v in temp.items()}
-    fragsmarts=rdmolfiles.MolToSmarts(fragmol)
-    m=mol_with_atom_index(poltype,fragmol)
-    fragsmirks=rdmolfiles.MolToSmarts(m)
-    fragidxarray=GrabAtomOrder(poltype,fragsmirks)
-    classkeytosmilesposarray={}
-    for tor in torlist:
-        rotbndindex=str(tor[1])+'_'+str(tor[2])
-        rotkey=rotbndindex.replace('_',' ')
-        tors=poltype.rotbndlist[rotkey]
-        parentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
-        for torsion in tors:
-            smilesposarray=[]
-            fragtor=[]
-            for index in torsion:
-                fragindex=parentindextofragindex[index-1]+1
-                fragtor.append(fragindex)
-                fragidxarraypos=fragidxarray.index(fragindex)
-                smilespos=fragidxarraypos+1
-                smilesposarray.append(smilespos)
-
-            classkey=get_class_key(poltype,fragtor[0],fragtor[1],fragtor[2],fragtor[3],fragidxtotypeidx)
-            classkeytosmilesposarray[classkey]=smilesposarray
-    p = Chem.MolFromSmarts(fragsmarts)
-    diditmatchrdkit=fragmol.HasSubstructMatch(p)
-    fragtypeidxtowholemoltypeidx={}
-    for fragidxbabel in fragidxtowholemolidxbabel.keys():
-        wholemolidxbabel=fragidxtowholemolidxbabel[fragidxbabel]
-        fragtypeidx=fragidxtotypeidx[fragidxbabel]
-        if fragtypeidx not in fragtypeidxtowholemoltypeidx.keys():
-            fragtypeidxtowholemoltypeidx[fragtypeidx]=[]
-        wholemoltypeidx=wholeidxtotypeidx[wholemolidxbabel]
-        if wholemoltypeidx not in fragtypeidxtowholemoltypeidx[fragtypeidx]: 
-            fragtypeidxtowholemoltypeidx[fragtypeidx].append(wholemoltypeidx)
-    newtemp=open(filepath+r'/'+'valence.prms','w')
-    temp=open(filepath+r'/'+fragmentfileprefix+'.key_6','w')
-    for line in fragkeyresults:
-        if 'torsion' in line:
-            linesplit=line.split()
-            typea=int(linesplit[1])
-            typeb=int(linesplit[2])
-            typec=int(linesplit[3])
-            typed=int(linesplit[4])
-            tor=[typea,typeb,typec,typed]
-            torkey='%d %d %d %d' % (typea, typeb, typec, typed)
-            #smilesposarray=classkeytosmilesposarray[torkey]
-            if typea in fragtypeidxtowholemoltypeidx.keys() and typeb in fragtypeidxtowholemoltypeidx.keys() and typec in fragtypeidxtowholemoltypeidx.keys() and typed in fragtypeidxtowholemoltypeidx.keys():
-                
-                possiblewholetypeslist=GenerateAllPossibleWholeTorsions(poltype,typea,typeb,typec,typed,fragtypeidxtowholemoltypeidx)
-                for possiblewholetypes in possiblewholetypeslist:
-                    wholetypea,wholetypeb,wholetypec,wholetyped=possiblewholetypes[:]
-                    wholemoltypestring=str(wholetypea)+' '+str(wholetypeb)+' '+str(wholetypec)+' '+str(wholetyped)
-                    torprmstring=' '.join(linesplit[5:])
-                    torstring='torsion '+wholemoltypestring+' '+torprmstring
-                    temp.write(torstring+'\n')
-                    #valencestring='"'+fragsmarts+'"'+' '+':'+' '+'['+str(smilesposarray[0])+','+str(smilesposarray[1])+','+str(smilesposarray[2])+','+str(smilesposarray[3])+','
-                    #torprmlist=linesplit[5:]
-                    #prms=torprmlist[0::3]
-                    #for prm in prms:
-                    #    valencestring+=prm+','
-                    #valencestring=valencestring[:-1]
-                    #valencestring+=']'+','+' '+r'\\'
-                    #newtemp.write(valencestring+'\n')
-        else:
-            temp.write(line)
-    temp.close()
-    newtemp.close()
-    return
-
-def GenerateAllPossibleWholeTorsions(poltype,typea,typeb,typec,typed,fragtypeidxtowholemoltypeidx):
-    possiblewholetypeslist=[]
-    possibleatypes=fragtypeidxtowholemoltypeidx[typea] 
-    possiblebtypes=fragtypeidxtowholemoltypeidx[typeb]
-    possiblectypes=fragtypeidxtowholemoltypeidx[typec]
-    possibledtypes=fragtypeidxtowholemoltypeidx[typed]
-   
-    for a in range(len(possibleatypes)):
-        wholeatype=possibleatypes[a]
-        for b in range(len(possiblebtypes)):
-            wholebtype=possiblebtypes[b]
-            for c in range(len(possiblectypes)):
-                wholectype=possiblectypes[c]
-                for d in range(len(possibledtypes)): 
-                    wholedtype=possibledtypes[d]
-                    temp=[wholeatype,wholebtype,wholectype,wholedtype]
-                    if temp not in possiblewholetypeslist and temp[::-1] not in possiblewholetypeslist:
-                        possiblewholetypeslist.append(temp)
-    return possiblewholetypeslist
 
 def GrabAtomOrder(poltype,smirks):
     atomorder=[]
@@ -538,21 +488,16 @@ def GenerateFrag(poltype,molindexlist,mol):
         formalcharge=oldatom.GetFormalCharge()
         oldindextoformalcharge[idx]=formalcharge
         spinmult=oldatom.GetSpinMultiplicity()
-        print('oldindex',idx,'spinmult',spinmult)
-    print('oldindextoformalcharge',oldindextoformalcharge)
-    print('oldindextonewindex',oldindextonewindex)
     for oldindex,formalcharge in oldindextoformalcharge.items():
         newindex=oldindextonewindex[oldindex]
         atm=em.GetAtom(newindex) 
         spinmult=atm.GetSpinMultiplicity()
-        print('oldindex',oldindex,'newindex',newindex,'spin mult',spinmult)
         atm.SetFormalCharge(formalcharge)
 
     atomiter=openbabel.OBMolAtomIter(em)
     for atom in atomiter:
         atomidx=atom.GetIdx()
         formalcharge=atom.GetFormalCharge()
-        print('atomidx',atomidx,'formalcharge',formalcharge) 
     atomswithcutbonds=[]
     bonditer=openbabel.OBMolBondIter(poltype.mol)
     for bond in bonditer:
@@ -572,7 +517,6 @@ def GenerateFrag(poltype,molindexlist,mol):
         bgnidx=oldindextonewindex[obgnidx]
         bondorder=bond.GetBondOrder()
         diditwork=em.AddBond(bgnidx,endidx,bondorder)
-        print('oldendindex',oendidx,'newendindex',endidx,'oldbgnidx',obgnidx,'bgnidx',bgnidx,'bondorder',bondorder)
         
 
     filename='frag.mol'
@@ -609,7 +553,6 @@ def GenerateFrag(poltype,molindexlist,mol):
     outputname='hydrated.mol'
     WriteOBMolToMol(poltype,nem,outputname)
     newmol=rdmolfiles.MolFromMolFile(outputname,removeHs=False)
-    print('newmol',newmol,os.getcwd())
     newmol.UpdatePropertyCache(strict=False)
     AllChem.EmbedMolecule(newmol)
     rdkitindextocoordinates={}
@@ -713,6 +656,7 @@ def GenerateWBOMatrix(poltype,molecule,structfname):
     return WBOmatrix,outputname,error
 
 def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
+
     newdir='Fragments'
     if not os.path.isdir(newdir):
         os.mkdir(newdir)
@@ -804,8 +748,10 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
             pass
         else:
             grow=True
-            fragmol,newindexes,fragWBOmatrix,structfname,WBOdifference,parentindextofragindex,fragpath,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist=GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfoldername,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,fragspath)
-            fragmoltoWBOmatrices,fragmoltobondindexlist=WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor,fragmoltoWBOmatrices,fragmoltobondindexlist)
+            possiblefragatmidxs=GrowPossibleFragmentAtomIndexes(poltype,poltype.rdkitmol,indexes)
+            if len(possiblefragatmidxs)!=0:
+                fragmol,newindexes,fragWBOmatrix,structfname,WBOdifference,parentindextofragindex,fragpath,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist=GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfoldername,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,fragspath)
+                fragmoltoWBOmatrices,fragmoltobondindexlist=WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor,fragmoltoWBOmatrices,fragmoltobondindexlist)
         curdir=os.getcwd()
         os.chdir(fragspath)
         growfragments=[mol_with_atom_index(poltype,frag) for frag in growfragments]
@@ -833,6 +779,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         fragmentarray.append(fragment)
         namearray.append(rotbndindex)
     equivalentrotbndindexarrays=FindEquivalentFragments(poltype,fragmentarray,namearray)
+    poltype.WriteToLog('equivalentrotbndindexarrays'+str(equivalentrotbndindexarrays))
     tempdic=rotbndindextoparentindextofragindex
     rotbndindextoparentindextofragindex=AddMatchingParentIndexesBetweenFragments(poltype,equivalentrotbndindexarrays,rotbndindextoparentindextofragindex,rotbndindextofragment)
     # now we need to redraw the 2Dimages for any fragments that are equivalent (get multiple torsions from different rotatable bonds around same fragment)
@@ -1000,17 +947,20 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
     fragfoldernamepath=os.getcwd()
     fragmentsforcomb=growfragments.copy()
     fragmentsforcombwbo=[WBOdifference]
+    growthcycles=0
     while not WBOdifference<=poltype.WBOtol:
+        if poltype.maxgrowthcycles!=None:
+            if growthcycles<=poltype.maxgrowthcycles:
+                break
+        growthcycles+=1
         WBOdiffarray=[]
         molarray=[]
         fragmolidxtoparentindextofragindex={}
         fragmentidxtostructfname={}
         fragmolidxtofoldername={}
         fragmolidxtofragmol={}
-
         fragments=[]
         possiblefragatmidxs=GrowPossibleFragmentAtomIndexes(poltype,poltype.rdkitmol,indexes)
-        print('possiblefragatmidxs',possiblefragatmidxs)
         if len(possiblefragatmidxs)!=0:
             for fragmolidx in range(len(possiblefragatmidxs)):
                 indexlist=possiblefragatmidxs[fragmolidx]

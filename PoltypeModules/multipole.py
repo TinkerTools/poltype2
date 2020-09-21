@@ -239,7 +239,6 @@ def gen_peditinfile(poltype,mol):
             bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
             idxtobisectidxs[atomidx]=bisectidxs
             poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
-
             # now make sure neighboring atom (lf1) also is using z-then-bisector
         else:
             if len(sorteduniquetypeneighbsnorepeat)==1:
@@ -249,13 +248,20 @@ def gen_peditinfile(poltype,mol):
                 newneighbs=RemoveFromList(poltype,neighboffirstneighbs,atom)
                 newsorteduniquetypeneighbsnorepeat=FindUniqueNonRepeatingNeighbors(poltype,newneighbs)
                 sorteduniquetypeneighbsnorepeat+=newsorteduniquetypeneighbsnorepeat
+        if len(sorteduniquetypeneighbsnorepeat)==0:
+            poltype.localframe1[atomidx - 1]=0
+            poltype.localframe2[atomidx - 1]=0
+        else:
             poltype.localframe1[atomidx - 1]=sorteduniquetypeneighbsnorepeat[0]
-            poltype.localframe2[atomidx - 1]=sorteduniquetypeneighbsnorepeat[1]
+            if len(sorteduniquetypeneighbsnorepeat)==2:
+                poltype.localframe2[atomidx - 1]=sorteduniquetypeneighbsnorepeat[1]
+
 
     # write out the local frames
     iteratom = openbabel.OBMolAtomIter(mol)
     if not os.path.isfile(poltype.peditinfile):
         f = open (poltype.peditinfile, 'w')
+        """
         for a in iteratom:
             if not idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
                 f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " " + str(poltype.localframe2[a.GetIdx() - 1]) + "\n")
@@ -267,7 +273,7 @@ def gen_peditinfile(poltype,mol):
                 f.write(str(a.GetIdx()) + " -" + str(trisecidxs[0])+ " -" + str(trisecidxs[1]) + " -" + str(trisecidxs[2])+ "\n")
 
 
-
+        """
         f.write("\n")
         f.write('A'+'\n')
 
@@ -394,7 +400,10 @@ def post_proc_localframes(poltype,keyfilename, lfzerox,atomindextoremovedipquad,
                 lf2 = '0'
             elif len(tmplst) == 6:
                 (keywd,atmidx,lf1,lf2,lf3,chg) = tmplst
-            # manually zero out components of the multipole if they were not done by poledit
+            elif len(tmplst) == 3:
+                (keywd,atmidx,chg) = tmplst
+
+                # manually zero out components of the multipole if they were not done by poledit
             if lfzerox[int(atmidx) - 1]:
                 tmpmp = list(map(float, lines[ln1+1].split()))
                 tmpmp[0] = 0
@@ -446,8 +455,20 @@ def post_proc_localframes(poltype,keyfilename, lfzerox,atomindextoremovedipquad,
                 templine=''.join(newtmplist)
                 newlines.extend(templine)
                 newlines.extend(lines[ln1+1:ln1+5])
+            if len(tmplst) == 3:
+                linesplit=re.split(r'(\s+)', lines[ln1])
+                newtmplist=linesplit[:len(linesplit)-3]
+                newtmplist.append('    0')
+                newtmplist.append('    0 ')
+                newtmplist.append(linesplit[-3])
+                newtmplist.append(linesplit[-2])
+                templine=''.join(newtmplist)
+                newlines.extend(templine)
+                newlines.extend(lines[ln1+1:ln1+5])
+
             else:
                 newlines.extend(lines[ln1:ln1+5])
+
             mpolelines = 4
         # append any lines unrelated to multipoles as is
         else:

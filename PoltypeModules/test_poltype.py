@@ -9,20 +9,18 @@ import getopt
 
 class TestPoltype(unittest.TestCase):
 
-    def __init__(self, method, examplepath,dontremovetestcase):
-         super(TestPoltype, self).__init__(method)
-         self.examplepath = examplepath
-         self.dontremovetestcase=dontremovetestcase
+    def __init__(self):
+         super(TestPoltype, self).__init__()
+         self.ptypepath=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__,os.pardir)), os.pardir))+r'/'
 
     def MakeTestCasePath(self,testfoldername):
 
         self.poltypemodulepath = os.path.abspath(os.path.join(__file__, os.pardir))
         self.poltypepath=os.path.abspath(os.path.join(self.poltypemodulepath, os.pardir))+r'/'
         self.testcaseparentpath=self.poltypepath+'TestCases'
-        if not self.dontremovetestcase:
-            if os.path.isdir(self.testcaseparentpath):
-                shutil.rmtree(self.testcaseparentpath)
-                os.mkdir(self.testcaseparentpath)
+        if not os.path.isdir(self.testcaseparentpath):
+            os.mkdir(self.testcaseparentpath)
+
         os.chdir(self.testcaseparentpath)
         testcasepath=self.testcaseparentpath+'/'+testfoldername
         if not os.path.isdir(testcasepath):
@@ -32,11 +30,11 @@ class TestPoltype(unittest.TestCase):
 
     def GenericCopy(self,testcasepath,examplefolder,examplestructure):
         exampleparentfolder='Examples/'
-        examplekey5fname=examplestructure.replace('.sdf','.key_5')
+        examplekey5fname=examplestructure.replace('.sdf','_copy.key_5')
         examplestructurepath=self.poltypepath+exampleparentfolder+examplefolder+examplestructure
         examplekeyfilepath=self.ptypepath+exampleparentfolder+examplefolder+examplekey5fname
         shutil.copy(examplestructurepath,testcasepath+examplestructure)
-        return examplekeyfilepath
+        return examplekeyfilepath,exampleparentfolder
 
     def GenericTest(self,exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath):
         testparams=ptype.main()
@@ -49,7 +47,7 @@ class TestPoltype(unittest.TestCase):
             self.assertEqual(testk,examplek)
             testreq=testitem.req
             examplereq=exampleitem.req
-            self.assertEqual(testreq,examplereq)
+            #self.assertEqual(testreq,examplereq)
         for key in testparams.angles.keys():     
             testitem=testparams.angles[key]
             exampleitem=exampleparams.angles[key]
@@ -58,7 +56,7 @@ class TestPoltype(unittest.TestCase):
             self.assertEqual(testk,examplek)
             testtheteq=testitem.theteq
             exampletheteq=exampleitem.theteq
-            self.assertEqual(testtheteq,exampletheteq)
+            #self.assertEqual(testtheteq,exampletheteq)
         for key in testparams.stretch_bends.keys():
             testitem=testparams.stretch_bends[key]
             exampleitem=exampleparams.stretch_bends[key]
@@ -231,78 +229,14 @@ class TestPoltype(unittest.TestCase):
         os.chdir(curdir)
         return dictionary
 
-
-    def test_Fragmenter(self):
-        print('Testing Fragmenter')
-        os.chdir(self.examplepath)
-        ptype=poltype.PolarizableTyper(readinionly=True)
-        head,tail=os.path.split(self.examplepath)
-        testfoldername='TestFragmenter/'+tail
-        testcasepath=self.MakeTestCasePath(testfoldername)
-        self.GenericFolderCopy(testcasepath)
-        os.chdir(testcasepath)
-        poltype.PolarizableTyper(dontfrag=False,structure=ptype.molstructfname,poltypeini=False,suppressdipoleerr=True,optmethod=ptype.optmethod,toroptmethod=ptype.toroptmethod,espmethod=ptype.espmethod,torspmethod=ptype.torspmethod,dmamethod=ptype.dmamethod,torspbasisset=ptype.torspbasisset,espbasisset=ptype.espbasisset,dmabasisset=ptype.dmabasisset,toroptbasisset=ptype.toroptbasisset,optbasisset=ptype.optbasisset,bashrcpath=ptype.bashrcpath,externalapi=ptype.externalapi,use_gaus=ptype.use_gaus,use_gausoptonly=ptype.use_gausoptonly,isfragjob=False,poltypepath=ptype.poltypepath,numproc=ptype.numproc,maxmem=ptype.maxmem,maxdisk=ptype.maxdisk,printoutput=True)
-        listofparenttorsions,listofparentqmminusmmtxtfiles=self.GrabTorsions(self.examplepath) 
-        for i in range(len(listofparenttorsions)):
-            torsion=listofparenttorsions=[i]
-            parentqmminusmmtxtfile=listofparentqmminusmmtxtfiles[i]
-            print('torsion',torsion)
-            parentrotbnd=str(torsion[1])+' '+str(torsion[2])
-            filepath=self.FindFragmentJobPath(parentrotbnd,testcasepath)
-            if filepath==None: # kept changing nature of fragmenter and torsion so not every torsion in example exists in fragmenter for this original example
-                continue
-            listoffragtorsions,listoffragqmminusmmtxtfiles=self.GrabTorsions(filepath)
-            parentindextofragindex=self.ReadDictionaryFromFile(filepath)
-            fragrotbnd=str(parentindextofragindex[torsion[1]])+'-'+str(parentindextofragindex[torsion[2]])
-            revfragrotbnd=str(parentindextofragindex[torsion[2]])+'-'+str(parentindextofragindex[torsion[1]])
-            for j in range(len(listoffragtorsions)):
-                fragtorsion=listoffragtorsions[j]
-                fragqmminusmmtxtfile=listoffragqmminusmmtxtfiles[j]
-                rotbnd=str(fragtorsion[1])+' '+str(fragtorsion[2])
-                print('comparing parenttorsion ',parenttorsion,'to fragtorsion ',fragtorsion)
-                print('fragrotbnd',fragrotbnd,'revfragrotbnd',revfragrotbnd,'rotbnd',rotbnd)
-
-                if fragrotbnd==rotbnd or revfragrotbnd==rotbnd:
-                    parentanglearray,parentqmminusmmarray=self.GrabArrayData(parentqmminusmmtxtfile)
-                    fraganglearray,fragqmminusmmarray=self.GrabArrayData(fragqmminusmmtxtfile)
-                    if len(parentanglearray)!=len(fraganglearray):
-                        print('parentanglearray',parentanglearray,'fraganglearray',fraganglearray)
-                        print('length of parent and fragment energy arrays are not same length so cannot compare')
-                        continue
-                    def RMSDW(c):
-                        return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.divide(parentqmminusmmarray,weight),c))))
-                    resultW=fmin(RMSDW,.5)
-                    minRMSDW=RMSDW(resultW[0])
-
-                    def RMSD(c):
-                        return numpy.sqrt(numpy.mean(numpy.square(numpy.add(parentqmminusmmarray,c))))
-                    result=fmin(RMSD,.5)
-                    minRMSD=RMSD(result[0])
-                    print('parent QM-MM2 RMSD and RMSDW',minRMSD,minRMSDW)
-                    if minRMSD>1 and minRMSDW>1:
-                        print('parent qm-mm array has bad fit, will not compare to fragment')
-                        continue
-                    else:
-
-                        def RMSD(c):
-                            return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.subtract(parentqmminusmmarray,fragqmminusmmarray,c)))))
-                        result=fmin(RMSD,.5)
-                        minRMSD=RMSD(result[0])
-                        print('RMSD of parent QM-MM2 and fragment QM-MM2',minRMSD)
-                        self.assertLessEqual(minRMSD, 1) 
-
-
-
-
-  
     def test_MethylamineCommonInputs(self):
         print('Testing common inputs')
         testcasefolder='TestMethylamineCommonInputs/'
         testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='SymmetryMethylamine/'
         examplestructure='methylamine.sdf'
-        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
+        examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
     
 
@@ -312,8 +246,8 @@ class TestPoltype(unittest.TestCase):
         testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='MethylamineGaus/'
         examplestructure='methylamine.sdf'
-        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,use_gaus=False,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
+        examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,use_gaus=False,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
 
 
@@ -323,8 +257,8 @@ class TestPoltype(unittest.TestCase):
         testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='MethylamineGausOptOnly/'
         examplestructure='methylamine.sdf'
-        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,use_gausoptonly=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
+        examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,use_gausoptonly=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
 
     
@@ -334,8 +268,8 @@ class TestPoltype(unittest.TestCase):
         testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='Methylamine/'
         examplestructure='methylamine.sdf'
-        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,qmonly=True,espbasisset='aug-cc-pVTZ',dmabasisset='cc-pVTZ',structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
+        examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,qmonly=True,espbasisset='aug-cc-pVTZ',dmabasisset='cc-pVTZ',structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
    
 
  
@@ -345,8 +279,8 @@ class TestPoltype(unittest.TestCase):
         testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='MethylamineGeometryOptimizationOptions/'
         examplestructure='methylamine.sdf'
-        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',optbasisset='6-311G*',gausoptcoords='cartesian',freq=True,optpcm=True,optmaxcycle=500,optmethod='HF',ptypeini=False,printoutput=True)
+        examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',optbasisset='6-311G*',gausoptcoords='cartesian',freq=True,optpcm=True,optmaxcycle=500,optmethod='HF',poltypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
     
     def test_MethanolTorsion(self):
@@ -355,8 +289,8 @@ class TestPoltype(unittest.TestCase):
         testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='MethanolTorsion/'
         examplestructure='methanol.sdf'
-        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,rotalltors=True,optpcm=True,torsppcm=True,toroptpcm=True,torsionrestraint=.2,foldnum=4,tordatapointsnum=13,toroptmethod='HF',torspmethod='MP2',toroptbasisset='6-311G*',torspbasisset='6-311++G(2d,2p)',structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
+        examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,rotalltors=True,optpcm=True,torsppcm=True,toroptpcm=True,torsionrestraint=.2,foldnum=4,tordatapointsnum=13,toroptmethod='HF',torspmethod='MP2',toroptbasisset='6-311G*',torspbasisset='6-311++G(2d,2p)',structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
 
     def test_MethanolTorsionGaus(self):
@@ -365,8 +299,8 @@ class TestPoltype(unittest.TestCase):
         testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='MethanolTorsionGaus/'
         examplestructure='methanol.sdf'
-        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,use_gaus=True,rotalltors=True,optpcm=True,torsppcm=True,toroptpcm=True,torsionrestraint=.2,foldnum=4,tordatapointsnum=13,toroptmethod='HF',torspmethod='MP2',toroptbasisset='6-311G*',torspbasisset='6-311++G(2d,2p)',structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
+        examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,use_gaus=True,rotalltors=True,optpcm=True,torsppcm=True,toroptpcm=True,torsionrestraint=.2,foldnum=4,tordatapointsnum=13,toroptmethod='HF',torspmethod='MP2',toroptbasisset='6-311G*',torspbasisset='6-311++G(2d,2p)',structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
      
  
@@ -376,8 +310,8 @@ class TestPoltype(unittest.TestCase):
         testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='MethanolOnlyRotBnd/'
         examplestructure='methanol.sdf'
-        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,onlyrotbnd='1,2',structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
+        examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,onlyrotbndslist='1,2',structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
 
 
@@ -387,8 +321,8 @@ class TestPoltype(unittest.TestCase):
         testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='MethanolFitRotBndsList/'
         examplestructure='methanol.sdf'
-        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,fitrotbndslist='1 2',structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
+        examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,fitrotbndslist='1 2',structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
 
 
@@ -398,8 +332,8 @@ class TestPoltype(unittest.TestCase):
         testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='Methylamine/'
         examplestructure='methylamine.sdf'
-        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,rotalltors=True,dontdotorfit=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
+        examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,rotalltors=True,dontdotorfit=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
 
     
     def test_MethylamineDontDoTor(self):
@@ -408,8 +342,8 @@ class TestPoltype(unittest.TestCase):
         testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='Methylamine/'
         examplestructure='methylamine.sdf'
-        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,dontdotor=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
+        examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,dontdotor=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
     
 
     def test_ModifiedAminoAcid(self):
@@ -418,8 +352,8 @@ class TestPoltype(unittest.TestCase):
         testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='ModifiedAminoAcid/'
         examplestructure='methylamine.sdf'
-        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,use_gaus=True,amoebabioprmpath='/home/bdw2292/Tinker-release/params/amoebabio18.prm',unmodifiedproteinpdbname='SNase_WT_H.pdb',mutatedresiduenumber='102',mutatedsidechain='CNC.sdf',modifiedresiduepdbcode='CNC',numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True) 
+        examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,use_gaus=True,amoebabioprmpath='/home/bdw2292/Tinker-release/params/amoebabio18.prm',unmodifiedproteinpdbname='SNase_WT_H.pdb',mutatedresiduenumber='102',mutatedsidechain='CNC.sdf',modifiedresiduepdbcode='CNC',numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True) 
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
 
     def test_Methane(self):
@@ -428,8 +362,8 @@ class TestPoltype(unittest.TestCase):
         testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='SymmetryMethane/'
         examplestructure='methane.sdf'
-        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
+        examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
 
     def test_Water(self):
@@ -438,8 +372,8 @@ class TestPoltype(unittest.TestCase):
         testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='SymmetryWater/'
         examplestructure='water.sdf'
-        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
+        examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
 
     def test_Acetamide(self):
@@ -448,8 +382,8 @@ class TestPoltype(unittest.TestCase):
         testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='SymmetryAcetamide/'
         examplestructure='acetamide.sdf'
-        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
+        examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
 
     def test_Ethene(self):
@@ -458,8 +392,8 @@ class TestPoltype(unittest.TestCase):
         testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='SymmetryEthene/'
         examplestructure='ethene.sdf'
-        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
+        examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
 
     def test_Ammonia(self):
@@ -468,8 +402,8 @@ class TestPoltype(unittest.TestCase):
         testcasepath=self.MakeTestCasePath(testcasefolder)
         examplefolder='SymmetryAmmonia/'
         examplestructure='ammonia.sdf'
-        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
+        examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
 
 
@@ -479,28 +413,34 @@ class TestPoltype(unittest.TestCase):
         testcasepath=self.MakeTestCasePath(testcasepath)
         examplefolder='SymmetryAniline/'
         examplestructure='aniline.sdf'
-        examplekeyfilepath=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',ptypeini=False,printoutput=True)
+        examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
+        ptype=poltype.PolarizableTyper(dontfrag=True,structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
     
 
 if __name__ == '__main__':
-    command_line_param = sys.argv[1:]
-    del sys.argv[1:]
-    examplepath=None
-    method=None
-    dontremovetestcase=False
-    opts, xargs = getopt.getopt(command_line_param,'e:m',["method=","examplepath=","dontremovetestcase"])
-    for o, a in opts:
-        if o in ("--examplepath"):
-            examplepath=a
-        elif o in ("--method"):
-            method=a
-        elif o in ("--dontremovetestcase"):
-            dontremovetestcase=True
  
     suite = unittest.TestSuite()
-    suite.addTest(TestPoltype(method,examplepath,dontremovetestcase))
+    obj=TestPoltype()
+    suite.addTest(obj.test_MethylamineCommonInputs())
+    suite.addTest(obj.test_MethylaminePsi4())
+    suite.addTest(obj.test_MethylaminePsi4SPOnly())
+    suite.addTest(obj.test_MethylamineDMAESPOptions())
+    suite.addTest(obj.test_MethylamineGeometryOptimizationOptions())
+    suite.addTest(obj.test_MethanolTorsion())
+    suite.addTest(obj.test_MethanolTorsionGaus())
+    suite.addTest(obj.test_MethanolOnlyRotBnd())
+    suite.addTest(obj.test_MethanolFitRotBndsList())
+    suite.addTest(obj.test_MethylamineDontDoTorFit())
+    suite.addTest(obj.test_MethylamineDontDoTor())
+    #suite.addTest(obj.test_ModifiedAminoAcid())
+    suite.addTest(obj.test_Methane())
+    suite.addTest(obj.test_Water())
+    suite.addTest(obj.test_Acetamide())
+    suite.addTest(obj.test_Ethene())
+    #suite.addTest(obj.test_Ammonia())
+    suite.addTest(obj.test_Aniline())
+
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

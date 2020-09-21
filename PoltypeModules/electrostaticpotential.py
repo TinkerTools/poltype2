@@ -32,11 +32,11 @@ def gen_esp_grid(poltype,mol):
     if poltype.use_gaus==False or poltype.use_gausoptonly==True:
         Vvals,gridpts=GrabGridData(poltype)
 
-        while len(gridpts) != len(Vvals):
-            time.sleep(60)
-            sys.stdout.flush()
-            poltype.WriteToLog('Waiting to flush system stdout for grid.dat and grid_esp.dat')
-            Vvals,gridpts=GrabGridData(poltype)
+        #while len(gridpts) != len(Vvals):
+        #    time.sleep(60)
+        #    sys.stdout.flush()
+        #    poltype.WriteToLog('Waiting to flush system stdout for grid.dat and grid_esp.dat')
+        #    Vvals,gridpts=GrabGridData(poltype)
    
         # Generate a "cube" file.  I have no idea what the format should be (it's not a
         # regular cube file) so I reverse engineered one by looking at TINKER source.
@@ -98,7 +98,7 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
     temp.write('}'+'\n')
     temp.write('memory '+maxmem+'\n')
     temp.write('set_num_threads(%s)'%(numproc)+'\n')
-    temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')
+    temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
     temp.write('set maxiter '+str(poltype.scfmaxiter)+'\n')
     temp.write('set freeze_core True'+'\n')
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
@@ -129,7 +129,7 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     temp.write('}'+'\n')
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
-    temp.write('psi4_io.set_default_path("%s")'%(poltype.scratchdir)+'\n')
+    temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
     temp.write('set freeze_core True'+'\n')
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
     temp.write("E, wfn = energy('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower(),poltype.dmabasisset)+'\n')
@@ -254,7 +254,8 @@ def SPForDMA(poltype,optmol,mol):
             cmdstr='cd '+os.getcwd()+' && '+'psi4 '+inputname+' '+poltype.logdmafname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logdmafname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
-            scratchdir=poltype.scratchdir
+            scratchdir=poltype.scrtmpdirpsi4
+
             jobtologlistfilenameprefix=os.getcwd()+r'/'+'dma_jobtolog_'+poltype.molecprefix
             if os.path.isfile(poltype.logdmafname):
                 os.remove(poltype.logdmafname) # if chk point exists just remove logfile, there could be error in it and we dont want WaitForTermination to catch error before job is resubmitted by daemon 
@@ -278,11 +279,11 @@ def SPForDMA(poltype,optmol,mol):
             if os.path.isfile(poltype.chkdmafname):
                 os.remove(poltype.chkdmafname)
             gen_comfile(poltype,poltype.comdmafname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkdmafname,poltype.comtmp,optmol)
-            cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdir + ' ' + poltype.gausexe + " " + poltype.comdmafname
+            cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + poltype.comdmafname
             
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logdmafname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
-            scratchdir=poltype.scrtmpdir
+            scratchdir=poltype.scrtmpdirgau
             jobtologlistfilenameprefix=os.getcwd()+r'/'+'dma_jobtolog_'+poltype.molecprefix
             if os.path.isfile(poltype.logdmafname):
                 os.remove(poltype.logdmafname)
@@ -314,7 +315,7 @@ def SPForESP(poltype,optmol,mol):
             cmdstr='cd '+os.getcwd()+' && '+'psi4 '+inputname+' '+outputname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+outputname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
-            scratchdir=poltype.scratchdir
+            scratchdir=poltype.scrtmpdirpsi4
             jobtologlistfilenameprefix=os.getcwd()+r'/'+'esp_jobtolog_'+poltype.molecprefix 
             if os.path.isfile(outputname):
                 os.remove(outputname)
@@ -337,10 +338,10 @@ def SPForESP(poltype,optmol,mol):
             if os.path.isfile(poltype.chkespfname):
                 os.remove(poltype.chkespfname)
             gen_comfile(poltype,poltype.comespfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkespfname,poltype.comtmp,optmol)
-            cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdir + ' ' + poltype.gausexe + " " + poltype.comespfname
+            cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + poltype.comespfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logespfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
-            scratchdir=poltype.scrtmpdir
+            scratchdir=poltype.scrtmpdirgau
             jobtologlistfilenameprefix=os.getcwd()+r'/'+'esp_jobtolog_'+poltype.molecprefix
             if os.path.isfile(poltype.logespfname):
                 os.remove(poltype.logespfname)
