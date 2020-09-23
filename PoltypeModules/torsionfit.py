@@ -679,7 +679,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         #  atoms restrained during restrained rotation.
         # tor_energy_list is set as qm - mm
 
-        weightlist=numpy.exp(-numpy.array(qm_energy_list)/2.5)
+        weightlist=numpy.exp(-numpy.add(numpy.array(qm_energy_list),15)/2.5)
 
         tor_energy_list = [qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)]
         if useweights==True:

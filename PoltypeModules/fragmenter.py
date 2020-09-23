@@ -110,8 +110,8 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
     results=temp.readlines()
     temp.close()
     temp=open(poltype.key5fname,'w')
-    fitline="# Fitted and Transferred from Fragment "
     for line in results:
+        fitline="# Fitted and Transferred from Fragment "
         if 'torsion' in line and '#' not in line:
             linesplit=line.split()
             typea=int(linesplit[1])
