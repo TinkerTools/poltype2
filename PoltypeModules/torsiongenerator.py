@@ -18,7 +18,15 @@ from rdkit import Chem
 
 def __init__(poltype):
     PolarizableTyper.__init__(poltype)
-    
+
+
+def DefaultMaxRange(poltype,torsions):
+    poltype.rotbndtomaxrange={}
+    for torsion in torsions:
+        a,b,c,d=torsion[0:4]
+        key=str(b)+' '+str(c)
+        poltype.rotbndtomaxrange[key]=360
+
 
 def RemoveCommentsFromKeyFile(poltype,keyfilename):
     temp=open(keyfilename,'r')
@@ -184,7 +192,11 @@ def GenerateTorsionSPInputFileGaus(poltype,torxyzfname,molecprefix,a,b,c,d,toran
 def tinker_minimize_angles(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseanglelist,prevstrctfname,torsionrestraint,torang,bondtopology):
     tinkerstructnamelist=[]
     # load prevstruct
-
+    tor=[a,b,c,d]
+    if tor in poltype.nonaroringtors:
+        nonaroringtor=True
+    else:
+        nonaroringtor=False
     # create xyz and key and write restraint then minimize, getting .xyz_2
     for phaseangle in phaseanglelist: # we need to send back minimized structure in XYZ (not tinker) format to load for next tinker minimization,but append the xyz_2 tinker XYZ file so that com file can be generated from that 
         prevstruct = opt.load_structfile(poltype,prevstrctfname)
@@ -201,24 +213,47 @@ def tinker_minimize_angles(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phase
         conf = rdmol.GetConformer()
         dihedral = optmol.GetTorsion(a,b,c,d)
         newdihedral=round((dihedral+phaseangle)%360)
-        rdmt.SetDihedralDeg(conf, a-1, b-1, c-1, d-1, newdihedral)
-        rdmol.UpdatePropertyCache(strict=False)
+        if nonaroringtor==False:
+            rdmt.SetDihedralDeg(conf, a-1, b-1, c-1, d-1, newdihedral)
+            rdmol.UpdatePropertyCache(strict=False)
+
         try:
             print(Chem.MolToMolBlock(rdmol,kekulize=True),file=open('tempout.mol','w+'))
         except:
             print(Chem.MolToMolBlock(rdmol,kekulize=False),file=open('tempout.mol','w+'))
 
         obConversion.ReadFile(prevstruct, 'tempout.mol')
-        prevstrctfname,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,torsionrestraint,prevstruct,torang,'_preQMOPTprefit',poltype.key4fname,'../')
+        
+
+        prevstrctfname,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,torsionrestraint,prevstruct,torang,'_preQMOPTprefit',poltype.key4fname,'../',nonaroringtor)
         tinkerstructnamelist.append(newtorxyzfname)
     return tinkerstructnamelist
 
 
 def tinker_minimize_analyze_QM_Struct(poltype,molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,prevstrctfname,torsionrestraint,designatexyz,keybase,keybasepath,bondtopology):
+    
+    tor=[a,b,c,d]
+    if tor in poltype.nonaroringtors:
+        nonaroringtor=True
+    else:
+        nonaroringtor=False
+    if 'post' not in designatexyz and nonaroringtor==False:    
+        dihedral = optmol.GetTorsion(a,b,c,d)
+        dihedral=round((dihedral+phaseangle)%360)
+        currentdihedral=prevstruct.GetTorsion(a,b,c,d)
+        currentdihedral=round((currentdihedral)%360)
+        diff= numpy.abs(currentdihedral-dihedral)
+        tol=.01
+        if diff>tol and diff!=360:
+            raise ValueError('Difference of '+str(diff)+' is greater than '+str(tol)+' for target dihedral of '+str(dihedral)+' and current dihedral of '+str(currentdihedral)+' '+os.getcwd())
+
+
+
+
     prevstruct = opt.load_structfile(poltype,prevstrctfname) # this should be a logfile
     prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
     prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology)
-    cartxyz,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,torsionrestraint,prevstruct,torang,designatexyz,keybase,keybasepath)
+    cartxyz,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,torsionrestraint,prevstruct,torang,designatexyz,keybase,keybasepath,nonaroringtor)
     toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
     term=AnalyzeTerm(poltype,toralzfname)
     if term==False:
@@ -241,16 +276,15 @@ def tinker_analyze(poltype,torxyzfname,keyfname,toralzfname):
     poltype.call_subsystem(alzcmdstr,True)
 
        
-def tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,torsionrestraint,prevstruct,torang,designatexyz,keybase,keybasepath):
-    if 'post' not in designatexyz:    
-        dihedral = optmol.GetTorsion(a,b,c,d)
-        dihedral=round((dihedral+phaseangle)%360)
-        currentdihedral=prevstruct.GetTorsion(a,b,c,d)
-        currentdihedral=round((currentdihedral)%360)
-        diff= numpy.abs(currentdihedral-dihedral)
-        tol=.01
-        if diff>tol and diff!=360:
-            raise ValueError('Difference of '+str(diff)+' is greater than '+str(tol)+' for target dihedral of '+str(dihedral)+' and current dihedral of '+str(currentdihedral)+' '+os.getcwd())
+def tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,torsionrestraint,prevstruct,torang,designatexyz,keybase,keybasepath,nonaroringtor):
+    if nonaroringtor==True:
+        tor=[a,b,c,d]
+        for torsionset in poltype.nonaroringtorsets:
+            if tor in torsionset:
+                ringset=torsionset
+
+    else:
+        ringset=[]
 
     torxyzfname = '%s-opt-%d-%d-%d-%d' % (molecprefix,a,b,c,d)
     torxyzfname+='-%03d%s.xyz' % (round((torang+phaseangle)%360),designatexyz)
@@ -330,9 +364,10 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         torang = optmol.GetTorsion(a,b,c,d)
         key=str(b)+' '+str(c)
         anginc=poltype.rotbndtoanginc[key]
-        phaselist=range(0,360,anginc)
+        maxrange=poltype.rotbndtomaxrange[key]
+        phaselist=range(0,maxrange,anginc)
         clock=phaselist[1:int(len(phaselist)/2)]
-        counterclock=[i-360 for i in phaselist[int(len(phaselist)/2) :][::-1]]
+        counterclock=[i-maxrange for i in phaselist[int(len(phaselist)/2) :][::-1]]
         consttorlist = list(poltype.torlist)
         consttorlist.remove(tor)
         if poltype.use_gaus==False and poltype.use_gausoptonly==False:
@@ -386,8 +421,6 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         finished,error=poltype.CheckNormalTermination(outputlog)
         if finished==True and 'opt' in outputlog:
             opt.GrabFinalXYZStructure(poltype,outputlog,outputlog.replace('.log','.xyz'))
-            #newoptmol = load_structfile(poltype,outputlog.replace('.log','.xyz'))
-            #CheckBondConnectivity(poltype,newoptmol,optmol)
 
         if finished==True and outputlog not in finishedjobs:
             finishedjobs.append(outputlog)

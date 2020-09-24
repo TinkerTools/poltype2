@@ -948,10 +948,9 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
     fragmentsforcomb=growfragments.copy()
     fragmentsforcombwbo=[WBOdifference]
     growthcycles=0
+    WBOdiffarray=[]
+    molarray=[]
     while not WBOdifference<=poltype.WBOtol:
-        if poltype.maxgrowthcycles!=None:
-            if growthcycles<=poltype.maxgrowthcycles:
-                break
         growthcycles+=1
         WBOdiffarray=[]
         molarray=[]
@@ -1035,6 +1034,10 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
             fragpath=os.getcwd()
         else:
             break
+        if poltype.maxgrowthcycles!=None:
+            if growthcycles<=poltype.maxgrowthcycles:
+                break
+
 
     curdir=os.getcwd()
     os.chdir('..')
