@@ -15,6 +15,7 @@ import numpy
 from rdkit.Chem.rdmolfiles import MolFromMol2File
 from rdkit.Chem import rdMolTransforms as rdmt
 from rdkit import Chem
+from itertools import product
 
 def __init__(poltype):
     PolarizableTyper.__init__(poltype)
@@ -22,10 +23,11 @@ def __init__(poltype):
 
 def DefaultMaxRange(poltype,torsions):
     poltype.rotbndtomaxrange={}
-    for torsion in torsions:
-        a,b,c,d=torsion[0:4]
-        key=str(b)+' '+str(c)
-        poltype.rotbndtomaxrange[key]=360
+    for torsionset in torsions:
+        for torsion in torsionset:
+            a,b,c,d=torsion[0:4]
+            key=str(b)+' '+str(c)
+            poltype.rotbndtomaxrange[key]=360
 
 
 def RemoveCommentsFromKeyFile(poltype,keyfilename):
@@ -46,14 +48,14 @@ def RemoveCommentsFromKeyFile(poltype,keyfilename):
         
     shutil.move(tempname, keyfilename)
 
-def ExecuteOptJobs(poltype,listofstructurestorunQM,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint):
+def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,variabletorlist,torsionrestraint):
     jobtooutputlog={}
     listofjobs=[]
     outputlogs=[]
     for i in range(len(listofstructurestorunQM)):
         torxyzfname=listofstructurestorunQM[i]
-        phaseangle=fullrange[i]
-        inputname,outputlog,cmdstr,scratchdir=GenerateTorsionOptInputFile(poltype,torxyzfname,poltype.molecprefix,a,b,c,d,torang,phaseangle,optmol,consttorlist)
+        phaseangles=phaselist[i]
+        inputname,outputlog,cmdstr,scratchdir=GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist)
         finished,error=poltype.CheckNormalTermination(outputlog)
         if finished==True and 'opt' in outputlog:
             opt.GrabFinalXYZStructure(poltype,outputlog,outputlog.replace('.log','.xyz'))
@@ -75,41 +77,39 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,fullrange,optmol,a,b,c,d,tora
         
     return outputlogs,listofjobs,scratchdir,jobtooutputlog
 
-def TinkerMinimizePostQMOpt(poltype,outputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,finishedjobs,errorjobs,bondtopology):
+def TinkerMinimizePostQMOpt(poltype,outputlogs,phaselist,optmol,torset,variabletorlist,torsionrestraint,finishedjobs,errorjobs,bondtopology):
     torxyznames=[]
     finishedoutputlogs=[]
     cartxyznames=[]
-    finishedphaseangles=[]
     for i in range(len(outputlogs)):
         outputlog=outputlogs[i]
+        phaseangles=phaselist[i]
         if outputlog in finishedjobs and outputlog not in errorjobs:
-            phaseangle=fullrange[i]
             if not poltype.use_gaus:
                 finalstruct=outputlog.replace('.log','.xyz')
-                cartxyz,torxyzfname=tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,finalstruct,torsionrestraint,'_postQMOPTprefit',poltype.key4fname,'../',bondtopology)
+                cartxyz,torxyzfname=tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,finalstruct,torsionrestraint,'_postQMOPTprefit',poltype.key4fname,'../',bondtopology)
             else:
-                cartxyz,torxyzfname=tinker_minimize_analyze_QM_Struct(poltype,poltype.molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,outputlog,torsionrestraint,'_postQMOPTprefit',poltype.key4fname,'../',bondtopology)
+                cartxyz,torxyzfname=tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,outputlog,torsionrestraint,'_postQMOPTprefit',poltype.key4fname,'../',bondtopology)
             torxyznames.append(torxyzfname)
             finishedoutputlogs.append(outputlog)
             cartxyznames.append(cartxyz)
-            finishedphaseangles.append(phaseangle)
-    return torxyznames,finishedoutputlogs,cartxyznames,finishedphaseangles
+    return torxyznames,finishedoutputlogs,cartxyznames
 
-def ExecuteSPJobs(poltype,torxyznames,cartxyznames,optoutputlogs,fullrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,outputlogtophaseangle,outputlogtocartxyz):
+def ExecuteSPJobs(poltype,torxyznames,cartxyznames,optoutputlogs,phaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,outputlogtocartxyz):
     jobtooutputlog={}
     listofjobs=[]
     outputnames=[]
     for i in range(len(torxyznames)):
         torxyzfname=torxyznames[i]
+        phaseangles=phaselist[i]
         outputlog=optoutputlogs[i]
-        phaseangle=fullrange[i]
         cartxyzname=cartxyznames[i]
         if not poltype.use_gaus:
             finalstruct=outputlog.replace('.log','_opt.xyz')
-            inputname,outputname=CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,poltype.molecprefix,a,b,c,d,torang,phaseangle)
+            inputname,outputname=CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,torset,phaseangles)
             cmdstr='cd '+os.getcwd()+' && '+'psi4 '+inputname+' '+outputname
         else:
-            inputname,outputname=GenerateTorsionSPInputFileGaus(poltype,torxyzfname,poltype.molecprefix,a,b,c,d,torang,phaseangle,outputlog)
+            inputname,outputname=GenerateTorsionSPInputFileGaus(poltype,torxyzfname,torset,optmol,phaseangles,outputlog)
             cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
         finished,error=poltype.CheckNormalTermination(outputname)
         if finished==True and error==False:
@@ -127,38 +127,53 @@ def ExecuteSPJobs(poltype,torxyznames,cartxyznames,optoutputlogs,fullrange,optmo
                 jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputname
 
         outputnames.append(outputname)
-        outputlogtophaseangle[outputname]=phaseangle
+        outputlogtophaseangles[outputname]=phaseangles
         outputlogtocartxyz[outputname]=cartxyzname
     if not poltype.use_gaus:
         
-        return outputnames,listofjobs,poltype.scrtmpdirpsi4,jobtooutputlog,outputlogtophaseangle,outputlogtocartxyz
+        return outputnames,listofjobs,poltype.scrtmpdirpsi4,jobtooutputlog,outputlogtophaseangles,outputlogtocartxyz
     else:
-        return outputnames,listofjobs,poltype.scrtmpdirgau,jobtooutputlog,outputlogtophaseangle,outputlogtocartxyz
+        return outputnames,listofjobs,poltype.scrtmpdirgau,jobtooutputlog,outputlogtophaseangles,outputlogtocartxyz
 
 
 
-def CreateGausTorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optmol,torxyzfname,consttorlist):
-    toroptcomfname = '%s-opt-%d-%d-%d-%d-%03d.com' % (molecprefix,a,b,c,d,round((torang+phaseangle)%360))
+def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist):
+    toroptcomfname = '%s-opt-' % (poltype.molecprefix)
+    for i in range(len(torset)):
+        tor=torset[i]
+        a,b,c,d=tor[:]
+        phaseangle=phaseangles[i]
+        torang = optmol.GetTorsion(a,b,c,d)
+        toroptcomfname+='%d-%d-%03d' % (b,c,round((torang+phaseangle)%360))
+        toroptcomfname+='_'
+    toroptcomfname=toroptcomfname[:-1]
+    toroptcomfname+='.com'     
     strctfname = os.path.splitext(toroptcomfname)[0] + '.log'
     gen_torcomfile(poltype,toroptcomfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,optmol,torxyzfname) # prevstruct is just used for Atomic Num and charge,torxyzfname is used for xyz coordinates
     # Append restraints to *opt*.com file
     tmpfh = open(toroptcomfname, "a")
-    # Fix all torsions around the rotatable bond b-c 
-    for resttors in poltype.rotbndlist[' '.join([str(b),str(c)])]:
-        rta,rtb,rtc,rtd = resttors
-        rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
-        if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
-           (optmol.GetAtom(rtd).GetAtomicNum() != 1):
-            tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
-
-    # Leave all torsions around other rotatable bonds fixed
-    for constangle in consttorlist:
-        csa,csb,csc,csd,csangle = constangle
-        for resttors in poltype.rotbndlist[' '.join([str(csb),str(csc)])]:
+    # Fix all torsions around the rotatable bond b-c
+    for i in range(len(torset)):
+        tor=torset[i]
+        a,b,c,d=tor[:]
+        for resttors in poltype.rotbndlist[' '.join([str(b),str(c)])]:
             rta,rtb,rtc,rtd = resttors
             rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
-            if (optmol.GetAtom(rta).GetAtomicNum() != 1) and (optmol.GetAtom(rtd).GetAtomicNum() != 1):
-                tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
+            if resttors not in variabletorlist and resttors not in restlist:
+                if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
+                   (optmol.GetAtom(rtd).GetAtomicNum() != 1):
+                    tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
+                    restlist.append(resttors)
+
+    # Leave all torsions around other rotatable bonds fixed
+    for rotkey,torsions in poltype.rotbndlist.items():
+        for resttors in torsions:
+            rta,rtb,rtc,rtd = resttors
+            rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
+            if resttors not in restlist and resttors not in variabletorlist:
+                if (optmol.GetAtom(rta).GetAtomicNum() != 1) and (optmol.GetAtom(rtd).GetAtomicNum() != 1):
+                    tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
+                    restlist.append(resttors)
     
     tmpfh.write("\n")
     tmpfh.close()
@@ -166,12 +181,12 @@ def CreateGausTorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optm
     return toroptcomfname,outputname
     
 
-def GenerateTorsionOptInputFile(poltype,torxyzfname,molecprefix,a,b,c,d,torang,phaseangle,optmol,consttorlist):
+def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist):
     if  poltype.use_gaus==False and poltype.use_gausoptonly==False:
-        inputname,outputname=CreatePsi4TorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optmol,torxyzfname,consttorlist)
+        inputname,outputname=CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist)
         cmdstr='cd '+os.getcwd()+' && '+'psi4 '+inputname+' '+outputname
     else:
-        inputname,outputname=CreateGausTorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optmol,torxyzfname,consttorlist)
+        inputname,outputname=CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist)
         cmdstr='cd '+os.getcwd()+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
         return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4
@@ -180,25 +195,35 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,molecprefix,a,b,c,d,torang,p
         return inputname,outputname,cmdstr,poltype.scrtmpdirgau
         
 
-def GenerateTorsionSPInputFileGaus(poltype,torxyzfname,molecprefix,a,b,c,d,torang,phaseangle,prevstrctfname):
+def GenerateTorsionSPInputFileGaus(poltype,torxyzfname,torset,optmol,phaseangles,prevstrctfname):
     prevstruct = opt.load_structfile(poltype,prevstrctfname)
-    torspcomfname = '%s-sp-%d-%d-%d-%d-%03d.com' % (molecprefix,a,b,c,d,round((torang+phaseangle)%360))
+    torspcomfname = '%s-sp-' % (poltype.molecprefix)
+    for i in range(len(torset)):
+        tor=torset[i]
+        a,b,c,d=tor[0:4]
+        torang = optmol.GetTorsion(a,b,c,d)
+        torspcomfname+='%d-%d-%03d' % (b,c,round((torang+phaseangle)%360))
+        torspcomfname+='_'
+    torspcomfname=torspcomfname[:-1]
+    torspcomfname+='.com'     
     torsplogfname = os.path.splitext(torspcomfname)[0] + '.log'
     gen_torcomfile(poltype,torspcomfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,prevstruct,torxyzfname)
     outputname=torspcomfname.replace('.com','.log')
     return torspcomfname,outputname
 
 
-def tinker_minimize_angles(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseanglelist,prevstrctfname,torsionrestraint,torang,bondtopology):
+def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevstrctfname,torsionrestraint,bondtopology):
     tinkerstructnamelist=[]
     # load prevstruct
+    firsttor=torset[0]
+    a,b,c,d=firsttor[0:4]
     tor=[a,b,c,d]
     if tor in poltype.nonaroringtors:
         nonaroringtor=True
     else:
         nonaroringtor=False
     # create xyz and key and write restraint then minimize, getting .xyz_2
-    for phaseangle in phaseanglelist: # we need to send back minimized structure in XYZ (not tinker) format to load for next tinker minimization,but append the xyz_2 tinker XYZ file so that com file can be generated from that 
+    for phaseanglelist in phaselist: # we need to send back minimized structure in XYZ (not tinker) format to load for next tinker minimization,but append the xyz_2 tinker XYZ file so that com file can be generated from that 
         prevstruct = opt.load_structfile(poltype,prevstrctfname)
         prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology) # sometimes extra bonds are made when atoms get too close during minimization
         prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
@@ -210,12 +235,16 @@ def tinker_minimize_angles(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phase
             rdmol=MolFromMol2File('temp.mol2',False,False)   
         except:
             rdmol=MolFromMol2File('temp.mol2',True,False)
-        conf = rdmol.GetConformer()
-        dihedral = optmol.GetTorsion(a,b,c,d)
-        newdihedral=round((dihedral+phaseangle)%360)
         if nonaroringtor==False:
-            rdmt.SetDihedralDeg(conf, a-1, b-1, c-1, d-1, newdihedral)
-            rdmol.UpdatePropertyCache(strict=False)
+            conf = rdmol.GetConformer()
+            for i in range(len(torset)):
+                tor=torset[i]
+                phaseangle=phaseanglelist[i]
+                a,b,c,d=tor[0:4]
+                dihedral = optmol.GetTorsion(a,b,c,d)
+                newdihedral=round((dihedral+phaseangle)%360)
+                rdmt.SetDihedralDeg(conf, a-1, b-1, c-1, d-1, newdihedral)
+                rdmol.UpdatePropertyCache(strict=False)
 
         try:
             print(Chem.MolToMolBlock(rdmol,kekulize=True),file=open('tempout.mol','w+'))
@@ -225,39 +254,39 @@ def tinker_minimize_angles(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phase
         obConversion.ReadFile(prevstruct, 'tempout.mol')
         
 
-        prevstrctfname,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,torsionrestraint,prevstruct,torang,'_preQMOPTprefit',poltype.key4fname,'../',nonaroringtor)
+        prevstrctfname,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,'_preQMOPTprefit',poltype.key4fname,'../',nonaroringtor)
         tinkerstructnamelist.append(newtorxyzfname)
     return tinkerstructnamelist
 
 
-def tinker_minimize_analyze_QM_Struct(poltype,molecprefix,a,b,c,d,torang,optmol,consttorlist,phaseangle,prevstrctfname,torsionrestraint,designatexyz,keybase,keybasepath,bondtopology):
-    
-    tor=[a,b,c,d]
-    if tor in poltype.nonaroringtors:
-        nonaroringtor=True
-    else:
-        nonaroringtor=False
-    if 'post' not in designatexyz and nonaroringtor==False:    
-        dihedral = optmol.GetTorsion(a,b,c,d)
-        dihedral=round((dihedral+phaseangle)%360)
-        currentdihedral=prevstruct.GetTorsion(a,b,c,d)
-        currentdihedral=round((currentdihedral)%360)
-        diff= numpy.abs(currentdihedral-dihedral)
-        tol=.01
-        if diff>tol and diff!=360:
-            raise ValueError('Difference of '+str(diff)+' is greater than '+str(tol)+' for target dihedral of '+str(dihedral)+' and current dihedral of '+str(currentdihedral)+' '+os.getcwd())
-
-
-
+def tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,prevstrctfname,torsionrestraint,designatexyz,keybase,keybasepath,bondtopology):
+    for i in range(len(phaseangles)):
+        phaseangle=phaseangles[i]
+        tor=torset[i]
+        a,b,c,d=tor[0:4] 
+        if tor in poltype.nonaroringtors:
+            nonaroringtor=True
+        else:
+            nonaroringtor=False
+        if 'post' not in designatexyz and nonaroringtor==False:    
+            dihedral = optmol.GetTorsion(a,b,c,d)
+            dihedral=round((dihedral+phaseangle)%360)
+            currentdihedral=prevstruct.GetTorsion(a,b,c,d)
+            currentdihedral=round((currentdihedral)%360)
+            diff= numpy.abs(currentdihedral-dihedral)
+            tol=.01
+            if diff>tol and diff!=360:
+                raise ValueError('Difference of '+str(diff)+' is greater than '+str(tol)+' for target dihedral of '+str(dihedral)+' and current dihedral of '+str(currentdihedral)+' '+os.getcwd())
 
     prevstruct = opt.load_structfile(poltype,prevstrctfname) # this should be a logfile
     prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
     prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology)
-    cartxyz,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,torsionrestraint,prevstruct,torang,designatexyz,keybase,keybasepath,nonaroringtor)
+    cartxyz,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseangles,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath,nonaroringtor)
     toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
     term=AnalyzeTerm(poltype,toralzfname)
     if term==False:
         tinker_analyze(poltype,newtorxyzfname,keyfname,toralzfname)
+
     return cartxyz,newtorxyzfname
 
 def AnalyzeTerm(poltype,filename):
@@ -276,35 +305,53 @@ def tinker_analyze(poltype,torxyzfname,keyfname,toralzfname):
     poltype.call_subsystem(alzcmdstr,True)
 
        
-def tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,torsionrestraint,prevstruct,torang,designatexyz,keybase,keybasepath,nonaroringtor):
-    if nonaroringtor==True:
-        tor=[a,b,c,d]
-        for torsionset in poltype.nonaroringtorsets:
-            if tor in torsionset:
-                ringset=torsionset
+def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath,nonaroringtor):
 
-    else:
-        ringset=[]
+    torxyzfname = '%s-opt-'%(poltype.molecprefix)
+    for i in range(len(torset)):
+        tor=torset[i]
+        phaseangle=phaseanglelist[i]
+        a,b,c,d=tor[0:4]
+        torang = optmol.GetTorsion(a,b,c,d)
+        torxyzfname+='%d-%d-%03d' % (b,c,round((torang+phaseangle)%360))
+        torxyzfname+='_'
+    torxyzfname=torxyzfname[:-1]
+    torxyzfname+='%s.xyz' % (designatexyz)
 
-    torxyzfname = '%s-opt-%d-%d-%d-%d' % (molecprefix,a,b,c,d)
-    torxyzfname+='-%03d%s.xyz' % (round((torang+phaseangle)%360),designatexyz)
-    tmpkeyfname = 'tmp-%d-%d-%d-%d' % (a,b,c,d)
-    tmpkeyfname+='-%03d%s.key' % (round((torang+phaseangle)%360),designatexyz)
+    tmpkeyfname = 'tmp-'
+    for i in range(len(torset)):
+        tor=torset[i]
+        phaseangle=phaseanglelist[i]
+        a,b,c,d=tor[0:4]
+        torang = optmol.GetTorsion(a,b,c,d)
+        tmpkeyfname+='%d-%d-%03d' % (b,c,round((torang+phaseangle)%360))
+        tmpkeyfname+='_'
+    tmpkeyfname=tmpkeyfname[:-1]
+    tmpkeyfname+='%s.key' % (designatexyz)
+
     torminlogfname=torxyzfname.replace('.xyz','.out')
     save_structfile(poltype,prevstruct,torxyzfname)
     shutil.copy(keybasepath+keybase, tmpkeyfname)
     tmpkeyfh = open(tmpkeyfname,'a')
-    tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (a,b,c,d,torsionrestraint,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
-    for key in poltype.rotbndlist:
-        torlist=poltype.rotbndlist[key]
-        for res in torlist:
-            resa,resb,resc,resd = res[0:4]
-            if (a,b,c,d) != (resa,resb,resc,resd) and (a,b,c,d) != (resd,resc,resb,resa):
-                if (b==resb and c==resc) or (b==resc and c==resb):
-                    secondang = optmol.GetTorsion(resa,resb,resc,resd)
-                    tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (resa,resb,resc,resd,torsionrestraint,round((secondang+phaseangle)%360),round((secondang+phaseangle)%360)))
-                else:
-                    tmpkeyfh.write('restrain-torsion %d %d %d %d %f\n' % (resa,resb,resc,resd,torsionrestraint))
+    restlist=[]
+    for i in range(len(torset)):
+        tor=torset[i]
+        a,b,c,d=tor[0:4]
+        torang = optmol.GetTorsion(a,b,c,d)
+        phaseangle=phaseanglelist[i]
+        tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (a,b,c,d,torsionrestraint,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
+        for key in poltype.rotbndlist.keys():
+            torlist=poltype.rotbndlist[key]
+            for res in torlist:
+                resa,resb,resc,resd = res[0:4]
+                if res not in restlist:
+                    if (resa,resb,resc,resd) not in torset and (resd,resc,resb,resa) not in torset and (resa,resb,resc,resd) not in variabletorlist and (resd,resc,resb,resa) not in variabletorlist:
+                        if (b==resb and c==resc) or (b==resc and c==resb):
+                            secondang = optmol.GetTorsion(resa,resb,resc,resd)
+                            tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (resa,resb,resc,resd,torsionrestraint,round((secondang+phaseangle)%360),round((secondang+phaseangle)%360)))
+                        else:
+                            tmpkeyfh.write('restrain-torsion %d %d %d %d %f\n' % (resa,resb,resc,resd,torsionrestraint))
+                        restlist.append(res)
     tmpkeyfh.close()
     mincmdstr = poltype.minimizeexe+' '+torxyzfname+' -k '+tmpkeyfname+' 0.1'+' '+'>'+torminlogfname
     term,error=poltype.CheckNormalTermination(torminlogfname)
@@ -316,6 +363,18 @@ def tinker_minimize(poltype,molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,t
     cartxyz=ConvertTinktoXYZ(poltype,torxyzfname+'_2')
     return cartxyz,torxyzfname,torxyzfname+'_2',tmpkeyfname
 
+def GenerateFilename(poltype,torset,phaseangles,prefix,postfix,mol):
+    filename=prefix
+    for i in range(len(torset)):
+        tor=torset[i]
+        a,b,c,d=tor[:]
+        phaseangle=phaseangles[i] 
+        torang = mol.GetTorsion(a,b,c,d)
+        filename+='%d-%d-%03d'%(b,c,round((torang+phaseangle)%360))
+        filename+='_'
+    filename=filename[:-1]
+    filename+=postfix
+    return filename
 
 def gen_torsion(poltype,optmol,torsionrestraint):
     """
@@ -336,14 +395,6 @@ def gen_torsion(poltype,optmol,torsionrestraint):
     if not os.path.isdir('qm-torsion'):
         os.mkdir('qm-torsion')
     os.chdir('qm-torsion')
-    '''
-    cmdstr='rm *.xyz_*'
-    os.system(cmdstr)
-    cmdstr='rm *.out'
-    os.system(cmdstr)
-    cmdstr='rm *.alz'
-    os.system(cmdstr)
-    '''
     files=os.listdir(os.getcwd())
      
     poltype.optoutputtotorsioninfo={}
@@ -354,50 +405,70 @@ def gen_torsion(poltype,optmol,torsionrestraint):
     fulllistofjobs=[]
     fulljobtolog={}
     fulljobtooutputlog={}
-    tortodihedralrange={}
-    tortooptoutputlog={}
+    poltype.torsettophaselist={}
+    torsettooptoutputlogs={}
     bondtopology=GenerateBondTopology(poltype,optmol)
-    tortotorang={}
-    for tor in poltype.torlist:
-        
-        a,b,c,d = tor[0:4]
-        torang = optmol.GetTorsion(a,b,c,d)
-        key=str(b)+' '+str(c)
-        anginc=poltype.rotbndtoanginc[key]
-        maxrange=poltype.rotbndtomaxrange[key]
-        phaselist=range(0,maxrange,anginc)
-        clock=phaselist[1:int(len(phaselist)/2)]
-        counterclock=[i-maxrange for i in phaselist[int(len(phaselist)/2) :][::-1]]
-        consttorlist = list(poltype.torlist)
-        consttorlist.remove(tor)
+    print('poltype.rotbndtoanginc',poltype.rotbndtoanginc)
+    for torset in poltype.torlist:
+        variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
+        phaselists=[]
+        for tor in torset:
+            a,b,c,d = tor[0:4]
+            torang = optmol.GetTorsion(a,b,c,d)
+            key=str(b)+' '+str(c)
+            anginc=poltype.rotbndtoanginc[key]
+            maxrange=poltype.rotbndtomaxrange[key]
+            phaselist=range(0,maxrange,anginc)
+            phaselists.append(phaselist)
+        flatphaselist=numpy.array(list(product(*phaselists)))
+        origshape=flatphaselist.shape
+        print('poltype.torsionsettonumptsneeded',poltype.torsionsettonumptsneeded)
+        prms=poltype.torsionsettonumptsneeded[tuple(torset)]
+        prmstoremove=len(flatphaselist)-prms
+        lastdim=len(phaselists)
+        shape=[]
+        for i in range(len(phaselists)):
+            phaselist=phaselists[i]
+            shape.append(len(phaselist))
+        shape.append(lastdim)
+        shape=tuple(shape)
+        flatphaselist=flatphaselist.reshape(shape) # now we can remove diagonal elements
+        ax2idx=len(shape)-1-1
+        ax1idx=ax2idx-1
+        diags = numpy.transpose(numpy.diagonal(flatphaselist, axis1=ax1idx, axis2=ax2idx))
+        flatphaselist=flatphaselist.reshape(origshape)
+        flatphaselist=flatphaselist.tolist()
+        indicestoremove=[]
+        for diag in diags:
+            loc=flatphaselist.index(diag)
+            indicestoremove.append(loc)
+        for index in indicestoremove:
+            del flatphaselist[index]
+        # we could remove more points if we wanted....
+        phaseangles=[0]*len(torset)
         if poltype.use_gaus==False and poltype.use_gausoptonly==False:
-            prevstrctfname = '%s-opt-%d-%d-%d-%d-%03d-opt.xyz' % (poltype.molecprefix,a,b,c,d,round((torang)%360))
+            prefix='%s-opt-' % (poltype.molecprefix)
+            postfix='-opt.xyz' 
+            prevstrctfname=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
             cmd = 'cp ../%s %s' % (poltype.logoptfname.replace('.log','.xyz'),prevstrctfname)
             poltype.call_subsystem(cmd,True)
+
         else:
-            prevstrctfname = '%s-opt-%d-%d-%d-%d-%03d.log' % (poltype.molecprefix,a,b,c,d,round(torang % 360))
+            prefix='%s-opt-' % (poltype.molecprefix)
+            postfix='.log' 
+            prevstrctfname=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
             # copy *-opt.log found early by Gaussian to 'prevstrctfname'
             cmd = 'cp ../%s %s' % (poltype.logoptfname,prevstrctfname)
             poltype.call_subsystem(cmd,True)
-        
+
 
         minstrctfname = prevstrctfname
         prevstrctfname = minstrctfname
-        clock=[0]+list(clock)
-        listoftinkertorstructuresclock=tinker_minimize_angles(poltype,poltype.molecprefix,a,b,c,d,optmol,consttorlist,clock,prevstrctfname,torsionrestraint,torang,bondtopology)
-        listoftinkertorstructurescounterclock=tinker_minimize_angles(poltype,poltype.molecprefix,a,b,c,d,optmol,consttorlist,counterclock,prevstrctfname,torsionrestraint,torang,bondtopology)
-        listofstructurestorunQM.extend(listoftinkertorstructuresclock)
-        listofstructurestorunQM.extend(listoftinkertorstructurescounterclock)
-        fullrange.extend(list(clock))
-        fullrange.extend(list(counterclock))
-        outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteOptJobs(poltype,listoftinkertorstructuresclock+listoftinkertorstructurescounterclock,clock+counterclock,optmol,a,b,c,d,torang,consttorlist,torsionrestraint)
-        torstring=''
-        for i in range(len(tor)-1):
-            torstring+=str(tor[i])+'-'
-        torstring=torstring[:-1]
-        tortotorang[torstring]=torang
-        tortodihedralrange[torstring]=clock+counterclock
-        tortooptoutputlog[torstring]=outputlogs
+        listoftinkertorstructures=tinker_minimize_angles(poltype,torset,optmol,variabletorlist,flatphaselist,prevstrctfname,torsionrestraint,bondtopology)
+        listofstructurestorunQM.extend(listoftinkertorstructures)
+        outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint)
+        poltype.torsettophaselist[tuple(torset)]=flatphaselist
+        torsettooptoutputlogs[tuple(torset)]=outputlogs
 
 
         lognames=[]
@@ -427,35 +498,27 @@ def gen_torsion(poltype,optmol,torsionrestraint):
     fulltorxyznames=[]
     fullfinishedoutputlogsSP=[]
     fullcartxyznames=[]
-    fullfinishedphaseangles=[]
     fulloutputlogsSP=[]
     fulllistofjobs=[]
     fulljobtolog={}
     fulljobtooutputlog={}
-    tortospoutputlogs={}
-    tortocartxyz={}
-    outputlogtophaseangle={}
+    torsettospoutputlogs={}
+    torsettocartxyz={}
+    outputlogtophaseangles={}
     outputlogtocartxyz={}
-    for tor in poltype.torlist:
-        a,b,c,d = tor[0:4]
-        consttorlist = list(poltype.torlist)
-        consttorlist.remove(tor)  
-        torstring=''
-        for i in range(len(tor)-1):
-            torstring+=str(tor[i])+'-'
-        torstring=torstring[:-1]
-        torang=tortotorang[torstring]
-        dihedralrange=tortodihedralrange[torstring]
-        outputlogs=tortooptoutputlog[torstring]
-        torxyznames,finishedoutputlogs,cartxyznames,finishedphaseangles=TinkerMinimizePostQMOpt(poltype,outputlogs,dihedralrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,finishedjobs,errorjobs,bondtopology)
+    for torset in poltype.torlist:
+        variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
+        flatphaselist=poltype.torsettophaselist[tuple(torset)]
+        outputlogs=torsettooptoutputlogs[tuple(torset)]
+        torxyznames,finishedoutputlogs,cartxyznames=TinkerMinimizePostQMOpt(poltype,outputlogs,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,finishedjobs,errorjobs,bondtopology)
         fulltorxyznames.extend(torxyznames)
         fullfinishedoutputlogsSP.extend(finishedoutputlogs)
         fullcartxyznames.extend(cartxyznames)
-        tortocartxyz[torstring]=cartxyznames
-        fullfinishedphaseangles.extend(finishedphaseangles)
-        outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangle,outputlogtocartxyz=ExecuteSPJobs(poltype,torxyznames,cartxyznames,finishedoutputlogs,dihedralrange,optmol,a,b,c,d,torang,consttorlist,torsionrestraint,outputlogtophaseangle,outputlogtocartxyz)
+        torsettocartxyz[tuple(torset)]=cartxyznames
+
+        outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangles,outputlogtocartxyz=ExecuteSPJobs(poltype,torxyznames,cartxyznames,finishedoutputlogs,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,outputlogtocartxyz)
         lognames=[]
-        tortospoutputlogs[torstring]=outputlogs
+        torsettospoutputlogs[tuple(torset)]=outputlogs
         for job in listofjobs:
            log=jobtooutputlog[job]
            lognames.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir))+r'/'+poltype.logfname)
@@ -464,21 +527,16 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         fulloutputlogsSP.extend(outputlogs)
         fulllistofjobs.extend(listofjobs)
         fulljobtolog.update(jobtolog)
-    for tor in poltype.torlist:
-        a,b,c,d = tor[0:4]
-        consttorlist = list(poltype.torlist)
-        consttorlist.remove(tor)
-        torstring=''
-        for i in range(len(tor)-1):
-            torstring+=str(tor[i])+'-'
-        torstring=torstring[:-1]
-        torang=tortotorang[torstring]
-        outputlogs=tortospoutputlogs[torstring]
+
+    for torset in poltype.torlist:
+        variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
+        flatphaselist=poltype.torsettophaselist[tuple(torset)]
+        outputlogs=torsettospoutputlogs[tuple(torset)]
         for i in range(len(outputlogs)):
             outputlog=outputlogs[i]
             cartxyzname=outputlogtocartxyz[outputlog] 
-            phaseangle=outputlogtophaseangle[outputlog]
-            poltype.optoutputtotorsioninfo[outputlog]= [a,b,c,d,torang,optmol,consttorlist,phaseangle,cartxyzname,bondtopology]
+            phaseangles=outputlogtophaseangles[outputlog]
+            poltype.optoutputtotorsioninfo[outputlog]= [torset,optmol,variabletorlist,phaseangles,cartxyzname,bondtopology]
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMSPJobToLog'+'_'+poltype.molecprefix
     if poltype.externalapi!=None:
         if len(fulllistofjobs)!=0:
@@ -552,7 +610,6 @@ def get_torlist(poltype,mol):
             continue
         if ringbond==True and poltype.allownonaromaticringscanning==False:
             continue
-
         if ((bond.IsRotor()) or [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist or (poltype.rotalltors and t2val>=2 and t3val>=2)):
             t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
             # is the torsion in toromitlist
@@ -562,16 +619,16 @@ def get_torlist(poltype,mol):
                 skiptorsion = False # override previous conditions if in list
             if poltype.rotalltors==True:
                 skiptorsion=False
-            rotbndkey = '%d %d' % (t2.GetIdx(), t3.GetIdx())
+
+            unq=get_uniq_rotbnd(poltype,t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx())
+            rotbndkey = '%d %d' % (unq[1],unq[2])
             if (not skiptorsion):
                 # store the torsion and temporary torsion value found by openbabel in torlist
                 tor = mol.GetTorsion(t1,t2,t3,t4)
-                torlist.append([t1,t2,t3,t4,tor % 360])
+                torlist.append(unq)
                 # store torsion in rotbndlist
                 rotbndlist[rotbndkey] = []
-                rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,
-                        t1.GetIdx(),t2.GetIdx(),
-                        t3.GetIdx(),t4.GetIdx()))
+                rotbndlist[rotbndkey].append(unq)
                 # write out rotatable bond to log
                 poltype.logfh.write('Rotatable bond found about %s\n' %
                 str(rotbndlist[rotbndkey][0]))
@@ -609,12 +666,14 @@ def get_torlist_opt_angle(poltype,optmol, torlist):
         tmplist.append([a,b,c,d,e % 360])
     return tmplist
 
-def DetermineAngleIncrementForEachTorsion(poltype,mol,rotbndlist):
+def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndlist):
     poltype.rotbndtoanginc={}
+    poltype.torsionsettonumptsneeded={}
     # if here are multiple torsions to fit per rotatable bond, make sure there are enough angles for QM profile to do fitting
     for key in rotbndlist:
         keylist=rotbndlist[key]
         torsionlist=[]
+        maintor=keylist[0]
         for tor in keylist:
             a2,b2,c2,d2=tor[0:4]
             obaa = mol.GetAtom(a2)
@@ -627,6 +686,8 @@ def DetermineAngleIncrementForEachTorsion(poltype,mol,rotbndlist):
         
         if poltype.tordatapointsnum==None:
             prmnum=len(poltype.nfoldlist)*(len(torsionlist))+1
+            torset=tuple([maintor])
+            poltype.torsionsettonumptsneeded[torset]=prmnum
             ang=round(360/(prmnum)) # offset parameter is the +1
             if ang> 30:
                 ang=30
@@ -634,7 +695,6 @@ def DetermineAngleIncrementForEachTorsion(poltype,mol,rotbndlist):
         else:
             ang=round(360/poltype.tordatapointsnum)
         ratio=round(360/ang)
-        phaselist=list(range(0,360,ang))
         poltype.rotbndtoanginc[key]=ang
     return poltype.rotbndtoanginc
 
@@ -700,8 +760,17 @@ def ConvertTinktoXYZ(poltype,filename):
     return filename.replace('.xyz_2','_xyzformat.xyz')
 
 
-def CreatePsi4TorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optmol,torxyzfname,consttorlist):
-    inputname = '%s-opt-%d-%d-%d-%d-%03d.psi4' % (molecprefix,a,b,c,d,round((torang+phaseangle)%360))
+def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist):
+    inputname = '%s-opt-'%(poltype.molecprefix)
+    for i in range(len(torset)):
+        tor=torset[i]
+        a,b,c,d=tor[0:4]
+        torang = optmol.GetTorsion(a,b,c,d)
+        phaseangle=phaseangles[i]
+        inputname+='%d-%d-%03d'%(b,c,round((torang+phaseangle)%360))
+        inputname+='_'
+    inputname=inputname[:-1]
+    inputname+='.psi4'     
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
     temp.write('%d %d\n' % (optmol.GetTotalCharge(),1))
@@ -720,31 +789,38 @@ def CreatePsi4TorOPTInputFile(poltype,molecprefix,a,b,c,d,phaseangle,torang,optm
     # Fix all torsions around the rotatable bond b-c
     temp.write('set optking { '+'\n')
     temp.write('  frozen_dihedral = ("'+'\n')
+    restlist=[]
     firsttor=True
-    for resttors in poltype.rotbndlist[' '.join([str(b),str(c)])]:
-        rta,rtb,rtc,rtd = resttors
-        rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
-        if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
-           (optmol.GetAtom(rtd).GetAtomicNum() != 1):
-            if not firsttor:
-                temp.write(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
-            else:
-                temp.write('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
-                firsttor=True
+    for i in range(len(torset)):
+        tor=torset[i]
+        a,b,c,d=tor[0:4]
+        for resttors in poltype.rotbndlist[' '.join([str(b),str(c)])]:
+            rta,rtb,rtc,rtd = resttors
+            if resttors not in variabletorlist:
+                rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
+                if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
+                   (optmol.GetAtom(rtd).GetAtomicNum() != 1):
+                    restlist.append(resttors)
+                    if not firsttor:
+                        temp.write(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
+                    else:
+                        temp.write('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
+                        firsttor=True
             
-    # Leave all torsions around other rotatable bonds fixed
-    for constangle in consttorlist:
-        csa,csb,csc,csd,csangle = constangle
-        for resttors in poltype.rotbndlist[' '.join([str(csb),str(csc)])]:
+        # Leave all torsions around other rotatable bonds fixed
+    for rotkey,torsions in poltype.rotbndlist.items():
+        for resttors in torsions:
             rta,rtb,rtc,rtd = resttors
             rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
-            if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
-               (optmol.GetAtom(rtd).GetAtomicNum() != 1):
-                if not firsttor:
-                    temp.write(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
-                else:
-                    temp.write('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
-                    firsttor=True
+            if resttors not in restlist and resttors not in variabletorlist:
+                if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
+                   (optmol.GetAtom(rtd).GetAtomicNum() != 1):
+                    restlist.append(resttors)
+                    if not firsttor:
+                        temp.write(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
+                    else:
+                        temp.write('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
+                        firsttor=True
     temp.write('  ")'+'\n')
     temp.write('}'+'\n')
 
@@ -970,8 +1046,17 @@ def write_arr_to_file(poltype,fname, array_list):
         outfh.write("\n")
 
 
-def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,molecprefix,a,b,c,d,torang,phaseangle,makecube=None):
-    inputname= '%s-sp-%d-%d-%d-%d-%03d.psi4' % (molecprefix,a,b,c,d,round((torang+phaseangle)%360))
+def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,torset,phaseangles,makecube=None):
+    inputname= '%s-sp-'%(poltype.molecprefix)
+    for i in range(len(torset)):
+        tor=torset[i]
+        phaseangle=phaseangles[i]
+        a,b,c,d=tor[0:4]
+        torang = optmol.GetTorsion(a,b,c,d)
+        inputname+='%d-%d-%03d' % (b,c,round((torang+phaseangle)%360))
+        inputname+='_'
+    inputname=inputname[:-1]
+    inputname+='.psi4'    
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
     temp.write('%d %d\n' % (optmol.GetTotalCharge(), 1))
@@ -1028,14 +1113,19 @@ def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,molecprefix
 
 def RemoveDuplicateRotatableBondTypes(poltype):
     tortorotbnd={}
-    for tor in poltype.torlist:
-        classkeynew=get_class_key(poltype,tor[0],tor[1],tor[2],tor[3])
-        temp=classkeynew[1]+','+classkeynew[2]
-        tortorotbnd[tuple(tor)]=classkeynew
+    for key,tors in poltype.rotbndlist.items():
+        for tor in tors:
+            classkeynew=get_class_key(poltype,tor[0],tor[1],tor[2],tor[3])
+            tortorotbnd[tuple(tor)]=classkeynew
     listofduptors=[]
     for key,value in tortorotbnd.items():
         duptors=[k for k,v in tortorotbnd.items() if v == value]
-        if len(duptors)>=2 and duptors not in listofduptors:
+        keylist=[]
+        for tor in duptors:
+            rotbndkey=str(tor[1])+' '+str(tor[2])
+            if rotbndkey not in keylist:
+                keylist.append(rotbndkey)
+        if len(keylist)>=2 and duptors not in listofduptors:
             listofduptors.append(duptors)
     for dup in listofduptors: # doesnt matter which one is first, just remove duplicates
         for i in range(len(dup)-1):
@@ -1045,7 +1135,8 @@ def RemoveDuplicateRotatableBondTypes(poltype):
                 poltype.torlist.remove(tor)
             if rotbndkey in poltype.rotbndlist.keys():
                 del poltype.rotbndlist[rotbndkey]
-    return poltype.torlist,poltype.rotbndlist
+    return poltype.torlist,poltype.rotbndlist 
+
 
 
 def PrependStringToKeyfile(poltype,keyfilename,string):

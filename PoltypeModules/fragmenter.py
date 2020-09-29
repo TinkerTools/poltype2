@@ -49,40 +49,57 @@ def AssignTotalCharge(poltype,molecule,babelmolecule):
     return molecule
 
 
+def GrabKeysFromValue(poltype,dic,thevalue):
+    keylist=[]
+    for key,value in dic.items():
+        if value==thevalue:
+            keylist.append(key)
+    return keylist
+
+
 def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfilepath):
     valenceprmlist=[]
-    symmtorlist=[]
-    for tor in torlist:
-        rotbndindex=str(tor[1])+'_'+str(tor[2])
-        rotkey=rotbndindex.replace('_',' ')
-        tors=poltype.rotbndlist[rotkey]
-        for torsion in tors:
-            fwd=torgen.get_class_key(poltype,torsion[0],torsion[1],torsion[2],torsion[3])
-            fwdsplit=fwd.split()        
-            revsplit=fwdsplit[::-1]
-            rev='%d %d %d %d' % (int(revsplit[0]), int(revsplit[1]), int(revsplit[2]), int(revsplit[3]))
-            if fwd not in symmtorlist:
-                symmtorlist.append(fwd)
-            if rev not in symmtorlist:
-                symmtorlist.append(rev)
+    parentsymmtorlist=[]
+    for torset in torlist:
+        for tor in torset:
+            rotbndindex=str(tor[1])+'_'+str(tor[2])
+            rotkey=rotbndindex.replace('_',' ')
+            tors=poltype.rotbndlist[rotkey]
+            for torsion in tors:
+                fwd=torgen.get_class_key(poltype,torsion[0],torsion[1],torsion[2],torsion[3])
+                fwdsplit=fwd.split()        
+                revsplit=fwdsplit[::-1]
+                rev='%d %d %d %d' % (int(revsplit[0]), int(revsplit[1]), int(revsplit[2]), int(revsplit[3]))
+                if fwd not in parentsymmtorlist:
+                    parentsymmtorlist.append(fwd)
+                if rev not in parentsymmtorlist:
+                    parentsymmtorlist.append(rev)
     classkeytoparameters={}
+    classkeytofragmentfilename={}
+    classkeytotorsionindexescollected={}
+    classkeytosmartscollected={}
+    classkeytosmartsposarraycollected={}
     curdir=os.getcwd()
     for rotbndindex,fragmentfilepath in rotbndindextofragmentfilepath.items():
         path,filename=os.path.split(fragmentfilepath)
         os.chdir(path)
        
-        
+         
         filelist=os.listdir(os.getcwd())
         for ff in filelist:
             if '.key_5' in ff:
                 parentindextofragindex=json.load(open("parentindextofragindex.txt"))
                 parentsymclasstofragsymclass=json.load(open("parentsymclasstofragsymclass.txt"))
                 parentindextofragindex=json.load(open("parentindextofragindex.txt"))
-                fragclasskeytoparentclasskey=json.load(open("fragclasskeytoparentclasskey.txt"))
+                parentclasskeytofragclasskey=json.load(open("parentclasskeytofragclasskey.txt"))
                 classkeytosmartsposarray=json.load(open("classkeytosmartsposarray.txt"))
                 classkeytosmarts=json.load(open("classkeytosmarts.txt"))
                 classkeytotorsionindexes=json.load(open("classkeytotorsionindexes.txt"))
-
+                fragsymmtorlist=[]
+                for tor in parentsymmtorlist:
+                    if tor in parentclasskeytofragclasskey.keys():
+                        fragclasskey=parentclasskeytofragclasskey[tor]
+                        fragsymmtorlist.append(fragclasskey)
                 temp=open(ff,'r')
                 results=temp.readlines()
                 temp.close()
@@ -98,12 +115,20 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
                         tor=[typea,typeb,typec,typed]
                         torkey='%d %d %d %d' % (typea, typeb, typec, typed)
                         revtorkey='%d %d %d %d' % (typed, typec, typeb, typea)
-                        if torkey in symmtorlist:
-                            if torkey in fragclasskeytoparentclasskey.keys():
-                                classkey=fragclasskeytoparentclasskey[torkey]
-                            elif revtorkey in fragclasskeytoparentclasskey.keys():
-                                classkey=fragclasskeytoparentclasskey[revtorkey]
-                            classkeytoparameters[classkey]=prms
+                        if torkey in fragsymmtorlist or revtorkey in fragsymmtorlist:
+                            if torkey in parentclasskeytofragclasskey.values():
+                                classkeys=GrabKeysFromValue(poltype,parentclasskeytofragclasskey,torkey)
+                            elif revtorkey in parentclasskeytofragclasskey.values():
+                                classkeys=GrabKeysFromValue(poltype,parentclasskeytofragclasskey,revtorkey)
+                            for classkey in classkeys:
+                                smartsposarray=classkeytosmartsposarray[classkey]
+                                torsionindexes=classkeytotorsionindexes[classkey]
+                                smarts=classkeytosmarts[classkey]
+                                classkeytotorsionindexescollected[classkey]=torsionindexes
+                                classkeytosmartscollected[classkey]=smarts
+                                classkeytosmartsposarraycollected[classkey]=smartsposarray
+                                classkeytoparameters[classkey]=prms
+                                classkeytofragmentfilename[classkey]=filename
 
     os.chdir(curdir)
     temp=open(poltype.key4fname,'r')
@@ -122,13 +147,14 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
             torkey='%d %d %d %d' % (typea, typeb, typec, typed)
             rev='%d %d %d %d' % (typed,typec,typeb,typea)
             if torkey in classkeytoparameters.keys():
+                filename=classkeytofragmentfilename[torkey]
                 prms=classkeytoparameters[torkey]
                 parameters=' '.join(prms)
                 torline='torsion '+torkey+' '+parameters+'\n'
-                smartspos=classkeytosmartsposarray[torkey]
-                smarts=classkeytosmarts[torkey]
-                torsionindexes=classkeytotorsionindexes[torkey]
-                fitline+=' SMARTS '+smarts+' torsion atom indexes = '+torsionindexes+' with smiles torsion indices '+smartspos+"\n"
+                smartspos=classkeytosmartsposarraycollected[torkey]
+                smarts=classkeytosmartscollected[torkey]
+                torsionindexes=classkeytotorsionindexescollected[torkey]
+                fitline+=' SMARTS '+smarts+' torsion atom indexes = '+torsionindexes+' with smiles torsion indices '+smartspos+' from fragment '+filename+"\n"
                 valencestring='# "'+smarts+'"'+' '+':'+' '+'['+smartspos+','
                 newprms=prms[0::3]
                 for prm in newprms:
@@ -139,13 +165,15 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
                 temp.write(valencestring)
                 temp.write(torline)
             elif rev in classkeytoparameters.keys():
+                filename=classkeytofragmentfilename[rev]
                 prms=classkeytoparameters[rev]
                 parameters=' '.join(prms)
                 torline='torsion '+torkey+' '+parameters+'\n'
-                smartspos=classkeytosmartsposarray[rev]
-                smarts=classkeytosmarts[rev]
-                torsionindexes=classkeytotorsionindexes[rev]
-                fitline+=' SMARTS '+smarts+' torsion atom indexes = '+torsionindexes+' with smiles torsion indices '+smartspos+"\n"
+                smartspos=classkeytosmartsposarraycollected[rev]
+                smarts=classkeytosmartscollected[rev]
+                torsionindexes=classkeytotorsionindexescollected[rev]
+                fitline+=' SMARTS '+smarts+' torsion atom indexes = '+torsionindexes+' with smiles torsion indices '+smartspos+' from fragment '+filename+"\n"
+
                 valencestring='# "'+smarts+'"'+' '+':'+' '+'['+smartspos+','
                 newprms=prms[0::3]
                 for prm in newprms:
@@ -310,7 +338,7 @@ def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog):
     return finishedjobs,errorjobs
 
 
-def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,torlist,equivalentrotbndindexarrays):
+def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays):
     parentdir=dirname(abspath(os.getcwd()))
     listofjobs=[]
     jobtooutputlog={}
@@ -367,10 +395,13 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         classkeytosmartsposarray={}
         classkeytosmarts={}
         classkeytotorsionindexes={}
-        fragclasskeytoparentclasskey={}
-        rotkey=rotbndindex.replace('_',' ')
-        tors=poltype.rotbndlist[rotkey]
-        for torsion in tors:
+        parentclasskeytofragclasskey={}
+        totaltors=[]
+        for rotbndindex in array:
+            rotkey=rotbndindex.replace('_',' ')
+            tors=list(poltype.rotbndlist[rotkey])
+            totaltors.extend(tors)
+        for torsion in totaltors:
             smilesposarray=[]
             fragtor=[]
             for index in torsion:
@@ -390,11 +421,11 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             fragclasskeysplit=[parentsymclasstofragsymclass[i] for i in classkeysplit]
             fragclasskeysplit=[str(i) for i in fragclasskeysplit]
             fragclasskey=' '.join(fragclasskeysplit)
-            fragclasskeytoparentclasskey[fragclasskey]=classkey
+            parentclasskeytofragclasskey[classkey]=fragclasskey
             classkeytosmartsposarray[classkey]=smilesposstring
             classkeytosmarts[classkey]=fragsmarts
             classkeytotorsionindexes[classkey]=fragtorstring
-        WriteDictionaryToFile(poltype,fragclasskeytoparentclasskey,"fragclasskeytoparentclasskey.txt")
+        WriteDictionaryToFile(poltype,parentclasskeytofragclasskey,"parentclasskeytofragclasskey.txt")
         WriteDictionaryToFile(poltype,classkeytosmartsposarray,"classkeytosmartsposarray.txt")
         WriteDictionaryToFile(poltype,classkeytosmarts,"classkeytosmarts.txt")
         WriteDictionaryToFile(poltype,classkeytotorsionindexes,"classkeytotorsionindexes.txt")
@@ -669,19 +700,26 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
     rotbndindextofragfoldername={}
     rotbndindextoWBOdifference={}
    
-    for tor in torlist:
+    for torset in torlist:
+        extendedtorindexes=[]
+        for tor in torset:
+            indexes=FirstPassAtomIndexes(poltype,tor)
+            for index in indexes:
+                if index not in extendedtorindexes:
+                    extendedtorindexes.append(index)
+             
+
         WBOdifferencetofragWBOmatrix={}
         WBOdifferencetofoldername={}
         WBOdifferencetofragmol={}
         WBOdifferencetostructfname={}
         highlightbonds=[]
-        indexes=FirstPassAtomIndexes(poltype,tor)
 
         fragfoldername=str(tor[1])+'_'+str(tor[2])+'_Hydrated'
         if not os.path.isdir(fragfoldername):
             os.mkdir(fragfoldername)
         os.chdir(fragfoldername)
-        fragmol,parentindextofragindex=GenerateFrag(poltype,indexes,mol)
+        fragmol,parentindextofragindex=GenerateFrag(poltype,extendedtorindexes,mol)
         growfragments=[]
         filename=fragfoldername+'.mol'
         WriteRdkitMolToMolFile(poltype,fragmol,filename)
@@ -748,9 +786,9 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
             pass
         else:
             grow=True
-            possiblefragatmidxs=GrowPossibleFragmentAtomIndexes(poltype,poltype.rdkitmol,indexes)
+            possiblefragatmidxs=GrowPossibleFragmentAtomIndexes(poltype,poltype.rdkitmol,extendedtorindexes)
             if len(possiblefragatmidxs)!=0:
-                fragmol,newindexes,fragWBOmatrix,structfname,WBOdifference,parentindextofragindex,fragpath,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist=GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfoldername,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,fragspath)
+                fragmol,newindexes,fragWBOmatrix,structfname,WBOdifference,parentindextofragindex,fragpath,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist=GrowFragmentOut(poltype,mol,parentWBOmatrix,extendedtorindexes,WBOdifference,tor,fragfoldername,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,fragspath)
                 fragmoltoWBOmatrices,fragmoltobondindexlist=WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor,fragmoltoWBOmatrices,fragmoltobondindexlist)
         curdir=os.getcwd()
         os.chdir(fragspath)

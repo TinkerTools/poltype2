@@ -43,7 +43,7 @@ from rdkit.Chem import rdmolfiles,AllChem,rdmolops
 from rdkit.Geometry import Point3D
 class PolarizableTyper():
 
-    def __init__(self,refinenonaroringtors=False,maxgrowthcycles=None,use_gauPCM=False,fitqmdipole=True,allownonaromaticringscanning=False,scfmaxiter=300,suppresstorfiterr=False,obminimizeexe='obminimize',readinionly=False,suppressdipoleerr=False,topologylib='residue_connect.txt',poltypepath=os.path.split(__file__)[0],WBOtol=.05,dontfrag=False,isfragjob=False,dipoletol=.1,externalapi=None,printoutput=False,poltypeini=True,structure=None,prmstartidx=401,numproc=1,maxmem="700MB",maxdisk="100GB",gausdir=None,gdmadir=None,tinkerdir=None,scratchdir="/scratch",paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/amoebabio18_header.prm",babelexe="babel",gausexe=None,formchkexe='formchk',cubegenexe='cubegen',gdmaexe='gdma',avgmpolesexe=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/avgmpoles.pl",peditexe='poledit.x',potentialexe='potential.x',minimizeexe='minimize.x',analyzeexe='analyze.x',superposeexe='superpose.x',defopbendval=0.20016677990819662,Hartree2kcal_mol=627.5095,optbasisset='6-31G*',toroptbasisset='6-31G*',dmabasisset='6-311G**',espbasisset="aug-cc-pVTZ",torspbasisset="6-311+G*",optmethod='wB97X-D',toroptmethod='wB97X-D',torspmethod='wB97X-D',dmamethod='MP2',espmethod='MP2',qmonly = False,espfit = True,parmtors = True,foldnum=3,foldoffsetlist = [ 0.0, 180.0, 0.0, 0.0, 0.0, 0.0 ],torlist = None,rotbndlist = None,fitrotbndslist=None,maxRMSD=.1,maxRMSPD=1,maxtorRMSPD=1.8,tordatapointsnum=None,gentorsion=False,gaustorerror=False,torsionrestraint=.1,onlyrotbndslist=None,rotalltors=False,dontdotor=False,dontdotorfit=False,toroptpcm=False,optpcm=False,torsppcm=False,use_gaus=False,use_gausoptonly=False,freq=False,postfit=False,bashrcpath=None,amoebabioprmpath=None,libpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/lib.bio18_conv1.txt",SMARTSToTypelibpath=sys.path[0]+'/SMARTSToTypeLib.txt',ModifiedResiduePrmPath=sys.path[0]+'/ModifiedResidue.prm',modifiedproteinpdbname=None,unmodifiedproteinpdbname=None,mutatedsidechain=None,mutatedresiduenumber=None,modifiedresiduepdbcode=None,optmaxcycle=3,torkeyfname=None,gausoptcoords='',forcefield="AMOEBA",helpfile='README.md',versionfile='version.md'): 
+    def __init__(self,refinenonaroringtors=False,maxgrowthcycles=None,use_gauPCM=False,fitqmdipole=False,allownonaromaticringscanning=False,scfmaxiter=300,suppresstorfiterr=False,obminimizeexe='obminimize',readinionly=False,suppressdipoleerr=False,topologylib='residue_connect.txt',poltypepath=os.path.split(__file__)[0],WBOtol=.05,dontfrag=False,isfragjob=False,dipoletol=.1,externalapi=None,printoutput=False,poltypeini=True,structure=None,prmstartidx=401,numproc=1,maxmem="700MB",maxdisk="100GB",gausdir=None,gdmadir=None,tinkerdir=None,scratchdir="/scratch",paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/amoebabio18_header.prm",babelexe="babel",gausexe=None,formchkexe='formchk',cubegenexe='cubegen',gdmaexe='gdma',avgmpolesexe=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/avgmpoles.pl",peditexe='poledit.x',potentialexe='potential.x',minimizeexe='minimize.x',analyzeexe='analyze.x',superposeexe='superpose.x',defopbendval=0.20016677990819662,Hartree2kcal_mol=627.5095,optbasisset='6-31G*',toroptbasisset='6-31G*',dmabasisset='6-311G**',espbasisset="aug-cc-pVTZ",torspbasisset="6-311+G*",optmethod='wB97X-D',toroptmethod='wB97X-D',torspmethod='wB97X-D',dmamethod='MP2',espmethod='MP2',qmonly = False,espfit = True,parmtors = True,foldnum=3,foldoffsetlist = [ 0.0, 180.0, 0.0, 0.0, 0.0, 0.0 ],torlist = None,rotbndlist = None,fitrotbndslist=None,maxRMSD=.1,maxRMSPD=1,maxtorRMSPD=1.8,tordatapointsnum=None,gentorsion=False,gaustorerror=False,torsionrestraint=.1,onlyrotbndslist=None,rotalltors=False,dontdotor=False,dontdotorfit=False,toroptpcm=False,optpcm=False,torsppcm=False,use_gaus=False,use_gausoptonly=False,freq=False,postfit=False,bashrcpath=None,amoebabioprmpath=None,libpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/lib.bio18_conv1.txt",SMARTSToTypelibpath=sys.path[0]+'/SMARTSToTypeLib.txt',ModifiedResiduePrmPath=sys.path[0]+'/ModifiedResidue.prm',modifiedproteinpdbname=None,unmodifiedproteinpdbname=None,mutatedsidechain=None,mutatedresiduenumber=None,modifiedresiduepdbcode=None,optmaxcycle=3,torkeyfname=None,gausoptcoords='',forcefield="AMOEBA",helpfile='README.md',versionfile='version.md'): 
         self.refinenonaroringtors=refinenonaroringtors
         self.fitqmdipole=fitqmdipole
         self.maxgrowthcycles=maxgrowthcycles
@@ -328,7 +328,7 @@ class PolarizableTyper():
                         else:
                             self.dontdotorfit=self.GrabBoolValue(a)
                     elif "optmaxcycle" in newline:
-                        self.optmaxcycle = a
+                        self.optmaxcycle = int(a)
                     elif "torsionrestraint" in newline:
                         self.torsionrestraint=float(a)
                     elif "foldnum" in newline:
@@ -688,7 +688,7 @@ class PolarizableTyper():
     def usage(self):
         self.printfile(self.helpfile)
     
-    def FindAddedHydrogenIndexes(poltype,mols):
+    def FindAddedHydrogenIndexes(self,mols):
         hydindexes=[]
         hydratedmol=mols[1]
         originalmol=mols[0]
@@ -711,7 +711,7 @@ class PolarizableTyper():
         if is2d==True: 
             molprefix=self.molstructfname.split('.')[0]
             newname=molprefix+'_3D'+'.mol'
-            poltype.molstructfname=newname
+            self.molstructfname=newname
 
             rdmolfiles.MolToMolFile(rdkitmol,'test.mol',kekulize=True)
             AllChem.EmbedMolecule(rdkitmol)
@@ -818,7 +818,7 @@ class PolarizableTyper():
                         error=False
                         continue
                     if ('Error termination request processed by link 9999' in line or 'Error termination via Lnk1e in' in line) or ('OptimizationConvergenceError' in line) and 'opt' in logfname:
-                        if self.CycleCount(logfname)>=poltype.optmaxcycle:
+                        if self.CycleCount(logfname)>=self.optmaxcycle:
                             term=True
                             error=False
                             print('no longer error',logfname)
@@ -970,11 +970,11 @@ class PolarizableTyper():
         if os.path.isfile(self.logfname):
             os.remove(self.logfname)
         self.logfh = open(self.logfname,"a",buffering=1)
-        if not os.path.exists(poltype.scrtmpdirpsi4):
-            mkdirstr='mkdir '+poltype.scrtmpdirpsi4
+        if not os.path.exists(self.scrtmpdirpsi4):
+            mkdirstr='mkdir '+self.scrtmpdirpsi4
             self.call_subsystem(mkdirstr,True)
-        if not os.path.exists(poltype.scrtmpdirgau):
-            mkdirstr='mkdir '+poltype.scrtmpdirgau
+        if not os.path.exists(self.scrtmpdirgau):
+            mkdirstr='mkdir '+self.scrtmpdirgau
             self.call_subsystem(mkdirstr,True)
 
         obConversion.SetOutFormat('mol')
@@ -1065,11 +1065,9 @@ class PolarizableTyper():
         # Average multipoles based on molecular symmetry
         # Does this using the script avgmpoles.pl which is found in the poltype directory
         # Atoms that belong to the same symm class will now have only one common multipole definition
-        if os.path.isfile(self.key2fname):
-            os.remove(self.key2fname)
-        if os.path.isfile(self.xyzoutfile):
-            os.remove(self.xyzoutfile)
-        mpole.AverageMultipoles(self,optmol)
+        if not os.path.isfile(self.key2fname):
+            mpole.AverageMultipoles(self,optmol)
+
         if self.espfit and not os.path.isfile(self.key3fname) and self.atomnum!=1:
             # Optimize multipole parameters to QM ESP Grid (*.cube_2)
             # tinker's potential utility is called, with option 6.
@@ -1084,10 +1082,17 @@ class PolarizableTyper():
             esp.ElectrostaticPotentialComparison(self)  
         # Find rotatable bonds for future torsion scans
         (self.torlist, self.rotbndlist) = torgen.get_torlist(self,mol)
-        self.torlist = torgen.get_torlist_opt_angle(self,optmol, self.torlist)
+        
         self.torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self) # this only happens in very symmetrical molecules
-        torlist=[i[:4] for i in self.torlist]
-        self.rotbndtoanginc=torgen.DetermineAngleIncrementForEachTorsion(self,mol,self.rotbndlist)
+        self.torlist=[tuple(i) for i in self.torlist]
+        self.flattorlist=self.torlist.copy()
+        self.torlist=[[i] for i in self.torlist] # need to group into torsion set for N-D scans
+        self.torsettovariabletorlist={}
+        for torset in self.torlist:
+            self.torsettovariabletorlist[tuple(torset)]=[]
+        print('self.torlist',self.torlist)
+        print('self.rotbndlist',self.rotbndlist)
+        self.rotbndtoanginc=torgen.DetermineAngleIncrementAndPointsNeededForEachTorsionSet(self,mol,self.rotbndlist)
 
         torgen.DefaultMaxRange(self,self.torlist)
         if not os.path.isfile(self.key4fname):
@@ -1131,30 +1136,34 @@ class PolarizableTyper():
 
             WBOmatrix,outputname,error=frag.GenerateWBOMatrix(self,self.rdkitmol,self.logoptfname.replace('.log','.xyz'))
             highlightbonds=[]
-            for tor in self.torlist:
-                rotbnd=[tor[1]-1,tor[2]-1]
-                highlightbonds.append(rotbnd)
+            for torset in self.torlist:
+                for tor in torset:
+                    rotbnd=[tor[1]-1,tor[2]-1]
+                    highlightbonds.append(rotbnd)
             frag.Draw2DMoleculeWithWBO(self,WBOmatrix,self.molstructfname.replace('.sdf',''),self.rdkitmol,bondindexlist=highlightbonds,imgsize=1500)        
-            rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays=frag.GenerateFragments(self,self.mol,torlist,WBOmatrix) # returns list of bond indexes that need parent molecule to do torsion scan for (fragment generated was same as the parent0
-            frag.SpawnPoltypeJobsForFragments(self,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,torlist,equivalentrotbndindexarrays)
+            rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays=frag.GenerateFragments(self,self.mol,self.torlist,WBOmatrix) # returns list of bond indexes that need parent molecule to do torsion scan for (fragment generated was same as the parent0
+            frag.SpawnPoltypeJobsForFragments(self,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays)
 
         if self.dontfrag==False and self.isfragjob==False and not os.path.isfile(self.key5fname):
-            frag.GrabTorsionParametersFromFragments(self,torlist,rotbndindextofragmentfilepath) # just dump to key_5 since does not exist for parent molecule
+            frag.GrabTorsionParametersFromFragments(self,self.torlist,rotbndindextofragmentfilepath) # just dump to key_5 since does not exist for parent molecule
         else:          
             # Torsion scanning then fitting. *.key_5 will contain updated torsions
             if not os.path.isfile(self.key5fname):
-                self.nonaroringtors=[]
-                self.nonaroringtorsets=[]
-                # torsion scanning
-                torgen.gen_torsion(self,optmol,self.torsionrestraint)
-                # torsion fitting
-                if self.dontdotorfit==True:
+                if len(self.torlist)!=0:
+                    self.nonaroringtors=[]
+                    self.nonaroringtorsets=[]
+                    # torsion scanning
+                    torgen.gen_torsion(self,optmol,self.torsionrestraint)
+                    # torsion fitting
+                    if self.dontdotorfit==True:
+                        shutil.copy(self.key4fname,self.key5fname)
+                        sys.exit()
+                    torfit.process_rot_bond_tors(self,optmol)
+                else:
                     shutil.copy(self.key4fname,self.key5fname)
-                    sys.exit()
-                torfit.process_rot_bond_tors(self,optmol)
-            else:
-                shutil.copy(self.key4fname,self.key5fname)
 
+
+            
         self.WriteOutLiteratureReferences(self.key5fname) 
         # A series of tests are done so you one can see whether or not the parameterization values
         # found are acceptable and to what degree

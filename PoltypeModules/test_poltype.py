@@ -311,7 +311,7 @@ class TestPoltype(unittest.TestCase):
         examplefolder='MethanolOnlyRotBnd/'
         examplestructure='methanol.sdf'
         examplekeyfilepath,exampleparentfolder=self.GenericCopy(testcasepath,examplefolder,examplestructure)
-        ptype=poltype.PolarizableTyper(dontfrag=True,onlyrotbndslist='1,2',structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
+        ptype=poltype.PolarizableTyper(dontfrag=True,onlyrotbndslist='1 2',structure=examplestructure,numproc=4,maxmem='20GB',maxdisk='100GB',poltypeini=False,printoutput=True)
         self.GenericTest(exampleparentfolder,testcasepath,examplefolder,examplestructure,ptype,examplekeyfilepath)
 
 
