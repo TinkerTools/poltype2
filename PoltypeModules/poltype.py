@@ -36,6 +36,7 @@ import optimization as opt
 import electrostaticpotential as esp
 import multipole as mpole
 import fragmenter as frag
+import rings
 from packaging import version
 from parmed.tinker import parameterfile
 from rdkit import Chem
@@ -1015,10 +1016,8 @@ class PolarizableTyper():
         # This information is used by cubegen
 
         optmol = opt.GeometryOptimization(self,mol)
-        self.optmethod='MP2' 
-        optmol = opt.GeometryOptimization(self,optmol)
-
-
+        #self.optmethod='MP2' 
+        #optmol = opt.GeometryOptimization(self,optmol)
 
         esp.SPForDMA(self,optmol,mol)
         # Obtain multipoles from Gaussian fchk file using GDMA
@@ -1085,17 +1084,14 @@ class PolarizableTyper():
         
         self.torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self) # this only happens in very symmetrical molecules
         self.torlist=[tuple(i) for i in self.torlist]
-        self.flattorlist=self.torlist.copy()
         self.torlist=[[i] for i in self.torlist] # need to group into torsion set for N-D scans
         self.torsettovariabletorlist={}
         for torset in self.torlist:
             self.torsettovariabletorlist[tuple(torset)]=[]
-        print('self.torlist',self.torlist)
-        print('self.rotbndlist',self.rotbndlist)
         self.rotbndtoanginc=torgen.DetermineAngleIncrementAndPointsNeededForEachTorsionSet(self,mol,self.rotbndlist)
 
         torgen.DefaultMaxRange(self,self.torlist)
-        if not os.path.isfile(self.key4fname):
+        if not os.path.isfile(self.key4fname) or self.refinenonaroringtors==True:
             shutil.copy(self.key3fname, self.key4fname)
             
             # Multipoles are scaled if needed using the scale found in process_types
@@ -1116,7 +1112,7 @@ class PolarizableTyper():
             v.setidxtoclass(self.idxtosymclass)
             dorot = True
             # valence.py method is called to find parameters and append them to the keyfile
-            v.appendtofile(self.key4fname, optmol, dorot,self.rotbndlist)
+            classkeytotorsionparametersguess=v.appendtofile(self.key4fname, optmol, dorot,self.rotbndlist)
             if self.torsppcm:
                 torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
         if self.use_gauPCM==True:
@@ -1128,6 +1124,12 @@ class PolarizableTyper():
         if self.dontdotor==True:
             shutil.copy(self.key4fname,self.key5fname)
             sys.exit()
+
+        self.nonaroringtors=[]
+        self.nonaroringtorsets=[]
+        self.classkeytoinitialprmguess={}
+        if self.refinenonaroringtors==True:
+            rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
 
 
         if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False:
@@ -1150,8 +1152,6 @@ class PolarizableTyper():
             # Torsion scanning then fitting. *.key_5 will contain updated torsions
             if not os.path.isfile(self.key5fname):
                 if len(self.torlist)!=0:
-                    self.nonaroringtors=[]
-                    self.nonaroringtorsets=[]
                     # torsion scanning
                     torgen.gen_torsion(self,optmol,self.torsionrestraint)
                     # torsion fitting

@@ -152,6 +152,7 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     gen_torcomfile(poltype,toroptcomfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,optmol,torxyzfname) # prevstruct is just used for Atomic Num and charge,torxyzfname is used for xyz coordinates
     # Append restraints to *opt*.com file
     tmpfh = open(toroptcomfname, "a")
+    restlist=[]
     # Fix all torsions around the rotatable bond b-c
     for i in range(len(torset)):
         tor=torset[i]
@@ -254,7 +255,7 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
         obConversion.ReadFile(prevstruct, 'tempout.mol')
         
 
-        prevstrctfname,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,'_preQMOPTprefit',poltype.key4fname,'../',nonaroringtor)
+        prevstrctfname,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,'_preQMOPTprefit',poltype.key4fname,'../')
         tinkerstructnamelist.append(newtorxyzfname)
     return tinkerstructnamelist
 
@@ -281,7 +282,7 @@ def tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phas
     prevstruct = opt.load_structfile(poltype,prevstrctfname) # this should be a logfile
     prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
     prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology)
-    cartxyz,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseangles,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath,nonaroringtor)
+    cartxyz,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseangles,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath)
     toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
     term=AnalyzeTerm(poltype,toralzfname)
     if term==False:
@@ -305,7 +306,7 @@ def tinker_analyze(poltype,torxyzfname,keyfname,toralzfname):
     poltype.call_subsystem(alzcmdstr,True)
 
        
-def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath,nonaroringtor):
+def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath):
 
     torxyzfname = '%s-opt-'%(poltype.molecprefix)
     for i in range(len(torset)):
@@ -394,6 +395,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
     """
     if not os.path.isdir('qm-torsion'):
         os.mkdir('qm-torsion')
+    
     os.chdir('qm-torsion')
     files=os.listdir(os.getcwd())
      
@@ -408,7 +410,6 @@ def gen_torsion(poltype,optmol,torsionrestraint):
     poltype.torsettophaselist={}
     torsettooptoutputlogs={}
     bondtopology=GenerateBondTopology(poltype,optmol)
-    print('poltype.rotbndtoanginc',poltype.rotbndtoanginc)
     for torset in poltype.torlist:
         variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
         phaselists=[]
@@ -583,7 +584,7 @@ def get_torlist(poltype,mol):
 
     torlist = []
     rotbndlist = {}
-
+    poltype.alltorsionslist=[]
     iterbond = openbabel.OBMolBondIter(mol)
     v1 = valence.Valence(poltype.versionnum,poltype.logfname,poltype.dontfrag,poltype.isfragjob,poltype.allownonaromaticringscanning)
     v1.setidxtoclass(poltype.idxtosymclass)
@@ -625,7 +626,10 @@ def get_torlist(poltype,mol):
             if (not skiptorsion):
                 # store the torsion and temporary torsion value found by openbabel in torlist
                 tor = mol.GetTorsion(t1,t2,t3,t4)
-                torlist.append(unq)
+                if not skiptorsion:
+                    torlist.append(unq)
+                poltype.alltorsionslist.append(unq)
+                poltype.alltorsionslist
                 # store torsion in rotbndlist
                 rotbndlist[rotbndkey] = []
                 rotbndlist[rotbndkey].append(unq)
@@ -643,13 +647,11 @@ def get_torlist(poltype,mol):
                         b = t2.GetIdx()
                         c = t3.GetIdx()
                         d = iaa2.GetIdx()
-                        if ((iaa.GetIdx() != t3.GetIdx() and \
-                                 iaa2.GetIdx() != t2.GetIdx()) \
-                            and not (iaa.GetIdx() == t1.GetIdx() and \
-                                 iaa2.GetIdx() == t4.GetIdx())):
-                            rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,
-                                iaa.GetIdx(),t2.GetIdx(),
-                                t3.GetIdx(),iaa2.GetIdx()))
+                        if ((iaa.GetIdx() != t3.GetIdx() and iaa2.GetIdx() != t2.GetIdx()) and not (iaa.GetIdx() == t1.GetIdx() and iaa2.GetIdx() == t4.GetIdx())):
+                            poltype.alltorsionslist.append(get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx()))
+
+                            if not skiptorsion:    
+                                rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx()))
 
             else:
                 continue

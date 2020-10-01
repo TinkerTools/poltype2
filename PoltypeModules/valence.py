@@ -2637,7 +2637,8 @@ class Valence():
                     d.update({key1string : key2})
                     zeroed = False
     
-        newdic={}    
+        newdic={}   
+        key1stringtoparameters={} 
         for key1string,key2 in d.items():
             smilesindices=torkeytosmilesindices[key1string]
             smilesindices=[str(i) for i in smilesindices]
@@ -2650,11 +2651,9 @@ class Valence():
             first=float(keysplit[5])
             second=float(keysplit[8])
             third=float(keysplit[11])
+            key1stringtoparameters[key1string]=[first,second,third]
             item=[skey,stringindexlist,smilesindices]
             newdic[key2]=item
-            #if first==0 and second==0 and third==0: # then dont print
-            #    pass
-            #else:
                 
             self.logfh.write('Torsion parameters for '+key2+ ' assigned from SMILES '+skey+' from torsion atom indices '+stringindexlist+' with smiles torsion indices '+smilesindices+'\n')
         
@@ -2668,7 +2667,7 @@ class Valence():
         #print(' sortedtuple ',sortedtuple)
         #x = [ t[1] for t in sortedtuple ]
         x=list(d.values())
-        return x,newdic
+        return x,newdic,key1stringtoparameters
 
     
 
@@ -2807,7 +2806,7 @@ class Valence():
                     f.write(x + "\n")
                 for x in self.opbguess(opbendvals):
                     f.write(x + "\n")
-                values,newdic=self.torguess(mol,dorot,rotbnds)
+                values,newdic,key1stringtoparameters=self.torguess(mol,dorot,rotbnds)
                 
                 for x in values:
 
@@ -2821,14 +2820,13 @@ class Valence():
                     f.flush()
                     os.fsync(f.fileno())
 
-                #for x in self.pitorguess(mol):
-                #    f.write(x+ "\n")
                 f.write('\n')
             else:
                 f.write(line)
         f.close()
         os.remove(vf)
         os.rename(tempname,vf)
+        return key1stringtoparameters
 
     def sortfirstlast(self, keylist):
         size = len(keylist)

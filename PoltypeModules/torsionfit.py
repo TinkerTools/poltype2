@@ -506,7 +506,11 @@ def insert_torphasedict (poltype,mol, toraboutbnd, torprmdict, initangle,write_p
 
     # else, force constants are set to 0
     else:
-        write_prm_dict[tpdkey] = {1:0., 2:0., 3:0.}
+        if tpdkey in poltype.classkeytoinitialprmguess.keys():
+            prms=poltype.classkeytoinitialprmguess[tpdkey]
+            write_prm_dict[tpdkey] = {1:prms[0], 2:prms[1], 3:prms[2]}
+        else: 
+            write_prm_dict[tpdkey] = {1:0., 2:0., 3:0.}
 
 
 def insert_torprmdict(poltype,mol, torprmdict):
@@ -795,7 +799,12 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             write_prm_dict[chkclskey] = torprmdict[chkclskey]['prmdict']
             # if not found, set as 0
             if write_prm_dict[chkclskey] == {}:
-                write_prm_dict[chkclskey] = {1:0., 2:0., 3:0.}
+                if chkclskey in poltype.classkeytoinitialprmguess.keys():
+                    prms=poltype.classkeytoinitialprmguess[chkclskey]
+                    write_prm_dict[chclskey] = {1:prms[0], 2:prms[1], 3:prms[2]}
+                else: 
+                    write_prm_dict[chkclskey] = {1:0., 2:0., 3:0.}
+
             # Check if no arguments were fitted.
             if 'offset' in torprmdict[chkclskey]:
                 if isinstance(p1,numpy.ndarray):
