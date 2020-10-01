@@ -1081,7 +1081,6 @@ class PolarizableTyper():
             esp.ElectrostaticPotentialComparison(self)  
         # Find rotatable bonds for future torsion scans
         (self.torlist, self.rotbndlist) = torgen.get_torlist(self,mol)
-        
         self.torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self) # this only happens in very symmetrical molecules
         self.torlist=[tuple(i) for i in self.torlist]
         self.torlist=[[i] for i in self.torlist] # need to group into torsion set for N-D scans

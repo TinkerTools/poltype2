@@ -915,6 +915,8 @@ def AddMatchingParentIndexesBetweenFragments(poltype,equivalentrotbndindexarrays
                        matches=reffragment.GetSubstructMatches(fragment)
                        for match in matches:
                            rotbndkey=rotbndindex.replace('_',' ')
+                           print('rotbndkey',rotbndkey)
+                           print('poltype.rotbndlist',poltype.rotbndlist)
                            tors=poltype.rotbndlist[rotbndkey]
                            for tor in tors:
                                indexes=[int(j)-1 for j in tor]
