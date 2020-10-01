@@ -337,7 +337,6 @@ def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog):
 
     return finishedjobs,errorjobs
 
-
 def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays):
     parentdir=dirname(abspath(os.getcwd()))
     listofjobs=[]
@@ -346,16 +345,20 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         strfragrotbndindexes=''
         strparentrotbndindexes=''
         fragrotbnds=[]
+        
         for i in range(len(array)):
             rotbndindex=array[i]
             parentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
             if i==0:
                 equivalentrotbndindex=rotbndindex
                 equivalentparentindextofragindex=parentindextofragindex
+            else:
+                parentindextofragindex=equivalentparentindextofragindex[rotbndindex]
             rotbndindexes=rotbndindex.split('_')
             parentrotbndindexes=[int(i) for i in rotbndindexes]
             rotbndindexes=[int(i)-1 for i in parentrotbndindexes]
-            fragrotbndindexes=[equivalentparentindextofragindex[i]+1 for i in rotbndindexes]
+
+            fragrotbndindexes=[parentindextofragindex[i]+1 for i in rotbndindexes]
             fragrotbnd=str(fragrotbndindexes[0])+' '+str(fragrotbndindexes[1])
             if fragrotbnd not in fragrotbnds:
                 fragrotbnds.append(fragrotbnd)
@@ -378,13 +381,27 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         parentindextofragindex=rotbndindextoparentindextofragindex[equivalentrotbndindex]
         tempdic={}
         for parentindex,fragindex in parentindextofragindex.items():
-            tempdic[parentindex+1]=fragindex+1
+            if type(parentindex)==str:
+                newtemp=parentindextofragindex[parentindex]
+                tempdic[parentindex]={}
+                for idx,value in newtemp.items():
+                    tempdic[parentindex][idx+1]=value+1
+            else: 
+                tempdic[parentindex+1]=fragindex+1
         parentindextofragindex=tempdic
         parentsymclasstofragsymclass={}
         for parentindex,fragindex in parentindextofragindex.items():
-            parentsymclass=poltype.idxtosymclass[parentindex]
-            fragsymclass=fragidxtosymclass[fragindex]
-            parentsymclasstofragsymclass[parentsymclass]=fragsymclass
+            if type(parentindex)!=str:
+                parentsymclass=poltype.idxtosymclass[parentindex]
+                fragsymclass=fragidxtosymclass[fragindex]
+                parentsymclasstofragsymclass[parentsymclass]=fragsymclass
+            else:
+                newdic=parentindextofragindex[parentindex]
+                for idx,fragidx in newdic.items():
+                    parentsymclass=poltype.idxtosymclass[idx]
+                    fragsymclass=fragidxtosymclass[fragidx]
+                    parentsymclasstofragsymclass[parentsymclass]=fragsymclass
+     
         WriteDictionaryToFile(poltype,parentsymclasstofragsymclass,"parentsymclasstofragsymclass.txt")
         WriteDictionaryToFile(poltype,parentindextofragindex,"parentindextofragindex.txt")
         tempmol=mol_with_atom_index_removed(poltype,fragmol) 
@@ -396,35 +413,37 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         classkeytosmarts={}
         classkeytotorsionindexes={}
         parentclasskeytofragclasskey={}
-        totaltors=[]
+        copied=parentindextofragindex.copy()
         for rotbndindex in array:
+            if rotbndindex!=equivalentrotbndindex:
+                parentindextofragindex=copied[rotbndindex]
             rotkey=rotbndindex.replace('_',' ')
             tors=list(poltype.rotbndlist[rotkey])
-            totaltors.extend(tors)
-        for torsion in totaltors:
-            smilesposarray=[]
-            fragtor=[]
-            for index in torsion:
-                fragindex=parentindextofragindex[index]
-                fragtor.append(fragindex)
-                fragidxarraypos=fragidxarray.index(fragindex)
-                smilespos=fragidxarraypos+1
-                smilesposarray.append(smilespos)
-            smilesposarray=[str(i) for i in smilesposarray]
-            smilesposstring=','.join(smilesposarray)
-            fragtor=[str(i) for i in fragtor]
-            fragtorstring=[str(i) for i in fragtor]
-            fragtorstring=','.join(fragtorstring)
-            classkey=torgen.get_class_key(poltype,torsion[0], torsion[1], torsion[2], torsion[3])
-            classkeysplit=classkey.split()
-            classkeysplit=[int(i) for i in classkeysplit]
-            fragclasskeysplit=[parentsymclasstofragsymclass[i] for i in classkeysplit]
-            fragclasskeysplit=[str(i) for i in fragclasskeysplit]
-            fragclasskey=' '.join(fragclasskeysplit)
-            parentclasskeytofragclasskey[classkey]=fragclasskey
-            classkeytosmartsposarray[classkey]=smilesposstring
-            classkeytosmarts[classkey]=fragsmarts
-            classkeytotorsionindexes[classkey]=fragtorstring
+            for torsion in tors:
+                smilesposarray=[]
+                fragtor=[]
+                for index in torsion:
+                   
+                    fragindex=parentindextofragindex[index]
+                    fragtor.append(fragindex)
+                    fragidxarraypos=fragidxarray.index(fragindex)
+                    smilespos=fragidxarraypos+1
+                    smilesposarray.append(smilespos)
+                smilesposarray=[str(i) for i in smilesposarray]
+                smilesposstring=','.join(smilesposarray)
+                fragtor=[str(i) for i in fragtor]
+                fragtorstring=[str(i) for i in fragtor]
+                fragtorstring=','.join(fragtorstring)
+                classkey=torgen.get_class_key(poltype,torsion[0], torsion[1], torsion[2], torsion[3])
+                classkeysplit=classkey.split()
+                classkeysplit=[int(i) for i in classkeysplit]
+                fragclasskeysplit=[parentsymclasstofragsymclass[i] for i in classkeysplit]
+                fragclasskeysplit=[str(i) for i in fragclasskeysplit]
+                fragclasskey=' '.join(fragclasskeysplit)
+                parentclasskeytofragclasskey[classkey]=fragclasskey
+                classkeytosmartsposarray[classkey]=smilesposstring
+                classkeytosmarts[classkey]=fragsmarts
+                classkeytotorsionindexes[classkey]=fragtorstring
         WriteDictionaryToFile(poltype,parentclasskeytofragclasskey,"parentclasskeytofragclasskey.txt")
         WriteDictionaryToFile(poltype,classkeytosmartsposarray,"classkeytosmartsposarray.txt")
         WriteDictionaryToFile(poltype,classkeytosmarts,"classkeytosmarts.txt")
@@ -435,6 +454,8 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         listofjobs,jobtooutputlog,newlog=FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog)
     os.chdir(parentdir)
     finishedjobs,errorjobs=SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog)
+
+
 
 def MakeTorsionFileName(poltype,string):
     temp=open('torsions.txt','w')
@@ -821,6 +842,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
     tempdic=rotbndindextoparentindextofragindex
     rotbndindextoparentindextofragindex=AddMatchingParentIndexesBetweenFragments(poltype,equivalentrotbndindexarrays,rotbndindextoparentindextofragindex,rotbndindextofragment)
     # now we need to redraw the 2Dimages for any fragments that are equivalent (get multiple torsions from different rotatable bonds around same fragment)
+    '''
     curdir=os.getcwd()
     for rotbndindex in rotbndindextofragment.keys():
         if len(equivalentrotbndindexarrays)!=0:
@@ -870,8 +892,8 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
                     Draw2DMoleculeWithWBO(poltype,fragWBOmatrix,basename+'_Absolute',m,bondindexlist=highlightbonds,smirks=fragsmirks)
                     Draw2DMoleculeWithWBO(poltype,relativematrix,basename+'_Relative',m,bondindexlist=highlightbonds,smirks=fragsmirks)
             os.chdir(curdir)
+    '''
     return rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays
-
 
 def AddMatchingParentIndexesBetweenFragments(poltype,equivalentrotbndindexarrays,rotbndindextoparentindextofragindex,rotbndindextofragment):
    newrotbndindextoparentindextofragindex={}
@@ -879,28 +901,35 @@ def AddMatchingParentIndexesBetweenFragments(poltype,equivalentrotbndindexarrays
        for refrotbndindex in rotbndindexarray:
            reffragment=rotbndindextofragment[refrotbndindex]
            refparentindextofragindex=rotbndindextoparentindextofragindex[refrotbndindex]
-           reffragindextoparentindex={v: k for k, v in refparentindextofragindex.items()}
+           reffragindextoparentindex={value: key for key, value in refparentindextofragindex.items()} 
            newrefparentindextofragindex=refparentindextofragindex.copy()
+            
            for rotbndindex in rotbndindexarray:
                if rotbndindex!=refrotbndindex:
+                   if rotbndindex not in newrefparentindextofragindex.keys():
+                       newrefparentindextofragindex[rotbndindex]={} 
                    parentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
-                   fragindextoparentindex={v: k for k, v in parentindextofragindex.items()}
                    fragment=rotbndindextofragment[rotbndindex]
                    match = reffragment.HasSubstructMatch(fragment)
                    if match==True:
-                       atomsinref=reffragment.GetNumAtoms()
-                       atomsinfrag=fragment.GetNumAtoms()
                        matches=reffragment.GetSubstructMatches(fragment)
                        for match in matches:
-                           for i in range(len(match)):
-                               matchindex=match[i]
-                               if matchindex in fragindextoparentindex.keys():
-                                   parentindex=fragindextoparentindex[matchindex]
-                                   if parentindex not in newrefparentindextofragindex.keys():
-                                       newrefparentindextofragindex[parentindex]=i
+                           rotbndkey=rotbndindex.replace('_',' ')
+                           tors=poltype.rotbndlist[rotbndkey]
+                           for tor in tors:
+                               indexes=[int(j)-1 for j in tor]
+                               fragindexes=[parentindextofragindex[j] for j in indexes]
+                               equivalentfragindexes=[match[j] for j in fragindexes]
+                               equivalentrefindexes=[reffragindextoparentindex[j] for j in equivalentfragindexes]
+
+                               for j in range(len(indexes)):
+                                   index=indexes[j]
+                                   equivalentfragindex=equivalentfragindexes[j]
+                                   newrefparentindextofragindex[rotbndindex][index]=equivalentfragindex
            newrotbndindextoparentindextofragindex[refrotbndindex]=newrefparentindextofragindex
            
    return newrotbndindextoparentindextofragindex
+ 
   
 def RemoveTempFolders(poltype):
     foldstoremove=[]
