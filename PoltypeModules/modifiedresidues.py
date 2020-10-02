@@ -668,10 +668,15 @@ def GrabMultipoleFrameDefintions(poltype,key,boundaryatomidxs,ligidxtotypeidx,pr
             removedchg=linesplit[:-1]
             removedstring=removedchg[1:]
             frames=[int(i.replace('-','')) for i in removedstring]
+            print('boundaryatomtypeidxs',boundaryatomtypeidxs)
+            print('frames',frames)
+            
             numberofboundatoms=CountNumberOfAtomsInBoundryList(poltype,frames,boundaryatomtypeidxs)
+            print('numberofboundatoms',numberofboundatoms)
             if numberofboundatoms==1:
                 protypes=[]
                 ligidxs=GrabIdxsFromType(poltype,frames,ligidxtotypeidx)
+                print('ligidxs',ligidxs)
                 if ligidxs[0] in ligidxtoproidx.keys():
                     firstprotype=proidxtoprotype[ligidxtoproidx[ligidxs[0]]]
                     if firstprotype>=mincorenumber and firstprotype<=maxcorenumber:
@@ -1984,6 +1989,7 @@ def GenerateModifiedProteinPoltypeInput(poltype):
     obConversion.ReadFile(newchopmodmol,refname)
     newchopmodmol.AddHydrogens() 
     proidxtoligidx=OldIndexToNewIndexBabel(poltype,poltype.modifiedproteinpdbname,newchopmodmol)
+    print('proidxtoligidx',proidxtoligidx)
     obConversion.SetOutFormat("pdb")
     refhydname='ModifiedResHydrated.pdb'
     obConversion.WriteFile(newchopmodmol,refhydname)
@@ -2016,8 +2022,11 @@ def GenerateModifiedProteinPoltypeInput(poltype):
     
     polrdkitmol=Chem.rdmolfiles.MolFromPDBFile(refname)
     # first using the carbonyl carbon and backbone N of modprotein indexes indexes iterate over the neighbors and if the neighbor is not already in the dictionary then that must be the atom index that matches to the hydrogen indexes
+
     ligidxtoproidx = dict([v,k] for k,v in proidxtoligidx.items()) 
+    print('ligidxtoproidx first',ligidxtoproidx)
     proidxtoligidx,addedproatoms=MatchCorrectProteinAtomsToCorrespondingHydrogen(poltype,backboneprobound,proOBmol,polOBmol,proidxtoligidx,ligidxtoproidx)
+    print('ligidxtoproidx second',ligidxtoproidx)
     ligidxtoproidx = dict([v,k] for k,v in proidxtoligidx.items()) 
     return knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference
 
@@ -2416,7 +2425,7 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
 
 
     ligboundaryatomtypes=[ligidxtotypeidx[i] for i in boundaryatomidxs]
-
+    print('ligand boundary atom indexes',boundaryatomidxs)
     # for the polarize and multipole we need to not only have list of atomindexes (ligand indexes) that are boundary atoms on the ligand side, but also the protein side (mulitpole and polarize use neighbors that may go across the boundaries)
        
     prosideboundligidx=GrabProSideBoundIdxs(poltype,proOBmol,boundaryatomidxs,ligidxtoproidx,modproidxs,proidxtoligidx)

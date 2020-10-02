@@ -117,9 +117,13 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
                         revtorkey='%d %d %d %d' % (typed, typec, typeb, typea)
                         if torkey in fragsymmtorlist or revtorkey in fragsymmtorlist:
                             if torkey in parentclasskeytofragclasskey.values():
-                                classkeys=GrabKeysFromValue(poltype,parentclasskeytofragclasskey,torkey)
+                                fwdclasskeys=GrabKeysFromValue(poltype,parentclasskeytofragclasskey,torkey)
+                                revclasskeys=GrabKeysFromValue(poltype,parentclasskeytofragclasskey,revtorkey)
+                                classkeys=fwdclasskeys+revclasskeys
                             elif revtorkey in parentclasskeytofragclasskey.values():
-                                classkeys=GrabKeysFromValue(poltype,parentclasskeytofragclasskey,revtorkey)
+                                fwdclasskeys=GrabKeysFromValue(poltype,parentclasskeytofragclasskey,torkey)
+                                revclasskeys=GrabKeysFromValue(poltype,parentclasskeytofragclasskey,revtorkey)
+                                classkeys=fwdclasskeys+revclasskeys
                             for classkey in classkeys:
                                 smartsposarray=classkeytosmartsposarray[classkey]
                                 torsionindexes=classkeytotorsionindexes[classkey]
@@ -345,15 +349,20 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         strfragrotbndindexes=''
         strparentrotbndindexes=''
         fragrotbnds=[]
-        
         for i in range(len(array)):
             rotbndindex=array[i]
+            fragmentfilepath=rotbndindextofragmentfilepath[rotbndindex]
+            head,tail=os.path.split(fragmentfilepath)
+            os.chdir(head)
+
             parentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
             if i==0:
                 equivalentrotbndindex=rotbndindex
                 equivalentparentindextofragindex=parentindextofragindex
             else:
                 parentindextofragindex=equivalentparentindextofragindex[rotbndindex]
+            
+            MakeFileName(poltype,equivalentrotbndindex,'equivalentfragment.txt')
             rotbndindexes=rotbndindex.split('_')
             parentrotbndindexes=[int(i) for i in rotbndindexes]
             rotbndindexes=[int(i)-1 for i in parentrotbndindexes]
@@ -377,7 +386,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
 
         head,tail=os.path.split(fragmentfilepath)
         os.chdir(head)
-        MakeTorsionFileName(poltype,strparentrotbndindexes)
+        MakeFileName(poltype,strparentrotbndindexes,'torsions.txt')
         parentindextofragindex=rotbndindextoparentindextofragindex[equivalentrotbndindex]
         tempdic={}
         for parentindex,fragindex in parentindextofragindex.items():
@@ -390,6 +399,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 tempdic[parentindex+1]=fragindex+1
         parentindextofragindex=tempdic
         parentsymclasstofragsymclass={}
+        
         for parentindex,fragindex in parentindextofragindex.items():
             if type(parentindex)!=str:
                 parentsymclass=poltype.idxtosymclass[parentindex]
@@ -397,11 +407,12 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 parentsymclasstofragsymclass[parentsymclass]=fragsymclass
             else:
                 newdic=parentindextofragindex[parentindex]
+                parentsymclasstofragsymclass[parentindex]={}
                 for idx,fragidx in newdic.items():
                     parentsymclass=poltype.idxtosymclass[idx]
                     fragsymclass=fragidxtosymclass[fragidx]
-                    parentsymclasstofragsymclass[parentsymclass]=fragsymclass
-     
+                    parentsymclasstofragsymclass[parentindex][parentsymclass]=fragsymclass
+
         WriteDictionaryToFile(poltype,parentsymclasstofragsymclass,"parentsymclasstofragsymclass.txt")
         WriteDictionaryToFile(poltype,parentindextofragindex,"parentindextofragindex.txt")
         tempmol=mol_with_atom_index_removed(poltype,fragmol) 
@@ -414,9 +425,11 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         classkeytotorsionindexes={}
         parentclasskeytofragclasskey={}
         copied=parentindextofragindex.copy()
+        anothercopy=parentsymclasstofragsymclass.copy()
         for rotbndindex in array:
             if rotbndindex!=equivalentrotbndindex:
                 parentindextofragindex=copied[rotbndindex]
+                parentsymclasstofragsymclass=anothercopy[rotbndindex]
             rotkey=rotbndindex.replace('_',' ')
             tors=list(poltype.rotbndlist[rotkey])
             for torsion in tors:
@@ -457,8 +470,8 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
 
 
 
-def MakeTorsionFileName(poltype,string):
-    temp=open('torsions.txt','w')
+def MakeFileName(poltype,string,filename):
+    temp=open(filename,'w')
     temp.write(string+'\n')
     temp.close()
 
@@ -915,8 +928,6 @@ def AddMatchingParentIndexesBetweenFragments(poltype,equivalentrotbndindexarrays
                        matches=reffragment.GetSubstructMatches(fragment)
                        for match in matches:
                            rotbndkey=rotbndindex.replace('_',' ')
-                           print('rotbndkey',rotbndkey)
-                           print('poltype.rotbndlist',poltype.rotbndlist)
                            tors=poltype.rotbndlist[rotbndkey]
                            for tor in tors:
                                indexes=[int(j)-1 for j in tor]
