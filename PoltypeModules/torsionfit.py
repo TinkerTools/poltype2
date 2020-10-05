@@ -680,9 +680,13 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         angle_list = cls_angle_dict[tup]  # Torsion angle for each corresponding energy
         mm_energy_list = cls_mm_engy_dict[tup]  # MM Energy before fitting to QM torsion energy
         qm_energy_list = cls_qm_engy_dict[tup]  # QM torsion energy
+        print('mm_energy_list before norm',mm_energy_list)
+        print('qm_energy_list before norm',qm_energy_list)
         # 'normalize'
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]
+        print('qm_energy_list after',qm_energy_list)
+        print('mm_energy_list after',mm_energy_list)
         if len(qm_energy_list)<round(prmidx*.5): # then might not be great fit any way, too many QM failed
             raise ValueError('Too many QM jobs have failed for '+str(tor)+' '+os.getcwd())
         # Parameterize each group of rotatable bond (identified by
@@ -692,9 +696,11 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         weightlist=numpy.exp(-numpy.add(numpy.array(qm_energy_list),15)/2.5)
 
         tor_energy_list = [qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)]
+        print('tor_energy_list before',tor_energy_list) 
+        print('useweights',useweights)
         if useweights==True:
             tor_energy_list=numpy.multiply(tor_energy_list,weightlist)
-
+        print('tor_energy_list after',tor_energy_list)
         tor_energy_list_noweight = [qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)]
 
         txtfname = "%s-fit-" % (poltype.molecprefix) 

@@ -387,7 +387,7 @@ def GrabParametersFromKeyFile(poltype,key,torsionligtypestoboundtypesforkey,ligb
         linesplitall=re.split(r'(\s+)', line)
 
         
-        if 'torsion' in line and 'unit' not in line:
+        if 'torsion' in line and 'unit' not in line and '#' not in line:
             torsiontypelist=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3]),int(linesplit[4])]
             foundtorsion=False
                
@@ -654,7 +654,7 @@ def GrabIdxsFromType(poltype,ligtypes,ligidxtotypeidx):
 
 
 
-def GrabMultipoleFrameDefintions(poltype,key,boundaryatomidxs,ligidxtotypeidx,proidxtoprotype,modproidxs,ligidxtoproidx,prosideboundligidx,proboundidxtoprotype,mincorenumber,maxcorenumber):
+def GrabMultipoleFrameDefintions(poltype,key,boundaryatomidxs,ligidxtotypeidx,proidxtoprotype,modproidxs,ligidxtoproidx,prosideboundligidx,proboundidxtoprotype,mincorenumber,maxcorenumber,modligidxs):
     boundaryatomtypeidxs=[ligidxtotypeidx[i] for i in boundaryatomidxs]
     temp=open(key,'r')
     results=temp.readlines()
@@ -668,16 +668,12 @@ def GrabMultipoleFrameDefintions(poltype,key,boundaryatomidxs,ligidxtotypeidx,pr
             removedchg=linesplit[:-1]
             removedstring=removedchg[1:]
             frames=[int(i.replace('-','')) for i in removedstring]
-            print('boundaryatomtypeidxs',boundaryatomtypeidxs)
-            print('frames',frames)
             
             numberofboundatoms=CountNumberOfAtomsInBoundryList(poltype,frames,boundaryatomtypeidxs)
-            print('numberofboundatoms',numberofboundatoms)
             if numberofboundatoms==1:
                 protypes=[]
                 ligidxs=GrabIdxsFromType(poltype,frames,ligidxtotypeidx)
-                print('ligidxs',ligidxs)
-                if ligidxs[0] in ligidxtoproidx.keys():
+                if ligidxs[0] in modligidxs:
                     firstprotype=proidxtoprotype[ligidxtoproidx[ligidxs[0]]]
                     if firstprotype>=mincorenumber and firstprotype<=maxcorenumber:
                         for i in range(len(ligidxs)):
@@ -693,8 +689,6 @@ def GrabMultipoleFrameDefintions(poltype,key,boundaryatomidxs,ligidxtotypeidx,pr
                             atomtypetoframedef[firstprotype]=protypes
                     else:
                         allprotypelist=[]
-                        print('ligidxtoproidx',ligidxtoproidx)
-                        print('ligidxs',ligidxs)
                         for i in range(len(ligidxs)):
                             ligidx=ligidxs[i]
                             proidx=ligidxtoproidx[ligidx]
@@ -1226,7 +1220,6 @@ def GrabAtomsForValenceTermsAcrossBoundary(poltype,ligOBmol,proOBmol,ligidxtopro
     return listoftorsionsforkey,listofbondsforprm,listofanglesforprm,listoftorsionsforprm
 
 
-
 def GrabPolarizeBoundaryLigTypeToProType(poltype,ligOBmol,proOBmol,modproidxs,boundaryatomidxs,prosideboundligidx):
     ligtypes=[] # need to know list of indexes that polarize terms needs to be changed
     # be careful we also want to use protein types instead of ligand types for the atom type being polarized if across the boundary on the protein side
@@ -1648,7 +1641,7 @@ def ConnectSideChainToBackbone(poltype,pdbfilename):
             resnumber=int(line[23:26+1])
             linesplit=line.split()
             position=[float(linesplit[6]),float(linesplit[7]),float(linesplit[8])]
-            if resnumber==int(poltype.mutatedresiduenumber):
+            if resnumber==int(poltype.mutatedresiduenumber) and atomindex<10: # quick hack not general...
                 if atomindex not in connectedidxs:
                     atomindextoposition[atomindex]=position
     atomindextodistance={}
@@ -1662,6 +1655,21 @@ def ConnectSideChainToBackbone(poltype,pdbfilename):
     newpdbfilename=pdbfilename.replace('.pdb','_mutsidechainconnected.pdb')
     obConversion.SetOutFormat('pdb')
     obConversion.WriteFile(pdbmol,newpdbfilename)
+    searchpos=atomindextoposition[minatomindex]
+    temp=open(newpdbfilename,'r')
+    results=temp.readlines()
+    temp.close()
+    atomindextoposition={}
+    for line in results:
+        if 'ATOM' in line and 'UNL' not in line: # sometimes UNL atoms from next amino acid (like an alpha carbon that does not continue on chain at end of file) needs to be removed
+            atomlabel=line[12:16].rstrip().lstrip()
+            atomindex=int(line[6:11].rstrip().lstrip())
+            resnumber=int(line[23:26+1])
+            linesplit=line.split()
+            position=[float(linesplit[6]),float(linesplit[7]),float(linesplit[8])]
+            if position==searchpos:
+                minatomindex=atomindex
+
     return newpdbfilename,minatomindex
     
                 
@@ -1989,7 +1997,7 @@ def GenerateModifiedProteinPoltypeInput(poltype):
     obConversion.ReadFile(newchopmodmol,refname)
     newchopmodmol.AddHydrogens() 
     proidxtoligidx=OldIndexToNewIndexBabel(poltype,poltype.modifiedproteinpdbname,newchopmodmol)
-    print('proidxtoligidx',proidxtoligidx)
+    modligidxs=[proidxtoligidx[j] for j in modproidxs]
     obConversion.SetOutFormat("pdb")
     refhydname='ModifiedResHydrated.pdb'
     obConversion.WriteFile(newchopmodmol,refhydname)
@@ -2024,11 +2032,9 @@ def GenerateModifiedProteinPoltypeInput(poltype):
     # first using the carbonyl carbon and backbone N of modprotein indexes indexes iterate over the neighbors and if the neighbor is not already in the dictionary then that must be the atom index that matches to the hydrogen indexes
 
     ligidxtoproidx = dict([v,k] for k,v in proidxtoligidx.items()) 
-    print('ligidxtoproidx first',ligidxtoproidx)
     proidxtoligidx,addedproatoms=MatchCorrectProteinAtomsToCorrespondingHydrogen(poltype,backboneprobound,proOBmol,polOBmol,proidxtoligidx,ligidxtoproidx)
-    print('ligidxtoproidx second',ligidxtoproidx)
     ligidxtoproidx = dict([v,k] for k,v in proidxtoligidx.items()) 
-    return knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference
+    return knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference,modligidxs
 
 def AddTotalCharge(poltype,charge,molecule):
     atomiter=openbabel.OBMolAtomIter(molecule)
@@ -2262,17 +2268,21 @@ def GrabClassNumbersForProtein(poltype,proidxtoprotype,check):
     return prmtypetoprmclass
 
 def GrabProBoundIdxToProType(poltype,proboundidxs,proOBmol,modproidxs,proidxtotypeidx,transferableidxs,transferableidxsformatching,firstresnum,lastresnum):
+    
     proboundidxtoprotype={}
     rdkittransferableidxs=[i-1 for i in transferableidxsformatching]
+    
     rdkitmol=Chem.rdmolfiles.MolFromPDBFile(poltype.modifiedproteinpdbname,removeHs=False,sanitize=False)
     mol=GenerateFragRdkit(poltype,rdkittransferableidxs,rdkitmol,poltype.modifiedproteinpdbname)
     oldindextonewindex=OldIndexToNewIndexRdkit(poltype,poltype.modifiedproteinpdbname,mol)
     newindextooldindex={v: k for k, v in oldindextonewindex.items()}
+    m=mol_with_atom_index(poltype,mol)
+    fragsmirks=Chem.rdmolfiles.MolToSmarts(m)
+
     fragsmarts=Chem.rdmolfiles.MolToSmarts(mol)
     p = Chem.MolFromSmarts(fragsmarts)
     matches=mol.GetSubstructMatches(p) 
     firstmatchmol=matches[0]
-    
     matches=rdkitmol.GetSubstructMatches(p) # just grab a match from somewhere else in protein without modproidxs
     for match in matches:
         allnotmodandtermres=True
@@ -2289,8 +2299,8 @@ def GrabProBoundIdxToProType(poltype,proboundidxs,proOBmol,modproidxs,proidxtoty
             firstmatch=match
     pdbmatchidxtofragmolmatchidx=dict(zip(firstmatch, firstmatchmol))
     firstmatchfragmol=[pdbmatchidxtofragmolmatchidx[i] for i in firstmatch]
-    oldboundidxsrdkit=[newindextooldindex[i] for i in firstmatchfragmol]  
-    oldboundidxsbabel=[i+1 for i in oldboundidxsrdkit] 
+    oldboundidxsrdkit=[newindextooldindex[i] for i in firstmatchfragmol] 
+    oldboundidxsbabel=[i+1 for i in oldboundidxsrdkit]
     for i in range(len(firstmatch)):
         newproidxbabel=firstmatch[i]+1
         newprotype=proidxtotypeidx[newproidxbabel]
@@ -2363,7 +2373,7 @@ def GrabCoreParameters(poltype,key5fname):
 
     return atomdefs,bondprms,angleprms,torsionprms,strbndprms,pitorprms,opbendprms,polarizeprms,vdwprms,mpoleprms
         
-def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference):
+def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference,modligidxs):
 
     obConversion = openbabel.OBConversion()
     ligOBmol = openbabel.OBMol()
@@ -2379,7 +2389,6 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
         ligidxtotypeidx=ReadSMARTSToTypeLib(poltype,smarts,modmol)
     modproidxtotypenumber=AssignNewTypeNumbers(poltype,modproidxs,ligidxtotypeidx,proidxtoligidx) # will try to keep modified residue type numbers as type numbers in poltype job but then for boudnary parts need to assign new type numbers 
     proidxtoprotype,firstresnum,lastresnum=GrabProteinTypeNumbers(poltype,poltype.modifiedproteinpdbname,knownresiduesymbs,poltype.libpath,modproidxtotypenumber)
-    
     protinkxyz,firstresnum,lastresnum=GenerateProteinTinkerXYZFile(poltype,poltype.modifiedproteinpdbname,modproidxtotypenumber,poltype.amoebabioprmpath,proidxtoprotype,knownresiduesymbs)
 
     listoftorsionsforkey,listofbondsforprm,listofanglesforprm,listoftorsionsforprm=GrabAtomsForValenceTermsAcrossBoundary(poltype,ligOBmol,proOBmol,ligidxtoproidx,proboundidxs,boundaryatomidxs,modproidxs) # execlude all cases where only 1 atom is in modproidxs and the others are in protein, seperate those into different lists since those can be transfered from prm file and the others from the key file
@@ -2391,12 +2400,10 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
     # for pitor use bond list (just two consecutive atoms)
 
 
-    
     transferableidxs=GetIdxsFromListOfTorsionsForPrm(poltype,listoftorsionsforprm) # now take connected atomidx (usually CB) and add any hydrogens connected
     transferableidxsformatching=AddHydrogensAndBackBoneOnConnectedAtomIdxToGetRightClass(poltype,connectedatomidx,proOBmol,backboneindexesreference)
     proboundidxtoprotype=GrabProBoundIdxToProType(poltype,proboundidxs,proOBmol,modproidxs,proidxtoprotype,transferableidxs,transferableidxsformatching,firstresnum,lastresnum)
-    
-    
+     
     # now convert protein index numbers to ligand index, then we will convert ligand index to type numbers to grab parameters. We also need dictionaries that map each type in ligand type numbers to what will be represented in final key file (so for a torsion across a boundary we want the ligand type numbers to grab parmeters but we want to have protein type numbers for part of torsion on the protein side in our key file)
 
     # these parameters will be taken from the key file so need to no what to convert the indexes to once they are taken from the key file
@@ -2420,12 +2427,10 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
     torsionligtypestoboundtypesforkey=GrabLigandTypeToBoundryTypeForKeyFile(poltype,listoftorsionsforkey,proidxtoligidx,ligidxtotypeidx,proidxtoprotype,poltype.amoebabioprmpath,modproidxs,mincorenumber,maxcorenumber)
     prmtypetoprmclass=GrabClassNumbersForProtein(poltype,proidxtoprotype,check) # need this for grepping torsion parameters from prm file
     bondprmclassestoboundclasses=GrabPrmClassToBoundryClassForPrmFile(poltype,listofbondsforprm,proidxtoligidx,ligidxtotypeidx,proidxtoprotype,poltype.amoebabioprmpath,modproidxs,proboundidxtoprotype,prmtypetoprmclass,mincorenumber,maxcorenumber)
+    
     angleprmclassestoboundclasses=GrabPrmClassToBoundryClassForPrmFile(poltype,listofanglesforprm,proidxtoligidx,ligidxtotypeidx,proidxtoprotype,poltype.amoebabioprmpath,modproidxs,proboundidxtoprotype,prmtypetoprmclass,mincorenumber,maxcorenumber)
     torsionprmclassestoboundclasses=GrabPrmClassToBoundryClassForPrmFile(poltype,listoftorsionsforprm,proidxtoligidx,ligidxtotypeidx,proidxtoprotype,poltype.amoebabioprmpath,modproidxs,proboundidxtoprotype,prmtypetoprmclass,mincorenumber,maxcorenumber)
-
-
     ligboundaryatomtypes=[ligidxtotypeidx[i] for i in boundaryatomidxs]
-    print('ligand boundary atom indexes',boundaryatomidxs)
     # for the polarize and multipole we need to not only have list of atomindexes (ligand indexes) that are boundary atoms on the ligand side, but also the protein side (mulitpole and polarize use neighbors that may go across the boundaries)
        
     prosideboundligidx=GrabProSideBoundIdxs(poltype,proOBmol,boundaryatomidxs,ligidxtoproidx,modproidxs,proidxtoligidx)
@@ -2433,7 +2438,8 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
     prmtypetoprmdeflines=GrabPolarizeDefinitionLinesFromPrmFile(poltype,prmtypetopoltype,poltype.amoebabioprmpath)
     prmdeflines=AppendPoltypeTypeNumbers(poltype,prmtypetoprmdeflines,prmtypetopoltype) # now also grab them from the key file and then append the prm types then combine with prmdeflines here
     poltypetoprmtype = dict([v,k] for k,v in prmtypetopoltype.items())
-    atomtypetoframedef,proteintypestoframedefforprmfile=GrabMultipoleFrameDefintions(poltype,key,boundaryatomidxs,ligidxtotypeidx,proidxtoprotype,modproidxs,ligidxtoproidx,prosideboundligidx,proboundidxtoprotype,mincorenumber,maxcorenumber) # for multipole frames on the boundary (on ligand side), we need to grab the original index frame definitions then convert to protein type number when appropriate, also need to consider atoms on other side of boundary (protein side)
+    
+    atomtypetoframedef,proteintypestoframedefforprmfile=GrabMultipoleFrameDefintions(poltype,key,boundaryatomidxs,ligidxtotypeidx,proidxtoprotype,modproidxs,ligidxtoproidx,prosideboundligidx,proboundidxtoprotype,mincorenumber,maxcorenumber,modligidxs) # for multipole frames on the boundary (on ligand side), we need to grab the original index frame definitions then convert to protein type number when appropriate, also need to consider atoms on other side of boundary (protein side)
 
     # need to add charge
     stitchtorsionprms,stitchpolarizeprms,stitchmpoleprms=GrabParametersFromKeyFile(poltype,key,torsionligtypestoboundtypesforkey,ligboundaryatomtypes,poltypetoprmtype,atomtypetoframedef,mincorenumber,maxcorenumber)
@@ -2455,7 +2461,6 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
         writekey=poltype.key5fname.replace('.key_5','.key_7')
         WriteNewKeyFile(poltype,coreatomdefs+stitchatomdefs,corebondprms+stitchbondprms,coreangleprms+stitchangleprms,coretorsionprms+stitchtorsionprms,corestrbndprms+stitchstrbndprms,corepitorprms+stitchpitorprms,coreopbendprms+stitchopbendprms,corepolarizeprms+stitchpolarizeprms,corevdwprms+stitchvdwprms,corempoleprms+stitchmpoleprms,writekey,poltype.amoebabioprmpath)       
         WriteToPrmFile(poltype,coreatomdefs,corebondprms,coreangleprms,coretorsionprms,corestrbndprms,corepitorprms,coreopbendprms,corepolarizeprms,corevdwprms,corempoleprms,poltype.ModifiedResiduePrmPath)
-        #print('proidxtoprotype ',proidxtoprotype)
         proidxtoprotype=ShiftDictionaryValueTypes(poltype,proidxtoprotype,oldtypetonewtype)
         ligidxtotypeidx=ShiftDictionaryValueTypes(poltype,ligidxtotypeidx,oldtypetonewtype)
         modproidxtotypenumber=ShiftDictionaryValueTypes(poltype,modproidxtotypenumber,oldtypetonewtype)
@@ -2566,7 +2571,9 @@ def ShiftPoltypeNumbers(poltype):
     oldtypetonewtype={}
     for typenum in typenumbers:
         newtypenum=typenum-shift
-        oldtypetonewtype[typenum]=newtypenum
+        #oldtypetonewtype[typenum]=newtypenum
+        oldtypetonewtype[typenum]=typenum # TEMP
+
     return oldtypetonewtype
 
 def GrabMaxTypeNumber(poltype,parameterfile):
