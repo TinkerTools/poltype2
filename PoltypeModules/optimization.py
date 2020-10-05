@@ -268,8 +268,10 @@ def StructureMinimization(poltype):
 
 def GeometryOptimization(poltype,mol):
     poltype.WriteToLog("NEED QM Density Matrix: Executing Gaussian Opt and SP")
-    OBOPTname=poltype.molstructfname.replace('.sdf','_OBOPT.pdb')
 
+    OBOPTmol=mol # openbabel changes atom order which breaks things in modifiedresidue.py
+    """
+    OBOPTname=poltype.molstructfname.replace('.sdf','_OBOPT.pdb')
     if not os.path.isfile(OBOPTname):
         cmdstr=poltype.obminimizeexe+' -ff MMFF94 '+poltype.molstructfname +' '+ '>'+ OBOPTname
         poltype.call_subsystem(cmdstr,True)
@@ -280,7 +282,7 @@ def GeometryOptimization(poltype,mol):
     obConversion.ReadFile(OBOPTmol,OBOPTname)
     charge=poltype.totalcharge
     OBOPTmol.SetTotalCharge(charge) # for some reason obminimize does not print charge in output PDB
-    
+    """
 
     
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt

@@ -201,6 +201,7 @@ def GenerateTorsionSPInputFileGaus(poltype,torxyzfname,torset,optmol,phaseangles
     torspcomfname = '%s-sp-' % (poltype.molecprefix)
     for i in range(len(torset)):
         tor=torset[i]
+        phaseangle=phaseangles[i]
         a,b,c,d=tor[0:4]
         torang = optmol.GetTorsion(a,b,c,d)
         torspcomfname+='%d-%d-%03d' % (b,c,round((torang+phaseangle)%360))
