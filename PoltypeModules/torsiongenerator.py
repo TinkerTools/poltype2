@@ -219,7 +219,7 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
     # load prevstruct
     firsttor=torset[0]
     a,b,c,d=firsttor[0:4]
-    tor=[a,b,c,d]
+    tor=tuple([a,b,c,d])
     if tor in poltype.nonaroringtors:
         nonaroringtor=True
     else:
@@ -264,7 +264,7 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
 def tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,prevstrctfname,torsionrestraint,designatexyz,keybase,keybasepath,bondtopology):
     for i in range(len(phaseangles)):
         phaseangle=phaseangles[i]
-        tor=torset[i]
+        tor=tuple(torset[i])
         a,b,c,d=tor[0:4] 
         if tor in poltype.nonaroringtors:
             nonaroringtor=True
@@ -424,7 +424,6 @@ def gen_torsion(poltype,optmol,torsionrestraint):
             phaselists.append(phaselist)
         flatphaselist=numpy.array(list(product(*phaselists)))
         origshape=flatphaselist.shape
-        print('poltype.torsionsettonumptsneeded',poltype.torsionsettonumptsneeded)
         prms=poltype.torsionsettonumptsneeded[tuple(torset)]
         prmstoremove=len(flatphaselist)-prms
         lastdim=len(phaselists)
@@ -439,13 +438,10 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         ax1idx=ax2idx-1
         diags = numpy.transpose(numpy.diagonal(flatphaselist, axis1=ax1idx, axis2=ax2idx))
         flatphaselist=flatphaselist.reshape(origshape)
-        flatphaselist=flatphaselist.tolist()
-        indicestoremove=[]
         for diag in diags:
-            loc=flatphaselist.index(diag)
-            indicestoremove.append(loc)
-        for index in indicestoremove:
-            del flatphaselist[index]
+            indexes=numpy.where((flatphaselist == diag).all(axis=1))
+            flatphaselist = numpy.delete(flatphaselist,indexes , axis=0)
+            
         # we could remove more points if we wanted....
         phaseangles=[0]*len(torset)
         if poltype.use_gaus==False and poltype.use_gausoptonly==False:
@@ -825,18 +821,20 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     for i in range(len(torset)):
         tor=torset[i]
         a,b,c,d=tor[0:4]
-        for resttors in poltype.rotbndlist[' '.join([str(b),str(c)])]:
-            rta,rtb,rtc,rtd = resttors
-            if resttors not in variabletorlist:
-                rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
-                if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
-                   (optmol.GetAtom(rtd).GetAtomicNum() != 1):
-                    restlist.append(resttors)
-                    if not firsttor:
-                        temp.write(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
-                    else:
-                        temp.write('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
-                        firsttor=True
+        key=' '.join([str(b),str(c)])
+        if key in poltype.rotbndlist.keys():
+            for resttors in poltype.rotbndlist[key]:
+                rta,rtb,rtc,rtd = resttors
+                if resttors not in variabletorlist:
+                    rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
+                    if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
+                       (optmol.GetAtom(rtd).GetAtomicNum() != 1):
+                        restlist.append(resttors)
+                        if not firsttor:
+                            temp.write(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
+                        else:
+                            temp.write('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
+                            firsttor=True
             
         # Leave all torsions around other rotatable bonds fixed
     for rotkey,torsions in poltype.rotbndlist.items():

@@ -28,8 +28,6 @@ def GrabRingAtomIndices(poltype,mol,ring):
 
 
 def NonAromaticRingTorsions(poltype,torsions,atomindices):
-    print('torsions',torsions)
-    print('atomindices',atomindices)
     nonarotorsions=[]
     nonarotorsionsflat=[]
     for ring in atomindices:
@@ -113,7 +111,7 @@ def DetermineMaxRanges(poltype,torset,optmol,bondtopology):
     variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
     phaselists=[]
     for tor in torset:
-        phaselist=range(0,360,5) # just try fine grid, remove points that dont work 
+        phaselist=range(0,50,5) # just try fine grid, remove points that dont work 
         phaselists.append(phaselist)
     phaseanglelist=numpy.array(list(product(*phaselists)))
     designatexyz='_determine_maxrange'
@@ -150,9 +148,9 @@ def RefineNonAromaticRingTorsions(poltype,mol,optmol,classkeytotorsionparameters
 
     bondtopology=torgen.GenerateBondTopology(poltype,optmol)
     atomindices=NonAromaticRingAtomicIndices(poltype,mol)
-    print('atomindices',atomindices)
     nonarotorsions,nonarotorsionsflat=NonAromaticRingTorsions(poltype,poltype.alltorsionslist,atomindices)
-    print('nonarotorsions',nonarotorsions)
+    print('nonarotorsionsflat',nonarotorsionsflat)
+    poltype.nonaroringtors=nonarotorsionsflat
     reducednonarotorsions=[]
     for nonarotors in nonarotorsions:
         combs=AllPossiblePuckeringLocationsForRing(poltype,nonarotors)
@@ -164,6 +162,7 @@ def RefineNonAromaticRingTorsions(poltype,mol,optmol,classkeytotorsionparameters
         DetermineMaxRanges(poltype,torset,optmol,bondtopology)
         numparameters=TotalParametersToFitForNonAromaticRing(poltype,firstcomb)
         datapoints=TotalDatapointsForNonAromaticRing(poltype,numparameters)
+        poltype.torsionsettonumptsneeded[torset]=datapoints
         dataptspertorsion=DatapointsPerTorsionForNonArtomaticRing(poltype,firstcomb,datapoints)
         for torsion in torset:
             a,b,c,d=torsion[0:4]

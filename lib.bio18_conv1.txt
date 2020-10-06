@@ -2636,3 +2636,269 @@ atom  402  402 C     CNC                    6 12.0107  0
 atom  407  407 S     CNC                    16 32.065  0
 atom  408  408 C     CNC                    6 12.0107  0
 atom  416  416 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  403  403 N     CNC                    7 14.0067  0
+atom  401  401 CA    CNC                    6 12.0107  0
+atom  404  404 C     CNC                    6 12.0107  0
+atom  411  411 O     CNC                    8 15.9994  0
+atom  412  412 H     CNC                    1  1.00794  0
+atom  410  410 HA    CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  402  402 C     CNC                    6 12.0107  0
+atom  407  407 S     CNC                    16 32.065  0
+atom  408  408 C     CNC                    6 12.0107  0
+atom  416  416 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  403  403 N     CNC                    7 14.0067  0
+atom  401  401 CA    CNC                    6 12.0107  0
+atom  404  404 C     CNC                    6 12.0107  0
+atom  411  411 O     CNC                    8 15.9994  0
+atom  412  412 H     CNC                    1  1.00794  0
+atom  410  410 HA    CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  402  402 C     CNC                    6 12.0107  0
+atom  407  407 S     CNC                    16 32.065  0
+atom  408  408 C     CNC                    6 12.0107  0
+atom  416  416 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  403  403 N     CNC                    7 14.0067  0
+atom  401  401 CA    CNC                    6 12.0107  0
+atom  404  404 C     CNC                    6 12.0107  0
+atom  411  411 O     CNC                    8 15.9994  0
+atom  412  412 H     CNC                    1  1.00794  0
+atom  410  410 HA    CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  402  402 C     CNC                    6 12.0107  0
+atom  407  407 S     CNC                    16 32.065  0
+atom  408  408 C     CNC                    6 12.0107  0
+atom  416  416 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  403  403 N     CNC                    7 14.0067  0
+atom  401  401 CA    CNC                    6 12.0107  0
+atom  404  404 C     CNC                    6 12.0107  0
+atom  411  411 O     CNC                    8 15.9994  0
+atom  412  412 H     CNC                    1  1.00794  0
+atom  410  410 HA    CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  402  402 C     CNC                    6 12.0107  0
+atom  407  407 S     CNC                    16 32.065  0
+atom  408  408 C     CNC                    6 12.0107  0
+atom  416  416 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  403  403 N     CNC                    7 14.0067  0
+atom  401  401 CA    CNC                    6 12.0107  0
+atom  404  404 C     CNC                    6 12.0107  0
+atom  411  411 O     CNC                    8 15.9994  0
+atom  412  412 H     CNC                    1  1.00794  0
+atom  410  410 HA    CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  402  402 C     CNC                    6 12.0107  0
+atom  407  407 S     CNC                    16 32.065  0
+atom  408  408 C     CNC                    6 12.0107  0
+atom  416  416 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  403  403 N     CNC                    7 14.0067  0
+atom  401  401 CA    CNC                    6 12.0107  0
+atom  404  404 C     CNC                    6 12.0107  0
+atom  411  411 O     CNC                    8 15.9994  0
+atom  412  412 H     CNC                    1  1.00794  0
+atom  410  410 HA    CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  402  402 C     CNC                    6 12.0107  0
+atom  407  407 S     CNC                    16 32.065  0
+atom  408  408 C     CNC                    6 12.0107  0
+atom  416  416 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  403  403 N     CNC                    7 14.0067  0
+atom  401  401 CA    CNC                    6 12.0107  0
+atom  404  404 C     CNC                    6 12.0107  0
+atom  411  411 O     CNC                    8 15.9994  0
+atom  412  412 H     CNC                    1  1.00794  0
+atom  410  410 HA    CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  402  402 C     CNC                    6 12.0107  0
+atom  407  407 S     CNC                    16 32.065  0
+atom  408  408 C     CNC                    6 12.0107  0
+atom  416  416 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  403  403 N     CNC                    7 14.0067  0
+atom  401  401 CA    CNC                    6 12.0107  0
+atom  404  404 C     CNC                    6 12.0107  0
+atom  411  411 O     CNC                    8 15.9994  0
+atom  412  412 H     CNC                    1  1.00794  0
+atom  410  410 HA    CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  402  402 C     CNC                    6 12.0107  0
+atom  407  407 S     CNC                    16 32.065  0
+atom  408  408 C     CNC                    6 12.0107  0
+atom  416  416 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  403  403 N     CNC                    7 14.0067  0
+atom  401  401 CA    CNC                    6 12.0107  0
+atom  404  404 C     CNC                    6 12.0107  0
+atom  411  411 O     CNC                    8 15.9994  0
+atom  412  412 H     CNC                    1  1.00794  0
+atom  410  410 HA    CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  402  402 C     CNC                    6 12.0107  0
+atom  407  407 S     CNC                    16 32.065  0
+atom  408  408 C     CNC                    6 12.0107  0
+atom  416  416 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  403  403 N     CNC                    7 14.0067  0
+atom  401  401 CA    CNC                    6 12.0107  0
+atom  404  404 C     CNC                    6 12.0107  0
+atom  411  411 O     CNC                    8 15.9994  0
+atom  412  412 H     CNC                    1  1.00794  0
+atom  410  410 HA    CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  402  402 C     CNC                    6 12.0107  0
+atom  407  407 S     CNC                    16 32.065  0
+atom  408  408 C     CNC                    6 12.0107  0
+atom  416  416 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  403  403 N     CNC                    7 14.0067  0
+atom  401  401 CA    CNC                    6 12.0107  0
+atom  404  404 C     CNC                    6 12.0107  0
+atom  411  411 O     CNC                    8 15.9994  0
+atom  412  412 H     CNC                    1  1.00794  0
+atom  410  410 HA    CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  402  402 C     CNC                    6 12.0107  0
+atom  407  407 S     CNC                    16 32.065  0
+atom  408  408 C     CNC                    6 12.0107  0
+atom  416  416 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  403  403 N     CNC                    7 14.0067  0
+atom  401  401 CA    CNC                    6 12.0107  0
+atom  404  404 C     CNC                    6 12.0107  0
+atom  411  411 O     CNC                    8 15.9994  0
+atom  412  412 H     CNC                    1  1.00794  0
+atom  410  410 HA    CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  402  402 C     CNC                    6 12.0107  0
+atom  407  407 S     CNC                    16 32.065  0
+atom  408  408 C     CNC                    6 12.0107  0
+atom  416  416 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  366  366 N     CNC                    7 14.0067  0
+atom  364  364 CA    CNC                    6 12.0107  0
+atom  367  367 C     CNC                    6 12.0107  0
+atom  374  374 O     CNC                    8 15.9994  0
+atom  375  375 H     CNC                    1  1.00794  0
+atom  373  373 HA    CNC                    1  1.00794  0
+atom  372  372 H     CNC                    1  1.00794  0
+atom  372  372 H     CNC                    1  1.00794  0
+atom  365  365 C     CNC                    6 12.0107  0
+atom  370  370 S     CNC                    16 32.065  0
+atom  371  371 C     CNC                    6 12.0107  0
+atom  379  379 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  403  403 N     CNC                    7 14.0067  0
+atom  401  401 CA    CNC                    6 12.0107  0
+atom  404  404 C     CNC                    6 12.0107  0
+atom  411  411 O     CNC                    8 15.9994  0
+atom  412  412 H     CNC                    1  1.00794  0
+atom  410  410 HA    CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  402  402 C     CNC                    6 12.0107  0
+atom  407  407 S     CNC                    16 32.065  0
+atom  408  408 C     CNC                    6 12.0107  0
+atom  416  416 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  403  403 N     CNC                    7 14.0067  0
+atom  401  401 CA    CNC                    6 12.0107  0
+atom  404  404 C     CNC                    6 12.0107  0
+atom  411  411 O     CNC                    8 15.9994  0
+atom  412  412 H     CNC                    1  1.00794  0
+atom  410  410 HA    CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  402  402 C     CNC                    6 12.0107  0
+atom  407  407 S     CNC                    16 32.065  0
+atom  408  408 C     CNC                    6 12.0107  0
+atom  416  416 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  403  403 N     CNC                    7 14.0067  0
+atom  401  401 CA    CNC                    6 12.0107  0
+atom  404  404 C     CNC                    6 12.0107  0
+atom  411  411 O     CNC                    8 15.9994  0
+atom  412  412 H     CNC                    1  1.00794  0
+atom  410  410 HA    CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  402  402 C     CNC                    6 12.0107  0
+atom  407  407 S     CNC                    16 32.065  0
+atom  408  408 C     CNC                    6 12.0107  0
+atom  416  416 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  403  403 N     CNC                    7 14.0067  0
+atom  401  401 CA    CNC                    6 12.0107  0
+atom  404  404 C     CNC                    6 12.0107  0
+atom  411  411 O     CNC                    8 15.9994  0
+atom  412  412 H     CNC                    1  1.00794  0
+atom  410  410 HA    CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  409  409 H     CNC                    1  1.00794  0
+atom  402  402 C     CNC                    6 12.0107  0
+atom  407  407 S     CNC                    16 32.065  0
+atom  408  408 C     CNC                    6 12.0107  0
+atom  416  416 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  366  366 N     CNC                    7 14.0067  0
+atom  364  364 CA    CNC                    6 12.0107  0
+atom  367  367 C     CNC                    6 12.0107  0
+atom  374  374 O     CNC                    8 15.9994  0
+atom  375  375 H     CNC                    1  1.00794  0
+atom  373  373 HA    CNC                    1  1.00794  0
+atom  372  372 H     CNC                    1  1.00794  0
+atom  372  372 H     CNC                    1  1.00794  0
+atom  365  365 C     CNC                    6 12.0107  0
+atom  370  370 S     CNC                    16 32.065  0
+atom  371  371 C     CNC                    6 12.0107  0
+atom  379  379 N     CNC                    7 14.0067  0
+
+# RESIDUE CNC
+atom  366  366 N     CNC                    7 14.0067  0
+atom  364  364 CA    CNC                    6 12.0107  0
+atom  367  367 C     CNC                    6 12.0107  0
+atom  374  374 O     CNC                    8 15.9994  0
+atom  375  375 H     CNC                    1  1.00794  0
+atom  373  373 HA    CNC                    1  1.00794  0
+atom  372  372 H     CNC                    1  1.00794  0
+atom  372  372 H     CNC                    1  1.00794  0
+atom  365  365 C     CNC                    6 12.0107  0
+atom  370  370 S     CNC                    16 32.065  0
+atom  371  371 C     CNC                    6 12.0107  0
+atom  379  379 N     CNC                    7 14.0067  0

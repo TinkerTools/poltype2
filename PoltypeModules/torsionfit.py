@@ -84,12 +84,14 @@ def fitfunc (poltype,parms, x,torset, torprmdict, debug = False):
                     tor_energy += tor_func_term (poltype,prm, ang, nfold, clscnt, torgen.rads(poltype,clsangle),torgen.rads(poltype,poltype.foldoffsetlist[nfold-1]))
         tor_energy_array[j]=tor_energy
 
-        if parms is 'eval' and 'offset' in torprm:
-            offset = torprm['offset']
+    if parms is 'eval' and 'offset' in torprm:
+        offset = torprm['offset']
     if parms is not 'eval':
         offset = parms[-1]
-    tor_energy_array += offset
-    return tor_energy_array
+    if type(offset)==list:
+        if len(tor_energy_array)==len(offset):
+            tor_energy_array += offset
+    return numpy.array(tor_energy_array)
 
 def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
     """
@@ -669,9 +671,13 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             rotbndkey = '%d %d' % (b, c)
             initangle = mol.GetTorsion(a,b,c,d)
             # Identify all torsion parameters involved with current rotatable bond.
-            for toraboutbnd in poltype.rotbndlist[rotbndkey]:
-                # However, initangle is the current angle for 'tor' not for 'toraboutbnd'
-                insert_torphasedict(poltype,mol, toraboutbnd, torprmdict, initangle, write_prm_dict)
+            if rotbndkey in poltype.rotbndlist.keys():
+                for toraboutbnd in poltype.rotbndlist[rotbndkey]:
+                    # However, initangle is the current angle for 'tor' not for 'toraboutbnd'
+                    insert_torphasedict(poltype,mol, toraboutbnd, torprmdict, initangle, write_prm_dict)
+            else:
+                insert_torphasedict(poltype,mol, tor, torprmdict, initangle, write_prm_dict)
+
 
         tup=tuple(classkeylist)
         prmidx = insert_torprmdict(poltype,mol, torprmdict)
@@ -691,7 +697,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
 
         weightlist=numpy.exp(-numpy.add(numpy.array(qm_energy_list),15)/2.5)
 
-        tor_energy_list = [qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)]
+        tor_energy_list = numpy.array([qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)])
         if useweights==True:
             tor_energy_list=numpy.multiply(tor_energy_list,weightlist)
         tor_energy_list_noweight = [qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)]
@@ -827,6 +833,9 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         figfname+='.png'
         fig = plt.figure(figsize=(10,10))
         ax = fig.add_subplot(111)
+        print('fitfunc_dict[clskey]',fitfunc_dict[clskey])
+        for value in fitfunc_dict[clskey]:
+            print('value',value)
         l1, = ax.plot(Sx,fitfunc_dict[clskey],'r',label='Fit')
         if useweights==False:
             lab='QM-MM1'

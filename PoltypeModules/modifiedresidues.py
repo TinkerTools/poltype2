@@ -473,6 +473,8 @@ def GrabParametersFromPrmFile(poltype,bondprmclassestoboundclasses,angleprmclass
         line=results[lineidx]
         linesplit=line.split()
         linesplitall=re.split(r'(\s+)', line)
+        if '#' in line:
+            continue
         if 'bond' in line and 'cubic' not in line and 'quartic' not in line:
             bondclasslist=[int(linesplit[1]),int(linesplit[2])]
             foundbond=False
@@ -2411,7 +2413,6 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
         maxcorenumber=GrabMaxTypeNumber(poltype,poltype.key5fname)
         mincorenumber=GrabMinTypeNumber(poltype,poltype.key5fname)
         key=poltype.key5fname
-        writekey=poltype.key5fname.replace('.key_5','.key_6')
         if not os.path.isfile(poltype.ModifiedResiduePrmPath):
             shutil.copy(poltype.amoebabioprmpath,poltype.ModifiedResiduePrmPath)
         if not os.path.isfile(poltype.SMARTSToTypelibpath):
@@ -2423,7 +2424,8 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
         maxcorenumber=GrabMaxTypeNumberModifiedCore(poltype,poltype.ModifiedResiduePrmPath)
         mincorenumber=GrabMinTypeNumberModifiedCore(poltype,poltype.ModifiedResiduePrmPath)
         key=poltype.ModifiedResiduePrmPath
-        writekey=poltype.key2fname
+
+    writekey=poltype.key5fname.replace('.key_5','.key_6')
     torsionligtypestoboundtypesforkey=GrabLigandTypeToBoundryTypeForKeyFile(poltype,listoftorsionsforkey,proidxtoligidx,ligidxtotypeidx,proidxtoprotype,poltype.amoebabioprmpath,modproidxs,mincorenumber,maxcorenumber)
     prmtypetoprmclass=GrabClassNumbersForProtein(poltype,proidxtoprotype,check) # need this for grepping torsion parameters from prm file
     bondprmclassestoboundclasses=GrabPrmClassToBoundryClassForPrmFile(poltype,listofbondsforprm,proidxtoligidx,ligidxtotypeidx,proidxtoprotype,poltype.amoebabioprmpath,modproidxs,proboundidxtoprotype,prmtypetoprmclass,mincorenumber,maxcorenumber)
@@ -2452,7 +2454,9 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
     WriteNewKeyFile(poltype,stitchatomdefs,stitchbondprms,stitchangleprms,stitchtorsionprms,stitchstrbndprms,stitchpitorprms,stitchopbendprms,stitchpolarizeprms,stitchvdwprms,stitchmpoleprms,writekey,poltype.amoebabioprmpath)
     if check==False:
         coreatomdefs,corebondprms,coreangleprms,coretorsionprms,corestrbndprms,corepitorprms,coreopbendprms,corepolarizeprms,corevdwprms,corempoleprms=GrabCoreParameters(poltype,poltype.key5fname)
-        oldtypetonewtype=ShiftPoltypeNumbers(poltype)
+        oldtypetonewtype,shift=ShiftPoltypeNumbers(poltype)
+        mincorenumber=mincorenumber-shift
+        maxcorenumber=maxcorenumber-shift 
         # now I need to convert all arrays
         coreresult=ShiftParameterDefintions(poltype,[coreatomdefs,corebondprms,coreangleprms,coretorsionprms,corestrbndprms,corepitorprms,coreopbendprms,corepolarizeprms,corevdwprms,corempoleprms],oldtypetonewtype)
         coreatomdefs,corebondprms,coreangleprms,coretorsionprms,corestrbndprms,corepitorprms,coreopbendprms,corepolarizeprms,corevdwprms,corempoleprms=coreresult[:] 
@@ -2468,7 +2472,7 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
         modresiduedic=GrabLibraryInfo(poltype,proidxtoprotype,modresiduelabel,proOBmol)
         protinkxyz,firstresnum,lastresnum=GenerateProteinTinkerXYZFile(poltype,poltype.modifiedproteinpdbname,modproidxtotypenumber,poltype.amoebabioprmpath,proidxtoprotype,knownresiduesymbs)
 
-        cmdstr=CallAnalyze(poltype,protinkxyz,writekey)
+        cmdstr=CallAnalyze(poltype,protinkxyz,writekey,'e','alz.out')
         poltype.call_subsystem(cmdstr,True)
         error=ReadAnalyzeOutput(poltype)
         if error==False:
@@ -2476,7 +2480,7 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
             GenerateSMARTSToTypeFileToAdd(poltype,modmol,ligidxtotypeidx,smarts)
         else:
             raise ValueError(' alz.out for PDB XYZ file and .key_7 have errors')
-
+        CorrectTotalCharge(poltype,poltype.unmodifiedproteinpdbname,writekey,protinkxyz,mincorenumber,maxcorenumber)
 
 def AddHydrogensAndBackBoneOnConnectedAtomIdxToGetRightClass(poltype,connectedatomidx,proOBmol,backboneindexesreference):
     transferableidxsformatching=[connectedatomidx]
@@ -2503,8 +2507,8 @@ def GetIdxsFromListOfTorsionsForPrm(poltype,listoftorsionsforprm):
     return transferableidxs
 
 
-def CallAnalyze(poltype,xyzfile,keyfile):
-    cmdstr=poltype.analyzeexe+' '+xyzfile+' '+'-k'+' '+keyfile+' '+'e'+' > '+'alz.out'
+def CallAnalyze(poltype,xyzfile,keyfile,option,outfile):
+    cmdstr=poltype.analyzeexe+' '+xyzfile+' '+'-k'+' '+keyfile+' '+option+' > '+outfile
     return cmdstr
 
 def ReadAnalyzeOutput(poltype):
@@ -2572,9 +2576,9 @@ def ShiftPoltypeNumbers(poltype):
     for typenum in typenumbers:
         newtypenum=typenum-shift
         oldtypetonewtype[typenum]=newtypenum
-        oldtypetonewtype[typenum]=typenum # TEMP
+        #oldtypetonewtype[typenum]=typenum # TEMP
 
-    return oldtypetonewtype
+    return oldtypetonewtype,shift
 
 def GrabMaxTypeNumber(poltype,parameterfile):
     maxnumberfromprm=1
@@ -2696,4 +2700,116 @@ def MatchSMARTSToOBMolGrabAllMatches(poltype,smarts,modmol):
         print('Houston, we have a problem')
         return None 
 
+def BabelGenerateMol2File(poltype,pdbfile):
+    tmpconv = openbabel.OBConversion()
+    tmpconv.SetInFormat('pdb')
+    molbabel=openbabel.OBMol()
+    tmpconv.ReadFile(molbabel,pdbfile)
+    tmpconv.SetOutFormat('mol2')
+    structfname=pdbfile.replace('.pdb','.mol2')
+    tmpconv.WriteFile(molbabel,structfname)
+    return structfname 
 
+
+def ReadTotalProteinChargeBeforeMerge(poltype,mol2file):
+    temp=open(mol2file,'r')
+    results=temp.readlines()
+    temp.close()
+    chg=0
+    for line in results:
+        linesplit=line.split()
+        if len(linesplit)==9:
+            chg+=float(linesplit[-1])
+    totalchg=round(chg)
+    return totalchg
+
+def ReadTotalProteinChargeAfterMerge(poltype,alzfile):
+    temp=open(alzfile,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        if 'Total Electric Charge : ' in line:
+            linesplit=line.split()
+            chg=float(linesplit[-2])
+    return chg
+
+def ChargeToRedistribute(poltype,proteinchargebeforemerge,ligandcharge,proteinchargeaftermerge):
+    return proteinchargeaftermerge-(proteinchargebeforemerge+ligandcharge)
+
+def ReadMonopolesFromMultipolesAcrossBoundary(poltype,keyfile,mincorenumber,maxcorenumber):
+    temp=open(keyfile,'r')
+    results=temp.readlines()
+    temp.close()
+    monopoles=[]
+    for line in results:
+        if 'multipole' in line:
+            linesplit=line.split()
+            monopole=float(linesplit[-1])
+            frames=linesplit[1:-1]
+            frames=[int(i) for i in frames]
+            polnums=CountNumberPoltypeNums(poltype,frames,mincorenumber,maxcorenumber)
+            if polnums!=len(frames):
+                monopoles.append(monopole)
+    return monopoles
+
+def ModifyMonopoles(poltype,monopoles,chgtoredistribute):
+    nummonopoles=len(monopoles)
+    chgpermonopole=chgtoredistribute/nummonopoles 
+    print('chgpermonopole',chgpermonopole)
+    modmonopoles=[]
+    for monopole in monopoles:
+        if monopole>0 and chgpermonopole>0:
+            modmonopole=monopole-chgpermonopole
+        elif monopole<0 and chgpermonopole>0:
+            modmonopole=monopole-chgpermonopole
+        elif monopole>0 and chgpermonopole<0:
+            modmonopole=monopole+chgpermonopole
+        elif monopole<0 and chgpermonopole<0:
+            modmonopole=monopole+chgpermonopole
+        modmonopoles.append(modmonopole)
+    return modmonopoles
+
+
+def ModifyMonopolesFromMultipolesAcrossBoundary(poltype,keyfile,modmonopoles,mincorenumber,maxcorenumber):
+    temp=open(keyfile,'r')
+    results=temp.readlines()
+    temp.close()
+    tempname='temp.txt'
+    temp=open(tempname,'w')
+    modcount=0
+    for line in results:
+        if 'multipole' in line:
+            linesplit=line.split()
+            frames=linesplit[1:-1]
+            frames=[int(i) for i in frames]
+            polnums=CountNumberPoltypeNums(poltype,frames,mincorenumber,maxcorenumber)
+            if polnums!=len(frames):
+                linesplit=re.split(r'(\s+)', line)
+                linesplit[-3]=str(modmonopoles[modcount])
+                modcount+=1
+                newline=''.join(linesplit)
+                temp.write(newline)
+        else:
+            temp.write(line)
+    temp.close()
+    os.remove(keyfile)
+    os.rename(tempname,keyfile)
+
+def CorrectTotalCharge(poltype,pdbfile,writekey,protinkxyz,mincorenumber,maxcorenumber):
+    mol2file=BabelGenerateMol2File(poltype,pdbfile)
+    proteinchargebeforemerge=ReadTotalProteinChargeBeforeMerge(poltype,mol2file)
+    alzfile='alz_charge.out'
+    cmdstr=CallAnalyze(poltype,protinkxyz,writekey,'m',alzfile)
+    poltype.call_subsystem(cmdstr,True)
+    proteinchargeaftermerge=ReadTotalProteinChargeAfterMerge(poltype,alzfile)
+    ligandcharge=poltype.totalcharge
+    chgtoredistribute=ChargeToRedistribute(poltype,proteinchargebeforemerge,ligandcharge,proteinchargeaftermerge)
+    monopoles=ReadMonopolesFromMultipolesAcrossBoundary(poltype,writekey,mincorenumber,maxcorenumber)
+    modmonopoles=ModifyMonopoles(poltype,monopoles,chgtoredistribute)
+    totnewchg=sum(modmonopoles)
+    
+    print('monopoles',monopoles)
+    print('modmonopoles',modmonopoles)
+    print('chgtoredistribute',chgtoredistribute)
+    print('totnewchg',totnewchg)
+    ModifyMonopolesFromMultipolesAcrossBoundary(poltype,writekey,modmonopoles,mincorenumber,maxcorenumber)
