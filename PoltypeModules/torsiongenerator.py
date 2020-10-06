@@ -585,7 +585,6 @@ def get_torlist(poltype,mol):
 
     torlist = []
     rotbndlist = {}
-    poltype.alltorsionslist=[]
     iterbond = openbabel.OBMolBondIter(mol)
     v1 = valence.Valence(poltype.versionnum,poltype.logfname,poltype.dontfrag,poltype.isfragjob,poltype.allownonaromaticringscanning)
     v1.setidxtoclass(poltype.idxtosymclass)
@@ -629,8 +628,6 @@ def get_torlist(poltype,mol):
                 tor = mol.GetTorsion(t1,t2,t3,t4)
                 if not skiptorsion:
                     torlist.append(unq)
-                poltype.alltorsionslist.append(unq)
-                poltype.alltorsionslist
                 # store torsion in rotbndlist
                 rotbndlist[rotbndkey] = []
                 rotbndlist[rotbndkey].append(unq)
@@ -649,7 +646,6 @@ def get_torlist(poltype,mol):
                         c = t3.GetIdx()
                         d = iaa2.GetIdx()
                         if ((iaa.GetIdx() != t3.GetIdx() and iaa2.GetIdx() != t2.GetIdx()) and not (iaa.GetIdx() == t1.GetIdx() and iaa2.GetIdx() == t4.GetIdx())):
-                            poltype.alltorsionslist.append(get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx()))
 
                             if not skiptorsion:    
                                 rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx()))
@@ -658,6 +654,38 @@ def get_torlist(poltype,mol):
                 continue
             
     return (torlist ,rotbndlist)
+
+
+
+def get_all_torsions(poltype,mol):
+    poltype.alltorsionslist=[]
+    iterbond = openbabel.OBMolBondIter(mol)
+    for bond in iterbond:
+        t2 = bond.GetBeginAtom()
+        t3 = bond.GetEndAtom()
+        t2idx=t2.GetIdx()
+        t3idx=t3.GetIdx()
+        t2val=t2.GetValence()
+        t3val=t3.GetValence()
+        if (t2val>=2 and t3val>=2):
+            t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
+            unq=get_uniq_rotbnd(poltype,t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx())
+            poltype.alltorsionslist.append(unq)
+            iteratomatom = openbabel.OBAtomAtomIter(bond.GetBeginAtom())
+            for iaa in iteratomatom:
+                iteratomatom2 = openbabel.OBAtomAtomIter(bond.GetEndAtom())
+                for iaa2 in iteratomatom2:
+                    a = iaa.GetIdx()
+                    b = t2.GetIdx()
+                    c = t3.GetIdx()
+                    d = iaa2.GetIdx()
+                    if ((iaa.GetIdx() != t3.GetIdx() and iaa2.GetIdx() != t2.GetIdx()) and not (iaa.GetIdx() == t1.GetIdx() and iaa2.GetIdx() == t4.GetIdx())):
+                        poltype.alltorsionslist.append(get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx()))
+
+
+            
+    return
+
 
 
 

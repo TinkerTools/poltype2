@@ -2571,7 +2571,7 @@ def ShiftPoltypeNumbers(poltype):
     oldtypetonewtype={}
     for typenum in typenumbers:
         newtypenum=typenum-shift
-        #oldtypetonewtype[typenum]=newtypenum
+        oldtypetonewtype[typenum]=newtypenum
         oldtypetonewtype[typenum]=typenum # TEMP
 
     return oldtypetonewtype

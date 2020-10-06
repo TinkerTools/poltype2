@@ -3,6 +3,9 @@ import torsiongenerator as torgen
 import optimization as opt
 import os
 import openbabel
+import numpy
+from itertools import product
+
 
 def NonAromaticRingAtomicIndices(poltype,mol):
     sssr = mol.GetSSSR()
@@ -79,8 +82,9 @@ def UpdateMaxRange(poltype,torsion,maxrange):
 def UpdateTorsionSets(poltype,nonarotors):
     for tor in nonarotors:
         torset=[tor]
-        index=poltype.torlist.index(torset)
-        del poltype.torlist[index]
+        if torset in poltype.torlist:
+            index=poltype.torlist.index(torset)
+            del poltype.torlist[index]
     poltype.torlist.append(nonarotors)
 
 
@@ -88,7 +92,7 @@ def UpdateVariableTorsions(poltype,nonarotors):
     torset=nonarotors
     poltype.torsettovariabletorlist[tuple(torset)]=torset
 
-def DetermineMaxRanges(poltype,torset,optmol):
+def DetermineMaxRanges(poltype,torset,optmol,bondtopology):
     phaseangles=[0]*len(torset)
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
         prefix='%s-opt-' % (poltype.molecprefix)
@@ -141,8 +145,10 @@ def DetermineMaxRanges(poltype,torset,optmol):
 def RefineNonAromaticRingTorsions(poltype,mol,optmol,classkeytotorsionparametersguess):
     if not os.path.isdir('qm-torsion'):
         os.mkdir('qm-torsion')
-    
+
     os.chdir('qm-torsion')
+
+    bondtopology=torgen.GenerateBondTopology(poltype,optmol)
     atomindices=NonAromaticRingAtomicIndices(poltype,mol)
     print('atomindices',atomindices)
     nonarotorsions,nonarotorsionsflat=NonAromaticRingTorsions(poltype,poltype.alltorsionslist,atomindices)
@@ -155,7 +161,7 @@ def RefineNonAromaticRingTorsions(poltype,mol,optmol,classkeytotorsionparameters
         UpdateTorsionSets(poltype,firstcomb)
         UpdateVariableTorsions(poltype,firstcomb)
         torset=tuple(firstcomb)
-        DetermineMaxRanges(poltype,torset,optmol)
+        DetermineMaxRanges(poltype,torset,optmol,bondtopology)
         numparameters=TotalParametersToFitForNonAromaticRing(poltype,firstcomb)
         datapoints=TotalDatapointsForNonAromaticRing(poltype,numparameters)
         dataptspertorsion=DatapointsPerTorsionForNonArtomaticRing(poltype,firstcomb,datapoints)
