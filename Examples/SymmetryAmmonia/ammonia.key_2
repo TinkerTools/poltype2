@@ -1,0 +1,25 @@
+parameters /home/bdw2292/poltype-poltype2-latest/amoebabio18_header.prm
+bondterm none
+angleterm none
+torsionterm none
+vdwterm none
+fix-monopole
+potential-offset 1.0
+
+TARGET-DIPOLE 0.004 -0.008 -1.532
+atom          401    401    N     "ammonia             "         7    14.007    3
+atom          402    402    H     "ammonia             "         1     1.008    1
+
+multipole    401   -402   -402   -402        -0.185440
+                                      0.00000    0.00000    0.33667
+                                      0.44987
+                                      0.00000    0.45008
+                                      0.00000    0.00000   -0.89995
+multipole    402    401   -402   -402         0.061813
+                                      0.00311    0.00000   -0.19282
+                                     -0.00927
+                                      0.00000    0.00670
+                                      0.01430    0.00000    0.00257
+
+polarize           401          1.0730     0.3900 402
+polarize           402          0.4960     0.3900 401

@@ -75,6 +75,7 @@ def fitfunc (poltype,parms, x,torset, torprmdict, debug = False):
                 for clsangle, clscnt in torprm['phasedict'].items():
                     # current dihedral angles and how many torsions are this angle 
                     # current parameter for this 'fold'
+                    
                     prm = torprm['prmdict'][nfold]
                     # not called by 'eval'
                     if parms is not 'eval':
@@ -267,30 +268,31 @@ def sum_xy_list(poltype,x1,y1,x2,y2):
             idx2 = x2.index(xx)
             y2[idx2] = y1[idx1]
 
-def del_tor_from_fit(poltype,dellist, torprmdict):
-    for delitem in dellist:
-        dic=torprmdict[delitem[0]]['prmdict']
-        if delitem[1] in dic.keys():
-            del dic[delitem[1]]
-        if not torprmdict[delitem[0]]['prmdict']:
-            torprmdict[delitem[0]]['count'] = 0
-            torprmdict[delitem[0]]['phasedict'] = {}
+def del_tor_from_fit(poltype,dellist, torprmdict,initialprms):
 
-    idx = 0
-    allidx = []
-    for toraboutbnd in torprmdict:
-        for fold in torprmdict[toraboutbnd]['prmdict']:
-            allidx.append(torprmdict[toraboutbnd]['prmdict'][fold])
+    for key in dellist:
+        indicestodelete=[]
+        for clskey in torprmdict.keys():
+            if clskey==key:
+                for fold,index in torprmdict[clskey]['prmdict'].items():
+                    indicestodelete.append(index)
 
-    # Only keep unique indices
-    allidx=list(set(allidx))
-    allidx.sort()
-    for toraboutbnd in torprmdict:
-        for fold in torprmdict[toraboutbnd]['prmdict']:
-            torprmdict[toraboutbnd]['prmdict'][fold] = \
-                allidx.index(torprmdict[toraboutbnd]['prmdict'][fold])
+        minidx=min(indicestodelete)
+        newinitialprms=[]
+        for i in range(len(initialprms)):
+            value=initialprms[i]
+            if i not in indicestodelete:
+                newinitialprms.append(value)
+        newinitialprms.append(0)
 
-    return len(allidx) + 1
+        del torprmdict[key]
+        for clskey in torprmdict.keys():
+            for fold,index in torprmdict[clskey]['prmdict'].items():
+                if index>minidx:
+                    torprmdict[clskey]['prmdict'][fold]-=minidx
+  
+        
+    return newinitialprms,torprmdict
 
 def find_least_connected_torsion(poltype,torprmdict,toralreadyremovedlist):
     """
@@ -434,27 +436,32 @@ def check_cooperative_tor_terms(poltype,clskey, nfold, angle, xvals, torprmdict)
     Description:
     """
     # for each class key
-    for (ck, tp) in torprmdict.items():
-        # for each angle for the class key
-        for phase in tp['phasedict']:
-            # if this torsion has the same number of folds
-            if nfold in tp['prmdict'] and \
-               not isinstance(tp['prmdict'][nfold], tuple):
-                outer_tor_e = tor_func_term(poltype,1.0,xvals,nfold,1.0,torgen.rads(poltype,phase),
-                                  torgen.rads(poltype,poltype.foldoffsetlist[nfold-1]))
-                inner_tor_e = tor_func_term(poltype,1.0,xvals,nfold,1.0,torgen.rads(poltype,angle),
-                                  torgen.rads(poltype,poltype.foldoffsetlist[nfold-1]))
-                # sum the profiles, then subtract the min from the list
-                sum_e = outer_tor_e + inner_tor_e
-                sum_e -= min(sum_e)
-                # diff the profiles, subtract the min from the list
-                diff_e = outer_tor_e - inner_tor_e
-                diff_e -= min(diff_e)
-                # if when summed, or diffed, the profile becomes close to constant
-                # i.e. the difference from the max and the min is < 1e-10
-                # then return the class key for this similar torsion
-                if max(sum_e) < 1e-10 or max(diff_e) < 1e-10:
-                    return ck
+    b=clskey[1]
+    c=clskey[2]
+    for ck,tp in torprmdict.items():
+    # for each angle for the class key
+        newb=ck[1]
+        newc=ck[2]
+        if b==newb and c==newc:
+            for phase in tp['phasedict']:
+                # if this torsion has the same number of folds
+                if nfold in tp['prmdict'] and \
+                   not isinstance(tp['prmdict'][nfold], tuple):
+                    outer_tor_e = tor_func_term(poltype,1.0,xvals,nfold,1.0,torgen.rads(poltype,phase),
+                                      torgen.rads(poltype,poltype.foldoffsetlist[nfold-1]))
+                    inner_tor_e = tor_func_term(poltype,1.0,xvals,nfold,1.0,torgen.rads(poltype,angle),
+                                      torgen.rads(poltype,poltype.foldoffsetlist[nfold-1]))
+                    # sum the profiles, then subtract the min from the list
+                    sum_e = outer_tor_e + inner_tor_e
+                    sum_e -= min(sum_e)
+                    # diff the profiles, subtract the min from the list
+                    diff_e = outer_tor_e - inner_tor_e
+                    diff_e -= min(diff_e)
+                    # if when summed, or diffed, the profile becomes close to constant
+                    # i.e. the difference from the max and the min is < 1e-10
+                    # then return the class key for this similar torsion
+                    if max(sum_e) < 1e-10 or max(diff_e) < 1e-10:
+                        return ck
     return None
 
 def insert_torphasedict (poltype,mol, toraboutbnd, torprmdict, initangle,write_prm_dict, keyfilter = None):
@@ -528,13 +535,13 @@ def insert_torprmdict(poltype,mol, torprmdict):
     Referenced By: fit_rot_bond_tors
     Description: -
     """
+    initialprms=[]
     tmpx = numpy.arange ( 0.0, 360.0, 10)
     prmidx = 0
-
     # for each cls key
     for (chkclskey, torprm) in torprmdict.items():
         # for each parameter in the energy equation for this torsion
-        # nfoldlist = [1,2,3] 
+        # nfoldlist = [1,2,3]
         for nfold in poltype.nfoldlist:
             # init array
             test_tor_energy = numpy.zeros(len(tmpx))
@@ -549,23 +556,36 @@ def insert_torprmdict(poltype,mol, torprmdict):
 
             # normalize
             test_tor_energy -= min(test_tor_energy)
+            
             if torprm['phasedict']:
                 if basetorkeys is not None:
                     # if the energy profile for this torsion/fold is not so dissimilar from
                     # another torsion/fold, then take its parameter 
                     # in this case, prmidx is not increased by one
                     torprmdict[chkclskey]['prmdict'][nfold] = torprmdict[basetorkeys]['prmdict'][nfold]
+
+
                 # will come here first
-                
                 elif max(test_tor_energy) > 1e-10:
                     torprm['prmdict'][nfold] = prmidx
                     prmidx += 1
         if not torprmdict[chkclskey]['prmdict']:
             torprmdict[chkclskey]['count'] = 0
             torprmdict[chkclskey]['phasedict'] = {}
+        if chkclskey in poltype.classkeytoinitialprmguess.keys():
+            prms=poltype.classkeytoinitialprmguess[chkclskey]
+            initialprms.append(prms[0])
+            initialprms.append(prms[1])
+            initialprms.append(prms[2])
+        else: 
+            initialprms.append(0)
+            initialprms.append(0)
+            initialprms.append(0)
 
+        
     prmidx += 1
-    return prmidx
+    initialprms.append(0)
+    return prmidx,initialprms
 
 def is_torprmdict_all_empty (poltype,torprmdict):
     """
@@ -582,6 +602,29 @@ def is_torprmdict_all_empty (poltype,torprmdict):
         if torprmdict[clskey]['prmdict']:
             return False
     return result
+
+def GenerateBoundaries(poltype,tor_energy_list,refine,initialprms):
+    lowerbounds=[]
+    upperbounds=[]
+    max_amp = max(tor_energy_list) - min(tor_energy_list)
+    if refine==False: 
+        lowerbounds.append(-max_amp)
+        upperbounds.append(max_amp)
+    else:
+        for initialprm in initialprms:
+            value=numpy.abs(initialprm)
+            scaledvalue=.3*value
+            if value!=0:
+                lowerbounds.append(initialprm-scaledvalue)
+                upperbounds.append(initialprm+scaledvalue)
+            else:
+                lowerbounds.append(-max_amp)
+                upperbounds.append(max_amp)
+    bounds=[lowerbounds,upperbounds]
+    return tuple(bounds),max_amp
+       
+
+
 
 def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,clskeyswithbadfits):
     """
@@ -654,6 +697,9 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         torprmdict = {}
         mm_energy_list2 = [] # MM Energy after fitting
         classkeylist=[]
+        refine=False
+        flatphaselist=poltype.torsettophaselist[tuple(torset)]
+
         for i in range(len(torset)):
             tor=torset[i]
             # get the atoms in the main torsion about this rotatable bond
@@ -667,7 +713,9 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
                 useweights=True
             else:
                 useweights=False
-
+            
+            if clskey in poltype.classkeytoinitialprmguess.keys():
+                refine=True
             rotbndkey = '%d %d' % (b, c)
             initangle = mol.GetTorsion(a,b,c,d)
             # Identify all torsion parameters involved with current rotatable bond.
@@ -678,15 +726,17 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             else:
                 insert_torphasedict(poltype,mol, tor, torprmdict, initangle, write_prm_dict)
 
-
+        
         tup=tuple(classkeylist)
-        prmidx = insert_torprmdict(poltype,mol, torprmdict)
+        prmidx,initialprms = insert_torprmdict(poltype,mol, torprmdict)
+        
         #poltype.WriteToLog('number of parameters to fit for '+clskey+' are '+str(prmidx))
         # get all the lists for the current clskey
         angle_list = cls_angle_dict[tup]  # Torsion angle for each corresponding energy
         mm_energy_list = cls_mm_engy_dict[tup]  # MM Energy before fitting to QM torsion energy
         qm_energy_list = cls_qm_engy_dict[tup]  # QM torsion energy
         # 'normalize'
+        
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]
         if len(qm_energy_list)<round(prmidx*.5): # then might not be great fit any way, too many QM failed
@@ -711,12 +761,9 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         txtfname=txtfname[:-1]
         txtfname+=".txt"         # create initial fit file, initially it seems to be 2d instead of 3d
         torgen.write_arr_to_file(poltype,txtfname,[tor_energy_list])
-
         # max amplitude of function
-        max_amp = max(tor_energy_list) - min(tor_energy_list)
-        pzero = [ max_amp ] * prmidx
+        boundstup,max_amp=GenerateBoundaries(poltype,tor_energy_list,refine,initialprms)
         # Remove parameters while # of parameters > # data points
-
         toralreadyremovedlist=[]
         while prmidx > len(mm_energy_list):
             
@@ -724,14 +771,14 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             least_conn_tor = find_least_connected_torsion(poltype,torprmdict,toralreadyremovedlist)
             for nfold in torprmdict[least_conn_tor]['prmdict']:
                 dellist.append((least_conn_tor,nfold))
-            prmidx = del_tor_from_fit(poltype,dellist,torprmdict)
+            initialprms,torprmdict = del_tor_from_fit(poltype,dellist,torprmdict)
+            prmidx=len(initialprms)
             if len(dellist)>1:
                 poltype.WriteToLog('torsion cosine terms that are being removed due to having too many parameters to fit '+str(dellist))
                 poltype.WriteToLog('number of parameters to fit for '+clskey+' are '+str(prmidx))
                 toralreadyremovedlist.append(least_conn_tor)
             
-        pzero = [ max_amp ] * prmidx
-
+        pzero = initialprms
         # run leastsq until all the parameter estimates are reasonable
         parm_sanitized = False
         while not parm_sanitized:
@@ -764,35 +811,41 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             # msg : string giving cause of failure if one exists
             # ier : an int. if ier is 1,2,3 or 4, a solution was found, else no solution was found
             #p1,covx,idict,msg,ier = optimize.leastsq(errfunc, pzero, args=(rads(numpy.array(angle_list)),torprmdict, tor_energy_list), full_output = True)
-            array=optimize.least_squares(errfunc, pzero, jac='2-point', bounds=(-max_amp, max_amp), args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
+            array=optimize.least_squares(errfunc, pzero, jac='2-point', bounds=boundstup, args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
             p1=array['x']
             # Remove parameters found by least.sq that aren't reasonable; 
             # remove parameters found that are greater than max_amp
-            for chkclskey in keylist:
-                for nfold in torprmdict[chkclskey]['prmdict']:
-                    # if the param value is greater than max_amp, remove it
-                    if abs(p1[torprmdict[chkclskey]['prmdict'][nfold]]) > max_amp:
-                        dellist.append((chkclskey,nfold))
-                        parm_sanitized = False
-                        break
+            if refine==False:
+                for chkclskey in keylist:
+                    for nfold in torprmdict[chkclskey]['prmdict']:
+                        # if the param value is greater than max_amp, remove it
+                        if abs(p1[torprmdict[chkclskey]['prmdict'][nfold]]) > max_amp:
+                            dellist.append((chkclskey,nfold))
+                            parm_sanitized = False
+                            break
             dellist = list(set(dellist))
             if len(dellist)>1:
                 poltype.WriteToLog('torsion cosine terms that are being removed due to unreasonable parameters '+str(dellist))
                 poltype.WriteToLog('number of parameters to fit for '+clskey+' are '+str(prmidx))
-                prmidx = del_tor_from_fit(poltype,dellist,torprmdict)
+                initialprms,torprmdict = del_tor_from_fit(poltype,dellist,torprmdict)
+                prmidx=len(initialprms)
             # new parameter array since prm size may have changed due to deletions
-            pzero = [ max_amp ] * prmidx
+            pzero = initialprms
 
         # Attempts to insert main torsion type if all are removed
         # Rerur leastsq, this time fitting for the force constants of the main torsion
         if is_torprmdict_all_empty(poltype,torprmdict):
-            toraboutbnd = poltype.rotbndlist[rotbndkey][0]
-            insert_torphasedict(poltype,mol, toraboutbnd, torprmdict,initangle, write_prm_dict,keyfilter = clskey)
+            for i in range(len(torset)):
+                tor=torset[i]
+                a,b,c,d = tor[0:4]
+                rotbndkey = '%d %d' % (b, c)
+                toraboutbnd = poltype.rotbndlist[rotbndkey][0]
+                insert_torphasedict(poltype,mol, toraboutbnd, torprmdict,initangle, write_prm_dict,keyfilter = clskey)
+            prmidx,initialprms = insert_torprmdict(mol, torprmdict)
 
-            prmidx = insert_torprmdict(mol, torprmdict)
-            pzero = [ max_amp ] * prmidx
+            pzero = initialprms
             errfunc = lambda p, x, z, torprmdict, y: fitfunc(poltype,p, x, z, torprmdict) - y
-            array=optimize.least_squares(errfunc, pzero, jac='2-point', bounds=(-max_amp, max_amp), args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
+            array=optimize.least_squares(errfunc, pzero, jac='2-point', bounds=boundstup, args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
             p1=array['x']
 
         # fill in torprmdict with the parameter estimates
@@ -815,14 +868,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
                     torprmdict[chkclskey]['offset'] = p1[-1]
                 else:
                     torprmdict[chkclskey]['offset'] = p1
-        Sx = numpy.array(cls_angle_dict[tup])
-        fitfunc_dict[clskey] = fitfunc(poltype,'eval',torgen.rads(poltype,Sx),torset,torprmdict,debug=False)
-        if len(fitfunc_dict[clskey])==len(tor_energy_list):
-            def RMSD(c):
-                return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.subtract(fitfunc_dict[clskey],tor_energy_list),c))))
-            result=fmin(RMSD,.5)
-            minRMSD=RMSD(result[0])
-           
+        dim=len(cls_angle_dict[tup][0])
         figfname = '%s-fit-' % (poltype.molecprefix)
         for i in range(len(torset)):
             tor=torset[i]
@@ -831,34 +877,117 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             figfname+='_'
         figfname=figfname[:-1]
         figfname+='.png'
-        fig = plt.figure(figsize=(10,10))
-        ax = fig.add_subplot(111)
-        print('fitfunc_dict[clskey]',fitfunc_dict[clskey])
-        for value in fitfunc_dict[clskey]:
-            print('value',value)
-        l1, = ax.plot(Sx,fitfunc_dict[clskey],'r',label='Fit')
-        if useweights==False:
-            lab='QM-MM1'
-        else:
-            lab='Weighted_(QM-MM1)'
-        l2, = ax.plot(Sx,tor_energy_list,'b',label=lab)
-        if useweights==True:
-            l3, = ax.plot(Sx,tor_energy_list_noweight,'black',label='QM-MM1')
+        Sx = numpy.array(cls_angle_dict[tup])
+        out=[]
 
-            plt.legend(handles=[l1,l2,l3],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=3)
-        else:
-            plt.legend(handles=[l1,l2],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=2)
 
+        out.append(cls_angle_dict[tup])
+        for clskey in classkeylist:
+            fitfunc_dict[clskey] = fitfunc(poltype,'eval',torgen.rads(poltype,Sx),torset,torprmdict,debug=False)
+            out.append(fitfunc_dict[clskey])
+            def RMSD(c):
+                return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.subtract(fitfunc_dict[clskey],tor_energy_list),c))))
+            result=fmin(RMSD,.5)
+            minRMSD=RMSD(result[0])
+
+        out.append(tor_energy_list)
         numprms=1 # offset parameter incldued with torsion force constant parameters
         for classkey in torprmdict:
-           numprms+= len(torprmdict[classkey]['prmdict'].keys())
-        # plot figure
+            numprms+= len(torprmdict[classkey]['prmdict'].keys())
         string=' , '.join(list(torprmdict.keys()))
-        ax.text(0.05, 1.1, 'Torsions Being Fit =%s'%(string), transform=ax.transAxes, fontsize=10,verticalalignment='top')
-        ax.text(0, -0.1, 'FoldNum=%s NumPrms=%s DataPts=%s RMSD(fit,QM-MM1),Abs=%s'%(str(len(poltype.nfoldlist)),str(numprms),str(len(mm_energy_list)),round(minRMSD,2)), transform=ax.transAxes, fontsize=10,verticalalignment='bottom')
-        fig.savefig(figfname)
-        torgen.write_arr_to_file(poltype,txtfname,[Sx,fitfunc_dict[clskey],tor_energy_list])
+        datapts=len(mm_energy_list)
+        if dim==1:
+               
+            fig = plt.figure(figsize=(10,10))
+            ax = fig.add_subplot(111)
+            l1, = ax.plot(Sx,fitfunc_dict[clskey],'r',label='Fit')
+            if useweights==False:
+                lab='QM-MM1'
+            else:
+                lab='Weighted_(QM-MM1)'
+            l2, = ax.plot(Sx,tor_energy_list,'b',label=lab)
+            if useweights==True:
+                l3, = ax.plot(Sx,tor_energy_list_noweight,'black',label='QM-MM1')
+
+                plt.legend(handles=[l1,l2,l3],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=3)
+            else:
+                plt.legend(handles=[l1,l2],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=2)
+
+            ax.text(0.05, 1.1, 'Torsions Being Fit =%s'%(string), transform=ax.transAxes, fontsize=10,verticalalignment='top')
+            ax.text(0, -0.1, 'FoldNum=%s NumPrms=%s DataPts=%s RMSD(fit,QM-MM1),Abs=%s'%(str(len(poltype.nfoldlist)),str(numprms),str(len(mm_energy_list)),round(minRMSD,2)), transform=ax.transAxes, fontsize=10,verticalalignment='bottom')
+            fig.savefig(figfname)
+        elif dim==2:
+            tormat,qmmat,mmmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,cls_angle_dict[tup],tor_energy_list,qm_energy_list,mm_energy_list)
+            PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,tormat,'QM-MM1 Heatmap (kcal/mol)','QM-MM1_Heatmap.png',numprms,datapts,minRMSD,string)
+            PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,qmmat,'QM Heatmap (kcal/mol)','QM_Heatmap.png',numprms,datapts,minRMSD,string)
+            PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,mmmat,'MM1 Heatmap (kcal/mol)','MM1_Heatmap.png',numprms,datapts,minRMSD,string)
+
+        torgen.write_arr_to_file(poltype,txtfname,out)
     return write_prm_dict,fitfunc_dict
+
+def PlotHeatmap(poltype,idealanglematrix,actualanglematrix,matrix,title,figfname,numprms,datapts,minRMSD,textstring=None):
+    fig, ax = plt.subplots()
+    im = ax.imshow(matrix)
+
+    cbar = ax.figure.colorbar(im, ax=ax)
+    cbar.ax.set_ylabel('', rotation=-90, va="bottom")
+    yangles=idealanglematrix[:,0,0]
+    yangles=[round(i,1) for i in yangles]
+    xangles=idealanglematrix[0,:,1]
+    xangles=[round(i,1) for i in xangles]
+    # We want to show all ticks...
+    ax.set_xticks(numpy.arange(len(xangles)))
+    ax.set_yticks(numpy.arange(len(yangles)))
+    # ... and label them with the respective list entries
+    ax.set_xticklabels(xangles)
+    ax.set_yticklabels(yangles)
+    ax.set_ylim(len(matrix),-0.5, -0.5) 
+    # Loop over data dimensions and create text annotations.
+    for i in range(len(yangles)):
+        for j in range(len(xangles)):
+            energyvalue=str(round(matrix[i,j],1))
+            value=actualanglematrix[i,j,:]
+            string=str(round(value[0],1))+','+str(round(value[1],1))
+            text = ax.text(j, i, energyvalue,ha="center", va="center", color="w")
+    
+    ax.set_title(title)
+    if textstring!=None:
+        ax.text(0.05, 1.1, 'Torsions Being Fit =%s'%(textstring), transform=ax.transAxes, fontsize=10,verticalalignment='top')
+        ax.text(0, -0.1, 'FoldNum=%s NumPrms=%s DataPts=%s RMSD(fit,QM-MM1),Abs=%s'%(str(len(poltype.nfoldlist)),str(numprms),str(datapts),round(minRMSD,2)), transform=ax.transAxes, fontsize=10,verticalalignment='bottom')
+    else:
+        ax.text(0.05, 1.1, 'RMSD(MM2,QM)=%s'%(round(minRMSD,2)), transform=ax.transAxes, fontsize=12,verticalalignment='top')
+
+
+
+    fig.tight_layout()
+    plt.show() 
+    fig.savefig(figfname)
+
+
+
+def FillInEnergyTensors(poltype,phaseanglearray,actualanglearray,tor_energy_list,qm_energy_list,mm_energy_list):
+    phasetensor=poltype.tensorphases
+    shape=list(phasetensor.shape)
+    shape=shape[:-1]
+    shape=tuple(shape)
+    tormat=numpy.empty(shape)
+    qmmat=numpy.empty(shape)
+    mmmat=numpy.empty(shape)
+    idealanglematrix=poltype.idealangletensor
+    actualanglematrix=numpy.empty(phasetensor.shape)
+    for i in range(len(phaseanglearray)):
+        phasetup=phaseanglearray[i]
+        torenergy=tor_energy_list[i]
+        qmenergy=qm_energy_list[i]
+        mmenergy=mm_energy_list[i]
+        angletup=actualanglearray[i]
+        indexes=numpy.where(numpy.all(phasetensor == numpy.array(phasetup), axis=-1))
+        tormat[indexes]=torenergy
+        qmmat[indexes]=qmenergy
+        mmmat[indexes]=mmenergy
+        actualanglematrix[indexes]=angletup
+    return tormat,qmmat,mmmat,idealanglematrix,actualanglematrix
+
 
 def write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename):
     """
@@ -989,38 +1118,46 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             figfname+='_'
         figfname=figfname[:-1]
         figfname+='.png'
-        fig = plt.figure(figsize=(10,10))
-        #fig.subplots_adjust(right=0.75,left=0.05,top=0.95,bottom=0.05)
-        ax = fig.add_subplot(111)
-        # energy profiles: mm (pre-fit), mm (post-fit), qm
-        line1, =ax.plot(mang_list,mm_energy_list,'g',label='MM1 (prefit)')
-        line2, =ax.plot(m2ang_list,mm2_energy_list,'r',label='MM2 (postfit)')
-        line3, =ax.plot(qang_list,qm_energy_list,'b',label='QM')
-        if count>0:
-            ax.text(0.05, 1.1, 'RMSD_Weighted(MM2,QM)=%s'%(round(minRMSDW,2)), transform=ax.transAxes, fontsize=12,verticalalignment='top')
-        else:
-            ax.text(0.05, 1.1, 'RMSD(MM2,QM)=%s'%(round(minRMSD,2)), transform=ax.transAxes, fontsize=12,verticalalignment='top')
+        dim=len(mang_list[0])
+        datapts=len(mm_energy_list)
+        numprms=None 
 
-        # mm + fit
-        line4, =ax.plot(mang_list,ff_list,'md-',label='MM1+Fit')
-        ax2=ax.twinx()
-        # make a plot with different y-axis using second axis object
-        line5, =ax2.plot(qang_list,WBOarray,'y',label='WBO')
-        ax2.set_ylabel("WBO",color="blue",fontsize=14)
-        ax.set_xlabel('Dihedral Angle')
-        ax.set_ylabel('SP Energy (kcal/mol)')
-        plt.legend(handles=[line1,line2,line3,line4,line5],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
+        if dim==1: 
+            fig = plt.figure(figsize=(10,10))
+            ax = fig.add_subplot(111)
+            # energy profiles: mm (pre-fit), mm (post-fit), qm
+            line1, =ax.plot(mang_list,mm_energy_list,'g',label='MM1 (prefit)')
+            line2, =ax.plot(m2ang_list,mm2_energy_list,'r',label='MM2 (postfit)')
+            line3, =ax.plot(qang_list,qm_energy_list,'b',label='QM')
+            if count>0:
+                ax.text(0.05, 1.1, 'RMSD_Weighted(MM2,QM)=%s'%(round(minRMSDW,2)), transform=ax.transAxes, fontsize=12,verticalalignment='top')
+            else:
+                ax.text(0.05, 1.1, 'RMSD(MM2,QM)=%s'%(round(minRMSD,2)), transform=ax.transAxes, fontsize=12,verticalalignment='top')
 
-        fig = plt.gcf()
-        plt.show()
-        fig.savefig(figfname)
+            # mm + fit
+            line4, =ax.plot(mang_list,ff_list,'md-',label='MM1+Fit')
+            ax2=ax.twinx()
+            # make a plot with different y-axis using second axis object
+            line5, =ax2.plot(qang_list,WBOarray,'y',label='WBO')
+            ax2.set_ylabel("WBO",color="blue",fontsize=14)
+            ax.set_xlabel('Dihedral Angle')
+            ax.set_ylabel('SP Energy (kcal/mol)')
+            plt.legend(handles=[line1,line2,line3,line4,line5],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
+
+            fig = plt.gcf()
+            plt.show()
+            fig.savefig(figfname)
+        elif dim==2:
+            mmmat,mm2mat,fmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,mang_list,mm_energy_list,mm2_energy_list,ff_list)
+            PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,mm2mat,'MM2 Heatmap (kcal/mol)','MM2_Heatmap.png',numprms,datapts,minRMSD)
+            PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,fmat,'MM1=Fit Heatmap (kcal/mol)','MM1+Fit_Heatmap.png',numprms,datapts,minRMSD)
+
 
 
         txtfname = figfname.replace('.png','.txt')
-        seperate_angle_lists = list(zip(*mang_list)) 
+ 
         out=[]
-        for ls in seperate_angle_lists:
-            out.append(list(ls))
+        out.append(mang_list)
         out.append(mm_energy_list)
         out.append(mm2_energy_list)
         out.append(qm_energy_list)

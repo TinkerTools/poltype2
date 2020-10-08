@@ -1,0 +1,166 @@
+parameters /home/bdw2292/poltype-poltype2-latest/amoebabio18_header.prm
+
+TARGET-DIPOLE -1.091 -0.001 -0.978
+atom          404    404    N     "aniline             "         7    14.007    3
+atom          401    401    C     "aniline             "         6    12.011    3
+atom          403    403    C     "aniline             "         6    12.011    3
+atom          402    402    C     "aniline             "         6    12.011    3
+atom          405    405    C     "aniline             "         6    12.011    3
+atom          406    406    H     "aniline             "         1     1.008    1
+atom         408   408    H     "aniline             "         1     1.008    1
+atom         409   409    H     "aniline             "         1     1.008    1
+atom         407   407    H     "aniline             "         1     1.008    1
+
+vdw       404  3.7100   0.1050
+SOLUTE 404 [#7;D3] 3.71 3.71
+
+vdw       401  3.8000   0.0910
+SOLUTE 401 [cH0] 3.8 3.8
+
+vdw       403  3.8000   0.0910
+SOLUTE 403 c([cH0]) 3.8 3.8
+
+vdw       402  3.8000   0.0910
+SOLUTE 402 c(c([cH0])) 3.8 3.8
+
+vdw       405  3.8000   0.0910
+SOLUTE 405 c(c(c([cH0]))) 3.8 3.8
+
+vdw       406  2.9800   0.0260 0.920
+SOLUTE 406 [#1](c) 2.98 2.98
+
+vdw       408  2.9800   0.0260 0.920
+SOLUTE 408 [#1](c) 2.98 2.98
+
+vdw       409  2.9800   0.0260 0.920
+SOLUTE 409 [#1](c) 2.98 2.98
+
+vdw       407  2.7000   0.0200 0.910
+SOLUTE 407 [#1]([N;D3]) 2.7 2.7
+
+bond      404   407   520.0000    1.0107
+bond      401   404   250.0000    1.3993
+bond      401   403   610.9000    1.4001
+bond      402   403   610.9000    1.3897
+bond      403   406   370.5000    1.0876
+bond      402   405   610.9000    1.3923
+bond      402   408   370.5000    1.0863
+bond      405   409   370.5000    1.0855
+anglep     401   403   402    64.6700  120.4161
+anglep     403   402   405    64.6700  120.7512
+anglep     403   401   403    64.6700  118.7252
+anglep     403   401   404    60.0000  120.6058
+anglep     402   405   402    64.6700  118.9401
+anglep     402   403   406    32.0000  120.0372
+anglep     401   403   406    32.0000  119.5450
+anglep     405   402   408    32.0000  120.0054
+anglep     403   402   408    32.0000  119.2432
+anglep     402   405   409    32.0000  120.5242
+angle     407   404   407    35.0000  110.9298
+angle     401   404   407    35.0000  114.2537
+strbnd    401   403   402    18.7000   18.7000
+strbnd    403   402   405    18.7000   18.7000
+strbnd    403   401   403    18.7000   18.7000
+strbnd    403   401   404    18.7000   18.7000
+strbnd    402   405   402    18.7000   18.7000
+strbnd    402   403   406    11.5000   18.7000
+strbnd    401   403   406    11.5000   18.7000
+strbnd    405   402   408    11.5000   18.7000
+strbnd    403   402   408    11.5000   18.7000
+strbnd    402   405   409    11.5000   18.7000
+strbnd    401   404   407     4.3000    7.2000
+strbnd    407   404   407     4.3000    7.2000
+opbend    401   403     0     0    14.3880
+opbend    402   403     0     0    14.3880
+opbend    402   405     0     0    14.3880
+opbend    403   401     0     0    14.3880
+opbend    403   402     0     0    14.3880
+opbend    404   401     0     0    14.4000
+opbend    405   402     0     0    14.3880
+opbend    406   403     0     0    15.1074
+opbend    408   402     0     0    15.1074
+opbend    409   405     0     0    15.1074
+# Transferred Torsion assigned from SMARTS [*]~cc~[*] torsion atom indexes = 6,4,2,1 with smiles torsion indices 1,2,3,4
+torsion   404   401   403   402     0.0000 0.0 1    14.0000 180.0 2     0.0000 0.0 3
+# Transferred Torsion assigned from SMARTS [*]~cc~[*] torsion atom indexes = 9,4,2,1 with smiles torsion indices 1,2,3,4
+torsion   404   401   403   406     0.0000 0.0 1    14.0000 180.0 2     0.0000 0.0 3
+# Transferred Torsion assigned from SMARTS [cH0]ccc torsion atom indexes = 2,4,6,7 with smiles torsion indices 1,2,3,4
+torsion   405   402   403   401    -0.6700 0.0 1     4.0040 180.0 2     0.0000 0.0 3
+# Transferred Torsion assigned from SMARTS [cH0]cc[#1] torsion atom indexes = 2,4,6,11 with smiles torsion indices 1,2,3,4
+torsion   408   402   403   401     0.5500 0.0 1     4.5340 180.0 2    -0.5500 0.0 3
+# Transferred Torsion assigned from SMARTS ccc[#1] torsion atom indexes = 4,6,7,12 with smiles torsion indices 1,2,3,4
+torsion   403   402   405   409     0.5500 0.0 1     4.5340 180.0 2    -0.5500 0.0 3
+# Transferred Torsion assigned from SMARTS cccc torsion atom indexes = 6,7,5,3 with smiles torsion indices 1,2,3,4
+torsion   403   402   405   402    -0.6700 0.0 1     4.0040 180.0 2     0.0000 0.0 3
+# Transferred Torsion assigned from SMARTS c[cH0]cc torsion atom indexes = 4,2,3,5 with smiles torsion indices 1,2,3,4
+torsion   403   401   403   402    -0.6700 0.0 1     4.0040 180.0 2     0.0000 0.0 3
+# Transferred Torsion assigned from SMARTS c[cH0]c[#1] torsion atom indexes = 4,2,3,8 with smiles torsion indices 1,2,3,4
+torsion   403   401   403   406     0.5500 0.0 1     4.5340 180.0 2    -0.5500 0.0 3
+# Transferred Torsion assigned from SMARTS [*]~[#6]~[#7]~[*] torsion atom indexes = 4,2,1,13 with smiles torsion indices 1,2,3,4
+torsion   403   401   404   407     0.0000 0.0 1    -0.9200 180.0 2     0.0000 0.0 3
+# Transferred Torsion assigned from SMARTS ccc[#1] torsion atom indexes = 6,7,5,10 with smiles torsion indices 1,2,3,4
+torsion   408   402   405   402     0.5500 0.0 1     4.5340 180.0 2    -0.5500 0.0 3
+# Transferred Torsion assigned from SMARTS ccc[#1] torsion atom indexes = 7,6,4,9 with smiles torsion indices 1,2,3,4
+torsion   405   402   403   406     0.5500 0.0 1     4.5340 180.0 2    -0.5500 0.0 3
+# Transferred Torsion assigned from SMARTS [#1]cc([#1])([cH0]) torsion atom indexes = 11,6,4,9,2 with smiles torsion indices 1,2,3,4
+torsion   408   402   403   406     0.0000 0.0 1     4.0720 180.0 2     0.0000 0.0 3
+# Transferred Torsion assigned from SMARTS [#1]cc([#1])(c[cH0]) torsion atom indexes = 12,7,6,11,4,2 with smiles torsion indices 1,2,3,4
+torsion   408   402   405   409     0.0000 0.0 1     4.0720 180.0 2     0.0000 0.0 3
+
+multipole   404  401 -407 -407         -0.31329
+                                        0.00000    0.00000    0.36785
+                                       -0.62093
+                                        0.00000    0.38994
+                                        0.00000    0.00000    0.23099
+multipole   401  404  403               0.27123
+                                        0.00000    0.00000    0.56063
+                                       -0.23090
+                                        0.00000   -0.01538
+                                        0.00000    0.00000    0.24628
+multipole   403  401  402              -0.06646
+                                       -0.06105    0.00000    0.05585
+                                        0.06029
+                                        0.00000   -0.38072
+                                       -0.02587    0.00000    0.32043
+multipole   402  403  405               0.06423
+                                        0.09745    0.00000    0.04562
+                                        0.13826
+                                        0.00000   -0.14037
+                                        0.14297    0.00000    0.00211
+multipole   405 -402 -402              -0.05562
+                                        0.00000    0.00000   -0.02643
+                                        0.24775
+                                        0.00000   -0.38064
+                                        0.00000    0.00000    0.13289
+multipole   406  403  401              -0.00942
+                                       -0.04957    0.00000   -0.17345
+                                       -0.01385
+                                        0.00000    0.08688
+                                       -0.01604    0.00000   -0.07303
+multipole   408  402  403               0.00224
+                                        0.00147    0.00000   -0.16073
+                                        0.12916
+                                        0.00000   -0.04164
+                                       -0.01034    0.00000   -0.08752
+multipole   409  405  402              -0.00496
+                                        0.00000    0.00000   -0.17463
+                                        0.07435
+                                        0.00000    0.01448
+                                        0.00000    0.00000   -0.08883
+multipole   407  404  401               0.06073
+                                       -0.13722    0.00000   -0.48605
+                                        0.23006
+                                        0.00000    0.26390
+                                       -0.08829    0.00000   -0.49396
+
+polarize           404          1.0730     0.3900 401 407
+polarize           401          1.7500     0.3900 404 403
+polarize           403          1.7500     0.3900 401 402 406
+polarize           402          1.7500     0.3900 403 405 408
+polarize           405          1.7500     0.3900 402 409
+polarize           406          0.6960     0.3900 403
+polarize          408          0.6960     0.3900 402
+polarize          409          0.6960     0.3900 405
+polarize          407          0.4960     0.3900 404
+
+

@@ -1,0 +1,448 @@
+Wed Feb 19 13:03:40 2020 Calling: ssh node35 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;mkdir /scratch/bdw2292/Gau-ModifiedRes"
+mkdir: cannot create directory ‘/scratch/bdw2292/Gau-ModifiedRes’: File exists
+Wed Feb 19 13:03:42 2020 Calling: ssh node35 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com"
+Wed Feb 19 13:03:42 2020 Calling: ssh node36 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;mkdir /scratch/bdw2292/Gau-ModifiedRes"
+Wed Feb 19 13:03:44 2020 Calling: ssh node36 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com"
+Wed Feb 19 13:03:44 2020 Calling: ssh node37 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;mkdir /scratch/bdw2292/Gau-ModifiedRes"
+mkdir: cannot create directory ‘/scratch/bdw2292/Gau-ModifiedRes’: File exists
+mkdir: cannot create directory ‘/scratch/bdw2292/Gau-ModifiedRes’: File exists
+Wed Feb 19 13:03:46 2020 Calling: ssh node37 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com"
+Wed Feb 19 13:03:46 2020 Calling: ssh node38 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;mkdir /scratch/bdw2292/Gau-ModifiedRes"
+mkdir: cannot create directory `/scratch/bdw2292/Gau-ModifiedRes': File exists
+Wed Feb 19 13:03:49 2020 Calling: ssh node38 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com"
+Wed Feb 19 13:03:49 2020 Calling: ssh node40 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;mkdir /scratch/bdw2292/Gau-ModifiedRes"
+Wed Feb 19 13:03:51 2020 Calling: ssh node40 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com"
+Wed Feb 19 13:03:51 2020 Calling: ssh node42 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;mkdir /scratch/bdw2292/Gau-ModifiedRes"
+mkdir: cannot create directory `/scratch/bdw2292/Gau-ModifiedRes': File exists
+Wed Feb 19 13:03:53 2020 Calling: ssh node42 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com"
+mkdir: cannot create directory `/scratch/bdw2292/Gau-ModifiedRes': File exists
+Wed Feb 19 13:03:53 2020 Calling: ssh node43 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;mkdir /scratch/bdw2292/Gau-ModifiedRes"
+mkdir: cannot create directory ‘/scratch/bdw2292/Gau-ModifiedRes’: File exists
+Wed Feb 19 13:03:55 2020 Calling: ssh node43 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com"
+Wed Feb 19 13:03:55 2020 Calling: ssh node44 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;mkdir /scratch/bdw2292/Gau-ModifiedRes"
+Wed Feb 19 13:03:57 2020 Calling: ssh node44 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com"
+Wed Feb 19 13:03:57 2020 Calling: ssh node45 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;mkdir /scratch/bdw2292/Gau-ModifiedRes"
+mkdir: cannot create directory `/scratch/bdw2292/Gau-ModifiedRes': File exists
+Wed Feb 19 13:03:59 2020 Calling: ssh node45 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com"
+Wed Feb 19 13:03:59 2020 Calling: ssh node46 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;mkdir /scratch/bdw2292/Gau-ModifiedRes"
+mkdir: cannot create directory `/scratch/bdw2292/Gau-ModifiedRes': File exists
+Wed Feb 19 13:04:01 2020 Calling: ssh node46 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com"
+Wed Feb 19 13:04:01 2020 Calling: ssh node47 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;mkdir /scratch/bdw2292/Gau-ModifiedRes"
+mkdir: cannot create directory `/scratch/bdw2292/Gau-ModifiedRes': File exists
+mkdir: cannot create directory `/scratch/bdw2292/Gau-ModifiedRes': File exists
+Wed Feb 19 13:04:03 2020 Calling: ssh node47 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com"
+Wed Feb 19 13:04:03 2020 Calling: ssh node48 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;mkdir /scratch/bdw2292/Gau-ModifiedRes"
+Wed Feb 19 13:04:05 2020 Calling: ssh node48 "cd /home/bdw2292/PoltypeJobs/CNC_200115/qm-torsion;source /home/bdw2292/.poltype.bashrc;GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com"
+mkdir: cannot create directory `/scratch/bdw2292/Gau-ModifiedRes': File exists
+Wed Feb 19 13:04:10 2020 Sleeping for 5 seconds
+Wed Feb 19 13:04:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:04:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:04:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:04:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:04:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:04:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:04:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:04:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:04:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:04:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:04:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:04:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:04:15 2020 Sleeping for 5 seconds
+Wed Feb 19 13:04:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:04:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:04:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:04:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:04:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:04:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:04:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:04:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:04:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:04:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:04:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:04:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:04:20 2020 Sleeping for 5 seconds
+Wed Feb 19 13:04:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:04:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:04:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:04:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:04:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:04:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:04:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:04:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:04:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:04:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:04:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:04:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:04:25 2020 Sleeping for 5 seconds
+Wed Feb 19 13:04:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:04:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:04:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:04:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:04:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:04:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:04:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:04:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:04:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:04:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:04:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:04:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:04:30 2020 Sleeping for 5 seconds
+Wed Feb 19 13:04:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:04:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:04:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:04:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:04:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:04:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:04:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:04:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:04:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:04:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:04:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:04:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:04:35 2020 Sleeping for 5 seconds
+Wed Feb 19 13:04:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:04:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:04:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:04:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:04:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:04:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:04:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:04:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:04:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:04:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:04:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:04:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:04:40 2020 Sleeping for 5 seconds
+Wed Feb 19 13:04:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:04:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:04:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:04:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:04:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:04:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:04:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:04:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:04:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:04:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:04:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:04:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:04:45 2020 Sleeping for 5 seconds
+Wed Feb 19 13:04:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:04:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:04:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:04:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:04:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:04:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:04:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:04:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:04:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:04:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:04:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:04:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:04:50 2020 Sleeping for 5 seconds
+Wed Feb 19 13:04:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:04:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:04:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:04:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:04:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:04:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:04:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:04:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:04:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:04:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:04:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:04:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:04:55 2020 Sleeping for 5 seconds
+Wed Feb 19 13:04:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:04:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:04:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:04:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:04:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:04:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:04:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:04:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:04:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:04:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:04:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:04:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:05:00 2020 Sleeping for 5 seconds
+Wed Feb 19 13:05:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:05:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:05:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:05:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:05:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:05:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:05:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:05:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:05:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:05:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:05:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:05:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:05:05 2020 Sleeping for 5 seconds
+Wed Feb 19 13:05:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:05:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:05:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:05:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:05:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:05:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:05:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:05:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:05:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:05:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:05:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:05:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:05:10 2020 Sleeping for 5 seconds
+Wed Feb 19 13:05:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:05:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:05:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:05:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:05:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:05:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:05:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:05:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:05:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:05:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:05:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:05:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:05:15 2020 Sleeping for 5 seconds
+Wed Feb 19 13:05:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:05:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:05:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:05:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:05:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:05:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:05:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:05:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:05:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:05:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:05:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:05:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:05:20 2020 Sleeping for 5 seconds
+Wed Feb 19 13:05:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:05:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:05:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:05:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:05:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:05:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:05:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:05:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:05:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:05:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:05:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:05:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:05:25 2020 Sleeping for 5 seconds
+Wed Feb 19 13:05:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:05:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:05:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:05:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:05:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:05:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:05:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:05:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:05:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:05:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:05:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:05:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:05:30 2020 Sleeping for 5 seconds
+Wed Feb 19 13:05:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:05:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:05:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:05:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:05:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:05:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:05:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:05:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:05:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:05:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:05:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:05:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:05:35 2020 Sleeping for 5 seconds
+Wed Feb 19 13:05:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:05:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:05:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:05:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:05:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:05:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:05:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:05:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:05:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:05:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:05:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:05:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:05:40 2020 Sleeping for 5 seconds
+Wed Feb 19 13:05:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:05:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:05:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:05:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:05:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:05:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:05:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:05:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:05:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:05:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:05:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:05:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:05:45 2020 Sleeping for 5 seconds
+Wed Feb 19 13:05:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:05:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:05:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:05:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:05:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:05:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has not terminated on node node42
+Wed Feb 19 13:05:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:05:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:05:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:05:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:05:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:05:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:05:50 2020 Sleeping for 5 seconds
+Wed Feb 19 13:05:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:05:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:05:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:05:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:05:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:05:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-341.com has terminated on node node42
+Wed Feb 19 13:05:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:05:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:05:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:05:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:05:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:05:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:05:55 2020 Sleeping for 5 seconds
+Wed Feb 19 13:05:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:05:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:05:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:05:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:05:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has not terminated on node node40
+Wed Feb 19 13:05:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:05:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has not terminated on node node44
+Wed Feb 19 13:05:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has not terminated on node node45
+Wed Feb 19 13:05:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:05:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:05:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:06:00 2020 Sleeping for 5 seconds
+Wed Feb 19 13:06:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:06:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:06:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:06:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:06:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-311.com has terminated on node node40
+Wed Feb 19 13:06:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:06:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-131.com has terminated on node node44
+Wed Feb 19 13:06:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-101.com has terminated on node node45
+Wed Feb 19 13:06:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has not terminated on node node46
+Wed Feb 19 13:06:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:06:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:06:05 2020 Sleeping for 5 seconds
+Wed Feb 19 13:06:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has not terminated on node node35
+Wed Feb 19 13:06:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:06:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:06:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:06:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has not terminated on node node43
+Wed Feb 19 13:06:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-071.com has terminated on node node46
+Wed Feb 19 13:06:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:06:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:06:10 2020 Sleeping for 5 seconds
+Wed Feb 19 13:06:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-191.com has terminated on node node35
+Wed Feb 19 13:06:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:06:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:06:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:06:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-161.com has terminated on node node43
+Wed Feb 19 13:06:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has not terminated on node node47
+Wed Feb 19 13:06:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:06:15 2020 Sleeping for 5 seconds
+Wed Feb 19 13:06:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:06:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:06:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:06:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-041.com has terminated on node node47
+Wed Feb 19 13:06:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has not terminated on node node48
+Wed Feb 19 13:06:20 2020 Sleeping for 5 seconds
+Wed Feb 19 13:06:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:06:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:06:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:06:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-011.com has terminated on node node48
+Wed Feb 19 13:06:25 2020 Sleeping for 5 seconds
+Wed Feb 19 13:06:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:06:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:06:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:06:30 2020 Sleeping for 5 seconds
+Wed Feb 19 13:06:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:06:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:06:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:06:35 2020 Sleeping for 5 seconds
+Wed Feb 19 13:06:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:06:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:06:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:06:40 2020 Sleeping for 5 seconds
+Wed Feb 19 13:06:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:06:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:06:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:06:45 2020 Sleeping for 5 seconds
+Wed Feb 19 13:06:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:06:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:06:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:06:50 2020 Sleeping for 5 seconds
+Wed Feb 19 13:06:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:06:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:06:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:06:55 2020 Sleeping for 5 seconds
+Wed Feb 19 13:06:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:06:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has not terminated on node node37
+Wed Feb 19 13:06:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:07:00 2020 Sleeping for 5 seconds
+Wed Feb 19 13:07:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:07:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-251.com has terminated on node node37
+Wed Feb 19 13:07:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has not terminated on node node38
+Wed Feb 19 13:07:05 2020 Sleeping for 5 seconds
+Wed Feb 19 13:07:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:07:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-281.com has terminated on node node38
+Wed Feb 19 13:07:10 2020 Sleeping for 5 seconds
+Wed Feb 19 13:07:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:07:15 2020 Sleeping for 5 seconds
+Wed Feb 19 13:07:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:07:20 2020 Sleeping for 5 seconds
+Wed Feb 19 13:07:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:07:25 2020 Sleeping for 5 seconds
+Wed Feb 19 13:07:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:07:30 2020 Sleeping for 5 seconds
+Wed Feb 19 13:07:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:07:35 2020 Sleeping for 5 seconds
+Wed Feb 19 13:07:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:07:40 2020 Sleeping for 5 seconds
+Wed Feb 19 13:07:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:07:45 2020 Sleeping for 5 seconds
+Wed Feb 19 13:07:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:07:50 2020 Sleeping for 5 seconds
+Wed Feb 19 13:07:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:07:55 2020 Sleeping for 5 seconds
+Wed Feb 19 13:07:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:08:00 2020 Sleeping for 5 seconds
+Wed Feb 19 13:08:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:08:05 2020 Sleeping for 5 seconds
+Wed Feb 19 13:08:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:08:10 2020 Sleeping for 5 seconds
+Wed Feb 19 13:08:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:08:15 2020 Sleeping for 5 seconds
+Wed Feb 19 13:08:15 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:08:20 2020 Sleeping for 5 seconds
+Wed Feb 19 13:08:20 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:08:25 2020 Sleeping for 5 seconds
+Wed Feb 19 13:08:25 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:08:30 2020 Sleeping for 5 seconds
+Wed Feb 19 13:08:30 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:08:35 2020 Sleeping for 5 seconds
+Wed Feb 19 13:08:35 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:08:40 2020 Sleeping for 5 seconds
+Wed Feb 19 13:08:40 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:08:45 2020 Sleeping for 5 seconds
+Wed Feb 19 13:08:45 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:08:50 2020 Sleeping for 5 seconds
+Wed Feb 19 13:08:50 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:08:55 2020 Sleeping for 5 seconds
+Wed Feb 19 13:08:55 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:09:00 2020 Sleeping for 5 seconds
+Wed Feb 19 13:09:00 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:09:05 2020 Sleeping for 5 seconds
+Wed Feb 19 13:09:05 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has not terminated on node node36
+Wed Feb 19 13:09:10 2020 Sleeping for 5 seconds
+Wed Feb 19 13:09:10 2020 GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-5-11-12-13-221.com has terminated on node node36
+Wed Feb 19 13:09:15 2020 Sleeping for 5 seconds
+Wed Feb 19 13:09:15 2020 All jobs have finished 

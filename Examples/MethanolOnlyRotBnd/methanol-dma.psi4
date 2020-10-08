@@ -1,0 +1,17 @@
+molecule { 
+0 1
+O            0.690256010091     0.021077645631     0.007120983199
+C           -0.722885496089     0.029155852584     0.009879650728
+H           -1.147666658208    -0.713337175374     0.701390439387
+H           -1.147700645448    -0.140835903928    -0.990406038765
+H           -1.030821790189     1.021944315270     0.345846751738
+H            0.978599067489    -0.849442509537    -0.287481631922
+}
+memory 100GB
+set_num_threads(8)
+psi4_io.set_default_path("/scratch/bdw2292/Psi4-methanol")
+set freeze_core True
+set PROPERTIES_ORIGIN ["COM"]
+E, wfn = energy('mp2/6-311G**',properties=['dipole'],return_wfn=True)
+fchk(wfn, "methanol-dma.fchk")
+clean()

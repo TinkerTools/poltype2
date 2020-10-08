@@ -1,0 +1,1007 @@
+Mon Sep 21 14:16:20 2020 Running on host: node37.bme.utexas.edu
+Mon Sep 21 14:16:20 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Mon Sep 21 14:16:20 2020  Calling: /home/bdw2292/miniconda3/envs/p4env/bin/obminimize -ff MMFF94 acetamide.sdf >acetamide_OBOPT.pdb path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+
+A T O M   T Y P E S
+
+IDX	TYPE	RING
+1	7	NO
+2	10	NO
+3	1	NO
+4	3	NO
+5	5	NO
+6	5	NO
+7	5	NO
+8	28	NO
+9	28	NO
+
+F O R M A L   C H A R G E S
+
+IDX	CHARGE
+1	0.000000
+2	0.000000
+3	0.000000
+4	0.000000
+5	0.000000
+6	0.000000
+7	0.000000
+8	0.000000
+9	0.000000
+
+P A R T I A L   C H A R G E S
+
+IDX	CHARGE
+1	-0.570000
+2	-0.800000
+3	0.061000
+4	0.569000
+5	0.000000
+6	0.000000
+7	0.000000
+8	0.370000
+9	0.370000
+
+S E T T I N G   U P   C A L C U L A T I O N S
+
+SETTING UP BOND CALCULATIONS...
+SETTING UP ANGLE & STRETCH-BEND CALCULATIONS...
+SETTING UP TORSION CALCULATIONS...
+SETTING UP OOP CALCULATIONS...
+SETTING UP VAN DER WAALS CALCULATIONS...
+SETTING UP ELECTROSTATIC CALCULATIONS...
+
+C O N J U G A T E   G R A D I E N T S
+
+STEPS = 2500
+
+STEP n     E(n)       E(n-1)    
+--------------------------------
+    1     -28.409     -28.301
+   10     -28.780     -28.770
+   20     -28.814     -28.814
+   30     -28.822     -28.821
+   40     -28.826     -28.826
+   50     -28.829     -28.828
+   60     -28.830     -28.830
+   70     -28.832     -28.832
+   80     -28.834     -28.834
+   90     -28.834     -28.834
+  100     -28.835     -28.835
+  110     -28.841     -28.841
+  120     -28.841     -28.841
+  130     -28.842     -28.842
+  140     -28.843     -28.843
+  150     -28.843     -28.843
+  160     -28.843     -28.843
+  170     -28.843     -28.843
+  180     -28.843     -28.843
+  190     -28.843     -28.843
+  200     -28.843     -28.843
+  210     -28.843     -28.843
+  220     -28.843     -28.843
+  230     -28.843     -28.843
+  240     -28.843     -28.843
+  250     -28.843     -28.843
+  260     -28.843     -28.843
+  270     -28.843     -28.843
+  280     -28.843     -28.843
+  290     -28.843     -28.843
+  300     -28.843     -28.843
+  310     -28.843     -28.843
+  320     -28.843     -28.843
+  330     -28.843     -28.843
+  340     -28.843     -28.843
+  350     -28.843     -28.843
+  360     -28.843     -28.843
+  370     -28.843     -28.843
+  380     -28.843     -28.843
+  390     -28.843     -28.843
+  400     -28.843     -28.843
+  410     -28.843     -28.843
+  420     -28.843     -28.843
+  430     -28.843     -28.843
+  440     -28.843     -28.843
+  450     -28.843     -28.843
+  460     -28.843     -28.843
+  470     -28.843     -28.843
+  480     -28.843     -28.843
+  490     -28.843     -28.843
+  500     -28.843     -28.843
+  510     -28.843     -28.843
+  520     -28.843     -28.843
+  530     -28.843     -28.843
+  540     -28.843     -28.843
+  550     -28.843     -28.843
+  560     -28.843     -28.843
+  570     -28.843     -28.843
+  580     -28.843     -28.843
+  590     -28.843     -28.843
+  600     -28.843     -28.843
+  610     -28.843     -28.843
+  620     -28.843     -28.843
+  630     -28.843     -28.843
+  640     -28.843     -28.843
+  650     -28.843     -28.843
+  660     -28.843     -28.843
+  670     -28.843     -28.843
+  680     -28.843     -28.843
+  690     -28.843     -28.843
+  700     -28.843     -28.843
+  710     -28.843     -28.843
+  720     -28.843     -28.843
+  730     -28.843     -28.843
+  740     -28.843     -28.843
+  750     -28.843     -28.843
+  760     -28.843     -28.843
+  770     -28.843     -28.843
+  780     -28.843     -28.843
+  790     -28.843     -28.843
+  800     -28.843     -28.843
+  810     -28.843     -28.843
+  820     -28.843     -28.843
+  830     -28.843     -28.843
+  840     -28.843     -28.843
+  850     -28.843     -28.843
+  860     -28.843     -28.843
+  870     -28.843     -28.843
+  880     -28.843     -28.843
+  890     -28.843     -28.843
+  900     -28.843     -28.843
+  910     -28.843     -28.843
+  920     -28.843     -28.843
+  930     -28.843     -28.843
+  940     -28.843     -28.843
+  950     -28.843     -28.843
+  960     -28.843     -28.843
+  970     -28.843     -28.843
+  980     -28.843     -28.843
+  990     -28.843     -28.843
+ 1000     -28.843     -28.843
+ 1010     -28.843     -28.843
+ 1020     -28.843     -28.843
+ 1030     -28.843     -28.843
+ 1040     -28.843     -28.843
+ 1050     -28.843     -28.843
+ 1060     -28.843     -28.843
+ 1070     -28.843     -28.843
+ 1080     -28.843     -28.843
+ 1090     -28.843     -28.843
+ 1100     -28.843     -28.843
+ 1110     -28.843     -28.843
+ 1120     -28.843     -28.843
+ 1130     -28.843     -28.843
+ 1140     -28.843     -28.843
+ 1150     -28.843     -28.843
+ 1160     -28.843     -28.843
+ 1170     -28.843     -28.843
+ 1180     -28.843     -28.843
+ 1190     -28.843     -28.843
+ 1200     -28.843     -28.843
+ 1210     -28.843     -28.843
+ 1220     -28.843     -28.843
+ 1230     -28.843     -28.843
+ 1240     -28.843     -28.843
+ 1250     -28.843     -28.843
+ 1260     -28.843     -28.843
+ 1270     -28.843     -28.843
+ 1280     -28.843     -28.843
+ 1290     -28.843     -28.843
+ 1300     -28.843     -28.843
+ 1310     -28.843     -28.843
+ 1320     -28.843     -28.843
+ 1330     -28.843     -28.843
+ 1340     -28.843     -28.843
+ 1350     -28.843     -28.843
+ 1360     -28.843     -28.843
+ 1370     -28.843     -28.843
+ 1380     -28.843     -28.843
+ 1390     -28.843     -28.843
+ 1400     -28.843     -28.843
+ 1410     -28.843     -28.843
+ 1420     -28.843     -28.843
+ 1430     -28.843     -28.843
+ 1440     -28.843     -28.843
+ 1450     -28.843     -28.843
+ 1460     -28.843     -28.843
+ 1470     -28.843     -28.843
+ 1480     -28.843     -28.843
+ 1490     -28.843     -28.843
+ 1500     -28.843     -28.843
+ 1510     -28.843     -28.843
+ 1520     -28.843     -28.843
+ 1530     -28.843     -28.843
+ 1540     -28.843     -28.843
+ 1550     -28.843     -28.843
+ 1560     -28.843     -28.843
+ 1570     -28.843     -28.843
+ 1580     -28.843     -28.843
+ 1590     -28.843     -28.843
+ 1600     -28.843     -28.843
+ 1610     -28.843     -28.843
+ 1620     -28.843     -28.843
+ 1630     -28.843     -28.843
+ 1640     -28.843     -28.843
+ 1650     -28.843     -28.843
+ 1660     -28.843     -28.843
+ 1670     -28.843     -28.843
+ 1680     -28.843     -28.843
+ 1690     -28.843     -28.843
+ 1700     -28.843     -28.843
+ 1710     -28.843     -28.843
+ 1720     -28.843     -28.843
+ 1730     -28.843     -28.843
+ 1740     -28.843     -28.843
+ 1750     -28.843     -28.843
+ 1760     -28.843     -28.843
+ 1770     -28.843     -28.843
+ 1780     -28.843     -28.843
+ 1790     -28.843     -28.843
+ 1800     -28.843     -28.843
+ 1810     -28.843     -28.843
+ 1820     -28.843     -28.843
+ 1830     -28.843     -28.843
+ 1840     -28.843     -28.843
+ 1850     -28.843     -28.843
+ 1860     -28.843     -28.843
+ 1870     -28.843     -28.843
+ 1880     -28.843     -28.843
+ 1890     -28.843     -28.843
+ 1900     -28.843     -28.843
+ 1910     -28.843     -28.843
+ 1920     -28.843     -28.843
+ 1930     -28.843     -28.843
+ 1940     -28.843     -28.843
+ 1950     -28.843     -28.843
+ 1960     -28.843     -28.843
+ 1970     -28.843     -28.843
+ 1980     -28.843     -28.843
+ 1990     -28.843     -28.843
+ 2000     -28.843     -28.843
+ 2010     -28.843     -28.843
+ 2020     -28.843     -28.843
+ 2030     -28.843     -28.843
+ 2040     -28.843     -28.843
+ 2050     -28.843     -28.843
+ 2060     -28.843     -28.843
+ 2070     -28.843     -28.843
+ 2080     -28.843     -28.843
+ 2090     -28.843     -28.843
+ 2100     -28.843     -28.843
+ 2110     -28.843     -28.843
+ 2120     -28.843     -28.843
+ 2130     -28.843     -28.843
+ 2140     -28.843     -28.843
+ 2150     -28.843     -28.843
+ 2160     -28.843     -28.843
+ 2170     -28.843     -28.843
+ 2180     -28.843     -28.843
+ 2190     -28.843     -28.843
+ 2200     -28.843     -28.843
+ 2210     -28.843     -28.843
+ 2220     -28.843     -28.843
+ 2230     -28.843     -28.843
+ 2240     -28.843     -28.843
+ 2250     -28.843     -28.843
+ 2260     -28.843     -28.843
+ 2270     -28.843     -28.843
+ 2280     -28.843     -28.843
+ 2290     -28.843     -28.843
+ 2300     -28.843     -28.843
+ 2310     -28.843     -28.843
+ 2320     -28.843     -28.843
+ 2330     -28.843     -28.843
+ 2340     -28.843     -28.843
+ 2350     -28.843     -28.843
+ 2360     -28.843     -28.843
+ 2370     -28.843     -28.843
+ 2380     -28.843     -28.843
+ 2390     -28.843     -28.843
+ 2400     -28.843     -28.843
+ 2410     -28.843     -28.843
+ 2420     -28.843     -28.843
+ 2430     -28.843     -28.843
+ 2440     -28.843     -28.843
+ 2450     -28.843     -28.843
+ 2460     -28.843     -28.843
+ 2470     -28.843     -28.843
+ 2480     -28.843     -28.843
+ 2490     -28.843     -28.843
+ 2500     -28.843     -28.843
+Time: 0.27seconds. Iterations per second: 9262.96
+Mon Sep 21 14:16:20 2020 Calling: Psi4 Optimization
+Mon Sep 21 14:16:20 2020  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide && psi4 acetamide-opt.psi4 acetamide-opt.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+Mon Sep 21 14:17:44 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide/acetamide-opt.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+Mon Sep 21 14:18:14 2020 All jobs have terminated 
+Mon Sep 21 14:18:14 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide/acetamide-opt.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+Mon Sep 21 14:18:44 2020 All jobs have terminated 
+Mon Sep 21 14:18:44 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Mon Sep 21 14:18:44 2020 Calling: Psi4 Optimization
+Mon Sep 21 14:18:44 2020 Calling: Psi4 Gradient for DMA
+Mon Sep 21 14:18:44 2020  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide && psi4 acetamide-dma.psi4 acetamide-dma.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+Mon Sep 21 14:18:48 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide/acetamide-dma.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+Mon Sep 21 14:19:18 2020 All jobs have terminated 
+Mon Sep 21 14:19:18 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide/acetamide-dma.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+Mon Sep 21 14:19:48 2020 All jobs have terminated 
+Mon Sep 21 14:19:48 2020 NEED DMA: Executing GDMA
+Mon Sep 21 14:19:48 2020  Calling: /users/zj2244/Public/Software/gdma-2.2.11/bin/gdma < acetamide.gdmain > acetamide.gdmaout path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+Mon Sep 21 14:19:48 2020  Calling: poledit.x 1 acetamide.gdmaout /home/bdw2292/poltype-poltype2-latest/amoebabio18_header.prm < acetamide-peditin.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Global Frame Cartesian Multipole Moments :
+
+ Site:       1         Name:   O         Atomic Number:       8
+
+ Coordinates:            0.581361      -1.174787       0.048614
+
+ Charge:                 -0.82550
+ Dipole:                  0.04411       -0.15774        0.02082
+ Quadrupole:             -0.23318
+                         -0.28815        0.10344
+                         -0.03790       -0.00389        0.12974
+
+ Site:       2         Name:   N         Atomic Number:       7
+
+ Coordinates:            0.778573       1.077397      -0.061957
+
+ Charge:                 -0.33856
+ Dipole:                  0.11562        0.16327        0.03735
+ Quadrupole:              0.52698
+                         -0.15875        0.33607
+                         -0.02474       -0.01831       -0.86305
+
+ Site:       3         Name:   C         Atomic Number:       6
+
+ Coordinates:           -1.454601       0.103784       0.005639
+
+ Charge:                 -0.13361
+ Dipole:                  0.13691        0.00819       -0.01375
+ Quadrupole:              0.20897
+                         -0.07076       -0.03339
+                          0.00008       -0.08582       -0.17558
+
+ Site:       4         Name:   C         Atomic Number:       6
+
+ Coordinates:            0.053374      -0.079144       0.001739
+
+ Charge:                  0.92247
+ Dipole:                  0.33782       -0.13667       -0.03634
+ Quadrupole:             -0.11349
+                          0.14495        0.10469
+                          0.04516        0.00300        0.00880
+
+ Site:       5         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.904533      -0.698689      -0.581327
+
+ Charge:                  0.07798
+ Dipole:                 -0.05217       -0.10622       -0.07465
+ Quadrupole:              0.00559
+                          0.00544       -0.00017
+                          0.00679        0.00763       -0.00542
+
+ Site:       6         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.819284       0.010348       1.033939
+
+ Charge:                  0.07150
+ Dipole:                 -0.05003       -0.01474        0.12814
+ Quadrupole:             -0.00381
+                         -0.00302       -0.00953
+                         -0.00135       -0.00186        0.01334
+
+ Site:       7         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.774571       1.071370      -0.390694
+
+ Charge:                  0.01089
+ Dipole:                 -0.07077        0.13182       -0.05698
+ Quadrupole:             -0.01674
+                          0.01475        0.01280
+                         -0.00692       -0.00290        0.00394
+
+ Site:       8         Name:   H         Atomic Number:       1
+
+ Coordinates:            1.783065       1.008511      -0.012460
+
+ Charge:                  0.10865
+ Dipole:                  0.21804       -0.01898        0.01682
+ Quadrupole:             -0.02098
+                          0.00482        0.02222
+                         -0.00946        0.00027       -0.00124
+
+ Site:       9         Name:   H         Atomic Number:       1
+
+ Coordinates:            0.355112       1.990065      -0.047997
+
+ Charge:                  0.10618
+ Dipole:                 -0.08486        0.19460       -0.00097
+ Quadrupole:              0.01897
+                          0.00840       -0.01198
+                          0.00004        0.00311       -0.00699
+
+ Local Frame Definition for Multipole Sites :
+
+     Atom     Name      Axis Type     Z Axis  X Axis  Y Axis
+
+       1      O         Z-then-X         4       2       0
+       2      N         Z-then-X         4       1       0
+       3      C         Z-then-X         4       1       0
+       4      C         Z-then-X         1       2       0
+       5      H         Z-then-X         3       4       0
+       6      H         Z-then-X         3       4       0
+       7      H         Z-then-X         3       4       0
+       8      H         Z-then-X         2       4       0
+       9      H         Z-then-X         2       4       0
+
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Choose Either the AMOEBA or HIPPO Polarization Model [A] :  
+ Polarizability Parameters for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      O            0.8370         0.3900
+       2      N            1.0730         0.3900
+       3      C            1.3340         0.3900
+       4      C            1.3340         0.3900
+       5      H            0.4960         0.3900
+       6      H            0.4960         0.3900
+       7      H            0.4960         0.3900
+       8      H            0.4960         0.3900
+       9      H            0.4960         0.3900
+
+ Enter Atom Number, Polarizability & Thole Values :  
+ The default is to place all atoms into one polarization group;
+ This can be altered by entering a series of bonded atom pairs
+ that separate the molecule into distinct polarization groups
+
+ Enter a Bond between Polarization Groups [<Enter>=Exit] :  
+ Polarization Groups for Multipole Sites :
+
+     Atom     Name       Polarization Group Definition
+
+       1      O               4
+       2      N               4     8     9
+       3      C               4     5     6     7
+       4      C               1     2     3
+       5      H               3
+       6      H               3
+       7      H               3
+       8      H               2
+       9      H               2
+
+ Electrostatic and Polarization Scale Factors :
+
+                    1-2         1-3         1-4         1-5
+
+ M-Scale:         0.0000      0.0000      0.4000      0.8000
+ P-Inter:         0.0000      0.0000      1.0000      1.0000
+ P-Intra:         0.0000      0.0000      0.5000      1.0000
+ W-Scale:         1.0000      1.0000      1.0000      1.0000
+
+                    1-1         1-2         1-3         1-4
+
+ D-Scale:         0.0000      1.0000      1.0000      1.0000
+ U-Scale:         1.0000      1.0000      1.0000      1.0000
+
+ Use Thole Damping:           True
+ Charge Penetration:          False
+ Set D Equal to P:            False
+
+ Determination of Intergroup Induced Dipoles :
+
+    Iter        RMS Change (Debye)
+
+       1           0.0000000000
+
+ Local Frame Intergroup Induced Dipole Moments (Debye) :
+
+    Atom              X           Y           Z         Total
+
+       1           0.0000      0.0000      0.0000      0.0000
+       2           0.0000      0.0000      0.0000      0.0000
+       3           0.0000      0.0000      0.0000      0.0000
+       4           0.0000      0.0000      0.0000      0.0000
+       5           0.0000      0.0000      0.0000      0.0000
+       6           0.0000      0.0000      0.0000      0.0000
+       7           0.0000      0.0000      0.0000      0.0000
+       8           0.0000      0.0000      0.0000      0.0000
+       9           0.0000      0.0000      0.0000      0.0000
+
+ Condense Symmetric Atoms to Equivalent Types [Y] :  
+ Remove Multipole Components Zeroed by Symmetry [Y] :  
+ Final Atomic Multipole Moments after Regularization :
+
+ Atom:       1         Name:   O         Atomic Number:       8
+
+ Local Frame:            Z-then-X             4       2       0
+
+ Charge:                 -0.82550
+ Dipole:                 -0.02918        0.00000       -0.16194
+ Quadrupole:             -0.39230
+                          0.00000        0.12812
+                         -0.04701        0.00000        0.26418
+
+ Atom:       2         Name:   N         Atomic Number:       7
+
+ Local Frame:            Z-then-X             4       1       0
+
+ Charge:                 -0.33856
+ Dipole:                  0.01197        0.00000       -0.19779
+ Quadrupole:              0.61528
+                          0.00000       -0.86259
+                         -0.01766        0.00000        0.24731
+
+ Atom:       3         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X             4       1       0
+
+ Charge:                 -0.13361
+ Dipole:                 -0.02523        0.00000        0.13496
+ Quadrupole:             -0.03901
+                          0.00000       -0.18330
+                          0.04001        0.00000        0.22231
+
+ Atom:       4         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X             1       2       0
+
+ Charge:                  0.92247
+ Dipole:                  0.24632        0.00000        0.26817
+ Quadrupole:              0.03797
+                          0.00000        0.01045
+                         -0.17440        0.00000       -0.04842
+
+ Atom:       5         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             3       4       0
+
+ Charge:                  0.07798
+ Dipole:                  0.00615        0.00000       -0.13977
+ Quadrupole:             -0.00051
+                          0.00000       -0.01112
+                          0.00570        0.00000        0.01163
+
+ Atom:       6         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             3       4       0
+
+ Charge:                  0.07150
+ Dipole:                 -0.00380        0.00000       -0.13825
+ Quadrupole:             -0.00196
+                          0.00000       -0.01029
+                         -0.00440        0.00000        0.01225
+
+ Atom:       7         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             3       4       0
+
+ Charge:                  0.01089
+ Dipole:                 -0.02548        0.00000       -0.15801
+ Quadrupole:             -0.00497
+                          0.00000        0.00311
+                         -0.02187        0.00000        0.00186
+
+ Atom:       8         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             2       4       0
+
+ Charge:                  0.10865
+ Dipole:                  0.00448        0.00000       -0.21939
+ Quadrupole:              0.02261
+                          0.00000       -0.00029
+                          0.00246        0.00000       -0.02232
+
+ Atom:       9         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             2       4       0
+
+ Charge:                  0.10618
+ Dipole:                 -0.00517        0.00000       -0.21221
+ Quadrupole:              0.01960
+                          0.00000       -0.00677
+                         -0.00654        0.00000       -0.01283
+Mon Sep 21 14:19:49 2020  Calling: potential.x 1 acetamide.xyz -k acetamide.key path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+       1      1     O     acetamide                    8     15.999     1
+       2      2     N     acetamide                    7     14.007     3
+       3      3     C     acetamide                    6     12.011     4
+       4      4     C     acetamide                    6     12.011     3
+       5      5     H     acetamide                    1      1.008     1
+       6      6     H     acetamide                    1      1.008     1
+       7      7     H     acetamide                    1      1.008     1
+       8      8     H     acetamide                    1      1.008     1
+       9      9     H     acetamide                    1      1.008     1
+
+ Electrostatic Potential Grid Points :                  7325
+
+ Gaussian CUBEGEN Input Written To :   acetamide.grid
+
+ Next, run the Gaussian CUBEGEN program; for example:
+ cubegen 0 potential=MP2 xxx.fchk xxx.cube -5 h < xxx.grid
+
+ See the Gaussian documentation for additional details;
+ After CUBEGEN, rerun Tinker POTENTIAL using Option 2
+Mon Sep 21 14:19:49 2020 Calling: Psi4 Gradient for ESP
+Mon Sep 21 14:19:49 2020  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide && psi4 acetamide-esp.psi4 acetamide-esp.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+Mon Sep 21 14:22:50 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide/acetamide-esp.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+Mon Sep 21 14:23:20 2020 All jobs have terminated 
+Mon Sep 21 14:23:20 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide/acetamide-esp.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+Mon Sep 21 14:23:50 2020 All jobs have terminated 
+Mon Sep 21 14:23:50 2020 Calling: Generating CUBE File from PSI4
+Mon Sep 21 14:23:50 2020  Calling: potential.x 2 acetamide.cube path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Electrostatic Potential Written To :  acetamide.pot
+Mon Sep 21 14:23:51 2020  Calling: /home/bdw2292/poltype-poltype2-latest/avgmpoles.pl acetamide.key acetamide.xyz acetamide-groups.txt acetamide.key_2 acetamide.xyz_2 401 path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+Mon Sep 21 14:23:51 2020 
+Mon Sep 21 14:23:51 2020 =========================================================
+Mon Sep 21 14:23:51 2020 QM Dipole moment
+
+Mon Sep 21 14:23:51 2020  Calling: potential.x 6 acetamide.xyz_2 -k acetamide.key_2 acetamide.pot N 0.1 path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+     405    405     O     acetamide                    8     15.999     1
+     403    403     N     acetamide                    7     14.007     3
+     401    401     C     acetamide                    6     12.011     4
+     402    402     C     acetamide                    6     12.011     3
+     404    404     H     acetamide                    1      1.008     1
+     406    406     H     acetamide                    1      1.008     1
+
+ Electrostatic Potential Grid Points :                  7325
+
+ Electrostatic Parameter Restraint Value :            1.0000
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+     405    405     O     acetamide                    8     15.999     1
+     403    403     N     acetamide                    7     14.007     3
+     401    401     C     acetamide                    6     12.011     4
+     402    402     C     acetamide                    6     12.011     3
+     404    404     H     acetamide                    1      1.008     1
+     406    406     H     acetamide                    1      1.008     1
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         405      402    403      0   Z-then-X    -0.82550
+                                                  -0.02918  0.00000 -0.16194
+                                                  -0.39230
+                                                   0.00000  0.12812
+                                                  -0.04701  0.00000  0.26418
+
+         403      402    405      0   Z-then-X    -0.33856
+                                                   0.01197  0.00000 -0.19779
+                                                   0.61528
+                                                   0.00000 -0.86259
+                                                  -0.01766  0.00000  0.24731
+
+         401      402    405      0   Z-then-X    -0.13361
+                                                  -0.02523  0.00000  0.13496
+                                                  -0.03901
+                                                   0.00000 -0.18330
+                                                   0.04001  0.00000  0.22231
+
+         402      405    403      0   Z-then-X     0.92247
+                                                   0.24632  0.00000  0.26817
+                                                   0.03797
+                                                   0.00000  0.01045
+                                                  -0.17440  0.00000 -0.04842
+
+         404      401    402      0   Z-then-X     0.05346
+                                                  -0.00771  0.00000 -0.14534
+                                                  -0.00248
+                                                   0.00000 -0.00610
+                                                  -0.00686  0.00000  0.00858
+
+         406      403    402      0   Z-then-X     0.10741
+                                                  -0.00034  0.00000 -0.21580
+                                                   0.02110
+                                                   0.00000 -0.00353
+                                                  -0.00204  0.00000 -0.01758
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         405             0.837       0.390         402
+         403             1.073       0.390         402  406
+         401             1.334       0.390         402  404
+         402             1.334       0.390         405  403  401
+         404             0.496       0.390         401
+         406             0.496       0.390         403
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1        1574       -16.8807       -14.5375         2.4422
+        1        2         763         4.3433         3.5835         1.1131
+        1        3         541         3.5074         3.0530         1.4097
+        1        4         327        -4.4769        -4.1703         0.7984
+        1        5         838        -1.7907        -1.1589         0.9970
+        1        6         887         2.6803         2.3105         1.0396
+        1        7         715        10.2797         7.7704         2.6472
+        1        8         909         3.6527         3.9305         0.6256
+        1        9         771        13.5783        11.6928         2.0637
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.1101
+ Average Potential Magnitude for Model :              8.8595
+ Average Potential Value for Target :                -0.0871
+ Average Potential Magnitude for Target :             7.5504
+
+ Average Signed Potential Difference :               -0.0231
+ Average Unsigned Potential Difference :              1.3965
+ Root Mean Square Potential Difference :              1.7353
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value         Fixed
+
+    --            405             Monopole          -0.82550          X
+     1            405             X-Dipole          -0.02918
+    --            405             Y-Dipole           0.00000          X
+     2            405             Z-Dipole          -0.16194
+     3            405             XX-Quad           -0.39230
+    --            405             XY-Quad            0.00000          X
+     4            405             XZ-Quad           -0.04701
+     5            405             YY-Quad            0.12812
+    --            405             YZ-Quad            0.00000          X
+    --            405             ZZ-Quad            0.26418
+    --            403             Monopole          -0.33856          X
+     6            403             X-Dipole           0.01197
+    --            403             Y-Dipole           0.00000          X
+     7            403             Z-Dipole          -0.19779
+     8            403             XX-Quad            0.61528
+    --            403             XY-Quad            0.00000          X
+     9            403             XZ-Quad           -0.01766
+    10            403             YY-Quad           -0.86259
+    --            403             YZ-Quad            0.00000          X
+    --            403             ZZ-Quad            0.24731
+    --            401             Monopole          -0.13361          X
+    11            401             X-Dipole          -0.02523
+    --            401             Y-Dipole           0.00000          X
+    12            401             Z-Dipole           0.13496
+    13            401             XX-Quad           -0.03901
+    --            401             XY-Quad            0.00000          X
+    14            401             XZ-Quad            0.04001
+    15            401             YY-Quad           -0.18330
+    --            401             YZ-Quad            0.00000          X
+    --            401             ZZ-Quad            0.22231
+    --            402             Monopole           0.92247          X
+    16            402             X-Dipole           0.24632
+    --            402             Y-Dipole           0.00000          X
+    17            402             Z-Dipole           0.26817
+    18            402             XX-Quad            0.03797
+    --            402             XY-Quad            0.00000          X
+    19            402             XZ-Quad           -0.17440
+    20            402             YY-Quad            0.01045
+    --            402             YZ-Quad            0.00000          X
+    --            402             ZZ-Quad           -0.04842
+    --            404             Monopole           0.05346          X
+    21            404             X-Dipole          -0.00771
+    --            404             Y-Dipole           0.00000          X
+    22            404             Z-Dipole          -0.14534
+    23            404             XX-Quad           -0.00248
+    --            404             XY-Quad            0.00000          X
+    24            404             XZ-Quad           -0.00686
+    25            404             YY-Quad           -0.00610
+    --            404             YZ-Quad            0.00000          X
+    --            404             ZZ-Quad            0.00858
+    --            406             Monopole           0.10741          X
+    26            406             X-Dipole          -0.00034
+    --            406             Y-Dipole           0.00000          X
+    27            406             Z-Dipole          -0.21580
+    28            406             XX-Quad            0.02111
+    --            406             XY-Quad            0.00000          X
+    29            406             XZ-Quad           -0.00204
+    30            406             YY-Quad           -0.00353
+    --            406             YZ-Quad            0.00000          X
+    --            406             ZZ-Quad           -0.01758
+
+ Levenberg-Marquardt Nonlinear Least Squares :
+
+ LS Iter     F Value      Total G     Active G    N Active   F Calls
+
+     0    33649.2487   15761.8859   15761.8859        30        31
+     1      317.5593     559.2004     559.2004        30        62
+     2      138.4512      34.1284      34.1284        30        93
+     3      114.5440       0.0000       0.0000        30       124
+
+ SQUARE  --  Normal Termination of Least Squares
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value         Fixed
+
+    --            405             Monopole          -0.82550          X
+     1            405             X-Dipole          -0.05097
+    --            405             Y-Dipole           0.00000          X
+     2            405             Z-Dipole          -0.23555
+     3            405             XX-Quad           -0.39800
+    --            405             XY-Quad            0.00000          X
+     4            405             XZ-Quad           -0.04978
+     5            405             YY-Quad            0.16679
+    --            405             YZ-Quad            0.00000          X
+    --            405             ZZ-Quad            0.23121
+    --            403             Monopole          -0.33856          X
+     6            403             X-Dipole           0.03856
+    --            403             Y-Dipole           0.00000          X
+     7            403             Z-Dipole          -0.16909
+     8            403             XX-Quad            0.48273
+    --            403             XY-Quad            0.00000          X
+     9            403             XZ-Quad            0.00209
+    10            403             YY-Quad           -0.79283
+    --            403             YZ-Quad            0.00000          X
+    --            403             ZZ-Quad            0.31010
+    --            401             Monopole          -0.13361          X
+    11            401             X-Dipole           0.10284
+    --            401             Y-Dipole           0.00000          X
+    12            401             Z-Dipole           0.19584
+    13            401             XX-Quad           -0.11941
+    --            401             XY-Quad            0.00000          X
+    14            401             XZ-Quad            0.03573
+    15            401             YY-Quad           -0.12344
+    --            401             YZ-Quad            0.00000          X
+    --            401             ZZ-Quad            0.24285
+    --            402             Monopole           0.92247          X
+    16            402             X-Dipole           0.24623
+    --            402             Y-Dipole           0.00000          X
+    17            402             Z-Dipole           0.30511
+    18            402             XX-Quad            0.04734
+    --            402             XY-Quad            0.00000          X
+    19            402             XZ-Quad           -0.18169
+    20            402             YY-Quad            0.03273
+    --            402             YZ-Quad            0.00000          X
+    --            402             ZZ-Quad           -0.08007
+    --            404             Monopole           0.05346          X
+    21            404             X-Dipole          -0.02613
+    --            404             Y-Dipole           0.00000          X
+    22            404             Z-Dipole          -0.08800
+    23            404             XX-Quad           -0.01399
+    --            404             XY-Quad            0.00000          X
+    24            404             XZ-Quad           -0.02258
+    25            404             YY-Quad            0.00371
+    --            404             YZ-Quad            0.00000          X
+    --            404             ZZ-Quad            0.01028
+    --            406             Monopole           0.10741          X
+    26            406             X-Dipole           0.04681
+    --            406             Y-Dipole           0.00000          X
+    27            406             Z-Dipole          -0.32234
+    28            406             XX-Quad            0.20279
+    --            406             XY-Quad            0.00000          X
+    29            406             XZ-Quad            0.08081
+    30            406             YY-Quad            0.11733
+    --            406             YZ-Quad            0.00000          X
+    --            406             ZZ-Quad           -0.32012
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1        1574       -14.5768       -14.5375         0.1085
+        1        2         763         3.4983         3.5835         0.2323
+        1        3         541         2.9989         3.0530         0.1267
+        1        4         327        -4.1236        -4.1703         0.1306
+        1        5         838        -1.2112        -1.1589         0.1027
+        1        6         887         2.2605         2.3105         0.0980
+        1        7         715         7.7946         7.7704         0.0750
+        1        8         909         3.9290         3.9305         0.1276
+        1        9         771        11.6730        11.6928         0.1716
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.1182
+ Average Potential Magnitude for Model :              7.5384
+ Average Potential Value for Target :                -0.0871
+ Average Potential Magnitude for Target :             7.5504
+
+ Average Signed Potential Difference :               -0.0312
+ Average Unsigned Potential Difference :              0.0908
+ Root Mean Square Potential Difference :              0.1347
+Mon Sep 21 14:23:52 2020  Calling: sed -e '/\(.* none$\|^#\|^fix\|^potential-offset\)/d' acetamide.key_3 > acetamide.key_3_tmp path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+Mon Sep 21 14:23:52 2020 
+Mon Sep 21 14:23:52 2020 =========================================================
+Mon Sep 21 14:23:52 2020 Electrostatic Potential Comparison
+
+Mon Sep 21 14:23:52 2020  Calling: potential.x 5 acetamide.xyz_2 -k acetamide.key_3 acetamide.pot N > RMSPD.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+****************************************************************************************************
+Torsion parameters for torsion   405   402   403   406     0.0000 0.0 1    -0.6640 180.0 2    -0.3570 0.0 3 assigned from SMILES O=CN[#1] from torsion atom indices 1,4,2,9 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   404   401   402   405     0.0000 0.0 1     0.0000 180.0 2     0.2350 0.0 3 assigned from SMILES [#1][C]C(=O)([N]) from torsion atom indices 7,3,4,1,2 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   404   401   402   403     0.0000 0.0 1     0.0000 180.0 2    -0.0100 0.0 3 assigned from SMILES [#1][C][C](N)(=O) from torsion atom indices 7,3,4,2,1 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   401   402   403   406     0.0000 0.0 1     1.2000 180.0 2     0.8000 0.0 3 assigned from SMILES [C]C(=O)N[#1] from torsion atom indices 3,4,1,2,9 with smiles torsion indices 1,2,4,5
+Mon Sep 21 14:23:53 2020  Calling: psi4 acetamide-esp_frag.psi4 acetamide-esp_frag.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+Mon 21 Sep 2020 02:23:55 PM CDT equivalentrotbndindexarrays[]
+Mon 21 Sep 2020 02:23:55 PM CDT All jobs have terminated 
+Mon 21 Sep 2020 02:23:55 PM CDT 
+Mon 21 Sep 2020 02:23:55 PM CDT =========================================================
+Mon 21 Sep 2020 02:23:55 PM CDT Minimizing structure
+
+Mon 21 Sep 2020 02:23:55 PM CDT  Calling: cp acetamide.xyz_2 ttt.xyz path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+Mon 21 Sep 2020 02:23:55 PM CDT  Calling: cp acetamide.key_5 ttt.key path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+Mon 21 Sep 2020 02:23:55 PM CDT  Calling: minimize.x -k ttt.key ttt.xyz 0.1 > Minimizedttt.out path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+Mon 21 Sep 2020 02:23:56 PM CDT 
+Mon 21 Sep 2020 02:23:56 PM CDT =========================================================
+Mon 21 Sep 2020 02:23:56 PM CDT QM Dipole moment
+
+Mon 21 Sep 2020 02:23:56 PM CDT QM Dipole moment = 3.78
+Mon 21 Sep 2020 02:23:56 PM CDT 
+Mon 21 Sep 2020 02:23:56 PM CDT =========================================================
+Mon 21 Sep 2020 02:23:56 PM CDT MM Dipole moment
+
+Mon 21 Sep 2020 02:23:56 PM CDT  Calling: analyze.x acetamide.xyz_2 -k ttt.key em | grep -A11 Charge>MMDipole.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAcetamide
+Mon 21 Sep 2020 02:23:56 PM CDT MM Dipole moment = 3.779
+Mon 21 Sep 2020 02:23:56 PM CDT Poltype Job Finished
+
+****************************************************************************************************
+Torsion parameters for torsion   405   402   403   406     0.0000 0.0 1    -0.6640 180.0 2    -0.3570 0.0 3 assigned from SMILES O=CN[#1] from torsion atom indices 1,4,2,8 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   404   401   402   405     0.0000 0.0 1     0.0000 180.0 2     0.2350 0.0 3 assigned from SMILES [#1][C]C(=O)([N]) from torsion atom indices 7,3,4,1,2 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   404   401   402   403     0.0000 0.0 1     0.0000 180.0 2    -0.0100 0.0 3 assigned from SMILES [#1][C][C](N)(=O) from torsion atom indices 7,3,4,2,1 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   401   402   403   406     0.0000 0.0 1     1.2000 180.0 2     0.8000 0.0 3 assigned from SMILES [C]C(=O)N[#1] from torsion atom indices 3,4,1,2,8 with smiles torsion indices 1,2,4,5

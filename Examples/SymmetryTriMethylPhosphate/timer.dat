@@ -1,0 +1,364 @@
+
+Host: node37.bme.utexas.edu
+
+Timers On : Mon Sep 21 14:49:07 2020
+Timers Off: Mon Sep 21 14:51:10 2020
+
+Wall Time:      122.86 seconds
+
+                                                       Time (seconds)
+Module                                       User      System        Wall        Calls
+V: Grid                             :     22.333u      0.583s      3.455w      6 calls
+JK: (A|mn)                          :     22.133u      0.033s      3.325w      6 calls
+JK: (A|Q)^-1/2                      :     12.833u      0.417s      1.981w      6 calls
+JK: (Q|mn)                          :      8.350u      0.067s      1.260w      6 calls
+JK: (A|mn)^L                        :      9.633u      0.067s      1.455w      6 calls
+JK: (A|Q)^-1                        :     12.833u      0.350s      1.978w      6 calls
+JK: (Q|mn)^L                        :      8.050u      0.067s      1.219w      6 calls
+JK: (A|mn)^R                        :     12.300u      0.033s      1.856w      6 calls
+HF: Form core H                     :      1.550u      0.150s      0.758w      6 calls
+HF: Form S/X                        :      0.200u      0.017s      0.027w      6 calls
+HF: Guess                           :      7.567u      0.467s      1.204w      6 calls
+SAD Guess                           :      7.417u      0.417s      1.176w      2 calls
+HF: Form G                          :    383.683u      7.750s     58.706w     73 calls
+RV: Form V                          :    247.800u      4.767s     37.860w     73 calls
+Properties                          :     57.386p                         224945 calls
+Functional                          :     53.846p                         224945 calls
+V_xc                                :     55.976p                         207863 calls
+JK: D                               :      0.067u      0.000s      0.009w     73 calls
+JK: USO2AO                          :      0.017u      0.000s      0.005w     73 calls
+JK: JK                              :    135.750u      2.950s     20.813w     73 calls
+JK: J                               :      3.250u      0.117s      0.510w     73 calls
+JK: J1                              :      1.867u      0.117s      0.288w     73 calls
+JK: J2                              :      1.383u      0.000s      0.215w     73 calls
+JK: K                               :     54.300u      0.183s      8.173w     73 calls
+JK: K1                              :     43.567u      0.133s      6.556w     73 calls
+JK: K2                              :     10.733u      0.050s      1.613w     73 calls
+JK: wK                              :     69.883u      0.867s     10.617w    146 calls
+JK: wK1                             :     58.800u      0.767s      8.962w    292 calls
+JK: wK2                             :     10.983u      0.100s      1.648w    146 calls
+JK: AO2USO                          :      0.000u      0.000s      0.000w     73 calls
+HF: Form F                          :      0.033u      0.000s      0.006w     73 calls
+HF: Form D                          :      0.000u      0.000s      0.004w     73 calls
+HF: DIIS                            :      1.017u      0.083s      0.181w     71 calls
+DIISManager::add_entry              :      0.283u      0.050s      0.048w     67 calls
+DIISManager::extrapolate            :      0.317u      0.033s      0.057w     67 calls
+bMatrix setup                       :      0.117u      0.017s      0.026w     67 calls
+bMatrix pseudoinverse               :      0.017u      0.000s      0.005w     67 calls
+New vector                          :      0.183u      0.017s      0.024w     67 calls
+HF: Form C                          :      1.750u      0.117s      0.278w     71 calls
+Grad: V T Perturb                   :      4.883u      0.133s      0.754w      6 calls
+Grad: S                             :      0.067u      0.000s      0.007w      6 calls
+Grad: JK                            :    170.433u      3.917s     26.527w      6 calls
+JKGrad: Amn                         :     19.483u      0.667s      3.134w      6 calls
+JKGrad: Awmn                        :     20.917u      0.633s      3.234w      6 calls
+JKGrad: AB                          :     15.100u      0.700s      2.365w      6 calls
+JKGrad: UV                          :      2.883u      0.200s      0.466w      6 calls
+JKGrad: ABx                         :      3.733u      0.217s      0.588w      6 calls
+JKGrad: Amnx                        :    105.367u      1.200s     16.225w      6 calls
+Grad: XC                            :     45.733u      0.183s      6.891w      6 calls
+V_xc gradient                       :     10.133p                          17082 calls
+
+--------------------------------------------------------------------------------------
+V: Grid                             :     22.333u      0.583s      3.455w      6 calls
+JK: (A|mn)                          :     22.133u      0.033s      3.325w      6 calls
+JK: (A|Q)^-1/2                      :     12.833u      0.417s      1.981w      6 calls
+JK: (Q|mn)                          :      8.350u      0.067s      1.260w      6 calls
+JK: (A|mn)^L                        :      9.633u      0.067s      1.455w      6 calls
+JK: (A|Q)^-1                        :     12.833u      0.350s      1.978w      6 calls
+JK: (Q|mn)^L                        :      8.050u      0.067s      1.219w      6 calls
+JK: (A|mn)^R                        :     12.300u      0.033s      1.856w      6 calls
+HF: Form core H                     :      1.550u      0.150s      0.758w      6 calls
+HF: Form S/X                        :      0.200u      0.017s      0.027w      6 calls
+HF: Guess                           :      7.567u      0.467s      1.204w      6 calls
+| SAD Guess                         :      7.417u      0.417s      1.176w      2 calls
+HF: Form G                          :    383.683u      7.750s     58.706w     73 calls
+| RV: Form V                        :    247.800u      4.767s     37.860w     73 calls
+| | Properties                      :     44.287p                         207863 calls
+| | Functional                      :     49.801p                         207863 calls
+| | V_xc                            :     55.976p                         207863 calls
+| JK: D                             :      0.067u      0.000s      0.009w     73 calls
+| JK: USO2AO                        :      0.017u      0.000s      0.005w     73 calls
+| JK: JK                            :    135.750u      2.950s     20.813w     73 calls
+| | JK: J                           :      3.250u      0.117s      0.510w     73 calls
+| | | JK: J1                        :      1.867u      0.117s      0.288w     73 calls
+| | | JK: J2                        :      1.383u      0.000s      0.215w     73 calls
+| | JK: K                           :     54.300u      0.183s      8.173w     73 calls
+| | | JK: K1                        :     43.567u      0.133s      6.556w     73 calls
+| | | JK: K2                        :     10.733u      0.050s      1.613w     73 calls
+| | JK: wK                          :     69.883u      0.867s     10.617w    146 calls
+| | | JK: wK1                       :     58.800u      0.767s      8.962w    292 calls
+| | | JK: wK2                       :     10.983u      0.100s      1.648w    146 calls
+| JK: AO2USO                        :      0.000u      0.000s      0.000w     73 calls
+HF: Form F                          :      0.033u      0.000s      0.006w     73 calls
+HF: Form D                          :      0.000u      0.000s      0.004w     73 calls
+HF: DIIS                            :      1.017u      0.083s      0.181w     71 calls
+| DIISManager::add_entry            :      0.283u      0.050s      0.048w     67 calls
+| DIISManager::extrapolate          :      0.317u      0.033s      0.057w     67 calls
+| | bMatrix setup                   :      0.117u      0.017s      0.026w     67 calls
+| | bMatrix pseudoinverse           :      0.017u      0.000s      0.005w     67 calls
+| | New vector                      :      0.183u      0.017s      0.024w     67 calls
+HF: Form C                          :      1.750u      0.117s      0.278w     71 calls
+Grad: V T Perturb                   :      4.883u      0.133s      0.754w      6 calls
+Grad: S                             :      0.067u      0.000s      0.007w      6 calls
+Grad: JK                            :    170.433u      3.917s     26.527w      6 calls
+| JKGrad: Amn                       :     19.483u      0.667s      3.134w      6 calls
+| JKGrad: Awmn                      :     20.917u      0.633s      3.234w      6 calls
+| JKGrad: AB                        :     15.100u      0.700s      2.365w      6 calls
+| JKGrad: UV                        :      2.883u      0.200s      0.466w      6 calls
+| JKGrad: ABx                       :      3.733u      0.217s      0.588w      6 calls
+| JKGrad: Amnx                      :    105.367u      1.200s     16.225w      6 calls
+Grad: XC                            :     45.733u      0.183s      6.891w      6 calls
+| Properties                        :     13.099p                          17082 calls
+| Functional                        :      4.045p                          17082 calls
+| V_xc gradient                     :     10.133p                          17082 calls
+
+**************************************************************************************
+
+Host: node37.bme.utexas.edu
+
+Timers On : Mon Sep 21 14:52:11 2020
+Timers Off: Mon Sep 21 14:52:19 2020
+
+Wall Time:        8.48 seconds
+
+                                                       Time (seconds)
+Module                                       User      System        Wall        Calls
+DFH: sparsity prep                  :      0.100u      0.000s      0.065w      1 calls
+DFH: initialize()                   :     10.467u      0.333s      1.620w      1 calls
+DFH: AO Construction                :      3.533u      0.067s      0.538w      1 calls
+DFH: AO-Met. Contraction            :      3.533u      0.117s      0.550w      1 calls
+HF: Form core H                     :      0.117u      0.017s      0.024w      1 calls
+HF: Form S/X                        :      0.083u      0.000s      0.013w      1 calls
+HF: Guess                           :      3.900u      0.200s      0.613w      1 calls
+SAD Guess                           :      3.800u      0.183s      0.599w      1 calls
+HF: Form G                          :      9.683u      0.467s      1.522w     13 calls
+JK: D                               :      0.017u      0.000s      0.002w     13 calls
+JK: USO2AO                          :      0.000u      0.000s      0.001w     13 calls
+JK: JK                              :      9.650u      0.467s      1.515w     13 calls
+DFH: compute_JK()                   :      9.633u      0.467s      1.515w     13 calls
+DFH: Grabbing AOs                   :      0.000u      0.000s      0.000w     13 calls
+DFH: compute_J                      :      1.333u      0.083s      0.213w     13 calls
+DFH: compute_K                      :      8.283u      0.367s      1.296w     13 calls
+JK: AO2USO                          :      0.000u      0.000s      0.000w     13 calls
+HF: Form F                          :      0.000u      0.000s      0.002w     13 calls
+HF: Form D                          :      0.033u      0.000s      0.002w     13 calls
+HF: DIIS                            :      0.333u      0.050s      0.058w     12 calls
+DIISManager::add_entry              :      0.083u      0.000s      0.009w     12 calls
+DIISManager::extrapolate            :      0.117u      0.033s      0.023w     12 calls
+bMatrix setup                       :      0.033u      0.033s      0.013w     12 calls
+bMatrix pseudoinverse               :      0.000u      0.000s      0.001w     12 calls
+New vector                          :      0.067u      0.000s      0.010w     12 calls
+HF: Form C                          :      0.950u      0.017s      0.148w     12 calls
+DFMP2 Singles                       :      0.017u      0.000s      0.001w      1 calls
+DFMP2 Aia                           :      8.267u      0.283s      1.396w      1 calls
+DFMP2 (A|mn)                        :      6.317u      0.000s      0.948w      1 calls
+DFMP2 (A|mn)C_mi                    :      0.317u      0.000s      0.047w      1 calls
+DFMP2 (A|mi)C_na                    :      0.183u      0.000s      0.027w      1 calls
+DFMP2 Aia Write                     :      0.067u      0.033s      0.018w      1 calls
+DFMP2 Qia                           :      3.867u      0.167s      0.607w      1 calls
+DFMP2 Metric                        :      2.933u      0.067s      0.450w      1 calls
+DFMP2 Aia Read                      :      0.067u      0.033s      0.013w      1 calls
+DFMP2 (Q|A)(A|ia)                   :      0.633u      0.000s      0.096w      1 calls
+DFMP2 Qia Write                     :      0.083u      0.033s      0.017w      1 calls
+DFMP2 Energy                        :      1.867u      0.100s      0.295w      1 calls
+DFMP2 Qia Read                      :      0.100u      0.033s      0.019w      2 calls
+
+--------------------------------------------------------------------------------------
+DFH: sparsity prep                  :      0.100u      0.000s      0.065w      1 calls
+DFH: initialize()                   :     10.467u      0.333s      1.620w      1 calls
+| DFH: AO Construction              :      3.533u      0.067s      0.538w      1 calls
+| DFH: AO-Met. Contraction          :      3.533u      0.117s      0.550w      1 calls
+HF: Form core H                     :      0.117u      0.017s      0.024w      1 calls
+HF: Form S/X                        :      0.083u      0.000s      0.013w      1 calls
+HF: Guess                           :      3.900u      0.200s      0.613w      1 calls
+| SAD Guess                         :      3.800u      0.183s      0.599w      1 calls
+HF: Form G                          :      9.683u      0.467s      1.522w     13 calls
+| JK: D                             :      0.017u      0.000s      0.002w     13 calls
+| JK: USO2AO                        :      0.000u      0.000s      0.001w     13 calls
+| JK: JK                            :      9.650u      0.467s      1.515w     13 calls
+| | DFH: compute_JK()               :      9.633u      0.467s      1.515w     13 calls
+| | | DFH: Grabbing AOs             :      0.000u      0.000s      0.000w     13 calls
+| | | DFH: compute_J                :      1.333u      0.083s      0.213w     13 calls
+| | | DFH: compute_K                :      8.283u      0.367s      1.296w     13 calls
+| JK: AO2USO                        :      0.000u      0.000s      0.000w     13 calls
+HF: Form F                          :      0.000u      0.000s      0.002w     13 calls
+HF: Form D                          :      0.033u      0.000s      0.002w     13 calls
+HF: DIIS                            :      0.333u      0.050s      0.058w     12 calls
+| DIISManager::add_entry            :      0.083u      0.000s      0.009w     12 calls
+| DIISManager::extrapolate          :      0.117u      0.033s      0.023w     12 calls
+| | bMatrix setup                   :      0.033u      0.033s      0.013w     12 calls
+| | bMatrix pseudoinverse           :      0.000u      0.000s      0.001w     12 calls
+| | New vector                      :      0.067u      0.000s      0.010w     12 calls
+HF: Form C                          :      0.950u      0.017s      0.148w     12 calls
+DFMP2 Singles                       :      0.017u      0.000s      0.001w      1 calls
+DFMP2 Aia                           :      8.267u      0.283s      1.396w      1 calls
+| DFMP2 (A|mn)                      :      6.317u      0.000s      0.948w      1 calls
+| DFMP2 (A|mn)C_mi                  :      0.317u      0.000s      0.047w      1 calls
+| DFMP2 (A|mi)C_na                  :      0.183u      0.000s      0.027w      1 calls
+| DFMP2 Aia Write                   :      0.067u      0.033s      0.018w      1 calls
+DFMP2 Qia                           :      3.867u      0.167s      0.607w      1 calls
+| DFMP2 Metric                      :      2.933u      0.067s      0.450w      1 calls
+| DFMP2 Aia Read                    :      0.067u      0.033s      0.013w      1 calls
+| DFMP2 (Q|A)(A|ia)                 :      0.633u      0.000s      0.096w      1 calls
+| DFMP2 Qia Write                   :      0.083u      0.033s      0.017w      1 calls
+DFMP2 Energy                        :      1.867u      0.100s      0.295w      1 calls
+| DFMP2 Qia Read                    :      0.100u      0.033s      0.019w      2 calls
+
+**************************************************************************************
+
+Host: node37.bme.utexas.edu
+
+Timers On : Mon Sep 21 14:53:20 2020
+Timers Off: Mon Sep 21 15:12:18 2020
+
+Wall Time:     1138.28 seconds
+
+                                                       Time (seconds)
+Module                                       User      System        Wall        Calls
+DFH: sparsity prep                  :      2.133u      0.133s      0.832w      2 calls
+DFH: initialize()                   :    279.633u     15.433s     47.199w      2 calls
+DFH: Total Workflow                 :    268.667u      8.217s     41.534w      2 calls
+DFH: AO Construction                :    102.400u      3.117s     15.830w      2 calls
+DFH: AO-Met. Contraction            :    166.267u      5.100s     25.704w      2 calls
+HF: Form core H                     :      0.017u      0.000s      0.048w      1 calls
+HF: Form S/X                        :      0.817u      0.067s      0.130w      1 calls
+HF: Guess                           :      4.967u      0.300s      0.797w      1 calls
+SAD Guess                           :      4.850u      0.283s      0.776w      1 calls
+HF: Form G                          :    147.683u     48.533s     45.312w     16 calls
+JK: D                               :      0.183u      0.000s      0.031w     29 calls
+JK: USO2AO                          :      0.117u      0.017s      0.025w     29 calls
+JK: JK                              :    389.850u     86.833s     98.378w     29 calls
+DFH: compute_JK()                   :    389.850u     86.833s     98.378w     29 calls
+DFH: Grabbing AOs                   :     26.733u     71.167s     41.452w     29 calls
+DFH: compute_J                      :     49.500u      0.133s      7.453w     29 calls
+DFH: compute_K                      :    298.883u      8.900s     46.173w     29 calls
+JK: AO2USO                          :      0.000u      0.000s      0.000w     29 calls
+HF: Form F                          :      0.050u      0.000s      0.021w     16 calls
+HF: Form D                          :      0.100u      0.000s      0.012w     16 calls
+HF: DIIS                            :      3.717u      0.517s      0.633w     15 calls
+DIISManager::add_entry              :      0.300u      0.033s      0.058w     15 calls
+DIISManager::extrapolate            :      1.033u      0.367s      0.204w     15 calls
+bMatrix setup                       :      0.500u      0.200s      0.104w     15 calls
+bMatrix pseudoinverse               :      0.017u      0.000s      0.002w     15 calls
+New vector                          :      0.517u      0.167s      0.098w     15 calls
+HF: Form C                          :     11.417u      0.283s      1.759w     15 calls
+DFMP2 Singles                       :      0.167u      0.000s      0.023w      1 calls
+DFMP2 Aia                           :     54.100u      2.400s     10.555w      1 calls
+DFMP2 (A|mn)                        :     43.983u      0.000s      6.599w      1 calls
+DFMP2 (A|mn)C_mi                    :      3.317u      0.017s      0.501w      1 calls
+DFMP2 (A|mi)C_na                    :      2.000u      0.000s      0.301w      1 calls
+DFMP2 Aia Write                     :      0.367u      0.167s      0.076w      1 calls
+DFMP2 iaQ                           :     14.150u      1.017s      2.386w      1 calls
+DFMP2 Metric                        :      4.917u      0.100s      0.815w      1 calls
+DFMP2 Aia Read                      :      0.217u      0.100s      0.048w      1 calls
+DFMP2 (Q|A)(A|ia)                   :      7.083u      0.067s      1.077w      2 calls
+DFMP2 Qia Write                     :      0.433u      0.200s      0.096w      1 calls
+DFMP2 Qia Read                      :      0.067u      0.133s      0.121w      3 calls
+DFMP2 Bia Write                     :      0.367u      0.183s      0.080w      1 calls
+DFMP2 aiQ                           :      0.600u      0.300s      0.207w      1 calls
+DFMP2 Tij                           :     97.200u      4.450s     16.561w      1 calls
+DFMP2 Cia Read                      :      0.000u      0.117s      0.079w      2 calls
+DFMP2 I                             :     71.900u      0.117s     10.800w      2 calls
+DFMP2 T2                            :      9.867u      1.150s      1.655w      2 calls
+DFMP2 G                             :     37.283u      0.433s      5.655w      1 calls
+DFMP2 Pab                           :     17.600u      0.967s      2.787w      1 calls
+DFMP2 Gia Write                     :      0.383u      0.167s      0.083w      1 calls
+DFMP2 Tab                           :     45.217u      2.033s      8.222w      1 calls
+DFMP2 Qai Read                      :      0.067u      0.067s      0.085w      2 calls
+DFMP2 Pij                           :      2.383u      0.000s      0.357w      1 calls
+DFMP2 gamma                         :      4.367u      0.300s      0.756w      1 calls
+DFMP2 Gia Read                      :      0.050u      0.150s      0.085w      2 calls
+DFMP2 g                             :      3.617u      0.017s      0.544w      1 calls
+DFMP2 Gia                           :      1.467u      0.517s      0.336w      1 calls
+DFMP2 aiG Write                     :      0.350u      0.133s      0.074w      1 calls
+DFMP2 AB^x                          :      1.250u      0.050s      0.196w      1 calls
+DFMP2 Amn^x                         :    196.183u      3.167s     31.544w      1 calls
+DFMP2 L                             :     88.250u      4.983s     17.805w      1 calls
+DFMP2 P                             :      0.033u      0.000s      0.012w      1 calls
+DFMP2 W                             :      0.100u      0.017s      0.018w      1 calls
+DFMP2 Z                             :    384.350u     46.817s     78.063w      1 calls
+
+--------------------------------------------------------------------------------------
+DFH: sparsity prep                  :      0.667u      0.050s      0.432w      1 calls
+DFH: initialize()                   :    142.800u      7.900s     24.145w      1 calls
+| DFH: Total Workflow               :    136.600u      4.117s     21.111w      1 calls
+| | DFH: AO Construction            :     51.933u      1.650s      8.041w      1 calls
+| | DFH: AO-Met. Contraction        :     84.667u      2.467s     13.069w      1 calls
+HF: Form core H                     :      0.017u      0.000s      0.048w      1 calls
+HF: Form S/X                        :      0.817u      0.067s      0.130w      1 calls
+HF: Guess                           :      4.967u      0.300s      0.797w      1 calls
+| SAD Guess                         :      4.850u      0.283s      0.776w      1 calls
+HF: Form G                          :    147.683u     48.533s     45.312w     16 calls
+| JK: D                             :      0.100u      0.000s      0.016w     16 calls
+| JK: USO2AO                        :      0.067u      0.017s      0.014w     16 calls
+| JK: JK                            :    147.267u     48.500s     45.246w     16 calls
+| | DFH: compute_JK()               :    147.267u     48.500s     45.246w     16 calls
+| | | DFH: Grabbing AOs             :     14.750u     41.683s     24.287w     16 calls
+| | | DFH: compute_J                :     22.533u      0.100s      3.404w     16 calls
+| | | DFH: compute_K                :    101.050u      2.750s     15.570w     16 calls
+| JK: AO2USO                        :      0.000u      0.000s      0.000w     16 calls
+HF: Form F                          :      0.050u      0.000s      0.021w     16 calls
+HF: Form D                          :      0.100u      0.000s      0.012w     16 calls
+HF: DIIS                            :      3.717u      0.517s      0.633w     15 calls
+| DIISManager::add_entry            :      0.300u      0.033s      0.058w     15 calls
+| DIISManager::extrapolate          :      1.033u      0.367s      0.204w     15 calls
+| | bMatrix setup                   :      0.500u      0.200s      0.104w     15 calls
+| | bMatrix pseudoinverse           :      0.017u      0.000s      0.002w     15 calls
+| | New vector                      :      0.517u      0.167s      0.098w     15 calls
+HF: Form C                          :     11.417u      0.283s      1.759w     15 calls
+DFMP2 Singles                       :      0.167u      0.000s      0.023w      1 calls
+DFMP2 Aia                           :     54.100u      2.400s     10.555w      1 calls
+| DFMP2 (A|mn)                      :     43.983u      0.000s      6.599w      1 calls
+| DFMP2 (A|mn)C_mi                  :      3.317u      0.017s      0.501w      1 calls
+| DFMP2 (A|mi)C_na                  :      2.000u      0.000s      0.301w      1 calls
+| DFMP2 Aia Write                   :      0.367u      0.167s      0.076w      1 calls
+DFMP2 iaQ                           :     14.150u      1.017s      2.386w      1 calls
+| DFMP2 Metric                      :      4.917u      0.100s      0.815w      1 calls
+| DFMP2 Aia Read                    :      0.217u      0.100s      0.048w      1 calls
+| DFMP2 (Q|A)(A|ia)                 :      7.083u      0.067s      1.077w      2 calls
+| DFMP2 Qia Write                   :      0.433u      0.200s      0.096w      1 calls
+| DFMP2 Qia Read                    :      0.000u      0.067s      0.042w      1 calls
+| DFMP2 Bia Write                   :      0.367u      0.183s      0.080w      1 calls
+DFMP2 aiQ                           :      0.600u      0.300s      0.207w      1 calls
+DFMP2 Tij                           :     97.200u      4.450s     16.561w      1 calls
+| DFMP2 Qia Read                    :      0.067u      0.067s      0.080w      2 calls
+| DFMP2 Cia Read                    :      0.000u      0.067s      0.042w      1 calls
+| DFMP2 I                           :     36.067u      0.083s      5.420w      1 calls
+| DFMP2 T2                          :      4.283u      0.800s      0.765w      1 calls
+| DFMP2 G                           :     37.283u      0.433s      5.655w      1 calls
+| DFMP2 Pab                         :     17.600u      0.967s      2.787w      1 calls
+| DFMP2 Gia Write                   :      0.383u      0.167s      0.083w      1 calls
+DFMP2 Tab                           :     45.217u      2.033s      8.222w      1 calls
+| DFMP2 Qai Read                    :      0.067u      0.067s      0.085w      2 calls
+| DFMP2 I                           :     35.833u      0.033s      5.380w      1 calls
+| DFMP2 T2                          :      5.583u      0.350s      0.890w      1 calls
+| DFMP2 Pij                         :      2.383u      0.000s      0.357w      1 calls
+DFMP2 gamma                         :      4.367u      0.300s      0.756w      1 calls
+| DFMP2 Gia Read                    :      0.050u      0.083s      0.045w      1 calls
+| DFMP2 Cia Read                    :      0.000u      0.050s      0.037w      1 calls
+| DFMP2 g                           :      3.617u      0.017s      0.544w      1 calls
+DFMP2 Gia                           :      1.467u      0.517s      0.336w      1 calls
+| DFMP2 Gia Read                    :      0.000u      0.067s      0.040w      1 calls
+| DFMP2 aiG Write                   :      0.350u      0.133s      0.074w      1 calls
+DFMP2 AB^x                          :      1.250u      0.050s      0.196w      1 calls
+DFMP2 Amn^x                         :    196.183u      3.167s     31.544w      1 calls
+DFMP2 L                             :     88.250u      4.983s     17.805w      1 calls
+DFMP2 P                             :      0.033u      0.000s      0.012w      1 calls
+DFMP2 W                             :      0.100u      0.017s      0.018w      1 calls
+DFMP2 Z                             :    384.350u     46.817s     78.063w      1 calls
+| DFH: sparsity prep                :      1.467u      0.083s      0.400w      1 calls
+| DFH: initialize()                 :    136.833u      7.533s     23.055w      1 calls
+| | DFH: Total Workflow             :    132.067u      4.100s     20.423w      1 calls
+| | | DFH: AO Construction          :     50.467u      1.467s      7.789w      1 calls
+| | | DFH: AO-Met. Contraction      :     81.600u      2.633s     12.634w      1 calls
+| JK: D                             :      0.083u      0.000s      0.015w     13 calls
+| JK: USO2AO                        :      0.050u      0.000s      0.011w     13 calls
+| JK: JK                            :    242.583u     38.333s     53.132w     13 calls
+| | DFH: compute_JK()               :    242.583u     38.333s     53.132w     13 calls
+| | | DFH: Grabbing AOs             :     11.983u     29.483s     17.165w     13 calls
+| | | DFH: compute_J                :     26.967u      0.033s      4.050w     13 calls
+| | | DFH: compute_K                :    197.833u      6.150s     30.604w     13 calls
+| JK: AO2USO                        :      0.000u      0.000s      0.000w     13 calls
+
+**************************************************************************************

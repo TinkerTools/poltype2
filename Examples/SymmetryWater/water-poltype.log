@@ -1,0 +1,412 @@
+Mon Sep 21 14:56:08 2020 Running on host: node37.bme.utexas.edu
+Mon Sep 21 14:56:08 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Mon Sep 21 14:56:08 2020  Calling: mkdir /scratch/bdw2292/Psi4-water path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+Mon Sep 21 14:56:08 2020 Calling: Psi4 Optimization
+Mon Sep 21 14:56:08 2020  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater && psi4 water-opt.psi4 water-opt.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+Optimizer: Optimization complete!
+Mon Sep 21 14:56:24 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater/water-opt.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+Mon Sep 21 14:56:54 2020 All jobs have terminated 
+Mon Sep 21 14:56:54 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater/water-opt.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+Mon Sep 21 14:57:24 2020 All jobs have terminated 
+Mon Sep 21 14:57:24 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Mon Sep 21 14:57:24 2020 Calling: Psi4 Optimization
+Mon Sep 21 14:57:24 2020 Calling: Psi4 Gradient for DMA
+Mon Sep 21 14:57:24 2020  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater && psi4 water-dma.psi4 water-dma.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+Mon Sep 21 14:57:26 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater/water-dma.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+Mon Sep 21 14:57:56 2020 All jobs have terminated 
+Mon Sep 21 14:57:56 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater/water-dma.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+Mon Sep 21 14:58:26 2020 All jobs have terminated 
+Mon Sep 21 14:58:26 2020 NEED DMA: Executing GDMA
+Mon Sep 21 14:58:26 2020  Calling: /users/zj2244/Public/Software/gdma-2.2.11/bin/gdma < water.gdmain > water.gdmaout path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+Mon Sep 21 14:58:26 2020  Calling: poledit.x 1 water.gdmaout /home/bdw2292/poltype-poltype2-latest/amoebabio18_header.prm < water-peditin.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Global Frame Cartesian Multipole Moments :
+
+ Site:       1         Name:   O         Atomic Number:       8
+
+ Coordinates:           -0.000305       0.066251       0.000000
+
+ Charge:                 -0.37686
+ Dipole:                  0.00162       -0.35362        0.00000
+ Quadrupole:              0.51124
+                          0.00191        0.09539
+                          0.00000        0.00000       -0.60664
+
+ Site:       2         Name:   H         Atomic Number:       1
+
+ Coordinates:           -0.757757      -0.529210       0.000000
+
+ Charge:                  0.18843
+ Dipole:                 -0.10429       -0.04102        0.00000
+ Quadrupole:              0.03222
+                          0.09908        0.04037
+                          0.00000        0.00000       -0.07259
+
+ Site:       3         Name:   H         Atomic Number:       1
+
+ Coordinates:            0.762593      -0.522243       0.000000
+
+ Charge:                  0.18843
+ Dipole:                  0.10466       -0.04006        0.00000
+ Quadrupole:              0.03403
+                         -0.09913        0.03856
+                          0.00000        0.00000       -0.07259
+
+ Local Frame Definition for Multipole Sites :
+
+     Atom     Name      Axis Type     Z Axis  X Axis  Y Axis
+
+       1      O         Bisector         2       3       0
+       2      H         Z-then-X         1       3       0
+       3      H         Z-then-X         1       2       0
+
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Choose Either the AMOEBA or HIPPO Polarization Model [A] :  
+ Polarizability Parameters for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      O            0.8370         0.3900
+       2      H            0.4960         0.3900
+       3      H            0.4960         0.3900
+
+ Enter Atom Number, Polarizability & Thole Values :  
+ The default is to place all atoms into one polarization group;
+ This can be altered by entering a series of bonded atom pairs
+ that separate the molecule into distinct polarization groups
+
+ Enter a Bond between Polarization Groups [<Enter>=Exit] :  
+ Polarization Groups for Multipole Sites :
+
+     Atom     Name       Polarization Group Definition
+
+       1      O               2     3
+       2      H               1
+       3      H               1
+
+ Electrostatic and Polarization Scale Factors :
+
+                    1-2         1-3         1-4         1-5
+
+ M-Scale:         0.0000      0.0000      0.4000      0.8000
+ P-Inter:         0.0000      0.0000      1.0000      1.0000
+ P-Intra:         0.0000      0.0000      0.5000      1.0000
+ W-Scale:         1.0000      1.0000      1.0000      1.0000
+
+                    1-1         1-2         1-3         1-4
+
+ D-Scale:         0.0000      1.0000      1.0000      1.0000
+ U-Scale:         1.0000      1.0000      1.0000      1.0000
+
+ Use Thole Damping:           True
+ Charge Penetration:          False
+ Set D Equal to P:            False
+
+ Determination of Intergroup Induced Dipoles :
+
+    Iter        RMS Change (Debye)
+
+       1           0.0000000000
+
+ Local Frame Intergroup Induced Dipole Moments (Debye) :
+
+    Atom              X           Y           Z         Total
+
+       1           0.0000      0.0000      0.0000      0.0000
+       2           0.0000      0.0000      0.0000      0.0000
+       3           0.0000      0.0000      0.0000      0.0000
+
+ Condense Symmetric Atoms to Equivalent Types [Y] :  
+ Remove Multipole Components Zeroed by Symmetry [Y] :  
+ Final Atomic Multipole Moments after Regularization :
+
+ Atom:       1         Name:   O         Atomic Number:       8
+
+ Local Frame:            Bisector             2       3       0
+
+ Charge:                 -0.37686
+ Dipole:                 -0.00001        0.00000        0.35363
+ Quadrupole:              0.51125
+                          0.00000       -0.60663
+                         -0.00001        0.00000        0.09538
+
+ Atom:       2         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             1       3       0
+
+ Charge:                  0.18843
+ Dipole:                 -0.03221        0.00000       -0.10734
+ Quadrupole:             -0.05902
+                          0.00000       -0.07259
+                         -0.02736        0.00000        0.13161
+
+ Atom:       3         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             1       2       0
+
+ Charge:                  0.18843
+ Dipole:                 -0.03221        0.00000       -0.10734
+ Quadrupole:             -0.05902
+                          0.00000       -0.07259
+                         -0.02736        0.00000        0.13161
+Mon Sep 21 14:58:27 2020  Calling: potential.x 1 water.xyz -k water.key path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+       1      1     O     water                        8     15.999     2
+       2      2     H     water                        1      1.008     1
+       3      3     H     water                        1      1.008     1
+
+ Electrostatic Potential Grid Points :                  4335
+
+ Gaussian CUBEGEN Input Written To :   water.grid
+
+ Next, run the Gaussian CUBEGEN program; for example:
+ cubegen 0 potential=MP2 xxx.fchk xxx.cube -5 h < xxx.grid
+
+ See the Gaussian documentation for additional details;
+ After CUBEGEN, rerun Tinker POTENTIAL using Option 2
+Mon Sep 21 14:58:27 2020 Calling: Psi4 Gradient for ESP
+Mon Sep 21 14:58:27 2020  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater && psi4 water-esp.psi4 water-esp.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+Mon Sep 21 14:58:39 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater/water-esp.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+Mon Sep 21 14:59:09 2020 All jobs have terminated 
+Mon Sep 21 14:59:09 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater/water-esp.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+Mon Sep 21 14:59:39 2020 All jobs have terminated 
+Mon Sep 21 14:59:39 2020 Calling: Generating CUBE File from PSI4
+Mon Sep 21 14:59:39 2020  Calling: potential.x 2 water.cube path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Electrostatic Potential Written To :  water.pot
+Mon Sep 21 14:59:39 2020  Calling: /home/bdw2292/poltype-poltype2-latest/avgmpoles.pl water.key water.xyz water-groups.txt water.key_2 water.xyz_2 401 path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+About to zero the x dipole and xz quadrupoleMon Sep 21 14:59:39 2020 
+Mon Sep 21 14:59:39 2020 =========================================================
+Mon Sep 21 14:59:39 2020 QM Dipole moment
+
+Mon Sep 21 14:59:39 2020  Calling: potential.x 6 water.xyz_2 -k water.key_2 water.pot N 0.1 path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+     401    401     O     water                        8     15.999     2
+     402    402     H     water                        1      1.008     1
+
+ Electrostatic Potential Grid Points :                  4335
+
+ Electrostatic Parameter Restraint Value :            1.0000
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+     401    401     O     water                        8     15.999     2
+     402    402     H     water                        1      1.008     1
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         401      402    402      0   Bisector    -0.37686
+                                                   0.00000  0.00000  0.35363
+                                                   0.51125
+                                                   0.00000 -0.60663
+                                                   0.00000  0.00000  0.09538
+
+         402      401    402      0   Z-then-X     0.18843
+                                                  -0.03221  0.00000 -0.10734
+                                                  -0.05902
+                                                   0.00000 -0.07259
+                                                  -0.02736  0.00000  0.13161
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         401             0.837       0.390         402
+         402             0.496       0.390         401
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1        1840        -8.5703        -7.6653         1.4682
+        1        2        1244         6.2047         5.5620         1.1565
+        1        3        1251         6.2035         5.5545         1.1596
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.0669
+ Average Potential Magnitude for Model :              7.5343
+ Average Potential Value for Target :                -0.0545
+ Average Potential Magnitude for Target :             6.6404
+
+ Average Signed Potential Difference :               -0.0124
+ Average Unsigned Potential Difference :              1.0977
+ Root Mean Square Potential Difference :              1.2988
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value         Fixed
+
+    --            401             Monopole          -0.37686          X
+    --            401             X-Dipole           0.00000          X
+    --            401             Y-Dipole           0.00000          X
+     1            401             Z-Dipole           0.35363
+     2            401             XX-Quad            0.51125
+    --            401             XY-Quad            0.00000          X
+    --            401             XZ-Quad            0.00000          X
+     3            401             YY-Quad           -0.60663
+    --            401             YZ-Quad            0.00000          X
+    --            401             ZZ-Quad            0.09538
+    --            402             Monopole           0.18843          X
+     4            402             X-Dipole          -0.03221
+    --            402             Y-Dipole           0.00000          X
+     5            402             Z-Dipole          -0.10734
+     6            402             XX-Quad           -0.05902
+    --            402             XY-Quad            0.00000          X
+     7            402             XZ-Quad           -0.02736
+     8            402             YY-Quad           -0.07259
+    --            402             YZ-Quad            0.00000          X
+    --            402             ZZ-Quad            0.13161
+
+ Levenberg-Marquardt Nonlinear Least Squares :
+
+ LS Iter     F Value      Total G     Active G    N Active   F Calls
+
+     0     8191.5943   17075.7374   17075.7374         8         9
+     1       34.5010       0.0000       0.0000         8        18
+
+ SQUARE  --  Normal Termination of Least Squares
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value         Fixed
+
+    --            401             Monopole          -0.37686          X
+    --            401             X-Dipole           0.00000          X
+    --            401             Y-Dipole           0.00000          X
+     1            401             Z-Dipole           0.28379
+     2            401             XX-Quad            0.49568
+    --            401             XY-Quad            0.00000          X
+    --            401             XZ-Quad            0.00000          X
+     3            401             YY-Quad           -0.67038
+    --            401             YZ-Quad            0.00000          X
+    --            401             ZZ-Quad            0.17470
+    --            402             Monopole           0.18843          X
+     4            402             X-Dipole          -0.07443
+    --            402             Y-Dipole           0.00000          X
+     5            402             Z-Dipole          -0.11691
+     6            402             XX-Quad           -0.00071
+    --            402             XY-Quad            0.00000          X
+     7            402             XZ-Quad           -0.04288
+     8            402             YY-Quad           -0.09687
+    --            402             YZ-Quad            0.00000          X
+    --            402             ZZ-Quad            0.09758
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1        1840        -7.6735        -7.6653         0.0702
+        1        2        1244         5.5175         5.5620         0.0772
+        1        3        1251         5.5097         5.5545         0.0778
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.0837
+ Average Potential Magnitude for Model :              6.6244
+ Average Potential Value for Target :                -0.0545
+ Average Potential Magnitude for Target :             6.6404
+
+ Average Signed Potential Difference :               -0.0292
+ Average Unsigned Potential Difference :              0.0529
+ Root Mean Square Potential Difference :              0.0745
+Mon Sep 21 14:59:40 2020  Calling: sed -e '/\(.* none$\|^#\|^fix\|^potential-offset\)/d' water.key_3 > water.key_3_tmp path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+Mon Sep 21 14:59:40 2020 
+Mon Sep 21 14:59:40 2020 =========================================================
+Mon Sep 21 14:59:40 2020 Electrostatic Potential Comparison
+
+Mon Sep 21 14:59:40 2020  Calling: potential.x 5 water.xyz_2 -k water.key_3 water.pot N > RMSPD.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+****************************************************************************************************
+Mon Sep 21 14:59:40 2020  Calling: psi4 water-esp_frag.psi4 water-esp_frag.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+Mon 21 Sep 2020 02:59:42 PM CDT equivalentrotbndindexarrays[]
+Mon 21 Sep 2020 02:59:42 PM CDT All jobs have terminated 
+Mon 21 Sep 2020 02:59:42 PM CDT 
+Mon 21 Sep 2020 02:59:42 PM CDT =========================================================
+Mon 21 Sep 2020 02:59:42 PM CDT Minimizing structure
+
+Mon 21 Sep 2020 02:59:42 PM CDT  Calling: cp water.xyz_2 ttt.xyz path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+Mon 21 Sep 2020 02:59:42 PM CDT  Calling: cp water.key_5 ttt.key path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+Mon 21 Sep 2020 02:59:42 PM CDT  Calling: minimize.x -k ttt.key ttt.xyz 0.1 > Minimizedttt.out path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+Mon 21 Sep 2020 02:59:43 PM CDT 
+Mon 21 Sep 2020 02:59:43 PM CDT =========================================================
+Mon 21 Sep 2020 02:59:43 PM CDT QM Dipole moment
+
+Mon 21 Sep 2020 02:59:43 PM CDT QM Dipole moment = 1.859
+Mon 21 Sep 2020 02:59:43 PM CDT 
+Mon 21 Sep 2020 02:59:43 PM CDT =========================================================
+Mon 21 Sep 2020 02:59:43 PM CDT MM Dipole moment
+
+Mon 21 Sep 2020 02:59:43 PM CDT  Calling: analyze.x water.xyz_2 -k ttt.key em | grep -A11 Charge>MMDipole.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryWater
+Mon 21 Sep 2020 02:59:43 PM CDT MM Dipole moment = 1.86
+Mon 21 Sep 2020 02:59:43 PM CDT Poltype Job Finished
+

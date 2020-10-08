@@ -1,0 +1,326 @@
+Mon Sep 21 15:07:37 2020 Running on host: node37.bme.utexas.edu
+Mon Sep 21 15:07:37 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Mon Sep 21 15:07:37 2020  Calling: /home/bdw2292/miniconda3/envs/p4env/bin/obminimize -ff MMFF94 methanol.sdf >methanol_OBOPT.pdb path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolTorsionGaus
+
+A T O M   T Y P E S
+
+IDX	TYPE	RING
+1	6	NO
+2	1	NO
+3	5	NO
+4	5	NO
+5	5	NO
+6	21	NO
+
+F O R M A L   C H A R G E S
+
+IDX	CHARGE
+1	0.000000
+2	0.000000
+3	0.000000
+4	0.000000
+5	0.000000
+6	0.000000
+
+P A R T I A L   C H A R G E S
+
+IDX	CHARGE
+1	-0.680000
+2	0.280000
+3	0.000000
+4	0.000000
+5	0.000000
+6	0.400000
+
+S E T T I N G   U P   C A L C U L A T I O N S
+
+SETTING UP BOND CALCULATIONS...
+SETTING UP ANGLE & STRETCH-BEND CALCULATIONS...
+SETTING UP TORSION CALCULATIONS...
+SETTING UP OOP CALCULATIONS...
+SETTING UP VAN DER WAALS CALCULATIONS...
+SETTING UP ELECTROSTATIC CALCULATIONS...
+
+C O N J U G A T E   G R A D I E N T S
+
+STEPS = 2500
+
+STEP n     E(n)       E(n-1)    
+--------------------------------
+    1       0.666       0.666
+   10       0.666       0.666
+   20       0.666       0.666
+   30       0.666       0.666
+   40       0.666       0.666
+   50       0.666       0.666
+   60       0.666       0.666
+   70       0.666       0.666
+   80       0.666       0.666
+   90       0.666       0.666
+  100       0.666       0.666
+  110       0.666       0.666
+  120       0.666       0.666
+  130       0.666       0.666
+  140       0.666       0.666
+  150       0.666       0.666
+  160       0.666       0.666
+  170       0.666       0.666
+  180       0.666       0.666
+  190       0.666       0.666
+  200       0.666       0.666
+  210       0.666       0.666
+  220       0.666       0.666
+  230       0.666       0.666
+  240       0.666       0.666
+  250       0.666       0.666
+  260       0.666       0.666
+  270       0.666       0.666
+  280       0.666       0.666
+  290       0.666       0.666
+  300       0.666       0.666
+  310       0.666       0.666
+  320       0.666       0.666
+  330       0.666       0.666
+  340       0.666       0.666
+  350       0.666       0.666
+  360       0.666       0.666
+  370       0.666       0.666
+  380       0.666       0.666
+  390       0.666       0.666
+  400       0.666       0.666
+  410       0.666       0.666
+  420       0.666       0.666
+  430       0.666       0.666
+  440       0.666       0.666
+  450       0.666       0.666
+  460       0.666       0.666
+  470       0.666       0.666
+  480       0.666       0.666
+  490       0.666       0.666
+  500       0.666       0.666
+  510       0.666       0.666
+  520       0.666       0.666
+  530       0.666       0.666
+  540       0.666       0.666
+  550       0.666       0.666
+  560       0.666       0.666
+  570       0.666       0.666
+  580       0.666       0.666
+  590       0.666       0.666
+  600       0.666       0.666
+  610       0.666       0.666
+  620       0.666       0.666
+  630       0.666       0.666
+  640       0.666       0.666
+  650       0.666       0.666
+  660       0.666       0.666
+  670       0.666       0.666
+  680       0.666       0.666
+  690       0.666       0.666
+  700       0.666       0.666
+  710       0.666       0.666
+  720       0.666       0.666
+  730       0.666       0.666
+  740       0.666       0.666
+  750       0.666       0.666
+  760       0.666       0.666
+  770       0.666       0.666
+  780       0.666       0.666
+  790       0.666       0.666
+  800       0.666       0.666
+  810       0.666       0.666
+  820       0.666       0.666
+  830       0.666       0.666
+  840       0.666       0.666
+  850       0.666       0.666
+  860       0.666       0.666
+  870       0.666       0.666
+  880       0.666       0.666
+  890       0.666       0.666
+  900       0.666       0.666
+  910       0.666       0.666
+  920       0.666       0.666
+  930       0.666       0.666
+  940       0.666       0.666
+  950       0.666       0.666
+  960       0.666       0.666
+  970       0.666       0.666
+  980       0.666       0.666
+  990       0.666       0.666
+ 1000       0.666       0.666
+ 1010       0.666       0.666
+ 1020       0.666       0.666
+ 1030       0.666       0.666
+ 1040       0.666       0.666
+ 1050       0.666       0.666
+ 1060       0.666       0.666
+ 1070       0.666       0.666
+ 1080       0.666       0.666
+ 1090       0.666       0.666
+ 1100       0.666       0.666
+ 1110       0.666       0.666
+ 1120       0.666       0.666
+ 1130       0.666       0.666
+ 1140       0.666       0.666
+ 1150       0.666       0.666
+ 1160       0.666       0.666
+ 1170       0.666       0.666
+ 1180       0.666       0.666
+ 1190       0.666       0.666
+ 1200       0.666       0.666
+ 1210       0.666       0.666
+ 1220       0.666       0.666
+ 1230       0.666       0.666
+ 1240       0.666       0.666
+ 1250       0.666       0.666
+ 1260       0.666       0.666
+ 1270       0.666       0.666
+ 1280       0.666       0.666
+ 1290       0.666       0.666
+ 1300       0.666       0.666
+ 1310       0.666       0.666
+ 1320       0.666       0.666
+ 1330       0.666       0.666
+ 1340       0.666       0.666
+ 1350       0.666       0.666
+ 1360       0.666       0.666
+ 1370       0.666       0.666
+ 1380       0.666       0.666
+ 1390       0.666       0.666
+ 1400       0.666       0.666
+ 1410       0.666       0.666
+ 1420       0.666       0.666
+ 1430       0.666       0.666
+ 1440       0.666       0.666
+ 1450       0.666       0.666
+ 1460       0.666       0.666
+ 1470       0.666       0.666
+ 1480       0.666       0.666
+ 1490       0.666       0.666
+ 1500       0.666       0.666
+ 1510       0.666       0.666
+ 1520       0.666       0.666
+ 1530       0.666       0.666
+ 1540       0.666       0.666
+ 1550       0.666       0.666
+ 1560       0.666       0.666
+ 1570       0.666       0.666
+ 1580       0.666       0.666
+ 1590       0.666       0.666
+ 1600       0.666       0.666
+ 1610       0.666       0.666
+ 1620       0.666       0.666
+ 1630       0.666       0.666
+ 1640       0.666       0.666
+ 1650       0.666       0.666
+ 1660       0.666       0.666
+ 1670       0.666       0.666
+ 1680       0.666       0.666
+ 1690       0.666       0.666
+ 1700       0.666       0.666
+ 1710       0.666       0.666
+ 1720       0.666       0.666
+ 1730       0.666       0.666
+ 1740       0.666       0.666
+ 1750       0.666       0.666
+ 1760       0.666       0.666
+ 1770       0.666       0.666
+ 1780       0.666       0.666
+ 1790       0.666       0.666
+ 1800       0.666       0.666
+ 1810       0.666       0.666
+ 1820       0.666       0.666
+ 1830       0.666       0.666
+ 1840       0.666       0.666
+ 1850       0.666       0.666
+ 1860       0.666       0.666
+ 1870       0.666       0.666
+ 1880       0.666       0.666
+ 1890       0.666       0.666
+ 1900       0.666       0.666
+ 1910       0.666       0.666
+ 1920       0.666       0.666
+ 1930       0.666       0.666
+ 1940       0.666       0.666
+ 1950       0.666       0.666
+ 1960       0.666       0.666
+ 1970       0.666       0.666
+ 1980       0.666       0.666
+ 1990       0.666       0.666
+ 2000       0.666       0.666
+ 2010       0.666       0.666
+ 2020       0.666       0.666
+ 2030       0.666       0.666
+ 2040       0.666       0.666
+ 2050       0.666       0.666
+ 2060       0.666       0.666
+ 2070       0.666       0.666
+ 2080       0.666       0.666
+ 2090       0.666       0.666
+ 2100       0.666       0.666
+ 2110       0.666       0.666
+ 2120       0.666       0.666
+ 2130       0.666       0.666
+ 2140       0.666       0.666
+ 2150       0.666       0.666
+ 2160       0.666       0.666
+ 2170       0.666       0.666
+ 2180       0.666       0.666
+ 2190       0.666       0.666
+ 2200       0.666       0.666
+ 2210       0.666       0.666
+ 2220       0.666       0.666
+ 2230       0.666       0.666
+ 2240       0.666       0.666
+ 2250       0.666       0.666
+ 2260       0.666       0.666
+ 2270       0.666       0.666
+ 2280       0.666       0.666
+ 2290       0.666       0.666
+ 2300       0.666       0.666
+ 2310       0.666       0.666
+ 2320       0.666       0.666
+ 2330       0.666       0.666
+ 2340       0.666       0.666
+ 2350       0.666       0.666
+ 2360       0.666       0.666
+ 2370       0.666       0.666
+ 2380       0.666       0.666
+ 2390       0.666       0.666
+ 2400       0.666       0.666
+ 2410       0.666       0.666
+ 2420       0.666       0.666
+ 2430       0.666       0.666
+ 2440       0.666       0.666
+ 2450       0.666       0.666
+ 2460       0.666       0.666
+ 2470       0.666       0.666
+ 2480       0.666       0.666
+ 2490       0.666       0.666
+ 2500       0.666       0.666
+Time: 0.1seconds. Iterations per second: 25010
+Mon Sep 21 15:07:37 2020  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolTorsionGaus && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt.com path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolTorsionGaus
+Mon Sep 21 15:08:05 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolTorsionGaus/methanol-opt.log path=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolTorsionGaus
+Mon Sep 21 15:08:35 2020 All jobs have terminated 
+Mon Sep 21 15:08:35 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolTorsionGaus/methanol-opt.log path=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolTorsionGaus
+Mon Sep 21 15:09:05 2020 All jobs have terminated 
+Mon Sep 21 15:09:05 2020  Calling: /opt/g09gh/gaussian/g09/formchk methanol-opt.chk path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolTorsionGaus
+ Read checkpoint file methanol-opt.chk
+ Write formatted file methanol-opt.fchk
+Mon Sep 21 15:09:05 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+ Coordinates translated and rotated.
+ Coordinates match /B/ after translation and rotation.
+Mon Sep 21 15:09:05 2020  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolTorsionGaus && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-dma.com path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolTorsionGaus
+ Rotating derivatives, DoTrsp=T IDiff= 1 LEDeriv=    917 LFDPrp=       0 LDFDPr=       0.
+Mon Sep 21 15:09:07 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolTorsionGaus/methanol-dma.log path=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolTorsionGaus
+Mon Sep 21 15:09:37 2020 All jobs have terminated 
+Mon Sep 21 15:09:37 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolTorsionGaus/methanol-dma.log path=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolTorsionGaus
+Mon Sep 21 15:10:07 2020 All jobs have terminated 
+Mon Sep 21 15:10:07 2020  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolTorsionGaus && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-dma.com path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolTorsionGaus
+PGFIO/stdio: No such file or directory
+PGFIO-F-/OPEN/unit=11/error code returned by host stdio - 2.
+ File name = /scratch/bdw2292/Gau-methanol/Gau-25834.inp
+ In source file ml0.f, at line number 182
+  0  0x42ccc1
+Error: segmentation violation, address not mapped to object
+Mon Sep 21 15:10:07 2020 ERROR: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolTorsionGaus && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-dma.com path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolTorsionGaus

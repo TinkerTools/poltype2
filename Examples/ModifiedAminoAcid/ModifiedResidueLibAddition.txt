@@ -1,0 +1,13 @@
+# RESIDUE CNC
+atom  366  366 N     CNC                    7 14.0067  0
+atom  375  375 H     CNC                    1  1.00794  0
+atom  364  364 CA    CNC                    6 12.0107  0
+atom  373  373 HA    CNC                    1  1.00794  0
+atom  367  367 C     CNC                    6 12.0107  0
+atom  374  374 O     CNC                    8 15.9994  0
+atom  372  372 H     CNC                    1  1.00794  0
+atom  372  372 H     CNC                    1  1.00794  0
+atom  365  365 C     CNC                    6 12.0107  0
+atom  370  370 S     CNC                    16 32.065  0
+atom  371  371 C     CNC                    6 12.0107  0
+atom  379  379 N     CNC                    7 14.0067  0

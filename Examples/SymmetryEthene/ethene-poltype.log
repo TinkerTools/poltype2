@@ -1,0 +1,797 @@
+Mon Sep 21 14:25:02 2020 Running on host: node37.bme.utexas.edu
+Mon Sep 21 14:25:02 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Mon Sep 21 14:25:02 2020  Calling: /home/bdw2292/miniconda3/envs/p4env/bin/obminimize -ff MMFF94 ethene.sdf >ethene_OBOPT.pdb path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+
+A T O M   T Y P E S
+
+IDX	TYPE	RING
+1	2	NO
+2	2	NO
+3	5	NO
+4	5	NO
+5	5	NO
+6	5	NO
+
+F O R M A L   C H A R G E S
+
+IDX	CHARGE
+1	0.000000
+2	0.000000
+3	0.000000
+4	0.000000
+5	0.000000
+6	0.000000
+
+P A R T I A L   C H A R G E S
+
+IDX	CHARGE
+1	-0.300000
+2	-0.300000
+3	0.150000
+4	0.150000
+5	0.150000
+6	0.150000
+
+S E T T I N G   U P   C A L C U L A T I O N S
+
+SETTING UP BOND CALCULATIONS...
+SETTING UP ANGLE & STRETCH-BEND CALCULATIONS...
+SETTING UP TORSION CALCULATIONS...
+SETTING UP OOP CALCULATIONS...
+SETTING UP VAN DER WAALS CALCULATIONS...
+SETTING UP ELECTROSTATIC CALCULATIONS...
+
+C O N J U G A T E   G R A D I E N T S
+
+STEPS = 2500
+
+STEP n     E(n)       E(n-1)    
+--------------------------------
+    1       8.209       8.217
+   10       8.200       8.200
+   20       8.200       8.200
+   30       8.200       8.200
+   40       8.200       8.200
+   50       8.200       8.200
+   60       8.200       8.200
+   70       8.200       8.200
+   80       8.200       8.200
+   90       8.200       8.200
+  100       8.200       8.200
+  110       8.200       8.200
+  120       8.200       8.200
+  130       8.200       8.200
+  140       8.200       8.200
+  150       8.200       8.200
+  160       8.200       8.200
+  170       8.200       8.200
+  180       8.200       8.200
+  190       8.200       8.200
+  200       8.200       8.200
+  210       8.200       8.200
+  220       8.200       8.200
+  230       8.200       8.200
+  240       8.200       8.200
+  250       8.200       8.200
+  260       8.200       8.200
+  270       8.200       8.200
+  280       8.200       8.200
+  290       8.200       8.200
+  300       8.200       8.200
+  310       8.200       8.200
+  320       8.200       8.200
+  330       8.200       8.200
+  340       8.200       8.200
+  350       8.200       8.200
+  360       8.200       8.200
+  370       8.200       8.200
+  380       8.200       8.200
+  390       8.200       8.200
+  400       8.200       8.200
+  410       8.200       8.200
+  420       8.200       8.200
+  430       8.200       8.200
+  440       8.200       8.200
+  450       8.200       8.200
+  460       8.200       8.200
+  470       8.200       8.200
+  480       8.200       8.200
+  490       8.200       8.200
+  500       8.200       8.200
+  510       8.200       8.200
+  520       8.200       8.200
+  530       8.200       8.200
+  540       8.200       8.200
+  550       8.200       8.200
+  560       8.200       8.200
+  570       8.200       8.200
+  580       8.200       8.200
+  590       8.200       8.200
+  600       8.200       8.200
+  610       8.200       8.200
+  620       8.200       8.200
+  630       8.200       8.200
+  640       8.200       8.200
+  650       8.200       8.200
+  660       8.200       8.200
+  670       8.200       8.200
+  680       8.200       8.200
+  690       8.200       8.200
+  700       8.200       8.200
+  710       8.200       8.200
+  720       8.200       8.200
+  730       8.200       8.200
+  740       8.200       8.200
+  750       8.200       8.200
+  760       8.200       8.200
+  770       8.200       8.200
+  780       8.200       8.200
+  790       8.200       8.200
+  800       8.200       8.200
+  810       8.200       8.200
+  820       8.200       8.200
+  830       8.200       8.200
+  840       8.200       8.200
+  850       8.200       8.200
+  860       8.200       8.200
+  870       8.200       8.200
+  880       8.200       8.200
+  890       8.200       8.200
+  900       8.200       8.200
+  910       8.200       8.200
+  920       8.200       8.200
+  930       8.200       8.200
+  940       8.200       8.200
+  950       8.200       8.200
+  960       8.200       8.200
+  970       8.200       8.200
+  980       8.200       8.200
+  990       8.200       8.200
+ 1000       8.200       8.200
+ 1010       8.200       8.200
+ 1020       8.200       8.200
+ 1030       8.200       8.200
+ 1040       8.200       8.200
+ 1050       8.200       8.200
+ 1060       8.200       8.200
+ 1070       8.200       8.200
+ 1080       8.200       8.200
+ 1090       8.200       8.200
+ 1100       8.200       8.200
+ 1110       8.200       8.200
+ 1120       8.200       8.200
+ 1130       8.200       8.200
+ 1140       8.200       8.200
+ 1150       8.200       8.200
+ 1160       8.200       8.200
+ 1170       8.200       8.200
+ 1180       8.200       8.200
+ 1190       8.200       8.200
+ 1200       8.200       8.200
+ 1210       8.200       8.200
+ 1220       8.200       8.200
+ 1230       8.200       8.200
+ 1240       8.200       8.200
+ 1250       8.200       8.200
+ 1260       8.200       8.200
+ 1270       8.200       8.200
+ 1280       8.200       8.200
+ 1290       8.200       8.200
+ 1300       8.200       8.200
+ 1310       8.200       8.200
+ 1320       8.200       8.200
+ 1330       8.200       8.200
+ 1340       8.200       8.200
+ 1350       8.200       8.200
+ 1360       8.200       8.200
+ 1370       8.200       8.200
+ 1380       8.200       8.200
+ 1390       8.200       8.200
+ 1400       8.200       8.200
+ 1410       8.200       8.200
+ 1420       8.200       8.200
+ 1430       8.200       8.200
+ 1440       8.200       8.200
+ 1450       8.200       8.200
+ 1460       8.200       8.200
+ 1470       8.200       8.200
+ 1480       8.200       8.200
+ 1490       8.200       8.200
+ 1500       8.200       8.200
+ 1510       8.200       8.200
+ 1520       8.200       8.200
+ 1530       8.200       8.200
+ 1540       8.200       8.200
+ 1550       8.200       8.200
+ 1560       8.200       8.200
+ 1570       8.200       8.200
+ 1580       8.200       8.200
+ 1590       8.200       8.200
+ 1600       8.200       8.200
+ 1610       8.200       8.200
+ 1620       8.200       8.200
+ 1630       8.200       8.200
+ 1640       8.200       8.200
+ 1650       8.200       8.200
+ 1660       8.200       8.200
+ 1670       8.200       8.200
+ 1680       8.200       8.200
+ 1690       8.200       8.200
+ 1700       8.200       8.200
+ 1710       8.200       8.200
+ 1720       8.200       8.200
+ 1730       8.200       8.200
+ 1740       8.200       8.200
+ 1750       8.200       8.200
+ 1760       8.200       8.200
+ 1770       8.200       8.200
+ 1780       8.200       8.200
+ 1790       8.200       8.200
+ 1800       8.200       8.200
+ 1810       8.200       8.200
+ 1820       8.200       8.200
+ 1830       8.200       8.200
+ 1840       8.200       8.200
+ 1850       8.200       8.200
+ 1860       8.200       8.200
+ 1870       8.200       8.200
+ 1880       8.200       8.200
+ 1890       8.200       8.200
+ 1900       8.200       8.200
+ 1910       8.200       8.200
+ 1920       8.200       8.200
+ 1930       8.200       8.200
+ 1940       8.200       8.200
+ 1950       8.200       8.200
+ 1960       8.200       8.200
+ 1970       8.200       8.200
+ 1980       8.200       8.200
+ 1990       8.200       8.200
+ 2000       8.200       8.200
+ 2010       8.200       8.200
+ 2020       8.200       8.200
+ 2030       8.200       8.200
+ 2040       8.200       8.200
+ 2050       8.200       8.200
+ 2060       8.200       8.200
+ 2070       8.200       8.200
+ 2080       8.200       8.200
+ 2090       8.200       8.200
+ 2100       8.200       8.200
+ 2110       8.200       8.200
+ 2120       8.200       8.200
+ 2130       8.200       8.200
+ 2140       8.200       8.200
+ 2150       8.200       8.200
+ 2160       8.200       8.200
+ 2170       8.200       8.200
+ 2180       8.200       8.200
+ 2190       8.200       8.200
+ 2200       8.200       8.200
+ 2210       8.200       8.200
+ 2220       8.200       8.200
+ 2230       8.200       8.200
+ 2240       8.200       8.200
+ 2250       8.200       8.200
+ 2260       8.200       8.200
+ 2270       8.200       8.200
+ 2280       8.200       8.200
+ 2290       8.200       8.200
+ 2300       8.200       8.200
+ 2310       8.200       8.200
+ 2320       8.200       8.200
+ 2330       8.200       8.200
+ 2340       8.200       8.200
+ 2350       8.200       8.200
+ 2360       8.200       8.200
+ 2370       8.200       8.200
+ 2380       8.200       8.200
+ 2390       8.200       8.200
+ 2400       8.200       8.200
+ 2410       8.200       8.200
+ 2420       8.200       8.200
+ 2430       8.200       8.200
+ 2440       8.200       8.200
+ 2450       8.200       8.200
+ 2460       8.200       8.200
+ 2470       8.200       8.200
+ 2480       8.200       8.200
+ 2490       8.200       8.200
+ 2500       8.200       8.200
+Time: 0.12seconds. Iterations per second: 20841.7
+Mon Sep 21 14:25:02 2020 Calling: Psi4 Optimization
+Mon Sep 21 14:25:02 2020  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene && psi4 ethene-opt.psi4 ethene-opt.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+Optimizer: Optimization complete!
+Mon Sep 21 14:25:14 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene/ethene-opt.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+Mon Sep 21 14:25:44 2020 All jobs have terminated 
+Mon Sep 21 14:25:44 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene/ethene-opt.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+Mon Sep 21 14:26:14 2020 All jobs have terminated 
+Mon Sep 21 14:26:14 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Mon Sep 21 14:26:14 2020 Calling: Psi4 Optimization
+Mon Sep 21 14:26:14 2020 Calling: Psi4 Gradient for DMA
+Mon Sep 21 14:26:14 2020  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene && psi4 ethene-dma.psi4 ethene-dma.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+Mon Sep 21 14:26:16 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene/ethene-dma.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+Mon Sep 21 14:26:46 2020 All jobs have terminated 
+Mon Sep 21 14:26:46 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene/ethene-dma.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+Mon Sep 21 14:27:16 2020 All jobs have terminated 
+Mon Sep 21 14:27:16 2020 NEED DMA: Executing GDMA
+Mon Sep 21 14:27:16 2020  Calling: /users/zj2244/Public/Software/gdma-2.2.11/bin/gdma < ethene.gdmain > ethene.gdmaout path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+Mon Sep 21 14:27:17 2020  Calling: poledit.x 1 ethene.gdmaout /home/bdw2292/poltype-poltype2-latest/amoebabio18_header.prm < ethene-peditin.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Global Frame Cartesian Multipole Moments :
+
+ Site:       1         Name:   C         Atomic Number:       6
+
+ Coordinates:           -0.664246      -0.000000       0.000000
+
+ Charge:                 -0.05898
+ Dipole:                 -0.07298        0.00000        0.00000
+ Quadrupole:             -0.05802
+                          0.00000        0.10437
+                          0.00000        0.00000       -0.04635
+
+ Site:       2         Name:   C         Atomic Number:       6
+
+ Coordinates:            0.664246       0.000000       0.000000
+
+ Charge:                 -0.05898
+ Dipole:                  0.07298        0.00000        0.00000
+ Quadrupole:             -0.05802
+                          0.00000        0.10437
+                          0.00000        0.00000       -0.04635
+
+ Site:       3         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.232024      -0.926223       0.000000
+
+ Charge:                  0.02949
+ Dipole:                 -0.10027       -0.14209        0.00000
+ Quadrupole:             -0.00445
+                         -0.01640        0.00631
+                          0.00000        0.00000       -0.00186
+
+ Site:       4         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.232024       0.926223       0.000000
+
+ Charge:                  0.02949
+ Dipole:                 -0.10027        0.14209        0.00000
+ Quadrupole:             -0.00445
+                          0.01640        0.00631
+                          0.00000        0.00000       -0.00186
+
+ Site:       5         Name:   H         Atomic Number:       1
+
+ Coordinates:            1.232024       0.926223       0.000000
+
+ Charge:                  0.02949
+ Dipole:                  0.10027        0.14209        0.00000
+ Quadrupole:             -0.00445
+                         -0.01640        0.00631
+                          0.00000        0.00000       -0.00186
+
+ Site:       6         Name:   H         Atomic Number:       1
+
+ Coordinates:            1.232024      -0.926223       0.000000
+
+ Charge:                  0.02949
+ Dipole:                  0.10027       -0.14209        0.00000
+ Quadrupole:             -0.00445
+                          0.01640        0.00631
+                          0.00000        0.00000       -0.00186
+
+ Local Frame Definition for Multipole Sites :
+
+     Atom     Name      Axis Type     Z Axis  X Axis  Y Axis
+
+       1      C         Z-then-X         2       3       0
+       2      C         Z-then-X         1       5       0
+       3      H         Z-then-X         1       2       0
+       4      H         Z-then-X         1       2       0
+       5      H         Z-then-X         2       1       0
+       6      H         Z-then-X         2       1       0
+
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Choose Either the AMOEBA or HIPPO Polarization Model [A] :  
+ Polarizability Parameters for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      C            1.7500         0.3900
+       2      C            1.7500         0.3900
+       3      H            0.6960         0.3900
+       4      H            0.6960         0.3900
+       5      H            0.6960         0.3900
+       6      H            0.6960         0.3900
+
+ Enter Atom Number, Polarizability & Thole Values :  
+ The default is to place all atoms into one polarization group;
+ This can be altered by entering a series of bonded atom pairs
+ that separate the molecule into distinct polarization groups
+
+ Enter a Bond between Polarization Groups [<Enter>=Exit] :  
+ Polarization Groups for Multipole Sites :
+
+     Atom     Name       Polarization Group Definition
+
+       1      C               2     3     4
+       2      C               1     5     6
+       3      H               1
+       4      H               1
+       5      H               2
+       6      H               2
+
+ Electrostatic and Polarization Scale Factors :
+
+                    1-2         1-3         1-4         1-5
+
+ M-Scale:         0.0000      0.0000      0.4000      0.8000
+ P-Inter:         0.0000      0.0000      1.0000      1.0000
+ P-Intra:         0.0000      0.0000      0.5000      1.0000
+ W-Scale:         1.0000      1.0000      1.0000      1.0000
+
+                    1-1         1-2         1-3         1-4
+
+ D-Scale:         0.0000      1.0000      1.0000      1.0000
+ U-Scale:         1.0000      1.0000      1.0000      1.0000
+
+ Use Thole Damping:           True
+ Charge Penetration:          False
+ Set D Equal to P:            False
+
+ Determination of Intergroup Induced Dipoles :
+
+    Iter        RMS Change (Debye)
+
+       1           0.0000000000
+
+ Local Frame Intergroup Induced Dipole Moments (Debye) :
+
+    Atom              X           Y           Z         Total
+
+       1           0.0000      0.0000      0.0000      0.0000
+       2           0.0000      0.0000      0.0000      0.0000
+       3           0.0000      0.0000      0.0000      0.0000
+       4           0.0000      0.0000      0.0000      0.0000
+       5           0.0000      0.0000      0.0000      0.0000
+       6           0.0000      0.0000      0.0000      0.0000
+
+ Condense Symmetric Atoms to Equivalent Types [Y] :  
+ Remove Multipole Components Zeroed by Symmetry [Y] :  
+ Final Atomic Multipole Moments after Regularization :
+
+ Atom:       1         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X             2       3       0
+
+ Charge:                 -0.05898
+ Dipole:                  0.00000        0.00000       -0.07298
+ Quadrupole:              0.10437
+                          0.00000       -0.04635
+                          0.00000        0.00000       -0.05802
+
+ Atom:       2         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X             1       5       0
+
+ Charge:                 -0.05898
+ Dipole:                  0.00000        0.00000       -0.07298
+ Quadrupole:              0.10437
+                          0.00000       -0.04635
+                          0.00000        0.00000       -0.05802
+
+ Atom:       3         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             1       2       0
+
+ Charge:                  0.02949
+ Dipole:                 -0.01122        0.00000       -0.17354
+ Quadrupole:              0.01310
+                          0.00000       -0.00186
+                         -0.01223        0.00000       -0.01124
+
+ Atom:       4         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             1       2       0
+
+ Charge:                  0.02949
+ Dipole:                 -0.01122        0.00000       -0.17354
+ Quadrupole:              0.01310
+                          0.00000       -0.00186
+                         -0.01223        0.00000       -0.01124
+
+ Atom:       5         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             2       1       0
+
+ Charge:                  0.02949
+ Dipole:                 -0.01122        0.00000       -0.17354
+ Quadrupole:              0.01310
+                          0.00000       -0.00186
+                         -0.01223        0.00000       -0.01124
+
+ Atom:       6         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             2       1       0
+
+ Charge:                  0.02949
+ Dipole:                 -0.01122        0.00000       -0.17354
+ Quadrupole:              0.01310
+                          0.00000       -0.00186
+                         -0.01223        0.00000       -0.01124
+Mon Sep 21 14:27:17 2020  Calling: potential.x 1 ethene.xyz -k ethene.key path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+       1      1     C     ethene                       6     12.011     3
+       2      2     C     ethene                       6     12.011     3
+       3      3     H     ethene                       1      1.008     1
+       4      4     H     ethene                       1      1.008     1
+       5      5     H     ethene                       1      1.008     1
+       6      6     H     ethene                       1      1.008     1
+
+ Electrostatic Potential Grid Points :                  6012
+
+ Gaussian CUBEGEN Input Written To :   ethene.grid
+
+ Next, run the Gaussian CUBEGEN program; for example:
+ cubegen 0 potential=MP2 xxx.fchk xxx.cube -5 h < xxx.grid
+
+ See the Gaussian documentation for additional details;
+ After CUBEGEN, rerun Tinker POTENTIAL using Option 2
+Mon Sep 21 14:27:17 2020 Calling: Psi4 Gradient for ESP
+Mon Sep 21 14:27:17 2020  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene && psi4 ethene-esp.psi4 ethene-esp.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+Mon Sep 21 14:28:07 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene/ethene-esp.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+Mon Sep 21 14:28:37 2020 All jobs have terminated 
+Mon Sep 21 14:28:37 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene/ethene-esp.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+Mon Sep 21 14:29:07 2020 All jobs have terminated 
+Mon Sep 21 14:29:07 2020 Calling: Generating CUBE File from PSI4
+Mon Sep 21 14:29:07 2020  Calling: potential.x 2 ethene.cube path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Electrostatic Potential Written To :  ethene.pot
+Mon Sep 21 14:29:08 2020  Calling: /home/bdw2292/poltype-poltype2-latest/avgmpoles.pl ethene.key ethene.xyz ethene-groups.txt ethene.key_2 ethene.xyz_2 401 path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+Mon Sep 21 14:29:08 2020 
+Mon Sep 21 14:29:08 2020 =========================================================
+Mon Sep 21 14:29:08 2020 QM Dipole moment
+
+Mon Sep 21 14:29:08 2020  Calling: potential.x 6 ethene.xyz_2 -k ethene.key_2 ethene.pot N 0.1 path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+     401    401     C     ethene                       6     12.011     3
+     402    402     H     ethene                       1      1.008     1
+
+ Electrostatic Potential Grid Points :                  6012
+
+ Electrostatic Parameter Restraint Value :            1.0000
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+     401    401     C     ethene                       6     12.011     3
+     402    402     H     ethene                       1      1.008     1
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         401      401    402      0   Z-then-X    -0.05898
+                                                   0.00000  0.00000 -0.07298
+                                                   0.10437
+                                                   0.00000 -0.04635
+                                                   0.00000  0.00000 -0.05802
+
+         402      401    401      0   Z-then-X     0.02949
+                                                  -0.01122  0.00000 -0.17354
+                                                   0.01310
+                                                   0.00000 -0.00186
+                                                  -0.01223  0.00000 -0.01124
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         401             1.750       0.390         401  402
+         402             0.696       0.390         401
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1        1145        -2.3984        -2.1882         0.3192
+        1        2        1168        -2.3891        -2.1831         0.3115
+        1        3         924         1.1779         1.1564         0.3163
+        1        4         923         1.1815         1.1579         0.3103
+        1        5         924         1.1663         1.1460         0.3184
+        1        6         928         1.1787         1.1616         0.3291
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.1973
+ Average Potential Magnitude for Model :              1.8438
+ Average Potential Value for Target :                -0.1300
+ Average Potential Magnitude for Target :             1.7553
+
+ Average Signed Potential Difference :               -0.0673
+ Average Unsigned Potential Difference :              0.2227
+ Root Mean Square Potential Difference :              0.3174
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value         Fixed
+
+    --            401             Monopole          -0.05898          X
+    --            401             X-Dipole           0.00000          X
+    --            401             Y-Dipole           0.00000          X
+     1            401             Z-Dipole          -0.07298
+     2            401             XX-Quad            0.10437
+    --            401             XY-Quad            0.00000          X
+    --            401             XZ-Quad            0.00000          X
+     3            401             YY-Quad           -0.04635
+    --            401             YZ-Quad            0.00000          X
+    --            401             ZZ-Quad           -0.05802
+    --            402             Monopole           0.02949          X
+     4            402             X-Dipole          -0.01122
+    --            402             Y-Dipole           0.00000          X
+     5            402             Z-Dipole          -0.17354
+     6            402             XX-Quad            0.01310
+    --            402             XY-Quad            0.00000          X
+     7            402             XZ-Quad           -0.01223
+     8            402             YY-Quad           -0.00186
+    --            402             YZ-Quad            0.00000          X
+    --            402             ZZ-Quad           -0.01124
+
+ Levenberg-Marquardt Nonlinear Least Squares :
+
+ LS Iter     F Value      Total G     Active G    N Active   F Calls
+
+     0      302.7771     475.4931     475.4931         8         9
+     1       88.1139      79.8475      79.8475         8        18
+     2       59.1729       5.5508       5.5508         8        28
+     3       58.5985       3.3521       3.3521         8        37
+     4       58.0680       2.4763       2.4763         8        46
+     5       57.5772       1.6201       1.6201         8        55
+     6       57.1864       0.0000       0.0000         8        64
+
+ SQUARE  --  Normal Termination of Least Squares
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value         Fixed
+
+    --            401             Monopole          -0.05898          X
+    --            401             X-Dipole           0.00000          X
+    --            401             Y-Dipole           0.00000          X
+     1            401             Z-Dipole          -0.10642
+     2            401             XX-Quad            0.10721
+    --            401             XY-Quad            0.00000          X
+    --            401             XZ-Quad            0.00000          X
+     3            401             YY-Quad           -0.06981
+    --            401             YZ-Quad            0.00000          X
+    --            401             ZZ-Quad           -0.03740
+    --            402             Monopole           0.02949          X
+     4            402             X-Dipole           0.00155
+    --            402             Y-Dipole           0.00000          X
+     5            402             Z-Dipole          -0.16349
+     6            402             XX-Quad            0.08408
+    --            402             XY-Quad            0.00000          X
+     7            402             XZ-Quad           -0.04835
+     8            402             YY-Quad            0.02146
+    --            402             YZ-Quad            0.00000          X
+    --            402             ZZ-Quad           -0.10554
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1        1145        -2.2337        -2.1882         0.1402
+        1        2        1168        -2.2261        -2.1831         0.1379
+        1        3         924         1.1276         1.1564         0.0717
+        1        4         923         1.1298         1.1579         0.0687
+        1        5         924         1.1170         1.1460         0.0734
+        1        6         928         1.1317         1.1616         0.0786
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.1648
+ Average Potential Magnitude for Model :              1.7511
+ Average Potential Value for Target :                -0.1300
+ Average Potential Magnitude for Target :             1.7553
+
+ Average Signed Potential Difference :               -0.0348
+ Average Unsigned Potential Difference :              0.0616
+ Root Mean Square Potential Difference :              0.1036
+Mon Sep 21 14:29:08 2020  Calling: sed -e '/\(.* none$\|^#\|^fix\|^potential-offset\)/d' ethene.key_3 > ethene.key_3_tmp path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+Mon Sep 21 14:29:08 2020 
+Mon Sep 21 14:29:08 2020 =========================================================
+Mon Sep 21 14:29:08 2020 Electrostatic Potential Comparison
+
+Mon Sep 21 14:29:08 2020  Calling: potential.x 5 ethene.xyz_2 -k ethene.key_3 ethene.pot N > RMSPD.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+****************************************************************************************************
+Torsion parameters for torsion   402   401   401   402     0.0000 0.0 1    10.0000 180.0 2     0.0000 0.0 3 assigned from SMILES [*]~[C]=[C]~[*] from torsion atom indices 6,2,1,4 with smiles torsion indices 1,2,3,4
+Mon Sep 21 14:29:09 2020  Calling: psi4 ethene-esp_frag.psi4 ethene-esp_frag.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+Mon 21 Sep 2020 02:29:11 PM CDT equivalentrotbndindexarrays[]
+Mon 21 Sep 2020 02:29:11 PM CDT All jobs have terminated 
+Mon 21 Sep 2020 02:29:11 PM CDT 
+Mon 21 Sep 2020 02:29:11 PM CDT =========================================================
+Mon 21 Sep 2020 02:29:11 PM CDT Minimizing structure
+
+Mon 21 Sep 2020 02:29:11 PM CDT  Calling: cp ethene.xyz_2 ttt.xyz path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+Mon 21 Sep 2020 02:29:11 PM CDT  Calling: cp ethene.key_5 ttt.key path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+Mon 21 Sep 2020 02:29:11 PM CDT  Calling: minimize.x -k ttt.key ttt.xyz 0.1 > Minimizedttt.out path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+Mon 21 Sep 2020 02:29:11 PM CDT 
+Mon 21 Sep 2020 02:29:11 PM CDT =========================================================
+Mon 21 Sep 2020 02:29:11 PM CDT QM Dipole moment
+
+Mon 21 Sep 2020 02:29:11 PM CDT QM Dipole moment = 0.0
+Mon 21 Sep 2020 02:29:11 PM CDT 
+Mon 21 Sep 2020 02:29:11 PM CDT =========================================================
+Mon 21 Sep 2020 02:29:11 PM CDT MM Dipole moment
+
+Mon 21 Sep 2020 02:29:11 PM CDT  Calling: analyze.x ethene.xyz_2 -k ttt.key em | grep -A11 Charge>MMDipole.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryEthene
+Mon 21 Sep 2020 02:29:12 PM CDT MM Dipole moment = 0.0
+Mon 21 Sep 2020 02:29:12 PM CDT Poltype Job Finished
+

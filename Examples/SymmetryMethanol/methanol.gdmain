@@ -1,0 +1,17 @@
+Title methanol gdmain
+
+File dma.fchk density CC
+Angstrom
+AU
+Multipoles
+Switch 0
+Limit 2
+Punch dma.punch
+Radius H 0.60
+Radius S 0.85
+Radius P 0.95
+Radius Cl 1.10
+
+Start
+
+Finish

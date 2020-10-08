@@ -1,0 +1,64 @@
+
+Host: node37.bme.utexas.edu
+
+Timers On : Mon Sep 21 15:06:31 2020
+Timers Off: Mon Sep 21 15:09:30 2020
+
+Wall Time:      179.36 seconds
+
+                                                       Time (seconds)
+Module                                       User      System        Wall        Calls
+V: Grid                             :      3.567u      0.017s      2.152w     16 calls
+Total PK formation time             :      7.233u      0.000s      4.366w     15 calls
+HF: Form core H                     :      0.017u      0.000s      0.205w     15 calls
+HF: Form S/X                        :      0.017u      0.000s      0.008w     15 calls
+HF: Guess                           :      8.933u      0.050s      5.408w     15 calls
+SAD Guess                           :      8.600u      0.050s      5.210w     15 calls
+HF: Form G                          :    108.667u      2.350s     66.611w    165 calls
+RV: Form V                          :    107.917u      2.333s     66.134w    165 calls
+Properties                          :     16.383u      0.417s     10.280w 175912 calls
+Functional                          :     68.800u      1.500s     42.091w 175912 calls
+V_xc                                :     19.883u      0.350s     12.310w 175912 calls
+JK: D                               :      0.000u      0.000s      0.003w    165 calls
+JK: USO2AO                          :      0.000u      0.000s      0.002w    165 calls
+JK: JK                              :      0.717u      0.017s      0.454w    165 calls
+PK computes JK                      :      0.700u      0.017s      0.453w    165 calls
+JK: AO2USO                          :      0.000u      0.000s      0.000w    165 calls
+HF: Form F                          :      0.033u      0.000s      0.008w    165 calls
+HF: Form D                          :      0.000u      0.000s      0.003w    165 calls
+HF: DIIS                            :      0.200u      0.017s      0.203w    150 calls
+DIISManager::add_entry              :      0.000u      0.017s      0.061w    150 calls
+DIISManager::extrapolate            :      0.067u      0.000s      0.034w    150 calls
+bMatrix setup                       :      0.017u      0.000s      0.012w    150 calls
+bMatrix pseudoinverse               :      0.033u      0.000s      0.014w    150 calls
+New vector                          :      0.000u      0.000s      0.008w    150 calls
+HF: Form C                          :      0.067u      0.017s      0.047w    150 calls
+
+--------------------------------------------------------------------------------------
+V: Grid                             :      3.567u      0.017s      2.152w     16 calls
+Total PK formation time             :      7.233u      0.000s      4.366w     15 calls
+HF: Form core H                     :      0.017u      0.000s      0.205w     15 calls
+HF: Form S/X                        :      0.017u      0.000s      0.008w     15 calls
+HF: Guess                           :      8.933u      0.050s      5.408w     15 calls
+| SAD Guess                         :      8.600u      0.050s      5.210w     15 calls
+HF: Form G                          :    108.667u      2.350s     66.611w    165 calls
+| RV: Form V                        :    107.917u      2.333s     66.134w    165 calls
+| | Properties                      :     16.383u      0.417s     10.280w 175912 calls
+| | Functional                      :     68.800u      1.500s     42.091w 175912 calls
+| | V_xc                            :     19.883u      0.350s     12.310w 175912 calls
+| JK: D                             :      0.000u      0.000s      0.003w    165 calls
+| JK: USO2AO                        :      0.000u      0.000s      0.002w    165 calls
+| JK: JK                            :      0.717u      0.017s      0.454w    165 calls
+| | PK computes JK                  :      0.700u      0.017s      0.453w    165 calls
+| JK: AO2USO                        :      0.000u      0.000s      0.000w    165 calls
+HF: Form F                          :      0.033u      0.000s      0.008w    165 calls
+HF: Form D                          :      0.000u      0.000s      0.003w    165 calls
+HF: DIIS                            :      0.200u      0.017s      0.203w    150 calls
+| DIISManager::add_entry            :      0.000u      0.017s      0.061w    150 calls
+| DIISManager::extrapolate          :      0.067u      0.000s      0.034w    150 calls
+| | bMatrix setup                   :      0.017u      0.000s      0.012w    150 calls
+| | bMatrix pseudoinverse           :      0.033u      0.000s      0.014w    150 calls
+| | New vector                      :      0.000u      0.000s      0.008w    150 calls
+HF: Form C                          :      0.067u      0.017s      0.047w    150 calls
+
+**************************************************************************************

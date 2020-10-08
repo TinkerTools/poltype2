@@ -1,0 +1,34 @@
+Poltype -- Polarizable atom typer of small molecules for the AMOEBA polarizable force field
+
+Please cite:
+Wu, J.C.; Chattree, G.; Ren, P.Y.; Automation of AMOEBA polarizable force field 
+parameterization for small molecules. Theor Chem Acc. 
+
+Version 2.3.0 February 2020
+
+Copyright (c)  Johnny Wu, Gaurav Chattree, Brandon Walker, Matthew Harger and Pengyu Ren 2019
+
+All Rights Reserved
+##############################################################################################################
+
+Calling: analyze.x /home/bdw2292/poltype-poltype2-latest/water.xyz -k /home/bdw2292/poltype-poltype2-latest/water.key e> version.out
+no longer error TrimethylPhosphate-opt.log
+no longer error TrimethylPhosphate-opt.log
+no longer error TrimethylPhosphate-opt.log
+no longer error TrimethylPhosphate-opt.log
+no longer error TrimethylPhosphate-opt.log
+no longer error TrimethylPhosphate-opt.log
+no longer error TrimethylPhosphate-opt.log
+no longer error TrimethylPhosphate-opt.log
+Traceback (most recent call last):
+  File "/home/bdw2292/poltype-poltype2-latest/PoltypeModules/poltype.py", line 1169, in <module>
+    params=poltype.main()
+  File "/home/bdw2292/poltype-poltype2-latest/PoltypeModules/poltype.py", line 894, in main
+    params= self.GenerateParameters()
+  File "/home/bdw2292/poltype-poltype2-latest/PoltypeModules/poltype.py", line 1058, in GenerateParameters
+    mpole.rm_esp_terms_keyfile(self,self.key3fname)
+  File "/home/bdw2292/poltype-poltype2-latest/PoltypeModules/multipole.py", line 576, in rm_esp_terms_keyfile
+    poltype.call_subsystem(cmdstr,True)
+  File "/home/bdw2292/poltype-poltype2-latest/PoltypeModules/poltype.py", line 841, in call_subsystem
+    raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
+ValueError: ERROR: sed -e '/\(.* none$\|^#\|^fix\|^potential-offset\)/d' TrimethylPhosphate.key_3 > TrimethylPhosphate.key_3_tmp path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryTriMethylPhosphate

@@ -1,0 +1,28 @@
+molecule { 
+0 1
+ O    0.707900    0.000000    0.000000
+ C   -0.707900    0.000000    0.000000
+ H   -1.073200   -0.769000    0.685200
+ H   -1.073100   -0.194700   -1.011300
+ H   -1.063200    0.978600    0.331200
+ H    0.993600   -0.880400   -0.298000
+}
+set {
+  geom_maxiter 3
+  g_convergence GAU_LOOSE
+}
+memory 100GB
+set_num_threads(8)
+psi4_io.set_default_path("/scratch/bdw2292/Psi4-methanol")
+for _ in range(1):
+  try:
+    optimize('wb97x-d/6-31G*')
+    break
+  except OptimizationConvergenceError:
+    try:
+      set opt_coordinates cartesian
+      optimize('wb97x-d/6-31G*')
+      break
+    except OptimizationConvergenceError:
+      pass
+clean()

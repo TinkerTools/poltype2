@@ -414,14 +414,17 @@ def gen_torsion(poltype,optmol,torsionrestraint):
     for torset in poltype.torlist:
         variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
         phaselists=[]
+        currentanglelist=[]
         for tor in torset:
             a,b,c,d = tor[0:4]
             torang = optmol.GetTorsion(a,b,c,d)
+            currentanglelist.append(round(torang,1))
             key=str(b)+' '+str(c)
             anginc=poltype.rotbndtoanginc[key]
             maxrange=poltype.rotbndtomaxrange[key]
             phaselist=range(0,maxrange,anginc)
             phaselists.append(phaselist)
+        currentanglelist=numpy.array(currentanglelist)
         flatphaselist=numpy.array(list(product(*phaselists)))
         origshape=flatphaselist.shape
         prms=poltype.torsionsettonumptsneeded[tuple(torset)]
@@ -433,7 +436,11 @@ def gen_torsion(poltype,optmol,torsionrestraint):
             shape.append(len(phaselist))
         shape.append(lastdim)
         shape=tuple(shape)
+        
         flatphaselist=flatphaselist.reshape(shape) # now we can remove diagonal elements
+        idealangletensor=flatphaselist+currentanglelist
+        poltype.idealangletensor=idealangletensor
+        poltype.tensorphases=flatphaselist
         ax2idx=len(shape)-1-1
         ax1idx=ax2idx-1
         diags = numpy.transpose(numpy.diagonal(flatphaselist, axis1=ax1idx, axis2=ax2idx))
@@ -1071,7 +1078,7 @@ def write_arr_to_file(poltype,fname, array_list):
     rows = zip(*array_list)
     for cols in rows:
         for ele in cols:
-            outfh.write("%10.4f" % ele)
+            outfh.write(str(ele))
         outfh.write("\n")
 
 

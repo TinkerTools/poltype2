@@ -1,0 +1,147 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+     404    404     N     aniline                      7     14.007     3
+     401    401     C     aniline                      6     12.011     3
+     403    403     C     aniline                      6     12.011     3
+     402    402     C     aniline                      6     12.011     3
+     405    405     C     aniline                      6     12.011     3
+     406    406     H     aniline                      1      1.008     1
+     408    408     H     aniline                      1      1.008     1
+     409    409     H     aniline                      1      1.008     1
+     407    407     H     aniline                      1      1.008     1
+
+ Electrostatic Potential Grid Points :                  9262
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+     404    404     N     aniline                      7     14.007     3
+     401    401     C     aniline                      6     12.011     3
+     403    403     C     aniline                      6     12.011     3
+     402    402     C     aniline                      6     12.011     3
+     405    405     C     aniline                      6     12.011     3
+     406    406     H     aniline                      1      1.008     1
+     408    408     H     aniline                      1      1.008     1
+     409    409     H     aniline                      1      1.008     1
+     407    407     H     aniline                      1      1.008     1
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         404      401    407    407   Z-Bisect    -0.31329
+                                                   0.00000  0.00000  0.36785
+                                                  -0.62093
+                                                   0.00000  0.38994
+                                                   0.00000  0.00000  0.23099
+
+         401      404    403      0   Z-then-X     0.27123
+                                                   0.00000  0.00000  0.56063
+                                                  -0.23090
+                                                   0.00000 -0.01538
+                                                   0.00000  0.00000  0.24628
+
+         403      401    402      0   Z-then-X    -0.06646
+                                                  -0.06105  0.00000  0.05585
+                                                   0.06029
+                                                   0.00000 -0.38072
+                                                  -0.02587  0.00000  0.32043
+
+         402      403    405      0   Z-then-X     0.06423
+                                                   0.09745  0.00000  0.04562
+                                                   0.13826
+                                                   0.00000 -0.14037
+                                                   0.14297  0.00000  0.00211
+
+         405      402    402      0   Bisector    -0.05562
+                                                   0.00000  0.00000 -0.02643
+                                                   0.24775
+                                                   0.00000 -0.38064
+                                                   0.00000  0.00000  0.13289
+
+         406      403    401      0   Z-then-X    -0.00942
+                                                  -0.04957  0.00000 -0.17345
+                                                  -0.01385
+                                                   0.00000  0.08688
+                                                  -0.01604  0.00000 -0.07303
+
+         408      402    403      0   Z-then-X     0.00224
+                                                   0.00147  0.00000 -0.16073
+                                                   0.12916
+                                                   0.00000 -0.04164
+                                                  -0.01034  0.00000 -0.08752
+
+         409      405    402      0   Z-then-X    -0.00496
+                                                   0.00000  0.00000 -0.17463
+                                                   0.07435
+                                                   0.00000  0.01448
+                                                   0.00000  0.00000 -0.08883
+
+         407      404    401      0   Z-then-X     0.06073
+                                                  -0.13722  0.00000 -0.48605
+                                                   0.23006
+                                                   0.00000  0.26390
+                                                  -0.08829  0.00000 -0.49396
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         404             1.073       0.390         401  407
+         401             1.750       0.390         404  403
+         403             1.750       0.390         401  402  406
+         402             1.750       0.390         403  405  408
+         405             1.750       0.390         402  409
+         406             0.696       0.390         403
+         408             0.696       0.390         402
+         409             0.696       0.390         405
+         407             0.496       0.390         404
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1         825        -3.8259        -3.8268         0.3753
+        1        2         217        -6.8186        -6.7949         0.2419
+        1        3         494        -4.8245        -4.7681         0.2178
+        1        4         485        -4.7927        -4.7357         0.2082
+        1        5         531        -5.6577        -5.6241         0.1992
+        1        6         540        -5.7090        -5.6766         0.1950
+        1        7         549        -6.1738        -6.1134         0.1869
+        1        8         716         2.8021         2.8639         0.1411
+        1        9         709         2.8222         2.8827         0.1382
+        1       10         881         0.4230         0.4781         0.0990
+        1       11         888         0.4376         0.4921         0.0965
+        1       12         886        -0.2231        -0.1735         0.0823
+        1       13         772         6.3049         6.3760         0.2814
+        1       14         769         6.3163         6.3843         0.2803
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.4885
+ Average Potential Magnitude for Model :              4.0409
+ Average Potential Value for Target :                -0.4385
+ Average Potential Magnitude for Target :             4.0727
+
+ Average Signed Potential Difference :               -0.0501
+ Average Unsigned Potential Difference :              0.1489
+ Root Mean Square Potential Difference :              0.2095

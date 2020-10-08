@@ -1,0 +1,22 @@
+Mon Sep 21 15:31:57 2020 Running on host: node37.bme.utexas.edu
+Mon Sep 21 15:31:57 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Mon Sep 21 15:31:57 2020 Calling: Psi4 Optimization
+Mon Sep 21 15:31:57 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Mon Sep 21 15:31:57 2020 Calling: Psi4 Optimization
+Mon Sep 21 15:31:57 2020 Calling: Psi4 Gradient for DMA
+Mon Sep 21 15:31:57 2020 Calling: Generating CUBE File from PSI4
+Mon Sep 21 15:31:57 2020  Calling: /home/bdw2292/poltype-poltype2-latest/avgmpoles.pl DiMethylPhosphate1H.key DiMethylPhosphate1H.xyz DiMethylPhosphate1H-groups.txt DiMethylPhosphate1H.key_2 DiMethylPhosphate1H.xyz_2 401 path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryDiMethylPhosphate1H
+Mon Sep 21 15:31:57 2020 
+Mon Sep 21 15:31:57 2020 =========================================================
+Mon Sep 21 15:31:57 2020 QM Dipole moment
+
+Mon Sep 21 15:31:57 2020  Calling: sed -e '/\(.* none$\|^#\|^fix\|^potential-offset\)/d' DiMethylPhosphate1H.key_3 > DiMethylPhosphate1H.key_3_tmp path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryDiMethylPhosphate1H
+Rotatable bond found about (5, 1, 2, 6)
+Rotatable bond found about (5, 1, 3, 7)
+****************************************************************************************************
+Torsion parameters for torsion   406   402   403   401     0.0000 0.0 1     0.0000 180.0 2     0.0000 0.0 3 assigned from SMILES [*]~[*]~[*]~[*] from torsion atom indices 13,7,3,1 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   403   401   403   402     0.0000 0.0 1     0.0000 180.0 2     0.0000 0.0 3 assigned from SMILES [*]~[*]~[*]~[*] from torsion atom indices 7,3,1,2 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   403   401   404   407     0.0000 0.0 1     0.0000 180.0 2     0.0000 0.0 3 assigned from SMILES [*]~[*]~[*]~[*] from torsion atom indices 14,4,1,3 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   404   401   403   402     0.0000 0.0 1     0.0000 180.0 2     0.0000 0.0 3 assigned from SMILES [*]~[*]~[*]~[*] from torsion atom indices 7,3,1,4 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   405   401   403   402     0.0000 0.0 1     0.0000 180.0 2     0.0000 0.0 3 assigned from SMILES [*]~[*]~[*]~[*] from torsion atom indices 7,3,1,5 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   405   401   404   407     0.0000 0.0 1     0.0000 180.0 2     0.0000 0.0 3 assigned from SMILES [*]~[*]~[*]~[*] from torsion atom indices 14,4,1,5 with smiles torsion indices 1,2,3,4

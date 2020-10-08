@@ -1,0 +1,479 @@
+Mon Sep 21 15:20:54 2020  Calling: mkdir /scratch/bdw2292/Psi4-aniline path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAniline
+Mon Sep 21 15:20:54 2020  Calling: mkdir /scratch/bdw2292/Gau-aniline path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAniline
+Mon Sep 21 15:20:54 2020 Running on host: node37.bme.utexas.edu
+Mon Sep 21 15:20:54 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Mon Sep 21 15:20:54 2020 Calling: Psi4 Optimization
+Mon Sep 21 15:20:54 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Mon Sep 21 15:20:54 2020 Calling: Psi4 Optimization
+Mon Sep 21 15:20:55 2020 Calling: Psi4 Gradient for DMA
+Mon Sep 21 15:20:55 2020 Error *** Resources and help at github.com/psi4/psi4.
+logpath=aniline-esp.log
+Mon Sep 21 15:20:55 2020 Calling: Psi4 Gradient for ESP
+Mon Sep 21 15:20:55 2020  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAniline && psi4 aniline-esp.psi4 aniline-esp.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAniline
+Mon Sep 21 15:34:29 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAniline/aniline-esp.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAniline
+Mon Sep 21 15:34:59 2020 All jobs have terminated 
+Mon Sep 21 15:34:59 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAniline/aniline-esp.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAniline
+Mon Sep 21 15:35:29 2020 All jobs have terminated 
+Mon Sep 21 15:35:29 2020 Calling: Generating CUBE File from PSI4
+Mon Sep 21 15:35:29 2020  Calling: potential.x 2 aniline.cube path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAniline
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Electrostatic Potential Written To :  aniline.pot
+Mon Sep 21 15:35:30 2020  Calling: /home/bdw2292/poltype-poltype2-latest/avgmpoles.pl aniline.key aniline.xyz aniline-groups.txt aniline.key_2 aniline.xyz_2 401 path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAniline
+multipole404401-407-407About to zero the x dipole and xz quadrupoleMon Sep 21 15:35:30 2020 
+Mon Sep 21 15:35:30 2020 =========================================================
+Mon Sep 21 15:35:30 2020 QM Dipole moment
+
+Mon Sep 21 15:35:30 2020  Calling: potential.x 6 aniline.xyz_2 -k aniline.key_2 aniline.pot N 0.1 path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAniline
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+     404    404     N     aniline                      7     14.007     3
+     401    401     C     aniline                      6     12.011     3
+     403    403     C     aniline                      6     12.011     3
+     402    402     C     aniline                      6     12.011     3
+     405    405     C     aniline                      6     12.011     3
+     406    406     H     aniline                      1      1.008     1
+     408    408     H     aniline                      1      1.008     1
+     409    409     H     aniline                      1      1.008     1
+     407    407     H     aniline                      1      1.008     1
+
+ Electrostatic Potential Grid Points :                  9262
+
+ Electrostatic Parameter Restraint Value :            1.0000
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+     404    404     N     aniline                      7     14.007     3
+     401    401     C     aniline                      6     12.011     3
+     403    403     C     aniline                      6     12.011     3
+     402    402     C     aniline                      6     12.011     3
+     405    405     C     aniline                      6     12.011     3
+     406    406     H     aniline                      1      1.008     1
+     408    408     H     aniline                      1      1.008     1
+     409    409     H     aniline                      1      1.008     1
+     407    407     H     aniline                      1      1.008     1
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         404      401    407    407   Z-Bisect    -0.31327
+                                                   0.00000  0.00000 -0.13278
+                                                  -0.68653
+                                                   0.00000  0.61405
+                                                   0.00000  0.00000  0.07248
+
+         401      404    403      0   Z-then-X     0.27123
+                                                   0.00000  0.00000  0.49810
+                                                  -0.31818
+                                                   0.00000 -0.19364
+                                                   0.00000  0.00000  0.51182
+
+         403      401    402      0   Z-then-X    -0.06646
+                                                  -0.04766  0.00000  0.03286
+                                                   0.06724
+                                                   0.00000 -0.41119
+                                                  -0.04914  0.00000  0.34395
+
+         402      403    405      0   Z-then-X     0.06423
+                                                   0.08900  0.00000  0.04636
+                                                   0.14710
+                                                   0.00000 -0.07809
+                                                   0.15693  0.00000 -0.06900
+
+         405      402    402      0   Bisector    -0.05562
+                                                   0.00000  0.00000 -0.02056
+                                                   0.25708
+                                                   0.00000 -0.37324
+                                                   0.00000  0.00000  0.11616
+
+         406      403    401      0   Z-then-X    -0.00942
+                                                  -0.01693  0.00000 -0.20004
+                                                   0.02280
+                                                   0.00000  0.00732
+                                                  -0.01053  0.00000 -0.03012
+
+         408      402    403      0   Z-then-X     0.00224
+                                                   0.00042  0.00000 -0.19656
+                                                   0.02286
+                                                   0.00000  0.00745
+                                                   0.00047  0.00000 -0.03031
+
+         409      405    402      0   Z-then-X    -0.00496
+                                                   0.00000  0.00000 -0.20268
+                                                   0.02603
+                                                   0.00000  0.00885
+                                                   0.00000  0.00000 -0.03488
+
+         407      404    401      0   Z-then-X     0.06073
+                                                  -0.01239  0.00000 -0.21239
+                                                   0.01749
+                                                   0.00000 -0.00417
+                                                  -0.00585  0.00000 -0.01331
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         404             1.073       0.390         401  407
+         401             1.750       0.390         404  403
+         403             1.750       0.390         401  402  406
+         402             1.750       0.390         403  405  408
+         405             1.750       0.390         402  409
+         406             0.696       0.390         403
+         408             0.696       0.390         402
+         409             0.696       0.390         405
+         407             0.496       0.390         404
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1         825        -1.9071        -3.8268         3.1234
+        1        2         217        -8.0882        -6.7949         2.2663
+        1        3         494        -5.6665        -4.7681         1.3758
+        1        4         485        -5.6145        -4.7357         1.3641
+        1        5         531        -5.8511        -5.6241         0.4474
+        1        6         540        -5.9145        -5.6766         0.4671
+        1        7         549        -6.4469        -6.1134         0.4359
+        1        8         716         2.7401         2.8639         0.5591
+        1        9         709         2.7480         2.8827         0.5741
+        1       10         881         0.9710         0.4781         0.5970
+        1       11         888         0.9807         0.4921         0.5955
+        1       12         886         0.0076        -0.1735         0.2673
+        1       13         772         5.1362         6.3760         2.0008
+        1       14         769         5.1511         6.3843         1.9880
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.5529
+ Average Potential Magnitude for Model :              3.8566
+ Average Potential Value for Target :                -0.4385
+ Average Potential Magnitude for Target :             4.0727
+
+ Average Signed Potential Difference :               -0.1145
+ Average Unsigned Potential Difference :              0.9248
+ Root Mean Square Potential Difference :              1.4174
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value         Fixed
+
+    --            404             Monopole          -0.31329          X
+    --            404             X-Dipole           0.00000          X
+    --            404             Y-Dipole           0.00000          X
+     1            404             Z-Dipole          -0.13278
+     2            404             XX-Quad           -0.68653
+    --            404             XY-Quad            0.00000          X
+    --            404             XZ-Quad            0.00000          X
+     3            404             YY-Quad            0.61405
+    --            404             YZ-Quad            0.00000          X
+    --            404             ZZ-Quad            0.07248
+    --            401             Monopole           0.27123          X
+    --            401             X-Dipole           0.00000          X
+    --            401             Y-Dipole           0.00000          X
+     4            401             Z-Dipole           0.49810
+     5            401             XX-Quad           -0.31818
+    --            401             XY-Quad            0.00000          X
+    --            401             XZ-Quad            0.00000          X
+     6            401             YY-Quad           -0.19364
+    --            401             YZ-Quad            0.00000          X
+    --            401             ZZ-Quad            0.51182
+    --            403             Monopole          -0.06646          X
+     7            403             X-Dipole          -0.04766
+    --            403             Y-Dipole           0.00000          X
+     8            403             Z-Dipole           0.03286
+     9            403             XX-Quad            0.06724
+    --            403             XY-Quad            0.00000          X
+    10            403             XZ-Quad           -0.04914
+    11            403             YY-Quad           -0.41119
+    --            403             YZ-Quad            0.00000          X
+    --            403             ZZ-Quad            0.34395
+    --            402             Monopole           0.06423          X
+    12            402             X-Dipole           0.08900
+    --            402             Y-Dipole           0.00000          X
+    13            402             Z-Dipole           0.04636
+    14            402             XX-Quad            0.14709
+    --            402             XY-Quad            0.00000          X
+    15            402             XZ-Quad            0.15693
+    16            402             YY-Quad           -0.07809
+    --            402             YZ-Quad            0.00000          X
+    --            402             ZZ-Quad           -0.06900
+    --            405             Monopole          -0.05562          X
+    --            405             X-Dipole           0.00000          X
+    --            405             Y-Dipole           0.00000          X
+    17            405             Z-Dipole          -0.02056
+    18            405             XX-Quad            0.25708
+    --            405             XY-Quad            0.00000          X
+    --            405             XZ-Quad            0.00000          X
+    19            405             YY-Quad           -0.37324
+    --            405             YZ-Quad            0.00000          X
+    --            405             ZZ-Quad            0.11616
+    --            406             Monopole          -0.00942          X
+    20            406             X-Dipole          -0.01693
+    --            406             Y-Dipole           0.00000          X
+    21            406             Z-Dipole          -0.20004
+    22            406             XX-Quad            0.02280
+    --            406             XY-Quad            0.00000          X
+    23            406             XZ-Quad           -0.01053
+    24            406             YY-Quad            0.00732
+    --            406             YZ-Quad            0.00000          X
+    --            406             ZZ-Quad           -0.03012
+    --            408             Monopole           0.00224          X
+    25            408             X-Dipole           0.00042
+    --            408             Y-Dipole           0.00000          X
+    26            408             Z-Dipole          -0.19656
+    27            408             XX-Quad            0.02286
+    --            408             XY-Quad            0.00000          X
+    28            408             XZ-Quad            0.00047
+    29            408             YY-Quad            0.00745
+    --            408             YZ-Quad            0.00000          X
+    --            408             ZZ-Quad           -0.03031
+    --            409             Monopole          -0.00496          X
+    --            409             X-Dipole           0.00000          X
+    --            409             Y-Dipole           0.00000          X
+    30            409             Z-Dipole          -0.20268
+    31            409             XX-Quad            0.02603
+    --            409             XY-Quad            0.00000          X
+    --            409             XZ-Quad            0.00000          X
+    32            409             YY-Quad            0.00885
+    --            409             YZ-Quad            0.00000          X
+    --            409             ZZ-Quad           -0.03488
+    --            407             Monopole           0.06073          X
+    33            407             X-Dipole          -0.01239
+    --            407             Y-Dipole           0.00000          X
+    34            407             Z-Dipole          -0.21239
+    35            407             XX-Quad            0.01748
+    --            407             XY-Quad            0.00000          X
+    36            407             XZ-Quad           -0.00585
+    37            407             YY-Quad           -0.00417
+    --            407             YZ-Quad            0.00000          X
+    --            407             ZZ-Quad           -0.01331
+
+ Levenberg-Marquardt Nonlinear Least Squares :
+
+ LS Iter     F Value      Total G     Active G    N Active   F Calls
+
+     0    17835.0041    5898.1614    5898.1614        37        38
+     1    12061.1698    4458.0664    4458.0664        37        77
+     2     4353.6874    3180.3421    3180.3421        37       115
+     3      613.2507     128.4601     128.4601        37       153
+     4      393.5253       0.0000       0.0000        37       191
+
+ SQUARE  --  Normal Termination of Least Squares
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value         Fixed
+
+    --            404             Monopole          -0.31329          X
+    --            404             X-Dipole           0.00000          X
+    --            404             Y-Dipole           0.00000          X
+     1            404             Z-Dipole           0.36785
+     2            404             XX-Quad           -0.62093
+    --            404             XY-Quad            0.00000          X
+    --            404             XZ-Quad            0.00000          X
+     3            404             YY-Quad            0.38994
+    --            404             YZ-Quad            0.00000          X
+    --            404             ZZ-Quad            0.23099
+    --            401             Monopole           0.27123          X
+    --            401             X-Dipole           0.00000          X
+    --            401             Y-Dipole           0.00000          X
+     4            401             Z-Dipole           0.56063
+     5            401             XX-Quad           -0.23090
+    --            401             XY-Quad            0.00000          X
+    --            401             XZ-Quad            0.00000          X
+     6            401             YY-Quad           -0.01538
+    --            401             YZ-Quad            0.00000          X
+    --            401             ZZ-Quad            0.24628
+    --            403             Monopole          -0.06646          X
+     7            403             X-Dipole          -0.06105
+    --            403             Y-Dipole           0.00000          X
+     8            403             Z-Dipole           0.05585
+     9            403             XX-Quad            0.06029
+    --            403             XY-Quad            0.00000          X
+    10            403             XZ-Quad           -0.02587
+    11            403             YY-Quad           -0.38072
+    --            403             YZ-Quad            0.00000          X
+    --            403             ZZ-Quad            0.32043
+    --            402             Monopole           0.06423          X
+    12            402             X-Dipole           0.09745
+    --            402             Y-Dipole           0.00000          X
+    13            402             Z-Dipole           0.04562
+    14            402             XX-Quad            0.13826
+    --            402             XY-Quad            0.00000          X
+    15            402             XZ-Quad            0.14297
+    16            402             YY-Quad           -0.14037
+    --            402             YZ-Quad            0.00000          X
+    --            402             ZZ-Quad            0.00211
+    --            405             Monopole          -0.05562          X
+    --            405             X-Dipole           0.00000          X
+    --            405             Y-Dipole           0.00000          X
+    17            405             Z-Dipole          -0.02643
+    18            405             XX-Quad            0.24775
+    --            405             XY-Quad            0.00000          X
+    --            405             XZ-Quad            0.00000          X
+    19            405             YY-Quad           -0.38064
+    --            405             YZ-Quad            0.00000          X
+    --            405             ZZ-Quad            0.13289
+    --            406             Monopole          -0.00942          X
+    20            406             X-Dipole          -0.04957
+    --            406             Y-Dipole           0.00000          X
+    21            406             Z-Dipole          -0.17345
+    22            406             XX-Quad           -0.01385
+    --            406             XY-Quad            0.00000          X
+    23            406             XZ-Quad           -0.01604
+    24            406             YY-Quad            0.08688
+    --            406             YZ-Quad            0.00000          X
+    --            406             ZZ-Quad           -0.07303
+    --            408             Monopole           0.00224          X
+    25            408             X-Dipole           0.00147
+    --            408             Y-Dipole           0.00000          X
+    26            408             Z-Dipole          -0.16073
+    27            408             XX-Quad            0.12916
+    --            408             XY-Quad            0.00000          X
+    28            408             XZ-Quad           -0.01034
+    29            408             YY-Quad           -0.04164
+    --            408             YZ-Quad            0.00000          X
+    --            408             ZZ-Quad           -0.08752
+    --            409             Monopole          -0.00496          X
+    --            409             X-Dipole           0.00000          X
+    --            409             Y-Dipole           0.00000          X
+    30            409             Z-Dipole          -0.17463
+    31            409             XX-Quad            0.07435
+    --            409             XY-Quad            0.00000          X
+    --            409             XZ-Quad            0.00000          X
+    32            409             YY-Quad            0.01448
+    --            409             YZ-Quad            0.00000          X
+    --            409             ZZ-Quad           -0.08883
+    --            407             Monopole           0.06073          X
+    33            407             X-Dipole          -0.13722
+    --            407             Y-Dipole           0.00000          X
+    34            407             Z-Dipole          -0.48605
+    35            407             XX-Quad            0.23006
+    --            407             XY-Quad            0.00000          X
+    36            407             XZ-Quad           -0.08829
+    37            407             YY-Quad            0.26390
+    --            407             YZ-Quad            0.00000          X
+    --            407             ZZ-Quad           -0.49396
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1         825        -3.8259        -3.8268         0.3753
+        1        2         217        -6.8186        -6.7949         0.2419
+        1        3         494        -4.8245        -4.7681         0.2178
+        1        4         485        -4.7927        -4.7357         0.2082
+        1        5         531        -5.6577        -5.6241         0.1992
+        1        6         540        -5.7090        -5.6766         0.1950
+        1        7         549        -6.1738        -6.1134         0.1869
+        1        8         716         2.8021         2.8639         0.1411
+        1        9         709         2.8222         2.8827         0.1382
+        1       10         881         0.4230         0.4781         0.0990
+        1       11         888         0.4376         0.4921         0.0965
+        1       12         886        -0.2231        -0.1735         0.0823
+        1       13         772         6.3049         6.3760         0.2814
+        1       14         769         6.3163         6.3843         0.2803
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.4885
+ Average Potential Magnitude for Model :              4.0409
+ Average Potential Value for Target :                -0.4385
+ Average Potential Magnitude for Target :             4.0727
+
+ Average Signed Potential Difference :               -0.0501
+ Average Unsigned Potential Difference :              0.1489
+ Root Mean Square Potential Difference :              0.2095
+Mon Sep 21 15:35:32 2020  Calling: sed -e '/\(.* none$\|^#\|^fix\|^potential-offset\)/d' aniline.key_3 > aniline.key_3_tmp path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAniline
+Mon Sep 21 15:35:32 2020 
+Mon Sep 21 15:35:32 2020 =========================================================
+Mon Sep 21 15:35:32 2020 Electrostatic Potential Comparison
+
+Mon Sep 21 15:35:32 2020  Calling: potential.x 5 aniline.xyz_2 -k aniline.key_3 aniline.pot N > RMSPD.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAniline
+****************************************************************************************************
+Torsion parameters for torsion   404   401   403   402     0.0000 0.0 1    14.0000 180.0 2     0.0000 0.0 3 assigned from SMILES [*]~cc~[*] from torsion atom indices 6,4,2,1 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   404   401   403   406     0.0000 0.0 1    14.0000 180.0 2     0.0000 0.0 3 assigned from SMILES [*]~cc~[*] from torsion atom indices 9,4,2,1 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   405   402   403   401    -0.6700 0.0 1     4.0040 180.0 2     0.0000 0.0 3 assigned from SMILES [cH0]ccc from torsion atom indices 2,4,6,7 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   408   402   403   401     0.5500 0.0 1     4.5340 180.0 2    -0.5500 0.0 3 assigned from SMILES [cH0]cc[#1] from torsion atom indices 2,4,6,11 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   403   401   404   407     0.0000 0.0 1     0.0000 180.0 2     0.0000 0.0 3 assigned from SMILES [*]~[*]~[*]~[*] from torsion atom indices 14,1,2,4 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   403   401   403   402    -0.6700 0.0 1     4.0040 180.0 2     0.0000 0.0 3 assigned from SMILES c[cH0]cc from torsion atom indices 4,2,3,5 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   403   401   403   406     0.5500 0.0 1     4.5340 180.0 2    -0.5500 0.0 3 assigned from SMILES c[cH0]c[#1] from torsion atom indices 4,2,3,8 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   403   402   405   402    -0.6700 0.0 1     4.0040 180.0 2     0.0000 0.0 3 assigned from SMILES cccc from torsion atom indices 6,7,5,3 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   403   402   405   409     0.5500 0.0 1     4.5340 180.0 2    -0.5500 0.0 3 assigned from SMILES ccc[#1] from torsion atom indices 4,6,7,12 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   408   402   405   402     0.5500 0.0 1     4.5340 180.0 2    -0.5500 0.0 3 assigned from SMILES ccc[#1] from torsion atom indices 6,7,5,10 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   405   402   403   406     0.5500 0.0 1     4.5340 180.0 2    -0.5500 0.0 3 assigned from SMILES ccc[#1] from torsion atom indices 7,6,4,9 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   408   402   403   406     0.0000 0.0 1     4.0720 180.0 2     0.0000 0.0 3 assigned from SMILES [#1]cc([#1])([cH0]) from torsion atom indices 11,6,4,9,2 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   408   402   405   409     0.0000 0.0 1     4.0720 180.0 2     0.0000 0.0 3 assigned from SMILES [#1]cc([#1])(c[cH0]) from torsion atom indices 12,7,6,11,4,2 with smiles torsion indices 1,2,3,4
+Mon Sep 21 15:35:33 2020  Calling: psi4 aniline-esp_frag.psi4 aniline-esp_frag.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAniline
+Mon 21 Sep 2020 03:35:36 PM CDT equivalentrotbndindexarrays[]
+Mon 21 Sep 2020 03:35:36 PM CDT All jobs have terminated 
+Mon 21 Sep 2020 03:35:36 PM CDT 
+Mon 21 Sep 2020 03:35:36 PM CDT =========================================================
+Mon 21 Sep 2020 03:35:36 PM CDT Minimizing structure
+
+Mon 21 Sep 2020 03:35:36 PM CDT  Calling: cp aniline.xyz_2 ttt.xyz path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAniline
+Mon 21 Sep 2020 03:35:36 PM CDT  Calling: cp aniline.key_5 ttt.key path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAniline
+Mon 21 Sep 2020 03:35:36 PM CDT  Calling: minimize.x -k ttt.key ttt.xyz 0.1 > Minimizedttt.out path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAniline
+Mon 21 Sep 2020 03:35:36 PM CDT 
+Mon 21 Sep 2020 03:35:36 PM CDT =========================================================
+Mon 21 Sep 2020 03:35:36 PM CDT QM Dipole moment
+
+Mon 21 Sep 2020 03:35:36 PM CDT QM Dipole moment = 1.465
+Mon 21 Sep 2020 03:35:36 PM CDT 
+Mon 21 Sep 2020 03:35:36 PM CDT =========================================================
+Mon 21 Sep 2020 03:35:36 PM CDT MM Dipole moment
+
+Mon 21 Sep 2020 03:35:36 PM CDT  Calling: analyze.x aniline.xyz_2 -k ttt.key em | grep -A11 Charge>MMDipole.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryAniline
+Mon 21 Sep 2020 03:35:37 PM CDT MM Dipole moment = 1.472
+Mon 21 Sep 2020 03:35:37 PM CDT Poltype Job Finished
+
+****************************************************************************************************
+Torsion parameters for torsion   404   401   403   402     0.0000 0.0 1    14.0000 180.0 2     0.0000 0.0 3 assigned from SMILES [*]~cc~[*] from torsion atom indices 6,4,2,1 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   404   401   403   406     0.0000 0.0 1    14.0000 180.0 2     0.0000 0.0 3 assigned from SMILES [*]~cc~[*] from torsion atom indices 9,4,2,1 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   405   402   403   401    -0.6700 0.0 1     4.0040 180.0 2     0.0000 0.0 3 assigned from SMILES [cH0]ccc from torsion atom indices 2,4,6,7 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   408   402   403   401     0.5500 0.0 1     4.5340 180.0 2    -0.5500 0.0 3 assigned from SMILES [cH0]cc[#1] from torsion atom indices 2,4,6,11 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   403   402   405   409     0.5500 0.0 1     4.5340 180.0 2    -0.5500 0.0 3 assigned from SMILES ccc[#1] from torsion atom indices 4,6,7,12 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   403   402   405   402    -0.6700 0.0 1     4.0040 180.0 2     0.0000 0.0 3 assigned from SMILES cccc from torsion atom indices 6,7,5,3 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   403   401   403   402    -0.6700 0.0 1     4.0040 180.0 2     0.0000 0.0 3 assigned from SMILES c[cH0]cc from torsion atom indices 4,2,3,5 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   403   401   403   406     0.5500 0.0 1     4.5340 180.0 2    -0.5500 0.0 3 assigned from SMILES c[cH0]c[#1] from torsion atom indices 4,2,3,8 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   403   401   404   407     0.0000 0.0 1    -0.9200 180.0 2     0.0000 0.0 3 assigned from SMILES [*]~[#6]~[#7]~[*] from torsion atom indices 4,2,1,13 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   408   402   405   402     0.5500 0.0 1     4.5340 180.0 2    -0.5500 0.0 3 assigned from SMILES ccc[#1] from torsion atom indices 6,7,5,10 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   405   402   403   406     0.5500 0.0 1     4.5340 180.0 2    -0.5500 0.0 3 assigned from SMILES ccc[#1] from torsion atom indices 7,6,4,9 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   408   402   403   406     0.0000 0.0 1     4.0720 180.0 2     0.0000 0.0 3 assigned from SMILES [#1]cc([#1])([cH0]) from torsion atom indices 11,6,4,9,2 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   408   402   405   409     0.0000 0.0 1     4.0720 180.0 2     0.0000 0.0 3 assigned from SMILES [#1]cc([#1])(c[cH0]) from torsion atom indices 12,7,6,11,4,2 with smiles torsion indices 1,2,3,4

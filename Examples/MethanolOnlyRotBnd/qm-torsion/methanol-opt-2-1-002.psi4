@@ -1,0 +1,32 @@
+molecule { 
+0 1
+ O    0.672458    0.008891    0.004477
+ C   -0.742999    0.034106    0.013924
+ H   -1.121161   -0.724999    0.712303
+ H   -1.103797   -0.119558   -1.012077
+ H   -1.052191    1.029277    0.364243
+ H    0.970890   -0.689818    0.596130
+}
+set optking { 
+  frozen_dihedral = ("
+  ")
+}
+set {
+  geom_maxiter 3
+  g_convergence GAU_LOOSE
+}
+memory 100GB
+set_num_threads(8)
+psi4_io.set_default_path("/scratch/bdw2292/Psi4-methanol")
+for _ in range(1):
+  try:
+    optimize('wb97x-d/6-31G*')
+    break
+  except OptimizationConvergenceError:
+    try:
+      set opt_coordinates cartesian
+      optimize('wb97x-d/6-31G*')
+      break
+    except OptimizationConvergenceError:
+      pass
+clean()

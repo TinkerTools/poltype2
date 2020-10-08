@@ -1,0 +1,332 @@
+
+    -----------------------------------------------------------------------
+          Psi4: An Open-Source Ab Initio Electronic Structure Package
+                               Psi4 1.3.2 release
+
+                         Git: Rev {HEAD} ecbda83 
+
+
+    R. M. Parrish, L. A. Burns, D. G. A. Smith, A. C. Simmonett,
+    A. E. DePrince III, E. G. Hohenstein, U. Bozkaya, A. Yu. Sokolov,
+    R. Di Remigio, R. M. Richard, J. F. Gonthier, A. M. James,
+    H. R. McAlexander, A. Kumar, M. Saitow, X. Wang, B. P. Pritchard,
+    P. Verma, H. F. Schaefer III, K. Patkowski, R. A. King, E. F. Valeev,
+    F. A. Evangelista, J. M. Turney, T. D. Crawford, and C. D. Sherrill,
+    J. Chem. Theory Comput. 13(7) pp 3185--3197 (2017).
+    (doi: 10.1021/acs.jctc.7b00174)
+
+
+                         Additional Contributions by
+    P. Kraus, H. Kruse, M. H. Lechner, M. C. Schieber, R. A. Shaw,
+    A. Alenaizan, R. Galvelis, Z. L. Glick, S. Lehtola, and J. P. Misiewicz
+
+    -----------------------------------------------------------------------
+
+
+    Psi4 started on: Monday, 21 September 2020 02:57PM
+
+    Process ID: 23899
+    Host:       node37.bme.utexas.edu
+    PSIDATADIR: /home/bdw2292/miniconda3/envs/p4env/share/psi4
+    Memory:     500.0 MiB
+    Threads:    1
+    
+  ==> Input File <==
+
+--------------------------------------------------------------------------
+molecule { 
+0 1
+O           -0.000304739719     0.066251069000     0.000000000000
+H           -0.757756578885    -0.529209961077     0.000000000000
+H            0.762593019367    -0.522242580998     0.000000000000
+}
+memory 700MB
+set_num_threads(1)
+psi4_io.set_default_path("/scratch/bdw2292/Psi4-water")
+set freeze_core True
+set PROPERTIES_ORIGIN ["COM"]
+E, wfn = energy('mp2/6-311G**',properties=['dipole'],return_wfn=True)
+fchk(wfn, "water-dma.fchk")
+clean()
+--------------------------------------------------------------------------
+
+  Memory set to 667.572 MiB by Python driver.
+  Threads set to 1 by Python driver.
+    SCF Algorithm Type (re)set to DF.
+
+*** tstart() called on node37.bme.utexas.edu
+*** at Mon Sep 21 14:57:25 2020
+
+   => Loading Basis Set <=
+
+    Name: 6-311G**
+    Role: ORBITAL
+    Keyword: BASIS
+    atoms 1   entry O          line   151 file /home/bdw2292/miniconda3/envs/p4env/share/psi4/basis/6-311gss.gbs 
+    atoms 2-3 entry H          line    32 file /home/bdw2292/miniconda3/envs/p4env/share/psi4/basis/6-311gss.gbs 
+
+
+         ---------------------------------------------------------
+                                   SCF
+               by Justin Turney, Rob Parrish, Andy Simmonett
+                          and Daniel G. A. Smith
+                              RHF Reference
+                        1 Threads,    667 MiB Core
+         ---------------------------------------------------------
+
+  ==> Geometry <==
+
+    Molecular point group: cs
+    Full point group: Cs
+
+    Geometry (in Angstrom), charge = 0, multiplicity = 1:
+
+       Center              X                  Y                   Z               Mass       
+    ------------   -----------------  -----------------  -----------------  -----------------
+         O           -0.000304739719     0.066251069000     0.000000000000    15.994914619570
+         H           -0.757756578885    -0.529209961077     0.000000000000     1.007825032230
+         H            0.762593019367    -0.522242580998     0.000000000000     1.007825032230
+
+  Running in cs symmetry.
+
+  Rotational constants: A =     26.87246  B =     14.47256  C =      9.40653 [cm^-1]
+  Rotational constants: A = 805616.05308  B = 433876.37758  C = 282000.73367 [MHz]
+  Nuclear repulsion =    9.135687709887952
+
+  Charge       = 0
+  Multiplicity = 1
+  Electrons    = 10
+  Nalpha       = 5
+  Nbeta        = 5
+
+  ==> Algorithm <==
+
+  SCF Algorithm Type is DF.
+  DIIS enabled.
+  MOM disabled.
+  Fractional occupation disabled.
+  Guess Type is SAD.
+  Energy threshold   = 1.00e-08
+  Density threshold  = 1.00e-08
+  Integral threshold = 0.00e+00
+
+  ==> Primary Basis <==
+
+  Basis Set: 6-311G**
+    Blend: 6-311G**
+    Number of shells: 16
+    Number of basis function: 30
+    Number of Cartesian functions: 31
+    Spherical Harmonics?: true
+    Max angular momentum: 2
+
+   => Loading Basis Set <=
+
+    Name: (6-311G** AUX)
+    Role: JKFIT
+    Keyword: DF_BASIS_SCF
+    atoms 1   entry O          line   229 file /home/bdw2292/miniconda3/envs/p4env/share/psi4/basis/cc-pvtz-jkfit.gbs 
+    atoms 2-3 entry H          line    51 file /home/bdw2292/miniconda3/envs/p4env/share/psi4/basis/cc-pvtz-jkfit.gbs 
+
+  ==> Pre-Iterations <==
+
+   -------------------------------------------------------
+    Irrep   Nso     Nmo     Nalpha   Nbeta   Ndocc  Nsocc
+   -------------------------------------------------------
+     A'        23      23       0       0       0       0
+     A"         7       7       0       0       0       0
+   -------------------------------------------------------
+    Total      30      30       5       5       5       0
+   -------------------------------------------------------
+
+  ==> Integral Setup <==
+
+  DFHelper Memory: AOs need 0.001 GiB; user supplied 0.489 GiB. Using in-core AOs.
+
+  ==> MemDFJK: Density-Fitted J/K Matrices <==
+
+    J tasked:                   Yes
+    K tasked:                   Yes
+    wK tasked:                   No
+    OpenMP threads:               1
+    Memory [MiB]:               500
+    Algorithm:                 Core
+    Schwarz Cutoff:           1E-12
+    Mask sparsity (%):       0.0000
+    Fitting Condition:        1E-10
+
+   => Auxiliary Basis Set <=
+
+  Basis Set: (6-311G** AUX)
+    Blend: CC-PVTZ-JKFIT
+    Number of shells: 45
+    Number of basis function: 139
+    Number of Cartesian functions: 166
+    Spherical Harmonics?: true
+    Max angular momentum: 4
+
+  Minimum eigenvalue in the overlap matrix is 1.8302702578E-02.
+  Using Symmetric Orthogonalization.
+
+  SCF Guess: Superposition of Atomic Densities via on-the-fly atomic UHF.
+
+  ==> Iterations <==
+
+                           Total Energy        Delta E     RMS |[F,P]|
+
+   @DF-RHF iter SAD:   -75.48953134261777   -7.54895e+01   0.00000e+00 
+   @DF-RHF iter   1:   -75.96721859114250   -4.77687e-01   1.85731e-02 DIIS
+   @DF-RHF iter   2:   -76.02258211659964   -5.53635e-02   1.14216e-02 DIIS
+   @DF-RHF iter   3:   -76.04549793809068   -2.29158e-02   9.44863e-04 DIIS
+   @DF-RHF iter   4:   -76.04591407028181   -4.16132e-04   2.25473e-04 DIIS
+   @DF-RHF iter   5:   -76.04593907010134   -2.49998e-05   4.06610e-05 DIIS
+   @DF-RHF iter   6:   -76.04594017207457   -1.10197e-06   7.98481e-06 DIIS
+   @DF-RHF iter   7:   -76.04594021582535   -4.37508e-08   1.12011e-06 DIIS
+   @DF-RHF iter   8:   -76.04594021661502   -7.89669e-10   2.33466e-07 DIIS
+   @DF-RHF iter   9:   -76.04594021665791   -4.28884e-11   5.50931e-08 DIIS
+   @DF-RHF iter  10:   -76.04594021666014   -2.23110e-12   4.77373e-09 DIIS
+  Energy and wave function converged.
+
+
+  ==> Post-Iterations <==
+
+    Orbital Energies [Eh]
+    ---------------------
+
+    Doubly Occupied:                                                      
+
+       1Ap   -20.546222     2Ap    -1.338428     3Ap    -0.702463  
+       4Ap    -0.571353     1App   -0.499432  
+
+    Virtual:                                                              
+
+       5Ap     0.149427     6Ap     0.216352     7Ap     0.563099  
+       8Ap     0.610819     9Ap     0.999865     2App    1.003880  
+      10Ap     1.108881    11Ap     1.315237    12Ap     1.485913  
+       3App    1.514692     4App    1.713790    13Ap     1.918572  
+      14Ap     2.238764    15Ap     2.379565    16Ap     2.597832  
+      17Ap     2.781141     5App    3.492140     6App    3.544355  
+      18Ap     3.711676    19Ap     4.004566    20Ap     4.257845  
+       7App    5.325911    21Ap     5.744403    22Ap     6.172860  
+      23Ap    51.543648  
+
+    Final Occupation by Irrep:
+             Ap   App 
+    DOCC [     4,    1 ]
+
+  @DF-RHF Final Energy:   -76.04594021666014
+
+   => Energetics <=
+
+    Nuclear Repulsion Energy =              9.1356877098879519
+    One-Electron Energy =                -123.0474610404717737
+    Two-Electron Energy =                  37.8658331139236850
+    Total Energy =                        -76.0459402166601421
+
+Computation Completed
+
+
+Properties will be evaluated at   0.000000,  -0.000000,   0.000000 [a0]
+
+Properties computed using the SCF density matrix
+
+  Nuclear Dipole Moment: [e a0]
+     X:     0.0045      Y:    -0.9854      Z:     0.0000
+
+  Electronic Dipole Moment: [e a0]
+     X:    -0.0006      Y:     0.1291      Z:     0.0000
+
+  Dipole Moment: [e a0]
+     X:     0.0039      Y:    -0.8563      Z:     0.0000     Total:     0.8563
+
+  Dipole Moment: [D]
+     X:     0.0100      Y:    -2.1765      Z:     0.0000     Total:     2.1765
+
+
+*** tstop() called on node37.bme.utexas.edu at Mon Sep 21 14:57:26 2020
+Module time:
+	user time   =       0.68 seconds =       0.01 minutes
+	system time =       0.02 seconds =       0.00 minutes
+	total time  =          1 seconds =       0.02 minutes
+Total time:
+	user time   =       0.68 seconds =       0.01 minutes
+	system time =       0.02 seconds =       0.00 minutes
+	total time  =          1 seconds =       0.02 minutes
+
+*** tstart() called on node37.bme.utexas.edu
+*** at Mon Sep 21 14:57:26 2020
+
+
+  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//
+  //               DFMP2               //
+  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<//
+
+   => Loading Basis Set <=
+
+    Name: (6-311G** AUX)
+    Role: RIFIT
+    Keyword: DF_BASIS_MP2
+    atoms 1   entry O          line   305 file /home/bdw2292/miniconda3/envs/p4env/share/psi4/basis/cc-pvtz-ri.gbs 
+    atoms 2-3 entry H          line    19 file /home/bdw2292/miniconda3/envs/p4env/share/psi4/basis/cc-pvtz-ri.gbs 
+
+	 --------------------------------------------------------
+	                          DF-MP2                         
+	      2nd-Order Density-Fitted Moller-Plesset Theory     
+	              RMP2 Wavefunction,   1 Threads             
+	                                                         
+	        Rob Parrish, Justin Turney, Andy Simmonett,      
+	           Ed Hohenstein, and C. David Sherrill          
+	 --------------------------------------------------------
+
+   => Auxiliary Basis Set <=
+
+  Basis Set: (6-311G** AUX)
+    Blend: CC-PVTZ-RI
+    Number of shells: 43
+    Number of basis function: 141
+    Number of Cartesian functions: 171
+    Spherical Harmonics?: true
+    Max angular momentum: 4
+
+	 --------------------------------------------------------
+	                 NBF =    30, NAUX =   141
+	 --------------------------------------------------------
+	   CLASS    FOCC     OCC    AOCC    AVIR     VIR    FVIR
+	   PAIRS       1       5       4      25      25       0
+	 --------------------------------------------------------
+
+	-----------------------------------------------------------
+	 ==================> DF-MP2 Energies <==================== 
+	-----------------------------------------------------------
+	 Reference Energy          =     -76.0459402166601421 [Eh]
+	 Singles Energy            =      -0.0000000000000000 [Eh]
+	 Same-Spin Energy          =      -0.0546133371780678 [Eh]
+	 Opposite-Spin Energy      =      -0.1632298629728229 [Eh]
+	 Correlation Energy        =      -0.2178432001508906 [Eh]
+	 Total Energy              =     -76.2637834168110373 [Eh]
+	-----------------------------------------------------------
+	 ================> DF-SCS-MP2 Energies <================== 
+	-----------------------------------------------------------
+	 SCS Same-Spin Scale       =       0.3333333333333333 [-]
+	 SCS Opposite-Spin Scale   =       1.2000000000000000 [-]
+	 SCS Same-Spin Energy      =      -0.0182044457260226 [Eh]
+	 SCS Opposite-Spin Energy  =      -0.1958758355673874 [Eh]
+	 SCS Correlation Energy    =      -0.2140802812934100 [Eh]
+	 SCS Total Energy          =     -76.2600204979535476 [Eh]
+	-----------------------------------------------------------
+
+
+*** tstop() called on node37.bme.utexas.edu at Mon Sep 21 14:57:26 2020
+Module time:
+	user time   =       0.17 seconds =       0.00 minutes
+	system time =       0.00 seconds =       0.00 minutes
+	total time  =          0 seconds =       0.00 minutes
+Total time:
+	user time   =       0.85 seconds =       0.01 minutes
+	system time =       0.02 seconds =       0.00 minutes
+	total time  =          1 seconds =       0.02 minutes
+
+    Psi4 stopped on: Monday, 21 September 2020 02:57PM
+    Psi4 wall time for execution: 0:00:01.07
+
+*** Psi4 exiting successfully. Buy a developer a beer!

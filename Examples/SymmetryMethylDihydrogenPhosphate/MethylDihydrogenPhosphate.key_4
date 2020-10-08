@@ -1,0 +1,109 @@
+parameters /home/bdw2292/poltype-poltype2-latest/amoebabio18_header.prm
+
+TARGET-DIPOLE -2.178 -1.467 0.175
+atom          401    401    P     "MethylDihydrogenPhos"        15    30.974    4
+atom          403    403    O     "MethylDihydrogenPhos"         8    15.999    2
+atom          404    404    O     "MethylDihydrogenPhos"         8    15.999    2
+atom          405    405    O     "MethylDihydrogenPhos"         8    15.999    1
+atom          402    402    C     "MethylDihydrogenPhos"         6    12.011    4
+atom          406    406    H     "MethylDihydrogenPhos"         1     1.008    1
+atom         407   407    H     "MethylDihydrogenPhos"         1     1.008    1
+
+vdw       401  4.4500   0.3900
+SOLUTE 401 [#15] 4.45 4.45
+
+vdw       403  3.4050   0.1100
+SOLUTE 403 [O;D2][#6] 3.405 3.405
+
+vdw       404  3.4050   0.1120
+SOLUTE 404 [#8;D2](~[#15]) 3.405 3.405
+
+vdw       405  3.3600   0.1120
+SOLUTE 405 [#8;D1]=[#15] 3.36 3.36
+
+vdw       402  3.8200   0.1010
+SOLUTE 402 [CH3] 3.82 3.82
+
+vdw       406  2.9600   0.0240 0.920
+SOLUTE 406 [#1][CH3] 2.96 2.96
+
+vdw       407  2.6650   0.0150 0.910
+SOLUTE 407 [#1]([#8]) 2.665 2.665
+
+bond      401   404   450.0000    1.6091
+bond      401   403   450.0000    1.5964
+bond      401   405   775.0000    1.4681
+bond      402   403   465.1000    1.4284
+bond      404   407   560.0000    0.9659
+bond      402   406   341.0000    1.0941
+angle     403   401   404    65.5800  104.6468
+angle     403   401   405    75.8600  113.0999
+angle     404   401   405    75.8600  116.3243
+angle     404   401   404    65.5800  100.1408
+angle     401   403   402    80.3000  120.4069
+angle     406   402   406    39.5700  109.7793
+angle     403   402   406    60.9900  110.5093
+angle     401   404   407    60.0000  109.5429
+strbnd    403   401   404    14.4000   14.4000
+strbnd    404   401   404    14.4000   14.4000
+strbnd    401   403   402    38.0000   38.0000
+strbnd    403   402   406    -4.5000   38.0000
+strbnd    401   404   407    -4.5000   38.0000
+# Transferred Torsion assigned from SMARTS [*]~[#6;D4]~[#8]~[*] torsion atom indexes = 9,6,2,1 with smiles torsion indices 1,2,3,4
+torsion   406   402   403   401     2.0000 0.0 1    -1.5000 180.0 2     0.8900 0.0 3
+# Transferred Torsion assigned from SMARTS [*]~[#8]~[#15]~[*] torsion atom indexes = 11,4,1,2 with smiles torsion indices 1,2,3,4
+torsion   403   401   404   407    -2.0000 0.0 1    -1.6800 180.0 2    -0.8000 0.0 3
+# Transferred Torsion assigned from SMARTS [*]~[#8]~[#15]~[*] torsion atom indexes = 6,2,1,4 with smiles torsion indices 1,2,3,4
+torsion   404   401   403   402     0.0000 0.0 1     0.0000 180.0 2     0.0000 0.0 3
+# Transferred Torsion assigned from SMARTS [*]~[#8]~[#15]~[*] torsion atom indexes = 11,4,1,3 with smiles torsion indices 1,2,3,4
+torsion   404   401   404   407    -2.0000 0.0 1    -1.6800 180.0 2    -0.8000 0.0 3
+# Transferred Torsion assigned from SMARTS [*]~[#8]~[#15]~[*] torsion atom indexes = 11,4,1,5 with smiles torsion indices 1,2,3,4
+torsion   405   401   404   407    -2.0000 0.0 1    -1.6800 180.0 2    -0.8000 0.0 3
+# Transferred Torsion assigned from SMARTS [*]~[#8]~[#15]~[*] torsion atom indexes = 6,2,1,5 with smiles torsion indices 1,2,3,4
+torsion   405   401   403   402     0.0000 0.0 1     0.0000 180.0 2     0.0000 0.0 3
+
+multipole   401  405  403               1.84213
+                                       -0.03493    0.00000   -0.26293
+                                       -0.05995
+                                        0.00000   -0.29564
+                                        0.04908    0.00000    0.35559
+multipole   403  401  402              -0.57961
+                                        0.27196    0.00000   -0.17887
+                                        0.31632
+                                        0.00000   -0.52056
+                                       -0.35043    0.00000    0.20424
+multipole   404  401  407              -0.58817
+                                        0.15374    0.00000   -0.09531
+                                        0.30743
+                                        0.00000   -0.41096
+                                       -0.26059    0.00000    0.10353
+multipole   405  401  403              -0.84148
+                                        0.03561    0.00000   -0.16869
+                                       -0.16329
+                                        0.00000   -0.18599
+                                        0.01606    0.00000    0.34928
+multipole   402  403  401               0.13075
+                                       -0.10929    0.00000    0.40462
+                                       -0.48769
+                                        0.00000   -0.41910
+                                       -0.09879    0.00000    0.90679
+multipole   406  402  403               0.04105
+                                       -0.00329    0.00000   -0.09133
+                                       -0.00662
+                                        0.00000    0.00010
+                                       -0.01033    0.00000    0.00652
+multipole   407  404  401               0.25070
+                                       -0.05781    0.00000   -0.12007
+                                       -0.03074
+                                        0.00000   -0.05971
+                                       -0.04037    0.00000    0.09045
+
+polarize           401          1.8280     0.3900 403 404 405
+polarize           403          0.8370     0.3900 401 402
+polarize           404          0.8370     0.3900 401 407
+polarize           405          0.8370     0.3900 401
+polarize           402          1.3340     0.3900 403 406
+polarize           406          0.4960     0.3900 402
+polarize          407          0.4960     0.3900 404
+
+

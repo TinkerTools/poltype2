@@ -1,0 +1,674 @@
+Mon Sep 21 15:01:28 2020  Calling: mkdir /scratch/bdw2292/Psi4-MonoMethylPhosphate0H path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H
+Mon Sep 21 15:01:28 2020 Running on host: node37.bme.utexas.edu
+Mon Sep 21 15:01:28 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Mon Sep 21 15:01:28 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Mon Sep 21 15:01:28 2020 Calling: Psi4 Gradient for DMA
+Mon Sep 21 15:01:28 2020 Error *** Resources and help at github.com/psi4/psi4.
+logpath=MonoMethylPhosphate0H-dma.log
+Mon Sep 21 15:01:28 2020  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H && psi4 MonoMethylPhosphate0H-dma.psi4 MonoMethylPhosphate0H-dma.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H
+Mon Sep 21 15:01:32 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/MonoMethylPhosphate0H-dma.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H
+Mon Sep 21 15:02:02 2020 All jobs have terminated 
+Mon Sep 21 15:02:02 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/MonoMethylPhosphate0H-dma.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H
+Mon Sep 21 15:02:32 2020 All jobs have terminated 
+Mon Sep 21 15:02:32 2020 NEED DMA: Executing GDMA
+Mon Sep 21 15:02:32 2020  Calling: /users/zj2244/Public/Software/gdma-2.2.11/bin/gdma < MonoMethylPhosphate0H.gdmain > MonoMethylPhosphate0H.gdmaout path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H
+Mon Sep 21 15:02:32 2020  Calling: poledit.x 1 MonoMethylPhosphate0H.gdmaout /home/bdw2292/poltype-poltype2-latest/amoebabio18_header.prm < MonoMethylPhosphate0H-peditin.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Global Frame Cartesian Multipole Moments :
+
+ Site:       1         Name:   P         Atomic Number:      15
+
+ Coordinates:           -0.450305      -0.060093      -0.000370
+
+ Charge:                  1.82480
+ Dipole:                  0.20259        0.07712        0.00316
+ Quadrupole:              0.14304
+                         -0.08945       -0.06246
+                          0.00733       -0.00625       -0.08058
+
+ Site:       2         Name:   O         Atomic Number:       8
+
+ Coordinates:            1.020765       0.799837       0.002600
+
+ Charge:                 -0.66876
+ Dipole:                  0.16681       -0.27630       -0.00071
+ Quadrupole:              0.42357
+                         -0.28813        0.04128
+                         -0.00100        0.00106       -0.46486
+
+ Site:       3         Name:   O         Atomic Number:       8
+
+ Coordinates:           -1.446075       1.102017      -0.021030
+
+ Charge:                 -1.08797
+ Dipole:                  0.02749       -0.04254        0.00104
+ Quadrupole:              0.00102
+                         -0.30200        0.21659
+                          0.00648       -0.00729       -0.21762
+
+ Site:       4         Name:   O         Atomic Number:       8
+
+ Coordinates:           -0.425365      -0.875443       1.299330
+
+ Charge:                 -1.09695
+ Dipole:                 -0.07305        0.03754       -0.06380
+ Quadrupole:             -0.32182
+                         -0.00618        0.01047
+                          0.04214       -0.30833        0.31135
+
+ Site:       5         Name:   O         Atomic Number:       8
+
+ Coordinates:           -0.404105      -0.904653      -1.280810
+
+ Charge:                 -1.09518
+ Dipole:                 -0.07236        0.03816        0.06513
+ Quadrupole:             -0.31637
+                         -0.01475        0.02065
+                         -0.04372        0.31530        0.29573
+
+ Site:       6         Name:   C         Atomic Number:       6
+
+ Coordinates:            2.198035       0.035407       0.000850
+
+ Charge:                  0.28675
+ Dipole:                 -0.35607        0.24316        0.00167
+ Quadrupole:              0.31975
+                         -0.41501        0.03115
+                          0.00350        0.00124       -0.35091
+
+ Site:       7         Name:   H         Atomic Number:       1
+
+ Coordinates:            2.256085      -0.623793       0.880040
+
+ Charge:                 -0.04440
+ Dipole:                 -0.00966       -0.09532        0.10616
+ Quadrupole:              0.01205
+                          0.00626       -0.01708
+                         -0.00574        0.00979        0.00502
+
+ Site:       8         Name:   H         Atomic Number:       1
+
+ Coordinates:            3.059615       0.715867       0.015290
+
+ Charge:                 -0.07470
+ Dipole:                  0.08958        0.05591        0.00112
+ Quadrupole:             -0.01213
+                          0.01400        0.01953
+                          0.00033        0.00055       -0.00740
+
+ Site:       9         Name:   H         Atomic Number:       1
+
+ Coordinates:            2.266255      -0.599173      -0.895560
+
+ Charge:                 -0.04359
+ Dipole:                 -0.00952       -0.09290       -0.10838
+ Quadrupole:              0.01292
+                          0.00657       -0.01725
+                          0.00536       -0.01033        0.00432
+
+ Local Frame Definition for Multipole Sites :
+
+     Atom     Name      Axis Type     Z Axis  X Axis  Y Axis
+
+       1      P         Z-then-X         2       6       0
+       2      O         Z-then-X         1       6       0
+       3      O         Z-then-X         1       2       0
+       4      O         Z-then-X         1       2       0
+       5      O         Z-then-X         1       2       0
+       6      C         Z-then-X         2       1       0
+       7      H         Z-then-X         6       2       0
+       8      H         Z-then-X         6       2       0
+       9      H         Z-then-X         6       2       0
+
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Choose Either the AMOEBA or HIPPO Polarization Model [A] :  
+ Polarizability Parameters for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      P            1.8280         0.3900
+       2      O            0.8370         0.3900
+       3      O            0.8370         0.3900
+       4      O            0.8370         0.3900
+       5      O            0.8370         0.3900
+       6      C            1.3340         0.3900
+       7      H            0.4960         0.3900
+       8      H            0.4960         0.3900
+       9      H            0.4960         0.3900
+
+ Enter Atom Number, Polarizability & Thole Values :  
+ The default is to place all atoms into one polarization group;
+ This can be altered by entering a series of bonded atom pairs
+ that separate the molecule into distinct polarization groups
+
+ Enter a Bond between Polarization Groups [<Enter>=Exit] :  
+ Polarization Groups for Multipole Sites :
+
+     Atom     Name       Polarization Group Definition
+
+       1      P               2     3     4     5
+       2      O               1     6
+       3      O               1
+       4      O               1
+       5      O               1
+       6      C               2     7     8     9
+       7      H               6
+       8      H               6
+       9      H               6
+
+ Electrostatic and Polarization Scale Factors :
+
+                    1-2         1-3         1-4         1-5
+
+ M-Scale:         0.0000      0.0000      0.4000      0.8000
+ P-Inter:         0.0000      0.0000      1.0000      1.0000
+ P-Intra:         0.0000      0.0000      0.5000      1.0000
+ W-Scale:         1.0000      1.0000      1.0000      1.0000
+
+                    1-1         1-2         1-3         1-4
+
+ D-Scale:         0.0000      1.0000      1.0000      1.0000
+ U-Scale:         1.0000      1.0000      1.0000      1.0000
+
+ Use Thole Damping:           True
+ Charge Penetration:          False
+ Set D Equal to P:            False
+
+ Determination of Intergroup Induced Dipoles :
+
+    Iter        RMS Change (Debye)
+
+       1           0.0000000000
+
+ Local Frame Intergroup Induced Dipole Moments (Debye) :
+
+    Atom              X           Y           Z         Total
+
+       1           0.0000      0.0000      0.0000      0.0000
+       2           0.0000      0.0000      0.0000      0.0000
+       3           0.0000      0.0000      0.0000      0.0000
+       4           0.0000      0.0000      0.0000      0.0000
+       5           0.0000      0.0000      0.0000      0.0000
+       6           0.0000      0.0000      0.0000      0.0000
+       7           0.0000      0.0000      0.0000      0.0000
+       8           0.0000      0.0000      0.0000      0.0000
+       9           0.0000      0.0000      0.0000      0.0000
+
+ Condense Symmetric Atoms to Equivalent Types [Y] :  
+ Remove Multipole Components Zeroed by Symmetry [Y] :  
+ Final Atomic Multipole Moments after Regularization :
+
+ Atom:       1         Name:   P         Atomic Number:      15
+
+ Local Frame:            Z-then-X             2       6       0
+
+ Charge:                  1.82479
+ Dipole:                  0.03566        0.00000        0.21382
+ Quadrupole:              0.06779
+                          0.00000       -0.08055
+                          0.13343        0.00000        0.01276
+
+ Atom:       2         Name:   O         Atomic Number:       8
+
+ Local Frame:            Z-then-X             1       6       0
+
+ Charge:                 -0.66876
+ Dipole:                  0.32272        0.00000       -0.00458
+ Quadrupole:              0.38971
+                          0.00000       -0.46485
+                         -0.30792        0.00000        0.07514
+
+ Atom:       3         Name:   O         Atomic Number:       8
+
+ Local Frame:            Z-then-X             1       2       0
+
+ Charge:                 -1.08797
+ Dipole:                 -0.00681        0.00000        0.05020
+ Quadrupole:             -0.20615
+                          0.00000       -0.21776
+                         -0.06022        0.00000        0.42391
+
+ Atom:       4         Name:   O         Atomic Number:       8
+
+ Local Frame:            Z-then-X             1       2       0
+
+ Charge:                 -1.09695
+ Dipole:                 -0.06534        0.00000        0.07517
+ Quadrupole:             -0.28167
+                          0.00000       -0.22335
+                         -0.02359        0.00000        0.50502
+
+ Atom:       5         Name:   O         Atomic Number:       8
+
+ Local Frame:            Z-then-X             1       2       0
+
+ Charge:                 -1.09517
+ Dipole:                 -0.06484        0.00000        0.07752
+ Quadrupole:             -0.28416
+                          0.00000       -0.21996
+                         -0.01908        0.00000        0.50412
+
+ Atom:       6         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X             2       1       0
+
+ Charge:                  0.28675
+ Dipole:                 -0.01003        0.00000        0.43106
+ Quadrupole:             -0.26235
+                          0.00000       -0.35091
+                         -0.03702        0.00000        0.61326
+
+ Atom:       7         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             6       2       0
+
+ Charge:                 -0.04440
+ Dipole:                  0.00922        0.00000       -0.14141
+ Quadrupole:              0.00937
+                          0.00000        0.00377
+                         -0.01250        0.00000       -0.01314
+
+ Atom:       8         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             6       2       0
+
+ Charge:                 -0.07470
+ Dipole:                 -0.01165        0.00000       -0.10495
+ Quadrupole:             -0.00625
+                          0.00000       -0.00741
+                         -0.01865        0.00000        0.01366
+
+ Atom:       9         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             6       2       0
+
+ Charge:                 -0.04359
+ Dipole:                  0.00979        0.00000       -0.14127
+ Quadrupole:              0.00943
+                          0.00000        0.00410
+                         -0.01228        0.00000       -0.01353
+Mon Sep 21 15:02:33 2020  Calling: potential.x 1 MonoMethylPhosphate0H.xyz -k MonoMethylPhosphate0H.key path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+       1      1     P     MonoMethylPhosphate0        15     30.974     4
+       2      2     O     MonoMethylPhosphate0         8     15.999     2
+       3      3     O     MonoMethylPhosphate0         8     15.999     1
+       4      4     O     MonoMethylPhosphate0         8     15.999     1
+       5      5     O     MonoMethylPhosphate0         8     15.999     1
+       6      6     C     MonoMethylPhosphate0         6     12.011     4
+       7      7     H     MonoMethylPhosphate0         1      1.008     1
+       8      8     H     MonoMethylPhosphate0         1      1.008     1
+       9      9     H     MonoMethylPhosphate0         1      1.008     1
+
+ Electrostatic Potential Grid Points :                  8294
+
+ Gaussian CUBEGEN Input Written To :   MonoMethylPhosphate0H.grid
+
+ Next, run the Gaussian CUBEGEN program; for example:
+ cubegen 0 potential=MP2 xxx.fchk xxx.cube -5 h < xxx.grid
+
+ See the Gaussian documentation for additional details;
+ After CUBEGEN, rerun Tinker POTENTIAL using Option 2
+Mon Sep 21 15:02:33 2020 Calling: Psi4 Gradient for ESP
+Mon Sep 21 15:02:33 2020  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H && psi4 MonoMethylPhosphate0H-esp.psi4 MonoMethylPhosphate0H-esp.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H
+Mon Sep 21 15:07:53 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/MonoMethylPhosphate0H-esp.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H
+Mon Sep 21 15:08:23 2020 All jobs have terminated 
+Mon Sep 21 15:08:23 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/MonoMethylPhosphate0H-esp.log path=/home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H
+Mon Sep 21 15:08:53 2020 All jobs have terminated 
+Mon Sep 21 15:08:53 2020 Calling: Generating CUBE File from PSI4
+Mon Sep 21 15:08:53 2020  Calling: potential.x 2 MonoMethylPhosphate0H.cube path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Electrostatic Potential Written To :  MonoMethylPhosphate0H.pot
+Mon Sep 21 15:08:53 2020  Calling: /home/bdw2292/poltype-poltype2-latest/avgmpoles.pl MonoMethylPhosphate0H.key MonoMethylPhosphate0H.xyz MonoMethylPhosphate0H-groups.txt MonoMethylPhosphate0H.key_2 MonoMethylPhosphate0H.xyz_2 401 path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H
+Mon Sep 21 15:08:53 2020 
+Mon Sep 21 15:08:53 2020 =========================================================
+Mon Sep 21 15:08:53 2020 QM Dipole moment
+
+Mon Sep 21 15:08:53 2020  Calling: potential.x 6 MonoMethylPhosphate0H.xyz_2 -k MonoMethylPhosphate0H.key_2 MonoMethylPhosphate0H.pot N 0.1 path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+     401    401     P     MonoMethylPhosphate0        15     30.974     4
+     403    403     O     MonoMethylPhosphate0         8     15.999     2
+     404    404     O     MonoMethylPhosphate0         8     15.999     1
+     402    402     C     MonoMethylPhosphate0         6     12.011     4
+     405    405     H     MonoMethylPhosphate0         1      1.008     1
+
+ Electrostatic Potential Grid Points :                  8294
+
+ Electrostatic Parameter Restraint Value :            1.0000
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+     401    401     P     MonoMethylPhosphate0        15     30.974     4
+     403    403     O     MonoMethylPhosphate0         8     15.999     2
+     404    404     O     MonoMethylPhosphate0         8     15.999     1
+     402    402     C     MonoMethylPhosphate0         6     12.011     4
+     405    405     H     MonoMethylPhosphate0         1      1.008     1
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         401      403    402      0   Z-then-X     1.82479
+                                                   0.03566  0.00000  0.21382
+                                                   0.06779
+                                                   0.00000 -0.08055
+                                                   0.13343  0.00000  0.01276
+
+         403      401    402      0   Z-then-X    -0.66876
+                                                   0.32272  0.00000 -0.00458
+                                                   0.38971
+                                                   0.00000 -0.46485
+                                                  -0.30792  0.00000  0.07514
+
+         404      401    403      0   Z-then-X    -1.09336
+                                                  -0.04566  0.00000  0.06763
+                                                  -0.25733
+                                                   0.00000 -0.22036
+                                                  -0.03430  0.00000  0.47768
+
+         402      403    401      0   Z-then-X     0.28675
+                                                  -0.01003  0.00000  0.43106
+                                                  -0.26235
+                                                   0.00000 -0.35091
+                                                  -0.03702  0.00000  0.61326
+
+         405      402    403      0   Z-then-X    -0.05423
+                                                   0.00245  0.00000 -0.12921
+                                                   0.00418
+                                                   0.00000  0.00015
+                                                  -0.01448  0.00000 -0.00434
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         401             1.828       0.390         403  404
+         403             0.837       0.390         401  402
+         404             0.837       0.390         401
+         402             1.334       0.390         403  405
+         405             0.496       0.390         402
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1         199      -184.6067      -182.8406         1.9265
+        1        2         611      -160.4250      -159.1828         1.5611
+        1        3        1695      -167.0909      -165.0775         2.1535
+        1        4        1460      -164.2991      -163.4064         1.1489
+        1        5        1452      -164.2841      -163.3964         1.1415
+        1        6         625      -128.7107      -129.9643         1.7706
+        1        7         650      -130.6825      -131.7825         1.3361
+        1        8         949      -111.5499      -113.7544         2.4077
+        1        9         653      -130.4157      -131.5136         1.3467
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :               -151.0493
+ Average Potential Magnitude for Model :            151.0493
+ Average Potential Value for Target :              -150.7107
+ Average Potential Magnitude for Target :           150.7107
+
+ Average Signed Potential Difference :               -0.3386
+ Average Unsigned Potential Difference :              1.4174
+ Root Mean Square Potential Difference :              1.6909
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value         Fixed
+
+    --            401             Monopole           1.82478          X
+     1            401             X-Dipole           0.03566
+    --            401             Y-Dipole           0.00000          X
+     2            401             Z-Dipole           0.21382
+     3            401             XX-Quad            0.06779
+    --            401             XY-Quad            0.00000          X
+     4            401             XZ-Quad            0.13343
+     5            401             YY-Quad           -0.08055
+    --            401             YZ-Quad            0.00000          X
+    --            401             ZZ-Quad            0.01276
+    --            403             Monopole          -0.66876          X
+     6            403             X-Dipole           0.32272
+    --            403             Y-Dipole           0.00000          X
+     7            403             Z-Dipole          -0.00458
+     8            403             XX-Quad            0.38971
+    --            403             XY-Quad            0.00000          X
+     9            403             XZ-Quad           -0.30792
+    10            403             YY-Quad           -0.46485
+    --            403             YZ-Quad            0.00000          X
+    --            403             ZZ-Quad            0.07514
+    --            404             Monopole          -1.09336          X
+    11            404             X-Dipole          -0.04566
+    --            404             Y-Dipole           0.00000          X
+    12            404             Z-Dipole           0.06763
+    13            404             XX-Quad           -0.25733
+    --            404             XY-Quad            0.00000          X
+    14            404             XZ-Quad           -0.03430
+    15            404             YY-Quad           -0.22036
+    --            404             YZ-Quad            0.00000          X
+    --            404             ZZ-Quad            0.47769
+    --            402             Monopole           0.28675          X
+    16            402             X-Dipole          -0.01003
+    --            402             Y-Dipole           0.00000          X
+    17            402             Z-Dipole           0.43106
+    18            402             XX-Quad           -0.26235
+    --            402             XY-Quad            0.00000          X
+    19            402             XZ-Quad           -0.03702
+    20            402             YY-Quad           -0.35091
+    --            402             YZ-Quad            0.00000          X
+    --            402             ZZ-Quad            0.61326
+    --            405             Monopole          -0.05423          X
+    21            405             X-Dipole           0.00245
+    --            405             Y-Dipole           0.00000          X
+    22            405             Z-Dipole          -0.12921
+    23            405             XX-Quad            0.00418
+    --            405             XY-Quad            0.00000          X
+    24            405             XZ-Quad           -0.01448
+    25            405             YY-Quad            0.00015
+    --            405             YZ-Quad            0.00000          X
+    --            405             ZZ-Quad           -0.00433
+
+ Levenberg-Marquardt Nonlinear Least Squares :
+
+ LS Iter     F Value      Total G     Active G    N Active   F Calls
+
+     0    34628.8761   24336.1845   24336.1845        25        26
+     1      955.8025    1409.3585    1409.3585        25        52
+     2      752.8961       0.0000       0.0000        25        78
+
+ SQUARE  --  Normal Termination of Least Squares
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value         Fixed
+
+    --            401             Monopole           1.82478          X
+     1            401             X-Dipole          -0.02679
+    --            401             Y-Dipole           0.00000          X
+     2            401             Z-Dipole           0.20614
+     3            401             XX-Quad            0.08288
+    --            401             XY-Quad            0.00000          X
+     4            401             XZ-Quad            0.07570
+     5            401             YY-Quad           -0.06302
+    --            401             YZ-Quad            0.00000          X
+    --            401             ZZ-Quad           -0.01986
+    --            403             Monopole          -0.66876          X
+     6            403             X-Dipole           0.26880
+    --            403             Y-Dipole           0.00000          X
+     7            403             Z-Dipole           0.04119
+     8            403             XX-Quad            0.45722
+    --            403             XY-Quad            0.00000          X
+     9            403             XZ-Quad           -0.35434
+    10            403             YY-Quad           -0.50431
+    --            403             YZ-Quad            0.00000          X
+    --            403             ZZ-Quad            0.04709
+    --            404             Monopole          -1.09336          X
+    11            404             X-Dipole          -0.04128
+    --            404             Y-Dipole           0.00000          X
+    12            404             Z-Dipole           0.06540
+    13            404             XX-Quad           -0.23329
+    --            404             XY-Quad            0.00000          X
+    14            404             XZ-Quad           -0.06849
+    15            404             YY-Quad           -0.22880
+    --            404             YZ-Quad            0.00000          X
+    --            404             ZZ-Quad            0.46209
+    --            402             Monopole           0.28675          X
+    16            402             X-Dipole           0.09342
+    --            402             Y-Dipole           0.00000          X
+    17            402             Z-Dipole           0.40723
+    18            402             XX-Quad           -0.28835
+    --            402             XY-Quad            0.00000          X
+    19            402             XZ-Quad           -0.08123
+    20            402             YY-Quad           -0.30969
+    --            402             YZ-Quad            0.00000          X
+    --            402             ZZ-Quad            0.59804
+    --            405             Monopole          -0.05423          X
+    21            405             X-Dipole           0.04309
+    --            405             Y-Dipole           0.00000          X
+    22            405             Z-Dipole          -0.07577
+    23            405             XX-Quad            0.04025
+    --            405             XY-Quad            0.00000          X
+    24            405             XZ-Quad           -0.04473
+    25            405             YY-Quad            0.00488
+    --            405             YZ-Quad            0.00000          X
+    --            405             ZZ-Quad           -0.04513
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1         199      -183.0778      -182.8406         0.4532
+        1        2         611      -159.2952      -159.1828         0.2766
+        1        3        1695      -165.3840      -165.0775         0.5023
+        1        4        1460      -163.6688      -163.4064         0.4792
+        1        5        1452      -163.6740      -163.3964         0.4925
+        1        6         625      -130.2170      -129.9643         0.3298
+        1        7         650      -132.0019      -131.7825         0.3081
+        1        8         949      -113.9215      -113.7544         0.2131
+        1        9         653      -131.7475      -131.5136         0.3204
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :               -150.9559
+ Average Potential Magnitude for Model :            150.9559
+ Average Potential Value for Target :              -150.7107
+ Average Potential Magnitude for Target :           150.7107
+
+ Average Signed Potential Difference :               -0.2452
+ Average Unsigned Potential Difference :              0.2786
+ Root Mean Square Potential Difference :              0.4170
+Mon Sep 21 15:08:54 2020  Calling: sed -e '/\(.* none$\|^#\|^fix\|^potential-offset\)/d' MonoMethylPhosphate0H.key_3 > MonoMethylPhosphate0H.key_3_tmp path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H
+Mon Sep 21 15:08:54 2020 
+Mon Sep 21 15:08:54 2020 =========================================================
+Mon Sep 21 15:08:54 2020 Electrostatic Potential Comparison
+
+Mon Sep 21 15:08:54 2020  Calling: potential.x 5 MonoMethylPhosphate0H.xyz_2 -k MonoMethylPhosphate0H.key_3 MonoMethylPhosphate0H.pot N > RMSPD.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H
+Rotatable bond found about (3, 1, 2, 6)
+****************************************************************************************************
+Torsion parameters for torsion   405   402   403   401     0.0000 0.0 1     0.0000 180.0 2     0.0000 0.0 3 assigned from SMILES [*]~[*]~[*]~[*] from torsion atom indices 9,6,2,1 with smiles torsion indices 1,2,3,4
+Torsion parameters for torsion   404   401   403   402     0.0000 0.0 1     0.0000 180.0 2     0.0000 0.0 3 assigned from SMILES [*]~[*]~[*]~[*] from torsion atom indices 6,2,1,5 with smiles torsion indices 1,2,3,4
+Mon Sep 21 15:08:55 2020  Calling: psi4 MonoMethylPhosphate0H-esp_frag.psi4 MonoMethylPhosphate0H-esp_frag.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H
+Mon 21 Sep 2020 03:08:58 PM CDT  Calling: psi4 MonoMethylPhosphate0H-esp_frag.psi4 MonoMethylPhosphate0H-esp_frag.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0
+Mon 21 Sep 2020 03:09:01 PM CDT equivalentrotbndindexarrays[['1_2']]
+Mon 21 Sep 2020 03:09:01 PM CDT  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0 && nohup python /home/bdw2292/poltype-poltype2-latest/PoltypeModules/poltype.py & path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H
+Mon 21 Sep 2020 03:09:01 PM CDT Waiting on /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0/1_2_Index_0-poltype.log to begin
+Mon 21 Sep 2020 03:09:31 PM CDT Waiting on /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0/1_2_Index_0-poltype.log for termination 
+Poltype -- Polarizable atom typer of small molecules for the AMOEBA polarizable force field
+
+Please cite:
+Wu, J.C.; Chattree, G.; Ren, P.Y.; Automation of AMOEBA polarizable force field 
+parameterization for small molecules. Theor Chem Acc. 
+
+Version 2.3.0 February 2020
+
+Copyright (c)  Johnny Wu, Gaurav Chattree, Brandon Walker, Matthew Harger and Pengyu Ren 2019
+
+All Rights Reserved
+##############################################################################################################
+
+Calling: analyze.x /home/bdw2292/poltype-poltype2-latest/water.xyz -k /home/bdw2292/poltype-poltype2-latest/water.key e> version.out
+Calling: /home/bdw2292/miniconda3/envs/p4env/bin/obminimize -ff MMFF94 1_2_Index_0.sdf >1_2_Index_0_OBOPT.pdb path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0 && GAUSS_SCRDIR=/scratch/bdw2292/Gau-1_2_Index_0 /opt/g09gh/gaussian/g09/g09 1_2_Index_0-opt.com path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0/1_2_Index_0-opt.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0/1_2_Index_0-opt.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0/1_2_Index_0-opt.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0/1_2_Index_0-opt.log
+Calling: /opt/g09gh/gaussian/g09/formchk 1_2_Index_0-opt.chk path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0
+no longer error 1_2_Index_0-opt.log
+no longer error 1_2_Index_0-opt.log
+no longer error 1_2_Index_0-opt.log
+no longer error 1_2_Index_0-opt.log
+no longer error 1_2_Index_0-opt.log
+no longer error 1_2_Index_0-opt.log
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0 && psi4 1_2_Index_0-dma.psi4 1_2_Index_0-dma.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0
+Calling: /users/zj2244/Public/Software/gdma-2.2.11/bin/gdma < 1_2_Index_0.gdmain > 1_2_Index_0.gdmaout path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0
+Calling: poledit.x 1 1_2_Index_0.gdmaout /home/bdw2292/poltype-poltype2-latest/amoebabio18_header.prm < 1_2_Index_0-peditin.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0
+Calling: potential.x 1 1_2_Index_0.xyz -k 1_2_Index_0.key path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0 && psi4 1_2_Index_0-esp.psi4 1_2_Index_0-esp.log path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMonoMethylPhosphate0H/Fragments/1_2_Index_0

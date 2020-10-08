@@ -1,0 +1,30 @@
+Mon Oct  5 16:13:00 2020 Running on host: node35.bme.utexas.edu
+Mon Oct  5 16:13:00 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Mon Oct  5 16:13:00 2020 Calling: Psi4 Optimization
+Mon Oct  5 16:13:00 2020 Calling: Psi4 Gradient for DMA
+Mon Oct  5 16:13:00 2020 Calling: Generating CUBE File from PSI4
+Mon Oct  5 16:13:00 2020  Calling: sed -e '/\(.* none$\|^#\|^fix\|^potential-offset\)/d' methanol.key_3 > methanol.key_3_tmp path = /home/bdw2292/finaltestpoltypeagain/Examples/MethanolOnlyRotBnd
+Rotatable bond found about (3, 2, 1, 6)
+****************************************************************************************************
+Torsion parameters for torsion   403   401   402   404     0.0000 0.0 1     0.0000 180.0 2     0.2740 0.0 3 assigned from SMILES [#1][O][C][#1] from torsion atom indices 6,1,2,5 with smiles torsion indices 1,2,3,4
+Mon Oct  5 16:13:00 2020  Calling: cp ../methanol-opt.xyz methanol-opt-2-1-062-opt.xyz path = /home/bdw2292/finaltestpoltypeagain/Examples/MethanolOnlyRotBnd/qm-torsion
+Mon Oct  5 16:13:00 2020 All jobs have terminated 
+Mon Oct  5 16:13:01 2020 All jobs have terminated 
+Mon Oct  5 16:13:02 2020 
+Mon Oct  5 16:13:02 2020 =========================================================
+Mon Oct  5 16:13:02 2020 Minimizing structure
+
+Mon Oct  5 16:13:02 2020  Calling: cp methanol.xyz_2 ttt.xyz path = /home/bdw2292/finaltestpoltypeagain/Examples/MethanolOnlyRotBnd
+Mon Oct  5 16:13:02 2020  Calling: cp methanol.key_5 ttt.key path = /home/bdw2292/finaltestpoltypeagain/Examples/MethanolOnlyRotBnd
+Mon Oct  5 16:13:02 2020  Calling: minimize.x -k ttt.key ttt.xyz 0.1 > Minimizedttt.out path = /home/bdw2292/finaltestpoltypeagain/Examples/MethanolOnlyRotBnd
+Mon Oct  5 16:13:02 2020 
+Mon Oct  5 16:13:02 2020 =========================================================
+Mon Oct  5 16:13:02 2020 QM Dipole moment
+
+Mon Oct  5 16:13:02 2020 QM Dipole moment = 1.679
+Mon Oct  5 16:13:02 2020 
+Mon Oct  5 16:13:02 2020 =========================================================
+Mon Oct  5 16:13:02 2020 MM Dipole moment
+
+Mon Oct  5 16:13:02 2020  Calling: analyze.x methanol.xyz_2 -k ttt.key em | grep -A11 Charge>MMDipole.txt path = /home/bdw2292/finaltestpoltypeagain/Examples/MethanolOnlyRotBnd
+Mon Oct  5 16:13:03 2020 MM Dipole moment = 2.062

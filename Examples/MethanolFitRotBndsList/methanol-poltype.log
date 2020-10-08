@@ -1,0 +1,1103 @@
+Mon Sep 21 14:57:31 2020 Running on host: node37.bme.utexas.edu
+Mon Sep 21 14:57:31 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Mon Sep 21 14:57:31 2020  Calling: /home/bdw2292/miniconda3/envs/p4env/bin/obminimize -ff MMFF94 methanol.sdf >methanol_OBOPT.pdb path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+
+A T O M   T Y P E S
+
+IDX	TYPE	RING
+1	6	NO
+2	1	NO
+3	5	NO
+4	5	NO
+5	5	NO
+6	21	NO
+
+F O R M A L   C H A R G E S
+
+IDX	CHARGE
+1	0.000000
+2	0.000000
+3	0.000000
+4	0.000000
+5	0.000000
+6	0.000000
+
+P A R T I A L   C H A R G E S
+
+IDX	CHARGE
+1	-0.680000
+2	0.280000
+3	0.000000
+4	0.000000
+5	0.000000
+6	0.400000
+
+S E T T I N G   U P   C A L C U L A T I O N S
+
+SETTING UP BOND CALCULATIONS...
+SETTING UP ANGLE & STRETCH-BEND CALCULATIONS...
+SETTING UP TORSION CALCULATIONS...
+SETTING UP OOP CALCULATIONS...
+SETTING UP VAN DER WAALS CALCULATIONS...
+SETTING UP ELECTROSTATIC CALCULATIONS...
+
+C O N J U G A T E   G R A D I E N T S
+
+STEPS = 2500
+
+STEP n     E(n)       E(n-1)    
+--------------------------------
+    1       0.666       0.666
+   10       0.666       0.666
+   20       0.666       0.666
+   30       0.666       0.666
+   40       0.666       0.666
+   50       0.666       0.666
+   60       0.666       0.666
+   70       0.666       0.666
+   80       0.666       0.666
+   90       0.666       0.666
+  100       0.666       0.666
+  110       0.666       0.666
+  120       0.666       0.666
+  130       0.666       0.666
+  140       0.666       0.666
+  150       0.666       0.666
+  160       0.666       0.666
+  170       0.666       0.666
+  180       0.666       0.666
+  190       0.666       0.666
+  200       0.666       0.666
+  210       0.666       0.666
+  220       0.666       0.666
+  230       0.666       0.666
+  240       0.666       0.666
+  250       0.666       0.666
+  260       0.666       0.666
+  270       0.666       0.666
+  280       0.666       0.666
+  290       0.666       0.666
+  300       0.666       0.666
+  310       0.666       0.666
+  320       0.666       0.666
+  330       0.666       0.666
+  340       0.666       0.666
+  350       0.666       0.666
+  360       0.666       0.666
+  370       0.666       0.666
+  380       0.666       0.666
+  390       0.666       0.666
+  400       0.666       0.666
+  410       0.666       0.666
+  420       0.666       0.666
+  430       0.666       0.666
+  440       0.666       0.666
+  450       0.666       0.666
+  460       0.666       0.666
+  470       0.666       0.666
+  480       0.666       0.666
+  490       0.666       0.666
+  500       0.666       0.666
+  510       0.666       0.666
+  520       0.666       0.666
+  530       0.666       0.666
+  540       0.666       0.666
+  550       0.666       0.666
+  560       0.666       0.666
+  570       0.666       0.666
+  580       0.666       0.666
+  590       0.666       0.666
+  600       0.666       0.666
+  610       0.666       0.666
+  620       0.666       0.666
+  630       0.666       0.666
+  640       0.666       0.666
+  650       0.666       0.666
+  660       0.666       0.666
+  670       0.666       0.666
+  680       0.666       0.666
+  690       0.666       0.666
+  700       0.666       0.666
+  710       0.666       0.666
+  720       0.666       0.666
+  730       0.666       0.666
+  740       0.666       0.666
+  750       0.666       0.666
+  760       0.666       0.666
+  770       0.666       0.666
+  780       0.666       0.666
+  790       0.666       0.666
+  800       0.666       0.666
+  810       0.666       0.666
+  820       0.666       0.666
+  830       0.666       0.666
+  840       0.666       0.666
+  850       0.666       0.666
+  860       0.666       0.666
+  870       0.666       0.666
+  880       0.666       0.666
+  890       0.666       0.666
+  900       0.666       0.666
+  910       0.666       0.666
+  920       0.666       0.666
+  930       0.666       0.666
+  940       0.666       0.666
+  950       0.666       0.666
+  960       0.666       0.666
+  970       0.666       0.666
+  980       0.666       0.666
+  990       0.666       0.666
+ 1000       0.666       0.666
+ 1010       0.666       0.666
+ 1020       0.666       0.666
+ 1030       0.666       0.666
+ 1040       0.666       0.666
+ 1050       0.666       0.666
+ 1060       0.666       0.666
+ 1070       0.666       0.666
+ 1080       0.666       0.666
+ 1090       0.666       0.666
+ 1100       0.666       0.666
+ 1110       0.666       0.666
+ 1120       0.666       0.666
+ 1130       0.666       0.666
+ 1140       0.666       0.666
+ 1150       0.666       0.666
+ 1160       0.666       0.666
+ 1170       0.666       0.666
+ 1180       0.666       0.666
+ 1190       0.666       0.666
+ 1200       0.666       0.666
+ 1210       0.666       0.666
+ 1220       0.666       0.666
+ 1230       0.666       0.666
+ 1240       0.666       0.666
+ 1250       0.666       0.666
+ 1260       0.666       0.666
+ 1270       0.666       0.666
+ 1280       0.666       0.666
+ 1290       0.666       0.666
+ 1300       0.666       0.666
+ 1310       0.666       0.666
+ 1320       0.666       0.666
+ 1330       0.666       0.666
+ 1340       0.666       0.666
+ 1350       0.666       0.666
+ 1360       0.666       0.666
+ 1370       0.666       0.666
+ 1380       0.666       0.666
+ 1390       0.666       0.666
+ 1400       0.666       0.666
+ 1410       0.666       0.666
+ 1420       0.666       0.666
+ 1430       0.666       0.666
+ 1440       0.666       0.666
+ 1450       0.666       0.666
+ 1460       0.666       0.666
+ 1470       0.666       0.666
+ 1480       0.666       0.666
+ 1490       0.666       0.666
+ 1500       0.666       0.666
+ 1510       0.666       0.666
+ 1520       0.666       0.666
+ 1530       0.666       0.666
+ 1540       0.666       0.666
+ 1550       0.666       0.666
+ 1560       0.666       0.666
+ 1570       0.666       0.666
+ 1580       0.666       0.666
+ 1590       0.666       0.666
+ 1600       0.666       0.666
+ 1610       0.666       0.666
+ 1620       0.666       0.666
+ 1630       0.666       0.666
+ 1640       0.666       0.666
+ 1650       0.666       0.666
+ 1660       0.666       0.666
+ 1670       0.666       0.666
+ 1680       0.666       0.666
+ 1690       0.666       0.666
+ 1700       0.666       0.666
+ 1710       0.666       0.666
+ 1720       0.666       0.666
+ 1730       0.666       0.666
+ 1740       0.666       0.666
+ 1750       0.666       0.666
+ 1760       0.666       0.666
+ 1770       0.666       0.666
+ 1780       0.666       0.666
+ 1790       0.666       0.666
+ 1800       0.666       0.666
+ 1810       0.666       0.666
+ 1820       0.666       0.666
+ 1830       0.666       0.666
+ 1840       0.666       0.666
+ 1850       0.666       0.666
+ 1860       0.666       0.666
+ 1870       0.666       0.666
+ 1880       0.666       0.666
+ 1890       0.666       0.666
+ 1900       0.666       0.666
+ 1910       0.666       0.666
+ 1920       0.666       0.666
+ 1930       0.666       0.666
+ 1940       0.666       0.666
+ 1950       0.666       0.666
+ 1960       0.666       0.666
+ 1970       0.666       0.666
+ 1980       0.666       0.666
+ 1990       0.666       0.666
+ 2000       0.666       0.666
+ 2010       0.666       0.666
+ 2020       0.666       0.666
+ 2030       0.666       0.666
+ 2040       0.666       0.666
+ 2050       0.666       0.666
+ 2060       0.666       0.666
+ 2070       0.666       0.666
+ 2080       0.666       0.666
+ 2090       0.666       0.666
+ 2100       0.666       0.666
+ 2110       0.666       0.666
+ 2120       0.666       0.666
+ 2130       0.666       0.666
+ 2140       0.666       0.666
+ 2150       0.666       0.666
+ 2160       0.666       0.666
+ 2170       0.666       0.666
+ 2180       0.666       0.666
+ 2190       0.666       0.666
+ 2200       0.666       0.666
+ 2210       0.666       0.666
+ 2220       0.666       0.666
+ 2230       0.666       0.666
+ 2240       0.666       0.666
+ 2250       0.666       0.666
+ 2260       0.666       0.666
+ 2270       0.666       0.666
+ 2280       0.666       0.666
+ 2290       0.666       0.666
+ 2300       0.666       0.666
+ 2310       0.666       0.666
+ 2320       0.666       0.666
+ 2330       0.666       0.666
+ 2340       0.666       0.666
+ 2350       0.666       0.666
+ 2360       0.666       0.666
+ 2370       0.666       0.666
+ 2380       0.666       0.666
+ 2390       0.666       0.666
+ 2400       0.666       0.666
+ 2410       0.666       0.666
+ 2420       0.666       0.666
+ 2430       0.666       0.666
+ 2440       0.666       0.666
+ 2450       0.666       0.666
+ 2460       0.666       0.666
+ 2470       0.666       0.666
+ 2480       0.666       0.666
+ 2490       0.666       0.666
+ 2500       0.666       0.666
+Time: 0.09seconds. Iterations per second: 27788.9
+Mon Sep 21 14:57:31 2020  Calling: mkdir /scratch/bdw2292/Psi4-methanol path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon Sep 21 14:57:31 2020 Calling: Psi4 Optimization
+Mon Sep 21 14:57:31 2020  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList && psi4 methanol-opt.psi4 methanol-opt.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Optimizer: Optimization complete!
+Mon Sep 21 14:57:53 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/methanol-opt.log path=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon Sep 21 14:58:23 2020 All jobs have terminated 
+Mon Sep 21 14:58:23 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/methanol-opt.log path=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon Sep 21 14:58:53 2020 All jobs have terminated 
+Mon Sep 21 14:58:53 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Mon Sep 21 14:58:53 2020 Calling: Psi4 Optimization
+Mon Sep 21 14:58:53 2020 Calling: Psi4 Gradient for DMA
+Mon Sep 21 14:58:53 2020  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList && psi4 methanol-dma.psi4 methanol-dma.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon Sep 21 14:58:56 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/methanol-dma.log path=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon Sep 21 14:59:26 2020 All jobs have terminated 
+Mon Sep 21 14:59:26 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/methanol-dma.log path=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon Sep 21 14:59:56 2020 All jobs have terminated 
+Mon Sep 21 14:59:56 2020 NEED DMA: Executing GDMA
+Mon Sep 21 14:59:56 2020  Calling: /users/zj2244/Public/Software/gdma-2.2.11/bin/gdma < methanol.gdmain > methanol.gdmaout path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon Sep 21 14:59:56 2020  Calling: poledit.x 1 methanol.gdmaout /home/bdw2292/poltype-poltype2-latest/amoebabio18_header.prm < methanol-peditin.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Global Frame Cartesian Multipole Moments :
+
+ Site:       1         Name:   O         Atomic Number:       8
+
+ Coordinates:            0.690256       0.021078       0.007121
+
+ Charge:                 -0.43835
+ Dipole:                 -0.21430       -0.23136       -0.07829
+ Quadrupole:              0.39026
+                         -0.23779        0.11398
+                         -0.08049        0.23628       -0.50425
+
+ Site:       2         Name:   C         Atomic Number:       6
+
+ Coordinates:           -0.722885       0.029156       0.009880
+
+ Charge:                  0.20175
+ Dipole:                  0.46216       -0.02433       -0.00824
+ Quadrupole:              0.84707
+                         -0.04710       -0.45923
+                         -0.01596       -0.02729       -0.38784
+
+ Site:       3         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.147667      -0.713337       0.701390
+
+ Charge:                 -0.00487
+ Dipole:                 -0.08017       -0.09641        0.09239
+ Quadrupole:             -0.01173
+                         -0.01640        0.00559
+                          0.01558       -0.00287        0.00614
+
+ Site:       4         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.147701      -0.140836      -0.990406
+
+ Charge:                 -0.00487
+ Dipole:                 -0.08017       -0.02049       -0.13195
+ Quadrupole:             -0.01173
+                         -0.00357        0.00303
+                         -0.02234        0.00049        0.00870
+
+ Site:       5         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.030822       1.021944       0.345847
+
+ Charge:                  0.04115
+ Dipole:                 -0.04876        0.12501        0.04230
+ Quadrupole:             -0.00728
+                          0.00788        0.01010
+                          0.00267        0.00494       -0.00283
+
+ Site:       6         Name:   H         Atomic Number:       1
+
+ Coordinates:            0.978599      -0.849443      -0.287482
+
+ Charge:                  0.20519
+ Dipole:                  0.05018       -0.06858       -0.02321
+ Quadrupole:             -0.05310
+                         -0.02835        0.11675
+                         -0.00960        0.06895       -0.06365
+
+ Local Frame Definition for Multipole Sites :
+
+     Atom     Name      Axis Type     Z Axis  X Axis  Y Axis
+
+       1      O         Z-then-X         2       6       0
+       2      C         Z-then-X         1       6       0
+       3      H         Z-then-X         2       1       0
+       4      H         Z-then-X         2       1       0
+       5      H         Z-then-X         2       1       0
+       6      H         Z-then-X         1       2       0
+
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Choose Either the AMOEBA or HIPPO Polarization Model [A] :  
+ Polarizability Parameters for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      O            0.8370         0.3900
+       2      C            1.3340         0.3900
+       3      H            0.4960         0.3900
+       4      H            0.4960         0.3900
+       5      H            0.4960         0.3900
+       6      H            0.4960         0.3900
+
+ Enter Atom Number, Polarizability & Thole Values :  
+ The default is to place all atoms into one polarization group;
+ This can be altered by entering a series of bonded atom pairs
+ that separate the molecule into distinct polarization groups
+
+ Enter a Bond between Polarization Groups [<Enter>=Exit] :  
+ Polarization Groups for Multipole Sites :
+
+     Atom     Name       Polarization Group Definition
+
+       1      O               2     6
+       2      C               1     3     4     5
+       3      H               2
+       4      H               2
+       5      H               2
+       6      H               1
+
+ Electrostatic and Polarization Scale Factors :
+
+                    1-2         1-3         1-4         1-5
+
+ M-Scale:         0.0000      0.0000      0.4000      0.8000
+ P-Inter:         0.0000      0.0000      1.0000      1.0000
+ P-Intra:         0.0000      0.0000      0.5000      1.0000
+ W-Scale:         1.0000      1.0000      1.0000      1.0000
+
+                    1-1         1-2         1-3         1-4
+
+ D-Scale:         0.0000      1.0000      1.0000      1.0000
+ U-Scale:         1.0000      1.0000      1.0000      1.0000
+
+ Use Thole Damping:           True
+ Charge Penetration:          False
+ Set D Equal to P:            False
+
+ Determination of Intergroup Induced Dipoles :
+
+    Iter        RMS Change (Debye)
+
+       1           0.0000000000
+
+ Local Frame Intergroup Induced Dipole Moments (Debye) :
+
+    Atom              X           Y           Z         Total
+
+       1           0.0000      0.0000      0.0000      0.0000
+       2           0.0000      0.0000      0.0000      0.0000
+       3           0.0000      0.0000      0.0000      0.0000
+       4           0.0000      0.0000      0.0000      0.0000
+       5           0.0000      0.0000      0.0000      0.0000
+       6           0.0000      0.0000      0.0000      0.0000
+
+ Condense Symmetric Atoms to Equivalent Types [Y] :  
+ Remove Multipole Components Zeroed by Symmetry [Y] :  
+ Final Atomic Multipole Moments after Regularization :
+
+ Atom:       1         Name:   O         Atomic Number:       8
+
+ Local Frame:            Z-then-X             2       6       0
+
+ Charge:                 -0.43835
+ Dipole:                  0.24553        0.00000        0.21282
+ Quadrupole:              0.19092
+                          0.00000       -0.58421
+                         -0.24984        0.00000        0.39329
+
+ Atom:       2         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X             1       6       0
+
+ Charge:                  0.20175
+ Dipole:                  0.02289        0.00000        0.46231
+ Quadrupole:             -0.46902
+                          0.00000       -0.37860
+                          0.04178        0.00000        0.84762
+
+ Atom:       3         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             2       1       0
+
+ Charge:                 -0.00487
+ Dipole:                 -0.02240        0.00000       -0.15412
+ Quadrupole:              0.00743
+                          0.00000        0.00303
+                         -0.02315        0.00000       -0.01046
+
+ Atom:       4         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             2       1       0
+
+ Charge:                 -0.00487
+ Dipole:                 -0.02240        0.00000       -0.15412
+ Quadrupole:              0.00743
+                          0.00000        0.00303
+                         -0.02315        0.00000       -0.01046
+
+ Atom:       5         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             2       1       0
+
+ Charge:                  0.04115
+ Dipole:                 -0.00958        0.00000       -0.14036
+ Quadrupole:             -0.00126
+                          0.00000       -0.00450
+                         -0.01215        0.00000        0.00576
+
+ Atom:       6         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             1       2       0
+
+ Charge:                  0.20519
+ Dipole:                 -0.02620        0.00000       -0.08410
+ Quadrupole:             -0.05288
+                          0.00000       -0.08699
+                         -0.03061        0.00000        0.13987
+Mon Sep 21 14:59:56 2020  Calling: potential.x 1 methanol.xyz -k methanol.key path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+       1      1     O     methanol                     8     15.999     2
+       2      2     C     methanol                     6     12.011     4
+       3      3     H     methanol                     1      1.008     1
+       4      4     H     methanol                     1      1.008     1
+       5      5     H     methanol                     1      1.008     1
+       6      6     H     methanol                     1      1.008     1
+
+ Electrostatic Potential Grid Points :                  5779
+
+ Gaussian CUBEGEN Input Written To :   methanol.grid
+
+ Next, run the Gaussian CUBEGEN program; for example:
+ cubegen 0 potential=MP2 xxx.fchk xxx.cube -5 h < xxx.grid
+
+ See the Gaussian documentation for additional details;
+ After CUBEGEN, rerun Tinker POTENTIAL using Option 2
+Mon Sep 21 14:59:56 2020 Calling: Psi4 Gradient for ESP
+Mon Sep 21 14:59:56 2020  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList && psi4 methanol-esp.psi4 methanol-esp.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon Sep 21 15:00:52 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/methanol-esp.log path=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon Sep 21 15:01:22 2020 All jobs have terminated 
+Mon Sep 21 15:01:22 2020 Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/methanol-esp.log path=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon Sep 21 15:01:52 2020 All jobs have terminated 
+Mon Sep 21 15:01:52 2020 Calling: Generating CUBE File from PSI4
+Mon Sep 21 15:01:52 2020  Calling: potential.x 2 methanol.cube path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Electrostatic Potential Written To :  methanol.pot
+Mon Sep 21 15:01:52 2020  Calling: /home/bdw2292/poltype-poltype2-latest/avgmpoles.pl methanol.key methanol.xyz methanol-groups.txt methanol.key_2 methanol.xyz_2 401 path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon Sep 21 15:01:52 2020 
+Mon Sep 21 15:01:52 2020 =========================================================
+Mon Sep 21 15:01:52 2020 QM Dipole moment
+
+Mon Sep 21 15:01:52 2020  Calling: potential.x 6 methanol.xyz_2 -k methanol.key_2 methanol.pot N 0.1 path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+     402    402     O     methanol                     8     15.999     2
+     401    401     C     methanol                     6     12.011     4
+     403    403     H     methanol                     1      1.008     1
+     404    404     H     methanol                     1      1.008     1
+
+ Electrostatic Potential Grid Points :                  5779
+
+ Electrostatic Parameter Restraint Value :            1.0000
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+     402    402     O     methanol                     8     15.999     2
+     401    401     C     methanol                     6     12.011     4
+     403    403     H     methanol                     1      1.008     1
+     404    404     H     methanol                     1      1.008     1
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         402      401    404      0   Z-then-X    -0.43835
+                                                   0.24553  0.00000  0.21282
+                                                   0.19092
+                                                   0.00000 -0.58421
+                                                  -0.24984  0.00000  0.39329
+
+         401      402    404      0   Z-then-X     0.20175
+                                                   0.02289  0.00000  0.46231
+                                                  -0.46902
+                                                   0.00000 -0.37860
+                                                   0.04178  0.00000  0.84762
+
+         403      401    402      0   Z-then-X     0.01047
+                                                  -0.01813  0.00000 -0.14953
+                                                   0.00453
+                                                   0.00000  0.00052
+                                                  -0.01948  0.00000 -0.00505
+
+         404      402    401      0   Z-then-X     0.20519
+                                                  -0.02620  0.00000 -0.08410
+                                                  -0.05288
+                                                   0.00000 -0.08699
+                                                  -0.03061  0.00000  0.13987
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         402             0.837       0.390         401  404
+         401             1.334       0.390         402  403
+         403             0.496       0.390         401
+         404             0.496       0.390         402
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1        1235        -9.8993        -8.8717         1.4102
+        1        2         670         0.4485         0.7650         1.2852
+        1        3         945         3.9629         3.0121         1.1410
+        1        4         945         3.9438         2.9997         1.1371
+        1        5         941        -1.9060        -0.5678         1.5546
+        1        6        1043         5.4659         4.8189         0.8262
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.0945
+ Average Potential Magnitude for Model :              5.5626
+ Average Potential Value for Target :                -0.0469
+ Average Potential Magnitude for Target :             4.6826
+
+ Average Signed Potential Difference :               -0.0476
+ Average Unsigned Potential Difference :              1.0359
+ Root Mean Square Potential Difference :              1.2480
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value         Fixed
+
+    --            402             Monopole          -0.43835          X
+     1            402             X-Dipole           0.24553
+    --            402             Y-Dipole           0.00000          X
+     2            402             Z-Dipole           0.21282
+     3            402             XX-Quad            0.19092
+    --            402             XY-Quad            0.00000          X
+     4            402             XZ-Quad           -0.24984
+     5            402             YY-Quad           -0.58421
+    --            402             YZ-Quad            0.00000          X
+    --            402             ZZ-Quad            0.39329
+    --            401             Monopole           0.20175          X
+     6            401             X-Dipole           0.02289
+    --            401             Y-Dipole           0.00000          X
+     7            401             Z-Dipole           0.46231
+     8            401             XX-Quad           -0.46902
+    --            401             XY-Quad            0.00000          X
+     9            401             XZ-Quad            0.04178
+    10            401             YY-Quad           -0.37860
+    --            401             YZ-Quad            0.00000          X
+    --            401             ZZ-Quad            0.84762
+    --            403             Monopole           0.01047          X
+    11            403             X-Dipole          -0.01813
+    --            403             Y-Dipole           0.00000          X
+    12            403             Z-Dipole          -0.14953
+    13            403             XX-Quad            0.00453
+    --            403             XY-Quad            0.00000          X
+    14            403             XZ-Quad           -0.01948
+    15            403             YY-Quad            0.00052
+    --            403             YZ-Quad            0.00000          X
+    --            403             ZZ-Quad           -0.00505
+    --            404             Monopole           0.20519          X
+    16            404             X-Dipole          -0.02620
+    --            404             Y-Dipole           0.00000          X
+    17            404             Z-Dipole          -0.08410
+    18            404             XX-Quad           -0.05288
+    --            404             XY-Quad            0.00000          X
+    19            404             XZ-Quad           -0.03061
+    20            404             YY-Quad           -0.08699
+    --            404             YZ-Quad            0.00000          X
+    --            404             ZZ-Quad            0.13987
+
+ Levenberg-Marquardt Nonlinear Least Squares :
+
+ LS Iter     F Value      Total G     Active G    N Active   F Calls
+
+     0    11534.3939    9753.7232    9753.7232        20        21
+     1      109.9512     394.7449     394.7449        20        42
+     2       36.1021       0.0000       0.0000        20        63
+
+ SQUARE  --  Normal Termination of Least Squares
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value         Fixed
+
+    --            402             Monopole          -0.43835          X
+     1            402             X-Dipole           0.17823
+    --            402             Y-Dipole           0.00000          X
+     2            402             Z-Dipole           0.25515
+     3            402             XX-Quad            0.19057
+    --            402             XY-Quad            0.00000          X
+     4            402             XZ-Quad           -0.25901
+     5            402             YY-Quad           -0.69280
+    --            402             YZ-Quad            0.00000          X
+    --            402             ZZ-Quad            0.50223
+    --            401             Monopole           0.20175          X
+     6            401             X-Dipole          -0.07814
+    --            401             Y-Dipole           0.00000          X
+     7            401             Z-Dipole           0.44295
+     8            401             XX-Quad           -0.39878
+    --            401             XY-Quad            0.00000          X
+     9            401             XZ-Quad            0.03906
+    10            401             YY-Quad           -0.41623
+    --            401             YZ-Quad            0.00000          X
+    --            401             ZZ-Quad            0.81501
+    --            403             Monopole           0.01047          X
+    11            403             X-Dipole           0.00221
+    --            403             Y-Dipole           0.00000          X
+    12            403             Z-Dipole          -0.10304
+    13            403             XX-Quad            0.01946
+    --            403             XY-Quad            0.00000          X
+    14            403             XZ-Quad           -0.02811
+    15            403             YY-Quad            0.00755
+    --            403             YZ-Quad            0.00000          X
+    --            403             ZZ-Quad           -0.02701
+    --            404             Monopole           0.20519          X
+    16            404             X-Dipole          -0.02969
+    --            404             Y-Dipole           0.00000          X
+    17            404             Z-Dipole          -0.10328
+    18            404             XX-Quad            0.03598
+    --            404             XY-Quad            0.00000          X
+    19            404             XZ-Quad           -0.01872
+    20            404             YY-Quad           -0.10620
+    --            404             YZ-Quad            0.00000          X
+    --            404             ZZ-Quad            0.07022
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1        1235        -8.8755        -8.8717         0.0754
+        1        2         670         0.7060         0.7650         0.1166
+        1        3         945         3.0003         3.0121         0.0498
+        1        4         945         2.9885         2.9997         0.0500
+        1        5         941        -0.6134        -0.5678         0.0842
+        1        6        1043         4.7776         4.8189         0.0729
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.0732
+ Average Potential Magnitude for Model :              4.6749
+ Average Potential Value for Target :                -0.0469
+ Average Potential Magnitude for Target :             4.6826
+
+ Average Signed Potential Difference :               -0.0263
+ Average Unsigned Potential Difference :              0.0507
+ Root Mean Square Potential Difference :              0.0756
+Mon Sep 21 15:01:53 2020  Calling: sed -e '/\(.* none$\|^#\|^fix\|^potential-offset\)/d' methanol.key_3 > methanol.key_3_tmp path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon Sep 21 15:01:53 2020 
+Mon Sep 21 15:01:53 2020 =========================================================
+Mon Sep 21 15:01:53 2020 Electrostatic Potential Comparison
+
+Mon Sep 21 15:01:53 2020  Calling: potential.x 5 methanol.xyz_2 -k methanol.key_3 methanol.pot N > RMSPD.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Rotatable bond found about (3, 2, 1, 6)
+****************************************************************************************************
+Torsion parameters for torsion   403   401   402   404     0.0000 0.0 1     0.0000 180.0 2     0.2740 0.0 3 assigned from SMILES [#1][O][C][#1] from torsion atom indices 6,1,2,5 with smiles torsion indices 1,2,3,4
+Mon Sep 21 15:01:54 2020  Calling: psi4 methanol-esp_frag.psi4 methanol-esp_frag.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon 21 Sep 2020 03:01:56 PM CDT  Calling: psi4 methanol-esp_frag.psi4 methanol-esp_frag.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+Mon 21 Sep 2020 03:01:58 PM CDT equivalentrotbndindexarrays[['1_2']]
+Mon 21 Sep 2020 03:01:58 PM CDT  Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0 && nohup python /home/bdw2292/poltype-poltype2-latest/PoltypeModules/poltype.py & path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon 21 Sep 2020 03:01:58 PM CDT Waiting on /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/1_2_Index_0-poltype.log to begin
+Mon 21 Sep 2020 03:02:28 PM CDT Waiting on /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/1_2_Index_0-poltype.log for termination 
+Poltype -- Polarizable atom typer of small molecules for the AMOEBA polarizable force field
+
+Please cite:
+Wu, J.C.; Chattree, G.; Ren, P.Y.; Automation of AMOEBA polarizable force field 
+parameterization for small molecules. Theor Chem Acc. 
+
+Version 2.3.0 February 2020
+
+Copyright (c)  Johnny Wu, Gaurav Chattree, Brandon Walker, Matthew Harger and Pengyu Ren 2019
+
+All Rights Reserved
+##############################################################################################################
+
+Calling: analyze.x /home/bdw2292/poltype-poltype2-latest/water.xyz -k /home/bdw2292/poltype-poltype2-latest/water.key e> version.out
+Calling: mkdir /scratch/bdw2292/Psi4-1_2_Index_0 path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+Calling: mkdir /scratch/bdw2292/Gau-1_2_Index_0 path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+Calling: /home/bdw2292/miniconda3/envs/p4env/bin/obminimize -ff MMFF94 1_2_Index_0.sdf >1_2_Index_0_OBOPT.pdb path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0 && psi4 1_2_Index_0-opt.psi4 1_2_Index_0-opt.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/1_2_Index_0-opt.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/1_2_Index_0-opt.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/1_2_Index_0-opt.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/1_2_Index_0-opt.log
+no longer error 1_2_Index_0-opt.log
+no longer error 1_2_Index_0-opt.log
+no longer error 1_2_Index_0-opt.log
+no longer error 1_2_Index_0-opt.log
+no longer error 1_2_Index_0-opt.log
+no longer error 1_2_Index_0-opt.log
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0 && psi4 1_2_Index_0-dma.psi4 1_2_Index_0-dma.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+Calling: /users/zj2244/Public/Software/gdma-2.2.11/bin/gdma < 1_2_Index_0.gdmain > 1_2_Index_0.gdmaout path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+Calling: poledit.x 1 1_2_Index_0.gdmaout /home/bdw2292/poltype-poltype2-latest/amoebabio18_header.prm < 1_2_Index_0-peditin.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+Calling: potential.x 1 1_2_Index_0.xyz -k 1_2_Index_0.key path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0 && psi4 1_2_Index_0-esp.psi4 1_2_Index_0-esp.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+Calling: potential.x 2 1_2_Index_0.cube path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+Calling: /home/bdw2292/poltype-poltype2-latest/avgmpoles.pl 1_2_Index_0.key 1_2_Index_0.xyz 1_2_Index_0-groups.txt 1_2_Index_0.key_2 1_2_Index_0.xyz_2 401 path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+Calling: potential.x 6 1_2_Index_0.xyz_2 -k 1_2_Index_0.key_2 1_2_Index_0.pot N 0.1 path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+Calling: sed -e '/\(.* none$\|^#\|^fix\|^potential-offset\)/d' 1_2_Index_0.key_3 > 1_2_Index_0.key_3_tmp path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+Calling: potential.x 5 1_2_Index_0.xyz_2 -k 1_2_Index_0.key_3 1_2_Index_0.pot N > RMSPD.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+Calling: cp ../1_2_Index_0-opt.xyz 1_2_Index_0-opt-3-1-2-4-062-opt.xyz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-062_preQMOPTprefit.xyz -k tmp-3-1-2-4-062_preQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-062_preQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-092_preQMOPTprefit.xyz -k tmp-3-1-2-4-092_preQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-092_preQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-122_preQMOPTprefit.xyz -k tmp-3-1-2-4-122_preQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-122_preQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-152_preQMOPTprefit.xyz -k tmp-3-1-2-4-152_preQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-152_preQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-182_preQMOPTprefit.xyz -k tmp-3-1-2-4-182_preQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-182_preQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-212_preQMOPTprefit.xyz -k tmp-3-1-2-4-212_preQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-212_preQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-032_preQMOPTprefit.xyz -k tmp-3-1-2-4-032_preQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-032_preQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-002_preQMOPTprefit.xyz -k tmp-3-1-2-4-002_preQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-002_preQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-332_preQMOPTprefit.xyz -k tmp-3-1-2-4-332_preQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-332_preQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-302_preQMOPTprefit.xyz -k tmp-3-1-2-4-302_preQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-302_preQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-272_preQMOPTprefit.xyz -k tmp-3-1-2-4-272_preQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-272_preQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-242_preQMOPTprefit.xyz -k tmp-3-1-2-4-242_preQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-242_preQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-opt-3-1-2-4-062.psi4 1_2_Index_0-opt-3-1-2-4-062.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-062.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-062.log
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-opt-3-1-2-4-092.psi4 1_2_Index_0-opt-3-1-2-4-092.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-092.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-092.log
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-opt-3-1-2-4-122.psi4 1_2_Index_0-opt-3-1-2-4-122.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-122.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-122.log
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-opt-3-1-2-4-152.psi4 1_2_Index_0-opt-3-1-2-4-152.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-152.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-152.log
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-opt-3-1-2-4-182.psi4 1_2_Index_0-opt-3-1-2-4-182.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-182.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-182.log
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-opt-3-1-2-4-212.psi4 1_2_Index_0-opt-3-1-2-4-212.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-212.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-212.log
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-opt-3-1-2-4-032.psi4 1_2_Index_0-opt-3-1-2-4-032.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-032.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-032.log
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-opt-3-1-2-4-002.psi4 1_2_Index_0-opt-3-1-2-4-002.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-002.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-002.log
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-opt-3-1-2-4-332.psi4 1_2_Index_0-opt-3-1-2-4-332.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-332.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-332.log
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-opt-3-1-2-4-302.psi4 1_2_Index_0-opt-3-1-2-4-302.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-302.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-302.log
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-opt-3-1-2-4-272.psi4 1_2_Index_0-opt-3-1-2-4-272.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-272.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-272.log
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-opt-3-1-2-4-242.psi4 1_2_Index_0-opt-3-1-2-4-242.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-242.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-242.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-062.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-062.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-092.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-092.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-122.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-122.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-152.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-152.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-182.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-182.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-212.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-212.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-032.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-032.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-002.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-002.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-332.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-332.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-302.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-302.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-272.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-272.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-242.log
+no longer error /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion/1_2_Index_0-opt-3-1-2-4-242.log
+no longer error 1_2_Index_0-opt-3-1-2-4-062.log
+no longer error 1_2_Index_0-opt-3-1-2-4-062.log
+no longer error 1_2_Index_0-opt-3-1-2-4-092.log
+no longer error 1_2_Index_0-opt-3-1-2-4-092.log
+no longer error 1_2_Index_0-opt-3-1-2-4-122.log
+no longer error 1_2_Index_0-opt-3-1-2-4-122.log
+no longer error 1_2_Index_0-opt-3-1-2-4-152.log
+no longer error 1_2_Index_0-opt-3-1-2-4-152.log
+no longer error 1_2_Index_0-opt-3-1-2-4-182.log
+no longer error 1_2_Index_0-opt-3-1-2-4-182.log
+no longer error 1_2_Index_0-opt-3-1-2-4-212.log
+no longer error 1_2_Index_0-opt-3-1-2-4-212.log
+no longer error 1_2_Index_0-opt-3-1-2-4-032.log
+no longer error 1_2_Index_0-opt-3-1-2-4-032.log
+no longer error 1_2_Index_0-opt-3-1-2-4-002.log
+no longer error 1_2_Index_0-opt-3-1-2-4-002.log
+no longer error 1_2_Index_0-opt-3-1-2-4-332.log
+no longer error 1_2_Index_0-opt-3-1-2-4-332.log
+no longer error 1_2_Index_0-opt-3-1-2-4-302.log
+no longer error 1_2_Index_0-opt-3-1-2-4-302.log
+no longer error 1_2_Index_0-opt-3-1-2-4-272.log
+no longer error 1_2_Index_0-opt-3-1-2-4-272.log
+no longer error 1_2_Index_0-opt-3-1-2-4-242.log
+no longer error 1_2_Index_0-opt-3-1-2-4-242.log
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-062_postQMOPTprefit.xyz -k tmp-3-1-2-4-062_postQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-062_postQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-062_postQMOPTprefit.key 1_2_Index_0-opt-3-1-2-4-062_postQMOPTprefit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-062_postQMOPTprefit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-092_postQMOPTprefit.xyz -k tmp-3-1-2-4-092_postQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-092_postQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-092_postQMOPTprefit.key 1_2_Index_0-opt-3-1-2-4-092_postQMOPTprefit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-092_postQMOPTprefit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-122_postQMOPTprefit.xyz -k tmp-3-1-2-4-122_postQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-122_postQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-122_postQMOPTprefit.key 1_2_Index_0-opt-3-1-2-4-122_postQMOPTprefit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-122_postQMOPTprefit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-152_postQMOPTprefit.xyz -k tmp-3-1-2-4-152_postQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-152_postQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-152_postQMOPTprefit.key 1_2_Index_0-opt-3-1-2-4-152_postQMOPTprefit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-152_postQMOPTprefit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-182_postQMOPTprefit.xyz -k tmp-3-1-2-4-182_postQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-182_postQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-182_postQMOPTprefit.key 1_2_Index_0-opt-3-1-2-4-182_postQMOPTprefit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-182_postQMOPTprefit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-212_postQMOPTprefit.xyz -k tmp-3-1-2-4-212_postQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-212_postQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-212_postQMOPTprefit.key 1_2_Index_0-opt-3-1-2-4-212_postQMOPTprefit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-212_postQMOPTprefit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-032_postQMOPTprefit.xyz -k tmp-3-1-2-4-032_postQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-032_postQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-032_postQMOPTprefit.key 1_2_Index_0-opt-3-1-2-4-032_postQMOPTprefit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-032_postQMOPTprefit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-002_postQMOPTprefit.xyz -k tmp-3-1-2-4-002_postQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-002_postQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-002_postQMOPTprefit.key 1_2_Index_0-opt-3-1-2-4-002_postQMOPTprefit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-002_postQMOPTprefit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-332_postQMOPTprefit.xyz -k tmp-3-1-2-4-332_postQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-332_postQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-332_postQMOPTprefit.key 1_2_Index_0-opt-3-1-2-4-332_postQMOPTprefit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-332_postQMOPTprefit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-302_postQMOPTprefit.xyz -k tmp-3-1-2-4-302_postQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-302_postQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-302_postQMOPTprefit.key 1_2_Index_0-opt-3-1-2-4-302_postQMOPTprefit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-302_postQMOPTprefit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-272_postQMOPTprefit.xyz -k tmp-3-1-2-4-272_postQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-272_postQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-272_postQMOPTprefit.key 1_2_Index_0-opt-3-1-2-4-272_postQMOPTprefit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-272_postQMOPTprefit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-242_postQMOPTprefit.xyz -k tmp-3-1-2-4-242_postQMOPTprefit.key 0.1 >1_2_Index_0-opt-3-1-2-4-242_postQMOPTprefit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-242_postQMOPTprefit.key 1_2_Index_0-opt-3-1-2-4-242_postQMOPTprefit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-242_postQMOPTprefit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-sp-3-1-2-4-062.psi4 1_2_Index_0-sp-3-1-2-4-062.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-sp-3-1-2-4-092.psi4 1_2_Index_0-sp-3-1-2-4-092.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-sp-3-1-2-4-122.psi4 1_2_Index_0-sp-3-1-2-4-122.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-sp-3-1-2-4-152.psi4 1_2_Index_0-sp-3-1-2-4-152.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-sp-3-1-2-4-182.psi4 1_2_Index_0-sp-3-1-2-4-182.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-sp-3-1-2-4-212.psi4 1_2_Index_0-sp-3-1-2-4-212.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-sp-3-1-2-4-032.psi4 1_2_Index_0-sp-3-1-2-4-032.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-sp-3-1-2-4-002.psi4 1_2_Index_0-sp-3-1-2-4-002.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-sp-3-1-2-4-332.psi4 1_2_Index_0-sp-3-1-2-4-332.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-sp-3-1-2-4-302.psi4 1_2_Index_0-sp-3-1-2-4-302.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-sp-3-1-2-4-272.psi4 1_2_Index_0-sp-3-1-2-4-272.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: cd /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion && psi4 1_2_Index_0-sp-3-1-2-4-242.psi4 1_2_Index_0-sp-3-1-2-4-242.log path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Optimization terminated successfully.
+         Current function value: 0.072971
+         Iterations: 16
+         Function evaluations: 32
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-062_postQMOPTpostfit.xyz -k tmp-3-1-2-4-062_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-062_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-062_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-062_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-062_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-092_postQMOPTpostfit.xyz -k tmp-3-1-2-4-092_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-092_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-092_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-092_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-092_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-122_postQMOPTpostfit.xyz -k tmp-3-1-2-4-122_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-122_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-122_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-122_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-122_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-152_postQMOPTpostfit.xyz -k tmp-3-1-2-4-152_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-152_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-152_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-152_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-152_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-182_postQMOPTpostfit.xyz -k tmp-3-1-2-4-182_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-182_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-182_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-182_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-182_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-212_postQMOPTpostfit.xyz -k tmp-3-1-2-4-212_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-212_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-212_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-212_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-212_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-032_postQMOPTpostfit.xyz -k tmp-3-1-2-4-032_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-032_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-032_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-032_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-032_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-002_postQMOPTpostfit.xyz -k tmp-3-1-2-4-002_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-002_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-002_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-002_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-002_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-332_postQMOPTpostfit.xyz -k tmp-3-1-2-4-332_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-332_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-332_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-332_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-332_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-302_postQMOPTpostfit.xyz -k tmp-3-1-2-4-302_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-302_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-302_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-302_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-302_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-272_postQMOPTpostfit.xyz -k tmp-3-1-2-4-272_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-272_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-272_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-272_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-272_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-242_postQMOPTpostfit.xyz -k tmp-3-1-2-4-242_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-242_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-242_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-242_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-242_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+count == 0
+Optimization terminated successfully.
+         Current function value: 0.054005
+         Iterations: 15
+         Function evaluations: 30
+Optimization terminated successfully.
+         Current function value: 0.069485
+         Iterations: 15
+         Function evaluations: 30
+Optimization terminated successfully.
+         Current function value: 0.072971
+         Iterations: 16
+         Function evaluations: 32
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-062_postQMOPTpostfit.xyz -k tmp-3-1-2-4-062_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-062_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-062_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-062_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-062_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-092_postQMOPTpostfit.xyz -k tmp-3-1-2-4-092_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-092_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-092_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-092_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-092_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-122_postQMOPTpostfit.xyz -k tmp-3-1-2-4-122_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-122_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-122_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-122_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-122_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-152_postQMOPTpostfit.xyz -k tmp-3-1-2-4-152_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-152_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-152_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-152_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-152_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-182_postQMOPTpostfit.xyz -k tmp-3-1-2-4-182_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-182_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-182_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-182_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-182_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-212_postQMOPTpostfit.xyz -k tmp-3-1-2-4-212_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-212_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-212_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-212_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-212_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-032_postQMOPTpostfit.xyz -k tmp-3-1-2-4-032_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-032_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-032_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-032_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-032_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-002_postQMOPTpostfit.xyz -k tmp-3-1-2-4-002_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-002_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-002_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-002_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-002_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-332_postQMOPTpostfit.xyz -k tmp-3-1-2-4-332_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-332_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-332_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-332_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-332_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-302_postQMOPTpostfit.xyz -k tmp-3-1-2-4-302_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-302_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-302_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-302_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-302_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-272_postQMOPTpostfit.xyz -k tmp-3-1-2-4-272_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-272_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-272_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-272_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-272_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: minimize.x 1_2_Index_0-opt-3-1-2-4-242_postQMOPTpostfit.xyz -k tmp-3-1-2-4-242_postQMOPTpostfit.key 0.1 >1_2_Index_0-opt-3-1-2-4-242_postQMOPTpostfit.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+Calling: analyze.x -k tmp-3-1-2-4-242_postQMOPTpostfit.key 1_2_Index_0-opt-3-1-2-4-242_postQMOPTpostfit.xyz_2 ed > 1_2_Index_0-opt-3-1-2-4-242_postQMOPTpostfit.alz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/qm-torsion
+count == 1
+Calling: cp 1_2_Index_0.xyz_2 ttt.xyz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+Calling: cp 1_2_Index_0.key_5 ttt.key path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+Calling: minimize.x -k ttt.key ttt.xyz 0.1 > Minimizedttt.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+Calling: analyze.x 1_2_Index_0.xyz_2 -k ttt.key em | grep -A11 Charge>MMDipole.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0
+Mon 21 Sep 2020 03:30:00 PM CDT Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/1_2_Index_0-poltype.log path=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon 21 Sep 2020 03:30:30 PM CDT All jobs have terminated 
+Mon 21 Sep 2020 03:30:30 PM CDT Normal termination: logfile=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList/Fragments/1_2_Index_0/1_2_Index_0-poltype.log path=/home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon 21 Sep 2020 03:31:00 PM CDT All jobs have terminated 
+Mon 21 Sep 2020 03:31:00 PM CDT 
+Mon 21 Sep 2020 03:31:00 PM CDT =========================================================
+Mon 21 Sep 2020 03:31:00 PM CDT Minimizing structure
+
+Mon 21 Sep 2020 03:31:00 PM CDT  Calling: cp methanol.xyz_2 ttt.xyz path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon 21 Sep 2020 03:31:00 PM CDT  Calling: cp methanol.key_5 ttt.key path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon 21 Sep 2020 03:31:00 PM CDT  Calling: minimize.x -k ttt.key ttt.xyz 0.1 > Minimizedttt.out path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon 21 Sep 2020 03:31:00 PM CDT 
+Mon 21 Sep 2020 03:31:00 PM CDT =========================================================
+Mon 21 Sep 2020 03:31:00 PM CDT QM Dipole moment
+
+Mon 21 Sep 2020 03:31:00 PM CDT QM Dipole moment = 1.679
+Mon 21 Sep 2020 03:31:00 PM CDT 
+Mon 21 Sep 2020 03:31:00 PM CDT =========================================================
+Mon 21 Sep 2020 03:31:00 PM CDT MM Dipole moment
+
+Mon 21 Sep 2020 03:31:00 PM CDT  Calling: analyze.x methanol.xyz_2 -k ttt.key em | grep -A11 Charge>MMDipole.txt path = /home/bdw2292/poltype-poltype2-latest/Examples/MethanolFitRotBndsList
+Mon 21 Sep 2020 03:31:00 PM CDT MM Dipole moment = 1.679
+Mon 21 Sep 2020 03:31:00 PM CDT Poltype Job Finished
+
+****************************************************************************************************
+Torsion parameters for torsion   403   401   402   404     0.0000 0.0 1     0.0000 180.0 2     0.0000 0.0 3 assigned from SMILES [#1][O][C][#1] from torsion atom indices 6,1,2,3 with smiles torsion indices 1,2,3,4

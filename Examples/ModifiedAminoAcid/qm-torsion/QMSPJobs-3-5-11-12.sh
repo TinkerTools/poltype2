@@ -1,0 +1,20 @@
+source /home/bdw2292/.poltype.bashrc
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-305.com
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-324.com
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-343.com
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-002.com
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-021.com
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-040.com
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-059.com
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-078.com
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-097.com
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-287.com
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-268.com
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-249.com
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-230.com
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-211.com
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-192.com
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-173.com
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-154.com
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-135.com
+GAUSS_SCRDIR=/scratch/bdw2292/Gau-ModifiedRes g09 ModifiedRes-sp-3-5-11-12-116.com

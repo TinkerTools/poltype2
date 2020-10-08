@@ -1,0 +1,20 @@
+molecule { 
+0 1
+ O    0.670729   -0.055588   -0.017893
+ C   -0.744458   -0.011380   -0.005416
+ H   -1.112693   -0.768327    0.700254
+ H   -1.109159   -0.165893   -1.029865
+ H   -1.059224    0.983899    0.340554
+ H    1.008414    0.795874    0.279293
+}
+set {
+ e_convergence 10 
+ d_convergence 10 
+}
+memory 100GB
+set_num_threads(8)
+psi4_io.set_default_path("/scratch/bdw2292/Psi4-methanol")
+set freeze_core True
+E, wfn = energy('wb97x-d/6-311+G*',return_wfn=True)
+oeprop(wfn,"WIBERG_LOWDIN_INDICES")
+clean()

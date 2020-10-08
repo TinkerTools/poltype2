@@ -1,0 +1,31 @@
+Tue Apr  7 11:28:42 2020 cannot use node node211 because of program exception
+Tue Apr  7 11:28:51 2020 cannot use node node54 because of program exception
+Tue Apr  7 11:28:54 2020 cannot use node node51 because of program exception
+Tue Apr  7 11:29:02 2020 cannot use node node56 because of program exception
+Tue Apr  7 11:29:03 2020 cannot use node node58 because of program exception
+Tue Apr  7 11:29:05 2020 cannot use node node195 because of program exception
+Tue Apr  7 11:29:08 2020 cannot use node node206 because of program exception
+Tue Apr  7 11:29:09 2020 cannot use node node55 because of program exception
+Tue Apr  7 11:29:13 2020 cannot use node node194 because of program exception
+Tue Apr  7 11:29:19 2020 cannot use node node74 because of program exception
+Tue Apr  7 11:29:29 2020 Calling: ssh node35 "cd /home/bdw2292/PoltypeJobs/084_Acetaldehyde/qm-torsion;source /home/bdw2292/.poltype.bashrc;cd /home/bdw2292/PoltypeJobs/084_Acetaldehyde/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-84_Acetaldehyde g09 84_Acetaldehyde-opt-4-2-3-7-209.com"
+Tue Apr  7 11:29:30 2020 Calling: ssh node36 "cd /home/bdw2292/PoltypeJobs/084_Acetaldehyde/qm-torsion;source /home/bdw2292/.poltype.bashrc;cd /home/bdw2292/PoltypeJobs/084_Acetaldehyde/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-84_Acetaldehyde g09 84_Acetaldehyde-opt-4-2-3-7-029.com"
+Tue Apr  7 11:29:31 2020 Calling: ssh node37 "cd /home/bdw2292/PoltypeJobs/084_Acetaldehyde/qm-torsion;source /home/bdw2292/.poltype.bashrc;cd /home/bdw2292/PoltypeJobs/084_Acetaldehyde/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-84_Acetaldehyde g09 84_Acetaldehyde-opt-4-2-3-7-329.com"
+Tue Apr  7 11:29:33 2020 Calling: ssh node38 "cd /home/bdw2292/PoltypeJobs/084_Acetaldehyde/qm-torsion;source /home/bdw2292/.poltype.bashrc;cd /home/bdw2292/PoltypeJobs/084_Acetaldehyde/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-84_Acetaldehyde g09 84_Acetaldehyde-opt-4-2-3-7-299.com"
+Tue Apr  7 11:29:35 2020 Calling: ssh node40 "cd /home/bdw2292/PoltypeJobs/084_Acetaldehyde/qm-torsion;source /home/bdw2292/.poltype.bashrc;cd /home/bdw2292/PoltypeJobs/084_Acetaldehyde/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-84_Acetaldehyde g09 84_Acetaldehyde-opt-4-2-3-7-269.com"
+Tue Apr  7 11:30:35 2020 *************************************
+Tue Apr  7 11:31:58 2020 cannot use node node211 because of program exception
+Tue Apr  7 11:32:05 2020 cannot use node node54 because of program exception
+Tue Apr  7 11:32:08 2020 cannot use node node51 because of program exception
+Tue Apr  7 11:32:16 2020 cannot use node node56 because of program exception
+Tue Apr  7 11:32:17 2020 cannot use node node58 because of program exception
+Tue Apr  7 11:32:19 2020 cannot use node node195 because of program exception
+Tue Apr  7 11:32:22 2020 cannot use node node206 because of program exception
+Tue Apr  7 11:32:23 2020 cannot use node node55 because of program exception
+Tue Apr  7 11:32:27 2020 cannot use node node194 because of program exception
+Tue Apr  7 11:32:33 2020 cannot use node node74 because of program exception
+Tue Apr  7 11:32:41 2020 cd /home/bdw2292/PoltypeJobs/084_Acetaldehyde/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-84_Acetaldehyde g09 84_Acetaldehyde-opt-4-2-3-7-209.com has terminated on node node35
+Tue Apr  7 11:32:41 2020 cd /home/bdw2292/PoltypeJobs/084_Acetaldehyde/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-84_Acetaldehyde g09 84_Acetaldehyde-opt-4-2-3-7-029.com has terminated on node node36
+Tue Apr  7 11:32:41 2020 cd /home/bdw2292/PoltypeJobs/084_Acetaldehyde/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-84_Acetaldehyde g09 84_Acetaldehyde-opt-4-2-3-7-329.com has terminated on node node37
+Tue Apr  7 11:32:41 2020 cd /home/bdw2292/PoltypeJobs/084_Acetaldehyde/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-84_Acetaldehyde g09 84_Acetaldehyde-opt-4-2-3-7-299.com has terminated on node node38
+Tue Apr  7 11:32:41 2020 cd /home/bdw2292/PoltypeJobs/084_Acetaldehyde/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-84_Acetaldehyde g09 84_Acetaldehyde-opt-4-2-3-7-269.com has terminated on node node40
