@@ -917,7 +917,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             ax.text(0, -0.1, 'FoldNum=%s NumPrms=%s DataPts=%s RMSD(fit,QM-MM1),Abs=%s'%(str(len(poltype.nfoldlist)),str(numprms),str(len(mm_energy_list)),round(minRMSD,2)), transform=ax.transAxes, fontsize=10,verticalalignment='bottom')
             fig.savefig(figfname)
         elif dim==2:
-            tormat,qmmat,mmmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,cls_angle_dict[tup],tor_energy_list,qm_energy_list,mm_energy_list)
+            tormat,qmmat,mmmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,cls_angle_dict[tup],tor_energy_list,qm_energy_list,mm_energy_list,torset)
             PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,tormat,'QM-MM1 Heatmap (kcal/mol)','QM-MM1_Heatmap.png',numprms,datapts,minRMSD,string)
             PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,qmmat,'QM Heatmap (kcal/mol)','QM_Heatmap.png',numprms,datapts,minRMSD,string)
             PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,mmmat,'MM1 Heatmap (kcal/mol)','MM1_Heatmap.png',numprms,datapts,minRMSD,string)
@@ -965,15 +965,15 @@ def PlotHeatmap(poltype,idealanglematrix,actualanglematrix,matrix,title,figfname
 
 
 
-def FillInEnergyTensors(poltype,phaseanglearray,actualanglearray,tor_energy_list,qm_energy_list,mm_energy_list):
-    phasetensor=poltype.tensorphases
+def FillInEnergyTensors(poltype,phaseanglearray,actualanglearray,tor_energy_list,qm_energy_list,mm_energy_list,torset):
+    phasetensor=poltype.tensorphases[torset]
     shape=list(phasetensor.shape)
     shape=shape[:-1]
     shape=tuple(shape)
     tormat=numpy.empty(shape)
     qmmat=numpy.empty(shape)
     mmmat=numpy.empty(shape)
-    idealanglematrix=poltype.idealangletensor
+    idealanglematrix=poltype.idealangletensor[torset]
     actualanglematrix=numpy.empty(phasetensor.shape)
     for i in range(len(phaseanglearray)):
         phasetup=phaseanglearray[i]
@@ -1148,9 +1148,9 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             plt.show()
             fig.savefig(figfname)
         elif dim==2:
-            mmmat,mm2mat,fmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,mang_list,mm_energy_list,mm2_energy_list,ff_list)
+            mmmat,mm2mat,fmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,mang_list,mm_energy_list,mm2_energy_list,ff_list,torset)
             PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,mm2mat,'MM2 Heatmap (kcal/mol)','MM2_Heatmap.png',numprms,datapts,minRMSD)
-            PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,fmat,'MM1=Fit Heatmap (kcal/mol)','MM1+Fit_Heatmap.png',numprms,datapts,minRMSD)
+            PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,fmat,'MM1+Fit Heatmap (kcal/mol)','MM1+Fit_Heatmap.png',numprms,datapts,minRMSD)
 
 
 

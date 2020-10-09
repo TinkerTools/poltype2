@@ -481,15 +481,6 @@ def WriteDictionaryToFile(poltype,dictionary,filename):
         json.dump(dictionary, f)
 
 
-def DeleteEquivalentFragments(poltype,equivalentfragmentstodelete):
-    curdir=os.getcwd()
-    os.chdir('..')
-    for fold in equivalentfragmentstodelete:
-        if os.path.isdir(fold):
-            shutil.rmtree(fold)
-    os.chdir(curdir)
-
-
 
 def GrabAtomOrder(poltype,smirks):
     atomorder=[]
@@ -633,12 +624,6 @@ def GenerateFrag(poltype,molindexlist,mol):
         rdkitoldindextonewindex[rdkitoldindex]=rdkitnewindex
     newmol=AssignTotalCharge(poltype,newmol,nem)
     return newmol,rdkitoldindextonewindex
-
-def ConvertRdkitMolToOBMol(poltype,mol):
-    outputname='intermediate.mol'
-    WriteRdkitMolToMolFile(poltype,mol,outputname)
-    OBmol=ReadMolFileToOBMol(poltype,outputname)
-    return OBmol
 
 def WriteOBMolToSDF(poltype,mol,outputname):
     tmpconv = openbabel.OBConversion()
@@ -969,58 +954,6 @@ def ReduceParentMatrix(poltype,parentindextofragindex,fragWBOmatrix,parentWBOmat
             reducedparentWBOmatrix[i,j]=parentvalue
     return reducedparentWBOmatrix
 
-def CombinationsHydIndexes(poltype,hydindexes,fragmol): # only keep combinations of hydrogens that are attachated to heavy atoms that have a formal charge in the parent molecule
-
-    combindexlist=[]
-    for i in range(len(hydindexes)):
-        comb = combinations(hydindexes, i+1)
-        combindexlist.append(comb)
-    return combindexlist
-
-
-def ChargedCombinations(poltype,combindexlist,molfilename,fragments): # only worry about charged combinations where you add hydrogen on atoms that were charged in parent molecule
-    fragmentsmarts=[]
-    j=0
-    for comb in combindexlist:
-        i=0
-        for idxlist in comb:
-            idxlist=list(idxlist)
-            fragmolcharged=ReadRdkitMolFromMolFile(poltype,molfilename)
-            fragmolchargededit=Chem.rdchem.EditableMol(fragmolcharged)
-            idxlist.sort(reverse=True)
-            origcharge=Chem.rdmolops.GetFormalCharge(fragmolcharged)
-            for idx in idxlist:
-                fragmolchargededit.RemoveAtom(idx)
-
-            newfragmolcharged=fragmolchargededit.GetMol()
-            fragsmartscharged=rdmolfiles.MolToSmarts(newfragmolcharged)
-            if fragsmartscharged not in fragmentsmarts:
-                charge=origcharge-len(idxlist)
-                fragmoltocharge[newfragmolcharged]=charge
-                fragmentsmarts.append(fragsmartscharged)
-                fragments.append(newfragmolcharged)
-            i+=1
-        j+=1
-    return fragments,fragmoltocharge
-
-
-def FindAddedHydrogenIndexesRdkit(poltype,mols):
-    hydindexes=[]
-    hydratedmol=mols[1]
-    originalmol=mols[0]
-    smarts=rdmolfiles.MolToSmarts(originalmol)
-    matches = hydratedmol.GetSubstructMatches(Chem.MolFromSmarts(smarts))
-    firstmatch=matches[0]
-    selfmatches = originalmol.GetSubstructMatches(Chem.MolFromSmarts(smarts))
-    firstselfmatch=selfmatches[0]
-    unhydratedidxtohydratedidx=dict(zip(firstselfmatch,firstmatch))
-
-    for atom in hydratedmol.GetAtoms():
-        atomidx=atom.GetIdx()
-        if atomidx not in firstmatch: # if its an H
-            hydindexes.append(atomidx)
-    return hydindexes,unhydratedidxtohydratedidx
-
 
 
 def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfoldername,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,fragspath):
@@ -1216,35 +1149,6 @@ def WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWB
     fragmoltobondindexlist[fragmol]=highlightbonds
     return fragmoltoWBOmatrices,fragmoltobondindexlist
 
-def CheckIfIndexInMatches(poltype,index,indexlist):
-    match=True
-    for ls in indexlist:
-        if index not in ls:
-            match=False
-            return match
-    return match
-
-def MapSMILESToParent(poltype,mol,smi,temptorlist):
-    sp = openbabel.OBSmartsPattern()
-    openbabel.OBSmartsPattern.Init(sp,smi)
-    match=sp.Match(mol)
-    if not match:
-        return None,None
-    indexlist=[]
-    for indexls in sp.GetMapList():
-        indexlist.append(indexls)
-    natoms=len(indexlist[0])
-    for tor in temptorlist:
-        foundall=True
-        for index in tor:
-            match=CheckIfIndexInMatches(index,indexlist)
-            if not match:
-                foundall=False
-        if foundall:
-            return str(tor[1])+'_'+str(tor[2]),natoms
-
-    return None,None
-
 def FirstPassAtomIndexes(poltype,tor):
    molindexlist=[]
    for atom in poltype.rdkitmol.GetAtoms():
@@ -1288,19 +1192,6 @@ def ChunksList(poltype,gen):
     for item in gen:
         newlst.append(item)
     return newlst
-
-def MatchSMARTSOB(poltype,smarts,filename):
-    obConversion = openbabel.OBConversion()
-    mol = openbabel.OBMol()
-    inFormat = obConversion.FormatFromExt(filename)
-    obConversion.SetInFormat(inFormat)
-    obConversion.ReadFile(mol,filename)
-    sp = openbabel.OBSmartsPattern()
-    openbabel.OBSmartsPattern.Init(sp,smarts)
-    diditmatch=sp.Match(mol)
-    return diditmatch
-
-
 
 
 def Draw2DMoleculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragfoldername,fragmoltobondindexlist,tor,basestr):

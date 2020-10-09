@@ -411,6 +411,8 @@ def gen_torsion(poltype,optmol,torsionrestraint):
     poltype.torsettophaselist={}
     torsettooptoutputlogs={}
     bondtopology=GenerateBondTopology(poltype,optmol)
+    poltype.idealangletensor={}
+    poltype.tensorphases={}
     for torset in poltype.torlist:
         variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
         phaselists=[]
@@ -423,7 +425,9 @@ def gen_torsion(poltype,optmol,torsionrestraint):
             anginc=poltype.rotbndtoanginc[key]
             maxrange=poltype.rotbndtomaxrange[key]
             phaselist=range(0,maxrange,anginc)
-            phaselists.append(phaselist)
+            clock=list(phaselist[:int(len(phaselist)/2)+1])
+            counterclock=[-1*i for i in phaselist[1:int(len(phaselist)/2)+1]][::-1]
+            phaselists.append(counterclock+clock)
         currentanglelist=numpy.array(currentanglelist)
         flatphaselist=numpy.array(list(product(*phaselists)))
         origshape=flatphaselist.shape
@@ -436,19 +440,22 @@ def gen_torsion(poltype,optmol,torsionrestraint):
             shape.append(len(phaselist))
         shape.append(lastdim)
         shape=tuple(shape)
-        
         flatphaselist=flatphaselist.reshape(shape) # now we can remove diagonal elements
         idealangletensor=flatphaselist+currentanglelist
-        poltype.idealangletensor=idealangletensor
-        poltype.tensorphases=flatphaselist
+        poltype.idealangletensor[torset]=idealangletensor
+        poltype.tensorphases[torset]=flatphaselist
         ax2idx=len(shape)-1-1
         ax1idx=ax2idx-1
-        diags = numpy.transpose(numpy.diagonal(flatphaselist, axis1=ax1idx, axis2=ax2idx))
+
+        #diags = numpy.transpose(numpy.diagonal(flatphaselist, axis1=ax1idx, axis2=ax2idx))
         flatphaselist=flatphaselist.reshape(origshape)
+        print('reshaped ',flatphaselist)
+        sys.exit()
+        '''
         for diag in diags:
             indexes=numpy.where((flatphaselist == diag).all(axis=1))
             flatphaselist = numpy.delete(flatphaselist,indexes , axis=0)
-            
+        ''' 
         # we could remove more points if we wanted....
         phaseangles=[0]*len(torset)
         if poltype.use_gaus==False and poltype.use_gausoptonly==False:
