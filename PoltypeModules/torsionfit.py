@@ -876,7 +876,11 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             figfname+='%d-%d' % (b,c)
             figfname+='_'
         figfname=figfname[:-1]
-        figfname+='.png'
+        if useweights==True:
+            wstring='_useweights'
+        else:
+            wstring=''
+        figfname+=wstring+'.png'
         Sx = numpy.array(cls_angle_dict[tup])
         out=[]
 
@@ -1117,7 +1121,11 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             figfname+="%d-%d" % (b,c)
             figfname+='_'
         figfname=figfname[:-1]
-        figfname+='.png'
+        if count>0:
+            wstring='_usewights'
+        else:
+            wstring=''
+        figfname+=wstring+'.png'
         dim=len(mang_list[0])
         datapts=len(mm_energy_list)
         numprms=None 
