@@ -446,15 +446,21 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         poltype.tensorphases[tuple(torset)]=flatphaselist
         ax2idx=len(shape)-1-1
         ax1idx=ax2idx-1
+        dim=len(shape)
+        locs=[]
+        if dim>=2:
+            firstlocs=flatphaselist[...,::2,::2,:]
+            firstlocs = firstlocs.reshape(-1, firstlocs.shape[-1])
+            secondlocs=flatphaselist[...,1::2,1::2,:]
+            secondlocs = secondlocs.reshape(-1, secondlocs.shape[-1])
 
-        #diags = numpy.transpose(numpy.diagonal(flatphaselist, axis1=ax1idx, axis2=ax2idx))
+            locs=numpy.concatenate((firstlocs, secondlocs), axis=0)
+            
         flatphaselist=flatphaselist.reshape(origshape)
-        print('reshaped ',flatphaselist)
-        '''
-        for diag in diags:
-            indexes=numpy.where((flatphaselist == diag).all(axis=1))
+        for loc in locs:
+            indexes=numpy.where((flatphaselist == loc).all(axis=1))
             flatphaselist = numpy.delete(flatphaselist,indexes , axis=0)
-        ''' 
+
         # we could remove more points if we wanted....
         phaseangles=[0]*len(torset)
         if poltype.use_gaus==False and poltype.use_gausoptonly==False:

@@ -56,10 +56,53 @@ def TotalParametersToFitForNonAromaticRing(poltype,ringtors): # symmetry class k
 def TotalDatapointsForNonAromaticRing(poltype,numparameters):
     return numparameters+1 # +1 so dont overfit
 
-def AllPossiblePuckeringLocationsForRing(poltype,ringtors):
+def AllPossiblePuckeringLocationsForRing(poltype,ringtors,tortoneighbtors):
     numbertors=len(ringtors)-3 
     combs=list(combinations(ringtors,numbertors))
-    return combs 
+    finalcombs=[]
+    for comb in combs:
+        goodcomb=True
+        for i in range(len(comb)):
+            tor=comb[i]
+            neighbtors=tortoneighbtors[tuple(tor)]
+            othertors = [x for j,x in enumerate(comb) if j!=i]
+            for otor in othertors:
+                if otor not in neighbtors:
+                    goodcomb=False
+        if goodcomb==True:
+            finalcombs.append(comb)
+    return finalcombs
+
+def NeighboringTorsion(poltype,ringtors,mol):
+    tortoneighbtors={}
+    for tor in ringtors:
+        a,b,c,d=tor[:]
+        finaltors=[]
+        ntors=IterativeOverNeighborsOfEndTorsionAtoms(poltype,a,ringtors,mol)
+        finaltors.extend(ntors)
+        ntors=IterativeOverNeighborsOfEndTorsionAtoms(poltype,d,ringtors,mol)
+        finaltors.extend(ntors)
+        tortoneighbtors[tuple(tor)]=finaltors
+    return tortoneighbtors
+
+def IterativeOverNeighborsOfEndTorsionAtoms(poltype,atomidx,ringtors,mol):
+    finaltors=[]
+    atom=mol.GetAtom(atomidx)        
+    atomatomiter=openbabel.OBAtomAtomIter(atom)
+    for natom in atomatomiter:
+        natomidx=natom.GetIdx()
+        ntors=CheckForNeighboringTorsions(poltype,natomidx,ringtors)
+        finaltors.extend(ntors)
+    return finaltors
+    
+def CheckForNeighboringTorsions(poltype,natomidx,ringtors):
+    ntors=[]
+    for tor in ringtors:
+        a,b,c,d=tor[:]
+        if a==natomidx or b==natomidx or c==natomidx or d==natomidx:
+            ntors.append(tor)
+    return ntors
+
 
 def DatapointsPerTorsionForNonArtomaticRing(poltype,ringtors,totaldatapoints):
     return int(totaldatapoints/len(ringtors))
@@ -149,11 +192,11 @@ def RefineNonAromaticRingTorsions(poltype,mol,optmol,classkeytotorsionparameters
     bondtopology=torgen.GenerateBondTopology(poltype,optmol)
     atomindices=NonAromaticRingAtomicIndices(poltype,mol)
     nonarotorsions,nonarotorsionsflat=NonAromaticRingTorsions(poltype,poltype.alltorsionslist,atomindices)
-    print('nonarotorsionsflat',nonarotorsionsflat)
     poltype.nonaroringtors=nonarotorsionsflat
     reducednonarotorsions=[]
     for nonarotors in nonarotorsions:
-        combs=AllPossiblePuckeringLocationsForRing(poltype,nonarotors)
+        tortoneighbtors=NeighboringTorsion(poltype,nonarotors,mol)
+        combs=AllPossiblePuckeringLocationsForRing(poltype,nonarotors,tortoneighbtors)
         firstcomb=combs[0]
         reducednonarotorsions.append(firstcomb)
         UpdateTorsionSets(poltype,firstcomb)
@@ -175,5 +218,4 @@ def RefineNonAromaticRingTorsions(poltype,mol,optmol,classkeytotorsionparameters
             poltype.classkeytoinitialprmguess[classkey]=prms
 
     os.chdir('..')
-
 
