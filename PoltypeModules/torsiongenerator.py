@@ -443,14 +443,13 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         flatphaselist=flatphaselist.reshape(shape) # now we can remove diagonal elements
         idealangletensor=flatphaselist+currentanglelist
         poltype.idealangletensor[tuple(torset)]=idealangletensor
-        poltype.tensorphases[torset]=flatphaselist
+        poltype.tensorphases[tuple(torset)]=flatphaselist
         ax2idx=len(shape)-1-1
         ax1idx=ax2idx-1
 
         #diags = numpy.transpose(numpy.diagonal(flatphaselist, axis1=ax1idx, axis2=ax2idx))
         flatphaselist=flatphaselist.reshape(origshape)
         print('reshaped ',flatphaselist)
-        sys.exit()
         '''
         for diag in diags:
             indexes=numpy.where((flatphaselist == diag).all(axis=1))
