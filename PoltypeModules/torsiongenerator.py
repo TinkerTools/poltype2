@@ -442,7 +442,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         shape=tuple(shape)
         flatphaselist=flatphaselist.reshape(shape) # now we can remove diagonal elements
         idealangletensor=flatphaselist+currentanglelist
-        poltype.idealangletensor[torset]=idealangletensor
+        poltype.idealangletensor[tuple(torset)]=idealangletensor
         poltype.tensorphases[torset]=flatphaselist
         ax2idx=len(shape)-1-1
         ax1idx=ax2idx-1
