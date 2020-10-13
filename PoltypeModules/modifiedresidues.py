@@ -1612,7 +1612,6 @@ def ConnectSideChainToBackbone(poltype,pdbfilename):
    
     obConversion.ReadFile(pdbmol,pdbfilename)
     
- 
     temp=open(pdbfilename,'r')
     results=temp.readlines()
     temp.close()
@@ -1643,22 +1642,33 @@ def ConnectSideChainToBackbone(poltype,pdbfilename):
             resnumber=int(line[23:26+1])
             linesplit=line.split()
             position=[float(linesplit[6]),float(linesplit[7]),float(linesplit[8])]
-            if resnumber==int(poltype.mutatedresiduenumber) and atomindex<10: # quick hack not general...
+            if resnumber==int(poltype.mutatedresiduenumber): # quick hack not general...
                 if atomindex not in connectedidxs:
                     atomindextoposition[atomindex]=position
     atomindextodistance={}
+    minatomindextodistance={}
     for atomindex,position in atomindextoposition.items():
         distance=numpy.linalg.norm(numpy.array(position)-numpy.array(refpos))
         atomindextodistance[atomindex]=distance
-    mindistance=min(atomindextodistance.values())
+        if atomindex<10:
+            minatomindextodistance[atomindex]=distance
+
+    mindistance=min(minatomindextodistance.values())
     distancetoatomindex={v: k for k, v in atomindextodistance.items()}
     minatomindex=distancetoatomindex[mindistance]
-    pdbmol.AddBond(refidx,minatomindex,1)
+    tempfilename=pdbfilename.replace('.pdb','_temp.pdb')
     newpdbfilename=pdbfilename.replace('.pdb','_mutsidechainconnected.pdb')
     obConversion.SetOutFormat('pdb')
-    obConversion.WriteFile(pdbmol,newpdbfilename)
+    obConversion.WriteFile(pdbmol,tempfilename)
+    newpdbmol=openbabel.OBMol()
+    obConversion = openbabel.OBConversion()
+    obConversion.SetInFormat('pdb')
+    obConversion.ReadFile(newpdbmol,tempfilename)
+    
+
     searchpos=atomindextoposition[minatomindex]
-    temp=open(newpdbfilename,'r')
+    searchposref=atomindextoposition[refidx]
+    temp=open(tempfilename,'r')
     results=temp.readlines()
     temp.close()
     atomindextoposition={}
@@ -1671,6 +1681,11 @@ def ConnectSideChainToBackbone(poltype,pdbfilename):
             position=[float(linesplit[6]),float(linesplit[7]),float(linesplit[8])]
             if position==searchpos:
                 minatomindex=atomindex
+            elif position==searchposref:
+                refidx=atomindex
+
+    newpdbmol.AddBond(refidx,minatomindex,1)
+    obConversion.WriteFile(newpdbmol,newpdbfilename)
 
     return newpdbfilename,minatomindex
     
@@ -1990,6 +2005,7 @@ def GenerateModifiedProteinPoltypeInput(poltype):
     choppedfragidxs=modproidxs+modneighbidxs
     chopmodmol=GenerateFragBabel(poltype,choppedfragidxs,poltype.modifiedproteinpdbname)
     # add hydrogens but only want to add to backbone, so remove any additional added hydrogens not on the backbone afterwords
+    
     obConversion.SetOutFormat("pdb")
     refname='ModifiedRes.pdb'
     obConversion.WriteFile(chopmodmol,refname)
@@ -2755,7 +2771,6 @@ def ReadMonopolesFromMultipolesAcrossBoundary(poltype,keyfile,mincorenumber,maxc
 def ModifyMonopoles(poltype,monopoles,chgtoredistribute):
     nummonopoles=len(monopoles)
     chgpermonopole=chgtoredistribute/nummonopoles 
-    print('chgpermonopole',chgpermonopole)
     modmonopoles=[]
     for monopole in monopoles:
         if monopole>0 and chgpermonopole>0:
@@ -2808,8 +2823,4 @@ def CorrectTotalCharge(poltype,pdbfile,writekey,protinkxyz,mincorenumber,maxcore
     modmonopoles=ModifyMonopoles(poltype,monopoles,chgtoredistribute)
     totnewchg=sum(modmonopoles)
     
-    print('monopoles',monopoles)
-    print('modmonopoles',modmonopoles)
-    print('chgtoredistribute',chgtoredistribute)
-    print('totnewchg',totnewchg)
     ModifyMonopolesFromMultipolesAcrossBoundary(poltype,writekey,modmonopoles,mincorenumber,maxcorenumber)
