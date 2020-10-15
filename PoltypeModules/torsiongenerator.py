@@ -446,7 +446,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         poltype.tensorphases[tuple(torset)]=flatphaselist
         ax2idx=len(shape)-1-1
         ax1idx=ax2idx-1
-        dim=len(shape)
+        dim=len(phaselists)
         locs=[]
         if dim>=2:
             firstlocs=flatphaselist[...,::2,::2,:]
