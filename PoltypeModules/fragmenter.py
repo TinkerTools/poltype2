@@ -431,7 +431,10 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 parentindextofragindex=copied[rotbndindex]
                 parentsymclasstofragsymclass=anothercopy[rotbndindex]
             rotkey=rotbndindex.replace('_',' ')
-            tors=list(poltype.rotbndlist[rotkey])
+            if rotkey in poltype.rotbndlist.keys():
+                tors=list(poltype.rotbndlist[rotkey])
+            else:
+                tors=[]
             for torsion in tors:
                 smilesposarray=[]
                 fragtor=[]
