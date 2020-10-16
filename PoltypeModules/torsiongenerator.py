@@ -948,23 +948,32 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
     optstr=opt.gen_opt_str(poltype,optimizeoptlist)
 
     if ('-opt-' in comfname):
+        if ('I ' in poltype.mol.GetSpacedFormula()):
+            poltype.toroptbasisset='gen'
+            poltype.toroptmethod='wB97XD'
+
         if poltype.toroptpcm==True:
-            operationstr = "%s %s/%s MaxDisk=%s SCRF=(PCM)\n" % (optstr,poltype.toroptmethod,poltype.toroptbasisset, maxdisk)
+            operationstr = "%s %s/%s SCRF=(PCM)" % (optstr,poltype.toroptmethod,poltype.toroptbasisset)
         else:
-            operationstr = "%s %s/%s MaxDisk=%s\n" % (optstr,poltype.toroptmethod,poltype.toroptbasisset, maxdisk)
+            operationstr = "%s %s/%s" % (optstr,poltype.toroptmethod,poltype.toroptbasisset)
         commentstr = poltype.molecprefix + " Rotatable Bond Optimization on " + gethostname()
     else:
-#        operationstr = "#m06L/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s\n" % (torspbasisset, maxdisk)
+        if ('I ' in poltype.mol.GetSpacedFormula()):
+            prevbasisset=poltype.torspbasisset
+            poltype.torspbasisset='gen'
+            poltype.torspmethod='wB97XD'
         if poltype.torsppcm==True:
-            operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s SCRF=(PCM) Pop=NBORead\n" % (poltype.torspmethod,poltype.torspbasisset, maxdisk)
+            operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) SCRF=(PCM) Pop=NBORead" % (poltype.torspmethod,poltype.torspbasisset)
         else:       
-            operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s Pop=NBORead\n" % (poltype.torspmethod,poltype.torspbasisset, maxdisk)
+            operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) Pop=NBORead" % (poltype.torspmethod,poltype.torspbasisset)
 
         commentstr = poltype.molecprefix + " Rotatable Bond SP Calculation on " + gethostname()   
 
-    bset=re.search('6-31\S+',operationstr)
     if ('I ' in poltype.mol.GetSpacedFormula()):
-        operationstr=re.sub(r'6-31\S+',r'Gen',operationstr)
+        operationstring+=' pseudo=read'
+    string=' MaxDisk=%s \n'%(maxdisk)
+    operationstring+=string
+
     tmpfh.write(operationstr)
     tmpfh.write('\n%s\n\n' % commentstr)
     tmpfh.write('%d %d\n' % (prevstruct.GetTotalCharge(), prevstruct.GetTotalSpinMultiplicity()))
@@ -979,17 +988,36 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
             ln = xyzstrl[i]
             tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), float(ln.split()[2]),float(ln.split()[3]),float(ln.split()[4])))
         tmpfh.write('\n')
-        tmpfh.close()
         xyzstr.close()
     else:
         for atm in iteratom:
             tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), atm.x(),atm.y(),atm.z()))
+    
+    tmpfh.write('\n')
+    if ('I ' in poltype.mol.GetSpacedFormula()):
+        formulalist=poltype.mol.GetSpacedFormula().lstrip().rstrip().split()
+        tmpfh.write('I 0'+'\n')
+        tmpfh.write('LANL2DZ '+'\n')
+        tmpfh.write('****'+'\n') 
+        elstr=''
+        for e in formulalist:
+            if not e.isdigit() and e!='I':
+                elstr+=e+' ' 
+        elstr+='0'+'\n'
+        tmpfh.write(elstr)
+        tmpfh.write(prevbasisset+'\n')
+        tmpfh.write('****'+'\n')
+    if 'opt' not in comfname and poltype.dontfrag==False: 
         tmpfh.write('\n')
-
         tmpfh.write('$nbo bndidx $end'+'\n')
         tmpfh.write('\n')
+    else:
+        tmpfh.write('\n')
+        tmpfh.write('\n')
 
-        tmpfh.close()
+
+
+    tmpfh.close()
 
 def save_structfile(poltype,molstruct, structfname):
     """

@@ -190,25 +190,44 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
     tmpfh = open(comfname, "a")
     #NOTE: Need to pass parameter to specify basis set
     if ('dma' in comfname):
+        if ('I ' in poltype.mol.GetSpacedFormula()):
+            prevbasisset=poltype.dmabasisset
+            poltype.dmabasisset='gen'
+            poltype.dmamethod='wB97XD'
+            iodinebasisset='LANL2DZ' 
         if poltype.dmamethod=='MP2':
             densitystring='MP2'
         else:
             densitystring='SCF'
-        opstr="#P %s/%s Sp Density=%s MaxDisk=%s\n" % (poltype.dmamethod,poltype.dmabasisset, densitystring,maxdisk)
+
+
+        opstr="#P %s/%s Sp Density=%s" % (poltype.dmamethod,poltype.dmabasisset, densitystring)
     elif ('pop' in comfname):
-        opstr="#P HF/%s MaxDisk=%s Pop=SaveMixed\n" % (poltype.popbasisset, maxdisk)
+        opstr="#P HF/%s MaxDisk=%s Pop=SaveMixed" % (poltype.popbasisset)
     else:
+        if ('I ' in poltype.mol.GetSpacedFormula()):
+            prevbasisset=poltype.espbasisset
+            poltype.espbasisset='gen'
+            poltype.espmethod='wB97XD'
+            iodinebasisset='LANL2DZ' 
+
+
         if poltype.espmethod=='MP2':
             densitystring='MP2'
         else:
             densitystring='SCF'
         
-        opstr="#P %s/%s Sp Density=%s SCF=Save MaxDisk=%s Pop=NBORead\n" % (poltype.espmethod,poltype.espbasisset, densitystring,maxdisk)
+        if poltype.dontfrag==False: 
+            opstr="#P %s/%s Sp Density=%s SCF=Save Pop=NBORead" % (poltype.espmethod,poltype.espbasisset, densitystring)
+        else:
+            opstr="#P %s/%s Sp Density=%s SCF=Save" % (poltype.espmethod,poltype.espbasisset, densitystring)
 
 
-    bset=re.search('(?i)(6-31|aug-cc)\S+',opstr)
-    if ('I ' in mol.GetSpacedFormula()):
-        opstr=re.sub(r'(?i)(6-31|aug-cc)\S+',r'Gen',opstr)
+    if ('I ' in poltype.mol.GetSpacedFormula()):
+        opstr+=' pseudo=read'
+    string=' MaxDisk=%s \n'%(maxdisk)
+    opstr+=string
+
     tmpfh.write(opstr)
     commentstr = poltype.molecprefix + " Gaussian SP Calculation on " + gethostname()
     tmpfh.write('\n%s\n\n' % commentstr)
@@ -223,8 +242,28 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
 
 
     tmpfh.write('\n')
-    tmpfh.write('$nbo bndidx $end'+'\n')
-    tmpfh.write('\n')
+    if ('I ' in poltype.mol.GetSpacedFormula()):
+        formulalist=poltype.mol.GetSpacedFormula().lstrip().rstrip().split()
+        tmpfh.write('I 0'+'\n')
+        tmpfh.write(iodinebasisset+'\n')
+        tmpfh.write('****'+'\n') 
+        elstr=''
+        for e in formulalist:
+            if not e.isdigit() and e!='I':
+                elstr+=e+' ' 
+        elstr+='0'+'\n'
+        tmpfh.write(elstr)
+        tmpfh.write(prevbasisset+'\n')
+        tmpfh.write('****'+'\n')
+    if not 'dma' in comfname and poltype.dontfrag==False:  
+        tmpfh.write('\n')
+        tmpfh.write('$nbo bndidx $end'+'\n')
+        tmpfh.write('\n')
+    else:
+        tmpfh.write('\n')
+        tmpfh.write('\n')
+
+
     tmpfh.close()
 
 def ElectrostaticPotentialFitting(poltype):

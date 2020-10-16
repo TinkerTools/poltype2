@@ -986,6 +986,8 @@ class PolarizableTyper():
         m=self.AddInputCoordinatesAsDefaultConformer(m,indextocoordinates)
         mol,m=self.CheckIsInput2D(mol,obConversion,m)
         self.mol=mol
+        if ('I ' in self.mol.GetSpacedFormula()):
+            self.dontfrag=True
         chgcount=self.NumberOfChargedAtoms(mol)
         if self.totalcharge!=0 and chgcount>1:
             if self.foundgauss==True:

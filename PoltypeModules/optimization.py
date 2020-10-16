@@ -148,19 +148,25 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule):
     if restraintlist:
         optimizeoptlist.insert(0,poltype.gausoptcoords)
     optstr=gen_opt_str(poltype,optimizeoptlist)
-    if ('I ' in molecule.GetSpacedFormula()):
-        optstring="%s HF/Gen freq Guess=INDO MaxDisk=%s\n" % (optstr,maxdisk)
-    else:
-        if poltype.freq==True:
-            if poltype.optpcm==True:
-                optstring= "%s %s/%s freq Guess=INDO MaxDisk=%s SCRF=(PCM)\n" % (optstr,poltype.optmethod,poltype.optbasisset,maxdisk)
-            else:
-                optstring= "%s %s/%s freq Guess=INDO MaxDisk=%s\n" % (optstr,poltype.optmethod,poltype.optbasisset,maxdisk)
+    spacedformulastr=molecule.GetSpacedFormula()
+    if ('I ' in spacedformulastr):
+        prevoptbasisset=poltype.optbasisset
+        poltype.optbasisset='gen'
+        poltype.optmethod='wB97XD'
+    if poltype.freq==True:
+        if poltype.optpcm==True:
+            optstring= "%s %s/%s freq SCRF=(PCM)" % (optstr,poltype.optmethod,poltype.optbasisset)
         else:
-            if poltype.optpcm==True:
-                optstring= "%s %s/%s Guess=INDO MaxDisk=%s SCRF=(PCM)\n" % (optstr,poltype.optmethod,poltype.optbasisset,maxdisk)
-            else:
-                optstring= "%s %s/%s Guess=INDO MaxDisk=%s\n" % (optstr,poltype.optmethod,poltype.optbasisset,maxdisk)
+            optstring= "%s %s/%s freq" % (optstr,poltype.optmethod,poltype.optbasisset)
+    else:
+        if poltype.optpcm==True:
+            optstring= "%s %s/%s SCRF=(PCM)" % (optstr,poltype.optmethod,poltype.optbasisset)
+        else:
+            optstring= "%s %s/%s" % (optstr,poltype.optmethod,poltype.optbasisset)
+    if ('I ' in spacedformulastr):
+        optstring+=' pseudo=read'
+    string=' MaxDisk=%s \n'%(maxdisk)
+    optstring+=string
     tmpfh.write(optstring)
     commentstr = poltype.molecprefix + " Gaussian OPT Calculation on " + gethostname()
     tmpfh.write('\n%s\n\n' % commentstr)
@@ -173,9 +179,29 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule):
     for atm in iteratombab:
         tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), atm.x(), atm.y(), atm.z()))
     tmpfh.write('\n')
-
-    tmpfh.close()
     
+    if ('I ' in spacedformulastr):
+        formulalist=spacedformulastr.lstrip().rstrip().split()
+        tmpfh.write('I 0'+'\n')
+        tmpfh.write('LANL2DZ '+'\n')
+        tmpfh.write('****'+'\n') 
+        elstr=''
+        for e in formulalist:
+            if not e.isdigit() and e!='I':
+                elstr+=e+' ' 
+        elstr+='0'+'\n'
+        tmpfh.write(elstr)
+        tmpfh.write(prevoptbasisset+'\n')
+        tmpfh.write('****'+'\n')
+        tmpfh.write('\n')
+        tmpfh.write('\n')
+    tmpfh.close()
+
+
+   
+
+
+ 
 def gen_opt_str(poltype,optimizeoptlist):
     optstr = "#P opt"
     if optimizeoptlist:
