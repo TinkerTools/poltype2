@@ -608,8 +608,8 @@ def GenerateBoundaries(poltype,tor_energy_list,refine,initialprms):
     upperbounds=[]
     max_amp = max(tor_energy_list) - min(tor_energy_list)
     if refine==False: 
-        lowerbounds.append(-max_amp)
-        upperbounds.append(max_amp)
+        bounds=[-max_amp,max_amp]
+
     else:
         for initialprm in initialprms:
             value=numpy.abs(initialprm)
@@ -620,7 +620,7 @@ def GenerateBoundaries(poltype,tor_energy_list,refine,initialprms):
             else:
                 lowerbounds.append(-max_amp)
                 upperbounds.append(max_amp)
-    bounds=[lowerbounds,upperbounds]
+        bounds=[lowerbounds,upperbounds]
     return tuple(bounds),max_amp
        
 
@@ -726,10 +726,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             else:
                 insert_torphasedict(poltype,mol, tor, torprmdict, initangle, write_prm_dict)
 
-        
         tup=tuple(classkeylist)
         prmidx,initialprms = insert_torprmdict(poltype,mol, torprmdict)
-        
         #poltype.WriteToLog('number of parameters to fit for '+clskey+' are '+str(prmidx))
         # get all the lists for the current clskey
         angle_list = cls_angle_dict[tup]  # Torsion angle for each corresponding energy
