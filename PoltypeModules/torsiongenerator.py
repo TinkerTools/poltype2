@@ -972,7 +972,7 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
     if ('I ' in poltype.mol.GetSpacedFormula()):
         operationstring+=' pseudo=read'
     string=' MaxDisk=%s \n'%(maxdisk)
-    operationstring+=string
+    operationstr+=string
 
     tmpfh.write(operationstr)
     tmpfh.write('\n%s\n\n' % commentstr)
