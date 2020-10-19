@@ -875,7 +875,6 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
 
     if poltype.toroptpcm==True:
         temp.write('set {'+'\n')
-        temp.write('  basis '+poltype.toroptbasisset+'\n')
         temp.write('  g_convergence GAU_LOOSE'+'\n')
         temp.write('  scf_type pk'+'\n')
         temp.write('  pcm true'+'\n')
@@ -909,7 +908,16 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     temp.write('  try:'+'\n')
     if poltype.toroptpcm==True:
         temp.write('    set opt_coordinates cartesian'+'\n')
-    temp.write("    optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
+    spacedformulastr=optmol.GetSpacedFormula()
+    if ('I ' in spacedformulastr):
+        temp.write('    basis {'+'\n')
+        temp.write('    ['+' '+poltype.toroptbasissetfile+' '+poltype.iodinetoroptbasissetfile +' '+ ']'+'\n')
+        temp=ReadInBasisSet(poltype,temp,poltype.toroptbasissetfile,poltype.iodinetoroptbasissetfile,'    ')
+        temp.write('    }'+'\n')
+        temp.write("    optimize('%s')" % (poltype.toroptmethod.lower())+'\n')
+
+    else:
+        temp.write("    optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
     if poltype.freq:
         temp.write('    scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
     temp.write('    break'+'\n')
@@ -950,7 +958,8 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
     if ('-opt-' in comfname):
         if ('I ' in poltype.mol.GetSpacedFormula()):
             poltype.toroptbasisset='gen'
-            poltype.toroptmethod='wB97XD'
+            iodinebasissetfile=poltype.iodinetoroptbasissetfile
+            basissetfile=poltype.toroptbasissetfile
 
         if poltype.toroptpcm==True:
             operationstr = "%s %s/%s SCRF=(PCM)" % (optstr,poltype.toroptmethod,poltype.toroptbasisset)
@@ -961,7 +970,9 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
         if ('I ' in poltype.mol.GetSpacedFormula()):
             prevbasisset=poltype.torspbasisset
             poltype.torspbasisset='gen'
-            poltype.torspmethod='wB97XD'
+            iodinebasissetfile=poltype.iodinetorspbasissetfile
+            basissetfile=poltype.torspbasissetfile
+
         if poltype.torsppcm==True:
             operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) SCRF=(PCM) Pop=NBORead" % (poltype.torspmethod,poltype.torspbasisset)
         else:       
@@ -996,17 +1007,21 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
     tmpfh.write('\n')
     if ('I ' in poltype.mol.GetSpacedFormula()):
         formulalist=poltype.mol.GetSpacedFormula().lstrip().rstrip().split()
-        tmpfh.write('I 0'+'\n')
-        tmpfh.write('LANL2DZ '+'\n')
-        tmpfh.write('****'+'\n') 
-        elstr=''
-        for e in formulalist:
-            if not e.isdigit() and e!='I':
-                elstr+=e+' ' 
-        elstr+='0'+'\n'
-        tmpfh.write(elstr)
-        tmpfh.write(prevbasisset+'\n')
-        tmpfh.write('****'+'\n')
+        temp=open(poltype.basissetpath+basissetfile,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            if '!' not in line and line!='\n':
+                tmpfh.write(line)
+
+
+        temp=open(poltype.basissetpath+iodinebasissetfile,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            if '!' not in line:
+                tmpfh.write(line)
+
     if 'opt' not in comfname and poltype.dontfrag==False: 
         tmpfh.write('\n')
         tmpfh.write('$nbo bndidx $end'+'\n')
@@ -1180,13 +1195,41 @@ def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,torset,phas
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
     temp.write('set freeze_core True'+'\n')
-    temp.write("E, wfn = energy('%s/%s',return_wfn=True)" % (poltype.torspmethod.lower(),poltype.torspbasisset)+'\n')
+    spacedformulastr=optmol.GetSpacedFormula()
+    if ('I ' in spacedformulastr):
+        temp.write('basis {'+'\n')
+        temp.write('['+' '+poltype.torspbasissetfile+' '+poltype.iodinetorspbasissetfile +' '+ ']'+'\n')
+        temp=ReadInBasisSet(poltype,temp,poltype.torspbasissetfile,poltype.iodinetorspbasissetfile,'')
+        temp.write('}'+'\n')
+        temp.write("E, wfn = energy('%s',return_wfn=True)" % (poltype.torspmethod.lower())+'\n')
+
+    else:
+
+        temp.write("E, wfn = energy('%s/%s',return_wfn=True)" % (poltype.torspmethod.lower(),poltype.torspbasisset)+'\n')
     temp.write('oeprop(wfn,"WIBERG_LOWDIN_INDICES")'+'\n')
 
     temp.write('clean()'+'\n')
     temp.close()
     outputname=os.path.splitext(inputname)[0] + '.log'
     return inputname,outputname
+
+def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetfile,space):
+    newtemp=open(poltype.basissetpath+normalelementbasissetfile,'r')
+    results=newtemp.readlines()
+    newtemp.close()
+    for line in results:
+        if '!' not in line and line!='\n':
+            tmpfh.write(space+line)
+
+
+    newtemp=open(poltype.basissetpath+otherelementbasissetfile,'r')
+    results=newtemp.readlines()
+    newtemp.close()
+    for line in results:
+        if '!' not in line:
+            tmpfh.write(space+line)
+    return tmpfh
+
 
 def RemoveDuplicateRotatableBondTypes(poltype):
     tortorotbnd={}

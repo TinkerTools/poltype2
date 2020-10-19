@@ -102,7 +102,15 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
     temp.write('set maxiter '+str(poltype.scfmaxiter)+'\n')
     temp.write('set freeze_core True'+'\n')
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
-    temp.write("E, wfn = properties('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
+    spacedformulastr=mol.GetSpacedFormula()
+    if ('I ' in spacedformulastr):
+        temp.write('basis {'+'\n')
+        temp.write('['+' '+poltype.espbasissetfile+' '+poltype.iodineespbasissetfile +' '+ ']'+'\n')
+        temp=ReadInBasisSet(poltype,temp,poltype.espbasissetfile,poltype.iodineespbasissetfile)
+        temp.write('}'+'\n')
+        temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
+    else:
+        temp.write("E, wfn = properties('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
     if makecube==True:
        temp.write('oeprop(wfn,"GRID_ESP","WIBERG_LOWDIN_INDICES","MULLIKEN_CHARGES")'+'\n')
     else:
@@ -132,11 +140,39 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
     temp.write('set freeze_core True'+'\n')
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
-    temp.write("E, wfn = energy('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower(),poltype.dmabasisset)+'\n')
+    spacedformulastr=mol.GetSpacedFormula()
+    if ('I ' in spacedformulastr):
+        temp.write('basis {'+'\n')
+        temp.write('['+' '+poltype.dmabasissetfile+' '+poltype.iodinedmabasissetfile +' '+ ']'+'\n')
+        temp=ReadInBasisSet(poltype,temp,poltype.dmabasissetfile,poltype.iodinedmabasissetfile)
+        temp.write('}'+'\n')
+        temp.write("E, wfn = energy('%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower())+'\n')
+
+    else:
+        temp.write("E, wfn = energy('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower(),poltype.dmabasisset)+'\n')
     temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
     temp.write('clean()'+'\n')
     temp.close()
     return inputname
+
+def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetfile):
+    newtemp=open(poltype.basissetpath+normalelementbasissetfile,'r')
+    results=newtemp.readlines()
+    newtemp.close()
+    for line in results:
+        if '!' not in line and line!='\n':
+            tmpfh.write(line)
+
+
+    newtemp=open(poltype.basissetpath+otherelementbasissetfile,'r')
+    results=newtemp.readlines()
+    newtemp.close()
+    for line in results:
+        if '!' not in line:
+            tmpfh.write(line)
+    return tmpfh
+
+
 
 def GrabFinalPsi4Energy(poltype,logname):
     energy=None
@@ -191,10 +227,10 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
     #NOTE: Need to pass parameter to specify basis set
     if ('dma' in comfname):
         if ('I ' in poltype.mol.GetSpacedFormula()):
-            prevbasisset=poltype.dmabasisset
             poltype.dmabasisset='gen'
-            poltype.dmamethod='wB97XD'
-            iodinebasisset='LANL2DZ' 
+            iodinebasissetfile=poltype.iodinedmabasissetfile 
+            basissetfile=poltype.dmabasissetfile 
+            #poltype.dmamethod='wB97XD'
         if poltype.dmamethod=='MP2':
             densitystring='MP2'
         else:
@@ -206,10 +242,10 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
         opstr="#P HF/%s MaxDisk=%s Pop=SaveMixed" % (poltype.popbasisset)
     else:
         if ('I ' in poltype.mol.GetSpacedFormula()):
-            prevbasisset=poltype.espbasisset
             poltype.espbasisset='gen'
-            poltype.espmethod='wB97XD'
-            iodinebasisset='LANL2DZ' 
+            iodinebasissetfile=poltype.iodineespbasissetfile 
+            basissetfile=poltype.espbasissetfile 
+            #poltype.espmethod='wB97XD'
 
 
         if poltype.espmethod=='MP2':
@@ -244,17 +280,20 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
     tmpfh.write('\n')
     if ('I ' in poltype.mol.GetSpacedFormula()):
         formulalist=poltype.mol.GetSpacedFormula().lstrip().rstrip().split()
-        tmpfh.write('I 0'+'\n')
-        tmpfh.write(iodinebasisset+'\n')
-        tmpfh.write('****'+'\n') 
-        elstr=''
-        for e in formulalist:
-            if not e.isdigit() and e!='I':
-                elstr+=e+' ' 
-        elstr+='0'+'\n'
-        tmpfh.write(elstr)
-        tmpfh.write(prevbasisset+'\n')
-        tmpfh.write('****'+'\n')
+        temp=open(poltype.basissetpath+basissetfile,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            if '!' not in line and line!='\n':
+                tmpfh.write(line)
+
+
+        temp=open(poltype.basissetpath+iodinebasissetfile,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            if '!' not in line:
+                tmpfh.write(line)
     if not 'dma' in comfname and poltype.dontfrag==False:  
         tmpfh.write('\n')
         tmpfh.write('$nbo bndidx $end'+'\n')
