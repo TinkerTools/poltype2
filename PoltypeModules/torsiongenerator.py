@@ -924,7 +924,11 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     temp.write('  except OptimizationConvergenceError:'+'\n')
     temp.write('    try:'+'\n')
     temp.write('      set opt_coordinates cartesian'+'\n')
-    temp.write("      optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
+    if ('I ' in spacedformulastr):
+        temp.write("      optimize('%s')" % (poltype.toroptmethod.lower())+'\n')
+    else:
+        temp.write("      optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
+
     if poltype.freq:
         temp.write('      scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
     temp.write('      break'+'\n')
@@ -1011,9 +1015,8 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
         results=temp.readlines()
         temp.close()
         for line in results:
-            if '!' not in line and line!='\n':
+            if '!' not in line:
                 tmpfh.write(line)
-
 
         temp=open(poltype.basissetpath+iodinebasissetfile,'r')
         results=temp.readlines()
@@ -1218,7 +1221,7 @@ def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetf
     results=newtemp.readlines()
     newtemp.close()
     for line in results:
-        if '!' not in line and line!='\n':
+        if '!' not in line:
             tmpfh.write(space+line)
 
 

@@ -71,7 +71,11 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
     temp.write('  except OptimizationConvergenceError:'+'\n')
     temp.write('    try:'+'\n')
     temp.write('      set opt_coordinates cartesian'+'\n')
-    temp.write("      optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
+    if ('I ' in spacedformulastr):
+        temp.write("      optimize('%s')" % (poltype.optmethod.lower())+'\n')
+    else:
+        temp.write("      optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
+
     if poltype.freq:
         temp.write('      scf_e,scf_wfn=freq("%s/%s",return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
     temp.write('      break'+'\n')
@@ -88,7 +92,7 @@ def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetf
     results=newtemp.readlines()
     newtemp.close()
     for line in results:
-        if '!' not in line and line!='\n':
+        if '!' not in line:
             tmpfh.write('    '+line)
 
 
@@ -212,9 +216,8 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule):
         results=temp.readlines()
         temp.close()
         for line in results:
-            if '!' not in line and line!='\n':
+            if '!' not in line:
                 tmpfh.write(line)
-
 
         temp=open(poltype.basissetpath+poltype.iodineoptbasissetfile,'r')
         results=temp.readlines()

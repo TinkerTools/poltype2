@@ -160,7 +160,7 @@ def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetf
     results=newtemp.readlines()
     newtemp.close()
     for line in results:
-        if '!' not in line and line!='\n':
+        if '!' not in line:
             tmpfh.write(line)
 
 
@@ -245,7 +245,6 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
             poltype.espbasisset='gen'
             iodinebasissetfile=poltype.iodineespbasissetfile 
             basissetfile=poltype.espbasissetfile 
-            #poltype.espmethod='wB97XD'
 
 
         if poltype.espmethod=='MP2':
@@ -284,9 +283,8 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
         results=temp.readlines()
         temp.close()
         for line in results:
-            if '!' not in line and line!='\n':
+            if '!' not in line:
                 tmpfh.write(line)
-
 
         temp=open(poltype.basissetpath+iodinebasissetfile,'r')
         results=temp.readlines()
