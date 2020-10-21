@@ -1149,7 +1149,7 @@ class PolarizableTyper():
             
             self.rdkitmol=rdmolfiles.MolFromMolFile(self.molstructfnamemol,sanitize=True,removeHs=False)
 
-            WBOmatrix,outputname,error=frag.GenerateWBOMatrix(self,self.rdkitmol,self.logoptfname.replace('.log','.xyz'))
+            WBOmatrix,outputname,error=frag.GenerateWBOMatrix(self,self.rdkitmol,self.mol,self.logoptfname.replace('.log','.xyz'))
             highlightbonds=[]
             for torset in self.torlist:
                 for tor in torset:

@@ -684,7 +684,7 @@ def mol_with_atom_index_removed(poltype,mol):
 
 
 
-def GenerateWBOMatrix(poltype,molecule,structfname):
+def GenerateWBOMatrix(poltype,molecule,moleculebabel,structfname):
     error=False
     WBOmatrix=None
     curespmethod=poltype.espmethod
@@ -693,7 +693,7 @@ def GenerateWBOMatrix(poltype,molecule,structfname):
     poltype.espbasisset='MINIX'
     charge=Chem.rdmolops.GetFormalCharge(molecule)
 
-    inputname,outputname=esp.CreatePsi4ESPInputFile(poltype,structfname,poltype.comespfname.replace('.com','_frag.com'),molecule,poltype.maxdisk,poltype.maxmem,poltype.numproc,charge,False)
+    inputname,outputname=esp.CreatePsi4ESPInputFile(poltype,structfname,poltype.comespfname.replace('.com','_frag.com'),moleculebabel,poltype.maxdisk,poltype.maxmem,poltype.numproc,charge,False)
     finished,error=poltype.CheckNormalTermination(outputname)
     if not finished and not error:
         cmdstr='psi4 '+inputname+' '+outputname
@@ -762,7 +762,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         WriteOBMolToXYZ(poltype,fragmolbabel,filename.replace('.mol','_xyzformat.xyz'))
         WriteOBMolToSDF(poltype,fragmolbabel,filename.replace('.mol','.sdf'))
         structfname=filename.replace('.mol','.sdf')
-        fragWBOmatrix,outputname,error=GenerateWBOMatrix(poltype,fragmol,filename.replace('.mol','_xyzformat.xyz'))
+        fragWBOmatrix,outputname,error=GenerateWBOMatrix(poltype,fragmol,fragmolbabel,filename.replace('.mol','_xyzformat.xyz'))
         if error:
             os.chdir('..')
             continue
@@ -1012,7 +1012,7 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
                 structfname=fragmentidxtostructfname[fragmolidx]
                 os.chdir(foldername)
 
-                fragWBOmatrix,outputname,error=GenerateWBOMatrix(poltype,fragmol,structfname)
+                fragWBOmatrix,outputname,error=GenerateWBOMatrix(poltype,fragmol,fragmolbabel,structfname)
                 if error:
                     os.chdir('..')
                     continue
