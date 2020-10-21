@@ -974,6 +974,7 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
         fragmentidxtostructfname={}
         fragmolidxtofoldername={}
         fragmolidxtofragmol={}
+        fragmolidxtofragmolbabel={}
         fragments=[]
         possiblefragatmidxs=GrowPossibleFragmentAtomIndexes(poltype,poltype.rdkitmol,indexes)
         if len(possiblefragatmidxs)!=0:
@@ -996,6 +997,8 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
                 WriteOBMolToSDF(poltype,fragmolbabel,filename.replace('.mol','.sdf'))
                 os.chdir('..')
                 fragmolidxtofragmol[fragmolidx]=fragmol
+                fragmolidxtofragmolbabel[fragmolidx]=fragmolbabel
+
                 fragmolidxtofoldername[fragmolidx]=basename
                 fragmolidxtoparentindextofragindex[fragmolidx]=parentindextofragindex
                 fragmentidxtostructfname[fragmolidx]=filename.replace('.mol','_xyzformat.xyz')
@@ -1011,6 +1014,7 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
                 parentindextofragindex=fragmolidxtoparentindextofragindex[fragmolidx]
                 structfname=fragmentidxtostructfname[fragmolidx]
                 os.chdir(foldername)
+                fragmolbabel=fragmolidxtofragmolbabel[fragmolidx]
 
                 fragWBOmatrix,outputname,error=GenerateWBOMatrix(poltype,fragmol,fragmolbabel,structfname)
                 if error:
