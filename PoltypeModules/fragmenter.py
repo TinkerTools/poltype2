@@ -20,6 +20,7 @@ from collections import Counter
 from rdkit.Geometry import Point3D
 import sys # used for terminaing job after fragmenter finishes and troubleshooting
 import symmetry as symm
+import shlex
 
 def AssignTotalCharge(poltype,molecule,babelmolecule):
     atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
@@ -323,7 +324,7 @@ def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog
     poltypeinput={'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','optmethod':poltype.optmethod,'toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'onlyrotbndslist':strfragrotbndindexes,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':poltype.numproc,'maxmem':poltype.maxmem,'maxdisk':poltype.maxdisk,'printoutput':True}
     inifilepath=poltype.WritePoltypeInitializationFile(poltypeinput)
     cmdstr='nohup'+' '+'python'+' '+poltype.poltypepath+r'/'+'poltype.py'+' '+'&'
-    cmdstr='cd '+os.getcwd()+' && '+cmdstr
+    cmdstr='cd '+shlex.quote(os.getcwd())+' && '+cmdstr
     molecprefix =  os.path.splitext(tail)[0]
     logname = molecprefix+ "-poltype.log"
     listofjobs.append(cmdstr)
