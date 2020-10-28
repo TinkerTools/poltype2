@@ -495,10 +495,11 @@ def CheckDipoleMoments(poltype,optmol):
             mmdipole=float(linesplit[-2])
             poltype.WriteToLog('MM Dipole moment = '+str(mmdipole))
             diff=qmdipole-mmdipole
-            if qmdipole!=0:
-                ratio=np.abs(diff/qmdipole)
-                if ratio>poltype.dipoletol and poltype.suppressdipoleerr==False:
-                    raise ValueError('Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)+' '+os.getcwd()) 
+            if np.abs(diff)>poltype.absdipoletol:
+                if qmdipole!=0:
+                    ratio=np.abs(diff/qmdipole)
+                    if ratio>poltype.dipoletol and poltype.suppressdipoleerr==False:
+                        raise ValueError('Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)+' '+os.getcwd()) 
 
 def ConvertDipoleToCOMFrame(poltype,dipole,optmol):
     nucsum = 0.0
