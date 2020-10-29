@@ -664,8 +664,8 @@ class PolarizableTyper():
         self.scrtmpdirgau = self.scratchdir.rstrip('//') + '/Gau-' + self.molecprefix
         self.scrtmpdirpsi4 = self.scratchdir.rstrip('//') + '/Psi4-' + self.molecprefix
 
-        self.tmpxyzfile = 'ttt.xyz'
-        self.tmpkeyfile = 'ttt.key'
+        self.tmpxyzfile = 'final.xyz'
+        self.tmpkeyfile = 'final.key'
         self.comtmp = self.assign_filenames ( "comtmp" , "-tmp.com")
         self.comoptfname = self.assign_filenames ( "comoptfname" , "-opt.com")
         self.chkoptfname = self.assign_filenames ( "chkoptfname" , "-opt.chk")
