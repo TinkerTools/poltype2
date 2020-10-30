@@ -731,11 +731,11 @@ def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndli
             tpdkey = get_class_key(poltype,a2, b2, c2, d2)
             if tpdkey not in torsionlist:
                 torsionlist.append(tpdkey)
-        
+        torset=tuple([maintor])
+        prmnum=len(poltype.nfoldlist)*(len(torsionlist))+1
+        poltype.torsionsettonumptsneeded[torset]=prmnum
+
         if poltype.tordatapointsnum==None:
-            prmnum=len(poltype.nfoldlist)*(len(torsionlist))+1
-            torset=tuple([maintor])
-            poltype.torsionsettonumptsneeded[torset]=prmnum
             ang=round(360/(prmnum)) # offset parameter is the +1
             if ang> 30:
                 ang=30
