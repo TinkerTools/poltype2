@@ -16,6 +16,7 @@ from rdkit.Chem.rdmolfiles import MolFromMol2File
 from rdkit.Chem import rdMolTransforms as rdmt
 from rdkit import Chem
 from itertools import product
+import shlex
 
 def __init__(poltype):
     PolarizableTyper.__init__(poltype)
@@ -107,10 +108,10 @@ def ExecuteSPJobs(poltype,torxyznames,cartxyznames,optoutputlogs,phaselist,optmo
         if not poltype.use_gaus:
             finalstruct=outputlog.replace('.log','_opt.xyz')
             inputname,outputname=CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,torset,phaseangles)
-            cmdstr='cd '+os.getcwd()+' && '+'psi4 '+inputname+' '+outputname
+            cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+inputname+' '+outputname
         else:
             inputname,outputname=GenerateTorsionSPInputFileGaus(poltype,torxyzfname,torset,optmol,phaseangles,outputlog)
-            cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
+            cmdstr = 'cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
         finished,error=poltype.CheckNormalTermination(outputname)
         if finished==True and error==False:
             pass
@@ -186,10 +187,10 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
 def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist):
     if  poltype.use_gaus==False and poltype.use_gausoptonly==False:
         inputname,outputname=CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist)
-        cmdstr='cd '+os.getcwd()+' && '+'psi4 '+inputname+' '+outputname
+        cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+inputname+' '+outputname
     else:
         inputname,outputname=CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist)
-        cmdstr='cd '+os.getcwd()+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
+        cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
         return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4
 
@@ -728,6 +729,7 @@ def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndli
                 torsionlist.append(tpdkey)
         torset=tuple([maintor])
         prmnum=len(poltype.nfoldlist)*1+1
+        prmnum=len(poltype.nfoldlist)*(len(torsionlist))+1
         poltype.torsionsettonumptsneeded[torset]=prmnum
 
         if poltype.tordatapointsnum==None:
@@ -1022,6 +1024,14 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
             if '!' not in line:
                 tmpfh.write(line)
 
+
+        temp=open(poltype.basissetpath+iodinebasissetfile,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            if '!' not in line:
+                tmpfh.write(line)
+
     if 'opt' not in comfname and poltype.dontfrag==False: 
         tmpfh.write('\n')
         tmpfh.write('$nbo bndidx $end'+'\n')
@@ -1034,6 +1044,10 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
 
     tmpfh.close()
 
+
+
+
+    tmpfh.close()
 
 def save_structfile(poltype,molstruct, structfname):
     """

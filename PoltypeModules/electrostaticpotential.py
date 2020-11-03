@@ -10,6 +10,7 @@ import shutil
 import time
 import numpy as np
 import openbabel
+import shlex
 
 def gen_esp_grid(poltype,mol):
     """
@@ -265,6 +266,11 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
     string=' MaxDisk=%s \n'%(maxdisk)
     opstr+=string
 
+    if ('I ' in poltype.mol.GetSpacedFormula()):
+        opstr+=' pseudo=read'
+    string=' MaxDisk=%s \n'%(maxdisk)
+    opstr+=string
+
     tmpfh.write(opstr)
     commentstr = poltype.molecprefix + " Gaussian SP Calculation on " + gethostname()
     tmpfh.write('\n%s\n\n' % commentstr)
@@ -330,7 +336,7 @@ def SPForDMA(poltype,optmol,mol):
         term,error=poltype.CheckNormalTermination(poltype.logdmafname)
         inputname=CreatePsi4DMAInputFile(poltype,poltype.logoptfname.replace('.log','.xyz'),poltype.comdmafname,mol)
         if term==False:
-            cmdstr='cd '+os.getcwd()+' && '+'psi4 '+inputname+' '+poltype.logdmafname
+            cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+inputname+' '+poltype.logdmafname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logdmafname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdirpsi4
@@ -358,7 +364,7 @@ def SPForDMA(poltype,optmol,mol):
             if os.path.isfile(poltype.chkdmafname):
                 os.remove(poltype.chkdmafname)
             gen_comfile(poltype,poltype.comdmafname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkdmafname,poltype.comtmp,optmol)
-            cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + poltype.comdmafname
+            cmdstr = 'cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + poltype.comdmafname
             
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logdmafname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
@@ -391,7 +397,7 @@ def SPForESP(poltype,optmol,mol):
         term,error=poltype.CheckNormalTermination(outputname)
         if term==False:
             poltype.WriteToLog("Calling: " + "Psi4 Gradient for ESP")
-            cmdstr='cd '+os.getcwd()+' && '+'psi4 '+inputname+' '+outputname
+            cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+inputname+' '+outputname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+outputname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdirpsi4
@@ -417,7 +423,7 @@ def SPForESP(poltype,optmol,mol):
             if os.path.isfile(poltype.chkespfname):
                 os.remove(poltype.chkespfname)
             gen_comfile(poltype,poltype.comespfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkespfname,poltype.comtmp,optmol)
-            cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + poltype.comespfname
+            cmdstr = 'cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + poltype.comespfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logespfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdirgau
@@ -499,6 +505,8 @@ def CheckDipoleMoments(poltype,optmol):
             diff=qmdipole-mmdipole
             if qmdipole!=0:
                 if np.abs(diff)>poltype.absdipoletol:
+            if np.abs(diff)>poltype.absdipoletol:
+                if qmdipole!=0:
                     ratio=np.abs(diff/qmdipole)
                     if ratio>poltype.dipoletol and poltype.suppressdipoleerr==False:
                         raise ValueError('Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)+' '+os.getcwd()) 

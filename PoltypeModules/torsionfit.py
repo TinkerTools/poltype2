@@ -721,10 +721,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             else:
                 insert_torphasedict(poltype,mol, tor, torprmdict, initangle, write_prm_dict)
 
-        
         tup=tuple(classkeylist)
         prmidx,initialprms = insert_torprmdict(poltype,mol, torprmdict)
-        
         #poltype.WriteToLog('number of parameters to fit for '+clskey+' are '+str(prmidx))
         # get all the lists for the current clskey
         angle_list = cls_angle_dict[tup]  # Torsion angle for each corresponding energy
@@ -1086,7 +1084,9 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]
         mm2_energy_list = [en - min(mm2_energy_list) for en in mm2_energy_list]
-
+        print('qm_energy_list',qm_energy_list)
+        print('mm_energy_list',mm_energy_list)
+        print('mm2_energy_list',mm2_energy_list)
         # find the difference between the two energy due to torsion profiles 
         tordif_list = [e2-e1 for (e1,e2) in zip(tor_e_list,tor_e_list2)]
         # normalize
@@ -1152,6 +1152,12 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             fig.savefig(figfname)
         elif dim==2:
             mmmat,mm2mat,fmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,mang_list,mm_energy_list,mm2_energy_list,ff_list,torset)
+            print('mmmat')
+            print(mmmat) 
+            print('mm2mat')
+            print(mm2mat) 
+            print('fmat')
+            print(fmat)   
             PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,mm2mat,'MM2 Heatmap (kcal/mol)','MM2_Heatmap.png',numprms,datapts,minRMSD)
             PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,fmat,'MM1+Fit Heatmap (kcal/mol)','MM1+Fit_Heatmap.png',numprms,datapts,minRMSD)
 

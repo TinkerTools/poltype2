@@ -5,6 +5,7 @@ import openbabel
 import re
 import time
 import apicall as call
+import shlex
 
 def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
     tempread=open(comfilecoords,'r')
@@ -103,6 +104,7 @@ def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetf
         if '!' not in line:
             tmpfh.write('    '+line)
     return tmpfh
+
 
 
 def NumberInLine(poltype,line):
@@ -224,11 +226,24 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule):
             if '!' not in line:
                 tmpfh.write(line)
 
+
+        temp=open(poltype.basissetpath+poltype.iodineoptbasissetfile,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            if '!' not in line:
+                tmpfh.write(line)
+
         tmpfh.write('\n')
         tmpfh.write('\n')
     tmpfh.close()
 
     
+
+   
+
+
+ 
 def gen_opt_str(poltype,optimizeoptlist):
     optstr = "#P opt"
     if optimizeoptlist:
@@ -343,7 +358,7 @@ def GeometryOptimization(poltype,mol):
         if not term:
             mystruct = load_structfile(poltype,poltype.molstructfname)
             gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,OBOPTmol)
-            cmdstr = 'cd '+os.getcwd()+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + poltype.comoptfname 
+            cmdstr = 'cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + poltype.comoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdirgau
@@ -372,7 +387,7 @@ def GeometryOptimization(poltype,mol):
         term,error=poltype.CheckNormalTermination(poltype.logoptfname)
         inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,OBOPTmol)
         if term==False:
-            cmdstr='cd '+os.getcwd()+' && '+'psi4 '+inputname+' '+poltype.logoptfname
+            cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+inputname+' '+poltype.logoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdirpsi4
