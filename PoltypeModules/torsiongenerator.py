@@ -1,7 +1,7 @@
 import symmetry as symm
 import optimization as opt
 import electrostaticpotential as esp
-import valence
+import databaseparser
 import torsionfit as torfit
 import apicall as call
 import os
@@ -157,14 +157,15 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     for i in range(len(torset)):
         tor=torset[i]
         a,b,c,d=tor[:]
-        for resttors in poltype.rotbndlist[' '.join([str(b),str(c)])]:
-            rta,rtb,rtc,rtd = resttors
-            rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
-            if resttors not in variabletorlist and resttors not in restlist:
-                if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
-                   (optmol.GetAtom(rtd).GetAtomicNum() != 1):
-                    tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
-                    restlist.append(resttors)
+        if ' '.join([str(b),str(c)]) in poltype.rotbndlist.keys(): 
+            for resttors in poltype.rotbndlist[' '.join([str(b),str(c)])]:
+                rta,rtb,rtc,rtd = resttors
+                rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
+                if resttors not in variabletorlist and resttors not in restlist:
+                    if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
+                       (optmol.GetAtom(rtd).GetAtomicNum() != 1):
+                        tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
+                        restlist.append(resttors)
 
     # Leave all torsions around other rotatable bonds fixed
     for rotkey,torsions in poltype.rotbndlist.items():
@@ -446,7 +447,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         poltype.tensorphases[tuple(torset)]=flatphaselist
         ax2idx=len(shape)-1-1
         ax1idx=ax2idx-1
-        dim=len(shape)
+        dim=len(phaselists)
         locs=[]
         if dim>=2:
             firstlocs=flatphaselist[...,::2,::2,:]
@@ -577,7 +578,7 @@ def GenerateBondTopology(poltype,optmol):
 
 
 
-def get_torlist(poltype,mol):
+def get_torlist(poltype,mol,missed_torsions):
     """
     Intent: Find unique rotatable bonds.
     Input:
@@ -601,10 +602,6 @@ def get_torlist(poltype,mol):
     torlist = []
     rotbndlist = {}
     iterbond = openbabel.OBMolBondIter(mol)
-    v1 = valence.Valence(poltype.versionnum,poltype.logfname,poltype.dontfrag,poltype.isfragjob,poltype.allownonaromaticringscanning)
-    v1.setidxtoclass(poltype.idxtosymclass)
-    v1.torguess(mol,False,[])
-    missed_torsions = v1.get_mt()
     for bond in iterbond:
         skiptorsion=True
         # is the bond rotatable
@@ -729,17 +726,18 @@ def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndli
             tpdkey = get_class_key(poltype,a2, b2, c2, d2)
             if tpdkey not in torsionlist:
                 torsionlist.append(tpdkey)
-        
+        torset=tuple([maintor])
+        prmnum=len(poltype.nfoldlist)*1+1
+        poltype.torsionsettonumptsneeded[torset]=prmnum
+
         if poltype.tordatapointsnum==None:
-            prmnum=len(poltype.nfoldlist)*(len(torsionlist))+1
-            torset=tuple([maintor])
-            poltype.torsionsettonumptsneeded[torset]=prmnum
             ang=round(360/(prmnum)) # offset parameter is the +1
             if ang> 30:
                 ang=30
            
         else:
             ang=round(360/poltype.tordatapointsnum)
+
         ratio=round(360/ang)
         poltype.rotbndtoanginc[key]=ang
     return poltype.rotbndtoanginc
@@ -804,7 +802,6 @@ def ConvertTinktoXYZ(poltype,filename):
     temp.close()
     tempwrite.close()
     return filename.replace('.xyz_2','_xyzformat.xyz')
-
 
 def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist):
     inputname = '%s-opt-'%(poltype.molecprefix)
@@ -874,7 +871,6 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
 
     if poltype.toroptpcm==True:
         temp.write('set {'+'\n')
-        temp.write('  basis '+poltype.toroptbasisset+'\n')
         temp.write('  g_convergence GAU_LOOSE'+'\n')
         temp.write('  scf_type pk'+'\n')
         temp.write('  pcm true'+'\n')
@@ -908,14 +904,27 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     temp.write('  try:'+'\n')
     if poltype.toroptpcm==True:
         temp.write('    set opt_coordinates cartesian'+'\n')
-    temp.write("    optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
+    spacedformulastr=optmol.GetSpacedFormula()
+    if ('I ' in spacedformulastr):
+        temp.write('    basis {'+'\n')
+        temp.write('    ['+' '+poltype.toroptbasissetfile+' '+poltype.iodinetoroptbasissetfile +' '+ ']'+'\n')
+        temp=ReadInBasisSet(poltype,temp,poltype.toroptbasissetfile,poltype.iodinetoroptbasissetfile,'    ')
+        temp.write('    }'+'\n')
+        temp.write("    optimize('%s')" % (poltype.toroptmethod.lower())+'\n')
+
+    else:
+        temp.write("    optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
     if poltype.freq:
         temp.write('    scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
     temp.write('    break'+'\n')
     temp.write('  except OptimizationConvergenceError:'+'\n')
     temp.write('    try:'+'\n')
     temp.write('      set opt_coordinates cartesian'+'\n')
-    temp.write("      optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
+    if ('I ' in spacedformulastr):
+        temp.write("      optimize('%s')" % (poltype.toroptmethod.lower())+'\n')
+    else:
+        temp.write("      optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
+
     if poltype.freq:
         temp.write('      scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
     temp.write('      break'+'\n')
@@ -925,6 +934,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     temp.close()
     outputname=inputname.replace('.psi4','.log')
     return inputname,outputname
+
 
 def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
     """
@@ -947,23 +957,35 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
     optstr=opt.gen_opt_str(poltype,optimizeoptlist)
 
     if ('-opt-' in comfname):
+        if ('I ' in poltype.mol.GetSpacedFormula()):
+            poltype.toroptbasisset='gen'
+            iodinebasissetfile=poltype.iodinetoroptbasissetfile
+            basissetfile=poltype.toroptbasissetfile
+
         if poltype.toroptpcm==True:
-            operationstr = "%s %s/%s MaxDisk=%s SCRF=(PCM)\n" % (optstr,poltype.toroptmethod,poltype.toroptbasisset, maxdisk)
+            operationstr = "%s %s/%s SCRF=(PCM)" % (optstr,poltype.toroptmethod,poltype.toroptbasisset)
         else:
-            operationstr = "%s %s/%s MaxDisk=%s\n" % (optstr,poltype.toroptmethod,poltype.toroptbasisset, maxdisk)
+            operationstr = "%s %s/%s" % (optstr,poltype.toroptmethod,poltype.toroptbasisset)
         commentstr = poltype.molecprefix + " Rotatable Bond Optimization on " + gethostname()
     else:
-#        operationstr = "#m06L/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s\n" % (torspbasisset, maxdisk)
+        if ('I ' in poltype.mol.GetSpacedFormula()):
+            prevbasisset=poltype.torspbasisset
+            poltype.torspbasisset='gen'
+            iodinebasissetfile=poltype.iodinetorspbasissetfile
+            basissetfile=poltype.torspbasissetfile
+
         if poltype.torsppcm==True:
-            operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s SCRF=(PCM) Pop=NBORead\n" % (poltype.torspmethod,poltype.torspbasisset, maxdisk)
+            operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) SCRF=(PCM) Pop=NBORead" % (poltype.torspmethod,poltype.torspbasisset)
         else:       
-            operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s Pop=NBORead\n" % (poltype.torspmethod,poltype.torspbasisset, maxdisk)
+            operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) Pop=NBORead" % (poltype.torspmethod,poltype.torspbasisset)
 
         commentstr = poltype.molecprefix + " Rotatable Bond SP Calculation on " + gethostname()   
 
-    bset=re.search('6-31\S+',operationstr)
     if ('I ' in poltype.mol.GetSpacedFormula()):
-        operationstr=re.sub(r'6-31\S+',r'Gen',operationstr)
+        operationstring+=' pseudo=read'
+    string=' MaxDisk=%s \n'%(maxdisk)
+    operationstr+=string
+
     tmpfh.write(operationstr)
     tmpfh.write('\n%s\n\n' % commentstr)
     tmpfh.write('%d %d\n' % (prevstruct.GetTotalCharge(), prevstruct.GetTotalSpinMultiplicity()))
@@ -978,17 +1000,40 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
             ln = xyzstrl[i]
             tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), float(ln.split()[2]),float(ln.split()[3]),float(ln.split()[4])))
         tmpfh.write('\n')
-        tmpfh.close()
         xyzstr.close()
     else:
         for atm in iteratom:
             tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), atm.x(),atm.y(),atm.z()))
-        tmpfh.write('\n')
+    
+    tmpfh.write('\n')
+    if ('I ' in poltype.mol.GetSpacedFormula()):
+        formulalist=poltype.mol.GetSpacedFormula().lstrip().rstrip().split()
+        temp=open(poltype.basissetpath+basissetfile,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            if '!' not in line:
+                tmpfh.write(line)
 
+        temp=open(poltype.basissetpath+iodinebasissetfile,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            if '!' not in line:
+                tmpfh.write(line)
+
+    if 'opt' not in comfname and poltype.dontfrag==False: 
+        tmpfh.write('\n')
         tmpfh.write('$nbo bndidx $end'+'\n')
         tmpfh.write('\n')
+    else:
+        tmpfh.write('\n')
+        tmpfh.write('\n')
 
-        tmpfh.close()
+
+
+    tmpfh.close()
+
 
 def save_structfile(poltype,molstruct, structfname):
     """
@@ -1093,7 +1138,6 @@ def write_arr_to_file(poltype,fname, array_list):
             outfh.write(str(ele))
         outfh.write("\n")
 
-
 def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,torset,phaseangles,makecube=None):
     inputname= '%s-sp-'%(poltype.molecprefix)
     for i in range(len(torset)):
@@ -1151,13 +1195,43 @@ def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,torset,phas
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
     temp.write('set freeze_core True'+'\n')
-    temp.write("E, wfn = energy('%s/%s',return_wfn=True)" % (poltype.torspmethod.lower(),poltype.torspbasisset)+'\n')
+    spacedformulastr=optmol.GetSpacedFormula()
+    if ('I ' in spacedformulastr):
+        temp.write('basis {'+'\n')
+        temp.write('['+' '+poltype.torspbasissetfile+' '+poltype.iodinetorspbasissetfile +' '+ ']'+'\n')
+        temp=ReadInBasisSet(poltype,temp,poltype.torspbasissetfile,poltype.iodinetorspbasissetfile,'')
+        temp.write('}'+'\n')
+        temp.write("E, wfn = energy('%s',return_wfn=True)" % (poltype.torspmethod.lower())+'\n')
+
+    else:
+
+        temp.write("E, wfn = energy('%s/%s',return_wfn=True)" % (poltype.torspmethod.lower(),poltype.torspbasisset)+'\n')
     temp.write('oeprop(wfn,"WIBERG_LOWDIN_INDICES")'+'\n')
 
     temp.write('clean()'+'\n')
     temp.close()
     outputname=os.path.splitext(inputname)[0] + '.log'
     return inputname,outputname
+
+
+def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetfile,space):
+    newtemp=open(poltype.basissetpath+normalelementbasissetfile,'r')
+    results=newtemp.readlines()
+    newtemp.close()
+    for line in results:
+        if '!' not in line:
+            tmpfh.write(space+line)
+
+
+    newtemp=open(poltype.basissetpath+otherelementbasissetfile,'r')
+    results=newtemp.readlines()
+    newtemp.close()
+    for line in results:
+        if '!' not in line:
+            tmpfh.write(space+line)
+    return tmpfh
+
+
 
 def RemoveDuplicateRotatableBondTypes(poltype):
     tortorotbnd={}

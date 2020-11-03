@@ -75,7 +75,6 @@ def fitfunc (poltype,parms, x,torset, torprmdict, debug = False):
                 for clsangle, clscnt in torprm['phasedict'].items():
                     # current dihedral angles and how many torsions are this angle 
                     # current parameter for this 'fold'
-                    
                     prm = torprm['prmdict'][nfold]
                     # not called by 'eval'
                     if parms is not 'eval':
@@ -569,18 +568,15 @@ def insert_torprmdict(poltype,mol, torprmdict):
                 elif max(test_tor_energy) > 1e-10:
                     torprm['prmdict'][nfold] = prmidx
                     prmidx += 1
+                    if chkclskey in poltype.classkeytoinitialprmguess.keys():
+                        prms=poltype.classkeytoinitialprmguess[chkclskey]
+                        initialprms.append(prms[nfold-1])
+                    else: 
+                        initialprms.append(0)
+
         if not torprmdict[chkclskey]['prmdict']:
             torprmdict[chkclskey]['count'] = 0
             torprmdict[chkclskey]['phasedict'] = {}
-        if chkclskey in poltype.classkeytoinitialprmguess.keys():
-            prms=poltype.classkeytoinitialprmguess[chkclskey]
-            initialprms.append(prms[0])
-            initialprms.append(prms[1])
-            initialprms.append(prms[2])
-        else: 
-            initialprms.append(0)
-            initialprms.append(0)
-            initialprms.append(0)
 
         
     prmidx += 1
@@ -603,13 +599,14 @@ def is_torprmdict_all_empty (poltype,torprmdict):
             return False
     return result
 
+
 def GenerateBoundaries(poltype,tor_energy_list,refine,initialprms):
     lowerbounds=[]
     upperbounds=[]
     max_amp = max(tor_energy_list) - min(tor_energy_list)
     if refine==False: 
-        lowerbounds.append(-max_amp)
-        upperbounds.append(max_amp)
+        bounds=[-max_amp,max_amp]
+
     else:
         for initialprm in initialprms:
             value=numpy.abs(initialprm)
@@ -620,11 +617,9 @@ def GenerateBoundaries(poltype,tor_energy_list,refine,initialprms):
             else:
                 lowerbounds.append(-max_amp)
                 upperbounds.append(max_amp)
-    bounds=[lowerbounds,upperbounds]
+        bounds=[lowerbounds,upperbounds]
     return tuple(bounds),max_amp
        
-
-
 
 def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,clskeyswithbadfits):
     """

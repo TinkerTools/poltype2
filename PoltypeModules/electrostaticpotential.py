@@ -81,7 +81,6 @@ def GrabGridData(poltype):
         gridpts = fp.readlines()
     return Vvals,gridpts
 
-
 def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,numproc,charge,makecube=None):
     tempread=open(comfilecoords,'r')
     results=tempread.readlines()
@@ -102,7 +101,15 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
     temp.write('set maxiter '+str(poltype.scfmaxiter)+'\n')
     temp.write('set freeze_core True'+'\n')
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
-    temp.write("E, wfn = properties('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
+    spacedformulastr=mol.GetSpacedFormula()
+    if ('I ' in spacedformulastr):
+        temp.write('basis {'+'\n')
+        temp.write('['+' '+poltype.espbasissetfile+' '+poltype.iodineespbasissetfile +' '+ ']'+'\n')
+        temp=ReadInBasisSet(poltype,temp,poltype.espbasissetfile,poltype.iodineespbasissetfile)
+        temp.write('}'+'\n')
+        temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
+    else:
+        temp.write("E, wfn = properties('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
     if makecube==True:
        temp.write('oeprop(wfn,"GRID_ESP","WIBERG_LOWDIN_INDICES","MULLIKEN_CHARGES")'+'\n')
     else:
@@ -112,6 +119,7 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
     temp.close()
     outputname=os.path.splitext(inputname)[0] + '.log'
     return inputname,outputname
+
 
 def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     tempread=open(comfilecoords,'r')
@@ -132,11 +140,40 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
     temp.write('set freeze_core True'+'\n')
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
-    temp.write("E, wfn = energy('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower(),poltype.dmabasisset)+'\n')
+    spacedformulastr=mol.GetSpacedFormula()
+    if ('I ' in spacedformulastr):
+        temp.write('basis {'+'\n')
+        temp.write('['+' '+poltype.dmabasissetfile+' '+poltype.iodinedmabasissetfile +' '+ ']'+'\n')
+        temp=ReadInBasisSet(poltype,temp,poltype.dmabasissetfile,poltype.iodinedmabasissetfile)
+        temp.write('}'+'\n')
+        temp.write("E, wfn = energy('%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower())+'\n')
+
+    else:
+        temp.write("E, wfn = energy('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower(),poltype.dmabasisset)+'\n')
     temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
     temp.write('clean()'+'\n')
     temp.close()
     return inputname
+
+def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetfile):
+    newtemp=open(poltype.basissetpath+normalelementbasissetfile,'r')
+    results=newtemp.readlines()
+    newtemp.close()
+    for line in results:
+        if '!' not in line:
+            tmpfh.write(line)
+
+
+    newtemp=open(poltype.basissetpath+otherelementbasissetfile,'r')
+    results=newtemp.readlines()
+    newtemp.close()
+    for line in results:
+        if '!' not in line:
+            tmpfh.write(line)
+    return tmpfh
+
+
+
 
 def GrabFinalPsi4Energy(poltype,logname):
     energy=None
@@ -190,25 +227,44 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
     tmpfh = open(comfname, "a")
     #NOTE: Need to pass parameter to specify basis set
     if ('dma' in comfname):
+        if ('I ' in poltype.mol.GetSpacedFormula()):
+            poltype.dmabasisset='gen'
+            iodinebasissetfile=poltype.iodinedmabasissetfile 
+            basissetfile=poltype.dmabasissetfile 
+            #poltype.dmamethod='wB97XD'
         if poltype.dmamethod=='MP2':
             densitystring='MP2'
         else:
             densitystring='SCF'
-        opstr="#P %s/%s Sp Density=%s MaxDisk=%s\n" % (poltype.dmamethod,poltype.dmabasisset, densitystring,maxdisk)
+
+
+        opstr="#P %s/%s Sp Density=%s" % (poltype.dmamethod,poltype.dmabasisset, densitystring)
     elif ('pop' in comfname):
-        opstr="#P HF/%s MaxDisk=%s Pop=SaveMixed\n" % (poltype.popbasisset, maxdisk)
+        opstr="#P HF/%s MaxDisk=%s Pop=SaveMixed" % (poltype.popbasisset)
     else:
+        if ('I ' in poltype.mol.GetSpacedFormula()):
+            poltype.espbasisset='gen'
+            iodinebasissetfile=poltype.iodineespbasissetfile 
+            basissetfile=poltype.espbasissetfile 
+            #poltype.espmethod='wB97XD'
+
+
         if poltype.espmethod=='MP2':
             densitystring='MP2'
         else:
             densitystring='SCF'
         
-        opstr="#P %s/%s Sp Density=%s SCF=Save MaxDisk=%s Pop=NBORead\n" % (poltype.espmethod,poltype.espbasisset, densitystring,maxdisk)
+        if poltype.dontfrag==False: 
+            opstr="#P %s/%s Sp Density=%s SCF=Save Pop=NBORead" % (poltype.espmethod,poltype.espbasisset, densitystring)
+        else:
+            opstr="#P %s/%s Sp Density=%s SCF=Save" % (poltype.espmethod,poltype.espbasisset, densitystring)
 
 
-    bset=re.search('(?i)(6-31|aug-cc)\S+',opstr)
-    if ('I ' in mol.GetSpacedFormula()):
-        opstr=re.sub(r'(?i)(6-31|aug-cc)\S+',r'Gen',opstr)
+    if ('I ' in poltype.mol.GetSpacedFormula()):
+        opstr+=' pseudo=read'
+    string=' MaxDisk=%s \n'%(maxdisk)
+    opstr+=string
+
     tmpfh.write(opstr)
     commentstr = poltype.molecprefix + " Gaussian SP Calculation on " + gethostname()
     tmpfh.write('\n%s\n\n' % commentstr)
@@ -223,9 +279,32 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
 
 
     tmpfh.write('\n')
-    tmpfh.write('$nbo bndidx $end'+'\n')
-    tmpfh.write('\n')
+    if ('I ' in poltype.mol.GetSpacedFormula()):
+        formulalist=poltype.mol.GetSpacedFormula().lstrip().rstrip().split()
+        temp=open(poltype.basissetpath+basissetfile,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            if '!' not in line:
+                tmpfh.write(line)
+
+        temp=open(poltype.basissetpath+iodinebasissetfile,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            if '!' not in line:
+                tmpfh.write(line)
+    if not 'dma' in comfname and poltype.dontfrag==False:  
+        tmpfh.write('\n')
+        tmpfh.write('$nbo bndidx $end'+'\n')
+        tmpfh.write('\n')
+    else:
+        tmpfh.write('\n')
+        tmpfh.write('\n')
+
+
     tmpfh.close()
+
 
 def ElectrostaticPotentialFitting(poltype):
     optmpolecmd = poltype.potentialexe + " 6 " + poltype.xyzoutfile + " -k " + poltype.key2fname + " " + poltype.qmesp2fname + " N 0.1"
@@ -418,9 +497,11 @@ def CheckDipoleMoments(poltype,optmol):
             mmdipole=float(linesplit[-2])
             poltype.WriteToLog('MM Dipole moment = '+str(mmdipole))
             diff=qmdipole-mmdipole
-            ratio=np.abs(diff/qmdipole)
-            if ratio>poltype.dipoletol and poltype.suppressdipoleerr==False:
-                raise ValueError('Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)+' '+os.getcwd()) 
+            if qmdipole!=0:
+                if np.abs(diff)>poltype.absdipoletol:
+                    ratio=np.abs(diff/qmdipole)
+                    if ratio>poltype.dipoletol and poltype.suppressdipoleerr==False:
+                        raise ValueError('Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)+' '+os.getcwd()) 
 
 def ConvertDipoleToCOMFrame(poltype,dipole,optmol):
     nucsum = 0.0

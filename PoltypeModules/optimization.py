@@ -22,7 +22,6 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
     temp.write('}'+'\n')
     if poltype.optpcm==True:
         temp.write('set {'+'\n')
-        temp.write('  basis '+poltype.optbasisset+'\n')
         temp.write('  g_convergence GAU_LOOSE'+'\n')
         temp.write('  scf_type pk'+'\n')
         temp.write('  pcm true'+'\n')
@@ -56,14 +55,27 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
     temp.write('  try:'+'\n')
     if poltype.optpcm==True:
         temp.write('    set opt_coordinates cartesian'+'\n')
-    temp.write("    optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
+    spacedformulastr=mol.GetSpacedFormula()
+    if ('I ' in spacedformulastr):
+        temp.write('    basis {'+'\n')
+        temp.write('    ['+' '+poltype.optbasissetfile+' '+poltype.iodineoptbasissetfile +' '+ ']'+'\n')
+        temp=ReadInBasisSet(poltype,temp,poltype.optbasissetfile,poltype.iodineoptbasissetfile)
+        temp.write('    }'+'\n')
+        temp.write("    optimize('%s')" % (poltype.optmethod.lower())+'\n')
+
+    else:
+        temp.write("    optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
     if poltype.freq:
         temp.write('    scf_e,scf_wfn=freq("%s/%s",return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
     temp.write('    break'+'\n')
     temp.write('  except OptimizationConvergenceError:'+'\n')
     temp.write('    try:'+'\n')
     temp.write('      set opt_coordinates cartesian'+'\n')
-    temp.write("      optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
+    if ('I ' in spacedformulastr):
+        temp.write("      optimize('%s')" % (poltype.optmethod.lower())+'\n')
+    else:
+        temp.write("      optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
+
     if poltype.freq:
         temp.write('      scf_e,scf_wfn=freq("%s/%s",return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
     temp.write('      break'+'\n')
@@ -74,6 +86,24 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
     temp.close()
     outputname=os.path.splitext(inputname)[0] + '.log'
     return inputname,outputname
+
+def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetfile):
+    newtemp=open(poltype.basissetpath+normalelementbasissetfile,'r')
+    results=newtemp.readlines()
+    newtemp.close()
+    for line in results:
+        if '!' not in line:
+            tmpfh.write('    '+line)
+
+
+    newtemp=open(poltype.basissetpath+otherelementbasissetfile,'r')
+    results=newtemp.readlines()
+    newtemp.close()
+    for line in results:
+        if '!' not in line:
+            tmpfh.write('    '+line)
+    return tmpfh
+
 
 def NumberInLine(poltype,line):
     numinline=False
@@ -126,7 +156,6 @@ def GrabFinalXYZStructure(poltype,logname,filename):
         obConversion.SetOutFormat('xyz')
         obConversion.WriteFile(tempmol, filename)
 
-
 def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule):
     """
     Intent: Create *.com file for qm opt
@@ -148,19 +177,24 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule):
     if restraintlist:
         optimizeoptlist.insert(0,poltype.gausoptcoords)
     optstr=gen_opt_str(poltype,optimizeoptlist)
-    if ('I ' in molecule.GetSpacedFormula()):
-        optstring="%s HF/Gen freq Guess=INDO MaxDisk=%s\n" % (optstr,maxdisk)
-    else:
-        if poltype.freq==True:
-            if poltype.optpcm==True:
-                optstring= "%s %s/%s freq Guess=INDO MaxDisk=%s SCRF=(PCM)\n" % (optstr,poltype.optmethod,poltype.optbasisset,maxdisk)
-            else:
-                optstring= "%s %s/%s freq Guess=INDO MaxDisk=%s\n" % (optstr,poltype.optmethod,poltype.optbasisset,maxdisk)
+    spacedformulastr=molecule.GetSpacedFormula()
+    if ('I ' in spacedformulastr):
+        prevoptbasisset=poltype.optbasisset
+        poltype.optbasisset='gen'
+    if poltype.freq==True:
+        if poltype.optpcm==True:
+            optstring= "%s %s/%s freq SCRF=(PCM)" % (optstr,poltype.optmethod,poltype.optbasisset)
         else:
-            if poltype.optpcm==True:
-                optstring= "%s %s/%s Guess=INDO MaxDisk=%s SCRF=(PCM)\n" % (optstr,poltype.optmethod,poltype.optbasisset,maxdisk)
-            else:
-                optstring= "%s %s/%s Guess=INDO MaxDisk=%s\n" % (optstr,poltype.optmethod,poltype.optbasisset,maxdisk)
+            optstring= "%s %s/%s freq" % (optstr,poltype.optmethod,poltype.optbasisset)
+    else:
+        if poltype.optpcm==True:
+            optstring= "%s %s/%s SCRF=(PCM)" % (optstr,poltype.optmethod,poltype.optbasisset)
+        else:
+            optstring= "%s %s/%s" % (optstr,poltype.optmethod,poltype.optbasisset)
+    if ('I ' in spacedformulastr):
+        optstring+=' pseudo=read'
+    string=' MaxDisk=%s \n'%(maxdisk)
+    optstring+=string
     tmpfh.write(optstring)
     commentstr = poltype.molecprefix + " Gaussian OPT Calculation on " + gethostname()
     tmpfh.write('\n%s\n\n' % commentstr)
@@ -173,8 +207,27 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule):
     for atm in iteratombab:
         tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), atm.x(), atm.y(), atm.z()))
     tmpfh.write('\n')
+    
+    if ('I ' in spacedformulastr):
+        formulalist=spacedformulastr.lstrip().rstrip().split()
+        temp=open(poltype.basissetpath+poltype.optbasissetfile,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            if '!' not in line:
+                tmpfh.write(line)
 
+        temp=open(poltype.basissetpath+poltype.iodineoptbasissetfile,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            if '!' not in line:
+                tmpfh.write(line)
+
+        tmpfh.write('\n')
+        tmpfh.write('\n')
     tmpfh.close()
+
     
 def gen_opt_str(poltype,optimizeoptlist):
     optstr = "#P opt"

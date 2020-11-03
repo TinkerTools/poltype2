@@ -10,7 +10,7 @@ import numpy
 import shutil
 import copy
 from rdkit.Chem import rdFMCS
-
+import databaseparser as db
 
 def GenIndexToTypeIndexDic(poltype,tinkxyzfile):
     temp=open(tinkxyzfile,'r')
@@ -375,6 +375,7 @@ def GrabPrmClassToBoundryClassForPrmFile(poltype,listofvalterms,proidxtoligidx,l
 
 
 def GrabParametersFromKeyFile(poltype,key,torsionligtypestoboundtypesforkey,ligboundaryatomtypes,poltypetoprmtype,atomtypetoframedef,mincorenumber,maxcorenumber):
+    
     temp=open(key,'r')
     results=temp.readlines()
     temp.close()
@@ -455,177 +456,6 @@ def GrabParametersFromKeyFile(poltype,key,torsionligtypestoboundtypesforkey,ligb
     
     return torsionprms,polarizeprms,mpoleprms
 
-def GrabParametersFromPrmFile(poltype,bondprmclassestoboundclasses,angleprmclassestoboundclasses,torsionprmclassestoboundclasses,ligboundaryatomtypes,poltypetoprmtype,proteintypestoframedefforprmfile,check):
-    if check==False:
-        temp=open(poltype.amoebabioprmpath,'r')
-    else:
-        temp=open(poltype.ModifiedResiduePrmPath,'r')
-    results=temp.readlines()
-    temp.close()
-    bondprms=[]
-    angleprms=[]
-    torsionprms=[]
-    strbndprms=[]
-    pitorsprms=[]
-    mpoleprms=[]
-    opbendprms=[]
-    for lineidx in range(len(results)):
-        line=results[lineidx]
-        linesplit=line.split()
-        linesplitall=re.split(r'(\s+)', line)
-        if '#' in line:
-            continue
-        if 'bond' in line and 'cubic' not in line and 'quartic' not in line:
-            bondclasslist=[int(linesplit[1]),int(linesplit[2])]
-            foundbond=False
-            
-            if tuple(bondclasslist) in bondprmclassestoboundclasses.keys():
-                bondtup=tuple(bondclasslist)
-                foundbond=True
-            elif tuple(bondclasslist[::-1]) in bondprmclassestoboundclasses.keys():
-                bondtup=tuple(bondclasslist[::-1])
-                foundbond=True
-            if foundbond==True:
-                boundclasses=bondprmclassestoboundclasses[bondtup]
-                for boundcls in boundclasses:
-                    linesplitall[2]=str(boundcls[0])    
-                    linesplitall[4]=str(boundcls[1])  
-                    newline=''.join(linesplitall)
-                    bondprms.append(newline)           
-        elif 'angle-cubic' not in line and 'angle-quartic' not in line and 'pentic' not in line and 'sextic' not in line and ('angle' in line or 'anglep' in line) :
-            angleclasslist=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3])]
-            foundangle=False
-            if tuple(angleclasslist) in angleprmclassestoboundclasses.keys():
-                angletup=tuple(angleclasslist)
-                foundangle=True
-            elif tuple(angleclasslist[::-1]) in angleprmclassestoboundclasses.keys():
-                angletup=tuple(angleclasslist[::-1])
-                foundangle=True
-            if foundangle==True:
-                boundclasses=angleprmclassestoboundclasses[angletup]
-                for boundcls in boundclasses:
-                    linesplitall[2]=str(boundcls[0])    
-                    linesplitall[4]=str(boundcls[1])  
-                    linesplitall[6]=str(boundcls[2])
-                    newline=''.join(linesplitall)
-                    angleprms.append(newline) 
-        
-        elif 'torsion' in line and 'torsionunit' not in line:
-            torsionclasslist=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3]),int(linesplit[4])]
-            foundtorsion=False
-            if tuple(torsionclasslist) in torsionprmclassestoboundclasses.keys():
-                torsiontup=tuple(torsionclasslist)
-                foundtorsion=True
-            elif tuple(torsionclasslist[::-1]) in torsionprmclassestoboundclasses.keys():
-                torsiontup=tuple(torsionclasslist[::-1])
-                foundtorsion=True
-            if foundtorsion==True:   
-                boundclasses=torsionprmclassestoboundclasses[torsiontup]
-                for boundcls in boundclasses:
-                    if linesplitall[0]=='': # sometimes when torsion is added back to the key file, it has a space in front of it
-                        linesplitall[4]=str(boundcls[0])    
-                        linesplitall[6]=str(boundcls[1])  
-                        linesplitall[8]=str(boundcls[2])
-                        linesplitall[10]=str(boundcls[3])
-                    else:
-                        linesplitall[2]=str(boundcls[0])    
-                        linesplitall[4]=str(boundcls[1])  
-                        linesplitall[6]=str(boundcls[2])
-                        linesplitall[8]=str(boundcls[3])
-
-                    newline=''.join(linesplitall)
-                    torsionprms.append(newline)
-
-        elif 'strbnd' in line:
-            angleclasslist=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3])]
-            foundstrbnd=False
-            if tuple(angleclasslist) in angleprmclassestoboundclasses.keys():
-                angletup=tuple(angleclasslist)
-                foundstrbnd=True
-            elif tuple(angleclasslist[::-1]) in angleprmclassestoboundclasses.keys():
-                angletup=tuple(angleclasslist[::-1])
-                foundstrbnd=True
-            if foundstrbnd==True:
-                boundclasses=angleprmclassestoboundclasses[angletup]
-                for boundcls in boundclasses:
-                    linesplitall[2]=str(boundcls[0])    
-                    linesplitall[4]=str(boundcls[1])  
-                    linesplitall[6]=str(boundcls[2])
-                    newline=''.join(linesplitall)
-                    strbndprms.append(newline) 
-
-               
-        elif 'pitors' in line:
-            bondclasslist=[int(linesplit[1]),int(linesplit[2])]
-            foundpitors=False
-            if tuple(bondclasslist) in bondprmclassestoboundclasses.keys():
-                bondtup=tuple(bondclasslist)
-                foundpitors=True
-            elif tuple(bondclasslist[::-1]) in bondprmclassestoboundclasses.keys():
-                bondtup=tuple(bondclasslist[::-1])
-                foundpitors=True
-            if foundpitors==True:
-                boundclasses=bondprmclassestoboundclasses[bondtup]
-                for boundcls in boundclasses:
-                    linesplitall[2]=str(boundcls[0])    
-                    linesplitall[4]=str(boundcls[1])  
-                    newline=''.join(linesplitall)
-                    pitorsprms.append(newline)
-
-        elif 'opbend' in line and 'opbendtype' not in line and 'cubic' not in line and 'quartic' not in line and 'pentic' not in line and 'sextic' not in line:
-            bondclasslist=[int(linesplit[1]),int(linesplit[2])]
-            foundopbend=False
-            reversedopbend=False
-            if tuple(bondclasslist) in bondprmclassestoboundclasses.keys():
-                bondtup=tuple(bondclasslist)
-                foundopbend=True
-            elif tuple(bondclasslist[::-1]) in bondprmclassestoboundclasses.keys():
-                bondtup=tuple(bondclasslist[::-1])
-                foundopbend=True
-                reversedopbend=True # need to be careful because for example 3 409 0 0 will be different than 409 3 0 0, so need to swap the boundindexes if the bondtypelist is reversed
-
-            if foundopbend==True:
-                boundclasses=bondprmclassestoboundclasses[bondtup]
-                for boundcls in boundclasses:
-                    if reversedopbend==True:
-                        linesplitall[4]=str(boundcls[0])    
-                        linesplitall[2]=str(boundcls[1]) 
-                    else:
-                        linesplitall[2]=str(boundcls[0])    
-                        linesplitall[4]=str(boundcls[1])  
-                    newline=''.join(linesplitall)
-                    opbendprms.append(newline)
- 
-        elif 'multipole' in line:
-            newlinesplit=linesplit[1:-1]
-            frames=[int(i) for i in newlinesplit]
-            grabit=False
-            if tuple(frames) in proteintypestoframedefforprmfile.keys():
-                theframe=tuple(frames)
-                grabit=True
-            elif tuple(frames[::-1]) in proteintypestoframedefforprmfile.keys():
-                theframe=tuple(frames[::-1])
-                grabit=True
-            if grabit==True:
-                chgpartofline=linesplitall[-2:] # include space
-                phrasepartofline=linesplitall[:2] # include space
-                spacetoadd='   '
-                newlist=[]
-                newlist.extend(phrasepartofline)
-                framedef=proteintypestoframedefforprmfile[atomtype]
-                for typenum in framedef:
-                    newlist.append(str(typenum))
-                    newlist.append(spacetoadd)
-                newlist=newlist[:-1] # remove last space then add space before chg
-                newlist.extend(chgpartofline)
-                newline=''.join(newlist)
-                mpolelist=[newline,results[lineidx+1],results[lineidx+2],results[lineidx+3],results[lineidx+4]]
-                for mpoleline in mpolelist:
-                    mpoleprms.append(mpoleline)
-
-
-    
-    return bondprms,angleprms,torsionprms,strbndprms,pitorsprms,mpoleprms,opbendprms
 
 def CountNumberPoltypeNums(poltype,typelist,mincorenumber,maxcorenumber):
     count=0
@@ -709,7 +539,7 @@ def GrabMultipoleFrameDefintions(poltype,key,boundaryatomidxs,ligidxtotypeidx,pr
     return atomtypetoframedef,proteintypestoframedefforprmfile
 
 
-def WriteNewKeyFile(poltype,atomdefs,bondprms,angleprms,torsionprms,strbndprms,pitorprms,opbendprms,polarizeprms,vdwprms,mpoleprms,writekey,amoebabioprmpath):
+def WriteNewKeyFile(poltype,atomdefs,bondprms,angleprms,torsionprms,strbndprms,opbendprms,polarizeprms,vdwprms,mpoleprms,writekey,amoebabioprmpath):
     # assumes that there is white space at end of every parameter block, just add a line to key_5
     temp=open(writekey,'a')
     temp.write('\n\n\n\n\n\n\n\n\n\n')
@@ -727,7 +557,6 @@ def WriteNewKeyFile(poltype,atomdefs,bondprms,angleprms,torsionprms,strbndprms,p
     firstpassstrbnd=True
     firstpasspolarize=True
     firstpassvdw=True
-    firstpasspitors=True
     firstpassvdw=True
     firstpassmpole=True
     firstpassopbend=True
@@ -739,7 +568,6 @@ def WriteNewKeyFile(poltype,atomdefs,bondprms,angleprms,torsionprms,strbndprms,p
     passedstrbndblock=False
     passedpolarizeblock=False
     passedvdwblock=False
-    passedpitorsblock=False
     passedvdwblock=False
     passedmpoleblock=False
     passedopbendblock=False
@@ -808,16 +636,6 @@ def WriteNewKeyFile(poltype,atomdefs,bondprms,angleprms,torsionprms,strbndprms,p
                 linelist.append(polarizeline)
             if line not in linelist:
                 linelist.append(line)
-        elif 'pitors' in line and firstpasspitors==False:
-            firstpasspitors=True
-            if line not in linelist:
-                linelist.append(line)
-        elif 'pitors' not in line and firstpasspitors==True and passedpitorsblock==False:
-            passedpitorsblock=True
-            for pitorsline in pitorprms:
-                linelist.append(pitorsline)
-            if line not in linelist:
-                linelist.append(line)
         elif 'opbend' in line and firstpassopbend==False:
             firstpassopbend=True
             if line not in linelist:
@@ -859,187 +677,6 @@ def WriteNewKeyFile(poltype,atomdefs,bondprms,angleprms,torsionprms,strbndprms,p
     temp.close()
 
 
-def WriteToPrmFile(poltype,atomdefs,bondprms,angleprms,torsionprms,strbndprms,pitorprms,opbendprms,polarizeprms,vdwprms,mpoleprms,prmpath):
-    # assumes that there is white space at end of every parameter block, just add a line to key_5
-    temp=open(prmpath,'r')
-    results=temp.readlines()
-    temp.close()
-    lastidx=len(results)-1
-    newprmname=prmpath.replace('.prm','_temp.prm')
-    temp=open(newprmname,'w')
-    linelist=[]
-    firstpassatomdef=False
-    firstpassbond=False
-    firstpassangle=False
-    firstpasstorsion=False
-    firstpassstrbnd=False
-    firstpasspolarize=False
-    firstpassvdw=False
-    firstpasspitors=False
-    firstpassmpole=False
-    firstpassopbend=False
-    passedatomdefblock=False
-    passedbondblock=False
-    passedangleblock=False
-    passedtorsionblock=False
-    passedstrbndblock=False
-    passedpolarizeblock=False
-    passedvdwblock=False
-    passedpitorsblock=False
-    passedmpoleblock=False
-    passedopbendblock=False
-
-    
-    for lineidx in range(len(results)):
-        line=results[lineidx]
-        if 'type' not in line and 'cubic' not in line and 'quartic' not in line and 'pentic' not in line and 'sextic' not in line and 'unit' not in line and 'scale' not in line:
-            prewhitespacelinesplit=re.split(r'(\s+)', line)
-            if 'atom' in line and firstpassatomdef==False:
-                firstpassatomdef=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'atom' not in line and firstpassatomdef==True and passedatomdefblock==False:
-                passedatomdefblock=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-                for atomdef in atomdefs:
-                    temp.write(atomdef)
-                temp.write(line)
-            elif 'vdw' in line and firstpassvdw==False:
-                firstpassvdw=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'vdw' not in line and firstpassvdw==True and passedvdwblock==False:
-                passedvdwblock=True
-                for vdwline in vdwprms:
-                    temp.write(vdwline)
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'bond' in line and firstpassbond==False:
-                firstpassbond=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'bond' not in line and firstpassbond==True and passedbondblock==False:
-                passedbondblock=True
-                for bondline in bondprms:
-                    temp.write(bondline)
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'angle' in line and firstpassangle==False:
-                firstpassangle=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'angle' not in line and firstpassangle==True and passedangleblock==False:
-                passedangleblock=True
-                for angleline in angleprms:
-                    temp.write(angleline)
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'torsion' in line and firstpasstorsion==False:
-                firstpasstorsion=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'torsion' not in line and firstpasstorsion==True and passedtorsionblock==False:
-                passedtorsionblock=True
-                for torsionline in torsionprms:
-                    temp.write(torsionline)
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'strbnd' in line and firstpassstrbnd==False:
-                firstpassstrbnd=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'strbnd' not in line and firstpassstrbnd==True and passedstrbndblock==False:
-                passedstrbndblock=True
-                for strbndline in strbndprms:
-                    temp.write(strbndline)
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'polarize' in line and firstpasspolarize==False:
-                firstpasspolarize=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'polarize' not in line and firstpasspolarize==True and passedpolarizeblock==False:
-                passedpolarizeblock=True
-                for polarizeline in polarizeprms:
-                    temp.write(polarizeline)
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'pitors' in line and firstpasspitors==False:
-                firstpasspitors=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'pitors' not in line and firstpasspitors==True and passedpitorsblock==False:
-                passedpitorsblock=True
-                for pitorsline in pitorprms:
-                    temp.write(pitorsline)
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'opbend' in line and firstpassopbend==False:
-                firstpassopbend=True
-                temp.write(line)
-            elif 'opbend' not in line and firstpassopbend==True and passedopbendblock==False:
-                passedopbendblock=True
-                for opbendline in opbendprms:
-                    temp.write(opbendline)
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'multipole' in line and firstpassmpole==False:
-                firstpassmpole=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'multipole' not in line and firstpassmpole==True and passedmpoleblock==False and line=='\n':
-                passedmpoleblock=True
-                for mpoleline in mpoleprms:
-                    temp.write(mpoleline)
-            else:
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-
-    temp.flush()
-    os.fsync(temp.fileno())
-    sys.stdout.flush()
-    temp.close()
-    os.remove(prmpath)
-    os.rename(newprmname,prmpath)
 
 def GenerateFragBabel(poltype,molindexlist,pdbname):
     atomidxstoremove=[]
@@ -2350,47 +1987,7 @@ def ReadSMARTSToTypeLib(poltype,smarts,modmol):
                 ligidxtotypeidx[ligidx]=typeidx
     return ligidxtotypeidx
 
-def GrabCoreParameters(poltype,key5fname):
-    atomdefs=[]
-    bondprms=[]
-    angleprms=[]
-    torsionprms=[]
-    strbndprms=[]
-    pitorprms=[]
-    opbendprms=[]
-    polarizeprms=[]
-    vdwprms=[]
-    mpoleprms=[]
-    temp=open(key5fname,'r')
-    results=temp.readlines()
-    temp.close()
-    for lineidx in range(len(results)):
-        line=results[lineidx]
-        if 'atom' in line:
-            atomdefs.append(line)
-        elif 'bond' in line:
-            bondprms.append(line)
-        elif 'angle' in line or 'anglep' in line:
-            angleprms.append(line)
-        elif 'torsion' in line:
-            torsionprms.append(line) 
-        elif 'strbnd' in line:
-            strbndprms.append(line)
-        elif 'pitor' in line:
-            pitorprms.append(line)
-        elif 'opbend' in line:
-            opbendprms.append(line)
-        elif 'polarize' in line:
-            polarizeprms.append(line)
-        elif 'vdw' in line: 
-            vdwprms.append(line)
-        elif 'multipole' in line:
-            mpolelist=[line,results[lineidx+1],results[lineidx+2],results[lineidx+3],results[lineidx+4]]
-            for mpoleline in mpolelist:
-                mpoleprms.append(mpoleline)
-
-    return atomdefs,bondprms,angleprms,torsionprms,strbndprms,pitorprms,opbendprms,polarizeprms,vdwprms,mpoleprms
-        
+       
 def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference,modligidxs):
 
     obConversion = openbabel.OBConversion()
@@ -2415,7 +2012,6 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
 
     # for  polarize just use list of single atom types, (the list of boundary atom types), do not need to transfer vdw, that does not cross boundary polarize neighbors do cross the boundary
 
-    # for pitor use bond list (just two consecutive atoms)
 
 
     transferableidxs=GetIdxsFromListOfTorsionsForPrm(poltype,listoftorsionsforprm) # now take connected atomidx (usually CB) and add any hydrogens connected
@@ -2426,8 +2022,8 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
 
     # these parameters will be taken from the key file so need to no what to convert the indexes to once they are taken from the key file
     if check==False:
-        maxcorenumber=GrabMaxTypeNumber(poltype,poltype.key5fname)
-        mincorenumber=GrabMinTypeNumber(poltype,poltype.key5fname)
+        maxcorenumber=db.GrabMaxTypeNumber(poltype,poltype.key5fname)
+        mincorenumber=db.GrabMinTypeNumber(poltype,poltype.key5fname)
         key=poltype.key5fname
         if not os.path.isfile(poltype.ModifiedResiduePrmPath):
             shutil.copy(poltype.amoebabioprmpath,poltype.ModifiedResiduePrmPath)
@@ -2437,8 +2033,8 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
             temp.close()
 
     else:
-        maxcorenumber=GrabMaxTypeNumberModifiedCore(poltype,poltype.ModifiedResiduePrmPath)
-        mincorenumber=GrabMinTypeNumberModifiedCore(poltype,poltype.ModifiedResiduePrmPath)
+        maxcorenumber=db.GrabMaxTypeNumberModifiedCore(poltype,poltype.ModifiedResiduePrmPath)
+        mincorenumber=db.GrabMinTypeNumberModifiedCore(poltype,poltype.ModifiedResiduePrmPath)
         key=poltype.ModifiedResiduePrmPath
 
     writekey=poltype.key5fname.replace('.key_5','.key_6')
@@ -2461,26 +2057,31 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
 
     # need to add charge
     stitchtorsionprms,stitchpolarizeprms,stitchmpoleprms=GrabParametersFromKeyFile(poltype,key,torsionligtypestoboundtypesforkey,ligboundaryatomtypes,poltypetoprmtype,atomtypetoframedef,mincorenumber,maxcorenumber)
-    stitchbondprms,stitchangleprms,stitchnewtorsionprms,stitchstrbndprms,stitchpitorprms,stitchnewmpoleprms,stitchopbendprms=GrabParametersFromPrmFile(poltype,bondprmclassestoboundclasses,angleprmclassestoboundclasses,torsionprmclassestoboundclasses,ligboundaryatomtypes,poltypetoprmtype,proteintypestoframedefforprmfile,check)
+    if check==False:
+        fname=poltype.amoebabioprmpath
+    else:
+        fname=poltype.ModifiedResiduePrmPath
+    polclasstoprmclass={}
+    stitchbondprms,stitchangleprms,stitchnewtorsionprms,stitchstrbndprms,stitchnewmpoleprms,stitchopbendprms,uneededpolarizeprms,unneededvdwprms=db.GrabParametersFromPrmFile(poltype,bondprmclassestoboundclasses,angleprmclassestoboundclasses,torsionprmclassestoboundclasses,poltypetoprmtype,polclasstoprmclass,proteintypestoframedefforprmfile,fname)
     stitchtorsionprms=stitchtorsionprms+stitchnewtorsionprms
     stitchmpoleprms=stitchnewmpoleprms+stitchmpoleprms
     stitchpolarizeprms=prmdeflines+stitchpolarizeprms
     stitchatomdefs=[]
     stitchvdwprms=[]
-    WriteNewKeyFile(poltype,stitchatomdefs,stitchbondprms,stitchangleprms,stitchtorsionprms,stitchstrbndprms,stitchpitorprms,stitchopbendprms,stitchpolarizeprms,stitchvdwprms,stitchmpoleprms,writekey,poltype.amoebabioprmpath)
+    WriteNewKeyFile(poltype,stitchatomdefs,stitchbondprms,stitchangleprms,stitchtorsionprms,stitchstrbndprms,stitchopbendprms,stitchpolarizeprms,stitchvdwprms,stitchmpoleprms,writekey,poltype.amoebabioprmpath)
     if check==False:
-        coreatomdefs,corebondprms,coreangleprms,coretorsionprms,corestrbndprms,corepitorprms,coreopbendprms,corepolarizeprms,corevdwprms,corempoleprms=GrabCoreParameters(poltype,poltype.key5fname)
-        oldtypetonewtype,shift=ShiftPoltypeNumbers(poltype)
+        coreatomdefs,corebondprms,coreangleprms,coretorsionprms,corestrbndprms,coreopbendprms,corepolarizeprms,corevdwprms,corempoleprms=db.GrabParameters(poltype,poltype.key5fname)
+        oldtypetonewtype,shift=db.ShiftPoltypeNumbers(poltype)
         mincorenumber=mincorenumber-shift
         maxcorenumber=maxcorenumber-shift 
         # now I need to convert all arrays
-        coreresult=ShiftParameterDefintions(poltype,[coreatomdefs,corebondprms,coreangleprms,coretorsionprms,corestrbndprms,corepitorprms,coreopbendprms,corepolarizeprms,corevdwprms,corempoleprms],oldtypetonewtype)
-        coreatomdefs,corebondprms,coreangleprms,coretorsionprms,corestrbndprms,corepitorprms,coreopbendprms,corepolarizeprms,corevdwprms,corempoleprms=coreresult[:] 
-        stitchresult=ShiftParameterDefintions(poltype,[stitchatomdefs,stitchbondprms,stitchangleprms,stitchtorsionprms,stitchstrbndprms,stitchpitorprms,stitchopbendprms,stitchpolarizeprms,stitchvdwprms,stitchmpoleprms],oldtypetonewtype)
-        stitchatomdefs,stitchbondprms,stitchangleprms,stitchtorsionprms,stitchstrbndprms,stitchpitorprms,stitchopbendprms,stitchpolarizeprms,stitchvdwprms,stitchmpoleprms=stitchresult[:]
+        coreresult=db.ShiftParameterDefintions(poltype,[coreatomdefs,corebondprms,coreangleprms,coretorsionprms,corestrbndprms,coreopbendprms,corepolarizeprms,corevdwprms,corempoleprms],oldtypetonewtype)
+        coreatomdefs,corebondprms,coreangleprms,coretorsionprms,corestrbndprms,coreopbendprms,corepolarizeprms,corevdwprms,corempoleprms=coreresult[:] 
+        stitchresult=db.ShiftParameterDefintions(poltype,[stitchatomdefs,stitchbondprms,stitchangleprms,stitchtorsionprms,stitchstrbndprms,stitchopbendprms,stitchpolarizeprms,stitchvdwprms,stitchmpoleprms],oldtypetonewtype)
+        stitchatomdefs,stitchbondprms,stitchangleprms,stitchtorsionprms,stitchstrbndprms,stitchopbendprms,stitchpolarizeprms,stitchvdwprms,stitchmpoleprms=stitchresult[:]
         writekey=poltype.key5fname.replace('.key_5','.key_7')
-        WriteNewKeyFile(poltype,coreatomdefs+stitchatomdefs,corebondprms+stitchbondprms,coreangleprms+stitchangleprms,coretorsionprms+stitchtorsionprms,corestrbndprms+stitchstrbndprms,corepitorprms+stitchpitorprms,coreopbendprms+stitchopbendprms,corepolarizeprms+stitchpolarizeprms,corevdwprms+stitchvdwprms,corempoleprms+stitchmpoleprms,writekey,poltype.amoebabioprmpath)       
-        WriteToPrmFile(poltype,coreatomdefs,corebondprms,coreangleprms,coretorsionprms,corestrbndprms,corepitorprms,coreopbendprms,corepolarizeprms,corevdwprms,corempoleprms,poltype.ModifiedResiduePrmPath)
+        WriteNewKeyFile(poltype,coreatomdefs+stitchatomdefs,corebondprms+stitchbondprms,coreangleprms+stitchangleprms,coretorsionprms+stitchtorsionprms,corestrbndprms+stitchstrbndprms,coreopbendprms+stitchopbendprms,corepolarizeprms+stitchpolarizeprms,corevdwprms+stitchvdwprms,corempoleprms+stitchmpoleprms,writekey,poltype.amoebabioprmpath)       
+        db.WriteToPrmFile(poltype,coreatomdefs,corebondprms,coreangleprms,coretorsionprms,corestrbndprms,coreopbendprms,corepolarizeprms,corevdwprms,corempoleprms,poltype.ModifiedResiduePrmPath)
         proidxtoprotype=ShiftDictionaryValueTypes(poltype,proidxtoprotype,oldtypetonewtype)
         ligidxtotypeidx=ShiftDictionaryValueTypes(poltype,ligidxtotypeidx,oldtypetonewtype)
         modproidxtotypenumber=ShiftDictionaryValueTypes(poltype,modproidxtotypenumber,oldtypetonewtype)
@@ -2546,32 +2147,7 @@ def ShiftDictionaryValueTypes(poltype,dictionary,oldtypetonewtype):
 
 
 
-def ShiftParameterDefintions(poltype,parameterarray,oldtypetonewtype):
-    newparameterarray=[]
-    for array in parameterarray:
-        newarray=[]
-        for line in array:
-            try:
-                linesplitall=re.split(r'(\s+)', line)
-            except:
-                print('Error ',line)
-            for i in range(len(linesplitall)):
-                element=linesplitall[i]
-                if RepresentsInt(poltype,element):
-                    oldtypenum=numpy.abs(int(element))
-                    if oldtypenum in oldtypetonewtype.keys():
-                        newtypenum=oldtypetonewtype[oldtypenum]
-                        typenum=newtypenum
-                    else:
-                        typenum=oldtypenum
-                    if '-' in element:
-                        typenum=-typenum
-                    linesplitall[i]=str(typenum)
-            newline=''.join(linesplitall)
-            newarray.append(newline)
-        newparameterarray.append(newarray)
-    return newparameterarray
-                    
+                   
     
 def RepresentsInt(poltype,s):
     try: 
@@ -2580,47 +2156,6 @@ def RepresentsInt(poltype,s):
     except ValueError:
         return False
 
-def ShiftPoltypeNumbers(poltype):
-    oldtypetonewtype={}
-    maxnumberfromprm=GrabMaxTypeNumber(poltype,poltype.ModifiedResiduePrmPath)
-    maxnumberfromkey=GrabMaxTypeNumber(poltype,poltype.key5fname)
-    minnumberfromkey=GrabMinTypeNumber(poltype,poltype.key5fname)
-    typenumbers=list(range(minnumberfromkey,maxnumberfromkey+1))
-    newmaxnumber=maxnumberfromprm+1
-    shift=minnumberfromkey-newmaxnumber
-    oldtypetonewtype={}
-    for typenum in typenumbers:
-        newtypenum=typenum-shift
-        oldtypetonewtype[typenum]=newtypenum
-        #oldtypetonewtype[typenum]=typenum # TEMP
-
-    return oldtypetonewtype,shift
-
-def GrabMaxTypeNumber(poltype,parameterfile):
-    maxnumberfromprm=1
-    temp=open(parameterfile,'r')
-    results=temp.readlines()
-    temp.close()
-    for line in results:
-        if 'atom' in line:
-            linesplit=line.split()
-            atomtype=int(linesplit[1])
-            if atomtype>maxnumberfromprm:
-                maxnumberfromprm=atomtype
-    return maxnumberfromprm
-
-def GrabMinTypeNumber(poltype,parameterfile):
-    minnumberfromprm=10000
-    temp=open(parameterfile,'r')
-    results=temp.readlines()
-    temp.close()
-    for line in results:
-        if 'atom' in line:
-            linesplit=line.split()
-            atomtype=int(linesplit[1])
-            if atomtype<minnumberfromprm:
-                minnumberfromprm=atomtype
-    return minnumberfromprm
 
 def GrabMaxTypeNumberModifiedCore(poltype,parameterfile):
     maxnumberfromprm=1

@@ -431,7 +431,11 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 parentindextofragindex=copied[rotbndindex]
                 parentsymclasstofragsymclass=anothercopy[rotbndindex]
             rotkey=rotbndindex.replace('_',' ')
-            tors=list(poltype.rotbndlist[rotkey])
+            if rotkey in poltype.rotbndlist.keys():
+                tors=list(poltype.rotbndlist[rotkey])
+            else:
+                tors=[]
+
             for torsion in tors:
                 smilesposarray=[]
                 fragtor=[]
@@ -526,13 +530,6 @@ def AddInputCoordinatesAsDefaultConformer(poltype,m,indextocoordinates):
 
 
 def GenerateFrag(poltype,molindexlist,mol):
-    bonditer=openbabel.OBMolBondIter(poltype.mol)
-    for bond in bonditer:
-        oendidx = bond.GetEndAtomIdx()
-        obgnidx = bond.GetBeginAtomIdx()
-        bondorder=bond.GetBondOrder()
-
-
     molindexlist=[i+1 for i in molindexlist]
     em = openbabel.OBMol()
     oldindextonewindex={}
@@ -681,7 +678,7 @@ def mol_with_atom_index_removed(poltype,mol):
 
 
 
-def GenerateWBOMatrix(poltype,molecule,structfname):
+def GenerateWBOMatrix(poltype,molecule,moleculebabel,structfname):
     error=False
     WBOmatrix=None
     curespmethod=poltype.espmethod
@@ -690,7 +687,7 @@ def GenerateWBOMatrix(poltype,molecule,structfname):
     poltype.espbasisset='MINIX'
     charge=Chem.rdmolops.GetFormalCharge(molecule)
 
-    inputname,outputname=esp.CreatePsi4ESPInputFile(poltype,structfname,poltype.comespfname.replace('.com','_frag.com'),molecule,poltype.maxdisk,poltype.maxmem,poltype.numproc,charge,False)
+    inputname,outputname=esp.CreatePsi4ESPInputFile(poltype,structfname,poltype.comespfname.replace('.com','_frag.com'),moleculebabel,poltype.maxdisk,poltype.maxmem,poltype.numproc,charge,False)
     finished,error=poltype.CheckNormalTermination(outputname)
     if not finished and not error:
         cmdstr='psi4 '+inputname+' '+outputname
@@ -759,7 +756,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         WriteOBMolToXYZ(poltype,fragmolbabel,filename.replace('.mol','_xyzformat.xyz'))
         WriteOBMolToSDF(poltype,fragmolbabel,filename.replace('.mol','.sdf'))
         structfname=filename.replace('.mol','.sdf')
-        fragWBOmatrix,outputname,error=GenerateWBOMatrix(poltype,fragmol,filename.replace('.mol','_xyzformat.xyz'))
+        fragWBOmatrix,outputname,error=GenerateWBOMatrix(poltype,fragmol,fragmolbabel,filename.replace('.mol','_xyzformat.xyz'))
         if error:
             os.chdir('..')
             continue
@@ -954,8 +951,6 @@ def ReduceParentMatrix(poltype,parentindextofragindex,fragWBOmatrix,parentWBOmat
             reducedparentWBOmatrix[i,j]=parentvalue
     return reducedparentWBOmatrix
 
-
-
 def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfoldername,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,fragspath):
     fragfoldernamepath=os.getcwd()
     fragmentsforcomb=growfragments.copy()
@@ -971,6 +966,7 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
         fragmentidxtostructfname={}
         fragmolidxtofoldername={}
         fragmolidxtofragmol={}
+        fragmolidxtofragmolbabel={}
         fragments=[]
         possiblefragatmidxs=GrowPossibleFragmentAtomIndexes(poltype,poltype.rdkitmol,indexes)
         if len(possiblefragatmidxs)!=0:
@@ -993,6 +989,8 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
                 WriteOBMolToSDF(poltype,fragmolbabel,filename.replace('.mol','.sdf'))
                 os.chdir('..')
                 fragmolidxtofragmol[fragmolidx]=fragmol
+                fragmolidxtofragmolbabel[fragmolidx]=fragmolbabel
+
                 fragmolidxtofoldername[fragmolidx]=basename
                 fragmolidxtoparentindextofragindex[fragmolidx]=parentindextofragindex
                 fragmentidxtostructfname[fragmolidx]=filename.replace('.mol','_xyzformat.xyz')
@@ -1008,8 +1006,9 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
                 parentindextofragindex=fragmolidxtoparentindextofragindex[fragmolidx]
                 structfname=fragmentidxtostructfname[fragmolidx]
                 os.chdir(foldername)
+                fragmolbabel=fragmolidxtofragmolbabel[fragmolidx]
 
-                fragWBOmatrix,outputname,error=GenerateWBOMatrix(poltype,fragmol,structfname)
+                fragWBOmatrix,outputname,error=GenerateWBOMatrix(poltype,fragmol,fragmolbabel,structfname)
                 if error:
                     os.chdir('..')
                     continue
