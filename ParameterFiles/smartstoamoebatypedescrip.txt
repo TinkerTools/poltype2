@@ -210,9 +210,6 @@
  H   "Propyl Sulfonate Me-CH2" % [#16](-[#8-])(=[#8])(=[#8])-[#6](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H] % 12
  C   "Propyl Sulfonate CH3" % [#16](-[#8-])(=[#8])(=[#8])-[#6](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H] % 7 
  H   "Propyl Sulfonate H3C" % [#16](-[#8-])(=[#8])(=[#8])-[#6](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H] % 9   
- C   "Hydrogen Cyanide CN"  % [#7]#[#6]-[H] % 2 
- N   "Hydrogen Cyanide CN"  % [#7]#[#6]-[H] % 1  
- H   "Hydrogen Cyanide HCN" % [#7]#[#6]-[H] % 3  
  C   "Acetonitrile CN" % [#7]#[#6]-[#6](-[H])(-[H])-[H] % 2       
  N   "Acetonitrile CN" % [#7]#[#6]-[#6](-[H])(-[H])-[H] % 1       
  C   "Acetonitrile CH3" % [#7]#[#6]-[#6](-[H])(-[H])-[H] % 3    
