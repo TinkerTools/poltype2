@@ -62,7 +62,8 @@ def ReadSmallMoleculeLib(poltype,filepath):
     results=temp.readlines()
     temp.close()
     smartsatomordertoelementtinkerdescrip={}
-    for line in results:
+    for lineidx in range(len(results)):
+        line=results[lineidx]
         linesplit=line.split()
         if len(linesplit)==0:
             continue
@@ -588,8 +589,22 @@ def GenerateSMARTSListFromAtomList(poltype,listforprm,rdkitmol,mol,maxatomsize):
     for ls in listforprm:
         smartslist=[]
         atomindiceslist=GenerateAllPossibleFragmentIndices(poltype,ls,rdkitmol,maxatomsize)
-        singlepathindices=GenerateAllPossibleSinglePathFragmentIndices(poltype,ls,rdkitmol)
-        atomindiceslist.extend(singlepathindices)
+        anyringatoms,ringindices=LookForRingAtoms(poltype,mol,ls)
+        lengthstoatomindices={}
+        for atomindices in atomindiceslist:
+            lengthstoatomindices[len(atomindices)]=atomindices
+        atomindiceslist=list(lengthstoatomindices.values()) 
+
+        if anyringatoms==True:
+            ringsize=FindRingSize(poltype,mol,ringindices)
+            singlepathindices=GenerateAllPossibleSinglePathFragmentIndices(poltype,ls,rdkitmol,ringsize)
+            singlepathindices.sort(key=len)
+            lengthtosinglepathindices={}
+            for indices in singlepathindices:
+                lengthtosinglepathindices[len(indices)]=indices
+            singlepathindices=list(lengthtosinglepathindices.values()) 
+
+            atomindiceslist.extend(singlepathindices)
         for subls in atomindiceslist:
             fragsmarts,smartsfortransfer=GenerateFragmentSMARTS(poltype,rdkitmol,mol,subls)
             smartslist.append([fragsmarts,smartsfortransfer])
@@ -597,10 +612,36 @@ def GenerateSMARTSListFromAtomList(poltype,listforprm,rdkitmol,mol,maxatomsize):
     return listforprmtosmartslist
 
 
-def GenerateAllPossibleSinglePathFragmentIndices(poltype,ls,rdkitmol): # for rings
+def FindRingSize(poltype,mol,ringindices):
+    ringsizes=[]
+    for index in ringindices:
+        atom=mol.GetAtom(index)
+        for i in range(3,9+1):
+            isinringofsize=atom.IsInRingSize(i)
+            if isinringofsize==True:
+                ringsizes.append(i)
+    maxringsize=max(ringsizes)
+    return maxringsize
+
+
+def LookForRingAtoms(poltype,mol,ls):
+    anyringatoms=False
+    babelindices=[i+1 for i in ls]
+    ringindices=[]
+    for index in babelindices:
+        atom=mol.GetAtom(index)
+        isinring=atom.IsInRing()
+        if isinring==True:
+            anyringatoms=True
+            ringindices.append(index)
+    return anyringatoms,ringindices
+
+
+
+def GenerateAllPossibleSinglePathFragmentIndices(poltype,ls,rdkitmol,ringsize): # for rings
     atomindiceslist=[]
-    for n in range(1,25):
-        paths=Chem.rdmolops.FindAllPathsOfLengthN(rdkitmol,n,useBonds=False,useHs=True)
+    for n in range(1,ringsize+1):
+        paths=Chem.rdmolops.FindAllPathsOfLengthN(rdkitmol,n,useBonds=False,useHs=True,rootedAtAtom=ls[0])
         for path in paths:
             allin=True
             for index in ls:
@@ -617,12 +658,17 @@ def GenerateAllPossibleFragmentIndices(poltype,ls,rdkitmol,maxatomsize):
     oldindexlist=copy.deepcopy(ls)
     indexlist=[]
     count=0
+    neighbcount=0
     while set(oldindexlist)!=set(indexlist):
         if count!=0:
             oldindexlist=copy.deepcopy(indexlist)
         if len(oldindexlist)>maxatomsize:
             break
+        if neighbcount>=2:
+            break
         neighborindexes=GrabNeighboringIndexes(poltype,oldindexlist,rdkitmol)
+        neighbcount+=1
+       
         for i in range(len(neighborindexes)):
             combs=list(itertools.combinations(neighborindexes, i+1))
             for comb in combs:
@@ -721,33 +767,32 @@ def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprmtosmartslist,param
     listforprmtosmarts={}
     for ls,smartslist in listforprmtosmartslist.items(): 
         parametersmartstomatchlen={}
-        parametersmartstosmarts={}
-        parametersmartstomatchlen,smartstomatchlen=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmarts)
+        parametersmartstosmartslist={}
+        parametersmartstomatchlen,smartstomatchlen=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
         if len(parametersmartstomatchlen.keys())==0:
             smartslist=ReplaceSMARTSBondsWithGenericBonds(poltype,smartslist,ls,mol)
-            parametersmartstomatchlen,smartstomatchlen=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmarts)
-            
+            parametersmartstomatchlen,smartstomatchlen=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
             if len(parametersmartstomatchlen.keys())==0:
                 smartslist=ReplaceEachAtomIdentityOnEnd(poltype,smartslist[0]) 
-                parametersmartstomatchlen,smartstomatchlen=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmarts)
+                parametersmartstomatchlen,smartstomatchlen=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
                 if len(parametersmartstomatchlen.keys())==0:
                     smartslist=ReplaceAtomIdentitiesOnEnd(poltype,smartslist[0])
-                    parametersmartstomatchlen,smartstomatchlen=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmarts)
+                    parametersmartstomatchlen,smartstomatchlen=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
                     if len(parametersmartstomatchlen.keys())==0:
                         smartslist=ReplaceAllAtomIdentities(poltype,smartslist[0])
-                        parametersmartstomatchlen,smartstomatchlen=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmarts)
-                        listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmarts,listforprmtoparametersmarts,listforprmtosmarts,ls)
+                        parametersmartstomatchlen,smartstomatchlen=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
+                        listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls)
 
                     else:
-                        listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmarts,listforprmtoparametersmarts,listforprmtosmarts,ls)
+                        listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls)
 
                 else:
-                    listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmarts,listforprmtoparametersmarts,listforprmtosmarts,ls)
+                    listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls)
 
             else:
-                listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmarts,listforprmtoparametersmarts,listforprmtosmarts,ls)
+                listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls)
         else:
-            listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmarts,listforprmtoparametersmarts,listforprmtosmarts,ls)
+            listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls)
 
     return listforprmtoparametersmarts,listforprmtosmarts
 
@@ -776,7 +821,7 @@ def ReplaceAtomIdentitiesOnEnd(poltype,smartsls):
         tempsplit[-1]='[*]'
         newsmarts='~'.join(tempsplit)
         newsmartslist.append(newsmarts)
-
+    newsmartslist=[newsmartslist]
     return newsmartslist
 
 
@@ -789,16 +834,16 @@ def ReplaceAllAtomIdentities(poltype,smartsls):
             tempsplit[idx]='[*]'
         newsmarts='~'.join(tempsplit)
         newsmartslist.append(newsmarts) 
-
+    newsmartslist=[newsmartslist]
     return newsmartslist
 
 
-def GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmarts,listforprmtoparametersmarts,listforprmtosmarts,ls):
+def GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls):
     maxparametersmartsmatchlength=max(parametersmartstomatchlen.values())
     parametersmartslist=GrabKeysFromValue(poltype,parametersmartstomatchlen,maxparametersmartsmatchlength)
     prmsmartstodiff={}
     for prmsmarts in parametersmartslist:
-        smartsls=parametersmartstosmarts[prmsmarts]
+        smartsls=parametersmartstosmartslist[prmsmarts]
         smartsfortransfer=smartsls[1]
         substructure = Chem.MolFromSmarts(smartsfortransfer)
         substructurenumatoms=substructure.GetNumAtoms()
@@ -813,7 +858,7 @@ def GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmarts,list
     parametersmartslist=GrabKeysFromValue(poltype,prmsmartstodiff,mindiff)
     commonatomstoprmsmarts={}
     for prmsmarts in parametersmartslist:
-        smartsls=parametersmartstosmarts[prmsmarts]
+        smartsls=parametersmartstosmartslist[prmsmarts]
         smartsfortransfer=smartsls[1]
         substructure = Chem.MolFromSmarts(smartsfortransfer)
         substructure = RemoveHydrogens(poltype,substructure)
@@ -825,10 +870,9 @@ def GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmarts,list
         commonatomstoprmsmarts[atomnum]=prmsmarts
     maxatoms=max(commonatomstoprmsmarts.keys())
     parametersmarts=commonatomstoprmsmarts[maxatoms]
-    smartsls=parametersmartstosmarts[parametersmarts]
+    smartsls=parametersmartstosmartslist[parametersmarts]
     listforprmtoparametersmarts[ls]=parametersmarts 
     listforprmtosmarts[ls]=smartsls
-
     return listforprmtoparametersmarts,listforprmtosmarts
 
 
@@ -851,32 +895,28 @@ def ReplaceSMARTSBondsWithGenericBonds(poltype,smartslist,atomindices,mol):
     for smartsls in smartslist:
         temp=[]
         for smarts in smartsls:
-            newsmarts=smarts.replace('-','~').replace('=','~')
+            newsmarts=smarts.replace('-','~').replace('=','~').replace(':','~')
             temp.append(newsmarts)
         newsmartslist.append(temp)
     return newsmartslist
          
 
-def MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmarts):
+def MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist):
     for smartls in smartslist:
         smartsfortransfer=smartls[1]
-        smarts=smartls[0]
         for parametersmarts in parametersmartslist:
-            try:
-                substructure = Chem.MolFromSmarts(smartsfortransfer)
-                substructurenumatoms=substructure.GetNumAtoms()
-                structure = Chem.MolFromSmarts(parametersmarts)
-                structurenumatoms=structure.GetNumAtoms()
-            except:
-                continue
+            substructure = Chem.MolFromSmarts(smartsfortransfer)
+            substructurenumatoms=substructure.GetNumAtoms()
+            structure = Chem.MolFromSmarts(parametersmarts)
+            structurenumatoms=structure.GetNumAtoms()
             if structurenumatoms>=substructurenumatoms:
                 diditmatch=structure.HasSubstructMatch(substructure)
                 if diditmatch==True:
                     matches=structure.GetSubstructMatches(substructure)
                     firstmatch=matches[0]
                     parametersmartstomatchlen[parametersmarts]=len(firstmatch)
-                    parametersmartstosmarts[parametersmarts]=[smarts,smartsfortransfer]
-    return parametersmartstomatchlen,parametersmartstosmarts
+                    parametersmartstosmartslist[parametersmarts]=smartls
+    return parametersmartstomatchlen,parametersmartstosmartslist
 
 
 
@@ -891,7 +931,6 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         smarts=smartsls[0]
         smartsfortransfer=smartsls[1]
         substructure = Chem.MolFromSmarts(smarts)
-                
         matches=rdkitmol.GetSubstructMatches(substructure)
         for match in matches:
             allin=True
@@ -903,7 +942,6 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
                 smartsindextomoleculeindex=dict(zip(indices,match)) 
                 moleculeindextosmartsindex={v: k for k, v in smartsindextomoleculeindex.items()}
                 break
-
 
         structure = Chem.MolFromSmarts(parametersmarts)
         substructure = Chem.MolFromSmarts(smartsfortransfer)
@@ -921,8 +959,6 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         
         allpossiblerdkitindices=ReturnSymmetryIdenticalIndicesSMARTSAndParameterSMARTS(poltype,allpossiblebabelindicessmarts,smartsindextomoleculeindex,trueparametersmartsindextosmartsindex)
 
-
-
         parametersmartsatomorderlists=[] 
         rdkitindextofinalparametersmartsatomorder={}
         rdkitindextosmartsorder={}
@@ -932,7 +968,9 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         for parametersmartsatomorderlist,elementtinkerdescrip in smartsatomordertoelementtinkerdescrip.items():
             prmsmarts=parametersmartsatomorderlist[0]
             atomorderlist=parametersmartsatomorderlist[1]
+
             if prmsmarts==parametersmarts:
+
                 parametersmartsatomorderlists.append(parametersmartsatomorderlist)
         for parametersmartsatomorderlist in parametersmartsatomorderlists:
             atomorderlist=parametersmartsatomorderlist[1]
@@ -1273,7 +1311,8 @@ def GrabPlanarBonds(poltype,listofbondsforprm,mol): # used for checking missing 
         atoms=[a,b]
         for atom in atoms:
             if atom.GetHyb()==2 and len(list(openbabel.OBAtomAtomIter(atom)))==3:
-                planarbonds.append(bond)
+                if bond not in planarbonds:
+                    planarbonds.append(bond)
 
     return planarbonds 
 
@@ -1391,6 +1430,25 @@ def ReadList(poltype,filename):
         newls.append(newsubls) 
     return newls
 
+def CheckIfParametersExist(poltype,potentialmissingindices,prms):
+    missingprmindices=[]
+    for indices in potentialmissingindices:
+        babelindices=[i+1 for i in indices]
+        symtypes=[poltype.idxtosymclass[i] for i in babelindices]
+        found=False
+        for prmline in prms:
+            allin=True
+            for symtype in symtypes:
+                if str(symtype) not in prmline:
+                    allin=False
+            if allin==True:
+                found=True
+        if found==False:
+            missingprmindices.append(indices)
+    return missingprmindices
+                
+            
+
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     smartsatomordertoelementtinkerdescrip=ReadSmallMoleculeLib(poltype,poltype.smallmoleculesmartstotinkerdescrip)
     elementtinkerdescriptotinkertype,tinkertypetoclass=GrabTypeAndClassNumbers(poltype,poltype.smallmoleculeprmlib)
@@ -1406,9 +1464,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     planarbondsforprmtosmartslist=GenerateSMARTSListFromAtomList(poltype,listofbondsforprm,rdkitmol,mol,maxatomsize)
     anglesforprmtosmartslist=GenerateSMARTSListFromAtomList(poltype,listofanglesforprm,rdkitmol,mol,maxatomsize)
     planaranglesforprmtosmartslist=GenerateSMARTSListFromAtomList(poltype,listofanglesthatneedplanarkeyword,rdkitmol,mol,maxatomsize)
-
     torsionsforprmtosmartslist=GenerateSMARTSListFromAtomList(poltype,listoftorsionsforprm,rdkitmol,mol,maxatomsize)
-
     atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,atomindicesforprmtosmartslist,parametersmartslist,mol)
     bondsforprmtoparametersmarts,bondsforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,bondsforprmtosmartslist,parametersmartslist,mol)
     planarbondsforprmtoparametersmarts,planarbondsforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,planarbondsforprmtosmartslist,parametersmartslist,mol)
@@ -1431,7 +1487,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
 
 
     torsionindicestotinkertypes,torsionindicestotinkerclasses,torsionindicestoparametersmartsatomorders,torsionindicestoelementtinkerdescrips,torsionindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,torsionsforprmtoparametersmarts,torsionsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
-
     torsionsmissing=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol)
     torsionsmissingindicestotinkerclasses=PruneDictionary(poltype,torsionsmissing,torsionindicestotinkerclasses)
     atomtinkerclasstopoltypeclass=TinkerClassesToPoltypeClasses(poltype,atomindextotinkerclass)
@@ -1466,7 +1521,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
 
     atompoltypeclassestoelementtinkerdescrip=ConvertIndicesDictionaryToPoltypeClasses(poltype,atomindextoelementtinkerdescrip,atomindextotinkerclass,atomtinkerclasstopoltypeclass)
 
-
     poltypetoprmtype={} # dont need polarize parameters 
     typestoframedefforprmfile={} # dont need multipole parameters
     fname=poltype.smallmoleculeprmlib
@@ -1479,7 +1533,9 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
 
     potentialmissingopbendprmtypes=FindPotentialMissingParameterTypes(poltype,opbendprms,planarbondtinkerclassestopoltypeclasses)
     potentialmissingopbendprmindices=ConvertPoltypeClassesToIndices(poltype,potentialmissingopbendprmtypes)
-    missingopbendprmindices=FilterIndices(poltype,potentialmissingopbendprmindices,planarbonds)
+    potentialmissingopbendprmindices=FilterIndices(poltype,potentialmissingopbendprmindices,planarbonds)
+    missingopbendprmindices=CheckIfParametersExist(poltype,potentialmissingopbendprmindices,opbendprms)
+    defaultvalues=None
     if len(missingopbendprmindices)!=0:
         newopbendprms,defaultvalues=DefaultOPBendParameters(poltype,missingopbendprmindices,mol)
         opbendprms.extend(newopbendprms)

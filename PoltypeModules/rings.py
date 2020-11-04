@@ -154,7 +154,7 @@ def DetermineMaxRanges(poltype,torset,optmol,bondtopology):
     variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
     phaselists=[]
     for tor in torset:
-        phaselist=range(0,40,10) # just try fine grid, remove points that dont work 
+        phaselist=range(0,50,10) # just try fine grid, remove points that dont work 
         phaselists.append(phaselist)
     phaseanglelist=numpy.array(list(product(*phaselists)))
     designatexyz='_determine_maxrange'
