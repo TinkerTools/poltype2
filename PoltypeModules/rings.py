@@ -161,16 +161,17 @@ def DetermineMaxRanges(poltype,torset,optmol,bondtopology):
     keybase=poltype.key4fname
     keybasepath='../'
     failedgridpoints=[]
-    for phaseangles in phaseanglelist:
-        prevstruct = opt.load_structfile(poltype,prevstrctfname)
-        prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology)
-        prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
-        prevstrctfname,torxyzfname,newtorxyzfname,keyfname=torgen.tinker_minimize(poltype,torset,optmol,variabletorlist,phaseangles,poltype.torsionrestraint,prevstruct,designatexyz,keybase,keybasepath)
-        toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
-        torgen.tinker_analyze(poltype,newtorxyzfname,keyfname,toralzfname)
-        term=torgen.AnalyzeTerm(poltype,toralzfname)
-        if term==False:
-            failedgridpoints.append(phaseangles)
+    if poltype.skipgridsearch==False:
+        for phaseangles in phaseanglelist:
+            prevstruct = opt.load_structfile(poltype,prevstrctfname)
+            prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology)
+            prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
+            prevstrctfname,torxyzfname,newtorxyzfname,keyfname=torgen.tinker_minimize(poltype,torset,optmol,variabletorlist,phaseangles,poltype.torsionrestraint,prevstruct,designatexyz,keybase,keybasepath)
+            toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
+            torgen.tinker_analyze(poltype,newtorxyzfname,keyfname,toralzfname)
+            term=torgen.AnalyzeTerm(poltype,toralzfname)
+            if term==False:
+                failedgridpoints.append(phaseangles)
     for angles in failedgridpoints:
         index=phaseanglelist.index(angles)
         del phaseanglelist[index]
@@ -214,7 +215,15 @@ def RefineNonAromaticRingTorsions(poltype,mol,optmol,classkeytotorsionparameters
             phasepertorsion=PhasePerTorsionForNonAromaticRing(poltype,dataptspertorsion,maxrange)
             UpdateAngleIncrement(poltype,phasepertorsion,torsion)
             classkey=torgen.get_class_key(poltype,a,b,c,d)
-            prms=classkeytotorsionparametersguess[classkey] 
+            classkeysplit=classkey.split()
+            cla,clb,clc,cld=classkeysplit[:]
+            revclasskey='%s %s %s %s' % (cld, clc, clb, cla)
+
+            if classkey in classkeytotorsionparametersguess.keys(): 
+                prms=classkeytotorsionparametersguess[classkey] 
+            elif revclasskey in classkeytotorsionparametersguess.keys(): 
+                prms=classkeytotorsionparametersguess[revclasskey] 
+
             poltype.classkeytoinitialprmguess[classkey]=prms
 
     os.chdir('..')

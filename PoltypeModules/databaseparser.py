@@ -1241,6 +1241,7 @@ def GrabTorsionParameterCoefficients(poltype,torsionprms):
         key = '%s %s %s %s' % (linesplit[1], linesplit[2], linesplit[3], linesplit[4])
         parameters=[float(linesplit[5]),float(linesplit[8]),float(linesplit[11])]
         torsionkeystringtoparameters[key]=parameters
+       
     return torsionkeystringtoparameters
 
 def PruneDictionary(poltype,keysubset,dic):

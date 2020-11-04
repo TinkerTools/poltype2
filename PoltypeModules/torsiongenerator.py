@@ -442,7 +442,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
             shape.append(len(phaselist))
         shape.append(lastdim)
         shape=tuple(shape)
-        flatphaselist=flatphaselist.reshape(shape) # now we can remove diagonal elements
+        flatphaselist=flatphaselist.reshape(shape) 
         idealangletensor=flatphaselist+currentanglelist
         poltype.idealangletensor[tuple(torset)]=idealangletensor
         poltype.tensorphases[tuple(torset)]=flatphaselist
@@ -463,6 +463,17 @@ def gen_torsion(poltype,optmol,torsionrestraint):
             indexes=numpy.where((flatphaselist == loc).all(axis=1))
             flatphaselist = numpy.delete(flatphaselist,indexes , axis=0)
 
+        gridspacing=int(len(flatphaselist)/poltype.defaultmaxtorsiongridpoints)
+        if gridspacing>1: 
+            locstoremove=[]
+            for i in range(1,len(flatphaselist)+1):
+                phases=flatphaselist[i-1]
+                if i % gridspacing == 0:
+                    pass
+                else:
+                    indexes=numpy.where((flatphaselist == phases).all(axis=1))[0][0]
+                    locstoremove.append(indexes)
+            flatphaselist = numpy.delete(flatphaselist,locstoremove , axis=0)
         # we could remove more points if we wanted....
         phaseangles=[0]*len(torset)
         if poltype.use_gaus==False and poltype.use_gausoptonly==False:
