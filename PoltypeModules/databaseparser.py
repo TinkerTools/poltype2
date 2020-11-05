@@ -942,7 +942,6 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
                 smartsindextomoleculeindex=dict(zip(indices,match)) 
                 moleculeindextosmartsindex={v: k for k, v in smartsindextomoleculeindex.items()}
                 break
-
         structure = Chem.MolFromSmarts(parametersmarts)
         substructure = Chem.MolFromSmarts(smartsfortransfer)
         matches=structure.GetSubstructMatches(substructure)
@@ -972,10 +971,12 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
             if prmsmarts==parametersmarts:
 
                 parametersmartsatomorderlists.append(parametersmartsatomorderlist)
+
         for rdkitindex in range(len(allpossiblerdkitindices)):
             rdkitindexlist=allpossiblerdkitindices[rdkitindex]
             for parametersmartsatomorderlist in parametersmartsatomorderlists:
                 atomorderlist=parametersmartsatomorderlist[1]
+                
                 elementtinkerdescrip=smartsatomordertoelementtinkerdescrip[parametersmartsatomorderlist]
 
                 for atomorder in atomorderlist:
@@ -1026,7 +1027,7 @@ def ReturnSymmetryIdenticalIndicesSMARTSAndParameterSMARTS(poltype,allpossibleba
         babelindicessmarts=allpossiblebabelindicessmarts[i]
         rdkitindicessmarts=[j-1 for j in babelindicessmarts]
         rdkitindicessmarts=[parametersmartsindextosmartsindex[j] for j in rdkitindicessmarts]
-        rdkitindicessmarts=[smartsindextomoleculeindex[j] for j in rdkitindicessmarts] 
+        rdkitindicessmarts=[smartsindextomoleculeindex[j] for j in rdkitindicessmarts]
         indices=[]
         for index in rdkitindicessmarts:
             if index not in indices:
