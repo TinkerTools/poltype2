@@ -2071,7 +2071,7 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
     WriteNewKeyFile(poltype,stitchatomdefs,stitchbondprms,stitchangleprms,stitchtorsionprms,stitchstrbndprms,stitchopbendprms,stitchpolarizeprms,stitchvdwprms,stitchmpoleprms,writekey,poltype.amoebabioprmpath)
     if check==False:
         coreatomdefs,corebondprms,coreangleprms,coretorsionprms,corestrbndprms,coreopbendprms,corepolarizeprms,corevdwprms,corempoleprms=db.GrabParameters(poltype,poltype.key5fname)
-        oldtypetonewtype,shift=db.ShiftPoltypeNumbers(poltype)
+        oldtypetonewtype,shift=db.ShiftPoltypeNumbers(poltype,poltype.ModifiedResiduePrmPath,poltype.key5fname)
         mincorenumber=mincorenumber-shift
         maxcorenumber=maxcorenumber-shift 
         # now I need to convert all arrays
@@ -2149,13 +2149,6 @@ def ShiftDictionaryValueTypes(poltype,dictionary,oldtypetonewtype):
 
                    
     
-def RepresentsInt(poltype,s):
-    try: 
-        int(s)
-        return True
-    except ValueError:
-        return False
-
 
 def GrabMaxTypeNumberModifiedCore(poltype,parameterfile):
     maxnumberfromprm=1

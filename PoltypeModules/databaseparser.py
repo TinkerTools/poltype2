@@ -119,11 +119,11 @@ def GrabParameters(poltype,fname):
 
     return atomdefs,bondprms,angleprms,torsionprms,strbndprms,opbendprms,polarizeprms,vdwprms,mpoleprms
  
-def ShiftPoltypeNumbers(poltype):
+def ShiftPoltypeNumbers(poltype,filename,keyfilename):
     oldtypetonewtype={}
-    maxnumberfromprm=GrabMaxTypeNumber(poltype,poltype.ModifiedResiduePrmPath)
-    maxnumberfromkey=GrabMaxTypeNumber(poltype,poltype.key5fname)
-    minnumberfromkey=GrabMinTypeNumber(poltype,poltype.key5fname)
+    maxnumberfromprm=GrabMaxTypeNumber(poltype,filename)
+    maxnumberfromkey=GrabMaxTypeNumber(poltype,keyfilename)
+    minnumberfromkey=GrabMinTypeNumber(poltype,keyfilename)
     typenumbers=list(range(minnumberfromkey,maxnumberfromkey+1))
     newmaxnumber=maxnumberfromprm+1
     shift=minnumberfromkey-newmaxnumber
@@ -172,7 +172,7 @@ def ShiftParameterDefintions(poltype,parameterarray,oldtypetonewtype):
             for i in range(len(linesplitall)):
                 element=linesplitall[i]
                 if RepresentsInt(poltype,element):
-                    oldtypenum=numpy.abs(int(element))
+                    oldtypenum=np.abs(int(element))
                     if oldtypenum in oldtypetonewtype.keys():
                         newtypenum=oldtypetonewtype[oldtypenum]
                         typenum=newtypenum
@@ -970,17 +970,13 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         for parametersmartsatomorderlist,elementtinkerdescrip in smartsatomordertoelementtinkerdescrip.items():
             prmsmarts=parametersmartsatomorderlist[0]
             atomorderlist=parametersmartsatomorderlist[1]
-
             if prmsmarts==parametersmarts:
-
                 parametersmartsatomorderlists.append(parametersmartsatomorderlist)
         for rdkitindex in range(len(allpossiblerdkitindices)):
             rdkitindexlist=allpossiblerdkitindices[rdkitindex]
             for parametersmartsatomorderlist in parametersmartsatomorderlists:
                 atomorderlist=parametersmartsatomorderlist[1]
-                
                 elementtinkerdescrip=smartsatomordertoelementtinkerdescrip[parametersmartsatomorderlist]
-
                 for atomorder in atomorderlist:
                     for idx in rdkitindexlist:
                         smartsindex=moleculeindextosmartsindex[idx]
@@ -1006,6 +1002,7 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         rdkitindextoelementatomtinkerdescrip=dict(sorted(rdkitindextoelementatomtinkerdescrip.items()))
         rdkitindextoatomtinkertype=dict(sorted(rdkitindextoatomtinkertype.items()))
         rdkitindextoatomtinkerclass=dict(sorted(rdkitindextoatomtinkerclass.items()))
+        
         if len(rdkitindextofinalparametersmartsatomorder.keys())!=len(atomindices):
             print('rdkitindextoelementatomtinkerdescrip',rdkitindextoelementatomtinkerdescrip)   
             raise ValueError('Missing SMARTS-Atom Order -> Tinker Description, Element entry for smarts '+smartsfortransfer+' and matching to parameter smarts '+parametersmarts+' for indices '+str(atomindices))
@@ -1503,6 +1500,55 @@ def WriteDictionaryToFile(poltype,dic,filename):
 def ReadDictionaryFromFile(poltype,filename):
     return json.load(open(filename))
 
+def GenerateSMARTSMatchLine(poltype,rdkitmol,rdkitindex):
+    smarts=rdmolfiles.MolToSmarts(rdkitmol)
+    smartsmol=Chem.MolFromSmarts(smarts)
+    matches=rdkitmol.GetSubstructMatches(smartsmol)
+    for match in matches:
+        lastmatch=match
+    lastindex=lastmatch.index(rdkitindex)
+    atomorder=lastindex+1
+    string='%'+' '+smarts+' % '+str(atomorder)
+    return string
+
+def GenerateAtomSMARTSMap(poltype,rdkitmol):
+    lines=[]
+    descrip='"%s"'% poltype.molecprefix
+    for atom in rdkitmol.GetAtoms():
+        atomidx=atom.GetIdx()
+        symbol=atom.GetSymbol()
+        string=GenerateSMARTSMatchLine(poltype,rdkitmol,atomidx)
+        line=' '+symbol+' '+descrip+' '+string+'\n'
+        lines.append(line)
+    return lines        
+
+def AppendToSMARTSMapFile(poltype,lines,filename):
+    temp=open(filename,'a')
+    for line in lines:
+        temp.write(line)
+    temp.close()
+
+
+def RepresentsInt(poltype,s):
+    try: 
+        int(s)
+        return True
+    except ValueError:
+        return False
+
+
+
+def AddKeyFileParametersToParameterFile(poltype,rdkitmol):   
+    atomdefs,bondprms,angleprms,torsionprms,strbndprms,opbendprms,polarizeprms,vdwprms,mpoleprms=GrabParameters(poltype,poltype.keyfiletoaddtodatabase)
+    oldtypetonewtype,shift=ShiftPoltypeNumbers(poltype,poltype.smallmoleculeprmlib,poltype.keyfiletoaddtodatabase)
+    result=ShiftParameterDefintions(poltype,[atomdefs,bondprms,angleprms,torsionprms,strbndprms,opbendprms,polarizeprms,vdwprms,mpoleprms],oldtypetonewtype)
+    atomdefs,bondprms,angleprms,torsionprms,strbndprms,opbendprms,polarizeprms,vdwprms,mpoleprms=result[:] 
+    WriteToPrmFile(poltype,atomdefs,bondprms,angleprms,torsionprms,strbndprms,opbendprms,polarizeprms,vdwprms,mpoleprms,poltype.smallmoleculeprmlib)
+    lines=GenerateAtomSMARTSMap(poltype,rdkitmol)
+    AppendToSMARTSMapFile(poltype,lines,poltype.smallmoleculesmartstotinkerdescrip)
+
+
+ 
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     smartsatomordertoelementtinkerdescrip=ReadSmallMoleculeLib(poltype,poltype.smallmoleculesmartstotinkerdescrip)
     elementtinkerdescriptotinkertype,tinkertypetoclass=GrabTypeAndClassNumbers(poltype,poltype.smallmoleculeprmlib)
@@ -1536,7 +1582,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     planarangleindicestotinkertypes,planarangleindicestotinkerclasses,planarangleindicestoparametersmartsatomorders,planarangleindicestoelementtinkerdescrips,planarangleindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
 
 
-
     torsionindicestotinkertypes,torsionindicestotinkerclasses,torsionindicestoparametersmartsatomorders,torsionindicestoelementtinkerdescrips,torsionindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,torsionsforprmtoparametersmarts,torsionsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
     torsionsmissing=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol)
     torsionsmissingindicestotinkerclasses=PruneDictionary(poltype,torsionsmissing,torsionindicestotinkerclasses)
@@ -1568,12 +1613,10 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     atompoltypeclasstosmartsatomorder=ConvertIndicesDictionaryToPoltypeClasses(poltype,atomindextosmartsatomorder,atomindextotinkerclass,atomtinkerclasstopoltypeclass)
 
     atompoltypeclassestoelementtinkerdescrip=ConvertIndicesDictionaryToPoltypeClasses(poltype,atomindextoelementtinkerdescrip,atomindextotinkerclass,atomtinkerclasstopoltypeclass)
-    print('atomtinkerclasstopoltypeclass',atomtinkerclasstopoltypeclass)
     poltypetoprmtype={} # dont need polarize parameters 
     typestoframedefforprmfile={} # dont need multipole parameters
     fname=poltype.smallmoleculeprmlib
     bondprms,angleprms,torsionprms,strbndprms,mpoleprms,opbendprms,polarizeprms,vdwprms=GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,angletinkerclassestopoltypeclasses,torsiontinkerclassestopoltypeclasses,poltypetoprmtype,atomtinkerclasstopoltypeclass,typestoframedefforprmfile,fname,True)
-    print('vdwprms',vdwprms)
     angleprms=ModifyAngleKeywords(poltype,angleprms,planarangletinkerclassestopoltypeclasses)
     bondprms=AddOptimizedBondLengths(poltype,optmol,bondprms)
     angleprms=AddOptimizedAngleLengths(poltype,optmol,angleprms)
