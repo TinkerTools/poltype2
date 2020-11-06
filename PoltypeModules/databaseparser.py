@@ -1151,7 +1151,9 @@ def AddOptimizedAngleLengths(poltype,mol,angleprms):
             anglelen = mol.GetAngle(a,b,c)
             tot+=anglelen
         avganglelength=tot/len(allangles)
-        linesplit=re.split(r'(\s+)', line)   
+        linesplit=re.split(r'(\s+)', line)
+        linesplit=linesplit[:11]
+        linesplit.append('\n')
         linesplit[8]=str(avganglelength)
         line=''.join(linesplit)
         newangleprms.append(line)
