@@ -520,10 +520,14 @@ def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,angletin
          
         elif 'vdw' in line and 'type' not in line and 'scale' not in line: 
             atomclass=int(linesplit[1])
-            if atomclass in atomtinkerclasstopoltypeclass.keys():
-                prmclass=atomtinkerclasstopoltypeclass[atomclass]
-                newline=line.replace('\n','')+' '+str(prmclass)+'\n'
-                vdwprmsprms.append(newline)
+            atomclasslist=tuple([atomclass])
+            if atomclasslist in atomtinkerclasstopoltypeclass.keys():
+                prmclasses=atomtinkerclasstopoltypeclass[atomclasslist]
+                for prmclasslist in prmclasses:
+                    for prmclass in prmclasslist:
+                        linesplit[1]=str(prmclass)
+                        newline=' '.join(linesplit)+'\n'
+                        vdwprms.append(newline)
          
 
     
@@ -1564,11 +1568,12 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     atompoltypeclasstosmartsatomorder=ConvertIndicesDictionaryToPoltypeClasses(poltype,atomindextosmartsatomorder,atomindextotinkerclass,atomtinkerclasstopoltypeclass)
 
     atompoltypeclassestoelementtinkerdescrip=ConvertIndicesDictionaryToPoltypeClasses(poltype,atomindextoelementtinkerdescrip,atomindextotinkerclass,atomtinkerclasstopoltypeclass)
-
+    print('atomtinkerclasstopoltypeclass',atomtinkerclasstopoltypeclass)
     poltypetoprmtype={} # dont need polarize parameters 
     typestoframedefforprmfile={} # dont need multipole parameters
     fname=poltype.smallmoleculeprmlib
     bondprms,angleprms,torsionprms,strbndprms,mpoleprms,opbendprms,polarizeprms,vdwprms=GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,angletinkerclassestopoltypeclasses,torsiontinkerclassestopoltypeclasses,poltypetoprmtype,atomtinkerclasstopoltypeclass,typestoframedefforprmfile,fname,True)
+    print('vdwprms',vdwprms)
     angleprms=ModifyAngleKeywords(poltype,angleprms,planarangletinkerclassestopoltypeclasses)
     bondprms=AddOptimizedBondLengths(poltype,optmol,bondprms)
     angleprms=AddOptimizedAngleLengths(poltype,optmol,angleprms)
