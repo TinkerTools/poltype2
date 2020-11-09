@@ -1055,7 +1055,6 @@ class PolarizableTyper():
        
         if os.path.isfile(self.torsionsmissingfilename):
             torsionsmissing=databaseparser.ReadList(self,self.torsionsmissingfilename)
-            print('torsionsmissing poltype',torsionsmissing)
         if os.path.isfile(self.torsionprmguessfilename):
             classkeytotorsionparametersguess=databaseparser.ReadDictionaryFromFile(self,self.torsionprmguessfilename)
         esp.SPForDMA(self,optmol,mol)

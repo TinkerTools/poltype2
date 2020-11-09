@@ -56,7 +56,7 @@ def TotalParametersToFitForNonAromaticRing(poltype,ringtors): # symmetry class k
 def TotalDatapointsForNonAromaticRing(poltype,numparameters):
     return numparameters+1 # +1 so dont overfit
 
-def AllPossiblePuckeringLocationsForRing(poltype,ringtors,tortoneighbtors):
+def AllPossiblePuckeringLocationsForRing(poltype,ringtors,tortoneighbtors,mol):
     numbertors=len(ringtors)-3 
     combs=list(combinations(ringtors,numbertors))
     finalcombs=[]
@@ -64,11 +64,18 @@ def AllPossiblePuckeringLocationsForRing(poltype,ringtors,tortoneighbtors):
         goodcomb=True
         for i in range(len(comb)):
             tor=comb[i]
-            neighbtors=tortoneighbtors[tuple(tor)]
-            othertors = [x for j,x in enumerate(comb) if j!=i]
-            for otor in othertors:
-                if otor not in neighbtors:
-                    goodcomb=False
+            a,b,c,d=tor[:]
+            bond=mol.GetBond(b,c)      
+            bo=bond.GetBO()
+            if bo>1:
+                goodcomb=False
+            else:      
+                neighbtors=tortoneighbtors[tuple(tor)]
+                othertors = [x for j,x in enumerate(comb) if j!=i]
+                for otor in othertors:
+                    if otor not in neighbtors:
+                        goodcomb=False
+        
         if goodcomb==True:
             finalcombs.append(comb)
     return finalcombs
@@ -197,7 +204,7 @@ def RefineNonAromaticRingTorsions(poltype,mol,optmol,classkeytotorsionparameters
     reducednonarotorsions=[]
     for nonarotors in nonarotorsions:
         tortoneighbtors=NeighboringTorsion(poltype,nonarotors,mol)
-        combs=AllPossiblePuckeringLocationsForRing(poltype,nonarotors,tortoneighbtors)
+        combs=AllPossiblePuckeringLocationsForRing(poltype,nonarotors,tortoneighbtors,mol)
         firstcomb=combs[0]
         reducednonarotorsions.append(firstcomb)
         UpdateTorsionSets(poltype,firstcomb)
@@ -223,8 +230,12 @@ def RefineNonAromaticRingTorsions(poltype,mol,optmol,classkeytotorsionparameters
                 prms=classkeytotorsionparametersguess[classkey] 
             elif revclasskey in classkeytotorsionparametersguess.keys(): 
                 prms=classkeytotorsionparametersguess[revclasskey] 
-
+            diff=len(poltype.nfoldlist)-len(prms)
+            if diff>0:
+                for i in range(diff):
+                    prms.append(0)
             poltype.classkeytoinitialprmguess[classkey]=prms
+               
 
     os.chdir('..')
 

@@ -893,6 +893,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             numprms+= len(torprmdict[classkey]['prmdict'].keys())
         string=' , '.join(list(torprmdict.keys()))
         datapts=len(mm_energy_list)
+        print('Torsions being fit',string,'RMSD(QM-MM1)',minRMSD), 
         if dim==1:
                
             fig = plt.figure(figsize=(10,10))
@@ -1124,7 +1125,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         dim=len(mang_list[0])
         datapts=len(mm_energy_list)
         numprms=None 
-
+        print('Torset',torset,'RMSD(MM2,QM)',minRMSD)
         if dim==1: 
             fig = plt.figure(figsize=(10,10))
             ax = fig.add_subplot(111)
