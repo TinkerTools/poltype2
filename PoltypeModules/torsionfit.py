@@ -80,8 +80,12 @@ def fitfunc (poltype,parms, x,torset, torprmdict, debug = False):
                     if parms is not 'eval':
                         # get prm from parms array
                         prm = parms[torprm['prmdict'][nfold]]
-
-                    tor_energy += tor_func_term (poltype,prm, ang, nfold, clscnt, torgen.rads(poltype,clsangle),torgen.rads(poltype,poltype.foldoffsetlist[nfold-1]))
+                    if 'firstphaseprmindex' in torprm.keys() and nfold==1:
+                        prmindex=['firstphaseprmindex']
+                        offset=parms[prmindex]
+                    else:
+                        offset=poltype.foldoffsetlist[nfold-1]
+                    tor_energy += tor_func_term (poltype,prm, ang, nfold, clscnt, torgen.rads(poltype,clsangle),torgen.rads(poltype,offset))
         tor_energy_array[j]=tor_energy
 
     if parms is 'eval' and 'offset' in torprm:
@@ -273,6 +277,11 @@ def del_tor_from_fit(poltype,dellist, torprmdict,initialprms):
         indicestodelete=[]
         for clskey in torprmdict.keys():
             if clskey==key:
+                if 'firstphaseprmindex' in torprmdict.keys():
+                    prmindex=['firstphaseprmindex']
+                    indicestodelete.append(prmindex) 
+   
+
                 for fold,index in torprmdict[clskey]['prmdict'].items():
                     indicestodelete.append(index)
 
@@ -282,7 +291,7 @@ def del_tor_from_fit(poltype,dellist, torprmdict,initialprms):
             value=initialprms[i]
             if i not in indicestodelete:
                 newinitialprms.append(value)
-        newinitialprms.append(0)
+        newinitialprms.append(0) # vertical shift
 
         del torprmdict[key]
         for clskey in torprmdict.keys():
@@ -541,6 +550,10 @@ def insert_torprmdict(poltype,mol, torprmdict):
     for (chkclskey, torprm) in torprmdict.items():
         # for each parameter in the energy equation for this torsion
         # nfoldlist = [1,2,3]
+        if poltype.fitfirsttorsionfoldphase==True:
+            torprm['firstphaseprmindex']=prmidx
+            prmidx+=1
+            initialprms.append(0)
         for nfold in poltype.nfoldlist:
             # init array
             test_tor_energy = numpy.zeros(len(tmpx))

@@ -739,8 +739,11 @@ def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndli
             if tpdkey not in torsionlist:
                 torsionlist.append(tpdkey)
         torset=tuple([maintor])
-        prmnum=len(poltype.nfoldlist)*1+1
-        prmnum=len(poltype.nfoldlist)*(len(torsionlist))+1
+        if poltype.fitfirsttorsionfoldphase==True:
+            prmnum=len(poltype.nfoldlist)*1+1+1
+
+        else:
+            prmnum=len(poltype.nfoldlist)*1+1
         poltype.torsionsettonumptsneeded[torset]=prmnum
 
         if poltype.tordatapointsnum==None:

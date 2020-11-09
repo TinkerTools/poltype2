@@ -962,6 +962,18 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
                     trueparametersmartsindextosmartsindex[parametersmartsindex]=smartsindex
         truesmartsindextoparametersmartsindex={v: k for k, v in trueparametersmartsindextosmartsindex.items()}
         allpossiblebabelindicessmarts=GrabSymmetryIdenticalIndicesBabel(poltype,structure,moleculeindextosmartsindex,truesmartsindextoparametersmartsindex,atomindices)
+        for i in range(len(allpossiblebabelindicessmarts)):
+            babelindicessmarts=allpossiblebabelindicessmarts[i]
+            rdkitindicessmarts=[j-1 for j in babelindicessmarts]
+            indicesindic=[]
+            indicesnotindic=[]
+            for idx in rdkitindicessmarts: # sometimes type classes for three oxygen are same but two are double bonded so matches will not match single bond
+                if idx in trueparametersmartsindextosmartsindex.keys():
+                    indicesindic.append(idx)
+                else:
+                    indicesnotindic.append(idx)
+            for idx in indicesnotindic:
+                trueparametersmartsindextosmartsindex[idx]=trueparametersmartsindextosmartsindex[indicesindic[0]]
         allpossiblerdkitindices=ReturnSymmetryIdenticalIndicesSMARTSAndParameterSMARTS(poltype,allpossiblebabelindicessmarts,smartsindextomoleculeindex,trueparametersmartsindextosmartsindex)
         wildcards=CountWildCards(poltype,smartsfortransfer)
         parametersmartsatomorderlists=[] 

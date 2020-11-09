@@ -402,7 +402,6 @@ def post_proc_localframes(poltype,keyfilename, lfzerox,atomindextoremovedipquad,
                 (keywd,atmidx,lf1,lf2,lf3,chg) = tmplst
             elif len(tmplst) == 3:
                 (keywd,atmidx,chg) = tmplst
-
                 # manually zero out components of the multipole if they were not done by poledit
             if lfzerox[int(atmidx) - 1]:
                 tmpmp = list(map(float, lines[ln1+1].split()))
