@@ -846,6 +846,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             for nfold in torprmdict[chkclskey]['prmdict']:
                 parm  = p1[torprmdict[chkclskey]['prmdict'][nfold]]
                 torprmdict[chkclskey]['prmdict'][nfold] = parm
+                if numpy.abs(parm)>20:
+                    raise ValueError('parameter way to big'+str(parm))
             write_prm_dict[chkclskey] = torprmdict[chkclskey]['prmdict']
             # if not found, set as 0
             if write_prm_dict[chkclskey] == {}:
