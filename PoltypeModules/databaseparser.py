@@ -14,6 +14,9 @@ import symmetry as symm
 from rdkit.Chem.Lipinski import RotatableBondSmarts
 import numpy as np
 import json
+import torsionfit as torfit
+
+
    
 def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo):
     temp=open(vf,'r')
@@ -1222,15 +1225,16 @@ def ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,
     newtorsionprms=[]
     for line in torsionprms:
         linesplit=line.split()
-        classes=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3]),int(linesplit[4])]
-        if classes in torsionsmissingtinkerclassestopoltypeclasses.values() or classes[::-1] in torsionsmissingtinkerclassestopoltypeclasses.values(): 
-            newlinesplit=re.split(r'(\s+)', line)
-            splitafter=newlinesplit[12:]
-            splitafter[0]='0'
-            splitafter[4]='0'
-            splitafter[10]='0'
-            newlinesplit=newlinesplit[:12]+splitafter
-            line=''.join(newlinesplit)
+        classes=tuple([int(linesplit[1]),int(linesplit[2]),int(linesplit[3]),int(linesplit[4])])
+        for sublist in torsionsmissingtinkerclassestopoltypeclasses.values():
+            if classes in sublist or classes[::-1] in sublist: 
+                newlinesplit=re.split(r'(\s+)', line)
+                splitafter=newlinesplit[12:]
+                splitafter[0]='0'
+                splitafter[4]='0'
+                splitafter[10]='0'
+                newlinesplit=newlinesplit[:12]+splitafter
+                line=''.join(newlinesplit)
         newtorsionprms.append(line)
 
     return newtorsionprms
@@ -1550,6 +1554,17 @@ def AddKeyFileParametersToParameterFile(poltype,rdkitmol):
     AppendToSMARTSMapFile(poltype,lines,poltype.smallmoleculesmartstotinkerdescrip)
 
 
+
+    
+def ConvertToPoltypeClasses(poltype,torsionsmissing):
+    newtorsionsmissing=[]
+    for sublist in torsionsmissing:
+        newsublist=[i+1 for i in sublist]
+        a,b,c,d=newsublist[:]
+        sorttor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[a],poltype.idxtosymclass[b],poltype.idxtosymclass[c],poltype.idxtosymclass[d]])
+        newtorsionsmissing.append(sorttor)
+    return newtorsionsmissing
+
  
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     smartsatomordertoelementtinkerdescrip=ReadSmallMoleculeLib(poltype,poltype.smallmoleculesmartstotinkerdescrip)
@@ -1624,7 +1639,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     angleprms=AddOptimizedAngleLengths(poltype,optmol,angleprms)
     torsionkeystringtoparameters=GrabTorsionParameterCoefficients(poltype,torsionprms)
     torsionprms=ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,torsionprms)
-
+    
     potentialmissingopbendprmtypes=FindPotentialMissingParameterTypes(poltype,opbendprms,planarbondtinkerclassestopoltypeclasses)
     potentialmissingopbendprmindices=ConvertPoltypeClassesToIndices(poltype,potentialmissingopbendprmtypes)
     potentialmissingopbendprmindices=FilterIndices(poltype,potentialmissingopbendprmindices,planarbonds)
@@ -1639,6 +1654,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     angleprmstotransferinfo=MapParameterLineToTransferInfo(poltype,angleprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips)
     strbndprmstotransferinfo=MapParameterLineToTransferInfo(poltype,strbndprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips)
     torsionprmstotransferinfo=MapParameterLineToTransferInfo(poltype,torsionprms,torsionpoltypeclassestoparametersmartsatomorders,torsionpoltypeclassestosmartsatomorders,torsionpoltypeclassestoelementtinkerdescrips)
+    torsionsmissing=ConvertToPoltypeClasses(poltype,torsionsmissing)
     WriteOutList(poltype,torsionsmissing,poltype.torsionsmissingfilename)
     WriteDictionaryToFile(poltype,torsionkeystringtoparameters,poltype.torsionprmguessfilename)
     return bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,torsionsmissing,torsionkeystringtoparameters

@@ -1054,7 +1054,8 @@ class PolarizableTyper():
             bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
        
         if os.path.isfile(self.torsionsmissingfilename):
-            torsionsmissing=databaseparser.ReadList(self,self.torsionsmissingfilename) 
+            torsionsmissing=databaseparser.ReadList(self,self.torsionsmissingfilename)
+            print('torsionsmissing poltype',torsionsmissing)
         if os.path.isfile(self.torsionprmguessfilename):
             classkeytotorsionparametersguess=databaseparser.ReadDictionaryFromFile(self,self.torsionprmguessfilename)
         esp.SPForDMA(self,optmol,mol)
@@ -1148,7 +1149,6 @@ class PolarizableTyper():
         self.rotbndtoanginc=torgen.DetermineAngleIncrementAndPointsNeededForEachTorsionSet(self,mol,self.rotbndlist)
 
         torgen.DefaultMaxRange(self,self.torlist)
-
         if self.use_gauPCM==True:
             self.use_gausoptonly=False
             self.use_gaus=True
