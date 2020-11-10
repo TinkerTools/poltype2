@@ -402,6 +402,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         os.chdir(head)
         MakeFileName(poltype,strparentrotbndindexes,'torsions.txt')
         parentindextofragindex=rotbndindextoparentindextofragindex[equivalentrotbndindex]
+
         tempdic={}
         for parentindex,fragindex in parentindextofragindex.items():
             if type(parentindex)==str:
@@ -426,7 +427,6 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                     parentsymclass=poltype.idxtosymclass[idx]
                     fragsymclass=fragidxtosymclass[fragidx]
                     parentsymclasstofragsymclass[parentindex][parentsymclass]=fragsymclass
-
         WriteDictionaryToFile(poltype,parentsymclasstofragsymclass,"parentsymclasstofragsymclass.txt")
         WriteDictionaryToFile(poltype,parentindextofragindex,"parentindextofragindex.txt")
         tempmol=mol_with_atom_index_removed(poltype,fragmol) 
@@ -449,12 +449,14 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 tors=list(poltype.rotbndlist[rotkey])
             else:
                 tors=[]
-
+            if rotbndindex in rotbndindextoringtor.keys():
+                torset=rotbndindextoringtor[rotbndindex]
+                for tor in torset:
+                    tors.append(tor)
             for torsion in tors:
                 smilesposarray=[]
                 fragtor=[]
                 for index in torsion:
-                   
                     fragindex=parentindextofragindex[index]
                     fragtor.append(fragindex)
                     fragidxarraypos=fragidxarray.index(fragindex)
