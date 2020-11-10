@@ -49,14 +49,14 @@ def RemoveCommentsFromKeyFile(poltype,keyfilename):
         
     shutil.move(tempname, keyfilename)
 
-def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,variabletorlist,torsionrestraint):
+def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,variabletorlist,torsionrestraint,mol):
     jobtooutputlog={}
     listofjobs=[]
     outputlogs=[]
     for i in range(len(listofstructurestorunQM)):
         torxyzfname=listofstructurestorunQM[i]
         phaseangles=phaselist[i]
-        inputname,outputlog,cmdstr,scratchdir=GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist)
+        inputname,outputlog,cmdstr,scratchdir=GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist,mol)
         finished,error=poltype.CheckNormalTermination(outputlog)
         if finished==True and 'opt' in outputlog:
             opt.GrabFinalXYZStructure(poltype,outputlog,outputlog.replace('.log','.xyz'))
@@ -96,7 +96,7 @@ def TinkerMinimizePostQMOpt(poltype,outputlogs,phaselist,optmol,torset,variablet
             cartxyznames.append(cartxyz)
     return torxyznames,finishedoutputlogs,cartxyznames
 
-def ExecuteSPJobs(poltype,torxyznames,cartxyznames,optoutputlogs,phaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,outputlogtocartxyz):
+def ExecuteSPJobs(poltype,torxyznames,cartxyznames,optoutputlogs,phaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,outputlogtocartxyz,mol):
     jobtooutputlog={}
     listofjobs=[]
     outputnames=[]
@@ -107,10 +107,10 @@ def ExecuteSPJobs(poltype,torxyznames,cartxyznames,optoutputlogs,phaselist,optmo
         cartxyzname=cartxyznames[i]
         if not poltype.use_gaus:
             finalstruct=outputlog.replace('.log','_opt.xyz')
-            inputname,outputname=CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,torset,phaseangles)
+            inputname,outputname=CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,torset,phaseangles,mol)
             cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+inputname+' '+outputname
         else:
-            inputname,outputname=GenerateTorsionSPInputFileGaus(poltype,torxyzfname,torset,optmol,phaseangles,outputlog)
+            inputname,outputname=GenerateTorsionSPInputFileGaus(poltype,torxyzfname,torset,optmol,phaseangles,outputlog,mol)
             cmdstr = 'cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
         finished,error=poltype.CheckNormalTermination(outputname)
         if finished==True and error==False:
@@ -138,7 +138,7 @@ def ExecuteSPJobs(poltype,torxyznames,cartxyznames,optoutputlogs,phaselist,optmo
 
 
 
-def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist):
+def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol):
     toroptcomfname = '%s-opt-' % (poltype.molecprefix)
     for i in range(len(torset)):
         tor=torset[i]
@@ -150,7 +150,7 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     toroptcomfname=toroptcomfname[:-1]
     toroptcomfname+='.com'     
     strctfname = os.path.splitext(toroptcomfname)[0] + '.log'
-    gen_torcomfile(poltype,toroptcomfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,optmol,torxyzfname) # prevstruct is just used for Atomic Num and charge,torxyzfname is used for xyz coordinates
+    gen_torcomfile(poltype,toroptcomfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,optmol,torxyzfname,mol) # prevstruct is just used for Atomic Num and charge,torxyzfname is used for xyz coordinates
     # Append restraints to *opt*.com file
     tmpfh = open(toroptcomfname, "a")
     restlist=[]
@@ -184,12 +184,12 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     return toroptcomfname,outputname
     
 
-def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist):
+def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist,mol):
     if  poltype.use_gaus==False and poltype.use_gausoptonly==False:
-        inputname,outputname=CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist)
+        inputname,outputname=CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol)
         cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+inputname+' '+outputname
     else:
-        inputname,outputname=CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist)
+        inputname,outputname=CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol)
         cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
         return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4
@@ -198,7 +198,7 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
         return inputname,outputname,cmdstr,poltype.scrtmpdirgau
         
 
-def GenerateTorsionSPInputFileGaus(poltype,torxyzfname,torset,optmol,phaseangles,prevstrctfname):
+def GenerateTorsionSPInputFileGaus(poltype,torxyzfname,torset,optmol,phaseangles,prevstrctfname,mol):
     prevstruct = opt.load_structfile(poltype,prevstrctfname)
     torspcomfname = '%s-sp-' % (poltype.molecprefix)
     for i in range(len(torset)):
@@ -211,7 +211,7 @@ def GenerateTorsionSPInputFileGaus(poltype,torxyzfname,torset,optmol,phaseangles
     torspcomfname=torspcomfname[:-1]
     torspcomfname+='.com'     
     torsplogfname = os.path.splitext(torspcomfname)[0] + '.log'
-    gen_torcomfile(poltype,torspcomfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,prevstruct,torxyzfname)
+    gen_torcomfile(poltype,torspcomfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,prevstruct,torxyzfname,mol)
     outputname=torspcomfname.replace('.com','.log')
     return torspcomfname,outputname
 
@@ -380,7 +380,7 @@ def GenerateFilename(poltype,torset,phaseangles,prefix,postfix,mol):
     filename+=postfix
     return filename
 
-def gen_torsion(poltype,optmol,torsionrestraint):
+def gen_torsion(poltype,optmol,torsionrestraint,mol):
     """
     Intent: For each rotatable bond, rotate the torsion about that bond about 
     30 degree intervals. At each interval use Gaussian SP to find the energy of the molecule at
@@ -496,7 +496,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         prevstrctfname = minstrctfname
         listoftinkertorstructures=tinker_minimize_angles(poltype,torset,optmol,variabletorlist,flatphaselist,prevstrctfname,torsionrestraint,bondtopology)
         listofstructurestorunQM.extend(listoftinkertorstructures)
-        outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint)
+        outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol)
         poltype.torsettophaselist[tuple(torset)]=flatphaselist
         torsettooptoutputlogs[tuple(torset)]=outputlogs
 
@@ -546,7 +546,7 @@ def gen_torsion(poltype,optmol,torsionrestraint):
         fullcartxyznames.extend(cartxyznames)
         torsettocartxyz[tuple(torset)]=cartxyznames
 
-        outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangles,outputlogtocartxyz=ExecuteSPJobs(poltype,torxyznames,cartxyznames,finishedoutputlogs,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,outputlogtocartxyz)
+        outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangles,outputlogtocartxyz=ExecuteSPJobs(poltype,torxyznames,cartxyznames,finishedoutputlogs,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,outputlogtocartxyz,mol)
         lognames=[]
         torsettospoutputlogs[tuple(torset)]=outputlogs
         for job in listofjobs:
@@ -819,7 +819,7 @@ def ConvertTinktoXYZ(poltype,filename):
     tempwrite.close()
     return filename.replace('.xyz_2','_xyzformat.xyz')
 
-def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist):
+def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol):
     inputname = '%s-opt-'%(poltype.molecprefix)
     for i in range(len(torset)):
         tor=torset[i]
@@ -832,7 +832,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     inputname+='.psi4'     
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
-    temp.write('%d %d\n' % (optmol.GetTotalCharge(),1))
+    temp.write('%d %d\n' % (mol.GetTotalCharge(),1))
     iteratom = openbabel.OBMolAtomIter(optmol)
     etab = openbabel.OBElementTable()
     if os.path.isfile(torxyzfname):
@@ -952,7 +952,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     return inputname,outputname
 
 
-def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
+def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol):
     """
     Intent: Create *.com file for qm torsion calculations 
     Input:
@@ -1004,7 +1004,7 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf):
 
     tmpfh.write(operationstr)
     tmpfh.write('\n%s\n\n' % commentstr)
-    tmpfh.write('%d %d\n' % (prevstruct.GetTotalCharge(), prevstruct.GetTotalSpinMultiplicity()))
+    tmpfh.write('%d %d\n' % (mol.GetTotalCharge(), mol.GetTotalSpinMultiplicity()))
     iteratom = openbabel.OBMolAtomIter(prevstruct)
     etab = openbabel.OBElementTable()
     if os.path.isfile(xyzf):
@@ -1166,7 +1166,7 @@ def write_arr_to_file(poltype,fname, array_list):
             outfh.write(str(ele))
         outfh.write("\n")
 
-def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,torset,phaseangles,makecube=None):
+def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,torset,phaseangles,mol,makecube=None):
     inputname= '%s-sp-'%(poltype.molecprefix)
     for i in range(len(torset)):
         tor=torset[i]
@@ -1179,7 +1179,7 @@ def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,torset,phas
     inputname+='.psi4'    
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
-    temp.write('%d %d\n' % (optmol.GetTotalCharge(), 1))
+    temp.write('%d %d\n' % (mol.GetTotalCharge(), 1))
     iteratom = openbabel.OBMolAtomIter(optmol)
     etab = openbabel.OBElementTable()
     if os.path.isfile(torxyzfname):

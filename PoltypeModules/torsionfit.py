@@ -80,8 +80,8 @@ def fitfunc (poltype,parms, x,torset, torprmdict, debug = False):
                     if parms is not 'eval':
                         # get prm from parms array
                         prm = parms[torprm['prmdict'][nfold]]
-                    if 'firstphaseprmindex' in torprm.keys() and nfold==1:
-                        prmindex=['firstphaseprmindex']
+                    if 'firstphaseprmindex' in torprm.keys() and nfold==1 and parms!='eval':
+                        prmindex=torprm['firstphaseprmindex']
                         offset=parms[prmindex]
                     else:
                         offset=poltype.foldoffsetlist[nfold-1]
@@ -613,7 +613,7 @@ def is_torprmdict_all_empty (poltype,torprmdict):
     return result
 
 
-def GenerateBoundaries(poltype,tor_energy_list,refine,initialprms):
+def GenerateBoundaries(poltype,tor_energy_list,refine,initialprms,torprmdict):
     lowerbounds=[]
     upperbounds=[]
     max_amp = max(tor_energy_list) - min(tor_energy_list)
@@ -621,15 +621,39 @@ def GenerateBoundaries(poltype,tor_energy_list,refine,initialprms):
         bounds=[-max_amp,max_amp]
 
     else:
-        for initialprm in initialprms:
-            value=numpy.abs(initialprm)
-            scaledvalue=.3*value
-            if value!=0:
-                lowerbounds.append(initialprm-scaledvalue)
-                upperbounds.append(initialprm+scaledvalue)
-            else:
-                lowerbounds.append(-max_amp)
-                upperbounds.append(max_amp)
+        for chkclskey in torprmdict:
+
+            prms=[]
+            for nfold in torprmdict[chkclskey]['prmdict']:
+                parm  = initialprms[torprmdict[chkclskey]['prmdict'][nfold]]
+                prms.append(parm)
+            allzero=True
+            for prm in prms:
+                value=numpy.abs(prm)
+                if value!=0:
+                    allzero=False
+            if 'firstphaseprmindex' in torprmdict[chkclskey].keys():
+                lowerbounds.append(0)
+                upperbounds.append(2*numpy.pi)
+
+            for prmidx in range(len(prms)):
+                prm=prms[prmidx]
+                value=numpy.abs(prm)
+                scaledvalue=.3*value
+                if allzero==False:
+                    if value!=0:
+                        lowerbounds.append(prm-scaledvalue)
+                        upperbounds.append(prm+scaledvalue)
+                    else:
+                        lowerbounds.append(prm)
+                        upperbounds.append(.2) # cant bound by 0,0
+                else:
+                    lowerbounds.append(-max_amp)
+                    upperbounds.append(max_amp)
+
+        lowerbounds.append(-max_amp) # vertical shift at end
+        upperbounds.append(max_amp)
+
         bounds=[lowerbounds,upperbounds]
     return tuple(bounds),max_amp
        
@@ -721,7 +745,6 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
                 useweights=True
             else:
                 useweights=False
-            
             if clskey in poltype.classkeytoinitialprmguess.keys():
                 refine=True
             rotbndkey = '%d %d' % (b, c)
@@ -768,7 +791,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         txtfname+=".txt"         # create initial fit file, initially it seems to be 2d instead of 3d
         torgen.write_arr_to_file(poltype,txtfname,[tor_energy_list])
         # max amplitude of function
-        boundstup,max_amp=GenerateBoundaries(poltype,tor_energy_list,refine,initialprms)
+        boundstup,max_amp=GenerateBoundaries(poltype,tor_energy_list,refine,initialprms,torprmdict)
         # Remove parameters while # of parameters > # data points
         toralreadyremovedlist=[]
         while prmidx > len(mm_energy_list):
@@ -860,6 +883,12 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
                 parm  = p1[torprmdict[chkclskey]['prmdict'][nfold]]
                 torprmdict[chkclskey]['prmdict'][nfold] = parm
                 if numpy.abs(parm)>20:
+                    print('p1',p1)
+                    print('torprmdict',torprmdict)
+                    print('max_amp',max_amp)
+                    print('mm_energy_list',mm_energy_list)
+                    print('qm_energy_list',qm_energy_list)
+                    print('boundstup',boundstup)
                     raise ValueError('parameter way to big'+str(parm))
             write_prm_dict[chkclskey] = torprmdict[chkclskey]['prmdict']
             # if not found, set as 0
@@ -1100,9 +1129,6 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]
         mm2_energy_list = [en - min(mm2_energy_list) for en in mm2_energy_list]
-        print('qm_energy_list',qm_energy_list)
-        print('mm_energy_list',mm_energy_list)
-        print('mm2_energy_list',mm2_energy_list)
         # find the difference between the two energy due to torsion profiles 
         tordif_list = [e2-e1 for (e1,e2) in zip(tor_e_list,tor_e_list2)]
         # normalize
@@ -1168,12 +1194,6 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             fig.savefig(figfname)
         elif dim==2:
             mmmat,mm2mat,fmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,mang_list,mm_energy_list,mm2_energy_list,ff_list,torset)
-            print('mmmat')
-            print(mmmat) 
-            print('mm2mat')
-            print(mm2mat) 
-            print('fmat')
-            print(fmat)   
             PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,mm2mat,'MM2 Heatmap (kcal/mol)','MM2_Heatmap.png',numprms,datapts,minRMSD)
             PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,fmat,'MM1+Fit Heatmap (kcal/mol)','MM1+Fit_Heatmap.png',numprms,datapts,minRMSD)
 
