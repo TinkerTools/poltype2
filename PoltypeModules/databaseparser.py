@@ -1184,11 +1184,20 @@ def GrabKeysFromValue(poltype,dic,thevalue):
     return keylist
           
 
-def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol):
+def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol):
     torsionsmissing=[]
     indextoneighbidxs=FindAllNeighborIndexes(poltype,rdkitmol)
     for torsionindices,smartsenv in torsionindicestoparametersmartsenv.items():
         aidx,bidx,cidx,didx=torsionindices[:]
+        babelindices=[i+1 for i in torsionindices]
+        babelatoms=[mol.GetAtom(i) for i in babelindices]
+        ringbools=[a.IsInRing() for a in babelatoms]
+        contin=False
+        for ringbool in ringbools:
+            if ringbool==True:
+                contin=True
+        if contin==True:
+            continue
         firstneighborindexes=indextoneighbidxs[bidx]
         secondneighborindexes=indextoneighbidxs[cidx]
         neighborindexes=firstneighborindexes+secondneighborindexes
@@ -1612,7 +1621,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
 
 
     torsionindicestotinkertypes,torsionindicestotinkerclasses,torsionindicestoparametersmartsatomorders,torsionindicestoelementtinkerdescrips,torsionindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,torsionsforprmtoparametersmarts,torsionsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
-    torsionsmissing=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol)
+    torsionsmissing=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol,mol)
     torsionsmissingindicestotinkerclasses=PruneDictionary(poltype,torsionsmissing,torsionindicestotinkerclasses)
     atomtinkerclasstopoltypeclass=TinkerClassesToPoltypeClasses(poltype,atomindextotinkerclass)
     bondtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,bondindicestotinkerclasses)
