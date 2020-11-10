@@ -1167,7 +1167,7 @@ class PolarizableTyper():
         self.nonaroringtors=[]
         self.nonaroringtorsets=[]
         self.classkeytoinitialprmguess={}
-        if self.refinenonaroringtors==True:
+        if self.refinenonaroringtors==True and self.dontfrag==False:
             rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
 
 
@@ -1182,8 +1182,8 @@ class PolarizableTyper():
                     rotbnd=[tor[1]-1,tor[2]-1]
                     highlightbonds.append(rotbnd)
             frag.Draw2DMoleculeWithWBO(self,WBOmatrix,self.molstructfname.replace('.sdf',''),self.rdkitmol,bondindexlist=highlightbonds,imgsize=1500)        
-            rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays=frag.GenerateFragments(self,self.mol,self.torlist,WBOmatrix) # returns list of bond indexes that need parent molecule to do torsion scan for (fragment generated was same as the parent0
-            frag.SpawnPoltypeJobsForFragments(self,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays)
+            rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor=frag.GenerateFragments(self,self.mol,self.torlist,WBOmatrix) # returns list of bond indexes that need parent molecule to do torsion scan for (fragment generated was same as the parent0
+            frag.SpawnPoltypeJobsForFragments(self,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor)
 
         if self.dontfrag==False and self.isfragjob==False and not os.path.isfile(self.key5fname):
             frag.GrabTorsionParametersFromFragments(self,self.torlist,rotbndindextofragmentfilepath) # just dump to key_5 since does not exist for parent molecule

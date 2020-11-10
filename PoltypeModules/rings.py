@@ -134,7 +134,7 @@ def UpdateTorsionSets(poltype,nonarotors):
             index=poltype.torlist.index(torset)
             del poltype.torlist[index]
     poltype.torlist.append(nonarotors)
-
+    poltype.nonaroringtorsets.append(nonarotors)
 
 def UpdateVariableTorsions(poltype,nonarotors):
     torset=nonarotors

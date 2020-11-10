@@ -301,16 +301,25 @@ def FindEquivalentFragments(poltype,fragmentarray,namearray):
         for name in array:
             namesplit=name.split('_')
             namesplit=[int(i) for i in namesplit]
-            firstrotidx.append(namesplit[0])
-            secondrotidx.append(namesplit[1])
+            if len(namesplit)>2:
+                for i in range(0,len(namesplit),2):
+                    firstrotidx.append(namesplit[i])
+                    secondrotidx.append(namesplit[i+1])
+            else:
+                firstrotidx.append(namesplit[0])
+                secondrotidx.append(namesplit[1])
+
         firstrotidx,secondrotidx=(list(t) for t in zip(*sorted(zip(firstrotidx, secondrotidx),reverse=True)))
         firstrotidx=[str(i)+'_' for i in firstrotidx]
-        secondrotidx=[str(i) for i in secondrotidx]    
+        secondrotidx=[str(i) for i in secondrotidx]   
         for i in range(len(firstrotidx)):
             firstrot=firstrotidx[i]
             secondrot=secondrotidx[i]
             rotbnd=firstrot+secondrot
-            newarray.append(rotbnd) 
+            newarray.append(rotbnd)
+        if len(namesplit)>2:
+            newarray=newarray[::-1]
+            newarray=['_'.join(newarray)] 
         newequivalentnamesarray.append(newarray)
     return newequivalentnamesarray
 
@@ -321,7 +330,9 @@ def FindRotatableBond(poltype,fragmol,rotbndindextofragment,temp):
             return rotbndindex
 
 def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog):
-    poltypeinput={'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','optmethod':poltype.optmethod,'toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'onlyrotbndslist':strfragrotbndindexes,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':poltype.numproc,'maxmem':poltype.maxmem,'maxdisk':poltype.maxdisk,'printoutput':True}
+    poltypeinput={'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','optmethod':poltype.optmethod,'toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':poltype.numproc,'maxmem':poltype.maxmem,'maxdisk':poltype.maxdisk,'printoutput':True}
+    if strfragrotbndindexes!=None:
+        poltypeinput['onlyrotbndslist']=strfragrotbndindexes
     inifilepath=poltype.WritePoltypeInitializationFile(poltypeinput)
     cmdstr='nohup'+' '+'python'+' '+poltype.poltypepath+r'/'+'poltype.py'+' '+'&'
     cmdstr='cd '+shlex.quote(os.getcwd())+' && '+cmdstr
@@ -342,7 +353,7 @@ def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog):
 
     return finishedjobs,errorjobs
 
-def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays):
+def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor):
     parentdir=dirname(abspath(os.getcwd()))
     listofjobs=[]
     jobtooutputlog={}
@@ -367,14 +378,16 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             rotbndindexes=rotbndindex.split('_')
             parentrotbndindexes=[int(i) for i in rotbndindexes]
             rotbndindexes=[int(i)-1 for i in parentrotbndindexes]
-
             fragrotbndindexes=[parentindextofragindex[i]+1 for i in rotbndindexes]
             fragrotbnd=str(fragrotbndindexes[0])+' '+str(fragrotbndindexes[1])
             if fragrotbnd not in fragrotbnds:
                 fragrotbnds.append(fragrotbnd)
                 strfragrotbndindexes+=str(fragrotbndindexes[0])+' '+str(fragrotbndindexes[1])+','
+            
             strparentrotbndindexes+=str(parentrotbndindexes[0])+' '+str(parentrotbndindexes[1])+','
         strfragrotbndindexes=strfragrotbndindexes[:-1]
+        if rotbndindex in rotbndindextoringtor.keys():
+            strfragrotbndindexes=None
         strparentrotbndindexes=strparentrotbndindexes[:-1]
         fragmol=rotbndindextofragment[equivalentrotbndindex]
         fragmentfilepath=rotbndindextofragmentfilepath[equivalentrotbndindex]
@@ -466,9 +479,13 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         WriteDictionaryToFile(poltype,classkeytosmartsposarray,"classkeytosmartsposarray.txt")
         WriteDictionaryToFile(poltype,classkeytosmarts,"classkeytosmarts.txt")
         WriteDictionaryToFile(poltype,classkeytotorsionindexes,"classkeytotorsionindexes.txt")
-
         wholexyz=parentdir+r'/'+poltype.xyzoutfile
         wholemol=parentdir+r'/'+poltype.molstructfname
+        
+
+        parentatoms=poltype.rdkitmol.GetNumAtoms()
+
+
         listofjobs,jobtooutputlog,newlog=FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog)
     os.chdir(parentdir)
     finishedjobs,errorjobs=SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog)
@@ -716,7 +733,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
     rotbndindextofragWBOmatrix={}
     rotbndindextofragfoldername={}
     rotbndindextoWBOdifference={}
-   
+    rotbndindextoringtor={} 
     for torset in torlist:
         extendedtorindexes=[]
         for tor in torset:
@@ -724,15 +741,18 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
             for index in indexes:
                 if index not in extendedtorindexes:
                     extendedtorindexes.append(index)
-             
-
+        if torset in poltype.nonaroringtorsets:
+            poltype.maxgrowthcycles=0
+            
         WBOdifferencetofragWBOmatrix={}
         WBOdifferencetofoldername={}
         WBOdifferencetofragmol={}
         WBOdifferencetostructfname={}
         highlightbonds=[]
-
-        fragfoldername=str(tor[1])+'_'+str(tor[2])+'_Hydrated'
+        fragfoldername=''
+        for tor in torset:
+            fragfoldername+=str(tor[1])+'_'+str(tor[2])+'_'
+        fragfoldername+='Hydrated'
         if not os.path.isdir(fragfoldername):
             os.mkdir(fragfoldername)
         os.chdir(fragfoldername)
@@ -744,12 +764,19 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         fragmoltoWBOmatrices={}
         fragmoltofragfoldername={}
         fragmoltobondindexlist={}
-        fragfoldername=str(tor[1])+'_'+str(tor[2])+'_Index'+'_'+str(0)
+        fragfoldername=''
+        for tor in torset:
+            fragfoldername+=str(tor[1])+'_'+str(tor[2])+'_'
+        fragfoldername+='Index'+'_'+str(0)
         if not os.path.isdir(fragfoldername):
             os.mkdir(fragfoldername)
         os.chdir(fragfoldername)
-
-        rotbndidx=str(tor[1])+'_'+str(tor[2])
+        rotbndidx=''
+        for tor in torset:
+            rotbndidx+=str(tor[1])+'_'+str(tor[2])+'_'
+        rotbndidx=rotbndidx[:-1]
+        if torset in poltype.nonaroringtorsets:
+            rotbndindextoringtor[rotbndidx]=torset
         filename=fragfoldername+'.mol'
         WriteRdkitMolToMolFile(poltype,fragmol,filename)
         fragmoltofragfoldername[fragmol]=fragfoldername
@@ -761,13 +788,13 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         if error:
             os.chdir('..')
             continue
-        fragmentWBOvalue=fragWBOmatrix[parentindextofragindex[tor[1]-1],parentindextofragindex[tor[2]-1]] # rdkit is 0 index based so need to subtract 1, babel is 1 indexbased
-        parentWBOvalue=parentWBOmatrix[tor[1]-1,tor[2]-1] # Matrix has 0,0 so need to subtract 1 from babel index
-        WBOdifference=round(numpy.abs(fragmentWBOvalue-parentWBOvalue),3)
+        fragmentWBOvalues=numpy.array([round(fragWBOmatrix[parentindextofragindex[tor[1]-1],parentindextofragindex[tor[2]-1]],3) for tor in torset]) # rdkit is 0 index based so need to subtract 1, babel is 1 indexbased
+        parentWBOvalues=numpy.array([round(parentWBOmatrix[tor[1]-1,tor[2]-1],3) for tor in torset]) # Matrix has 0,0 so need to subtract 1 from babel index
+        WBOdifference=numpy.amax(numpy.abs(fragmentWBOvalues-parentWBOvalues))
         WBOdifferencetofragmol[WBOdifference]=fragmol
         WBOdifferencetostructfname[WBOdifference]=structfname
         rotbndindextoWBOdifference[rotbndidx]=WBOdifference
-        fragmoltoWBOmatrices,fragmoltobondindexlist=WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor,fragmoltoWBOmatrices,fragmoltobondindexlist)
+        fragmoltoWBOmatrices,fragmoltobondindexlist=WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,torset,fragmoltoWBOmatrices,fragmoltobondindexlist)
 
         os.chdir('..')
 
@@ -780,13 +807,13 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         fragfoldername=WBOdifferencetofoldername[WBOdifference]
         rotbndindextofragfoldername[rotbndidx]=fragfoldername
         os.chdir(fragfoldername)
-
-        fragrotbndidx=[parentindextofragindex[tor[1]-1],parentindextofragindex[tor[2]-1]]
-        highlightbonds.append(fragrotbndidx)
+        for tor in torset:
+            fragrotbndidx=[parentindextofragindex[tor[1]-1],parentindextofragindex[tor[2]-1]]
+            highlightbonds.append(fragrotbndidx)
         fragpath=os.getcwd()
         grow=False
         growfragments.append(fragmol)
-        fragmoltoWBOmatrices,fragmoltobondindexlist=WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor,fragmoltoWBOmatrices,fragmoltobondindexlist)
+        fragmoltoWBOmatrices,fragmoltobondindexlist=WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,torset,fragmoltoWBOmatrices,fragmoltobondindexlist)
         curdir=os.getcwd()
         os.chdir('..')
         growfragmoltoWBOmatrices=fragmoltoWBOmatrices.copy()
@@ -794,9 +821,9 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         growfragmoltobondindexlist=fragmoltobondindexlist.copy()
 
         fragments=[fragmol]
-        Draw2DMoleculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragfoldername,fragmoltobondindexlist,tor,'CombinationsWithIndex')
+        Draw2DMoleculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragfoldername,fragmoltobondindexlist,torset,'CombinationsWithIndex')
         sanitizedfragments=[mol_with_atom_index_removed(poltype,frag) for frag in fragments]
-        Draw2DMoleculesWithWBO(poltype,sanitizedfragments,fragmoltoWBOmatrices,fragmoltofragfoldername,fragmoltobondindexlist,tor,'CombinationsWithoutIndex')
+        Draw2DMoleculesWithWBO(poltype,sanitizedfragments,fragmoltoWBOmatrices,fragmoltofragfoldername,fragmoltobondindexlist,torset,'CombinationsWithoutIndex')
 
         os.chdir(curdir)
         if WBOdifference<=poltype.WBOtol: # then we consider the fragment good enough to transfer torsion parameters, so make this fragment into .sdf file
@@ -804,15 +831,15 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         else:
             grow=True
             possiblefragatmidxs=GrowPossibleFragmentAtomIndexes(poltype,poltype.rdkitmol,extendedtorindexes)
-            if len(possiblefragatmidxs)!=0:
-                fragmol,newindexes,fragWBOmatrix,structfname,WBOdifference,parentindextofragindex,fragpath,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist=GrowFragmentOut(poltype,mol,parentWBOmatrix,extendedtorindexes,WBOdifference,tor,fragfoldername,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,fragspath)
-                fragmoltoWBOmatrices,fragmoltobondindexlist=WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor,fragmoltoWBOmatrices,fragmoltobondindexlist)
+            if len(possiblefragatmidxs)!=0 and poltype.maxgrowthcycles!=0:
+                fragmol,newindexes,fragWBOmatrix,structfname,WBOdifference,parentindextofragindex,fragpath,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist=GrowFragmentOut(poltype,mol,parentWBOmatrix,extendedtorindexes,WBOdifference,torset,fragfoldername,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,fragspath)
+                fragmoltoWBOmatrices,fragmoltobondindexlist=WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,torset,fragmoltoWBOmatrices,fragmoltobondindexlist)
         curdir=os.getcwd()
         os.chdir(fragspath)
         growfragments=[mol_with_atom_index(poltype,frag) for frag in growfragments]
-        Draw2DMoleculesWithWBO(poltype,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,tor,'FragmentGrowthWithIndex')
+        Draw2DMoleculesWithWBO(poltype,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,torset,'FragmentGrowthWithIndex')
         sanitizedfragments=[mol_with_atom_index_removed(poltype,frag) for frag in growfragments]
-        Draw2DMoleculesWithWBO(poltype,sanitizedfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,tor,'FragmentGrowthWithoutIndex')
+        Draw2DMoleculesWithWBO(poltype,sanitizedfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,torset,'FragmentGrowthWithoutIndex')
 
         os.chdir(curdir)
 
@@ -889,7 +916,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
                     Draw2DMoleculeWithWBO(poltype,relativematrix,basename+'_Relative',m,bondindexlist=highlightbonds,smirks=fragsmirks)
             os.chdir(curdir)
     '''
-    return rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays
+    return rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor
 
 def AddMatchingParentIndexesBetweenFragments(poltype,equivalentrotbndindexarrays,rotbndindextoparentindextofragindex,rotbndindextofragment):
    newrotbndindextoparentindextofragindex={}
@@ -952,7 +979,7 @@ def ReduceParentMatrix(poltype,parentindextofragindex,fragWBOmatrix,parentWBOmat
             reducedparentWBOmatrix[i,j]=parentvalue
     return reducedparentWBOmatrix
 
-def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfoldername,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,fragspath):
+def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,torset,fragfoldername,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,fragspath):
     fragfoldernamepath=os.getcwd()
     fragmentsforcomb=growfragments.copy()
     fragmentsforcombwbo=[WBOdifference]
@@ -1015,12 +1042,13 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
                     continue
                 reducedparentWBOmatrix=ReduceParentMatrix(poltype,parentindextofragindex,fragWBOmatrix,parentWBOmatrix)
                 relativematrix=numpy.subtract(reducedparentWBOmatrix,fragWBOmatrix)
-                fragrotbndidx=[parentindextofragindex[tor[1]-1],parentindextofragindex[tor[2]-1]]
-                fragmentWBOvalue=fragWBOmatrix[fragrotbndidx[0],fragrotbndidx[1]]
-                parentWBOvalue=parentWBOmatrix[tor[1]-1,tor[2]-1]
-                WBOdifference=round(numpy.abs(fragmentWBOvalue-parentWBOvalue),3)
+                
+                fragrotbndidxs=[[parentindextofragindex[tor[1]-1],parentindextofragindex[tor[2]-1]] for tor in torset]
+                fragmentWBOvalues=numpy.array([round(fragWBOmatrix[fragrotbndidx[0],fragrotbndidx[1]],3) for fragrotbndidx in fragrotbndidxs])
+                parentWBOvalues=numpy.array([round(parentWBOmatrix[tor[1]-1,tor[2]-1],3) for tor in torset])
+                WBOdifference=numpy.amax(numpy.abs(fragmentWBOvalues-parentWBOvalues))
                 fragmentsforcombwbo.append(WBOdifference)
-                growfragmoltoWBOmatrices,growfragmoltobondindexlist=WriteOutFragmentInputs(poltype,fragmol,foldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor,growfragmoltoWBOmatrices,growfragmoltobondindexlist)
+                growfragmoltoWBOmatrices,growfragmoltobondindexlist=WriteOutFragmentInputs(poltype,fragmol,foldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,torset,growfragmoltoWBOmatrices,growfragmoltobondindexlist)
 
                 m=mol_with_atom_index(poltype,fragmol)
                 os.chdir('..')
@@ -1058,9 +1086,9 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,tor,fragfo
     sortedwbotofragments={k: v for k, v in sorted(wbotofragments.items(), key=lambda item: item[0],reverse=True)}
     sorted_list=list(sortedwbotofragments.values())
     sorted_list.insert(0,fragmentsforcomb[0])
-    Draw2DMoleculesWithWBO(poltype,sorted_list,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,tor,'CombinationsWithIndex')
+    Draw2DMoleculesWithWBO(poltype,sorted_list,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,torset,'CombinationsWithIndex')
     sanitizedfragments=[mol_with_atom_index_removed(poltype,frag) for frag in sorted_list]
-    Draw2DMoleculesWithWBO(poltype,sanitizedfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,tor,'CombinationsWithoutIndex')
+    Draw2DMoleculesWithWBO(poltype,sanitizedfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,torset,'CombinationsWithoutIndex')
     os.chdir(curdir)
     os.chdir(fragfoldernamepath)
     PlotFragmenterResults(poltype,WBOdiffarray,molarray)
@@ -1125,7 +1153,7 @@ def GrowPossibleFragmentAtomIndexes(poltype,rdkitmol,indexes):
     return possiblefragatmidxs
 
 
-def WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,tor,fragmoltoWBOmatrices,fragmoltobondindexlist):
+def WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,torset,fragmoltoWBOmatrices,fragmoltobondindexlist):
     highlightbonds=[]
     structfnamemol=fragfoldername+'.mol'
     tmpconv = openbabel.OBConversion()
@@ -1136,8 +1164,9 @@ def WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWB
     structfname=fragfoldername+'.sdf'
     tmpconv.WriteFile(fragmolbabel,structfname)
     basename=fragfoldername+'_WBO_'+str(round(WBOdifference,3))
-    fragrotbndidx=[parentindextofragindex[tor[1]-1],parentindextofragindex[tor[2]-1]]
-    highlightbonds.append(fragrotbndidx)
+    for tor in torset:
+        fragrotbndidx=[parentindextofragindex[tor[1]-1],parentindextofragindex[tor[2]-1]]
+        highlightbonds.append(fragrotbndidx)
     reducedparentWBOmatrix=ReduceParentMatrix(poltype,parentindextofragindex,fragWBOmatrix,parentWBOmatrix)
     relativematrix=numpy.subtract(reducedparentWBOmatrix,fragWBOmatrix)
     m=mol_with_atom_index(poltype,fragmol)
@@ -1194,7 +1223,7 @@ def ChunksList(poltype,gen):
     return newlst
 
 
-def Draw2DMoleculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragfoldername,fragmoltobondindexlist,tor,basestr):
+def Draw2DMoleculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragfoldername,fragmoltobondindexlist,torset,basestr):
 
     bondlistoflists=[]
     for frag in fragments:
@@ -1303,8 +1332,11 @@ def Draw2DMoleculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragf
                     label.rotate(sign*angle,bondcoords[0],bondcoords[1])
 
                     fig.append(label)
-
-        basename=basestr+'_'+'Bnd_'+str(tor[1])+'-'+str(tor[2])+'_Index_'+str(i)
+     
+        basename=basestr+'_'+'Bnd_'
+        for tor in torset:
+            basename+=str(tor[1])+'-'+str(tor[2])+'_'
+        basename+='Index_'+str(i)
         fig.save(basename+'.svg')
         svg_code=fig.to_str()
         svg2png(bytestring=svg_code,write_to=basename+'.png')
