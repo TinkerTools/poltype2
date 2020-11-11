@@ -14,6 +14,8 @@ import symmetry as symm
 from rdkit.Chem.Lipinski import RotatableBondSmarts
 import numpy as np
 import json
+import torsionfit as torfit
+
    
 def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo):
     temp=open(vf,'r')
@@ -611,10 +613,16 @@ def GenerateSMARTSListFromAtomList(poltype,listforprm,rdkitmol,mol,maxatomsize):
             atomindiceslist.extend(singlepathindices)
         for subls in atomindiceslist:
             fragsmarts,smartsfortransfer=GenerateFragmentSMARTS(poltype,rdkitmol,mol,subls)
+            fragsmarts=FilterSMARTS(poltype,fragsmarts)
+            smartsfortransfer=FilterSMARTS(poltype,smartsfortransfer)
+
             smartslist.append([fragsmarts,smartsfortransfer])
         listforprmtosmartslist[tuple(ls)]=smartslist
     return listforprmtosmartslist
 
+def FilterSMARTS(poltype,smarts):
+    smarts=smarts.replace('-]',']')
+    return smarts
 
 def FindRingSize(poltype,mol,ringindices):
     ringsizes=[]
@@ -908,6 +916,7 @@ def ReplaceSMARTSBondsWithGenericBonds(poltype,smartslist,atomindices,mol):
 def MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist):
     for smartls in smartslist:
         smartsfortransfer=smartls[1]
+        smarts=smartls[0]
         for parametersmarts in parametersmartslist:
             substructure = Chem.MolFromSmarts(smartsfortransfer)
             substructurenumatoms=substructure.GetNumAtoms()
