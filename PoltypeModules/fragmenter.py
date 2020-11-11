@@ -160,12 +160,11 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
                 smarts=classkeytosmartscollected[torkey]
                 torsionindexes=classkeytotorsionindexescollected[torkey]
                 fitline+=' SMARTS '+smarts+' torsion atom indexes = '+torsionindexes+' with smiles torsion indices '+smartspos+' from fragment '+filename+"\n"
-                valencestring='# "'+smarts+'"'+' '+':'+' '+'['+smartspos+','
+                valencestring='#'+smarts+' % '+smartspos+' % '
                 newprms=prms[0::3]
                 for prm in newprms:
                     valencestring+=prm+','
                 valencestring=valencestring[:-1]
-                valencestring+=']'+','+' '+r'\\'+'\n'
                 temp.write(fitline)
                 temp.write(valencestring)
                 temp.write(torline)
