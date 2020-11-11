@@ -13,6 +13,9 @@ from scipy.optimize import fmin
 import matplotlib
 import pylab as plt
 import time
+from itertools import combinations
+
+
 
 def insert_torprmdict_angle(poltype,angle, angledict):
     """
@@ -613,10 +616,9 @@ def is_torprmdict_all_empty (poltype,torprmdict):
     return result
 
 
-def GenerateBoundaries(poltype,tor_energy_list,refine,initialprms,torprmdict):
+def GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict):
     lowerbounds=[]
     upperbounds=[]
-    max_amp = max(tor_energy_list) - min(tor_energy_list)
     if refine==False: 
         bounds=[-max_amp,max_amp]
 
@@ -655,7 +657,7 @@ def GenerateBoundaries(poltype,tor_energy_list,refine,initialprms,torprmdict):
         upperbounds.append(max_amp)
 
         bounds=[lowerbounds,upperbounds]
-    return tuple(bounds),max_amp
+    return tuple(bounds)
        
 
 def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,clskeyswithbadfits):
@@ -791,7 +793,9 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         txtfname+=".txt"         # create initial fit file, initially it seems to be 2d instead of 3d
         torgen.write_arr_to_file(poltype,txtfname,[tor_energy_list])
         # max amplitude of function
-        boundstup,max_amp=GenerateBoundaries(poltype,tor_energy_list,refine,initialprms,torprmdict)
+        max_amp = max(tor_energy_list) - min(tor_energy_list)
+
+        boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
         # Remove parameters while # of parameters > # data points
         toralreadyremovedlist=[]
         while prmidx > len(mm_energy_list):
@@ -810,6 +814,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         pzero = initialprms
         # run leastsq until all the parameter estimates are reasonable
         parm_sanitized = False
+        bypassrmsd=False
         while not parm_sanitized:
             parm_sanitized = True
             dellist = []
@@ -852,6 +857,34 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
                             dellist.append((chkclskey,nfold))
                             parm_sanitized = False
                             break
+            foldtoparmslist={}
+            parmtokey={}
+            for chkclskey in keylist:
+                for nfold in torprmdict[chkclskey]['prmdict']:
+                    if nfold not in foldtoparmslist.keys():
+                        foldtoparmslist[nfold]=[]
+                    # if the param value is greater than max_amp, remove it
+                    parm=p1[torprmdict[chkclskey]['prmdict'][nfold]]
+                    foldtoparmslist[nfold].append(parm)
+                    parmtokey[parm]=chkclskey
+                    if abs(parm) > max_amp:
+                        dellist.append((chkclskey,nfold))
+                        parm_sanitized = False
+                        break
+            for fold,parmslist in foldtoparmslist.items():
+                combs=list(combinations(parmslist,2))
+                
+                for comb in combs:
+                    Sum=comb[0]+comb[1]
+                    if Sum<.01: # tolerance for torsions cancelling each other
+                       keytodelete=parmtokey[comb[0]]
+                       max_amp=20
+                       boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
+                       bypassrmsd=True
+                       parm_sanitized = False
+                       for nfold in torprmdict[keytodelete]['prmdict']:
+                           dellist.append((keytodelete,nfold)) 
+
             dellist = list(set(dellist))
             if len(dellist)>1:
                 poltype.WriteToLog('torsion cosine terms that are being removed due to unreasonable parameters '+str(dellist))
@@ -937,7 +970,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             numprms+= len(torprmdict[classkey]['prmdict'].keys())
         string=' , '.join(list(torprmdict.keys()))
         datapts=len(mm_energy_list)
-        print('Torsions being fit',string,'RMSD(QM-MM1)',minRMSD), 
+        print('Torsions being fit',string,'RMSD(QM-MM1)',minRMSD)
+        poltype.WriteToLog('Torsions being fit '+string+' RMSD(QM-MM1)'+str(minRMSD))
         if dim==1:
                
             fig = plt.figure(figsize=(10,10))
@@ -1167,6 +1201,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         datapts=len(mm_energy_list)
         numprms=None 
         print('Torset',torset,'RMSD(MM2,QM)',minRMSD)
+        poltype.WriteToLog('Torset'+str(torset)+' RMSD(MM2,QM) '+str(minRMSD))
         if dim==1: 
             fig = plt.figure(figsize=(10,10))
             ax = fig.add_subplot(111)
@@ -1215,7 +1250,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         if float(RMSD)>poltype.maxtorRMSPD:
             poltype.WriteToLog('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(RMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
             clskeyswithbadfits.append(clskey)
-            if poltype.suppresstorfiterr==False and count>0:
+            if poltype.suppresstorfiterr==False and count>0 and bypassrmsd==False:
                 raise ValueError('RMSPD of QM and MM torsion profile is high, tried fitting to minima and failed, RMSPD = '+str(RMSD))
     return clskeyswithbadfits
                  

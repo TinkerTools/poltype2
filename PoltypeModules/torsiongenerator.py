@@ -588,7 +588,23 @@ def GenerateBondTopology(poltype,optmol):
     return bondtopology
 
 
-
+def FindPartialDoubleBonds(poltype,rdkitmol):
+    poltype.partialdoublebonds=[]
+    amidesmarts='[NX3][CX3](=[OX1])'
+    acidsmarts='[CX3](=O)[OX2H1]'
+    smartslist=[amidesmarts,acidsmarts]
+    for smartsidx in range(len(smartslist)):
+        smarts=smartslist[smartsidx]
+        substructure = Chem.MolFromSmarts(smarts)
+        matches=rdkitmol.GetSubstructMatches(substructure)
+        for match in matches:
+            if smartsidx==0:
+                bond=[match[0],match[1]]
+            else:
+                bond=[match[0],match[2]]
+            babelbond=[i+1 for i in bond] 
+            if babelbond not in poltype.partialdoublebonds:
+                poltype.partialdoublebonds.append(babelbond)
 
 def get_torlist(poltype,mol,missed_torsions):
     """
@@ -621,7 +637,7 @@ def get_torlist(poltype,mol,missed_torsions):
         t3 = bond.GetEndAtom()
         t2idx=t2.GetIdx()
         t3idx=t3.GetIdx()
-        
+        bnd=[t2idx,t3idx]
         t2val=t2.GetValence()
         t3val=t3.GetValence()
         ringbond=False
@@ -634,6 +650,8 @@ def get_torlist(poltype,mol,missed_torsions):
         if arobond==True:
             continue
         if ringbond==True and poltype.allownonaromaticringscanning==False:
+            continue
+        if bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds:
             continue
         if ((bond.IsRotor()) or [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist or (poltype.rotalltors and t2val>=2 and t3val>=2)):
             t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)

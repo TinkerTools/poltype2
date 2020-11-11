@@ -1193,6 +1193,9 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol)
         babelatoms=[mol.GetAtom(i) for i in babelindices]
         ringbools=[a.IsInRing() for a in babelatoms]
         contin=False
+        bnd=[babelindices[1],babelindices[2]]
+        if bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds:
+            continue 
         for ringbool in ringbools:
             if ringbool==True:
                 contin=True
