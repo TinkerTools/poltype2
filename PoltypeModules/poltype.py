@@ -1020,10 +1020,10 @@ class PolarizableTyper():
             sys.exit()
 
         if ('I ' in self.mol.GetSpacedFormula()):
-            self.dontfrag=True
+            if self.foundgauss==True:
+                self.use_gaus=True
 
-        #if ('I ' in self.mol.GetSpacedFormula()) and self.use_gaus==True:
-        #    self.use_gaus=False
+
         chgcount=self.NumberOfChargedAtoms(mol)
         if self.totalcharge!=0 and chgcount>1:
             if self.foundgauss==True:
