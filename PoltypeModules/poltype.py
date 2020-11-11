@@ -1057,6 +1057,7 @@ class PolarizableTyper():
         self.optmethod='MP2' 
         optmol = opt.GeometryOptimization(self,optmol)
 
+        torgen.FindPartialDoubleBonds(self,m)
         if not os.path.isfile(self.key4fname) or not os.path.isfile(self.torsionsmissingfilename) or not os.path.isfile(self.torsionprmguessfilename):
             bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
        
@@ -1144,7 +1145,6 @@ class PolarizableTyper():
         if self.torsppcm:
             torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
 
-        torgen.FindPartialDoubleBonds(self,m)
         # Find rotatable bonds for future torsion scans
         (self.torlist, self.rotbndlist) = torgen.get_torlist(self,mol,torsionsmissing)
         torgen.get_all_torsions(self,mol)
