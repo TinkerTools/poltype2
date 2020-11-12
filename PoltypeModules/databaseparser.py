@@ -966,6 +966,7 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
                     trueparametersmartsindextosmartsindex[parametersmartsindex]=smartsindex
         truesmartsindextoparametersmartsindex={v: k for k, v in trueparametersmartsindextosmartsindex.items()}
         allpossiblebabelindicessmarts=GrabSymmetryIdenticalIndicesBabel(poltype,structure,moleculeindextosmartsindex,truesmartsindextoparametersmartsindex,atomindices)
+        print('trueparametersmartsindextosmartsindex before',trueparametersmartsindextosmartsindex)
         for i in range(len(allpossiblebabelindicessmarts)):
             babelindicessmarts=allpossiblebabelindicessmarts[i]
             rdkitindicessmarts=[j-1 for j in babelindicessmarts]
@@ -978,6 +979,12 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
                     indicesnotindic.append(idx)
             for idx in indicesnotindic:
                 trueparametersmartsindextosmartsindex[idx]=trueparametersmartsindextosmartsindex[indicesindic[0]]
+        print('trueparametersmartsindextosmartsindex after',trueparametersmartsindextosmartsindex)
+        smartsindextoparametersmartsindices={}
+        for parametersmartsindex,smartsindex in trueparametersmartsindextosmartsindex.items():
+            if smartsindex not in smartsindextoparametersmartsindices.keys():
+                smartsindextoparametersmartsindices[smartsindex]=[]
+            smartsindextoparametersmartsindices[smartsindex].append(parametersmartsindex)
         allpossiblerdkitindices=ReturnSymmetryIdenticalIndicesSMARTSAndParameterSMARTS(poltype,allpossiblebabelindicessmarts,smartsindextomoleculeindex,trueparametersmartsindextosmartsindex)
         wildcards=CountWildCards(poltype,smartsfortransfer)
         parametersmartsatomorderlists=[] 
@@ -1000,10 +1007,12 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
                     for idx in rdkitindexlist:
                         smartsindex=moleculeindextosmartsindex[idx]
                         smartsorder=smartsindex+1
-                        for match in matches:
-                            indices=list(range(len(match)))
-                            smartsindextoparametersmartsindex=dict(zip(indices,match))
-                            parametersmartsatomindex=smartsindextoparametersmartsindex[smartsindex]
+                        #for match in matches:
+                        parametersmartsindices=smartsindextoparametersmartsindices[smartsindex]
+                        for parametersmartsatomindex in parametersmartsindices:
+                            #indices=list(range(len(match)))
+                            #smartsindextoparametersmartsindex=dict(zip(indices,match))
+                            #parametersmartsatomindex=smartsindextoparametersmartsindex[smartsindex]
                             parametersmartsatomorder=parametersmartsatomindex+1
                             if parametersmartsatomorder==atomorder:
                                 rdkitindextofinalparametersmartsatomorder[rdkitindex]=parametersmartsatomorder
