@@ -65,7 +65,10 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
         for tor in torset:
             rotbndindex=str(tor[1])+'_'+str(tor[2])
             rotkey=rotbndindex.replace('_',' ')
-            tors=poltype.rotbndlist[rotkey]
+            if rotkey in poltype.rotbndlist.keys():
+                tors=poltype.rotbndlist[rotkey]
+            else:
+                tors=[tor]
             for torsion in tors:
                 fwd=torgen.get_class_key(poltype,torsion[0],torsion[1],torsion[2],torsion[3])
                 fwdsplit=fwd.split()        
