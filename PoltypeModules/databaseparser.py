@@ -781,15 +781,20 @@ def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprmtosmartslist,param
         parametersmartstomatchlen={}
         parametersmartstosmartslist={}
         parametersmartstomatchlen,smartstomatchlen=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
+        
         if len(parametersmartstomatchlen.keys())==0:
             smartslist=ReplaceSMARTSBondsWithGenericBonds(poltype,smartslist,ls,mol)
             parametersmartstomatchlen,smartstomatchlen=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
+
             if len(parametersmartstomatchlen.keys())==0:
+
                 smartslist=ReplaceEachAtomIdentityOnEnd(poltype,smartslist[0]) 
                 parametersmartstomatchlen,smartstomatchlen=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
+
                 if len(parametersmartstomatchlen.keys())==0:
                     smartslist=ReplaceAtomIdentitiesOnEnd(poltype,smartslist[0])
                     parametersmartstomatchlen,smartstomatchlen=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
+
                     if len(parametersmartstomatchlen.keys())==0:
                         smartslist=ReplaceAllAtomIdentities(poltype,smartslist[0])
                         parametersmartstomatchlen,smartstomatchlen=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
@@ -805,7 +810,6 @@ def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprmtosmartslist,param
                 listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls)
         else:
             listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls)
-
     return listforprmtoparametersmarts,listforprmtosmarts
 
 def ReplaceEachAtomIdentityOnEnd(poltype,smartsls):
@@ -814,7 +818,12 @@ def ReplaceEachAtomIdentityOnEnd(poltype,smartsls):
         temp=[]
         smartsplit=smarts.split('~') 
         tempsplit=smartsplit[:]
+        addp=False
+        if tempsplit[0][-1]=='(':
+            addp=True
         tempsplit[0]='[*]'
+        if addp==True:
+           tempsplit[0]+='('
         newsmarts='~'.join(tempsplit)
         temp.append(newsmarts) 
         tempsplit=smartsplit[:]
@@ -966,7 +975,6 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
                     trueparametersmartsindextosmartsindex[parametersmartsindex]=smartsindex
         truesmartsindextoparametersmartsindex={v: k for k, v in trueparametersmartsindextosmartsindex.items()}
         allpossiblebabelindicessmarts=GrabSymmetryIdenticalIndicesBabel(poltype,structure,moleculeindextosmartsindex,truesmartsindextoparametersmartsindex,atomindices)
-        print('trueparametersmartsindextosmartsindex before',trueparametersmartsindextosmartsindex)
         for i in range(len(allpossiblebabelindicessmarts)):
             babelindicessmarts=allpossiblebabelindicessmarts[i]
             rdkitindicessmarts=[j-1 for j in babelindicessmarts]
@@ -979,7 +987,6 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
                     indicesnotindic.append(idx)
             for idx in indicesnotindic:
                 trueparametersmartsindextosmartsindex[idx]=trueparametersmartsindextosmartsindex[indicesindic[0]]
-        print('trueparametersmartsindextosmartsindex after',trueparametersmartsindextosmartsindex)
         smartsindextoparametersmartsindices={}
         for parametersmartsindex,smartsindex in trueparametersmartsindextosmartsindex.items():
             if smartsindex not in smartsindextoparametersmartsindices.keys():
@@ -1744,7 +1751,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     anglesforprmtoparametersmarts,anglesforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,anglesforprmtosmartslist,parametersmartslist,mol)
     planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,planaranglesforprmtosmartslist,parametersmartslist,mol)
     torsionsforprmtoparametersmarts,torsionsforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,torsionsforprmtosmartslist,parametersmartslist,mol)
-
     atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,vdwindicestoextsmarts=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,vdwindicestoextsmartsmatchlength,atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,vdwindicestoextsmarts)
 
     bondsforprmtoparametersmarts,bondsforprmtosmarts,bondindicestoextsmarts=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,bondindicestoextsmartsmatchlength,bondsforprmtoparametersmarts,bondsforprmtosmarts,bondindicestoextsmarts)
