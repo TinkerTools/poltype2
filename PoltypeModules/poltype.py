@@ -665,7 +665,8 @@ class PolarizableTyper():
         self.chkname = self.assign_filenames ( "chkname" , ".chk")
         self.fname = self.assign_filenames ( "fname" , ".fchk")
         self.gausfname = self.assign_filenames ( "gausfname" , ".log")
-        self.gausoptfname = self.assign_filenames ( ".gausoptfname" , "-opt.log")
+        self.firstgausoptfname = self.assign_filenames ( ".gausoptfname" , "-opt_1.log")
+        self.secondgausoptfname = self.assign_filenames ( ".gausoptfname" , "-opt_2.log")
         self.gdmafname = self.assign_filenames ( "gdmafname" , ".gdmaout")
         self.keyfname = self.assign_filenames ( "keyfname" , ".key")
         self.xyzfname = self.assign_filenames ( "xyzfname" , ".xyz")
@@ -687,10 +688,15 @@ class PolarizableTyper():
         self.tmpxyzfile = 'final.xyz'
         self.tmpkeyfile = 'final.key'
         self.comtmp = self.assign_filenames ( "comtmp" , "-tmp.com")
-        self.comoptfname = self.assign_filenames ( "comoptfname" , "-opt.com")
-        self.chkoptfname = self.assign_filenames ( "chkoptfname" , "-opt.chk")
-        self.fckoptfname = self.assign_filenames ( "fckoptfname" , "-opt.fchk")
-        self.logoptfname = self.assign_filenames ( "logoptfname" , "-opt.log")
+        self.firstcomoptfname = self.assign_filenames ( "comoptfname" , "-opt_1.com")
+        self.firstchkoptfname = self.assign_filenames ( "chkoptfname" , "-opt_1.chk")
+        self.firstfckoptfname = self.assign_filenames ( "fckoptfname" , "-opt_1.fchk")
+        self.firstlogoptfname = self.assign_filenames ( "logoptfname" , "-opt_1.log")
+        self.secondcomoptfname = self.assign_filenames ( "comoptfname" , "-opt_2.com")
+        self.secondchkoptfname = self.assign_filenames ( "chkoptfname" , "-opt_2.chk")
+        self.secondfckoptfname = self.assign_filenames ( "fckoptfname" , "-opt_2.fchk")
+        self.secondlogoptfname = self.assign_filenames ( "logoptfname" , "-opt_2.log")
+
         self.compopfname = self.assign_filenames ( "compopfname" , "-pop.com")
         self.chkpopfname = self.assign_filenames ( "chkpopfname" , "-pop.chk")
         self.fckpopfname = self.assign_filenames ( "fckpopfname" , "-pop.fchk")
@@ -996,8 +1002,6 @@ class PolarizableTyper():
         self.atomnum=mol.NumAtoms() 
         self.totalcharge=mol.GetTotalCharge()
         # Begin log. *-poltype.log
-        if os.path.isfile(self.logfname):
-            os.remove(self.logfname)
         self.logfh = open(self.logfname,"a",buffering=1)
         if not os.path.exists(self.scrtmpdirpsi4):
             mkdirstr='mkdir '+self.scrtmpdirpsi4
@@ -1052,9 +1056,19 @@ class PolarizableTyper():
         # This is used by GDMA to find multipoles
         # Then information for generating the electrostatic potential grid is found (-esp)
         # This information is used by cubegen
-
+        self.comoptfname=self.firstcomoptfname 
+        self.chkoptfname=self.firstchkoptfname 
+        self.fckoptfname=self.firstfckoptfname
+        self.logoptfname=self.firstlogoptfname 
+        self.gausoptfname=self.firstgausoptfname 
         optmol = opt.GeometryOptimization(self,mol)
         self.optmethod='MP2' 
+        self.comoptfname=self.secondcomoptfname 
+        self.chkoptfname=self.secondchkoptfname 
+        self.fckoptfname=self.secondfckoptfname
+        self.logoptfname=self.secondlogoptfname 
+        self.gausoptfname=self.secondgausoptfname 
+
         optmol = opt.GeometryOptimization(self,optmol)
 
         torgen.FindPartialDoubleBonds(self,m)
