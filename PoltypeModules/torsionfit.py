@@ -86,6 +86,8 @@ def fitfunc (poltype,parms, x,torset, torprmdict, debug = False):
                     if 'firstphaseprmindex' in torprm.keys() and nfold==1 and parms!='eval':
                         prmindex=torprm['firstphaseprmindex']
                         offset=parms[prmindex]
+                    elif 'firstphaseprmindex' in torprm.keys() and nfold==1 and parms=='eval':
+                        offset=torprm['firstphaseprmindex']
                     else:
                         offset=poltype.foldoffsetlist[nfold-1]
                     tor_energy += tor_func_term (poltype,prm, ang, nfold, clscnt, torgen.rads(poltype,clsangle),torgen.rads(poltype,offset))
@@ -275,32 +277,31 @@ def sum_xy_list(poltype,x1,y1,x2,y2):
             y2[idx2] = y1[idx1]
 
 def del_tor_from_fit(poltype,dellist, torprmdict,initialprms):
-
-    for key in dellist:
+    for keylist in dellist:
+        key=keylist[0]
         indicestodelete=[]
         for clskey in torprmdict.keys():
             if clskey==key:
-                if 'firstphaseprmindex' in torprmdict.keys():
-                    prmindex=['firstphaseprmindex']
+                if 'firstphaseprmindex' in torprmdict[key].keys():
+                    prmindex=torprmdict[key]['firstphaseprmindex']
                     indicestodelete.append(prmindex) 
    
-
                 for fold,index in torprmdict[clskey]['prmdict'].items():
                     indicestodelete.append(index)
+    
+    minidx=min(indicestodelete)
+    newinitialprms=[]
+    for i in range(len(initialprms)):
+        value=initialprms[i]
+        if i not in indicestodelete:
+            newinitialprms.append(value)
+    newinitialprms.append(0) # vertical shift
 
-        minidx=min(indicestodelete)
-        newinitialprms=[]
-        for i in range(len(initialprms)):
-            value=initialprms[i]
-            if i not in indicestodelete:
-                newinitialprms.append(value)
-        newinitialprms.append(0) # vertical shift
-
-        del torprmdict[key]
-        for clskey in torprmdict.keys():
-            for fold,index in torprmdict[clskey]['prmdict'].items():
-                if index>minidx:
-                    torprmdict[clskey]['prmdict'][fold]-=minidx
+    del torprmdict[key]
+    for clskey in torprmdict.keys():
+        for fold,index in torprmdict[clskey]['prmdict'].items():
+            if index>minidx:
+                torprmdict[clskey]['prmdict'][fold]-=minidx
   
         
     return newinitialprms,torprmdict
@@ -804,7 +805,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             least_conn_tor = find_least_connected_torsion(poltype,torprmdict,toralreadyremovedlist)
             for nfold in torprmdict[least_conn_tor]['prmdict']:
                 dellist.append((least_conn_tor,nfold))
-            initialprms,torprmdict = del_tor_from_fit(poltype,dellist,torprmdict)
+            initialprms,torprmdict = del_tor_from_fit(poltype,dellist,torprmdict,initialprms)
             prmidx=len(initialprms)
             if len(dellist)>1:
                 poltype.WriteToLog('torsion cosine terms that are being removed due to having too many parameters to fit '+str(dellist))
@@ -873,9 +874,9 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
                         break
             for fold,parmslist in foldtoparmslist.items():
                 combs=list(combinations(parmslist,2))
-                
                 for comb in combs:
-                    Sum=comb[0]+comb[1]
+                    Sum=numpy.abs(comb[0]+comb[1])
+                     
                     if Sum<.01: # tolerance for torsions cancelling each other
                        keytodelete=parmtokey[comb[0]]
                        max_amp=20
@@ -889,7 +890,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             if len(dellist)>1:
                 poltype.WriteToLog('torsion cosine terms that are being removed due to unreasonable parameters '+str(dellist))
                 poltype.WriteToLog('number of parameters to fit for '+clskey+' are '+str(prmidx))
-                initialprms,torprmdict = del_tor_from_fit(poltype,dellist,torprmdict)
+                initialprms,torprmdict = del_tor_from_fit(poltype,dellist,torprmdict,initialprms)
                 prmidx=len(initialprms)
             # new parameter array since prm size may have changed due to deletions
             pzero = initialprms
@@ -912,16 +913,15 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
 
         # fill in torprmdict with the parameter estimates
         for chkclskey in torprmdict:
+            if 'firstphaseprmindex' in torprmdict[chkclskey].keys():
+                prmindex=torprmdict[chkclskey]['firstphaseprmindex']
+                prm=p1[prmindex]
+                torprmdict[chkclskey]['firstphaseprmindex']=prm
+
             for nfold in torprmdict[chkclskey]['prmdict']:
                 parm  = p1[torprmdict[chkclskey]['prmdict'][nfold]]
                 torprmdict[chkclskey]['prmdict'][nfold] = parm
                 if numpy.abs(parm)>20:
-                    print('p1',p1)
-                    print('torprmdict',torprmdict)
-                    print('max_amp',max_amp)
-                    print('mm_energy_list',mm_energy_list)
-                    print('qm_energy_list',qm_energy_list)
-                    print('boundstup',boundstup)
                     raise ValueError('parameter way to big'+str(parm))
             write_prm_dict[chkclskey] = torprmdict[chkclskey]['prmdict']
             # if not found, set as 0

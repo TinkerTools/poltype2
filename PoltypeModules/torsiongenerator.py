@@ -1345,3 +1345,61 @@ def RemoveStringFromKeyfile(poltype,keyfilename,string):
             tmpfh.write(line)
     shutil.move(tmpfname, keyfilename)
 
+def UpdateMaxRange(poltype,torsion,maxrange):
+    a,b,c,d=torsion[0:4]
+    key=str(b)+' '+str(c)
+    poltype.rotbndtomaxrange[key]=maxrange
+
+
+def TinkerTorsionTorsionInitialScan(poltype,torset,optmol,bondtopology):
+    phaseangles=[0]*len(torset)
+    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
+        prefix='%s-opt-' % (poltype.molecprefix)
+        postfix='-opt.xyz' 
+        prevstrctfname=torgen.GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
+        cmd = 'cp ../%s %s' % (poltype.logoptfname.replace('.log','.xyz'),prevstrctfname)
+        poltype.call_subsystem(cmd,True)
+
+    else:
+        prefix='%s-opt-' % (poltype.molecprefix)
+        postfix='.log' 
+        prevstrctfname=torgen.GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
+        # copy *-opt.log found early by Gaussian to 'prevstrctfname'
+        cmd = 'cp ../%s %s' % (poltype.logoptfname,prevstrctfname)
+        poltype.call_subsystem(cmd,True)
+
+
+    variabletorlist=[]
+    phaselists=[]
+ 
+    for tor in torset:
+        phaselist=range(0,360,12) 
+        phaselists.append(phaselist)
+    phaseanglelist=numpy.array(list(product(*phaselists)))
+    designatexyz='_determine_tor-tor_minima'
+    keybase=poltype.key4fname
+    keybasepath='../'
+    failedgridpoints=[]
+    for phaseangles in phaseanglelist:
+        prevstruct = opt.load_structfile(poltype,prevstrctfname)
+        prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology)
+        prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
+        prevstrctfname,torxyzfname,newtorxyzfname,keyfname=torgen.tinker_minimize(poltype,torset,optmol,variabletorlist,phaseangles,poltype.torsionrestraint,prevstruct,designatexyz,keybase,keybasepath)
+        toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
+        torgen.tinker_analyze(poltype,newtorxyzfname,keyfname,toralzfname)
+        term=torgen.AnalyzeTerm(poltype,toralzfname)
+        if term==False:
+            failedgridpoints.append(phaseangles)
+    for angles in failedgridpoints:
+        index=phaseanglelist.index(angles)
+        del phaseanglelist[index]
+    seperate_angle_lists = list(zip(*phaseanglelist)) 
+    for i in range(len(seperate_angle_lists)):
+        torsion=torset[i]
+        angle_list=seperate_angle_lists[i]
+        max_angle=max(angle_list)
+        min_angle=min(angle_list)
+        maxrange=max_angle-min_angle 
+        UpdateMaxRange(poltype,torsion,maxrange)
+
+
