@@ -354,7 +354,7 @@ def WriteToPrmFile(poltype,atomdefs,bondprms,angleprms,torsionprms,strbndprms,op
     os.remove(prmpath)
     os.rename(newprmname,prmpath)
 
-def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,angletinkerclassestopoltypeclasses,torsiontinkerclassestopoltypeclasses,poltypetoprmtype,atomtinkerclasstopoltypeclass,typestoframedefforprmfile,fname,skipmultipole=False):
+def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendtinkerclassestopoltypeclasses,angletinkerclassestopoltypeclasses,torsiontinkerclassestopoltypeclasses,poltypetoprmtype,atomtinkerclasstopoltypeclass,typestoframedefforprmfile,fname,skipmultipole=False):
     temp=open(fname,'r') 
     results=temp.readlines()
     temp.close()
@@ -456,16 +456,16 @@ def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,angletin
             bondclasslist=[int(linesplit[1]),int(linesplit[2])]
             foundopbend=False
             reversedopbend=False
-            if tuple(bondclasslist) in bondtinkerclassestopoltypeclasses.keys():
+            if tuple(bondclasslist) in opbendtinkerclassestopoltypeclasses.keys():
                 bondtup=tuple(bondclasslist)
                 foundopbend=True
-            elif tuple(bondclasslist[::-1]) in bondtinkerclassestopoltypeclasses.keys():
+            elif tuple(bondclasslist[::-1]) in opbendtinkerclassestopoltypeclasses.keys():
                 bondtup=tuple(bondclasslist[::-1])
                 foundopbend=True
                 reversedopbend=True # need to be careful because for example 3 409 0 0 will be different than 409 3 0 0, so need to swap the boundindexes if the bondtypelist is reversed
 
             if foundopbend==True:
-                classes=bondtinkerclassestopoltypeclasses[bondtup]
+                classes=opbendtinkerclassestopoltypeclasses[bondtup]
                 for boundcls in classes:
                     if reversedopbend==True:
                         linesplitall[4]=str(boundcls[0])    
@@ -1125,7 +1125,7 @@ def ModifyAngleKeywords(poltype,angleprms,listofanglesthatneedplanarkeywordtinke
                 for index in polclasses:
                     if str(index) not in line:
                         inline=False
-                if inline==False:
+                if inline==True:
                     break
             if inline==True:
                 found=True
@@ -1426,26 +1426,32 @@ def FindPotentialMissingParameterTypes(poltype,prms,tinkerclassestopoltypeclasse
     missingprms=[]
     foundprms=[]
     for line in prms:
-        poltypeclasses=SearchForPoltypeClasses(poltype,line,poltypeclasseslist)
-        if poltypeclasses!=None:
-            foundprms.append(poltypeclasses) 
-    for poltypeclasses in poltypeclasseslist:
-        if poltypeclasses not in foundprms and poltypeclasses not in missingprms:
-            missingprms.append(poltypeclasses)
+        poltypeclassesls=SearchForPoltypeClasses(poltype,line,poltypeclasseslist)
+        if poltypeclassesls!=None:
+            for poltypeclasses in poltypeclassesls:
+                allin=True
+                for poltypeclass in poltypeclasses:
+                    if str(poltypeclass) not in line:
+                        allin=False
+                if allin==True:
+                    foundprms.append(poltypeclasses) 
+    for poltypeclassesls in poltypeclasseslist:
+        for poltypeclasses in poltypeclassesls:
+            if poltypeclasses not in foundprms and poltypeclasses not in missingprms:
+                missingprms.append(poltypeclasses)
  
     return missingprms 
 
 
 def ConvertPoltypeClassesToIndices(poltype,missingprmtypes):
     missingprmindices=[]
-    for poltypeclasseslist in missingprmtypes: 
-        for poltypeclasses in poltypeclasseslist:
-            indices=[]
-            for poltypeclass in poltypeclasses:
-                keylist=GrabKeysFromValue(poltype,poltype.idxtosymclass,poltypeclass)
-                keylist=[i-1 for i in keylist]
-                indices.append(keylist)
-            missingprmindices.append(indices)
+    for poltypeclasses in missingprmtypes:
+        indices=[]
+        for poltypeclass in poltypeclasses:
+            keylist=GrabKeysFromValue(poltype,poltype.idxtosymclass,poltypeclass)
+            keylist=[i-1 for i in keylist]
+            indices.append(keylist)
+        missingprmindices.append(indices)
     finallist=[]
     for indices in missingprmindices:
         combs = list(itertools.product(*indices))
@@ -1720,6 +1726,29 @@ def AddExternalDatabaseSMARTSMatchParameters(poltype,prms,indicestoextsmarts,sma
     return prms,poltypeclassestosmartsatomordersext
 
 
+def FilterBondSMARTSEnviorment(poltype,bondindicestosmartsatomorders,bondindicestotinkerclasses):
+    opbendbondindicestosmartsatomorders={}
+    opbendbondindicestotinkerclasses={}
+    for bondindices,smartsatomorders in bondindicestosmartsatomorders.items(): 
+        smarts=smartsatomorders[0]
+        brackcount=CountBrackets(poltype,smarts)
+        if brackcount==2:
+            pass
+        else:
+            opbendbondindicestotinkerclasses[bondindices]=bondindicestotinkerclasses[bondindices]
+            opbendbondindicestosmartsatomorders[bondindices]=smartsatomorders 
+ 
+    return opbendbondindicestotinkerclasses,opbendbondindicestosmartsatomorders
+
+def CountBrackets(poltype,string):
+    count=0
+    for e in string:
+        if e=='[':
+            count+=1
+    return count
+
+
+
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters=ReadExternalDatabase(poltype)
 
@@ -1768,22 +1797,32 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
 
     bondindicestotinkertypes,bondindicestotinkerclasses,bondindicestoparametersmartsatomorders,bondindicestoelementtinkerdescrips,bondindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,bondsforprmtoparametersmarts,bondsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
 
+
+
+
+
+    opbendbondindicestotinkerclasses,opbendbondindicestosmartsatomorders=FilterBondSMARTSEnviorment(poltype,bondindicestosmartsatomorders,bondindicestotinkerclasses)
+
+
+
+
+
     planarbondindicestotinkertypes,planarbondindicestotinkerclasses,planarbondindicestoparametersmartsatomorders,planarbondindicestoelementtinkerdescrips,planarbondindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,planarbondsforprmtoparametersmarts,planarbondsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
 
 
     angleindicestotinkertypes,angleindicestotinkerclasses,angleindicestoparametersmartsatomorders,angleindicestoelementtinkerdescrips,angleindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,anglesforprmtoparametersmarts,anglesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
     planarangleindicestotinkertypes,planarangleindicestotinkerclasses,planarangleindicestoparametersmartsatomorders,planarangleindicestoelementtinkerdescrips,planarangleindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
-
-
+ 
     torsionindicestotinkertypes,torsionindicestotinkerclasses,torsionindicestoparametersmartsatomorders,torsionindicestoelementtinkerdescrips,torsionindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,torsionsforprmtoparametersmarts,torsionsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
     torsionsmissing=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol,mol)
     torsionsmissingindicestotinkerclasses=PruneDictionary(poltype,torsionsmissing,torsionindicestotinkerclasses)
     atomtinkerclasstopoltypeclass=TinkerClassesToPoltypeClasses(poltype,atomindextotinkerclass)
     bondtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,bondindicestotinkerclasses)
     planarbondtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,planarbondindicestotinkerclasses)
+    opbendtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,opbendbondindicestotinkerclasses)
+
     angletinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,angleindicestotinkerclasses)
     planarangletinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,planarangleindicestotinkerclasses)
-    
     torsiontinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,torsionindicestotinkerclasses)
     torsionsmissingtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,torsionsmissingindicestotinkerclasses)
     torsionpoltypeclassestoparametersmartsatomorders=ConvertIndicesDictionaryToPoltypeClasses(poltype,torsionindicestoparametersmartsatomorders,torsionindicestotinkerclasses,torsiontinkerclassestopoltypeclasses)
@@ -1811,7 +1850,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     poltypetoprmtype={} # dont need polarize parameters 
     typestoframedefforprmfile={} # dont need multipole parameters
     fname=poltype.smallmoleculeprmlib
-    bondprms,angleprms,torsionprms,strbndprms,mpoleprms,opbendprms,polarizeprms,vdwprms=GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,angletinkerclassestopoltypeclasses,torsiontinkerclassestopoltypeclasses,poltypetoprmtype,atomtinkerclasstopoltypeclass,typestoframedefforprmfile,fname,True)
+    bondprms,angleprms,torsionprms,strbndprms,mpoleprms,opbendprms,polarizeprms,vdwprms=GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendtinkerclassestopoltypeclasses,angletinkerclassestopoltypeclasses,torsiontinkerclassestopoltypeclasses,poltypetoprmtype,atomtinkerclasstopoltypeclass,typestoframedefforprmfile,fname,True)
     bondprms,bondpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,bondprms,bondindicestoextsmarts,bondsmartsatomordertoparameters,'bond')
     angleprms,anglepoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,angleprms,angleindicestoextsmarts,anglesmartsatomordertoparameters,'angle')
     strbndprms,strbndpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,strbndprms,angleindicestoextsmarts,strbndsmartsatomordertoparameters,'strbnd')
@@ -1819,14 +1858,13 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     opbendprms,opbendpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,opbendprms,bondindicestoextsmarts,bondsmartsatomordertoparameters,'opbend')
     vdwprms,vdwpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,vdwprms,vdwindicestoextsmarts,vdwsmartsatomordertoparameters,'vdw')
 
-
     angleprms=ModifyAngleKeywords(poltype,angleprms,planarangletinkerclassestopoltypeclasses)
     bondprms=AddOptimizedBondLengths(poltype,optmol,bondprms)
     angleprms=AddOptimizedAngleLengths(poltype,optmol,angleprms)
     torsionkeystringtoparameters=GrabTorsionParameterCoefficients(poltype,torsionprms)
     torsionprms=ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,torsionprms)
-    
     potentialmissingopbendprmtypes=FindPotentialMissingParameterTypes(poltype,opbendprms,planarbondtinkerclassestopoltypeclasses)
+ 
     potentialmissingopbendprmindices=ConvertPoltypeClassesToIndices(poltype,potentialmissingopbendprmtypes)
     potentialmissingopbendprmindices=FilterIndices(poltype,potentialmissingopbendprmindices,planarbonds)
     missingopbendprmindices=CheckIfParametersExist(poltype,potentialmissingopbendprmindices,opbendprms)
