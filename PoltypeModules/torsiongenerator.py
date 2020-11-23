@@ -596,7 +596,7 @@ def FindPartialDoubleBonds(poltype,rdkitmol):
     for smartsidx in range(len(smartslist)):
         smarts=smartslist[smartsidx]
         substructure = Chem.MolFromSmarts(smarts)
-        rdkitmol.UpdatePropertyCache()
+        rdkitmol.UpdatePropertyCache(strict=False)
         matches=rdkitmol.GetSubstructMatches(substructure)
         for match in matches:
             if smartsidx==0:

@@ -223,18 +223,8 @@ def compute_mm_tor_energy(poltype,mol,torset,designatexyz,flatphaselist,keyfile 
         torxyzfname+='%s.xyz' % (designatexyz) 
         newtorxyzfname=torxyzfname.replace('.xyz','.xyz_2')
         toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
-        tot_energy = None
-        tor_energy = None
-        if os.path.isfile(toralzfname):  
-            tmpfh = open(toralzfname, 'r')
-            for line in tmpfh:
-                m = re.search(r'Potential Energy :\s+(\-*\d+\.\d+)',line)
-                if not m is None:
-                    tot_energy = float(m.group(1))
-                m = re.search(r'Torsional Angle\s+(\-*\d+\.\d+)',line)
-                if not m is None:
-                    tor_energy = float(m.group(1))
-            tmpfh.close()
+        tot_energy,tor_energy=GrabTinkerEnergy(poltype,toralzfname)
+
         energy_list.append(tot_energy)
         torse_list.append(tor_energy)
         angle_list.append(angles)
@@ -249,6 +239,23 @@ def compute_mm_tor_energy(poltype,mol,torset,designatexyz,flatphaselist,keyfile 
     rows2=list([i[2] for i in rows])
 
     return rows1,rows0,rows2
+
+
+def GrabTinkerEnergy(poltype,toralzfname):
+    tot_energy = None
+    tor_energy = None
+    if os.path.isfile(toralzfname):  
+        tmpfh = open(toralzfname, 'r')
+        for line in tmpfh:
+            m = re.search(r'Potential Energy :\s+(\-*\d+\.\d+)',line)
+            if not m is None:
+                tot_energy = float(m.group(1))
+            m = re.search(r'Torsional Angle\s+(\-*\d+\.\d+)',line)
+            if not m is None:
+                tor_energy = float(m.group(1))
+        tmpfh.close()
+    return tot_energy,tor_energy
+
 
 def find_del_list(poltype,mme_list,current_ang_list):
     """
