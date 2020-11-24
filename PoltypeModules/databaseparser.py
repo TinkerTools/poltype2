@@ -859,6 +859,17 @@ def ReplaceAllAtomIdentities(poltype,smartsls):
     return newsmartslist
 
 
+def GenerateElementCountsDictionary(poltype,structure):
+    countdic={}
+    for atom in structure.GetAtoms():
+        atomicnum=atom.GetAtomicNum()
+        if atomicnum not in countdic.keys():
+            countdic[atomicnum]=0
+        countdic[atomicnum]+=1
+    return countdic 
+
+
+
 def GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls):
     maxparametersmartsmatchlength=max(parametersmartstomatchlen.values())
     parametersmartslist=GrabKeysFromValue(poltype,parametersmartstomatchlen,maxparametersmartsmatchlength)
@@ -877,20 +888,36 @@ def GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,
         prmsmartstodiff[prmsmarts]=diff
     mindiff=min(prmsmartstodiff.values())
     parametersmartslist=GrabKeysFromValue(poltype,prmsmartstodiff,mindiff)
-    commonatomstoprmsmarts={}
+    smartstocountdic={}
+    atomicnums=[]
     for prmsmarts in parametersmartslist:
-        smartsls=parametersmartstosmartslist[prmsmarts]
-        smartsfortransfer=smartsls[1]
-        substructure = Chem.MolFromSmarts(smartsfortransfer)
-        substructure = RemoveHydrogens(poltype,substructure)
-        structure = Chem.MolFromSmarts(prmsmarts)
-        mols = [structure,substructure]
-        res=rdFMCS.FindMCS(mols)
-        atomnum=res.numAtoms
-        smartsmcs=res.smartsString
-        commonatomstoprmsmarts[atomnum]=prmsmarts
-    maxatoms=max(commonatomstoprmsmarts.keys())
-    parametersmarts=commonatomstoprmsmarts[maxatoms]
+        countdic=GenerateElementCountsDictionary(poltype,Chem.MolFromSmarts(prmsmarts))
+        for atomicnum in countdic.keys():
+            if atomicnum not in atomicnums:
+                atomicnums.append(atomicnum)
+        smartstocountdic[prmsmarts]=countdic
+    for smarts,countdic in smartstocountdic.items():
+        for atomicnum in atomicnums:
+            if atomicnum not in countdic.keys():
+                countdic[atomicnum]=0
+        smartstocountdic[smarts]=countdic
+
+    mastercountdic=GenerateElementCountsDictionary(poltype,poltype.rdkitmol)
+    for atomicnum in atomicnums:
+        if atomicnum not in mastercountdic.keys():
+            mastercountdic[atomicnum]=0
+    difftosmarts={}
+    for smarts,countdic in smartstocountdic.items():
+        totdiff=0
+        for atomicnum,counts in countdic.items():
+            mastercounts=mastercountdic[atomicnum]
+            diff=np.abs(mastercounts-counts)
+            totdiff+=diff 
+        difftosmarts[totdiff]=smarts
+    
+    
+    mindiff=min(difftosmarts.keys())
+    parametersmarts=difftosmarts[mindiff]
     smartsls=parametersmartstosmartslist[parametersmarts]
     listforprmtoparametersmarts[ls]=parametersmarts 
     listforprmtosmarts[ls]=smartsls
@@ -952,6 +979,7 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         smartsfortransfer=smartsls[1]
         substructure = Chem.MolFromSmarts(smarts)
         matches=rdkitmol.GetSubstructMatches(substructure)
+        truemoleculeindextosmartsindex={}
         for match in matches:
             allin=True
             for idx in atomindices:
@@ -961,7 +989,13 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
                 indices=list(range(len(match)))
                 smartsindextomoleculeindex=dict(zip(indices,match)) 
                 moleculeindextosmartsindex={v: k for k, v in smartsindextomoleculeindex.items()}
-                break
+                for moleculeindex,smartsindex in moleculeindextosmartsindex.items():
+                    if moleculeindex not in truemoleculeindextosmartsindex.keys():
+                        truemoleculeindextosmartsindex[moleculeindex]=smartsindex 
+        #print('atomindices',atomindices)
+        #print('moleculeindextosmartsindex',moleculeindextosmartsindex)
+        #print('matches',matches)
+        #print('truemoleculeindextosmartsindex',truemoleculeindextosmartsindex)
         structure = Chem.MolFromSmarts(parametersmarts)
         substructure = Chem.MolFromSmarts(smartsfortransfer)
         matches=structure.GetSubstructMatches(substructure)
@@ -973,6 +1007,8 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
             for parametersmartsindex,smartsindex in parametersmartsindextosmartsindex.items():
                 if parametersmartsindex not in trueparametersmartsindextosmartsindex.keys():
                     trueparametersmartsindextosmartsindex[parametersmartsindex]=smartsindex
+        #print('new matches',matches)
+        #print('trueparametersmartsindextosmartsindex',trueparametersmartsindextosmartsindex)
         truesmartsindextoparametersmartsindex={v: k for k, v in trueparametersmartsindextosmartsindex.items()}
         allpossiblebabelindicessmarts=GrabSymmetryIdenticalIndicesBabel(poltype,structure,moleculeindextosmartsindex,truesmartsindextoparametersmartsindex,atomindices)
         for i in range(len(allpossiblebabelindicessmarts)):
@@ -987,12 +1023,35 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
                     indicesnotindic.append(idx)
             for idx in indicesnotindic:
                 trueparametersmartsindextosmartsindex[idx]=trueparametersmartsindextosmartsindex[indicesindic[0]]
+        babelatomindices=[i+1 for i in atomindices]
+        symclasses=[poltype.idxtosymclass[babelindex] for babelindex in babelatomindices]
+        '''
+        allpossiblebabelindices=[GrabKeysFromValue(poltype,poltype.idxtosymclass,symclass) for symclass in symclasses]
+        print('allpossiblebabelindices',allpossiblebabelindices)
+        allpossiblebabelindicessmartsmol=[]
+        for babelindices in allpossiblebabelindices:
+            rdkitindices=[i-1 for i in babelindices]
+            print('babelindices',babelindices)
+            print('rdkitindices',rdkitindices)
+            rdkitindicessmarts=[]
+            for i in rdkitindices:
+                if i in truemoleculeindextosmartsindex.keys():
+                    rdkitindexsmart=truemoleculeindextosmartsindex[i]
+                    rdkitindicessmarts.append(rdkitindexsmart)
+            print('rdkitindicessmarts',rdkitindicessmarts)
+            babelindicessmarts=[i+1 for i in rdkitindicessmarts]
+            allpossiblebabelindicessmartsmol.append(babelindicessmarts)
+
+        print('allpossiblebabelindicessmartsmol',allpossiblebabelindicessmartsmol)
+        '''
         smartsindextoparametersmartsindices={}
         for parametersmartsindex,smartsindex in trueparametersmartsindextosmartsindex.items():
             if smartsindex not in smartsindextoparametersmartsindices.keys():
                 smartsindextoparametersmartsindices[smartsindex]=[]
             smartsindextoparametersmartsindices[smartsindex].append(parametersmartsindex)
+        #print('allpossiblebabelindicessmarts',allpossiblebabelindicessmarts)
         allpossiblerdkitindices=ReturnSymmetryIdenticalIndicesSMARTSAndParameterSMARTS(poltype,allpossiblebabelindicessmarts,smartsindextomoleculeindex,trueparametersmartsindextosmartsindex)
+        #print('allpossiblerdkitindices',allpossiblerdkitindices) 
         wildcards=CountWildCards(poltype,smartsfortransfer)
         parametersmartsatomorderlists=[] 
         rdkitindextofinalparametersmartsatomorder={}
@@ -1005,6 +1064,7 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
             atomorderlist=parametersmartsatomorderlist[1]
             if prmsmarts==parametersmarts:
                 parametersmartsatomorderlists.append(parametersmartsatomorderlist)
+        #print('***************************************************************',flush=True)
         for rdkitindex in range(len(allpossiblerdkitindices)):
             rdkitindexlist=allpossiblerdkitindices[rdkitindex]
             for parametersmartsatomorderlist in parametersmartsatomorderlists:
@@ -1014,14 +1074,16 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
                     for idx in rdkitindexlist:
                         smartsindex=moleculeindextosmartsindex[idx]
                         smartsorder=smartsindex+1
-                        #for match in matches:
                         parametersmartsindices=smartsindextoparametersmartsindices[smartsindex]
                         for parametersmartsatomindex in parametersmartsindices:
-                            #indices=list(range(len(match)))
-                            #smartsindextoparametersmartsindex=dict(zip(indices,match))
-                            #parametersmartsatomindex=smartsindextoparametersmartsindex[smartsindex]
                             parametersmartsatomorder=parametersmartsatomindex+1
+                            #print('**')
+                            #print('rdkitindex',rdkitindex,'idx',idx,'smartsindex',smartsindex,'parametersmartsatomindex',parametersmartsatomindex,flush=True)
+                            #print('rdkitindexlist',rdkitindexlist,elementtinkerdescrip,flush=True)
+                            #print('atomorder',atomorder,'smartsorder',smartsorder,'parametersmartsatomorder',parametersmartsatomorder,flush=True)
+
                             if parametersmartsatomorder==atomorder:
+                                #print('match !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',flush=True)
                                 rdkitindextofinalparametersmartsatomorder[rdkitindex]=parametersmartsatomorder
                                 rdkitindextosmartsorder[rdkitindex]=smartsorder
                                 rdkitindextoelementatomtinkerdescrip[rdkitindex]=elementtinkerdescrip 

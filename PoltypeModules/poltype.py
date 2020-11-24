@@ -1024,7 +1024,7 @@ class PolarizableTyper():
         m=self.AddInputCoordinatesAsDefaultConformer(m,indextocoordinates)
         mol,m=self.CheckIsInput2D(mol,obConversion,m)
         self.mol=mol
-
+        self.rdkitmol=m
         if self.keyfiletoaddtodatabase!=None:
             databaseparser.AddKeyFileParametersToParameterFile(self,m)   
             sys.exit()
@@ -1191,6 +1191,8 @@ class PolarizableTyper():
         self.nonaroringtors=[]
         self.nonaroringtorsets=[]
         self.classkeytoinitialprmguess={}
+        #if self.dontfrag==False:
+        #    torgen.PrepareTorsionTorsion(poltype,optmol,mol,bondtopology)
         if self.refinenonaroringtors==True and self.dontfrag==False:
             rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
 
