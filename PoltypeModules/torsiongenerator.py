@@ -658,8 +658,6 @@ def get_torlist(poltype,mol,missed_torsions):
                 rotbndlist[rotbndkey] = []
                 rotbndlist[rotbndkey].append(unq)
                 # write out rotatable bond to log
-                poltype.logfh.write('Rotatable bond found about %s\n' %
-                str(rotbndlist[rotbndkey][0]))
 
 
                 #Find other possible torsions about this rotatable bond
@@ -1156,7 +1154,6 @@ def write_arr_to_file(poltype,fname, array_list):
     Referenced By: fit_rot_bond_tors, eval_rot_bond_parms
     Description: - 
     """
-    poltype.WriteToLog(str(array_list))
     outfh = open(fname,'w')
     rows = zip(*array_list)
     for cols in rows:

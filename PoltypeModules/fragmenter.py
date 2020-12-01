@@ -886,7 +886,6 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         fragmentarray.append(fragment)
         namearray.append(rotbndindex)
     equivalentrotbndindexarrays=FindEquivalentFragments(poltype,fragmentarray,namearray)
-    poltype.WriteToLog('equivalentrotbndindexarrays'+str(equivalentrotbndindexarrays))
     tempdic=rotbndindextoparentindextofragindex
     rotbndindextoparentindextofragindex=AddMatchingParentIndexesBetweenFragments(poltype,equivalentrotbndindexarrays,rotbndindextoparentindextofragindex,rotbndindextofragment)
     # now we need to redraw the 2Dimages for any fragments that are equivalent (get multiple torsions from different rotatable bonds around same fragment)
