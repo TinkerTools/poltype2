@@ -90,8 +90,10 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
        
          
         filelist=os.listdir(os.getcwd())
+        found=False
         for ff in filelist:
             if '.key_5' in ff:
+                found=True
                 parentindextofragindex=json.load(open("parentindextofragindex.txt"))
                 parentsymclasstofragsymclass=json.load(open("parentsymclasstofragsymclass.txt"))
                 parentindextofragindex=json.load(open("parentindextofragindex.txt"))
@@ -137,7 +139,8 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
                                 classkeytosmartsposarraycollected[classkey]=smartsposarray
                                 classkeytoparameters[classkey]=prms
                                 classkeytofragmentfilename[classkey]=filename
-
+        if found==False:
+            raise ValueError('Fragment job did not finish '+filename)
     os.chdir(curdir)
     temp=open(poltype.key4fname,'r')
     results=temp.readlines()
@@ -168,6 +171,7 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
                 for prm in newprms:
                     valencestring+=prm+','
                 valencestring=valencestring[:-1]
+                valencestring+='\n'
                 temp.write(fitline)
                 temp.write(valencestring)
                 temp.write(torline)
@@ -180,13 +184,12 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
                 smarts=classkeytosmartscollected[rev]
                 torsionindexes=classkeytotorsionindexescollected[rev]
                 fitline+=' SMARTS '+smarts+' torsion atom indexes = '+torsionindexes+' with smiles torsion indices '+smartspos+' from fragment '+filename+"\n"
-
-                valencestring='# "'+smarts+'"'+' '+':'+' '+'['+smartspos+','
+                valencestring='#'+smarts+' % '+smartspos+' % '
                 newprms=prms[0::3]
                 for prm in newprms:
                     valencestring+=prm+','
                 valencestring=valencestring[:-1]
-                valencestring+=']'+','+' '+r'\\'+'\n'
+                valencestring+='\n'
                 temp.write(fitline)
                 temp.write(valencestring)
                 temp.write(torline)
@@ -381,13 +384,15 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             parentrotbndindexes=[int(i) for i in rotbndindexes]
             rotbndindexes=[int(i)-1 for i in parentrotbndindexes]
             fragrotbndindexes=[parentindextofragindex[i]+1 for i in rotbndindexes]
-            fragrotbnd=str(fragrotbndindexes[0])+' '+str(fragrotbndindexes[1])
-            if fragrotbnd not in fragrotbnds:
-                fragrotbnds.append(fragrotbnd)
-                strfragrotbndindexes+=str(fragrotbndindexes[0])+' '+str(fragrotbndindexes[1])+','
+            for j in range(0,len(fragrotbndindexes),2):
+                fragrotbnd=str(fragrotbndindexes[j])+' '+str(fragrotbndindexes[j+1])
+                if fragrotbnd not in fragrotbnds:
+                    fragrotbnds.append(fragrotbnd)
+                    strfragrotbndindexes+=str(fragrotbndindexes[j])+' '+str(fragrotbndindexes[j+1])+','
             
-            strparentrotbndindexes+=str(parentrotbndindexes[0])+' '+str(parentrotbndindexes[1])+','
+                strparentrotbndindexes+=str(parentrotbndindexes[j])+' '+str(parentrotbndindexes[j+1])+','
         strfragrotbndindexes=strfragrotbndindexes[:-1]
+        
         if rotbndindex in rotbndindextoringtor.keys():
             strfragrotbndindexes=None
         strparentrotbndindexes=strparentrotbndindexes[:-1]
@@ -447,14 +452,23 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 parentindextofragindex=copied[rotbndindex]
                 parentsymclasstofragsymclass=anothercopy[rotbndindex]
             rotkey=rotbndindex.replace('_',' ')
-            if rotkey in poltype.rotbndlist.keys():
-                tors=list(poltype.rotbndlist[rotkey])
-            else:
-                tors=[]
+            tors=[]
             if rotbndindex in rotbndindextoringtor.keys():
                 torset=rotbndindextoringtor[rotbndindex]
                 for tor in torset:
                     tors.append(tor)
+            elif rotkey in poltype.rotbndlist.keys():
+                tors=list(poltype.rotbndlist[rotkey])
+            else:
+                rotkeysplit=rotkey.split()
+                rotkeys=[]
+                for j in range(0,len(rotkeysplit),2):
+                    curkey=str(rotkeysplit[j])+' '+str(rotkeysplit[j+1])
+                    rotkeys.append(curkey)
+                for key in rotkeys: 
+                    keytors=list(poltype.rotbndlist[key])
+                    tors.extend(keytors)
+
             for torsion in tors:
                 smilesposarray=[]
                 fragtor=[]
@@ -495,6 +509,13 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
     finishedjobs,errorjobs=SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog)
 
 
+
+def CountUnderscores(poltype,string):
+    count=0
+    for e in string:
+        if e=='_':
+            count+=1
+    return count
 
 def MakeFileName(poltype,string,filename):
     temp=open(filename,'w')

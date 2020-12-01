@@ -145,14 +145,14 @@ def DetermineMaxRanges(poltype,torset,optmol,bondtopology):
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
         prefix='%s-opt-' % (poltype.molecprefix)
         postfix='-opt.xyz' 
-        prevstrctfname=torgen.GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
+        prevstrctfname,angles=torgen.GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
         cmd = 'cp ../%s %s' % (poltype.logoptfname.replace('.log','.xyz'),prevstrctfname)
         poltype.call_subsystem(cmd,True)
 
     else:
         prefix='%s-opt-' % (poltype.molecprefix)
         postfix='.log' 
-        prevstrctfname=torgen.GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
+        prevstrctfname,angles=torgen.GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
         # copy *-opt.log found early by Gaussian to 'prevstrctfname'
         cmd = 'cp ../%s %s' % (poltype.logoptfname,prevstrctfname)
         poltype.call_subsystem(cmd,True)
@@ -173,10 +173,13 @@ def DetermineMaxRanges(poltype,torset,optmol,bondtopology):
             prevstruct = opt.load_structfile(poltype,prevstrctfname)
             prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology)
             prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
-            prevstrctfname,torxyzfname,newtorxyzfname,keyfname=torgen.tinker_minimize(poltype,torset,optmol,variabletorlist,phaseangles,poltype.torsionrestraint,prevstruct,designatexyz,keybase,keybasepath)
+            torxyzfname,tmpkeyfname,torminlogfname=tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseangles,poltype.torsionrestraint,prevstruct,designatexyz,keybase,keybasepath)
+            prevstrctfname,torxyzfname,newtorxyzfname,keyfname=torgen.tinker_minimize(poltype,torset,optmol,variabletorlist,phaseangles,poltype.torsionrestraint,prevstruct,designatexyz,keybase,keybasepath,torxyzfname,tmpkeyfname,torminlogfname)
             toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
-            torgen.tinker_analyze(poltype,newtorxyzfname,keyfname,toralzfname)
             term=torgen.AnalyzeTerm(poltype,toralzfname)
+            if term==False:
+                torgen.tinker_analyze(poltype,newtorxyzfname,keyfname,toralzfname)
+                term=torgen.AnalyzeTerm(poltype,toralzfname)
             if term==False:
                 failedgridpoints.append(phaseangles)
     for angles in failedgridpoints:
