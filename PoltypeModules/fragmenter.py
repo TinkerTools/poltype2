@@ -1,6 +1,6 @@
 import electrostaticpotential as esp
 import torsiongenerator as torgen
-
+import torsionfit
 import os
 import numpy
 import openbabel
@@ -21,6 +21,7 @@ from rdkit.Geometry import Point3D
 import sys # used for terminaing job after fragmenter finishes and troubleshooting
 import symmetry as symm
 import shlex
+
 
 def AssignTotalCharge(poltype,molecule,babelmolecule):
     atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
@@ -101,6 +102,9 @@ def GrabTorsionParametersFromFragments(poltype,torlist,rotbndindextofragmentfile
                 classkeytosmartsposarray=json.load(open("classkeytosmartsposarray.txt"))
                 classkeytosmarts=json.load(open("classkeytosmarts.txt"))
                 classkeytotorsionindexes=json.load(open("classkeytotorsionindexes.txt"))
+                parenttortorclasskeytofragtortorclasskey=json.load(open("parenttortorclasskeytofragtortorclasskey.txt"))
+
+
                 fragsymmtorlist=[]
                 for tor in parentsymmtorlist:
                     if tor in parentclasskeytofragclasskey.keys():
@@ -445,6 +449,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         classkeytosmarts={}
         classkeytotorsionindexes={}
         parentclasskeytofragclasskey={}
+        parenttortorclasskeytofragtortorclasskey={}
         copied=parentindextofragindex.copy()
         anothercopy=parentsymclasstofragsymclass.copy()
         for rotbndindex in array:
@@ -453,6 +458,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 parentsymclasstofragsymclass=anothercopy[rotbndindex]
             rotkey=rotbndindex.replace('_',' ')
             tors=[]
+            tortor=False
             if rotbndindex in rotbndindextoringtor.keys():
                 torset=rotbndindextoringtor[rotbndindex]
                 for tor in torset:
@@ -460,13 +466,16 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             elif rotkey in poltype.rotbndlist.keys():
                 tors=list(poltype.rotbndlist[rotkey])
             else:
+                tortor=True
                 rotkeysplit=rotkey.split()
                 rotkeys=[]
+                maintortors=[]
                 for j in range(0,len(rotkeysplit),2):
                     curkey=str(rotkeysplit[j])+' '+str(rotkeysplit[j+1])
                     rotkeys.append(curkey)
                 for key in rotkeys: 
                     keytors=list(poltype.rotbndlist[key])
+                    maintortors.append(keytors[0])
                     tors.extend(keytors)
 
             for torsion in tors:
@@ -493,6 +502,17 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 classkeytosmartsposarray[classkey]=smilesposstring
                 classkeytosmarts[classkey]=fragsmarts
                 classkeytotorsionindexes[classkey]=fragtorstring
+        if tortor==True:
+            firsttor=maintortors[0]
+            secondtor=maintotors[1]
+            tortorclskey=torsionfit.GenerateTorTorClasskey(poltype,firsttor,secondtor)
+            classkeysplit=tortorclskey.split()
+            classkeysplit=[int(i) for i in classkeysplit]
+            fragclasskeysplit=[parentsymclasstofragsymclass[i] for i in classkeysplit]
+            fragclasskeysplit=[str(i) for i in fragclasskeysplit]
+            fragclasskey=' '.join(fragclasskeysplit)
+            parenttortorclasskeytofragtortorclasskey[tortorclskey]=fragclasskey
+        WriteDictionaryToFile(poltype,parenttortorclasskeytofragtortorclasskey,"parenttortorclasskeytofragtortorclasskey.txt")
         WriteDictionaryToFile(poltype,parentclasskeytofragclasskey,"parentclasskeytofragclasskey.txt")
         WriteDictionaryToFile(poltype,classkeytosmartsposarray,"classkeytosmartsposarray.txt")
         WriteDictionaryToFile(poltype,classkeytosmarts,"classkeytosmarts.txt")

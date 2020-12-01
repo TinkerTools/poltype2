@@ -1434,16 +1434,7 @@ def PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle
         tormat,qmmat,mmmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,cls_angle_dict[tup],tor_energy_list,qm_energy_list,mm_energy_list,torset)
         firsttor=torsions[0]
         secondtor=torsions[1]
-        if set(firsttor[2:])==set(secondtor[2:]):
-            pass
-        else:
-            secondtor=secondtor[::-1]
-        firsttor=firsttor[:-1]
-        secondtor=secondtor[:-1]
-        tortoratomidxs=[secondtor[0],secondtor[1],secondtor[2],firsttor[1],firsttor[0]]
-        tortortypeidxs=[poltype.idxtosymclass[j] for j in tortoratomidxs]
-        tortortypeidxs=[str(j) for j in tortortypeidxs]
-        tortorclskey=' '.join(tortortypeidxs)
+        tortorclskey=GenerateTorTorClasskey(poltype,firsttor,secondtor)
         firstanglerow=idealanglematrix[0,:]
         firstrow=tormat[0,:]
         N=list(idealanglematrix.shape)[0]
@@ -1495,3 +1486,16 @@ def PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle
                 temp.write(line)
     temp.flush()
     temp.close()
+
+def GenerateTorTorClasskey(poltype,firsttor,secondtor):
+    if set(firsttor[2:])==set(secondtor[2:]):
+        pass
+    else:
+        secondtor=secondtor[::-1]
+    firsttor=firsttor[:-1]
+    secondtor=secondtor[:-1]
+    tortoratomidxs=[secondtor[0],secondtor[1],secondtor[2],firsttor[1],firsttor[0]]
+    tortortypeidxs=[poltype.idxtosymclass[j] for j in tortoratomidxs]
+    tortortypeidxs=[str(j) for j in tortortypeidxs]
+    tortorclskey=' '.join(tortortypeidxs)
+    return tortorclskey
