@@ -994,7 +994,7 @@ def CheckIfOrientationIsSameAsPrevious(poltype,currentorientation,smartsindextop
             orientation=[set(allpossibleprmsmartsindices[1])]
         elif len(allpossibleprmsmartsindices)==4:
             orientation=[set(allpossibleprmsmartsindices[1]),set(allpossibleprmsmartsindices[2])]
-        if orientation in currentorientation:
+        if orientation not in currentorientation and len(currentorientation)!=0:
             keep=False
 
     return orientation,keep
@@ -1949,6 +1949,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     planarangleindicestotinkertypes,planarangleindicestotinkerclasses,planarangleindicestoparametersmartsatomorders,planarangleindicestoelementtinkerdescrips,planarangleindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
  
     torsionindicestotinkertypes,torsionindicestotinkerclasses,torsionindicestoparametersmartsatomorders,torsionindicestoelementtinkerdescrips,torsionindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,torsionsforprmtoparametersmarts,torsionsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
+
     torsionsmissing=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol,mol)
     torsionsmissingindicestotinkerclasses=PruneDictionary(poltype,torsionsmissing,torsionindicestotinkerclasses)
     atomtinkerclasstopoltypeclass=TinkerClassesToPoltypeClasses(poltype,atomindextotinkerclass)

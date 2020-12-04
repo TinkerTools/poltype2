@@ -1440,9 +1440,9 @@ def PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle
         N=list(idealanglematrix.shape)[0]
         b = numpy.zeros((N+1,N,2))
         b[:-1,:,:] = idealanglematrix
-        b[-1,:,:]=firstanglerow
-        
+        b[-1,:,:]=firstanglerow    
         idealanglematrix=numpy.copy(b)
+
         b = numpy.zeros((N+1,N))
         b[:-1,:] = tormat
         b[-1,:]=firstrow
@@ -1452,14 +1452,14 @@ def PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle
         firstcol=tormat[:,0]
         b = numpy.zeros((N+1,N+1,2))
         b[:,:-1,:] = idealanglematrix
-        b[:,-1,:]=firstanglecol
-        
+        b[:,-1,:]=firstanglecol        
         idealanglematrix=numpy.copy(b)
 
         b = numpy.zeros((N+1,N+1))
         b[:,:-1] = tormat
         b[:,-1]=firstcol
         tormat=numpy.copy(b)
+
         eps=.00001
         tormat[numpy.abs(tormat) < eps] = 0
         eps=10**7
