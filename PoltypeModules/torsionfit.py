@@ -1013,9 +1013,9 @@ def PlotHeatmap(poltype,idealanglematrix,actualanglematrix,matrix,title,figfname
     cbar = ax.figure.colorbar(im, ax=ax)
     cbar.ax.set_ylabel('', rotation=-90, va="bottom")
     yangles=idealanglematrix[:,0,0]
-    yangles=[round(i,1) for i in yangles]
+    yangles=[round(i) for i in yangles]
     xangles=idealanglematrix[0,:,1]
-    xangles=[round(i,1) for i in xangles]
+    xangles=[round(i) for i in xangles]
     # We want to show all ticks...
     ax.set_xticks(numpy.arange(len(xangles)))
     ax.set_yticks(numpy.arange(len(yangles)))
@@ -1026,7 +1026,7 @@ def PlotHeatmap(poltype,idealanglematrix,actualanglematrix,matrix,title,figfname
     # Loop over data dimensions and create text annotations.
     for i in range(len(yangles)):
         for j in range(len(xangles)):
-            energyvalue=str(round(matrix[i,j],1))
+            energyvalue=str(round(matrix[i,j]))
             text = ax.text(j, i, energyvalue,ha="center", va="center", color="w")
     
     ax.set_title(title)
@@ -1498,4 +1498,4 @@ def GenerateTorTorClasskey(poltype,firsttor,secondtor):
     tortortypeidxs=[poltype.idxtosymclass[j] for j in tortoratomidxs]
     tortortypeidxs=[str(j) for j in tortortypeidxs]
     tortorclskey=' '.join(tortortypeidxs)
-    return tortorclskey
+    return tortorclskey,tortoratomidxs
