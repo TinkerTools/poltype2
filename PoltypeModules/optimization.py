@@ -337,27 +337,12 @@ def StructureMinimization(poltype):
 def GeometryOptimization(poltype,mol):
     poltype.WriteToLog("NEED QM Density Matrix: Executing Gaussian Opt and SP")
 
-    OBOPTmol=mol # openbabel changes atom order which breaks things in modifiedresidue.py
-    """
-    OBOPTname=poltype.molstructfname.replace('.sdf','_OBOPT.pdb')
-    if not os.path.isfile(OBOPTname):
-        cmdstr=poltype.obminimizeexe+' -ff MMFF94 '+poltype.molstructfname +' '+ '>'+ OBOPTname
-        poltype.call_subsystem(cmdstr,True)
-    obConversion = openbabel.OBConversion()
-    OBOPTmol = openbabel.OBMol()
-    inFormat = obConversion.FormatFromExt(OBOPTname)
-    obConversion.SetInFormat(inFormat)
-    obConversion.ReadFile(OBOPTmol,OBOPTname)
-    charge=poltype.totalcharge
-    OBOPTmol.SetTotalCharge(charge) # for some reason obminimize does not print charge in output PDB
-    """
-
     
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt
         term,error=poltype.CheckNormalTermination(poltype.logoptfname)
         if not term:
             mystruct = load_structfile(poltype,poltype.molstructfname)
-            gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,OBOPTmol)
+            gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol)
             cmdstr = 'cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + poltype.comoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
@@ -382,10 +367,10 @@ def GeometryOptimization(poltype,mol):
         
            
     else:
-        gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,OBOPTmol)
+        gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol)
         poltype.WriteToLog("Calling: " + "Psi4 Optimization")
         term,error=poltype.CheckNormalTermination(poltype.logoptfname)
-        inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,OBOPTmol)
+        inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol)
         if term==False:
             cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+inputname+' '+poltype.logoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
