@@ -1002,6 +1002,14 @@ class PolarizableTyper():
             if chg!=0:
                 chgcount+=1
         return chgcount
+
+    def RemoveXYZFiles(self):
+        files=os.listdir()
+        for f in files:
+            filename, file_extension = os.path.splitext(f)
+            if file_extension=='.xyz' and 'opt' not in filename:
+                os.remove(f)
+             
             
     def GenerateParameters(self):
         if os.path.isfile(self.tmpxyzfile+'_2'):
@@ -1058,7 +1066,7 @@ class PolarizableTyper():
             self.SanitizeAllQMMethods()
 
  
-
+        self.RemoveXYZFiles()
  
         self.WriteToLog("Running on host: " + gethostname())
         # Initializing arrays

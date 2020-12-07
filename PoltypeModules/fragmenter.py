@@ -399,7 +399,6 @@ def FindEquivalentFragments(poltype,fragmentarray,namearray):
                 match = refsmartsmol.HasSubstructMatch(smartsmol)
                 if match==True:
                     nametemp.append(name)
-
         if set(nametemp) not in equivalentnamesarrayset:
             equivalentnamesarrayset.append(set(nametemp))
             equivalentnamesarray.append(set(nametemp))
@@ -420,10 +419,9 @@ def FindEquivalentFragments(poltype,fragmentarray,namearray):
             else:
                 firstrotidx.append(namesplit[0])
                 secondrotidx.append(namesplit[1])
-
         firstrotidx,secondrotidx=(list(t) for t in zip(*sorted(zip(firstrotidx, secondrotidx),reverse=True)))
         firstrotidx=[str(i)+'_' for i in firstrotidx]
-        secondrotidx=[str(i) for i in secondrotidx]   
+        secondrotidx=[str(i) for i in secondrotidx]  
         for i in range(len(firstrotidx)):
             firstrot=firstrotidx[i]
             secondrot=secondrotidx[i]
@@ -483,8 +481,9 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             if i==0:
                 equivalentrotbndindex=rotbndindex
                 equivalentparentindextofragindex=parentindextofragindex
+                
             else:
-                parentindextofragindex=equivalentparentindextofragindex[rotbndindex]
+                parentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
             
             MakeFileName(poltype,equivalentrotbndindex,'equivalentfragment.txt')
             rotbndindexes=rotbndindex.split('_')

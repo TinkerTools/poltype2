@@ -348,11 +348,12 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
 
 def GenerateFilename(poltype,torset,phaseangles,prefix,postfix,mol):
     oldtorset=torset[:]
-    if torset in poltype.torsettofilenametorset.keys():
-        tortorindex=poltype.torsettotortorindex[torset]
-        phaseangle=phaseangles[tortorindex]
-        phaseindex=phaseangles.index(phaseangle)
-        torset=poltype.torsettofilenametorset[torset]
+    if type(torset)!=list:
+        if torset in poltype.torsettofilenametorset.keys():
+            tortorindex=poltype.torsettotortorindex[torset]
+            phaseangle=phaseangles[tortorindex]
+            phaseindex=phaseangles.index(phaseangle)
+            torset=poltype.torsettofilenametorset[torset]
     angles=[]
     filename=prefix
     for i in range(len(torset)):
@@ -361,9 +362,13 @@ def GenerateFilename(poltype,torset,phaseangles,prefix,postfix,mol):
         phaseangle=phaseangles[i]
         torang = mol.GetTorsion(a,b,c,d)
         angle=round((torang+phaseangle)%360)
-        if oldtorset in poltype.torsettofilenametorset.keys():
-            if phaseindex==i:
+        if type(oldtorset)!=list:
+            if oldtorset in poltype.torsettofilenametorset.keys():
+                if phaseindex==i:
+                    angles.append(angle)
+            else:
                 angles.append(angle)
+
         else:
             angles.append(angle)
         filename+='%d-%d-%03d'%(b,c,angle)

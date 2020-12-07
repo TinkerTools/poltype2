@@ -1437,6 +1437,8 @@ def PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle
         tortorclskey=GenerateTorTorClasskey(poltype,firsttor,secondtor)
         firstanglerow=idealanglematrix[0,:]
         firstrow=tormat[0,:]
+        firstqmrow=qmmat[0,:]
+        firstmmrow=mmat[0,:]
         N=list(idealanglematrix.shape)[0]
         b = numpy.zeros((N+1,N,2))
         b[:-1,:,:] = idealanglematrix
@@ -1448,8 +1450,23 @@ def PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle
         b[-1,:]=firstrow
         tormat=numpy.copy(b)
 
+
+        b = numpy.zeros((N+1,N))
+        b[:-1,:] = qmmat
+        b[-1,:]=firstqmrow
+        qmmat=numpy.copy(b)
+
+        b = numpy.zeros((N+1,N))
+        b[:-1,:] = mmmat
+        b[-1,:]=firstmmrow
+        mmmat=numpy.copy(b)
+
+
         firstanglecol=idealanglematrix[:,0]
         firstcol=tormat[:,0]
+        firstqmcol=qmmat[:,0]
+        firstmmcol=mmmat[:,0]
+
         b = numpy.zeros((N+1,N+1,2))
         b[:,:-1,:] = idealanglematrix
         b[:,-1,:]=firstanglecol        
@@ -1460,6 +1477,20 @@ def PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle
         b[:,-1]=firstcol
         tormat=numpy.copy(b)
 
+
+        b = numpy.zeros((N+1,N+1))
+        b[:,:-1] = mmmat
+        b[:,-1]=firstmmcol
+        mmmat=numpy.copy(b)
+
+        b = numpy.zeros((N+1,N+1))
+        b[:,:-1] = qmmat
+        b[:,-1]=firstqmcol
+        qmmat=numpy.copy(b)
+
+
+
+
         eps=.00001
         tormat[numpy.abs(tormat) < eps] = 0
         eps=10**7
@@ -1467,10 +1498,17 @@ def PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle
 
         tormat=numpy.nan_to_num(tormat)
         tormat=numpy.around(tormat, decimals=3)
+        qmmat=numpy.nan_to_num(qmmat)
+        qmmat=numpy.around(qmmat, decimals=3)
+        mmmat=numpy.nan_to_num(mmmat)
+        mmmat=numpy.around(mmmat, decimals=3)
+
         idealanglematrix=numpy.around(idealanglematrix, decimals=3)
         actualanglematrix=numpy.around(actualanglematrix, decimals=3)
 
         PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,tormat,'QM-MM2 Heatmap (kcal/mol)','QM-MM2_Heatmap.png',None,None,None)
+        PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,qmmat,'QM Heatmap (kcal/mol)','QM_Heatmap.png',None,None,None)
+        PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,mmmat,'MM2 Heatmap (kcal/mol)','MM2_Heatmap.png',None,None,None)
 
         rowpts=N+1
         colpts=N+1
