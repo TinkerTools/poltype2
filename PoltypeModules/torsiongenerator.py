@@ -348,12 +348,11 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
 
 def GenerateFilename(poltype,torset,phaseangles,prefix,postfix,mol):
     oldtorset=torset[:]
-    if type(torset)!=list:
-        if torset in poltype.torsettofilenametorset.keys():
-            tortorindex=poltype.torsettotortorindex[torset]
-            phaseangle=phaseangles[tortorindex]
-            phaseindex=phaseangles.index(phaseangle)
-            torset=poltype.torsettofilenametorset[torset]
+    if torset in poltype.torsettofilenametorset.keys():
+        tortorindex=poltype.torsettotortorindex[torset]
+        phaseangle=phaseangles[tortorindex]
+        phaseindex=phaseangles.index(phaseangle)
+        torset=poltype.torsettofilenametorset[torset]
     angles=[]
     filename=prefix
     for i in range(len(torset)):
@@ -362,11 +361,8 @@ def GenerateFilename(poltype,torset,phaseangles,prefix,postfix,mol):
         phaseangle=phaseangles[i]
         torang = mol.GetTorsion(a,b,c,d)
         angle=round((torang+phaseangle)%360)
-        if type(oldtorset)!=list:
-            if oldtorset in poltype.torsettofilenametorset.keys():
-                if phaseindex==i:
-                    angles.append(angle)
-            else:
+        if oldtorset in poltype.torsettofilenametorset.keys():
+            if phaseindex==i:
                 angles.append(angle)
 
         else:
@@ -432,7 +428,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     poltype.tensorphases={}
     for torset in poltype.torlist:
         variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
-        
         phaselists,currentanglelist=GeneratePhaseLists(poltype,torset,optmol)
         flatphaselist=numpy.array(list(product(*phaselists)))
         poltype.tensorphases[tuple(torset)]=flatphaselist
@@ -1432,7 +1427,7 @@ def FindMainConsecutiveTorsions(poltype,mol,tortorbonds):
 
 def UpdateTorsionSets(poltype,tortor):
     for tor in tortor:
-        torset=[tuple(tor)]
+        torset=tuple([tuple(tor)])
         if torset in poltype.torlist:
             index=poltype.torlist.index(torset)
             del poltype.torlist[index]

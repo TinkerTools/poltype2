@@ -1014,8 +1014,13 @@ def PlotHeatmap(poltype,idealanglematrix,actualanglematrix,matrix,title,figfname
     cbar.ax.set_ylabel('', rotation=-90, va="bottom")
     yangles=idealanglematrix[:,0,0]
     yangles=[round(i) for i in yangles]
+    yangles=[str(i) for i in yangles]
+    yangles=[i.split('.')[0] for i in yangles]
     xangles=idealanglematrix[0,:,1]
     xangles=[round(i) for i in xangles]
+    xangles=[str(i) for i in xangles]
+    xangles=[i.split('.')[0] for i in xangles]
+
     # We want to show all ticks...
     ax.set_xticks(numpy.arange(len(xangles)))
     ax.set_yticks(numpy.arange(len(yangles)))
@@ -1024,10 +1029,10 @@ def PlotHeatmap(poltype,idealanglematrix,actualanglematrix,matrix,title,figfname
     ax.set_yticklabels(yangles)
     ax.set_ylim(len(matrix),-0.5, -0.5) 
     # Loop over data dimensions and create text annotations.
-    for i in range(len(yangles)):
-        for j in range(len(xangles)):
-            energyvalue=str(round(matrix[i,j]))
-            text = ax.text(j, i, energyvalue,ha="center", va="center", color="w")
+    #for i in range(len(yangles)):
+    #    for j in range(len(xangles)):
+    #        energyvalue=str(round(matrix[i,j]))
+    #        text = ax.text(j, i, energyvalue,ha="center", va="center", color="w")
     
     ax.set_title(title)
     if textstring!=None and numprms!=None and datapts!=None and minRMSD!=None:
@@ -1434,11 +1439,11 @@ def PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle
         tormat,qmmat,mmmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,cls_angle_dict[tup],tor_energy_list,qm_energy_list,mm_energy_list,torset)
         firsttor=torsions[0]
         secondtor=torsions[1]
-        tortorclskey=GenerateTorTorClasskey(poltype,firsttor,secondtor)
+        tortorclskey,atomidxs=GenerateTorTorClasskey(poltype,firsttor,secondtor)
         firstanglerow=idealanglematrix[0,:]
         firstrow=tormat[0,:]
         firstqmrow=qmmat[0,:]
-        firstmmrow=mmat[0,:]
+        firstmmrow=mmmat[0,:]
         N=list(idealanglematrix.shape)[0]
         b = numpy.zeros((N+1,N,2))
         b[:-1,:,:] = idealanglematrix
@@ -1493,8 +1498,13 @@ def PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle
 
         eps=.00001
         tormat[numpy.abs(tormat) < eps] = 0
+        qmmat[numpy.abs(qmmat) < eps] = 0
+        mmmat[numpy.abs(mmmat) < eps] = 0
+
         eps=10**7
         tormat[numpy.abs(tormat) > eps] = 0
+        qmmat[numpy.abs(qmmat) > eps] = 0
+        mmmat[numpy.abs(mmmat) > eps] = 0
 
         tormat=numpy.nan_to_num(tormat)
         tormat=numpy.around(tormat, decimals=3)

@@ -228,8 +228,8 @@ def GrabTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepath,equ
         else:
             temp.write(line)
     for tortorkey in tortorclasskeytogridpts.keys():
-        valenceprmlist=ConstructTorsionTorsionLineFromFragment(poltype,tortorkey,classkeytofragmentfilename,tortorclasskeytogridpts,tortorclasskeytosmartsposarraycollected,tortorclasskeytosmartscollected,tortorclasskeytotorsionindexescollected,temp,valenceprmlist,fitline)
-        valenceprmlist=WriteGridPoints(poltype,valenceprmlist,tortorkey,tortorclasskeytogridlinesarray,temp)
+        valenceprmlist=ConstructTorsionTorsionLineFromFragment(poltype,tortorkey,classkeytofragmentfilename,tortorclasskeytogridpts,tortorclasskeytosmartsposarraycollected,tortorclasskeytosmartscollected,tortorclasskeytotorsionindexescollected,temp,valenceprmlist,fitline,tortorclasskeytogridlinesarray)
+        WriteGridPoints(poltype,tortorkey,tortorclasskeytogridlinesarray,temp)
 
 
 
@@ -244,12 +244,12 @@ def WriteOutDatabaseLines(poltype,valenceprmlist):
     newtemp.close()
 
 
-def WriteGridPoints(poltype,valenceprmlist,key,tortorclasskeytogridlinesarray,temp):
+def WriteGridPoints(poltype,key,tortorclasskeytogridlinesarray,temp):
     gridarray=tortorclasskeytogridlinesarray[key]
     for line in gridarray:
         temp.write(line)
-        valenceprmlist.append(line)
-    return valenceprmlist
+        
+    
 
 
 def ParseGridLines(poltype,results,lineidx):
@@ -274,9 +274,16 @@ def ConstructTorsionLineFromFragment(poltype,key,classkeytofragmentfilename,clas
     smarts=classkeytosmartscollected[key]
     torsionindexes=classkeytotorsionindexescollected[key]
     fitline+=' SMARTS '+smarts+' torsion atom indexes = '+torsionindexes+' with smarts torsion indices '+smartspos+' from fragment '+filename+"\n"
-    valencestring='#'+smarts+' % '+smartspos+' % '
+    valencestring='torsion'+' % '+smarts+' % '+smartspos+' % '
     newprms=prms[0::3]
-    for prm in newprms:
+    folds=prms[2::3]
+    folds=[int(i) for i in folds]
+    foldtoprms=dict(zip(folds,newprms))
+    for i in range(1,4):
+        if i not in foldtoprms.keys():
+            foldtoprms[i]=str(0)
+    for fold in sorted(foldtoprms.keys()):
+        prm=foldtoprms[fold]
         valencestring+=prm+','
     valencestring=valencestring[:-1]
     valencestring+='\n'
@@ -287,21 +294,27 @@ def ConstructTorsionLineFromFragment(poltype,key,classkeytofragmentfilename,clas
     return valenceprmlist
 
 
-def ConstructTorsionTorsionLineFromFragment(poltype,key,classkeytofragmentfilename,tortorclasskeytogridpts,tortorclasskeytosmartsposarraycollected,tortorclasskeytosmartscollected,tortorclasskeytotorsionindexescollected,temp,valenceprmlist,fitline):
+def ConstructTorsionTorsionLineFromFragment(poltype,key,classkeytofragmentfilename,tortorclasskeytogridpts,tortorclasskeytosmartsposarraycollected,tortorclasskeytosmartscollected,tortorclasskeytotorsionindexescollected,temp,valenceprmlist,fitline,tortorclasskeytogridlinesarray):
     filename=classkeytofragmentfilename[key]
     gridpts=tortorclasskeytogridpts[key]
-    gridpts=[str(i) for i in gridpts]
-    gridpts=' '.join(gridpts)
+    gridptsarray=[str(i) for i in gridpts]
+    gridpts=' '.join(gridptsarray)
+    gridlinesarray=tortorclasskeytogridlinesarray[key]
     torline='tortors '+key+' '+gridpts+'\n'
     smartspos=tortorclasskeytosmartsposarraycollected[key]
     smarts=tortorclasskeytosmartscollected[key]
     torsionindexes=tortorclasskeytotorsionindexescollected[key]
     fitline+=' SMARTS '+smarts+' torsion atom indexes = '+torsionindexes+' with smarts torsion indices '+smartspos+' from fragment '+filename+"\n"
-    valencestring='#'+smarts+' % '+smartspos+' % '
+    gridptscommastr=','.join(gridptsarray)
+    valencestring='tortors'+' % '+smarts+' % '+smartspos+' % '+gridptscommastr+' % '
     valencestring+='\n'
     temp.write(fitline)
     temp.write(valencestring)
     temp.write(torline)
+    for gridline in gridlinesarray:
+        gridline=gridline.replace('\n','')
+        valencestring+=gridline+','
+    valencestring=valencestring[:-1]
     valenceprmlist.append(valencestring)
     return valenceprmlist
 
@@ -440,7 +453,7 @@ def FindRotatableBond(poltype,fragmol,rotbndindextofragment,temp):
             return rotbndindex
 
 def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog):
-    poltypeinput={'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','optmethod':poltype.optmethod,'toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':poltype.numproc,'maxmem':poltype.maxmem,'maxdisk':poltype.maxdisk,'printoutput':True}
+    poltypeinput={'tortor':poltype.tortor,'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','optmethod':poltype.optmethod,'toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':poltype.numproc,'maxmem':poltype.maxmem,'maxdisk':poltype.maxdisk,'printoutput':True}
     if strfragrotbndindexes!=None:
         poltypeinput['onlyrotbndslist']=strfragrotbndindexes
     inifilepath=poltype.WritePoltypeInitializationFile(poltypeinput)
