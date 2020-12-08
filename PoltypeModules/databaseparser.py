@@ -1669,11 +1669,12 @@ def WriteOutList(poltype,ls,filename):
     np.savetxt(filename,ls)
 
 def ReadList(poltype,filename):
-    ls=np.loadtxt(filename)
     newls=[]
-    for subls in ls:
-        newsubls=[int(i) for i in subls]
-        newls.append(newsubls) 
+    if os.stat(filename).st_size != 0:
+        ls=np.loadtxt(filename)
+        for subls in ls:
+            newsubls=[int(i) for i in subls]
+            newls.append(newsubls)
     return newls
 
 def CheckIfParametersExist(poltype,potentialmissingindices,prms):
