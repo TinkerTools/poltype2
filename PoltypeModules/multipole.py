@@ -7,28 +7,6 @@ import shutil
 import re
 from collections import deque
 
-def is_in_polargroup(poltype,mol, smarts, bond, f):
-    """
-    Intent: Check if a given bond is in the group defined by the smarts string
-    Input:
-        mol: OBMol object
-        smarts: Smarts String defining the group (e.g. O-[*])
-        bond: bond in question
-        f: output file (not used)
-    Output:
-        True if the bond is in the group, False if not
-    Referenced By: gen_peditinfile
-    Description: -
-    """
-    sp = openbabel.OBSmartsPattern()
-    openbabel.OBSmartsPattern.Init(sp,smarts)
-    sp.Match(mol)
-    for i in sp.GetUMapList():
-        if ((bond.GetBeginAtomIdx() in i) and
-             (bond.GetEndAtomIdx() in i)):
-            return True
-    return False
-
 def CheckIfAllAtomsSameClass(poltype,classlist):
     allsymm=True
     if len(classlist)>=1:
@@ -304,43 +282,17 @@ def gen_peditinfile(poltype,mol):
             for line in lines:
                 f.write(line)
 
-        # Carboxylate ion O-
-        sp = openbabel.OBSmartsPattern()
-        openbabel.OBSmartsPattern.Init(sp,'[OD1]~C~[OD1]')
-        sp.Match(mol)
-        for ia in sp.GetMapList():
-            f.write(str(ia[0]) + " " + str(0.921) + "\n")
-
+        
 
 
         f.write("\n")
         f.flush()
         os.fsync(f.fileno())
-        #Define polarizable groups by cutting bonds
-        iterbond = openbabel.OBMolBondIter(mol)
-        for b in iterbond:
-            if (b.IsRotor()):
-                cut_bond = True
-                # If in this group, then don't cut bond
-                cut_bond = cut_bond and (not is_in_polargroup(poltype,mol,'a[CH2][*]', b,f))
-                cut_bond = cut_bond and (not is_in_polargroup(poltype,mol,'[#6]O-[#1]', b,f))
-                #cut_bond = cut_bond and (not is_in_polargroup(mol,'[#6][#6]~O', b,f))
-                # Formamide RC=O
-                cut_bond = cut_bond and (not is_in_polargroup(poltype,mol,'[*][CH]=O', b,f))
-                # Amide
-                cut_bond = cut_bond and (not is_in_polargroup(poltype,mol,'N(C=O)', b,f))
-                cut_bond = cut_bond and (not is_in_polargroup(poltype,mol,'C(C=O)', b,f))
-                cut_bond = cut_bond and (not is_in_polargroup(poltype,mol,'aN', b,f))
-                cut_bond = cut_bond and (not is_in_polargroup(poltype,mol,'O-[*]', b,f))
-                #cut_bond = cut_bond and (not is_in_polargroup(mol,'C[NH2]', b,f))
-                if (cut_bond):
-                    f.write( str(b.GetBeginAtomIdx()) + " " + str(b.GetEndAtomIdx()) + "\n")
-
         f.write('\n')
-        # DONT do multipole condense
+        f.write("2\n")
         f.write("N\n")
-        # DO zero out multipole components
-        f.write("Y\n")
+        f.write('\n')
+        f.write("N\n")
 
 
         f.flush()

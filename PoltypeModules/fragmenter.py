@@ -1105,11 +1105,8 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
 
 def AddMatchingParentIndexesBetweenFragments(poltype,equivalentrotbndindexarrays,rotbndindextoparentindextofragindex,rotbndindextofragment):
    newrotbndindextoparentindextofragindex={}
-   print('rotbndindextofragment',rotbndindextofragment)
-   print('equivalentrotbndindexarrays',equivalentrotbndindexarrays)
    for rotbndindexarray in equivalentrotbndindexarrays:
        for refrotbndindex in rotbndindexarray:
-           print('refrotbndindex',refrotbndindex)
            reffragment=rotbndindextofragment[refrotbndindex]
            refparentindextofragindex=rotbndindextoparentindextofragindex[refrotbndindex]
            reffragindextoparentindex={value: key for key, value in refparentindextofragindex.items()} 

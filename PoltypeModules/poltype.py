@@ -610,7 +610,7 @@ class PolarizableTyper():
             if "Version" in line:
                 linesplit = line.split()
                 self.versionnum = linesplit[2]
-                if version.parse(self.versionnum) >= version.parse("8.7"):
+                if version.parse(self.versionnum) >= version.parse("8.8.3"):
                     latestversion = True
                     break
 
