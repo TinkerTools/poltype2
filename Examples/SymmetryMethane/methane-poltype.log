@@ -418,3 +418,579 @@ Fortran runtime error: Expected REAL for item 1 in formatted transfer, got INTEG
     --            402             YZ-Quad            0.00000          X
      2            402             ZZ-Quad           -0.00434
 Mon Sep 21 15:25:55 2020 ERROR: potential.x 6 methane.xyz_2 -k methane.key_2 methane.pot N 0.1 path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMethane
+Tue Dec  8 14:44:14 2020  Calling: mkdir /scratch/bdw2292/Psi4-methane path = /home/bdw2292/currentstable/Examples/SymmetryMethane
+Tue Dec  8 14:44:14 2020  Calling: mkdir /scratch/bdw2292/Gau-methane path = /home/bdw2292/currentstable/Examples/SymmetryMethane
+Tue Dec  8 14:44:14 2020 Running on host: g2-node38.bme.utexas.edu
+Tue Dec  8 14:44:14 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Tue Dec  8 14:44:14 2020 Calling: Psi4 Optimization
+Tue Dec  8 14:44:14 2020  Calling: cd /home/bdw2292/currentstable/Examples/SymmetryMethane && psi4 methane-opt_1.psi4 methane-opt_1.log path = /home/bdw2292/currentstable/Examples/SymmetryMethane
+Optimizer: Optimization complete!
+Tue Dec  8 14:44:42 2020 Normal termination: logfile=/home/bdw2292/currentstable/Examples/SymmetryMethane/methane-opt_1.log path=/home/bdw2292/currentstable/Examples/SymmetryMethane
+Tue Dec  8 14:45:12 2020 All jobs have terminated 
+Tue Dec  8 14:45:12 2020 Normal termination: logfile=/home/bdw2292/currentstable/Examples/SymmetryMethane/methane-opt_1.log path=/home/bdw2292/currentstable/Examples/SymmetryMethane
+Tue Dec  8 14:45:42 2020 All jobs have terminated 
+Tue Dec  8 14:45:42 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Tue Dec  8 14:45:42 2020 Calling: Psi4 Optimization
+Tue Dec  8 14:45:42 2020  Calling: cd /home/bdw2292/currentstable/Examples/SymmetryMethane && psi4 methane-opt_2.psi4 methane-opt_2.log path = /home/bdw2292/currentstable/Examples/SymmetryMethane
+Optimizer: Optimization complete!
+Tue Dec  8 14:45:45 2020 Normal termination: logfile=/home/bdw2292/currentstable/Examples/SymmetryMethane/methane-opt_2.log path=/home/bdw2292/currentstable/Examples/SymmetryMethane
+Tue Dec  8 14:46:15 2020 All jobs have terminated 
+Tue Dec  8 14:46:15 2020 Normal termination: logfile=/home/bdw2292/currentstable/Examples/SymmetryMethane/methane-opt_2.log path=/home/bdw2292/currentstable/Examples/SymmetryMethane
+Tue Dec  8 14:46:45 2020 All jobs have terminated 
+Tue Dec  8 14:46:45 2020 Calling: Psi4 Gradient for DMA
+Tue Dec  8 14:46:45 2020  Calling: poledit.x 1 methane.gdmaout /home/bdw2292/currentstable/ParameterFiles/amoebabio18_header.prm < methane-peditin.txt path = /home/bdw2292/currentstable/Examples/SymmetryMethane
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                       Version 8.8.3  November 2020                       ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+At line 3720 of file poledit.f (unit = 5, file = 'stdin')
+Fortran runtime error: End of file
+
+ Global Frame Cartesian Multipole Moments :
+
+ Site:       1         Name:   C         Atomic Number:       6
+
+ Coordinates:           -0.000084       0.000082       0.000095
+
+ Charge:                 -0.17181
+ Dipole:                 -0.00014        0.00020        0.00016
+ Quadrupole:              0.00017
+                         -0.00023       -0.00014
+                          0.00017       -0.00008       -0.00004
+
+ Site:       2         Name:   H         Atomic Number:       1
+
+ Coordinates:           -0.676518       0.853273      -0.085717
+
+ Charge:                  0.04303
+ Dipole:                 -0.08538        0.10759       -0.01097
+ Quadrupole:              0.00089
+                         -0.00902        0.00523
+                          0.00083       -0.00105       -0.00612
+
+ Site:       3         Name:   H         Atomic Number:       1
+
+ Coordinates:           -0.394038      -0.836372      -0.581791
+
+ Charge:                  0.04290
+ Dipole:                 -0.04960       -0.10539       -0.07344
+ Quadrupole:             -0.00377
+                          0.00521        0.00479
+                          0.00360        0.00759       -0.00102
+
+ Site:       4         Name:   H         Atomic Number:       1
+
+ Coordinates:            0.086307      -0.293963       1.048557
+
+ Charge:                  0.04299
+ Dipole:                  0.01108       -0.03715        0.13222
+ Quadrupole:             -0.00611
+                         -0.00036       -0.00489
+                          0.00127       -0.00478        0.01101
+
+ Site:       5         Name:   H         Atomic Number:       1
+
+ Coordinates:            0.985247       0.276089      -0.382179
+
+ Charge:                  0.04290
+ Dipole:                  0.12422        0.03465       -0.04817
+ Quadrupole:              0.00895
+                          0.00437       -0.00500
+                         -0.00591       -0.00171       -0.00394
+
+ Local Frame Definition for Multipole Sites :
+
+     Atom     Name      Axis Type     Z Axis  X Axis  Y Axis
+
+       1      C         None             0       0       0
+       2      H         Z-Only           1       0       0
+       3      H         Z-Only           1       0       0
+       4      H         Z-Only           1       0       0
+       5      H         Z-Only           1       0       0
+
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Choose Either the AMOEBA or HIPPO Polarization Model [A] :  
+ Polarizability Parameters for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      C            1.3340         0.3900
+       2      H            0.4960         0.3900
+       3      H            0.4960         0.3900
+       4      H            0.4960         0.3900
+       5      H            0.4960         0.3900
+
+ Enter Atom Number, Polarizability & Thole Values :  
+ Choose Method for Division into Polarization Groups :
+
+    (1) Put All Atoms in One Polarization Group
+    (2) Separate into Groups at Rotatable Bonds
+
+ Enter the Number of the Desired Choice [1] :  
+ All atoms are placed initially into one polarization group;
+ This can be modified by entering a series of bonded atom pairs
+ that separate the molecule into distinct polarization groups
+
+ Enter a Bond between Polarization Groups [<Enter>=Exit] :  
+ Polarization Groups for Multipole Sites :
+
+     Atom     Name       Polarization Group Definition
+
+       1      C               2     3     4     5
+       2      H               1
+       3      H               1
+       4      H               1
+       5      H               1
+
+ Electrostatic and Polarization Scale Factors :
+
+                    1-2         1-3         1-4         1-5
+
+ M-Scale:         0.0000      0.0000      0.4000      0.8000
+ P-Inter:         0.0000      0.0000      1.0000      1.0000
+ P-Intra:         0.0000      0.0000      0.5000      1.0000
+ W-Scale:         1.0000      1.0000      1.0000      1.0000
+
+                    1-1         1-2         1-3         1-4
+
+ D-Scale:         0.0000      1.0000      1.0000      1.0000
+ U-Scale:         1.0000      1.0000      1.0000      1.0000
+
+ Use Thole Damping:           True
+ Charge Penetration:          False
+ Set D Equal to P:            False
+
+ Determination of Intergroup Induced Dipoles :
+
+    Iter        RMS Change (Debye)
+
+       1           0.0000000000
+
+ Local Frame Intergroup Induced Dipole Moments (Debye) :
+
+    Atom              X           Y           Z         Total
+
+       1           0.0000      0.0000      0.0000      0.0000
+       2           0.0000      0.0000      0.0000      0.0000
+       3           0.0000      0.0000      0.0000      0.0000
+       4           0.0000      0.0000      0.0000      0.0000
+       5           0.0000      0.0000      0.0000      0.0000
+
+ Condense Symmetric Atoms to Equivalent Types [Y] :  
+ Equivalent Atoms Assigned the Same Atom Type :
+
+ Atoms     2  and     3  Set to Equivalent Types
+ Atoms     2  and     4  Set to Equivalent Types
+ Atoms     2  and     5  Set to Equivalent Types
+
+ Enter Sets of Equivalent or Different Atoms [<Enter>=Exit] :  Tue Dec  8 14:46:46 2020 ERROR: poledit.x 1 methane.gdmaout /home/bdw2292/currentstable/ParameterFiles/amoebabio18_header.prm < methane-peditin.txt path = /home/bdw2292/currentstable/Examples/SymmetryMethane
+Tue Dec  8 14:47:12 2020 Running on host: g2-node38.bme.utexas.edu
+Tue Dec  8 14:47:12 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Tue Dec  8 14:47:12 2020 Calling: Psi4 Optimization
+Tue Dec  8 14:47:12 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Tue Dec  8 14:47:12 2020 Calling: Psi4 Optimization
+Tue Dec  8 14:47:12 2020 Calling: Psi4 Gradient for DMA
+Tue Dec  8 14:47:12 2020  Calling: poledit.x 1 methane.gdmaout /home/bdw2292/currentstable/ParameterFiles/amoebabio18_header.prm < methane-peditin.txt path = /home/bdw2292/currentstable/Examples/SymmetryMethane
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                       Version 8.8.3  November 2020                       ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Global Frame Cartesian Multipole Moments :
+
+ Site:       1         Name:   C         Atomic Number:       6
+
+ Coordinates:           -0.000084       0.000082       0.000095
+
+ Charge:                 -0.17181
+ Dipole:                 -0.00014        0.00020        0.00016
+ Quadrupole:              0.00017
+                         -0.00023       -0.00014
+                          0.00017       -0.00008       -0.00004
+
+ Site:       2         Name:   H         Atomic Number:       1
+
+ Coordinates:           -0.676518       0.853273      -0.085717
+
+ Charge:                  0.04303
+ Dipole:                 -0.08538        0.10759       -0.01097
+ Quadrupole:              0.00089
+                         -0.00902        0.00523
+                          0.00083       -0.00105       -0.00612
+
+ Site:       3         Name:   H         Atomic Number:       1
+
+ Coordinates:           -0.394038      -0.836372      -0.581791
+
+ Charge:                  0.04290
+ Dipole:                 -0.04960       -0.10539       -0.07344
+ Quadrupole:             -0.00377
+                          0.00521        0.00479
+                          0.00360        0.00759       -0.00102
+
+ Site:       4         Name:   H         Atomic Number:       1
+
+ Coordinates:            0.086307      -0.293963       1.048557
+
+ Charge:                  0.04299
+ Dipole:                  0.01108       -0.03715        0.13222
+ Quadrupole:             -0.00611
+                         -0.00036       -0.00489
+                          0.00127       -0.00478        0.01101
+
+ Site:       5         Name:   H         Atomic Number:       1
+
+ Coordinates:            0.985247       0.276089      -0.382179
+
+ Charge:                  0.04290
+ Dipole:                  0.12422        0.03465       -0.04817
+ Quadrupole:              0.00895
+                          0.00437       -0.00500
+                         -0.00591       -0.00171       -0.00394
+
+ Local Frame Definition for Multipole Sites :
+
+     Atom     Name      Axis Type     Z Axis  X Axis  Y Axis
+
+       1      C         None             0       0       0
+       2      H         Z-Only           1       0       0
+       3      H         Z-Only           1       0       0
+       4      H         Z-Only           1       0       0
+       5      H         Z-Only           1       0       0
+
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Choose Either the AMOEBA or HIPPO Polarization Model [A] :  
+ Polarizability Parameters for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      C            1.3340         0.3900
+       2      H            0.4960         0.3900
+       3      H            0.4960         0.3900
+       4      H            0.4960         0.3900
+       5      H            0.4960         0.3900
+
+ Enter Atom Number, Polarizability & Thole Values :  
+ Choose Method for Division into Polarization Groups :
+
+    (1) Put All Atoms in One Polarization Group
+    (2) Separate into Groups at Rotatable Bonds
+
+ Enter the Number of the Desired Choice [1] :  
+ All atoms are placed initially into one polarization group;
+ This can be modified by entering a series of bonded atom pairs
+ that separate the molecule into distinct polarization groups
+
+ Enter a Bond between Polarization Groups [<Enter>=Exit] :  
+ Polarization Groups for Multipole Sites :
+
+     Atom     Name       Polarization Group Definition
+
+       1      C               2     3     4     5
+       2      H               1
+       3      H               1
+       4      H               1
+       5      H               1
+
+ Electrostatic and Polarization Scale Factors :
+
+                    1-2         1-3         1-4         1-5
+
+ M-Scale:         0.0000      0.0000      0.4000      0.8000
+ P-Inter:         0.0000      0.0000      1.0000      1.0000
+ P-Intra:         0.0000      0.0000      0.5000      1.0000
+ W-Scale:         1.0000      1.0000      1.0000      1.0000
+
+                    1-1         1-2         1-3         1-4
+
+ D-Scale:         0.0000      1.0000      1.0000      1.0000
+ U-Scale:         1.0000      1.0000      1.0000      1.0000
+
+ Use Thole Damping:           True
+ Charge Penetration:          False
+ Set D Equal to P:            False
+
+ Determination of Intergroup Induced Dipoles :
+
+    Iter        RMS Change (Debye)
+
+       1           0.0000000000
+
+ Local Frame Intergroup Induced Dipole Moments (Debye) :
+
+    Atom              X           Y           Z         Total
+
+       1           0.0000      0.0000      0.0000      0.0000
+       2           0.0000      0.0000      0.0000      0.0000
+       3           0.0000      0.0000      0.0000      0.0000
+       4           0.0000      0.0000      0.0000      0.0000
+       5           0.0000      0.0000      0.0000      0.0000
+
+ Condense Symmetric Atoms to Equivalent Types [Y] :  
+ Remove Multipole Components Zeroed by Symmetry [Y] :  
+ Final Atomic Multipole Moments after Regularization :
+
+ Atom:       1         Name:   C         Atomic Number:       6
+
+ Local Frame:            None                 0       0       0
+
+ Charge:                 -0.17181
+ Dipole:                  0.00000        0.00000        0.00000
+ Quadrupole:              0.00000
+                          0.00000        0.00000
+                          0.00000        0.00000        0.00000
+
+ Atom:       2         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-Only               1       0       0
+
+ Charge:                  0.04303
+ Dipole:                  0.00000        0.00000       -0.13778
+ Quadrupole:             -0.00622
+                          0.00000       -0.00622
+                          0.00000        0.00000        0.01243
+
+ Atom:       3         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-Only               1       0       0
+
+ Charge:                  0.04290
+ Dipole:                  0.00000        0.00000       -0.13769
+ Quadrupole:             -0.00624
+                          0.00000       -0.00624
+                          0.00000        0.00000        0.01248
+
+ Atom:       4         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-Only               1       0       0
+
+ Charge:                  0.04299
+ Dipole:                  0.00000        0.00000       -0.13778
+ Quadrupole:             -0.00622
+                          0.00000       -0.00622
+                          0.00000        0.00000        0.01243
+
+ Atom:       5         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-Only               1       0       0
+
+ Charge:                  0.04289
+ Dipole:                  0.00000        0.00000       -0.13766
+ Quadrupole:             -0.00626
+                          0.00000       -0.00626
+                          0.00000        0.00000        0.01251
+Tue Dec  8 14:47:13 2020 Calling: Psi4 Gradient for ESP
+Tue Dec  8 14:47:13 2020  Calling: cd /home/bdw2292/currentstable/Examples/SymmetryMethane && psi4 methane-esp.psi4 methane-esp.log path = /home/bdw2292/currentstable/Examples/SymmetryMethane
+Tue Dec  8 14:47:40 2020 Normal termination: logfile=/home/bdw2292/currentstable/Examples/SymmetryMethane/methane-esp.log path=/home/bdw2292/currentstable/Examples/SymmetryMethane
+Tue Dec  8 14:48:10 2020 All jobs have terminated 
+Tue Dec  8 14:48:10 2020 Normal termination: logfile=/home/bdw2292/currentstable/Examples/SymmetryMethane/methane-esp.log path=/home/bdw2292/currentstable/Examples/SymmetryMethane
+Tue Dec  8 14:48:40 2020 All jobs have terminated 
+Tue Dec  8 14:48:40 2020 Calling: Generating CUBE File from PSI4
+Tue Dec  8 14:48:40 2020  Calling: /home/bdw2292/currentstable/PoltypeModules/avgmpoles.pl methane.key methane.xyz methane-groups.txt methane.key_2 methane.xyz_2 401 path = /home/bdw2292/currentstable/Examples/SymmetryMethane
+Tue Dec  8 14:48:40 2020  Calling: potential.x 6 methane.xyz_2 -k methane.key_2 methane.pot N 0.1 path = /home/bdw2292/currentstable/Examples/SymmetryMethane
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                       Version 8.8.3  November 2020                       ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      401   401     C     methane                      6     12.011     4
+      402   402     H     methane                      1      1.008     1
+
+ Electrostatic Potential Grid Points :                  5126
+
+ Electrostatic Parameter Restraint Value :            1.0000
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      401   401     C     methane                      6     12.011     4
+      402   402     H     methane                      1      1.008     1
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         401        0      0      0   None        -0.17181
+                                                   0.00000  0.00000  0.00000
+                                                   0.00000
+                                                   0.00000  0.00000
+                                                   0.00000  0.00000  0.00000
+
+         402      401      0      0   Z-Only       0.04295
+                                                   0.00000  0.00000 -0.13773
+                                                  -0.00624
+                                                   0.00000 -0.00624
+                                                   0.00000  0.00000  0.01246
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         401             1.334       0.390         402
+         402             0.496       0.390         401
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1        1273        -1.1427        -0.6771         0.5628
+        1        2         965         0.2534         0.1767         0.2555
+        1        3         962         0.2624         0.1776         0.2568
+        1        4         962         0.2659         0.1829         0.2526
+        1        5         964         0.2590         0.1763         0.2590
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.0882
+ Average Potential Magnitude for Model :              0.7186
+ Average Potential Value for Target :                -0.0341
+ Average Potential Magnitude for Target :             0.4574
+
+ Average Signed Potential Difference :               -0.0541
+ Average Unsigned Potential Difference :              0.2633
+ Root Mean Square Potential Difference :              0.3577
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value         Fixed
+
+    --            401             Monopole          -0.17181          X
+    --            401             X-Dipole           0.00000          X
+    --            401             Y-Dipole           0.00000          X
+    --            401             Z-Dipole           0.00000          X
+    --            401             XX-Quad            0.00000          X
+    --            401             XY-Quad            0.00000          X
+    --            401             XZ-Quad            0.00000          X
+    --            401             YY-Quad            0.00000          X
+    --            401             YZ-Quad            0.00000          X
+    --            401             ZZ-Quad            0.00000          X
+    --            402             Monopole           0.04295          X
+    --            402             X-Dipole           0.00000          X
+    --            402             Y-Dipole           0.00000          X
+     1            402             Z-Dipole          -0.13773
+    --            402             XX-Quad           -0.00624
+    --            402             XY-Quad            0.00000          X
+    --            402             XZ-Quad            0.00000          X
+    --            402             YY-Quad           -0.00624
+    --            402             YZ-Quad            0.00000          X
+     2            402             ZZ-Quad            0.01248
+
+ Levenberg-Marquardt Nonlinear Least Squares :
+
+ LS Iter     F Value      Total G     Active G    N Active   F Calls
+
+     0      327.9071     932.5127     932.5127         2         3
+     1      256.9724       0.0000       0.0000         2         6
+
+ SQUARE  --  Normal Termination of Least Squares
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value         Fixed
+
+    --            401             Monopole          -0.17181          X
+    --            401             X-Dipole           0.00000          X
+    --            401             Y-Dipole           0.00000          X
+    --            401             Z-Dipole           0.00000          X
+    --            401             XX-Quad            0.00000          X
+    --            401             XY-Quad            0.00000          X
+    --            401             XZ-Quad            0.00000          X
+    --            401             YY-Quad            0.00000          X
+    --            401             YZ-Quad            0.00000          X
+    --            401             ZZ-Quad            0.00000          X
+    --            402             Monopole           0.04295          X
+    --            402             X-Dipole           0.00000          X
+    --            402             Y-Dipole           0.00000          X
+     1            402             Z-Dipole          -0.12554
+    --            402             XX-Quad           -0.00342
+    --            402             XY-Quad            0.00000          X
+    --            402             XZ-Quad            0.00000          X
+    --            402             YY-Quad           -0.00342
+    --            402             YZ-Quad            0.00000          X
+     2            402             ZZ-Quad            0.00684
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1        1273        -1.0455        -0.6771         0.4557
+        1        2         965         0.2320         0.1767         0.1903
+        1        3         962         0.2404         0.1776         0.1916
+        1        4         962         0.2435         0.1829         0.1876
+        1        5         964         0.2372         0.1763         0.1937
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.0806
+ Average Potential Magnitude for Model :              0.6565
+ Average Potential Value for Target :                -0.0341
+ Average Potential Magnitude for Target :             0.4574
+
+ Average Signed Potential Difference :               -0.0465
+ Average Unsigned Potential Difference :              0.2021
+ Root Mean Square Potential Difference :              0.2809
+Tue Dec  8 14:48:40 2020  Calling: sed -e '/\(.* none$\|^#\|^fix\|^potential-offset\)/d' methane.key_3 > methane.key_3_tmp path = /home/bdw2292/currentstable/Examples/SymmetryMethane
+Tue Dec  8 14:48:40 2020 
+Tue Dec  8 14:48:40 2020 =========================================================
+Tue Dec  8 14:48:40 2020 Electrostatic Potential Comparison
+
+Tue Dec  8 14:48:40 2020  Calling: potential.x 5 methane.xyz_2 -k methane.key_3 methane.pot N > RMSPD.txt path = /home/bdw2292/currentstable/Examples/SymmetryMethane
+Tue Dec  8 14:48:41 2020  Calling: psi4 methane-esp_frag.psi4 methane-esp_frag.log path = /home/bdw2292/currentstable/Examples/SymmetryMethane
+Tue 08 Dec 2020 02:48:43 PM CST All jobs have terminated 
+Tue 08 Dec 2020 02:48:43 PM CST 
+Tue 08 Dec 2020 02:48:43 PM CST =========================================================
+Tue 08 Dec 2020 02:48:43 PM CST Minimizing structure
+
+Tue 08 Dec 2020 02:48:43 PM CST  Calling: cp methane.xyz_2 final.xyz path = /home/bdw2292/currentstable/Examples/SymmetryMethane
+Tue 08 Dec 2020 02:48:43 PM CST  Calling: cp methane.key_5 final.key path = /home/bdw2292/currentstable/Examples/SymmetryMethane
+Tue 08 Dec 2020 02:48:43 PM CST  Calling: minimize.x -k final.key final.xyz 0.1 > Minimizedttt.out path = /home/bdw2292/currentstable/Examples/SymmetryMethane
+Tue 08 Dec 2020 02:48:44 PM CST 
+Tue 08 Dec 2020 02:48:44 PM CST =========================================================
+Tue 08 Dec 2020 02:48:44 PM CST QM Dipole moment
+
+Tue 08 Dec 2020 02:48:44 PM CST QM Dipole moment = 0.0
+Tue 08 Dec 2020 02:48:44 PM CST 
+Tue 08 Dec 2020 02:48:44 PM CST =========================================================
+Tue 08 Dec 2020 02:48:44 PM CST MM Dipole moment
+
+Tue 08 Dec 2020 02:48:44 PM CST  Calling: analyze.x methane.xyz_2 -k final.key em | grep -A11 Charge>MMDipole.txt path = /home/bdw2292/currentstable/Examples/SymmetryMethane
+Tue 08 Dec 2020 02:48:44 PM CST MM Dipole moment = 0.001
+Tue 08 Dec 2020 02:48:44 PM CST Poltype Job Finished
+

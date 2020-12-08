@@ -263,15 +263,6 @@ def gen_peditinfile(poltype,mol):
             if (a.GetAtomicNum() == 6 and a.IsAromatic()):
                 lines.append(str(a.GetIdx()) + " " + str(1.750) + "\n")
                 writesection=True
-            elif (a.GetAtomicNum() == 9):
-                lines.append(str(a.GetIdx()) + " " + str(0.507) + "\n")
-                writesection=True
-            elif (a.GetAtomicNum() == 17):
-                lines.append(str(a.GetIdx()) + " " + str(2.500) + "\n")
-                writesection=True
-            elif (a.GetAtomicNum() == 35):
-                lines.append(str(a.GetIdx()) + " " + str(3.595) + "\n")
-                writesection=True
             elif (a.GetAtomicNum() == 1):
                 iteratomatom = openbabel.OBAtomAtomIter(a)
                 for b in iteratomatom:

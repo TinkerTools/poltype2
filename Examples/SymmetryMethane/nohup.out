@@ -11,26 +11,4 @@ Copyright (c)  Johnny Wu, Gaurav Chattree, Brandon Walker, Matthew Harger and Pe
 All Rights Reserved
 ##############################################################################################################
 
-Calling: analyze.x /home/bdw2292/poltype-poltype2-latest/water.xyz -k /home/bdw2292/poltype-poltype2-latest/water.key e> version.out
-no longer error /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMethane/methane-opt.log
-no longer error /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMethane/methane-opt.log
-no longer error /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMethane/methane-opt.log
-no longer error /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMethane/methane-opt.log
-no longer error methane-opt.log
-no longer error methane-opt.log
-no longer error methane-opt.log
-no longer error methane-opt.log
-no longer error methane-opt.log
-no longer error methane-opt.log
-Traceback (most recent call last):
-  File "/home/bdw2292/poltype-poltype2-latest/PoltypeModules/poltype.py", line 1169, in <module>
-    if __name__ == '__main__':
-  File "/home/bdw2292/poltype-poltype2-latest/PoltypeModules/poltype.py", line 894, in main
-    params= self.GenerateParameters()
-  File "/home/bdw2292/poltype-poltype2-latest/PoltypeModules/poltype.py", line 1054, in GenerateParameters
-    esp.ElectrostaticPotentialFitting(self) 
-  File "/home/bdw2292/poltype-poltype2-latest/PoltypeModules/electrostaticpotential.py", line 232, in ElectrostaticPotentialFitting
-    poltype.call_subsystem(optmpolecmd,True)
-  File "/home/bdw2292/poltype-poltype2-latest/PoltypeModules/poltype.py", line 841, in call_subsystem
-    raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
-ValueError: ERROR: potential.x 6 methane.xyz_2 -k methane.key_2 methane.pot N 0.1 path = /home/bdw2292/poltype-poltype2-latest/Examples/SymmetryMethane
+Calling: analyze.x /home/bdw2292/currentstable/VersionFiles/water.xyz -k /home/bdw2292/currentstable/VersionFiles/water.key e> version.out
