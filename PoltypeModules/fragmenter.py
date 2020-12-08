@@ -416,7 +416,7 @@ def FindEquivalentFragments(poltype,fragmentarray,namearray):
             equivalentnamesarrayset.append(set(nametemp))
             equivalentnamesarray.append(set(nametemp))
      # need unique way to always order the same way so dont redo QM if list order is different
-        
+
     newequivalentnamesarray=[]
     for array in equivalentnamesarray:
         firstrotidx=[]
@@ -432,7 +432,9 @@ def FindEquivalentFragments(poltype,fragmentarray,namearray):
             else:
                 firstrotidx.append(namesplit[0])
                 secondrotidx.append(namesplit[1])
-        firstrotidx,secondrotidx=(list(t) for t in zip(*sorted(zip(firstrotidx, secondrotidx),reverse=True)))
+        #firstrotidx,secondrotidx=(list(t) for t in zip(*sorted(zip(firstrotidx, secondrotidx),reverse=True)))
+        #print('firstrotidx',firstrotidx)
+        #print('secondrotidx',secondrotidx)
         firstrotidx=[str(i)+'_' for i in firstrotidx]
         secondrotidx=[str(i) for i in secondrotidx]  
         for i in range(len(firstrotidx)):
@@ -441,7 +443,7 @@ def FindEquivalentFragments(poltype,fragmentarray,namearray):
             rotbnd=firstrot+secondrot
             newarray.append(rotbnd)
         if len(namesplit)>2:
-            newarray=newarray[::-1]
+            #newarray=newarray[::-1]
             newarray=['_'.join(newarray)] 
         newequivalentnamesarray.append(newarray)
     return newequivalentnamesarray
@@ -1103,8 +1105,11 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
 
 def AddMatchingParentIndexesBetweenFragments(poltype,equivalentrotbndindexarrays,rotbndindextoparentindextofragindex,rotbndindextofragment):
    newrotbndindextoparentindextofragindex={}
+   print('rotbndindextofragment',rotbndindextofragment)
+   print('equivalentrotbndindexarrays',equivalentrotbndindexarrays)
    for rotbndindexarray in equivalentrotbndindexarrays:
        for refrotbndindex in rotbndindexarray:
+           print('refrotbndindex',refrotbndindex)
            reffragment=rotbndindextofragment[refrotbndindex]
            refparentindextofragindex=rotbndindextoparentindextofragindex[refrotbndindex]
            reffragindextoparentindex={value: key for key, value in refparentindextofragindex.items()} 
