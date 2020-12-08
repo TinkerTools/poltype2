@@ -1005,11 +1005,13 @@ class PolarizableTyper():
                 chgcount+=1
         return chgcount
 
-    def RemoveXYZFiles(self):
+    def RemoveXYZKeyFiles(self):
         files=os.listdir()
         for f in files:
             filename, file_extension = os.path.splitext(f)
             if file_extension=='.xyz' and 'opt' not in filename:
+                os.remove(f)
+            elif 'key' in file_extension:
                 os.remove(f)
              
             
@@ -1068,7 +1070,7 @@ class PolarizableTyper():
             self.SanitizeAllQMMethods()
 
  
-        self.RemoveXYZFiles()
+        self.RemoveXYZKeyFiles()
  
         self.WriteToLog("Running on host: " + gethostname())
         # Initializing arrays
@@ -1204,7 +1206,6 @@ class PolarizableTyper():
         self.rotbndtoanginc=torgen.DetermineAngleIncrementAndPointsNeededForEachTorsionSet(self,mol,self.rotbndlist)
 
         torgen.DefaultMaxRange(self,self.torlist)
-        
         if self.dontdotor==True:
             shutil.copy(self.key4fname,self.key5fname)
             sys.exit()
@@ -1218,7 +1219,6 @@ class PolarizableTyper():
             torgen.PrepareTorsionTorsion(poltype,optmol,mol)
         if self.refinenonaroringtors==True and self.dontfrag==False:
             rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
-
 
         if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False:
             
