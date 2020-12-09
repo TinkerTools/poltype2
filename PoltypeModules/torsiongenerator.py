@@ -574,7 +574,7 @@ def GenerateBondTopology(poltype,optmol):
 def FindPartialDoubleBonds(poltype,rdkitmol):
     poltype.partialdoublebonds=[]
     amidesmarts='[NX3][CX3](=[OX1])'
-    acidsmarts='[CX3](=O)[OX2H1]'
+    acidsmarts='[CX3](=O)[OX2]'
     smartslist=[amidesmarts,acidsmarts]
     for smartsidx in range(len(smartslist)):
         smarts=smartslist[smartsidx]

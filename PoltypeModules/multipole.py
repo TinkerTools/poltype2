@@ -237,59 +237,58 @@ def gen_peditinfile(poltype,mol):
 
     # write out the local frames
     iteratom = openbabel.OBMolAtomIter(mol)
-    if not os.path.isfile(poltype.peditinfile):
-        f = open (poltype.peditinfile, 'w')
-        """
-        for a in iteratom:
-            if not idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
-                f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " " + str(poltype.localframe2[a.GetIdx() - 1]) + "\n")
-            elif idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
-                bisectidxs=idxtobisectidxs[a.GetIdx()]
-                f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " -" + str(bisectidxs[0])+ " -" + str(bisectidxs[1]) + "\n")
-            else:
-                trisecidxs=idxtotrisectidxs[a.GetIdx()]
-                f.write(str(a.GetIdx()) + " -" + str(trisecidxs[0])+ " -" + str(trisecidxs[1]) + " -" + str(trisecidxs[2])+ "\n")
+    f = open (poltype.peditinfile, 'w')
+    """
+    for a in iteratom:
+        if not idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
+            f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " " + str(poltype.localframe2[a.GetIdx() - 1]) + "\n")
+        elif idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
+            bisectidxs=idxtobisectidxs[a.GetIdx()]
+            f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " -" + str(bisectidxs[0])+ " -" + str(bisectidxs[1]) + "\n")
+        else:
+            trisecidxs=idxtotrisectidxs[a.GetIdx()]
+            f.write(str(a.GetIdx()) + " -" + str(trisecidxs[0])+ " -" + str(trisecidxs[1]) + " -" + str(trisecidxs[2])+ "\n")
 
 
-        """
-        f.write("\n")
-        f.write('A'+'\n')
+    """
+    f.write("\n")
+    f.write('A'+'\n')
 
-        #Find aromatic carbon, halogens, and bonded hydrogens to correct polarizability
-        iteratom = openbabel.OBMolAtomIter(mol)
-        writesection=False
-        lines=[]
-        for a in iteratom:
-            if (a.GetAtomicNum() == 6 and a.IsAromatic()):
-                lines.append(str(a.GetIdx()) + " " + str(1.750) + "\n")
-                writesection=True
-            elif (a.GetAtomicNum() == 1):
-                iteratomatom = openbabel.OBAtomAtomIter(a)
-                for b in iteratomatom:
-                    if (b.GetAtomicNum() == 6 and b.IsAromatic()):
-                        lines.append(str(a.GetIdx()) + " " + str(0.696) + "\n")
-                        writesection=True
-        if writesection:
-            for line in lines:
-                f.write(line)
+    #Find aromatic carbon, halogens, and bonded hydrogens to correct polarizability
+    iteratom = openbabel.OBMolAtomIter(mol)
+    writesection=False
+    lines=[]
+    for a in iteratom:
+        if (a.GetAtomicNum() == 6 and a.IsAromatic()):
+            lines.append(str(a.GetIdx()) + " " + str(1.750) + "\n")
+            writesection=True
+        elif (a.GetAtomicNum() == 1):
+            iteratomatom = openbabel.OBAtomAtomIter(a)
+            for b in iteratomatom:
+                if (b.GetAtomicNum() == 6 and b.IsAromatic()):
+                    lines.append(str(a.GetIdx()) + " " + str(0.696) + "\n")
+                    writesection=True
+    if writesection:
+        for line in lines:
+            f.write(line)
 
-        
-
-
-        f.write("\n")
-        f.flush()
-        os.fsync(f.fileno())
-        f.write('\n')
-        f.write("2\n")
-        f.write("N\n")
-        f.write('\n')
-        f.write("N\n")
+    
 
 
-        f.flush()
-        os.fsync(f.fileno())
+    f.write("\n")
+    f.flush()
+    os.fsync(f.fileno())
+    f.write('\n')
+    f.write("2\n")
+    f.write("N\n")
+    f.write('\n')
+    f.write("N\n")
 
-        f.close()
+
+    f.flush()
+    os.fsync(f.fileno())
+
+    f.close()
     return lfzerox,atomindextoremovedipquad,atomtypetospecialtrace,atomindextoremovedipquadcross
 
 
