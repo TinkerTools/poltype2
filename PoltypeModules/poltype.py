@@ -1101,7 +1101,8 @@ class PolarizableTyper():
             self.fckoptfname=self.secondfckoptfname
             self.logoptfname=self.secondlogoptfname 
             self.gausoptfname=self.secondgausoptfname 
-
+            optmol.SetTotalCharge(mol.GetTotalCharge())
+            optmol.SetTotalSpinMultiplicity(mol.GetTotalSpinMultiplicity())
             optmol = opt.GeometryOptimization(self,optmol)
 
        
