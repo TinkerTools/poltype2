@@ -759,43 +759,36 @@ def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndli
     return poltype.rotbndtoanginc
 
 def find_tor_restraint_idx(poltype,mol,b1,b2):
-    """
-    Intent: Find the atoms 1 and 4 about which torsion angles are restrained
-    Given b1, b2, finds the torsion: t1 b1 b2 t4
-    Input:
-        mol: OBMol object
-        b1: first atom of the rotatable bond (t2 in the torsion)
-        b2: second atom of the rotatable bond (t3 in the torsion)
-    Output:
-        t1: atom 1 in the torsion
-        t4: atom 4 in the torsion
-    Referenced By: get_torlist
-    Description:
-    1. Find the heaviest (heaviest meaning of highest sym class) 
-       atom bound to atom b1 (that is not b2)
-    2. Find the heaviest atom bound to atom b2 (that is not b1)
-    3. These two atoms are returned as atoms 1 and 4 for the torsion
-    """
     b1idx = b1.GetIdx()
     b2idx = b2.GetIdx()
     iteratomatom = openbabel.OBAtomAtomIter(b1)
     b1nbridx = list(map(lambda x: x.GetIdx(), iteratomatom))
     del b1nbridx[b1nbridx.index(b2idx)]    # Remove b2 from list
-    assert(b1nbridx is not [])
-    maxb1class = max(b1nbridx,key=lambda x: poltype.idxtosymclass[x])
-
+    t1idx=GrabFirstHeavyAtomIdx(poltype,b1nbridx,mol)
+ 
     iteratomatom = openbabel.OBAtomAtomIter(b2)
     b2nbridx = list(map(lambda x: x.GetIdx(), iteratomatom))
     del b2nbridx[b2nbridx.index(b1idx)]    # Remove b1 from list
-    assert(b2nbridx is not [])
-    maxb2class = max(b2nbridx, key= lambda x:poltype.idxtosymclass[x])
+    t4idx=GrabFirstHeavyAtomIdx(poltype,b2nbridx,mol)
 
 
-    t1 = mol.GetAtom(maxb1class)
-    t4 = mol.GetAtom(maxb2class)
+    t1 = mol.GetAtom(t1idx)
+    t4 = mol.GetAtom(t4idx)
 
 
     return t1,t4
+
+def GrabFirstHeavyAtomIdx(poltype,indices,mol):
+    atoms=[mol.GetAtom(i) for i in indices]
+    atomicnums=[a.GetAtomicNum() for a in atoms]
+    heavyidx=indices[0]
+    for i in range(len(indices)):
+        idx=indices[i]
+        atomnum=atomicnums[i]
+        if atomnum!=1:
+            heavyidx=idx
+    return heavyidx
+
 
 def ConvertTinktoXYZ(poltype,filename):
     temp=open(os.getcwd()+r'/'+filename,'r')

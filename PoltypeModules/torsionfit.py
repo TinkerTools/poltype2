@@ -508,8 +508,11 @@ def insert_torphasedict (poltype,mol, toraboutbnd, torprmdict, initangle,write_p
     tpdkey = torgen.get_class_key(poltype,a2, b2, c2, d2)
 
     # if the key passes the keyfilter or if the keyfilter does exist
-    # and, the end atoms are not hydrogens
-    if (keyfilter is None or keyfilter == tpdkey): # MODIFY THIS LINE TO ALLOW HYDROGEN TORSION
+    aatomicnum=obaa.GetAtomicNum()
+    datomicnum=obad.GetAtomicNum()
+    if aatomicnum==1 or datomicnum==1:
+        return 
+    if (keyfilter is None or keyfilter == tpdkey): 
         # current torsion value (normalized by initangle)
         torabangle = round(mol.GetTorsion(obaa,obab,obac,obad) -initangle) % 360
         if tpdkey in torprmdict:
@@ -773,7 +776,6 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         mm_energy_list = cls_mm_engy_dict[tup]  # MM Energy before fitting to QM torsion energy
         qm_energy_list = cls_qm_engy_dict[tup]  # QM torsion energy
         # 'normalize'
-        poltype.WriteToLog('about to normalize') 
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]
         if len(qm_energy_list)<round(prmidx*.5): # then might not be great fit any way, too many QM failed
@@ -781,14 +783,18 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         # Parameterize each group of rotatable bond (identified by
         #  atoms restrained during restrained rotation.
         # tor_energy_list is set as qm - mm
+        max_qm_energy=max(qm_energy_list)
+        max_allowed=5
+        scale=max_allowed/max_qm_energy
+        weightlist=[scale for i in range(len(qm_energy_list))]
 
-        weightlist=numpy.exp(-numpy.array(qm_energy_list)/2.5)
+        #weightlist=numpy.exp(-numpy.array(qm_energy_list)/2.5)
 
+        tor_energy_list_noweight = [qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)]
         if useweights==True:
             qm_energy_list=numpy.multiply(qm_energy_list,weightlist)
 
         tor_energy_list = numpy.array([qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)])
-        tor_energy_list_noweight = [qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)]
         '''
         txtfname = "%s-fit-" % (poltype.molecprefix) 
         for i in range(len(torset)):
@@ -877,7 +883,6 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
                     foldtoparmslist[nfold].append(parm)
                     parmtokey[parm]=chkclskey
                     if abs(parm) > max_amp:
-                        print('greater than max_amp')
                         dellist.append((chkclskey,nfold))
                         parm_sanitized = False
                         break
@@ -886,8 +891,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
                 for comb in combs:
                     Sum=numpy.abs(comb[0]+comb[1])
                      
-                    if Sum<.01 and useweights==False: # tolerance for torsions cancelling each other
-                       print('cancelling here') 
+                    if Sum<.01 and useweights==False and comb[0]!=0 and comb[1]!=0: # tolerance for torsions cancelling each other
                        keytodelete=parmtokey[comb[0]]
                        max_amp=20
                        boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
@@ -930,8 +934,6 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             for nfold in torprmdict[chkclskey]['prmdict']:
                 parm  = p1[torprmdict[chkclskey]['prmdict'][nfold]]
                 torprmdict[chkclskey]['prmdict'][nfold] = parm
-                if numpy.abs(parm)>20:
-                    raise ValueError('parameter way to big'+str(parm))
             write_prm_dict[chkclskey] = torprmdict[chkclskey]['prmdict']
             # if not found, set as 0
             if write_prm_dict[chkclskey] == {}:
@@ -981,7 +983,6 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         string=' , '.join(list(torprmdict.keys()))
         datapts=len(mm_energy_list)
         print('Torsions being fit',string,'RMSD(QM-MM1)',minRMSD)
-        print('torprmdict',torprmdict)
         poltype.WriteToLog('Torsions being fit '+string+' RMSD(QM-MM1)'+str(minRMSD))
         if dim==1:
             fig = plt.figure(figsize=(10,10))
@@ -1115,7 +1116,7 @@ def write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename):
                 for (nfold, prm) in write_prm_dict[clskey].items():
                     torline += ' %7.3f %.1f %d' % (prm,poltype.foldoffsetlist[nfold - 1], nfold)
                 torline += '\n'
-            tmpfh2.write(fitline)
+                tmpfh2.write(fitline)
             tmpfh2.write(torline)
     tmpfh1.close()
     tmpfh2.close()
@@ -1205,8 +1206,12 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         #print('fitfunc_dict[clskey]',fitfunc_dict[clskey])
 
         ff_list = [aa+bb for (aa,bb) in zip(mm_energy_list,fitfunc_dict[clskey])]
-        weight=numpy.exp(-numpy.array(qm_energy_list)/2.5)
-
+        max_qm_energy=max(qm_energy_list)
+        max_allowed=5
+        scale=max_allowed/max_qm_energy
+        weight=[scale for i in range(len(qm_energy_list))]
+        #weight=numpy.exp(-numpy.array(qm_energy_list)/2.5)
+        weighted_qm_energy_list=numpy.multiply(qm_energy_list,weight)
         if len(ff_list)==len(mm2_energy_list):
 
             def RMSDW(c):
@@ -1232,8 +1237,13 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         dim=len(mang_list[0])
         datapts=len(mm_energy_list)
         numprms=None 
-        print('Torset',torset,'RMSD(MM2,QM)',minRMSD)
-        poltype.WriteToLog('Torset'+str(torset)+' RMSD(MM2,QM) '+str(minRMSD))
+        if clskey in clskeyswithbadfits:
+            RMSD=minRMSDW
+        else:
+            RMSD=minRMSD
+
+        print('Torset',torset,'RMSD(MM2,QM)',RMSD)
+        poltype.WriteToLog('Torset'+str(torset)+' RMSD(MM2,QM) '+str(RMSD))
         if dim==1: 
             fig = plt.figure(figsize=(10,10))
             ax = fig.add_subplot(111)
@@ -1241,7 +1251,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             line1, =ax.plot(mang_list,mm_energy_list,'g',label='MM1 (prefit)')
             line2, =ax.plot(m2ang_list,mm2_energy_list,'r',label='MM2 (postfit)')
             line3, =ax.plot(qang_list,qm_energy_list,'b',label='QM')
-            ax.text(0.05, 1.1, 'RMSD(MM2,QM)=%s'%(round(minRMSD,2)), transform=ax.transAxes, fontsize=12,verticalalignment='top')
+            ax.text(0.05, 1.1, 'RMSD(MM2,QM)=%s'%(round(RMSD,2)), transform=ax.transAxes, fontsize=12,verticalalignment='top')
 
             # mm + fit
             line4, =ax.plot(mang_list,ff_list,'md-',label='MM1+Fit')
@@ -1251,7 +1261,13 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             ax2.set_ylabel("WBO",color="blue",fontsize=14)
             ax.set_xlabel('Dihedral Angle')
             ax.set_ylabel('SP Energy (kcal/mol)')
-            plt.legend(handles=[line1,line2,line3,line4,line5],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
+            if clskey in clskeyswithbadfits:
+                line6, =ax.plot(qang_list,weighted_qm_energy_list,'black',label='Weighted_QM')
+                plt.legend(handles=[line1,line2,line3,line4,line5,line6],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=6)
+
+            else:
+
+                plt.legend(handles=[line1,line2,line3,line4,line5],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
 
             fig = plt.gcf()
             plt.show()
@@ -1272,10 +1288,6 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         out.append(qm_energy_list)
         out.append(tordif_list)
         torgen.write_arr_to_file(poltype,txtfname,out)
-        if clskey in clskeyswithbadfits:
-            RMSD=minRMSDW
-        else:
-            RMSD=minRMSD
         if float(RMSD)>poltype.maxtorRMSPD:
             poltype.WriteToLog('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(RMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
             clskeyswithbadfits.append(clskey)
@@ -1552,3 +1564,5 @@ def GenerateTorTorClasskey(poltype,firsttor,secondtor):
     tortortypeidxs=[str(j) for j in tortortypeidxs]
     tortorclskey=' '.join(tortortypeidxs)
     return tortorclskey,tortoratomidxs
+
+

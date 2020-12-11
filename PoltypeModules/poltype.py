@@ -979,6 +979,23 @@ class PolarizableTyper():
         temp.close()
         return inifilepath
 
+    def CheckTorsionParameters(self,keyfilename):
+        temp=open(keyfilename,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            if 'torsion' in line and '#' not in line:
+                allzero=True
+                linesplit=line.split()
+                prms=linesplit[5:]
+                newprms=prms[0::3]
+                newprms=[float(i) for i in newprms]
+                for prm in newprms:
+                    if prm!=0:
+                        allzero=False
+                if allzero==True:
+                    raise ValueError("torsion parameters are all zero "+line+' path ='+os.getcwd())
+
     #POLTYPE BEGINS HERE
     def main(self):
          
@@ -1027,15 +1044,28 @@ class PolarizableTyper():
                 chgcount+=1
         return chgcount
 
-    def RemoveXYZKeyFiles(self):
+           
+
+    def CheckIfCartesianXYZ(self,f):
+        check=True
+        temp=open(f,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            linesplit=line.split()
+            if len(linesplit)>4:
+                check=False
+        return check
+
+    def RemoveCartesianXYZFiles(self):
         files=os.listdir()
         for f in files:
             filename, file_extension = os.path.splitext(f)
             if file_extension=='.xyz' and 'opt' not in filename:
-                os.remove(f)
-            elif 'key' in file_extension:
-                os.remove(f)
-             
+                check=self.CheckIfCartesianXYZ(f)
+                if check==True:
+                    os.remove(f)
+     
             
     def GenerateParameters(self):
         if os.path.isfile(self.tmpxyzfile+'_2'):
@@ -1092,7 +1122,7 @@ class PolarizableTyper():
             self.SanitizeAllQMMethods()
 
  
-        self.RemoveXYZKeyFiles()
+        self.RemoveCartesianXYZFiles()
  
         self.WriteToLog("Running on host: " + gethostname())
         # Initializing arrays
@@ -1275,6 +1305,7 @@ class PolarizableTyper():
 
 
             
+        self.CheckTorsionParameters(self.key5fname)
         self.WriteOutLiteratureReferences(self.key5fname) 
         # A series of tests are done so you one can see whether or not the parameterization values
         # found are acceptable and to what degree

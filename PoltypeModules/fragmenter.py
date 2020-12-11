@@ -288,7 +288,7 @@ def ConstructTorsionLineFromFragment(poltype,key,classkeytofragmentfilename,clas
     valencestring=valencestring[:-1]
     valencestring+='\n'
     temp.write(fitline)
-    temp.write(valencestring)
+    temp.write('# '+valencestring)
     temp.write(torline)
     valenceprmlist.append(valencestring)
     return valenceprmlist
@@ -309,7 +309,7 @@ def ConstructTorsionTorsionLineFromFragment(poltype,key,classkeytofragmentfilena
     valencestring='tortors'+' % '+smarts+' % '+smartspos+' % '+gridptscommastr+' % '
     valencestring+='\n'
     temp.write(fitline)
-    temp.write(valencestring)
+    temp.write('# '+valencestring)
     temp.write(torline)
     for gridline in gridlinesarray:
         gridline=gridline.replace('\n','')
