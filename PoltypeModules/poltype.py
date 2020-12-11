@@ -1304,8 +1304,8 @@ class PolarizableTyper():
                     shutil.copy(self.key4fname,self.key5fname)
 
 
-            
-        self.CheckTorsionParameters(self.key5fname)
+        if self.isfragjob==False:    
+            self.CheckTorsionParameters(self.key5fname)
         self.WriteOutLiteratureReferences(self.key5fname) 
         # A series of tests are done so you one can see whether or not the parameterization values
         # found are acceptable and to what degree
