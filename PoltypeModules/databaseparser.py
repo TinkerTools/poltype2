@@ -1294,7 +1294,15 @@ def ModifyAngleKeywords(poltype,angleprms,listofanglesthatneedplanarkeywordtinke
         newangleprms.append(newline)
     return newangleprms
 
-def AddOptimizedBondLengths(poltype,mol,bondprms):
+def FilterList(poltype,allitems,listbabel):
+    newallitems=[]
+    for ls in allitems:
+        revls=ls[::-1]
+        if list(ls) in listbabel or list(revls) in listbabel:
+            newallitems.append(ls)
+    return newallitems
+
+def AddOptimizedBondLengths(poltype,mol,bondprms,bondlistbabel):
     newbondprms=[]
     for line in bondprms:
         linesplit=line.split()
@@ -1305,7 +1313,7 @@ def AddOptimizedBondLengths(poltype,mol,bondprms):
             bondindices.append(keylist)
         allbonds = list(itertools.product(bondindices[0], bondindices[1]))
         allbonds=[x for x in allbonds if len(x) == len(set(x))]
-
+        allbonds=FilterList(poltype,allbonds,bondlistbabel)
         tot=0
 
         for bond in allbonds:
@@ -1322,7 +1330,7 @@ def AddOptimizedBondLengths(poltype,mol,bondprms):
     return newbondprms
       
 
-def AddOptimizedAngleLengths(poltype,mol,angleprms):
+def AddOptimizedAngleLengths(poltype,mol,angleprms,anglelistbabel):
     newangleprms=[]
     for line in angleprms:
         linesplit=line.split()
@@ -1333,6 +1341,7 @@ def AddOptimizedAngleLengths(poltype,mol,angleprms):
             angleindices.append(keylist)
         allangles = list(itertools.product(angleindices[0], angleindices[1],angleindices[2]))
         allangles=[x for x in allangles if len(x) == len(set(x))]
+        allangles=FilterList(poltype,allangles,anglelistbabel)
 
         tot=0
         for angle in allangles:
@@ -2004,10 +2013,43 @@ def FindMissingParameters(poltype,indicestosmartsatomorders,rdkitmol,mol,indexto
         matches=rdkitmol.GetSubstructMatches(substructure)
         firstmatch=matches[0]
         check=CheckIfNeighborsExistInSMARTMatch(poltype,nindexes,firstmatch)
-        if check==False:
+        if check==False or '*' in smarts or '~' in smarts:
             missing.append(indices)
     return missing
 
+def ReduceMissingVdwByTypes(poltype,vdwmissing):
+    reducedvdwmissing=[]
+    typesfound=[]
+    for vdwarray in vdwmissing:
+        vdwatomidx=vdwarray[0]
+        vdwbabelidx=vdwatomidx+1
+        vdwtype=poltype.idxtosymclass[vdwbabelidx]
+        if vdwtype in typesfound:
+            continue
+        else:
+            typesfound.append(vdwtype)
+            reducedvdwmissing.append(vdwbabelidx)
+    return reducedvdwmissing
+
+
+def FindVdwAtomNeighbors(poltype,vdwmissing,mol):
+    missingvdwatomindextoneighbors={}
+    for vdwbabelidx in vdwmissing:
+        atom=mol.GetAtom(vdwbabelidx)
+        atomatomiter = openbabel.OBAtomAtomIter(atom)
+        neighbs=[vdwbabelidx]
+        for atom in atomatomiter:
+            atomidx=atom.GetIdx()
+            neighbs.append(atomidx)
+        missingvdwatomindextoneighbors[vdwbabelidx]=neighbs
+    return missingvdwatomindextoneighbors
+
+def ConvertToBabelList(poltype,listforprm):
+    babellist=[]
+    for ls in listforprm:
+        babells=[i+1 for i in ls]
+        babellist.append(babells)
+    return babellist
 
 
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
@@ -2070,6 +2112,8 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     indextoneighbidxs=FindAllNeighborIndexes(poltype,rdkitmol)
     torsionsmissing=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
     vdwmissing=FindMissingParameters(poltype,atomindextosmartsatomorder,rdkitmol,mol,indextoneighbidxs)
+    vdwmissing=ReduceMissingVdwByTypes(poltype,vdwmissing)
+    missingvdwatomindextoneighbors=FindVdwAtomNeighbors(poltype,vdwmissing,mol)
     bondmissing=FindMissingParameters(poltype,bondindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
     anglemissing=FindMissingParameters(poltype,angleindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
     torsionsmissingindicestotinkerclasses=PruneDictionary(poltype,torsionsmissing,torsionindicestotinkerclasses)
@@ -2115,8 +2159,10 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     vdwprms,vdwpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,vdwprms,vdwindicestoextsmarts,vdwsmartsatomordertoparameters,'vdw')
 
     angleprms=ModifyAngleKeywords(poltype,angleprms,planarangletinkerclassestopoltypeclasses)
-    bondprms=AddOptimizedBondLengths(poltype,optmol,bondprms)
-    angleprms=AddOptimizedAngleLengths(poltype,optmol,angleprms)
+    bondlistbabel=ConvertToBabelList(poltype,listofbondsforprm)
+    anglelistbabel=ConvertToBabelList(poltype,listofanglesforprm)
+    bondprms=AddOptimizedBondLengths(poltype,optmol,bondprms,bondlistbabel)
+    angleprms=AddOptimizedAngleLengths(poltype,optmol,angleprms,anglelistbabel)
     torsionkeystringtoparameters=GrabTorsionParameterCoefficients(poltype,torsionprms)
     torsionprms=ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,torsionprms)
     potentialmissingopbendprmtypes=FindPotentialMissingParameterTypes(poltype,opbendprms,planarbondtinkerclassestopoltypeclasses)
@@ -2136,4 +2182,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     torsionsmissing=ConvertToPoltypeClasses(poltype,torsionsmissing)
     WriteOutList(poltype,torsionsmissing,poltype.torsionsmissingfilename)
     WriteDictionaryToFile(poltype,torsionkeystringtoparameters,poltype.torsionprmguessfilename)
-    return bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,torsionsmissing,torsionkeystringtoparameters
+    WriteDictionaryToFile(poltype,missingvdwatomindextoneighbors,poltype.vdwmissingfilename)
+
+    return bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,torsionsmissing,torsionkeystringtoparameters,missingvdwatomindextoneighbors
