@@ -1098,10 +1098,8 @@ def write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename):
     tmpfh2 = open(tmpkey2basename, "w")
     fitline="# Fitted torsion" +"\n"
     for line in tmpfh1:
-        if '#' in line:
-            continue
         m = re.search(r'torsion',line)
-        if m is None:
+        if m is None or '#' in line:
             tmpfh2.write(line)
         else:
             linarr = line.split()
