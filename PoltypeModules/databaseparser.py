@@ -1419,7 +1419,8 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         babelindices=[i+1 for i in torsionindices]
         abidx,bbidx,cbidx,dbidx=babelindices[:]
         if len(poltype.onlyrotbndslist)!=0:
-            if [bbidx,cbidx] not in poltype.onlyrotbndslist or [cbidx,bbidx] not in poltype.onlyrotbndslist:
+            if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
+                torsionsmissing.append(torsionindices)
                 continue
         bond=mol.GetBond(bbidx,cbidx)
         bondorder=bond.GetBondOrder()

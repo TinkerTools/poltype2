@@ -537,7 +537,7 @@ def insert_torphasedict (poltype,mol, toraboutbnd, torprmdict, initangle,write_p
             write_prm_dict[tpdkey] = {1:prms[0], 2:prms[1], 3:prms[2]}
         else: 
             write_prm_dict[tpdkey] = {1:0., 2:0., 3:0.}
-
+    return torprmdict
 
 def insert_torprmdict(poltype,mol, torprmdict):
     """
@@ -577,7 +577,7 @@ def insert_torprmdict(poltype,mol, torprmdict):
 
             # normalize
             test_tor_energy -= min(test_tor_energy)
-            
+             
             if torprm['phasedict']:
                 if basetorkeys is not None:
                     # if the energy profile for this torsion/fold is not so dissimilar from
@@ -603,7 +603,7 @@ def insert_torprmdict(poltype,mol, torprmdict):
         
     prmidx += 1
     initialprms.append(0)
-    return prmidx,initialprms
+    return prmidx,initialprms,torprmdict
 
 def is_torprmdict_all_empty (poltype,torprmdict):
     """
@@ -764,12 +764,12 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             if rotbndkey in poltype.rotbndlist.keys():
                 for toraboutbnd in poltype.rotbndlist[rotbndkey]:
                     # However, initangle is the current angle for 'tor' not for 'toraboutbnd'
-                    insert_torphasedict(poltype,mol, toraboutbnd, torprmdict, initangle, write_prm_dict)
+                    torprmdict=insert_torphasedict(poltype,mol, toraboutbnd, torprmdict, initangle, write_prm_dict)
             else:
-                insert_torphasedict(poltype,mol, tor, torprmdict, initangle, write_prm_dict)
+                torprmdict=insert_torphasedict(poltype,mol, tor, torprmdict, initangle, write_prm_dict)
 
         tup=tuple(classkeylist)
-        prmidx,initialprms = insert_torprmdict(poltype,mol, torprmdict)
+        prmidx,initialprms,torprmdict = insert_torprmdict(poltype,mol, torprmdict)
         #poltype.WriteToLog('number of parameters to fit for '+clskey+' are '+str(prmidx))
         # get all the lists for the current clskey
         angle_list = cls_angle_dict[tup]  # Torsion angle for each corresponding energy
@@ -916,8 +916,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
                 a,b,c,d = tor[0:4]
                 rotbndkey = '%d %d' % (b, c)
                 toraboutbnd = poltype.rotbndlist[rotbndkey][0]
-                insert_torphasedict(poltype,mol, toraboutbnd, torprmdict,initangle, write_prm_dict,keyfilter = clskey)
-            prmidx,initialprms = insert_torprmdict(mol, torprmdict)
+                torprmdict=insert_torphasedict(poltype,mol, toraboutbnd, torprmdict,initangle, write_prm_dict,keyfilter = clskey)
+            prmidx,initialprms,torprmdict = insert_torprmdict(mol, torprmdict)
 
             pzero = initialprms
             errfunc = lambda p, x, z, torprmdict, y: fitfunc(poltype,p, x, z, torprmdict) - y
@@ -1156,7 +1156,6 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
     for torset in poltype.torlist:
         if torset not in poltype.nonaroringtorsets and len(torset)==2 and poltype.torfit1Drotonly==True:
             continue
-
         bypassrmsd=torsettobypassrmsd[torset]
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
         classkeylist=[]
@@ -1301,6 +1300,8 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         torgen.write_arr_to_file(poltype,txtfname,out)
         if float(RMSD)>poltype.maxtorRMSPD:
             poltype.WriteToLog('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(RMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
+            print('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(RMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
+
             clskeyswithbadfits.append(clskey)
             if poltype.suppresstorfiterr==False and count>0 and bypassrmsd==False:
                 raise ValueError('RMSPD of QM and MM torsion profile is high, tried fitting to minima and failed, RMSPD = '+str(RMSD))
