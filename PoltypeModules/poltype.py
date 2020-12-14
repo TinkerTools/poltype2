@@ -1246,7 +1246,7 @@ class PolarizableTyper():
             databaseparser.appendtofile(self,self.key3fname,self.key4fname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo)
         if self.torsppcm:
             torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
-
+        self.optmaxcycle=10 # increase since torsion only doing 1 DFT opt
         # Find rotatable bonds for future torsion scans
         (self.torlist, self.rotbndlist) = torgen.get_torlist(self,mol,torsionsmissing)
         torgen.get_all_torsions(self,mol)

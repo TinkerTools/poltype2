@@ -1104,6 +1104,8 @@ def write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename):
         else:
             linarr = line.split()
             cl = linarr[1:5]
+            revcl=cl[::-1]
+            revclskey= ' '.join(revcl) 
             clskey = ' '.join(cl) # Order is fine (read from *.prm file)
             torline = line
             torvals = [float(ele) for ele in linarr[5:24:3]]
@@ -1115,6 +1117,14 @@ def write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename):
                     torline += ' %7.3f %.1f %d' % (prm,poltype.foldoffsetlist[nfold - 1], nfold)
                 torline += '\n'
                 tmpfh2.write(fitline)
+
+            elif revclskey in write_prm_dict:
+                torline = ' torsion %7s %4s %4s %4s   ' % (cl[0],cl[1],cl[2],cl[3])
+                for (nfold, prm) in write_prm_dict[revclskey].items():
+                    torline += ' %7.3f %.1f %d' % (prm,poltype.foldoffsetlist[nfold - 1], nfold)
+                torline += '\n'
+                tmpfh2.write(fitline)
+
             tmpfh2.write(torline)
     tmpfh1.close()
     tmpfh2.close()
@@ -1230,7 +1240,10 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             figfname+="%d-%d" % (b,c)
             figfname+='_'
         figfname=figfname[:-1]
-        wstring=''
+        if clskey in clskeyswithbadfits:
+            wstring='_use_weights'
+        else:
+            wstring=''
         figfname+=wstring+'.png'
         dim=len(mang_list[0])
         datapts=len(mm_energy_list)
