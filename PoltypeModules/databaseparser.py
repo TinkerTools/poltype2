@@ -1020,6 +1020,7 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         moleculeindextosmartsindices={}
         smartsindextomoleculeindices={} 
         currentorientation=[]
+        orient=[]
         for match in matches:
             allin=True
             for idx in atomindices:
@@ -1033,6 +1034,17 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
                 revsmartsindices=smartsindices[::-1]
                 if revsmartsindices in currentorientation:
                     continue
+                if len(smartsindices)==3:
+                    orientation=[smartsindices[1]]
+                elif len(smartsindices)==4:
+                    orientation=[smartsindices[1],smartsindices[2]]
+                else:
+                    orientation=[]
+                if len(orientation)!=0 and len(orient)!=0 and orientation not in orient:
+                    continue
+                if len(orientation)!=0 and orientation not in orient:
+                    orient.append(orientation)
+               
                 if smartsindices not in currentorientation:
                     currentorientation.append(smartsindices)
                 
@@ -1086,7 +1098,6 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         wildcards=CountWildCards(poltype,smartsfortransfer)
         parametersmartsatomorderlists=[]
         masterdic={}
-
         for parametersmartsatomorderlist,elementtinkerdescrip in smartsatomordertoelementtinkerdescrip.items():
             prmsmarts=parametersmartsatomorderlist[0]
             atomorderlist=parametersmartsatomorderlist[1]
@@ -1994,7 +2005,7 @@ def CorrectPitorEnergy(poltype,torsionprms,torsiontopitor):
             torprm=float(torlinesplit[8])
             newtorprm=prm+torprm
             torlinesplit[8]=str(newtorprm)
-        torline=' '.join(torlinesplit)
+        torline=' '.join(torlinesplit)+'\n'
         newtorsionprms.append(torline)
     return newtorsionprms
 
@@ -2105,6 +2116,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     planarbondindicestotinkertypes,planarbondindicestotinkerclasses,planarbondindicestoparametersmartsatomorders,planarbondindicestoelementtinkerdescrips,planarbondindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,planarbondsforprmtoparametersmarts,planarbondsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
 
     angleindicestotinkertypes,angleindicestotinkerclasses,angleindicestoparametersmartsatomorders,angleindicestoelementtinkerdescrips,angleindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,anglesforprmtoparametersmarts,anglesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
+
     planarangleindicestotinkertypes,planarangleindicestotinkerclasses,planarangleindicestoparametersmartsatomorders,planarangleindicestoelementtinkerdescrips,planarangleindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
 
     torsionindicestotinkertypes,torsionindicestotinkerclasses,torsionindicestoparametersmartsatomorders,torsionindicestoelementtinkerdescrips,torsionindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,torsionsforprmtoparametersmarts,torsionsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
