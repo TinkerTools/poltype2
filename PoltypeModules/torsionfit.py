@@ -783,18 +783,16 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         # Parameterize each group of rotatable bond (identified by
         #  atoms restrained during restrained rotation.
         # tor_energy_list is set as qm - mm
-        max_qm_energy=max(qm_energy_list)
-        max_allowed=5
-        scale=max_allowed/max_qm_energy
-        weightlist=[scale for i in range(len(qm_energy_list))]
 
-        #weightlist=numpy.exp(-numpy.array(qm_energy_list)/2.5)
+        weightlist=numpy.exp(-numpy.array(qm_energy_list)/4)
 
         tor_energy_list_noweight = [qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)]
-        if useweights==True:
-            qm_energy_list=numpy.multiply(qm_energy_list,weightlist)
+        tor_energy_list = [qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)]
 
-        tor_energy_list = numpy.array([qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)])
+        if useweights==True:
+            tor_energy_list=numpy.multiply(tor_energy_list,weightlist)
+
+        #tor_energy_list = numpy.array([qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)])
         '''
         txtfname = "%s-fit-" % (poltype.molecprefix) 
         for i in range(len(torset)):
@@ -1213,12 +1211,9 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         #print('fitfunc_dict[clskey]',fitfunc_dict[clskey])
 
         ff_list = [aa+bb for (aa,bb) in zip(mm_energy_list,fitfunc_dict[clskey])]
-        max_qm_energy=max(qm_energy_list)
-        max_allowed=5
-        scale=max_allowed/max_qm_energy
-        weight=[scale for i in range(len(qm_energy_list))]
-        #weight=numpy.exp(-numpy.array(qm_energy_list)/2.5)
-        weighted_qm_energy_list=numpy.multiply(qm_energy_list,weight)
+        weight=numpy.exp(-numpy.array(qm_energy_list)/4)
+        #weighted_qm_energy_list=numpy.multiply(qm_energy_list,weight)
+
         if len(ff_list)==len(mm2_energy_list):
 
             def RMSDW(c):
@@ -1271,13 +1266,13 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             ax2.set_ylabel("WBO",color="blue",fontsize=14)
             ax.set_xlabel('Dihedral Angle')
             ax.set_ylabel('SP Energy (kcal/mol)')
-            if clskey in clskeyswithbadfits:
-                line6, =ax.plot(qang_list,weighted_qm_energy_list,'black',label='Weighted_QM')
-                plt.legend(handles=[line1,line2,line3,line4,line5,line6],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=6)
+            #if clskey in clskeyswithbadfits:
+            #    line6, =ax.plot(qang_list,weighted_qm_energy_list,'black',label='Weighted_QM')
+            #    plt.legend(handles=[line1,line2,line3,line4,line5,line6],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=6)
 
-            else:
+            #else:
 
-                plt.legend(handles=[line1,line2,line3,line4,line5],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
+            plt.legend(handles=[line1,line2,line3,line4,line5],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
 
             fig = plt.gcf()
             plt.show()
