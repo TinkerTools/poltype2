@@ -537,7 +537,6 @@ def insert_torphasedict (poltype,mol, toraboutbnd, torprmdict, initangle,write_p
             write_prm_dict[tpdkey] = {1:prms[0], 2:prms[1], 3:prms[2]}
         else: 
             write_prm_dict[tpdkey] = {1:0., 2:0., 3:0.}
-    return torprmdict
 
 def insert_torprmdict(poltype,mol, torprmdict):
     """
@@ -603,7 +602,7 @@ def insert_torprmdict(poltype,mol, torprmdict):
         
     prmidx += 1
     initialprms.append(0)
-    return prmidx,initialprms,torprmdict
+    return prmidx,initialprms
 
 def is_torprmdict_all_empty (poltype,torprmdict):
     """
@@ -764,12 +763,12 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             if rotbndkey in poltype.rotbndlist.keys():
                 for toraboutbnd in poltype.rotbndlist[rotbndkey]:
                     # However, initangle is the current angle for 'tor' not for 'toraboutbnd'
-                    torprmdict=insert_torphasedict(poltype,mol, toraboutbnd, torprmdict, initangle, write_prm_dict)
+                    insert_torphasedict(poltype,mol, toraboutbnd, torprmdict, initangle, write_prm_dict)
             else:
-                torprmdict=insert_torphasedict(poltype,mol, tor, torprmdict, initangle, write_prm_dict)
+                insert_torphasedict(poltype,mol, tor, torprmdict, initangle, write_prm_dict)
 
         tup=tuple(classkeylist)
-        prmidx,initialprms,torprmdict = insert_torprmdict(poltype,mol, torprmdict)
+        prmidx,initialprms = insert_torprmdict(poltype,mol, torprmdict)
         #poltype.WriteToLog('number of parameters to fit for '+clskey+' are '+str(prmidx))
         # get all the lists for the current clskey
         angle_list = cls_angle_dict[tup]  # Torsion angle for each corresponding energy
@@ -914,8 +913,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
                 a,b,c,d = tor[0:4]
                 rotbndkey = '%d %d' % (b, c)
                 toraboutbnd = poltype.rotbndlist[rotbndkey][0]
-                torprmdict=insert_torphasedict(poltype,mol, toraboutbnd, torprmdict,initangle, write_prm_dict,keyfilter = clskey)
-            prmidx,initialprms,torprmdict = insert_torprmdict(mol, torprmdict)
+                insert_torphasedict(poltype,mol, toraboutbnd, torprmdict,initangle, write_prm_dict,keyfilter = clskey)
+            prmidx,initialprms = insert_torprmdict(mol, torprmdict)
 
             pzero = initialprms
             errfunc = lambda p, x, z, torprmdict, y: fitfunc(poltype,p, x, z, torprmdict) - y
