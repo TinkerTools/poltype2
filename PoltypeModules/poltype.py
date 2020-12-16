@@ -1258,19 +1258,18 @@ class PolarizableTyper():
         torgen.DefaultMaxRange(self,self.torlist)
         if self.dontdotor==True:
             shutil.copy(self.key4fname,self.key5fname)
-            sys.exit()
         self.torsettofilenametorset={}
         self.torsettotortorindex={}
         self.torsettotortorphaseindicestokeep={}
         self.nonaroringtors=[]
         self.nonaroringtorsets=[]
         self.classkeytoinitialprmguess={}
-        if self.dontfrag==False and self.tortor==True:
+        if self.dontfrag==False and self.tortor==True and self.dontdotor==False:
             torgen.PrepareTorsionTorsion(poltype,optmol,mol)
         if self.refinenonaroringtors==True and self.dontfrag==False:
             rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
 
-        if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False:
+        if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False and self.dontdotor==False:
             
             self.rdkitmol=rdmolfiles.MolFromMolFile(self.molstructfnamemol,sanitize=True,removeHs=False)
 
@@ -1284,11 +1283,11 @@ class PolarizableTyper():
             rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor=frag.GenerateFragments(self,self.mol,self.torlist,WBOmatrix) # returns list of bond indexes that need parent molecule to do torsion scan for (fragment generated was same as the parent0
             equivalentrotbndindexarrays,rotbndindextoringtor=frag.SpawnPoltypeJobsForFragments(self,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor)
 
-        if self.dontfrag==False and self.isfragjob==False and not os.path.isfile(self.key5fname):
+        if self.dontfrag==False and self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontdotor==False:
             frag.GrabTorsionParametersFromFragments(self,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor) # just dump to key_5 since does not exist for parent molecule
         else:          
             # Torsion scanning then fitting. *.key_5 will contain updated torsions
-            if not os.path.isfile(self.key5fname):
+            if not os.path.isfile(self.key5fname) and self.dontdotor==False:
                 if len(self.torlist)!=0:
                     # torsion scanning
                     torgen.gen_torsion(self,optmol,self.torsionrestraint,mol)
@@ -1301,7 +1300,7 @@ class PolarizableTyper():
                     shutil.copy(self.key4fname,self.key5fname)
 
 
-        if self.isfragjob==False:    
+        if self.isfragjob==False and self.dontdotor==False:
             self.CheckTorsionParameters(self.key5fname)
         self.WriteOutLiteratureReferences(self.key5fname) 
         # A series of tests are done so you one can see whether or not the parameterization values

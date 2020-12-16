@@ -1284,14 +1284,14 @@ def ModifyAngleKeywords(poltype,angleprms,listofanglesthatneedplanarkeywordtinke
     newangleprms=[]
     for line in angleprms:
         found=False
+        print('line',line)
+        linesplit=line.split()
+        temp=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3])]
         for ls,polclassesls in listofanglesthatneedplanarkeywordtinkerclassestopoltypeclasses.items():
             inline=True
-            for polclasses in polclassesls:
-                for index in polclasses:
-                    if str(index) not in line:
-                        inline=False
-                if inline==True:
-                    break
+            for i in temp:
+                if i not in polclassesls:
+                    inline=False
             if inline==True:
                 found=True
                 if 'anglep' not in line:
