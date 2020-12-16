@@ -1418,10 +1418,10 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         aidx,bidx,cidx,didx=torsionindices[:]
         babelindices=[i+1 for i in torsionindices]
         abidx,bbidx,cbidx,dbidx=babelindices[:]
-        if len(poltype.onlyrotbndslist)!=0:
-            if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
-                torsionsmissing.append(torsionindices)
-                continue
+        #if len(poltype.onlyrotbndslist)!=0:
+        #    if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
+        #        torsionsmissing.append(torsionindices)
+        #        continue
         bond=mol.GetBond(bbidx,cbidx)
         bondorder=bond.GetBondOrder()
         if bondorder!=1: # then dont zero out
@@ -1440,7 +1440,6 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         if contin==True:
             continue
         allhydrogentor=CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
-
         firstneighborindexes=indextoneighbidxs[bidx]
         secondneighborindexes=indextoneighbidxs[cidx]
         neighborindexes=firstneighborindexes+secondneighborindexes
@@ -1758,6 +1757,8 @@ def ReadList(poltype,filename):
     newls=[]
     if os.stat(filename).st_size != 0:
         ls=np.loadtxt(filename)
+        if ls.ndim==1: # read only in to list, but need list of list
+            ls=[ls.tolist()]       
         for subls in ls:
             newsubls=[int(i) for i in subls]
             newls.append(newsubls)
@@ -2064,6 +2065,12 @@ def ConvertToBabelList(poltype,listforprm):
     return babellist
 
 
+def GrabMissingVdwParameterGuesses(poltype,vdwprms,vdwmissing):
+
+    missingvdwatomindextoradiusguess={}
+    missingvdwatomindextodepthguess={}
+
+
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters=ReadExternalDatabase(poltype)
 
@@ -2171,6 +2178,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     opbendprms,opbendpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,opbendprms,bondindicestoextsmarts,bondsmartsatomordertoparameters,'opbend')
     vdwprms,vdwpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,vdwprms,vdwindicestoextsmarts,vdwsmartsatomordertoparameters,'vdw')
 
+    #missingvdwatomindextoradiusguess,missingvdwatomindextodepthguess=GrabMissingVdwParameterGuesses(poltype,vdwprms,vdwmissing)
     angleprms=ModifyAngleKeywords(poltype,angleprms,planarangletinkerclassestopoltypeclasses)
     bondlistbabel=ConvertToBabelList(poltype,listofbondsforprm)
     anglelistbabel=ConvertToBabelList(poltype,listofanglesforprm)

@@ -157,20 +157,16 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                 rta,rtb,rtc,rtd = resttors
                 rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
                 if resttors not in variabletorlist and resttors not in restlist:
-                    if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
-                       (optmol.GetAtom(rtd).GetAtomicNum() != 1):
-                        tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
-                        restlist.append(resttors)
-
+                    tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
+                    restlist.append(resttors)
     # Leave all torsions around other rotatable bonds fixed
     for rotkey,torsions in poltype.rotbndlist.items():
         for resttors in torsions:
             rta,rtb,rtc,rtd = resttors
             rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
             if resttors not in restlist and resttors not in variabletorlist:
-                if (optmol.GetAtom(rta).GetAtomicNum() != 1) and (optmol.GetAtom(rtd).GetAtomicNum() != 1):
-                    tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
-                    restlist.append(resttors)
+                tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
+                restlist.append(resttors)
     
     tmpfh.write("\n")
     tmpfh.close()
@@ -387,6 +383,7 @@ def GeneratePhaseLists(poltype,torset,optmol):
         phaselist=range(0,maxrange,anginc)
         clock=list(phaselist[:int(len(phaselist)/2)+1])
         counterclock=[-1*i for i in phaselist[1:int(len(phaselist)/2)+1]][::-1]
+        counterclock=counterclock[1:]
         phaselists.append(counterclock+clock)
     currentanglelist=numpy.array(currentanglelist)
     return phaselists,currentanglelist
@@ -482,7 +479,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol)
         poltype.torsettophaselist[tuple(torset)]=flatphaselist
         torsettooptoutputlogs[tuple(torset)]=outputlogs
-
 
         lognames=[]
         for job in listofjobs:
@@ -627,7 +623,7 @@ def get_torlist(poltype,mol,missed_torsions):
         ringbond=False
         if t2.IsInRing()==True and t3.IsInRing()==True:
             ringbond=True
-
+        
         arobond=False
         if t2.IsAromatic()==True and t3.IsAromatic()==True:
             arobond=True
@@ -637,6 +633,7 @@ def get_torlist(poltype,mol,missed_torsions):
             continue
         if bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds:
             continue
+
         if ((bond.IsRotor()) or [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist or (poltype.rotalltors and t2val>=2 and t3val>=2)):
             t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
             # is the torsion in toromitlist
@@ -649,33 +646,26 @@ def get_torlist(poltype,mol,missed_torsions):
 
             unq=get_uniq_rotbnd(poltype,t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx())
             rotbndkey = '%d %d' % (unq[1],unq[2])
-            if (not skiptorsion):
-                # store the torsion and temporary torsion value found by openbabel in torlist
-                tor = mol.GetTorsion(t1,t2,t3,t4)
-                if not skiptorsion:
-                    torlist.append(unq)
-                # store torsion in rotbndlist
-                rotbndlist[rotbndkey] = []
-                rotbndlist[rotbndkey].append(unq)
-                # write out rotatable bond to log
+            # store the torsion and temporary torsion value found by openbabel in torlist
+            tor = mol.GetTorsion(t1,t2,t3,t4)
+            if not skiptorsion:
+                torlist.append(unq)
+            # store torsion in rotbndlist
+            rotbndlist[rotbndkey] = []
+            rotbndlist[rotbndkey].append(unq)
+            # write out rotatable bond to log
+            #Find other possible torsions about this rotatable bond
+            iteratomatom = openbabel.OBAtomAtomIter(bond.GetBeginAtom())
+            for iaa in iteratomatom:
+                iteratomatom2 = openbabel.OBAtomAtomIter(bond.GetEndAtom())
+                for iaa2 in iteratomatom2:
+                    a = iaa.GetIdx()
+                    b = t2.GetIdx()
+                    c = t3.GetIdx()
+                    d = iaa2.GetIdx()
+                    if ((iaa.GetIdx() != t3.GetIdx() and iaa2.GetIdx() != t2.GetIdx()) and not (iaa.GetIdx() == t1.GetIdx() and iaa2.GetIdx() == t4.GetIdx())):
+                        rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx()))
 
-
-                #Find other possible torsions about this rotatable bond
-                iteratomatom = openbabel.OBAtomAtomIter(bond.GetBeginAtom())
-                for iaa in iteratomatom:
-                    iteratomatom2 = openbabel.OBAtomAtomIter(bond.GetEndAtom())
-                    for iaa2 in iteratomatom2:
-                        a = iaa.GetIdx()
-                        b = t2.GetIdx()
-                        c = t3.GetIdx()
-                        d = iaa2.GetIdx()
-                        if ((iaa.GetIdx() != t3.GetIdx() and iaa2.GetIdx() != t2.GetIdx()) and not (iaa.GetIdx() == t1.GetIdx() and iaa2.GetIdx() == t4.GetIdx())):
-
-                            if not skiptorsion:    
-                                rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx()))
-
-            else:
-                continue
             
     return (torlist ,rotbndlist)
 
@@ -781,6 +771,7 @@ def find_tor_restraint_idx(poltype,mol,b1,b2):
 def GrabFirstHeavyAtomIdx(poltype,indices,mol):
     atoms=[mol.GetAtom(i) for i in indices]
     atomicnums=[a.GetAtomicNum() for a in atoms]
+    
     heavyidx=indices[0]
     for i in range(len(indices)):
         idx=indices[i]
@@ -862,14 +853,12 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
             rta,rtb,rtc,rtd = resttors
             rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
             if resttors not in restlist and resttors not in variabletorlist:
-                if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
-                   (optmol.GetAtom(rtd).GetAtomicNum() != 1):
-                    restlist.append(resttors)
-                    if not firsttor:
-                        temp.write(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
-                    else:
-                        temp.write('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
-                        firsttor=True
+                restlist.append(resttors)
+                if not firsttor:
+                    temp.write(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
+                else:
+                    temp.write('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
+                    firsttor=True
     temp.write('  ")'+'\n')
     temp.write('}'+'\n')
 

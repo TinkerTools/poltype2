@@ -14,7 +14,7 @@ import matplotlib
 import pylab as plt
 import time
 from itertools import product,combinations
-
+from scipy.interpolate import interp1d
 
 
 def insert_torprmdict_angle(poltype,angle, angledict):
@@ -425,7 +425,6 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename):
         cls_qm_engy_dict[tup] = [ runsum+eng for runsum,eng in zip (cls_qm_engy_dict[tup], qme_list)]
         cls_mm_engy_dict[tup] = [ runsum+eng for runsum,eng in zip (cls_mm_engy_dict[tup], mme_list)]
         cls_angle_dict[tup] = mang_list
-
     # if multiple class keys, take the average
     for tup in clscount_dict:
         cnt = clscount_dict[tup]
@@ -766,7 +765,6 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
                     insert_torphasedict(poltype,mol, toraboutbnd, torprmdict, initangle, write_prm_dict)
             else:
                 insert_torphasedict(poltype,mol, tor, torprmdict, initangle, write_prm_dict)
-
         tup=tuple(classkeylist)
         prmidx,initialprms = insert_torprmdict(poltype,mol, torprmdict)
         #poltype.WriteToLog('number of parameters to fit for '+clskey+' are '+str(prmidx))
@@ -963,7 +961,6 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         Sx = numpy.array(cls_angle_dict[tup])
         out=[]
 
-
         out.append(cls_angle_dict[tup])
         for clskey in classkeylist:
             fitfunc_dict[clskey] = fitfunc(poltype,'eval',torgen.rads(poltype,Sx),torset,torprmdict,debug=False)
@@ -982,16 +979,28 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         print('Torsions being fit',string,'RMSD(QM-MM1)',minRMSD)
         poltype.WriteToLog('Torsions being fit '+string+' RMSD(QM-MM1)'+str(minRMSD))
         if dim==1:
+            xpoints=numpy.array([Sx[i][0] for i in range(len(Sx))])
+            x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
             fig = plt.figure(figsize=(10,10))
             ax = fig.add_subplot(111)
-            l1, = ax.plot(Sx,fitfunc_dict[clskey],'r',label='Fit')
+            l1, = ax.plot(Sx,fitfunc_dict[clskey],'ro',color='red',label='Fit')
+            f = interp1d(xpoints,fitfunc_dict[clskey], kind='quadratic')
+            y_smooth=f(x_new)
+            ax.plot(x_new,y_smooth,color='red')
             if useweights==False:
                 lab='QM-MM1'
             else:
                 lab='Weighted_(QM-MM1)'
-            l2, = ax.plot(Sx,tor_energy_list,'b',label=lab)
+            l2, = ax.plot(Sx,tor_energy_list,'bo',color='blue',label=lab)
+            f = interp1d(xpoints,tor_energy_list, kind='quadratic')
+            y_smooth=f(x_new)
+            ax.plot(x_new,y_smooth,color='blue')
+
             if useweights==True:
-                l3, = ax.plot(Sx,tor_energy_list_noweight,'black',label='QM-MM1')
+                l3, = ax.plot(Sx,tor_energy_list_noweight,'ko',color='black',label='QM-MM1')
+                f = interp1d(xpoints,tor_energy_list_noweight, kind='quadratic')
+                y_smooth=f(x_new)
+                ax.plot(x_new,y_smooth,color='black')
 
                 plt.legend(handles=[l1,l2,l3],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=3)
             else:
@@ -1192,12 +1201,12 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
         del_ang_list = find_del_list(poltype,mm2_energy_list,m2ang_list)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
-        
-
+        ff_list = [aa+bb for (aa,bb) in zip(mm_energy_list,fitfunc_dict[clskey])]
         # normalize profiles
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]
         mm2_energy_list = [en - min(mm2_energy_list) for en in mm2_energy_list]
+
         # find the difference between the two energy due to torsion profiles 
         tordif_list = [e2-e1 for (e1,e2) in zip(tor_e_list,tor_e_list2)]
         # normalize
@@ -1245,23 +1254,53 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             RMSD=minRMSDW
         else:
             RMSD=minRMSD
-
         print('Torset',torset,'RMSD(MM2,QM)',RMSD)
         poltype.WriteToLog('Torset'+str(torset)+' RMSD(MM2,QM) '+str(RMSD))
         if dim==1: 
             fig = plt.figure(figsize=(10,10))
             ax = fig.add_subplot(111)
             # energy profiles: mm (pre-fit), mm (post-fit), qm
-            line1, =ax.plot(mang_list,mm_energy_list,'g',label='MM1 (prefit)')
-            line2, =ax.plot(m2ang_list,mm2_energy_list,'r',label='MM2 (postfit)')
-            line3, =ax.plot(qang_list,qm_energy_list,'b',label='QM')
+            line1, =ax.plot(mang_list,mm_energy_list,'go',color='green',label='MM1 (prefit)')
+            xpoints=numpy.array([mang_list[i][0] for i in range(len(mang_list))])
+            x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
+            f = interp1d(xpoints,mm_energy_list, kind='quadratic')
+            y_smooth=f(x_new)
+            ax.plot(x_new,y_smooth,color='green')
+
+            line2, =ax.plot(m2ang_list,mm2_energy_list,'ro',color='red',label='MM2 (postfit)')
+            xpoints=numpy.array([m2ang_list[i][0] for i in range(len(m2ang_list))])
+            x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
+            f = interp1d(xpoints,mm2_energy_list, kind='quadratic')
+            y_smooth=f(x_new)
+            ax.plot(x_new,y_smooth,color='red')
+
+            line3, =ax.plot(qang_list,qm_energy_list,'bo',color='blue',label='QM')
+            xpoints=numpy.array([qang_list[i][0] for i in range(len(qang_list))])
+            x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
+            f = interp1d(xpoints,qm_energy_list, kind='quadratic')
+            y_smooth=f(x_new)
+            ax.plot(x_new,y_smooth,color='blue')
+
             ax.text(0.05, 1.1, 'RMSD(MM2,QM)=%s'%(round(RMSD,2)), transform=ax.transAxes, fontsize=12,verticalalignment='top')
 
             # mm + fit
-            line4, =ax.plot(mang_list,ff_list,'md-',label='MM1+Fit')
+            line4, =ax.plot(mang_list,ff_list,'mo',color='magenta',label='MM1+Fit')
+            xpoints=numpy.array([mang_list[i][0] for i in range(len(mang_list))])
+            x_new = numpy.linspace(xpoints.min(), xpoints.max(),500)
+            f = interp1d(xpoints,ff_list, kind='quadratic')
+            y_smooth=f(x_new)
+            ax.plot(x_new,y_smooth,color='magenta')
+
             ax2=ax.twinx()
             # make a plot with different y-axis using second axis object
-            line5, =ax2.plot(qang_list,WBOarray,'y',label='WBO')
+            line5, =ax2.plot(qang_list,WBOarray,'yo',color='yellow',label='WBO')
+            xpoints=numpy.array([qang_list[i][0] for i in range(len(qang_list))])
+            x_new = numpy.linspace(xpoints.min(), xpoints.max(),500)
+            ypoints=numpy.array([WBOarray[i][0] for i in range(len(WBOarray))])
+            f = interp1d(xpoints,ypoints, kind='quadratic')
+            y_smooth=f(x_new)
+            ax2.plot(x_new,y_smooth,color='yellow')
+
             ax2.set_ylabel("WBO",color="blue",fontsize=14)
             ax.set_xlabel('Dihedral Angle')
             ax.set_ylabel('SP Energy (kcal/mol)')

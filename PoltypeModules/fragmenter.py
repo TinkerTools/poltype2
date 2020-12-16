@@ -432,9 +432,6 @@ def FindEquivalentFragments(poltype,fragmentarray,namearray):
             else:
                 firstrotidx.append(namesplit[0])
                 secondrotidx.append(namesplit[1])
-        #firstrotidx,secondrotidx=(list(t) for t in zip(*sorted(zip(firstrotidx, secondrotidx),reverse=True)))
-        #print('firstrotidx',firstrotidx)
-        #print('secondrotidx',secondrotidx)
         firstrotidx=[str(i)+'_' for i in firstrotidx]
         secondrotidx=[str(i) for i in secondrotidx]  
         for i in range(len(firstrotidx)):
@@ -497,14 +494,12 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 equivalentrotbndindex=rotbndindex
                 equivalentparentindextofragindex=parentindextofragindex
                 
-            else:
-                parentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
             
             MakeFileName(poltype,equivalentrotbndindex,'equivalentfragment.txt')
             rotbndindexes=rotbndindex.split('_')
             parentrotbndindexes=[int(i) for i in rotbndindexes]
             rotbndindexes=[int(i)-1 for i in parentrotbndindexes]
-            fragrotbndindexes=[parentindextofragindex[i]+1 for i in rotbndindexes]
+            fragrotbndindexes=[equivalentparentindextofragindex[i]+1 for i in rotbndindexes]
             for j in range(0,len(fragrotbndindexes),2):
                 fragrotbnd=str(fragrotbndindexes[j])+' '+str(fragrotbndindexes[j+1])
                 if fragrotbnd not in fragrotbnds:
@@ -513,7 +508,6 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             
                 strparentrotbndindexes+=str(parentrotbndindexes[j])+' '+str(parentrotbndindexes[j+1])+','
         strfragrotbndindexes=strfragrotbndindexes[:-1]
-        
         if rotbndindex in rotbndindextoringtor.keys():
             strfragrotbndindexes=None
         strparentrotbndindexes=strparentrotbndindexes[:-1]
@@ -617,6 +611,8 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
 
         listofjobs,jobtooutputlog,newlog=FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog)
     os.chdir(parentdir)
+
+    sys.exit()
     finishedjobs,errorjobs=SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog)
     return equivalentrotbndindexarrays,rotbndindextoringtor
 
