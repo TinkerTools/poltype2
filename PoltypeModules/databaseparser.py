@@ -1284,7 +1284,6 @@ def ModifyAngleKeywords(poltype,angleprms,listofanglesthatneedplanarkeywordtinke
     newangleprms=[]
     for line in angleprms:
         found=False
-        print('line',line)
         linesplit=line.split()
         temp=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3])]
         for ls,polclassesls in listofanglesthatneedplanarkeywordtinkerclassestopoltypeclasses.items():
@@ -1365,7 +1364,7 @@ def AddOptimizedAngleLengths(poltype,mol,angleprms,anglelistbabel):
         linesplit=re.split(r'(\s+)', line)
         linesplit=linesplit[:11]
         linesplit.append('\n')
-        linesplit[8]=str(avganglelength)
+        linesplit[10]=str(avganglelength)
         line=''.join(linesplit)
         newangleprms.append(line)
     return newangleprms
@@ -2173,11 +2172,11 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     torsionprms=CorrectPitorEnergy(poltype,torsionprms,torsiontopitor)
     bondprms,bondpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,bondprms,bondindicestoextsmarts,bondsmartsatomordertoparameters,'bond')
     angleprms,anglepoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,angleprms,angleindicestoextsmarts,anglesmartsatomordertoparameters,'angle')
+    
     strbndprms,strbndpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,strbndprms,angleindicestoextsmarts,strbndsmartsatomordertoparameters,'strbnd')
     torsionprms,torsionpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,torsionprms,torsionindicestoextsmarts,torsionsmartsatomordertoparameters,'torsion')
     opbendprms,opbendpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,opbendprms,bondindicestoextsmarts,bondsmartsatomordertoparameters,'opbend')
     vdwprms,vdwpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,vdwprms,vdwindicestoextsmarts,vdwsmartsatomordertoparameters,'vdw')
-
     #missingvdwatomindextoradiusguess,missingvdwatomindextodepthguess=GrabMissingVdwParameterGuesses(poltype,vdwprms,vdwmissing)
     angleprms=ModifyAngleKeywords(poltype,angleprms,planarangletinkerclassestopoltypeclasses)
     bondlistbabel=ConvertToBabelList(poltype,listofbondsforprm)
