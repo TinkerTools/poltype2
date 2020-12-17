@@ -15,7 +15,7 @@ import pylab as plt
 import time
 from itertools import product,combinations
 from scipy.interpolate import interp1d
-
+import databaseparser as db
 
 def insert_torprmdict_angle(poltype,angle, angledict):
     """
@@ -63,8 +63,6 @@ def fitfunc (poltype,parms, x,torset, torprmdict, debug = False):
     """
     tor_energy_array = [ 0.0 ] * len(x)
     offset = 0
-    print('torprmdict',torprmdict)
-    print('torset',torset,os.getcwd())
     for j in range(len(x)):
         angtup=x[j]
         tor_energy=0
@@ -73,7 +71,6 @@ def fitfunc (poltype,parms, x,torset, torprmdict, debug = False):
             tor=torset[i]
             a,b,c,d=tor[0:4]
             clskey = torgen.get_class_key(poltype,a,b,c,d)
-            print('clskey',clskey)
             torprm=torprmdict[clskey]
             # for each torsion about the same rotatable bond (clskey)
             for nfold in torprm['prmdict']:
@@ -512,8 +509,10 @@ def insert_torphasedict (poltype,mol, toraboutbnd, torprmdict, initangle,write_p
     # if the key passes the keyfilter or if the keyfilter does exist
     aatomicnum=obaa.GetAtomicNum()
     datomicnum=obad.GetAtomicNum()
-    if aatomicnum==1 or datomicnum==1:
-        return 
+    babelindices=[a2,b2,c2,d2]
+    allhydtor=db.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
+    if aatomicnum==1 or datomicnum==1 and allhydtor==False:
+        return
     if (keyfilter is None or keyfilter == tpdkey): 
         # current torsion value (normalized by initangle)
         torabangle = round(mol.GetTorsion(obaa,obab,obac,obad) -initangle) % 360

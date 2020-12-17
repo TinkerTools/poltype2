@@ -1265,9 +1265,9 @@ class PolarizableTyper():
         self.classkeytoinitialprmguess={}
         if self.dontfrag==False and self.tortor==True and self.dontdotor==False:
             torgen.PrepareTorsionTorsion(poltype,optmol,mol)
+ 
         if self.refinenonaroringtors==True and self.dontfrag==False:
             rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
-
         if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False and self.dontdotor==False:
             
             self.rdkitmol=rdmolfiles.MolFromMolFile(self.molstructfnamemol,sanitize=True,removeHs=False)
@@ -1319,15 +1319,6 @@ class PolarizableTyper():
         torgen.RemoveStringFromKeyfile(self,keyfilecopyname,'SOLUTE')
         torgen.RemoveStringFromKeyfile(self,keyfilecopyname,'TARGET-DIPOLE')
         torgen.RemoveCommentsFromKeyFile(self,keyfilecopyname)
-        for fname in os.listdir():
-            if fname.endswith('.chk'):
-                os.remove(fname)
-        if os.path.isdir('qm-torsion'):
-            os.chdir('qm-torsion')
-            for fname in os.listdir():
-                if fname.endswith('.chk'):
-                    os.remove(fname)
-            os.chdir('..')
         if os.path.exists(self.scrtmpdirgau):
             shutil.rmtree(self.scrtmpdirgau)
         if os.path.exists(self.scrtmpdirpsi4):

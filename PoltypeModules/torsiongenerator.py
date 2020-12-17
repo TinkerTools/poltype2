@@ -633,7 +633,9 @@ def get_torlist(poltype,mol,missed_torsions):
             continue
         if bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds:
             continue
+        
 
+        print('missed_torsions',missed_torsions)
         if ((bond.IsRotor()) or [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist or (poltype.rotalltors and t2val>=2 and t3val>=2)):
             t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
             # is the torsion in toromitlist
@@ -643,6 +645,12 @@ def get_torlist(poltype,mol,missed_torsions):
                 skiptorsion = False # override previous conditions if in list
             if poltype.rotalltors==True:
                 skiptorsion=False
+            babelindices=[t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()]
+            t1atomicnum=t1.GetAtomicNum()
+            t4atomicnum=t4.GetAtomicNum()
+            allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
+            if t1atomicnum==1 or t4atomicnum==1 and allhydtors==False:
+                skiptorsion=True
 
             unq=get_uniq_rotbnd(poltype,t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx())
             rotbndkey = '%d %d' % (unq[1],unq[2])
