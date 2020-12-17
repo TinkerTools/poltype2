@@ -1973,10 +1973,10 @@ def CountBrackets(poltype,string):
             count+=1
     return count
 
-def CheckTrigonalCenters(poltype,opbendbondindicestotinkerclasses,mol):
-    opbendtinkerclassestotrigonalcenterbools={}
+def CheckTrigonalCenters(poltype,listofbondsforprm,mol):
     opbendbondindicestotrigonalcenterbools={}
-    for bondindices,tinkerclasses in opbendbondindicestotinkerclasses.items():
+    for bondindices in listofbondsforprm:
+        bondindices=tuple(bondindices)
         boolarray=[]
         babelindices=[i+1 for i in bondindices]
         atoms=[mol.GetAtom(i) for i in babelindices]     
@@ -1987,14 +1987,11 @@ def CheckTrigonalCenters(poltype,opbendbondindicestotinkerclasses,mol):
                 boolarray.append(True)
             else:
                 boolarray.append(False)
-        opbendtinkerclassestotrigonalcenterbools[tuple(tinkerclasses)]=boolarray
         opbendbondindicestotrigonalcenterbools[bondindices]=boolarray
-        revtinkerclasses=tuple(tinkerclasses[::-1])
         revboolarray=boolarray[::-1]
         revbondindices=bondindices[::-1]
         opbendbondindicestotrigonalcenterbools[revbondindices]=revboolarray
-        opbendtinkerclassestotrigonalcenterbools[tuple(revtinkerclasses)]=revboolarray
-    return opbendtinkerclassestotrigonalcenterbools,opbendbondindicestotrigonalcenterbools
+    return opbendbondindicestotrigonalcenterbools
 
 
 def CorrectPitorEnergy(poltype,torsionprms,torsiontopitor):
@@ -2080,6 +2077,15 @@ def AddReverseKeys(poltype,tinkerclassestopoltypeclasses):
         newtinkerclassestopoltypeclasses[revtinkerclasses]=revpoltypeclasses
     return newtinkerclassestopoltypeclasses
 
+
+def TinkerClassesToTrigonalCenter(poltype,opbendbondindicestotinkerclasses,opbendbondindicestotrigonalcenterbools):
+    opbendtinkerclassestotrigonalcenterbools={}
+    for bondindices,tinkerclasses in opbendbondindicestotinkerclasses.items():
+        boolarray=opbendbondindicestotrigonalcenterbools[bondindices]
+        opbendtinkerclassestotrigonalcenterbools[tuple(tinkerclasses)]=boolarray
+
+    return opbendtinkerclassestotrigonalcenterbools
+
 def GrabMissingVdwParameterGuesses(poltype,vdwprms,vdwmissing):
 
     missingvdwatomindextoradiusguess={}
@@ -2159,7 +2165,9 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     planarbondtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,planarbondindicestotinkerclasses)
     opbendtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,opbendbondindicestotinkerclasses)
     opbendtinkerclassestopoltypeclasses=AddReverseKeys(poltype,opbendtinkerclassestopoltypeclasses)
-    opbendtinkerclassestotrigonalcenterbools,opbendbondindicestotrigonalcenterbools=CheckTrigonalCenters(poltype,opbendbondindicestotinkerclasses,mol)
+    opbendbondindicestotrigonalcenterbools=CheckTrigonalCenters(poltype,listofbondsforprm,mol)
+    opbendtinkerclassestotrigonalcenterbools=TinkerClassesToTrigonalCenter(poltype,opbendbondindicestotinkerclasses,opbendbondindicestotrigonalcenterbools)
+
     angletinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,angleindicestotinkerclasses)
     planarangletinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,planarangleindicestotinkerclasses)
     torsiontinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,torsionindicestotinkerclasses)
