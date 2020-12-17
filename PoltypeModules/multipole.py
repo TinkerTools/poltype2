@@ -27,6 +27,27 @@ def RemoveFromList(poltype,atomlist,atm):
     return newatmlist
 
 
+def SanitizeMultipoleFrames(poltype,keyfilename): # pearl script for averging only understands 0 and not empty spaces for parsing
+    temp=open(keyfilename,'r')
+    results=temp.readlines()
+    temp.close()
+    tempname=keyfilename.replace('.key','_temp.key')
+    temp=open(tempname,'w')
+    extraspace='     '
+    for line in results:
+        if 'multipole' in line:
+            linesplit=line.split()
+            realsplit=re.split(r'(\s+)', line)
+            if len(linesplit)==3:
+                realsplit=realsplit[:3]+[extraspace]+['0']+[extraspace]+['0']+realsplit[3:]
+            elif len(linesplit)==4:
+                realsplit=realsplit[:5]+[extraspace]+['0']+realsplit[5:]
+            line=''.join(realsplit)
+        temp.write(line)
+    temp.close()
+    os.remove(keyfilename)
+    os.rename(tempname,keyfilename)
+
 def AtLeastOneHeavyLf1NeighbNotAtom(poltype,lf1atom,atom):
     foundatleastoneheavy=False
     checkneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(lf1atom)]

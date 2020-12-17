@@ -1186,6 +1186,7 @@ class PolarizableTyper():
                 time.sleep(1)
                 self.WriteToLog('Waiting for '+self.keyfname)
             mpole.prepend_keyfile(self,self.keyfname,optmol)
+            mpole.SanitizeMultipoleFrames(self,self.keyfname)
         # post process local frames written out by poledit
         mpole.post_proc_localframes(self,self.keyfname, lfzerox,atomindextoremovedipquad,atomindextoremovedipquadcross)
         if self.atomnum!=1: 
