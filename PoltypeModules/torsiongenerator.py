@@ -479,7 +479,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol)
         poltype.torsettophaselist[tuple(torset)]=flatphaselist
         torsettooptoutputlogs[tuple(torset)]=outputlogs
-
         lognames=[]
         for job in listofjobs:
             log=jobtooutputlog[job]
@@ -635,7 +634,6 @@ def get_torlist(poltype,mol,missed_torsions):
             continue
         
 
-        print('missed_torsions',missed_torsions)
         if ((bond.IsRotor()) or [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist or (poltype.rotalltors and t2val>=2 and t3val>=2)):
             t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
             # is the torsion in toromitlist
@@ -1263,18 +1261,7 @@ def RemoveDuplicateRotatableBondTypes(poltype):
             tor=list(dup[i])
             if tor in poltype.torlist:
                 poltype.torlist.remove(tor)
-    keystokeep=[]
-    for i in range(len(poltype.torlist)):
-        tor=poltype.torlist[i]
-        rotbndkey=str(tor[1])+' '+str(tor[2])
-        if rotbndkey not in keystokeep:
-            keystokeep.append(rotbndkey)
-    keystoremove=[]
-    for key,value in poltype.rotbndlist.items():
-        if key not in keystokeep:
-            keystoremove.append(key) 
-    for key in keystoremove:
-        del poltype.rotbndlist[key]
+    
     return poltype.torlist,poltype.rotbndlist 
 
 
