@@ -63,6 +63,8 @@ def fitfunc (poltype,parms, x,torset, torprmdict, debug = False):
     """
     tor_energy_array = [ 0.0 ] * len(x)
     offset = 0
+    print('torprmdict',torprmdict)
+    print('torset',torset,os.getcwd())
     for j in range(len(x)):
         angtup=x[j]
         tor_energy=0
@@ -71,6 +73,7 @@ def fitfunc (poltype,parms, x,torset, torprmdict, debug = False):
             tor=torset[i]
             a,b,c,d=tor[0:4]
             clskey = torgen.get_class_key(poltype,a,b,c,d)
+            print('clskey',clskey)
             torprm=torprmdict[clskey]
             # for each torsion about the same rotatable bond (clskey)
             for nfold in torprm['prmdict']:

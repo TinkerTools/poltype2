@@ -892,7 +892,6 @@ class PolarizableTyper():
                             error=False
                         else:
                             error=True
-                term=True # TEMP
                 error=False
                 if error==True:
                     message='Error '+line+ 'logpath='+logfname
