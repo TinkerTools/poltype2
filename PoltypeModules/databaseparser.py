@@ -466,30 +466,20 @@ def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendti
             if tuple(bondclasslist) in opbendtinkerclassestopoltypeclasses.keys():
                 bondtup=tuple(bondclasslist)
                 foundopbend=True
-            elif tuple(bondclasslist[::-1]) in opbendtinkerclassestopoltypeclasses.keys():
-                bondtup=tuple(bondclasslist[::-1])
-                foundopbend=True
 
             if foundopbend==True:
                 classes=opbendtinkerclassestopoltypeclasses[bondtup]
                 boolarray=opbendtinkerclassestotrigonalcenterbools[bondtup]
+
                 for boundcls in classes:
                     linesplitall[2]=str(boundcls[0])    
                     linesplitall[4]=str(boundcls[1])  
                     newlinesplitall=linesplitall[:]
                     newlinesplitall[4]=str(boundcls[0])    
                     newlinesplitall[2]=str(boundcls[1])
-                   
                     newline=''.join(linesplitall)
-                    revnewline=''.join(newlinesplitall)
-                    if boolarray[0]==True and boolarray[1]==False: 
-                        opbendprms.append(revnewline)
-                    elif boolarray[0]==False and boolarray[1]==True:
+                    if boolarray[1]==True: 
                         opbendprms.append(newline)
-                    elif boolarray[0]==True and boolarray[1]==True:
-                        opbendprms.append(newline)
-                        opbendprms.append(revnewline)
-
 
         elif 'multipole' in line and skipmultipole==False:
             newlinesplit=linesplit[1:-1]
@@ -1332,7 +1322,7 @@ def AddOptimizedBondLengths(poltype,mol,bondprms,bondlistbabel):
                 tot+=blen
             except:
                 pass
-        avgbondlength=tot/len(allbonds)
+        avgbondlength=round(tot/len(allbonds),2)
         linesplit=re.split(r'(\s+)', line)   
         linesplit[8]=str(avgbondlength)
         line=''.join(linesplit)
@@ -1360,7 +1350,7 @@ def AddOptimizedAngleLengths(poltype,mol,angleprms,anglelistbabel):
             c = mol.GetAtom(angle[2])
             anglelen = mol.GetAngle(a,b,c)
             tot+=anglelen
-        avganglelength=tot/len(allangles)
+        avganglelength=round(tot/len(allangles),2)
         linesplit=re.split(r'(\s+)', line)
         linesplit=linesplit[:11]
         linesplit.append('\n')
@@ -1627,11 +1617,13 @@ def FindMaximumCommonSubstructures(poltype,parametersmartslist,rdkitmol):
 def GrabPlanarBonds(poltype,listofbondsforprm,mol): # used for checking missing opbend parameters later
     planarbonds=[]
     for bond in listofbondsforprm:
-        a = mol.GetAtom(bond[0]+1)
-        b = mol.GetAtom(bond[1]+1)
-        atoms=[a,b]
-        for atom in atoms:
-            if atom.GetHyb()==2 and len(list(openbabel.OBAtomAtomIter(atom)))==3:
+        revbond=bond[::-1]
+        totalbonds=[bond,revbond]
+        for lsidx in range(len(totalbonds)):
+            bond=totalbonds[lsidx]
+            a = mol.GetAtom(bond[0]+1)
+            b = mol.GetAtom(bond[1]+1)
+            if b.GetHyb()==2 and len(list(openbabel.OBAtomAtomIter(b)))==3:
                 if bond not in planarbonds:
                     planarbonds.append(bond)
 
@@ -1640,22 +1632,27 @@ def GrabPlanarBonds(poltype,listofbondsforprm,mol): # used for checking missing 
 
 def FindPotentialMissingParameterTypes(poltype,prms,tinkerclassestopoltypeclasses):
     poltypeclasseslist=list(tinkerclassestopoltypeclasses.values())
+    newpoltypeclasseslist=[]
+    for poltypeclassesls in poltypeclasseslist:
+        newpoltypeclassesls=[]
+        for poltypeclasses in poltypeclassesls:
+            revpoltypeclasses=poltypeclasses[::-1]
+            newpoltypeclassesls.append(poltypeclasses)
+            newpoltypeclassesls.append(revpoltypeclasses)
+        newpoltypeclasseslist.append(newpoltypeclassesls)
+
     missingprms=[]
     foundprms=[]
     for line in prms:
-        poltypeclassesls=SearchForPoltypeClasses(poltype,line,poltypeclasseslist)
+        poltypeclassesls=SearchForPoltypeClasses(poltype,line,newpoltypeclasseslist)
         linesplit=line.split()
-        prms=[linesplit[1],linesplit[2]]
+        prms=[int(linesplit[1]),int(linesplit[2])]
         if poltypeclassesls!=None:
             for poltypeclasses in poltypeclassesls:
-                allin=True
-                poltypeclasses=[str(i) for i in poltypeclasses]
-                for prm in prms:
-                    if prm not in poltypeclasses:
-                        allin=False
-                if allin==True:
+                poltypeclasses=tuple([int(i) for i in poltypeclasses])
+                if poltypeclasses[0]==prms[0] and poltypeclasses[1]==prms[1]:
                     foundprms.append(poltypeclasses) 
-    for poltypeclassesls in poltypeclasseslist:
+    for poltypeclassesls in newpoltypeclasseslist:
         for poltypeclasses in poltypeclassesls:
             if poltypeclasses not in foundprms and poltypeclasses not in missingprms:
                 missingprms.append(poltypeclasses)
@@ -1682,7 +1679,7 @@ def ConvertPoltypeClassesToIndices(poltype,missingprmtypes):
 def FilterIndices(poltype,potentialmissingprmindices,indices):
     missingprmindices=[]
     for prmindices in potentialmissingprmindices:
-        if list(prmindices) in indices or list(prmindices[::-1]) in indices:
+        if list(prmindices) in indices:
             missingprmindices.append(prmindices)
     return missingprmindices
         
@@ -1704,7 +1701,7 @@ def GrabTypeAndDescriptions(poltype,prmfile):
     return elementmm3descriptomm3type 
 
 
-def DefaultOPBendParameters(poltype,missingopbendprmindices,mol):
+def DefaultOPBendParameters(poltype,missingopbendprmindices,mol,opbendbondindicestotrigonalcenterbools):
     newopbendprms=[]
     defaultvalues=[]
     for opbendprmindices in missingopbendprmindices:
@@ -1742,10 +1739,12 @@ def DefaultOPBendParameters(poltype,missingopbendprmindices,mol):
                     opbendvalue=round(poltype.defopbendval*71.94,2)
 
                 defaultvalues.append(opbendvalue)
+                boolarray=opbendbondindicestotrigonalcenterbools[opbendprmindices]
                 firstprmline='opbend'+' '+str(poltypeclasses[0])+' '+str(poltypeclasses[1])+' '+'0'+' '+'0'+' '+str(opbendvalue)+'\n'
-                secondprmline='opbend'+' '+str(poltypeclasses[1])+' '+str(poltypeclasses[0])+' '+'0'+' '+'0'+' '+str(opbendvalue)+'\n' 
-                newopbendprms.append(firstprmline)
-                newopbendprms.append(secondprmline)
+
+                if boolarray[1]==True: 
+                    newopbendprms.append(firstprmline)
+
     return newopbendprms,defaultvalues
 
 
@@ -1771,14 +1770,10 @@ def CheckIfParametersExist(poltype,potentialmissingindices,prms):
         found=False
         symtypes=[str(i) for i in symtypes]
         for prmline in prms:
-            allin=True
             linesplit=prmline.split()
             parms=[linesplit[1],linesplit[2]]
-            for prm in parms:
-                if prm not in symtypes:
-                    allin=False 
-            if allin==True:
-                found=True
+            if parms[0]==symtypes[0] and parms[1]==symtypes[1]:
+               found=True
         if found==False:
             missingprmindices.append(indices)
     return missingprmindices
@@ -1958,12 +1953,17 @@ def FilterBondSMARTSEnviorment(poltype,bondindicestosmartsatomorders,bondindices
     for bondindices,smartsatomorders in bondindicestosmartsatomorders.items(): 
         smarts=smartsatomorders[0]
         brackcount=CountBrackets(poltype,smarts)
+        revbondindices=bondindices[::-1]
         if brackcount==2:
             pass
         else:
-            opbendbondindicestotinkerclasses[bondindices]=bondindicestotinkerclasses[bondindices]
+            temp=bondindicestotinkerclasses[bondindices]
+            revtemp=temp[::-1]
+            opbendbondindicestotinkerclasses[bondindices]=temp
+            opbendbondindicestotinkerclasses[revbondindices]=revtemp
             opbendbondindicestosmartsatomorders[bondindices]=smartsatomorders 
- 
+            opbendbondindicestosmartsatomorders[revbondindices]=smartsatomorders 
+
     return opbendbondindicestotinkerclasses,opbendbondindicestosmartsatomorders
 
 def CountBrackets(poltype,string):
@@ -1975,6 +1975,7 @@ def CountBrackets(poltype,string):
 
 def CheckTrigonalCenters(poltype,opbendbondindicestotinkerclasses,mol):
     opbendtinkerclassestotrigonalcenterbools={}
+    opbendbondindicestotrigonalcenterbools={}
     for bondindices,tinkerclasses in opbendbondindicestotinkerclasses.items():
         boolarray=[]
         babelindices=[i+1 for i in bondindices]
@@ -1987,11 +1988,13 @@ def CheckTrigonalCenters(poltype,opbendbondindicestotinkerclasses,mol):
             else:
                 boolarray.append(False)
         opbendtinkerclassestotrigonalcenterbools[tuple(tinkerclasses)]=boolarray
+        opbendbondindicestotrigonalcenterbools[bondindices]=boolarray
         revtinkerclasses=tuple(tinkerclasses[::-1])
         revboolarray=boolarray[::-1]
+        revbondindices=bondindices[::-1]
+        opbendbondindicestotrigonalcenterbools[revbondindices]=revboolarray
         opbendtinkerclassestotrigonalcenterbools[tuple(revtinkerclasses)]=revboolarray
-
-    return opbendtinkerclassestotrigonalcenterbools
+    return opbendtinkerclassestotrigonalcenterbools,opbendbondindicestotrigonalcenterbools
 
 
 def CorrectPitorEnergy(poltype,torsionprms,torsiontopitor):
@@ -2064,10 +2067,26 @@ def ConvertToBabelList(poltype,listforprm):
     return babellist
 
 
+
+def AddReverseKeys(poltype,tinkerclassestopoltypeclasses):
+    newtinkerclassestopoltypeclasses={}
+    for tinkerclasses,poltypeclasses in tinkerclassestopoltypeclasses.items():
+        revtinkerclasses=tinkerclasses[::-1]
+        revpoltypeclasses=[]
+        for ls in poltypeclasses:
+            revls=ls[::-1]
+            revpoltypeclasses.append(revls) 
+        newtinkerclassestopoltypeclasses[tinkerclasses]=poltypeclasses
+        newtinkerclassestopoltypeclasses[revtinkerclasses]=revpoltypeclasses
+    return newtinkerclassestopoltypeclasses
+
 def GrabMissingVdwParameterGuesses(poltype,vdwprms,vdwmissing):
 
     missingvdwatomindextoradiusguess={}
     missingvdwatomindextodepthguess={}
+
+
+
 
 
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
@@ -2119,7 +2138,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
 
 
     opbendbondindicestotinkerclasses,opbendbondindicestosmartsatomorders=FilterBondSMARTSEnviorment(poltype,bondindicestosmartsatomorders,bondindicestotinkerclasses)
-
     planarbondindicestotinkertypes,planarbondindicestotinkerclasses,planarbondindicestoparametersmartsatomorders,planarbondindicestoelementtinkerdescrips,planarbondindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,planarbondsforprmtoparametersmarts,planarbondsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
 
     angleindicestotinkertypes,angleindicestotinkerclasses,angleindicestoparametersmartsatomorders,angleindicestoelementtinkerdescrips,angleindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,anglesforprmtoparametersmarts,anglesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
@@ -2140,7 +2158,8 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     bondtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,bondindicestotinkerclasses)
     planarbondtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,planarbondindicestotinkerclasses)
     opbendtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,opbendbondindicestotinkerclasses)
-    opbendtinkerclassestotrigonalcenterbools=CheckTrigonalCenters(poltype,opbendbondindicestotinkerclasses,mol)
+    opbendtinkerclassestopoltypeclasses=AddReverseKeys(poltype,opbendtinkerclassestopoltypeclasses)
+    opbendtinkerclassestotrigonalcenterbools,opbendbondindicestotrigonalcenterbools=CheckTrigonalCenters(poltype,opbendbondindicestotinkerclasses,mol)
     angletinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,angleindicestotinkerclasses)
     planarangletinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,planarangleindicestotinkerclasses)
     torsiontinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,torsionindicestotinkerclasses)
@@ -2191,7 +2210,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     missingopbendprmindices=CheckIfParametersExist(poltype,potentialmissingopbendprmindices,opbendprms)
     defaultvalues=None
     if len(missingopbendprmindices)!=0:
-        newopbendprms,defaultvalues=DefaultOPBendParameters(poltype,missingopbendprmindices,mol)
+        newopbendprms,defaultvalues=DefaultOPBendParameters(poltype,missingopbendprmindices,mol,opbendbondindicestotrigonalcenterbools)
         opbendprms.extend(newopbendprms)
     vdwprmstotransferinfo=MapParameterLineToTransferInfo(poltype,vdwprms,atompoltypeclasstoparametersmartsatomorder,atompoltypeclasstosmartsatomorder,atompoltypeclassestoelementtinkerdescrip,vdwpoltypeclassestosmartsatomordersext)
     bondprmstotransferinfo=MapParameterLineToTransferInfo(poltype,bondprms,bondpoltypeclassestoparametersmartsatomorders,bondpoltypeclassestosmartsatomorders,bondpoltypeclassestoelementtinkerdescrips,bondpoltypeclassestosmartsatomordersext)
