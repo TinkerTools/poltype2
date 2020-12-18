@@ -973,7 +973,7 @@ class PolarizableTyper():
         temp.close()
         return inifilepath
 
-    def CheckTorsionParameters(self,keyfilename):
+    def CheckTorsionParameters(self,keyfilename,torsionsmissing):
         temp=open(keyfilename,'r')
         results=temp.readlines()
         temp.close()
@@ -981,6 +981,12 @@ class PolarizableTyper():
             if 'torsion' in line and '#' not in line:
                 allzero=True
                 linesplit=line.split()
+                ls=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3]),int(linesplit[4])]
+                revls=ls[::-1]
+                if ls in torsionsmissing or revls in torsionsmissing:
+                    pass
+                else:
+                    continue
                 prms=linesplit[5:]
                 newprms=prms[0::3]
                 newprms=[float(i) for i in newprms]
@@ -1301,7 +1307,7 @@ class PolarizableTyper():
 
 
         if self.isfragjob==False and self.dontdotor==False:
-            self.CheckTorsionParameters(self.key5fname)
+            self.CheckTorsionParameters(self.key5fname,torsionsmissing)
         self.WriteOutLiteratureReferences(self.key5fname) 
         # A series of tests are done so you one can see whether or not the parameterization values
         # found are acceptable and to what degree
