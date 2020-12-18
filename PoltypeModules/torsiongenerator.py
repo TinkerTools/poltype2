@@ -622,7 +622,6 @@ def get_torlist(poltype,mol,missed_torsions):
         ringbond=False
         if t2.IsInRing()==True and t3.IsInRing()==True:
             ringbond=True
-        
         arobond=False
         if t2.IsAromatic()==True and t3.IsAromatic()==True:
             arobond=True
@@ -630,8 +629,7 @@ def get_torlist(poltype,mol,missed_torsions):
             continue
         if ringbond==True and poltype.allownonaromaticringscanning==False:
             continue
-        if bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds:
-            continue
+            
         
 
         if ((bond.IsRotor()) or [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist or (poltype.rotalltors and t2val>=2 and t3val>=2)):
@@ -643,6 +641,10 @@ def get_torlist(poltype,mol,missed_torsions):
                 skiptorsion = False # override previous conditions if in list
             if poltype.rotalltors==True:
                 skiptorsion=False
+
+            if bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds:
+                skiptorsion=True
+
             babelindices=[t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()]
             t1atomicnum=t1.GetAtomicNum()
             t4atomicnum=t4.GetAtomicNum()

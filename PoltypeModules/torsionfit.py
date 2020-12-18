@@ -783,15 +783,10 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         #  atoms restrained during restrained rotation.
         # tor_energy_list is set as qm - mm
 
-        weightlist=numpy.exp(-numpy.array(qm_energy_list)/4)
+        weightlist=numpy.exp(-numpy.array(qm_energy_list)/8)
 
-        tor_energy_list_noweight = [qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)]
         tor_energy_list = [qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)]
 
-        if useweights==True:
-            tor_energy_list=numpy.multiply(tor_energy_list,weightlist)
-
-        #tor_energy_list = numpy.array([qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)])
         '''
         txtfname = "%s-fit-" % (poltype.molecprefix) 
         for i in range(len(torset)):
@@ -837,8 +832,12 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             # p: parameters
             # x: angle list
             # torprmdict: torsion information 
-            # y: tor_energy_list 
-            errfunc = lambda p, x, z, torprmdict, y: fitfunc(poltype,p, x,z, torprmdict) - y
+            # y: tor_energy_list
+            if useweights==True: 
+                errfunc = lambda p, x, z, torprmdict, y: weightlist*(fitfunc(poltype,p, x,z, torprmdict) - y)
+
+            else:
+                errfunc = lambda p, x, z, torprmdict, y: fitfunc(poltype,p, x,z, torprmdict) - y
 
             # optimize.leastsq is run, found in the scipy library
             # http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.leastsq.html
@@ -857,7 +856,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             # msg : string giving cause of failure if one exists
             # ier : an int. if ier is 1,2,3 or 4, a solution was found, else no solution was found
             #p1,covx,idict,msg,ier = optimize.leastsq(errfunc, pzero, args=(rads(numpy.array(angle_list)),torprmdict, tor_energy_list), full_output = True)
-            array=optimize.least_squares(errfunc, pzero, jac='2-point', bounds=boundstup, args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
+            array=optimize.least_squares(errfunc, pzero,jac='2-point', bounds=boundstup, args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
             p1=array['x']
             # Remove parameters found by least.sq that aren't reasonable; 
             # remove parameters found that are greater than max_amp
@@ -917,8 +916,13 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             prmidx,initialprms = insert_torprmdict(mol, torprmdict)
 
             pzero = initialprms
-            errfunc = lambda p, x, z, torprmdict, y: fitfunc(poltype,p, x, z, torprmdict) - y
-            array=optimize.least_squares(errfunc, pzero, jac='2-point', bounds=boundstup, args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
+            if useweights==True: 
+                errfunc = lambda p, x, z, torprmdict, y: weightlist*(fitfunc(poltype,p, x,z, torprmdict) - y)
+
+            else:
+                errfunc = lambda p, x, z, torprmdict, y: fitfunc(poltype,p, x,z, torprmdict) - y
+
+            array=optimize.least_squares(errfunc, pzero,jac='2-point', bounds=boundstup, args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
             p1=array['x']
 
         # fill in torprmdict with the parameter estimates
@@ -989,24 +993,12 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             f = interp1d(xpoints,fitfunc_dict[clskey], kind='quadratic')
             y_smooth=f(x_new)
             ax.plot(x_new,y_smooth,color='red')
-            if useweights==False:
-                lab='QM-MM1'
-            else:
-                lab='Weighted_(QM-MM1)'
-            l2, = ax.plot(Sx,tor_energy_list,'bo',color='blue',label=lab)
+            l2, = ax.plot(Sx,tor_energy_list,'bo',color='blue',label='QM-MM1')
             f = interp1d(xpoints,tor_energy_list, kind='quadratic')
             y_smooth=f(x_new)
             ax.plot(x_new,y_smooth,color='blue')
 
-            if useweights==True:
-                l3, = ax.plot(Sx,tor_energy_list_noweight,'ko',color='black',label='QM-MM1')
-                f = interp1d(xpoints,tor_energy_list_noweight, kind='quadratic')
-                y_smooth=f(x_new)
-                ax.plot(x_new,y_smooth,color='black')
-
-                plt.legend(handles=[l1,l2,l3],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=3)
-            else:
-                plt.legend(handles=[l1,l2],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=2)
+            plt.legend(handles=[l1,l2],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=2)
 
             ax.text(0.05, 1.1, 'Torsions Being Fit =%s'%(string), transform=ax.transAxes, fontsize=10,verticalalignment='top')
             ax.text(0, -0.1, 'FoldNum=%s NumPrms=%s DataPts=%s RMSD(fit,QM-MM1),Abs=%s'%(str(len(poltype.nfoldlist)),str(numprms),str(len(mm_energy_list)),round(minRMSD,2)), transform=ax.transAxes, fontsize=10,verticalalignment='bottom')
@@ -1221,19 +1213,12 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         #print('fitfunc_dict[clskey]',fitfunc_dict[clskey])
 
         ff_list = [aa+bb for (aa,bb) in zip(mm_energy_list,fitfunc_dict[clskey])]
-        weight=numpy.exp(-numpy.array(qm_energy_list)/4)
-        #weighted_qm_energy_list=numpy.multiply(qm_energy_list,weight)
-
+        shifted_mm2_energy_list=numpy.add(1,mm2_energy_list)
+        shifted_qm_energy_list=numpy.add(1,qm_energy_list)
         if len(ff_list)==len(mm2_energy_list):
 
-            def RMSDW(c):
-                return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.multiply(numpy.subtract(mm2_energy_list,qm_energy_list),weight),c))))
-
-            resultW=fmin(RMSDW,.5)
-            minRMSDW=RMSDW(resultW[0])
-
             def RMSD(c):
-                return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.subtract(mm2_energy_list,qm_energy_list),c))))
+                return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.divide(numpy.subtract(shifted_mm2_energy_list,shifted_qm_energy_list),shifted_qm_energy_list),c))))
             result=fmin(RMSD,.5)
             minRMSD=RMSD(result[0])
         # output the profiles as plots
@@ -1252,12 +1237,8 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         dim=len(mang_list[0])
         datapts=len(mm_energy_list)
         numprms=None 
-        if clskey in clskeyswithbadfits:
-            RMSD=minRMSDW
-        else:
-            RMSD=minRMSD
-        print('Torset',torset,'RMSD(MM2,QM)',RMSD)
-        poltype.WriteToLog('Torset'+str(torset)+' RMSD(MM2,QM) '+str(RMSD))
+        print('Torset',torset,'RMSD(MM2,QM)',minRMSD)
+        poltype.WriteToLog('Torset'+str(torset)+' RMSD(MM2,QM) '+str(minRMSD))
         if dim==1: 
             fig = plt.figure(figsize=(10,10))
             ax = fig.add_subplot(111)
@@ -1283,7 +1264,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             y_smooth=f(x_new)
             ax.plot(x_new,y_smooth,color='blue')
 
-            ax.text(0.05, 1.1, 'RMSD(MM2,QM)=%s'%(round(RMSD,2)), transform=ax.transAxes, fontsize=12,verticalalignment='top')
+            ax.text(0.05, 1.1, 'RMSD(MM2,QM)=%s'%(round(minRMSD,2)), transform=ax.transAxes, fontsize=12,verticalalignment='top')
 
             # mm + fit
             line4, =ax.plot(mang_list,ff_list,'mo',color='magenta',label='MM1+Fit')
@@ -1306,12 +1287,6 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             ax2.set_ylabel("WBO",color="blue",fontsize=14)
             ax.set_xlabel('Dihedral Angle')
             ax.set_ylabel('SP Energy (kcal/mol)')
-            #if clskey in clskeyswithbadfits:
-            #    line6, =ax.plot(qang_list,weighted_qm_energy_list,'black',label='Weighted_QM')
-            #    plt.legend(handles=[line1,line2,line3,line4,line5,line6],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=6)
-
-            #else:
-
             plt.legend(handles=[line1,line2,line3,line4,line5],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
 
             fig = plt.gcf()
@@ -1333,13 +1308,13 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         out.append(qm_energy_list)
         out.append(tordif_list)
         torgen.write_arr_to_file(poltype,txtfname,out)
-        if float(RMSD)>poltype.maxtorRMSPD:
-            poltype.WriteToLog('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(RMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
-            print('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(RMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
+        if float(minRMSD)>poltype.maxtorRMSPD:
+            poltype.WriteToLog('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
+            print('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
 
             clskeyswithbadfits.append(clskey)
             if poltype.suppresstorfiterr==False and count>0 and bypassrmsd==False:
-                raise ValueError('RMSPD of QM and MM torsion profile is high, tried fitting to minima and failed, RMSPD = '+str(RMSD))
+                raise ValueError('RMSPD of QM and MM torsion profile is high, tried fitting to minima and failed, RMSPD = '+str(minRMSD))
     return clskeyswithbadfits
                  
 
@@ -1428,13 +1403,17 @@ def process_rot_bond_tors(poltype,mol):
             break # dont redo fitting forever
         write_prm_dict,fitfunc_dict,torsettobypassrmsd = fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,clskeyswithbadfits)
         # write out new keyfile
+        print('did the fit')
         write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename)
         if count>0:
             rmstr='rm *post*post*'
             os.system(rmstr) # delete previous files for post fitting
         if len(poltype.torlist)!=0:
+            print('about to do post fit with new parameters')
             PostfitMinAlz(poltype,tmpkey2basename,'')
+
         # evaluate the new parameters
+        print('now evaluating new parameters')
         clskeyswithbadfits=eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename,count,clskeyswithbadfits,torsettobypassrmsd)
         if len(clskeyswithbadfits)==0:
             break
