@@ -382,7 +382,8 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename):
     clscount_dict = {}
     for torset in poltype.torlist:
         if torset not in poltype.nonaroringtorsets and len(torset)==2 and poltype.torfit1Drotonly==True and poltype.torfit2Drotonly==False:
-           continue
+            print('firstcontinue')
+            continue
         elif torset not in poltype.nonaroringtorsets and len(torset)==1 and poltype.torfit1Drotonly==True and poltype.torfit2Drotonly==False:
            pass
         elif torset not in poltype.nonaroringtorsets and len(torset)==2 and poltype.torfit1Drotonly==False and poltype.torfit2Drotonly==True:
@@ -390,6 +391,7 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename):
         elif poltype.torfit1Drotonly==False and poltype.torfit2Drotonly==False: 
             pass
         else:
+            print('in else',poltype.torfit1Drotonly,poltype.torfit2Drotonly)
             continue
         
 
@@ -407,6 +409,7 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename):
             cls_mm_engy_dict[tup] = [0]*len(flatphaselist)
             cls_qm_engy_dict[tup] = [0]*len(flatphaselist)
             cls_angle_dict[tup] = [0]*len(flatphaselist)
+        print('cls_angle_dict',cls_angle_dict)
 
         clscount_dict[tup] += 1
         mme_list = []  # MM Energy before fitting to QM torsion energy
@@ -771,6 +774,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         prmidx,initialprms = insert_torprmdict(poltype,mol, torprmdict)
         #poltype.WriteToLog('number of parameters to fit for '+clskey+' are '+str(prmidx))
         # get all the lists for the current clskey
+        print('tup',tup,'torset',torset)
         angle_list = cls_angle_dict[tup]  # Torsion angle for each corresponding energy
         mm_energy_list = cls_mm_engy_dict[tup]  # MM Energy before fitting to QM torsion energy
         qm_energy_list = cls_qm_engy_dict[tup]  # QM torsion energy
@@ -1404,7 +1408,8 @@ def process_rot_bond_tors(poltype,mol):
     # For each rotatable bond, get torsion energy profile from QM
     # and MM (with no rotatable bond torsion parameters)
     # Get QM and MM (pre-fit) energy profiles for torsion parameters
-    DecomposeTorsionTorsion(poltype,mol)
+    if poltype.tortor==True: 
+        DecomposeTorsionTorsion(poltype,mol)
     cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict = get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename)
     # if the fit has not been done already
     clskeyswithbadfits=[]
@@ -1427,7 +1432,7 @@ def process_rot_bond_tors(poltype,mol):
             break
         count+=1
    
-    if poltype.torfit1Drotonly==True:
+    if poltype.torfit1Drotonly==True and poltype.tortor==True:
         poltype.torfit1Drotonly=False
         poltype.torfit2Drotonly=True 
         cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict = get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename)
