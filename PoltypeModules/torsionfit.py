@@ -1211,16 +1211,27 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         # TBC
         #print('mm_energy_list',mm_energy_list)
         #print('fitfunc_dict[clskey]',fitfunc_dict[clskey])
-
+        weights=numpy.exp(-numpy.array(qm_energy_list)/8)
+        weights = [float(i)/sum(weights) for i in weights] 
         ff_list = [aa+bb for (aa,bb) in zip(mm_energy_list,fitfunc_dict[clskey])]
         shifted_mm2_energy_list=numpy.add(1,mm2_energy_list)
         shifted_qm_energy_list=numpy.add(1,qm_energy_list)
-        if len(ff_list)==len(mm2_energy_list):
+        final_tor_energy_list=numpy.subtract(mm2_energy_list,qm_energy_list)
+        final_relative_tor_energy_list=numpy.subtract(shifted_mm2_energy_list,shifted_qm_energy_list)
+        if clskey in clskeyswithbadfits:
+            final_tor_energy_list=numpy.multiply(final_tor_energy_list,weights)
+            final_relative_tor_energy_list=numpy.multiply(final_relative_tor_energy_list,weights)
 
+        if len(ff_list)==len(mm2_energy_list):
             def RMSD(c):
-                return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.divide(numpy.subtract(shifted_mm2_energy_list,shifted_qm_energy_list),shifted_qm_energy_list),c))))
+                return numpy.sqrt(numpy.mean(numpy.square(numpy.add(final_tor_energy_list,c))))
             result=fmin(RMSD,.5)
             minRMSD=RMSD(result[0])
+
+            def RMSDRel(c):
+                return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.divide(final_relative_tor_energy_list,shifted_qm_energy_list),c))))
+            resultRel=fmin(RMSDRel,.5)
+            minRMSDRel=RMSDRel(resultRel[0])
         # output the profiles as plots
 
         figfname = "%s-energy-" % (poltype.molecprefix)
@@ -1237,6 +1248,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         dim=len(mang_list[0])
         datapts=len(mm_energy_list)
         numprms=None 
+        
         print('Torset',torset,'RMSD(MM2,QM)',minRMSD)
         poltype.WriteToLog('Torset'+str(torset)+' RMSD(MM2,QM) '+str(minRMSD))
         if dim==1: 
@@ -1264,7 +1276,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             y_smooth=f(x_new)
             ax.plot(x_new,y_smooth,color='blue')
 
-            ax.text(0.05, 1.1, 'RMSD(MM2,QM)=%s'%(round(minRMSD,2)), transform=ax.transAxes, fontsize=12,verticalalignment='top')
+            ax.text(0.05, 1.1, 'RMSD(MM2,QM)=%s , RMSDRel(MM2,QM)=%s'%(round(minRMSD,2),round(minRMSDRel,2)), transform=ax.transAxes, fontsize=12,verticalalignment='top')
 
             # mm + fit
             line4, =ax.plot(mang_list,ff_list,'mo',color='magenta',label='MM1+Fit')
@@ -1308,13 +1320,13 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         out.append(qm_energy_list)
         out.append(tordif_list)
         torgen.write_arr_to_file(poltype,txtfname,out)
-        if float(minRMSD)>poltype.maxtorRMSPD:
-            poltype.WriteToLog('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
+        if float(minRMSD)>poltype.maxtorRMSPD and float(minRMSDRel)>poltype.maxtorRMSPDRel:
+            poltype.WriteToLog('Absolute or Relative RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol '+'RMSPDRel ='+str(minRMSDRel)+' tolerance is '+str(poltype.maxtorRMSPDRel))
             print('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
 
             clskeyswithbadfits.append(clskey)
             if poltype.suppresstorfiterr==False and count>0 and bypassrmsd==False:
-                raise ValueError('RMSPD of QM and MM torsion profile is high, tried fitting to minima and failed, RMSPD = '+str(minRMSD))
+                raise ValueError('RMSPD of QM and MM torsion profile is high, tried fitting to minima and failed, RMSPD = '+str(minRMSD)+','+str(minRMSDRel))
     return clskeyswithbadfits
                  
 
@@ -1403,17 +1415,13 @@ def process_rot_bond_tors(poltype,mol):
             break # dont redo fitting forever
         write_prm_dict,fitfunc_dict,torsettobypassrmsd = fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,clskeyswithbadfits)
         # write out new keyfile
-        print('did the fit')
         write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename)
-        if count>0:
-            rmstr='rm *post*post*'
-            os.system(rmstr) # delete previous files for post fitting
+
+        RemoveFiles(poltype,'post',2)  
         if len(poltype.torlist)!=0:
-            print('about to do post fit with new parameters')
             PostfitMinAlz(poltype,tmpkey2basename,'')
 
         # evaluate the new parameters
-        print('now evaluating new parameters')
         clskeyswithbadfits=eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename,count,clskeyswithbadfits,torsettobypassrmsd)
         if len(clskeyswithbadfits)==0:
             break
@@ -1428,11 +1436,19 @@ def process_rot_bond_tors(poltype,mol):
     shutil.copy(tmpkey2basename,'../' + poltype.key5fname)
     os.chdir('..')
 
+def RemoveFiles(poltype,string,occurance):
+    files=os.listdir()
+    for f in files:
+        count = f.count(string)  
+        if count==occurance:
+            os.remove(f)
+
+
 def PostfitMinAlz(poltype,keybasename,keybasepath):
     for outputlog in poltype.optoutputtotorsioninfo.keys():
         term,error=poltype.CheckNormalTermination(outputlog)
         [torset,optmol,variabletorlist,phaseangles,cartxyzname,bondtopology]=poltype.optoutputtotorsioninfo[outputlog]
-        if term==True:    
+        if term==True:   
             if not poltype.use_gaus:
                 cartxyz,torxyzfname=torgen.tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,cartxyzname,poltype.torsionrestraint,'_postQMOPTpostfit',keybasename,keybasepath,bondtopology)
             else:
