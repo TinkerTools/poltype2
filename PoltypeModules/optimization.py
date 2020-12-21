@@ -332,9 +332,8 @@ def StructureMinimization(poltype):
     cmd='cp ' + poltype.key5fname + ' ' + poltype.tmpkeyfile
     poltype.call_subsystem(cmd)
 
-    if poltype.numatom != 1:
-        cmd = poltype.minimizeexe+' -k '+poltype.tmpkeyfile+' '+poltype.tmpxyzfile+' 0.1 > Minimized_final.out'
-        poltype.call_subsystem(cmd, True)
+    cmd = poltype.minimizeexe+' -k '+poltype.tmpkeyfile+' '+poltype.tmpxyzfile+' 0.1 > Minimized_final.out'
+    poltype.call_subsystem(cmd, True)
 
 
 def GeometryOptimization(poltype,mol):
