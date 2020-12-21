@@ -322,16 +322,19 @@ def CheckRMSD(poltype):
                 raise ValueError(os.getcwd()+' '+'RMSD of QM and MM optimized structures is high, RMSD = '+str(RMSD))
 
 def StructureMinimization(poltype):
-     poltype.WriteToLog("")
-     poltype.WriteToLog("=========================================================")
-     poltype.WriteToLog("Minimizing structure\n")
-    
-     cmd='cp ' + poltype.xyzoutfile + ' ' + poltype.tmpxyzfile
-     poltype.call_subsystem(cmd)
-     cmd='cp ' + poltype.key5fname + ' ' + poltype.tmpkeyfile
-     poltype.call_subsystem(cmd)
-     cmd = poltype.minimizeexe+' -k '+poltype.tmpkeyfile+' '+poltype.tmpxyzfile+' 0.1 > Minimizedttt.out'
-     poltype.call_subsystem(cmd,True)
+    poltype.WriteToLog("")
+    poltype.WriteToLog("=========================================================")
+    poltype.WriteToLog("Minimizing structure\n")
+
+    cmd='cp ' + poltype.xyzoutfile + ' ' + poltype.tmpxyzfile
+    poltype.call_subsystem(cmd)
+
+    cmd='cp ' + poltype.key5fname + ' ' + poltype.tmpkeyfile
+    poltype.call_subsystem(cmd)
+
+    if poltype.numatom != 1:
+        cmd = poltype.minimizeexe+' -k '+poltype.tmpkeyfile+' '+poltype.tmpxyzfile+' 0.1 > Minimized_final.out'
+        poltype.call_subsystem(cmd, True)
 
 
 def GeometryOptimization(poltype,mol):

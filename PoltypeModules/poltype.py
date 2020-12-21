@@ -1310,9 +1310,8 @@ class PolarizableTyper():
         self.WriteOutLiteratureReferences(self.key5fname) 
         # A series of tests are done so you one can see whether or not the parameterization values
         # found are acceptable and to what degree
-        if self.atomnum!=1: 
-
-            opt.StructureMinimization(self)
+        opt.StructureMinimization(self)
+        if self.atomnum != 1:
             opt.gen_superposeinfile(self)
             opt.CheckRMSD(self)
         if self.torsppcm:
