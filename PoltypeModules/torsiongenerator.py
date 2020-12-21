@@ -734,14 +734,20 @@ def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndli
             obac = mol.GetAtom(c2)
             obad = mol.GetAtom(d2)
             tpdkey = get_class_key(poltype,a2, b2, c2, d2)
+            aatomicnum=obaa.GetAtomicNum()
+            datomicnum=obad.GetAtomicNum()
+            babelindices=[a2,b2,c2,d2]
+            allhydtor=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
+            if allhydtor==False and (aatomicnum==1 or datomicnum==1):
+                continue
             if tpdkey not in torsionlist:
                 torsionlist.append(tpdkey)
         torset=tuple([maintor])
         if poltype.fitfirsttorsionfoldphase==True:
-            prmnum=len(poltype.nfoldlist)*1+1+1
+            prmnum=len(poltype.nfoldlist)*len(torsionlist)+1+1
 
         else:
-            prmnum=len(poltype.nfoldlist)*1+1
+            prmnum=len(poltype.nfoldlist)*len(torsionlist)+1
         poltype.torsionsettonumptsneeded[torset]=prmnum
 
         if poltype.tordatapointsnum==None:

@@ -71,7 +71,10 @@ def fitfunc (poltype,parms, x,torset, torprmdict, debug = False):
             tor=torset[i]
             a,b,c,d=tor[0:4]
             clskey = torgen.get_class_key(poltype,a,b,c,d)
+            if clskey not in torprmdict.keys(): # then it was removed from fitting
+                continue
             torprm=torprmdict[clskey]
+            print('adding key to fitting error function',clskey,torprm)
             # for each torsion about the same rotatable bond (clskey)
             for nfold in torprm['prmdict']:
                 # for each nfold for this torsion (# of parameters)
@@ -809,13 +812,20 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
         # Remove parameters while # of parameters > # data points
         toralreadyremovedlist=[]
+        print('torprmdict ',torprmdict)
+        print('tup ',tup)
+        print('torset ',torset)
+        print('prmidx',prmidx)
+        print('mm_energy_list',mm_energy_list)
         while prmidx > len(mm_energy_list):
             
             dellist= []
             least_conn_tor = find_least_connected_torsion(poltype,torprmdict,toralreadyremovedlist)
             for nfold in torprmdict[least_conn_tor]['prmdict']:
                 dellist.append((least_conn_tor,nfold))
+            print('about to delete keys')
             initialprms,torprmdict = del_tor_from_fit(poltype,dellist,torprmdict,initialprms)
+            print('torprmfict after',torprmdict)
             prmidx=len(initialprms)
             if len(dellist)>1:
                 poltype.WriteToLog('torsion cosine terms that are being removed due to having too many parameters to fit '+str(dellist))
@@ -862,6 +872,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             #p1,covx,idict,msg,ier = optimize.leastsq(errfunc, pzero, args=(rads(numpy.array(angle_list)),torprmdict, tor_energy_list), full_output = True)
             array=optimize.least_squares(errfunc, pzero,jac='2-point', bounds=boundstup, args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
             p1=array['x']
+            print('p1',p1)
             # Remove parameters found by least.sq that aren't reasonable; 
             # remove parameters found that are greater than max_amp
             if refine==False:
@@ -954,6 +965,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
                     torprmdict[chkclskey]['offset'] = p1[-1]
                 else:
                     torprmdict[chkclskey]['offset'] = p1
+        print('write_prm_dict',write_prm_dict)
+
         torsettobypassrmsd[torset]=bypassrmsd
         dim=len(cls_angle_dict[tup][0])
         figfname = '%s-fit-' % (poltype.molecprefix)
