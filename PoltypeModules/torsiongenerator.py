@@ -259,7 +259,7 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
     return tinkerstructnamelist
 
 
-def CheckTargetDihedralAngle(poltype,optmol,torset,phaseangles,prevstruct):
+def CheckTargetDihedralAngle(poltype,optmol,torset,phaseangles,prevstruct,filename):
     for i in range(len(phaseangles)):
         phaseangle=phaseangles[i]
         tor=tuple(torset[i])
@@ -276,7 +276,7 @@ def CheckTargetDihedralAngle(poltype,optmol,torset,phaseangles,prevstruct):
             diff= numpy.abs(currentdihedral-dihedral)
             tol=1.1
             if diff>tol and diff!=360:
-                raise ValueError('Difference of '+str(diff)+' is greater than '+str(tol)+' for target dihedral of '+str(dihedral)+' and current dihedral of '+str(currentdihedral)+' '+os.getcwd())
+                raise ValueError('Difference of '+str(diff)+' is greater than '+str(tol)+' for target dihedral of '+str(dihedral)+' and current dihedral of '+str(currentdihedral)+' '+filename+' '+os.getcwd())
 
 
 def tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,prevstrctfname,torsionrestraint,designatexyz,keybase,keybasepath,bondtopology):
@@ -284,7 +284,7 @@ def tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phas
     prevstruct = opt.load_structfile(poltype,prevstrctfname) 
     prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
     prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology)
-    CheckTargetDihedralAngle(poltype,optmol,torset,phaseangles,prevstruct)
+    CheckTargetDihedralAngle(poltype,optmol,torset,phaseangles,prevstruct,prevstrctfname)
     torxyzfname,tmpkeyfname,torminlogfname=tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseangles,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath)
     cartxyz,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseangles,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath,torxyzfname,tmpkeyfname,torminlogfname)
     toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
@@ -1029,7 +1029,6 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
         for atm in iteratom:
             tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), atm.x(),atm.y(),atm.z()))
     
-    tmpfh.write('\n')
     if ('I ' in poltype.mol.GetSpacedFormula()):
         formulalist=poltype.mol.GetSpacedFormula().lstrip().rstrip().split()
         temp=open(poltype.basissetpath+basissetfile,'r')
@@ -1055,16 +1054,11 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
                 tmpfh.write(line)
 
     if 'opt' not in comfname and poltype.dontfrag==False: 
-        tmpfh.write('\n')
         tmpfh.write('$nbo bndidx $end'+'\n')
         tmpfh.write('\n')
-    else:
-        tmpfh.write('\n')
-        tmpfh.write('\n')
 
 
 
-    tmpfh.close()
     tmpfh.close()
 
 
