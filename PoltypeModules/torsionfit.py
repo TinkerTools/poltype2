@@ -74,7 +74,6 @@ def fitfunc (poltype,parms, x,torset, torprmdict, debug = False):
             if clskey not in torprmdict.keys(): # then it was removed from fitting
                 continue
             torprm=torprmdict[clskey]
-            print('adding key to fitting error function',clskey,torprm)
             # for each torsion about the same rotatable bond (clskey)
             for nfold in torprm['prmdict']:
                 # for each nfold for this torsion (# of parameters)
@@ -281,20 +280,21 @@ def del_tor_from_fit(poltype,dellist, torprmdict,initialprms):
    
                 for fold,index in torprmdict[clskey]['prmdict'].items():
                     indicestodelete.append(index)
-    
-    minidx=min(indicestodelete)
+    maxidx=max(indicestodelete)
     newinitialprms=[]
     for i in range(len(initialprms)):
         value=initialprms[i]
         if i not in indicestodelete:
             newinitialprms.append(value)
-    newinitialprms.append(0) # vertical shift
 
     del torprmdict[key]
     for clskey in torprmdict.keys():
         for fold,index in torprmdict[clskey]['prmdict'].items():
-            if index>minidx:
-                torprmdict[clskey]['prmdict'][fold]-=minidx
+          
+            if index>maxidx:
+                oldindex=torprmdict[clskey]['prmdict'][fold]
+                newindex=oldindex-maxidx-1
+                torprmdict[clskey]['prmdict'][fold]=newindex
   
         
     return newinitialprms,torprmdict
@@ -385,7 +385,6 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename):
     clscount_dict = {}
     for torset in poltype.torlist:
         if torset not in poltype.nonaroringtorsets and len(torset)==2 and poltype.torfit1Drotonly==True and poltype.torfit2Drotonly==False:
-            print('firstcontinue')
             continue
         elif torset not in poltype.nonaroringtorsets and len(torset)==1 and poltype.torfit1Drotonly==True and poltype.torfit2Drotonly==False:
            pass
@@ -394,7 +393,6 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename):
         elif poltype.torfit1Drotonly==False and poltype.torfit2Drotonly==False: 
             pass
         else:
-            print('in else',poltype.torfit1Drotonly,poltype.torfit2Drotonly)
             continue
         
 
@@ -412,7 +410,6 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename):
             cls_mm_engy_dict[tup] = [0]*len(flatphaselist)
             cls_qm_engy_dict[tup] = [0]*len(flatphaselist)
             cls_angle_dict[tup] = [0]*len(flatphaselist)
-        print('cls_angle_dict',cls_angle_dict)
 
         clscount_dict[tup] += 1
         mme_list = []  # MM Energy before fitting to QM torsion energy
@@ -560,7 +557,7 @@ def insert_torprmdict(poltype,mol, torprmdict):
     """
     initialprms=[]
     tmpx = numpy.arange ( 0.0, 360.0, 10)
-    prmidx = 0
+    prmidx = -1
     # for each cls key
     for (chkclskey, torprm) in torprmdict.items():
         # for each parameter in the energy equation for this torsion
@@ -594,8 +591,8 @@ def insert_torprmdict(poltype,mol, torprmdict):
 
                 # will come here first
                 elif max(test_tor_energy) > 1e-10:
-                    torprm['prmdict'][nfold] = prmidx
                     prmidx += 1
+                    torprm['prmdict'][nfold] = prmidx
                     if chkclskey in poltype.classkeytoinitialprmguess.keys():
                         prms=poltype.classkeytoinitialprmguess[chkclskey]
                         initialprms.append(prms[nfold-1])
@@ -777,7 +774,6 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         prmidx,initialprms = insert_torprmdict(poltype,mol, torprmdict)
         #poltype.WriteToLog('number of parameters to fit for '+clskey+' are '+str(prmidx))
         # get all the lists for the current clskey
-        print('tup',tup,'torset',torset)
         angle_list = cls_angle_dict[tup]  # Torsion angle for each corresponding energy
         mm_energy_list = cls_mm_engy_dict[tup]  # MM Energy before fitting to QM torsion energy
         qm_energy_list = cls_qm_engy_dict[tup]  # QM torsion energy
@@ -812,20 +808,13 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
         # Remove parameters while # of parameters > # data points
         toralreadyremovedlist=[]
-        print('torprmdict ',torprmdict)
-        print('tup ',tup)
-        print('torset ',torset)
-        print('prmidx',prmidx)
-        print('mm_energy_list',mm_energy_list)
         while prmidx > len(mm_energy_list):
             
             dellist= []
             least_conn_tor = find_least_connected_torsion(poltype,torprmdict,toralreadyremovedlist)
             for nfold in torprmdict[least_conn_tor]['prmdict']:
                 dellist.append((least_conn_tor,nfold))
-            print('about to delete keys')
             initialprms,torprmdict = del_tor_from_fit(poltype,dellist,torprmdict,initialprms)
-            print('torprmfict after',torprmdict)
             prmidx=len(initialprms)
             if len(dellist)>1:
                 poltype.WriteToLog('torsion cosine terms that are being removed due to having too many parameters to fit '+str(dellist))
@@ -872,7 +861,6 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             #p1,covx,idict,msg,ier = optimize.leastsq(errfunc, pzero, args=(rads(numpy.array(angle_list)),torprmdict, tor_energy_list), full_output = True)
             array=optimize.least_squares(errfunc, pzero,jac='2-point', bounds=boundstup, args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
             p1=array['x']
-            print('p1',p1)
             # Remove parameters found by least.sq that aren't reasonable; 
             # remove parameters found that are greater than max_amp
             if refine==False:
@@ -965,7 +953,6 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
                     torprmdict[chkclskey]['offset'] = p1[-1]
                 else:
                     torprmdict[chkclskey]['offset'] = p1
-        print('write_prm_dict',write_prm_dict)
 
         torsettobypassrmsd[torset]=bypassrmsd
         dim=len(cls_angle_dict[tup][0])

@@ -22,6 +22,18 @@ def __init__(poltype):
     PolarizableTyper.__init__(poltype)
 
 
+def CheckGeometricRestraintEnergy(poltype,alzfile):
+    temp=open(alzfile,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        if 'Geometric Restraints' in line:
+            linesplit=line.split()
+            energy=float(linesplit[2])
+            if energy>1: # 1 kcal/mol
+                raise ValueError('Geometric restraint energy is greater than 1 kcal/mol '+alzfile)
+
+
 def DefaultMaxRange(poltype,torsions):
     poltype.rotbndtomaxrange={}
     for torsionset in torsions:
@@ -247,7 +259,7 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
     return tinkerstructnamelist
 
 
-def tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,prevstrctfname,torsionrestraint,designatexyz,keybase,keybasepath,bondtopology):
+def CheckTargetDihedralAngle(poltype,optmol,torset,phaseangles,prevstruct):
     for i in range(len(phaseangles)):
         phaseangle=phaseangles[i]
         tor=tuple(torset[i])
@@ -256,19 +268,23 @@ def tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phas
             nonaroringtor=True
         else:
             nonaroringtor=False
-        if 'post' not in designatexyz and nonaroringtor==False:    
+        if nonaroringtor==False:    
             dihedral = optmol.GetTorsion(a,b,c,d)
             dihedral=round((dihedral+phaseangle)%360)
             currentdihedral=prevstruct.GetTorsion(a,b,c,d)
             currentdihedral=round((currentdihedral)%360)
             diff= numpy.abs(currentdihedral-dihedral)
-            tol=.01
+            tol=1.1
             if diff>tol and diff!=360:
                 raise ValueError('Difference of '+str(diff)+' is greater than '+str(tol)+' for target dihedral of '+str(dihedral)+' and current dihedral of '+str(currentdihedral)+' '+os.getcwd())
 
-    prevstruct = opt.load_structfile(poltype,prevstrctfname) # this should be a logfile
+
+def tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,prevstrctfname,torsionrestraint,designatexyz,keybase,keybasepath,bondtopology):
+    
+    prevstruct = opt.load_structfile(poltype,prevstrctfname) 
     prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
     prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology)
+    CheckTargetDihedralAngle(poltype,optmol,torset,phaseangles,prevstruct)
     torxyzfname,tmpkeyfname,torminlogfname=tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseangles,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath)
     cartxyz,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseangles,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath,torxyzfname,tmpkeyfname,torminlogfname)
     toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
@@ -276,6 +292,7 @@ def tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phas
     if term==False:
         tinker_analyze(poltype,newtorxyzfname,keyfname,toralzfname)
 
+    CheckGeometricRestraintEnergy(poltype,toralzfname)
     return cartxyz,newtorxyzfname
 
 def AnalyzeTerm(poltype,filename):
@@ -959,7 +976,7 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
     """
     opt.write_com_header(poltype,comfname,os.path.splitext(comfname)[0] + ".chk",maxdisk,maxmem,numproc)
     tmpfh = open(comfname, "a")
-    optimizeoptlist = ["maxcycle=%s"%(poltype.optmaxcycle),'Loose']
+    optimizeoptlist = ["ModRedundant","maxcycle=%s"%(poltype.optmaxcycle),'Loose']
 
     optstr=opt.gen_opt_str(poltype,optimizeoptlist)
 
@@ -1048,11 +1065,12 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
 
 
     tmpfh.close()
-
-
-
-
     tmpfh.close()
+
+
+
+
+
 
 def save_structfile(poltype,molstruct, structfname):
     """
@@ -1354,6 +1372,7 @@ def TinkerTorsionTorsionInitialScan(poltype,torset,optmol,bondtopology):
         if term==False:
             tinker_analyze(poltype,newtorxyzfname,keyfname,toralzfname)
             term=AnalyzeTerm(poltype,toralzfname)
+            CheckGeometricRestraintEnergy(poltype,toralzfname)
         if term==False:
             failedgridpoints.append(phaseangles)
         else:
