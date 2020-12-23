@@ -563,8 +563,8 @@ def insert_torprmdict(poltype,mol, torprmdict):
         # for each parameter in the energy equation for this torsion
         # nfoldlist = [1,2,3]
         if poltype.fitfirsttorsionfoldphase==True:
-            torprm['firstphaseprmindex']=prmidx
             prmidx+=1
+            torprm['firstphaseprmindex']=prmidx
             initialprms.append(0)
         for nfold in poltype.nfoldlist:
             # init array
