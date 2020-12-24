@@ -47,7 +47,6 @@ def AssignTotalCharge(poltype,molecule,babelmolecule):
                 chg=1
         totchg+=chg
         atom.SetFormalCharge(chg)
-
     return molecule
 
 
@@ -611,7 +610,6 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
 
         listofjobs,jobtooutputlog,newlog=FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog)
     os.chdir(parentdir)
-
     finishedjobs,errorjobs=SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog)
     return equivalentrotbndindexarrays,rotbndindextoringtor
 

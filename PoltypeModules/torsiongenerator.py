@@ -164,8 +164,11 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     for i in range(len(torset)):
         tor=torset[i]
         a,b,c,d=tor[:]
-        if ' '.join([str(b),str(c)]) in poltype.rotbndlist.keys(): 
-            for resttors in poltype.rotbndlist[' '.join([str(b),str(c)])]:
+        babelindices=[b,c]
+        string=' '.join([str(b),str(c)])
+        if string in poltype.rotbndlist.keys(): 
+            tors=poltype.rotbndlist[string]
+            for resttors in tors:
                 rta,rtb,rtc,rtd = resttors
                 rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
                 if resttors not in variabletorlist and resttors not in restlist:
