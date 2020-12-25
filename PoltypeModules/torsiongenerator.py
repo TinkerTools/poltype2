@@ -499,6 +499,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol)
         poltype.torsettophaselist[tuple(torset)]=flatphaselist
         torsettooptoutputlogs[tuple(torset)]=outputlogs
+
         lognames=[]
         for job in listofjobs:
             log=jobtooutputlog[job]
@@ -523,6 +524,11 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
 
         if finished==True and outputlog not in finishedjobs:
             finishedjobs.append(outputlog)
+
+
+
+
+
     fulltorxyznames=[]
     fullfinishedoutputlogsSP=[]
     fullcartxyznames=[]

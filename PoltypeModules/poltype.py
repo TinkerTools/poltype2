@@ -888,31 +888,36 @@ class PolarizableTyper():
                     if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line or "LBFGS  --  Normal Termination due to SmallGrad" in line or "Normal termination" in line:
                         term=True
                     if ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line and 'except' not in line:
-                        if self.CycleCount(logfname)>=self.optmaxcycle:
+                        error=True
+                    if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line:
+                        error=False
+                        continue
+                    if ('Error termination request processed by link 9999' in line or 'Error termination via Lnk1e in' in line) or ('OptimizationConvergenceError' in line) and 'opt' in logfname:
+                        if self.CycleCount(logfname)>=poltype.optmaxcycle:
                             term=True
                             error=False
-                        else:
-                            error=True
-                error=False
-                if error==True:
-                    message='Error '+line+ 'logpath='+logfname
-                #if error==False and term==False and htime>=updatetime:
-                #    error=True
-                #    message='Error '+'Job died and has not been updated in '+str(updatetime)+' hours'+' last update time = '+str(htime)+' hours'+' logname='+logfname
-                if error==True and term==False:
-                    if errormessages!=None:
-                        if message not in errormessages:
-                            self.WriteToLog(message) 
-                            errormessages.append(message)
-                    else:
+
+            if error==True:
+                message='Error '+line+ 'logpath='+logfname
+   
+            if error==False and term==False and htime>=updatetime:
+                error=True
+                message='Error '+'Job died and has not been updated in '+str(updatetime)+' hours'+' last update time = '+str(htime)+' hours'+' logname='+logfname
+            if error==True and term==False:
+                if errormessages!=None:
+                    if message not in errormessages:
                         self.WriteToLog(message) 
+                        errormessages.append(message)
+                else:
+                    self.WriteToLog(message) 
 
 
         if errormessages!=None:
             return term,error,errormessages
         else:
-            return term,error
-       
+            return term,error        
+
+
     
         
     def NormalTerm(self,logfname):
@@ -930,9 +935,10 @@ class PolarizableTyper():
         p = subprocess.Popen(cmdstr, shell=True,stdout=self.logfh, stderr=self.logfh)
         if wait==True:
             p.wait()
-            if p.returncode != 0 and skiperrors==False:
-                self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
-                raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
+            if skiperrors==False:
+                if p.returncode != 0:
+                    self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
+                    raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
 
     def WriteOutLiteratureReferences(self,keyfilename): # to use ParmEd on key file need Literature References delimited for parsing
         temp=open(keyfilename,'r')
