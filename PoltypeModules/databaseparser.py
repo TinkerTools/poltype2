@@ -609,14 +609,15 @@ def GenerateSMARTSListFromAtomList(poltype,listforprm,rdkitmol,mol,maxatomsize):
 
         if anyringatoms==True:
             ringsize=FindRingSize(poltype,mol,ringindices)
-            singlepathindices=GenerateAllPossibleSinglePathFragmentIndices(poltype,ls,rdkitmol,ringsize)
-            singlepathindices.sort(key=len)
-            lengthtosinglepathindices={}
-            for indices in singlepathindices:
-                lengthtosinglepathindices[len(indices)]=indices
-            singlepathindices=list(lengthtosinglepathindices.values()) 
+            if ringsize!=0:
+                singlepathindices=GenerateAllPossibleSinglePathFragmentIndices(poltype,ls,rdkitmol,ringsize)
+                singlepathindices.sort(key=len)
+                lengthtosinglepathindices={}
+                for indices in singlepathindices:
+                    lengthtosinglepathindices[len(indices)]=indices
+                singlepathindices=list(lengthtosinglepathindices.values()) 
 
-            atomindiceslist.extend(singlepathindices)
+                atomindiceslist.extend(singlepathindices)
         for subls in atomindiceslist:
             fragsmarts,smartsfortransfer=GenerateFragmentSMARTS(poltype,rdkitmol,mol,subls)
             fragsmarts=FilterSMARTS(poltype,fragsmarts)
@@ -638,7 +639,11 @@ def FindRingSize(poltype,mol,ringindices):
             isinringofsize=atom.IsInRingSize(i)
             if isinringofsize==True:
                 ringsizes.append(i)
-    maxringsize=max(ringsizes)
+    if len(ringsizes)!=0:
+        maxringsize=max(ringsizes)
+    else:
+        maxringsize=0
+
     return maxringsize
 
 

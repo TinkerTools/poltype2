@@ -1207,8 +1207,6 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         tordifmm_list = [e1+e2 for (e1,e2) in zip (tordif_list,mm_energy_list)]
         tordifmm_list = [en - min(tordifmm_list) for en in tordifmm_list]
         # TBC
-        #print('mm_energy_list',mm_energy_list)
-        #print('fitfunc_dict[clskey]',fitfunc_dict[clskey])
         weights=numpy.exp(-numpy.array(qm_energy_list)/8)
         weights = [float(i)/sum(weights) for i in weights] 
         ff_list = [aa+bb for (aa,bb) in zip(mm_energy_list,fitfunc_dict[clskey])]

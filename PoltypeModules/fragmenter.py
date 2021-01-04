@@ -474,6 +474,8 @@ def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog):
 
     return finishedjobs,errorjobs
 
+
+
 def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor):
     parentdir=dirname(abspath(os.getcwd()))
     listofjobs=[]
@@ -492,13 +494,14 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             if i==0:
                 equivalentrotbndindex=rotbndindex
                 equivalentparentindextofragindex=parentindextofragindex
-                
+            else:
+                parentindextofragindex=equivalentparentindextofragindex[rotbndindex]    
             
             MakeFileName(poltype,equivalentrotbndindex,'equivalentfragment.txt')
             rotbndindexes=rotbndindex.split('_')
             parentrotbndindexes=[int(i) for i in rotbndindexes]
             rotbndindexes=[int(i)-1 for i in parentrotbndindexes]
-            fragrotbndindexes=[equivalentparentindextofragindex[i]+1 for i in rotbndindexes]
+            fragrotbndindexes=[parentindextofragindex[i]+1 for i in rotbndindexes]
             for j in range(0,len(fragrotbndindexes),2):
                 fragrotbnd=str(fragrotbndindexes[j])+' '+str(fragrotbndindexes[j+1])
                 if fragrotbnd not in fragrotbnds:
