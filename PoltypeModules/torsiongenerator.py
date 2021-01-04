@@ -61,14 +61,14 @@ def RemoveCommentsFromKeyFile(poltype,keyfilename):
         
     shutil.move(tempname, keyfilename)
 
-def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,variabletorlist,torsionrestraint,mol):
+def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,variabletorlist,torsionrestraint,mol,currentopt):
     jobtooutputlog={}
     listofjobs=[]
     outputlogs=[]
     for i in range(len(listofstructurestorunQM)):
         torxyzfname=listofstructurestorunQM[i]
         phaseangles=phaselist[i]
-        inputname,outputlog,cmdstr,scratchdir=GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist,mol)
+        inputname,outputlog,cmdstr,scratchdir=GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist,mol,currentopt)
         finished,error=poltype.CheckNormalTermination(outputlog)
         if finished==True and 'opt' in outputlog:
             opt.GrabFinalXYZStructure(poltype,outputlog,outputlog.replace('.log','.xyz'))
@@ -150,9 +150,9 @@ def ExecuteSPJobs(poltype,torxyznames,cartxyznames,optoutputlogs,phaselist,optmo
 
 
 
-def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol):
+def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt):
 
-    prefix='%s-opt-' % (poltype.molecprefix)
+    prefix='%s-opt-%s_' % (poltype.molecprefix,currentopt)
     postfix='.com' 
     toroptcomfname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
     strctfname = os.path.splitext(toroptcomfname)[0] + '.log'
@@ -189,12 +189,12 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     return toroptcomfname,outputname
     
 
-def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist,mol):
+def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist,mol,currentopt):
     if  poltype.use_gaus==False and poltype.use_gausoptonly==False:
-        inputname,outputname=CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol)
+        inputname,outputname=CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt)
         cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+inputname+' '+outputname
     else:
-        inputname,outputname=CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol)
+        inputname,outputname=CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt)
         cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
         return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4
@@ -408,6 +408,57 @@ def GeneratePhaseLists(poltype,torset,optmol):
     currentanglelist=numpy.array(currentanglelist)
     return phaselists,currentanglelist
 
+
+def ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz):
+    temp=open('../'+poltype.xyzfname,'r')
+    results=temp.readlines()
+    temp.close() 
+    tinkerxyzstuff=[]
+    for lineidx in range(len(results)):
+        line=results[lineidx]
+        linesplit=line.split()
+        if lineidx==0:
+            totalatoms=linesplit[0]
+        if len(linesplit)>=6:
+            index=linesplit[0]
+            element=linesplit[1] 
+            tinkertype=linesplit[5]
+            if len(linesplit)>6:
+                connections=linesplit[6:] 
+            else:
+                connections=[]
+            tinkerxyzstuff.append([index,element,tinkertype,connections])
+    cartxyzstuff=[]
+    temp=open(cartxyz,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        linesplit=line.split()
+        if len(linesplit)==4:
+            x=linesplit[1]
+            y=linesplit[2]
+            z=linesplit[3]
+            cartxyzstuff.append([x,y,z]) 
+    temp=open(tinkerxyz,'w')
+    temp.write(totalatoms+'\n') 
+    for i in range(len(tinkerxyzstuff)):
+        tink=tinkerxyzstuff[i]
+        coords=cartxyzstuff[i]
+        index=tink[0]
+        element=tink[1]
+        tinkertype=tink[2]
+        connections=tink[3]
+        x=coords[0]
+        y=coords[1]
+        z=coords[2]
+        line=index+' '+element+' '+x+' '+y+' '+z+' '+tinkertype+' '
+        for item in connections:
+            line+=item+' '
+        line+='\n'
+        temp.write(line)
+    temp.close()
+
+
 def gen_torsion(poltype,optmol,torsionrestraint,mol):
     """
     Intent: For each rotatable bond, rotate the torsion about that bond about 
@@ -434,8 +485,13 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
 
     listofstructurestorunQM=[]
     fullrange=[]
-    fulloutputlogs=[]
-    fulllistofjobs=[]
+    optnumtotorsettofulloutputlogs={}
+    optnumtotorsettofulloutputlogs['1']={}
+    optnumtotorsettofulloutputlogs['2']={}
+    optnumtofulllistofjobs={}
+    optnumtofulllistofjobs['1']=[]
+    optnumtofulllistofjobs['2']=[]
+
     fulljobtolog={}
     fulljobtooutputlog={}
     poltype.torsettophaselist={}
@@ -444,6 +500,8 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     poltype.idealangletensor={}
     poltype.tensorphases={}
     for torset in poltype.torlist:
+        optnumtotorsettofulloutputlogs['1'][tuple(torset)]=[]
+        optnumtotorsettofulloutputlogs['2'][tuple(torset)]=[]
         variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
         phaselists,currentanglelist=GeneratePhaseLists(poltype,torset,optmol)
         flatphaselist=numpy.array(list(product(*phaselists)))
@@ -496,8 +554,13 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         prevstrctfname = minstrctfname
         listoftinkertorstructures=tinker_minimize_angles(poltype,torset,optmol,variabletorlist,flatphaselist,prevstrctfname,torsionrestraint,bondtopology)
         listofstructurestorunQM.extend(listoftinkertorstructures)
-        outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol)
         poltype.torsettophaselist[tuple(torset)]=flatphaselist
+
+
+        poltype.toroptmethod=poltype.firsttoroptmethod
+        poltype.toroptbasisset=poltype.firsttoroptbasisset
+        poltype.optmaxcycle=2
+        outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol,'1')
         torsettooptoutputlogs[tuple(torset)]=outputlogs
 
         lognames=[]
@@ -505,25 +568,68 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             log=jobtooutputlog[job]
             lognames.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir))+r'/'+poltype.logfname)
         jobtolog=dict(zip(listofjobs, lognames)) 
-        fulloutputlogs.extend(outputlogs)
-        fulllistofjobs.extend(listofjobs)
+        optnumtotorsettofulloutputlogs['1'][tuple(torset)].extend(outputlogs)
+        optnumtofulllistofjobs['1'].extend(listofjobs)
         fulljobtolog.update(jobtolog) 
         fulljobtooutputlog.update(jobtooutputlog)
 
-    jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMOptJobToLog'+'_'+poltype.molecprefix
+    jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMOptJobToLog'+'_1'+'_'+poltype.molecprefix
     if poltype.externalapi!=None:
-        if len(fulllistofjobs)!=0:
+        if len(optnumtofulllistofjobs['1'])!=0:
             call.CallExternalAPI(poltype,fulljobtolog,jobtologlistfilenameprefix,scratchdir)
         finishedjobs,errorjobs=poltype.WaitForTermination(fulljobtooutputlog)
     else:
         finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
-    for outputlog in fulloutputlogs:
-        finished,error=poltype.CheckNormalTermination(outputlog)
-        if finished==True and 'opt' in outputlog:
-            opt.GrabFinalXYZStructure(poltype,outputlog,outputlog.replace('.log','.xyz'))
+    
+    torsettofinshedtinkerxyzfiles={}
+    for torset in poltype.torlist:
+        torsettofinshedtinkerxyzfiles[tuple(torset)]=[]
+        for outputlog in optnumtotorsettofulloutputlogs['1'][tuple(torset)]:
+            finished,error=poltype.CheckNormalTermination(outputlog)
+            if finished==True and 'opt' in outputlog:
+                cartxyz=outputlog.replace('.log','.xyz')
+                opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz)
+                tinkerxyz=outputlog.replace('.log','_tinker.xyz')
+                ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz) 
+                torsettofinshedtinkerxyzfiles[tuple(torset)].append(tinkerxyz)
 
-        if finished==True and outputlog not in finishedjobs:
-            finishedjobs.append(outputlog)
+
+
+    poltype.toroptmethod=poltype.secondtoroptmethod
+    poltype.toroptbasisset=poltype.secondtoroptbasisset
+    for torset in poltype.torlist:
+        listoftinkerstructures=torsettofinshedtinkerxyzfiles[tuple(torset)]
+        flatphaselist=poltype.torsettophaselist[tuple(torset)]
+        variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
+        outputlogs,listofjobs,scratchdir,jobtooutputlog=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol,'2')
+        torsettooptoutputlogs[tuple(torset)]=outputlogs
+        lognames=[]
+        for job in listofjobs:
+            log=jobtooutputlog[job]
+            lognames.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir))+r'/'+poltype.logfname)
+        jobtolog=dict(zip(listofjobs, lognames)) 
+        optnumtotorsettofulloutputlogs['2'][tuple(torset)].extend(outputlogs)
+        optnumtofulllistofjobs['2'].extend(listofjobs)
+        fulljobtolog.update(jobtolog) 
+        fulljobtooutputlog.update(jobtooutputlog)
+
+    jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMOptJobToLog'+'_2'+'_'+poltype.molecprefix
+    if poltype.externalapi!=None:
+        if len(optnumtofulllistofjobs['2'])!=0:
+            call.CallExternalAPI(poltype,fulljobtolog,jobtologlistfilenameprefix,scratchdir)
+        finishedjobs,errorjobs=poltype.WaitForTermination(fulljobtooutputlog)
+    else:
+        finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
+
+    for torset in poltype.torlist:
+        for outputlog in optnumtotorsettofulloutputlogs['2'][tuple(torset)]:
+            finished,error=poltype.CheckNormalTermination(outputlog)
+            if finished==True and 'opt' in outputlog:
+                cartxyz=outputlog.replace('.log','.xyz')
+                opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz)
+
+            if finished==True and outputlog not in finishedjobs:
+                finishedjobs.append(outputlog)
 
 
 
@@ -631,7 +737,6 @@ def get_torlist(poltype,mol,missed_torsions):
         e. If it neither c nor d are true, then append this torsion to 'rotbndlist' for future torsion scanning
         f. Find other possible torsions around the bond t2-t3 and repeat steps c through e
     """
-
     torlist = []
     rotbndlist = {}
     iterbond = openbabel.OBMolBondIter(mol)
@@ -660,8 +765,9 @@ def get_torlist(poltype,mol,missed_torsions):
 
         if ((bond.IsRotor()) or [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist or (poltype.rotalltors and t2val>=2 and t3val>=2)):
             t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
-            # is the torsion in toromitlist
-            if(torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]]) in missed_torsions) and len(poltype.onlyrotbndslist)==0:
+            sortedtor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]])
+          
+            if(sortedtor in missed_torsions):
                 skiptorsion = False
             if [t2.GetIdx(),t3.GetIdx()] in poltype.fitrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.fitrotbndslist or [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist:
                 skiptorsion = False # override previous conditions if in list
@@ -843,9 +949,9 @@ def ConvertTinktoXYZ(poltype,filename):
     tempwrite.close()
     return filename.replace('.xyz_2','_xyzformat.xyz')
 
-def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol):
+def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt):
 
-    prefix='%s-opt-' % (poltype.molecprefix)
+    prefix='%s-opt-%s_' % (poltype.molecprefix,currentopt)
     postfix='.psi4'  
     inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
 

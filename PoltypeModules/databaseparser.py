@@ -1412,10 +1412,11 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         aidx,bidx,cidx,didx=torsionindices[:]
         babelindices=[i+1 for i in torsionindices]
         abidx,bbidx,cbidx,dbidx=babelindices[:]
-        #if len(poltype.onlyrotbndslist)!=0:
-        #    if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
-        #        torsionsmissing.append(torsionindices)
-        #        continue
+        if len(poltype.onlyrotbndslist)!=0:
+            if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
+                if torsionindices not in torsionsmissing:
+                    torsionsmissing.append(torsionindices)
+                    continue
         bond=mol.GetBond(bbidx,cbidx)
         bondorder=bond.GetBondOrder()
         if bondorder!=1: # then dont zero out
@@ -1449,15 +1450,18 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         if poltype.transferanyhydrogentor==True: 
             if atomicnumatoma==1 or atomicnumatomd==1:
                 if allhydrogentor==True:
-                    torsionsmissing.append(torsionindices)
+                    if torsionindices not in torsionsmissing:
+                        torsionsmissing.append(torsionindices)
                 else:
                     continue
         if '~' in smarts or '*' in smarts:
-            torsionsmissing.append(torsionindices)
+            if torsionindices not in torsionsmissing:
+                torsionsmissing.append(torsionindices)
             continue
 
         if check==False:
-            torsionsmissing.append(torsionindices)
+            if torsionindices not in torsionsmissing:
+                torsionsmissing.append(torsionindices)
     return torsionsmissing 
 
 
@@ -1883,7 +1887,8 @@ def ConvertToPoltypeClasses(poltype,torsionsmissing):
         newsublist=[i+1 for i in sublist]
         a,b,c,d=newsublist[:]
         sorttor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[a],poltype.idxtosymclass[b],poltype.idxtosymclass[c],poltype.idxtosymclass[d]])
-        newtorsionsmissing.append(sorttor)
+        if sorttor not in newtorsionsmissing:
+            newtorsionsmissing.append(sorttor)
     return newtorsionsmissing
 
 
