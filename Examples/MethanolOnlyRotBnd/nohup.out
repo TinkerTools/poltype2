@@ -11,83 +11,20 @@ Copyright (c)  Johnny Wu, Gaurav Chattree, Brandon Walker, Matthew Harger and Pe
 All Rights Reserved
 ##############################################################################################################
 
-Calling: analyze.x /home/bdw2292/finaltestpoltypeagain/water.xyz -k /home/bdw2292/finaltestpoltypeagain/water.key e> version.out
-no longer error methanol-opt.log
-no longer error methanol-opt.log
-no longer error methanol-opt.log
-no longer error methanol-opt.log
-poltype.torsionsettonumptsneeded {((3, 2, 1, 6),): 4}
-no longer error methanol-opt-2-1-092.log
-no longer error methanol-opt-2-1-092.log
-no longer error methanol-opt-2-1-122.log
-no longer error methanol-opt-2-1-122.log
-no longer error methanol-opt-2-1-152.log
-no longer error methanol-opt-2-1-152.log
-no longer error methanol-opt-2-1-182.log
-no longer error methanol-opt-2-1-182.log
-no longer error methanol-opt-2-1-212.log
-no longer error methanol-opt-2-1-212.log
-no longer error methanol-opt-2-1-242.log
-no longer error methanol-opt-2-1-242.log
-no longer error methanol-opt-2-1-272.log
-no longer error methanol-opt-2-1-272.log
-no longer error methanol-opt-2-1-302.log
-no longer error methanol-opt-2-1-302.log
-no longer error methanol-opt-2-1-332.log
-no longer error methanol-opt-2-1-332.log
-no longer error methanol-opt-2-1-002.log
-no longer error methanol-opt-2-1-002.log
-no longer error methanol-opt-2-1-032.log
-no longer error methanol-opt-2-1-032.log
-no longer error methanol-opt-2-1-092.log
-no longer error methanol-opt-2-1-092.log
-no longer error methanol-opt-2-1-122.log
-no longer error methanol-opt-2-1-122.log
-no longer error methanol-opt-2-1-152.log
-no longer error methanol-opt-2-1-152.log
-no longer error methanol-opt-2-1-182.log
-no longer error methanol-opt-2-1-182.log
-no longer error methanol-opt-2-1-212.log
-no longer error methanol-opt-2-1-212.log
-no longer error methanol-opt-2-1-242.log
-no longer error methanol-opt-2-1-242.log
-no longer error methanol-opt-2-1-272.log
-no longer error methanol-opt-2-1-272.log
-no longer error methanol-opt-2-1-302.log
-no longer error methanol-opt-2-1-302.log
-no longer error methanol-opt-2-1-332.log
-no longer error methanol-opt-2-1-332.log
-no longer error methanol-opt-2-1-002.log
-no longer error methanol-opt-2-1-002.log
-no longer error methanol-opt-2-1-032.log
-no longer error methanol-opt-2-1-032.log
-mm_energy_list before norm [0.5579, 0.4572, 0.4572, 0.5578, 0.4879, 0.4128, 0.5134, 0.6093, 0.5134, 0.4128, 0.4879]
-qm_energy_list before norm [-72608.76874388526, -72609.39086192714, -72609.39086203714, -72608.7687147694, -72609.12599238164, -72609.59856167986, -72609.12944893577, -72608.65160988968, -72609.12944225993, -72609.59855183805, -72609.12598741344]
-qm_energy_list after [0.8298177945980569, 0.20769975271832664, 0.20769964272039942, 0.8298469104629476, 0.47256929821742233, 0.0, 0.469112744089216, 0.9469517901743529, 0.46911941992584616, 9.841809514909983e-06, 0.4725742664159043]
-mm_energy_list after [0.14509999999999995, 0.044399999999999995, 0.044399999999999995, 0.14499999999999996, 0.0751, 0.0, 0.10059999999999997, 0.19649999999999995, 0.10059999999999997, 0.0, 0.0751]
-tor_energy_list before [0.6847177945980569, 0.16329975271832664, 0.16329964272039943, 0.6848469104629475, 0.39746929821742233, 0.0, 0.368512744089216, 0.750451790174353, 0.3685194199258462, 9.841809514909983e-06, 0.3974742664159043]
-useweights False
-tor_energy_list after [0.6847177945980569, 0.16329975271832664, 0.16329964272039943, 0.6848469104629475, 0.39746929821742233, 0.0, 0.368512744089216, 0.750451790174353, 0.3685194199258462, 9.841809514909983e-06, 0.3974742664159043]
+Calling: analyze.x /home/bdw2292/currentstable/VersionFiles/water.xyz -k /home/bdw2292/currentstable/VersionFiles/water.key e> version.out
+torsettofailedoutputlogtoinitialstructure {((3, 2, 1, 6),): {}}
+torsettofailedoutputlogtoinitialstructure {((3, 2, 1, 6),): {}}
 Optimization terminated successfully.
-         Current function value: 0.066033
+         Current function value: 0.078572
          Iterations: 16
          Function evaluations: 32
-count 0
+Torsions being fit 403 401 402 404 RMSD(QM-MM1) 0.07857197014500178
 Optimization terminated successfully.
-         Current function value: 0.000148
-         Iterations: 16
-         Function evaluations: 32
+         Current function value: 0.075504
+         Iterations: 15
+         Function evaluations: 30
 Optimization terminated successfully.
-         Current function value: 0.063929
-         Iterations: 16
-         Function evaluations: 32
-Traceback (most recent call last):
-  File "/home/bdw2292/finaltestpoltypeagain/PoltypeModules/poltype.py", line 1205, in <module>
-    params=poltype.main()
-  File "/home/bdw2292/finaltestpoltypeagain/PoltypeModules/poltype.py", line 919, in main
-    params= self.GenerateParameters()
-  File "/home/bdw2292/finaltestpoltypeagain/PoltypeModules/poltype.py", line 1177, in GenerateParameters
-    esp.CheckDipoleMoments(self,optmol)
-  File "/home/bdw2292/finaltestpoltypeagain/PoltypeModules/electrostaticpotential.py", line 423, in CheckDipoleMoments
-    raise ValueError('Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)+' '+os.getcwd()) 
-ValueError: Relative error of 0.22811197141155437 for QMDipole 1.679 and 2.062 for MMDipole is bigger than 0.1 /home/bdw2292/finaltestpoltypeagain/Examples/MethanolOnlyRotBnd
+         Current function value: 0.049261
+         Iterations: 15
+         Function evaluations: 30
+Torset ((3, 2, 1, 6),) RMSD(MM2,QM) 0.07550369692530104

@@ -1,30 +1,1084 @@
-Mon Oct  5 16:13:00 2020 Running on host: node35.bme.utexas.edu
-Mon Oct  5 16:13:00 2020 NEED QM Density Matrix: Executing Gaussian Opt and SP
-Mon Oct  5 16:13:00 2020 Calling: Psi4 Optimization
-Mon Oct  5 16:13:00 2020 Calling: Psi4 Gradient for DMA
-Mon Oct  5 16:13:00 2020 Calling: Generating CUBE File from PSI4
-Mon Oct  5 16:13:00 2020  Calling: sed -e '/\(.* none$\|^#\|^fix\|^potential-offset\)/d' methanol.key_3 > methanol.key_3_tmp path = /home/bdw2292/finaltestpoltypeagain/Examples/MethanolOnlyRotBnd
-Rotatable bond found about (3, 2, 1, 6)
-****************************************************************************************************
-Torsion parameters for torsion   403   401   402   404     0.0000 0.0 1     0.0000 180.0 2     0.2740 0.0 3 assigned from SMILES [#1][O][C][#1] from torsion atom indices 6,1,2,5 with smiles torsion indices 1,2,3,4
-Mon Oct  5 16:13:00 2020  Calling: cp ../methanol-opt.xyz methanol-opt-2-1-062-opt.xyz path = /home/bdw2292/finaltestpoltypeagain/Examples/MethanolOnlyRotBnd/qm-torsion
-Mon Oct  5 16:13:00 2020 All jobs have terminated 
-Mon Oct  5 16:13:01 2020 All jobs have terminated 
-Mon Oct  5 16:13:02 2020 
-Mon Oct  5 16:13:02 2020 =========================================================
-Mon Oct  5 16:13:02 2020 Minimizing structure
+Fri Jan  8 10:43:36 2021 Running on host: node37.bme.utexas.edu
+Fri Jan  8 10:43:36 2021 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Fri Jan  8 10:43:36 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt_1.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 10:43:47 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/methanol-opt_1.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 10:44:17 2021 All jobs have terminated 
+Fri Jan  8 10:44:17 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/methanol-opt_1.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 10:44:47 2021 All jobs have terminated 
+Fri Jan  8 10:44:47 2021  Calling: /opt/g09gh/gaussian/g09/formchk methanol-opt_1.chk path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+ Read checkpoint file methanol-opt_1.chk
+ Write formatted file methanol-opt_1.fchk
+Fri Jan  8 10:44:47 2021 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Fri Jan  8 10:44:47 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt_2.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+ Coordinates translated and rotated.
+ Coordinates match /B/ after translation and rotation.
+ Rotating derivatives, DoTrsp=T IDiff= 1 LEDeriv=    917 LFDPrp=       0 LDFDPr=       0.
+Fri Jan  8 10:44:51 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/methanol-opt_2.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 10:45:21 2021 All jobs have terminated 
+Fri Jan  8 10:45:21 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/methanol-opt_2.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 10:45:51 2021 All jobs have terminated 
+Fri Jan  8 10:45:51 2021  Calling: /opt/g09gh/gaussian/g09/formchk methanol-opt_2.chk path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+ Read checkpoint file methanol-opt_2.chk
+ Write formatted file methanol-opt_2.fchk
+ Coordinates translated and rotated.
+ Coordinates match /B/ after translation and rotation.
+ Rotating derivatives, DoTrsp=T IDiff= 1 LEDeriv=    917 LFDPrp=       0 LDFDPr=       0.
+Fri Jan  8 10:45:51 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-dma.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 10:45:53 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/methanol-dma.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 10:46:23 2021 All jobs have terminated 
+Fri Jan  8 10:46:23 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/methanol-dma.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 10:46:53 2021 All jobs have terminated 
+Fri Jan  8 10:46:53 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-dma.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 10:46:55 2021  Calling: /opt/g09gh/gaussian/g09/formchk methanol-dma.chk path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+ Read checkpoint file methanol-dma.chk
+ Write formatted file methanol-dma.fchk
+ Initial coordinates match /B/.
+ Rotating derivatives, DoTrsp=T IDiff= 1 LEDeriv=    917 LFDPrp=       0 LDFDPr=       0.
+Fri Jan  8 10:46:55 2021 NEED DMA: Executing GDMA
+Fri Jan  8 10:46:55 2021  Calling: /users/zj2244/Public/Software/gdma-2.2.11/bin/gdma < methanol.gdmain > methanol.gdmaout path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 10:46:55 2021  Calling: poledit.x 1 methanol.gdmaout /home/bdw2292/currentstable/ParameterFiles/amoebabio18_header.prm < methanol-peditin.txt path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
 
-Mon Oct  5 16:13:02 2020  Calling: cp methanol.xyz_2 ttt.xyz path = /home/bdw2292/finaltestpoltypeagain/Examples/MethanolOnlyRotBnd
-Mon Oct  5 16:13:02 2020  Calling: cp methanol.key_5 ttt.key path = /home/bdw2292/finaltestpoltypeagain/Examples/MethanolOnlyRotBnd
-Mon Oct  5 16:13:02 2020  Calling: minimize.x -k ttt.key ttt.xyz 0.1 > Minimizedttt.out path = /home/bdw2292/finaltestpoltypeagain/Examples/MethanolOnlyRotBnd
-Mon Oct  5 16:13:02 2020 
-Mon Oct  5 16:13:02 2020 =========================================================
-Mon Oct  5 16:13:02 2020 QM Dipole moment
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                       Version 8.8.3  November 2020                       ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
 
-Mon Oct  5 16:13:02 2020 QM Dipole moment = 1.679
-Mon Oct  5 16:13:02 2020 
-Mon Oct  5 16:13:02 2020 =========================================================
-Mon Oct  5 16:13:02 2020 MM Dipole moment
 
-Mon Oct  5 16:13:02 2020  Calling: analyze.x methanol.xyz_2 -k ttt.key em | grep -A11 Charge>MMDipole.txt path = /home/bdw2292/finaltestpoltypeagain/Examples/MethanolOnlyRotBnd
-Mon Oct  5 16:13:03 2020 MM Dipole moment = 2.062
+ Global Frame Cartesian Multipole Moments :
+
+ Site:       1         Name:   O         Atomic Number:       8
+
+ Coordinates:            0.749531       0.122589      -0.000002
+
+ Charge:                 -0.43165
+ Dipole:                 -0.17641       -0.25182        0.00000
+ Quadrupole:              0.44188
+                         -0.20876        0.16888
+                          0.00000       -0.00001       -0.61076
+
+ Site:       2         Name:   C         Atomic Number:       6
+
+ Coordinates:           -0.664447      -0.019643       0.000000
+
+ Charge:                  0.15081
+ Dipole:                  0.45963        0.01896       -0.00000
+ Quadrupole:              0.85014
+                          0.09110       -0.47639
+                         -0.00000        0.00000       -0.37375
+
+ Site:       3         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.034255      -0.542785       0.891370
+
+ Charge:                  0.00636
+ Dipole:                 -0.06102       -0.06175        0.10392
+ Quadrupole:             -0.00800
+                         -0.00904        0.00030
+                          0.01502       -0.00050        0.00770
+
+ Site:       4         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.034254      -0.542822      -0.891347
+
+ Charge:                  0.00636
+ Dipole:                 -0.06102       -0.06176       -0.10392
+ Quadrupole:             -0.00800
+                         -0.00904        0.00030
+                         -0.01502        0.00050        0.00770
+
+ Site:       5         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.076406       0.989749      -0.000020
+
+ Charge:                  0.05589
+ Dipole:                 -0.05487        0.11077       -0.00000
+ Quadrupole:             -0.00930
+                          0.00418        0.01465
+                          0.00000       -0.00000       -0.00535
+
+ Site:       6         Name:   H         Atomic Number:       1
+
+ Coordinates:            1.135352      -0.766996       0.000010
+
+ Charge:                  0.21223
+ Dipole:                  0.05278       -0.03608        0.00000
+ Quadrupole:             -0.05286
+                         -0.05232        0.14544
+                          0.00000       -0.00000       -0.09258
+
+ Local Frame Definition for Multipole Sites :
+
+     Atom     Name      Axis Type     Z Axis  X Axis  Y Axis
+
+       1      O         Z-then-X         2       6       0
+       2      C         Z-then-X         1       6       0
+       3      H         Z-then-X         2       1       0
+       4      H         Z-then-X         2       1       0
+       5      H         Z-then-X         2       1       0
+       6      H         Z-then-X         1       2       0
+
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Choose Either the AMOEBA or HIPPO Polarization Model [A] :  
+ Polarizability Parameters for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      O            0.8370         0.3900
+       2      C            1.3340         0.3900
+       3      H            0.4960         0.3900
+       4      H            0.4960         0.3900
+       5      H            0.4960         0.3900
+       6      H            0.4960         0.3900
+
+ Enter Atom Number, Polarizability & Thole Values :  
+ Choose Method for Division into Polarization Groups :
+
+    (1) Put All Atoms in One Polarization Group
+    (2) Separate into Groups at Rotatable Bonds
+
+ Enter the Number of the Desired Choice [1] :  
+ All atoms are placed initially into one polarization group;
+ This can be modified by entering a series of bonded atom pairs
+ that separate the molecule into distinct polarization groups
+
+ Enter a Bond between Polarization Groups [<Enter>=Exit] :  
+ Polarization Groups for Multipole Sites :
+
+     Atom     Name       Polarization Group Definition
+
+       1      O               2     6
+       2      C               1     3     4     5
+       3      H               2
+       4      H               2
+       5      H               2
+       6      H               1
+
+ Electrostatic and Polarization Scale Factors :
+
+                    1-2         1-3         1-4         1-5
+
+ M-Scale:         0.0000      0.0000      0.4000      0.8000
+ P-Inter:         0.0000      0.0000      1.0000      1.0000
+ P-Intra:         0.0000      0.0000      0.5000      1.0000
+ W-Scale:         1.0000      1.0000      1.0000      1.0000
+
+                    1-1         1-2         1-3         1-4
+
+ D-Scale:         0.0000      1.0000      1.0000      1.0000
+ U-Scale:         1.0000      1.0000      1.0000      1.0000
+
+ Use Thole Damping:           True
+ Charge Penetration:          False
+ Set D Equal to P:            False
+
+ Determination of Intergroup Induced Dipoles :
+
+    Iter        RMS Change (Debye)
+
+       1           0.0000000000
+
+ Local Frame Intergroup Induced Dipole Moments (Debye) :
+
+    Atom              X           Y           Z         Total
+
+       1           0.0000      0.0000      0.0000      0.0000
+       2           0.0000      0.0000      0.0000      0.0000
+       3           0.0000      0.0000      0.0000      0.0000
+       4           0.0000      0.0000      0.0000      0.0000
+       5           0.0000      0.0000      0.0000      0.0000
+       6           0.0000      0.0000      0.0000      0.0000
+
+ Condense Symmetric Atoms to Equivalent Types [Y] :  
+ Remove Multipole Components Zeroed by Symmetry [Y] :  
+ Final Atomic Multipole Moments after Regularization :
+
+ Atom:       1         Name:   O         Atomic Number:       8
+
+ Local Frame:            Z-then-X             2       6       0
+
+ Charge:                 -0.43165
+ Dipole:                  0.23290        0.00000        0.20072
+ Quadrupole:              0.21319
+                          0.00000       -0.61075
+                         -0.23176        0.00000        0.39756
+
+ Atom:       2         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X             1       6       0
+
+ Charge:                  0.15081
+ Dipole:                  0.02714        0.00000        0.45922
+ Quadrupole:             -0.48125
+                          0.00000       -0.37375
+                          0.04282        0.00000        0.85500
+
+ Atom:       3         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             2       1       0
+
+ Charge:                  0.00636
+ Dipole:                 -0.01672        0.00000       -0.13437
+ Quadrupole:              0.00486
+                          0.00000        0.00163
+                         -0.01826        0.00000       -0.00649
+
+ Atom:       4         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             2       1       0
+
+ Charge:                  0.00636
+ Dipole:                 -0.01672        0.00000       -0.13437
+ Quadrupole:              0.00486
+                          0.00000        0.00163
+                         -0.01826        0.00000       -0.00649
+
+ Atom:       5         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             2       1       0
+
+ Charge:                  0.05589
+ Dipole:                 -0.00895        0.00000       -0.12329
+ Quadrupole:             -0.00296
+                          0.00000       -0.00535
+                         -0.01136        0.00000        0.00831
+
+ Atom:       6         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             1       2       0
+
+ Charge:                  0.21223
+ Dipole:                 -0.03407        0.00000       -0.05410
+ Quadrupole:             -0.05966
+                          0.00000       -0.09258
+                         -0.03663        0.00000        0.15224
+Fri Jan  8 10:46:56 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-esp.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 10:47:42 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/methanol-esp.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 10:48:12 2021 All jobs have terminated 
+Fri Jan  8 10:48:12 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/methanol-esp.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 10:48:42 2021 All jobs have terminated 
+Fri Jan  8 10:48:42 2021  Calling: /opt/g09gh/gaussian/g09/formchk methanol-esp.chk path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+ Read checkpoint file methanol-esp.chk
+ Write formatted file methanol-esp.fchk
+ Initial coordinates match /B/.
+ Rotating derivatives, DoTrsp=T IDiff= 1 LEDeriv=    917 LFDPrp=       0 LDFDPr=       0.
+Fri Jan  8 10:48:42 2021  Calling: /opt/g09gh/gaussian/g09/cubegen 0 potential=MP2 methanol-esp.fchk methanol.cube -5 h < methanol.grid path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 10:48:44 2021  Calling: potential.x 2 methanol.cube path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                       Version 8.8.3  November 2020                       ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Electrostatic Potential Written To :  methanol.pot
+Fri Jan  8 10:48:44 2021  Calling: /home/bdw2292/currentstable/PoltypeModules/avgmpoles.pl methanol.key methanol.xyz methanol-groups.txt methanol.key_2 methanol.xyz_2 401 path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 10:48:44 2021  Calling: potential.x 6 methanol.xyz_2 -k methanol.key_2 methanol.pot N 0.1 path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                       Version 8.8.3  November 2020                       ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      402   402     O     methanol                     8     15.999     2
+      401   401     C     methanol                     6     12.011     4
+      403   403     H     methanol                     1      1.008     1
+      404   404     H     methanol                     1      1.008     1
+
+ Electrostatic Potential Grid Points :                  5779
+
+ Electrostatic Parameter Restraint Value :            1.0000
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      402   402     O     methanol                     8     15.999     2
+      401   401     C     methanol                     6     12.011     4
+      403   403     H     methanol                     1      1.008     1
+      404   404     H     methanol                     1      1.008     1
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         402      401    404      0   Z-then-X    -0.43165
+                                                   0.23290  0.00000  0.20072
+                                                   0.21319
+                                                   0.00000 -0.61075
+                                                  -0.23176  0.00000  0.39756
+
+         401      402    404      0   Z-then-X     0.15081
+                                                   0.02714  0.00000  0.45922
+                                                  -0.48125
+                                                   0.00000 -0.37375
+                                                   0.04282  0.00000  0.85500
+
+         403      401    402      0   Z-then-X     0.02287
+                                                  -0.01413  0.00000 -0.13068
+                                                   0.00225
+                                                   0.00000 -0.00070
+                                                  -0.01596  0.00000 -0.00156
+
+         404      402    401      0   Z-then-X     0.21223
+                                                  -0.03407  0.00000 -0.05410
+                                                  -0.05966
+                                                   0.00000 -0.09258
+                                                  -0.03663  0.00000  0.15224
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         402             0.837       0.390         401  404
+         401             1.334       0.390         402  403
+         403             0.496       0.390         401
+         404             0.496       0.390         402
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1        1200        -9.5687        -9.3199         0.9406
+        1        2         723         0.3073         0.8075         1.0363
+        1        3         935         3.7670         3.1781         0.7841
+        1        4         940         3.6011         3.0295         0.7984
+        1        5         958        -1.9799        -0.5299         1.5588
+        1        6        1023         5.5857         4.8956         0.7261
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.0927
+ Average Potential Magnitude for Model :              5.2795
+ Average Potential Value for Target :                -0.0485
+ Average Potential Magnitude for Target :             4.7754
+
+ Average Signed Potential Difference :               -0.0442
+ Average Unsigned Potential Difference :              0.8395
+ Root Mean Square Potential Difference :              1.0087
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value         Fixed
+
+    --            402             Monopole          -0.43165          X
+     1            402             X-Dipole           0.23290
+    --            402             Y-Dipole           0.00000          X
+     2            402             Z-Dipole           0.20072
+     3            402             XX-Quad            0.21319
+    --            402             XY-Quad            0.00000          X
+     4            402             XZ-Quad           -0.23176
+     5            402             YY-Quad           -0.61075
+    --            402             YZ-Quad            0.00000          X
+    --            402             ZZ-Quad            0.39756
+    --            401             Monopole           0.15081          X
+     6            401             X-Dipole           0.02714
+    --            401             Y-Dipole           0.00000          X
+     7            401             Z-Dipole           0.45922
+     8            401             XX-Quad           -0.48125
+    --            401             XY-Quad            0.00000          X
+     9            401             XZ-Quad            0.04282
+    10            401             YY-Quad           -0.37375
+    --            401             YZ-Quad            0.00000          X
+    --            401             ZZ-Quad            0.85500
+    --            403             Monopole           0.02287          X
+    11            403             X-Dipole          -0.01413
+    --            403             Y-Dipole           0.00000          X
+    12            403             Z-Dipole          -0.13068
+    13            403             XX-Quad            0.00226
+    --            403             XY-Quad            0.00000          X
+    14            403             XZ-Quad           -0.01596
+    15            403             YY-Quad           -0.00070
+    --            403             YZ-Quad            0.00000          X
+    --            403             ZZ-Quad           -0.00156
+    --            404             Monopole           0.21223          X
+    16            404             X-Dipole          -0.03407
+    --            404             Y-Dipole           0.00000          X
+    17            404             Z-Dipole          -0.05410
+    18            404             XX-Quad           -0.05966
+    --            404             XY-Quad            0.00000          X
+    19            404             XZ-Quad           -0.03663
+    20            404             YY-Quad           -0.09258
+    --            404             YZ-Quad            0.00000          X
+    --            404             ZZ-Quad            0.15224
+
+ Levenberg-Marquardt Nonlinear Least Squares :
+
+ LS Iter     F Value      Total G     Active G    N Active   F Calls
+
+     0     2939.7511    2221.4577    2221.4577        20        21
+     1      119.1599     171.8200     171.8200        20        42
+     2       51.6653       9.5104       9.5104        20        63
+     3       41.7328       0.0000       0.0000        20        84
+
+ SQUARE  --  Normal Termination of Least Squares
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value         Fixed
+
+    --            402             Monopole          -0.43165          X
+     1            402             X-Dipole           0.17824
+    --            402             Y-Dipole           0.00000          X
+     2            402             Z-Dipole           0.26925
+     3            402             XX-Quad            0.21276
+    --            402             XY-Quad            0.00000          X
+     4            402             XZ-Quad           -0.24991
+     5            402             YY-Quad           -0.71235
+    --            402             YZ-Quad            0.00000          X
+    --            402             ZZ-Quad            0.49959
+    --            401             Monopole           0.15081          X
+     6            401             X-Dipole          -0.07559
+    --            401             Y-Dipole           0.00000          X
+     7            401             Z-Dipole           0.43488
+     8            401             XX-Quad           -0.40536
+    --            401             XY-Quad            0.00000          X
+     9            401             XZ-Quad            0.04394
+    10            401             YY-Quad           -0.41140
+    --            401             YZ-Quad            0.00000          X
+    --            401             ZZ-Quad            0.81676
+    --            403             Monopole           0.02287          X
+    11            403             X-Dipole           0.00119
+    --            403             Y-Dipole           0.00000          X
+    12            403             Z-Dipole          -0.09698
+    13            403             XX-Quad            0.01412
+    --            403             XY-Quad            0.00000          X
+    14            403             XZ-Quad           -0.02971
+    15            403             YY-Quad            0.01101
+    --            403             YZ-Quad            0.00000          X
+    --            403             ZZ-Quad           -0.02513
+    --            404             Monopole           0.21223          X
+    16            404             X-Dipole          -0.03128
+    --            404             Y-Dipole           0.00000          X
+    17            404             Z-Dipole          -0.08897
+    18            404             XX-Quad            0.03033
+    --            404             XY-Quad            0.00000          X
+    19            404             XZ-Quad           -0.01541
+    20            404             YY-Quad           -0.11445
+    --            404             YZ-Quad            0.00000          X
+    --            404             ZZ-Quad            0.08412
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1        1200        -9.3241        -9.3199         0.0810
+        1        2         723         0.7379         0.8075         0.1229
+        1        3         935         3.1654         3.1781         0.0574
+        1        4         940         3.0133         3.0295         0.0632
+        1        5         958        -0.5847        -0.5299         0.0946
+        1        6        1023         4.8551         4.8956         0.0824
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.0790
+ Average Potential Magnitude for Model :              4.7666
+ Average Potential Value for Target :                -0.0485
+ Average Potential Magnitude for Target :             4.7754
+
+ Average Signed Potential Difference :               -0.0305
+ Average Unsigned Potential Difference :              0.0551
+ Root Mean Square Potential Difference :              0.0844
+Fri Jan  8 10:48:45 2021  Calling: sed -e '/\(.* none$\|^#\|^fix\|^potential-offset\)/d' methanol.key_3 > methanol.key_3_tmp path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 10:48:45 2021 
+Fri Jan  8 10:48:45 2021 =========================================================
+Fri Jan  8 10:48:45 2021 Electrostatic Potential Comparison
+
+Fri Jan  8 10:48:45 2021  Calling: potential.x 5 methanol.xyz_2 -k methanol.key_3 methanol.pot N > RMSPD.txt path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 10:48:46 2021  Calling: cp ../methanol-opt_2.log methanol-opt-2-1-062.log path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:48:46 2021  Calling: minimize.x methanol-opt-2-1-272_preQMOPTprefit.xyz -k tmp-2-1-272_preQMOPTprefit.key 0.1 >methanol-opt-2-1-272_preQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:48:47 2021  Calling: minimize.x methanol-opt-2-1-302_preQMOPTprefit.xyz -k tmp-2-1-302_preQMOPTprefit.key 0.1 >methanol-opt-2-1-302_preQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:48:47 2021  Calling: minimize.x methanol-opt-2-1-332_preQMOPTprefit.xyz -k tmp-2-1-332_preQMOPTprefit.key 0.1 >methanol-opt-2-1-332_preQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:48:48 2021  Calling: minimize.x methanol-opt-2-1-002_preQMOPTprefit.xyz -k tmp-2-1-002_preQMOPTprefit.key 0.1 >methanol-opt-2-1-002_preQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:48:48 2021  Calling: minimize.x methanol-opt-2-1-032_preQMOPTprefit.xyz -k tmp-2-1-032_preQMOPTprefit.key 0.1 >methanol-opt-2-1-032_preQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:48:49 2021  Calling: minimize.x methanol-opt-2-1-062_preQMOPTprefit.xyz -k tmp-2-1-062_preQMOPTprefit.key 0.1 >methanol-opt-2-1-062_preQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:48:49 2021  Calling: minimize.x methanol-opt-2-1-092_preQMOPTprefit.xyz -k tmp-2-1-092_preQMOPTprefit.key 0.1 >methanol-opt-2-1-092_preQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:48:50 2021  Calling: minimize.x methanol-opt-2-1-122_preQMOPTprefit.xyz -k tmp-2-1-122_preQMOPTprefit.key 0.1 >methanol-opt-2-1-122_preQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:48:51 2021  Calling: minimize.x methanol-opt-2-1-152_preQMOPTprefit.xyz -k tmp-2-1-152_preQMOPTprefit.key 0.1 >methanol-opt-2-1-152_preQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:48:51 2021  Calling: minimize.x methanol-opt-2-1-182_preQMOPTprefit.xyz -k tmp-2-1-182_preQMOPTprefit.key 0.1 >methanol-opt-2-1-182_preQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:48:52 2021  Calling: minimize.x methanol-opt-2-1-212_preQMOPTprefit.xyz -k tmp-2-1-212_preQMOPTprefit.key 0.1 >methanol-opt-2-1-212_preQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:48:52 2021  Calling: minimize.x methanol-opt-2-1-242_preQMOPTprefit.xyz -k tmp-2-1-242_preQMOPTprefit.key 0.1 >methanol-opt-2-1-242_preQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:48:53 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-1_2-1-272.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 0000000000006de1, rsp 00007ffd0c07e258, rbp 00007ffd0c07e830
+   rsi 000000000000000b, rdi 0000000000006de1, r8  00002b1b754eb2c0
+   r9  0000000000000000, r10 00007ffd0c07dce0, r11 0000000000000202
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffd0c07e878
+   r15 00000000000007bc
+  0  0x2b1b75c13607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 10:49:41 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-272.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:50:11 2021 All jobs have terminated 
+Fri Jan  8 10:50:11 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-1_2-1-302.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 000000000000714b, rsp 00007ffdd509f648, rbp 00007ffdd509fc20
+   rsi 000000000000000b, rdi 000000000000714b, r8  00002b99843902c0
+   r9  0000000000000000, r10 00007ffdd509f0a0, r11 0000000000000206
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffdd509fc68
+   r15 00000000000007bc
+  0  0x2b9984ab8607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 10:50:58 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-302.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:51:28 2021 All jobs have terminated 
+Fri Jan  8 10:51:28 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-1_2-1-332.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 0000000000007713, rsp 00007ffcbb759078, rbp 00007ffcbb759650
+   rsi 000000000000000b, rdi 0000000000007713, r8  00002b1c532732c0
+   r9  0000000000000000, r10 00007ffcbb758ae0, r11 0000000000000206
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffcbb759698
+   r15 00000000000007bc
+  0  0x2b1c5399b607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 10:52:16 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-332.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:52:46 2021 All jobs have terminated 
+Fri Jan  8 10:52:46 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-1_2-1-002.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 0000000000007a86, rsp 00007ffd60f716d8, rbp 00007ffd60f71cb0
+   rsi 000000000000000b, rdi 0000000000007a86, r8  00002ac7b13082c0
+   r9  0000000000000000, r10 00007ffd60f71160, r11 0000000000000206
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffd60f71cf8
+   r15 00000000000007bc
+  0  0x2ac7b1a30607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 10:53:33 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-002.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:54:03 2021 All jobs have terminated 
+Fri Jan  8 10:54:03 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-1_2-1-032.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 0000000000007dea, rsp 00007ffed4cc5688, rbp 00007ffed4cc5c60
+   rsi 000000000000000b, rdi 0000000000007dea, r8  00002b73f4ce92c0
+   r9  0000000000000000, r10 00007ffed4cc50e0, r11 0000000000000206
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffed4cc5ca8
+   r15 00000000000007bc
+  0  0x2b73f5411607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 10:55:32 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-032.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:56:02 2021 All jobs have terminated 
+Fri Jan  8 10:56:02 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-1_2-1-062.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 0000000000008457, rsp 00007ffd8d87a348, rbp 00007ffd8d87a920
+   rsi 000000000000000b, rdi 0000000000008457, r8  00002aafde5f12c0
+   r9  0000000000000000, r10 00007ffd8d879da0, r11 0000000000000206
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffd8d87a968
+   r15 00000000000007bc
+  0  0x2aafded19607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 10:57:35 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-062.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 10:58:05 2021 All jobs have terminated 
+Fri Jan  8 10:58:05 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-1_2-1-092.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 0000000000008a99, rsp 00007ffc8f732478, rbp 00007ffc8f732a50
+   rsi 000000000000000b, rdi 0000000000008a99, r8  00002b0f0792d2c0
+   r9  0000000000000000, r10 00007ffc8f731ee0, r11 0000000000000206
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffc8f732a98
+   r15 00000000000007bc
+  0  0x2b0f08055607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 10:59:31 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-092.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:00:01 2021 All jobs have terminated 
+Fri Jan  8 11:00:01 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-1_2-1-122.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 000000000000910f, rsp 00007ffe385ee9a8, rbp 00007ffe385eef80
+   rsi 000000000000000b, rdi 000000000000910f, r8  00002b94f47832c0
+   r9  0000000000000000, r10 00007ffe385ee420, r11 0000000000000202
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffe385eefc8
+   r15 00000000000007bc
+  0  0x2b94f4eab607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 11:01:32 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-122.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:02:02 2021 All jobs have terminated 
+Fri Jan  8 11:02:02 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-1_2-1-152.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 0000000000009758, rsp 00007ffc1c17c158, rbp 00007ffc1c17c730
+   rsi 000000000000000b, rdi 0000000000009758, r8  00002b95f9e8c2c0
+   r9  0000000000000000, r10 00007ffc1c17bbe0, r11 0000000000000202
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffc1c17c778
+   r15 00000000000007bc
+  0  0x2b95fa5b4607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 11:03:29 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-152.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:03:59 2021 All jobs have terminated 
+Fri Jan  8 11:03:59 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-1_2-1-182.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 0000000000009dac, rsp 00007ffe37185448, rbp 00007ffe37185a20
+   rsi 000000000000000b, rdi 0000000000009dac, r8  00002b800545b2c0
+   r9  0000000000000000, r10 00007ffe37184ea0, r11 0000000000000206
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffe37185a68
+   r15 00000000000007bc
+  0  0x2b8005b83607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 11:05:30 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-182.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:06:00 2021 All jobs have terminated 
+Fri Jan  8 11:06:00 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-1_2-1-212.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 000000000000a41e, rsp 00007ffe7ff07d88, rbp 00007ffe7ff08360
+   rsi 000000000000000b, rdi 000000000000a41e, r8  00002b43f40432c0
+   r9  0000000000000000, r10 00007ffe7ff077e0, r11 0000000000000206
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffe7ff083a8
+   r15 00000000000007bc
+  0  0x2b43f476b607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 11:06:47 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-212.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:07:17 2021 All jobs have terminated 
+Fri Jan  8 11:07:17 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-1_2-1-242.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 000000000000a9b2, rsp 00007fff60d6b9e8, rbp 00007fff60d6bfc0
+   rsi 000000000000000b, rdi 000000000000a9b2, r8  00002b4bde02c2c0
+   r9  0000000000000000, r10 00007fff60d6b460, r11 0000000000000206
+   r12 0000000000000000, r13 0000000000000000, r14 00007fff60d6c008
+   r15 00000000000007bc
+  0  0x2b4bde754607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 11:08:05 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-242.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:08:35 2021 All jobs have terminated 
+Fri Jan  8 11:08:35 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-272.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:08:35 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-302.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:08:35 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-332.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:08:35 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-002.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:08:35 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-032.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:08:35 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-062.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:08:35 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-092.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:08:35 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-122.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:08:35 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-152.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:08:35 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-182.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:08:35 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-212.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:08:35 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-1_2-1-242.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:09:05 2021 All jobs have terminated 
+Fri Jan  8 11:42:34 2021 Running on host: node37.bme.utexas.edu
+Fri Jan  8 11:42:34 2021 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Fri Jan  8 11:42:34 2021 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Fri Jan  8 11:42:34 2021  Calling: sed -e '/\(.* none$\|^#\|^fix\|^potential-offset\)/d' methanol.key_3 > methanol.key_3_tmp path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 11:42:34 2021  Calling: cp ../methanol-opt_2.log methanol-opt-2-1-062.log path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 11:42:34 2021 All jobs have terminated 
+Fri Jan  8 13:21:15 2021 Running on host: node37.bme.utexas.edu
+Fri Jan  8 13:21:15 2021 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Fri Jan  8 13:21:15 2021 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Fri Jan  8 13:21:15 2021  Calling: sed -e '/\(.* none$\|^#\|^fix\|^potential-offset\)/d' methanol.key_3 > methanol.key_3_tmp path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 13:21:15 2021  Calling: cp ../methanol-opt_2.log methanol-opt-2-1-062.log path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:21:16 2021 All jobs have terminated 
+Fri Jan  8 13:23:02 2021 Running on host: node37.bme.utexas.edu
+Fri Jan  8 13:23:02 2021 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Fri Jan  8 13:23:02 2021 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Fri Jan  8 13:23:03 2021  Calling: sed -e '/\(.* none$\|^#\|^fix\|^potential-offset\)/d' methanol.key_3 > methanol.key_3_tmp path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 13:23:03 2021  Calling: cp ../methanol-opt_2.log methanol-opt-2-1-062.log path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:23:03 2021 All jobs have terminated 
+Fri Jan  8 13:23:55 2021 Running on host: node37.bme.utexas.edu
+Fri Jan  8 13:23:55 2021 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Fri Jan  8 13:23:55 2021 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Fri Jan  8 13:23:55 2021  Calling: sed -e '/\(.* none$\|^#\|^fix\|^potential-offset\)/d' methanol.key_3 > methanol.key_3_tmp path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 13:23:55 2021  Calling: cp ../methanol-opt_2.log methanol-opt-2-1-062.log path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:23:56 2021 All jobs have terminated 
+Fri Jan  8 13:23:57 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-2_2-1-272.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 0000000000009dc9, rsp 00007ffedc545cc8, rbp 00007ffedc5462a0
+   rsi 000000000000000b, rdi 0000000000009dc9, r8  00002b027422c2c0
+   r9  0000000000000000, r10 00007ffedc545720, r11 0000000000000202
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffedc5462e8
+   r15 00000000000007bc
+  0  0x2b0274954607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 13:24:50 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-272.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:25:20 2021 All jobs have terminated 
+Fri Jan  8 13:25:20 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-2_2-1-302.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 000000000000a1c2, rsp 00007fff840b3eb8, rbp 00007fff840b4490
+   rsi 000000000000000b, rdi 000000000000a1c2, r8  00002b63ad4782c0
+   r9  0000000000000000, r10 00007fff840b3920, r11 0000000000000206
+   r12 0000000000000000, r13 0000000000000000, r14 00007fff840b44d8
+   r15 00000000000007bc
+  0  0x2b63adba0607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 13:26:28 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-302.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:26:58 2021 All jobs have terminated 
+Fri Jan  8 13:26:58 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-2_2-1-332.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 000000000000a75c, rsp 00007ffcef4f9a18, rbp 00007ffcef4f9ff0
+   rsi 000000000000000b, rdi 000000000000a75c, r8  00002b65c35782c0
+   r9  0000000000000000, r10 00007ffcef4f94a0, r11 0000000000000206
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffcef4fa038
+   r15 00000000000007bc
+  0  0x2b65c3ca0607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 13:28:35 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-332.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:29:06 2021 All jobs have terminated 
+Fri Jan  8 13:29:06 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-2_2-1-002.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 000000000000ad6d, rsp 00007ffe021b6348, rbp 00007ffe021b6920
+   rsi 000000000000000b, rdi 000000000000ad6d, r8  00002b50460bb2c0
+   r9  0000000000000000, r10 00007ffe021b5da0, r11 0000000000000206
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffe021b6968
+   r15 00000000000007bc
+  0  0x2b50467e3607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 13:30:41 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-002.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:31:11 2021 All jobs have terminated 
+Fri Jan  8 13:31:11 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-2_2-1-032.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 000000000000b35c, rsp 00007ffe748fa8a8, rbp 00007ffe748fae80
+   rsi 000000000000000b, rdi 000000000000b35c, r8  00002aba47f042c0
+   r9  0000000000000000, r10 00007ffe748fa320, r11 0000000000000202
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffe748faec8
+   r15 00000000000007bc
+  0  0x2aba4862c607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 13:32:39 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-032.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:33:09 2021 All jobs have terminated 
+Fri Jan  8 13:33:09 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-2_2-1-062.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 000000000000b96e, rsp 00007ffe03881448, rbp 00007ffe03881a20
+   rsi 000000000000000b, rdi 000000000000b96e, r8  00002ba08a3702c0
+   r9  0000000000000000, r10 00007ffe03880ea0, r11 0000000000000206
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffe03881a68
+   r15 00000000000007bc
+  0  0x2ba08aa98607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 13:34:39 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-062.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:35:09 2021 All jobs have terminated 
+Fri Jan  8 13:35:09 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-2_2-1-092.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 000000000000bf52, rsp 00007ffde328d2a8, rbp 00007ffde328d880
+   rsi 000000000000000b, rdi 000000000000bf52, r8  00002b40d363a2c0
+   r9  0000000000000000, r10 00007ffde328cd20, r11 0000000000000202
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffde328d8c8
+   r15 00000000000007bc
+  0  0x2b40d3d62607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 13:36:44 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-092.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:37:14 2021 All jobs have terminated 
+Fri Jan  8 13:37:14 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-2_2-1-122.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 00000000000006b2, rsp 00007fffcf6b5578, rbp 00007fffcf6b5b50
+   rsi 000000000000000b, rdi 00000000000006b2, r8  00002b75c07ef2c0
+   r9  0000000000000000, r10 00007fffcf6b4fe0, r11 0000000000000206
+   r12 0000000000000000, r13 0000000000000000, r14 00007fffcf6b5b98
+   r15 00000000000007bc
+  0  0x2b75c0f17607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 13:38:49 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-122.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:39:19 2021 All jobs have terminated 
+Fri Jan  8 13:39:19 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-2_2-1-152.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 0000000000000cf9, rsp 00007fffd4b54078, rbp 00007fffd4b54650
+   rsi 000000000000000b, rdi 0000000000000cf9, r8  00002aca400562c0
+   r9  0000000000000000, r10 00007fffd4b53ae0, r11 0000000000000206
+   r12 0000000000000000, r13 0000000000000000, r14 00007fffd4b54698
+   r15 00000000000007bc
+  0  0x2aca4077e607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 13:40:55 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-152.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:41:25 2021 All jobs have terminated 
+Fri Jan  8 13:41:25 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-2_2-1-182.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 0000000000001479, rsp 00007ffd2cba9068, rbp 00007ffd2cba9640
+   rsi 000000000000000b, rdi 0000000000001479, r8  00002af774af72c0
+   r9  0000000000000000, r10 00007ffd2cba8ae0, r11 0000000000000202
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffd2cba9688
+   r15 00000000000007bc
+  0  0x2af77521f607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 13:42:19 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-182.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:42:49 2021 All jobs have terminated 
+Fri Jan  8 13:42:49 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-2_2-1-212.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 0000000000001911, rsp 00007ffd783f96b8, rbp 00007ffd783f9c90
+   rsi 000000000000000b, rdi 0000000000001911, r8  00002b1a55de92c0
+   r9  0000000000000000, r10 00007ffd783f9120, r11 0000000000000206
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffd783f9cd8
+   r15 00000000000007bc
+  0  0x2b1a56511607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 13:42:57 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-212.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:43:27 2021 All jobs have terminated 
+Fri Jan  8 13:43:27 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-opt-2_2-1-242.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Error: segmentation violation
+   rax 0000000000000000, rbx ffffffffffffffff, rcx ffffffffffffffff
+   rdx 0000000000001c55, rsp 00007ffe141f76a8, rbp 00007ffe141f7c80
+   rsi 000000000000000b, rdi 0000000000001c55, r8  00002af8d6e912c0
+   r9  0000000000000000, r10 00007ffe141f7120, r11 0000000000000202
+   r12 0000000000000000, r13 0000000000000000, r14 00007ffe141f7cc8
+   r15 00000000000007bc
+  0  0x2af8d75b9607
+  1  0x458935  lnk1e_ + 0x225
+  2  0x453420  gauerr_ + 0x80
+  3  0x406547  alldun_ + 0x2e17
+  4  0x403710  MAIN_ + 0xb0
+  5  0x403648
+Fri Jan  8 13:44:21 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-242.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:44:51 2021 All jobs have terminated 
+Fri Jan  8 13:44:51 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-272.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:44:51 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-302.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:44:51 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-332.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:44:51 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-002.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:44:51 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-032.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:44:51 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-062.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:44:51 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-092.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:44:51 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-122.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:44:51 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-152.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:44:51 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-182.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:44:51 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-212.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:44:51 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-opt-2_2-1-242.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:21 2021 All jobs have terminated 
+Fri Jan  8 13:45:22 2021  Calling: minimize.x methanol-opt-2-1-272_postQMOPTprefit.xyz -k tmp-2-1-272_postQMOPTprefit.key 0.1 >methanol-opt-2-1-272_postQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:22 2021  Calling: analyze.x -k tmp-2-1-272_postQMOPTprefit.key methanol-opt-2-1-272_postQMOPTprefit.xyz_2 ed > methanol-opt-2-1-272_postQMOPTprefit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:23 2021  Calling: minimize.x methanol-opt-2-1-302_postQMOPTprefit.xyz -k tmp-2-1-302_postQMOPTprefit.key 0.1 >methanol-opt-2-1-302_postQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:23 2021  Calling: analyze.x -k tmp-2-1-302_postQMOPTprefit.key methanol-opt-2-1-302_postQMOPTprefit.xyz_2 ed > methanol-opt-2-1-302_postQMOPTprefit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:24 2021  Calling: minimize.x methanol-opt-2-1-332_postQMOPTprefit.xyz -k tmp-2-1-332_postQMOPTprefit.key 0.1 >methanol-opt-2-1-332_postQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:25 2021  Calling: analyze.x -k tmp-2-1-332_postQMOPTprefit.key methanol-opt-2-1-332_postQMOPTprefit.xyz_2 ed > methanol-opt-2-1-332_postQMOPTprefit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:25 2021  Calling: minimize.x methanol-opt-2-1-002_postQMOPTprefit.xyz -k tmp-2-1-002_postQMOPTprefit.key 0.1 >methanol-opt-2-1-002_postQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:26 2021  Calling: analyze.x -k tmp-2-1-002_postQMOPTprefit.key methanol-opt-2-1-002_postQMOPTprefit.xyz_2 ed > methanol-opt-2-1-002_postQMOPTprefit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:27 2021  Calling: minimize.x methanol-opt-2-1-032_postQMOPTprefit.xyz -k tmp-2-1-032_postQMOPTprefit.key 0.1 >methanol-opt-2-1-032_postQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:27 2021  Calling: analyze.x -k tmp-2-1-032_postQMOPTprefit.key methanol-opt-2-1-032_postQMOPTprefit.xyz_2 ed > methanol-opt-2-1-032_postQMOPTprefit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:28 2021  Calling: minimize.x methanol-opt-2-1-062_postQMOPTprefit.xyz -k tmp-2-1-062_postQMOPTprefit.key 0.1 >methanol-opt-2-1-062_postQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:28 2021  Calling: analyze.x -k tmp-2-1-062_postQMOPTprefit.key methanol-opt-2-1-062_postQMOPTprefit.xyz_2 ed > methanol-opt-2-1-062_postQMOPTprefit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:29 2021  Calling: minimize.x methanol-opt-2-1-092_postQMOPTprefit.xyz -k tmp-2-1-092_postQMOPTprefit.key 0.1 >methanol-opt-2-1-092_postQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:30 2021  Calling: analyze.x -k tmp-2-1-092_postQMOPTprefit.key methanol-opt-2-1-092_postQMOPTprefit.xyz_2 ed > methanol-opt-2-1-092_postQMOPTprefit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:30 2021  Calling: minimize.x methanol-opt-2-1-122_postQMOPTprefit.xyz -k tmp-2-1-122_postQMOPTprefit.key 0.1 >methanol-opt-2-1-122_postQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:31 2021  Calling: analyze.x -k tmp-2-1-122_postQMOPTprefit.key methanol-opt-2-1-122_postQMOPTprefit.xyz_2 ed > methanol-opt-2-1-122_postQMOPTprefit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:32 2021  Calling: minimize.x methanol-opt-2-1-152_postQMOPTprefit.xyz -k tmp-2-1-152_postQMOPTprefit.key 0.1 >methanol-opt-2-1-152_postQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:32 2021  Calling: analyze.x -k tmp-2-1-152_postQMOPTprefit.key methanol-opt-2-1-152_postQMOPTprefit.xyz_2 ed > methanol-opt-2-1-152_postQMOPTprefit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:33 2021  Calling: minimize.x methanol-opt-2-1-182_postQMOPTprefit.xyz -k tmp-2-1-182_postQMOPTprefit.key 0.1 >methanol-opt-2-1-182_postQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:34 2021  Calling: analyze.x -k tmp-2-1-182_postQMOPTprefit.key methanol-opt-2-1-182_postQMOPTprefit.xyz_2 ed > methanol-opt-2-1-182_postQMOPTprefit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:34 2021  Calling: minimize.x methanol-opt-2-1-212_postQMOPTprefit.xyz -k tmp-2-1-212_postQMOPTprefit.key 0.1 >methanol-opt-2-1-212_postQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:35 2021  Calling: analyze.x -k tmp-2-1-212_postQMOPTprefit.key methanol-opt-2-1-212_postQMOPTprefit.xyz_2 ed > methanol-opt-2-1-212_postQMOPTprefit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:36 2021  Calling: minimize.x methanol-opt-2-1-242_postQMOPTprefit.xyz -k tmp-2-1-242_postQMOPTprefit.key 0.1 >methanol-opt-2-1-242_postQMOPTprefit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:36 2021  Calling: analyze.x -k tmp-2-1-242_postQMOPTprefit.key methanol-opt-2-1-242_postQMOPTprefit.xyz_2 ed > methanol-opt-2-1-242_postQMOPTprefit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:45:37 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-sp-2-1-272.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:46:07 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-272.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:46:37 2021 All jobs have terminated 
+Fri Jan  8 13:46:37 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-sp-2-1-302.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:47:07 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-302.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:47:37 2021 All jobs have terminated 
+Fri Jan  8 13:47:37 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-sp-2-1-332.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:48:07 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-332.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:48:37 2021 All jobs have terminated 
+Fri Jan  8 13:48:37 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-sp-2-1-002.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:49:09 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-002.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:49:39 2021 All jobs have terminated 
+Fri Jan  8 13:49:39 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-sp-2-1-032.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:50:10 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-032.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:50:40 2021 All jobs have terminated 
+Fri Jan  8 13:50:40 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-sp-2-1-062.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:51:09 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-062.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:51:39 2021 All jobs have terminated 
+Fri Jan  8 13:51:39 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-sp-2-1-092.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:52:09 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-092.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:52:39 2021 All jobs have terminated 
+Fri Jan  8 13:52:39 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-sp-2-1-122.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:53:09 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-122.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:53:39 2021 All jobs have terminated 
+Fri Jan  8 13:53:39 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-sp-2-1-152.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:54:08 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-152.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:54:38 2021 All jobs have terminated 
+Fri Jan  8 13:54:38 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-sp-2-1-182.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:55:06 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-182.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:55:36 2021 All jobs have terminated 
+Fri Jan  8 13:55:37 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-sp-2-1-212.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:56:06 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-212.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:56:36 2021 All jobs have terminated 
+Fri Jan  8 13:56:36 2021  Calling: cd /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion && GAUSS_SCRDIR=/scratch/bdw2292/Gau-methanol /opt/g09gh/gaussian/g09/g09 methanol-sp-2-1-242.com path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:57:06 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-242.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:57:36 2021 All jobs have terminated 
+Fri Jan  8 13:57:36 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-272.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:57:36 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-302.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:57:36 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-332.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:57:36 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-002.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:57:36 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-032.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:57:36 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-062.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:57:36 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-092.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:57:36 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-122.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:57:36 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-152.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:57:36 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-182.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:57:36 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-212.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:57:36 2021 Normal termination: logfile=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion/methanol-sp-2-1-242.log path=/home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:06 2021 All jobs have terminated 
+Fri Jan  8 13:58:06 2021 Torsions being fit 403 401 402 404 RMSD(QM-MM1)0.07857197014500178
+Fri Jan  8 13:58:06 2021  Calling: minimize.x methanol-opt-2-1-272_postQMOPTpostfit.xyz -k tmp-2-1-272_postQMOPTpostfit.key 0.1 >methanol-opt-2-1-272_postQMOPTpostfit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:07 2021  Calling: analyze.x -k tmp-2-1-272_postQMOPTpostfit.key methanol-opt-2-1-272_postQMOPTpostfit.xyz_2 ed > methanol-opt-2-1-272_postQMOPTpostfit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:07 2021  Calling: minimize.x methanol-opt-2-1-302_postQMOPTpostfit.xyz -k tmp-2-1-302_postQMOPTpostfit.key 0.1 >methanol-opt-2-1-302_postQMOPTpostfit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:08 2021  Calling: analyze.x -k tmp-2-1-302_postQMOPTpostfit.key methanol-opt-2-1-302_postQMOPTpostfit.xyz_2 ed > methanol-opt-2-1-302_postQMOPTpostfit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:08 2021  Calling: minimize.x methanol-opt-2-1-332_postQMOPTpostfit.xyz -k tmp-2-1-332_postQMOPTpostfit.key 0.1 >methanol-opt-2-1-332_postQMOPTpostfit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:09 2021  Calling: analyze.x -k tmp-2-1-332_postQMOPTpostfit.key methanol-opt-2-1-332_postQMOPTpostfit.xyz_2 ed > methanol-opt-2-1-332_postQMOPTpostfit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:09 2021  Calling: minimize.x methanol-opt-2-1-002_postQMOPTpostfit.xyz -k tmp-2-1-002_postQMOPTpostfit.key 0.1 >methanol-opt-2-1-002_postQMOPTpostfit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:10 2021  Calling: analyze.x -k tmp-2-1-002_postQMOPTpostfit.key methanol-opt-2-1-002_postQMOPTpostfit.xyz_2 ed > methanol-opt-2-1-002_postQMOPTpostfit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:11 2021  Calling: minimize.x methanol-opt-2-1-032_postQMOPTpostfit.xyz -k tmp-2-1-032_postQMOPTpostfit.key 0.1 >methanol-opt-2-1-032_postQMOPTpostfit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:11 2021  Calling: analyze.x -k tmp-2-1-032_postQMOPTpostfit.key methanol-opt-2-1-032_postQMOPTpostfit.xyz_2 ed > methanol-opt-2-1-032_postQMOPTpostfit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:12 2021  Calling: minimize.x methanol-opt-2-1-062_postQMOPTpostfit.xyz -k tmp-2-1-062_postQMOPTpostfit.key 0.1 >methanol-opt-2-1-062_postQMOPTpostfit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:12 2021  Calling: analyze.x -k tmp-2-1-062_postQMOPTpostfit.key methanol-opt-2-1-062_postQMOPTpostfit.xyz_2 ed > methanol-opt-2-1-062_postQMOPTpostfit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:13 2021  Calling: minimize.x methanol-opt-2-1-092_postQMOPTpostfit.xyz -k tmp-2-1-092_postQMOPTpostfit.key 0.1 >methanol-opt-2-1-092_postQMOPTpostfit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:13 2021  Calling: analyze.x -k tmp-2-1-092_postQMOPTpostfit.key methanol-opt-2-1-092_postQMOPTpostfit.xyz_2 ed > methanol-opt-2-1-092_postQMOPTpostfit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:14 2021  Calling: minimize.x methanol-opt-2-1-122_postQMOPTpostfit.xyz -k tmp-2-1-122_postQMOPTpostfit.key 0.1 >methanol-opt-2-1-122_postQMOPTpostfit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:15 2021  Calling: analyze.x -k tmp-2-1-122_postQMOPTpostfit.key methanol-opt-2-1-122_postQMOPTpostfit.xyz_2 ed > methanol-opt-2-1-122_postQMOPTpostfit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:15 2021  Calling: minimize.x methanol-opt-2-1-152_postQMOPTpostfit.xyz -k tmp-2-1-152_postQMOPTpostfit.key 0.1 >methanol-opt-2-1-152_postQMOPTpostfit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:16 2021  Calling: analyze.x -k tmp-2-1-152_postQMOPTpostfit.key methanol-opt-2-1-152_postQMOPTpostfit.xyz_2 ed > methanol-opt-2-1-152_postQMOPTpostfit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:17 2021  Calling: minimize.x methanol-opt-2-1-182_postQMOPTpostfit.xyz -k tmp-2-1-182_postQMOPTpostfit.key 0.1 >methanol-opt-2-1-182_postQMOPTpostfit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:18 2021  Calling: analyze.x -k tmp-2-1-182_postQMOPTpostfit.key methanol-opt-2-1-182_postQMOPTpostfit.xyz_2 ed > methanol-opt-2-1-182_postQMOPTpostfit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:18 2021  Calling: minimize.x methanol-opt-2-1-212_postQMOPTpostfit.xyz -k tmp-2-1-212_postQMOPTpostfit.key 0.1 >methanol-opt-2-1-212_postQMOPTpostfit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:19 2021  Calling: analyze.x -k tmp-2-1-212_postQMOPTpostfit.key methanol-opt-2-1-212_postQMOPTpostfit.xyz_2 ed > methanol-opt-2-1-212_postQMOPTpostfit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:19 2021  Calling: minimize.x methanol-opt-2-1-242_postQMOPTpostfit.xyz -k tmp-2-1-242_postQMOPTpostfit.key 0.1 >methanol-opt-2-1-242_postQMOPTpostfit.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:20 2021  Calling: analyze.x -k tmp-2-1-242_postQMOPTpostfit.key methanol-opt-2-1-242_postQMOPTpostfit.xyz_2 ed > methanol-opt-2-1-242_postQMOPTpostfit.alz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd/qm-torsion
+Fri Jan  8 13:58:21 2021 Torset((3, 2, 1, 6),) RMSD(MM2,QM) 0.07550369692530104
+Fri Jan  8 13:58:21 2021 
+Fri Jan  8 13:58:21 2021 =========================================================
+Fri Jan  8 13:58:21 2021 Minimizing structure
+
+Fri Jan  8 13:58:21 2021  Calling: cp methanol.xyz_2 final.xyz path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 13:58:21 2021  Calling: cp methanol.key_5 final.key path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 13:58:21 2021  Calling: minimize.x -k final.key final.xyz 0.1 > Minimized_final.out path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 13:58:21 2021 
+Fri Jan  8 13:58:21 2021 =========================================================
+Fri Jan  8 13:58:21 2021 QM Dipole moment
+
+Fri Jan  8 13:58:21 2021  Calling: grep -A7 "Dipole moment" methanol-esp.log>QMDipole.txt path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 13:58:21 2021 QM Dipole moment = 1.698
+Fri Jan  8 13:58:21 2021 
+Fri Jan  8 13:58:21 2021 =========================================================
+Fri Jan  8 13:58:21 2021 MM Dipole moment
+
+Fri Jan  8 13:58:21 2021  Calling: analyze.x methanol.xyz_2 -k final.key em | grep -A11 Charge>MMDipole.txt path = /home/bdw2292/currentstable/Examples/MethanolOnlyRotBnd
+Fri Jan  8 13:58:22 2021 MM Dipole moment = 1.698
+Fri Jan  8 13:58:22 2021 Poltype Job Finished
+

@@ -1313,7 +1313,7 @@ class PolarizableTyper():
                 else:
                     shutil.copy(self.key4fname,self.key5fname)
 
-        if self.isfragjob==True:
+        if self.isfragjob==True and self.dontdovdwscan==False:
             vdwfit.VanDerWaalsOptimization(self,missingvdwatomindices)       
         if self.isfragjob==False and self.dontdotor==False:
             self.CheckTorsionParameters(self.key5fname,torsionsmissing,hydtorsions)

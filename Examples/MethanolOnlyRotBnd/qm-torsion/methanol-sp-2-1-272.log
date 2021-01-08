@@ -1,372 +1,430 @@
-
-    -----------------------------------------------------------------------
-          Psi4: An Open-Source Ab Initio Electronic Structure Package
-                               Psi4 1.3.2 release
-
-                         Git: Rev {HEAD} ecbda83 
-
-
-    R. M. Parrish, L. A. Burns, D. G. A. Smith, A. C. Simmonett,
-    A. E. DePrince III, E. G. Hohenstein, U. Bozkaya, A. Yu. Sokolov,
-    R. Di Remigio, R. M. Richard, J. F. Gonthier, A. M. James,
-    H. R. McAlexander, A. Kumar, M. Saitow, X. Wang, B. P. Pritchard,
-    P. Verma, H. F. Schaefer III, K. Patkowski, R. A. King, E. F. Valeev,
-    F. A. Evangelista, J. M. Turney, T. D. Crawford, and C. D. Sherrill,
-    J. Chem. Theory Comput. 13(7) pp 3185--3197 (2017).
-    (doi: 10.1021/acs.jctc.7b00174)
-
-
-                         Additional Contributions by
-    P. Kraus, H. Kruse, M. H. Lechner, M. C. Schieber, R. A. Shaw,
-    A. Alenaizan, R. Galvelis, Z. L. Glick, S. Lehtola, and J. P. Misiewicz
-
-    -----------------------------------------------------------------------
-
-
-    Psi4 started on: Monday, 05 October 2020 03:40PM
-
-    Process ID: 58028
-    Host:       node35.bme.utexas.edu
-    PSIDATADIR: /home/bdw2292/miniconda3/envs/p4env/share/psi4
-    Memory:     500.0 MiB
-    Threads:    1
-    
-  ==> Input File <==
-
---------------------------------------------------------------------------
-molecule { 
-0 1
- O    0.673292   -0.047332   -0.020557
- C   -0.741853   -0.019120   -0.013121
- H   -1.106115   -0.778345    0.692353
- H   -1.099943   -0.179440   -1.039025
- H   -1.065079    0.974471    0.329638
- H    0.993833    0.544571    0.668178
-}
-set {
- e_convergence 10 
- d_convergence 10 
-}
-memory 100GB
-set_num_threads(8)
-psi4_io.set_default_path("/scratch/bdw2292/Psi4-methanol")
-set freeze_core True
-E, wfn = energy('wb97x-d/6-311+G*',return_wfn=True)
-oeprop(wfn,"WIBERG_LOWDIN_INDICES")
-clean()
---------------------------------------------------------------------------
-
-  Memory set to  93.132 GiB by Python driver.
-  Threads set to 8 by Python driver.
-
-*** tstart() called on node35.bme.utexas.edu
-*** at Mon Oct  5 15:40:00 2020
-
-   => Loading Basis Set <=
-
-    Name: 6-311+G*
-    Role: ORBITAL
-    Keyword: BASIS
-    atoms 1   entry O          line   172 file /home/bdw2292/miniconda3/envs/p4env/share/psi4/basis/6-311pgs.gbs 
-    atoms 2   entry C          line   130 file /home/bdw2292/miniconda3/envs/p4env/share/psi4/basis/6-311pgs.gbs 
-    atoms 3-6 entry H          line    47 file /home/bdw2292/miniconda3/envs/p4env/share/psi4/basis/6-311pgs.gbs 
-
-
-         ---------------------------------------------------------
-                                   SCF
-               by Justin Turney, Rob Parrish, Andy Simmonett
-                          and Daniel G. A. Smith
-                              RKS Reference
-                        8 Threads,  95367 MiB Core
-         ---------------------------------------------------------
-
-  ==> Geometry <==
-
-    Molecular point group: c1
-    Full point group: C1
-
-    Geometry (in Angstrom), charge = 0, multiplicity = 1:
-
-       Center              X                  Y                   Z               Mass       
-    ------------   -----------------  -----------------  -----------------  -----------------
-         O            0.686659546759    -0.034190814007    -0.025864519614    15.994914619570
-         C           -0.728485453241    -0.005978814007    -0.018428519614    12.000000000000
-         H           -1.092747453241    -0.765203814007     0.687045480386     1.007825032230
-         H           -1.086575453241    -0.166298814007    -1.044332519614     1.007825032230
-         H           -1.051711453241     0.987612185993     0.324330480386     1.007825032230
-         H            1.007200546759     0.557712185993     0.662870480386     1.007825032230
-
-  Running in c1 symmetry.
-
-  Rotational constants: A =      4.16519  B =      0.83749  C =      0.80856 [cm^-1]
-  Rotational constants: A = 124869.29335  B =  25107.25997  C =  24240.02889 [MHz]
-  Nuclear repulsion =   40.368081881475213
-
-  Charge       = 0
-  Multiplicity = 1
-  Electrons    = 18
-  Nalpha       = 9
-  Nbeta        = 9
-
-  ==> Algorithm <==
-
-  SCF Algorithm Type is DF.
-  DIIS enabled.
-  MOM disabled.
-  Fractional occupation disabled.
-  Guess Type is SAD.
-  Energy threshold   = 1.00e-10
-  Density threshold  = 1.00e-10
-  Integral threshold = 0.00e+00
-
-  ==> Primary Basis <==
-
-  Basis Set: 6-311+G*
-    Blend: 6-311+G*
-    Number of shells: 32
-    Number of basis function: 56
-    Number of Cartesian functions: 58
-    Spherical Harmonics?: true
-    Max angular momentum: 2
-
-  ==> DFT Potential <==
-
-   => Composite Functional: WB97X-D <= 
-
-    wB97X-D Hyb-GGA Exchange-Correlation Functional
-
-    J.-D. Chai and M. Head-Gordon, Phys. Chem. Chem. Phys. 10, 6615 (2008)
-
-    Deriv               =              1
-    GGA                 =           TRUE
-    Meta                =          FALSE
-
-    Exchange Hybrid     =           TRUE
-    MP2 Hybrid          =          FALSE
-
-   => Exchange-Correlation Functionals <=
-
-    1.0000   wB97D range-separated functional
-
-   => Exact (HF) Exchange <=
-
-    0.7780            HF,LR [omega = 0.2000]
-    0.2220               HF 
-
-   => Molecular Quadrature <=
-
-    Radial Scheme          =       TREUTLER
-    Pruning Scheme         =           FLAT
-    Nuclear Scheme         =       TREUTLER
-
-    BS radius alpha        =              1
-    Pruning alpha          =              1
-    Radial Points          =             75
-    Spherical Points       =            302
-    Total Points           =         135900
-    Total Blocks           =           1081
-    Max Points             =            256
-    Max Functions          =             56
-
-   => WB97X-D: Empirical Dispersion <=
-
-    Chai and Head-Gordon Dispersion Correction
-    Chai, J.-D.; Head-Gordon, M. (2010), J. Chem. Phys., 132: 6615-6620
-
-        s6 =       1.000000
-
-   => Loading Basis Set <=
-
-    Name: (6-311+G* AUX)
-    Role: JKFIT
-    Keyword: DF_BASIS_SCF
-    atoms 1   entry O          line   324 file /home/bdw2292/miniconda3/envs/p4env/share/psi4/basis/heavy-aug-cc-pvtz-jkfit.gbs 
-    atoms 2   entry C          line   200 file /home/bdw2292/miniconda3/envs/p4env/share/psi4/basis/heavy-aug-cc-pvtz-jkfit.gbs 
-    atoms 3-6 entry H          line   116 file /home/bdw2292/miniconda3/envs/p4env/share/psi4/basis/heavy-aug-cc-pvtz-jkfit.gbs 
-
-  ==> Pre-Iterations <==
-
-   -------------------------------------------------------
-    Irrep   Nso     Nmo     Nalpha   Nbeta   Ndocc  Nsocc
-   -------------------------------------------------------
-     A         56      56       0       0       0       0
-   -------------------------------------------------------
-    Total      56      56       9       9       9       0
-   -------------------------------------------------------
-
-  ==> Integral Setup <==
-
-  ==> DiskDFJK: Density-Fitted J/K Matrices <==
-
-    J tasked:                  Yes
-    K tasked:                  Yes
-    wK tasked:                 Yes
-    Omega:               2.000E-01
-    OpenMP threads:              8
-    Integrals threads:           8
-    Memory [MiB]:            71324
-    Algorithm:                Core
-    Integral Cache:           NONE
-    Schwarz Cutoff:          1E-12
-    Fitting Condition:       1E-10
-
-   => Auxiliary Basis Set <=
-
-  Basis Set: (6-311+G* AUX)
-    Blend: HEAVY-AUG-CC-PVTZ-JKFIT
-    Number of shells: 100
-    Number of basis function: 328
-    Number of Cartesian functions: 402
-    Spherical Harmonics?: true
-    Max angular momentum: 4
-
-  Cached 100.0% of DFT collocation blocks in 0.196 [GiB].
-
-  Minimum eigenvalue in the overlap matrix is 3.7156194148E-03.
-  Using Symmetric Orthogonalization.
-
-  SCF Guess: Superposition of Atomic Densities via on-the-fly atomic UHF.
-
-  ==> Iterations <==
-
-                           Total Energy        Delta E     RMS |[F,P]|
-
-   @DF-RKS iter SAD:  -115.13984044542880   -1.15140e+02   0.00000e+00 
-   @DF-RKS iter   1:  -115.55370131435556   -4.13861e-01   1.09065e-02 DIIS
-   @DF-RKS iter   2:  -115.56618103230953   -1.24797e-02   1.13493e-02 DIIS
-   @DF-RKS iter   3:  -115.70810859709238   -1.41928e-01   1.22438e-03 DIIS
-   @DF-RKS iter   4:  -115.70982571594089   -1.71712e-03   3.54704e-04 DIIS
-   @DF-RKS iter   5:  -115.71000172937926   -1.76013e-04   5.63143e-05 DIIS
-   @DF-RKS iter   6:  -115.71000809741980   -6.36804e-06   7.39358e-06 DIIS
-   @DF-RKS iter   7:  -115.71000827478979   -1.77370e-07   1.30695e-06 DIIS
-   @DF-RKS iter   8:  -115.71000828213037   -7.34059e-09   2.36481e-07 DIIS
-   @DF-RKS iter   9:  -115.71000828234918   -2.18805e-10   4.21542e-08 DIIS
-   @DF-RKS iter  10:  -115.71000828235998   -1.08002e-11   9.14697e-09 DIIS
-   @DF-RKS iter  11:  -115.71000828236028   -2.98428e-13   2.17011e-09 DIIS
-   @DF-RKS iter  12:  -115.71000828236059   -3.12639e-13   4.90745e-10 DIIS
-   @DF-RKS iter  13:  -115.71000828236055    4.26326e-14   1.28023e-10 DIIS
-   @DF-RKS iter  14:  -115.71000828236055    0.00000e+00   2.38339e-11 DIIS
-  Energy and wave function converged.
-
-
-  ==> Post-Iterations <==
-
-    Orbital Energies [Eh]
-    ---------------------
-
-    Doubly Occupied:                                                      
-
-       1A    -19.245676     2A    -10.325631     3A     -1.128077  
-       4A     -0.781868     5A     -0.601981     6A     -0.535505  
-       7A     -0.517520     8A     -0.421829     9A     -0.361660  
-
-    Virtual:                                                              
-
-      10A      0.063716    11A      0.085086    12A      0.104205  
-      13A      0.107402    14A      0.200401    15A      0.222374  
-      16A      0.230203    17A      0.243487    18A      0.277183  
-      19A      0.282720    20A      0.297668    21A      0.318722  
-      22A      0.373989    23A      0.485658    24A      0.499856  
-      25A      0.577598    26A      0.614258    27A      0.674165  
-      28A      0.690243    29A      0.736534    30A      0.967753  
-      31A      1.102705    32A      1.134927    33A      1.137022  
-      34A      1.384934    35A      1.447318    36A      1.602866  
-      37A      1.650989    38A      1.672748    39A      1.822459  
-      40A      2.257267    41A      2.481168    42A      2.490720  
-      43A      2.544411    44A      2.869344    45A      2.933851  
-      46A      3.031668    47A      3.083388    48A      3.251444  
-      49A      3.283845    50A      3.443162    51A      3.956578  
-      52A      5.088226    53A      5.187018    54A      5.483541  
-      55A     23.597603    56A     49.981870  
-
-    Final Occupation by Irrep:
-              A 
-    DOCC [     9 ]
-
-  @DF-RKS Final Energy:  -115.71000828236055
-
-   => Energetics <=
-
-    Nuclear Repulsion Energy =             40.3680818814752129
-    One-Electron Energy =                -237.0928945249321487
-    Two-Electron Energy =                  91.6800940192257201
-    DFT Exchange-Correlation Energy =     -10.6644736935181772
-    Empirical Dispersion Energy =          -0.0008159646111446
-    VV10 Nonlocal Energy =                  0.0000000000000000
-    Total Energy =                       -115.7100082823605476
-
-Computation Completed
-
-
-Properties will be evaluated at   0.000000,   0.000000,   0.000000 [a0]
-
-Properties computed using the SCF density matrix
-
-  Nuclear Dipole Moment: [e a0]
-     X:    -2.0815      Y:     0.5753      Z:     0.5904
-
-  Electronic Dipole Moment: [e a0]
-     X:     1.6443      Y:    -0.1097      Z:    -0.0918
-
-  Dipole Moment: [e a0]
-     X:    -0.4372      Y:     0.4656      Z:     0.4986     Total:     0.8103
-
-  Dipole Moment: [D]
-     X:    -1.1112      Y:     1.1834      Z:     1.2674     Total:     2.0595
-
-
-*** tstop() called on node35.bme.utexas.edu at Mon Oct  5 15:40:05 2020
-Module time:
-	user time   =      29.54 seconds =       0.49 minutes
-	system time =       1.94 seconds =       0.03 minutes
-	total time  =          5 seconds =       0.08 minutes
-Total time:
-	user time   =      29.54 seconds =       0.49 minutes
-	system time =       1.94 seconds =       0.03 minutes
-	total time  =          5 seconds =       0.08 minutes
-
-
-Properties will be evaluated at   0.000000,   0.000000,   0.000000 [a0]
-OEProp: No title given, name of density matrix used for the following properties is 'SCF density'
-
-
-  Wiberg Bond Indices using Orthogonal Lowdin Orbitals:
-
-  Irrep: 1 Size: 6 x 6
-
-                 1                   2                   3                   4                   5
-
-    1     0.00000000000000     1.39301812209338     0.06346557268028     0.05460988119520     0.05382425125137
-    2     1.39301812209338     0.00000000000000     0.92192933097838     0.92005117416560     0.92553894640180
-    3     0.06346557268028     0.92192933097838     0.00000000000000     0.00948340566601     0.00963226515302
-    4     0.05460988119520     0.92005117416560     0.00948340566601     0.00000000000000     0.00980864658372
-    5     0.05382425125137     0.92553894640180     0.00963226515302     0.00980864658372     0.00000000000000
-    6     0.87025691374384     0.03827169656582     0.00197663985504     0.00864625313422     0.00845000100472
-
-                 6
-
-    1     0.87025691374384
-    2     0.03827169656582
-    3     0.00197663985504
-    4     0.00864625313422
-    5     0.00845000100472
-    6     0.00000000000000
-
-
-
-  Atomic Valences: 
-
- #  #
- Irrep: 1
-      1:  2.4351747
-      2:  4.1988093
-      3:  1.0064872
-      4:  1.0025994
-      5:  1.0072541
-      6:  0.9276015
-
-
-    Psi4 stopped on: Monday, 05 October 2020 03:40PM
-    Psi4 wall time for execution: 0:00:04.75
-
-*** Psi4 exiting successfully. Buy a developer a beer!
+ Entering Gaussian System, Link 0=/opt/g09gh/gaussian/g09/g09
+ Input=methanol-sp-2-1-272.com
+ Output=methanol-sp-2-1-272.log
+ Initial command:
+ /opt/g09gh/gaussian/g09/l1.exe /scratch/bdw2292/Gau-methanol/Gau-9224.inp -scrdir=/scratch/bdw2292/Gau-methanol/
+ Entering Link 1 = /opt/g09gh/gaussian/g09/l1.exe PID=      9225.
+  
+ Copyright (c) 1988,1990,1992,1993,1995,1998,2003,2009, Gaussian, Inc.
+                  All Rights Reserved.
+  
+ This is part of the Gaussian(R) 09 program.  It is based on
+ the Gaussian(R) 03 system (copyright 2003, Gaussian, Inc.),
+ the Gaussian(R) 98 system (copyright 1998, Gaussian, Inc.),
+ the Gaussian(R) 94 system (copyright 1995, Gaussian, Inc.),
+ the Gaussian 92(TM) system (copyright 1992, Gaussian, Inc.),
+ the Gaussian 90(TM) system (copyright 1990, Gaussian, Inc.),
+ the Gaussian 88(TM) system (copyright 1988, Gaussian, Inc.),
+ the Gaussian 86(TM) system (copyright 1986, Carnegie Mellon
+ University), and the Gaussian 82(TM) system (copyright 1983,
+ Carnegie Mellon University). Gaussian is a federally registered
+ trademark of Gaussian, Inc.
+  
+ This software contains proprietary and confidential information,
+ including trade secrets, belonging to Gaussian, Inc.
+  
+ This software is provided under written license and may be
+ used, copied, transmitted, or stored only in accord with that
+ written license.
+  
+ The following legend is applicable only to US Government
+ contracts under FAR:
+  
+                    RESTRICTED RIGHTS LEGEND
+  
+ Use, reproduction and disclosure by the US Government is
+ subject to restrictions as set forth in subparagraphs (a)
+ and (c) of the Commercial Computer Software - Restricted
+ Rights clause in FAR 52.227-19.
+  
+ Gaussian, Inc.
+ 340 Quinnipiac St., Bldg. 40, Wallingford CT 06492
+  
+  
+ ---------------------------------------------------------------
+ Warning -- This program may not be used in any manner that
+ competes with the business of Gaussian, Inc. or will provide
+ assistance to any competitor of Gaussian, Inc.  The licensee
+ of this program is prohibited from giving any competitor of
+ Gaussian, Inc. access to this program.  By using this program,
+ the user acknowledges that Gaussian, Inc. is engaged in the
+ business of creating and licensing software in the field of
+ computational chemistry and represents and warrants to the
+ licensee that it is not a competitor of Gaussian, Inc. and that
+ it will not use this program in any manner prohibited above.
+ ---------------------------------------------------------------
+  
+
+ Cite this work as:
+ Gaussian 09, Revision A.02,
+ M. J. Frisch, G. W. Trucks, H. B. Schlegel, G. E. Scuseria, 
+ M. A. Robb, J. R. Cheeseman, G. Scalmani, V. Barone, B. Mennucci, 
+ G. A. Petersson, H. Nakatsuji, M. Caricato, X. Li, H. P. Hratchian, 
+ A. F. Izmaylov, J. Bloino, G. Zheng, J. L. Sonnenberg, M. Hada, 
+ M. Ehara, K. Toyota, R. Fukuda, J. Hasegawa, M. Ishida, T. Nakajima, 
+ Y. Honda, O. Kitao, H. Nakai, T. Vreven, J. A. Montgomery, Jr., 
+ J. E. Peralta, F. Ogliaro, M. Bearpark, J. J. Heyd, E. Brothers, 
+ K. N. Kudin, V. N. Staroverov, R. Kobayashi, J. Normand, 
+ K. Raghavachari, A. Rendell, J. C. Burant, S. S. Iyengar, J. Tomasi, 
+ M. Cossi, N. Rega, J. M. Millam, M. Klene, J. E. Knox, J. B. Cross, 
+ V. Bakken, C. Adamo, J. Jaramillo, R. Gomperts, R. E. Stratmann, 
+ O. Yazyev, A. J. Austin, R. Cammi, C. Pomelli, J. W. Ochterski, 
+ R. L. Martin, K. Morokuma, V. G. Zakrzewski, G. A. Voth, 
+ P. Salvador, J. J. Dannenberg, S. Dapprich, A. D. Daniels, 
+ O. Farkas, J. B. Foresman, J. V. Ortiz, J. Cioslowski, 
+ and D. J. Fox, Gaussian, Inc., Wallingford CT, 2009.
+ 
+ ******************************************
+ Gaussian 09:  EM64L-G09RevA.02 11-Jun-2009
+                 8-Jan-2021 
+ ******************************************
+ %RWF=/scratch/bdw2292/Gau-methanol/,200GB
+ %Nosave
+ %Chk=methanol-sp-2-1-272.chk
+ %Mem=100GB
+ %Nproc=8
+ Will use up to    8 processors via shared memory.
+ ---------------------------------------------------------------------
+ #P wB97XD/6-311+G* SP SCF=(qc,maxcycle=800) Pop=NBORead MaxDisk=200GB
+ ---------------------------------------------------------------------
+ 1/38=1/1;
+ 2/12=2,17=6,18=5,40=1/2;
+ 3/5=4,6=6,7=11,11=2,16=1,25=1,30=1,74=-58/1,2,3;
+ 4//1;
+ 5/5=2,7=800,8=3,38=5/8;
+ 6/7=2,8=2,9=2,10=2,28=1,40=1/1,7;
+ 99/5=1,9=1/99;
+ Leave Link    1 at Fri Jan  8 13:45:37 2021, MaxMem=13421772800 cpu:       0.3
+ (Enter /opt/g09gh/gaussian/g09/l101.exe)
+ ---------------------------------------------------------------
+ methanol Rotatable Bond SP Calculation on node37.bme.utexas.edu
+ ---------------------------------------------------------------
+ Symbolic Z-matrix:
+ Charge =  0 Multiplicity = 1
+ O                     0.75605  -0.10817   0.016 
+ C                    -0.66071   0.00067  -0.00046 
+ H                    -1.05603   0.14822   1.0157 
+ H                    -1.11571  -0.88557  -0.46694 
+ H                    -0.96927   0.8734   -0.59657 
+ H                     1.13257   0.78307  -0.05943 
+ 
+ NAtoms=      6 NQM=      6 NQMF=      0 NMic=      0 NMicF=      0 NTot=      6.
+                    Isotopes and Nuclear Properties:
+ (Nuclear quadrupole moments (NQMom) in fm**2, nuclear magnetic moments (NMagM)
+  in nuclear magnetons)
+
+  Atom         1           2           3           4           5           6
+ IAtWgt=          16          12           1           1           1           1
+ AtmWgt=  15.9949146  12.0000000   1.0078250   1.0078250   1.0078250   1.0078250
+ NucSpn=           0           0           1           1           1           1
+ AtZEff=   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000
+ NQMom=    0.0000000   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000
+ NMagM=    0.0000000   0.0000000   2.7928460   2.7928460   2.7928460   2.7928460
+ Leave Link  101 at Fri Jan  8 13:45:37 2021, MaxMem=13421772800 cpu:       0.9
+ (Enter /opt/g09gh/gaussian/g09/l202.exe)
+                          Input orientation:                          
+ ---------------------------------------------------------------------
+ Center     Atomic      Atomic             Coordinates (Angstroms)
+ Number     Number       Type             X           Y           Z
+ ---------------------------------------------------------------------
+      1          8           0        0.756052   -0.108171    0.015999
+      2          6           0       -0.660711    0.000672   -0.000457
+      3          1           0       -1.056029    0.148223    1.015701
+      4          1           0       -1.115714   -0.885571   -0.466936
+      5          1           0       -0.969274    0.873396   -0.596565
+      6          1           0        1.132565    0.783074   -0.059425
+ ---------------------------------------------------------------------
+                    Distance matrix (angstroms):
+                    1          2          3          4          5
+     1  O    0.000000
+     2  C    1.421033   0.000000
+     3  H    2.085373   1.100284   0.000000
+     4  H    2.083527   1.100026   1.808454   0.000000
+     5  H    2.077368   1.101001   1.769973   1.769806   0.000000
+     6  H    0.970448   1.957414   2.519697   2.829346   2.171268
+                    6
+     6  H    0.000000
+ Stoichiometry    CH4O
+ Framework group  C1[X(CH4O)]
+ Deg. of freedom    12
+ Full point group                 C1      NOp   1
+ Largest Abelian subgroup         C1      NOp   1
+ Largest concise Abelian subgroup C1      NOp   1
+                         Standard orientation:                         
+ ---------------------------------------------------------------------
+ Center     Atomic      Atomic             Coordinates (Angstroms)
+ Number     Number       Type             X           Y           Z
+ ---------------------------------------------------------------------
+      1          8           0        0.749214   -0.128577    0.007130
+      2          6           0       -0.664802    0.012401    0.002646
+      3          1           0       -1.050948    0.139923    1.025023
+      4          1           0       -1.142318   -0.849854   -0.485771
+      5          1           0       -0.956947    0.908357   -0.566667
+      6          1           0        1.145316    0.755788   -0.045497
+ ---------------------------------------------------------------------
+ Rotational constants (GHZ):    126.9233204     24.6651415     23.8103500
+ Leave Link  202 at Fri Jan  8 13:45:37 2021, MaxMem=13421772800 cpu:       0.0
+ (Enter /opt/g09gh/gaussian/g09/l301.exe)
+ Standard basis: 6-311+G(d) (5D, 7F)
+ Ernie: Thresh=  0.10000D-02 Tol=  0.10000D-05 Strict=F.
+ There are    56 symmetry adapted basis functions of A   symmetry.
+ Integral buffers will be    131072 words long.
+ Raffenetti 2 integral format.
+ Two-electron integral symmetry is turned on.
+    56 basis functions,    92 primitive gaussians,    58 cartesian basis functions
+     9 alpha electrons        9 beta electrons
+       nuclear repulsion energy        40.1460454324 Hartrees.
+ IExCor= 4639 DFT=T Ex+Corr=wB97XD ExCW=0 ScaHFX=  1.000000
+ ScaDFX=  1.000000  1.000000  1.000000  1.000000 ScalE2=  1.000000  1.000000
+ IRadAn=      0 IRanWt=     -1 IRanGd=            0 ICorTp=0
+  HFx wShort=  0.000000 wLong=  0.200000 cFull=  0.222036 cShort=  0.000000 cLong=  0.777964
+  DFx wShort=  0.000000 wLong=  0.200000 cFull=  0.000000 cShort=  0.000000 cLong=  1.000000
+ NAtoms=    6 NActive=    6 NUniq=    6 SFac= 7.50D-01 NAtFMM=   80 NAOKFM=F Big=F
+ R6Disp: Dispersion energy =        -0.0008143623 Hartrees.
+ Nuclear repulsion after empirical dispersion term =       40.1452310701 Hartrees.
+ Leave Link  301 at Fri Jan  8 13:45:37 2021, MaxMem=13421772800 cpu:       0.5
+ (Enter /opt/g09gh/gaussian/g09/l302.exe)
+ NPDir=0 NMtPBC=     1 NCelOv=     1 NCel=       1 NClECP=     1 NCelD=      1
+         NCelK=      1 NCelE2=     1 NClLst=     1 CellRange=     0.0.
+ One-electron integrals computed using PRISM.
+ NBasis=    56 RedAO= T  NBF=    56
+ NBsUse=    56 1.00D-06 NBFU=    56
+ Precomputing XC quadrature grid using
+ IXCGrd= 2 IRadAn=           0 IRanWt=          -1 IRanGd=           0 AccXCQ= 1.00D-10.
+ NRdTot=     384 NPtTot=       48764 NUsed=       51543 NTot=       51575
+ NSgBfM=    58    58    58    58    58 NAtAll=     6     6.
+ Leave Link  302 at Fri Jan  8 13:45:37 2021, MaxMem=13421772800 cpu:       1.3
+ (Enter /opt/g09gh/gaussian/g09/l303.exe)
+ DipDrv:  MaxL=1.
+ Leave Link  303 at Fri Jan  8 13:45:37 2021, MaxMem=13421772800 cpu:       0.3
+ (Enter /opt/g09gh/gaussian/g09/l401.exe)
+ Harris functional with IExCor= 4639 diagonalized for initial guess.
+ ExpMin= 4.38D-02 ExpMax= 8.59D+03 ExpMxC= 1.30D+03 IAcc=2 IRadAn=         0 AccDes= 0.00D+00
+ HarFok:  IExCor= 4639 AccDes= 0.00D+00 IRadAn=         0 IDoV= 1
+ ScaDFX=  1.000000  1.000000  1.000000  1.000000
+ FoFCou: FMM=F IPFlag=           0 FMFlag=      100000 FMFlg1=           0
+         NFxFlg=           0 DoJE=T BraDBF=F KetDBF=T FulRan=T
+         Omega=  0.000000  0.000000  1.000000  0.000000  0.000000 ICntrl=     500 IOpCl=  0
+         NMat0=    1 NMatS0=    1 NMatT0=    0 NMatD0=    1 NMtDS0=    0 NMtDT0=    0
+         I1Cent=           4 NGrid=           0.
+ Petite list used in FoFCou.
+ Harris En= -110.970444359428    
+ Initial guess orbital symmetries:
+       Occupied  (A) (A) (A) (A) (A) (A) (A) (A) (A)
+       Virtual   (A) (A) (A) (A) (A) (A) (A) (A) (A) (A) (A) (A)
+                 (A) (A) (A) (A) (A) (A) (A) (A) (A) (A) (A) (A)
+                 (A) (A) (A) (A) (A) (A) (A) (A) (A) (A) (A) (A)
+                 (A) (A) (A) (A) (A) (A) (A) (A) (A) (A) (A)
+ The electronic state of the initial guess is 1-A.
+ Leave Link  401 at Fri Jan  8 13:45:38 2021, MaxMem=13421772800 cpu:       1.6
+ (Enter /opt/g09gh/gaussian/g09/l508.exe)
+ Direct SCF.
+ Tight linear equation convergence will be used.
+ RwB97XD wavefunction.
+ Quadratic Convergence SCF Method.
+ Line search only if initial step raises energy.
+ Integral symmetry usage will be decided dynamically.
+ ReadGW:  IGet=1 IStart=           2 Next=       51478 LGW=       51476.
+ Pruned (  75, 302) grid will be used in CalDFT.
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ FoFCou: FMM=F IPFlag=           0 FMFlag=      100000 FMFlg1=           0
+         NFxFlg=           0 DoJE=T BraDBF=F KetDBF=F FulRan=T
+         Omega=  0.000000  0.000000  1.000000  0.000000  0.000000 ICntrl=     500 IOpCl=  0
+         NMat0=    1 NMatS0=    1 NMatT0=    0 NMatD0=    1 NMtDS0=    0 NMtDT0=    0
+         I1Cent=           0 NGrid=           0.
+ Petite list used in FoFCou.
+ Iteration   1 EE= -115.681574615710                                    Grad=6.849D-01
+ Gradient too large for Newton-Raphson -- use scaled steepest descent instead.
+     ILin= 1 X=0.000D+00 Y=-1.156815746157D+02 DE= 0.00D+00
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+     ILin= 2 X=3.000D-01 Y=-1.157001056108D+02 DE=-1.85D-02
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+     ILin= 3 X=4.243D-01 Y=-1.157042126350D+02 DE=-2.26D-02
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+     ILin= 4 X=6.000D-01 Y=-1.157064773049D+02 DE=-2.49D-02
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+     ILin= 5 X=8.485D-01 Y=-1.157026475225D+02 DE=-2.11D-02
+     An  expanding polynomial of degree  5 produced  0.6084
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ Iteration   2 EE= -115.706482022755     Delta-E=       -0.024907407045 Grad=2.409D-01
+ Gradient too large for Newton-Raphson -- use scaled steepest descent instead.
+     ILin= 1 X=0.000D+00 Y=-1.157064820228D+02 DE= 0.00D+00
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+     ILin= 2 X=6.084D-01 Y=-1.157097744032D+02 DE=-3.29D-03
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+     ILin= 3 X=8.604D-01 Y=-1.157093631387D+02 DE=-2.88D-03
+     An  expanding polynomial of degree  3 produced  0.6347
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ Iteration   3 EE= -115.709780126488     Delta-E=       -0.003298103733 Grad=8.617D-02
+ Gradient too large for Newton-Raphson -- use scaled steepest descent instead.
+     ILin= 1 X=0.000D+00 Y=-1.157097801265D+02 DE= 0.00D+00
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+     ILin= 2 X=6.347D-01 Y=-1.157102835524D+02 DE=-5.03D-04
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+     ILin= 3 X=8.976D-01 Y=-1.157101993354D+02 DE=-4.19D-04
+     An  expanding polynomial of degree  3 produced  0.6371
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ Iteration   4 EE= -115.710283557472     Delta-E=       -0.000503430984 Grad=2.880D-02
+ Gradient too large for Newton-Raphson -- use scaled steepest descent instead.
+     ILin= 1 X=0.000D+00 Y=-1.157102835575D+02 DE= 0.00D+00
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+     ILin= 2 X=6.371D-01 Y=-1.157103717225D+02 DE=-8.82D-05
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+     ILin= 3 X=9.010D-01 Y=-1.157103600526D+02 DE=-7.65D-05
+     An  expanding polynomial of degree  3 produced  0.6599
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ Iteration   5 EE= -115.710371828561     Delta-E=       -0.000088271090 Grad=1.025D-02
+ Gradient too large for Newton-Raphson -- use scaled steepest descent instead.
+     ILin= 1 X=0.000D+00 Y=-1.157103718286D+02 DE= 0.00D+00
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+     ILin= 2 X=6.599D-01 Y=-1.157103893258D+02 DE=-1.75D-05
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+     ILin= 3 X=9.333D-01 Y=-1.157103864162D+02 DE=-1.46D-05
+     An  expanding polynomial of degree  3 produced  0.6629
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ Iteration   6 EE= -115.710389326118     Delta-E=       -0.000017497557 Grad=3.648D-03
+ QCNR:  CnvC1=2.91D-09 CnvC2=2.91D-08
+ LinEq1:  Iter=  0 NonCon=     1 RMS=7.95D-05 Max=4.04D-04
+ AX will form     1 AO Fock derivatives at one time.
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ LinEq1:  Iter=  1 NonCon=     1 RMS=6.27D-05 Max=6.19D-04
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ LinEq1:  Iter=  2 NonCon=     1 RMS=6.63D-06 Max=4.91D-05
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ LinEq1:  Iter=  3 NonCon=     1 RMS=8.23D-07 Max=5.70D-06
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ LinEq1:  Iter=  4 NonCon=     1 RMS=1.04D-07 Max=7.82D-07
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ LinEq1:  Iter=  5 NonCon=     1 RMS=1.46D-08 Max=7.17D-08
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ LinEq1:  Iter=  6 NonCon=     1 RMS=3.08D-09 Max=1.78D-08
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ LinEq1:  Iter=  7 NonCon=     0 RMS=8.70D-10 Max=4.06D-09
+ Linear equations converged to 2.909D-09 2.909D-08 after     7 iterations.
+ Angle between quadratic step and gradient=  56.58 degrees.
+     ILin= 1 X=0.000D+00 Y=-1.157103893261D+02 DE= 0.00D+00
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+     ILin= 2 X=1.000D+00 Y=-1.157103944163D+02 DE=-5.09D-06
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+     ILin= 3 X=1.414D+00 Y=-1.157103935399D+02 DE=-4.21D-06
+     An  expanding polynomial of degree  3 produced  0.9995
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ Iteration   7 EE= -115.710394416342     Delta-E=       -0.000005090225 Grad=1.913D-06
+ QCNR:  CnvC1=1.91D-11 CnvC2=1.91D-10
+ LinEq1:  Iter=  0 NonCon=     1 RMS=4.37D-08 Max=2.91D-07
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ LinEq1:  Iter=  1 NonCon=     1 RMS=1.67D-08 Max=8.28D-08
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ LinEq1:  Iter=  2 NonCon=     1 RMS=4.09D-09 Max=2.31D-08
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ LinEq1:  Iter=  3 NonCon=     1 RMS=1.52D-09 Max=8.52D-09
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ LinEq1:  Iter=  4 NonCon=     1 RMS=7.38D-10 Max=3.70D-09
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ LinEq1:  Iter=  5 NonCon=     1 RMS=2.02D-10 Max=1.38D-09
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ LinEq1:  Iter=  6 NonCon=     1 RMS=2.70D-11 Max=1.92D-10
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+ LinEq1:  Iter=  7 NonCon=     0 RMS=4.19D-12 Max=2.14D-11
+ Linear equations converged to 1.913D-11 1.913D-10 after     7 iterations.
+ Angle between quadratic step and gradient=  57.45 degrees.
+     ILin= 1 X=0.000D+00 Y=-1.157103944163D+02 DE= 0.00D+00
+ FoFJK:  IHMeth= 1 ICntrl=     0 DoSepK=T KAlg= 1 I1Cent= 0 FoldK=F
+     ILin= 2 X=1.000D+00 Y=-1.157103944163D+02 DE=-1.42D-12
+ Iteration   8 EE= -115.710394416344     Delta-E=       -0.000000000001 Grad=1.585D-10
+ Rotation gradient small -- convergence achieved.
+ SCF Done:  E(RwB97XD) =  -115.710394416     a.u. after    8 cycles
+            Convg  =    0.1585D-09                    36 Fock formations.
+              S**2 =  0.0000                  -V/T =  2.0036
+ Leave Link  508 at Fri Jan  8 13:45:48 2021, MaxMem=13421772800 cpu:      79.8
+ (Enter /opt/g09gh/gaussian/g09/l601.exe)
+ Copying SCF densities to generalized density rwf, IOpCl= 0 IROHF=0.
+
+ **********************************************************************
+
+            Population analysis using the SCF density.
+
+ **********************************************************************
+
+ Orbital symmetries:
+       Occupied  (A) (A) (A) (A) (A) (A) (A) (A) (A)
+       Virtual   (A) (A) (A) (A) (A) (A) (A) (A) (A) (A) (A) (A)
+                 (A) (A) (A) (A) (A) (A) (A) (A) (A) (A) (A) (A)
+                 (A) (A) (A) (A) (A) (A) (A) (A) (A) (A) (A) (A)
+                 (A) (A) (A) (A) (A) (A) (A) (A) (A) (A) (A)
+ The electronic state is 1-A.
+ Alpha  occ. eigenvalues --  -19.24943 -10.32668  -1.12594  -0.78251  -0.60221
+ Alpha  occ. eigenvalues --   -0.53100  -0.51730  -0.42295  -0.36345
+ Alpha virt. eigenvalues --    0.06355   0.08336   0.10478   0.10782   0.20000
+ Alpha virt. eigenvalues --    0.22329   0.23079   0.24454   0.27745   0.28342
+ Alpha virt. eigenvalues --    0.29131   0.31837   0.37369   0.48661   0.49922
+ Alpha virt. eigenvalues --    0.57321   0.61158   0.67248   0.68879   0.74075
+ Alpha virt. eigenvalues --    0.96970   1.10313   1.13758   1.13891   1.38058
+ Alpha virt. eigenvalues --    1.44084   1.59971   1.64943   1.67130   1.82163
+ Alpha virt. eigenvalues --    2.25533   2.48318   2.49407   2.52207   2.87087
+ Alpha virt. eigenvalues --    2.93246   3.04758   3.10513   3.22930   3.25848
+ Alpha virt. eigenvalues --    3.42582   3.95659   5.08750   5.18111   5.47727
+ Alpha virt. eigenvalues --   23.59366  49.97609
+          Condensed to atoms (all electrons):
+              1          2          3          4          5          6
+     1  O    8.239656   0.124802  -0.053412  -0.051312  -0.042955   0.216416
+     2  C    0.124802   5.342366   0.390852   0.391871   0.389567  -0.018281
+     3  H   -0.053412   0.390852   0.513630  -0.039055  -0.040714  -0.002427
+     4  H   -0.051312   0.391871  -0.039055   0.474265  -0.031112   0.006755
+     5  H   -0.042955   0.389567  -0.040714  -0.031112   0.520880  -0.008966
+     6  H    0.216416  -0.018281  -0.002427   0.006755  -0.008966   0.445146
+ Mulliken atomic charges:
+              1
+     1  O   -0.433195
+     2  C   -0.621177
+     3  H    0.231126
+     4  H    0.248588
+     5  H    0.213300
+     6  H    0.361357
+ Sum of Mulliken atomic charges =   0.00000
+ Mulliken charges with hydrogens summed into heavy atoms:
+              1
+     1  O   -0.071838
+     2  C    0.071838
+ Sum of Mulliken charges with hydrogens summed into heavy atoms =   0.00000
+ Electronic spatial extent (au):  <R**2>=             85.1127
+ Charge=              0.0000 electrons
+ Dipole moment (field-independent basis, Debye):
+    X=             -0.9836    Y=              1.8227    Z=             -0.1577  Tot=              2.0771
+ Quadrupole moment (field-independent basis, Debye-Ang):
+   XX=            -13.0660   YY=            -12.3056   ZZ=            -13.8858
+   XY=              2.5627   XZ=             -0.0513   YZ=              0.0004
+ Traceless Quadrupole moment (field-independent basis, Debye-Ang):
+   XX=              0.0198   YY=              0.7802   ZZ=             -0.8000
+   XY=              2.5627   XZ=             -0.0513   YZ=              0.0004
+ Octapole moment (field-independent basis, Debye-Ang**2):
+  XXX=              3.8711  YYY=              1.3179  ZZZ=              0.4791  XYY=              1.5961
+  XXY=              2.6899  XXZ=             -0.3262  XZZ=             -0.0049  YZZ=              0.4298
+  YYZ=             -0.7037  XYZ=             -0.2944
+ Hexadecapole moment (field-independent basis, Debye-Ang**3):
+ XXXX=            -63.1801 YYYY=            -20.6510 ZZZZ=            -20.5720 XXXY=              4.7057
+ XXXZ=              0.0043 YYYX=              2.7207 YYYZ=             -0.0994 ZZZX=             -0.6318
+ ZZZY=              0.1090 XXYY=            -13.0013 XXZZ=            -14.6670 YYZZ=             -6.9466
+ XXYZ=              0.2049 YYXZ=              0.6448 ZZXY=              0.5331
+ N-N= 4.014523107007D+01 E-N=-3.519414260691D+02  KE= 1.152899468213D+02
+ No NMR shielding tensors so no spin-rotation constants.
+ Leave Link  601 at Fri Jan  8 13:45:48 2021, MaxMem=13421772800 cpu:       0.9
+ (Enter /opt/g09gh/gaussian/g09/l607.exe)
+ Leave Link  607 at Fri Jan  8 13:46:00 2021, MaxMem=13421772800 cpu:      93.2
+ (Enter /opt/g09gh/gaussian/g09/l9999.exe)
+ 1\1\GINC-NODE37\SP\RwB97XD\6-311+G(d)\C1H4O1\BDW2292\08-Jan-2021\0\\#P
+  wB97XD/6-311+G* SP SCF=(qc,maxcycle=800) Pop=NBORead MaxDisk=200GB\\m
+ ethanol Rotatable Bond SP Calculation on node37.bme.utexas.edu\\0,1\O,
+ 0,0.756052,-0.108171,0.015999\C,0,-0.660711,0.000672,-0.000457\H,0,-1.
+ 056029,0.148223,1.015701\H,0,-1.115714,-0.885571,-0.466936\H,0,-0.9692
+ 74,0.873396,-0.596565\H,0,1.132565,0.783074,-0.059425\\Version=EM64L-G
+ 09RevA.02\State=1-A\HF=-115.7103944\RMSD=0.000e+00\Dipole=-0.4025428,0
+ .706138,-0.0845217\Quadrupole=-0.0698671,0.6647793,-0.5949121,1.888962
+ 3,-0.0881293,-0.0242172\PG=C01 [X(C1H4O1)]\\@
+
+
+ THE FIRST MORNING OF CREATION WROTE WHAT THE LAST DAWN OF
+ RECKONING SHALL READ. -- OMAR KHAYYAM
+ Job cpu time:  0 days  0 hours  3 minutes  6.1 seconds.
+ File lengths (MBytes):  RWF=      5 Int=      0 D2E=      0 Chk=      1 Scr=      1
+ Normal termination of Gaussian 09 at Fri Jan  8 13:46:07 2021.
