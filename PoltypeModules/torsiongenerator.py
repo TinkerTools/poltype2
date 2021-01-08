@@ -602,10 +602,11 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                 torsettofinshedtinkerxyzfiles[tuple(torset)].append(tinkerxyz)
             else:
                 failed=True
+
+
                 torsettofailedoutputlogtoinitialstructure[tuple(torset)][outputlog]=outputlogtoinitialstructure[outputlog]
 
-
-    if poltype.use_gaus==True or poltype.use_gausoptonly==True and failed==True:
+    if (poltype.use_gaus==True or poltype.use_gausoptonly==True) and failed==True:
         temp_use_gaus=poltype.use_gaus
         temp_use_gausoptonly=poltype.use_gausoptonly
         poltype.use_gaus=False
@@ -709,8 +710,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             if finished==True and outputlog not in finishedjobs:
                 finishedjobs.append(outputlog)
 
-    print('torsettofailedoutputlogtoinitialstructure',torsettofailedoutputlogtoinitialstructure)
-    if poltype.use_gaus==True or poltype.use_gausoptonly==True and failed==True:
+    if (poltype.use_gaus==True or poltype.use_gausoptonly==True) and failed==True:
         temp_use_gaus=poltype.use_gaus
         temp_use_gausoptonly=poltype.use_gausoptonly
         poltype.use_gaus=False
@@ -868,6 +868,7 @@ def get_torlist(poltype,mol,missed_torsions):
         f. Find other possible torsions around the bond t2-t3 and repeat steps c through e
     """
     torlist = []
+    hydtorsionlist=[]
     rotbndlist = {}
     iterbond = openbabel.OBMolBondIter(mol)
     for bond in iterbond:
@@ -913,8 +914,9 @@ def get_torlist(poltype,mol,missed_torsions):
             t1atomicnum=t1.GetAtomicNum()
             t4atomicnum=t4.GetAtomicNum()
             allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
-            if t1atomicnum==1 or t4atomicnum==1 and allhydtors==False:
+            if (t1atomicnum==1 or t4atomicnum==1) and allhydtors==False:
                 skiptorsion=True
+                hydtorsionlist.append(sortedtor)       
 
             unq=get_uniq_rotbnd(poltype,t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx())
             rotbndkey = '%d %d' % (unq[1],unq[2])
@@ -939,7 +941,7 @@ def get_torlist(poltype,mol,missed_torsions):
                         rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx()))
 
             
-    return (torlist ,rotbndlist)
+    return (torlist ,rotbndlist,hydtorsionlist)
 
 
 

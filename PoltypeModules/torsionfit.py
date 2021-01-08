@@ -508,7 +508,7 @@ def insert_torphasedict (poltype,mol, toraboutbnd, torprmdict, initangle,write_p
     datomicnum=obad.GetAtomicNum()
     babelindices=[a2,b2,c2,d2]
     allhydtor=db.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
-    if aatomicnum==1 or datomicnum==1 and allhydtor==False:
+    if (aatomicnum==1 or datomicnum==1) and allhydtor==False:
         return
     if (keyfilter is None or keyfilter == tpdkey): 
         # current torsion value (normalized by initangle)

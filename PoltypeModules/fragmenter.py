@@ -58,35 +58,40 @@ def GrabKeysFromValue(poltype,dic,thevalue):
     return keylist
 
 
-def GrabTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor):
+def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor):
     valenceprmlist=[]
     parentsymmtorlist=[]
     allparenttortorskeys=[]
     for array in equivalentrotbndindexarrays:
+        vdwfragment=False
         for rotbndindex in array:
-            rotkey=rotbndindex.replace('_',' ')
-            tors,maintortors,tortor=GrabParentTorsions(poltype,rotbndindextoringtor,rotbndindex,rotkey)
-            if len(maintortors)>0:
-                firsttor=maintortors[0]
-                secondtor=maintortors[1]
-                tortorclskey,tortoratomidxs=torsionfit.GenerateTorTorClasskey(poltype,firsttor,secondtor)
-                fwdsplit=tortorclskey.split()        
-                revsplit=fwdsplit[::-1]
-                rev='%d %d %d %d %d' % (int(revsplit[0]), int(revsplit[1]), int(revsplit[2]), int(revsplit[3]),int(revsplit[4]))
-                allparenttortorskeys.append(tortorclskey)
-                allparenttortorskeys.append(rev)
-            for torsion in tors:
-                fwd=torgen.get_class_key(poltype,torsion[0],torsion[1],torsion[2],torsion[3])
-                fwdsplit=fwd.split()        
-                revsplit=fwdsplit[::-1]
-                rev='%d %d %d %d' % (int(revsplit[0]), int(revsplit[1]), int(revsplit[2]), int(revsplit[3]))
-                if fwd not in parentsymmtorlist:
-                    parentsymmtorlist.append(fwd)
-                if rev not in parentsymmtorlist:
-                    parentsymmtorlist.append(rev)
+            if '_' not in rotbndindex:
+                vdwfragment=True
+            if vdwfragment==False:
+                rotkey=rotbndindex.replace('_',' ')
+                tors,maintortors,tortor=GrabParentTorsions(poltype,rotbndindextoringtor,rotbndindex,rotkey)
+                if len(maintortors)>0:
+                    firsttor=maintortors[0]
+                    secondtor=maintortors[1]
+                    tortorclskey,tortoratomidxs=torsionfit.GenerateTorTorClasskey(poltype,firsttor,secondtor)
+                    fwdsplit=tortorclskey.split()        
+                    revsplit=fwdsplit[::-1]
+                    rev='%d %d %d %d %d' % (int(revsplit[0]), int(revsplit[1]), int(revsplit[2]), int(revsplit[3]),int(revsplit[4]))
+                    allparenttortorskeys.append(tortorclskey)
+                    allparenttortorskeys.append(rev)
+                for torsion in tors:
+                    fwd=torgen.get_class_key(poltype,torsion[0],torsion[1],torsion[2],torsion[3])
+                    fwdsplit=fwd.split()        
+                    revsplit=fwdsplit[::-1]
+                    rev='%d %d %d %d' % (int(revsplit[0]), int(revsplit[1]), int(revsplit[2]), int(revsplit[3]))
+                    if fwd not in parentsymmtorlist:
+                        parentsymmtorlist.append(fwd)
+                    if rev not in parentsymmtorlist:
+                        parentsymmtorlist.append(rev)
     classkeytoparameters={}
     classkeytofragmentfilename={}
     classkeytotorsionindexescollected={}
+    classkeytoatomindexescollected={}
     classkeytosmartscollected={}
     classkeytosmartsposarraycollected={}
     tortorclasskeytogridpts={}
@@ -98,11 +103,14 @@ def GrabTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepath,equ
     for rotbndindex,fragmentfilepath in rotbndindextofragmentfilepath.items():
         path,filename=os.path.split(fragmentfilepath)
         os.chdir(path)
-       
+        vdwfragment=False
+        if '_' not in rotbndindex:
+            vdwfragment=True 
          
         filelist=os.listdir(os.getcwd())
         foundkey5=False
         foundkey=False
+
         for ff in filelist:
             if '.key' in ff:
                 foundkey=True
@@ -110,26 +118,29 @@ def GrabTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepath,equ
                 foundkey5=True
                 parentindextofragindex=json.load(open("parentindextofragindex.txt"))
                 parentsymclasstofragsymclass=json.load(open("parentsymclasstofragsymclass.txt"))
-                parentindextofragindex=json.load(open("parentindextofragindex.txt"))
-                parentclasskeytofragclasskey=json.load(open("parentclasskeytofragclasskey.txt"))
                 classkeytosmartsposarray=json.load(open("classkeytosmartsposarray.txt"))
                 classkeytosmarts=json.load(open("classkeytosmarts.txt"))
-                classkeytotorsionindexes=json.load(open("classkeytotorsionindexes.txt"))
-                parenttortorclasskeytofragtortorclasskey=json.load(open("parenttortorclasskeytofragtortorclasskey.txt"))
-                tortorclasskeytosmartsposarray=json.load(open("tortorclasskeytosmartsposarray.txt"))
-                tortorclasskeytosmarts=json.load(open("tortorclasskeytosmarts.txt"))
-                tortorclasskeytotorsionindexes=json.load(open("tortorclasskeytotorsionindexes.txt"))
 
-                fragsymmtorlist=[]
-                for tor in parentsymmtorlist:
-                    if tor in parentclasskeytofragclasskey.keys():
-                        fragclasskey=parentclasskeytofragclasskey[tor]
-                        fragsymmtorlist.append(fragclasskey)
-                fragsymmtortorlist=[]
-                for tortorclskey in allparenttortorskeys:
-                    if tortorclskey in parenttortorclasskeytofragtortorclasskey.keys():
-                        fragtortorclskey=parenttortorclasskeytofragtortorclasskey[tortorclskey]
-                        fragsymmtortorlist.append(fragtortorclskey) 
+                if vdwfragment==False:
+                    classkeytotorsionindexes=json.load(open("classkeytotorsionindexes.txt"))
+                    parenttortorclasskeytofragtortorclasskey=json.load(open("parenttortorclasskeytofragtortorclasskey.txt"))
+                    tortorclasskeytosmartsposarray=json.load(open("tortorclasskeytosmartsposarray.txt"))
+                    tortorclasskeytosmarts=json.load(open("tortorclasskeytosmarts.txt"))
+                    tortorclasskeytotorsionindexes=json.load(open("tortorclasskeytotorsionindexes.txt"))
+
+                    fragsymmtorlist=[]
+                    for tor in parentsymmtorlist:
+                        if tor in parentclasskeytofragclasskey.keys():
+                            fragclasskey=parentclasskeytofragclasskey[tor]
+                            fragsymmtorlist.append(fragclasskey)
+                    fragsymmtortorlist=[]
+                    for tortorclskey in allparenttortorskeys:
+                        if tortorclskey in parenttortorclasskeytofragtortorclasskey.keys():
+                            fragtortorclskey=parenttortorclasskeytofragtortorclasskey[tortorclskey]
+                            fragsymmtortorlist.append(fragtortorclskey) 
+                else:
+                    classkeytoatomindexes=json.load(open("classkeytoatomindexes.txt"))
+
                 temp=open(ff,'r')
                 results=temp.readlines()
                 temp.close()
@@ -137,7 +148,7 @@ def GrabTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepath,equ
                     line=results[lineidx]
                     newline=line.strip()
                     linesplit=newline.split()
-                    if 'torsion' in line and '#' not in line:
+                    if 'torsion' in line and '#' not in line and vdwfragment==False:
                         typea=int(linesplit[1])
                         typeb=int(linesplit[2])
                         typec=int(linesplit[3])
@@ -164,7 +175,7 @@ def GrabTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepath,equ
                                 classkeytosmartsposarraycollected[classkey]=smartsposarray
                                 classkeytoparameters[classkey]=prms
                                 classkeytofragmentfilename[classkey]=filename
-                    elif 'tortors' in line:
+                    elif 'tortors' in line and vdwfragment==False:
                         typea=int(linesplit[1])
                         typeb=int(linesplit[2])
                         typec=int(linesplit[3])
@@ -194,6 +205,22 @@ def GrabTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepath,equ
                                 tortorclasskeytogridpts[classkey]=gridpts
                                 tortorclasskeytogridlinesarray[classkey]=gridlinesarray
                                 classkeytofragmentfilename[classkey]=filename
+                    elif 'vdw' in line and '#' not in line and vdwfragment==True:
+                        fragclasskey=linesplit[1]
+                        fragsymclass=int(fragclasskey)
+                        parentclasskeys=GrabKeysFromValue(poltype,parentsymclasstofragsymclass,fragsymclass)
+                        parentsymclass=parentclasskeys[0]
+                        classkey=str(parentsymclass)
+                        prms=linesplit[2:]
+                        smartsposarray=classkeytosmartsposarray[classkey]
+                        atomindexes=classkeytoatomindexes[classkey]
+                        smarts=classkeytosmarts[classkey]
+                        classkeytoatomindexescollected[classkey]=atomindexes
+                        classkeytosmartscollected[classkey]=smarts
+                        classkeytosmartsposarraycollected[classkey]=smartsposarray
+                        classkeytoparameters[classkey]=prms
+                        classkeytofragmentfilename[classkey]=filename
+
 
 
 
@@ -222,6 +249,11 @@ def GrabTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepath,equ
 
             else:
                 temp.write(line)
+        elif 'vdw' in line and '#' not in line:
+            classkey=linesplit[1]
+            if classkey in classkeytoatomindexescollected.keys():
+                valenceprmlist=ConstructVdwLineFromFragment(poltype,classkey,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarraycollected,classkeytosmartscollected,classkeytoatomindexescollected,temp,valenceprmlist,fitline)
+
 
             
         else:
@@ -234,6 +266,32 @@ def GrabTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepath,equ
 
     temp.close()
     WriteOutDatabaseLines(poltype,valenceprmlist)
+
+
+
+def ConstructVdwLineFromFragment(poltype,key,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarraycollected,classkeytosmartscollected,classkeytoatomindexescollected,temp,valenceprmlist,fitline):
+    filename=classkeytofragmentfilename[key]
+    prms=classkeytoparameters[key]
+    parameters=' '.join(prms)
+    line='vdw '+key+' '+parameters+'\n'
+    smartspos=classkeytosmartsposarraycollected[key]
+    smarts=classkeytosmartscollected[key]
+    atomindexes=classkeytoatomindexescollected[key]
+    fitline+=' SMARTS '+smarts+' vdw atom indexes = '+atomindexes+' with smarts torsion indices '+smartspos+' from fragment '+filename+"\n"
+    valencestring='vdw'+' % '+smarts+' % '+smartspos+' % '
+    prmsplit=prms.split()
+    for prm in prmsplit:
+        valencestring+=prm+','
+    valencestring=valencestring[:-1]
+    valencestring+='\n'
+    temp.write(fitline)
+    temp.write('# '+valencestring)
+    temp.write(line)
+    valenceprmlist.append(valencestring)
+    return valenceprmlist
+
+
+
 
 
 def WriteOutDatabaseLines(poltype,valenceprmlist):
@@ -484,6 +542,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         strfragrotbndindexes=''
         strparentrotbndindexes=''
         fragrotbnds=[]
+        vdwfragment=False
         for i in range(len(array)):
             rotbndindex=array[i]
             fragmentfilepath=rotbndindextofragmentfilepath[rotbndindex]
@@ -498,19 +557,24 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 parentindextofragindex=equivalentparentindextofragindex[rotbndindex]    
             
             MakeFileName(poltype,equivalentrotbndindex,'equivalentfragment.txt')
-            rotbndindexes=rotbndindex.split('_')
-            parentrotbndindexes=[int(i) for i in rotbndindexes]
-            rotbndindexes=[int(i)-1 for i in parentrotbndindexes]
-            fragrotbndindexes=[parentindextofragindex[i]+1 for i in rotbndindexes]
-            for j in range(0,len(fragrotbndindexes),2):
-                fragrotbnd=str(fragrotbndindexes[j])+' '+str(fragrotbndindexes[j+1])
-                if fragrotbnd not in fragrotbnds:
-                    fragrotbnds.append(fragrotbnd)
-                    strfragrotbndindexes+=str(fragrotbndindexes[j])+' '+str(fragrotbndindexes[j+1])+','
-            
-                strparentrotbndindexes+=str(parentrotbndindexes[j])+' '+str(parentrotbndindexes[j+1])+','
-        strfragrotbndindexes=strfragrotbndindexes[:-1]
-        if rotbndindex in rotbndindextoringtor.keys():
+            if '_' not in rotbndindex:
+                vdwfragment=True
+            if vdwfragment==False:
+                rotbndindexes=rotbndindex.split('_')
+                parentrotbndindexes=[int(i) for i in rotbndindexes]
+                rotbndindexes=[int(i)-1 for i in parentrotbndindexes]
+                fragrotbndindexes=[parentindextofragindex[i]+1 for i in rotbndindexes]
+                for j in range(0,len(fragrotbndindexes),2):
+                    fragrotbnd=str(fragrotbndindexes[j])+' '+str(fragrotbndindexes[j+1])
+                    if fragrotbnd not in fragrotbnds:
+                        fragrotbnds.append(fragrotbnd)
+                        strfragrotbndindexes+=str(fragrotbndindexes[j])+' '+str(fragrotbndindexes[j+1])+','
+                
+                    strparentrotbndindexes+=str(parentrotbndindexes[j])+' '+str(parentrotbndindexes[j+1])+','
+        if vdwfragment==True:
+            strfragrotbndindexes=strfragrotbndindexes[:-1]
+
+        if rotbndindex in rotbndindextoringtor.keys() or vdwfragment==True:
             strfragrotbndindexes=None
         strparentrotbndindexes=strparentrotbndindexes[:-1]
         fragmol=rotbndindextofragment[equivalentrotbndindex]
@@ -524,7 +588,8 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
 
         head,tail=os.path.split(fragmentfilepath)
         os.chdir(head)
-        MakeFileName(poltype,strparentrotbndindexes,'torsions.txt')
+        if vdwfragment==False:
+            MakeFileName(poltype,strparentrotbndindexes,'torsions.txt')
         parentindextofragindex=rotbndindextoparentindextofragindex[equivalentrotbndindex]
 
         tempdic={}
@@ -561,6 +626,8 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         classkeytosmartsposarray={}
         classkeytosmarts={}
         classkeytotorsionindexes={}
+        classkeytoatomindexes={}
+
         tortorclasskeytosmartsposarray={}
         tortorclasskeytosmarts={}
         tortorclasskeytotorsionindexes={}
@@ -569,41 +636,56 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         parenttortorclasskeytofragtortorclasskey={}
         copied=parentindextofragindex.copy()
         anothercopy=parentsymclasstofragsymclass.copy()
-        for rotbndindex in array:
-            if rotbndindex!=equivalentrotbndindex:
-                parentindextofragindex=copied[rotbndindex]
-                parentsymclasstofragsymclass=anothercopy[rotbndindex]
-            rotkey=rotbndindex.replace('_',' ')
-            tors,maintortors,tortor=GrabParentTorsions(poltype,rotbndindextoringtor,rotbndindex,rotkey)
+        if vdwfragment==False:
+            for rotbndindex in array:
+                if rotbndindex!=equivalentrotbndindex:
+                    parentindextofragindex=copied[rotbndindex]
+                    parentsymclasstofragsymclass=anothercopy[rotbndindex]
+                rotkey=rotbndindex.replace('_',' ')
+                tors,maintortors,tortor=GrabParentTorsions(poltype,rotbndindextoringtor,rotbndindex,rotkey)
 
-            for torsion in tors:
-                classkey=torgen.get_class_key(poltype,torsion[0], torsion[1], torsion[2], torsion[3])
-                fragclasskey=GenerateFragmentClassKey(poltype,classkey,parentsymclasstofragsymclass)
-                smilesposstring,fragtorstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,torsion,parentindextofragindex,fragidxarray)
-                parentclasskeytofragclasskey[classkey]=fragclasskey
-                classkeytosmartsposarray[classkey]=smilesposstring
-                classkeytosmarts[classkey]=fragsmarts
-                classkeytotorsionindexes[classkey]=fragtorstring
-        if tortor==True:
-            firsttor=maintortors[0]
-            secondtor=maintortors[1]
-            tortorclskey,tortoratomidxs=torsionfit.GenerateTorTorClasskey(poltype,firsttor,secondtor)
-            fragclasskey=GenerateFragmentClassKey(poltype,tortorclskey,parentsymclasstofragsymclass)
-            smilesposstring,fragtorstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,tortoratomidxs,parentindextofragindex,fragidxarray)
+                for torsion in tors:
+                    classkey=torgen.get_class_key(poltype,torsion[0], torsion[1], torsion[2], torsion[3])
+                    fragclasskey=GenerateFragmentClassKey(poltype,classkey,parentsymclasstofragsymclass)
+                    smilesposstring,fragtorstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,torsion,parentindextofragindex,fragidxarray)
+                    parentclasskeytofragclasskey[classkey]=fragclasskey
+                    classkeytosmartsposarray[classkey]=smilesposstring
+                    classkeytosmarts[classkey]=fragsmarts
+                    classkeytotorsionindexes[classkey]=fragtorstring
+            if tortor==True:
+                firsttor=maintortors[0]
+                secondtor=maintortors[1]
+                tortorclskey,tortoratomidxs=torsionfit.GenerateTorTorClasskey(poltype,firsttor,secondtor)
+                fragclasskey=GenerateFragmentClassKey(poltype,tortorclskey,parentsymclasstofragsymclass)
+                smilesposstring,fragtorstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,tortoratomidxs,parentindextofragindex,fragidxarray)
 
-            parenttortorclasskeytofragtortorclasskey[tortorclskey]=fragclasskey
-            tortorclasskeytosmartsposarray[tortorclskey]=smilesposstring
-            tortorclasskeytosmarts[tortorclskey]=fragsmarts
-            tortorclasskeytotorsionindexes[tortorclskey]=fragtorstring
-        WriteDictionaryToFile(poltype,tortorclasskeytosmartsposarray,"tortorclasskeytosmartsposarray.txt")
-        WriteDictionaryToFile(poltype,tortorclasskeytosmarts,"tortorclasskeytosmarts.txt")
-        WriteDictionaryToFile(poltype,tortorclasskeytotorsionindexes,"tortorclasskeytotorsionindexes.txt")
+                parenttortorclasskeytofragtortorclasskey[tortorclskey]=fragclasskey
+                tortorclasskeytosmartsposarray[tortorclskey]=smilesposstring
+                tortorclasskeytosmarts[tortorclskey]=fragsmarts
+                tortorclasskeytotorsionindexes[tortorclskey]=fragtorstring
 
-        WriteDictionaryToFile(poltype,parenttortorclasskeytofragtortorclasskey,"parenttortorclasskeytofragtortorclasskey.txt")
-        WriteDictionaryToFile(poltype,parentclasskeytofragclasskey,"parentclasskeytofragclasskey.txt")
+
+            WriteDictionaryToFile(poltype,tortorclasskeytosmartsposarray,"tortorclasskeytosmartsposarray.txt")
+            WriteDictionaryToFile(poltype,tortorclasskeytosmarts,"tortorclasskeytosmarts.txt")
+            WriteDictionaryToFile(poltype,tortorclasskeytotorsionindexes,"tortorclasskeytotorsionindexes.txt")
+
+            WriteDictionaryToFile(poltype,parenttortorclasskeytofragtortorclasskey,"parenttortorclasskeytofragtortorclasskey.txt")
+            WriteDictionaryToFile(poltype,parentclasskeytofragclasskey,"parentclasskeytofragclasskey.txt")
+            WriteDictionaryToFile(poltype,classkeytotorsionindexes,"classkeytotorsionindexes.txt")
+        else:
+            rotbndindex=array[0]
+            vdwatomindex=int(rotbndindex)
+            classkey=str(poltype.idxtosymclass[vdwatomindex])
+            ls=[vdwatomindex] 
+            smilesposstring,fragatomstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,ls,parentindextofragindex,fragidxarray)
+            classkeytosmartsposarray[classkey]=smilesposstring
+            classkeytosmarts[classkey]=fragsmarts
+            classkeytoatomindexes[classkey]=fragatomstring
+            WriteDictionaryToFile(poltype,classkeytoatomindexes,"classkeytoatomindexes.txt")
+
         WriteDictionaryToFile(poltype,classkeytosmartsposarray,"classkeytosmartsposarray.txt")
         WriteDictionaryToFile(poltype,classkeytosmarts,"classkeytosmarts.txt")
-        WriteDictionaryToFile(poltype,classkeytotorsionindexes,"classkeytotorsionindexes.txt")
+
         wholexyz=parentdir+r'/'+poltype.xyzoutfile
         wholemol=parentdir+r'/'+poltype.molstructfname
         
@@ -902,7 +984,7 @@ def GenerateWBOMatrix(poltype,molecule,moleculebabel,structfname):
 
     return WBOmatrix,outputname,error
 
-def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
+def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets):
 
     newdir='Fragments'
     if not os.path.isdir(newdir):
@@ -916,6 +998,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
     rotbndindextofragfoldername={}
     rotbndindextoWBOdifference={}
     rotbndindextoringtor={} 
+    tempmaxgrowthcycles=poltype.maxgrowthcycles
     for torset in torlist:
         extendedtorindexes=[]
         for tor in torset:
@@ -923,8 +1006,10 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
             for index in indexes:
                 if index not in extendedtorindexes:
                     extendedtorindexes.append(index)
-        if torset in poltype.nonaroringtorsets:
+        if torset in poltype.nonaroringtorsets or torset in missingvdwatomsets:
             poltype.maxgrowthcycles=0
+        else:
+            poltype.maxgrowthcycles=tempmaxgrowthcycles
             
         WBOdifferencetofragWBOmatrix={}
         WBOdifferencetofoldername={}
@@ -933,7 +1018,10 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         highlightbonds=[]
         fragfoldername=''
         for tor in torset:
-            fragfoldername+=str(tor[1])+'_'+str(tor[2])+'_'
+            if len(tor)>1:
+                fragfoldername+=str(tor[1])+'_'+str(tor[2])+'_'
+            else:
+                fragfoldername+=str(tor[0])+'_' # special case for vdw atom types
         fragfoldername+='Hydrated'
         if not os.path.isdir(fragfoldername):
             os.mkdir(fragfoldername)
@@ -948,14 +1036,20 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         fragmoltobondindexlist={}
         fragfoldername=''
         for tor in torset:
-            fragfoldername+=str(tor[1])+'_'+str(tor[2])+'_'
+            if len(tor)>1:
+                fragfoldername+=str(tor[1])+'_'+str(tor[2])+'_'
+            else:
+                fragfoldername+=str(tor[0])+'_'
         fragfoldername+='Index'+'_'+str(0)
         if not os.path.isdir(fragfoldername):
             os.mkdir(fragfoldername)
         os.chdir(fragfoldername)
         rotbndidx=''
         for tor in torset:
-            rotbndidx+=str(tor[1])+'_'+str(tor[2])+'_'
+            if len(tor)>1:
+                rotbndidx+=str(tor[1])+'_'+str(tor[2])+'_'
+            else:
+                rotbndidx+=str(tor[0])+'_'
         rotbndidx=rotbndidx[:-1]
         if torset in poltype.nonaroringtorsets:
             rotbndindextoringtor[rotbndidx]=torset
@@ -970,6 +1064,10 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
         if error:
             os.chdir('..')
             continue
+        # add fake torset for vdw,easier then adding if statements everywhere
+        if torset in missingvdwatomsets:
+            torset=GenerateFakeTorset(poltype,mol)
+
         fragmentWBOvalues=numpy.array([round(fragWBOmatrix[parentindextofragindex[tor[1]-1],parentindextofragindex[tor[2]-1]],3) for tor in torset]) # rdkit is 0 index based so need to subtract 1, babel is 1 indexbased
         parentWBOvalues=numpy.array([round(parentWBOmatrix[tor[1]-1,tor[2]-1],3) for tor in torset]) # Matrix has 0,0 so need to subtract 1 from babel index
         WBOdifference=numpy.amax(numpy.abs(fragmentWBOvalues-parentWBOvalues))
@@ -1039,10 +1137,17 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
     fragmentarray=[]
     namearray=[]
     for rotbndindex in rotbndindextofragment.keys():
-        fragment=rotbndindextofragment[rotbndindex]
-        fragmentarray.append(fragment)
-        namearray.append(rotbndindex)
+        if '_' in rotbndindex:
+            fragment=rotbndindextofragment[rotbndindex]
+            fragmentarray.append(fragment)
+            namearray.append(rotbndindex)
     equivalentrotbndindexarrays=FindEquivalentFragments(poltype,fragmentarray,namearray)
+    print('equivalentrotbndindexarrays',equivalentrotbndindexarrays)
+    for rotbndindex in rotbndindextofragment.keys():
+        if '_' not in rotbndindex: # for vdwfragments
+            array=[rotbndindex]
+            equivalentrotbndindexarrays.append(array)
+ 
     tempdic=rotbndindextoparentindextofragindex
     rotbndindextoparentindextofragindex=AddMatchingParentIndexesBetweenFragments(poltype,equivalentrotbndindexarrays,rotbndindextoparentindextofragindex,rotbndindextofragment)
     # now we need to redraw the 2Dimages for any fragments that are equivalent (get multiple torsions from different rotatable bonds around same fragment)
@@ -1098,6 +1203,20 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix):
             os.chdir(curdir)
     '''
     return rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor
+
+
+def GenerateFakeTorset(poltype,mol):
+    
+    bonditer=openbabel.OBMolBondIter(poltype.mol)
+    for bond in bonditer:
+        oendidx = bond.GetEndAtomIdx()
+        obgnidx = bond.GetBeginAtomIdx()
+        tor=[1,oendidx,obgnidx,1]
+        torset=[tuple(tor)]
+        return torset
+
+
+
 
 def AddMatchingParentIndexesBetweenFragments(poltype,equivalentrotbndindexarrays,rotbndindextoparentindextofragindex,rotbndindextofragment):
    newrotbndindextoparentindextofragindex={}
