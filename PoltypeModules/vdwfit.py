@@ -13,6 +13,8 @@ import optimization as opt
 import openbabel
 import itertools
 import symmetry as symm
+from socket import gethostname
+import shlex
 
 
 def best_fit_slope_and_intercept(poltype,xs,ys):
@@ -197,7 +199,6 @@ def MoveDimerAboutMinima(poltype,txyzFile,outputprefixname,nAtomsFirst,atomidx1,
         with open(fname,'w') as f:
     
             twoDots = [atomidx1,atomidx2] #two atoms selected to vary; the atom number exactly in TINKER file
-            
             temp=open(txyzFile,'r')
             lines=temp.readlines()
             temp.close()
@@ -205,10 +206,8 @@ def MoveDimerAboutMinima(poltype,txyzFile,outputprefixname,nAtomsFirst,atomidx1,
             coordSecondMol = [] #Coordinates of the second molecule
             data = lines[twoDots[0]].split()
             coordFirstAtm = [float(data[2]), float(data[3]), float(data[4])] 
-    
             data = lines[twoDots[1]].split()
             coordSecondAtm = [float(data[2]), float(data[3]), float(data[4])] 
-    
             varyVector = []
             norm = 0.0
             for i in range(3):
@@ -216,7 +215,6 @@ def MoveDimerAboutMinima(poltype,txyzFile,outputprefixname,nAtomsFirst,atomidx1,
                 norm += (coordSecondAtm[i]-coordFirstAtm[i])**2.0
             norm = norm**0.5 # initial distance between the two atoms
             distance=norm*frac
-    
             for i in range(3):
                 varyVector[i] = (distance - norm) * varyVector[i]/norm # scaling the x,y,z coordinates of displacement vector to new distance
             stringsList = [] 
@@ -419,7 +417,7 @@ def readTXYZ(poltype,TXYZ):
         coord.append([float(data[2]), float(data[3]), float(data[4])])
     return atoms,coord,order, types, connections
 
-def TXYZ2COM(poltype,TXYZ,comfname,chkname,maxdisk,maxmem,numproc):
+def TXYZ2COM(poltype,TXYZ,comfname,chkname,maxdisk,maxmem,numproc,mol):
     data = readTXYZ(poltype,TXYZ)
     atoms = data[0];coord = data[1]
     opt.write_com_header(poltype,comfname,chkname,maxdisk,maxmem,numproc)
@@ -496,12 +494,12 @@ def WriteOutCartesianXYZ(poltype,mol,filename):
     output.close()
 
 
-def GenerateSPInputFiles(poltype,filenamearray):
+def GenerateSPInputFiles(poltype,filenamearray,mol):
     qmfilenamearray=[]
     for filename in filenamearray:
         qmfilename=filename.replace('.xyz','_sp.com')
         chkfilename=filename.replace('.xyz','_sp.chk')
-        TXYZ2COM(poltype,filename,qmfilename,chkname,poltype.maxdisk,poltype.maxmem,poltype.numproc)   
+        TXYZ2COM(poltype,filename,qmfilename,chkfilename,poltype.maxdisk,poltype.maxmem,poltype.numproc,mol)   
         qmfilenamearray.append(qmfilename)
     return qmfilenamearray
 
@@ -514,7 +512,7 @@ def ExecuteSPJobs(poltype,qmfilenamearray,prefix):
     for i in range(len(qmfilenamearray)):
         filename=qmfilenamearray[i]
         outputname=filename.replace('.com','.log')
-        cmdstr = 'cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
+        cmdstr = 'cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+filename
         
         finished,error=poltype.CheckNormalTermination(outputname)
         if finished==True and error==False:
@@ -531,7 +529,7 @@ def ExecuteSPJobs(poltype,qmfilenamearray,prefix):
                 listofjobs.append(cmdstr)
                 jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputname
         outputfilenames.append(outputname)
-
+    lognames=[]
     for job in listofjobs:
         log=jobtooutputlog[job]
         lognames.append(os.path.abspath(poltype.logfname))
@@ -879,9 +877,10 @@ def GenerateInitialProbeStructure(poltype,missingvdwatomindices):
                   if e1=='H' and e2=='H':
                       continue
                   dimer = mol[:-4] + "-" + probename[:-4] + "_" + str("%d_%d"%(p1+1,len(atoms1)+p2+1)) + ".xyz"
-                  optimize(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,poltype.mol,probemol)
+                  if not os.path.isfile(dimer):
+                      optimize(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,poltype.mol,probemol)
                   dimernames.append(dimer)
-                  probeindices.append(p2+1)
+                  probeindices.append(p2+1+len(atoms1))
                   moleculeindices.append(p1+1)
     return dimernames,probeindices,moleculeindices
 
@@ -896,6 +895,10 @@ def GrabKeysFromValue(poltype,dic,thevalue):
 
 def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     poltype.optmaxcycle=400
+    poltype.optmethod='wB97X-D'
+    poltype.espmethod='wB97X-D'
+    poltype.SanitizeAllQMMethods()
+
     array=[.8,.9,1,1.1,1.2]
     dimerfiles,probeindices,moleculeindices=GenerateInitialProbeStructure(poltype,missingvdwatomindices)
     obConversion = openbabel.OBConversion()
@@ -913,7 +916,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
         poltype.fckoptfname=prefix+'.fchk'
         poltype.logoptfname=prefix+'.log'
         poltype.gausoptfname=prefix+'.log'
-        optmol = opt.GeometryOptimization(poltype,dimermol)
+        optmol = opt.GeometryOptimization(poltype,dimermol,checkbonds=False)
         dimeratoms=dimermol.NumAtoms()
         moleculeatoms=dimeratoms-3
         moleculeatom=optmol.GetAtom(moleculeindex)
@@ -928,8 +931,8 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
         WriteOutCartesianXYZ(poltype,optmol,inputxyz)
         ConvertWaterProbeDimerXYZToTinkerXYZ(poltype,inputxyz,poltype.tmpxyzfile,outputxyz)
         filenamearray=MoveDimerAboutMinima(poltype,outputxyz,outputprefixname,moleculeatoms,moleculeindex,probeindex,equildistance,array)
-        qmfilenamearray=GenerateSPInputFiles(poltype,filenamearray)
-        outputfilenames=ExecuteSPJobs(poltype,qmfilenamearray)
+        qmfilenamearray=GenerateSPInputFiles(poltype,filenamearray,poltype.mol)
+        outputfilenames=ExecuteSPJobs(poltype,qmfilenamearray,prefix)
         ReadCounterPoiseAndWriteQMData(poltype,outputfilenames)
         vdwtype=poltype.idxtosymclass[poltype.moleculeatomindex]
         vdwtypesarray=[vdwtype]

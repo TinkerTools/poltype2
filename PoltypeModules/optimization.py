@@ -336,7 +336,7 @@ def StructureMinimization(poltype):
     poltype.call_subsystem(cmd, True)
 
 
-def GeometryOptimization(poltype,mol):
+def GeometryOptimization(poltype,mol,checkbonds=True):
     poltype.WriteToLog("NEED QM Density Matrix: Executing Gaussian Opt and SP")
 
     
@@ -397,7 +397,8 @@ def GeometryOptimization(poltype,mol):
 
 
     GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'))
-    CheckBondConnectivity(poltype,mol,optmol)
+    if checkbonds==True:
+        CheckBondConnectivity(poltype,mol,optmol)
     return optmol
 
 

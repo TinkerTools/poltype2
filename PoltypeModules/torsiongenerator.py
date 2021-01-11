@@ -891,56 +891,56 @@ def get_torlist(poltype,mol,missed_torsions):
             continue
         if ringbond==True and poltype.allownonaromaticringscanning==False:
             continue
-            
+        if t2val<2 or t3val<2:
+            continue    
+        
+        t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
+        sortedtor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]])
+        print('sortedtor',sortedtor) 
+        if(sortedtor in missed_torsions) and len(poltype.onlyrotbndslist)==0:
+            skiptorsion = False
+            print('in here',sortedtor)
+        if [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist:
+            skiptorsion = False
         
 
-        if  [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist or (poltype.rotalltors and t2val>=2 and t3val>=2):
-            t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
-            sortedtor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]])
-          
-            if(sortedtor in missed_torsions) and len(poltype.onlyrotbndslist)==0:
-                skiptorsion = False
-            if [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist:
-                skiptorsion = False
-           
+        if poltype.rotalltors==True:
+            skiptorsion=False
 
-            if poltype.rotalltors==True:
-                skiptorsion=False
+        if bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds:
+            skiptorsion=True
 
-            if bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds:
-                skiptorsion=True
+        babelindices=[t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()]
+        t1atomicnum=t1.GetAtomicNum()
+        t4atomicnum=t4.GetAtomicNum()
+        allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
+        if (t1atomicnum==1 or t4atomicnum==1) and allhydtors==False:
+            skiptorsion=True
+            hydtorsionlist.append(sortedtor)       
 
-            babelindices=[t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()]
-            t1atomicnum=t1.GetAtomicNum()
-            t4atomicnum=t4.GetAtomicNum()
-            allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
-            if (t1atomicnum==1 or t4atomicnum==1) and allhydtors==False:
-                skiptorsion=True
-                hydtorsionlist.append(sortedtor)       
+        unq=get_uniq_rotbnd(poltype,t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx())
+        rotbndkey = '%d %d' % (unq[1],unq[2])
+        # store the torsion and temporary torsion value found by openbabel in torlist
+        tor = mol.GetTorsion(t1,t2,t3,t4)
+        if not skiptorsion:
+            torlist.append(unq)
+        # store torsion in rotbndlist
+        rotbndlist[rotbndkey] = []
+        rotbndlist[rotbndkey].append(unq)
+        # write out rotatable bond to log
+        #Find other possible torsions about this rotatable bond
+        iteratomatom = openbabel.OBAtomAtomIter(bond.GetBeginAtom())
+        for iaa in iteratomatom:
+            iteratomatom2 = openbabel.OBAtomAtomIter(bond.GetEndAtom())
+            for iaa2 in iteratomatom2:
+                a = iaa.GetIdx()
+                b = t2.GetIdx()
+                c = t3.GetIdx()
+                d = iaa2.GetIdx()
+                if ((iaa.GetIdx() != t3.GetIdx() and iaa2.GetIdx() != t2.GetIdx()) and not (iaa.GetIdx() == t1.GetIdx() and iaa2.GetIdx() == t4.GetIdx())):
+                    rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx()))
 
-            unq=get_uniq_rotbnd(poltype,t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx())
-            rotbndkey = '%d %d' % (unq[1],unq[2])
-            # store the torsion and temporary torsion value found by openbabel in torlist
-            tor = mol.GetTorsion(t1,t2,t3,t4)
-            if not skiptorsion:
-                torlist.append(unq)
-            # store torsion in rotbndlist
-            rotbndlist[rotbndkey] = []
-            rotbndlist[rotbndkey].append(unq)
-            # write out rotatable bond to log
-            #Find other possible torsions about this rotatable bond
-            iteratomatom = openbabel.OBAtomAtomIter(bond.GetBeginAtom())
-            for iaa in iteratomatom:
-                iteratomatom2 = openbabel.OBAtomAtomIter(bond.GetEndAtom())
-                for iaa2 in iteratomatom2:
-                    a = iaa.GetIdx()
-                    b = t2.GetIdx()
-                    c = t3.GetIdx()
-                    d = iaa2.GetIdx()
-                    if ((iaa.GetIdx() != t3.GetIdx() and iaa2.GetIdx() != t2.GetIdx()) and not (iaa.GetIdx() == t1.GetIdx() and iaa2.GetIdx() == t4.GetIdx())):
-                        rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx()))
-
-            
+        
     return (torlist ,rotbndlist,hydtorsionlist)
 
 
