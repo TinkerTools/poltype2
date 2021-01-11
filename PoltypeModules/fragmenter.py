@@ -891,6 +891,7 @@ def GenerateFrag(poltype,molindexlist,mol):
     newmol.UpdatePropertyCache(strict=False)
     AllChem.EmbedMolecule(newmol)
     rdkitindextocoordinates={}
+    print('os.cetcwd()',os.getcwd())
     for idx,coords in indextocoordinates.items():
         rdkitidx=idx-1
         rdkitindextocoordinates[rdkitidx]=coords
@@ -999,6 +1000,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets):
     rotbndindextoWBOdifference={}
     rotbndindextoringtor={} 
     tempmaxgrowthcycles=poltype.maxgrowthcycles
+    print('torlist',torlist)
     for torset in torlist:
         extendedtorindexes=[]
         for tor in torset:
@@ -1067,7 +1069,6 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets):
         # add fake torset for vdw,easier then adding if statements everywhere
         if torset in missingvdwatomsets:
             torset=GenerateFakeTorset(poltype,mol)
-
         fragmentWBOvalues=numpy.array([round(fragWBOmatrix[parentindextofragindex[tor[1]-1],parentindextofragindex[tor[2]-1]],3) for tor in torset]) # rdkit is 0 index based so need to subtract 1, babel is 1 indexbased
         parentWBOvalues=numpy.array([round(parentWBOmatrix[tor[1]-1,tor[2]-1],3) for tor in torset]) # Matrix has 0,0 so need to subtract 1 from babel index
         WBOdifference=numpy.amax(numpy.abs(fragmentWBOvalues-parentWBOvalues))
@@ -1142,7 +1143,6 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets):
             fragmentarray.append(fragment)
             namearray.append(rotbndindex)
     equivalentrotbndindexarrays=FindEquivalentFragments(poltype,fragmentarray,namearray)
-    print('equivalentrotbndindexarrays',equivalentrotbndindexarrays)
     for rotbndindex in rotbndindextofragment.keys():
         if '_' not in rotbndindex: # for vdwfragments
             array=[rotbndindex]
@@ -1656,6 +1656,10 @@ def Draw2DMoleculeWithWBO(poltype,WBOmatrix,basename,mol,bondindexlist=None,smir
             if bond!=None:
                 bondidx=bond.GetIdx()
                 bondlist.append(bondidx)
+    try:
+        mol.UpdatePropertyCache()
+    except:
+        return
     drawer.DrawMolecule(mol,highlightAtoms=[],highlightBonds=bondlist)
     drawer.FinishDrawing()
     svg = drawer.GetDrawingText().replace('svg:','')

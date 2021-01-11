@@ -1262,8 +1262,9 @@ class PolarizableTyper():
         if self.dontdotor==True:
             self.torlist=[]
         # add missingvdwindices to torlist (for fragmenter input)
-        if self.isfragjob==False and self.dontfrag==False:
-            missingvdwatomsets=[]
+
+        missingvdwatomsets=[]
+        if self.isfragjob==False and self.dontfrag==False and self.dontdovdwscan==False:
             for vdwatomindex in missingvdwatomindices:
                 ls=tuple([tuple([vdwatomindex])])
                 missingvdwatomsets.append(ls)
@@ -1284,7 +1285,6 @@ class PolarizableTyper():
             rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
         if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False and (self.dontdotor==False or self.dontdovdwscan==False):
             
-            self.rdkitmol=rdmolfiles.MolFromMolFile(self.molstructfnamemol,sanitize=True,removeHs=False)
 
             WBOmatrix,outputname,error=frag.GenerateWBOMatrix(self,self.rdkitmol,self.mol,self.logoptfname.replace('.log','.xyz'))
             highlightbonds=[]

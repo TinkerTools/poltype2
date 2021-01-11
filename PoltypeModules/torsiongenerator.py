@@ -17,6 +17,7 @@ from rdkit.Chem import rdMolTransforms as rdmt
 from rdkit import Chem
 from itertools import product,combinations
 import shlex
+from rdkit.Chem import rdmolfiles
 
 def __init__(poltype):
     PolarizableTyper.__init__(poltype)
@@ -835,15 +836,15 @@ def FindPartialDoubleBonds(poltype,rdkitmol):
     smartslist=[amidesmarts,acidsmarts]
     for smartsidx in range(len(smartslist)):
         smarts=smartslist[smartsidx]
-        substructure = Chem.MolFromSmarts(smarts)
-        rdkitmol.UpdatePropertyCache()
-        matches=rdkitmol.GetSubstructMatches(substructure)
+        sp = openbabel.OBSmartsPattern()
+        openbabel.OBSmartsPattern.Init(sp,smarts)
+        diditmatch=sp.Match(poltype.mol)
+        matches=sp.GetMapList()
         for match in matches:
             if smartsidx==0:
-                bond=[match[0],match[1]]
+                babelbond=[match[0],match[1]]
             else:
-                bond=[match[0],match[2]]
-            babelbond=[i+1 for i in bond] 
+                babelbond=[match[0],match[2]]
             if babelbond not in poltype.partialdoublebonds:
                 poltype.partialdoublebonds.append(babelbond)
 
