@@ -1632,9 +1632,18 @@ def GrabPlanarBonds(poltype,listofbondsforprm,mol): # used for checking missing 
             bond=totalbonds[lsidx]
             a = mol.GetAtom(bond[0]+1)
             b = mol.GetAtom(bond[1]+1)
-            if b.GetHyb()==2 and len(list(openbabel.OBAtomAtomIter(b)))==3:
-                if bond not in planarbonds:
-                    planarbonds.append(bond)
+            ainring=a.IsInRing()
+            binring=b.IsInRing()
+            aisaromatic=a.IsAromatic()
+            bisaromatic=b.IsAromatic()
+            if ainring==True and binring==True:
+                if aisaromatic==True or bisaromatic==True:
+                    if bond not in planarbonds:
+                        planarbonds.append(bond)
+            else:
+                if b.GetHyb()==2 and len(list(openbabel.OBAtomAtomIter(b)))==3:
+                    if bond not in planarbonds:
+                        planarbonds.append(bond)
 
     return planarbonds 
 
@@ -2085,18 +2094,28 @@ def TinkerClassesToTrigonalCenter(poltype,opbendbondindicestotinkerclasses,opben
 
     return opbendtinkerclassestotrigonalcenterbools
 
-def GrabMissingVdwParameterGuesses(poltype,vdwprms,vdwmissing):
-
-    missingvdwatomindextoradiusguess={}
-    missingvdwatomindextodepthguess={}
 
 
+def FilterDictionaries(poltype,dics,ls):
+    newdics=[]
+    for dic in dics:
+        newdic={}
+        for key,value in dic.items():
+            if key in ls:
+                newdic[key]=value
+        newdics.append(newdic)
+    return newdics
 
+def ConvertListOfListToListOfTuples(poltype,listoflist):
+    listoftuples=[]
+    for item in listoflist:
+        tup=tuple(item)
+        listoftuples.append(tup)
+    return listoftuples
 
 
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters=ReadExternalDatabase(poltype)
-
     smartsatomordertoelementtinkerdescrip=ReadSmallMoleculeLib(poltype,poltype.smallmoleculesmartstotinkerdescrip)
     elementtinkerdescriptotinkertype,tinkertypetoclass=GrabTypeAndClassNumbers(poltype,poltype.smallmoleculeprmlib)
     listofatomsforprm,listofbondsforprm,listofanglesforprm,listoftorsionsforprm=GrabAtomsForParameters(poltype,mol)
@@ -2141,8 +2160,11 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
 
     bondindicestotinkertypes,bondindicestotinkerclasses,bondindicestoparametersmartsatomorders,bondindicestoelementtinkerdescrips,bondindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,bondsforprmtoparametersmarts,bondsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
 
-
     opbendbondindicestotinkerclasses,opbendbondindicestosmartsatomorders=FilterBondSMARTSEnviorment(poltype,bondindicestosmartsatomorders,bondindicestotinkerclasses)
+    newplanarbonds=ConvertListOfListToListOfTuples(poltype,planarbonds)
+     
+    newdics=FilterDictionaries(poltype,[opbendbondindicestotinkerclasses,opbendbondindicestosmartsatomorders],newplanarbonds)
+    opbendbondindicestotinkerclasses,opbendbondindicestosmartsatomorders=newdics[:]
     planarbondindicestotinkertypes,planarbondindicestotinkerclasses,planarbondindicestoparametersmartsatomorders,planarbondindicestoelementtinkerdescrips,planarbondindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,planarbondsforprmtoparametersmarts,planarbondsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
 
     angleindicestotinkertypes,angleindicestotinkerclasses,angleindicestoparametersmartsatomorders,angleindicestoelementtinkerdescrips,angleindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,anglesforprmtoparametersmarts,anglesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
@@ -2160,6 +2182,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     torsionsmissingindicestotinkerclasses=PruneDictionary(poltype,torsionsmissing,torsionindicestotinkerclasses)
     atomtinkerclasstopoltypeclass=TinkerClassesToPoltypeClasses(poltype,atomindextotinkerclass)
     bondtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,bondindicestotinkerclasses)
+   
     planarbondtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,planarbondindicestotinkerclasses)
     opbendtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,opbendbondindicestotinkerclasses)
     opbendtinkerclassestopoltypeclasses=AddReverseKeys(poltype,opbendtinkerclassestopoltypeclasses)

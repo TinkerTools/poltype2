@@ -896,10 +896,8 @@ def get_torlist(poltype,mol,missed_torsions):
         
         t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
         sortedtor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]])
-        print('sortedtor',sortedtor) 
         if(sortedtor in missed_torsions) and len(poltype.onlyrotbndslist)==0:
             skiptorsion = False
-            print('in here',sortedtor)
         if [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist:
             skiptorsion = False
         
