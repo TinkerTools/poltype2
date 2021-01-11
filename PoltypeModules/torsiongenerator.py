@@ -1191,6 +1191,8 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
         temp.write('    scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
     temp.write('    break'+'\n')
     temp.write('  except OptimizationConvergenceError:'+'\n')
+    temp.write('    break'+'\n')
+    temp.write('  else:'+'\n')
     temp.write('    try:'+'\n')
     temp.write('      set opt_coordinates cartesian'+'\n')
     if ('I ' in spacedformulastr):
