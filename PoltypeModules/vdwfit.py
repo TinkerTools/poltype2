@@ -437,7 +437,7 @@ def TXYZ2COM(poltype,TXYZ,comfname,chkname,maxdisk,maxmem,numproc,mol):
     tmpfh.write(opstr)
     commentstr = poltype.molecprefix + " Gaussian SP Calculation on " + gethostname()
     tmpfh.write('\n%s\n\n' % commentstr)
-    tmpfh.write('%d %d %d %d %d %d\n' % (mol.GetTotalCharge(), mol.GetTotalSpinMultiplicity(),mol.GetTotalCharge(), mol.GetTotalSpinMultiplicity()+1,0,1))
+    tmpfh.write('%d %d %d %d %d %d\n' % (mol.GetTotalCharge(), mol.GetTotalSpinMultiplicity(),mol.GetTotalCharge(), mol.GetTotalSpinMultiplicity(),0,1))
 
     for n in range(len(atoms)):
         if n>=len(atoms)-3:

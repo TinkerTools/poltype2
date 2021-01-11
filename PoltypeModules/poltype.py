@@ -1095,7 +1095,7 @@ class PolarizableTyper():
 
 
         chgcount=self.NumberOfChargedAtoms(mol)
-        if self.totalcharge!=0 and chgcount>1:
+        if self.totalcharge==0 and chgcount>1:
             if self.foundgauss==True:
                 self.use_gauPCM=True
                 self.SanitizeAllQMMethods()
