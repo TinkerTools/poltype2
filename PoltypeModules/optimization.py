@@ -70,6 +70,8 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
         temp.write('    scf_e,scf_wfn=freq("%s/%s",return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
     temp.write('    break'+'\n')
     temp.write('  except OptimizationConvergenceError:'+'\n')
+    temp.write('    break'+'\n')
+    temp.write('  else:'+'\n')
     temp.write('    try:'+'\n')
     temp.write('      set opt_coordinates cartesian'+'\n')
     if ('I ' in spacedformulastr):
