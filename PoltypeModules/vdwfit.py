@@ -433,11 +433,12 @@ def TXYZ2COM(poltype,TXYZ,comfname,chkname,maxdisk,maxmem,numproc,mol):
         opstr+=' pseudo=read'
     string=' MaxDisk=%s \n'%(maxdisk)
     opstr+=string
-
+    mul=mol.GetTotalSpinMultiplicity()
+    chg=mol.GetTotalCharge()
     tmpfh.write(opstr)
     commentstr = poltype.molecprefix + " Gaussian SP Calculation on " + gethostname()
     tmpfh.write('\n%s\n\n' % commentstr)
-    tmpfh.write('%d %d %d %d %d %d\n' % (mol.GetTotalCharge(), mol.GetTotalSpinMultiplicity(),mol.GetTotalCharge(), mol.GetTotalSpinMultiplicity(),0,1))
+    tmpfh.write('%d %d %d %d %d %d\n' % (chg,mul,chg,mul,0,1))
 
     for n in range(len(atoms)):
         if n>=len(atoms)-3:
@@ -897,6 +898,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     poltype.optmaxcycle=400
     poltype.optmethod='wB97X-D'
     poltype.espmethod='wB97X-D'
+    poltype.espbasisset="6-311+G*"
     poltype.SanitizeAllQMMethods()
 
     array=[.8,.9,1,1.1,1.2]
