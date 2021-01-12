@@ -120,7 +120,7 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
                 parentsymclasstofragsymclass=json.load(open("parentsymclasstofragsymclass.txt"))
                 classkeytosmartsposarray=json.load(open("classkeytosmartsposarray.txt"))
                 classkeytosmarts=json.load(open("classkeytosmarts.txt"))
-
+                parentclasskeytofragclasskey=json.load(open("parentclasskeytofragclasskey.txt"))
                 if vdwfragment==False:
                     classkeytotorsionindexes=json.load(open("classkeytotorsionindexes.txt"))
                     parenttortorclasskeytofragtortorclasskey=json.load(open("parenttortorclasskeytofragtortorclasskey.txt"))
