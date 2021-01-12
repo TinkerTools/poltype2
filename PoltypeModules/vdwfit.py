@@ -474,6 +474,88 @@ def TXYZ2COM(poltype,TXYZ,comfname,chkname,maxdisk,maxmem,numproc,mol):
     tmpfh.write("\n")
     tmpfh.close()
 
+
+
+def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc,charge):
+    data = readTXYZ(poltype,TXYZ)
+    atoms = data[0];coord = data[1]
+
+    inputname=comfilename.replace('.com','.psi4')
+    temp=open(inputname,'w')
+    temp.write('molecule { '+'\n')
+    temp.write('%d %d\n' % (charge, 1))
+    for n in range(len(atoms)):
+        if n==len(atoms)-3:
+            temp.write('--'+'\n')
+            temp.write('%d %d\n' % (0, 1))
+        if n>=len(atoms)-3:
+            tmpfh.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
+        else:
+            tmpfh.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
+
+    temp.write('}'+'\n')
+    temp.write('memory '+maxmem+'\n')
+    temp.write('set_num_threads(%s)'%(numproc)+'\n')
+    temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
+    temp.write('set maxiter '+str(poltype.scfmaxiter)+'\n')
+    temp.write('set freeze_core True'+'\n')
+    temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
+    spacedformulastr=mol.GetSpacedFormula()
+    if ('I ' in spacedformulastr):
+        temp.write('basis {'+'\n')
+        temp.write('['+' '+poltype.espbasissetfile+' '+poltype.iodineespbasissetfile +' '+ ']'+'\n')
+        temp=ReadInBasisSet(poltype,temp,poltype.espbasissetfile,poltype.iodineespbasissetfile)
+        temp.write('}'+'\n')
+        temp.write("e_dim= properties('%s',bsse_type='cp')" % (poltype.espmethod.lower())+'\n')
+    else:
+        temp.write("e_dim= properties('%s/%s',bsse_type='cp')" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
+    temp.write('\n')
+    temp.write('molecule { '+'\n')
+    temp.write('%d %d\n' % (charge, 1))
+    for n in range(len(atoms)):
+        if n>=len(atoms)-3:
+            tmpfh.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
+        else:
+            tmpfh.write("@%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
+
+    if ('I ' in spacedformulastr):
+        temp.write('basis {'+'\n')
+        temp.write('['+' '+poltype.espbasissetfile+' '+poltype.iodineespbasissetfile +' '+ ']'+'\n')
+        temp=ReadInBasisSet(poltype,temp,poltype.espbasissetfile,poltype.iodineespbasissetfile)
+        temp.write('}'+'\n')
+        temp.write("e_mon_a= properties('%s')" % (poltype.espmethod.lower())+'\n')
+    else:
+        temp.write("e_mon_a= properties('%s/%s')" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
+
+    temp.write('\n')
+    temp.write('molecule { '+'\n')
+    temp.write('%d %d\n' % (charge, 1))
+    for n in range(len(atoms)):
+        if n>=len(atoms)-3:
+            tmpfh.write("@%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
+        else:
+            tmpfh.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
+
+    if ('I ' in spacedformulastr):
+        temp.write('basis {'+'\n')
+        temp.write('['+' '+poltype.espbasissetfile+' '+poltype.iodineespbasissetfile +' '+ ']'+'\n')
+        temp=ReadInBasisSet(poltype,temp,poltype.espbasissetfile,poltype.iodineespbasissetfile)
+        temp.write('}'+'\n')
+        temp.write("e_mon_b= properties('%s')" % (poltype.espmethod.lower())+'\n')
+    else:
+        temp.write("e_mon_b= properties('%s/%s')" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
+
+    temp.write('\n')
+    
+    temp.write("e_cp = e_dim - e_mon_a - e_mon_b"+'\n')
+    temp.write("psi4.print_out('CP Energy =%10.6f\n' % (e_cp))"+'\n')
+    temp.write('clean()'+'\n')
+    temp.close()
+    outputname=os.path.splitext(inputname)[0] + '.log'
+    return inputname,outputname
+
+
+
 def WriteOutCartesianXYZ(poltype,mol,filename):
     output=open(filename,'w')
     atomcounter=0

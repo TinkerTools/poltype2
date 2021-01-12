@@ -893,8 +893,7 @@ def get_torlist(poltype,mol,missed_torsions):
         if ringbond==True and poltype.allownonaromaticringscanning==False:
             continue
         if t2val<2 or t3val<2:
-            continue    
-        
+            continue 
         t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
         sortedtor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]])
         if(sortedtor in missed_torsions) and len(poltype.onlyrotbndslist)==0:
@@ -938,8 +937,6 @@ def get_torlist(poltype,mol,missed_torsions):
                 d = iaa2.GetIdx()
                 if ((iaa.GetIdx() != t3.GetIdx() and iaa2.GetIdx() != t2.GetIdx()) and not (iaa.GetIdx() == t1.GetIdx() and iaa2.GetIdx() == t4.GetIdx())):
                     rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx()))
-
-        
     return (torlist ,rotbndlist,hydtorsionlist)
 
 

@@ -1080,7 +1080,7 @@ class PolarizableTyper():
         self.molstructfnamemol=self.molstructfname.replace('.sdf','.mol')
         obConversion.WriteFile(mol,self.molstructfnamemol)
         indextocoordinates=self.GrabIndexToCoordinates(mol)
-        m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False,sanitize=False)
+        m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False)
         m=self.AddInputCoordinatesAsDefaultConformer(m,indextocoordinates)
         mol,m=self.CheckIsInput2D(mol,obConversion,m)
         self.mol=mol
@@ -1262,14 +1262,14 @@ class PolarizableTyper():
         if self.dontdotor==True:
             self.torlist=[]
         # add missingvdwindices to torlist (for fragmenter input)
-
         missingvdwatomsets=[]
         if self.isfragjob==False and self.dontfrag==False and self.dontdovdwscan==False:
             for vdwatomindex in missingvdwatomindices:
                 ls=tuple([tuple([vdwatomindex])])
                 missingvdwatomsets.append(ls)
                 self.torlist.append(ls)
-
+        print('self.torlist',self.torlist,'curdir',os.getcwd())
+        self.WriteToLog('torlist '+str(self.torlist))
         if self.dontdotor==True and self.dontdovdwscan==True:
             shutil.copy(self.key4fname,self.key5fname)
         self.torsettofilenametorset={}
