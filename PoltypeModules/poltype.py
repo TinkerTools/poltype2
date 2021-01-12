@@ -128,7 +128,6 @@ class PolarizableTyper():
         self.Hartree2kcal_mol = Hartree2kcal_mol
         self.optbasisset = optbasisset             
         self.toroptbasisset = toroptbasisset         
-        self.secondtoroptbasisset=self.toroptbasisset
         self.dmabasisset = dmabasisset             
         self.espbasisset = espbasisset         
         self.torspbasisset = torspbasisset
@@ -196,7 +195,6 @@ class PolarizableTyper():
         self.versionfile=versionfile 
         self.optmethod=optmethod               
         self.toroptmethod=toroptmethod              
-        self.secondtoroptmethod=self.toroptmethod 
         self.torspmethod=torspmethod                   
         self.dmamethod=dmamethod                    
         self.espmethod=espmethod                 
