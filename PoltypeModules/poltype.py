@@ -473,6 +473,8 @@ class PolarizableTyper():
                         self.usage()
                         print('Unrecognized '+line)
                         sys.exit()
+        self.secondtoroptbasisset=self.toroptbasisset
+        self.secondtoroptmethod=self.toroptmethod 
         self.SanitizeAllQMMethods()
         if self.readinionly==True:
             return
