@@ -1,4 +1,4 @@
-##################################################################
+#################################################################
 #
 # Title: Poltype
 # Description: Atomic typer for the polarizable AMOEBA force field
@@ -1268,8 +1268,6 @@ class PolarizableTyper():
                 ls=tuple([tuple([vdwatomindex])])
                 missingvdwatomsets.append(ls)
                 self.torlist.append(ls)
-        print('self.torlist',self.torlist,'curdir',os.getcwd())
-        self.WriteToLog('torlist '+str(self.torlist))
         if self.dontdotor==True and self.dontdovdwscan==True:
             shutil.copy(self.key4fname,self.key5fname)
         self.torsettofilenametorset={}

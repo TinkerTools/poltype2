@@ -15,9 +15,10 @@ import itertools
 import symmetry as symm
 from socket import gethostname
 import shlex
+from scipy.optimize import fmin
 
 
-def best_fit_slope_and_intercept(poltype,xs,ys):
+def best_fit_slope_and_intercept(xs,ys):
     xs=np.array(xs)
     ys=np.array(ys)
     m = (((mean(xs)*mean(ys)) - mean(xs*ys)) /
@@ -25,19 +26,19 @@ def best_fit_slope_and_intercept(poltype,xs,ys):
     b = mean(ys) - m*mean(xs)
     return m, b
 
-def squared_error(poltype,ys_orig,ys_line):
+def squared_error(ys_orig,ys_line):
     ys_orig=np.array(ys_orig)
     ys_line=np.array(ys_line)
     return sum((ys_line - ys_orig) * (ys_line - ys_orig))
 
-def coefficient_of_determination(poltype,ys_orig,ys_line):
+def coefficient_of_determination(ys_orig,ys_line):
     y_mean_line = [mean(ys_orig) for y in ys_orig]
     squared_error_regr = squared_error(ys_orig, ys_line)
     squared_error_y_mean = squared_error(ys_orig, y_mean_line)
     return 1 - (squared_error_regr/squared_error_y_mean)
 
 
-def MeanError(poltype,data,pred):
+def MeanError(data,pred):
     Sum=0
     for i in range(len(data)):
         true=data[i]
@@ -59,7 +60,7 @@ def ReadInitialPrmFile(poltype):
     return frontarray
 
 
-def RMSE(poltype,rawdata,refdata):
+def RMSE(rawdata,refdata):
     rms=0.0
     len1=len(rawdata)
     len2=len(refdata)
@@ -71,27 +72,24 @@ def RMSE(poltype,rawdata,refdata):
         rms=(rms/len1)**0.5
     return rms
 
-def writePRM(poltype,params):
-  print(params)
-  for i in range(0,len(params),2):
-      oFile = open("temp.key", 'w')
-      rFile=open(poltype.tmpkeyfile,'r')
-      j=i/2
-      front=frontarray[j]
-      for line in rFile.readlines():
-          if front in line:
-              oFile.write(front+" %s %s\n"%(params[i], params[i+1]))
-          else:
-              oFile.write(line)
-  oFile.flush()
-  os.fsync(oFile.fileno())
-  oFile.close()
-  rFile.close()
-  os.remove(poltype.tmpkeyfile)
-  os.rename("temp.key",poltype.tmpkeyfile)
-  return
+def writePRM(poltype,params,vdwtype):
+    for i in range(0,len(params),2):
+        oFile = open("temp.key", 'w')
+        rFile=open(poltype.key5fname,'r')
+        for line in rFile.readlines():
+            if vdwtype in line and 'vdw' in line:
+                oFile.write('vdw '+vdwtype+" %s %s\n"%(params[i], params[i+1]))
+            else:
+                oFile.write(line)
+    oFile.flush()
+    os.fsync(oFile.fileno())
+    oFile.close()
+    rFile.close()
+    os.remove(poltype.key5fname)
+    os.rename("temp.key",poltype.key5fname)
+    return
 
-def readOneColumn(poltype,filename,columnnumber):
+def readOneColumn(filename,columnnumber):
     temp=open(filename,'r')
     results=temp.readlines()
     temp.close()
@@ -103,29 +101,31 @@ def readOneColumn(poltype,filename,columnnumber):
     return array
      
 
-def myFUNC(params):
+def myFUNC(params,poltype,vdwtype):
     params=list(params)
-    writePRM(params)
+    writePRM(poltype,params,vdwtype)
     target = []
     target = readOneColumn("QM_DATA",1)
+    target=[float(i) for i in target]
     temp=open('QM_DATA','r')
     cmdarray=[] 
     filenamearray=[]
     for line in temp.readlines():
         xyzname=line.split()[0]
         filename=xyzname.replace('.xyz','.alz')
-        cmdstr=poltype.analyzeexe+' '+xyzname+' '+'-k '+poltype.tmpkeyfile +' e '+'> '+filename
+        cmdstr=poltype.analyzeexe+' '+xyzname+' '+'-k '+poltype.key5fname +' e '+'> '+filename
         cmdarray.append(cmdstr)
         filenamearray.append(filename)
 
     temp.close()
     # need to execute commands now
     for cmd in cmdarray:
-        poltype.call_subsystem(cmd)
+        poltype.call_subsystem(cmd,True)
 
     ReadAnalyzeEnergiesWriteOut(poltype,filenamearray)
     vdw=readOneColumn("SP.dat",-1)
     current=list(np.array(vdw))
+    current=[float(i) for i in current]
     new_rmse=RMSE(current,target)
 
     return new_rmse
@@ -133,9 +133,10 @@ def myFUNC(params):
 
 def PlotQMVsMMEnergy(poltype,vdwtypesarray):
     target = readOneColumn("QM_DATA",1)
+    target=[float(i) for i in target]
     vdw=readOneColumn("SP.dat",-1)
     current=list(np.array(vdw))
-
+    current=[float(i) for i in current]
     vdwtypes=[str(i) for i in vdwtypesarray]
     vdwtypestring=','.join(vdwtypes)
 
@@ -143,22 +144,23 @@ def PlotQMVsMMEnergy(poltype,vdwtypesarray):
     MAE=metrics.mean_absolute_error(current,target)
     m, b = best_fit_slope_and_intercept(current,target)
     regression_line = [(m*x)+b for x in current]
+    new_rmse=RMSE(current,target)
 
     r_squared = coefficient_of_determination(current,target)
-    #error=[3 for i in range(len(target))] # comes from BSSE error in log files
     fig = plt.figure()
-    plt.errorbar(current,target,linestyle="None",label='R^2=%s MAE=%s RMSE=%s MSE=%s'%(round(r_squared,2),round(MAE,2),round(new_rmse,2),round(MSE,2)))
+    plt.plot(current,target,label='R^2=%s MAE=%s RMSE=%s MSE=%s'%(round(r_squared,2),round(MAE,2),round(new_rmse,2),round(MSE,2)))
     plt.plot(current,regression_line,label='Linear Regression line')
     plt.ylabel('QM BSSE Corrected (kcal/mol)')
     plt.xlabel('AMOEBA (kcal/mol)')
     plt.legend(loc='best')
     plt.title('QM vs AMOEBA , '+vdwtypestring)
-    fig.savefig('QMvsAMOEBA.png')
+    fig.savefig('QMvsAMOEBA'+vdwtypestring+'.png')
 
 
 def VDWOptimizer(poltype):
     x0 = []
-    lines = file("INITIAL.PRM").readlines()
+    temp=open("INITIAL.PRM",'r')
+    lines = temp.readlines()
     for line in lines:
         x0.append(float(line.split()[2]))
         x0.append(float(line.split()[3]))
@@ -167,10 +169,13 @@ def VDWOptimizer(poltype):
     rmin=readOneColumn("INITIAL.PRM", 4)
     depthmax=readOneColumn("INITIAL.PRM", 7)
     depthmin=readOneColumn("INITIAL.PRM", 6)
-    l1=zip(rmin, rmax)
-    l2=zip(depthmin, depthmax)
+    vdwtypes=readOneColumn("INITIAL.PRM", 1)
+    vdwtype=vdwtypes[0]
+    l1=list(zip(rmin, rmax))
+    l2=list(zip(depthmin, depthmax))
     MyBounds=[]
     for i in range(len(l1)):
+        
         l1bound=l1[i]
         l2bound=l2[i]
         MyBounds.append(l1bound)
@@ -178,8 +183,9 @@ def VDWOptimizer(poltype):
     tuple(MyBounds)
     ''' local optimization method can be BFGS, CG, Newton-CG, L-BFGS-B,etc.., see here\
     https://docs.scipy.org/doc/scipy-0.19.1/reference/generated/scipy.optimize.minimize.html'''
-    
-    ret = minimize(myFUNC, x0, method='L-BFGS-B', jac=None, bounds=MyBounds, options={'gtol': 1e-1, 'eps':1e-4, 'disp': True})
+    errorfunc= lambda p: (myFUNC(p,poltype,vdwtype))
+
+    ret = minimize(myFUNC, x0, method='L-BFGS-B', jac=None, bounds=MyBounds, args=(poltype,vdwtype),options={'gtol': 1e-1, 'eps':1e-4, 'disp': True})
     vdwradius=ret.x[0]
     vdwdepth=ret.x[1]
     ofile = open("RESULTS.OPT", "a")
@@ -288,31 +294,9 @@ def ConvertWaterProbeDimerXYZToTinkerXYZ(poltype,inputxyz,tttxyz,outputxyz):
 
 
 def GrabMonomerEnergy(poltype,line):
-    numstring=line.split()[5]
-    prefix=''
-    plus=False
-    minus=False
-    for eidx in range(len(numstring)):
-        e=numstring[eidx]
-        
-        if e=='D':
-            continue
-        elif e=='+':
-            plus=True
-            prefixnum=float(prefix)
-            prefix=''
-            continue
-        elif e=='-' and eidx!=0:
-            minus=True
-            print(prefix)
-            prefixnum=float(prefix)
-            prefix=''
-            continue
-        else:
-            prefix+=e
-
-    exponentnum=int(prefix)
-    monomerenergy=(prefixnum*10**exponentnum)*poltype.Hartree2kcal_mol
+    linesplit=line.split()
+    energy=float(linesplit[4]) 
+    monomerenergy=(energy)*poltype.Hartree2kcal_mol
     return monomerenergy
 
 
@@ -321,48 +305,57 @@ def ReadCounterPoiseAndWriteQMData(poltype,logfilelist):
     temp=open('QM_DATA','w')
     for f in logfilelist:
         tmpfh=open(f,'r')
-        frag1calc=False
-        frag2calc=False
-        for line in tmpfh:
-            if 'Counterpoise: corrected energy =' in line:
-                dimerenergy=float(line.split()[4])*poltype.Hartree2kcal_mol
-            elif 'Counterpoise: doing DCBS calculation for fragment   1' in line:
-                frag1calc=True
-                frag2calc=False
-            elif 'Counterpoise: doing DCBS calculation for fragment   2' in line:
-                frag1calc=False
-                frag2calc=True
-            elif 'E2' in line and 'EUMP2' in line:
-                if frag1calc:
-                    frag1energy=GrabMonomerEnergy(poltype,line)
-                elif frag2calc:
-                    frag2energy=GrabMonomerEnergy(poltype,line)
-        interenergy=dimerenergy-(frag1energy+frag2energy)
+        if poltype.use_gaus==True:
+            frag1calc=False
+            frag2calc=False
+            for line in tmpfh:
+                if 'Counterpoise: corrected energy =' in line:
+                    dimerenergy=float(line.split()[4])*poltype.Hartree2kcal_mol
+                elif 'Counterpoise: doing DCBS calculation for fragment   1' in line:
+                    frag1calc=True
+                    frag2calc=False
+                elif 'Counterpoise: doing DCBS calculation for fragment   2' in line:
+                    frag1calc=False
+                    frag2calc=True
+                elif 'SCF Done' in line:
+                    if frag1calc:
+                        frag1energy=GrabMonomerEnergy(poltype,line)
+                    elif frag2calc:
+                        frag2energy=GrabMonomerEnergy(poltype,line)
+            interenergy=dimerenergy-(frag1energy+frag2energy)
+        else:
+            for line in tmpfh:
+                if 'CP Energy =' in line:
+                    linesplit=line.split()
+                    interenergy=float(linesplit[3])*poltype.Hartree2kcal_mol
+
         tmpfh.close()
-        temp.write(f.replace('sp.log','')+' '+str(interenergy)+'\n')
+        temp.write(f.replace('_sp.log','.xyz')+' '+str(interenergy)+'\n')
     temp.close()
 
 
-
-def RMSD(c):
-    return np.sqrt(np.mean(np.square(np.add(np.subtract(np.array(energyarray),np.array(qmenergyarray)),c))))
 
 
 def PlotEnergyVsDistance(poltype,distarray,prefix,rad,depth,vdwtypesarray):
     vdwtypes=[str(i) for i in vdwtypesarray]
     vdwtypestring=','.join(vdwtypes)
     qmenergyarray = readOneColumn("QM_DATA",1)
+    qmenergyarray=[float(i) for i in qmenergyarray]
     vdw=readOneColumn("SP.dat",-1)
     energyarray=list(np.array(vdw))
+    energyarray=[float(i) for i in energyarray]
+    def RMSD(c):
+        return np.sqrt(np.mean(np.square(np.add(np.subtract(np.array(energyarray),np.array(qmenergyarray)),c))))
 
-    r_squared = coefficient_of_determination(energyarray,qmenergyarray)
+
+    r_squared = round(coefficient_of_determination(energyarray,qmenergyarray),2)
     result=fmin(RMSD,.5)
-    minRMSD=RMSD(result[0])
+    minRMSD=round(RMSD(result[0]),2)
     plotname=prefix+'.png'
     fig = plt.figure()
-    title=prefix+'VdwTypes = '+vdwtypesstring
+    title=prefix+' VdwTypes = '+vdwtypestring
     plt.title(title)
-    plt.plot(distarray,energyarray,'b-',label='MM ,'+'Radius=%s, Depth=%s'%(rad,depth))
+    plt.plot(distarray,energyarray,'b-',label='MM ,'+'Radius=%s, Depth=%s'%(round(rad,2),round(depth,2)))
     plt.plot(distarray,qmenergyarray,'r-',label='QM')
     plt.plot()
     plt.ylabel('Energy (kcal/mol)')
@@ -384,7 +377,7 @@ def ReadAnalyzeEnergiesWriteOut(poltype,filenamelist):
     temp=open('SP.dat','w')
     for filename in filenamelist:
         energy=ReadIntermolecularEnergyMM(poltype,filename)
-        temp.write(filename+' '+str(energy))
+        temp.write(filename+' '+str(energy)+'\n')
     temp.close() 
 
 
@@ -476,14 +469,16 @@ def TXYZ2COM(poltype,TXYZ,comfname,chkname,maxdisk,maxmem,numproc,mol):
 
 
 
-def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc,charge):
+def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc):
     data = readTXYZ(poltype,TXYZ)
     atoms = data[0];coord = data[1]
+    mul=mol.GetTotalSpinMultiplicity()
+    chg=mol.GetTotalCharge()
 
     inputname=comfilename.replace('.com','.psi4')
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
-    temp.write('%d %d\n' % (charge, 1))
+    temp.write('%d %d\n' % (chg, mul))
     for n in range(len(atoms)):
         if n==len(atoms)-3:
             temp.write('--'+'\n')
@@ -580,9 +575,13 @@ def WriteOutCartesianXYZ(poltype,mol,filename):
 def GenerateSPInputFiles(poltype,filenamearray,mol):
     qmfilenamearray=[]
     for filename in filenamearray:
-        qmfilename=filename.replace('.xyz','_sp.com')
-        chkfilename=filename.replace('.xyz','_sp.chk')
-        TXYZ2COM(poltype,filename,qmfilename,chkfilename,poltype.maxdisk,poltype.maxmem,poltype.numproc,mol)   
+        if poltype.use_gaus==True:
+            qmfilename=filename.replace('.xyz','_sp.com')
+            chkfilename=filename.replace('.xyz','_sp.chk')
+            TXYZ2COM(poltype,filename,qmfilename,chkfilename,poltype.maxdisk,poltype.maxmem,poltype.numproc,mol)
+        else:
+            qmfilename=filename.replace('.xyz','_sp.com')
+            CreatePsi4SPInputFile(poltype,filename,mol,poltype.maxdisk,poltype.maxmem,poltype.numproc)
         qmfilenamearray.append(qmfilename)
     return qmfilenamearray
 
@@ -595,7 +594,12 @@ def ExecuteSPJobs(poltype,qmfilenamearray,prefix):
     for i in range(len(qmfilenamearray)):
         filename=qmfilenamearray[i]
         outputname=filename.replace('.com','.log')
-        cmdstr = 'cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+filename
+        if poltype.use_gaus==True:
+            cmdstr = 'cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+filename
+        else:
+            cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+filename+' '+outputname
+
+
         
         finished,error=poltype.CheckNormalTermination(outputname)
         if finished==True and error==False:
@@ -632,7 +636,7 @@ def ExecuteSPJobs(poltype,qmfilenamearray,prefix):
 
 
 def GrabVdwParameters(poltype,vdwtype):
-    temp=open(poltype.tmpkeyfile,'r')
+    temp=open(poltype.key5fname,'r')
     results=temp.readlines()
     temp.close()
     for line in results:
@@ -908,7 +912,7 @@ def optimize(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,m
     coords=sol.x
     indextoreferencecoordinate=UpdateCoordinates(coords,indextoreferencecoordinate)
     with open(dimer, "w") as f:
-      f.write("\n")
+      f.write(str(len(indextoreferencecoordinate.keys()))+"\n")
       f.write("\n")
       for index,coordinate in indextoreferencecoordinate.items():
           element=indextoreferenceelement[index]
@@ -975,6 +979,20 @@ def GrabKeysFromValue(poltype,dic,thevalue):
     return keylist
 
 
+def ReplaceParameterFileHeader(poltype,paramhead,keyfile):
+    tempname='temp.key'
+    temp=open(keyfile,'r')
+    results=temp.readlines()
+    temp.close() 
+    temp=open(tempname,'w')
+    for line in results:
+        if 'parameter' in line:
+            line='parameters '+paramhead+'\n'
+        temp.write(line)
+    temp.close() 
+    os.remove(keyfile)
+    os.rename(tempname,keyfile)
+   
 
 def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     poltype.optmaxcycle=400
@@ -982,7 +1000,8 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     poltype.espmethod='wB97X-D'
     poltype.espbasisset="6-311+G*"
     poltype.SanitizeAllQMMethods()
-
+    paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebabio18.prm"
+    ReplaceParameterFileHeader(poltype,paramhead,poltype.key5fname)
     array=[.8,.9,1,1.1,1.2]
     dimerfiles,probeindices,moleculeindices=GenerateInitialProbeStructure(poltype,missingvdwatomindices)
     obConversion = openbabel.OBConversion()
@@ -995,39 +1014,41 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
         obConversion.SetInFormat(inFormat)
         obConversion.ReadFile(dimermol, filename)
         prefix=filename.replace('.xyz','')
-        poltype.comoptfname=prefix+'.com'
-        poltype.chkoptfname=prefix+'.chk'
-        poltype.fckoptfname=prefix+'.fchk'
-        poltype.logoptfname=prefix+'.log'
-        poltype.gausoptfname=prefix+'.log'
-        optmol = opt.GeometryOptimization(poltype,dimermol,checkbonds=False)
-        dimeratoms=dimermol.NumAtoms()
-        moleculeatoms=dimeratoms-3
-        moleculeatom=optmol.GetAtom(moleculeindex)
-        probeatom=optmol.GetAtom(probeindex)
-        moleculeatomcoords=np.array([moleculeatom.GetX(),moleculeatom.GetY(),moleculeatom.GetZ()])
-        probeatomcoords=np.array([probeatom.GetX(),probeatom.GetY(),probeatom.GetZ()])
-        equildistance=np.linalg.norm(probeatomcoords-moleculeatomcoords)
-        distarray=np.multiply(equildistance,np.array(array))
-        outputprefixname=filename.split('.')[0]
-        outputxyz=outputprefixname+'_tinker.xyz'
-        inputxyz=outputprefixname+'_cartesian.xyz'
-        WriteOutCartesianXYZ(poltype,optmol,inputxyz)
-        ConvertWaterProbeDimerXYZToTinkerXYZ(poltype,inputxyz,poltype.tmpxyzfile,outputxyz)
-        filenamearray=MoveDimerAboutMinima(poltype,outputxyz,outputprefixname,moleculeatoms,moleculeindex,probeindex,equildistance,array)
-        qmfilenamearray=GenerateSPInputFiles(poltype,filenamearray,poltype.mol)
-        outputfilenames=ExecuteSPJobs(poltype,qmfilenamearray,prefix)
-        ReadCounterPoiseAndWriteQMData(poltype,outputfilenames)
-        vdwtype=poltype.idxtosymclass[poltype.moleculeatomindex]
-        vdwtypesarray=[vdwtype]
-        initialvdwradius,initialvdwdepth,minvdwradius,maxvdwradius,minvdwdepth,maxvdwdepth=GrabVdwParameters(poltype,vdwtype)
-        intialradii=[initialvdwradius]
-        intialdepths=[initialvdwdepth]
-        minradii=[minvdwradius]
-        maxradii=[maxvdwradius]
-        mindepths=[minvdwdepth]
-        maxdepths=[maxvdwdepth]
-        WriteInitialPrmFile(poltype,vdwtypesarray,initialradii,initialdepths,minradii,maxradii,mindepths,maxdepths)
-        vdwradius,vdwdepth=VDWOptimizer(poltype)
-        PlotEnergyVsDistance(poltype,distarray,prefix,vdwradius,vdwdepth,vdwtypesarray)
-        PlotQMVsMMEnergy(poltype,vdwtypesarray)
+        plotname=prefix+'.png'
+        if not os.path.isfile(plotname):
+            poltype.comoptfname=prefix+'.com'
+            poltype.chkoptfname=prefix+'.chk'
+            poltype.fckoptfname=prefix+'.fchk'
+            poltype.logoptfname=prefix+'.log'
+            poltype.gausoptfname=prefix+'.log'
+            optmol = opt.GeometryOptimization(poltype,dimermol,checkbonds=False)
+            dimeratoms=dimermol.NumAtoms()
+            moleculeatoms=dimeratoms-3
+            moleculeatom=optmol.GetAtom(moleculeindex)
+            probeatom=optmol.GetAtom(probeindex)
+            moleculeatomcoords=np.array([moleculeatom.GetX(),moleculeatom.GetY(),moleculeatom.GetZ()])
+            probeatomcoords=np.array([probeatom.GetX(),probeatom.GetY(),probeatom.GetZ()])
+            equildistance=np.linalg.norm(probeatomcoords-moleculeatomcoords)
+            distarray=np.multiply(equildistance,np.array(array))
+            outputprefixname=filename.split('.')[0]
+            outputxyz=outputprefixname+'_tinker.xyz'
+            inputxyz=outputprefixname+'_cartesian.xyz'
+            WriteOutCartesianXYZ(poltype,optmol,inputxyz)
+            ConvertWaterProbeDimerXYZToTinkerXYZ(poltype,inputxyz,poltype.xyzoutfile,outputxyz)
+            filenamearray=MoveDimerAboutMinima(poltype,outputxyz,outputprefixname,moleculeatoms,moleculeindex,probeindex,equildistance,array)
+            qmfilenamearray=GenerateSPInputFiles(poltype,filenamearray,poltype.mol)
+            outputfilenames=ExecuteSPJobs(poltype,qmfilenamearray,prefix)
+            ReadCounterPoiseAndWriteQMData(poltype,outputfilenames)
+            vdwtype=poltype.idxtosymclass[moleculeindex]
+            vdwtypesarray=[vdwtype]
+            initialvdwradius,initialvdwdepth,minvdwradius,maxvdwradius,minvdwdepth,maxvdwdepth=GrabVdwParameters(poltype,vdwtype)
+            initialradii=[initialvdwradius]
+            initialdepths=[initialvdwdepth]
+            minradii=[minvdwradius]
+            maxradii=[maxvdwradius]
+            mindepths=[minvdwdepth]
+            maxdepths=[maxvdwdepth]
+            WriteInitialPrmFile(poltype,vdwtypesarray,initialradii,initialdepths,minradii,maxradii,mindepths,maxdepths)
+            vdwradius,vdwdepth=VDWOptimizer(poltype)
+            PlotEnergyVsDistance(poltype,distarray,prefix,vdwradius,vdwdepth,vdwtypesarray)
+            PlotQMVsMMEnergy(poltype,vdwtypesarray)

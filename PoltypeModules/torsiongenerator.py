@@ -166,12 +166,30 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     for i in range(len(torset)):
         tor=torset[i]
         a,b,c,d=tor[:]
+        indices=[a,b,c,d]
+        allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,mol)
+        aatom=mol.GetAtom(a)
+        datom=mol.GetAtom(d)
+        aatomicnum=aatom.GetAtomicNum()
+        datomicnum=datom.GetAtomicNum()
+        if (aatomicnum==1 or datomicnum==1) and allhydtors==False:
+            continue
+
         babelindices=[b,c]
         string=' '.join([str(b),str(c)])
         if string in poltype.rotbndlist.keys(): 
             tors=poltype.rotbndlist[string]
             for resttors in tors:
                 rta,rtb,rtc,rtd = resttors
+                indices=[rta,rtb,rtc,rtd]
+                allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,mol)
+                aatom=mol.GetAtom(rta)
+                datom=mol.GetAtom(rtd)
+                rtaatomicnum=aatom.GetAtomicNum()
+                rtdatomicnum=datom.GetAtomicNum()
+                if (rtaatomicnum==1 or rtdatomicnum==1) and allhydtors==False:
+                    continue
+
                 rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
                 if resttors not in variabletorlist and resttors not in restlist:
                     tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
@@ -1112,6 +1130,15 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
         if key in poltype.rotbndlist.keys():
             for resttors in poltype.rotbndlist[key]:
                 rta,rtb,rtc,rtd = resttors
+                indices=[rta,rtb,rtc,rtd]
+                allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,mol)
+                aatom=mol.GetAtom(rta)
+                datom=mol.GetAtom(rtd)
+                rtaatomicnum=aatom.GetAtomicNum()
+                rtdatomicnum=datom.GetAtomicNum()
+                if (rtaatomicnum==1 or rtdatomicnum==1) and allhydtors==False:
+                    continue
+
                 if resttors not in variabletorlist:
                     rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
                     if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
@@ -1127,6 +1154,15 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     for rotkey,torsions in poltype.rotbndlist.items():
         for resttors in torsions:
             rta,rtb,rtc,rtd = resttors
+            indices=[rta,rtb,rtc,rtd]
+            allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,mol)
+            aatom=mol.GetAtom(rta)
+            datom=mol.GetAtom(rtd)
+            rtaatomicnum=aatom.GetAtomicNum()
+            rtdatomicnum=datom.GetAtomicNum()
+            if (rtaatomicnum==1 or rtdatomicnum==1) and allhydtors==False:
+                continue
+
             rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
             if resttors not in restlist and resttors not in variabletorlist:
                 restlist.append(resttors)
