@@ -1109,7 +1109,14 @@ class PolarizableTyper():
             self.use_gaus=True
             self.SanitizeAllQMMethods()
 
- 
+        atomiter=openbabel.OBMolAtomIter(self.mol)
+        atomnum=0
+        for atom in atomiter:
+            atomnum+=1
+
+
+        if atomnum<25:
+            self.dontfrag=True 
         self.RemoveCartesianXYZFiles()
  
         self.WriteToLog("Running on host: " + gethostname())
@@ -1311,7 +1318,7 @@ class PolarizableTyper():
                 else:
                     shutil.copy(self.key4fname,self.key5fname)
 
-        if self.isfragjob==True and self.dontdovdwscan==False:
+        if self.dontdovdwscan==False:
             vdwfit.VanDerWaalsOptimization(self,missingvdwatomindices)       
         if self.isfragjob==False and self.dontdotor==False:
             self.CheckTorsionParameters(self.key5fname,torsionsmissing,hydtorsions)
