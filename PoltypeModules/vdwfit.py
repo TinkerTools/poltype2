@@ -987,8 +987,10 @@ def ReplaceParameterFileHeader(poltype,paramhead,keyfile):
     temp=open(tempname,'w')
     for line in results:
         if 'parameter' in line:
-            line='parameters '+paramhead+'\n'
-        temp.write(line)
+            newline='parameters '+paramhead+'\n'
+        else:
+            newline=line
+        temp.write(newline)
     temp.close() 
     os.remove(keyfile)
     os.rename(tempname,keyfile)
