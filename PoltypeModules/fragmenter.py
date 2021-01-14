@@ -508,7 +508,21 @@ def FindRotatableBond(poltype,fragmol,rotbndindextofragment,temp):
         if len(m.GetAtoms())==len(fragmol.GetAtoms()) and rotbndindex not in temp:
             return rotbndindex
 
-def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog):
+def CopyAllQMDataAndRename(poltype,molecprefix,parentdir):
+    curdir=os.getcwd()
+    os.chdir(parentdir)
+    files=os.listdir()
+    for f in files:
+        if poltype.molecprefix in f:
+            fsplit=f.split(poltype.molecprefix)
+            secondpart=fsplit[1]
+            newfname=molecprefix+secondpart 
+            destination=curdir+r'/'+newfname
+            
+    os.chdir(curdir)    
+
+
+def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog,fragmol,parentdir):
     poltypeinput={'dontdovdwscan':poltype.dontdovdwscan,'refinenonaroringtors':poltype.refinenonaroringtors,'tortor':poltype.tortor,'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','optmethod':poltype.optmethod,'toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':poltype.numproc,'maxmem':poltype.maxmem,'maxdisk':poltype.maxdisk,'printoutput':True}
     if strfragrotbndindexes!=None:
         poltypeinput['onlyrotbndslist']=strfragrotbndindexes
@@ -522,6 +536,10 @@ def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog
     if os.path.isfile(logpath): # make sure to remove logfile if exists, dont want WaitForTermination to catch previous errors before job is resubmitted
         os.remove(logpath)
     jobtooutputlog[cmdstr]=logpath
+    b = Chem.MolToSmiles(poltype.rdkitmol)
+    a = Chem.MolToSmiles(fragmol)
+    if a==b:
+        CopyAllQMDataAndRename(poltype,molecprefix,parentdir)
     return listofjobs,jobtooutputlog,logpath
 
 def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog):
@@ -693,7 +711,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         parentatoms=poltype.rdkitmol.GetNumAtoms()
 
 
-        listofjobs,jobtooutputlog,newlog=FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog)
+        listofjobs,jobtooutputlog,newlog=FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog,tempmol,parentdir)
     os.chdir(parentdir)
     finishedjobs,errorjobs=SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog)
     return equivalentrotbndindexarrays,rotbndindextoringtor
