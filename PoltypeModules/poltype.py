@@ -1056,8 +1056,8 @@ class PolarizableTyper():
 
     def CheckMemorySettings(self):
         proc=int(self.numproc)
-        if proc>10:
-            raise ValueError('Too many input processors, lower the numproc value to 10 or less')
+        if proc>8:
+            raise ValueError('Too many input processors, lower the numproc value to 8 or less')
         maxmem_value,maxdisk_value=self.GenerateMemoryValues() 
         if maxmem_value<50:
             if maxdisk_value<2*maxmem_value:

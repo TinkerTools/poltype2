@@ -74,7 +74,6 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,varia
         finished,error=poltype.CheckNormalTermination(outputlog)
         if finished==True and 'opt' in outputlog:
             opt.GrabFinalXYZStructure(poltype,outputlog,outputlog.replace('.log','.xyz'))
-
         if finished==False:
             if os.path.isfile(outputlog):
                 statinfo=os.stat(outputlog)
@@ -92,6 +91,17 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,varia
         initialstructures.append(torxyzfname)   
     return outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures
 
+def CheckIfPsi4Log(poltype,outputlog):
+    check=False
+    temp=open(outputlog,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        if 'Psi4' in line:
+            check=True
+            break 
+    return check 
+
 def TinkerMinimizePostQMOpt(poltype,outputlogs,phaselist,optmol,torset,variabletorlist,torsionrestraint,finishedjobs,errorjobs,bondtopology):
     torxyznames=[]
     finishedoutputlogs=[]
@@ -100,7 +110,8 @@ def TinkerMinimizePostQMOpt(poltype,outputlogs,phaselist,optmol,torset,variablet
         outputlog=outputlogs[i]
         phaseangles=phaselist[i]
         if outputlog in finishedjobs and outputlog not in errorjobs:
-            if not poltype.use_gaus:
+            checkifpsi4output=CheckIfPsi4Log(poltype,outputlog) # psi4 used if gaussian fails need to check
+            if checkifpsi4output==True:
                 finalstruct=outputlog.replace('.log','.xyz')
                 cartxyz,torxyzfname=tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,finalstruct,torsionrestraint,'_postQMOPTprefit',poltype.key4fname,'../',bondtopology)
             else:
@@ -282,32 +293,11 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
     return tinkerstructnamelist
 
 
-def CheckTargetDihedralAngle(poltype,optmol,torset,phaseangles,prevstruct,filename):
-    for i in range(len(phaseangles)):
-        phaseangle=phaseangles[i]
-        tor=tuple(torset[i])
-        a,b,c,d=tor[0:4] 
-        if tor in poltype.nonaroringtors:
-            nonaroringtor=True
-        else:
-            nonaroringtor=False
-        if nonaroringtor==False:    
-            dihedral = optmol.GetTorsion(a,b,c,d)
-            dihedral=round((dihedral+phaseangle)%360)
-            currentdihedral=prevstruct.GetTorsion(a,b,c,d)
-            currentdihedral=round((currentdihedral)%360)
-            diff= numpy.abs(currentdihedral-dihedral)
-            tol=1.1
-            if diff>tol and diff!=360:
-                raise ValueError('Difference of '+str(diff)+' is greater than '+str(tol)+' for target dihedral of '+str(dihedral)+' and current dihedral of '+str(currentdihedral)+' '+filename+' '+os.getcwd())
-
 
 def tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,prevstrctfname,torsionrestraint,designatexyz,keybase,keybasepath,bondtopology):
-    
     prevstruct = opt.load_structfile(poltype,prevstrctfname) 
     prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
     prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology)
-    CheckTargetDihedralAngle(poltype,optmol,torset,phaseangles,prevstruct,prevstrctfname)
     torxyzfname,tmpkeyfname,torminlogfname=tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseangles,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath)
     cartxyz,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseangles,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath,torxyzfname,tmpkeyfname,torminlogfname)
     toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
@@ -348,7 +338,6 @@ def tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseangl
 
        
 def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath,torxyzfname,tmpkeyfname,torminlogfname):
-
     save_structfile(poltype,prevstruct,torxyzfname)
     shutil.copy(keybasepath+keybase, tmpkeyfname)
     tmpkeyfh = open(tmpkeyfname,'a')
@@ -602,7 +591,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         finishedjobs,errorjobs=poltype.WaitForTermination(fulljobtooutputlog)
     else:
         finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
-    
     torsettofinshedtinkerxyzfiles={}
     torsettofailedoutputlogtoinitialstructure={}
     failed=False
@@ -681,7 +669,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     poltype.toroptmethod=poltype.secondtoroptmethod
     poltype.toroptbasisset=poltype.secondtoroptbasisset
     poltype.SanitizeAllQMMethods()
-
     torsettooutputlogtoinitialstructure={}
     for torset in poltype.torlist:
         torsettooutputlogtoinitialstructure[tuple(torset)]={}
@@ -702,7 +689,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         optnumtofulllistofjobs['2'].extend(listofjobs)
         fulljobtolog.update(jobtolog) 
         fulljobtooutputlog.update(jobtooutputlog)
-
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMOptJobToLog'+'_2'+'_'+poltype.molecprefix
     if poltype.externalapi!=None:
         if len(optnumtofulllistofjobs['2'])!=0:
@@ -728,7 +714,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
 
             if finished==True and outputlog not in finishedjobs:
                 finishedjobs.append(outputlog)
-
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True) and failed==True:
         temp_use_gaus=poltype.use_gaus
         temp_use_gausoptonly=poltype.use_gausoptonly
@@ -756,7 +741,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             redofulljobtolog.update(jobtolog) 
             redofulljobtooutputlog.update(jobtooutputlog)
             torsettoredoneoutputlogs[tuple(torset)].extend(outputlogs)
-   
         jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMOptJobToLog'+'_Redo_2'+'_'+poltype.molecprefix
         if poltype.externalapi!=None:
             if len(redofulllistofjobs)!=0:

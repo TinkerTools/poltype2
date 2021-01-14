@@ -123,8 +123,21 @@ def NumberInLine(poltype,line):
     return numinline
 
 
+def CheckIfPsi4Log(poltype,outputlog):
+    check=False
+    temp=open(outputlog,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        if 'Psi4' in line:
+            check=True
+            break 
+    return check 
+
+
 def GrabFinalXYZStructure(poltype,logname,filename):
-    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
+    checkifpsi4=CheckIfPsi4Log(poltype,logname)
+    if checkifpsi4==True:
         temp=open(logname,'r')
         results=temp.readlines()
         temp.close()
@@ -151,7 +164,7 @@ def GrabFinalXYZStructure(poltype,logname,filename):
                     temp.write(line.lstrip())
                     lengthchange=False
         temp.close()
-    elif poltype.use_gaus==True or poltype.use_gausoptonly==True:
+    elif checkifpsi4==False:
         obConversion = openbabel.OBConversion()
         tempmol = openbabel.OBMol()
         inFormat = obConversion.FormatFromExt(logname)
