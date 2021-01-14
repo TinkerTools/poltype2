@@ -1,4 +1,4 @@
-#################################################################
+################################################################
 #
 # Title: Poltype
 # Description: Atomic typer for the polarizable AMOEBA force field
@@ -44,7 +44,7 @@ from rdkit.Geometry import Point3D
 import vdwfit
 
 class PolarizableTyper():
-    def __init__(self,dontdovdwscan=True,vdwprobepathname=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/VdwProbes/',vdwprobenames=['water'],firsttoroptbasisset='3-21G',firsttoroptmethod='HF',use_gausgeomoptonly=False,maxtorRMSPDRel=.2,vdwmissingfilename='missingvdw.txt',databaseprmfilename='database.prm',tortor=False,torfit2Drotonly=False,torfit1Drotonly=False,skipsecondopt=False,externalparameterdatabase=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'externalparameterdatabase.txt',fitfirsttorsionfoldphase=False,keyfiletoaddtodatabase=None,skipgridsearch=True,torsionprmguessfilename='torsionprmguess.txt',defaultmaxtorsiongridpoints=40,torsionsmissingfilename='torsionsmissing.txt',smallmoleculemm3prmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'mm3.prm',smallmoleculesmartstomm3descrip=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'smartstomm3typedescrip.txt',absdipoletol=.5,transferanyhydrogentor=True,smallmoleculesmartstotinkerdescrip=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'smartstoamoebatypedescrip.txt',smallmoleculeprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba09.prm',torspbasissetfile='6-311+g_st_.0.gbs',toroptbasissetfile='6-311g_st_.0.gbs',optbasissetfile='6-311g_st_.0.gbs',dmabasissetfile='6-311g_st__st_.0.gbs',espbasissetfile='aug-cc-pvtz.1.gbs',iodinetorspbasissetfile='def2-svp.1.gbs',iodinetoroptbasissetfile='def2-svp.1.gbs',iodineoptbasissetfile='def2-svp.1.gbs',iodinedmabasissetfile='def2-svp.1.gbs',iodineespbasissetfile='def2-tzvpp.1.gbs',basissetpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/'+'BasisSets/',refinenonaroringtors=False,maxgrowthcycles=4,use_gauPCM=False,fitqmdipole=False,allownonaromaticringscanning=False,scfmaxiter=300,suppresstorfiterr=False,obminimizeexe='obminimize',readinionly=False,suppressdipoleerr=False,topologylib='residue_connect.txt',poltypepath=os.path.split(__file__)[0],WBOtol=.05,dontfrag=False,isfragjob=False,dipoletol=.1,externalapi=None,printoutput=False,poltypeini=True,structure=None,prmstartidx=401,numproc=1,maxmem="700MB",maxdisk="100GB",gausdir=None,gdmadir=None,tinkerdir=None,scratchdir="/scratch",paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebabio18_header.prm",gausexe=None,formchkexe='formchk',cubegenexe='cubegen',gdmaexe='gdma',avgmpolesexe=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/PoltypeModules/avgmpoles.pl",peditexe='poledit.x',potentialexe='potential.x',minimizeexe='minimize.x',analyzeexe='analyze.x',superposeexe='superpose.x',defopbendval=0.20016677990819662,Hartree2kcal_mol=627.5095,optbasisset='6-31G*',toroptbasisset='6-31G*',dmabasisset='6-311G**',espbasisset="aug-cc-pVTZ",torspbasisset="6-311+G*",optmethod='wB97X-D',toroptmethod='wB97X-D',torspmethod='wB97X-D',dmamethod='MP2',espmethod='MP2',qmonly = False,espfit = True,parmtors = True,foldnum=3,foldoffsetlist = [ 0.0, 180.0, 0.0, 180.0, 0.0, 180.0 ],torlist = None,rotbndlist = None,maxRMSD=.1,maxRMSPD=1,maxtorRMSPD=1.8,tordatapointsnum=None,gentorsion=False,gaustorerror=False,torsionrestraint=.1,onlyrotbndslist=None,rotalltors=False,dontdotor=False,dontdotorfit=False,toroptpcm=False,optpcm=False,torsppcm=False,use_gaus=False,use_gausoptonly=False,freq=False,postfit=False,bashrcpath=None,amoebabioprmpath=None,libpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ModifiedResidueLibraries/lib.bio18_conv1.txt",SMARTSToTypelibpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ModifiedResidueLibraries/SMARTSToTypeLib.txt',ModifiedResiduePrmPath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/ModifiedResidue.prm',modifiedproteinpdbname=None,unmodifiedproteinpdbname=None,mutatedsidechain=None,mutatedresiduenumber=None,modifiedresiduepdbcode=None,optmaxcycle=3,torkeyfname=None,gausoptcoords='',forcefield="AMOEBA",helpfile='README.md',versionfile='version.md',sleeptime=30):
+    def __init__(self,dontdovdwscan=True,vdwprobepathname=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/VdwProbes/',vdwprobenames=['water'],firsttoroptbasisset='3-21G',firsttoroptmethod='HF',use_gausgeomoptonly=False,maxtorRMSPDRel=.2,vdwmissingfilename='missingvdw.txt',databaseprmfilename='database.prm',tortor=False,torfit2Drotonly=False,torfit1Drotonly=False,skipsecondopt=False,externalparameterdatabase=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'externalparameterdatabase.txt',fitfirsttorsionfoldphase=False,keyfiletoaddtodatabase=None,skipgridsearch=True,torsionprmguessfilename='torsionprmguess.txt',defaultmaxtorsiongridpoints=40,torsionsmissingfilename='torsionsmissing.txt',smallmoleculemm3prmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'mm3.prm',smallmoleculesmartstomm3descrip=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'smartstomm3typedescrip.txt',absdipoletol=.5,transferanyhydrogentor=True,smallmoleculesmartstotinkerdescrip=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'smartstoamoebatypedescrip.txt',smallmoleculeprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba09.prm',torspbasissetfile='6-311+g_st_.0.gbs',toroptbasissetfile='6-311g_st_.0.gbs',optbasissetfile='6-311g_st_.0.gbs',dmabasissetfile='6-311g_st__st_.0.gbs',espbasissetfile='aug-cc-pvtz.1.gbs',iodinetorspbasissetfile='def2-svp.1.gbs',iodinetoroptbasissetfile='def2-svp.1.gbs',iodineoptbasissetfile='def2-svp.1.gbs',iodinedmabasissetfile='def2-svp.1.gbs',iodineespbasissetfile='def2-tzvpp.1.gbs',basissetpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/'+'BasisSets/',refinenonaroringtors=False,maxgrowthcycles=4,use_gauPCM=False,fitqmdipole=False,allownonaromaticringscanning=False,scfmaxiter=300,suppresstorfiterr=False,obminimizeexe='obminimize',readinionly=False,suppressdipoleerr=False,topologylib='residue_connect.txt',poltypepath=os.path.split(__file__)[0],WBOtol=.05,dontfrag=False,isfragjob=False,dipoletol=.1,externalapi=None,printoutput=False,poltypeini=True,structure=None,prmstartidx=401,numproc="1",maxmem="700MB",maxdisk="100GB",gausdir=None,gdmadir=None,tinkerdir=None,scratchdir="/scratch",paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebabio18_header.prm",gausexe=None,formchkexe='formchk',cubegenexe='cubegen',gdmaexe='gdma',avgmpolesexe=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/PoltypeModules/avgmpoles.pl",peditexe='poledit.x',potentialexe='potential.x',minimizeexe='minimize.x',analyzeexe='analyze.x',superposeexe='superpose.x',defopbendval=0.20016677990819662,Hartree2kcal_mol=627.5095,optbasisset='6-31G*',toroptbasisset='6-31G*',dmabasisset='6-311G**',espbasisset="aug-cc-pVTZ",torspbasisset="6-311+G*",optmethod='wB97X-D',toroptmethod='wB97X-D',torspmethod='wB97X-D',dmamethod='MP2',espmethod='MP2',qmonly = False,espfit = True,parmtors = True,foldnum=3,foldoffsetlist = [ 0.0, 180.0, 0.0, 180.0, 0.0, 180.0 ],torlist = None,rotbndlist = None,maxRMSD=.1,maxRMSPD=1,maxtorRMSPD=1.8,tordatapointsnum=None,gentorsion=False,gaustorerror=False,torsionrestraint=.1,onlyrotbndslist=None,rotalltors=False,dontdotor=False,dontdotorfit=False,toroptpcm=False,optpcm=False,torsppcm=False,use_gaus=False,use_gausoptonly=False,freq=False,postfit=False,bashrcpath=None,amoebabioprmpath=None,libpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ModifiedResidueLibraries/lib.bio18_conv1.txt",SMARTSToTypelibpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ModifiedResidueLibraries/SMARTSToTypeLib.txt',ModifiedResiduePrmPath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/ModifiedResidue.prm',modifiedproteinpdbname=None,unmodifiedproteinpdbname=None,mutatedsidechain=None,mutatedresiduenumber=None,modifiedresiduepdbcode=None,optmaxcycle=3,torkeyfname=None,gausoptcoords='',forcefield="AMOEBA",helpfile='README.md',versionfile='version.md',sleeptime=30):
         self.dontdovdwscan=dontdovdwscan
         self.vdwprobepathname=vdwprobepathname
         self.vdwprobenames=vdwprobenames
@@ -1053,11 +1053,59 @@ class PolarizableTyper():
                 check=self.CheckIfCartesianXYZ(f)
                 if check==True:
                     os.remove(f)
-     
-            
+
+    def CheckMemorySettings(self):
+        proc=int(self.numproc)
+        if proc>10:
+            raise ValueError('Too many input processors, lower the numproc value to 10 or less')
+        maxmem_value,maxdisk_value=self.GenerateMemoryValues() 
+        if maxmem_value<50:
+            if maxdisk_value<2*maxmem_value:
+                raise ValueError('Increase maxdisk value to twice maxmem value')
+           
+    def GenerateMemoryValues(self):
+        if 'MB' in self.maxmem:
+            maxmem_value=float(self.maxmem[:-2])*.001 # convert to GB
+        elif 'GB' in self.maxmem:
+            maxmem_value=float(self.maxmem[:-2])           
+        if 'MB' in self.maxdisk:
+            maxdisk_value=float(self.maxdisk[:-2])*.001 # convert to GB
+        elif 'GB' in self.maxmem:
+            maxdisk_value=float(self.maxdisk[:-2])  
+        return maxmem_value,maxdisk_value         
+
+
+    def CheckInputCharge(self,molecule):
+        atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
+        for atom in molecule.GetAtoms():
+            atomidx=atom.GetIdx()
+            atomnum=atom.GetAtomicNum()
+            val=atom.GetExplicitValence()
+            valtochg=atomicnumtoformalchg[atomnum]
+            if val not in valtochg.keys(): # then assume chg=0
+                chg=0
+            else:
+                chg=valtochg[val]
+    
+            polneighb=False
+            if atomnum==6:
+                for natom in atom.GetNeighbors():
+                    natomicnum=natom.GetAtomicNum()
+                    if natomicnum==7 or natomicnum==8 or natomicnum==16:
+                        polneighb=True
+                if polneighb and val==3:
+                    chg=1
+
+            userformalcharge=atom.GetFormalCharge()
+            if userformalcharge!=chg:
+                raise ValueError('Valence is not consistent with user input charge ,atomindex='+str(atomidx+1)+' , atomnumber= '+str(atomnum)+' user input charge is '+str(userformalcharge)+' but expected charge from valence is '+str(chg)) 
+        return molecule
+
+
+
+ 
     def GenerateParameters(self):
-        if os.path.isfile(self.tmpxyzfile+'_2'):
-            os.remove(self.tmpxyzfile+'_2') 
+        self.CheckMemorySettings()        
 
         obConversion = openbabel.OBConversion()
         mol = openbabel.OBMol()
@@ -1080,6 +1128,8 @@ class PolarizableTyper():
         self.molstructfnamemol=self.molstructfname.replace('.sdf','.mol')
         obConversion.WriteFile(mol,self.molstructfnamemol)
         indextocoordinates=self.GrabIndexToCoordinates(mol)
+        m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False,sanitize=False)
+        self.CheckInputCharge(m)
         m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False)
         m=self.AddInputCoordinatesAsDefaultConformer(m,indextocoordinates)
         mol,m=self.CheckIsInput2D(mol,obConversion,m)
@@ -1088,7 +1138,7 @@ class PolarizableTyper():
         if self.keyfiletoaddtodatabase!=None:
             databaseparser.AddKeyFileParametersToParameterFile(self,m)   
             sys.exit()
-
+       
         if ('I ' in self.mol.GetSpacedFormula()):
             if self.foundgauss==True:
                 self.use_gaus=True
