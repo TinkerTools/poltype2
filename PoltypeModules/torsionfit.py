@@ -1184,15 +1184,24 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         shutil.copy(tmpkey1basename, tmpkeyfname)
         # get the original mm energy profile
         mm_energy_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,'_postQMOPTprefit',flatphaselist,tmpkeyfname)
+        
+     
         # get the new mm energy profile (uses new parameters to find energies)
         mm2_energy_list,m2ang_list,tor_e_list2 = compute_mm_tor_energy(poltype,mol,torset,'_postQMOPTpostfit',flatphaselist,tmpkey2basename)
+
         # remove angles for which energy was unable to be found
         del_ang_list = find_del_list(poltype,mm_energy_list,mang_list)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_mme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
+
         del_ang_list = find_del_list(poltype,qm_energy_list,qang_list)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
+
         del_ang_list = find_del_list(poltype,mm2_energy_list,m2ang_list)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
+        del_ang_list = find_del_list(poltype,WBOarray,qang_list)
+        (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
+
+
         ff_list = [aa+bb for (aa,bb) in zip(mm_energy_list,fitfunc_dict[clskey])]
         # normalize profiles
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
@@ -1284,6 +1293,8 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
 
             ax2=ax.twinx()
             # make a plot with different y-axis using second axis object
+            print('qang_list',qang_list,len(qang_list))
+            print('WBOarray',WBOarray,len(WBOarray))
             line5, =ax2.plot(qang_list,WBOarray,'yo',color='yellow',label='WBO')
             xpoints=numpy.array([qang_list[i][0] for i in range(len(qang_list))])
             x_new = numpy.linspace(xpoints.min(), xpoints.max(),500)

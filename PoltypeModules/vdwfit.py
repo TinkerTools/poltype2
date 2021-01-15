@@ -16,7 +16,7 @@ import symmetry as symm
 from socket import gethostname
 import shlex
 from scipy.optimize import fmin
-
+import shutil
 
 def best_fit_slope_and_intercept(xs,ys):
     xs=np.array(xs)
@@ -131,7 +131,7 @@ def myFUNC(params,poltype,vdwtype):
     return new_rmse
 
 
-def PlotQMVsMMEnergy(poltype,vdwtypesarray):
+def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix):
     target = readOneColumn("QM_DATA",1)
     target=[float(i) for i in target]
     vdw=readOneColumn("SP.dat",-1)
@@ -154,7 +154,7 @@ def PlotQMVsMMEnergy(poltype,vdwtypesarray):
     plt.xlabel('AMOEBA (kcal/mol)')
     plt.legend(loc='best')
     plt.title('QM vs AMOEBA , '+vdwtypestring)
-    fig.savefig('QMvsAMOEBA'+vdwtypestring+'.png')
+    fig.savefig('QMvsAMOEBA-'+prefix+'_'+vdwtypestring+'.png')
 
 
 def VDWOptimizer(poltype):
@@ -351,7 +351,7 @@ def PlotEnergyVsDistance(poltype,distarray,prefix,rad,depth,vdwtypesarray):
     r_squared = round(coefficient_of_determination(energyarray,qmenergyarray),2)
     result=fmin(RMSD,.5)
     minRMSD=round(RMSD(result[0]),2)
-    plotname=prefix+'.png'
+    plotname='EnergyVsDistance-'+prefix+'_'+vdwtypestring+'.png'
     fig = plt.figure()
     title=prefix+' VdwTypes = '+vdwtypestring
     plt.title(title)
@@ -886,7 +886,6 @@ def optimize(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,m
     indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb=GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol)
     indexpairtoreferencedistance,indexpairtobounds=ConvertAngleRestraintToDistanceRestraint(indexpairtoreferencedistance,indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb,indexpairtobounds,indextoreferencecoordinate) 
     coordinatesguess=GenerateCoordinateGuesses(indextoreferencecoordinate)
-
     def PairwiseCostFunction(x):
         func=0
         for indexpair,bounds in indexpairtobounds.items():
@@ -994,9 +993,26 @@ def ReplaceParameterFileHeader(poltype,paramhead,keyfile):
     temp.close() 
     os.remove(keyfile)
     os.rename(tempname,keyfile)
-   
+  
+def CheckIfFittingCompleted(poltype,prefix):
+    check=False
+    files=os.listdir()
+    for f in files:
+        if prefix in f and '.png' in f:
+            check=True
+            break
+    return check
+ 
 
 def VanDerWaalsOptimization(poltype,missingvdwatomindices):
+    poltype.parentdir=os.getcwd()+r'/'
+    vdwfoldername='vdw'
+    if not os.path.isdir(vdwfoldername):
+        os.mkdir(vdwfoldername)
+    shutil.copy(poltype.key5fname,vdwfoldername+r'/'+poltype.key5fname)
+    shutil.copy(poltype.xyzoutfile,vdwfoldername+r'/'+poltype.xyzoutfile)
+    shutil.copy(poltype.xyzfname,vdwfoldername+r'/'+poltype.xyzfname)
+    os.chdir(vdwfoldername) 
     poltype.optmaxcycle=400
     poltype.optmethod='wB97X-D'
     poltype.espmethod='wB97X-D'
@@ -1016,14 +1032,14 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
         obConversion.SetInFormat(inFormat)
         obConversion.ReadFile(dimermol, filename)
         prefix=filename.replace('.xyz','')
-        plotname=prefix+'.png'
-        if not os.path.isfile(plotname):
+        check=CheckIfFittingCompleted(poltype,prefix)
+        if check==False:
             poltype.comoptfname=prefix+'.com'
             poltype.chkoptfname=prefix+'.chk'
             poltype.fckoptfname=prefix+'.fchk'
             poltype.logoptfname=prefix+'.log'
             poltype.gausoptfname=prefix+'.log'
-            optmol = opt.GeometryOptimization(poltype,dimermol,checkbonds=False)
+            optmol = opt.GeometryOptimization(poltype,dimermol,checkbonds=False,modred=False)
             dimeratoms=dimermol.NumAtoms()
             moleculeatoms=dimeratoms-3
             moleculeatom=optmol.GetAtom(moleculeindex)
@@ -1053,4 +1069,6 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             WriteInitialPrmFile(poltype,vdwtypesarray,initialradii,initialdepths,minradii,maxradii,mindepths,maxdepths)
             vdwradius,vdwdepth=VDWOptimizer(poltype)
             PlotEnergyVsDistance(poltype,distarray,prefix,vdwradius,vdwdepth,vdwtypesarray)
-            PlotQMVsMMEnergy(poltype,vdwtypesarray)
+            PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix)
+    shutil.copy(poltype.key5fname,'../'+poltype.key5fname)
+    os.chdir(poltype.parentdir)

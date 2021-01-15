@@ -1097,6 +1097,7 @@ class PolarizableTyper():
                     chg=1
 
             userformalcharge=atom.GetFormalCharge()
+            
             if userformalcharge!=chg:
                 raise ValueError('Valence is not consistent with user input charge ,atomindex='+str(atomidx+1)+' , atomnumber= '+str(atomnum)+' user input charge is '+str(userformalcharge)+' but expected charge from valence is '+str(chg)) 
         return molecule
@@ -1223,7 +1224,12 @@ class PolarizableTyper():
             missingvdwatomindices=databaseparser.ReadList(self,self.vdwmissingfilename)
             if len(missingvdwatomindices)!=0:
                 missingvdwatomindices=missingvdwatomindices[0]
+                missingvdwatomindices=[1,10] # TEMP
                 print('missingvdwatomindices',missingvdwatomindices)
+            else:
+                missingvdwatomindices=[1,10] # TEMP
+                print('missingvdwatomindices',missingvdwatomindices)
+
         esp.SPForDMA(self,optmol,mol)
         # Obtain multipoles from Gaussian fchk file using GDMA
     

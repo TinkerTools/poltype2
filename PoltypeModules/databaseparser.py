@@ -1441,8 +1441,14 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         smarts=smartsenv[0]
         substructure = Chem.MolFromSmarts(smarts)
         matches=rdkitmol.GetSubstructMatches(substructure)
-        firstmatch=matches[0]
-        check=CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,firstmatch)
+
+        matcharray=[]
+        for match in matches:
+            for idx in match:
+                if idx not in matcharray:
+                    matcharray.append(idx)
+            
+        check=CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,matcharray)
         atoma=rdkitmol.GetAtomWithIdx(aidx)
         atomd=rdkitmol.GetAtomWithIdx(didx)
         atomicnumatoma=atoma.GetAtomicNum()
@@ -2042,8 +2048,14 @@ def FindMissingParameters(poltype,indicestosmartsatomorders,rdkitmol,mol,indexto
         smarts=smartsatomorders[0]
         substructure = Chem.MolFromSmarts(smarts)
         matches=rdkitmol.GetSubstructMatches(substructure)
-        firstmatch=matches[0]
-        check=CheckIfNeighborsExistInSMARTMatch(poltype,nindexes,firstmatch)
+        matcharray=[]
+        for match in matches:
+            for idx in match:
+                if idx not in matcharray:
+                    matcharray.append(idx)
+            
+        check=CheckIfNeighborsExistInSMARTMatch(poltype,nindexes,matcharray)
+               
         if check==False or '*' in smarts or '~' in smarts:
             missing.append(indices)
     return missing

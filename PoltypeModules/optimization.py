@@ -173,7 +173,7 @@ def GrabFinalXYZStructure(poltype,logname,filename):
         obConversion.SetOutFormat('xyz')
         obConversion.WriteFile(tempmol, filename)
 
-def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule):
+def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modred=True):
     """
     Intent: Create *.com file for qm opt
     Input:
@@ -190,7 +190,11 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule):
     restraintlist = []
     write_com_header(poltype,comfname,chkname,maxdisk,maxmem,numproc)
     tmpfh = open(comfname, "a")
-    optimizeoptlist = ["ModRedundant","maxcycle=%s"%(poltype.optmaxcycle),'Loose']
+    if modred==True:
+        optimizeoptlist = ["ModRedundant","maxcycle=%s"%(poltype.optmaxcycle),'Loose']
+    else:
+        optimizeoptlist = ["maxcycle=%s"%(poltype.optmaxcycle),'Loose']
+
     if restraintlist:
         optimizeoptlist.insert(0,poltype.gausoptcoords)
     optstr=gen_opt_str(poltype,optimizeoptlist)
@@ -351,7 +355,7 @@ def StructureMinimization(poltype):
     poltype.call_subsystem(cmd, True)
 
 
-def GeometryOptimization(poltype,mol,checkbonds=True):
+def GeometryOptimization(poltype,mol,checkbonds=True,modred=True):
     poltype.WriteToLog("NEED QM Density Matrix: Executing Gaussian Opt and SP")
 
     
@@ -359,7 +363,7 @@ def GeometryOptimization(poltype,mol,checkbonds=True):
         term,error=poltype.CheckNormalTermination(poltype.logoptfname)
         if not term:
             mystruct = load_structfile(poltype,poltype.molstructfname)
-            gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol)
+            gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol,modred)
             cmdstr = 'cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + poltype.comoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
@@ -384,7 +388,7 @@ def GeometryOptimization(poltype,mol,checkbonds=True):
         
            
     else:
-        gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol)
+        gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol,modred)
         poltype.WriteToLog("Calling: " + "Psi4 Optimization")
         term,error=poltype.CheckNormalTermination(poltype.logoptfname)
         inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol)
