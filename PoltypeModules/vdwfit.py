@@ -474,8 +474,8 @@ def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc):
     atoms = data[0];coord = data[1]
     mul=mol.GetTotalSpinMultiplicity()
     chg=mol.GetTotalCharge()
+    inputname=TXYZ.replace('.xyz','_sp.psi4')
 
-    inputname=comfilename.replace('.com','.psi4')
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
     temp.write('%d %d\n' % (chg, mul))
@@ -484,9 +484,9 @@ def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc):
             temp.write('--'+'\n')
             temp.write('%d %d\n' % (0, 1))
         if n>=len(atoms)-3:
-            tmpfh.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
+            temp.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
         else:
-            tmpfh.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
+            temp.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
 
     temp.write('}'+'\n')
     temp.write('memory '+maxmem+'\n')
@@ -506,12 +506,13 @@ def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc):
         temp.write("e_dim= properties('%s/%s',bsse_type='cp')" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
     temp.write('\n')
     temp.write('molecule { '+'\n')
-    temp.write('%d %d\n' % (charge, 1))
+    temp.write('%d %d\n' % (chg, 1))
     for n in range(len(atoms)):
         if n>=len(atoms)-3:
-            tmpfh.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
+            temp.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
         else:
-            tmpfh.write("@%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
+            temp.write("3%s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
+    temp.write('}'+'\n')
 
     if ('I ' in spacedformulastr):
         temp.write('basis {'+'\n')
@@ -524,12 +525,13 @@ def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc):
 
     temp.write('\n')
     temp.write('molecule { '+'\n')
-    temp.write('%d %d\n' % (charge, 1))
+    temp.write('%d %d\n' % (chg, 1))
     for n in range(len(atoms)):
         if n>=len(atoms)-3:
-            tmpfh.write("@%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
+            temp.write("@%s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
         else:
-            tmpfh.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
+            temp.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
+    temp.write('}'+'\n')
 
     if ('I ' in spacedformulastr):
         temp.write('basis {'+'\n')
@@ -545,6 +547,9 @@ def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc):
     temp.write("e_cp = e_dim - e_mon_a - e_mon_b"+'\n')
     temp.write("psi4.print_out('CP Energy =%10.6f\n' % (e_cp))"+'\n')
     temp.write('clean()'+'\n')
+    temp.close()
+    temp=open(inputname,'r')
+    results=temp.readlines()
     temp.close()
     outputname=os.path.splitext(inputname)[0] + '.log'
     return inputname,outputname
@@ -580,8 +585,7 @@ def GenerateSPInputFiles(poltype,filenamearray,mol):
             chkfilename=filename.replace('.xyz','_sp.chk')
             TXYZ2COM(poltype,filename,qmfilename,chkfilename,poltype.maxdisk,poltype.maxmem,poltype.numproc,mol)
         else:
-            qmfilename=filename.replace('.xyz','_sp.com')
-            CreatePsi4SPInputFile(poltype,filename,mol,poltype.maxdisk,poltype.maxmem,poltype.numproc)
+            qmfilename,outputname=CreatePsi4SPInputFile(poltype,filename,mol,poltype.maxdisk,poltype.maxmem,poltype.numproc)
         qmfilenamearray.append(qmfilename)
     return qmfilenamearray
 
@@ -593,10 +597,12 @@ def ExecuteSPJobs(poltype,qmfilenamearray,prefix):
     outputfilenames=[]
     for i in range(len(qmfilenamearray)):
         filename=qmfilenamearray[i]
-        outputname=filename.replace('.com','.log')
         if poltype.use_gaus==True:
             cmdstr = 'cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+filename
+        
+            outputname=filename.replace('.com','.log')
         else:
+            outputname=filename.replace('.psi4','.log')
             cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+filename+' '+outputname
 
 
@@ -886,6 +892,7 @@ def optimize(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,m
     indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb=GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol)
     indexpairtoreferencedistance,indexpairtobounds=ConvertAngleRestraintToDistanceRestraint(indexpairtoreferencedistance,indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb,indexpairtobounds,indextoreferencecoordinate) 
     coordinatesguess=GenerateCoordinateGuesses(indextoreferencecoordinate)
+    
     def PairwiseCostFunction(x):
         func=0
         for indexpair,bounds in indexpairtobounds.items():
@@ -910,6 +917,7 @@ def optimize(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,m
     sol = minimize(PairwiseCostFunction, coordinatesguess, method='SLSQP',options={'disp':False, 'maxiter': 1000, 'ftol': 1e-6})
     coords=sol.x
     indextoreferencecoordinate=UpdateCoordinates(coords,indextoreferencecoordinate)
+
     with open(dimer, "w") as f:
       f.write(str(len(indextoreferencecoordinate.keys()))+"\n")
       f.write("\n")

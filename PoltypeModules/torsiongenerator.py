@@ -73,7 +73,7 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,varia
         inputname,outputlog,cmdstr,scratchdir=GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist,mol,currentopt)
         finished,error=poltype.CheckNormalTermination(outputlog)
         if finished==True and 'opt' in outputlog:
-            opt.GrabFinalXYZStructure(poltype,outputlog,outputlog.replace('.log','.xyz'))
+            opt.GrabFinalXYZStructure(poltype,outputlog,outputlog.replace('.log','.xyz'),mol)
         if finished==False:
             if os.path.isfile(outputlog):
                 statinfo=os.stat(outputlog)
@@ -603,7 +603,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             finished,error=poltype.CheckNormalTermination(outputlog)
             if finished==True and 'opt' in outputlog:
                 cartxyz=outputlog.replace('.log','.xyz')
-                opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz)
+                opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
                 tinkerxyz=outputlog.replace('.log','_tinker.xyz')
                 ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz) 
                 torsettofinshedtinkerxyzfiles[tuple(torset)].append(tinkerxyz)
@@ -655,7 +655,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                 finished,error=poltype.CheckNormalTermination(outputlog)
                 if finished==True and 'opt' in outputlog:
                     cartxyz=outputlog.replace('.log','.xyz')
-                    opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz)
+                    opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
                     tinkerxyz=outputlog.replace('.log','_tinker.xyz')
                     ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz) 
                     torsettofinshedtinkerxyzfiles[tuple(torset)].append(tinkerxyz)
@@ -706,7 +706,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             finished,error=poltype.CheckNormalTermination(outputlog)
             if finished==True and 'opt' in outputlog:
                 cartxyz=outputlog.replace('.log','.xyz')
-                opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz)
+                opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
             else:
                 failed=True
                 torsettofailedoutputlogtoinitialstructure[tuple(torset)][outputlog]=outputlogtoinitialstructure[outputlog]
@@ -755,7 +755,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                 finished,error=poltype.CheckNormalTermination(outputlog)
                 if finished==True and 'opt' in outputlog:
                     cartxyz=outputlog.replace('.log','.xyz')
-                    opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz)
+                    opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
 
                 if finished==True and outputlog not in finishedjobs:
                     finishedjobs.append(outputlog)

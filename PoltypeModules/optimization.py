@@ -135,14 +135,14 @@ def CheckIfPsi4Log(poltype,outputlog):
     return check 
 
 
-def GrabFinalXYZStructure(poltype,logname,filename):
+def GrabFinalXYZStructure(poltype,logname,filename,mol):
     checkifpsi4=CheckIfPsi4Log(poltype,logname)
     if checkifpsi4==True:
         temp=open(logname,'r')
         results=temp.readlines()
         temp.close()
         temp=open(filename,'w')
-        temp.write(str(poltype.mol.NumAtoms())+'\n')
+        temp.write(str(mol.NumAtoms())+'\n')
         temp.write('\n')
         finalmarker=False
         lengthchange=None
@@ -193,7 +193,7 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
     if modred==True:
         optimizeoptlist = ["ModRedundant","maxcycle=%s"%(poltype.optmaxcycle),'Loose']
     else:
-        optimizeoptlist = ["maxcycle=%s"%(poltype.optmaxcycle),'Loose']
+        optimizeoptlist = ["Cartesian","maxcycle=%s"%(poltype.optmaxcycle)]
 
     if restraintlist:
         optimizeoptlist.insert(0,poltype.gausoptcoords)
@@ -410,12 +410,12 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True):
         term,error=poltype.CheckNormalTermination(poltype.logoptfname) # now grabs final structure when finished with QM if using Psi4
         if error and term==False:
             poltype.RaiseOutputFileError(poltype.logoptfname) 
-        GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'))
+        GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'),mol)
         optmol =  load_structfile(poltype,poltype.logoptfname.replace('.log','.xyz'))
         optmol=rebuild_bonds(poltype,optmol,mol)
 
 
-    GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'))
+    GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'),mol)
     if checkbonds==True:
         CheckBondConnectivity(poltype,mol,optmol)
     return optmol

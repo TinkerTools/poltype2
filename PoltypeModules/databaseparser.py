@@ -463,6 +463,7 @@ def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendti
         elif 'opbend' in line and 'opbendtype' not in line and 'cubic' not in line and 'quartic' not in line and 'pentic' not in line and 'sextic' not in line:
             bondclasslist=[int(linesplit[1]),int(linesplit[2])]
             foundopbend=False
+
             if tuple(bondclasslist) in opbendtinkerclassestopoltypeclasses.keys():
                 bondtup=tuple(bondclasslist)
                 foundopbend=True
@@ -1646,11 +1647,15 @@ def GrabPlanarBonds(poltype,listofbondsforprm,mol): # used for checking missing 
                 if aisaromatic==True or bisaromatic==True:
                     if bond not in planarbonds:
                         planarbonds.append(bond)
+                else:
+                    if b.GetHyb()==2 and len(list(openbabel.OBAtomAtomIter(b)))==3:
+                        if bond not in planarbonds:
+                            planarbonds.append(bond)
+
             else:
                 if b.GetHyb()==2 and len(list(openbabel.OBAtomAtomIter(b)))==3:
                     if bond not in planarbonds:
                         planarbonds.append(bond)
-
     return planarbonds 
 
 
@@ -2174,7 +2179,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
 
     opbendbondindicestotinkerclasses,opbendbondindicestosmartsatomorders=FilterBondSMARTSEnviorment(poltype,bondindicestosmartsatomorders,bondindicestotinkerclasses)
     newplanarbonds=ConvertListOfListToListOfTuples(poltype,planarbonds)
-     
     newdics=FilterDictionaries(poltype,[opbendbondindicestotinkerclasses,opbendbondindicestosmartsatomorders],newplanarbonds)
     opbendbondindicestotinkerclasses,opbendbondindicestosmartsatomorders=newdics[:]
     planarbondindicestotinkertypes,planarbondindicestotinkerclasses,planarbondindicestoparametersmartsatomorders,planarbondindicestoelementtinkerdescrips,planarbondindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,planarbondsforprmtoparametersmarts,planarbondsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
