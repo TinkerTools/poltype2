@@ -443,18 +443,25 @@ def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendti
         elif 'strbnd' in line:
             angleclasslist=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3])]
             foundstrbnd=False
+            rev=False
+            prm1=linesplitall[8]
+            prm2=linesplitall[10]
             if tuple(angleclasslist) in angletinkerclassestopoltypeclasses.keys():
                 angletup=tuple(angleclasslist)
                 foundstrbnd=True
             elif tuple(angleclasslist[::-1]) in angletinkerclassestopoltypeclasses.keys():
                 angletup=tuple(angleclasslist[::-1])
                 foundstrbnd=True
+                rev=True
             if foundstrbnd==True:
                 classes=angletinkerclassestopoltypeclasses[angletup]
                 for boundcls in classes:
                     linesplitall[2]=str(boundcls[0])    
                     linesplitall[4]=str(boundcls[1])  
                     linesplitall[6]=str(boundcls[2])
+                    if rev==True:
+                        linesplitall[8]=prm2
+                        linesplitall[10]=prm1
                     newline=''.join(linesplitall)
                     strbndprms.append(newline) 
 

@@ -7,7 +7,7 @@ import time
 import apicall as call
 import shlex
 
-def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
+def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred):
     tempread=open(comfilecoords,'r')
     results=tempread.readlines()
     tempread.close()
@@ -65,6 +65,8 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol):
         temp.write("    optimize('%s')" % (poltype.optmethod.lower())+'\n')
 
     else:
+        if modred==False:
+            temp.write('    set opt_coordinates both'+'\n')
         temp.write("    optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
     if poltype.freq:
         temp.write('    scf_e,scf_wfn=freq("%s/%s",return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
@@ -191,9 +193,9 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
     write_com_header(poltype,comfname,chkname,maxdisk,maxmem,numproc)
     tmpfh = open(comfname, "a")
     if modred==True:
-        optimizeoptlist = ["ModRedundant","maxcycle=%s"%(poltype.optmaxcycle),'Loose']
+        optimizeoptlist = ["ModRedundant","maxcycles=%s"%(poltype.optmaxcycle),'Loose']
     else:
-        optimizeoptlist = ["Cartesian","maxcycle=%s"%(poltype.optmaxcycle)]
+        optimizeoptlist = ["Cartesian","maxcycles=%s"%(poltype.optmaxcycle)]
 
     if restraintlist:
         optimizeoptlist.insert(0,poltype.gausoptcoords)
@@ -391,7 +393,7 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True):
         gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol,modred)
         poltype.WriteToLog("Calling: " + "Psi4 Optimization")
         term,error=poltype.CheckNormalTermination(poltype.logoptfname)
-        inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol)
+        inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol,modred)
         if term==False:
             cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+inputname+' '+poltype.logoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
