@@ -192,6 +192,10 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
     restraintlist = []
     write_com_header(poltype,comfname,chkname,maxdisk,maxmem,numproc)
     tmpfh = open(comfname, "a")
+
+    spacedformulastr=molecule.GetSpacedFormula()
+    if ('I ' in spacedformulastr):
+        modred=False
     if modred==True:
         optimizeoptlist = ["ModRedundant","maxcycles=%s"%(poltype.optmaxcycle),'Loose']
     else:
@@ -200,7 +204,6 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
     if restraintlist:
         optimizeoptlist.insert(0,poltype.gausoptcoords)
     optstr=gen_opt_str(poltype,optimizeoptlist)
-    spacedformulastr=molecule.GetSpacedFormula()
     if ('I ' in spacedformulastr):
         prevoptbasisset=poltype.optbasisset
         poltype.optbasisset='gen'
@@ -233,12 +236,11 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
     
     if ('I ' in spacedformulastr):
         formulalist=spacedformulastr.lstrip().rstrip().split()
-        temp=open(poltype.basissetpath+poltype.optbasissetfile,'r')
-        results=temp.readlines()
-        temp.close()
-        for line in results:
-            if '!' not in line:
-                tmpfh.write(line)
+        elementtobasissetlines=GenerateElementToBasisSetLines(poltype,poltype.basissetpath+poltype.optbasissetfile)
+        for element,basissetlines in elementtobasissetlines.items():
+            if element in spacedformulastr:
+                for line in basissetlines: 
+                    tmpfh.write(line)
 
         temp=open(poltype.basissetpath+poltype.iodineoptbasissetfile,'r')
         results=temp.readlines()
@@ -248,22 +250,30 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
                 tmpfh.write(line)
 
 
-        temp=open(poltype.basissetpath+poltype.iodineoptbasissetfile,'r')
-        results=temp.readlines()
-        temp.close()
-        for line in results:
-            if '!' not in line:
-                tmpfh.write(line)
-
+        
         tmpfh.write('\n')
         tmpfh.write('\n')
     tmpfh.close()
 
-    
-
    
-
-
+def GenerateElementToBasisSetLines(poltype,basissetfile):
+    elementtobasissetlines={}
+    temp=open(basissetfile,'r')
+    results=temp.readlines()
+    temp.close()
+    lines=[]
+    element=None
+    for line in results:
+        linesplit=line.split()
+        if len(linesplit)==2 and linesplit[0].isalpha() and linesplit[1]=='0':
+            if element!=None:
+                elementtobasissetlines[element]=lines
+            element=linesplit[0]
+            lines=[line]
+        else:
+            lines.append(line)
+    return elementtobasissetlines
+      
  
 def gen_opt_str(poltype,optimizeoptlist):
     optstr = "#P opt"

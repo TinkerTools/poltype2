@@ -1245,6 +1245,7 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
     """
     opt.write_com_header(poltype,comfname,os.path.splitext(comfname)[0] + ".chk",maxdisk,maxmem,numproc)
     tmpfh = open(comfname, "a")
+
     optimizeoptlist = ["ModRedundant","maxcycle=%s"%(poltype.optmaxcycle),'Loose']
 
     optstr=opt.gen_opt_str(poltype,optimizeoptlist)
@@ -1300,12 +1301,13 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
     
     if ('I ' in poltype.mol.GetSpacedFormula()):
         formulalist=poltype.mol.GetSpacedFormula().lstrip().rstrip().split()
-        temp=open(poltype.basissetpath+basissetfile,'r')
-        results=temp.readlines()
-        temp.close()
-        for line in results:
-            if '!' not in line:
-                tmpfh.write(line)
+        elementtobasissetlines=GenerateElementToBasisSetLines(poltype,poltype.basissetpath+basissetfile)
+        for element,basissetlines in elementtobasissetlines.items():
+            if element in poltype.mol.GetSpacedFormula():
+                for line in basissetlines: 
+                    tmpfh.write(line)
+
+
 
         temp=open(poltype.basissetpath+iodinebasissetfile,'r')
         results=temp.readlines()
@@ -1315,13 +1317,7 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
                 tmpfh.write(line)
 
 
-        temp=open(poltype.basissetpath+iodinebasissetfile,'r')
-        results=temp.readlines()
-        temp.close()
-        for line in results:
-            if '!' not in line:
-                tmpfh.write(line)
-
+        
     if 'opt' not in comfname and poltype.dontfrag==False: 
         tmpfh.write('$nbo bndidx $end'+'\n')
         tmpfh.write('\n')
@@ -1331,7 +1327,24 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
     tmpfh.close()
 
 
-
+def GenerateElementToBasisSetLines(poltype,basissetfile):
+    elementtobasissetlines={}
+    temp=open(basissetfile,'r')
+    results=temp.readlines()
+    temp.close()
+    lines=[]
+    element=None
+    for line in results:
+        linesplit=line.split()
+        if len(linesplit)==2 and linesplit[0].isalpha() and linesplit[1]=='0':
+            if element!=None:
+                elementtobasissetlines[element]=lines
+            element=linesplit[0]
+            lines=[line]
+        else:
+            lines.append(line)
+    return elementtobasissetlines
+ 
 
 
 

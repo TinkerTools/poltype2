@@ -1030,6 +1030,8 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     poltype.optmethod='wB97X-D'
     poltype.espmethod='wB97X-D'
     poltype.espbasisset="6-311+G*"
+    poltype.use_gaus=False
+    poltype.use_gausoptonly=False
     poltype.SanitizeAllQMMethods()
     paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebabio18.prm"
     ReplaceParameterFileHeader(poltype,paramhead,poltype.key5fname)

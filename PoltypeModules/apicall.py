@@ -9,9 +9,10 @@ def CallExternalAPI(poltype,jobtolog,jobinfofilenameprefix,scratchdir):
     for job,log in jobtolog.items():
         temp.write('--job='+job+' '+'--outputlogpath='+log+' '+'--scratchdir='+scratchdir+' '+'--scratchspace='+poltype.maxdisk+'\n')
     temp.close()
-    cmdstr='python'+' '+poltype.externalapi+' '+'--bashrcpath='+poltype.bashrcpath+' '+'--jobinfofilepath='+jobinfofilepath
-    p = subprocess.Popen(cmdstr, shell=True,stdout=poltype.logfh, stderr=poltype.logfh)
-    if p.wait() != 0:
-        poltype.WriteToLog("ERROR: " + cmdstr)
-        sys.exit(1)
+    if poltype.bashrcpath!=None:
+        cmdstr='python'+' '+poltype.externalapi+' '+'--bashrcpath='+poltype.bashrcpath+' '+'--jobinfofilepath='+jobinfofilepath
+    else:
+        cmdstr='python'+' '+poltype.externalapi+' '+'--jobinfofilepath='+jobinfofilepath
+    print('cmdstr '+cmdstr,flush=True)
+    poltype.call_subsystem(cmdstr,True)
 

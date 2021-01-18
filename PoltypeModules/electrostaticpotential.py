@@ -266,10 +266,6 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
     string=' MaxDisk=%s \n'%(maxdisk)
     opstr+=string
 
-    if ('I ' in poltype.mol.GetSpacedFormula()):
-        opstr+=' pseudo=read'
-    string=' MaxDisk=%s \n'%(maxdisk)
-    opstr+=string
 
     tmpfh.write(opstr)
     commentstr = poltype.molecprefix + " Gaussian SP Calculation on " + gethostname()
@@ -287,12 +283,11 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
     tmpfh.write('\n')
     if ('I ' in poltype.mol.GetSpacedFormula()):
         formulalist=poltype.mol.GetSpacedFormula().lstrip().rstrip().split()
-        temp=open(poltype.basissetpath+basissetfile,'r')
-        results=temp.readlines()
-        temp.close()
-        for line in results:
-            if '!' not in line:
-                tmpfh.write(line)
+        elementtobasissetlines=GenerateElementToBasisSetLines(poltype,poltype.basissetpath+basissetfile)
+        for element,basissetlines in elementtobasissetlines.items():
+            if element in poltype.mol.GetSpacedFormula():
+                for line in basissetlines: 
+                    tmpfh.write(line)
 
         temp=open(poltype.basissetpath+iodinebasissetfile,'r')
         results=temp.readlines()
@@ -310,6 +305,26 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
 
 
     tmpfh.close()
+
+
+def GenerateElementToBasisSetLines(poltype,basissetfile):
+    elementtobasissetlines={}
+    temp=open(basissetfile,'r')
+    results=temp.readlines()
+    temp.close()
+    lines=[]
+    element=None
+    for line in results:
+        linesplit=line.split()
+        if len(linesplit)==2 and linesplit[0].isalpha() and linesplit[1]=='0':
+            if element!=None:
+                elementtobasissetlines[element]=lines
+            element=linesplit[0]
+            lines=[line]
+        else:
+            lines.append(line)
+    return elementtobasissetlines
+ 
 
 
 def ElectrostaticPotentialFitting(poltype):
