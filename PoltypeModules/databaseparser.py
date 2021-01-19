@@ -1542,6 +1542,8 @@ def TinkerClassesToPoltypeClasses(poltype,indicestotinkerclasses):
     for indices,tinkerclasses in indicestotinkerclasses.items():
         babelindices=[i+1 for i in indices]
         poltypeclasses=[poltype.idxtosymclass[i] for i in babelindices]
+        revpoltypeclasses=poltypeclasses[::-1]
+        revtinkerclasses=tinkerclasses[::-1]
         if len(indices)>1:
             first=int(tinkerclasses[0])
             second=int(tinkerclasses[-1])
@@ -1569,6 +1571,11 @@ def TinkerClassesToPoltypeClasses(poltype,indicestotinkerclasses):
             tinkerclassestopoltypeclasses[tuple(tinkerclasses)]=[]
         if tuple(poltypeclasses) not in tinkerclassestopoltypeclasses[tuple(tinkerclasses)]: 
             tinkerclassestopoltypeclasses[tuple(tinkerclasses)].append(tuple(poltypeclasses))
+        if tuple(revtinkerclasses) not in tinkerclassestopoltypeclasses.keys():
+            tinkerclassestopoltypeclasses[tuple(revtinkerclasses)]=[]
+        if tuple(revpoltypeclasses) not in tinkerclassestopoltypeclasses[tuple(revtinkerclasses)]: 
+            tinkerclassestopoltypeclasses[tuple(revtinkerclasses)].append(tuple(revpoltypeclasses))
+
     return tinkerclassestopoltypeclasses
 
 
@@ -1785,17 +1792,21 @@ def DefaultOPBendParameters(poltype,missingopbendprmindices,mol,opbendbondindice
 
 
 def WriteOutList(poltype,ls,filename):
-    np.savetxt(filename,ls)
+    np.savetxt(filename,ls,fmt='%d')
 
 def ReadList(poltype,filename):
     newls=[]
     if os.stat(filename).st_size != 0:
-        ls=np.loadtxt(filename)
+        ls=np.loadtxt(filename,dtype=int)
         if ls.ndim==1: # read only in to list, but need list of list
-            ls=[ls.tolist()]       
+            ls=[ls.tolist()]
+        elif ls.ndim==0:
+            ls=[ls.tolist()]
         for subls in ls:
-            newsubls=[int(i) for i in subls]
-            newls.append(newsubls)
+            if type(subls)!=list:
+                newls.append(subls.tolist())
+            else:
+                newls.append(subls)
     return newls
 
 def CheckIfParametersExist(poltype,potentialmissingindices,prms):
@@ -2115,6 +2126,9 @@ def TinkerClassesToTrigonalCenter(poltype,opbendbondindicestotinkerclasses,opben
     for bondindices,tinkerclasses in opbendbondindicestotinkerclasses.items():
         boolarray=opbendbondindicestotrigonalcenterbools[bondindices]
         opbendtinkerclassestotrigonalcenterbools[tuple(tinkerclasses)]=boolarray
+        revtinkerclasses=tinkerclasses[::-1]
+        revboolarray=boolarray[::-1]
+        opbendtinkerclassestotrigonalcenterbools[tuple(revtinkerclasses)]=revboolarray
 
     return opbendtinkerclassestotrigonalcenterbools
 
@@ -2211,7 +2225,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     opbendtinkerclassestopoltypeclasses=AddReverseKeys(poltype,opbendtinkerclassestopoltypeclasses)
     opbendbondindicestotrigonalcenterbools=CheckTrigonalCenters(poltype,listofbondsforprm,mol)
     opbendtinkerclassestotrigonalcenterbools=TinkerClassesToTrigonalCenter(poltype,opbendbondindicestotinkerclasses,opbendbondindicestotrigonalcenterbools)
-
     angletinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,angleindicestotinkerclasses)
     planarangletinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,planarangleindicestotinkerclasses)
     torsiontinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,torsionindicestotinkerclasses)

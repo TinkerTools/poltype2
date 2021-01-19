@@ -361,7 +361,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
                             tmpkeyfh.write('restrain-torsion %d %d %d %d %f\n' % (resa,resb,resc,resd,torsionrestraint))
                         restlist.append(res)
     tmpkeyfh.close()
-    mincmdstr = poltype.minimizeexe+' '+torxyzfname+' -k '+tmpkeyfname+' 0.1'+' '+'>'+torminlogfname
+    mincmdstr = poltype.minimizeexe+' '+torxyzfname+' -k '+tmpkeyfname+' 0.01'+' '+'>'+torminlogfname
     term,error=poltype.CheckNormalTermination(torminlogfname)
     if term==True and error==False:
         pass
