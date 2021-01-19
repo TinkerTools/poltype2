@@ -345,13 +345,33 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
     for i in range(len(torset)):
         tor=torset[i]
         a,b,c,d=tor[0:4]
+        indices=[a,b,c,d]
         torang = optmol.GetTorsion(a,b,c,d)
         phaseangle=phaseanglelist[i]
+        allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,optmol)
+        aatom=optmol.GetAtom(a)
+        datom=optmol.GetAtom(d)
+        aatomicnum=aatom.GetAtomicNum()
+        datomicnum=datom.GetAtomicNum()
+        if (aatomicnum==1 or datomicnum==1) and allhydtors==False:
+            continue
+
+
         tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (a,b,c,d,torsionrestraint,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
         for key in poltype.rotbndlist.keys():
             torlist=poltype.rotbndlist[key]
             for res in torlist:
                 resa,resb,resc,resd = res[0:4]
+                indices=[resa,resb,resc,resd]
+                allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,optmol)
+                aatom=optmol.GetAtom(resa)
+                datom=optmol.GetAtom(resd)
+                aatomicnum=aatom.GetAtomicNum()
+                datomicnum=datom.GetAtomicNum()
+                if (aatomicnum==1 or datomicnum==1) and allhydtors==False:
+                    continue
+
+
                 if res not in restlist:
                     if (resa,resb,resc,resd) not in torset and (resd,resc,resb,resa) not in torset and (resa,resb,resc,resd) not in variabletorlist and (resd,resc,resb,resa) not in variabletorlist:
                         if (b==resb and c==resc) or (b==resc and c==resb):

@@ -328,7 +328,7 @@ def ReadCounterPoiseAndWriteQMData(poltype,logfilelist):
             interenergy=dimerenergy-(frag1energy+frag2energy)
         else:
             for line in tmpfh:
-                if 'CP Energy =' in line:
+                if 'CP Energy =' in line and 'print' not in line:
                     linesplit=line.split()
                     interenergy=float(linesplit[3])*poltype.Hartree2kcal_mol
 
@@ -358,6 +358,11 @@ def PlotEnergyVsDistance(poltype,distarray,prefix,rad,depth,vdwtypesarray):
     fig = plt.figure()
     title=prefix+' VdwTypes = '+vdwtypestring
     plt.title(title)
+    print('energyarray',energyarray)
+    print('rad',rad)
+    print('depth',depth)
+    print('distarray',distarray)
+    print('qmenergyarray',qmenergyarray)
     plt.plot(distarray,energyarray,'b-',label='MM ,'+'Radius=%s, Depth=%s'%(round(rad,2),round(depth,2)))
     plt.plot(distarray,qmenergyarray,'r-',label='QM')
     plt.plot()
@@ -514,7 +519,7 @@ def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc):
         if n>=len(atoms)-3:
             temp.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
         else:
-            temp.write("3%s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
+            temp.write("%3s             %14.7f%14.7f%14.7f\n"%('@'+atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
     temp.write('}'+'\n')
 
     if ('I ' in spacedformulastr):
@@ -531,7 +536,7 @@ def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc):
     temp.write('%d %d\n' % (chg, 1))
     for n in range(len(atoms)):
         if n>=len(atoms)-3:
-            temp.write("@%s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
+            temp.write("%s             %14.7f%14.7f%14.7f\n"%('@'+atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
         else:
             temp.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
     temp.write('}'+'\n')
@@ -548,7 +553,7 @@ def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc):
     temp.write('\n')
     
     temp.write("e_cp = e_dim - e_mon_a - e_mon_b"+'\n')
-    temp.write("psi4.print_out('CP Energy =%10.6f' % (e_cp))"+'\n')
+    temp.write("psi4.print_out('CP Energy = %10.6f' % (e_cp))"+'\n')
     temp.write('clean()'+'\n')
     temp.close()
     temp=open(inputname,'r')
@@ -1043,6 +1048,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
         alloutputfilenames=[]
         prefixarrays=[]
         distancearrays=[]
+        checkarray=[]
         for filename in filenamelist:
             dimermol = openbabel.OBMol()
             probeindex=probeindices[i]
@@ -1053,32 +1059,36 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             prefix=filename.replace('.xyz','')
             prefixarrays.append(prefix)
             check=CheckIfFittingCompleted(poltype,prefix)
+            checkarray.append(check)
+            poltype.comoptfname=prefix+'.com'
+            poltype.chkoptfname=prefix+'.chk'
+            poltype.fckoptfname=prefix+'.fchk'
+            poltype.logoptfname=prefix+'.log'
+            poltype.gausoptfname=prefix+'.log'
+            optmol = opt.GeometryOptimization(poltype,dimermol,checkbonds=False,modred=False)
+            dimeratoms=dimermol.NumAtoms()
+            moleculeatoms=dimeratoms-3
+            moleculeatom=optmol.GetAtom(moleculeindex)
+            probeatom=optmol.GetAtom(probeindex)
+            moleculeatomcoords=np.array([moleculeatom.GetX(),moleculeatom.GetY(),moleculeatom.GetZ()])
+            probeatomcoords=np.array([probeatom.GetX(),probeatom.GetY(),probeatom.GetZ()])
+            equildistance=np.linalg.norm(probeatomcoords-moleculeatomcoords)
+            distarray=np.multiply(equildistance,np.array(array))
+            distancearrays.append(distarray)
+            outputprefixname=filename.split('.')[0]
+            outputxyz=outputprefixname+'_tinker.xyz'
+            inputxyz=outputprefixname+'_cartesian.xyz'
+            WriteOutCartesianXYZ(poltype,optmol,inputxyz)
+            ConvertWaterProbeDimerXYZToTinkerXYZ(poltype,inputxyz,poltype.xyzoutfile,outputxyz)
+            filenamearray=MoveDimerAboutMinima(poltype,outputxyz,outputprefixname,moleculeatoms,moleculeindex,probeindex,equildistance,array)
+            qmfilenamearray=GenerateSPInputFiles(poltype,filenamearray,poltype.mol)
+            outputfilenames=ExecuteSPJobs(poltype,qmfilenamearray,prefix)
+            alloutputfilenames.extend(outputfilenames)
+        dothefit=False
+        for check in checkarray:
             if check==False:
-                poltype.comoptfname=prefix+'.com'
-                poltype.chkoptfname=prefix+'.chk'
-                poltype.fckoptfname=prefix+'.fchk'
-                poltype.logoptfname=prefix+'.log'
-                poltype.gausoptfname=prefix+'.log'
-                optmol = opt.GeometryOptimization(poltype,dimermol,checkbonds=False,modred=False)
-                dimeratoms=dimermol.NumAtoms()
-                moleculeatoms=dimeratoms-3
-                moleculeatom=optmol.GetAtom(moleculeindex)
-                probeatom=optmol.GetAtom(probeindex)
-                moleculeatomcoords=np.array([moleculeatom.GetX(),moleculeatom.GetY(),moleculeatom.GetZ()])
-                probeatomcoords=np.array([probeatom.GetX(),probeatom.GetY(),probeatom.GetZ()])
-                equildistance=np.linalg.norm(probeatomcoords-moleculeatomcoords)
-                distarray=np.multiply(equildistance,np.array(array))
-                distancearrays.append(distarray)
-                outputprefixname=filename.split('.')[0]
-                outputxyz=outputprefixname+'_tinker.xyz'
-                inputxyz=outputprefixname+'_cartesian.xyz'
-                WriteOutCartesianXYZ(poltype,optmol,inputxyz)
-                ConvertWaterProbeDimerXYZToTinkerXYZ(poltype,inputxyz,poltype.xyzoutfile,outputxyz)
-                filenamearray=MoveDimerAboutMinima(poltype,outputxyz,outputprefixname,moleculeatoms,moleculeindex,probeindex,equildistance,array)
-                qmfilenamearray=GenerateSPInputFiles(poltype,filenamearray,poltype.mol)
-                outputfilenames=ExecuteSPJobs(poltype,qmfilenamearray,prefix)
-                alloutputfilenames.extend(outputfilenames)
-        if check==False:
+                dothefit=True
+        if dothefit==True:
             ReadCounterPoiseAndWriteQMData(poltype,alloutputfilenames)
             vdwtype=poltype.idxtosymclass[moleculeindex]
             vdwtypesarray=[vdwtype]
@@ -1095,6 +1105,8 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             for k in range(len(prefixarrays)):
                 prefix=prefixarrays[k]
                 distarray=distancearrays[k]
+                print('prefix',prefix)
+                print('distarray',distarray)
                 PlotEnergyVsDistance(poltype,distarray,prefix,vdwradius,vdwdepth,vdwtypesarray)
                 PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix)
     shutil.copy(poltype.key5fname,'../'+poltype.key5fname)
