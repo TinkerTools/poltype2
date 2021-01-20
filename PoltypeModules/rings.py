@@ -228,7 +228,6 @@ def RefineNonAromaticRingTorsions(poltype,mol,optmol,classkeytotorsionparameters
             classkeysplit=classkey.split()
             cla,clb,clc,cld=classkeysplit[:]
             revclasskey='%s %s %s %s' % (cld, clc, clb, cla)
-
             if classkey in classkeytotorsionparametersguess.keys(): 
                 prms=classkeytotorsionparametersguess[classkey] 
             elif revclasskey in classkeytotorsionparametersguess.keys(): 

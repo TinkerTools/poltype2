@@ -246,46 +246,26 @@ def GenerateTorsionSPInputFileGaus(poltype,torxyzfname,torset,optmol,phaseangles
     return torspcomfname,outputname
 
 
-def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevstrctfname,torsionrestraint,bondtopology):
+def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevstrctfname,torsionrestraint,bondtopology,clockindex):
     tinkerstructnamelist=[]
     # load prevstruct
     firsttor=torset[0]
     a,b,c,d=firsttor[0:4]
     tor=tuple([a,b,c,d])
-    if tor in poltype.nonaroringtors:
-        nonaroringtor=True
-    else:
-        nonaroringtor=False
+    newtorxyzfname=None  
     # create xyz and key and write restraint then minimize, getting .xyz_2
+    count=-1
     for phaseanglelist in phaselist: # we need to send back minimized structure in XYZ (not tinker) format to load for next tinker minimization,but append the xyz_2 tinker XYZ file so that com file can be generated from that 
-        prevstruct = opt.load_structfile(poltype,prevstrctfname)
+        count+=1
+        if newtorxyzfname==None or count==clockindex:
+            prevstruct = opt.load_structfile(poltype,prevstrctfname)
+        else:
+            cartxyz=ConvertTinktoXYZ(poltype,newtorxyzfname,newtorxyzfname.replace('.xyz_2','_cart.xyz'))
+
+            prevstruct =opt.load_structfile(poltype,cartxyz)
+
         prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology) # sometimes extra bonds are made when atoms get too close during minimization
         prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
-        obConversion = openbabel.OBConversion()
-        obConversion.SetInFormat('mol')
-        obConversion.SetOutFormat('mol2')
-        obConversion.WriteFile(prevstruct, 'temp.mol2')
-        try:
-            rdmol=MolFromMol2File('temp.mol2',False,False)   
-        except:
-            rdmol=MolFromMol2File('temp.mol2',True,False)
-        if nonaroringtor==False:
-            conf = rdmol.GetConformer()
-            for i in range(len(torset)):
-                tor=torset[i]
-                phaseangle=phaseanglelist[i]
-                a,b,c,d=tor[0:4]
-                dihedral = optmol.GetTorsion(a,b,c,d)
-                newdihedral=round((dihedral+phaseangle)%360)
-                rdmt.SetDihedralDeg(conf, a-1, b-1, c-1, d-1, newdihedral)
-                rdmol.UpdatePropertyCache(strict=False)
-
-        try:
-            print(Chem.MolToMolBlock(rdmol,kekulize=True),file=open('tempout.mol','w+'))
-        except:
-            print(Chem.MolToMolBlock(rdmol,kekulize=False),file=open('tempout.mol','w+'))
-
-        obConversion.ReadFile(prevstruct, 'tempout.mol')
         
         torxyzfname,tmpkeyfname,torminlogfname=tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,'_preQMOPTprefit',poltype.key4fname,'../')
         prevstrctfname,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,'_preQMOPTprefit',poltype.key4fname,'../',torxyzfname,tmpkeyfname,torminlogfname)
@@ -381,14 +361,15 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
                             tmpkeyfh.write('restrain-torsion %d %d %d %d %f\n' % (resa,resb,resc,resd,torsionrestraint))
                         restlist.append(res)
     tmpkeyfh.close()
-    mincmdstr = poltype.minimizeexe+' '+torxyzfname+' -k '+tmpkeyfname+' 0.01'+' '+'>'+torminlogfname
+    mincmdstr = poltype.minimizeexe+' '+torxyzfname+' -k '+tmpkeyfname+' 0.1'+' '+'>'+torminlogfname
     term,error=poltype.CheckNormalTermination(torminlogfname)
     if term==True and error==False:
         pass
     else:
         poltype.call_subsystem(mincmdstr,True)
-    
-    cartxyz=ConvertTinktoXYZ(poltype,torxyzfname+'_2')
+    filename=torxyzfname+'_2'
+    newfilename=filename.replace('.xyz_2','_xyzformat.xyz')
+    cartxyz=ConvertTinktoXYZ(poltype,torxyzfname+'_2',newfilename)
     return cartxyz,torxyzfname,torxyzfname+'_2',tmpkeyfname
 
 def GenerateFilename(poltype,torset,phaseangles,prefix,postfix,mol):
@@ -431,11 +412,12 @@ def GeneratePhaseLists(poltype,torset,optmol):
         maxrange=poltype.rotbndtomaxrange[key]
         phaselist=range(0,maxrange,anginc)
         clock=list(phaselist[:int(len(phaselist)/2)+1])
-        counterclock=[-1*i for i in phaselist[1:int(len(phaselist)/2)+1]][::-1]
-        counterclock=counterclock[1:]
-        phaselists.append(counterclock+clock)
+        counterclock=[-1*i for i in phaselist[1:int(len(phaselist)/2)+1]]
+        counterclock=counterclock[:-1]
+        phaselists.append(clock+counterclock)
+        clockindex=len(clock)-1+1 # need next index (when counterclock starts)
     currentanglelist=numpy.array(currentanglelist)
-    return phaselists,currentanglelist
+    return phaselists,currentanglelist,clockindex
 
 
 def ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz):
@@ -533,7 +515,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         optnumtotorsettofulloutputlogs['1'][tuple(torset)]=[]
         optnumtotorsettofulloutputlogs['2'][tuple(torset)]=[]
         variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
-        phaselists,currentanglelist=GeneratePhaseLists(poltype,torset,optmol)
+        phaselists,currentanglelist,clockindex=GeneratePhaseLists(poltype,torset,optmol) # clockindex might change if  points on grid are removed (come back to this)
         flatphaselist=numpy.array(list(product(*phaselists)))
         poltype.tensorphases[tuple(torset)]=flatphaselist
         flatphaselist=FlattenArray(poltype,flatphaselist)
@@ -582,7 +564,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
 
         minstrctfname = prevstrctfname
         prevstrctfname = minstrctfname
-        listoftinkertorstructures=tinker_minimize_angles(poltype,torset,optmol,variabletorlist,flatphaselist,prevstrctfname,torsionrestraint,bondtopology)
+        listoftinkertorstructures=tinker_minimize_angles(poltype,torset,optmol,variabletorlist,flatphaselist,prevstrctfname,torsionrestraint,bondtopology,clockindex)
         poltype.torsettophaselist[tuple(torset)]=flatphaselist
 
         poltype.toroptmethod=poltype.firsttoroptmethod
@@ -1079,9 +1061,9 @@ def GrabFirstHeavyAtomIdx(poltype,indices,mol):
     return heavyidx
 
 
-def ConvertTinktoXYZ(poltype,filename):
+def ConvertTinktoXYZ(poltype,filename,newfilename):
     temp=open(os.getcwd()+r'/'+filename,'r')
-    tempwrite=open(os.getcwd()+r'/'+filename.replace('.xyz_2','_xyzformat.xyz'),'w')
+    tempwrite=open(os.getcwd()+r'/'+newfilename,'w')
     results=temp.readlines()
     for lineidx in range(len(results)):
         line=results[lineidx]
