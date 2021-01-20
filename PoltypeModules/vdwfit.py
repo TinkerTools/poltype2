@@ -110,6 +110,7 @@ def myFUNC(params,poltype,vdwtype):
     target = []
     target = readOneColumn("QM_DATA",1)
     target=[float(i) for i in target]
+    target=[i-min(target) for i in target]
     temp=open('QM_DATA','r')
     cmdarray=[] 
     filenamearray=[]
@@ -129,6 +130,7 @@ def myFUNC(params,poltype,vdwtype):
     vdw=readOneColumn("SP.dat",-1)
     current=list(np.array(vdw))
     current=[float(i) for i in current]
+    current=[i-min(current) for i in current]
     new_rmse=RMSE(current,target)
 
     return new_rmse
@@ -137,9 +139,11 @@ def myFUNC(params,poltype,vdwtype):
 def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix):
     target = readOneColumn("QM_DATA",1,prefix)
     target=[float(i) for i in target]
+    target=[i-min(target) for i in target]
     vdw=readOneColumn("SP.dat",-1,prefix)
     current=list(np.array(vdw))
     current=[float(i) for i in current]
+    current=[i-min(current) for i in current]
     vdwtypes=[str(i) for i in vdwtypesarray]
     vdwtypestring=','.join(vdwtypes)
 
@@ -344,9 +348,11 @@ def PlotEnergyVsDistance(poltype,distarray,prefix,rad,depth,vdwtypesarray):
     vdwtypestring=','.join(vdwtypes)
     qmenergyarray = readOneColumn("QM_DATA",1,prefix)
     qmenergyarray=[float(i) for i in qmenergyarray]
+    qmenergyarray=[i-min(qmenergyarray) for i in qmenergyarray]
     vdw=readOneColumn("SP.dat",-1,prefix)
     energyarray=list(np.array(vdw))
     energyarray=[float(i) for i in energyarray]
+    energyarray=[i-min(energyarray) for i in energyarray]
     def RMSD(c):
         return np.sqrt(np.mean(np.square(np.add(np.subtract(np.array(energyarray),np.array(qmenergyarray)),c))))
 
@@ -358,11 +364,6 @@ def PlotEnergyVsDistance(poltype,distarray,prefix,rad,depth,vdwtypesarray):
     fig = plt.figure()
     title=prefix+' VdwTypes = '+vdwtypestring
     plt.title(title)
-    print('energyarray',energyarray)
-    print('rad',rad)
-    print('depth',depth)
-    print('distarray',distarray)
-    print('qmenergyarray',qmenergyarray)
     plt.plot(distarray,energyarray,'b-',label='MM ,'+'Radius=%s, Depth=%s'%(round(rad,2),round(depth,2)))
     plt.plot(distarray,qmenergyarray,'r-',label='QM')
     plt.plot()
@@ -972,7 +973,8 @@ def GenerateInitialProbeStructure(poltype,missingvdwatomindices):
             for symclass in list(probeidxtosymclass.values()): 
                 keys= GrabKeysFromValue(poltype,probeidxtosymclass,symclass)       
                 probeidx=keys[0]-1 # shift to 0 index
-                prob_spots.append(probeidx)
+                if probeidx not in prob_spots:
+                    prob_spots.append(probeidx)
             for p1 in mol_spots:
                 for p2 in prob_spots:
                   e1=atoms1[p1]
@@ -1105,8 +1107,6 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             for k in range(len(prefixarrays)):
                 prefix=prefixarrays[k]
                 distarray=distancearrays[k]
-                print('prefix',prefix)
-                print('distarray',distarray)
                 PlotEnergyVsDistance(poltype,distarray,prefix,vdwradius,vdwdepth,vdwtypesarray)
                 PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix)
     shutil.copy(poltype.key5fname,'../'+poltype.key5fname)

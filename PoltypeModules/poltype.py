@@ -1217,18 +1217,13 @@ class PolarizableTyper():
             bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,missingvdwatomindextoneighbors=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
        
         if os.path.isfile(self.torsionsmissingfilename):
-            torsionsmissing=databaseparser.ReadList(self,self.torsionsmissingfilename)
+            torsionsmissing=databaseparser.ReadTorsionList(self,self.torsionsmissingfilename)
+            print('torsiosmissing',torsionsmissing)
         if os.path.isfile(self.torsionprmguessfilename):
             classkeytotorsionparametersguess=databaseparser.ReadDictionaryFromFile(self,self.torsionprmguessfilename)
         if os.path.isfile(self.vdwmissingfilename):
-            missingvdwatomindices=databaseparser.ReadList(self,self.vdwmissingfilename)
-            if len(missingvdwatomindices)!=0:
-                missingvdwatomindices=missingvdwatomindices[0]
-                missingvdwatomindices=[1,10] # TEMP
-                print('missingvdwatomindices',missingvdwatomindices)
-            else:
-                missingvdwatomindices=[1,10] # TEMP
-                print('missingvdwatomindices',missingvdwatomindices)
+            missingvdwatomindices=databaseparser.ReadVdwList(self,self.vdwmissingfilename)
+            print('missingvdwatomindices',missingvdwatomindices)
 
         esp.SPForDMA(self,optmol,mol)
         # Obtain multipoles from Gaussian fchk file using GDMA

@@ -1788,22 +1788,33 @@ def DefaultOPBendParameters(poltype,missingopbendprmindices,mol,opbendbondindice
 
 
 def WriteOutList(poltype,ls,filename):
-    np.savetxt(filename,ls,fmt='%d')
+    with open(filename, 'w') as filehandle:
+        for listitem in ls:
+            filehandle.write('%s\n' % listitem)
 
-def ReadList(poltype,filename):
+def ReadTorsionList(poltype,filename):
     newls=[]
     if os.stat(filename).st_size != 0:
-        ls=np.loadtxt(filename,dtype=int)
-        if ls.ndim==1: # read only in to list, but need list of list
-            ls=[ls.tolist()]
-        elif ls.ndim==0:
-            ls=[ls.tolist()]
-        for subls in ls:
-            if type(subls)!=list:
-                newls.append(subls.tolist())
-            else:
-                newls.append(subls)
+        with open(filename, 'r') as filehandle:
+            for line in filehandle:
+                current = line[:-1]
+                current=current.replace('[','').replace(']','')
+                current=current.split(',')
+                current=[int(i) for i in current]
+                newls.append(current)
+
     return newls
+
+def ReadVdwList(poltype,filename):
+    newls=[]
+    if os.stat(filename).st_size != 0:
+        with open(filename, 'r') as filehandle:
+            for line in filehandle:
+                current = line[:-1]
+                newls.append(int(current))
+
+    return newls
+
 
 def CheckIfParametersExist(poltype,potentialmissingindices,prms):
     missingprmindices=[]
