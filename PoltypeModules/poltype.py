@@ -1355,7 +1355,7 @@ class PolarizableTyper():
             frag.GrabVdwAndTorsionParametersFromFragments(self,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor) # just dump to key_5 since does not exist for parent molecule
         else:          
             # Torsion scanning then fitting. *.key_5 will contain updated torsions
-            if not os.path.isfile(self.key5fname) and self.dontdotor==False:
+            if not os.path.isfile(self.key5fname):
                 if len(self.torlist)!=0:
                     # torsion scanning
                     torgen.gen_torsion(self,optmol,self.torsionrestraint,mol)

@@ -801,6 +801,7 @@ def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprmtosmartslist,param
         parametersmartstosmartslist={}
         parametersmartstomatchlen,parametersmartstosmartslist=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
         if len(parametersmartstomatchlen.keys())==0:
+           
             smartslist=ReplaceSMARTSBondsWithGenericBonds(poltype,smartslist,ls,mol)
             parametersmartstomatchlen,parametersmartstosmartslist=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
             if len(parametersmartstomatchlen.keys())==0:
@@ -839,19 +840,45 @@ def ReplaceEachAtomIdentityOnEnd(poltype,smartsls):
 def ReplaceLeftAtomIdentity(poltype,smarts):
     smartsplit=smarts.split('~') 
     tempsplit=smartsplit[:]
-    addp=False
-    if tempsplit[0][-1]=='(':
-        addp=True
+    #addp=False
+    #if tempsplit[0][-1]=='(':
+    #    addp=True
+    brackindex=tempsplit[0].index(']')
+    extra=''
+    for i in range(len(tempsplit[0][brackindex:])):
+        char=tempsplit[0][brackindex+i]
+        extra+=char
+    if len(extra)>1:
+        extra=extra[1:]
+    else:
+        extra=''
     tempsplit[0]='[*]'
-    if addp==True:
-       tempsplit[0]+='('
+    #if addp==True:
+    #   tempsplit[0]+='('
+    tempsplit[0]+=extra
     newsmarts='~'.join(tempsplit)
     return newsmarts
 
 def ReplaceRightAtomIdentity(poltype,smarts):
     smartsplit=smarts.split('~') 
     tempsplit=smartsplit[:]
-    tempsplit[-1]='[*]'
+    if ']' in tempsplit[-1]:
+        idx=-1
+    else:
+        idx=-2
+    brackindex=tempsplit[idx].index(']')
+    extra=''
+    for i in range(len(tempsplit[idx][brackindex:])):
+        char=tempsplit[idx][brackindex+i]
+        extra+=char
+    if len(extra)>1:
+        extra=extra[1:]
+    else:
+        extra=''
+
+    tempsplit[idx]='[*]'
+
+    tempsplit[idx]+=extra
     newsmarts='~'.join(tempsplit)
     return newsmarts
 
@@ -860,9 +887,12 @@ def ReplaceAtomIdentitiesOnEnd(poltype,smartsls):
     for smarts in smartsls:
         smartsplit=smarts.split('~') 
         tempsplit=copy.deepcopy(smartsplit)
-        tempsplit[0]='[*]'
-        tempsplit[-1]='[*]'
-        newsmarts='~'.join(tempsplit)
+        #tempsplit[0]='[*]'
+        #tempsplit[-1]='[*]'
+        #newsmarts='~'.join(tempsplit)
+        newsmarts=ReplaceLeftAtomIdentity(poltype,smarts)
+        newsmarts=ReplaceRightAtomIdentity(poltype,newsmarts)
+
         newsmartslist.append(newsmarts)
     newsmartslist=[newsmartslist]
     return newsmartslist

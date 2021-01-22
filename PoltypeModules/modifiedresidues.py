@@ -125,7 +125,6 @@ def GrabProteinTypeNumbers(poltype,pdbfilename,knownresiduesymbs,libpath,modproi
     proidxtothreelettercode,proidxtoatomlabel,proidxtoresnum,firstresnum,lastresnum=GrabPDBInfo(poltype,pdbfilename)
 
     proidxtotypeidx={}
-    proidxtoboundtypeidx={}
  
     for proidx in proidxtoatomlabel.keys():
         atomlabel=proidxtoatomlabel[proidx]
