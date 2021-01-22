@@ -255,10 +255,11 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
     newtorxyzfname=None  
     # create xyz and key and write restraint then minimize, getting .xyz_2
     count=-1
+    originalprevstrctfname=prevstrctfname
     for phaseanglelist in phaselist: # we need to send back minimized structure in XYZ (not tinker) format to load for next tinker minimization,but append the xyz_2 tinker XYZ file so that com file can be generated from that 
         count+=1
         if newtorxyzfname==None or count==clockindex:
-            prevstruct = opt.load_structfile(poltype,prevstrctfname)
+            prevstruct = opt.load_structfile(poltype,originalprevstrctfname)
         else:
             cartxyz=ConvertTinktoXYZ(poltype,newtorxyzfname,newtorxyzfname.replace('.xyz_2','_cart.xyz'))
 
