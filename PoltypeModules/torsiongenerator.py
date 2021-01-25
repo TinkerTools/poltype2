@@ -23,17 +23,6 @@ def __init__(poltype):
     PolarizableTyper.__init__(poltype)
 
 
-def CheckGeometricRestraintEnergy(poltype,alzfile):
-    temp=open(alzfile,'r')
-    results=temp.readlines()
-    temp.close()
-    for line in results:
-        if 'Geometric Restraints' in line:
-            linesplit=line.split()
-            energy=float(linesplit[2])
-            if energy>1: # 1 kcal/mol
-                raise ValueError('Geometric restraint energy is greater than 1 kcal/mol '+alzfile)
-
 
 def DefaultMaxRange(poltype,torsions):
     poltype.rotbndtomaxrange={}
@@ -286,7 +275,6 @@ def tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phas
     if term==False:
         tinker_analyze(poltype,newtorxyzfname,keyfname,toralzfname)
 
-    CheckGeometricRestraintEnergy(poltype,toralzfname)
     return cartxyz,newtorxyzfname
 
 def AnalyzeTerm(poltype,filename):
@@ -1651,7 +1639,6 @@ def TinkerTorsionTorsionInitialScan(poltype,torset,optmol,bondtopology):
         if term==False:
             tinker_analyze(poltype,newtorxyzfname,keyfname,toralzfname)
             term=AnalyzeTerm(poltype,toralzfname)
-            CheckGeometricRestraintEnergy(poltype,toralzfname)
         if term==False:
             failedgridpoints.append(phaseangles)
         else:

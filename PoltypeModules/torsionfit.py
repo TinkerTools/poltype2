@@ -17,6 +17,17 @@ from itertools import product,combinations
 from scipy.interpolate import interp1d
 import databaseparser as db
 
+def CheckGeometricRestraintEnergy(poltype,alzfile):
+    temp=open(alzfile,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        if 'Geometric Restraints' in line:
+            linesplit=line.split()
+            energy=float(linesplit[2])
+    return energy
+
+
 def insert_torprmdict_angle(poltype,angle, angledict):
     """
     Intent: Increase the count of this angle by one
@@ -232,6 +243,8 @@ def GrabTinkerEnergy(poltype,toralzfname):
             m = re.search(r'Torsional Angle\s+(\-*\d+\.\d+)',line)
             if not m is None:
                 tor_energy = float(m.group(1))
+        geom=CheckGeometricRestraintEnergy(poltype,toralzfname)
+        tor_energy=tor_energy-geom
         tmpfh.close()
     return tot_energy,tor_energy
 
