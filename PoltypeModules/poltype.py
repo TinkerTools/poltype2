@@ -1282,7 +1282,7 @@ class PolarizableTyper():
             shutil.copy(self.key2fname, self.key3fname)
         # Remove header terms from the keyfile
         mpole.rm_esp_terms_keyfile(self,self.key3fname)
-        if self.atomnum!=1: 
+        if self.atomnum!=1 and not os.path.isfile('RMSPD.txt'): 
             esp.ElectrostaticPotentialComparison(self)  
         
         # Multipoles are scaled if needed using the scale found in process_types
