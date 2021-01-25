@@ -1466,8 +1466,6 @@ def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,torset,phas
     temp.write('}'+'\n')
     if poltype.torsppcm==True:
         temp.write('set {'+'\n')
-        temp.write(' e_convergence 10 '+'\n')
-        temp.write(' d_convergence 10 '+'\n')
         temp.write(' scf_type pk'+'\n')
         temp.write(' pcm true'+'\n')
         temp.write(' pcm_scf_type total '+'\n')
@@ -1485,11 +1483,6 @@ def CreatePsi4TorESPInputFile(poltype,finalstruct,torxyzfname,optmol,torset,phas
         temp.write(' Area = 0.3'+'\n')
         temp.write(' Mode = Implicit'+'\n')
         temp.write(' }'+'\n')
-        temp.write('}'+'\n')
-    else:
-        temp.write('set {'+'\n')
-        temp.write(' e_convergence 10 '+'\n')
-        temp.write(' d_convergence 10 '+'\n')
         temp.write('}'+'\n')
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
