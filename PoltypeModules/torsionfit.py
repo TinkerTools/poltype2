@@ -423,7 +423,7 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename):
         qme_list = []  # QM torsion energy
         # find qm, then mm energies of the various torsion values found for 'tor'
         qme_list,qang_list,WBOarray = compute_qm_tor_energy(poltype,torset,mol,flatphaselist)
-        mme_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,'_postQMOPTprefit',flatphaselist,tmpkey1basename)
+        mme_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,'_preQMOPTprefit',flatphaselist,tmpkey1basename)
         # delete members of the list where the energy was not able to be found 
         del_ang_list = find_del_list(poltype,mme_list,mang_list)
         (cls_angle_dict[tup],cls_mm_engy_dict[tup])=prune_mme_error(poltype,del_ang_list,cls_angle_dict[tup],cls_mm_engy_dict[tup])
@@ -676,6 +676,7 @@ def GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict):
     return tuple(bounds)
        
 
+
 def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,clskeyswithbadfits):
     """
     Intent: Uses scipy's optimize.leastsq function to find estimates for the torsion 
@@ -789,8 +790,9 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         # Parameterize each group of rotatable bond (identified by
         #  atoms restrained during restrained rotation.
         # tor_energy_list is set as qm - mm
+        # experimental, if all but min QM point > certain value, make them all roughly same magnitude, so no artificial minina are created
 
-        weightlist=numpy.exp(-numpy.array(qm_energy_list)/8)
+        weightlist=numpy.exp(-numpy.array(qm_energy_list)/poltype.boltzmantemp)
 
         tor_energy_list = [qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)]
 
@@ -1196,7 +1198,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         tmpkeyfname = 'tmp.key'
         shutil.copy(tmpkey1basename, tmpkeyfname)
         # get the original mm energy profile
-        mm_energy_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,'_postQMOPTprefit',flatphaselist,tmpkeyfname)
+        mm_energy_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,'_preQMOPTprefit',flatphaselist,tmpkeyfname)
         
      
         # get the new mm energy profile (uses new parameters to find energies)
@@ -1229,7 +1231,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         tordifmm_list = [e1+e2 for (e1,e2) in zip (tordif_list,mm_energy_list)]
         tordifmm_list = [en - min(tordifmm_list) for en in tordifmm_list]
         # TBC
-        weights=numpy.exp(-numpy.array(qm_energy_list)/8)
+        weights=numpy.exp(-numpy.array(qm_energy_list)/poltype.boltzmantemp)
         weights = [float(i)/sum(weights) for i in weights] 
         ff_list = [aa+bb for (aa,bb) in zip(mm_energy_list,fitfunc_dict[clskey])]
         shifted_mm2_energy_list=numpy.add(1,mm2_energy_list)
@@ -1306,8 +1308,6 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
 
             ax2=ax.twinx()
             # make a plot with different y-axis using second axis object
-            print('qang_list',qang_list,len(qang_list))
-            print('WBOarray',WBOarray,len(WBOarray))
             line5, =ax2.plot(qang_list,WBOarray,'yo',color='yellow',label='WBO')
             xpoints=numpy.array([qang_list[i][0] for i in range(len(qang_list))])
             x_new = numpy.linspace(xpoints.min(), xpoints.max(),500)
@@ -1339,6 +1339,12 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         out.append(mm2_energy_list)
         out.append(qm_energy_list)
         out.append(tordif_list)
+        print('weights',weights)
+        print('mm2_energy_list',mm2_energy_list)
+        print('qm_energy_list',qm_energy_list)
+        print('final_tor_energy_list',final_tor_energy_list)
+        print('final_relative_tor_energy_list',final_relative_tor_energy_list)
+        print('shifted_qm_energy_list',shifted_qm_energy_list)
         torgen.write_arr_to_file(poltype,txtfname,out)
         if float(minRMSD)>poltype.maxtorRMSPD and float(minRMSDRel)>poltype.maxtorRMSPDRel:
             poltype.WriteToLog('Absolute or Relative RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol '+'RMSPDRel ='+str(minRMSDRel)+' tolerance is '+str(poltype.maxtorRMSPDRel))
@@ -1468,9 +1474,11 @@ def RemoveFiles(poltype,string,occurance):
 def PostfitMinAlz(poltype,keybasename,keybasepath):
     for outputlog in poltype.optoutputtotorsioninfo.keys():
         term,error=poltype.CheckNormalTermination(outputlog)
-        [torset,optmol,variabletorlist,phaseangles,cartxyzname,bondtopology]=poltype.optoutputtotorsioninfo[outputlog]
+        [torset,optmol,variabletorlist,phaseangles,bondtopology,optoutputlog]=poltype.optoutputtotorsioninfo[outputlog]
         if term==True:   
             if not poltype.use_gaus:
+                cartxyzname=optoutputlog.replace('.log','.xyz')
+
                 cartxyz,torxyzfname=torgen.tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,cartxyzname,poltype.torsionrestraint,'_postQMOPTpostfit',keybasename,keybasepath,bondtopology)
             else:
                 cartxyz,torxyzfname=torgen.tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,outputlog,poltype.torsionrestraint,'_postQMOPTpostfit',keybasename,keybasepath,bondtopology)
