@@ -1051,7 +1051,8 @@ def ConvertTinktoXYZ(poltype,filename,newfilename):
     tempwrite.close()
     return filename.replace('.xyz_2','_xyzformat.xyz')
 
-def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,variabletorlist,mol,currentopt):
+
+def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt):
 
     prefix='%s-opt-%s_' % (poltype.molecprefix,currentopt)
     postfix='.psi4'  
@@ -1062,9 +1063,17 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,variabletorlist,
     temp.write('%d %d\n' % (mol.GetTotalCharge(),1))
     iteratom = openbabel.OBMolAtomIter(optmol)
     etab = openbabel.OBElementTable()
-    for atm in iteratom:
-        temp.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), atm.GetX(),atm.GetY(),atm.GetZ()))
+    if os.path.isfile(torxyzfname):
+        xyzstr = open(torxyzfname,'r')
+        xyzstrl = xyzstr.readlines()
+        i = 0
+        for atm in iteratom:
+            i = i + 1
+            ln = xyzstrl[i]
+            temp.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), float(ln.split()[2]),float(ln.split()[3]),float(ln.split()[4])))
+        xyzstr.close()
     temp.write('}'+'\n')
+
     # Fix all torsions around the rotatable bond b-c
     temp.write('set optking { '+'\n')
     temp.write('  frozen_dihedral = ("'+'\n')
