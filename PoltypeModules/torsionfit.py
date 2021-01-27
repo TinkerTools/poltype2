@@ -832,6 +832,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
                 toralreadyremovedlist.append(least_conn_tor)
             
         pzero = initialprms
+        boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
+
         # run leastsq until all the parameter estimates are reasonable
         parm_sanitized = False
         bypassrmsd=False
@@ -883,18 +885,19 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
                             break
             foldtoparmslist={}
             parmtokey={}
-            for chkclskey in keylist:
-                for nfold in torprmdict[chkclskey]['prmdict']:
-                    if nfold not in foldtoparmslist.keys():
-                        foldtoparmslist[nfold]=[]
-                    # if the param value is greater than max_amp, remove it
-                    parm=p1[torprmdict[chkclskey]['prmdict'][nfold]]
-                    foldtoparmslist[nfold].append(parm)
-                    parmtokey[parm]=chkclskey
-                    if abs(parm) > max_amp:
-                        dellist.append((chkclskey,nfold))
-                        parm_sanitized = False
-                        break
+            if refine==False:
+                for chkclskey in keylist:
+                    for nfold in torprmdict[chkclskey]['prmdict']:
+                        if nfold not in foldtoparmslist.keys():
+                            foldtoparmslist[nfold]=[]
+                        # if the param value is greater than max_amp, remove it
+                        parm=p1[torprmdict[chkclskey]['prmdict'][nfold]]
+                        foldtoparmslist[nfold].append(parm)
+                        parmtokey[parm]=chkclskey
+                        if abs(parm) > max_amp:
+                            dellist.append((chkclskey,nfold))
+                            parm_sanitized = False
+                            break
             for fold,parmslist in foldtoparmslist.items():
                 combs=list(combinations(parmslist,2))
                 for comb in combs:
@@ -917,6 +920,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
                 prmidx=len(initialprms)
             # new parameter array since prm size may have changed due to deletions
             pzero = initialprms
+            boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
+
         # Attempts to insert main torsion type if all are removed
         # Rerur leastsq, this time fitting for the force constants of the main torsion
         if is_torprmdict_all_empty(poltype,torprmdict):
@@ -929,6 +934,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             prmidx,initialprms = insert_torprmdict(mol, torprmdict)
 
             pzero = initialprms
+            boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
+
             if useweights==True: 
                 errfunc = lambda p, x, z, torprmdict, y: weightlist*(fitfunc(poltype,p, x,z, torprmdict) - y)
 
