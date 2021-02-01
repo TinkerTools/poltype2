@@ -443,50 +443,6 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename):
 
     return cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict
 
-def check_cooperative_tor_terms(poltype,clskey, nfold, angle, xvals, torprmdict):
-    """ 
-    Intent: Check if a cosine term for a torsion is cooperative with the corresponding cosine term of another torsion
-    i.e. do they have equal or opposite phase shifts
-    Input:
-        clskey: class key for the torsion
-        nfold: the 'fold' of the cosine term for the torsion
-        angle: angle that the torsion is at
-        xvals: angle list
-        tormprmdict: dictionary containing information about the torsions about a rotatable bond
-    Output:
-        ck: class key of the torsion that has a cooperative term
-    Referenced By: insert_torprmdict
-    Description:
-    """
-    # for each class key
-    b=clskey[1]
-    c=clskey[2]
-    for ck,tp in torprmdict.items():
-    # for each angle for the class key
-        newb=ck[1]
-        newc=ck[2]
-        if b==newb and c==newc:
-            for phase in tp['phasedict']:
-                # if this torsion has the same number of folds
-                if nfold in tp['prmdict'] and \
-                   not isinstance(tp['prmdict'][nfold], tuple):
-                    outer_tor_e = tor_func_term(poltype,1.0,xvals,nfold,1.0,torgen.rads(poltype,phase),
-                                      torgen.rads(poltype,poltype.foldoffsetlist[nfold-1]))
-                    inner_tor_e = tor_func_term(poltype,1.0,xvals,nfold,1.0,torgen.rads(poltype,angle),
-                                      torgen.rads(poltype,poltype.foldoffsetlist[nfold-1]))
-                    # sum the profiles, then subtract the min from the list
-                    sum_e = outer_tor_e + inner_tor_e
-                    sum_e -= min(sum_e)
-                    # diff the profiles, subtract the min from the list
-                    diff_e = outer_tor_e - inner_tor_e
-                    diff_e -= min(diff_e)
-                    # if when summed, or diffed, the profile becomes close to constant
-                    # i.e. the difference from the max and the min is < 1e-10
-                    # then return the class key for this similar torsion
-                    if max(sum_e) < 1e-10 or max(diff_e) < 1e-10:
-                        return ck
-    return None
-
 def insert_torphasedict (poltype,mol, toraboutbnd, torprmdict, initangle,write_prm_dict, keyfilter = None):
     """
     Intent: Adds torsion to be fitted to torprmdict.
@@ -583,8 +539,7 @@ def insert_torprmdict(poltype,mol, torprmdict):
                 test_tor_energy += tor_func_term(poltype,1.0, tmpx, nfold, scale, torgen.rads(poltype,angle),torgen.rads(poltype,poltype.foldoffsetlist[nfold-1]))
 
                 # check if another torsion has a similar profile 
-                basetorkeys = check_cooperative_tor_terms(poltype,chkclskey, nfold, angle, tmpx, torprmdict)
-
+                basetorkeys=None
             # normalize
             test_tor_energy -= min(test_tor_energy)
              
@@ -816,6 +771,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             raise ValueError('Too many QM jobs have failed for '+str(tor)+' '+os.getcwd())
 
         boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
+        print('torprmdict',torprmdict)
         # Remove parameters while # of parameters > # data points
         toralreadyremovedlist=[]
         while prmidx > len(mm_energy_list):
@@ -833,7 +789,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             
         pzero = initialprms
         boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
-
+        print('pzero',pzero,len(pzero))
+        print('boundstup',boundstup,len(boundstup))
         # run leastsq until all the parameter estimates are reasonable
         parm_sanitized = False
         bypassrmsd=False
@@ -898,21 +855,20 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
                             dellist.append((chkclskey,nfold))
                             parm_sanitized = False
                             break
-            for fold,parmslist in foldtoparmslist.items():
-                combs=list(combinations(parmslist,2))
-                for comb in combs:
-                    Sum=numpy.abs(comb[0]+comb[1])
-                     
-                    if Sum<.01 and useweights==False and comb[0]!=0 and comb[1]!=0: # tolerance for torsions cancelling each other
-                       keytodelete=parmtokey[comb[0]]
-                       max_amp=20
-                       boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
-                       bypassrmsd=True
-                       parm_sanitized = False
-                       for nfold in torprmdict[keytodelete]['prmdict']:
-                           dellist.append((keytodelete,nfold)) 
+                for fold,parmslist in foldtoparmslist.items():
+                    combs=list(combinations(parmslist,2))
+                    for comb in combs:
+                        Sum=numpy.abs(comb[0]+comb[1])
+                         
+                        if Sum<.01 and useweights==False and comb[0]!=0 and comb[1]!=0: # tolerance for torsions cancelling each other
+                           keytodelete=parmtokey[comb[0]]
+                           max_amp=20
+                           bypassrmsd=True
+                           parm_sanitized = False
+                           for nfold in torprmdict[keytodelete]['prmdict']:
+                               dellist.append((keytodelete,nfold)) 
 
-            dellist = list(set(dellist))
+                dellist = list(set(dellist))
             if len(dellist)>0:
                 poltype.WriteToLog('torsion cosine terms that are being removed due to unreasonable parameters '+str(dellist))
                 poltype.WriteToLog('number of parameters to fit for '+clskey+' are '+str(prmidx))

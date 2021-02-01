@@ -47,6 +47,7 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred):
         temp.write('set {'+'\n')
         temp.write('  geom_maxiter '+str(poltype.optmaxcycle)+'\n')
         temp.write('  g_convergence GAU_LOOSE'+'\n')
+        temp.write('  dynamic_level 1'+'\n')
         temp.write('}'+'\n')
 
     temp.write('memory '+poltype.maxmem+'\n')
