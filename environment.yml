@@ -12,7 +12,7 @@ dependencies:
   - mdanalysis
   - openbabel=2.4.1
   - svgutils
-  - psi4
+  - psi4=1.4a2.dev523+e25656e
   - rdkit
   - pip:
     - git+git://github.com/ParmEd/ParmEd.git
