@@ -1036,7 +1036,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     poltype.optmaxcycle=400
     poltype.optmethod='wB97X-D'
     poltype.espmethod='wB97X-D'
-    poltype.espbasisset="6-311+G*"
+    poltype.espbasisset="aug-cc-pVDZ"
     poltype.use_gaus=False
     poltype.use_gausoptonly=False
     poltype.SanitizeAllQMMethods()
