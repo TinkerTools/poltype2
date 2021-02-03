@@ -753,25 +753,13 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
 
         max_amp = max(tor_energy_list) - min(tor_energy_list)
         prmidx,initialprms = insert_torprmdict(poltype,mol, torprmdict)
-        '''
-        txtfname = "%s-fit-" % (poltype.molecprefix) 
-        for i in range(len(torset)):
-            tor=torset[i]
-            a,b,c,d = tor[0:4]
-            txtfname+="%d-%d" % (b, c)
-            txtfname+='_'
-        txtfname=txtfname[:-1]
-        txtfname+=".txt"         # create initial fit file, initially it seems to be 2d instead of 3d
-        torgen.write_arr_to_file(poltype,txtfname,[tor_energy_list])
-        print('about to fit')
-        poltype.WriteToLog('about to fit')
-        ''' 
+        
+
         # max amplitude of function
         if len(qm_energy_list)<round(prmidx*.5): # then might not be great fit any way, too many QM failed
             raise ValueError('Too many QM jobs have failed for '+str(tor)+' '+os.getcwd())
 
         boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
-        print('torprmdict',torprmdict)
         # Remove parameters while # of parameters > # data points
         toralreadyremovedlist=[]
         while prmidx > len(mm_energy_list):
@@ -789,8 +777,6 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             
         pzero = initialprms
         boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
-        print('pzero',pzero,len(pzero))
-        print('boundstup',boundstup,len(boundstup))
         # run leastsq until all the parameter estimates are reasonable
         parm_sanitized = False
         bypassrmsd=False
@@ -1302,12 +1288,6 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         out.append(mm2_energy_list)
         out.append(qm_energy_list)
         out.append(tordif_list)
-        print('weights',weights)
-        print('mm2_energy_list',mm2_energy_list)
-        print('qm_energy_list',qm_energy_list)
-        print('final_tor_energy_list',final_tor_energy_list)
-        print('final_relative_tor_energy_list',final_relative_tor_energy_list)
-        print('shifted_qm_energy_list',shifted_qm_energy_list)
         torgen.write_arr_to_file(poltype,txtfname,out)
         if float(minRMSD)>poltype.maxtorRMSPD and float(minRMSDRel)>poltype.maxtorRMSPDRel:
             poltype.WriteToLog('Absolute or Relative RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol '+'RMSPDRel ='+str(minRMSDRel)+' tolerance is '+str(poltype.maxtorRMSPDRel))
