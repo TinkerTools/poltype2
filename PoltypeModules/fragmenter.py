@@ -120,7 +120,6 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
                 parentsymclasstofragsymclass=json.load(open("parentsymclasstofragsymclass.txt"))
                 classkeytosmartsposarray=json.load(open("classkeytosmartsposarray.txt"))
                 classkeytosmarts=json.load(open("classkeytosmarts.txt"))
-                print('os.getcwd()',os.getcwd())
                 parentclasskeytofragclasskey=json.load(open("parentclasskeytofragclasskey.txt"))
                 if vdwfragment==False:
                     classkeytotorsionindexes=json.load(open("classkeytotorsionindexes.txt"))
@@ -256,6 +255,8 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
             if classkey in classkeytoatomindexescollected.keys():
                 valenceprmlist=ConstructVdwLineFromFragment(poltype,classkey,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarraycollected,classkeytosmartscollected,classkeytoatomindexescollected,temp,valenceprmlist,fitline)
 
+            else:
+                temp.write(line)
 
             
         else:
@@ -549,6 +550,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         fragrotbnds=[]
         vdwfragment=False
         vdwparentindices=[]
+        print('array',array)
         for i in range(len(array)):
             rotbndindex=array[i]
             if '_' not in rotbndindex:
@@ -560,7 +562,6 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             parentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
                         
             if vdwfragment==False:
-
                 if i==0:
                     equivalentrotbndindex=rotbndindex
                     equivalentparentindextofragindex=parentindextofragindex
@@ -580,10 +581,10 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 
                     strparentrotbndindexes+=str(parentrotbndindexes[j])+' '+str(parentrotbndindexes[j+1])+','
             else:
-                rotbndindex=array[0]
+                rotbndindex=array[i]
                 vdwatomindex=int(rotbndindex)
                 vdwparentindices.append(vdwatomindex)
-
+        print('vdwparentindices',vdwparentindices)
         if vdwfragment==True:
             strfragrotbndindexes=strfragrotbndindexes[:-1]
 
@@ -606,38 +607,46 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
 
         head,tail=os.path.split(fragmentfilepath)
         os.chdir(head)
+        parentindextofragindexmaps=[]
         if vdwfragment==False:
             MakeFileName(poltype,strparentrotbndindexes,'torsions.txt')
             parentindextofragindex=rotbndindextoparentindextofragindex[equivalentrotbndindex]
+            parentindextofragindexmaps.append(parentindextofragindex)
         else:
-            parentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
+            for i in range(len(array)):
+                rotbndindex=array[i]
+                parentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
+                parentindextofragindexmaps.append(parentindextofragindex)
 
-
-        tempdic={}
-        for parentindex,fragindex in parentindextofragindex.items():
-            if type(parentindex)==str:
-                newtemp=parentindextofragindex[parentindex]
-                tempdic[parentindex]={}
-                for idx,value in newtemp.items():
-                    tempdic[parentindex][idx+1]=value+1
-            else: 
-                tempdic[parentindex+1]=fragindex+1
-        parentindextofragindex=tempdic
+        newparentindextofragindexmaps=[]
         parentsymclasstofragsymclass={}
-        
-        for parentindex,fragindex in parentindextofragindex.items():
-            if type(parentindex)!=str:
-                parentsymclass=poltype.idxtosymclass[parentindex]
-                fragsymclass=fragidxtosymclass[fragindex]
-                parentsymclasstofragsymclass[parentsymclass]=fragsymclass
-            else:
-                newdic=parentindextofragindex[parentindex]
-                parentsymclasstofragsymclass[parentindex]={}
-                for idx,fragidx in newdic.items():
-                    parentsymclass=poltype.idxtosymclass[idx]
-                    fragsymclass=fragidxtosymclass[fragidx]
-                    parentsymclasstofragsymclass[parentindex][parentsymclass]=fragsymclass
+        for parentindextofragindex in parentindextofragindexmaps: 
+            tempdic={}
+            for parentindex,fragindex in parentindextofragindex.items():
+                if type(parentindex)==str:
+                    newtemp=parentindextofragindex[parentindex]
+                    tempdic[parentindex]={}
+                    for idx,value in newtemp.items():
+                        tempdic[parentindex][idx+1]=value+1
+                else: 
+                    tempdic[parentindex+1]=fragindex+1
+            parentindextofragindex=tempdic
+            newparentindextofragindexmaps.append(parentindextofragindex)  
+            for parentindex,fragindex in parentindextofragindex.items():
+                if type(parentindex)!=str:
+                    parentsymclass=poltype.idxtosymclass[parentindex]
+                    fragsymclass=fragidxtosymclass[fragindex]
+                    parentsymclasstofragsymclass[parentsymclass]=fragsymclass
+                else:
+                    newdic=parentindextofragindex[parentindex]
+                    parentsymclasstofragsymclass[parentindex]={}
+                    for idx,fragidx in newdic.items():
+                        parentsymclass=poltype.idxtosymclass[idx]
+                        fragsymclass=fragidxtosymclass[fragidx]
+                        parentsymclasstofragsymclass[parentindex][parentsymclass]=fragsymclass
+
         WriteDictionaryToFile(poltype,parentsymclasstofragsymclass,"parentsymclasstofragsymclass.txt")
+        parentindextofragindex=newparentindextofragindexmaps[0]
         WriteDictionaryToFile(poltype,parentindextofragindex,"parentindextofragindex.txt")
         tempmol=mol_with_atom_index_removed(poltype,fragmol) 
         fragsmarts=rdmolfiles.MolToSmarts(tempmol)
@@ -693,7 +702,10 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             WriteDictionaryToFile(poltype,parenttortorclasskeytofragtortorclasskey,"parenttortorclasskeytofragtortorclasskey.txt")
             WriteDictionaryToFile(poltype,classkeytotorsionindexes,"classkeytotorsionindexes.txt")
         else:
-            for vdwatomindex in vdwparentindices:
+            for k in range(len(vdwparentindices)):
+                vdwatomindex=vdwparentindices[k]
+                parentindextofragindex=newparentindextofragindexmaps[k]
+
                 classkey=str(poltype.idxtosymclass[vdwatomindex])
                 ls=[vdwatomindex] 
                 smilesposstring,fragatomstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,ls,parentindextofragindex,fragidxarray)
@@ -705,7 +717,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 classkeytoatomindexes[classkey]=fragatomstring
 
             WriteDictionaryToFile(poltype,classkeytoatomindexes,"classkeytoatomindexes.txt")
-
+        print('parentclasskeytofragclasskey',parentclasskeytofragclasskey)
         WriteDictionaryToFile(poltype,classkeytosmartsposarray,"classkeytosmartsposarray.txt")
         WriteDictionaryToFile(poltype,classkeytosmarts,"classkeytosmarts.txt")
         WriteDictionaryToFile(poltype,parentclasskeytofragclasskey,"parentclasskeytofragclasskey.txt")

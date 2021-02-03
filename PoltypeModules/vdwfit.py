@@ -193,8 +193,8 @@ def VDWOptimizer(poltype):
     errorfunc= lambda p: (myFUNC(p,poltype,vdwtype))
 
     ret = minimize(myFUNC, x0, method='L-BFGS-B', jac=None, bounds=MyBounds, args=(poltype,vdwtype),options={'gtol': 1e-1, 'eps':1e-4, 'disp': True})
-    vdwradius=ret.x[0]
-    vdwdepth=ret.x[1]
+    vdwradius=round(ret.x[0],3)
+    vdwdepth=round(ret.x[1],3)
     ofile = open("RESULTS.OPT", "a")
     for i in range(0,len(ret.x),2):
         ofile.write("Param:%15.6f%15.6f\n"%(ret.x[i], ret.x[i+1]))
@@ -963,31 +963,36 @@ def GenerateInitialProbeStructure(poltype,missingvdwatomindices):
         atoms1,coords1,order1, types1, connections1=readTXYZ(poltype,mol)
         mol_spots = missingvdwatomindices
         mol_spots = [i-1 for i in mol_spots]
-        probelist=[]
         for prob in probes:
             probename=os.path.basename(prob)
             atoms2,coords2=readXYZ(poltype,prob)
             probemol=opt.load_structfile(poltype,prob)
             probeidxtosymclass,symmetryclass=symm.gen_canonicallabels(poltype,probemol) 
             prob_spots=[]
+
             for symclass in list(probeidxtosymclass.values()): 
                 keys= GrabKeysFromValue(poltype,probeidxtosymclass,symclass)       
                 probeidx=keys[0]-1 # shift to 0 index
                 if probeidx not in prob_spots:
                     prob_spots.append(probeidx)
             for p1 in mol_spots:
+                probelist=[]
+                probeindiceslist=[]
+                moleculeindiceslist=[]
                 for p2 in prob_spots:
-                  e1=atoms1[p1]
-                  e2=atoms2[p2]
-                  if e1=='H' and e2=='H':
-                      continue
-                  dimer = mol[:-4] + "-" + probename[:-4] + "_" + str("%d_%d"%(p1+1,len(atoms1)+p2+1)) + ".xyz"
-                  if not os.path.isfile(dimer):
-                      optimize(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,poltype.mol,probemol)
-                  probelist.append(dimer)
-                  probeindices.append(p2+1+len(atoms1))
-                  moleculeindices.append(p1+1)
-        dimernames.append(probelist)
+                    e1=atoms1[p1]
+                    e2=atoms2[p2]
+                    if e1=='H' and e2=='H':
+                        continue
+                    dimer = mol[:-4] + "-" + probename[:-4] + "_" + str("%d_%d"%(p1+1,len(atoms1)+p2+1)) + ".xyz"
+                    if not os.path.isfile(dimer):
+                        optimize(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,poltype.mol,probemol)
+                    probelist.append(dimer)
+                    probeindiceslist.append(p2+1+len(atoms1))
+                    moleculeindiceslist.append(p1+1)
+                moleculeindices.append(moleculeindiceslist)
+                probeindices.append(probeindiceslist)
+                dimernames.append(probelist)
     return dimernames,probeindices,moleculeindices
 
 def GrabKeysFromValue(poltype,dic,thevalue):
@@ -1047,14 +1052,17 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     obConversion = openbabel.OBConversion()
     for i in range(len(dimerfiles)):
         filenamelist=dimerfiles[i]
+        probeindexlist=probeindices[i]
+        moleculeindexlist=moleculeindices[i]
         alloutputfilenames=[]
         prefixarrays=[]
         distancearrays=[]
         checkarray=[]
-        for filename in filenamelist:
+        for filenameidx in range(len(filenamelist)):
+            filename=filenamelist[filenameidx]
             dimermol = openbabel.OBMol()
-            probeindex=probeindices[i]
-            moleculeindex=moleculeindices[i]
+            probeindex=probeindexlist[filenameidx]
+            moleculeindex=moleculeindexlist[filenameidx]
             inFormat = obConversion.FormatFromExt(filename)
             obConversion.SetInFormat(inFormat)
             obConversion.ReadFile(dimermol, filename)
