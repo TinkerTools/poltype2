@@ -1331,7 +1331,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             continue 
         ringb=ringbools[1]
         ringc=ringbools[2]
-        if ringb==True and ringc==True:
+        if ringb==True and ringc==True and poltype.allownonaromaticringscanning==False:
             contin=True
 
         if contin==True:
