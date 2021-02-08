@@ -550,7 +550,6 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         fragrotbnds=[]
         vdwfragment=False
         vdwparentindices=[]
-        print('array',array)
         for i in range(len(array)):
             rotbndindex=array[i]
             if '_' not in rotbndindex:
@@ -584,7 +583,6 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 rotbndindex=array[i]
                 vdwatomindex=int(rotbndindex)
                 vdwparentindices.append(vdwatomindex)
-        print('vdwparentindices',vdwparentindices)
         if vdwfragment==True:
             strfragrotbndindexes=strfragrotbndindexes[:-1]
 
@@ -717,7 +715,6 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 classkeytoatomindexes[classkey]=fragatomstring
 
             WriteDictionaryToFile(poltype,classkeytoatomindexes,"classkeytoatomindexes.txt")
-        print('parentclasskeytofragclasskey',parentclasskeytofragclasskey)
         WriteDictionaryToFile(poltype,classkeytosmartsposarray,"classkeytosmartsposarray.txt")
         WriteDictionaryToFile(poltype,classkeytosmarts,"classkeytosmarts.txt")
         WriteDictionaryToFile(poltype,parentclasskeytofragclasskey,"parentclasskeytofragclasskey.txt")

@@ -1325,13 +1325,16 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             continue 
         babelatoms=[mol.GetAtom(i) for i in babelindices]
         ringbools=[a.IsInRing() for a in babelatoms]
+        arobools=[a.IsAromatic() for a in babelatoms]
         contin=False
         bnd=[babelindices[1],babelindices[2]]
         if bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds:
             continue 
         ringb=ringbools[1]
         ringc=ringbools[2]
-        if ringb==True and ringc==True and poltype.allownonaromaticringscanning==False:
+        arob=arobools[1]
+        aroc=arobools[2]
+        if arob==True and aroc==True:
             contin=True
 
         if contin==True:
@@ -1419,7 +1422,12 @@ def GrabTorsionParameterCoefficients(poltype,torsionprms):
         linesplit=line.split() 
         key = '%s %s %s %s' % (linesplit[1], linesplit[2], linesplit[3], linesplit[4])
         parameters=[float(linesplit[5]),float(linesplit[8]),float(linesplit[11])]
-        torsionkeystringtoparameters[key]=parameters
+        allzero=True
+        for prm in parameters:
+            if prm!=0:
+                allzero=False
+        if allzero==False:
+            torsionkeystringtoparameters[key]=parameters
        
     return torsionkeystringtoparameters
 
@@ -2166,8 +2174,8 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     anglelistbabel=ConvertToBabelList(poltype,listofanglesforprm)
     bondprms=AddOptimizedBondLengths(poltype,optmol,bondprms,bondlistbabel)
     angleprms=AddOptimizedAngleLengths(poltype,optmol,angleprms,anglelistbabel)
-    torsionkeystringtoparameters=GrabTorsionParameterCoefficients(poltype,torsionprms)
     torsionprms=ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,torsionprms)
+    torsionkeystringtoparameters=GrabTorsionParameterCoefficients(poltype,torsionprms)
     potentialmissingopbendprmtypes=FindPotentialMissingParameterTypes(poltype,opbendprms,planarbondtinkerclassestopoltypeclasses)
     potentialmissingopbendprmindices=ConvertPoltypeClassesToIndices(poltype,potentialmissingopbendprmtypes)
     potentialmissingopbendprmindices=FilterIndices(poltype,potentialmissingopbendprmindices,planarbonds)

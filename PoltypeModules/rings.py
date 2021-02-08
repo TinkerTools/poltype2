@@ -228,15 +228,19 @@ def RefineNonAromaticRingTorsions(poltype,mol,optmol,classkeytotorsionparameters
             classkeysplit=classkey.split()
             cla,clb,clc,cld=classkeysplit[:]
             revclasskey='%s %s %s %s' % (cld, clc, clb, cla)
+            found=False
             if classkey in classkeytotorsionparametersguess.keys(): 
                 prms=classkeytotorsionparametersguess[classkey] 
+                found=True
             elif revclasskey in classkeytotorsionparametersguess.keys(): 
                 prms=classkeytotorsionparametersguess[revclasskey] 
-            diff=len(poltype.nfoldlist)-len(prms)
-            if diff>0:
-                for i in range(diff):
-                    prms.append(0)
-            poltype.classkeytoinitialprmguess[classkey]=prms
+                found=True
+            if found==True:
+                diff=len(poltype.nfoldlist)-len(prms) # basically force only three terms for ring torsion.
+                if diff>0:
+                    for i in range(diff):
+                        prms.append(0)
+                poltype.classkeytoinitialprmguess[classkey]=prms
                
 
     os.chdir('..')
