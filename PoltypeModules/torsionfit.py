@@ -16,6 +16,7 @@ import time
 from itertools import product,combinations
 from scipy.interpolate import interp1d
 import databaseparser as db
+from copy import deepcopy
 
 def CheckGeometricRestraintEnergy(poltype,alzfile):
     temp=open(alzfile,'r')
@@ -56,7 +57,7 @@ def tor_func_term (poltype,parms, x, nfold, C, angle, offset):
     return C*(parms/2.0)*(1+numpy.cos(nfold*(x+angle)+offset))
 
 
-def fitfunc (poltype,parms, x,torset, torprmdict, debug = False):
+def fitfunc (poltype,parms, x,torset, torprmdict,keyonlylist=None,nfoldonlylist=None,debug = False):
     """
     Intent: Gives energy due to torsion around one rotatable bond 
     (torsion energy vs. dihedral angle) given a set of parameters
@@ -74,13 +75,19 @@ def fitfunc (poltype,parms, x,torset, torprmdict, debug = False):
     """
     tor_energy_array = [ 0.0 ] * len(x)
     offset = 0
-    for torprm in torprmdict.values():
+    for clskey,torprm in torprmdict.items():
+        if keyonlylist!=None:
+            if clskey not in keyonlylist:
+                continue
         for j in range(len(x)):
             angtup=x[j]
             tor_energy=0
             for i in range(len(angtup)):
                 ang=angtup[i]
                 for nfold in torprm['prmdict']:
+                    if nfoldonlylist!=None:
+                        if nfold not in nfoldonlylist:
+                            continue
                     # for each nfold for this torsion (# of parameters)
                     for clsangle, clscnt in torprm['phasedict'].items():
                         # current dihedral angles and how many torsions are this angle 
@@ -274,37 +281,6 @@ def sum_xy_list(poltype,x1,y1,x2,y2):
             idx1 = x1.index(xx)
             idx2 = x2.index(xx)
             y2[idx2] = y1[idx1]
-
-def del_tor_from_fit(poltype,dellist, torprmdict,initialprms):
-    for keylist in dellist:
-        key=keylist[0]
-        indicestodelete=[]
-        for clskey in torprmdict.keys():
-            if clskey==key:
-                if 'firstphaseprmindex' in torprmdict[key].keys():
-                    prmindex=torprmdict[key]['firstphaseprmindex']
-                    indicestodelete.append(prmindex) 
-   
-                for fold,index in torprmdict[clskey]['prmdict'].items():
-                    indicestodelete.append(index)
-    maxidx=max(indicestodelete)
-    newinitialprms=[]
-    for i in range(len(initialprms)):
-        value=initialprms[i]
-        if i not in indicestodelete:
-            newinitialprms.append(value)
-
-    del torprmdict[key]
-    for clskey in torprmdict.keys():
-        for fold,index in torprmdict[clskey]['prmdict'].items():
-          
-            if index>maxidx:
-                oldindex=torprmdict[clskey]['prmdict'][fold]
-                newindex=oldindex-maxidx-1
-                torprmdict[clskey]['prmdict'][fold]=newindex
-  
-        
-    return newinitialprms,torprmdict
 
 def find_least_connected_torsion(poltype,torprmdict,toralreadyremovedlist):
     """
@@ -570,49 +546,30 @@ def insert_torprmdict(poltype,mol, torprmdict):
     initialprms.append(0)
     return prmidx,initialprms
 
-def is_torprmdict_all_empty (poltype,torprmdict):
-    """
-    Intent: Determines if all torsion parameters for fitting have been eliminated.
-    Input:
-        torprmdict: a dict containing list of torsions to be fit
-    Ouptput:
-        results: True if empty, False if not
-    Referenced By: fit_rot_bond_tors
-    Description: -
-    """
-    result = True
-    for clskey in torprmdict:
-        if torprmdict[clskey]['prmdict']:
-            return False
-    return result
-
 
 def GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict):
     lowerbounds=[]
     upperbounds=[]
-    if refine==False: 
-        bounds=[-max_amp,max_amp]
+    for chkclskey in torprmdict:
 
-    else:
-        for chkclskey in torprmdict:
+        prms=[]
+        for nfold in torprmdict[chkclskey]['prmdict']:
+            parm  = initialprms[torprmdict[chkclskey]['prmdict'][nfold]]
+            prms.append(parm)
+        allzero=True
+        for prm in prms:
+            value=numpy.abs(prm)
+            if value!=0:
+                allzero=False
+        if 'firstphaseprmindex' in torprmdict[chkclskey].keys():
+            lowerbounds.append(0)
+            upperbounds.append(2*numpy.pi)
 
-            prms=[]
-            for nfold in torprmdict[chkclskey]['prmdict']:
-                parm  = initialprms[torprmdict[chkclskey]['prmdict'][nfold]]
-                prms.append(parm)
-            allzero=True
-            for prm in prms:
-                value=numpy.abs(prm)
-                if value!=0:
-                    allzero=False
-            if 'firstphaseprmindex' in torprmdict[chkclskey].keys():
-                lowerbounds.append(0)
-                upperbounds.append(2*numpy.pi)
-
-            for prmidx in range(len(prms)):
-                prm=prms[prmidx]
-                value=numpy.abs(prm)
-                scaledvalue=.3*value
+        for prmidx in range(len(prms)):
+            prm=prms[prmidx]
+            value=numpy.abs(prm)
+            scaledvalue=.3*value
+            if refine==True:
                 if allzero==False:
                     if value!=0:
                         lowerbounds.append(prm-scaledvalue)
@@ -621,15 +578,48 @@ def GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict):
                         lowerbounds.append(prm)
                         upperbounds.append(.2) # cant bound by 0,0
                 else:
-                    lowerbounds.append(-max_amp)
-                    upperbounds.append(max_amp)
+                    lowerbounds.append(prm)
+                    upperbounds.append(.2) # cant bound by 0,0
+            else:
+                lowerbounds.append(-max_amp)
+                upperbounds.append(max_amp)
 
-        lowerbounds.append(-max_amp) # vertical shift at end
-        upperbounds.append(max_amp)
+               
 
-        bounds=[lowerbounds,upperbounds]
+    lowerbounds.append(-max_amp) # vertical shift at end
+    upperbounds.append(max_amp)
+
+    bounds=[lowerbounds,upperbounds]
     return tuple(bounds)
        
+def GenerateNewParmGuessAndBounds(poltype,parm):
+    bounds=[]
+    if parm<0:
+        newparmguess=-1.5
+    elif parm>0:
+        newparmguess=1.5
+    
+    adjustment=.001 
+    bounds=[newparmguess-adjustment,newparmguess+adjustment]
+
+    return newparmguess,bounds
+
+
+def ModifyInitialGuessAndBoundries(poltype,parameterinfo,pzero,boundstup):
+    boundstup=list(boundstup)
+    lowerbounds=boundstup[0]
+    upperbounds=boundstup[1]
+    for ls in parameterinfo:
+        newparmguess,bounds,index=ls[:]
+        pzero[index]=newparmguess
+        lowerbound=bounds[0]
+        upperbound=bounds[1]
+        lowerbounds[index]=lowerbound
+        upperbounds[index]=upperbound
+    
+    boundstup=tuple([lowerbounds,upperbounds])
+
+    return pzero,boundstup
 
 
 def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,clskeyswithbadfits):
@@ -734,57 +724,34 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             else:
                 insert_torphasedict(poltype,mol, tor, torprmdict, initangle, write_prm_dict)
         tup=tuple(classkeylist)
-        #poltype.WriteToLog('number of parameters to fit for '+clskey+' are '+str(prmidx))
-        # get all the lists for the current clskey
         angle_list = cls_angle_dict[tup]  # Torsion angle for each corresponding energy
         mm_energy_list = cls_mm_engy_dict[tup]  # MM Energy before fitting to QM torsion energy
         qm_energy_list = cls_qm_engy_dict[tup]  # QM torsion energy
         # 'normalize'
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]
-        # Parameterize each group of rotatable bond (identified by
-        #  atoms restrained during restrained rotation.
-        # tor_energy_list is set as qm - mm
-        # experimental, if all but min QM point > certain value, make them all roughly same magnitude, so no artificial minina are created
 
         weightlist=numpy.exp(-numpy.array(qm_energy_list)/poltype.boltzmantemp)
 
         tor_energy_list = [qme - mme for qme,mme in zip(qm_energy_list,mm_energy_list)]
 
         max_amp = max(tor_energy_list) - min(tor_energy_list)
+        amplist=[20,max_amp]
+        max_amp=min(amplist)
         prmidx,initialprms = insert_torprmdict(poltype,mol, torprmdict)
-        
 
-        # max amplitude of function
-        if len(qm_energy_list)<round(prmidx*.5): # then might not be great fit any way, too many QM failed
-            raise ValueError('Too many QM jobs have failed for '+str(tor)+' '+os.getcwd())
-
-        boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
-        # Remove parameters while # of parameters > # data points
-        toralreadyremovedlist=[]
-        while prmidx > len(mm_energy_list):
-            
-            dellist= []
-            least_conn_tor = find_least_connected_torsion(poltype,torprmdict,toralreadyremovedlist)
-            for nfold in torprmdict[least_conn_tor]['prmdict']:
-                dellist.append((least_conn_tor,nfold))
-            initialprms,torprmdict = del_tor_from_fit(poltype,dellist,torprmdict,initialprms)
-            prmidx=len(initialprms)
-            if len(dellist)>1:
-                poltype.WriteToLog('torsion cosine terms that are being removed due to having too many parameters to fit '+str(dellist))
-                poltype.WriteToLog('number of parameters to fit for '+clskey+' are '+str(prmidx))
-                toralreadyremovedlist.append(least_conn_tor)
-            
         pzero = initialprms
         boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
         # run leastsq until all the parameter estimates are reasonable
         parm_sanitized = False
         bypassrmsd=False
+        maxiter=5
+        count=0
         while not parm_sanitized:
+            if count>=maxiter:
+                break
             parm_sanitized = True
-            dellist = []
             keylist = list(torprmdict.keys())
-            keylist.reverse()
             
             # creating a new function, errfunc
             # p: parameters
@@ -796,182 +763,173 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
 
             else:
                 errfunc = lambda p, x, z, torprmdict, y: fitfunc(poltype,p, x,z, torprmdict) - y
-
-            # optimize.leastsq is run, found in the scipy library
-            # http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.leastsq.html
-            # Inputs:
-            # errfunc : the callable function that we supply, based on fitfunc
-            # This is the function for which the squares are attempted to be minimized
-            # pzero : starting parameter estimates
-            # args=(rads(numpy.array(angle_list)), torprmdict, tor_energy_list) :
-            # These are the arguments that errfunc needs aside from 'p' (which will be supplied by
-            # leastsq)
-            # full_output : set to True, leastsq returns all optional outputs
-            # Outputs:
-            # p1 : parameter estimates returned by optimize.leastsq
-            # covx : matrix that can be used to find covariance of parameter estimates
-            # idict : dictionary containing info about the run
-            # msg : string giving cause of failure if one exists
-            # ier : an int. if ier is 1,2,3 or 4, a solution was found, else no solution was found
-            #p1,covx,idict,msg,ier = optimize.leastsq(errfunc, pzero, args=(rads(numpy.array(angle_list)),torprmdict, tor_energy_list), full_output = True)
             array=optimize.least_squares(errfunc, pzero,jac='2-point', bounds=boundstup, args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
-            p1=array['x']
-            # Remove parameters found by least.sq that aren't reasonable; 
-            # remove parameters found that are greater than max_amp
-            if refine==False:
-                for chkclskey in keylist:
-                    for nfold in torprmdict[chkclskey]['prmdict']:
-                        # if the param value is greater than max_amp, remove it
-                        if abs(p1[torprmdict[chkclskey]['prmdict'][nfold]]) > max_amp:
-                            dellist.append((chkclskey,nfold))
-                            parm_sanitized = False
-                            break
-            foldtoparmslist={}
-            parmtokey={}
-            if refine==False:
-                for chkclskey in keylist:
-                    for nfold in torprmdict[chkclskey]['prmdict']:
-                        if nfold not in foldtoparmslist.keys():
-                            foldtoparmslist[nfold]=[]
-                        # if the param value is greater than max_amp, remove it
-                        parm=p1[torprmdict[chkclskey]['prmdict'][nfold]]
-                        foldtoparmslist[nfold].append(parm)
-                        parmtokey[parm]=chkclskey
-                        if abs(parm) > max_amp:
-                            dellist.append((chkclskey,nfold))
-                            parm_sanitized = False
-                            break
-                for fold,parmslist in foldtoparmslist.items():
-                    combs=list(combinations(parmslist,2))
-                    for comb in combs:
-                        Sum=numpy.abs(comb[0]+comb[1])
-                         
-                        if Sum<.01 and useweights==False and comb[0]!=0 and comb[1]!=0: # tolerance for torsions cancelling each other
-                           keytodelete=parmtokey[comb[0]]
-                           max_amp=20
-                           bypassrmsd=True
-                           parm_sanitized = False
-                           for nfold in torprmdict[keytodelete]['prmdict']:
-                               dellist.append((keytodelete,nfold)) 
 
-                dellist = list(set(dellist))
-            if len(dellist)>0:
-                poltype.WriteToLog('torsion cosine terms that are being removed due to unreasonable parameters '+str(dellist))
-                poltype.WriteToLog('number of parameters to fit for '+clskey+' are '+str(prmidx))
-                initialprms,torprmdict = del_tor_from_fit(poltype,dellist,torprmdict,initialprms)
-                prmidx=len(initialprms)
-            # new parameter array since prm size may have changed due to deletions
-            pzero = initialprms
-            boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
-
-        # Attempts to insert main torsion type if all are removed
-        # Rerur leastsq, this time fitting for the force constants of the main torsion
-        if is_torprmdict_all_empty(poltype,torprmdict):
-            for i in range(len(torset)):
-                tor=torset[i]
-                a,b,c,d = tor[0:4]
-                rotbndkey = '%d %d' % (b, c)
-                toraboutbnd = poltype.rotbndlist[rotbndkey][0]
-                insert_torphasedict(poltype,mol, toraboutbnd, torprmdict,initangle, write_prm_dict,keyfilter = clskey)
-            prmidx,initialprms = insert_torprmdict(mol, torprmdict)
-
-            pzero = initialprms
-            boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
-
-            if useweights==True: 
-                errfunc = lambda p, x, z, torprmdict, y: weightlist*(fitfunc(poltype,p, x,z, torprmdict) - y)
-
-            else:
-                errfunc = lambda p, x, z, torprmdict, y: fitfunc(poltype,p, x,z, torprmdict) - y
-
-            array=optimize.least_squares(errfunc, pzero,jac='2-point', bounds=boundstup, args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
+            
             p1=array['x']
 
-        # fill in torprmdict with the parameter estimates
-        for chkclskey in torprmdict:
-            if 'firstphaseprmindex' in torprmdict[chkclskey].keys():
-                prmindex=torprmdict[chkclskey]['firstphaseprmindex']
-                prm=p1[prmindex]
-                torprmdict[chkclskey]['firstphaseprmindex']=prm
+            pzero,boundstup,parm_sanitized=CheckFitParameters(poltype,pzero,boundstup,parm_sanitized,refine,keylist,torprmdict,p1,angle_list,torset,max_amp)
+            count+=1
+ 
+        
 
-            for nfold in torprmdict[chkclskey]['prmdict']:
-                parm  = p1[torprmdict[chkclskey]['prmdict'][nfold]]
-                torprmdict[chkclskey]['prmdict'][nfold] = parm
-            write_prm_dict[chkclskey] = torprmdict[chkclskey]['prmdict']
-            # if not found, set as 0
-            if write_prm_dict[chkclskey] == {}:
-                if chkclskey in poltype.classkeytoinitialprmguess.keys():
-                    prms=poltype.classkeytoinitialprmguess[chkclskey]
-                    write_prm_dict[chclskey] = {1:prms[0], 2:prms[1], 3:prms[2]}
-                else: 
-                    write_prm_dict[chkclskey] = {1:0., 2:0., 3:0.}
-
-            # Check if no arguments were fitted.
-            if 'offset' in torprmdict[chkclskey]:
-                if isinstance(p1,numpy.ndarray):
-                    torprmdict[chkclskey]['offset'] = p1[-1]
-                else:
-                    torprmdict[chkclskey]['offset'] = p1
+        torprmdict,write_prm_dict=FillInDictionariesParameterEstimates(poltype,torprmdict,p1,write_prm_dict)
         torsettobypassrmsd[torset]=bypassrmsd
-        dim=len(cls_angle_dict[tup][0])
-        figfname = '%s-fit-' % (poltype.molecprefix)
-        for i in range(len(torset)):
-            tor=torset[i]
-            a,b,c,d = tor[0:4]
-            figfname+='%d-%d' % (b,c)
-            figfname+='_'
-        figfname=figfname[:-1]
-        if useweights==True:
-            wstring='_useweights'
-        else:
-            wstring=''
-        figfname+=wstring+'.png'
-        Sx = numpy.array(cls_angle_dict[tup])
-        out=[]
-
-        out.append(cls_angle_dict[tup])
-        for clskey in classkeylist:
-            fitfunc_dict[clskey] = fitfunc(poltype,'eval',torgen.rads(poltype,Sx),torset,torprmdict,debug=False)
-            out.append(fitfunc_dict[clskey])
-            def RMSD(c):
-                return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.subtract(fitfunc_dict[clskey],tor_energy_list),c))))
-            result=fmin(RMSD,.5)
-            minRMSD=RMSD(result[0])
-
-        out.append(tor_energy_list)
-        numprms=1 # offset parameter incldued with torsion force constant parameters
-        for classkey in torprmdict:
-            numprms+= len(torprmdict[classkey]['prmdict'].keys())
-        string=' , '.join(list(torprmdict.keys()))
-        datapts=len(mm_energy_list)
-        print('Torsions being fit',string,'RMSD(QM-MM1)',minRMSD)
-        poltype.WriteToLog('Torsions being fit '+string+' RMSD(QM-MM1)'+str(minRMSD))
-        if dim==1:
-            xpoints=numpy.array([Sx[i][0] for i in range(len(Sx))])
-            x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
-            fig = plt.figure(figsize=(10,10))
-            ax = fig.add_subplot(111)
-            l1, = ax.plot(Sx,fitfunc_dict[clskey],'ro',color='red',label='Fit')
-            f = interp1d(xpoints,fitfunc_dict[clskey], kind='quadratic')
-            y_smooth=f(x_new)
-            ax.plot(x_new,y_smooth,color='red')
-            l2, = ax.plot(Sx,tor_energy_list,'bo',color='blue',label='QM-MM1')
-            f = interp1d(xpoints,tor_energy_list, kind='quadratic')
-            y_smooth=f(x_new)
-            ax.plot(x_new,y_smooth,color='blue')
-
-            plt.legend(handles=[l1,l2],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=2)
-
-            ax.text(0.05, 1.1, 'Torsions Being Fit =%s'%(string), transform=ax.transAxes, fontsize=10,verticalalignment='top')
-            ax.text(0, -0.1, 'FoldNum=%s NumPrms=%s DataPts=%s RMSD(fit,QM-MM1),Abs=%s'%(str(len(poltype.nfoldlist)),str(numprms),str(len(mm_energy_list)),round(minRMSD,2)), transform=ax.transAxes, fontsize=10,verticalalignment='bottom')
-            fig.savefig(figfname)
-        elif dim==2:
-            tormat,qmmat,mmmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,cls_angle_dict[tup],tor_energy_list,qm_energy_list,mm_energy_list,torset)
-            PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,tormat,'QM-MM1 Heatmap (kcal/mol)','QM-MM1_Heatmap.png',numprms,datapts,minRMSD,string)
-            PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,qmmat,'QM Heatmap (kcal/mol)','QM_Heatmap.png',numprms,datapts,minRMSD,string)
-            PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,mmmat,'MM1 Heatmap (kcal/mol)','MM1_Heatmap.png',numprms,datapts,minRMSD,string)
-        #torgen.write_arr_to_file(poltype,txtfname,out)
+        GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_dict,torprmdict,mm_energy_list,tor_energy_list,flatphaselist,qm_energy_list,tup)
+        
     return write_prm_dict,fitfunc_dict,torsettobypassrmsd
+
+
+
+def CheckFitParameters(poltype,pzero,boundstup,parm_sanitized,refine,keylist,torprmdict,p1,angle_list,torset,max_amp):
+    foldtoparmslist={}
+    parameterinfo=[]
+    parmtokey={}
+    parmtoindex={}
+    if refine==False:
+        indicesmodified=[]
+        for chkclskey in keylist:
+            for nfold in torprmdict[chkclskey]['prmdict']:
+                if nfold not in foldtoparmslist.keys():
+                    foldtoparmslist[nfold]=[]
+                index=torprmdict[chkclskey]['prmdict'][nfold]
+                parm=p1[index]
+                parmtokey[parm]=chkclskey
+                parmtoindex[parm]=index
+                foldtoparmslist[nfold].append(parm)
+                if abs(parm) > max_amp:
+                    parm_sanitized = False
+                    indicesmodified.apend(index)
+                    newparmguess,bounds=GenerateNewParmGuessAndBounds(poltype,parm) 
+                    parameterinfo.append([newparmguess,bounds,index])
+                    break
+        for fold,parmslist in foldtoparmslist.items():
+            combs=list(combinations(parmslist,2))
+            for comb in combs:
+                keylist=[parmtokey[i] for i in comb]
+                energyarray=fitfunc(poltype,p1,torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict,keyonlylist=keylist,nfoldonlylist=[fold])  
+                minenergy=min(energyarray)
+                energyarray=[i-minenergy for i in energyarray]
+                energy=max(energyarray)
+                maxV=max(comb)
+                ratio=numpy.abs(energy/maxV)
+                if ratio<.1: 
+                    parm_sanitized = False 
+                    parm=comb[0] # just fix one 
+                    index=parmtoindex[parm]
+                    indicesmodified.append(index)
+                    newparmguess,bounds=GenerateNewParmGuessAndBounds(poltype,parm) 
+                    parameterinfo.append([newparmguess,bounds,index])
+
+                if fold==1 or fold==3:
+                    allbig=True
+                    for prm in comb:
+                        if numpy.abs(prm)<15:
+                            allbig=False
+                    if allbig==True:
+                        parm=comb[0] # just fix one 
+                        index=parmtoindex[parm]
+                        if index not in indicesmodified:
+                            parm_sanitized = False
+                            indicesmodified.append(index)
+                            newparmguess,bounds=GenerateNewParmGuessAndBounds(poltype,parm) 
+                            parameterinfo.append([newparmguess,bounds,index])
+    
+
+        pzero,boundstup=ModifyInitialGuessAndBoundries(poltype,parameterinfo,pzero,boundstup)
+    return pzero,boundstup,parm_sanitized
+
+
+
+def GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_dict,torprmdict,mm_energy_list,tor_energy_list,flatphaselist,qm_energy_list,tup):
+    dim=len(cls_angle_dict[tup][0])
+    figfname = '%s-fit-' % (poltype.molecprefix)
+    for i in range(len(torset)):
+        tor=torset[i]
+        a,b,c,d = tor[0:4]
+        figfname+='%d-%d' % (b,c)
+        figfname+='_'
+    figfname=figfname[:-1]
+    if useweights==True:
+        wstring='_useweights'
+    else:
+        wstring=''
+    figfname+=wstring+'.png'
+    Sx = numpy.array(cls_angle_dict[tup])
+    out=[]
+
+    out.append(cls_angle_dict[tup])
+    for clskey in classkeylist:
+        fitfunc_dict[clskey] = fitfunc(poltype,'eval',torgen.rads(poltype,Sx),torset,torprmdict,debug=False)
+        out.append(fitfunc_dict[clskey])
+        def RMSD(c):
+            return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.subtract(fitfunc_dict[clskey],tor_energy_list),c))))
+        result=fmin(RMSD,.5)
+        minRMSD=RMSD(result[0])
+
+    out.append(tor_energy_list)
+    numprms=1 # offset parameter incldued with torsion force constant parameters
+    for classkey in torprmdict:
+        numprms+= len(torprmdict[classkey]['prmdict'].keys())
+    string=' , '.join(list(torprmdict.keys()))
+    datapts=len(mm_energy_list)
+    print('Torsions being fit',string,'RMSD(QM-MM1)',minRMSD)
+    poltype.WriteToLog('Torsions being fit '+string+' RMSD(QM-MM1)'+str(minRMSD))
+    if dim==1:
+        xpoints=numpy.array([Sx[i][0] for i in range(len(Sx))])
+        x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
+        fig = plt.figure(figsize=(10,10))
+        ax = fig.add_subplot(111)
+        l1, = ax.plot(Sx,fitfunc_dict[clskey],'ro',color='red',label='Fit')
+        f = interp1d(xpoints,fitfunc_dict[clskey], kind='quadratic')
+        y_smooth=f(x_new)
+        ax.plot(x_new,y_smooth,color='red')
+        l2, = ax.plot(Sx,tor_energy_list,'bo',color='blue',label='QM-MM1')
+        f = interp1d(xpoints,tor_energy_list, kind='quadratic')
+        y_smooth=f(x_new)
+        ax.plot(x_new,y_smooth,color='blue')
+
+        plt.legend(handles=[l1,l2],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=2)
+
+        ax.text(0.05, 1.1, 'Torsions Being Fit =%s'%(string), transform=ax.transAxes, fontsize=10,verticalalignment='top')
+        ax.text(0, -0.1, 'FoldNum=%s NumPrms=%s DataPts=%s RMSD(fit,QM-MM1),Abs=%s'%(str(len(poltype.nfoldlist)),str(numprms),str(len(mm_energy_list)),round(minRMSD,2)), transform=ax.transAxes, fontsize=10,verticalalignment='bottom')
+        fig.savefig(figfname)
+    elif dim==2:
+        tormat,qmmat,mmmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,cls_angle_dict[tup],tor_energy_list,qm_energy_list,mm_energy_list,torset)
+        PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,tormat,'QM-MM1 Heatmap (kcal/mol)','QM-MM1_Heatmap.png',numprms,datapts,minRMSD,string)
+        PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,qmmat,'QM Heatmap (kcal/mol)','QM_Heatmap.png',numprms,datapts,minRMSD,string)
+        PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,mmmat,'MM1 Heatmap (kcal/mol)','MM1_Heatmap.png',numprms,datapts,minRMSD,string)
+
+
+
+def FillInDictionariesParameterEstimates(poltype,torprmdict,p1,write_prm_dict):
+    for chkclskey in torprmdict:
+        if 'firstphaseprmindex' in torprmdict[chkclskey].keys():
+            prmindex=torprmdict[chkclskey]['firstphaseprmindex']
+            prm=p1[prmindex]
+            torprmdict[chkclskey]['firstphaseprmindex']=prm
+
+        for nfold in torprmdict[chkclskey]['prmdict']:
+            parm  = p1[torprmdict[chkclskey]['prmdict'][nfold]]
+            torprmdict[chkclskey]['prmdict'][nfold] = parm
+        write_prm_dict[chkclskey] = torprmdict[chkclskey]['prmdict']
+        # if not found, set as 0
+        if write_prm_dict[chkclskey] == {}:
+            if chkclskey in poltype.classkeytoinitialprmguess.keys():
+                prms=poltype.classkeytoinitialprmguess[chkclskey]
+                write_prm_dict[chclskey] = {1:prms[0], 2:prms[1], 3:prms[2]}
+            else: 
+                write_prm_dict[chkclskey] = {1:0., 2:0., 3:0.}
+
+        # Check if no arguments were fitted.
+        if 'offset' in torprmdict[chkclskey]:
+            if isinstance(p1,numpy.ndarray):
+                torprmdict[chkclskey]['offset'] = p1[-1]
+            else:
+                torprmdict[chkclskey]['offset'] = p1
+    return torprmdict,write_prm_dict
+
+
 
 def PlotHeatmap(poltype,idealanglematrix,actualanglematrix,matrix,title,figfname,numprms,datapts,minRMSD,textstring=None):
     fig, ax = plt.subplots()
