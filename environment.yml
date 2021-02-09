@@ -11,8 +11,7 @@ dependencies:
   - cairosvg
   - mdanalysis
   - openbabel=2.4.1
+  - parmed
   - svgutils
   - psi4
   - rdkit
-  - pip:
-    - git+git://github.com/ParmEd/ParmEd.git
