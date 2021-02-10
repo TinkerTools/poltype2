@@ -2,8 +2,6 @@ import unittest
 import os,sys,inspect
 import poltype
 import shutil
-from parmed.tinker import parameterfile
-from scipy.optimize import fmin
 import argparse
 import getopt
 

@@ -37,7 +37,6 @@ import multipole as mpole
 import fragmenter as frag
 import rings
 from packaging import version
-from parmed.tinker import parameterfile
 from rdkit import Chem
 from rdkit.Chem import rdmolfiles,AllChem,rdmolops
 from rdkit.Geometry import Point3D
@@ -1399,7 +1398,6 @@ class PolarizableTyper():
         if os.path.exists(self.scrtmpdirpsi4):
             shutil.rmtree(self.scrtmpdirpsi4)
 
-        #param = parameterfile.AmoebaParameterSet(keyfilecopyname)
         #return param
 
 
