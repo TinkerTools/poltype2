@@ -820,6 +820,46 @@ def FindPartialDoubleBonds(poltype,rdkitmol):
             if babelbond not in poltype.partialdoublebonds:
                 poltype.partialdoublebonds.append(babelbond)
 
+def RdkitIsInRing(poltype,atom):
+    isinringofsize=False
+    for i in range(3,13+1):
+        isinringofsize=atom.IsInRingSize(i)
+        if isinringofsize==True:
+            break
+    return isinringofsize
+
+
+def GrabRingAtoms(poltype,neighbatom):
+    ringindexes=[]
+    prevringidxlen=len(ringindexes)
+    ringindexes.append(neighbatom.GetIdx())
+    ringidxlen=len(ringindexes)
+    while prevringidxlen!=ringidxlen:
+        for atmindex in ringindexes:
+            atm=poltype.rdkitmol.GetAtomWithIdx(atmindex)
+            if RdkitIsInRing(poltype,atm)==True and atmindex not in ringindexes:
+                ringindexes.append(atmindex)
+            for natm in atm.GetNeighbors():
+                if RdkitIsInRing(poltype,natm)==True and natm.GetIdx() not in ringindexes:
+                    ringindexes.append(natm.GetIdx())
+        prevringidxlen=ringidxlen
+        ringidxlen=len(ringindexes)
+
+    return ringindexes
+
+def CheckForAnyAromaticsInRing(poltype,babelindex):
+    rdkitindex=babelindex-1
+    rdkitatom=poltype.rdkitmol.GetAtomWithIdx(rdkitindex)
+    ringindexes=GrabRingAtoms(poltype,rdkitatom)
+    anyaro=False
+    for index in ringindexes:
+        atm=poltype.rdkitmol.GetAtomWithIdx(index)
+        if atm.GetIsAromatic()==True:
+            anyaro=True
+    return anyaro
+
+
+
 def get_torlist(poltype,mol,missed_torsions):
     """
     Intent: Find unique rotatable bonds.
@@ -844,6 +884,7 @@ def get_torlist(poltype,mol,missed_torsions):
     hydtorsionlist=[]
     rotbndlist = {}
     iterbond = openbabel.OBMolBondIter(mol)
+    nonaroringtorlist=[]
     for bond in iterbond:
         skiptorsion=True
         # is the bond rotatable
@@ -862,7 +903,10 @@ def get_torlist(poltype,mol,missed_torsions):
             arobond=True
         if arobond==True:
             continue
-        if ringbond==True and poltype.allownonaromaticringscanning==False:
+        anyarot2=CheckForAnyAromaticsInRing(poltype,t2idx)
+        anyarot3=CheckForAnyAromaticsInRing(poltype,t3idx)
+
+        if anyarot2==True and anyarot3==True and ringbond==True:
             continue
         if t2val<2 or t3val<2:
             continue 
@@ -888,7 +932,10 @@ def get_torlist(poltype,mol,missed_torsions):
             skiptorsion=True
             hydtorsionlist.append(sortedtor)       
 
+
         unq=get_uniq_rotbnd(poltype,t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx())
+        if ringbond==True and poltype.allownonaromaticringscanning==False:
+            nonaroringtorlist.append(unq)
         rotbndkey = '%d %d' % (unq[1],unq[2])
         # store the torsion and temporary torsion value found by openbabel in torlist
         tor = mol.GetTorsion(t1,t2,t3,t4)
@@ -909,7 +956,7 @@ def get_torlist(poltype,mol,missed_torsions):
                 d = iaa2.GetIdx()
                 if ((iaa.GetIdx() != t3.GetIdx() and iaa2.GetIdx() != t2.GetIdx()) and not (iaa.GetIdx() == t1.GetIdx() and iaa2.GetIdx() == t4.GetIdx())):
                     rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx()))
-    return (torlist ,rotbndlist,hydtorsionlist)
+    return (torlist ,rotbndlist,hydtorsionlist,nonaroringtorlist)
 
 
 
@@ -1429,7 +1476,6 @@ def CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,m
     prefix='%s-sp-'%(poltype.molecprefix)
     postfix='.psi4'  
     inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
-    print('prevstrctfname',prevstrctfname)
     finalstruct= opt.load_structfile(poltype,prevstrctfname)
 
     temp=open(inputname,'w')
