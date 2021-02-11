@@ -625,11 +625,9 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         classkeytosmarts={}
         classkeytotorsionindexes={}
         classkeytoatomindexes={}
-
         tortorclasskeytosmartsposarray={}
         tortorclasskeytosmarts={}
         tortorclasskeytotorsionindexes={}
-
         parentclasskeytofragclasskey={}
         parenttortorclasskeytofragtortorclasskey={}
         if vdwfragment==False:
@@ -637,15 +635,15 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 rotbndindex=array[j]
                 indextoequivalentindex=maps[i]
                 parentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
-
                 rotkey=rotbndindex.replace('_',' ')
                 tors,maintortors,tortor=GrabParentTorsions(poltype,rotbndindextoringtor,rotbndindex,rotkey)
                 for torsion in tors:
+
                     try:
                         fragindices=[parentindextofragindex[k-1] for k in torsion]
-                        classkeysplit=clskey.split()
+                        classkey=torgen.get_class_key(poltype,torsion[0],torsion[1],torsion[2],torsion[3])
+                        classkeysplit=classkey.split()
                         classkeysplit=[int(i) for i in classkeysplit]
-
                         fragclasses=[parentsymclasstofragsymclass[k] for k in classkeysplit] 
                     except:
                         continue
@@ -698,11 +696,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         WriteDictionaryToFile(poltype,parentclasskeytofragclasskey,"parentclasskeytofragclasskey.txt")
         wholexyz=parentdir+r'/'+poltype.xyzoutfile
         wholemol=parentdir+r'/'+poltype.molstructfname
-        
-
         parentatoms=poltype.rdkitmol.GetNumAtoms()
-
-
         listofjobs,jobtooutputlog,newlog=FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog,tempmol,parentdir,vdwfragment)
     os.chdir(parentdir)
     finishedjobs,errorjobs=SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog)
