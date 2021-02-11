@@ -934,8 +934,9 @@ def get_torlist(poltype,mol,missed_torsions):
 
 
         unq=get_uniq_rotbnd(poltype,t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx())
-        if ringbond==True and poltype.allownonaromaticringscanning==False:
+        if ringbond==True and poltype.allownonaromaticringscanning==False and poltype.refinenonaroringtors==False:
             nonaroringtorlist.append(unq)
+            skiptorsion=False
         rotbndkey = '%d %d' % (unq[1],unq[2])
         # store the torsion and temporary torsion value found by openbabel in torlist
         tor = mol.GetTorsion(t1,t2,t3,t4)

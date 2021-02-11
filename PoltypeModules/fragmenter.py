@@ -614,7 +614,6 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             parentsymclass=poltype.idxtosymclass[parentindex+1]
             fragsymclass=fragidxtosymclass[fragindex+1]
             parentsymclasstofragsymclass[parentsymclass]=fragsymclass
-
         WriteDictionaryToFile(poltype,parentsymclasstofragsymclass,"parentsymclasstofragsymclass.txt")
         WriteDictionaryToFile(poltype,parentindextofragindex,"parentindextofragindex.txt")
         tempmol=mol_with_atom_index_removed(poltype,fragmol) 
@@ -642,12 +641,17 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 rotkey=rotbndindex.replace('_',' ')
                 tors,maintortors,tortor=GrabParentTorsions(poltype,rotbndindextoringtor,rotbndindex,rotkey)
                 for torsion in tors:
-                    classkey=torgen.get_class_key(poltype,torsion[0],torsion[1],torsion[2],torsion[3])
-                    fragclasskey=GenerateFragmentClassKey(poltype,classkey,parentsymclasstofragsymclass)
                     try:
                         fragindices=[parentindextofragindex[k-1] for k in torsion]
+                        classkeysplit=clskey.split()
+                        classkeysplit=[int(i) for i in classkeysplit]
+
+                        fragclasses=[parentsymclasstofragsymclass[k] for k in classkeysplit] 
                     except:
                         continue
+                    
+                    classkey=torgen.get_class_key(poltype,torsion[0],torsion[1],torsion[2],torsion[3])
+                    fragclasskey=GenerateFragmentClassKey(poltype,classkey,parentsymclasstofragsymclass)
                     smilesposstring,fragtorstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,torsion,parentindextofragindex,fragidxarray,indextoequivalentindex)
                     parentclasskeytofragclasskey[classkey]=fragclasskey
                     classkeytosmartsposarray[classkey]=smilesposstring
@@ -1165,7 +1169,6 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets,non
             torfragmentarray.append(fragment)
             tornamearray.append(rotbndindex)
 
-    
     vdwequivalentrotbndindexarrays=FindEquivalentFragments(poltype,vdwfragmentarray,vdwnamearray)
     torequivalentrotbndindexarrays=FindEquivalentFragments(poltype,torfragmentarray,tornamearray)
     equivalentrotbndindexarrays=[]

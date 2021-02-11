@@ -1316,7 +1316,6 @@ class PolarizableTyper():
             self.torsettovariabletorlist[tuple(torset)]=[]
         nonaroringtorlist=[tuple(i) for i in nonaroringtorlist]
         nonaroringtorlist=[tuple([i]) for i in nonaroringtorlist]
-
         self.rotbndtoanginc=torgen.DetermineAngleIncrementAndPointsNeededForEachTorsionSet(self,mol,self.rotbndlist)
         torgen.DefaultMaxRange(self,self.torlist)
         if self.dontdotor==True:
