@@ -1319,7 +1319,8 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
     else:
         for atm in iteratom:
             tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), atm.x(),atm.y(),atm.z()))
-    
+        tmpfh.write('\n')
+
     if ('I ' in poltype.mol.GetSpacedFormula()):
         formulalist=poltype.mol.GetSpacedFormula().lstrip().rstrip().split()
         elementtobasissetlines=GenerateElementToBasisSetLines(poltype,poltype.basissetpath+basissetfile)
