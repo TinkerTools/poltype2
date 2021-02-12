@@ -638,7 +638,6 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 rotkey=rotbndindex.replace('_',' ')
                 tors,maintortors,tortor=GrabParentTorsions(poltype,rotbndindextoringtor,rotbndindex,rotkey)
                 for torsion in tors:
-
                     try:
                         fragindices=[parentindextofragindex[k-1] for k in torsion]
                         classkey=torgen.get_class_key(poltype,torsion[0],torsion[1],torsion[2],torsion[3])
@@ -1473,10 +1472,16 @@ def FirstPassAtomIndexes(poltype,tor,onlyinputindices):
    for atom in poltype.rdkitmol.GetAtoms():
        atomindex=atom.GetIdx()
        babelatomindex=atomindex+1
+       grabneighbs=False
        if babelatomindex in tor:
            if atomindex not in molindexlist:
                molindexlist.append(atomindex)
            if onlyinputindices==False:
+               grabneighbs=True
+           else:
+               if babelatomindex==tor[1] or babelatomindex==tor[2]: # always need neighbors of middle two atoms
+                   grabneighbs=True
+           if grabneighbs==True: 
                for neighbatom in atom.GetNeighbors():
                    neighbatomindex=neighbatom.GetIdx()
                    if neighbatomindex not in molindexlist:

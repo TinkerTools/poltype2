@@ -209,7 +209,7 @@ def GenerateTorsionSPInputFileGaus(poltype,torset,optmol,phaseangles,prevstrctfn
     torspcomfname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
 
     torsplogfname = os.path.splitext(torspcomfname)[0] + '.log'
-    gen_torcomfile(poltype,torspcomfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,prevstruct,torxyzfname,mol)
+    gen_torcomfile(poltype,torspcomfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,prevstruct,None,mol)
     outputname=torspcomfname.replace('.com','.log')
     return torspcomfname,outputname
 
@@ -1305,16 +1305,17 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
     tmpfh.write('%d %d\n' % (mol.GetTotalCharge(), mol.GetTotalSpinMultiplicity()))
     iteratom = openbabel.OBMolAtomIter(prevstruct)
     etab = openbabel.OBElementTable()
-    if os.path.isfile(xyzf):
-        xyzstr = open(xyzf,'r')
-        xyzstrl = xyzstr.readlines()
-        i = 0
-        for atm in iteratom:
-            i = i + 1
-            ln = xyzstrl[i]
-            tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), float(ln.split()[2]),float(ln.split()[3]),float(ln.split()[4])))
-        tmpfh.write('\n')
-        xyzstr.close()
+    if xyzf!=None:
+        if os.path.isfile(xyzf):
+            xyzstr = open(xyzf,'r')
+            xyzstrl = xyzstr.readlines()
+            i = 0
+            for atm in iteratom:
+                i = i + 1
+                ln = xyzstrl[i]
+                tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), float(ln.split()[2]),float(ln.split()[3]),float(ln.split()[4])))
+            tmpfh.write('\n')
+            xyzstr.close()
     else:
         for atm in iteratom:
             tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), atm.x(),atm.y(),atm.z()))
