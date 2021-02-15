@@ -1358,7 +1358,6 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             for idx in match:
                 if idx not in matcharray:
                     matcharray.append(idx)
-        print('torsionindices',torsionindices,'allaro',allaro,'aroa',aroa,'arob',arob,'aroc',aroc,'arod',arod,'ringb',ringb,'ringc',ringc,'hybs',hybs)   
         check=CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,matcharray)
         atoma=rdkitmol.GetAtomWithIdx(aidx)
         atomd=rdkitmol.GetAtomWithIdx(didx)
@@ -1514,13 +1513,14 @@ def TinkerClassesToPoltypeClasses(poltype,indicestotinkerclasses):
 def ConvertIndicesDictionaryToPoltypeClasses(poltype,indicestovalue,indicestotinkerclasses,tinkerclassestopoltypeclasses):
     poltypeclassestovalue={}
     for indices,value in indicestovalue.items():
-        tinkerclasses=tuple(indicestotinkerclasses[indices])
-        if tinkerclasses in tinkerclassestopoltypeclasses.keys():
-            poltypeclasses=tuple(tinkerclassestopoltypeclasses[tinkerclasses])
-        else:
-            poltypeclasses=tuple(tinkerclassestopoltypeclasses[tinkerclasses[::-1]])
+        if indices in indicestotinkerclasses.keys():
+            tinkerclasses=tuple(indicestotinkerclasses[indices])
+            if tinkerclasses in tinkerclassestopoltypeclasses.keys():
+                poltypeclasses=tuple(tinkerclassestopoltypeclasses[tinkerclasses])
+            else:
+                poltypeclasses=tuple(tinkerclassestopoltypeclasses[tinkerclasses[::-1]])
 
-        poltypeclassestovalue[poltypeclasses]=value
+            poltypeclassestovalue[poltypeclasses]=value
     return poltypeclassestovalue 
 
 
@@ -2103,6 +2103,18 @@ def ConvertListOfListToListOfTuples(poltype,listoflist):
     return listoftuples
 
 
+def AddExternalDatabaseMatches(poltype, indicestosmartsatomorder,extindicestoextsmarts,smartsatomordertoparameters):
+    newindicestosmartsatomorder=indicestosmartsatomorder.copy()
+    for smartsatomorder in smartsatomordertoparameters.keys():
+        smarts=smartsatomorder[0]
+        for indices,extsmarts in extindicestoextsmarts.items():
+            if smarts==extsmarts:
+                newindicestosmartsatomorder[indices]=list(smartsatomorder)         
+        
+    return newindicestosmartsatomorder   
+    
+
+
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters=ReadExternalDatabase(poltype)
     smartsatomordertoelementtinkerdescrip=ReadSmallMoleculeLib(poltype,poltype.smallmoleculesmartstotinkerdescrip)
@@ -2146,7 +2158,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     torsionsforprmtoparametersmarts,torsionsforprmtosmarts,torsionindicestoextsmarts=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,torsionindicestoextsmartsmatchlength,torsionsforprmtoparametersmarts,torsionsforprmtosmarts,torsionindicestoextsmarts)
 
     atomindextotinkertype,atomindextotinkerclass,atomindextoparametersmartsatomorder,atomindextoelementtinkerdescrip,atomindextosmartsatomorder=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
-
     bondindicestotinkertypes,bondindicestotinkerclasses,bondindicestoparametersmartsatomorders,bondindicestoelementtinkerdescrips,bondindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,bondsforprmtoparametersmarts,bondsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
 
     opbendbondindicestotinkerclasses,opbendbondindicestosmartsatomorders=FilterBondSMARTSEnviorment(poltype,bondindicestosmartsatomorders,bondindicestotinkerclasses)
@@ -2162,6 +2173,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
 
     indextoneighbidxs=FindAllNeighborIndexes(poltype,rdkitmol)
     torsionsmissing,poormatchingaromatictorsions=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
+    atomindextosmartsatomorder=AddExternalDatabaseMatches(poltype, atomindextosmartsatomorder,vdwindicestoextsmarts,vdwsmartsatomordertoparameters)
     vdwmissing=FindMissingParameters(poltype,atomindextosmartsatomorder,rdkitmol,mol,indextoneighbidxs)
     missingvdwatomindices=ReduceMissingVdwByTypes(poltype,vdwmissing)
     bondmissing=FindMissingParameters(poltype,bondindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)

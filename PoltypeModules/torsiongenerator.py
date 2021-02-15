@@ -932,7 +932,6 @@ def get_torlist(poltype,mol,missed_torsions):
             skiptorsion=True
             hydtorsionlist.append(sortedtor)       
 
-
         unq=get_uniq_rotbnd(poltype,t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx())
         if ringbond==True and poltype.allownonaromaticringscanning==False and poltype.refinenonaroringtors==False:
             nonaroringtorlist.append(unq)
