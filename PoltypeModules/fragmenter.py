@@ -21,7 +21,7 @@ from rdkit.Geometry import Point3D
 import sys # used for terminaing job after fragmenter finishes and troubleshooting
 import symmetry as symm
 import shlex
-
+import itertools
 
 def AssignTotalCharge(poltype,molecule,babelmolecule):
     atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
@@ -289,7 +289,8 @@ def ConstructVdwLineFromFragment(poltype,key,classkeytofragmentfilename,classkey
     temp.write(fitline)
     temp.write('# '+valencestring)
     temp.write(line)
-    valenceprmlist.append(valencestring)
+    if valencestring not in valenceprmlist: 
+        valenceprmlist.append(valencestring)
     return valenceprmlist
 
 
@@ -299,7 +300,8 @@ def ConstructVdwLineFromFragment(poltype,key,classkeytofragmentfilename,classkey
 def WriteOutDatabaseLines(poltype,valenceprmlist):
     newtemp=open(poltype.databaseprmfilename,'w')
     for line in valenceprmlist:
-        newtemp.write(line)
+        if line not in results:
+            newtemp.write(line)
     newtemp.close()
 
 
@@ -349,7 +351,9 @@ def ConstructTorsionLineFromFragment(poltype,key,classkeytofragmentfilename,clas
     temp.write(fitline)
     temp.write('# '+valencestring)
     temp.write(torline)
-    valenceprmlist.append(valencestring)
+    if valencestring not in valenceprmlist: 
+        valenceprmlist.append(valencestring)
+
     return valenceprmlist
 
 
@@ -374,7 +378,9 @@ def ConstructTorsionTorsionLineFromFragment(poltype,key,classkeytofragmentfilena
         gridline=gridline.replace('\n','')
         valencestring+=gridline+','
     valencestring=valencestring[:-1]
-    valenceprmlist.append(valencestring)
+    if valencestring not in valenceprmlist: 
+        valenceprmlist.append(valencestring)
+
     return valenceprmlist
 
 
@@ -554,7 +560,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         vdwparentindices=[]
         vdwparentindextoequivmaps=[]
         vdwparentindextofragindexmaps=[]
-        parentsymclasstofragsymclass={}
+        parentsymclasstofragsymclasses={}
         for i in range(len(array)):
             rotbndindex=array[i]
             indextoequivalentindex=maps[i]
@@ -575,7 +581,9 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 rotbndindexes=[int(j)-1 for j in parentrotbndindexes]
                 fragrotbndindexes=[parentindextofragindex[j] for j in rotbndindexes]
                 fragrotbndindexes=[indextoequivalentindex[j] for j in fragrotbndindexes]
+
                 fragrotbndindexes=[j+1 for j in fragrotbndindexes]
+          
                 for j in range(0,len(fragrotbndindexes),2):
                     fragrotbnd=str(fragrotbndindexes[j])+' '+str(fragrotbndindexes[j+1])
                     if fragrotbnd not in fragrotbnds:
@@ -609,12 +617,16 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         for parentindex,fragindex in parentindextofragindex.items():
             parentsymclass=poltype.idxtosymclass[parentindex+1]
             fragsymclass=fragidxtosymclass[fragindex+1]
-            parentsymclasstofragsymclass[parentsymclass]=fragsymclass
+            if parentsymclass not in parentsymclasstofragsymclasses.keys():
+                parentsymclasstofragsymclasses[parentsymclass]=[]
+            if fragsymclass not in parentsymclasstofragsymclasses[parentsymclass]: 
+                parentsymclasstofragsymclasses[parentsymclass].append(fragsymclass)
+
         head,tail=os.path.split(fragmentfilepath)
         os.chdir(head)
         if vdwfragment==False:
             MakeFileName(poltype,strparentrotbndindexes,'torsions.txt')
-        WriteDictionaryToFile(poltype,parentsymclasstofragsymclass,"parentsymclasstofragsymclass.txt")
+        WriteDictionaryToFile(poltype,parentsymclasstofragsymclasses,"parentsymclasstofragsymclasses.txt")
         WriteDictionaryToFile(poltype,parentindextofragindex,"parentindextofragindex.txt")
         tempmol=mol_with_atom_index_removed(poltype,fragmol) 
         fragsmarts=rdmolfiles.MolToSmarts(tempmol)
@@ -638,24 +650,17 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 rotkey=rotbndindex.replace('_',' ')
                 tors,maintortors,tortor=GrabParentTorsions(poltype,rotbndindextoringtor,rotbndindex,rotkey)
                 for torsion in tors:
-                    try:
-                        classkey=torgen.get_class_key(poltype,torsion[0],torsion[1],torsion[2],torsion[3])
-                        classkeysplit=classkey.split()
-                        classkeysplit=[int(i) for i in classkeysplit]
-                        fragclasses=[parentsymclasstofragsymclass[k] for k in classkeysplit] 
-                    except:
-                        continue
                     rdkittor=[k-1 for k in torsion] 
                     fragtor=[parentindextofragindex[k] for k in rdkittor]
                     equivfragtor=[indextoequivalentindex[k] for k in fragtor]
                     equivparenttor=[fragindextoparentindex[k] for k in equivfragtor]
                     equivparenttor=[k+1 for k in equivparenttor] 
                     equivclasskey=torgen.get_class_key(poltype,equivparenttor[0],equivparenttor[1],equivparenttor[2],equivparenttor[3])
-                    equivfragclasskey=GenerateFragmentClassKey(poltype,equivclasskey,parentsymclasstofragsymclass)
-
+                    equivfragtorbabel=[k+1 for k in equivfragtor]
+                    equivfragclasskey=[fragidxtosymclass[k] for k in equivfragtorbabel]
+                    equivfragclasskey=[str(k) for k in equivfragclasskey]
+                    equivfragclasskey=' '.join(equivfragclasskey)
                     classkey=torgen.get_class_key(poltype,torsion[0],torsion[1],torsion[2],torsion[3])
-                    fragclasskey=GenerateFragmentClassKey(poltype,classkey,parentsymclasstofragsymclass)
-
                     smilesposstring,fragtorstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,torsion,parentindextofragindex,fragidxarray,indextoequivalentindex)
                     parentclasskeytofragclasskey[classkey]=equivfragclasskey
                     classkeytosmartsposarray[classkey]=smilesposstring
@@ -665,9 +670,9 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                     firsttor=maintortors[0]
                     secondtor=maintortors[1]
                     tortorclskey,tortoratomidxs=torsionfit.GenerateTorTorClasskey(poltype,firsttor,secondtor)
-                    fragclasskey=GenerateFragmentClassKey(poltype,tortorclskey,parentsymclasstofragsymclass)
+                    fragclasskeys=GenerateFragmentClassKeys(poltype,tortorclskey,parentsymclasstofragsymclasses)
+                    
                     smilesposstring,fragtorstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,tortoratomidxs,parentindextofragindex,fragidxarray,indextoequivalentindex)
-
                     parenttortorclasskeytofragtortorclasskey[tortorclskey]=fragclasskey
                     tortorclasskeytosmartsposarray[tortorclskey]=smilesposstring
                     tortorclasskeytosmarts[tortorclskey]=fragsmarts
@@ -688,9 +693,12 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 classkey=str(poltype.idxtosymclass[vdwatomindex])
                 ls=[vdwatomindex] 
                 smilesposstring,fragatomstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,ls,parentindextofragindex,fragidxarray,indextoequivalentindex)
-                fragclasskey=GenerateFragmentClassKey(poltype,classkey,parentsymclasstofragsymclass)
+                fragvdwatomindex=parentindextofragindex[vdwatomindex-1] 
+                equivfragvdwatomindex=indextoequivalentindex[fragvdwatomindex]
+                equivfragvdwatomindex+=1
+                fragclasskey=fragidxtosymclass[equivfragvdwatomindex]
+                fragclasskey=str(fragclasskey)
                 parentclasskeytofragclasskey[classkey]=fragclasskey
-
                 classkeytosmartsposarray[classkey]=smilesposstring
                 classkeytosmarts[classkey]=fragsmarts
                 classkeytoatomindexes[classkey]=fragatomstring
@@ -706,14 +714,6 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
     finishedjobs,errorjobs=SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog)
     return equivalentrotbndindexarrays,rotbndindextoringtor
 
-
-def GenerateFragmentClassKey(poltype,clskey,parentsymclasstofragsymclass):
-    classkeysplit=clskey.split()
-    classkeysplit=[int(i) for i in classkeysplit]
-    fragclasskeysplit=[parentsymclasstofragsymclass[i] for i in classkeysplit]
-    fragclasskeysplit=[str(i) for i in fragclasskeysplit]
-    fragclasskey=' '.join(fragclasskeysplit)
-    return fragclasskey
 
 def GenerateSMARTSPositionStringAndAtomIndices(poltype,torsion,parentindextofragindex,fragidxarray,indextoequivalentindex):
     smilesposarray=[]
@@ -834,7 +834,7 @@ def GenerateFrag(poltype,molindexlist,mol):
         spinmult=oldatom.GetSpinMultiplicity()
     for oldindex,formalcharge in oldindextoformalcharge.items():
         newindex=oldindextonewindex[oldindex]
-        atm=em.GetAtom(newindex) 
+        atm=em.GetAtom(newindex)
         spinmult=atm.GetSpinMultiplicity()
         atm.SetFormalCharge(formalcharge)
 
@@ -861,7 +861,9 @@ def GenerateFrag(poltype,molindexlist,mol):
         bgnidx=oldindextonewindex[obgnidx]
         bondorder=bond.GetBondOrder()
         diditwork=em.AddBond(bgnidx,endidx,bondorder)
-        
+    
+
+
 
     filename='frag.mol'
     WriteOBMolToMol(poltype,em,filename)
@@ -916,6 +918,8 @@ def GenerateFrag(poltype,molindexlist,mol):
 def WriteOBMolToSDF(poltype,mol,outputname):
     tmpconv = openbabel.OBConversion()
     tmpconv.SetOutFormat('sdf')
+    atomiter=openbabel.OBMolAtomIter(mol)
+
     tmpconv.WriteFile(mol,outputname)
 
 
@@ -1144,8 +1148,9 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets,non
 
 
         structfname=structfname.replace('_xyzformat.xyz','.sdf')
+        structfnamemol=structfname.replace('.sdf','.mol')
         rotbndindextofragment[rotbndidx]=fragmol
-        rotbndindextofragmentfilepath[rotbndidx]=fragpath+r'/'+structfname
+        rotbndindextofragmentfilepath[rotbndidx]=fragpath+r'/'+structfnamemol
         rotbndindextoparentindextofragindex[rotbndidx]=parentindextofragindex
         rotbndindextofragWBOmatrix[rotbndidx]=fragWBOmatrix
         rotbndindextofragfoldername[rotbndidx]=fragfoldername
