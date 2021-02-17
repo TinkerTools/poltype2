@@ -1216,7 +1216,7 @@ def MatchOBMols(poltype,molstruct,equivalentmolstruct):
     outputname='temp.mol'
     tmpconv.WriteFile(equivalentmolstruct,outputname)
     newmol=rdmolfiles.MolFromMolFile(outputname,removeHs=False)
-    smarts=rdmolfiles.MolToSmarts(newmol)
+    smarts=rdmolfiles.MolToSmarts(newmol).replace('@','')
     sp = openbabel.OBSmartsPattern()
     openbabel.OBSmartsPattern.Init(sp,smarts)
     diditmatch=sp.Match(molstruct)
