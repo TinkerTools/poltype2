@@ -1478,11 +1478,14 @@ def PruneDictionary(poltype,keysubset,dic):
 
 def TinkerClassesToPoltypeClasses(poltype,indicestotinkerclasses):
     tinkerclassestopoltypeclasses={}
+    poltypeclassesalreadyassigned=[]
     for indices,tinkerclasses in indicestotinkerclasses.items():
         babelindices=[i+1 for i in indices]
         poltypeclasses=[poltype.idxtosymclass[i] for i in babelindices]
         revpoltypeclasses=poltypeclasses[::-1]
         revtinkerclasses=tinkerclasses[::-1]
+        if poltypeclasses in poltypeclassesalreadyassigned or revpoltypeclasses in poltypeclassesalreadyassigned:
+            continue
         if len(indices)>1:
             first=int(tinkerclasses[0])
             second=int(tinkerclasses[-1])
@@ -1505,7 +1508,7 @@ def TinkerClassesToPoltypeClasses(poltype,indicestotinkerclasses):
                         tinkerclasses=tinkerclasses[::-1]
                         poltypeclasses=poltypeclasses[::-1]
 
-                     
+        poltypeclassesalreadyassigned.append(poltypeclasses)                
         if tuple(tinkerclasses) not in tinkerclassestopoltypeclasses.keys():
             tinkerclassestopoltypeclasses[tuple(tinkerclasses)]=[]
         if tuple(poltypeclasses) not in tinkerclassestopoltypeclasses[tuple(tinkerclasses)]: 
@@ -1521,8 +1524,10 @@ def ConvertIndicesDictionaryToPoltypeClasses(poltype,indicestovalue,indicestotin
             tinkerclasses=tuple(indicestotinkerclasses[indices])
             if tinkerclasses in tinkerclassestopoltypeclasses.keys():
                 poltypeclasses=tuple(tinkerclassestopoltypeclasses[tinkerclasses])
-            else:
+            elif tinkerclasses[::-1] in tinkerclassestopoltypeclasses.keys():
                 poltypeclasses=tuple(tinkerclassestopoltypeclasses[tinkerclasses[::-1]])
+            else:
+                continue
 
             poltypeclassestovalue[poltypeclasses]=value
     return poltypeclassestovalue 
@@ -2174,7 +2179,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     planarangleindicestotinkertypes,planarangleindicestotinkerclasses,planarangleindicestoparametersmartsatomorders,planarangleindicestoelementtinkerdescrips,planarangleindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
 
     torsionindicestotinkertypes,torsionindicestotinkerclasses,torsionindicestoparametersmartsatomorders,torsionindicestoelementtinkerdescrips,torsionindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,torsionsforprmtoparametersmarts,torsionsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
-
     indextoneighbidxs=FindAllNeighborIndexes(poltype,rdkitmol)
     torsionsmissing,poormatchingaromatictorsions=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
     atomindextosmartsatomorder=AddExternalDatabaseMatches(poltype, atomindextosmartsatomorder,vdwindicestoextsmarts,vdwsmartsatomordertoparameters)
@@ -2221,6 +2225,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     fname=poltype.smallmoleculeprmlib
     bondprms,angleprms,torsionprms,strbndprms,mpoleprms,opbendprms,polarizeprms,vdwprms,torsiontopitor=GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendtinkerclassestopoltypeclasses,opbendtinkerclassestotrigonalcenterbools,angletinkerclassestopoltypeclasses,torsiontinkerclassestopoltypeclasses,poltypetoprmtype,atomtinkerclasstopoltypeclass,typestoframedefforprmfile,fname,True)
     torsionprms=CorrectPitorEnergy(poltype,torsionprms,torsiontopitor)
+
     bondprms,bondpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,bondprms,bondindicestoextsmarts,bondsmartsatomordertoparameters,'bond')
     angleprms,anglepoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,angleprms,angleindicestoextsmarts,anglesmartsatomordertoparameters,'angle')
     strbndprms,strbndpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,strbndprms,angleindicestoextsmarts,strbndsmartsatomordertoparameters,'strbnd')
