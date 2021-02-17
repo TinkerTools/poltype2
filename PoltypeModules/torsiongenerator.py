@@ -151,7 +151,7 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
         datom=mol.GetAtom(d)
         aatomicnum=aatom.GetAtomicNum()
         datomicnum=datom.GetAtomicNum()
-        if (aatomicnum==1 or datomicnum==1) and allhydtors==False:
+        if (aatomicnum==1 and datomicnum==1) and allhydtors==False:
             continue
 
         babelindices=[b,c]
@@ -166,7 +166,7 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                 datom=mol.GetAtom(rtd)
                 rtaatomicnum=aatom.GetAtomicNum()
                 rtdatomicnum=datom.GetAtomicNum()
-                if (rtaatomicnum==1 or rtdatomicnum==1) and allhydtors==False:
+                if (rtaatomicnum==1 and rtdatomicnum==1) and allhydtors==False:
                     continue
 
                 rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
@@ -306,7 +306,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
         datom=optmol.GetAtom(d)
         aatomicnum=aatom.GetAtomicNum()
         datomicnum=datom.GetAtomicNum()
-        if (aatomicnum==1 or datomicnum==1) and allhydtors==False:
+        if (aatomicnum==1 and datomicnum==1) and allhydtors==False:
             continue
 
 
@@ -321,7 +321,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
                 datom=optmol.GetAtom(resd)
                 aatomicnum=aatom.GetAtomicNum()
                 datomicnum=datom.GetAtomicNum()
-                if (aatomicnum==1 or datomicnum==1) and allhydtors==False:
+                if (aatomicnum==1 and datomicnum==1) and allhydtors==False:
                     continue
 
 
@@ -928,7 +928,7 @@ def get_torlist(poltype,mol,missed_torsions):
         t1atomicnum=t1.GetAtomicNum()
         t4atomicnum=t4.GetAtomicNum()
         allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
-        if (t1atomicnum==1 or t4atomicnum==1) and allhydtors==False and poltype.rotalltors==False:
+        if (t1atomicnum==1 and t4atomicnum==1) and allhydtors==False and poltype.rotalltors==False:
             skiptorsion=True
             hydtorsionlist.append(sortedtor)       
 
@@ -1019,7 +1019,7 @@ def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndli
             datomicnum=obad.GetAtomicNum()
             babelindices=[a2,b2,c2,d2]
             allhydtor=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
-            if allhydtor==False and (aatomicnum==1 or datomicnum==1):
+            if allhydtor==False and (aatomicnum==1 and datomicnum==1):
                 continue
             if tpdkey not in torsionlist:
                 torsionlist.append(tpdkey)
@@ -1139,7 +1139,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                 datom=mol.GetAtom(rtd)
                 rtaatomicnum=aatom.GetAtomicNum()
                 rtdatomicnum=datom.GetAtomicNum()
-                if (rtaatomicnum==1 or rtdatomicnum==1) and allhydtors==False:
+                if (rtaatomicnum==1 and rtdatomicnum==1) and allhydtors==False:
                     continue
 
                 if resttors not in variabletorlist:
@@ -1163,7 +1163,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
             datom=mol.GetAtom(rtd)
             rtaatomicnum=aatom.GetAtomicNum()
             rtdatomicnum=datom.GetAtomicNum()
-            if (rtaatomicnum==1 or rtdatomicnum==1) and allhydtors==False:
+            if (rtaatomicnum==1 and rtdatomicnum==1) and allhydtors==False:
                 continue
 
             rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)

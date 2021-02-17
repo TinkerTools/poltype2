@@ -1364,7 +1364,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         atomicnumatoma=atoma.GetAtomicNum()
         atomicnumatomd=atomd.GetAtomicNum()
         if poltype.transferanyhydrogentor==True and allaro==False: 
-            if atomicnumatoma==1 or atomicnumatomd==1:
+            if atomicnumatoma==1 and atomicnumatomd==1:
                 if allhydrogentor==True:
                     if torsionindices not in torsionsmissing:
                         torsionsmissing.append(torsionindices)
