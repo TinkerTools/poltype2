@@ -928,7 +928,7 @@ def get_torlist(poltype,mol,missed_torsions):
         t1atomicnum=t1.GetAtomicNum()
         t4atomicnum=t4.GetAtomicNum()
         allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
-        if (t1atomicnum==1 or t4atomicnum==1) and allhydtors==False:
+        if (t1atomicnum==1 or t4atomicnum==1) and allhydtors==False and poltype.rotalltors==False:
             skiptorsion=True
             hydtorsionlist.append(sortedtor)       
 
