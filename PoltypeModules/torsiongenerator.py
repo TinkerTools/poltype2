@@ -921,7 +921,7 @@ def get_torlist(poltype,mol,missed_torsions):
         if poltype.rotalltors==True:
             skiptorsion=False
 
-        if bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds:
+        if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False:
             skiptorsion=True
 
         babelindices=[t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()]
