@@ -1386,6 +1386,10 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             else:
                 if torsionindices not in poormatchingaromatictorsions:
                     poormatchingaromatictorsions.append(torsionindices)
+        else:
+            if poltype.rotalltors==True:
+                if torsionindices not in torsionsmissing:
+                    torsionsmissing.append(torsionindices)
 
     return torsionsmissing,poormatchingaromatictorsions 
 
