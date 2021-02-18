@@ -1330,26 +1330,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         atomnums=[a.GetAtomicNum() for a in babelatoms]
         batomnum=atomnums[1]
         catomnum=atomnums[2]
-        needcontin=False
-        if batomnum==15:
-            iteratomatom = openbabel.OBAtomAtomIter(babelatoms[2])
-            for iaa in iteratomatom:
-                idx=iaa.GetIdx()
-                if idx!=babelindices[1]:
-                    val=iaa.GetValence()
-                    if val==1:
-                        needcontin=True
-        elif catomnum==15:
-            iteratomatom = openbabel.OBAtomAtomIter(babelatoms[1])
-            for iaa in iteratomatom:
-                idx=iaa.GetIdx()
-                if idx!=babelindices[2]:
-                    val=iaa.GetValence()
-                    if val==1:
-                        needcontin=True
-        if needcontin==True:
-            continue
-   
+           
         ringbools=[a.IsInRing() for a in babelatoms]
         arobools=[a.IsAromatic() for a in babelatoms]
         contin=False
