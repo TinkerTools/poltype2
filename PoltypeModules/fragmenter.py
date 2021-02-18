@@ -466,6 +466,8 @@ def FindEquivalentFragments(poltype,fragmentarray,namearray):
         refname=namearray[smartidx]
         reffragment=fragmentarray[smartidx]
         refsmartsmol=Chem.MolFromSmarts(refsmarts)
+        refsmartsatoms=refsmartsmol.GetNumAtoms()
+
         nametemp=[]
         nametemp.append(refname)
         for anothersmartidx in range(len(smartsarray)):
@@ -474,8 +476,9 @@ def FindEquivalentFragments(poltype,fragmentarray,namearray):
                 name=namearray[anothersmartidx]
                 fragment=fragmentarray[anothersmartidx]
                 smartsmol=Chem.MolFromSmarts(smarts)
+                smartsatoms=smartsmol.GetNumAtoms()
                 match = refsmartsmol.HasSubstructMatch(smartsmol)
-                if match==True:
+                if match==True and refsmartsatoms==smartsatoms:
                     nametemp.append(name)
         if set(nametemp) not in equivalentnamesarrayset:
             equivalentnamesarrayset.append(set(nametemp))
@@ -1217,18 +1220,15 @@ def MatchOBMols(poltype,molstruct,equivalentmolstruct):
     tmpconv.WriteFile(equivalentmolstruct,outputname)
     newmol=rdmolfiles.MolFromMolFile(outputname,removeHs=False)
     smarts=rdmolfiles.MolToSmarts(newmol).replace('@','')
-    sp = openbabel.OBSmartsPattern()
-    openbabel.OBSmartsPattern.Init(sp,smarts)
-    diditmatch=sp.Match(molstruct)
-    matches=list(sp.GetMapList())
+    tmpconv.WriteFile(molstruct,outputname)
+    molstructrdkit=rdmolfiles.MolFromMolFile(outputname,removeHs=False)
+    p = Chem.MolFromSmarts(smarts)
+    matches=molstructrdkit.GetSubstructMatches(p) 
     firstmatch=matches[0]
-    firstmatch=[i-1 for i in firstmatch]
     indices=list(range(len(firstmatch)))
     smartsindextomoleculeindex=dict(zip(indices,firstmatch)) 
-    diditmatch=sp.Match(equivalentmolstruct)
-    matches=sp.GetMapList()
+    matches=newmol.GetSubstructMatches(p) 
     firstmatch=matches[0]
-    firstmatch=[i-1 for i in firstmatch]
     indices=list(range(len(firstmatch)))
     smartsindextoequivalentmoleculeindex=dict(zip(indices,firstmatch)) 
     moleculeindextosmartsindex={v: k for k, v in smartsindextomoleculeindex.items()}
