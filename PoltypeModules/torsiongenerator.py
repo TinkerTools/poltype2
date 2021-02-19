@@ -822,11 +822,12 @@ def FindPartialDoubleBonds(poltype,rdkitmol):
 
 def RdkitIsInRing(poltype,atom):
     isinringofsize=False
+    i=None
     for i in range(3,13+1):
         isinringofsize=atom.IsInRingSize(i)
         if isinringofsize==True:
             break
-    return isinringofsize
+    return isinringofsize,i
 
 
 def GrabRingAtoms(poltype,neighbatom):
@@ -837,11 +838,15 @@ def GrabRingAtoms(poltype,neighbatom):
     while prevringidxlen!=ringidxlen:
         for atmindex in ringindexes:
             atm=poltype.rdkitmol.GetAtomWithIdx(atmindex)
-            if RdkitIsInRing(poltype,atm)==True and atmindex not in ringindexes:
+            ringbool,ringsize=RdkitIsInRing(poltype,atm)
+           
+            if ringbool==True and atmindex not in ringindexes:
                 ringindexes.append(atmindex)
             for natm in atm.GetNeighbors():
-                if RdkitIsInRing(poltype,natm)==True and natm.GetIdx() not in ringindexes:
-                    ringindexes.append(natm.GetIdx())
+                ringbool,nringsize=RdkitIsInRing(poltype,natm)
+                if ringbool==True and natm.GetIdx() not in ringindexes:
+                    if nringsize==ringsize:
+                        ringindexes.append(natm.GetIdx())
         prevringidxlen=ringidxlen
         ringidxlen=len(ringindexes)
 
@@ -905,7 +910,6 @@ def get_torlist(poltype,mol,missed_torsions):
             continue
         anyarot2=CheckForAnyAromaticsInRing(poltype,t2idx)
         anyarot3=CheckForAnyAromaticsInRing(poltype,t3idx)
-
         if anyarot2==True and anyarot3==True and ringbond==True:
             continue
         if t2val<2 or t3val<2:
@@ -914,14 +918,15 @@ def get_torlist(poltype,mol,missed_torsions):
         sortedtor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]])
         if(sortedtor in missed_torsions) and len(poltype.onlyrotbndslist)==0:
             skiptorsion = False
+        onlyrot=False
         if [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist:
             skiptorsion = False
-        
+            onlyrot=True
 
         if poltype.rotalltors==True:
             skiptorsion=False
 
-        if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False:
+        if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False and onlyrot==False:
             skiptorsion=True
 
         babelindices=[t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()]

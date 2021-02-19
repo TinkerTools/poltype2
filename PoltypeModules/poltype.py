@@ -1168,8 +1168,8 @@ class PolarizableTyper():
             atomnum+=1
 
 
-        if atomnum<25:
-            self.dontfrag=True 
+        #if atomnum<25: TEMP FOR TESTING TORTOR
+        #    self.dontfrag=True 
         self.RemoveCartesianXYZFiles()
  
         self.WriteToLog("Running on host: " + gethostname())

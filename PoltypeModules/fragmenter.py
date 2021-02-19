@@ -73,7 +73,7 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
                 if len(maintortors)>0:
                     firsttor=maintortors[0]
                     secondtor=maintortors[1]
-                    tortorclskey,tortoratomidxs=torsionfit.GenerateTorTorClasskey(poltype,firsttor,secondtor)
+                    tortorclskey,tortoratomidxs=torsionfit.GenerateTorTorClasskey(poltype,firsttor,secondtor,poltype.idxtosymclass)
                     fwdsplit=tortorclskey.split()        
                     revsplit=fwdsplit[::-1]
                     rev='%d %d %d %d %d' % (int(revsplit[0]), int(revsplit[1]), int(revsplit[2]), int(revsplit[3]),int(revsplit[4]))
@@ -117,7 +117,7 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
             if '.key_5' in ff:
                 foundkey5=True
                 parentindextofragindex=json.load(open("parentindextofragindex.txt"))
-                parentsymclasstofragsymclass=json.load(open("parentsymclasstofragsymclass.txt"))
+                parentsymclasstofragsymclasses=json.load(open("parentsymclasstofragsymclasses.txt"))
                 classkeytosmartsposarray=json.load(open("classkeytosmartsposarray.txt"))
                 classkeytosmarts=json.load(open("classkeytosmarts.txt"))
                 parentclasskeytofragclasskey=json.load(open("parentclasskeytofragclasskey.txt"))
@@ -207,20 +207,21 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
                     elif 'vdw' in line and '#' not in line and vdwfragment==True:
                         fragclasskey=linesplit[1]
                         fragsymclass=int(fragclasskey)
-                        if fragsymclass in parentsymclasstofragsymclass.values():
-                            parentclasskeys=GrabKeysFromValue(poltype,parentsymclasstofragsymclass,fragsymclass)
-                            for parentsymclass in parentclasskeys:
-                                classkey=str(parentsymclass)
-                                prms=linesplit[2:]
-                                if classkey in classkeytosmartsposarray.keys():
-                                    smartsposarray=classkeytosmartsposarray[classkey]
-                                    atomindexes=classkeytoatomindexes[classkey]
-                                    smarts=classkeytosmarts[classkey]
-                                    classkeytoatomindexescollected[classkey]=atomindexes
-                                    classkeytosmartscollected[classkey]=smarts
-                                    classkeytosmartsposarraycollected[classkey]=smartsposarray
-                                    classkeytoparameters[classkey]=prms
-                                    classkeytofragmentfilename[classkey]=filename
+                        for ls in parentsymclasstofragsymclasses.values():
+                            if fragsymclass in ls:
+                                parentclasskeys=GrabKeysFromValue(poltype,parentsymclasstofragsymclass,fragsymclass)
+                                for parentsymclass in parentclasskeys:
+                                    classkey=str(parentsymclass)
+                                    prms=linesplit[2:]
+                                    if classkey in classkeytosmartsposarray.keys():
+                                        smartsposarray=classkeytosmartsposarray[classkey]
+                                        atomindexes=classkeytoatomindexes[classkey]
+                                        smarts=classkeytosmarts[classkey]
+                                        classkeytoatomindexescollected[classkey]=atomindexes
+                                        classkeytosmartscollected[classkey]=smarts
+                                        classkeytosmartsposarraycollected[classkey]=smartsposarray
+                                        classkeytoparameters[classkey]=prms
+                                        classkeytofragmentfilename[classkey]=filename
 
 
 
@@ -300,8 +301,7 @@ def ConstructVdwLineFromFragment(poltype,key,classkeytofragmentfilename,classkey
 def WriteOutDatabaseLines(poltype,valenceprmlist):
     newtemp=open(poltype.databaseprmfilename,'w')
     for line in valenceprmlist:
-        if line not in results:
-            newtemp.write(line)
+        newtemp.write(line)
     newtemp.close()
 
 
@@ -629,6 +629,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         os.chdir(head)
         if vdwfragment==False:
             MakeFileName(poltype,strparentrotbndindexes,'torsions.txt')
+        
         WriteDictionaryToFile(poltype,parentsymclasstofragsymclasses,"parentsymclasstofragsymclasses.txt")
         WriteDictionaryToFile(poltype,parentindextofragindex,"parentindextofragindex.txt")
         tempmol=mol_with_atom_index_removed(poltype,fragmol) 
@@ -672,11 +673,20 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 if tortor==True:
                     firsttor=maintortors[0]
                     secondtor=maintortors[1]
-                    tortorclskey,tortoratomidxs=torsionfit.GenerateTorTorClasskey(poltype,firsttor,secondtor)
-                    fragclasskeys=GenerateFragmentClassKeys(poltype,tortorclskey,parentsymclasstofragsymclasses)
-                    
+                    tortorclskey,tortoratomidxs=torsionfit.GenerateTorTorClasskey(poltype,firsttor,secondtor,poltype.idxtosymclass)
+                    firstrdkittor=[k-1 for k in firsttor]
+                    secondrdkittor=[k-1 for k in secondtor]
+                    firstfragtor=[parentindextofragindex[k] for k in firstrdkittor]
+                    secondfragtor=[parentindextofragindex[k] for k in secondrdkittor]
+                    firstequivfragtor=[indextoequivalentindex[k] for k in firstfragtor]
+                    secondequivfragtor=[indextoequivalentindex[k] for k in secondfragtor]
+                    firstequivfragtorbabel=[k+1 for k in firstequivfragtor]
+                    secondequivfragtorbabel=[k+1 for k in secondequivfragtor]
+                    fragtortorclskey,fragtortoratomidxs=torsionfit.GenerateTorTorClasskey(poltype,firstequivfragtorbabel,secondequivfragtorbabel,fragidxtosymclass)
+
+
                     smilesposstring,fragtorstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,tortoratomidxs,parentindextofragindex,fragidxarray,indextoequivalentindex)
-                    parenttortorclasskeytofragtortorclasskey[tortorclskey]=fragclasskey
+                    parenttortorclasskeytofragtortorclasskey[tortorclskey]=fragtortorclskey
                     tortorclasskeytosmartsposarray[tortorclskey]=smilesposstring
                     tortorclasskeytosmarts[tortorclskey]=fragsmarts
                     tortorclasskeytotorsionindexes[tortorclskey]=fragtorstring

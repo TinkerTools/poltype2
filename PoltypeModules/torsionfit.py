@@ -799,7 +799,7 @@ def CheckFitParameters(poltype,pzero,boundstup,parm_sanitized,refine,keylist,tor
                 foldtoparmslist[nfold].append(parm)
                 if abs(parm) > max_amp:
                     parm_sanitized = False
-                    indicesmodified.apend(index)
+                    indicesmodified.append(index)
                     newparmguess,bounds=GenerateNewParmGuessAndBounds(poltype,parm) 
                     parameterinfo.append([newparmguess,bounds,index])
                     break
@@ -1428,7 +1428,7 @@ def PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle
         tormat,qmmat,mmmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,cls_angle_dict[tup],tor_energy_list,qm_energy_list,mm_energy_list,torset)
         firsttor=torsions[0]
         secondtor=torsions[1]
-        tortorclskey,atomidxs=GenerateTorTorClasskey(poltype,firsttor,secondtor)
+        tortorclskey,atomidxs=GenerateTorTorClasskey(poltype,firsttor,secondtor,poltype.idxtosymclass)
         firstanglerow=idealanglematrix[0,:]
         firstrow=tormat[0,:]
         firstqmrow=qmmat[0,:]
@@ -1524,7 +1524,7 @@ def PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle
     temp.flush()
     temp.close()
 
-def GenerateTorTorClasskey(poltype,firsttor,secondtor):
+def GenerateTorTorClasskey(poltype,firsttor,secondtor,idxtosymclass):
     if set(firsttor[2:])==set(secondtor[2:]):
         pass
     else:
@@ -1532,7 +1532,7 @@ def GenerateTorTorClasskey(poltype,firsttor,secondtor):
     firsttor=firsttor[:-1]
     secondtor=secondtor[:-1]
     tortoratomidxs=[secondtor[0],secondtor[1],secondtor[2],firsttor[1],firsttor[0]]
-    tortortypeidxs=[poltype.idxtosymclass[j] for j in tortoratomidxs]
+    tortortypeidxs=[idxtosymclass[j] for j in tortoratomidxs]
     tortortypeidxs=[str(j) for j in tortortypeidxs]
     tortorclskey=' '.join(tortortypeidxs)
     return tortorclskey,tortoratomidxs

@@ -1436,6 +1436,66 @@ def ZeroOutMissingStrbnd(poltype,anglemissingtinkerclassestopoltypeclasses,strbn
 
     return newstrbndprms
 
+def AssignAngleGuessParameters(poltype,angletinkerclassestoexampleindices,anglemissingtinkerclassestopoltypeclasses,angleprms):
+    newangleprms=[]
+    for line in angleprms:
+        linesplit=line.split()
+        classes=tuple([int(linesplit[1]),int(linesplit[2]),int(linesplit[3])])
+        for tinkerclasses,sublist in anglemissingtinkerclassestopoltypeclasses.items():
+            found=False
+            if classes in sublist:
+                found=True
+            elif classes[::-1] in sublist: 
+                found=True
+            if found==True:
+                if tinkerclasses in angletinkerclassestoexampleindices.keys(): 
+                    exampleindices=angletinkerclassestoexampleindices[tinkerclasses]
+                elif tinkerclasses[::-1] in angletinkerclassestoexampleindices.keys(): 
+                    exampleindices=angletinkerclassestoexampleindices[tinkerclasses[::-1]]
+
+                atoms=[poltype.rdkitmol.GetAtomWithIdx(k) for k in exampleindices]
+                atomicnums=[a.GetAtomicNum() for a in atoms]
+                atomicval=[a.GetExplicitValence() for a in atoms]
+
+                angleguess=AngleGuess(poltype,atomicnums[0],atomicnums[1],atomicnums[2],atomicval[0],atomicval[1],atomicval[2])
+                newlinesplit=re.split(r'(\s+)', line)
+                newlinesplit[8]=str(angleguess)
+                line=''.join(newlinesplit)
+        newangleprms.append(line)
+
+    return newangleprms
+
+def AssignBondGuessParameters(poltype,bondtinkerclassestoexampleindices,bondmissingtinkerclassestopoltypeclasses,bondprms):
+    newbondprms=[]
+    for line in bondprms:
+        linesplit=line.split()
+        classes=tuple([int(linesplit[1]),int(linesplit[2])])
+        for tinkerclasses,sublist in bondmissingtinkerclassestopoltypeclasses.items():
+            found=False
+            if classes in sublist:
+                found=True
+            elif classes[::-1] in sublist: 
+                found=True
+            if found==True:
+                if tinkerclasses in bondtinkerclassestoexampleindices.keys(): 
+                    exampleindices=bondtinkerclassestoexampleindices[tinkerclasses]
+                elif tinkerclasses[::-1] in bondtinkerclassestoexampleindices.keys(): 
+                    exampleindices=bondtinkerclassestoexampleindices[tinkerclasses[::-1]]
+
+                atoms=[poltype.rdkitmol.GetAtomWithIdx(k) for k in exampleindices]
+                atomicnums=[a.GetAtomicNum() for a in atoms]
+                atomicval=[a.GetExplicitValence() for a in atoms]
+
+                bondguess=BondGuess(poltype,atomicnums[0],atomicnums[1],atomicval[0],atomicval[1])
+                newlinesplit=re.split(r'(\s+)', line)
+                newlinesplit[6]=str(bondguess)
+                line=''.join(newlinesplit)
+        newbondprms.append(line)
+
+    return newbondprms
+
+
+
 
 def ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,torsionprms):
     newtorsionprms=[]
@@ -2143,8 +2203,309 @@ def AddExternalDatabaseMatches(poltype, indicestosmartsatomorder,extindicestoext
                 newindicestosmartsatomorder[indices]=list(smartsatomorder)         
         
     return newindicestosmartsatomorder   
+   
+def AngleGuess(poltype,ita,itb,itc,iva,ivb,ivc):
+    radian=57.29577951
+    angunit = 1.0 / radian**2
+    if (itb==6):
+       if (ita==1):
+          if (ivb==4):
+             if (itc==1):
+                angguess = 34.50
+             elif (itc==6):
+                angguess = 38.0
+             elif (itc==7):
+                angguess = 50.60
+             elif (itc==8):
+                angguess = 51.50
+             elif (itc==9):
+                angguess = 50.0
+             else:
+                angguess = 35.0
+          elif (ivb==3):
+             angguess = 32.00
+          else:
+             angguess = 32.00
+       elif (ita==6):
+          if (ivb==4):
+             if (itc==6):
+                angguess = 60.00
+             elif (itc==7):
+                angguess = 80.00
+             elif (itc==8):
+                angguess = 88.00
+             elif (itc==9):
+                angguess = 89.00
+             elif (itc==14):
+                angguess = 65.00
+             elif (itc==15):
+                angguess = 60.00
+             elif (itc==16):
+                angguess = 53.20
+             elif(itc==17):
+                angguess = 55.00
+             else:
+                angguess = 50.00
+          elif (ivb==3):
+             angguess = 60.00
+          else:
+             angguess = 60.00
+       elif (ita==8):
+          if (ivb==4):
+             if (itc==8):
+                angguess = 65.00
+             elif (itc==9):
+                angguess = 65.00
+             elif (itc==15):
+                angguess = 60.00
+             elif (itc==16):
+                angguess = 65.00
+             else:
+                angguess = 65.00
+             
+          elif (ivb==3):
+             angguess = 50.00
+          else:
+             angguess = 60.00
+          
+       else:
+          angguess = 60.00
+       
+    elif (itb==8):
+       if (ita==1):
+          if (itc==1):
+             angguess = 34.05
+          elif (itc==6):
+             angguess = 65.00
+          else:
+             angguess = 60.00
+          
+       elif (ita==6):
+          if (itc==6):
+             angguess = 88.50
+          elif (itc==8):
+             if (iva==1 or ivc==1):
+                angguess = 122.30
+             else:
+                angguess = 85.00
+             
+          elif (itc==15):
+             angguess = 80.30
+          else:
+             angguess = 80.0
+          
+       else:
+          angguess = 80.0
+       
+    elif (itb==15):
+       if (ita==1):
+          angguess = 30.0
+       elif (ita==6):
+          if (itc==6):
+             angguess = 75.00
+          elif (itc==8):
+             angguess = 80.00
+          else:
+             angguess = 75.00
+         
+       elif (ita==8):
+          if (itc==8):
+             if (iva==1 and ivc==1):
+                angguess = 89.88
+             elif (iva==1 or ivc==1):
+                angguess = 75.86
+             else:
+                angguess = 65.58
+             
+          else:
+             angguess = 70.00
+          
+       else:
+          angguess = 75.00
+       
+    elif (itb==16):
+       if (ita==1):
+          angguess = 30.00
+       elif (ita==6):
+          if (itc==16):
+             angguess = 72.00
+          else:
+             angguess = 80.00
+          
+       elif (ita==8):
+          if (itc==8):
+             if (iva==1 and ivc==1):
+                angguess = 168.00
+             elif (iva==1 or ivc==1):
+                angguess = 85.00
+             else:
+                angguess = 80.00
+             
+          elif (itc==16):
+             angguess = 75.00
+          else:
+             angguess = 75.00
+          
+       else:
+          angguess = 75.00
+       
+    elif (ita==1):
+       angguess = 35.00
+    else:
+       angguess = 65.00
     
+    angguess = angguess / (angunit*radian**2)
+    return angguess
+ 
+ 
+def BondGuess(poltype,ita,itb,iva,ivb):
+    bndunit=1
+    if (ita==1):
+         if (itb==6):
+            if (ivb==3):
+               bndguess = 410.0
+            elif (ivb==4):
+               bndguess = 400.0
+            else:
+               bndguess = 400.0
+            
+         elif (itb==7):
+            bndguess = 520.0
+         elif (itb==8):
+            bndguess = 560.0
+         elif (itb==9):
+            bndguess = 500.0
+         elif (itb==14):
+            bndguess = 200.0
+         elif (itb==15):
+            bndguess = 230.0
+         elif (itb==16):
+            bndguess = 260.0
+         else:
+            bndguess = 300.0
+         
+    elif (ita==6):
+       if (itb==6):
+          if (iva==3 and ivb==3):
+             bndguess = 680.0
+          elif (iva==4 or ivb==4):
+             bndguess = 385.0
+          else:
+             bndguess = 350.0
+          
+       elif (itb==7):
+          if (iva==3 and ivb==2):
+             bndguess = 435.0
+          elif (iva==3 and ivb==3):
+             bndguess = 250.0
+          elif (iva==4):
+             bndguess = 400.0
+          else:
+             bndguess = 450.0
+          
+       elif (itb==8):
+          if (ivb==1):
+             bndguess = 680.0
+          elif (ivb==2):
+             bndguess = 465.0
+          else:
+             bndguess = 465.0
+          
+       elif (itb==9):
+          bndguess = 350.0
+       elif (itb==14):
+          bndguess = 350.0
+       elif (itb==15):
+          bndguess = 350.0
+       elif (itb==16):
+          bndguess = 216.0
+       elif (itb==17):
+          bndguess = 350.0
+       else:
+          bndguess = 450.0
+       
+    elif (ita==7):
+       if (itb==7):
+          if (iva==1):
+             bndguess = 1613.0
+          elif (iva==2 and ivb==2):
+             bndguess = 950.0
+          else:
+             bndguess = 850.0
+          
+       elif (itb==8):
+          if (ivb==1):
+             bndguess = 900.0
+          else:
+             bndguess = 750.0
+          
+       elif (itb==14):
+          bndguess = 450.0
+       elif (itb==15):
+          bndguess = 500.0
+       elif (itb==16):
+          bndguess = 550.0
+       else:
+          bndguess = 600.0
+       
+    elif (ita==8):
+       if (itb==8):
+          bndguess = 750.0
+       elif (itb==14):
+          bndguess = 500.0
+       elif (itb==15):
+          if (iva==2):
+             bndguess = 450.0
+          elif (iva==1):
+             bndguess = 775.0
+          else:
+             bndguess = 450.0
+          
+       elif (itb==16):
+          bndguess = 606.0
+       elif (itb==17):
+          bndguess = 500.0
+       else:
+          bndguess = 600.0
+       
+    elif (ita==14):
+       if (itb==14):
+          bndguess = 400.0
+       elif (itb==15):
+          bndguess = 450.0
+       elif (itb==16):
+          bndguess = 500.0
+       elif (itb==17):
+          bndguess = 650.0
+       else:
+          bndguess = 450.0
+      
+    elif (ita==16):
+       if (itb==16):
+          bndguess = 188.0
+       else:
+          bndguess = 250.0
+       
+    elif (ita==17):
+       bndguess = 300.0
+    else:
+       bndguess = 350.0
+      
+    bndguess = bndguess / bndunit
+    return bndguess 
 
+def ReverseDictionaryValueList(poltype,keytovalues):
+    valuetokey={}
+    for key,value in keytovalues.items():
+        for ls in value:
+            valuetokey[tuple(ls)]=list(key)
+    return valuetokey
+
+def ReverseDictionary(poltype,keytovalues):
+    valuetokey={}
+    for key,value in keytovalues.items():
+        valuetokey[tuple(value)]=list(key)
+    return valuetokey
 
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters=ReadExternalDatabase(poltype)
@@ -2209,10 +2570,14 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     bondmissing=FindMissingParameters(poltype,bondindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
     anglemissing=FindMissingParameters(poltype,angleindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
     anglemissingindicestotinkerclasses=PruneDictionary(poltype,anglemissing,angleindicestotinkerclasses)
+    angletinkerclassestoexampleindices=ReverseDictionary(poltype,angleindicestotinkerclasses)
+    bondmissingindicestotinkerclasses=PruneDictionary(poltype,bondmissing,bondindicestotinkerclasses)
+    bondtinkerclassestoexampleindices=ReverseDictionary(poltype,bondmissingindicestotinkerclasses)
 
     torsionsmissingindicestotinkerclasses=PruneDictionary(poltype,torsionsmissing,torsionindicestotinkerclasses)
     atomtinkerclasstopoltypeclass=TinkerClassesToPoltypeClasses(poltype,atomindextotinkerclass)
     bondtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,bondindicestotinkerclasses)
+    
     arotorsionsmissingindicestotinkerclasses=PruneDictionary(poltype,poormatchingaromatictorsions,torsionindicestotinkerclasses)
     planarbondtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,planarbondindicestotinkerclasses)
     opbendtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,opbendbondindicestotinkerclasses)
@@ -2220,12 +2585,16 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     opbendbondindicestotrigonalcenterbools=CheckTrigonalCenters(poltype,listofbondsforprm,mol)
     opbendtinkerclassestotrigonalcenterbools=TinkerClassesToTrigonalCenter(poltype,opbendbondindicestotinkerclasses,opbendbondindicestotrigonalcenterbools)
     angletinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,angleindicestotinkerclasses)
+    anglepoltypeclassestotinkerclasses=ReverseDictionaryValueList(poltype,angletinkerclassestopoltypeclasses)
+   
     planarangletinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,planarangleindicestotinkerclasses)
     torsiontinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,torsionindicestotinkerclasses)
     torsionsmissingtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,torsionsmissingindicestotinkerclasses)
     arotorsionsmissingtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,arotorsionsmissingindicestotinkerclasses)
     anglemissingtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,anglemissingindicestotinkerclasses)
-
+    bondmissingtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,bondmissingindicestotinkerclasses)
+    
+    bondpoltypeclassestotinkerclasses=ReverseDictionaryValueList(poltype,bondtinkerclassestopoltypeclasses)
     torsionpoltypeclassestoparametersmartsatomorders=ConvertIndicesDictionaryToPoltypeClasses(poltype,torsionindicestoparametersmartsatomorders,torsionindicestotinkerclasses,torsiontinkerclassestopoltypeclasses)
     torsionpoltypeclassestosmartsatomorders=ConvertIndicesDictionaryToPoltypeClasses(poltype,torsionindicestosmartsatomorders,torsionindicestotinkerclasses,torsiontinkerclassestopoltypeclasses)
     torsionpoltypeclassestoelementtinkerdescrips=ConvertIndicesDictionaryToPoltypeClasses(poltype,torsionindicestoelementtinkerdescrips,torsionindicestotinkerclasses,torsiontinkerclassestopoltypeclasses)
@@ -2258,6 +2627,9 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     opbendprms,opbendpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,opbendprms,bondindicestoextsmarts,bondsmartsatomordertoparameters,'opbend')
     vdwprms,vdwpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,vdwprms,vdwindicestoextsmarts,vdwsmartsatomordertoparameters,'vdw')
     strbndprms=ZeroOutMissingStrbnd(poltype,anglemissingtinkerclassestopoltypeclasses,strbndprms)
+    angleprms=AssignAngleGuessParameters(poltype,angletinkerclassestoexampleindices,anglemissingtinkerclassestopoltypeclasses,angleprms)
+    bondprms=AssignBondGuessParameters(poltype,bondtinkerclassestoexampleindices,bondmissingtinkerclassestopoltypeclasses,bondprms)
+
     angleprms=ModifyAngleKeywords(poltype,angleprms,planarangletinkerclassestopoltypeclasses)
     bondlistbabel=ConvertToBabelList(poltype,listofbondsforprm)
     anglelistbabel=ConvertToBabelList(poltype,listofanglesforprm)
