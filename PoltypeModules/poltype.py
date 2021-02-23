@@ -926,66 +926,58 @@ class PolarizableTyper():
                     self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
                     raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
 
-    def WriteOutLiteratureReferences(self,keyfilename): # to use ParmEd on key file need Literature References delimited for parsing
-        temp=open(keyfilename,'r')
-        results=temp.readlines()
-        temp.close()
-        tempname=keyfilename.replace('.key','_temp.key')
-        temp=open(tempname,'w')
-        foundatomblock=False
-        for i in range(len(results)):
-            line=results[i]
-            if 'atom' in line and foundatomblock==False:
-                foundatomblock=True
-                temp.write('#############################'+'\n')
-                temp.write('##                         ##'+'\n')
-                temp.write('##  Literature References  ##'+'\n')
-                temp.write('##                         ##'+'\n')
-                temp.write('#############################'+'\n')
-                temp.write('\n')
-                temp.write('Wu, J.C.; Chattree, G.; Ren, P.Y.; Automation of AMOEBA polarizable force field'+'\n')
-                temp.write('parameterization for small molecules. Theor Chem Acc.'+'\n')
-                temp.write('\n')
-                temp.write(line)
-            else:
-                temp.write(line)
+    def WriteOutLiteratureReferences(self, keyfilename): # to use ParmEd on key file need Literature References delimited for parsing
+        with open(keyfilename, "r") as temp:
+            results = temp.readlines()
+        tempname = keyfilename.replace('.key','_temp.key')
+        with open(tempname, "w") as temp:
+            foundatomblock = False
+            for line in results:
+                if 'atom' in line and not foundatomblock:
+                    foundatomblock=True
+                    temp.write('#############################'+'\n')
+                    temp.write('##                         ##'+'\n')
+                    temp.write('##  Literature References  ##'+'\n')
+                    temp.write('##                         ##'+'\n')
+                    temp.write('#############################'+'\n')
+                    temp.write('\n')
+                    temp.write('Wu, J.C.; Chattree, G.; Ren, P.Y.; Automation of AMOEBA polarizable force field'+'\n')
+                    temp.write('parameterization for small molecules. Theor Chem Acc.'+'\n')
+                    temp.write('\n')
+                    temp.write(line)
+                else:
+                    temp.write(line)
         os.remove(keyfilename)
-        os.replace(tempname,keyfilename)    
+        os.replace(tempname, keyfilename)
 
-    def RaiseOutputFileError(self,logname):
-        raise ValueError('An error occured for '+logname) 
+    def RaiseOutputFileError(self, logname):
+        raise ValueError(f"An error occured for {logname}") 
 
-    def WritePoltypeInitializationFile(self,poltypeinput):
-        inifilepath=os.getcwd()+r'/'+'poltype.ini'
-        temp=open(inifilepath,'w')
-        for key,value in poltypeinput.items():
-            line=key+'='+str(value)+'\n'
-            temp.write(line)
-        temp.close()
+    def WritePoltypeInitializationFile(self, poltypeinput):
+        inifilepath = os.path.abspath("poltype.ini")
+        with open(inifilepath, "w") as temp:
+            for key, value in poltypeinput.items():
+                line = f"{key}={value}\n"
+                temp.write(line)
         return inifilepath
 
-    def CheckTorsionParameters(self,keyfilename,torsionsmissing,hydtorsions): # dont check torsions skipped due to rule that if a-b-c-d, a or d is hydroten and not all possible a and d around b-c is hydrogen then torsion is skipped, if database transfers all zeros do not check
-        temp=open(keyfilename,'r')
-        results=temp.readlines()
-        temp.close()
+    def CheckTorsionParameters(self, keyfilename, torsionsmissing, hydtorsions):
+        """
+        don't check torsions skipped due to rule that if a-b-c-d,
+        # a or d is hydrogen and not all possible a and d around b-c is hydrogen
+        then torsion is skipped, if database transfers all zeros do not check
+        """
+        with open(keyfilename, 'r') as temp:
+            results = temp.readlines()
         for line in results:
             if 'torsion' in line and '#' not in line:
-                allzero=True
-                linesplit=line.split()
-                ls=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3]),int(linesplit[4])]
-                revls=ls[::-1]
+                linesplit = line.split()
+                ls = [int(l) for l in linesplit[1:5]]
+                revls = ls[::-1]
                 if (ls in torsionsmissing or revls in torsionsmissing) and (ls not in hydtorsions or revls not in hydtorsions):
-                    pass
-                else:
-                    continue
-                prms=linesplit[5:]
-                newprms=prms[0::3]
-                newprms=[float(i) for i in newprms]
-                for prm in newprms:
-                    if prm!=0:
-                        allzero=False
-                if allzero==True:
-                    raise ValueError("torsion parameters are all zero "+line+' path ='+os.getcwd())
+                    prms = [float(i) for i in linesplit[5::3]]
+                    if not any(prms):
+                        raise ValueError(f"Torsion parameters are all zero {line} path = {os.getcwd()}")
 
     def main(self):
          
