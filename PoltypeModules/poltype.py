@@ -1049,24 +1049,27 @@ class PolarizableTyper():
                     os.remove(f)
 
     def CheckMemorySettings(self):
-        proc=int(self.numproc)
-        if proc>8:
+        proc = int(self.numproc)
+        if proc > 8:
             raise ValueError('Too many input processors, lower the numproc value to 8 or less')
-        maxmem_value,maxdisk_value=self.GenerateMemoryValues() 
-        if maxmem_value<50:
-            if maxdisk_value<2*maxmem_value:
-                raise ValueError('Increase maxdisk value to twice maxmem value')
-           
+        maxmem_value, maxdisk_value = self.GenerateMemoryValues()
+        if (maxmem_value < 50) and (maxdisk_value < 2*maxmem_value):
+            raise ValueError('Increase maxdisk value to twice maxmem value')
+
     def GenerateMemoryValues(self):
         if 'MB' in self.maxmem:
-            maxmem_value=float(self.maxmem[:-2])*.001 # convert to GB
+            maxmem_value = float(self.maxmem[:-2])*.001 # convert to GB
         elif 'GB' in self.maxmem:
-            maxmem_value=float(self.maxmem[:-2])           
+            maxmem_value = float(self.maxmem[:-2])
+        else:
+            raise ValueError("maxmem must have units of MB or GB attached (e.g. \"700MB\")")
         if 'MB' in self.maxdisk:
             maxdisk_value=float(self.maxdisk[:-2])*.001 # convert to GB
-        elif 'GB' in self.maxmem:
-            maxdisk_value=float(self.maxdisk[:-2])  
-        return maxmem_value,maxdisk_value         
+        elif 'GB' in self.maxdisk:
+            maxdisk_value=float(self.maxdisk[:-2])
+        else:
+            raise ValueError("maxmem must have units of MB or GB attached (e.g. \"100GB\")")
+        return maxmem_value, maxdisk_value
 
 
     def CheckInputCharge(self,molecule):
