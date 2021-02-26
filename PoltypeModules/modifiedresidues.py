@@ -2032,8 +2032,8 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
             temp.close()
 
     else:
-        maxcorenumber=db.GrabMaxTypeNumberModifiedCore(poltype,poltype.ModifiedResiduePrmPath)
-        mincorenumber=db.GrabMinTypeNumberModifiedCore(poltype,poltype.ModifiedResiduePrmPath)
+        maxcorenumber=GrabMaxTypeNumberModifiedCore(poltype,poltype.ModifiedResiduePrmPath)
+        mincorenumber=GrabMinTypeNumberModifiedCore(poltype,poltype.ModifiedResiduePrmPath)
         key=poltype.ModifiedResiduePrmPath
 
     writekey=poltype.key5fname.replace('.key_5','.key_6')
@@ -2061,7 +2061,7 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
     else:
         fname=poltype.ModifiedResiduePrmPath
     polclasstoprmclass={}
-    stitchbondprms,stitchangleprms,stitchnewtorsionprms,stitchstrbndprms,stitchnewmpoleprms,stitchopbendprms,uneededpolarizeprms,unneededvdwprms=db.GrabParametersFromPrmFile(poltype,bondprmclassestoboundclasses,angleprmclassestoboundclasses,torsionprmclassestoboundclasses,poltypetoprmtype,polclasstoprmclass,proteintypestoframedefforprmfile,fname)
+    stitchbondprms,stitchangleprms,stitchnewtorsionprms,stitchstrbndprms,stitchnewmpoleprms,stitchopbendprms,uneededpolarizeprms,unneededvdwprms,torsiontopitor=db.GrabParametersFromPrmFile(poltype,bondprmclassestoboundclasses,{},{},angleprmclassestoboundclasses,torsionprmclassestoboundclasses,poltypetoprmtype,polclasstoprmclass,proteintypestoframedefforprmfile,fname)
     stitchtorsionprms=stitchtorsionprms+stitchnewtorsionprms
     stitchmpoleprms=stitchnewmpoleprms+stitchmpoleprms
     stitchpolarizeprms=prmdeflines+stitchpolarizeprms
