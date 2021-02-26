@@ -15,7 +15,7 @@ from rdkit.Chem.Lipinski import RotatableBondSmarts
 import numpy as np
 import json
 import torsionfit as torfit
-
+from rdkit import DataStructs
    
 def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo):
     temp=open(vf,'r')
@@ -1229,10 +1229,13 @@ def AddOptimizedBondLengths(poltype,mol,bondprms,bondlistbabel):
                 tot+=blen
             except:
                 pass
-        avgbondlength=round(tot/len(allbonds),2)
-        linesplit=re.split(r'(\s+)', line)   
-        linesplit[8]=str(avgbondlength)
-        line=''.join(linesplit)
+        if len(allbonds)==0:
+            pass 
+        else:
+            avgbondlength=round(tot/len(allbonds),2)
+            linesplit=re.split(r'(\s+)', line)   
+            linesplit[8]=str(avgbondlength)
+            line=''.join(linesplit)
         newbondprms.append(line)
     return newbondprms
       
@@ -1257,12 +1260,16 @@ def AddOptimizedAngleLengths(poltype,mol,angleprms,anglelistbabel):
             c = mol.GetAtom(angle[2])
             anglelen = mol.GetAngle(a,b,c)
             tot+=anglelen
-        avganglelength=round(tot/len(allangles),2)
-        linesplit=re.split(r'(\s+)', line)
-        linesplit=linesplit[:11]
-        linesplit.append('\n')
-        linesplit[10]=str(avganglelength)
-        line=''.join(linesplit)
+        if len(allangles)==0:
+            pass
+        else:
+            avganglelength=round(tot/len(allangles),2)
+            linesplit=re.split(r'(\s+)', line)
+            linesplit=linesplit[:11]
+            linesplit.append('\n')
+            linesplit[10]=str(avganglelength)
+            line=''.join(linesplit)
+        line+='\n'
         newangleprms.append(line)
     return newangleprms
  
@@ -1616,6 +1623,9 @@ def ConvertIndicesDictionaryToPoltypeClasses(poltype,indicestovalue,indicestotin
 
 
 def SearchForPoltypeClasses(poltype,prmline,poltypeclasseslist):
+    listofpoltypeclasses=None
+    poltypeclasses=None
+    allin=None
     for listofpoltypeclasses in poltypeclasseslist:
         for poltypeclasses in listofpoltypeclasses:
             allin=True
@@ -1623,16 +1633,31 @@ def SearchForPoltypeClasses(poltype,prmline,poltypeclasseslist):
                 if str(poltypeclass) not in prmline:
                     allin=False 
             if allin==True:
-                return listofpoltypeclasses
+                return listofpoltypeclasses,poltypeclasses
+    if allin!=None:
+        if allin==False:
+            listofpoltypeclasses=None
+            poltypeclasses=None
 
-def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsatomorders,poltypeclassestosmartsatomorders,poltypeclassestoelementtinkerdescrips,poltypeclassestosmartsatomordersext,defaultvalues=None):
+    return listofpoltypeclasses,poltypeclasses
+
+
+def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsatomorders,poltypeclassestosmartsatomorders,poltypeclassestoelementtinkerdescrips,poltypeclassestosmartsatomordersext,newpoltypeclassestocomments,newpoltypeclassestosmartslist,defaultvalues=None):
     prmstotransferinfo={}
     for line in prms:
-        poltypeclasses=SearchForPoltypeClasses(poltype,line,poltypeclassestoparametersmartsatomorders.keys())
+        poltypeclasses,subpoltypeclasses=SearchForPoltypeClasses(poltype,line,poltypeclassestoparametersmartsatomorders.keys())
         if poltypeclasses==None:
-            poltypeclasses=SearchForPoltypeClasses(poltype,line,poltypeclassestosmartsatomordersext.keys())
-            smartsatomorders=poltypeclassestosmartsatomordersext[poltypeclasses]
-            transferinfoline='#'+' '+'matching SMARTS from molecule '+' '+str(smartsatomorders)+' from external database'+'\n'
+            poltypeclasses,subpoltypeclasses=SearchForPoltypeClasses(poltype,line,poltypeclassestosmartsatomordersext.keys())
+            if poltypeclasses==None:
+                poltypeclasses,subpoltypeclasses=SearchForPoltypeClasses(poltype,line,newpoltypeclassestocomments.keys())
+                comments=newpoltypeclassestocomments[poltypeclasses]
+                smartslist=newpoltypeclassestosmartslist[poltypeclasses]
+                commentstring=' '.join(comments)
+                smartsliststring=' '.join(smartslist)
+                transferinfoline='#'+' '+'updated valence parameter matched comments='+commentstring+' '+'SMARTS match = '+smartsliststring+'\n'
+            else:
+                smartsatomorders=poltypeclassestosmartsatomordersext[poltypeclasses]
+                transferinfoline='#'+' '+'matching SMARTS from molecule '+' '+str(smartsatomorders)+' from external database'+'\n'
         else:
             parametersmartsatomorders=poltypeclassestoparametersmartsatomorders[poltypeclasses]
             smartsatomorders=poltypeclassestosmartsatomorders[poltypeclasses]
@@ -1648,7 +1673,6 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
             smarts=smartsatomorders[0]
             if '~' in smarts or '*' in smarts:
                 transferinfoline+='# '+'WARNING WILDCARDS USED IN SMARTS PARAMETER MATCHING'+'\n'
-                
         prmstotransferinfo[line]=transferinfoline
 
     return prmstotransferinfo
@@ -1710,7 +1734,7 @@ def FindPotentialMissingParameterTypes(poltype,prms,tinkerclassestopoltypeclasse
     missingprms=[]
     foundprms=[]
     for line in prms:
-        poltypeclassesls=SearchForPoltypeClasses(poltype,line,newpoltypeclasseslist)
+        poltypeclassesls,subpoltypeclasses=SearchForPoltypeClasses(poltype,line,newpoltypeclasseslist)
         linesplit=line.split()
         prms=[int(linesplit[1]),int(linesplit[2])]
         if poltypeclassesls!=None:
@@ -2141,11 +2165,18 @@ def ReduceMissingVdwByTypes(poltype,vdwmissing):
 
 
 
-def ConvertToBabelList(poltype,listforprm):
+def ConvertToBabelList(poltype,listforprm,indicestoclasses):
     babellist=[]
     for ls in listforprm:
-        babells=[i+1 for i in ls]
-        babellist.append(babells)
+        add=True
+        if poltype.transferqmequilvalues==False:
+            fwd=tuple(ls)
+            rev=fwd[::-1]
+            if fwd in indicestoclasses.keys() or rev in indicestoclasses.keys():
+                add=False
+        if add==True:
+            babells=[i+1 for i in ls]
+            babellist.append(babells)
     return babellist
 
 
@@ -2507,12 +2538,386 @@ def ReverseDictionary(poltype,keytovalues):
         valuetokey[tuple(value)]=list(key)
     return valuetokey
 
+def ReadUpdatedValenceDatabaseSmartsMap(poltype):
+    smartstoatomclass={}
+    atomclasstoclassname={}
+    atomclasstocomment={}
+    temp=open(poltype.latestsmallmoleculesmartstotinkerclass,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        linesplit=line.split()
+        first=linesplit[0]
+        if first!='#':
+            smarts=linesplit[0]
+            tinkerclass=int(linesplit[1])
+            tinkername=linesplit[2]
+            comment=' '.join(linesplit[3:])
+            comment=comment.replace('\n','').replace('#','').lstrip().rstrip()
+            smartstoatomclass[smarts]=tinkerclass
+            atomclasstocomment[tinkerclass]=comment
+            atomclasstoclassname[tinkerclass]=tinkername
+             
+
+    return smartstoatomclass, atomclasstoclassname, atomclasstocomment
+ 
+
+def MatchAllSmartsToAtomIndices(poltype,smartstoatomclass): #rdkit 0 index based
+    atomindextoallsmarts={}
+    atomindextoallsmartsmatches={}
+    for smarts in smartstoatomclass.keys():
+        substructure = Chem.MolFromSmarts(smarts)
+        diditmatch=poltype.rdkitmol.HasSubstructMatch(substructure)
+        if diditmatch==True:
+            matches=list(poltype.rdkitmol.GetSubstructMatches(substructure))
+            for match in matches:
+                atomindex=match[0]
+                if atomindex not in atomindextoallsmarts.keys():
+                    atomindextoallsmarts[atomindex]=[]
+                    atomindextoallsmartsmatches[atomindex]=[] 
+                atomindextoallsmarts[atomindex].append(smarts) 
+                atomindextoallsmartsmatches[atomindex].append(match)   
+               
+    return atomindextoallsmarts,atomindextoallsmartsmatches
+
+def MapIndicesToClasses(poltype,atomindextoallsmarts,smartstoatomclass,listofbondsforprm,listofanglesforprm,planarbonds):
+    bondclassestolistofsmartslist={}
+    angleclassestolistofsmartslist={}
+    strbndclassestolistofsmartslist={}
+    opbendclassestolistofsmartslist={}
+    bondindicestolistofbondclasses={}
+    angleindicestolistofangleclasses={}
+    strbndindicestolistofstrbndclasses={}
+    opbendindicestolistofopbendclasses={}
+
+    for bond in listofbondsforprm:
+        aindex=bond[0]
+        bindex=bond[1] 
+        asmartslist=atomindextoallsmarts[aindex]
+        bsmartslist=atomindextoallsmarts[bindex]   
+        combs = list(itertools.product(asmartslist, bsmartslist)) 
+        for comb in combs:
+            asmarts=comb[0]
+            bsmarts=comb[1]
+            aclass=smartstoatomclass[asmarts]
+            bclass=smartstoatomclass[bsmarts]
+            bondclasses=tuple([aclass,bclass])
+            smartslist=[asmarts,bsmarts]
+            if bondclasses not in bondclassestolistofsmartslist.keys():
+                bondclassestolistofsmartslist[bondclasses]=[]
+            if tuple(bond) not in bondindicestolistofbondclasses.keys(): 
+                bondindicestolistofbondclasses[tuple(bond)]=[]
+            if smartslist not in bondclassestolistofsmartslist[bondclasses]: 
+                bondclassestolistofsmartslist[bondclasses].append(smartslist)   
+             
+            if bondclasses not in bondindicestolistofbondclasses[tuple(bond)]: 
+                bondindicestolistofbondclasses[tuple(bond)].append(bondclasses)    
+
+            if bond in planarbonds or bond[::-1] in planarbonds:
+                if bondclasses not in opbendclassestolistofsmartslist.keys():
+                    opbendclassestolistofsmartslist[bondclasses]=[]
+                if tuple(bond) not in opbendindicestolistofopbendclasses.keys():
+                    opbendindicestolistofopbendclasses[tuple(bond)]=[]
+                if smartslist not in opbendclassestolistofsmartslist[bondclasses]: 
+                    opbendclassestolistofsmartslist[bondclasses].append(smartslist)   
+                if bondclasses not in opbendindicestolistofopbendclasses[tuple(bond)]:
+                    opbendindicestolistofopbendclasses[tuple(bond)].append(bondclasses)    
+
+
+    for angle in listofanglesforprm:
+        aindex=angle[0]
+        bindex=angle[1] 
+        cindex=angle[2] 
+        asmartslist=atomindextoallsmarts[aindex]
+        bsmartslist=atomindextoallsmarts[bindex]   
+        csmartslist=atomindextoallsmarts[cindex]   
+        combs = list(itertools.product(asmartslist,bsmartslist,csmartslist)) 
+        for comb in combs:
+            asmarts=comb[0]
+            bsmarts=comb[1]
+            csmarts=comb[2]
+            aclass=smartstoatomclass[asmarts]
+            bclass=smartstoatomclass[bsmarts]
+            cclass=smartstoatomclass[csmarts]
+            angleclasses=tuple([aclass,bclass,cclass])
+            smartslist=[asmarts,bsmarts,csmarts]
+            if angleclasses not in angleclassestolistofsmartslist.keys():
+                angleclassestolistofsmartslist[angleclasses]=[]
+                strbndclassestolistofsmartslist[angleclasses]=[]
+            if tuple(angle) not in angleindicestolistofangleclasses.keys():
+                angleindicestolistofangleclasses[tuple(angle)]=[]
+            if tuple(angle) not in strbndindicestolistofstrbndclasses.keys():
+                strbndindicestolistofstrbndclasses[tuple(angle)]=[]
+            if smartslist not in angleclassestolistofsmartslist[angleclasses]: 
+                angleclassestolistofsmartslist[angleclasses].append(smartslist)     
+            if smartslist not in strbndclassestolistofsmartslist[angleclasses]:
+                strbndclassestolistofsmartslist[angleclasses].append(smartslist)     
+            if angleclasses not in angleindicestolistofangleclasses[tuple(angle)]: 
+                angleindicestolistofangleclasses[tuple(angle)].append(angleclasses)     
+            if angleclasses not in strbndindicestolistofstrbndclasses[tuple(angle)]: 
+                strbndindicestolistofstrbndclasses[tuple(angle)].append(angleclasses)     
+
+    return bondclassestolistofsmartslist,angleclassestolistofsmartslist,strbndclassestolistofsmartslist,opbendclassestolistofsmartslist,bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses
+
+def SearchForParameters(poltype,bondclassestolistofsmartslist,angleclassestolistofsmartslist,strbndclassestolistofsmartslist,opbendclassestolistofsmartslist,bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses):
+    bondclassestoparameters={}
+    angleclassestoparameters={}
+    strbndclassestoparameters={}
+    opbendclassestoparameters={}
+    temp=open(poltype.latestsmallmoleculeprmlib,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        linesplit=line.split()
+        if 'bond' in line:
+            bondclasses=tuple([int(linesplit[1]),int(linesplit[2])]) 
+            prms=[float(linesplit[3]),float(linesplit[4])]
+            bondclassestoparameters[bondclasses]=prms
+        elif 'angle' in line:
+            angleclasses=tuple([int(linesplit[1]),int(linesplit[2]),int(linesplit[3])]) 
+            prms=[float(linesplit[4]),float(linesplit[5])]
+            angleclassestoparameters[angleclasses]=prms
+        elif 'strbnd' in line:
+            angleclasses=tuple([int(linesplit[1]),int(linesplit[2]),int(linesplit[3])]) 
+            prms=[float(linesplit[4]),float(linesplit[5])]
+            strbndclassestoparameters[angleclasses]=prms
+        elif 'opbend' in line:
+            bondclasses=tuple([int(linesplit[1]),int(linesplit[2])]) 
+            prms=[float(linesplit[5])]
+            opbendclassestoparameters[bondclasses]=prms
+
+    bondindicestolistofbondclasses=RemoveIndicesThatDontHaveParameters(poltype,bondindicestolistofbondclasses,bondclassestolistofsmartslist,bondclassestoparameters)
+    angleindicestolistofangleclasses=RemoveIndicesThatDontHaveParameters(poltype,angleindicestolistofangleclasses,angleclassestolistofsmartslist,angleclassestoparameters)
+    strbndindicestolistofstrbndclasses=RemoveIndicesThatDontHaveParameters(poltype,strbndindicestolistofstrbndclasses,strbndclassestolistofsmartslist,strbndclassestoparameters)
+    opbendindicestolistofopbendclasses=RemoveIndicesThatDontHaveParameters(poltype,opbendindicestolistofopbendclasses,opbendclassestolistofsmartslist,opbendclassestoparameters)
+
+ 
+    return bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses,bondclassestoparameters,angleclassestoparameters,strbndclassestoparameters,opbendclassestoparameters
+
+def RemoveIndicesThatDontHaveParameters(poltype,indicestolistofclasses,classestolistofsmartslist,classestoparameters):
+    indicestodelete=[]
+    for i in range(len(indicestolistofclasses.keys())):
+        indices=list(indicestolistofclasses.keys())[i]
+        listofclasses=indicestolistofclasses[indices]
+        classesmissing=[]
+        classesexisting=[]
+        for classes in listofclasses:
+            if classes not in classestoparameters.keys() or classes[::-1] not in classestoparameters.keys():
+                classesmissing.append(classes)
+            else:
+                classesexisting.append(classes)
+        if len(classesmissing)==len(listofclasses):
+            indicestodelete.append(indices)
+        indicestolistofclasses[indices]=classesexisting
+
+    for indices in indicestodelete:
+        del indicestolistofclasses[indices]
+    return indicestolistofclasses
+
+def FindBestSMARTSMatch(poltype,indicestolistofclasses,classestolistofsmartslist):
+    indicestoclasses={}
+    indicestosmartslist={}
+    for indices,listofclasses in indicestolistofclasses.items():
+        fragmentsarray=[]
+        classesarray=[]
+        smartslistarray=[] 
+        for classes in listofclasses:
+            listofsmartslist=classestolistofsmartslist[classes]
+            for smartslist in listofsmartslist:
+                matchedindices=MatchAllSMARTS(poltype,smartslist,indices) 
+                fragmentmol=CreateFragment(poltype,matchedindices)
+                fragmentsarray.append(fragmentmol)
+                classesarray.append(classes)
+                smartslistarray.append(smartslist)
+        classes,smartslist=DetermineBestSMARTSMatch(poltype,fragmentsarray,classesarray,smartslistarray)         
+        indicestoclasses[indices]=classes
+        indicestosmartslist[indices]=smartslist
+
+    return indicestoclasses,indicestosmartslist
+
+def DetermineBestSMARTSMatch(poltype,listoffragments,listofclasses,listofsmartslist):  
+    tanimotoarray=[]     
+    for i in range(len(listoffragments)):
+        fragment=listoffragments[i]
+        classes=listofclasses[i]
+        smartslist=listofsmartslist[i]
+        ms=[poltype.rdkitmol,fragment]
+        fps = [Chem.RDKFingerprint(x) for x in ms]
+        tanimoto=DataStructs.FingerprintSimilarity(fps[0],fps[1], metric=DataStructs.DiceSimilarity) 
+        tanimotoarray.append(tanimoto)
+    maxvalue=max(tanimotoarray)
+    nums=tanimotoarray.count(maxvalue)
+    if nums>1:
+        smartslisttocompare=[]
+        for i in range(len(listofsmartslist)):
+            smartslist=listofsmartslist[i]
+            tanimoto=tanimotoarray[i]
+            if tanimoto==maxvalue:
+                smartslisttocompare.append(smartslist)
+        smartslist=ChooseMostDescriptiveSMARTSList(poltype,smartslisttocompare) 
+        index=listofsmartslist.index(smartslist)
+        classes=listofclasses[index]
+    else:
+        maxindex=tanimotoarray.index(maxvalue)
+        classes=listofclasses[maxindex]
+        smartslist=listofsmartslist[maxindex]
+    return classes,smartslist 
+
+
+def ChooseMostDescriptiveSMARTSList(poltype,smartslisttocompare):
+    lengtharray=[]
+    for smartslist in smartslisttocompare:
+        lengths=[len(e) for e in smartslist]
+        total=sum(lengths)
+        lengtharray.append(total)
+    maxlength=max(lengtharray)
+    maxidx=lengtharray.index(maxlength)
+    smartslist=smartslisttocompare[maxidx]
+    return smartslist
+
+
+def CreateFragment(poltype,matchedindices):
+    m = Chem.Mol()
+    em = Chem.EditableMol(m)
+    oldindextonewindex={}
+    for i,idx in enumerate(matchedindices):
+        oldatom=poltype.rdkitmol.GetAtomWithIdx(idx)
+        newindex=em.AddAtom(oldatom)
+        oldindextonewindex[idx]=newindex
+
+    for bond in poltype.rdkitmol.GetBonds():
+        oendidx = bond.GetEndAtomIdx()
+        obgnidx = bond.GetBeginAtomIdx()
+        if oendidx not in oldindextonewindex.keys() and obgnidx not in oldindextonewindex.keys():
+            continue
+        elif oendidx in oldindextonewindex.keys() and obgnidx not in oldindextonewindex.keys():
+            continue
+        elif oendidx not in oldindextonewindex.keys() and obgnidx in oldindextonewindex.keys():
+            continue
+
+        endidx=oldindextonewindex[oendidx]
+        bgnidx=oldindextonewindex[obgnidx]
+        bondorder=bond.GetBondType()
+        em.AddBond(bgnidx,endidx,bondorder)
+
+    return em.GetMol()
+
+
+
+def MatchAllSMARTS(poltype,smartslist,indices):
+    matchedindices=[]
+    for idx in range(len(smartslist)):
+        smarts=smartslist[idx]
+        index=indices[idx]
+        substructure = Chem.MolFromSmarts(smarts)
+        diditmatch=poltype.rdkitmol.HasSubstructMatch(substructure)
+        if diditmatch==True:
+            matches=poltype.rdkitmol.GetSubstructMatches(substructure)
+            for match in matches:
+                if index in match:
+                    for atomindex in match:
+                        if atomindex not in matchedindices:
+                            matchedindices.append(atomindex)
+                    break
+        else:
+            raise ValueError('SMARTS match does not exist')
+
+
+    return matchedindices
+
+
+def GrabNewParameters(poltype,indicestoclasses,classestoparameters,keyword,indicestosmartslist,atomclasstocomment):
+    indicestopoltypeclasses={}
+    newpoltypeclassestocomments={}
+    newpoltypeclassestosmartslist={}
+
+    newprms=[]
+    for indices,classes in indicestoclasses.items():
+        smartslist=indicestosmartslist[indices]
+        comments=[atomclasstocomment[k] for k in classes]
+        babelindices=[k+1 for k in indices]
+        poltypeclasses=[poltype.idxtosymclass[k] for k in babelindices]
+        indicestopoltypeclasses[indices]=poltypeclasses
+        newpoltypeclassestocomments[tuple([tuple(poltypeclasses)])]=comments
+        newpoltypeclassestosmartslist[tuple([tuple(poltypeclasses)])]=smartslist
+        poltypeclasses=[str(k) for k in poltypeclasses]
+        if keyword=='opbend':
+            poltypeclasses.append('0')
+            poltypeclasses.append('0')
+        parameters=classestoparameters[classes]
+        parameters=[str(k) for k in parameters]
+        poltypeclassesstring=' '.join(poltypeclasses)
+        parametersstring=' '.join(parameters)
+        newprm=keyword+' '+poltypeclassesstring+' '+parametersstring
+        newprms.append(newprm)
+        
+
+    return indicestopoltypeclasses,newprms,newpoltypeclassestocomments,newpoltypeclassestosmartslist
+
+
+def RemoveOldParametersKeepNewParameters(poltype,prms,newindicestopoltypeclasses,keyword,poltypeclassestoparametersmartsatomorders,poltypeclassestosmartsatomorders,poltypeclassestoelementtinkerdescrips,removefromdic=True):
+    newprms=[]
+    dellist=[]
+    appendlist=[]
+    for prm in prms:
+        prmsplit=prm.split()
+        if keyword=='bond' or keyword=='opbend':
+            endindex=2
+        elif keyword=='angle' or keyword=='strbnd':
+            endindex=3
+        prmsplit=prmsplit[1:endindex+1]
+        classes=[int(k) for k in prmsplit]
+        if classes in newindicestopoltypeclasses.values() or classes[::-1] in newindicestopoltypeclasses.values():
+            pass
+            if removefromdic==True:
+                poltypeclasseslist,poltypeclasses=SearchForPoltypeClasses(poltype,prm,poltypeclassestoparametersmartsatomorders.keys())
+                if poltypeclasseslist!=None:
+                    newpoltypeclasseslist=[]
+                    for cls in poltypeclasseslist:
+                        if cls==poltypeclasses:
+                            pass
+                        else:
+                            newpoltypeclasseslist.append(cls)
+                    newpoltypeclasseslist=tuple(newpoltypeclasseslist)
+                    if poltypeclasseslist not in dellist:
+                        dellist.append(poltypeclasseslist)
+                        appendlist.append(newpoltypeclasseslist)
+        else:
+            newprms.append(prm)
+    for i in range(len(dellist)):
+        item=dellist[i]
+        newitem=appendlist[i]
+        value=poltypeclassestoparametersmartsatomorders[item]
+        del poltypeclassestoparametersmartsatomorders[item]
+        del poltypeclassestosmartsatomorders[item]
+        del poltypeclassestoelementtinkerdescrips[item]
+        poltypeclassestoparametersmartsatomorders[newitem]=value 
+        poltypeclassestosmartsatomorders[newitem]=value
+        poltypeclassestoelementtinkerdescrips[newitem]=value
+
+
+    return newprms,poltypeclassestoparametersmartsatomorders,poltypeclassestosmartsatomorders,poltypeclassestoelementtinkerdescrips
+
+
+
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
+    smartstoatomclass, atomclasstoclassname, atomclasstocomment=ReadUpdatedValenceDatabaseSmartsMap(poltype) 
+    atomindextoallsmarts,atomindextoallsmartsmatches=MatchAllSmartsToAtomIndices(poltype,smartstoatomclass)
     bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters=ReadExternalDatabase(poltype)
     smartsatomordertoelementtinkerdescrip=ReadSmallMoleculeLib(poltype,poltype.smallmoleculesmartstotinkerdescrip)
     elementtinkerdescriptotinkertype,tinkertypetoclass=GrabTypeAndClassNumbers(poltype,poltype.smallmoleculeprmlib)
     listofatomsforprm,listofbondsforprm,listofanglesforprm,listoftorsionsforprm=GrabAtomsForParameters(poltype,mol)
     planarbonds=GrabPlanarBonds(poltype,listofbondsforprm,mol)
+    bondclassestolistofsmartslist,angleclassestolistofsmartslist,strbndclassestolistofsmartslist,opbendclassestolistofsmartslist,bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses=MapIndicesToClasses(poltype,atomindextoallsmarts,smartstoatomclass,listofbondsforprm,listofanglesforprm,planarbonds)
+    bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses,bondclassestoparameters,angleclassestoparameters,strbndclassestoparameters,opbendclassestoparameters=SearchForParameters(poltype,bondclassestolistofsmartslist,angleclassestolistofsmartslist,strbndclassestolistofsmartslist,opbendclassestolistofsmartslist,bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses)
+    bondindicestoclasses,bondindicestosmartslist=FindBestSMARTSMatch(poltype,bondindicestolistofbondclasses,bondclassestolistofsmartslist)
+    angleindicestoclasses,angleindicestosmartslist=FindBestSMARTSMatch(poltype,angleindicestolistofangleclasses,angleclassestolistofsmartslist)
+    strbndindicestoclasses,strbndindicestosmartslist=FindBestSMARTSMatch(poltype,strbndindicestolistofstrbndclasses,strbndclassestolistofsmartslist)
+    opbendindicestoclasses,opbendindicestosmartslist=FindBestSMARTSMatch(poltype,opbendindicestolistofopbendclasses,opbendclassestolistofsmartslist)
+    newangleindicestopoltypeclasses,newangleprms,newanglepoltypeclassestocomments,newanglepoltypeclassestosmartslist=GrabNewParameters(poltype,angleindicestoclasses,angleclassestoparameters,'angle',angleindicestosmartslist,atomclasstocomment) 
+    newbondindicestopoltypeclasses,newbondprms,newbondpoltypeclassestocomments,newbondpoltypeclassestosmartslist=GrabNewParameters(poltype,bondindicestoclasses,bondclassestoparameters,'bond',bondindicestosmartslist,atomclasstocomment) 
+    newstrbndindicestopoltypeclasses,newstrbndprms,newstrbndpoltypeclassestocomments,newstrbndpoltypeclassestosmartslist=GrabNewParameters(poltype,strbndindicestoclasses,strbndclassestoparameters,'strbnd',strbndindicestosmartslist,atomclasstocomment) 
+    newopbendindicestopoltypeclasses,newopbendprms,newopbendpoltypeclassestocomments,newopbendpoltypeclassestosmartslist=GrabNewParameters(poltype,opbendindicestoclasses,opbendclassestoparameters,'opbend',opbendindicestosmartslist,atomclasstocomment) 
     listofanglesthatneedplanarkeyword=CheckForPlanerAngles(poltype,listofanglesforprm,mol)
     parametersmartslist=GrabSMARTSList(poltype,smartsatomordertoelementtinkerdescrip)
     parametersmartstomaxcommonsubstructuresmarts,maxatomsize=FindMaximumCommonSubstructures(poltype,parametersmartslist,rdkitmol)
@@ -2619,7 +3024,14 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     fname=poltype.smallmoleculeprmlib
     bondprms,angleprms,torsionprms,strbndprms,mpoleprms,opbendprms,polarizeprms,vdwprms,torsiontopitor=GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendtinkerclassestopoltypeclasses,opbendtinkerclassestotrigonalcenterbools,angletinkerclassestopoltypeclasses,torsiontinkerclassestopoltypeclasses,poltypetoprmtype,atomtinkerclasstopoltypeclass,typestoframedefforprmfile,fname,True)
     torsionprms=CorrectPitorEnergy(poltype,torsionprms,torsiontopitor)
-
+    angleprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips=RemoveOldParametersKeepNewParameters(poltype,angleprms,newangleindicestopoltypeclasses,'angle',anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips)
+    opbendprms,blankbondpoltypeclassestoparametersmartsatomorders,blankbondpoltypeclassestosmartsatomorders,blankbondpoltypeclassestoelementtinkerdescrips=RemoveOldParametersKeepNewParameters(poltype,opbendprms,newopbendindicestopoltypeclasses,'opbend',bondpoltypeclassestoparametersmartsatomorders,bondpoltypeclassestosmartsatomorders,bondpoltypeclassestoelementtinkerdescrips,removefromdic=False)
+    
+    opbendpoltypeclassestoparametersmartsatomorders=bondpoltypeclassestoparametersmartsatomorders.copy()
+    opbendpoltypeclassestosmartsatomorders=bondpoltypeclassestosmartsatomorders.copy()
+    opbendpoltypeclassestoelementtinkerdescrips=bondpoltypeclassestoelementtinkerdescrips.copy()
+    bondprms,bondpoltypeclassestoparametersmartsatomorders,bondpoltypeclassestosmartsatomorders,bondpoltypeclassestoelementtinkerdescrips=RemoveOldParametersKeepNewParameters(poltype,bondprms,newbondindicestopoltypeclasses,'bond',bondpoltypeclassestoparametersmartsatomorders,bondpoltypeclassestosmartsatomorders,bondpoltypeclassestoelementtinkerdescrips)
+    strbndprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips=RemoveOldParametersKeepNewParameters(poltype,strbndprms,newstrbndindicestopoltypeclasses,'strbnd',anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips)
     bondprms,bondpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,bondprms,bondindicestoextsmarts,bondsmartsatomordertoparameters,'bond')
     angleprms,anglepoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,angleprms,angleindicestoextsmarts,anglesmartsatomordertoparameters,'angle')
     strbndprms,strbndpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,strbndprms,angleindicestoextsmarts,strbndsmartsatomordertoparameters,'strbnd')
@@ -2628,11 +3040,16 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     vdwprms,vdwpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,vdwprms,vdwindicestoextsmarts,vdwsmartsatomordertoparameters,'vdw')
     strbndprms=ZeroOutMissingStrbnd(poltype,anglemissingtinkerclassestopoltypeclasses,strbndprms)
     angleprms=AssignAngleGuessParameters(poltype,angletinkerclassestoexampleindices,anglemissingtinkerclassestopoltypeclasses,angleprms)
+    # do i need to fix bong/angle guess
     bondprms=AssignBondGuessParameters(poltype,bondtinkerclassestoexampleindices,bondmissingtinkerclassestopoltypeclasses,bondprms)
-
+    # add new database parameters here
+    angleprms.extend(newangleprms)
+    bondprms.extend(newbondprms)
+    strbndprms.extend(newstrbndprms)
+    opbendprms.extend(newopbendprms)
     angleprms=ModifyAngleKeywords(poltype,angleprms,planarangletinkerclassestopoltypeclasses)
-    bondlistbabel=ConvertToBabelList(poltype,listofbondsforprm)
-    anglelistbabel=ConvertToBabelList(poltype,listofanglesforprm)
+    bondlistbabel=ConvertToBabelList(poltype,listofbondsforprm,bondindicestoclasses)
+    anglelistbabel=ConvertToBabelList(poltype,listofanglesforprm,angleindicestoclasses)
     bondprms=AddOptimizedBondLengths(poltype,optmol,bondprms,bondlistbabel)
     angleprms=AddOptimizedAngleLengths(poltype,optmol,angleprms,anglelistbabel)
     torsionprms=ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,torsionprms)
@@ -2646,12 +3063,12 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     if len(missingopbendprmindices)!=0:
         newopbendprms,defaultvalues=DefaultOPBendParameters(poltype,missingopbendprmindices,mol,opbendbondindicestotrigonalcenterbools)
         opbendprms.extend(newopbendprms)
-    vdwprmstotransferinfo=MapParameterLineToTransferInfo(poltype,vdwprms,atompoltypeclasstoparametersmartsatomorder,atompoltypeclasstosmartsatomorder,atompoltypeclassestoelementtinkerdescrip,vdwpoltypeclassestosmartsatomordersext)
-    bondprmstotransferinfo=MapParameterLineToTransferInfo(poltype,bondprms,bondpoltypeclassestoparametersmartsatomorders,bondpoltypeclassestosmartsatomorders,bondpoltypeclassestoelementtinkerdescrips,bondpoltypeclassestosmartsatomordersext)
-    opbendprmstotransferinfo=MapParameterLineToTransferInfo(poltype,opbendprms,bondpoltypeclassestoparametersmartsatomorders,bondpoltypeclassestosmartsatomorders,bondpoltypeclassestoelementtinkerdescrips,opbendpoltypeclassestosmartsatomordersext,defaultvalues)
-    angleprmstotransferinfo=MapParameterLineToTransferInfo(poltype,angleprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips,anglepoltypeclassestosmartsatomordersext)
-    strbndprmstotransferinfo=MapParameterLineToTransferInfo(poltype,strbndprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips,strbndpoltypeclassestosmartsatomordersext)
-    torsionprmstotransferinfo=MapParameterLineToTransferInfo(poltype,torsionprms,torsionpoltypeclassestoparametersmartsatomorders,torsionpoltypeclassestosmartsatomorders,torsionpoltypeclassestoelementtinkerdescrips,torsionpoltypeclassestosmartsatomordersext)
+    vdwprmstotransferinfo=MapParameterLineToTransferInfo(poltype,vdwprms,atompoltypeclasstoparametersmartsatomorder,atompoltypeclasstosmartsatomorder,atompoltypeclassestoelementtinkerdescrip,vdwpoltypeclassestosmartsatomordersext,{},{})
+    bondprmstotransferinfo=MapParameterLineToTransferInfo(poltype,bondprms,bondpoltypeclassestoparametersmartsatomorders,bondpoltypeclassestosmartsatomorders,bondpoltypeclassestoelementtinkerdescrips,bondpoltypeclassestosmartsatomordersext,newbondpoltypeclassestocomments,newbondpoltypeclassestosmartslist)
+    opbendprmstotransferinfo=MapParameterLineToTransferInfo(poltype,opbendprms,opbendpoltypeclassestoparametersmartsatomorders,opbendpoltypeclassestosmartsatomorders,opbendpoltypeclassestoelementtinkerdescrips,opbendpoltypeclassestosmartsatomordersext,newopbendpoltypeclassestocomments,newopbendpoltypeclassestosmartslist,defaultvalues)
+    angleprmstotransferinfo=MapParameterLineToTransferInfo(poltype,angleprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips,anglepoltypeclassestosmartsatomordersext,newanglepoltypeclassestocomments,newanglepoltypeclassestosmartslist)
+    strbndprmstotransferinfo=MapParameterLineToTransferInfo(poltype,strbndprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips,strbndpoltypeclassestosmartsatomordersext,newstrbndpoltypeclassestocomments,newstrbndpoltypeclassestosmartslist)
+    torsionprmstotransferinfo=MapParameterLineToTransferInfo(poltype,torsionprms,torsionpoltypeclassestoparametersmartsatomorders,torsionpoltypeclassestosmartsatomorders,torsionpoltypeclassestoelementtinkerdescrips,torsionpoltypeclassestosmartsatomordersext,{},{})
     torsionsmissing=ConvertToPoltypeClasses(poltype,torsionsmissing)
     WriteOutList(poltype,torsionsmissing,poltype.torsionsmissingfilename)
     WriteDictionaryToFile(poltype,torsionkeystringtoparameters,poltype.torsionprmguessfilename)
