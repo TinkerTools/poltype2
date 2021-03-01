@@ -17,7 +17,7 @@ import json
 import torsionfit as torfit
 from rdkit import DataStructs
    
-def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo):
+def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo):
     temp=open(vf,'r')
     results=temp.readlines()
     temp.close()
@@ -26,11 +26,26 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
     wroteout=False
     tempname=vf.replace('.key','_temp.key')
     f=open(tempname,'w')
+    linestoskip=[]
     for line in results:
         if 'atom' in line:
             atomline=True
             if foundatomblock==False:
                 foundatomblock=True
+        elif 'polarize' in line:
+            linesplit=line.split()
+            atomtype=linesplit[1]
+            resid=linesplit[3:]
+            residstring=' '.join(resid)
+            for polarprmsline,transferinfo in polarprmstotransferinfo.items(): 
+                polarlinesplit=polarprmsline.split()
+                polartype=polarlinesplit[1]
+                if atomtype==polartype:
+                    f.write(transferinfo)
+                    f.write(polarprmsline+' '+residstring+'\n')
+                    linestoskip.append(line)
+                    break
+                    
         else:
             atomline=False
         if foundatomblock==True and atomline==False and wroteout==False:
@@ -62,10 +77,10 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
             f.write('\n')
                                     
         else:
-            f.write(line)
+            if line not in linestoskip:
+                f.write(line)
     f.close()
     os.rename(tempname,newname)
-     
 
 def ReadSmallMoleculeLib(poltype,filepath):
     temp=open(filepath,'r')
@@ -2538,25 +2553,36 @@ def ReverseDictionary(poltype,keytovalues):
         valuetokey[tuple(value)]=list(key)
     return valuetokey
 
-def ReadUpdatedValenceDatabaseSmartsMap(poltype):
+def RepresentsInt(s):
+    try: 
+        int(s)
+        return True
+    except ValueError:
+        return False
+
+def ReadUpdatedValenceDatabaseSmartsMap(poltype,databasepath):
     smartstoatomclass={}
     atomclasstoclassname={}
     atomclasstocomment={}
-    temp=open(poltype.latestsmallmoleculesmartstotinkerclass,'r')
+    temp=open(databasepath,'r')
     results=temp.readlines()
     temp.close()
     for line in results:
         linesplit=line.split()
-        first=linesplit[0]
-        if first!='#':
-            smarts=linesplit[0]
-            tinkerclass=int(linesplit[1])
-            tinkername=linesplit[2]
-            comment=' '.join(linesplit[3:])
-            comment=comment.replace('\n','').replace('#','').lstrip().rstrip()
-            smartstoatomclass[smarts]=tinkerclass
-            atomclasstocomment[tinkerclass]=comment
-            atomclasstoclassname[tinkerclass]=tinkername
+        if len(linesplit)>0:
+            first=linesplit[0]
+            if first!='#':
+                smarts=linesplit[0]
+                if RepresentsInt(linesplit[1])==True:
+                    tinkerclass=int(linesplit[1])
+                else:
+                    tinkerclass=linesplit[1]
+                tinkername=linesplit[2]
+                comment=' '.join(linesplit[3:])
+                comment=comment.replace('\n','').replace('#','').lstrip().rstrip()
+                smartstoatomclass[smarts]=tinkerclass
+                atomclasstocomment[tinkerclass]=comment
+                atomclasstoclassname[tinkerclass]=tinkername
              
 
     return smartstoatomclass, atomclasstoclassname, atomclasstocomment
@@ -2579,6 +2605,30 @@ def MatchAllSmartsToAtomIndices(poltype,smartstoatomclass): #rdkit 0 index based
                 atomindextoallsmartsmatches[atomindex].append(match)   
                
     return atomindextoallsmarts,atomindextoallsmartsmatches
+
+
+def MapIndicesToComments(poltype,atomindextoallsmarts,smartstocomment,listofatomsforprm):
+    atomcommentstolistofsmartslist={}
+    atomindicestolistofatomcomments={}
+    for atoms in listofatomsforprm:
+        aindex=atoms[0] 
+        asmartslist=atomindextoallsmarts[aindex]
+        combs = list(itertools.product(asmartslist)) 
+        for comb in combs:
+            asmarts=comb[0]
+            acomment=smartstocomment[asmarts]
+            comments=tuple([acomment])
+            smartslist=[asmarts]
+            if comments not in atomcommentstolistofsmartslist.keys():
+                atomcommentstolistofsmartslist[comments]=[]
+            if tuple(atoms) not in atomindicestolistofatomcomments.keys(): 
+                atomindicestolistofatomcomments[tuple(atoms)]=[]
+            if smartslist not in atomcommentstolistofsmartslist[comments]: 
+                atomcommentstolistofsmartslist[comments].append(smartslist)   
+            if comments not in atomindicestolistofatomcomments[tuple(atoms)]: 
+                atomindicestolistofatomcomments[tuple(atoms)].append(comments)    
+    return atomcommentstolistofsmartslist,atomindicestolistofatomcomments
+
 
 def MapIndicesToClasses(poltype,atomindextoallsmarts,smartstoatomclass,listofbondsforprm,listofanglesforprm,planarbonds):
     bondclassestolistofsmartslist={}
@@ -2658,6 +2708,22 @@ def MapIndicesToClasses(poltype,atomindextoallsmarts,smartstoatomclass,listofbon
                 strbndindicestolistofstrbndclasses[tuple(angle)].append(angleclasses)     
 
     return bondclassestolistofsmartslist,angleclassestolistofsmartslist,strbndclassestolistofsmartslist,opbendclassestolistofsmartslist,bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses
+
+def SearchForParametersViaComments(poltype,atomcommentstolistofsmartslist,atomindicestolistofatomcomments):
+    atomcommentstoparameters={}
+    temp=open(poltype.latestsmallmoleculepolarizeprmlib,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        linesplit=line.split()
+        if '#' not in line:
+            comment=linesplit[0]
+            prm=linesplit[1]
+            atomcommentstoparameters[tuple([comment])]=[prm]
+
+    atomindicestolistofatomcomments=RemoveIndicesThatDontHaveParameters(poltype,atomindicestolistofatomcomments,atomcommentstolistofsmartslist,atomcommentstoparameters)
+    return atomindicestolistofatomcomments,atomcommentstoparameters
+
 
 def SearchForParameters(poltype,bondclassestolistofsmartslist,angleclassestolistofsmartslist,strbndclassestolistofsmartslist,opbendclassestolistofsmartslist,bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses):
     bondclassestoparameters={}
@@ -2898,15 +2964,33 @@ def RemoveOldParametersKeepNewParameters(poltype,prms,newindicestopoltypeclasses
 
     return newprms,poltypeclassestoparametersmartsatomorders,poltypeclassestosmartsatomorders,poltypeclassestoelementtinkerdescrips
 
+def MapSMARTSToComments(poltype,smartstoatomclasspolar,atomclasstocommentpolar):
+    smartstocomment={}
+    for smarts,atomclass in smartstoatomclasspolar.items():
+        comment=atomclasstocommentpolar[atomclass]
+        smartstocomment[smarts]=comment
+
+    return smartstocomment
+
 
 
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
-    smartstoatomclass, atomclasstoclassname, atomclasstocomment=ReadUpdatedValenceDatabaseSmartsMap(poltype) 
+    listofatomsforprm,listofbondsforprm,listofanglesforprm,listoftorsionsforprm=GrabAtomsForParameters(poltype,mol)
+    smartstoatomclasspolar, atomclasstoclassnamepolar, atomclasstocommentpolar=ReadUpdatedValenceDatabaseSmartsMap(poltype,poltype.latestsmallmoleculesmartstotypespolarize) 
+    atomindextoallsmartspolar,atomindextoallsmartsmatchespolar=MatchAllSmartsToAtomIndices(poltype,smartstoatomclasspolar)
+    smartstocomment=MapSMARTSToComments(poltype,smartstoatomclasspolar,atomclasstoclassnamepolar)
+    atomcommentstolistofsmartslist,atomindicestolistofatomcomments=MapIndicesToComments(poltype,atomindextoallsmartspolar,smartstocomment,listofatomsforprm)
+    atomindicestolistofatomcomments,atomcommentstoparameters=SearchForParametersViaComments(poltype,atomcommentstolistofsmartslist,atomindicestolistofatomcomments)
+    atomindicestocomments,atomindicestosmartslist=FindBestSMARTSMatch(poltype,atomindicestolistofatomcomments,atomcommentstolistofsmartslist)
+    commentlist=list(atomclasstoclassnamepolar.values())
+    atomcommentstocomment=dict(zip(commentlist,commentlist))
+    newpolarindicestopoltypeclasses,newpolarprms,newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist=GrabNewParameters(poltype,atomindicestocomments,atomcommentstoparameters,'polarize',atomindicestosmartslist,atomcommentstocomment) 
+
+    smartstoatomclass, atomclasstoclassname, atomclasstocomment=ReadUpdatedValenceDatabaseSmartsMap(poltype,poltype.latestsmallmoleculesmartstotinkerclass) 
     atomindextoallsmarts,atomindextoallsmartsmatches=MatchAllSmartsToAtomIndices(poltype,smartstoatomclass)
     bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters=ReadExternalDatabase(poltype)
     smartsatomordertoelementtinkerdescrip=ReadSmallMoleculeLib(poltype,poltype.smallmoleculesmartstotinkerdescrip)
     elementtinkerdescriptotinkertype,tinkertypetoclass=GrabTypeAndClassNumbers(poltype,poltype.smallmoleculeprmlib)
-    listofatomsforprm,listofbondsforprm,listofanglesforprm,listoftorsionsforprm=GrabAtomsForParameters(poltype,mol)
     planarbonds=GrabPlanarBonds(poltype,listofbondsforprm,mol)
     bondclassestolistofsmartslist,angleclassestolistofsmartslist,strbndclassestolistofsmartslist,opbendclassestolistofsmartslist,bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses=MapIndicesToClasses(poltype,atomindextoallsmarts,smartstoatomclass,listofbondsforprm,listofanglesforprm,planarbonds)
     bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses,bondclassestoparameters,angleclassestoparameters,strbndclassestoparameters,opbendclassestoparameters=SearchForParameters(poltype,bondclassestolistofsmartslist,angleclassestolistofsmartslist,strbndclassestolistofsmartslist,opbendclassestolistofsmartslist,bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses)
@@ -3063,6 +3147,10 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     if len(missingopbendprmindices)!=0:
         newopbendprms,defaultvalues=DefaultOPBendParameters(poltype,missingopbendprmindices,mol,opbendbondindicestotrigonalcenterbools)
         opbendprms.extend(newopbendprms)
+    
+    polarprmstotransferinfo=MapParameterLineToTransferInfo(poltype,newpolarprms,{},{},{},{},newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist)
+
+
     vdwprmstotransferinfo=MapParameterLineToTransferInfo(poltype,vdwprms,atompoltypeclasstoparametersmartsatomorder,atompoltypeclasstosmartsatomorder,atompoltypeclassestoelementtinkerdescrip,vdwpoltypeclassestosmartsatomordersext,{},{})
     bondprmstotransferinfo=MapParameterLineToTransferInfo(poltype,bondprms,bondpoltypeclassestoparametersmartsatomorders,bondpoltypeclassestosmartsatomorders,bondpoltypeclassestoelementtinkerdescrips,bondpoltypeclassestosmartsatomordersext,newbondpoltypeclassestocomments,newbondpoltypeclassestosmartslist)
     opbendprmstotransferinfo=MapParameterLineToTransferInfo(poltype,opbendprms,opbendpoltypeclassestoparametersmartsatomorders,opbendpoltypeclassestosmartsatomorders,opbendpoltypeclassestoelementtinkerdescrips,opbendpoltypeclassestosmartsatomordersext,newopbendpoltypeclassestocomments,newopbendpoltypeclassestosmartslist,defaultvalues)
@@ -3074,4 +3162,4 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     WriteDictionaryToFile(poltype,torsionkeystringtoparameters,poltype.torsionprmguessfilename)
     WriteOutList(poltype,missingvdwatomindices,poltype.vdwmissingfilename)
 
-    return bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,torsionsmissing,torsionkeystringtoparameters,missingvdwatomindices
+    return bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,torsionkeystringtoparameters,missingvdwatomindices
