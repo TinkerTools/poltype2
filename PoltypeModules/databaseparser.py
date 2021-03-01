@@ -17,7 +17,7 @@ import json
 import torsionfit as torfit
 from rdkit import DataStructs
    
-def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo):
+def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms):
     temp=open(vf,'r')
     results=temp.readlines()
     temp.close()
@@ -75,6 +75,8 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
                 f.write(transferinfo)
                 f.write(line)
             f.write('\n')
+            for line in soluteprms:
+                f.write(line)
                                     
         else:
             if line not in linestoskip:
@@ -2602,7 +2604,8 @@ def MatchAllSmartsToAtomIndices(poltype,smartstoatomclass): #rdkit 0 index based
                     atomindextoallsmarts[atomindex]=[]
                     atomindextoallsmartsmatches[atomindex]=[] 
                 atomindextoallsmarts[atomindex].append(smarts) 
-                atomindextoallsmartsmatches[atomindex].append(match)   
+                if match not in atomindextoallsmartsmatches[atomindex]:
+                    atomindextoallsmartsmatches[atomindex].append(match)   
                
     return atomindextoallsmarts,atomindextoallsmartsmatches
 
@@ -2972,9 +2975,54 @@ def MapSMARTSToComments(poltype,smartstoatomclasspolar,atomclasstocommentpolar):
 
     return smartstocomment
 
+def GrabSmartsToSoluteRadiiMap(poltype):
+    smartstosoluteradiiprms={}
+    temp=open(poltype.smartstosoluteradiimap,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        linesplit=line.split()
+        smarts=linesplit[0]
+        prms=linesplit[1:]
+        smartstosoluteradiiprms[smarts]=prms
+    return smartstosoluteradiiprms
+
+
+def MakeListOfListValues(poltype,keytovalue):
+    newkeytovalue={}
+    for key,value in keytovalue.items():
+        newvalues=[]
+        for item in value:
+            newitem=[item]
+            newvalues.append(newitem)
+        newkeytovalue[key]=newvalues    
+
+    return newkeytovalue
+
+def GenerateSoluteParameters(poltype,atomindicestosmartslist,smartstosoluteradiiprms):
+    soluteprms=[]
+    for atomindices,smartslist in atomindicestosmartslist.items():
+        atomindex=atomindices[0]
+        smarts=smartslist[0]
+        babelatomindex=atomindex+1
+        poltypeclass=poltype.idxtosymclass[babelatomindex]
+        prms=smartstosoluteradiiprms[smarts]
+        prmsline=' '.join(prms)
+        line='SOLUTE'+' '+str(poltypeclass)+' '+smarts+' '+prmsline+'\n'
+        soluteprms.append(line)
+
+    return soluteprms
 
 
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
+    smartstosoluteradiiprms=GrabSmartsToSoluteRadiiMap(poltype)   
+    atomindextoallsmartssolute,atomindextoallsmartsmatchessolute=MatchAllSmartsToAtomIndices(poltype,smartstosoluteradiiprms)
+    atomindices=list(atomindextoallsmartssolute.keys())
+    atomindices=[tuple([k]) for k in atomindices]
+    atomindicestolistofatomindices=dict(zip(atomindices,atomindices))
+    atomindextoallsmartssolute=MakeListOfListValues(poltype,atomindextoallsmartssolute)
+    atomindicestoindices,atomindicestosmartslist=FindBestSMARTSMatch(poltype,atomindicestolistofatomindices,atomindextoallsmartssolute)
+    soluteprms=GenerateSoluteParameters(poltype,atomindicestosmartslist,smartstosoluteradiiprms)
     listofatomsforprm,listofbondsforprm,listofanglesforprm,listoftorsionsforprm=GrabAtomsForParameters(poltype,mol)
     smartstoatomclasspolar, atomclasstoclassnamepolar, atomclasstocommentpolar=ReadUpdatedValenceDatabaseSmartsMap(poltype,poltype.latestsmallmoleculesmartstotypespolarize) 
     atomindextoallsmartspolar,atomindextoallsmartsmatchespolar=MatchAllSmartsToAtomIndices(poltype,smartstoatomclasspolar)
@@ -3162,4 +3210,4 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     WriteDictionaryToFile(poltype,torsionkeystringtoparameters,poltype.torsionprmguessfilename)
     WriteOutList(poltype,missingvdwatomindices,poltype.vdwmissingfilename)
 
-    return bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,torsionkeystringtoparameters,missingvdwatomindices
+    return bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,torsionkeystringtoparameters,missingvdwatomindices,soluteprms
