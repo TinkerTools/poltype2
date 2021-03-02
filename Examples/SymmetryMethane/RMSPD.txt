@@ -1,0 +1,75 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                       Version 8.8.3  November 2020                       ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      401   401     C     methane                      6     12.011     4
+      402   402     H     methane                      1      1.008     1
+
+ Electrostatic Potential Grid Points :                  5126
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      401   401     C     methane                      6     12.011     4
+      402   402     H     methane                      1      1.008     1
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         401        0      0      0   None        -0.17181
+                                                   0.00000  0.00000  0.00000
+                                                   0.00000
+                                                   0.00000  0.00000
+                                                   0.00000  0.00000  0.00000
+
+         402      401      0      0   Z-Only       0.04295
+                                                   0.00000  0.00000 -0.12554
+                                                  -0.00342
+                                                   0.00000 -0.00342
+                                                   0.00000  0.00000  0.00684
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         401             1.334       0.390         402
+         402             0.496       0.390         401
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1        1273        -1.0455        -0.6771         0.4557
+        1        2         965         0.2320         0.1767         0.1903
+        1        3         962         0.2404         0.1776         0.1916
+        1        4         962         0.2435         0.1829         0.1876
+        1        5         964         0.2372         0.1763         0.1937
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.0806
+ Average Potential Magnitude for Model :              0.6565
+ Average Potential Value for Target :                -0.0341
+ Average Potential Magnitude for Target :             0.4574
+
+ Average Signed Potential Difference :               -0.0465
+ Average Unsigned Potential Difference :              0.2021
+ Root Mean Square Potential Difference :              0.2809
