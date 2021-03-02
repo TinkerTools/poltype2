@@ -592,7 +592,7 @@ def prepend_keyfile(poltype,keyfilename,optmol,dipole=False):
     tmpfh = open(tmpfname, "w")
     keyfh = open(keyfilename, "r")
     tmpfh.write("parameters " + poltype.paramhead + "\n")
-
+    tmpfh.write('OPENMP-THREADS '+str(poltype.numproc)+'\n')
     tmpfh.write("bondterm none\n")
     tmpfh.write("angleterm none\n")
     tmpfh.write("torsionterm none\n")

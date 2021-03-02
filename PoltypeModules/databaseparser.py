@@ -2866,7 +2866,7 @@ def SearchForParametersViaCommentsChargeFlux(poltype,bondcommentstolistofsmartsl
                     comments=linesplit[5:]
                     anglecommentstocfparameters[tuple(comments)]=prms
 
-
+    print('bondcommentstocfparameters',bondcommentstocfparameters)
     bondindicestolistofbondcomments=RemoveIndicesThatDontHaveParameters(poltype,bondindicestolistofbondcomments,bondcommentstolistofsmartslist,bondcommentstocfparameters)
     angleindicestolistofanglecomments=RemoveIndicesThatDontHaveParameters(poltype,angleindicestolistofanglecomments,anglecommentstolistofsmartslist,anglecommentstocfparameters)
 
@@ -2912,6 +2912,8 @@ def SearchForParameters(poltype,bondclassestolistofsmartslist,angleclassestolist
 
 def RemoveIndicesThatDontHaveParameters(poltype,indicestolistofclasses,classestolistofsmartslist,classestoparameters):
     indicestodelete=[]
+    print('***********************')
+    print('classestoparameters',classestoparameters)
     for i in range(len(indicestolistofclasses.keys())):
         indices=list(indicestolistofclasses.keys())[i]
         listofclasses=indicestolistofclasses[indices]
@@ -3170,6 +3172,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
         smartstocommentcf=MapSMARTSToComments(poltype,smartstoatomclasscf,atomclasstoclassnamecf)
         bondcommentstolistofsmartslist,bondindicestolistofbondcomments,anglecommentstolistofsmartslist,angleindicestolistofanglecomments=MapIndicesToCommentsBondAngle(poltype,atomindextoallsmartscf,smartstocommentcf,listofbondsforprm,listofanglesforprm)
         bondindicestolistofbondcomments,bondcommentstocfparameters,angleindicestolistofanglecomments,anglecommentstocfparameters=SearchForParametersViaCommentsChargeFlux(poltype,bondcommentstolistofsmartslist,bondindicestolistofbondcomments,anglecommentstolistofsmartslist,angleindicestolistofanglecomments)
+
         bondindicestocommentscf,bondindicestosmartslistcf=FindBestSMARTSMatch(poltype,bondindicestolistofbondcomments,bondcommentstolistofsmartslist)
         angleindicestocommentscf,angleindicestosmartslistcf=FindBestSMARTSMatch(poltype,angleindicestolistofanglecomments,anglecommentstolistofsmartslist)
         commentlistcf=list(atomclasstoclassnamecf.values())
