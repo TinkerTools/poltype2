@@ -17,7 +17,7 @@ import json
 import torsionfit as torfit
 from rdkit import DataStructs
    
-def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms):
+def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo):
     temp=open(vf,'r')
     results=temp.readlines()
     temp.close()
@@ -51,9 +51,15 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
         if foundatomblock==True and atomline==False and wroteout==False:
             wroteout=True
             f.write('\n')
-            for line,transferinfo in vdwprmstotransferinfo.items():
-                f.write(transferinfo)
-                f.write(line)
+            if poltype.forcefield=='AMOEBA+':
+                for line,transferinfo in amoebaplusvdwprmstotransferinfo.items():
+                    f.write(transferinfo)
+                    f.write(line)
+
+            else:
+                for line,transferinfo in vdwprmstotransferinfo.items():
+                    f.write(transferinfo)
+                    f.write(line)
             f.write('\n')
             for line,transferinfo in bondprmstotransferinfo.items():
                 f.write(transferinfo)
@@ -77,6 +83,26 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
             f.write('\n')
             for line in soluteprms:
                 f.write(line)
+            f.write('\n')
+            if poltype.forcefield=='AMOEBA+':
+                for line,transferinfo in ctprmstotransferinfo.items():
+                    f.write(transferinfo)
+                    f.write(line)
+                f.write('\n')
+                for line,transferinfo in cpprmstotransferinfo.items():
+                    f.write(transferinfo)
+                    f.write(line)
+                f.write('\n')
+                for line,transferinfo in bondcfprmstotransferinfo.items():
+                    f.write(transferinfo)
+                    f.write(line)
+                f.write('\n')
+                for line,transferinfo in anglecfprmstotransferinfo.items():
+                    f.write(transferinfo)
+                    f.write(line)
+                f.write('\n')
+
+
                                     
         else:
             if line not in linestoskip:
@@ -2610,7 +2636,7 @@ def MatchAllSmartsToAtomIndices(poltype,smartstoatomclass): #rdkit 0 index based
     return atomindextoallsmarts,atomindextoallsmartsmatches
 
 
-def MapIndicesToComments(poltype,atomindextoallsmarts,smartstocomment,listofatomsforprm):
+def MapIndicesToCommentsAtom(poltype,atomindextoallsmarts,smartstocomment,listofatomsforprm):
     atomcommentstolistofsmartslist={}
     atomindicestolistofatomcomments={}
     for atoms in listofatomsforprm:
@@ -2631,6 +2657,64 @@ def MapIndicesToComments(poltype,atomindextoallsmarts,smartstocomment,listofatom
             if comments not in atomindicestolistofatomcomments[tuple(atoms)]: 
                 atomindicestolistofatomcomments[tuple(atoms)].append(comments)    
     return atomcommentstolistofsmartslist,atomindicestolistofatomcomments
+
+
+def MapIndicesToCommentsBondAngle(poltype,atomindextoallsmarts,smartstocomment,listofbondsforprm,listofanglesforprm):
+    bondcommentstolistofsmartslist={}
+    bondindicestolistofbondcomments={}
+    for bond in listofbondsforprm:
+        aindex=bond[0] 
+        bindex=bond[1] 
+        asmartslist=atomindextoallsmarts[aindex]
+        bsmartslist=atomindextoallsmarts[bindex]
+        combs = list(itertools.product(asmartslist,bsmartslist)) 
+        for comb in combs:
+            asmarts=comb[0]
+            bsmarts=comb[1]
+            acomment=smartstocomment[asmarts]
+            bcomment=smartstocomment[bsmarts]
+            comments=tuple([acomment,bcomment])
+            smartslist=[asmarts,bsmarts]
+            if comments not in bondcommentstolistofsmartslist.keys():
+                bondcommentstolistofsmartslist[comments]=[]
+            if tuple(bond) not in bondindicestolistofbondcomments.keys(): 
+                bondindicestolistofbondcomments[tuple(bond)]=[]
+            if smartslist not in bondcommentstolistofsmartslist[comments]: 
+                bondcommentstolistofsmartslist[comments].append(smartslist)   
+            if comments not in bondindicestolistofbondcomments[tuple(bond)]: 
+                bondindicestolistofbondcomments[tuple(bond)].append(comments)    
+
+    anglecommentstolistofsmartslist={}
+    angleindicestolistofanglecomments={}
+    for angle in listofanglesforprm:
+        aindex=angle[0] 
+        bindex=angle[1] 
+        cindex=angle[2] 
+        asmartslist=atomindextoallsmarts[aindex]
+        bsmartslist=atomindextoallsmarts[bindex]
+        csmartslist=atomindextoallsmarts[cindex]
+        combs = list(itertools.product(asmartslist,bsmartslist,csmartslist)) 
+        for comb in combs:
+            asmarts=comb[0]
+            bsmarts=comb[1]
+            csmarts=comb[2]
+            acomment=smartstocomment[asmarts]
+            bcomment=smartstocomment[bsmarts]
+            ccomment=smartstocomment[csmarts]
+            comments=tuple([acomment,bcomment,ccomment])
+            smartslist=[asmarts,bsmarts,csmarts]
+            if comments not in anglecommentstolistofsmartslist.keys():
+                anglecommentstolistofsmartslist[comments]=[]
+            if tuple(angle) not in angleindicestolistofanglecomments.keys(): 
+                angleindicestolistofanglecomments[tuple(angle)]=[]
+            if smartslist not in anglecommentstolistofsmartslist[comments]: 
+                anglecommentstolistofsmartslist[comments].append(smartslist)   
+            if comments not in angleindicestolistofanglecomments[tuple(angle)]: 
+                angleindicestolistofanglecomments[tuple(angle)].append(comments)    
+
+    return bondcommentstolistofsmartslist,bondindicestolistofbondcomments,anglecommentstolistofsmartslist,angleindicestolistofanglecomments
+
+
 
 
 def MapIndicesToClasses(poltype,atomindextoallsmarts,smartstoatomclass,listofbondsforprm,listofanglesforprm,planarbonds):
@@ -2732,6 +2816,10 @@ def SearchForParametersViaCommentsNonBondedAMOEBAPlus(poltype,atomcommentstolist
     atomcommentstocpparameters={}
     atomcommentstoctparameters={}
     atomcommentstovdwparameters={}
+    atomindicestolistofatomcommentscp=atomindicestolistofatomcomments.copy()
+    atomindicestolistofatomcommentsct=atomindicestolistofatomcomments.copy()
+    atomindicestolistofatomcommentsvdw=atomindicestolistofatomcomments.copy()
+
     temp=open(poltype.amoebaplusnonbondedprmlib,'r')
     results=temp.readlines()
     temp.close()
@@ -2741,14 +2829,48 @@ def SearchForParametersViaCommentsNonBondedAMOEBAPlus(poltype,atomcommentstolist
         if '#' not in first:
             comment=linesplit[0]
             cpprms=linesplit[1:2+1]
+            linesplit[3]=str(float(linesplit[3])*3.01147) # conversion factor for ct
             ctprms=linesplit[3:4+1]
             vdwprms=linesplit[5:7+1]
             atomcommentstocpparameters[tuple([comment])]=cpprms
-            atomcommentstocfparameters[tuple([comment])]=cfprms
+            atomcommentstoctparameters[tuple([comment])]=ctprms
+            atomcommentstovdwparameters[tuple([comment])]=vdwprms
 
-    atomindicestolistofatomcomments=RemoveIndicesThatDontHaveParameters(poltype,atomindicestolistofatomcomments,atomcommentstolistofsmartslist,atomcommentstoparameters)
-    return atomindicestolistofatomcomments,atomcommentstoparameters
 
+    atomindicestolistofatomcommentscp=RemoveIndicesThatDontHaveParameters(poltype,atomindicestolistofatomcommentscp,atomcommentstolistofsmartslist,atomcommentstocpparameters)
+    atomindicestolistofatomcommentsct=RemoveIndicesThatDontHaveParameters(poltype,atomindicestolistofatomcommentsct,atomcommentstolistofsmartslist,atomcommentstoctparameters)
+    atomindicestolistofatomcommentsvdw=RemoveIndicesThatDontHaveParameters(poltype,atomindicestolistofatomcommentsvdw,atomcommentstolistofsmartslist,atomcommentstovdwparameters)
+
+
+
+    return atomindicestolistofatomcommentscp,atomcommentstocpparameters,atomindicestolistofatomcommentsct,atomcommentstoctparameters,atomindicestolistofatomcommentsvdw,atomcommentstovdwparameters
+
+
+def SearchForParametersViaCommentsChargeFlux(poltype,bondcommentstolistofsmartslist,bondindicestolistofbondcomments,anglecommentstolistofsmartslist,angleindicestolistofanglecomments):
+    bondcommentstocfparameters={}
+    anglecommentstocfparameters={}
+    temp=open(poltype.amoebapluscfprmlib,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        linesplit=line.split()
+        if len(linesplit)>0:
+            first=linesplit[0]
+            if '#' not in first:
+                if 'cflux-b' in line:
+                    comments=linesplit[2:]
+                    prms=[linesplit[1]] 
+                    bondcommentstocfparameters[tuple(comments)]=prms
+                elif 'cflux-a' in line:
+                    prms=linesplit[1:4+1]
+                    comments=linesplit[5:]
+                    anglecommentstocfparameters[tuple(comments)]=prms
+
+
+    bondindicestolistofbondcomments=RemoveIndicesThatDontHaveParameters(poltype,bondindicestolistofbondcomments,bondcommentstolistofsmartslist,bondcommentstocfparameters)
+    angleindicestolistofanglecomments=RemoveIndicesThatDontHaveParameters(poltype,angleindicestolistofanglecomments,anglecommentstolistofsmartslist,anglecommentstocfparameters)
+
+    return bondindicestolistofbondcomments,bondcommentstocfparameters,angleindicestolistofanglecomments,anglecommentstocfparameters
 
 
 
@@ -3042,20 +3164,34 @@ def GenerateSoluteParameters(poltype,atomindicestosmartslist,smartstosoluteradii
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     
     listofatomsforprm,listofbondsforprm,listofanglesforprm,listoftorsionsforprm=GrabAtomsForParameters(poltype,mol)
-    #smartstoatomclassnonbondedplus, atomclasstoclassnamenonbondedplus, atomclasstocommentnonbondedplus=ReadDatabaseSmartsMap(poltype,poltype.amoebaplusnonbondedsmartstocommentmap) 
-    #atomindextoallsmartsnonbondedplus,atomindextoallsmartsmatchesnonbondedplus=MatchAllSmartsToAtomIndices(poltype,smartstoatomclassnonbondedplus)
-    #print('atomindextoallsmartsnonbondedplus',atomindextoallsmartsnonbondedplus)
-    #smartstocommentnonbondedplus=MapSMARTSToComments(poltype,smartstoatomclassnonbondedplus,atomclasstoclassnamenonbondedplus)
-    #print('smartstocommentnonbondedplus',smartstocommentnonbondedplus)
-    #atomcommentstolistofsmartslistnonbondedplus,atomindicestolistofatomcommentsnonbondedplus=MapIndicesToComments(poltype,atomindextoallsmartsnonbondedplus,smartstocommentnonbondedplus,listofatomsforprm)
-    #print('atomcommentstolistofsmartslistnonbondedplus',atomcommentstolistofsmartslistnonbondedplus)
-    #atomindicestolistofatomcommentsnonbondedplus,atomcommentstoparametersnonbondedplus=SearchForParametersViaComments(poltype,atomcommentstolistofsmartslistnonbondedplus,atomindicestolistofatomcommentsnonbondedplus)
-    #print('atomindicestolistofatomcommentsnonbondedplus',atomindicestolistofatomcommentsnonbondedplus)
-    #atomindicestocommentsnonbondedplus,atomindicestosmartslistnonbondedplus=FindBestSMARTSMatch(poltype,atomindicestolistofatomcommentsnonbondedplus,atomcommentstolistofsmartslistnonbondedplus)
-    #print('atomindicestocommentsnonbondedplus',atomindicestocommentsnonbondedplus)
-    #commentlistnonbondedplus=list(atomclasstoclassnamenonbondedplus.values())
-    #atomcommentstocommentnonbondedplus=dict(zip(commentlistnonbondedplus,commentlistnonbondedplus))
-    #newpolarindicestopoltypeclasses,newpolarprms,newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist=GrabNewParameters(poltype,atomindicestocomments,atomcommentstoparameters,'polarize',atomindicestosmartslist,atomcommentstocomment) 
+    if poltype.forcefield=='AMOEBA+':
+        smartstoatomclasscf, atomclasstoclassnamecf, atomclasstocommentcf=ReadDatabaseSmartsMap(poltype,poltype.amoebapluscfsmartstocommentmap) 
+        atomindextoallsmartscf,atomindextoallsmartsmatchescf=MatchAllSmartsToAtomIndices(poltype,smartstoatomclasscf)
+        smartstocommentcf=MapSMARTSToComments(poltype,smartstoatomclasscf,atomclasstoclassnamecf)
+        bondcommentstolistofsmartslist,bondindicestolistofbondcomments,anglecommentstolistofsmartslist,angleindicestolistofanglecomments=MapIndicesToCommentsBondAngle(poltype,atomindextoallsmartscf,smartstocommentcf,listofbondsforprm,listofanglesforprm)
+        bondindicestolistofbondcomments,bondcommentstocfparameters,angleindicestolistofanglecomments,anglecommentstocfparameters=SearchForParametersViaCommentsChargeFlux(poltype,bondcommentstolistofsmartslist,bondindicestolistofbondcomments,anglecommentstolistofsmartslist,angleindicestolistofanglecomments)
+        bondindicestocommentscf,bondindicestosmartslistcf=FindBestSMARTSMatch(poltype,bondindicestolistofbondcomments,bondcommentstolistofsmartslist)
+        angleindicestocommentscf,angleindicestosmartslistcf=FindBestSMARTSMatch(poltype,angleindicestolistofanglecomments,anglecommentstolistofsmartslist)
+        commentlistcf=list(atomclasstoclassnamecf.values())
+        atomcommentstocommentcf=dict(zip(commentlistcf,commentlistcf))
+        bondcfindicestopoltypeclasses,bondcfprms,bondcfpoltypecommentstocomments,bondcfpoltypecommentstosmartslist=GrabNewParameters(poltype,bondindicestocommentscf,bondcommentstocfparameters,'cflux-b',bondindicestosmartslistcf,atomcommentstocommentcf) 
+        anglecfindicestopoltypeclasses,anglecfprms,anglecfpoltypecommentstocomments,anglecfpoltypecommentstosmartslist=GrabNewParameters(poltype,angleindicestocommentscf,anglecommentstocfparameters,'cflux-a',angleindicestosmartslistcf,atomcommentstocommentcf) 
+        smartstoatomclassnonbondedplus, atomclasstoclassnamenonbondedplus, atomclasstocommentnonbondedplus=ReadDatabaseSmartsMap(poltype,poltype.amoebaplusnonbondedsmartstocommentmap) 
+        atomindextoallsmartsnonbondedplus,atomindextoallsmartsmatchesnonbondedplus=MatchAllSmartsToAtomIndices(poltype,smartstoatomclassnonbondedplus)
+        smartstocommentnonbondedplus=MapSMARTSToComments(poltype,smartstoatomclassnonbondedplus,atomclasstoclassnamenonbondedplus)
+        atomcommentstolistofsmartslistnonbondedplus,atomindicestolistofatomcommentsnonbondedplus=MapIndicesToCommentsAtom(poltype,atomindextoallsmartsnonbondedplus,smartstocommentnonbondedplus,listofatomsforprm)
+
+        atomindicestolistofatomcommentscp,atomcommentstocpparameters,atomindicestolistofatomcommentsct,atomcommentstoctparameters,atomindicestolistofatomcommentsvdw,atomcommentstovdwparameters=SearchForParametersViaCommentsNonBondedAMOEBAPlus(poltype,atomcommentstolistofsmartslistnonbondedplus,atomindicestolistofatomcommentsnonbondedplus)
+        atomindicestocommentscp,atomindicestosmartslistcp=FindBestSMARTSMatch(poltype,atomindicestolistofatomcommentscp,atomcommentstolistofsmartslistnonbondedplus)
+        atomindicestocommentsct,atomindicestosmartslistct=FindBestSMARTSMatch(poltype,atomindicestolistofatomcommentsct,atomcommentstolistofsmartslistnonbondedplus)
+        atomindicestocommentsvdw,atomindicestosmartslistvdw=FindBestSMARTSMatch(poltype,atomindicestolistofatomcommentsvdw,atomcommentstolistofsmartslistnonbondedplus)
+
+        commentlistnonbondedplus=list(atomclasstoclassnamenonbondedplus.values())
+        atomcommentstocommentnonbondedplus=dict(zip(commentlistnonbondedplus,commentlistnonbondedplus))
+
+        cpindicestopoltypeclasses,cpprms,cppoltypecommentstocomments,cppoltypecommentstosmartslist=GrabNewParameters(poltype,atomindicestocommentscp,atomcommentstocpparameters,'chgpen',atomindicestosmartslistcp,atomcommentstocommentnonbondedplus) 
+        ctindicestopoltypeclasses,ctprms,ctpoltypecommentstocomments,ctpoltypecommentstosmartslist=GrabNewParameters(poltype,atomindicestocommentsct,atomcommentstoctparameters,'chgtrn',atomindicestosmartslistct,atomcommentstocommentnonbondedplus) 
+        newvdwindicestopoltypeclasses,newvdwprms,newvdwpoltypecommentstocomments,newvdwpoltypecommentstosmartslist=GrabNewParameters(poltype,atomindicestocommentsvdw,atomcommentstovdwparameters,'vdw',atomindicestosmartslistvdw,atomcommentstocommentnonbondedplus) 
 
 
     smartstosoluteradiiprms=GrabSmartsToSoluteRadiiMap(poltype)   
@@ -3069,7 +3205,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     smartstoatomclasspolar, atomclasstoclassnamepolar, atomclasstocommentpolar=ReadDatabaseSmartsMap(poltype,poltype.latestsmallmoleculesmartstotypespolarize) 
     atomindextoallsmartspolar,atomindextoallsmartsmatchespolar=MatchAllSmartsToAtomIndices(poltype,smartstoatomclasspolar)
     smartstocomment=MapSMARTSToComments(poltype,smartstoatomclasspolar,atomclasstoclassnamepolar)
-    atomcommentstolistofsmartslist,atomindicestolistofatomcomments=MapIndicesToComments(poltype,atomindextoallsmartspolar,smartstocomment,listofatomsforprm)
+    atomcommentstolistofsmartslist,atomindicestolistofatomcomments=MapIndicesToCommentsAtom(poltype,atomindextoallsmartspolar,smartstocomment,listofatomsforprm)
     atomindicestolistofatomcomments,atomcommentstoparameters=SearchForParametersViaCommentsPolarize(poltype,atomcommentstolistofsmartslist,atomindicestolistofatomcomments)
     atomindicestocomments,atomindicestosmartslist=FindBestSMARTSMatch(poltype,atomindicestolistofatomcomments,atomcommentstolistofsmartslist)
     commentlist=list(atomclasstoclassnamepolar.values())
@@ -3240,8 +3376,23 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     
     polarprmstotransferinfo=MapParameterLineToTransferInfo(poltype,newpolarprms,{},{},{},{},newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist)
 
-
     vdwprmstotransferinfo=MapParameterLineToTransferInfo(poltype,vdwprms,atompoltypeclasstoparametersmartsatomorder,atompoltypeclasstosmartsatomorder,atompoltypeclassestoelementtinkerdescrip,vdwpoltypeclassestosmartsatomordersext,{},{})
+    if poltype.forcefield=='AMOEBA+':
+        amoebaplusvdwprmstotransferinfo=MapParameterLineToTransferInfo(poltype,newvdwprms,{},{},{},{},newvdwpoltypecommentstocomments,newvdwpoltypecommentstosmartslist)
+        ctprmstotransferinfo=MapParameterLineToTransferInfo(poltype,ctprms,{},{},{},{},ctpoltypecommentstocomments,ctpoltypecommentstosmartslist)
+        cpprmstotransferinfo=MapParameterLineToTransferInfo(poltype,cpprms,{},{},{},{},cppoltypecommentstocomments,cppoltypecommentstosmartslist)
+
+        bondcfprmstotransferinfo=MapParameterLineToTransferInfo(poltype,bondcfprms,{},{},{},{},bondcfpoltypecommentstocomments,bondcfpoltypecommentstosmartslist)
+        anglecfprmstotransferinfo=MapParameterLineToTransferInfo(poltype,anglecfprms,{},{},{},{},anglecfpoltypecommentstocomments,anglecfpoltypecommentstosmartslist)
+
+
+    else:
+        amoebaplusvdwprmstotransferinfo={}
+        ctprmstotransferinfo={}
+        cpprmstotransferinfo={}
+        bondcfprmstotransferinfo={}
+        anglecfprmstotransferinfo={}
+
     bondprmstotransferinfo=MapParameterLineToTransferInfo(poltype,bondprms,bondpoltypeclassestoparametersmartsatomorders,bondpoltypeclassestosmartsatomorders,bondpoltypeclassestoelementtinkerdescrips,bondpoltypeclassestosmartsatomordersext,newbondpoltypeclassestocomments,newbondpoltypeclassestosmartslist)
     opbendprmstotransferinfo=MapParameterLineToTransferInfo(poltype,opbendprms,opbendpoltypeclassestoparametersmartsatomorders,opbendpoltypeclassestosmartsatomorders,opbendpoltypeclassestoelementtinkerdescrips,opbendpoltypeclassestosmartsatomordersext,newopbendpoltypeclassestocomments,newopbendpoltypeclassestosmartslist,defaultvalues)
     angleprmstotransferinfo=MapParameterLineToTransferInfo(poltype,angleprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips,anglepoltypeclassestosmartsatomordersext,newanglepoltypeclassestocomments,newanglepoltypeclassestosmartslist)
@@ -3252,4 +3403,4 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     WriteDictionaryToFile(poltype,torsionkeystringtoparameters,poltype.torsionprmguessfilename)
     WriteOutList(poltype,missingvdwatomindices,poltype.vdwmissingfilename)
 
-    return bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,torsionkeystringtoparameters,missingvdwatomindices,soluteprms
+    return bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,torsionkeystringtoparameters,missingvdwatomindices,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo
