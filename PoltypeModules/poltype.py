@@ -1414,11 +1414,16 @@ class PolarizableTyper():
         if os.path.exists(self.scrtmpdirpsi4):
             shutil.rmtree(self.scrtmpdirpsi4)
 
-        #return param
 
 
 
 if __name__ == '__main__':
     poltype=PolarizableTyper() 
-    #params=poltype.main()
-    poltype.main()
+    try:
+        poltype.main()
+    except:
+        if os.path.exists(poltype.scrtmpdirgau):
+            shutil.rmtree(poltype.scrtmpdirgau)
+        if os.path.exists(poltype.scrtmpdirpsi4):
+            shutil.rmtree(poltype.scrtmpdirpsi4)
+
