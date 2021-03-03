@@ -1208,6 +1208,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
         temp.write('set {'+'\n')
         temp.write('  geom_maxiter '+str(poltype.optmaxcycle)+'\n')
         temp.write('  g_convergence GAU_LOOSE'+'\n')
+        temp.write('  dynamic_level 1'+'\n')
         temp.write('}'+'\n')
 
     temp.write('memory '+poltype.maxmem+'\n')
@@ -1665,7 +1666,6 @@ def TinkerTorsionTorsionInitialScan(poltype,torset,optmol,bondtopology):
             failedgridpoints.append(phaseangles)
         else:
             tot_energy,tor_energy=torfit.GrabTinkerEnergy(poltype,toralzfname)
-            #rowindex=numpy.where((phaseanglelist == phaseangles).all(axis=1))[0][0]
             energyarray[rowindex]=tot_energy
 
     for angles in failedgridpoints:
@@ -1689,7 +1689,16 @@ def FindAllConsecutiveRotatableBonds(poltype,mol):
     newrotbnds=[]
     for rotbnd in rotbnds:
         newrotbnd=[int(i) for i in rotbnd]
-        newrotbnds.append(newrotbnd)
+        found=False
+        for torset in poltype.torlist:
+           for torsion in torset:
+               b=torsion[1]
+               c=torsion[2]
+               rots=[b,c]
+               if rots==newrotbnd or rots[::-1]==newrotbnd:
+                   found=True
+        if found==True:   
+            newrotbnds.append(newrotbnd)
     combs=list(combinations(newrotbnds,2)) 
     for comb in combs:
         firstbnd=comb[0]
@@ -1778,12 +1787,6 @@ def RemoveTorTorPoints(poltype,energyarray,phaseanglelist,indicestokeep):
             currentlength=len(newphasearray)
             if currentlength<=poltype.defaultmaxtorsiongridpoints:
                 newphasearray.append(phase)
-    newphasearrayoriginalsort=[]
-    for phase in phaseanglelist:
-        phase=phase.tolist()
-        found=phase in newphasearray
-        if found==True:
-            newphasearrayoriginalsort.append(phase)
     return newphasearray
             
 

@@ -17,7 +17,7 @@
 # GNU General Public License for more details.
 #
 ##################################################################
-
+import traceback
 import os
 import sys
 from socket import gethostname
@@ -1422,6 +1422,7 @@ if __name__ == '__main__':
     try:
         poltype.main()
     except:
+        traceback.print_stack()
         if os.path.exists(poltype.scrtmpdirgau):
             shutil.rmtree(poltype.scrtmpdirgau)
         if os.path.exists(poltype.scrtmpdirpsi4):

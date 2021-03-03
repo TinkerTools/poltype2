@@ -337,7 +337,7 @@ def prune_qme_error(poltype,del_ang_list,*arr_list):
                 del a_list[del_idx]
     return arr_list
 
-def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename):
+def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,fileprefix):
     """
     Intent: Form dicts for each torsion in torlist, mapping the torsion class key ('clskey') to 
     an energy profile (dihedral angle vs. energy). 'cls_mm_engy_dict' maps 'clskey' to pre-fit MM 
@@ -399,7 +399,7 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename):
         qme_list = []  # QM torsion energy
         # find qm, then mm energies of the various torsion values found for 'tor'
         qme_list,qang_list,WBOarray = compute_qm_tor_energy(poltype,torset,mol,flatphaselist)
-        mme_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,'_preQMOPTprefit',flatphaselist,tmpkey1basename)
+        mme_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,fileprefix,flatphaselist,tmpkey1basename)
         # delete members of the list where the energy was not able to be found 
         del_ang_list = find_del_list(poltype,mme_list,mang_list)
         (cls_angle_dict[tup],cls_mm_engy_dict[tup])=prune_mme_error(poltype,del_ang_list,cls_angle_dict[tup],cls_mm_engy_dict[tup])
@@ -1333,7 +1333,7 @@ def process_rot_bond_tors(poltype,mol):
     # Get QM and MM (pre-fit) energy profiles for torsion parameters
     if poltype.tortor==True: 
         DecomposeTorsionTorsion(poltype,mol)
-    cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict = get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename)
+    cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict = get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,'_preQMOPTprefit')
     # if the fit has not been done already
     clskeyswithbadfits=[]
     count=0
@@ -1358,7 +1358,7 @@ def process_rot_bond_tors(poltype,mol):
     if poltype.torfit1Drotonly==True and poltype.tortor==True:
         poltype.torfit1Drotonly=False
         poltype.torfit2Drotonly=True 
-        cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict = get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename)
+        cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict = get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,'_postQMOPTpostfit')
         PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,mol,tmpkey2basename)
 
     shutil.copy(tmpkey2basename,'../' + poltype.key5fname)

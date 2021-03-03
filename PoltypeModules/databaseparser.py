@@ -16,7 +16,8 @@ import numpy as np
 import json
 import torsionfit as torfit
 from rdkit import DataStructs
-   
+import torsiongenerator as torgen
+  
 def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo):
     temp=open(vf,'r')
     results=temp.readlines()
@@ -42,7 +43,7 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
                 polartype=polarlinesplit[1]
                 if atomtype==polartype:
                     f.write(transferinfo)
-                    f.write(polarprmsline+' '+residstring+'\n')
+                    f.write(polarprmsline.replace('\n','')+' '+residstring+'\n')
                     linestoskip.append(line)
                     break
                     
@@ -1355,7 +1356,49 @@ def CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol):
                 allhydrogentor=False
     return allhydrogentor    
 
+def FindAllConsecutiveRotatableBonds(poltype,mol,listofbondsforprm):
+    totalbondscollector=[]
+    newrotbnds=[]
+    for rotbnd in listofbondsforprm:
+        newrotbnds.append(rotbnd)
+    combs=list(combinations(newrotbnds,2)) 
+    for comb in combs:
+        firstbnd=comb[0]
+        secondbnd=comb[1]
+        total=firstbnd[:]+secondbnd[:]
+        totalset=set(total)
+        if len(totalset)==3:
+            totalbondscollector.append([firstbnd,secondbnd])
+    return totalbondscollector
 
+def FindAdjacentMissingTorsionsForTorTor(poltype,torsionsmissing,totalbondscollector):
+    for bndlist in totalbondscollector:
+        first=bndlist[0]
+        second=bndlist[1]
+        foundfirst=CheckIfRotatableBondInMissingTorsions(poltype,first,torsionsmissing) 
+        foundsecond=CheckIfRotatableBondInMissingTorsions(poltype,second,torsionsmissing) 
+        if (foundfirst==False and foundsecond==True and poltype.tortor==True):
+            b=first[0]+1
+            c=first[1]+1
+            a,d = torgen.find_tor_restraint_idx(poltype,poltype.mol,b,c)
+            tor=[a-1,b-1,c-1,d-1]
+            torsionsmissing.append(tor)
+        elif (foundfirst==True and foundsecond==False and poltype.tortor==True):
+            b=second[0]+1
+            c=second[1]+1
+            a,d = torgen.find_tor_restraint_idx(poltype,poltype.mol,b,c)
+            tor=[a-1,b-1,c-1,d-1]
+            torsionsmissing.append(tor)
+    return torsionsmissing
+
+def CheckIfRotatableBondInMissingTorsions(poltype,rotbnd,torsionsmissing):
+    found=False
+    for tor in torsionsmissing:
+        bnd=[tor[1],tor[2]]
+        if bnd==rotbnd or bnd[::-1]==rotbnd:
+            found=True
+            break
+    return found
 
 
 def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,indextoneighbidxs):
@@ -1987,6 +2030,7 @@ def ReadExternalDatabase(poltype):
     anglesmartsatomordertoparameters={}
     strbndsmartsatomordertoparameters={}
     torsionsmartsatomordertoparameters={}
+    tortorsmartsatomordertoparameters={}
     opbendsmartsatomordertoparameters={}
     vdwsmartsatomordertoparameters={}
     for line in results:
@@ -2017,6 +2061,11 @@ def ReadExternalDatabase(poltype):
             opbendsmartsatomordertoparameters[smartsatomorder]=prmlist
         elif keyword=='vdw':
             vdwsmartsatomordertoparameters[smartsatomorder]=prmlist
+        elif keyword=='tortors':
+            prmstring=linesplit[4]
+            prmstringlist=prmstring.split(',')
+            prmlist=[float(i) for i in prmstringlist] 
+
     return bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters
 
 
@@ -2866,7 +2915,6 @@ def SearchForParametersViaCommentsChargeFlux(poltype,bondcommentstolistofsmartsl
                     comments=linesplit[5:]
                     anglecommentstocfparameters[tuple(comments)]=prms
 
-    print('bondcommentstocfparameters',bondcommentstocfparameters)
     bondindicestolistofbondcomments=RemoveIndicesThatDontHaveParameters(poltype,bondindicestolistofbondcomments,bondcommentstolistofsmartslist,bondcommentstocfparameters)
     angleindicestolistofanglecomments=RemoveIndicesThatDontHaveParameters(poltype,angleindicestolistofanglecomments,anglecommentstolistofsmartslist,anglecommentstocfparameters)
 
@@ -2912,8 +2960,6 @@ def SearchForParameters(poltype,bondclassestolistofsmartslist,angleclassestolist
 
 def RemoveIndicesThatDontHaveParameters(poltype,indicestolistofclasses,classestolistofsmartslist,classestoparameters):
     indicestodelete=[]
-    print('***********************')
-    print('classestoparameters',classestoparameters)
     for i in range(len(indicestolistofclasses.keys())):
         indices=list(indicestolistofclasses.keys())[i]
         listofclasses=indicestolistofclasses[indices]
@@ -3282,6 +3328,8 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     torsionindicestotinkertypes,torsionindicestotinkerclasses,torsionindicestoparametersmartsatomorders,torsionindicestoelementtinkerdescrips,torsionindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,torsionsforprmtoparametersmarts,torsionsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
     indextoneighbidxs=FindAllNeighborIndexes(poltype,rdkitmol)
     torsionsmissing,poormatchingaromatictorsions=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
+    #totalbondscollector=FindAllConsecutiveRotatableBonds(poltype,mol,listofbondsforprm)
+    #torsionsmissing=FindAdjacentMissingTorsionsForTorTor(poltype,torsionsmissing,totalbondscollector)
     atomindextosmartsatomorder=AddExternalDatabaseMatches(poltype, atomindextosmartsatomorder,vdwindicestoextsmarts,vdwsmartsatomordertoparameters)
     vdwmissing=FindMissingParameters(poltype,atomindextosmartsatomorder,rdkitmol,mol,indextoneighbidxs)
     missingvdwatomindices=ReduceMissingVdwByTypes(poltype,vdwmissing)
