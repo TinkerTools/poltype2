@@ -34,6 +34,7 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
             if foundatomblock==False:
                 foundatomblock=True
         elif 'polarize' in line:
+            atomline=False
             linesplit=line.split()
             atomtype=linesplit[1]
             resid=linesplit[3:]
@@ -2031,6 +2032,8 @@ def ReadExternalDatabase(poltype):
     strbndsmartsatomordertoparameters={}
     torsionsmartsatomordertoparameters={}
     tortorsmartsatomordertoparameters={}
+    tortorsmartsatomordertogrid={}
+
     opbendsmartsatomordertoparameters={}
     vdwsmartsatomordertoparameters={}
     for line in results:
@@ -2062,11 +2065,15 @@ def ReadExternalDatabase(poltype):
         elif keyword=='vdw':
             vdwsmartsatomordertoparameters[smartsatomorder]=prmlist
         elif keyword=='tortors':
+            gridstring=linesplit[3].lstrip().rstrip()
+            grid=gridstring.split()
             prmstring=linesplit[4]
             prmstringlist=prmstring.split(',')
-            prmlist=[float(i) for i in prmstringlist] 
+            prmstringsplits=[s.split() for s in prmstring]
+            tortorsmartsatomordertoparameters[smartsatomorder]=prmstringsplits
+            tortorsmartsatomordertogrid[smartsatomorder]=grid
 
-    return bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters
+    return bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters,tortorsmartsatomordertoparameters,tortorsmartsatomordertogrid
 
 
 def ConvertToPoltypeClasses(poltype,torsionsmissing):
@@ -3263,7 +3270,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
 
     smartstoatomclass, atomclasstoclassname, atomclasstocomment=ReadDatabaseSmartsMap(poltype,poltype.latestsmallmoleculesmartstotinkerclass) 
     atomindextoallsmarts,atomindextoallsmartsmatches=MatchAllSmartsToAtomIndices(poltype,smartstoatomclass)
-    bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters=ReadExternalDatabase(poltype)
+    bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters,tortorsmartsatomordertoparameters,tortorsmartsatomordertogrid=ReadExternalDatabase(poltype)
     smartsatomordertoelementtinkerdescrip=ReadSmallMoleculeLib(poltype,poltype.smallmoleculesmartstotinkerdescrip)
     elementtinkerdescriptotinkertype,tinkertypetoclass=GrabTypeAndClassNumbers(poltype,poltype.smallmoleculeprmlib)
     planarbonds=GrabPlanarBonds(poltype,listofbondsforprm,mol)
@@ -3295,6 +3302,8 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
 
     opbendindicestoextsmartsmatchlength,opbendindicestoextsmarts=MatchExternalSMARTSToMolecule(poltype,rdkitmol,opbendsmartsatomordertoparameters)
     vdwindicestoextsmartsmatchlength,vdwindicestoextsmarts=MatchExternalSMARTSToMolecule(poltype,rdkitmol,vdwsmartsatomordertoparameters)
+    tortorindicestoextsmartsmatchlength,tortorindicestoextsmarts=MatchExternalSMARTSToMolecule(poltype,rdkitmol,tortorsmartsatomordertoparameters)
+
     atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,atomindicesforprmtosmartslist,parametersmartslist,mol)
     bondsforprmtoparametersmarts,bondsforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,bondsforprmtosmartslist,parametersmartslist,mol)
     planarbondsforprmtoparametersmarts,planarbondsforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,planarbondsforprmtosmartslist,parametersmartslist,mol)
