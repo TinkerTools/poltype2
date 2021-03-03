@@ -539,7 +539,7 @@ def rm_esp_terms_keyfile(poltype,keyfilename):
     results=anothertemp.readlines()
     anothertemp.close()
     for line in results:
-        if 'potential-offset' in line or 'none' in line or 'fix-monopole' in line and 'atom' not in line:
+        if ('potential-offset' in line or 'none' in line or 'fix-monopole' in line) and 'atom' not in line:
             pass
         else:
             temp.write(line)
