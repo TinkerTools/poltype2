@@ -1233,8 +1233,7 @@ class PolarizableTyper():
 
         torgen.FindPartialDoubleBonds(self,m)
         if not os.path.isfile(self.key4fname) or not os.path.isfile(self.torsionsmissingfilename) or not os.path.isfile(self.torsionprmguessfilename):
-            bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,missingvdwatomindextoneighbors,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
-       
+            bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,missingvdwatomindextoneighbors,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
         if os.path.isfile(self.torsionsmissingfilename):
             torsionsmissing=databaseparser.ReadTorsionList(self,self.torsionsmissingfilename)
         if os.path.isfile(self.torsionprmguessfilename):
@@ -1319,7 +1318,7 @@ class PolarizableTyper():
         # Map from idx to symm class is made for databaseparser.py
         # databaseparser.py method is called to find parameters and append them to the keyfile
         if not os.path.exists(self.key4fname):
-            databaseparser.appendtofile(self,self.key3fname,self.key4fname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo)
+            databaseparser.appendtofile(self,self.key3fname,self.key4fname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo)
         if self.torsppcm:
             torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
         # Find rotatable bonds for future torsion scans
@@ -1422,9 +1421,10 @@ if __name__ == '__main__':
     try:
         poltype.main()
     except:
-        traceback.print_stack()
+        traceback.print_exc(file=sys.stdout)
         if os.path.exists(poltype.scrtmpdirgau):
             shutil.rmtree(poltype.scrtmpdirgau)
         if os.path.exists(poltype.scrtmpdirpsi4):
             shutil.rmtree(poltype.scrtmpdirpsi4)
+        raise ValueError('Houston, we have a problem. Buy a developer some coffee!')
 

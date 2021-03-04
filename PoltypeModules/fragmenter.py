@@ -657,6 +657,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                     rdkittor=[k-1 for k in torsion] 
                     fragtor=[parentindextofragindex[k] for k in rdkittor]
                     equivfragtor=[indextoequivalentindex[k] for k in fragtor]
+                    equivfragtor=FindCorrectEquivalentMapping(poltype,equivfragtor,fragidxtosymclass,fragindextoparentindex)
                     equivparenttor=[fragindextoparentindex[k] for k in equivfragtor]
                     equivparenttor=[k+1 for k in equivparenttor] 
                     equivclasskey=torgen.get_class_key(poltype,equivparenttor[0],equivparenttor[1],equivparenttor[2],equivparenttor[3])
@@ -726,6 +727,22 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
     os.chdir(parentdir)
     finishedjobs,errorjobs=SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog)
     return equivalentrotbndindexarrays,rotbndindextoringtor
+
+
+def FindCorrectEquivalentMapping(poltype,equivfragtor,fragidxtosymclass,fragindextoparentindex):
+    newequivfragtor=[]
+    for equividx in equivfragtor:
+        babelidx=equividx+1
+        symclass=fragidxtosymclass[babelidx] 
+        indices=GrabKeysFromValue(poltype,fragidxtosymclass,symclass)
+        for index in indices:
+            rdkitindex=index-1
+            if rdkitindex in fragindextoparentindex.keys():
+                newequivfragtor.append(rdkitindex)
+                break
+
+    return newequivfragtor
+
 
 
 def GenerateSMARTSPositionStringAndAtomIndices(poltype,torsion,parentindextofragindex,fragidxarray,indextoequivalentindex):
@@ -1197,32 +1214,37 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets,non
             tempdic[rotbndindex]=parentindextofragindex     
     for key,value in tempdic.items():
         rotbndindextoparentindextofragindex[key]=value 
-    equivalentrotbndindexmaps=CopyEquivalentReferenceFragmentToOtherFragments(poltype,equivalentrotbndindexarrays,rotbndindextofragmentfilepath)
+    equivalentrotbndindexmaps=CopyEquivalentReferenceFragmentToOtherFragments(poltype,equivalentrotbndindexarrays,rotbndindextofragmentfilepath,rotbndindextoparentindextofragindex)
     return rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor,equivalentrotbndindexmaps
 
 
-def CopyEquivalentReferenceFragmentToOtherFragments(poltype,equivalentrotbndindexarrays,rotbndindextofragmentfilepath):
+def CopyEquivalentReferenceFragmentToOtherFragments(poltype,equivalentrotbndindexarrays,rotbndindextofragmentfilepath,rotbndindextoparentindextofragindex):
     equivalentrotbndindexmaps=[]
     for array in equivalentrotbndindexarrays:
         maps=[]
+        equivalentrotbndindex=array[0]
+        equivalentparentindextofragindex=rotbndindextoparentindextofragindex[equivalentrotbndindex]
         for i in range(len(array)):
             rotbndindex=array[i]
+            parentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
             if i==0:
                 equivalentstructurepath=rotbndindextofragmentfilepath[rotbndindex]
                 equivalentmolstruct=ReadToOBMol(poltype,equivalentstructurepath)
-                indextoreferenceindex=MatchOBMols(poltype,equivalentmolstruct,equivalentmolstruct)
+                indextoreferenceindex=MatchOBMols(poltype,equivalentmolstruct,equivalentmolstruct,parentindextofragindex,equivalentparentindextofragindex)
 
             else:
                 structurepath=rotbndindextofragmentfilepath[rotbndindex]
                 molstruct=ReadToOBMol(poltype,structurepath)
-                indextoreferenceindex=MatchOBMols(poltype,molstruct,equivalentmolstruct)
+                indextoreferenceindex=MatchOBMols(poltype,molstruct,equivalentmolstruct,parentindextofragindex,equivalentparentindextofragindex)
                 shutil.copy(equivalentstructurepath,structurepath)
             maps.append(indextoreferenceindex)
         equivalentrotbndindexmaps.append(maps)
     return equivalentrotbndindexmaps   
 
 
-def MatchOBMols(poltype,molstruct,equivalentmolstruct):
+def MatchOBMols(poltype,molstruct,equivalentmolstruct,parentindextofragindex,equivalentparentindextofragindex):
+    fragindices=list(parentindextofragindex.values())
+    equivalentfragindices=list(equivalentparentindextofragindex.values())
     indextoreferenceindex={}
     tmpconv = openbabel.OBConversion()
     tmpconv.SetOutFormat('mol')
@@ -1233,18 +1255,19 @@ def MatchOBMols(poltype,molstruct,equivalentmolstruct):
     tmpconv.WriteFile(molstruct,outputname)
     molstructrdkit=rdmolfiles.MolFromMolFile(outputname,removeHs=False)
     p = Chem.MolFromSmarts(smarts)
-    matches=molstructrdkit.GetSubstructMatches(p) 
-    firstmatch=matches[0]
-    indices=list(range(len(firstmatch)))
-    smartsindextomoleculeindex=dict(zip(indices,firstmatch)) 
-    matches=newmol.GetSubstructMatches(p) 
-    firstmatch=matches[0]
-    indices=list(range(len(firstmatch)))
-    smartsindextoequivalentmoleculeindex=dict(zip(indices,firstmatch)) 
-    moleculeindextosmartsindex={v: k for k, v in smartsindextomoleculeindex.items()}
-    for moleculeindex,smartsindex in moleculeindextosmartsindex.items():
-        refindex=smartsindextoequivalentmoleculeindex[smartsindex]
-        indextoreferenceindex[moleculeindex]=refindex
+    matches=molstructrdkit.GetSubstructMatches(p)
+    for othermatch in matches: 
+       indices=list(range(len(othermatch)))
+       smartsindextomoleculeindex=dict(zip(indices,othermatch)) 
+       matches=newmol.GetSubstructMatches(p)
+       for match in matches: 
+           indices=list(range(len(match)))
+           smartsindextoequivalentmoleculeindex=dict(zip(indices,match)) 
+           moleculeindextosmartsindex={v: k for k, v in smartsindextomoleculeindex.items()}
+           for moleculeindex,smartsindex in moleculeindextosmartsindex.items():
+               refindex=smartsindextoequivalentmoleculeindex[smartsindex]
+               indextoreferenceindex[moleculeindex]=refindex
+   
     return indextoreferenceindex
 
 def GenerateFakeTorset(poltype,mol,parentindextofragindex):
