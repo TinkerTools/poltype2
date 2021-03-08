@@ -1503,13 +1503,26 @@ def FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertop
         dnew=dnewatom.GetIdx()
         bnew=bnewatom.GetIdx()
         e=eatom.GetIdx()
-        indices=[a-1,bnew-1,c,dnew-1,e-1]
+        indices=[a-1,b,c,d,e-1]
+        inonlyrotbnds=CheckIfRotatableBondsInOnlyRotBnds(poltype,first,second)
         foundtortormissing=CheckIfRotatableBondInMissingTorTors(poltype,[bnew-1,c],[c,dnew-1],tortorsmissing)
         foundtortor=CheckIfRotatableBondInMissingTorTors(poltype,[bnew-1,c],[c,dnew-1],tortorsfound)
-        if foundtortormissing==False and foundtortor==False:
+        if foundtortormissing==False and foundtortor==False and inonlyrotbnds==True:
             tortorsmissing.append(indices)
 
     return tortorsmissing
+
+def CheckIfRotatableBondsInOnlyRotBnds(poltype,first,second):
+    inonlyrotbnds=True
+    first=[i+1 for i in first]
+    second=[i+1 for i in second]
+    if (first in poltype.onlyrotbndslist or first[::-1] in poltype.onlyrotbndslist) and (second in poltype.onlyrotbndslist or second[::-1] in poltype.onlyrotbndslist):
+        pass
+    else:
+        inonlyrotbnds=False
+
+    return inonlyrotbnds 
+
 
 def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,indextoneighbidxs):
     torsionsmissing=[]
@@ -2072,6 +2085,22 @@ def ReadTorsionList(poltype,filename):
                 newls.append(current)
 
     return newls
+
+
+def ReadTorTorList(poltype,filename):
+    newls=[]
+    if os.stat(filename).st_size != 0:
+        with open(filename, 'r') as filehandle:
+            for line in filehandle:
+                current = line[:-1]
+                current=current.replace('[','').replace(']','')
+                current=current.split(',')
+                current=[int(i) for i in current]
+                newls.append(current)
+
+    return newls
+
+
 
 def ReadVdwList(poltype,filename):
     newls=[]
@@ -3301,9 +3330,12 @@ def RemoveOldParametersKeepNewParameters(poltype,prms,newindicestopoltypeclasses
         item=dellist[i]
         newitem=appendlist[i]
         value=poltypeclassestoparametersmartsatomorders[item]
-        del poltypeclassestoparametersmartsatomorders[item]
-        del poltypeclassestosmartsatomorders[item]
-        del poltypeclassestoelementtinkerdescrips[item]
+        if item in poltypeclassestoparametersmartsatomorders.keys():
+            del poltypeclassestoparametersmartsatomorders[item]
+        if item in poltypeclassestosmartsatomorders.keys():
+            del poltypeclassestosmartsatomorders[item]
+        if item in poltypeclassestoelementtinkerdescrips.items():
+            del poltypeclassestoelementtinkerdescrips[item]
         poltypeclassestoparametersmartsatomorders[newitem]=value 
         poltypeclassestosmartsatomorders[newitem]=value
         poltypeclassestoelementtinkerdescrips[newitem]=value
@@ -3357,6 +3389,18 @@ def GenerateSoluteParameters(poltype,atomindicestosmartslist,smartstosoluteradii
             soluteprms.append(line)
 
     return soluteprms
+
+def RemoveIndicesMatchedFromNewDatabase(poltype,indicestosmartsatomorders,indicestopoltypeclasses):
+    removelist=[]
+    for indices,smartsatomorders in indicestosmartsatomorders.items():
+        if indices in indicestopoltypeclasses.keys() or indices[::-1] in indicestopoltypeclasses.keys():
+            removelist.append(indices)
+    for indices in removelist:
+        del indicestosmartsatomorders[indices]
+
+
+    return indicestosmartsatomorders
+
 
 
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
@@ -3478,8 +3522,12 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     planarangleindicestotinkertypes,planarangleindicestotinkerclasses,planarangleindicestoparametersmartsatomorders,planarangleindicestoelementtinkerdescrips,planarangleindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
 
     torsionindicestotinkertypes,torsionindicestotinkerclasses,torsionindicestoparametersmartsatomorders,torsionindicestoelementtinkerdescrips,torsionindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,torsionsforprmtoparametersmarts,torsionsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
+    angleindicestosmartsatomorders=RemoveIndicesMatchedFromNewDatabase(poltype,angleindicestosmartsatomorders,newangleindicestopoltypeclasses) 
+    originalbondindicestosmartsatomorders=bondindicestosmartsatomorders.copy()
+    formissingbondindicestosmartsatomorders=RemoveIndicesMatchedFromNewDatabase(poltype,bondindicestosmartsatomorders,newbondindicestopoltypeclasses) 
     indextoneighbidxs=FindAllNeighborIndexes(poltype,rdkitmol)
-    
+    bondindicestosmartsatomorders=originalbondindicestosmartsatomorders.copy()
+ 
     totalbondscollector=FindAllConsecutiveRotatableBonds(poltype,mol,listofbondsforprm)
     tortorsmissing=FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertoparameters,rdkitmol,mol,indextoneighbidxs,totalbondscollector)
     torsionsmissing,poormatchingaromatictorsions=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
@@ -3487,7 +3535,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     atomindextosmartsatomorder=AddExternalDatabaseMatches(poltype, atomindextosmartsatomorder,vdwindicestoextsmarts,vdwsmartsatomordertoparameters)
     vdwmissing=FindMissingParameters(poltype,atomindextosmartsatomorder,rdkitmol,mol,indextoneighbidxs)
     missingvdwatomindices=ReduceMissingVdwByTypes(poltype,vdwmissing)
-    bondmissing=FindMissingParameters(poltype,bondindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
+    bondmissing=FindMissingParameters(poltype,formissingbondindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
     anglemissing=FindMissingParameters(poltype,angleindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
     anglemissingindicestotinkerclasses=PruneDictionary(poltype,anglemissing,angleindicestotinkerclasses)
     angletinkerclassestoexampleindices=ReverseDictionary(poltype,angleindicestotinkerclasses)
@@ -3560,9 +3608,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
 
     strbndprms=ZeroOutMissingStrbnd(poltype,anglemissingtinkerclassestopoltypeclasses,strbndprms)
     angleprms=AssignAngleGuessParameters(poltype,angletinkerclassestoexampleindices,anglemissingtinkerclassestopoltypeclasses,angleprms)
-    # do i need to fix bong/angle guess
     bondprms=AssignBondGuessParameters(poltype,bondtinkerclassestoexampleindices,bondmissingtinkerclassestopoltypeclasses,bondprms)
-    # add new database parameters here
     angleprms.extend(newangleprms)
     bondprms.extend(newbondprms)
     strbndprms.extend(newstrbndprms)
@@ -3613,4 +3659,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     WriteOutList(poltype,torsionsmissing,poltype.torsionsmissingfilename)
     WriteDictionaryToFile(poltype,torsionkeystringtoparameters,poltype.torsionprmguessfilename)
     WriteOutList(poltype,missingvdwatomindices,poltype.vdwmissingfilename)
-    return bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,torsionkeystringtoparameters,missingvdwatomindices,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo
+    WriteOutList(poltype,tortorsmissing,poltype.tortormissingfilename)
+
+    
+    return bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,torsionkeystringtoparameters,missingvdwatomindices,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo,tortorsmissing

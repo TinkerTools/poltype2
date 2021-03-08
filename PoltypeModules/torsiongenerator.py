@@ -56,6 +56,7 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,varia
     listofjobs=[]
     outputlogs=[]
     initialstructures=[]
+    scratchdir=None
     for i in range(len(listofstructurestorunQM)):
         torxyzfname=listofstructurestorunQM[i]
         phaseangles=phaselist[i]
@@ -64,6 +65,8 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,varia
         if finished==True and 'opt' in outputlog:
             opt.GrabFinalXYZStructure(poltype,outputlog,outputlog.replace('.log','.xyz'),mol)
         if finished==False:
+            if poltype.tordebugmode==True:
+                continue
             if os.path.isfile(outputlog):
                 statinfo=os.stat(outputlog)
                 size=statinfo.st_size
@@ -110,6 +113,8 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
         if finished==True and error==False:
             pass
         else:
+            if poltype.tordebugmode==True:
+                continue
             if os.path.isfile(outputname):
                 statinfo=os.stat(outputname)
                 size=statinfo.st_size
@@ -580,17 +585,18 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                 cartxyz=outputlog.replace('.log','.xyz')
                 opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
                 tinkerxyz=outputlog.replace('.log','_tinker.xyz')
-                ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz) 
+                if error==False:
+                    ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz) 
                 torsettofinshedtinkerxyzfiles[tuple(torset)].append(tinkerxyz)
             else:
                 failed=True
+                if poltype.tordebugmode==False:
 
-
-                torsettofailedoutputlogtoinitialstructure[tuple(torset)][outputlog]=outputlogtoinitialstructure[outputlog]
+                    torsettofailedoutputlogtoinitialstructure[tuple(torset)][outputlog]=outputlogtoinitialstructure[outputlog]
 
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True) and failed==True:
         temp_use_gaus=poltype.use_gaus
-        temp_use_gausoptonly=poltype.use_gausoptonly
+        temp_use_gaus_optonly=poltype.use_gausoptonly
         poltype.use_gaus=False
         poltype.use_gausoptonly=False
         poltype.SanitizeAllQMMethods()
@@ -632,7 +638,8 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                     cartxyz=outputlog.replace('.log','.xyz')
                     opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
                     tinkerxyz=outputlog.replace('.log','_tinker.xyz')
-                    ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz) 
+                    if error==False:
+                        ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz) 
                     torsettofinshedtinkerxyzfiles[tuple(torset)].append(tinkerxyz)
 
 
@@ -684,14 +691,15 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                 opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
             else:
                 failed=True
-                torsettofailedoutputlogtoinitialstructure[tuple(torset)][outputlog]=outputlogtoinitialstructure[outputlog]
+                if poltype.tordebugmode==False:
+                    torsettofailedoutputlogtoinitialstructure[tuple(torset)][outputlog]=outputlogtoinitialstructure[outputlog]
 
 
             if finished==True and outputlog not in finishedjobs:
                 finishedjobs.append(outputlog)
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True) and failed==True:
         temp_use_gaus=poltype.use_gaus
-        temp_use_gausoptonly=poltype.use_gausoptonly
+        temp_use_gaus_optonly=poltype.use_gausoptonly
         poltype.use_gaus=False
         poltype.use_gausoptonly=False
         poltype.SanitizeAllQMMethods()
@@ -1049,24 +1057,42 @@ def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndli
     return poltype.rotbndtoanginc
 
 def find_tor_restraint_idx(poltype,mol,b1,b2):
+    """
+    Intent: Find the atoms 1 and 4 about which torsion angles are restrained
+    Given b1, b2, finds the torsion: t1 b1 b2 t4
+    Input:
+        mol: OBMol object
+        b1: first atom of the rotatable bond (t2 in the torsion)
+        b2: second atom of the rotatable bond (t3 in the torsion)
+    Output:
+        t1: atom 1 in the torsion
+        t4: atom 4 in the torsion
+    Referenced By: get_torlist
+    Description:
+    1. Find the heaviest (heaviest meaning of highest sym class) 
+       atom bound to atom b1 (that is not b2)
+    2. Find the heaviest atom bound to atom b2 (that is not b1)
+    3. These two atoms are returned as atoms 1 and 4 for the torsion
+    """
     b1idx = b1.GetIdx()
     b2idx = b2.GetIdx()
     iteratomatom = openbabel.OBAtomAtomIter(b1)
     b1nbridx = list(map(lambda x: x.GetIdx(), iteratomatom))
     del b1nbridx[b1nbridx.index(b2idx)]    # Remove b2 from list
-    t1idx=GrabFirstHeavyAtomIdx(poltype,b1nbridx,mol)
- 
+    assert(b1nbridx is not [])
+    maxb1class = max(b1nbridx,key=lambda x: poltype.idxtosymclass[x])
+
     iteratomatom = openbabel.OBAtomAtomIter(b2)
     b2nbridx = list(map(lambda x: x.GetIdx(), iteratomatom))
     del b2nbridx[b2nbridx.index(b1idx)]    # Remove b1 from list
-    t4idx=GrabFirstHeavyAtomIdx(poltype,b2nbridx,mol)
+    assert(b2nbridx is not [])
+    maxb2class = max(b2nbridx, key= lambda x:poltype.idxtosymclass[x])
 
-
-    t1 = mol.GetAtom(t1idx)
-    t4 = mol.GetAtom(t4idx)
-
+    t1 = mol.GetAtom(maxb1class)
+    t4 = mol.GetAtom(maxb2class)
 
     return t1,t4
+
 
 def GrabFirstHeavyAtomIdx(poltype,indices,mol):
     atoms=[mol.GetAtom(i) for i in indices]
@@ -1682,56 +1708,56 @@ def TinkerTorsionTorsionInitialScan(poltype,torset,optmol,bondtopology):
 
     return energyarray,phaseanglelist
 
-def FindAllConsecutiveRotatableBonds(poltype,mol):
-    totalbondscollector=[]
-    rotbnds=list(poltype.rotbndlist.keys())
-    rotbnds=[item.split() for item in rotbnds]
-    newrotbnds=[]
-    for rotbnd in rotbnds:
-        newrotbnd=[int(i) for i in rotbnd]
-        found=False
-        for torset in poltype.torlist:
-           for torsion in torset:
-               b=torsion[1]
-               c=torsion[2]
-               rots=[b,c]
-               if rots==newrotbnd or rots[::-1]==newrotbnd:
-                   found=True
-        if found==True:   
-            newrotbnds.append(newrotbnd)
-    combs=list(combinations(newrotbnds,2)) 
-    for comb in combs:
-        firstbnd=comb[0]
-        secondbnd=comb[1]
-        total=firstbnd[:]+secondbnd[:]
-        totalset=set(total)
-        if len(totalset)==3:
-            totalbondscollector.append([firstbnd,secondbnd])
-    return totalbondscollector
-
-
-def FindMainConsecutiveTorsions(poltype,mol,tortorbonds):
+def FindMainConsecutiveTorsions(poltype,tortorsmissing):
     tortors=[]
-    for tortorbondlist in tortorbonds:
-        tortor=[]
-        for tortorbond in tortorbondlist: 
-            bidx,cidx=tortorbond[:]
-            b=mol.GetAtom(bidx)
-            c=mol.GetAtom(cidx)
-            a,d = find_tor_restraint_idx(poltype,mol,b,c)
-            aidx=a.GetIdx()
-            didx=d.GetIdx()
-            tortor.append(tuple([aidx,bidx,cidx,didx]))
-        tortors.append(tortor)
+    for tortor in tortorsmissing:
+        a,b,c,d,e=tortor[:]
+        aidx=a+1
+        bidx=b+1
+        cidx=c+1
+        didx=d+1
+        eidx=e+1
+        temp=[]
+        firstrot=[bidx,cidx]
+        firstrot=[str(i) for i in firstrot]
+        secondrot=[cidx,didx]
+        secondrot=[str(i) for i in secondrot]
+        firstkey=' '.join(firstrot)
+        revfirstkey=' '.join(firstrot[::-1])
+        secondkey=' '.join(secondrot)
+        revsecondkey=' '.join(secondrot[::-1])
+        first=tuple([aidx,bidx,cidx,didx])
+        second=tuple([bidx,cidx,didx,eidx])
+        if firstkey in poltype.rotbndlist.keys():
+            temp.append(first)
+        elif revfirstkey in poltype.rotbndlist.keys():
+            temp.append(first[::-1])
+        if secondkey in poltype.rotbndlist.keys():
+            temp.append(second)
+        elif revsecondkey in poltype.rotbndlist.keys():
+            temp.append(second[::-1])
 
+        tortors.append(temp)
     return tortors
+
+def RemoveRotatableBondFromTorlist(poltype,tor):
+    indicestoremove=[]
+    rotbnd=[tor[1],tor[2]]
+    for grpidx in range(len(poltype.torlist)):
+        grp=poltype.torlist[grpidx]
+        ls=grp[0]
+        other=[ls[1],ls[2]]
+        if rotbnd==other or rotbnd[::-1]==other:
+            indicestoremove.append(grpidx)
+    for index in indicestoremove:
+        del poltype.torlist[index]
+
+
 
 def UpdateTorsionSets(poltype,tortor):
     for tor in tortor:
         torset=tuple([tuple(tor)])
-        if torset in poltype.torlist:
-            index=poltype.torlist.index(torset)
-            del poltype.torlist[index]
+        RemoveRotatableBondFromTorlist(poltype,tor)
     poltype.torsettovariabletorlist[tuple(tortor)]=[]
     poltype.torlist.append(tuple(tortor))
 
@@ -1790,8 +1816,7 @@ def RemoveTorTorPoints(poltype,energyarray,phaseanglelist,indicestokeep):
     return newphasearray
             
 
-def PrepareTorsionTorsion(poltype,optmol,mol):
-    totalbondscollector=FindAllConsecutiveRotatableBonds(poltype,mol)
-    tortors=FindMainConsecutiveTorsions(poltype,mol,totalbondscollector)
+def PrepareTorsionTorsion(poltype,optmol,mol,tortorsmissing):
+    tortors=FindMainConsecutiveTorsions(poltype,tortorsmissing)
     for tortor in tortors:
         UpdateTorsionSets(poltype,tortor)

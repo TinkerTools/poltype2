@@ -781,8 +781,10 @@ def GrabParentTorsions(poltype,rotbndindextoringtor,rotbndindex,rotkey):
         for j in range(0,len(rotkeysplit),2):
             curkey=str(rotkeysplit[j])+' '+str(rotkeysplit[j+1])
             rotkeys.append(curkey)
-        for key in rotkeys: 
+        for keyidx in range(len(rotkeys)):
+            key=rotkeys[keyidx]
             keytors=list(poltype.rotbndlist[key])
+
             maintortors.append(keytors[0])
             tors.extend(keytors)
     return tors,maintortors,tortor
