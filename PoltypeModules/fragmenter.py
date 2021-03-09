@@ -73,7 +73,7 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
                 if len(maintortors)>0:
                     firsttor=maintortors[0]
                     secondtor=maintortors[1]
-                    tortorclskey,tortoratomidxs=torsionfit.GenerateTorTorClasskey(poltype,firsttor,secondtor,poltype.idxtosymclass)
+                    tortorclskey,tortoratomidxs=torsionfit.GenerateTorTorClasskey(poltype,firsttor,secondtor,poltype.idxtosymclass,poltype.rdkitmol)
                     fwdsplit=tortorclskey.split()        
                     revsplit=fwdsplit[::-1]
                     rev='%d %d %d %d %d' % (int(revsplit[0]), int(revsplit[1]), int(revsplit[2]), int(revsplit[3]),int(revsplit[4]))
@@ -517,7 +517,7 @@ def CopyAllQMDataAndRename(poltype,molecprefix,parentdir):
 
 
 def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog,fragmol,parentdir,vdwfragment):
-    poltypeinput={'dontdovdwscan':poltype.dontdovdwscan,'refinenonaroringtors':poltype.refinenonaroringtors,'tortor':poltype.tortor,'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':poltype.numproc,'maxmem':poltype.maxmem,'maxdisk':poltype.maxdisk,'printoutput':True}
+    poltypeinput={'tordebugmode':poltype.tordebugmode,'dontdovdwscan':poltype.dontdovdwscan,'refinenonaroringtors':poltype.refinenonaroringtors,'tortor':poltype.tortor,'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':poltype.numproc,'maxmem':poltype.maxmem,'maxdisk':poltype.maxdisk,'printoutput':True}
     if strfragrotbndindexes!=None:
         poltypeinput['onlyrotbndslist']=strfragrotbndindexes
     if vdwfragment==True:
@@ -674,16 +674,20 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 if tortor==True:
                     firsttor=maintortors[0]
                     secondtor=maintortors[1]
-                    tortorclskey,tortoratomidxs=torsionfit.GenerateTorTorClasskey(poltype,firsttor,secondtor,poltype.idxtosymclass)
+                    tortorclskey,tortoratomidxs=torsionfit.GenerateTorTorClasskey(poltype,firsttor,secondtor,poltype.idxtosymclass,poltype.rdkitmol)
                     firstrdkittor=[k-1 for k in firsttor]
                     secondrdkittor=[k-1 for k in secondtor]
                     firstfragtor=[parentindextofragindex[k] for k in firstrdkittor]
                     secondfragtor=[parentindextofragindex[k] for k in secondrdkittor]
+
                     firstequivfragtor=[indextoequivalentindex[k] for k in firstfragtor]
                     secondequivfragtor=[indextoequivalentindex[k] for k in secondfragtor]
+                    
+
                     firstequivfragtorbabel=[k+1 for k in firstequivfragtor]
                     secondequivfragtorbabel=[k+1 for k in secondequivfragtor]
-                    fragtortorclskey,fragtortoratomidxs=torsionfit.GenerateTorTorClasskey(poltype,firstequivfragtorbabel,secondequivfragtorbabel,fragidxtosymclass)
+
+                    fragtortorclskey,fragtortoratomidxs=torsionfit.GenerateTorTorClasskey(poltype,firstequivfragtorbabel,secondequivfragtorbabel,fragidxtosymclass,fragmol)
 
 
                     smilesposstring,fragtorstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,tortoratomidxs,parentindextofragindex,fragidxarray,indextoequivalentindex)

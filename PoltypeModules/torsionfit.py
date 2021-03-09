@@ -17,6 +17,7 @@ from itertools import product,combinations
 from scipy.interpolate import interp1d
 import databaseparser as db
 from copy import deepcopy
+from rdkit import Chem
 
 def CheckGeometricRestraintEnergy(poltype,alzfile):
     temp=open(alzfile,'r')
@@ -450,8 +451,8 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,fileprefix):
         cnt = clscount_dict[tup]
         cls_mm_engy_dict[tup] = [eng/cnt for eng in cls_mm_engy_dict[tup]]
         cls_qm_engy_dict[tup] = [eng/cnt for eng in cls_qm_engy_dict[tup]]
-        cls_mm_engy_dict_unmodified[tup] = [eng/cnt for eng in cls_mm_engy_dict[tup]]
-        cls_qm_engy_dict_unmodified[tup] = [eng/cnt for eng in cls_qm_engy_dict[tup]]
+        cls_mm_engy_dict_unmodified[tup] = [eng/cnt for eng in cls_mm_engy_dict_unmodified[tup]]
+        cls_qm_engy_dict_unmodified[tup] = [eng/cnt for eng in cls_qm_engy_dict_unmodified[tup]]
 
 
     return cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,indicesremoved,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified
@@ -490,7 +491,9 @@ def insert_torphasedict (poltype,mol, toraboutbnd, torprmdict, initangle,write_p
     datomicnum=obad.GetAtomicNum()
     babelindices=[a2,b2,c2,d2]
     allhydtor=db.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
-    if (aatomicnum==1 and datomicnum==1) and allhydtor==False:
+    allhydtoroneside=db.CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol)
+
+    if (aatomicnum==1 or datomicnum==1) and (allhydtor==False and allhydtoroneside==False):
         return
     if (keyfilter is None or keyfilter == tpdkey): 
         # current torsion value (normalized by initangle)
@@ -1037,7 +1040,6 @@ def FillInEnergyTensors(poltype,phaseanglearray,actualanglearray,tor_energy_list
     shape=tuple([sqrt,sqrt])
     idealanglematrix=poltype.idealangletensor[torset]
     actualanglematrix=numpy.empty(phasetensor.shape)
-
     for i in range(len(phaseanglearray)):
         haveenergy=True
         if i in indicesremoved:
@@ -1047,7 +1049,7 @@ def FillInEnergyTensors(poltype,phaseanglearray,actualanglearray,tor_energy_list
         indexes=numpy.where(numpy.all(phasetensor == numpy.array(phasetup), axis=-1))
         if haveenergy==True:
             torenergy=tor_energy_list_unmodified[i]
-            qmenergy=qm_energy_list_unomdified[i]
+            qmenergy=qm_energy_list_unmodified[i]
             mmenergy=mm_energy_list_unmodified[i]
         else:
             torenergy=0
@@ -1359,7 +1361,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             print('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
 
             clskeyswithbadfits.append(clskey)
-            if poltype.suppresstorfiterr==False and count>0 and bypassrmsd==False:
+            if poltype.suppresstorfiterr==False and count>0 and bypassrmsd==False and poltype.tordebugmode==False:
                 raise ValueError('RMSPD of QM and MM torsion profile is high, tried fitting to minima and failed, RMSPD = '+str(minRMSD)+','+str(minRMSDRel))
     return clskeyswithbadfits
                  
@@ -1448,6 +1450,7 @@ def process_rot_bond_tors(poltype,mol):
         # do the fit
         if count==2:
             break # dont redo fitting forever
+
         write_prm_dict,fitfunc_dict,torsettobypassrmsd,classkeytofoldtophase = fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,clskeyswithbadfits,indicesremoved,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified)
         # write out new keyfile
         write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename,classkeytofoldtophase)
@@ -1541,7 +1544,7 @@ def PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle
         tormat,qmmat,mmmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,cls_angle_dict[tup],tor_energy_list,qm_energy_list,mm_energy_list,torset,indicesremoved,cls_angle_dict_unmodified[tup],tor_energy_list_unmodified,qm_energy_list_unmodified,mm_energy_list_unmodified)
         firsttor=torsions[0]
         secondtor=torsions[1]
-        tortorclskey,atomidxs=GenerateTorTorClasskey(poltype,firsttor,secondtor,poltype.idxtosymclass)
+        tortorclskey,atomidxs=GenerateTorTorClasskey(poltype,firsttor,secondtor,poltype.idxtosymclass,poltype.rdkitmol)
         firstanglerow=idealanglematrix[0,:]
         firstrow=tormat[0,:]
         firstqmrow=qmmat[0,:]
@@ -1637,14 +1640,19 @@ def PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle
     temp.flush()
     temp.close()
 
-def GenerateTorTorClasskey(poltype,firsttor,secondtor,idxtosymclass):
-    if set(firsttor[2:])==set(secondtor[2:]):
-        pass
-    else:
-        secondtor=secondtor[::-1]
-    firsttor=firsttor[:-1]
-    secondtor=secondtor[:-1]
-    tortoratomidxs=[secondtor[0],secondtor[1],secondtor[2],firsttor[1],firsttor[0]]
+def GenerateTorTorClasskey(poltype,firsttor,secondtor,idxtosymclass,mol):
+    rdkitfirsttor=[i-1 for i in firsttor]
+    rdkitsecondtor=[i-1 for i in secondtor]
+    paths=Chem.rdmolops.FindAllPathsOfLengthN(mol,5,useBonds=False,useHs=True)
+    for path in paths:
+        allin=True
+        for index in path:
+            if index not in rdkitfirsttor and index not in rdkitsecondtor:
+                allin=False
+        if allin==True:
+            break
+    path=[i+1 for i in path]
+    tortoratomidxs=[path[0],path[1],path[2],path[3],path[4]]
     tortortypeidxs=[idxtosymclass[j] for j in tortoratomidxs]
     tortortypeidxs=[str(j) for j in tortortypeidxs]
     tortorclskey=' '.join(tortortypeidxs)

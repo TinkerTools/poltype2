@@ -1364,6 +1364,36 @@ def CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol):
                 allhydrogentor=False
     return allhydrogentor    
 
+def CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol):
+    allhydrogentoroneside=True
+    atomobjects=[mol.GetAtom(i) for i in babelindices]
+    a,b,c,d=atomobjects[:]
+    aidx,bidx,cidx,didx=babelindices[:]
+    aatomicnum=a.GetAtomicNum()
+    datomicnum=d.GetAtomicNum()
+    if aatomicnum!=1 and datomicnum!=1:
+        allhydrogentoroneside=False
+    else:
+        torlist=[]
+        iteratomatom = openbabel.OBAtomAtomIter(b)
+        for iaa in iteratomatom:
+            iteratomatom2 = openbabel.OBAtomAtomIter(c)
+            for iaa2 in iteratomatom2:
+                ta = iaa.GetIdx()
+                tb = bidx
+                tc = cidx
+                td = iaa2.GetIdx()
+                if ((ta != tc and td != tb) and not (ta == aidx and td == didx)):
+                    torlist.append([ta,tb,tc,td])
+        for tor in torlist:
+            atoms=[mol.GetAtom(i) for i in tor]
+            aatomnum=atoms[0].GetAtomicNum()
+            datomnum=atoms[3].GetAtomicNum()
+            if aatomnum!=1 and datomnum!=1:
+                allhydrogentoroneside=False
+    return allhydrogentoroneside
+
+
 def FindAllConsecutiveRotatableBonds(poltype,mol,listofbondsforprm):
     totalbondscollector=[]
     newrotbnds=[]
@@ -1536,6 +1566,8 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                 if torsionindices not in torsionsmissing:
                     torsionsmissing.append(torsionindices)
                     continue
+            else:
+                continue
         bond=mol.GetBond(bbidx,cbidx)
         bondorder=bond.GetBondOrder()
         if bondorder!=1: # then dont zero out
@@ -1568,6 +1600,8 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         if contin==True:
             continue
         allhydrogentor=CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
+        allhydrogentoroneside=CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol)
+
         firstneighborindexes=indextoneighbidxs[aidx]
         secondneighborindexes=indextoneighbidxs[bidx]
         thirdneighborindexes=indextoneighbidxs[cidx]
@@ -1588,12 +1622,12 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         atomicnumatoma=atoma.GetAtomicNum()
         atomicnumatomd=atomd.GetAtomicNum()
         if poltype.transferanyhydrogentor==True and allaro==False: 
-            if atomicnumatoma==1 and atomicnumatomd==1:
-                if allhydrogentor==True:
+            if atomicnumatoma==1 or atomicnumatomd==1:
+                if allhydrogentor==False and allhydrogentoroneside==False:
+                    continue
+                else:
                     if torsionindices not in torsionsmissing:
                         torsionsmissing.append(torsionindices)
-                else:
-                    continue
         if '~' in smarts or '*' in smarts:
             if allaro==False:
                 if torsionindices not in torsionsmissing:
@@ -3536,6 +3570,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     tortorsmissing=FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertoparameters,rdkitmol,mol,indextoneighbidxs,totalbondscollector)
     torsionsmissing,poormatchingaromatictorsions=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
     torsionsmissing=FindAdjacentMissingTorsionsForTorTor(poltype,torsionsmissing,totalbondscollector,tortorsmissing)
+
     atomindextosmartsatomorder=AddExternalDatabaseMatches(poltype, atomindextosmartsatomorder,vdwindicestoextsmarts,vdwsmartsatomordertoparameters)
     vdwmissing=FindMissingParameters(poltype,atomindextosmartsatomorder,rdkitmol,mol,indextoneighbidxs)
     missingvdwatomindices=ReduceMissingVdwByTypes(poltype,vdwmissing)
@@ -3664,5 +3699,4 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     WriteDictionaryToFile(poltype,torsionkeystringtoparameters,poltype.torsionprmguessfilename)
     WriteOutList(poltype,missingvdwatomindices,poltype.vdwmissingfilename)
     WriteOutList(poltype,tortorsmissing,poltype.tortormissingfilename)
-
     return bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,torsionkeystringtoparameters,missingvdwatomindices,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo,tortorsmissing
