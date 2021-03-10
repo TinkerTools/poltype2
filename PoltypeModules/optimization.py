@@ -297,9 +297,10 @@ def write_com_header(poltype,comfname,chkfname,maxdisk,maxmem,numproc):
     tmpfh.write("%Nproc=" + str(numproc) + "\n")
     tmpfh.close()
 
-def CheckBondConnectivity(poltype,mol,optmol):
+def CheckBondConnectivity(poltype,mol,optmol,raiseerror=False):
     atomitermol=openbabel.OBMolAtomIter(mol)
     atomiteroptmol=openbabel.OBMolAtomIter(optmol)
+    issame=True
     for atm in atomitermol:
        
         atmidxmol=atm.GetIdx()
@@ -320,7 +321,10 @@ def CheckBondConnectivity(poltype,mol,optmol):
             else:
                 diff=set(atmneighbidxlistoptmol)-set(atmneighbidxlist)
                 idxset='optmol'
-            RaiseConnectivityError(poltype,diff,idxset)
+            issame=False
+            if raiseerror==True:
+                RaiseConnectivityError(poltype,diff,idxset)
+    return issame
 
 def RaiseConnectivityError(poltype,diff,idxset):
     print('Error! The bond connectivity before and after structure optimization is different')
@@ -431,7 +435,7 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True):
 
     GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'),mol)
     if checkbonds==True:
-        CheckBondConnectivity(poltype,mol,optmol)
+        issame=CheckBondConnectivity(poltype,mol,optmol,raiseerror=True)
     return optmol
 
 

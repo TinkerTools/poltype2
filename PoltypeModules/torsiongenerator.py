@@ -650,14 +650,18 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                     torsettofinshedtinkerxyzfiles[tuple(torset)].append(tinkerxyz)
 
 
-
         poltype.use_gaus=temp_use_gaus
         poltype.use_gausoptonly=temp_use_gaus_optonly
         poltype.SanitizeAllQMMethods()
 
+
+    firsttorsettooptoutputlogs=torsettooptoutputlogs.copy()
+
     poltype.toroptmethod=poltype.secondtoroptmethod
     poltype.toroptbasisset=poltype.secondtoroptbasisset
     poltype.SanitizeAllQMMethods()
+    poltype.optmaxcycle=5
+
     torsettooutputlogtoinitialstructure={}
     for torset in poltype.torlist:
         torsettooutputlogtoinitialstructure[tuple(torset)]={}
@@ -756,7 +760,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         poltype.SanitizeAllQMMethods()
 
 
-
+    torsettooptoutputlogs=CompareQMStructuresCheckForRelaxedBonds(poltype,firsttorsettooptoutputlogs,torsettooptoutputlogs)
 
     fulllistofjobs=[]
     fulljobtolog={}
@@ -803,6 +807,36 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     else:
         finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
     os.chdir('..')
+
+
+
+def CompareQMStructuresCheckForRelaxedBonds(poltype,firsttorsettooptoutputlogs,torsettooptoutputlogs):
+    newtorsettooptoutputlogs={}
+    for torset in poltype.torlist:
+        firstoutputlogs=firsttorsettooptoutputlogs[torset]
+        secondoutputlogs=torsettooptoutputlogs[torset]
+        newtorsettooptoutputlogs[torset]=[]   
+        for firstlog in firstoutputlogs:
+            firstlogsplit=firstlog.split('opt-1')
+            delim=firstlogsplit[1]
+            for secondlog in secondoutputlogs:
+                if delim in secondlog:
+                    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
+                        fname1=firstlog.replace('.log','.xyz')
+                        fname2=secondlog.replace('.log','.xyz')
+                    else:
+                        fname1=firstlog
+                        fname2=secondlog
+
+                    optmol1 = opt.load_structfile(poltype,fname1)
+                    optmol2 = opt.load_structfile(poltype,fname2)
+                    issame=opt.CheckBondConnectivity(poltype,optmol1,optmol2)
+                    if issame==True:
+                        newtorsettooptoutputlogs[torset].append(secondlog)
+                    else:           
+                        newtorsettooptoutputlogs[torset].append(firstlog)
+
+    return newtorsettooptoutputlogs 
 
 def GenerateBondTopology(poltype,optmol):
     bondtopology=[]

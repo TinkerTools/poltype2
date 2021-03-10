@@ -1126,6 +1126,22 @@ def ConvertNoneToZero(poltype,listinput):
         
     return listinput
 
+def AssignZeros(poltype,array):
+    newarray=[]
+    allindices=[]
+    for ls in array:
+        indices=[i for i in range(len(ls)) if ls[i]==0 or i==None]
+        for index in indices:
+            if index not in allindices:
+                allindices.append(index)
+    for ls in array:
+        for index in allindices:
+            ls[index]=0
+        newarray.append(ls)
+
+    return newarray
+
+
 def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename,count,clskeyswithbadfits,torsettobypassrmsd):
     """
     Intent: 
@@ -1193,9 +1209,15 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         originalmm2ang_list=m2ang_list.copy()
         originalmm2_energy_list=mm2_energy_list.copy()
         originalmm_energy_list=mm_energy_list.copy()
-        originalmm_energy_list=ConvertNoneToZero(poltype,originalmm_energy_list)
+        originalqm_energy_list=qm_energy_list.copy()
 
+        originalmm_energy_list=ConvertNoneToZero(poltype,originalmm_energy_list)
+        originalqm_energy_list=ConvertNoneToZero(poltype,originalqm_energy_list)
         originalmm2_energy_list=ConvertNoneToZero(poltype,originalmm2_energy_list)
+        arrays=AssignZeros(poltype,[originalmm_energy_list,originalqm_energy_list,originalmm2_energy_list])
+        originalmm_energy_list=arrays[0]
+        originalqm_energy_list=arrays[1]
+        originalmm2_energy_list=arrays[2]
 
         # remove angles for which energy was unable to be found
         del_ang_list = find_del_list(poltype,mm_energy_list,mang_list)
@@ -1216,18 +1238,19 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
         array=numpy.array(originalmm_energy_list)
         originalfitfuncarray=numpy.zeros(array.shape)
+
         for i in range(len(originalmm_energy_list)):
            e=originalmm_energy_list[i]
            if e==0:
                originalfitfuncarray[i]=0
            else:
                originalfitfuncarray[i]=1
-        count=0
+        newcount=0
         for i in range(len(originalmm_energy_list)):
             fite=originalfitfuncarray[i]
             if fite==1:
-                newfite=fitfunc_dict[clskey][count]
-                count+=1
+                newfite=fitfunc_dict[clskey][newcount]
+                newcount+=1
 
 
 
@@ -1450,7 +1473,6 @@ def process_rot_bond_tors(poltype,mol):
         # do the fit
         if count==2:
             break # dont redo fitting forever
-
         write_prm_dict,fitfunc_dict,torsettobypassrmsd,classkeytofoldtophase = fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,clskeyswithbadfits,indicesremoved,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified)
         # write out new keyfile
         write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename,classkeytofoldtophase)
@@ -1458,7 +1480,6 @@ def process_rot_bond_tors(poltype,mol):
         RemoveFiles(poltype,'post',2)  
         if len(poltype.torlist)!=0:
             PostfitMinAlz(poltype,tmpkey2basename,'')
-
         # evaluate the new parameters
         clskeyswithbadfits=eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename,count,clskeyswithbadfits,torsettobypassrmsd)
         if len(clskeyswithbadfits)==0:

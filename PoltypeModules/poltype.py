@@ -890,7 +890,7 @@ class PolarizableTyper():
             Ftime=os.path.getmtime(logfname)
             reltime=time.time()-Ftime
             htime=reltime*0.000277778
-            updatetime=2 # hours
+            updatetime=6 # hours
             for line in open(logfname):
                 if 'poltype' in tail:
                     if 'Poltype Job Finished' in line:
@@ -912,9 +912,9 @@ class PolarizableTyper():
             if error==True:
                 message='Error '+line+ 'logpath='+logfname
    
-            if error==False and term==False and htime>=updatetime:
-                error=True
-                message='Error '+'Job died and has not been updated in '+str(updatetime)+' hours'+' last update time = '+str(htime)+' hours'+' logname='+logfname
+            #if error==False and term==False and htime>=updatetime:
+            #    error=True
+            #    message='Error '+'Job died and has not been updated in '+str(updatetime)+' hours'+' last update time = '+str(htime)+' hours'+' logname='+logfname
             if error==True and term==False:
                 if errormessages!=None:
                     if message not in errormessages:
