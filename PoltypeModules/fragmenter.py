@@ -1056,7 +1056,6 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets,non
             onlyinputindices=False
         for tor in torset:
             indexes=FirstPassAtomIndexes(poltype,tor,onlyinputindices)
-
             for index in indexes:
                 if index not in extendedtorindexes:
                     extendedtorindexes.append(index)
@@ -1545,6 +1544,12 @@ def FirstPassAtomIndexes(poltype,tor,onlyinputindices):
    temp=[]
    for index in molindexlist:
        atom=poltype.rdkitmol.GetAtomWithIdx(index)
+       atomicnum=atom.GetAtomicNum()
+       if atomicnum==15: # add all neighbors, seems to be issue with cutting bonds on P then adding H, h is added in strange way
+           for neighbneighbatom in atom.GetNeighbors():
+               neighbneighbatomidx=neighbneighbatom.GetIdx()
+               if neighbneighbatomidx not in molindexlist:
+                   molindexlist.append(neighbneighbatomidx) 
        for neighbneighbatom in atom.GetNeighbors():
            atomicnum=neighbneighbatom.GetAtomicNum()
            neighbneighbatomidx=neighbneighbatom.GetIdx()

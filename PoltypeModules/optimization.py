@@ -301,6 +301,13 @@ def CheckBondConnectivity(poltype,mol,optmol,raiseerror=False):
     atomitermol=openbabel.OBMolAtomIter(mol)
     atomiteroptmol=openbabel.OBMolAtomIter(optmol)
     issame=True
+
+    firstatomnum=mol.NumAtoms()
+    secondatomnum=optmol.NumAtoms()
+    if firstatomnum!=secondatomnum:
+        issame=False
+        return issame
+
     for atm in atomitermol:
        
         atmidxmol=atm.GetIdx()

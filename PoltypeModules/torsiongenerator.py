@@ -326,6 +326,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
             for res in torlist:
                 resa,resb,resc,resd = res[0:4]
                 indices=[resa,resb,resc,resd]
+                totalatoms=optmol.NumAtoms()
                 allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,optmol)
                 allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,optmol)
 
@@ -827,7 +828,6 @@ def CompareQMStructuresCheckForRelaxedBonds(poltype,firsttorsettooptoutputlogs,t
                     else:
                         fname1=firstlog
                         fname2=secondlog
-
                     optmol1 = opt.load_structfile(poltype,fname1)
                     optmol2 = opt.load_structfile(poltype,fname2)
                     issame=opt.CheckBondConnectivity(poltype,optmol1,optmol2)

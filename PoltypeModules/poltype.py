@@ -1237,6 +1237,7 @@ class PolarizableTyper():
             optmol.SetTotalCharge(mol.GetTotalCharge())
             optmol.SetTotalSpinMultiplicity(mol.GetTotalSpinMultiplicity())
             optmol = opt.GeometryOptimization(self,optmol)
+        totalatoms=optmol.NumAtoms()
         if self.use_gausgeomoptonly==True:
             self.use_gausoptonly=False
             self.use_gaus=False

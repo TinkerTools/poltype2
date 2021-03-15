@@ -1560,12 +1560,23 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
     for torsionindices,smartsenv in torsionindicestoparametersmartsenv.items():
         aidx,bidx,cidx,didx=torsionindices[:]
         babelindices=[i+1 for i in torsionindices]
+        allhydrogentor=CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
+        allhydrogentoroneside=CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol)
+        atoma=rdkitmol.GetAtomWithIdx(aidx)
+        atomd=rdkitmol.GetAtomWithIdx(didx)
+        atomicnumatoma=atoma.GetAtomicNum()
+        atomicnumatomd=atomd.GetAtomicNum()
         abidx,bbidx,cbidx,dbidx=babelindices[:]
         if len(poltype.onlyrotbndslist)!=0:
             if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
-                if torsionindices not in torsionsmissing:
-                    torsionsmissing.append(torsionindices)
-                    continue
+                if atomicnumatoma==1 or atomicnumatomd==1:
+                    if allhydrogentor==False and allhydrogentoroneside==False:
+                       continue
+                else:
+
+                    if torsionindices not in torsionsmissing:
+                        torsionsmissing.append(torsionindices)
+                        continue
             else:
                 continue
         bond=mol.GetBond(bbidx,cbidx)
@@ -1599,8 +1610,6 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             allaro=True
         if contin==True:
             continue
-        allhydrogentor=CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
-        allhydrogentoroneside=CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol)
 
         firstneighborindexes=indextoneighbidxs[aidx]
         secondneighborindexes=indextoneighbidxs[bidx]
@@ -1617,10 +1626,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                 if idx not in matcharray:
                     matcharray.append(idx)
         check=CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,matcharray)
-        atoma=rdkitmol.GetAtomWithIdx(aidx)
-        atomd=rdkitmol.GetAtomWithIdx(didx)
-        atomicnumatoma=atoma.GetAtomicNum()
-        atomicnumatomd=atomd.GetAtomicNum()
+        
         if poltype.transferanyhydrogentor==True and allaro==False: 
             if atomicnumatoma==1 or atomicnumatomd==1:
                 if allhydrogentor==False and allhydrogentoroneside==False:
