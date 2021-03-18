@@ -209,7 +209,7 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
                         fragsymclass=int(fragclasskey)
                         for ls in parentsymclasstofragsymclasses.values():
                             if fragsymclass in ls:
-                                parentclasskeys=GrabKeysFromValue(poltype,parentsymclasstofragsymclass,fragsymclass)
+                                parentclasskeys=GrabKeysFromValue(poltype,parentsymclasstofragsymclasses,fragsymclass)
                                 for parentsymclass in parentclasskeys:
                                     classkey=str(parentsymclass)
                                     prms=linesplit[2:]
@@ -906,7 +906,6 @@ def GenerateFrag(poltype,molindexlist,mol):
     indextocoordinates=GrabIndexToCoordinates(poltype,em) # need to convert indexes now
     nem=ReadToOBMol(poltype,filename)
     nem.AddHydrogens()
-
     hydindexes=[]
     atomiter=openbabel.OBMolAtomIter(nem)
     for atom in atomiter:
@@ -1473,6 +1472,13 @@ def GrowPossibleFragmentAtomIndexes(poltype,rdkitmol,indexes):
         temp=[]
         for idx in indexlist:
            neighbatom=poltype.rdkitmol.GetAtomWithIdx(idx)
+           atomicnum=neighbatom.GetAtomicNum()
+           if atomicnum==15: # add all neighbors, seems to be issue with cutting bonds on P then adding H, h is added in strange way
+               for neighbneighbatom in neighbatom.GetNeighbors():
+                   neighbneighbatomidx=neighbneighbatom.GetIdx()
+                   if neighbneighbatomidx not in indexlist and neighbneighbatomidx not in temp:
+                       temp.append(neighbneighbatomidx) 
+
            for neighbneighbatom in neighbatom.GetNeighbors():
                atomicnum=neighbneighbatom.GetAtomicNum()
                neighbneighbatomidx=neighbneighbatom.GetIdx()
@@ -1483,7 +1489,8 @@ def GrowPossibleFragmentAtomIndexes(poltype,rdkitmol,indexes):
                if bondorder>1 and neighbneighbatomidx not in indexlist:
                    temp.append(neighbneighbatomidx)
         for idx in temp:
-            indexlist.append(idx)
+            if idx not in indexlist:
+                indexlist.append(idx)
 
         if indexlist not in possiblefragatmidxs:
            possiblefragatmidxs.append(indexlist)
@@ -1548,8 +1555,8 @@ def FirstPassAtomIndexes(poltype,tor,onlyinputindices):
        if atomicnum==15: # add all neighbors, seems to be issue with cutting bonds on P then adding H, h is added in strange way
            for neighbneighbatom in atom.GetNeighbors():
                neighbneighbatomidx=neighbneighbatom.GetIdx()
-               if neighbneighbatomidx not in molindexlist:
-                   molindexlist.append(neighbneighbatomidx) 
+               if neighbneighbatomidx not in temp:
+                   temp.append(neighbneighbatomidx) 
        for neighbneighbatom in atom.GetNeighbors():
            atomicnum=neighbneighbatom.GetAtomicNum()
            neighbneighbatomidx=neighbneighbatom.GetIdx()
@@ -1560,7 +1567,8 @@ def FirstPassAtomIndexes(poltype,tor,onlyinputindices):
            if bondorder>1 and neighbneighbatomidx not in molindexlist:
                temp.append(neighbneighbatomidx)
    for idx in temp:
-       molindexlist.append(idx)
+       if idx not in molindexlist:
+           molindexlist.append(idx)
    return molindexlist
 
 def Chunks(poltype,lst, n):

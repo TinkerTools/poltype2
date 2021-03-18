@@ -661,7 +661,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     poltype.toroptmethod=poltype.secondtoroptmethod
     poltype.toroptbasisset=poltype.secondtoroptbasisset
     poltype.SanitizeAllQMMethods()
-    poltype.optmaxcycle=5
+    poltype.optmaxcycle=2
 
     torsettooutputlogtoinitialstructure={}
     for torset in poltype.torlist:

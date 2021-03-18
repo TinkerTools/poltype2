@@ -299,10 +299,8 @@ def gen_peditinfile(poltype,mol):
     f.write("\n")
     f.flush()
     os.fsync(f.fileno())
-    f.write('\n')
     f.write("2\n")
     f.write("N\n")
-    f.write('\n')
     f.write("N\n")
 
 

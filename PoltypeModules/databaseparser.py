@@ -1247,8 +1247,10 @@ def ModifyAngleKeywords(poltype,angleprms,listofanglesthatneedplanarkeywordtinke
                 else:
                     newline=line
                 break
+        newline=line.replace('anglef','angle')
+
         if found==False:
-            newline=line.replace('anglep','angle')
+            newline=newline.replace('anglep','angle')
 
         newangleprms.append(newline)
     return newangleprms
@@ -2908,21 +2910,22 @@ def MapIndicesToCommentsAtom(poltype,atomindextoallsmarts,smartstocomment,listof
     atomindicestolistofatomcomments={}
     for atoms in listofatomsforprm:
         aindex=atoms[0] 
-        asmartslist=atomindextoallsmarts[aindex]
-        combs = list(itertools.product(asmartslist)) 
-        for comb in combs:
-            asmarts=comb[0]
-            acomment=smartstocomment[asmarts]
-            comments=tuple([acomment])
-            smartslist=[asmarts]
-            if comments not in atomcommentstolistofsmartslist.keys():
-                atomcommentstolistofsmartslist[comments]=[]
-            if tuple(atoms) not in atomindicestolistofatomcomments.keys(): 
-                atomindicestolistofatomcomments[tuple(atoms)]=[]
-            if smartslist not in atomcommentstolistofsmartslist[comments]: 
-                atomcommentstolistofsmartslist[comments].append(smartslist)   
-            if comments not in atomindicestolistofatomcomments[tuple(atoms)]: 
-                atomindicestolistofatomcomments[tuple(atoms)].append(comments)    
+        if aindex in atomindextoallsmarts.keys():
+            asmartslist=atomindextoallsmarts[aindex]
+            combs = list(itertools.product(asmartslist)) 
+            for comb in combs:
+                asmarts=comb[0]
+                acomment=smartstocomment[asmarts]
+                comments=tuple([acomment])
+                smartslist=[asmarts]
+                if comments not in atomcommentstolistofsmartslist.keys():
+                    atomcommentstolistofsmartslist[comments]=[]
+                if tuple(atoms) not in atomindicestolistofatomcomments.keys(): 
+                    atomindicestolistofatomcomments[tuple(atoms)]=[]
+                if smartslist not in atomcommentstolistofsmartslist[comments]: 
+                    atomcommentstolistofsmartslist[comments].append(smartslist)   
+                if comments not in atomindicestolistofatomcomments[tuple(atoms)]: 
+                    atomindicestolistofatomcomments[tuple(atoms)].append(comments)    
     return atomcommentstolistofsmartslist,atomindicestolistofatomcomments
 
 
@@ -2993,73 +2996,74 @@ def MapIndicesToClasses(poltype,atomindextoallsmarts,smartstoatomclass,listofbon
     angleindicestolistofangleclasses={}
     strbndindicestolistofstrbndclasses={}
     opbendindicestolistofopbendclasses={}
-
     for bond in listofbondsforprm:
         aindex=bond[0]
         bindex=bond[1] 
-        asmartslist=atomindextoallsmarts[aindex]
-        bsmartslist=atomindextoallsmarts[bindex]   
-        combs = list(itertools.product(asmartslist, bsmartslist)) 
-        for comb in combs:
-            asmarts=comb[0]
-            bsmarts=comb[1]
-            aclass=smartstoatomclass[asmarts]
-            bclass=smartstoatomclass[bsmarts]
-            bondclasses=tuple([aclass,bclass])
-            smartslist=[asmarts,bsmarts]
-            if bondclasses not in bondclassestolistofsmartslist.keys():
-                bondclassestolistofsmartslist[bondclasses]=[]
-            if tuple(bond) not in bondindicestolistofbondclasses.keys(): 
-                bondindicestolistofbondclasses[tuple(bond)]=[]
-            if smartslist not in bondclassestolistofsmartslist[bondclasses]: 
-                bondclassestolistofsmartslist[bondclasses].append(smartslist)   
-             
-            if bondclasses not in bondindicestolistofbondclasses[tuple(bond)]: 
-                bondindicestolistofbondclasses[tuple(bond)].append(bondclasses)    
+        if aindex in atomindextoallsmarts.keys() and bindex in atomindextoallsmarts.keys():
+            asmartslist=atomindextoallsmarts[aindex]
+            bsmartslist=atomindextoallsmarts[bindex]   
+            combs = list(itertools.product(asmartslist, bsmartslist)) 
+            for comb in combs:
+                asmarts=comb[0]
+                bsmarts=comb[1]
+                aclass=smartstoatomclass[asmarts]
+                bclass=smartstoatomclass[bsmarts]
+                bondclasses=tuple([aclass,bclass])
+                smartslist=[asmarts,bsmarts]
+                if bondclasses not in bondclassestolistofsmartslist.keys():
+                    bondclassestolistofsmartslist[bondclasses]=[]
+                if tuple(bond) not in bondindicestolistofbondclasses.keys(): 
+                    bondindicestolistofbondclasses[tuple(bond)]=[]
+                if smartslist not in bondclassestolistofsmartslist[bondclasses]: 
+                    bondclassestolistofsmartslist[bondclasses].append(smartslist)   
+                 
+                if bondclasses not in bondindicestolistofbondclasses[tuple(bond)]: 
+                    bondindicestolistofbondclasses[tuple(bond)].append(bondclasses)    
 
-            if bond in planarbonds or bond[::-1] in planarbonds:
-                if bondclasses not in opbendclassestolistofsmartslist.keys():
-                    opbendclassestolistofsmartslist[bondclasses]=[]
-                if tuple(bond) not in opbendindicestolistofopbendclasses.keys():
-                    opbendindicestolistofopbendclasses[tuple(bond)]=[]
-                if smartslist not in opbendclassestolistofsmartslist[bondclasses]: 
-                    opbendclassestolistofsmartslist[bondclasses].append(smartslist)   
-                if bondclasses not in opbendindicestolistofopbendclasses[tuple(bond)]:
-                    opbendindicestolistofopbendclasses[tuple(bond)].append(bondclasses)    
+                if bond in planarbonds or bond[::-1] in planarbonds:
+                    if bondclasses not in opbendclassestolistofsmartslist.keys():
+                        opbendclassestolistofsmartslist[bondclasses]=[]
+                    if tuple(bond) not in opbendindicestolistofopbendclasses.keys():
+                        opbendindicestolistofopbendclasses[tuple(bond)]=[]
+                    if smartslist not in opbendclassestolistofsmartslist[bondclasses]: 
+                        opbendclassestolistofsmartslist[bondclasses].append(smartslist)   
+                    if bondclasses not in opbendindicestolistofopbendclasses[tuple(bond)]:
+                        opbendindicestolistofopbendclasses[tuple(bond)].append(bondclasses)    
 
 
     for angle in listofanglesforprm:
         aindex=angle[0]
         bindex=angle[1] 
         cindex=angle[2] 
-        asmartslist=atomindextoallsmarts[aindex]
-        bsmartslist=atomindextoallsmarts[bindex]   
-        csmartslist=atomindextoallsmarts[cindex]   
-        combs = list(itertools.product(asmartslist,bsmartslist,csmartslist)) 
-        for comb in combs:
-            asmarts=comb[0]
-            bsmarts=comb[1]
-            csmarts=comb[2]
-            aclass=smartstoatomclass[asmarts]
-            bclass=smartstoatomclass[bsmarts]
-            cclass=smartstoatomclass[csmarts]
-            angleclasses=tuple([aclass,bclass,cclass])
-            smartslist=[asmarts,bsmarts,csmarts]
-            if angleclasses not in angleclassestolistofsmartslist.keys():
-                angleclassestolistofsmartslist[angleclasses]=[]
-                strbndclassestolistofsmartslist[angleclasses]=[]
-            if tuple(angle) not in angleindicestolistofangleclasses.keys():
-                angleindicestolistofangleclasses[tuple(angle)]=[]
-            if tuple(angle) not in strbndindicestolistofstrbndclasses.keys():
-                strbndindicestolistofstrbndclasses[tuple(angle)]=[]
-            if smartslist not in angleclassestolistofsmartslist[angleclasses]: 
-                angleclassestolistofsmartslist[angleclasses].append(smartslist)     
-            if smartslist not in strbndclassestolistofsmartslist[angleclasses]:
-                strbndclassestolistofsmartslist[angleclasses].append(smartslist)     
-            if angleclasses not in angleindicestolistofangleclasses[tuple(angle)]: 
-                angleindicestolistofangleclasses[tuple(angle)].append(angleclasses)     
-            if angleclasses not in strbndindicestolistofstrbndclasses[tuple(angle)]: 
-                strbndindicestolistofstrbndclasses[tuple(angle)].append(angleclasses)     
+        if aindex in atomindextoallsmarts.keys() and bindex in atomindextoallsmarts.keys() and cindex in atomindextoallsmarts.keys():
+            asmartslist=atomindextoallsmarts[aindex]
+            bsmartslist=atomindextoallsmarts[bindex]   
+            csmartslist=atomindextoallsmarts[cindex]   
+            combs = list(itertools.product(asmartslist,bsmartslist,csmartslist)) 
+            for comb in combs:
+                asmarts=comb[0]
+                bsmarts=comb[1]
+                csmarts=comb[2]
+                aclass=smartstoatomclass[asmarts]
+                bclass=smartstoatomclass[bsmarts]
+                cclass=smartstoatomclass[csmarts]
+                angleclasses=tuple([aclass,bclass,cclass])
+                smartslist=[asmarts,bsmarts,csmarts]
+                if angleclasses not in angleclassestolistofsmartslist.keys():
+                    angleclassestolistofsmartslist[angleclasses]=[]
+                    strbndclassestolistofsmartslist[angleclasses]=[]
+                if tuple(angle) not in angleindicestolistofangleclasses.keys():
+                    angleindicestolistofangleclasses[tuple(angle)]=[]
+                if tuple(angle) not in strbndindicestolistofstrbndclasses.keys():
+                    strbndindicestolistofstrbndclasses[tuple(angle)]=[]
+                if smartslist not in angleclassestolistofsmartslist[angleclasses]: 
+                    angleclassestolistofsmartslist[angleclasses].append(smartslist)     
+                if smartslist not in strbndclassestolistofsmartslist[angleclasses]:
+                    strbndclassestolistofsmartslist[angleclasses].append(smartslist)     
+                if angleclasses not in angleindicestolistofangleclasses[tuple(angle)]: 
+                    angleindicestolistofangleclasses[tuple(angle)].append(angleclasses)     
+                if angleclasses not in strbndindicestolistofstrbndclasses[tuple(angle)]: 
+                    strbndindicestolistofstrbndclasses[tuple(angle)].append(angleclasses)     
 
     return bondclassestolistofsmartslist,angleclassestolistofsmartslist,strbndclassestolistofsmartslist,opbendclassestolistofsmartslist,bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses
 

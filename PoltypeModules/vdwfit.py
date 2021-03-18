@@ -17,6 +17,7 @@ from socket import gethostname
 import shlex
 from scipy.optimize import fmin
 import shutil
+import copy
 
 def best_fit_slope_and_intercept(xs,ys):
     xs=np.array(xs)
@@ -210,12 +211,10 @@ def MoveDimerAboutMinima(poltype,txyzFile,outputprefixname,nAtomsFirst,atomidx1,
         fname=outputprefixname+'_%s.xyz' %(str(frac))
         fnamearray.append(fname)
         with open(fname,'w') as f:
-    
             twoDots = [atomidx1,atomidx2] #two atoms selected to vary; the atom number exactly in TINKER file
             temp=open(txyzFile,'r')
             lines=temp.readlines()
             temp.close()
-    
             coordSecondMol = [] #Coordinates of the second molecule
             data = lines[twoDots[0]].split()
             coordFirstAtm = [float(data[2]), float(data[3]), float(data[4])] 
@@ -237,8 +236,6 @@ def MoveDimerAboutMinima(poltype,txyzFile,outputprefixname,nAtomsFirst,atomidx1,
                 headString = ' '.join(lines[i].split()[0:2]) 
                 tailString = ' '.join(lines[i].split()[5:])
                 stringsList.append([headString, tailString])
-    
-    
             for i in range(0, nAtomsFirst+1, 1):
                 f.write(lines[i])
     
@@ -253,7 +250,7 @@ def MoveDimerAboutMinima(poltype,txyzFile,outputprefixname,nAtomsFirst,atomidx1,
     return fnamearray
 
 
-def ConvertWaterProbeDimerXYZToTinkerXYZ(poltype,inputxyz,tttxyz,outputxyz):
+def ConvertProbeDimerXYZToTinkerXYZ(poltype,inputxyz,tttxyz,outputxyz,waterbool,probeatoms):
     temp=open(inputxyz,'r')
     resultsinputxyz=temp.readlines()
     temp.close()
@@ -261,7 +258,6 @@ def ConvertWaterProbeDimerXYZToTinkerXYZ(poltype,inputxyz,tttxyz,outputxyz):
     temp=open(tttxyz,'r')
     resultstttxyz=temp.readlines()
     temp.close()
-    
     outfile=open(outputxyz,'w')
     outarray=[]
     for lineidx in range(len(resultstttxyz)):
@@ -285,18 +281,48 @@ def ConvertWaterProbeDimerXYZToTinkerXYZ(poltype,inputxyz,tttxyz,outputxyz):
     
     
     totalatomnum=int(totatoms.strip().replace('\n',''))
-    for lineidx in range(len(resultsinputxyz)):
-        inputxyzline=resultsinputxyz[lineidx]
-        if lineidx==totalatomnum-2:
-            outline = str(totalatomnum-2)+ ' ' +inputxyzline.split()[0]+ " " + ' '.join(inputxyzline.split()[1:5]) + " 349 " + str(totalatomnum-1) + " " + str(totalatomnum) + "" 
-            outfile.write(outline+'\n')
-        elif lineidx==totalatomnum-1:
-            outline = str(totalatomnum-1) + ' ' +inputxyzline.split()[0]+ " " + ' '.join(inputxyzline.split()[1:5]) + " 350 " + str(totalatomnum-2)+ ""
-            outfile.write(outline+'\n')
-        elif lineidx==totalatomnum:
-            outline = str(totalatomnum) + ' ' +inputxyzline.split()[0]+ " " + ' '.join(inputxyzline.split()[1:5]) + " 350 " + str(totalatomnum-2)+ ""
-            outfile.write(outline+'\n')
+
+    if waterbool==True:
+        for lineidx in range(len(resultsinputxyz)):
+            inputxyzline=resultsinputxyz[lineidx]
+            if lineidx==totalatomnum-2:
+                outline = str(totalatomnum-2)+ ' ' +inputxyzline.split()[0]+ " " + ' '.join(inputxyzline.split()[1:5]) + " 349 " + str(totalatomnum-1) + " " + str(totalatomnum) + "" 
+                outfile.write(outline+'\n')
+            elif lineidx==totalatomnum-1:
+                outline = str(totalatomnum-1) + ' ' +inputxyzline.split()[0]+ " " + ' '.join(inputxyzline.split()[1:5]) + " 350 " + str(totalatomnum-2)+ ""
+                outfile.write(outline+'\n')
+            elif lineidx==totalatomnum:
+                outline = str(totalatomnum) + ' ' +inputxyzline.split()[0]+ " " + ' '.join(inputxyzline.split()[1:5]) + " 350 " + str(totalatomnum-2)+ ""
+                outfile.write(outline+'\n')
+    else:
+        count=0
+        newoutarray=[]
+        for lineidx in range(len(resultsinputxyz)):
+            inputxyzline=resultsinputxyz[lineidx]
+            if lineidx>probeatoms:
+                tttindex=lineidx-probeatoms
+            else:
+                tttindex=lineidx        
+            tttxyzline=resultstttxyz[tttindex]
+            if lineidx!=0:
+                count+=1 
+                if count>probeatoms:
+                    linesplitinput=inputxyzline.split()
+                    linesplittttxyz=tttxyzline.split()
+                    output=''
+                    atomindex=int(linesplittttxyz[0])
+                    linesplittttxyz[0]=str(atomindex+probeatoms)
+                    output+=' '.join(linesplittttxyz[0:2])+' '
+                    output+=' '.join(linesplitinput[1:])+' '
+                    for i in range(6,len(linesplittttxyz)):
+                        currentindex=str(int(linesplittttxyz[i])+probeatoms)
+                        linesplittttxyz[i]=currentindex
+                    output+=' '.join(linesplittttxyz[5:])
+                    newoutarray.append(output)
     
+        for out in newoutarray:
+            outfile.write(out+'\n')
+
     outfile.close()
 
 
@@ -419,7 +445,7 @@ def readTXYZ(poltype,TXYZ):
         coord.append([float(data[2]), float(data[3]), float(data[4])])
     return atoms,coord,order, types, connections
 
-def TXYZ2COM(poltype,TXYZ,comfname,chkname,maxdisk,maxmem,numproc,mol):
+def TXYZ2COM(poltype,TXYZ,comfname,chkname,maxdisk,maxmem,numproc,mol,probeatoms):
     data = readTXYZ(poltype,TXYZ)
     atoms = data[0];coord = data[1]
     opt.write_com_header(poltype,comfname,chkname,maxdisk,maxmem,numproc)
@@ -443,7 +469,7 @@ def TXYZ2COM(poltype,TXYZ,comfname,chkname,maxdisk,maxmem,numproc,mol):
     tmpfh.write('%d %d %d %d %d %d\n' % (chg,mul,chg,mul,0,1))
 
     for n in range(len(atoms)):
-        if n>=len(atoms)-3:
+        if n>=len(atoms)-probeatoms:
             tmpfh.write("%3s%s             %14.7f%14.7f%14.7f\n"%(atoms[n],'(Fragment=2)',float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
         else:
             tmpfh.write("%3s%s             %14.7f%14.7f%14.7f\n"%(atoms[n],'(Fragment=1)',float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
@@ -478,7 +504,7 @@ def TXYZ2COM(poltype,TXYZ,comfname,chkname,maxdisk,maxmem,numproc,mol):
 
 
 
-def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc):
+def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc,probeatoms):
     data = readTXYZ(poltype,TXYZ)
     atoms = data[0];coord = data[1]
     mul=mol.GetTotalSpinMultiplicity()
@@ -489,10 +515,10 @@ def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc):
     temp.write('molecule { '+'\n')
     temp.write('%d %d\n' % (chg, mul))
     for n in range(len(atoms)):
-        if n==len(atoms)-3:
+        if n==len(atoms)-probeatoms:
             temp.write('--'+'\n')
             temp.write('%d %d\n' % (0, 1))
-        if n>=len(atoms)-3:
+        if n>=len(atoms)-probeatoms:
             temp.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
         else:
             temp.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
@@ -517,7 +543,7 @@ def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc):
     temp.write('molecule { '+'\n')
     temp.write('%d %d\n' % (chg, 1))
     for n in range(len(atoms)):
-        if n>=len(atoms)-3:
+        if n>=len(atoms)-probeatoms:
             temp.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
         else:
             temp.write("%3s             %14.7f%14.7f%14.7f\n"%('@'+atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
@@ -536,7 +562,7 @@ def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc):
     temp.write('molecule { '+'\n')
     temp.write('%d %d\n' % (chg, 1))
     for n in range(len(atoms)):
-        if n>=len(atoms)-3:
+        if n>=len(atoms)-probeatoms:
             temp.write("%s             %14.7f%14.7f%14.7f\n"%('@'+atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
         else:
             temp.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
@@ -586,15 +612,15 @@ def WriteOutCartesianXYZ(poltype,mol,filename):
     output.close()
 
 
-def GenerateSPInputFiles(poltype,filenamearray,mol):
+def GenerateSPInputFiles(poltype,filenamearray,mol,probeatoms):
     qmfilenamearray=[]
     for filename in filenamearray:
         if poltype.use_gaus==True:
             qmfilename=filename.replace('.xyz','_sp.com')
             chkfilename=filename.replace('.xyz','_sp.chk')
-            TXYZ2COM(poltype,filename,qmfilename,chkfilename,poltype.maxdisk,poltype.maxmem,poltype.numproc,mol)
+            TXYZ2COM(poltype,filename,qmfilename,chkfilename,poltype.maxdisk,poltype.maxmem,poltype.numproc,mol,probeatoms)
         else:
-            qmfilename,outputname=CreatePsi4SPInputFile(poltype,filename,mol,poltype.maxdisk,poltype.maxmem,poltype.numproc)
+            qmfilename,outputname=CreatePsi4SPInputFile(poltype,filename,mol,poltype.maxdisk,poltype.maxmem,poltype.numproc,probeatoms)
         qmfilenamearray.append(qmfilename)
     return qmfilenamearray
 
@@ -690,7 +716,6 @@ def GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indext
     indexpairtobounds={}
     indices=list(indextoreferencecoordinate.keys())
     allpairs=list(itertools.combinations(indices, 2)) 
-    stericdistance=1
     pairwiseratio=1
     for pair in allpairs:
         index1=pair[0]
@@ -712,17 +737,41 @@ def GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indext
             if target1=='target' and target2=='target': # then use vdw distances
                 targetdistance=pairwiseratio*(vdwradius1+vdwradius2)
                 bound=[targetdistance,targetdistance]
-            else: # then use steric distance constraints
-                targetdistance=stericdistance
+
+        indexpairtoreferencedistance[tuple(pair)]=targetdistance 
+        indexpairtobounds[tuple(pair)]=bound
+
+    for pair in allpairs:
+        index1=pair[0]
+        index2=pair[1]
+        molecule1=indextomolecule[index1]
+        molecule2=indextomolecule[index2]
+        coord1=indextoreferencecoordinate[index1]
+        coord2=indextoreferencecoordinate[index2]
+        target1=indextotargetatom[index1]
+        target2=indextotargetatom[index2]
+        element1=indextoreferenceelement[index1]
+        element2=indextoreferenceelement[index2]
+        vdwradius1=vdwradius[element1]
+        vdwradius2=vdwradius[element2]
+        if molecule1==molecule2:
+            targetdistance=np.linalg.norm(coord1-coord2)
+            bound=[targetdistance,targetdistance]
+        else:
+            if target1=='target' and target2=='target': # then use vdw distances
+                targetdistance=pairwiseratio*(vdwradius1+vdwradius2)
+                bound=[targetdistance,targetdistance]
+            else:
                 bound=[targetdistance,100] # high upper bound, large range to not add cost in cost function                
 
         indexpairtoreferencedistance[tuple(pair)]=targetdistance 
         indexpairtobounds[tuple(pair)]=bound
+
  
     return indexpairtoreferencedistance,indexpairtobounds
 
 
-def GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol):
+def GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol,indextoreferencecoordinate):
     indicestoreferenceangleprobe={}
     indicestoreferenceanglemoleculeneighb={}
     indicestoreferenceanglemoleculeneighbneighb={}
@@ -749,15 +798,27 @@ def GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol):
 
     probeneighbs=[i-1+len(atoms1) for i in probeneighbs] # shift to 0 index, shift passed first molecule
     acceptorneighbs=[i-1 for i in acceptorneighbs]
-    if len(probeneighbs)==2 and len(probeneighbsymclassesset)==1:
-        angleatoms=[probeneighbatoms[0],donoratom,probeneighbatoms[1]]
-        bisectangle=probemol.GetAngle(angleatoms[0],angleatoms[1],angleatoms[2])
-        angle=.5*bisectangle
-    elif len(probeneighbs)==1:
-        angle=0 # degenerate triangle
-
+    donorcoordinate=indextoreferencecoordinate[donorindex]
+    acceptorcoordinate=indextoreferencecoordinate[acceptorindex]
     for donorneighbindex in probeneighbs:
-        angleindices=tuple([donorindex,donorneighbindex,acceptorindex])
+        if len(probeneighbs)==2 and len(probeneighbsymclassesset)==1:
+            angleatoms=[probeneighbatoms[0],donoratom,probeneighbatoms[1]]
+            bisectangle=probemol.GetAngle(angleatoms[0],angleatoms[1],angleatoms[2])
+            angle=180-.5*bisectangle 
+
+        elif len(probeneighbs)==1:
+            angle=180
+        else:
+
+            donorneighbcoordinate=indextoreferencecoordinate[donorneighbindex]
+            donortoacceptor=acceptorcoordinate-donorcoordinate
+            donortodonorneighb=donorneighbcoordinate-donorcoordinate
+            donortoacceptornormed=donortoacceptor/np.linalg.norm(donortoacceptor)
+            donortodonorneighbnormed=donortodonorneighb/np.linalg.norm(donortodonorneighb) 
+            angle=np.arccos(np.dot(donortoacceptornormed,donortodonorneighbnormed))
+
+
+        angleindices=tuple([donorneighbindex,donorindex,acceptorindex])
         indicestoreferenceangleprobe[angleindices]=angle
     if len(acceptorneighbs)!=1:
         angle=90
@@ -782,23 +843,14 @@ def GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol):
 
 def ConvertAngleRestraintToDistanceRestraint(indexpairtoreferencedistance,indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb,indexpairtobounds,indextoreferencecoordinate):
     for indices,targetangle in indicestoreferenceangleprobe.items(): 
-        donorneighbindex=indices[1]
+        donorneighbindex=indices[0]
         acceptorindex=indices[2]
-        donorindex=indices[0]
+        donorindex=indices[1]
         inputpair=tuple([donorneighbindex,donorindex])
         inputdistance=GrabPairwiseDistance(inputpair,indexpairtoreferencedistance)
         targetpair=tuple([donorindex,acceptorindex])
         targetdistance=GrabPairwiseDistance(targetpair,indexpairtoreferencedistance)
-        acceptorcoordinate=indextoreferencecoordinate[acceptorindex]
-        donorcoordinate=indextoreferencecoordinate[donorindex]
-        donorneighbcoordinate=indextoreferencecoordinate[donorneighbindex]
-        acceptordonorvector=donorcoordinate-acceptorcoordinate
-        acceptordonorneighbvector=donorneighbcoordinate-acceptorcoordinate
-        acceptordonorvectornormed=acceptordonorvector/np.linalg.norm(acceptordonorvector)
-        acceptordonorneighbvectornormed=acceptordonorneighbvector/np.linalg.norm(acceptordonorneighbvector)
-        currentangle=np.arccos(np.dot(acceptordonorneighbvectornormed,acceptordonorvectornormed))
-        angle=180-currentangle-targetangle
-        angledist=LawOfCosines(inputdistance,targetdistance,angle)    
+        angledist=LawOfCosines(inputdistance,targetdistance,targetangle)    
         anglepair=tuple([donorneighbindex,acceptorindex])
         indexpairtoreferencedistance[anglepair]=angledist
         indexpairtobounds[anglepair]=[angledist,angledist]
@@ -869,6 +921,7 @@ def GenerateInitialDictionaries(coords1,coords2,atoms1,atoms2,p1,p2):
     for i in range(len(coords1)):
         coords=np.array(coords1[i])
         element=atoms1[i]
+
         indextoreferencecoordinate[count]=coords
         indextoreferenceelement[count]=element
         indextomolecule[count]='molecule1'
@@ -898,10 +951,9 @@ def GenerateInitialDictionaries(coords1,coords2,atoms1,atoms2,p1,p2):
 def optimize(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,mol,probemol):
     indextoreferencecoordinate,indextoreferenceelement,indextomolecule,indextotargetatom=GenerateInitialDictionaries(coords1,coords2,atoms1,atoms2,p1,p2) 
     indexpairtoreferencedistance,indexpairtobounds=GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indextotargetatom,indextoreferenceelement,vdwradius)
-    indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb=GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol)
+    indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb=GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol,indextoreferencecoordinate)
     indexpairtoreferencedistance,indexpairtobounds=ConvertAngleRestraintToDistanceRestraint(indexpairtoreferencedistance,indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb,indexpairtobounds,indextoreferencecoordinate) 
     coordinatesguess=GenerateCoordinateGuesses(indextoreferencecoordinate)
-    
     def PairwiseCostFunction(x):
         func=0
         for indexpair,bounds in indexpairtobounds.items():
@@ -935,11 +987,13 @@ def optimize(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,m
           f.write("%3s %12.5f%12.5f%12.5f\n"%(element, coordinate[0], coordinate[1], coordinate[2]))
 
 
-def GenerateProbePathNames(poltype,vdwprobenames):
+def GenerateProbePathNames(poltype,vdwprobenames,moleculexyz):
     probepaths=[]
     if 'water' in vdwprobenames:
         path=poltype.vdwprobepathname+'water.xyz'
         probepaths.append(path)
+    if poltype.homodimers==True:
+        probepaths.append(moleculexyz)
     return probepaths
 
 
@@ -949,24 +1003,50 @@ def readXYZ(poltype,xyz):
   return atoms,coords
 
 
+def CheckBuriedAtoms(poltype,indexarray,molecule,zeroindex=False):
+    indicestodelete=[]
+    for i in range(len(indexarray)):
+        index=indexarray[i]
+        if zeroindex==False:
+            idx=index
+        else:
+            idx=index+1
+        atom=molecule.GetAtom(idx)
+        valence=atom.GetValence()
+        hyb=atom.GetHyb() 
+        if valence==4 and hyb==3:
+            indicestodelete.append(i)
+    for index in indicestodelete:
+        del indexarray[index]
+
+    return indexarray
+
+
 def GenerateInitialProbeStructure(poltype,missingvdwatomindices):
     molecules = [poltype.xyzfname]
-    probes = GenerateProbePathNames(poltype,poltype.vdwprobenames)
-    
+    probes = GenerateProbePathNames(poltype,poltype.vdwprobenames,poltype.xyzfname)
     vdwradius = {"H" : 1.20, "Li": 1.82, "Na": 2.27, "K": 2.75, "Rb": 3.03, "Cs": 3.43, \
                  "Be": 1.53, "Mg": 1.73, "Ca": 2.31, "B": 1.92, "C": 1.70, "N": 1.55, "O":1.52, \
                  "P" : 1.80, "S" : 1.80, "F" : 1.47, "Cl":1.75, "Br":1.85, "Zn":1.39}           
     dimernames=[]
     probeindices=[]
     moleculeindices=[]
+    numberprobeatoms=[]
     for mol in molecules:
         atoms1,coords1,order1, types1, connections1=readTXYZ(poltype,mol)
-        mol_spots = missingvdwatomindices
+        mol_spots = missingvdwatomindices.copy()
+        mol_spots = CheckBuriedAtoms(poltype,mol_spots,poltype.mol)
         mol_spots = [i-1 for i in mol_spots]
         for prob in probes:
             probename=os.path.basename(prob)
-            atoms2,coords2=readXYZ(poltype,prob)
-            probemol=opt.load_structfile(poltype,prob)
+            prefix=poltype.molstructfname.split('.')[0]
+            if prefix in prob:
+                probemol=poltype.mol
+                atoms2=atoms1.copy()
+                coords2=coords1.copy()
+            else:
+                atoms2,coords2=readXYZ(poltype,prob)
+                probemol=opt.load_structfile(poltype,prob)
             probeidxtosymclass,symmetryclass=symm.gen_canonicallabels(poltype,probemol) 
             prob_spots=[]
 
@@ -975,6 +1055,7 @@ def GenerateInitialProbeStructure(poltype,missingvdwatomindices):
                 probeidx=keys[0]-1 # shift to 0 index
                 if probeidx not in prob_spots:
                     prob_spots.append(probeidx)
+            prob_spots = CheckBuriedAtoms(poltype,prob_spots,probemol,zeroindex=True)
             for p1 in mol_spots:
                 probelist=[]
                 probeindiceslist=[]
@@ -993,7 +1074,8 @@ def GenerateInitialProbeStructure(poltype,missingvdwatomindices):
                 moleculeindices.append(moleculeindiceslist)
                 probeindices.append(probeindiceslist)
                 dimernames.append(probelist)
-    return dimernames,probeindices,moleculeindices
+                numberprobeatoms.append(probemol.NumAtoms())
+    return dimernames,probeindices,moleculeindices,numberprobeatoms
 
 def GrabKeysFromValue(poltype,dic,thevalue):
     keylist=[]
@@ -1048,12 +1130,13 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebabio18.prm"
     ReplaceParameterFileHeader(poltype,paramhead,poltype.key5fname)
     array=[.8,.9,1,1.1,1.2]
-    dimerfiles,probeindices,moleculeindices=GenerateInitialProbeStructure(poltype,missingvdwatomindices)
+    dimerfiles,probeindices,moleculeindices,numberprobeatoms=GenerateInitialProbeStructure(poltype,missingvdwatomindices)
     obConversion = openbabel.OBConversion()
     for i in range(len(dimerfiles)):
         filenamelist=dimerfiles[i]
         probeindexlist=probeindices[i]
         moleculeindexlist=moleculeindices[i]
+        probeatoms=numberprobeatoms[i]
         alloutputfilenames=[]
         prefixarrays=[]
         distancearrays=[]
@@ -1077,7 +1160,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             poltype.gausoptfname=prefix+'.log'
             optmol = opt.GeometryOptimization(poltype,dimermol,checkbonds=False,modred=False)
             dimeratoms=dimermol.NumAtoms()
-            moleculeatoms=dimeratoms-3
+            moleculeatoms=dimeratoms-probeatoms
             moleculeatom=optmol.GetAtom(moleculeindex)
             probeatom=optmol.GetAtom(probeindex)
             moleculeatomcoords=np.array([moleculeatom.GetX(),moleculeatom.GetY(),moleculeatom.GetZ()])
@@ -1089,9 +1172,13 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             outputxyz=outputprefixname+'_tinker.xyz'
             inputxyz=outputprefixname+'_cartesian.xyz'
             WriteOutCartesianXYZ(poltype,optmol,inputxyz)
-            ConvertWaterProbeDimerXYZToTinkerXYZ(poltype,inputxyz,poltype.xyzoutfile,outputxyz)
+            if 'water' in outputxyz:
+                waterbool=True
+            else:
+                waterbool=False
+            ConvertProbeDimerXYZToTinkerXYZ(poltype,inputxyz,poltype.xyzoutfile,outputxyz,waterbool,probeatoms)
             filenamearray=MoveDimerAboutMinima(poltype,outputxyz,outputprefixname,moleculeatoms,moleculeindex,probeindex,equildistance,array)
-            qmfilenamearray=GenerateSPInputFiles(poltype,filenamearray,poltype.mol)
+            qmfilenamearray=GenerateSPInputFiles(poltype,filenamearray,poltype.mol,probeatoms)
             outputfilenames=ExecuteSPJobs(poltype,qmfilenamearray,prefix)
             alloutputfilenames.extend(outputfilenames)
         dothefit=False
