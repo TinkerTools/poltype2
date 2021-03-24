@@ -890,10 +890,11 @@ def GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol,indextorefe
             neighbofneighbsatoms.append(atom)
         for atom in neighbofneighbsatoms:
             atomidx=atom.GetIdx()
-            angleatoms=[atom,neighb,acceptoratom] 
-            angle=mol.GetAngle(angleatoms[0],angleatoms[1],angleatoms[2])
-            angleindices=tuple([atomidx-1,neighb.GetIdx()-1,acceptorindex,donorindex]) # acceptorindex and donorindex colinear here, but need both to get correct distance information for law of cosines
-            indicestoreferenceanglemoleculeneighbneighb[angleindices]=angle
+            if (atomidx-1)!=acceptorindex:
+                angleatoms=[atom,neighb,acceptoratom] 
+                angle=mol.GetAngle(angleatoms[0],angleatoms[1],angleatoms[2])
+                angleindices=tuple([atomidx-1,neighb.GetIdx()-1,acceptorindex,donorindex]) # acceptorindex and donorindex colinear here, but need both to get correct distance information for law of cosines
+                indicestoreferenceanglemoleculeneighbneighb[angleindices]=angle
     
     return indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb
 
@@ -1138,7 +1139,7 @@ def GrabAngle(inputpair,indicestoangle):
         a=inputpair[0]
         b=inputpair[1]
         if a in tupindices and b in tupindices:
-            indices.append(tupindices)
+            indices.append(tupindices[:2+1])
             angleguesses.append(angle)
 
  
