@@ -1218,24 +1218,22 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         originalmm_energy_list=arrays[0]
         originalqm_energy_list=arrays[1]
         originalmm2_energy_list=arrays[2]
-
         # remove angles for which energy was unable to be found
         del_ang_list = find_del_list(poltype,mm_energy_list,mang_list)
         indicesremoved=FindRemovedIndices(poltype,originalmang_list,del_ang_list)
-
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_mme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
-
         del_ang_list = find_del_list(poltype,qm_energy_list,qang_list)
         indicesremoved=FindRemovedIndices(poltype,originalqang_list,del_ang_list,indicesremoved=indicesremoved)
-
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
 
         del_ang_list = find_del_list(poltype,mm2_energy_list,m2ang_list)
         indicesremoved=FindRemovedIndices(poltype,originalmm2ang_list,del_ang_list,indicesremoved=indicesremoved)
 
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
+
         del_ang_list = find_del_list(poltype,WBOarray,qang_list)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=prune_qme_error(poltype,del_ang_list,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
+
         array=numpy.array(originalmm_energy_list)
         originalfitfuncarray=numpy.zeros(array.shape)
 

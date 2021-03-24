@@ -559,6 +559,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         poltype.optmaxcycle=2
         outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol,'1')
         torsettooptoutputlogs[tuple(torset)]=outputlogs
+
         dictionary = dict(zip(outputlogs,initialstructures))  
         torsettooutputlogtoinitialstructure[tuple(torset)].update(dictionary)
 
@@ -596,12 +597,15 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                 if error==False:
                     ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz) 
                 torsettofinshedtinkerxyzfiles[tuple(torset)].append(tinkerxyz)
+                if finished==True and outputlog not in finishedjobs:
+                    finishedjobs.append(outputlog)
+
             else:
                 failed=True
                 if poltype.tordebugmode==False:
 
                     torsettofailedoutputlogtoinitialstructure[tuple(torset)][outputlog]=outputlogtoinitialstructure[outputlog]
-
+    firstfinishedjobs=finishedjobs[:]
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True) and failed==True:
         temp_use_gaus=poltype.use_gaus
         temp_use_gaus_optonly=poltype.use_gausoptonly
@@ -709,6 +713,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
 
             if finished==True and outputlog not in finishedjobs:
                 finishedjobs.append(outputlog)
+
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True) and failed==True:
         temp_use_gaus=poltype.use_gaus
         temp_use_gaus_optonly=poltype.use_gausoptonly
@@ -755,14 +760,13 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                 if finished==True and outputlog not in finishedjobs:
                     finishedjobs.append(outputlog)
 
-
         poltype.use_gaus=temp_use_gaus
         poltype.use_gausoptonly=temp_use_gaus_optonly
         poltype.SanitizeAllQMMethods()
-
-
+    for job in firstfinishedjobs:
+        if job not in finishedjobs:
+            finishedjobs.append(job)
     torsettooptoutputlogs=CompareQMStructuresCheckForRelaxedBonds(poltype,firsttorsettooptoutputlogs,torsettooptoutputlogs)
-
     fulllistofjobs=[]
     fulljobtolog={}
     fulljobtooutputlog={}
@@ -772,14 +776,16 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
         outputlogs=torsettooptoutputlogs[tuple(torset)]
-
         finishedoutputlogs=[]
+        finishedflatphaselist=[]
         for i in range(len(outputlogs)):
             outputlog=outputlogs[i]
+            phaselist=flatphaselist[i]
             if outputlog in finishedjobs and outputlog not in errorjobs:
                 finishedoutputlogs.append(outputlog)
+                finishedflatphaselist.append(phaselist)
 
-        outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangles=ExecuteSPJobs(poltype,finishedoutputlogs,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,mol)
+        outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangles=ExecuteSPJobs(poltype,finishedoutputlogs,finishedflatphaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,mol)
         lognames=[]
         torsettospoutputlogs[tuple(torset)]=outputlogs
         for job in listofjobs:
