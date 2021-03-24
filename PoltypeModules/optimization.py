@@ -7,7 +7,7 @@ import time
 import apicall as call
 import shlex
 
-def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred):
+def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,restraints,skipscferror):
     tempread=open(comfilecoords,'r')
     results=tempread.readlines()
     tempread.close()
@@ -50,6 +50,33 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred):
         temp.write('  dynamic_level 1'+'\n')
         temp.write('}'+'\n')
 
+    if restraints!=None:
+        space='  '
+        bondres=[restraints[0]]
+        string='frozen_distance'
+        temp.write('set optking{'+'\n')
+        temp.write('  '+string+' '+'='+' '+'('+'"'+'\n')
+        for res in bondres:
+            res=[str(i) for i in res]
+            resstring=' '.join(res)+'\n'
+            temp.write('   '+resstring)
+        temp.write('  "'+')'+'\n')
+        temp.write('}'+'\n')
+       
+        anglerestraints=restraints[1:]
+        string='frozen_bend'
+        temp.write('set optking{'+'\n')
+        temp.write('  '+string+' '+'='+' '+'('+'"'+'\n')
+        for res in anglerestraints:
+            res=[str(i) for i in res]
+            resstring=' '.join(res)+'\n'
+            temp.write('   '+resstring)
+        temp.write('  "'+')'+'\n')
+        temp.write('}'+'\n')
+   
+
+
+
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
@@ -74,6 +101,10 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred):
     temp.write('    break'+'\n')
     temp.write('  except OptimizationConvergenceError:'+'\n')
     temp.write('    break'+'\n')
+    if skipscferror==True:
+        temp.write('  except SCFConvergenceError:'+'\n')
+        temp.write('    pass'+'\n')
+   
     temp.write('  else:'+'\n')
     temp.write('    try:'+'\n')
     temp.write('      set opt_coordinates cartesian'+'\n')
@@ -151,19 +182,24 @@ def GrabFinalXYZStructure(poltype,logname,filename,mol):
         lengthchange=None
         for lineidx in range(len(results)):
             line=results[lineidx]
-            if 'Geometry' in line:
-                lastidx=lineidx
+            if 'Successfully symmetrized geometry' in line:
+                lastsuccessidx=lineidx
         for lineidx in range(len(results)):
             line=results[lineidx]
-            if 'Geometry' in line and lineidx==lastidx:
+            if lineidx<lastsuccessidx:
+                if 'Geometry (in Angstrom)' in line:
+                    lastidx=lineidx
+        for lineidx in range(len(results)):
+            line=results[lineidx]
+            if 'Geometry (in Angstrom)' in line and lineidx==lastidx:
                 finalmarker=True
             if finalmarker==True and lineidx>lastidx:    
                 linesplit=line.split()
-                if len(linesplit)!=4 and lengthchange==False:
+                if (len(linesplit)!=4 and len(linesplit)!=5) and lengthchange==False:
                     lengthchange=True
                     break
                 foundfloat=bool(re.search(r'\d', line))
-                if len(linesplit)==4 and foundfloat==True and 'point' not in line:
+                if (len(linesplit)==4 or len(linesplit)==5) and foundfloat==True and 'point' not in line:
                     temp.write(line.lstrip())
                     lengthchange=False
         temp.close()
@@ -379,7 +415,7 @@ def StructureMinimization(poltype):
     poltype.call_subsystem(cmd, True)
 
 
-def GeometryOptimization(poltype,mol,checkbonds=True,modred=True):
+def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,restraints=None,skipscferror=False):
     poltype.WriteToLog("NEED QM Density Matrix: Executing Gaussian Opt and SP")
 
     
@@ -416,7 +452,7 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True):
         poltype.WriteToLog("Calling: " + "Psi4 Optimization")
         term,error=poltype.CheckNormalTermination(poltype.logoptfname)
         modred=False
-        inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol,modred)
+        inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol,modred,restraints,skipscferror)
         if term==False:
             cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+inputname+' '+poltype.logoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}

@@ -16,6 +16,7 @@ import symmetry as symm
 from socket import gethostname
 import shlex
 from scipy.optimize import fmin
+from scipy import optimize
 import shutil
 import copy
 
@@ -61,18 +62,6 @@ def ReadInitialPrmFile(poltype):
     return frontarray
 
 
-def RMSE(rawdata,refdata):
-    rms=0.0
-    len1=len(rawdata)
-    len2=len(refdata)
-    if len1 != len2:
-        print("Data count does not match!")
-    else:
-        for n in range(len1):
-          rms=rms+(float(rawdata[n])-float(refdata[n]))**2.0
-        rms=(rms/len1)**0.5
-    return rms
-
 def writePRM(poltype,params,vdwtype):
     for i in range(0,len(params),2):
         oFile = open("temp.key", 'w')
@@ -112,6 +101,7 @@ def myFUNC(params,poltype,vdwtype):
     target = readOneColumn("QM_DATA",1)
     target=[float(i) for i in target]
     target=[i-min(target) for i in target]
+
     temp=open('QM_DATA','r')
     cmdarray=[] 
     filenamearray=[]
@@ -132,19 +122,27 @@ def myFUNC(params,poltype,vdwtype):
     current=list(np.array(vdw))
     current=[float(i) for i in current]
     current=[i-min(current) for i in current]
-    new_rmse=RMSE(current,target)
-
-    return new_rmse
+    return current
 
 
-def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix):
-    target = readOneColumn("QM_DATA",1,prefix)
+def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count,allprefix=False):
+    if allprefix==False:
+        target = readOneColumn("QM_DATA",1,prefix)
+        vdw=readOneColumn("SP.dat",-1,prefix)
+    else:
+        target=[]
+        vdw=[]
+        for ls in prefix:
+            target.extend(readOneColumn("QM_DATA",1,ls))
+            vdw.extend(readOneColumn("SP.dat",-1,ls))
+
     target=[float(i) for i in target]
     target=[i-min(target) for i in target]
-    vdw=readOneColumn("SP.dat",-1,prefix)
+    target=np.array(target)
     current=list(np.array(vdw))
     current=[float(i) for i in current]
     current=[i-min(current) for i in current]
+    current=np.array(current)
     vdwtypes=[str(i) for i in vdwtypesarray]
     vdwtypestring=','.join(vdwtypes)
 
@@ -152,20 +150,60 @@ def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix):
     MAE=metrics.mean_absolute_error(current,target)
     m, b = best_fit_slope_and_intercept(current,target)
     regression_line = [(m*x)+b for x in current]
-    new_rmse=RMSE(current,target)
+    weightlist=np.exp(-np.array(target)/poltype.boltzmantemp)
+
+    energy_list=target-current
+    if count>1:
+        energy_list=np.multiply(weightlist,energy_list)
+    shifted_target=np.add(1,target)
+    shifted_current=np.add(1,current)
+    relative_energy_list=shifted_target-shifted_current
+    if count>1:
+        relative_energy_list=np.multiply(weightlist,relative_energy_list)
+
+    def RMSD(c):
+        return np.sqrt(np.mean(np.square(np.add(energy_list,c))))
+    result=fmin(RMSD,.5)
+    new_rmse=RMSD(result[0])
+
+    def RMSDRel(c):
+        return np.sqrt(np.mean(np.square(np.add(np.divide(relative_energy_list,shifted_target),c))))
+    resultRel=fmin(RMSDRel,.5)
+    new_rmse_rel=RMSDRel(resultRel[0])
+
 
     r_squared = coefficient_of_determination(current,target)
     fig = plt.figure()
-    plt.plot(current,target,label='R^2=%s MAE=%s RMSE=%s MSE=%s'%(round(r_squared,2),round(MAE,2),round(new_rmse,2),round(MSE,2)))
+    plt.plot(current,target,'.',label='R^2=%s MAE=%s RMSE=%s RelRMSE=%s MSE=%s'%(round(r_squared,2),round(MAE,2),round(new_rmse,2),round(new_rmse_rel,2),round(MSE,2)))
     plt.plot(current,regression_line,label='Linear Regression line')
     plt.ylabel('QM BSSE Corrected (kcal/mol)')
     plt.xlabel('AMOEBA (kcal/mol)')
     plt.legend(loc='best')
     plt.title('QM vs AMOEBA , '+vdwtypestring)
-    fig.savefig('QMvsAMOEBA-'+prefix+'_'+vdwtypestring+'.png')
+    if count>1:
+        suffix='_boltzman.png'
+    else:
+        suffix='.png'
+    if allprefix==False:
+        fig.savefig('QMvsAMOEBA-'+prefix+'_'+vdwtypestring+suffix)
+    else:
+        prefstring=','.join(prefix)
+        fig.savefig('QMvsAMOEBA-'+prefstring+'_'+vdwtypestring+suffix)
+        prefix=prefstring
+    rmsetol=1.5
+    relrmsetol=.2
+    goodfit=True
+    if new_rmse>rmsetol and new_rmse_rel>relrmsetol:
+        goodfit=False
+        if allprefix==True and count>1:
+            raise ValueError('RMSE is too high! RMSE='+str(new_rmse)+' tol='+str(rmsetol)+' '+'RelRMSE='+str(new_rmse)+' tol='+str(relrmsetol)+' '+prefix)
+        elif allprefix==True and count<=1:
+            mes='RMSE is too high! RMSE='+str(new_rmse)+' tol='+str(rmsetol)+' '+'RelRMSE='+str(new_rmse)+' tol='+str(relrmsetol)+' '+prefix
+            print(mes,flush=True)
 
+    return goodfit
 
-def VDWOptimizer(poltype):
+def VDWOptimizer(poltype,count):
     x0 = []
     temp=open("INITIAL.PRM",'r')
     lines = temp.readlines()
@@ -174,35 +212,61 @@ def VDWOptimizer(poltype):
         x0.append(float(line.split()[3]))
     x0 = np.array(x0)
     rmax=readOneColumn("INITIAL.PRM", 5)
+    rmax=[float(i) for i in rmax]
     rmin=readOneColumn("INITIAL.PRM", 4)
+    rmin=[float(i) for i in rmin]
     depthmax=readOneColumn("INITIAL.PRM", 7)
+    depthmax=[float(i) for i in depthmax]
     depthmin=readOneColumn("INITIAL.PRM", 6)
+    depthmin=[float(i) for i in depthmin]
     vdwtypes=readOneColumn("INITIAL.PRM", 1)
     vdwtype=vdwtypes[0]
     l1=list(zip(rmin, rmax))
     l2=list(zip(depthmin, depthmax))
-    MyBounds=[]
+
+    lower=[]
+    upper=[]
     for i in range(len(l1)):
         
         l1bound=l1[i]
         l2bound=l2[i]
-        MyBounds.append(l1bound)
-        MyBounds.append(l2bound)
-    tuple(MyBounds)
+        l1lower=l1bound[0] 
+        l1upper=l1bound[1] 
+        l2lower=l2bound[0] 
+        l2upper=l2bound[1] 
+        lower.append(l1lower)
+        lower.append(l2lower)
+        upper.append(l1upper)
+        upper.append(l2upper)
+    MyBounds=[lower,upper]
+    MyBounds=tuple(MyBounds)
     ''' local optimization method can be BFGS, CG, Newton-CG, L-BFGS-B,etc.., see here\
     https://docs.scipy.org/doc/scipy-0.19.1/reference/generated/scipy.optimize.minimize.html'''
-    errorfunc= lambda p: (myFUNC(p,poltype,vdwtype))
+    y = readOneColumn("QM_DATA",1)
+    y=[float(i) for i in y]
+    y=np.array([i-min(y) for i in y])
+    weightlist=np.exp(-np.array(y)/poltype.boltzmantemp)
+    if count>1:
+        errorfunc= lambda p, poltype, vdwtype, y: weightlist*(myFUNC(p,poltype,vdwtype)-y)
 
-    ret = minimize(myFUNC, x0, method='L-BFGS-B', jac=None, bounds=MyBounds, args=(poltype,vdwtype),options={'gtol': 1e-1, 'eps':1e-4, 'disp': True})
-    vdwradius=round(ret.x[0],3)
-    vdwdepth=round(ret.x[1],3)
+    else:
+        errorfunc= lambda p, poltype, vdwtype, y: (myFUNC(p,poltype,vdwtype)-y)
+
+
+    ret = optimize.least_squares(errorfunc, x0, jac='2-point', bounds=MyBounds, args=(poltype,vdwtype,y))
+    vdwradii=[]
+    vdwdepths=[] 
     ofile = open("RESULTS.OPT", "a")
     for i in range(0,len(ret.x),2):
         ofile.write("Param:%15.6f%15.6f\n"%(ret.x[i], ret.x[i+1]))
+        vdwradius=round(ret.x[i],3)
+        vdwdepth=round(ret.x[i+1],3)
+        vdwradii.append(vdwradius)
+        vdwdepths.append(vdwdepth)
     ofile.write("%s\n"%(ret.message))
     ofile.write("\n")
     ofile.close()
-    return vdwradius,vdwdepth 
+    return vdwradii,vdwdepths 
 
 def MoveDimerAboutMinima(poltype,txyzFile,outputprefixname,nAtomsFirst,atomidx1,atomidx2,equildistance,array):
     fnamearray=[]
@@ -254,7 +318,15 @@ def ConvertProbeDimerXYZToTinkerXYZ(poltype,inputxyz,tttxyz,outputxyz,waterbool,
     temp=open(inputxyz,'r')
     resultsinputxyz=temp.readlines()
     temp.close()
-    
+    todelete=[]
+    for lineidx in range(len(resultsinputxyz)):
+        line=resultsinputxyz[lineidx]
+        linesplit=line.split()
+        if len(linesplit)==0:
+            todelete.append(lineidx)
+    for index in todelete:
+        del resultsinputxyz[index]
+ 
     temp=open(tttxyz,'r')
     resultstttxyz=temp.readlines()
     temp.close()
@@ -369,7 +441,7 @@ def ReadCounterPoiseAndWriteQMData(poltype,logfilelist):
 
 
 
-def PlotEnergyVsDistance(poltype,distarray,prefix,rad,depth,vdwtypesarray):
+def PlotEnergyVsDistance(poltype,distarray,prefix,radii,depths,vdwtypesarray):
     vdwtypes=[str(i) for i in vdwtypesarray]
     vdwtypestring=','.join(vdwtypes)
     qmenergyarray = readOneColumn("QM_DATA",1,prefix)
@@ -390,8 +462,14 @@ def PlotEnergyVsDistance(poltype,distarray,prefix,rad,depth,vdwtypesarray):
     fig = plt.figure()
     title=prefix+' VdwTypes = '+vdwtypestring
     plt.title(title)
-    plt.plot(distarray,energyarray,'b-',label='MM ,'+'Radius=%s, Depth=%s'%(round(rad,2),round(depth,2)))
-    plt.plot(distarray,qmenergyarray,'r-',label='QM')
+    string=''
+    for i in range(len(radii)):
+        rad=radii[i]
+        depth=depths[i]
+        cur='Radius=%s, Depth=%s '%(round(rad,2),round(depth,2))
+        string+=cur
+    plt.plot(distarray,energyarray,'--bo',label='MM ,'+string)
+    plt.plot(distarray,qmenergyarray,'--ro',label='QM')
     plt.plot()
     plt.ylabel('Energy (kcal/mol)')
     plt.xlabel('Distance Angstrom '+'RMSD=%s, R^2=%s'%(minRMSD,r_squared))
@@ -502,6 +580,24 @@ def TXYZ2COM(poltype,TXYZ,comfname,chkname,maxdisk,maxmem,numproc,mol,probeatoms
     tmpfh.write("\n")
     tmpfh.close()
 
+def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetfile,space):
+    newtemp=open(poltype.basissetpath+normalelementbasissetfile,'r')
+    results=newtemp.readlines()
+    newtemp.close()
+    for line in results:
+        if '!' not in line:
+            tmpfh.write(space+line)
+
+
+    newtemp=open(poltype.basissetpath+otherelementbasissetfile,'r')
+    results=newtemp.readlines()
+    newtemp.close()
+    for line in results:
+        if '!' not in line:
+            tmpfh.write(space+line)
+    return tmpfh
+
+
 
 
 def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc,probeatoms):
@@ -534,53 +630,13 @@ def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc,probeatoms):
     if ('I ' in spacedformulastr):
         temp.write('basis {'+'\n')
         temp.write('['+' '+poltype.espbasissetfile+' '+poltype.iodineespbasissetfile +' '+ ']'+'\n')
-        temp=ReadInBasisSet(poltype,temp,poltype.espbasissetfile,poltype.iodineespbasissetfile)
+        temp=ReadInBasisSet(poltype,temp,poltype.espbasissetfile,poltype.iodineespbasissetfile,'')
         temp.write('}'+'\n')
         temp.write("e_dim= energy('%s',bsse_type='cp')" % (poltype.espmethod.lower())+'\n')
     else:
         temp.write("e_dim= energy('%s/%s',bsse_type='cp')" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
     temp.write('\n')
-    temp.write('molecule { '+'\n')
-    temp.write('%d %d\n' % (chg, 1))
-    for n in range(len(atoms)):
-        if n>=len(atoms)-probeatoms:
-            temp.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
-        else:
-            temp.write("%3s             %14.7f%14.7f%14.7f\n"%('@'+atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
-    temp.write('}'+'\n')
-
-    if ('I ' in spacedformulastr):
-        temp.write('basis {'+'\n')
-        temp.write('['+' '+poltype.espbasissetfile+' '+poltype.iodineespbasissetfile +' '+ ']'+'\n')
-        temp=ReadInBasisSet(poltype,temp,poltype.espbasissetfile,poltype.iodineespbasissetfile)
-        temp.write('}'+'\n')
-        temp.write("e_mon_a= energy('%s')" % (poltype.espmethod.lower())+'\n')
-    else:
-        temp.write("e_mon_a= energy('%s/%s')" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
-
-    temp.write('\n')
-    temp.write('molecule { '+'\n')
-    temp.write('%d %d\n' % (chg, 1))
-    for n in range(len(atoms)):
-        if n>=len(atoms)-probeatoms:
-            temp.write("%s             %14.7f%14.7f%14.7f\n"%('@'+atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
-        else:
-            temp.write("%3s             %14.7f%14.7f%14.7f\n"%(atoms[n],float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
-    temp.write('}'+'\n')
-
-    if ('I ' in spacedformulastr):
-        temp.write('basis {'+'\n')
-        temp.write('['+' '+poltype.espbasissetfile+' '+poltype.iodineespbasissetfile +' '+ ']'+'\n')
-        temp=ReadInBasisSet(poltype,temp,poltype.espbasissetfile,poltype.iodineespbasissetfile)
-        temp.write('}'+'\n')
-        temp.write("e_mon_b= energy('%s')" % (poltype.espmethod.lower())+'\n')
-    else:
-        temp.write("e_mon_b= energy('%s/%s')" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
-
-    temp.write('\n')
-    
-    temp.write("e_cp = e_dim - e_mon_a - e_mon_b"+'\n')
-    temp.write("psi4.print_out('CP Energy = %10.6f' % (e_cp))"+'\n')
+    temp.write("psi4.print_out('CP Energy = %10.6f' % (e_dim))"+'\n')
     temp.write('clean()'+'\n')
     temp.close()
     temp=open(inputname,'r')
@@ -685,11 +741,11 @@ def GrabVdwParameters(poltype,vdwtype):
             if str(vdwtype) in line:
                 linesplit=line.split()
                 radius=float(linesplit[2])
-                minvdwradius=radius-.1*radius
-                maxvdwradius=radius+.1*radius
+                minvdwradius=radius-.3*radius
+                maxvdwradius=radius+.3*radius
                 depth=float(linesplit[3])
-                minvdwdepth=depth-.1*depth
-                maxvdwdepth=depth+.1*depth
+                minvdwdepth=depth-1*depth
+                maxvdwdepth=depth+1*depth
 
                 return radius,depth,minvdwradius,maxvdwradius,minvdwdepth,maxvdwdepth 
 
@@ -716,7 +772,6 @@ def GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indext
     indexpairtobounds={}
     indices=list(indextoreferencecoordinate.keys())
     allpairs=list(itertools.combinations(indices, 2)) 
-    pairwiseratio=1
     for pair in allpairs:
         index1=pair[0]
         index2=pair[1]
@@ -735,7 +790,8 @@ def GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indext
             bound=[targetdistance,targetdistance]
         else:
             if target1=='target' and target2=='target': # then use vdw distances
-                targetdistance=pairwiseratio*(vdwradius1+vdwradius2)
+                targetdistance=(vdwradius1**3+vdwradius2**3)/(vdwradius1**2+vdwradius2**2)
+
                 bound=[targetdistance,targetdistance]
 
         indexpairtoreferencedistance[tuple(pair)]=targetdistance 
@@ -759,7 +815,8 @@ def GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indext
             bound=[targetdistance,targetdistance]
         else:
             if target1=='target' and target2=='target': # then use vdw distances
-                targetdistance=pairwiseratio*(vdwradius1+vdwradius2)
+                targetdistance=(vdwradius1**3+vdwradius2**3)/(vdwradius1**2+vdwradius2**2)
+
                 bound=[targetdistance,targetdistance]
             else:
                 bound=[targetdistance,100] # high upper bound, large range to not add cost in cost function                
@@ -948,9 +1005,10 @@ def GenerateInitialDictionaries(coords1,coords2,atoms1,atoms2,p1,p2):
     return indextoreferencecoordinate,indextoreferenceelement,indextomolecule,indextotargetatom
 
 
-def optimize(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,mol,probemol):
+def optimizedimer(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,mol,probemol,probeidxtosymclass):
     indextoreferencecoordinate,indextoreferenceelement,indextomolecule,indextotargetatom=GenerateInitialDictionaries(coords1,coords2,atoms1,atoms2,p1,p2) 
     indexpairtoreferencedistance,indexpairtobounds=GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indextotargetatom,indextoreferenceelement,vdwradius)
+    indexpairtoreferencedistanceoriginal=indexpairtoreferencedistance.copy()
     indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb=GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol,indextoreferencecoordinate)
     indexpairtoreferencedistance,indexpairtobounds=ConvertAngleRestraintToDistanceRestraint(indexpairtoreferencedistance,indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb,indexpairtobounds,indextoreferencecoordinate) 
     coordinatesguess=GenerateCoordinateGuesses(indextoreferencecoordinate)
@@ -985,7 +1043,117 @@ def optimize(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,m
       for index,coordinate in indextoreferencecoordinate.items():
           element=indextoreferenceelement[index]
           f.write("%3s %12.5f%12.5f%12.5f\n"%(element, coordinate[0], coordinate[1], coordinate[2]))
+    if 'water' in dimer:
+        waterbool=True
+    else:
+        waterbool=False
+    outputxyz=dimer.replace('.xyz','-tinkermin.xyz')
+    probeatoms=len(atoms2)
+    ConvertProbeDimerXYZToTinkerXYZ(poltype,dimer,poltype.xyzoutfile,outputxyz,waterbool,probeatoms)
+    outputxyz,restraints=MinimizeDimer(poltype,outputxyz,poltype.key5fname,indexpairtoreferencedistanceoriginal,indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb,p1,p2,atoms1,probeidxtosymclass)
+    return outputxyz,restraints
 
+def MinimizeDimer(poltype,inputxyz,keyfile,indexpairtoreferencedistanceoriginal,indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb,p1,p2,atoms1,probeidxtosymclass):
+    p2shifted=p2+len(atoms1)
+    inputpair=tuple([p1,p2shifted])
+    distanceguess=GrabPairwiseDistance(inputpair,indexpairtoreferencedistanceoriginal)
+    distanceratio=.1
+    distanceforceconstant=5 # kcal/mol/ang^2
+    angleforceconstant=.1 # kcal/mol/deg^2
+    lower,upper=GrabUpperLowerBounds(poltype,distanceguess,distanceratio)
+    lower=0 # only for distance since want flat-bottom
+    p1babel=p1+1
+    p2babel=p2+1+len(atoms1)
+    restraints=[[p1babel,p2babel]]
+    resstring='RESTRAIN-DISTANCE '+str(p1babel)+' '+str(p2babel)+' '+str(distanceforceconstant)+' '+str(lower)+' '+str(upper)+'\n'
+    reslist=[resstring]
+    angleratio=.03
+    anglereslist=[]
+    anglereslist,restraints=GrabAngleRestraints(poltype,indicestoreferenceangleprobe,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,restraints)
+    anglereslist,restraints=GrabAngleRestraints(poltype,indicestoreferenceanglemoleculeneighb,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,restraints)
+    anglereslist,restraints=GrabAngleRestraints(poltype,indicestoreferenceanglemoleculeneighbneighb,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,restraints)
+    reslist.extend(anglereslist)
+    tempkeyfilename=inputxyz.replace('.xyz','.key')
+    shutil.copyfile(keyfile,tempkeyfilename)
+    temp=open(tempkeyfilename,'a')
+    for line in reslist:
+        temp.write(line)
+    temp.close()
+    torminlogfname=inputxyz.replace('.xyz','.out')
+    mincmdstr = poltype.minimizeexe+' '+inputxyz+' -k '+tempkeyfilename+' 0.1'+' '+'>'+torminlogfname
+    term,error=poltype.CheckNormalTermination(torminlogfname)
+    if term==True and error==False:
+        pass
+    else:
+        poltype.call_subsystem(mincmdstr,True)
+
+    finaloutputxyz=inputxyz+'_2'
+    newfilename=inputxyz.replace('.xyz','cart.xyz')
+    ConvertTinktoXYZ(poltype,finaloutputxyz,newfilename)
+
+    return newfilename,restraints
+
+def ConvertTinktoXYZ(poltype,filename,newfilename):
+    temp=open(os.getcwd()+r'/'+filename,'r')
+    tempwrite=open(os.getcwd()+r'/'+newfilename,'w')
+    results=temp.readlines()
+    for lineidx in range(len(results)):
+        line=results[lineidx]
+        if lineidx==0:
+            linesplit=line.split()
+            tempwrite.write(linesplit[0]+'\n')
+            tempwrite.write('\n')
+            tempwrite.flush()
+            os.fsync(tempwrite.fileno())
+        else:
+            linesplit=line.split()
+            newline=linesplit[1]+' '+linesplit[2]+' '+linesplit[3]+' '+linesplit[4]+'\n'
+            tempwrite.write(newline)
+            tempwrite.flush()
+            os.fsync(tempwrite.fileno())
+    temp.close()
+    tempwrite.close()
+
+
+def GrabAngleRestraints(poltype,indicestoangle,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,restraints):
+    inputpair=tuple([p1,p2shifted])
+    indices,angleguesses=GrabAngle(inputpair,indicestoangle)
+    for i in range(len(indices)):
+        tup=indices[i]
+        angle=angleguesses[i]
+        babelindices=[j+1 for j in tup]
+        classes=[]
+        lower,upper=GrabUpperLowerBounds(poltype,angle,angleratio,angle=True)
+        resstring='RESTRAIN-ANGLE '+str(babelindices[0])+' '+str(babelindices[1])+' '+str(babelindices[2])+' '+str(angleforceconstant)+' '+str(lower)+' '+str(upper)+'\n'
+        anglereslist.append(resstring)
+        restraints.append(babelindices)
+         
+
+    return anglereslist,restraints
+
+def GrabAngle(inputpair,indicestoangle):
+    indices=[]
+    angleguesses=[]
+    for tupindices,angle in indicestoangle.items():
+        a=inputpair[0]
+        b=inputpair[1]
+        if a in tupindices and b in tupindices:
+            indices.append(tupindices)
+            angleguesses.append(angle)
+
+ 
+    return indices,angleguesses
+
+
+def GrabUpperLowerBounds(poltype,guess,ratio,angle=False):
+    if angle==False:
+        lower=guess-guess*ratio
+        upper=guess+guess*ratio
+    else:
+        lower=guess-360*ratio
+        upper=guess+360*ratio
+
+    return lower,upper
 
 def GenerateProbePathNames(poltype,vdwprobenames,moleculexyz):
     probepaths=[]
@@ -1022,6 +1190,10 @@ def CheckBuriedAtoms(poltype,indexarray,molecule,zeroindex=False):
     return indexarray
 
 
+def GrabWaterTypes(poltype):
+    probeidxtosymclass={1:349,2:350,3:350}
+    return probeidxtosymclass
+
 def GenerateInitialProbeStructure(poltype,missingvdwatomindices):
     molecules = [poltype.xyzfname]
     probes = GenerateProbePathNames(poltype,poltype.vdwprobenames,poltype.xyzfname)
@@ -1037,6 +1209,8 @@ def GenerateInitialProbeStructure(poltype,missingvdwatomindices):
         mol_spots = missingvdwatomindices.copy()
         mol_spots = CheckBuriedAtoms(poltype,mol_spots,poltype.mol)
         mol_spots = [i-1 for i in mol_spots]
+        moldimernames=[]
+        atomrestraintslist=[]
         for prob in probes:
             probename=os.path.basename(prob)
             prefix=poltype.molstructfname.split('.')[0]
@@ -1055,27 +1229,31 @@ def GenerateInitialProbeStructure(poltype,missingvdwatomindices):
                 probeidx=keys[0]-1 # shift to 0 index
                 if probeidx not in prob_spots:
                     prob_spots.append(probeidx)
+            if 'water' in prob:
+                probeidxtosymclass=GrabWaterTypes(poltype)
             prob_spots = CheckBuriedAtoms(poltype,prob_spots,probemol,zeroindex=True)
             for p1 in mol_spots:
                 probelist=[]
                 probeindiceslist=[]
                 moleculeindiceslist=[]
+                reslist=[]
                 for p2 in prob_spots:
                     e1=atoms1[p1]
                     e2=atoms2[p2]
                     if e1=='H' and e2=='H':
                         continue
                     dimer = mol[:-4] + "-" + probename[:-4] + "_" + str("%d_%d"%(p1+1,len(atoms1)+p2+1)) + ".xyz"
-                    if not os.path.isfile(dimer):
-                        optimize(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,poltype.mol,probemol)
-                    probelist.append(dimer)
+                    outputxyz,restraints=optimizedimer(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,poltype.mol,probemol,probeidxtosymclass)
+                    probelist.append(outputxyz)
                     probeindiceslist.append(p2+1+len(atoms1))
                     moleculeindiceslist.append(p1+1)
+                    reslist.append(restraints)
                 moleculeindices.append(moleculeindiceslist)
                 probeindices.append(probeindiceslist)
-                dimernames.append(probelist)
+                moldimernames.append(probelist)
+                atomrestraintslist.append(reslist)
                 numberprobeatoms.append(probemol.NumAtoms())
-    return dimernames,probeindices,moleculeindices,numberprobeatoms
+    return moldimernames,probeindices,moleculeindices,numberprobeatoms,atomrestraintslist
 
 def GrabKeysFromValue(poltype,dic,thevalue):
     keylist=[]
@@ -1130,22 +1308,25 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebabio18.prm"
     ReplaceParameterFileHeader(poltype,paramhead,poltype.key5fname)
     array=[.8,.9,1,1.1,1.2]
-    dimerfiles,probeindices,moleculeindices,numberprobeatoms=GenerateInitialProbeStructure(poltype,missingvdwatomindices)
+    dimerfiles,probeindices,moleculeindices,numberprobeatoms,atomrestraintslist=GenerateInitialProbeStructure(poltype,missingvdwatomindices)
     obConversion = openbabel.OBConversion()
-    for i in range(len(dimerfiles)):
-        filenamelist=dimerfiles[i]
+    for i in range(len(probeindices)):
+        filenameslist=dimerfiles[i]
+        restraintslist=atomrestraintslist[i]
         probeindexlist=probeindices[i]
         moleculeindexlist=moleculeindices[i]
         probeatoms=numberprobeatoms[i]
-        alloutputfilenames=[]
-        prefixarrays=[]
         distancearrays=[]
+        prefixarrays=[]
+        alloutputfilenames=[]
         checkarray=[]
-        for filenameidx in range(len(filenamelist)):
-            filename=filenamelist[filenameidx]
+        count=1
+        for probeidx in range(len(probeindexlist)):
+            filename=filenameslist[probeidx]
+            restraints=restraintslist[probeidx]
             dimermol = openbabel.OBMol()
-            probeindex=probeindexlist[filenameidx]
-            moleculeindex=moleculeindexlist[filenameidx]
+            probeindex=probeindexlist[probeidx]
+            moleculeindex=moleculeindexlist[probeidx]
             inFormat = obConversion.FormatFromExt(filename)
             obConversion.SetInFormat(inFormat)
             obConversion.ReadFile(dimermol, filename)
@@ -1153,12 +1334,15 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             prefixarrays.append(prefix)
             check=CheckIfFittingCompleted(poltype,prefix)
             checkarray.append(check)
-            poltype.comoptfname=prefix+'.com'
-            poltype.chkoptfname=prefix+'.chk'
-            poltype.fckoptfname=prefix+'.fchk'
-            poltype.logoptfname=prefix+'.log'
-            poltype.gausoptfname=prefix+'.log'
-            optmol = opt.GeometryOptimization(poltype,dimermol,checkbonds=False,modred=False)
+            poltype.comoptfname=prefix+'-opt.com'
+            poltype.chkoptfname=prefix+'-opt.chk'
+            poltype.fckoptfname=prefix+'-opt.fchk'
+            poltype.logoptfname=prefix+'-opt.log'
+            poltype.gausoptfname=prefix+'-opt.log'
+            try:
+                optmol = opt.GeometryOptimization(poltype,dimermol,checkbonds=False,modred=False,restraints=restraints,skipscferror=False)
+            except:
+                continue
             dimeratoms=dimermol.NumAtoms()
             moleculeatoms=dimeratoms-probeatoms
             moleculeatom=optmol.GetAtom(moleculeindex)
@@ -1186,23 +1370,54 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             if check==False:
                 dothefit=True
         if dothefit==True:
-            ReadCounterPoiseAndWriteQMData(poltype,alloutputfilenames)
-            vdwtype=poltype.idxtosymclass[moleculeindex]
-            vdwtypesarray=[vdwtype]
-            initialvdwradius,initialvdwdepth,minvdwradius,maxvdwradius,minvdwdepth,maxvdwdepth=GrabVdwParameters(poltype,vdwtype)
-            initialradii=[initialvdwradius]
-            initialdepths=[initialvdwdepth]
-            minradii=[minvdwradius]
-            maxradii=[maxvdwradius]
-            mindepths=[minvdwdepth]
-            maxdepths=[maxvdwdepth]
-            WriteInitialPrmFile(poltype,vdwtypesarray,initialradii,initialdepths,minradii,maxradii,mindepths,maxdepths)
-            vdwradius,vdwdepth=VDWOptimizer(poltype)
+            goodfit=False
+            while goodfit==False:
+                if count>2:
+                    break
+                vdwtypesarray=[]
+                initialradii=[]
+                initialdepths=[]
+                minradii=[]
+                maxradii=[]
+                mindepths=[]
+                maxdepths=[]
 
-            for k in range(len(prefixarrays)):
-                prefix=prefixarrays[k]
-                distarray=distancearrays[k]
-                PlotEnergyVsDistance(poltype,distarray,prefix,vdwradius,vdwdepth,vdwtypesarray)
-                PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix)
+                ReadCounterPoiseAndWriteQMData(poltype,alloutputfilenames)
+                for probeidx in range(len(probeindexlist)):
+                    moleculeindex=moleculeindexlist[probeidx]
+                    vdwtype=poltype.idxtosymclass[moleculeindex]
+                    if vdwtype not in vdwtypesarray:
+                        vdwtypesarray.append(vdwtype)
+                        initialvdwradius,initialvdwdepth,minvdwradius,maxvdwradius,minvdwdepth,maxvdwdepth=GrabVdwParameters(poltype,vdwtype)
+                        initialradii.append(initialvdwradius)
+                        initialdepths.append(initialvdwdepth)
+                        minradii.append(minvdwradius)
+                        maxradii.append(maxvdwradius)
+                        mindepths.append(minvdwdepth)
+                        maxdepths.append(maxvdwdepth)
+                    
+                    if poltype.homodimers==True:
+                        probeindex=probeindexlist[probeidx]-probeatoms
+                        vdwtype=poltype.idxtosymclass[probeindex]
+                        if vdwtype not in vdwtypesarray:
+                            vdwtypesarray.append(vdwtype)
+                            initialvdwradius,initialvdwdepth,minvdwradius,maxvdwradius,minvdwdepth,maxvdwdepth=GrabVdwParameters(poltype,vdwtype)
+                            initialradii.append(initialvdwradius)
+                            initialdepths.append(initialvdwdepth)
+                            minradii.append(minvdwradius)
+                            maxradii.append(maxvdwradius)
+                            mindepths.append(minvdwdepth)
+                            maxdepths.append(maxvdwdepth)
+                WriteInitialPrmFile(poltype,vdwtypesarray,initialradii,initialdepths,minradii,maxradii,mindepths,maxdepths)
+                vdwradii,vdwdepths=VDWOptimizer(poltype,count)
+
+                for k in range(len(prefixarrays)):
+                    prefix=prefixarrays[k]
+                    distarray=distancearrays[k]
+                    PlotEnergyVsDistance(poltype,distarray,prefix,vdwradii,vdwdepths,vdwtypesarray)
+                    othergoodfit=PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count)
+                goodfit=PlotQMVsMMEnergy(poltype,vdwtypesarray,prefixarrays,count,allprefix=True)
+                count+=1
+
     shutil.copy(poltype.key5fname,'../'+poltype.key5fname)
     os.chdir(poltype.parentdir)

@@ -918,7 +918,8 @@ class PolarizableTyper():
 
             if error==True:
                 message='Error '+line+ 'logpath='+logfname
-   
+                print('message',message,flush=True)
+                print('line',line,flush=True) 
             #if error==False and term==False and htime>=updatetime:
             #    error=True
             #    message='Error '+'Job died and has not been updated in '+str(updatetime)+' hours'+' last update time = '+str(htime)+' hours'+' logname='+logfname
