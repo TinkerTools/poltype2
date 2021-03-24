@@ -1200,7 +1200,7 @@ def GenerateInitialProbeStructure(poltype,missingvdwatomindices):
     probes = GenerateProbePathNames(poltype,poltype.vdwprobenames,poltype.xyzfname)
     vdwradius = {"H" : 1.20, "Li": 1.82, "Na": 2.27, "K": 2.75, "Rb": 3.03, "Cs": 3.43, \
                  "Be": 1.53, "Mg": 1.73, "Ca": 2.31, "B": 1.92, "C": 1.70, "N": 1.55, "O":1.52, \
-                 "P" : 1.80, "S" : 1.80, "F" : 1.47, "Cl":1.75, "Br":1.85, "Zn":1.39}           
+                 "P" : 1.80, "S" : 1.80, "F" : 1.47, "Cl":1.75, "Br":1.85, "Zn":1.39,'I':4.61}           
     dimernames=[]
     probeindices=[]
     moleculeindices=[]
