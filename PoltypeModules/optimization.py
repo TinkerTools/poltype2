@@ -200,7 +200,7 @@ def GrabFinalXYZStructure(poltype,logname,filename,mol):
                     break
                 foundfloat=bool(re.search(r'\d', line))
                 if (len(linesplit)==4 or len(linesplit)==5) and foundfloat==True and 'point' not in line:
-                    temp.write(line.lstrip())
+                    temp.write(' '.join(line.lstrip().split()[:3+1])+'\n')
                     lengthchange=False
         temp.close()
     elif checkifpsi4==False:
