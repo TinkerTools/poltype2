@@ -56,27 +56,57 @@ def MeanError(data,pred):
     return Sum
     
 
-def ReadInitialPrmFile(poltype):
-    temp=open('INITIAL.PRM','r')
-    frontarray=[]
-    for line in temp.readlines():
-        linesplit=re.split(r'(\s+)', line)
-        front=linesplit[0:3]
-        frontarray.append(''.join(front))
-    temp.close()
-    return frontarray
 
-
-def writePRM(poltype,params,vdwtypes):
-    for i in range(0,len(params),2):
+def writePRM(poltype,params,vdwtypes,idxtotype):
+    vdwradius=None
+    vdwdepth=None
+    vdwred=None
+    vdwtypesalreadyfit=[]
+    vdwtypetonewline={}
+    for i in range(len(params)):
         oFile = open("temp.key", 'w')
         rFile=open(poltype.key5fname,'r')
         vdwtype=vdwtypes[i]
-        for line in rFile.readlines():
-            if vdwtype in line and 'vdw' in line:
-                oFile.write("vdw %s %s %s\n"%(vdwtype,params[i], params[i+1]))
+        vartype=idxtotype[i]
+        if vartype=='rad':
+            vdwradius=round(params[i],3)
+
+        elif vartype=='depth':
+            vdwdepth=round(params[i],3)
+            if (i+1) in idxtotype.keys():
+                nexttype=idxtotype[i+1]
+                if nexttype!='red':
+                    vdwred=1
+                    vdwreds.append(vdwred)
             else:
-                oFile.write(line)
+                vdwred=1
+
+
+        elif vartype=='red':
+            vdwred=round(params[i],3)
+        if vdwradius!=None and vdwdepth!=None and vdwred!=None:
+            for line in rFile.readlines():
+                if vdwtype in line and 'vdw' in line:
+                    newline="vdw %s %s %s %s \n"%(vdwtype,vdwradius, vdwdepth,vdwred)
+                    vdwtypetonewline[vdwtype]=newline
+                    oFile.write(newline)
+                else:
+                    notinline=True
+                    for othertype in vdwtypesalreadyfit:
+                        if othertype in line and 'vdw' in line:
+                            notinline=False
+                            break
+                    if notinline==True:
+                        oFile.write(line)
+                    else:
+                        newline=vdwtypetonewline[othertype]
+                        oFile.write(newline)
+
+            vdwtypesalreadyfit.append(vdwtype)
+            vdwradius=None
+            vdwdepth=None
+            vdwred=None
+      
     oFile.flush()
     os.fsync(oFile.fileno())
     oFile.close()
@@ -100,9 +130,9 @@ def readOneColumn(filename,columnnumber,prefix=None):
     return array
      
 
-def myFUNC(params,poltype,vdwtypes):
+def myFUNC(params,poltype,vdwtypes,idxtotype):
     params=list(params)
-    writePRM(poltype,params,vdwtypes)
+    writePRM(poltype,params,vdwtypes,idxtotype)
     target = []
     target = readOneColumn("QM_DATA",1)
     target=[float(i) for i in target]
@@ -208,46 +238,73 @@ def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count,allprefix=False):
 
     return goodfit
 
-def VDWOptimizer(poltype,count):
+def VDWOptimizer(poltype,count,fitredboolarray):
     x0 = []
 
     curvdwtypes=readOneColumn("INITIAL.PRM", 1)
     vdwtypes=[]
     temp=open("INITIAL.PRM",'r')
     lines = temp.readlines()
+    idxtotype={}
+    count=0
     for lineidx in range(len(lines)):
+        fitredbool=fitredboolarray[lineidx]
         line=lines[lineidx]
         x0.append(float(line.split()[2]))
+        idxtotype[count]='rad'
+        count+=1
         x0.append(float(line.split()[3]))
+        idxtotype[count]='depth'
+        count+=1
+
+        if fitredbool==True:
+            x0.append(float(line.split()[4]))
+            idxtotype[count]='red'
+            count+=1
+
         vdwtype=curvdwtypes[lineidx]
         vdwtypes.append(vdwtype)
         vdwtypes.append(vdwtype)
+        if fitredbool==True:
+            vdwtypes.append(vdwtype)
+
     x0 = np.array(x0)
-    rmax=readOneColumn("INITIAL.PRM", 5)
+    rmax=readOneColumn("INITIAL.PRM", 6)
     rmax=[float(i) for i in rmax]
-    rmin=readOneColumn("INITIAL.PRM", 4)
+    rmin=readOneColumn("INITIAL.PRM", 5)
     rmin=[float(i) for i in rmin]
-    depthmax=readOneColumn("INITIAL.PRM", 7)
+    depthmax=readOneColumn("INITIAL.PRM", 8)
     depthmax=[float(i) for i in depthmax]
-    depthmin=readOneColumn("INITIAL.PRM", 6)
+    depthmin=readOneColumn("INITIAL.PRM", 7)
     depthmin=[float(i) for i in depthmin]
+    redmax=readOneColumn("INITIAL.PRM", 10)
+    redmax=[float(i) for i in redmax]
+    redmin=readOneColumn("INITIAL.PRM", 9)
+    redmin=[float(i) for i in redmin]
     l1=list(zip(rmin, rmax))
     l2=list(zip(depthmin, depthmax))
-
+    l3=list(zip(redmin, redmax))
     lower=[]
     upper=[]
     for i in range(len(l1)):
-        
+        fitredbool=fitredboolarray[i]
         l1bound=l1[i]
         l2bound=l2[i]
+        l3bound=l3[i]
         l1lower=l1bound[0] 
         l1upper=l1bound[1] 
         l2lower=l2bound[0] 
         l2upper=l2bound[1] 
+        l3lower=l3bound[0] 
+        l3upper=l3bound[1] 
         lower.append(l1lower)
         lower.append(l2lower)
+        if fitredbool==True:
+            lower.append(l3lower)
         upper.append(l1upper)
         upper.append(l2upper)
+        if fitredbool==True:
+            upper.append(l3upper)
     MyBounds=[lower,upper]
     MyBounds=tuple(MyBounds)
     ''' local optimization method can be BFGS, CG, Newton-CG, L-BFGS-B,etc.., see here\
@@ -257,26 +314,44 @@ def VDWOptimizer(poltype,count):
     y=np.array([i-min(y) for i in y])
     weightlist=np.exp(-np.array(y)/poltype.boltzmantemp)
     if count>1:
-        errorfunc= lambda p, poltype, vdwtypes, y: weightlist*(myFUNC(p,poltype,vdwtypes)-y)
+        errorfunc= lambda p, poltype, vdwtypes, idxtotype, y: weightlist*(myFUNC(p,poltype,vdwtypes,idxtotype,)-y)
 
     else:
-        errorfunc= lambda p, poltype, vdwtypes, y: (myFUNC(p,poltype,vdwtypes)-y)
+        errorfunc= lambda p, poltype, vdwtypes,idxtotype,  y: (myFUNC(p,poltype,vdwtypes,idxtotype)-y)
 
-
-    ret = optimize.least_squares(errorfunc, x0, jac='2-point', bounds=MyBounds, args=(poltype,vdwtypes,y))
+    ret = optimize.least_squares(errorfunc, x0, jac='2-point', bounds=MyBounds, args=(poltype,vdwtypes,idxtotype,y))
     vdwradii=[]
     vdwdepths=[] 
+    vdwreds=[]
     ofile = open("RESULTS.OPT", "a")
-    for i in range(0,len(ret.x),2):
-        ofile.write("Param:%15.6f%15.6f\n"%(ret.x[i], ret.x[i+1]))
-        vdwradius=round(ret.x[i],3)
-        vdwdepth=round(ret.x[i+1],3)
-        vdwradii.append(vdwradius)
-        vdwdepths.append(vdwdepth)
+    for i in range(len(ret.x)):
+        vartype=idxtotype[i]
+        if vartype=='rad':
+            vdwradius=round(ret.x[i],3)
+            vdwradii.append(vdwradius)
+
+        elif vartype=='depth':
+            vdwdepth=round(ret.x[i],3)
+            vdwdepths.append(vdwdepth)
+            if (i+1) in idxtotype.keys():
+                nexttype=idxtotype[i+1]
+                if nexttype!='red':
+                    vdwred=1
+                    vdwreds.append(vdwred)
+            else:
+                vdwred=1
+                vdwreds.append(vdwred)
+
+
+        elif vartype=='red':
+            vdwred=round(ret.x[i],3)
+            vdwreds.append(vdwred)
+            
     ofile.write("%s\n"%(ret.message))
     ofile.write("\n")
     ofile.close()
-    return vdwradii,vdwdepths 
+    return vdwradii,vdwdepths,vdwreds 
+
 
 def MoveDimerAboutMinima(poltype,txyzFile,outputprefixname,nAtomsFirst,atomidx1,atomidx2,equildistance,array):
     fnamearray=[]
@@ -451,7 +526,7 @@ def ReadCounterPoiseAndWriteQMData(poltype,logfilelist):
 
 
 
-def PlotEnergyVsDistance(poltype,distarray,prefix,radii,depths,vdwtypesarray,count):
+def PlotEnergyVsDistance(poltype,distarray,prefix,radii,depths,reds,vdwtypesarray,count):
     vdwtypes=[str(i) for i in vdwtypesarray]
     vdwtypestring=','.join(vdwtypes)
     qmenergyarray = readOneColumn("QM_DATA",1,prefix)
@@ -480,7 +555,8 @@ def PlotEnergyVsDistance(poltype,distarray,prefix,radii,depths,vdwtypesarray,cou
     for i in range(len(radii)):
         rad=radii[i]
         depth=depths[i]
-        cur='Radius=%s, Depth=%s '%(round(rad,2),round(depth,2))
+        red=reds[i]
+        cur='Radius=%s, Depth=%s ,Red=%s'%(round(rad,2),round(depth,2),round(red,2))
         string+=cur
     plt.plot(distarray,energyarray,'--bo',label='MM ,'+string)
     plt.plot(distarray,qmenergyarray,'--ro',label='QM')
@@ -508,17 +584,21 @@ def ReadAnalyzeEnergiesWriteOut(poltype,filenamelist):
     temp.close() 
 
 
-def WriteInitialPrmFile(poltype,vdwtypesarray,initialradii,initialdepths,minradii,maxradii,mindepths,maxdepths):
+def WriteInitialPrmFile(poltype,vdwtypesarray,initialradii,initialdepths,minradii,maxradii,mindepths,maxdepths,initialreds,minreds,maxreds):
+
     temp=open('INITIAL.PRM','w')
     for i in range(len(vdwtypesarray)):
         vdwtype=str(vdwtypesarray[i])
         initialradius=str(initialradii[i])
         initialdepth=str(initialdepths[i])
+        initialred=str(initialreds[i])
         minradius=str(minradii[i])
         maxradius=str(maxradii[i])
         mindepth=str(mindepths[i])
         maxdepth=str(maxdepths[i])
-        line='vdw '+vdwtype+' '+initialradius+' '+initialdepth+' '+minradius+' '+maxradius+' '+mindepth+' '+maxdepth+'\n'
+        minred=str(minreds[i])
+        maxred=str(maxreds[i])
+        line='vdw '+vdwtype+' '+initialradius+' '+initialdepth+' '+initialred+' '+minradius+' '+maxradius+' '+mindepth+' '+maxdepth+' '+minred+' '+maxred+'\n'
         temp.write(line)
 
     temp.close()
@@ -760,8 +840,14 @@ def GrabVdwParameters(poltype,vdwtype):
                 depth=float(linesplit[3])
                 minvdwdepth=depth-1*depth
                 maxvdwdepth=depth+1*depth
+                if len(linesplit)==5:
+                    red=float(linesplit[4])
+                else:
+                    red=1
+                minred=red-.2*red
+                maxred=1
 
-                return radius,depth,minvdwradius,maxvdwradius,minvdwdepth,maxvdwdepth 
+                return radius,depth,minvdwradius,maxvdwradius,minvdwdepth,maxvdwdepth,red,minred,maxred
 
 
 def GenerateCoordinateGuesses(indextoreferencecoordinate):
@@ -1467,44 +1553,68 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
                 vdwtypesarray=[]
                 initialradii=[]
                 initialdepths=[]
+                initialreds=[]
                 minradii=[]
                 maxradii=[]
                 mindepths=[]
                 maxdepths=[]
+                minreds=[]
+                maxreds=[]
+                fitredboolarray=[]
                 ReadCounterPoiseAndWriteQMData(poltype,flat_filenames)
                 for probeidx in range(len(flat_probeindices)):
                     prefix=flat_prefixarrays[probeidx]
                     probeindex=flat_probeindices[probeidx]
                     moleculeindex=flat_moleculeindices[probeidx]
                     vdwtype=poltype.idxtosymclass[moleculeindex]
+                    atom=poltype.mol.GetAtom(moleculeindex)
+                    valence=atom.GetValence()
+                    if valence==1:
+                       fitred=True
+                    else:
+                       fitred=False
                     if vdwtype not in vdwtypesarray:
                         vdwtypesarray.append(vdwtype)
-                        initialvdwradius,initialvdwdepth,minvdwradius,maxvdwradius,minvdwdepth,maxvdwdepth=GrabVdwParameters(poltype,vdwtype)
+                        fitredboolarray.append(fitred)
+                        initialvdwradius,initialvdwdepth,minvdwradius,maxvdwradius,minvdwdepth,maxvdwdepth,red,minred,maxred=GrabVdwParameters(poltype,vdwtype)
                         initialradii.append(initialvdwradius)
                         initialdepths.append(initialvdwdepth)
                         minradii.append(minvdwradius)
                         maxradii.append(maxvdwradius)
                         mindepths.append(minvdwdepth)
                         maxdepths.append(maxvdwdepth)
+                        initialreds.append(red)
+                        minreds.append(minred)
+                        maxreds.append(maxred)
                     if 'water' not in prefix:
                         adjustedprobeindex=probeindex-len(poltype.idxtosymclass.keys())
                         vdwtype=poltype.idxtosymclass[adjustedprobeindex]
+                        atom=poltype.mol.GetAtom(adjustedprobeindex)
+                        valence=atom.GetValence()
+                        if valence==1:
+                           fitred=True
+                        else:
+                           fitred=False
+
                         if vdwtype not in vdwtypesarray:
                             vdwtypesarray.append(vdwtype)
-                            initialvdwradius,initialvdwdepth,minvdwradius,maxvdwradius,minvdwdepth,maxvdwdepth=GrabVdwParameters(poltype,vdwtype)
+                            fitredboolarray.append(fitred)
+                            initialvdwradius,initialvdwdepth,minvdwradius,maxvdwradius,minvdwdepth,maxvdwdepth,red,minred,maxred=GrabVdwParameters(poltype,vdwtype)
                             initialradii.append(initialvdwradius)
                             initialdepths.append(initialvdwdepth)
                             minradii.append(minvdwradius)
                             maxradii.append(maxvdwradius)
                             mindepths.append(minvdwdepth)
                             maxdepths.append(maxvdwdepth)
-
-                WriteInitialPrmFile(poltype,vdwtypesarray,initialradii,initialdepths,minradii,maxradii,mindepths,maxdepths)
-                vdwradii,vdwdepths=VDWOptimizer(poltype,count)
+                            initialreds.append(red)
+                            minreds.append(minred)
+                            maxreds.append(maxred)
+                WriteInitialPrmFile(poltype,vdwtypesarray,initialradii,initialdepths,minradii,maxradii,mindepths,maxdepths,initialreds,minreds,maxreds)
+                vdwradii,vdwdepths,vdwreds=VDWOptimizer(poltype,count,fitredboolarray)
                 for k in range(len(flat_prefixarrays)):
                     prefix=flat_prefixarrays[k]
                     distarray=flat_distarrays[k]
-                    PlotEnergyVsDistance(poltype,distarray,prefix,vdwradii,vdwdepths,vdwtypesarray,count)
+                    PlotEnergyVsDistance(poltype,distarray,prefix,vdwradii,vdwdepths,vdwreds,vdwtypesarray,count)
                     othergoodfit=PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count)
                 goodfit=PlotQMVsMMEnergy(poltype,vdwtypesarray,flat_prefixarrays,count,allprefix=True)
                 count+=1
