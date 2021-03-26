@@ -37,8 +37,13 @@ def coefficient_of_determination(ys_orig,ys_line):
     y_mean_line = [mean(ys_orig) for y in ys_orig]
     squared_error_regr = squared_error(ys_orig, ys_line)
     squared_error_y_mean = squared_error(ys_orig, y_mean_line)
-    return 1 - (squared_error_regr/squared_error_y_mean)
+    try:
+        value=1 - (squared_error_regr/squared_error_y_mean)
 
+    except:
+        value=1 # incase division by 0
+
+    return value 
 
 def MeanError(data,pred):
     Sum=0
@@ -62,13 +67,14 @@ def ReadInitialPrmFile(poltype):
     return frontarray
 
 
-def writePRM(poltype,params,vdwtype):
+def writePRM(poltype,params,vdwtypes):
     for i in range(0,len(params),2):
         oFile = open("temp.key", 'w')
         rFile=open(poltype.key5fname,'r')
+        vdwtype=vdwtypes[i]
         for line in rFile.readlines():
             if vdwtype in line and 'vdw' in line:
-                oFile.write('vdw '+vdwtype+" %s %s\n"%(params[i], params[i+1]))
+                oFile.write("vdw %s %s %s\n"%(vdwtype,params[i], params[i+1]))
             else:
                 oFile.write(line)
     oFile.flush()
@@ -94,9 +100,9 @@ def readOneColumn(filename,columnnumber,prefix=None):
     return array
      
 
-def myFUNC(params,poltype,vdwtype):
+def myFUNC(params,poltype,vdwtypes):
     params=list(params)
-    writePRM(poltype,params,vdwtype)
+    writePRM(poltype,params,vdwtypes)
     target = []
     target = readOneColumn("QM_DATA",1)
     target=[float(i) for i in target]
@@ -145,7 +151,6 @@ def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count,allprefix=False):
     current=np.array(current)
     vdwtypes=[str(i) for i in vdwtypesarray]
     vdwtypestring=','.join(vdwtypes)
-
     MSE=MeanError(current,target)
     MAE=metrics.mean_absolute_error(current,target)
     m, b = best_fit_slope_and_intercept(current,target)
@@ -205,11 +210,18 @@ def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count,allprefix=False):
 
 def VDWOptimizer(poltype,count):
     x0 = []
+
+    curvdwtypes=readOneColumn("INITIAL.PRM", 1)
+    vdwtypes=[]
     temp=open("INITIAL.PRM",'r')
     lines = temp.readlines()
-    for line in lines:
+    for lineidx in range(len(lines)):
+        line=lines[lineidx]
         x0.append(float(line.split()[2]))
         x0.append(float(line.split()[3]))
+        vdwtype=curvdwtypes[lineidx]
+        vdwtypes.append(vdwtype)
+        vdwtypes.append(vdwtype)
     x0 = np.array(x0)
     rmax=readOneColumn("INITIAL.PRM", 5)
     rmax=[float(i) for i in rmax]
@@ -219,8 +231,6 @@ def VDWOptimizer(poltype,count):
     depthmax=[float(i) for i in depthmax]
     depthmin=readOneColumn("INITIAL.PRM", 6)
     depthmin=[float(i) for i in depthmin]
-    vdwtypes=readOneColumn("INITIAL.PRM", 1)
-    vdwtype=vdwtypes[0]
     l1=list(zip(rmin, rmax))
     l2=list(zip(depthmin, depthmax))
 
@@ -247,13 +257,13 @@ def VDWOptimizer(poltype,count):
     y=np.array([i-min(y) for i in y])
     weightlist=np.exp(-np.array(y)/poltype.boltzmantemp)
     if count>1:
-        errorfunc= lambda p, poltype, vdwtype, y: weightlist*(myFUNC(p,poltype,vdwtype)-y)
+        errorfunc= lambda p, poltype, vdwtypes, y: weightlist*(myFUNC(p,poltype,vdwtypes)-y)
 
     else:
-        errorfunc= lambda p, poltype, vdwtype, y: (myFUNC(p,poltype,vdwtype)-y)
+        errorfunc= lambda p, poltype, vdwtypes, y: (myFUNC(p,poltype,vdwtypes)-y)
 
 
-    ret = optimize.least_squares(errorfunc, x0, jac='2-point', bounds=MyBounds, args=(poltype,vdwtype,y))
+    ret = optimize.least_squares(errorfunc, x0, jac='2-point', bounds=MyBounds, args=(poltype,vdwtypes,y))
     vdwradii=[]
     vdwdepths=[] 
     ofile = open("RESULTS.OPT", "a")
@@ -441,7 +451,7 @@ def ReadCounterPoiseAndWriteQMData(poltype,logfilelist):
 
 
 
-def PlotEnergyVsDistance(poltype,distarray,prefix,radii,depths,vdwtypesarray):
+def PlotEnergyVsDistance(poltype,distarray,prefix,radii,depths,vdwtypesarray,count):
     vdwtypes=[str(i) for i in vdwtypesarray]
     vdwtypestring=','.join(vdwtypes)
     qmenergyarray = readOneColumn("QM_DATA",1,prefix)
@@ -458,7 +468,11 @@ def PlotEnergyVsDistance(poltype,distarray,prefix,radii,depths,vdwtypesarray):
     r_squared = round(coefficient_of_determination(energyarray,qmenergyarray),2)
     result=fmin(RMSD,.5)
     minRMSD=round(RMSD(result[0]),2)
-    plotname='EnergyVsDistance-'+prefix+'_'+vdwtypestring+'.png'
+    if count>1:
+        suffix='_boltzman.png'
+    else:
+        suffix='.png'
+    plotname='EnergyVsDistance-'+prefix+'_'+vdwtypestring+suffix
     fig = plt.figure()
     title=prefix+' VdwTypes = '+vdwtypestring
     plt.title(title)
@@ -852,7 +866,6 @@ def GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol,indextorefe
     probeneighbsymclassesset=list(set(probeneighbsymclasses))
     probeneighbatoms=[probemol.GetAtom(i) for i in probeneighbs]
     acceptorneighbatoms=[mol.GetAtom(i) for i in acceptorneighbs]
-
     probeneighbs=[i-1+len(atoms1) for i in probeneighbs] # shift to 0 index, shift passed first molecule
     acceptorneighbs=[i-1 for i in acceptorneighbs]
     donorcoordinate=indextoreferencecoordinate[donorindex]
@@ -1288,6 +1301,60 @@ def CheckIfFittingCompleted(poltype,prefix):
             check=True
             break
     return check
+
+def CombineProbesThatNeedToBeFitTogether(poltype,probeindices,moleculeindices,fullprefixarrays,fulldistarrays,alloutputfilenames):
+
+    newprobeindices=[]
+    newmoleculeindices=[]
+    newprefixarrays=[]
+    newdistarrays=[]
+    newoutputfilenames=[]
+    indextoindexlist={}
+    for i in range(len(moleculeindices)):
+        moleculelist=moleculeindices[i]
+        firstindex=moleculelist[0]
+        if i not in indextoindexlist.keys():
+            indextoindexlist[i]=[i]
+        for j in range(len(moleculeindices)):
+            othermoleculelist=moleculeindices[j]
+            otherfirstindex=othermoleculelist[0]
+            if j not in indextoindexlist.keys():
+                indextoindexlist[j]=[j]
+            if firstindex==otherfirstindex and i!=j:
+                groupedindices=[i,j]
+                for idx in groupedindices:
+                    if idx not in indextoindexlist[i]:
+                        indextoindexlist[i].append(idx)
+                    if idx not in indextoindexlist[j]:
+                        indextoindexlist[j].append(idx)
+    indicesalreadydone=[]
+    for index,indexlist in indextoindexlist.items():
+        if index not in indicesalreadydone:
+            tempmoleculeindices=[]
+            tempprobeindices=[]
+            tempprefixes=[]
+            tempdistarrays=[]
+            tempfilenames=[]
+            for idx in indexlist:
+                indicesalreadydone.append(idx)  
+                moleculelist=moleculeindices[idx]
+                probelist=probeindices[idx]
+                prefixes=fullprefixarrays[idx]
+                distarrays=fulldistarrays[idx]
+                filenames=alloutputfilenames[idx]
+                tempmoleculeindices.append(moleculelist)
+                tempprobeindices.append(probelist)
+                tempprefixes.append(prefixes)
+                tempdistarrays.append(distarrays)     
+                tempfilenames.append(filenames)
+            
+            newprobeindices.append(tempprobeindices)
+            newmoleculeindices.append(tempmoleculeindices)
+            newprefixarrays.append(tempprefixes)
+            newdistarrays.append(tempdistarrays)
+            newoutputfilenames.append(tempfilenames)  
+
+    return newprobeindices,newmoleculeindices,newprefixarrays,newdistarrays,newoutputfilenames
  
 
 def VanDerWaalsOptimization(poltype,missingvdwatomindices):
@@ -1311,6 +1378,10 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     array=[.8,.9,1,1.1,1.2]
     dimerfiles,probeindices,moleculeindices,numberprobeatoms,atomrestraintslist=GenerateInitialProbeStructure(poltype,missingvdwatomindices)
     obConversion = openbabel.OBConversion()
+    checkarray=[]
+    fullprefixarrays=[]
+    fulldistarrays=[]
+    alloutputfilenames=[]
     for i in range(len(probeindices)):
         filenameslist=dimerfiles[i]
         restraintslist=atomrestraintslist[i]
@@ -1319,9 +1390,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
         probeatoms=numberprobeatoms[i]
         distancearrays=[]
         prefixarrays=[]
-        alloutputfilenames=[]
-        checkarray=[]
-        count=1
+        filenamesarray=[] 
         for probeidx in range(len(probeindexlist)):
             filename=filenameslist[probeidx]
             restraints=restraintslist[probeidx]
@@ -1332,7 +1401,6 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             obConversion.SetInFormat(inFormat)
             obConversion.ReadFile(dimermol, filename)
             prefix=filename.replace('.xyz','')
-            prefixarrays.append(prefix)
             check=CheckIfFittingCompleted(poltype,prefix)
             checkarray.append(check)
             poltype.comoptfname=prefix+'-opt.com'
@@ -1344,6 +1412,8 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
                 optmol = opt.GeometryOptimization(poltype,dimermol,checkbonds=False,modred=False,restraints=restraints,skipscferror=False)
             except:
                 continue
+
+            prefixarrays.append(prefix)
             dimeratoms=dimermol.NumAtoms()
             moleculeatoms=dimeratoms-probeatoms
             moleculeatom=optmol.GetAtom(moleculeindex)
@@ -1365,13 +1435,32 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             filenamearray=MoveDimerAboutMinima(poltype,outputxyz,outputprefixname,moleculeatoms,moleculeindex,probeindex,equildistance,array)
             qmfilenamearray=GenerateSPInputFiles(poltype,filenamearray,poltype.mol,probeatoms)
             outputfilenames=ExecuteSPJobs(poltype,qmfilenamearray,prefix)
-            alloutputfilenames.extend(outputfilenames)
-        dothefit=False
-        for check in checkarray:
-            if check==False:
-                dothefit=True
-        if dothefit==True:
+            filenamesarray.append(outputfilenames)
+        fullprefixarrays.append(prefixarrays)
+        fulldistarrays.append(distancearrays)
+        alloutputfilenames.append(filenamesarray)
+    dothefit=False
+    for check in checkarray:
+        if check==False:
+            dothefit=True
+    if dothefit==True:
+        newprobeindices,newmoleculeindices,newprefixarrays,newdistarrays,newoutputfilenames=CombineProbesThatNeedToBeFitTogether(poltype,probeindices,moleculeindices,fullprefixarrays,fulldistarrays,alloutputfilenames)
+        for k in range(len(newprobeindices)):
             goodfit=False
+            count=1
+            subprobeindices=newprobeindices[k]
+            submoleculeindices=newmoleculeindices[k]
+            subprefixarrays=newprefixarrays[k]
+            subdistarrays=newdistarrays[k]
+            subfilenames=newoutputfilenames[k]
+            flat_probeindices = [item for sublist in subprobeindices for item in sublist]
+            flat_moleculeindices = [item for sublist in submoleculeindices for item in sublist]
+            flat_prefixarrays = [item for sublist in subprefixarrays for item in sublist]
+            flat_distarrays = [item for sublist in subdistarrays for item in sublist]
+            flat_filenames = [item for sublist in subfilenames for item in sublist]
+            flat_filenames = [item for sublist in flat_filenames for item in sublist]
+
+
             while goodfit==False:
                 if count>2:
                     break
@@ -1382,10 +1471,11 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
                 maxradii=[]
                 mindepths=[]
                 maxdepths=[]
-
-                ReadCounterPoiseAndWriteQMData(poltype,alloutputfilenames)
-                for probeidx in range(len(probeindexlist)):
-                    moleculeindex=moleculeindexlist[probeidx]
+                ReadCounterPoiseAndWriteQMData(poltype,flat_filenames)
+                for probeidx in range(len(flat_probeindices)):
+                    prefix=flat_prefixarrays[probeidx]
+                    probeindex=flat_probeindices[probeidx]
+                    moleculeindex=flat_moleculeindices[probeidx]
                     vdwtype=poltype.idxtosymclass[moleculeindex]
                     if vdwtype not in vdwtypesarray:
                         vdwtypesarray.append(vdwtype)
@@ -1396,10 +1486,9 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
                         maxradii.append(maxvdwradius)
                         mindepths.append(minvdwdepth)
                         maxdepths.append(maxvdwdepth)
-                    
-                    if poltype.homodimers==True:
-                        probeindex=probeindexlist[probeidx]-probeatoms
-                        vdwtype=poltype.idxtosymclass[probeindex]
+                    if 'water' not in prefix:
+                        adjustedprobeindex=probeindex-len(poltype.idxtosymclass.keys())
+                        vdwtype=poltype.idxtosymclass[adjustedprobeindex]
                         if vdwtype not in vdwtypesarray:
                             vdwtypesarray.append(vdwtype)
                             initialvdwradius,initialvdwdepth,minvdwradius,maxvdwradius,minvdwdepth,maxvdwdepth=GrabVdwParameters(poltype,vdwtype)
@@ -1409,15 +1498,15 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
                             maxradii.append(maxvdwradius)
                             mindepths.append(minvdwdepth)
                             maxdepths.append(maxvdwdepth)
+
                 WriteInitialPrmFile(poltype,vdwtypesarray,initialradii,initialdepths,minradii,maxradii,mindepths,maxdepths)
                 vdwradii,vdwdepths=VDWOptimizer(poltype,count)
-
-                for k in range(len(prefixarrays)):
-                    prefix=prefixarrays[k]
-                    distarray=distancearrays[k]
-                    PlotEnergyVsDistance(poltype,distarray,prefix,vdwradii,vdwdepths,vdwtypesarray)
+                for k in range(len(flat_prefixarrays)):
+                    prefix=flat_prefixarrays[k]
+                    distarray=flat_distarrays[k]
+                    PlotEnergyVsDistance(poltype,distarray,prefix,vdwradii,vdwdepths,vdwtypesarray,count)
                     othergoodfit=PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count)
-                goodfit=PlotQMVsMMEnergy(poltype,vdwtypesarray,prefixarrays,count,allprefix=True)
+                goodfit=PlotQMVsMMEnergy(poltype,vdwtypesarray,flat_prefixarrays,count,allprefix=True)
                 count+=1
 
     shutil.copy(poltype.key5fname,'../'+poltype.key5fname)
