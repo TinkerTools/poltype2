@@ -102,7 +102,7 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
     temp.write('set maxiter '+str(poltype.scfmaxiter)+'\n')
     temp.write('set freeze_core True'+'\n')
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
-    temp.write("set cubeprop_tasks ['density']"+'\n')
+    temp.write("set cubeprop_tasks ['esp']"+'\n')
     spacedformulastr=mol.GetSpacedFormula()
     if ('I ' in spacedformulastr):
         temp.write('basis {'+'\n')
@@ -145,7 +145,7 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
     temp.write('set freeze_core True'+'\n')
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
-    temp.write("set cubeprop_tasks ['density']"+'\n')
+    temp.write("set cubeprop_tasks ['esp']"+'\n')
 
     spacedformulastr=mol.GetSpacedFormula()
     if ('I ' in spacedformulastr):
