@@ -77,7 +77,6 @@ def writePRM(poltype,params,vdwtypes,idxtotype):
                 nexttype=idxtotype[i+1]
                 if nexttype!='red':
                     vdwred=1
-                    vdwreds.append(vdwred)
             else:
                 vdwred=1
 
@@ -891,7 +890,8 @@ def GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indext
         else:
             if target1=='target' and target2=='target': # then use vdw distances
                 targetdistance=(vdwradius1**3+vdwradius2**3)/(vdwradius1**2+vdwradius2**2)
-
+                if targetdistance<2:
+                    targetdistance=2
                 bound=[targetdistance,targetdistance]
 
         indexpairtoreferencedistance[tuple(pair)]=targetdistance 
@@ -916,6 +916,8 @@ def GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indext
         else:
             if target1=='target' and target2=='target': # then use vdw distances
                 targetdistance=(vdwradius1**3+vdwradius2**3)/(vdwradius1**2+vdwradius2**2)
+                if targetdistance<2:
+                    targetdistance=2
 
                 bound=[targetdistance,targetdistance]
             else:
@@ -938,6 +940,7 @@ def GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol,indextorefe
     donorneighbs=[]
     probeidxtosymclass,symmetryclass=symm.gen_canonicallabels(poltype,probemol) 
     acceptoratom=mol.GetAtom(p1+1)
+    acceptorhyb=acceptoratom.GetHyb()
     donoratom=probemol.GetAtom(p2+1)
     probeneighbs=[]
     atomatomiter=openbabel.OBAtomAtomIter(donoratom)
@@ -976,11 +979,12 @@ def GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol,indextorefe
 
         angleindices=tuple([donorneighbindex,donorindex,acceptorindex])
         indicestoreferenceangleprobe[angleindices]=angle
-    if len(acceptorneighbs)!=1:
+    if len(acceptorneighbs)!=1 and acceptorhyb==2:
         angle=90
         for acceptorneighbindex in acceptorneighbs:
             angleindices=tuple([donorindex,acceptorneighbindex,acceptorindex])
             indicestoreferenceanglemoleculeneighb[angleindices]=angle
+
     elif len(acceptorneighbs)==1:
         neighb=acceptorneighbatoms[0]
         atomatomiter=openbabel.OBAtomAtomIter(neighb)
@@ -1111,6 +1115,8 @@ def optimizedimer(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwrad
     indexpairtoreferencedistanceoriginal=indexpairtoreferencedistance.copy()
     indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb=GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol,indextoreferencecoordinate)
     indexpairtoreferencedistance,indexpairtobounds=ConvertAngleRestraintToDistanceRestraint(indexpairtoreferencedistance,indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb,indexpairtobounds,indextoreferencecoordinate) 
+    
+    shiftedp2=p2+len(atoms1)
     coordinatesguess=GenerateCoordinateGuesses(indextoreferencecoordinate)
     def PairwiseCostFunction(x):
         func=0
@@ -1307,7 +1313,6 @@ def GenerateInitialProbeStructure(poltype,missingvdwatomindices):
     for mol in molecules:
         atoms1,coords1,order1, types1, connections1=readTXYZ(poltype,mol)
         mol_spots = missingvdwatomindices.copy()
-        mol_spots = CheckBuriedAtoms(poltype,mol_spots,poltype.mol)
         mol_spots = [i-1 for i in mol_spots]
         moldimernames=[]
         atomrestraintslist=[]
@@ -1332,6 +1337,9 @@ def GenerateInitialProbeStructure(poltype,missingvdwatomindices):
             if 'water' in prob:
                 probeidxtosymclass=GrabWaterTypes(poltype)
             prob_spots = CheckBuriedAtoms(poltype,prob_spots,probemol,zeroindex=True)
+            if 'water' not in prob:
+                mol_spots = CheckBuriedAtoms(poltype,mol_spots,poltype.mol,zeroindex=True) 
+
             for p1 in mol_spots:
                 probelist=[]
                 probeindiceslist=[]
@@ -1353,6 +1361,7 @@ def GenerateInitialProbeStructure(poltype,missingvdwatomindices):
                 moldimernames.append(probelist)
                 atomrestraintslist.append(reslist)
                 numberprobeatoms.append(probemol.NumAtoms())
+    
     return moldimernames,probeindices,moleculeindices,numberprobeatoms,atomrestraintslist
 
 def GrabKeysFromValue(poltype,dic,thevalue):

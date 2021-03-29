@@ -242,7 +242,7 @@ class PolarizableTyper():
                         else:
                             self.rotalltors=self.GrabBoolValue(a)
 
-                    if "homodimers" in newline:
+                    elif "homodimers" in newline:
                         if '=' not in line:
                             self.homodimers = True
                         else:
