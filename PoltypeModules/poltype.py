@@ -1245,6 +1245,23 @@ class PolarizableTyper():
             optmol.SetTotalCharge(mol.GetTotalCharge())
             optmol.SetTotalSpinMultiplicity(mol.GetTotalSpinMultiplicity())
             optmol = opt.GeometryOptimization(self,optmol)
+            if poltype.use_gaus==False and poltype.use_gausoptonly==False:
+                fname1=self.firstlogoptfname.replace('.log','.xyz')
+                fname2=self.secondlogoptfname.replace('.log','.xyz')
+            else:
+                fname1=self.firstlogoptfname
+                fname2=self.secondlogoptfname
+            optmol1 = opt.load_structfile(poltype,fname1)
+            optmol2 = opt.load_structfile(poltype,fname2)
+            issame=opt.CheckBondConnectivity(poltype,optmol1,optmol2)
+            if issame==False:
+                optmol=optmol1
+            else:
+                optmol=optmol2
+            optmol.SetTotalCharge(mol.GetTotalCharge())
+            optmol.SetTotalSpinMultiplicity(mol.GetTotalSpinMultiplicity())
+
+
         totalatoms=optmol.NumAtoms()
         if self.use_gausgeomoptonly==True:
             self.use_gausoptonly=False
