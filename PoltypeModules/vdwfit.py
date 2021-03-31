@@ -69,12 +69,13 @@ def writePRM(poltype,params,vdwtypes,idxtotype):
         vdwtype=vdwtypes[i]
         vartype=idxtotype[i]
         if vartype=='rad':
-            vdwradius=round(params[i],3)
+            vdwradius=params[i]
 
         elif vartype=='depth':
-            vdwdepth=round(params[i],3)
+            vdwdepth=params[i]
             if (i+1) in idxtotype.keys():
                 nexttype=idxtotype[i+1]
+
                 if nexttype!='red':
                     vdwred=1
             else:
@@ -82,7 +83,7 @@ def writePRM(poltype,params,vdwtypes,idxtotype):
 
 
         elif vartype=='red':
-            vdwred=round(params[i],3)
+            vdwred=params[i]
         if vdwradius!=None and vdwdepth!=None and vdwred!=None:
             for line in rFile.readlines():
                 if vdwtype in line and 'vdw' in line:
@@ -148,7 +149,6 @@ def myFUNC(params,poltype,vdwtypes,idxtotype):
         filenamearray.append(filename)
 
     temp.close()
-    # need to execute commands now
     for cmd in cmdarray:
         poltype.call_subsystem(cmd,True)
 
@@ -195,17 +195,21 @@ def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count,allprefix=False):
     if count>1:
         relative_energy_list=np.multiply(weightlist,relative_energy_list)
 
+    def FirstRMSD(c):
+        return np.sqrt(np.mean(np.square(np.add(target-current,c))))
+    result=fmin(FirstRMSD,.5)
+    first_new_rmse=FirstRMSD(0)
+
+
     def RMSD(c):
         return np.sqrt(np.mean(np.square(np.add(energy_list,c))))
     result=fmin(RMSD,.5)
-    new_rmse=RMSD(result[0])
+    new_rmse=RMSD(0)
 
     def RMSDRel(c):
         return np.sqrt(np.mean(np.square(np.add(np.divide(relative_energy_list,shifted_target),c))))
     resultRel=fmin(RMSDRel,.5)
-    new_rmse_rel=RMSDRel(resultRel[0])
-
-
+    new_rmse_rel=RMSDRel(0)
     r_squared = coefficient_of_determination(current,target)
     fig = plt.figure()
     plt.plot(current,target,'.',label='R^2=%s MAE=%s RMSE=%s RelRMSE=%s MSE=%s'%(round(r_squared,2),round(MAE,2),round(new_rmse,2),round(new_rmse_rel,2),round(MSE,2)))
@@ -230,9 +234,9 @@ def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count,allprefix=False):
     if new_rmse>rmsetol and new_rmse_rel>relrmsetol:
         goodfit=False
         if allprefix==True and count>1:
-            raise ValueError('RMSE is too high! RMSE='+str(new_rmse)+' tol='+str(rmsetol)+' '+'RelRMSE='+str(new_rmse)+' tol='+str(relrmsetol)+' '+prefix)
+            raise ValueError('RMSE is too high! RMSE='+str(new_rmse)+' tol='+str(rmsetol)+' '+'RelRMSE='+str(new_rmse_rel)+' tol='+str(relrmsetol)+' '+prefix)
         elif allprefix==True and count<=1:
-            mes='RMSE is too high! RMSE='+str(new_rmse)+' tol='+str(rmsetol)+' '+'RelRMSE='+str(new_rmse)+' tol='+str(relrmsetol)+' '+prefix
+            mes='RMSE is too high! RMSE='+str(new_rmse)+' tol='+str(rmsetol)+' '+'RelRMSE='+str(new_rmse_rel)+' tol='+str(relrmsetol)+' '+prefix
             print(mes,flush=True)
 
     return goodfit
@@ -318,7 +322,7 @@ def VDWOptimizer(poltype,count,fitredboolarray):
     else:
         errorfunc= lambda p, poltype, vdwtypes,idxtotype,  y: (myFUNC(p,poltype,vdwtypes,idxtotype)-y)
 
-    ret = optimize.least_squares(errorfunc, x0, jac='2-point', bounds=MyBounds, args=(poltype,vdwtypes,idxtotype,y))
+    ret = optimize.least_squares(errorfunc, x0, jac='2-point', bounds=MyBounds, diff_step=1e-4,args=(poltype,vdwtypes,idxtotype,y))
     vdwradii=[]
     vdwdepths=[] 
     vdwreds=[]
@@ -829,6 +833,7 @@ def GrabVdwParameters(poltype,vdwtype):
     temp=open(poltype.key5fname,'r')
     results=temp.readlines()
     temp.close()
+    vdwdepthlimit=.4 # may need to change this to handle ions case
     for line in results:
         if 'vdw' in line:
             if str(vdwtype) in line:
@@ -839,6 +844,10 @@ def GrabVdwParameters(poltype,vdwtype):
                 depth=float(linesplit[3])
                 minvdwdepth=depth-1*depth
                 maxvdwdepth=depth+1*depth
+                if maxvdwdepth>vdwdepthlimit:
+                    maxvdwdepth=vdwdepthlimit
+                if depth>maxvdwdepth:
+                    depth=maxvdwdepth-.001
                 if len(linesplit)==5:
                     red=float(linesplit[4])
                 else:
@@ -1554,7 +1563,11 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             flat_distarrays = [item for sublist in subdistarrays for item in sublist]
             flat_filenames = [item for sublist in subfilenames for item in sublist]
             flat_filenames = [item for sublist in flat_filenames for item in sublist]
-
+            print('flat_probeindices',flat_probeindices)
+            print('flat_moleculeindices',flat_moleculeindices)
+            print('flat_prefixarrays',flat_prefixarrays)
+            print('flat_distarrays',flat_distarrays)
+            print('flat_filenames',flat_filenames) 
 
             while goodfit==False:
                 if count>2:
