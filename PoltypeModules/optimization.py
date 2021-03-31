@@ -6,6 +6,7 @@ import re
 import time
 import apicall as call
 import shlex
+import numpy as np
 
 def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,restraints,skipscferror):
     tempread=open(comfilecoords,'r')
@@ -332,6 +333,25 @@ def write_com_header(poltype,comfname,chkfname,maxdisk,maxmem,numproc):
     tmpfh.write("%Mem=" + maxmem + "\n")
     tmpfh.write("%Nproc=" + str(numproc) + "\n")
     tmpfh.close()
+
+def CompareBondLengths(poltype,inioptmol,optmol):
+    isnear=True
+    tol=.1
+
+    for inib in openbabel.OBMolBondIter(inioptmol):
+        beg = inib.GetBeginAtomIdx()
+        end = inib.GetEndAtomIdx()
+        b=optmol.GetBond(beg,end)
+        if b==None:
+            isnear=False
+            break
+        iniblength=inib.GetLength()
+        blength=b.GetLength()
+        
+        diff=np.abs(iniblength-blength)/iniblength
+        if diff>=tol:
+            isnear=False
+    return isnear
 
 def CheckBondConnectivity(poltype,mol,optmol,raiseerror=False):
     atomitermol=openbabel.OBMolAtomIter(mol)
