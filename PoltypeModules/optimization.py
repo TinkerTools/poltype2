@@ -500,7 +500,6 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,restraints=None
                 if len(jobtooutputlog.keys())!=0:
                     call.CallExternalAPI(poltype,jobtolog,jobtologlistfilepathprefix,scratchdir)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
-            
         term,error=poltype.CheckNormalTermination(poltype.logoptfname) # now grabs final structure when finished with QM if using Psi4
         if error and term==False:
             poltype.RaiseOutputFileError(poltype.logoptfname) 

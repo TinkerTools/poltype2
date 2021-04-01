@@ -907,6 +907,7 @@ class PolarizableTyper():
                         term=True
                     if ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line and 'except' not in line:
                         error=True
+                        errorline=line
                     if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line:
                         error=False
                         continue
@@ -917,12 +918,7 @@ class PolarizableTyper():
 
 
             if error==True:
-                message='Error '+line+ 'logpath='+logfname
-                print('message',message,flush=True)
-                print('line',line,flush=True) 
-            #if error==False and term==False and htime>=updatetime:
-            #    error=True
-            #    message='Error '+'Job died and has not been updated in '+str(updatetime)+' hours'+' last update time = '+str(htime)+' hours'+' logname='+logfname
+                message='Error '+errorline+ 'logpath='+logfname
             if error==True and term==False:
                 if errormessages!=None:
                     if message not in errormessages:

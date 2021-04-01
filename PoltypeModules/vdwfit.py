@@ -1465,6 +1465,29 @@ def CombineProbesThatNeedToBeFitTogether(poltype,probeindices,moleculeindices,fu
     return newprobeindices,newmoleculeindices,newprefixarrays,newdistarrays,newoutputfilenames
  
 
+def RemoveIgnoredIndices(poltype,probeindices,moleculeindices,moleculeprobeindicestoignore):
+    finalprobeindices=[]
+    finalmoleculeindices=[]
+    for i in range(len(probeindices)):
+        probeindexlist=probeindices[i]
+        moleculeindexlist=moleculeindices[i]
+        newprobeindexlist=[]
+        newmoleculeindexlist=[]
+        for j in range(len(probeindexlist)):
+            probeindex=probeindexlist[j]
+            moleculeindex=moleculeindexlist[j]
+            ls=[moleculeindex,probeindex]
+            if ls in moleculeprobeindicestoignore:
+                pass
+            else:
+                newmoleculeindexlist.append(moleculeindex)
+                newprobeindexlist.append(probeindex)
+        finalprobeindices.append(newprobeindexlist)
+        finalmoleculeindices.append(newmoleculeindexlist)
+
+
+    return finalprobeindices,finalmoleculeindices
+
 def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     poltype.parentdir=os.getcwd()+r'/'
     vdwfoldername='vdw'
@@ -1492,6 +1515,8 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     alloutputfilenames=[]
     originalcharge=poltype.mol.GetTotalCharge()
     originalmul=poltype.mol.GetTotalSpinMultiplicity()
+    moleculeprobeindicestoignore=[] # if opt fails
+
     for i in range(len(probeindices)):
         filenameslist=dimerfiles[i]
         restraintslist=atomrestraintslist[i]
@@ -1530,6 +1555,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             try:
                 optmol = opt.GeometryOptimization(poltype,mol,checkbonds=False,modred=False,restraints=restraints,skipscferror=False,charge=totchg)
             except:
+                moleculeprobeindicestoignore.append([moleculeindex,probeindex])
                 continue
 
             prefixarrays.append(prefix)
@@ -1563,7 +1589,9 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
         if check==False:
             dothefit=True
     if dothefit==True:
+        probeindices,moleculeindices=RemoveIgnoredIndices(poltype,probeindices,moleculeindices,moleculeprobeindicestoignore)
         newprobeindices,newmoleculeindices,newprefixarrays,newdistarrays,newoutputfilenames=CombineProbesThatNeedToBeFitTogether(poltype,probeindices,moleculeindices,fullprefixarrays,fulldistarrays,alloutputfilenames)
+
         for k in range(len(newprobeindices)):
             goodfit=False
             count=1
