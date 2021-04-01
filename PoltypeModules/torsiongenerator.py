@@ -161,7 +161,7 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
         datomicnum=datom.GetAtomicNum()
         if (aatomicnum==1 or datomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
             continue
-        if allhydtorsoneside==True:
+        if (allhydtorsoneside==True or allhydtors==True) and (aatomicnum==1 or datomicnum==1):
             if count>=1:
                 continue
             count+=1
@@ -182,7 +182,9 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                 rtdatomicnum=datom.GetAtomicNum()
                 if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
                     continue
-                if allhydtorsoneside==True:
+                if (allhydtorsoneside==True or allhydtors==True) and (rtaatomicnum==1 or rtdatomicnum==1):
+
+              
                     if count>=1:
                         continue
                     count+=1
@@ -329,8 +331,9 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
         datomicnum=datom.GetAtomicNum()
         if (aatomicnum==1 or datomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
             continue
+        if (allhydtorsoneside==True or allhydtors==True) and (aatomicnum==1 or datomicnum==1):
 
-        if allhydtorsoneside==True:
+       
             if count>=1:
                 continue
             count+=1
@@ -352,7 +355,9 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
                 datomicnum=datom.GetAtomicNum()
                 if (aatomicnum==1 or datomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
                     continue
-                if allhydtorsoneside==True:
+                if (allhydtorsoneside==True or allhydtors==True) and (aatomicnum==1 or datomicnum==1):
+
+               
                     if count>=1:
                         continue
                     count+=1
@@ -950,7 +955,9 @@ def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndli
 
             if (allhydtor==False and allhydtoroneside==False)  and (aatomicnum==1 or datomicnum==1):
                 continue
-            if allhydtoroneside==True:
+            if (allhydtoroneside==True or allhydtors==True) and (aatomicnum==1 or datomicnum==1):
+
+         
                 if count>=1:
                     continue
                 count+=1
@@ -1095,7 +1102,9 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                 rtdatomicnum=datom.GetAtomicNum()
                 if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
                     continue
-                if allhydtorsoneside==True:
+                if (allhydtorsoneside==True or allhydtors==True) and (rtaatomicnum==1 or rtdatomicnum==1):
+
+               
                     if count>=1:
                         continue
                     count+=1
@@ -1126,7 +1135,9 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
             rtdatomicnum=datom.GetAtomicNum()
             if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
                 continue
-            if allhydtorsoneside==True:
+            if (allhydtorsoneside==True or allhydtors==True) and (rtaatomicnum==1 or rtdatomicnum==1):
+
+           
                 if count>=1:
                     continue
                 count+=1
