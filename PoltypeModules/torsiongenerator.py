@@ -516,6 +516,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     poltype.idealangletensor={}
     poltype.tensorphases={}
     torsettooutputlogtoinitialstructure={}
+    torsettoinistructophaselist={}
     for torset in poltype.torlist:
         torsettooutputlogtoinitialstructure[tuple(torset)]={}
         optnumtotorsettofulloutputlogs['1'][tuple(torset)]=[]
@@ -581,7 +582,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         dictionary = dict(zip(outputlogs,initialstructures))  
         torsettooutputlogtoinitialstructure[tuple(torset)].update(dictionary)
         inistructophaselist = dict(zip(initialstructures,flatphaselist))  
-
+        torsettoinistructophaselist[tuple(torset)]=inistructophaselist
         lognames=[]
         for job in listofjobs:
             log=jobtooutputlog[job]
@@ -601,10 +602,12 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
     torsettofailedoutputlogtoinitialstructure={}
     failed=False
+
     for torset in poltype.torlist:
         torsettofailedoutputlogtoinitialstructure[tuple(torset)]={}
         outputlogtoinitialstructure=torsettooutputlogtoinitialstructure[tuple(torset)]
         tryoutputlogs=optnumtotorsettofulloutputlogs['1'][tuple(torset)]
+        inistructophaselist=torsettoinistructophaselist[tuple(torset)]
         for outputlog in tryoutputlogs:
             initialtinkerstructure=outputlogtoinitialstructure[outputlog]
             phaseangles=inistructophaselist[initialtinkerstructure]
@@ -613,7 +616,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                 cartxyz=outputlog.replace('.log','.xyz')
                 opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
                 tinkerxyz=outputlog.replace('.log','_tinker.xyz')
-                print('cehcking outputlog',outputlog)
                 bondtoposame=CheckBondTopology(poltype,outputlog,initialtinkerstructure)
                 while bondtoposame==False:
                     poltype.optmaxcycle+=2            

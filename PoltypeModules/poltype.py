@@ -1153,7 +1153,7 @@ class PolarizableTyper():
         self.atomnum=mol.NumAtoms() 
         self.totalcharge=mol.GetTotalCharge()
         # Begin log. *-poltype.log
-        self.logfh = open(self.logfname,"a",buffering=1)
+        self.logfh = open(self.logfname,"w",buffering=1)
         if not os.path.exists(self.scrtmpdirpsi4):
             mkdirstr='mkdir '+self.scrtmpdirpsi4
             self.call_subsystem(mkdirstr,True)

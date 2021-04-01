@@ -181,15 +181,25 @@ def GrabFinalXYZStructure(poltype,logname,filename,mol):
         temp.write('\n')
         finalmarker=False
         lengthchange=None
+        lastsuccessidx=None
         for lineidx in range(len(results)):
             line=results[lineidx]
             if 'Successfully symmetrized geometry' in line:
                 lastsuccessidx=lineidx
+        if lastsuccessidx==None: # sometimes it doesnt print this but converges? 
+            lastsuccessidx=len(results)-1
         for lineidx in range(len(results)):
             line=results[lineidx]
-            if lineidx<lastsuccessidx:
-                if 'Geometry (in Angstrom)' in line:
-                    lastidx=lineidx
+            try:
+                if lineidx<lastsuccessidx:
+                    if 'Geometry (in Angstrom)' in line:
+                        lastidx=lineidx
+            except:
+                print('logname',logname)
+                if lineidx<lastsuccessidx:
+                    if 'Geometry (in Angstrom)' in line:
+                        lastidx=lineidx
+
         for lineidx in range(len(results)):
             line=results[lineidx]
             if 'Geometry (in Angstrom)' in line and lineidx==lastidx:
