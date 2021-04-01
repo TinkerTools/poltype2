@@ -955,7 +955,7 @@ def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndli
 
             if (allhydtor==False and allhydtoroneside==False)  and (aatomicnum==1 or datomicnum==1):
                 continue
-            if (allhydtoroneside==True or allhydtors==True) and (aatomicnum==1 or datomicnum==1):
+            if (allhydtoroneside==True or allhydtor==True) and (aatomicnum==1 or datomicnum==1):
 
          
                 if count>=1:

@@ -8,14 +8,18 @@ import apicall as call
 import shlex
 import numpy as np
 
-def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,restraints,skipscferror):
+def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,restraints,skipscferror,chg):
     tempread=open(comfilecoords,'r')
     results=tempread.readlines()
     tempread.close()
     inputname=comfilename.replace('.com','.psi4')
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
-    temp.write('%d %d\n' % (mol.GetTotalCharge(), 1))
+    if chg==None:
+        temp.write('%d %d\n' % (mol.GetTotalCharge(), 1))
+    else:
+        temp.write('%d %d\n' % (chg, 1))
+
     for lineidx in range(len(results)):
         line=results[lineidx]
         linesplit=line.split()
@@ -195,7 +199,6 @@ def GrabFinalXYZStructure(poltype,logname,filename,mol):
                     if 'Geometry (in Angstrom)' in line:
                         lastidx=lineidx
             except:
-                print('logname',logname)
                 if lineidx<lastsuccessidx:
                     if 'Geometry (in Angstrom)' in line:
                         lastidx=lineidx
@@ -445,9 +448,8 @@ def StructureMinimization(poltype):
     poltype.call_subsystem(cmd, True)
 
 
-def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,restraints=None,skipscferror=False):
+def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,restraints=None,skipscferror=False,charge=None): # specify charge instead of reading from mol if charge!=None
     poltype.WriteToLog("NEED QM Density Matrix: Executing Gaussian Opt and SP")
-
     
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt
         term,error=poltype.CheckNormalTermination(poltype.logoptfname)
@@ -482,7 +484,8 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,restraints=None
         poltype.WriteToLog("Calling: " + "Psi4 Optimization")
         term,error=poltype.CheckNormalTermination(poltype.logoptfname)
         modred=False
-        inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol,modred,restraints,skipscferror)
+
+        inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol,modred,restraints,skipscferror,charge)
         if term==False:
             cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+inputname+' '+poltype.logoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}

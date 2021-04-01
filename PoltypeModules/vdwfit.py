@@ -523,7 +523,11 @@ def ReadCounterPoiseAndWriteQMData(poltype,logfilelist):
                     interenergy=float(linesplit[3])*poltype.Hartree2kcal_mol
 
         tmpfh.close()
-        temp.write(f.replace('_sp.log','.xyz')+' '+str(interenergy)+'\n')
+        try:
+            temp.write(f.replace('_sp.log','.xyz')+' '+str(interenergy)+'\n')
+        except:
+            temp.write(f.replace('_sp.log','.xyz')+' '+str(interenergy)+'\n')
+
     temp.close()
 
 
@@ -1486,6 +1490,8 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     fullprefixarrays=[]
     fulldistarrays=[]
     alloutputfilenames=[]
+    originalcharge=poltype.mol.GetTotalCharge()
+    originalmul=poltype.mol.GetTotalSpinMultiplicity()
     for i in range(len(probeindices)):
         filenameslist=dimerfiles[i]
         restraintslist=atomrestraintslist[i]
@@ -1498,12 +1504,21 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
         for probeidx in range(len(probeindexlist)):
             filename=filenameslist[probeidx]
             restraints=restraintslist[probeidx]
-            dimermol = openbabel.OBMol()
+            mol = openbabel.OBMol()
+            if 'water' in filename:
+                totchg=originalcharge
+                totmul=originalmul
+            else: # homodimer
+                totchg=2*originalcharge
+                totmul=originalmul# assume is always 1
+            mol.SetTotalCharge(totchg)
+            mol.SetTotalSpinMultiplicity(totmul)
+            chk=mol.GetTotalCharge()
             probeindex=probeindexlist[probeidx]
             moleculeindex=moleculeindexlist[probeidx]
             inFormat = obConversion.FormatFromExt(filename)
             obConversion.SetInFormat(inFormat)
-            obConversion.ReadFile(dimermol, filename)
+            obConversion.ReadFile(mol, filename)
             prefix=filename.replace('.xyz','')
             check=CheckIfFittingCompleted(poltype,prefix)
             checkarray.append(check)
@@ -1513,12 +1528,12 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             poltype.logoptfname=prefix+'-opt.log'
             poltype.gausoptfname=prefix+'-opt.log'
             try:
-                optmol = opt.GeometryOptimization(poltype,dimermol,checkbonds=False,modred=False,restraints=restraints,skipscferror=False)
+                optmol = opt.GeometryOptimization(poltype,mol,checkbonds=False,modred=False,restraints=restraints,skipscferror=False,charge=totchg)
             except:
                 continue
 
             prefixarrays.append(prefix)
-            dimeratoms=dimermol.NumAtoms()
+            dimeratoms=mol.NumAtoms()
             moleculeatoms=dimeratoms-probeatoms
             moleculeatom=optmol.GetAtom(moleculeindex)
             probeatom=optmol.GetAtom(probeindex)
@@ -1563,11 +1578,6 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             flat_distarrays = [item for sublist in subdistarrays for item in sublist]
             flat_filenames = [item for sublist in subfilenames for item in sublist]
             flat_filenames = [item for sublist in flat_filenames for item in sublist]
-            print('flat_probeindices',flat_probeindices)
-            print('flat_moleculeindices',flat_moleculeindices)
-            print('flat_prefixarrays',flat_prefixarrays)
-            print('flat_distarrays',flat_distarrays)
-            print('flat_filenames',flat_filenames) 
 
             while goodfit==False:
                 if count>2:
