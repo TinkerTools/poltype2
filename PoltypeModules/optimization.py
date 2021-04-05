@@ -293,6 +293,7 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
                 for line in basissetlines: 
                     tmpfh.write(line)
 
+
         temp=open(poltype.basissetpath+poltype.iodineoptbasissetfile,'r')
         results=temp.readlines()
         temp.close()
@@ -306,25 +307,32 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
         tmpfh.write('\n')
     tmpfh.close()
 
-   
 def GenerateElementToBasisSetLines(poltype,basissetfile):
     elementtobasissetlines={}
     temp=open(basissetfile,'r')
     results=temp.readlines()
     temp.close()
     lines=[]
-    element=None
-    for line in results:
-        linesplit=line.split()
-        if len(linesplit)==2 and linesplit[0].isalpha() and linesplit[1]=='0':
-            if element!=None:
-                elementtobasissetlines[element]=lines
+    for lineidx in range(len(results)):
+        line=results[lineidx]
+        if lineidx==0:  
+            linesplit=line.split()
             element=linesplit[0]
             lines=[line]
+            elementtobasissetlines[element]=lines
+        elif lineidx>0 and  '****' in results[lineidx-1]:
+            linesplit=line.split()
+            element=linesplit[0]
+            lines=[line]
+            elementtobasissetlines[element]=lines
         else:
             lines.append(line)
+            elementtobasissetlines[element]=lines
+
+
     return elementtobasissetlines
-      
+   
+     
  
 def gen_opt_str(poltype,optimizeoptlist):
     optstr = "#P opt"
