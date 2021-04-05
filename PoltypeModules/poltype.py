@@ -728,8 +728,8 @@ class PolarizableTyper():
         self.peditinfile = self.assign_filenames ( "peditinfile" , "-peditin.txt")
         self.superposeinfile = self.assign_filenames ( "superposeinfile" , "-superin.txt")
         self.espgrdfname = self.assign_filenames ( "espgrdfname" , ".grid")
-        self.qmespfname = self.assign_filenames ( "qmespfname" , ".cube")
-        self.qmesp2fname = self.assign_filenames ( "qmesp2fname" , ".pot")
+        self.qmespfname = self.assign_filenames ( "qmespfname" , "_fortinker.cube")
+        self.qmesp2fname = self.assign_filenames ( "qmesp2fname" , "_fortinker.pot")
         self.grpfname = self.assign_filenames ( "grpfname" , "-groups.txt")
         self.key2fname = self.assign_filenames ( "key2fname" , ".key_2")
         self.key3fname = self.assign_filenames ( "key3fname" , ".key_3")
@@ -886,7 +886,7 @@ class PolarizableTyper():
         return count
 
 
-    def CheckNormalTermination(self,logfname,errormessages=None): # needs to handle error checking now
+    def CheckNormalTermination(self,logfname,errormessages=None,skiperrors=False): # needs to handle error checking now
         """
         Intent: Checks the *.log file for normal termination
         """
@@ -919,7 +919,7 @@ class PolarizableTyper():
 
             if error==True:
                 message='Error '+errorline+ 'logpath='+logfname
-            if error==True and term==False:
+            if error==True and term==False and skiperrors==False:
                 if errormessages!=None:
                     if message not in errormessages:
                         self.WriteToLog(message) 

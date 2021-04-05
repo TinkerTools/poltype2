@@ -33,11 +33,6 @@ def gen_esp_grid(poltype,mol):
     if poltype.use_gaus==False or poltype.use_gausoptonly==True:
         Vvals,gridpts=GrabGridData(poltype)
 
-        #while len(gridpts) != len(Vvals):
-        #    time.sleep(60)
-        #    sys.stdout.flush()
-        #    poltype.WriteToLog('Waiting to flush system stdout for grid.dat and grid_esp.dat')
-        #    Vvals,gridpts=GrabGridData(poltype)
    
         # Generate a "cube" file.  I have no idea what the format should be (it's not a
         # regular cube file) so I reverse engineered one by looking at TINKER source.
@@ -82,6 +77,8 @@ def GrabGridData(poltype):
         gridpts = fp.readlines()
     return Vvals,gridpts
 
+
+      
 def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,numproc,charge,makecube=None):
     tempread=open(comfilecoords,'r')
     results=tempread.readlines()

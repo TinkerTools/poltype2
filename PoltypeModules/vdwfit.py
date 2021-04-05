@@ -1553,7 +1553,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             poltype.logoptfname=prefix+'-opt.log'
             poltype.gausoptfname=prefix+'-opt.log'
             try:
-                optmol = opt.GeometryOptimization(poltype,mol,checkbonds=False,modred=False,restraints=restraints,skipscferror=False,charge=totchg)
+                optmol = opt.GeometryOptimization(poltype,mol,checkbonds=False,modred=False,restraints=restraints,skipscferror=False,charge=totchg,skiperrors=True)
             except:
                 moleculeprobeindicestoignore.append([moleculeindex,probeindex])
                 continue

@@ -448,7 +448,7 @@ def StructureMinimization(poltype):
     poltype.call_subsystem(cmd, True)
 
 
-def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,restraints=None,skipscferror=False,charge=None): # specify charge instead of reading from mol if charge!=None
+def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,restraints=None,skipscferror=False,charge=None,skiperrors=False): # specify charge instead of reading from mol if charge!=None
     poltype.WriteToLog("NEED QM Density Matrix: Executing Gaussian Opt and SP")
     
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt
@@ -482,7 +482,7 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,restraints=None
     else:
         gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol,modred)
         poltype.WriteToLog("Calling: " + "Psi4 Optimization")
-        term,error=poltype.CheckNormalTermination(poltype.logoptfname)
+        term,error=poltype.CheckNormalTermination(poltype.logoptfname,None,skiperrors)
         modred=False
 
         inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol,modred,restraints,skipscferror,charge)
@@ -500,8 +500,8 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,restraints=None
                 if len(jobtooutputlog.keys())!=0:
                     call.CallExternalAPI(poltype,jobtolog,jobtologlistfilepathprefix,scratchdir)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
-        term,error=poltype.CheckNormalTermination(poltype.logoptfname) # now grabs final structure when finished with QM if using Psi4
-        if error and term==False:
+        term,error=poltype.CheckNormalTermination(poltype.logoptfname,None,skiperrors) # now grabs final structure when finished with QM if using Psi4
+        if error and term==False and skiperrors==False:
             poltype.RaiseOutputFileError(poltype.logoptfname) 
         GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'),mol)
         optmol =  load_structfile(poltype,poltype.logoptfname.replace('.log','.xyz'))
