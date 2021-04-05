@@ -879,12 +879,15 @@ def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprmtosmartslist,param
             if len(parametersmartstomatchlen.keys())==0:
                 smartslist=ReplaceEachAtomIdentityOnEnd(poltype,smartslist[0]) 
                 parametersmartstomatchlen,parametersmartstosmartslist=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
+
                 if len(parametersmartstomatchlen.keys())==0:
                     smartslist=ReplaceAtomIdentitiesOnEnd(poltype,smartslist[0])
                     parametersmartstomatchlen,parametersmartstosmartslist=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
+
                     if len(parametersmartstomatchlen.keys())==0:
                         smartslist=ReplaceAllAtomIdentities(poltype,smartslist[0])
                         parametersmartstomatchlen,parametersmartstosmartslist=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
+
                         listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls)
                         
                     else:
@@ -969,6 +972,7 @@ def ReplaceAllAtomIdentities(poltype,smartsls):
         tempsplit=copy.deepcopy(smartsplit)
         for idx in range(len(tempsplit)):
             tempsplit[idx]='[*]'
+
         newsmarts='~'.join(tempsplit)
         newsmartslist.append(newsmarts) 
     newsmartslist=[newsmartslist]
@@ -1060,6 +1064,21 @@ def ReplaceSMARTSBondsWithGenericBonds(poltype,smartslist,atomindices,mol):
         temp=[]
         for smarts in smartsls:
             newsmarts=smarts.replace('-','~').replace('=','~').replace(':','~')
+            tmpsmarts=''
+            for eidx in range(len(newsmarts)):
+                e=newsmarts[eidx]
+                replace=False
+                if eidx>0:
+                    if e=='#':
+                        if newsmarts[eidx-1]=='[':
+                            pass
+                        else:
+                            replace=True
+                if replace==True:
+                    tmpsmarts+='~'
+                else:
+                    tmpsmarts+=e
+            newsmarts=tmpsmarts
             temp.append(newsmarts)
         newsmartslist.append(temp)
     return newsmartslist
@@ -1139,6 +1158,7 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         for newmtch in newbabelmatches:
             if newmtch not in matches:
                 matches.append(newmtch)
+
         for match in matches:
             validmatch=CheckMatch(poltype,match,atomindices,smartsfortransfer)
             if validmatch==True:
@@ -1185,7 +1205,7 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
                 elementtinkerdescrip=parametersmartsordertoelementtinkerdescrip[specialindex]
                 for index in indexes:
                     parametersmartsordertoelementtinkerdescrip[index]=elementtinkerdescrip
-                
+            
         smartindices=[moleculeindextosmartsindex[i] for i in atomindices]
         parametersmartindices=[smartsindextoparametersmartsindex[i] for i in smartindices]
         parametersmartsorders=[i+1 for i in parametersmartindices]

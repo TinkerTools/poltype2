@@ -1090,23 +1090,8 @@ class PolarizableTyper():
         proc=int(self.numproc)
         if proc>8:
             raise ValueError('Too many input processors, lower the numproc value to 8 or less')
-        maxmem_value,maxdisk_value=self.GenerateMemoryValues() 
-        if maxmem_value<50:
-            if maxdisk_value<2*maxmem_value:
-                raise ValueError('Increase maxdisk value to twice maxmem value')
            
-    def GenerateMemoryValues(self):
-        if 'MB' in self.maxmem:
-            maxmem_value=float(self.maxmem[:-2])*.001 # convert to GB
-        elif 'GB' in self.maxmem:
-            maxmem_value=float(self.maxmem[:-2])           
-        if 'MB' in self.maxdisk:
-            maxdisk_value=float(self.maxdisk[:-2])*.001 # convert to GB
-        elif 'GB' in self.maxmem:
-            maxdisk_value=float(self.maxdisk[:-2])  
-        return maxmem_value,maxdisk_value         
-
-
+    
     def CheckInputCharge(self,molecule):
         atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
         for atom in molecule.GetAtoms():
