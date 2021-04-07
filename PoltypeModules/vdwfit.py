@@ -19,6 +19,7 @@ from scipy.optimize import fmin
 from scipy import optimize
 import shutil
 import copy
+import traceback
 
 def best_fit_slope_and_intercept(xs,ys):
     xs=np.array(xs)
@@ -1482,8 +1483,10 @@ def RemoveIgnoredIndices(poltype,probeindices,moleculeindices,moleculeprobeindic
             else:
                 newmoleculeindexlist.append(moleculeindex)
                 newprobeindexlist.append(probeindex)
-        finalprobeindices.append(newprobeindexlist)
-        finalmoleculeindices.append(newmoleculeindexlist)
+        if len(newprobeindexlist)!=0:
+            finalprobeindices.append(newprobeindexlist)
+        if len(newmoleculeindexlist)!=0:
+            finalmoleculeindices.append(newmoleculeindexlist)
 
 
     return finalprobeindices,finalmoleculeindices
@@ -1555,6 +1558,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             try:
                 optmol = opt.GeometryOptimization(poltype,mol,checkbonds=False,modred=False,restraints=restraints,skipscferror=False,charge=totchg,skiperrors=True)
             except:
+
                 moleculeprobeindicestoignore.append([moleculeindex,probeindex])
                 continue
 

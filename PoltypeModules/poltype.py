@@ -911,13 +911,17 @@ class PolarizableTyper():
                     if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line:
                         error=False
                         continue
-                    if ('Error termination request processed by link 9999' in line or 'Error termination via Lnk1e in' in line) or ('OptimizationConvergenceError' in line) and 'opt' in logfname:
-                        if self.CycleCount(logfname)>=poltype.optmaxcycle:
-                            term=True
-                            error=False
+                    if ('Error termination request processed by link 9999' in line or 'Error termination via Lnk1e in' in line) or (('OptimizationConvergenceError' in line and 'except' not in line) or 'PsiException: Could not converge geometry optimization in' in line) and 'opt' in logfname:
+                        error=True
+                        errorline=line
+            if 'opt' in logfname:
+                if self.CycleCount(logfname)>=poltype.optmaxcycle:
+                    term=True
+                    error=False
 
 
             if error==True:
+                term=False # sometimes psi4 geometry opt not fully converge but says successfully exiting etc..
                 message='Error '+errorline+ 'logpath='+logfname
             if error==True and term==False and skiperrors==False:
                 if errormessages!=None:

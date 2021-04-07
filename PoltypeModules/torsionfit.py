@@ -919,7 +919,6 @@ def GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_
         numprms+= len(torprmdict[classkey]['prmdict'].keys())
     string=' , '.join(list(torprmdict.keys()))
     datapts=len(mm_energy_list)
-    print('Torsions being fit',string,'RMSD(QM-MM1)',minRMSD)
     poltype.WriteToLog('Torsions being fit '+string+' RMSD(QM-MM1)'+str(minRMSD))
     if dim==1:
         xpoints=numpy.array([Sx[i][0] for i in range(len(Sx))])
@@ -1508,7 +1507,7 @@ def PostfitMinAlz(poltype,keybasename,keybasepath):
         if term==True:   
             if not poltype.use_gaus:
                 cartxyzname=optoutputlog.replace('.log','.xyz')
-
+                
                 cartxyz,torxyzfname=torgen.tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,cartxyzname,poltype.torsionrestraint,'_postQMOPTpostfit',keybasename,keybasepath,bondtopology)
             else:
                 cartxyz,torxyzfname=torgen.tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,outputlog,poltype.torsionrestraint,'_postQMOPTpostfit',keybasename,keybasepath,bondtopology)

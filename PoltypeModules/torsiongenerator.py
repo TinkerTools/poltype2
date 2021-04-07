@@ -662,7 +662,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             if outputlog in finishedjobs and outputlog not in errorjobs:
                 finishedoutputlogs.append(outputlog)
                 finishedflatphaselist.append(phaselist)
-
         outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangles=ExecuteSPJobs(poltype,finishedoutputlogs,finishedflatphaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,mol)
         lognames=[]
         torsettospoutputlogs[tuple(torset)]=outputlogs
@@ -682,8 +681,9 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         for i in range(len(outputlogs)):
             outputlog=outputlogs[i]
             optoutputlog=optoutputlogs[i]
-            phaseangles=outputlogtophaseangles[outputlog]
-            poltype.optoutputtotorsioninfo[outputlog]= [torset,optmol,variabletorlist,phaseangles,bondtopology,optoutputlog]
+            if optoutputlog in finishedjobs and outputlog not in errorjobs:
+                phaseangles=outputlogtophaseangles[outputlog]
+                poltype.optoutputtotorsioninfo[outputlog]= [torset,optmol,variabletorlist,phaseangles,bondtopology,optoutputlog]
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMSPJobToLog'+'_'+poltype.molecprefix
     if poltype.externalapi!=None:
         if len(fulllistofjobs)!=0:
