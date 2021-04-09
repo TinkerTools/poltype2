@@ -1623,12 +1623,12 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         arob=arobools[1]
         aroc=arobools[2]
         arod=arobools[3]
-        allaro=False
         hybs=[a.GetHyb() for a in babelatoms]
         hybb=hybs[1]
-        hybc=hybs[2] 
-        if ((arob==True or aroc==True) or (hybb==2 and hybc==2)) and (ringb==True and ringc==True):
-            allaro=True
+        hybc=hybs[2]
+        anyarot2=CheckForAnyAromaticsInRing(poltype,babelindices[1])
+        anyarot3=CheckForAnyAromaticsInRing(poltype,babelindices[2])
+
         if contin==True:
             continue
 
@@ -1648,7 +1648,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                     matcharray.append(idx)
         check=CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,matcharray)
         
-        if poltype.transferanyhydrogentor==True and allaro==False: 
+        if poltype.transferanyhydrogentor==True and (anyarot2==False and anyarot3==False): 
             if atomicnumatoma==1 or atomicnumatomd==1:
                 if allhydrogentor==False and allhydrogentoroneside==False:
                     continue
@@ -1656,7 +1656,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                     if torsionindices not in torsionsmissing:
                         torsionsmissing.append(torsionindices)
         if '~' in smarts or '*' in smarts:
-            if allaro==False:
+            if (anyarot2==False and anyarot3==False):
                 if torsionindices not in torsionsmissing:
                     torsionsmissing.append(torsionindices)
             else:
@@ -1665,7 +1665,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             continue
 
         if check==False:
-            if allaro==False:
+            if (anyarot2==False and anyarot3==False):
                 if torsionindices not in torsionsmissing:
                     torsionsmissing.append(torsionindices)
             else:
@@ -1677,6 +1677,27 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                     torsionsmissing.append(torsionindices)
 
     return torsionsmissing,poormatchingaromatictorsions 
+
+def GrabRingAtoms(poltype,neighbatom):
+    ri = poltype.rdkitmol.GetRingInfo()
+    ls=ri.AtomRings()
+    atmidx=neighbatom.GetIdx()
+    for grp in ls:
+        if atmidx in grp:
+            return grp
+    grp=[]
+    return grp
+    
+def CheckForAnyAromaticsInRing(poltype,babelindex):
+    rdkitindex=babelindex-1
+    rdkitatom=poltype.rdkitmol.GetAtomWithIdx(rdkitindex)
+    ringindexes=GrabRingAtoms(poltype,rdkitatom)
+    anyaro=False
+    for index in ringindexes:
+        atm=poltype.rdkitmol.GetAtomWithIdx(index)
+        if atm.GetIsAromatic()==True:
+            anyaro=True
+    return anyaro
 
 
 def FindAllNeighborIndexes(poltype,rdkitmol):
@@ -3589,6 +3610,11 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     torsionindicestotinkertypes,torsionindicestotinkerclasses,torsionindicestoparametersmartsatomorders,torsionindicestoelementtinkerdescrips,torsionindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,torsionsforprmtoparametersmarts,torsionsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
     originalbondindicestosmartsatomorders=bondindicestosmartsatomorders.copy()
     originalangleindicestosmartsatomorders=angleindicestosmartsatomorders.copy()
+    print('torsionindicestotinkertypes',torsionindicestotinkertypes)
+    print('torsionindicestotinkerclasses',torsionindicestotinkerclasses)
+    print('torsionindicestoparametersmartsatomorders',torsionindicestoparametersmartsatomorders) 
+    print('torsionindicestoelementtinkerdescrips',torsionindicestoelementtinkerdescrips)
+    print('torsionindicestosmartsatomorders',torsionindicestosmartsatomorders)
 
     formissingangleindicestosmartsatomorders=RemoveIndicesMatchedFromNewDatabase(poltype,angleindicestosmartsatomorders,newangleindicestopoltypeclasses) 
 
@@ -3626,6 +3652,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     anglepoltypeclassestotinkerclasses=ReverseDictionaryValueList(poltype,angletinkerclassestopoltypeclasses)
     planarangletinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,planarangleindicestotinkerclasses)
     torsiontinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,torsionindicestotinkerclasses)
+    print('torsiontinkerclassestopoltypeclasses',torsiontinkerclassestopoltypeclasses)
     torsionsmissingtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,torsionsmissingindicestotinkerclasses)
     arotorsionsmissingtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,arotorsionsmissingindicestotinkerclasses)
     anglemissingtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,anglemissingindicestotinkerclasses)
@@ -3656,6 +3683,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     fname=poltype.smallmoleculeprmlib
     bondprms,angleprms,torsionprms,strbndprms,mpoleprms,opbendprms,polarizeprms,vdwprms,torsiontopitor=GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendtinkerclassestopoltypeclasses,opbendtinkerclassestotrigonalcenterbools,angletinkerclassestopoltypeclasses,torsiontinkerclassestopoltypeclasses,poltypetoprmtype,atomtinkerclasstopoltypeclass,typestoframedefforprmfile,fname,True)
     torsionprms=CorrectPitorEnergy(poltype,torsionprms,torsiontopitor)
+    print('torsionprms',torsionprms)
     angleprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips=RemoveOldParametersKeepNewParameters(poltype,angleprms,newangleindicestopoltypeclasses,'angle',anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips)
     opbendprms,blankbondpoltypeclassestoparametersmartsatomorders,blankbondpoltypeclassestosmartsatomorders,blankbondpoltypeclassestoelementtinkerdescrips=RemoveOldParametersKeepNewParameters(poltype,opbendprms,newopbendindicestopoltypeclasses,'opbend',bondpoltypeclassestoparametersmartsatomorders,bondpoltypeclassestosmartsatomorders,bondpoltypeclassestoelementtinkerdescrips,removefromdic=False)
 
@@ -3689,6 +3717,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     angleprms=AddOptimizedAngleLengths(poltype,optmol,angleprms,anglelistbabel)
     torsionprms=ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,torsionprms)
     torsionprms=DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopoltypeclasses,torsionprms)
+    print('torsionprms final',torsionprms)
     torsionkeystringtoparameters=GrabTorsionParameterCoefficients(poltype,torsionprms)
     potentialmissingopbendprmtypes=FindPotentialMissingParameterTypes(poltype,opbendprms,planarbondtinkerclassestopoltypeclasses)
     potentialmissingopbendprmindices=ConvertPoltypeClassesToIndices(poltype,potentialmissingopbendprmtypes)

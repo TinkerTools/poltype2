@@ -663,7 +663,9 @@ def gen_gdmain(poltype,gdmainfname,molecprefix,fname,dmamethod):
     tmpfh.write("Radius H 0.60\n")
     tmpfh.write("Radius S 0.85\n")
     tmpfh.write("Radius P 0.95\n")
-    tmpfh.write("Radius Cl 1.10\n")
+    tmpfh.write("Radius Cl 1.0\n")
+    tmpfh.write("Radius Br 1.1\n")
+    tmpfh.write("Radius I 1.3\n")
     tmpfh.write("\n")
     tmpfh.write("Start\n")
     tmpfh.write("\n")
@@ -682,20 +684,35 @@ def run_gdma(poltype):
     1. Generates the gdma input file by calling 'gen_gdmain'
     2. Runs the following command: gdma < *.gdmain > *.gdmaout
     """
+    if poltype.use_gaus==True:
+        poltype.WriteToLog("NEED DMA: Executing GDMA")
 
-    poltype.WriteToLog("NEED DMA: Executing GDMA")
+        if not os.path.isfile(poltype.fckdmafname):
+            poltype.fckdmafname = os.path.splitext(poltype.fckdmafname)[0]
 
-    if not os.path.isfile(poltype.fckdmafname):
-        poltype.fckdmafname = os.path.splitext(poltype.fckdmafname)[0]
+        assert os.path.isfile(poltype.fckdmafname), "Error: " + poltype.fckdmafname + " does not exist."+' '+os.getcwd()
+        poltype.gdmainfname = poltype.assign_filenames ( "gdmainfname" , ".gdmain")
+        gen_gdmain(poltype,poltype.gdmainfname,poltype.molecprefix,poltype.fckdmafname,poltype.dmamethod)
 
-    assert os.path.isfile(poltype.fckdmafname), "Error: " + poltype.fckdmafname + " does not exist."+' '+os.getcwd()
-    poltype.gdmainfname = poltype.assign_filenames ( "gdmainfname" , ".gdmain")
-    gen_gdmain(poltype,poltype.gdmainfname,poltype.molecprefix,poltype.fckdmafname,poltype.dmamethod)
+        cmdstr = poltype.gdmaexe + " < " + poltype.gdmainfname + " > " + poltype.gdmafname
+        poltype.call_subsystem(cmdstr,True)
 
-    cmdstr = poltype.gdmaexe + " < " + poltype.gdmainfname + " > " + poltype.gdmafname
-    poltype.call_subsystem(cmdstr,True)
-
-    assert os.path.getsize(poltype.gdmafname) > 0, "Error: " + os.getcwd() +' '+os.path.basename(poltype.gdmaexe) + " cannot create .gdmaout file."
+        assert os.path.getsize(poltype.gdmafname) > 0, "Error: " + os.getcwd() +' '+os.path.basename(poltype.gdmaexe) + " cannot create .gdmaout file."
+    else:
+        temp=open(poltype.logdmafname,'r')
+        results=temp.readlines()
+        temp.close()
+        temp=open(poltype.gdmafname,'w')
+        start=False
+        for line in results:
+            if 'G D M A' in line:
+                start=True
+            if 'Finished at' in line:
+                temp.write(line)
+                start=False
+            if start==True:
+                temp.write(line)
+        temp.close()
 
 def AverageMultipoles(poltype,optmol):
     # gen input file

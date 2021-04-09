@@ -1504,6 +1504,9 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     poltype.optmethod='wB97X-D'
     poltype.espmethod='wB97X-D'
     poltype.espbasisset="aug-cc-pVDZ"
+    tempuse_gaus=poltype.use_gaus
+    tempuse_gausoptonly=poltype.use_gausoptonly
+
     poltype.use_gaus=False
     poltype.use_gausoptonly=False
     poltype.SanitizeAllQMMethods()
@@ -1685,3 +1688,6 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
 
     shutil.copy(poltype.key5fname,'../'+poltype.key5fname)
     os.chdir(poltype.parentdir)
+    poltype.use_gaus=tempuse_gaus
+    poltype.use_gausoptonly=tempuse_gausoptonly
+

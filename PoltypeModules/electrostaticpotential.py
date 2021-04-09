@@ -156,6 +156,8 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
         temp.write("E, wfn = energy('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower(),poltype.dmabasisset)+'\n')
     temp.write('cubeprop(wfn)'+'\n')
     temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
+    header=poltype.molstructfname.split('.')[0]
+    temp.write('gdma(wfn,"%s")'%(header+'.gdmain')+'\n')
     temp.write('clean()'+'\n')
     temp.close()
     return inputname
@@ -484,14 +486,13 @@ def GrabQMDipoles(poltype,optmol,logname):
 
                 
     else:
-        grepcmd = 'grep -A7 "Dipole moment" ' + logname+'>'+'QMDipole.txt'
-        poltype.call_subsystem(grepcmd,True)
-        temp=open('QMDipole.txt','r')
+        temp=open(logname,'r')
         results=temp.readlines()
         temp.close()
         for line in results:
             linesplit=line.split()
-            if 'Tot' in line:
+            
+            if 'Tot' in line and 'X' in line and 'Y' in line and 'Z' in line:
                 dipole=np.array([float(linesplit[1]),float(linesplit[3]),float(linesplit[5])])
                 dipole=ConvertDipoleToCOMFrame(poltype,dipole,optmol)
     dipole=np.array([round(dipole[0],3),round(dipole[1],3),round(dipole[2],3)])

@@ -18,6 +18,7 @@ from rdkit import Chem
 from itertools import product,combinations
 import shlex
 from rdkit.Chem import rdmolfiles
+from rdkit.Chem.EnumerateHeterocycles import EnumerateHeterocycles
 
 def __init__(poltype):
     PolarizableTyper.__init__(poltype)
@@ -144,66 +145,85 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     strctfname = os.path.splitext(toroptcomfname)[0] + '.log'
     gen_torcomfile(poltype,toroptcomfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,optmol,torxyzfname,mol) # prevstruct is just used for Atomic Num and charge,torxyzfname is used for xyz coordinates
     # Append restraints to *opt*.com file
-    tmpfh = open(toroptcomfname, "a")
-    restlist=[]
-    # Fix all torsions around the rotatable bond b-c
-    count=0
-    for i in range(len(torset)):
-        tor=torset[i]
-        a,b,c,d=tor[:]
-        indices=[a,b,c,d]
-        allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,mol)
-        allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,mol)
-
-        aatom=mol.GetAtom(a)
-        datom=mol.GetAtom(d)
-        aatomicnum=aatom.GetAtomicNum()
-        datomicnum=datom.GetAtomicNum()
-        if (aatomicnum==1 or datomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
-            continue
-        if (allhydtorsoneside==True or allhydtors==True) and (aatomicnum==1 or datomicnum==1):
-            if count>=1:
-                continue
-            count+=1
-
-        babelindices=[b,c]
-        string=' '.join([str(b),str(c)])
-        if string in poltype.rotbndlist.keys(): 
-            tors=poltype.rotbndlist[string]
+    tempname=toroptcomfname.replace('.com','_temp.com')
+    temp=open(toroptcomfname,'r')
+    results=temp.readlines()
+    temp.close()
+    tmpfh = open(tempname, "w")
+    foundatomblock=False
+    writeres=False
+    for k in range(len(results)):
+        line=results[k]
+        linesplit=line.split() 
+        if len(linesplit)==4 and foundatomblock==False:
+            foundatomblock=True
+        if len(linesplit)!=4 and foundatomblock==True and writeres==False:
+            writeres=True
+            tmpfh.write('\n')
+            restlist=[]
+            # Fix all torsions around the rotatable bond b-c
             count=0
-            for resttors in tors:
-                rta,rtb,rtc,rtd = resttors
-                indices=[rta,rtb,rtc,rtd]
+            for i in range(len(torset)):
+                tor=torset[i]
+                a,b,c,d=tor[:]
+                indices=[a,b,c,d]
                 allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,mol)
                 allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,mol)
-                aatom=mol.GetAtom(rta)
-                datom=mol.GetAtom(rtd)
-                rtaatomicnum=aatom.GetAtomicNum()
-                rtdatomicnum=datom.GetAtomicNum()
-                if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
-                    continue
-                if (allhydtorsoneside==True or allhydtors==True) and (rtaatomicnum==1 or rtdatomicnum==1):
 
-              
+                aatom=mol.GetAtom(a)
+                datom=mol.GetAtom(d)
+                aatomicnum=aatom.GetAtomicNum()
+                datomicnum=datom.GetAtomicNum()
+                if (aatomicnum==1 or datomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
+                    continue
+                if (allhydtorsoneside==True or allhydtors==True) and (aatomicnum==1 or datomicnum==1):
                     if count>=1:
                         continue
                     count+=1
 
-                rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
-                if resttors not in variabletorlist and resttors not in restlist:
-                    tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
-                    restlist.append(resttors)
-    # Leave all torsions around other rotatable bonds fixed
-    for rotkey,torsions in poltype.rotbndlist.items():
-        for resttors in torsions:
-            rta,rtb,rtc,rtd = resttors
-            rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
-            if resttors not in restlist and resttors not in variabletorlist:
-                tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
-                restlist.append(resttors)
-    
+                babelindices=[b,c]
+                string=' '.join([str(b),str(c)])
+                if string in poltype.rotbndlist.keys(): 
+                    tors=poltype.rotbndlist[string]
+                    count=0
+                    for resttors in tors:
+                        rta,rtb,rtc,rtd = resttors
+                        indices=[rta,rtb,rtc,rtd]
+                        allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,mol)
+                        allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,mol)
+                        aatom=mol.GetAtom(rta)
+                        datom=mol.GetAtom(rtd)
+                        rtaatomicnum=aatom.GetAtomicNum()
+                        rtdatomicnum=datom.GetAtomicNum()
+                        if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
+                            continue
+                        if (allhydtorsoneside==True or allhydtors==True) and (rtaatomicnum==1 or rtdatomicnum==1):
+
+                      
+                            if count>=1:
+                                continue
+                            count+=1
+
+                        rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
+                        if resttors not in variabletorlist and resttors not in restlist:
+                            tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
+                            restlist.append(resttors)
+            # Leave all torsions around other rotatable bonds fixed
+            for rotkey,torsions in poltype.rotbndlist.items():
+                for resttors in torsions:
+                    rta,rtb,rtc,rtd = resttors
+                    rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
+                    if resttors not in restlist and resttors not in variabletorlist:
+                        tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
+                        restlist.append(resttors)
+            
+            tmpfh.write("\n")
+        else:
+            tmpfh.write(line)
     tmpfh.write("\n")
     tmpfh.close()
+    os.remove(toroptcomfname)
+    shutil.copy(tempname,toroptcomfname)
     outputname= os.path.splitext(toroptcomfname)[0] + '.log'
     return toroptcomfname,outputname
     
@@ -755,27 +775,15 @@ def RdkitIsInRing(poltype,atom):
 
 
 def GrabRingAtoms(poltype,neighbatom):
-    ringindexes=[]
-    prevringidxlen=len(ringindexes)
-    ringindexes.append(neighbatom.GetIdx())
-    ringidxlen=len(ringindexes)
-    while prevringidxlen!=ringidxlen:
-        for atmindex in ringindexes:
-            atm=poltype.rdkitmol.GetAtomWithIdx(atmindex)
-            ringbool,ringsize=RdkitIsInRing(poltype,atm)
-           
-            if ringbool==True and atmindex not in ringindexes:
-                ringindexes.append(atmindex)
-            for natm in atm.GetNeighbors():
-                ringbool,nringsize=RdkitIsInRing(poltype,natm)
-                if ringbool==True and natm.GetIdx() not in ringindexes:
-                    if nringsize==ringsize:
-                        ringindexes.append(natm.GetIdx())
-        prevringidxlen=ringidxlen
-        ringidxlen=len(ringindexes)
-
-    return ringindexes
-
+    ri = poltype.rdkitmol.GetRingInfo()
+    ls=ri.AtomRings()
+    atmidx=neighbatom.GetIdx()
+    for grp in ls:
+        if atmidx in grp:
+            return grp
+    grp=[]
+    return grp
+    
 def CheckForAnyAromaticsInRing(poltype,babelindex):
     rdkitindex=babelindex-1
     rdkitatom=poltype.rdkitmol.GetAtomWithIdx(rdkitindex)
@@ -838,6 +846,7 @@ def get_torlist(poltype,mol,missed_torsions):
             continue
         if t2val<2 or t3val<2:
             continue 
+        
         t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
         sortedtor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]])
         if(sortedtor in missed_torsions) and len(poltype.onlyrotbndslist)==0:
@@ -1245,7 +1254,6 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
     optimizeoptlist = ["ModRedundant","maxcycle=%s"%(poltype.optmaxcycle),'Loose']
 
     optstr=opt.gen_opt_str(poltype,optimizeoptlist)
-
     if ('-opt-' in comfname):
         if ('I ' in poltype.mol.GetSpacedFormula()):
             poltype.toroptbasisset='gen'
@@ -1270,9 +1278,8 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
             operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) Pop=NBORead" % (poltype.torspmethod,poltype.torspbasisset)
 
         commentstr = poltype.molecprefix + " Rotatable Bond SP Calculation on " + gethostname()   
-
     if ('I ' in poltype.mol.GetSpacedFormula()):
-        operationstring+=' pseudo=read'
+        operationstr+=' pseudo=read'
     string=' MaxDisk=%s \n'%(maxdisk)
     operationstr+=string
 
