@@ -357,8 +357,7 @@ def write_com_header(poltype,comfname,chkfname,maxdisk,maxmem,numproc):
 
 def CompareBondLengths(poltype,inioptmol,optmol):
     isnear=True
-    tol=.1
-
+    tol=.2
     for inib in openbabel.OBMolBondIter(inioptmol):
         beg = inib.GetBeginAtomIdx()
         end = inib.GetEndAtomIdx()
@@ -368,8 +367,7 @@ def CompareBondLengths(poltype,inioptmol,optmol):
             break
         iniblength=inib.GetLength()
         blength=b.GetLength()
-        
-        diff=np.abs(iniblength-blength)/iniblength
+        diff=np.abs(iniblength-blength)
         if diff>=tol:
             isnear=False
     return isnear
