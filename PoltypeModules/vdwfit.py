@@ -87,16 +87,33 @@ def writePRM(poltype,params,vdwtypes,idxtotype):
             vdwred=params[i]
         if vdwradius!=None and vdwdepth!=None and vdwred!=None:
             for line in rFile.readlines():
+                linesplit=line.split()
                 if vdwtype in line and 'vdw' in line:
-                    newline="vdw %s %s %s %s \n"%(vdwtype,vdwradius, vdwdepth,vdwred)
-                    vdwtypetonewline[vdwtype]=newline
-                    oFile.write(newline)
+                    if linesplit[1]==vdwtype:
+                        newline="vdw %s %s %s %s \n"%(vdwtype,vdwradius, vdwdepth,vdwred)
+                        vdwtypetonewline[vdwtype]=newline
+                        oFile.write(newline)
+                    else:
+                        notinline=True
+                        for othertype in vdwtypesalreadyfit:
+                            if othertype in line and 'vdw' in line:
+                                if linesplit[1]==othertype:
+                                    notinline=False
+                                    break
+                        if notinline==True:
+                            oFile.write(line)
+                        else:
+                            newline=vdwtypetonewline[othertype]
+                            oFile.write(newline)
+
+
                 else:
                     notinline=True
                     for othertype in vdwtypesalreadyfit:
                         if othertype in line and 'vdw' in line:
-                            notinline=False
-                            break
+                            if linesplit[1]==othertype:
+                                notinline=False
+                                break
                     if notinline==True:
                         oFile.write(line)
                     else:
@@ -107,7 +124,6 @@ def writePRM(poltype,params,vdwtypes,idxtotype):
             vdwradius=None
             vdwdepth=None
             vdwred=None
-      
     oFile.flush()
     os.fsync(oFile.fileno())
     oFile.close()
@@ -130,14 +146,38 @@ def readOneColumn(filename,columnnumber,prefix=None):
         array.append(value)
     return array
      
+def NormalizeTarget(poltype,filename,aprefix=None):
+    prefixarray=readOneColumn(filename,0)
+    energyarray=readOneColumn(filename,1)
+    energyarray=[float(i) for i in energyarray]
+    prefixtoenergyarray={}
+    for prefixidx in range(len(prefixarray)):
+        prefix=prefixarray[prefixidx]
+        if aprefix!=None:
+            if aprefix not in prefix:
+                continue
+        energy=energyarray[prefixidx]
+        prefixsplit=prefix.split('_')
+        prefixsplit=prefixsplit[:-1] 
+        prefix=''.join(prefixsplit)
+        if prefix not in prefixtoenergyarray.keys():
+            prefixtoenergyarray[prefix]=[]
+        prefixtoenergyarray[prefix].append(energy)
+    for prefix,energyarray in prefixtoenergyarray.items():
+        normenergyarray=[i-min(energyarray) for i in energyarray]
+        prefixtoenergyarray[prefix]=normenergyarray
+    totalenergyarray=[]
+    for prefix,energyarray in prefixtoenergyarray.items():
+        for e in energyarray:
+            totalenergyarray.append(e)
+    
+    return np.array(totalenergyarray)
 
-def myFUNC(params,poltype,vdwtypes,idxtotype):
+
+def myFUNC(params,poltype,vdwtypes,idxtotype,count):
     params=list(params)
     writePRM(poltype,params,vdwtypes,idxtotype)
-    target = []
-    target = readOneColumn("QM_DATA",1)
-    target=[float(i) for i in target]
-    target=[i-min(target) for i in target]
+    target = NormalizeTarget(poltype,'QM_DATA')
 
     temp=open('QM_DATA','r')
     cmdarray=[] 
@@ -154,31 +194,53 @@ def myFUNC(params,poltype,vdwtypes,idxtotype):
         poltype.call_subsystem(cmd,True)
 
     ReadAnalyzeEnergiesWriteOut(poltype,filenamearray)
-    vdw=readOneColumn("SP.dat",-1)
-    current=list(np.array(vdw))
-    current=[float(i) for i in current]
-    current=[i-min(current) for i in current]
-    return current
+    current = NormalizeTarget(poltype,'SP.dat')
+    current,target,distarray=ScreenHighEnergyPoints(poltype,current,target)
+    if count>1:
+        weightlist=np.exp(-np.array(target)/poltype.boltzmantemp)
+
+    else:
+        weightlist=np.ones(len(target))
+    return weightlist*(current-target)
+
+def ScreenHighEnergyPoints(poltype,current,target,distarray=None):
+    tol=15
+    newcurrent=[]
+    newtarget=[]
+    newdistarray=[]
+    for i in range(len(current)):
+        cur=current[i]
+        tar=target[i]
+        try:
+            if distarray==None:
+                pass
+        except:
+            dist=distarray[i]
+        if cur>=tol or tar>=tol:
+            pass
+        else:
+            newcurrent.append(cur)
+            newtarget.append(tar)
+            try:
+                if distarray==None:
+                    pass
+            except:
+                newdistarray.append(dist)
+    return np.array(newcurrent),np.array(newtarget),np.array(newdistarray)
 
 
 def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count,allprefix=False):
     if allprefix==False:
-        target = readOneColumn("QM_DATA",1,prefix)
-        vdw=readOneColumn("SP.dat",-1,prefix)
+        target= NormalizeTarget(poltype,'QM_DATA',prefix)
+        current=NormalizeTarget(poltype,'SP.dat',prefix)
+
     else:
         target=[]
-        vdw=[]
+        current=[]
         for ls in prefix:
-            target.extend(readOneColumn("QM_DATA",1,ls))
-            vdw.extend(readOneColumn("SP.dat",-1,ls))
-
-    target=[float(i) for i in target]
-    target=[i-min(target) for i in target]
-    target=np.array(target)
-    current=list(np.array(vdw))
-    current=[float(i) for i in current]
-    current=[i-min(current) for i in current]
-    current=np.array(current)
+            target.extend(NormalizeTarget(poltype,'QM_DATA',ls))
+            current.extend(NormalizeTarget(poltype,'SP.dat',ls))
+    current,target,distarray=ScreenHighEnergyPoints(poltype,current,target)
     vdwtypes=[str(i) for i in vdwtypesarray]
     vdwtypestring=','.join(vdwtypes)
     MSE=MeanError(current,target)
@@ -229,7 +291,7 @@ def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count,allprefix=False):
         prefstring=','.join(prefix)
         fig.savefig('QMvsAMOEBA-'+prefstring+'_'+vdwtypestring+suffix)
         prefix=prefstring
-    rmsetol=1.5
+    rmsetol=1.6
     relrmsetol=.2
     goodfit=True
     if new_rmse>rmsetol and new_rmse_rel>relrmsetol:
@@ -313,48 +375,44 @@ def VDWOptimizer(poltype,count,fitredboolarray):
     MyBounds=tuple(MyBounds)
     ''' local optimization method can be BFGS, CG, Newton-CG, L-BFGS-B,etc.., see here\
     https://docs.scipy.org/doc/scipy-0.19.1/reference/generated/scipy.optimize.minimize.html'''
-    y = readOneColumn("QM_DATA",1)
-    y=[float(i) for i in y]
-    y=np.array([i-min(y) for i in y])
-    weightlist=np.exp(-np.array(y)/poltype.boltzmantemp)
-    if count>1:
-        errorfunc= lambda p, poltype, vdwtypes, idxtotype, y: weightlist*(myFUNC(p,poltype,vdwtypes,idxtotype,)-y)
-
-    else:
-        errorfunc= lambda p, poltype, vdwtypes,idxtotype,  y: (myFUNC(p,poltype,vdwtypes,idxtotype)-y)
-
-    ret = optimize.least_squares(errorfunc, x0, jac='2-point', bounds=MyBounds, diff_step=1e-4,args=(poltype,vdwtypes,idxtotype,y))
+    errorfunc= lambda p, poltype, vdwtypes,idxtotype,count: (myFUNC(p,poltype,vdwtypes,idxtotype,count))
+    fail=False
+    try: 
+        ret = optimize.least_squares(errorfunc, x0, jac='2-point', bounds=MyBounds, diff_step=1e-4,args=(poltype,vdwtypes,idxtotype,count))
+    except:
+        fail=True
     vdwradii=[]
     vdwdepths=[] 
     vdwreds=[]
     ofile = open("RESULTS.OPT", "a")
-    for i in range(len(ret.x)):
-        vartype=idxtotype[i]
-        if vartype=='rad':
-            vdwradius=round(ret.x[i],3)
-            vdwradii.append(vdwradius)
+    if fail==False:
+        for i in range(len(ret.x)):
+            vartype=idxtotype[i]
+            if vartype=='rad':
+                vdwradius=round(ret.x[i],3)
+                vdwradii.append(vdwradius)
 
-        elif vartype=='depth':
-            vdwdepth=round(ret.x[i],3)
-            vdwdepths.append(vdwdepth)
-            if (i+1) in idxtotype.keys():
-                nexttype=idxtotype[i+1]
-                if nexttype!='red':
+            elif vartype=='depth':
+                vdwdepth=round(ret.x[i],3)
+                vdwdepths.append(vdwdepth)
+                if (i+1) in idxtotype.keys():
+                    nexttype=idxtotype[i+1]
+                    if nexttype!='red':
+                        vdwred=1
+                        vdwreds.append(vdwred)
+                else:
                     vdwred=1
                     vdwreds.append(vdwred)
-            else:
-                vdwred=1
+
+
+            elif vartype=='red':
+                vdwred=round(ret.x[i],3)
                 vdwreds.append(vdwred)
-
-
-        elif vartype=='red':
-            vdwred=round(ret.x[i],3)
-            vdwreds.append(vdwred)
-            
-    ofile.write("%s\n"%(ret.message))
-    ofile.write("\n")
+                
+        ofile.write("%s\n"%(ret.message))
+        ofile.write("\n")
     ofile.close()
-    return vdwradii,vdwdepths,vdwreds 
+    return vdwradii,vdwdepths,vdwreds,fail 
 
 
 def MoveDimerAboutMinima(poltype,txyzFile,outputprefixname,nAtomsFirst,atomidx1,atomidx2,equildistance,array):
@@ -537,13 +595,11 @@ def ReadCounterPoiseAndWriteQMData(poltype,logfilelist):
 def PlotEnergyVsDistance(poltype,distarray,prefix,radii,depths,reds,vdwtypesarray,count):
     vdwtypes=[str(i) for i in vdwtypesarray]
     vdwtypestring=','.join(vdwtypes)
-    qmenergyarray = readOneColumn("QM_DATA",1,prefix)
-    qmenergyarray=[float(i) for i in qmenergyarray]
-    qmenergyarray=[i-min(qmenergyarray) for i in qmenergyarray]
-    vdw=readOneColumn("SP.dat",-1,prefix)
-    energyarray=list(np.array(vdw))
-    energyarray=[float(i) for i in energyarray]
-    energyarray=[i-min(energyarray) for i in energyarray]
+    qmenergyarray = NormalizeTarget(poltype,'QM_DATA',prefix)
+    energyarray = NormalizeTarget(poltype,'SP.dat',prefix)
+
+    energyarray,qmenergyarray,distarray=ScreenHighEnergyPoints(poltype,energyarray,qmenergyarray,distarray)
+
     def RMSD(c):
         return np.sqrt(np.mean(np.square(np.add(np.subtract(np.array(energyarray),np.array(qmenergyarray)),c))))
 
@@ -1677,14 +1733,17 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
                             minreds.append(minred)
                             maxreds.append(maxred)
                 WriteInitialPrmFile(poltype,vdwtypesarray,initialradii,initialdepths,minradii,maxradii,mindepths,maxdepths,initialreds,minreds,maxreds)
-                vdwradii,vdwdepths,vdwreds=VDWOptimizer(poltype,count,fitredboolarray)
-                for k in range(len(flat_prefixarrays)):
-                    prefix=flat_prefixarrays[k]
-                    distarray=flat_distarrays[k]
-                    PlotEnergyVsDistance(poltype,distarray,prefix,vdwradii,vdwdepths,vdwreds,vdwtypesarray,count)
-                    othergoodfit=PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count)
-                goodfit=PlotQMVsMMEnergy(poltype,vdwtypesarray,flat_prefixarrays,count,allprefix=True)
-                count+=1
+                vdwradii,vdwdepths,vdwreds,fail=VDWOptimizer(poltype,count,fitredboolarray)
+                if fail==True: # rare case failure not due to inputs but something intenral to optimizer?
+                    goodfit=True
+                if fail==False:
+                    for k in range(len(flat_prefixarrays)):
+                        prefix=flat_prefixarrays[k]
+                        distarray=flat_distarrays[k]
+                        PlotEnergyVsDistance(poltype,distarray,prefix,vdwradii,vdwdepths,vdwreds,vdwtypesarray,count)
+                        othergoodfit=PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count)
+                    goodfit=PlotQMVsMMEnergy(poltype,vdwtypesarray,flat_prefixarrays,count,allprefix=True)
+                    count+=1
 
     shutil.copy(poltype.key5fname,'../'+poltype.key5fname)
     os.chdir(poltype.parentdir)

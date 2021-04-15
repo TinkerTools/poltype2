@@ -1320,6 +1320,8 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
         for line in results:
             if '!' not in line:
                 tmpfh.write(line)
+        tmpfh.write('\n')
+
 
 
         
