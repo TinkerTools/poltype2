@@ -232,7 +232,7 @@ def ShiftParameterDefintions(poltype,parameterarray,oldtypetonewtype):
                 print('Error ',line)
             for i in range(len(linesplitall)):
                 element=linesplitall[i]
-                if RepresentsInt(poltype,element):
+                if RepresentsInt(element):
                     oldtypenum=np.abs(int(element))
                     if oldtypenum in oldtypetonewtype.keys():
                         newtypenum=oldtypetonewtype[oldtypenum]
@@ -426,6 +426,7 @@ def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendti
     polarizeprms=[]
     vdwprms=[]
     torsiontopitor={}
+
     for lineidx in range(len(results)):
         line=results[lineidx]
         linesplit=line.split()
@@ -596,7 +597,6 @@ def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendti
                 if (b==tb and c==tc) or (b==tc and c==tb):
                     for cls in poltypeclasses:
                         torsiontopitor[tuple(cls)]=line
-                        torsiontopitor[tuple(cls[::-1])]=line
 
     
     return bondprms,angleprms,torsionprms,strbndprms,mpoleprms,opbendprms,polarizeprms,vdwprms,torsiontopitor
@@ -994,6 +994,12 @@ def GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,
     maxparametersmartsmatchlength=max(parametersmartstomatchlen.values())
     parametersmartslist=GrabKeysFromValue(poltype,parametersmartstomatchlen,maxparametersmartsmatchlength)
     prmsmartstodiff={}
+    prmsmartstomolnum={}
+    for prmsmarts in parametersmartslist:
+        structure = Chem.MolFromSmarts(prmsmarts)
+        structurenumatoms=structure.GetNumAtoms()
+        prmsmartstomolnum[prmsmarts]=structurenumatoms
+    minfragmentsize=min(prmsmartstomolnum.values())
     for prmsmarts in parametersmartslist:
         smartsls=parametersmartstosmartslist[prmsmarts]
         smartsfortransfer=smartsls[1]
@@ -1004,7 +1010,8 @@ def GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,
         res=rdFMCS.FindMCS(mols)
         structurenumatoms=structure.GetNumAtoms()
         atomnum=res.numAtoms
-        diff=np.abs(atomnum-structurenumatoms)
+        sizediff=structurenumatoms-minfragmentsize # some fragments have greater absolute size so without adding this than we are biasing smaller fragments that match to be a "closer match"
+        diff=np.abs(atomnum-structurenumatoms)-sizediff
         prmsmartstodiff[prmsmarts]=diff
     mindiff=min(prmsmartstodiff.values())
     parametersmartslist=GrabKeysFromValue(poltype,prmsmartstodiff,mindiff)
@@ -1021,7 +1028,6 @@ def GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,
             if atomicnum not in countdic.keys():
                 countdic[atomicnum]=0
         smartstocountdic[smarts]=countdic
-
     mastercountdic=GenerateElementCountsDictionary(poltype,poltype.rdkitmol)
     for atomicnum in atomicnums:
         if atomicnum not in mastercountdic.keys():
@@ -1034,7 +1040,6 @@ def GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,
             diff=np.abs(mastercounts-counts)
             totdiff+=diff 
         difftosmarts[totdiff]=smarts
-    
     
     mindiff=min(difftosmarts.keys())
     parametersmarts=difftosmarts[mindiff]
@@ -1921,16 +1926,35 @@ def CheckIfStringInStringList(poltype,string,stringlist):
             found=True
     return found
 
+def GrabTypesFromPrmLine(poltype,ls):
+    typenums=[]
+    for e in ls:
+        isint=RepresentsInt(e)  
+        if isint==True:
+            typenums.append(e) 
+    if len(typenums)>=4:
+        if typenums[-2]=='0' and typenums[-1]=='0':
+            typenums=typenums[:2]
+    if len(typenums)>4:
+        typenums=typenums[:4]     
+    return typenums
+
+
 def SearchForPoltypeClasses(poltype,prmline,poltypeclasseslist):
     listofpoltypeclasses=None
     poltypeclasses=None
     allin=None
     prmlinesplit=prmline.split()
+    typenums=GrabTypesFromPrmLine(poltype,prmlinesplit)
     for listofpoltypeclasses in poltypeclasseslist:
         for poltypeclasses in listofpoltypeclasses:
             allin=True
-            for poltypeclass in poltypeclasses:
-                if CheckIfStringInStringList(poltype,str(poltypeclass),prmlinesplit)==False:
+            if int(typenums[0])!=poltypeclasses[0]: # then try flipping
+                poltypeclasses=poltypeclasses[::-1]
+            for i in range(len(typenums)):
+                poltypeclass=int(typenums[i])
+                otherpoltypeclass=poltypeclasses[i]
+                if poltypeclass!=otherpoltypeclass:
                     allin=False 
             if allin==True:
                 return listofpoltypeclasses,poltypeclasses
@@ -1954,7 +1978,6 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
                 transferinfoline='#'+' '+'matching SMARTS from molecule '+' '+str(smartsatomorders)+' from external database'+'\n'
 
         else:
-        
             poltypeclasses,subpoltypeclasses=SearchForPoltypeClasses(poltype,line,poltypeclassestoparametersmartsatomorders.keys())
             if poltypeclasses==None:
                      
@@ -2246,13 +2269,6 @@ def AppendToSMARTSMapFile(poltype,lines,filename):
     temp.close()
 
 
-def RepresentsInt(poltype,s):
-    try: 
-        int(s)
-        return True
-    except ValueError:
-        return False
-
 
 
 def AddKeyFileParametersToParameterFile(poltype,rdkitmol):   
@@ -2462,13 +2478,30 @@ def CheckTrigonalCenters(poltype,listofbondsforprm,mol):
 
 def CorrectPitorEnergy(poltype,torsionprms,torsiontopitor):
     newtorsionprms=[]
+    torsiontocount={}
+    middletocount={}
+     
+    for torsion in torsiontopitor.keys():
+        middle=tuple([torsion[1],torsion[2]])
+        if middle not in middletocount.keys():
+            middletocount[middle]=0
+        middletocount[middle]+=1
+    for torsion in torsiontopitor.keys():
+        middle=tuple([torsion[1],torsion[2]])
+        count=middletocount[middle]
+        torsiontocount[torsion]=count
     for torline in torsionprms:
         torlinesplit=torline.split()
         tor=tuple([int(torlinesplit[1]),int(torlinesplit[2]),int(torlinesplit[3]),int(torlinesplit[4])])
         if tor in torsiontopitor:
-            pitorline=torsiontopitor[tor]
+            if tor in torsiontopitor.keys():
+                pitorline=torsiontopitor[tor]
+            else:
+                pitorline=torsiontopitor[tor[::-1]]
+
+            count=torsiontocount[tor]
             pitorlinesplit=pitorline.split()
-            prm=float(pitorlinesplit[3])
+            prm=float(pitorlinesplit[3])/count
             torprm=float(torlinesplit[8])
             newtorprm=prm+torprm
             torlinesplit[8]=str(newtorprm)
@@ -3608,6 +3641,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     planarangleindicestotinkertypes,planarangleindicestotinkerclasses,planarangleindicestoparametersmartsatomorders,planarangleindicestoelementtinkerdescrips,planarangleindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
 
     torsionindicestotinkertypes,torsionindicestotinkerclasses,torsionindicestoparametersmartsatomorders,torsionindicestoelementtinkerdescrips,torsionindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,torsionsforprmtoparametersmarts,torsionsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
+ 
     originalbondindicestosmartsatomorders=bondindicestosmartsatomorders.copy()
     originalangleindicestosmartsatomorders=angleindicestosmartsatomorders.copy()
 

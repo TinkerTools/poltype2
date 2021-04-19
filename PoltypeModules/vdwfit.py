@@ -88,7 +88,7 @@ def writePRM(poltype,params,vdwtypes,idxtotype):
         if vdwradius!=None and vdwdepth!=None and vdwred!=None:
             for line in rFile.readlines():
                 linesplit=line.split()
-                if vdwtype in line and 'vdw' in line:
+                if 'vdw' in line:
                     if linesplit[1]==vdwtype:
                         newline="vdw %s %s %s %s \n"%(vdwtype,vdwradius, vdwdepth,vdwred)
                         vdwtypetonewline[vdwtype]=newline
@@ -96,29 +96,17 @@ def writePRM(poltype,params,vdwtypes,idxtotype):
                     else:
                         notinline=True
                         for othertype in vdwtypesalreadyfit:
-                            if othertype in line and 'vdw' in line:
-                                if linesplit[1]==othertype:
-                                    notinline=False
-                                    break
+                            if linesplit[1]==othertype:
+                                notinline=False
+                                break
                         if notinline==True:
                             oFile.write(line)
                         else:
                             newline=vdwtypetonewline[othertype]
                             oFile.write(newline)
 
-
                 else:
-                    notinline=True
-                    for othertype in vdwtypesalreadyfit:
-                        if othertype in line and 'vdw' in line:
-                            if linesplit[1]==othertype:
-                                notinline=False
-                                break
-                    if notinline==True:
-                        oFile.write(line)
-                    else:
-                        newline=vdwtypetonewline[othertype]
-                        oFile.write(newline)
+                    oFile.write(line)
 
             vdwtypesalreadyfit.append(vdwtype)
             vdwradius=None
@@ -915,7 +903,6 @@ def GrabVdwParameters(poltype,vdwtype):
                     red=1
                 minred=red-.2*red
                 maxred=1
-
                 return radius,depth,minvdwradius,maxvdwradius,minvdwdepth,maxvdwdepth,red,minred,maxred
 
 

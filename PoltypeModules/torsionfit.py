@@ -1242,12 +1242,6 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
                originalfitfuncarray[i]=0
            else:
                originalfitfuncarray[i]=1
-        newcount=0
-        for i in range(len(originalmm_energy_list)):
-            fite=originalfitfuncarray[i]
-            if fite==1:
-                newfite=fitfunc_dict[clskey][newcount]
-                newcount+=1
 
 
 
