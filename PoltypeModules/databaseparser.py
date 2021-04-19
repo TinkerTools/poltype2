@@ -1810,11 +1810,11 @@ def ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,
         for sublist in torsionsmissingtinkerclassestopoltypeclasses.values():
             if classes in sublist or classes[::-1] in sublist: 
                 newlinesplit=re.split(r'(\s+)', line)
-                splitafter=newlinesplit[12:]
+                splitafter=newlinesplit[10:]
                 splitafter[0]='0'
-                splitafter[4]='0'
-                splitafter[10]='0'
-                newlinesplit=newlinesplit[:12]+splitafter
+                splitafter[6]='0'
+                splitafter[12]='0'
+                newlinesplit=newlinesplit[:10]+splitafter
                 line=''.join(newlinesplit)
         newtorsionprms.append(line)
 
@@ -3518,6 +3518,46 @@ def RemoveIndicesMatchedFromNewDatabase(poltype,indicestosmartsatomorders,indice
 
     return indicestosmartsatomorders
 
+def RemoveHighEnergyHydrogenTorsionParameters(poltype,torsionprms):
+    extramissingtorsion=[]
+    hydtypes=[]
+    for atom in poltype.rdkitmol.GetAtoms():
+        atomnum=atom.GetAtomicNum()
+        if atomnum==1:
+            atomindex=atom.GetIdx()+1
+            hydclass=poltype.idxtosymclass[atomindex]
+            if hydclass not in hydtypes:
+                hydtypes.append(hydclass)
+    for torsionprm in torsionprms:
+        linesplit=torsionprm.split()
+        newlinesplit=re.split(r'(\s+)', torsionprm)
+        splitafter=newlinesplit[10:]
+        prms=[splitafter[0],splitafter[6],splitafter[12]]
+        prms=[float(i) for i in prms]
+        typenums=[linesplit[1],linesplit[2],linesplit[3],linesplit[4]]
+        typenums=[int(i) for i in typenums]
+        if typenums[0] in hydtypes or typenums[-1] in hydtypes:
+            for prm in prms:
+                if np.abs(prm)>=1:
+                    extramissingtorsion.append([tuple(typenums)]) 
+
+
+    return extramissingtorsion 
+
+def AddExtraMissingHydrogenTorsions(poltype,extramissingtorsion,torsionsmissingtinkerclassestopoltypeclasses):
+    for tor in extramissingtorsion:
+        torsionsmissingtinkerclassestopoltypeclasses[tuple(tor)]=tor
+
+    return torsionsmissingtinkerclassestopoltypeclasses
+
+
+def AddExtraMissingHydrogenTorsionsToFinal(poltype,extramissingtorsion,torsionsmissing):
+    for tor in extramissingtorsion:
+        thetor=list(tor[0])
+        torsionsmissing.append(thetor)
+
+
+    return torsionsmissing
 
 
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
@@ -3711,6 +3751,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     fname=poltype.smallmoleculeprmlib
     bondprms,angleprms,torsionprms,strbndprms,mpoleprms,opbendprms,polarizeprms,vdwprms,torsiontopitor=GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendtinkerclassestopoltypeclasses,opbendtinkerclassestotrigonalcenterbools,angletinkerclassestopoltypeclasses,torsiontinkerclassestopoltypeclasses,poltypetoprmtype,atomtinkerclasstopoltypeclass,typestoframedefforprmfile,fname,True)
     torsionprms=CorrectPitorEnergy(poltype,torsionprms,torsiontopitor)
+    extramissingtorsion=RemoveHighEnergyHydrogenTorsionParameters(poltype,torsionprms) # since we want to transfer only small energy barrier hydrogen torsion
     angleprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips=RemoveOldParametersKeepNewParameters(poltype,angleprms,newangleindicestopoltypeclasses,'angle',anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips)
     opbendprms,blankbondpoltypeclassestoparametersmartsatomorders,blankbondpoltypeclassestosmartsatomorders,blankbondpoltypeclassestoelementtinkerdescrips=RemoveOldParametersKeepNewParameters(poltype,opbendprms,newopbendindicestopoltypeclasses,'opbend',bondpoltypeclassestoparametersmartsatomorders,bondpoltypeclassestosmartsatomorders,bondpoltypeclassestoelementtinkerdescrips,removefromdic=False)
 
@@ -3742,6 +3783,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     anglelistbabel=ConvertToBabelList(poltype,listofanglesforprm,angleindicestoclasses)
     bondprms=AddOptimizedBondLengths(poltype,optmol,bondprms,bondlistbabel)
     angleprms=AddOptimizedAngleLengths(poltype,optmol,angleprms,anglelistbabel)
+    torsionsmissingtinkerclassestopoltypeclasses=AddExtraMissingHydrogenTorsions(poltype,extramissingtorsion,torsionsmissingtinkerclassestopoltypeclasses)
     torsionprms=ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,torsionprms)
     torsionprms=DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopoltypeclasses,torsionprms)
     torsionkeystringtoparameters=GrabTorsionParameterCoefficients(poltype,torsionprms)
@@ -3780,6 +3822,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     strbndprmstotransferinfo=MapParameterLineToTransferInfo(poltype,strbndprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips,strbndpoltypeclassestosmartsatomordersext,newstrbndpoltypeclassestocomments,newstrbndpoltypeclassestosmartslist)
     torsionprmstotransferinfo=MapParameterLineToTransferInfo(poltype,torsionprms,torsionpoltypeclassestoparametersmartsatomorders,torsionpoltypeclassestosmartsatomorders,torsionpoltypeclassestoelementtinkerdescrips,torsionpoltypeclassestosmartsatomordersext,{},{})
     torsionsmissing=ConvertToPoltypeClasses(poltype,torsionsmissing)
+    torsionsmissing=AddExtraMissingHydrogenTorsionsToFinal(poltype,extramissingtorsion,torsionsmissing)
     WriteOutList(poltype,torsionsmissing,poltype.torsionsmissingfilename)
     WriteDictionaryToFile(poltype,torsionkeystringtoparameters,poltype.torsionprmguessfilename)
     WriteOutList(poltype,missingvdwatomindices,poltype.vdwmissingfilename)
