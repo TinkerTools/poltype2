@@ -18,6 +18,8 @@ from scipy.interpolate import interp1d
 import databaseparser as db
 from copy import deepcopy
 from rdkit import Chem
+import databaseparser
+
 
 def CheckGeometricRestraintEnergy(poltype,alzfile):
     temp=open(alzfile,'r')
@@ -490,10 +492,9 @@ def insert_torphasedict (poltype,mol, toraboutbnd, torprmdict, initangle,write_p
     aatomicnum=obaa.GetAtomicNum()
     datomicnum=obad.GetAtomicNum()
     babelindices=[a2,b2,c2,d2]
-    allhydtor=db.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
-    allhydtoroneside=db.CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol)
-
-    if (aatomicnum==1 or datomicnum==1) and (allhydtor==False and allhydtoroneside==False):
+    torsionsmissing=databaseparser.ReadTorsionList(poltype.torsionsmissingfilename)
+    classes=[poltype.idxtosymclass[i] for i in babelindices]
+    if classes not in torsionsmissing and classes[::-1] not in torsionsmissing: # then probably H torsions transferred
         return
     if (keyfilter is None or keyfilter == tpdkey): 
         # current torsion value (normalized by initangle)

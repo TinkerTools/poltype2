@@ -3524,10 +3524,19 @@ def RemoveHighEnergyHydrogenTorsionParameters(poltype,torsionprms):
     for atom in poltype.rdkitmol.GetAtoms():
         atomnum=atom.GetAtomicNum()
         if atomnum==1:
-            atomindex=atom.GetIdx()+1
-            hydclass=poltype.idxtosymclass[atomindex]
-            if hydclass not in hydtypes:
-                hydtypes.append(hydclass)
+            atomneighbs=atom.GetNeighbors()
+            isrot=True
+            for natom in atomneighbs:
+                natombabelidx=natom.GetIdx()+1
+                babelatom=poltype.mol.GetAtom(natombabelidx) 
+                isinring=babelatom.IsInRing()
+                if isinring==True:
+                    isrot=False
+            if isrot==True:
+                atomindex=atom.GetIdx()+1
+                hydclass=poltype.idxtosymclass[atomindex]
+                if hydclass not in hydtypes:
+                    hydtypes.append(hydclass)
     for torsionprm in torsionprms:
         linesplit=torsionprm.split()
         newlinesplit=re.split(r'(\s+)', torsionprm)
