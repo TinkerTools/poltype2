@@ -492,7 +492,7 @@ def insert_torphasedict (poltype,mol, toraboutbnd, torprmdict, initangle,write_p
     aatomicnum=obaa.GetAtomicNum()
     datomicnum=obad.GetAtomicNum()
     babelindices=[a2,b2,c2,d2]
-    torsionsmissing=databaseparser.ReadTorsionList(poltype.torsionsmissingfilename)
+    torsionsmissing=databaseparser.ReadTorsionList(poltype,poltype.torsionsmissingfilename)
     classes=[poltype.idxtosymclass[i] for i in babelindices]
     if classes not in torsionsmissing and classes[::-1] not in torsionsmissing: # then probably H torsions transferred
         return
