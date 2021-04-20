@@ -1611,6 +1611,16 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             continue 
         
         babelatoms=[mol.GetAtom(i) for i in babelindices]
+        aatom,batom,catom,datom=babelatoms[:]
+        firstangle=mol.GetAngle(aatom,batom,catom)
+        secondangle=mol.GetAngle(batom,catom,datom)
+        if firstangle<0:
+            firstangle=firstangle+360
+        if secondangle<0:
+            secondangle=secondangle+360
+        angletol=2
+        if np.abs(180-firstangle)<=2 or np.abs(180-secondangle)<=2:
+            continue 
         atomvals=[a.GetValence() for a in babelatoms]
         atomnums=[a.GetAtomicNum() for a in babelatoms]
         batomnum=atomnums[1]
