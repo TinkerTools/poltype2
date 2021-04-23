@@ -1621,7 +1621,7 @@ def TinkerTorsionTorsionInitialScan(poltype,torset,optmol,bondtopology):
     variabletorlist=[]
     phaselists=[]
  
-    for tor in torset:
+    for tor in torset: # initial scan not doing clockwise/counter clockwise  like in real scan?
         phaselist=range(0,360,30) 
         phaselists.append(phaselist)
     phaseanglelist=numpy.array(list(product(*phaselists)))

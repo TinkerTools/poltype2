@@ -624,8 +624,6 @@ class PolarizableTyper():
             self.cubegenexe = os.path.join(self.gausdir,self.cubegenexe)
             self.formchkexe = os.path.join(self.gausdir,self.formchkexe)
 
-        if self.which('obminimize') is not None:
-            self.obminimizeexe = self.which('obminimize')
 
         cmdstr=self.analyzeexe+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/VersionFiles/'+'water.xyz'+' '+'-k'+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/VersionFiles/'+'water.key'+' '+'e'+'>'+' '+'version.out'
         try:
@@ -941,9 +939,11 @@ class PolarizableTyper():
             print("Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
         self.WriteToLog(" Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
         p = subprocess.Popen(cmdstr, shell=True,stdout=self.logfh, stderr=self.logfh)
+        print('wait',wait,'skiperrors',skiperrors,flush=True)
         if wait==True:
             p.wait()
             if skiperrors==False:
+                print('return code',p.returncode,flush=True)
                 if p.returncode != 0:
                     self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
                     raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())

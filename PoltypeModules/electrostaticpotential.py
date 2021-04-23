@@ -157,7 +157,6 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     temp.write('cubeprop(wfn)'+'\n')
     temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
     header=poltype.molstructfname.split('.')[0]
-    temp.write('gdma(wfn,"%s")'%(header+'.gdmain')+'\n')
     temp.write('clean()'+'\n')
     temp.close()
     return inputname

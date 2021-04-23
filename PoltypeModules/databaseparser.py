@@ -1628,7 +1628,6 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
            
         ringbools=[a.IsInRing() for a in babelatoms]
         arobools=[a.IsAromatic() for a in babelatoms]
-        contin=False
         bnd=[babelindices[1],babelindices[2]]
         if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False:
             continue 
@@ -1644,8 +1643,6 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         anyarot2=CheckForAnyAromaticsInRing(poltype,babelindices[1])
         anyarot3=CheckForAnyAromaticsInRing(poltype,babelindices[2])
 
-        if contin==True:
-            continue
 
         firstneighborindexes=indextoneighbidxs[aidx]
         secondneighborindexes=indextoneighbidxs[bidx]
