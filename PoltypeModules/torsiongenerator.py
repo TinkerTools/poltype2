@@ -155,7 +155,7 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     for k in range(len(results)):
         line=results[k]
         linesplit=line.split() 
-        if len(linesplit)==4 and foundatomblock==False:
+        if len(linesplit)==4 and foundatomblock==False and '#' not in line:
             foundatomblock=True
         if len(linesplit)!=4 and foundatomblock==True and writeres==False:
             writeres=True
