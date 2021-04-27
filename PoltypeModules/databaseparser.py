@@ -1607,9 +1607,13 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         bondorder=bond.GetBondOrder()
         if bondorder!=1: # then dont zero out
             continue 
-        
         babelatoms=[mol.GetAtom(i) for i in babelindices]
         aatom,batom,catom,datom=babelatoms[:]
+
+        ringbond=False
+        middlebond=mol.GetBond(babelindices[1],babelindices[2])
+        ringbond=middlebond.IsInRing()
+       
         firstangle=mol.GetAngle(aatom,batom,catom)
         secondangle=mol.GetAngle(batom,catom,datom)
         if firstangle<0:
@@ -1641,7 +1645,6 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         anyarot2=CheckForAnyAromaticsInRing(poltype,babelindices[1])
         anyarot3=CheckForAnyAromaticsInRing(poltype,babelindices[2])
 
-
         firstneighborindexes=indextoneighbidxs[aidx]
         secondneighborindexes=indextoneighbidxs[bidx]
         thirdneighborindexes=indextoneighbidxs[cidx]
@@ -1657,7 +1660,6 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                 if idx not in matcharray:
                     matcharray.append(idx)
         check=CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,matcharray)
-        
         if poltype.transferanyhydrogentor==True and (anyarot2==False and anyarot3==False): 
             if atomicnumatoma==1 or atomicnumatomd==1:
                 if allhydrogentor==False and allhydrogentoroneside==False:
@@ -1666,13 +1668,15 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                     if torsionindices not in torsionsmissing:
                         torsionsmissing.append(torsionindices)
         if '~' in smarts or '*' in smarts:
-            if (anyarot2==False and anyarot3==False):
-                if torsionindices not in torsionsmissing:
-                    torsionsmissing.append(torsionindices)
-            else:
+            if ((anyarot2==True or anyarot3==True) and ringbond==True):
                 if torsionindices not in poormatchingaromatictorsions:
                     poormatchingaromatictorsions.append(torsionindices)
-            continue
+
+            else:
+                if torsionindices not in torsionsmissing:
+                    torsionsmissing.append(torsionindices)
+                    continue
+                else:
 
         if check==False:
             if (anyarot2==False and anyarot3==False):
@@ -1685,7 +1689,6 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             if poltype.rotalltors==True:
                 if torsionindices not in torsionsmissing:
                     torsionsmissing.append(torsionindices)
-
     return torsionsmissing,poormatchingaromatictorsions 
 
 def GrabRingAtoms(poltype,neighbatom):

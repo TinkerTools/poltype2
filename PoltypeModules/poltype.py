@@ -1427,6 +1427,7 @@ class PolarizableTyper():
         self.torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self) # this only happens in very symmetrical molecules
         self.torlist=[tuple(i) for i in self.torlist]
         self.torlist=[tuple([i]) for i in self.torlist]
+        print('self.torlist',self.torlist)
         self.torsettovariabletorlist={}
         for torset in self.torlist:
             self.torsettovariabletorlist[tuple(torset)]=[]

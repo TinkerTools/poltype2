@@ -833,11 +833,9 @@ def get_torlist(poltype,mol,missed_torsions):
         bnd=[t2idx,t3idx]
         t2val=t2.GetValence()
         t3val=t3.GetValence()
-        ringbond=False
         if BO>1:
             continue
-        if t2.IsInRing()==True and t3.IsInRing()==True:
-            ringbond=True
+        ringbond=bond.IsInRing()
         arobond=False
         if t2.IsAromatic()==True and t3.IsAromatic()==True:
             arobond=True
@@ -849,7 +847,7 @@ def get_torlist(poltype,mol,missed_torsions):
             continue
         if t2val<2 or t3val<2:
             continue 
-        
+                
         t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
         sortedtor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]])
         if(sortedtor in missed_torsions) and len(poltype.onlyrotbndslist)==0:
@@ -864,13 +862,11 @@ def get_torlist(poltype,mol,missed_torsions):
 
         if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False and onlyrot==False:
             skiptorsion=True
-
         babelindices=[t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()]
         t1atomicnum=t1.GetAtomicNum()
         t4atomicnum=t4.GetAtomicNum()
         allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
         allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol)
-
         if (t1atomicnum==1 or t4atomicnum==1) and (allhydtors==False and allhydtorsoneside==False) and poltype.rotalltors==False:
             skiptorsion=True
             hydtorsionlist.append(sortedtor)

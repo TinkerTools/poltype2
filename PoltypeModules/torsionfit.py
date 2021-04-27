@@ -387,6 +387,7 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,fileprefix):
     cls_angle_dict = {}
     cls_angle_dict_unmodified = {}
     clscount_dict = {}
+    indicesremoved=[]
     for torset in poltype.torlist:
         if torset not in poltype.nonaroringtorsets and len(torset)==2 and poltype.torfit1Drotonly==True and poltype.torfit2Drotonly==False:
             continue
