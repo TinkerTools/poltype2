@@ -543,12 +543,15 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     torsettooutputlogtoinitialstructure={}
     torsettoinistructophaselist={}
     for torset in poltype.torlist:
+        #print('torset',torset)
         torsettooutputlogtoinitialstructure[tuple(torset)]={}
         optnumtotorsettofulloutputlogs['1'][tuple(torset)]=[]
         optnumtotorsettofulloutputlogs['2'][tuple(torset)]=[]
         variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
         phaselists,currentanglelist,clockindex=GeneratePhaseLists(poltype,torset,optmol) # clockindex might change if  points on grid are removed (come back to this)
         flatphaselist=numpy.array(list(product(*phaselists)))
+        #print('phaselists',phaselists)
+        #print('flatphaselist',flatphaselist)
         poltype.tensorphases[tuple(torset)]=flatphaselist
         flatphaselist=FlattenArray(poltype,flatphaselist)
         idealangletensor=flatphaselist+currentanglelist
@@ -592,7 +595,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             # copy *-opt.log found early by Gaussian to 'prevstrctfname'
             cmd = 'cp ../%s %s' % (poltype.logoptfname,prevstrctfname)
             poltype.call_subsystem(cmd,True)
-
 
         minstrctfname = prevstrctfname
         prevstrctfname = minstrctfname

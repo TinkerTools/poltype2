@@ -1551,6 +1551,13 @@ def FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertop
     for bndlist in totalbondscollector:
         first=bndlist[0]
         second=bndlist[1]
+        babelfirst=[i+1 for i in first]
+        babelsecond=[i+1 for i in second]
+        if (babelfirst in poltype.partialdoublebonds or babelfirst[::-1] in poltype.partialdoublebonds):
+            continue    
+        if (babelsecond in poltype.partialdoublebonds or babelsecond[::-1] in poltype.partialdoublebonds):
+            continue    
+
         b,c=first[:]
         d=second[0]
         aatom,dnewatom = torgen.find_tor_restraint_idx(poltype,poltype.mol,poltype.mol.GetAtom(b+1),poltype.mol.GetAtom(c+1))
@@ -1653,7 +1660,6 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         smarts=smartsenv[0]
         substructure = Chem.MolFromSmarts(smarts)
         matches=rdkitmol.GetSubstructMatches(substructure)
-
         matcharray=[]
         for match in matches:
             for idx in match:
@@ -1676,7 +1682,6 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                 if torsionindices not in torsionsmissing:
                     torsionsmissing.append(torsionindices)
                     continue
-                else:
 
         if check==False:
             if (anyarot2==False and anyarot3==False):
@@ -3712,7 +3717,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     tortorsmissing=FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertoparameters,rdkitmol,mol,indextoneighbidxs,totalbondscollector)
     torsionsmissing,poormatchingaromatictorsions=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
     torsionsmissing=FindAdjacentMissingTorsionsForTorTor(poltype,torsionsmissing,totalbondscollector,tortorsmissing)
-
     atomindextosmartsatomorder=AddExternalDatabaseMatches(poltype, atomindextosmartsatomorder,vdwindicestoextsmarts,vdwsmartsatomordertoparameters)
     vdwmissing=FindMissingParameters(poltype,atomindextosmartsatomorder,rdkitmol,mol,indextoneighbidxs)
     missingvdwatomindices=ReduceMissingVdwByTypes(poltype,vdwmissing)
