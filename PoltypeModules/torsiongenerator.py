@@ -827,12 +827,15 @@ def get_torlist(poltype,mol,missed_torsions):
         # is the bond rotatable
         t2 = bond.GetBeginAtom()
         t3 = bond.GetEndAtom()
+        BO=bond.GetBondOrder()
         t2idx=t2.GetIdx()
         t3idx=t3.GetIdx()
         bnd=[t2idx,t3idx]
         t2val=t2.GetValence()
         t3val=t3.GetValence()
         ringbond=False
+        if BO>1:
+            continue
         if t2.IsInRing()==True and t3.IsInRing()==True:
             ringbond=True
         arobond=False

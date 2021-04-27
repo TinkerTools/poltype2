@@ -770,7 +770,6 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         qm_energy_list = cls_qm_engy_dict[tup]  # QM torsion energy
         mm_energy_list_unmodified = cls_mm_engy_dict_unmodified[tup]  # MM Energy before fitting to QM torsion energy
         qm_energy_list_unmodified = cls_qm_engy_dict_unmodified[tup]  # QM torsion energy
-
         # 'normalize'
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]

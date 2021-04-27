@@ -888,11 +888,11 @@ def GrabVdwParameters(poltype,vdwtype):
             if str(vdwtype) in line:
                 linesplit=line.split()
                 radius=float(linesplit[2])
-                minvdwradius=radius-.3*radius
-                maxvdwradius=radius+.3*radius
+                minvdwradius=radius-.1*radius
+                maxvdwradius=radius+.1*radius
                 depth=float(linesplit[3])
-                minvdwdepth=depth-1*depth
-                maxvdwdepth=depth+1*depth
+                minvdwdepth=depth-.1*depth
+                maxvdwdepth=depth+.1*depth
                 if maxvdwdepth>vdwdepthlimit:
                     maxvdwdepth=vdwdepthlimit
                 if depth>maxvdwdepth:
@@ -901,7 +901,7 @@ def GrabVdwParameters(poltype,vdwtype):
                     red=float(linesplit[4])
                 else:
                     red=1
-                minred=red-.2*red
+                minred=red-.1*red
                 maxred=1
                 return radius,depth,minvdwradius,maxvdwradius,minvdwdepth,maxvdwdepth,red,minred,maxred
 
