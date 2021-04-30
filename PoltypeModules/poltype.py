@@ -814,18 +814,18 @@ class PolarizableTyper():
            temp={}
            self.call_subsystem(job,True,skiperrors)
            temp[job]=fulljobtooutputlog[job]
-           finishedjob,errorjob=self.WaitForTermination(temp)
-       finishedjobs,errorjobs=self.WaitForTermination(fulljobtooutputlog)
+           finishedjob,errorjob=self.WaitForTermination(temp,skiperrors)
+       finishedjobs,errorjobs=self.WaitForTermination(fulljobtooutputlog,skiperrors)
        return finishedjobs,errorjobs
 
     def CallJobsLocalHost(self,fulljobtooutputlog,skiperrors):
        for job in fulljobtooutputlog.keys():
            self.call_subsystem(job,True,skiperrors)
-       finishedjobs,errorjobs=self.WaitForTermination(fulljobtooutputlog)
+       finishedjobs,errorjobs=self.WaitForTermination(fulljobtooutputlog,skiperrors)
        return finishedjobs,errorjobs
 
 
-    def WaitForTermination(self,jobtooutputlog):
+    def WaitForTermination(self,jobtooutputlog,skiperrors):
         finishedjobs=[]
         errorjobs=[]
         errormessages=[]
@@ -845,7 +845,7 @@ class PolarizableTyper():
                         finishedjobs.append(outputlog)
                 elif finished==False and error==True:
                     if outputlog not in finishedjobs:
-                        self.ErrorTerm(outputlog)
+                        self.ErrorTerm(outputlog,skiperrors)
                         finishedjobs.append(outputlog)
                         errorjobs.append(outputlog)
                 elif finished==False and error==False:
@@ -938,8 +938,9 @@ class PolarizableTyper():
         self.WriteToLog("Normal termination: logfile=%s path=%s" % (logfname,os.getcwd()))
     
     
-    def ErrorTerm(self,logfname):
-        self.WriteToLog("ERROR termination: logfile=%s path=%s" % (logfname,os.getcwd()))
+    def ErrorTerm(self,logfname,skiperrors):
+        if skiperrors==False:
+            self.WriteToLog("ERROR termination: logfile=%s path=%s" % (logfname,os.getcwd()))
 
 
     def call_subsystem(self,cmdstr,wait=False,skiperrors=False):

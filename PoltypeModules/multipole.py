@@ -82,13 +82,35 @@ def rm_esp_terms_keyfile(poltype,keyfilename):
     anothertemp=open(keyfilename,'r')
     results=anothertemp.readlines()
     anothertemp.close()
+    passedatomblock=False
+    foundatomblock=False
+    foundpolarize=False
     for line in results:
         if ('potential-offset' in line or 'none' in line or 'fix-monopole' in line) and 'atom' not in line:
             pass
         else:
-            temp.write(line)
+            linesplit=line.split()
+            if len(linesplit)>0:
+                if linesplit[0]=='atom':
+                    if foundatomblock==False:
+                        foundatomblock=True
+                    temp.write(line)
+
+                else:
+                    if foundatomblock==True:
+                        passedatomblock=True
+                    if linesplit[0]=='polarize':
+                        foundpolarize=True
+                    if passedatomblock==True and foundpolarize==False: # then old multipoles
+                        pass
+                    else:
+                        temp.write(line)
+            else:
+                temp.write(line)
+
     temp.close()
     shutil.move(tmpfname, keyfilename)
+   
     
 def prepend_keyfile(poltype,keyfilename,optmol,dipole=False):
     """
