@@ -21,6 +21,25 @@ import shutil
 import copy
 import traceback
 
+def CheckAllVdwTypesExist(poltype,keyfilename):
+    temp=open(keyfilename,'r')
+    results=temp.readlines()
+    temp.close()
+    vdwtypes=[]
+    for line in results:
+        if 'vdw' in line and '#' not in line:
+            linesplit=line.split()
+            atomtype=int(linesplit[1])
+            vdwtypes.append(atomtype)
+    alltypes=[]
+    for atom in poltype.rdkitmol.GetAtoms():
+        atomidx=atom.GetIdx()+1
+        symtype=poltype.idxtosymclass[atomidx]
+        alltypes.append(symtype)
+    for atomtype in alltypes:
+        if atomtype not in vdwtypes:
+            raise ValueError('Missing vdwtype in keyfile '+str(atomtype)) 
+
 def best_fit_slope_and_intercept(xs,ys):
     xs=np.array(xs)
     ys=np.array(ys)
@@ -118,6 +137,7 @@ def writePRM(poltype,params,vdwtypes,idxtotype):
     rFile.close()
     os.remove(poltype.key5fname)
     os.rename("temp.key",poltype.key5fname)
+    CheckAllVdwTypesExist(poltype,poltype.key5fname)
     return
 
 def readOneColumn(filename,columnnumber,prefix=None):
@@ -879,6 +899,7 @@ def ExecuteSPJobs(poltype,qmfilenamearray,prefix):
 
 
 def GrabVdwParameters(poltype,vdwtype):
+    CheckAllVdwTypesExist(poltype,poltype.key5fname)
     temp=open(poltype.key5fname,'r')
     results=temp.readlines()
     temp.close()
@@ -1436,7 +1457,7 @@ def ReplaceParameterFileHeader(poltype,paramhead,keyfile):
     temp.close() 
     temp=open(tempname,'w')
     for line in results:
-        if 'parameter' in line:
+        if 'parameter' in line and '#' not in line:
             newline='parameters '+paramhead+'\n'
         else:
             newline=line
@@ -1540,6 +1561,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     if not os.path.isdir(vdwfoldername):
         os.mkdir(vdwfoldername)
     shutil.copy(poltype.key5fname,vdwfoldername+r'/'+poltype.key5fname)
+    CheckAllVdwTypesExist(poltype,poltype.key5fname)
     shutil.copy(poltype.xyzoutfile,vdwfoldername+r'/'+poltype.xyzoutfile)
     shutil.copy(poltype.xyzfname,vdwfoldername+r'/'+poltype.xyzfname)
     os.chdir(vdwfoldername) 
@@ -1601,10 +1623,8 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             poltype.fckoptfname=prefix+'-opt.fchk'
             poltype.logoptfname=prefix+'-opt.log'
             poltype.gausoptfname=prefix+'-opt.log'
-            try:
-                optmol = opt.GeometryOptimization(poltype,mol,checkbonds=False,modred=False,restraints=restraints,skipscferror=False,charge=totchg,skiperrors=True)
-            except:
-
+            optmol,error = opt.GeometryOptimization(poltype,mol,checkbonds=False,modred=False,restraints=restraints,skipscferror=False,charge=totchg,skiperrors=True)
+            if error==True:
                 moleculeprobeindicestoignore.append([moleculeindex,probeindex])
                 continue
 

@@ -254,7 +254,7 @@ def GenerateTorsionSPInputFileGaus(poltype,torset,optmol,phaseangles,prevstrctfn
     return torspcomfname,outputname
 
 
-def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevstrctfname,torsionrestraint,bondtopology,clockindex):
+def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevstrctfname,torsionrestraint,bondtopology):
     tinkerstructnamelist=[]
     # load prevstruct
     firsttor=torset[0]
@@ -263,14 +263,31 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
     newtorxyzfname=None  
     # create xyz and key and write restraint then minimize, getting .xyz_2
     count=-1
-    originalprevstrctfname=prevstrctfname
-    for phaseanglelist in phaselist: # we need to send back minimized structure in XYZ (not tinker) format to load for next tinker minimization,but append the xyz_2 tinker XYZ file so that com file can be generated from that 
-        count+=1
-        if newtorxyzfname==None or count==clockindex:
-            prevstruct = opt.load_structfile(poltype,originalprevstrctfname)
-        else:
-            cartxyz=ConvertTinktoXYZ(poltype,newtorxyzfname,newtorxyzfname.replace('.xyz_2','_cart.xyz'))
+    center=prevstrctfname
+    prevphaseanglelist=None
+    energyarray=numpy.empty(phaselist.shape[0])
+    failedgridpoints=[]
 
+        
+    for rowindex in range(len(phaselist)): # we need to send back minimized structure in XYZ (not tinker) format to load for next tinker minimization,but append the xyz_2 tinker XYZ file so that com file can be generated from that 
+        phaseanglelist=phaselist[rowindex]
+        count+=1
+        if len(phaseanglelist)==2:
+            a=phaseanglelist[1]
+            idx=1
+        else:
+            a=phaseanglelist[0]
+            idx=0
+        needtogobacktocenter=False
+        try:
+            preva=prevphaseanglelist[idx]
+            if (a>0 and preva<0) or (a<0 and preva>0):
+                needtogobacktocenter=True
+        except: # first time no prevphaseanglelist
+            pass
+        if newtorxyzfname==None or needtogobacktocenter==True:
+            prevstruct = opt.load_structfile(poltype,center)
+        else:
             prevstruct =opt.load_structfile(poltype,cartxyz)
 
         prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology) # sometimes extra bonds are made when atoms get too close during minimization
@@ -282,9 +299,25 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
         term=AnalyzeTerm(poltype,toralzfname)
         if term==False:
             tinker_analyze(poltype,newtorxyzfname,keyfname,toralzfname)
-   
+        if term==False:
+            failedgridpoints.append(phaseanglelist)
+        else:
+            tot_energy,tor_energy=torfit.GrabTinkerEnergy(poltype,toralzfname)
+            energyarray[rowindex]=tot_energy
+
+        cartxyz=ConvertTinktoXYZ(poltype,newtorxyzfname,newtorxyzfname.replace('.xyz_2','_cart.xyz'))
         tinkerstructnamelist.append(newtorxyzfname)
-    return tinkerstructnamelist
+        try:
+            if len(phaseanglelist)==2: # then check for new center make sure hopping around 2D grid correctly (clockwise then counterclockwise)
+                a=phaseanglelist[0]
+                aprev=prevphaseanglelist[0]
+                if a!=aprev:
+                    center=cartxyz    
+        except: # no prevphaseanglelist
+            pass
+
+        prevphaseanglelist=phaseanglelist
+    return tinkerstructnamelist,failedgridpoints,energyarray
 
 
 
@@ -446,9 +479,8 @@ def GeneratePhaseLists(poltype,torset,optmol):
         counterclock=[-1*i for i in phaselist[1:int(len(phaselist)/2)+1]]
         counterclock=counterclock[:-1]
         phaselists.append(clock+counterclock)
-        clockindex=len(clock)-1+1 # need next index (when counterclock starts)
     currentanglelist=numpy.array(currentanglelist)
-    return phaselists,currentanglelist,clockindex
+    return phaselists,currentanglelist
 
 
 def ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz):
@@ -542,24 +574,41 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     poltype.tensorphases={}
     torsettooutputlogtoinitialstructure={}
     torsettoinistructophaselist={}
+    
     for torset in poltype.torlist:
-        #print('torset',torset)
+        phaseangles=[0]*len(torset)
+        if poltype.use_gaus==False and poltype.use_gausoptonly==False:
+            prefix='%s-opt-' % (poltype.molecprefix)
+            postfix='-opt.xyz' 
+            prevstrctfname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
+            cmd = 'cp ../%s %s' % (poltype.logoptfname.replace('.log','.xyz'),prevstrctfname)
+            poltype.call_subsystem(cmd,True)
+
+        else:
+            prefix='%s-opt-' % (poltype.molecprefix)
+            postfix='.log' 
+            prevstrctfname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
+            # copy *-opt.log found early by Gaussian to 'prevstrctfname'
+            cmd = 'cp ../%s %s' % (poltype.logoptfname,prevstrctfname)
+            poltype.call_subsystem(cmd,True)
+
         torsettooutputlogtoinitialstructure[tuple(torset)]={}
         optnumtotorsettofulloutputlogs['1'][tuple(torset)]=[]
         optnumtotorsettofulloutputlogs['2'][tuple(torset)]=[]
         variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
-        phaselists,currentanglelist,clockindex=GeneratePhaseLists(poltype,torset,optmol) # clockindex might change if  points on grid are removed (come back to this)
+        phaselists,currentanglelist=GeneratePhaseLists(poltype,torset,optmol) 
         flatphaselist=numpy.array(list(product(*phaselists)))
-        #print('phaselists',phaselists)
-        #print('flatphaselist',flatphaselist)
         poltype.tensorphases[tuple(torset)]=flatphaselist
         flatphaselist=FlattenArray(poltype,flatphaselist)
         idealangletensor=flatphaselist+currentanglelist
         poltype.idealangletensor[tuple(torset)]=idealangletensor
+        
+        minstrctfname = prevstrctfname
+        prevstrctfname = minstrctfname
+        listoftinkertorstructures,failedgridpoints,energyarray=tinker_minimize_angles(poltype,torset,optmol,variabletorlist,flatphaselist,prevstrctfname,torsionrestraint,bondtopology)
         if len(torset)==2 and torset not in poltype.nonaroringtorsets:
-            energyarray,phaseanglelist=TinkerTorsionTorsionInitialScan(poltype,torset,optmol,bondtopology)
-            indicestokeep,firsttorindices,secondtorindices=Determine1DTorsionSlicesOnTorTorSurface(poltype,energyarray,phaseanglelist,torset)
-            flatphaselist=RemoveTorTorPoints(poltype,energyarray,phaseanglelist,indicestokeep)
+            indicestokeep,firsttorindices,secondtorindices=Determine1DTorsionSlicesOnTorTorSurface(poltype,energyarray,flatphaselist,torset)
+            flatphaselist,listoftinkertorstructures=RemoveTorTorPoints(poltype,energyarray,flatphaselist,indicestokeep,listoftinkertorstructures)
             for toridx in range(len(torset)):
                 tor=torset[toridx]
                 if toridx==0:
@@ -579,26 +628,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                         indexes=numpy.where((flatphaselist == phases).all(axis=1))[0][0]
                         locstoremove.append(indexes)
                 flatphaselist = numpy.delete(flatphaselist,locstoremove , axis=0)
-
-        phaseangles=[0]*len(torset)
-        if poltype.use_gaus==False and poltype.use_gausoptonly==False:
-            prefix='%s-opt-' % (poltype.molecprefix)
-            postfix='-opt.xyz' 
-            prevstrctfname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
-            cmd = 'cp ../%s %s' % (poltype.logoptfname.replace('.log','.xyz'),prevstrctfname)
-            poltype.call_subsystem(cmd,True)
-
-        else:
-            prefix='%s-opt-' % (poltype.molecprefix)
-            postfix='.log' 
-            prevstrctfname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
-            # copy *-opt.log found early by Gaussian to 'prevstrctfname'
-            cmd = 'cp ../%s %s' % (poltype.logoptfname,prevstrctfname)
-            poltype.call_subsystem(cmd,True)
-
-        minstrctfname = prevstrctfname
-        prevstrctfname = minstrctfname
-        listoftinkertorstructures=tinker_minimize_angles(poltype,torset,optmol,variabletorlist,flatphaselist,prevstrctfname,torsionrestraint,bondtopology,clockindex)
+                listoftinkertorstructures=numpy.delete(listoftinkertorstructures,locstoremove,axis=0)
         poltype.torsettophaselist[tuple(torset)]=flatphaselist
 
         poltype.SanitizeAllQMMethods()
@@ -750,7 +780,7 @@ def GenerateBondTopology(poltype,optmol):
 def FindPartialDoubleBonds(poltype,rdkitmol):
     poltype.partialdoublebonds=[]
     amidesmarts='[NX3][CX3](=[OX1])'
-    acidsmarts='[CX3](=O)[OX2]'
+    acidsmarts='[*][CX3](=O)[OX2]'
     smartslist=[amidesmarts,acidsmarts]
     for smartsidx in range(len(smartslist)):
         smarts=smartslist[smartsidx]
@@ -762,7 +792,7 @@ def FindPartialDoubleBonds(poltype,rdkitmol):
             if smartsidx==0:
                 babelbond=[match[0],match[1]]
             else:
-                babelbond=[match[0],match[2]]
+                babelbond=[match[0],match[1]]
             if babelbond not in poltype.partialdoublebonds:
                 poltype.partialdoublebonds.append(babelbond)
 
@@ -871,8 +901,8 @@ def get_torlist(poltype,mol,missed_torsions):
         allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol)
         if (t1atomicnum==1 or t4atomicnum==1) and (allhydtors==False and allhydtorsoneside==False) and poltype.rotalltors==False:
             skiptorsion=True
+        if (t1atomicnum==1 or t4atomicnum==1):
             hydtorsionlist.append(sortedtor)
-
         unq=get_uniq_rotbnd(poltype,t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx())
         if ringbond==True and poltype.allownonaromaticringscanning==False and poltype.refinenonaroringtors==False and len(poltype.onlyrotbndslist)==0:
             nonaroringtorlist.append(unq)
@@ -1601,67 +1631,10 @@ def UpdateMaxRange(poltype,torsion,maxrange):
     poltype.rotbndtomaxrange[key]=maxrange
 
 
-def TinkerTorsionTorsionInitialScan(poltype,torset,optmol,bondtopology):
-    phaseangles=[0]*len(torset)
-    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
-        prefix='%s-opt-' % (poltype.molecprefix)
-        postfix='-opt.xyz' 
-        prevstrctfname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
-        cmd = 'cp ../%s %s' % (poltype.logoptfname.replace('.log','.xyz'),prevstrctfname)
-        poltype.call_subsystem(cmd,True)
-
-    else:
-        prefix='%s-opt-' % (poltype.molecprefix)
-        postfix='.log' 
-        prevstrctfname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
-        # copy *-opt.log found early by Gaussian to 'prevstrctfname'
-        cmd = 'cp ../%s %s' % (poltype.logoptfname,prevstrctfname)
-        poltype.call_subsystem(cmd,True)
-
-
-    variabletorlist=[]
-    phaselists=[]
+    
  
-    for tor in torset: # initial scan not doing clockwise/counter clockwise  like in real scan?
-        phaselist=range(0,360,30) 
-        phaselists.append(phaselist)
-    phaseanglelist=numpy.array(list(product(*phaselists)))
-    energyarray=numpy.empty(phaseanglelist.shape[0])
-    designatexyz='_determine_tor-tor_minima'
-    keybase=poltype.key4fname
-    keybasepath='../'
-    failedgridpoints=[]
-    for rowindex in range(len(phaseanglelist)):
-        phaseangles=phaseanglelist[rowindex]
-        prevstruct = opt.load_structfile(poltype,prevstrctfname)
-        prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology)
-        prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
-        torxyzfname,tmpkeyfname,torminlogfname=tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseangles,poltype.torsionrestraint,prevstruct,designatexyz,keybase,keybasepath)
-        prevstrctfname,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseangles,poltype.torsionrestraint,prevstruct,designatexyz,keybase,keybasepath,torxyzfname,tmpkeyfname,torminlogfname)
-        toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
-        term=AnalyzeTerm(poltype,toralzfname)
-        if term==False:
-            tinker_analyze(poltype,newtorxyzfname,keyfname,toralzfname)
-            term=AnalyzeTerm(poltype,toralzfname)
-        if term==False:
-            failedgridpoints.append(phaseangles)
-        else:
-            tot_energy,tor_energy=torfit.GrabTinkerEnergy(poltype,toralzfname)
-            energyarray[rowindex]=tot_energy
 
-    for angles in failedgridpoints:
-        index=phaseanglelist.index(angles)
-        del phaseanglelist[index]
-    seperate_angle_lists = list(zip(*phaseanglelist)) 
-    for i in range(len(seperate_angle_lists)):
-        torsion=torset[i]
-        angle_list=seperate_angle_lists[i]
-        max_angle=max(angle_list)
-        min_angle=min(angle_list)
-        maxrange=max_angle-min_angle 
-        UpdateMaxRange(poltype,torsion,maxrange)
 
-    return energyarray,phaseanglelist
 
 def FindMainConsecutiveTorsions(poltype,tortorsmissing):
     tortors=[]
@@ -1747,20 +1720,26 @@ def Determine1DTorsionSlicesOnTorTorSurface(poltype,energyarray,phaseanglelist,t
     poltype.torsettotortorphaseindicestokeep[tuple([torset[0]])]=firsttorindices
     return indicestokeep,firsttorindices,secondtorindices
 
-def RemoveTorTorPoints(poltype,energyarray,phaseanglelist,indicestokeep):
+def RemoveTorTorPoints(poltype,energyarray,phaseanglelist,indicestokeep,listofstructurestorunQM):
     energyarray=numpy.array(energyarray)
+    listofstructurestorunQM=numpy.array(listofstructurestorunQM)
     sortedenergyarrayindices=numpy.argsort(energyarray)
     sortedenergyarray=energyarray[sortedenergyarrayindices]
     sortedphaseanglelist=phaseanglelist[sortedenergyarrayindices]
+    sortedlistofstructurestorunQM=listofstructurestorunQM[sortedenergyarrayindices]
     numpts=len(sortedenergyarray)
     newphasearray=[]
+    newlistofstructurestorunQM=[]
     for i in range(len(sortedphaseanglelist)):
+        struct=sortedlistofstructurestorunQM[i]
         phase=sortedphaseanglelist[i]
         phase=phase.tolist()
         found=phase in indicestokeep
         if found==True:
             newphasearray.append(phase)
+            newlistofstructurestorunQM.append(struct)
     for i in range(len(sortedphaseanglelist)):
+        struct=sortedlistofstructurestorunQM[i]
         phase=sortedphaseanglelist[i]
         phase=phase.tolist()
         found=phase in newphasearray
@@ -1768,7 +1747,19 @@ def RemoveTorTorPoints(poltype,energyarray,phaseanglelist,indicestokeep):
             currentlength=len(newphasearray)
             if currentlength<=poltype.defaultmaxtorsiongridpoints:
                 newphasearray.append(phase)
-    return newphasearray
+                newlistofstructurestorunQM.append(struct)
+
+    correctorderphasearray=[]
+    correctlistofstructurestorunQM=[]
+    for i in range(len(phaseanglelist)):
+        struct=listofstructurestorunQM[i]
+        phase=phaseanglelist[i]
+        phase=phase.tolist()
+        found=phase in newphasearray
+        if found==True:
+            correctorderphasearray.append(phase)
+            correctlistofstructurestorunQM.append(struct)
+    return correctorderphasearray,correctlistofstructurestorunQM
             
 
 def PrepareTorsionTorsion(poltype,optmol,mol,tortorsmissing):

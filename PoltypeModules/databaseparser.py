@@ -1669,7 +1669,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         if poltype.transferanyhydrogentor==True and (anyarot2==False and anyarot3==False): 
             if atomicnumatoma==1 or atomicnumatomd==1:
                 if allhydrogentor==False and allhydrogentoroneside==False:
-                    continue
+                    continue 
                 else:
                     if torsionindices not in torsionsmissing:
                         torsionsmissing.append(torsionindices)
@@ -3715,7 +3715,9 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
 
     totalbondscollector=FindAllConsecutiveRotatableBonds(poltype,mol,listofbondsforprm)
     tortorsmissing=FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertoparameters,rdkitmol,mol,indextoneighbidxs,totalbondscollector)
+    print('tortorsmissing',tortorsmissing) 
     torsionsmissing,poormatchingaromatictorsions=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
+    print('torsionsmissing',torsionsmissing) 
     torsionsmissing=FindAdjacentMissingTorsionsForTorTor(poltype,torsionsmissing,totalbondscollector,tortorsmissing)
     atomindextosmartsatomorder=AddExternalDatabaseMatches(poltype, atomindextosmartsatomorder,vdwindicestoextsmarts,vdwsmartsatomordertoparameters)
     vdwmissing=FindMissingParameters(poltype,atomindextosmartsatomorder,rdkitmol,mol,indextoneighbidxs)

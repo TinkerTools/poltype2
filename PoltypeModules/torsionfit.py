@@ -1006,10 +1006,10 @@ def PlotHeatmap(poltype,idealanglematrix,actualanglematrix,matrix,title,figfname
     ax.set_yticklabels(yangles)
     ax.set_ylim(len(matrix),-0.5, -0.5) 
     # Loop over data dimensions and create text annotations.
-    #for i in range(len(yangles)):
-    #    for j in range(len(xangles)):
-    #        energyvalue=str(round(matrix[i,j]))
-    #        text = ax.text(j, i, energyvalue,ha="center", va="center", color="w")
+    for i in range(len(yangles)):
+        for j in range(len(xangles)):
+            energyvalue=str(round(matrix[i,j]))
+            text = ax.text(j, i, energyvalue,ha="center", va="center", color="w")
     
     ax.set_title(title)
     if textstring!=None and numprms!=None and datapts!=None and minRMSD!=None:
@@ -1236,7 +1236,6 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
 
         array=numpy.array(originalmm_energy_list)
         originalfitfuncarray=numpy.zeros(array.shape)
-
         for i in range(len(originalmm_energy_list)):
            e=originalmm_energy_list[i]
            if e==0:

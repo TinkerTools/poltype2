@@ -357,7 +357,7 @@ def write_com_header(poltype,comfname,chkfname,maxdisk,maxmem,numproc):
 
 def CompareBondLengths(poltype,inioptmol,optmol):
     isnear=True
-    tol=.2
+    tol=.25
     for inib in openbabel.OBMolBondIter(inioptmol):
         beg = inib.GetBeginAtomIdx()
         end = inib.GetEndAtomIdx()
@@ -502,14 +502,14 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,restraints=None
             if os.path.isfile(poltype.logoptfname):
                 os.remove(poltype.logoptfname)
             if poltype.externalapi==None:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,skiperrors)
             else:
                 if len(jobtooutputlog.keys())!=0:
                     call.CallExternalAPI(poltype,jobtolog,jobtologlistfilepathprefix,scratchdir)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
 
         term,error=poltype.CheckNormalTermination(poltype.logoptfname,None,skiperrors) # now grabs final structure when finished with QM if using Psi4
-        if error and term==False:
+        if error and term==False and skiperrors==False:
             poltype.RaiseOutputFileError(poltype.logoptfname) 
         GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'),mol)
         optmol =  load_structfile(poltype,poltype.logoptfname.replace('.log','.xyz'))
@@ -519,7 +519,7 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,restraints=None
     GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'),mol)
     if checkbonds==True:
         issame=CheckBondConnectivity(poltype,mol,optmol,raiseerror=True)
-    return optmol
+    return optmol,error
 
 
 def load_structfile(poltype,structfname):
