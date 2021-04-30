@@ -1601,7 +1601,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         if len(poltype.onlyrotbndslist)!=0:
             if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
                 if atomicnumatoma==1 or atomicnumatomd==1:
-                    if allhydrogentor==False and allhydrogentoroneside==False:
+                    if allhydrogentor==False and allhydrogentoroneside==False: # try to transfer H even if bad match in this case
                        continue
                 else:
 
@@ -1620,7 +1620,6 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         ringbond=False
         middlebond=mol.GetBond(babelindices[1],babelindices[2])
         ringbond=middlebond.IsInRing()
-       
         firstangle=mol.GetAngle(aatom,batom,catom)
         secondangle=mol.GetAngle(batom,catom,datom)
         if firstangle<0:
@@ -1666,30 +1665,27 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                 if idx not in matcharray:
                     matcharray.append(idx)
         check=CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,matcharray)
-        if poltype.transferanyhydrogentor==True and (anyarot2==False and anyarot3==False): 
-            if atomicnumatoma==1 or atomicnumatomd==1:
-                if allhydrogentor==False and allhydrogentoroneside==False:
-                    continue 
+        if '~' in smarts or '*' in smarts:
+            check=False
+        if check==False:
+            if ringbond==True:
+                if (anyarot2==False and anyarot3==False): # non-aromatic torsion want parameters for 
+                    if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
+                        continue
+                    else: # if dont have heavy atoms on either side then just fit the hydrogen torsion
+                        if torsionindices not in torsionsmissing:
+                            torsionsmissing.append(torsionindices)
+                else: # then aromatic and will try and transfer benzene:
+                    if torsionindices not in poormatchingaromatictorsions:
+                        poormatchingaromatictorsions.append(torsionindices)
+            else:
+                if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
+                    continue
                 else:
                     if torsionindices not in torsionsmissing:
                         torsionsmissing.append(torsionindices)
-        if '~' in smarts or '*' in smarts:
-            if ((anyarot2==True or anyarot3==True) and ringbond==True):
-                if torsionindices not in poormatchingaromatictorsions:
-                    poormatchingaromatictorsions.append(torsionindices)
-
-            else:
-                if torsionindices not in torsionsmissing:
-                    torsionsmissing.append(torsionindices)
                     continue
 
-        if check==False:
-            if (anyarot2==False and anyarot3==False):
-                if torsionindices not in torsionsmissing:
-                    torsionsmissing.append(torsionindices)
-            else:
-                if torsionindices not in poormatchingaromatictorsions:
-                    poormatchingaromatictorsions.append(torsionindices)
         else:
             if poltype.rotalltors==True:
                 if torsionindices not in torsionsmissing:
@@ -2359,6 +2355,7 @@ def ConvertToPoltypeClasses(poltype,torsionsmissing):
 def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters):
     indicestoextsmartsmatchlength={}
     indicestoextsmarts={}
+    indicestoextsmartsatomorder={}
     for smartsatomorder,parameters in smartsatomordertoparameters.items():
         smarts=smartsatomorder[0]
         atomorderlist=smartsatomorder[1]
@@ -2374,7 +2371,8 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters):
                 if moleculeindices not in indicestoextsmartsmatchlength.keys():
                     indicestoextsmartsmatchlength[moleculeindices]=len(match)
                     indicestoextsmarts[moleculeindices]=smarts
-    return indicestoextsmartsmatchlength,indicestoextsmarts
+                    indicestoextsmartsatomorder[moleculeindices]=smartsatomorder
+    return indicestoextsmartsmatchlength,indicestoextsmarts,indicestoextsmartsatomorder
 
 def CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,indicestoextsmartsmatchlength,indicesforprmtoparametersmarts,indicesforprmtosmarts,indicestoextsmarts):
     newindicestoextsmarts={}
@@ -2432,6 +2430,18 @@ def AddExternalDatabaseSMARTSMatchParameters(poltype,prms,indicestoextsmarts,sma
                         string+='\n'
                         prms.append(string)
                     pass
+                elif keyword=='torsion':
+                    for prmidx in range(len(parameters)):
+                        prm=parameters[prmidx]
+                        if prmidx==1:
+                            phase=180
+                        else:
+                            phase=0
+                        fold=prmidx+1
+                        line+=str(prm)+' '+str(phase)+' '+str(fold)+' ' 
+                    line+='\n' 
+
+
                 else:
                
                     for prm in parameters:
@@ -3581,6 +3591,20 @@ def AddExtraMissingHydrogenTorsionsToFinal(poltype,extramissingtorsion,torsionsm
 
     return torsionsmissing
 
+def TrimDictionary(poltype,dictotrim,dicref):
+    keylist=[]
+    for key,value in dictotrim.items():
+        if key not in dicref.keys():
+            keylist.append(key)
+    for key in keylist:
+        del dictotrim[key]
+    return dictotrim
+
+def AddDictionaryItems(poltype,dictoaddto,dicref):
+    for key,value in dicref.items():
+        dictoaddto[key]=value
+    return dictoaddto
+
 
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     
@@ -3661,14 +3685,14 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     anglesforprmtosmartslist=GenerateSMARTSListFromAtomList(poltype,listofanglesforprm,rdkitmol,mol,maxatomsize)
     planaranglesforprmtosmartslist=GenerateSMARTSListFromAtomList(poltype,listofanglesthatneedplanarkeyword,rdkitmol,mol,maxatomsize)
     torsionsforprmtosmartslist=GenerateSMARTSListFromAtomList(poltype,listoftorsionsforprm,rdkitmol,mol,maxatomsize)
-    bondindicestoextsmartsmatchlength,bondindicestoextsmarts=MatchExternalSMARTSToMolecule(poltype,rdkitmol,bondsmartsatomordertoparameters)
-    angleindicestoextsmartsmatchlength,angleindicestoextsmarts=MatchExternalSMARTSToMolecule(poltype,rdkitmol,anglesmartsatomordertoparameters)
-    strbndindicestoextsmartsmatchlength,strbndindicestoextsmarts=MatchExternalSMARTSToMolecule(poltype,rdkitmol,strbndsmartsatomordertoparameters)
-    torsionindicestoextsmartsmatchlength,torsionindicestoextsmarts=MatchExternalSMARTSToMolecule(poltype,rdkitmol,torsionsmartsatomordertoparameters)
+    bondindicestoextsmartsmatchlength,bondindicestoextsmarts,bondindicestoextsmartsatomorder=MatchExternalSMARTSToMolecule(poltype,rdkitmol,bondsmartsatomordertoparameters)
+    angleindicestoextsmartsmatchlength,angleindicestoextsmarts,angleindicestoextsmartsatomorder=MatchExternalSMARTSToMolecule(poltype,rdkitmol,anglesmartsatomordertoparameters)
+    strbndindicestoextsmartsmatchlength,strbndindicestoextsmarts,strbndindicestoextsmartsatomorder=MatchExternalSMARTSToMolecule(poltype,rdkitmol,strbndsmartsatomordertoparameters)
+    torsionindicestoextsmartsmatchlength,torsionindicestoextsmarts,torsionindicestoextsmartsatomorders=MatchExternalSMARTSToMolecule(poltype,rdkitmol,torsionsmartsatomordertoparameters)
 
-    opbendindicestoextsmartsmatchlength,opbendindicestoextsmarts=MatchExternalSMARTSToMolecule(poltype,rdkitmol,opbendsmartsatomordertoparameters)
-    vdwindicestoextsmartsmatchlength,vdwindicestoextsmarts=MatchExternalSMARTSToMolecule(poltype,rdkitmol,vdwsmartsatomordertoparameters)
-    tortorindicestoextsmartsmatchlength,tortorindicestoextsmarts=MatchExternalSMARTSToMolecule(poltype,rdkitmol,tortorsmartsatomordertoparameters)
+    opbendindicestoextsmartsmatchlength,opbendindicestoextsmarts,opbendindicestoextsmartsatomorder=MatchExternalSMARTSToMolecule(poltype,rdkitmol,opbendsmartsatomordertoparameters)
+    vdwindicestoextsmartsmatchlength,vdwindicestoextsmarts,vdwindicestoextsmartsatomorder=MatchExternalSMARTSToMolecule(poltype,rdkitmol,vdwsmartsatomordertoparameters)
+    tortorindicestoextsmartsmatchlength,tortorindicestoextsmarts,tortorindicestoextsmartsatomorders=MatchExternalSMARTSToMolecule(poltype,rdkitmol,tortorsmartsatomordertoparameters)
     atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,atomindicesforprmtosmartslist,parametersmartslist,mol)
     bondsforprmtoparametersmarts,bondsforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,bondsforprmtosmartslist,parametersmartslist,mol)
     planarbondsforprmtoparametersmarts,planarbondsforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,planarbondsforprmtosmartslist,parametersmartslist,mol)
@@ -3684,9 +3708,11 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
 
     planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts,angleindicestoextsmarts=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,angleindicestoextsmartsmatchlength,planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts,angleindicestoextsmarts)
 
-
     torsionsforprmtoparametersmarts,torsionsforprmtosmarts,torsionindicestoextsmarts=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,torsionindicestoextsmartsmatchlength,torsionsforprmtoparametersmarts,torsionsforprmtosmarts,torsionindicestoextsmarts)
+    
 
+    torsionindicestoextsmartsatomorders=TrimDictionary(poltype,torsionindicestoextsmartsatomorders,torsionindicestoextsmarts)
+    
     atomindextotinkertype,atomindextotinkerclass,atomindextoparametersmartsatomorder,atomindextoelementtinkerdescrip,atomindextosmartsatomorder=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
     bondindicestotinkertypes,bondindicestotinkerclasses,bondindicestoparametersmartsatomorders,bondindicestoelementtinkerdescrips,bondindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,bondsforprmtoparametersmarts,bondsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
 
@@ -3715,9 +3741,9 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
 
     totalbondscollector=FindAllConsecutiveRotatableBonds(poltype,mol,listofbondsforprm)
     tortorsmissing=FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertoparameters,rdkitmol,mol,indextoneighbidxs,totalbondscollector)
-    print('tortorsmissing',tortorsmissing) 
+    torsionindicestosmartsatomorders=AddDictionaryItems(poltype,torsionindicestosmartsatomorders,torsionindicestoextsmartsatomorders)
+
     torsionsmissing,poormatchingaromatictorsions=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
-    print('torsionsmissing',torsionsmissing) 
     torsionsmissing=FindAdjacentMissingTorsionsForTorTor(poltype,torsionsmissing,totalbondscollector,tortorsmissing)
     atomindextosmartsatomorder=AddExternalDatabaseMatches(poltype, atomindextosmartsatomorder,vdwindicestoextsmarts,vdwsmartsatomordertoparameters)
     vdwmissing=FindMissingParameters(poltype,atomindextosmartsatomorder,rdkitmol,mol,indextoneighbidxs)

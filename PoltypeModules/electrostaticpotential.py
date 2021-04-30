@@ -207,10 +207,11 @@ def CheckRMSPD(poltype):
                 rmspdexists=True
         temp.close()
         if rmspdexists==True:
-            if float(RMSPD)>poltype.maxRMSPD:
-                poltype.WriteToLog('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
+            relrmspd=float(RMSPD)/len(poltype.rdkitmol.GetAtoms())
+            if float(RMSPD)>poltype.maxRMSPD and relrmspd>poltype.relativeRMSPDtol:
+                poltype.WriteToLog('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol '+'Relative RMSPD = '+ str(relrmspd)+' relative tolerance is '+str(poltype.relativeRMSPDtol)+' kcal/mol ')
             
-                raise ValueError(os.getcwd()+' '+'Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+str(RMSPD))
+                raise ValueError(os.getcwd()+' '+'Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol '+'Relative RMSPD = '+ str(relrmspd)+' relative tolerance is '+str(poltype.relativeRMSPDtol)+' kcal/mol ')
     return rmspdexists
 
 def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
