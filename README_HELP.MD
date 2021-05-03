@@ -31,9 +31,9 @@ python /path_to_poltype/poltype.py --help
 
 ### Recommended Protocol (esp for charged molecules)
 * For molecules that are neutral and not Zwitterion (total charge can be 0), PSI4 for all QM steps (psi4 is default behaviour).
-* For molecules with more than 1 charge center and 0 net charge, POLTYPE turns on (implicit solvent) for QM optimization and torsion energy scan (MM/Tinker is set to use Generalized Kirkwood implicit solvation to be consistent)). DMA & ESP fitting of multipoles always in gas-phase. In case PCM is not on automatically for your molecules, you can mannually add options ot turn on PCM (optpcm=True, toroptpcm=True, torsppcm=True). If gaussian is detected in enviorment, then gaussian will be used for PCM computations such as initial geometry optimization, torsion geometry optimization and torsion SP. 
-* PSI4 PCM optimzation or single point energy calculation of large molecules may be problematic. In that case, you may consider to use Gaussian
-* The most expensive calculation in POLTYPE is the ESP (MP2/aug-cc-pvtz). For large molecules, Gaussain requires large memeory and disk.
+* For molecules with more than 1 charge center within 3 bond distances away, POLTYPE turns on (implicit solvent) for QM optimization and torsion energy scan (MM/Tinker is set to use Generalized Kirkwood implicit solvation to be consistent)). DMA & ESP fitting of multipoles always in gas-phase. In case PCM is not on automatically for your molecules, you can mannually add options ot turn on PCM (optpcm=True, toroptpcm=True, torsppcm=True). If gaussian is detected in enviorment, then gaussian will be used for PCM computations such as initial geometry optimization, torsion geometry optimization and torsion SP. 
+* PSI4 PCM optimzation or single point energy calculation of large molecules may be problematic. In that case, you may consider to use Gaussian (if concentrated charge centers are detected and Gaussian is found in envioronment, then Gaussian is used by default).
+* The most expensive calculation in POLTYPE is the ESP (MP2/aug-cc-pvtz). For large molecules, Gaussain requires large memeory and disk, Psi4 is an order og magnitude faster for MP2 (default is psi4).
 * Speical cases for zwitter ions
   ** If you need to use Gaussain (PSI4 PCM failed), and do not have suffcient mem/disk, you could lower the basis set to 6-311++G(2d,2p).
   ** another possibility is to (use_gausoptonly. This will use Gaussian for all opt jobs but PSi4 for DMA and ESP QM.  

@@ -2304,6 +2304,8 @@ def ReadExternalDatabase(poltype):
     vdwsmartsatomordertoparameters={}
     for line in results:
         linesplit=line.split()
+        if len(linesplit)==0:
+            continue
         if linesplit[0]=='#':
             continue
         keyword=linesplit[0]

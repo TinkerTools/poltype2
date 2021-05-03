@@ -899,7 +899,7 @@ class PolarizableTyper():
                     if ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line:
                         error=True
                         errorline=line
-                    if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line:
+                    if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line or ('OptimizationConvergenceError' in line and 'except' in line):
                         error=False
                         continue
                     if ('Error termination request processed by link 9999' in line or 'Error termination via Lnk1e in' in line) or ('OptimizationConvergenceError' in line and 'except' not in line):
@@ -1054,16 +1054,7 @@ class PolarizableTyper():
 
         return m 
 
-    def NumberOfChargedAtoms(self,mol):
-        atomitermol=openbabel.OBMolAtomIter(mol)
-        chgcount=0
-        for atm in atomitermol:
-            chg=atm.GetFormalCharge()
-            if chg!=0:
-                chgcount+=1
-        return chgcount
-
-           
+               
 
     def CheckIfCartesianXYZ(self,f):
         check=True
@@ -1094,6 +1085,7 @@ class PolarizableTyper():
     def CheckInputCharge(self,molecule):
         array=[]
         totchg=0
+        atomindextoformalcharge={}
         atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
         for atom in molecule.GetAtoms():
             atomidx=atom.GetIdx()
@@ -1113,6 +1105,7 @@ class PolarizableTyper():
                         polneighb=True
                 if polneighb and val==3:
                     chg=1
+            atomindextoformalcharge[atomidx]=chg
             totchg+=chg
             string='Atom index = '+str(atomidx+1)+' Atomic Number = ' +str(atomnum)+ ' Valence = '+str(val)+ ' Formal charge = '+str(chg)
             array.append(string)
@@ -1123,7 +1116,7 @@ class PolarizableTyper():
                 raise ValueError('Valence is not consistent with input total charge')
         else:
             self.totalcharge=totchg 
-        return molecule
+        return molecule,atomindextoformalcharge
 
     def CheckBondTopology(poltype,outputlog,rdkitmol):
         bondtoposame=True
@@ -1216,6 +1209,33 @@ class PolarizableTyper():
             
 
         return indextocoordinates
+
+    def CheckForConcentratedFormalCharges(self,m,atomindextoformalcharge):
+        chargedindices=[]
+        pcm=False
+        for atomindex,chg in atomindextoformalcharge.items():
+            if chg!=0:
+                chargedindices.append(atomindex)
+        for atomindex in chargedindices:
+            atom=m.GetAtomWithIdx(atomindex)
+            for atm in atom.GetNeighbors():
+                atmidx=atom.GetIdx()
+                if atmidx in chargedindices:
+                    pcm=True
+                for natm in atm.GetNeighbors():
+                    natmidx=natm.GetIdx()
+                    if natmidx!=atomindex:
+                        if natmidx in chargedindices:
+                            pcm=True
+                        for nnatm in natm.GetNeighbors():
+                            nnatmidx=nnatm.GetIdx()
+                            if nnatmidx!=atmidx:
+                                if nnatmidx in chargedindices:
+                                    pcm=True
+        return pcm 
+                
+                    
+
  
     def GenerateParameters(self):
         self.CheckMemorySettings()        
@@ -1241,7 +1261,8 @@ class PolarizableTyper():
         obConversion.WriteFile(mol,self.molstructfnamemol)
         indextocoordinates=self.GrabIndexToCoordinates(mol)
         m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False,sanitize=False)
-        self.CheckInputCharge(m)
+        m,atomindextoformalcharge=self.CheckInputCharge(m)
+        pcm=self.CheckForConcentratedFormalCharges(m,atomindextoformalcharge)
         m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False)
         
         cpm = copy.deepcopy(m)
@@ -1265,8 +1286,7 @@ class PolarizableTyper():
         if ('Br ' in self.mol.GetSpacedFormula()):
             self.torspbasisset=self.torspbasissethalogen
 
-        chgcount=self.NumberOfChargedAtoms(mol)
-        if self.totalcharge==0 and chgcount>1:
+        if pcm==True:
             if self.foundgauss==True:
                 self.use_gauPCM=True
                 self.SanitizeAllQMMethods()
