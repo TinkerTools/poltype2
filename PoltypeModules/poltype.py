@@ -888,7 +888,7 @@ class PolarizableTyper():
             Ftime=os.path.getmtime(logfname)
             reltime=time.time()-Ftime
             htime=reltime*0.000277778
-            updatetime=48 # hours. sometimes psi4 gives return code 0 even though program crashes
+            updatetime=6 # hours. sometimes psi4 gives return code 0 even though program crashes
             for line in open(logfname):
                 if 'poltype' in tail:
                     if 'Poltype Job Finished' in line:
@@ -896,7 +896,7 @@ class PolarizableTyper():
                 else:
                     if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line or "LBFGS  --  Normal Termination due to SmallGrad" in line or "Normal termination" in line or 'Normal Termination' in line:
                         term=True
-                    if ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line and 'except' not in line:
+                    if ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line:
                         error=True
                         errorline=line
                     if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line:
