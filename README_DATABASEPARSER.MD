@@ -97,7 +97,7 @@
     <li>	Distribute total pitor energy to all torsion around rotatable bond (the second fold torsion parameter)</li> 
 </ol>
 <li>	Correct torsion parameters with pitor energy </li>
-<li>	Remove high energy hydrogen torsion parameters that are not in ring system </li>
+<li>	Remove high energy hydrogen torsion parameters that dont have any atoms in torsion on a ring and also dont include any hydrogen torsion around partial double bond. </li>
 <ol>
     <li>	>= 1 kcal/mol </li>
 </ol>

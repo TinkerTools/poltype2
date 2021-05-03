@@ -46,7 +46,7 @@
 <li>	Compare final multipole parameters to QM potential grid file </li>
 <ol>
     <li>Compare via tinkers potential program. </li>
-    <li>Check Root Mean Square Potential Difference between final multipole fitted parameters and QM potential grid. Raise error if greater than tolerance of 1. Also must fail relative RMSPD criteria of RMSPD/atom number with tolerance of .013 </li>
+    <li>Check Root Mean Square Potential Difference between final multipole fitted parameters and QM potential grid. Raise error if greater than tolerance of 1. </li>
 </ol>
 <li>	Grab QM dipoles </li> 
 <ol>
