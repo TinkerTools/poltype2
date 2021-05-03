@@ -3551,7 +3551,11 @@ def RemoveHighEnergyHydrogenTorsionParameters(poltype,torsionprms,listoftorsions
         symmtor=tuple([poltype.idxtosymclass[i] for i in babeltor])
         if symmtor not in symmtortolistofbabeltor.keys() and symmtor[::-1] not in symmtortolistofbabeltor.keys():
             symmtortolistofbabeltor[symmtor]=[]
-        symmtortolistofbabeltor[symmtor].append(babeltor)    
+        if symmtor in symmtortolistofbabeltor.keys():
+            symmtortolistofbabeltor[symmtor].append(babeltor)    
+        elif symmtor[::-1] in symmtortolistofbabeltor.keys():
+            symmtortolistofbabeltor[symmtor[::-1]].append(babeltor)    
+
     for torsionprm in torsionprms:
         linesplit=torsionprm.split()
         newlinesplit=re.split(r'(\s+)', torsionprm)
