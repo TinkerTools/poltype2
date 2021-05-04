@@ -1343,19 +1343,18 @@ class PolarizableTyper():
             bondtoposame=self.CheckBondTopology(self.firstlogoptfname,self.rdkitmol)
         else:
             bondtoposame=False
-
+        #bondtoposame=True # temp
         while bondtoposame==False:
             if self.optmaxcycle>=400:
                 raise ValueError('Geometry optimization cant converge!')
             self.optmaxcycle+=2
             try:           
-                optmol,error = opt.GeometryOptimization(self,mol)
+                optmol,error = opt.GeometryOptimization(self,mol,checkbonds=True,modred=True,restraints=None,skipscferror=False,charge=None,skiperrors=False,overridecheckterm=True)
                 finished,error=self.CheckNormalTermination(self.firstlogoptfname)
 
             except:
                 pass
             bondtoposame=self.CheckBondTopology(self.firstlogoptfname,self.rdkitmol)
-
 
         
 

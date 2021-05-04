@@ -454,12 +454,12 @@ def StructureMinimization(poltype):
     poltype.call_subsystem(cmd, True)
 
 
-def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,restraints=None,skipscferror=False,charge=None,skiperrors=False): # specify charge instead of reading from mol if charge!=None
+def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,restraints=None,skipscferror=False,charge=None,skiperrors=False,overridecheckterm=False): # specify charge instead of reading from mol if charge!=None
     poltype.WriteToLog("NEED QM Density Matrix: Executing Gaussian Opt and SP")
 
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt
         term,error=poltype.CheckNormalTermination(poltype.logoptfname)
-        if not term:
+        if not term or overridecheckterm==True:
             mystruct = load_structfile(poltype,poltype.molstructfname)
             gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol,modred)
             cmdstr = 'cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + poltype.comoptfname
@@ -493,7 +493,7 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,restraints=None
         modred=False
 
         inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol,modred,restraints,skipscferror,charge)
-        if term==False:
+        if term==False or overridecheckterm==True:
             cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+inputname+' '+poltype.logoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}

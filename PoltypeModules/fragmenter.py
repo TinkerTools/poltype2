@@ -584,9 +584,8 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 rotbndindexes=[int(j)-1 for j in parentrotbndindexes]
                 fragrotbndindexes=[parentindextofragindex[j] for j in rotbndindexes]
                 fragrotbndindexes=[indextoequivalentindex[j] for j in fragrotbndindexes]
-
                 fragrotbndindexes=[j+1 for j in fragrotbndindexes]
-          
+
                 for j in range(0,len(fragrotbndindexes),2):
                     fragrotbnd=str(fragrotbndindexes[j])+' '+str(fragrotbndindexes[j+1])
                     if fragrotbnd not in fragrotbnds:
@@ -735,13 +734,14 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
 
 def FindCorrectEquivalentMapping(poltype,equivfragtor,fragidxtosymclass,fragindextoparentindex):
     newequivfragtor=[]
+    
     for equividx in equivfragtor:
         babelidx=equividx+1
         symclass=fragidxtosymclass[babelidx] 
         indices=GrabKeysFromValue(poltype,fragidxtosymclass,symclass)
         for index in indices:
             rdkitindex=index-1
-            if rdkitindex in fragindextoparentindex.keys():
+            if rdkitindex in fragindextoparentindex.keys() and rdkitindex not in newequivfragtor:
                 newequivfragtor.append(rdkitindex)
                 break
 

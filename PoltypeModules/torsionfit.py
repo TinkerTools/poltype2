@@ -186,6 +186,7 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
         WBOarray.append(WBOvalues)
         energy_list.append(tor_energy)
         angle_list.append(angles)
+     
     rows = zip(*[angle_list, energy_list])
     rows=sorted(rows)
     rows0=list([i[0] for i in rows])
@@ -773,6 +774,9 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         qm_energy_list_unmodified = cls_qm_engy_dict_unmodified[tup]  # QM torsion energy
         # 'normalize'
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
+        for e in qm_energy_list:
+            if e>50:
+                raise ValueError('Energy is greater than 50 kcal/mol for '+str(torset))
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]
 
         weightlist=numpy.exp(-numpy.array(qm_energy_list)/poltype.boltzmantemp)
