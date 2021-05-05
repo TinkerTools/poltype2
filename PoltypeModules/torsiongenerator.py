@@ -106,10 +106,10 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
         if not poltype.use_gaus:
             prevstrctfname=outputlog.replace('.log','.xyz')
             inputname,outputname=CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,mol)
-            cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+inputname+' '+outputname
+            cmdstr='psi4 '+inputname+' '+outputname
         else:
             inputname,outputname=GenerateTorsionSPInputFileGaus(poltype,torset,optmol,phaseangles,outputlog,mol)
-            cmdstr = 'cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
+            cmdstr = 'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
         finished,error=poltype.CheckNormalTermination(outputname)
         if finished==True and error==False:
             pass
@@ -231,10 +231,10 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
 def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist,mol,currentopt):
     if  poltype.use_gaus==False and poltype.use_gausoptonly==False:
         inputname,outputname=CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt)
-        cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+inputname+' '+outputname
+        cmdstr='psi4 '+inputname+' '+outputname
     else:
         inputname,outputname=CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt)
-        cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
+        cmdstr='GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
         return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4
 
@@ -581,16 +581,20 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             prefix='%s-opt-' % (poltype.molecprefix)
             postfix='-opt.xyz' 
             prevstrctfname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
-            cmd = 'cp ../%s %s' % (poltype.logoptfname.replace('.log','.xyz'),prevstrctfname)
-            poltype.call_subsystem(cmd,True)
-
+            tempdir=os.getcwd()
+            os.chdir('..')
+            shutil.copy(poltype.logoptfname.replace('.log','.xyz'),os.path.join(tempdir,prevstrctfname))
+            os.chdir(tempdir)
         else:
             prefix='%s-opt-' % (poltype.molecprefix)
             postfix='.log' 
             prevstrctfname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
             # copy *-opt.log found early by Gaussian to 'prevstrctfname'
-            cmd = 'cp ../%s %s' % (poltype.logoptfname,prevstrctfname)
-            poltype.call_subsystem(cmd,True)
+            tempdir=os.getcwd()
+            os.chdir('..')
+            shutil.copy(poltype.logoptfname,os.path.join(tempdir,prevstrctfname))
+            os.chdir(tempdir)
+
 
         torsettooutputlogtoinitialstructure[tuple(torset)]={}
         optnumtotorsettofulloutputlogs['1'][tuple(torset)]=[]

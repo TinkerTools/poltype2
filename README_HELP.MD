@@ -65,6 +65,8 @@ maxdisk           specifies max scratch space used for running quantum jobs.
                   Default=100GB
 totalcharge       specifies totalcharge of molecule.
                   Defualt=None
+optmaxcycle       This keyword to reduce number of optcycles needed (they are expensive), 5 cycles is good for quicker QM OPT but in an extreme case if input structure is too far from poltypes internal bond length change checking tolerances then poltype will not beable to increase cycles automatically. If using 5 cycles and then input structure is too far from final QM structure( bond lengths differ by more than internal tolerance) (after 5 cycles), then poltype will increase cycles and repeat QM OPT.
+                  Default=400
 ```
 
 * Note for very large molecules initial opt, DMA and ESP may require large amounts of memory if quantum job consistently crashes
@@ -101,15 +103,13 @@ freq              specifies to do a frequency calculation during geometry optimi
 optpcm            specifies to use PCM for geometry optimization. 
                   Default=True if there is no net charge, but some atoms have formal charge.
 optmaxcycle       specifies the number of max cycles or iterations allowed during optimization.
-                  Default=5
+                  Default=400
 optmethod         specifies quantum method for geometry optimziation. 
                   Default=wB97XD
 
 use_gausgeomoptonly specifies to only use gaussian for initial geometry optimization and Psi4 for all other QM stepsi
                   Default=False 
 
-skipsecondopt     specifies to skip second initial geometry optimization (default MP2 QM method)
-                  Default=False
 ```
 
 ### Distributed Multipole Analysis (DMA) and Electrostatic Single Point (ESP) Inputs
