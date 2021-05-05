@@ -403,13 +403,15 @@ def write_com_header(poltype,comfname,chkfname,maxdisk,maxmem,numproc):
 
 def AverageBondTableLength(poltype,elementsbondorder):
     elementstobondordertolength={tuple([1,1,1]):.74,tuple([9,9,1]):1.42,tuple([17,17,1]):1.99,tuple([35,35,1]):2.28,tuple([53,53,1]):2.67,tuple([1,6,1]):1.10,tuple([1,7,1]):1.00,tuple([1,8,1]):.97,tuple([1,9,1]):.92,tuple([6,6,1]):1.54,tuple([6,7,1]):1.47,tuple([6,8,1]):1.43,tuple([7,7,1]):1.45,tuple([8,8,1]):1.45,tuple([1,6,1]):1.10,tuple([6,6,2]):1.34,tuple([6,6,3]):1.20,tuple([6,7,2]):1.28,tuple([6,8,2]):1.20,tuple([6,8,3]):1.13,tuple([7,7,2]):1.23,tuple([7,7,3]):1.10,tuple([8,8,2]):1.21,tuple([1,9,1]):.92,tuple([1,17,1]):1.27,tuple([1,35,1]):1.41,tuple([1,53,1]):1.61,tuple([6,16,1]):1.82,tuple([1,6,1]):1.10,tuple([6,9,1]):1.35,tuple([6,17,1]):1.77,tuple([6,35,1]):1.94,tuple([6,53,1]):2.14}
+    
     found=False
     length=None
+    rev=tuple([elementsbondorder[1],elementsbondorder[0],elementsbondorder[2]])
     if elementsbondorder in elementstobondordertolength.keys():
         length=elementstobondordertolength[elementsbondorder]
         found=True
-    elif elementsbondorder[::-1] in elementstobondordertolength.keys():
-        length=elementstobondordertolength[elementsbondorder[::-1]]
+    elif rev in elementstobondordertolength.keys():
+        length=elementstobondordertolength[rev]
         found=True
     if found==False:
         tol=.2 # extreme case if any missing above
@@ -428,15 +430,20 @@ def CompareBondLengths(poltype,inioptmol,optmol):
         if b==None:
             isnear=False
             break
-        begatom=optmol.GetAtomWithIdx(beg)
-        endatom=optmol.GetAtomWithIdx(end)
+        begatom=optmol.GetAtom(beg)
+        endatom=optmol.GetAtom(end)
         begatomicnum=begatom.GetAtomicNum()
         endatomicnum=endatom.GetAtomicNum()
         bondorder=b.GetBondOrder()
-        elementsbondorder=[begatomicnum,endatomicnum,bondorder]
+        elementsbondorder=tuple([begatomicnum,endatomicnum,bondorder])
         tol,length=AverageBondTableLength(poltype,elementsbondorder)
         blength=b.GetLength()
-        diff=np.abs(length-blength)
+        iniblength=b.GetLength()
+        if length!=None:
+            diff=np.abs(length-blength)
+        else:
+            diff=np.abs(iniblength-blength)
+
         if diff>=tol:
             isnear=False
     return isnear
