@@ -65,7 +65,7 @@ maxdisk           specifies max scratch space used for running quantum jobs.
                   Default=100GB
 totalcharge       specifies totalcharge of molecule.
                   Defualt=None
-optmaxcycle       This keyword to reduce number of optcycles needed (they are expensive), 5 cycles is good for quicker QM OPT but in an extreme case if input structure is too far from poltypes internal bond length change checking tolerances then poltype will not beable to increase cycles automatically. If using 5 cycles and then input structure is too far from final QM structure( bond lengths differ by more than internal tolerance) (after 5 cycles), then poltype will increase cycles and repeat QM OPT.
+optmaxcycle       This keyword to reduce number of optcycles needed (they are expensive), 5 cycles is good for quicker QM OPT but in an extreme case if input structure is too far from poltypes internal bond length change checking tolerances then poltype will not beable to increase cycles automatically. If using 5 cycles and then input structure is too far from final QM structure( bond lengths differ by more than internal tolerance) (after 5 cycles), then poltype will increase cycles and repeat QM OPT. By default rotatble bonds have dihedrals restrained during first QM OPT.
                   Default=400
 ```
 

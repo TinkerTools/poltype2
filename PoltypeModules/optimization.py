@@ -7,8 +7,10 @@ import time
 import apicall as call
 import shlex
 import numpy as np
+import shutil
+import torsiongenerator as torgen
 
-def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,restraints,skipscferror,chg):
+def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondanglerestraints,skipscferror,chg,torsionrestraints=[]):
     tempread=open(comfilecoords,'r')
     results=tempread.readlines()
     tempread.close()
@@ -51,13 +53,14 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,restrain
     else:
         temp.write('set {'+'\n')
         temp.write('  geom_maxiter '+str(poltype.optmaxcycle)+'\n')
-        temp.write('  g_convergence GAU_LOOSE'+'\n')
+        if len(torsionrestraints)==0:
+            temp.write('  g_convergence GAU_LOOSE'+'\n')
         temp.write('  dynamic_level 1'+'\n')
         temp.write('}'+'\n')
 
-    if restraints!=None:
+    if bondanglerestraints!=None:
         space='  '
-        bondres=[restraints[0]]
+        bondres=[bondanglerestraints[0]]
         string='frozen_distance'
         temp.write('set optking{'+'\n')
         temp.write('  '+string+' '+'='+' '+'('+'"'+'\n')
@@ -68,7 +71,7 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,restrain
         temp.write('  "'+')'+'\n')
         temp.write('}'+'\n')
        
-        anglerestraints=restraints[1:]
+        anglerestraints=bondanglerestraints[1:]
         string='frozen_bend'
         temp.write('set optking{'+'\n')
         temp.write('  '+string+' '+'='+' '+'('+'"'+'\n')
@@ -78,7 +81,20 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,restrain
             temp.write('   '+resstring)
         temp.write('  "'+')'+'\n')
         temp.write('}'+'\n')
-   
+    if len(torsionrestraints)!=0:
+        temp.write('set optking { '+'\n')
+        temp.write('  frozen_dihedral = ("'+'\n')
+        for residx in range(len(torsionrestraints)):
+            res=torsionrestraints[residx]
+            rta,rtb,rtc,rtd=res[:]
+            if residx>0:
+                temp.write(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
+            else:
+                temp.write('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
+
+        temp.write('  ")'+'\n')
+        temp.write('}'+'\n')
+
 
 
 
@@ -226,7 +242,7 @@ def GrabFinalXYZStructure(poltype,logname,filename,mol):
         obConversion.SetOutFormat('xyz')
         obConversion.WriteFile(tempmol, filename)
 
-def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modred=True):
+def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modred=True,torsionrestraints=[]):
     """
     Intent: Create *.com file for qm opt
     Input:
@@ -306,6 +322,36 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
         tmpfh.write('\n')
         tmpfh.write('\n')
     tmpfh.close()
+    if len(torsionrestraints)!=0:
+        tempname=comfname.replace('.com','_temp.com')
+        temp=open(comfname,'r')
+        results=temp.readlines()
+        temp.close()
+        tmpfh = open(tempname, "w")
+        foundatomblock=False
+        writeres=False
+        for k in range(len(results)):
+            line=results[k]
+            linesplit=line.split() 
+            if len(linesplit)==4 and foundatomblock==False and '#' not in line:
+                foundatomblock=True
+            if len(linesplit)!=4 and foundatomblock==True and writeres==False:
+                writeres=True
+                tmpfh.write('\n')
+                for res in torsionrestraints:
+                    rta,rtb,rtc,rtd=res[:]
+                    tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
+                tmpfh.write("\n")
+            else:
+                tmpfh.write(line)
+
+        tmpfh.close()
+        os.remove(comfname)
+        shutil.copy(tempname,comfname)
+
+
+
+
 
 def GenerateElementToBasisSetLines(poltype,basissetfile):
     elementtobasissetlines={}
@@ -355,9 +401,26 @@ def write_com_header(poltype,comfname,chkfname,maxdisk,maxmem,numproc):
     tmpfh.write("%Nproc=" + str(numproc) + "\n")
     tmpfh.close()
 
+def AverageBondTableLength(poltype,elementsbondorder):
+    elementstobondordertolength={tuple([1,1,1]):.74,tuple([9,9,1]):1.42,tuple([17,17,1]):1.99,tuple([35,35,1]):2.28,tuple([53,53,1]):2.67,tuple([1,6,1]):1.10,tuple([1,7,1]):1.00,tuple([1,8,1]):.97,tuple([1,9,1]):.92,tuple([6,6,1]):1.54,tuple([6,7,1]):1.47,tuple([6,8,1]):1.43,tuple([7,7,1]):1.45,tuple([8,8,1]):1.45,tuple([1,6,1]):1.10,tuple([6,6,2]):1.34,tuple([6,6,3]):1.20,tuple([6,7,2]):1.28,tuple([6,8,2]):1.20,tuple([6,8,3]):1.13,tuple([7,7,2]):1.23,tuple([7,7,3]):1.10,tuple([8,8,2]):1.21,tuple([1,9,1]):.92,tuple([1,17,1]):1.27,tuple([1,35,1]):1.41,tuple([1,53,1]):1.61,tuple([6,16,1]):1.82,tuple([1,6,1]):1.10,tuple([6,9,1]):1.35,tuple([6,17,1]):1.77,tuple([6,35,1]):1.94,tuple([6,53,1]):2.14}
+    found=False
+    length=None
+    if elementsbondorder in elementstobondordertolength.keys():
+        length=elementstobondordertolength[elementsbondorder]
+        found=True
+    elif elementsbondorder[::-1] in elementstobondordertolength.keys():
+        length=elementstobondordertolength[elementsbondorder[::-1]]
+        found=True
+    if found==False:
+        tol=.2 # extreme case if any missing above
+    else:
+        tol=.05 # test this may increase tolerance later
+    return tol,length
+
+    
+
 def CompareBondLengths(poltype,inioptmol,optmol):
     isnear=True
-    tol=.25
     for inib in openbabel.OBMolBondIter(inioptmol):
         beg = inib.GetBeginAtomIdx()
         end = inib.GetEndAtomIdx()
@@ -365,9 +428,15 @@ def CompareBondLengths(poltype,inioptmol,optmol):
         if b==None:
             isnear=False
             break
-        iniblength=inib.GetLength()
+        begatom=optmol.GetAtomWithIdx(beg)
+        endatom=optmol.GetAtomWithIdx(end)
+        begatomicnum=begatom.GetAtomicNum()
+        endatomicnum=endatom.GetAtomicNum()
+        bondorder=b.GetBondOrder()
+        elementsbondorder=[begatomicnum,endatomicnum,bondorder]
+        tol,length=AverageBondTableLength(poltype,elementsbondorder)
         blength=b.GetLength()
-        diff=np.abs(iniblength-blength)
+        diff=np.abs(length-blength)
         if diff>=tol:
             isnear=False
     return isnear
@@ -444,25 +513,52 @@ def StructureMinimization(poltype):
     poltype.WriteToLog("=========================================================")
     poltype.WriteToLog("Minimizing structure\n")
 
-    cmd='cp ' + poltype.xyzoutfile + ' ' + poltype.tmpxyzfile
-    poltype.call_subsystem(cmd)
-
-    cmd='cp ' + poltype.key5fname + ' ' + poltype.tmpkeyfile
-    poltype.call_subsystem(cmd)
-
+    shutil.copy(poltype.xyzoutfile,poltype.tmpxyzfile)
+    shutil.copy(poltype.key5fname,poltype.tmpkeyfile)
     cmd = poltype.minimizeexe+' -k '+poltype.tmpkeyfile+' '+poltype.tmpxyzfile+' 0.1 > Minimized_final.out'
     poltype.call_subsystem(cmd, True)
 
 
-def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,restraints=None,skipscferror=False,charge=None,skiperrors=False,overridecheckterm=False): # specify charge instead of reading from mol if charge!=None
-    poltype.WriteToLog("NEED QM Density Matrix: Executing Gaussian Opt and SP")
+def FindTorsionRestraints(poltype,mol):
+    torsionrestraints=[]
+    atomiter=openbabel.OBMolAtomIter(mol)
+    atomnum=0
+    for atom in atomiter:
+        atomnum+=1
+    bondnum=0
+    for b in openbabel.OBMolBondIter(mol):
+        isrot=b.IsRotor()
+        if isrot==True:
+            bondnum+=1
+    if atomnum>=25 or bondnum>=2:
+        for b in openbabel.OBMolBondIter(mol):
+            isrot=b.IsRotor()
+            if isrot==True:
+                t2 = b.GetBeginAtom()
+                t3 = b.GetEndAtom()
+                t1,t4 = torgen.find_tor_restraint_idx(poltype,mol,t2,t3)
+                t2idx=t2.GetIdx()
+                t3idx=t3.GetIdx()
+                t1idx=t1.GetIdx()
+                t4idx=t4.GetIdx()
+                torsionrestraints.append([t1idx,t2idx,t3idx,t4idx])
 
+
+    return torsionrestraints
+
+def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,bondanglerestraints=None,skipscferror=False,charge=None,skiperrors=False,overridecheckterm=False): # specify charge instead of reading from mol if charge!=None
+    poltype.WriteToLog("NEED QM Density Matrix: Executing Gaussian Opt and SP")
+    if bondanglerestraints!=None: # then vdw opt
+        pass
+    else: # see if need to restrain torsion in extended conformation
+        torsionrestraints=FindTorsionRestraints(poltype,mol)
+ 
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt
         term,error=poltype.CheckNormalTermination(poltype.logoptfname)
         if not term or overridecheckterm==True:
             mystruct = load_structfile(poltype,poltype.molstructfname)
-            gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol,modred)
-            cmdstr = 'cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + poltype.comoptfname
+            gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol,modred,torsionrestraints)
+            cmdstr = 'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + poltype.comoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdirgau
@@ -487,14 +583,14 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,restraints=None
            
     else:
 
-        gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol,modred)
+        gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol,modred,torsionrestraints)
         poltype.WriteToLog("Calling: " + "Psi4 Optimization")
         term,error=poltype.CheckNormalTermination(poltype.logoptfname,None,skiperrors)
         modred=False
 
-        inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol,modred,restraints,skipscferror,charge)
+        inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol,modred,bondanglerestraints,skipscferror,charge,torsionrestraints)
         if term==False or overridecheckterm==True:
-            cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+inputname+' '+poltype.logoptfname
+            cmdstr='psi4 '+inputname+' '+poltype.logoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdirpsi4

@@ -906,7 +906,7 @@ class PolarizableTyper():
                         error=True
                         errorline=line
             if 'opt' in logfname:
-                if self.CycleCount(logfname)>=poltype.optmaxcycle:
+                if self.CycleCount(logfname)>=self.optmaxcycle:
                     term=True
                     error=False
 
@@ -1118,20 +1118,23 @@ class PolarizableTyper():
             self.totalcharge=totchg 
         return molecule,atomindextoformalcharge
 
-    def CheckBondTopology(poltype,outputlog,rdkitmol):
+    def CheckBondTopology(self,outputlog,rdkitmol):
         bondtoposame=True
-        if poltype.use_gaus==False and poltype.use_gausoptonly==False:
+        if self.use_gaus==False and self.use_gausoptonly==False:
             fname=outputlog.replace('.log','.xyz')
         else:
             fname=outputlog
         outputname='preQMopt.mol'
         rdmolfiles.MolToMolFile(rdkitmol,outputname)
-        optmol = opt.load_structfile(poltype,fname)
-        inioptmol = opt.load_structfile(poltype,outputname)
-        issame=opt.CheckBondConnectivity(poltype,inioptmol,optmol)
+        optmol = opt.load_structfile(self,fname)
+        inioptmol = opt.load_structfile(self,outputname)
+        issame=opt.CheckBondConnectivity(self,inioptmol,optmol)
         if issame==False:
-            bondtoposame=False 
-        isnear=opt.CompareBondLengths(poltype,inioptmol,optmol)
+            bondtoposame=False
+        if self.fullopt==False: 
+            isnear=opt.CompareBondLengths(self,inioptmol,optmol)
+        else:
+            isnear=True
         if isnear==False:
             bondtoposame=False
     
@@ -1239,7 +1242,10 @@ class PolarizableTyper():
  
     def GenerateParameters(self):
         self.CheckMemorySettings()        
-
+        if self.optmaxcycle>=100:
+            self.fullopt=True
+        else:
+            self.fullopt=False
         obConversion = openbabel.OBConversion()
         mol = openbabel.OBMol()
         inFormat = obConversion.FormatFromExt(self.molstructfname)
@@ -1332,6 +1338,7 @@ class PolarizableTyper():
 
         if self.use_gausgeomoptonly==True:
             self.use_gausoptonly=True
+
         try:
             optmol,error = opt.GeometryOptimization(self,mol)
         except:
@@ -1481,7 +1488,7 @@ class PolarizableTyper():
         self.nonaroringtorsets=[]
         self.classkeytoinitialprmguess={}
         if self.tortor==True and self.dontdotor==False:
-            torgen.PrepareTorsionTorsion(poltype,optmol,mol,tortorsmissing)
+            torgen.PrepareTorsionTorsion(self,optmol,mol,tortorsmissing)
 
         if self.refinenonaroringtors==True and self.dontfrag==False:
             rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)

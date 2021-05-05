@@ -27,6 +27,8 @@
     <li>	Check for normal termination signal, if not found and error detected than crash program. </li>
     <li>	If using Gaussian call formchk program to generate fchk file. </li>
     <li>	If normal termination detected (number of cycles is >=maxoptcycles) then grab the final XYZ structure and output to -opt.xyz file. </li>
+    <li>	Default behaviour is full QM OPT (400 cycles). Dihedrals around rotatable bonds are restrained to not move during OPT. If optmaxcycles<100 (optional keyword), then GAU LOOSE criteria will be used and also attempt to use input users number of optcycles and detect if QM structure is too far from internal table of bond lengths, then need more optcycles and will do a longer QM OPT. </li>
+
 </ol>
 <li>	Compare bond lengths. </li> 
 <ol>
