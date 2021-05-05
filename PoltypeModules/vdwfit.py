@@ -1623,8 +1623,6 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             poltype.fckoptfname=prefix+'-opt.fchk'
             poltype.logoptfname=prefix+'-opt.log'
             poltype.gausoptfname=prefix+'-opt.log'
-            print('mol',mol,flush=True)
-            print('mol.NumAtoms())',mol.NumAtoms(),flush=True)
             optmol,error = opt.GeometryOptimization(poltype,mol,checkbonds=False,modred=False,restraints=restraints,skipscferror=False,charge=totchg,skiperrors=True)
             if error==True:
                 moleculeprobeindicestoignore.append([moleculeindex,probeindex])
@@ -1635,10 +1633,6 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             moleculeatoms=dimeratoms-probeatoms
             moleculeatom=optmol.GetAtom(moleculeindex)
             probeatom=optmol.GetAtom(probeindex)
-            print('error',error,flush=True)
-            print('optmol',optmol,flush=True)
-            print('moelculeindex',moleculeindex,flush=True)
-            print('prefix',prefix,flush=True)
             moleculeatomcoords=np.array([moleculeatom.GetX(),moleculeatom.GetY(),moleculeatom.GetZ()])
             probeatomcoords=np.array([probeatom.GetX(),probeatom.GetY(),probeatom.GetZ()])
             equildistance=np.linalg.norm(probeatomcoords-moleculeatomcoords)

@@ -982,7 +982,6 @@ def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndli
         keylist=rotbndlist[key]
         torsionlist=[]
         maintor=keylist[0]
-        count=0
         for tor in keylist:
             a2,b2,c2,d2=tor[0:4]
             obaa = mol.GetAtom(a2)
@@ -993,17 +992,14 @@ def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndli
             aatomicnum=obaa.GetAtomicNum()
             datomicnum=obad.GetAtomicNum()
             babelindices=[a2,b2,c2,d2]
-            allhydtor=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
-            allhydtoroneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol)
-
-            if (allhydtor==False and allhydtoroneside==False)  and (aatomicnum==1 or datomicnum==1):
+            torsionsmissing=databaseparser.ReadTorsionList(poltype,os.path.join(os.path.abspath(os.getcwd()),poltype.torsionsmissingfilename))
+            classes=[poltype.idxtosymclass[i] for i in babelindices]
+            if classes not in torsionsmissing and classes[::-1] not in torsionsmissing: # then probably H torsions transferred
                 continue
-            if (allhydtoroneside==True or allhydtor==True) and (aatomicnum==1 or datomicnum==1):
+
+
 
          
-                if count>=1:
-                    continue
-                count+=1
             if tpdkey not in torsionlist:
                 torsionlist.append(tpdkey)
         torset=tuple([maintor])

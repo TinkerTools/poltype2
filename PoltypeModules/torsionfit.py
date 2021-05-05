@@ -186,7 +186,12 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
         WBOarray.append(WBOvalues)
         energy_list.append(tor_energy)
         angle_list.append(angles)
-     
+    nonecount=energy_list.count(None)
+    normalpts=len(energy_list)-nonecount
+    prmnum=poltype.torsionsettonumptsneeded[torset]
+
+    if normalpts<prmnum:
+        raise ValueError('Too many missing QM SP energy values for torsion set = '+str(torset)+' , need '+str(prmnum)+' points') 
     rows = zip(*[angle_list, energy_list])
     rows=sorted(rows)
     rows0=list([i[0] for i in rows])
