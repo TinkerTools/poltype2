@@ -889,6 +889,7 @@ class PolarizableTyper():
             reltime=time.time()-Ftime
             htime=reltime*0.000277778
             updatetime=6 # hours. sometimes psi4 gives return code 0 even though program crashes
+            foundendgau=False # sometimes gaussian comments have keyword Error, ERROR in them
             for line in open(logfname):
                 if 'poltype' in tail:
                     if 'Poltype Job Finished' in line:
@@ -899,12 +900,19 @@ class PolarizableTyper():
                     if ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line:
                         error=True
                         errorline=line
-                    if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line or ('OptimizationConvergenceError' in line and 'except' in line):
+                    if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line or ('OptimizationConvergenceError' in line and 'except' in line) or "Error on total polarization charges" in line:
                         error=False
                         continue
                     if ('Error termination request processed by link 9999' in line or 'Error termination via Lnk1e in' in line) or ('OptimizationConvergenceError' in line and 'except' not in line):
                         error=True
                         errorline=line
+                    if 'l9999.exe' in line and foundendgau==False:
+                        foundendgau=True
+                        preverror=error # did find error before comment?
+                    if foundendgau==True:
+                        if error==True and preverror==False: # then caused by Gaussian comment
+                            error=False
+                    
             if 'opt' in logfname:
                 if self.CycleCount(logfname)>=self.optmaxcycle:
                     term=True
@@ -1222,7 +1230,7 @@ class PolarizableTyper():
         for atomindex in chargedindices:
             atom=m.GetAtomWithIdx(atomindex)
             for atm in atom.GetNeighbors():
-                atmidx=atom.GetIdx()
+                atmidx=atm.GetIdx()
                 if atmidx in chargedindices:
                     pcm=True
                 for natm in atm.GetNeighbors():
