@@ -557,6 +557,7 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,bondanglerestra
     poltype.WriteToLog("NEED QM Density Matrix: Executing Gaussian Opt and SP")
     if bondanglerestraints!=None: # then vdw opt
         pass
+        torsionrestraints=[]
     else: # see if need to restrain torsion in extended conformation
         torsionrestraints=FindTorsionRestraints(poltype,mol)
  
