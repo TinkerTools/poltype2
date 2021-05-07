@@ -903,7 +903,7 @@ class PolarizableTyper():
                     if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line or ('OptimizationConvergenceError' in line and 'except' in line) or "Error on total polarization charges" in line:
                         error=False
                         continue
-                    if ('Error termination request processed by link 9999' in line or 'Error termination via Lnk1e in' in line) or ('OptimizationConvergenceError' in line and 'except' not in line):
+                    if ('Error termination request processed by link 9999' in line or 'Error termination via Lnk1e in' in line) or ('OptimizationConvergenceError' in line and 'except' not in line) or 'Could not converge geometry optimization' in line:
                         error=True
                         errorline=line
                     if 'l9999.exe' in line and foundendgau==False:
@@ -913,10 +913,6 @@ class PolarizableTyper():
                         if error==True and preverror==False: # then caused by Gaussian comment
                             error=False
                     
-            if 'opt' in logfname:
-                if self.CycleCount(logfname)>=self.optmaxcycle:
-                    term=True
-                    error=False
 
             if error==True:
                 term=False # sometimes psi4 geometry opt not fully converge but says successfully exiting etc..
@@ -1352,24 +1348,32 @@ class PolarizableTyper():
         except:
             pass
         finished,error=self.CheckNormalTermination(self.firstlogoptfname)
-        if finished==True:
+        if finished==False:
             bondtoposame=self.CheckBondTopology(self.firstlogoptfname,self.rdkitmol)
         else:
-            bondtoposame=False
-        #bondtoposame=True # temp
+            bondtoposame=True
+        attempts=0
+        maxiter=20
+        cartxyz=self.firstlogoptfname.replace('.log','.xyz')
+        opt.GrabFinalXYZStructure(self,self.firstlogoptfname,cartxyz,mol)
+
+        inioptmol = opt.load_structfile(poltype,cartxyz)
+        inioptmol.SetTotalCharge(mol.GetTotalCharge())
+
         while bondtoposame==False:
-            if self.optmaxcycle>=400:
-                raise ValueError('Geometry optimization cant converge!')
-            self.optmaxcycle+=2
+            if attempts>=maxiter or finished==True:
+                break
             try:           
-                optmol,error = opt.GeometryOptimization(self,mol,checkbonds=True,modred=True,bondanglerestraints=None,skipscferror=False,charge=None,skiperrors=False,overridecheckterm=True)
+                optmol,error = opt.GeometryOptimization(self,inioptmol,checkbonds=True,modred=True,bondanglerestraints=None,skipscferror=False,charge=None,skiperrors=False,overridecheckterm=True)
                 finished,error=self.CheckNormalTermination(self.firstlogoptfname)
-
+                cartxyz=self.firstlogoptfname.replace('.log','.xyz')
+                opt.GrabFinalXYZStructure(self,self.firstlogoptfname,cartxyz,mol)
+                inioptmol = opt.load_structfile(poltype,cartxyz)
+                inioptmol.SetTotalCharge(mol.GetTotalCharge())
             except:
-
                 pass
             bondtoposame=self.CheckBondTopology(self.firstlogoptfname,self.rdkitmol)
-
+            attempts+=1
         
 
         totalatoms=optmol.NumAtoms()
@@ -1468,6 +1472,7 @@ class PolarizableTyper():
             torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
         # Find rotatable bonds for future torsion scans
         (self.torlist, self.rotbndlist,hydtorsions,nonaroringtorlist) = torgen.get_torlist(self,mol,torsionsmissing)
+        
         torgen.get_all_torsions(self,mol)
         self.torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self) # this only happens in very symmetrical molecules
         self.torlist=[tuple(i) for i in self.torlist]
@@ -1481,6 +1486,7 @@ class PolarizableTyper():
         torgen.DefaultMaxRange(self,self.torlist)
         if self.dontdotor==True:
             self.torlist=[]
+        
         # add missingvdwindices to torlist (for fragmenter input)
         missingvdwatomsets=[]
         if self.isfragjob==False and self.dontfrag==False and self.dontdovdwscan==False:
@@ -1501,6 +1507,9 @@ class PolarizableTyper():
 
         if self.refinenonaroringtors==True and self.dontfrag==False:
             rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
+        if self.tordebugmode==True:
+            sys.exit()
+
         if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False and (self.dontdotor==False or self.dontdovdwscan==False):
             
 

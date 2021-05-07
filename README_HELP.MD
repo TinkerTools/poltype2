@@ -105,7 +105,7 @@ optpcm            specifies to use PCM for geometry optimization.
 optmaxcycle       specifies the number of max cycles or iterations allowed during optimization.
                   Default=400
 optmethod         specifies quantum method for geometry optimziation. 
-                  Default=wB97XD
+                  Default=MP2
 
 use_gausgeomoptonly specifies to only use gaussian for initial geometry optimization and Psi4 for all other QM stepsi
                   Default=False 

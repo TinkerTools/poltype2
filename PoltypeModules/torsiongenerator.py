@@ -62,7 +62,7 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,varia
         torxyzfname=listofstructurestorunQM[i]
         phaseangles=phaselist[i]
         inputname,outputlog,cmdstr,scratchdir=GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist,mol,currentopt)
-        finished,error=poltype.CheckNormalTermination(outputlog)
+        finished,error=poltype.CheckNormalTermination(outputlog,errormessages=None,skiperrors=True)
         if finished==True and 'opt' in outputlog:
             opt.GrabFinalXYZStructure(poltype,outputlog,outputlog.replace('.log','.xyz'),mol)
         if finished==False:
@@ -110,7 +110,7 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
         else:
             inputname,outputname=GenerateTorsionSPInputFileGaus(poltype,torset,optmol,phaseangles,outputlog,mol)
             cmdstr = 'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
-        finished,error=poltype.CheckNormalTermination(outputname)
+        finished,error=poltype.CheckNormalTermination(outputname,errormessages=None,skiperrors=True)
         if finished==True and error==False:
             pass
         else:
@@ -636,7 +636,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         poltype.torsettophaselist[tuple(torset)]=flatphaselist
 
         poltype.SanitizeAllQMMethods()
-        poltype.optmaxcycle=6
+        poltype.optmaxcycle=5
         outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol,'1')
         torsettooptoutputlogs[tuple(torset)]=outputlogs
 
@@ -661,11 +661,8 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         finishedjobs,errorjobs=poltype.WaitForTermination(fulljobtooutputlog)
     else:
         finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
-    torsettofailedoutputlogtoinitialstructure={}
-    failed=False
 
     for torset in poltype.torlist:
-        torsettofailedoutputlogtoinitialstructure[tuple(torset)]={}
         outputlogtoinitialstructure=torsettooutputlogtoinitialstructure[tuple(torset)]
         tryoutputlogs=optnumtotorsettofulloutputlogs['1'][tuple(torset)]
         inistructophaselist=torsettoinistructophaselist[tuple(torset)]
@@ -673,30 +670,34 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             initialtinkerstructure=outputlogtoinitialstructure[outputlog]
             phaseangles=inistructophaselist[initialtinkerstructure]
             finished,error=poltype.CheckNormalTermination(outputlog)
-            if finished==True and 'opt' in outputlog:
-                cartxyz=outputlog.replace('.log','.xyz')
-                opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
-                tinkerxyz=outputlog.replace('.log','_tinker.xyz')
+            cartxyz=outputlog.replace('.log','.xyz')
+            opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
+            tinkerxyz=outputlog.replace('.log','_tinker.xyz')
+            ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz) 
+            if finished==False and 'opt' in outputlog: # if there is an error, then finished=False
                 bondtoposame=CheckBondTopology(poltype,outputlog,initialtinkerstructure)
+                maxiter=4
+                attempts=0
                 while bondtoposame==False:
-                    poltype.optmaxcycle+=2            
-                    inputname,outputlog,cmdstr,scratchdir=GenerateTorsionOptInputFile(poltype,initialtinkerstructure,torset,phaseangles,optmol,variabletorlist,mol,'1')
+                    if attempts>=maxiter or finished==True:
+                        break
+                    inputname,outputlog,cmdstr,scratchdir=GenerateTorsionOptInputFile(poltype,tinkerxyz,torset,phaseangles,optmol,variabletorlist,mol,'1')
                     jobtolog={cmdstr:outputlog}
                     otherfinishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtolog,True)
                     opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
+                    ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz) 
                     bondtoposame=CheckBondTopology(poltype,outputlog,initialtinkerstructure)
+                    finished,error=poltype.CheckNormalTermination(outputlog)
+                    attempts+=1
 
                 finished,error=poltype.CheckNormalTermination(outputlog)
-                if error==False:
-                    ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz) 
                 if finished==True and outputlog not in finishedjobs:
                     finishedjobs.append(outputlog)
 
             else:
-                failed=True
-                if poltype.tordebugmode==False:
+                if finished==True and outputlog not in finishedjobs:
+                    finishedjobs.append(outputlog)
 
-                    torsettofailedoutputlogtoinitialstructure[tuple(torset)][outputlog]=outputlogtoinitialstructure[outputlog]
     firstfinishedjobs=finishedjobs[:]
     for job in firstfinishedjobs:
         if job not in finishedjobs:
@@ -910,6 +911,8 @@ def get_torlist(poltype,mol,missed_torsions):
         if ringbond==True and poltype.allownonaromaticringscanning==False and poltype.refinenonaroringtors==False and len(poltype.onlyrotbndslist)==0:
             nonaroringtorlist.append(unq)
             skiptorsion=False
+        elif ringbond==True and poltype.refinenonaroringtors==True:
+            skiptorsion=True
         rotbndkey = '%d %d' % (unq[1],unq[2])
         # store the torsion and temporary torsion value found by openbabel in torlist
         tor = mol.GetTorsion(t1,t2,t3,t4)

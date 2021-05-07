@@ -562,7 +562,7 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,bondanglerestra
         torsionrestraints=FindTorsionRestraints(poltype,mol)
  
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt
-        term,error=poltype.CheckNormalTermination(poltype.logoptfname)
+        term,error=poltype.CheckNormalTermination(poltype.logoptfname,errormessages=None,skiperrors=True)
         if not term or overridecheckterm==True:
             mystruct = load_structfile(poltype,poltype.molstructfname)
             gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol,modred,torsionrestraints)
@@ -582,9 +582,10 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,bondanglerestra
 
             cmdstr = poltype.formchkexe + " " + poltype.chkoptfname
             poltype.call_subsystem(cmdstr)
-        term,error=poltype.CheckNormalTermination(poltype.logoptfname)
-        if error and term==False:
-            poltype.RaiseOutputFileError(poltype.logoptfname) 
+        term,error=poltype.CheckNormalTermination(poltype.logoptfname,errormessages=None,skiperrors=True)
+        if error and term==False and skiperrors==False:
+            if poltype.fullopt==True:
+                poltype.RaiseOutputFileError(poltype.logoptfname) 
         optmol =  load_structfile(poltype,poltype.logoptfname)
         optmol=rebuild_bonds(poltype,optmol,mol)
         
@@ -593,7 +594,7 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,bondanglerestra
 
         gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol,modred,torsionrestraints)
         poltype.WriteToLog("Calling: " + "Psi4 Optimization")
-        term,error=poltype.CheckNormalTermination(poltype.logoptfname,None,skiperrors)
+        term,error=poltype.CheckNormalTermination(poltype.logoptfname,errormessages=None,skiperrors=True)
         modred=False
 
         inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol,modred,bondanglerestraints,skipscferror,charge,torsionrestraints)
@@ -614,7 +615,8 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,bondanglerestra
 
         term,error=poltype.CheckNormalTermination(poltype.logoptfname,None,skiperrors) # now grabs final structure when finished with QM if using Psi4
         if error and term==False and skiperrors==False:
-            poltype.RaiseOutputFileError(poltype.logoptfname) 
+            if poltype.fullopt==True: # if not doing full opt, assume it did input number of cycles and check if structure is reasonable, otherwise if doing full optcheck if error and crash
+                poltype.RaiseOutputFileError(poltype.logoptfname) 
         GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'),mol)
         optmol =  load_structfile(poltype,poltype.logoptfname.replace('.log','.xyz'))
         optmol=rebuild_bonds(poltype,optmol,mol)
