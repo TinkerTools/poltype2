@@ -952,10 +952,7 @@ class PolarizableTyper():
         self.WriteToLog(" Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
         p = subprocess.Popen(cmdstr,shell=True,stdout=self.logfh, stderr=self.logfh)
         if wait==True:
-            print('cmdstr',cmdstr,flush=True)
-            print('about to wait for command to finish',flush=True)
             p.communicate()
-            print('all done',flush=True)
             if skiperrors==False:
                 if p.returncode != 0:
                     self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
