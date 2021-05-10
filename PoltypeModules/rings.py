@@ -5,7 +5,7 @@ import os
 import openbabel
 import numpy
 from itertools import product
-
+import shutil
 
 def NonAromaticRingAtomicIndices(poltype,mol):
     sssr = mol.GetSSSR()
@@ -146,16 +146,20 @@ def DetermineMaxRanges(poltype,torset,optmol,bondtopology):
         prefix='%s-opt-' % (poltype.molecprefix)
         postfix='-opt.xyz' 
         prevstrctfname,angles=torgen.GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
-        cmd = 'cp ../%s %s' % (poltype.logoptfname.replace('.log','.xyz'),prevstrctfname)
-        poltype.call_subsystem(cmd,True)
+        tempdir=os.getcwd()
+        os.chdir('..')
+        shutil.copy(poltype.logoptfname.replace('.log','.xyz'),os.path.join(tempdir,prevstrctfname))
+        os.chdir(tempdir)
+
 
     else:
         prefix='%s-opt-' % (poltype.molecprefix)
         postfix='.log' 
         prevstrctfname,angles=torgen.GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
-        # copy *-opt.log found early by Gaussian to 'prevstrctfname'
-        cmd = 'cp ../%s %s' % (poltype.logoptfname,prevstrctfname)
-        poltype.call_subsystem(cmd,True)
+        tempdir=os.getcwd()
+        os.chdir('..')
+        shutil.copy(poltype.logoptfname,os.path.join(tempdir,prevstrctfname))
+        os.chdir(tempdir)
 
 
     variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]

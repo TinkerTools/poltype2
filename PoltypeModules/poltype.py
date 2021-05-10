@@ -952,7 +952,10 @@ class PolarizableTyper():
         self.WriteToLog(" Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
         p = subprocess.Popen(cmdstr,shell=True,stdout=self.logfh, stderr=self.logfh)
         if wait==True:
-            p.wait()
+            print('cmdstr',cmdstr,flush=True)
+            print('about to wait for command to finish',flush=True)
+            p.communicate()
+            print('all done',flush=True)
             if skiperrors==False:
                 if p.returncode != 0:
                     self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
@@ -1144,22 +1147,47 @@ class PolarizableTyper():
     
         return bondtoposame
 
-    def GenerateExtendedConformer(self,rdkitmol):
+    def CheckIfTorsionUndefined(self,listoftorsionsforprm,conf): # sometimes rdkit conformation has 3 linear atoms
+        isitsafe=True
+        for tor in listoftorsionsforprm:
+            middle=[tor[1],tor[2]]
+            firstangle=rdMolTransforms.GetAngleDeg(conf,tor[0],tor[1],tor[2])
+            secondangle=rdMolTransforms.GetAngleDeg(conf,tor[1],tor[2],tor[3])
+
+            if firstangle<0:
+                firstangle=firstangle+360
+            if secondangle<0:
+                secondangle=secondangle+360
+            angletol=2
+            if np.abs(180-firstangle)<=2 or np.abs(180-secondangle)<=2:
+                isitsafe=False
+                break
+
+        return isitsafe
+
+
+
+    def GenerateExtendedConformer(self,rdkitmol,mol):
         numconf=100 # just try this
         AllChem.EmbedMultipleConfs(rdkitmol, numConfs=numconf)
         confs=rdkitmol.GetConformers()
+        listofatomsforprm,listofbondsforprm,listofanglesforprm,listoftorsionsforprm=databaseparser.GrabAtomsForParameters(self,mol)
         disttoconf={}
         for i in range(len(confs)):
+            conf=confs[i]
             name="conftest.mol"
             rdmolfiles.MolToMolFile(rdkitmol,name,confId=i)
             mol=rdmolfiles.MolFromMolFile(name,removeHs=False)
+            isitsafe=self.CheckIfTorsionUndefined(listoftorsionsforprm,conf)
+            if isitsafe==False:
+                continue
             maxdist=self.FindLongestDistanceInMolecule(mol)
             disttoconf[maxdist]=i
         distances=list(disttoconf.keys())
         maxdist=max(distances)
         confindex=disttoconf[maxdist]
         indextocoordinates={}
-        rdmolfiles.MolToMolFile(rdkitmol,name,confId=i)
+        rdmolfiles.MolToMolFile(rdkitmol,name,confId=confindex)
         mol=rdmolfiles.MolFromMolFile(name,removeHs=False)
         for i in range(len(mol.GetAtoms())):
             pos = mol.GetConformer().GetAtomPosition(i) 
@@ -1274,7 +1302,7 @@ class PolarizableTyper():
         m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False)
         
         cpm = copy.deepcopy(m)
-        indextocoordinates=self.GenerateExtendedConformer(m)
+        indextocoordinates=self.GenerateExtendedConformer(m,mol)
         indextocoordinates=self.CorrectBondLengths(indextocoordinates,cpm)
 
         m=self.AddInputCoordinatesAsDefaultConformer(m,indextocoordinates)
@@ -1343,10 +1371,8 @@ class PolarizableTyper():
         if self.use_gausgeomoptonly==True:
             self.use_gausoptonly=True
 
-        try:
-            optmol,error = opt.GeometryOptimization(self,mol)
-        except:
-            pass
+        torgen.FindPartialDoubleBonds(self,m)
+        optmol,error = opt.GeometryOptimization(self,mol)
         finished,error=self.CheckNormalTermination(self.firstlogoptfname)
         if finished==False:
             bondtoposame=self.CheckBondTopology(self.firstlogoptfname,self.rdkitmol)
@@ -1376,13 +1402,11 @@ class PolarizableTyper():
             attempts+=1
         
 
-        totalatoms=optmol.NumAtoms()
         if self.use_gausgeomoptonly==True:
             self.use_gausoptonly=False
             self.use_gaus=False
 
 
-        torgen.FindPartialDoubleBonds(self,m)
         if not os.path.isfile(self.key4fname) or not os.path.isfile(self.torsionsmissingfilename) or not os.path.isfile(self.torsionprmguessfilename):
             bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,missingvdwatomindextoneighbors,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo,tortorsmissing=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
         if os.path.isfile(self.torsionsmissingfilename):
@@ -1396,8 +1420,17 @@ class PolarizableTyper():
             tortorsmissing=databaseparser.ReadTorTorList(self,self.tortormissingfilename)
 
 
+        try:
+            esp.SPForDMA(self,optmol,mol)
+        except:
+            if self.use_gaus==True: # if gaussian failed try psi4
+                self.use_gaus=False
+                esp.SPForDMA(self,optmol,mol)
+                self.use_gaus=True
+            else:
+                traceback.print_exc(file=sys.stdout)
 
-        esp.SPForDMA(self,optmol,mol)
+
         # Obtain multipoles from Gaussian fchk file using GDMA
     
         if not os.path.isfile(self.gdmafname):
@@ -1423,7 +1456,17 @@ class PolarizableTyper():
             mpole.SanitizeMultipoleFrames(self,self.keyfname)
         # post process local frames written out by poledit
         if self.atomnum!=1: 
-             esp.SPForESP(self,optmol,mol) 
+             try:
+                 esp.SPForESP(self,optmol,mol) 
+             except:
+                 if self.use_gaus==True: # if gaussian failed try psi4
+                     self.use_gaus=False
+                     esp.SPForESP(self,optmol,mol) 
+                     self.use_gaus=True
+                 else:
+                     traceback.print_exc(file=sys.stdout)
+
+
         # End here if qm calculations were all that needed to be done 
         if self.qmonly:
             self.WriteToLog("poltype QM-only complete.")

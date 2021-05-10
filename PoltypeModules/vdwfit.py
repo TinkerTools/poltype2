@@ -1253,9 +1253,10 @@ def MinimizeDimer(poltype,inputxyz,keyfile,indexpairtoreferencedistanceoriginal,
     reslist=[resstring]
     angleratio=.03
     anglereslist=[]
-    anglereslist,restraints=GrabAngleRestraints(poltype,indicestoreferenceangleprobe,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,restraints)
-    anglereslist,restraints=GrabAngleRestraints(poltype,indicestoreferenceanglemoleculeneighb,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,restraints)
-    anglereslist,restraints=GrabAngleRestraints(poltype,indicestoreferenceanglemoleculeneighbneighb,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,restraints)
+    tempres=[]
+    anglereslist,otherrestraints=GrabAngleRestraints(poltype,indicestoreferenceangleprobe,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,tempres)
+    anglereslist,otherrestraints=GrabAngleRestraints(poltype,indicestoreferenceanglemoleculeneighb,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,tempres)
+    anglereslist,otherrestraints=GrabAngleRestraints(poltype,indicestoreferenceanglemoleculeneighbneighb,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,tempres)
     reslist.extend(anglereslist)
     tempkeyfilename=inputxyz.replace('.xyz','.key')
     shutil.copyfile(keyfile,tempkeyfilename)

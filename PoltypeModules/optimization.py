@@ -73,14 +73,15 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
        
         anglerestraints=bondanglerestraints[1:]
         string='frozen_bend'
-        temp.write('set optking{'+'\n')
-        temp.write('  '+string+' '+'='+' '+'('+'"'+'\n')
-        for res in anglerestraints:
-            res=[str(i) for i in res]
-            resstring=' '.join(res)+'\n'
-            temp.write('   '+resstring)
-        temp.write('  "'+')'+'\n')
-        temp.write('}'+'\n')
+        if len(anglerestraints)!=0:
+            temp.write('set optking{'+'\n')
+            temp.write('  '+string+' '+'='+' '+'('+'"'+'\n')
+            for res in anglerestraints:
+                res=[str(i) for i in res]
+                resstring=' '.join(res)+'\n'
+                temp.write('   '+resstring)
+            temp.write('  "'+')'+'\n')
+            temp.write('}'+'\n')
     if len(torsionrestraints)!=0:
         temp.write('set optking { '+'\n')
         temp.write('  frozen_dihedral = ("'+'\n')
@@ -546,6 +547,9 @@ def FindTorsionRestraints(poltype,mol):
                 t1,t4 = torgen.find_tor_restraint_idx(poltype,mol,t2,t3)
                 t2idx=t2.GetIdx()
                 t3idx=t3.GetIdx()
+                babelfirst=[t2idx,t3idx]
+                if (babelfirst in poltype.partialdoublebonds or babelfirst[::-1] in poltype.partialdoublebonds):
+                    continue
                 t1idx=t1.GetIdx()
                 t4idx=t4.GetIdx()
                 torsionrestraints.append([t1idx,t2idx,t3idx,t4idx])

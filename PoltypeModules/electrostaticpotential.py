@@ -353,7 +353,7 @@ def SPForDMA(poltype,optmol,mol):
 
         gen_comfile(poltype,poltype.comdmafname.replace('.com','_temp.com'),poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkdmafname,poltype.comtmp,optmol)
         poltype.WriteToLog("Calling: " + "Psi4 Gradient for DMA")
-        term,error=poltype.CheckNormalTermination(poltype.logdmafname)
+        term,error=poltype.CheckNormalTermination(poltype.logdmafname,errormessages=None,skiperrors=True)
         inputname=CreatePsi4DMAInputFile(poltype,poltype.logoptfname.replace('.log','.xyz'),poltype.comdmafname,mol)
         if term==False:
             cmdstr='psi4 '+inputname+' '+poltype.logdmafname
@@ -379,7 +379,7 @@ def SPForDMA(poltype,optmol,mol):
 
         
     else:
-        term,error=poltype.CheckNormalTermination(poltype.logdmafname)
+        term,error=poltype.CheckNormalTermination(poltype.logdmafname,errormessages=None,skiperrors=True)
         if not term:
             if os.path.isfile(poltype.chkdmafname):
                 os.remove(poltype.chkdmafname)
@@ -414,7 +414,7 @@ def SPForESP(poltype,optmol,mol):
     if poltype.use_gaus==False or poltype.use_gausoptonly==True:
         shutil.copy(poltype.espgrdfname, 'grid.dat') 
         inputname,outputname=CreatePsi4ESPInputFile(poltype,poltype.logoptfname.replace('.log','.xyz'),poltype.comespfname,mol,poltype.maxdisk,poltype.maxmem,poltype.numproc,poltype.totalcharge,True)
-        term,error=poltype.CheckNormalTermination(outputname)
+        term,error=poltype.CheckNormalTermination(outputname,errormessages=None,skiperrors=True)
         if term==False:
             poltype.WriteToLog("Calling: " + "Psi4 Gradient for ESP")
             cmdstr='psi4 '+inputname+' '+outputname
@@ -438,7 +438,7 @@ def SPForESP(poltype,optmol,mol):
 
 
     else:
-        term,error=poltype.CheckNormalTermination(poltype.logespfname)
+        term,error=poltype.CheckNormalTermination(poltype.logespfname,errormessages=None,skiperrors=True)
         if poltype.espfit and not term:
             if os.path.isfile(poltype.chkespfname):
                 os.remove(poltype.chkespfname)

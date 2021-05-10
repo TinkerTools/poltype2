@@ -1673,7 +1673,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                     if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
                         continue
                     else: # if dont have heavy atoms on either side then just fit the hydrogen torsion
-                        if torsionindices not in torsionsmissing:
+                        if torsionindices not in torsionsmissing and poltype.dontfrag==False: # make sure fragmenter is on (wont work for < 25 atoms by default)
                             torsionsmissing.append(torsionindices)
                 else: # then aromatic and will try and transfer benzene:
                     if torsionindices not in poormatchingaromatictorsions:
