@@ -33,7 +33,6 @@ def gen_esp_grid(poltype,mol):
     if poltype.use_gaus==False or poltype.use_gausoptonly==True:
         Vvals,gridpts=GrabGridData(poltype)
 
-   
         # Generate a "cube" file.  I have no idea what the format should be (it's not a
         # regular cube file) so I reverse engineered one by looking at TINKER source.
         with open(poltype.qmespfname, 'w') as fp:

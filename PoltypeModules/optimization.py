@@ -169,7 +169,6 @@ def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetf
 def NumberInLine(poltype,line):
     numinline=False
     linesplit=line.split()
-    
     for e in linesplit:
         try:
             float(e)
@@ -263,8 +262,6 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
     tmpfh = open(comfname, "a")
 
     spacedformulastr=molecule.GetSpacedFormula()
-    if ('I ' in spacedformulastr):
-        modred=False
     if modred==True:
         optimizeoptlist = ["ModRedundant","maxcycles=%s"%(poltype.optmaxcycle),'Loose']
     else:

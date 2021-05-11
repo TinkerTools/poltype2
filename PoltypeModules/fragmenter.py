@@ -1611,10 +1611,9 @@ def Draw2DMoleculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragf
         newmol=mol_with_atom_index_removed(poltype,firstmolcopy)
         newermol = Chem.RemoveHs(newmol)
         smarts=rdmolfiles.MolToSmarts(newermol)
-        smarts=smarts.replace('@','').replace('H3','').replace('H2','').replace('H','')
+        smarts=smarts.replace('@','').replace('/[H]','').replace('H3','').replace('H2','').replace('H','')
         patt = Chem.MolFromSmarts(smarts)
         newfragments.append(firstmol)
-
         for i in range(1,len(fragments)):
             frag=fragments[i]
             frag=mol_with_atom_index_removed(poltype,frag)
