@@ -115,6 +115,7 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
         temp.write("    optimize('%s')" % (poltype.optmethod.lower())+'\n')
 
     else:
+
         if modred==False:
             temp.write('    set opt_coordinates both'+'\n')
         temp.write("    optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
@@ -497,24 +498,26 @@ def gen_superposeinfile(poltype):
     """
     Intent: Initialize superpose input file (for tinker's superpose) 
     """
-    f = open(poltype.superposeinfile, 'w')
-    f.write('\n\n\n\n\n')
-
-# Create file to specify groups of atoms based on molecular symmetry
+    poltype.WriteToLog("\n")
+    poltype.WriteToLog("=========================================================\n")
+    poltype.WriteToLog("Structure RMSD Comparison\n\n")
+    cmd = poltype.superposeexe + ' ' + poltype.xyzoutfile + ' ' + poltype.tmpxyzfile + '_2'+' 1 Y M N 0  > '+ poltype.superposeinfile
+    poltype.call_subsystem(cmd)
 
 
 def CheckRMSD(poltype):
+    RMSD=None
     for line in open(poltype.superposeinfile,'r'):
-        if os.stat(poltype.superposeinfile).st_size > 5:
-            if 'Root Mean' in line:
-                RMSD=''
-                for e in line:
-                    if e.isdigit() or e=='.':
-                        RMSD+=e
-            if float(RMSD)>poltype.maxRMSD:
-                poltype.WriteToLog('Warning: RMSD of QM and MM optimized structures is high, RMSD = '+ RMSD+' Tolerance is '+str(poltype.maxRMSD)+' kcal/mol ')
+        if 'Root Mean' in line:
+            RMSD=''
+            for e in line:
+                if e.isdigit() or e=='.':
+                    RMSD+=e
+    if RMSD!=None:    
+        if float(RMSD)>poltype.maxRMSD:
+            poltype.WriteToLog('Warning: RMSD of QM and MM optimized structures is high, RMSD = '+ RMSD+' Tolerance is '+str(poltype.maxRMSD)+' kcal/mol ')
 
-                raise ValueError(os.getcwd()+' '+'RMSD of QM and MM optimized structures is high, RMSD = '+str(RMSD))
+            raise ValueError(os.getcwd()+' '+'RMSD of QM and MM optimized structures is high, RMSD = '+str(RMSD))
 
 def StructureMinimization(poltype):
     poltype.WriteToLog("")

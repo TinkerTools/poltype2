@@ -55,18 +55,20 @@ python ~/poltypepackage/PoltypeModules/test_poltype.py
 
 #### Most Common Inputs
 ```
-structure         specifies input structure for poltype, must include total charge information. 
-                  Default=None.
-numproc           specifies number of processors used for running quantum jobs. 
-                  Default=1.
-maxmem            specifies max RAM used for running quantum jobs. 
-                  Default=700MB 
-maxdisk           specifies max scratch space used for running quantum jobs. 
-                  Default=100GB
-totalcharge       specifies totalcharge of molecule.
-                  Defualt=None
-optmaxcycle       This keyword to reduce number of optcycles needed (they are expensive), 5 cycles is good for quicker QM OPT but in an extreme case if input structure is too far from poltypes internal bond length change checking tolerances then poltype will not beable to increase cycles automatically. If using 5 cycles and then input structure is too far from final QM structure( bond lengths differ by more than internal tolerance) (after 5 cycles), then poltype will increase cycles and repeat QM OPT. By default rotatble bonds have dihedrals restrained during first QM OPT.
-                  Default=400
+structure            specifies input structure for poltype, must include total charge information. 
+                     Default=None.
+numproc              specifies number of processors used for running quantum jobs. 
+                     Default=1.
+maxmem               specifies max RAM used for running quantum jobs. 
+                     Default=700MB 
+maxdisk              specifies max scratch space used for running quantum jobs. 
+                     Default=100GB
+totalcharge          specifies totalcharge of molecule.
+                     Defualt=None
+optmaxcycle          This keyword to reduce number of optcycles needed (they are expensive), 5 cycles is good for quicker QM OPT but in an extreme case if input structure is too far from poltypes internal bond length change checking tolerances then poltype will not beable to increase cycles automatically. If using 5 cycles and then input structure is too far from final QM structure( bond lengths differ by more than internal tolerance) (after 5 cycles), then poltype will increase cycles and repeat QM OPT. By default rotatble bonds have dihedrals restrained during first QM OPT.
+                     Default=400
+deleteallnonqmfiles  This will delete all non-qm log files (sometimes errors require restarting and deleting the correct files).
+                     Default=False
 ```
 
 * Note for very large molecules initial opt, DMA and ESP may require large amounts of memory if quantum job consistently crashes
@@ -227,6 +229,9 @@ dontdovdwscan            specifies to not refine initial guess vdw parameters fr
 ```
 keyfiletoaddtodatabase   specifies to add keyfile parameters to amoeba09 parameter file, located in ParameterFiles/.
                          Default=None
+
+deleteallnonqmfiles  This will delete all non-qm log files (sometimes errors require restarting and deleting the correct files).
+                     Default=False
 ```
 
 

@@ -1219,6 +1219,9 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets,non
     for key,value in tempdic.items():
         rotbndindextoparentindextofragindex[key]=value 
     equivalentrotbndindexmaps=CopyEquivalentReferenceFragmentToOtherFragments(poltype,equivalentrotbndindexarrays,rotbndindextofragmentfilepath,rotbndindextoparentindextofragindex)
+    if poltype.deleteallnonqmfiles==True:
+        for path in rotbndindextofragmentfilepath.values():
+            poltype.DeleteAllNonQMFiles(path)
     return rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor,equivalentrotbndindexmaps
 
 

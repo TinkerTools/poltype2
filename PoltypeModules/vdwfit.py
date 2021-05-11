@@ -1253,10 +1253,9 @@ def MinimizeDimer(poltype,inputxyz,keyfile,indexpairtoreferencedistanceoriginal,
     reslist=[resstring]
     angleratio=.03
     anglereslist=[]
-    tempres=[]
-    anglereslist,otherrestraints=GrabAngleRestraints(poltype,indicestoreferenceangleprobe,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,tempres)
-    anglereslist,otherrestraints=GrabAngleRestraints(poltype,indicestoreferenceanglemoleculeneighb,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,tempres)
-    anglereslist,otherrestraints=GrabAngleRestraints(poltype,indicestoreferenceanglemoleculeneighbneighb,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,tempres)
+    anglereslist,restraints=GrabAngleRestraints(poltype,indicestoreferenceangleprobe,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,restraints)
+    anglereslist,restraints=GrabAngleRestraints(poltype,indicestoreferenceanglemoleculeneighb,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,restraints)
+    anglereslist,restraints=GrabAngleRestraints(poltype,indicestoreferenceanglemoleculeneighbneighb,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,restraints)
     reslist.extend(anglereslist)
     tempkeyfilename=inputxyz.replace('.xyz','.key')
     shutil.copyfile(keyfile,tempkeyfilename)
@@ -1275,8 +1274,13 @@ def MinimizeDimer(poltype,inputxyz,keyfile,indexpairtoreferencedistanceoriginal,
     finaloutputxyz=inputxyz+'_2'
     newfilename=inputxyz.replace('.xyz','cart.xyz')
     ConvertTinktoXYZ(poltype,finaloutputxyz,newfilename)
-
-    return newfilename,restraints
+    maxresidx=3-1
+    newrestraints=[]
+    for residx in range(len(restraints)):
+        res=restraints[residx]
+        if residx<=maxresidx:
+            newrestraints.append(res)
+    return newfilename,newrestraints
 
 def ConvertTinktoXYZ(poltype,filename,newfilename):
     temp=open(os.getcwd()+r'/'+filename,'r')
@@ -1572,9 +1576,11 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     poltype.espbasisset="aug-cc-pVDZ"
     tempuse_gaus=poltype.use_gaus
     tempuse_gausoptonly=poltype.use_gausoptonly
-
-    poltype.use_gaus=False
-    poltype.use_gausoptonly=False
+    if ('I ' in poltype.mol.GetSpacedFormula()):
+        pass
+    else:
+        poltype.use_gaus=False
+        poltype.use_gausoptonly=False
     poltype.SanitizeAllQMMethods()
     paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebabio18.prm"
     ReplaceParameterFileHeader(poltype,paramhead,poltype.key5fname)

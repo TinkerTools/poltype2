@@ -1241,6 +1241,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
         temp.write("    optimize('%s')" % (poltype.toroptmethod.lower())+'\n')
 
     else:
+
         temp.write('    set opt_coordinates both'+'\n')
         temp.write("    optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
     if poltype.freq:
