@@ -11,6 +11,7 @@ import time
 import numpy as np
 import openbabel
 import shlex
+import warnings
 
 def gen_esp_grid(poltype,mol):
     """
@@ -528,7 +529,9 @@ def CheckDipoleMoments(poltype,optmol):
                     if qmdipole!=0:
                         ratio=np.abs(diff/qmdipole)
                         if ratio>poltype.dipoletol and poltype.suppressdipoleerr==False:
-                            raise ValueError('Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)+' '+os.getcwd()) 
+                            string='Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)+' '+os.getcwd()
+                            warnings.warn(string)
+                            poltype.WriteToLog(string) 
 
 def ConvertDipoleToCOMFrame(poltype,dipole,optmol):
     nucsum = 0.0

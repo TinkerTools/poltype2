@@ -1639,10 +1639,12 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             moleculeatoms=dimeratoms-probeatoms
             moleculeatom=optmol.GetAtom(moleculeindex)
             probeatom=optmol.GetAtom(probeindex)
-            if moleculeatom==None or probeatom==None:
+            try:
+                moleculeatomcoords=np.array([moleculeatom.GetX(),moleculeatom.GetY(),moleculeatom.GetZ()])
+                probeatomcoords=np.array([probeatom.GetX(),probeatom.GetY(),probeatom.GetZ()])
+            except:
                 moleculeprobeindicestoignore.append([moleculeindex,probeindex])
                 continue
-          
             moleculeatomcoords=np.array([moleculeatom.GetX(),moleculeatom.GetY(),moleculeatom.GetZ()])
             probeatomcoords=np.array([probeatom.GetX(),probeatom.GetY(),probeatom.GetZ()])
             equildistance=np.linalg.norm(probeatomcoords-moleculeatomcoords)

@@ -1185,8 +1185,11 @@ class PolarizableTyper():
             maxdist=self.FindLongestDistanceInMolecule(mol)
             disttoconf[maxdist]=i
         distances=list(disttoconf.keys())
-        maxdist=max(distances)
-        confindex=disttoconf[maxdist]
+        if len(distances)!=0:
+            maxdist=max(distances)
+            confindex=disttoconf[maxdist]
+        else:
+            confindex=0
         indextocoordinates={}
         rdmolfiles.MolToMolFile(rdkitmol,name,confId=confindex)
         mol=rdmolfiles.MolFromMolFile(name,removeHs=False)
@@ -1518,7 +1521,6 @@ class PolarizableTyper():
         # Atoms that belong to the same symm class will now have only one common multipole definition
         if not os.path.isfile(self.key2fname):
             mpole.AverageMultipoles(self,optmol)
-
         if self.espfit and not os.path.isfile(self.key3fname) and self.atomnum!=1:
             # Optimize multipole parameters to QM ESP Grid (*.cube_2)
             # tinker's potential utility is called, with option 6.
@@ -1550,7 +1552,6 @@ class PolarizableTyper():
             torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
         # Find rotatable bonds for future torsion scans
         (self.torlist, self.rotbndlist,hydtorsions,nonaroringtorlist) = torgen.get_torlist(self,mol,torsionsmissing)
-        
         torgen.get_all_torsions(self,mol)
         self.torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self) # this only happens in very symmetrical molecules
         self.torlist=[tuple(i) for i in self.torlist]
@@ -1601,10 +1602,9 @@ class PolarizableTyper():
             frag.Draw2DMoleculeWithWBO(self,WBOmatrix,self.molstructfname.replace('.sdf',''),self.rdkitmol,bondindexlist=highlightbonds,imgsize=1500)        
             rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor,equivalentrotbndindexmaps=frag.GenerateFragments(self,self.mol,self.torlist,WBOmatrix,missingvdwatomsets,nonaroringtorlist) # returns list of bond indexes that need parent molecule to do torsion scan for (fragment generated was same as the parent0
             equivalentrotbndindexarrays,rotbndindextoringtor=frag.SpawnPoltypeJobsForFragments(self,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor,equivalentrotbndindexmaps)
-
         if self.dontfrag==False and self.isfragjob==False and not os.path.isfile(self.key5fname) and (self.dontdotor==False or self.dontdovdwscan==False):
             frag.GrabVdwAndTorsionParametersFromFragments(self,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor) # just dump to key_5 since does not exist for parent molecule
-        else:          
+        else:         
             # Torsion scanning then fitting. *.key_5 will contain updated torsions
             if not os.path.isfile(self.key5fname):
                 if len(self.torlist)!=0:
@@ -1617,7 +1617,6 @@ class PolarizableTyper():
                     torfit.process_rot_bond_tors(self,optmol)
                 else:
                     shutil.copy(self.key4fname,self.key5fname)
-
         if self.dontdovdwscan==False:
             if self.dontfrag==False: 
                 if self.isfragjob==True:
@@ -1644,7 +1643,9 @@ class PolarizableTyper():
             shutil.rmtree(self.scrtmpdirgau)
         if os.path.exists(self.scrtmpdirpsi4):
             shutil.rmtree(self.scrtmpdirpsi4)
-        warnings.warn('Poltype has completed successfully, but this software is still under active development. It is your responsibility to check your own final parameters, while we are still in development phase.')
+        string='Poltype has completed successfully, but this software is still under active development. It is your responsibility to check your own final parameters, while we are still in development phase.'
+        warnings.warn(string)
+        self.WriteToLog(string)
 
 
 

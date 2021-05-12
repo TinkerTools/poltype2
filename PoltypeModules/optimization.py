@@ -499,7 +499,7 @@ def gen_superposeinfile(poltype):
     poltype.WriteToLog("=========================================================\n")
     poltype.WriteToLog("Structure RMSD Comparison\n\n")
     cmd = poltype.superposeexe + ' ' + poltype.xyzoutfile + ' ' + poltype.tmpxyzfile + '_2'+' 1 Y M N 0  > '+ poltype.superposeinfile
-    poltype.call_subsystem(cmd)
+    poltype.call_subsystem(cmd,wait=True)
 
 
 def CheckRMSD(poltype):
