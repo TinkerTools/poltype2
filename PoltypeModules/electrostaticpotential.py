@@ -530,8 +530,7 @@ def CheckDipoleMoments(poltype,optmol):
                         ratio=np.abs(diff/qmdipole)
                         if ratio>poltype.dipoletol and poltype.suppressdipoleerr==False:
                             string='Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)+' '+os.getcwd()
-                            warnings.warn(string)
-                            poltype.WriteToLog(string) 
+                            raise ValueError(string)
 
 def ConvertDipoleToCOMFrame(poltype,dipole,optmol):
     nucsum = 0.0

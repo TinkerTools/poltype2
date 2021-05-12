@@ -1183,6 +1183,7 @@ class PolarizableTyper():
             if isitsafe==False:
                 continue
             maxdist=self.FindLongestDistanceInMolecule(mol)
+
             disttoconf[maxdist]=i
         distances=list(disttoconf.keys())
         if len(distances)!=0:
@@ -1335,6 +1336,8 @@ class PolarizableTyper():
         
         cpm = copy.deepcopy(m)
         indextocoordinates=self.GenerateExtendedConformer(m,mol)
+        #if self.tordebugmode==True:
+        #    sys.exit()
         #indextocoordinates=self.CorrectBondLengths(indextocoordinates,cpm) # messes up angles in aromatic rings sometimes? dont need this since QM is full opt and will correct any wrong bong lengths by default
 
         m=self.AddInputCoordinatesAsDefaultConformer(m,indextocoordinates)
@@ -1586,8 +1589,7 @@ class PolarizableTyper():
 
         if self.refinenonaroringtors==True and self.dontfrag==False:
             rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
-        if self.tordebugmode==True:
-            sys.exit()
+        
 
         if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False and (self.dontdotor==False or self.dontdovdwscan==False):
             
