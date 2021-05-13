@@ -1369,16 +1369,17 @@ class PolarizableTyper():
                 self.use_gaus=True
         if ('Br ' in self.mol.GetSpacedFormula()):
             self.torspbasisset=self.torspbasissethalogen
-
+        self.pcm=False
         if pcm==True and self.dontusepcm==False:
             if self.foundgauss==True:
                 self.use_gauPCM=True
                 self.SanitizeAllQMMethods()
-
+            self.pcm=True
             self.toroptpcm=True
             self.optpcm=True
             self.torsppcm=True
 
+        
         if self.use_gauPCM==True:
             self.use_gausoptonly=False
             self.use_gaus=True
@@ -1390,8 +1391,6 @@ class PolarizableTyper():
             atomnum+=1
 
 
-        if atomnum<25: 
-            self.dontfrag=True 
         self.RemoveCartesianXYZFiles()
  
         self.WriteToLog("Running on host: " + gethostname())
@@ -1562,6 +1561,9 @@ class PolarizableTyper():
             torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
         # Find rotatable bonds for future torsion scans
         (self.torlist, self.rotbndlist,hydtorsions,nonaroringtorlist) = torgen.get_torlist(self,mol,torsionsmissing)
+        if atomnum<25 and len(nonaroringtorlist)==0: 
+            self.dontfrag=True 
+
         torgen.get_all_torsions(self,mol)
         self.torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self) # this only happens in very symmetrical molecules
         self.torlist=[tuple(i) for i in self.torlist]
