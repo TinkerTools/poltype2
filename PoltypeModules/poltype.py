@@ -1420,7 +1420,7 @@ class PolarizableTyper():
             self.use_gausoptonly=True
 
         torgen.FindPartialDoubleBonds(self,m)
-        optmol,error = opt.GeometryOptimization(self,mol)
+        optmol,error = opt.GeometryOPTWrapper(self,mol)
         finished,error=self.CheckNormalTermination(self.firstlogoptfname)
         if finished==False:
             bondtoposame=self.CheckBondTopology(self.firstlogoptfname,self.rdkitmol)

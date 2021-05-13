@@ -9,6 +9,32 @@ import shlex
 import numpy as np
 import shutil
 import torsiongenerator as torgen
+import traceback
+
+def GeometryOPTWrapper(poltype,mol):
+    try:
+        optmol,error = GeometryOptimization(poltype,mol)
+    except:
+        redo=False
+        if poltype.fullopt==True:
+            if poltype.pcm==True:
+                 # Gaussian would have been used first if was detected. 
+                 poltype.pcm=False
+                 poltype.optpcm=False
+                 redo=True
+            else:
+                if poltype.optmethod=='MP2':
+                    poltype.optmethod='HF'
+                    redo=True
+        if redo==True:
+            optmol,error = GeometryOPTWrapper(poltype,mol) # recursive call allows for muliple attempts
+        else:
+            traceback.print_exc(file=sys.stdout)
+            sys.exit()
+
+    return optmol,error
+ 
+
 
 def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondanglerestraints,skipscferror,chg,torsionrestraints=[]):
     tempread=open(comfilecoords,'r')
