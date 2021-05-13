@@ -263,9 +263,9 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
 
     spacedformulastr=molecule.GetSpacedFormula()
     if modred==True:
-        optimizeoptlist = ["ModRedundant","maxcycles=%s"%(poltype.optmaxcycle),'Loose']
+        optimizeoptlist = ["ModRedundant","maxcycles=%s"%(str(poltype.optmaxcycle)),'Loose']
     else:
-        optimizeoptlist = ["Cartesian","maxcycles=%s"%(poltype.optmaxcycle)]
+        optimizeoptlist = ["Cartesian","maxcycles=%s"%(str(poltype.optmaxcycle))]
 
     if restraintlist:
         optimizeoptlist.insert(0,poltype.gausoptcoords)
@@ -535,21 +535,39 @@ def FindTorsionRestraints(poltype,mol):
         atomnum+=1
     bondnum=0
     for b in openbabel.OBMolBondIter(mol):
-        isrot=b.IsRotor()
-        if isrot==True:
-            bondnum+=1
+        t2 = b.GetBeginAtom()
+        t3 = b.GetEndAtom()
+        t2val=t2.GetValence()
+        t3val=t3.GetValence()
+        if t2val<2 or t3val<2:
+            continue 
+        ringbond=b.IsInRing()
+        if ringbond==True:
+            continue
+        bondnum+=1
+
     if atomnum>=25 or bondnum>=2:
         for b in openbabel.OBMolBondIter(mol):
             isrot=b.IsRotor()
-            if isrot==True:
-                t2 = b.GetBeginAtom()
-                t3 = b.GetEndAtom()
-                t1,t4 = torgen.find_tor_restraint_idx(poltype,mol,t2,t3)
-                t2idx=t2.GetIdx()
-                t3idx=t3.GetIdx()
-                babelfirst=[t2idx,t3idx]
-                if (babelfirst in poltype.partialdoublebonds or babelfirst[::-1] in poltype.partialdoublebonds):
-                    continue
+            t2 = b.GetBeginAtom()
+            t3 = b.GetEndAtom()
+            t2val=t2.GetValence()
+            t3val=t3.GetValence()
+            if t2val<2 or t3val<2:
+                continue 
+            ringbond=b.IsInRing()
+            if ringbond==True:
+                continue
+            t2idx=t2.GetIdx()
+            t3idx=t3.GetIdx()
+            t2 = b.GetBeginAtom()
+            t3 = b.GetEndAtom()
+            t1,t4 = torgen.find_tor_restraint_idx(poltype,mol,t2,t3)
+            t2idx=t2.GetIdx()
+            t3idx=t3.GetIdx()
+            babelfirst=[t2idx,t3idx]
+            if (babelfirst in poltype.partialdoublebonds or babelfirst[::-1] in poltype.partialdoublebonds):
+                continue
                 t1idx=t1.GetIdx()
                 t4idx=t4.GetIdx()
                 torsionrestraints.append([t1idx,t2idx,t3idx,t4idx])
@@ -564,7 +582,7 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,bondanglerestra
         torsionrestraints=[]
     else: # see if need to restrain torsion in extended conformation
         torsionrestraints=FindTorsionRestraints(poltype,mol)
- 
+
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt
         term,error=poltype.CheckNormalTermination(poltype.logoptfname,errormessages=None,skiperrors=True)
         if not term or overridecheckterm==True:

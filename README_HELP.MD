@@ -94,23 +94,26 @@ externalapi       specifies path to external API used for submitting quantum job
 
 ### Geometry Optimization
 ```
-optbasisset       specifies basis set for geometry optimization. 
-                  Default=6-31G*
-gausoptcoords     specifies coordinate system used for gaussian geometry optimization. 
-                  Default='' 
-                  (will default to modified redundant internal coordinates).
-freq              specifies to do a frequency calculation during geometry optimization. Computes true Hessian 
-                  and determines if structure is minimum rather than saddle point, but very expensive. 
-                  Default=False
-optpcm            specifies to use PCM for geometry optimization. 
-                  Default=True if there is no net charge, but some atoms have formal charge.
-optmaxcycle       specifies the number of max cycles or iterations allowed during optimization.
-                  Default=400
-optmethod         specifies quantum method for geometry optimziation. 
-                  Default=MP2
+optbasisset          specifies basis set for geometry optimization. 
+                     Default=6-31G*
+gausoptcoords        specifies coordinate system used for gaussian geometry optimization. 
+                     Default='' 
+                     (will default to modified redundant internal coordinates).
+freq                 specifies to do a frequency calculation during geometry optimization. Computes true Hessian 
+                     and determines if structure is minimum rather than saddle point, but very expensive. 
+                     Default=False
+optpcm               specifies to use PCM for geometry optimization. 
+                     Default=True if there is no net charge, but some atoms have formal charge.
+optmaxcycle          specifies the number of max cycles or iterations allowed during optimization.
+                     Default=400
+optmethod            specifies quantum method for geometry optimziation. 
+                     Default=MP2
 
-use_gausgeomoptonly specifies to only use gaussian for initial geometry optimization and Psi4 for all other QM stepsi
-                  Default=False 
+use_gausgeomoptonly  specifies to only use gaussian for initial geometry optimization and Psi4 for all other QM stepsi
+                     Default=False 
+
+dontusepcm           Dont use pcm for any QM calculation.
+                     Default=False
 
 ```
 
@@ -231,6 +234,9 @@ keyfiletoaddtodatabase   specifies to add keyfile parameters to amoeba09 paramet
                          Default=None
 
 deleteallnonqmfiles  This will delete all non-qm log files (sometimes errors require restarting and deleting the correct files).
+                     Default=False
+
+dontusepcm           Dont use pcm for any QM calculation.
                      Default=False
 ```
 
