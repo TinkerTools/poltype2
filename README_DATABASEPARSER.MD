@@ -68,7 +68,6 @@
     <li>	If the angle between a-b-c and b-c-d is near 180 degrees, then skip torsion </li>
     <li>	If linear, then dihedral angle is not defined, minimize will not work </li>
     <li>	If b-c is in partial double bonds then skip torsion </li>
-
     <li>	If missing any neighbors of a-b-c-d in SMARTS string or *, ~ in SMARTS string, then determine this to be poorly transferred parameters. </li>
     <li>	If ring bond and missing torsion from database: </li>
 <ol>
@@ -77,50 +76,36 @@
                   <li> If a or d is H and and there exist other a/d such that a,d is not H, then just transfer whatever matches for H torsion </li>
 <ol>
                           <li> Exception when transferring high energy H torsion, then zero out and fit  </li>
-
 </ol>
                   <li> Else, chop ring and derive parameters  </li>
-
 </ol>
              <li> b-c aromatic (or b-c have hybridization of 2). Below, lowercase leter means aromatic atom or ring atom with hyb of 2. Letter x refers to non-hydrogen atom.  </li>
 <ol>
                     <li> If H-x-x-x transfer from H-c-c-c  </li>
                     <li> If H-x-x-H transfer from H-c-c-H  </li>
                     <li> If x-x-x-x transfer from c-c-c-c  </li>
-
-
 </ol>
              <li> If b aromatic and c not aromatic or (b non-aromatic and c aromatic).   </li>
 <ol>
                     <li> If H-X-X-X transfer from H-C-C-C  </li>
                     <li> If H-X-X-H transfer from H-C-C-H  </li>
                     <li> If X-X-X-X transfer from C-C-C-C  </li>
-
-
 </ol>
              <li> If b and c non-aromatic but a or d is aromatic   </li>
 <ol>
                     <li> If H-X-X-X transfer from H-C-C-C  </li>
                     <li> If H-X-X-H transfer from H-C-C-H  </li>
                     <li> If X-X-X-X transfer from C-C-C-C  </li>
-
-
 </ol>
-
 </ol>
              <li> If NOT ring bond and missing torsion from database:   </li>
 <ol>
                   <li> If a or d is H and and there exist other a/d such that a,d is not H, then just transfer whatever matches for H torsion </li>
 <ol>
                           <li> Exception when transferring high energy H torsion, then zero out and fit  </li>
-
 </ol>
                   <li> Else, derive parameters for torsion  </li>
-
 </ol>
-
-
-
 </ol>
 <li>	Find adjacent missing tortors </li>
 <ol>
@@ -170,3 +155,59 @@
 <li>	Construct comment lines for all parameter lines </li>
 <li>	Write out lists of missing torsions, missing vdw, missing tortors </li>
 </ol>
+
+### Example keyfiles comments
+*  ['[#16]-[H]', [1]] this first SMARTS, describes a fragment of the input molecule containing the vdw atom type and a neighbor. This SMARTS is the closest match found to all amoeba0 SMARTS matches. The 1 indicates first atom in SMARTS string. Similarily, the [2] in the second SMARTS string (from amoeba09 molecule), indicates the second atom in that SMART string is where the parameter is transferred from. [('S', '"Ethyl Sulfide S"')] this shows the tinker type description from amoeba09 atom.
+* "Missing vdw parameters, will attempt to fit parameters", this means that the SMARTS '[#16]-[H]' does not contain all neighbors of the sulfur atom in the input molecule and thus the parameters are determined to be missing and not transferrible enough, so parameters will be derived. 
+
+```
+# matching SMARTS from molecule  ['[#16]-[H]', [1]] to SMARTS from parameter file ['[H]-[#16]-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H]', [2]] with tinker type descriptions [('S', '"Ethyl Sulfide S"')]
+# Missing vdw parameters, will attempt to fit parameters
+vdw 401 4.0050 0.3550
+
+```
+* "Missing bond parameters, assigning default parameters", this means that bond parameters SMARTS "[#16]-[#6]", did not contain all neighbors in input molecule and so the parameters are determined not to be transferrible and default parameters based on element and valence are assigned.
+
+```
+# matching SMARTS from molecule  ['[#16]-[#6]', [1, 2]] to SMARTS from parameter file ['[#16](-[#8-])(=[#8])(=[#8])-[#6](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H]', [1, 5]] with tinker type descriptions [('S', '"Ethyl Sulfonate SO3-"'), ('C', '"Ethyl Sulfonate CH2"')]
+# Missing bond parameters, assigning default parameters
+bond         401   402          250.0     1.8015
+```
+* "WARNING WILDCARDS USED IN SMARTS PARAMETER MATCHING", another way that parameters are determined to be non-transferable and default parameters involving element and valence are assigned.
+```
+# matching SMARTS from molecule  ['[#6]~[#6]~[#16]~[H]', [1, 2, 3]] to SMARTS from parameter file ['[H]-[#16]-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H]', [4, 3, 2]] with tinker type descriptions [('C', '"Ethyl Sulfide CH3"'), ('C', '"Ethyl Sulfide CH2"'), ('S', '"Ethyl Sulfide S"')]
+# WARNING WILDCARDS USED IN SMARTS PARAMETER MATCHING
+# Missing angle parameters, assigning default parameters
+angle       403   402   401      53.2     119.02
+```
+* New database for bond,angle,strbnd and opbend supersedes the amoeba09 database matches and has comments such as " updated valence parameter database match, comments=car, car, car, SMARTS match = [c] [c] [c]"
+```
+# updated valence parameter database match, comments=car, car, car, SMARTS match = [c] [c] [c]
+angle 404 403 402 74.630713 118.66
+```
+* When parameters are missing in the database for strbnd, they are removed and you will see a comment such as "Missing strbnd parameters, zeroing out parameters"
+
+```
+# matching SMARTS from molecule  ['[H]-[#16]-[#6]', [1, 2, 3]] to SMARTS from parameter file ['[H]-[#16]-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H]', [1, 2, 3]] with tinker type descriptions [('H', '"Ethyl Sulfide HS"'), ('S', '"Ethyl Sulfide S"'), ('C', '"Ethyl Sulfide CH2"')]
+# Missing strbnd parameters, zeroing out parameters
+strbnd       407   401   402       0       0
+```
+* If missing opbend parameters from database, MM3 forcefield default parameters are used and a comment in the key file will say "WARNING DEFAULT MM3 OPBEND VALUES USED "
+# matching SMARTS from molecule  ['[#6]1:[#6]:[#6]:[#6]:[#6]:[#6]:1', [1, 2]] to SMARTS from parameter file ['[#8](-[#6]1:[#6](:[#6](:[#6](:[#6](:[#6]:1-[H])-[H])-[H])-[H])-[H])-[H]', [2, 3]] with tinker type descriptions [('C', '"Phenol C1-OH"'), ('C', '"Phenol C2"')]
+# WARNING DEFAULT MM3 OPBEND VALUES USED 
+opbend 402 403 0 0 14.39
+```
+* If missing aromatic torsion (or b-c bond in a-b-c-d both are in ring with hybridization of 2) from database benzene parameters are transferred 
+```
+# Transferring from ['Benzene HC', 'Benzene C', 'Benzene C', 'Benzene C']
+torsion 409 404 405 404 0.55 0.0 1 6.187 180.0 2 -0.55 0.0 3
+```
+* If missing torsion parameters from database, a comment will appear saying "Missing torsion parameters, will attempt to fit parameters"
+ 
+```
+# matching SMARTS from molecule  ['[#8]~[#16]~[#6]~[#6]~[#6]~[H]', [1, 2, 3, 4]] to SMARTS from parameter file ['[#16](-[#8-])(=[#8])(=[#8])-[#6](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H]', [2, 1, 5, 6]] with tinker type descriptions [('O', '"Ethyl Sulfonate SO3-"'), ('S', '"Ethyl Sulfonate SO3-"'), ('C', '"Ethyl Sulfonate CH2"'), ('C', '"Propyl Sulfonate Me-CH2"')]
+# WARNING WILDCARDS USED IN SMARTS PARAMETER MATCHING
+Missing torsion parameters, will attempt to fit parameters
+torsion 406 401 402 403 0 0.0 1 0 180.0 2 0 0.0 3
+
+```
