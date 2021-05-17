@@ -193,6 +193,7 @@ angle 404 403 402 74.630713 118.66
 strbnd       407   401   402       0       0
 ```
 * If missing opbend parameters from database, MM3 forcefield default parameters are used and a comment in the key file will say "WARNING DEFAULT MM3 OPBEND VALUES USED "
+```
 # matching SMARTS from molecule  ['[#6]1:[#6]:[#6]:[#6]:[#6]:[#6]:1', [1, 2]] to SMARTS from parameter file ['[#8](-[#6]1:[#6](:[#6](:[#6](:[#6](:[#6]:1-[H])-[H])-[H])-[H])-[H])-[H]', [2, 3]] with tinker type descriptions [('C', '"Phenol C1-OH"'), ('C', '"Phenol C2"')]
 # WARNING DEFAULT MM3 OPBEND VALUES USED 
 opbend 402 403 0 0 14.39
@@ -202,6 +203,7 @@ opbend 402 403 0 0 14.39
 # Transferring from ['Benzene HC', 'Benzene C', 'Benzene C', 'Benzene C']
 torsion 409 404 405 404 0.55 0.0 1 6.187 180.0 2 -0.55 0.0 3
 ```
+
 * If missing torsion parameters from database, a comment will appear saying "Missing torsion parameters, will attempt to fit parameters"
  
 ```
