@@ -64,14 +64,63 @@
     <li>	This defines which torsions are zeroed out prior to torsion fitting </li>
     <li>	Iterate over torsion indices, SMARTS strings </li>
     <li>	If b-c (a-b-c-d) is in onlyrotbndslist, and if a or d is a hydrogen, if there is an example of a possible a and d that is heavy (non-hydrogen) then skip this torsion (try to transfer hydrogen torsion), else then add to missing torsions list. So if all hydrogen torsion on one side or both sides then fit this torsion. </li>
-    <li>	If bond order of b-c is not 1, then skip torsion </li>
+    <li>	If bond order of b-c is not 1 and bond is not in a ring, then skip torsion </li>
     <li>	If the angle between a-b-c and b-c-d is near 180 degrees, then skip torsion </li>
     <li>	If linear, then dihedral angle is not defined, minimize will not work </li>
     <li>	If b-c is in partial double bonds then skip torsion </li>
-    <li>	If there are no aromatic atoms (such as if torsion was in a ring) </li>
-<li>	If a or d is hydrogen but there is example of a and d as heavy atoms than skip torsion (try to transfer hydrogen) else if no heavy atoms both sides don’t skip torsion. So, if all hydrogen torsion on one side or both sides then fit this torsion. </li>
-    <li>	If ~ or * in SMARTS, and no aromatic atoms in torsion (such as if in ring), then this is a poor match and then try to derive parameters for this torsion. So aromatic torsions can transfer ~ * in SMARTS but non-aromatic will decide to derive parameters for. </li>
-    <li>	If missing any neighbors of a-b-c-d in SMARTS and not in an aromatic ring, then derive torsion parameters for this torsion. </li>
+
+    <li>	If missing any neighbors of a-b-c-d in SMARTS string or *, ~ in SMARTS string, then determine this to be poorly transferred parameters. </li>
+    <li>	If ring bond and missing torsion from database: </li>
+<ol>
+             <li> If a-b-c-d all non-aromatic  </li>
+<ol>
+                  <li> If a or d is H and and there exist other a/d such that a,d is not H, then just transfer whatever matches for H torsion </li>
+<ol>
+                          <li> Exception when transferring high energy H torsion, then zero out and fit  </li>
+
+</ol>
+                  <li> Else, chop ring and derive parameters  </li>
+
+</ol>
+             <li> b-c aromatic (or b-c have hybridization of 2). Below, lowercase leter means aromatic atom or ring atom with hyb of 2. Letter x refers to non-hydrogen atom.  </li>
+<ol>
+                    <li> If H-x-x-x transfer from H-c-c-c  </li>
+                    <li> If H-x-x-H transfer from H-c-c-H  </li>
+                    <li> If x-x-x-x transfer from c-c-c-c  </li>
+
+
+</ol>
+             <li> If b aromatic and c not aromatic or (b non-aromatic and c aromatic).   </li>
+<ol>
+                    <li> If H-X-X-X transfer from H-C-C-C  </li>
+                    <li> If H-X-X-H transfer from H-C-C-H  </li>
+                    <li> If X-X-X-X transfer from C-C-C-C  </li>
+
+
+</ol>
+             <li> If b and c non-aromatic but a or d is aromatic   </li>
+<ol>
+                    <li> If H-X-X-X transfer from H-C-C-C  </li>
+                    <li> If H-X-X-H transfer from H-C-C-H  </li>
+                    <li> If X-X-X-X transfer from C-C-C-C  </li>
+
+
+</ol>
+
+</ol>
+             <li> If NOT ring bond and missing torsion from database:   </li>
+<ol>
+                  <li> If a or d is H and and there exist other a/d such that a,d is not H, then just transfer whatever matches for H torsion </li>
+<ol>
+                          <li> Exception when transferring high energy H torsion, then zero out and fit  </li>
+
+</ol>
+                  <li> Else, derive parameters for torsion  </li>
+
+</ol>
+
+
+
 </ol>
 <li>	Find adjacent missing tortors </li>
 <ol>
