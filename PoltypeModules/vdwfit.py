@@ -1274,7 +1274,7 @@ def MinimizeDimer(poltype,inputxyz,keyfile,indexpairtoreferencedistanceoriginal,
     finaloutputxyz=inputxyz+'_2'
     newfilename=inputxyz.replace('.xyz','cart.xyz')
     ConvertTinktoXYZ(poltype,finaloutputxyz,newfilename)
-    maxresidx=3-1
+    maxresidx=2
     newrestraints=[]
     for residx in range(len(restraints)):
         res=restraints[residx]
@@ -1576,11 +1576,8 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     poltype.espbasisset="aug-cc-pVDZ"
     tempuse_gaus=poltype.use_gaus
     tempuse_gausoptonly=poltype.use_gausoptonly
-    #if ('I ' in poltype.mol.GetSpacedFormula()):
-    #    pass
-    #else:
-    #    poltype.use_gaus=False
-    #    poltype.use_gausoptonly=False
+    if poltype.use_gau_vdw==True and poltype.foundgauss==True:
+         poltype.use_gaus=True
     poltype.SanitizeAllQMMethods()
     paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebabio18.prm"
     ReplaceParameterFileHeader(poltype,paramhead,poltype.key5fname)
@@ -1630,15 +1627,21 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             poltype.fckoptfname=prefix+'-opt.fchk'
             poltype.logoptfname=prefix+'-opt.log'
             poltype.gausoptfname=prefix+'-opt.log'
-            optmol,error = opt.GeometryOptimization(poltype,mol,checkbonds=False,modred=False,bondanglerestraints=restraints,skipscferror=False,charge=totchg,skiperrors=True)
-            if error==True:
-                moleculeprobeindicestoignore.append([moleculeindex,probeindex])
-                continue
+            if poltype.use_qmopt_vdw==True:
+                optmol,error = opt.GeometryOptimization(poltype,mol,checkbonds=False,modred=False,bondanglerestraints=restraints,skipscferror=False,charge=totchg,skiperrors=True)
+                if error==True:
+                    moleculeprobeindicestoignore.append([moleculeindex,probeindex])
+                    continue
             prefixarrays.append(prefix)
             dimeratoms=mol.NumAtoms()
             moleculeatoms=dimeratoms-probeatoms
-            moleculeatom=optmol.GetAtom(moleculeindex)
-            probeatom=optmol.GetAtom(probeindex)
+            if poltype.use_qmopt_vdw==True:
+                moleculeatom=optmol.GetAtom(moleculeindex)
+                probeatom=optmol.GetAtom(probeindex)
+            else:
+                moleculeatom=mol.GetAtom(moleculeindex)
+                probeatom=mol.GetAtom(probeindex)
+
             try:
                 moleculeatomcoords=np.array([moleculeatom.GetX(),moleculeatom.GetY(),moleculeatom.GetZ()])
                 probeatomcoords=np.array([probeatom.GetX(),probeatom.GetY(),probeatom.GetZ()])
@@ -1653,7 +1656,11 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             outputprefixname=filename.split('.')[0]
             outputxyz=outputprefixname+'_tinker.xyz'
             inputxyz=outputprefixname+'_cartesian.xyz'
-            WriteOutCartesianXYZ(poltype,optmol,inputxyz)
+            if poltype.use_qmopt_vdw==True:
+                WriteOutCartesianXYZ(poltype,optmol,inputxyz)
+            else:
+                WriteOutCartesianXYZ(poltype,mol,inputxyz)
+
             if 'water' in outputxyz:
                 waterbool=True
             else:

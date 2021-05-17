@@ -846,7 +846,9 @@ def GenerateFragmentSMARTS(poltype,rdkitmol,mol,ls):
     return smarts,smartsfortransfer
 
 
-def MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist):
+def MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist,ls):
+    parametersmartstomatchlenlist={}
+    parametersmartstosmartslistlist={}
     for smartls in smartslist:
         smartsfortransfer=smartls[1]
         smarts=smartls[0]
@@ -860,8 +862,24 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartsli
                 if diditmatch==True:
                     matches=structure.GetSubstructMatches(substructure)
                     firstmatch=matches[0]
-                    parametersmartstomatchlen[parametersmarts]=len(firstmatch)
-                    parametersmartstosmartslist[parametersmarts]=smartls
+                    if parametersmarts not in parametersmartstosmartslistlist.keys():
+                        parametersmartstosmartslistlist[parametersmarts]=[]
+                    if parametersmarts not in parametersmartstomatchlenlist.keys():
+                        parametersmartstomatchlenlist[parametersmarts]=[]
+                    if smartls not in parametersmartstosmartslistlist[parametersmarts]:
+                        parametersmartstosmartslistlist[parametersmarts].append(smartls)
+                        parametersmartstomatchlenlist[parametersmarts].append(len(firstmatch))
+
+    for prmsmarts,newls in parametersmartstosmartslistlist.items():
+        lengths=parametersmartstomatchlenlist[prmsmarts]
+        smartslengths=[len(i[0]) for i in newls]
+        maxlen=max(smartslengths)
+        maxidx=smartslengths.index(maxlen)
+        parametersmartstosmartslist[prmsmarts]=newls[maxidx]
+        parametersmartstomatchlen[prmsmarts]=lengths[maxidx]
+
+            
+
     return parametersmartstomatchlen,parametersmartstosmartslist
 
 
@@ -872,35 +890,35 @@ def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprmtosmartslist,param
     for ls,smartslist in listforprmtosmartslist.items(): 
         parametersmartstomatchlen={}
         parametersmartstosmartslist={}
-        parametersmartstomatchlen,parametersmartstosmartslist=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
+        parametersmartstomatchlen,parametersmartstosmartslist=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist,ls)
         if len(parametersmartstomatchlen.keys())==0:
            
             smartslist=ReplaceSMARTSBondsWithGenericBonds(poltype,smartslist,ls,mol)
-            parametersmartstomatchlen,parametersmartstosmartslist=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
+            parametersmartstomatchlen,parametersmartstosmartslist=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist,ls)
             if len(parametersmartstomatchlen.keys())==0:
                 smartslist=ReplaceEachAtomIdentityOnEnd(poltype,smartslist[0]) 
-                parametersmartstomatchlen,parametersmartstosmartslist=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
+                parametersmartstomatchlen,parametersmartstosmartslist=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist,ls)
 
                 if len(parametersmartstomatchlen.keys())==0:
                     smartslist=ReplaceAtomIdentitiesOnEnd(poltype,smartslist[0])
-                    parametersmartstomatchlen,parametersmartstosmartslist=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
+                    parametersmartstomatchlen,parametersmartstosmartslist=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist,ls)
 
                     if len(parametersmartstomatchlen.keys())==0:
                         smartslist=ReplaceAllAtomIdentities(poltype,smartslist[0])
-                        parametersmartstomatchlen,parametersmartstosmartslist=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist)
+                        parametersmartstomatchlen,parametersmartstosmartslist=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist,ls)
 
-                        listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls)
+                        listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls,smartslist)
                         
                     else:
-                        listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls)
+                        listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls,smartslist)
 
                 else:
-                    listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls)
+                    listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls,smartslist)
                     
             else:
-                listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls)
+                listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls,smartslist)
         else:
-            listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls)
+            listforprmtoparametersmarts,listforprmtosmarts=GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls,smartslist)
     return listforprmtoparametersmarts,listforprmtosmarts
 
 def ReplaceEachAtomIdentityOnEnd(poltype,smartsls):
@@ -980,10 +998,13 @@ def ReplaceAllAtomIdentities(poltype,smartsls):
     return newsmartslist
 
 
-def GenerateElementCountsDictionary(poltype,structure):
+def GenerateElementCountsDictionary(poltype,structure,match):
     countdic={}
     for atom in structure.GetAtoms():
         atomicnum=atom.GetAtomicNum()
+        atomindex=atom.GetIdx()
+        if atomindex not in match:
+            continue
         if atomicnum not in countdic.keys():
             countdic[atomicnum]=0
         countdic[atomicnum]+=1
@@ -991,7 +1012,7 @@ def GenerateElementCountsDictionary(poltype,structure):
 
 
 
-def GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls):
+def GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,listforprmtoparametersmarts,listforprmtosmarts,ls,smartslist):
     maxparametersmartsmatchlength=max(parametersmartstomatchlen.values())
     parametersmartslist=GrabKeysFromValue(poltype,parametersmartstomatchlen,maxparametersmartsmatchlength)
     prmsmartstodiff={}
@@ -1018,8 +1039,16 @@ def GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,
     parametersmartslist=GrabKeysFromValue(poltype,prmsmartstodiff,mindiff)
     smartstocountdic={}
     atomicnums=[]
-    for prmsmarts in parametersmartslist:
-        countdic=GenerateElementCountsDictionary(poltype,Chem.MolFromSmarts(prmsmarts))
+    for prmsmartsidx in range(len(parametersmartslist)):
+        prmsmarts=parametersmartslist[prmsmartsidx]
+        smartsls=parametersmartstosmartslist[prmsmarts]
+        smartsfortransfer=smartsls[0]
+        newmol=Chem.MolFromSmarts(prmsmarts)
+        substructure = Chem.MolFromSmarts(smartsfortransfer)
+        matches=newmol.GetSubstructMatches(substructure)
+        firstmatch=matches[0]
+        firstmatch=AddNeighbors(poltype,firstmatch,newmol)
+        countdic=GenerateElementCountsDictionary(poltype,newmol,firstmatch)
         for atomicnum in countdic.keys():
             if atomicnum not in atomicnums:
                 atomicnums.append(atomicnum)
@@ -1029,7 +1058,11 @@ def GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,
             if atomicnum not in countdic.keys():
                 countdic[atomicnum]=0
         smartstocountdic[smarts]=countdic
-    mastercountdic=GenerateElementCountsDictionary(poltype,poltype.rdkitmol)
+    substructure = Chem.MolFromSmarts(smartsfortransfer)
+    matches=poltype.rdkitmol.GetSubstructMatches(substructure)
+    firstmatch=matches[0]
+    firstmatch=AddNeighbors(poltype,firstmatch,poltype.rdkitmol)
+    mastercountdic=GenerateElementCountsDictionary(poltype,poltype.rdkitmol,firstmatch)
     for atomicnum in atomicnums:
         if atomicnum not in mastercountdic.keys():
             mastercountdic[atomicnum]=0
@@ -1039,15 +1072,30 @@ def GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,
         for atomicnum,counts in countdic.items():
             mastercounts=mastercountdic[atomicnum]
             diff=np.abs(mastercounts-counts)
-            totdiff+=diff 
+            totdiff+=diff
         difftosmarts[totdiff]=smarts
-    
     mindiff=min(difftosmarts.keys())
     parametersmarts=difftosmarts[mindiff]
     smartsls=parametersmartstosmartslist[parametersmarts]
     listforprmtoparametersmarts[ls]=parametersmarts 
     listforprmtosmarts[ls]=smartsls
     return listforprmtoparametersmarts,listforprmtosmarts
+
+
+
+def AddNeighbors(poltype,match,mol):
+    newmatch=[]
+    for atmidx in match:
+        atom=mol.GetAtomWithIdx(atmidx)
+        if atmidx not in newmatch:
+            newmatch.append(atmidx)
+        for natm in atom.GetNeighbors():
+            natmidx=natm.GetIdx()
+            if natmidx not in newmatch:
+                newmatch.append(natmidx)
+    return newmatch
+            
+    
 
 
 def RemoveHydrogens(poltype,mol):
@@ -1184,9 +1232,10 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         obConversion.ReadFile(fragbabelmol, fragmentfilepath)
         fragidxtosymclass,symmetryclass=symm.gen_canonicallabels(poltype,fragbabelmol)
 
+        smartindices=[moleculeindextosmartsindex[i] for i in atomindices]
         substructure = Chem.MolFromSmarts(smartsfortransfer)
         matches=structure.GetSubstructMatches(substructure)
-        firstmatch=matches[0]
+        firstmatch=TryAndPickMatchWithNeighbors(poltype,matches,smartindices,substructure)
 
         indices=list(range(len(firstmatch)))
         smartsindextoparametersmartsindex=dict(zip(indices,firstmatch)) 
@@ -1211,10 +1260,10 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
                 elementtinkerdescrip=parametersmartsordertoelementtinkerdescrip[specialindex]
                 for index in indexes:
                     parametersmartsordertoelementtinkerdescrip[index]=elementtinkerdescrip
-        smartindices=[moleculeindextosmartsindex[i] for i in atomindices]
         parametersmartindices=[smartsindextoparametersmartsindex[i] for i in smartindices]
         parametersmartsorders=[i+1 for i in parametersmartindices]
         elementtinkerdescrips=[parametersmartsordertoelementtinkerdescrip[i] for i in parametersmartsorders]
+
         tinkertypes=[elementtinkerdescriptotinkertype[i] for i in elementtinkerdescrips]
         tinkerclasses=[tinkertypetoclass[i] for i in tinkertypes]
         tinkerclasses=[int(i) for i in tinkerclasses]
@@ -1229,6 +1278,28 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
 
     return atomindicestotinkertypes,atomindicestotinkerclasses,atomindicestoparametersmartsatomorders,atomindicestoelementtinkerdescrips,atomindicestosmartsatomorders
 
+def TryAndPickMatchWithNeighbors(poltype,matches,smartindices,substructure):
+    extendedsmartindices=[]
+    for idx in smartindices:
+        atom=substructure.GetAtomWithIdx(idx)
+        extendedsmartindices.append(idx)
+        for natm in atom.GetNeighbors():
+            natmidx=natm.GetIdx()
+            if natmidx not in extendedsmartindices:
+                extendedsmartindices.append(natmidx)
+    for match in matches:
+        indices=list(range(len(match)))
+        smartsindextoparametersmartsindex=dict(zip(indices,match)) 
+        foundmap=True
+        for idx in extendedsmartindices:
+            if idx not in smartsindextoparametersmartsindex:
+                foundmap=False
+        if foundmap==True:
+            return match
+    firstmatch=matches[0]
+    return firstmatch
+   
+        
 
 def GrabSMARTSList(poltype,smartsatomordertoelementtinkerdescrip):
     smartslist=[]
@@ -1952,8 +2023,10 @@ def ConvertIndicesDictionaryToPoltypeClasses(poltype,indicestovalue,indicestotin
                 poltypeclasses=tuple(tinkerclassestopoltypeclasses[tinkerclasses[::-1]])
             else:
                 continue
-
-            poltypeclassestovalue[poltypeclasses]=value
+            if poltypeclasses not in poltypeclassestovalue.keys():
+                poltypeclassestovalue[poltypeclasses]=[]
+            if value not in poltypeclassestovalue[poltypeclasses]:
+                poltypeclassestovalue[poltypeclasses].append(value)
     return poltypeclassestovalue 
 
 def CheckIfStringInStringList(poltype,string,stringlist):
@@ -2639,9 +2712,19 @@ def FindMissingParameters(poltype,indicestosmartsatomorders,rdkitmol,mol,indexto
                     matcharray.append(idx)
             
         check=CheckIfNeighborsExistInSMARTMatch(poltype,nindexes,matcharray)
-               
         if check==False or '*' in smarts or '~' in smarts:
-            missing.append(indices)
+            if len(indices)==1: # vdw
+                if poltype.onlyvdwatomindex==None:
+                    missing.append(indices)
+                else:
+                    idx=indices[0]+1
+                    if idx==poltype.onlyvdwatomindex:
+                        missing.append(indices)
+            else:
+                missing.append(indices)
+
+
+
     return missing
 
 def ReduceMissingVdwByTypes(poltype,vdwmissing):
@@ -3860,6 +3943,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     vdwindicestoextsmartsmatchlength,vdwindicestoextsmarts,vdwindicestoextsmartsatomorder=MatchExternalSMARTSToMolecule(poltype,rdkitmol,vdwsmartsatomordertoparameters)
     tortorindicestoextsmartsmatchlength,tortorindicestoextsmarts,tortorindicestoextsmartsatomorders=MatchExternalSMARTSToMolecule(poltype,rdkitmol,tortorsmartsatomordertoparameters)
     atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,atomindicesforprmtosmartslist,parametersmartslist,mol)
+ 
     bondsforprmtoparametersmarts,bondsforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,bondsforprmtosmartslist,parametersmartslist,mol)
     planarbondsforprmtoparametersmarts,planarbondsforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,planarbondsforprmtosmartslist,parametersmartslist,mol)
     anglesforprmtoparametersmarts,anglesforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,anglesforprmtosmartslist,parametersmartslist,mol)
@@ -3960,7 +4044,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     atompoltypeclasstoparametersmartsatomorder=ConvertIndicesDictionaryToPoltypeClasses(poltype,atomindextoparametersmartsatomorder,atomindextotinkerclass,atomtinkerclasstopoltypeclass)
 
     atompoltypeclasstosmartsatomorder=ConvertIndicesDictionaryToPoltypeClasses(poltype,atomindextosmartsatomorder,atomindextotinkerclass,atomtinkerclasstopoltypeclass)
-
     atompoltypeclassestoelementtinkerdescrip=ConvertIndicesDictionaryToPoltypeClasses(poltype,atomindextoelementtinkerdescrip,atomindextotinkerclass,atomtinkerclasstopoltypeclass)
     poltypetoprmtype={} # dont need polarize parameters 
     typestoframedefforprmfile={} # dont need multipole parameters

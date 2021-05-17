@@ -115,6 +115,12 @@ use_gausgeomoptonly  specifies to only use gaussian for initial geometry optimiz
 dontusepcm           Dont use pcm for any QM calculation.
                      Default=False
 
+use_qmopt_vdw        Use QM opt after MM opt for vdw dimer.
+                     Default=False
+
+use_gau_vdw          Use Gaussian for vdw QM if detected in envioronment.
+                     Default=False
+
 ```
 
 ### Distributed Multipole Analysis (DMA) and Electrostatic Single Point (ESP) Inputs
@@ -226,6 +232,8 @@ transferqmequilvalues     specifies to tranfer QM equilbrium angle and bond leng
 ```
 dontdovdwscan            specifies to not refine initial guess vdw parameters from database assignment.
                          Default=False
+
+onlyvdwatomindex         Only probe one vdw atom index on molecule.
 ```
 
 ### Misc.

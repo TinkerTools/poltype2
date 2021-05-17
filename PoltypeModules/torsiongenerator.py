@@ -653,6 +653,8 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         optnumtofulllistofjobs['1'].extend(listofjobs)
         fulljobtolog.update(jobtolog) 
         fulljobtooutputlog.update(jobtooutputlog)
+    if poltype.tordebugmode==True:
+        sys.exit()
 
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMOptJobToLog'+'_1'+'_'+poltype.molecprefix
     if poltype.externalapi!=None:
@@ -998,10 +1000,6 @@ def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndli
             classes=[poltype.idxtosymclass[i] for i in babelindices]
             if classes not in torsionsmissing and classes[::-1] not in torsionsmissing: # then probably H torsions transferred
                 continue
-
-
-
-         
             if tpdkey not in torsionlist:
                 torsionlist.append(tpdkey)
         torset=tuple([maintor])
@@ -1011,16 +1009,12 @@ def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndli
         else:
             prmnum=len(poltype.nfoldlist)*len(torsionlist)+1
         poltype.torsionsettonumptsneeded[torset]=prmnum
-
         if poltype.tordatapointsnum==None:
             ang=round(360/(prmnum)) # offset parameter is the +1
             if ang> 30:
                 ang=30
-           
         else:
             ang=round(360/poltype.tordatapointsnum)
-
-        ratio=round(360/ang)
         poltype.rotbndtoanginc[key]=ang
     return poltype.rotbndtoanginc
 
