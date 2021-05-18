@@ -1,5 +1,10 @@
 ## Torsion README
 
+```math
+\mathcal{E}_{\rm{torsion}} = \sum_{n} K_{n\phi} [1 + cos(n\phi \pm \delta)]
+```
+​
+
 First the torsion angles are identified in the actual molecular structure through the **torsiongenerator.py** program; a QM relaxed scan with constraints, is then performed for each of the dihedrals identified (or a selected subset of the molecular dihedrals), in order to derive the force field dihedral parameter, fitting the classical torsion energy functional (which is a parametric functional) as defined in the AMOEBA force field to those QM data. This crucial part of the procedure is executed by a second program, namely **torsionfit.py**.
 
 More specifically, the **databaseparser.py** creates a list of the missing torsion parameters: each bond in the molecule is analyzed, checking if it is part of a non-aromatic ring, then finding one atom from each side of the actual bond which can define the dihedral angle. When the quartet of atoms is found in the missing torsion list already defined, then the procedure is applied to the dihedral angle. **By default, if a reasonably close dihedral exist in the database** (e.g.: the amoeba09 force field, or external SMARTS parmaeter database), torsion parameters are not computed *ab initio* by default, unless strictly necessary (if the SMARTS string is not similar enough to input envioronment). If the  **onlyrotbndslist** keyword is used (*vide infra*) the specified dihedrals are fitted to QM data. On the opposite, the **rotalltors** impose to perform a QM dihedral scan followed by a fitting procedure for any dihedral. **WARNING: using this keyword might cause the program to fail, if bonds that can not be rotated are taken into account (this wont work for ring bonds)**.
