@@ -1,4 +1,28 @@
 ## Torsion Fitting Readme
+
+The program **torsionfit.py** extracts the energies from the output files of the calculations performed on the MM and QM optimized structures, along the torsion scan for each torsion parameters. Pre-fit MM energy, QM energy and angles from all rotatable bonds are collected and average energy of multiple instances of the same torsion, which can be found, repeated, in different part of molecule (same symmetry types).
+
+The fitting procedure is performed, and repeated **at most** twice if necessary, for all rotatable bonds, using Boltzmann fitting when trying for the second time. 
+Consecutive coupled torsion can be parameterized, first by parameterizing single torsions are fitted (1D torsion) then by using a spline fit the QM-MM2, where MM2 is parameters from 1D torsion fitting.
+
+Additionally, torsion rotations are categorized by symmetry, based on the atoms which are forming that torsion, for storing fitting results (*e.g.*: C-C-C-C or H-C-C-H torsions, *etc.*).
+
+To proceed with the fitting, first QM and MM energies are **normalized**, and the QM value is then subtracted from the MM one ($E_{QM} -E_{MM}$). If a second try for the fitting procedure is required, the Boltzmann weight defined as
+
+$$ e^{-E_{QM}/8}.$$
+
+From all the $E_{QM} -E_{MM}$ energies differences a min/max criterion is used to set the boundaries to evaluate the fitting quality. Those boundaries are identified by the amplitude between the max and min. The parameters for fitting are then initialized, for each fold of the torsion potential energy term. In addition to the min/max boundaries, also boundaries for the phase angle (0-2$\pi$) for fitting phase angle and also an additional criterion is defined for non-aromatic ring puckering torsion parameters.
+
+The cost function to be minimized in the fitting procedure is defined from subtracting the energy of torsion parameters only from the $E_{QM} -E_{MM}$E_{QM} -E_{MM} energies. The least squares procedure of scipy is used for this optimization. The Boltzmann weights are applied to the energy difference , when it fails at first attempt of fitting.
+
+The fitting parameters' quality is then checked: all parameters are compared to the min/max boundary, and when the actual fitted parameter is greater than that, the fitting is repeated and boundaries modified (essentially remove one of the parameters from fitting by keeping it fixed near a lower specific value). When combinations of torsions are considered, a specific criterion is applied to first and third fold torsion terms (try to prevent parameter cancellation). Graphs are generated to also check the results of the fitting, comparing pre-fitting MM, QM and post-fitting MM energies, as functions of the torsion angle values.
+
+If everything goes smoothly, the fitted parameters are written to the .key file with all the parameters derived. Moreover, from the QM optimized structures, tinker minimization are performed again, using the new parameters, analyzing the newly optimized MM structures.
+
+If either the QM energy, the WBO bond index, the pre-fit MM or post-fit MM energies is missing for a specific point along the torsion scan, that point is removed from the scan.
+
+
+
 <ol>
 <li>    Copy .key_4 from parent poltype directory into qm-torsion folder </li> 
 <li>    Change directory to qm-torsion </li> 

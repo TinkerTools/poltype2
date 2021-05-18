@@ -1,5 +1,20 @@
 ## Torsion README
 
+First the torsion angles are identified in the actual molecular structure through the **torsiongenerator.py** program; a QM relaxed scan with constraints, is then performed for each of the dihedrals identified (or a selected subset of the molecular dihedrals), in order to derive the force field dihedral parameter, fitting the classical torsion energy functional (which is a parametric functional) as defined in the AMOEBA force field to those QM data. This crucial part of the procedure is executed by a second program, namely **torsionfit.py**.
+
+More specifically, the **databaseparser.py** creates a list of the missing torsion parameters: each bond in the molecule is analyzed, checking if it is part of a non-aromatic ring, then finding one atom from each side of the actual bond which can define the dihedral angle. When the quartet of atoms is found in the missing torsion list already defined, then the procedure is applied to the dihedral angle. **By default, if a reasonably close dihedral exist in the database** (e.g.: the amoeba09 force field, or external SMARTS parmaeter database), torsion parameters are not computed *ab initio* by default, unless strictly necessary (if the SMARTS string is not similar enough to input envioronment). If the  **onlyrotbndslist** keyword is used (*vide infra*) the specified dihedrals are fitted to QM data. On the opposite, the **rotalltors** impose to perform a QM dihedral scan followed by a fitting procedure for any dihedral. **WARNING: using this keyword might cause the program to fail, if bonds that can not be rotated are taken into account (this wont work for ring bonds)**.
+
+When rotalltors is not used, partial double bonds are ignored. For bonds in non-aromatic rings with missing torsion parameters (all atoms non-aromatic), **puckering** is applied (if keyword is active), else fragmenter will fragment the non-aromatic ring around bond with missing torsion parameters and do rigid dihedral scan.
+
+**Consecutive torsions** are also found (if keyword is on), removing individual torsions from torsion list and replace with tuples of two torsions.
+
+Before to fitting, **torsiongenerator.py** calls the Tinker minimize, followed by analyze is performed, to construct the MM energy profile along the torsion's scan. Later, for each tinker minimized structure the Gaussian/Psi4 input file for a constrained QM optimization is created with frozen torsion restraints. All torsion around all bonds are restrained, but with some exceptions: if heavy atoms are the two side of the torsion then pick those as restraints; if there are multiple torsions with hydrogen atoms at the two sides instead, then pick only one as restraint.
+
+After the QM optimizations are completed, the original QM topology is compared to the newly optimized one,if missing bond type from internal table, else QM bond length is compared to table length and tolerance is set to .05 angstroms. If bond lengths differ by more than tolerance, then optimization is performed again using the last structure from the last QM opt as starting point for next QM opt.
+
+At the end, an ESP calculation is performed on the final optimized structures along the torsion scan.
+
+When for some reason QM optimizations or SP can not converge, at any point of the PES, the problematic point is just removed from scan.
 
 ![Torsion Protocol](Images/TorsionProtocol.PNG)
 
@@ -77,9 +92,9 @@
 </ol>
 <li>	For each opt job submitted </li>
 <ol>
-    <li>	Compare original QM bond topology to newly optimized QM topology </li>
+    <li>	Compare original QM bond topology to newly optimized QM topology, unless bond exists in internal table, then compare QM optimized bond length to internal table bond length and set tolerance to .05 angstroms. </li>
 <ol>
-        <li>	If bond lengths differ by more than .2 angstroms, then resubmit the job and increase maxoptcycles +2 </li>
+        <li>	If bond lengths differ by more than tolerance, then resubmit the job and use output QM structure as input for new QM opt job. </li>
         <li>	Grab Final structure after each finished optimization </li>
 </ol>
 </ol>

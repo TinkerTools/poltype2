@@ -61,7 +61,7 @@
 </ol>
 <li>	For each tinker minimized initial probe structure </li>
 <ol>
-    <li>	Try geometry optimization </li>
+    <li>	Try geometry optimization (by default dont do QM OPT, just use MM OPT) </li>
 <ol>
         <li>	If this fails, then remove this probe atom – molecule atom pair from fitting </li>
         <li>	If successful grab output XYZ and then convert to tinker XYZ </li>
@@ -70,7 +70,7 @@
     <li>	Then generate input SP files for Gaussian/Psi4 </li>
     <li>	Execute Gaussian/Psi4 SP jobs </li>
 </ol>
-<li>	Move dimer about QM minima </li>
+<li>	Move dimer about MM (or QM if want QM minima) minima </li>
 <ol>
     <li>	Default array of .8,.9,1,1.1,1.2 </li>
     <li>	The initial distance between target atom on the molecule and the probe atom is scaled to each value in array by shifting the probe </li>
