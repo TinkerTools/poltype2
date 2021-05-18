@@ -1329,7 +1329,6 @@ class PolarizableTyper():
         os.chdir(tempdir) 
 
     def GenerateParameters(self):
-        print(whoops) # test to send email
         if self.deleteallnonqmfiles==True:
             self.DeleteAllNonQMFiles()
         self.CheckMemorySettings()        
