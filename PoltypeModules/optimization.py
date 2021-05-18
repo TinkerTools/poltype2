@@ -426,7 +426,7 @@ def write_com_header(poltype,comfname,chkfname,maxdisk,maxmem,numproc):
     tmpfh.write("%Nproc=" + str(numproc) + "\n")
     tmpfh.close()
 
-def AverageBondTableLength(poltype,elementsbondorder):
+def AverageBondTableLength(poltype,elementsbondorder,ringbond,hybs):
     elementstobondordertolength={tuple([15,17,1]):2.043,tuple([15,8,1]):2.21,tuple([15,8,1]):1.65,tuple([1,1,1]):.74,tuple([9,9,1]):1.42,tuple([17,17,1]):1.99,tuple([35,35,1]):2.28,tuple([53,53,1]):2.67,tuple([1,6,1]):1.10,tuple([1,7,1]):1.00,tuple([1,8,1]):.97,tuple([1,9,1]):.92,tuple([6,6,1]):1.54,tuple([6,7,1]):1.47,tuple([6,8,1]):1.43,tuple([7,7,1]):1.45,tuple([8,8,1]):1.45,tuple([1,6,1]):1.10,tuple([6,6,2]):1.34,tuple([6,6,3]):1.20,tuple([6,7,2]):1.28,tuple([6,8,2]):1.20,tuple([6,8,3]):1.13,tuple([7,7,2]):1.23,tuple([7,7,3]):1.10,tuple([8,8,2]):1.21,tuple([1,9,1]):.92,tuple([1,17,1]):1.27,tuple([1,35,1]):1.41,tuple([1,53,1]):1.61,tuple([6,16,1]):1.82,tuple([1,6,1]):1.10,tuple([6,9,1]):1.35,tuple([6,17,1]):1.77,tuple([6,35,1]):1.94,tuple([6,53,1]):2.14}
     
     found=False
@@ -438,13 +438,21 @@ def AverageBondTableLength(poltype,elementsbondorder):
     elif rev in elementstobondordertolength.keys():
         length=elementstobondordertolength[rev]
         found=True
+    if ringbond==True and hybs[0]==2 and hybs[1]==2:
+        if elementsbondorder[0]==6 and elementsbondorder[1]==6:
+            length=1.41
+            found=True
+    else:
+        found=False
+        length=None
+
+
     if found==False:
         tol=.1 # extreme case if any missing above
     else:
         tol=.05 # test this may increase tolerance later
     return tol,length
 
-    
 
 def CompareBondLengths(poltype,inioptmol,optmol):
     isnear=True
@@ -455,13 +463,17 @@ def CompareBondLengths(poltype,inioptmol,optmol):
         if b==None:
             isnear=False
             break
+        ringbond=inib.IsInRing()
+        idxs=[beg,end]
+        atoms=[inioptmol.GetAtom(i) for i in idxs]
+        hybs=[a.GetHyb() for a in atoms]
         begatom=optmol.GetAtom(beg)
         endatom=optmol.GetAtom(end)
         begatomicnum=begatom.GetAtomicNum()
         endatomicnum=endatom.GetAtomicNum()
         bondorder=b.GetBondOrder()
         elementsbondorder=tuple([begatomicnum,endatomicnum,bondorder])
-        tol,length=AverageBondTableLength(poltype,elementsbondorder)
+        tol,length=AverageBondTableLength(poltype,elementsbondorder,ringbond,hybs)
         blength=b.GetLength()
         iniblength=b.GetLength()
         if length!=None:
@@ -524,7 +536,7 @@ def gen_superposeinfile(poltype):
     poltype.WriteToLog("\n")
     poltype.WriteToLog("=========================================================\n")
     poltype.WriteToLog("Structure RMSD Comparison\n\n")
-    cmd = poltype.superposeexe + ' ' + poltype.xyzoutfile + ' ' + poltype.tmpxyzfile + '_2'+' 1 Y M N 0  > '+ poltype.superposeinfile
+    cmd = poltype.superposeexe + ' ' + poltype.xyzoutfile + ' ' + poltype.tmpxyzfile + '_2'+' 1 N M N 0  > '+ poltype.superposeinfile
     poltype.call_subsystem(cmd,wait=True)
 
 

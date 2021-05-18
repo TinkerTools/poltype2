@@ -69,6 +69,9 @@ optmaxcycle          This keyword to reduce number of optcycles needed (they are
                      Default=400
 deleteallnonqmfiles  This will delete all non-qm log files (sometimes errors require restarting and deleting the correct files).
                      Default=False
+
+email                Email address to send crash reports to.
+                     Default=None
 ```
 
 * Note for very large molecules initial opt, DMA and ESP may require large amounts of memory if quantum job consistently crashes
@@ -246,6 +249,10 @@ deleteallnonqmfiles  This will delete all non-qm log files (sometimes errors req
 
 dontusepcm           Dont use pcm for any QM calculation.
                      Default=False
+
+email                Email address to send crash reports to.
+                     Default=None
+
 ```
 
 

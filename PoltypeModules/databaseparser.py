@@ -1042,7 +1042,8 @@ def GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,
     for prmsmartsidx in range(len(parametersmartslist)):
         prmsmarts=parametersmartslist[prmsmartsidx]
         smartsls=parametersmartstosmartslist[prmsmarts]
-        smartsfortransfer=smartsls[0]
+        smartsfortransfer=smartsls[1]
+        othersmarts=smartsls[0]
         newmol=Chem.MolFromSmarts(prmsmarts)
         substructure = Chem.MolFromSmarts(smartsfortransfer)
         matches=newmol.GetSubstructMatches(substructure)
@@ -1058,7 +1059,7 @@ def GrabBestMatch(poltype,parametersmartstomatchlen,parametersmartstosmartslist,
             if atomicnum not in countdic.keys():
                 countdic[atomicnum]=0
         smartstocountdic[smarts]=countdic
-    substructure = Chem.MolFromSmarts(smartsfortransfer)
+    substructure = Chem.MolFromSmarts(othersmarts)
     matches=poltype.rdkitmol.GetSubstructMatches(substructure)
     firstmatch=matches[0]
     firstmatch=AddNeighbors(poltype,firstmatch,poltype.rdkitmol)

@@ -692,8 +692,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                     finished,error=poltype.CheckNormalTermination(outputlog)
                     attempts+=1
 
-                finished,error=poltype.CheckNormalTermination(outputlog)
-                if finished==True and outputlog not in finishedjobs:
+                if outputlog not in finishedjobs: # assume if not converged in 5 cycles (or 20 etc) then bond lengths are okay, if not torsionfit will catch later
                     finishedjobs.append(outputlog)
 
             else:
