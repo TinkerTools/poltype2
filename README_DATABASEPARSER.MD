@@ -1,4 +1,32 @@
 ## Databaseparser README
+
+### Bonding, vdW and polarizability parameters and where to find them
+
+The program **databaseparser.py** finds, based on SMARTS string, the best parameters for the bonding, vdW and polarizability parameters. Each of the parameters is transferred from other AMOEBA force fields (e.g.: amoeba09,external databases), evaluating the similarities between the atom types of the target molecule to be parameterized and those available in the databases. Torsion and vdw parameters are derived by default.
+
+The program starts by mapping the atoms in the molecular species to the best SMARTS representation available. For the amoeba09 database, the program generates list of potential SMARTS for atom, bonds, angles, torsion by iteratively generating all possible fragment indices and consecutively connected atom indices in molecule, then converting to fragment and generating a SMARTS string. The SMARTS found for the atoms are then connected to Tinker's atom types descriptions, based on the amoeba09.prm definitions. Possible good SMARTS representing the related energy terms for the input molecule, are then compared with those included in an external SMARTS database with tinker atom types descriptions. This is done for **bond**, **angle**, **strbnd**, **torsion**, **opbend** and **vdW**.
+
+This procedure could be completed without any satisfactory parameter for any of the energy terms one needs to compute. 
+
+### Torsions and vdW parameters
+
+Coupled torsions and single torsions parameters which are missing have to be identified and then explicitly parameterized, by fitting them to reference QM values. Torsions are also corrected adding eventually pi-torsions if there is a match for pi-torsion (only if from amoeba09 database), distributing their values to all torsions around the rotatable bond as a contribution as a second fold torsion contribution. Lastly, missing aromatic torsions are set by default to benzene torsions.
+
+The program also search for missing vdw parameters, which are also explicitly parameterized against QM data.
+
+### Bonding terms
+
+**For angle, bond, opbend, strbnd matches to amoeba09 that also have matches to external database, determine the best match by largest SMARTS string and remove amoeba09 matches that had matches to the bond, angle, strbnd, opbend external SMARTS database. Then add parameters from bond, angle, strbnd, torsion, opbend, vdw, tortor.** If matches are made to the bond,angle,strbnd,opbend database this automatically supersedes amoeba09.
+
+1. **External SMARTS for bond, angle, strbnd, torsion, opbend, vdw, tortor has highest priority (think vdw, torsion, tortor from poltype will be most descriptive SMARTS)**
+2. **Then bond, opbend, strbnd, angle has next highest priority**
+3. **Then amoeba09 matches is last priority**
+
+Missing bond/angle parameters are assigned bond/angle guesses using the chemical element and its valence, employing the **valence.f** Tinker program. Then **angles and bonds parameters are modified to use QM optimized bond and angle lengths.**
+
+The last thing done is to writing out in a list all missing torsions, vdw and tortor parameters.
+
+
 <ol>
 <li>	Determine all single atoms, bonds, angles and torsions from input molecule </li>
 <li>	If input forcefield is AMOEBA+ </li>
