@@ -236,7 +236,7 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
     for line in results:
         fitline="# Fitted from Fragment "
         linesplit=line.split()
-        if 'torsion' in line and '#' not in line:
+        if 'torsion' in line and '#' not in line and 'Missing' not in line:
             typea=int(linesplit[1])
             typeb=int(linesplit[2])
             typec=int(linesplit[3])
@@ -251,7 +251,7 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
 
             else:
                 temp.write(line)
-        elif 'vdw' in line and '#' not in line:
+        elif 'vdw' in line and '#' not in line and 'Missing' not in line:
             classkey=linesplit[1]
             if classkey in classkeytoatomindexescollected.keys():
                 valenceprmlist=ConstructVdwLineFromFragment(poltype,classkey,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarraycollected,classkeytosmartscollected,classkeytoatomindexescollected,temp,valenceprmlist,fitline)

@@ -475,10 +475,29 @@ def GeneratePhaseLists(poltype,torset,optmol):
         anginc=poltype.rotbndtoanginc[key]
         maxrange=poltype.rotbndtomaxrange[key]
         phaselist=range(0,maxrange,anginc)
-        clock=list(phaselist[:int(len(phaselist)/2)+1])
-        counterclock=[-1*i for i in phaselist[1:int(len(phaselist)/2)+1]]
-        counterclock=counterclock[:-1]
-        phaselists.append(clock+counterclock)
+        halfindex=int(len(phaselist)/2)
+        clock=list(phaselist[:halfindex+1])
+        counterclock=[-1*i for i in phaselist[1:halfindex+1]]
+        full=clock+counterclock
+
+        checkfull=[]
+        for i in range(len(full)):
+            value=full[i]
+            if value<0:
+                value=value+360
+            checkfull.append(value)
+
+        check=[]
+        removeindices=[]
+        for i in range(len(checkfull)):
+            value=checkfull[i]
+            if value in check:
+                removeindices.append(i)
+            else:
+                check.append(value)
+        for index in removeindices: # should only be 1
+            del full[index]
+        phaselists.append(full)
     currentanglelist=numpy.array(currentanglelist)
     return phaselists,currentanglelist
 

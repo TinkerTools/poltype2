@@ -716,23 +716,17 @@ def TXYZ2COM(poltype,TXYZ,comfname,chkname,maxdisk,maxmem,numproc,mol,probeatoms
         if n>=len(atoms)-probeatoms:
             tmpfh.write("%3s%s             %14.7f%14.7f%14.7f\n"%(atoms[n],'(Fragment=2)',float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
         else:
-            tmpfh.write("%3s%s             %14.7f%14.7f%14.7f\n"%(atoms[n],'(Fragment=1)',float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))    
+            tmpfh.write("%3s%s             %14.7f%14.7f%14.7f\n"%(atoms[n],'(Fragment=1)',float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))   
+    tmpfh.write("\n")
+
     
     if ('I ' in poltype.mol.GetSpacedFormula()):
         formulalist=poltype.mol.GetSpacedFormula().lstrip().rstrip().split()
-        temp=open(poltype.basissetpath+basissetfile,'r')
-        results=temp.readlines()
-        temp.close()
-        for line in results:
-            if '!' not in line:
-                tmpfh.write(line)
-
-        temp=open(poltype.basissetpath+iodinebasissetfile,'r')
-        results=temp.readlines()
-        temp.close()
-        for line in results:
-            if '!' not in line:
-                tmpfh.write(line)
+        elementtobasissetlines=GenerateElementToBasisSetLines(poltype,poltype.basissetpath+basissetfile)
+        for element,basissetlines in elementtobasissetlines.items():
+            if element in poltype.mol.GetSpacedFormula():
+                for line in basissetlines: 
+                    tmpfh.write(line)
 
 
         temp=open(poltype.basissetpath+iodinebasissetfile,'r')
@@ -741,10 +735,31 @@ def TXYZ2COM(poltype,TXYZ,comfname,chkname,maxdisk,maxmem,numproc,mol,probeatoms
         for line in results:
             if '!' not in line:
                 tmpfh.write(line)
+        tmpfh.write('\n')
 
+        
 
     tmpfh.write("\n")
     tmpfh.close()
+
+def GenerateElementToBasisSetLines(poltype,basissetfile):
+    elementtobasissetlines={}
+    temp=open(basissetfile,'r')
+    results=temp.readlines()
+    temp.close()
+    lines=[]
+    element=None
+    for line in results:
+        linesplit=line.split()
+        if len(linesplit)==2 and linesplit[0].isalpha() and linesplit[1]=='0':
+            if element!=None:
+                elementtobasissetlines[element]=lines
+            element=linesplit[0]
+            lines=[line]
+        else:
+            lines.append(line)
+    return elementtobasissetlines
+ 
 
 def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetfile,space):
     newtemp=open(poltype.basissetpath+normalelementbasissetfile,'r')

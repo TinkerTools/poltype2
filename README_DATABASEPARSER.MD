@@ -148,7 +148,7 @@ The last thing done is to writing out in a list all missing torsions, vdw and to
 <li>	Find examples of atomindices for each missing vdw type </li>
 <li>	Find missing bond/angle parameters </li>
 <ol>
-    <li>	If SMARTS match does not have atom index + neighbors in SMARTS match then defined as missing vdw parameter </li>
+    <li>	If SMARTS match does not have atom index + neighbors in SMARTS match then defined as missing bond/angle parameter </li>
     <li>	Or if ~, * in SMARTS defined as missing parameters </li>
 </ol>
 <li>	Find missing bond/angle parameters </li>

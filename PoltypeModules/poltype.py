@@ -1053,7 +1053,7 @@ class PolarizableTyper():
         temp.close()
         for lineidx in range(len(results)):
             line=results[lineidx]
-            if 'torsion' in line and '#' not in line and '# Fitted torsion' not in results[lineidx-1]:
+            if 'torsion' in line and '#' not in line and '# Fitted torsion' not in results[lineidx-1] and 'Missing' not in line:
                 allzero=True
                 linesplit=line.split()
                 ls=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3]),int(linesplit[4])]
