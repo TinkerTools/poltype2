@@ -746,7 +746,6 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         classkeylist=[]
         refine=False
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
-
         for i in range(len(torset)):
             tor=torset[i]
             # get the atoms in the main torsion about this rotatable bond

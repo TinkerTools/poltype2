@@ -12,7 +12,9 @@ def NonAromaticRingAtomicIndices(poltype,mol):
     atomindices=[]
     for ring in sssr:
         ringatomindices=GrabRingAtomIndices(poltype,mol,ring)
-        if ring.IsAromatic()==False:
+        ringatoms=[mol.GetAtom(i) for i in ringatomindices]
+        hybs=[x.GetHyb() for x in ringatoms]
+        if ring.IsAromatic()==False and 2 not in hybs:
             atomindices.append(ringatomindices)        
 
     return atomindices

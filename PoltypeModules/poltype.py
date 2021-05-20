@@ -1580,6 +1580,7 @@ class PolarizableTyper():
             torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
         # Find rotatable bonds for future torsion scans
         (self.torlist, self.rotbndlist,hydtorsions,nonaroringtorlist) = torgen.get_torlist(self,mol,torsionsmissing)
+        print('self.torlist',self.torlist)
         if atomnum<25 and len(nonaroringtorlist)==0: 
             self.dontfrag=True 
         torgen.get_all_torsions(self,mol)
@@ -1614,7 +1615,7 @@ class PolarizableTyper():
         if self.tortor==True and self.dontdotor==False:
             torgen.PrepareTorsionTorsion(self,optmol,mol,tortorsmissing)
 
-        if self.refinenonaroringtors==True and self.dontfrag==False:
+        if self.refinenonaroringtors==True and self.dontfrag==False and len(self.onlyrotbndslist)==0:
             rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
         
 
@@ -1689,7 +1690,6 @@ class PolarizableTyper():
         s.ehlo()
         s.login(fromaddr,password)
         text = msg.as_string()
-        print(text,flush=True)
         s.sendmail(fromaddr, [toaddr],text)
         s.quit()
 
@@ -1705,7 +1705,6 @@ if __name__ == '__main__':
         if os.path.exists(poltype.scrtmpdirpsi4):
             shutil.rmtree(poltype.scrtmpdirpsi4)
         if poltype.email!=None:
-            print('in here',flush=True)
             password='amoebaisbest'
             fromaddr = 'poltypecrashreportnoreply@gmail.com'
             toaddr = poltype.email

@@ -672,8 +672,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         optnumtofulllistofjobs['1'].extend(listofjobs)
         fulljobtolog.update(jobtolog) 
         fulljobtooutputlog.update(jobtooutputlog)
-    if poltype.tordebugmode==True:
-        sys.exit()
 
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMOptJobToLog'+'_1'+'_'+poltype.molecprefix
     if poltype.externalapi!=None:
