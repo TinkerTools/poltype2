@@ -1647,13 +1647,15 @@ class PolarizableTyper():
                     torfit.process_rot_bond_tors(self,optmol)
                 else:
                     shutil.copy(self.key4fname,self.key5fname)
+        if self.isfragjob and len(self.onlyrotbndslist)!=0:
+            self.dontdovdwscan=True
         if self.dontdovdwscan==False:
             if self.dontfrag==False: 
                 if self.isfragjob==True:
                     vdwfit.VanDerWaalsOptimization(self,missingvdwatomindices)    
             else:
                 vdwfit.VanDerWaalsOptimization(self,missingvdwatomindices)       
-  
+        
         if self.isfragjob==False and self.dontdotor==False:
             self.CheckTorsionParameters(self.key5fname,torsionsmissing,hydtorsions)
 
