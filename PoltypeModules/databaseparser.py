@@ -2507,9 +2507,19 @@ def ConvertToPoltypeClasses(poltype,torsionsmissing):
     for sublist in torsionsmissing:
         newsublist=[i+1 for i in sublist]
         a,b,c,d=newsublist[:]
+        batom=poltype.mol.GetAtom(b)
+        catom=poltype.mol.GetAtom(c)
+        aatom,datom = torgen.find_tor_restraint_idx(poltype,poltype.mol,batom,catom)
+        newa=aatom.GetIdx()
+        newd=datom.GetIdx()
         sorttor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[a],poltype.idxtosymclass[b],poltype.idxtosymclass[c],poltype.idxtosymclass[d]])
+        newsorttor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[newa],poltype.idxtosymclass[b],poltype.idxtosymclass[c],poltype.idxtosymclass[newd]])
+
         if sorttor not in newtorsionsmissing:
             newtorsionsmissing.append(sorttor)
+        if newsorttor not in newtorsionsmissing:
+            newtorsionsmissing.append(newsorttor)
+
     return newtorsionsmissing
 
 

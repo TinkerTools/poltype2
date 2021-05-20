@@ -784,7 +784,7 @@ def CheckBondTopology(poltype,outputlog,initialtinkerstructure):
     issame=opt.CheckBondConnectivity(poltype,inioptmol,optmol)
     if issame==False:
         bondtoposame=False 
-    isnear=opt.CompareBondLengths(poltype,inioptmol,optmol)
+    isnear=opt.CompareBondLengths(poltype,inioptmol,optmol,outputlog)
     if isnear==False:
         bondtoposame=False
 
@@ -896,7 +896,8 @@ def get_torlist(poltype,mol,missed_torsions):
         arobond=False
         if t2.IsAromatic()==True and t3.IsAromatic()==True:
             arobond=True
-        if arobond==True:
+
+        if arobond==True and ringbond==True:
             continue
         anyarot2=CheckForAnyAromaticsInRing(poltype,t2idx)
         anyarot3=CheckForAnyAromaticsInRing(poltype,t3idx)

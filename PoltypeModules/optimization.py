@@ -10,6 +10,7 @@ import numpy as np
 import shutil
 import torsiongenerator as torgen
 import traceback
+import warnings
 
 def GeometryOPTWrapper(poltype,mol):
     try:
@@ -438,13 +439,14 @@ def AverageBondTableLength(poltype,elementsbondorder,ringbond,hybs):
     elif rev in elementstobondordertolength.keys():
         length=elementstobondordertolength[rev]
         found=True
-    if ringbond==True and hybs[0]==2 and hybs[1]==2:
-        if elementsbondorder[0]==6 and elementsbondorder[1]==6:
-            length=1.41
-            found=True
-    else:
-        found=False
-        length=None
+    if ringbond==True:
+        if hybs[0]==2 and hybs[1]==2:
+            if elementsbondorder[0]==6 and elementsbondorder[1]==6:
+                length=1.41
+                found=True
+            else:
+                found=False
+                length=None
 
 
     if found==False:
@@ -454,7 +456,7 @@ def AverageBondTableLength(poltype,elementsbondorder,ringbond,hybs):
     return tol,length
 
 
-def CompareBondLengths(poltype,inioptmol,optmol):
+def CompareBondLengths(poltype,inioptmol,optmol,outputlog):
     isnear=True
     for inib in openbabel.OBMolBondIter(inioptmol):
         beg = inib.GetBeginAtomIdx()
@@ -482,6 +484,9 @@ def CompareBondLengths(poltype,inioptmol,optmol):
             diff=np.abs(iniblength-blength)
 
         if diff>=tol:
+            string='Bond lengths changed too much for '+str(beg)+' '+str(end)+' difference is '+str(diff)+" tolerance is "+str(tol)+' current bond length is '+str(blength)+' initial bond length is '+str(iniblength)+' internal table bond length is '+str(length)+'. Will try to redo QM opt for '+str(outputlog)
+            poltype.WriteToLog(string)
+            warnings.warn(string) 
             isnear=False
     return isnear
 
