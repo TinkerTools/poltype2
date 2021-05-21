@@ -1186,7 +1186,7 @@ class PolarizableTyper():
         if issame==False:
             bondtoposame=False
         if self.fullopt==False: 
-            isnear=opt.CompareBondLengths(self,inioptmol,optmol)
+            isnear=opt.CompareBondLengths(self,inioptmol,optmol,outputlog)
         else:
             isnear=True
         if isnear==False:
@@ -1580,7 +1580,6 @@ class PolarizableTyper():
             torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
         # Find rotatable bonds for future torsion scans
         (self.torlist, self.rotbndlist,hydtorsions,nonaroringtorlist) = torgen.get_torlist(self,mol,torsionsmissing)
-        print('self.torlist',self.torlist)
         if atomnum<25 and len(nonaroringtorlist)==0: 
             self.dontfrag=True 
         torgen.get_all_torsions(self,mol)

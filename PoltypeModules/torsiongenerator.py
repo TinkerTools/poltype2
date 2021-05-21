@@ -829,29 +829,6 @@ def RdkitIsInRing(poltype,atom):
     return isinringofsize,i
 
 
-def GrabRingAtoms(poltype,neighbatom):
-    ri = poltype.rdkitmol.GetRingInfo()
-    ls=ri.AtomRings()
-    atmidx=neighbatom.GetIdx()
-    for grp in ls:
-        if atmidx in grp:
-            return grp
-    grp=[]
-    return grp
-    
-def CheckForAnyAromaticsInRing(poltype,babelindex):
-    rdkitindex=babelindex-1
-    rdkitatom=poltype.rdkitmol.GetAtomWithIdx(rdkitindex)
-    ringindexes=GrabRingAtoms(poltype,rdkitatom)
-    anyaro=False
-    for index in ringindexes:
-        atm=poltype.rdkitmol.GetAtomWithIdx(index)
-        if atm.GetIsAromatic()==True:
-            anyaro=True
-    return anyaro
-
-
-
 def get_torlist(poltype,mol,missed_torsions):
     """
     Intent: Find unique rotatable bonds.
@@ -891,19 +868,16 @@ def get_torlist(poltype,mol,missed_torsions):
         if BO>1:
             continue
         ringbond=bond.IsInRing()
-        arobond=False
-        if t2.IsAromatic()==True and t3.IsAromatic()==True:
-            arobond=True
-
-        if arobond==True and ringbond==True:
-            continue
-        anyarot2=CheckForAnyAromaticsInRing(poltype,t2idx)
-        anyarot3=CheckForAnyAromaticsInRing(poltype,t3idx)
-        if anyarot2==True and anyarot3==True and ringbond==True:
-            continue
         if t2val<2 or t3val<2:
             continue 
         t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
+        babelatoms=[t1,t2,t3,t4]
+        aromatics=[i.IsAromatic() for i in babelatoms]
+        hybs=[i.GetHyb() for i in babelatoms]
+        if ringbond==True:
+            if 2 in hybs or True in aromatics:
+                continue
+        
         sortedtor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]])
         if(sortedtor in missed_torsions or sortedtor[::-1] in missed_torsions) and len(poltype.onlyrotbndslist)==0:
             skiptorsion = False
