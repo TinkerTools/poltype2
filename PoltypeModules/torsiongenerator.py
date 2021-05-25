@@ -66,18 +66,8 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,varia
         if finished==True and 'opt' in outputlog:
             opt.GrabFinalXYZStructure(poltype,outputlog,outputlog.replace('.log','.xyz'),mol)
         if finished==False:
-            if poltype.tordebugmode==True:
-                continue
-            if os.path.isfile(outputlog):
-                statinfo=os.stat(outputlog)
-                size=statinfo.st_size
-                if size!=0:
-                    os.remove(outputlog)
-                    listofjobs.append(cmdstr)
-                    jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputlog
-            else:
-                listofjobs.append(cmdstr)
-                jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputlog
+            listofjobs.append(cmdstr)
+            jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputlog
 
 
         outputlogs.append(outputlog)
@@ -114,18 +104,8 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
         if finished==True and error==False:
             pass
         else:
-            if poltype.tordebugmode==True:
-                continue
-            if os.path.isfile(outputname):
-                statinfo=os.stat(outputname)
-                size=statinfo.st_size
-                if size!=0:
-                    os.remove(outputname)
-                    listofjobs.append(cmdstr)
-                    jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputname
-            else:
-                listofjobs.append(cmdstr)
-                jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputname
+            listofjobs.append(cmdstr)
+            jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputname
 
         outputnames.append(outputname)
         outputlogtophaseangles[outputname]=phaseangles
@@ -479,14 +459,12 @@ def GeneratePhaseLists(poltype,torset,optmol):
         clock=list(phaselist[:halfindex+1])
         counterclock=[-1*i for i in phaselist[1:halfindex+1]]
         full=clock+counterclock
-
         checkfull=[]
         for i in range(len(full)):
             value=full[i]
             if value<0:
                 value=value+360
             checkfull.append(value)
-
         check=[]
         removeindices=[]
         for i in range(len(checkfull)):
@@ -625,7 +603,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         flatphaselist=FlattenArray(poltype,flatphaselist)
         idealangletensor=flatphaselist+currentanglelist
         poltype.idealangletensor[tuple(torset)]=idealangletensor
-        
         minstrctfname = prevstrctfname
         prevstrctfname = minstrctfname
         listoftinkertorstructures,failedgridpoints,energyarray=tinker_minimize_angles(poltype,torset,optmol,variabletorlist,flatphaselist,prevstrctfname,torsionrestraint,bondtopology)
@@ -655,10 +632,12 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         poltype.torsettophaselist[tuple(torset)]=flatphaselist
 
         poltype.SanitizeAllQMMethods()
-        poltype.optmaxcycle=5
+        
         outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol,'1')
-        torsettooptoutputlogs[tuple(torset)]=outputlogs
+        if poltype.tordebugmode==True:
+            sys.exit() 
 
+        torsettooptoutputlogs[tuple(torset)]=outputlogs
         dictionary = dict(zip(outputlogs,initialstructures))  
         torsettooutputlogtoinitialstructure[tuple(torset)].update(dictionary)
         inistructophaselist = dict(zip(initialstructures,flatphaselist))  
@@ -680,7 +659,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         finishedjobs,errorjobs=poltype.WaitForTermination(fulljobtooutputlog)
     else:
         finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
-
     for torset in poltype.torlist:
         outputlogtoinitialstructure=torsettooutputlogtoinitialstructure[tuple(torset)]
         tryoutputlogs=optnumtotorsettofulloutputlogs['1'][tuple(torset)]
@@ -708,7 +686,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                     bondtoposame=CheckBondTopology(poltype,outputlog,initialtinkerstructure)
                     finished,error=poltype.CheckNormalTermination(outputlog)
                     attempts+=1
-
                 if outputlog not in finishedjobs: # assume if not converged in 5 cycles (or 20 etc) then bond lengths are okay, if not torsionfit will catch later
                     finishedjobs.append(outputlog)
 
