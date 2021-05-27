@@ -11,6 +11,8 @@ import shutil
 import torsiongenerator as torgen
 import traceback
 import warnings
+from rdkit.Chem import rdmolfiles
+from rdkit import Chem
 
 def GeometryOPTWrapper(poltype,mol):
     try:
@@ -490,7 +492,7 @@ def CompareBondLengths(poltype,inioptmol,optmol,outputlog):
             isnear=False
     return isnear
 
-def CheckBondConnectivity(poltype,mol,optmol,raiseerror=False):
+def CheckBondConnectivity(poltype,mol,optmol,outputxyz,raiseerror=False):
     atomitermol=openbabel.OBMolAtomIter(mol)
     atomiteroptmol=openbabel.OBMolAtomIter(optmol)
     issame=True
@@ -501,38 +503,25 @@ def CheckBondConnectivity(poltype,mol,optmol,raiseerror=False):
         issame=False
         return issame
 
-    for atm in atomitermol:
-       
-        atmidxmol=atm.GetIdx()
-        atmoptmol=optmol.GetAtom(atmidxmol)
-        atmidxoptmol=atmoptmol.GetIdx()
-        atmneighbidxlist=[]
-        iteratomatommol = openbabel.OBAtomAtomIter(atm)
-        for newatm in iteratomatommol:
-            atmneighbidxlist.append(newatm.GetIdx())
-        atmneighbidxlistoptmol=[]
-        iteratomatomoptmol = openbabel.OBAtomAtomIter(atmoptmol)
-        for newatm in iteratomatomoptmol:
-            atmneighbidxlistoptmol.append(newatm.GetIdx())
-        if set(atmneighbidxlist)!=set(atmneighbidxlistoptmol):
-            if len(set(atmneighbidxlist))>len(set(atmneighbidxlistoptmol)):
-                diff=set(atmneighbidxlist)-set(atmneighbidxlistoptmol)
-                idxset='mol'
-            else:
-                diff=set(atmneighbidxlistoptmol)-set(atmneighbidxlist)
-                idxset='optmol'
-            issame=False
-            if raiseerror==True:
-                RaiseConnectivityError(poltype,diff,idxset)
+    obConversion = openbabel.OBConversion()
+    mol = openbabel.OBMol()
+    inFormat = obConversion.FormatFromExt(outputxyz)
+    obConversion.SetInFormat(inFormat)
+    obConversion.ReadFile(mol,outputxyz)
+    obConversion.SetOutFormat('mol')
+    molname=outputxyz.replace('.xyz','.mol')
+    obConversion.WriteFile(mol,molname)
+    temprdkitmol=rdmolfiles.MolFromMolFile(molname,removeHs=False)
+    b = Chem.MolToSmiles(poltype.rdkitmol)
+    a = Chem.MolToSmiles(temprdkitmol)
+    if a!=b:
+        RaiseConnectivityError(poltype)
+
+
     return issame
 
-def RaiseConnectivityError(poltype,diff,idxset):
-    print('Error! The bond connectivity before and after structure optimization is different')
-    poltype.WriteToLog('Error! The bond connectivity before and after structure optimization is different')
-    for atmidx in diff:
-        print('The atom index '+str(atmidx)+' from structure '+idxset+' does not have the same connectivity before and after structure optimization')
-        poltype.WriteToLog('The atom index '+str(atmidx)+' from structure '+idxset+' does not have the same connectivity before and after structure optimization')
-    sys.exit() 
+def RaiseConnectivityError(poltype):
+    raise ValueError('Error! The bond connectivity before and after structure optimization is different')
 
 def gen_superposeinfile(poltype):
     """
@@ -689,7 +678,7 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,bondanglerestra
 
     GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'),mol)
     if checkbonds==True:
-        issame=CheckBondConnectivity(poltype,mol,optmol,raiseerror=True)
+        issame=CheckBondConnectivity(poltype,mol,optmol,poltype.logoptfname.replace('.log','.xyz'),raiseerror=True)
     return optmol,error
 
 

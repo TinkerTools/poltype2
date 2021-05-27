@@ -1182,7 +1182,7 @@ class PolarizableTyper():
         rdmolfiles.MolToMolFile(rdkitmol,outputname)
         optmol = opt.load_structfile(self,fname)
         inioptmol = opt.load_structfile(self,outputname)
-        issame=opt.CheckBondConnectivity(self,inioptmol,optmol,outputlog)
+        issame=opt.CheckBondConnectivity(self,inioptmol,optmol,outputlog.replace('.log','.xyz'))
         if issame==False:
             bondtoposame=False
         if self.fullopt==False: 
@@ -1401,6 +1401,7 @@ class PolarizableTyper():
         atomnum=0
         for atom in atomiter:
             atomnum+=1
+                            
 
 
         self.RemoveCartesianXYZFiles()
