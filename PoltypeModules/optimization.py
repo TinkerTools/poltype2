@@ -512,9 +512,30 @@ def CheckBondConnectivity(poltype,mol,optmol,outputxyz,raiseerror=False):
     molname=outputxyz.replace('.xyz','.mol')
     obConversion.WriteFile(mol,molname)
     temprdkitmol=rdmolfiles.MolFromMolFile(molname,removeHs=False)
-    b = Chem.MolToSmiles(poltype.rdkitmol)
+
+    obConversion = openbabel.OBConversion()
+    mol = openbabel.OBMol()
+    inFormat = obConversion.FormatFromExt(poltype.molstructfname)
+    obConversion.SetInFormat(inFormat)
+    obConversion.ReadFile(mol, poltype.molstructfname)
+    obConversion.SetOutFormat('xyz')
+    xyzname=poltype.molstructfname.replace('.sdf','.xyz')
+    obConversion.WriteFile(mol,xyzname)
+    mol = openbabel.OBMol()
+    inFormat = obConversion.SetInFormat('xyz')
+    obConversion.ReadFile(mol,xyzname)
+    obConversion.SetOutFormat('mol')
+    molname=xyzname.replace('.xyz','.mol')
+    obConversion.WriteFile(mol,molname)
+    firstrdkitmol=rdmolfiles.MolFromMolFile(molname,removeHs=False)
+    b = Chem.MolToSmiles(firstrdkitmol)
     a = Chem.MolToSmiles(temprdkitmol)
-    if a!=b:
+    match=firstrdkitmol.HasSubstructMatch(temprdkitmol)
+    patoms=len(temprdkitmol.GetAtoms())
+    allatoms=len(firstrdkitmol.GetAtoms())
+    if match==True and patoms==allatoms:
+        pass
+    else:
         RaiseConnectivityError(poltype)
 
 
