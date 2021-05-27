@@ -890,6 +890,7 @@ def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprmtosmartslist,param
     for ls,smartslist in listforprmtosmartslist.items(): 
         parametersmartstomatchlen={}
         parametersmartstosmartslist={}
+
         parametersmartstomatchlen,parametersmartstosmartslist=MatchAllPossibleSMARTSToParameterSMARTS(poltype,smartslist,parametersmartslist,parametersmartstomatchlen,parametersmartstosmartslist,ls)
         if len(parametersmartstomatchlen.keys())==0:
            
