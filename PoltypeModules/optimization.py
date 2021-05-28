@@ -519,7 +519,7 @@ def CheckBondConnectivity(poltype,mol,optmol,outputxyz,raiseerror=False):
     obConversion.SetInFormat(inFormat)
     obConversion.ReadFile(mol, poltype.molstructfname)
     obConversion.SetOutFormat('xyz')
-    xyzname=poltype.molstructfname.replace('.sdf','.xyz')
+    xyzname=poltype.molstructfname.replace('.sdf','temp_.xyz')
     obConversion.WriteFile(mol,xyzname)
     mol = openbabel.OBMol()
     inFormat = obConversion.SetInFormat('xyz')
