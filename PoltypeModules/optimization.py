@@ -492,54 +492,6 @@ def CompareBondLengths(poltype,inioptmol,optmol,outputlog):
             isnear=False
     return isnear
 
-def CheckBondConnectivity(poltype,mol,optmol,outputxyz,raiseerror=False):
-    atomitermol=openbabel.OBMolAtomIter(mol)
-    atomiteroptmol=openbabel.OBMolAtomIter(optmol)
-    issame=True
-
-    firstatomnum=mol.NumAtoms()
-    secondatomnum=optmol.NumAtoms()
-    if firstatomnum!=secondatomnum:
-        issame=False
-        return issame
-
-    obConversion = openbabel.OBConversion()
-    mol = openbabel.OBMol()
-    inFormat = obConversion.FormatFromExt(outputxyz)
-    obConversion.SetInFormat(inFormat)
-    obConversion.ReadFile(mol,outputxyz)
-    obConversion.SetOutFormat('mol')
-    molname=outputxyz.replace('.xyz','.mol')
-    obConversion.WriteFile(mol,molname)
-    temprdkitmol=rdmolfiles.MolFromMolFile(molname,removeHs=False)
-
-    obConversion = openbabel.OBConversion()
-    mol = openbabel.OBMol()
-    inFormat = obConversion.FormatFromExt(poltype.molstructfname)
-    obConversion.SetInFormat(inFormat)
-    obConversion.ReadFile(mol, poltype.molstructfname)
-    obConversion.SetOutFormat('xyz')
-    xyzname=poltype.molstructfname.replace('.sdf','temp_.xyz')
-    obConversion.WriteFile(mol,xyzname)
-    mol = openbabel.OBMol()
-    inFormat = obConversion.SetInFormat('xyz')
-    obConversion.ReadFile(mol,xyzname)
-    obConversion.SetOutFormat('mol')
-    molname=xyzname.replace('.xyz','.mol')
-    obConversion.WriteFile(mol,molname)
-    firstrdkitmol=rdmolfiles.MolFromMolFile(molname,removeHs=False)
-    b = Chem.MolToSmiles(firstrdkitmol)
-    a = Chem.MolToSmiles(temprdkitmol)
-    match=firstrdkitmol.HasSubstructMatch(temprdkitmol)
-    patoms=len(temprdkitmol.GetAtoms())
-    allatoms=len(firstrdkitmol.GetAtoms())
-    if match==True and patoms==allatoms:
-        pass
-    else:
-        RaiseConnectivityError(poltype)
-
-
-    return issame
 
 def RaiseConnectivityError(poltype):
     raise ValueError('Error! The bond connectivity before and after structure optimization is different')
@@ -563,7 +515,7 @@ def CheckRMSD(poltype):
             for e in line:
                 if e.isdigit() or e=='.':
                     RMSD+=e
-    if RMSD!=None:    
+    if RMSD!=None:   
         if float(RMSD)>poltype.maxRMSD:
             poltype.WriteToLog('Warning: RMSD of QM and MM optimized structures is high, RMSD = '+ RMSD+' Tolerance is '+str(poltype.maxRMSD)+' kcal/mol ')
 
@@ -698,8 +650,6 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,bondanglerestra
 
 
     GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'),mol)
-    if checkbonds==True:
-        issame=CheckBondConnectivity(poltype,mol,optmol,poltype.logoptfname.replace('.log','.xyz'),raiseerror=True)
     return optmol,error
 
 

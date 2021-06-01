@@ -386,7 +386,7 @@ def SPForDMA(poltype,optmol,mol):
             if os.path.isfile(poltype.chkdmafname):
                 os.remove(poltype.chkdmafname)
             gen_comfile(poltype,poltype.comdmafname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkdmafname,poltype.comtmp,optmol)
-            cmdstr = 'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + poltype.comdmafname
+            cmdstr = poltype.gausexe + " " + poltype.comdmafname
             
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logdmafname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
@@ -445,7 +445,7 @@ def SPForESP(poltype,optmol,mol):
             if os.path.isfile(poltype.chkespfname):
                 os.remove(poltype.chkespfname)
             gen_comfile(poltype,poltype.comespfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkespfname,poltype.comtmp,optmol)
-            cmdstr = 'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + poltype.comespfname
+            cmdstr = poltype.gausexe + " " + poltype.comespfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logespfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdirgau

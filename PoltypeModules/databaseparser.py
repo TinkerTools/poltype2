@@ -3813,10 +3813,10 @@ def RemoveHighEnergyHydrogenTorsionParameters(poltype,torsionprms,listoftorsions
         bnd=[firstexample[1],firstexample[2]]
         middlebond=poltype.mol.GetBond(firstexample[1],firstexample[2])
         ringbond=middlebond.IsInRing()
-
+        BO=middlebond.GetBondOrder()
         if True not in ringatoms and highenergytor==True and (aatomicnum==1 or datomicnum==1) and ringbond==False:
             removetor=True
-        if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds): # then dont remove
+        if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) or BO>1: # then dont remove
             continue
 
         if removetor==True:
@@ -4017,7 +4017,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
 
     torsionsmissing,poormatchingaromatictorsions,poormatchingpartialaromatictorsions=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
     torsionsmissing=FindAdjacentMissingTorsionsForTorTor(poltype,torsionsmissing,totalbondscollector,tortorsmissing)
-
     atomindextosmartsatomorder=AddExternalDatabaseMatches(poltype, atomindextosmartsatomorder,vdwindicestoextsmarts,vdwsmartsatomordertoparameters)
     vdwmissing=FindMissingParameters(poltype,atomindextosmartsatomorder,rdkitmol,mol,indextoneighbidxs)
     missingvdwatomindices=ReduceMissingVdwByTypes(poltype,vdwmissing)

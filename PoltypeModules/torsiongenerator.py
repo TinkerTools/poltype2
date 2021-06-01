@@ -756,9 +756,6 @@ def CheckBondTopology(poltype,outputlog,initialtinkerstructure):
     optmol = opt.load_structfile(poltype,fname)
     cartxyz=ConvertTinktoXYZ(poltype,initialtinkerstructure,initialtinkerstructure.replace('.xyz','_cart.xyz'))
     inioptmol = opt.load_structfile(poltype,cartxyz)
-    issame=opt.CheckBondConnectivity(poltype,inioptmol,optmol,outputlog.replace('.log','.xyz'))
-    if issame==False:
-        bondtoposame=False 
     isnear=opt.CompareBondLengths(poltype,inioptmol,optmol,outputlog)
     if isnear==False:
         bondtoposame=False
