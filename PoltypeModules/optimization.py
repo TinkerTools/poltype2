@@ -648,7 +648,6 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,bondanglerestra
         optmol =  load_structfile(poltype,poltype.logoptfname.replace('.log','.xyz'))
         optmol=rebuild_bonds(poltype,optmol,mol)
 
-
     GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'),mol)
     return optmol,error
 
@@ -674,14 +673,13 @@ def load_structfile(poltype,structfname):
         tmpconv.SetInFormat(inFormat)
     tmpmol = openbabel.OBMol()
     tmpconv.ReadFile(tmpmol, structfname)
-
     return tmpmol
 
 def rebuild_bonds(poltype,newmol, refmol):
+
     for b in openbabel.OBMolBondIter(refmol):
         beg = b.GetBeginAtomIdx()
         end = b.GetEndAtomIdx()
-
         if not newmol.GetBond(beg,end):
             newmol.AddBond(beg,end, b.GetBO(), b.GetFlags())
         else:
