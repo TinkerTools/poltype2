@@ -50,7 +50,7 @@ python ~/poltypepackage/PoltypeModules/test_poltype.py
 
 ### Input Structure
 * Use an SDF file format for the input structure.
-* Use totalcharge=charge keyword in .ini file to specify total charge, otherwise poltype will guess based on formal charge from input valence.
+* Use totalcharge=charge keyword in .ini file to specify total charge, otherwise poltype will guess based on formal charge from input valence. 
 * Bond topologys (input valence) need to be correct for formal charge assignment.
 
 #### Most Common Inputs

@@ -1159,6 +1159,7 @@ class PolarizableTyper():
                         polneighb=True
                 if polneighb and val==3:
                     chg=1
+            atom.SetFormalCharge(chg) 
             atomindextoformalcharge[atomidx]=chg
             totchg+=chg
             string='Atom index = '+str(atomidx+1)+' Atomic Number = ' +str(atomnum)+ ' Valence = '+str(val)+ ' Formal charge = '+str(chg)
@@ -1352,12 +1353,8 @@ class PolarizableTyper():
         m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False,sanitize=False)
         m,atomindextoformalcharge=self.CheckInputCharge(m)
         pcm=self.CheckForConcentratedFormalCharges(m,atomindextoformalcharge)
-        m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False)
-        
         cpm = copy.deepcopy(m)
         indextocoordinates=self.GenerateExtendedConformer(m,mol)
-        #if self.tordebugmode==True:
-        #    sys.exit()
 
         m=self.AddInputCoordinatesAsDefaultConformer(m,indextocoordinates)
         rdmolfiles.MolToMolFile(m,'test.mol')
