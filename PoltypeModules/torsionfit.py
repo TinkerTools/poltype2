@@ -1279,7 +1279,6 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         if clskey in clskeyswithbadfits:
             final_tor_energy_list=numpy.multiply(final_tor_energy_list,weights)
             final_relative_tor_energy_list=numpy.multiply(final_relative_tor_energy_list,weights)
-
         if len(ff_list)==len(mm2_energy_list):
             def RMSD(c):
                 return numpy.sqrt(numpy.mean(numpy.square(numpy.add(final_tor_energy_list,c))))

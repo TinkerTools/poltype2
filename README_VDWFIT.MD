@@ -43,10 +43,7 @@
 </ol>
 </ol>
 </ol>
-    <li>	Convert angle restraints to distance restraints via the law of cosines </li>
-    <li>	Update pairwise distance bounds matrix </li>
-    <li>	Pairwise distance cost function of X^2 where X is the difference between actual distance of probe atom and molecule atom and the reference distance of probe atom and molecule atom </li>
-    <li>	Minimize structure via SLSQP method </li>
+    <li>	Search on 3D mesh grid for optimal probe location near target atom on molecule while avoiding sterics with molecule. </li>
     <li>	Convert final cartesian XYZ probe to tinker XYZ probe </li>
     <li>	Minimize tinker XYZ with the above distance and angle restraints with some tolerance </li>
 <ol>

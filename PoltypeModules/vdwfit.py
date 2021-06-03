@@ -21,6 +21,7 @@ import shutil
 import copy
 import traceback
 
+
 def CheckAllVdwTypesExist(poltype,keyfilename):
     temp=open(keyfilename,'r')
     results=temp.readlines()
@@ -942,28 +943,13 @@ def GrabVdwParameters(poltype,vdwtype):
                 return radius,depth,minvdwradius,maxvdwradius,minvdwdepth,maxvdwdepth,red,minred,maxred
 
 
-def GenerateCoordinateGuesses(indextoreferencecoordinate):
-    coordinatesguess=[]
-    for i in range(len(indextoreferencecoordinate.keys())):
-        coordinate=indextoreferencecoordinate[i]
-        x,y,z=coordinate[:]
-        coordinatesguess.append(x)
-        coordinatesguess.append(y)
-        coordinatesguess.append(z)
-    return coordinatesguess
-
-def UpdateCoordinates(coords,indextoreferencecoordinate):
-    for i in range(len(indextoreferencecoordinate.keys())):
-        startindex=3*i
-        coordinate=np.array([coords[startindex],coords[startindex+1],coords[startindex+2]])
-        indextoreferencecoordinate[i]=coordinate
-    return indextoreferencecoordinate
-
 def GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indextotargetatom,indextoreferenceelement,vdwradius):
     indexpairtoreferencedistance={}
     indexpairtobounds={}
     indices=list(indextoreferencecoordinate.keys())
     allpairs=list(itertools.combinations(indices, 2)) 
+    tol=1
+    distpairs=[]
     for pair in allpairs:
         index1=pair[0]
         index2=pair[1]
@@ -986,7 +972,7 @@ def GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indext
                 if targetdistance<2:
                     targetdistance=2
                 bound=[targetdistance,targetdistance]
-
+                distpairs.append(pair)
         indexpairtoreferencedistance[tuple(pair)]=targetdistance 
         indexpairtobounds[tuple(pair)]=bound
 
@@ -1012,15 +998,17 @@ def GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indext
                 if targetdistance<2:
                     targetdistance=2
 
-                bound=[targetdistance,targetdistance]
+                bound=[targetdistance-tol,targetdistance+tol]
             else:
+                if targetdistance<2:
+                    targerdistance=2
                 bound=[targetdistance,100] # high upper bound, large range to not add cost in cost function                
 
         indexpairtoreferencedistance[tuple(pair)]=targetdistance 
         indexpairtobounds[tuple(pair)]=bound
 
  
-    return indexpairtoreferencedistance,indexpairtobounds
+    return indexpairtoreferencedistance,indexpairtobounds,distpairs
 
 
 def GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol,indextoreferencecoordinate):
@@ -1057,9 +1045,14 @@ def GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol,indextorefe
             angleatoms=[probeneighbatoms[0],donoratom,probeneighbatoms[1]]
             bisectangle=probemol.GetAngle(angleatoms[0],angleatoms[1],angleatoms[2])
             angle=180-.5*bisectangle 
+            angleindices=tuple([donorneighbindex,donorindex,acceptorindex])
+            indicestoreferenceangleprobe[angleindices]=angle
 
         elif len(probeneighbs)==1:
             angle=180
+            angleindices=tuple([donorneighbindex,donorindex,acceptorindex])
+            indicestoreferenceangleprobe[angleindices]=angle
+
         else:
 
             donorneighbcoordinate=indextoreferencecoordinate[donorneighbindex]
@@ -1068,14 +1061,25 @@ def GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol,indextorefe
             donortoacceptornormed=donortoacceptor/np.linalg.norm(donortoacceptor)
             donortodonorneighbnormed=donortodonorneighb/np.linalg.norm(donortodonorneighb) 
             angle=np.arccos(np.dot(donortoacceptornormed,donortodonorneighbnormed))
+            angleindices=tuple([donorneighbindex,donorindex,acceptorindex])
+            indicestoreferenceangleprobe[angleindices]=angle
 
 
-        angleindices=tuple([donorneighbindex,donorindex,acceptorindex])
-        indicestoreferenceangleprobe[angleindices]=angle
+    ls=[]
+    allflat=True
     if len(acceptorneighbs)!=1 and acceptorhyb==2:
         angle=90
         for acceptorneighbindex in acceptorneighbs:
-            angleindices=tuple([donorindex,acceptorneighbindex,acceptorindex])
+            acceptorneighbatom=mol.GetAtom(acceptorneighbindex+1)
+            acceptorneighbhyb=acceptorneighbatom.GetHyb()
+            if acceptorneighbhyb==2:
+                angleindices=tuple([donorindex,acceptorindex,acceptorneighbindex])
+                ls.append(angleindices)
+            else:
+                allflat=False
+    if allflat==True:
+        angle=90
+        for angleindices in ls:
             indicestoreferenceanglemoleculeneighb[angleindices]=angle
 
     elif len(acceptorneighbs)==1:
@@ -1091,68 +1095,8 @@ def GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol,indextorefe
                 angle=mol.GetAngle(angleatoms[0],angleatoms[1],angleatoms[2])
                 angleindices=tuple([atomidx-1,neighb.GetIdx()-1,acceptorindex,donorindex]) # acceptorindex and donorindex colinear here, but need both to get correct distance information for law of cosines
                 indicestoreferenceanglemoleculeneighbneighb[angleindices]=angle
-    
+
     return indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb
-
-
-def ConvertAngleRestraintToDistanceRestraint(indexpairtoreferencedistance,indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb,indexpairtobounds,indextoreferencecoordinate):
-    for indices,targetangle in indicestoreferenceangleprobe.items(): 
-        donorneighbindex=indices[0]
-        acceptorindex=indices[2]
-        donorindex=indices[1]
-        inputpair=tuple([donorneighbindex,donorindex])
-        inputdistance=GrabPairwiseDistance(inputpair,indexpairtoreferencedistance)
-        targetpair=tuple([donorindex,acceptorindex])
-        targetdistance=GrabPairwiseDistance(targetpair,indexpairtoreferencedistance)
-        angledist=LawOfCosines(inputdistance,targetdistance,targetangle)    
-        anglepair=tuple([donorneighbindex,acceptorindex])
-        indexpairtoreferencedistance[anglepair]=angledist
-        indexpairtobounds[anglepair]=[angledist,angledist]
-
-    for indices,targetangle in indicestoreferenceanglemoleculeneighb.items(): 
-        acceptorneighbindex=indices[1]
-        acceptorindex=indices[2]
-        donorindex=indices[0]
-        inputpair=tuple([acceptorneighbindex,acceptorindex])
-        inputdistance=GrabPairwiseDistance(inputpair,indexpairtoreferencedistance)
-        targetpair=tuple([donorindex,acceptorindex])
-        targetdistance=GrabPairwiseDistance(targetpair,indexpairtoreferencedistance)
-        acceptorcoordinate=indextoreferencecoordinate[acceptorindex]
-        acceptorneighbcoordinate=indextoreferencecoordinate[acceptorneighbindex]
-        donorcoordinate=indextoreferencecoordinate[donorindex]
-        donoracceptorvector=acceptorcoordinate-donorcoordinate
-        donoracceptorneighbvector=acceptorneighbcoordinate-donorcoordinate
-        donoracceptorvectornormed=donoracceptorvector/np.linalg.norm(donoracceptorvector)
-        donoracceptorneighbvectornormed=donoracceptorneighbvector/np.linalg.norm(donoracceptorneighbvector)
-        currentangle=np.arccos(np.dot(donoracceptorvectornormed,donoracceptorneighbvectornormed))
-        angle=180-currentangle-targetangle
-        angledist=LawOfCosines(inputdistance,targetdistance,angle)    
-        anglepair=tuple([acceptorneighbindex,donorindex])
-        indexpairtoreferencedistance[anglepair]=angledist
-        indexpairtobounds[anglepair]=[angledist,angledist]
-
-    for indices,targetangle in indicestoreferenceanglemoleculeneighbneighb.items(): 
-        acceptorneighbneighbindex=indices[0]
-        acceptorneighbindex=indices[1]
-        acceptorindex=indices[2]
-        donorindex=indices[3] 
-        inputpair=tuple([acceptorneighbneighbindex,acceptorneighbindex])
-        inputdistance=GrabPairwiseDistance(inputpair,indexpairtoreferencedistance)
-        targetpair=tuple([donorindex,acceptorindex])
-        targetdistance=GrabPairwiseDistance(targetpair,indexpairtoreferencedistance)
-        anotherinputpair=tuple([acceptorneighbindex,acceptorindex])
-        anotherinputdistance=GrabPairwiseDistance(anotherinputpair,indexpairtoreferencedistance)
-        firstdistance=inputdistance
-        seconddistance=targetdistance+anotherinputdistance
-        angledist=LawOfCosines(firstdistance,seconddistance,targetangle)    
-        anglepair=tuple([acceptorneighbneighbindex,donorindex])
-        indexpairtoreferencedistance[anglepair]=angledist
-        indexpairtobounds[anglepair]=[angledist,angledist]
-
-
-           
-    return indexpairtoreferencedistance,indexpairtobounds
-
 
 
 def GrabPairwiseDistance(pair,indexpairtoreferencedistance):
@@ -1163,8 +1107,6 @@ def GrabPairwiseDistance(pair,indexpairtoreferencedistance):
     return distance
 
 
-def LawOfCosines(a,b,angleC):
-    return np.sqrt(a**2+b**2-2*a*b*np.cos(np.radians(angleC)))
 
 def GenerateInitialDictionaries(coords1,coords2,atoms1,atoms2,p1,p2):
     indextoreferencecoordinate={}
@@ -1202,40 +1144,116 @@ def GenerateInitialDictionaries(coords1,coords2,atoms1,atoms2,p1,p2):
     return indextoreferencecoordinate,indextoreferenceelement,indextomolecule,indextotargetatom
 
 
+def Generate3DMeshGrid(poltype,moleculecoords,probecoords):
+    grid=[]
+    meshsize=.5 # angstroms, half smallest bond length
+    maxdistmolecule,maxcoordmolecule=FindLongestDistanceInMolecule(poltype,moleculecoords)
+    maxdistprobe,maxcoordprobe=FindLongestDistanceInMolecule(poltype,probecoords)
+    sidebuffer=2*(maxdistprobe+2) # number of angstroms away from end of molecule on both sides, so if water molecule is probe, longest length of water +2 ang, then x 2, add this to both sides of longest length of molecule
+    for i in range(len(maxcoordmolecule)):
+        coord=maxcoordmolecule[i]
+        lower=coord-sidebuffer
+        upper=coord+maxdistmolecule+sidebuffer
+        row=np.arange(lower,upper,meshsize)
+        grid.append(row)
+    xv, yv , zv= np.meshgrid(grid[0], grid[1],grid[2])
+    return xv,yv,zv
+
+
+def FindLongestDistanceInMolecule(poltype,coords):
+    veclist=[]
+    for i in range(len(coords)):
+        vec=coords[i]
+        veclist.append(vec)
+    pairs=list(itertools.combinations(veclist, 2))
+    disttopair={}
+    for pairidx in range(len(pairs)):
+        pair=pairs[pairidx]
+        dist=np.linalg.norm(np.array(pair[0])-np.array(pair[1]))
+        disttopair[dist]=pair
+    distances=list(disttopair.keys())
+    maxdist=max(distances)
+    maxpair=disttopair[maxdist]
+    maxcoord=maxpair[0] # just choose first one as starting point
+    return maxdist,maxcoord
+
+def GrabMoleculeCoords(poltype,indextoreferencecoordinate,indextomolecule,moleculekey):
+    moleculeatoms=[]
+    for i in indextoreferencecoordinate.keys():
+        molecule=indextomolecule[i]
+        if molecule==moleculekey:
+            moleculeatoms.append(i)
+    coords=[indextoreferencecoordinate[i] for i in moleculeatoms]
+    return coords,moleculeatoms
+
+
+def FindBestGridPoint(poltype,x,y,z,moleculecoords,probecoords,indextoreferencecoordinate,refcoord,refdistance):
+    bestgridpoint=[]
+    maxdistprobe,maxcoordprobe=FindLongestDistanceInMolecule(poltype,probecoords)
+    differencetopoint={}
+    for i in range(len(x)):
+        for j in range(len(x[0])):
+            for k in range(len(x[0,0])):
+                xvalue=x[i,j,k]
+                yvalue=y[i,j,k]
+                zvalue=z[i,j,k]
+                point=np.array([xvalue,yvalue,zvalue])
+                nosteric=True
+                for coord in moleculecoords:
+                    distance=np.linalg.norm(np.array(coord)-np.array(point))
+                    if distance<2*maxdistprobe: 
+                       nosteric=False
+                       break
+                if nosteric==True:
+                    distance=np.linalg.norm(np.array(refcoord)-np.array(point))
+                    difference=np.abs(distance) 
+                    differencetopoint[difference]=point
+    mindifference=min(differencetopoint.keys())
+    bestgridpoint=differencetopoint[mindifference] 
+
+
+    return bestgridpoint
+
+def TranslateProbe(poltype,indextoreferencecoordinate,bestgridpoint,probecoords,probeatoms,probedonorindex):
+    transvec=np.array(bestgridpoint)-np.array(indextoreferencecoordinate[probedonorindex]) 
+    for i in range(len(probecoords)): 
+        probecoord=probecoords[i]
+        probeindex=probeatoms[i]
+        newcoord=np.array(probecoord)+transvec
+        indextoreferencecoordinate[probeindex]=newcoord
+
+    return indextoreferencecoordinate
+
+
+def GenerateStartingDimer(poltype,indextoreferencecoordinate,indexpairtoreferencedistance,distpairs,indextomolecule):
+    moleculecoords,moleculeatoms=GrabMoleculeCoords(poltype,indextoreferencecoordinate,indextomolecule,'molecule1')
+    probecoords,probeatoms=GrabMoleculeCoords(poltype,indextoreferencecoordinate,indextomolecule,'molecule2')
+    x,y,z=Generate3DMeshGrid(poltype,moleculecoords,probecoords) 
+    distpair=distpairs[0]
+    for i in range(len(distpair)):
+        index=distpair[i]
+        molecule=indextomolecule[index]
+        if molecule=='molecule1':
+            refcoord=indextoreferencecoordinate[index]
+            refdistance=indexpairtoreferencedistance[distpair]
+        elif molecule=='molecule2':
+            probeindex=index
+    bestgridpoint=FindBestGridPoint(poltype,x,y,z,moleculecoords,probecoords,indextoreferencecoordinate,refcoord,refdistance)
+    
+    indextoreferencecoordinate=TranslateProbe(poltype,indextoreferencecoordinate,bestgridpoint,probecoords,probeatoms,probeindex)
+
+
+
+    return indextoreferencecoordinate
+
+
 def optimizedimer(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,mol,probemol,probeidxtosymclass):
     indextoreferencecoordinate,indextoreferenceelement,indextomolecule,indextotargetatom=GenerateInitialDictionaries(coords1,coords2,atoms1,atoms2,p1,p2) 
-    indexpairtoreferencedistance,indexpairtobounds=GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indextotargetatom,indextoreferenceelement,vdwradius)
+    indexpairtoreferencedistance,indexpairtobounds,distpairs=GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indextotargetatom,indextoreferenceelement,vdwradius)
     indexpairtoreferencedistanceoriginal=indexpairtoreferencedistance.copy()
     indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb=GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol,indextoreferencecoordinate)
-    indexpairtoreferencedistance,indexpairtobounds=ConvertAngleRestraintToDistanceRestraint(indexpairtoreferencedistance,indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb,indexpairtobounds,indextoreferencecoordinate) 
+    indextoreferencecoordinate=GenerateStartingDimer(poltype,indextoreferencecoordinate,indexpairtoreferencedistance,distpairs,indextomolecule)
     
-    shiftedp2=p2+len(atoms1)
-    coordinatesguess=GenerateCoordinateGuesses(indextoreferencecoordinate)
-    def PairwiseCostFunction(x):
-        func=0
-        for indexpair,bounds in indexpairtobounds.items():
-            firstindex=indexpair[0]
-            secondindex=indexpair[1]
-            startfirstindex=3*firstindex
-            startsecondindex=3*secondindex     
-            firstcoordinate=np.array([x[startfirstindex],x[startfirstindex+1],x[startfirstindex+2]])
-            secondcoordinate=np.array([x[startsecondindex],x[startsecondindex+1],x[startsecondindex+2]])       
-            distance=np.linalg.norm(firstcoordinate-secondcoordinate)
-            referencedistance=indexpairtoreferencedistance[indexpair]
-            difference=np.abs(distance-referencedistance)
-            lowerbound=bounds[0]
-            upperbound=bounds[1]
-            if distance<lowerbound or distance>upperbound:
-                func+=difference**2
-
-
-        return func
-
-
-    sol = minimize(PairwiseCostFunction, coordinatesguess, method='SLSQP',options={'disp':False, 'maxiter': 1000, 'ftol': 1e-6})
-    coords=sol.x
-    indextoreferencecoordinate=UpdateCoordinates(coords,indextoreferencecoordinate)
-
     with open(dimer, "w") as f:
       f.write(str(len(indextoreferencecoordinate.keys()))+"\n")
       f.write("\n")
@@ -1459,7 +1477,9 @@ def GenerateInitialProbeStructure(poltype,missingvdwatomindices):
                 moldimernames.append(probelist)
                 atomrestraintslist.append(reslist)
                 numberprobeatoms.append(probemol.NumAtoms())
-    
+    if poltype.tordebugmode==True:
+        sys.exit()
+
     return moldimernames,probeindices,moleculeindices,numberprobeatoms,atomrestraintslist
 
 def GrabKeysFromValue(poltype,dic,thevalue):
