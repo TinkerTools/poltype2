@@ -294,7 +294,8 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
     restraintlist = []
     write_com_header(poltype,comfname,chkname,maxdisk,maxmem,numproc)
     tmpfh = open(comfname, "a")
-
+    if len(torsionrestraints)==0:
+        modred=False
     spacedformulastr=molecule.GetSpacedFormula()
     if modred==True:
         optimizeoptlist = ["ModRedundant","maxcycles=%s"%(str(poltype.optmaxcycle)),'Loose']
