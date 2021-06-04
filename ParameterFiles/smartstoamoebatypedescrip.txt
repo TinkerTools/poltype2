@@ -213,9 +213,6 @@
  S   "Dimethyl Sulfide S" % [#16](-[#6](-[H])(-[H])-[H])-[#6](-[H])(-[H])-[H] % 1    
  C   "Dimethyl Sulfide CH3" % [#16](-[#6](-[H])(-[H])-[H])-[#6](-[H])(-[H])-[H] % 2   
  H   "Dimethyl Sulfide H3C" % [#16](-[#6](-[H])(-[H])-[H])-[#6](-[H])(-[H])-[H] % 3  
- S   "Dimethyl Disulfide S" % [#16](-[#16]-[#6](-[H])(-[H])-[H])-[#6](-[H])(-[H])-[H] % 1  
- C   "Dimethyl Disulfide CH3" % [#16](-[#16]-[#6](-[H])(-[H])-[H])-[#6](-[H])(-[H])-[H] % 7 
- H   "Dimethyl Disulfide H3C" % [#16](-[#16]-[#6](-[H])(-[H])-[H])-[#6](-[H])(-[H])-[H] % 9 
  S   "Ethyl Sulfide S" % [H]-[#16]-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H] % 2       
  H   "Ethyl Sulfide HS" % [H]-[#16]-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H] % 1      
  C   "Ethyl Sulfide CH2" % [H]-[#16]-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H] % 3    

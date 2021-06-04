@@ -2769,7 +2769,6 @@ def ConvertToBabelList(poltype,listforprm,indicestoclasses,mol,prms,indicestoele
             babelatoms=[mol.GetAtom(i) for i in babells]
             qmlen = mol.GetAngle(babelatoms[0],babelatoms[1],babelatoms[2])
             tol=angletol
-
         truetypes=[poltype.idxtosymclass[i] for i in babells]
         for line in prms:
             linesplit=line.split()
@@ -4074,6 +4073,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     torsionprms=CorrectPitorEnergy(poltype,torsionprms,torsiontopitor)
     extramissingtorsion=RemoveHighEnergyHydrogenTorsionParameters(poltype,torsionprms,listoftorsionsforprm) # since we want to transfer only small energy barrier hydrogen torsion
     angleprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips=RemoveOldParametersKeepNewParameters(poltype,angleprms,newangleindicestopoltypeclasses,'angle',anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips)
+
     opbendprms,blankbondpoltypeclassestoparametersmartsatomorders,blankbondpoltypeclassestosmartsatomorders,blankbondpoltypeclassestoelementtinkerdescrips=RemoveOldParametersKeepNewParameters(poltype,opbendprms,newopbendindicestopoltypeclasses,'opbend',bondpoltypeclassestoparametersmartsatomorders,bondpoltypeclassestosmartsatomorders,bondpoltypeclassestoelementtinkerdescrips,removefromdic=False)
 
     opbendpoltypeclassestoparametersmartsatomorders=bondpoltypeclassestoparametersmartsatomorders.copy()
@@ -4106,6 +4106,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     anglelistbabel=ConvertToBabelList(poltype,listofanglesforprm,angleindicestoclasses,optmol,angleprms,angleindicestoelementtinkerdescrips,newangleindicestopoltypeclasses,newanglepoltypeclassestosmartslist)
     bondprms=AddOptimizedBondLengths(poltype,optmol,bondprms,bondlistbabel)
     angleprms=AddOptimizedAngleLengths(poltype,optmol,angleprms,anglelistbabel)
+   
     torsionsmissingtinkerclassestopoltypeclasses=AddExtraMissingHydrogenTorsions(poltype,extramissingtorsion,torsionsmissingtinkerclassestopoltypeclasses)
     torsionprms=ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,torsionprms)
     torsionprms,arotorsionlinetodescrips=DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopoltypeclasses,partialarotorsionsmissingtinkerclassestopoltypeclasses,torsionprms)

@@ -1355,7 +1355,9 @@ class PolarizableTyper():
         pcm=self.CheckForConcentratedFormalCharges(m,atomindextoformalcharge)
         cpm = copy.deepcopy(m)
         indextocoordinates=self.GenerateExtendedConformer(m,mol)
-
+        m.UpdatePropertyCache()
+        Chem.GetSymmSSSR(m)
+        m.GetRingInfo().NumRings() 
         m=self.AddInputCoordinatesAsDefaultConformer(m,indextocoordinates)
         rdmolfiles.MolToMolFile(m,'test.mol')
         mol,m=self.CheckIsInput2D(mol,obConversion,m)
