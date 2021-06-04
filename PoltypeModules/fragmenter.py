@@ -1546,9 +1546,12 @@ def FirstPassAtomIndexes(poltype,tor,onlyinputindices):
            if grabneighbs==True: 
                for neighbatom in atom.GetNeighbors():
                    neighbatomindex=neighbatom.GetIdx()
+                   babelneighbatom=poltype.mol.GetAtom(neighbatomindex+1)
+                   babelneighbatomisinring=babelneighbatom.IsInRing()
+                   babelneighbatomhyb=babelneighbatom.GetHyb()
                    if neighbatomindex not in molindexlist:
                        molindexlist.append(neighbatomindex)
-                       if neighbatom.GetIsAromatic():
+                       if neighbatom.GetIsAromatic() or (babelneighbatomisinring==True and babelneighbatomhyb==2):
                            aromaticindexes=GrabAromaticAtoms(poltype,neighbatom)
                            newindexes=aromaticindexes
                            for atmidx in newindexes:
@@ -1778,11 +1781,19 @@ def GrabAromaticAtoms(poltype,neighbatom):
     while prevringidxlen!=ringidxlen:
         for atmindex in aromaticindexes:
             atm=poltype.rdkitmol.GetAtomWithIdx(atmindex)
-            if atm.GetIsAromatic() and atmindex not in aromaticindexes:
+            babelatom=poltype.mol.GetAtom(atmindex+1)
+            babelatomisinring=babelatom.IsInRing()
+            babelatomhyb=babelatom.GetHyb()
+            if (atm.GetIsAromatic() or (babelatomisinring==True and babelatomhyb==2)) and atmindex not in aromaticindexes:
                 aromaticindexes.append(atmindex)
             for natm in atm.GetNeighbors():
-                if natm.GetIsAromatic() and natm.GetIdx() not in aromaticindexes:
-                    aromaticindexes.append(natm.GetIdx())
+                natmindex=natm.GetIdx()
+                babelatom=poltype.mol.GetAtom(natmindex+1)
+                babelatomisinring=babelatom.IsInRing()
+                babelatomhyb=babelatom.GetHyb()
+
+                if (natm.GetIsAromatic() or (babelatomisinring==True and babelatomhyb==2)) and natmindex not in aromaticindexes:
+                    aromaticindexes.append(natmindex)
         prevringidxlen=ringidxlen
         ringidxlen=len(aromaticindexes)
 
