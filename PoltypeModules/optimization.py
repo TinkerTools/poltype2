@@ -29,7 +29,7 @@ def GeometryOPTWrapper(poltype,mol):
                 if poltype.optmethod=='MP2':
                     poltype.optmethod='HF'
                     redo=True
-                elif poltype.optmethod=='HF' and (poltype.use_gauss==True or poltype.use_gausoptonly==True): # if Gaussian failed try Psi4 as last resort....
+                elif poltype.optmethod=='HF' and (poltype.use_gaus==True or poltype.use_gausoptonly==True): # if Gaussian failed try Psi4 as last resort....
                     poltype.use_gaus=False
                     poltype.use_gausoptonly=False
                     redo=True

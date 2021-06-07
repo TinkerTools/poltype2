@@ -1786,6 +1786,8 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             ringtorindices=GrabIndicesInRing(poltype,babelindices,ring)
             ringtoratoms=[mol.GetAtom(a) for a in ringtorindices]
             ringhybs=[a.GetHyb() for a in ringtoratoms]
+            if len(ring)==4: # non-aromatic ring of 4, just skip torsion (transfer), otherwise would have to add more complicated rules for fragmenter on rings and keep all atoms but cut one of the bonds
+                check=True 
 
         if check==False:
             if ringbond==True:

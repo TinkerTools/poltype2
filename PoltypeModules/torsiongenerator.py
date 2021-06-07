@@ -671,7 +671,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
             tinkerxyz=outputlog.replace('.log','_tinker.xyz')
             ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz) 
-            if finished==False and 'opt' in outputlog: # if there is an error, then finished=False
+            if finished==False and 'opt' in outputlog and self.fullopt==False: # if there is an error, then finished=False
                 bondtoposame=CheckBondTopology(poltype,outputlog,initialtinkerstructure)
                 maxiter=4
                 attempts=0

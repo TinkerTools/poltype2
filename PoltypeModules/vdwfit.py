@@ -1477,8 +1477,6 @@ def GenerateInitialProbeStructure(poltype,missingvdwatomindices):
                 moldimernames.append(probelist)
                 atomrestraintslist.append(reslist)
                 numberprobeatoms.append(probemol.NumAtoms())
-    if poltype.tordebugmode==True:
-        sys.exit()
 
     return moldimernames,probeindices,moleculeindices,numberprobeatoms,atomrestraintslist
 

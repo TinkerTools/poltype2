@@ -1551,7 +1551,7 @@ def FirstPassAtomIndexes(poltype,tor,onlyinputindices):
                    babelneighbatomhyb=babelneighbatom.GetHyb()
                    if neighbatomindex not in molindexlist:
                        molindexlist.append(neighbatomindex)
-                       if neighbatom.GetIsAromatic() or (babelneighbatomisinring==True and babelneighbatomhyb==2):
+                       if neighbatom.GetIsAromatic() or (babelneighbatomisinring==True and babelneighbatomhyb==2) and onlyinputindices==False:
                            aromaticindexes=GrabAromaticAtoms(poltype,neighbatom)
                            newindexes=aromaticindexes
                            for atmidx in newindexes:
@@ -1618,7 +1618,7 @@ def Draw2DMoleculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragf
         newmol=mol_with_atom_index_removed(poltype,firstmolcopy)
         newermol = Chem.RemoveHs(newmol)
         smarts=rdmolfiles.MolToSmarts(newermol)
-        smarts=smarts.replace('@','').replace('/[H]','').replace('H3','').replace('H2','').replace('H','')
+        smarts=smarts.replace('@','').replace('/[H]','').replace('\[H]','').replace('H3','').replace('H2','').replace('H','')
         patt = Chem.MolFromSmarts(smarts)
         newfragments.append(firstmol)
         for i in range(1,len(fragments)):
