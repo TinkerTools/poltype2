@@ -1660,6 +1660,40 @@ def CheckIfRotatableBondsInOnlyRotBnds(poltype,first,second):
     return inonlyrotbnds 
 
 
+def RingAtomicIndices(poltype,mol):
+    sssr = mol.GetSSSR()
+    atomindices=[]
+    for ring in sssr:
+        ringatomindices=GrabRingAtomIndices(poltype,mol,ring)
+        atomindices.append(ringatomindices)        
+    return atomindices
+
+def GrabRingAtomIndices(poltype,mol,ring):
+    ringatomindices=[]
+    atomiter=openbabel.OBMolAtomIter(mol)
+    for atom in atomiter:
+        atomidx=atom.GetIdx()
+        if ring.IsInRing(atomidx)==True:
+            ringatomindices.append(atomidx)
+    return ringatomindices
+
+def GrabRingAtomIndicesFromInputIndex(poltype,atomindex,atomindices):
+    ring=None
+    for ring in atomindices:
+        if atomindex in ring:
+            return ring
+
+    return ring
+
+def GrabIndicesInRing(poltype,babelindices,ring):
+    ringtorindices=[]
+    for index in ring:
+        if index in babelindices:
+            ringtorindices.append(index)
+
+    return ringtorindices
+
+
 def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,indextoneighbidxs):
     torsionsmissing=[]
     poormatchingaromatictorsions=[]
@@ -1746,9 +1780,16 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         check=CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,matcharray)
         if '~' in smarts or '*' in smarts:
             check=False
+        if ringbond==True:
+            atomindices=RingAtomicIndices(poltype,mol)
+            ring=GrabRingAtomIndicesFromInputIndex(poltype,babelindices[1],atomindices)
+            ringtorindices=GrabIndicesInRing(poltype,babelindices,ring)
+            ringtoratoms=[mol.GetAtom(a) for a in ringtorindices]
+            ringhybs=[a.GetHyb() for a in ringtoratoms]
+
         if check==False:
             if ringbond==True:
-                if (2 not in hybs): # non-aromatic torsion want parameters for 
+                if (2 not in ringhybs): # non-aromatic torsion want parameters for 
                     if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
                         continue
                     else: # if dont have heavy atoms on either side then just fit the hydrogen torsion
