@@ -2,7 +2,7 @@
 
 
 ### Required Programs
-* Tinker, version >=8.7
+* Tinker, version >=8.9.2 (potential fitting errors previous versions)
 * GDMA, version 2.3 and greater
 * PSI4 (or Gaussian 09/16)
 * scipy
