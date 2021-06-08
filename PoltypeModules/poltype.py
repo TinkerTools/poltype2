@@ -1484,8 +1484,6 @@ class PolarizableTyper():
 
         if os.path.isfile(self.tortormissingfilename):
             tortorsmissing=databaseparser.ReadTorTorList(self,self.tortormissingfilename)
-
-
         try:
             esp.SPForDMA(self,optmol,mol)
         except:
@@ -1595,7 +1593,8 @@ class PolarizableTyper():
         torgen.DefaultMaxRange(self,self.torlist)
         if self.dontdotor==True:
             self.torlist=[]
-        
+
+
         # add missingvdwindices to torlist (for fragmenter input)
         missingvdwatomsets=[]
         if self.isfragjob==False and self.dontfrag==False and self.dontdovdwscan==False:

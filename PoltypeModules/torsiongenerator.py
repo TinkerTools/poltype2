@@ -863,8 +863,10 @@ def get_torlist(poltype,mol,missed_torsions):
             if 2 in ringhybs:
                 continue
         sortedtor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]])
+        foundmissing=False
         if(sortedtor in missed_torsions or sortedtor[::-1] in missed_torsions) and len(poltype.onlyrotbndslist)==0:
             skiptorsion = False
+            foundmissing=True
         onlyrot=False
         if [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist:
             skiptorsion = False
@@ -884,7 +886,7 @@ def get_torlist(poltype,mol,missed_torsions):
         if (t1atomicnum==1 or t4atomicnum==1):
             hydtorsionlist.append(sortedtor)
         unq=get_uniq_rotbnd(poltype,t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx())
-        if ringbond==True and poltype.allownonaromaticringscanning==False and poltype.refinenonaroringtors==False and len(poltype.onlyrotbndslist)==0 and poltype.dontfrag==False:
+        if ringbond==True and poltype.allownonaromaticringscanning==False and poltype.refinenonaroringtors==False and len(poltype.onlyrotbndslist)==0 and poltype.dontfrag==False and foundmissing==True:
             nonaroringtorlist.append(unq)
             skiptorsion=False
         elif ringbond==True and poltype.refinenonaroringtors==True:

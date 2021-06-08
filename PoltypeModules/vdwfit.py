@@ -591,9 +591,7 @@ def ReadCounterPoiseAndWriteQMData(poltype,logfilelist):
                     interenergy=float(linesplit[3])*poltype.Hartree2kcal_mol
 
         tmpfh.close()
-        try:
-            temp.write(f.replace('_sp.log','.xyz')+' '+str(interenergy)+'\n')
-        except:
+        if interenergy!=None:
             temp.write(f.replace('_sp.log','.xyz')+' '+str(interenergy)+'\n')
 
     temp.close()
