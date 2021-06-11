@@ -13,6 +13,18 @@ import openbabel
 import shlex
 import warnings
 
+def CheckIfLogFileUsingGaussian(poltype,f):
+    use_gaus=False
+    temp=open(f,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        if 'Entering Gaussian System' in line:
+            use_gaus=True
+            break 
+    return use_gaus
+
+
 def gen_esp_grid(poltype,mol):
     """
     Intent: Find the QM Electrostatic Potential Grid which can be used for multipole fitting
@@ -31,7 +43,8 @@ def gen_esp_grid(poltype,mol):
        "(2) Get QM Potential from a Gaussian Cube File"
        Outputs *.cube_2
     """
-    if poltype.use_gaus==False or poltype.use_gausoptonly==True:
+    use_gaus=CheckIfLogFileUsingGaussian(poltype,poltype.logespfname)
+    if use_gaus==False:
         Vvals,gridpts=GrabGridData(poltype)
 
         # Generate a "cube" file.  I have no idea what the format should be (it's not a

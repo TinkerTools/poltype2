@@ -802,6 +802,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         bypassrmsd=False
         maxiter=5
         count=0
+        print('angle_list',angle_list,len(angle_list))
+        print('tor_energy_list',tor_energy_list,len(tor_energy_list))
         while not parm_sanitized:
             if count>=maxiter:
                 break

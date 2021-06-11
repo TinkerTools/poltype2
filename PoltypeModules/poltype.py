@@ -695,7 +695,7 @@ class PolarizableTyper():
 
         if not latestversion:
             if self.forcefield.upper() != "AMOEBA+":  #allow old version for AMOEBA+
-                raise ValueError("Notice: Not latest working version of tinker (8.8.3)"+' '+os.getcwd())
+                raise ValueError("Notice: Not latest working version of tinker (8.9.2)"+' '+os.getcwd())
       
         if ("TINKERDIR" in os.environ):
             self.tinkerdir = os.environ["TINKERDIR"]
@@ -1412,7 +1412,6 @@ class PolarizableTyper():
         self.localframe1 = [ 0 ] * mol.NumAtoms()
         self.localframe2 = [ 0 ] * mol.NumAtoms()
         self.idxtosymclass,self.symmetryclass=symm.gen_canonicallabels(self,mol) 
-
  
         # QM calculations are done here
         # First the molecule is optimized. (-opt) 
