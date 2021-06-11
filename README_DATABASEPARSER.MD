@@ -1,4 +1,8 @@
 ## Databaseparser README
+Currently we have 3 databases for valence, polarizability and vdw parameters:
+1. External database (user may add)
+2. AMOEBA21 datbase (bond, angle, str-bend, opbend). Paper in preparation.
+3. AMOEBA09.prm
 
 ### Bonding, vdW and polarizability parameters and where to find them
 
@@ -19,7 +23,7 @@ The program also search for missing vdw parameters, which are also explicitly pa
 **For angle, bond, opbend, strbnd matches to amoeba09 that also have matches to external database, determine the best match by largest SMARTS string and remove amoeba09 matches that had matches to the bond, angle, strbnd, opbend external SMARTS database. Then add parameters from bond, angle, strbnd, torsion, opbend, vdw, tortor.** If matches are made to the bond,angle,strbnd,opbend database this automatically supersedes amoeba09.
 
 1. **External SMARTS for bond, angle, strbnd, torsion, opbend, vdw, tortor has highest priority (think vdw, torsion, tortor from poltype will be most descriptive SMARTS)**
-2. **Then bond, opbend, strbnd, angle has next highest priority**
+2. **Then AMOEMBA21 bond, opbend, strbnd, angle has next highest priority**
 3. **Then amoeba09 matches is last priority**
 
 Missing bond/angle parameters are assigned bond/angle guesses using the chemical element and its valence, employing the **valence.f** Tinker program. Then **angles and bonds parameters are modified to use QM optimized bond and angle lengths.**
