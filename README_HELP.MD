@@ -253,6 +253,7 @@ dontusepcm           Dont use pcm for any QM calculation.
 email                Email address to send crash reports to.
                      Default=None
 
+inputmoleculefolderpaths   Path to folders containing sdf files for molecules you want to parameterize with poltype. Other settings in poltype.ini file will be written to poltype.ini files in each folder.
 ```
 
 
