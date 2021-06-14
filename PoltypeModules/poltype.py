@@ -340,13 +340,33 @@ class PolarizableTyper():
                             self.fitqmdipole=self.GrabBoolValue(a)
                     elif "maxgrowthcycles" in newline:
                         self.maxgrowthcycles=int(a)
+                    elif 'maxtorRMSPDRel' in newline:
+                        self.maxtorRMSPDRel=float(a)
                     elif "boltzmantemp" in newline:
                         self.boltzmantemp=float(a)
+                    elif 'absdipoletol' in newline:
+                        self.absdipoletol=float(a)
+                    elif 'dipoletol' in newline:
+                        self.dipoletol=float(a)
+                    elif 'maxRMSD' in newline:
+                        self.maxRMSD=float(a)
+                    elif 'maxRMSPD' in newline:
+                        self.maxRMSPD=float(a)
+                    elif 'maxtorRMSPD' in newline:
+                        self.maxtorRMSPD=float(a)
                     elif "use_gauPCM" in newline:
                         if '=' not in line:
                             self.use_gauPCM = True
                         else:
                             self.use_gauPCM=self.GrabBoolValue(a)
+
+                    elif "espfit" in newline:
+                        if '=' not in line:
+                            self.espfit = True
+                        else:
+                            self.espfit=self.GrabBoolValue(a)
+
+
 
                     elif 'allownonaromaticringscanning' in newline:
                         if '=' not in line:
@@ -474,6 +494,8 @@ class PolarizableTyper():
                         self.optmaxcycle = int(a)
                     elif "torsionrestraint" in newline:
                         self.torsionrestraint=float(a)
+                    elif 'maxtorRMSPDRel' in newline:
+                        self.maxtorRMSPDRel=float(a)
                     elif "foldnum" in newline:
                         self.foldnum=int(a)
                         self.nfoldlist =  list(range(1,self.foldnum+1))
@@ -507,6 +529,8 @@ class PolarizableTyper():
                         self.maxdisk = a
                     elif "atmidx" in newline:
                         self.prmstartidx = int(a)
+                    elif 'defaultmaxtorsiongridpoints' in newline:
+                        self.defaultmaxtorsiongridpoints=int(a)
                     elif "optbasisset" in newline and 'tor' not in newline:
                         self.optbasisset = a
                     elif "dmabasisset" in newline:
@@ -1375,12 +1399,13 @@ class PolarizableTyper():
                         inifilepath=self.WritePoltypeInitializationFile(dic)
                         curdir=os.getcwd()
                         jobpaths.append(curdir)
-                        joblist.append('cd '+curdir+' '+'&&'+' '+'python '+poltypepath)
+                        joblist.append('cd '+curdir+' '+'&&'+' '+'python '+self.poltypepath)
 
                 os.chdir('..')
         if self.externalapi!=None:
+            inputdaemonfilepath=os.path.join(self.inputmoleculefolderpaths,'jobinfo.txt')
             scratchspacelist,ramlist,numproclist=self.ResourceInputs(jobpaths,self.maxmem,self.maxdisk,self.numproc)
-            GenerateDaemonInput(joblist,outputlogpath,scratchspacelist,ramlist,numproclist,jobpaths,inputdaemonfilepath)
+            self.GenerateDaemonInput(joblist,self.inputmoleculefolderpaths,scratchspacelist,ramlist,numproclist,jobpaths,inputdaemonfilepath)
 
         sys.exit()
 
