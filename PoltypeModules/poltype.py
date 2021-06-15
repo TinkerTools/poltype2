@@ -1399,13 +1399,15 @@ class PolarizableTyper():
                         inifilepath=self.WritePoltypeInitializationFile(dic)
                         curdir=os.getcwd()
                         jobpaths.append(curdir)
-                        joblist.append('cd '+curdir+' '+'&&'+' '+'python '+self.poltypepath)
+                        poltypefilepath=os.path.join(self.poltypepath,'poltype.py')
+                        joblist.append('cd '+curdir+' '+'&&'+' '+'python '+poltypefilepath)
 
                 os.chdir('..')
         if self.externalapi!=None:
+            outputlogfilepath=os.path.join(self.inputmoleculefolderpaths,'outputlog.txt')
             inputdaemonfilepath=os.path.join(self.inputmoleculefolderpaths,'jobinfo.txt')
             scratchspacelist,ramlist,numproclist=self.ResourceInputs(jobpaths,self.maxmem,self.maxdisk,self.numproc)
-            self.GenerateDaemonInput(joblist,self.inputmoleculefolderpaths,scratchspacelist,ramlist,numproclist,jobpaths,inputdaemonfilepath)
+            self.GenerateDaemonInput(joblist,outputlogfilepath,scratchspacelist,ramlist,numproclist,jobpaths,inputdaemonfilepath)
 
         sys.exit()
 
@@ -1744,9 +1746,6 @@ class PolarizableTyper():
         # A series of tests are done so you one can see whether or not the parameterization values
         # found are acceptable and to what degree
         opt.StructureMinimization(self)
-        if self.atomnum != 1:
-            opt.gen_superposeinfile(self)
-            opt.CheckRMSD(self)
         if self.torsppcm:
             torgen.RemoveStringFromKeyfile(self,self.key5fname,'solvate GK')
         if self.atomnum!=1: 

@@ -1201,6 +1201,10 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         smartsls=atomindicesforprmtosmarts[atomindices]
         smarts=smartsls[0]
         smartsfortransfer=smartsls[1]
+        #print('smarts',smarts)
+        #print('smartsfortransfer',smartsfortransfer)
+        #print('atomindices',atomindices)
+        #print('parametersmarts',parametersmarts)
         substructure = Chem.MolFromSmarts(smarts)
         matches=list(rdkitmol.GetSubstructMatches(substructure,maxMatches=1000))
         sp=openbabel.OBSmartsPattern()
@@ -1220,6 +1224,7 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
             if validmatch==True:
                indices=list(range(len(match)))
                smartsindextomoleculeindex=dict(zip(indices,match)) 
+               #print('smartsindextomoleculeindex',smartsindextomoleculeindex)
                moleculeindextosmartsindex={v: k for k, v in smartsindextomoleculeindex.items()}
             
         structure = Chem.MolFromSmarts(parametersmarts)
@@ -1233,7 +1238,7 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         obConversion.SetInFormat(inFormat)
         obConversion.ReadFile(fragbabelmol, fragmentfilepath)
         fragidxtosymclass,symmetryclass=symm.gen_canonicallabels(poltype,fragbabelmol)
-
+        #print('moleculeindextosmartsindex',moleculeindextosmartsindex) 
         smartindices=[moleculeindextosmartsindex[i] for i in atomindices]
         substructure = Chem.MolFromSmarts(smartsfortransfer)
         matches=structure.GetSubstructMatches(substructure)
@@ -4013,6 +4018,10 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     anglesforprmtoparametersmarts,anglesforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,anglesforprmtosmartslist,parametersmartslist,mol)
     planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,planaranglesforprmtosmartslist,parametersmartslist,mol)
     torsionsforprmtoparametersmarts,torsionsforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,torsionsforprmtosmartslist,parametersmartslist,mol)
+    #print('torsionsforprmtoparametersmarts',torsionsforprmtoparametersmarts)
+    #print('torsionsforprmtosmarts',torsionsforprmtosmarts)
+    #print('torsionsforprmtosmartslist',torsionsforprmtosmartslist)
+ 
     atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,vdwindicestoextsmarts=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,vdwindicestoextsmartsmatchlength,atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,vdwindicestoextsmarts)
     bondsforprmtoparametersmarts,bondsforprmtosmarts,bondindicestoextsmarts=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,bondindicestoextsmartsmatchlength,bondsforprmtoparametersmarts,bondsforprmtosmarts,bondindicestoextsmarts)
 
