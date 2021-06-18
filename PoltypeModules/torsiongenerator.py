@@ -349,6 +349,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
     tmpkeyfh = open(tmpkeyfname,'a')
     restlist=[]
     count=0
+    torsiontophaseangle={}
     for i in range(len(torset)):
         tor=torset[i]
         a,b,c,d=tor[0:4]
@@ -370,7 +371,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
             if count>=1:
                 continue
             count+=1
-
+        torsiontophaseangle[tuple([a,b,c,d])]=round((torang+phaseangle)%360)
         tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (a,b,c,d,torsionrestraint,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
         for key in poltype.rotbndlist.keys():
             torlist=poltype.rotbndlist[key]
@@ -400,6 +401,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
                     if (resa,resb,resc,resd) not in torset and (resd,resc,resb,resa) not in torset and (resa,resb,resc,resd) not in variabletorlist and (resd,resc,resb,resa) not in variabletorlist:
                         if (b==resb and c==resc) or (b==resc and c==resb):
                             secondang = optmol.GetTorsion(resa,resb,resc,resd)
+                            torsiontophaseangle[tuple([resa,resb,resc,resd])]=round((secondang+phaseangle)%360)
                             tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (resa,resb,resc,resd,torsionrestraint,round((secondang+phaseangle)%360),round((secondang+phaseangle)%360)))
                         else:
                             tmpkeyfh.write('restrain-torsion %d %d %d %d %f\n' % (resa,resb,resc,resd,torsionrestraint))
@@ -414,7 +416,22 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
     filename=torxyzfname+'_2'
     newfilename=filename.replace('.xyz_2','_xyzformat.xyz')
     cartxyz=ConvertTinktoXYZ(poltype,torxyzfname+'_2',newfilename)
+    CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle) 
     return cartxyz,torxyzfname,torxyzfname+'_2',tmpkeyfname
+
+def CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle):
+    inimol = opt.load_structfile(poltype,cartxyz)
+    tol=2
+    for indices,phase in torsiontophaseangle.items():
+        a,b,c,d=indices[:]
+        ang = inimol.GetTorsion(a,b,c,d)
+        if ang<0:
+            ang=ang+360
+        if numpy.abs(ang-phase)>tol:
+            raise ValueError('Torsion did not reach target dihedral! '+str(indices)+' '+str(phase)+' is actually at angle '+str(ang)+', filename='+cartxyz)
+
+
+
 
 def GenerateFilename(poltype,torset,phaseangles,prefix,postfix,mol):
     oldtorset=torset[:]
