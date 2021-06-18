@@ -7,7 +7,7 @@ def CallExternalAPI(poltype,jobtolog,jobinfofilenameprefix,scratchdir):
     jobinfofilepath=jobinfofilenameprefix+'.txt'
     temp=open(jobinfofilepath,'w')
     for job,log in jobtolog.items():
-        temp.write('--job='+job+' '+'--outputlogpath='+log+' '+'--scratchdir='+scratchdir+' '+'--scratchspace='+poltype.maxdisk+'\n')
+        temp.write('--job='+job+' '+'--outputlogpath='+log+' '+'--scratchdir='+scratchdir+' '+'--scratchspace='+poltype.maxdisk+' '+'--numproc='+str(poltype.numproc)+'\n')
     temp.close()
     if poltype.bashrcpath!=None:
         cmdstr='python'+' '+poltype.externalapi+' '+'--bashrcpath='+poltype.bashrcpath+' '+'--jobinfofilepath='+jobinfofilepath
