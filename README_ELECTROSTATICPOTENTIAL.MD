@@ -51,9 +51,9 @@
 <li>	Grab QM dipoles </li> 
 <ol>
     <li>From Psi4 ESP log file or Gaussian ESP log file. </li>
-    <li>Gaussian dipole vector is converted to COM frame dipole vector (tinker computes in COM frame). </li>
+    <li>Gaussian dipole vector is converted to COM frame dipole vector (tinker computes in COM frame). Psi4 is already in COM frame due to input keywords in file. </li>
 <ol>
-	<li>Compute COM position vector and COC (center of charge) position vector, then compute displacement vector needed to convert the dipole vector </li>
+	<li>Compute COM position vector and COC (center of nuclear charge) position vector, then compute displacement vector needed to convert the dipole vector </li>
 </ol>
 </ol>
 <li>	Grab MM dipoles </li>

@@ -1192,6 +1192,9 @@ class PolarizableTyper():
             totchg+=chg
             string='Atom index = '+str(atomidx+1)+' Atomic Number = ' +str(atomnum)+ ' Valence = '+str(val)+ ' Formal charge = '+str(chg)
             array.append(string)
+            if atomnum==6 and val==3:
+                warnings.warn('WARNING! Strange valence for '+string) 
+                self.WriteToLog('WARNING! Strange valence for '+string)
         if self.totalcharge!=None: 
             if self.totalcharge!=totchg:
                 for row in array:
@@ -1432,7 +1435,8 @@ class PolarizableTyper():
         
         self.atomnum=mol.NumAtoms() 
         # Begin log. *-poltype.log
-        
+        self.logfh = open(self.logfname,"w",buffering=1)
+
         obConversion.SetOutFormat('mol')
         self.molstructfnamemol=self.molstructfname.replace('.sdf','.mol')
         obConversion.WriteFile(mol,self.molstructfnamemol)
@@ -1457,7 +1461,6 @@ class PolarizableTyper():
         self.mol=mol
         self.rdkitmol=m
         self.mol.SetTotalCharge(self.totalcharge)
-        self.logfh = open(self.logfname,"w",buffering=1)
         if self.keyfiletoaddtodatabase!=None:
             databaseparser.AddKeyFileParametersToParameterFile(self,m)   
             sys.exit()

@@ -910,6 +910,9 @@ def GenerateFrag(poltype,molindexlist,mol):
     indextocoordinates=GrabIndexToCoordinates(poltype,em) # need to convert indexes now
     nem=ReadToOBMol(poltype,filename)
     nem.AddHydrogens()
+    filename='fragalladdedhyd.mol'
+    WriteOBMolToMol(poltype,nem,filename)
+
     hydindexes=[]
     atomiter=openbabel.OBMolAtomIter(nem)
     for atom in atomiter:
@@ -940,6 +943,7 @@ def GenerateFrag(poltype,molindexlist,mol):
     newmol=rdmolfiles.MolFromMolFile(outputname,removeHs=False)
     newmol.UpdatePropertyCache(strict=False)
     AllChem.EmbedMolecule(newmol)
+    indextocoordinates=UpdateAtomNumbers(poltype,indextocoordinates)
     rdkitindextocoordinates={}
     for idx,coords in indextocoordinates.items():
         rdkitidx=idx-1
@@ -953,6 +957,17 @@ def GenerateFrag(poltype,molindexlist,mol):
         rdkitoldindextonewindex[rdkitoldindex]=rdkitnewindex
     newmol=AssignTotalCharge(poltype,newmol,nem)
     return newmol,rdkitoldindextonewindex
+
+def UpdateAtomNumbers(poltype,indextocoordinates):
+    newindextocoordinates={}
+    ls=list(indextocoordinates.keys())
+    for i in range(len(ls)):
+        originalbabelindex=ls[i]
+        newbabelindex=i+1
+        coords=indextocoordinates[originalbabelindex]
+        newindextocoordinates[newbabelindex]=coords
+    return newindextocoordinates
+
 
 def WriteOBMolToSDF(poltype,mol,outputname):
     tmpconv = openbabel.OBConversion()
