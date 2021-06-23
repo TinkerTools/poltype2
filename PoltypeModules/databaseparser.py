@@ -1795,12 +1795,14 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                 check=True 
         if check==False:
             if ringbond==True:
+                
                 if (2 not in ringhybs): # non-aromatic torsion want parameters for 
                     if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
                         continue
                     else: # if dont have heavy atoms on either side then just fit the hydrogen torsion
                         if torsionindices not in torsionsmissing and poltype.dontfrag==False: # make sure fragmenter is on (wont work for < 25 atoms by default)
                             torsionsmissing.append(torsionindices)
+                            print('in here')
                 elif hybs[1]==2 and hybs[2]==2:
                     if torsionindices not in poormatchingaromatictorsions:
                         poormatchingaromatictorsions.append(torsionindices)
@@ -1820,7 +1822,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                     continue
 
         else:
-            if poltype.rotalltors==True:
+            if poltype.rotalltors==True and ringbond==False:
                 if torsionindices not in torsionsmissing:
                     torsionsmissing.append(torsionindices)
     return torsionsmissing,poormatchingaromatictorsions,poormatchingpartialaromatictorsions 
@@ -4063,9 +4065,10 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
 
     totalbondscollector=FindAllConsecutiveRotatableBonds(poltype,mol,listofbondsforprm)
     tortorsmissing=FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertoparameters,rdkitmol,mol,indextoneighbidxs,totalbondscollector)
+    
     torsionindicestosmartsatomorders=AddDictionaryItems(poltype,torsionindicestosmartsatomorders,torsionindicestoextsmartsatomorders)
-
     torsionsmissing,poormatchingaromatictorsions,poormatchingpartialaromatictorsions=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
+    
     torsionsmissing=FindAdjacentMissingTorsionsForTorTor(poltype,torsionsmissing,totalbondscollector,tortorsmissing)
     atomindextosmartsatomorder=AddExternalDatabaseMatches(poltype, atomindextosmartsatomorder,vdwindicestoextsmarts,vdwsmartsatomordertoparameters)
     vdwmissing=FindMissingParameters(poltype,atomindextosmartsatomorder,rdkitmol,mol,indextoneighbidxs)
