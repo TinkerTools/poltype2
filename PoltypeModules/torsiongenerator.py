@@ -425,9 +425,13 @@ def CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle):
     for indices,phase in torsiontophaseangle.items():
         a,b,c,d=indices[:]
         ang = inimol.GetTorsion(a,b,c,d)
+        phase=phase % 360
         if ang<0:
             ang=ang+360
-        if numpy.abs(ang-phase)>tol:
+        ang=ang % 360
+        reducedangle=360-ang
+        
+        if numpy.abs(ang-phase)>tol and numpy.abs(reducedangle-phase)>tol:
             raise ValueError('Torsion did not reach target dihedral! '+str(indices)+' '+str(phase)+' is actually at angle '+str(ang)+', filename='+cartxyz)
 
 
