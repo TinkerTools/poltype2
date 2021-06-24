@@ -16,7 +16,7 @@ from rdkit import Chem
 
 def GeometryOPTWrapper(poltype,mol):
     try:
-        optmol,error = GeometryOptimization(poltype,mol)
+        optmol,error,torsionrestraints = GeometryOptimization(poltype,mol)
     except:
         redo=False
         if poltype.fullopt==True:
@@ -40,7 +40,7 @@ def GeometryOPTWrapper(poltype,mol):
             traceback.print_exc(file=sys.stdout)
             sys.exit()
 
-    return optmol,error
+    return optmol,error,torsionrestraints
  
 
 
@@ -523,20 +523,30 @@ def CheckRMSD(poltype):
                     RMSD+=e
     if RMSD!=None:   
         if float(RMSD)>poltype.maxRMSD:
-            poltype.WriteToLog('Warning: RMSD of QM and MM optimized structures is high, RMSD = '+ RMSD+' Tolerance is '+str(poltype.maxRMSD)+' kcal/mol ')
+            poltype.WriteToLog('Warning: RMSD of QM and MM optimized structures is high, RMSD = '+ RMSD+' Tolerance is '+str(poltype.maxRMSD))
 
             raise ValueError(os.getcwd()+' '+'RMSD of QM and MM optimized structures is high, RMSD = '+str(RMSD))
+        else:
+            poltype.WriteToLog('RMSD = '+ RMSD+' Tolerance is '+str(poltype.maxRMSD))
 
-def StructureMinimization(poltype):
+def StructureMinimization(poltype,torsionrestraints):
     poltype.WriteToLog("")
     poltype.WriteToLog("=========================================================")
     poltype.WriteToLog("Minimizing structure\n")
-
+    AddTorsionRestraints(poltype,poltype.key5fname,torsionrestraints)
     shutil.copy(poltype.xyzoutfile,poltype.tmpxyzfile)
     shutil.copy(poltype.key5fname,poltype.tmpkeyfile)
     cmd = poltype.minimizeexe+' -k '+poltype.tmpkeyfile+' '+poltype.tmpxyzfile+' 0.1 > Minimized_final.out'
     poltype.call_subsystem(cmd, True)
+    torgen.RemoveStringFromKeyfile(poltype,poltype.key5fname,'restrain-torsion')
 
+
+def AddTorsionRestraints(poltype,keyname,torsionrestraints):
+    tmpfh=open(keyname,'a')
+    for res in torsionrestraints:
+        a,b,c,d=res[:]
+        tmpfh.write('restrain-torsion %d %d %d %d %f\n' % (a,b,c,d,poltype.torsionrestraint))
+    tmpfh.close()
 
 def FindTorsionRestraints(poltype,mol):
     torsionrestraints=[]
@@ -655,7 +665,7 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,bondanglerestra
         optmol=rebuild_bonds(poltype,optmol,mol)
 
     GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'),mol)
-    return optmol,error
+    return optmol,error,torsionrestraints
 
 
 def load_structfile(poltype,structfname):

@@ -226,6 +226,9 @@ def CheckRMSPD(poltype):
                 poltype.WriteToLog('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
             
                 raise ValueError(os.getcwd()+' '+'Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
+            else:
+                poltype.WriteToLog('RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
+
     return rmspdexists
 
 def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
@@ -484,9 +487,6 @@ def SPForESP(poltype,optmol,mol):
 
 
 def GrabQMDipoles(poltype,optmol,logname):
-    poltype.WriteToLog("")
-    poltype.WriteToLog("=========================================================")
-    poltype.WriteToLog("QM Dipole moment\n")
     if poltype.use_gaus==False or poltype.use_gausoptonly==True:
         temp=open(logname,'r')
         results=temp.readlines()
@@ -517,10 +517,6 @@ def CheckDipoleMoments(poltype,optmol):
     logname=poltype.logespfname
     dipole=GrabQMDipoles(poltype,optmol,logname)
     qmdipole=round(np.linalg.norm(dipole),3)
-    poltype.WriteToLog('QM Dipole moment = '+str(qmdipole))    
-    poltype.WriteToLog("")
-    poltype.WriteToLog("=========================================================")
-    poltype.WriteToLog("MM Dipole moment\n")
     while not os.path.exists(poltype.tmpkeyfile):
         time.sleep(1)
     torgen.RemoveStringFromKeyfile(poltype,poltype.tmpkeyfile,'solvate')
@@ -535,15 +531,19 @@ def CheckDipoleMoments(poltype,optmol):
         if 'Dipole Moment' in line:
             linesplit=line.split()
             mmdipole=float(linesplit[-2])
-            poltype.WriteToLog('MM Dipole moment = '+str(mmdipole))
             diff=qmdipole-mmdipole
             if qmdipole!=0:
-                if np.abs(diff)>poltype.absdipoletol:
-                    if qmdipole!=0:
-                        ratio=np.abs(diff/qmdipole)
-                        if ratio>poltype.dipoletol and poltype.suppressdipoleerr==False:
-                            string='Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)+' '+os.getcwd()
-                            raise ValueError(string)
+                ratio=np.abs(diff/qmdipole)
+            else:
+                ratio=0
+
+            if ratio>poltype.dipoletol and poltype.suppressdipoleerr==False and np.abs(diff)>poltype.absdipoletol:
+                string='Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)+' '+os.getcwd()
+                raise ValueError(string)
+            else:
+                 string='Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+' tolerance = '+str(poltype.dipoletol)+' '+os.getcwd()
+                 poltype.WriteToLog(string)
+
 
 def ConvertDipoleToCOMFrame(poltype,dipole,optmol):
     nucsum = 0.0
