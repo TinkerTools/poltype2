@@ -569,6 +569,7 @@ def FindTorsionRestraints(poltype,mol):
             ringbond=b.IsInRing()
             if ringbond==True:
                 continue
+             
             t2idx=t2.GetIdx()
             t3idx=t3.GetIdx()
             t2 = b.GetBeginAtom()
@@ -579,9 +580,9 @@ def FindTorsionRestraints(poltype,mol):
             babelfirst=[t2idx,t3idx]
             if (babelfirst in poltype.partialdoublebonds or babelfirst[::-1] in poltype.partialdoublebonds):
                 continue
-                t1idx=t1.GetIdx()
-                t4idx=t4.GetIdx()
-                torsionrestraints.append([t1idx,t2idx,t3idx,t4idx])
+            t1idx=t1.GetIdx()
+            t4idx=t4.GetIdx()
+            torsionrestraints.append([t1idx,t2idx,t3idx,t4idx])
 
 
     return torsionrestraints
@@ -593,7 +594,6 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,bondanglerestra
         torsionrestraints=[]
     else: # see if need to restrain torsion in extended conformation
         torsionrestraints=FindTorsionRestraints(poltype,mol)
-
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt
         term,error=poltype.CheckNormalTermination(poltype.logoptfname,errormessages=None,skiperrors=True)
         if not term or overridecheckterm==True:
