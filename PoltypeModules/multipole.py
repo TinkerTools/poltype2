@@ -129,6 +129,7 @@ def prepend_keyfile(poltype,keyfilename,optmol,dipole=False):
     tmpfh.write("torsionterm none\n")
     tmpfh.write("vdwterm none\n")
     tmpfh.write("fix-monopole\n")
+    tmpfh.write("digits 8\n")
     tmpfh.write("potential-offset 1.0\n\n")
     logname=poltype.logespfname
     if poltype.fitqmdipole==True and os.path.exists(logname):

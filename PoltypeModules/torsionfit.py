@@ -820,7 +820,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
 
             else:
                 errfunc = lambda p, x, z, torprmdict, y: fitfunc(poltype,p, x,z, torprmdict) - y
-            array=optimize.least_squares(errfunc, pzero,jac='2-point', bounds=boundstup, diff_step=1e-4,args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
+            array=optimize.least_squares(errfunc, pzero,jac='2-point', bounds=boundstup,args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
 
             
             p1=array['x']

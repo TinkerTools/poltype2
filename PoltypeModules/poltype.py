@@ -1744,7 +1744,6 @@ class PolarizableTyper():
         
         if self.isfragjob==False and self.dontdotor==False:
             self.CheckTorsionParameters(self.key5fname,torsionsmissing,hydtorsions)
-
         self.WriteOutLiteratureReferences(self.key5fname) 
         # A series of tests are done so you one can see whether or not the parameterization values
         # found are acceptable and to what degree
@@ -1758,6 +1757,7 @@ class PolarizableTyper():
         if self.atomnum!=1: 
              esp.CheckDipoleMoments(self,optmol)
         self.WriteToLog('Poltype Job Finished'+'\n')
+        
         if os.path.exists(self.scrtmpdirgau):
             shutil.rmtree(self.scrtmpdirgau)
         if os.path.exists(self.scrtmpdirpsi4):
@@ -1781,6 +1781,8 @@ class PolarizableTyper():
         text = msg.as_string()
         s.sendmail(fromaddr, [toaddr],text)
         s.quit()
+
+  
 
 if __name__ == '__main__':
     poltype=PolarizableTyper() 
