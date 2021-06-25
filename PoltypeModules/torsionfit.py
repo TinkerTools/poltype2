@@ -97,13 +97,15 @@ def fitfunc (poltype,parms, x,torset, torprmdict,keyonlylist=None,nfoldonlylist=
                         # current parameter for this 'fold'
                         prm = torprm['prmdict'][nfold]
                         # not called by 'eval'
+                        evaluate=True
                         if parms is not 'eval':
                             # get prm from parms array
                             prm = parms[torprm['prmdict'][nfold]]
-                        if 'firstphaseprmindex' in torprm.keys() and nfold==1 and parms!='eval':
+                            evaluate=False
+                        if 'firstphaseprmindex' in torprm.keys() and nfold==1 and evaluate==False:
                             prmindex=torprm['firstphaseprmindex']
                             offset=parms[prmindex]
-                        elif 'firstphaseprmindex' in torprm.keys() and nfold==1 and parms=='eval':
+                        elif 'firstphaseprmindex' in torprm.keys() and nfold==1 and evaluate==True:
                             offset=torprm['firstphaseprmindex']
                         else:
                             offset=poltype.foldoffsetlist[nfold-1]
@@ -529,7 +531,7 @@ def insert_torphasedict (poltype,mol, toraboutbnd, torprmdict, initangle,write_p
         else: 
             write_prm_dict[tpdkey] = {1:0., 2:0., 3:0.}
 
-def insert_torprmdict(poltype,mol, torprmdict):
+def insert_torprmdict(poltype,mol, torprmdict,max_amp):
     """
     Intent: Initialize the prmdicts in torprmdict 
     Give each torsion intially 3 folds
@@ -583,7 +585,7 @@ def insert_torprmdict(poltype,mol, torprmdict):
                         prms=poltype.classkeytoinitialprmguess[chkclskey]
                         initialprms.append(prms[nfold-1])
                     else: 
-                        initialprms.append(0)
+                        initialprms.append(max_amp)
 
         if not torprmdict[chkclskey]['prmdict']:
             torprmdict[chkclskey]['count'] = 0
@@ -611,7 +613,7 @@ def GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict):
                 allzero=False
         if 'firstphaseprmindex' in torprmdict[chkclskey].keys():
             lowerbounds.append(0)
-            upperbounds.append(2*numpy.pi)
+            upperbounds.append(360)
 
         for prmidx in range(len(prms)):
             prm=prms[prmidx]
@@ -793,7 +795,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         max_amp = max(tor_energy_list) - min(tor_energy_list)
         amplist=[20,max_amp]
         max_amp=min(amplist)
-        prmidx,initialprms = insert_torprmdict(poltype,mol, torprmdict)
+        prmidx,initialprms = insert_torprmdict(poltype,mol, torprmdict,max_amp)
 
         pzero = initialprms
         boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
@@ -802,8 +804,6 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         bypassrmsd=False
         maxiter=5
         count=0
-        print('angle_list',angle_list,len(angle_list))
-        print('tor_energy_list',tor_energy_list,len(tor_energy_list))
         while not parm_sanitized:
             if count>=maxiter:
                 break
@@ -820,7 +820,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
 
             else:
                 errfunc = lambda p, x, z, torprmdict, y: fitfunc(poltype,p, x,z, torprmdict) - y
-            array=optimize.least_squares(errfunc, pzero,jac='2-point', bounds=boundstup, args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
+            array=optimize.least_squares(errfunc, pzero,jac='2-point', bounds=boundstup, diff_step=1e-4,args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
 
             
             p1=array['x']
@@ -965,7 +965,6 @@ def FillInDictionariesParameterEstimates(poltype,torprmdict,p1,write_prm_dict):
         if 'firstphaseprmindex' in torprmdict[chkclskey].keys():
             prmindex=torprmdict[chkclskey]['firstphaseprmindex']
             prm=p1[prmindex]
-            prm=prm*57.2958 # convert radians to degrees
             phaselist=classkeytofoldtophase[chkclskey] 
             phaselist[0]=prm   
             classkeytofoldtophase[chkclskey]=phaselist
