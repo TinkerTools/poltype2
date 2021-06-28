@@ -1353,7 +1353,7 @@ class PolarizableTyper():
                 fsplit=f.split('.')
                 if len(fsplit)>1:
                     end=fsplit[1]
-                    if 'log' not in end and 'sdf' not in end and 'ini' not in end: 
+                    if 'log' not in end and 'sdf' not in end and 'ini' not in end and 'chk' not in end: 
                         deletearray.append(f)
         for f in deletearray:
             os.remove(f)
