@@ -401,7 +401,6 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
                     if (resa,resb,resc,resd) not in torset and (resd,resc,resb,resa) not in torset and (resa,resb,resc,resd) not in variabletorlist and (resd,resc,resb,resa) not in variabletorlist:
                         if (b==resb and c==resc) or (b==resc and c==resb):
                             secondang = optmol.GetTorsion(resa,resb,resc,resd)
-                            torsiontophaseangle[tuple([resa,resb,resc,resd])]=round((secondang+phaseangle)%360)
                             tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (resa,resb,resc,resd,torsionrestraint,round((secondang+phaseangle)%360),round((secondang+phaseangle)%360)))
                         else:
                             tmpkeyfh.write('restrain-torsion %d %d %d %d %f\n' % (resa,resb,resc,resd,torsionrestraint))
@@ -421,7 +420,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
 
 def CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle):
     inimol = opt.load_structfile(poltype,cartxyz)
-    tol=2
+    tol=2.4
     for indices,phase in torsiontophaseangle.items():
         a,b,c,d=indices[:]
         ang = inimol.GetTorsion(a,b,c,d)
