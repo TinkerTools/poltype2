@@ -1791,6 +1791,10 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             ringtorindices=GrabIndicesInRing(poltype,babelindices,ring)
             ringtoratoms=[mol.GetAtom(a) for a in ringtorindices]
             ringhybs=[a.GetHyb() for a in ringtoratoms]
+            if 2 in ringhybs: # then stiff ring and just transfer
+                check=True
+            if len(ringtorindices)!=4: # then one of torsion atoms outside of ring, these torsion fragments are only for torsion on non-aromatic ring
+                check=True
             if len(ring)==4: # non-aromatic ring of 4, just skip torsion (transfer), otherwise would have to add more complicated rules for fragmenter on rings and keep all atoms but cut one of the bonds
                 check=True 
         if check==False:
@@ -1802,7 +1806,6 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                     else: # if dont have heavy atoms on either side then just fit the hydrogen torsion
                         if torsionindices not in torsionsmissing and poltype.dontfrag==False: # make sure fragmenter is on (wont work for < 25 atoms by default)
                             torsionsmissing.append(torsionindices)
-                            print('in here')
                 elif hybs[1]==2 and hybs[2]==2:
                     if torsionindices not in poormatchingaromatictorsions:
                         poormatchingaromatictorsions.append(torsionindices)

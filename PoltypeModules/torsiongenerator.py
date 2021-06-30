@@ -420,7 +420,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
 
 def CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle):
     inimol = opt.load_structfile(poltype,cartxyz)
-    tol=2.4
+    tol=3.4
     for indices,phase in torsiontophaseangle.items():
         a,b,c,d=indices[:]
         ang = inimol.GetTorsion(a,b,c,d)
