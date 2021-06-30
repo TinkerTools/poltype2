@@ -559,33 +559,16 @@ def insert_torprmdict(poltype,mol, torprmdict,max_amp):
             # init array
             test_tor_energy = numpy.zeros(len(tmpx))
             # for each dihedral angle about this rotatable bond and the number of time it occurs 
-            # sum up test_tor_energy
-            for (angle, scale) in torprm['phasedict'].items():
-                # create a test energy list (0 - 360, 10) starting from this angle
-                test_tor_energy += tor_func_term(poltype,1.0, tmpx, nfold, scale, torgen.rads(poltype,angle),torgen.rads(poltype,poltype.foldoffsetlist[nfold-1]))
 
-                # check if another torsion has a similar profile 
-                basetorkeys=None
             # normalize
-            test_tor_energy -= min(test_tor_energy)
-             
             if torprm['phasedict']:
-                if basetorkeys is not None:
-                    # if the energy profile for this torsion/fold is not so dissimilar from
-                    # another torsion/fold, then take its parameter 
-                    # in this case, prmidx is not increased by one
-                    torprmdict[chkclskey]['prmdict'][nfold] = torprmdict[basetorkeys]['prmdict'][nfold]
-
-
-                # will come here first
-                elif max(test_tor_energy) > 1e-10:
-                    prmidx += 1
-                    torprm['prmdict'][nfold] = prmidx
-                    if chkclskey in poltype.classkeytoinitialprmguess.keys():
-                        prms=poltype.classkeytoinitialprmguess[chkclskey]
-                        initialprms.append(prms[nfold-1])
-                    else: 
-                        initialprms.append(max_amp)
+                prmidx += 1
+                torprm['prmdict'][nfold] = prmidx
+                if chkclskey in poltype.classkeytoinitialprmguess.keys():
+                    prms=poltype.classkeytoinitialprmguess[chkclskey]
+                    initialprms.append(prms[nfold-1])
+                else: 
+                    initialprms.append(max_amp)
 
         if not torprmdict[chkclskey]['prmdict']:
             torprmdict[chkclskey]['count'] = 0
@@ -796,7 +779,6 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         amplist=[20,max_amp]
         max_amp=min(amplist)
         prmidx,initialprms = insert_torprmdict(poltype,mol, torprmdict,max_amp)
-
         pzero = initialprms
         boundstup=GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict)
         # run leastsq until all the parameter estimates are reasonable
@@ -832,8 +814,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
 
         torprmdict,write_prm_dict,classkeytofoldtophase=FillInDictionariesParameterEstimates(poltype,torprmdict,p1,write_prm_dict)
         torsettobypassrmsd[torset]=bypassrmsd
+
         GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_dict,torprmdict,mm_energy_list,tor_energy_list,flatphaselist,qm_energy_list,tup,indicesremoved,cls_angle_dict_unmodified,qm_energy_list_unmodified,mm_energy_list_unmodified)
-        
     return write_prm_dict,fitfunc_dict,torsettobypassrmsd,classkeytofoldtophase
 
 

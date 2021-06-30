@@ -420,7 +420,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
 
 def CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle):
     inimol = opt.load_structfile(poltype,cartxyz)
-    tol=3.4
+    tol=3.5
     for indices,phase in torsiontophaseangle.items():
         a,b,c,d=indices[:]
         ang = inimol.GetTorsion(a,b,c,d)
@@ -873,7 +873,6 @@ def get_torlist(poltype,mol,missed_torsions):
         indices=[a.GetIdx() for a in babelatoms]
         aromatics=[i.IsAromatic() for i in babelatoms]
         hybs=[i.GetHyb() for i in babelatoms]
-
         if ringbond==True:
             atomindices=databaseparser.RingAtomicIndices(poltype,mol)
             ring=databaseparser.GrabRingAtomIndicesFromInputIndex(poltype,t2idx,atomindices)
