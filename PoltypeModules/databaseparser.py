@@ -1710,21 +1710,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         atomicnumatoma=atoma.GetAtomicNum()
         atomicnumatomd=atomd.GetAtomicNum()
         abidx,bbidx,cbidx,dbidx=babelindices[:]
-        if len(poltype.onlyrotbndslist)!=0:
-            if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
-                if atomicnumatoma==1 or atomicnumatomd==1:
-                    if allhydrogentor==False and allhydrogentoroneside==False: # try to transfer H even if bad match in this case
-                       continue
-                    else:
-                        if torsionindices not in torsionsmissing:
-                            torsionsmissing.append(torsionindices)
-                            continue
-                else:
-                    if torsionindices not in torsionsmissing:
-                        torsionsmissing.append(torsionindices)
-                        continue
-            else:
-                continue
+        
         bond=mol.GetBond(bbidx,cbidx)
         bondorder=bond.GetBondOrder()
         babelatoms=[mol.GetAtom(i) for i in babelindices]
@@ -1782,6 +1768,22 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         check=CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,matcharray)
         if '~' in smarts or '*' in smarts:
             check=False
+
+        if len(poltype.onlyrotbndslist)!=0:
+            if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
+                if atomicnumatoma==1 or atomicnumatomd==1:
+                    if allhydrogentor==False and allhydrogentoroneside==False and check==True: # try to transfer H even if bad match in this case
+                       continue
+                    else:
+                        if torsionindices not in torsionsmissing:
+                            torsionsmissing.append(torsionindices)
+                            continue
+                else:
+                    if torsionindices not in torsionsmissing:
+                        torsionsmissing.append(torsionindices)
+                        continue
+            else:
+                continue
         if ringbond==True:
             atomindices=RingAtomicIndices(poltype,mol)
             ring=GrabRingAtomIndicesFromInputIndex(poltype,babelindices[1],atomindices)
