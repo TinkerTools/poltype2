@@ -1201,10 +1201,6 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         smartsls=atomindicesforprmtosmarts[atomindices]
         smarts=smartsls[0]
         smartsfortransfer=smartsls[1]
-        #print('smarts',smarts)
-        #print('smartsfortransfer',smartsfortransfer)
-        #print('atomindices',atomindices)
-        #print('parametersmarts',parametersmarts)
         substructure = Chem.MolFromSmarts(smarts)
         matches=list(rdkitmol.GetSubstructMatches(substructure,maxMatches=1000))
         sp=openbabel.OBSmartsPattern()
@@ -1224,7 +1220,6 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
             if validmatch==True:
                indices=list(range(len(match)))
                smartsindextomoleculeindex=dict(zip(indices,match)) 
-               #print('smartsindextomoleculeindex',smartsindextomoleculeindex)
                moleculeindextosmartsindex={v: k for k, v in smartsindextomoleculeindex.items()}
             
         structure = Chem.MolFromSmarts(parametersmarts)
@@ -1238,7 +1233,6 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         obConversion.SetInFormat(inFormat)
         obConversion.ReadFile(fragbabelmol, fragmentfilepath)
         fragidxtosymclass,symmetryclass=symm.gen_canonicallabels(poltype,fragbabelmol)
-        #print('moleculeindextosmartsindex',moleculeindextosmartsindex) 
         smartindices=[moleculeindextosmartsindex[i] for i in atomindices]
         substructure = Chem.MolFromSmarts(smartsfortransfer)
         matches=structure.GetSubstructMatches(substructure)
@@ -1366,7 +1360,7 @@ def FilterList(poltype,allitems,listbabel):
             newallitems.append(ls)
     return newallitems
 
-def AddOptimizedBondLengths(poltype,mol,bondprms,bondlistbabel):
+def AddOptimizedBondLengths(poltype,optmol,bondprms,bondlistbabel):
     newbondprms=[]
     for line in bondprms:
         linesplit=line.split()
@@ -1382,7 +1376,7 @@ def AddOptimizedBondLengths(poltype,mol,bondprms,bondlistbabel):
 
         for bond in allbonds:
             try:
-                blen = mol.GetBond(bond[0],bond[1]).GetLength()
+                blen = optmol.GetBond(bond[0],bond[1]).GetLength()
                 tot+=blen
             except:
                 pass
@@ -1397,7 +1391,7 @@ def AddOptimizedBondLengths(poltype,mol,bondprms,bondlistbabel):
     return newbondprms
       
 
-def AddOptimizedAngleLengths(poltype,mol,angleprms,anglelistbabel):
+def AddOptimizedAngleLengths(poltype,optmol,angleprms,anglelistbabel):
     newangleprms=[]
     for line in angleprms:
         linesplit=line.split()
@@ -1412,10 +1406,10 @@ def AddOptimizedAngleLengths(poltype,mol,angleprms,anglelistbabel):
 
         tot=0
         for angle in allangles:
-            a = mol.GetAtom(angle[0])
-            b = mol.GetAtom(angle[1])
-            c = mol.GetAtom(angle[2])
-            anglelen = mol.GetAngle(a,b,c)
+            a = optmol.GetAtom(angle[0])
+            b = optmol.GetAtom(angle[1])
+            c = optmol.GetAtom(angle[2])
+            anglelen = optmol.GetAngle(a,b,c)
             tot+=anglelen
         if len(allangles)==0:
             pass
@@ -2226,7 +2220,7 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
             d=int(linesplit[4])
             ls=[a,b,c,d]
             if ls in torsionsmissing or ls[::-1] in torsionsmissing:
-                extraline+='Missing torsion parameters, will attempt to fit parameters'
+                extraline+='# Missing torsion parameters, will attempt to fit parameters'
 
         extraline+='\n'
         transferinfoline+=extraline
@@ -2811,55 +2805,11 @@ def ReduceMissingVdwByTypes(poltype,vdwmissing):
 
 
 
-def ConvertToBabelList(poltype,listforprm,indicestoclasses,mol,prms,indicestoelementtinkerdescrips,newindicestopoltypeclasses,newpoltypeclassestosmartslist):
+def ConvertToBabelList(poltype,listforprm):
     babellist=[]
-    angletol=1
-    bondtol=2
     for ls in listforprm:
         babells=[i+1 for i in ls]
-        if len(babells)==2:  
-            qmlen = mol.GetBond(babells[0],babells[1]).GetLength()
-            tol=bondtol
-        elif len(babells)==3:   
-            babelatoms=[mol.GetAtom(i) for i in babells]
-            qmlen = mol.GetAngle(babelatoms[0],babelatoms[1],babelatoms[2])
-            tol=angletol
-        truetypes=[poltype.idxtosymclass[i] for i in babells]
-        for line in prms:
-            linesplit=line.split()
-            if len(babells)==2:
-                types=[int(linesplit[1]),int(linesplit[2])]
-            elif len(babells)==3:
-                types=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3])]
-            if types==truetypes or types[::-1]==truetypes:
-                trueline=line
-                break
-        truelinesplit=trueline.split()
-        transferlen=float(truelinesplit[-1])
-        diff=np.abs(qmlen-transferlen)
-        rel=(diff/qmlen)*100
-
-        if rel>=tol:
-            rdkitindices=tuple([i-1 for i in babells])
-            if rdkitindices in newindicestopoltypeclasses.keys():
-                polclasses=tuple([tuple(newindicestopoltypeclasses[rdkitindices])])
-                string=str(newpoltypeclassestosmartslist[polclasses])
-            elif rdkitindices[::-1] in newindicestopoltypeclasses.keys():
-                polclasses=tuple([tuple(newindicestopoltypeclasses[rdkitindices[::-1]])])
-
-                string=str(newpoltypeclassestosmartslist[polclasses])
-
-            else:
-                if rdkitindices in indicestoelementtinkerdescrips.keys():
-                    string=str(indicestoelementtinkerdescrips[rdkitindices])
-                else:
-                    string=str(indicestoelementtinkerdescrips[rdkitindices[::-1]])
-
-            finalstring='Parameter transferred equilibrium value is too far from QM structure value , transferred parameters ='+trueline+' QM value = '+str(qmlen)+', parameters are transferred from '+string+'. Will use QM value.'
-            warnings.warn(finalstring)
-            poltype.WriteToLog(finalstring)
-            babellist.append(babells)
-
+        babellist.append(babells)
 
     return babellist
 
@@ -4035,9 +3985,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     anglesforprmtoparametersmarts,anglesforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,anglesforprmtosmartslist,parametersmartslist,mol)
     planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,planaranglesforprmtosmartslist,parametersmartslist,mol)
     torsionsforprmtoparametersmarts,torsionsforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,torsionsforprmtosmartslist,parametersmartslist,mol)
-    #print('torsionsforprmtoparametersmarts',torsionsforprmtoparametersmarts)
-    #print('torsionsforprmtosmarts',torsionsforprmtosmarts)
-    #print('torsionsforprmtosmartslist',torsionsforprmtosmartslist)
  
     atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,vdwindicestoextsmarts=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,vdwindicestoextsmartsmatchlength,atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,vdwindicestoextsmarts)
     bondsforprmtoparametersmarts,bondsforprmtosmarts,bondindicestoextsmarts=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,bondindicestoextsmartsmatchlength,bondsforprmtoparametersmarts,bondsforprmtosmarts,bondindicestoextsmarts)
@@ -4146,7 +4093,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     torsionprms=CorrectPitorEnergy(poltype,torsionprms,torsiontopitor)
     extramissingtorsion=RemoveHighEnergyHydrogenTorsionParameters(poltype,torsionprms,listoftorsionsforprm) # since we want to transfer only small energy barrier hydrogen torsion
     angleprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips=RemoveOldParametersKeepNewParameters(poltype,angleprms,newangleindicestopoltypeclasses,'angle',anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips)
-
     opbendprms,blankbondpoltypeclassestoparametersmartsatomorders,blankbondpoltypeclassestosmartsatomorders,blankbondpoltypeclassestoelementtinkerdescrips=RemoveOldParametersKeepNewParameters(poltype,opbendprms,newopbendindicestopoltypeclasses,'opbend',bondpoltypeclassestoparametersmartsatomorders,bondpoltypeclassestosmartsatomorders,bondpoltypeclassestoelementtinkerdescrips,removefromdic=False)
 
     opbendpoltypeclassestoparametersmartsatomorders=bondpoltypeclassestoparametersmartsatomorders.copy()
@@ -4162,7 +4108,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     vdwprms,vdwpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,vdwprms,vdwindicestoextsmarts,vdwsmartsatomordertoparameters,'vdw')
     tortorprms=[]
     tortorprms,tortorpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,tortorprms,tortorindicestoextsmarts,tortorsmartsatomordertoparameters,'tortors',tortorsmartsatomordertogrid)
-    
     anglemissingtinkerclassestopoltypeclasses=RemovePoltypeClassesFromNewMatches(poltype,anglemissingtinkerclassestopoltypeclasses,anglepoltypeclassestoparametersmartsatomorders)
     bondmissingtinkerclassestopoltypeclasses=RemovePoltypeClassesFromNewMatches(poltype,bondmissingtinkerclassestopoltypeclasses,bondpoltypeclassestoparametersmartsatomorders)
     missinganglepoltypeclasses=ExtractMissingPoltypeClasses(poltype,anglemissingtinkerclassestopoltypeclasses)
@@ -4175,11 +4120,10 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     strbndprms.extend(newstrbndprms)
     opbendprms.extend(newopbendprms)
     angleprms=ModifyAngleKeywords(poltype,angleprms,planarangletinkerclassestopoltypeclasses)
-    bondlistbabel=ConvertToBabelList(poltype,listofbondsforprm,bondindicestoclasses,optmol,bondprms,bondindicestoelementtinkerdescrips,newbondindicestopoltypeclasses,newbondpoltypeclassestosmartslist)
-    anglelistbabel=ConvertToBabelList(poltype,listofanglesforprm,angleindicestoclasses,optmol,angleprms,angleindicestoelementtinkerdescrips,newangleindicestopoltypeclasses,newanglepoltypeclassestosmartslist)
+    bondlistbabel=ConvertToBabelList(poltype,listofbondsforprm)
+    anglelistbabel=ConvertToBabelList(poltype,listofanglesforprm)
     bondprms=AddOptimizedBondLengths(poltype,optmol,bondprms,bondlistbabel)
     angleprms=AddOptimizedAngleLengths(poltype,optmol,angleprms,anglelistbabel)
-   
     torsionsmissingtinkerclassestopoltypeclasses=AddExtraMissingHydrogenTorsions(poltype,extramissingtorsion,torsionsmissingtinkerclassestopoltypeclasses)
     torsionsmissingtinkerclassestopoltypeclasses=MergeDictionaries(poltype,torsionszeroouttinkerclassestopoltypeclasses,torsionsmissingtinkerclassestopoltypeclasses)
     torsionprms=ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,torsionprms)
