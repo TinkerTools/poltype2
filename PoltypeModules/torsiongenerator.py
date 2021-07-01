@@ -152,6 +152,9 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
 
                 aatom=mol.GetAtom(a)
                 datom=mol.GetAtom(d)
+                batom=mol.GetAtom(b)
+                catom=mol.GetAtom(c)
+
                 aatomicnum=aatom.GetAtomicNum()
                 datomicnum=datom.GetAtomicNum()
                 if (aatomicnum==1 or datomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
@@ -160,6 +163,16 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                     if count>=1:
                         continue
                     count+=1
+
+                firstangle=mol.GetAngle(aatom,batom,catom)
+                secondangle=mol.GetAngle(batom,catom,datom)
+                if firstangle<0:
+                    firstangle=firstangle+360
+                if secondangle<0:
+                    secondangle=secondangle+360
+                angletol=2
+                if numpy.abs(180-firstangle)<=2 or numpy.abs(180-secondangle)<=2:
+                    continue
 
                 babelindices=[b,c]
                 string=' '.join([str(b),str(c)])
@@ -173,6 +186,9 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                         allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,mol)
                         aatom=mol.GetAtom(rta)
                         datom=mol.GetAtom(rtd)
+                        batom=mol.GetAtom(rtb)
+                        catom=mol.GetAtom(rtc)
+
                         rtaatomicnum=aatom.GetAtomicNum()
                         rtdatomicnum=datom.GetAtomicNum()
                         if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
@@ -183,6 +199,16 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                             if count>=1:
                                 continue
                             count+=1
+                        firstangle=mol.GetAngle(aatom,batom,catom)
+                        secondangle=mol.GetAngle(batom,catom,datom)
+                        if firstangle<0:
+                            firstangle=firstangle+360
+                        if secondangle<0:
+                            secondangle=secondangle+360
+                        angletol=2
+                        if numpy.abs(180-firstangle)<=2 or numpy.abs(180-secondangle)<=2:
+                            continue
+
 
                         rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
                         if resttors not in variabletorlist and resttors not in restlist:
@@ -360,6 +386,8 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
         allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,optmol)
 
         aatom=optmol.GetAtom(a)
+        batom=optmol.GetAtom(b)
+        catom=optmol.GetAtom(c)
         datom=optmol.GetAtom(d)
         aatomicnum=aatom.GetAtomicNum()
         datomicnum=datom.GetAtomicNum()
@@ -371,6 +399,16 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
             if count>=1:
                 continue
             count+=1
+        firstangle=optmol.GetAngle(aatom,batom,catom)
+        secondangle=optmol.GetAngle(batom,catom,datom)
+        if firstangle<0:
+            firstangle=firstangle+360
+        if secondangle<0:
+            secondangle=secondangle+360
+        angletol=2
+        if numpy.abs(180-firstangle)<=2 or numpy.abs(180-secondangle)<=2:
+            continue 
+
         torsiontophaseangle[tuple([a,b,c,d])]=round((torang+phaseangle)%360)
         tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (a,b,c,d,torsionrestraint,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
         for key in poltype.rotbndlist.keys():
@@ -385,6 +423,9 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
 
                 aatom=optmol.GetAtom(resa)
                 datom=optmol.GetAtom(resd)
+                batom=optmol.GetAtom(resb)
+                catom=optmol.GetAtom(resc)
+
                 aatomicnum=aatom.GetAtomicNum()
                 datomicnum=datom.GetAtomicNum()
                 if (aatomicnum==1 or datomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
@@ -396,6 +437,15 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
                         continue
                     count+=1
 
+                firstangle=optmol.GetAngle(aatom,batom,catom)
+                secondangle=optmol.GetAngle(batom,catom,datom)
+                if firstangle<0:
+                    firstangle=firstangle+360
+                if secondangle<0:
+                    secondangle=secondangle+360
+                angletol=2
+                if numpy.abs(180-firstangle)<=2 or numpy.abs(180-secondangle)<=2:
+                    continue 
 
                 if res not in restlist:
                     if (resa,resb,resc,resd) not in torset and (resd,resc,resb,resa) not in torset and (resa,resb,resc,resd) not in variabletorlist and (resd,resc,resb,resa) not in variabletorlist:
