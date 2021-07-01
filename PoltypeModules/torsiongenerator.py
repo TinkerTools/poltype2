@@ -978,7 +978,7 @@ def get_torlist(poltype,mol,missed_torsions):
                 b = t2.GetIdx()
                 c = t3.GetIdx()
                 d = iaa2.GetIdx()
-                if ((iaa.GetIdx() != t3.GetIdx() and iaa2.GetIdx() != t2.GetIdx()) and not (iaa.GetIdx() == t1.GetIdx() and iaa2.GetIdx() == t4.GetIdx())):
+                if ((iaa.GetIdx() != t3.GetIdx() and iaa2.GetIdx() != t2.GetIdx()) and not (iaa.GetIdx() == t1.GetIdx() and iaa2.GetIdx() == t4.GetIdx())) and iaa.GetIdx()!=iaa2.GetIdx(): # also include case for three atom ring
                     rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx()))
     return (torlist ,rotbndlist,hydtorsionlist,nonaroringtorlist)
 
@@ -1089,13 +1089,13 @@ def find_tor_restraint_idx(poltype,mol,b1,b2):
     del b1nbridx[b1nbridx.index(b2idx)]    # Remove b2 from list
     assert(b1nbridx is not [])
     minb1class = min(b1nbridx,key=lambda x: poltype.idxtosymclass[x])
-
     iteratomatom = openbabel.OBAtomAtomIter(b2)
     b2nbridx = list(map(lambda x: x.GetIdx(), iteratomatom))
     del b2nbridx[b2nbridx.index(b1idx)]    # Remove b1 from list
     assert(b2nbridx is not [])
+    if minb1class in b2nbridx:
+        b2nbridx.remove(minb1class)
     minb2class = min(b2nbridx, key= lambda x:poltype.idxtosymclass[x])
-
     t1 = mol.GetAtom(minb1class)
     t4 = mol.GetAtom(minb2class)
 
