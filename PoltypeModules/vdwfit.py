@@ -554,36 +554,17 @@ def ConvertProbeDimerXYZToTinkerXYZ(poltype,inputxyz,tttxyz,outputxyz,waterbool,
     outfile.close()
 
 
-def GrabMonomerEnergy(poltype,line):
-    linesplit=line.split()
-    energy=float(linesplit[4]) 
-    monomerenergy=(energy)*poltype.Hartree2kcal_mol
-    return monomerenergy
-
-
 
 def ReadCounterPoiseAndWriteQMData(poltype,logfilelist):
     temp=open('QM_DATA','w')
     for f in logfilelist:
         tmpfh=open(f,'r')
+        print('f',f)
         if poltype.use_gaus==True:
-            frag1calc=False
-            frag2calc=False
             for line in tmpfh:
-                if 'Counterpoise: corrected energy =' in line:
+                if 'Counterpoise: corrected energy =' in line or 'Counterpoise corrected energy' in line:
                     dimerenergy=float(line.split()[4])*poltype.Hartree2kcal_mol
-                elif 'Counterpoise: doing DCBS calculation for fragment   1' in line:
-                    frag1calc=True
-                    frag2calc=False
-                elif 'Counterpoise: doing DCBS calculation for fragment   2' in line:
-                    frag1calc=False
-                    frag2calc=True
-                elif 'SCF Done' in line:
-                    if frag1calc:
-                        frag1energy=GrabMonomerEnergy(poltype,line)
-                    elif frag2calc:
-                        frag2energy=GrabMonomerEnergy(poltype,line)
-            interenergy=dimerenergy-(frag1energy+frag2energy)
+            interenergy=dimerenergy
         else:
             for line in tmpfh:
                 if 'CP Energy =' in line and 'print' not in line:
