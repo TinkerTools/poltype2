@@ -1741,8 +1741,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         ringbools=[a.IsInRing() for a in babelatoms]
         arobools=[a.IsAromatic() for a in babelatoms]
         bnd=[babelindices[1],babelindices[2]]
-        if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False:
-            continue 
+         
         ringb=ringbools[1]
         ringc=ringbools[2]
         aroa=arobools[0]
@@ -1768,7 +1767,6 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         check=CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,matcharray)
         if '~' in smarts or '*' in smarts:
             check=False
-
         if len(poltype.onlyrotbndslist)!=0:
             if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
                 if atomicnumatoma==1 or atomicnumatomd==1:
@@ -1784,6 +1782,8 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                         continue
             else:
                 continue
+        if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False and ([bbidx,cbidx] not in poltype.onlyrotbndslist or [cbidx,bbidx] not in poltype.onlyrotbndslist):
+            continue
         if ringbond==True:
             atomindices=RingAtomicIndices(poltype,mol)
             ring=GrabRingAtomIndicesFromInputIndex(poltype,babelindices[1],atomindices)
