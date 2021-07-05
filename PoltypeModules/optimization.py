@@ -44,7 +44,7 @@ def GeometryOPTWrapper(poltype,mol):
  
 
 
-def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondanglerestraints,skipscferror,chg,torsionrestraints=[]):
+def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondanglerestraints,skipscferror,chg,loose,torsionrestraints=[]):
     tempread=open(comfilecoords,'r')
     results=tempread.readlines()
     tempread.close()
@@ -64,7 +64,8 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     temp.write('}'+'\n')
     if poltype.optpcm==True:
         temp.write('set {'+'\n')
-        temp.write('  g_convergence GAU_LOOSE'+'\n')
+        if loose==True:
+            temp.write('  g_convergence GAU_LOOSE'+'\n')
         temp.write('  scf_type pk'+'\n')
         temp.write('  pcm true'+'\n')
         temp.write('  pcm_scf_type total '+'\n')
@@ -87,7 +88,7 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     else:
         temp.write('set {'+'\n')
         temp.write('  geom_maxiter '+str(poltype.optmaxcycle)+'\n')
-        if len(torsionrestraints)==0:
+        if len(torsionrestraints)==0 and loose==True:
             temp.write('  g_convergence GAU_LOOSE'+'\n')
         temp.write('  dynamic_level 1'+'\n')
         temp.write('}'+'\n')
@@ -597,7 +598,7 @@ def FindTorsionRestraints(poltype,mol):
 
     return torsionrestraints
 
-def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,bondanglerestraints=None,skipscferror=False,charge=None,skiperrors=False,overridecheckterm=False): # specify charge instead of reading from mol if charge!=None
+def GeometryOptimization(poltype,mol,loose=False,checkbonds=True,modred=True,bondanglerestraints=None,skipscferror=False,charge=None,skiperrors=False,overridecheckterm=False): # specify charge instead of reading from mol if charge!=None
     poltype.WriteToLog("NEED QM Density Matrix: Executing Gaussian Opt and SP")
     if bondanglerestraints!=None: # then vdw opt
         pass
@@ -640,7 +641,7 @@ def GeometryOptimization(poltype,mol,checkbonds=True,modred=True,bondanglerestra
         term,error=poltype.CheckNormalTermination(poltype.logoptfname,errormessages=None,skiperrors=True)
         modred=False
 
-        inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol,modred,bondanglerestraints,skipscferror,charge,torsionrestraints)
+        inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol,modred,bondanglerestraints,skipscferror,charge,loose,torsionrestraints)
         if term==False or overridecheckterm==True:
             cmdstr='psi4 '+inputname+' '+poltype.logoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}

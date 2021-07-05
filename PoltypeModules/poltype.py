@@ -1539,7 +1539,7 @@ class PolarizableTyper():
                 if attempts>=maxiter or finished==True:
                     break
                 try:           
-                    optmol,error = opt.GeometryOptimization(self,inioptmol,checkbonds=True,modred=True,bondanglerestraints=None,skipscferror=False,charge=None,skiperrors=True,overridecheckterm=True)
+                    optmol,error = opt.GeometryOptimization(self,inioptmol,loose=False,checkbonds=True,modred=True,bondanglerestraints=None,skipscferror=False,charge=None,skiperrors=True,overridecheckterm=True)
                     finished,error=self.CheckNormalTermination(self.firstlogoptfname)
                     cartxyz=self.firstlogoptfname.replace('.log','.xyz')
                     opt.GrabFinalXYZStructure(self,self.firstlogoptfname,cartxyz,mol)
