@@ -66,6 +66,9 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
         temp.write('set {'+'\n')
         if loose==True:
             temp.write('  g_convergence GAU_LOOSE'+'\n')
+        else:
+            temp.write('  g_convergence GAU'+'\n')
+
         temp.write('  scf_type pk'+'\n')
         temp.write('  pcm true'+'\n')
         temp.write('  pcm_scf_type total '+'\n')
@@ -88,8 +91,11 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     else:
         temp.write('set {'+'\n')
         temp.write('  geom_maxiter '+str(poltype.optmaxcycle)+'\n')
-        if len(torsionrestraints)==0 and loose==True:
+        if loose==True:
             temp.write('  g_convergence GAU_LOOSE'+'\n')
+        else:
+            temp.write('  g_convergence GAU'+'\n')
+
         temp.write('  dynamic_level 1'+'\n')
         temp.write('}'+'\n')
 
