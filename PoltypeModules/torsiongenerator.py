@@ -1179,6 +1179,8 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
 
                 aatom=mol.GetAtom(rta)
                 datom=mol.GetAtom(rtd)
+                batom=mol.GetAtom(rtb)
+                catom=mol.GetAtom(rtc)
                 rtaatomicnum=aatom.GetAtomicNum()
                 rtdatomicnum=datom.GetAtomicNum()
                 if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
@@ -1189,7 +1191,16 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                     if count>=1:
                         continue
                     count+=1
-
+                firstangle=mol.GetAngle(aatom,batom,catom)
+                secondangle=mol.GetAngle(batom,catom,datom)
+                if firstangle<0:
+                    firstangle=firstangle+360
+                if secondangle<0:
+                    secondangle=secondangle+360
+                angletol=2
+                if numpy.abs(180-firstangle)<=2 or numpy.abs(180-secondangle)<=2:
+                    continue
+                print('rta',rta,'rtb',rtb,'rtc',rtc,'rtd',rtd,'firstangle',firstangle,'secondangle',secondangle,flush=True)
                 if resttors not in variabletorlist:
                     rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
                     if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
@@ -1212,6 +1223,9 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
 
             aatom=mol.GetAtom(rta)
             datom=mol.GetAtom(rtd)
+            batom=mol.GetAtom(rtb)
+            catom=mol.GetAtom(rtc)
+
             rtaatomicnum=aatom.GetAtomicNum()
             rtdatomicnum=datom.GetAtomicNum()
             if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
@@ -1222,6 +1236,15 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                 if count>=1:
                     continue
                 count+=1
+            firstangle=mol.GetAngle(aatom,batom,catom)
+            secondangle=mol.GetAngle(batom,catom,datom)
+            if firstangle<0:
+                firstangle=firstangle+360
+            if secondangle<0:
+                secondangle=secondangle+360
+            angletol=2
+            if numpy.abs(180-firstangle)<=2 or numpy.abs(180-secondangle)<=2:
+                continue
 
             rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
             if resttors not in restlist and resttors not in variabletorlist:
