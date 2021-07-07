@@ -457,10 +457,9 @@ def AllIntegers(poltype,testlist):
             allintegers=False
     return allintegers
 
+
 def FindEquivalentFragments(poltype,fragmentarray,namearray):
     equivalentnamesarray=[]
-    equivalentsmartsarray=[]
-
     equivalentnamesarrayset=[]
     smartsarray=[rdmolfiles.MolToSmarts(m) for m in fragmentarray]
     for smartidx in range(len(smartsarray)):
@@ -472,8 +471,6 @@ def FindEquivalentFragments(poltype,fragmentarray,namearray):
 
         nametemp=[]
         nametemp.append(refname)
-        smartstemp=[]
-        smartstemp.append(refsmarts)
         for anothersmartidx in range(len(smartsarray)):
             if anothersmartidx!=smartidx:
                 smarts=smartsarray[anothersmartidx]
@@ -482,21 +479,15 @@ def FindEquivalentFragments(poltype,fragmentarray,namearray):
                 smartsmol=Chem.MolFromSmarts(smarts)
                 smartsatoms=smartsmol.GetNumAtoms()
                 match = refsmartsmol.HasSubstructMatch(smartsmol)
-                if match==True and smartsatoms==refsmartsatoms:
+                if match==True and refsmartsatoms==smartsatoms:
                     nametemp.append(name)
-                    smartstemp.append(smarts)
         if set(nametemp) not in equivalentnamesarrayset:
             equivalentnamesarrayset.append(set(nametemp))
             equivalentnamesarray.append(set(nametemp))
-            equivalentsmartsarray.append(set(smartstemp))
     # need unique way to always order the same way so dont redo QM if list order is different
     newequivalentnamesarray=[]
-    newequivalentsmartsarray=[]
-    for arrayidx in range(len(equivalentnamesarray)):
-        array=equivalentnamesarray[arrayidx]
-        smartsarray=equivalentsmartsarray[arrayidx]
+    for array in equivalentnamesarray:
         Sumarray=[]
-        nametosmarts=dict(zip(array,smartsarray))  
         for name in array:
             namesplit=name.split('_')
             namesplit=[int(i) for i in namesplit]
@@ -504,15 +495,8 @@ def FindEquivalentFragments(poltype,fragmentarray,namearray):
             Sumarray.append(Sum)
         sortedarray=[x for _, x in sorted(zip(Sumarray,array), key=lambda pair: pair[0])] 
         newequivalentnamesarray.append(sortedarray) 
-        newarray=[]
-        for name in sortedarray:
-            smarts=nametosmarts[name]
-            newarray.append(smarts)
-
-        newequivalentsmartsarray.append(newarray)
-
-
     return newequivalentnamesarray
+
 
 def FindRotatableBond(poltype,fragmol,rotbndindextofragment,temp):
     for rotbndindex in rotbndindextofragment.keys():
