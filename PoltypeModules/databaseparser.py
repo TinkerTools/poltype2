@@ -1776,9 +1776,8 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                     if allhydrogentor==False and allhydrogentoroneside==False and check==True: # try to transfer H even if bad match in this case
                        continue
                     else:
-                        if torsionindices not in torsionsmissing:
-                            torsionsmissing.append(torsionindices)
-                            continue
+                        poormatchingpartialaromatictorsions.append(torsionindices)
+
                 else:
                     if torsionindices not in torsionsmissing:
                         torsionsmissing.append(torsionindices)
