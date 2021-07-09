@@ -1802,10 +1802,12 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             if ringbond==True:
                 if (2 not in ringhybs): # non-aromatic torsion want parameters for 
                     if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
-                        continue
+                        poormatchingpartialaromatictorsions.append(torsionindices)
+
                     else: # if dont have heavy atoms on either side then just fit the hydrogen torsion
                         if torsionindices not in torsionsmissing and poltype.dontfrag==False: # make sure fragmenter is on (wont work for < 25 atoms by default)
                             torsionsmissing.append(torsionindices)
+                        
                 elif hybs[1]==2 and hybs[2]==2:
                     if torsionindices not in poormatchingaromatictorsions:
                         poormatchingaromatictorsions.append(torsionindices)
