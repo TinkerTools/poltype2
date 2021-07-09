@@ -129,7 +129,7 @@ export GAUSS_SCRDIR=/scratch/your_username/
 export GDMADIR=/opt/gdma/gdma-2.3.3/bin/
 export PATH=/opt/gdma/gdma-2.3.3/bin/:$PATH
 export PSI_SCRATCH=/scratch/your_username/ 
-export PATH=/home/liuchw/Softwares/tinkers/Tinker-latest/source/:$PATH
+export PATH=/home/bdw2292/TheLatestTinker/bin/:$PATH
 # you may add alias for submitting - replace path_to_poltype
 #alias run_poltype="nohup python path_to_poltype/poltype.py &"
 ```

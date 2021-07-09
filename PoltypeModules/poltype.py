@@ -1446,7 +1446,8 @@ class PolarizableTyper():
         pcm=self.CheckForConcentratedFormalCharges(m,atomindextoformalcharge)
         cpm = copy.deepcopy(m)
         m.UpdatePropertyCache()
-        indextocoordinates=self.GenerateExtendedConformer(m,mol)
+        if self.firstoptfinished==False:
+            indextocoordinates=self.GenerateExtendedConformer(m,mol)
         Chem.GetSymmSSSR(m)
         m.GetRingInfo().NumRings() 
         m=self.AddInputCoordinatesAsDefaultConformer(m,indextocoordinates)
@@ -1560,7 +1561,6 @@ class PolarizableTyper():
         if self.use_gausgeomoptonly==True:
             self.use_gausoptonly=False
             self.use_gaus=False
-
 
         if not os.path.isfile(self.key4fname) or not os.path.isfile(self.torsionsmissingfilename) or not os.path.isfile(self.torsionprmguessfilename):
             bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,missingvdwatomindextoneighbors,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo,tortorsmissing=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)

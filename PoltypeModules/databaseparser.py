@@ -667,7 +667,6 @@ def GenerateSMARTSListFromAtomList(poltype,listforprm,rdkitmol,mol,maxatomsize):
         for atomindices in atomindiceslist:
             lengthstoatomindices[len(atomindices)]=atomindices
         atomindiceslist=list(lengthstoatomindices.values()) 
-
         if anyringatoms==True:
             ringsize=FindRingSize(poltype,mol,ringindices)
             if ringsize!=0:
@@ -1759,11 +1758,15 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         smarts=smartsenv[0]
         substructure = Chem.MolFromSmarts(smarts)
         matches=rdkitmol.GetSubstructMatches(substructure)
-        matcharray=[]
         for match in matches:
-            for idx in match:
-                if idx not in matcharray:
-                    matcharray.append(idx)
+            allin=True
+            for idx in torsionindices:
+                if idx not in match:
+                    allin=False
+            if allin==True:
+                matcharray=match
+                break
+
         check=CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,matcharray)
         if '~' in smarts or '*' in smarts:
             check=False
@@ -1798,7 +1801,6 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                 check=True 
         if check==False:
             if ringbond==True:
-                
                 if (2 not in ringhybs): # non-aromatic torsion want parameters for 
                     if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
                         continue
@@ -3922,7 +3924,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
         ctindicestopoltypeclasses,ctprms,ctpoltypecommentstocomments,ctpoltypecommentstosmartslist=GrabNewParameters(poltype,atomindicestocommentsct,atomcommentstoctparameters,'chgtrn',atomindicestosmartslistct,atomcommentstocommentnonbondedplus) 
         newvdwindicestopoltypeclasses,newvdwprms,newvdwpoltypecommentstocomments,newvdwpoltypecommentstosmartslist=GrabNewParameters(poltype,atomindicestocommentsvdw,atomcommentstovdwparameters,'vdw',atomindicestosmartslistvdw,atomcommentstocommentnonbondedplus) 
 
-
     smartstosoluteradiiprms=GrabSmartsToSoluteRadiiMap(poltype)   
     atomindextoallsmartssolute,atomindextoallsmartsmatchessolute=MatchAllSmartsToAtomIndices(poltype,smartstosoluteradiiprms)
     atomindices=list(atomindextoallsmartssolute.keys())
@@ -3940,7 +3941,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     commentlist=list(atomclasstoclassnamepolar.values())
     atomcommentstocomment=dict(zip(commentlist,commentlist))
     newpolarindicestopoltypeclasses,newpolarprms,newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist=GrabNewParameters(poltype,atomindicestocomments,atomcommentstoparameters,'polarize',atomindicestosmartslist,atomcommentstocomment) 
-
     smartstoatomclass, atomclasstoclassname, atomclasstocomment=ReadDatabaseSmartsMap(poltype,poltype.latestsmallmoleculesmartstotinkerclass) 
     atomindextoallsmarts,atomindextoallsmartsmatches=MatchAllSmartsToAtomIndices(poltype,smartstoatomclass)
     bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters,tortorsmartsatomordertoparameters,tortorsmartsatomordertogrid=ReadExternalDatabase(poltype)
@@ -3948,7 +3948,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     elementtinkerdescriptotinkertype,tinkertypetoclass=GrabTypeAndClassNumbers(poltype,poltype.smallmoleculeprmlib)
     planarbonds=GrabPlanarBonds(poltype,listofbondsforprm,mol)
     bondclassestolistofsmartslist,angleclassestolistofsmartslist,strbndclassestolistofsmartslist,opbendclassestolistofsmartslist,bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses=MapIndicesToClasses(poltype,atomindextoallsmarts,smartstoatomclass,listofbondsforprm,listofanglesforprm,planarbonds)
-
     bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses,bondclassestoparameters,angleclassestoparameters,strbndclassestoparameters,opbendclassestoparameters=SearchForParameters(poltype,bondclassestolistofsmartslist,angleclassestolistofsmartslist,strbndclassestolistofsmartslist,opbendclassestolistofsmartslist,bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses)
     bondindicestoclasses,bondindicestosmartslist=FindBestSMARTSMatch(poltype,bondindicestolistofbondclasses,bondclassestolistofsmartslist)
  
@@ -3958,7 +3957,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     opbendindicestoclasses,opbendindicestosmartslist=FindBestSMARTSMatch(poltype,opbendindicestolistofopbendclasses,opbendclassestolistofsmartslist)
     newangleindicestopoltypeclasses,newangleprms,newanglepoltypeclassestocomments,newanglepoltypeclassestosmartslist=GrabNewParameters(poltype,angleindicestoclasses,angleclassestoparameters,'angle',angleindicestosmartslist,atomclasstocomment) 
     newbondindicestopoltypeclasses,newbondprms,newbondpoltypeclassestocomments,newbondpoltypeclassestosmartslist=GrabNewParameters(poltype,bondindicestoclasses,bondclassestoparameters,'bond',bondindicestosmartslist,atomclasstocomment) 
-
     newstrbndindicestopoltypeclasses,newstrbndprms,newstrbndpoltypeclassestocomments,newstrbndpoltypeclassestosmartslist=GrabNewParameters(poltype,strbndindicestoclasses,strbndclassestoparameters,'strbnd',strbndindicestosmartslist,atomclasstocomment) 
     newopbendindicestopoltypeclasses,newopbendprms,newopbendpoltypeclassestocomments,newopbendpoltypeclassestosmartslist=GrabNewParameters(poltype,opbendindicestoclasses,opbendclassestoparameters,'opbend',opbendindicestosmartslist,atomclasstocomment) 
     listofanglesthatneedplanarkeyword=CheckForPlanerAngles(poltype,listofanglesforprm,mol)
@@ -3987,7 +3985,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     anglesforprmtoparametersmarts,anglesforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,anglesforprmtosmartslist,parametersmartslist,mol)
     planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,planaranglesforprmtosmartslist,parametersmartslist,mol)
     torsionsforprmtoparametersmarts,torsionsforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,torsionsforprmtosmartslist,parametersmartslist,mol)
- 
     atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,vdwindicestoextsmarts=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,vdwindicestoextsmartsmatchlength,atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,vdwindicestoextsmarts)
     bondsforprmtoparametersmarts,bondsforprmtosmarts,bondindicestoextsmarts=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,bondindicestoextsmartsmatchlength,bondsforprmtoparametersmarts,bondsforprmtosmarts,bondindicestoextsmarts)
 

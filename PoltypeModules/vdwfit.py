@@ -300,7 +300,7 @@ def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count,allprefix=False):
         prefstring=','.join(prefix)
         fig.savefig('QMvsAMOEBA-'+prefstring+'_'+vdwtypestring+suffix)
         prefix=prefstring
-    rmsetol=1.6
+    rmsetol=1.9
     relrmsetol=.2
     goodfit=True
     if new_rmse>rmsetol and new_rmse_rel>relrmsetol:

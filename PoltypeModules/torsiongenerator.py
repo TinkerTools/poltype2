@@ -1200,7 +1200,6 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                 angletol=2
                 if numpy.abs(180-firstangle)<=2 or numpy.abs(180-secondangle)<=2:
                     continue
-                print('rta',rta,'rtb',rtb,'rtc',rtc,'rtd',rtd,'firstangle',firstangle,'secondangle',secondangle,flush=True)
                 if resttors not in variabletorlist:
                     rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
                     if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
