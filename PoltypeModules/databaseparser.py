@@ -3350,8 +3350,10 @@ def GenerateSoluteParameters(poltype,atomindicestosmartslist,smartstosoluteradii
         poltypeclass=poltype.idxtosymclass[babelatomindex]
         prms=smartstosoluteradiiprms[smarts]
         prmsline=' '.join(prms)
-        line='SOLUTE'+' '+str(poltypeclass)+' '+smarts+' '+prmsline+'\n'
+        commentline='#SOLUTE-SMARTS'+' '+str(poltypeclass)+' '+smarts+'\n'
+        line='SOLUTE'+' '+str(poltypeclass)+' '+prmsline+'\n'
         if line not in soluteprms:
+            soluteprms.append(commentline)
             soluteprms.append(line)
 
     return soluteprms
