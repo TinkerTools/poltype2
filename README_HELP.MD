@@ -237,6 +237,9 @@ dontdovdwscan            specifies to not refine initial guess vdw parameters fr
                          Default=False
 
 onlyvdwatomindex         Only probe one vdw atom index on molecule.
+
+accuratevdwsp            Use CBS extraction on MP2 with counterpoise on basis sets aug-cc-pV[TQ]Z.
+                         Default=False
 ```
 
 ### Misc.

@@ -1584,8 +1584,13 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     os.chdir(vdwfoldername) 
     poltype.optmaxcycle=400
     poltype.optmethod='wB97X-D'
-    poltype.espmethod='wB97X-D'
-    poltype.espbasisset="aug-cc-pVDZ"
+    if poltype.accuratevdwsp==True and not ('I ' in poltype.mol.GetSpacedFormula()):
+        poltype.espmethod='MP2'
+        poltype.espbasisset="aug-cc-pV[TQ]Z"
+
+    else:
+        poltype.espmethod='wB97X-D'
+        poltype.espbasisset="aug-cc-pVDZ"
     tempuse_gaus=poltype.use_gaus
     tempuse_gausoptonly=poltype.use_gausoptonly
     if poltype.use_gau_vdw==True and poltype.foundgauss==True:
