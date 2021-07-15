@@ -105,10 +105,8 @@ The last thing done is to writing out in a list all missing torsions, vdw and to
 <ol>
              <li> If a-b-c-d all non-aromatic  </li>
 <ol>
-                  <li> If a or d is H and and there exist other a/d such that a,d is not H, then just transfer whatever matches for H torsion </li>
-<ol>
-                          <li> Exception when transferring high energy H torsion, then zero out and fit  </li>
-</ol>
+                  <li> If a or d is H and and there exist other a/d such that a,d is not H, then just transfer whatever matches for H torsion if its a good match, else transfer alkane parameter. </li>
+
                   <li> Else, chop ring and derive parameters  </li>
 </ol>
              <li> b-c aromatic (or b-c have hybridization of 2). Below, lowercase leter means aromatic atom or ring atom with hyb of 2. Letter x refers to non-hydrogen atom.  </li>
@@ -132,10 +130,7 @@ The last thing done is to writing out in a list all missing torsions, vdw and to
 </ol>
              <li> If NOT ring bond and missing torsion from database:   </li>
 <ol>
-                  <li> If a or d is H and and there exist other a/d such that a,d is not H, then just transfer whatever matches for H torsion </li>
-<ol>
-                          <li> Exception when transferring high energy H torsion, then zero out and fit  </li>
-</ol>
+                  <li> If a or d is H and and there exist other a/d such that a,d is not H, then just transfer whatever matches for H torsion if its a good match, else transfer alkane parameters. </li>
                   <li> Else, derive parameters for torsion  </li>
 </ol>
 </ol>
