@@ -546,6 +546,7 @@ def StructureMinimization(poltype,torsionrestraints):
     cmd = poltype.minimizeexe+' -k '+poltype.tmpkeyfile+' '+poltype.tmpxyzfile+' 0.1 > Minimized_final.out'
     poltype.call_subsystem(cmd, True)
     torgen.RemoveStringFromKeyfile(poltype,poltype.key5fname,'restrain-torsion')
+    torgen.RemoveStringFromKeyfile(poltype,poltype.tmpkeyfile,'restrain-torsion')
 
 
 def AddTorsionRestraints(poltype,keyname,torsionrestraints):

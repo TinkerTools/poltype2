@@ -1751,7 +1751,7 @@ class PolarizableTyper():
         if self.atomnum != 1:
             opt.gen_superposeinfile(self)
             opt.CheckRMSD(self)
-        
+
         if self.torsppcm:
             torgen.RemoveStringFromKeyfile(self,self.key5fname,'solvate GK')
         if self.atomnum!=1: 
