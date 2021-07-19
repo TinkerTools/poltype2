@@ -1610,8 +1610,10 @@ class PolarizableTyper():
             while not os.path.isfile(self.keyfname):
                 time.sleep(1)
                 self.WriteToLog('Waiting for '+self.keyfname)
+            
             mpole.prepend_keyfile(self,self.keyfname,optmol)
             mpole.SanitizeMultipoleFrames(self,self.keyfname)
+
         # post process local frames written out by poledit
         if self.atomnum!=1: 
              try:
@@ -1641,6 +1643,8 @@ class PolarizableTyper():
         # Atoms that belong to the same symm class will now have only one common multipole definition
         if not os.path.isfile(self.key2fname):
             mpole.AverageMultipoles(self,optmol)
+            polarprmstotransferinfo=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m,polarize=True)
+            databaseparser.UpdatePolarizeParameters(self, self.key2fname,self.key2fname, polarprmstotransferinfo)
         if self.espfit and not os.path.isfile(self.key3fname) and self.atomnum!=1:
             # Optimize multipole parameters to QM ESP Grid (*.cube_2)
             # tinker's potential utility is called, with option 6.
