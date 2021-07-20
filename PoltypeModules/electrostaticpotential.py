@@ -164,11 +164,11 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
         temp.write('['+' '+poltype.dmabasissetfile+' '+poltype.iodinedmabasissetfile +' '+ ']'+'\n')
         temp=ReadInBasisSet(poltype,temp,poltype.dmabasissetfile,poltype.iodinedmabasissetfile)
         temp.write('}'+'\n')
-        temp.write("E, wfn = energy('%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower())+'\n')
+        temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower())+'\n')
 
     else:
 
-        temp.write("E, wfn = energy('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower(),poltype.dmabasisset)+'\n')
+        temp.write("E, wfn = properties('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower(),poltype.dmabasisset)+'\n')
     temp.write('cubeprop(wfn)'+'\n')
     temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
     header=poltype.molstructfname.split('.')[0]
