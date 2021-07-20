@@ -141,6 +141,21 @@ def prepend_keyfile(poltype,keyfilename,optmol,dipole=False):
     shutil.move(tmpfname, keyfilename)
 
 
+def CheckFileForString(poltype,filetocheck):
+    temp=open(filetocheck,'r')
+    results=temp.readlines()
+    temp.close()
+    usemp2=False
+    for line in results:
+        if 'MP2' in line and 'Density' in line:
+            usemp2=True
+    if usemp2==False:
+        string='CC'
+    else:
+        string='MP2'
+    return string
+
+
 def gen_gdmain(poltype,gdmainfname,molecprefix,fname,dmamethod):
     """
     Intent: Generate GDMA input file for the molecule
@@ -179,7 +194,7 @@ def gen_gdmain(poltype,gdmainfname,molecprefix,fname,dmamethod):
         densitystring='SCF'
     if not poltype.use_gaus or poltype.use_gausoptonly:
         if poltype.dmamethod=='MP2':
-            densitystring='CC' # for some reason fchk outputs CC for MP2 density
+            densitystring=CheckFileForString(poltype,fnamesym)
         tmpfh.write("File " + fnamesym  + " density %s\n"%(densitystring))
     else:
         tmpfh.write("File " + fnamesym  + " density %s\n"%(densitystring))
