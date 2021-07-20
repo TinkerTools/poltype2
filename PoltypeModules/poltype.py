@@ -653,7 +653,7 @@ class PolarizableTyper():
         if self.which(exe) is None:
             exe = exe[:-2] if exe.endswith('.x') else exe + '.x'
             if self.which(exe) is None:
-                print("ERROR: Cannot find Tinker {} executable".format(executable))
+                print("ERROR: Cannot find Tinker {} executable".format(exe))
                 sys.exit(2)
         return exe
 
