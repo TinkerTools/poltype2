@@ -587,12 +587,22 @@ def FindTorsionRestraints(poltype,mol):
             ringbond=b.IsInRing()
             if ringbond==True:
                 continue
-             
             t2idx=t2.GetIdx()
             t3idx=t3.GetIdx()
             t2 = b.GetBeginAtom()
             t3 = b.GetEndAtom()
             t1,t4 = torgen.find_tor_restraint_idx(poltype,mol,t2,t3)
+
+            firstangle=mol.GetAngle(t1,t2,t3)
+            secondangle=mol.GetAngle(t2,t3,t4)
+            if firstangle<0:
+                firstangle=firstangle+360
+            if secondangle<0:
+                secondangle=secondangle+360
+            angletol=2
+            if np.abs(180-firstangle)<=2 or np.abs(180-secondangle)<=2:
+                continue
+
             t2idx=t2.GetIdx()
             t3idx=t3.GetIdx()
             babelfirst=[t2idx,t3idx]
