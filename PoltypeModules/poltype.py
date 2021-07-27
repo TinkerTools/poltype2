@@ -1199,7 +1199,7 @@ class PolarizableTyper():
             atomindextoformalcharge[atomidx]=chg
             string='Atom index = '+str(atomidx+1)+' Atomic Number = ' +str(atomnum)+ ' Valence = '+str(val)+ ' Formal charge = '+str(chg)
             array.append(string)
-            if atomnum==6 and val==3:
+            if atomnum==6 and val==3 and self.addhydrogentononcharged==True:
                 warnings.warn('WARNING! Strange valence for Carbon, will assume missing hydrogens and add'+string) 
                 self.WriteToLog('WARNING! Strange valence for Carbon, will assume missing hydrogens and add '+string)
             else:
@@ -1508,7 +1508,6 @@ class PolarizableTyper():
             atomnum+=1
             atomidx=atom.GetIdx()
             atomicnum=atom.GetAtomicNum()
-            print('atomidx ',atomidx,'atomicnum ',atomicnum,flush=True)        
 
 
         self.RemoveCartesianXYZFiles()

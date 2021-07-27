@@ -559,7 +559,6 @@ def ReadCounterPoiseAndWriteQMData(poltype,logfilelist):
     temp=open('QM_DATA','w')
     for f in logfilelist:
         tmpfh=open(f,'r')
-        print('f',f)
         if poltype.use_gaus==True:
             for line in tmpfh:
                 if 'Counterpoise: corrected energy =' in line or 'Counterpoise corrected energy' in line:

@@ -63,16 +63,15 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,varia
         phaseangles=phaselist[i]
         inputname,outputlog,cmdstr,scratchdir=GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist,mol,currentopt)
         finished,error=poltype.CheckNormalTermination(outputlog,errormessages=None,skiperrors=True)
-        if poltype.tordebugmode==True:
-            finished=True
+            
         if finished==True and 'opt' in outputlog:
             opt.GrabFinalXYZStructure(poltype,outputlog,outputlog.replace('.log','.xyz'),mol)
-        if finished==False:
+        if finished==False and poltype.tordebugmode==False:
             listofjobs.append(cmdstr)
             jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputlog
 
-
-        outputlogs.append(outputlog)
+        if finished==True or ( finished==False and poltype.tordebugmode==False):
+            outputlogs.append(outputlog)
         initialstructures.append(torxyzfname)   
     return outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures
 
@@ -103,14 +102,13 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
             inputname,outputname=GenerateTorsionSPInputFileGaus(poltype,torset,optmol,phaseangles,outputlog,mol)
             cmdstr = 'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
         finished,error=poltype.CheckNormalTermination(outputname,errormessages=None,skiperrors=True)
-        if poltype.tordebugmode==True:
-            finished=True
 
         if finished==True and error==False:
             pass
         else:
-            listofjobs.append(cmdstr)
-            jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputname
+            if poltype.tordebugmode==False:
+                listofjobs.append(cmdstr)
+                jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputname
 
         outputnames.append(outputname)
         outputlogtophaseangles[outputname]=phaseangles

@@ -320,15 +320,20 @@ def prune_mme_error(poltype,indicesremoved,indicesalreadyremoved,*arr_list):
     Referenced By: get_qmmm_rot_bond_energy, eval_rot_bond_parms
     Description: -
     """
+
     x_list = arr_list[0]
     temp=[]
+    new_arr_list=deepcopy(arr_list)
+    indicesremoved.sort(reverse=True)
     for del_ang_idx in indicesremoved:
         if del_ang_idx not in indicesalreadyremoved:
             temp.append(del_ang_idx)
-            for a_list in arr_list:
-                del a_list[del_ang_idx]
-    return arr_list,temp
+            for a_list_idx in range(len(arr_list)):
+                a_list=arr_list[a_list_idx]
+                del new_arr_list[a_list_idx][del_ang_idx]
+    return new_arr_list,temp
 
+    
 def prune_qme_error(poltype,indicesremoved,indicesalreadyremoved,*arr_list):
     """
     Intent: Delete the given ids (del_ang_list) in every list in *arr_list
@@ -341,14 +346,17 @@ def prune_qme_error(poltype,indicesremoved,indicesalreadyremoved,*arr_list):
     """
     x_list = arr_list[0]
     temp=[]
+    new_arr_list=deepcopy(arr_list)
+    indicesremoved.sort(reverse=True)
     for del_ang_idx in indicesremoved:
         if del_ang_idx not in indicesalreadyremoved:
             temp.append(del_ang_idx)
-            for a_list in arr_list:
-                del a_list[del_ang_idx]
-    return arr_list,temp
+            for a_list_idx in range(len(arr_list)):
+                a_list=arr_list[a_list_idx]
+                del new_arr_list[a_list_idx][del_ang_idx]
+    return new_arr_list,temp
 
-
+    
 def FindRemovedIndices(poltype,ang_list,del_ang_list,indicesremoved=None):
     if indicesremoved!=None:
         pass
@@ -395,7 +403,6 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,fileprefix):
     cls_angle_dict = {}
     cls_angle_dict_unmodified = {}
     clscount_dict = {}
-    indicesremoved=[]
     classkeylisttoindicesalreadydicremoved={}
     for torset in poltype.torlist:
         if torset not in poltype.nonaroringtorsets and len(torset)==2 and poltype.torfit1Drotonly==True and poltype.torfit2Drotonly==False:
@@ -409,6 +416,7 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,fileprefix):
         else:
             continue
         
+        indicesremoved=[]
         indicesalreadyremoved=[]
         classkeylist=[]
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
@@ -438,25 +446,20 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,fileprefix):
         originalmang_list=mang_list.copy()
         originalqang_list=qang_list.copy()
         originalmme_list=mme_list.copy()
-        originalmme_list=ConvertNoneToZero(poltype,originalmme_list)
+       
         originalqme_list=qme_list.copy()
-        originalqme_list=ConvertNoneToZero(poltype,originalqme_list)
+        originaltor_e_list=tor_e_list.copy()
         # delete members of the list where the energy was not able to be found 
         del_ang_list = find_del_list(poltype,mme_list,mang_list)
         indicesremoved=FindRemovedIndices(poltype,originalmang_list,del_ang_list,indicesremoved=indicesremoved)
-        
         array=prune_mme_error(poltype,indicesremoved,classkeylisttoindicesalreadydicremoved[tup],cls_angle_dict[tup],cls_mm_engy_dict[tup])
         (cls_angle_dict[tup],cls_mm_engy_dict[tup])=array[:-1][0]
         x=array[-1]
-        array=prune_mme_error(poltype,indicesremoved,indicesalreadyremoved,mang_list,mme_list,qme_list,qang_list,tor_e_list)
+        array=prune_mme_error(poltype,indicesremoved,indicesalreadyremoved,originalmang_list,originalmme_list,originalqme_list,originalqang_list,originaltor_e_list)
         (mang_list,mme_list,qme_list,qang_list,tor_e_list)=array[:-1][0]
         x=array[-1]
-        del_ang_list = find_del_list(poltype,qme_list,qang_list)
 
-        for idx in x:
-            if idx not in indicesalreadyremoved:
-                indicesalreadyremoved.append(idx) 
-                classkeylisttoindicesalreadydicremoved[tup].append(idx)
+        del_ang_list = find_del_list(poltype,qme_list,qang_list)
 
         indicesremoved=FindRemovedIndices(poltype,originalqang_list,del_ang_list,indicesremoved=indicesremoved)
 
@@ -464,13 +467,9 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,fileprefix):
         array=prune_qme_error(poltype,indicesremoved,classkeylisttoindicesalreadydicremoved[tup],cls_angle_dict[tup],cls_mm_engy_dict[tup])
         (cls_angle_dict[tup],cls_mm_engy_dict[tup])=array[:-1][0]
         x=array[-1]
-        array=prune_qme_error(poltype,indicesremoved,indicesalreadyremoved,mang_list,mme_list,qme_list,qang_list,tor_e_list)
+        array=prune_qme_error(poltype,indicesremoved,indicesalreadyremoved,originalmang_list,originalmme_list,originalqme_list,originalqang_list,originaltor_e_list)
         (mang_list,mme_list,qme_list,qang_list,tor_e_list)=array[:-1][0]
         x=array[-1]
-        for idx in x:
-            if idx not in indicesalreadyremoved:
-                indicesalreadyremoved.append(idx) 
-                classkeylisttoindicesalreadydicremoved[tup].append(idx)
 
         cls_qm_engy_dict[tup] = [ runsum+eng for runsum,eng in zip (cls_qm_engy_dict[tup], qme_list)]
         cls_mm_engy_dict[tup] = [ runsum+eng for runsum,eng in zip (cls_mm_engy_dict[tup], mme_list)]
@@ -482,6 +481,8 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,fileprefix):
     # if multiple class keys, take the average
     for tup in clscount_dict:
         cnt = clscount_dict[tup]
+        cls_qm_engy_dict_unmodified[tup]=ConvertNoneToZero(poltype,cls_qm_engy_dict_unmodified[tup])
+        cls_mm_engy_dict_unmodified[tup]=ConvertNoneToZero(poltype,cls_mm_engy_dict_unmodified[tup])
         cls_mm_engy_dict[tup] = [eng/cnt for eng in cls_mm_engy_dict[tup]]
         cls_qm_engy_dict[tup] = [eng/cnt for eng in cls_qm_engy_dict[tup]]
         cls_mm_engy_dict_unmodified[tup] = [eng/cnt for eng in cls_mm_engy_dict_unmodified[tup]]
@@ -1225,57 +1226,44 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         originalmm2_energy_list=mm2_energy_list.copy()
         originalmm_energy_list=mm_energy_list.copy()
         originalqm_energy_list=qm_energy_list.copy()
-        originalmm_energy_list=ConvertNoneToZero(poltype,originalmm_energy_list)
-        originalqm_energy_list=ConvertNoneToZero(poltype,originalqm_energy_list)
-        originalmm2_energy_list=ConvertNoneToZero(poltype,originalmm2_energy_list)
         arrays=AssignZeros(poltype,[originalmm_energy_list,originalqm_energy_list,originalmm2_energy_list])
         originalmm_energy_list=arrays[0]
         originalqm_energy_list=arrays[1]
         originalmm2_energy_list=arrays[2]
-
+        originaltor_e_list=tor_e_list.copy()
+        originaltor_e_list2=tor_e_list2.copy()
+        originalWBOarray=WBOarray.copy()
+        originalm2ang_list=m2ang_list.copy()
         # remove angles for which energy was unable to be found
-        del_ang_list = find_del_list(poltype,mm_energy_list,mang_list)
+        del_ang_list = find_del_list(poltype,originalmm_energy_list,originalmang_list)
         classkeylisttoindicesremoved[tup]=FindRemovedIndices(poltype,originalmang_list,del_ang_list,indicesremoved=classkeylisttoindicesremoved[tup])
-        array=prune_mme_error(poltype,classkeylisttoindicesremoved[tup],indicesalreadyremoved,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
+        array=prune_mme_error(poltype,classkeylisttoindicesremoved[tup],indicesalreadyremoved,originalmang_list,originalmm_energy_list,originalm2ang_list,originalmm2_energy_list,originalqm_energy_list,originalqang_list,originaltor_e_list,originaltor_e_list2,originalWBOarray)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=array[:-1][0]
         x=array[-1]
-        del_ang_list = find_del_list(poltype,qm_energy_list,qang_list)
-        for idx in x:
-            if idx not in indicesalreadyremoved:
-                indicesalreadyremoved.append(idx) 
+        del_ang_list = find_del_list(poltype,originalqm_energy_list,originalqang_list)
 
         classkeylisttoindicesremoved[tup]=FindRemovedIndices(poltype,originalqang_list,del_ang_list,indicesremoved=classkeylisttoindicesremoved[tup])
 
-        array=prune_qme_error(poltype,classkeylisttoindicesremoved[tup],indicesalreadyremoved,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
+        array=prune_qme_error(poltype,classkeylisttoindicesremoved[tup],indicesalreadyremoved,originalmang_list,originalmm_energy_list,originalm2ang_list,originalmm2_energy_list,originalqm_energy_list,originalqang_list,originaltor_e_list,originaltor_e_list2,originalWBOarray)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=array[:-1][0]
         x=array[-1]
-        for idx in x:
-            if idx not in indicesalreadyremoved:
-                indicesalreadyremoved.append(idx) 
-
-        del_ang_list = find_del_list(poltype,mm2_energy_list,m2ang_list)
-
+        del_ang_list = find_del_list(poltype,originalmm2_energy_list,originalm2ang_list)
         classkeylisttoindicesremoved[tup]=FindRemovedIndices(poltype,originalmm2ang_list,del_ang_list,indicesremoved=classkeylisttoindicesremoved[tup])
 
-        array=prune_qme_error(poltype,classkeylisttoindicesremoved[tup],indicesalreadyremoved,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
+        array=prune_qme_error(poltype,classkeylisttoindicesremoved[tup],indicesalreadyremoved,originalmang_list,originalmm_energy_list,originalm2ang_list,originalmm2_energy_list,originalqm_energy_list,originalqang_list,originaltor_e_list,originaltor_e_list2,originalWBOarray)
+         
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=array[:-1][0]
         x=array[-1]
         for idx in x:
             if idx not in classkeylisttoindicesalreadydicremoved[tup]:
                 classkeylisttoindicesalreadydicremoved[tup].append(idx)
-            if idx not in indicesalreadyremoved:
-                indicesalreadyremoved.append(idx)
 
 
-        del_ang_list = find_del_list(poltype,WBOarray,qang_list)
+        del_ang_list = find_del_list(poltype,originalWBOarray,originalqang_list)
         classkeylisttoindicesremoved[tup]=FindRemovedIndices(poltype,originalqang_list,del_ang_list,indicesremoved=classkeylisttoindicesremoved[tup])
-
-        array=prune_qme_error(poltype,classkeylisttoindicesremoved[tup],indicesalreadyremoved,mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)
+        array=prune_qme_error(poltype,classkeylisttoindicesremoved[tup],indicesalreadyremoved,originalmang_list,originalmm_energy_list,originalm2ang_list,originalmm2_energy_list,originalqm_energy_list,originalqang_list,originaltor_e_list,originaltor_e_list2,originalWBOarray)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=array[:-1][0]
         y=array[-1]
-        for idx in y:
-            if idx not in indicesalreadyremoved:
-                indicesalreadyremoved.append(idx)
         for del_ang_idx in classkeylisttoindicesremoved[tup]:
             if del_ang_idx not in classkeylisttoindicesalreadydicremoved[tup]:
                 fitfunc_dict[clskey]=numpy.delete(fitfunc_dict[clskey],del_ang_idx)
@@ -1294,12 +1282,13 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
                originalfitfuncarray[i]=0
            else:
                originalfitfuncarray[i]=1
-
-
         # normalize profiles
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]
         mm2_energy_list = [en - min(mm2_energy_list) for en in mm2_energy_list]
+        originalmm2_energy_list=ConvertNoneToZero(poltype,originalmm2_energy_list)
+        originalmm_energy_list=ConvertNoneToZero(poltype,originalmm_energy_list)
+
         originalmm2_energy_list= [en - min(originalmm2_energy_list) for en in originalmm2_energy_list]
         originalmm_energy_list= [en - min(originalmm_energy_list) for en in originalmm_energy_list]
 
@@ -1551,7 +1540,6 @@ def PostfitMinAlz(poltype,keybasename,keybasepath):
         if term==True:   
             if not poltype.use_gaus:
                 cartxyzname=optoutputlog.replace('.log','.xyz')
-                
                 cartxyz,torxyzfname=torgen.tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,cartxyzname,poltype.torsionrestraint,'_postQMOPTpostfit',keybasename,keybasepath,bondtopology)
             else:
                 cartxyz,torxyzfname=torgen.tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,outputlog,poltype.torsionrestraint,'_postQMOPTpostfit',keybasename,keybasepath,bondtopology)
