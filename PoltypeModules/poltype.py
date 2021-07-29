@@ -1106,6 +1106,7 @@ class PolarizableTyper():
                     if prm!=0:
                         allzero=False
                 if allzero==True:
+                    self.WriteToLog("torsion parameters are all zero "+line+' path ='+os.getcwd())
                     raise ValueError("torsion parameters are all zero "+line+' path ='+os.getcwd())
 
     def main(self):

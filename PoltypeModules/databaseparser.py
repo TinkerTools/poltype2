@@ -1425,15 +1425,15 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                 continue
         if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False and ([bbidx,cbidx] not in poltype.onlyrotbndslist or [cbidx,bbidx] not in poltype.onlyrotbndslist):
             continue
-        if ringbond==True:
-            atomindices=RingAtomicIndices(poltype,mol)
-            ring=GrabRingAtomIndicesFromInputIndex(poltype,babelindices[1],atomindices)
-            ringtorindices=GrabIndicesInRing(poltype,babelindices,ring)
-            ringtoratoms=[mol.GetAtom(a) for a in ringtorindices]
-            ringhybs=[a.GetHyb() for a in ringtoratoms]
+        #if ringbond==True:
+        #    atomindices=RingAtomicIndices(poltype,mol)
+        #    ring=GrabRingAtomIndicesFromInputIndex(poltype,babelindices[1],atomindices)
+        #    ringtorindices=GrabIndicesInRing(poltype,babelindices,ring)
+        #    ringtoratoms=[mol.GetAtom(a) for a in ringtorindices]
+        #    ringhybs=[a.GetHyb() for a in ringtoratoms]
         if check==False:
             if ringbond==True:
-                if (2 not in ringhybs): # non-aromatic torsion want parameters for 
+                if (2 not in hybs): # non-aromatic torsion want parameters for 
                     if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
                         poormatchingpartialaromatictorsions.append(torsionindices)
                     else: # if dont have heavy atoms on either side then just fit the hydrogen torsion
