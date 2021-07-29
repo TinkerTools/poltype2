@@ -1203,6 +1203,11 @@ class PolarizableTyper():
             if atomnum==6 and val==3 and self.addhydrogentononcharged==True:
                 warnings.warn('WARNING! Strange valence for Carbon, will assume missing hydrogens and add'+string) 
                 self.WriteToLog('WARNING! Strange valence for Carbon, will assume missing hydrogens and add '+string)
+            
+            elif atomnum==7 and val==2 and self.addhydrogentononcharged==True:
+                warnings.warn('WARNING! Strange valence for Nitrogen, will assume missing hydrogens and add'+string) 
+                self.WriteToLog('WARNING! Strange valence for Nitrogen, will assume missing hydrogens and add '+string)
+
             else:
                 atom.SetFormalCharge(chg) 
                 totchg+=chg
