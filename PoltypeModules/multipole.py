@@ -192,12 +192,9 @@ def gen_gdmain(poltype,gdmainfname,molecprefix,fname,dmamethod):
         densitystring='MP2'
     else:
         densitystring='SCF'
-    if not poltype.use_gaus or poltype.use_gausoptonly:
-        if poltype.dmamethod=='MP2':
-            densitystring=CheckFileForString(poltype,fnamesym)
-        tmpfh.write("File " + fnamesym  + " density %s\n"%(densitystring))
-    else:
-        tmpfh.write("File " + fnamesym  + " density %s\n"%(densitystring))
+    if poltype.dmamethod=='MP2':
+        densitystring=CheckFileForString(poltype,fnamesym)
+    tmpfh.write("File " + fnamesym  + " density %s\n"%(densitystring))
     tmpfh.write("Angstrom\n")
     tmpfh.write("AU\n")
     tmpfh.write("Multipoles\n")

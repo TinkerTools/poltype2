@@ -690,20 +690,23 @@ def TXYZ2COM(poltype,TXYZ,comfname,chkname,maxdisk,maxmem,numproc,mol,probeatoms
     commentstr = poltype.molecprefix + " Gaussian SP Calculation on " + gethostname()
     tmpfh.write('\n%s\n\n' % commentstr)
     tmpfh.write('%d %d %d %d %d %d\n' % (chg,mul,chg,mul,0,1))
-
+    fragelements=[]
     for n in range(len(atoms)):
         if n>=len(atoms)-probeatoms:
+            ele=atoms[n]
+            if ele not in fragelements:
+                 fragelements.append(ele)
+
             tmpfh.write("%3s%s             %14.7f%14.7f%14.7f\n"%(atoms[n],'(Fragment=2)',float(coord[n][0]),float(coord[n][1]),float(coord[n][2]))) 
         else:
             tmpfh.write("%3s%s             %14.7f%14.7f%14.7f\n"%(atoms[n],'(Fragment=1)',float(coord[n][0]),float(coord[n][1]),float(coord[n][2])))   
     tmpfh.write("\n")
 
-    
     if ('I ' in poltype.mol.GetSpacedFormula()):
         formulalist=poltype.mol.GetSpacedFormula().lstrip().rstrip().split()
         elementtobasissetlines=GenerateElementToBasisSetLines(poltype,poltype.basissetpath+basissetfile)
         for element,basissetlines in elementtobasissetlines.items():
-            if element in poltype.mol.GetSpacedFormula():
+            if element in poltype.mol.GetSpacedFormula() or element in fragelements:
                 for line in basissetlines: 
                     tmpfh.write(line)
 
