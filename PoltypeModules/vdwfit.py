@@ -204,12 +204,15 @@ def myFUNC(params,poltype,vdwtypes,idxtotype,count):
 
     ReadAnalyzeEnergiesWriteOut(poltype,filenamearray)
     current = NormalizeTarget(poltype,'SP.dat')
+
     current,target,distarray=ScreenHighEnergyPoints(poltype,current,target)
     if count>1:
         weightlist=np.exp(-np.array(target)/poltype.boltzmantemp)
 
     else:
         weightlist=np.ones(len(target))
+    value=weightlist*(current-target)
+
     return weightlist*(current-target)
 
 def ScreenHighEnergyPoints(poltype,current,target,distarray=None):
@@ -225,7 +228,7 @@ def ScreenHighEnergyPoints(poltype,current,target,distarray=None):
                 pass
         except:
             dist=distarray[i]
-        if cur>=tol or tar>=tol:
+        if tar>=tol:
             pass
         else:
             newcurrent.append(cur)
@@ -385,43 +388,38 @@ def VDWOptimizer(poltype,count,fitredboolarray):
     ''' local optimization method can be BFGS, CG, Newton-CG, L-BFGS-B,etc.., see here\
     https://docs.scipy.org/doc/scipy-0.19.1/reference/generated/scipy.optimize.minimize.html'''
     errorfunc= lambda p, poltype, vdwtypes,idxtotype,count: (myFUNC(p,poltype,vdwtypes,idxtotype,count))
-    fail=False
-    try: 
-        ret = optimize.least_squares(errorfunc, x0, jac='2-point', bounds=MyBounds, diff_step=1e-4,args=(poltype,vdwtypes,idxtotype,count))
-    except:
-        fail=True
+    ret = optimize.least_squares(errorfunc, x0, jac='2-point', bounds=MyBounds, diff_step=1e-4,args=(poltype,vdwtypes,idxtotype,count))
     vdwradii=[]
     vdwdepths=[] 
     vdwreds=[]
     ofile = open("RESULTS.OPT", "a")
-    if fail==False:
-        for i in range(len(ret.x)):
-            vartype=idxtotype[i]
-            if vartype=='rad':
-                vdwradius=round(ret.x[i],3)
-                vdwradii.append(vdwradius)
+    for i in range(len(ret.x)):
+        vartype=idxtotype[i]
+        if vartype=='rad':
+            vdwradius=round(ret.x[i],3)
+            vdwradii.append(vdwradius)
 
-            elif vartype=='depth':
-                vdwdepth=round(ret.x[i],3)
-                vdwdepths.append(vdwdepth)
-                if (i+1) in idxtotype.keys():
-                    nexttype=idxtotype[i+1]
-                    if nexttype!='red':
-                        vdwred=1
-                        vdwreds.append(vdwred)
-                else:
+        elif vartype=='depth':
+            vdwdepth=round(ret.x[i],3)
+            vdwdepths.append(vdwdepth)
+            if (i+1) in idxtotype.keys():
+                nexttype=idxtotype[i+1]
+                if nexttype!='red':
                     vdwred=1
                     vdwreds.append(vdwred)
-
-
-            elif vartype=='red':
-                vdwred=round(ret.x[i],3)
+            else:
+                vdwred=1
                 vdwreds.append(vdwred)
-                
-        ofile.write("%s\n"%(ret.message))
-        ofile.write("\n")
+
+
+        elif vartype=='red':
+            vdwred=round(ret.x[i],3)
+            vdwreds.append(vdwred)
+            
+    ofile.write("%s\n"%(ret.message))
+    ofile.write("\n")
     ofile.close()
-    return vdwradii,vdwdepths,vdwreds,fail 
+    return vdwradii,vdwdepths,vdwreds
 
 
 def MoveDimerAboutMinima(poltype,txyzFile,outputprefixname,nAtomsFirst,atomidx1,atomidx2,equildistance,array):
@@ -1778,17 +1776,14 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
                             minreds.append(minred)
                             maxreds.append(maxred)
                 WriteInitialPrmFile(poltype,vdwtypesarray,initialradii,initialdepths,minradii,maxradii,mindepths,maxdepths,initialreds,minreds,maxreds)
-                vdwradii,vdwdepths,vdwreds,fail=VDWOptimizer(poltype,count,fitredboolarray)
-                if fail==True: # rare case failure not due to inputs but something intenral to optimizer?
-                    goodfit=True
-                if fail==False:
-                    for k in range(len(flat_prefixarrays)):
-                        prefix=flat_prefixarrays[k]
-                        distarray=flat_distarrays[k]
-                        PlotEnergyVsDistance(poltype,distarray,prefix,vdwradii,vdwdepths,vdwreds,vdwtypesarray,count)
-                        othergoodfit=PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count)
-                    goodfit=PlotQMVsMMEnergy(poltype,vdwtypesarray,flat_prefixarrays,count,allprefix=True)
-                    count+=1
+                vdwradii,vdwdepths,vdwreds=VDWOptimizer(poltype,count,fitredboolarray)
+                for k in range(len(flat_prefixarrays)):
+                    prefix=flat_prefixarrays[k]
+                    distarray=flat_distarrays[k]
+                    PlotEnergyVsDistance(poltype,distarray,prefix,vdwradii,vdwdepths,vdwreds,vdwtypesarray,count)
+                    othergoodfit=PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count)
+                goodfit=PlotQMVsMMEnergy(poltype,vdwtypesarray,flat_prefixarrays,count,allprefix=True)
+                count+=1
 
     shutil.copy(poltype.key5fname,'../'+poltype.key5fname)
     os.chdir(poltype.parentdir)
