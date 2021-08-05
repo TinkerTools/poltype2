@@ -107,7 +107,7 @@ The last thing done is to writing out in a list all missing torsions, vdw and to
 <ol>
                   <li> If a or d is H and and there exist other a/d such that a,d is not H, then just transfer whatever matches for H torsion if its a good match, else transfer alkane parameter. </li>
 
-                  <li> Else, chop ring and derive parameters  </li>
+                  <li> Else, chop ring and derive parameters (if ring length is greater than 4 atoms), else transfer alkane. Fragmenter does not cut bonds in 3 or 4 atom ring fragments, only includes part of ring atom indices where torsion is involved.  </li>
 </ol>
              <li> b-c aromatic (or b-c have hybridization of 2). Below, lowercase leter means aromatic atom or ring atom with hyb of 2. Letter x refers to non-hydrogen atom.  </li>
 <ol>

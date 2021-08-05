@@ -799,21 +799,20 @@ def CheckMatch(poltype,match,atomindices,smartsfortransfer):
 
     validmatch=True
     if allin==True:
-        branchcounts=smartsfortransfer.count('(')
-        ringcounts=CountRings(poltype,smartsfortransfer)
-        if branchcounts==0 and len(atomindices)>1 and ringcounts==0:
-            indices=[]
-            for idx in atomindices:
-                matchidx=match.index(idx)
-                indices.append(matchidx)
-            checkconsecleft=checkConsecutive(indices)
-            revindices=indices[::-1]
-            checkconsecright=checkConsecutive(revindices)
-            if checkconsecleft==False and checkconsecright==False:
-                validmatch=False
+        #branchcounts=smartsfortransfer.count('(')
+        #ringcounts=CountRings(poltype,smartsfortransfer)
+        #if branchcounts==0 and len(atomindices)>1 and ringcounts==0:
+        indices=[]
+        for idx in atomindices:
+            matchidx=match.index(idx)
+            indices.append(matchidx)
+        checkconsecleft=checkConsecutive(indices)
+        revindices=indices[::-1]
+        checkconsecright=checkConsecutive(revindices)
+        if checkconsecleft==False and checkconsecright==False:
+            validmatch=False
     else:
         validmatch=False
-
     return validmatch 
 
 def checkConsecutive(l): 
@@ -913,7 +912,6 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         atomindicestoparametersmartsatomorders[atomindices]=[parametersmarts,parametersmartsorders]
         atomindicestoelementtinkerdescrips[atomindices]=elementtinkerdescrips             
         atomindicestosmartsatomorders[atomindices]=[smarts,smartsorders]
-
 
     return atomindicestotinkertypes,atomindicestotinkerclasses,atomindicestoparametersmartsatomorders,atomindicestoelementtinkerdescrips,atomindicestosmartsatomorders
 
@@ -1354,7 +1352,6 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         babelatoms=[mol.GetAtom(i) for i in babelindices]
         aatom,batom,catom,datom=babelatoms[:]
 
-        ringbond=False
         middlebond=mol.GetBond(babelindices[1],babelindices[2])
         ringbond=middlebond.IsInRing()
         firstangle=mol.GetAngle(aatom,batom,catom)
@@ -1369,8 +1366,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             continue
         if bondorder!=1 and ringbond==False: # then dont zero out
             continue 
-
-
+        
         atomvals=[a.GetValence() for a in babelatoms]
         atomnums=[a.GetAtomicNum() for a in babelatoms]
         batomnum=atomnums[1]
@@ -1409,6 +1405,10 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         check=CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,matcharray)
         if '~' in smarts or '*' in smarts:
             check=False
+        if ringbond==True:
+            atomindices=RingAtomicIndices(poltype,mol)
+            ring=GrabRingAtomIndicesFromInputIndex(poltype,babelindices[1],atomindices)
+            ringtorindices=GrabIndicesInRing(poltype,babelindices,ring)
         if len(poltype.onlyrotbndslist)!=0:
             if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
                 if atomicnumatoma==1 or atomicnumatomd==1:
@@ -1418,27 +1418,26 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                         poormatchingpartialaromatictorsions.append(torsionindices)
 
                 else:
-                    if torsionindices not in torsionsmissing:
-                        torsionsmissing.append(torsionindices)
-                        continue
+                    if ringbond==False:
+                        if torsionindices not in torsionsmissing:
+                            torsionsmissing.append(torsionindices)
+                            continue
             else:
                 continue
         if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False and ([bbidx,cbidx] not in poltype.onlyrotbndslist or [cbidx,bbidx] not in poltype.onlyrotbndslist):
             continue
-        #if ringbond==True:
-        #    atomindices=RingAtomicIndices(poltype,mol)
-        #    ring=GrabRingAtomIndicesFromInputIndex(poltype,babelindices[1],atomindices)
-        #    ringtorindices=GrabIndicesInRing(poltype,babelindices,ring)
-        #    ringtoratoms=[mol.GetAtom(a) for a in ringtorindices]
-        #    ringhybs=[a.GetHyb() for a in ringtoratoms]
         if check==False:
             if ringbond==True:
-                if (2 not in hybs): # non-aromatic torsion want parameters for 
+                if (2 not in hybs): # non-aromatic torsion want parameters for , if ring is 4 or smaller than fragmenter will not be able to cut bond (it only includes indices from torsion plus neighbors has no mechanism to cut bond in case of 4 member ring
                     if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
                         poormatchingpartialaromatictorsions.append(torsionindices)
                     else: # if dont have heavy atoms on either side then just fit the hydrogen torsion
-                        if torsionindices not in torsionsmissing and poltype.dontfrag==False: # make sure fragmenter is on (wont work for < 25 atoms by default)
-                            torsionsmissing.append(torsionindices)
+                        if len(ring)>4:
+                            if torsionindices not in torsionsmissing and poltype.dontfrag==False: # make sure fragmenter is on (wont work for < 25 atoms by default)
+                                torsionsmissing.append(torsionindices)
+                        else:
+                            poormatchingpartialaromatictorsions.append(torsionindices)
+
                         
                 elif hybs[1]==2 and hybs[2]==2:
                     if torsionindices not in poormatchingaromatictorsions:
@@ -3590,7 +3589,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         planarangleindicestotinkertypes,planarangleindicestotinkerclasses,planarangleindicestoparametersmartsatomorders,planarangleindicestoelementtinkerdescrips,planarangleindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
 
         torsionindicestotinkertypes,torsionindicestotinkerclasses,torsionindicestoparametersmartsatomorders,torsionindicestoelementtinkerdescrips,torsionindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,torsionsforprmtoparametersmarts,torsionsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
- 
         originalbondindicestosmartsatomorders=bondindicestosmartsatomorders.copy()
         originalangleindicestosmartsatomorders=angleindicestosmartsatomorders.copy()
         formissingangleindicestosmartsatomorders=RemoveIndicesMatchedFromNewDatabase(poltype,angleindicestosmartsatomorders,newangleindicestopoltypeclasses) 
@@ -3605,7 +3603,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         
         torsionindicestosmartsatomorders=AddDictionaryItems(poltype,torsionindicestosmartsatomorders,torsionindicestoextsmartsatomorders)
         torsionsmissing,poormatchingaromatictorsions,poormatchingpartialaromatictorsions,torsionstozerooutduetocolinear=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
-
         torsionsmissing=FindAdjacentMissingTorsionsForTorTor(poltype,torsionsmissing,totalbondscollector,tortorsmissing)
         atomindextosmartsatomorder=AddExternalDatabaseMatches(poltype, atomindextosmartsatomorder,vdwindicestoextsmarts,vdwsmartsatomordertoparameters)
         vdwmissing=FindMissingParameters(poltype,atomindextosmartsatomorder,rdkitmol,mol,indextoneighbidxs)
