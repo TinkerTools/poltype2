@@ -1372,8 +1372,8 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             firstangle=firstangle+360
         if secondangle<0:
             secondangle=secondangle+360
-        angletol=2
-        if np.abs(180-firstangle)<=2 or np.abs(180-secondangle)<=2:
+        angletol=3.5
+        if np.abs(180-firstangle)<=angletol or np.abs(180-secondangle)<=angletol:
             torsionstozerooutduetocolinear.append(torsionindices)
             continue
         if bondorder!=1 and ringbond==False: # then dont zero out
@@ -1423,17 +1423,16 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             ringtorindices=GrabIndicesInRing(poltype,babelindices,ring)
         if len(poltype.onlyrotbndslist)!=0:
             if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
-                if atomicnumatoma==1 or atomicnumatomd==1:
+                if (atomicnumatoma==1 or atomicnumatomd==1) and poltype.refinenonaroringtors==False:
                     if allhydrogentor==False and allhydrogentoroneside==False and check==True: # try to transfer H even if bad match in this case
                        continue
                     else:
                         poormatchingpartialaromatictorsions.append(torsionindices)
 
                 else:
-                    if ringbond==False:
-                        if torsionindices not in torsionsmissing:
-                            torsionsmissing.append(torsionindices)
-                            continue
+                    if torsionindices not in torsionsmissing:
+                        torsionsmissing.append(torsionindices)
+                        continue
             else:
                 continue
         if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False and ([bbidx,cbidx] not in poltype.onlyrotbndslist or [cbidx,bbidx] not in poltype.onlyrotbndslist):

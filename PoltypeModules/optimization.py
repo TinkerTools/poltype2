@@ -595,12 +595,14 @@ def FindTorsionRestraints(poltype,mol):
 
             firstangle=mol.GetAngle(t1,t2,t3)
             secondangle=mol.GetAngle(t2,t3,t4)
+            atoms=[t1,t2,t3,t4]
+            indices=[i.GetIdx() for i in atoms]
             if firstangle<0:
                 firstangle=firstangle+360
             if secondangle<0:
                 secondangle=secondangle+360
             angletol=2
-            if np.abs(180-firstangle)<=2 or np.abs(180-secondangle)<=2:
+            if np.abs(180-firstangle)<=3.5 or np.abs(180-secondangle)<=3.5:
                 continue
 
             t2idx=t2.GetIdx()

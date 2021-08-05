@@ -605,8 +605,9 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         if vdwfragment==True:
             strfragrotbndindexes=strfragrotbndindexes[:-1]
 
-        if rotbndindex in rotbndindextoringtor.keys() or vdwfragment==True:
+        if vdwfragment==True:
             strfragrotbndindexes=None
+
         strparentrotbndindexes=strparentrotbndindexes[:-1]
         fragmol=rotbndindextofragment[equivalentrotbndindex]
         fragmentfilepath=rotbndindextofragmentfilepath[equivalentrotbndindex]
@@ -734,6 +735,8 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         parentatoms=poltype.rdkitmol.GetNumAtoms()
         listofjobs,jobtooutputlog,newlog=FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog,tempmol,parentdir,vdwfragment,strfragvdwatomindex)
     os.chdir(parentdir)
+    if poltype.tordebugmode==True:
+        sys.exit()
     finishedjobs,errorjobs=SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog)
     return equivalentrotbndindexarrays,rotbndindextoringtor
 
@@ -1488,7 +1491,7 @@ def GrowPossibleFragmentAtomIndexes(poltype,rdkitmol,indexes):
     for comb in combinationslist:
         indexlist=indexes.copy()
         for idx in comb:
-           aromaticindexes=GrabAromaticAtoms(poltype,rdkitmol.GetAtomWithIdx(idx))
+           aromaticindexes=GrabAromaticAtoms(poltype,idx+1)
            newindexes=aromaticindexes
            for atmidx in newindexes:
                if atmidx not in indexlist:
@@ -1569,7 +1572,7 @@ def FirstPassAtomIndexes(poltype,tor,onlyinputindices):
                    if neighbatomindex not in molindexlist:
                        molindexlist.append(neighbatomindex)
                        if neighbatom.GetIsAromatic() or (babelneighbatomisinring==True and babelneighbatomhyb==2) and onlyinputindices==False:
-                           aromaticindexes=GrabAromaticAtoms(poltype,neighbatom)
+                           aromaticindexes=GrabAromaticAtoms(poltype,neighbatomindex+1)
                            newindexes=aromaticindexes
                            for atmidx in newindexes:
                                if atmidx not in molindexlist:
@@ -1790,30 +1793,49 @@ def Draw2DMoleculeWithWBO(poltype,WBOmatrix,basename,mol,bondindexlist=None,smir
     svg_code=fig.to_str()
     svg2png(bytestring=svg_code,write_to=basename+'.png')
 
-def GrabAromaticAtoms(poltype,neighbatom):
+
+def RingAtomicIndices(poltype,mol):
+    sssr = mol.GetSSSR()
+    atomindices=[]
+    for ring in sssr:
+        ringatomindices=GrabRingAtomIndices(poltype,mol,ring)
+        atomindices.append(ringatomindices)        
+    return atomindices
+
+def GrabRingAtomIndicesFromInputIndex(poltype,atomindex,atomindices):
+    ring=None
+    for ring in atomindices:
+        if atomindex in ring:
+            return ring
+
+    return ring
+
+def GrabRingAtomIndices(poltype,mol,ring):
+    ringatomindices=[]
+    atomiter=openbabel.OBMolAtomIter(mol)
+    for atom in atomiter:
+        atomidx=atom.GetIdx()
+        if ring.IsInRing(atomidx)==True:
+            ringatomindices.append(atomidx)
+    return ringatomindices
+
+
+
+def GrabAromaticAtoms(poltype,neighbatomidx):
+    atomindices=RingAtomicIndices(poltype,poltype.mol)
+    ring=GrabRingAtomIndicesFromInputIndex(poltype,neighbatomidx,atomindices)
     aromaticindexes=[]
-    prevringidxlen=len(aromaticindexes)
-    aromaticindexes.append(neighbatom.GetIdx())
-    ringidxlen=len(aromaticindexes)
-    while prevringidxlen!=ringidxlen:
-        for atmindex in aromaticindexes:
-            atm=poltype.rdkitmol.GetAtomWithIdx(atmindex)
-            babelatom=poltype.mol.GetAtom(atmindex+1)
-            babelatomisinring=babelatom.IsInRing()
-            babelatomhyb=babelatom.GetHyb()
-            if (atm.GetIsAromatic() or (babelatomisinring==True and babelatomhyb==2)) and atmindex not in aromaticindexes:
-                aromaticindexes.append(atmindex)
-            for natm in atm.GetNeighbors():
-                natmindex=natm.GetIdx()
-                babelatom=poltype.mol.GetAtom(natmindex+1)
-                babelatomisinring=babelatom.IsInRing()
-                babelatomhyb=babelatom.GetHyb()
-
-                if (natm.GetIsAromatic() or (babelatomisinring==True and babelatomhyb==2)) and natmindex not in aromaticindexes:
-                    aromaticindexes.append(natmindex)
-        prevringidxlen=ringidxlen
-        ringidxlen=len(aromaticindexes)
-
+    if ring!=None:
+        babelatoms=[poltype.mol.GetAtom(atmindex) for atmindex in ring]
+        hybs=[babelatom.GetHyb() for babelatom in babelatoms]
+        allflat=True
+        for hyb in hybs:
+            if hyb!=2:
+                allflat=False
+        if allflat==True:
+             ring=[i-1 for i in ring]
+             aromaticindexes.extend(ring) 
+    
     return aromaticindexes
 
 

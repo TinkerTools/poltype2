@@ -146,8 +146,6 @@ espbasisset       specifies basis set to use for quantum intended for refined mu
 
 ### Torsion Parameterization
 ```
-allownonaromaticringscanning     specifies to allow non-aromatic ring torsions to be scanned, only use for strange                                    cases like entire molecule is a ring. Does not work for small non-aromatic rings,                                    rdkit will not spin ring bonds.
-                  Default=False
 rotalltors        specifies poltype to spin all rotatable bonds instead of transferring torsion parameters if 
                   found in database. 
                   Default=False

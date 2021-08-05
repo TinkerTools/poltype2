@@ -173,8 +173,8 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                     firstangle=firstangle+360
                 if secondangle<0:
                     secondangle=secondangle+360
-                angletol=2
-                if numpy.abs(180-firstangle)<=2 or numpy.abs(180-secondangle)<=2:
+                angletol=3.5
+                if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
                     continue
 
                 babelindices=[b,c]
@@ -208,8 +208,8 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                             firstangle=firstangle+360
                         if secondangle<0:
                             secondangle=secondangle+360
-                        angletol=2
-                        if numpy.abs(180-firstangle)<=2 or numpy.abs(180-secondangle)<=2:
+                        angletol=3.5
+                        if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
                             continue
 
 
@@ -408,8 +408,8 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
             firstangle=firstangle+360
         if secondangle<0:
             secondangle=secondangle+360
-        angletol=2
-        if numpy.abs(180-firstangle)<=2 or numpy.abs(180-secondangle)<=2:
+        angletol=3.5
+        if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
             continue 
 
         torsiontophaseangle[tuple([a,b,c,d])]=round((torang+phaseangle)%360)
@@ -423,7 +423,6 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
                 totalatoms=optmol.NumAtoms()
                 allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,optmol)
                 allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,optmol)
-
                 aatom=optmol.GetAtom(resa)
                 datom=optmol.GetAtom(resd)
                 batom=optmol.GetAtom(resb)
@@ -446,8 +445,8 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
                     firstangle=firstangle+360
                 if secondangle<0:
                     secondangle=secondangle+360
-                angletol=2
-                if numpy.abs(180-firstangle)<=2 or numpy.abs(180-secondangle)<=2:
+                angletol=3.5
+                if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
                     continue 
 
                 if res not in restlist:
@@ -956,7 +955,7 @@ def get_torlist(poltype,mol,missed_torsions):
         if (t1atomicnum==1 or t4atomicnum==1):
             hydtorsionlist.append(sortedtor)
         unq=get_uniq_rotbnd(poltype,t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx())
-        if ringbond==True and poltype.allownonaromaticringscanning==False and poltype.refinenonaroringtors==False and len(poltype.onlyrotbndslist)==0 and poltype.dontfrag==False and foundmissing==True:
+        if ringbond==True and poltype.refinenonaroringtors==False and len(poltype.onlyrotbndslist)==0 and poltype.dontfrag==False and foundmissing==True:
             nonaroringtorlist.append(unq)
             skiptorsion=False
         elif ringbond==True and poltype.refinenonaroringtors==True:
@@ -1091,10 +1090,11 @@ def find_tor_restraint_idx(poltype,mol,b1,b2):
     b2nbridx = list(map(lambda x: x.GetIdx(), iteratomatom2))
     b1len=len(b1nbridx)
     b2len=len(b2nbridx)
-
+    shift=False
     if b1len<=b2len:
         pass
     else: # weird case of torsion on three atom ring need to fix, let b1 be one with fewest neighbors
+        shift=True
         b1idx=b2.GetIdx()
         b2idx=b1.GetIdx()  
         b1=mol.GetAtom(b1idx)
@@ -1114,8 +1114,10 @@ def find_tor_restraint_idx(poltype,mol,b1,b2):
     minb2class = min(b2nbridx, key= lambda x:poltype.idxtosymclass[x])
     t1 = mol.GetAtom(minb1class)
     t4 = mol.GetAtom(minb2class)
-
-    return t1,t4
+    if shift==False:
+        return t1,t4
+    else:
+        return t4,t1
 
 
 def GrabFirstHeavyAtomIdx(poltype,indices,mol):
@@ -1213,8 +1215,8 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                     firstangle=firstangle+360
                 if secondangle<0:
                     secondangle=secondangle+360
-                angletol=2
-                if numpy.abs(180-firstangle)<=2 or numpy.abs(180-secondangle)<=2:
+                angletol=3.5
+                if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
                     continue
                 if resttors not in variabletorlist:
                     rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
@@ -1257,8 +1259,8 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                 firstangle=firstangle+360
             if secondangle<0:
                 secondangle=secondangle+360
-            angletol=2
-            if numpy.abs(180-firstangle)<=2 or numpy.abs(180-secondangle)<=2:
+            angletol=3.5
+            if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
                 continue
 
             rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
