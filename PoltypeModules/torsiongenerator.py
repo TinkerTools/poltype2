@@ -1085,13 +1085,28 @@ def find_tor_restraint_idx(poltype,mol,b1,b2):
     """
     b1idx = b1.GetIdx()
     b2idx = b2.GetIdx()
-    iteratomatom = openbabel.OBAtomAtomIter(b1)
-    b1nbridx = list(map(lambda x: x.GetIdx(), iteratomatom))
+    iteratomatom1 = openbabel.OBAtomAtomIter(b1)
+    b1nbridx = list(map(lambda x: x.GetIdx(), iteratomatom1))
+    iteratomatom2 = openbabel.OBAtomAtomIter(b2)
+    b2nbridx = list(map(lambda x: x.GetIdx(), iteratomatom2))
+    b1len=len(b1nbridx)
+    b2len=len(b2nbridx)
+
+    if b1len<=b2len:
+        pass
+    else: # weird case of torsion on three atom ring need to fix, let b1 be one with fewest neighbors
+        b1idx=b2.GetIdx()
+        b2idx=b1.GetIdx()  
+        b1=mol.GetAtom(b1idx)
+        b2=mol.GetAtom(b2idx)
+    iteratomatomb1 = openbabel.OBAtomAtomIter(b1)
+
+    b1nbridx = list(map(lambda x: x.GetIdx(), iteratomatomb1))
     del b1nbridx[b1nbridx.index(b2idx)]    # Remove b2 from list
     assert(b1nbridx is not [])
     minb1class = min(b1nbridx,key=lambda x: poltype.idxtosymclass[x])
-    iteratomatom = openbabel.OBAtomAtomIter(b2)
-    b2nbridx = list(map(lambda x: x.GetIdx(), iteratomatom))
+    iteratomatomb2 = openbabel.OBAtomAtomIter(b2)
+    b2nbridx = list(map(lambda x: x.GetIdx(), iteratomatomb2))
     del b2nbridx[b2nbridx.index(b1idx)]    # Remove b1 from list
     assert(b2nbridx is not [])
     if minb1class in b2nbridx:
