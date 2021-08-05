@@ -719,6 +719,8 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                 matches=poltype.rdkitmol.GetSubstructMatches(mcsmol)
                 for match in matches:
                     goodmatch=True
+                    if ',' in smartsmcs:
+                        goodmatch=False
                     oldmatchidx=None
                     for idx in ls:
                         if idx not in match:
@@ -774,7 +776,6 @@ def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprm,parametersmartsli
             maxprmsmarts='[#6](-[H])(-[H])(-[H])-[#6](-[H])(-[H])(-[H])'
         listforprmtoparametersmarts[tuple(ls)]=maxprmsmarts
         listforprmtosmarts[tuple(ls)]=maxsmartsls
-
         
     return listforprmtoparametersmarts,listforprmtosmarts
 
@@ -791,44 +792,55 @@ def CountRings(poltype,smartsfortransfer):
 
 
 
-def CheckMatch(poltype,match,atomindices,smartsfortransfer):
+def CheckMatch(poltype,match,atomindices,smarts,substructure):
     allin=True
     for idx in atomindices:
         if idx not in match:
             allin=False
-
     validmatch=True
     if allin==True:
-        #branchcounts=smartsfortransfer.count('(')
-        #ringcounts=CountRings(poltype,smartsfortransfer)
-        #if branchcounts==0 and len(atomindices)>1 and ringcounts==0:
         indices=[]
         for idx in atomindices:
             matchidx=match.index(idx)
             indices.append(matchidx)
-        checkconsecleft=checkConsecutive(indices)
-        revindices=indices[::-1]
-        checkconsecright=checkConsecutive(revindices)
-        if checkconsecleft==False and checkconsecright==False:
+        checkconsec=CheckConsecutiveTorsion(poltype,indices,substructure)
+        if checkconsec==False:
             validmatch=False
     else:
         validmatch=False
     return validmatch 
-
-def checkConsecutive(l): 
+       
+def CheckConsecutiveTorsion(poltype,indices,substructure):
     consec=True
-    previdx=None
-    for i in range(len(l)):
-        idx=l[i]
-        if previdx!=None:
-            if idx<previdx:
-                consec=False
-        previdx=idx
+    if len(indices)==2:
+        a,b=indices[:]
+        bond=substructure.GetBondBetweenAtoms(a,b)
+        if bond==None:
+            consec=False
+
+    elif len(indices)==3:
+        a,b,c=indices[:]
+        bond=substructure.GetBondBetweenAtoms(a,b)
+        if bond==None:
+            consec=False
+        bond=substructure.GetBondBetweenAtoms(b,c)
+        if bond==None:
+            consec=False
+
+    elif len(indices)==4: 
+        a,b,c,d=indices[:]
+        bond=substructure.GetBondBetweenAtoms(a,b)
+        if bond==None:
+            consec=False
+        bond=substructure.GetBondBetweenAtoms(b,c)
+        if bond==None:
+            consec=False
+        bond=substructure.GetBondBetweenAtoms(c,d)
+        if bond==None:
+            consec=False
+
+
     return consec
-        
-
-
-
 def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol):
     atomindicestotinkertypes={}
     atomindicestotinkerclasses={}
@@ -853,7 +865,7 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
             if newmtch not in matches:
                 matches.append(newmtch)
         for match in matches:
-            validmatch=CheckMatch(poltype,match,atomindices,smartsfortransfer)
+            validmatch=CheckMatch(poltype,match,atomindices,smarts,substructure)
             if validmatch==True:
                indices=list(range(len(match)))
                smartsindextomoleculeindex=dict(zip(indices,match)) 
