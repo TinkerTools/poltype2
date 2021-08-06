@@ -1732,7 +1732,7 @@ class PolarizableTyper():
         self.classkeytoinitialprmguess={}
         if self.tortor==True and self.dontdotor==False:
             torgen.PrepareTorsionTorsion(self,optmol,mol,tortorsmissing)
-
+        poltype.torsetpuckertotorsetfit={}
         if self.refinenonaroringtors==True and self.dontfrag==False:
             rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
         if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False and (self.dontdotor==False or self.dontdovdwscan==False):

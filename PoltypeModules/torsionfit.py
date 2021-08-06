@@ -419,6 +419,10 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,fileprefix):
         indicesalreadyremoved=[]
         classkeylist=[]
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
+        qme_list,qang_list,WBOarray = compute_qm_tor_energy(poltype,torset,mol,flatphaselist)
+        mme_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,fileprefix,flatphaselist,tmpkey1basename)
+        if torset in poltype.torsetpuckertotorsetfit.keys():
+            torset=poltype.torsetpuckertotorsetfit[torset] 
         for i in range(len(torset)):
             tor=torset[i]
             a,b,c,d = tor[0:4]
@@ -433,18 +437,13 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,fileprefix):
             cls_angle_dict_unmodified[tup] = [0]*len(flatphaselist)
             cls_mm_engy_dict_unmodified[tup] = [0]*len(flatphaselist)
             cls_qm_engy_dict_unmodified[tup] = [0]*len(flatphaselist)
-
         if tup not in classkeylisttoindicesalreadydicremoved.keys():
             classkeylisttoindicesalreadydicremoved[tup]=[]
         if tup not in classkeylisttoindicesremoved.keys():
             classkeylisttoindicesremoved[tup]=[]
 
         clscount_dict[tup] += 1
-        mme_list = []  # MM Energy before fitting to QM torsion energy
-        qme_list = []  # QM torsion energy
         # find qm, then mm energies of the various torsion values found for 'tor'
-        qme_list,qang_list,WBOarray = compute_qm_tor_energy(poltype,torset,mol,flatphaselist)
-        mme_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,fileprefix,flatphaselist,tmpkey1basename)
         originalmang_list=mang_list.copy()
         originalqang_list=qang_list.copy()
         originalmme_list=mme_list.copy()
@@ -453,6 +452,7 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,fileprefix):
         originaltor_e_list=tor_e_list.copy()
         # delete members of the list where the energy was not able to be found 
         del_ang_list = find_del_list(poltype,mme_list,mang_list)
+
         classkeylisttoindicesremoved[tup]=FindRemovedIndices(poltype,originalmang_list,del_ang_list,indicesremoved=classkeylisttoindicesremoved[tup])
 
         array=prune_mme_error(poltype,classkeylisttoindicesremoved[tup],originalmang_list,originalmme_list,originalqme_list,originalqang_list,originaltor_e_list)
@@ -747,6 +747,9 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         classkeylist=[]
         refine=False
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
+        if torset in poltype.torsetpuckertotorsetfit.keys():
+            torset=poltype.torsetpuckertotorsetfit[torset] 
+
         for i in range(len(torset)):
             tor=torset[i]
             # get the atoms in the main torsion about this rotatable bond
@@ -790,7 +793,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         qm_energy_list_unmodified = [en - min(qm_energy_list_unmodified) for en in qm_energy_list_unmodified]
         mm_energy_list_unmodified = [en - min(mm_energy_list_unmodified) for en in mm_energy_list_unmodified]
         tor_energy_list_unmodified = [qme - mme for qme,mme in zip(qm_energy_list_unmodified,mm_energy_list_unmodified)]
-
+       
         max_amp = max(tor_energy_list) - min(tor_energy_list)
         amplist=[20,max_amp]
         max_amp=min(amplist)
@@ -1176,8 +1179,16 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
     for torset in poltype.torlist:
         if torset not in poltype.nonaroringtorsets and len(torset)==2 and poltype.torfit1Drotonly==True:
             continue
-        bypassrmsd=torsettobypassrmsd[torset]
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
+
+        tmpkeyfname = 'tmp.key'
+        qm_energy_list,qang_list,WBOarray = compute_qm_tor_energy(poltype,torset,mol,flatphaselist)
+        mm_energy_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,'_preQMOPTprefit',flatphaselist,tmpkeyfname)
+        mm2_energy_list,m2ang_list,tor_e_list2 = compute_mm_tor_energy(poltype,mol,torset,'_postQMOPTpostfit',flatphaselist,tmpkey2basename)
+        if torset in poltype.torsetpuckertotorsetfit.keys():
+            torset=poltype.torsetpuckertotorsetfit[torset] 
+
+        bypassrmsd=torsettobypassrmsd[torset]
         classkeylist=[]
         for tor in torset:
             a,b,c,d = tor[0:4]
@@ -1197,20 +1208,13 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             #if clskey not in fitfunc_dict.keys():
             #    continue
         
-        mm_energy_list = []
-        mm_energy_list2 = []
-        qm_energy_list = []
         # get the qm energy profile
-        qm_energy_list,qang_list,WBOarray = compute_qm_tor_energy(poltype,torset,mol,flatphaselist)
-        tmpkeyfname = 'tmp.key'
         shutil.copy(tmpkey1basename, tmpkeyfname)
         # get the original mm energy profile
-        mm_energy_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,'_preQMOPTprefit',flatphaselist,tmpkeyfname)
         tup=tuple(classkeylist)
         if tup not in classkeylisttoindicesremoved.keys():
             classkeylisttoindicesremoved[tup]=[]
         # get the new mm energy profile (uses new parameters to find energies)
-        mm2_energy_list,m2ang_list,tor_e_list2 = compute_mm_tor_energy(poltype,mol,torset,'_postQMOPTpostfit',flatphaselist,tmpkey2basename)
         originalmang_list=mang_list.copy()
         originalqang_list=qang_list.copy()
         originalmm2ang_list=m2ang_list.copy()
@@ -1229,18 +1233,22 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         del_ang_list = find_del_list(poltype,originalmm_energy_list,originalmang_list)
         classkeylisttoindicesremoved[tup]=FindRemovedIndices(poltype,originalmang_list,del_ang_list,indicesremoved=classkeylisttoindicesremoved[tup])
         array=prune_mme_error(poltype,classkeylisttoindicesremoved[tup],originalmang_list,originalmm_energy_list,originalm2ang_list,originalmm2_energy_list,originalqm_energy_list,originalqang_list,originaltor_e_list,originaltor_e_list2,originalWBOarray)
+
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=array[:-1][0]
+        
         x=array[-1]
         del_ang_list = find_del_list(poltype,originalqm_energy_list,originalqang_list)
         classkeylisttoindicesremoved[tup]=FindRemovedIndices(poltype,originalqang_list,del_ang_list,indicesremoved=classkeylisttoindicesremoved[tup])
         array=prune_qme_error(poltype,classkeylisttoindicesremoved[tup],originalmang_list,originalmm_energy_list,originalm2ang_list,originalmm2_energy_list,originalqm_energy_list,originalqang_list,originaltor_e_list,originaltor_e_list2,originalWBOarray)
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=array[:-1][0]
+
         x=array[-1]
         del_ang_list = find_del_list(poltype,originalmm2_energy_list,originalm2ang_list)
         classkeylisttoindicesremoved[tup]=FindRemovedIndices(poltype,originalmm2ang_list,del_ang_list,indicesremoved=classkeylisttoindicesremoved[tup])
         array=prune_qme_error(poltype,classkeylisttoindicesremoved[tup],originalmang_list,originalmm_energy_list,originalm2ang_list,originalmm2_energy_list,originalqm_energy_list,originalqang_list,originaltor_e_list,originaltor_e_list2,originalWBOarray)
          
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=array[:-1][0]
+        
         x=array[-1]
         del_ang_list = find_del_list(poltype,originalWBOarray,originalqang_list)
         classkeylisttoindicesremoved[tup]=FindRemovedIndices(poltype,originalqang_list,del_ang_list,indicesremoved=classkeylisttoindicesremoved[tup])
@@ -1284,6 +1292,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         ff_list = [aa+bb for (aa,bb) in zip(mm_energy_list,fitfunc_dict[clskey])]
         shifted_mm2_energy_list=numpy.add(1,mm2_energy_list)
         shifted_qm_energy_list=numpy.add(1,qm_energy_list)
+        
         final_tor_energy_list=numpy.subtract(mm2_energy_list,qm_energy_list)
         final_relative_tor_energy_list=numpy.subtract(shifted_mm2_energy_list,shifted_qm_energy_list)
         if clskey in clskeyswithbadfits:

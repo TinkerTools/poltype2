@@ -6,6 +6,7 @@ import openbabel
 import numpy
 from itertools import product
 import shutil
+import sys
 
 def NonAromaticRingAtomicIndices(poltype,mol):
     sssr = mol.GetSSSR()
@@ -138,9 +139,112 @@ def UpdateTorsionSets(poltype,nonarotors):
     poltype.torlist.append(nonarotors)
     poltype.nonaroringtorsets.append(nonarotors)
 
-def UpdateVariableTorsions(poltype,nonarotors):
-    torset=nonarotors
-    poltype.torsettovariabletorlist[tuple(torset)]=torset
+def UpdateVariableTorsions(poltype,comb,nonarotors,atomindices):
+    ringindices=atomindices[0]
+    newlist=[]
+    othertors=[]
+    othertorsnoringrotbndtolist={}
+    for tor in nonarotors:
+        a,b,c,d=tor[:]
+        for othertor in comb:
+            oa,ob,oc,od=othertor[:]
+            if (b!=ob and c!=oc) and (b!=oc and c!=ob):
+                othertors.append(tor)
+    for tor in othertors:
+        a,b,c,d=tor[:]
+        for othertor in poltype.alltorsionslist:
+            oa,ob,oc,od=othertor[:]
+            if (b==ob and c==oc) or (b==oc and c==ob):
+                newlist.append(othertor)
+    
+    for tor in poltype.alltorsionslist:
+        a,b,c,d=tor[:]
+        inother=False
+        for othertor in nonarotors:
+            oa,ob,oc,od=othertor[:]
+            if (b==ob and c==oc) or (b==oc and c==ob):
+                inother=True
+        if inother==False:
+            if tuple(set([b,c])) not in othertorsnoringrotbndtolist.keys():
+                othertorsnoringrotbndtolist[tuple(set([b,c]))]=[]
+            if tor not in othertorsnoringrotbndtolist[tuple(set([b,c]))]:
+                othertorsnoringrotbndtolist[tuple(set([b,c]))].append(tor)
+    for key,value in othertorsnoringrotbndtolist.items():
+        firsttor=value[0]
+        if len(value)>1:
+            othertors=value[1:]
+            for tor in othertors:
+                newlist.append(tor)
+    diff=[]
+    for ls in comb:
+        for index in ls:
+            inothers=False
+            for otherls in comb:
+                if ls!=otherls:
+                    if index in otherls:
+                        inothers=True
+            if inothers==False:
+                diff.append(index)
+    rotbndtotortokeep={}
+    for tor in comb:
+        a,b,c,d=tor[:]
+        for othertor in poltype.alltorsionslist:
+            oa,ob,oc,od=othertor[:]
+            rotbnd=tuple(set([ob,oc]))
+            if (b==ob and c==oc) or (b==oc or c==ob):
+                count=0
+                for index in othertor:
+                    if index in ringindices:
+                        count+=1
+
+                if count<=3:
+                      nomorethanoneincommon=True
+                      if len(rotbndtotortokeep)==1 and rotbnd in rotbndtotortokeep.keys():
+                          pass
+                      else:
+                          for key,value in rotbndtotortokeep.items():
+                              othertorset=set(othertor)
+                              valueset=set(value)
+                              common=len(othertorset.intersection(valueset))
+                              if common>1:
+                                  nomorethanoneincommon=False
+                      if nomorethanoneincommon==True:
+                          if rotbnd in rotbndtotortokeep.keys():
+                              thetor=rotbndtotortokeep[rotbnd]
+                              anyindex=False
+                              for index in thetor:
+                                  if index in diff:
+                                      anyindex=True
+                              if anyindex==True:
+                                  continue 
+                          rotbndtotortokeep[rotbnd]=othertor
+                                          
+        
+    for key,value in rotbndtotortokeep.items():
+        a,b,c,d=value[:]
+        for othertor in poltype.alltorsionslist:
+            oa,ob,oc,od=othertor[:]
+            if (b==ob and c==oc):
+                if a!=oa or d!=od:
+                    if othertor not in newlist:
+                        newlist.append(othertor)
+            elif (b==oc and c==od):
+                if a!=od or d!=oa:
+                    if othertor not in newlist:
+                        newlist.append(othertor)
+    newcomb=[]
+    for tor in comb:
+        a,b,c,d=tor[:]
+        rotbnd=tuple(set([b,c]))
+        if rotbnd not in rotbndtotortokeep.keys():
+            newcomb.append(tor)
+        else:
+            newtor=rotbndtotortokeep[rotbnd]
+            newcomb.append(newtor) 
+    poltype.torsetpuckertotorsetfit[tuple(newcomb)]=tuple(comb)
+    poltype.torsettovariabletorlist[tuple(newcomb)]=newlist
+    newcomb=tuple(newcomb)
+    return newcomb
 
 def DetermineMaxRanges(poltype,torset,optmol,bondtopology):
     phaseangles=[0]*len(torset)
@@ -216,9 +320,9 @@ def RefineNonAromaticRingTorsions(poltype,mol,optmol,classkeytotorsionparameters
         combs=AllPossiblePuckeringLocationsForRing(poltype,nonarotors,tortoneighbtors,mol)
         firstcomb=combs[0]
         reducednonarotorsions.append(firstcomb)
-        UpdateTorsionSets(poltype,firstcomb)
-        UpdateVariableTorsions(poltype,firstcomb)
-        torset=tuple(firstcomb)
+        comb=UpdateVariableTorsions(poltype,firstcomb,nonarotors,atomindices)
+        UpdateTorsionSets(poltype,comb)
+        torset=tuple(comb)
         DetermineMaxRanges(poltype,torset,optmol,bondtopology)
         numparameters=TotalParametersToFitForNonAromaticRing(poltype,firstcomb)
         datapoints=TotalDatapointsForNonAromaticRing(poltype,numparameters)

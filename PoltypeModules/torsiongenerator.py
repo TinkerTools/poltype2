@@ -160,12 +160,6 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
 
                 aatomicnum=aatom.GetAtomicNum()
                 datomicnum=datom.GetAtomicNum()
-                if (aatomicnum==1 or datomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
-                    continue
-                if (allhydtorsoneside==True or allhydtors==True) and (aatomicnum==1 or datomicnum==1):
-                    if count>=1:
-                        continue
-                    count+=1
 
                 firstangle=mol.GetAngle(aatom,batom,catom)
                 secondangle=mol.GetAngle(batom,catom,datom)
@@ -214,7 +208,7 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
 
 
                         rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
-                        if resttors not in variabletorlist and resttors not in restlist:
+                        if resttors not in variabletorlist and resttors[::-1] not in variabletorlist and resttors not in restlist:
                             tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
                             restlist.append(resttors)
             # Leave all torsions around other rotatable bonds fixed
@@ -222,7 +216,7 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                 for resttors in torsions:
                     rta,rtb,rtc,rtd = resttors
                     rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
-                    if resttors not in restlist and resttors not in variabletorlist:
+                    if resttors not in restlist and resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
                         tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
                         restlist.append(resttors)
             
@@ -394,14 +388,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
         datom=optmol.GetAtom(d)
         aatomicnum=aatom.GetAtomicNum()
         datomicnum=datom.GetAtomicNum()
-        if (aatomicnum==1 or datomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
-            continue
-        if (allhydtorsoneside==True or allhydtors==True) and (aatomicnum==1 or datomicnum==1):
-
-       
-            if count>=1:
-                continue
-            count+=1
+        
         firstangle=optmol.GetAngle(aatom,batom,catom)
         secondangle=optmol.GetAngle(batom,catom,datom)
         if firstangle<0:
@@ -411,9 +398,9 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
         angletol=3.5
         if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
             continue 
-
         torsiontophaseangle[tuple([a,b,c,d])]=round((torang+phaseangle)%360)
-        tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (a,b,c,d,torsionrestraint,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
+        if (a,b,c,d) not in variabletorlist and (d,c,b,a) not in variabletorlist:
+            tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (a,b,c,d,torsionrestraint,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
         for key in poltype.rotbndlist.keys():
             torlist=poltype.rotbndlist[key]
             count=0
@@ -448,7 +435,6 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
                 angletol=3.5
                 if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
                     continue 
-
                 if res not in restlist:
                     if (resa,resb,resc,resd) not in torset and (resd,resc,resb,resa) not in torset and (resa,resb,resc,resd) not in variabletorlist and (resd,resc,resb,resa) not in variabletorlist:
                         if (b==resb and c==resc) or (b==resc and c==resb):
@@ -1188,7 +1174,6 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
         a,b,c,d=tor[0:4]
         key=' '.join([str(b),str(c)])
         if key in poltype.rotbndlist.keys():
-            count=0
             for resttors in poltype.rotbndlist[key]:
                 rta,rtb,rtc,rtd = resttors
                 indices=[rta,rtb,rtc,rtd]
@@ -1201,14 +1186,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                 catom=mol.GetAtom(rtc)
                 rtaatomicnum=aatom.GetAtomicNum()
                 rtdatomicnum=datom.GetAtomicNum()
-                if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
-                    continue
-                if (allhydtorsoneside==True or allhydtors==True) and (rtaatomicnum==1 or rtdatomicnum==1):
 
-               
-                    if count>=1:
-                        continue
-                    count+=1
                 firstangle=mol.GetAngle(aatom,batom,catom)
                 secondangle=mol.GetAngle(batom,catom,datom)
                 if firstangle<0:
@@ -1218,7 +1196,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                 angletol=3.5
                 if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
                     continue
-                if resttors not in variabletorlist:
+                if resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
                     rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
                     if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
                        (optmol.GetAtom(rtd).GetAtomicNum() != 1):
@@ -1264,7 +1242,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                 continue
 
             rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
-            if resttors not in restlist and resttors not in variabletorlist:
+            if resttors not in restlist and resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
                 restlist.append(resttors)
                 if not firsttor:
                     temp.write(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
