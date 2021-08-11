@@ -35,7 +35,7 @@ def GeometryOPTWrapper(poltype,mol):
                     redo=True
 
         if redo==True:
-            shutil.copy(poltype.logoptfname,poltype.logoptfname.replace('.log','_failed.log')
+            shutil.copy(poltype.logoptfname,poltype.logoptfname.replace('.log','_failed.log'))
             optmol,error,torsionrestraints = GeometryOPTWrapper(poltype,mol) # recursive call allows for muliple attempts
         else:
             traceback.print_exc(file=sys.stdout)
