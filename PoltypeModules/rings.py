@@ -130,14 +130,23 @@ def UpdateMaxRange(poltype,torsion,maxrange):
     key=str(b)+' '+str(c)
     poltype.rotbndtomaxrange[key]=maxrange
 
-def UpdateTorsionSets(poltype,nonarotors):
+def UpdateTorsionSets(poltype,comb,nonarotors):
+     
     for tor in nonarotors:
-        torset=[tor]
-        if torset in poltype.torlist:
-            index=poltype.torlist.index(torset)
-            del poltype.torlist[index]
-    poltype.torlist.append(nonarotors)
-    poltype.nonaroringtorsets.append(nonarotors)
+        a,b,c,d=tor[:] 
+        for torls in poltype.torlist:
+            for ttor in torls:
+                if len(ttor)==4:
+                    oa,ob,oc,od=ttor[:]
+                    if (b==ob and c==oc) or (b==oc and c==ob):
+                        index=poltype.torlist.index(torls)
+                        del poltype.torlist[index]
+                        if comb not in poltype.nonarotortotorsbeingfit.keys():
+                            poltype.nonarotortotorsbeingfit[comb]=[]
+                        poltype.nonarotortotorsbeingfit[comb].append(ttor)  
+
+    poltype.torlist.append(comb)
+    poltype.nonaroringtorsets.append(comb)
 
 def UpdateVariableTorsions(poltype,comb,nonarotors,atomindices):
     ringindices=atomindices[0]
@@ -241,7 +250,6 @@ def UpdateVariableTorsions(poltype,comb,nonarotors,atomindices):
         else:
             newtor=rotbndtotortokeep[rotbnd]
             newcomb.append(newtor) 
-    poltype.torsetpuckertotorsetfit[tuple(newcomb)]=tuple(comb)
     poltype.torsettovariabletorlist[tuple(newcomb)]=newlist
     newcomb=tuple(newcomb)
     return newcomb
@@ -309,19 +317,30 @@ def RefineNonAromaticRingTorsions(poltype,mol,optmol,classkeytotorsionparameters
         os.mkdir('qm-torsion')
 
     os.chdir('qm-torsion')
-
+   
     bondtopology=torgen.GenerateBondTopology(poltype,optmol)
     atomindices=NonAromaticRingAtomicIndices(poltype,mol)
     nonarotorsions,nonarotorsionsflat=NonAromaticRingTorsions(poltype,poltype.alltorsionslist,atomindices)
     poltype.nonaroringtors=nonarotorsionsflat
     reducednonarotorsions=[]
     for nonarotors in nonarotorsions:
+        foundatleastonemissing=False
+        for nonarotor in nonarotors:
+            a,b,c,d,=nonarotor[:]
+            for torls in poltype.torlist:
+                for tor in torls:
+                    if len(tor)==4:
+                        oa,ob,oc,od=tor[:]
+                        if (b==ob and c==oc) or (b==oc and c==ob):
+                            foundatleastonemissing=True
+        if foundatleastonemissing==False:
+            continue
         tortoneighbtors=NeighboringTorsion(poltype,nonarotors,mol)
         combs=AllPossiblePuckeringLocationsForRing(poltype,nonarotors,tortoneighbtors,mol)
         firstcomb=combs[0]
         reducednonarotorsions.append(firstcomb)
         comb=UpdateVariableTorsions(poltype,firstcomb,nonarotors,atomindices)
-        UpdateTorsionSets(poltype,comb)
+        UpdateTorsionSets(poltype,comb,nonarotors)
         torset=tuple(comb)
         DetermineMaxRanges(poltype,torset,optmol,bondtopology)
         numparameters=TotalParametersToFitForNonAromaticRing(poltype,firstcomb)

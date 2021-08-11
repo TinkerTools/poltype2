@@ -19,6 +19,8 @@ from itertools import product,combinations
 import shlex
 from rdkit.Chem import rdmolfiles
 from rdkit.Chem.EnumerateHeterocycles import EnumerateHeterocycles
+import warnings
+import rings
 
 def __init__(poltype):
     PolarizableTyper.__init__(poltype)
@@ -467,9 +469,13 @@ def CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle):
             ang=ang+360
         ang=ang % 360
         reducedangle=360-ang
-        
+         
         if numpy.abs(ang-phase)>tol and numpy.abs(reducedangle-phase)>tol:
-            raise ValueError('Torsion did not reach target dihedral! '+str(indices)+' '+str(phase)+' is actually at angle '+str(ang)+', filename='+cartxyz)
+            if 'postfit' in cartxyz and poltype.refinenonaroringtors==True:
+                warnings.warn('Torsion did not reach target dihedral! '+str(indices)+' '+str(phase)+' is actually at angle '+str(ang)+', filename='+cartxyz+' . Will just compute post fit energy at new angle.')
+
+            else: 
+                raise ValueError('Torsion did not reach target dihedral! '+str(indices)+' '+str(phase)+' is actually at angle '+str(ang)+', filename='+cartxyz)
 
 
 
@@ -657,10 +663,16 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
         phaselists,currentanglelist=GeneratePhaseLists(poltype,torset,optmol) 
         flatphaselist=numpy.array(list(product(*phaselists)))
-        poltype.tensorphases[tuple(torset)]=flatphaselist
+        if len(poltype.onlyfittorstogether)!=0:
+            truetorset=tuple(poltype.onlyfittorstogether)
+        else:
+            truetorset=torset[:]
+
+        poltype.tensorphases[tuple(truetorset)]=flatphaselist
         flatphaselist=FlattenArray(poltype,flatphaselist)
         idealangletensor=flatphaselist+currentanglelist
-        poltype.idealangletensor[tuple(torset)]=idealangletensor
+
+        poltype.idealangletensor[tuple(truetorset)]=idealangletensor
         minstrctfname = prevstrctfname
         prevstrctfname = minstrctfname
         listoftinkertorstructures,failedgridpoints,energyarray=tinker_minimize_angles(poltype,torset,optmol,variabletorlist,flatphaselist,prevstrctfname,torsionrestraint,bondtopology)
@@ -909,19 +921,26 @@ def get_torlist(poltype,mol,missed_torsions):
         indices=[a.GetIdx() for a in babelatoms]
         aromatics=[i.IsAromatic() for i in babelatoms]
         hybs=[i.GetHyb() for i in babelatoms]
-        if ringbond==True:
-            atomindices=databaseparser.RingAtomicIndices(poltype,mol)
-            ring=databaseparser.GrabRingAtomIndicesFromInputIndex(poltype,t2idx,atomindices)
-            ringtorindices=databaseparser.GrabIndicesInRing(poltype,indices,ring)
-            ringtoratoms=[mol.GetAtom(a) for a in ringtorindices]
-            ringhybs=[a.GetHyb() for a in ringtoratoms]
-            if 2 in ringhybs:
-                continue
+        
+                            
+            
         sortedtor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]])
         foundmissing=False
         if(sortedtor in missed_torsions or sortedtor[::-1] in missed_torsions) and len(poltype.onlyrotbndslist)==0:
             skiptorsion = False
             foundmissing=True
+
+        atomindices=rings.NonAromaticRingAtomicIndices(poltype,mol)
+        nonarotorsions,nonarotorsionsflat=rings.NonAromaticRingTorsions(poltype,poltype.alltorsionslist,atomindices)
+        willrefinenonarotor=False
+        if poltype.refinenonaroringtors==True and skiptorsion==False:
+            if ringbond==True:
+                for nonarotors in nonarotorsions:
+                    for nonarotor in nonarotors:
+                        oa,ob,oc,od=nonarotor[:]
+                        if (ob==indices[1] and oc==indices[2]) or (ob==indices[2] and oc==indices[1]):
+                            willrefinenonarotor=True                
+
         onlyrot=False
         if [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist:
             skiptorsion = False
@@ -941,11 +960,9 @@ def get_torlist(poltype,mol,missed_torsions):
         if (t1atomicnum==1 or t4atomicnum==1):
             hydtorsionlist.append(sortedtor)
         unq=get_uniq_rotbnd(poltype,t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx())
-        if ringbond==True and poltype.refinenonaroringtors==False and len(poltype.onlyrotbndslist)==0 and poltype.dontfrag==False and foundmissing==True:
+        if ringbond==True and willrefinenonarotor==False and len(poltype.onlyrotbndslist)==0 and poltype.dontfrag==False and foundmissing==True:
             nonaroringtorlist.append(unq)
             skiptorsion=False
-        elif ringbond==True and poltype.refinenonaroringtors==True:
-            skiptorsion=True
         rotbndkey = '%d %d' % (unq[1],unq[2])
         # store the torsion and temporary torsion value found by openbabel in torlist
         tor = mol.GetTorsion(t1,t2,t3,t4)

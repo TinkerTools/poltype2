@@ -69,7 +69,7 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
                 vdwfragment=True
             if vdwfragment==False:
                 rotkey=rotbndindex.replace('_',' ')
-                tors,maintortors,tortor=GrabParentTorsions(poltype,rotbndindextoringtor,rotbndindex,rotkey)
+                tors,maintortors,tortor,nonaroringfrag=GrabParentTorsions(poltype,rotbndindextoringtor,rotbndindex,rotkey)
                 if len(maintortors)>0:
                     firsttor=maintortors[0]
                     secondtor=maintortors[1]
@@ -518,13 +518,21 @@ def CopyAllQMDataAndRename(poltype,molecprefix,parentdir):
     os.chdir(curdir)    
 
 
-def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog,fragmol,parentdir,vdwfragment,strfragvdwatomindex):
+def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog,fragmol,parentdir,vdwfragment,strfragvdwatomindex,onlyfittorsions):
     poltypeinput={'parentname':poltype.parentname,'use_gau_vdw':poltype.use_gau_vdw,'use_qmopt_vdw':poltype.use_qmopt_vdw,'onlyvdwatomindex':poltype.onlyvdwatomindex,'tordebugmode':poltype.tordebugmode,'dontdovdwscan':poltype.dontdovdwscan,'refinenonaroringtors':poltype.refinenonaroringtors,'tortor':poltype.tortor,'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':poltype.numproc,'maxmem':poltype.maxmem,'maxdisk':poltype.maxdisk,'printoutput':True}
     if strfragrotbndindexes!=None:
         poltypeinput['onlyrotbndslist']=strfragrotbndindexes
     if vdwfragment==True:
         poltypeinput['dontdotor']=True
         poltypeinput['onlyvdwatomindex']=strfragvdwatomindex
+    if len(onlyfittorsions)!=0:
+        string=''
+        for tor in onlyfittorsions:
+            stringtor=[str(i) for i in tor]
+            stringtor=' '.join(stringtor)
+            string+=stringtor+','
+        string=string[:-1]
+        poltypeinput['onlyfittorstogether']=string 
 
     inifilepath=poltype.WritePoltypeInitializationFile(poltypeinput)
     cmdstr='nohup'+' '+'python'+' '+poltype.poltypepath+r'/'+'poltype.py'+' '+'&'
@@ -650,13 +658,14 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         parentclasskeytofragclasskey={}
         parenttortorclasskeytofragtortorclasskey={}
         strfragvdwatomindex=None
+        onlyfittorsions=[]
         if vdwfragment==False:
             for j in range(len(array)):
                 rotbndindex=array[j]
                 indextoequivalentindex=maps[j]
                 parentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
                 rotkey=rotbndindex.replace('_',' ')
-                tors,maintortors,tortor=GrabParentTorsions(poltype,rotbndindextoringtor,rotbndindex,rotkey)
+                tors,maintortors,tortor,nonaroringfrag=GrabParentTorsions(poltype,rotbndindextoringtor,rotbndindex,rotkey)
                 for torsion in tors:
                     rdkittor=[k-1 for k in torsion] 
                     fragtor=[parentindextofragindex[k] for k in rdkittor]
@@ -666,6 +675,10 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                     equivparenttor=[k+1 for k in equivparenttor] 
                     equivclasskey=torgen.get_class_key(poltype,equivparenttor[0],equivparenttor[1],equivparenttor[2],equivparenttor[3])
                     equivfragtorbabel=[k+1 for k in equivfragtor]
+                    if nonaroringfrag==True:
+                        if equivfragtorbabel not in onlyfittorsions:
+                            onlyfittorsions.append(equivfragtorbabel)
+
                     equivfragclasskey=[fragidxtosymclass[k] for k in equivfragtorbabel]
                     equivfragclasskey=[str(k) for k in equivfragclasskey]
                     equivfragclasskey=' '.join(equivfragclasskey)
@@ -733,10 +746,8 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         wholexyz=parentdir+r'/'+poltype.xyzoutfile
         wholemol=parentdir+r'/'+poltype.molstructfname
         parentatoms=poltype.rdkitmol.GetNumAtoms()
-        listofjobs,jobtooutputlog,newlog=FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog,tempmol,parentdir,vdwfragment,strfragvdwatomindex)
+        listofjobs,jobtooutputlog,newlog=FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog,tempmol,parentdir,vdwfragment,strfragvdwatomindex,onlyfittorsions)
     os.chdir(parentdir)
-    if poltype.tordebugmode==True:
-        sys.exit()
     finishedjobs,errorjobs=SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog)
     return equivalentrotbndindexarrays,rotbndindextoringtor
 
@@ -779,8 +790,10 @@ def GenerateSMARTSPositionStringAndAtomIndices(poltype,torsion,parentindextofrag
 def GrabParentTorsions(poltype,rotbndindextoringtor,rotbndindex,rotkey):
     tors=[]
     tortor=False
+    nonaroringfrag=False
     maintortors=[]
     if rotbndindex in rotbndindextoringtor.keys():
+        nonaroringfrag=True
         torset=rotbndindextoringtor[rotbndindex]
         for tor in torset:
             tors.append(tor)
@@ -800,7 +813,7 @@ def GrabParentTorsions(poltype,rotbndindextoringtor,rotbndindex,rotkey):
 
             maintortors.append(keytors[0])
             tors.extend(keytors)
-    return tors,maintortors,tortor
+    return tors,maintortors,tortor,nonaroringfrag
 
 
 def CountUnderscores(poltype,string):
@@ -1134,7 +1147,8 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets,non
                 rotbndidx+=str(tor[0])+'_'
         rotbndidx=rotbndidx[:-1]
         if torset in poltype.nonaroringtorsets:
-            rotbndindextoringtor[rotbndidx]=torset
+            torsbeingfit=poltype.nonarotortotorsbeingfit[torset]
+            rotbndindextoringtor[rotbndidx]=torsbeingfit
         filename=fragfoldername+'.mol'
         WriteRdkitMolToMolFile(poltype,fragmol,filename)
         fragmoltofragfoldername[fragmol]=fragfoldername
@@ -1142,7 +1156,21 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets,non
         WriteOBMolToXYZ(poltype,fragmolbabel,filename.replace('.mol','_xyzformat.xyz'))
         WriteOBMolToSDF(poltype,fragmolbabel,filename.replace('.mol','.sdf'))
         structfname=filename.replace('.mol','.sdf')
-        fragWBOmatrix,outputname,error=GenerateWBOMatrix(poltype,fragmol,fragmolbabel,filename.replace('.mol','_xyzformat.xyz'))
+        print('os.getcwd()',os.getcwd(),flush=True)
+        try:
+            fragWBOmatrix,outputname,error=GenerateWBOMatrix(poltype,fragmol,fragmolbabel,filename.replace('.mol','_xyzformat.xyz'))
+        except: # assume that fragmenter changed (code changed so structure changed and then need to delete and restart that fragment. Can remove this when code becomes more stable
+            os.chdir('..')
+            shutil.rmtree(fragfoldername)
+            if not os.path.isdir(fragfoldername):
+                os.mkdir(fragfoldername)
+            os.chdir(fragfoldername)
+            WriteRdkitMolToMolFile(poltype,fragmol,filename)
+            WriteOBMolToXYZ(poltype,fragmolbabel,filename.replace('.mol','_xyzformat.xyz'))
+            WriteOBMolToSDF(poltype,fragmolbabel,filename.replace('.mol','.sdf'))
+            fragWBOmatrix,outputname,error=GenerateWBOMatrix(poltype,fragmol,fragmolbabel,filename.replace('.mol','_xyzformat.xyz'))
+
+              
         if error:
             os.chdir('..')
             continue

@@ -214,6 +214,7 @@ def GrabFinalPsi4Energy(poltype,logname):
             
 def CheckRMSPD(poltype):
     rmspdexists=False
+    poltype.failedrmspd=False
     if os.path.isfile('RMSPD.txt'):
         temp=open('RMSPD.txt','r')
         for line in temp.readlines():
@@ -223,9 +224,12 @@ def CheckRMSPD(poltype):
         temp.close()
         if rmspdexists==True:
             if float(RMSPD)>poltype.maxRMSPD:
+                poltype.failedrmspd=True
                 poltype.WriteToLog('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
-            
-                raise ValueError(os.getcwd()+' '+'Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
+                warnings.warn('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
+                if poltype.issane==True:
+                    if poltype.deletedfiles==True:
+                        raise ValueError(os.getcwd()+' '+'Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
             else:
                 poltype.WriteToLog('RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
 

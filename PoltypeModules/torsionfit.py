@@ -200,7 +200,7 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
     rows1=list([i[1] for i in rows])
     return rows1,rows0,WBOarray
 
-def compute_mm_tor_energy(poltype,mol,torset,designatexyz,flatphaselist,keyfile = None):
+def compute_mm_tor_energy(poltype,mol,torset,designatexyz,flatphaselist,readangles=False,keyfile = None):
     """
     Intent: Use tinker analyze to find the Pre-fit MM Energy vs. Dihedral Angle profile
     Input:
@@ -232,7 +232,8 @@ def compute_mm_tor_energy(poltype,mol,torset,designatexyz,flatphaselist,keyfile 
         newtorxyzfname=torxyzfname.replace('.xyz','.xyz_2')
         toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
         tot_energy,tor_energy=GrabTinkerEnergy(poltype,toralzfname)
-
+        if readangles==True:
+            angles=ReadAnglesFromOutputFile(poltype,torset,newtorxyzfname)
         energy_list.append(tot_energy)
         torse_list.append(tor_energy)
         angle_list.append(angles)
@@ -247,6 +248,23 @@ def compute_mm_tor_energy(poltype,mol,torset,designatexyz,flatphaselist,keyfile 
     rows2=list([i[2] for i in rows])
 
     return rows1,rows0,rows2
+
+
+def ReadAnglesFromOutputFile(poltype,torset,newtorxyzfname):
+    cartxyz=torgen.ConvertTinktoXYZ(poltype,newtorxyzfname,newtorxyzfname.replace('.xyz','_cart.xyz'))
+    angles=[]
+    themol = opt.load_structfile(poltype,cartxyz)
+    for tor in torset:
+        a,b,c,d=tor[:]
+        torang = themol.GetTorsion(a,b,c,d)
+        if torang<0:
+            torang+=360
+        angles.append(torang)
+   
+
+
+    return angles
+
 
 
 def GrabTinkerEnergy(poltype,toralzfname):
@@ -420,9 +438,10 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,fileprefix):
         classkeylist=[]
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
         qme_list,qang_list,WBOarray = compute_qm_tor_energy(poltype,torset,mol,flatphaselist)
-        mme_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,fileprefix,flatphaselist,tmpkey1basename)
-        if torset in poltype.torsetpuckertotorsetfit.keys():
-            torset=poltype.torsetpuckertotorsetfit[torset] 
+        mme_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,fileprefix,flatphaselist,False,tmpkey1basename)
+        if len(poltype.onlyfittorstogether)!=0:
+            torset=tuple(poltype.onlyfittorstogether)
+
         for i in range(len(torset)):
             tor=torset[i]
             a,b,c,d = tor[0:4]
@@ -747,9 +766,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         classkeylist=[]
         refine=False
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
-        if torset in poltype.torsetpuckertotorsetfit.keys():
-            torset=poltype.torsetpuckertotorsetfit[torset] 
-
+        if len(poltype.onlyfittorstogether)!=0:
+            torset=tuple(poltype.onlyfittorstogether)
         for i in range(len(torset)):
             tor=torset[i]
             # get the atoms in the main torsion about this rotatable bond
@@ -952,7 +970,9 @@ def GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_
         ax.text(0, -0.1, 'FoldNum=%s NumPrms=%s DataPts=%s RMSD(fit,QM-MM1),Abs=%s'%(str(len(poltype.nfoldlist)),str(numprms),str(len(mm_energy_list)),round(minRMSD,2)), transform=ax.transAxes, fontsize=10,verticalalignment='bottom')
         fig.savefig(figfname)
     elif dim==2:
-        tormat,qmmat,mmmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,cls_angle_dict[tup],tor_energy_list,qm_energy_list,mm_energy_list,torset,indicesremoveddic,cls_angle_dict_unmodified[tup],qm_energy_list_unmodified,mm_energy_list_unmodified)
+        tor_energy_list_unmodified = numpy.array([qme - mme for qme,mme in zip(qm_energy_list_unmodified,mm_energy_list_unmodified)])
+
+        tormat,qmmat,mmmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,cls_angle_dict[tup],tor_energy_list,qm_energy_list,mm_energy_list,torset,indicesremoveddic,cls_angle_dict_unmodified[tup],tor_energy_list_unmodified,qm_energy_list_unmodified,mm_energy_list_unmodified)
         PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,tormat,'QM-MM1 Heatmap (kcal/mol)','QM-MM1_Heatmap.png',numprms,datapts,minRMSD,string)
         PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,qmmat,'QM Heatmap (kcal/mol)','QM_Heatmap.png',numprms,datapts,minRMSD,string)
         PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,mmmat,'MM1 Heatmap (kcal/mol)','MM1_Heatmap.png',numprms,datapts,minRMSD,string)
@@ -1039,6 +1059,7 @@ def PlotHeatmap(poltype,idealanglematrix,actualanglematrix,matrix,title,figfname
 
 
 def FillInEnergyTensors(poltype,phaseanglearray,actualanglearray,tor_energy_list,qm_energy_list,mm_energy_list,torset,indicesremoved,actualanglearrayunmodified,tor_energy_list_unmodified,qm_energy_list_unmodified,mm_energy_list_unmodified):
+
     phasetensor=poltype.tensorphases[torset]
     shape=list(phasetensor.shape)
     
@@ -1183,30 +1204,22 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
 
         tmpkeyfname = 'tmp.key'
         qm_energy_list,qang_list,WBOarray = compute_qm_tor_energy(poltype,torset,mol,flatphaselist)
-        mm_energy_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,'_preQMOPTprefit',flatphaselist,tmpkeyfname)
-        mm2_energy_list,m2ang_list,tor_e_list2 = compute_mm_tor_energy(poltype,mol,torset,'_postQMOPTpostfit',flatphaselist,tmpkey2basename)
-        if torset in poltype.torsetpuckertotorsetfit.keys():
-            torset=poltype.torsetpuckertotorsetfit[torset] 
-
+        mm_energy_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,'_preQMOPTprefit',flatphaselist,False,tmpkeyfname)
+        mm2_energy_list,m2ang_list,tor_e_list2 = compute_mm_tor_energy(poltype,mol,torset,'_postQMOPTpostfit',flatphaselist,True,tmpkey2basename)
+        if len(poltype.onlyfittorstogether)!=0:
+            torset=tuple(poltype.onlyfittorstogether)
         bypassrmsd=torsettobypassrmsd[torset]
         classkeylist=[]
         for tor in torset:
             a,b,c,d = tor[0:4]
             key=str(b)+' '+str(c)
-            anginc=poltype.rotbndtoanginc[key]
-            maxrange=poltype.rotbndtomaxrange[key]
-            anglelist=range(0,maxrange,anginc)
             torang = mol.GetTorsion(a,b,c,d)
             atmnuma = mol.GetAtom(a).GetAtomicNum()
             atmnumd = mol.GetAtom(d).GetAtomicNum()
 
             # clskey
             clskey = torgen.get_class_key(poltype,a, b, c, d)
-            #if clskey not in clskeyswithbadfits and count>0:
-            #    continue
             classkeylist.append(clskey)
-            #if clskey not in fitfunc_dict.keys():
-            #    continue
         
         # get the qm energy profile
         shutil.copy(tmpkey1basename, tmpkeyfname)
@@ -1381,10 +1394,9 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             plt.show()
             fig.savefig(figfname)
         elif dim==2:
-            mmmat,mm2mat,fmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,mang_list,mm_energy_list,mm2_energy_list,ff_list,torset,indicesremoved,originalmang_list,originalmm2_energy_list,originalmm_energy_list)
+            mmmat,mm2mat,fmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,mang_list,mm_energy_list,mm2_energy_list,ff_list,torset,classkeylisttoindicesremoved[tup],originalmang_list,originalmm_energy_list,originalmm2_energy_list,originalff_list)
             PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,mm2mat,'MM2 Heatmap (kcal/mol)','MM2_Heatmap.png',numprms,datapts,minRMSD)
             PlotHeatmap(poltype,idealanglematrix,actualanglematrix ,fmat,'MM1+Fit Heatmap (kcal/mol)','MM1+Fit_Heatmap.png',numprms,datapts,minRMSD)
-
 
 
         txtfname = figfname.replace('.png','.txt')
@@ -1585,6 +1597,7 @@ def PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle
         tor_energy_list_unmodified = numpy.array([qme - mme for qme,mme in zip(qm_energy_list_unmodified,mm_energy_list_unmodified)])
 
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
+        
         tormat,qmmat,mmmat,idealanglematrix,actualanglematrix=FillInEnergyTensors(poltype,flatphaselist,cls_angle_dict[tup],tor_energy_list,qm_energy_list,mm_energy_list,torset,indicesremoved,cls_angle_dict_unmodified[tup],tor_energy_list_unmodified,qm_energy_list_unmodified,mm_energy_list_unmodified)
         firsttor=torsions[0]
         secondtor=torsions[1]

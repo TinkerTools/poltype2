@@ -54,7 +54,10 @@ from email.mime.base import MIMEBase
 
 
 class PolarizableTyper():
-    def __init__(self,parentname=None,addhydrogentononcharged=True,accuratevdwsp=False,inputmoleculefolderpaths=None,email=None,firstoptfinished=False,firstoptonly=False,onlyvdwatomindex=None,use_qmopt_vdw=False,use_gau_vdw=False,dontusepcm=False,deleteallnonqmfiles=False,totalcharge=None,torspbasissethalogen="6-311G*",homodimers=False,tortormissingfilename='tortormissing.txt',tordebugmode=False,amoebapluscfsmartstocommentmap=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoebapluscfsmartstocomment.txt',amoebapluscfprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'cfprmlib.txt',amoebaplusnonbondedprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoebaplusnonbonded.prm',amoebaplusnonbondedsmartstocommentmap=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoebaplusnonbonded.txt',smartstosoluteradiimap=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'SMARTsToSoluteRadiiMap.txt',latestsmallmoleculepolarizeprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21polarize.prm',latestsmallmoleculesmartstotypespolarize=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21polarcommenttoparameters.txt',latestsmallmoleculesmartstotinkerclass=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21smartstoclass.txt',latestsmallmoleculeprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21.prm',boltzmantemp=8,dontdovdwscan=False,vdwprobepathname=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/VdwProbes/',vdwprobenames=['water'],use_gausgeomoptonly=False,maxtorRMSPDRel=.2,vdwmissingfilename='missingvdw.txt',databaseprmfilename='database.prm',tortor=False,torfit2Drotonly=False,torfit1Drotonly=False,externalparameterdatabase=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'externalparameterdatabase.txt',fitfirsttorsionfoldphase=False,keyfiletoaddtodatabase=None,skipgridsearch=True,torsionprmguessfilename='torsionprmguess.txt',defaultmaxtorsiongridpoints=40,torsionsmissingfilename='torsionsmissing.txt',smallmoleculemm3prmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'mm3.prm',smallmoleculesmartstomm3descrip=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'smartstomm3typedescrip.txt',absdipoletol=.5,transferanyhydrogentor=True,smallmoleculesmartstotinkerdescrip=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'smartstoamoebatypedescrip.txt',smallmoleculeprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba09.prm',torspbasissetfile='6-311+g_st_.0.gbs',toroptbasissetfile='6-311g_st_.0.gbs',optbasissetfile='6-311g_st_.0.gbs',dmabasissetfile='6-311g_st__st_.0.gbs',espbasissetfile='aug-cc-pvtz.1.gbs',iodinetorspbasissetfile='def2-svp.1.gbs',iodinetoroptbasissetfile='def2-svp.1.gbs',iodineoptbasissetfile='def2-svp.1.gbs',iodinedmabasissetfile='def2-svp.1.gbs',iodineespbasissetfile='def2-tzvpp.1.gbs',basissetpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/'+'BasisSets/',refinenonaroringtors=False,maxgrowthcycles=4,use_gauPCM=False,fitqmdipole=False,scfmaxiter=500,suppresstorfiterr=False,obminimizeexe='obminimize',readinionly=False,suppressdipoleerr=False,topologylib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ModifiedResidueLibraries/residue_connect.txt",poltypepath=os.path.abspath(os.path.split(__file__)[0]),WBOtol=.05,dontfrag=False,isfragjob=False,dipoletol=.13,externalapi=None,printoutput=False,poltypeini=True,structure=None,prmstartidx=401,numproc="1",maxmem="700MB",maxdisk="100GB",gausdir=None,gdmadir=None,tinkerdir=None,scratchdir="/scratch",paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebabio18_header.prm",gausexe=None,formchkexe='formchk',cubegenexe='cubegen',gdmaexe='gdma',avgmpolesexe=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/PoltypeModules/avgmpoles.pl",peditexe='poledit.x',potentialexe='potential.x',minimizeexe='minimize.x',analyzeexe='analyze.x',superposeexe='superpose.x',defopbendval=0.20016677990819662,Hartree2kcal_mol=627.5095,optbasisset='6-31G*',toroptbasisset='6-311G',dmabasisset='6-311G**',espbasisset="aug-cc-pVTZ",torspbasisset="6-311+G*",optmethod='MP2',toroptmethod='wB97X-D',torspmethod='wB97X-D',dmamethod='MP2',espmethod='MP2',qmonly = False,espfit = True,parmtors = True,foldnum=3,foldoffsetlist = [ 0.0, 180.0, 0.0, 180.0, 0.0, 180.0 ],torlist = None,rotbndlist = None,maxRMSD=1,maxRMSPD=1,maxtorRMSPD=1.8,tordatapointsnum=None,gentorsion=False,gaustorerror=False,torsionrestraint=.1*3282.80354574,onlyrotbndslist=None,rotalltors=False,dontdotor=False,dontdotorfit=False,toroptpcm=False,optpcm=False,torsppcm=False,use_gaus=False,use_gausoptonly=False,freq=False,postfit=False,bashrcpath=None,amoebabioprmpath=None,libpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ModifiedResidueLibraries/lib.bio18_conv1.txt",SMARTSToTypelibpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ModifiedResidueLibraries/SMARTSToTypeLib.txt',ModifiedResiduePrmPath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/ModifiedResidue.prm',modifiedproteinpdbname=None,unmodifiedproteinpdbname=None,mutatedsidechain=None,mutatedresiduenumber=None,modifiedresiduepdbcode=None,optmaxcycle=400,torkeyfname=None,gausoptcoords='',forcefield="AMOEBA",helpfile='README.md',versionfile='version.md',sleeptime=30):
+    def __init__(self,issane=True,deletedfiles=False,onlyfittorstogether=[],parentname=None,addhydrogentononcharged=True,accuratevdwsp=False,inputmoleculefolderpaths=None,email=None,firstoptfinished=False,firstoptonly=False,onlyvdwatomindex=None,use_qmopt_vdw=False,use_gau_vdw=False,dontusepcm=False,deleteallnonqmfiles=False,totalcharge=None,torspbasissethalogen="6-311G*",homodimers=False,tortormissingfilename='tortormissing.txt',tordebugmode=False,amoebapluscfsmartstocommentmap=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoebapluscfsmartstocomment.txt',amoebapluscfprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'cfprmlib.txt',amoebaplusnonbondedprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoebaplusnonbonded.prm',amoebaplusnonbondedsmartstocommentmap=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoebaplusnonbonded.txt',smartstosoluteradiimap=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'SMARTsToSoluteRadiiMap.txt',latestsmallmoleculepolarizeprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21polarize.prm',latestsmallmoleculesmartstotypespolarize=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21polarcommenttoparameters.txt',latestsmallmoleculesmartstotinkerclass=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21smartstoclass.txt',latestsmallmoleculeprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21.prm',boltzmantemp=8,dontdovdwscan=False,vdwprobepathname=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/VdwProbes/',vdwprobenames=['water'],use_gausgeomoptonly=False,maxtorRMSPDRel=.2,vdwmissingfilename='missingvdw.txt',databaseprmfilename='database.prm',tortor=False,torfit2Drotonly=False,torfit1Drotonly=False,externalparameterdatabase=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'externalparameterdatabase.txt',fitfirsttorsionfoldphase=False,keyfiletoaddtodatabase=None,skipgridsearch=True,torsionprmguessfilename='torsionprmguess.txt',defaultmaxtorsiongridpoints=40,torsionsmissingfilename='torsionsmissing.txt',smallmoleculemm3prmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'mm3.prm',smallmoleculesmartstomm3descrip=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'smartstomm3typedescrip.txt',absdipoletol=.5,transferanyhydrogentor=True,smallmoleculesmartstotinkerdescrip=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'smartstoamoebatypedescrip.txt',smallmoleculeprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba09.prm',torspbasissetfile='6-311+g_st_.0.gbs',toroptbasissetfile='6-311g_st_.0.gbs',optbasissetfile='6-311g_st_.0.gbs',dmabasissetfile='6-311g_st__st_.0.gbs',espbasissetfile='aug-cc-pvtz.1.gbs',iodinetorspbasissetfile='def2-svp.1.gbs',iodinetoroptbasissetfile='def2-svp.1.gbs',iodineoptbasissetfile='def2-svp.1.gbs',iodinedmabasissetfile='def2-svp.1.gbs',iodineespbasissetfile='def2-tzvpp.1.gbs',basissetpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/'+'BasisSets/',refinenonaroringtors=False,maxgrowthcycles=4,use_gauPCM=False,fitqmdipole=False,scfmaxiter=500,suppresstorfiterr=False,obminimizeexe='obminimize',readinionly=False,suppressdipoleerr=False,topologylib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ModifiedResidueLibraries/residue_connect.txt",poltypepath=os.path.abspath(os.path.split(__file__)[0]),WBOtol=.05,dontfrag=False,isfragjob=False,dipoletol=.13,externalapi=None,printoutput=False,poltypeini=True,structure=None,prmstartidx=401,numproc="1",maxmem="700MB",maxdisk="100GB",gausdir=None,gdmadir=None,tinkerdir=None,scratchdir="/scratch",paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebabio18_header.prm",gausexe=None,formchkexe='formchk',cubegenexe='cubegen',gdmaexe='gdma',avgmpolesexe=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/PoltypeModules/avgmpoles.pl",peditexe='poledit.x',potentialexe='potential.x',minimizeexe='minimize.x',analyzeexe='analyze.x',superposeexe='superpose.x',defopbendval=0.20016677990819662,Hartree2kcal_mol=627.5095,optbasisset='6-31G*',toroptbasisset='6-311G',dmabasisset='6-311G**',espbasisset="aug-cc-pVTZ",torspbasisset="6-311+G*",optmethod='MP2',toroptmethod='wB97X-D',torspmethod='wB97X-D',dmamethod='MP2',espmethod='MP2',qmonly = False,espfit = True,parmtors = True,foldnum=3,foldoffsetlist = [ 0.0, 180.0, 0.0, 180.0, 0.0, 180.0 ],torlist = None,rotbndlist = None,maxRMSD=1,maxRMSPD=1,maxtorRMSPD=1.8,tordatapointsnum=None,gentorsion=False,gaustorerror=False,torsionrestraint=.1*3282.80354574,onlyrotbndslist=None,rotalltors=False,dontdotor=False,dontdotorfit=False,toroptpcm=False,optpcm=False,torsppcm=False,use_gaus=False,use_gausoptonly=False,freq=False,postfit=False,bashrcpath=None,amoebabioprmpath=None,libpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ModifiedResidueLibraries/lib.bio18_conv1.txt",SMARTSToTypelibpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ModifiedResidueLibraries/SMARTSToTypeLib.txt',ModifiedResiduePrmPath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/ModifiedResidue.prm',modifiedproteinpdbname=None,unmodifiedproteinpdbname=None,mutatedsidechain=None,mutatedresiduenumber=None,modifiedresiduepdbcode=None,optmaxcycle=400,torkeyfname=None,gausoptcoords='',forcefield="AMOEBA",helpfile='README.md',versionfile='version.md',sleeptime=30):
+        self.issane=issane
+        self.deletedfiles=deletedfiles
+        self.onlyfittorstogether=onlyfittorstogether
         self.parentname=parentname
         self.addhydrogentononcharged=addhydrogentononcharged
         self.accuratevdwsp=accuratevdwsp
@@ -518,6 +521,18 @@ class PolarizableTyper():
                                 temp.append(int(e))
                             templist.append(temp)
                         self.onlyrotbndslist=templist
+
+                    elif "onlyfittorstogether" in newline:
+                        self.onlyfittorstogether=a.split(',')
+                        templist=[]
+                        for ele in self.onlyfittorstogether:
+                            nums=ele.lstrip().rstrip().split()
+                            temp=[]
+                            for e in nums:
+                                temp.append(int(e))
+                            templist.append(temp)
+                        self.onlyfittorstogether=templist
+                        self.onlyfittorstogether=[tuple(i) for i in self.onlyfittorstogether]
 
                     elif "optmethod" in newline and 'tor' not in newline:
                         self.optmethod = a
@@ -1469,6 +1484,7 @@ class PolarizableTyper():
         if self.addhydrogentononcharged==True:
             m = Chem.AddHs(m)
             AllChem.EmbedMolecule(m)
+        
 
         pcm=self.CheckForConcentratedFormalCharges(m,atomindextoformalcharge)
         cpm = copy.deepcopy(m)
@@ -1561,7 +1577,7 @@ class PolarizableTyper():
             cartxyz=self.firstlogoptfname.replace('.log','.xyz')
             opt.GrabFinalXYZStructure(self,self.firstlogoptfname,cartxyz,mol)
 
-            inioptmol = opt.load_structfile(poltype,cartxyz)
+            inioptmol = opt.load_structfile(self,cartxyz)
             inioptmol.SetTotalCharge(mol.GetTotalCharge())
 
             while bondtoposame==False:
@@ -1572,7 +1588,7 @@ class PolarizableTyper():
                     finished,error=self.CheckNormalTermination(self.firstlogoptfname)
                     cartxyz=self.firstlogoptfname.replace('.log','.xyz')
                     opt.GrabFinalXYZStructure(self,self.firstlogoptfname,cartxyz,mol)
-                    inioptmol = opt.load_structfile(poltype,cartxyz)
+                    inioptmol = opt.load_structfile(self,cartxyz)
                     inioptmol.SetTotalCharge(mol.GetTotalCharge())
                 except:
                     pass
@@ -1580,7 +1596,7 @@ class PolarizableTyper():
                 attempts+=1
         else:
             cartxyz=self.firstlogoptfname.replace('.log','.xyz')
-            optmol = opt.load_structfile(poltype,cartxyz)
+            optmol = opt.load_structfile(self,cartxyz)
             optmol.SetTotalCharge(mol.GetTotalCharge())
 
         
@@ -1633,10 +1649,15 @@ class PolarizableTyper():
             while not os.path.isfile(self.keyfname):
                 time.sleep(1)
                 self.WriteToLog('Waiting for '+self.keyfname)
-            
+                
             mpole.prepend_keyfile(self,self.keyfname,optmol)
             mpole.SanitizeMultipoleFrames(self,self.keyfname)
-
+        self.issane=self.CheckFileSanity()
+        if self.issane==False:
+            self.deletedfiles=True
+            self.DeleteAllFiles()
+            RunPoltype()
+            
         # post process local frames written out by poledit
         if self.atomnum!=1: 
              try:
@@ -1679,7 +1700,12 @@ class PolarizableTyper():
         # Remove header terms from the keyfile
         mpole.rm_esp_terms_keyfile(self,self.key3fname)
         if self.atomnum!=1: 
-            esp.ElectrostaticPotentialComparison(self)  
+            esp.ElectrostaticPotentialComparison(self) 
+            if self.failedrmspd==True and self.deletedfiles==False:
+                self.DeleteFilesWithExtension(['pot','grid','key','xyz','key_2','key_3','key_4','key_5','xyz_2'])
+                self.deletedfiles=True
+                self.GenerateParameters()
+
         
         
         # Now that multipoles have been found
@@ -1697,11 +1723,12 @@ class PolarizableTyper():
             databaseparser.appendtofile(self,self.key3fname,self.key4fname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo)
         if self.torsppcm:
             torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
+
+        torgen.get_all_torsions(self,mol)
         # Find rotatable bonds for future torsion scans
         (self.torlist, self.rotbndlist,hydtorsions,nonaroringtorlist) = torgen.get_torlist(self,mol,torsionsmissing)
         if atomnum<25 and len(nonaroringtorlist)==0: 
             self.dontfrag=True
-        torgen.get_all_torsions(self,mol)
         self.torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self) # this only happens in very symmetrical molecules
         self.torlist=[tuple(i) for i in self.torlist]
         self.torlist=[tuple([i]) for i in self.torlist]
@@ -1732,11 +1759,10 @@ class PolarizableTyper():
         self.classkeytoinitialprmguess={}
         if self.tortor==True and self.dontdotor==False:
             torgen.PrepareTorsionTorsion(self,optmol,mol,tortorsmissing)
-        poltype.torsetpuckertotorsetfit={}
+        self.nonarotortotorsbeingfit={}
         if self.refinenonaroringtors==True and self.dontfrag==False:
             rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
         if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False and (self.dontdotor==False or self.dontdovdwscan==False):
-            
 
             WBOmatrix,outputname,error=frag.GenerateWBOMatrix(self,self.rdkitmol,self.mol,self.logoptfname.replace('.log','.xyz'))
             highlightbonds=[]
@@ -1796,6 +1822,71 @@ class PolarizableTyper():
         warnings.warn(string)
         self.WriteToLog(string)
 
+    def DeleteFilesWithExtension(self,ls):
+        files=os.listdir()
+        for f in files:
+            if '.' in f and not os.path.isdir(f):
+                ext=f.split('.')[1]
+                if ext in ls:
+                    os.remove(f)
+
+
+    def DeleteAllFiles(self):
+        files=os.listdir()
+        for f in files:
+            if os.path.isdir(f):
+                shutil.rmtree(f)
+            elif '.' in f and not os.path.isdir(f):
+                ext=f.split('.')[1]
+                if ext!='sdf' and ext!='ini' and ext!='out':
+                    os.remove(f)
+       
+
+    def CheckFileSanity(self):
+        optxyzname=self.logoptfname.replace('.log','.xyz')
+        temp=open(optxyzname,'r')
+        results=temp.readlines()
+        temp.close()
+        atomindextocoords={}
+        atomcount=1
+        for line in results:
+            linesplit=line.split()
+            if len(linesplit)==1:
+                optatomnum=int(linesplit[0])
+            else:
+                if len(linesplit)==4:
+                    coords=[float(linesplit[1]),float(linesplit[2]),float(linesplit[3])]
+                    atomindextocoords[atomcount]=coords
+                    atomcount+=1
+        temp=open(self.xyzfname,'r')
+        results=temp.readlines()
+        temp.close()
+        tinkatomindextocoords={}
+        atomcount=1
+        for line in results:
+            linesplit=line.split()
+            if len(linesplit)==1:
+                atomnum=int(linesplit[0])
+            else:
+                coords=[float(linesplit[2]),float(linesplit[3]),float(linesplit[4])]
+                tinkatomindextocoords[atomcount]=coords
+                atomcount+=1
+        issane=True
+        if optatomnum!=atomnum:
+            warnings.warn('Tinker XYZ file and OPT XYZ file are not same atom number, program changes have been made between runs, need to delete and restart parameterization')
+            issane=False
+        else:
+            for atomnum,optcoord in atomindextocoords.items():
+                tinkcoord=tinkatomindextocoords[atomnum]
+                for i in range(len(optcoord)):
+                    optnum=optcoord[i]
+                    tinknum=tinkcoord[i]
+                    if np.abs(optnum-tinknum)>.01:
+                        issane=False
+                        break
+            if issane==False:
+                warnings.warn('Tinker XYZ file and OPT XYZ file are not same coordinates, program changes have been made between runs, need to delete and restart parameterization')
+        return issane
 
     
     def SendCrashReportEmail(self,TEXT,fromaddr,toaddr,password,filename):
@@ -1815,20 +1906,22 @@ class PolarizableTyper():
   
 
 if __name__ == '__main__':
-    poltype=PolarizableTyper() 
-    try:
-        poltype.main()
-    except:
-        traceback.print_exc(file=sys.stdout)
-        text = str(traceback.format_exc())
-        if os.path.exists(poltype.scrtmpdirgau):
-            shutil.rmtree(poltype.scrtmpdirgau)
-        if os.path.exists(poltype.scrtmpdirpsi4):
-            shutil.rmtree(poltype.scrtmpdirpsi4)
-        if poltype.email!=None:
-            password='amoebaisbest'
-            fromaddr = 'poltypecrashreportnoreply@gmail.com'
-            toaddr = poltype.email
-            filename=poltype.logfname
-            poltype.SendCrashReportEmail(text,fromaddr,toaddr,password,filename)
+    def RunPoltype():
+        poltype=PolarizableTyper() 
+        try:
+            poltype.main()
+        except:
+            traceback.print_exc(file=sys.stdout)
+            text = str(traceback.format_exc())
+            if os.path.exists(poltype.scrtmpdirgau):
+                shutil.rmtree(poltype.scrtmpdirgau)
+            if os.path.exists(poltype.scrtmpdirpsi4):
+                shutil.rmtree(poltype.scrtmpdirpsi4)
+            if poltype.email!=None:
+                password='amoebaisbest'
+                fromaddr = 'poltypecrashreportnoreply@gmail.com'
+                toaddr = poltype.email
+                filename=poltype.logfname
+                poltype.SendCrashReportEmail(text,fromaddr,toaddr,password,filename)
         raise ValueError('Houston, we have a problem. Buy a developer some coffee!')
+    RunPoltype()
