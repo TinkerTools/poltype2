@@ -870,7 +870,6 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
                indices=list(range(len(match)))
                smartsindextomoleculeindex=dict(zip(indices,match)) 
                moleculeindextosmartsindex={v: k for k, v in smartsindextomoleculeindex.items()}
-            
         structure = Chem.MolFromSmarts(parametersmarts)
         fragmentfilepath='fragment.mol'
         if os.path.isfile(fragmentfilepath):
@@ -886,7 +885,6 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         substructure = Chem.MolFromSmarts(smartsfortransfer)
         matches=structure.GetSubstructMatches(substructure)
         firstmatch=TryAndPickMatchWithNeighbors(poltype,matches,smartindices,substructure)
-
         indices=list(range(len(firstmatch)))
         smartsindextoparametersmartsindex=dict(zip(indices,firstmatch)) 
         parametersmartsordertoelementtinkerdescrip={}
@@ -1051,7 +1049,6 @@ def AddOptimizedAngleLengths(poltype,optmol,angleprms,anglelistbabel):
         allangles = list(itertools.product(angleindices[0], angleindices[1],angleindices[2]))
         allangles=[x for x in allangles if len(x) == len(set(x))]
         allangles=FilterList(poltype,allangles,anglelistbabel)
-
         tot=0
         for angle in allangles:
             a = optmol.GetAtom(angle[0])
@@ -3603,7 +3600,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         originalbondindicestosmartsatomorders=bondindicestosmartsatomorders.copy()
         originalangleindicestosmartsatomorders=angleindicestosmartsatomorders.copy()
         formissingangleindicestosmartsatomorders=RemoveIndicesMatchedFromNewDatabase(poltype,angleindicestosmartsatomorders,newangleindicestopoltypeclasses) 
-
         formissingbondindicestosmartsatomorders=RemoveIndicesMatchedFromNewDatabase(poltype,bondindicestosmartsatomorders,newbondindicestopoltypeclasses) 
         indextoneighbidxs=FindAllNeighborIndexes(poltype,rdkitmol)
         bondindicestosmartsatomorders=originalbondindicestosmartsatomorders.copy()
@@ -3627,7 +3623,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         torsionsmissingindicestotinkerclasses=PruneDictionary(poltype,torsionsmissing,torsionindicestotinkerclasses)
         
         torsionszerooutindicestotinkerclasses=PruneDictionary(poltype,torsionstozerooutduetocolinear,torsionindicestotinkerclasses)
-
         atomtinkerclasstopoltypeclass=TinkerClassesToPoltypeClasses(poltype,atomindextotinkerclass)
         bondtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,bondindicestotinkerclasses)
         arotorsionsmissingindicestotinkerclasses=PruneDictionary(poltype,poormatchingaromatictorsions,torsionindicestotinkerclasses)
@@ -3715,7 +3710,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         potentialmissingopbendprmindices=ConvertPoltypeClassesToIndices(poltype,potentialmissingopbendprmtypes)
         potentialmissingopbendprmindices=FilterIndices(poltype,potentialmissingopbendprmindices,planarbonds)
         missingopbendprmindices=CheckIfParametersExist(poltype,potentialmissingopbendprmindices,opbendprms)
-
         torsionsmissing=ConvertToPoltypeClasses(poltype,torsionsmissing)
         missingvdwtypes=[poltype.idxtosymclass[i] for i in missingvdwatomindices]
         defaultvalues=None
@@ -3740,7 +3734,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
             cpprmstotransferinfo={}
             bondcfprmstotransferinfo={}
             anglecfprmstotransferinfo={}
-
         tortorprmstotransferinfo=MapParameterLineToTransferInfo(poltype,tortorprms,{},{},{},tortorpoltypeclassestosmartsatomordersext,{},{},arotorsionlinetodescrips,missingvdwtypes,torsionsmissing,missingbondpoltypeclasses,missinganglepoltypeclasses,defaultvalues=None,keyword='tortors')
         bondprmstotransferinfo=MapParameterLineToTransferInfo(poltype,bondprms,bondpoltypeclassestoparametersmartsatomorders,bondpoltypeclassestosmartsatomorders,bondpoltypeclassestoelementtinkerdescrips,bondpoltypeclassestosmartsatomordersext,newbondpoltypeclassestocomments,newbondpoltypeclassestosmartslist,arotorsionlinetodescrips,missingvdwtypes,torsionsmissing,missingbondpoltypeclasses,missinganglepoltypeclasses)
         opbendprmstotransferinfo=MapParameterLineToTransferInfo(poltype,opbendprms,opbendpoltypeclassestoparametersmartsatomorders,opbendpoltypeclassestosmartsatomorders,opbendpoltypeclassestoelementtinkerdescrips,opbendpoltypeclassestosmartsatomordersext,newopbendpoltypeclassestocomments,newopbendpoltypeclassestosmartslist,arotorsionlinetodescrips,missingvdwtypes,torsionsmissing,missingbondpoltypeclasses,missinganglepoltypeclasses,defaultvalues)

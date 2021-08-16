@@ -1156,7 +1156,6 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets,non
         WriteOBMolToXYZ(poltype,fragmolbabel,filename.replace('.mol','_xyzformat.xyz'))
         WriteOBMolToSDF(poltype,fragmolbabel,filename.replace('.mol','.sdf'))
         structfname=filename.replace('.mol','.sdf')
-        print('os.getcwd()',os.getcwd(),flush=True)
         try:
             fragWBOmatrix,outputname,error=GenerateWBOMatrix(poltype,fragmol,fragmolbabel,filename.replace('.mol','_xyzformat.xyz'))
         except: # assume that fragmenter changed (code changed so structure changed and then need to delete and restart that fragment. Can remove this when code becomes more stable

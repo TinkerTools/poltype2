@@ -464,6 +464,7 @@ def SPForESP(poltype,optmol,mol):
         if poltype.espfit and not term:
             if os.path.isfile(poltype.chkespfname):
                 os.remove(poltype.chkespfname)
+            poltype.WriteToLog("Calling: " + "Gaussian for ESP")
             gen_comfile(poltype,poltype.comespfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkespfname,poltype.comtmp,optmol)
             cmdstr = poltype.gausexe + " " + poltype.comespfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logespfname}

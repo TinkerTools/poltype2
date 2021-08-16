@@ -1599,7 +1599,13 @@ class PolarizableTyper():
             optmol = opt.load_structfile(self,cartxyz)
             optmol.SetTotalCharge(mol.GetTotalCharge())
 
-        
+        optatomnums=optmol.NumAtoms()
+        molatomnums=mol.NumAtoms()
+        if optatomnums!=molatomnums: # then program behaviour changed need to restart
+            self.deletedfiles=True
+            self.DeleteAllFiles()
+            RunPoltype()
+
         if self.firstoptonly==True:
             sys.exit()
         if self.use_gausgeomoptonly==True:
@@ -1626,7 +1632,6 @@ class PolarizableTyper():
                 self.use_gaus=True
             else:
                 traceback.print_exc(file=sys.stdout)
-
 
         # Obtain multipoles from Gaussian fchk file using GDMA
     
@@ -1923,5 +1928,5 @@ if __name__ == '__main__':
                 toaddr = poltype.email
                 filename=poltype.logfname
                 poltype.SendCrashReportEmail(text,fromaddr,toaddr,password,filename)
-        raise ValueError('Houston, we have a problem. Buy a developer some coffee!')
+            raise ValueError('Houston, we have a problem. Buy a developer some coffee!')
     RunPoltype()
