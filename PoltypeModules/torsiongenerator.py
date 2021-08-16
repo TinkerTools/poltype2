@@ -54,7 +54,7 @@ def RemoveCommentsFromKeyFile(poltype,keyfilename):
         
     shutil.move(tempname, keyfilename)
 
-def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,variabletorlist,torsionrestraint,mol,currentopt):
+def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,variabletorlist,torsionrestraint,mol,currentopt,optlogtophaseangle):
     jobtooutputlog={}
     listofjobs=[]
     outputlogs=[]
@@ -74,8 +74,9 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,varia
 
         if finished==True or ( finished==False and poltype.tordebugmode==False):
             outputlogs.append(outputlog)
+        optlogtophaseangle[outputlog]=phaseangles
         initialstructures.append(torxyzfname)   
-    return outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures
+    return outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures,optlogtophaseangle
 
 def CheckIfPsi4Log(poltype,outputlog):
     check=False
@@ -89,13 +90,13 @@ def CheckIfPsi4Log(poltype,outputlog):
     return check 
 
 
-def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,mol):
+def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,mol,optlogtosplog,optlogtophaseangle):
     jobtooutputlog={}
     listofjobs=[]
     outputnames=[]
     for i in range(len(optoutputlogs)):
-        phaseangles=phaselist[i]
         outputlog=optoutputlogs[i]
+        phaseangles=optlogtophaseangle[outputlog]
         if not poltype.use_gaus:
             prevstrctfname=outputlog.replace('.log','.xyz')
             inputname,outputname=CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,mol)
@@ -111,14 +112,14 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
             if poltype.tordebugmode==False:
                 listofjobs.append(cmdstr)
                 jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputname
-
         outputnames.append(outputname)
         outputlogtophaseangles[outputname]=phaseangles
+        optlogtosplog[outputlog]=outputname
     if not poltype.use_gaus:
         
-        return outputnames,listofjobs,poltype.scrtmpdirpsi4,jobtooutputlog,outputlogtophaseangles
+        return outputnames,listofjobs,poltype.scrtmpdirpsi4,jobtooutputlog,outputlogtophaseangles,optlogtosplog
     else:
-        return outputnames,listofjobs,poltype.scrtmpdirgau,jobtooutputlog,outputlogtophaseangles
+        return outputnames,listofjobs,poltype.scrtmpdirgau,jobtooutputlog,outputlogtophaseangles,optlogtosplog
 
 
 
@@ -636,6 +637,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     torsettooutputlogtoinitialstructure={}
     torsettoinistructophaselist={}
     
+    optlogtophaseangle={}
     for torset in poltype.torlist:
         phaseangles=[0]*len(torset)
         if poltype.use_gaus==False and poltype.use_gausoptonly==False:
@@ -671,7 +673,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         poltype.tensorphases[tuple(truetorset)]=flatphaselist
         flatphaselist=FlattenArray(poltype,flatphaselist)
         idealangletensor=flatphaselist+currentanglelist
-
         poltype.idealangletensor[tuple(truetorset)]=idealangletensor
         minstrctfname = prevstrctfname
         prevstrctfname = minstrctfname
@@ -703,8 +704,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
 
         poltype.SanitizeAllQMMethods()
         
-        outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol,'1')
-
+        outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures,optlogtophaseangle=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol,'1',optlogtophaseangle)
         torsettooptoutputlogs[tuple(torset)]=outputlogs
         dictionary = dict(zip(outputlogs,initialstructures))  
         torsettooutputlogtoinitialstructure[tuple(torset)].update(dictionary)
@@ -770,6 +770,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     fulljobtooutputlog={}
     torsettospoutputlogs={}
     outputlogtophaseangles={}
+    optlogtosplog={}
     for torset in poltype.torlist:
         variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
@@ -782,7 +783,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             if outputlog in finishedjobs and outputlog not in errorjobs:
                 finishedoutputlogs.append(outputlog)
                 finishedflatphaselist.append(phaselist)
-        outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangles=ExecuteSPJobs(poltype,finishedoutputlogs,finishedflatphaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,mol)
+        outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangles,optlogtosplog=ExecuteSPJobs(poltype,finishedoutputlogs,finishedflatphaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,mol,optlogtosplog,optlogtophaseangle)
         lognames=[]
         torsettospoutputlogs[tuple(torset)]=outputlogs
         for job in listofjobs:
@@ -799,8 +800,8 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         outputlogs=torsettospoutputlogs[tuple(torset)]
         optoutputlogs=torsettooptoutputlogs[tuple(torset)]
         for i in range(len(outputlogs)):
-            outputlog=outputlogs[i]
             optoutputlog=optoutputlogs[i]
+            outputlog=optlogtosplog[optoutputlog]
             if optoutputlog in finishedjobs and outputlog not in errorjobs:
                 phaseangles=outputlogtophaseangles[outputlog]
                 poltype.optoutputtotorsioninfo[outputlog]= [torset,optmol,variabletorlist,phaseangles,bondtopology,optoutputlog]
