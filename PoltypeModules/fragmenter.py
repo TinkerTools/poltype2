@@ -1062,12 +1062,20 @@ def GenerateWBOMatrix(poltype,molecule,moleculebabel,structfname):
              poltype.call_subsystem(cmdstr,True)
         except Exception:
              error=True
-    if not error:
+    try:
+        if not error:
+            WBOmatrix=GrabWBOMatrixPsi4(poltype,outputname,molecule)
+    except:
+        cmdstr='psi4 '+inputname+' '+outputname
+        poltype.call_subsystem(cmdstr,True)
         WBOmatrix=GrabWBOMatrixPsi4(poltype,outputname,molecule)
+
     poltype.espmethod=curespmethod
     poltype.espbasisset=curspbasisset
 
     return WBOmatrix,outputname,error
+
+
 
 def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets,nonaroringtorlist):
 
@@ -1169,7 +1177,6 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets,non
             WriteOBMolToSDF(poltype,fragmolbabel,filename.replace('.mol','.sdf'))
             fragWBOmatrix,outputname,error=GenerateWBOMatrix(poltype,fragmol,fragmolbabel,filename.replace('.mol','_xyzformat.xyz'))
 
-              
         if error:
             os.chdir('..')
             continue
@@ -1425,11 +1432,7 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,torset,fra
                 structfname=fragmentidxtostructfname[fragmolidx]
                 os.chdir(foldername)
                 fragmolbabel=fragmolidxtofragmolbabel[fragmolidx]
-
                 fragWBOmatrix,outputname,error=GenerateWBOMatrix(poltype,fragmol,fragmolbabel,structfname)
-                if error:
-                    os.chdir('..')
-                    continue
                 reducedparentWBOmatrix=ReduceParentMatrix(poltype,parentindextofragindex,fragWBOmatrix,parentWBOmatrix)
                 relativematrix=numpy.subtract(reducedparentWBOmatrix,fragWBOmatrix)
                 
@@ -1590,7 +1593,7 @@ def FirstPassAtomIndexes(poltype,tor,onlyinputindices):
            else:
                if babelatomindex==tor[1] or babelatomindex==tor[2]: # always need neighbors of middle two atoms
                    grabneighbs=True
-           if grabneighbs==True: 
+           if grabneighbs==True:
                for neighbatom in atom.GetNeighbors():
                    neighbatomindex=neighbatom.GetIdx()
                    babelneighbatom=poltype.mol.GetAtom(neighbatomindex+1)
@@ -1617,11 +1620,14 @@ def FirstPassAtomIndexes(poltype,tor,onlyinputindices):
        for neighbneighbatom in atom.GetNeighbors():
            atomicnum=neighbneighbatom.GetAtomicNum()
            neighbneighbatomidx=neighbneighbatom.GetIdx()
+           babelneighbatom=poltype.mol.GetAtom(neighbneighbatomidx+1)
+           babelneighbatomisinring=babelneighbatom.IsInRing()
+
            if atomicnum==1 and neighbneighbatomidx not in molindexlist:
                temp.append(neighbneighbatomidx)
            bond=poltype.rdkitmol.GetBondBetweenAtoms(neighbneighbatomidx,index)
            bondorder=bond.GetBondTypeAsDouble()
-           if bondorder>1 and neighbneighbatomidx not in molindexlist:
+           if bondorder>1 and neighbneighbatomidx not in molindexlist and babelneighbatomisinring==False:
                temp.append(neighbneighbatomidx)
    for idx in temp:
        if idx not in molindexlist:
