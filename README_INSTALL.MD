@@ -48,7 +48,7 @@ Make sure to download the ZIP folder from the poltype2 branch, NOT the master br
 
 * Or simply using the following git command
 ```shell
-git clone git@github.com:pren/poltype.git --branch poltype2
+git clone https://github.com/TinkerTools/poltype2.git master
 ```
 * Make sure you are on a node with an updated OS (as much as possible)
 
