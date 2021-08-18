@@ -227,7 +227,12 @@ def run_gdma(poltype):
     if not os.path.isfile(poltype.fckdmafname):
         poltype.fckdmafname = os.path.splitext(poltype.fckdmafname)[0]
 
-    assert os.path.isfile(poltype.fckdmafname), "Error: " + poltype.fckdmafname + " does not exist."+' '+os.getcwd()
+    try:
+        assert os.path.isfile(poltype.fckdmafname), "Error: " + poltype.fckdmafname + " does not exist."+' '+os.getcwd()
+    except:
+        poltype.DeleteFilesWithString(['dma'])
+        poltype.GenerateParameters()
+
     poltype.gdmainfname = poltype.assign_filenames ( "gdmainfname" , ".gdmain")
     gen_gdmain(poltype,poltype.gdmainfname,poltype.molecprefix,poltype.fckdmafname,poltype.dmamethod)
 

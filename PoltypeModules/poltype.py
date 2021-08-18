@@ -1835,6 +1835,13 @@ class PolarizableTyper():
                 if ext in ls:
                     os.remove(f)
 
+    def DeleteFilesWithString(self,ls):
+        files=os.listdir()
+        for f in files:
+            for string in ls:
+                if string in f:
+                    os.remove(f)
+
 
     def DeleteAllFiles(self):
         files=os.listdir()
