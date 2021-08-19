@@ -60,7 +60,7 @@ def RemoveRedunantTorsionRestraints(poltype):
                     for i in range(1,len(tors)):
                         tor=tors[i]
                         for torset in poltype.torlist:
-                            if len(torset)==1:
+                            if torset in poltype.torsettovariabletorlist.keys():
                                 poltype.torsettovariabletorlist[torset].append(tor)
         
 def FindWhichRingTorIsIn(poltype,ringlist,atomindex):
