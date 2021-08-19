@@ -969,6 +969,8 @@ def get_torlist(poltype,mol,missed_torsions):
         tor = mol.GetTorsion(t1,t2,t3,t4)
         if not skiptorsion:
             torlist.append(unq)
+        if skiptorsion==True and ringbond==True:
+            continue
         # store torsion in rotbndlist
         rotbndlist[rotbndkey] = []
         rotbndlist[rotbndkey].append(unq)
