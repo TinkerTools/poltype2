@@ -25,6 +25,48 @@ import rings
 def __init__(poltype):
     PolarizableTyper.__init__(poltype)
 
+def RemoveRedunantTorsionRestraints(poltype):
+    sssr = poltype.mol.GetSSSR()
+    ringlist=[]
+    for ring in sssr:
+        ringatomindices=rings.GrabRingAtomIndices(poltype,poltype.mol,ring)
+        ringlist.append(ringatomindices)
+    for rotbndkey,othertors in poltype.rotbndlist.items():
+        ringtotorlist={}
+        for tor in othertors:
+            atoms=[poltype.mol.GetAtom(i) for i in tor]
+            ringbool=[a.IsInRing() for a in atoms]
+            if ringbool[0]==True:
+                atomindex=tor[0]
+            elif ringbool[-1]==True:
+                atomindex=tor[-1]
+            ring=FindWhichRingTorIsIn(poltype,ringlist,atomindex) 
+            if ring not in ringtotorlist.keys():
+                ringtotorlist[ring]=[]
+            ringtotorlist[ring].append(tor)    
+        for ring,ls in ringtotorlist.items():
+            triptotorinring={}
+            for tor in ls:
+                a,b,c,d=tor[:]
+                if a in ring:
+                    trip=tuple([b,c,d])
+                elif d in ring:
+                    trip=tuple([a,b,c])
+                if trip not in triptotorinring.keys():
+                    triptotorinring[trip]=[]
+                triptotorinring[trip].append(tor)
+            for trip,tors in triptotorinring.items():
+                if len(tors)>1:
+                    for i in range(1,len(tors)):
+                        tor=tors[i]
+                        for torset in poltype.torlist:
+                            if len(torset)==1:
+                                poltype.torsettovariabletorlist[torset].append(tor)
+        
+def FindWhichRingTorIsIn(poltype,ringlist,atomindex):
+    for ring in ringlist:
+        if atomindex in ring:
+            return tuple(ring)
 
 
 def DefaultMaxRange(poltype,torsions):
@@ -611,6 +653,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         a. Rotate the torsion value by interval of 30 from 30 to 180, then -30 to -210
         b. Find energy using Gaussian SP
     """
+    RemoveRedunantTorsionRestraints(poltype)
     if not os.path.isdir('qm-torsion'):
         os.mkdir('qm-torsion')
     
