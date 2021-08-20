@@ -40,6 +40,8 @@ def RemoveRedunantTorsionRestraints(poltype):
                 atomindex=tor[0]
             elif ringbool[-1]==True:
                 atomindex=tor[-1]
+            else:
+                continue
             ring=FindWhichRingTorIsIn(poltype,ringlist,atomindex) 
             if ring not in ringtotorlist.keys():
                 ringtotorlist[ring]=[]
