@@ -1728,7 +1728,6 @@ class PolarizableTyper():
             databaseparser.appendtofile(self,self.key3fname,self.key4fname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo)
         if self.torsppcm:
             torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
-
         torgen.get_all_torsions(self,mol)
         # Find rotatable bonds for future torsion scans
         (self.torlist, self.rotbndlist,hydtorsions,nonaroringtorlist) = torgen.get_torlist(self,mol,torsionsmissing)
