@@ -48,6 +48,8 @@ def UpdatePolarizeParameters(poltype, vf,newname, polarprmstotransferinfo):
                 if atomtype==polartype:
                     f.write(transferinfo)
                     f.write(polarprmsline.replace('\n','')+' '+residstring+'\n')
+                    f.flush()
+                    os.fsync(f.fileno())
                     linestoskip.append(line)
                     break
                     
@@ -2823,7 +2825,8 @@ def RepresentsInt(s):
     except ValueError:
         return False
 
-def ReadDatabaseSmartsMap(poltype,databasepath):
+def ReadDatabaseSmartsMap(poltype,databasepath): # smartsString classNumber className # comments
+
     smartstoatomclass={}
     atomclasstoclassname={}
     atomclasstocomment={}
@@ -2850,7 +2853,31 @@ def ReadDatabaseSmartsMap(poltype,databasepath):
 
     return smartstoatomclass, atomclasstoclassname, atomclasstocomment
  
+def ReadDatabaseSmartsMapPolarize(poltype,databasepath): # smartsString className # comments
 
+    smartstoatomclass={}
+    atomclasstocomment={}
+    temp=open(databasepath,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        linesplit=line.split()
+        if len(linesplit)>0:
+            first=linesplit[0]
+            if '#' not in first:
+                smarts=linesplit[0]
+                if RepresentsInt(linesplit[1])==True:
+                    tinkerclass=int(linesplit[1])
+                else:
+                    tinkerclass=linesplit[1]
+                comment=' '.join(linesplit[3:])
+                comment=comment.replace('\n','').replace('#','').lstrip().rstrip()
+                smartstoatomclass[smarts]=tinkerclass
+                atomclasstocomment[tinkerclass]=comment
+             
+
+    return smartstoatomclass, atomclasstocomment
+ 
 def MatchAllSmartsToAtomIndices(poltype,smartstoatomclass): #rdkit 0 index based
     atomindextoallsmarts={}
     atomindextoallsmartsmatches={}
@@ -3045,7 +3072,7 @@ def SearchForParametersViaCommentsPolarize(poltype,atomcommentstolistofsmartslis
             prm=linesplit[1]
             atomcommentstoparameters[tuple([comment])]=[prm]
 
-    atomindicestolistofatomcomments=RemoveIndicesThatDontHaveParameters(poltype,atomindicestolistofatomcomments,atomcommentstolistofsmartslist,atomcommentstoparameters)
+    atomindicestolistofatomcomments=RemoveIndicesThatDontHaveParameters(poltype,atomindicestolistofatomcomments,atomcommentstolistofsmartslist,atomcommentstoparameters,prin=True)
     return atomindicestolistofatomcomments,atomcommentstoparameters
 
 
@@ -3146,13 +3173,14 @@ def SearchForParameters(poltype,bondclassestolistofsmartslist,angleclassestolist
  
     return bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses,bondclassestoparameters,angleclassestoparameters,strbndclassestoparameters,opbendclassestoparameters
 
-def RemoveIndicesThatDontHaveParameters(poltype,indicestolistofclasses,classestolistofsmartslist,classestoparameters):
+def RemoveIndicesThatDontHaveParameters(poltype,indicestolistofclasses,classestolistofsmartslist,classestoparameters,prin=False):
     indicestodelete=[]
     for i in range(len(indicestolistofclasses.keys())):
         indices=list(indicestolistofclasses.keys())[i]
         listofclasses=indicestolistofclasses[indices]
         classesmissing=[]
         classesexisting=[]
+        
         for classes in listofclasses:
             if classes not in classestoparameters.keys() and classes[::-1] not in classestoparameters.keys():
                 classesmissing.append(classes)
@@ -3162,7 +3190,6 @@ def RemoveIndicesThatDontHaveParameters(poltype,indicestolistofclasses,classesto
         if len(classesmissing)==len(listofclasses):
             indicestodelete.append(indices)
         indicestolistofclasses[indices]=classesexisting
-
     for indices in indicestodelete:
         del indicestolistofclasses[indices]
     return indicestolistofclasses
@@ -3310,6 +3337,40 @@ def GrabNewParameters(poltype,indicestoclasses,classestoparameters,keyword,indic
         
 
     return indicestopoltypeclasses,newprms,newpoltypeclassestocomments,newpoltypeclassestosmartslist
+
+def GrabNewParametersPolarize(poltype,indicestoclasses,classestoparameters,keyword,indicestosmartslist,atomclasstocomment):
+    indicestopoltypeclasses={}
+    newpoltypeclassestocomments={}
+    newpoltypeclassestosmartslist={}
+
+    newprms=[]
+    for indices,classes in indicestoclasses.items():
+        smartslist=indicestosmartslist[indices]
+        comments=[atomclasstocomment[k] for k in classes]
+        babelindices=[k+1 for k in indices]
+        poltypeclasses=[poltype.idxtosymclass[k] for k in babelindices]
+        indicestopoltypeclasses[indices]=poltypeclasses
+        newpoltypeclassestocomments[tuple([tuple(poltypeclasses)])]=comments
+        newpoltypeclassestosmartslist[tuple([tuple(poltypeclasses)])]=smartslist
+        poltypeclasses=[str(k) for k in poltypeclasses]
+        if keyword=='opbend':
+            poltypeclasses.append('0')
+            poltypeclasses.append('0')
+        if classes in classestoparameters.keys():
+            parameters=classestoparameters[classes]
+        elif classes[::-1] in classestoparameters.keys():
+            parameters=classestoparameters[classes[::-1]]
+
+        parameters=[str(k) for k in parameters]
+        poltypeclassesstring=' '.join(poltypeclasses)
+        parametersstring=' '.join(parameters)
+        newprm=keyword+' '+poltypeclassesstring+' '+parametersstring+'\n'
+        newprms.append(newprm)
+        
+
+    return indicestopoltypeclasses,newprms,newpoltypeclassestocomments,newpoltypeclassestosmartslist
+
+
 
 
 def RemoveOldParametersKeepNewParameters(poltype,prms,newindicestopoltypeclasses,keyword,poltypeclassestoparametersmartsatomorders,poltypeclassestosmartsatomorders,poltypeclassestoelementtinkerdescrips,removefromdic=True):
@@ -3468,16 +3529,16 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
     if polarize==True:
         listofatomsforprm,listofbondsforprm,listofanglesforprm,listoftorsionsforprm=GrabAtomsForParameters(poltype,mol)
 
-        smartstoatomclasspolar, atomclasstoclassnamepolar, atomclasstocommentpolar=ReadDatabaseSmartsMap(poltype,poltype.latestsmallmoleculesmartstotypespolarize) 
+        smartstoatomclasspolar, atomclasstocommentpolar=ReadDatabaseSmartsMapPolarize(poltype,poltype.latestsmallmoleculesmartstotypespolarize) 
+        atomclasstoatomclass=dict(zip(atomclasstocommentpolar.keys(),atomclasstocommentpolar.keys()))
+
         atomindextoallsmartspolar,atomindextoallsmartsmatchespolar=MatchAllSmartsToAtomIndices(poltype,smartstoatomclasspolar)
-        smartstocomment=MapSMARTSToComments(poltype,smartstoatomclasspolar,atomclasstoclassnamepolar)
+        smartstocomment=MapSMARTSToComments(poltype,smartstoatomclasspolar,atomclasstoatomclass)
         atomcommentstolistofsmartslist,atomindicestolistofatomcomments=MapIndicesToCommentsAtom(poltype,atomindextoallsmartspolar,smartstocomment,listofatomsforprm)
         atomindicestolistofatomcomments,atomcommentstoparameters=SearchForParametersViaCommentsPolarize(poltype,atomcommentstolistofsmartslist,atomindicestolistofatomcomments)
         atomindicestocomments,atomindicestosmartslist=FindBestSMARTSMatch(poltype,atomindicestolistofatomcomments,atomcommentstolistofsmartslist)
 
-        commentlist=list(atomclasstoclassnamepolar.values())
-        atomcommentstocomment=dict(zip(commentlist,commentlist))
-        newpolarindicestopoltypeclasses,newpolarprms,newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist=GrabNewParameters(poltype,atomindicestocomments,atomcommentstoparameters,'polarize',atomindicestosmartslist,atomcommentstocomment) 
+        newpolarindicestopoltypeclasses,newpolarprms,newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist=GrabNewParametersPolarize(poltype,atomindicestocomments,atomcommentstoparameters,'polarize',atomindicestosmartslist,atomclasstocommentpolar) 
 
         polarprmstotransferinfo=MapParameterLineToTransferInfo(poltype,newpolarprms,{},{},{},{},newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist,{},[],[],[],[])
         return polarprmstotransferinfo
@@ -3523,15 +3584,14 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         atomindextoallsmartssolute=MakeListOfListValues(poltype,atomindextoallsmartssolute)
         atomindicestoindices,atomindicestosmartslist=FindBestSMARTSMatch(poltype,atomindicestolistofatomindices,atomindextoallsmartssolute)
         soluteprms=GenerateSoluteParameters(poltype,atomindicestosmartslist,smartstosoluteradiiprms)
-        smartstoatomclasspolar, atomclasstoclassnamepolar, atomclasstocommentpolar=ReadDatabaseSmartsMap(poltype,poltype.latestsmallmoleculesmartstotypespolarize) 
+        smartstoatomclasspolar, atomclasstocommentpolar=ReadDatabaseSmartsMapPolarize(poltype,poltype.latestsmallmoleculesmartstotypespolarize) 
+        atomclasstoatomclass=dict(zip(atomclasstocommentpolar.keys(),atomclasstocommentpolar.keys()))
         atomindextoallsmartspolar,atomindextoallsmartsmatchespolar=MatchAllSmartsToAtomIndices(poltype,smartstoatomclasspolar)
-        smartstocomment=MapSMARTSToComments(poltype,smartstoatomclasspolar,atomclasstoclassnamepolar)
+        smartstocomment=MapSMARTSToComments(poltype,smartstoatomclasspolar,atomclasstoatomclass)
         atomcommentstolistofsmartslist,atomindicestolistofatomcomments=MapIndicesToCommentsAtom(poltype,atomindextoallsmartspolar,smartstocomment,listofatomsforprm)
         atomindicestolistofatomcomments,atomcommentstoparameters=SearchForParametersViaCommentsPolarize(poltype,atomcommentstolistofsmartslist,atomindicestolistofatomcomments)
         atomindicestocomments,atomindicestosmartslist=FindBestSMARTSMatch(poltype,atomindicestolistofatomcomments,atomcommentstolistofsmartslist)
-        commentlist=list(atomclasstoclassnamepolar.values())
-        atomcommentstocomment=dict(zip(commentlist,commentlist))
-        newpolarindicestopoltypeclasses,newpolarprms,newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist=GrabNewParameters(poltype,atomindicestocomments,atomcommentstoparameters,'polarize',atomindicestosmartslist,atomcommentstocomment) 
+        newpolarindicestopoltypeclasses,newpolarprms,newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist=GrabNewParametersPolarize(poltype,atomindicestocomments,atomcommentstoparameters,'polarize',atomindicestosmartslist,atomclasstocommentpolar) 
         smartstoatomclass, atomclasstoclassname, atomclasstocomment=ReadDatabaseSmartsMap(poltype,poltype.latestsmallmoleculesmartstotinkerclass) 
         atomindextoallsmarts,atomindextoallsmartsmatches=MatchAllSmartsToAtomIndices(poltype,smartstoatomclass)
         bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters,tortorsmartsatomordertoparameters,tortorsmartsatomordertogrid=ReadExternalDatabase(poltype)
