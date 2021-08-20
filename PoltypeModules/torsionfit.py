@@ -147,6 +147,7 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
         postfix='.log' 
         minstrctfname,angles=torgen.GenerateFilename(poltype,torset,phaseangles,prefix,postfix,mol)
         if not os.path.exists(minstrctfname): # if optimization failed then SP file will not exist
+            
             tor_energy=None
             WBOvalues=None
         else:
@@ -191,7 +192,6 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
     nonecount=energy_list.count(None)
     normalpts=len(energy_list)-nonecount
     prmnum=poltype.torsionsettonumptsneeded[torset]
-
     if normalpts<prmnum:
         raise ValueError('Too many missing QM SP energy values for torsion set = '+str(torset)+' , need '+str(prmnum)+' points') 
     rows = zip(*[angle_list, energy_list])

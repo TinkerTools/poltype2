@@ -844,10 +844,11 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         optoutputlogs=torsettooptoutputlogs[tuple(torset)]
         for i in range(len(outputlogs)):
             optoutputlog=optoutputlogs[i]
-            outputlog=optlogtosplog[optoutputlog]
-            if optoutputlog in finishedjobs and outputlog not in errorjobs:
-                phaseangles=outputlogtophaseangles[outputlog]
-                poltype.optoutputtotorsioninfo[outputlog]= [torset,optmol,variabletorlist,phaseangles,bondtopology,optoutputlog]
+            if optoutputlog in optlogtosplog.keys():
+                outputlog=optlogtosplog[optoutputlog]
+                if optoutputlog in finishedjobs and outputlog not in errorjobs:
+                    phaseangles=outputlogtophaseangles[outputlog]
+                    poltype.optoutputtotorsioninfo[outputlog]= [torset,optmol,variabletorlist,phaseangles,bondtopology,optoutputlog]
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMSPJobToLog'+'_'+poltype.molecprefix
     if poltype.externalapi!=None:
         if len(fulllistofjobs)!=0:
@@ -1619,7 +1620,6 @@ def CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,m
     postfix='.psi4'  
     inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
     finalstruct= opt.load_structfile(poltype,prevstrctfname)
-
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
     temp.write('%d %d\n' % (mol.GetTotalCharge(), 1))
