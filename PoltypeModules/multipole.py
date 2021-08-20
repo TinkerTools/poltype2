@@ -170,10 +170,11 @@ def gen_gdmain(poltype,gdmainfname,molecprefix,fname,dmamethod):
         2. create *.gdmain file and write in all the necessary information for the gdma run
     """
     fnamesym = "dma.fchk"
-    try:
-        os.symlink(fname,fnamesym)
-    except Exception as e:
-        print(e)
+    if not os.path.isfile(fnamesym):
+        try:
+            os.symlink(fname,fnamesym)
+        except Exception as e:
+            print(e)
 
 
 
