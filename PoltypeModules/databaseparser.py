@@ -21,50 +21,6 @@ import torsiongenerator as torgen
 from itertools import combinations
 
 
-def UpdatePolarizeParameters(poltype, vf,newname, polarprmstotransferinfo):
-    temp=open(vf,'r')
-    results=temp.readlines()
-    temp.close()
-    foundatomblock=False
-    atomline=False
-    wroteout=False
-    tempname=vf.replace('.key','_temp.key')
-    f=open(tempname,'w')
-    linestoskip=[]
-    for line in results:
-        if 'atom' in line:
-            atomline=True
-            if foundatomblock==False:
-                foundatomblock=True
-        elif 'polarize' in line:
-            atomline=False
-            linesplit=line.split()
-            atomtype=linesplit[1]
-            resid=linesplit[3:]
-            residstring=' '.join(resid)
-            for polarprmsline,transferinfo in polarprmstotransferinfo.items(): 
-                polarlinesplit=polarprmsline.split()
-                polartype=polarlinesplit[1]
-                if atomtype==polartype:
-                    f.write(transferinfo)
-                    f.write(polarprmsline.replace('\n','')+' '+residstring+'\n')
-                    f.flush()
-                    os.fsync(f.fileno())
-                    linestoskip.append(line)
-                    break
-                    
-        else:
-            atomline=False
-        if foundatomblock==True and atomline==False and wroteout==False:
-            wroteout=True
-            f.write('\n')
-                                    
-        else:
-            if line not in linestoskip:
-                f.write(line)
-    f.close()
-    os.rename(tempname,newname)
-
 
   
 def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo):
@@ -3524,6 +3480,20 @@ def MergeDictionaries(poltype,add,addto):
     return addto
 
 
+def GetPolarIndexToPolarizePrm(poltype,polarprmstotransferinfo):
+    polarindextopolarizeprm={}
+    for line in polarprmstotransferinfo.keys():
+        linesplit=line.split()
+        typenum=int(linesplit[1])
+        prm=float(linesplit[2])
+        for index in poltype.idxtosymclass:
+            othertypenum=poltype.idxtosymclass[index]
+            if typenum==othertypenum:
+                polarindextopolarizeprm[index]=prm   
+         
+
+    return polarindextopolarizeprm
+
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False):
 
     if polarize==True:
@@ -3541,7 +3511,8 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         newpolarindicestopoltypeclasses,newpolarprms,newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist=GrabNewParametersPolarize(poltype,atomindicestocomments,atomcommentstoparameters,'polarize',atomindicestosmartslist,atomclasstocommentpolar) 
 
         polarprmstotransferinfo=MapParameterLineToTransferInfo(poltype,newpolarprms,{},{},{},{},newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist,{},[],[],[],[])
-        return polarprmstotransferinfo
+        polarindextopolarizeprm=GetPolarIndexToPolarizePrm(poltype,polarprmstotransferinfo)
+        return polarindextopolarizeprm
 
     else:
 
