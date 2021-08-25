@@ -1418,7 +1418,7 @@ class PolarizableTyper():
             ram=ramlist[i]
             numproc=numproclist[i]
             jobpath=jobpaths[i]
-            string='--job='+job+' '+'--outputlogpath='+outputlogpath+' '+'--scratchspace='+str(scratchspace)+' '+'--ram='+str(ram)+' '+'--numproc='+str(numproc)+' '+'--jobpath='+jobpath+'\n'
+            string='--job='+job+' '+'--scratchspace='+str(scratchspace)+' '+'--ram='+str(ram)+' '+'--numproc='+str(numproc)+' '+'--jobpath='+jobpath+'\n'
             temp.write(string)
         temp.close()
 
