@@ -1484,7 +1484,7 @@ class PolarizableTyper():
         if self.addhydrogentononcharged==True:
             m = Chem.AddHs(m)
             AllChem.EmbedMolecule(m)
-        
+        Chem.SanitizeMol(m) 
 
         pcm=self.CheckForConcentratedFormalCharges(m,atomindextoformalcharge)
         cpm = copy.deepcopy(m)
@@ -1508,7 +1508,6 @@ class PolarizableTyper():
         if self.keyfiletoaddtodatabase!=None:
             databaseparser.AddKeyFileParametersToParameterFile(self,m)   
             sys.exit()
-       
         if ('I ' in self.mol.GetSpacedFormula()):
             if self.foundgauss==True:
                 self.use_gaus=True
