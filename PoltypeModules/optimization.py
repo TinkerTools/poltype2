@@ -635,14 +635,19 @@ def GeometryOptimization(poltype,mol,loose=False,checkbonds=True,modred=True,bon
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdirgau
             jobtologlistfilepathprefix=os.getcwd()+r'/'+'optimization_jobtolog_'+poltype.molecprefix 
+            inputfilepath=os.path.join(os.getcwd(),poltype.comoptfname)
+            jobtoinputfilepaths={cmdstr:[inputfilepath]}
+            jobtooutputfiles={cmdstr:[poltype.logoptfname]}
+            jobtoabsolutebinpath={cmdstr:poltype.which(poltype.gausexe)}
+
             if os.path.isfile(poltype.chkoptfname) and os.path.isfile(poltype.logoptfname):
                 os.remove(poltype.logoptfname) # if chk point exists just remove logfile, there could be error in it and we dont want WaitForTermination to catch error before job is resubmitted by daemon 
             if poltype.externalapi==None:
                 finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,True) # have to skip errors because setting optmaxcycle to low number in gaussian causes it to crash
             else:
                 if len(jobtooutputlog.keys())!=0:
-                    call.CallExternalAPI(poltype,jobtolog,jobtologlistfilepathprefix,scratchdir)
-                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
+                    call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilepathprefix)
+                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
 
             cmdstr = poltype.formchkexe + " " + poltype.chkoptfname
             poltype.call_subsystem(cmdstr)
@@ -668,14 +673,19 @@ def GeometryOptimization(poltype,mol,loose=False,checkbonds=True,modred=True,bon
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdirpsi4
             jobtologlistfilepathprefix=os.getcwd()+r'/'+'optimization_jobtolog_'+poltype.molecprefix
+            inputfilepath=os.path.join(os.getcwd(),inputname)
+            jobtoinputfilepaths={cmdstr:[inputfilepath]}
+            jobtooutputfiles={cmdstr:[poltype.logoptfname]}
+            jobtoabsolutebinpath={cmdstr:poltype.which('psi4')}
+
             if os.path.isfile(poltype.logoptfname):
                 os.remove(poltype.logoptfname)
             if poltype.externalapi==None:
                 finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,skiperrors)
             else:
                 if len(jobtooutputlog.keys())!=0:
-                    call.CallExternalAPI(poltype,jobtolog,jobtologlistfilepathprefix,scratchdir)
-                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
+                    call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilepathprefix)
+                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
 
         term,error=poltype.CheckNormalTermination(poltype.logoptfname,None,skiperrors) # now grabs final structure when finished with QM if using Psi4
         if error and term==False and skiperrors==False:

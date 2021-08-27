@@ -382,7 +382,10 @@ def SPForDMA(poltype,optmol,mol):
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logdmafname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdirpsi4
-
+            inputfilepath=os.path.join(os.getcwd(),inputname)
+            jobtoinputfilepaths={cmdstr:[inputfilepath]}
+            jobtooutputfiles={cmdstr:[poltype.logdmafname,poltype.fckdmafname]}
+            jobtoabsolutebinpath={cmdstr:poltype.which('psi4')}
             jobtologlistfilenameprefix=os.getcwd()+r'/'+'dma_jobtolog_'+poltype.molecprefix
             if os.path.isfile(poltype.logdmafname):
                 os.remove(poltype.logdmafname) # if chk point exists just remove logfile, there could be error in it and we dont want WaitForTermination to catch error before job is resubmitted by daemon 
@@ -390,8 +393,8 @@ def SPForDMA(poltype,optmol,mol):
 
             if poltype.externalapi!=None:
                 if len(jobtooutputlog.keys())!=0:
-                    call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
-                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
+                    call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
+                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
             else:
                 finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
 
@@ -412,12 +415,17 @@ def SPForDMA(poltype,optmol,mol):
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdirgau
             jobtologlistfilenameprefix=os.getcwd()+r'/'+'dma_jobtolog_'+poltype.molecprefix
+            inputfilepath=os.path.join(os.getcwd(),poltype.comdmafname)
+            jobtoinputfilepaths={cmdstr:[inputfilepath]}
+            jobtooutputfiles={cmdstr:[poltype.logdmafname,poltype.chkdmafname]}
+            jobtoabsolutebinpath={cmdstr:poltype.which(poltype.gausexe)}
+
             if os.path.isfile(poltype.logdmafname):
                 os.remove(poltype.logdmafname)
             if poltype.externalapi!=None:
                 if len(jobtooutputlog.keys())!=0:
-                    call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
-                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
+                    call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
+                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
             else:
                 finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
 
@@ -444,13 +452,19 @@ def SPForESP(poltype,optmol,mol):
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdirpsi4
             jobtologlistfilenameprefix=os.getcwd()+r'/'+'esp_jobtolog_'+poltype.molecprefix 
+            inputfilepath=os.path.join(os.getcwd(),inputname)
+            anotherinputfile=os.path.join(os.getcwd(),'grid.dat')
+            jobtoinputfilepaths={cmdstr:[inputfilepath,anotherinputfile]}
+            jobtooutputfiles={cmdstr:[outputname,poltype.fckespfname,'grid_esp.dat']}
+            jobtoabsolutebinpath={cmdstr:poltype.which('psi4')}
+
             if os.path.isfile(outputname):
                 os.remove(outputname)
 
             if poltype.externalapi!=None:
                 if len(jobtooutputlog.keys())!=0:
-                    call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
-                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
+                    call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
+                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
             else:
                 finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
 
@@ -471,13 +485,18 @@ def SPForESP(poltype,optmol,mol):
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdirgau
             jobtologlistfilenameprefix=os.getcwd()+r'/'+'esp_jobtolog_'+poltype.molecprefix
+            inputfilepath=os.path.join(os.getcwd(),poltype.comespfname)
+            jobtoinputfilepaths={cmdstr:[inputfilepath]}
+            jobtooutputfiles={cmdstr:[poltype.logespfname,poltype.chkespfname]}
+            jobtoabsolutebinpath={cmdstr:poltype.which(poltype.gausexe)}
+
             if os.path.isfile(poltype.logespfname):
                 os.remove(poltype.logespfname)
 
             if poltype.externalapi!=None:
                 if len(jobtooutputlog.keys())!=0:
-                    call.CallExternalAPI(poltype,jobtolog,jobtologlistfilenameprefix,scratchdir)
-                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog)
+                    call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
+                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
             else:
                 finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
 
@@ -489,10 +508,23 @@ def SPForESP(poltype,optmol,mol):
 
     sys.stdout.flush()
 
+def CheckIfLogFileIsGaussian(poltype,logname):
+    gaus=False
+    temp=open(logname,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        if 'Gaussian System' in line:
+            gaus=True
+            break
+
+    return gaus
 
 
 def GrabQMDipoles(poltype,optmol,logname):
-    if poltype.use_gaus==False or poltype.use_gausoptonly==True:
+    gaus=False
+    gaus=CheckIfLogFileIsGaussian(poltype,logname)
+    if gaus==False:
         temp=open(logname,'r')
         results=temp.readlines()
         temp.close()

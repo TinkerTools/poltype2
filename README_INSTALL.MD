@@ -82,6 +82,8 @@ conda install -c conda-forge rdkit --yes
 conda install -c conda-forge mdanalysis --yes
 conda install -c conda-forge svgutils --yes
 conda install -c conda-forge cairosvg --yes
+conda install -c conda-forge ndcctools --yes
+conda install -c anaconda dill --yes
 ```
 
 ### Environment var for running POLTYPE:

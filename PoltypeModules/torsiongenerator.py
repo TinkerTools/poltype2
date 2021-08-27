@@ -104,23 +104,29 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,varia
     outputlogs=[]
     initialstructures=[]
     scratchdir=None
+    inputfilepaths=[]
+    outputfilenames=[]
+    executables=[]
     for i in range(len(listofstructurestorunQM)):
         torxyzfname=listofstructurestorunQM[i]
         phaseangles=phaselist[i]
-        inputname,outputlog,cmdstr,scratchdir=GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist,mol,currentopt)
+        inputname,outputlog,cmdstr,scratchdir,executable=GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist,mol,currentopt)
         finished,error=poltype.CheckNormalTermination(outputlog,errormessages=None,skiperrors=True)
-            
+        inputfilepath=os.path.join(os.getcwd(),inputname)
         if finished==True and 'opt' in outputlog:
             opt.GrabFinalXYZStructure(poltype,outputlog,outputlog.replace('.log','.xyz'),mol)
         if finished==False and poltype.tordebugmode==False:
             listofjobs.append(cmdstr)
+            outputfilenames.append(outputlog)
+            inputfilepaths.append(inputfilepath)  
+            executables.append(executable) 
             jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputlog
 
         if finished==True or ( finished==False and poltype.tordebugmode==False):
             outputlogs.append(outputlog)
         optlogtophaseangle[outputlog]=phaseangles
         initialstructures.append(torxyzfname)   
-    return outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures,optlogtophaseangle
+    return outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures,optlogtophaseangle,inputfilepaths,outputfilenames,executables
 
 def CheckIfPsi4Log(poltype,outputlog):
     check=False
@@ -138,6 +144,9 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
     jobtooutputlog={}
     listofjobs=[]
     outputnames=[]
+    inputfilepaths=[]
+    outputfilenames=[]
+    executables=[]
     for i in range(len(optoutputlogs)):
         outputlog=optoutputlogs[i]
         phaseangles=optlogtophaseangle[outputlog]
@@ -145,25 +154,30 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
             prevstrctfname=outputlog.replace('.log','.xyz')
             inputname,outputname=CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,mol)
             cmdstr='psi4 '+inputname+' '+outputname
+            executable='psi4'
         else:
             inputname,outputname=GenerateTorsionSPInputFileGaus(poltype,torset,optmol,phaseangles,outputlog,mol)
             cmdstr = 'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
+            executable=poltype.gausexe
         finished,error=poltype.CheckNormalTermination(outputname,errormessages=None,skiperrors=True)
-
+        inputfilepath=os.path.join(os.getcwd(),inputname)
         if finished==True and error==False:
             pass
         else:
             if poltype.tordebugmode==False:
                 listofjobs.append(cmdstr)
+                outputfilenames.append(outputname)
+                inputfilepaths.append(inputfilepath)
+                executables.append(executable)
                 jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputname
         outputnames.append(outputname)
         outputlogtophaseangles[outputname]=phaseangles
         optlogtosplog[outputlog]=outputname
     if not poltype.use_gaus:
         
-        return outputnames,listofjobs,poltype.scrtmpdirpsi4,jobtooutputlog,outputlogtophaseangles,optlogtosplog
+        return outputnames,listofjobs,poltype.scrtmpdirpsi4,jobtooutputlog,outputlogtophaseangles,optlogtosplog,inputfilepaths,outputfilenames,executables
     else:
-        return outputnames,listofjobs,poltype.scrtmpdirgau,jobtooutputlog,outputlogtophaseangles,optlogtosplog
+        return outputnames,listofjobs,poltype.scrtmpdirgau,jobtooutputlog,outputlogtophaseangles,optlogtosplog,inputfilepaths,outputfilenames,executables
 
 
 
@@ -282,14 +296,16 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
     if  poltype.use_gaus==False and poltype.use_gausoptonly==False:
         inputname,outputname=CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt)
         cmdstr='psi4 '+inputname+' '+outputname
+        executable='psi4'
     else:
         inputname,outputname=CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt)
         cmdstr='GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
+        executable=poltype.gausexe
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
-        return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4
+        return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4,executable
 
     else:
-        return inputname,outputname,cmdstr,poltype.scrtmpdirgau
+        return inputname,outputname,cmdstr,poltype.scrtmpdirgau,executable
         
 
 def GenerateTorsionSPInputFileGaus(poltype,torset,optmol,phaseangles,prevstrctfname,mol):
@@ -674,6 +690,10 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
 
     fulljobtolog={}
     fulljobtooutputlog={}
+    jobtoinputfilepaths={}
+    jobtooutputfiles={}
+    jobtoabsolutebinpath={}
+
     poltype.torsettophaselist={}
     torsettooptoutputlogs={}
     bondtopology=GenerateBondTopology(poltype,optmol)
@@ -749,15 +769,24 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
 
         poltype.SanitizeAllQMMethods()
         
-        outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures,optlogtophaseangle=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol,'1',optlogtophaseangle)
+        outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures,optlogtophaseangle,inputfilepaths,outputfilenames,executables=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol,'1',optlogtophaseangle)
         torsettooptoutputlogs[tuple(torset)]=outputlogs
         dictionary = dict(zip(outputlogs,initialstructures))  
         torsettooutputlogtoinitialstructure[tuple(torset)].update(dictionary)
         inistructophaselist = dict(zip(initialstructures,flatphaselist))  
         torsettoinistructophaselist[tuple(torset)]=inistructophaselist
         lognames=[]
-        for job in listofjobs:
+        
+        for jobidx in range(len(listofjobs)):
+            job=listofjobs[jobidx]
             log=jobtooutputlog[job]
+            inputfilepath=inputfilepaths[jobidx]
+            outputfilename=outputfilenames[jobidx]
+            executable=executables[jobidx]
+            fullpath=poltype.which(executable)
+            jobtoinputfilepaths[job]=[inputfilepath]
+            jobtooutputfiles[job]=[outputfilename]
+            jobtoabsolutebinpath[job]=fullpath
             lognames.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir))+r'/'+poltype.logfname)
         jobtolog=dict(zip(listofjobs, lognames)) 
         optnumtotorsettofulloutputlogs['1'][tuple(torset)].extend(outputlogs)
@@ -768,8 +797,8 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMOptJobToLog'+'_1'+'_'+poltype.molecprefix
     if poltype.externalapi!=None:
         if len(optnumtofulllistofjobs['1'])!=0:
-            call.CallExternalAPI(poltype,fulljobtolog,jobtologlistfilenameprefix,scratchdir)
-        finishedjobs,errorjobs=poltype.WaitForTermination(fulljobtooutputlog)
+            call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
+        finishedjobs,errorjobs=poltype.WaitForTermination(fulljobtooutputlog,False)
     else:
         finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
     for torset in poltype.torlist:
@@ -791,7 +820,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                 while bondtoposame==False:
                     if attempts>=maxiter or finished==True:
                         break
-                    inputname,outputlog,cmdstr,scratchdir=GenerateTorsionOptInputFile(poltype,tinkerxyz,torset,phaseangles,optmol,variabletorlist,mol,'1')
+                    inputname,outputlog,cmdstr,scratchdir,executable=GenerateTorsionOptInputFile(poltype,tinkerxyz,torset,phaseangles,optmol,variabletorlist,mol,'1')
                     jobtolog={cmdstr:outputlog}
                     otherfinishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtolog,True)
                     opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
@@ -816,6 +845,10 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     torsettospoutputlogs={}
     outputlogtophaseangles={}
     optlogtosplog={}
+    jobtoinputfilepaths={}
+    jobtooutputfiles={}
+    jobtoabsolutebinpath={}
+
     for torset in poltype.torlist:
         variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
@@ -828,11 +861,19 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             if outputlog in finishedjobs and outputlog not in errorjobs:
                 finishedoutputlogs.append(outputlog)
                 finishedflatphaselist.append(phaselist)
-        outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangles,optlogtosplog=ExecuteSPJobs(poltype,finishedoutputlogs,finishedflatphaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,mol,optlogtosplog,optlogtophaseangle)
+        outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangles,optlogtosplog,inputfilepaths,outputfilenames,executables=ExecuteSPJobs(poltype,finishedoutputlogs,finishedflatphaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,mol,optlogtosplog,optlogtophaseangle)
         lognames=[]
         torsettospoutputlogs[tuple(torset)]=outputlogs
-        for job in listofjobs:
+        for jobidx in range(len(listofjobs)):
+           job=listofjobs[jobidx]
            log=jobtooutputlog[job]
+           inputfilepath=inputfilepaths[jobidx]
+           outputfilename=outputfilenames[jobidx]
+           executable=executables[jobidx]
+           abspath=poltype.which(executable)
+           jobtoinputfilepaths[job]=[inputfilepath]
+           jobtooutputfiles[job]=[outputfilename]
+           jobtoabsolutebinpath[job]=abspath   
            lognames.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir))+r'/'+poltype.logfname)
         jobtolog=dict(zip(listofjobs, lognames)) 
         fulljobtooutputlog.update(jobtooutputlog)
@@ -854,8 +895,8 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMSPJobToLog'+'_'+poltype.molecprefix
     if poltype.externalapi!=None:
         if len(fulllistofjobs)!=0:
-            call.CallExternalAPI(poltype,fulljobtolog,jobtologlistfilenameprefix,scratchdir)
-        finshedjobs,errorjobs=poltype.WaitForTermination(fulljobtooutputlog)
+            call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
+        finshedjobs,errorjobs=poltype.WaitForTermination(fulljobtooutputlog,False)
     else:
         finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
     os.chdir('..')

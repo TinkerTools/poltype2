@@ -20,6 +20,7 @@ from scipy import optimize
 import shutil
 import copy
 import traceback
+import apicall as call
 
 
 def CheckAllVdwTypesExist(poltype,keyfilename):
@@ -846,33 +847,34 @@ def ExecuteSPJobs(poltype,qmfilenamearray,prefix):
     jobtooutputlog={}
     listofjobs=[]
     fulljobtooutputlog={}
+    jobtoinputfilepaths={}
+    jobtooutputfiles={}
+    jobtoabsolutebinpath={}
     outputfilenames=[]
     for i in range(len(qmfilenamearray)):
         filename=qmfilenamearray[i]
         if poltype.use_gaus==True:
-            cmdstr = 'cd '+shlex.quote(os.getcwd())+' && '+'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+filename
-        
+            cmdstr = 'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+filename
             outputname=filename.replace('.com','.log')
+            executable=poltype.gausexe
+            scratchdir=poltype.scrtmpdirgau
         else:
             outputname=filename.replace('.psi4','.log')
-            cmdstr='cd '+shlex.quote(os.getcwd())+' && '+'psi4 '+filename+' '+outputname
-
-
-        
+            cmdstr='psi4 '+filename+' '+outputname
+            executable='psi4'
+            scratchdir=poltype.scrtmpdirpsi4
+        abspath=poltype.which(executable)
+        inputfilepath=os.path.join(os.getcwd(),filename) 
         finished,error=poltype.CheckNormalTermination(outputname)
         if finished==True and error==False:
             pass
         else:
-            if os.path.isfile(outputname):
-                statinfo=os.stat(outputname)
-                size=statinfo.st_size
-                if size!=0:
-                    os.remove(outputname)
-                    listofjobs.append(cmdstr)
-                    jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputname
-            else:
-                listofjobs.append(cmdstr)
-                jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputname
+            listofjobs.append(cmdstr)
+            jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputname
+            jobtoinputfilepaths[cmdstr]=[inputfilepath]
+            jobtooutputfiles[cmdstr]=[outputname]
+            jobtoabsolutebinpath[cmdstr]=abspath
+
         outputfilenames.append(outputname)
     lognames=[]
     for job in listofjobs:
@@ -880,13 +882,11 @@ def ExecuteSPJobs(poltype,qmfilenamearray,prefix):
         lognames.append(os.path.abspath(poltype.logfname))
     fulljobtolog=dict(zip(listofjobs, lognames)) 
     fulljobtooutputlog.update(jobtooutputlog)
-
-    scratchdir=poltype.scrtmpdirgau
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMSPJobToLog'+'_'+prefix
     if poltype.externalapi!=None:
         if len(listofjobs)!=0:
-            call.CallExternalAPI(poltype,fulljobtolog,jobtologlistfilenameprefix,scratchdir)
-        finshedjobs,errorjobs=poltype.WaitForTermination(fulljobtooutputlog)
+            call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
+        finshedjobs,errorjobs=poltype.WaitForTermination(fulljobtooutputlog,False)
     else:
         finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
 
