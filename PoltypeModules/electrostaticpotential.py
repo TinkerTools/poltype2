@@ -12,6 +12,7 @@ import numpy as np
 import openbabel
 import shlex
 import warnings
+from scipy.optimize import fmin
 
 def CheckIfLogFileUsingGaussian(poltype,f):
     use_gaus=False
@@ -223,17 +224,55 @@ def CheckRMSPD(poltype):
                 rmspdexists=True
         temp.close()
         if rmspdexists==True:
-            if float(RMSPD)>poltype.maxRMSPD:
-                poltype.failedrmspd=True
-                poltype.WriteToLog('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
-                warnings.warn('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
-                if poltype.issane==True:
-                    if poltype.deletedfiles==True:
-                        raise ValueError(os.getcwd()+' '+'Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
-            else:
-                poltype.WriteToLog('RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
+            relRMSPD=ComputeRelativeRMSPD(poltype)
+            if relRMSPD>1: # greater than 1% relative error
+                if float(RMSPD)>poltype.maxRMSPD:
+                    poltype.failedrmspd=True
+                    poltype.WriteToLog('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
+                    warnings.warn('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
+                    if poltype.issane==True:
+                        if poltype.deletedfiles==True:
+                            raise ValueError(os.getcwd()+' '+'Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
+                else:
+                    poltype.WriteToLog('RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
 
     return rmspdexists
+
+def IsFloat(poltype,string):
+    isfloat=False
+    try:
+        float(string)
+        isfloat=True
+    except:
+        pass
+    return isfloat
+
+def ComputeRelativeRMSPD(poltype):
+    target=[]
+    model=[]
+    if os.path.isfile('RMSPD.txt'):
+       temp=open('RMSPD.txt','r')
+       for line in temp.readlines():
+           linesplit=line.split()
+           if len(linesplit)==6:
+               allfloats=True
+               for e in linesplit:
+                   isfloat=IsFloat(poltype,e)
+                   if isfloat==False:
+                       allfloats=False
+               if allfloats==True:
+                   targetvalue=float(linesplit[-2])
+                   modelvalue=float(linesplit[-3])
+                   target.append(targetvalue)
+                   model.append(modelvalue)
+    model=np.array(model)
+    target=np.array(target)
+    def RMSDRel(c):
+        return np.sqrt(np.mean(np.square(np.add(np.divide(model-target,target),c))))
+    resultRel=fmin(RMSDRel,.5)
+    minRMSDRel=RMSDRel(resultRel[0])*100
+    return minRMSDRel
+
 
 def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
     """
