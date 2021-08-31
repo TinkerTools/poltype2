@@ -1710,7 +1710,8 @@ class PolarizableTyper():
         if self.atomnum!=1: 
             esp.ElectrostaticPotentialComparison(self) 
             if self.failedrmspd==True and self.deletedfiles==False:
-                self.DeleteFilesWithExtension(['pot','grid','key','xyz','key_2','key_3','key_4','key_5','xyz_2'])
+                self.DeleteFilesWithExtension(['pot','grid','key','xyz','key_2','key_3','key_4','key_5','xyz_2','cube'])
+                self.DeleteFilesWithString(['esp','dma'])
                 self.deletedfiles=True
                 self.GenerateParameters()
 
