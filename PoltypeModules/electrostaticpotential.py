@@ -273,7 +273,6 @@ def ComputeRelativeRMSPD(poltype):
         return np.sqrt(np.mean(np.square(np.add(np.divide(model-target,target),c))))
     resultRel=fmin(RMSDRel,.5)
     minRMSDRel=RMSDRel(resultRel[0])*100
-    print('minRMSDRel',minRMSDRel)
     return minRMSDRel
 
 
@@ -617,8 +616,14 @@ def CheckDipoleMoments(poltype,optmol):
                 ratio=0
 
             if ratio>poltype.dipoletol and poltype.suppressdipoleerr==False and np.abs(diff)>poltype.absdipoletol:
-                string='Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)+' '+os.getcwd()
-                raise ValueError(string)
+                if poltype.esprestweight==.1:
+                    string='Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)+' '+os.getcwd()
+                    raise ValueError(string)
+                else:
+                    poltype.esprestweight=poltype.esprestweight-.1
+                    poltype.DeleteFilesWithExtension(['key_4','key_5','key_3','key_2'])
+                    poltype.GenerateParameters()
+
             else:
                  string='Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+' tolerance = '+str(poltype.dipoletol)+' '+os.getcwd()
                  poltype.WriteToLog(string)
