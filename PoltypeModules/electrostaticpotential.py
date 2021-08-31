@@ -396,7 +396,7 @@ def GenerateElementToBasisSetLines(poltype,basissetfile):
 
 
 def ElectrostaticPotentialFitting(poltype):
-    optmpolecmd = poltype.potentialexe + " 6 " + poltype.xyzoutfile + " -k " + poltype.key2fname + " " + poltype.qmesp2fname + " N "+poltype.espgrad
+    optmpolecmd = poltype.potentialexe + " 6 " + poltype.xyzoutfile + " -k " + poltype.key2fname + " " + poltype.qmesp2fname + " N "+str(poltype.espgrad)
     poltype.call_subsystem(optmpolecmd,True)
 
 def ElectrostaticPotentialComparison(poltype):
