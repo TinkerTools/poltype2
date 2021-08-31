@@ -266,11 +266,14 @@ def ComputeRelativeRMSPD(poltype):
                    target.append(targetvalue)
                    model.append(modelvalue)
     model=np.array(model)
+    model=np.add(1,model)
     target=np.array(target)
+    target=np.add(1,target)
     def RMSDRel(c):
         return np.sqrt(np.mean(np.square(np.add(np.divide(model-target,target),c))))
     resultRel=fmin(RMSDRel,.5)
     minRMSDRel=RMSDRel(resultRel[0])*100
+    print('minRMSDRel',minRMSDRel)
     return minRMSDRel
 
 
@@ -394,7 +397,7 @@ def GenerateElementToBasisSetLines(poltype,basissetfile):
 
 
 def ElectrostaticPotentialFitting(poltype):
-    optmpolecmd = poltype.potentialexe + " 6 " + poltype.xyzoutfile + " -k " + poltype.key2fname + " " + poltype.qmesp2fname + " N 0.1"
+    optmpolecmd = poltype.potentialexe + " 6 " + poltype.xyzoutfile + " -k " + poltype.key2fname + " " + poltype.qmesp2fname + " N "+poltype.espgrad
     poltype.call_subsystem(optmpolecmd,True)
 
 def ElectrostaticPotentialComparison(poltype):
