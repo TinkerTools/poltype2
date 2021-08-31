@@ -1526,6 +1526,8 @@ def GrowPossibleFragmentAtomIndexes(poltype,rdkitmol,indexes):
            for atmidx in newindexes:
                if atmidx not in indexlist:
                    indexlist.append(atmidx)
+           if idx not in indexlist:
+               indexlist.append(idx)
         temp=[]
         for idx in indexlist:
            neighbatom=poltype.rdkitmol.GetAtomWithIdx(idx)

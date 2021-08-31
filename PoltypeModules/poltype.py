@@ -1763,6 +1763,8 @@ class PolarizableTyper():
         self.nonarotortotorsbeingfit={}
         if self.refinenonaroringtors==True and self.dontfrag==False:
             rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
+
+
         if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False and (self.dontdotor==False or self.dontdovdwscan==False):
 
             WBOmatrix,outputname,error=frag.GenerateWBOMatrix(self,self.rdkitmol,self.mol,self.logoptfname.replace('.log','.xyz'))
@@ -1804,10 +1806,15 @@ class PolarizableTyper():
         self.WriteOutLiteratureReferences(self.key5fname) 
         # A series of tests are done so you one can see whether or not the parameterization values
         # found are acceptable and to what degree
-        opt.StructureMinimization(self,torsionrestraints)
-        if self.atomnum != 1:
-            opt.gen_superposeinfile(self)
-            opt.CheckRMSD(self)
+        try:
+            opt.StructureMinimization(self,torsionrestraints)
+            if self.atomnum != 1:
+                opt.gen_superposeinfile(self)
+                opt.CheckRMSD(self)
+        except: # in case old key_4,key_5 files not working delete and restart
+                self.DeleteFilesWithExtension(['key_4','key_5'])
+                self.GenerateParameters()
+
 
         if self.torsppcm:
             torgen.RemoveStringFromKeyfile(self,self.key5fname,'solvate GK')
