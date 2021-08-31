@@ -599,7 +599,12 @@ def CheckDipoleMoments(poltype,optmol):
         time.sleep(1)
     torgen.RemoveStringFromKeyfile(poltype,poltype.tmpkeyfile,'solvate')
     cmd=poltype.analyzeexe + ' ' + poltype.xyzoutfile+' '+'-k'+' '+poltype.tmpkeyfile + ' em | grep -A11 Charge'+'>'+'MMDipole.txt'
-    poltype.call_subsystem(cmd,True)
+    try: 
+        poltype.call_subsystem(cmd,True)
+    except: # in case old key_4,key_5 files not working delete and restart
+        poltype.DeleteFilesWithExtension(['key_4','key_5'])
+        poltype.GenerateParameters()
+
     while not os.path.isfile('MMDipole.txt'):
         time.sleep(1)
     temp=open('MMDipole.txt','r')
