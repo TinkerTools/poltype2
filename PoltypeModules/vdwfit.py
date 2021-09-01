@@ -898,7 +898,6 @@ def GrabVdwParameters(poltype,vdwtype):
     temp=open(poltype.key5fname,'r')
     results=temp.readlines()
     temp.close()
-    vdwdepthlimit=.4 # may need to change this to handle ions case
     for line in results:
         if 'vdw' in line:
             if str(vdwtype) in line:
@@ -909,8 +908,6 @@ def GrabVdwParameters(poltype,vdwtype):
                 depth=float(linesplit[3])
                 minvdwdepth=depth-.1*depth
                 maxvdwdepth=depth+.1*depth
-                if maxvdwdepth>vdwdepthlimit:
-                    maxvdwdepth=vdwdepthlimit
                 if depth>maxvdwdepth:
                     depth=maxvdwdepth-.001
                 if len(linesplit)==5:
