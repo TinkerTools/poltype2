@@ -552,13 +552,26 @@ def ConvertProbeDimerXYZToTinkerXYZ(poltype,inputxyz,tttxyz,outputxyz,waterbool,
 
     outfile.close()
 
+def CheckIfLogFileUsingGaussian(poltype,f):
+    use_gaus=False
+    temp=open(f,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        if 'Entering Gaussian System' in line:
+            use_gaus=True
+            break 
+    return use_gaus
+
 
 
 def ReadCounterPoiseAndWriteQMData(poltype,logfilelist):
     temp=open('QM_DATA','w')
     for f in logfilelist:
+        use_gaus=False
+        use_gaus=CheckIfLogFileUsingGaussian(poltype,f)
         tmpfh=open(f,'r')
-        if poltype.use_gaus==True:
+        if use_gaus==True:
             for line in tmpfh:
                 if 'Counterpoise: corrected energy =' in line or 'Counterpoise corrected energy' in line:
                     dimerenergy=float(line.split()[4])*poltype.Hartree2kcal_mol
