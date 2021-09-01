@@ -331,9 +331,9 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
     count=-1
     center=prevstrctfname
     prevphaseanglelist=None
-    energyarray=numpy.empty(phaselist.shape[0])
+    energyarray=[]
     failedgridpoints=[]
-
+    newphaselist=[]
         
     for rowindex in range(len(phaselist)): # we need to send back minimized structure in XYZ (not tinker) format to load for next tinker minimization,but append the xyz_2 tinker XYZ file so that com file can be generated from that 
         phaseanglelist=phaselist[rowindex]
@@ -360,7 +360,7 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
         prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
         
         torxyzfname,tmpkeyfname,torminlogfname=tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,'_preQMOPTprefit',poltype.key4fname,'../')
-        prevstrctfname,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,'_preQMOPTprefit',poltype.key4fname,'../',torxyzfname,tmpkeyfname,torminlogfname)
+        prevstrctfname,torxyzfname,newtorxyzfname,keyfname,failedcheck=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,'_preQMOPTprefit',poltype.key4fname,'../',torxyzfname,tmpkeyfname,torminlogfname)
         toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
         term=AnalyzeTerm(poltype,toralzfname)
         if term==False:
@@ -369,9 +369,13 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
             failedgridpoints.append(phaseanglelist)
         else:
             tot_energy,tor_energy=torfit.GrabTinkerEnergy(poltype,toralzfname)
-            energyarray[rowindex]=tot_energy
+            if failedcheck==False:
+                energyarray.append(tot_energy)
+           
         cartxyz=ConvertTinktoXYZ(poltype,newtorxyzfname,newtorxyzfname.replace('.xyz_2','_cart.xyz'))
-        tinkerstructnamelist.append(newtorxyzfname)
+        if failedcheck==False:
+            newphaselist.append(phaseanglelist)
+            tinkerstructnamelist.append(newtorxyzfname)
         try:
             if len(phaseanglelist)==2: # then check for new center make sure hopping around 2D grid correctly (clockwise then counterclockwise)
                 a=phaseanglelist[0]
@@ -382,7 +386,7 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
             pass
 
         prevphaseanglelist=phaseanglelist
-    return tinkerstructnamelist,failedgridpoints,energyarray
+    return tinkerstructnamelist,failedgridpoints,numpy.array(energyarray),numpy.array(newphaselist)
 
 
 
@@ -391,7 +395,7 @@ def tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phas
     prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
     prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology)
     torxyzfname,tmpkeyfname,torminlogfname=tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseangles,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath)
-    cartxyz,torxyzfname,newtorxyzfname,keyfname=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseangles,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath,torxyzfname,tmpkeyfname,torminlogfname)
+    cartxyz,torxyzfname,newtorxyzfname,keyfname,failedcheck=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseangles,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath,torxyzfname,tmpkeyfname,torminlogfname)
     toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
     term=AnalyzeTerm(poltype,toralzfname)
     if term==False:
@@ -515,12 +519,13 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
     filename=torxyzfname+'_2'
     newfilename=filename.replace('.xyz_2','_xyzformat.xyz')
     cartxyz=ConvertTinktoXYZ(poltype,torxyzfname+'_2',newfilename)
-    CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle) 
-    return cartxyz,torxyzfname,torxyzfname+'_2',tmpkeyfname
+    failedcheck=CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle) 
+    return cartxyz,torxyzfname,torxyzfname+'_2',tmpkeyfname,failedcheck
 
 def CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle):
     inimol = opt.load_structfile(poltype,cartxyz)
     tol=3.5
+    fail=False
     for indices,phase in torsiontophaseangle.items():
         a,b,c,d=indices[:]
         ang = inimol.GetTorsion(a,b,c,d)
@@ -534,11 +539,12 @@ def CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle):
             if 'postfit' in cartxyz and poltype.refinenonaroringtors==True:
                 warnings.warn('Torsion did not reach target dihedral! '+str(indices)+' '+str(phase)+' is actually at angle '+str(ang)+', filename='+cartxyz+' . Will just compute post fit energy at new angle.')
 
-            else: 
-                raise ValueError('Torsion did not reach target dihedral! '+str(indices)+' '+str(phase)+' is actually at angle '+str(ang)+', filename='+cartxyz)
+            else:
+                warnings.warn('Torsion did not reach target dihedral! '+str(indices)+' '+str(phase)+' is actually at angle '+str(ang)+', filename='+cartxyz+' . Will just remove this point from energy surface.')
+                fail=True 
 
 
-
+    return fail
 
 def GenerateFilename(poltype,torset,phaseangles,prefix,postfix,mol):
     oldtorset=torset[:]
@@ -740,7 +746,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         poltype.idealangletensor[tuple(truetorset)]=idealangletensor
         minstrctfname = prevstrctfname
         prevstrctfname = minstrctfname
-        listoftinkertorstructures,failedgridpoints,energyarray=tinker_minimize_angles(poltype,torset,optmol,variabletorlist,flatphaselist,prevstrctfname,torsionrestraint,bondtopology)
+        listoftinkertorstructures,failedgridpoints,energyarray,flatphaselist=tinker_minimize_angles(poltype,torset,optmol,variabletorlist,flatphaselist,prevstrctfname,torsionrestraint,bondtopology)
         if len(torset)==2 and torset not in poltype.nonaroringtorsets:
             indicestokeep,firsttorindices,secondtorindices=Determine1DTorsionSlicesOnTorTorSurface(poltype,energyarray,flatphaselist,torset)
             flatphaselist,listoftinkertorstructures=RemoveTorTorPoints(poltype,energyarray,flatphaselist,indicestokeep,listoftinkertorstructures)
