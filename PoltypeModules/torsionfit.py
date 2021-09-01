@@ -233,7 +233,8 @@ def compute_mm_tor_energy(poltype,mol,torset,designatexyz,flatphaselist,readangl
         toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
         tot_energy,tor_energy=GrabTinkerEnergy(poltype,toralzfname)
         if readangles==True:
-            angles=ReadAnglesFromOutputFile(poltype,torset,newtorxyzfname)
+            if os.path.isfile(newtorxyzfname):
+                angles=ReadAnglesFromOutputFile(poltype,torset,newtorxyzfname)
         energy_list.append(tot_energy)
         torse_list.append(tor_energy)
         angle_list.append(angles)
@@ -261,8 +262,6 @@ def ReadAnglesFromOutputFile(poltype,torset,newtorxyzfname):
             torang+=360
         angles.append(torang)
    
-
-
     return angles
 
 

@@ -370,7 +370,6 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
         else:
             tot_energy,tor_energy=torfit.GrabTinkerEnergy(poltype,toralzfname)
             energyarray[rowindex]=tot_energy
-
         cartxyz=ConvertTinktoXYZ(poltype,newtorxyzfname,newtorxyzfname.replace('.xyz_2','_cart.xyz'))
         tinkerstructnamelist.append(newtorxyzfname)
         try:
