@@ -121,6 +121,21 @@ def fitfunc (poltype,parms, x,torset, torprmdict,keyonlylist=None,nfoldonlylist=
             tor_energy_array += offset
     return numpy.array(tor_energy_array)
 
+
+def CheckIfLogFileUsingGaussian(poltype,f):
+    use_gaus=False
+    temp=open(f,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        if 'Entering Gaussian System' in line:
+            use_gaus=True
+            break 
+    return use_gaus
+
+
+
+
 def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
     """
     Intent: Store the QM Energies (vs. Dihedral Angle) found in 'gen_torsion' in a list
@@ -151,7 +166,9 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
             tor_energy=None
             WBOvalues=None
         else:
-            if poltype.use_gaus:
+            use_gaus=False
+            use_gaus=CheckIfLogFileUsingGaussian(poltype,minstrctfname)
+            if use_gaus:
                 WBOmatrix=frag.GrabWBOMatrixGaussian(poltype,minstrctfname,poltype.mol)
             else:
                 WBOmatrix=frag.GrabWBOMatrixPsi4(poltype,minstrctfname,poltype.mol)
@@ -164,7 +181,7 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
                 
             tmpfh = open(minstrctfname, 'r')
             tor_energy = None
-            if not poltype.use_gaus:
+            if not use_gaus:
                 mengi=esp.GrabFinalPsi4Energy(poltype,minstrctfname)
                 if mengi==None:
                     tor_energy=None
