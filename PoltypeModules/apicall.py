@@ -16,7 +16,7 @@ def CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebi
         inputfilestr=','.join(inputfilepaths)
         outputfilestr=','.join(outputfiles)
         binpath=jobtoabsolutebinpath[job]
-        temp.write('--job='+job+' '+'--scratchpath='+scratchdir+' '+'--numproc='+str(poltype.numproc)+' '+'--ram='+poltype.maxmem+' '+'--inputfilepaths='+inputfilestr+' '+'--outputfilepaths='+outputfilestr+' '+'--absolutepathtobin='+binpath+'\n')
+        temp.write('--job='+job+' '+'--scratchpath='+scratchdir+' '+'--numproc='+str(poltype.numproc)+' '+'--ram='+poltype.maxmem+' '+'--disk='+poltype.maxdisk+' '+'--inputfilepaths='+inputfilestr+' '+'--outputfilepaths='+outputfilestr+' '+'--absolutepathtobin='+binpath+'\n')
     temp.close()
     if poltype.bashrcpath!=None:
         cmdstr='python'+' '+poltype.externalapi+' '+'--bashrcpath='+poltype.bashrcpath+' '+'--jobinfofilepath='+jobinfofilepath
