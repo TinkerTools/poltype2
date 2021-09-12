@@ -93,6 +93,9 @@ bashrcpath        specifies path for bashrc to source for running quantum jobs, 
                   Default None.
 externalapi       specifies path to external API used for submitting quantum jobs on a cluster. 
                   Default=None.
+
+username          Needed for RenLabCluster daemon (externalapi keyword). This will inform the daemon which username to submit jobs for the queuing system.
+                  Default=None
 ```
 
 ### Geometry Optimization

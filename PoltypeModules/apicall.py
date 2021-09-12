@@ -16,12 +16,11 @@ def CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebi
         inputfilestr=','.join(inputfilepaths)
         outputfilestr=','.join(outputfiles)
         binpath=jobtoabsolutebinpath[job]
-        temp.write('--job='+job+' '+'--scratchpath='+scratchdir+' '+'--numproc='+str(poltype.numproc)+' '+'--ram='+poltype.maxmem+' '+'--disk='+poltype.maxdisk+' '+'--inputfilepaths='+inputfilestr+' '+'--outputfilepaths='+outputfilestr+' '+'--absolutepathtobin='+binpath+'\n')
+        temp.write('--job='+job+' '+'--scratchpath='+scratchdir+' '+'--numproc='+str(poltype.numproc)+' '+'--ram='+poltype.maxmem+' '+'--disk='+poltype.maxdisk+' '+'--inputfilepaths='+inputfilestr+' '+'--outputfilepaths='+outputfilestr+' '+'--absolutepathtobin='+binpath+' '+'--username='+poltype.username+'\n')
     temp.close()
     if poltype.bashrcpath!=None:
         cmdstr='python'+' '+poltype.externalapi+' '+'--bashrcpath='+poltype.bashrcpath+' '+'--jobinfofilepath='+jobinfofilepath
     else:
         cmdstr='python'+' '+poltype.externalapi+' '+'--jobinfofilepath='+jobinfofilepath
-    print('cmdstr '+cmdstr,flush=True)
     poltype.call_subsystem(cmdstr,True)
 
