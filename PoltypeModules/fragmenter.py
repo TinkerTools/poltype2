@@ -705,20 +705,26 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             WriteDictionaryToFile(poltype,parenttortorclasskeytofragtortorclasskey,"parenttortorclasskeytofragtortorclasskey.txt")
             WriteDictionaryToFile(poltype,classkeytotorsionindexes,"classkeytotorsionindexes.txt")
         else:
-            vdwatomindex=vdwparentindices[0]
-            classkey=str(poltype.idxtosymclass[vdwatomindex])
-            ls=[vdwatomindex] 
-            smilesposstring,fragatomstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,ls,parentindextofragindex,fragidxarray)
-            fragvdwatomindex=parentindextofragindex[vdwatomindex-1]
-            strfragvdwatomindex=str(fragvdwatomindex+1)
-            fragvdwatomindex+=1
-            fragclasskey=fragidxtosymclass[fragvdwatomindex]
-            fragclasskey=str(fragclasskey)
-            parentclasskeytofragclasskey[classkey]=fragclasskey
-            classkeytosmartsposarray[classkey]=smilesposstring
-            classkeytosmarts[classkey]=fragsmarts
-            classkeytoatomindexes[classkey]=fragatomstring
-            WriteDictionaryToFile(poltype,classkeytoatomindexes,"classkeytoatomindexes.txt")
+            vdwindextoequivindex={}
+            equivvdwindex=vdwparentindices[0]
+            for vdwatomindex in vdwparentindices:
+                vdwindextoequivindex[vdwatomindex]=equivvdwindex
+            for k in range(len(vdwparentindices)): 
+                vdwatomindex=vdwparentindices[k]
+                classkey=str(poltype.idxtosymclass[vdwatomindex])
+                ls=[vdwindextoequivindex[vdwatomindex]] 
+                smilesposstring,fragatomstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,ls,parentindextofragindex,fragidxarray)
+                fragvdwatomindex=parentindextofragindex[vdwindextoequivindex[vdwatomindex]-1]
+                if k==0:            
+                    strfragvdwatomindex=str(fragvdwatomindex+1)
+                fragvdwatomindex+=1
+                fragclasskey=fragidxtosymclass[fragvdwatomindex]
+                fragclasskey=str(fragclasskey)
+                parentclasskeytofragclasskey[classkey]=fragclasskey
+                classkeytosmartsposarray[classkey]=smilesposstring
+                classkeytosmarts[classkey]=fragsmarts
+                classkeytoatomindexes[classkey]=fragatomstring
+                WriteDictionaryToFile(poltype,classkeytoatomindexes,"classkeytoatomindexes.txt")
         WriteDictionaryToFile(poltype,classkeytosmartsposarray,"classkeytosmartsposarray.txt")
         WriteDictionaryToFile(poltype,classkeytosmarts,"classkeytosmarts.txt")
         WriteDictionaryToFile(poltype,parentclasskeytofragclasskey,"parentclasskeytofragclasskey.txt")
