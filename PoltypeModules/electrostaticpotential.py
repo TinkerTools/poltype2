@@ -602,9 +602,9 @@ def CheckDipoleMoments(poltype,optmol):
     try: 
         poltype.call_subsystem(cmd,True)
     except: # in case old key_4,key_5 files not working delete and restart
-        poltype.DeleteFilesWithExtension(['key_4','key_5'])
-        poltype.GenerateParameters()
-
+        #poltype.DeleteFilesWithExtension(['key_4','key_5'])
+        #poltype.GenerateParameters()
+        pass
     while not os.path.isfile('MMDipole.txt'):
         time.sleep(1)
     temp=open('MMDipole.txt','r')

@@ -1427,7 +1427,7 @@ class PolarizableTyper():
             ram=ramlist[i]
             numproc=numproclist[i]
             jobpath=jobpaths[i]
-            string='--job='+job+' '+'--numproc='+str(0)+' '+'--ram=5GB'+' '+'--disk=0GB'+' '+'--inputfilepaths='+os.path.join(jobpath,'poltype.ini')+' '+'--username='+self.username+'\n'
+            string='--job='+job+' '+'--numproc='+str(0)+' '+'--ram=10GB'+' '+'--disk=0GB'+' '+'--inputfilepaths='+os.path.join(jobpath,'poltype.ini')+' '+'--username='+self.username+'\n'
             temp.write(string)
         temp.close()
 
@@ -1822,9 +1822,9 @@ class PolarizableTyper():
                 opt.gen_superposeinfile(self)
                 opt.CheckRMSD(self)
         except: # in case old key_4,key_5 files not working delete and restart
-                self.DeleteFilesWithExtension(['key_4','key_5'])
-                self.GenerateParameters()
-
+                #self.DeleteFilesWithExtension(['key_4','key_5'])
+                #self.GenerateParameters()
+                pass
 
         if self.torsppcm:
             torgen.RemoveStringFromKeyfile(self,self.key5fname,'solvate GK')
