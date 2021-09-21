@@ -1427,7 +1427,7 @@ class PolarizableTyper():
             ram=ramlist[i]
             numproc=numproclist[i]
             jobpath=jobpaths[i]
-            string='--job='+job+' '+'--numproc='+str(0)+' '+'--ram=10GB'+' '+'--disk=0GB'+' '+'--inputfilepaths='+os.path.join(jobpath,'poltype.ini')+' '+'--username='+self.username+'\n'
+            string='--job='+job+' '+'--numproc='+str(1)+' '+'--ram=5GB'+' '+'--disk=0GB'+' '+'--inputfilepaths='+os.path.join(jobpath,'poltype.ini')+' '+'--username='+self.username+'\n'
             temp.write(string)
         temp.close()
 
