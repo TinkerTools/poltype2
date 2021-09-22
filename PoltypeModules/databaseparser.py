@@ -3626,25 +3626,28 @@ def CheckBondAngleDeviationsFromQM(poltype,alzout):
             continue
         linesplit=line.split()
         tol=None
+        keyword=None
         if 'Angle' in line:
             indexlist=[1,2,3]
             equilindices=[4,5]
             indices,qmequil,currentequil=GrabIndicesAndEquilValues(linesplit,indexlist,equilindices)
-            tol=1.84
+            tol=1
+            keyword='angle'
     
         if 'Bond' in line:
             indexlist=[1,2]
             equilindices=[3,4]
             indices,qmequil,currentequil=GrabIndicesAndEquilValues(linesplit,indexlist,equilindices)
-            tol=1
+            tol=2
+            keyword='bond'
             
         if tol!=None:
             deviation=(np.abs(qmequil-currentequil)*100)/qmequil
             if deviation>=tol:
                 shift=qmequil-(currentequil-qmequil)
-                if tol==1:
+                if keyword=='bond':
                     bondindicestonewbondequilvalues[tuple(indices)]=shift
-                elif tol==1.84:
+                elif keyword=='angle':
                     angleindicestonewbondequilvalues[tuple(indices)]=shift
 
 
