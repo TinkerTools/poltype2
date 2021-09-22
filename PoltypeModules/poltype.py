@@ -1733,6 +1733,9 @@ class PolarizableTyper():
         # databaseparser.py method is called to find parameters and append them to the keyfile
         if not os.path.exists(self.key4fname):
             databaseparser.appendtofile(self,self.key3fname,self.key4fname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo)
+            databaseparser.TestBondAngleEquilValues(self)
+            
+
         if self.torsppcm:
             torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
         torgen.get_all_torsions(self,mol)

@@ -19,7 +19,7 @@ import torsionfit as torfit
 from rdkit import DataStructs
 import torsiongenerator as torgen
 from itertools import combinations
-
+import shutil
 
 
   
@@ -3538,6 +3538,132 @@ def GetPolarIndexToPolarizePrm(poltype,polarprmstotransferinfo):
          
 
     return polarindextopolarizeprm
+
+
+def TestBondAngleEquilValues(poltype):
+    tmpkeyfile='testbondangleequilvalues.key'
+    tmpxyzfile='testbondangleequilvalues.xyz'
+    alzout='testbondangleequilvaluesalz.out'
+    shutil.copy(poltype.key4fname,tmpkeyfile)
+    shutil.copy(poltype.xyzoutfile,tmpxyzfile)
+    cmd = poltype.minimizeexe+' -k '+tmpkeyfile+' '+tmpxyzfile+' 0.1 > testbondangleequilvalues.out'
+    poltype.call_subsystem(cmd, True)
+    cmd = poltype.analyzeexe+' -k '+tmpkeyfile+' '+tmpxyzfile+'_2'+' d > '+alzout
+    poltype.call_subsystem(cmd, True)
+    bondindicestonewbondequilvalues,angleindicestonewbondequilvalues=CheckBondAngleDeviationsFromQM(poltype,alzout)
+   
+    bondtypeindicestonewbondequilvalues=ConvertIndicesToTypeIndices(poltype,bondindicestonewbondequilvalues)
+    angletypeindicestonewbondequilvalues=ConvertIndicesToTypeIndices(poltype,angleindicestonewbondequilvalues)
+    ChangeBondAngleEquilValues(poltype,bondtypeindicestonewbondequilvalues,angletypeindicestonewbondequilvalues)
+
+def ChangeBondAngleEquilValues(poltype,bondtypeindicestonewbondequilvalues,angletypeindicestonewbondequilvalues): 
+    temp=open(poltype.key4fname,'r')
+    results=temp.readlines()
+    temp.close()
+    tempname=poltype.key4fname.replace('.key','_TEMP.key')
+    temp=open(tempname,'w')
+    for line in results:
+        if '#' not in line:
+            found=False
+            linesplit=line.split()
+            if 'angle' in line:
+                typeindices=tuple([int(linesplit[1]),int(linesplit[2]),int(linesplit[3])])
+                if typeindices in angletypeindicestonewbondequilvalues.keys():
+                    equilvalue=angletypeindicestonewbondequilvalues[typeindices]
+                    found=True
+                elif typeindices[::-1] in angletypeindicestonewbondequilvalues.keys():
+                    equilvalue=angletypeindicestonewbondequilvalues[typeindices[::-1]]
+                    found=True
+                if found==True:
+                    linesplit=re.split(r'(\s+)', line)
+                    linesplit=linesplit[:11]
+                    linesplit.append('\n')
+                    linesplit[10]=str(equilvalue)
+                    line=''.join(linesplit)
+                
+            if 'bond' in line:
+                typeindices=tuple([int(linesplit[1]),int(linesplit[2])])
+                if typeindices in bondtypeindicestonewbondequilvalues.keys():
+                    equilvalue=bondtypeindicestonewbondequilvalues[typeindices]
+                    found=True
+                elif typeindices[::-1] in bondtypeindicestonewbondequilvalues.keys():
+                    equilvalue=bondtypeindicestonewbondequilvalues[typeindices[::-1]]
+                    found=True
+                if found==True:
+                    linesplit=re.split(r'(\s+)', line)
+                    linesplit=linesplit[:11]
+                    linesplit.append('\n')
+                    linesplit[8]=str(equilvalue)
+                    line=''.join(linesplit)
+        temp.write(line)
+    temp.close()
+    os.remove(poltype.key4fname)
+    os.rename(tempname,poltype.key4fname)
+             
+
+
+def ConvertIndicesToTypeIndices(poltype,indicestonewequilvalues):
+    typeindicestonewequilvalues={}
+    for indices,newequilvalues in indicestonewequilvalues.items():
+        typeindices=[]
+        for index in indices:
+            symclass=poltype.idxtosymclass[index]
+            typeindices.append(symclass)
+        typeindicestonewequilvalues[tuple(typeindices)]=newequilvalues
+
+
+    return typeindicestonewequilvalues
+
+
+def CheckBondAngleDeviationsFromQM(poltype,alzout):
+    bondindicestonewbondequilvalues={}
+    angleindicestonewbondequilvalues={}
+    temp=open(alzout,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        if 'Additional' in line or 'Classes' in line or 'Individual' in line or 'Atom' in line or 'Stretch' in line or 'Bending' in line or 'Torsional' in line:
+            continue
+        linesplit=line.split()
+        tol=None
+        if 'Angle' in line:
+            indexlist=[1,2,3]
+            equilindices=[4,5]
+            indices,qmequil,currentequil=GrabIndicesAndEquilValues(linesplit,indexlist,equilindices)
+            tol=1.84
+    
+        if 'Bond' in line:
+            indexlist=[1,2]
+            equilindices=[3,4]
+            indices,qmequil,currentequil=GrabIndicesAndEquilValues(linesplit,indexlist,equilindices)
+            tol=1
+            
+        if tol!=None:
+            deviation=(np.abs(qmequil-currentequil)*100)/qmequil
+            if deviation>=tol:
+                shift=qmequil-(currentequil-qmequil)
+                if tol==1:
+                    bondindicestonewbondequilvalues[tuple(indices)]=shift
+                elif tol==1.84:
+                    angleindicestonewbondequilvalues[tuple(indices)]=shift
+
+
+
+    return bondindicestonewbondequilvalues,angleindicestonewbondequilvalues
+
+def GrabIndicesAndEquilValues(linesplit,indexlist,equilindices):
+    indices=[]
+    for index in indexlist:
+        indexele=linesplit[index] 
+        indexelesplit=indexele.split('-')
+        theindex=int(indexelesplit[0])
+        indices.append(theindex)
+    qmequil=float(linesplit[equilindices[0]])
+    currentequil=float(linesplit[equilindices[1]])
+
+    return indices,qmequil,currentequil
+
+
 
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False):
 
