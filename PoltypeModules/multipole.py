@@ -33,37 +33,38 @@ def SanitizeMultipoleFrames(poltype,keyfilename): # pearl script for averging on
 def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
     # write out the local frames
     iteratom = openbabel.OBMolAtomIter(mol)
-    f = open (poltype.peditinfile, 'w')
-    f.write("\n")
-    f.write('A'+'\n')
+    if not os.path.isfile(poltype.peditinfile):
+        f = open (poltype.peditinfile, 'w')
+        f.write("\n")
+        f.write('A'+'\n')
 
-    #Find aromatic carbon, halogens, and bonded hydrogens to correct polarizability
-    iteratom = openbabel.OBMolAtomIter(mol)
-    writesection=True
-    lines=[]
-    for index,prm in polarindextopolarizeprm.items():
-       line=str(index)+' '+str(prm)+'\n'
-       lines.append(line) 
-    
-    if writesection:
-        for line in lines:
-            f.write(line)
+        #Find aromatic carbon, halogens, and bonded hydrogens to correct polarizability
+        iteratom = openbabel.OBMolAtomIter(mol)
+        writesection=True
+        lines=[]
+        for index,prm in polarindextopolarizeprm.items():
+           line=str(index)+' '+str(prm)+'\n'
+           lines.append(line) 
+        
+        if writesection:
+            for line in lines:
+                f.write(line)
 
-    
-
-
-    f.write("\n")
-    f.flush()
-    os.fsync(f.fileno())
-    f.write("2\n")
-    f.write("N\n")
-    f.write("Y\n")
+        
 
 
-    f.flush()
-    os.fsync(f.fileno())
+        f.write("\n")
+        f.flush()
+        os.fsync(f.fileno())
+        f.write("2\n")
+        f.write("N\n")
+        f.write("Y\n")
 
-    f.close()
+
+        f.flush()
+        os.fsync(f.fileno())
+
+        f.close()
     
 
 

@@ -26,7 +26,7 @@ def GeometryOPTWrapper(poltype,mol):
                  poltype.optpcm=False
                  redo=True
             else:
-                if poltype.optmethod=='MP2':
+                if poltype.optmethod=='MP2' and poltype.allowradicals==False: # HF doesnt work for radical?
                     poltype.optmethod='HF'
                     redo=True
                 elif poltype.optmethod=='HF' and (poltype.use_gaus==True or poltype.use_gausoptonly==True): # if Gaussian failed try Psi4 as last resort....
@@ -53,9 +53,9 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
     if chg==None:
-        temp.write('%d %d\n' % (mol.GetTotalCharge(), 1))
+        temp.write('%d %d\n' % (mol.GetTotalCharge(), mol.GetTotalSpinMultiplicity()))
     else:
-        temp.write('%d %d\n' % (chg, 1))
+        temp.write('%d %d\n' % (chg, mol.GetTotalSpinMultiplicity()))
 
     for lineidx in range(len(results)):
         line=results[lineidx]
@@ -138,7 +138,8 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
         temp.write('  ")'+'\n')
         temp.write('}'+'\n')
 
-
+    if poltype.allowradicals==True:
+        temp.write('set reference uhf '+'\n')
 
 
     temp.write('memory '+poltype.maxmem+'\n')
@@ -639,7 +640,8 @@ def GeometryOptimization(poltype,mol,loose=False,checkbonds=True,modred=True,bon
             jobtoinputfilepaths={cmdstr:[inputfilepath]}
             jobtooutputfiles={cmdstr:[poltype.logoptfname]}
             jobtoabsolutebinpath={cmdstr:poltype.which(poltype.gausexe)}
-
+            if poltype.checkinputonly==True:
+                sys.exit()
             if os.path.isfile(poltype.chkoptfname) and os.path.isfile(poltype.logoptfname):
                 os.remove(poltype.logoptfname) # if chk point exists just remove logfile, there could be error in it and we dont want WaitForTermination to catch error before job is resubmitted by daemon 
             if poltype.externalapi==None:
@@ -677,6 +679,10 @@ def GeometryOptimization(poltype,mol,loose=False,checkbonds=True,modred=True,bon
             jobtoinputfilepaths={cmdstr:[inputfilepath]}
             jobtooutputfiles={cmdstr:[poltype.logoptfname]}
             jobtoabsolutebinpath={cmdstr:poltype.which('psi4')}
+
+            if poltype.checkinputonly==True:
+                sys.exit()
+
 
             if os.path.isfile(poltype.logoptfname):
                 os.remove(poltype.logoptfname)

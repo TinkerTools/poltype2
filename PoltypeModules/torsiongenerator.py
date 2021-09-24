@@ -1392,6 +1392,8 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
         temp.write('  g_convergence GAU_LOOSE'+'\n')
         temp.write('  dynamic_level 1'+'\n')
         temp.write('}'+'\n')
+    if poltype.allowradicals==True:
+        temp.write('set reference uhf '+'\n')
 
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
@@ -1696,6 +1698,9 @@ def CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,m
         temp.write(' Mode = Implicit'+'\n')
         temp.write(' }'+'\n')
         temp.write('}'+'\n')
+    if poltype.allowradicals==True:
+        temp.write('set reference uhf '+'\n')
+
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')

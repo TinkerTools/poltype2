@@ -801,6 +801,9 @@ def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc,probeatoms):
     temp.write('set maxiter '+str(poltype.scfmaxiter)+'\n')
     temp.write('set freeze_core True'+'\n')
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
+    if poltype.allowradicals==True:
+        temp.write('set reference uhf '+'\n')
+
     spacedformulastr=mol.GetSpacedFormula()
     if ('I ' in spacedformulastr):
         temp.write('basis {'+'\n')

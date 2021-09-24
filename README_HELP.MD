@@ -52,6 +52,7 @@ python ~/poltypepackage/PoltypeModules/test_poltype.py
 * Use an SDF file format for the input structure.
 * Use totalcharge=charge keyword in .ini file to specify total charge, otherwise poltype will guess based on formal charge from input valence. 
 * Bond topologys (input valence) need to be correct for formal charge assignment.
+* If you have a radical, then add keyword "allowradicals" to input file, otherwise be default poltype will set radicals to zero and guess charge based on input valence.
 
 #### Most Common Inputs
 ```
@@ -258,6 +259,9 @@ email                Email address to send crash reports to.
                      Default=None
 
 inputmoleculefolderpaths   Path to folders containing sdf files for molecules you want to parameterize with poltype. Other settings in poltype.ini file will be written to poltype.ini files in each folder.
+
+allowradicals             Tells poltype to allow radicals in input file, default behaviour sets radicals to 0.
+                          Default=False
 ```
 
 
