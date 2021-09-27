@@ -657,8 +657,9 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             tors,maintortors,tortor,nonaroringfrag,tortoequivtor=GrabParentTorsions(poltype,rotbndindextoringtor,array)
             for torsion in tors:
                 equivtorsion=tortoequivtor[tuple(torsion)]
-                rdkittor=[k-1 for k in equivtorsion]
-                fragtor=[parentindextofragindex[k] for k in rdkittor]
+                torsion=[k-1 for k in equivtorsion]
+                
+                fragtor=[parentindextofragindex[k] for k in torsion]
                 fragtorbabel=[k+1 for k in fragtor]
                 if nonaroringfrag==True:
                     if fragtorbabel not in onlyfittorsions:
@@ -667,7 +668,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 fragclasskey=[fragidxtosymclass[k] for k in fragtorbabel]
                 fragclasskey=[str(k) for k in fragclasskey]
                 fragclasskey=' '.join(fragclasskey)
-                classkey=torgen.get_class_key(poltype,torsion[0],torsion[1],torsion[2],torsion[3])
+                classkey=torgen.get_class_key(poltype,equivtorsion[0],equivtorsion[1],equivtorsion[2],equivtorsion[3])
                 smilesposstring,fragtorstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,equivtorsion,parentindextofragindex,fragidxarray)
                 parentclasskeytofragclasskey[classkey]=fragclasskey
                 classkeytosmartsposarray[classkey]=smilesposstring
@@ -731,6 +732,8 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         parentatoms=poltype.rdkitmol.GetNumAtoms()
         listofjobs,jobtooutputlog,newlog=FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog,tempmol,parentdir,vdwfragment,strfragvdwatomindex,onlyfittorsions)
     os.chdir(parentdir)
+    if poltype.setupfragjobsonly==True:
+        sys.exit()
     finishedjobs,errorjobs=SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog)
     return equivalentrotbndindexarrays,rotbndindextoringtor
 
@@ -775,8 +778,8 @@ def GrabParentTorsions(poltype,rotbndindextoringtor,array):
     tortor=False
     nonaroringfrag=False
     maintortors=[]
-    tortoequivtor={}
     listoftors=[]
+    parenttorsiontotypetorsion={}
     for i in range(len(array)):
         rotbndindex=array[i]
         rotkey=rotbndindex.replace('_',' ')
@@ -785,6 +788,7 @@ def GrabParentTorsions(poltype,rotbndindextoringtor,array):
             torset=rotbndindextoringtor[rotbndindex]
             for tor in torset:
                 tors.append(tor)
+               
         elif rotkey in poltype.rotbndlist.keys():
             tors.extend(list(poltype.rotbndlist[rotkey]))
             listoftors.append(list(poltype.rotbndlist[rotkey]))
@@ -803,13 +807,28 @@ def GrabParentTorsions(poltype,rotbndindextoringtor,array):
                 maintortors.append(keytors[0])
                 tors.extend(keytors)
         if i==0:
-            equivtors=tors[:]
-        for ls in listoftors:
-            for toridx in range(len(ls)):
-                tor=ls[toridx]
-                equivtor=equivtors[toridx]
-                tortoequivtor[tuple(tor)]=equivtor
-             
+            firstfragtors=tors[:]
+        for tor in tors:
+            symtypes=[poltype.idxtosymclass[idx] for idx in tor]
+            parenttorsiontotypetorsion[tuple(tor)]=tuple(symtypes)
+    typetorsiontoparenttorsions={}
+    for tor,typetor in parenttorsiontotypetorsion.items():
+        if typetor not in typetorsiontoparenttorsions.keys():
+            typetorsiontoparenttorsions[typetor]=[]
+        typetorsiontoparenttorsions[typetor].append(tor)
+        for othertor,othertypetor in parenttorsiontotypetorsion.items():
+            if tor!=othertor:
+                if typetor==othertypetor:
+                    typetorsiontoparenttorsions[typetor].append(othertor)
+    tortoequivtor={}
+    for typetor,parenttors in typetorsiontoparenttorsions.items():
+        for j in range(len(parenttors)):
+            parenttor=parenttors[j]
+            if parenttor in firstfragtors:
+                firstfragtor=parenttor[:]
+        for j in range(len(parenttors)):
+            parenttor=parenttors[j]
+            tortoequivtor[tuple(parenttor)]=firstfragtor
     return tors,maintortors,tortor,nonaroringfrag,tortoequivtor
 
 
