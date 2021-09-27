@@ -657,9 +657,8 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             tors,maintortors,tortor,nonaroringfrag,tortoequivtor=GrabParentTorsions(poltype,rotbndindextoringtor,array)
             for torsion in tors:
                 equivtorsion=tortoequivtor[tuple(torsion)]
-                torsion=[k-1 for k in equivtorsion]
-                
-                fragtor=[parentindextofragindex[k] for k in torsion]
+                rdkittorsion=[k-1 for k in equivtorsion]
+                fragtor=[parentindextofragindex[k] for k in rdkittorsion]
                 fragtorbabel=[k+1 for k in fragtor]
                 if nonaroringfrag==True:
                     if fragtorbabel not in onlyfittorsions:
@@ -668,8 +667,8 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 fragclasskey=[fragidxtosymclass[k] for k in fragtorbabel]
                 fragclasskey=[str(k) for k in fragclasskey]
                 fragclasskey=' '.join(fragclasskey)
-                classkey=torgen.get_class_key(poltype,equivtorsion[0],equivtorsion[1],equivtorsion[2],equivtorsion[3])
-                smilesposstring,fragtorstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,equivtorsion,parentindextofragindex,fragidxarray)
+                classkey=torgen.get_class_key(poltype,torsion[0],torsion[1],torsion[2],torsion[3])
+                smilesposstring,fragtorstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,torsion,parentindextofragindex,fragidxarray)
                 parentclasskeytofragclasskey[classkey]=fragclasskey
                 classkeytosmartsposarray[classkey]=smilesposstring
                 classkeytosmarts[classkey]=fragsmarts

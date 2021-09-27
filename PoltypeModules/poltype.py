@@ -1678,6 +1678,7 @@ class PolarizableTyper():
                 self.use_gaus=True
             else:
                 traceback.print_exc(file=sys.stdout)
+                sys.exit()
 
         # Obtain multipoles from Gaussian fchk file using GDMA
     
@@ -1720,7 +1721,7 @@ class PolarizableTyper():
                      self.use_gaus=True
                  else:
                      traceback.print_exc(file=sys.stdout)
-
+                     sys.exit()
 
         # End here if qm calculations were all that needed to be done 
         if self.qmonly:

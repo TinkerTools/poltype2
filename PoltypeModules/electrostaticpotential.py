@@ -117,17 +117,18 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
 
     if poltype.allowradicals==True:
         temp.write('set reference uhf '+'\n')
-
-    spacedformulastr=mol.GetSpacedFormula()
-    if ('I ' in spacedformulastr):
-        temp.write('basis {'+'\n')
-        temp.write('['+' '+poltype.espbasissetfile+' '+poltype.iodineespbasissetfile +' '+ ']'+'\n')
-        temp=ReadInBasisSet(poltype,temp,poltype.espbasissetfile,poltype.iodineespbasissetfile)
-        temp.write('}'+'\n')
-        temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
+        temp.write("G, wfn = gradient('%s/%s', return_wfn=True)" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
     else:
+        spacedformulastr=mol.GetSpacedFormula()
+        if ('I ' in spacedformulastr):
+            temp.write('basis {'+'\n')
+            temp.write('['+' '+poltype.espbasissetfile+' '+poltype.iodineespbasissetfile +' '+ ']'+'\n')
+            temp=ReadInBasisSet(poltype,temp,poltype.espbasissetfile,poltype.iodineespbasissetfile)
+            temp.write('}'+'\n')
+            temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
+        else:
 
-        temp.write("E, wfn = properties('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
+            temp.write("E, wfn = properties('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
     temp.write('cubeprop(wfn)'+'\n')
     temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
 
@@ -165,17 +166,19 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     if poltype.allowradicals==True:
         temp.write('set reference uhf '+'\n')
 
-    spacedformulastr=mol.GetSpacedFormula()
-    if ('I ' in spacedformulastr):
-        temp.write('basis {'+'\n')
-        temp.write('['+' '+poltype.dmabasissetfile+' '+poltype.iodinedmabasissetfile +' '+ ']'+'\n')
-        temp=ReadInBasisSet(poltype,temp,poltype.dmabasissetfile,poltype.iodinedmabasissetfile)
-        temp.write('}'+'\n')
-        temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower())+'\n')
-
+        temp.write("G, wfn = gradient('%s/%s', return_wfn=True)" % (poltype.dmamethod.lower(),poltype.dmabasisset)+'\n')
     else:
+        spacedformulastr=mol.GetSpacedFormula()
+        if ('I ' in spacedformulastr):
+            temp.write('basis {'+'\n')
+            temp.write('['+' '+poltype.dmabasissetfile+' '+poltype.iodinedmabasissetfile +' '+ ']'+'\n')
+            temp=ReadInBasisSet(poltype,temp,poltype.dmabasissetfile,poltype.iodinedmabasissetfile)
+            temp.write('}'+'\n')
+            temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower())+'\n')
 
-        temp.write("E, wfn = properties('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower(),poltype.dmabasisset)+'\n')
+        else:
+
+            temp.write("E, wfn = properties('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower(),poltype.dmabasisset)+'\n')
     temp.write('cubeprop(wfn)'+'\n')
     temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
     header=poltype.molstructfname.split('.')[0]
@@ -417,8 +420,6 @@ def ElectrostaticPotentialComparison(poltype):
 
 def SPForDMA(poltype,optmol,mol):
     if poltype.use_gaus==False or poltype.use_gausoptonly==True:
-        if os.path.isfile(poltype.chkdmafname):
-            os.remove(poltype.chkdmafname)
 
         gen_comfile(poltype,poltype.comdmafname.replace('.com','_temp.com'),poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkdmafname,poltype.comtmp,optmol)
         poltype.WriteToLog("Calling: " + "Psi4 Gradient for DMA")
@@ -434,8 +435,6 @@ def SPForDMA(poltype,optmol,mol):
             jobtooutputfiles={cmdstr:[poltype.logdmafname,poltype.fckdmafname]}
             jobtoabsolutebinpath={cmdstr:poltype.which('psi4')}
             jobtologlistfilenameprefix=os.getcwd()+r'/'+'dma_jobtolog_'+poltype.molecprefix
-            if os.path.isfile(poltype.logdmafname):
-                os.remove(poltype.logdmafname) # if chk point exists just remove logfile, there could be error in it and we dont want WaitForTermination to catch error before job is resubmitted by daemon 
 
 
             if poltype.externalapi!=None:
@@ -453,8 +452,6 @@ def SPForDMA(poltype,optmol,mol):
     else:
         term,error=poltype.CheckNormalTermination(poltype.logdmafname,errormessages=None,skiperrors=True)
         if not term:
-            if os.path.isfile(poltype.chkdmafname):
-                os.remove(poltype.chkdmafname)
             gen_comfile(poltype,poltype.comdmafname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkdmafname,poltype.comtmp,optmol)
             cmdstr = poltype.gausexe + " " + poltype.comdmafname
             
@@ -467,8 +464,6 @@ def SPForDMA(poltype,optmol,mol):
             jobtooutputfiles={cmdstr:[poltype.logdmafname,poltype.chkdmafname]}
             jobtoabsolutebinpath={cmdstr:poltype.which(poltype.gausexe)}
 
-            if os.path.isfile(poltype.logdmafname):
-                os.remove(poltype.logdmafname)
             if poltype.externalapi!=None:
                 if len(jobtooutputlog.keys())!=0:
                     call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
@@ -505,8 +500,6 @@ def SPForESP(poltype,optmol,mol):
             jobtooutputfiles={cmdstr:[outputname,poltype.fckespfname,'grid_esp.dat']}
             jobtoabsolutebinpath={cmdstr:poltype.which('psi4')}
 
-            if os.path.isfile(outputname):
-                os.remove(outputname)
 
             if poltype.externalapi!=None:
                 if len(jobtooutputlog.keys())!=0:
@@ -523,8 +516,6 @@ def SPForESP(poltype,optmol,mol):
     else:
         term,error=poltype.CheckNormalTermination(poltype.logespfname,errormessages=None,skiperrors=True)
         if poltype.espfit and not term:
-            if os.path.isfile(poltype.chkespfname):
-                os.remove(poltype.chkespfname)
             poltype.WriteToLog("Calling: " + "Gaussian for ESP")
             gen_comfile(poltype,poltype.comespfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkespfname,poltype.comtmp,optmol)
             cmdstr = poltype.gausexe + " " + poltype.comespfname
@@ -537,8 +528,6 @@ def SPForESP(poltype,optmol,mol):
             jobtooutputfiles={cmdstr:[poltype.logespfname,poltype.chkespfname]}
             jobtoabsolutebinpath={cmdstr:poltype.which(poltype.gausexe)}
 
-            if os.path.isfile(poltype.logespfname):
-                os.remove(poltype.logespfname)
 
             if poltype.externalapi!=None:
                 if len(jobtooutputlog.keys())!=0:
