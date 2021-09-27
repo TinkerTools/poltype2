@@ -1262,7 +1262,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
 
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
-    temp.write('%d %d\n' % (mol.GetTotalCharge(),1))
+    temp.write('%d %d\n' % (mol.GetTotalCharge(),mol.GetTotalSpinMultiplicity()))
     iteratom = openbabel.OBMolAtomIter(optmol)
     etab = openbabel.OBElementTable()
     if os.path.isfile(torxyzfname):
@@ -1672,7 +1672,7 @@ def CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,m
     finalstruct= opt.load_structfile(poltype,prevstrctfname)
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
-    temp.write('%d %d\n' % (mol.GetTotalCharge(), 1))
+    temp.write('%d %d\n' % (mol.GetTotalCharge(), mol.GetTotalSpinMultiplicity()))
     iteratom = openbabel.OBMolAtomIter(finalstruct)
     etab = openbabel.OBElementTable()
     for atm in iteratom:

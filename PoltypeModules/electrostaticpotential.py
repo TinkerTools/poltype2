@@ -100,7 +100,7 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
     inputname=comfilename.replace('.com','.psi4')
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
-    temp.write('%d %d\n' % (charge, 1))
+    temp.write('%d %d\n' % (charge, mol.GetTotalSpinMultiplicity()))
     for lineidx in range(len(results)):
         line=results[lineidx]
         linesplit=line.split()
@@ -149,7 +149,7 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     inputname=comfilename.replace('.com','.psi4')
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
-    temp.write('%d %d\n' % (poltype.totalcharge, 1))
+    temp.write('%d %d\n' % (poltype.totalcharge, mol.GetTotalSpinMultiplicity()))
     for lineidx in range(len(results)):
         line=results[lineidx]
         linesplit=line.split()
