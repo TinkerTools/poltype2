@@ -647,40 +647,39 @@ def GrabAtomsForParameters(poltype,mol):
 
 
 
+def ExtendByNeighbors(poltype,ls):    
+    extendneighbofneighb=False
+    if len(ls)==1:
+        extendneighbofneighb=True 
+    newls=[]
+    for atomidx in ls:
+        newls.append(atomidx)
+        atom=poltype.rdkitmol.GetAtomWithIdx(atomidx)
+        for natom in atom.GetNeighbors():
+            natomidx=natom.GetIdx()
+            if natomidx not in newls:
+                newls.append(natomidx)      
+            if extendneighbofneighb==True:
+                for nnatom in natom.GetNeighbors():
+                    nnatomidx=nnatom.GetIdx()
+                    if nnatomidx not in newls:
+                        newls.append(nnatomidx)
 
-           
+
+    return newls
              
 
 def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,parametersmartstosmartslist,ls,rdkitmol):
     smartsmcstomol={}
     prmsmartstomcssmarts={}
     parametersmartstoscore={}
-    rdkitatomicnumtonum={}
-    for atom in poltype.rdkitmol.GetAtoms():
-        atomicnum=atom.GetAtomicNum()
-        if atomicnum not in rdkitatomicnumtonum.keys():
-            rdkitatomicnumtonum[atomicnum]=0
-        rdkitatomicnumtonum[atomicnum]+=1
-
+     
     for parametersmarts in parametersmartslist:
         prmmol=Chem.MolFromSmarts(parametersmarts)
         mols = [poltype.rdkitmol,prmmol]
         res=rdFMCS.FindMCS(mols)
         atomnum=res.numAtoms
         smartsmcs=res.smartsString
-        prmsmartsatomicnumtonum={}
-        for atomicnum,num in rdkitatomicnumtonum.items():
-            prmsmartsatomicnumtonum[atomicnum]=0
-        for atom in prmmol.GetAtoms():
-            atomicnum=atom.GetAtomicNum()
-            if atomicnum not in prmsmartsatomicnumtonum.keys():
-                prmsmartsatomicnumtonum[atomicnum]=0
-            prmsmartsatomicnumtonum[atomicnum]+=1
-        otherscore=0
-        for atomicnum,num in rdkitatomicnumtonum.items():
-            prmnum=prmsmartsatomicnumtonum[atomicnum]
-            diff=np.abs(prmnum-num)
-            otherscore+=diff 
         prmsmartsatomnum=prmmol.GetNumAtoms()
         mcsmol=Chem.MolFromSmarts(smartsmcs)
         if atomnum>0:
@@ -703,16 +702,21 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                                 matchidxs.append(matchidx)
                         if len(ls)>1 and goodmatch==True:
                             goodmatch=CheckIfConsecutivelyConnected(poltype,matchidxs,mcsmol)
+                        newls=ExtendByNeighbors(poltype,ls) 
+                        score=0 
+                        for idx in newls:
+                            if idx in match:
+                                score+=1
                         if goodmatch==True:
                             break
                     if goodmatch==True:
                         prmsmartstomcssmarts[parametersmarts]=smartsmcs
-                        score=np.abs(prmsmartsatomnum-atomnum)+otherscore
                         parametersmartstoscore[parametersmarts]=score
                         smartsmcstomol[smartsmcs]=mcsmol
     foundmin=False
     if len(parametersmartstoscore.keys())>0:
-        minscore=min(parametersmartstoscore.values())
+ 
+        minscore=max(parametersmartstoscore.values())
         for parametersmarts in parametersmartstoscore.keys():
             score=parametersmartstoscore[parametersmarts]
             if score==minscore:
@@ -3779,7 +3783,8 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         anglesforprmtoparametersmarts,anglesforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofanglesforprm,parametersmartslist,mol)
         planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofanglesforprm,parametersmartslist,mol)
         torsionsforprmtoparametersmarts,torsionsforprmtosmarts=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listoftorsionsforprm,parametersmartslist,mol)
- 
+        
+
         atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,vdwindicestoextsmarts=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,vdwindicestoextsmartsmatchlength,atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,vdwindicestoextsmarts)
         
         bondsforprmtoparametersmarts,bondsforprmtosmarts,bondindicestoextsmarts=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,bondindicestoextsmartsmatchlength,bondsforprmtoparametersmarts,bondsforprmtosmarts,bondindicestoextsmarts)
