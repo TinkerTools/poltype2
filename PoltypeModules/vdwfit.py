@@ -1267,7 +1267,7 @@ def MinimizeDimer(poltype,inputxyz,keyfile,indexpairtoreferencedistanceoriginal,
     inputpair=tuple([p1,p2shifted])
     distanceguess=GrabPairwiseDistance(inputpair,indexpairtoreferencedistanceoriginal)
     distanceratio=.1
-    distanceforceconstant=5 # kcal/mol/ang^2
+    distanceforceconstant=1 # kcal/mol/ang^2
     angleforceconstant=.1 # kcal/mol/deg^2
     lower,upper=GrabUpperLowerBounds(poltype,distanceguess,distanceratio)
     lower=0 # only for distance since want flat-bottom
