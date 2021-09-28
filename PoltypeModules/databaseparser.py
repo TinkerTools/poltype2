@@ -673,7 +673,16 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
     smartsmcstomol={}
     prmsmartstomcssmarts={}
     parametersmartstoscore={}
-     
+    parametersmartstonumcommon={}
+    rdkitatomicnumtonum={}
+    parametersmartstootherscore={}
+
+    for atom in poltype.rdkitmol.GetAtoms():
+        atomicnum=atom.GetAtomicNum()
+        if atomicnum not in rdkitatomicnumtonum.keys():
+            rdkitatomicnumtonum[atomicnum]=0
+        rdkitatomicnumtonum[atomicnum]+=1
+
     for parametersmarts in parametersmartslist:
         prmmol=Chem.MolFromSmarts(parametersmarts)
         mols = [poltype.rdkitmol,prmmol]
@@ -682,17 +691,28 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
         smartsmcs=res.smartsString
         prmsmartsatomnum=prmmol.GetNumAtoms()
         mcsmol=Chem.MolFromSmarts(smartsmcs)
+        prmsmartsatomicnumtonum={}
+        for atomicnum,num in rdkitatomicnumtonum.items():
+            prmsmartsatomicnumtonum[atomicnum]=0
+        for atom in prmmol.GetAtoms():
+            atomicnum=atom.GetAtomicNum()
+            if atomicnum not in prmsmartsatomicnumtonum.keys():
+                prmsmartsatomicnumtonum[atomicnum]=0
+            prmsmartsatomicnumtonum[atomicnum]+=1
+        otherscore=0
+        for atomicnum,num in rdkitatomicnumtonum.items():
+            prmnum=prmsmartsatomicnumtonum[atomicnum]
+            diff=np.abs(prmnum-num)
+            otherscore+=diff 
         if atomnum>0:
             diditmatch=poltype.rdkitmol.HasSubstructMatch(mcsmol)
             if diditmatch==True:
-
+                
                 matches=poltype.rdkitmol.GetSubstructMatches(mcsmol)
                 firstmatch=matches[0]
                 if len(firstmatch)>=len(ls):
                     for match in matches:
                         goodmatch=True
-                        if ',' in smartsmcs:
-                            goodmatch=False
                         matchidxs=[]
                         for idx in ls:
                             if idx not in match:
@@ -712,18 +732,38 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                     if goodmatch==True:
                         prmsmartstomcssmarts[parametersmarts]=smartsmcs
                         parametersmartstoscore[parametersmarts]=score
+                        parametersmartstonumcommon[parametersmarts]=atomnum
+                        parametersmartstootherscore[parametersmarts]=otherscore
                         smartsmcstomol[smartsmcs]=mcsmol
     foundmin=False
+    
+    parametersmartstofinalscore={}
+    parametersmartstotruefinalscore={}
+
     if len(parametersmartstoscore.keys())>0:
- 
         minscore=max(parametersmartstoscore.values())
         for parametersmarts in parametersmartstoscore.keys():
             score=parametersmartstoscore[parametersmarts]
+            if score==minscore:
+                numcommon=parametersmartstonumcommon[parametersmarts]
+                parametersmartstofinalscore[parametersmarts]=numcommon
+        maxscore=max(parametersmartstofinalscore.values())
+        for parametersmarts in parametersmartstofinalscore.keys():
+            score=parametersmartstofinalscore[parametersmarts]
+            if score==maxscore:
+                
+                otherscore=parametersmartstootherscore[parametersmarts]
+                parametersmartstotruefinalscore[parametersmarts]=otherscore
+
+        minscore=min(parametersmartstotruefinalscore.values())
+        for parametersmarts in parametersmartstotruefinalscore.keys():
+            score=parametersmartstotruefinalscore[parametersmarts]
             if score==minscore:
                 smartsmcs=prmsmartstomcssmarts[parametersmarts] 
                 mcsmol=smartsmcstomol[smartsmcs]
                 foundmin=True
                 break
+
         if foundmin==True:
             smartls=[smartsmcs,smartsmcs]
             if parametersmarts not in parametersmartstosmartslist.keys():
