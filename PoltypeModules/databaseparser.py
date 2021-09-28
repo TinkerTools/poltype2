@@ -768,6 +768,23 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
             smartls=[smartsmcs,smartsmcs]
             if parametersmarts not in parametersmartstosmartslist.keys():
                 parametersmartstosmartslist[parametersmarts]=smartls
+    else:
+        if len(ls)==1:
+            atom=poltype.rdkitmol.GetAtomWithIdx(ls[0])
+            atomicnum=atom.GetAtomicNum()
+            string='[#'+str(atomicnum)+']'
+            othermol=Chem.MolFromSmarts(string)
+            for parametersmarts in parametersmartslist:
+                prmmol=Chem.MolFromSmarts(parametersmarts)
+                mols = [othermol,prmmol]
+                diditmatch=mols[1].HasSubstructMatch(mols[0])
+                if diditmatch==True:
+                    matches=mols[1].GetSubstructMatches(mols[0])
+                    firstmatch=matches[0]
+                    smartls=[string,string]
+                    if parametersmarts not in parametersmartstosmartslist.keys():
+                        parametersmartstosmartslist[parametersmarts]=smartls
+                    break
 
          
 
