@@ -668,7 +668,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 fragclasskey=[str(k) for k in fragclasskey]
                 fragclasskey=' '.join(fragclasskey)
                 classkey=torgen.get_class_key(poltype,torsion[0],torsion[1],torsion[2],torsion[3])
-                smilesposstring,fragtorstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,torsion,parentindextofragindex,fragidxarray)
+                smilesposstring,fragtorstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,equivtorsion,parentindextofragindex,fragidxarray)
                 parentclasskeytofragclasskey[classkey]=fragclasskey
                 classkeytosmartsposarray[classkey]=smilesposstring
                 classkeytosmarts[classkey]=fragsmarts
