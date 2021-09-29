@@ -20,8 +20,6 @@ from rdkit import DataStructs
 import torsiongenerator as torgen
 from itertools import combinations
 import shutil
-
-
   
 def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo):
     temp=open(vf,'r')
@@ -720,6 +718,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                             else:
                                 matchidx=match.index(idx)
                                 matchidxs.append(matchidx)
+                        
                         if len(ls)>1 and goodmatch==True:
                             goodmatch=CheckIfConsecutivelyConnected(poltype,matchidxs,mcsmol)
                         newls=ExtendByNeighbors(poltype,ls) 
@@ -739,7 +738,6 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
     
     parametersmartstofinalscore={}
     parametersmartstotruefinalscore={}
-
     if len(parametersmartstoscore.keys())>0:
         minscore=max(parametersmartstoscore.values())
         for parametersmarts in parametersmartstoscore.keys():
@@ -751,7 +749,6 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
         for parametersmarts in parametersmartstofinalscore.keys():
             score=parametersmartstofinalscore[parametersmarts]
             if score==maxscore:
-                
                 otherscore=parametersmartstootherscore[parametersmarts]
                 parametersmartstotruefinalscore[parametersmarts]=otherscore
 
@@ -2472,15 +2469,24 @@ def FindMissingParameters(poltype,indicestosmartsatomorders,rdkitmol,mol,indexto
             for nidx in neighborindexes:
                 if nidx not in nindexes:
                     nindexes.append(nidx)
+                if len(indices)==1 and len(neighborindexes)==1::
+                    nneighborindexes=indextoneighbidxs[nidx]
+                    for nnidx in nneighborindexes:
+                        if nnidx not in nindexes:
+                            nindexes.append(nnidx) 
         smarts=smartsatomorders[0]
         substructure = Chem.MolFromSmarts(smarts)
         matches=rdkitmol.GetSubstructMatches(substructure)
-        matcharray=[]
         for match in matches:
-            for idx in match:
-                if idx not in matcharray:
-                    matcharray.append(idx)
-            
+            allin=True
+            for idx in indices:
+                if idx not in match:
+                    allin=False
+            if allin==True:
+                matcharray=match
+                break
+
+   
         check=CheckIfNeighborsExistInSMARTMatch(poltype,nindexes,matcharray)
         if check==False or '*' in smarts or '~' in smarts:
             if len(indices)==1: # vdw
