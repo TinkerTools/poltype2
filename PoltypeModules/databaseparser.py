@@ -2469,7 +2469,7 @@ def FindMissingParameters(poltype,indicestosmartsatomorders,rdkitmol,mol,indexto
             for nidx in neighborindexes:
                 if nidx not in nindexes:
                     nindexes.append(nidx)
-                if len(indices)==1 and len(neighborindexes)==1::
+                if len(indices)==1 and len(neighborindexes)==1:
                     nneighborindexes=indextoneighbidxs[nidx]
                     for nnidx in nneighborindexes:
                         if nnidx not in nindexes:
