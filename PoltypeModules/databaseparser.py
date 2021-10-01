@@ -746,20 +746,25 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
         minscore=max(parametersmartstoscore.values())
         for parametersmarts in parametersmartstoscore.keys():
             score=parametersmartstoscore[parametersmarts]
+
+            numcommon=parametersmartstonumcommon[parametersmarts]
+
             if score==minscore:
-                numcommon=parametersmartstonumcommon[parametersmarts]
                 parametersmartstofinalscore[parametersmarts]=numcommon
         maxscore=max(parametersmartstofinalscore.values())
         for parametersmarts in parametersmartstofinalscore.keys():
             score=parametersmartstofinalscore[parametersmarts]
             if score==maxscore:
+
                 otherscore=parametersmartstootherscore[parametersmarts]
+
                 parametersmartstotruefinalscore[parametersmarts]=otherscore
 
         minscore=min(parametersmartstotruefinalscore.values())
         for parametersmarts in parametersmartstotruefinalscore.keys():
             score=parametersmartstotruefinalscore[parametersmarts]
             if score==minscore:
+
                 smartsmcs=prmsmartstomcssmarts[parametersmarts] 
                 mcsmol=smartsmcstomol[smartsmcs]
                 foundmin=True

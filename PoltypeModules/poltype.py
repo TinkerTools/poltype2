@@ -1396,22 +1396,30 @@ class PolarizableTyper():
         for atomindex,chg in atomindextoformalcharge.items():
             if chg!=0:
                 chargedindices.append(atomindex)
+        atleastonehashydrogen=False
         for atomindex in chargedindices:
             atom=m.GetAtomWithIdx(atomindex)
-            for atm in atom.GetNeighbors():
-                atmidx=atm.GetIdx()
-                if atmidx in chargedindices:
-                    pcm=True
-                for natm in atm.GetNeighbors():
-                    natmidx=natm.GetIdx()
-                    if natmidx!=atomindex:
-                        if natmidx in chargedindices:
-                            pcm=True
-                        for nnatm in natm.GetNeighbors():
-                            nnatmidx=nnatm.GetIdx()
-                            if nnatmidx!=atmidx:
-                                if nnatmidx in chargedindices:
-                                    pcm=True
+            for natom in atom.GetNeighbors():
+                natomicnum=natom.GetAtomicNum()
+                if natomicnum==1:
+                    atleastonehashydrogen=True
+        if atleastonehashydrogen==True:         
+            for atomindex in chargedindices:
+                atom=m.GetAtomWithIdx(atomindex)
+                for atm in atom.GetNeighbors():
+                    atmidx=atm.GetIdx()
+                    if atmidx in chargedindices:
+                        pcm=True
+                    for natm in atm.GetNeighbors():
+                        natmidx=natm.GetIdx()
+                        if natmidx!=atomindex:
+                            if natmidx in chargedindices:
+                                pcm=True
+                            for nnatm in natm.GetNeighbors():
+                                nnatmidx=nnatm.GetIdx()
+                                if nnatmidx!=atmidx:
+                                    if nnatmidx in chargedindices:
+                                        pcm=True
         return pcm 
                 
                     
