@@ -246,6 +246,26 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                         datom=mol.GetAtom(rtd)
                         batom=mol.GetAtom(rtb)
                         catom=mol.GetAtom(rtc)
+                        rtbatomicnum=batom.GetAtomicNum()
+                        rtcatomicnum=catom.GetAtomicNum()
+                        if rtbatomicnum==6:
+                            iteratomatom = openbabel.OBAtomAtomIter(batom)
+                            hcount=0
+                            for nrtb in iteratomatom:
+                                nrtbatomicnum=nrtb.GetAtomicNum()
+                                if nrtbatomicnum==1:
+                                    hcount+=1
+                            if hcount==3:
+                                continue 
+                        if rtcatomicnum==6:
+                            iteratomatom = openbabel.OBAtomAtomIter(catom)
+                            hcount=0
+                            for nrtc in iteratomatom:
+                                nrtcatomicnum=nrtc.GetAtomicNum()
+                                if nrtcatomicnum==1:
+                                    hcount+=1
+                            if hcount==3:
+                                continue 
 
                         rtaatomicnum=aatom.GetAtomicNum()
                         rtdatomicnum=datom.GetAtomicNum()
@@ -1335,6 +1355,29 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
 
             rtaatomicnum=aatom.GetAtomicNum()
             rtdatomicnum=datom.GetAtomicNum()
+
+
+            rtbatomicnum=batom.GetAtomicNum()
+            rtcatomicnum=catom.GetAtomicNum()
+            if rtbatomicnum==6:
+                iteratomatom = openbabel.OBAtomAtomIter(batom)
+                hcount=0
+                for nrtb in iteratomatom:
+                    nrtbatomicnum=nrtb.GetAtomicNum()
+                    if nrtbatomicnum==1:
+                        hcount+=1
+                if hcount==3:
+                    continue 
+            if rtcatomicnum==6:
+                iteratomatom = openbabel.OBAtomAtomIter(catom)
+                hcount=0
+                for nrtc in iteratomatom:
+                    nrtcatomicnum=nrtc.GetAtomicNum()
+                    if nrtcatomicnum==1:
+                        hcount+=1
+                if hcount==3:
+                    continue 
+
             if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
                 continue
             if (allhydtorsoneside==True or allhydtors==True) and (rtaatomicnum==1 or rtdatomicnum==1):
