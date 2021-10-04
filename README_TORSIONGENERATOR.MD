@@ -92,7 +92,7 @@ When for some reason QM optimizations or SP can not converge, at any point of th
     <li>	Same as in optimization.py but add frozen torsion restraints at bottom of COM file  </li>
 <ol>
         <li>	Restrain all torsion around all bonds (with some exceptions below) </li>
-        <li>	If the bond b-c has heavy atoms a, b (non-hydrogen) then pick those as restraints and don’t pick hydrogen. If there are multiple hydrogen torsions (and no heavy on both sides) then pick only one as restraint. </li>
+        <li>	If the bond b-c has heavy atoms a, b (non-hydrogen) then pick those as restraints and don’t pick hydrogen. If there are multiple hydrogen torsions (and no heavy on both sides) then pick only one as restraint. If methyl group on either b or c (a-b-c-d) and also a-b-c-d is not being fit (but being restrained), then skip restraining that torsion since cause issues with QM opt but methyl rotation will still be similar to MM opt. </li>
 </ol>
 </ol>
 <li>	For each opt job submitted </li>
