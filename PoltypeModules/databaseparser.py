@@ -13,6 +13,7 @@ from rdkit import Chem
 import copy
 import symmetry as symm
 from rdkit.Chem.Lipinski import RotatableBondSmarts
+from rdkit.Chem.rdMolDescriptors import CalcNumRings
 import numpy as np
 import json
 import torsionfit as torfit
@@ -731,6 +732,10 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                                 allneighbsin=False
                         if goodmatch==True:
                             break
+                    prmmolnumrings=CountRingsInSMARTS(poltype,parametersmarts)
+                    molnumrings=CalcNumRings(poltype.rdkitmol)
+                    if prmmolnumrings>molnumrings:
+                        goodmatch=False
                     if goodmatch==True:
                         prmsmartstomcssmarts[parametersmarts]=smartsmcs
                         parametersmartstoscore[parametersmarts]=score
@@ -744,8 +749,10 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
     parametersmartstotruefinalscore={}
     if len(parametersmartstoscore.keys())>0:
         minscore=max(parametersmartstoscore.values())
+
         for parametersmarts in parametersmartstoscore.keys():
             score=parametersmartstoscore[parametersmarts]
+            numcommon=parametersmartstonumcommon[parametersmarts]
 
             numcommon=parametersmartstonumcommon[parametersmarts]
 
@@ -754,8 +761,8 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
         maxscore=max(parametersmartstofinalscore.values())
         for parametersmarts in parametersmartstofinalscore.keys():
             score=parametersmartstofinalscore[parametersmarts]
-            if score==maxscore:
 
+            if score==maxscore:
                 otherscore=parametersmartstootherscore[parametersmarts]
 
                 parametersmartstotruefinalscore[parametersmarts]=otherscore
@@ -764,7 +771,6 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
         for parametersmarts in parametersmartstotruefinalscore.keys():
             score=parametersmartstotruefinalscore[parametersmarts]
             if score==minscore:
-
                 smartsmcs=prmsmartstomcssmarts[parametersmarts] 
                 mcsmol=smartsmcstomol[smartsmcs]
                 foundmin=True
@@ -798,6 +804,21 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
     return parametersmartstosmartslist,parametersmartstofoundallneighbs
 
 
+
+def CountRingsInSMARTS(poltype,parametersmarts):
+    closedbrack=True
+    numbers=[]
+    for e in parametersmarts:
+        if e=='[':
+            closedbrack=False
+        elif e==']':
+            closedbrack=True
+        elif e.isdigit():
+            if closedbrack==True:
+                if e not in numbers:
+                    numbers.append(e)
+    rings=len(numbers)
+    return rings
 
 def CheckIfConsecutivelyConnected(poltype,matchidxs,mcsmol):
     goodmatch=True
