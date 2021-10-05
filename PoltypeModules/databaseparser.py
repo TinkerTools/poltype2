@@ -668,6 +668,84 @@ def ExtendByNeighbors(poltype,ls):
     return newls
              
 
+
+def GenerateFragmentSMARTS(poltype,ls):
+    newmol = Chem.Mol()
+    mw = Chem.RWMol(newmol)
+    # need to treat ring bonds as aromatic since all transferred parameters from amoeba09 are aromatic rings
+    oldindextonewindex={}
+    aromaticindices=[]
+    for i,idx in enumerate(ls):
+        oldatom=poltype.rdkitmol.GetAtomWithIdx(idx)
+        mw.AddAtom(oldatom)
+        oldindextonewindex[idx]=i
+        oldatombabel=poltype.mol.GetAtom(idx+1)
+        isinring=oldatombabel.IsInRing()
+        if isinring==True:
+            aromaticindices.append(i)
+
+    
+
+    atomswithcutbonds=[]
+    aromaticbonds=[]
+    bonditer=poltype.rdkitmol.GetBonds()
+    for bond in bonditer:
+        oendidx = bond.GetEndAtomIdx()
+        obgnidx = bond.GetBeginAtomIdx()
+        babelbond=poltype.mol.GetBond(oendidx+1,obgnidx+1)
+        isinring=babelbond.IsInRing()
+        if oendidx in oldindextonewindex.keys() and obgnidx not in oldindextonewindex.keys():
+            if oldindextonewindex[oendidx] not in atomswithcutbonds:
+                atomswithcutbonds.append(oldindextonewindex[oendidx])
+            continue
+        if oendidx not in oldindextonewindex.keys() and obgnidx in oldindextonewindex.keys():
+            if oldindextonewindex[obgnidx] not in atomswithcutbonds:
+                atomswithcutbonds.append(oldindextonewindex[obgnidx])
+            continue
+        if oendidx not in oldindextonewindex.keys() and obgnidx not in oldindextonewindex.keys():
+            continue
+        endidx=oldindextonewindex[oendidx]
+        bgnidx=oldindextonewindex[obgnidx]
+        if isinring==True:
+            aromaticbonds.append([endidx,bgnidx]) 
+        bondorder=bond.GetBondType()
+        mw.AddBond(bgnidx,endidx,bondorder)
+
+
+
+    smarts=rdmolfiles.MolToSmarts(mw)
+
+    for atom in mw.GetAtoms():
+        atomidx=atom.GetIdx()
+        if atomidx in aromaticindices:
+            atom.SetIsAromatic(True)
+
+
+    for bond in mw.GetBonds():
+        endidx = bond.GetEndAtomIdx()
+        bgnidx = bond.GetBeginAtomIdx()
+        temp=[endidx,bgnidx]
+        if temp in aromaticbonds or temp[::-1] in aromaticbonds:
+            bond.SetIsAromatic(True)
+
+    smartsfortransfer=rdmolfiles.MolToSmarts(mw)
+
+    return smarts,smartsfortransfer
+
+
+
+def GenerateFragmentSMARTSList(poltype,ls):
+    fragsmartslist=[]
+    atomindiceslist=GenerateAllPossibleFragmentIndices(poltype,ls,poltype.rdkitmol,100)
+    for thels in atomindiceslist:
+        smarts,smartsfortransfer=GenerateFragmentSMARTS(poltype,thels)
+        if smarts not in fragsmartslist:
+            fragsmartslist.append(smarts)
+
+
+    return fragsmartslist
+
+
 def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,parametersmartstosmartslist,ls,rdkitmol):
     smartsmcstomol={}
     prmsmartstomcssmarts={}
@@ -682,14 +760,35 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
             rdkitatomicnumtonum[atomicnum]=0
         rdkitatomicnumtonum[atomicnum]+=1
 
+    newls=copy.deepcopy(ls)
+    fragsmartslist=GenerateFragmentSMARTSList(poltype,newls)
+
     for parametersmarts in parametersmartslist:
         prmmol=Chem.MolFromSmarts(parametersmarts)
+        smartsmatchingtoindices=[]
+        molsmatchingtoindices=[]
+        finalfragsmartslist=[]
+        for fragsmarts in fragsmartslist:
+            fragmol=Chem.MolFromSmarts(fragsmarts)
+            diditmatch=prmmol.HasSubstructMatch(fragmol)
+            if diditmatch==True:
+                finalfragsmartslist.append(fragsmarts)
+
         mols = [poltype.rdkitmol,prmmol]
         res=rdFMCS.FindMCS(mols)
         atomnum=res.numAtoms
         smartsmcs=res.smartsString
         prmsmartsatomnum=prmmol.GetNumAtoms()
         mcsmol=Chem.MolFromSmarts(smartsmcs)
+        molsmatchingtoindices.append(mcsmol)
+        smartsmatchingtoindices.append(smartsmcs)
+        thesmartstonumneighbs={}
+        thesmartstothemol={}
+        for fragsmarts in finalfragsmartslist:
+            fragmol=Chem.MolFromSmarts(fragsmarts)
+            molsmatchingtoindices.append(fragmol)
+            smartsmatchingtoindices.append(fragsmarts)
+
         prmsmartsatomicnumtonum={}
         for atomicnum,num in rdkitatomicnumtonum.items():
             prmsmartsatomicnumtonum[atomicnum]=0
@@ -703,11 +802,13 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
             prmnum=prmsmartsatomicnumtonum[atomicnum]
             diff=np.abs(prmnum-num)
             otherscore+=diff 
-        if atomnum>0:
-            diditmatch=poltype.rdkitmol.HasSubstructMatch(mcsmol)
+        for idx in range(len(smartsmatchingtoindices)):
+            thesmarts=smartsmatchingtoindices[idx]
+            themol=molsmatchingtoindices[idx]
+            thesmartstothemol[thesmarts]=themol
+            diditmatch=poltype.rdkitmol.HasSubstructMatch(themol)
             if diditmatch==True:
-                
-                matches=poltype.rdkitmol.GetSubstructMatches(mcsmol)
+                matches=poltype.rdkitmol.GetSubstructMatches(themol)
                 firstmatch=matches[0]
                 if len(firstmatch)>=len(ls):
                     for match in matches:
@@ -719,9 +820,9 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                             else:
                                 matchidx=match.index(idx)
                                 matchidxs.append(matchidx)
-                        
+
                         if len(ls)>1 and goodmatch==True:
-                            goodmatch=CheckIfConsecutivelyConnected(poltype,matchidxs,mcsmol)
+                            goodmatch=CheckIfConsecutivelyConnected(poltype,matchidxs,themol)
                         newls=ExtendByNeighbors(poltype,ls) 
                         score=0 
                         allneighbsin=True
@@ -737,13 +838,19 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                     if prmmolnumrings>molnumrings:
                         goodmatch=False
                     if goodmatch==True:
-
-                        prmsmartstomcssmarts[parametersmarts]=smartsmcs
-                        parametersmartstoscore[parametersmarts]=score
-                        parametersmartstonumcommon[parametersmarts]=atomnum
-                        parametersmartstootherscore[parametersmarts]=otherscore
-                        smartsmcstomol[smartsmcs]=mcsmol
-                        parametersmartstofoundallneighbs[parametersmarts]=allneighbsin
+                        thesmartstonumneighbs[thesmarts]=score
+        if len(thesmartstonumneighbs.keys())>0:
+            maxscore=max(thesmartstonumneighbs.values())            
+            for thesmarts,score in thesmartstonumneighbs.items():
+                themol=thesmartstothemol[thesmarts]
+                if score==maxscore:
+                    prmsmartstomcssmarts[parametersmarts]=thesmarts
+                    parametersmartstoscore[parametersmarts]=score
+                    parametersmartstonumcommon[parametersmarts]=atomnum
+                    parametersmartstootherscore[parametersmarts]=otherscore
+                    smartsmcstomol[thesmarts]=themol
+                    parametersmartstofoundallneighbs[parametersmarts]=allneighbsin
+                    break
     foundmin=False
     
     parametersmartstofinalscore={}
@@ -753,7 +860,6 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
         for parametersmarts in parametersmartstoscore.keys():
             score=parametersmartstoscore[parametersmarts]
             numcommon=parametersmartstonumcommon[parametersmarts]
-
 
             if score==minscore:
                 parametersmartstofinalscore[parametersmarts]=numcommon
@@ -774,6 +880,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                 smartsmcs=prmsmartstomcssmarts[parametersmarts] 
                 mcsmol=smartsmcstomol[smartsmcs]
                 foundmin=True
+
                 break
 
         if foundmin==True:
@@ -803,6 +910,49 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
 
     return parametersmartstosmartslist,parametersmartstofoundallneighbs
 
+
+def GenerateAllPossibleFragmentIndices(poltype,ls,rdkitmol,maxatomsize):
+    atomindiceslist=[copy.deepcopy(ls)]
+    oldindexlist=copy.deepcopy(ls)
+    indexlist=[]
+    count=0
+    neighbcount=0
+    while set(oldindexlist)!=set(indexlist):
+        if count!=0:
+            oldindexlist=copy.deepcopy(indexlist)
+        if len(oldindexlist)>maxatomsize:
+            break
+        if neighbcount>=2:
+            break
+        neighborindexes=GrabNeighboringIndexes(poltype,oldindexlist,rdkitmol)
+        neighbcount+=1
+       
+        for i in range(len(neighborindexes)):
+            combs=list(itertools.combinations(neighborindexes, i+1))
+            for comb in combs:
+                newcomb=copy.deepcopy(oldindexlist)
+                newcomb.extend(comb) 
+                if newcomb not in atomindiceslist:
+                    atomindiceslist.append(newcomb)
+        count+=1
+        newindexlist=copy.deepcopy(oldindexlist)
+        for index in neighborindexes:
+            if index not in newindexlist:
+                newindexlist.append(index)
+        indexlist=newindexlist
+  
+    return atomindiceslist
+
+
+def GrabNeighboringIndexes(poltype,indexlist,rdkitmol):
+    neighborindexes=[]
+    for index in indexlist:
+        atom=rdkitmol.GetAtomWithIdx(index)
+        for natom in atom.GetNeighbors():
+            natomidx=natom.GetIdx()
+            if natomidx not in neighborindexes and natomidx not in indexlist:
+                neighborindexes.append(natomidx)
+    return neighborindexes
 
 
 def CountRingsInSMARTS(poltype,parametersmarts):
@@ -943,6 +1093,7 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
     atomindicestoelementtinkerdescrips={}
     atomindicestosmartsatomorders={}
     for atomindices,parametersmarts in atomindicesforprmtoparametersmarts.items():
+        
         smartsls=atomindicesforprmtosmarts[atomindices]
         smarts=smartsls[0]
         smartsfortransfer=smartsls[1]
@@ -3899,7 +4050,8 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         opbendindicestoextsmartsmatchlength,opbendindicestoextsmarts,opbendindicestoextsmartsatomorder=MatchExternalSMARTSToMolecule(poltype,rdkitmol,opbendsmartsatomordertoparameters)
         vdwindicestoextsmartsmatchlength,vdwindicestoextsmarts,vdwindicestoextsmartsatomorder=MatchExternalSMARTSToMolecule(poltype,rdkitmol,vdwsmartsatomordertoparameters)
         tortorindicestoextsmartsmatchlength,tortorindicestoextsmarts,tortorindicestoextsmartsatomorders=MatchExternalSMARTSToMolecule(poltype,rdkitmol,tortorsmartsatomordertoparameters)
-        
+       
+
         atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,atomindicesforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofatomsforprm,parametersmartslist,mol)
  
         bondsforprmtoparametersmarts,bondsforprmtosmarts,bondsforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofbondsforprm,parametersmartslist,mol)
