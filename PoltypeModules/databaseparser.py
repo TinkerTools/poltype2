@@ -658,7 +658,7 @@ def ExtendByNeighbors(poltype,ls):
             natomidx=natom.GetIdx()
             if natomidx not in newls:
                 newls.append(natomidx)      
-            if extendneighbofneighb==True:
+            if extendneighbofneighb==True and len(atom.GetNeighbors())==1:
                 for nnatom in natom.GetNeighbors():
                     nnatomidx=nnatom.GetIdx()
                     if nnatomidx not in newls:
@@ -737,6 +737,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                     if prmmolnumrings>molnumrings:
                         goodmatch=False
                     if goodmatch==True:
+
                         prmsmartstomcssmarts[parametersmarts]=smartsmcs
                         parametersmartstoscore[parametersmarts]=score
                         parametersmartstonumcommon[parametersmarts]=atomnum
@@ -749,16 +750,15 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
     parametersmartstotruefinalscore={}
     if len(parametersmartstoscore.keys())>0:
         minscore=max(parametersmartstoscore.values())
-
         for parametersmarts in parametersmartstoscore.keys():
             score=parametersmartstoscore[parametersmarts]
             numcommon=parametersmartstonumcommon[parametersmarts]
 
-            numcommon=parametersmartstonumcommon[parametersmarts]
 
             if score==minscore:
                 parametersmartstofinalscore[parametersmarts]=numcommon
         maxscore=max(parametersmartstofinalscore.values())
+        
         for parametersmarts in parametersmartstofinalscore.keys():
             score=parametersmartstofinalscore[parametersmarts]
 
@@ -2549,6 +2549,7 @@ def FindMissingParameters(poltype,indicestosmartsatomorders,rdkitmol,mol,indexto
                         missing.append(indices)
             else:
                 missing.append(indices)
+
 
 
 
