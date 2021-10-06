@@ -1251,18 +1251,19 @@ class PolarizableTyper():
                         polneighb=True
                 if polneighb and val==3:
                     chg=1
-            atomindextoformalcharge[atomidx]=chg
             string='Atom index = '+str(atomidx+1)+' Atomic Number = ' +str(atomnum)+ ' Valence = '+str(val)+ ' Formal charge = '+str(chg)
             array.append(string)
             if atomnum==6 and val==3 and self.addhydrogentononcharged==True and self.allowradicals==False:
                 warnings.warn('WARNING! Strange valence for Carbon, will assume missing hydrogens and add'+string) 
                 self.WriteToLog('WARNING! Strange valence for Carbon, will assume missing hydrogens and add '+string)
                 atom.SetNumRadicalElectrons(0)
+                chg=0
 
             elif atomnum==7 and val==2 and self.addhydrogentononcharged==True and self.allowradicals==False:
                 warnings.warn('WARNING! Strange valence for Nitrogen, will assume missing hydrogens and add'+string) 
                 self.WriteToLog('WARNING! Strange valence for Nitrogen, will assume missing hydrogens and add '+string)
                 atom.SetNumRadicalElectrons(0)
+                chg=0
 
             elif atomnum==7 and val==2 and self.allowradicals==True:
                 warnings.warn('WARNING! Strange valence for Nitrogen, will assume radical and set charge to zero') 
@@ -1283,6 +1284,8 @@ class PolarizableTyper():
                     atom.SetNumRadicalElectrons(0)
  
                 totchg+=chg
+            
+            atomindextoformalcharge[atomidx]=chg
         if self.totalcharge!=None: 
             if self.totalcharge!=totchg:
                 for row in array:
