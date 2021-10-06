@@ -278,11 +278,6 @@ class PolarizableTyper():
                         self.espgrad=a
                     elif "checkinputonly" in newline:
                         self.checkinputonly=True
-                    elif "allowradicals" in newline:
-                        if '=' not in line:
-                            self.allowradicals = True
-                        else:
-                            self.allowradicals=self.GrabBoolValue(a)
                     elif "setupfragjobsonly" in newline:
                         if '=' not in line:
                             self.setupfragjobsonly = True
@@ -1253,30 +1248,38 @@ class PolarizableTyper():
                     chg=1
             string='Atom index = '+str(atomidx+1)+' Atomic Number = ' +str(atomnum)+ ' Valence = '+str(val)+ ' Formal charge = '+str(chg)
             array.append(string)
-            if atomnum==6 and val==3 and self.addhydrogentononcharged==True and self.allowradicals==False:
+            if atomnum==6 and val==3 and self.addhydrogentononcharged==True and radicals==0:
                 warnings.warn('WARNING! Strange valence for Carbon, will assume missing hydrogens and add'+string) 
                 self.WriteToLog('WARNING! Strange valence for Carbon, will assume missing hydrogens and add '+string)
                 atom.SetNumRadicalElectrons(0)
                 chg=0
 
-            elif atomnum==7 and val==2 and self.addhydrogentononcharged==True and self.allowradicals==False:
+            elif atomnum==7 and val==2 and self.addhydrogentononcharged==True and radicals==0:
                 warnings.warn('WARNING! Strange valence for Nitrogen, will assume missing hydrogens and add'+string) 
                 self.WriteToLog('WARNING! Strange valence for Nitrogen, will assume missing hydrogens and add '+string)
                 atom.SetNumRadicalElectrons(0)
                 chg=0
 
-            elif atomnum==7 and val==2 and self.allowradicals==True:
+            elif atomnum==7 and val==2 and radicals==1:
                 warnings.warn('WARNING! Strange valence for Nitrogen, will assume radical and set charge to zero') 
                 self.WriteToLog('WARNING! Strange valence for Nitrogen, will assume radical and set charge to zero')
+                self.allowradicals=True
 
                 atom.SetFormalCharge(0)
+                self.addhydrogentononcharged=False
 
-            elif atomnum==8 and val==2 and self.allowradicals==True:
+            elif atomnum==8 and val==2 and radicals==1:
                 warnings.warn('WARNING! Strange valence for Oxygen, will assume radical and set charge to +1') 
                 self.WriteToLog('WARNING! Strange valence for Oxygen, will assume radical and set charge to +1')
+                self.allowradicals=True
 
                 atom.SetFormalCharge(1)
-
+            elif atomnum==8 and val==1 and radicals==1:
+                warnings.warn('WARNING! Strange valence for Oxygen, will assume radical and set charge to +1') 
+                self.WriteToLog('WARNING! Strange valence for Oxygen, will assume radical and set charge to +0')
+                self.allowradicals=True
+                atom.SetFormalCharge(0)
+                self.addhydrogentononcharged=False
 
             else:
                 atom.SetFormalCharge(chg)
@@ -1284,7 +1287,6 @@ class PolarizableTyper():
                     atom.SetNumRadicalElectrons(0)
  
                 totchg+=chg
-            
             atomindextoformalcharge[atomidx]=chg
         if self.totalcharge!=None: 
             if self.totalcharge!=totchg:
