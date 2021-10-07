@@ -202,6 +202,21 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                 poltype.localframe2[atomidx - 1] = 0
                 lfzerox[atomidx - 1]=True
                 foundcase=True
+            elif val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==1: # ammonium
+                neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
+                idxtotrisecbool[atomidx]=True
+                trisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
+                idxtotrisectidxs[atomidx]=trisectidxs
+                lfzerox[atomidx - 1]=True 
+                foundcase=True
+            elif val==1 and highestsymneighbnorepeatval==4 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2: # ammonium H
+                poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
+                poltype.localframe2[atomidx - 1] = 0
+                lfzerox[atomidx - 1]=True
+                foundcase=True
+
+
+
         if foundcase==False:
             if val==1 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(atomneighbs[0])]) and atomneighbs[0].GetValence()==4: # then this is like H in Methane, we want Z-only
              
