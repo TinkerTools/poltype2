@@ -148,12 +148,12 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
         atomneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(atom)]
         uniqueneighbtypes=list(set([poltype.idxtosymclass[b.GetIdx()] for b in atomneighbs]))
         sorteduniquetypeneighbsnorepeat=FindUniqueNonRepeatingNeighbors(poltype,atomneighbs)
-                
         foundcase=False
+        numhyds=GrabNumberOfConnectedHydrogens(poltype,atom)
         if len(sorteduniquetypeneighbsnorepeat)!=0:
             highestsymneighbnorepeatidx=sorteduniquetypeneighbsnorepeat[0]
             highestsymneighbnorepeat=mol.GetAtom(highestsymneighbnorepeatidx)
-            numhyds=GrabNumberOfConnectedHydrogens(poltype,highestsymneighbnorepeat)
+            numhydsneighb=GrabNumberOfConnectedHydrogens(poltype,highestsymneighbnorepeat)
             highestsymneighbnorepeatval=highestsymneighbnorepeat.GetValence()
             neighbsofneighb=[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbnorepeat)]
             uniqueneighbtypesofhighestsymneighbnorepeat=list(set([poltype.idxtosymclass[b.GetIdx()] for b in neighbsofneighb]))
@@ -171,24 +171,33 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                 poltype.localframe2[atomidx - 1] = 0
                 lfzerox[atomidx - 1]=True
                 foundcase=True
-            elif ((val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==3) or (val==3 and len(uniqueneighbtypes)==2 and (highestsymneighbnorepeatval==3 or highestsymneighbnorepeatval==4))) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1:  # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector, need len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1 otherwise hits dimethylamine
-                idxtobisecthenzbool[atomidx]=True
-                if atomicnum==6:
-                    bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
+                
+            elif ((val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==3) or (val==3 and len(uniqueneighbtypes)==2 and (highestsymneighbnorepeatval==3 or highestsymneighbnorepeatval==4))) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1:  # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector, need len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1 otherwise hits dimethylamine. Need to specify numhyds otherwise will hit nitrobenzene N/C
+
+                if numhyds==2 or numhydsneighb==2:
+                    idxtobisecthenzbool[atomidx]=True
+                    if atomicnum==6:
+                        bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
+                    else:
+                        neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
+                        bisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
+                       
+                    idxtobisectidxs[atomidx]=bisectidxs
+                    poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
+                    foundcase=True
                 else:
-                    neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
-                    bisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
-                   
-                idxtobisectidxs[atomidx]=bisectidxs
-                poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
-                foundcase=True
+                    foundcase=True
+                    poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
+                    poltype.localframe2[atomidx - 1] = 0
+                    lfzerox[atomidx - 1]=True
+
                 # now make sure neighboring atom (lf1) also is using z-then-bisector
-            elif ((val==1 and (highestsymneighbnorepeatval==3)) or ((val==3) and highestsymneighbnorepeatval==1)) and numhyds<=1 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=2: #dimethylamine
+            elif ((val==1 and (highestsymneighbnorepeatval==3) and atomicnum==1) or ((val==3) and highestsymneighbnorepeatval==1)) and numhydsneighb<=1 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=2: #dimethylamine
                 poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                 poltype.localframe2[atomidx - 1] = 0
                 lfzerox[atomidx - 1]=True
                 foundcase=True
-            elif (((val==3) and (highestsymneighbnorepeatval==4))) and numhyds<=2 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=3:
+            elif (((val==3) and (highestsymneighbnorepeatval==4))) and numhydsneighb<=2 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=3:
                 poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                 poltype.localframe2[atomidx - 1] = 0
                 lfzerox[atomidx - 1]=True
