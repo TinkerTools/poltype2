@@ -2462,6 +2462,27 @@ def ConvertToPoltypeClasses(poltype,torsionsmissing):
     return newtorsionsmissing
 
 
+
+def GrabKeysFromValue(poltype,dic,thevalue):
+    keylist=[]
+    for key,value in dic.items():
+        if value==thevalue:
+            keylist.append(key)
+    return keylist
+
+
+
+def GrabAllPossibleMoleculeIndices(poltype,typeindices):
+    thelist=[]
+    for typenum in typeindices:
+        allindices=GrabKeysFromValue(poltype,poltype.idxtosymclass,typenum)
+        thelist.append(allindices)
+    listofmoleculeindices=list(itertools.product(*thelist))
+
+
+    return listofmoleculeindices
+
+
 def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters):
     indicestoextsmartsmatchlength={}
     indicestoextsmarts={}
@@ -2486,9 +2507,14 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters):
                     if len(smarts)>len(indicestoextsmarts[moleculeindices]):
                        enter=True 
                 if enter==True:
-                    indicestoextsmartsmatchlength[moleculeindices]=len(match)
-                    indicestoextsmarts[moleculeindices]=smarts
-                    indicestoextsmartsatomorder[moleculeindices]=smartsatomorder
+                    babelindices=[i+1 for i in moleculeindices]
+                    typeindices=[poltype.idxtosymclass[i] for i in babelindices]
+                    listofmoleculeindices=GrabAllPossibleMoleculeIndices(poltype,typeindices) 
+                    for babelindices in listofmoleculeindices:
+                        moleculeindices=tuple([i-1 for i in babelindices])
+                        indicestoextsmartsmatchlength[moleculeindices]=len(match)
+                        indicestoextsmarts[moleculeindices]=smarts
+                        indicestoextsmartsatomorder[moleculeindices]=smartsatomorder
     return indicestoextsmartsmatchlength,indicestoextsmarts,indicestoextsmartsatomorder
 
 def CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,indicestoextsmartsmatchlength,indicesforprmtoparametersmarts,indicesforprmtosmarts,indicestoextsmarts,indicesforprmtomatchallneighbs,indicestoextsmartsatomorders):

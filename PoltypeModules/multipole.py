@@ -212,7 +212,7 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     lfzerox[atomidx - 1]=True
 
                 # now make sure neighboring atom (lf1) also is using z-then-bisector
-            elif ((val==1 and (highestsymneighbnorepeatval==3) and atomicnum==1) or ((val==3) and highestsymneighbnorepeatval==1)) and numhydsneighb<=1 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=2: #dimethylamine
+            elif ((val==1 and (highestsymneighbnorepeatval==3)) or ((val==3) and highestsymneighbnorepeatval==1)) and numhydsneighb<=1 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=2: #dimethylamine
                 poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                 poltype.localframe2[atomidx - 1] = 0
                 lfzerox[atomidx - 1]=True
@@ -277,8 +277,46 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     newneighbs=RemoveFromList(poltype,neighboffirstneighbs,atom)
                     newsorteduniquetypeneighbsnorepeat=FindUniqueNonRepeatingNeighbors(poltype,newneighbs)
                     sorteduniquetypeneighbsnorepeat+=newsorteduniquetypeneighbsnorepeat
-                poltype.localframe1[atomidx - 1]=sorteduniquetypeneighbsnorepeat[0]
-                poltype.localframe2[atomidx - 1]=sorteduniquetypeneighbsnorepeat[1] 
+                sorteduniquetypeneighbsnorepeattypes=[poltype.idxtosymclass[i] for i in sorteduniquetypeneighbsnorepeat]
+                indicesofsametypetomove=[]
+                atomtype=poltype.idxtosymclass[atomidx]
+                for i in range(len(sorteduniquetypeneighbsnorepeat)):
+                    index=sorteduniquetypeneighbsnorepeat[i]
+                    typenum=sorteduniquetypeneighbsnorepeattypes[i]
+                    if typenum==atomtype:
+                        indicesofsametypetomove.append(index)
+                newsorteduniquetypeneighbsnorepeat=[]
+                for index in sorteduniquetypeneighbsnorepeat:  
+                    if index not in indicesofsametypetomove:
+                        newsorteduniquetypeneighbsnorepeat.append(index)
+                for index in indicesofsametypetomove:
+                    newsorteduniquetypeneighbsnorepeat.append(index)
+                symtypetocount={}
+                for typenum in sorteduniquetypeneighbsnorepeattypes:
+                    cnt=sorteduniquetypeneighbsnorepeattypes.count(typenum)
+                    symtypetocount[typenum]=cnt
+                mincnt=min(symtypetocount.values())
+                if mincnt==1:
+                    for symtype,cnt in symtypetocount.items():
+                        if cnt==mincnt:
+                            break
+                    for i in range(len(sorteduniquetypeneighbsnorepeat)):
+                        index=sorteduniquetypeneighbsnorepeat[i]
+                        typenum=sorteduniquetypeneighbsnorepeattypes[i]
+                        if typenum==symtype:
+                            break
+                    specialindex=index
+                    thenewsorteduniquetypeneighbsnorepeat=[specialindex]
+                    for i in range(len(sorteduniquetypeneighbsnorepeat)):
+                        index=sorteduniquetypeneighbsnorepeat[i]
+                        if index!=specialindex:
+                            if i==0:
+                                thenewsorteduniquetypeneighbsnorepeat.insert(0,index)
+                            else:
+                                thenewsorteduniquetypeneighbsnorepeat.append(index)
+                    newsorteduniquetypeneighbsnorepeat=thenewsorteduniquetypeneighbsnorepeat[:]
+                poltype.localframe1[atomidx - 1]=newsorteduniquetypeneighbsnorepeat[0]
+                poltype.localframe2[atomidx - 1]=newsorteduniquetypeneighbsnorepeat[1] 
     # write out the local frames
     iteratom = openbabel.OBMolAtomIter(mol)
     if not os.path.isfile(poltype.peditinfile):
