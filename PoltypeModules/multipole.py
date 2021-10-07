@@ -170,9 +170,11 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
         sorteduniquetypeneighbsnorepeat=FindUniqueNonRepeatingNeighbors(poltype,atomneighbs)
         foundcase=False
         numhyds=GrabNumberOfConnectedHydrogens(poltype,atom)
+        atomisinring=atom.IsInRing()
         if len(sorteduniquetypeneighbsnorepeat)!=0:
             highestsymneighbnorepeatidx=sorteduniquetypeneighbsnorepeat[0]
             highestsymneighbnorepeat=mol.GetAtom(highestsymneighbnorepeatidx)
+            highestsymneighbnorepeatatomicnum=highestsymneighbnorepeat.GetAtomicNum()
             numhydsneighb=GrabNumberOfConnectedHydrogens(poltype,highestsymneighbnorepeat)
             highestsymneighbnorepeatval=highestsymneighbnorepeat.GetValence()
             neighbsofneighb=[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbnorepeat)]
@@ -184,8 +186,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
             highestsymneighbofneighbnorepeatidx=sorteduniquetypeneighbsofneighbsnorepeat[0]
             highestsymneighbofneighbnorepeat=mol.GetAtom(highestsymneighbofneighbnorepeatidx)
             neighbsofneighbofneighb=[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbofneighbnorepeat)]
-
-
 
             if highestsymneighbnorepeatval==3 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbnorepeat)]): # then this is like the H on Ammonia and we can use z-then bisector
                 poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
@@ -219,18 +219,28 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     lfzerox[atomidx - 1]=True
 
                 # now make sure neighboring atom (lf1) also is using z-then-bisector
-            elif ((val==1 and (highestsymneighbnorepeatval==3)) or ((val==3) and highestsymneighbnorepeatval==1)) and numhydsneighb<=1 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=2: #dimethylamine
+            elif val==1 and highestsymneighbnorepeatval==3 and numhydsneighb==1 and len(uniqueneighbtypes)==1 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and highestsymneighbnorepeatatomicnum==7: #dimethylamine
                 idxtobisecthenzbool[atomidx]=True
 
-                if atomicnum==1:
-                    bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
-                else:
-                    neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
-                    bisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
+                bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
                 idxtobisectidxs[atomidx]=bisectidxs
                 poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
                 foundcase=True
 
+            elif val==3 and highestsymneighbnorepeatval==1 and numhydsneighb==0 and len(uniqueneighbtypes)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==1 and atomicnum==7: #dimethylamine
+                idxtobisecthenzbool[atomidx]=True
+
+                neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
+                bisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
+                idxtobisectidxs[atomidx]=bisectidxs
+                poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
+                foundcase=True
+
+            elif val==1 and highestsymneighbnorepeatval==3 and numhydsneighb==1 and len(uniqueneighbtypes)==1 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2: # H on benzene
+                poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
+                poltype.localframe2[atomidx - 1] = 0
+                lfzerox[atomidx - 1]=True
+                foundcase=True
 
 
             elif (((val==3) and (highestsymneighbnorepeatval==4))) and numhydsneighb<=2 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=3:
@@ -278,11 +288,27 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                 idxlist=GrabIndexesFromUniqueTypeNumber(poltype,atomneighbs,uniqueneighbtypes[0])
                 poltype.localframe1[atomidx-1]=-1*idxlist[0]
                 poltype.localframe2[atomidx-1]=-1*idxlist[1]
-            elif len(uniqueneighbtypes)==2 and CheckIfNeighbHasSameType(poltype,atom,atomneighbs): # this handles, ethane,ethene...., z-only
+            elif len(uniqueneighbtypes)==2 and CheckIfNeighbHasSameType(poltype,atom,atomneighbs) and atomisinring==False: # this handles, ethane,ethene...., z-only
                 poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                 poltype.localframe2[atomidx - 1] = 0
                 lfzerox[atomidx - 1]=True
         
+
+            elif len(uniqueneighbtypes)==2 and val==3 and atomisinring==True: # benzene, one carbon in anilne
+                typenumtocnt={}
+                neighbtypes=[poltype.idxtosymclass[b.GetIdx()] for b in atomneighbs]
+                for typenum in neighbtypes:
+                    cnt=neighbtypes.count(typenum)
+                    typenumtocnt[typenum]=cnt
+                maxcnt=max(typenumtocnt.values())
+                for typenum in uniqueneighbtypes:
+                    cnt=typenumtocnt[typenum]
+                    if cnt==maxcnt:
+                        break 
+                idxlist=GrabIndexesFromUniqueTypeNumber(poltype,atomneighbs,typenum)
+                poltype.localframe1[atomidx-1]=-1*idxlist[0]
+                poltype.localframe2[atomidx-1]=-1*idxlist[1]
+
 
 
             else:
