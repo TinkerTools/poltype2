@@ -8,6 +8,26 @@ import re
 from collections import deque
 
 
+
+def AddPolarizeCommentsToKey(poltype,keyfilename,polartypetotransferinfo):
+    temp=open(keyfilename,'r')
+    results=temp.readlines()
+    temp.close()
+    tempname=keyfilename.replace('.key','_temp.key')
+    temp=open(tempname,'w')
+    for line in results:
+        if 'polarize' in line and '#' not in line:
+            linesplit=line.split()
+            typenum=linesplit[1]
+            comments=polartypetotransferinfo[typenum]
+            line=comments+line
+        temp.write(line)
+    temp.close()
+    os.remove(keyfilename)
+    os.rename(tempname,keyfilename)
+
+
+
 def SanitizeMultipoleFrames(poltype,keyfilename): # pearl script for averging only understands 0 and not empty spaces for parsing
     temp=open(keyfilename,'r')
     results=temp.readlines()

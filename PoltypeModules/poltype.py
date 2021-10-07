@@ -1708,7 +1708,7 @@ class PolarizableTyper():
         # Set up input file for poledit
         # find multipole local frame definitions
 
-        polarindextopolarizeprm=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m,polarize=True)
+        polarindextopolarizeprm,polartypetotransferinfo=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m,polarize=True)
         mpole.gen_peditinfile(self,mol,polarindextopolarizeprm)
 
         
@@ -1724,6 +1724,8 @@ class PolarizableTyper():
                 
             mpole.prepend_keyfile(self,self.keyfname,optmol)
             mpole.SanitizeMultipoleFrames(self,self.keyfname)
+            
+
         self.issane=self.CheckFileSanity()
         if self.issane==False:
             self.deletedfiles=True
@@ -1759,6 +1761,7 @@ class PolarizableTyper():
         # Atoms that belong to the same symm class will now have only one common multipole definition
         if not os.path.isfile(self.key2fname):
             mpole.AverageMultipoles(self,optmol)
+            mpole.AddPolarizeCommentsToKey(self,self.key2fname,polartypetotransferinfo)
         if self.espfit and not os.path.isfile(self.key3fname) and self.atomnum!=1:
             # Optimize multipole parameters to QM ESP Grid (*.cube_2)
             # tinker's potential utility is called, with option 6.

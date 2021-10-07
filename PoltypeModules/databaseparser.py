@@ -3979,6 +3979,16 @@ def RemoveIndicesMatchedFromExternalDatabase(poltype,indicestosmartsatomorder,in
     return missingindicestosmartsatomorders
 
 
+def ExtractTransferInfo(poltype,polarprmstotransferinfo):
+    polartypetotransferinfo={}
+    for polarprms,transferinfo in polarprmstotransferinfo.items():
+        linesplit=polarprms.split()
+        polartype=linesplit[1]
+        polartypetotransferinfo[polartype]=transferinfo
+
+    return polartypetotransferinfo
+
+
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False):
 
     if polarize==True:
@@ -3996,8 +4006,8 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
 
         polarprmstotransferinfo=MapParameterLineToTransferInfo(poltype,newpolarprms,{},{},{},{},newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist,{},[],[],[],[])
         polarindextopolarizeprm=GetPolarIndexToPolarizePrm(poltype,polarprmstotransferinfo)
-
-        return polarindextopolarizeprm
+        polartypetotransferinfo=ExtractTransferInfo(poltype,polarprmstotransferinfo)
+        return polarindextopolarizeprm,polartypetotransferinfo
 
     else:
 
