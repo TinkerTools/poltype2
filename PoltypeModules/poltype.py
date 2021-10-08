@@ -1544,7 +1544,8 @@ class PolarizableTyper():
         indextocoordinates=self.GrabIndexToCoordinates(mol)
         m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False,sanitize=False)
         m,atomindextoformalcharge=self.CheckInputCharge(m)
-
+        if self.allowradicals==True:
+            self.dontfrag=True # Psi4 doesnt allow UHF and properties (like compute WBO) for fragmenter, so need to turn of fragmenter if radical detected
         m.UpdatePropertyCache()
         if self.addhydrogentononcharged==True:
             m = Chem.AddHs(m)
