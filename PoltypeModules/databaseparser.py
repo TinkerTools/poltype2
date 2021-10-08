@@ -1965,10 +1965,13 @@ def ConvertIndicesDictionaryToPoltypeClasses(poltype,indicestovalue,indicestotin
                 poltypeclasses=tuple(tinkerclassestopoltypeclasses[tinkerclasses[::-1]])
             else:
                 continue
-            if poltypeclasses not in poltypeclassestovalue.keys():
-                poltypeclassestovalue[poltypeclasses]=[]
-            if value not in poltypeclassestovalue[poltypeclasses]:
-                poltypeclassestovalue[poltypeclasses].append(value)
+            for ls in poltypeclasses:
+                ls=tuple([ls])
+                if ls not in poltypeclassestovalue.keys():
+                    poltypeclassestovalue[ls]=[]
+                    if value not in poltypeclassestovalue[ls]:
+                        poltypeclassestovalue[ls].append(value)
+
     return poltypeclassestovalue 
 
 def CheckIfStringInStringList(poltype,string,stringlist):
@@ -4226,7 +4229,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         bondpoltypeclassestosmartsatomorders=ConvertIndicesDictionaryToPoltypeClasses(poltype,bondindicestosmartsatomorders,bondindicestotinkerclasses,bondtinkerclassestopoltypeclasses)
 
         bondpoltypeclassestoelementtinkerdescrips=ConvertIndicesDictionaryToPoltypeClasses(poltype,bondindicestoelementtinkerdescrips,bondindicestotinkerclasses,bondtinkerclassestopoltypeclasses)
-
         atompoltypeclasstoparametersmartsatomorder=ConvertIndicesDictionaryToPoltypeClasses(poltype,atomindextoparametersmartsatomorder,atomindextotinkerclass,atomtinkerclasstopoltypeclass)
 
         atompoltypeclasstosmartsatomorder=ConvertIndicesDictionaryToPoltypeClasses(poltype,atomindextosmartsatomorder,atomindextotinkerclass,atomtinkerclasstopoltypeclass)
@@ -4281,7 +4283,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
             newopbendprms,defaultvalues=DefaultOPBendParameters(poltype,missingopbendprmindices,mol,opbendbondindicestotrigonalcenterbools)
             opbendprms.extend(newopbendprms)
         polarprmstotransferinfo=MapParameterLineToTransferInfo(poltype,newpolarprms,{},{},{},{},newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist,arotorsionlinetodescrips,missingvdwtypes,torsionsmissing,missingbondpoltypeclasses,missinganglepoltypeclasses)
-
         vdwprmstotransferinfo=MapParameterLineToTransferInfo(poltype,vdwprms,atompoltypeclasstoparametersmartsatomorder,atompoltypeclasstosmartsatomorder,atompoltypeclassestoelementtinkerdescrip,vdwpoltypeclassestosmartsatomordersext,{},{},arotorsionlinetodescrips,missingvdwtypes,torsionsmissing,missingbondpoltypeclasses,missinganglepoltypeclasses)
         if poltype.forcefield=='AMOEBA+':
             amoebaplusvdwprmstotransferinfo=MapParameterLineToTransferInfo(poltype,newvdwprms,{},{},{},{},newvdwpoltypecommentstocomments,newvdwpoltypecommentstosmartslist,arotorsionlinetodescrips,missingvdwtypes,torsionsmissing,missingbondpoltypeclasses,missinganglepoltypeclasses)
