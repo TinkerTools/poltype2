@@ -147,231 +147,233 @@ def GrabNumberOfConnectedHydrogens(poltype,highestsymneighbnorepeat):
 
    
 def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
-    lfzerox = [ False ] * mol.NumAtoms()
-    atomindextoremovedipquad={} # for methane need to make dipole and quadupole on the carbon zeroed out, will return this for post proccesing the keyfile after poledit is run
-    atomindextoremovedipquadcross={}
-    atomtypetospecialtrace={} # for H on CH4 need to make sure Qxx=Qyy=-1/2*Qzz
-    idxtobisecthenzbool={}
-    idxtobisectidxs={}
-    idxtotrisecbool={}
-    idxtotrisectidxs={}
-    # Assign local frame for atom a based on the symmetry classes of the atoms it is bound to
-    atomiter=openbabel.OBMolAtomIter(mol)
-    poltype.localframe2 = list(poltype.localframe2)
-    for a in atomiter:
-        idxtobisecthenzbool[a.GetIdx()]=False
-        idxtotrisecbool[a.GetIdx()]=False
-    for atom in openbabel.OBMolAtomIter(mol):
-        atomidx=atom.GetIdx()
-        val=atom.GetValence()
-        atomicnum=atom.GetAtomicNum()
-        atomneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(atom)]
-        uniqueneighbtypes=list(set([poltype.idxtosymclass[b.GetIdx()] for b in atomneighbs]))
-        sorteduniquetypeneighbsnorepeat=FindUniqueNonRepeatingNeighbors(poltype,atomneighbs)
-        foundcase=False
-        numhyds=GrabNumberOfConnectedHydrogens(poltype,atom)
-        atomisinring=atom.IsInRing()
-        if len(sorteduniquetypeneighbsnorepeat)!=0:
-            highestsymneighbnorepeatidx=sorteduniquetypeneighbsnorepeat[0]
-            highestsymneighbnorepeat=mol.GetAtom(highestsymneighbnorepeatidx)
-            highestsymneighbnorepeatatomicnum=highestsymneighbnorepeat.GetAtomicNum()
-            numhydsneighb=GrabNumberOfConnectedHydrogens(poltype,highestsymneighbnorepeat)
-            highestsymneighbnorepeatval=highestsymneighbnorepeat.GetValence()
-            neighbsofneighb=[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbnorepeat)]
-            uniqueneighbtypesofhighestsymneighbnorepeat=list(set([poltype.idxtosymclass[b.GetIdx()] for b in neighbsofneighb]))
-            neighbsofneighbwithoutatom=RemoveFromList(poltype,neighbsofneighb,atom)
-            neighbswithoutatom=RemoveFromList(poltype,atomneighbs,atom)
-            uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom=list(set([poltype.idxtosymclass[b.GetIdx()] for b in neighbsofneighbwithoutatom]))
-            sorteduniquetypeneighbsofneighbsnorepeat=FindUniqueNonRepeatingNeighbors(poltype,neighbsofneighb)
-            highestsymneighbofneighbnorepeatidx=sorteduniquetypeneighbsofneighbsnorepeat[0]
-            highestsymneighbofneighbnorepeat=mol.GetAtom(highestsymneighbofneighbnorepeatidx)
-            neighbsofneighbofneighb=[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbofneighbnorepeat)]
+    if poltype.usepoleditframes==False:
+        lfzerox = [ False ] * mol.NumAtoms()
+        atomindextoremovedipquad={} # for methane need to make dipole and quadupole on the carbon zeroed out, will return this for post proccesing the keyfile after poledit is run
+        atomindextoremovedipquadcross={}
+        atomtypetospecialtrace={} # for H on CH4 need to make sure Qxx=Qyy=-1/2*Qzz
+        idxtobisecthenzbool={}
+        idxtobisectidxs={}
+        idxtotrisecbool={}
+        idxtotrisectidxs={}
+        # Assign local frame for atom a based on the symmetry classes of the atoms it is bound to
+        atomiter=openbabel.OBMolAtomIter(mol)
+        poltype.localframe2 = list(poltype.localframe2)
+        for a in atomiter:
+            idxtobisecthenzbool[a.GetIdx()]=False
+            idxtotrisecbool[a.GetIdx()]=False
+        for atom in openbabel.OBMolAtomIter(mol):
+            atomidx=atom.GetIdx()
+            val=atom.GetValence()
+            atomicnum=atom.GetAtomicNum()
+            atomneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(atom)]
+            uniqueneighbtypes=list(set([poltype.idxtosymclass[b.GetIdx()] for b in atomneighbs]))
+            sorteduniquetypeneighbsnorepeat=FindUniqueNonRepeatingNeighbors(poltype,atomneighbs)
+            foundcase=False
+            numhyds=GrabNumberOfConnectedHydrogens(poltype,atom)
+            atomisinring=atom.IsInRing()
+            if len(sorteduniquetypeneighbsnorepeat)!=0:
+                highestsymneighbnorepeatidx=sorteduniquetypeneighbsnorepeat[0]
+                highestsymneighbnorepeat=mol.GetAtom(highestsymneighbnorepeatidx)
+                highestsymneighbnorepeatatomicnum=highestsymneighbnorepeat.GetAtomicNum()
+                numhydsneighb=GrabNumberOfConnectedHydrogens(poltype,highestsymneighbnorepeat)
+                highestsymneighbnorepeatval=highestsymneighbnorepeat.GetValence()
+                neighbsofneighb=[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbnorepeat)]
+                uniqueneighbtypesofhighestsymneighbnorepeat=list(set([poltype.idxtosymclass[b.GetIdx()] for b in neighbsofneighb]))
+                neighbsofneighbwithoutatom=RemoveFromList(poltype,neighbsofneighb,atom)
+                neighbswithoutatom=RemoveFromList(poltype,atomneighbs,atom)
+                uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom=list(set([poltype.idxtosymclass[b.GetIdx()] for b in neighbsofneighbwithoutatom]))
+                sorteduniquetypeneighbsofneighbsnorepeat=FindUniqueNonRepeatingNeighbors(poltype,neighbsofneighb)
+                highestsymneighbofneighbnorepeatidx=sorteduniquetypeneighbsofneighbsnorepeat[0]
+                highestsymneighbofneighbnorepeat=mol.GetAtom(highestsymneighbofneighbnorepeatidx)
+                neighbsofneighbofneighb=[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbofneighbnorepeat)]
 
-            if highestsymneighbnorepeatval==3 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbnorepeat)]): # then this is like the H on Ammonia and we can use z-then bisector
-                poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
-                idxtobisecthenzbool[atomidx]=True
-                bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
-                idxtobisectidxs[atomidx]=bisectidxs
-                foundcase=True
-            elif ((len(uniqueneighbtypes)==2 and val==4)) and val==highestsymneighbnorepeatval and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and CheckIfNeighbHasSameType(poltype,atom,neighbsofneighbwithoutatom)==False: # then this is like CH3PO3, we want z-onlytrisector would also work
-                poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
-                poltype.localframe2[atomidx - 1] = 0
-                lfzerox[atomidx - 1]=True
-                foundcase=True
-                
-            elif ((val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==3) or (val==3 and len(uniqueneighbtypes)==2 and (highestsymneighbnorepeatval==3 or highestsymneighbnorepeatval==4))) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1:  # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector, need len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1 otherwise hits dimethylamine. Need to specify numhyds otherwise will hit nitrobenzene N/C
-
-                if numhyds==2 or numhydsneighb==2:
+                if highestsymneighbnorepeatval==3 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbnorepeat)]): # then this is like the H on Ammonia and we can use z-then bisector
+                    poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                     idxtobisecthenzbool[atomidx]=True
-                    if atomicnum==6:
-                        bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
-                    else:
-                        neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
-                        bisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
-                       
+                    bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
                     idxtobisectidxs[atomidx]=bisectidxs
-                    poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
                     foundcase=True
-                else:
-                    foundcase=True
+                elif ((len(uniqueneighbtypes)==2 and val==4)) and val==highestsymneighbnorepeatval and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and CheckIfNeighbHasSameType(poltype,atom,neighbsofneighbwithoutatom)==False: # then this is like CH3PO3, we want z-onlytrisector would also work
                     poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                     poltype.localframe2[atomidx - 1] = 0
                     lfzerox[atomidx - 1]=True
+                    foundcase=True
+                    
+                elif ((val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==3) or (val==3 and len(uniqueneighbtypes)==2 and (highestsymneighbnorepeatval==3 or highestsymneighbnorepeatval==4))) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1:  # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector, need len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1 otherwise hits dimethylamine. Need to specify numhyds otherwise will hit nitrobenzene N/C
 
-                # now make sure neighboring atom (lf1) also is using z-then-bisector
-            elif val==1 and highestsymneighbnorepeatval==3 and numhydsneighb==1 and len(uniqueneighbtypes)==1 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and highestsymneighbnorepeatatomicnum==7: #dimethylamine
-                idxtobisecthenzbool[atomidx]=True
+                    if numhyds==2 or numhydsneighb==2:
+                        idxtobisecthenzbool[atomidx]=True
+                        if atomicnum==6:
+                            bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
+                        else:
+                            neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
+                            bisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
+                           
+                        idxtobisectidxs[atomidx]=bisectidxs
+                        poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
+                        foundcase=True
+                    else:
+                        foundcase=True
+                        poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
+                        poltype.localframe2[atomidx - 1] = 0
+                        lfzerox[atomidx - 1]=True
 
-                bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
-                idxtobisectidxs[atomidx]=bisectidxs
-                poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
-                foundcase=True
+                    # now make sure neighboring atom (lf1) also is using z-then-bisector
+                elif val==1 and highestsymneighbnorepeatval==3 and numhydsneighb==1 and len(uniqueneighbtypes)==1 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and highestsymneighbnorepeatatomicnum==7: #dimethylamine
+                    idxtobisecthenzbool[atomidx]=True
 
-            elif val==3 and highestsymneighbnorepeatval==1 and numhydsneighb==0 and len(uniqueneighbtypes)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==1 and atomicnum==7: #dimethylamine
-                idxtobisecthenzbool[atomidx]=True
+                    bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
+                    idxtobisectidxs[atomidx]=bisectidxs
+                    poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
+                    foundcase=True
 
-                neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
-                bisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
-                idxtobisectidxs[atomidx]=bisectidxs
-                poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
-                foundcase=True
+                elif val==3 and highestsymneighbnorepeatval==1 and numhydsneighb==0 and len(uniqueneighbtypes)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==1 and atomicnum==7: #dimethylamine
+                    idxtobisecthenzbool[atomidx]=True
 
-            elif val==1 and highestsymneighbnorepeatval==3 and numhydsneighb==1 and len(uniqueneighbtypes)==1 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2: # H on benzene
-                poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
-                poltype.localframe2[atomidx - 1] = 0
-                lfzerox[atomidx - 1]=True
-                foundcase=True
+                    neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
+                    bisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
+                    idxtobisectidxs[atomidx]=bisectidxs
+                    poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
+                    foundcase=True
 
-
-            elif (((val==3) and (highestsymneighbnorepeatval==4))) and numhydsneighb<=2 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=3:
-                poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
-                poltype.localframe2[atomidx - 1] = 0
-                lfzerox[atomidx - 1]=True
-                foundcase=True
-            elif val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==1: # ammonium
-                neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
-                idxtotrisecbool[atomidx]=True
-                trisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
-                idxtotrisectidxs[atomidx]=trisectidxs
-                lfzerox[atomidx - 1]=True 
-                foundcase=True
-            elif val==1 and highestsymneighbnorepeatval==4 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(neighbsofneighbofneighb)==1: # CH3NH
-                poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
-                poltype.localframe2[atomidx - 1] = 0
-                lfzerox[atomidx - 1]=True
-                foundcase=True
+                elif val==1 and highestsymneighbnorepeatval==3 and numhydsneighb==1 and len(uniqueneighbtypes)==1 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2: # H on benzene
+                    poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
+                    poltype.localframe2[atomidx - 1] = 0
+                    lfzerox[atomidx - 1]=True
+                    foundcase=True
 
 
-
-        if foundcase==False:
-            if val==1 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(atomneighbs[0])]) and atomneighbs[0].GetValence()==4: # then this is like H in Methane, we want Z-only
-             
-                poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
-                poltype.localframe2[atomidx - 1] = 0
-                lfzerox[atomidx - 1]=True
-                zonly=True
-                atomtypetospecialtrace[atomidx]=True
-                atomindextoremovedipquadcross[atomidx]=True
-            elif CheckIfAllAtomsSameClass(poltype,atomneighbs) and not AtLeastOneHeavyNeighb(poltype,atom) and val==4: # then this is like carbon in Methane, we want Z-only
-                idxlist=GrabIndexesFromUniqueTypeNumber(poltype,atomneighbs,uniqueneighbtypes[0])
-                poltype.localframe1[atomidx-1]=idxlist[0]
-                poltype.localframe2[atomidx - 1] = 0
-                lfzerox[atomidx - 1]=True
-                atomindextoremovedipquad[atomidx]=True
-            elif CheckIfAllAtomsSameClass(poltype,atomneighbs) and val==3: # then this is like Ammonia and we can use a trisector here which behaves like Z-only
-                idxtotrisecbool[atomidx]=True
-                trisectidxs=[atm.GetIdx() for atm in atomneighbs]
-                idxtotrisectidxs[atomidx]=trisectidxs
-                lfzerox[atomidx - 1]=True # need to zero out the x components just like for z-only case
-        
-            elif (val==2 and CheckIfAllAtomsSameClass(poltype,atomneighbs)) or (val==4 and len(uniqueneighbtypes)==2) and len(sorteduniquetypeneighbsnorepeat)==0:  # then this is like middle propane carbon or oxygen in water
-                idxlist=GrabIndexesFromUniqueTypeNumber(poltype,atomneighbs,uniqueneighbtypes[0])
-                poltype.localframe1[atomidx-1]=-1*idxlist[0]
-                poltype.localframe2[atomidx-1]=-1*idxlist[1]
-            elif len(uniqueneighbtypes)==2 and CheckIfNeighbHasSameType(poltype,atom,atomneighbs) and atomisinring==False: # this handles, ethane,ethene...., z-only
-                poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
-                poltype.localframe2[atomidx - 1] = 0
-                lfzerox[atomidx - 1]=True
-        
-
-            elif len(uniqueneighbtypes)==2 and val==3 and atomisinring==True: # benzene, one carbon in anilne
-                typenumtocnt={}
-                neighbtypes=[poltype.idxtosymclass[b.GetIdx()] for b in atomneighbs]
-                for typenum in neighbtypes:
-                    cnt=neighbtypes.count(typenum)
-                    typenumtocnt[typenum]=cnt
-                maxcnt=max(typenumtocnt.values())
-                for typenum in uniqueneighbtypes:
-                    cnt=typenumtocnt[typenum]
-                    if cnt==maxcnt:
-                        break 
-                idxlist=GrabIndexesFromUniqueTypeNumber(poltype,atomneighbs,typenum)
-                poltype.localframe1[atomidx-1]=-1*idxlist[0]
-                poltype.localframe2[atomidx-1]=-1*idxlist[1]
+                elif (((val==3) and (highestsymneighbnorepeatval==4))) and numhydsneighb<=2 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=3:
+                    poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
+                    poltype.localframe2[atomidx - 1] = 0
+                    lfzerox[atomidx - 1]=True
+                    foundcase=True
+                elif val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==1: # ammonium
+                    neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
+                    idxtotrisecbool[atomidx]=True
+                    trisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
+                    idxtotrisectidxs[atomidx]=trisectidxs
+                    lfzerox[atomidx - 1]=True 
+                    foundcase=True
+                elif val==1 and highestsymneighbnorepeatval==4 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(neighbsofneighbofneighb)==1: # CH3NH
+                    poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
+                    poltype.localframe2[atomidx - 1] = 0
+                    lfzerox[atomidx - 1]=True
+                    foundcase=True
 
 
 
-            else:
-                if len(sorteduniquetypeneighbsnorepeat)==1:
-                    neighboffirstneighbs=[]
-                    for n in openbabel.OBAtomAtomIter(highestsymneighbnorepeat):
-                        neighboffirstneighbs.append(n)
-                    newneighbs=RemoveFromList(poltype,neighboffirstneighbs,atom)
-                    newsorteduniquetypeneighbsnorepeat=FindUniqueNonRepeatingNeighbors(poltype,newneighbs)
-                    sorteduniquetypeneighbsnorepeat+=newsorteduniquetypeneighbsnorepeat
-                sorteduniquetypeneighbsnorepeattypes=[poltype.idxtosymclass[i] for i in sorteduniquetypeneighbsnorepeat]
-                indicesofsametypetomove=[]
-                atomtype=poltype.idxtosymclass[atomidx]
-                for i in range(len(sorteduniquetypeneighbsnorepeat)):
-                    index=sorteduniquetypeneighbsnorepeat[i]
-                    typenum=sorteduniquetypeneighbsnorepeattypes[i]
-                    if typenum==atomtype:
-                        indicesofsametypetomove.append(index)
-                newsorteduniquetypeneighbsnorepeat=[]
-                for index in sorteduniquetypeneighbsnorepeat:  
-                    if index not in indicesofsametypetomove:
-                        newsorteduniquetypeneighbsnorepeat.append(index)
-                for index in indicesofsametypetomove:
-                    newsorteduniquetypeneighbsnorepeat.append(index)
-                symtypetocount={}
-                for typenum in sorteduniquetypeneighbsnorepeattypes:
-                    cnt=sorteduniquetypeneighbsnorepeattypes.count(typenum)
-                    symtypetocount[typenum]=cnt
-                mincnt=min(symtypetocount.values())
-                if mincnt==1:
-                    for symtype,cnt in symtypetocount.items():
-                        if cnt==mincnt:
-                            break
+            if foundcase==False:
+                if val==1 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(atomneighbs[0])]) and atomneighbs[0].GetValence()==4: # then this is like H in Methane, we want Z-only
+                 
+                    poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
+                    poltype.localframe2[atomidx - 1] = 0
+                    lfzerox[atomidx - 1]=True
+                    zonly=True
+                    atomtypetospecialtrace[atomidx]=True
+                    atomindextoremovedipquadcross[atomidx]=True
+                elif CheckIfAllAtomsSameClass(poltype,atomneighbs) and not AtLeastOneHeavyNeighb(poltype,atom) and val==4: # then this is like carbon in Methane, we want Z-only
+                    idxlist=GrabIndexesFromUniqueTypeNumber(poltype,atomneighbs,uniqueneighbtypes[0])
+                    poltype.localframe1[atomidx-1]=idxlist[0]
+                    poltype.localframe2[atomidx - 1] = 0
+                    lfzerox[atomidx - 1]=True
+                    atomindextoremovedipquad[atomidx]=True
+                elif CheckIfAllAtomsSameClass(poltype,atomneighbs) and val==3: # then this is like Ammonia and we can use a trisector here which behaves like Z-only
+                    idxtotrisecbool[atomidx]=True
+                    trisectidxs=[atm.GetIdx() for atm in atomneighbs]
+                    idxtotrisectidxs[atomidx]=trisectidxs
+                    lfzerox[atomidx - 1]=True # need to zero out the x components just like for z-only case
+            
+                elif (val==2 and CheckIfAllAtomsSameClass(poltype,atomneighbs)) or (val==4 and len(uniqueneighbtypes)==2) and len(sorteduniquetypeneighbsnorepeat)==0:  # then this is like middle propane carbon or oxygen in water
+                    idxlist=GrabIndexesFromUniqueTypeNumber(poltype,atomneighbs,uniqueneighbtypes[0])
+                    poltype.localframe1[atomidx-1]=-1*idxlist[0]
+                    poltype.localframe2[atomidx-1]=-1*idxlist[1]
+                elif len(uniqueneighbtypes)==2 and CheckIfNeighbHasSameType(poltype,atom,atomneighbs) and atomisinring==False: # this handles, ethane,ethene...., z-only
+                    poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
+                    poltype.localframe2[atomidx - 1] = 0
+                    lfzerox[atomidx - 1]=True
+            
+
+                elif len(uniqueneighbtypes)==2 and val==3 and atomisinring==True: # benzene, one carbon in anilne
+                    typenumtocnt={}
+                    neighbtypes=[poltype.idxtosymclass[b.GetIdx()] for b in atomneighbs]
+                    for typenum in neighbtypes:
+                        cnt=neighbtypes.count(typenum)
+                        typenumtocnt[typenum]=cnt
+                    maxcnt=max(typenumtocnt.values())
+                    for typenum in uniqueneighbtypes:
+                        cnt=typenumtocnt[typenum]
+                        if cnt==maxcnt:
+                            break 
+                    idxlist=GrabIndexesFromUniqueTypeNumber(poltype,atomneighbs,typenum)
+                    poltype.localframe1[atomidx-1]=-1*idxlist[0]
+                    poltype.localframe2[atomidx-1]=-1*idxlist[1]
+
+
+
+                else:
+                    if len(sorteduniquetypeneighbsnorepeat)==1:
+                        neighboffirstneighbs=[]
+                        for n in openbabel.OBAtomAtomIter(highestsymneighbnorepeat):
+                            neighboffirstneighbs.append(n)
+                        newneighbs=RemoveFromList(poltype,neighboffirstneighbs,atom)
+                        newsorteduniquetypeneighbsnorepeat=FindUniqueNonRepeatingNeighbors(poltype,newneighbs)
+                        sorteduniquetypeneighbsnorepeat+=newsorteduniquetypeneighbsnorepeat
+                    sorteduniquetypeneighbsnorepeattypes=[poltype.idxtosymclass[i] for i in sorteduniquetypeneighbsnorepeat]
+                    indicesofsametypetomove=[]
+                    atomtype=poltype.idxtosymclass[atomidx]
                     for i in range(len(sorteduniquetypeneighbsnorepeat)):
                         index=sorteduniquetypeneighbsnorepeat[i]
                         typenum=sorteduniquetypeneighbsnorepeattypes[i]
-                        if typenum==symtype:
-                            break
-                    specialindex=index
-                    thenewsorteduniquetypeneighbsnorepeat=[specialindex]
-                    for i in range(len(sorteduniquetypeneighbsnorepeat)):
-                        index=sorteduniquetypeneighbsnorepeat[i]
-                        if index!=specialindex:
-                            if i==0:
-                                thenewsorteduniquetypeneighbsnorepeat.insert(0,index)
-                            else:
-                                thenewsorteduniquetypeneighbsnorepeat.append(index)
-                    newsorteduniquetypeneighbsnorepeat=thenewsorteduniquetypeneighbsnorepeat[:]
-                poltype.localframe1[atomidx - 1]=newsorteduniquetypeneighbsnorepeat[0]
-                poltype.localframe2[atomidx - 1]=newsorteduniquetypeneighbsnorepeat[1] 
+                        if typenum==atomtype:
+                            indicesofsametypetomove.append(index)
+                    newsorteduniquetypeneighbsnorepeat=[]
+                    for index in sorteduniquetypeneighbsnorepeat:  
+                        if index not in indicesofsametypetomove:
+                            newsorteduniquetypeneighbsnorepeat.append(index)
+                    for index in indicesofsametypetomove:
+                        newsorteduniquetypeneighbsnorepeat.append(index)
+                    symtypetocount={}
+                    for typenum in sorteduniquetypeneighbsnorepeattypes:
+                        cnt=sorteduniquetypeneighbsnorepeattypes.count(typenum)
+                        symtypetocount[typenum]=cnt
+                    mincnt=min(symtypetocount.values())
+                    if mincnt==1:
+                        for symtype,cnt in symtypetocount.items():
+                            if cnt==mincnt:
+                                break
+                        for i in range(len(sorteduniquetypeneighbsnorepeat)):
+                            index=sorteduniquetypeneighbsnorepeat[i]
+                            typenum=sorteduniquetypeneighbsnorepeattypes[i]
+                            if typenum==symtype:
+                                break
+                        specialindex=index
+                        thenewsorteduniquetypeneighbsnorepeat=[specialindex]
+                        for i in range(len(sorteduniquetypeneighbsnorepeat)):
+                            index=sorteduniquetypeneighbsnorepeat[i]
+                            if index!=specialindex:
+                                if i==0:
+                                    thenewsorteduniquetypeneighbsnorepeat.insert(0,index)
+                                else:
+                                    thenewsorteduniquetypeneighbsnorepeat.append(index)
+                        newsorteduniquetypeneighbsnorepeat=thenewsorteduniquetypeneighbsnorepeat[:]
+                    poltype.localframe1[atomidx - 1]=newsorteduniquetypeneighbsnorepeat[0]
+                    poltype.localframe2[atomidx - 1]=newsorteduniquetypeneighbsnorepeat[1] 
     # write out the local frames
     iteratom = openbabel.OBMolAtomIter(mol)
     if not os.path.isfile(poltype.peditinfile):
         f = open (poltype.peditinfile, 'w')
-        for a in iteratom:
-            if not idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
-                f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " " + str(poltype.localframe2[a.GetIdx() - 1]) + "\n")
-            elif idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
-                bisectidxs=idxtobisectidxs[a.GetIdx()]
-                f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " -" + str(bisectidxs[0])+ " -" + str(bisectidxs[1]) + "\n")
-            else:
-                trisecidxs=idxtotrisectidxs[a.GetIdx()]
-                f.write(str(a.GetIdx()) + " -" + str(trisecidxs[0])+ " -" + str(trisecidxs[1]) + " -" + str(trisecidxs[2])+ "\n")
+        if poltype.usepoleditframes==False:
+            for a in iteratom:
+                if not idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
+                    f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " " + str(poltype.localframe2[a.GetIdx() - 1]) + "\n")
+                elif idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
+                    bisectidxs=idxtobisectidxs[a.GetIdx()]
+                    f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " -" + str(bisectidxs[0])+ " -" + str(bisectidxs[1]) + "\n")
+                else:
+                    trisecidxs=idxtotrisectidxs[a.GetIdx()]
+                    f.write(str(a.GetIdx()) + " -" + str(trisecidxs[0])+ " -" + str(trisecidxs[1]) + " -" + str(trisecidxs[2])+ "\n")
 
 
 
