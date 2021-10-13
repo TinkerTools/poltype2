@@ -183,10 +183,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                 neighbsofneighbwithoutatom=RemoveFromList(poltype,neighbsofneighb,atom)
                 neighbswithoutatom=RemoveFromList(poltype,atomneighbs,atom)
                 uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom=list(set([poltype.idxtosymclass[b.GetIdx()] for b in neighbsofneighbwithoutatom]))
-                sorteduniquetypeneighbsofneighbsnorepeat=FindUniqueNonRepeatingNeighbors(poltype,neighbsofneighb)
-                highestsymneighbofneighbnorepeatidx=sorteduniquetypeneighbsofneighbsnorepeat[0]
-                highestsymneighbofneighbnorepeat=mol.GetAtom(highestsymneighbofneighbnorepeatidx)
-                neighbsofneighbofneighb=[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbofneighbnorepeat)]
 
                 if highestsymneighbnorepeatval==3 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbnorepeat)]): # then this is like the H on Ammonia and we can use z-then bisector
                     poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
@@ -256,7 +252,7 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     idxtotrisectidxs[atomidx]=trisectidxs
                     lfzerox[atomidx - 1]=True 
                     foundcase=True
-                elif val==1 and highestsymneighbnorepeatval==4 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(neighbsofneighbofneighb)==1: # CH3NH
+                elif val==1 and highestsymneighbnorepeatval==4 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and numhydsneighb==1: # CH3NH
                     poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                     poltype.localframe2[atomidx - 1] = 0
                     lfzerox[atomidx - 1]=True
