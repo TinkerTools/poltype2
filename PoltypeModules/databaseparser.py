@@ -779,18 +779,20 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
     parametersmartstofoundallneighbs={}
     
     newls=copy.deepcopy(ls)
-    fragsmartslist=GenerateFragmentSMARTSList(poltype,newls)
-
+    usemcsonly=False
+    if usemcsonly==False:
+        fragsmartslist=GenerateFragmentSMARTSList(poltype,newls)
     for parametersmarts in parametersmartslist:
         prmmol=Chem.MolFromSmarts(parametersmarts)
         smartsmatchingtoindices=[]
         molsmatchingtoindices=[]
         finalfragsmartslist=[]
-        for fragsmarts in fragsmartslist:
-            fragmol=Chem.MolFromSmarts(fragsmarts)
-            diditmatch=prmmol.HasSubstructMatch(fragmol)
-            if diditmatch==True:
-                finalfragsmartslist.append(fragsmarts)
+        if usemcsonly==False:
+            for fragsmarts in fragsmartslist:
+                fragmol=Chem.MolFromSmarts(fragsmarts)
+                diditmatch=prmmol.HasSubstructMatch(fragmol)
+                if diditmatch==True:
+                    finalfragsmartslist.append(fragsmarts)
 
         mols = [poltype.rdkitmol,prmmol]
         res=rdFMCS.FindMCS(mols)
@@ -804,11 +806,11 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
         thesmartstoelementscore={}
 
         thesmartstothemol={}
-        #thesmartstonumcommon={}
-        for fragsmarts in finalfragsmartslist:
-            fragmol=Chem.MolFromSmarts(fragsmarts)
-            molsmatchingtoindices.append(fragmol)
-            smartsmatchingtoindices.append(fragsmarts)
+        if usemcsonly==False:
+            for fragsmarts in finalfragsmartslist:
+                fragmol=Chem.MolFromSmarts(fragsmarts)
+                molsmatchingtoindices.append(fragmol)
+                smartsmatchingtoindices.append(fragsmarts)
 
          
         for idx in range(len(smartsmatchingtoindices)):
@@ -2009,37 +2011,37 @@ def PruneDictionary(poltype,keysubset,dic):
     return newdic
 
 
-def TinkerClassesToPoltypeClasses(poltype,indicestotinkerclasses):
+def TinkerClassesToPoltypeClasses(poltype,indicestotinkerclasses,formatorder=True):
     tinkerclassestopoltypeclasses={}
     poltypeclassesalreadyassigned=[]
     for indices,tinkerclasses in indicestotinkerclasses.items():
         babelindices=[i+1 for i in indices]
         poltypeclasses=[poltype.idxtosymclass[i] for i in babelindices]
-        revpoltypeclasses=poltypeclasses[::-1]
         revtinkerclasses=tinkerclasses[::-1]
-        if poltypeclasses in poltypeclassesalreadyassigned or revpoltypeclasses in poltypeclassesalreadyassigned:
+        if poltypeclasses in poltypeclassesalreadyassigned:
             continue
-        if len(indices)>1:
-            first=int(tinkerclasses[0])
-            second=int(tinkerclasses[-1])
-            if first>second:
-                pass
-            elif first<second:
-                tinkerclasses=tinkerclasses[::-1]
-                poltypeclasses=poltypeclasses[::-1]
-            else:
-                if len(indices)==4:
-                    first=int(tinkerclasses[0])
-                    second=int(tinkerclasses[1])
-                    third=int(tinkerclasses[2])
-                    fourth=int(tinkerclasses[3])
-                    firstsum=first+second
-                    secondsum=third+fourth
-                    if firstsum>secondsum:
-                        pass
-                    elif firstsum<secondsum:
-                        tinkerclasses=tinkerclasses[::-1]
-                        poltypeclasses=poltypeclasses[::-1]
+        if formatorder==True:
+            if len(indices)>1:
+                first=int(tinkerclasses[0])
+                second=int(tinkerclasses[-1])
+                if first>second:
+                    pass
+                elif first<second:
+                    tinkerclasses=tinkerclasses[::-1]
+                    poltypeclasses=poltypeclasses[::-1]
+                else:
+                    if len(indices)==4:
+                        first=int(tinkerclasses[0])
+                        second=int(tinkerclasses[1])
+                        third=int(tinkerclasses[2])
+                        fourth=int(tinkerclasses[3])
+                        firstsum=first+second
+                        secondsum=third+fourth
+                        if firstsum>secondsum:
+                            pass
+                        elif firstsum<secondsum:
+                            tinkerclasses=tinkerclasses[::-1]
+                            poltypeclasses=poltypeclasses[::-1]
 
         poltypeclassesalreadyassigned.append(poltypeclasses)                
         if tuple(tinkerclasses) not in tinkerclassestopoltypeclasses.keys():
@@ -2338,7 +2340,9 @@ def DefaultOPBendParameters(poltype,missingopbendprmindices,mol,opbendbondindice
     for opbendprmindices in missingopbendprmindices:
         babelindices=[i+1 for i in opbendprmindices]
         poltypeclasses=[poltype.idxtosymclass[i] for i in babelindices]
-        for atomindex in babelindices:
+        boolarray=opbendbondindicestotrigonalcenterbools[opbendprmindices]
+        if boolarray[1]==True:
+            atomindex=babelindices[1] 
             atom=mol.GetAtom(atomindex)
             neighbs=list(openbabel.OBAtomAtomIter(atom))
             if len(neighbs)==3:
@@ -2370,11 +2374,8 @@ def DefaultOPBendParameters(poltype,missingopbendprmindices,mol,opbendbondindice
                     opbendvalue=round(poltype.defopbendval*71.94,2)
 
                 defaultvalues.append(opbendvalue)
-                boolarray=opbendbondindicestotrigonalcenterbools[opbendprmindices]
                 firstprmline='opbend'+' '+str(poltypeclasses[0])+' '+str(poltypeclasses[1])+' '+'0'+' '+'0'+' '+str(opbendvalue)+'\n'
-
-                if boolarray[1]==True: 
-                    newopbendprms.append(firstprmline)
+                newopbendprms.append(firstprmline)
 
     return newopbendprms,defaultvalues
 
@@ -4223,7 +4224,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,atomindicesforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofatomsforprm,parametersmartslist,mol)
  
         bondsforprmtoparametersmarts,bondsforprmtosmarts,bondsforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofbondsforprm,parametersmartslist,mol)
-        planarbondsforprmtoparametersmarts,planarbondsforprmtosmarts,planarbondsforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofbondsforprm,parametersmartslist,mol)
+        planarbondsforprmtoparametersmarts,planarbondsforprmtosmarts,planarbondsforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,planarbonds,parametersmartslist,mol)
         anglesforprmtoparametersmarts,anglesforprmtosmarts,anglesforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofanglesforprm,parametersmartslist,mol)
         planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts,planaranglesforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofanglesforprm,parametersmartslist,mol)
         torsionsforprmtoparametersmarts,torsionsforprmtosmarts,torsionsforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listoftorsionsforprm,parametersmartslist,mol)
@@ -4250,7 +4251,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         newplanarbonds=ConvertListOfListToListOfTuples(poltype,planarbonds)
         newdics=FilterDictionaries(poltype,[opbendbondindicestotinkerclasses,opbendbondindicestosmartsatomorders],newplanarbonds)
         opbendbondindicestotinkerclasses,opbendbondindicestosmartsatomorders=newdics[:]
-
         planarbondindicestotinkertypes,planarbondindicestotinkerclasses,planarbondindicestoparametersmartsatomorders,planarbondindicestoelementtinkerdescrips,planarbondindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,planarbondsforprmtoparametersmarts,planarbondsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
 
         angleindicestotinkertypes,angleindicestotinkerclasses,angleindicestoparametersmartsatomorders,angleindicestoelementtinkerdescrips,angleindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,anglesforprmtoparametersmarts,anglesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
@@ -4290,8 +4290,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         bondtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,bondindicestotinkerclasses)
         arotorsionsmissingindicestotinkerclasses=PruneDictionary(poltype,poormatchingaromatictorsions,torsionindicestotinkerclasses)
         partialarotorsionsmissingindicestotinkerclasses=PruneDictionary(poltype,poormatchingpartialaromatictorsions,torsionindicestotinkerclasses)
-
-        planarbondtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,planarbondindicestotinkerclasses)
+        planarbondtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,planarbondindicestotinkerclasses,False)
         opbendtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,opbendbondindicestotinkerclasses)
         opbendtinkerclassestopoltypeclasses=AddReverseKeys(poltype,opbendtinkerclassestopoltypeclasses)
         opbendtinkerclassestotrigonalcenterbools=TinkerClassesToTrigonalCenter(poltype,opbendbondindicestotinkerclasses,opbendbondindicestotrigonalcenterbools)
