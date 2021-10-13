@@ -167,6 +167,7 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
             val=atom.GetValence()
             atomicnum=atom.GetAtomicNum()
             atomneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(atom)]
+            neighbtypes=list([poltype.idxtosymclass[b.GetIdx()] for b in atomneighbs])
             uniqueneighbtypes=list(set([poltype.idxtosymclass[b.GetIdx()] for b in atomneighbs]))
             sorteduniquetypeneighbsnorepeat=FindUniqueNonRepeatingNeighbors(poltype,atomneighbs)
             foundcase=False
@@ -183,8 +184,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                 neighbsofneighbwithoutatom=RemoveFromList(poltype,neighbsofneighb,atom)
                 neighbswithoutatom=RemoveFromList(poltype,atomneighbs,atom)
                 uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom=list(set([poltype.idxtosymclass[b.GetIdx()] for b in neighbsofneighbwithoutatom]))
-
-
                 if highestsymneighbnorepeatval==3 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbnorepeat)]): # then this is like the H on Ammonia and we can use z-then bisector
                     poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                     idxtobisecthenzbool[atomidx]=True
@@ -197,24 +196,18 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     lfzerox[atomidx - 1]=True
                     foundcase=True
                     
-                elif ((val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==3) or (val==3 and len(uniqueneighbtypes)==2 and (highestsymneighbnorepeatval==3 or highestsymneighbnorepeatval==4))) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1:  # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector, need len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1 otherwise hits dimethylamine. Need to specify numhyds otherwise will hit nitrobenzene N/C
+                elif ((val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==3) or (val==3 and len(uniqueneighbtypes)==2 and (highestsymneighbnorepeatval==3 or highestsymneighbnorepeatval==4))) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1 and (numhyds==2 or numhydsneighb==2):  # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector, need len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1 otherwise hits dimethylamine. Need to specify numhyds otherwise will hit nitrobenzene N/C
 
-                    if numhyds==2 or numhydsneighb==2:
-                        idxtobisecthenzbool[atomidx]=True
-                        if atomicnum==6:
-                            bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
-                        else:
-                            neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
-                            bisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
-                           
-                        idxtobisectidxs[atomidx]=bisectidxs
-                        poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
-                        foundcase=True
+                    idxtobisecthenzbool[atomidx]=True
+                    if atomicnum==6:
+                        bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
                     else:
-                        foundcase=True
-                        poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
-                        poltype.localframe2[atomidx - 1] = 0
-                        lfzerox[atomidx - 1]=True
+                        neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
+                        bisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
+                       
+                    idxtobisectidxs[atomidx]=bisectidxs
+                    poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
+                    foundcase=True
 
 
                 elif (val==3 and len(uniqueneighbtypes)==2 and (highestsymneighbnorepeatval==4)) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==3 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==2: # ethylamine
@@ -251,18 +244,14 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     foundcase=True
 
 
-                elif (((val==3) and (highestsymneighbnorepeatval==4))) and numhydsneighb<=2 and len(uniqueneighbtypes)<=2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)<=3:
-                    poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
-                    poltype.localframe2[atomidx - 1] = 0
-                    lfzerox[atomidx - 1]=True
-                    foundcase=True
-                elif val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==1: # ammonium
+                elif val==4 and len(uniqueneighbtypes)==2 and (len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==0 or len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1): # N(CH3)(CH3)(CH3)H
                     neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
                     idxtotrisecbool[atomidx]=True
                     trisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
                     idxtotrisectidxs[atomidx]=trisectidxs
                     lfzerox[atomidx - 1]=True 
                     foundcase=True
+
                 elif val==1 and highestsymneighbnorepeatval==4 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and numhydsneighb==1: # CH3NH
                     poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                     poltype.localframe2[atomidx - 1] = 0
