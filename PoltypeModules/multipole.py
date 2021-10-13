@@ -184,6 +184,7 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                 neighbswithoutatom=RemoveFromList(poltype,atomneighbs,atom)
                 uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom=list(set([poltype.idxtosymclass[b.GetIdx()] for b in neighbsofneighbwithoutatom]))
 
+
                 if highestsymneighbnorepeatval==3 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbnorepeat)]): # then this is like the H on Ammonia and we can use z-then bisector
                     poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                     idxtobisecthenzbool[atomidx]=True
@@ -214,6 +215,16 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                         poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                         poltype.localframe2[atomidx - 1] = 0
                         lfzerox[atomidx - 1]=True
+
+
+                elif (val==3 and len(uniqueneighbtypes)==2 and (highestsymneighbnorepeatval==4)) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==3 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==2: # ethylamine
+                        neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
+                        bisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
+                        idxtobisectidxs[atomidx]=bisectidxs
+                        poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
+                        foundcase=True
+                        idxtobisecthenzbool[atomidx]=True
+
 
                     # now make sure neighboring atom (lf1) also is using z-then-bisector
                 elif val==1 and highestsymneighbnorepeatval==3 and numhydsneighb==1 and len(uniqueneighbtypes)==1 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and highestsymneighbnorepeatatomicnum==7: #dimethylamine
