@@ -555,7 +555,7 @@ def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog):
     if poltype.externalapi is not None:
         finishedjobs,errorjobs=poltype.CallJobsLocalHost(jobtooutputlog,True)
     else:
-        finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
+        finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,True)
 
     return finishedjobs,errorjobs
 

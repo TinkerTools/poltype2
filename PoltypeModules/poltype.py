@@ -952,7 +952,6 @@ class PolarizableTyper():
         return newmol,rdkitmol
     
     def CallJobsSeriallyLocalHost(self,fulljobtooutputlog,skiperrors):
-       print('fulljobtooutputlog',fulljobtooutputlog)
        for jobidx in range(len(fulljobtooutputlog.keys())):
            job=list(fulljobtooutputlog.keys())[jobidx]
            count=jobidx+1
@@ -961,7 +960,8 @@ class PolarizableTyper():
            temp={}
            self.call_subsystem(job,True,skiperrors)
            temp[job]=fulljobtooutputlog[job]
-           finishedjob,errorjob=self.WaitForTermination(temp,skiperrors)
+           if skiperrors==False:
+               finishedjob,errorjob=self.WaitForTermination(temp,skiperrors)
        finishedjobs,errorjobs=self.WaitForTermination(fulljobtooutputlog,skiperrors)
        return finishedjobs,errorjobs
 
@@ -1105,6 +1105,10 @@ class PolarizableTyper():
                 if p.returncode != 0:
                     self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
                     raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
+            else:
+                if p.returncode != 0:
+                    self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
+
 
     def WriteOutLiteratureReferences(self,keyfilename): # to use ParmEd on key file need Literature References delimited for parsing
         temp=open(keyfilename,'r')
