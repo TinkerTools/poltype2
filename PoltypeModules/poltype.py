@@ -952,7 +952,12 @@ class PolarizableTyper():
         return newmol,rdkitmol
     
     def CallJobsSeriallyLocalHost(self,fulljobtooutputlog,skiperrors):
-       for job in fulljobtooutputlog.keys():
+       print('fulljobtooutputlog',fulljobtooutputlog)
+       for jobidx in range(len(fulljobtooutputlog.keys())):
+           job=list(fulljobtooutputlog.keys())[jobidx]
+           count=jobidx+1
+           ratio=(100*count)/len(fulljobtooutputlog.keys())
+           self.WriteToLog('Percent of jobs submitted '+str(ratio))   
            temp={}
            self.call_subsystem(job,True,skiperrors)
            temp[job]=fulljobtooutputlog[job]
