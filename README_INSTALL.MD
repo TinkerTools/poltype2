@@ -110,24 +110,5 @@ export PSI_SCRATCH=/scratch/$USER
 
 #Tinker
 export PATH=path_to_tinker/source/:$PATH
-
 ```
-
-
-* Ren lab users
-```shell      
-#Set whichever conda you are using in next line
-export PATH="/opt/software/anaconda/bin:$PATH"
-conda activate poltype
-export g09root=/opt/g09gh/gaussian
-source $g09root/g09/bsd/g09.profile
-export GAUSS_SCRDIR=/scratch/your_username/
-export GDMADIR=/opt/gdma/gdma-2.3.3/bin/
-export PATH=/opt/gdma/gdma-2.3.3/bin/:$PATH
-export PSI_SCRATCH=/scratch/your_username/ 
-export PATH=/home/bdw2292/TheLatestTinker/bin/:$PATH
-# you may add alias for submitting - replace path_to_poltype
-#alias run_poltype="nohup python path_to_poltype/poltype.py &"
-```
-
 
