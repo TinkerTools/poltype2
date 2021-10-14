@@ -237,7 +237,7 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
                     foundcase=True
 
-                elif val==1 and highestsymneighbnorepeatval==3 and numhydsneighb==1 and len(uniqueneighbtypes)==1 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2: # H on benzene
+                elif val==1 and highestsymneighbnorepeatval==3 and len(uniqueneighbtypes)==1 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1: # H on benzene
                     poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                     poltype.localframe2[atomidx - 1] = 0
                     lfzerox[atomidx - 1]=True
@@ -291,7 +291,7 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     lfzerox[atomidx - 1]=True
             
 
-                elif len(uniqueneighbtypes)==2 and val==3 and atomisinring==True: # benzene, one carbon in anilne
+                elif len(uniqueneighbtypes)==2 and val==3: # benzene, one carbon in anilne
                     typenumtocnt={}
                     neighbtypes=[poltype.idxtosymclass[b.GetIdx()] for b in atomneighbs]
                     for typenum in neighbtypes:
