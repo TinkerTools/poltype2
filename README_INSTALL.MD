@@ -86,29 +86,24 @@ conda install -c conda-forge cairosvg --yes
 * Note do not put source in your default .bashrc profile
 * Note do not keep multiple sources for different purposes (unless necessary) in the same .bashrc source file, this can cause internal conflicts to arise
 
-* Generic bashrc
+* Example bashrc
 ```shell
-#!/usr/bin/bash
-#
-##Python
-##Set whichever conda you are using in next line
-export PATH="path_to_conda/bin:$PATH"
+conda activate poltype  # relative conda path for user installed conda
+OSVERSION=`cat /etc/system-release` # OS version for TINKER paths
+place="${OSVERSION//[!0-9]/}"
+OSVERSION=${place::1}
+if [ $OSVERSION == 8 ] ; then
+    export PATH=/home/bdw2292/NewestTinkerOS8/bin/:$PATH # example tinker path
+else
+    export PATH=/home/bdw2292/NewestTinker/bin/:$PATH # example tinker path
+fi
 
-#Poltype
-conda activate poltype
-# you may add alias for submitting - replace path_to_poltype
-#alias run_poltype="nohup python path_to_poltype/poltype.py &"
-#
-#Gaussian, GDMA and scratch
-#replace paths with your own
-export g09root=path_to_g09/gaussian
-source $g09root/g09/path_to_g09_profile/g09.profile
-export GAUSS_SCRDIR=/scratch/$USER
-export GDMADIR=/path_to_gdma/bin
-export PATH=$GDMADIR:$PATH
-export PSI_SCRATCH=/scratch/$USER
-
-#Tinker
-export PATH=path_to_tinker/source/:$PATH
+export myusername=`whoami` 
+export g09root=/opt/g09gh/gaussian # example gaussian executable
+source $g09root/g09/bsd/g09.profile # example bashrc for gaussian
+export GAUSS_SCRDIR=/scratch/$myusername/ # example scratch directory
+export GDMADIR=/opt/gdma/gdma-2.3.3/bin/ # example GDMA directory
+export PATH=/opt/gdma/gdma-2.3.3/bin/:$PATH # example GDMA directory
+export PSI_SCRATCH=/scratch/$myusername/ # example PSI4 scratch directory
 ```
 
