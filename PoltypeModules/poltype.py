@@ -952,11 +952,16 @@ class PolarizableTyper():
         return newmol,rdkitmol
     
     def CallJobsSeriallyLocalHost(self,fulljobtooutputlog,skiperrors):
+       
+       thepath=os.path.join(os.getcwd(),'Fragments')
        for jobidx in range(len(fulljobtooutputlog.keys())):
            job=list(fulljobtooutputlog.keys())[jobidx]
            count=jobidx+1
            ratio=(100*count)/len(fulljobtooutputlog.keys())
            self.WriteToLog('Percent of jobs submitted '+str(ratio))   
+           if jobidx!=0:
+               if 'poltype.py' in job:
+                   self.ETAQMFinish(thepath,len(fulljobtooutputlog.keys()))
            temp={}
            self.call_subsystem(job,True,skiperrors)
            temp[job]=fulljobtooutputlog[job]
@@ -964,6 +969,101 @@ class PolarizableTyper():
                finishedjob,errorjob=self.WaitForTermination(temp,skiperrors)
        finishedjobs,errorjobs=self.WaitForTermination(fulljobtooutputlog,skiperrors)
        return finishedjobs,errorjobs
+
+    def TabulateLogs(self,thepath):
+        listoffilepaths=[]
+        os.chdir(thepath)
+        files=os.listdir()
+        for f in files:
+            path=os.path.join(thepath,f)
+            if os.path.isdir(path):
+                logfilepaths=self.GrabLogFilePaths(path)
+                if len(logfilepaths)!=0:
+                    listoffilepaths.append(logfilepaths)
+        return listoffilepaths
+    
+    def GrabLogFilePaths(self,path):
+        filepaths=[]
+        for root, subdirs, files in os.walk(path):
+            finishedpoltype=False
+            for f in files:
+                if 'final.key' in f:
+                    finishedpoltype=True
+            if finishedpoltype==False:
+                continue
+            for f in files:
+                if '.log' in f and '_frag' not in f and 'poltype' not in f:
+                    filepath=os.path.join(path, f)  
+                    filepaths.append(filepath)
+            for d in subdirs:
+                curdir=os.getcwd()
+                path=os.path.join(root, d)
+                os.chdir(path)
+                newfiles=os.listdir()
+                for f in newfiles:
+                    if '.log' in f:
+                        filepath=os.path.join(path, f)  
+                        filepaths.append(filepath) 
+        return filepaths
+    
+    def ConvertTimeString(self,timestring):
+        timestringsplit=timestring.split(':')
+        hours=float(timestringsplit[0])
+        minutes=float(timestringsplit[1])*(1/60)
+        seconds=float(timestringsplit[2])*(1/60)*(1/60)
+        totaltime=hours+minutes+seconds
+        return totaltime
+    
+    def ConvertTimeStringGaussian(self,line):
+        linesplit=line.split()
+        days=float(linesplit[3])*24
+        hours=float(linesplit[5])
+        minutes=float(linesplit[7])*(1/60)
+        seconds=float(linesplit[9])*(1/60)*(1/60)
+        walltime=days+hours+minutes+seconds
+        return walltime
+    
+    def TabulateCPUTimes(self,listoffilepaths):
+        n=5
+        listoflistofcputimes=[]
+        for filepathsidx in range(len(listoffilepaths)):
+            filepaths=listoffilepaths[filepathsidx]
+            cputimearray=[]
+            for logfile in filepaths: 
+                if os.path.isfile(logfile):
+                    with open(logfile) as frb:
+                        for line in frb:
+                            if 'wall time' in line:
+                                timestring=line.split()[-1]
+                                walltime=self.ConvertTimeString(timestring) 
+                                cputimearray.append(walltime)
+                                break
+                            elif "Job cpu time:" in line:
+                                cputime=self.ConvertTimeStringGaussian(line) 
+                                walltime=4*cputime # 4 processors
+                                cputimearray.append(walltime)
+    
+                                break
+    
+            listoflistofcputimes.append(cputimearray)
+        return listoflistofcputimes
+    
+    
+    def ETAQMFinish(self,thepath,numberofmolstotal):
+        listoffilepaths=self.TabulateLogs(thepath)
+        listoflistofcputimes=self.TabulateCPUTimes(listoffilepaths)
+        listofcputimes=[sum(ls) for ls in listoflistofcputimes]
+        average=np.mean(listofcputimes)
+        mintime=min(listofcputimes)
+        maxtime=max(listofcputimes)
+        ls=[mintime,average,maxtime]
+        string='Min, Average, Max time for jobs to finish '+str(ls)+' hours'
+        self.WriteToLog(string)
+
+        jobsleft=int(numberofmolstotal)-len(listoffilepaths)
+        timeleft=average*jobsleft
+        string='There are '+str(jobsleft)+' jobs left, with ETA='+str(timeleft)+',hours for all jobs to finish'
+        self.WriteToLog(string)
 
     def CallJobsLocalHost(self,fulljobtooutputlog,skiperrors):
        for job in fulljobtooutputlog.keys():
