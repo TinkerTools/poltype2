@@ -2,7 +2,7 @@
 
 
 ### Required Programs
-* Tinker, version >=8.9.2 (potential fitting errors previous versions)
+* Tinker, version >=8.9.4 (potential fitting errors previous versions)
 * GDMA, version 2.3 and greater
 * PSI4 (or Gaussian 09/16)
 * scipy
@@ -42,11 +42,7 @@ export PATH=/opt/gdma/gdma-2.3.3/bin/:$PATH
 
 * Download POLTYPE
 
-Make sure to download the ZIP folder from the poltype2 branch, NOT the master branch
-
-```https://github.com/pren/poltype/tree/poltype2 ```
-
-* Or simply using the following git command
+* Simply using the following git command
 ```shell
 git clone https://github.com/TinkerTools/poltype2.git master
 ```
