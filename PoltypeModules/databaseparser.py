@@ -681,12 +681,11 @@ def GenerateFragmentSMARTS(poltype,ls):
         mw.AddAtom(oldatom)
         oldindextonewindex[idx]=i
         oldatombabel=poltype.mol.GetAtom(idx+1)
-        isinring=oldatombabel.IsInRing()
+        isinring=oldatombabel.IsAromatic()
         if isinring==True:
             aromaticindices.append(i)
 
     
-
     atomswithcutbonds=[]
     aromaticbonds=[]
     bonditer=poltype.rdkitmol.GetBonds()
@@ -712,15 +711,11 @@ def GenerateFragmentSMARTS(poltype,ls):
         bondorder=bond.GetBondType()
         mw.AddBond(bgnidx,endidx,bondorder)
 
-
-
     smarts=rdmolfiles.MolToSmarts(mw)
-
     for atom in mw.GetAtoms():
         atomidx=atom.GetIdx()
         if atomidx in aromaticindices:
             atom.SetIsAromatic(True)
-
 
     for bond in mw.GetBonds():
         endidx = bond.GetEndAtomIdx()
@@ -728,11 +723,64 @@ def GenerateFragmentSMARTS(poltype,ls):
         temp=[endidx,bgnidx]
         if temp in aromaticbonds or temp[::-1] in aromaticbonds:
             bond.SetIsAromatic(True)
-
     smartsfortransfer=rdmolfiles.MolToSmarts(mw)
+    testmol=Chem.MolFromSmarts(smartsfortransfer)
+    diditmatch=mw.HasSubstructMatch(testmol)
+    atomicnumtosymbol={6:'c',7:'n',8:'o'}
+    if diditmatch==True and len(aromaticindices)!=0:
+        matches=mw.GetSubstructMatches(testmol)
+        firstmatch=matches[0]
+        indices=list(range(len(firstmatch)))
+        smartsindextomoleculeindex=dict(zip(indices,firstmatch)) 
+        aromaticsmartindices=[smartsindextomoleculeindex[i] for i in aromaticindices]
+        smartatomlocations=FindSMARTSAtomLocations(poltype,smartsfortransfer)
+        smartsindextosmartslocindex=dict(zip(indices,smartatomlocations)) 
+        aromaticsmartsatomlocations=[smartsindextosmartslocindex[i] for i in  aromaticsmartindices]
+        smartsfortransfer=SanitizeSMARTSAromaticity(poltype,aromaticsmartsatomlocations,atomicnumtosymbol,smartsfortransfer)
+
 
     return smarts,smartsfortransfer
 
+
+def SanitizeSMARTSAromaticity(poltype,aromaticsmartsatomlocations,atomicnumtosymbol,smartsfortransfer):
+    newstring=[e for e in smartsfortransfer]
+    for locidx in aromaticsmartsatomlocations:
+        e=smartsfortransfer[locidx]
+        removeprev=False
+        if e.isdigit():
+            digit=int(e)
+            symbol=atomicnumtosymbol[digit]
+            e=symbol
+            removeprev=True
+        else:
+            if e.islower():
+                e=e.upper()
+        newstring[locidx]=e
+        if removeprev==True:
+             newstring[locidx-1]=''
+    smartsfortransfer=''.join(newstring)
+    return smartsfortransfer 
+
+
+
+def FindSMARTSAtomLocations(poltype,smartsfortransfer):
+    smartatomlocations=[]
+    for eidx in range(len(smartsfortransfer)):
+        e=smartsfortransfer[eidx]
+        if e=='[':
+            inbrack=True
+
+        elif e==']':
+            inbrack=False
+
+        else:
+            if inbrack==True:
+                if e.isdigit()==True or e.isalpha()==True:
+                    smartatomlocations.append(eidx)   
+
+
+
+    return smartatomlocations
 
 
 def GenerateFragmentSMARTSList(poltype,ls):
@@ -740,8 +788,8 @@ def GenerateFragmentSMARTSList(poltype,ls):
     atomindiceslist=GenerateAllPossibleFragmentIndices(poltype,ls,poltype.rdkitmol,100)
     for thels in atomindiceslist:
         smarts,smartsfortransfer=GenerateFragmentSMARTS(poltype,thels)
-        if smarts not in fragsmartslist:
-            fragsmartslist.append(smarts)
+        if smartsfortransfer not in fragsmartslist:
+            fragsmartslist.append(smartsfortransfer)
 
 
     return fragsmartslist
@@ -782,6 +830,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
     usemcsonly=False
     if usemcsonly==False:
         fragsmartslist=GenerateFragmentSMARTSList(poltype,newls)
+
     for parametersmarts in parametersmartslist:
         prmmol=Chem.MolFromSmarts(parametersmarts)
         smartsmatchingtoindices=[]
@@ -811,7 +860,6 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                 fragmol=Chem.MolFromSmarts(fragsmarts)
                 molsmatchingtoindices.append(fragmol)
                 smartsmatchingtoindices.append(fragsmarts)
-
          
         for idx in range(len(smartsmatchingtoindices)):
             thesmarts=smartsmatchingtoindices[idx]

@@ -1093,6 +1093,7 @@ class PolarizableTyper():
                     if size==0:
                         continue
                 finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
+
                 if finished==True and error==False: # then check if SP has been submitted or not
                     if outputlog not in finishedjobs:
                         self.NormalTerm(outputlog)
@@ -1103,8 +1104,8 @@ class PolarizableTyper():
                             self.ErrorTerm(outputlog,skiperrors)
                             finishedjobs.append(outputlog)
                             errorjobs.append(outputlog)
-                        else:
-                            finishedjobs.append(outputlog)
+                    else:
+                        finishedjobs.append(outputlog)
 
                 elif finished==False and error==False:
                     if not os.path.isfile(outputlog):
