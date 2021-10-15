@@ -70,11 +70,11 @@ def gen_esp_grid(poltype,mol):
         else:
             densitystring='SCF'
         gencubecmd = poltype.cubegenexe + " 0 potential=%s "%(densitystring) + fckfname + " " + poltype.qmespfname + " -5 h < " + poltype.espgrdfname
-        poltype.call_subsystem(gencubecmd,True)
+        poltype.call_subsystem([gencubecmd],True)
     # Run potential
     if not os.path.isfile(poltype.qmesp2fname):
         genqmpotcmd = poltype.potentialexe + " 2 " + poltype.qmespfname
-        poltype.call_subsystem(genqmpotcmd,True)
+        poltype.call_subsystem([genqmpotcmd],True)
        
 def GrabGridData(poltype):
     temp=open('grid_esp.dat','r')
@@ -406,7 +406,7 @@ def GenerateElementToBasisSetLines(poltype,basissetfile):
 
 def ElectrostaticPotentialFitting(poltype):
     optmpolecmd = poltype.potentialexe + " 6 " + poltype.xyzoutfile + " -k " + poltype.key2fname + " " + poltype.qmesp2fname + " N "+str(poltype.espgrad)
-    poltype.call_subsystem(optmpolecmd,True)
+    poltype.call_subsystem([optmpolecmd],True)
 
 def ElectrostaticPotentialComparison(poltype):
     rmspdexists=CheckRMSPD(poltype)
@@ -415,7 +415,7 @@ def ElectrostaticPotentialComparison(poltype):
         poltype.WriteToLog("=========================================================")
         poltype.WriteToLog("Electrostatic Potential Comparison\n")
         cmd=poltype.potentialexe + ' 5 ' + poltype.xyzoutfile + ' ' + '-k'+' '+ poltype.key3fname+' '+ poltype.qmesp2fname + ' N > RMSPD.txt'
-        poltype.call_subsystem(cmd,True)
+        poltype.call_subsystem([cmd],True)
     rmspdexists=CheckRMSPD(poltype)
 
 def SPForDMA(poltype,optmol,mol):
@@ -471,9 +471,9 @@ def SPForDMA(poltype,optmol,mol):
             else:
                 finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
 
-            poltype.call_subsystem(cmdstr,True)
+            poltype.call_subsystem([cmdstr],True)
             cmdstr = poltype.formchkexe + " " + poltype.chkdmafname
-            poltype.call_subsystem(cmdstr,True)
+            poltype.call_subsystem([cmdstr],True)
             term,error=poltype.CheckNormalTermination(poltype.logdmafname)
             if error:
                 poltype.RaiseOutputFileError(poltype.logdmafname) 
@@ -482,7 +482,7 @@ def SPForDMA(poltype,optmol,mol):
 def SPForESP(poltype,optmol,mol):
     if not os.path.isfile(poltype.espgrdfname):
         gengridcmd = poltype.potentialexe + " 1 " + poltype.xyzfname+' -k '+poltype.keyfname
-        poltype.call_subsystem(gengridcmd,True)
+        poltype.call_subsystem([gengridcmd],True)
     if poltype.use_gaus==False or poltype.use_gausoptonly==True:
         shutil.copy(poltype.espgrdfname, 'grid.dat') 
         inputname,outputname=CreatePsi4ESPInputFile(poltype,poltype.logoptfname.replace('.log','.xyz'),poltype.comespfname,mol,poltype.maxdisk,poltype.maxmem,poltype.numproc,poltype.totalcharge,True)
@@ -537,7 +537,7 @@ def SPForESP(poltype,optmol,mol):
                 finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
 
             cmdstr = poltype.formchkexe + " " + poltype.chkespfname
-            poltype.call_subsystem(cmdstr,True)
+            poltype.call_subsystem([cmdstr],True)
             term,error=poltype.CheckNormalTermination(poltype.logespfname)
             if error:
                 poltype.RaiseOutputFileError(poltype.logespfname)
@@ -595,7 +595,7 @@ def CheckDipoleMoments(poltype,optmol):
     torgen.RemoveStringFromKeyfile(poltype,poltype.tmpkeyfile,'solvate')
     cmd=poltype.analyzeexe + ' ' + poltype.xyzoutfile+' '+'-k'+' '+poltype.tmpkeyfile + ' em | grep -A11 Charge'+'>'+'MMDipole.txt'
     try: 
-        poltype.call_subsystem(cmd,True)
+        poltype.call_subsystem([cmd],True)
     except: # in case old key_4,key_5 files not working delete and restart
         #poltype.DeleteFilesWithExtension(['key_4','key_5'])
         #poltype.GenerateParameters()

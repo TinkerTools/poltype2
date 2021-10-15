@@ -519,7 +519,7 @@ def gen_superposeinfile(poltype):
     poltype.WriteToLog("=========================================================\n")
     poltype.WriteToLog("Structure RMSD Comparison\n\n")
     cmd = poltype.superposeexe + ' ' + poltype.xyzoutfile + ' ' + poltype.tmpxyzfile + '_2'+' 1 N M N 0  > '+ poltype.superposeinfile
-    poltype.call_subsystem(cmd,wait=True)
+    poltype.call_subsystem([cmd],wait=True)
 
 
 def CheckRMSD(poltype):
@@ -546,7 +546,7 @@ def StructureMinimization(poltype,torsionrestraints):
     shutil.copy(poltype.xyzoutfile,poltype.tmpxyzfile)
     shutil.copy(poltype.key5fname,poltype.tmpkeyfile)
     cmd = poltype.minimizeexe+' -k '+poltype.tmpkeyfile+' '+poltype.tmpxyzfile+' 0.1 > Minimized_final.out'
-    poltype.call_subsystem(cmd, True)
+    poltype.call_subsystem([cmd], True)
     torgen.RemoveStringFromKeyfile(poltype,poltype.key5fname,'restrain-torsion')
     torgen.RemoveStringFromKeyfile(poltype,poltype.tmpkeyfile,'restrain-torsion')
 
@@ -652,7 +652,7 @@ def GeometryOptimization(poltype,mol,loose=False,checkbonds=True,modred=True,bon
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
 
             cmdstr = poltype.formchkexe + " " + poltype.chkoptfname
-            poltype.call_subsystem(cmdstr)
+            poltype.call_subsystem([cmdstr])
         term,error=poltype.CheckNormalTermination(poltype.logoptfname,errormessages=None,skiperrors=True)
         if error and term==False and skiperrors==False:
             if poltype.fullopt==True:

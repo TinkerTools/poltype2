@@ -436,7 +436,7 @@ def AnalyzeTerm(poltype,filename):
 
 def tinker_analyze(poltype,torxyzfname,keyfname,toralzfname):
     alzcmdstr=poltype.analyzeexe+' -k '+keyfname+' '+torxyzfname+' ed > %s' % toralzfname
-    poltype.call_subsystem(alzcmdstr,True)
+    poltype.call_subsystem([alzcmdstr],True)
 
 
 def tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath):
@@ -535,7 +535,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
     if term==True and error==False:
         pass
     else:
-        poltype.call_subsystem(mincmdstr,True)
+        poltype.call_subsystem([mincmdstr],True)
     filename=torxyzfname+'_2'
     newfilename=filename.replace('.xyz_2','_xyzformat.xyz')
     cartxyz=ConvertTinktoXYZ(poltype,torxyzfname+'_2',newfilename)

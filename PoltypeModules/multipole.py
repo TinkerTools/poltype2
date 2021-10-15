@@ -577,7 +577,7 @@ def run_gdma(poltype):
     gen_gdmain(poltype,poltype.gdmainfname,poltype.molecprefix,poltype.fckdmafname,poltype.dmamethod)
 
     cmdstr = poltype.gdmaexe + " < " + poltype.gdmainfname + " > " + poltype.gdmafname
-    poltype.call_subsystem(cmdstr,True)
+    poltype.call_subsystem([cmdstr],True)
 
     assert os.path.getsize(poltype.gdmafname) > 0, "Error: " + os.getcwd() +' '+os.path.basename(poltype.gdmaexe) + " cannot create .gdmaout file."
    
@@ -586,7 +586,7 @@ def AverageMultipoles(poltype,optmol):
     gen_avgmpole_groups_file(poltype)
     # call avgmpoles.pl
     avgmpolecmdstr = poltype.avgmpolesexe + " " + poltype.keyfname + " " + poltype.xyzfname + " " + poltype.grpfname + " " + poltype.key2fname + " " + poltype.xyzoutfile + " " + str(poltype.prmstartidx)
-    poltype.call_subsystem(avgmpolecmdstr,True)
+    poltype.call_subsystem([avgmpolecmdstr],True)
     prepend_keyfile(poltype,poltype.key2fname,optmol,True)
 
 def gen_avgmpole_groups_file(poltype):

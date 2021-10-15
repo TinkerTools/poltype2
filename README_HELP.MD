@@ -202,6 +202,9 @@ dontfrag          specifies to not use fragmenter library for torsion.
 
 WBOtol            Tolerance for relative differences in Wiberg bond order between parent and fragment. Still                    trying to figure out the "best" tolerance.
                   Default=.001
+
+fragjobsatsametime How many fragment jobs to run in parralel on single node, will distribute resources evenly to each job.
+                  Default=1
 ```
 
 ### Modified Amino Acids

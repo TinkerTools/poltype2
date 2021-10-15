@@ -22,5 +22,5 @@ def CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebi
         cmdstr='python'+' '+poltype.externalapi+' '+'--bashrcpath='+poltype.bashrcpath+' '+'--jobinfofilepath='+jobinfofilepath
     else:
         cmdstr='python'+' '+poltype.externalapi+' '+'--jobinfofilepath='+jobinfofilepath
-    poltype.call_subsystem(cmdstr,True)
+    poltype.call_subsystem([cmdstr],True)
 

@@ -201,7 +201,7 @@ def myFUNC(params,poltype,vdwtypes,idxtotype,count):
 
     temp.close()
     for cmd in cmdarray:
-        poltype.call_subsystem(cmd,True)
+        poltype.call_subsystem([cmd],True)
 
     ReadAnalyzeEnergiesWriteOut(poltype,filenamearray)
     current = NormalizeTarget(poltype,'SP.dat')
@@ -1294,7 +1294,7 @@ def MinimizeDimer(poltype,inputxyz,keyfile,indexpairtoreferencedistanceoriginal,
     if term==True and error==False:
         pass
     else:
-        poltype.call_subsystem(mincmdstr,True)
+        poltype.call_subsystem([mincmdstr],True)
 
     finaloutputxyz=inputxyz+'_2'
     newfilename=inputxyz.replace('.xyz','cart.xyz')

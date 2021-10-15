@@ -3974,9 +3974,9 @@ def TestBondAngleEquilValues(poltype):
     shutil.copy(poltype.key4fname,tmpkeyfile)
     shutil.copy(poltype.xyzoutfile,tmpxyzfile)
     cmd = poltype.minimizeexe+' -k '+tmpkeyfile+' '+tmpxyzfile+' 0.1 > testbondangleequilvalues.out'
-    poltype.call_subsystem(cmd, True)
+    poltype.call_subsystem([cmd], True)
     cmd = poltype.analyzeexe+' -k '+tmpkeyfile+' '+tmpxyzfile+'_2'+' d > '+alzout
-    poltype.call_subsystem(cmd, True)
+    poltype.call_subsystem([cmd], True)
     bondindicestonewbondequilvalues,angleindicestonewbondequilvalues=CheckBondAngleDeviationsFromQM(poltype,alzout)
    
     bondtypeindicestonewbondequilvalues=ConvertIndicesToTypeIndices(poltype,bondindicestonewbondequilvalues)
