@@ -12,11 +12,20 @@ def CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebi
         else:
             outputfilepath=jobtooutputfilepath[job]
         outputfiles=jobtooutputfiles[job]
-        outputfiles=[os.path.join(outputfilepath,i) for i in outputfiles]
-        inputfilestr=','.join(inputfilepaths)
-        outputfilestr=','.join(outputfiles)
+        if 'poltype.ini' in inputfilepaths:
+            inputfilestr=inputfilepaths
+        else:
+            inputfilestr=','.join(inputfilepaths)
         binpath=jobtoabsolutebinpath[job]
-        temp.write('--job='+job+' '+'--scratchpath='+scratchdir+' '+'--numproc='+str(poltype.numproc)+' '+'--ram='+poltype.maxmem+' '+'--disk='+poltype.maxdisk+' '+'--inputfilepaths='+inputfilestr+' '+'--outputfilepaths='+outputfilestr+' '+'--absolutepathtobin='+binpath+' '+'--username='+poltype.username+'\n')
+        string='--job='+job+' '+'--scratchpath='+scratchdir+' '+'--numproc='+str(poltype.numproc)+' '+'--ram='+poltype.maxmem+' '+'--disk='+poltype.maxdisk+' '+'--inputfilepaths='+inputfilestr+' '+'--username='+poltype.username
+        if binpath!=None:
+            string+=' '+'--absolutepathtobin='+binpath
+        if outputfiles!=None:
+            outputfiles=[os.path.join(outputfilepath,i) for i in outputfiles]
+            outputfilestr=','.join(outputfiles)
+            string+='--outputfilepaths='+outputfilestr
+
+        temp.write(string+'\n')
     temp.close()
     if poltype.bashrcpath!=None:
         cmdstr='python'+' '+poltype.externalapi+' '+'--bashrcpath='+poltype.bashrcpath+' '+'--jobinfofilepath='+jobinfofilepath

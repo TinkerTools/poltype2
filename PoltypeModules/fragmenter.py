@@ -22,6 +22,9 @@ import sys # used for terminaing job after fragmenter finishes and troubleshooti
 import symmetry as symm
 import shlex
 import itertools
+import apicall as call
+
+
 
 def AssignTotalCharge(poltype,molecule,babelmolecule):
     atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
@@ -534,20 +537,20 @@ def ExtractResource(poltype,string):
 
 def PartitionResources(poltype):
     maxmem,memstring=ExtractResource(poltype,poltype.maxmem)
-    maxmem=maxmem/poltype.fragjobsatsametime
+    maxmem=maxmem/poltype.jobsatsametime
     tempmaxmem=str(maxmem)+memstring
     maxdisk,diskstring=ExtractResource(poltype,poltype.maxdisk)
-    maxdisk=maxdisk/poltype.fragjobsatsametime
+    maxdisk=maxdisk/poltype.jobsatsametime
     tempmaxdisk=str(maxdisk)+diskstring
-    numproc=int(int(poltype.numproc)/poltype.fragjobsatsametime)
+    numproc=int(int(poltype.numproc)/poltype.jobsatsametime)
     tempnumproc=str(numproc)
 
     return tempmaxmem,tempmaxdisk,tempnumproc
 
 
-def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog,fragmol,parentdir,vdwfragment,strfragvdwatomindex,onlyfittorsions):
+def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog,fragmol,parentdir,vdwfragment,strfragvdwatomindex,onlyfittorsions,jobtoinputfilepaths):
     tempmaxmem,tempmaxdisk,tempnumproc=PartitionResources(poltype)
-    poltypeinput={'username':poltype.username,'atmidx':poltype.prmstartidx,'parentname':poltype.parentname,'use_gau_vdw':poltype.use_gau_vdw,'use_qmopt_vdw':poltype.use_qmopt_vdw,'onlyvdwatomindex':poltype.onlyvdwatomindex,'tordebugmode':poltype.tordebugmode,'dontdovdwscan':poltype.dontdovdwscan,'refinenonaroringtors':poltype.refinenonaroringtors,'tortor':poltype.tortor,'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':tempnumproc,'maxmem':tempmaxmem,'maxdisk':tempmaxdisk,'printoutput':True}
+    poltypeinput={'jobsatsametime':poltype.jobsatsametime,'debugmode':poltype.debugmode,'username':poltype.username,'atmidx':poltype.prmstartidx,'parentname':poltype.parentname,'use_gau_vdw':poltype.use_gau_vdw,'use_qmopt_vdw':poltype.use_qmopt_vdw,'onlyvdwatomindex':poltype.onlyvdwatomindex,'tordebugmode':poltype.tordebugmode,'dontdovdwscan':poltype.dontdovdwscan,'refinenonaroringtors':poltype.refinenonaroringtors,'tortor':poltype.tortor,'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':tempnumproc,'maxmem':tempmaxmem,'maxdisk':tempmaxdisk,'printoutput':True}
     if strfragrotbndindexes!=None:
         poltypeinput['onlyrotbndslist']=strfragrotbndindexes
     if vdwfragment==True:
@@ -563,26 +566,50 @@ def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog
         poltypeinput['onlyfittorstogether']=string 
 
     inifilepath=poltype.WritePoltypeInitializationFile(poltypeinput)
-    cmdstr='nohup'+' '+'python'+' '+poltype.poltypepath+r'/'+'poltype.py'+' '+'&'
+    cmdstr='python'+' '+poltype.poltypepath+r'/'+'poltype.py'
     cmdstr='cd '+shlex.quote(os.getcwd())+' && '+cmdstr
+    
+    jobtoinputfilepaths[cmdstr]=inifilepath
     molecprefix =  os.path.splitext(tail)[0]
     logname = molecprefix+ "-poltype.log"
     listofjobs.append(cmdstr)
     logpath=os.getcwd()+r'/'+logname
+    jobtooutputlog[cmdstr]=logpath
     if os.path.isfile(logpath): # make sure to remove logfile if exists, dont want WaitForTermination to catch previous errors before job is resubmitted
         os.remove(logpath)
-    jobtooutputlog[cmdstr]=logpath
+    
+
     b = Chem.MolToSmiles(poltype.rdkitmol)
     a = Chem.MolToSmiles(fragmol)
     if a==b:
         CopyAllQMDataAndRename(poltype,molecprefix,parentdir)
-    return listofjobs,jobtooutputlog,logpath
+    return listofjobs,jobtooutputlog,logpath,jobtoinputfilepaths
 
-def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog):
-    if poltype.externalapi is not None:
-        finishedjobs,errorjobs=poltype.CallJobsLocalHost(jobtooutputlog,True)
+
+def SetupClusterSubmission(poltype,listofjobs,parentdir):
+    jobtologlistfilenameprefix=os.path.join(parentdir,'FragmentJobToLog'+'_'+poltype.molecprefix)
+    jobtooutputfiles={}
+    jobtoabsolutebinpath={}
+    scratchdir=poltype.scratchdir
+    for cmdstr in listofjobs:
+        jobtooutputfiles[cmdstr]=None
+        jobtoabsolutebinpath[cmdstr]=None
+
+
+    return jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix
+
+def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix):
+    
+    if poltype.fragmenterdebugmode==False:
+        if poltype.externalapi is not None:
+            call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
+            finshedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
+
+        else:
+            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,True)
     else:
-        finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,True)
+        finishedjobs=list(jobtooutputlog.keys())
+        errorjobs=[]
 
     return finishedjobs,errorjobs
 
@@ -592,6 +619,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
     parentdir=dirname(abspath(os.getcwd()))
     listofjobs=[]
     jobtooutputlog={}
+    jobtoinputfilepaths={}
     for arrayidx in range(len(equivalentrotbndindexarrays)):
         array=equivalentrotbndindexarrays[arrayidx]
         strfragrotbndindexes=''
@@ -756,11 +784,14 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         wholexyz=parentdir+r'/'+poltype.xyzoutfile
         wholemol=parentdir+r'/'+poltype.molstructfname
         parentatoms=poltype.rdkitmol.GetNumAtoms()
-        listofjobs,jobtooutputlog,newlog=FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog,tempmol,parentdir,vdwfragment,strfragvdwatomindex,onlyfittorsions)
+        listofjobs,jobtooutputlog,newlog,jobtoinputfilepaths=FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog,tempmol,parentdir,vdwfragment,strfragvdwatomindex,onlyfittorsions,jobtoinputfilepaths)
     os.chdir(parentdir)
     if poltype.setupfragjobsonly==True:
         sys.exit()
-    finishedjobs,errorjobs=SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog)
+
+
+    jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix=SetupClusterSubmission(poltype,listofjobs,parentdir)
+    finishedjobs,errorjobs=SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
     return equivalentrotbndindexarrays,rotbndindextoringtor
 
 

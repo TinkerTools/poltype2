@@ -64,15 +64,31 @@ maxmem               specifies max RAM used for running quantum jobs.
                      Default=700MB 
 maxdisk              specifies max scratch space used for running quantum jobs. 
                      Default=100GB
-totalcharge          specifies totalcharge of molecule.
+totalcharge          Specifies totalcharge of molecule. If not assigned, will guess via valence.
                      Defualt=None
-optmaxcycle          This keyword to reduce number of optcycles needed (they are expensive), 5 cycles is good for quicker QM OPT but in an extreme case if input structure is too far from poltypes internal bond length change checking tolerances then poltype will not beable to increase cycles automatically. If using 5 cycles and then input structure is too far from final QM structure( bond lengths differ by more than internal tolerance) (after 5 cycles), then poltype will increase cycles and repeat QM OPT. By default rotatble bonds have dihedrals restrained during first QM OPT.
-                     Default=400
 deleteallnonqmfiles  This will delete all non-qm log files (sometimes errors require restarting and deleting the correct files).
                      Default=False
 
-email                Email address to send crash reports to.
+email                Email address to send crash reports to, will send email when poltype job finished.
                      Default=None
+
+debugmode            Cheap QM, just to run through and check for any software bugs.
+                     Default=False
+
+jobsatsametime       Parralelize your QM and fragment poltype jobs for local host. 
+                     Default=1
+
+
+externalapi          Specifies path to external API used for submitting quantum jobs on a cluster. Parralelize QM jobs and fragment poltype jobs on cluseter. For fragment jobs, if you wish to make fragment poltype jobs consume less memory then the parent job on the cluster, also add the keyword "jobsatsametime", this will divide parent memory by "jobsatsametime", (number of processors will be rounded to integer).
+                     Default=None.
+
+username             Needed for RenLabCluster daemon (externalapi keyword). This will inform the daemon which username to submit jobs for the queuing system.
+                     Default=None
+
+
+tordebugmode         Assume QM for torsion is finished. Sometimes python subprocess does not get return signal from psi4 job and python stuck in while loop. This will skip over points not finished, and use what is finished for torsion fitting.
+                     Default=False
+
 ```
 
 * Note for very large molecules initial opt, DMA and ESP may require large amounts of memory if quantum job consistently crashes
@@ -89,9 +105,6 @@ maxdisk=100GB
 
 ####Submitting Quantum Jobs Externally
 ```
-bashrcpath        specifies path for bashrc to source for running quantum jobs, used when calling external API 
-                  for submitting quantum jobs. 
-                  Default None.
 externalapi       specifies path to external API used for submitting quantum jobs on a cluster. 
                   Default=None.
 
@@ -203,7 +216,7 @@ dontfrag          specifies to not use fragmenter library for torsion.
 WBOtol            Tolerance for relative differences in Wiberg bond order between parent and fragment. Still                    trying to figure out the "best" tolerance.
                   Default=.001
 
-fragjobsatsametime How many fragment jobs to run in parralel on single node, will distribute resources evenly to each job.
+jobsatsametime    How many jobs (QM or fragment poltype jobs) to run in parralel on single node, will distribute resources evenly to each job.
                   Default=1
 ```
 
@@ -262,6 +275,9 @@ email                Email address to send crash reports to.
                      Default=None
 
 inputmoleculefolderpaths   Path to folders containing sdf files for molecules you want to parameterize with poltype. Other settings in poltype.ini file will be written to poltype.ini files in each folder.
+
+debugmode            All QM methods are HF , basis set is MINIX. This is for testing for software crashes, fast QM.
+                     Default=False
 
 ```
 

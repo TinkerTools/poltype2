@@ -115,14 +115,14 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,varia
         inputfilepath=os.path.join(os.getcwd(),inputname)
         if finished==True and 'opt' in outputlog:
             opt.GrabFinalXYZStructure(poltype,outputlog,outputlog.replace('.log','.xyz'),mol)
-        if finished==False and poltype.tordebugmode==False:
+        if finished==False and (poltype.tordebugmode==False and poltype.toroptdebugmode==False):
             listofjobs.append(cmdstr)
             outputfilenames.append(outputlog)
             inputfilepaths.append(inputfilepath)  
             executables.append(executable) 
             jobtooutputlog[cmdstr]=os.getcwd()+r'/'+outputlog
 
-        if finished==True or ( finished==False and poltype.tordebugmode==False):
+        if finished==True or ( finished==False and (poltype.tordebugmode==False and poltype.toroptdebugmode==False)):
             outputlogs.append(outputlog)
         optlogtophaseangle[outputlog]=phaseangles
         initialstructures.append(torxyzfname)   

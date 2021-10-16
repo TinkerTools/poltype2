@@ -619,10 +619,10 @@ def CheckDipoleMoments(poltype,optmol):
                 if poltype.esprestweight==.1:
                     string='Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)+' '+os.getcwd()
                     raise ValueError(string)
-                else:
-                    poltype.esprestweight=poltype.esprestweight-.1
-                    poltype.DeleteFilesWithExtension(['key_4','key_5','key_3','key_2'])
-                    poltype.GenerateParameters()
+                #else:
+                #    poltype.esprestweight=poltype.esprestweight-.1
+                #    poltype.DeleteFilesWithExtension(['key_4','key_5','key_3','key_2'])
+                #    poltype.GenerateParameters()
 
             else:
                  string='Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+' tolerance = '+str(poltype.dipoletol)+' '+os.getcwd()

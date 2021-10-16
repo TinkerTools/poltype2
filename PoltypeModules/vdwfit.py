@@ -1604,6 +1604,10 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     else:
         poltype.espmethod='wB97X-D'
         poltype.espbasisset="aug-cc-pVDZ"
+    if poltype.debugmode==True:
+        poltype.espmethod='HF'
+        poltype.espbasisset="MINIX"
+
     tempuse_gaus=poltype.use_gaus
     tempuse_gausoptonly=poltype.use_gausoptonly
     if poltype.use_gau_vdw==True and poltype.foundgauss==True:
