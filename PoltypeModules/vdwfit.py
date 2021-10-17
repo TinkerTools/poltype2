@@ -200,8 +200,13 @@ def myFUNC(params,poltype,vdwtypes,idxtotype,count):
         filenamearray.append(filename)
 
     temp.close()
-    for cmd in cmdarray:
-        poltype.call_subsystem([cmd],True)
+    for cmdidx in range(len(cmdarray)):
+        cmd=cmdarray[cmdidx]
+        filename=filenamearray[cmdidx]
+        poltype.call_subsystem([cmd],False)
+        temp={cmd:filename} 
+        finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
+
 
     ReadAnalyzeEnergiesWriteOut(poltype,filenamearray)
     current = NormalizeTarget(poltype,'SP.dat')
@@ -1294,7 +1299,10 @@ def MinimizeDimer(poltype,inputxyz,keyfile,indexpairtoreferencedistanceoriginal,
     if term==True and error==False:
         pass
     else:
-        poltype.call_subsystem([mincmdstr],True)
+        poltype.call_subsystem([mincmdstr],False)
+        temp={mincmdstr:torminlogfname} 
+        finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
+
 
     finaloutputxyz=inputxyz+'_2'
     newfilename=inputxyz.replace('.xyz','cart.xyz')

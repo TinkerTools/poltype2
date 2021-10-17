@@ -2089,7 +2089,10 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
         protinkxyz,firstresnum,lastresnum=GenerateProteinTinkerXYZFile(poltype,poltype.modifiedproteinpdbname,modproidxtotypenumber,poltype.amoebabioprmpath,proidxtoprotype,knownresiduesymbs)
 
         cmdstr=CallAnalyze(poltype,protinkxyz,writekey,'e','alz.out')
-        poltype.call_subsystem([cmdstr],True)
+        poltype.call_subsystem([cmdstr],False)
+        temp={cmdstr:'alz.out'} 
+        finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
+
         error=ReadAnalyzeOutput(poltype)
         if error==False:
             GenerateLibFileToAdd(poltype,modresiduedic,modresiduelabel)
@@ -2342,7 +2345,10 @@ def CorrectTotalCharge(poltype,pdbfile,writekey,protinkxyz,mincorenumber,maxcore
     proteinchargebeforemerge=ReadTotalProteinChargeBeforeMerge(poltype,mol2file)
     alzfile='alz_charge.out'
     cmdstr=CallAnalyze(poltype,protinkxyz,writekey,'m',alzfile)
-    poltype.call_subsystem([cmdstr],True)
+    poltype.call_subsystem([cmdstr],False)
+    temp={cmdstr:alzfile} 
+    finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
+
     proteinchargeaftermerge=ReadTotalProteinChargeAfterMerge(poltype,alzfile)
     ligandcharge=poltype.totalcharge
     chgtoredistribute=ChargeToRedistribute(poltype,proteinchargebeforemerge,ligandcharge,proteinchargeaftermerge)

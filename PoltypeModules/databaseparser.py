@@ -742,6 +742,34 @@ def GenerateFragmentSMARTS(poltype,ls):
     return smarts,smartsfortransfer
 
 
+def SanitizeSMARTS(poltype,smartsmcs):
+    atomicnumtosymbol={6:'c',7:'n',8:'o'}
+    aromaticindices=[]
+    for i in range(len(poltype.rdkitmol.GetAtoms())):
+        oldatombabel=poltype.mol.GetAtom(i+1)
+        isaro=oldatombabel.IsAromatic()
+        if isaro==True:
+            aromaticindices.append(i)
+
+    testmol=Chem.MolFromSmarts(smartsmcs)
+    diditmatch=poltype.rdkitmol.HasSubstructMatch(testmol)
+    if diditmatch==True and len(aromaticindices)!=0:
+        matches=poltype.rdkitmol.GetSubstructMatches(testmol)
+        firstmatch=matches[0]
+        indices=list(range(len(firstmatch)))
+        moleculeindextosmartsindex=dict(zip(firstmatch,indices))
+        newaromaticindices=[]
+        for idx in aromaticindices:
+            if idx in moleculeindextosmartsindex.keys():
+                newaromaticindices.append(idx)
+        aromaticsmartindices=[moleculeindextosmartsindex[i] for i in newaromaticindices]
+        smartatomlocations=FindSMARTSAtomLocations(poltype,smartsmcs)
+        smartsindextosmartslocindex=dict(zip(indices,smartatomlocations)) 
+        aromaticsmartsatomlocations=[smartsindextosmartslocindex[i] for i in  aromaticsmartindices]
+        smartsmcs=SanitizeSMARTSAromaticity(poltype,aromaticsmartsatomlocations,atomicnumtosymbol,smartsmcs)
+    return smartsmcs
+
+
 def SanitizeSMARTSAromaticity(poltype,aromaticsmartsatomlocations,atomicnumtosymbol,smartsfortransfer):
     newstring=[e for e in smartsfortransfer]
     for locidx in aromaticsmartsatomlocations:
@@ -847,6 +875,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
         res=rdFMCS.FindMCS(mols)
         atomnum=res.numAtoms
         smartsmcs=res.smartsString
+        smartsmcs=SanitizeSMARTS(poltype,smartsmcs)
         prmsmartsatomnum=prmmol.GetNumAtoms()
         mcsmol=Chem.MolFromSmarts(smartsmcs)
         molsmatchingtoindices.append(mcsmol)
@@ -865,8 +894,10 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
             thesmarts=smartsmatchingtoindices[idx]
             themol=molsmatchingtoindices[idx]
             thesmartstothemol[thesmarts]=themol
+            diditmatchprmmol=prmmol.HasSubstructMatch(themol)
+
             diditmatch=poltype.rdkitmol.HasSubstructMatch(themol)
-            if diditmatch==True:
+            if diditmatch==True and diditmatchprmmol==True:
                 matches=poltype.rdkitmol.GetSubstructMatches(themol)
                 firstmatch=matches[0]
                 if len(firstmatch)>=len(ls):
@@ -931,6 +962,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
 
                         smartindices=[moleculeindextosmartsindex[i] for i in ls]
                         matches=prmmol.GetSubstructMatches(themol)
+ 
                         firstmatch=TryAndPickMatchWithNeighbors(poltype,matches,smartindices,themol)
                         indices=list(range(len(firstmatch)))
                         smartsindextoparametersmartsindex=dict(zip(indices,firstmatch)) 
@@ -4022,9 +4054,15 @@ def TestBondAngleEquilValues(poltype):
     shutil.copy(poltype.key4fname,tmpkeyfile)
     shutil.copy(poltype.xyzoutfile,tmpxyzfile)
     cmd = poltype.minimizeexe+' -k '+tmpkeyfile+' '+tmpxyzfile+' 0.1 > testbondangleequilvalues.out'
-    poltype.call_subsystem([cmd], True)
+    poltype.call_subsystem([cmd], False)
+    temp={cmd:'testbondangleequilvalues.out'} 
+    finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
+
     cmd = poltype.analyzeexe+' -k '+tmpkeyfile+' '+tmpxyzfile+'_2'+' d > '+alzout
-    poltype.call_subsystem([cmd], True)
+    poltype.call_subsystem([cmd], False)
+    temp={cmd:alzout} 
+    finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
+
     bondindicestonewbondequilvalues,angleindicestonewbondequilvalues=CheckBondAngleDeviationsFromQM(poltype,alzout)
    
     bondtypeindicestonewbondequilvalues=ConvertIndicesToTypeIndices(poltype,bondindicestonewbondequilvalues)

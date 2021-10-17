@@ -596,6 +596,7 @@ def CheckDipoleMoments(poltype,optmol):
     cmd=poltype.analyzeexe + ' ' + poltype.xyzoutfile+' '+'-k'+' '+poltype.tmpkeyfile + ' em | grep -A11 Charge'+'>'+'MMDipole.txt'
     try: 
         poltype.call_subsystem([cmd],True)
+
     except: # in case old key_4,key_5 files not working delete and restart
         #poltype.DeleteFilesWithExtension(['key_4','key_5'])
         #poltype.GenerateParameters()

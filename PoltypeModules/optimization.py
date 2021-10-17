@@ -546,7 +546,10 @@ def StructureMinimization(poltype,torsionrestraints):
     shutil.copy(poltype.xyzoutfile,poltype.tmpxyzfile)
     shutil.copy(poltype.key5fname,poltype.tmpkeyfile)
     cmd = poltype.minimizeexe+' -k '+poltype.tmpkeyfile+' '+poltype.tmpxyzfile+' 0.1 > Minimized_final.out'
-    poltype.call_subsystem([cmd], True)
+    poltype.call_subsystem([cmd], False)
+    temp={cmd:'Minimized_final.out'} 
+    finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
+
     torgen.RemoveStringFromKeyfile(poltype,poltype.key5fname,'restrain-torsion')
     torgen.RemoveStringFromKeyfile(poltype,poltype.tmpkeyfile,'restrain-torsion')
 
@@ -652,7 +655,7 @@ def GeometryOptimization(poltype,mol,loose=False,checkbonds=True,modred=True,bon
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
 
             cmdstr = poltype.formchkexe + " " + poltype.chkoptfname
-            poltype.call_subsystem([cmdstr])
+            poltype.call_subsystem([cmdstr],True)
         term,error=poltype.CheckNormalTermination(poltype.logoptfname,errormessages=None,skiperrors=True)
         if error and term==False and skiperrors==False:
             if poltype.fullopt==True:

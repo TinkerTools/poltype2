@@ -550,7 +550,7 @@ def PartitionResources(poltype):
 
 def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog,fragmol,parentdir,vdwfragment,strfragvdwatomindex,onlyfittorsions,jobtoinputfilepaths):
     tempmaxmem,tempmaxdisk,tempnumproc=PartitionResources(poltype)
-    poltypeinput={'jobsatsametime':poltype.jobsatsametime,'debugmode':poltype.debugmode,'username':poltype.username,'atmidx':poltype.prmstartidx,'parentname':poltype.parentname,'use_gau_vdw':poltype.use_gau_vdw,'use_qmopt_vdw':poltype.use_qmopt_vdw,'onlyvdwatomindex':poltype.onlyvdwatomindex,'tordebugmode':poltype.tordebugmode,'dontdovdwscan':poltype.dontdovdwscan,'refinenonaroringtors':poltype.refinenonaroringtors,'tortor':poltype.tortor,'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':tempnumproc,'maxmem':tempmaxmem,'maxdisk':tempmaxdisk,'printoutput':True}
+    poltypeinput={'debugmode':poltype.debugmode,'username':poltype.username,'atmidx':poltype.prmstartidx,'parentname':poltype.parentname,'use_gau_vdw':poltype.use_gau_vdw,'use_qmopt_vdw':poltype.use_qmopt_vdw,'onlyvdwatomindex':poltype.onlyvdwatomindex,'tordebugmode':poltype.tordebugmode,'dontdovdwscan':poltype.dontdovdwscan,'refinenonaroringtors':poltype.refinenonaroringtors,'tortor':poltype.tortor,'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':tempnumproc,'maxmem':tempmaxmem,'maxdisk':tempmaxdisk,'printoutput':True}
     if strfragrotbndindexes!=None:
         poltypeinput['onlyrotbndslist']=strfragrotbndindexes
     if vdwfragment==True:
@@ -1132,7 +1132,10 @@ def GenerateWBOMatrix(poltype,molecule,moleculebabel,structfname):
     if not finished and not error:
         cmdstr='psi4 '+inputname+' '+outputname
         try:
-             poltype.call_subsystem([cmdstr],True)
+             poltype.call_subsystem([cmdstr],False)
+             temp={cmdstr:outputname} 
+             finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
+
         except Exception:
              error=True
     try:
@@ -1140,7 +1143,10 @@ def GenerateWBOMatrix(poltype,molecule,moleculebabel,structfname):
             WBOmatrix=GrabWBOMatrixPsi4(poltype,outputname,molecule)
     except:
         cmdstr='psi4 '+inputname+' '+outputname
-        poltype.call_subsystem([cmdstr],True)
+        poltype.call_subsystem([cmdstr],False)
+        temp={cmdstr:outputname} 
+        inishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
+
         WBOmatrix=GrabWBOMatrixPsi4(poltype,outputname,molecule)
 
     poltype.espmethod=curespmethod
