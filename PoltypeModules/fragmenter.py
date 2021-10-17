@@ -601,7 +601,7 @@ def SetupClusterSubmission(poltype,listofjobs,parentdir):
 def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix):
     
     if poltype.fragmenterdebugmode==False:
-        if poltype.externalapi is not None:
+        if poltype.externalapi is not None and poltype.fragmentjobslocal==False:
             call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
             finshedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
 
@@ -1126,18 +1126,16 @@ def GenerateWBOMatrix(poltype,molecule,moleculebabel,structfname):
     poltype.espmethod='HF'
     poltype.espbasisset='MINIX'
     charge=Chem.rdmolops.GetFormalCharge(molecule)
-
     inputname,outputname=esp.CreatePsi4ESPInputFile(poltype,structfname,poltype.comespfname.replace('.com','_frag.com'),moleculebabel,poltype.maxdisk,poltype.maxmem,poltype.numproc,charge,False)
     finished,error=poltype.CheckNormalTermination(outputname)
-    if not finished and not error:
-        cmdstr='psi4 '+inputname+' '+outputname
-        try:
-             poltype.call_subsystem([cmdstr],False)
-             temp={cmdstr:outputname} 
-             finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
+    cmdstr='psi4 '+inputname+' '+outputname
+    try:
+         poltype.call_subsystem([cmdstr],False)
+         temp={cmdstr:outputname} 
+         finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
 
-        except Exception:
-             error=True
+    except Exception:
+         error=True
     try:
         if not error:
             WBOmatrix=GrabWBOMatrixPsi4(poltype,outputname,molecule)
@@ -1570,6 +1568,7 @@ def GrowPossibleFragmentAtomIndexes(poltype,rdkitmol,indexes):
         indexlist=indexes.copy()
         for idx in comb:
            aromaticindexes=GrabAromaticAtoms(poltype,idx+1)
+           
            newindexes=aromaticindexes
            for atmidx in newindexes:
                if atmidx not in indexlist:
@@ -1593,7 +1592,10 @@ def GrowPossibleFragmentAtomIndexes(poltype,rdkitmol,indexes):
                    temp.append(neighbneighbatomidx)
                bond=poltype.rdkitmol.GetBondBetweenAtoms(neighbneighbatomidx,idx)
                bondorder=bond.GetBondTypeAsDouble()
-               if bondorder>1 and neighbneighbatomidx not in indexlist:
+               babelneighbatom=poltype.mol.GetAtom(neighbneighbatomidx+1)
+
+               babelneighbatomisinring=babelneighbatom.IsInRing()
+               if bondorder>1 and neighbneighbatomidx not in indexlist and babelneighbatomisinring==False:
                    temp.append(neighbneighbatomidx)
         for idx in temp:
             if idx not in indexlist:
@@ -1886,11 +1888,10 @@ def RingAtomicIndices(poltype,mol):
     return atomindices
 
 def GrabRingAtomIndicesFromInputIndex(poltype,atomindex,atomindices):
-    ring=None
     for ring in atomindices:
         if atomindex in ring:
             return ring
-
+    ring=None
     return ring
 
 def GrabRingAtomIndices(poltype,mol,ring):

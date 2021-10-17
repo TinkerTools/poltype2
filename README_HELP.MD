@@ -86,7 +86,7 @@ username             Needed for RenLabCluster daemon (externalapi keyword). This
                      Default=None
 
 
-tordebugmode         Assume QM for torsion is finished. Sometimes python subprocess does not get return signal from psi4 job and python stuck in while loop. This will skip over points not finished, and use what is finished for torsion fitting.
+fragmentjobslocal Run fragment jobs on localhost even when externalapi keyword is active
                      Default=False
 
 ```
@@ -218,6 +218,9 @@ WBOtol            Tolerance for relative differences in Wiberg bond order betwee
 
 jobsatsametime    How many jobs (QM or fragment poltype jobs) to run in parralel on single node, will distribute resources evenly to each job.
                   Default=1
+
+fragmentjobslocal Run fragment jobs on localhost even when externalapi keyword is active
+                  Default=False
 ```
 
 ### Modified Amino Acids
