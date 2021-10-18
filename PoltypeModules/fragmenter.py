@@ -65,6 +65,7 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
     valenceprmlist=[]
     parentsymmtorlist=[]
     allparenttortorskeys=[]
+    curdir=os.getcwd()
     for array in equivalentrotbndindexarrays:
         vdwfragment=False
         firstfrag=array[0]
@@ -101,7 +102,6 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
     tortorclasskeytotorsionindexescollected={}
     tortorclasskeytosmartscollected={}
     tortorclasskeytosmartsposarraycollected={}
-    curdir=os.getcwd()
     for rotbndindex,fragmentfilepath in rotbndindextofragmentfilepath.items():
         path,filename=os.path.split(fragmentfilepath)
         os.chdir(path)
@@ -792,6 +792,8 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
 
     jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix=SetupClusterSubmission(poltype,listofjobs,parentdir)
     finishedjobs,errorjobs=SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
+    os.chdir(parentdir)
+
     return equivalentrotbndindexarrays,rotbndindextoringtor
 
 
