@@ -1225,9 +1225,9 @@ class PolarizableTyper():
             if error==True:
                 term=False # sometimes psi4 geometry opt not fully converge but says successfully exiting etc..
                 message='Error '+errorline+ 'logpath='+logfname
-            if error==False and term==False and htime>=updatetime:
-                error=True
-                message='Error '+'Job has not been updated in '+str(updatetime)+' hours'+' last update time = '+str(htime)+' hours'+' logname='+logfname
+            #if error==False and term==False and htime>=updatetime:
+            #    error=True
+            #    message='Error '+'Job has not been updated in '+str(updatetime)+' hours'+' last update time = '+str(htime)+' hours'+' logname='+logfname
             if error==True and term==False and skiperrors==False:
                 if errormessages!=None:
                     if message not in errormessages:

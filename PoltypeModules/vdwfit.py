@@ -207,7 +207,7 @@ def myFUNC(params,poltype,vdwtypes,idxtotype,count):
         temp={cmd:filename} 
         finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
 
-
+    time.sleep(1) 
     ReadAnalyzeEnergiesWriteOut(poltype,filenamearray)
     current = NormalizeTarget(poltype,'SP.dat')
 
