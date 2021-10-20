@@ -1261,8 +1261,11 @@ class PolarizableTyper():
         procs=[]
         for cmdstr in cmdstrs:
             self.WriteToLog("Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
-            p = subprocess.Popen(cmdstr,shell=True,stdout=self.logfh, stderr=self.logfh)
-            procs.append(p)
+            if wait==True:
+                p = subprocess.Popen(cmdstr,shell=True,stdout=self.logfh, stderr=self.logfh)
+                procs.append(p)
+            else:
+                os.system(cmdstr)
         if wait==True:
             exit_codes=[p.wait() for p in procs]
             for i in range(len(procs)):
@@ -2081,6 +2084,8 @@ class PolarizableTyper():
             torgen.RemoveStringFromKeyfile(self,self.key5fname,'solvate GK')
         if self.atomnum!=1: 
              esp.CheckDipoleMoments(self,optmol)
+        self.AddIndicesToKey(self.tmpkeyfile)
+        self.FinalVDWMultipoleCheck(self.tmpkeyfile)
         self.WriteToLog('Poltype Job Finished'+'\n')
         
         if os.path.exists(self.scrtmpdirgau):
@@ -2097,6 +2102,88 @@ class PolarizableTyper():
             toaddr = self.email
             TEXT='Molecule has finished parameterization'
             self.SendFinalReportEmail(TEXT,fromaddr,toaddr,password,moleculename)
+
+
+    def FinalVDWMultipoleCheck(self,keyfile):
+        temp=open(keyfile,'r')
+        results=temp.readlines()
+        temp.close()
+        vdwtypetofound={}
+        mpoletypetofound={}
+        typenums=list(self.idxtosymclass.values())
+        for typenum in typenums:
+            typenum=str(typenum)
+            vdwtypetofound[typenum]=False
+            mpoletypetofound[typenum]=False
+        for line in results:
+            if '#' not in line:
+                if 'vdw' in line or 'multipole' in line:
+                    linesplit=line.split()
+                    typenum=linesplit[1]
+                    if 'vdw' in line:
+                        vdwtypetofound[typenum]=True
+                    elif 'multipole' in line:
+                        mpoletypetofound[typenum]=True
+
+        missingvdw=[]
+        missingmpole=[]
+        for typenum,found in vdwtypetofound.items():
+            if found==False:
+                missingvdw.append(typenum)
+
+        for typenum,found in mpoletypetofound.items():
+            if found==False:
+                missingmpole.append(typenum)
+
+        if len(missingvdw)!=0:
+            raise ValueError('Missing vdw parameters '+str(missingvdw))
+
+        if len(missingmpole)!=0:
+            raise ValueError('Missing multipole parameters '+str(missingmpole))
+
+
+    def AddIndicesToKey(self,keyfilename):
+        temp=open(keyfilename,'r')
+        results=temp.readlines()
+        temp.close()
+        tempname=keyfilename.replace('.key','_TEMP.key')
+        temp=open(tempname,'w')
+       
+        for line in results:
+            if '#' not in line:
+                indices=[]
+                if 'multipole' in line or 'polarize' in line or 'vdw' in line:
+                    indices=[1]
+                elif 'bond' in line or 'opbend' in line:
+                    indices=[1,2]
+                elif 'angle' in line or 'strbnd' in line:
+                    indices=[1,2,3]
+                elif 'torsion' in line:
+                    indices=[1,2,3,4]
+                if len(indices)!=0:
+                    allindices=[]
+                    linesplit=line.split()
+                    typenums=[linesplit[i] for i in indices]
+                    typenums=[int(i) for i in typenums]
+                    for typenum in typenums: 
+                        indexes=self.GrabKeysFromValue(self.idxtosymclass,typenum)
+                        allindices.append(indexes)
+                    string='# '+str(typenums) +' = '+str(allindices)+'\n'
+                    temp.write(string)
+            temp.write(line)
+
+
+        temp.close()
+        os.remove(keyfilename)
+        os.replace(tempname,keyfilename)
+
+
+    def GrabKeysFromValue(self,dic,thevalue):
+        keylist=[]
+        for key,value in dic.items():
+            if value==thevalue:
+                keylist.append(key)
+        return keylist
 
 
     def DeleteFilesWithExtension(self,ls):
