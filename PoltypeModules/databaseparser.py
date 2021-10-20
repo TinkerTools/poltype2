@@ -1863,11 +1863,11 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             continue
         if check==False:
             if ringbond==True:
-                if (2 not in hybs): # non-aromatic torsion want parameters for , if ring is 4 or smaller than fragmenter will not be able to cut bond (it only includes indices from torsion plus neighbors has no mechanism to cut bond in case of 4 member ring
+                if (2 not in hybs): # non-aromatic torsion want parameters for 
                     if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
                         poormatchingpartialaromatictorsions.append(torsionindices)
                     else: # if dont have heavy atoms on either side then just fit the hydrogen torsion
-                        if len(ring)>4:
+                        if len(ring)>3:
                             if torsionindices not in torsionsmissing and poltype.dontfrag==False: # make sure fragmenter is on (wont work for < 25 atoms by default)
                                 torsionsmissing.append(torsionindices)
                         else:
@@ -2708,10 +2708,7 @@ def CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,indicestoextsmartsm
             smarts=smartsls[0]
             matchallneighbs=indicesforprmtomatchallneighbs[indices]
             smartsatomorder=indicestoextsmartsatomorders[indices]
-            if '~' in smarts or '*' in smarts or matchallneighbs==False:
-                poormatch=True
-            else:
-                poormatch=False
+            poormatch=True
             substructure = Chem.MolFromSmarts(smarts)
             substructurenumatoms=substructure.GetNumAtoms()
             if extsmartsmatchlength>substructurenumatoms or poormatch==True:
@@ -2724,10 +2721,7 @@ def CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,indicestoextsmartsm
             smarts=smartsls[0]
             matchallneighbs=indicesforprmtomatchallneighbs[indices[::-1]]
             smartsatomorder=indicestoextsmartsatomorders[indices[::-1]]
-            if '~' in smarts or '*' in smarts or matchallneighbs==False:
-                poormatch=True
-            else:
-                poormatch=False
+            poormatch=True
             substructure = Chem.MolFromSmarts(smarts)
             substructurenumatoms=substructure.GetNumAtoms()
             if extsmartsmatchlength>substructurenumatoms:

@@ -1953,7 +1953,7 @@ class PolarizableTyper():
             # option 6 reads: 'Fit Electrostatic Parameters to a Target Grid'
             
             esp.ElectrostaticPotentialFitting(self) 
-        else:
+        elif self.atomnum==1 or self.espfit==False:
             shutil.copy(self.key2fname, self.key3fname)
         # Remove header terms from the keyfile
         mpole.rm_esp_terms_keyfile(self,self.key3fname)

@@ -953,7 +953,19 @@ def AddInputCoordinatesAsDefaultConformer(poltype,m,indextocoordinates):
     return m
 
 
+def GrabNeigbsBabel(poltype,atomidx):
+    neigbindexes=[]
+    atom=poltype.mol.GetAtom(atomidx)
+    atomatomiter=openbabel.OBAtomAtomIter(atom)
+    for natom in atomatomiter:
+        natomidx=natom.GetIdx()
+        neighbindexes.append(natomidx)
+
+    return neigbindexes
+
+
 def GenerateFrag(poltype,molindexlist,mol):
+    
     molindexlist=[i+1 for i in molindexlist]
     em = openbabel.OBMol()
     oldindextonewindex={}
@@ -971,6 +983,54 @@ def GenerateFrag(poltype,molindexlist,mol):
         spinmult=atm.GetSpinMultiplicity()
         atm.SetFormalCharge(formalcharge)
 
+
+    bondstoremove=[]
+    
+    if poltype.refinenonaroringtors==False:
+        bonditer=openbabel.OBMolBondIter(poltype.mol)
+        for bond in bonditer:
+            oendidx = bond.GetEndAtomIdx()
+            obgnidx = bond.GetBeginAtomIdx()
+            if oendidx in oldindextonewindex.keys() and obgnidx not in oldindextonewindex.keys():
+                continue
+            if oendidx not in oldindextonewindex.keys() and obgnidx in oldindextonewindex.keys():
+                continue
+            if oendidx not in oldindextonewindex.keys() and obgnidx not in oldindextonewindex.keys():
+                continue
+            ringbond=bond.IsInRing()
+            bgnatom=bond.GetBeginAtom()
+            endatom=bond.GetEndAtom()
+            bgnhyb=bgnatom.GetHyb()
+            endhyb=endatom.GetHyb()
+            if ringbond==True and bgnhyb!=2 and endhyb!=2 and len(molindexlist)>=4:
+                atomindices=RingAtomicIndices(poltype,mol)
+                ring=GrabRingAtomIndicesFromInputIndex(poltype,obgnidx,atomindices)
+                a=molindexlist[0]
+                b=molindexlist[1]
+                c=molindexlist[2]
+                d=molindexlist[3]
+                if len(ring)==4: 
+                   ls=[a,d] 
+                   bondstoremove.append(ls)
+                elif len(ring)==5: 
+                   neigbindexes=GrabNeigbsBabel(poltype,a)
+                   for idx in neighbindexes:
+                       if idx not in ring:
+                           theidx=idx
+                           break
+                   ls=[a,theidx] 
+                   bondstoremove.append(ls)
+                elif len(ring)==6: 
+                   ls=[]
+                   for idx in ring:
+                       if idx!=a and idx!=b and idx!=c and idx!=d:
+                           ls.append(idx) 
+                   bondstoremove.append(ls)
+
+
+                                   
+
+
     atomiter=openbabel.OBMolAtomIter(em)
     for atom in atomiter:
         atomidx=atom.GetIdx()
@@ -980,6 +1040,9 @@ def GenerateFrag(poltype,molindexlist,mol):
     for bond in bonditer:
         oendidx = bond.GetEndAtomIdx()
         obgnidx = bond.GetBeginAtomIdx()
+        ls=[oendidx,obgnidx]
+        if ls in bondstoremove or ls[::-1] in bondstoremove:
+            continue
         if oendidx in oldindextonewindex.keys() and obgnidx not in oldindextonewindex.keys():
             if oldindextonewindex[oendidx] not in atomswithcutbonds:
                 atomswithcutbonds.append(oldindextonewindex[oendidx])
@@ -1131,21 +1194,23 @@ def GenerateWBOMatrix(poltype,molecule,moleculebabel,structfname):
     inputname,outputname=esp.CreatePsi4ESPInputFile(poltype,structfname,poltype.comespfname.replace('.com','_frag.com'),moleculebabel,poltype.maxdisk,poltype.maxmem,poltype.numproc,charge,False)
     finished,error=poltype.CheckNormalTermination(outputname)
     cmdstr='psi4 '+inputname+' '+outputname
-    try:
-         poltype.call_subsystem([cmdstr],False)
-         temp={cmdstr:outputname} 
-         finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
+    if finished==False:
+        try:
+             poltype.WriteToLog('Calling: '+cmdstr)
+             os.system(cmdstr)
+             temp={cmdstr:outputname} 
+             finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
 
-    except Exception:
-         error=True
+        except Exception:
+             error=True
     try:
         if not error:
             WBOmatrix=GrabWBOMatrixPsi4(poltype,outputname,molecule)
     except:
         cmdstr='psi4 '+inputname+' '+outputname
-        poltype.call_subsystem([cmdstr],False)
+        os.system(cmdstr)
         temp={cmdstr:outputname} 
-        inishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
+        finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
 
         WBOmatrix=GrabWBOMatrixPsi4(poltype,outputname,molecule)
 
@@ -1173,12 +1238,8 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets,non
     tempmaxgrowthcycles=poltype.maxgrowthcycles
     for torset in torlist:
         extendedtorindexes=[]
-        if torset in nonaroringtorlist:
-            onlyinputindices=True
-        else:
-            onlyinputindices=False
         for tor in torset:
-            indexes=FirstPassAtomIndexes(poltype,tor,onlyinputindices)
+            indexes=FirstPassAtomIndexes(poltype,tor)
             for index in indexes:
                 if index not in extendedtorindexes:
                     extendedtorindexes.append(index)
@@ -1633,8 +1694,8 @@ def WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWB
     fragmoltobondindexlist[fragmol]=highlightbonds
     return fragmoltoWBOmatrices,fragmoltobondindexlist
 
-def FirstPassAtomIndexes(poltype,tor,onlyinputindices):
-   molindexlist=[]
+def FirstPassAtomIndexes(poltype,tor):
+   molindexlist=[i-1 for i in tor]
    for atom in poltype.rdkitmol.GetAtoms():
        atomindex=atom.GetIdx()
        babelatomindex=atomindex+1
@@ -1642,11 +1703,7 @@ def FirstPassAtomIndexes(poltype,tor,onlyinputindices):
        if babelatomindex in tor:
            if atomindex not in molindexlist:
                molindexlist.append(atomindex)
-           if onlyinputindices==False:
-               grabneighbs=True
-           else:
-               if babelatomindex==tor[1] or babelatomindex==tor[2]: # always need neighbors of middle two atoms
-                   grabneighbs=True
+           grabneighbs=True
            if grabneighbs==True:
                for neighbatom in atom.GetNeighbors():
                    neighbatomindex=neighbatom.GetIdx()
@@ -1655,7 +1712,7 @@ def FirstPassAtomIndexes(poltype,tor,onlyinputindices):
                    babelneighbatomhyb=babelneighbatom.GetHyb()
                    if neighbatomindex not in molindexlist:
                        molindexlist.append(neighbatomindex)
-                       if neighbatom.GetIsAromatic() or (babelneighbatomisinring==True and babelneighbatomhyb==2) and onlyinputindices==False:
+                       if neighbatom.GetIsAromatic() or (babelneighbatomisinring==True and babelneighbatomhyb==2):
                            aromaticindexes=GrabAromaticAtoms(poltype,neighbatomindex+1)
                            newindexes=aromaticindexes
                            for atmidx in newindexes:
