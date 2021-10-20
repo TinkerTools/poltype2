@@ -964,8 +964,13 @@ def GrabNeigbsBabel(poltype,atomidx):
     return neigbindexes
 
 
-def GenerateFrag(poltype,molindexlist,mol):
-    
+def GenerateFrag(poltype,molindexlist,mol,torset):
+    vdwfrag=True
+    for tor in torset:
+        if len(tor)>1:
+            vdwfrag=False   
+
+ 
     molindexlist=[i+1 for i in molindexlist]
     em = openbabel.OBMol()
     oldindextonewindex={}
@@ -986,6 +991,7 @@ def GenerateFrag(poltype,molindexlist,mol):
 
     bondstoremove=[]
     
+    atomswithcutbonds=[]
     if poltype.refinenonaroringtors==False:
         bonditer=openbabel.OBMolBondIter(poltype.mol)
         for bond in bonditer:
@@ -1002,31 +1008,37 @@ def GenerateFrag(poltype,molindexlist,mol):
             endatom=bond.GetEndAtom()
             bgnhyb=bgnatom.GetHyb()
             endhyb=endatom.GetHyb()
-            if ringbond==True and bgnhyb!=2 and endhyb!=2 and len(molindexlist)>=4:
+            if ringbond==True and bgnhyb!=2 and endhyb!=2 and vdwfrag==False:
                 atomindices=RingAtomicIndices(poltype,mol)
                 ring=GrabRingAtomIndicesFromInputIndex(poltype,obgnidx,atomindices)
                 a=molindexlist[0]
                 b=molindexlist[1]
                 c=molindexlist[2]
                 d=molindexlist[3]
-                if len(ring)==4: 
-                   ls=[a,d] 
-                   bondstoremove.append(ls)
-                elif len(ring)==5: 
-                   neigbindexes=GrabNeigbsBabel(poltype,a)
-                   for idx in neighbindexes:
-                       if idx not in ring:
-                           theidx=idx
-                           break
-                   ls=[a,theidx] 
-                   bondstoremove.append(ls)
-                elif len(ring)==6: 
-                   ls=[]
-                   for idx in ring:
-                       if idx!=a and idx!=b and idx!=c and idx!=d:
-                           ls.append(idx) 
-                   bondstoremove.append(ls)
-
+                if c in ring and b in ring:
+                    if len(ring)==4: 
+                       ls=[a,d] 
+                       bondstoremove.append(ls)
+                       atomswithcutbonds.append(oldindextonewindex[a])
+                       atomswithcutbonds.append(oldindextonewindex[d])
+                    elif len(ring)==5: 
+                       neigbindexes=GrabNeigbsBabel(poltype,a)
+                       for idx in neighbindexes:
+                           if idx not in ring:
+                               theidx=idx
+                               break
+                       ls=[a,theidx] 
+                       atomswithcutbonds.append(oldindextonewindex[a])
+                       atomswithcutbonds.append(oldindextonewindex[theidx])
+                       bondstoremove.append(ls)
+                    elif len(ring)==6: 
+                       ls=[]
+                       for idx in ring:
+                           if idx!=a and idx!=b and idx!=c and idx!=d:
+                               ls.append(idx) 
+                       bondstoremove.append(ls)
+                       for idx in ls:
+                           atomswithcutbonds.append(oldindextonewindex[idx])
 
                                    
 
@@ -1035,7 +1047,6 @@ def GenerateFrag(poltype,molindexlist,mol):
     for atom in atomiter:
         atomidx=atom.GetIdx()
         formalcharge=atom.GetFormalCharge()
-    atomswithcutbonds=[]
     bonditer=openbabel.OBMolBondIter(poltype.mol)
     for bond in bonditer:
         oendidx = bond.GetEndAtomIdx()
@@ -1269,7 +1280,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets,non
         if not os.path.isdir(fragfoldername):
             os.mkdir(fragfoldername)
         os.chdir(fragfoldername)
-        fragmol,parentindextofragindex=GenerateFrag(poltype,extendedtorindexes,mol)
+        fragmol,parentindextofragindex=GenerateFrag(poltype,extendedtorindexes,mol,torset)
         growfragments=[]
         filename=fragfoldername+'.mol'
         WriteRdkitMolToMolFile(poltype,fragmol,filename)
@@ -1508,7 +1519,7 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,torset,fra
                 indexlist=possiblefragatmidxs[fragmolidx]
 
                 basename=fragfoldername+'_GrowFragment_'+str(fragmolidx)
-                fragmol,parentindextofragindex=GenerateFrag(poltype,indexlist,mol)
+                fragmol,parentindextofragindex=GenerateFrag(poltype,indexlist,mol,torset)
                 fragments.append(fragmol) # include the case where all H and no H converted to CH3
                 if fragmol not in fragmentsforcomb:
                     fragmentsforcomb.append(fragmol)
