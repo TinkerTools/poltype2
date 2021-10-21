@@ -23,7 +23,7 @@ import symmetry as symm
 import shlex
 import itertools
 import apicall as call
-
+import math
 
 
 def AssignTotalCharge(poltype,molecule,babelmolecule):
@@ -542,7 +542,7 @@ def PartitionResources(poltype):
     maxdisk,diskstring=ExtractResource(poltype,poltype.maxdisk)
     maxdisk=maxdisk/poltype.jobsatsametime
     tempmaxdisk=str(maxdisk)+diskstring
-    numproc=int(int(poltype.numproc)/poltype.jobsatsametime)
+    numproc=math.floor(int(poltype.numproc)/poltype.jobsatsametime)
     tempnumproc=str(numproc)
 
     return tempmaxmem,tempmaxdisk,tempnumproc
@@ -725,6 +725,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 classkey=torgen.get_class_key(poltype,torsion[0],torsion[1],torsion[2],torsion[3])
                 smilesposstring,fragtorstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,equivtorsion,parentindextofragindex,fragidxarray)
                 parentclasskeytofragclasskey[classkey]=fragclasskey
+
                 classkeytosmartsposarray[classkey]=smilesposstring
                 classkeytosmarts[classkey]=fragsmarts
                 classkeytotorsionindexes[classkey]=fragtorstring
@@ -959,7 +960,7 @@ def GrabNeigbsBabel(poltype,atomidx):
     atomatomiter=openbabel.OBAtomAtomIter(atom)
     for natom in atomatomiter:
         natomidx=natom.GetIdx()
-        neighbindexes.append(natomidx)
+        neigbindexes.append(natomidx)
 
     return neigbindexes
 
@@ -1023,7 +1024,7 @@ def GenerateFrag(poltype,molindexlist,mol,torset):
                        atomswithcutbonds.append(oldindextonewindex[d])
                     elif len(ring)==5: 
                        neigbindexes=GrabNeigbsBabel(poltype,a)
-                       for idx in neighbindexes:
+                       for idx in neigbindexes:
                            if idx not in ring:
                                theidx=idx
                                break
