@@ -1403,10 +1403,6 @@ class PolarizableTyper():
                 if check==True:
                     os.remove(f)
 
-    def CheckMemorySettings(self):
-        proc=int(self.numproc)
-        if proc>8:
-            raise ValueError('Too many input processors, lower the numproc value to 8 or less')
            
     
     def CheckInputCharge(self,molecule):
@@ -1707,7 +1703,6 @@ class PolarizableTyper():
     def GenerateParameters(self):
         if self.deleteallnonqmfiles==True:
             self.DeleteAllNonQMFiles()
-        self.CheckMemorySettings()       
         if self.inputmoleculefolderpaths!=None:
             self.CreatePoltypeInputFilesMultipleMolecules() 
         if self.optmaxcycle>=100:
