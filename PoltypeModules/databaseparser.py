@@ -814,7 +814,7 @@ def FindSMARTSAtomLocations(poltype,smartsfortransfer):
 
 def GenerateFragmentSMARTSList(poltype,ls):
     fragsmartslist=[]
-    atomindiceslist=GenerateAllPossibleFragmentIndices(poltype,ls,poltype.rdkitmol,100)
+    atomindiceslist=GenerateAllPossibleFragmentIndices(poltype,ls,poltype.rdkitmol,15)
     for thels in atomindiceslist:
         smarts,smartsfortransfer=GenerateFragmentSMARTS(poltype,thels)
         if smartsfortransfer not in fragsmartslist:
@@ -854,18 +854,16 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
     parametersmartstonumcommon={}
     parametersmartstootherscore={}
     parametersmartstofoundallneighbs={}
-    
     newls=copy.deepcopy(ls)
     usemcsonly=False
-    if usemcsonly==False:
+    if usemcsonly==False or (len(ls)==1 and ls[0]==26):
         fragsmartslist=GenerateFragmentSMARTSList(poltype,newls)
-
     for parametersmarts in parametersmartslist:
         prmmol=Chem.MolFromSmarts(parametersmarts)
         smartsmatchingtoindices=[]
         molsmatchingtoindices=[]
         finalfragsmartslist=[]
-        if usemcsonly==False:
+        if usemcsonly==False or (len(ls)==1 and ls[0]==26):
             for fragsmarts in fragsmartslist:
                 fragmol=Chem.MolFromSmarts(fragsmarts)
                 diditmatch=prmmol.HasSubstructMatch(fragmol)
@@ -886,7 +884,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
         thesmartstoelementscore={}
 
         thesmartstothemol={}
-        if usemcsonly==False:
+        if usemcsonly==False or (len(ls)==1 and ls[0]==26):
             for fragsmarts in finalfragsmartslist:
                 fragmol=Chem.MolFromSmarts(fragsmarts)
                 molsmatchingtoindices.append(fragmol)
@@ -2145,13 +2143,15 @@ def ConvertIndicesDictionaryToPoltypeClasses(poltype,indicestovalue,indicestotin
                 poltypeclasses=tuple(tinkerclassestopoltypeclasses[tinkerclasses[::-1]])
             else:
                 continue
+            babelindices=[i+1 for i in indices]
+            symclasses=tuple([poltype.idxtosymclass[i] for i in babelindices])
             for ls in poltypeclasses:
-                ls=tuple([ls])
-                if ls not in poltypeclassestovalue.keys():
-                    poltypeclassestovalue[ls]=[]
-                    if value not in poltypeclassestovalue[ls]:
-                        poltypeclassestovalue[ls].append(value)
-
+                if ls==symclasses or ls==symclasses[::-1]:
+                    ls=tuple([ls])
+                    if ls not in poltypeclassestovalue.keys():
+                        poltypeclassestovalue[ls]=[]
+                        if value not in poltypeclassestovalue[ls]:
+                            poltypeclassestovalue[ls].append(value)
     return poltypeclassestovalue 
 
 def CheckIfStringInStringList(poltype,string,stringlist):
@@ -4324,7 +4324,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         
         torsionindicestoextsmartsatomorders=TrimDictionary(poltype,torsionindicestoextsmartsatomorders,torsionindicestoextsmarts)
         atomindextotinkertype,atomindextotinkerclass,atomindextoparametersmartsatomorder,atomindextoelementtinkerdescrip,atomindextosmartsatomorder=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
-       
+ 
         bondindicestotinkertypes,bondindicestotinkerclasses,bondindicestoparametersmartsatomorders,bondindicestoelementtinkerdescrips,bondindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,bondsforprmtoparametersmarts,bondsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
 
  
