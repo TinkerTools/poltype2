@@ -681,8 +681,10 @@ def GenerateFragmentSMARTS(poltype,ls):
         mw.AddAtom(oldatom)
         oldindextonewindex[idx]=i
         oldatombabel=poltype.mol.GetAtom(idx+1)
-        isinring=oldatombabel.IsAromatic()
-        if isinring==True:
+        isaro=oldatombabel.IsAromatic()
+        isinring=oldatombabel.IsInRing()
+        hyb=oldatombabel.GetHyb()
+        if isaro==True and isinring==True and hyb==2:
             aromaticindices.append(i)
 
     
@@ -776,17 +778,24 @@ def SanitizeSMARTSAromaticity(poltype,aromaticsmartsatomlocations,atomicnumtosym
     for locidx in aromaticsmartsatomlocations:
         e=smartsfortransfer[locidx]
         removeprev=False
+        removeafter=False
         if e.isdigit():
             digit=int(e)
             symbol=atomicnumtosymbol[digit]
             e=symbol
             removeprev=True
+            nextone=smartsfortransfer[locidx+1]
+            if nextone.isdigit()==True:
+                removeafter=True
         else:
             if e.islower():
                 e=e.upper()
         newstring[locidx]=e
         if removeprev==True:
              newstring[locidx-1]=''
+        if removeafter==True:
+             newstring[locidx+1]=''
+
     smartsfortransfer=''.join(newstring)
     return smartsfortransfer 
 
@@ -805,7 +814,9 @@ def FindSMARTSAtomLocations(poltype,smartsfortransfer):
         else:
             if inbrack==True:
                 if e.isdigit()==True or e.isalpha()==True:
-                    smartatomlocations.append(eidx)   
+                    prev=smartsfortransfer[eidx-1]
+                    if prev.isdigit()==False:
+                        smartatomlocations.append(eidx)   
 
 
 
@@ -1742,11 +1753,11 @@ def GrabRingAtomIndices(poltype,mol,ring):
     return ringatomindices
 
 def GrabRingAtomIndicesFromInputIndex(poltype,atomindex,atomindices):
-    ring=None
     for ring in atomindices:
         if atomindex in ring:
             return ring
 
+    ring=None
     return ring
 
 def GrabIndicesInRing(poltype,babelindices,ring):
