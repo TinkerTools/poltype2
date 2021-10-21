@@ -862,12 +862,24 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
 
             else:
                 if finished==True and outputlog not in finishedjobs:
-                    finishedjobs.append(outputlog)
+                    obConversion = openbabel.OBConversion()
+                    mol = openbabel.OBMol()
+                    obConversion.SetInFormat('xyz')
+                    obConversion.ReadFile(mol, cartxyz)
+                    obConversion.SetOutFormat('mol')
+                    obConversion.WriteFile(mol,'temp.mol')
+                    m=Chem.MolFromMolFile('temp.mol',removeHs=False)
+                    smarts=rdmolfiles.MolToSmarts(m)
+                    if '.' in smarts:
+                        poltype.WriteToLog('Warining: Fragments detected in file from optimization, will remove point from fitting  '+outputlog)
+                    else:
+                        finishedjobs.append(outputlog)
 
     firstfinishedjobs=finishedjobs[:]
     for job in firstfinishedjobs:
         if job not in finishedjobs:
             finishedjobs.append(job)
+    print('finishedjobs',finishedjobs)
     fulllistofjobs=[]
     fulljobtolog={}
     fulljobtooutputlog={}
@@ -890,6 +902,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             if outputlog in finishedjobs and outputlog not in errorjobs:
                 finishedoutputlogs.append(outputlog)
                 finishedflatphaselist.append(phaselist)
+        print('finishedoutputlogs',finishedoutputlogs)
         outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangles,optlogtosplog,inputfilepaths,outputfilenames,executables=ExecuteSPJobs(poltype,finishedoutputlogs,finishedflatphaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,mol,optlogtosplog,optlogtophaseangle)
         lognames=[]
         torsettospoutputlogs[tuple(torset)]=outputlogs

@@ -1732,7 +1732,9 @@ class PolarizableTyper():
             m = Chem.AddHs(m)
             AllChem.EmbedMolecule(m)
         Chem.SanitizeMol(m)
-
+        smarts=rdmolfiles.MolToSmarts(m)
+        if '.' in smarts:
+            raise ValueError('Multiple fragments detectected in input molecule')
         pcm=self.CheckForConcentratedFormalCharges(m,atomindextoformalcharge)
         cpm = copy.deepcopy(m)
         if self.firstoptfinished==False:
