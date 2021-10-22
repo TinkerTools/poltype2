@@ -1022,10 +1022,15 @@ def GenerateFrag(poltype,molindexlist,mol,torset):
                        bondstoremove.append(ls)
                        atomswithcutbonds.append(oldindextonewindex[a])
                        atomswithcutbonds.append(oldindextonewindex[d])
-                    elif len(ring)==5: 
-                       neigbindexes=GrabNeigbsBabel(poltype,a)
+                    elif len(ring)==5:
+                       if a in ring:
+                           idx=a
+                       elif d in ring:
+                           idx=d
+                        
+                       neigbindexes=GrabNeigbsBabel(poltype,idx)
                        for idx in neigbindexes:
-                           if idx not in ring:
+                           if idx in ring and idx!=a and idx!=b and idx!=c and idx!=d:
                                theidx=idx
                                break
                        ls=[a,theidx] 
@@ -1041,7 +1046,6 @@ def GenerateFrag(poltype,molindexlist,mol,torset):
                        for idx in ls:
                            atomswithcutbonds.append(oldindextonewindex[idx])
 
-                                   
 
 
     atomiter=openbabel.OBMolAtomIter(em)
