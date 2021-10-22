@@ -1324,7 +1324,7 @@ class PolarizableTyper():
         temp.close()
         for lineidx in range(len(results)):
             line=results[lineidx]
-            if 'torsion' in line and '#' not in line and 'Missing' not in line:
+            if 'torsion' in line and '#' not in line and 'Missing' not in line and 'none' not in line:
                 allzero=True
                 linesplit=line.split()
                 ls=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3]),int(linesplit[4])]
@@ -1470,7 +1470,7 @@ class PolarizableTyper():
  
                 totchg+=chg
             atomindextoformalcharge[atomidx]=chg
-        if self.totalcharge!=None: 
+        if self.totalcharge!=None:
             if self.totalcharge!=totchg:
                 for row in array:
                     print(row,flush=True)
@@ -1697,7 +1697,12 @@ class PolarizableTyper():
 
         sys.exit()
 
-
+    def CheckIfAtomsAreAllowed(self,m):
+        listofallowedatoms=[1,6,7,8,915,16,17,35,53]
+        for atom in m.GetAtoms():
+            atomicnum=atom.GetAtomicNum()
+            if atomicnum not in listofallowedatoms:
+                raise ValueError('Element not allowed! '+str(atomicnum)) 
 
 
     def GenerateParameters(self):
@@ -1724,6 +1729,7 @@ class PolarizableTyper():
         obConversion.WriteFile(mol,self.molstructfnamemol)
         indextocoordinates=self.GrabIndexToCoordinates(mol)
         m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False,sanitize=False)
+        self.CheckIfAtomsAreAllowed(m)
         m,atomindextoformalcharge=self.CheckInputCharge(m)
         if self.allowradicals==True:
             self.dontfrag=True # Psi4 doesnt allow UHF and properties (like compute WBO) for fragmenter, so need to turn of fragmenter if radical detected
@@ -2146,7 +2152,7 @@ class PolarizableTyper():
         temp=open(tempname,'w')
        
         for line in results:
-            if '#' not in line:
+            if '#' not in line and 'none' not in line:
                 indices=[]
                 if 'multipole' in line or 'polarize' in line or 'vdw' in line:
                     indices=[1]

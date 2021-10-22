@@ -868,10 +868,14 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                     obConversion.ReadFile(mol, cartxyz)
                     obConversion.SetOutFormat('mol')
                     obConversion.WriteFile(mol,'temp.mol')
-                    m=Chem.MolFromMolFile('temp.mol',removeHs=False)
-                    smarts=rdmolfiles.MolToSmarts(m)
-                    if '.' in smarts:
-                        poltype.WriteToLog('Warining: Fragments detected in file from optimization, will remove point from fitting  '+outputlog)
+                    try:
+                        m=Chem.MolFromMolFile('temp.mol',removeHs=False,sanitize=False)
+                  
+                        smarts=rdmolfiles.MolToSmarts(m)
+                        if '.' in smarts:
+                            poltype.WriteToLog('Warining: Fragments detected in file from optimization, will remove point from fitting  '+outputlog)
+                    except:
+                        pass
                     else:
                         finishedjobs.append(outputlog)
 

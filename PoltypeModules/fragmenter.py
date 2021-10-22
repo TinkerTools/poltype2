@@ -1042,8 +1042,12 @@ def GenerateFrag(poltype,molindexlist,mol,torset):
                        for idx in ring:
                            if idx!=a and idx!=b and idx!=c and idx!=d:
                                ls.append(idx) 
-                       bondstoremove.append(ls)
+                       newls=[]
                        for idx in ls:
+                           if idx in oldindextonewindex.keys():
+                               newls.append(idx)
+                       bondstoremove.append(newls)
+                       for idx in newls:
                            atomswithcutbonds.append(oldindextonewindex[idx])
 
 
