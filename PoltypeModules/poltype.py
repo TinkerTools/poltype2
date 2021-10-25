@@ -1698,7 +1698,7 @@ class PolarizableTyper():
         sys.exit()
 
     def CheckIfAtomsAreAllowed(self,m):
-        listofallowedatoms=[1,6,7,8,915,16,17,35,53,9]
+        listofallowedatoms=[1,6,7,8,15,16,17,35,53,9]
         for atom in m.GetAtoms():
             atomicnum=atom.GetAtomicNum()
             if atomicnum not in listofallowedatoms:
