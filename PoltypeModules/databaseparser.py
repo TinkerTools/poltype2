@@ -2826,9 +2826,20 @@ def CheckTrigonalCenters(poltype,listofbondsforprm,mol):
         atoms=[mol.GetAtom(i) for i in babelindices]     
         for a in atoms:
             hyb=a.GetHyb()
+            numhyds=0
             neighbs=list(openbabel.OBAtomAtomIter(a))
+            for natom in neighbs:
+                natomicnum=natom.GetAtomicNum()
+                if natomicnum==1:
+                    numhyds+=1
+            idx=a.GetIdx()
+            atomicnum=a.GetAtomicNum()
             if len(neighbs)==3 and hyb==2:
-                boolarray.append(True)
+                if atomicnum==7 and numhyds==2:
+                    boolarray.append(False)
+
+                else:
+                    boolarray.append(True)
             else:
                 boolarray.append(False)
         opbendbondindicestotrigonalcenterbools[bondindices]=boolarray
@@ -4061,14 +4072,10 @@ def TestBondAngleEquilValues(poltype):
     shutil.copy(poltype.key4fname,tmpkeyfile)
     shutil.copy(poltype.xyzoutfile,tmpxyzfile)
     cmd = poltype.minimizeexe+' -k '+tmpkeyfile+' '+tmpxyzfile+' 0.1 > testbondangleequilvalues.out'
-    poltype.call_subsystem([cmd], False)
-    temp={cmd:'testbondangleequilvalues.out'} 
-    finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
+    poltype.call_subsystem([cmd], True)
 
     cmd = poltype.analyzeexe+' -k '+tmpkeyfile+' '+tmpxyzfile+'_2'+' d > '+alzout
-    poltype.call_subsystem([cmd], False)
-    temp={cmd:alzout} 
-    finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
+    poltype.call_subsystem([cmd], True)
 
     bondindicestonewbondequilvalues,angleindicestonewbondequilvalues=CheckBondAngleDeviationsFromQM(poltype,alzout)
    

@@ -164,6 +164,7 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
             idxtotrisecbool[a.GetIdx()]=False
         for atom in openbabel.OBMolAtomIter(mol):
             atomidx=atom.GetIdx()
+            hyb=atom.GetHyb()
             val=atom.GetValence()
             atomicnum=atom.GetAtomicNum()
             atomneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(atom)]
@@ -176,6 +177,7 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
             if len(sorteduniquetypeneighbsnorepeat)!=0:
                 highestsymneighbnorepeatidx=sorteduniquetypeneighbsnorepeat[0]
                 highestsymneighbnorepeat=mol.GetAtom(highestsymneighbnorepeatidx)
+                highestsymneighbnorepeathyb=highestsymneighbnorepeat.GetHyb()
                 highestsymneighbnorepeatatomicnum=highestsymneighbnorepeat.GetAtomicNum()
                 numhydsneighb=GrabNumberOfConnectedHydrogens(poltype,highestsymneighbnorepeat)
                 highestsymneighbnorepeatval=highestsymneighbnorepeat.GetValence()
@@ -196,8 +198,7 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     lfzerox[atomidx - 1]=True
                     foundcase=True
                     
-                elif ((val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==3) or (val==3 and len(uniqueneighbtypes)==2 and (highestsymneighbnorepeatval==3 or highestsymneighbnorepeatval==4))) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1 and (numhyds==2 or numhydsneighb==2):  # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector, need len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1 otherwise hits dimethylamine. Need to specify numhyds otherwise will hit nitrobenzene N/C
-
+                elif ((val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==3 and highestsymneighbnorepeathyb!=2) or (val==3 and hyb!=2 and len(uniqueneighbtypes)==2 and (highestsymneighbnorepeatval==3 or highestsymneighbnorepeatval==4))) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1 and (numhyds==2 or numhydsneighb==2):  # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector, need len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1 otherwise hits dimethylamine. Need to specify numhyds otherwise will hit nitrobenzene N/C
                     idxtobisecthenzbool[atomidx]=True
                     if atomicnum==6:
                         bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
@@ -291,7 +292,7 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     lfzerox[atomidx - 1]=True
             
 
-                elif len(uniqueneighbtypes)==2 and val==3: # benzene, one carbon in anilne
+                elif len(uniqueneighbtypes)==2 and val==3: # benzene, one carbon in aniline
                     typenumtocnt={}
                     neighbtypes=[poltype.idxtosymclass[b.GetIdx()] for b in atomneighbs]
                     for typenum in neighbtypes:
