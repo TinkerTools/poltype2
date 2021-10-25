@@ -1011,11 +1011,11 @@ def GenerateFrag(poltype,molindexlist,mol,torset):
             endhyb=endatom.GetHyb()
             if ringbond==True and bgnhyb!=2 and endhyb!=2 and vdwfrag==False:
                 atomindices=RingAtomicIndices(poltype,mol)
-                ring=GrabRingAtomIndicesFromInputIndex(poltype,obgnidx,atomindices)
                 a=molindexlist[0]
                 b=molindexlist[1]
                 c=molindexlist[2]
                 d=molindexlist[3]
+                ring=GrabRingAtomIndicesFromInputIndex(poltype,[a,b,c,d],atomindices)
                 if c in ring and b in ring:
                     if len(ring)==4: 
                        ls=[a,d] 
@@ -1966,10 +1966,19 @@ def RingAtomicIndices(poltype,mol):
         atomindices.append(ringatomindices)        
     return atomindices
 
-def GrabRingAtomIndicesFromInputIndex(poltype,atomindex,atomindices):
+def GrabRingAtomIndicesFromInputIndex(poltype,atomindexlist,atomindices):
+    ringtocount={}
     for ring in atomindices:
-        if atomindex in ring:
+        count=0
+        for atomindex in atomindexlist:
+            if atomindex in ring:
+                count+=1
+        ringtocount[tuple(ring)]=count
+    maxcount=max(ringtocount.values())
+    for ring,count in ringtocount.items():
+        if count==maxcount:
             return ring
+
     ring=None
     return ring
 
@@ -1986,7 +1995,7 @@ def GrabRingAtomIndices(poltype,mol,ring):
 
 def GrabAromaticAtoms(poltype,neighbatomidx):
     atomindices=RingAtomicIndices(poltype,poltype.mol)
-    ring=GrabRingAtomIndicesFromInputIndex(poltype,neighbatomidx,atomindices)
+    ring=GrabRingAtomIndicesFromInputIndex(poltype,[neighbatomidx],atomindices)
     aromaticindexes=[]
     if ring!=None:
         babelatoms=[poltype.mol.GetAtom(atmindex) for atmindex in ring]

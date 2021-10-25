@@ -1539,7 +1539,7 @@ def process_rot_bond_tors(poltype,mol):
         poltype.torfit1Drotonly=False
         poltype.torfit2Drotonly=True 
         cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,indicesremoveddic,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified,classkeylisttoindicesalreadydicremoved= get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,'_postQMOPTpostfit')
-        PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,mol,tmpkey2basename,indicesremoved,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified)
+        PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,mol,tmpkey2basename,indicesremoveddic,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified)
 
     shutil.copy(tmpkey2basename,'../' + poltype.key5fname)
     os.chdir('..')

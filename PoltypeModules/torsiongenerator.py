@@ -883,7 +883,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     for job in firstfinishedjobs:
         if job not in finishedjobs:
             finishedjobs.append(job)
-    print('finishedjobs',finishedjobs)
     fulllistofjobs=[]
     fulljobtolog={}
     fulljobtooutputlog={}
@@ -906,7 +905,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             if outputlog in finishedjobs and outputlog not in errorjobs:
                 finishedoutputlogs.append(outputlog)
                 finishedflatphaselist.append(phaselist)
-        print('finishedoutputlogs',finishedoutputlogs)
         outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangles,optlogtosplog,inputfilepaths,outputfilenames,executables=ExecuteSPJobs(poltype,finishedoutputlogs,finishedflatphaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,mol,optlogtosplog,optlogtophaseangle)
         lognames=[]
         torsettospoutputlogs[tuple(torset)]=outputlogs
