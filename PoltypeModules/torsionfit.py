@@ -208,9 +208,10 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
         angle_list.append(angles)
     nonecount=energy_list.count(None)
     normalpts=len(energy_list)-nonecount
-    prmnum=poltype.torsionsettonumptsneeded[torset]
-    if normalpts<prmnum:
-        raise ValueError('Too many missing QM SP energy values for torsion set = '+str(torset)+' , need '+str(prmnum)+' points') 
+    if torset in poltype.torsionsettonumptsneeded.keys():
+        prmnum=poltype.torsionsettonumptsneeded[torset]
+        if normalpts<prmnum:
+            raise ValueError('Too many missing QM SP energy values for torsion set = '+str(torset)+' , need '+str(prmnum)+' points') 
     rows = zip(*[angle_list, energy_list])
     rows=sorted(rows)
     rows0=list([i[0] for i in rows])
@@ -1723,6 +1724,7 @@ def GenerateTorTorClasskey(poltype,firsttor,secondtor,idxtosymclass,mol):
             break
     path=[i+1 for i in path]
     tortoratomidxs=[path[0],path[1],path[2],path[3],path[4]]
+    print('tortoratomidxs',tortoratomidxs)
     tortortypeidxs=[idxtosymclass[j] for j in tortoratomidxs]
     tortortypeidxs=[str(j) for j in tortortypeidxs]
     tortorclskey=' '.join(tortortypeidxs)

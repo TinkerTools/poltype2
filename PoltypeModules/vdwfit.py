@@ -29,7 +29,7 @@ def CheckAllVdwTypesExist(poltype,keyfilename):
     temp.close()
     vdwtypes=[]
     for line in results:
-        if 'vdw' in line and '#' not in line:
+        if 'vdw ' in line and '#' not in line:
             linesplit=line.split()
             atomtype=int(linesplit[1])
             vdwtypes.append(atomtype)
@@ -1182,9 +1182,8 @@ def GrabMoleculeCoords(poltype,indextoreferencecoordinate,indextomolecule,molecu
     coords=[indextoreferencecoordinate[i] for i in moleculeatoms]
     return coords,moleculeatoms
 
-
-def FindBestGridPoint(poltype,x,y,z,moleculecoords,probecoords,indextoreferencecoordinate,refcoord,refdistance):
-    bestgridpoint=[]
+def FindBestGridPoints(poltype,x,y,z,moleculecoords,probecoords,indextoreferencecoordinate,refcoord,refdistance):
+    bestgridpoints=[]
     maxdistprobe,maxcoordprobe=FindLongestDistanceInMolecule(poltype,probecoords)
     differencetopoint={}
     for i in range(len(x)):
@@ -1196,19 +1195,32 @@ def FindBestGridPoint(poltype,x,y,z,moleculecoords,probecoords,indextoreferencec
                 point=np.array([xvalue,yvalue,zvalue])
                 nosteric=True
                 for coord in moleculecoords:
-                    distance=np.linalg.norm(np.array(coord)-np.array(point))
-                    if distance<2*maxdistprobe: 
-                       nosteric=False
-                       break
+                    if not np.array_equal(np.array(refcoord),np.array(coord)):
+                        distance=np.linalg.norm(np.array(coord)-np.array(point))
+                        if distance<refdistance: # want to be at least refdistance away from other atoms and also target atom, if any closer then not probing the target atom  
+                           nosteric=False
+                           break
                 if nosteric==True:
-                    distance=np.linalg.norm(np.array(refcoord)-np.array(point))
+                    distance=np.linalg.norm(np.array(refcoord)-np.array(point))-refdistance
                     difference=np.abs(distance) 
                     differencetopoint[difference]=point
-    mindifference=min(differencetopoint.keys())
-    bestgridpoint=differencetopoint[mindifference] 
+
+    sorted_dict = {}
+    sorted_keys = sorted(differencetopoint.keys())  
+    for w in sorted_keys:
+        sorted_dict[w] = differencetopoint[w]
+    count=0
+    diffs=[]
+    for key,value in sorted_dict.items():
+        count+=1
+        bestgridpoints.append(value)
+        diffs.append(key)
+        if count>poltype.vdwmaxtinkergridpoints:
+            break
+    return bestgridpoints
 
 
-    return bestgridpoint
+
 
 def TranslateProbe(poltype,indextoreferencecoordinate,bestgridpoint,probecoords,probeatoms,probedonorindex):
     transvec=np.array(bestgridpoint)-np.array(indextoreferencecoordinate[probedonorindex]) 
@@ -1221,7 +1233,7 @@ def TranslateProbe(poltype,indextoreferencecoordinate,bestgridpoint,probecoords,
     return indextoreferencecoordinate
 
 
-def GenerateStartingDimer(poltype,indextoreferencecoordinate,indexpairtoreferencedistance,distpairs,indextomolecule):
+def GenerateStartingDimers(poltype,indextoreferencecoordinate,indexpairtoreferencedistance,distpairs,indextomolecule):
     moleculecoords,moleculeatoms=GrabMoleculeCoords(poltype,indextoreferencecoordinate,indextomolecule,'molecule1')
     probecoords,probeatoms=GrabMoleculeCoords(poltype,indextoreferencecoordinate,indextomolecule,'molecule2')
     x,y,z=Generate3DMeshGrid(poltype,moleculecoords,probecoords) 
@@ -1234,83 +1246,60 @@ def GenerateStartingDimer(poltype,indextoreferencecoordinate,indexpairtoreferenc
             refdistance=indexpairtoreferencedistance[distpair]
         elif molecule=='molecule2':
             probeindex=index
-    bestgridpoint=FindBestGridPoint(poltype,x,y,z,moleculecoords,probecoords,indextoreferencecoordinate,refcoord,refdistance)
-    
-    indextoreferencecoordinate=TranslateProbe(poltype,indextoreferencecoordinate,bestgridpoint,probecoords,probeatoms,probeindex)
+    bestgridpoints=FindBestGridPoints(poltype,x,y,z,moleculecoords,probecoords,indextoreferencecoordinate,refcoord,refdistance)
+    listofindextoreferencecoordinate=[]
+    for bestgridpoint in bestgridpoints:
+        newindextoreferencecoordinate=indextoreferencecoordinate.copy()
+        newindextoreferencecoordinate=TranslateProbe(poltype,newindextoreferencecoordinate,bestgridpoint,probecoords,probeatoms,probeindex)
+        listofindextoreferencecoordinate.append(newindextoreferencecoordinate)
+
+
+    return listofindextoreferencecoordinate
 
 
 
-    return indextoreferencecoordinate
 
 
-def optimizedimer(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,mol,probemol,probeidxtosymclass):
+def optimizedimers(poltype,atoms1, atoms2, coords1, coords2, p1, p2, oridimer,vdwradius,mol,probemol,probeidxtosymclass):
     indextoreferencecoordinate,indextoreferenceelement,indextomolecule,indextotargetatom=GenerateInitialDictionaries(coords1,coords2,atoms1,atoms2,p1,p2) 
     indexpairtoreferencedistance,indexpairtobounds,distpairs=GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indextotargetatom,indextoreferenceelement,vdwradius)
     indexpairtoreferencedistanceoriginal=indexpairtoreferencedistance.copy()
-    indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb=GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol,indextoreferencecoordinate)
-    indextoreferencecoordinate=GenerateStartingDimer(poltype,indextoreferencecoordinate,indexpairtoreferencedistance,distpairs,indextomolecule)
-    
-    with open(dimer, "w") as f:
-      f.write(str(len(indextoreferencecoordinate.keys()))+"\n")
-      f.write("\n")
-      for index,coordinate in indextoreferencecoordinate.items():
-          element=indextoreferenceelement[index]
-          f.write("%3s %12.5f%12.5f%12.5f\n"%(element, coordinate[0], coordinate[1], coordinate[2]))
-    if 'water' in dimer:
-        waterbool=True
-    else:
-        waterbool=False
-    outputxyz=dimer.replace('.xyz','-tinkermin.xyz')
-    probeatoms=len(atoms2)
-    ConvertProbeDimerXYZToTinkerXYZ(poltype,dimer,poltype.xyzoutfile,outputxyz,waterbool,probeatoms)
-    outputxyz,restraints=MinimizeDimer(poltype,outputxyz,poltype.key5fname,indexpairtoreferencedistanceoriginal,indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb,p1,p2,atoms1,probeidxtosymclass)
-    return outputxyz,restraints
+    listofindextoreferencecoordinate=GenerateStartingDimers(poltype,indextoreferencecoordinate,indexpairtoreferencedistance,distpairs,indextomolecule)
+    minstructs=[]
+    for i in range(len(listofindextoreferencecoordinate)):
+        indextoreferencecoordinate=listofindextoreferencecoordinate[i]
+        dimer=oridimer.replace('.xyz','_'+str(i)+'.xyz')
+        with open(dimer, "w") as f:
+          f.write(str(len(indextoreferencecoordinate.keys()))+"\n")
+          f.write("\n")
+          for index,coordinate in indextoreferencecoordinate.items():
+              element=indextoreferenceelement[index]
+              f.write("%3s %12.5f%12.5f%12.5f\n"%(element, coordinate[0], coordinate[1], coordinate[2]))
+        if 'water' in dimer:
+            waterbool=True
+        else:
+            waterbool=False
+        outputxyz=dimer.replace('.xyz','-tinkermin.xyz')
+        probeatoms=len(atoms2)
+        ConvertProbeDimerXYZToTinkerXYZ(poltype,dimer,poltype.xyzoutfile,outputxyz,waterbool,probeatoms)
+        outputxyz=MinimizeDimer(poltype,outputxyz,poltype.key5fname)
+        minstructs.append(outputxyz)
+    return minstructs
 
-def MinimizeDimer(poltype,inputxyz,keyfile,indexpairtoreferencedistanceoriginal,indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb,p1,p2,atoms1,probeidxtosymclass):
-    p2shifted=p2+len(atoms1)
-    inputpair=tuple([p1,p2shifted])
-    distanceguess=GrabPairwiseDistance(inputpair,indexpairtoreferencedistanceoriginal)
-    distanceratio=.1
-    distanceforceconstant=1 # kcal/mol/ang^2
-    angleforceconstant=.1 # kcal/mol/deg^2
-    lower,upper=GrabUpperLowerBounds(poltype,distanceguess,distanceratio)
-    lower=0 # only for distance since want flat-bottom
-    p1babel=p1+1
-    p2babel=p2+1+len(atoms1)
-    restraints=[[p1babel,p2babel]]
-    resstring='RESTRAIN-DISTANCE '+str(p1babel)+' '+str(p2babel)+' '+str(distanceforceconstant)+' '+str(lower)+' '+str(upper)+'\n'
-    reslist=[resstring]
-    angleratio=.03
-    anglereslist=[]
-    anglereslist,restraints=GrabAngleRestraints(poltype,indicestoreferenceangleprobe,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,restraints)
-    anglereslist,restraints=GrabAngleRestraints(poltype,indicestoreferenceanglemoleculeneighb,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,restraints)
-    anglereslist,restraints=GrabAngleRestraints(poltype,indicestoreferenceanglemoleculeneighbneighb,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,restraints)
-    reslist.extend(anglereslist)
-    tempkeyfilename=inputxyz.replace('.xyz','.key')
-    shutil.copyfile(keyfile,tempkeyfilename)
-    temp=open(tempkeyfilename,'a')
-    for line in reslist:
-        temp.write(line)
-    temp.close()
+def MinimizeDimer(poltype,inputxyz,keyfile):
     torminlogfname=inputxyz.replace('.xyz','.out')
-    mincmdstr = poltype.minimizeexe+' '+inputxyz+' -k '+tempkeyfilename+' 0.1'+' '+'>'+torminlogfname
+    mincmdstr = poltype.minimizeexe+' '+inputxyz+' -k '+keyfile+' 0.1'+' '+'>'+torminlogfname
     term,error=poltype.CheckNormalTermination(torminlogfname)
     if term==True and error==False:
         pass
     else:
         poltype.call_subsystem([mincmdstr],True)
 
-
     finaloutputxyz=inputxyz+'_2'
-    newfilename=inputxyz.replace('.xyz','cart.xyz')
-    ConvertTinktoXYZ(poltype,finaloutputxyz,newfilename)
-    maxresidx=2
-    newrestraints=[]
-    for residx in range(len(restraints)):
-        res=restraints[residx]
-        if residx<=maxresidx:
-            newrestraints.append(res)
-    return newfilename,newrestraints
+    return finaloutputxyz
+
+
+
 
 def ConvertTinktoXYZ(poltype,filename,newfilename):
     temp=open(os.getcwd()+r'/'+filename,'r')
@@ -1413,7 +1402,8 @@ def GrabWaterTypes(poltype):
     probeidxtosymclass={1:349,2:350,3:350}
     return probeidxtosymclass
 
-def GenerateInitialProbeStructure(poltype,missingvdwatomindices):
+
+def GenerateInitialProbeStructures(poltype,missingvdwatomindices):
     molecules = [poltype.xyzfname]
     probes = GenerateProbePathNames(poltype,poltype.vdwprobenames,poltype.xyzfname)
     vdwradius = {"H" : 1.20, "Li": 1.82, "Na": 2.27, "K": 2.75, "Rb": 3.03, "Cs": 3.43, \
@@ -1428,7 +1418,6 @@ def GenerateInitialProbeStructure(poltype,missingvdwatomindices):
         mol_spots = missingvdwatomindices.copy()
         mol_spots = [i-1 for i in mol_spots]
         moldimernames=[]
-        atomrestraintslist=[]
         for prob in probes:
             probename=os.path.basename(prob)
             prefix=poltype.molstructfname.split('.')[0]
@@ -1457,25 +1446,33 @@ def GenerateInitialProbeStructure(poltype,missingvdwatomindices):
                 probelist=[]
                 probeindiceslist=[]
                 moleculeindiceslist=[]
-                reslist=[]
                 for p2 in prob_spots:
                     e1=atoms1[p1]
                     e2=atoms2[p2]
                     if e1=='H' and e2=='H':
                         continue
                     dimer = mol[:-4] + "-" + probename[:-4] + "_" + str("%d_%d"%(p1+1,len(atoms1)+p2+1)) + ".xyz"
-                    outputxyz,restraints=optimizedimer(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,poltype.mol,probemol,probeidxtosymclass)
-                    probelist.append(outputxyz)
-                    probeindiceslist.append(p2+1+len(atoms1))
-                    moleculeindiceslist.append(p1+1)
-                    reslist.append(restraints)
+                    minstructs=optimizedimers(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,poltype.mol,probemol,probeidxtosymclass)
+                    probelist.append(minstructs)
+                    probevalue=p2+1+len(atoms1)
+                    ls=[]
+                    for k in range(len(minstructs)):
+                        ls.append(probevalue)
+                    probeindiceslist.append(ls)
+                    molvalue=p1+1
+                    ls=[]
+                    for k in range(len(minstructs)):
+                        ls.append(molvalue)
+                    moleculeindiceslist.append(ls)
                 moleculeindices.append(moleculeindiceslist)
                 probeindices.append(probeindiceslist)
                 moldimernames.append(probelist)
-                atomrestraintslist.append(reslist)
                 numberprobeatoms.append(probemol.NumAtoms())
 
-    return moldimernames,probeindices,moleculeindices,numberprobeatoms,atomrestraintslist
+    return moldimernames,probeindices,moleculeindices,numberprobeatoms
+
+
+
 
 def GrabKeysFromValue(poltype,dic,thevalue):
     keylist=[]
@@ -1590,6 +1587,127 @@ def RemoveIgnoredIndices(poltype,probeindices,moleculeindices,moleculeprobeindic
 
     return finalprobeindices,finalmoleculeindices
 
+
+def CheckIfProbeIsTooFar(poltype,mol,probeindex,moleculeindex,probeatoms):
+    checktoofar=False
+    moleculeatom=mol.GetAtom(moleculeindex)
+    probeatom=mol.GetAtom(probeindex)
+    moleculeatomcoords=np.array([moleculeatom.GetX(),moleculeatom.GetY(),moleculeatom.GetZ()])
+    probeatomcoords=np.array([probeatom.GetX(),probeatom.GetY(),probeatom.GetZ()])
+    dist=np.linalg.norm(probeatomcoords-moleculeatomcoords)
+    if dist>=7:
+        checktoofar=True
+    atomiter=openbabel.OBMolAtomIter(mol)
+    total=0
+    for atom in atomiter:
+        total+=1
+
+    maxatomindex=total-probeatoms
+    atomiter=openbabel.OBMolAtomIter(mol)
+
+    for atom in atomiter:
+        atomindex=atom.GetIndex()
+        if atomindex!=(moleculeindex+1) and atomindex<=maxatomindex and atomindex!=(probeindex+1):
+            moleculeatomcoords=np.array([atom.GetX(),atom.GetY(),atom.GetZ()])
+            otherdist=np.linalg.norm(probeatomcoords-moleculeatomcoords)
+            if otherdist<dist:
+                checktoofar=True
+
+
+    return checktoofar
+
+
+
+def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprobeatoms):
+    newdimerfiles=[]
+    newprobeindices=[]
+    newmoleculeindices=[]
+    newnumberprobeatoms=[]
+    moleculeindextofilenamearray={}
+    moleculeindextoenergyarray={}
+    moleculeindextoprobeindexarray={}
+    moleculeindextonumberofprobeatoms={}
+    obConversion = openbabel.OBConversion()
+
+    for i in range(len(probeindices)):
+        filenameslistoflist=dimerfiles[i]
+        probeindexlistoflist=probeindices[i]
+        moleculeindexlistoflist=moleculeindices[i]
+        probeatoms=numberprobeatoms[i]
+        filenameslist = [item for sublist in filenameslistoflist for item in sublist]
+        probeindexlist = [item for sublist in probeindexlistoflist for item in sublist]
+        moleculeindexlist = [item for sublist in moleculeindexlistoflist for item in sublist]
+        for j in range(len(filenameslist)):
+            filename=filenameslist[j]
+            probeindex=probeindexlist[j]
+            moleculeindex=moleculeindexlist[j]
+            
+            newfilename=filename.replace('.xyz_2','cart.xyz')
+            ConvertTinktoXYZ(poltype,filename,newfilename)
+            mol = openbabel.OBMol()
+            inFormat = obConversion.FormatFromExt(newfilename)
+            obConversion.SetInFormat(inFormat)
+            obConversion.ReadFile(mol, newfilename)
+            checktoofar=CheckIfProbeIsTooFar(poltype,mol,probeindex,moleculeindex,probeatoms)
+            if checktoofar==True:
+                continue
+            filenameout=filename.replace('.xyz_2','.alz')
+            term,error=poltype.CheckNormalTermination(filenameout)
+            if term==True and error==False:
+                pass
+            else:
+                cmdstr=poltype.analyzeexe+' '+filename+' '+'-k '+poltype.key5fname +' e '+'> '+filenameout
+                poltype.call_subsystem([cmdstr],True)
+            energy=ReadIntermolecularEnergyMM(poltype,filenameout)
+            if moleculeindex not in moleculeindextofilenamearray.keys():
+                moleculeindextofilenamearray[moleculeindex]=[]
+            moleculeindextofilenamearray[moleculeindex].append(newfilename)
+            if moleculeindex not in moleculeindextoenergyarray.keys():
+                moleculeindextoenergyarray[moleculeindex]=[]
+            moleculeindextoenergyarray[moleculeindex].append(energy)
+            if moleculeindex not in moleculeindextoprobeindexarray.keys():
+                moleculeindextoprobeindexarray[moleculeindex]=[]
+            moleculeindextoprobeindexarray[moleculeindex].append(probeindex)
+            if moleculeindex not in moleculeindextonumberofprobeatoms.keys():
+                moleculeindextonumberofprobeatoms[moleculeindex]=[]
+            moleculeindextonumberofprobeatoms[moleculeindex].append(probeatoms)
+
+    for moleculeindex,energyarray in moleculeindextoenergyarray.items():
+        s = np.array(energyarray)
+        sort_index = np.argsort(s)
+        filenamearray=np.array(moleculeindextofilenamearray[moleculeindex])
+        filenamearray=filenamearray[sort_index]
+        probeindexarray=moleculeindextoprobeindexarray[moleculeindex]
+        probeindexarray=np.array(probeindexarray)
+        probeindexarray=probeindexarray[sort_index]
+        probeatomarray=moleculeindextonumberofprobeatoms[moleculeindex]
+        probeatomarray=np.array(probeatomarray)
+        probeatomarray=probeatomarray[sort_index]
+        count=0
+        tempnewmoleculeindices=[]
+        tempnewprobeindices=[]
+        tempnewdimerfiles=[]
+        tempprobeatoms=[]
+        for i in range(len(filenamearray)):
+            filename=filenamearray[i]
+            
+            probeindex=probeindexarray[i]
+            probeatoms=probeatomarray[i]
+            count+=1
+            if count>poltype.vdwmaxqmstartingpointspertype:
+                break
+
+            tempnewmoleculeindices.append(moleculeindex)
+            tempnewprobeindices.append(probeindex)
+            tempnewdimerfiles.append(filename)
+            tempprobeatoms.append(probeatoms)
+        newdimerfiles.append(tempnewdimerfiles)
+        newprobeindices.append(tempnewprobeindices)
+        newmoleculeindices.append(tempnewmoleculeindices)
+        newnumberprobeatoms.append(tempprobeatoms)
+
+    return newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms
+
 def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     poltype.parentdir=os.getcwd()+r'/'
     vdwfoldername='vdw'
@@ -1610,8 +1728,8 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
         poltype.espmethod='wB97X-D'
         poltype.espbasisset="aug-cc-pVDZ"
     if poltype.debugmode==True:
-        poltype.espmethod='HF'
-        poltype.espbasisset="MINIX"
+        poltype.espmethod='hf'
+        poltype.espbasisset="minix"
 
     tempuse_gaus=poltype.use_gaus
     tempuse_gausoptonly=poltype.use_gausoptonly
@@ -1621,7 +1739,11 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebabio18.prm"
     ReplaceParameterFileHeader(poltype,paramhead,poltype.key5fname)
     array=[.8,.9,1,1.1,1.2]
-    dimerfiles,probeindices,moleculeindices,numberprobeatoms,atomrestraintslist=GenerateInitialProbeStructure(poltype,missingvdwatomindices)
+
+
+    dimerfiles,probeindices,moleculeindices,numberprobeatoms=GenerateInitialProbeStructures(poltype,missingvdwatomindices)
+    dimerfiles,probeindices,moleculeindices,numberprobeatoms=FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprobeatoms)
+
     obConversion = openbabel.OBConversion()
     checkarray=[]
     fullprefixarrays=[]
@@ -1630,19 +1752,17 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     originalcharge=poltype.mol.GetTotalCharge()
     originalmul=poltype.mol.GetTotalSpinMultiplicity()
     moleculeprobeindicestoignore=[] # if opt fails
-
     for i in range(len(probeindices)):
         filenameslist=dimerfiles[i]
-        restraintslist=atomrestraintslist[i]
         probeindexlist=probeindices[i]
         moleculeindexlist=moleculeindices[i]
-        probeatoms=numberprobeatoms[i]
+        probeatomslist=numberprobeatoms[i]
         distancearrays=[]
         prefixarrays=[]
         filenamesarray=[] 
         for probeidx in range(len(probeindexlist)):
+            probeatoms=int(probeatomslist[probeidx])
             filename=filenameslist[probeidx]
-            restraints=restraintslist[probeidx]
             mol = openbabel.OBMol()
             if 'water' in filename:
                 totchg=originalcharge
@@ -1653,7 +1773,8 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             mol.SetTotalCharge(totchg)
             mol.SetTotalSpinMultiplicity(totmul)
             chk=mol.GetTotalCharge()
-            probeindex=probeindexlist[probeidx]
+            probeindex=int(probeindexlist[probeidx])
+    
             moleculeindex=moleculeindexlist[probeidx]
             inFormat = obConversion.FormatFromExt(filename)
             obConversion.SetInFormat(inFormat)

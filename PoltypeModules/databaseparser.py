@@ -1703,10 +1703,13 @@ def FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertop
         second=bndlist[1]
         babelfirst=[i+1 for i in first]
         babelsecond=[i+1 for i in second]
-        if (babelfirst in poltype.partialdoublebonds or babelfirst[::-1] in poltype.partialdoublebonds):
-            continue    
-        if (babelsecond in poltype.partialdoublebonds or babelsecond[::-1] in poltype.partialdoublebonds):
-            continue    
+        if not (babelfirst in poltype.onlyrotbndslist or babelfirst[::-1] in poltype.onlyrotbndslist):
+            if (babelfirst in poltype.partialdoublebonds or babelfirst[::-1] in poltype.partialdoublebonds):
+                continue
+        if not (babelsecond in poltype.onlyrotbndslist or babelsecond[::-1] in poltype.onlyrotbndslist):
+
+            if (babelsecond in poltype.partialdoublebonds or babelsecond[::-1] in poltype.partialdoublebonds):
+                continue    
 
         b,c=first[:]
         d=second[0]

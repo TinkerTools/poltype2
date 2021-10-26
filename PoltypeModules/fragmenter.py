@@ -129,7 +129,6 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
                     tortorclasskeytosmartsposarray=json.load(open("tortorclasskeytosmartsposarray.txt"))
                     tortorclasskeytosmarts=json.load(open("tortorclasskeytosmarts.txt"))
                     tortorclasskeytotorsionindexes=json.load(open("tortorclasskeytotorsionindexes.txt"))
-
                     fragsymmtorlist=[]
                     for tor in parentsymmtorlist:
                         if tor in parentclasskeytofragclasskey.keys():
@@ -636,10 +635,11 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             fragmentfilepath=rotbndindextofragmentfilepath[rotbndindex]
             head,tail=os.path.split(fragmentfilepath)
             os.chdir(head)
-            parentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
             
             if i==0:
                 equivalentrotbndindex=rotbndindex
+
+            parentindextofragindex=rotbndindextoparentindextofragindex[equivalentrotbndindex]
             if vdwfragment==False:
                 MakeFileName(poltype,equivalentrotbndindex,'equivalentfragment.txt')
                 rotbndindexes=rotbndindex.split('_')
@@ -647,7 +647,6 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 rotbndindexes=[int(j)-1 for j in parentrotbndindexes]
                 fragrotbndindexes=[parentindextofragindex[j] for j in rotbndindexes]
                 fragrotbndindexes=[j+1 for j in fragrotbndindexes]
-
                 for j in range(0,len(fragrotbndindexes),2):
                     fragrotbnd=str(fragrotbndindexes[j])+' '+str(fragrotbndindexes[j+1])
                     if fragrotbnd not in fragrotbnds:
@@ -738,14 +737,10 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 firstfragtor=[parentindextofragindex[k] for k in firstrdkittor]
                 secondfragtor=[parentindextofragindex[k] for k in secondrdkittor]
 
-                
-
                 firstfragtorbabel=[k+1 for k in firstfragtor]
                 secondfragtorbabel=[k+1 for k in secondfragtor]
 
                 fragtortorclskey,fragtortoratomidxs=torsionfit.GenerateTorTorClasskey(poltype,firstfragtorbabel,secondfragtorbabel,fragidxtosymclass,fragmol)
-
-
                 smilesposstring,fragtorstring=GenerateSMARTSPositionStringAndAtomIndices(poltype,tortoratomidxs,parentindextofragindex,fragidxarray)
                 parenttortorclasskeytofragtortorclasskey[tortorclskey]=fragtortorclskey
                 tortorclasskeytosmartsposarray[tortorclskey]=smilesposstring
