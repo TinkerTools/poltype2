@@ -1646,7 +1646,6 @@ def GrowPossibleFragmentAtomIndexes(poltype,rdkitmol,indexes):
         indexlist=indexes.copy()
         for idx in comb:
            aromaticindexes=GrabAromaticAtoms(poltype,idx+1)
-           
            newindexes=aromaticindexes
            for atmidx in newindexes:
                if atmidx not in indexlist:
@@ -1970,9 +1969,10 @@ def GrabRingAtomIndicesFromInputIndex(poltype,atomindexlist,atomindices):
                 count+=1
         ringtocount[tuple(ring)]=count
     maxcount=max(ringtocount.values())
-    for ring,count in ringtocount.items():
-        if count==maxcount:
-            return ring
+    if maxcount!=0:
+        for ring,count in ringtocount.items():
+            if count==maxcount:
+                return ring
 
     ring=None
     return ring

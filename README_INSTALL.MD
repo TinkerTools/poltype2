@@ -68,16 +68,16 @@ You may need to run "conda init bash" and then source ~/.bashrc first.
 After you have conda in your PATH, run the following commands. These will be installed under "/home/username/miniconda3/". You can use the provided `environment.yml` file to create a conda environment named "poltype" with `conda env create -f environment.yml`, or run the following commands:
 
 ```shell
-conda create -n poltype python=3.6 psi4=1.3.2+ecbda83 -c psi4 --yes
+conda create -n poltype python=3.7 psi4=1.4.1+cd00f19 -c psi4 --yes
 conda activate poltype
-conda install scipy --yes
-conda install matplotlib --yes
+conda install scipy=1.7.1 --yes
+conda install matplotlib=3.4.3 --yes
 conda install -c conda-forge openbabel=2.4.1 --yes
-conda install git pip --yes
-conda install -c conda-forge rdkit --yes
-conda install -c conda-forge mdanalysis --yes
-conda install -c conda-forge svgutils --yes
-conda install -c conda-forge cairosvg --yes
+conda install git pip=21.3.1 --yes
+conda install -c conda-forge rdkit=2021.09.2 --yes
+conda install -c conda-forge mdanalysis=2.0.0 --yes
+conda install -c conda-forge svgutils=0.3.4 --yes
+conda install -c conda-forge cairosvg=2.5.2 --yes
 ```
 
 ### Environment var for running POLTYPE:

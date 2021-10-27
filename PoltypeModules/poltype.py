@@ -2021,6 +2021,8 @@ class PolarizableTyper():
                 self.torlist.append(ls)
         if self.dontdotor==True and self.dontdovdwscan==True:
             shutil.copy(self.key4fname,self.key5fname)
+
+        self.AddIndicesToKey(self.key4fname)
         self.torsettofilenametorset={}
         self.torsettotortorindex={}
         self.torsettotortorphaseindicestokeep={}
@@ -2089,7 +2091,6 @@ class PolarizableTyper():
             torgen.RemoveStringFromKeyfile(self,self.key5fname,'solvate GK')
         if self.atomnum!=1: 
              esp.CheckDipoleMoments(self,optmol)
-        self.AddIndicesToKey(self.tmpkeyfile)
         self.FinalVDWMultipoleCheck(self.tmpkeyfile)
         self.WriteToLog('Poltype Job Finished'+'\n')
         

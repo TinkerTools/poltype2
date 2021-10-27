@@ -867,6 +867,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
     parametersmartstofoundallneighbs={}
     newls=copy.deepcopy(ls)
     usemcsonly=False
+    print('ls',ls,flush=True)
     if usemcsonly==False or (len(ls)==1 and ls[0]==26):
         fragsmartslist=GenerateFragmentSMARTSList(poltype,newls)
     for parametersmarts in parametersmartslist:
@@ -1551,6 +1552,7 @@ def CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol):
         allhydrogentoroneside=False
     else:
         torlist=[]
+        
         iteratomatom = openbabel.OBAtomAtomIter(b)
         for iaa in iteratomatom:
             iteratomatom2 = openbabel.OBAtomAtomIter(c)
@@ -1567,6 +1569,29 @@ def CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol):
             datomnum=atoms[3].GetAtomicNum()
             if aatomnum!=1 and datomnum!=1:
                 allhydrogentoroneside=False
+    catomicnum=c.GetAtomicNum()
+    batomicnum=b.GetAtomicNum()
+    bhydcount=0
+    iteratomatom = openbabel.OBAtomAtomIter(b)
+    for iaa in iteratomatom:
+        atomicnum=iaa.GetAtomicNum()
+        if atomicnum==1:
+            bhydcount+=1
+
+    chydcount=0
+    iteratomatom = openbabel.OBAtomAtomIter(c)
+    for iaa in iteratomatom:
+        atomicnum=iaa.GetAtomicNum()
+        if atomicnum==1:
+            chydcount+=1
+    if batomicnum==6 and bhydcount==3:
+        allhydrogentoroneside=False
+
+    if catomicnum==6 and chydcount==3:
+        allhydrogentoroneside=False
+
+
+
     return allhydrogentoroneside
 
 
@@ -1846,6 +1871,8 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                 break
 
         check=CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,matcharray)
+        checknonarotor=CheckIfNeighborsExistInSMARTMatch(poltype,[aidx,bidx,cidx,didx],matcharray)
+
         if '~' in smarts or '*' in smarts:
             check=False
         if ringbond==True:
@@ -1876,14 +1903,15 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         if check==False:
             if ringbond==True:
                 if (2 not in hybs): # non-aromatic torsion want parameters for 
-                    if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
-                        poormatchingpartialaromatictorsions.append(torsionindices)
-                    else: # if dont have heavy atoms on either side then just fit the hydrogen torsion
-                        if len(ring)>3:
-                            if torsionindices not in torsionsmissing and poltype.dontfrag==False: # make sure fragmenter is on (wont work for < 25 atoms by default)
-                                torsionsmissing.append(torsionindices)
-                        else:
+                    if checknonarotor==False:
+                        if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
                             poormatchingpartialaromatictorsions.append(torsionindices)
+                        else: # if dont have heavy atoms on either side then just fit the hydrogen torsion
+                            if len(ring)>3:
+                                if torsionindices not in torsionsmissing and poltype.dontfrag==False: # make sure fragmenter is on (wont work for < 25 atoms by default)
+                                    torsionsmissing.append(torsionindices)
+                            else:
+                                poormatchingpartialaromatictorsions.append(torsionindices)
 
                         
                 elif hybs[1]==2 and hybs[2]==2:
