@@ -729,98 +729,12 @@ def GenerateFragmentSMARTS(poltype,ls):
     testmol=Chem.MolFromSmarts(smartsfortransfer)
     diditmatch=mw.HasSubstructMatch(testmol)
     atomicnumtosymbol={6:'c',7:'n',8:'o'}
-    if diditmatch==True and len(aromaticindices)==1:
-        matches=mw.GetSubstructMatches(testmol)
-        firstmatch=matches[0]
-        indices=list(range(len(firstmatch)))
-        smartsindextomoleculeindex=dict(zip(indices,firstmatch)) 
-        aromaticsmartindices=[smartsindextomoleculeindex[i] for i in aromaticindices]
-        smartatomlocations=FindSMARTSAtomLocations(poltype,smartsfortransfer)
-        smartsindextosmartslocindex=dict(zip(indices,smartatomlocations)) 
-        aromaticsmartsatomlocations=[smartsindextosmartslocindex[i] for i in  aromaticsmartindices]
-        smartsfortransfer=SanitizeSMARTSAromaticity(poltype,aromaticsmartsatomlocations,atomicnumtosymbol,smartsfortransfer)
-
-
+    
     return smarts,smartsfortransfer
 
 
-def SanitizeSMARTS(poltype,smartsmcs):
-    atomicnumtosymbol={6:'c',7:'n',8:'o'}
-    aromaticindices=[]
-    for i in range(len(poltype.rdkitmol.GetAtoms())):
-        oldatombabel=poltype.mol.GetAtom(i+1)
-        isaro=oldatombabel.IsAromatic()
-        if isaro==True:
-            aromaticindices.append(i)
-
-    testmol=Chem.MolFromSmarts(smartsmcs)
-    diditmatch=poltype.rdkitmol.HasSubstructMatch(testmol)
-    if diditmatch==True and len(aromaticindices)!=0:
-        matches=poltype.rdkitmol.GetSubstructMatches(testmol)
-        firstmatch=matches[0]
-        indices=list(range(len(firstmatch)))
-        moleculeindextosmartsindex=dict(zip(firstmatch,indices))
-        newaromaticindices=[]
-        for idx in aromaticindices:
-            if idx in moleculeindextosmartsindex.keys():
-                newaromaticindices.append(idx)
-        if len(newaromaticindices)==1:
-            aromaticsmartindices=[moleculeindextosmartsindex[i] for i in newaromaticindices]
-            smartatomlocations=FindSMARTSAtomLocations(poltype,smartsmcs)
-            smartsindextosmartslocindex=dict(zip(indices,smartatomlocations)) 
-            aromaticsmartsatomlocations=[smartsindextosmartslocindex[i] for i in  aromaticsmartindices]
-            smartsmcs=SanitizeSMARTSAromaticity(poltype,aromaticsmartsatomlocations,atomicnumtosymbol,smartsmcs)
-    return smartsmcs
 
 
-def SanitizeSMARTSAromaticity(poltype,aromaticsmartsatomlocations,atomicnumtosymbol,smartsfortransfer):
-    newstring=[e for e in smartsfortransfer]
-    for locidx in aromaticsmartsatomlocations:
-        e=smartsfortransfer[locidx]
-        removeprev=False
-        removeafter=False
-        if e.isdigit():
-            digit=int(e)
-            symbol=atomicnumtosymbol[digit]
-            e=symbol
-            removeprev=True
-            nextone=smartsfortransfer[locidx+1]
-            if nextone.isdigit()==True:
-                removeafter=True
-        else:
-            if e.islower():
-                e=e.upper()
-        newstring[locidx]=e
-        if removeprev==True:
-             newstring[locidx-1]=''
-        if removeafter==True:
-             newstring[locidx+1]=''
-
-    smartsfortransfer=''.join(newstring)
-    return smartsfortransfer 
-
-
-
-def FindSMARTSAtomLocations(poltype,smartsfortransfer):
-    smartatomlocations=[]
-    for eidx in range(len(smartsfortransfer)):
-        e=smartsfortransfer[eidx]
-        if e=='[':
-            inbrack=True
-
-        elif e==']':
-            inbrack=False
-
-        else:
-            if inbrack==True:
-                if e.isdigit()==True or e.isalpha()==True:
-                    prev=smartsfortransfer[eidx-1]
-                    if prev.isdigit()==False:
-                        smartatomlocations.append(eidx)   
-
-
-
-    return smartatomlocations
 
 
 def GenerateFragmentSMARTSList(poltype,ls):
@@ -858,6 +772,19 @@ def FindHowManyBondTypes(poltype,trymol,atomidx):
 
     return atomtype
 
+
+def GrabAromaticIndices(poltype,match,themol):
+    aromaticindices=[]
+    for index in match:
+        atom=themol.GetAtomWithIdx(index)
+        isaro=atom.GetIsAromatic()
+        if isaro==True:
+            aromaticindices.append(index)
+
+    return aromaticindices
+
+
+
 def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,parametersmartstosmartslist,ls,rdkitmol):
     smartsmcstomol={}
     prmsmartstomcssmarts={}
@@ -867,14 +794,14 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
     parametersmartstofoundallneighbs={}
     newls=copy.deepcopy(ls)
     usemcsonly=False
-    if usemcsonly==False or (len(ls)==1 and ls[0]==26):
+    if usemcsonly==False:
         fragsmartslist=GenerateFragmentSMARTSList(poltype,newls)
     for parametersmarts in parametersmartslist:
         prmmol=Chem.MolFromSmarts(parametersmarts)
         smartsmatchingtoindices=[]
         molsmatchingtoindices=[]
         finalfragsmartslist=[]
-        if usemcsonly==False or (len(ls)==1 and ls[0]==26):
+        if usemcsonly==False:
             for fragsmarts in fragsmartslist:
                 fragmol=Chem.MolFromSmarts(fragsmarts)
                 diditmatch=prmmol.HasSubstructMatch(fragmol)
@@ -886,7 +813,6 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
         atomnum=res.numAtoms
         smartsmcs=res.smartsString
             
-        smartsmcs=SanitizeSMARTS(poltype,smartsmcs)
         prmsmartsatomnum=prmmol.GetNumAtoms()
         mcsmol=Chem.MolFromSmarts(smartsmcs)
         molsmatchingtoindices.append(mcsmol)
@@ -895,7 +821,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
         thesmartstoelementscore={}
 
         thesmartstothemol={}
-        if usemcsonly==False or (len(ls)==1 and ls[0]==26):
+        if usemcsonly==False:
             for fragsmarts in finalfragsmartslist:
                 fragmol=Chem.MolFromSmarts(fragsmarts)
                 molsmatchingtoindices.append(fragmol)
@@ -903,6 +829,8 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
          
         for idx in range(len(smartsmatchingtoindices)):
             thesmarts=smartsmatchingtoindices[idx]
+            #if len(ls)==1 and ls[0]==7:
+            #    print('thesmarts',thesmarts)
             themol=molsmatchingtoindices[idx]
             thesmartstothemol[thesmarts]=themol
             diditmatchprmmol=prmmol.HasSubstructMatch(themol)
@@ -911,6 +839,9 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
             if diditmatch==True and diditmatchprmmol==True:
                 matches=poltype.rdkitmol.GetSubstructMatches(themol)
                 firstmatch=matches[0]
+                aromaticindices=GrabAromaticIndices(poltype,firstmatch,poltype.rdkitmol)
+                #if len(ls)==1 and ls[0]==7:
+                #    print('aromaticindices',aromaticindices)
                 if len(firstmatch)>=len(ls):
                     for match in matches:
                         goodmatch=True
@@ -970,6 +901,16 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                                indices=list(range(len(match)))
                                smartsindextomoleculeindex=dict(zip(indices,match)) 
                                moleculeindextosmartsindex={v: k for k, v in smartsindextomoleculeindex.items()}
+                        #if len(ls)==1 and ls[0]==7:
+                        #    print('moleculeindextosmartsindex',moleculeindextosmartsindex)
+                        #    newaromaticindices=[]
+                        #    for index in aromaticindices:
+                        #        if index in moleculeindextosmartsindex.keys():
+                        #            newaromaticindices.append(index)
+
+                        #    aromaticsmartindices=[moleculeindextosmartsindex[i] for i in newaromaticindices]
+                        #    print('aromaticsmartindices',aromaticsmartindices)
+
 
                         smartindices=[moleculeindextosmartsindex[i] for i in ls]
                         matches=prmmol.GetSubstructMatches(themol)
@@ -978,7 +919,12 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                         indices=list(range(len(firstmatch)))
                         smartsindextoparametersmartsindex=dict(zip(indices,firstmatch)) 
                         prmsmartsindices=[smartsindextoparametersmartsindex[i] for i in smartindices]
+                        #if len(ls)==1 and ls[0]==7:
+                        #    aromaticprmsmartsindices=[smartsindextoparametersmartsindex[i] for i in aromaticsmartindices]
+                        #    print('aromaticprmsmartsindices',aromaticprmsmartsindices,'parametersmarts',parametersmarts)
 
+                            #aromaticprmindices=GrabAromaticIndices(poltype,aromaticprmsmartsindices,prmmol)
+                            #print('aromaticprmindices',aromaticprmindices)
 
                         prmsmartsatomicnumtonum={}
                         for atomicnum,num in rdkitatomicnumtonum.items():
@@ -4263,7 +4209,6 @@ def StiffenZThenBisectorAngleConstants(poltype,keyfilename):
                 c=newlinesplit[2]
                 angle=tuple([b,a,c])
                 angles.append(angle)
-    print('angles',angles)
     for line in results:
         if 'angle ' in line and '#' not in line:
             linesplit=line.split()
