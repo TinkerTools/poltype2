@@ -773,12 +773,14 @@ def FindHowManyBondTypes(poltype,trymol,atomidx):
     return atomtype
 
 
-def GrabAromaticIndices(poltype,match,themol):
+def GrabAromaticIndices(poltype,match,themol,ls):
     aromaticindices=[]
+
     for index in match:
         atom=themol.GetAtomWithIdx(index)
-        isaro=atom.GetIsAromatic()
-        if isaro==True:
+        isinring=atom.IsInRing()
+        hyb=atom.GetHybridization()
+        if isinring==True and hyb==Chem.HybridizationType.SP2:
             aromaticindices.append(index)
 
     return aromaticindices
@@ -829,8 +831,6 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
          
         for idx in range(len(smartsmatchingtoindices)):
             thesmarts=smartsmatchingtoindices[idx]
-            #if len(ls)==1 and ls[0]==7:
-            #    print('thesmarts',thesmarts)
             themol=molsmatchingtoindices[idx]
             thesmartstothemol[thesmarts]=themol
             diditmatchprmmol=prmmol.HasSubstructMatch(themol)
@@ -839,9 +839,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
             if diditmatch==True and diditmatchprmmol==True:
                 matches=poltype.rdkitmol.GetSubstructMatches(themol)
                 firstmatch=matches[0]
-                aromaticindices=GrabAromaticIndices(poltype,firstmatch,poltype.rdkitmol)
-                #if len(ls)==1 and ls[0]==7:
-                #    print('aromaticindices',aromaticindices)
+                aromaticindices=GrabAromaticIndices(poltype,firstmatch,poltype.rdkitmol,ls)
                 if len(firstmatch)>=len(ls):
                     for match in matches:
                         goodmatch=True
@@ -901,15 +899,12 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                                indices=list(range(len(match)))
                                smartsindextomoleculeindex=dict(zip(indices,match)) 
                                moleculeindextosmartsindex={v: k for k, v in smartsindextomoleculeindex.items()}
-                        #if len(ls)==1 and ls[0]==7:
-                        #    print('moleculeindextosmartsindex',moleculeindextosmartsindex)
-                        #    newaromaticindices=[]
-                        #    for index in aromaticindices:
-                        #        if index in moleculeindextosmartsindex.keys():
-                        #            newaromaticindices.append(index)
+                        newaromaticindices=[]
+                        for index in aromaticindices:
+                            if index in moleculeindextosmartsindex.keys():
+                                newaromaticindices.append(index)
 
-                        #    aromaticsmartindices=[moleculeindextosmartsindex[i] for i in newaromaticindices]
-                        #    print('aromaticsmartindices',aromaticsmartindices)
+                        aromaticsmartindices=[moleculeindextosmartsindex[i] for i in newaromaticindices]
 
 
                         smartindices=[moleculeindextosmartsindex[i] for i in ls]
@@ -919,12 +914,12 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                         indices=list(range(len(firstmatch)))
                         smartsindextoparametersmartsindex=dict(zip(indices,firstmatch)) 
                         prmsmartsindices=[smartsindextoparametersmartsindex[i] for i in smartindices]
-                        #if len(ls)==1 and ls[0]==7:
-                        #    aromaticprmsmartsindices=[smartsindextoparametersmartsindex[i] for i in aromaticsmartindices]
-                        #    print('aromaticprmsmartsindices',aromaticprmsmartsindices,'parametersmarts',parametersmarts)
+                        aromaticprmsmartsindices=[smartsindextoparametersmartsindex[i] for i in aromaticsmartindices]
 
-                            #aromaticprmindices=GrabAromaticIndices(poltype,aromaticprmsmartsindices,prmmol)
-                            #print('aromaticprmindices',aromaticprmindices)
+                        
+                        aromaticprmindices=GrabAromaticIndices(poltype,aromaticprmsmartsindices,prmmol,ls)
+                        if len(aromaticprmindices)!=len(aromaticprmsmartsindices):
+                            continue
 
                         prmsmartsatomicnumtonum={}
                         for atomicnum,num in rdkitatomicnumtonum.items():
