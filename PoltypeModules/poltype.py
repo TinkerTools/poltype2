@@ -679,7 +679,7 @@ class PolarizableTyper():
                         print('Unrecognized '+line)
                         sys.exit()
 
-
+        self.firsterror=False
         if self.debugmode==True:
             self.optmethod="HF"      
             self.toroptmethod="HF"         
@@ -1148,6 +1148,7 @@ class PolarizableTyper():
                     if size==0:
                         continue
                 finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
+                print('outputlog',outputlog,'finished',finished,'error',error,flush=True)
                 if finished==True and error==False: # then check if SP has been submitted or not
                     if outputlog not in finishedjobs:
                         self.NormalTerm(outputlog)
@@ -1727,7 +1728,6 @@ class PolarizableTyper():
         obConversion.ReadFile(mol, self.molstructfname)
         
         self.atomnum=mol.NumAtoms() 
-        # Begin log. *-poltype.log
         self.logfh = open(self.logfname,"w",buffering=1)
 
         obConversion.SetOutFormat('mol')
@@ -1967,11 +1967,11 @@ class PolarizableTyper():
         mpole.rm_esp_terms_keyfile(self,self.key3fname)
         if self.atomnum!=1: 
             esp.ElectrostaticPotentialComparison(self) 
-            #if self.failedrmspd==True and self.deletedfiles==False:
-            #    self.DeleteFilesWithExtension(['pot','grid','key','xyz','key_2','key_3','key_4','key_5','xyz_2','cube'])
-            #    self.DeleteFilesWithString(['esp','dma'])
-            #    self.deletedfiles=True
-            #    self.GenerateParameters()
+            if self.failedrmspd==True and self.deletedfiles==False:
+                self.DeleteFilesWithExtension(['pot','grid','key','xyz','key_2','key_3','key_4','key_5','xyz_2','cube'])
+                self.DeleteFilesWithString(['esp','dma'])
+                self.deletedfiles=True
+                self.GenerateParameters()
 
         
         
@@ -1988,6 +1988,7 @@ class PolarizableTyper():
         # databaseparser.py method is called to find parameters and append them to the keyfile
         if not os.path.exists(self.key4fname):
             databaseparser.appendtofile(self,self.key3fname,self.key4fname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo)
+            databaseparser.StiffenZThenBisectorAngleConstants(self,self.key4fname)
             databaseparser.TestBondAngleEquilValues(self)
             if self.databasematchonly==True:
                 sys.exit()
@@ -2142,10 +2143,21 @@ class PolarizableTyper():
                 missingmpole.append(typenum)
 
         if len(missingvdw)!=0:
-            raise ValueError('Missing vdw parameters '+str(missingvdw))
+            if self.firsterror==True:
+                raise ValueError('Missing vdw parameters '+str(missingvdw))
+            else:
+                self.firsterror=False
+                self.DeleteFilesWithExtension(['key','xyz','key_2','key_3','key_4','key_5','xyz_2'])
+                self.GenerateParameters()
+
 
         if len(missingmpole)!=0:
-            raise ValueError('Missing multipole parameters '+str(missingmpole))
+            if self.firsterror==True:
+                raise ValueError('Missing multipole parameters '+str(missingmpole))
+            else:
+                self.firsterror=False
+                self.DeleteFilesWithExtension(['key','xyz','key_2','key_3','key_4','key_5','xyz_2'])
+                self.GenerateParameters()
 
 
     def AddIndicesToKey(self,keyfilename):
@@ -2215,7 +2227,7 @@ class PolarizableTyper():
                 shutil.rmtree(f)
             elif '.' in f and not os.path.isdir(f):
                 ext=f.split('.')[1]
-                if ext!='sdf' and ext!='ini' and ext!='out':
+                if ext!='sdf' and ext!='ini' and 'nohup' not in f:
                     os.remove(f)
        
 

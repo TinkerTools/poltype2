@@ -1911,10 +1911,11 @@ def RemoveRotatableBondFromTorlist(poltype,tor):
     rotbnd=[tor[1],tor[2]]
     for grpidx in range(len(poltype.torlist)):
         grp=poltype.torlist[grpidx]
-        ls=grp[0]
-        other=[ls[1],ls[2]]
-        if rotbnd==other or rotbnd[::-1]==other:
-            indicestoremove.append(grpidx)
+        if len(grp)==1:
+            ls=grp[0]
+            other=[ls[1],ls[2]]
+            if rotbnd==other or rotbnd[::-1]==other:
+                indicestoremove.append(grpidx)
     for index in indicestoremove:
         del poltype.torlist[index]
 

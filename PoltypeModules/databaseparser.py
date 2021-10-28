@@ -867,7 +867,6 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
     parametersmartstofoundallneighbs={}
     newls=copy.deepcopy(ls)
     usemcsonly=False
-    print('ls',ls,flush=True)
     if usemcsonly==False or (len(ls)==1 and ls[0]==26):
         fragsmartslist=GenerateFragmentSMARTSList(poltype,newls)
     for parametersmarts in parametersmartslist:
@@ -1903,7 +1902,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         if check==False:
             if ringbond==True:
                 if (2 not in hybs): # non-aromatic torsion want parameters for 
-                    if checknonarotor==False:
+                    if checknonarotor==False or poltype.refinenonaroringtors==True:
                         if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
                             poormatchingpartialaromatictorsions.append(torsionindices)
                         else: # if dont have heavy atoms on either side then just fit the hydrogen torsion
@@ -4243,6 +4242,49 @@ def ExtractTransferInfo(poltype,polarprmstotransferinfo):
         polartypetotransferinfo[polartype]=transferinfo
 
     return polartypetotransferinfo
+
+
+def StiffenZThenBisectorAngleConstants(poltype,keyfilename):
+    temp=open(keyfilename,'r')
+    results=temp.readlines()
+    temp.close()
+    tempname=keyfilename.replace('.key','TEMP.key')
+    temp=open(tempname,'w')
+    angles=[]
+    for line in results:
+        if 'multipole ' in line and '#' not in line:
+            linesplit=line.split()
+            if len(linesplit)==6:
+                newlinesplit=linesplit[1:-2]
+                newlinesplit=[int(i) for i in newlinesplit]
+                newlinesplit=[int(np.abs(i)) for i in newlinesplit]
+                a=newlinesplit[0]
+                b=newlinesplit[1]
+                c=newlinesplit[2]
+                angle=tuple([b,a,c])
+                angles.append(angle)
+    print('angles',angles)
+    for line in results:
+        if 'angle ' in line and '#' not in line:
+            linesplit=line.split()
+            indices=[linesplit[1],linesplit[2],linesplit[3]]
+            indices=[int(i) for i in indices]
+            indices=tuple(indices)
+            for angle in angles:
+                if angle==indices or angle==indices[::-1]:
+                    value=float(linesplit[4])
+                    value=str(2*value)
+                    linesplit[4]=value
+                    string='# Doubling angle force constant because z-then-bisector frame '+'\n'
+                    line=string+' '.join(linesplit)
+        temp.write(line)
+                    
+                    
+
+
+    temp.close()
+    os.remove(keyfilename)
+    os.rename(tempname,keyfilename)
 
 
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False):
