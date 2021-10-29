@@ -1815,29 +1815,12 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
 
         if '~' in smarts or '*' in smarts:
             check=False
+            checknonarotor=False
         if ringbond==True:
             atomindices=RingAtomicIndices(poltype,mol)
             ring=GrabRingAtomIndicesFromInputIndex(poltype,babelindices[1],atomindices)
             ringtorindices=GrabIndicesInRing(poltype,babelindices,ring)
-        if len(poltype.onlyrotbndslist)!=0:
-            if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
-                if (atomicnumatoma==1 or atomicnumatomd==1) and poltype.refinenonaroringtors==False:
-                    if allhydrogentor==False and allhydrogentoroneside==False and check==True: # try to transfer H even if bad match in this case
-                       continue
-                    elif allhydrogentor==False and allhydrogentoroneside==False and check==False:
-                        poormatchingpartialaromatictorsions.append(torsionindices)
-                    else:
-                        if torsionindices not in torsionsmissing:
-                            torsionsmissing.append(torsionindices)
-                            continue
-
-
-                else:
-                    if torsionindices not in torsionsmissing:
-                        torsionsmissing.append(torsionindices)
-                        continue
-            else:
-                continue
+        
         if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False and ([bbidx,cbidx] not in poltype.onlyrotbndslist or [cbidx,bbidx] not in poltype.onlyrotbndslist):
             continue
         if check==False:
@@ -1847,9 +1830,12 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                         if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
                             poormatchingpartialaromatictorsions.append(torsionindices)
                         else: # if dont have heavy atoms on either side then just fit the hydrogen torsion
-                            if len(ring)>3:
-                                if torsionindices not in torsionsmissing and poltype.dontfrag==False: # make sure fragmenter is on (wont work for < 25 atoms by default)
-                                    torsionsmissing.append(torsionindices)
+                            if len(poltype.onlyrotbndslist)!=0:
+                                if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
+
+                                    if len(ring)>3:
+                                        if torsionindices not in torsionsmissing and poltype.dontfrag==False: # make sure fragmenter is on (wont work for < 25 atoms by default)
+                                            torsionsmissing.append(torsionindices)
                             else:
                                 poormatchingpartialaromatictorsions.append(torsionindices)
 
@@ -1868,8 +1854,11 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                 if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
                     poormatchingpartialaromatictorsions.append(torsionindices)
                 else:
-                    if torsionindices not in torsionsmissing:
-                        torsionsmissing.append(torsionindices)
+                    if len(poltype.onlyrotbndslist)!=0:
+                        if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
+
+                            if torsionindices not in torsionsmissing:
+                                torsionsmissing.append(torsionindices)
                     continue
 
         else:
