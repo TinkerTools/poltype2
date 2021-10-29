@@ -1645,7 +1645,7 @@ class PolarizableTyper():
         deletearray=[]
         files=os.listdir()
         for f in files:
-            if not os.path.isdir(f) and 'nohup' not in f:
+            if not os.path.isdir(f) and 'nohup' not in f and f[0]!='.':
                 fsplit=f.split('.')
                 if len(fsplit)>1:
                     end=fsplit[1]

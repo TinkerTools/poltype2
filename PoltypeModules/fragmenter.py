@@ -627,6 +627,17 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         vdwfragment=False
         vdwparentindices=[]
         parentsymclasstofragsymclasses={}
+        fragmol=rotbndindextofragment[array[0]]
+        fragmentfilepath=rotbndindextofragmentfilepath[array[0]]
+
+        obConversion = openbabel.OBConversion()
+        fragbabelmol = openbabel.OBMol()
+        inFormat = obConversion.FormatFromExt(fragmentfilepath)
+        obConversion.SetInFormat(inFormat)
+        obConversion.ReadFile(fragbabelmol, fragmentfilepath)
+        fragidxtosymclass,symmetryclass=symm.gen_canonicallabels(poltype,fragbabelmol)
+        rdkitmol=rdmolfiles.MolFromMolFile(fragmentfilepath,removeHs=False)
+
         for i in range(len(array)):
             rotbndindex=array[i]
             if '_' not in rotbndindex:
@@ -640,12 +651,19 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 equivalentrotbndindex=rotbndindex
 
             parentindextofragindex=rotbndindextoparentindextofragindex[equivalentrotbndindex]
+            otherparentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
+            otherfragmentfilepath=rotbndindextofragmentfilepath[rotbndindex]
+            otherrdkitmol=rdmolfiles.MolFromMolFile(otherfragmentfilepath,removeHs=False)
+            matches=rdkitmol.GetSubstructMatches(otherrdkitmol)
+            match=matches[0]
+            indices=list(range(len(match)))
+            othermolindextoequivmolindex=dict(zip(indices,match)) 
             if vdwfragment==False:
                 MakeFileName(poltype,equivalentrotbndindex,'equivalentfragment.txt')
                 rotbndindexes=rotbndindex.split('_')
                 parentrotbndindexes=[int(j) for j in rotbndindexes]
                 rotbndindexes=[int(j)-1 for j in parentrotbndindexes]
-                rotbndindexes=ConvertSameBondTypes(poltype,rotbndindexes,parentindextofragindex)
+                rotbndindexes=ConvertSameBondTypes(poltype,rotbndindexes,parentindextofragindex,otherparentindextofragindex,othermolindextoequivmolindex)
                 fragrotbndindexes=[parentindextofragindex[j] for j in rotbndindexes]
                 fragrotbndindexes=[j+1 for j in fragrotbndindexes]
                 for j in range(0,len(fragrotbndindexes),2):
@@ -666,15 +684,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             strfragrotbndindexes=None
 
         strparentrotbndindexes=strparentrotbndindexes[:-1]
-        fragmol=rotbndindextofragment[equivalentrotbndindex]
-        fragmentfilepath=rotbndindextofragmentfilepath[equivalentrotbndindex]
-
-        obConversion = openbabel.OBConversion()
-        fragbabelmol = openbabel.OBMol()
-        inFormat = obConversion.FormatFromExt(fragmentfilepath)
-        obConversion.SetInFormat(inFormat)
-        obConversion.ReadFile(fragbabelmol, fragmentfilepath)
-        fragidxtosymclass,symmetryclass=symm.gen_canonicallabels(poltype,fragbabelmol)
+        
         parentindextofragindex=rotbndindextoparentindextofragindex[equivalentrotbndindex]
         fragindextoparentindex={v: k for k, v in parentindextofragindex.items()}
         for parentindex,fragindex in parentindextofragindex.items():
@@ -794,36 +804,24 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
     return equivalentrotbndindexarrays,rotbndindextoringtor
 
 
-def ConvertSameBondTypes(poltype,rotbndindexes,parentindextofragindex):
+def ConvertSameBondTypes(poltype,rotbndindexes,parentindextofragindex,otherparentindextofragindex,othermolindextoequivmolindex):
     foundall=True
     for index in rotbndindexes:
         if index not in parentindextofragindex.keys():
             foundall=False
+    fragindextoparentindex = {v: k for k, v in parentindextofragindex.items()}
     if foundall==False:
-        allindices=[]
-        babelindices=[i+1 for i in rotbndindexes]
-        for index in babelindices:
-            typenum=poltype.idxtosymclass[index]
-            indices=GrabKeysFromValue(poltype,poltype.idxtosymclass,typenum)
-            rdkitindices=[i-1 for i in indices]
-            newrdkitindices=[]
-            for index in rdkitindices:
-                if index in rotbndindexes:
-                    pass
-                else:
-                    newrdkitindices.append(index)
-            allindices.append(newrdkitindices)
-        combs=list(itertools.product(*allindices))
-        for comb in combs:
-            foundall=True
-            for index in comb:
-                if index not in parentindextofragindex.keys():
-                    foundall=False
-            bonded=CheckIfIndicesBonded(poltype,comb,poltype.rdkitmol)
-            if foundall==True and bonded==True:
-                return comb
+        comb=[]
+        for index in rotbndindexes:
+            otherfragindex=otherparentindextofragindex[index]
+            equivfragindex=othermolindextoequivmolindex[otherfragindex]
+            parentindex=fragindextoparentindex[equivfragindex]
+            comb.append(parentindex)
 
-        return newrotbndindexes
+        bonded=CheckIfIndicesBonded(poltype,comb,poltype.rdkitmol)
+        if bonded==True:
+            return comb
+
     else:
         return rotbndindexes
 
@@ -1162,14 +1160,16 @@ def GenerateFrag(poltype,molindexlist,mol,torset):
     WriteOBMolToMol(poltype,nem,outputname)
     newmol=rdmolfiles.MolFromMolFile(outputname,removeHs=False)
     newmol.UpdatePropertyCache(strict=False)
-    AllChem.EmbedMolecule(newmol)
-    indextocoordinates=UpdateAtomNumbers(poltype,indextocoordinates)
-    rdkitindextocoordinates={}
-    for idx,coords in indextocoordinates.items():
-        rdkitidx=idx-1
-        rdkitindextocoordinates[rdkitidx]=coords
-    newmol=AddInputCoordinatesAsDefaultConformer(poltype,newmol,rdkitindextocoordinates)
-
+    try:
+        status = AllChem.EmbedMolecule(newmol,maxAttempts=5000)
+        indextocoordinates=UpdateAtomNumbers(poltype,indextocoordinates)
+        rdkitindextocoordinates={}
+        for idx,coords in indextocoordinates.items():
+            rdkitidx=idx-1
+            rdkitindextocoordinates[rdkitidx]=coords
+        newmol=AddInputCoordinatesAsDefaultConformer(poltype,newmol,rdkitindextocoordinates)
+    except:
+        pass
     rdkitoldindextonewindex={}
     for oldindex,newindex in oldindextonewindex.items():
         rdkitoldindex=oldindex-1
