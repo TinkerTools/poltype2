@@ -1346,8 +1346,15 @@ class PolarizableTyper():
                     if prm!=0:
                         allzero=False
                 if allzero==True:
-                    self.WriteToLog("torsion parameters are all zero "+line+' path ='+os.getcwd())
-                    raise ValueError("torsion parameters are all zero "+line+' path ='+os.getcwd())
+                    if self.firsterror==True:
+                        self.WriteToLog("torsion parameters are all zero "+line+' path ='+os.getcwd())
+                        raise ValueError("torsion parameters are all zero "+line+' path ='+os.getcwd())
+                    else:
+                        self.firsterror=False
+                        self.DeleteFilesWithExtension(['key_5'])
+                        self.GenerateParameters()
+
+                    
 
     def main(self):
          

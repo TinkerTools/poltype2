@@ -645,6 +645,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 rotbndindexes=rotbndindex.split('_')
                 parentrotbndindexes=[int(j) for j in rotbndindexes]
                 rotbndindexes=[int(j)-1 for j in parentrotbndindexes]
+                rotbndindexes=ConvertSameBondTypes(poltype,rotbndindexes,parentindextofragindex)
                 fragrotbndindexes=[parentindextofragindex[j] for j in rotbndindexes]
                 fragrotbndindexes=[j+1 for j in fragrotbndindexes]
                 for j in range(0,len(fragrotbndindexes),2):
@@ -791,6 +792,53 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
     os.chdir(parentdir)
 
     return equivalentrotbndindexarrays,rotbndindextoringtor
+
+
+def ConvertSameBondTypes(poltype,rotbndindexes,parentindextofragindex):
+    foundall=True
+    for index in rotbndindexes:
+        if index not in parentindextofragindex.keys():
+            foundall=False
+    if foundall==False:
+        allindices=[]
+        babelindices=[i+1 for i in rotbndindexes]
+        for index in babelindices:
+            typenum=poltype.idxtosymclass[index]
+            indices=GrabKeysFromValue(poltype,poltype.idxtosymclass,typenum)
+            rdkitindices=[i-1 for i in indices]
+            newrdkitindices=[]
+            for index in rdkitindices:
+                if index in rotbndindexes:
+                    pass
+                else:
+                    newrdkitindices.append(index)
+            allindices.append(newrdkitindices)
+        combs=list(itertools.product(*allindices))
+        for comb in combs:
+            foundall=True
+            for index in comb:
+                if index not in parentindextofragindex.keys():
+                    foundall=False
+            bonded=CheckIfIndicesBonded(poltype,comb,poltype.rdkitmol)
+            if foundall==True and bonded==True:
+                return comb
+
+        return newrotbndindexes
+    else:
+        return rotbndindexes
+
+
+def CheckIfIndicesBonded(poltype,comb,themol):
+    bonded=False
+    firstatomidx=comb[0]
+    secondatomidx=comb[1]
+    firstatom=themol.GetAtomWithIdx(firstatomidx)
+    for atom in firstatom.GetNeighbors():
+        atomidx=atom.GetIdx()
+        if atomidx==secondatomidx:
+            bonded=True
+
+    return bonded
 
 
 def FindCorrectEquivalentMapping(poltype,equivfragtor,fragidxtosymclass,fragindextoparentindex):
@@ -1011,39 +1059,40 @@ def GenerateFrag(poltype,molindexlist,mol,torset):
                 c=molindexlist[2]
                 d=molindexlist[3]
                 ring=GrabRingAtomIndicesFromInputIndex(poltype,[a,b,c,d],atomindices)
-                if c in ring and b in ring:
-                    if len(ring)==4: 
-                       ls=[a,d] 
-                       bondstoremove.append(ls)
-                       atomswithcutbonds.append(oldindextonewindex[a])
-                       atomswithcutbonds.append(oldindextonewindex[d])
-                    elif len(ring)==5:
-                       if a in ring:
-                           idx=a
-                       elif d in ring:
-                           idx=d
-                        
-                       neigbindexes=GrabNeigbsBabel(poltype,idx)
-                       for idx in neigbindexes:
-                           if idx in ring and idx!=a and idx!=b and idx!=c and idx!=d:
-                               theidx=idx
-                               break
-                       ls=[a,theidx] 
-                       atomswithcutbonds.append(oldindextonewindex[a])
-                       atomswithcutbonds.append(oldindextonewindex[theidx])
-                       bondstoremove.append(ls)
-                    elif len(ring)==6: 
-                       ls=[]
-                       for idx in ring:
-                           if idx!=a and idx!=b and idx!=c and idx!=d:
-                               ls.append(idx) 
-                       newls=[]
-                       for idx in ls:
-                           if idx in oldindextonewindex.keys():
-                               newls.append(idx)
-                       bondstoremove.append(newls)
-                       for idx in newls:
-                           atomswithcutbonds.append(oldindextonewindex[idx])
+                if ring!=None:
+                    if c in ring and b in ring:
+                        if len(ring)==4: 
+                           ls=[a,d] 
+                           bondstoremove.append(ls)
+                           atomswithcutbonds.append(oldindextonewindex[a])
+                           atomswithcutbonds.append(oldindextonewindex[d])
+                        elif len(ring)==5:
+                           if a in ring:
+                               idx=a
+                           elif d in ring:
+                               idx=d
+                            
+                           neigbindexes=GrabNeigbsBabel(poltype,idx)
+                           for idx in neigbindexes:
+                               if idx in ring and idx!=a and idx!=b and idx!=c and idx!=d:
+                                   theidx=idx
+                                   break
+                           ls=[a,theidx] 
+                           atomswithcutbonds.append(oldindextonewindex[a])
+                           atomswithcutbonds.append(oldindextonewindex[theidx])
+                           bondstoremove.append(ls)
+                        elif len(ring)==6: 
+                           ls=[]
+                           for idx in ring:
+                               if idx!=a and idx!=b and idx!=c and idx!=d:
+                                   ls.append(idx) 
+                           newls=[]
+                           for idx in ls:
+                               if idx in oldindextonewindex.keys():
+                                   newls.append(idx)
+                           bondstoremove.append(newls)
+                           for idx in newls:
+                               atomswithcutbonds.append(oldindextonewindex[idx])
 
 
 
@@ -1383,7 +1432,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets,non
             possiblefragatmidxs=GrowPossibleFragmentAtomIndexes(poltype,poltype.rdkitmol,extendedtorindexes)
             if len(possiblefragatmidxs)!=0 and poltype.maxgrowthcycles!=0:
                 fragmol,newindexes,fragWBOmatrix,structfname,WBOdifference,parentindextofragindex,fragpath,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist=GrowFragmentOut(poltype,mol,parentWBOmatrix,extendedtorindexes,WBOdifference,torset,fragfoldername,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,fragspath)
-                fragmoltoWBOmatrices,fragmoltobondindexlist=WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,torset,fragmoltoWBOmatrices,fragmoltobondindexlist)
+                
         curdir=os.getcwd()
         os.chdir(fragspath)
         growfragments=[mol_with_atom_index(poltype,frag) for frag in growfragments]
@@ -1968,11 +2017,12 @@ def GrabRingAtomIndicesFromInputIndex(poltype,atomindexlist,atomindices):
             if atomindex in ring:
                 count+=1
         ringtocount[tuple(ring)]=count
-    maxcount=max(ringtocount.values())
-    if maxcount!=0:
-        for ring,count in ringtocount.items():
-            if count==maxcount:
-                return ring
+    if len(ringtocount.keys())!=0:
+        maxcount=max(ringtocount.values())
+        if maxcount!=0:
+            for ring,count in ringtocount.items():
+                if count==maxcount:
+                    return ring
 
     ring=None
     return ring
