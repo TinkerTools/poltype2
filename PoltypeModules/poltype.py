@@ -1840,6 +1840,22 @@ class PolarizableTyper():
         if self.firstoptfinished==False:
             optmol,error,torsionrestraints = opt.GeometryOPTWrapper(self,mol)
             finished,error=self.CheckNormalTermination(self.firstlogoptfname)
+
+            bondtopoopt=torgen.GenerateBondTopology(self,optmol)
+            bondtopoopt=[list(i) for i in bondtopoopt]
+            bondtopo=torgen.GenerateBondTopology(self,mol)
+            bondtopo=[list(i) for i in bondtopo]
+            for bond in bondtopo:
+                if bond in bondtopoopt or bond[::-1] in bondtopoopt:
+                    pass
+                else:
+                    raise ValueError('Bond does not exist after optimization !'+str(bond))
+            for bond in bondtopoopt:
+                if bond in bondtopo or bond[::-1] in bondtopo:
+                    pass
+                else:
+                    raise ValueError('Bond created after optimization !'+str(bond))
+
             if finished==False:
                 bondtoposame=self.CheckBondTopology(self.firstlogoptfname,self.rdkitmol)
             else:

@@ -793,6 +793,8 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
     parametersmartstoscore={}
     parametersmartstonumcommon={}
     parametersmartstootherscore={}
+    parametersmartstothefinalscore={}
+
     parametersmartstofoundallneighbs={}
     newls=copy.deepcopy(ls)
     usemcsonly=False
@@ -820,6 +822,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
         molsmatchingtoindices.append(mcsmol)
         smartsmatchingtoindices.append(smartsmcs)
         thesmartstonumneighbs={}
+        thesmartstotypescore={}
         thesmartstoelementscore={}
 
         thesmartstothemol={}
@@ -865,22 +868,27 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                             else:
                                 allneighbsin=False
                         if goodmatch==True:
+                             
                             break
                     prmmolnumrings=CountRingsInSMARTS(poltype,parametersmarts)
                     molnumrings=CalcNumRings(poltype.rdkitmol)
                     if prmmolnumrings>molnumrings:
                         goodmatch=False
                     if goodmatch==True:
+                        rdkitatomictypetotype={}
                         rdkitatomicnumtonum={}
                         for atom in poltype.rdkitmol.GetAtoms():
                             atomicnum=atom.GetAtomicNum()
                             atomidx=atom.GetIdx()
+                            if atomicnum not in rdkitatomicnumtonum.keys():
+                                rdkitatomicnumtonum[atomicnum]=0
+                            rdkitatomicnumtonum[atomicnum]+=1
                             if atomidx in newls:
                                 atomtype=FindHowManyBondTypes(poltype,poltype.rdkitmol,atomidx)
                                 
-                                if atomtype not in rdkitatomicnumtonum.keys():
-                                    rdkitatomicnumtonum[atomtype]=0
-                                rdkitatomicnumtonum[atomtype]+=1
+                                if atomtype not in rdkitatomictypetotype.keys():
+                                    rdkitatomictypetotype[atomtype]=0
+                                rdkitatomictypetotype[atomtype]+=1
                         matches=list(poltype.rdkitmol.GetSubstructMatches(themol,maxMatches=10000))
                         sp=openbabel.OBSmartsPattern()
                         openbabel.OBSmartsPattern.Init(sp,thesmarts)
@@ -920,29 +928,35 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                         aromaticprmindices=GrabAromaticIndices(poltype,aromaticprmsmartsindices,prmmol,ls)
                         if len(aromaticprmindices)!=len(aromaticprmsmartsindices):
                             continue
-
                         prmsmartsatomicnumtonum={}
                         for atomicnum,num in rdkitatomicnumtonum.items():
-                            prmsmartsatomicnumtonum[atomicnum]=0
+                            if atomicnum not in prmsmartsatomicnumtonum.keys():
+                                prmsmartsatomicnumtonum[atomicnum]=0
+                        prmsmartsatomictypetotype={}
+                        for atomicnum,num in rdkitatomictypetotype.items():
+                            prmsmartsatomictypetotype[atomicnum]=0
                         extra=prmsmartsindices[:]
                         for atom in prmmol.GetAtoms():
                             atomicnum=atom.GetAtomicNum()
                             atomidx=atom.GetIdx()
+                            if atomicnum not in prmsmartsatomicnumtonum.keys():
+                                prmsmartsatomicnumtonum[atomicnum]=0
+                            prmsmartsatomicnumtonum[atomicnum]+=1
                             if atomidx in prmsmartsindices:
                                 atomtype=FindHowManyBondTypes(poltype,prmmol,atomidx)
 
-                                if atomtype not in prmsmartsatomicnumtonum.keys():
-                                    prmsmartsatomicnumtonum[atomtype]=0
-                                prmsmartsatomicnumtonum[atomtype]+=1
+                                if atomtype not in prmsmartsatomictypetotype.keys():
+                                    prmsmartsatomictypetotype[atomtype]=0
+                                prmsmartsatomictypetotype[atomtype]+=1
                                 for natom in atom.GetNeighbors():
                                     natomidx=natom.GetIdx()
                                     atomicnum=natom.GetAtomicNum()
 
                                     if natomidx not in extra:
                                         atomtype=FindHowManyBondTypes(poltype,prmmol,natomidx)
-                                        if atomtype not in prmsmartsatomicnumtonum.keys():
-                                            prmsmartsatomicnumtonum[atomtype]=0
-                                        prmsmartsatomicnumtonum[atomtype]+=1
+                                        if atomtype not in prmsmartsatomictypetotype.keys():
+                                            prmsmartsatomictypetotype[atomtype]=0
+                                        prmsmartsatomictypetotype[atomtype]+=1
                                         extra.append(natomidx)
                                     if len(ls)==1 and len(atom.GetNeighbors())==1:
                                         for nnatom in natom.GetNeighbors():
@@ -951,29 +965,38 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
 
                                             if nnatomidx not in extra:
                                                 atomtype=FindHowManyBondTypes(poltype,prmmol,nnatomidx)
-                                                if atomtype not in prmsmartsatomicnumtonum.keys():
-                                                    prmsmartsatomicnumtonum[atomtype]=0
-                                                prmsmartsatomicnumtonum[atomtype]+=1
+                                                if atomtype not in prmsmartsatomictypetotype.keys():
+                                                    prmsmartsatomictypetotype[atomtype]=0
+                                                prmsmartsatomictypetotype[atomtype]+=1
                                                 extra.append(natomidx)
 
 
 
 
                         otherscore=0
+                        for atomicnum,num in rdkitatomictypetotype.items():
+                            prmnum=prmsmartsatomictypetotype[atomicnum]
+                            diff=np.abs(prmnum-num)
+
+                            otherscore+=diff
+
+                        globalscore=0
                         for atomicnum,num in rdkitatomicnumtonum.items():
                             prmnum=prmsmartsatomicnumtonum[atomicnum]
                             diff=np.abs(prmnum-num)
 
-                            otherscore+=diff
+                            globalscore+=diff
+
                         thesmartstonumneighbs[thesmarts]=score
-                        thesmartstoelementscore[thesmarts]=otherscore
- 
+                        thesmartstotypescore[thesmarts]=otherscore
+                        thesmartstoelementscore[thesmarts]=globalscore
+    
 
         if len(thesmartstonumneighbs.keys())>0:
             maxscore=max(thesmartstonumneighbs.values())            
             for thesmarts,score in thesmartstonumneighbs.items():
                 themol=thesmartstothemol[thesmarts]
-                otherscore=thesmartstoelementscore[thesmarts]
+                otherscore=thesmartstotypescore[thesmarts]
                 if score==maxscore:
 
                     prmsmartstomcssmarts[parametersmarts]=thesmarts
@@ -981,34 +1004,42 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                     parametersmartstootherscore[parametersmarts]=otherscore
                     smartsmcstomol[thesmarts]=themol
                     parametersmartstofoundallneighbs[parametersmarts]=allneighbsin
+                    parametersmartstothefinalscore[parametersmarts]=thesmartstoelementscore[thesmarts]
                     break
     foundmin=False
-    
+
     parametersmartstofinalscore={}
+    parametersmartstolastscore={}
+
     if len(parametersmartstoscore.keys())>0:
         minscore=max(parametersmartstoscore.values())
         for parametersmarts in parametersmartstoscore.keys():
             score=parametersmartstoscore[parametersmarts]
             otherscore=parametersmartstootherscore[parametersmarts]
             smartsmcs=prmsmartstomcssmarts[parametersmarts]
+            lastscore=parametersmartstothefinalscore[parametersmarts]
             if score==minscore:
-                
+                parametersmartstolastscore[parametersmarts]=lastscore          
                 parametersmartstofinalscore[parametersmarts]=otherscore
         minscore=min(parametersmartstofinalscore.values())
-        
+        finalprmsmartstoscore={}
         for parametersmarts in parametersmartstofinalscore.keys():
             score=parametersmartstofinalscore[parametersmarts]
             smartsmcs=prmsmartstomcssmarts[parametersmarts]
-
+            lastscore=parametersmartstolastscore[parametersmarts]
             if score==minscore:
-
+                finalprmsmartstoscore[parametersmarts]=lastscore
+                
+        minscore=min(finalprmsmartstoscore.values())
+        for parametersmarts,score in finalprmsmartstoscore.items():
+            if score==minscore:
                 smartsmcs=prmsmartstomcssmarts[parametersmarts] 
                 mcsmol=smartsmcstomol[smartsmcs]
                 foundmin=True
                 break
 
-
         if foundmin==True:
+
             smartls=[smartsmcs,smartsmcs]
             if parametersmarts not in parametersmartstosmartslist.keys():
                 parametersmartstosmartslist[parametersmarts]=smartls
@@ -4302,7 +4333,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         strbndindicestoclasses,strbndindicestosmartslist=FindBestSMARTSMatch(poltype,strbndindicestolistofstrbndclasses,strbndclassestolistofsmartslist)
         opbendindicestoclasses,opbendindicestosmartslist=FindBestSMARTSMatch(poltype,opbendindicestolistofopbendclasses,opbendclassestolistofsmartslist)
         opbendbondindicestotrigonalcenterbools=CheckTrigonalCenters(poltype,listofbondsforprm,mol)
-        print('opbendbondindicestotrigonalcenterbools',opbendbondindicestotrigonalcenterbools)
         newangleindicestopoltypeclasses,newangleprms,newanglepoltypeclassestocomments,newanglepoltypeclassestosmartslist=GrabNewParameters(poltype,angleindicestoclasses,angleclassestoparameters,'angle',angleindicestosmartslist,atomclasstocomment) 
         newbondindicestopoltypeclasses,newbondprms,newbondpoltypeclassestocomments,newbondpoltypeclassestosmartslist=GrabNewParameters(poltype,bondindicestoclasses,bondclassestoparameters,'bond',bondindicestosmartslist,atomclasstocomment) 
         newstrbndindicestopoltypeclasses,newstrbndprms,newstrbndpoltypeclassestocomments,newstrbndpoltypeclassestosmartslist=GrabNewParameters(poltype,strbndindicestoclasses,strbndclassestoparameters,'strbnd',strbndindicestosmartslist,atomclasstocomment) 

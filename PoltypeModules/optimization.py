@@ -703,6 +703,23 @@ def GeometryOptimization(poltype,mol,loose=False,checkbonds=True,modred=True,bon
         optmol=rebuild_bonds(poltype,optmol,mol)
 
     GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'),mol)
+    obConversion = openbabel.OBConversion()
+    themol = openbabel.OBMol()
+    obConversion.SetInFormat('xyz')
+    obConversion.ReadFile(themol, poltype.logoptfname.replace('.log','.xyz'))
+    obConversion.SetOutFormat('mol')
+    obConversion.WriteFile(themol,'temp.mol')
+    smarts=None
+    try:
+        m=Chem.MolFromMolFile('temp.mol',removeHs=False,sanitize=False)
+    
+        smarts=rdmolfiles.MolToSmarts(m)
+    except:
+        pass
+    if smarts!=None:
+        if '.' in smarts:
+            raise ValueError('Fragment detected after optimization!')
+
     return optmol,error,torsionrestraints
 
 
