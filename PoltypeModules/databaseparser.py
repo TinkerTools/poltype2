@@ -4031,10 +4031,10 @@ def TestBondAngleEquilValues(poltype):
     alzout='testbondangleequilvaluesalz.out'
     shutil.copy(poltype.key4fname,tmpkeyfile)
     shutil.copy(poltype.xyzoutfile,tmpxyzfile)
-    cmd = poltype.minimizeexe+' -k '+tmpkeyfile+' '+tmpxyzfile+' 0.1 > testbondangleequilvalues.out'
+    cmd = poltype.minimizeexe+' '+tmpxyzfile+' -k '+tmpkeyfile+' 0.1 > testbondangleequilvalues.out'
     poltype.call_subsystem([cmd], True)
 
-    cmd = poltype.analyzeexe+' -k '+tmpkeyfile+' '+tmpxyzfile+'_2'+' d > '+alzout
+    cmd = poltype.analyzeexe+' '+tmpxyzfile+'_2'+' -k '+tmpkeyfile+' '+' d > '+alzout
     poltype.call_subsystem([cmd], True)
 
     bondindicestonewbondequilvalues,angleindicestonewbondequilvalues=CheckBondAngleDeviationsFromQM(poltype,alzout)
@@ -4302,6 +4302,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         strbndindicestoclasses,strbndindicestosmartslist=FindBestSMARTSMatch(poltype,strbndindicestolistofstrbndclasses,strbndclassestolistofsmartslist)
         opbendindicestoclasses,opbendindicestosmartslist=FindBestSMARTSMatch(poltype,opbendindicestolistofopbendclasses,opbendclassestolistofsmartslist)
         opbendbondindicestotrigonalcenterbools=CheckTrigonalCenters(poltype,listofbondsforprm,mol)
+        print('opbendbondindicestotrigonalcenterbools',opbendbondindicestotrigonalcenterbools)
         newangleindicestopoltypeclasses,newangleprms,newanglepoltypeclassestocomments,newanglepoltypeclassestosmartslist=GrabNewParameters(poltype,angleindicestoclasses,angleclassestoparameters,'angle',angleindicestosmartslist,atomclasstocomment) 
         newbondindicestopoltypeclasses,newbondprms,newbondpoltypeclassestocomments,newbondpoltypeclassestosmartslist=GrabNewParameters(poltype,bondindicestoclasses,bondclassestoparameters,'bond',bondindicestosmartslist,atomclasstocomment) 
         newstrbndindicestopoltypeclasses,newstrbndprms,newstrbndpoltypeclassestocomments,newstrbndpoltypeclassestosmartslist=GrabNewParameters(poltype,strbndindicestoclasses,strbndclassestoparameters,'strbnd',strbndindicestosmartslist,atomclasstocomment) 

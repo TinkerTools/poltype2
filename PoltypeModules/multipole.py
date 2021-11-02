@@ -14,18 +14,22 @@ def AddPolarizeCommentsToKey(poltype,keyfilename,polartypetotransferinfo):
     results=temp.readlines()
     temp.close()
     tempname=keyfilename.replace('.key','_temp.key')
+    time.sleep(1)
     temp=open(tempname,'w')
     for line in results:
         if 'polarize' in line and '#' not in line:
             linesplit=line.split()
             typenum=linesplit[1]
-            comments=polartypetotransferinfo[typenum]
-            line=comments+line
+            if typenum in polartypetotransferinfo.keys():
+                comments=polartypetotransferinfo[typenum]
+                line=comments+line
         temp.write(line)
+        temp.flush()
+        sys.stdout.flush()
     temp.close()
     os.remove(keyfilename)
     os.rename(tempname,keyfilename)
-
+    time.sleep(1)
 
 
 def SanitizeMultipoleFrames(poltype,keyfilename): # pearl script for averging only understands 0 and not empty spaces for parsing

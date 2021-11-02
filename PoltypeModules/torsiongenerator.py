@@ -863,11 +863,11 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             else:
                 if finished==True and outputlog not in finishedjobs:
                     obConversion = openbabel.OBConversion()
-                    mol = openbabel.OBMol()
+                    themol = openbabel.OBMol()
                     obConversion.SetInFormat('xyz')
-                    obConversion.ReadFile(mol, cartxyz)
+                    obConversion.ReadFile(themol, cartxyz)
                     obConversion.SetOutFormat('mol')
-                    obConversion.WriteFile(mol,'temp.mol')
+                    obConversion.WriteFile(themol,'temp.mol')
                     try:
                         m=Chem.MolFromMolFile('temp.mol',removeHs=False,sanitize=False)
                   

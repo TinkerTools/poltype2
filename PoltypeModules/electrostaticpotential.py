@@ -239,7 +239,7 @@ def CheckRMSPD(poltype):
                     poltype.failedrmspd=True
                     poltype.WriteToLog('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
                     warnings.warn('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
-                    if poltype.issane==True:
+                    if poltype.issane==True and poltype.skipespfiterror==False:
                         if poltype.deletedfiles==True:
                             raise ValueError(os.getcwd()+' '+'Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
                 else:
@@ -406,16 +406,23 @@ def GenerateElementToBasisSetLines(poltype,basissetfile):
 
 def ElectrostaticPotentialFitting(poltype):
     optmpolecmd = poltype.potentialexe + " 6 " + poltype.xyzoutfile + " -k " + poltype.key2fname + " " + poltype.qmesp2fname + " N "+str(poltype.espgrad)
-    poltype.call_subsystem([optmpolecmd],True)
+    if poltype.deletedfiles==True:
+        poltype.call_subsystem([optmpolecmd],True)
+    else:
+        try:
+            poltype.call_subsystem([optmpolecmd],True)
+        except:
+            poltype.DeleteFilesWithExtension(['key','xyz','key_2','xyz_2'])
+            poltype.deletedfiles=True
+            poltype.GenerateParameters()
+
 
 def ElectrostaticPotentialComparison(poltype):
-    rmspdexists=CheckRMSPD(poltype)
-    if rmspdexists==False:
-        poltype.WriteToLog("")
-        poltype.WriteToLog("=========================================================")
-        poltype.WriteToLog("Electrostatic Potential Comparison\n")
-        cmd=poltype.potentialexe + ' 5 ' + poltype.xyzoutfile + ' ' + '-k'+' '+ poltype.key3fname+' '+ poltype.qmesp2fname + ' N > RMSPD.txt'
-        poltype.call_subsystem([cmd],True)
+    poltype.WriteToLog("")
+    poltype.WriteToLog("=========================================================")
+    poltype.WriteToLog("Electrostatic Potential Comparison\n")
+    cmd=poltype.potentialexe + ' 5 ' + poltype.xyzoutfile + ' ' + '-k'+' '+ poltype.key3fname+' '+ poltype.qmesp2fname + ' N > RMSPD.txt'
+    poltype.call_subsystem([cmd],True)
     rmspdexists=CheckRMSPD(poltype)
 
 def SPForDMA(poltype,optmol,mol):
