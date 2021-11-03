@@ -1890,6 +1890,10 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
 
                             if torsionindices not in torsionsmissing:
                                 torsionsmissing.append(torsionindices)
+                    else:
+                        if torsionindices not in torsionsmissing:
+                            torsionsmissing.append(torsionindices)
+
                     continue
 
         else:

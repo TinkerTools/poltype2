@@ -1726,6 +1726,24 @@ class PolarizableTyper():
 
 
     def GenerateParameters(self):
+        temp=open(os.getcwd()+r'/'+'poltype.ini','r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            if '#' not in line and line!='\n':
+                if '=' in line:
+                    linesplit=line.split('=',1)
+                    a=linesplit[1].replace('\n','').rstrip().lstrip()
+                    newline=linesplit[0]
+                    if a=='None':
+                        continue
+                else:
+                    newline=line
+
+                if "structure" in newline:
+                    self.molstructfname = a
+
+        self.totalcharge=None
         if self.deleteallnonqmfiles==True:
             self.DeleteAllNonQMFiles()
         if self.inputmoleculefolderpaths!=None:
@@ -1849,12 +1867,26 @@ class PolarizableTyper():
                 if bond in bondtopoopt or bond[::-1] in bondtopoopt:
                     pass
                 else:
-                    raise ValueError('Bond does not exist after optimization !'+str(bond))
+                    if self.debugmode==False:
+                        raise ValueError('Bond does not exist after optimization !'+str(bond))
+                    else:
+                        self.debugmode=False
+                        self.deletedfiles=True
+                        self.DeleteAllFiles()
+                        self.GenerateParameters()
+
             for bond in bondtopoopt:
                 if bond in bondtopo or bond[::-1] in bondtopo:
                     pass
                 else:
-                    raise ValueError('Bond created after optimization !'+str(bond))
+                    if self.debugmode==False:
+                        raise ValueError('Bond created after optimization !'+str(bond))
+                    else:
+                        self.debugmode=False
+                        self.deletedfiles=True
+                        self.DeleteAllFiles()
+                        self.GenerateParameters()
+
 
             if finished==False:
                 bondtoposame=self.CheckBondTopology(self.firstlogoptfname,self.rdkitmol)
@@ -1892,7 +1924,8 @@ class PolarizableTyper():
         if optatomnums!=molatomnums: # then program behaviour changed need to restart
             self.deletedfiles=True
             self.DeleteAllFiles()
-            RunPoltype()
+            self.GenerateParameters()
+
 
         if self.optonly==True:
             sys.exit()
