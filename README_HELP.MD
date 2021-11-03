@@ -219,8 +219,11 @@ WBOtol            Tolerance for relative differences in Wiberg bond order betwee
 jobsatsametime    How many jobs (QM or fragment poltype jobs) to run in parralel on single node, will distribute resources evenly to each job.
                   Default=1
 
-fragmentjobslocal Run fragment jobs on localhost even when externalapi keyword is active
-                  Default=False
+fragmentjobslocal   Run fragment jobs on localhost even when externalapi keyword is active
+                    Default=False
+
+nonaroringtor1Dscan This keyword will cut a non-aromatic ring and spin the torsion for a 1D scan. Default behaviour is to transfer alkane torsion parameters.
+                    Default=False  
 ```
 
 ### Modified Amino Acids

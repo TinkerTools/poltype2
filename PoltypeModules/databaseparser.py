@@ -1842,11 +1842,9 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                 break
 
         check=CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,matcharray)
-        checknonarotor=CheckIfNeighborsExistInSMARTMatch(poltype,[aidx,bidx,cidx,didx],matcharray)
 
         if '~' in smarts or '*' in smarts:
             check=False
-            checknonarotor=False
         if ringbond==True:
             atomindices=RingAtomicIndices(poltype,mol)
             ring=GrabRingAtomIndicesFromInputIndex(poltype,babelindices[1],atomindices)
@@ -1857,18 +1855,17 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         if check==False:
             if ringbond==True:
                 if (2 not in hybs): # non-aromatic torsion want parameters for 
-                    if checknonarotor==False or poltype.refinenonaroringtors==True:
-                        if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
-                            poormatchingpartialaromatictorsions.append(torsionindices)
-                        else: # if dont have heavy atoms on either side then just fit the hydrogen torsion
-                            if len(poltype.onlyrotbndslist)!=0:
-                                if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
+                    if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
+                        poormatchingpartialaromatictorsions.append(torsionindices)
+                    else: # if dont have heavy atoms on either side then just fit the hydrogen torsion
+                        if len(poltype.onlyrotbndslist)!=0 and poltype.nonaroringtor1Dscan==True:
+                            if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
 
-                                    if len(ring)>3:
-                                        if torsionindices not in torsionsmissing and poltype.dontfrag==False: # make sure fragmenter is on (wont work for < 25 atoms by default)
-                                            torsionsmissing.append(torsionindices)
-                            else:
-                                poormatchingpartialaromatictorsions.append(torsionindices)
+                                if len(ring)>3:
+                                    if torsionindices not in torsionsmissing and poltype.dontfrag==False: # make sure fragmenter is on (wont work for < 25 atoms by default)
+                                        torsionsmissing.append(torsionindices)
+                        else:
+                            poormatchingpartialaromatictorsions.append(torsionindices)
 
                         
                 elif hybs[1]==2 and hybs[2]==2:
