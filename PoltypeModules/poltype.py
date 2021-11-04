@@ -1637,7 +1637,9 @@ class PolarizableTyper():
 		return pcm 
 			
 			    
-	    def DeleteAllNonQMFiles(self):
+	    def DeleteAllNonQMFiles(self,path=None):
+                if path!=None:
+                    os.chdir(path)
 		tempdir=os.getcwd()
 		self.DeleteNonQMFiles(os.getcwd()) 
 		if os.path.isdir('qm-torsion'):

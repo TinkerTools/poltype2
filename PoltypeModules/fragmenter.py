@@ -102,6 +102,7 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
     tortorclasskeytotorsionindexescollected={}
     tortorclasskeytosmartscollected={}
     tortorclasskeytosmartsposarraycollected={}
+    print('rotbndindextofragmentfilepath',rotbndindextofragmentfilepath,flush=True)
     for rotbndindex,fragmentfilepath in rotbndindextofragmentfilepath.items():
         path,filename=os.path.split(fragmentfilepath)
         os.chdir(path)
@@ -229,6 +230,7 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
 
 
         if foundkey5==False and foundkey==True:
+            poltype.WriteToLog('Fragment job did not finish '+filename)
             raise ValueError('Fragment job did not finish '+filename)
     os.chdir(curdir)
     temp=open(poltype.key4fname,'r')
@@ -619,6 +621,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
     listofjobs=[]
     jobtooutputlog={}
     jobtoinputfilepaths={}
+    listofrotbndindexes=[]
     for arrayidx in range(len(equivalentrotbndindexarrays)):
         array=equivalentrotbndindexarrays[arrayidx]
         strfragrotbndindexes=''
@@ -1487,9 +1490,11 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets,non
     for key,value in tempdic.items():
         rotbndindextoparentindextofragindex[key]=value 
     CopyEquivalentReferenceFragmentToOtherFragments(poltype,equivalentrotbndindexarrays,rotbndindextofragmentfilepath,rotbndindextoparentindextofragindex)
+
     if poltype.deleteallnonqmfiles==True:
         for path in rotbndindextofragmentfilepath.values():
-            poltype.DeleteAllNonQMFiles(path)
+            thepath,tail=os.path.split(path)
+            poltype.DeleteAllNonQMFiles(thepath)
     return rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor
 
 
