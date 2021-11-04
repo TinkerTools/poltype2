@@ -1732,6 +1732,30 @@ class PolarizableTyper():
                 raise ValueError('Element not allowed! '+str(atomicnum)) 
 
 
+    def CheckMP2OptFailed(self):
+        files=os.listdir()
+        for f in files:
+            if 'opt' in f and ('.com' in f or '.psi4' in f) and '_temp' not in f:
+                break
+
+        temp=open(f,'r')
+        results=temp.readlines()
+        temp.close()
+        foundHF=False
+        foundminix=False
+        mp2failed=False
+        for line in results:
+            if 'optimize' in line or 'opt' in line:
+                if 'hf' in line or 'HF' in line:
+                    foundHF=True
+                if 'minix' in line or 'MINIX' in line:
+                    foundminix=True 
+        if foundHF==True and foundminix==False:
+            mp2failed=True
+        return mp2failed
+
+
+
     def GenerateParameters(self):
         temp=open(os.getcwd()+r'/'+'poltype.ini','r')
         results=temp.readlines()
@@ -1807,6 +1831,10 @@ class PolarizableTyper():
         if self.keyfiletoaddtodatabase!=None:
             databaseparser.AddKeyFileParametersToParameterFile(self,m)   
             sys.exit()
+
+        if ('I ' in self.mol.GetSpacedFormula()):
+            if self.foundgauss==True:
+                self.use_gaus=True
         if ('Br ' in self.mol.GetSpacedFormula()):
             self.torspbasisset=self.torspbasissethalogen
         self.pcm=False
@@ -1933,6 +1961,12 @@ class PolarizableTyper():
             self.DeleteAllFiles()
             self.GenerateParameters()
 
+        checkmp2optfailed=self.CheckMP2OptFailed()
+        if checkmp2optfailed==True:
+            self.deletedfiles=True
+            self.DeleteAllFiles()
+            self.GenerateParameters()
+
 
         if self.optonly==True:
             sys.exit()
@@ -1992,7 +2026,8 @@ class PolarizableTyper():
         if self.issane==False:
             self.deletedfiles=True
             self.DeleteAllFiles()
-            RunPoltype()
+            self.GenerateParameters()
+
             
         # post process local frames written out by poledit
         if self.atomnum!=1: 
@@ -2289,11 +2324,15 @@ class PolarizableTyper():
                     os.remove(f)
 
 
-    def DeleteAllFiles(self):
+    def DeleteAllFiles(self,deletefragments=False):
         files=os.listdir()
         for f in files:
             if os.path.isdir(f):
-                shutil.rmtree(f)
+                if deletefragments==True:
+                    shutil.rmtree(f)
+                else:
+                    if f!='Fragments':
+                        shutil.rmtree(f)
             elif '.' in f and not os.path.isdir(f):
                 ext=f.split('.')[1]
                 if ext!='sdf' and ext!='ini' and 'nohup' not in f:

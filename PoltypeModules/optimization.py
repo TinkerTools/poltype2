@@ -26,13 +26,9 @@ def GeometryOPTWrapper(poltype,mol):
                  poltype.optpcm=False
                  redo=True
             else:
-                if poltype.optmethod=='MP2' and poltype.allowradicals==False: # HF doesnt work for radical?
-                    poltype.optmethod='HF'
+                if poltype.optmethod=='MP2' and (poltype.use_gaus==False and poltype.use_gausoptonly==False) and poltype.foundgauss==True:
                     redo=True
-                elif poltype.optmethod=='HF' and (poltype.use_gaus==True or poltype.use_gausoptonly==True): # if Gaussian failed try Psi4 as last resort....
-                    poltype.use_gaus=False
-                    poltype.use_gausoptonly=False
-                    redo=True
+                    poltype.use_gausoptonly=True
 
         if redo==True:
             shutil.copy(poltype.logoptfname,poltype.logoptfname.replace('.log','_failed.log'))
@@ -576,7 +572,11 @@ def FindTorsionRestraints(poltype,mol):
         ringbond=b.IsInRing()
         if ringbond==True:
             continue
+        ls=[t2.GetIdx(),t3.GetIdx()]
+        if ls in poltype.partialdoublebonds or ls[::-1] in poltype.partialdoublebonds:
+            continue
         bondnum+=1
+        
 
     if atomnum>=25 or bondnum>=2:
         for b in openbabel.OBMolBondIter(mol):
