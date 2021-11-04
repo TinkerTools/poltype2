@@ -78,6 +78,7 @@ conda install -c conda-forge rdkit=2021.09.2 --yes
 conda install -c conda-forge mdanalysis=2.0.0 --yes
 conda install -c conda-forge svgutils=0.3.4 --yes
 conda install -c conda-forge cairosvg=2.5.2 --yes
+conda install -c anaconda psutil --yes
 ```
 
 ### Environment var for running POLTYPE:

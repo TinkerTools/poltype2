@@ -59,13 +59,18 @@ python ~/poltypepackage/PoltypeModules/test_poltype.py
 structure            specifies input structure for poltype, must include total charge information. 
                      Default=None.
 numproc              specifies number of processors used for running quantum jobs. 
-                     Default=1.
+                     Default=Will be 80% of total available on node
 maxmem               specifies max RAM used for running quantum jobs. 
-                     Default=700MB 
+                     Default=Will be 80% of total available on node
 maxdisk              specifies max scratch space used for running quantum jobs. 
-                     Default=100GB
-totalcharge          Specifies totalcharge of molecule. If not assigned, will guess via valence.
-                     Defualt=None
+                     Default=Will be 80% of total available on node
+
+scratchpath          Path to scratch directory
+                     Default=/scratch
+
+consumptionratio     Default % of resources to use on node if not specified by user
+                     Default=.8
+
 deleteallnonqmfiles  This will delete all non-qm log files (sometimes errors require restarting and deleting the correct files).
                      Default=False
 
@@ -88,6 +93,8 @@ username             Needed for RenLabCluster daemon (externalapi keyword). This
 
 fragmentjobslocal Run fragment jobs on localhost even when externalapi keyword is active
                      Default=False
+
+maximizejobsatsametime  Sets the jobsatsametime equal to number of processors allowed 
 
 ```
 
