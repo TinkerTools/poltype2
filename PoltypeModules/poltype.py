@@ -1028,7 +1028,7 @@ class PolarizableTyper():
 
     
     def CallJobsSeriallyLocalHost(self,fulljobtooutputlog,skiperrors):
-       jobchunks=list(self.Chunks(list(fulljobtooutputlog.keys()),self.jobsatsametime))  
+       jobchunks=list(self.Chunks(list(fulljobtooutputlog.keys()),self.jobsatsametime))   
        thepath=os.path.join(os.getcwd(),'Fragments')
        for jobidx in range(len(jobchunks)):
            jobs=jobchunks[jobidx]
@@ -1156,1029 +1156,1029 @@ class PolarizableTyper():
         while len(finishedjobs)!=len(jobtooutputlog.keys()):
             for job in jobtooutputlog.keys():
                 outputlog=jobtooutputlog[job]
-			finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
-			#print('finished',finished,'error',error,'outputlog',outputlog,'skiperrors',skiperrors,flush=True)
-			if finished==True and error==False: # then check if SP has been submitted or not
-			    if outputlog not in finishedjobs:
-				self.NormalTerm(outputlog)
-				finishedjobs.append(outputlog)
-			elif finished==False and error==True:
-			    if skiperrors==False:
-				if outputlog not in finishedjobs:
-				    self.ErrorTerm(outputlog,skiperrors)
-				    finishedjobs.append(outputlog)
-				    errorjobs.append(outputlog)
-			    else:
-				finishedjobs.append(outputlog)
-
-			elif finished==False and error==False:
-			    if not os.path.isfile(outputlog):
-				printStr='Waiting on '+outputlog+' '+'to begin'
-			    else:
-				printStr = 'Waiting on '+outputlog+' '+'for termination '
-			    if (printStr != outputStatusDict[job]):
-				self.WriteToLog(printStr)
-				outputStatusDict[job] = printStr
-			else: # this case is finshed=True and error=True because there stupid quotes sometimes have word error in it                  
-			    if outputlog not in finishedjobs:
-				if skiperrors==True:
-				    error=False
-				    self.NormalTerm(outputlog)
-				    finishedjobs.append(outputlog)
-	    
-		    time.sleep(self.sleeptime) # how often to check logs (default every 30 s)
-		self.WriteToLog('All jobs have terminated '+str(finishedjobs))
-		return finishedjobs,errorjobs
-
-	    def CycleCount(self,logname):
-		temp=open(logname,'r')
-		results=temp.readlines()
-		temp.close()
-		count=0
-		for line in results:
-		    if 'Converged' in line or 'Convergence Check' in line:
-			count+=1
-		return count
-
-
-	    def CheckNormalTermination(self,logfname,errormessages=None,skiperrors=False): # needs to handle error checking now
-		"""
-		Intent: Checks the *.log file for normal termination
-		"""
-		error=False
-		term=False
-		if os.path.isfile(logfname):
-		    head,tail=os.path.split(logfname)
-		    Ftime=os.path.getmtime(logfname)
-		    reltime=time.time()-Ftime
-		    htime=reltime*0.000277778
-		    updatetime=4 # hours. sometimes psi4 gives return code 0 even though program crashes
-		    foundendgau=False # sometimes gaussian comments have keyword Error, ERROR in them
-		    for line in open(logfname):
-			if 'poltype' in tail:
-			    if 'Poltype Job Finished' in line:
-				term=True
-			else:
-			    if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line or "LBFGS  --  Normal Termination due to SmallGrad" in line or "Normal termination" in line or 'Normal Termination' in line or 'Total Potential Energy' in line:
-				term=True
-			    if ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line:
-				error=True
-				errorline=line
-			    if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line or ('OptimizationConvergenceError' in line and 'except' in line) or "Error on total polarization charges" in line or 'Erroneous write' in line:
-				error=False
-				continue
-			    if ('Error termination request processed by link 9999' in line or 'Error termination via Lnk1e in' in line) or ('OptimizationConvergenceError' in line and 'except' not in line) or 'Could not converge geometry optimization' in line or 'SCFConvergenceError' in line or 'Incomplete Convergence due to BadIntpln' in line:
-				error=True
-				errorline=line
-			    if 'l9999.exe' in line and foundendgau==False:
-				foundendgau=True
-				preverror=error # did find error before comment?
-			    if foundendgau==True:
-				if error==True and preverror==False: # then caused by Gaussian comment
-				    error=False
-			    
-
-		    if error==True:
-			term=False # sometimes psi4 geometry opt not fully converge but says successfully exiting etc..
-			message='Error '+errorline+ 'logpath='+logfname
-		    #if error==False and term==False and htime>=updatetime:
-		    #    error=True
-		    #    message='Error '+'Job has not been updated in '+str(updatetime)+' hours'+' last update time = '+str(htime)+' hours'+' logname='+logfname
-		    if error==True and term==False and skiperrors==False:
-			if errormessages!=None:
-			    if message not in errormessages:
-				self.WriteToLog(message) 
-				errormessages.append(message)
-			else:
-			    self.WriteToLog(message) 
-
-
-		if errormessages!=None:
-		    return term,error,errormessages
-		else:
-		    return term,error        
-
-
-	    
-		
-	    def NormalTerm(self,logfname):
-		self.WriteToLog("Normal termination: logfile=%s path=%s" % (logfname,os.getcwd()))
-	    
-	    
-	    def ErrorTerm(self,logfname,skiperrors):
-		if skiperrors==False:
-		    self.WriteToLog("ERROR termination: logfile=%s path=%s" % (logfname,os.getcwd()))
-
-
-	    def call_subsystem(self,cmdstrs,wait=False,skiperrors=False):
-		if self.printoutput==True:
-		    for cmdstr in cmdstrs:
-			print("Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
-		procs=[]
-		for cmdstr in cmdstrs:
-		    self.WriteToLog("Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
-		    if wait==True:
-			p = subprocess.Popen(cmdstr,shell=True,stdout=self.logfh, stderr=self.logfh)
-			procs.append(p)
-		    else:
-			os.system(cmdstr)
-		if wait==True:
-		    exit_codes=[p.wait() for p in procs]
-		    for i in range(len(procs)):
-			exitcode=exit_codes[i]
-			cmdstr=cmdstrs[i] 
-			if skiperrors==False:
-			    if exitcode != 0:
-				self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
-				raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
-			else:
-			    if exitcode != 0:
-				self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
-
-	    def WriteOutLiteratureReferences(self,keyfilename): # to use ParmEd on key file need Literature References delimited for parsing
-		temp=open(keyfilename,'r')
-		results=temp.readlines()
-		temp.close()
-		tempname=keyfilename.replace('.key','_temp.key')
-		temp=open(tempname,'w')
-		foundatomblock=False
-		for i in range(len(results)):
-		    line=results[i]
-		    if 'atom' in line and foundatomblock==False:
-			foundatomblock=True
-			temp.write('#############################'+'\n')
-			temp.write('##                         ##'+'\n')
-			temp.write('##  Literature References  ##'+'\n')
-			temp.write('##                         ##'+'\n')
-			temp.write('#############################'+'\n')
-			temp.write('\n')
-			temp.write('Wu, J.C.; Chattree, G.; Ren, P.Y.; Automation of AMOEBA polarizable force field'+'\n')
-			temp.write('parameterization for small molecules. Theor Chem Acc.'+'\n')
-			temp.write('\n')
-			temp.write(line)
-		    else:
-			temp.write(line)
-		os.remove(keyfilename)
-		os.replace(tempname,keyfilename)    
-
-	    def RaiseOutputFileError(self,logname):
-		raise ValueError('An error occured for '+logname) 
-
-	    def WritePoltypeInitializationFile(self,poltypeinput):
-		inifilepath=os.getcwd()+r'/'+'poltype.ini'
-		temp=open(inifilepath,'w')
-		for key,value in poltypeinput.items():
-		    if value!=None:
-			line=key+'='+str(value)+'\n'
-			temp.write(line)
-		temp.close()
-		return inifilepath
-
-	    def CheckTorsionParameters(self,keyfilename,torsionsmissing,hydtorsions): # dont check torsions skipped due to rule that if a-b-c-d, a or d is hydroten and not all possible a and d around b-c is hydrogen then torsion is skipped, if database transfers all zeros do not check
-		temp=open(keyfilename,'r')
-		results=temp.readlines()
-		temp.close()
-		for lineidx in range(len(results)):
-		    line=results[lineidx]
-		    if 'torsion' in line and '#' not in line and 'Missing' not in line and 'none' not in line:
-			allzero=True
-			linesplit=line.split()
-			ls=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3]),int(linesplit[4])]
-			revls=ls[::-1]
-			if (ls in torsionsmissing or revls in torsionsmissing) and (ls not in hydtorsions or revls not in hydtorsions):
-			    pass
-			else:
-			    continue
-			prms=linesplit[5:]
-			newprms=prms[0::3]
-			newprms=[float(i) for i in newprms]
-			for prm in newprms:
-			    if prm!=0:
-				allzero=False
-			if allzero==True:
-			    if self.firsterror==True:
-				self.WriteToLog("torsion parameters are all zero "+line+' path ='+os.getcwd())
-				raise ValueError("torsion parameters are all zero "+line+' path ='+os.getcwd())
-			    else:
-				self.firsterror=False
-				self.DeleteFilesWithExtension(['key_5'])
-				self.GenerateParameters()
-
-			    
-
-	    def main(self):
-		 
-		if self.amoebabioprmpath!=None and (self.modifiedproteinpdbname!=None or self.unmodifiedproteinpdbname!=None):
-		    knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference,modligidxs=modres.GenerateModifiedProteinPoltypeInput(self)
-		    self.molstructfname=molname
-		    head, self.molstructfname = os.path.split(self.molstructfname)
-		    self.molecprefix =  os.path.splitext(self.molstructfname)[0]
-
-		if self.amoebabioprmpath!=None and (self.modifiedproteinpdbname!=None or self.unmodifiedproteinpdbname!=None): # if already have core parameters in modified prm database then dont regenerate parameters
-		    if check==False:
-			self.GenerateParameters()
-		else:
-		   params= self.GenerateParameters()
-		   return params
-
-	    
-		if self.amoebabioprmpath!=None and (self.modifiedproteinpdbname!=None or self.unmodifiedproteinpdbname!=None):
-		    modres.GenerateModifiedProteinXYZAndKey(self,knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference,modligidxs)
-	    
-	    
-	    def GrabIndexToCoordinates(self,mol):
-		indextocoordinates={}
-		iteratom = openbabel.OBMolAtomIter(mol)
-		for atom in iteratom:
-		    atomidx=atom.GetIdx()
-		    rdkitindex=atomidx-1
-		    coords=[atom.GetX(),atom.GetY(),atom.GetZ()]
-		    indextocoordinates[rdkitindex]=coords
-		return indextocoordinates
-
-	    def AddInputCoordinatesAsDefaultConformer(self,m,indextocoordinates):
-		conf = m.GetConformer()
-		for i in range(m.GetNumAtoms()):
-		    x,y,z = indextocoordinates[i]
-		    conf.SetAtomPosition(i,Point3D(x,y,z))
-
-		return m 
-
-		       
-
-	    def CheckIfCartesianXYZ(self,f):
-		check=True
-		temp=open(f,'r')
-		results=temp.readlines()
-		temp.close()
-		for line in results:
-		    linesplit=line.split()
-		    if len(linesplit)>4:
-			check=False
-		return check
-
-	    def RemoveCartesianXYZFiles(self):
-		files=os.listdir()
-		for f in files:
-		    filename, file_extension = os.path.splitext(f)
-		    if file_extension=='.xyz' and 'opt' not in filename:
-			check=self.CheckIfCartesianXYZ(f)
-			if check==True:
-			    os.remove(f)
-
-		   
-	    
-	    def CheckInputCharge(self,molecule):
-		array=[]
-		totchg=0
-		atomindextoformalcharge={}
-		atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
-		for atom in molecule.GetAtoms():
-		    atomidx=atom.GetIdx()
-		    atomnum=atom.GetAtomicNum()
-		    val=atom.GetExplicitValence()
-		    valtochg=atomicnumtoformalchg[atomnum]
-		    radicals=atom.GetNumRadicalElectrons()
-		    if val not in valtochg.keys(): # then assume chg=0
-			chg=0
-		    else:
-			chg=valtochg[val]
-		    polneighb=False
-		    if atomnum==6:
-			for natom in atom.GetNeighbors():
-			    natomicnum=natom.GetAtomicNum()
-			    if natomicnum==7 or natomicnum==8 or natomicnum==16:
-				polneighb=True
-			if polneighb and val==3:
-			    chg=1
-		    string='Atom index = '+str(atomidx+1)+' Atomic Number = ' +str(atomnum)+ ' Valence = '+str(val)+ ' Formal charge = '+str(chg)
-		    array.append(string)
-		    if atomnum==6 and val==3 and self.addhydrogentononcharged==True and radicals==0:
-			warnings.warn('WARNING! Strange valence for Carbon, will assume missing hydrogens and add'+string) 
-			self.WriteToLog('WARNING! Strange valence for Carbon, will assume missing hydrogens and add '+string)
-			atom.SetNumRadicalElectrons(0)
-			chg=0
-			atom.SetFormalCharge(chg)
-
-
-		    elif atomnum==7 and val==2 and self.addhydrogentononcharged==True and radicals==0:
-			warnings.warn('WARNING! Strange valence for Nitrogen, will assume missing hydrogens and add'+string) 
-			self.WriteToLog('WARNING! Strange valence for Nitrogen, will assume missing hydrogens and add '+string)
-			atom.SetNumRadicalElectrons(0)
-			chg=0
-			atom.SetFormalCharge(chg)
-
-
-		    elif atomnum==7 and val==2 and radicals==1:
-			warnings.warn('WARNING! Strange valence for Nitrogen, will assume radical and set charge to zero') 
-			self.WriteToLog('WARNING! Strange valence for Nitrogen, will assume radical and set charge to zero')
-			self.allowradicals=True
-
-			atom.SetFormalCharge(0)
-			self.addhydrogentononcharged=False
-
-		    elif atomnum==8 and val==2 and radicals==1:
-			warnings.warn('WARNING! Strange valence for Oxygen, will assume radical and set charge to +1') 
-			self.WriteToLog('WARNING! Strange valence for Oxygen, will assume radical and set charge to +1')
-			self.allowradicals=True
-
-			atom.SetFormalCharge(1)
-		    elif atomnum==8 and val==1 and radicals==1:
-			warnings.warn('WARNING! Strange valence for Oxygen, will assume radical and set charge to +1') 
-			self.WriteToLog('WARNING! Strange valence for Oxygen, will assume radical and set charge to +0')
-			self.allowradicals=True
-			atom.SetFormalCharge(0)
-			self.addhydrogentononcharged=False
-
-		    else:
-			atom.SetFormalCharge(chg)
-			if self.allowradicals==False:
-			    atom.SetNumRadicalElectrons(0)
-	 
-			totchg+=chg
-		    atomindextoformalcharge[atomidx]=chg
-		if self.totalcharge!=None:
-		    if self.totalcharge!=totchg:
-			for row in array:
-			    print(row,flush=True)
-			raise ValueError('Valence is not consistent with input total charge')
-		else:
-		    self.totalcharge=totchg 
-		return molecule,atomindextoformalcharge
-
-	    def CheckBondTopology(self,outputlog,rdkitmol):
-		bondtoposame=True
-		if self.use_gaus==False and self.use_gausoptonly==False:
-		    fname=outputlog.replace('.log','.xyz')
-		else:
-		    fname=outputlog
-		outputname='preQMopt.mol'
-		rdmolfiles.MolToMolFile(rdkitmol,outputname)
-		optmol = opt.load_structfile(self,fname)
-		inioptmol = opt.load_structfile(self,outputname)
-		issame=opt.CheckBondConnectivity(self,inioptmol,optmol,outputlog.replace('.log','.xyz'))
-		if issame==False:
-		    bondtoposame=False
-		if self.fullopt==False: 
-		    isnear=opt.CompareBondLengths(self,inioptmol,optmol,outputlog)
-		else:
-		    isnear=True
-		if isnear==False:
-		    bondtoposame=False
-	    
-		return bondtoposame
-
-	    def CheckIfTorsionUndefined(self,listoftorsionsforprm,conf): # sometimes rdkit conformation has 3 linear atoms
-		isitsafe=True
-		for tor in listoftorsionsforprm:
-		    middle=[tor[1],tor[2]]
-		    firstangle=rdMolTransforms.GetAngleDeg(conf,tor[0],tor[1],tor[2])
-		    secondangle=rdMolTransforms.GetAngleDeg(conf,tor[1],tor[2],tor[3])
-
-		    if firstangle<0:
-			firstangle=firstangle+360
-		    if secondangle<0:
-			secondangle=secondangle+360
-		    angletol=2
-		    if np.abs(180-firstangle)<=2 or np.abs(180-secondangle)<=2:
-			isitsafe=False
-			break
-
-		return isitsafe
-
-
-
-	    def GenerateExtendedConformer(self,rdkitmol,mol):
-		numconf=100 # just try this
-		AllChem.EmbedMultipleConfs(rdkitmol, numConfs=numconf)
-		confs=rdkitmol.GetConformers()
-		listofatomsforprm,listofbondsforprm,listofanglesforprm,listoftorsionsforprm=databaseparser.GrabAtomsForParameters(self,mol)
-		disttoconf={}
-		for i in range(len(confs)):
-		    conf=confs[i]
-		    name="conftest.mol"
-		    rdmolfiles.MolToMolFile(rdkitmol,name,confId=i)
-		    mol=rdmolfiles.MolFromMolFile(name,removeHs=False)
-		    isitsafe=self.CheckIfTorsionUndefined(listoftorsionsforprm,conf)
-		    if isitsafe==False:
-			continue
-		    maxdist=self.FindLongestDistanceInMolecule(mol)
-
-		    disttoconf[maxdist]=i
-		distances=list(disttoconf.keys())
-		if len(distances)!=0:
-		    maxdist=max(distances)
-		    confindex=disttoconf[maxdist]
-		else:
-		    confindex=0
-		indextocoordinates={}
-		rdmolfiles.MolToMolFile(rdkitmol,name,confId=confindex)
-		mol=rdmolfiles.MolFromMolFile(name,removeHs=False)
-		for i in range(len(mol.GetAtoms())):
-		    pos = mol.GetConformer().GetAtomPosition(i) 
-		    vec=np.array([float(pos.x),float(pos.y),float(pos.z)])
-		    indextocoordinates[i]=vec
-		return indextocoordinates
-
-	    def FindLongestDistanceInMolecule(self,mol):
-		veclist=[]
-		for i in range(len(mol.GetAtoms())):
-		    pos = mol.GetConformer().GetAtomPosition(i) 
-		    vec=np.array([float(pos.x),float(pos.y),float(pos.z)])
-		    veclist.append(vec)
-		pairs=list(itertools.combinations(veclist, 2))
-		distlist=[]
-		for pairidx in range(len(pairs)):
-		    pair=pairs[pairidx]
-		    dist=np.linalg.norm(np.array(pair[0])-np.array(pair[1]))
-		    distlist.append(dist)
-		maxdist=np.amax(np.array(distlist))
-		return maxdist
-	    
-	    def SetDefaultCoordinatesBabel(self,mol,indextocoordinates):
-		for index,coords in indextocoordinates.items():
-		    atom=mol.GetAtom(index+1)
-		    x=coords[0]
-		    y=coords[1]
-		    z=coords[2]
-		    atom.SetVector(x,y,z)
-		return mol
-
-	    def CheckForConcentratedFormalCharges(self,m,atomindextoformalcharge):
-		chargedindices=[]
-		pcm=False
-		for atomindex,chg in atomindextoformalcharge.items():
-		    if chg!=0:
-			chargedindices.append(atomindex)
-		atleastonehashydrogen=False
-		for atomindex in chargedindices:
-		    atom=m.GetAtomWithIdx(atomindex)
-		    for natom in atom.GetNeighbors():
-			natomicnum=natom.GetAtomicNum()
-			if natomicnum==1:
-			    atleastonehashydrogen=True
-		if atleastonehashydrogen==True:         
-		    for atomindex in chargedindices:
-			atom=m.GetAtomWithIdx(atomindex)
-			for atm in atom.GetNeighbors():
-			    atmidx=atm.GetIdx()
-			    if atmidx in chargedindices:
-				pcm=True
-			    for natm in atm.GetNeighbors():
-				natmidx=natm.GetIdx()
-				if natmidx!=atomindex:
-				    if natmidx in chargedindices:
-					pcm=True
-				    for nnatm in natm.GetNeighbors():
-					nnatmidx=nnatm.GetIdx()
-					if nnatmidx!=atmidx:
-					    if nnatmidx in chargedindices:
-						pcm=True
-		return pcm 
-			
-			    
-	    def DeleteAllNonQMFiles(self,path=None):
-                if path!=None:
-                    os.chdir(path)
-		tempdir=os.getcwd()
-		self.DeleteNonQMFiles(os.getcwd()) 
-		if os.path.isdir('qm-torsion'):
-		    os.chdir('qm-torsion')
-		    self.DeleteNonQMFiles(os.getcwd()) 
-		    os.chdir('..')
-		if os.path.isdir('vdw'):
-		    os.chdir('vdw')
-		    self.DeleteNonQMFiles(os.getcwd()) 
-		    os.chdir('..')
-
-		os.chdir(tempdir)
-	       
-	    def DeleteNonQMFiles(self,directory):
-		tempdir=os.getcwd()
-		os.chdir(directory)
-		deletearray=[]
-		files=os.listdir()
-		for f in files:
-		    if not os.path.isdir(f) and 'nohup' not in f and f[0]!='.':
-			fsplit=f.split('.')
-			if len(fsplit)>1:
-			    end=fsplit[1]
-			    if 'log' not in end and 'sdf' not in end and 'ini' not in end and 'chk' not in end and 'dat' not in end: 
-				deletearray.append(f)
-		for f in deletearray:
-		    os.remove(f)
-
-		os.chdir(tempdir) 
-
-	    def ResourceInputs(self,jobpaths,ramalljobs,diskalljobs,numprocalljobs):
-		scratchspacelist=[]
-		ramlist=[]
-		numproclist=[]
-		for i in range(len(jobpaths)):
-		    scratchspacelist.append(diskalljobs)
-		    ramlist.append(ramalljobs)
-		    numproclist.append(numprocalljobs)
-	    
-		return scratchspacelist,ramlist,numproclist
-
-	    def GenerateDaemonInput(self,joblist,outputlogpath,scratchspacelist,ramlist,numproclist,jobpaths,inputdaemonfilepath):
-		head,tail=os.path.split(outputlogpath)
-		os.chdir(head)
-		temp=open(inputdaemonfilepath,'w')
-		for i in range(len(joblist)):
-		    job=joblist[i]
-		    scratchspace=scratchspacelist[i]
-		    ram=ramlist[i]
-		    numproc=numproclist[i]
-		    jobpath=jobpaths[i]
-		    string='--job='+job+' '+'--numproc='+str(1)+' '+'--ram=10GB'+' '+'--disk=0GB'+' '+'--inputfilepaths='+os.path.join(jobpath,'poltype.ini')+' '+'--username='+self.username+'\n'
-		    temp.write(string)
-		temp.close()
-
-
-	    def CreatePoltypeInputFilesMultipleMolecules(self):
-		dic={'username':self.username,'externalapi':self.externalapi,'accuratevdwsp':self.accuratevdwsp,'email':self.email,'firstoptfinished':self.firstoptfinished,'optonly':self.optonly,'onlyvdwatomindex':self.onlyvdwatomindex,'use_qmopt_vdw':self.use_qmopt_vdw,'use_gau_vdw':self.use_gau_vdw,'dontusepcm':self.dontusepcm,'deleteallnonqmfiles':self.deleteallnonqmfiles,'totalcharge':self.totalcharge,'torspbasissethalogen':self.torspbasissethalogen,'homodimers':self.homodimers,'boltzmantemp':self.boltzmantemp,'dontdovdwscan':self.dontdovdwscan,'use_gausgeomoptonly':self.use_gausgeomoptonly,'maxtorRMSPDRel':self.maxtorRMSPDRel,'tortor':self.tortor,'fitfirsttorsionfoldphase':self.fitfirsttorsionfoldphase,'defaultmaxtorsiongridpoints':self.defaultmaxtorsiongridpoints,'absdipoletol':self.absdipoletol,'refinenonaroringtors':self.refinenonaroringtors,'maxgrowthcycles':self.maxgrowthcycles,'use_gauPCM':self.use_gauPCM,'fitqmdipole':self.fitqmdipole,'WBOtol':self.WBOtol,'dontfrag':self.dontfrag,'dipoletol':self.dipoletol,'numproc':self.numproc,'maxmem':self.maxmem,'maxdisk':self.maxdisk,'optbasisset':self.optbasisset,'toroptbasisset':self.toroptbasisset,'dmabasisset':self.dmabasisset,'espbasisset':self.espbasisset,'torspbasisset':self.torspbasisset,'optmethod':self.optmethod,'toroptmethod':self.toroptmethod,'torspmethod':self.torspmethod,'dmamethod':self.dmamethod,'espmethod':self.espmethod,'qmonly' : self.qmonly,'espfit' : self.espfit,'foldnum':self.foldnum,'maxRMSD':self.maxRMSD,'maxRMSPD':self.maxRMSPD,'maxtorRMSPD':self.maxtorRMSPD,'tordatapointsnum':self.tordatapointsnum,'torsionrestraint':self.torsionrestraint,'rotalltors':self.rotalltors,'dontdotor':self.dontdotor,'dontdotorfit':self.dontdotorfit,'toroptpcm':self.toroptpcm,'optpcm':self.optpcm,'torsppcm':self.torsppcm,'use_gaus':self.use_gaus,'use_gausoptonly':self.use_gausoptonly,'freq':self.freq,'optmaxcycle':self.optmaxcycle,'forcefield':self.forcefield}
-		os.chdir(self.inputmoleculefolderpaths)
-		files=os.listdir()
-		jobpaths=[]
-		joblist=[]
-		for f in files:
-		    if os.path.isdir(f):
-			os.chdir(f)
-			subfiles=os.listdir()
-			for subf in subfiles:
-			    if '.sdf' in subf:
-				dic['structure']=subf
-				inifilepath=self.WritePoltypeInitializationFile(dic)
-				curdir=os.getcwd()
-				jobpaths.append(curdir)
-				poltypefilepath=os.path.join(self.poltypepath,'poltype.py')
-				joblist.append('cd '+curdir+' '+'&&'+' '+'python '+poltypefilepath)
-
-			os.chdir('..')
-		if self.externalapi!=None:
-		    outputlogfilepath=os.path.join(self.inputmoleculefolderpaths,'outputlog.txt')
-		    inputdaemonfilepath=os.path.join(self.inputmoleculefolderpaths,'jobinfo.txt')
-		    scratchspacelist,ramlist,numproclist=self.ResourceInputs(jobpaths,self.maxmem,self.maxdisk,self.numproc)
-		    self.GenerateDaemonInput(joblist,outputlogfilepath,scratchspacelist,ramlist,numproclist,jobpaths,inputdaemonfilepath)
-
-		sys.exit()
-
-	    def CheckIfAtomsAreAllowed(self,m):
-		listofallowedatoms=[1,6,7,8,15,16,17,35,53,9]
-		for atom in m.GetAtoms():
-		    atomicnum=atom.GetAtomicNum()
-		    if atomicnum not in listofallowedatoms:
-			raise ValueError('Element not allowed! '+str(atomicnum)) 
-
-
-	    def CheckMP2OptFailed(self):
-		files=os.listdir()
-		for f in files:
-		    if 'opt' in f and ('.com' in f or '.psi4' in f) and '_temp' not in f:
-			break
-
-		temp=open(f,'r')
-		results=temp.readlines()
-		temp.close()
-		foundHF=False
-		foundminix=False
-		mp2failed=False
-		for line in results:
-		    if 'optimize' in line or 'opt' in line:
-			if 'hf' in line or 'HF' in line:
-			    foundHF=True
-			if 'minix' in line or 'MINIX' in line:
-			    foundminix=True 
-		if foundHF==True and foundminix==False:
-		    mp2failed=True
-		return mp2failed
-
-
-
-	    def GenerateParameters(self):
-		temp=open(os.getcwd()+r'/'+'poltype.ini','r')
-		results=temp.readlines()
-		temp.close()
-		for line in results:
-		    if '#' not in line and line!='\n':
-			if '=' in line:
-			    linesplit=line.split('=',1)
-			    a=linesplit[1].replace('\n','').rstrip().lstrip()
-			    newline=linesplit[0]
-			    if a=='None':
-				continue
-			else:
-			    newline=line
-
-			if "structure" in newline:
-			    self.molstructfname = a
-
-		self.totalcharge=None
-		if self.deleteallnonqmfiles==True:
-		    self.DeleteAllNonQMFiles()
-		if self.inputmoleculefolderpaths!=None:
-		    self.CreatePoltypeInputFilesMultipleMolecules() 
-		if self.optmaxcycle>=100:
-		    self.fullopt=True
-		else:
-		    self.fullopt=False
-		obConversion = openbabel.OBConversion()
-		mol = openbabel.OBMol()
-		inFormat = obConversion.FormatFromExt(self.molstructfname)
-		obConversion.SetInFormat(inFormat)
-		obConversion.ReadFile(mol, self.molstructfname)
-		
-		self.atomnum=mol.NumAtoms() 
-		self.logfh = open(self.logfname,"w",buffering=1)
-
-		obConversion.SetOutFormat('mol')
-		self.molstructfnamemol=self.molstructfname.replace('.sdf','.mol')
-		obConversion.WriteFile(mol,self.molstructfnamemol)
-		indextocoordinates=self.GrabIndexToCoordinates(mol)
-		m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False,sanitize=False)
-		self.CheckIfAtomsAreAllowed(m)
-		m,atomindextoformalcharge=self.CheckInputCharge(m)
-		if self.allowradicals==True:
-		    self.dontfrag=True # Psi4 doesnt allow UHF and properties (like compute WBO) for fragmenter, so need to turn of fragmenter if radical detected
-		m.UpdatePropertyCache()
-		if self.addhydrogentononcharged==True:
-		    m = Chem.AddHs(m)
-		    AllChem.EmbedMolecule(m)
-		Chem.SanitizeMol(m)
-		smarts=rdmolfiles.MolToSmarts(m)
-		if '.' in smarts:
-		    raise ValueError('Multiple fragments detectected in input molecule')
-		pcm=self.CheckForConcentratedFormalCharges(m,atomindextoformalcharge)
-		cpm = copy.deepcopy(m)
-		if self.firstoptfinished==False:
-		    indextocoordinates=self.GenerateExtendedConformer(m,mol)
-		Chem.GetSymmSSSR(m)
-		m.GetRingInfo().NumRings() 
-		m=self.AddInputCoordinatesAsDefaultConformer(m,indextocoordinates)
-		rdmolfiles.MolToMolFile(m,'test.mol')
-		mol,m=self.CheckIsInput2D(mol,obConversion,m)
-		if not os.path.exists(self.scrtmpdirpsi4):
-		    os.mkdir(self.scrtmpdirpsi4)
-		if not os.path.exists(self.scrtmpdirgau):
-		    os.mkdir(self.scrtmpdirgau)
-
-		mol=self.SetDefaultCoordinatesBabel(mol,indextocoordinates)
-		self.mol=mol
-
-		self.rdkitmol=m
-		self.mol.SetTotalCharge(self.totalcharge)
-		if self.keyfiletoaddtodatabase!=None:
-		    databaseparser.AddKeyFileParametersToParameterFile(self,m)   
-		    sys.exit()
-
-		if ('I ' in self.mol.GetSpacedFormula()):
-		    if self.foundgauss==True:
-			self.use_gaus=True
-		if ('Br ' in self.mol.GetSpacedFormula()):
-		    self.torspbasisset=self.torspbasissethalogen
-		self.pcm=False
-		if pcm==True and self.dontusepcm==False:
-		    if self.foundgauss==True:
-			self.use_gauPCM=True
-			self.SanitizeAllQMMethods()
-		    self.pcm=True
-		    self.toroptpcm=True
-		    self.optpcm=True
-		    self.torsppcm=True
-
-		
-		if self.use_gauPCM==True:
-		    self.use_gausoptonly=False
-		    self.use_gaus=True
-		    self.SanitizeAllQMMethods()
-
-		atomiter=openbabel.OBMolAtomIter(self.mol)
-		atomnum=0
-		for atom in atomiter:
-		    atomnum+=1
-		    atomidx=atom.GetIdx()
-		    atomicnum=atom.GetAtomicNum()
-
-
-		self.RemoveCartesianXYZFiles()
-	 
-		self.WriteToLog("Running on host: " + gethostname())
-		# Initializing arrays
-		
-		self.canonicallabel = [ 0 ] * mol.NumAtoms()
-		self.localframe1 = [ 0 ] * mol.NumAtoms()
-		self.localframe2 = [ 0 ] * mol.NumAtoms()
-		self.idxtosymclass,self.symmetryclass=symm.gen_canonicallabels(self,mol) 
-	 
-		# QM calculations are done here
-		# First the molecule is optimized. (-opt) 
-		# This optimized molecule is stored in the structure optmol
-		# Then the electron density matrix is found (-dma)
-		# This is used by GDMA to find multipoles
-		# Then information for generating the electrostatic potential grid is found (-esp)
-		# This information is used by cubegen
-		self.comoptfname=self.firstcomoptfname 
-		self.chkoptfname=self.firstchkoptfname 
-		self.fckoptfname=self.firstfckoptfname
-		self.logoptfname=self.firstlogoptfname 
-		self.gausoptfname=self.firstgausoptfname 
-
-		if self.use_gausgeomoptonly==True:
-		    self.use_gausoptonly=True
-
-		torgen.FindPartialDoubleBonds(self,m)
-		    
-
-		if self.firstoptfinished==False:
-		    optmol,error,torsionrestraints = opt.GeometryOPTWrapper(self,mol)
-		    finished,error=self.CheckNormalTermination(self.firstlogoptfname)
-
-		    bondtopoopt=torgen.GenerateBondTopology(self,optmol)
-		    bondtopoopt=[list(i) for i in bondtopoopt]
-		    bondtopo=torgen.GenerateBondTopology(self,mol)
-		    bondtopo=[list(i) for i in bondtopo]
-		    for bond in bondtopo:
-			if bond in bondtopoopt or bond[::-1] in bondtopoopt:
-			    pass
-			else:
-			    if self.debugmode==False:
-				raise ValueError('Bond does not exist after optimization !'+str(bond))
-			    else:
-				self.debugmode=False
-				self.deletedfiles=True
-				self.DeleteAllFiles()
-				self.GenerateParameters()
-
-		    for bond in bondtopoopt:
-			if bond in bondtopo or bond[::-1] in bondtopo:
-			    pass
-			else:
-			    if self.debugmode==False:
-				raise ValueError('Bond created after optimization !'+str(bond))
-			    else:
-				self.debugmode=False
-				self.deletedfiles=True
-				self.DeleteAllFiles()
-				self.GenerateParameters()
-
-
-		    if finished==False:
-			bondtoposame=self.CheckBondTopology(self.firstlogoptfname,self.rdkitmol)
-		    else:
-			bondtoposame=True
-		    attempts=0
-		    maxiter=4
-		    cartxyz=self.firstlogoptfname.replace('.log','.xyz')
-		    opt.GrabFinalXYZStructure(self,self.firstlogoptfname,cartxyz,mol)
-
-		    inioptmol = opt.load_structfile(self,cartxyz)
-		    inioptmol.SetTotalCharge(mol.GetTotalCharge())
-
-		    while bondtoposame==False:
-			if attempts>=maxiter or finished==True:
-			    break
-			try:           
-			    optmol,error = opt.GeometryOptimization(self,inioptmol,loose=False,checkbonds=True,modred=True,bondanglerestraints=None,skipscferror=False,charge=None,skiperrors=True,overridecheckterm=True)
-			    finished,error=self.CheckNormalTermination(self.firstlogoptfname)
-			    cartxyz=self.firstlogoptfname.replace('.log','.xyz')
-			    opt.GrabFinalXYZStructure(self,self.firstlogoptfname,cartxyz,mol)
-			    inioptmol = opt.load_structfile(self,cartxyz)
-			    inioptmol.SetTotalCharge(mol.GetTotalCharge())
-			except:
-			    pass
-			bondtoposame=self.CheckBondTopology(self.firstlogoptfname,self.rdkitmol)
-			attempts+=1
-		else:
-		    cartxyz=self.firstlogoptfname.replace('.log','.xyz')
-		    optmol = opt.load_structfile(self,cartxyz)
-		    optmol.SetTotalCharge(mol.GetTotalCharge())
-
-		optatomnums=optmol.NumAtoms()
-		molatomnums=mol.NumAtoms()
-		if optatomnums!=molatomnums: # then program behaviour changed need to restart
-		    self.deletedfiles=True
-		    self.DeleteAllFiles()
-		    self.GenerateParameters()
-
-		checkmp2optfailed=self.CheckMP2OptFailed()
-		if checkmp2optfailed==True:
-		    self.deletedfiles=True
-		    self.DeleteAllFiles()
-		    self.GenerateParameters()
-
-
-		if self.optonly==True:
-		    sys.exit()
-		if self.use_gausgeomoptonly==True:
-		    self.use_gausoptonly=False
-		    self.use_gaus=False
-		if not os.path.isfile(self.key4fname) or not os.path.isfile(self.torsionsmissingfilename) or not os.path.isfile(self.torsionprmguessfilename):
-		    bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,missingvdwatomindextoneighbors,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo,tortorsmissing=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
-		if os.path.isfile(self.torsionsmissingfilename):
-		    torsionsmissing=databaseparser.ReadTorsionList(self,self.torsionsmissingfilename)
-		if os.path.isfile(self.torsionprmguessfilename):
-		    classkeytotorsionparametersguess=databaseparser.ReadDictionaryFromFile(self,self.torsionprmguessfilename)
-		if os.path.isfile(self.vdwmissingfilename):
-		    missingvdwatomindices=databaseparser.ReadVdwList(self,self.vdwmissingfilename)
-
-		if os.path.isfile(self.tortormissingfilename):
-		    tortorsmissing=databaseparser.ReadTorTorList(self,self.tortormissingfilename)
-		try:
-		    esp.SPForDMA(self,optmol,mol)
-		except:
-		    if self.use_gaus==True: # if gaussian failed try psi4
-			self.use_gaus=False
-			esp.SPForDMA(self,optmol,mol)
-			self.use_gaus=True
-		    else:
-			traceback.print_exc(file=sys.stdout)
-			sys.exit()
-
-		# Obtain multipoles from Gaussian fchk file using GDMA
-	    
-		if not os.path.isfile(self.gdmafname):
-		    mpole.run_gdma(self)
-	    
-		# Set up input file for poledit
-		# find multipole local frame definitions
-
-		polarindextopolarizeprm,polartypetotransferinfo=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m,polarize=True)
-		mpole.gen_peditinfile(self,mol,polarindextopolarizeprm)
-
-		
-		
-		if (not os.path.isfile(self.xyzfname) or not os.path.isfile(self.keyfname)):
-		    # Run poledit
-		    cmdstr = self.peditexe + " 1 " + self.gdmafname +' '+self.paramhead+ " < " + self.peditinfile
-		    self.call_subsystem([cmdstr],True)
-
-		    # Add header to the key file output by poledit
-		    while not os.path.isfile(self.keyfname):
-			time.sleep(1)
-			self.WriteToLog('Waiting for '+self.keyfname)
-			
-		    mpole.prepend_keyfile(self,self.keyfname,optmol)
-		    mpole.SanitizeMultipoleFrames(self,self.keyfname)
-		    
-
-		self.issane=self.CheckFileSanity()
-		if self.issane==False:
-		    self.deletedfiles=True
-		    self.DeleteAllFiles()
-		    self.GenerateParameters()
-
-		    
-		# post process local frames written out by poledit
-		if self.atomnum!=1: 
-		     try:
-			 esp.SPForESP(self,optmol,mol) 
-		     except:
-			 if self.use_gaus==True: # if gaussian failed try psi4
-			     self.use_gaus=False
-			     esp.SPForESP(self,optmol,mol) 
-			     self.use_gaus=True
-			 else:
-			     traceback.print_exc(file=sys.stdout)
-			     sys.exit()
-
-		# End here if qm calculations were all that needed to be done 
-		if self.qmonly:
-		    self.WriteToLog("poltype QM-only complete.")
-		    sys.exit(0)
-	    
-		       
-		
-		# generate the electrostatic potential grid used for multipole fitting
-		if self.atomnum!=1: 
-		    esp.gen_esp_grid(self,optmol)
-	    
-		# Average multipoles based on molecular symmetry
-		# Does this using the script avgmpoles.pl which is found in the poltype directory
-		# Atoms that belong to the same symm class will now have only one common multipole definition
-		if not os.path.isfile(self.key2fname):
-		    mpole.AverageMultipoles(self,optmol)
-		    mpole.AddPolarizeCommentsToKey(self,self.key2fname,polartypetotransferinfo)
-		if self.espfit and not os.path.isfile(self.key3fname) and self.atomnum!=1:
-		    # Optimize multipole parameters to QM ESP Grid (*.cube_2)
-		    # tinker's potential utility is called, with option 6.
-		    # option 6 reads: 'Fit Electrostatic Parameters to a Target Grid'
-		    
-		    esp.ElectrostaticPotentialFitting(self) 
-		elif self.atomnum==1 or self.espfit==False:
-		    shutil.copy(self.key2fname, self.key3fname)
-		# Remove header terms from the keyfile
-		mpole.rm_esp_terms_keyfile(self,self.key3fname)
-		if self.atomnum!=1: 
-		    esp.ElectrostaticPotentialComparison(self) 
-		    if self.failedrmspd==True and self.deletedfiles==False and self.skipespfiterror==False:
-			self.DeleteFilesWithExtension(['pot','grid','key','xyz','key_2','key_3','key_4','key_5','xyz_2','cube'])
-			self.DeleteFilesWithString(['esp','dma'])
-			self.deletedfiles=True
-			self.GenerateParameters()
-
-		
-		
-		# Now that multipoles have been found
-		# Other parameters such as opbend, vdw, etc. are found here using a look up table
-		# Part of the look up table is here in poltype.py 
-		# Most of it is in the file databaseparser.py found in the poltype directory
-	    
-		# Finds aromatic carbons and associated hydrogens and corrects polarizability
-		# Find opbend values using a look up table
-		# Outputs a list of rotatable bonds (found in get_torlist) in a form usable by databaseparser.py
-	    
-		# Map from idx to symm class is made for databaseparser.py
-		# databaseparser.py method is called to find parameters and append them to the keyfile
-		if not os.path.exists(self.key4fname):
-		    databaseparser.appendtofile(self,self.key3fname,self.key4fname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo)
-		    databaseparser.StiffenZThenBisectorAngleConstants(self,self.key4fname)
-		    databaseparser.TestBondAngleEquilValues(self)
-		    if self.databasematchonly==True:
-			sys.exit()
-
-		if self.torsppcm:
-		    torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
-		torgen.get_all_torsions(self,mol)
-		# Find rotatable bonds for future torsion scans
-		(self.torlist, self.rotbndlist,hydtorsions,nonaroringtorlist) = torgen.get_torlist(self,mol,torsionsmissing)
-		if atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False: 
-		    self.dontfrag=True
-		self.torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self) # this only happens in very symmetrical molecules
-		self.torlist=[tuple(i) for i in self.torlist]
-		self.torlist=[tuple([i]) for i in self.torlist]
-		self.torsettovariabletorlist={}
-		for torset in self.torlist:
-		    self.torsettovariabletorlist[tuple(torset)]=[]
-		nonaroringtorlist=[tuple(i) for i in nonaroringtorlist]
-		nonaroringtorlist=[tuple([i]) for i in nonaroringtorlist]
-		self.rotbndtoanginc=torgen.DetermineAngleIncrementAndPointsNeededForEachTorsionSet(self,mol,self.rotbndlist)
-		torgen.DefaultMaxRange(self,self.torlist)
-		if self.dontdotor==True:
-		    self.torlist=[]
-
-		# add missingvdwindices to torlist (for fragmenter input)
-		missingvdwatomsets=[]
-		if self.isfragjob==False and self.dontfrag==False and self.dontdovdwscan==False:
-		    for vdwatomindex in missingvdwatomindices:
-			ls=tuple([tuple([vdwatomindex])])
-			missingvdwatomsets.append(ls)
-			self.torlist.append(ls)
-		if self.dontdotor==True and self.dontdovdwscan==True:
-		    shutil.copy(self.key4fname,self.key5fname)
-
-		self.AddIndicesToKey(self.key4fname)
-		self.torsettofilenametorset={}
-		self.torsettotortorindex={}
-		self.torsettotortorphaseindicestokeep={}
-		self.nonaroringtors=[]
-		self.nonaroringtorsets=[]
-		self.classkeytoinitialprmguess={}
-		if self.tortor==True and self.dontdotor==False:
-		    torgen.PrepareTorsionTorsion(self,optmol,mol,tortorsmissing)
-		self.nonarotortotorsbeingfit={}
-		if self.refinenonaroringtors==True and self.dontfrag==False:
-		    rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
-
-
-		if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False and (self.dontdotor==False or self.dontdovdwscan==False):
-
-		    WBOmatrix,outputname,error=frag.GenerateWBOMatrix(self,self.rdkitmol,self.mol,self.logoptfname.replace('.log','.xyz'))
-		    highlightbonds=[]
-		    for torset in self.torlist:
-			for tor in torset:
-			    if len(tor)>1:
-				rotbnd=[tor[1]-1,tor[2]-1]
-				highlightbonds.append(rotbnd)
-		    frag.Draw2DMoleculeWithWBO(self,WBOmatrix,self.molstructfname.replace('.sdf',''),self.rdkitmol,bondindexlist=highlightbonds,imgsize=1500)        
-		    rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor=frag.GenerateFragments(self,self.mol,self.torlist,WBOmatrix,missingvdwatomsets,nonaroringtorlist) # returns list of bond indexes that need parent molecule to do torsion scan for (fragment generated was same as the parent0
-		    equivalentrotbndindexarrays,rotbndindextoringtor=frag.SpawnPoltypeJobsForFragments(self,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor)
-		if self.dontfrag==False and self.isfragjob==False and not os.path.isfile(self.key5fname) and (self.dontdotor==False or self.dontdovdwscan==False):
-		    frag.GrabVdwAndTorsionParametersFromFragments(self,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor) # just dump to key_5 since does not exist for parent molecule
-		else:         
-		    # Torsion scanning then fitting. *.key_5 will contain updated torsions
-		    if not os.path.isfile(self.key5fname):
-			if len(self.torlist)!=0:
-			    # torsion scanning
-			    torgen.gen_torsion(self,optmol,self.torsionrestraint,mol)
-			    # torsion fitting
-			    if self.dontdotorfit==True:
-				shutil.copy(self.key4fname,self.key5fname)
-				sys.exit()
-			    torfit.process_rot_bond_tors(self,optmol)
-			else:
-			    shutil.copy(self.key4fname,self.key5fname)
-		if self.isfragjob and len(self.onlyrotbndslist)!=0:
-		    self.dontdovdwscan=True
-		if self.dontdovdwscan==False:
-		    if self.dontfrag==False: 
-			if self.isfragjob==True:
-			    vdwfit.VanDerWaalsOptimization(self,missingvdwatomindices)    
-		    else:
-			vdwfit.VanDerWaalsOptimization(self,missingvdwatomindices)       
-		
-		if self.isfragjob==False and self.dontdotor==False:
-		    self.CheckTorsionParameters(self.key5fname,torsionsmissing,hydtorsions)
+                finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
+                #print('finished',finished,'error',error,'outputlog',outputlog,'skiperrors',skiperrors,flush=True)
+                if finished==True and error==False: # then check if SP has been submitted or not
+                    if outputlog not in finishedjobs:
+                        self.NormalTerm(outputlog)
+                        finishedjobs.append(outputlog)
+                elif finished==False and error==True:
+                    if skiperrors==False:
+                        if outputlog not in finishedjobs:
+                            self.ErrorTerm(outputlog,skiperrors)
+                            finishedjobs.append(outputlog)
+                            errorjobs.append(outputlog)
+                    else:
+                        finishedjobs.append(outputlog)
+
+                elif finished==False and error==False:
+                    if not os.path.isfile(outputlog):
+                        printStr='Waiting on '+outputlog+' '+'to begin'
+                    else:
+                        printStr = 'Waiting on '+outputlog+' '+'for termination '
+                    if (printStr != outputStatusDict[job]):
+                        self.WriteToLog(printStr)
+                        outputStatusDict[job] = printStr
+                else: # this case is finshed=True and error=True because there stupid quotes sometimes have word error in it                  
+                    if outputlog not in finishedjobs:
+                        if skiperrors==True:
+                            error=False
+                            self.NormalTerm(outputlog)
+                            finishedjobs.append(outputlog)
+    
+            time.sleep(self.sleeptime) # how often to check logs (default every 30 s)
+        self.WriteToLog('All jobs have terminated '+str(finishedjobs))
+        return finishedjobs,errorjobs
+
+    def CycleCount(self,logname):
+        temp=open(logname,'r')
+        results=temp.readlines()
+        temp.close()
+        count=0
+        for line in results:
+            if 'Converged' in line or 'Convergence Check' in line:
+                count+=1
+        return count
+
+
+    def CheckNormalTermination(self,logfname,errormessages=None,skiperrors=False): # needs to handle error checking now
+        """
+        Intent: Checks the *.log file for normal termination
+        """
+        error=False
+        term=False
+        if os.path.isfile(logfname):
+            head,tail=os.path.split(logfname)
+            Ftime=os.path.getmtime(logfname)
+            reltime=time.time()-Ftime
+            htime=reltime*0.000277778
+            updatetime=4 # hours. sometimes psi4 gives return code 0 even though program crashes
+            foundendgau=False # sometimes gaussian comments have keyword Error, ERROR in them
+            for line in open(logfname):
+                if 'poltype' in tail:
+                    if 'Poltype Job Finished' in line:
+                        term=True
+                else:
+                    if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line or "LBFGS  --  Normal Termination due to SmallGrad" in line or "Normal termination" in line or 'Normal Termination' in line or 'Total Potential Energy' in line:
+                        term=True
+                    if ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line:
+                        error=True
+                        errorline=line
+                    if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line or ('OptimizationConvergenceError' in line and 'except' in line) or "Error on total polarization charges" in line or 'Erroneous write' in line:
+                        error=False
+                        continue
+                    if ('Error termination request processed by link 9999' in line or 'Error termination via Lnk1e in' in line) or ('OptimizationConvergenceError' in line and 'except' not in line) or 'Could not converge geometry optimization' in line or 'SCFConvergenceError' in line or 'Incomplete Convergence due to BadIntpln' in line:
+                        error=True
+                        errorline=line
+                    if 'l9999.exe' in line and foundendgau==False:
+                        foundendgau=True
+                        preverror=error # did find error before comment?
+                    if foundendgau==True:
+                        if error==True and preverror==False: # then caused by Gaussian comment
+                            error=False
+                    
+
+            if error==True:
+                term=False # sometimes psi4 geometry opt not fully converge but says successfully exiting etc..
+                message='Error '+errorline+ 'logpath='+logfname
+            #if error==False and term==False and htime>=updatetime:
+            #    error=True
+            #    message='Error '+'Job has not been updated in '+str(updatetime)+' hours'+' last update time = '+str(htime)+' hours'+' logname='+logfname
+            if error==True and term==False and skiperrors==False:
+                if errormessages!=None:
+                    if message not in errormessages:
+                        self.WriteToLog(message) 
+                        errormessages.append(message)
+                else:
+                    self.WriteToLog(message) 
+
+
+        if errormessages!=None:
+            return term,error,errormessages
+        else:
+            return term,error        
+
+
+    
+        
+    def NormalTerm(self,logfname):
+        self.WriteToLog("Normal termination: logfile=%s path=%s" % (logfname,os.getcwd()))
+    
+    
+    def ErrorTerm(self,logfname,skiperrors):
+        if skiperrors==False:
+            self.WriteToLog("ERROR termination: logfile=%s path=%s" % (logfname,os.getcwd()))
+
+
+    def call_subsystem(self,cmdstrs,wait=False,skiperrors=False):
+        if self.printoutput==True:
+            for cmdstr in cmdstrs:
+                print("Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
+        procs=[]
+        for cmdstr in cmdstrs:
+            self.WriteToLog("Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
+            if wait==True:
+                p = subprocess.Popen(cmdstr,shell=True,stdout=self.logfh, stderr=self.logfh)
+                procs.append(p)
+            else:
+                os.system(cmdstr)
+        if wait==True:
+            exit_codes=[p.wait() for p in procs]
+            for i in range(len(procs)):
+                exitcode=exit_codes[i]
+                cmdstr=cmdstrs[i] 
+                if skiperrors==False:
+                    if exitcode != 0:
+                        self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
+                        raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
+                else:
+                    if exitcode != 0:
+                        self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
+
+    def WriteOutLiteratureReferences(self,keyfilename): # to use ParmEd on key file need Literature References delimited for parsing
+        temp=open(keyfilename,'r')
+        results=temp.readlines()
+        temp.close()
+        tempname=keyfilename.replace('.key','_temp.key')
+        temp=open(tempname,'w')
+        foundatomblock=False
+        for i in range(len(results)):
+            line=results[i]
+            if 'atom' in line and foundatomblock==False:
+                foundatomblock=True
+                temp.write('#############################'+'\n')
+                temp.write('##                         ##'+'\n')
+                temp.write('##  Literature References  ##'+'\n')
+                temp.write('##                         ##'+'\n')
+                temp.write('#############################'+'\n')
+                temp.write('\n')
+                temp.write('Wu, J.C.; Chattree, G.; Ren, P.Y.; Automation of AMOEBA polarizable force field'+'\n')
+                temp.write('parameterization for small molecules. Theor Chem Acc.'+'\n')
+                temp.write('\n')
+                temp.write(line)
+            else:
+                temp.write(line)
+        os.remove(keyfilename)
+        os.replace(tempname,keyfilename)    
+
+    def RaiseOutputFileError(self,logname):
+        raise ValueError('An error occured for '+logname) 
+
+    def WritePoltypeInitializationFile(self,poltypeinput):
+        inifilepath=os.getcwd()+r'/'+'poltype.ini'
+        temp=open(inifilepath,'w')
+        for key,value in poltypeinput.items():
+            if value!=None:
+                line=key+'='+str(value)+'\n'
+                temp.write(line)
+        temp.close()
+        return inifilepath
+
+    def CheckTorsionParameters(self,keyfilename,torsionsmissing,hydtorsions): # dont check torsions skipped due to rule that if a-b-c-d, a or d is hydroten and not all possible a and d around b-c is hydrogen then torsion is skipped, if database transfers all zeros do not check
+        temp=open(keyfilename,'r')
+        results=temp.readlines()
+        temp.close()
+        for lineidx in range(len(results)):
+            line=results[lineidx]
+            if 'torsion' in line and '#' not in line and 'Missing' not in line and 'none' not in line:
+                allzero=True
+                linesplit=line.split()
+                ls=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3]),int(linesplit[4])]
+                revls=ls[::-1]
+                if (ls in torsionsmissing or revls in torsionsmissing) and (ls not in hydtorsions or revls not in hydtorsions):
+                    pass
+                else:
+                    continue
+                prms=linesplit[5:]
+                newprms=prms[0::3]
+                newprms=[float(i) for i in newprms]
+                for prm in newprms:
+                    if prm!=0:
+                        allzero=False
+                if allzero==True:
+                    if self.firsterror==True:
+                        self.WriteToLog("torsion parameters are all zero "+line+' path ='+os.getcwd())
+                        raise ValueError("torsion parameters are all zero "+line+' path ='+os.getcwd())
+                    else:
+                        self.firsterror=False
+                        self.DeleteFilesWithExtension(['key_5'])
+                        self.GenerateParameters()
+
+                    
+
+    def main(self):
+         
+        if self.amoebabioprmpath!=None and (self.modifiedproteinpdbname!=None or self.unmodifiedproteinpdbname!=None):
+            knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference,modligidxs=modres.GenerateModifiedProteinPoltypeInput(self)
+            self.molstructfname=molname
+            head, self.molstructfname = os.path.split(self.molstructfname)
+            self.molecprefix =  os.path.splitext(self.molstructfname)[0]
+
+        if self.amoebabioprmpath!=None and (self.modifiedproteinpdbname!=None or self.unmodifiedproteinpdbname!=None): # if already have core parameters in modified prm database then dont regenerate parameters
+            if check==False:
+                self.GenerateParameters()
+        else:
+           params= self.GenerateParameters()
+           return params
+
+    
+        if self.amoebabioprmpath!=None and (self.modifiedproteinpdbname!=None or self.unmodifiedproteinpdbname!=None):
+            modres.GenerateModifiedProteinXYZAndKey(self,knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference,modligidxs)
+    
+    
+    def GrabIndexToCoordinates(self,mol):
+        indextocoordinates={}
+        iteratom = openbabel.OBMolAtomIter(mol)
+        for atom in iteratom:
+            atomidx=atom.GetIdx()
+            rdkitindex=atomidx-1
+            coords=[atom.GetX(),atom.GetY(),atom.GetZ()]
+            indextocoordinates[rdkitindex]=coords
+        return indextocoordinates
+
+    def AddInputCoordinatesAsDefaultConformer(self,m,indextocoordinates):
+        conf = m.GetConformer()
+        for i in range(m.GetNumAtoms()):
+            x,y,z = indextocoordinates[i]
+            conf.SetAtomPosition(i,Point3D(x,y,z))
+
+        return m 
+
+               
+
+    def CheckIfCartesianXYZ(self,f):
+        check=True
+        temp=open(f,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            linesplit=line.split()
+            if len(linesplit)>4:
+                check=False
+        return check
+
+    def RemoveCartesianXYZFiles(self):
+        files=os.listdir()
+        for f in files:
+            filename, file_extension = os.path.splitext(f)
+            if file_extension=='.xyz' and 'opt' not in filename:
+                check=self.CheckIfCartesianXYZ(f)
+                if check==True:
+                    os.remove(f)
+
+           
+    
+    def CheckInputCharge(self,molecule):
+        array=[]
+        totchg=0
+        atomindextoformalcharge={}
+        atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
+        for atom in molecule.GetAtoms():
+            atomidx=atom.GetIdx()
+            atomnum=atom.GetAtomicNum()
+            val=atom.GetExplicitValence()
+            valtochg=atomicnumtoformalchg[atomnum]
+            radicals=atom.GetNumRadicalElectrons()
+            if val not in valtochg.keys(): # then assume chg=0
+                chg=0
+            else:
+                chg=valtochg[val]
+            polneighb=False
+            if atomnum==6:
+                for natom in atom.GetNeighbors():
+                    natomicnum=natom.GetAtomicNum()
+                    if natomicnum==7 or natomicnum==8 or natomicnum==16:
+                        polneighb=True
+                if polneighb and val==3:
+                    chg=1
+            string='Atom index = '+str(atomidx+1)+' Atomic Number = ' +str(atomnum)+ ' Valence = '+str(val)+ ' Formal charge = '+str(chg)
+            array.append(string)
+            if atomnum==6 and val==3 and self.addhydrogentononcharged==True and radicals==0:
+                warnings.warn('WARNING! Strange valence for Carbon, will assume missing hydrogens and add'+string) 
+                self.WriteToLog('WARNING! Strange valence for Carbon, will assume missing hydrogens and add '+string)
+                atom.SetNumRadicalElectrons(0)
+                chg=0
+                atom.SetFormalCharge(chg)
+
+
+            elif atomnum==7 and val==2 and self.addhydrogentononcharged==True and radicals==0:
+                warnings.warn('WARNING! Strange valence for Nitrogen, will assume missing hydrogens and add'+string) 
+                self.WriteToLog('WARNING! Strange valence for Nitrogen, will assume missing hydrogens and add '+string)
+                atom.SetNumRadicalElectrons(0)
+                chg=0
+                atom.SetFormalCharge(chg)
+
+
+            elif atomnum==7 and val==2 and radicals==1:
+                warnings.warn('WARNING! Strange valence for Nitrogen, will assume radical and set charge to zero') 
+                self.WriteToLog('WARNING! Strange valence for Nitrogen, will assume radical and set charge to zero')
+                self.allowradicals=True
+
+                atom.SetFormalCharge(0)
+                self.addhydrogentononcharged=False
+
+            elif atomnum==8 and val==2 and radicals==1:
+                warnings.warn('WARNING! Strange valence for Oxygen, will assume radical and set charge to +1') 
+                self.WriteToLog('WARNING! Strange valence for Oxygen, will assume radical and set charge to +1')
+                self.allowradicals=True
+
+                atom.SetFormalCharge(1)
+            elif atomnum==8 and val==1 and radicals==1:
+                warnings.warn('WARNING! Strange valence for Oxygen, will assume radical and set charge to +1') 
+                self.WriteToLog('WARNING! Strange valence for Oxygen, will assume radical and set charge to +0')
+                self.allowradicals=True
+                atom.SetFormalCharge(0)
+                self.addhydrogentononcharged=False
+
+            else:
+                atom.SetFormalCharge(chg)
+                if self.allowradicals==False:
+                    atom.SetNumRadicalElectrons(0)
+ 
+                totchg+=chg
+            atomindextoformalcharge[atomidx]=chg
+        if self.totalcharge!=None:
+            if self.totalcharge!=totchg:
+                for row in array:
+                    print(row,flush=True)
+                raise ValueError('Valence is not consistent with input total charge')
+        else:
+            self.totalcharge=totchg 
+        return molecule,atomindextoformalcharge
+
+    def CheckBondTopology(self,outputlog,rdkitmol):
+        bondtoposame=True
+        if self.use_gaus==False and self.use_gausoptonly==False:
+            fname=outputlog.replace('.log','.xyz')
+        else:
+            fname=outputlog
+        outputname='preQMopt.mol'
+        rdmolfiles.MolToMolFile(rdkitmol,outputname)
+        optmol = opt.load_structfile(self,fname)
+        inioptmol = opt.load_structfile(self,outputname)
+        issame=opt.CheckBondConnectivity(self,inioptmol,optmol,outputlog.replace('.log','.xyz'))
+        if issame==False:
+            bondtoposame=False
+        if self.fullopt==False: 
+            isnear=opt.CompareBondLengths(self,inioptmol,optmol,outputlog)
+        else:
+            isnear=True
+        if isnear==False:
+            bondtoposame=False
+    
+        return bondtoposame
+
+    def CheckIfTorsionUndefined(self,listoftorsionsforprm,conf): # sometimes rdkit conformation has 3 linear atoms
+        isitsafe=True
+        for tor in listoftorsionsforprm:
+            middle=[tor[1],tor[2]]
+            firstangle=rdMolTransforms.GetAngleDeg(conf,tor[0],tor[1],tor[2])
+            secondangle=rdMolTransforms.GetAngleDeg(conf,tor[1],tor[2],tor[3])
+
+            if firstangle<0:
+                firstangle=firstangle+360
+            if secondangle<0:
+                secondangle=secondangle+360
+            angletol=2
+            if np.abs(180-firstangle)<=2 or np.abs(180-secondangle)<=2:
+                isitsafe=False
+                break
+
+        return isitsafe
+
+
+
+    def GenerateExtendedConformer(self,rdkitmol,mol):
+        numconf=100 # just try this
+        AllChem.EmbedMultipleConfs(rdkitmol, numConfs=numconf)
+        confs=rdkitmol.GetConformers()
+        listofatomsforprm,listofbondsforprm,listofanglesforprm,listoftorsionsforprm=databaseparser.GrabAtomsForParameters(self,mol)
+        disttoconf={}
+        for i in range(len(confs)):
+            conf=confs[i]
+            name="conftest.mol"
+            rdmolfiles.MolToMolFile(rdkitmol,name,confId=i)
+            mol=rdmolfiles.MolFromMolFile(name,removeHs=False)
+            isitsafe=self.CheckIfTorsionUndefined(listoftorsionsforprm,conf)
+            if isitsafe==False:
+                continue
+            maxdist=self.FindLongestDistanceInMolecule(mol)
+
+            disttoconf[maxdist]=i
+        distances=list(disttoconf.keys())
+        if len(distances)!=0:
+            maxdist=max(distances)
+            confindex=disttoconf[maxdist]
+        else:
+            confindex=0
+        indextocoordinates={}
+        rdmolfiles.MolToMolFile(rdkitmol,name,confId=confindex)
+        mol=rdmolfiles.MolFromMolFile(name,removeHs=False)
+        for i in range(len(mol.GetAtoms())):
+            pos = mol.GetConformer().GetAtomPosition(i) 
+            vec=np.array([float(pos.x),float(pos.y),float(pos.z)])
+            indextocoordinates[i]=vec
+        return indextocoordinates
+
+    def FindLongestDistanceInMolecule(self,mol):
+        veclist=[]
+        for i in range(len(mol.GetAtoms())):
+            pos = mol.GetConformer().GetAtomPosition(i) 
+            vec=np.array([float(pos.x),float(pos.y),float(pos.z)])
+            veclist.append(vec)
+        pairs=list(itertools.combinations(veclist, 2))
+        distlist=[]
+        for pairidx in range(len(pairs)):
+            pair=pairs[pairidx]
+            dist=np.linalg.norm(np.array(pair[0])-np.array(pair[1]))
+            distlist.append(dist)
+        maxdist=np.amax(np.array(distlist))
+        return maxdist
+    
+    def SetDefaultCoordinatesBabel(self,mol,indextocoordinates):
+        for index,coords in indextocoordinates.items():
+            atom=mol.GetAtom(index+1)
+            x=coords[0]
+            y=coords[1]
+            z=coords[2]
+            atom.SetVector(x,y,z)
+        return mol
+
+    def CheckForConcentratedFormalCharges(self,m,atomindextoformalcharge):
+        chargedindices=[]
+        pcm=False
+        for atomindex,chg in atomindextoformalcharge.items():
+            if chg!=0:
+                chargedindices.append(atomindex)
+        atleastonehashydrogen=False
+        for atomindex in chargedindices:
+            atom=m.GetAtomWithIdx(atomindex)
+            for natom in atom.GetNeighbors():
+                natomicnum=natom.GetAtomicNum()
+                if natomicnum==1:
+                    atleastonehashydrogen=True
+        if atleastonehashydrogen==True:         
+            for atomindex in chargedindices:
+                atom=m.GetAtomWithIdx(atomindex)
+                for atm in atom.GetNeighbors():
+                    atmidx=atm.GetIdx()
+                    if atmidx in chargedindices:
+                        pcm=True
+                    for natm in atm.GetNeighbors():
+                        natmidx=natm.GetIdx()
+                        if natmidx!=atomindex:
+                            if natmidx in chargedindices:
+                                pcm=True
+                            for nnatm in natm.GetNeighbors():
+                                nnatmidx=nnatm.GetIdx()
+                                if nnatmidx!=atmidx:
+                                    if nnatmidx in chargedindices:
+                                        pcm=True
+        return pcm 
+                
+                    
+    def DeleteAllNonQMFiles(self,folderpath=None):
+        tempdir=os.getcwd()
+        if folderpath!=None:
+            os.chdir(folderpath)
+        self.DeleteNonQMFiles(os.getcwd()) 
+        if os.path.isdir('qm-torsion'):
+            os.chdir('qm-torsion')
+            self.DeleteNonQMFiles(os.getcwd()) 
+            os.chdir('..')
+        if os.path.isdir('vdw'):
+            os.chdir('vdw')
+            self.DeleteNonQMFiles(os.getcwd()) 
+            os.chdir('..')
+
+        os.chdir(tempdir)
+       
+    def DeleteNonQMFiles(self,directory):
+        tempdir=os.getcwd()
+        os.chdir(directory)
+        deletearray=[]
+        files=os.listdir()
+        for f in files:
+            if not os.path.isdir(f) and 'nohup' not in f and f[0]!='.':
+                fsplit=f.split('.')
+                if len(fsplit)>1:
+                    end=fsplit[1]
+                    if 'log' not in end and 'sdf' not in end and 'ini' not in end and 'chk' not in end and 'dat' not in end: 
+                        deletearray.append(f)
+        for f in deletearray:
+            os.remove(f)
+
+        os.chdir(tempdir) 
+
+    def ResourceInputs(self,jobpaths,ramalljobs,diskalljobs,numprocalljobs):
+        scratchspacelist=[]
+        ramlist=[]
+        numproclist=[]
+        for i in range(len(jobpaths)):
+            scratchspacelist.append(diskalljobs)
+            ramlist.append(ramalljobs)
+            numproclist.append(numprocalljobs)
+    
+        return scratchspacelist,ramlist,numproclist
+
+    def GenerateDaemonInput(self,joblist,outputlogpath,scratchspacelist,ramlist,numproclist,jobpaths,inputdaemonfilepath):
+        head,tail=os.path.split(outputlogpath)
+        os.chdir(head)
+        temp=open(inputdaemonfilepath,'w')
+        for i in range(len(joblist)):
+            job=joblist[i]
+            scratchspace=scratchspacelist[i]
+            ram=ramlist[i]
+            numproc=numproclist[i]
+            jobpath=jobpaths[i]
+            string='--job='+job+' '+'--numproc='+str(1)+' '+'--ram=10GB'+' '+'--disk=0GB'+' '+'--inputfilepaths='+os.path.join(jobpath,'poltype.ini')+' '+'--username='+self.username+'\n'
+            temp.write(string)
+        temp.close()
+
+
+    def CreatePoltypeInputFilesMultipleMolecules(self):
+        dic={'username':self.username,'externalapi':self.externalapi,'accuratevdwsp':self.accuratevdwsp,'email':self.email,'firstoptfinished':self.firstoptfinished,'optonly':self.optonly,'onlyvdwatomindex':self.onlyvdwatomindex,'use_qmopt_vdw':self.use_qmopt_vdw,'use_gau_vdw':self.use_gau_vdw,'dontusepcm':self.dontusepcm,'deleteallnonqmfiles':self.deleteallnonqmfiles,'totalcharge':self.totalcharge,'torspbasissethalogen':self.torspbasissethalogen,'homodimers':self.homodimers,'boltzmantemp':self.boltzmantemp,'dontdovdwscan':self.dontdovdwscan,'use_gausgeomoptonly':self.use_gausgeomoptonly,'maxtorRMSPDRel':self.maxtorRMSPDRel,'tortor':self.tortor,'fitfirsttorsionfoldphase':self.fitfirsttorsionfoldphase,'defaultmaxtorsiongridpoints':self.defaultmaxtorsiongridpoints,'absdipoletol':self.absdipoletol,'refinenonaroringtors':self.refinenonaroringtors,'maxgrowthcycles':self.maxgrowthcycles,'use_gauPCM':self.use_gauPCM,'fitqmdipole':self.fitqmdipole,'WBOtol':self.WBOtol,'dontfrag':self.dontfrag,'dipoletol':self.dipoletol,'numproc':self.numproc,'maxmem':self.maxmem,'maxdisk':self.maxdisk,'optbasisset':self.optbasisset,'toroptbasisset':self.toroptbasisset,'dmabasisset':self.dmabasisset,'espbasisset':self.espbasisset,'torspbasisset':self.torspbasisset,'optmethod':self.optmethod,'toroptmethod':self.toroptmethod,'torspmethod':self.torspmethod,'dmamethod':self.dmamethod,'espmethod':self.espmethod,'qmonly' : self.qmonly,'espfit' : self.espfit,'foldnum':self.foldnum,'maxRMSD':self.maxRMSD,'maxRMSPD':self.maxRMSPD,'maxtorRMSPD':self.maxtorRMSPD,'tordatapointsnum':self.tordatapointsnum,'torsionrestraint':self.torsionrestraint,'rotalltors':self.rotalltors,'dontdotor':self.dontdotor,'dontdotorfit':self.dontdotorfit,'toroptpcm':self.toroptpcm,'optpcm':self.optpcm,'torsppcm':self.torsppcm,'use_gaus':self.use_gaus,'use_gausoptonly':self.use_gausoptonly,'freq':self.freq,'optmaxcycle':self.optmaxcycle,'forcefield':self.forcefield}
+        os.chdir(self.inputmoleculefolderpaths)
+        files=os.listdir()
+        jobpaths=[]
+        joblist=[]
+        for f in files:
+            if os.path.isdir(f):
+                os.chdir(f)
+                subfiles=os.listdir()
+                for subf in subfiles:
+                    if '.sdf' in subf:
+                        dic['structure']=subf
+                        inifilepath=self.WritePoltypeInitializationFile(dic)
+                        curdir=os.getcwd()
+                        jobpaths.append(curdir)
+                        poltypefilepath=os.path.join(self.poltypepath,'poltype.py')
+                        joblist.append('cd '+curdir+' '+'&&'+' '+'python '+poltypefilepath)
+
+                os.chdir('..')
+        if self.externalapi!=None:
+            outputlogfilepath=os.path.join(self.inputmoleculefolderpaths,'outputlog.txt')
+            inputdaemonfilepath=os.path.join(self.inputmoleculefolderpaths,'jobinfo.txt')
+            scratchspacelist,ramlist,numproclist=self.ResourceInputs(jobpaths,self.maxmem,self.maxdisk,self.numproc)
+            self.GenerateDaemonInput(joblist,outputlogfilepath,scratchspacelist,ramlist,numproclist,jobpaths,inputdaemonfilepath)
+
+        sys.exit()
+
+    def CheckIfAtomsAreAllowed(self,m):
+        listofallowedatoms=[1,6,7,8,15,16,17,35,53,9]
+        for atom in m.GetAtoms():
+            atomicnum=atom.GetAtomicNum()
+            if atomicnum not in listofallowedatoms:
+                raise ValueError('Element not allowed! '+str(atomicnum)) 
+
+
+    def CheckMP2OptFailed(self):
+        files=os.listdir()
+        for f in files:
+            if 'opt' in f and ('.com' in f or '.psi4' in f) and '_temp' not in f:
+                break
+
+        temp=open(f,'r')
+        results=temp.readlines()
+        temp.close()
+        foundHF=False
+        foundminix=False
+        mp2failed=False
+        for line in results:
+            if 'optimize' in line or 'opt' in line:
+                if 'hf' in line or 'HF' in line:
+                    foundHF=True
+                if 'minix' in line or 'MINIX' in line:
+                    foundminix=True 
+        if foundHF==True and foundminix==False:
+            mp2failed=True
+        return mp2failed
+
+
+
+    def GenerateParameters(self):
+        temp=open(os.getcwd()+r'/'+'poltype.ini','r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            if '#' not in line and line!='\n':
+                if '=' in line:
+                    linesplit=line.split('=',1)
+                    a=linesplit[1].replace('\n','').rstrip().lstrip()
+                    newline=linesplit[0]
+                    if a=='None':
+                        continue
+                else:
+                    newline=line
+
+                if "structure" in newline:
+                    self.molstructfname = a
+
+        self.totalcharge=None
+        if self.deleteallnonqmfiles==True:
+            self.DeleteAllNonQMFiles()
+        if self.inputmoleculefolderpaths!=None:
+            self.CreatePoltypeInputFilesMultipleMolecules() 
+        if self.optmaxcycle>=100:
+            self.fullopt=True
+        else:
+            self.fullopt=False
+        obConversion = openbabel.OBConversion()
+        mol = openbabel.OBMol()
+        inFormat = obConversion.FormatFromExt(self.molstructfname)
+        obConversion.SetInFormat(inFormat)
+        obConversion.ReadFile(mol, self.molstructfname)
+        
+        self.atomnum=mol.NumAtoms() 
+        self.logfh = open(self.logfname,"w",buffering=1)
+
+        obConversion.SetOutFormat('mol')
+        self.molstructfnamemol=self.molstructfname.replace('.sdf','.mol')
+        obConversion.WriteFile(mol,self.molstructfnamemol)
+        indextocoordinates=self.GrabIndexToCoordinates(mol)
+        m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False,sanitize=False)
+        self.CheckIfAtomsAreAllowed(m)
+        m,atomindextoformalcharge=self.CheckInputCharge(m)
+        if self.allowradicals==True:
+            self.dontfrag=True # Psi4 doesnt allow UHF and properties (like compute WBO) for fragmenter, so need to turn of fragmenter if radical detected
+        m.UpdatePropertyCache()
+        if self.addhydrogentononcharged==True:
+            m = Chem.AddHs(m)
+            AllChem.EmbedMolecule(m)
+        Chem.SanitizeMol(m)
+        smarts=rdmolfiles.MolToSmarts(m)
+        if '.' in smarts:
+            raise ValueError('Multiple fragments detectected in input molecule')
+        pcm=self.CheckForConcentratedFormalCharges(m,atomindextoformalcharge)
+        cpm = copy.deepcopy(m)
+        if self.firstoptfinished==False:
+            indextocoordinates=self.GenerateExtendedConformer(m,mol)
+        Chem.GetSymmSSSR(m)
+        m.GetRingInfo().NumRings() 
+        m=self.AddInputCoordinatesAsDefaultConformer(m,indextocoordinates)
+        rdmolfiles.MolToMolFile(m,'test.mol')
+        mol,m=self.CheckIsInput2D(mol,obConversion,m)
+        if not os.path.exists(self.scrtmpdirpsi4):
+            os.mkdir(self.scrtmpdirpsi4)
+        if not os.path.exists(self.scrtmpdirgau):
+            os.mkdir(self.scrtmpdirgau)
+
+        mol=self.SetDefaultCoordinatesBabel(mol,indextocoordinates)
+        self.mol=mol
+
+        self.rdkitmol=m
+        self.mol.SetTotalCharge(self.totalcharge)
+        if self.keyfiletoaddtodatabase!=None:
+            databaseparser.AddKeyFileParametersToParameterFile(self,m)   
+            sys.exit()
+
+        if ('I ' in self.mol.GetSpacedFormula()):
+            if self.foundgauss==True:
+                self.use_gaus=True
+        if ('Br ' in self.mol.GetSpacedFormula()):
+            self.torspbasisset=self.torspbasissethalogen
+        self.pcm=False
+        if pcm==True and self.dontusepcm==False:
+            if self.foundgauss==True:
+                self.use_gauPCM=True
+                self.SanitizeAllQMMethods()
+            self.pcm=True
+            self.toroptpcm=True
+            self.optpcm=True
+            self.torsppcm=True
+
+        
+        if self.use_gauPCM==True:
+            self.use_gausoptonly=False
+            self.use_gaus=True
+            self.SanitizeAllQMMethods()
+
+        atomiter=openbabel.OBMolAtomIter(self.mol)
+        atomnum=0
+        for atom in atomiter:
+            atomnum+=1
+            atomidx=atom.GetIdx()
+            atomicnum=atom.GetAtomicNum()
+
+
+        self.RemoveCartesianXYZFiles()
+ 
+        self.WriteToLog("Running on host: " + gethostname())
+        # Initializing arrays
+        
+        self.canonicallabel = [ 0 ] * mol.NumAtoms()
+        self.localframe1 = [ 0 ] * mol.NumAtoms()
+        self.localframe2 = [ 0 ] * mol.NumAtoms()
+        self.idxtosymclass,self.symmetryclass=symm.gen_canonicallabels(self,mol) 
+ 
+        # QM calculations are done here
+        # First the molecule is optimized. (-opt) 
+        # This optimized molecule is stored in the structure optmol
+        # Then the electron density matrix is found (-dma)
+        # This is used by GDMA to find multipoles
+        # Then information for generating the electrostatic potential grid is found (-esp)
+        # This information is used by cubegen
+        self.comoptfname=self.firstcomoptfname 
+        self.chkoptfname=self.firstchkoptfname 
+        self.fckoptfname=self.firstfckoptfname
+        self.logoptfname=self.firstlogoptfname 
+        self.gausoptfname=self.firstgausoptfname 
+
+        if self.use_gausgeomoptonly==True:
+            self.use_gausoptonly=True
+
+        torgen.FindPartialDoubleBonds(self,m)
+            
+
+        if self.firstoptfinished==False:
+            optmol,error,torsionrestraints = opt.GeometryOPTWrapper(self,mol)
+            finished,error=self.CheckNormalTermination(self.firstlogoptfname)
+
+            bondtopoopt=torgen.GenerateBondTopology(self,optmol)
+            bondtopoopt=[list(i) for i in bondtopoopt]
+            bondtopo=torgen.GenerateBondTopology(self,mol)
+            bondtopo=[list(i) for i in bondtopo]
+            for bond in bondtopo:
+                if bond in bondtopoopt or bond[::-1] in bondtopoopt:
+                    pass
+                else:
+                    if self.debugmode==False:
+                        raise ValueError('Bond does not exist after optimization !'+str(bond))
+                    else:
+                        self.debugmode=False
+                        self.deletedfiles=True
+                        self.DeleteAllFiles()
+                        self.GenerateParameters()
+
+            for bond in bondtopoopt:
+                if bond in bondtopo or bond[::-1] in bondtopo:
+                    pass
+                else:
+                    if self.debugmode==False:
+                        raise ValueError('Bond created after optimization !'+str(bond))
+                    else:
+                        self.debugmode=False
+                        self.deletedfiles=True
+                        self.DeleteAllFiles()
+                        self.GenerateParameters()
+
+
+            if finished==False:
+                bondtoposame=self.CheckBondTopology(self.firstlogoptfname,self.rdkitmol)
+            else:
+                bondtoposame=True
+            attempts=0
+            maxiter=4
+            cartxyz=self.firstlogoptfname.replace('.log','.xyz')
+            opt.GrabFinalXYZStructure(self,self.firstlogoptfname,cartxyz,mol)
+
+            inioptmol = opt.load_structfile(self,cartxyz)
+            inioptmol.SetTotalCharge(mol.GetTotalCharge())
+
+            while bondtoposame==False:
+                if attempts>=maxiter or finished==True:
+                    break
+                try:           
+                    optmol,error = opt.GeometryOptimization(self,inioptmol,loose=False,checkbonds=True,modred=True,bondanglerestraints=None,skipscferror=False,charge=None,skiperrors=True,overridecheckterm=True)
+                    finished,error=self.CheckNormalTermination(self.firstlogoptfname)
+                    cartxyz=self.firstlogoptfname.replace('.log','.xyz')
+                    opt.GrabFinalXYZStructure(self,self.firstlogoptfname,cartxyz,mol)
+                    inioptmol = opt.load_structfile(self,cartxyz)
+                    inioptmol.SetTotalCharge(mol.GetTotalCharge())
+                except:
+                    pass
+                bondtoposame=self.CheckBondTopology(self.firstlogoptfname,self.rdkitmol)
+                attempts+=1
+        else:
+            cartxyz=self.firstlogoptfname.replace('.log','.xyz')
+            optmol = opt.load_structfile(self,cartxyz)
+            optmol.SetTotalCharge(mol.GetTotalCharge())
+
+        optatomnums=optmol.NumAtoms()
+        molatomnums=mol.NumAtoms()
+        if optatomnums!=molatomnums: # then program behaviour changed need to restart
+            self.deletedfiles=True
+            self.DeleteAllFiles()
+            self.GenerateParameters()
+
+        checkmp2optfailed=self.CheckMP2OptFailed()
+        if checkmp2optfailed==True:
+            self.deletedfiles=True
+            self.DeleteAllFiles()
+            self.GenerateParameters()
+
+
+        if self.optonly==True:
+            sys.exit()
+        if self.use_gausgeomoptonly==True:
+            self.use_gausoptonly=False
+            self.use_gaus=False
+        if not os.path.isfile(self.key4fname) or not os.path.isfile(self.torsionsmissingfilename) or not os.path.isfile(self.torsionprmguessfilename):
+            bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,missingvdwatomindextoneighbors,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo,tortorsmissing=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
+        if os.path.isfile(self.torsionsmissingfilename):
+            torsionsmissing=databaseparser.ReadTorsionList(self,self.torsionsmissingfilename)
+        if os.path.isfile(self.torsionprmguessfilename):
+            classkeytotorsionparametersguess=databaseparser.ReadDictionaryFromFile(self,self.torsionprmguessfilename)
+        if os.path.isfile(self.vdwmissingfilename):
+            missingvdwatomindices=databaseparser.ReadVdwList(self,self.vdwmissingfilename)
+
+        if os.path.isfile(self.tortormissingfilename):
+            tortorsmissing=databaseparser.ReadTorTorList(self,self.tortormissingfilename)
+        try:
+            esp.SPForDMA(self,optmol,mol)
+        except:
+            if self.use_gaus==True: # if gaussian failed try psi4
+                self.use_gaus=False
+                esp.SPForDMA(self,optmol,mol)
+                self.use_gaus=True
+            else:
+                traceback.print_exc(file=sys.stdout)
+                sys.exit()
+
+        # Obtain multipoles from Gaussian fchk file using GDMA
+    
+        if not os.path.isfile(self.gdmafname):
+            mpole.run_gdma(self)
+    
+        # Set up input file for poledit
+        # find multipole local frame definitions
+
+        polarindextopolarizeprm,polartypetotransferinfo=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m,polarize=True)
+        mpole.gen_peditinfile(self,mol,polarindextopolarizeprm)
+
+        
+        
+        if (not os.path.isfile(self.xyzfname) or not os.path.isfile(self.keyfname)):
+            # Run poledit
+            cmdstr = self.peditexe + " 1 " + self.gdmafname +' '+self.paramhead+ " < " + self.peditinfile
+            self.call_subsystem([cmdstr],True)
+
+            # Add header to the key file output by poledit
+            while not os.path.isfile(self.keyfname):
+                time.sleep(1)
+                self.WriteToLog('Waiting for '+self.keyfname)
+                
+            mpole.prepend_keyfile(self,self.keyfname,optmol)
+            mpole.SanitizeMultipoleFrames(self,self.keyfname)
+            
+
+        self.issane=self.CheckFileSanity()
+        if self.issane==False:
+            self.deletedfiles=True
+            self.DeleteAllFiles()
+            self.GenerateParameters()
+
+            
+        # post process local frames written out by poledit
+        if self.atomnum!=1: 
+             try:
+                 esp.SPForESP(self,optmol,mol) 
+             except:
+                 if self.use_gaus==True: # if gaussian failed try psi4
+                     self.use_gaus=False
+                     esp.SPForESP(self,optmol,mol) 
+                     self.use_gaus=True
+                 else:
+                     traceback.print_exc(file=sys.stdout)
+                     sys.exit()
+
+        # End here if qm calculations were all that needed to be done 
+        if self.qmonly:
+            self.WriteToLog("poltype QM-only complete.")
+            sys.exit(0)
+    
+               
+        
+        # generate the electrostatic potential grid used for multipole fitting
+        if self.atomnum!=1: 
+            esp.gen_esp_grid(self,optmol)
+    
+        # Average multipoles based on molecular symmetry
+        # Does this using the script avgmpoles.pl which is found in the poltype directory
+        # Atoms that belong to the same symm class will now have only one common multipole definition
+        if not os.path.isfile(self.key2fname):
+            mpole.AverageMultipoles(self,optmol)
+            mpole.AddPolarizeCommentsToKey(self,self.key2fname,polartypetotransferinfo)
+        if self.espfit and not os.path.isfile(self.key3fname) and self.atomnum!=1:
+            # Optimize multipole parameters to QM ESP Grid (*.cube_2)
+            # tinker's potential utility is called, with option 6.
+            # option 6 reads: 'Fit Electrostatic Parameters to a Target Grid'
+            
+            esp.ElectrostaticPotentialFitting(self) 
+        elif self.atomnum==1 or self.espfit==False:
+            shutil.copy(self.key2fname, self.key3fname)
+        # Remove header terms from the keyfile
+        mpole.rm_esp_terms_keyfile(self,self.key3fname)
+        if self.atomnum!=1: 
+            esp.ElectrostaticPotentialComparison(self) 
+            if self.failedrmspd==True and self.deletedfiles==False and self.skipespfiterror==False:
+                self.DeleteFilesWithExtension(['pot','grid','key','xyz','key_2','key_3','key_4','key_5','xyz_2','cube'])
+                self.DeleteFilesWithString(['esp','dma'])
+                self.deletedfiles=True
+                self.GenerateParameters()
+
+        
+        
+        # Now that multipoles have been found
+        # Other parameters such as opbend, vdw, etc. are found here using a look up table
+        # Part of the look up table is here in poltype.py 
+        # Most of it is in the file databaseparser.py found in the poltype directory
+    
+        # Finds aromatic carbons and associated hydrogens and corrects polarizability
+        # Find opbend values using a look up table
+        # Outputs a list of rotatable bonds (found in get_torlist) in a form usable by databaseparser.py
+    
+        # Map from idx to symm class is made for databaseparser.py
+        # databaseparser.py method is called to find parameters and append them to the keyfile
+        if not os.path.exists(self.key4fname):
+            databaseparser.appendtofile(self,self.key3fname,self.key4fname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo)
+            databaseparser.StiffenZThenBisectorAngleConstants(self,self.key4fname)
+            databaseparser.TestBondAngleEquilValues(self)
+            if self.databasematchonly==True:
+                sys.exit()
+
+        if self.torsppcm:
+            torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
+        torgen.get_all_torsions(self,mol)
+        # Find rotatable bonds for future torsion scans
+        (self.torlist, self.rotbndlist,hydtorsions,nonaroringtorlist) = torgen.get_torlist(self,mol,torsionsmissing)
+        if atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False: 
+            self.dontfrag=True
+        self.torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self) # this only happens in very symmetrical molecules
+        self.torlist=[tuple(i) for i in self.torlist]
+        self.torlist=[tuple([i]) for i in self.torlist]
+        self.torsettovariabletorlist={}
+        for torset in self.torlist:
+            self.torsettovariabletorlist[tuple(torset)]=[]
+        nonaroringtorlist=[tuple(i) for i in nonaroringtorlist]
+        nonaroringtorlist=[tuple([i]) for i in nonaroringtorlist]
+        self.rotbndtoanginc=torgen.DetermineAngleIncrementAndPointsNeededForEachTorsionSet(self,mol,self.rotbndlist)
+        torgen.DefaultMaxRange(self,self.torlist)
+        if self.dontdotor==True:
+            self.torlist=[]
+
+        # add missingvdwindices to torlist (for fragmenter input)
+        missingvdwatomsets=[]
+        if self.isfragjob==False and self.dontfrag==False and self.dontdovdwscan==False:
+            for vdwatomindex in missingvdwatomindices:
+                ls=tuple([tuple([vdwatomindex])])
+                missingvdwatomsets.append(ls)
+                self.torlist.append(ls)
+        if self.dontdotor==True and self.dontdovdwscan==True:
+            shutil.copy(self.key4fname,self.key5fname)
+
+        self.AddIndicesToKey(self.key4fname)
+        self.torsettofilenametorset={}
+        self.torsettotortorindex={}
+        self.torsettotortorphaseindicestokeep={}
+        self.nonaroringtors=[]
+        self.nonaroringtorsets=[]
+        self.classkeytoinitialprmguess={}
+        if self.tortor==True and self.dontdotor==False:
+            torgen.PrepareTorsionTorsion(self,optmol,mol,tortorsmissing)
+        self.nonarotortotorsbeingfit={}
+        if self.refinenonaroringtors==True and self.dontfrag==False:
+            rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
+
+
+        if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False and (self.dontdotor==False or self.dontdovdwscan==False):
+
+            WBOmatrix,outputname,error=frag.GenerateWBOMatrix(self,self.rdkitmol,self.mol,self.logoptfname.replace('.log','.xyz'))
+            highlightbonds=[]
+            for torset in self.torlist:
+                for tor in torset:
+                    if len(tor)>1:
+                        rotbnd=[tor[1]-1,tor[2]-1]
+                        highlightbonds.append(rotbnd)
+            frag.Draw2DMoleculeWithWBO(self,WBOmatrix,self.molstructfname.replace('.sdf',''),self.rdkitmol,bondindexlist=highlightbonds,imgsize=1500)        
+            rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor=frag.GenerateFragments(self,self.mol,self.torlist,WBOmatrix,missingvdwatomsets,nonaroringtorlist) # returns list of bond indexes that need parent molecule to do torsion scan for (fragment generated was same as the parent0
+            equivalentrotbndindexarrays,rotbndindextoringtor=frag.SpawnPoltypeJobsForFragments(self,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor)
+        if self.dontfrag==False and self.isfragjob==False and not os.path.isfile(self.key5fname) and (self.dontdotor==False or self.dontdovdwscan==False):
+            frag.GrabVdwAndTorsionParametersFromFragments(self,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor) # just dump to key_5 since does not exist for parent molecule
+        else:         
+            # Torsion scanning then fitting. *.key_5 will contain updated torsions
+            if not os.path.isfile(self.key5fname):
+                if len(self.torlist)!=0:
+                    # torsion scanning
+                    torgen.gen_torsion(self,optmol,self.torsionrestraint,mol)
+                    # torsion fitting
+                    if self.dontdotorfit==True:
+                        shutil.copy(self.key4fname,self.key5fname)
+                        sys.exit()
+                    torfit.process_rot_bond_tors(self,optmol)
+                else:
+                    shutil.copy(self.key4fname,self.key5fname)
+        if self.isfragjob and len(self.onlyrotbndslist)!=0:
+            self.dontdovdwscan=True
+        if self.dontdovdwscan==False:
+            if self.dontfrag==False: 
+                if self.isfragjob==True:
+                    vdwfit.VanDerWaalsOptimization(self,missingvdwatomindices)    
+            else:
+                vdwfit.VanDerWaalsOptimization(self,missingvdwatomindices)       
+        
+        if self.isfragjob==False and self.dontdotor==False:
+            self.CheckTorsionParameters(self.key5fname,torsionsmissing,hydtorsions)
         self.WriteOutLiteratureReferences(self.key5fname) 
         # A series of tests are done so you one can see whether or not the parameterization values
         # found are acceptable and to what degree
