@@ -102,8 +102,12 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
     tortorclasskeytotorsionindexescollected={}
     tortorclasskeytosmartscollected={}
     tortorclasskeytosmartsposarraycollected={}
-    print('rotbndindextofragmentfilepath',rotbndindextofragmentfilepath,flush=True)
-    for rotbndindex,fragmentfilepath in rotbndindextofragmentfilepath.items():
+    print('equivalentrotbndindexarrays',equivalentrotbndindexarrays)
+    for array in equivalentrotbndindexarrays:
+        rotbndindex=array[0]
+        
+        fragmentfilepath=rotbndindextofragmentfilepath[rotbndindex]
+
         path,filename=os.path.split(fragmentfilepath)
         os.chdir(path)
         vdwfragment=False
@@ -697,6 +701,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 parentsymclasstofragsymclasses[parentsymclass]=[]
             if fragsymclass not in parentsymclasstofragsymclasses[parentsymclass]: 
                 parentsymclasstofragsymclasses[parentsymclass].append(fragsymclass)
+        fragmentfilepath=rotbndindextofragmentfilepath[equivalentrotbndindex]
 
         head,tail=os.path.split(fragmentfilepath)
         os.chdir(head)
