@@ -461,6 +461,8 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
     restlist=[]
     count=0
     torsiontophaseangle={}
+    rotbndtorescount={}
+    maxrotbnds=3
     for i in range(len(torset)):
         tor=torset[i]
         a,b,c,d=tor[0:4]
@@ -525,11 +527,20 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
                     continue 
                 if res not in restlist:
                     if (resa,resb,resc,resd) not in torset and (resd,resc,resb,resa) not in torset and (resa,resb,resc,resd) not in variabletorlist and (resd,resc,resb,resa) not in variabletorlist:
+                        if b<c:
+                            rotbnd=tuple([b,c])
+                        else:
+                            rotbnd=tuple([c,b])
+                        if rotbnd not in rotbndtorescount.keys():
+                            rotbndtorescount[rotbnd]=0
+                        if rotbndtorescount[rotbnd]>maxrotbnds:
+                            continue
                         if (b==resb and c==resc) or (b==resc and c==resb):
                             secondang = optmol.GetTorsion(resa,resb,resc,resd)
                             tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (resa,resb,resc,resd,torsionrestraint,round((secondang+phaseangle)%360),round((secondang+phaseangle)%360)))
                         else:
                             tmpkeyfh.write('restrain-torsion %d %d %d %d %f\n' % (resa,resb,resc,resd,torsionrestraint))
+                        rotbndtorescount[rotbnd]+=1
                         restlist.append(res)
     tmpkeyfh.close()
     mincmdstr = poltype.minimizeexe+' '+torxyzfname+' -k '+tmpkeyfname+' 0.1'+' '+'>'+torminlogfname

@@ -96,6 +96,10 @@ fragmentjobslocal Run fragment jobs on localhost even when externalapi keyword i
 
 maximizejobsatsametime  Sets the jobsatsametime equal to number of processors allowed 
 
+
+addhydrogens         Adds hydrogens to unprotonated atoms.
+                     Default=False
+
 ```
 
 * Note for very large molecules initial opt, DMA and ESP may require large amounts of memory if quantum job consistently crashes
