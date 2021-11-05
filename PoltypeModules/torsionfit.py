@@ -455,6 +455,7 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,fileprefix):
         classkeylist=[]
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
         qme_list,qang_list,WBOarray = compute_qm_tor_energy(poltype,torset,mol,flatphaselist)
+        
         mme_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,fileprefix,flatphaselist,False,tmpkey1basename)
         if len(poltype.onlyfittorstogether)!=0:
             torset=tuple(poltype.onlyfittorstogether)
@@ -512,11 +513,11 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,fileprefix):
         cnt = clscount_dict[tup]
         cls_qm_engy_dict_unmodified[tup]=ConvertNoneToZero(poltype,cls_qm_engy_dict_unmodified[tup])
         cls_mm_engy_dict_unmodified[tup]=ConvertNoneToZero(poltype,cls_mm_engy_dict_unmodified[tup])
+        
         cls_mm_engy_dict[tup] = [eng/cnt for eng in cls_mm_engy_dict[tup]]
         cls_qm_engy_dict[tup] = [eng/cnt for eng in cls_qm_engy_dict[tup]]
         cls_mm_engy_dict_unmodified[tup] = [eng/cnt for eng in cls_mm_engy_dict_unmodified[tup]]
         cls_qm_engy_dict_unmodified[tup] = [eng/cnt for eng in cls_qm_engy_dict_unmodified[tup]]
-
 
     return cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,classkeylisttoindicesremoved,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified,classkeylisttoindicesalreadydicremoved
 
@@ -813,6 +814,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         angle_list = cls_angle_dict[tup]  # Torsion angle for each corresponding energy
         mm_energy_list = cls_mm_engy_dict[tup]  # MM Energy before fitting to QM torsion energy
         qm_energy_list = cls_qm_engy_dict[tup]  # QM torsion energy
+
         mm_energy_list_unmodified = cls_mm_engy_dict_unmodified[tup]  # MM Energy before fitting to QM torsion energy
         qm_energy_list_unmodified = cls_qm_engy_dict_unmodified[tup]  # QM torsion energy
         # 'normalize'
@@ -866,7 +868,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         torprmdict,write_prm_dict,classkeytofoldtophase=FillInDictionariesParameterEstimates(poltype,torprmdict,p1,write_prm_dict)
         torsettobypassrmsd[torset]=bypassrmsd
 
-        GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_dict,torprmdict,mm_energy_list,tor_energy_list,flatphaselist,qm_energy_list,tup,indicesremoveddic,cls_angle_dict_unmodified,qm_energy_list_unmodified,mm_energy_list_unmodified)
+        GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_dict,torprmdict,mm_energy_list,tor_energy_list,flatphaselist,qm_energy_list,tup,indicesremoveddic,cls_angle_dict_unmodified,qm_energy_list_unmodified,mm_energy_list_unmodified,clskeyswithbadfits,weightlist)
     return write_prm_dict,fitfunc_dict,torsettobypassrmsd,classkeytofoldtophase
 
 
@@ -931,7 +933,7 @@ def CheckFitParameters(poltype,pzero,boundstup,parm_sanitized,refine,keylist,tor
 
 
 
-def GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_dict,torprmdict,mm_energy_list,tor_energy_list,flatphaselist,qm_energy_list,tup,indicesremoveddic,cls_angle_dict_unmodified,qm_energy_list_unmodified,mm_energy_list_unmodified):
+def GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_dict,torprmdict,mm_energy_list,tor_energy_list,flatphaselist,qm_energy_list,tup,indicesremoveddic,cls_angle_dict_unmodified,qm_energy_list_unmodified,mm_energy_list_unmodified,clskeyswithbadfits,weightlist):
     dim=len(cls_angle_dict[tup][0])
     figfname = '%s-fit-' % (poltype.molecprefix)
     for i in range(len(torset)):
@@ -947,13 +949,20 @@ def GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_
     figfname+=wstring+'.png'
     Sx = numpy.array(cls_angle_dict[tup])
     out=[]
+        
 
     out.append(cls_angle_dict[tup])
     for clskey in classkeylist:
         fitfunc_dict[clskey] = fitfunc(poltype,'eval',torgen.rads(poltype,Sx),torset,torprmdict,debug=False)
         out.append(fitfunc_dict[clskey])
-        def RMSD(c):
-            return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.subtract(fitfunc_dict[clskey],tor_energy_list),c))))
+        if clskey in clskeyswithbadfits:
+            def RMSD(c):
+                return numpy.sqrt(numpy.mean(numpy.square(numpy.add(weightlist*(numpy.subtract(fitfunc_dict[clskey],tor_energy_list)),c))))
+
+
+        else:
+            def RMSD(c):
+                return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.subtract(fitfunc_dict[clskey],tor_energy_list),c))))
         result=fmin(RMSD,.5)
         minRMSD=RMSD(result[0])
 
@@ -1220,6 +1229,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         qm_energy_list,qang_list,WBOarray = compute_qm_tor_energy(poltype,torset,mol,flatphaselist)
         mm_energy_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,'_preQMOPTprefit',flatphaselist,False,tmpkeyfname)
         mm2_energy_list,m2ang_list,tor_e_list2 = compute_mm_tor_energy(poltype,mol,torset,'_postQMOPTpostfit',flatphaselist,True,tmpkey2basename)
+
         if len(poltype.onlyfittorstogether)!=0:
             torset=tuple(poltype.onlyfittorstogether)
         bypassrmsd=torsettobypassrmsd[torset]
@@ -1299,6 +1309,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]
         mm2_energy_list = [en - min(mm2_energy_list) for en in mm2_energy_list]
+
         originalmm2_energy_list=ConvertNoneToZero(poltype,originalmm2_energy_list)
         originalmm_energy_list=ConvertNoneToZero(poltype,originalmm_energy_list)
 
@@ -1724,7 +1735,6 @@ def GenerateTorTorClasskey(poltype,firsttor,secondtor,idxtosymclass,mol):
             break
     path=[i+1 for i in path]
     tortoratomidxs=[path[0],path[1],path[2],path[3],path[4]]
-    print('tortoratomidxs',tortoratomidxs)
     tortortypeidxs=[idxtosymclass[j] for j in tortoratomidxs]
     tortortypeidxs=[str(j) for j in tortortypeidxs]
     tortorclskey=' '.join(tortortypeidxs)

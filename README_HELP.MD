@@ -94,12 +94,14 @@ username             Needed for RenLabCluster daemon (externalapi keyword). This
 fragmentjobslocal Run fragment jobs on localhost even when externalapi keyword is active
                      Default=False
 
-maximizejobsatsametime  Sets the jobsatsametime equal to number of processors allowed 
-
+coresperjob          Number of cores for jobs in parralel
+                     Default=2
 
 addhydrogens         Adds hydrogens to unprotonated atoms.
                      Default=False
 
+parentjobsatsametime Number of parent molecules at sametime, informs poltype how much resources to divide from available on the host.
+                     Default=1
 ```
 
 * Note for very large molecules initial opt, DMA and ESP may require large amounts of memory if quantum job consistently crashes

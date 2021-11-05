@@ -1822,22 +1822,14 @@ def RemoveDuplicateRotatableBondTypes(poltype):
         for tor in tors:
             classkeynew=get_class_key(poltype,tor[0],tor[1],tor[2],tor[3])
             tortorotbnd[tuple(tor)]=classkeynew
-    listofduptors=[]
-    for key,value in tortorotbnd.items():
-        duptors=[k for k,v in tortorotbnd.items() if v == value]
-        keylist=[]
-        for tor in duptors:
-            rotbndkey=str(tor[1])+' '+str(tor[2])
-            if rotbndkey not in keylist:
-                keylist.append(rotbndkey)
-        if len(keylist)>=2 and duptors not in listofduptors:
-            listofduptors.append(duptors)
-    for dup in listofduptors: # doesnt matter which one is first, just remove duplicates
-        for i in range(len(dup)-1):
-            tor=list(dup[i])
-            if tor in poltype.torlist:
-                poltype.torlist.remove(tor)
-    
+    newlist=[]
+    classkeylist=[]
+    for tor,classkey in tortorotbnd.items():
+        tor=list(tor)
+        if classkey not in classkeylist:
+            classkeylist.append(classkey)
+            newlist.append(tor)
+    poltype.torlist=newlist[:] 
     return poltype.torlist,poltype.rotbndlist 
 
 
