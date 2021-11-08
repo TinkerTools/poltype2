@@ -489,8 +489,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
         if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
             continue 
         torsiontophaseangle[tuple([a,b,c,d])]=round((torang+phaseangle)%360)
-        if (a,b,c,d) not in variabletorlist and (d,c,b,a) not in variabletorlist:
-            tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (a,b,c,d,torsionrestraint,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
+        tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (a,b,c,d,torsionrestraint,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
         for key in poltype.rotbndlist.keys():
             torlist=poltype.rotbndlist[key]
             count=0
@@ -537,6 +536,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
                             continue
                         if (b==resb and c==resc) or (b==resc and c==resb):
                             secondang = optmol.GetTorsion(resa,resb,resc,resd)
+
                             tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (resa,resb,resc,resd,torsionrestraint,round((secondang+phaseangle)%360),round((secondang+phaseangle)%360)))
                         else:
                             tmpkeyfh.write('restrain-torsion %d %d %d %d %f\n' % (resa,resb,resc,resd,torsionrestraint))

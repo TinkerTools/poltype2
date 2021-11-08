@@ -102,7 +102,6 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
     tortorclasskeytotorsionindexescollected={}
     tortorclasskeytosmartscollected={}
     tortorclasskeytosmartsposarraycollected={}
-    print('equivalentrotbndindexarrays',equivalentrotbndindexarrays)
     for array in equivalentrotbndindexarrays:
         rotbndindex=array[0]
         
@@ -1276,8 +1275,8 @@ def GenerateWBOMatrix(poltype,molecule,moleculebabel,structfname):
         except Exception:
              error=True
     try:
-        if not error:
-            WBOmatrix=GrabWBOMatrixPsi4(poltype,outputname,molecule)
+        WBOmatrix=GrabWBOMatrixPsi4(poltype,outputname,molecule)
+            
     except:
         cmdstr='psi4 '+inputname+' '+outputname
         os.system(cmdstr)

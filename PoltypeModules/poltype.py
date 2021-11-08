@@ -1082,6 +1082,7 @@ class PolarizableTyper():
            for job,outputlog in fulljobtooutputlog.items():
                if job not in finishedjobs:
                   finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
+                  
                   if job not in submittedjobs and len(submittedjobs)<=self.jobsatsametime and finished==False:
                       count=len(finishedjobs)
                       ratio=(100*count)/len(fulljobtooutputlog.keys())
