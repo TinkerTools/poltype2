@@ -215,7 +215,7 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     foundcase=True
 
 
-                elif (val==3 and len(uniqueneighbtypes)==2 and (highestsymneighbnorepeatval==4)) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==3 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==2: # ethylamine
+                elif (val==3 and len(uniqueneighbtypes)==2 and (highestsymneighbnorepeatval==4) and hyb!=2) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==3 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==2: # ethylamine
                         neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
                         bisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
                         idxtobisectidxs[atomidx]=bisectidxs
