@@ -461,6 +461,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
     restlist=[]
     count=0
     torsiontophaseangle={}
+    torsiontomaintor={}
     rotbndtorescount={}
     maxrotbnds=3
     for i in range(len(torset)):
@@ -489,6 +490,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
         if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
             continue 
         torsiontophaseangle[tuple([a,b,c,d])]=round((torang+phaseangle)%360)
+        torsiontomaintor[tuple([a,b,c,d])]=True
         tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (a,b,c,d,torsionrestraint,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
         for key in poltype.rotbndlist.keys():
             torlist=poltype.rotbndlist[key]
@@ -538,8 +540,15 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
                             secondang = optmol.GetTorsion(resa,resb,resc,resd)
 
                             tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (resa,resb,resc,resd,torsionrestraint,round((secondang+phaseangle)%360),round((secondang+phaseangle)%360)))
+                            
+                            torsiontophaseangle[tuple([resa,resb,resc,resd])]=round((secondang+phaseangle)%360)
+                            torsiontomaintor[tuple([resa,resb,resc,resd])]=False
                         else:
                             tmpkeyfh.write('restrain-torsion %d %d %d %d %f\n' % (resa,resb,resc,resd,torsionrestraint))
+                            secondang = optmol.GetTorsion(resa,resb,resc,resd)
+                            torsiontophaseangle[tuple([resa,resb,resc,resd])]=round((secondang)%360)
+                            torsiontomaintor[tuple([resa,resb,resc,resd])]=False
+
                         rotbndtorescount[rotbnd]+=1
                         restlist.append(res)
     tmpkeyfh.close()
@@ -554,16 +563,15 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
     filename=torxyzfname+'_2'
     newfilename=filename.replace('.xyz_2','_xyzformat.xyz')
     cartxyz=ConvertTinktoXYZ(poltype,torxyzfname+'_2',newfilename)
-    failedcheck=CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle) 
-    if poltype.tordebugmode==True:
-        sys.exit()
+    failedcheck=CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle,torsiontomaintor) 
     return cartxyz,torxyzfname,torxyzfname+'_2',tmpkeyfname,failedcheck
 
-def CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle):
+def CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle,torsiontomaintor):
     inimol = opt.load_structfile(poltype,cartxyz)
-    tol=3.5
+    tol=2.5
     fail=False
     for indices,phase in torsiontophaseangle.items():
+        maintor=torsiontomaintor[indices]
         a,b,c,d=indices[:]
         ang = inimol.GetTorsion(a,b,c,d)
         phase=phase % 360
@@ -571,14 +579,18 @@ def CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle):
             ang=ang+360
         ang=ang % 360
         reducedangle=360-ang
-         
         if numpy.abs(ang-phase)>tol and numpy.abs(reducedangle-phase)>tol:
             if 'postfit' in cartxyz and poltype.refinenonaroringtors==True:
                 warnings.warn('Torsion did not reach target dihedral! '+str(indices)+' '+str(phase)+' is actually at angle '+str(ang)+', filename='+cartxyz+' . Will just compute post fit energy at new angle.')
-
+                poltype.WriteToLog('Torsion did not reach target dihedral! '+str(indices)+' '+str(phase)+' is actually at angle '+str(ang)+', filename='+cartxyz+' . Will just compute post fit energy at new angle.')
             else:
-                warnings.warn('Torsion did not reach target dihedral! '+str(indices)+' '+str(phase)+' is actually at angle '+str(ang)+', filename='+cartxyz+' . Will just remove this point from energy surface.')
-                fail=True 
+                if maintor==True:
+                    warnings.warn('Torsion did not reach target dihedral! '+str(indices)+' '+str(phase)+' is actually at angle '+str(ang)+', filename='+cartxyz+' . Will just remove this point from energy surface.')
+                    poltype.WriteToLog('Torsion did not reach target dihedral! '+str(indices)+' '+str(phase)+' is actually at angle '+str(ang)+', filename='+cartxyz+' . Will just remove this point from energy surface.')
+                    fail=True
+                else:
+                    warnings.warn('Torsion did not reach target dihedral! '+str(indices)+' '+str(phase)+' is actually at angle '+str(ang)+', filename='+cartxyz)
+                    poltype.WriteToLog('Torsion did not reach target dihedral! '+str(indices)+' '+str(phase)+' is actually at angle '+str(ang)+', filename='+cartxyz)
 
 
     return fail
