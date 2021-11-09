@@ -717,8 +717,13 @@ class PolarizableTyper():
                         self.usage()
                         print('Unrecognized '+line)
                         sys.exit()
+
+        
         if self.jobsatsametime!=1:
             self.maximizejobsatsametime=False
+
+        if self.maximizejobsatsametime==True and self.isfragjob==False:
+           self.jobsatsametime=math.floor(int(self.numproc)/self.coresperjob)
         if self.maxdisk==None:
             stat= os.statvfs(self.scratchpath) 
             gb=stat.f_bfree*stat.f_bsize*10**-9
@@ -1076,8 +1081,8 @@ class PolarizableTyper():
        errorjobs=[]
        submittedjobs=[]
        errormessages=[]
-       if self.maximizejobsatsametime==True:
-           self.jobsatsametime=math.floor(int(self.numproc)/self.coresperjob)
+       
+           
        while len(finishedjobs)!=len(list(fulljobtooutputlog.keys())):
            for job,outputlog in fulljobtooutputlog.items():
                if job not in finishedjobs:
