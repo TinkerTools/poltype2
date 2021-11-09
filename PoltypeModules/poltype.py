@@ -2188,7 +2188,9 @@ class PolarizableTyper():
         self.rotbndtoanginc=torgen.DetermineAngleIncrementAndPointsNeededForEachTorsionSet(self,mol,self.rotbndlist)
         if self.dontdotor==True:
             self.torlist=[]
-
+        if self.tortor==True and self.dontdotor==False:
+            torgen.PrepareTorsionTorsion(self,optmol,mol,tortorsmissing)
+        torgen.DefaultMaxRange(self,self.torlist)
         # add missingvdwindices to torlist (for fragmenter input)
         missingvdwatomsets=[]
         if self.isfragjob==False and self.dontfrag==False and self.dontdovdwscan==False:
@@ -2205,10 +2207,7 @@ class PolarizableTyper():
         self.nonaroringtors=[]
         self.nonaroringtorsets=[]
         self.classkeytoinitialprmguess={}
-        if self.tortor==True and self.dontdotor==False:
-            torgen.PrepareTorsionTorsion(self,optmol,mol,tortorsmissing)
-
-        torgen.DefaultMaxRange(self,self.torlist)
+        
         self.nonarotortotorsbeingfit={}
         if self.refinenonaroringtors==True and self.dontfrag==False:
             rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)

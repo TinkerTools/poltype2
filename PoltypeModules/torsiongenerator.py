@@ -526,10 +526,10 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
                     continue 
                 if res not in restlist:
                     if (resa,resb,resc,resd) not in torset and (resd,resc,resb,resa) not in torset and (resa,resb,resc,resd) not in variabletorlist and (resd,resc,resb,resa) not in variabletorlist:
-                        if b<c:
-                            rotbnd=tuple([b,c])
+                        if resb<resc:
+                            rotbnd=tuple([resb,resc])
                         else:
-                            rotbnd=tuple([c,b])
+                            rotbnd=tuple([resc,resb])
                         if rotbnd not in rotbndtorescount.keys():
                             rotbndtorescount[rotbnd]=0
                         if rotbndtorescount[rotbnd]>maxrotbnds:
@@ -555,6 +555,8 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
     newfilename=filename.replace('.xyz_2','_xyzformat.xyz')
     cartxyz=ConvertTinktoXYZ(poltype,torxyzfname+'_2',newfilename)
     failedcheck=CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle) 
+    if poltype.tordebugmode==True:
+        sys.exit()
     return cartxyz,torxyzfname,torxyzfname+'_2',tmpkeyfname,failedcheck
 
 def CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle):
@@ -1064,9 +1066,6 @@ def get_torlist(poltype,mol,missed_torsions):
         indices=[a.GetIdx() for a in babelatoms]
         aromatics=[i.IsAromatic() for i in babelatoms]
         hybs=[i.GetHyb() for i in babelatoms]
-        
-                            
-            
         sortedtor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]])
         foundmissing=False
         if(sortedtor in missed_torsions or sortedtor[::-1] in missed_torsions) and len(poltype.onlyrotbndslist)==0:
@@ -1087,6 +1086,7 @@ def get_torlist(poltype,mol,missed_torsions):
         onlyrot=False
         if [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist:
             skiptorsion = False
+            
             onlyrot=True
 
         if poltype.rotalltors==True:
@@ -1111,9 +1111,9 @@ def get_torlist(poltype,mol,missed_torsions):
         tor = mol.GetTorsion(t1,t2,t3,t4)
         if not skiptorsion:
             torlist.append(unq)
-        if skiptorsion==True and ringbond==True:
-            continue
         # store torsion in rotbndlist
+        if ringbond==True:
+            continue
         rotbndlist[rotbndkey] = []
         rotbndlist[rotbndkey].append(unq)
         # write out rotatable bond to log
@@ -1828,7 +1828,8 @@ def RemoveDuplicateRotatableBondTypes(poltype):
         tor=list(tor)
         if classkey not in classkeylist:
             classkeylist.append(classkey)
-            newlist.append(tor)
+            if tuple(tor) in poltype.torlist or tuple(tor[::-1]) in poltype.torlist:
+                newlist.append(tor)
     poltype.torlist=newlist[:] 
     return poltype.torlist,poltype.rotbndlist 
 
