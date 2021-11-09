@@ -1571,9 +1571,7 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,torset,fra
         fragmolidxtofragmol={}
         fragmolidxtofragmolbabel={}
         fragments=[]
-        print('fragfoldername',fragfoldername,flush=True)
         possiblefragatmidxs=GrowPossibleFragmentAtomIndexes(poltype,poltype.rdkitmol,indexes)
-        print('possiblefragatmidxs',possiblefragatmidxs,flush=True)
         if len(possiblefragatmidxs)!=0:
             for fragmolidx in range(len(possiblefragatmidxs)):
                 indexlist=possiblefragatmidxs[fragmolidx]
@@ -1666,7 +1664,6 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,torset,fra
     os.chdir(fragfoldernamepath)
     PlotFragmenterResults(poltype,WBOdiffarray,molarray)
     os.chdir(curdir)
-
     return fragmol,indexes,fragWBOmatrix,structfname,WBOdifference,parentindextofragindex,fragpath,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist
 
 
@@ -1766,22 +1763,21 @@ def WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWB
 
 def FirstPassAtomIndexes(poltype,tor):
    molindexlist=[i-1 for i in tor]
-   #if len(molindexlist)==4: # then add all a,d for a-b-c-d, this way if a is H, then neighbors of the other a still get added to fragment
-   #    for atom in poltype.rdkitmol.GetAtoms():
-   #        atomindex=atom.GetIdx()
-   #        babelatomindex=atomindex+1
-   #        if atomindex==molindexlist[1] or atomindex==molindexlist[2]:
-   #            for neighbatom in atom.GetNeighbors():
-   #                neighbatomindex=neighbatom.GetIdx()
-   #                if neighbatomindex not in molindexlist:
-   #                    molindexlist.append(neighbatomindex)
-
-
+   if len(molindexlist)==4: # then add all a,d for a-b-c-d, this way if a is H, then neighbors of the other a still get added to fragment
+       for atom in poltype.rdkitmol.GetAtoms():
+           atomindex=atom.GetIdx()
+           babelatomindex=atomindex+1
+           if atomindex==molindexlist[1] or atomindex==molindexlist[2]:
+               for neighbatom in atom.GetNeighbors():
+                   neighbatomindex=neighbatom.GetIdx()
+                   if neighbatomindex not in molindexlist:
+                       molindexlist.append(neighbatomindex)
+   originalatomindexlist=molindexlist[:]
    for atom in poltype.rdkitmol.GetAtoms():
        atomindex=atom.GetIdx()
        babelatomindex=atomindex+1
        grabneighbs=False
-       if atomindex in molindexlist:
+       if atomindex in originalatomindexlist:
            if atomindex not in molindexlist:
                molindexlist.append(atomindex)
            grabneighbs=True
