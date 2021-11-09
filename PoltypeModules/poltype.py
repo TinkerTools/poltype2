@@ -1083,16 +1083,6 @@ class PolarizableTyper():
                if job not in finishedjobs:
                   finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
                   
-                  if job not in submittedjobs and len(submittedjobs)<=self.jobsatsametime and finished==False:
-                      count=len(finishedjobs)
-                      ratio=(100*count)/len(fulljobtooutputlog.keys())
-                      self.WriteToLog('Percent of jobs submitted '+str(ratio))   
-                      if len(finishedjobs)!=0:
-                          if 'poltype.py' in job:
-                              self.ETAQMFinish(thepath,len(fulljobtooutputlog.keys()))
-                      self.call_subsystem([job],False,skiperrors)
-                      submittedjobs.append(job)
-                      self.WriteToLog('Percent of jobs submitted '+str(ratio))
                   if finished==True:
                       if outputlog not in finishedjobs:
                           finishedjobs.append(outputlog)
@@ -1106,9 +1096,20 @@ class PolarizableTyper():
                               finishedjobs.append(outputlog) 
                               self.ErrorTerm(outputlog,skiperrors)
                               if job in submittedjobs:
-                                  submittedjobs.remove(job) 
+                                  submittedjobs.remove(job)
+                  if job not in submittedjobs and len(submittedjobs)<self.jobsatsametime and finished==False:
+                      count=len(finishedjobs)
+                      ratio=(100*count)/len(fulljobtooutputlog.keys())
+                      if len(finishedjobs)!=0:
+                          if 'poltype.py' in job:
+                              self.ETAQMFinish(thepath,len(fulljobtooutputlog.keys()))
+                      
+                      self.WriteToLog('Percent of jobs finished '+str(ratio))
+                      self.call_subsystem([job],False,skiperrors)
+                      submittedjobs.append(job)
+                   
 
-                  time.sleep(self.sleeptime)
+           time.sleep(self.sleeptime)
        return finishedjobs,errorjobs
 
     def TabulateLogs(self,thepath):
@@ -1342,11 +1343,9 @@ class PolarizableTyper():
         procs=[]
         for cmdstr in cmdstrs:
             self.WriteToLog("Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
-            if wait==True:
-                p = subprocess.Popen(cmdstr,shell=True,stdout=self.logfh, stderr=self.logfh)
-                procs.append(p)
-            else:
-                os.system(cmdstr)
+            p = subprocess.Popen(cmdstr,shell=True,stdout=self.logfh, stderr=self.logfh)
+            procs.append(p)
+
         if wait==True:
             exit_codes=[p.wait() for p in procs]
             for i in range(len(procs)):
