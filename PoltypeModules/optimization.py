@@ -619,7 +619,6 @@ def FindTorsionRestraints(poltype,mol):
     return torsionrestraints
 
 def GeometryOptimization(poltype,mol,loose=False,checkbonds=True,modred=True,bondanglerestraints=None,skipscferror=False,charge=None,skiperrors=False,overridecheckterm=False): # specify charge instead of reading from mol if charge!=None
-    poltype.WriteToLog("NEED QM Density Matrix: Executing Gaussian Opt and SP")
     if bondanglerestraints!=None: # then vdw opt
         pass
         torsionrestraints=[]
@@ -628,6 +627,8 @@ def GeometryOptimization(poltype,mol,loose=False,checkbonds=True,modred=True,bon
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt
         term,error=poltype.CheckNormalTermination(poltype.logoptfname,errormessages=None,skiperrors=True)
         if not term or overridecheckterm==True:
+            
+            poltype.WriteToLog("NEED QM Density Matrix: Executing Gaussian Opt and SP")
             mystruct = load_structfile(poltype,poltype.molstructfname)
             gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol,modred,torsionrestraints)
             cmdstr = 'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + poltype.comoptfname
@@ -663,12 +664,13 @@ def GeometryOptimization(poltype,mol,loose=False,checkbonds=True,modred=True,bon
     else:
 
         gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol,modred,torsionrestraints)
-        poltype.WriteToLog("Calling: " + "Psi4 Optimization")
         term,error=poltype.CheckNormalTermination(poltype.logoptfname,errormessages=None,skiperrors=True)
         modred=False
 
         inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol,modred,bondanglerestraints,skipscferror,charge,loose,torsionrestraints)
         if term==False or overridecheckterm==True:
+            
+            poltype.WriteToLog("Calling: " + "Psi4 Optimization")
             cmdstr='psi4 '+inputname+' '+poltype.logoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}

@@ -718,15 +718,6 @@ class PolarizableTyper():
                         print('Unrecognized '+line)
                         sys.exit()
 
-
-        files=os.listdir()
-        foundfinal=False
-        for f in files:
-            if 'final.key' in f:
-                foundfinal=True
-        if foundfinal==False:
-            self.deleteallnonqmfiles=True # keep this on during development phase
-
         
         if self.jobsatsametime!=1:
             self.maximizejobsatsametime=False
@@ -1746,7 +1737,7 @@ class PolarizableTyper():
                 fsplit=f.split('.')
                 if len(fsplit)>1:
                     end=fsplit[1]
-                    if 'log' not in end and 'sdf' not in end and 'ini' not in end and 'chk' not in end and 'dat' not in end: 
+                    if 'log' not in end and 'sdf' not in end and 'ini' not in end and 'chk' not in end and 'dat' not in end and '.mol' not in end: 
                         deletearray.append(f)
         for f in deletearray:
             os.remove(f)
@@ -1894,7 +1885,8 @@ class PolarizableTyper():
             raise ValueError('Multiple fragments detectected in input molecule')
         pcm=self.CheckForConcentratedFormalCharges(m,atomindextoformalcharge)
         cpm = copy.deepcopy(m)
-        if self.firstoptfinished==False:
+        finished,error=self.CheckNormalTermination(self.firstlogoptfname)
+        if self.firstoptfinished==False and finished==False:
             indextocoordinates=self.GenerateExtendedConformer(m,mol)
         Chem.GetSymmSSSR(m)
         m.GetRingInfo().NumRings() 
@@ -2057,6 +2049,7 @@ class PolarizableTyper():
             self.use_gausoptonly=False
             self.use_gaus=False
         if not os.path.isfile(self.key4fname) or not os.path.isfile(self.torsionsmissingfilename) or not os.path.isfile(self.torsionprmguessfilename):
+            self.WriteToLog('Searching database for parameters')
             bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,missingvdwatomindextoneighbors,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo,tortorsmissing=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
         if os.path.isfile(self.torsionsmissingfilename):
             torsionsmissing=databaseparser.ReadTorsionList(self,self.torsionsmissingfilename)
