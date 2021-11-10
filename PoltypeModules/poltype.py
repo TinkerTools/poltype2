@@ -1737,7 +1737,7 @@ class PolarizableTyper():
                 fsplit=f.split('.')
                 if len(fsplit)>1:
                     end=fsplit[1]
-                    if 'log' not in end and 'sdf' not in end and 'ini' not in end and 'chk' not in end and 'dat' not in end and '.mol' not in end: 
+                    if 'log' not in end and 'sdf' not in end and 'ini' not in end and 'chk' not in end and 'dat' not in end and 'mol' not in end: 
                         deletearray.append(f)
         for f in deletearray:
             os.remove(f)
@@ -1862,13 +1862,13 @@ class PolarizableTyper():
         inFormat = obConversion.FormatFromExt(self.molstructfname)
         obConversion.SetInFormat(inFormat)
         obConversion.ReadFile(mol, self.molstructfname)
-        
         self.atomnum=mol.NumAtoms() 
         self.logfh = open(self.logfname,"w",buffering=1)
 
-        obConversion.SetOutFormat('mol')
         self.molstructfnamemol=self.molstructfname.replace('.sdf','.mol')
-        obConversion.WriteFile(mol,self.molstructfnamemol)
+        if '.mol' not in self.molstructfname: 
+            obConversion.SetOutFormat('mol')
+            obConversion.WriteFile(mol,self.molstructfnamemol)
         indextocoordinates=self.GrabIndexToCoordinates(mol)
         m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False,sanitize=False)
         self.CheckIfAtomsAreAllowed(m)
@@ -2416,7 +2416,6 @@ class PolarizableTyper():
                 ext=f.split('.')[1]
                 if ext!='sdf' and ext!='ini' and 'nohup' not in f:
                     os.remove(f)
-       
 
     def CheckFileSanity(self):
         optxyzname=self.logoptfname.replace('.log','.xyz')
