@@ -355,7 +355,7 @@ class PolarizableTyper():
                         self.consumptionratio=float(a)
                     elif "scratchpath" in newline:
                         self.scratchpath=a
-                    elif "jobsatsametime" in newline and 'max' not in newline:
+                    elif "jobsatsametime" in newline and 'max' not in newline and 'parentjobsatsametime' not in newline:
                         self.jobsatsametime=int(a)
                     elif "esprestweight" in newline:
                         self.esprestweight=float(a)
@@ -722,8 +722,7 @@ class PolarizableTyper():
         if self.jobsatsametime!=1:
             self.maximizejobsatsametime=False
 
-        if self.maximizejobsatsametime==True and self.isfragjob==False:
-           self.jobsatsametime=math.floor(int(self.numproc)/self.coresperjob)
+        
         if self.maxdisk==None:
             stat= os.statvfs(self.scratchpath) 
             gb=stat.f_bfree*stat.f_bsize*10**-9
@@ -740,9 +739,8 @@ class PolarizableTyper():
             cpu=multiprocessing.cpu_count()
             cpu=str(int(int(cpu*self.consumptionratio)/self.parentjobsatsametime))
             self.numproc=cpu
-
-
-
+        if self.maximizejobsatsametime==True and self.isfragjob==False:
+           self.jobsatsametime=math.floor(int(self.numproc)/self.coresperjob)
         self.firsterror=False
         if self.debugmode==True:
             self.optmethod="HF"      
