@@ -718,6 +718,15 @@ class PolarizableTyper():
                         print('Unrecognized '+line)
                         sys.exit()
 
+
+        files=os.listdir()
+        foundfinal=False
+        for f in files:
+            if 'final.key' in f:
+                foundfinal=True
+        if foundfinal==False:
+            self.deleteallnonqmfiles=True # keep this on during development phase
+
         
         if self.jobsatsametime!=1:
             self.maximizejobsatsametime=False
