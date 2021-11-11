@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - psi4
 dependencies:
-  - python=3.6
+  - python=3.7
   - git
   - matplotlib=3.4.3
   - pip=21.3.1
