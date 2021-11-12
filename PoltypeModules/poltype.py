@@ -1081,7 +1081,7 @@ class PolarizableTyper():
     
 
     
-    def CallJobsSeriallyLocalHost(self,fulljobtooutputlog,skiperrors):
+    def CallJobsSeriallyLocalHost(self,fulljobtooutputlog,skiperrors,wait=False):
        thepath=os.path.join(os.getcwd(),'Fragments')
        finishedjobs=[]
        errorjobs=[]
@@ -1116,7 +1116,7 @@ class PolarizableTyper():
                               self.ETAQMFinish(thepath,len(fulljobtooutputlog.keys()))
                       
                       self.WriteToLog('Percent of jobs finished '+str(ratio))
-                      self.call_subsystem([job],False,skiperrors)
+                      self.call_subsystem([job],wait,skiperrors)
                       submittedjobs.append(job)
                    
 

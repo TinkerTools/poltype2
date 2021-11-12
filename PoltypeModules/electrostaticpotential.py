@@ -77,9 +77,6 @@ def gen_esp_grid(poltype,mol):
         poltype.call_subsystem([genqmpotcmd],True)
        
 def GrabGridData(poltype):
-    while not os.path.isfile('grid_esp.dat'):
-        time.sleep(1)
-    time.sleep(1)
     temp=open('grid_esp.dat','r')
     results=temp.readlines()
     temp.close()
@@ -516,7 +513,7 @@ def SPForESP(poltype,optmol,mol):
                     call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
             else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False,wait=True)
 
             term,error=poltype.CheckNormalTermination(outputname)
             if error:
@@ -544,7 +541,7 @@ def SPForESP(poltype,optmol,mol):
                     call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
             else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False,wait=True)
 
             cmdstr = poltype.formchkexe + " " + poltype.chkespfname
             poltype.call_subsystem([cmdstr],True)
