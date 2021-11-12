@@ -77,6 +77,9 @@ def gen_esp_grid(poltype,mol):
         poltype.call_subsystem([genqmpotcmd],True)
        
 def GrabGridData(poltype):
+    while not os.path.isfile('grid_esp.dat'):
+        time.sleep(1)
+    time.sleep(1)
     temp=open('grid_esp.dat','r')
     results=temp.readlines()
     temp.close()
