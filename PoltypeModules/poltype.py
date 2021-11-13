@@ -1298,7 +1298,7 @@ class PolarizableTyper():
                 else:
                     if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line or "LBFGS  --  Normal Termination due to SmallGrad" in line or "Normal termination" in line or 'Normal Termination' in line or 'Total Potential Energy' in line:
                         term=True
-                    if ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line:
+                    if ('error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line and 'RMS Error' not in line:
                         error=True
                         errorline=line
                     if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line or ('OptimizationConvergenceError' in line and 'except' in line) or "Error on total polarization charges" in line or 'Erroneous write' in line:
@@ -2068,16 +2068,7 @@ class PolarizableTyper():
 
         if os.path.isfile(self.tortormissingfilename):
             tortorsmissing=databaseparser.ReadTorTorList(self,self.tortormissingfilename)
-        try:
-            esp.SPForDMA(self,optmol,mol)
-        except:
-            if self.use_gaus==True: # if gaussian failed try psi4
-                self.use_gaus=False
-                esp.SPForDMA(self,optmol,mol)
-                self.use_gaus=True
-            else:
-                traceback.print_exc(file=sys.stdout)
-                sys.exit()
+        esp.SPForDMA(self,optmol,mol)
 
         # Obtain multipoles from Gaussian fchk file using GDMA
     
