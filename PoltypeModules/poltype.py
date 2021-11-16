@@ -1093,7 +1093,6 @@ class PolarizableTyper():
            for job,outputlog in fulljobtooutputlog.items():
                if job not in finishedjobs:
                   finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
-                  print('finished',finished,'error',error,'outputlog',outputlog) 
                   if finished==True:
                       if outputlog not in finishedjobs:
                           finishedjobs.append(outputlog)
@@ -1886,7 +1885,7 @@ class PolarizableTyper():
         if self.allowradicals==True:
             self.dontfrag=True # Psi4 doesnt allow UHF and properties (like compute WBO) for fragmenter, so need to turn of fragmenter if radical detected
         m.UpdatePropertyCache()
-        if self.addhydrogentononcharged==True:
+        if self.addhydrogentononcharged==True and self.isfragjob==False:
             m = Chem.AddHs(m)
             AllChem.EmbedMolecule(m)
         Chem.SanitizeMol(m)
@@ -1895,7 +1894,7 @@ class PolarizableTyper():
             raise ValueError('Multiple fragments detectected in input molecule')
         pcm=self.CheckForConcentratedFormalCharges(m,atomindextoformalcharge)
         cpm = copy.deepcopy(m)
-        if self.firstoptfinished==False:
+        if self.firstoptfinished==False and self.isfragjob==False:
             indextocoordinates=self.GenerateExtendedConformer(m,mol)
         Chem.GetSymmSSSR(m)
         m.GetRingInfo().NumRings() 
