@@ -196,6 +196,9 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     tmpfh = open(tempname, "w")
     foundatomblock=False
     writeres=False
+    rotbndtorescount={}
+    maxrotbnds=2
+
     for k in range(len(results)):
         line=results[k]
         linesplit=line.split() 
@@ -296,10 +299,20 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
             for rotkey,torsions in poltype.rotbndlist.items():
                 for resttors in torsions:
                     rta,rtb,rtc,rtd = resttors
+                    if rtb<rtc:
+                        rotbnd=tuple([rtb,rtc])
+                    else:
+                        rotbnd=tuple([rtc,rtb])
+                    if rotbnd not in rotbndtorescount.keys():
+                        rotbndtorescount[rotbnd]=0
+                    if rotbndtorescount[rotbnd]>=maxrotbnds:
+                        continue
+
                     rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
                     if resttors not in restlist and resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
                         tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
                         restlist.append(resttors)
+                        rotbndtorescount[rotbnd]+=1
             
             tmpfh.write("\n")
         else:
@@ -534,7 +547,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
                             rotbnd=tuple([resc,resb])
                         if rotbnd not in rotbndtorescount.keys():
                             rotbndtorescount[rotbnd]=0
-                        if rotbndtorescount[rotbnd]>maxrotbnds:
+                        if rotbndtorescount[rotbnd]>=maxrotbnds:
                             continue
                         if (b==resb and c==resc) or (b==resc and c==resb):
                             secondang = optmol.GetTorsion(resa,resb,resc,resd)
@@ -1327,6 +1340,9 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     temp.write('%d %d\n' % (mol.GetTotalCharge(),mol.GetTotalSpinMultiplicity()))
     iteratom = openbabel.OBMolAtomIter(optmol)
     etab = openbabel.OBElementTable()
+    rotbndtorescount={}
+    maxrotbnds=2
+
     if os.path.isfile(torxyzfname):
         xyzstr = open(torxyzfname,'r')
         xyzstrl = xyzstr.readlines()
@@ -1437,6 +1453,14 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
             angletol=3.5
             if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
                 continue
+            if rtb<rtc:
+                rotbnd=tuple([rtb,rtc])
+            else:
+                rotbnd=tuple([rtc,rtb])
+            if rotbnd not in rotbndtorescount.keys():
+                rotbndtorescount[rotbnd]=0
+            if rotbndtorescount[rotbnd]>=maxrotbnds:
+                continue
 
             rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
             if resttors not in restlist and resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
@@ -1446,6 +1470,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                 else:
                     temp.write('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
                     firsttor=True
+                rotbndtorescount[rotbnd]+=1
     temp.write('  ")'+'\n')
     temp.write('}'+'\n')
 

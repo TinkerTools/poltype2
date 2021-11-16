@@ -267,7 +267,6 @@ foreach $typenum (@grp_heads)
       $e53[$typeid[$typenum]] = $e53[$typeid[$typenum]] / $N[$typeid[$typenum]];
       if ($c2[$typeid[$typenum]] < 0 and $atmnumtozthenbisectbool{$typenum} == 0)  # if the C2 is negative due to bisector this is okay (why dont we also make y zero??) not for z-then-bisector or trisector
       {
-         print "About to zero the x dipole and xz quadrupole";
          $e21[$typeid[$typenum]] = 0.0;
          $e51[$typeid[$typenum]] = 0.0;
       }

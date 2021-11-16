@@ -247,6 +247,11 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     poltype.localframe2[atomidx - 1] = 0
                     lfzerox[atomidx - 1]=True
                     foundcase=True
+                elif val==1 and highestsymneighbnorepeatval==1 and len(uniqueneighbtypes)==1: # H on Iodine
+                    poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
+                    poltype.localframe2[atomidx - 1] = 0
+                    lfzerox[atomidx - 1]=True
+                    foundcase=True
 
 
                 elif val==4 and len(uniqueneighbtypes)==2 and (len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==0 or len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1): # N(CH3)(CH3)(CH3)H

@@ -1437,9 +1437,11 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             poltype.WriteToLog('Absolute or Relative RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol '+'RMSPDRel ='+str(minRMSDRel)+' tolerance is '+str(poltype.maxtorRMSPDRel))
             print('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
 
-            clskeyswithbadfits.append(clskey)
-            if poltype.suppresstorfiterr==False and count>0 and bypassrmsd==False and poltype.tordebugmode==False:
+            if poltype.suppresstorfiterr==False and count>0 and bypassrmsd==False and poltype.tordebugmode==False and clskey in clskeyswithbadfits:
                 raise ValueError('RMSPD of QM and MM torsion profile is high, tried fitting to minima and failed, RMSPD = '+str(minRMSD)+','+str(minRMSDRel))
+            
+            
+            clskeyswithbadfits.append(clskey)
     return clskeyswithbadfits
                  
 
@@ -1529,10 +1531,11 @@ def process_rot_bond_tors(poltype,mol):
     cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,indicesremoveddic, cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified,classkeylisttoindicesalreadydicremoved= get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,'_preQMOPTprefit')
     # if the fit has not been done already
     clskeyswithbadfits=[]
+
     count=0
     while 1:
         # do the fit
-        if count==2:
+        if count==3:
             break # dont redo fitting forever
         write_prm_dict,fitfunc_dict,torsettobypassrmsd,classkeytofoldtophase = fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,clskeyswithbadfits,indicesremoveddic,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified)
         # write out new keyfile

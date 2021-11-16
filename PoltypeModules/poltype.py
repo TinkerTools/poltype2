@@ -1093,7 +1093,7 @@ class PolarizableTyper():
            for job,outputlog in fulljobtooutputlog.items():
                if job not in finishedjobs:
                   finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
-                  
+                  print('finished',finished,'error',error,'outputlog',outputlog) 
                   if finished==True:
                       if outputlog not in finishedjobs:
                           finishedjobs.append(outputlog)
@@ -1816,24 +1816,26 @@ class PolarizableTyper():
 
     def CheckMP2OptFailed(self):
         files=os.listdir()
+        mp2failed=False
+        found=False
         for f in files:
             if 'opt' in f and ('.com' in f or '.psi4' in f) and '_temp' not in f:
+                found=True
                 break
-
-        temp=open(f,'r')
-        results=temp.readlines()
-        temp.close()
-        foundHF=False
-        foundminix=False
-        mp2failed=False
-        for line in results:
-            if 'optimize' in line or 'opt' in line:
-                if 'hf' in line or 'HF' in line:
-                    foundHF=True
-                if 'minix' in line or 'MINIX' in line:
-                    foundminix=True 
-        if foundHF==True and foundminix==False:
-            mp2failed=True
+        if found==True:
+            temp=open(f,'r')
+            results=temp.readlines()
+            temp.close()
+            foundHF=False
+            foundminix=False
+            for line in results:
+                if 'optimize' in line or 'opt' in line:
+                    if 'hf' in line or 'HF' in line:
+                        foundHF=True
+                    if 'minix' in line or 'MINIX' in line:
+                        foundminix=True 
+            if foundHF==True and foundminix==False:
+                mp2failed=True
         return mp2failed
 
 
@@ -1893,8 +1895,7 @@ class PolarizableTyper():
             raise ValueError('Multiple fragments detectected in input molecule')
         pcm=self.CheckForConcentratedFormalCharges(m,atomindextoformalcharge)
         cpm = copy.deepcopy(m)
-        finished,error=self.CheckNormalTermination(self.firstlogoptfname)
-        if self.firstoptfinished==False and finished==False:
+        if self.firstoptfinished==False:
             indextocoordinates=self.GenerateExtendedConformer(m,mol)
         Chem.GetSymmSSSR(m)
         m.GetRingInfo().NumRings() 
