@@ -1293,6 +1293,8 @@ class PolarizableTyper():
                 if 'poltype' in tail:
                     if 'Poltype Job Finished' in line:
                         term=True
+                    elif 'Poltype has crashed!' in line:
+                        error=True
                 else:
                     if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line or "LBFGS  --  Normal Termination due to SmallGrad" in line or "Normal termination" in line or 'Normal Termination' in line or 'Total Potential Energy' in line:
                         term=True
@@ -2510,6 +2512,7 @@ if __name__ == '__main__':
                 fromaddr = 'poltypecrashreportnoreply@gmail.com'
                 toaddr = poltype.email
                 filename=poltype.logfname
+                poltype.WriteToLog('Poltype has crashed!')
                 try:
                     poltype.SendCrashReportEmail(text,fromaddr,toaddr,password,filename)
                 except:
