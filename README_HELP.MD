@@ -1,7 +1,6 @@
 ## Help
 
 * [Running Poltype](#running-poltype)
-* [Unittesting](#unittesting)
 * [Input Structure](#input-structure)
 * [Most Common Inputs](#most-common-inputs)
 * [Geometry Optimization](#geometry-optimization)
@@ -39,15 +38,6 @@ python /path_to_poltype/poltype.py --help
   ** another possibility is to (use_gausoptonly. This will use Gaussian for all opt jobs but PSi4 for DMA and ESP QM.  
 
  
-### Unittesting
-```shell
-python ~/poltypepackage/PoltypeModules/test_poltype.py
-```
-
-* Currently have not updated examples folder with recent changes, do not use with unittesting
-* modifiedresidue library also has some bugs currently
-
-
 ### Input Structure
 * Use an SDF file format for the input structure.
 * Use totalcharge=charge keyword in .ini file to specify total charge, otherwise poltype will guess based on formal charge from input valence. 

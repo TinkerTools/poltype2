@@ -2512,6 +2512,7 @@ if __name__ == '__main__':
                 fromaddr = 'poltypecrashreportnoreply@gmail.com'
                 toaddr = poltype.email
                 filename=poltype.logfname
+                poltype.WriteToLog(text)
                 poltype.WriteToLog('Poltype has crashed!')
                 try:
                     poltype.SendCrashReportEmail(text,fromaddr,toaddr,password,filename)

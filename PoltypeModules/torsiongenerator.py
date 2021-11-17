@@ -877,9 +877,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             phaseangles=inistructophaselist[initialtinkerstructure]
             finished,error=poltype.CheckNormalTermination(outputlog)
             cartxyz=outputlog.replace('.log','.xyz')
-            opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
-            tinkerxyz=outputlog.replace('.log','_tinker.xyz')
-            ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz) 
+             
             if finished==False and 'opt' in outputlog and poltype.fullopt==False: # if there is an error, then finished=False
                 bondtoposame=CheckBondTopology(poltype,outputlog,initialtinkerstructure)
                 maxiter=4
@@ -900,6 +898,9 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
 
             else:
                 if finished==True and outputlog not in finishedjobs:
+                    opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
+                    tinkerxyz=outputlog.replace('.log','_tinker.xyz')
+                    ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz)
                     obConversion = openbabel.OBConversion()
                     themol = openbabel.OBMol()
                     obConversion.SetInFormat('xyz')
