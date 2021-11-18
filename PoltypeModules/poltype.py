@@ -1107,7 +1107,7 @@ class PolarizableTyper():
                           self.ErrorTerm(outputlog,skiperrors)
                           if job in submittedjobs:
                               submittedjobs.remove(job)
-                  if job not in submittedjobs and len(submittedjobs)<self.jobsatsametime and finished==False and job not in finishedjobs:
+                  if job not in submittedjobs and len(submittedjobs)<self.jobsatsametime and finished==False and outputlog not in finishedjobs:
                       count=len(finishedjobs)
                       ratio=(100*count)/len(fulljobtooutputlog.keys())
                       if len(finishedjobs)!=0:
