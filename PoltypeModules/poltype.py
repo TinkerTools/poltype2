@@ -1288,8 +1288,9 @@ class PolarizableTyper():
             Ftime=os.path.getmtime(logfname)
             reltime=time.time()-Ftime
             htime=reltime*0.000277778
-            updatetime=4 # hours. sometimes psi4 gives return code 0 even though program crashes
+            updatetime=1 # hours. sometimes psi4 gives return code 0 even though program crashes
             foundendgau=False # sometimes gaussian comments have keyword Error, ERROR in them
+            foundhf=False
             for line in open(logfname):
                 if 'poltype' in tail:
                     if 'Poltype Job Finished' in line:
@@ -1314,14 +1315,18 @@ class PolarizableTyper():
                     if foundendgau==True:
                         if error==True and preverror==False: # then caused by Gaussian comment
                             error=False
+                    if 'hf/MINIX' in line and '_frag' not in logfname:
+                        foundhf=True
+            if self.debugmode==False and foundhf==True:
+                term=False
                     
 
             if error==True:
                 term=False # sometimes psi4 geometry opt not fully converge but says successfully exiting etc..
                 message='Error '+errorline+ 'logpath='+logfname
-            #if error==False and term==False and htime>=updatetime:
-            #    error=True
-            #    message='Error '+'Job has not been updated in '+str(updatetime)+' hours'+' last update time = '+str(htime)+' hours'+' logname='+logfname
+            if error==False and term==False and htime>=updatetime and ('opt-' in logfname or 'sp-' in logfname):
+                error=True
+                message='Error '+'Job has not been updated in '+str(updatetime)+' hours'+' last update time = '+str(htime)+' hours'+' logname='+logfname
             if error==True and term==False and skiperrors==False:
                 if errormessages!=None:
                     if message not in errormessages:
