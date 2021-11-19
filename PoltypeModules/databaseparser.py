@@ -780,9 +780,8 @@ def GrabAromaticIndices(poltype,match,themol,ls):
         atom=themol.GetAtomWithIdx(index)
         isinring=atom.IsInRing()
         hyb=atom.GetHybridization()
-        if isinring==True and hyb==Chem.HybridizationType.SP2:
+        if isinring==True and str(hyb)==str(Chem.HybridizationType.SP2):
             aromaticindices.append(index)
-
     return aromaticindices
 
 
@@ -924,9 +923,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                         prmsmartsindices=[smartsindextoparametersmartsindex[i] for i in smartindices]
                         aromaticprmsmartsindices=[smartsindextoparametersmartsindex[i] for i in aromaticsmartindices]
 
-                        
-                        aromaticprmindices=GrabAromaticIndices(poltype,aromaticprmsmartsindices,prmmol,ls)
-                        if len(aromaticprmindices)!=len(aromaticprmsmartsindices):
+                        if len(newaromaticindices)!=len(aromaticprmsmartsindices):
                             continue
                         prmsmartsatomicnumtonum={}
                         for atomicnum,num in rdkitatomicnumtonum.items():

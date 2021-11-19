@@ -1315,7 +1315,7 @@ class PolarizableTyper():
                     if foundendgau==True:
                         if error==True and preverror==False: # then caused by Gaussian comment
                             error=False
-                    if 'hf/MINIX' in line and '_frag' not in logfname:
+                    if ('hf/MINIX' in line or 'HF/gen' in line) and '_frag' not in logfname:
                         foundhf=True
             if self.debugmode==False and foundhf==True:
                 term=False
