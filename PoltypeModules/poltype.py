@@ -1099,7 +1099,7 @@ class PolarizableTyper():
                           self.NormalTerm(outputlog)
                           if job in submittedjobs:
                               submittedjobs.remove(job) 
-                  if error==True:
+                  if error==True and outputlog in submittedjobs:
                       if outputlog not in finishedjobs:
 
                           errorjobs.append(outputlog)

@@ -775,7 +775,6 @@ def FindHowManyBondTypes(poltype,trymol,atomidx):
 
 def GrabAromaticIndices(poltype,match,themol,ls):
     aromaticindices=[]
-
     for index in match:
         atom=themol.GetAtomWithIdx(index)
         isinring=atom.IsInRing()
@@ -801,6 +800,12 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
         fragsmartslist=GenerateFragmentSMARTSList(poltype,newls)
     for parametersmarts in parametersmartslist:
         prmmol=Chem.MolFromSmarts(parametersmarts)
+        if len(ls)==1:
+            rdmolfiles.MolToMolFile(prmmol,'test.mol')
+            prmmol=Chem.MolFromMolFile('test.mol',removeHs=False,sanitize=False)
+            poltype.totalcharge=None
+            prmmol,atomindextoformalcharge=poltype.CheckInputCharge(prmmol)
+            Chem.SanitizeMol(prmmol)
         smartsmatchingtoindices=[]
         molsmatchingtoindices=[]
         finalfragsmartslist=[]
@@ -923,7 +928,9 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                         prmsmartsindices=[smartsindextoparametersmartsindex[i] for i in smartindices]
                         aromaticprmsmartsindices=[smartsindextoparametersmartsindex[i] for i in aromaticsmartindices]
 
-                        if len(newaromaticindices)!=len(aromaticprmsmartsindices):
+                        
+                        aromaticprmindices=GrabAromaticIndices(poltype,aromaticprmsmartsindices,prmmol,ls)
+                        if len(aromaticprmindices)!=len(aromaticprmsmartsindices) and len(ls)==1:
                             continue
                         prmsmartsatomicnumtonum={}
                         for atomicnum,num in rdkitatomicnumtonum.items():
