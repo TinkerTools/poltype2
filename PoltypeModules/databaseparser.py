@@ -785,7 +785,7 @@ def GrabAromaticIndices(poltype,match,themol,ls):
 
 
 
-def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,parametersmartstosmartslist,ls,rdkitmol):
+def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,parametersmartstosmartslist,ls,rdkitmol,parametersmartstordkitmol):
     smartsmcstomol={}
     prmsmartstomcssmarts={}
     parametersmartstoscore={}
@@ -801,13 +801,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
         fragsmartslist=GenerateFragmentSMARTSList(poltype,newls)
     for parametersmarts in parametersmartslist:
         prmmol=Chem.MolFromSmarts(parametersmarts)
-        if len(ls)==1:
-            rdmolfiles.MolToMolFile(prmmol,'test.mol')
-            prmmol=Chem.MolFromMolFile('test.mol',removeHs=False,sanitize=False)
-            poltype.totalcharge=None
-            prmmol,atomindextoformalcharge=poltype.CheckInputCharge(prmmol)
-            Chem.SanitizeMol(prmmol)
-            poltype.totalcharge=temptotalcharge
+        prmmol=parametersmartstordkitmol[parametersmarts]
         smartsmatchingtoindices=[]
         molsmatchingtoindices=[]
         finalfragsmartslist=[]
@@ -1146,7 +1140,7 @@ def CheckIfConsecutivelyConnected(poltype,matchidxs,mcsmol):
 
     return goodmatch
 
-def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprm,parametersmartslist,mol):
+def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprm,parametersmartslist,mol,parametersmartstordkitmol):
     listforprmtoparametersmarts={}
     listforprmtosmarts={}
     listforprmtomatchallneighbs={}
@@ -1154,7 +1148,7 @@ def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprm,parametersmartsli
         parametersmartstomatchlen={}
         parametersmartstosmartslist={}
 
-        parametersmartstosmartslist,parametersmartstofoundallneighbs=MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,parametersmartstosmartslist,ls,mol)
+        parametersmartstosmartslist,parametersmartstofoundallneighbs=MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,parametersmartstosmartslist,ls,mol,parametersmartstordkitmol)
 
         if len(parametersmartstosmartslist.keys())!=0:
             parametersmartstosmartslen={}
@@ -4262,6 +4256,21 @@ def StiffenZThenBisectorAngleConstants(poltype,keyfilename):
     os.rename(tempname,keyfilename)
 
 
+def GenerateRdkitMolObjectsParameterSMARTS(poltype,parametersmartslist):
+    parametersmartstordkitmol={}
+    temptotalcharge=poltype.totalcharge
+    for parametersmarts in parametersmartslist:
+        prmmol=Chem.MolFromSmarts(parametersmarts)
+        rdmolfiles.MolToMolFile(prmmol,'test.mol')
+        prmmol=Chem.MolFromMolFile('test.mol',removeHs=False,sanitize=False)
+        poltype.totalcharge=None
+        prmmol,atomindextoformalcharge=poltype.CheckInputCharge(prmmol)
+        Chem.SanitizeMol(prmmol)
+        poltype.totalcharge=temptotalcharge
+        parametersmartstordkitmol[parametersmarts]=prmmol
+
+    return parametersmartstordkitmol
+
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False):
 
     if polarize==True:
@@ -4368,14 +4377,14 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         vdwindicestoextsmartsmatchlength,vdwindicestoextsmarts,vdwindicestoextsmartsatomorder=MatchExternalSMARTSToMolecule(poltype,rdkitmol,vdwsmartsatomordertoparameters)
         tortorindicestoextsmartsmatchlength,tortorindicestoextsmarts,tortorindicestoextsmartsatomorders=MatchExternalSMARTSToMolecule(poltype,rdkitmol,tortorsmartsatomordertoparameters)
        
-
-        atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,atomindicesforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofatomsforprm,parametersmartslist,mol)
+        parametersmartstordkitmol=GenerateRdkitMolObjectsParameterSMARTS(poltype,parametersmartslist)
+        atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,atomindicesforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofatomsforprm,parametersmartslist,mol,parametersmartstordkitmol)
  
-        bondsforprmtoparametersmarts,bondsforprmtosmarts,bondsforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofbondsforprm,parametersmartslist,mol)
-        planarbondsforprmtoparametersmarts,planarbondsforprmtosmarts,planarbondsforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,planarbonds,parametersmartslist,mol)
-        anglesforprmtoparametersmarts,anglesforprmtosmarts,anglesforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofanglesforprm,parametersmartslist,mol)
-        planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts,planaranglesforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofanglesforprm,parametersmartslist,mol)
-        torsionsforprmtoparametersmarts,torsionsforprmtosmarts,torsionsforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listoftorsionsforprm,parametersmartslist,mol)
+        bondsforprmtoparametersmarts,bondsforprmtosmarts,bondsforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofbondsforprm,parametersmartslist,mol,parametersmartstordkitmol)
+        planarbondsforprmtoparametersmarts,planarbondsforprmtosmarts,planarbondsforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,planarbonds,parametersmartslist,mol,parametersmartstordkitmol)
+        anglesforprmtoparametersmarts,anglesforprmtosmarts,anglesforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofanglesforprm,parametersmartslist,mol,parametersmartstordkitmol)
+        planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts,planaranglesforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofanglesforprm,parametersmartslist,mol,parametersmartstordkitmol)
+        torsionsforprmtoparametersmarts,torsionsforprmtosmarts,torsionsforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listoftorsionsforprm,parametersmartslist,mol,parametersmartstordkitmol)
         atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,vdwindicestoextsmarts,vdwindicestoextsmartsatomorder=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,vdwindicestoextsmartsmatchlength,atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,vdwindicestoextsmarts,atomindicesforprmtomatchallneighbs,vdwindicestoextsmartsatomorder)
  
         bondsforprmtoparametersmarts,bondsforprmtosmarts,bondindicestoextsmarts,bondindicestoextsmartsatomorder=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,bondindicestoextsmartsmatchlength,bondsforprmtoparametersmarts,bondsforprmtosmarts,bondindicestoextsmarts,bondsforprmtomatchallneighbs,bondindicestoextsmartsatomorder)

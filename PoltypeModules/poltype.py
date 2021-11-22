@@ -1509,7 +1509,7 @@ class PolarizableTyper():
 
            
     
-    def CheckInputCharge(self,molecule):
+    def CheckInputCharge(self,molecule,verbose=False):
         array=[]
         totchg=0
         atomindextoformalcharge={}
@@ -1535,45 +1535,51 @@ class PolarizableTyper():
             string='Atom index = '+str(atomidx+1)+' Atomic Number = ' +str(atomnum)+ ' Valence = '+str(val)+ ' Formal charge = '+str(chg)
             array.append(string)
             if atomnum==6 and val==3 and (self.addhydrogentononcharged==True or self.addhydrogens==True)  and radicals==0:
-                warnings.warn('WARNING! Strange valence for Carbon, will assume missing hydrogens and add'+string) 
-                self.WriteToLog('WARNING! Strange valence for Carbon, will assume missing hydrogens and add '+string)
+                if verbose==True:
+                    warnings.warn('WARNING! Strange valence for Carbon, will assume missing hydrogens and add'+string) 
+                    self.WriteToLog('WARNING! Strange valence for Carbon, will assume missing hydrogens and add '+string)
                 atom.SetNumRadicalElectrons(0)
                 chg=0
                 atom.SetFormalCharge(chg)
 
 
             elif atomnum==7 and val==2 and (self.addhydrogentononcharged==True or self.addhydrogens==True) and radicals==0:
-                warnings.warn('WARNING! Strange valence for Nitrogen, will assume missing hydrogens and add'+string) 
-                self.WriteToLog('WARNING! Strange valence for Nitrogen, will assume missing hydrogens and add '+string)
+                if verbose==True:
+                    warnings.warn('WARNING! Strange valence for Nitrogen, will assume missing hydrogens and add'+string) 
+                    self.WriteToLog('WARNING! Strange valence for Nitrogen, will assume missing hydrogens and add '+string)
                 atom.SetNumRadicalElectrons(0)
                 chg=0
                 atom.SetFormalCharge(chg)
 
             elif atomnum==8 and val==1 and (self.addhydrogens==True) and radicals==0:
-                warnings.warn('WARNING! Strange valence for Oxygen, will assume missing hydrogens and add'+string) 
-                self.WriteToLog('WARNING! Strange valence for Oxygen, will assume missing hydrogens and add '+string)
+                if verbose==True:
+                    warnings.warn('WARNING! Strange valence for Oxygen, will assume missing hydrogens and add'+string) 
+                    self.WriteToLog('WARNING! Strange valence for Oxygen, will assume missing hydrogens and add '+string)
                 atom.SetNumRadicalElectrons(0)
                 chg=0
                 atom.SetFormalCharge(chg)
 
 
             elif atomnum==7 and val==2 and radicals==1:
-                warnings.warn('WARNING! Strange valence for Nitrogen, will assume radical and set charge to zero') 
-                self.WriteToLog('WARNING! Strange valence for Nitrogen, will assume radical and set charge to zero')
+                if verbose==True:
+                    warnings.warn('WARNING! Strange valence for Nitrogen, will assume radical and set charge to zero') 
+                    self.WriteToLog('WARNING! Strange valence for Nitrogen, will assume radical and set charge to zero')
                 self.allowradicals=True
 
                 atom.SetFormalCharge(0)
                 self.addhydrogentononcharged=False
 
             elif atomnum==8 and val==2 and radicals==1:
-                warnings.warn('WARNING! Strange valence for Oxygen, will assume radical and set charge to +1') 
-                self.WriteToLog('WARNING! Strange valence for Oxygen, will assume radical and set charge to +1')
+                if verbose==True:
+                    warnings.warn('WARNING! Strange valence for Oxygen, will assume radical and set charge to +1') 
+                    self.WriteToLog('WARNING! Strange valence for Oxygen, will assume radical and set charge to +1')
                 self.allowradicals=True
 
                 atom.SetFormalCharge(1)
             elif atomnum==8 and val==1 and radicals==1:
-                warnings.warn('WARNING! Strange valence for Oxygen, will assume radical and set charge to +1') 
-                self.WriteToLog('WARNING! Strange valence for Oxygen, will assume radical and set charge to +0')
+                if verbose==True:
+                    warnings.warn('WARNING! Strange valence for Oxygen, will assume radical and set charge to +1') 
+                    self.WriteToLog('WARNING! Strange valence for Oxygen, will assume radical and set charge to +0')
                 self.allowradicals=True
                 atom.SetFormalCharge(0)
                 self.addhydrogentononcharged=False
@@ -1888,7 +1894,7 @@ class PolarizableTyper():
         indextocoordinates=self.GrabIndexToCoordinates(mol)
         m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False,sanitize=False)
         self.CheckIfAtomsAreAllowed(m)
-        m,atomindextoformalcharge=self.CheckInputCharge(m)
+        m,atomindextoformalcharge=self.CheckInputCharge(m,verbose=True)
         if self.allowradicals==True:
             self.dontfrag=True # Psi4 doesnt allow UHF and properties (like compute WBO) for fragmenter, so need to turn of fragmenter if radical detected
         m.UpdatePropertyCache()
