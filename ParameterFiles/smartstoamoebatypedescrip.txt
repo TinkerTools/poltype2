@@ -17,8 +17,6 @@
  I-  "Iodide Ion I-"    % [I-] % 1              
  C   "Cyanide Ion C"    % [C-]#[N] % 1             
  N   "Cyanide Ion N"    % [C-]#[N] % 2
- B   "Tetrafluoroborate B" % [#9]-[#5-](-[#9])(-[#9])-[#9] % 2 
- F   "Tetrafluoroborate F" % [#9]-[#5-](-[#9])(-[#9])-[#9] % 1 
  P   "Hexafluorophosphate P" % [#15-](-[#9])(-[#9])(-[#9])(-[#9])(-[#9])-[#9] % 1  
  F   "Hexafluorophosphate F" % [#15-](-[#9])(-[#9])(-[#9])(-[#9])(-[#9])-[#9] % 2 
  N   "Dinitrogen N2"    % [N]#[N]% 1 
