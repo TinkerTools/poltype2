@@ -1854,8 +1854,9 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             ring=GrabRingAtomIndicesFromInputIndex(poltype,babelindices[1],atomindices)
             ringtorindices=GrabIndicesInRing(poltype,babelindices,ring)
         
-        if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False and ([bbidx,cbidx] not in poltype.onlyrotbndslist or [cbidx,bbidx] not in poltype.onlyrotbndslist):
+        if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False and ([bbidx,cbidx] not in poltype.onlyrotbndslist and [cbidx,bbidx] not in poltype.onlyrotbndslist):
             continue
+
         if check==False:
             if ringbond==True:
                 if (2 not in hybs): # non-aromatic torsion want parameters for 

@@ -2420,7 +2420,7 @@ class PolarizableTyper():
                         shutil.rmtree(f)
             elif '.' in f and not os.path.isdir(f):
                 ext=f.split('.')[1]
-                if ext!='sdf' and ext!='ini' and 'nohup' not in f:
+                if ext!='sdf' and ext!='ini' and 'nohup' not in f and f[0]!='.':
                     os.remove(f)
 
     def CheckFileSanity(self):

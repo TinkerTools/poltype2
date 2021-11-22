@@ -950,7 +950,6 @@ def GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_
     Sx = numpy.array(cls_angle_dict[tup])
     out=[]
         
-
     out.append(cls_angle_dict[tup])
     for clskey in classkeylist:
         fitfunc_dict[clskey] = fitfunc(poltype,'eval',torgen.rads(poltype,Sx),torset,torprmdict,debug=False)
