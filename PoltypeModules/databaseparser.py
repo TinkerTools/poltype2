@@ -796,6 +796,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
     parametersmartstofoundallneighbs={}
     newls=copy.deepcopy(ls)
     usemcsonly=False
+    temptotalcharge=poltype.totalcharge
     if usemcsonly==False:
         fragsmartslist=GenerateFragmentSMARTSList(poltype,newls)
     for parametersmarts in parametersmartslist:
@@ -806,6 +807,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
             poltype.totalcharge=None
             prmmol,atomindextoformalcharge=poltype.CheckInputCharge(prmmol)
             Chem.SanitizeMol(prmmol)
+            poltype.totalcharge=temptotalcharge
         smartsmatchingtoindices=[]
         molsmatchingtoindices=[]
         finalfragsmartslist=[]

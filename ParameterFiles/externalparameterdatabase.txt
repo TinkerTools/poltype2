@@ -14,22 +14,9 @@ vdw % [P](=[O])([O])([O][#1])[O][#1] % 4 % 3.45, .108
 vdw % [P](=[O])([O])([O][#1])[O][#1] % 5 % 2.655, .01, .91
 
 
-# Temporary Nitro parameters from old poltype paper
-vdw % [#8][#7]=[#8] % 1 % 3.3, .1120
-vdw % [#8][#7]=[#8] % 2 % 3.710, .1050
-
-# Temporary Bromine-Benzene parameters from old poltype paper
-
-vdw % [#35]-[#6]1:[#6](:[#6](:[#6](-[#35]):[#6](:[#6]:1-[H])-[H])-[H])-[H] % 1 % 4.38, .43 
-
-# Temporary Tert-butylbenzene parameter assingment to skip vdw probe, Ethane CH3
-vdw % [#6]([CH3])([CH3])([CH3])([c]) % 1 %  3.820 ,0.1010
-
-
-# Temporary Isobutryaldehyde CH3 from Alkane and Ethane/Ethanol H3C 
-vdw  %  [#6]([#1])([CH3])([CH3])([#6](=[#8])([#1]))  % 1 %  3.820 , 0.1010
-vdw   %  [#6]([#1])([CH3])([CH3])([#6](=[#8])([#1]))  % 2 %   2.960  ,   0.0240  ,   0.92
 
 # H2C alkane parameters are to repulsive, so use H3C parameters
 vdw % [#6]([#1])([#1])([#6])([#6]) % 2 % 2.960 , 0.0240 , 0.92
 
+
+vdw % [#8](-[#6]1:[#6](:[#6](:[#6](:[#6](:[#6]:1)))))-[H] % 1 % 3.356 , 0.1188        
