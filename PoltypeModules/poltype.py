@@ -1288,7 +1288,7 @@ class PolarizableTyper():
             Ftime=os.path.getmtime(logfname)
             reltime=time.time()-Ftime
             htime=reltime*0.000277778
-            updatetime=1 # hours. sometimes psi4 gives return code 0 even though program crashes
+            updatetime=.25 # hours. sometimes psi4 gives return code 0 even though program crashes
             foundendgau=False # sometimes gaussian comments have keyword Error, ERROR in them
             foundhf=False
             for line in open(logfname):
