@@ -860,7 +860,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         optnumtofulllistofjobs['1'].extend(listofjobs)
         fulljobtolog.update(jobtolog) 
         fulljobtooutputlog.update(jobtooutputlog)
-
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMOptJobToLog'+'_1'+'_'+poltype.molecprefix
     if poltype.externalapi!=None:
         if len(optnumtofulllistofjobs['1'])!=0:
@@ -872,6 +871,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         outputlogtoinitialstructure=torsettooutputlogtoinitialstructure[tuple(torset)]
         tryoutputlogs=optnumtotorsettofulloutputlogs['1'][tuple(torset)]
         inistructophaselist=torsettoinistructophaselist[tuple(torset)]
+        newphaseangles=[]
         for outputlog in tryoutputlogs:
             initialtinkerstructure=outputlogtoinitialstructure[outputlog]
             phaseangles=inistructophaselist[initialtinkerstructure]
@@ -897,7 +897,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                     finishedjobs.append(outputlog)
 
             else:
-                if finished==True and outputlog not in finishedjobs:
+                if finished==True:
                     opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
                     tinkerxyz=outputlog.replace('.log','_tinker.xyz')
                     ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz)
@@ -909,15 +909,21 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                     obConversion.WriteFile(themol,'temp.mol')
                     try:
                         m=Chem.MolFromMolFile('temp.mol',removeHs=False,sanitize=False)
-                  
                         smarts=rdmolfiles.MolToSmarts(m)
                         if '.' in smarts:
                             poltype.WriteToLog('Warining: Fragments detected in file from optimization, will remove point from fitting  '+outputlog)
+                        else:
+                            if outputlog not in finishedjobs:
+                                finishedjobs.append(outputlog)
+                            phsang=optlogtophaseangle[outputlog]
+                            newphaseangles.append(phsang)
                     except:
-                        pass
-                    else:
-                        finishedjobs.append(outputlog)
+                        if outputlog not in finishedjobs:
+                            finishedjobs.append(outputlog)
+                        phsang=optlogtophaseanglm[outputlog]
+                        newphaseangles.append(phsang)
 
+        poltype.torsettophaselist[tuple(torset)]=newphaseangles          
     firstfinishedjobs=finishedjobs[:]
     for job in firstfinishedjobs:
         if job not in finishedjobs:
@@ -940,8 +946,8 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         finishedflatphaselist=[]
         for i in range(len(outputlogs)):
             outputlog=outputlogs[i]
-            phaselist=flatphaselist[i]
             if outputlog in finishedjobs and outputlog not in errorjobs:
+                phaselist=optlogtophaseangle[outputlog]
                 finishedoutputlogs.append(outputlog)
                 finishedflatphaselist.append(phaselist)
         outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangles,optlogtosplog,inputfilepaths,outputfilenames,executables=ExecuteSPJobs(poltype,finishedoutputlogs,finishedflatphaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,mol,optlogtosplog,optlogtophaseangle)

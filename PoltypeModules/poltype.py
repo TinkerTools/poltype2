@@ -1087,7 +1087,6 @@ class PolarizableTyper():
        errorjobs=[]
        submittedjobs=[]
        errormessages=[]
-       
            
        while len(finishedjobs)!=len(list(fulljobtooutputlog.keys())):
            for job,outputlog in fulljobtooutputlog.items():
@@ -1099,14 +1098,12 @@ class PolarizableTyper():
                           self.NormalTerm(outputlog)
                           if job in submittedjobs:
                               submittedjobs.remove(job) 
-                  if error==True and outputlog in submittedjobs:
+                  if error==True and job in submittedjobs:
                       if outputlog not in finishedjobs:
-
                           errorjobs.append(outputlog)
                           finishedjobs.append(outputlog) 
                           self.ErrorTerm(outputlog,skiperrors)
-                          if job in submittedjobs:
-                              submittedjobs.remove(job)
+                          submittedjobs.remove(job)
                   if job not in submittedjobs and len(submittedjobs)<self.jobsatsametime and finished==False and outputlog not in finishedjobs:
                       count=len(finishedjobs)
                       ratio=(100*count)/len(fulljobtooutputlog.keys())
