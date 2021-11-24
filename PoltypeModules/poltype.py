@@ -1754,7 +1754,7 @@ class PolarizableTyper():
                 fsplit=f.split('.')
                 if len(fsplit)>1:
                     end=fsplit[1]
-                    if 'log' not in end and 'sdf' not in end and 'ini' not in end and 'chk' not in end and 'dat' not in end and 'mol' not in end: 
+                    if 'log' not in end and 'sdf' not in end and 'ini' not in end and 'chk' not in end and 'dat' not in end and 'mol' not in end and 'txt' not in end: 
                         deletearray.append(f)
         for f in deletearray:
             os.remove(f)
@@ -2115,7 +2115,7 @@ class PolarizableTyper():
 
             
         # post process local frames written out by poledit
-        if self.atomnum!=1: 
+        if self.atomnum!=1 and not os.path.isfile(self.key3fname): 
              try:
                  esp.SPForESP(self,optmol,mol) 
              except:
@@ -2156,6 +2156,7 @@ class PolarizableTyper():
         mpole.rm_esp_terms_keyfile(self,self.key3fname)
         if self.atomnum!=1: 
             esp.ElectrostaticPotentialComparison(self) 
+            self.failedrmspd=False
             if self.failedrmspd==True and self.deletedfiles==False and self.skipespfiterror==False:
                 self.DeleteFilesWithExtension(['pot','grid','key','xyz','key_2','key_3','key_4','key_5','xyz_2','cube'])
                 self.DeleteFilesWithString(['esp','dma'])
