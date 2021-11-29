@@ -536,13 +536,13 @@ def StructureMinimization(poltype,torsionrestraints):
     poltype.WriteToLog("")
     poltype.WriteToLog("=========================================================")
     poltype.WriteToLog("Minimizing structure\n")
-    AddTorsionRestraints(poltype,poltype.key5fname,torsionrestraints)
+    AddTorsionRestraints(poltype,poltype.key7fname,torsionrestraints)
     shutil.copy(poltype.xyzoutfile,poltype.tmpxyzfile)
-    shutil.copy(poltype.key5fname,poltype.tmpkeyfile)
+    shutil.copy(poltype.key7fname,poltype.tmpkeyfile)
     cmd = poltype.minimizeexe+' -k '+poltype.tmpkeyfile+' '+poltype.tmpxyzfile+' 0.1 > Minimized_final.out'
     poltype.call_subsystem([cmd], True)
 
-    torgen.RemoveStringFromKeyfile(poltype,poltype.key5fname,'restrain-torsion')
+    torgen.RemoveStringFromKeyfile(poltype,poltype.key7fname,'restrain-torsion')
     torgen.RemoveStringFromKeyfile(poltype,poltype.tmpkeyfile,'restrain-torsion')
 
 

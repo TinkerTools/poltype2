@@ -800,6 +800,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
     if usemcsonly==False:
         fragsmartslist=GenerateFragmentSMARTSList(poltype,newls)
     for parametersmarts in parametersmartslist:
+        prmmol=Chem.MolFromSmarts(parametersmarts)
         prmmol=parametersmartstordkitmol[parametersmarts]
         smartsmatchingtoindices=[]
         molsmatchingtoindices=[]

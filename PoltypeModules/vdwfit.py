@@ -87,7 +87,7 @@ def writePRM(poltype,params,vdwtypes,idxtotype):
     vdwtypetonewline={}
     for i in range(len(params)):
         oFile = open("temp.key", 'w')
-        rFile=open(poltype.key5fname,'r')
+        rFile=open(poltype.key4fname,'r')
         vdwtype=vdwtypes[i]
         vartype=idxtotype[i]
         if vartype=='rad':
@@ -137,9 +137,9 @@ def writePRM(poltype,params,vdwtypes,idxtotype):
     os.fsync(oFile.fileno())
     oFile.close()
     rFile.close()
-    os.remove(poltype.key5fname)
-    os.rename("temp.key",poltype.key5fname)
-    CheckAllVdwTypesExist(poltype,poltype.key5fname)
+    os.remove(poltype.key4fname)
+    os.rename("temp.key",poltype.key4fname)
+    CheckAllVdwTypesExist(poltype,poltype.key4fname)
     return
 
 def readOneColumn(filename,columnnumber,prefix=None):
@@ -195,7 +195,7 @@ def myFUNC(params,poltype,vdwtypes,idxtotype,count):
     for line in temp.readlines():
         xyzname=line.split()[0]
         filename=xyzname.replace('.xyz','.alz')
-        cmdstr=poltype.analyzeexe+' '+xyzname+' '+'-k '+poltype.key5fname +' e '+'> '+filename
+        cmdstr=poltype.analyzeexe+' '+xyzname+' '+'-k '+poltype.key4fname +' e '+'> '+filename
         cmdarray.append(cmdstr)
         filenamearray.append(filename)
 
@@ -246,7 +246,7 @@ def ScreenHighEnergyPoints(poltype,current,target,distarray=None):
     return np.array(newcurrent),np.array(newtarget),np.array(newdistarray)
 
 
-def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count,allprefix=False):
+def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count,classkeytofitresults,allprefix=False):
     if allprefix==False:
         target= NormalizeTarget(poltype,'QM_DATA',prefix)
         current=NormalizeTarget(poltype,'SP.dat',prefix)
@@ -300,14 +300,21 @@ def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count,allprefix=False):
     plt.title('QM vs AMOEBA , '+vdwtypestring)
     if count>1:
         suffix='_boltzman.png'
+        ostring='Boltzmann Fit'
     else:
         suffix='.png'
+        ostring=''
     if allprefix==False:
         fig.savefig('QMvsAMOEBA-'+prefix+'_'+vdwtypestring+suffix)
     else:
         prefstring=','.join(prefix)
         fig.savefig('QMvsAMOEBA-'+prefstring+'_'+vdwtypestring+suffix)
         prefix=prefstring
+    for vdwtypenum in vdwtypes:
+        thestring='VDW '+str(vdwtypenum)+' RMSD(MM,QM) '+str(new_rmse)+' '+'RelativeRMSD(MM,QM) '+str(new_rmse_rel)+' '+ostring+'\n'
+        poltype.WriteToLog(thestring)
+        classkeytofitresults[vdwtypenum]=thestring
+
     rmsetol=1.9
     relrmsetol=.2
     goodfit=True
@@ -317,9 +324,10 @@ def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count,allprefix=False):
             raise ValueError('RMSE is too high! RMSE='+str(new_rmse)+' tol='+str(rmsetol)+' '+'RelRMSE='+str(new_rmse_rel)+' tol='+str(relrmsetol)+' '+prefix)
         elif allprefix==True and count<=1:
             mes='RMSE is too high! RMSE='+str(new_rmse)+' tol='+str(rmsetol)+' '+'RelRMSE='+str(new_rmse_rel)+' tol='+str(relrmsetol)+' '+prefix
-            print(mes,flush=True)
+            poltype.WriteToLog(mes)
 
-    return goodfit
+    return goodfit,classkeytofitresults
+
 
 def VDWOptimizer(poltype,count,fitredboolarray):
     x0 = []
@@ -914,8 +922,8 @@ def ExecuteSPJobs(poltype,qmfilenamearray,prefix):
 
 
 def GrabVdwParameters(poltype,vdwtype):
-    CheckAllVdwTypesExist(poltype,poltype.key5fname)
-    temp=open(poltype.key5fname,'r')
+    CheckAllVdwTypesExist(poltype,poltype.key4fname)
+    temp=open(poltype.key4fname,'r')
     results=temp.readlines()
     temp.close()
     for line in results:
@@ -1282,7 +1290,7 @@ def optimizedimers(poltype,atoms1, atoms2, coords1, coords2, p1, p2, oridimer,vd
         outputxyz=dimer.replace('.xyz','-tinkermin.xyz')
         probeatoms=len(atoms2)
         ConvertProbeDimerXYZToTinkerXYZ(poltype,dimer,poltype.xyzoutfile,outputxyz,waterbool,probeatoms)
-        outputxyz=MinimizeDimer(poltype,outputxyz,poltype.key5fname)
+        outputxyz=MinimizeDimer(poltype,outputxyz,poltype.key4fname)
         minstructs.append(outputxyz)
     return minstructs
 
@@ -1602,14 +1610,13 @@ def CheckIfProbeIsTooFar(poltype,mol,probeindex,moleculeindex,probeatoms):
     for atom in atomiter:
         total+=1
 
-    maxatomindex=total-probeatoms
+    maxatomindex=total-probeatoms-1
     atomiter=openbabel.OBMolAtomIter(mol)
-
     for atom in atomiter:
         atomindex=atom.GetIndex()
-        if atomindex!=(moleculeindex+1) and atomindex<=maxatomindex and atomindex!=(probeindex+1):
-            moleculeatomcoords=np.array([atom.GetX(),atom.GetY(),atom.GetZ()])
-            otherdist=np.linalg.norm(probeatomcoords-moleculeatomcoords)
+        if atomindex!=(moleculeindex-1) and atomindex<=maxatomindex:
+            othermoleculeatomcoords=np.array([atom.GetX(),atom.GetY(),atom.GetZ()])
+            otherdist=np.linalg.norm(probeatomcoords-othermoleculeatomcoords)
             if otherdist<dist:
                 checktoofar=True
 
@@ -1656,7 +1663,7 @@ def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprob
             if term==True and error==False:
                 pass
             else:
-                cmdstr=poltype.analyzeexe+' '+filename+' '+'-k '+poltype.key5fname +' e '+'> '+filenameout
+                cmdstr=poltype.analyzeexe+' '+filename+' '+'-k '+poltype.key4fname +' e '+'> '+filenameout
                 poltype.call_subsystem([cmdstr],True)
             energy=ReadIntermolecularEnergyMM(poltype,filenameout)
             if moleculeindex not in moleculeindextofilenamearray.keys():
@@ -1708,13 +1715,35 @@ def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprob
 
     return newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms
 
+def WriteFittingResults(poltype,keyname,classkeytofitresults):
+    temp=open(keyname,'r')
+    results=temp.readlines()
+    temp.close()
+    tempname=keyname.replace('.key','_TEMP.key')
+    temp=open(tempname,'w')
+    for line in results:
+        linesplit=line.split()
+        if 'vdw ' in line and '#' not in line:
+            fwd='%d' % (int(linesplit[1]))       
+            for classkey,fitresults in classkeytofitresults.items():
+                if classkey==fwd:
+                    newresults='# '+fitresults
+                    temp.write(newresults)     
+
+        temp.write(line)
+    temp.close()
+    os.remove(keyname)
+    os.rename(tempname,keyname)
+
+
+
 def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     poltype.parentdir=os.getcwd()+r'/'
     vdwfoldername='vdw'
     if not os.path.isdir(vdwfoldername):
         os.mkdir(vdwfoldername)
-    shutil.copy(poltype.key5fname,vdwfoldername+r'/'+poltype.key5fname)
-    CheckAllVdwTypesExist(poltype,poltype.key5fname)
+    shutil.copy(poltype.key4fname,vdwfoldername+r'/'+poltype.key4fname)
+    CheckAllVdwTypesExist(poltype,poltype.key4fname)
     shutil.copy(poltype.xyzoutfile,vdwfoldername+r'/'+poltype.xyzoutfile)
     shutil.copy(poltype.xyzfname,vdwfoldername+r'/'+poltype.xyzfname)
     os.chdir(vdwfoldername) 
@@ -1737,7 +1766,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
          poltype.use_gaus=True
     poltype.SanitizeAllQMMethods()
     paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebabio18.prm"
-    ReplaceParameterFileHeader(poltype,paramhead,poltype.key5fname)
+    ReplaceParameterFileHeader(poltype,paramhead,poltype.key4fname)
     array=[.8,.9,1,1.1,1.2]
 
 
@@ -1837,6 +1866,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     for check in checkarray:
         if check==False:
             dothefit=True
+    classkeytofitresults={}
     if dothefit==True:
         probeindices,moleculeindices=RemoveIgnoredIndices(poltype,probeindices,moleculeindices,moleculeprobeindicestoignore)
         newprobeindices,newmoleculeindices,newprefixarrays,newdistarrays,newoutputfilenames=CombineProbesThatNeedToBeFitTogether(poltype,probeindices,moleculeindices,fullprefixarrays,fulldistarrays,alloutputfilenames)
@@ -1924,11 +1954,11 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
                     prefix=flat_prefixarrays[k]
                     distarray=flat_distarrays[k]
                     PlotEnergyVsDistance(poltype,distarray,prefix,vdwradii,vdwdepths,vdwreds,vdwtypesarray,count)
-                    othergoodfit=PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count)
-                goodfit=PlotQMVsMMEnergy(poltype,vdwtypesarray,flat_prefixarrays,count,allprefix=True)
+                    othergoodfit,classkeytofitresults=PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count,classkeytofitresults)
+                goodfit,classkeytofitresults=PlotQMVsMMEnergy(poltype,vdwtypesarray,flat_prefixarrays,count,classkeytofitresults,allprefix=True)
                 count+=1
-
-    shutil.copy(poltype.key5fname,'../'+poltype.key5fname)
+    WriteFittingResults(poltype,poltype.key4fname,classkeytofitresults)
+    shutil.copy(poltype.key4fname,'../'+poltype.key5fname)
     os.chdir(poltype.parentdir)
     poltype.use_gaus=tempuse_gaus
     poltype.use_gausoptonly=tempuse_gausoptonly

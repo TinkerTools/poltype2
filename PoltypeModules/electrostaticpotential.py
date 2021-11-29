@@ -240,8 +240,7 @@ def CheckRMSPD(poltype):
                     poltype.WriteToLog('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
                     warnings.warn('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
                     if poltype.issane==True and poltype.skipespfiterror==False:
-                        if poltype.deletedfiles==True:
-                            raise ValueError(os.getcwd()+' '+'Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
+                        raise ValueError(os.getcwd()+' '+'Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
                 else:
                     poltype.WriteToLog('RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
 
@@ -405,7 +404,7 @@ def GenerateElementToBasisSetLines(poltype,basissetfile):
 
 
 def ElectrostaticPotentialFitting(poltype):
-    optmpolecmd = poltype.potentialexe + " 6 " + poltype.xyzoutfile + " -k " + poltype.key2fname + " " + poltype.qmesp2fname + " N "+str(poltype.espgrad)
+    optmpolecmd = poltype.potentialexe + " 6 " + poltype.xyzoutfile + " -k " + poltype.key2fnamefromavg + " " + poltype.qmesp2fname + " N "+str(poltype.espgrad)
     if poltype.deletedfiles==True:
         poltype.call_subsystem([optmpolecmd],True)
     else:
@@ -418,13 +417,12 @@ def ElectrostaticPotentialFitting(poltype):
 
 
 def ElectrostaticPotentialComparison(poltype):
-    if not os.path.isfile('RMSPD.txt'):
-        poltype.WriteToLog("")
-        poltype.WriteToLog("=========================================================")
-        poltype.WriteToLog("Electrostatic Potential Comparison\n")
-        cmd=poltype.potentialexe + ' 5 ' + poltype.xyzoutfile + ' ' + '-k'+' '+ poltype.key3fname+' '+ poltype.qmesp2fname + ' N > RMSPD.txt'
-        poltype.call_subsystem([cmd],True)
-        rmspdexists=CheckRMSPD(poltype)
+    poltype.WriteToLog("")
+    poltype.WriteToLog("=========================================================")
+    poltype.WriteToLog("Electrostatic Potential Comparison\n")
+    cmd=poltype.potentialexe + ' 5 ' + poltype.xyzoutfile + ' ' + '-k'+' '+ poltype.key3fname+' '+ poltype.qmesp2fname + ' N > RMSPD.txt'
+    poltype.call_subsystem([cmd],True)
+    rmspdexists=CheckRMSPD(poltype)
 
 def SPForDMA(poltype,optmol,mol):
     if poltype.use_gaus==False or poltype.use_gausoptonly==True:
@@ -488,7 +486,7 @@ def SPForDMA(poltype,optmol,mol):
 
 
 def SPForESP(poltype,optmol,mol):
-    if not os.path.isfile(poltype.espgrdfname) and not os.path.isfile(poltype.key3fname):
+    if not os.path.isfile(poltype.espgrdfname):
         gengridcmd = poltype.potentialexe + " 1 " + poltype.xyzfname+' -k '+poltype.keyfname
         poltype.call_subsystem([gengridcmd],True)
     if poltype.use_gaus==False or poltype.use_gausoptonly==True:

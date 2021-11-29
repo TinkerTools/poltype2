@@ -61,8 +61,8 @@ def GrabKeysFromValue(poltype,dic,thevalue):
     return keylist
 
 
-def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor):
-    valenceprmlist=[]
+def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor,openkey,newkey):
+    valenceprmlist={}
     parentsymmtorlist=[]
     allparenttortorskeys=[]
     curdir=os.getcwd()
@@ -91,12 +91,14 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
                     parentsymmtorlist.append(fwd)
                 if rev not in parentsymmtorlist:
                     parentsymmtorlist.append(rev)
+ 
     classkeytoparameters={}
     classkeytofragmentfilename={}
     classkeytotorsionindexescollected={}
     classkeytoatomindexescollected={}
     classkeytosmartscollected={}
     classkeytosmartsposarraycollected={}
+    classkeytofitresults={}
     tortorclasskeytogridpts={}
     tortorclasskeytogridlinesarray={}
     tortorclasskeytotorsionindexescollected={}
@@ -104,23 +106,20 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
     tortorclasskeytosmartsposarraycollected={}
     for array in equivalentrotbndindexarrays:
         rotbndindex=array[0]
-        
         fragmentfilepath=rotbndindextofragmentfilepath[rotbndindex]
-
         path,filename=os.path.split(fragmentfilepath)
         os.chdir(path)
         vdwfragment=False
         if '_' not in rotbndindex:
             vdwfragment=True 
-         
         filelist=os.listdir(os.getcwd())
         foundkey5=False
         foundkey=False
-
+        post=newkey.split('_')[-1]
         for ff in filelist:
             if '.key' in ff:
                 foundkey=True
-            if '.key_5' in ff:
+            if post in ff:
                 foundkey5=True
                 parentindextofragindex=json.load(open("parentindextofragindex.txt"))
                 parentsymclasstofragsymclasses=json.load(open("parentsymclasstofragsymclasses.txt"))
@@ -179,6 +178,31 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
                                 classkeytosmartsposarraycollected[classkey]=smartsposarray
                                 classkeytoparameters[classkey]=prms
                                 classkeytofragmentfilename[classkey]=filename
+                    elif 'RMSD(MM2,QM)' in line and vdwfragment==False:
+                        typea=int(linesplit[2])
+                        typeb=int(linesplit[3])
+                        typec=int(linesplit[4])
+                        typed=int(linesplit[5])
+                        tor=[typea,typeb,typec,typed]
+                        torkey='%d %d %d %d' % (typea, typeb, typec, typed)
+                        revtorkey='%d %d %d %d' % (typed, typec, typeb, typea)
+                        if torkey in fragsymmtorlist or revtorkey in fragsymmtorlist:
+                            if torkey in parentclasskeytofragclasskey.values():
+                                fwdclasskeys=GrabKeysFromValue(poltype,parentclasskeytofragclasskey,torkey)
+                                revclasskeys=GrabKeysFromValue(poltype,parentclasskeytofragclasskey,revtorkey)
+                                classkeys=fwdclasskeys+revclasskeys
+                            elif revtorkey in parentclasskeytofragclasskey.values():
+                                fwdclasskeys=GrabKeysFromValue(poltype,parentclasskeytofragclasskey,torkey)
+                                revclasskeys=GrabKeysFromValue(poltype,parentclasskeytofragclasskey,revtorkey)
+                                classkeys=fwdclasskeys+revclasskeys
+                            for classkey in classkeys:
+                                fragclasssplit=classkey.split()
+                                linesplit[2]=fragclasssplit[0]
+                                linesplit[3]=fragclasssplit[1]
+                                linesplit[4]=fragclasssplit[2]
+                                linesplit[5]=fragclasssplit[3]
+                                classkeytofitresults[classkey]=' '.join(linesplit)+'\n'
+                    
                     elif 'tortors' in line and vdwfragment==False:
                         typea=int(linesplit[1])
                         typeb=int(linesplit[2])
@@ -229,6 +253,19 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
                                         classkeytoparameters[classkey]=prms
                                         classkeytofragmentfilename[classkey]=filename
 
+                    elif 'RMSD(MM,QM)' in line and vdwfragment==True:
+                        fragclasskey=linesplit[2]
+                        fragsymclass=int(fragclasskey)
+                        for ls in parentsymclasstofragsymclasses.values():
+                            first=ls[0]
+                            if fragsymclass in ls:
+                                parentclasskeys=GrabKeysFromValue(poltype,parentsymclasstofragsymclasses,ls)
+                                for parentsymclass in parentclasskeys:
+                                    classkey=str(parentsymclass)
+                                    if classkey in classkeytosmartsposarray.keys():
+                                        fragclasssplit=classkey.split()
+                                        linesplit[2]=fragclasssplit[0]
+                                        classkeytofitresults[classkey]=' '.join(linesplit)+'\n'
 
 
 
@@ -236,10 +273,10 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
             poltype.WriteToLog('Fragment job did not finish '+filename)
             raise ValueError('Fragment job did not finish '+filename)
     os.chdir(curdir)
-    temp=open(poltype.key4fname,'r')
+    temp=open(openkey,'r')
     results=temp.readlines()
     temp.close()
-    temp=open(poltype.key5fname,'w')
+    temp=open(newkey,'w')
     for line in results:
         fitline="# Fitted from Fragment "
         linesplit=line.split()
@@ -250,18 +287,22 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
             typed=int(linesplit[4])
             torkey='%d %d %d %d' % (typea, typeb, typec, typed)
             rev='%d %d %d %d' % (typed,typec,typeb,typea)
+            if typeb<typec:
+                valkey=tuple([typeb,typec])
+            else:
+                valkey=tuple([typec,typeb])
             if torkey in classkeytoparameters.keys():
-                valenceprmlist=ConstructTorsionLineFromFragment(poltype,torkey,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarraycollected,classkeytosmartscollected,classkeytotorsionindexescollected,temp,valenceprmlist,fitline)
+                valenceprmlist=ConstructTorsionLineFromFragment(poltype,torkey,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarraycollected,classkeytosmartscollected,classkeytotorsionindexescollected,temp,valenceprmlist,fitline,classkeytofitresults,valkey)
 
             elif rev in classkeytoparameters.keys():
-                valenceprmlist=ConstructTorsionLineFromFragment(poltype,rev,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarraycollected,classkeytosmartscollected,classkeytotorsionindexescollected,temp,valenceprmlist,fitline)
+                valenceprmlist=ConstructTorsionLineFromFragment(poltype,rev,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarraycollected,classkeytosmartscollected,classkeytotorsionindexescollected,temp,valenceprmlist,fitline,classkeytofitresults,valkey)
 
             else:
                 temp.write(line)
         elif 'vdw' in line and '#' not in line and 'Missing' not in line:
             classkey=linesplit[1]
             if classkey in classkeytoatomindexescollected.keys():
-                valenceprmlist=ConstructVdwLineFromFragment(poltype,classkey,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarraycollected,classkeytosmartscollected,classkeytoatomindexescollected,temp,valenceprmlist,fitline)
+                valenceprmlist=ConstructVdwLineFromFragment(poltype,classkey,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarraycollected,classkeytosmartscollected,classkeytoatomindexescollected,temp,valenceprmlist,fitline,classkeytofitresults)
 
             else:
                 temp.write(line)
@@ -280,7 +321,7 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
 
 
 
-def ConstructVdwLineFromFragment(poltype,key,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarraycollected,classkeytosmartscollected,classkeytoatomindexescollected,temp,valenceprmlist,fitline):
+def ConstructVdwLineFromFragment(poltype,key,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarraycollected,classkeytosmartscollected,classkeytoatomindexescollected,temp,valenceprmlist,fitline,classkeytofitresults):
     filename=classkeytofragmentfilename[key]
     prms=classkeytoparameters[key]
     parameters=' '.join(prms)
@@ -288,6 +329,12 @@ def ConstructVdwLineFromFragment(poltype,key,classkeytofragmentfilename,classkey
     smartspos=classkeytosmartsposarraycollected[key]
     smarts=classkeytosmartscollected[key]
     atomindexes=classkeytoatomindexescollected[key]
+    if key in classkeytofitresults.keys():
+        fitresultsline=classkeytofitresults[key]
+        
+    else:
+        fitresultsline='' 
+
     fitline+=' SMARTS '+smarts+' vdw atom indexes = '+atomindexes+' with smarts torsion indices '+smartspos+' from fragment '+filename+"\n"
     valencestring='vdw'+' % '+smarts+' % '+smartspos+' % '
     for prm in prms:
@@ -295,10 +342,18 @@ def ConstructVdwLineFromFragment(poltype,key,classkeytofragmentfilename,classkey
     valencestring=valencestring[:-1]
     valencestring+='\n'
     temp.write(fitline)
+    if fitresultsline!='':
+        temp.write(fitresultsline)
     temp.write('# '+valencestring)
     temp.write(line)
-    if valencestring not in valenceprmlist: 
-        valenceprmlist.append(valencestring)
+    if key not in valenceprmlist.keys():
+        valenceprmlist[key]=[] 
+
+    if valencestring not in valenceprmlist[key]: 
+        if fitresultsline!='':
+            valenceprmlist[key].append(fitresultsline)
+
+        valenceprmlist[key].append(valencestring)
     return valenceprmlist
 
 
@@ -307,8 +362,14 @@ def ConstructVdwLineFromFragment(poltype,key,classkeytofragmentfilename,classkey
 
 def WriteOutDatabaseLines(poltype,valenceprmlist):
     newtemp=open(poltype.databaseprmfilename,'w')
-    for line in valenceprmlist:
-        newtemp.write(line)
+    for key,ls in valenceprmlist.items():
+        for line in ls:
+            if '#' in line:
+                 newtemp.write(line)
+        for line in ls:
+            if '#' not in line:
+                 newtemp.write(line)
+        newtemp.write('\n')
     newtemp.close()
 
 
@@ -333,7 +394,7 @@ def ParseGridLines(poltype,results,lineidx):
         
     return gridlinesarray
 
-def ConstructTorsionLineFromFragment(poltype,key,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarraycollected,classkeytosmartscollected,classkeytotorsionindexescollected,temp,valenceprmlist,fitline):
+def ConstructTorsionLineFromFragment(poltype,key,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarraycollected,classkeytosmartscollected,classkeytotorsionindexescollected,temp,valenceprmlist,fitline,classkeytofitresults,valkey):
     filename=classkeytofragmentfilename[key]
     prms=classkeytoparameters[key]
     parameters=' '.join(prms)
@@ -341,6 +402,11 @@ def ConstructTorsionLineFromFragment(poltype,key,classkeytofragmentfilename,clas
     smartspos=classkeytosmartsposarraycollected[key]
     smarts=classkeytosmartscollected[key]
     torsionindexes=classkeytotorsionindexescollected[key]
+    if key in classkeytofitresults.keys():
+        fitresultsline=classkeytofitresults[key]
+        
+    else:
+        fitresultsline='' 
     fitline+=' SMARTS '+smarts+' torsion atom indexes = '+torsionindexes+' with smarts torsion indices '+smartspos+' from fragment '+filename+"\n"
     valencestring='torsion'+' % '+smarts+' % '+smartspos+' % '
     newprms=prms[0::3]
@@ -356,10 +422,17 @@ def ConstructTorsionLineFromFragment(poltype,key,classkeytofragmentfilename,clas
     valencestring=valencestring[:-1]
     valencestring+='\n'
     temp.write(fitline)
+    if fitresultsline!='':
+        temp.write(fitresultsline)
     temp.write('# '+valencestring)
     temp.write(torline)
-    if valencestring not in valenceprmlist: 
-        valenceprmlist.append(valencestring)
+    if valkey not in valenceprmlist.keys():
+        valenceprmlist[valkey]=[] 
+    if valencestring not in valenceprmlist[valkey]:
+        if fitresultsline!='':
+            valenceprmlist[valkey].append(fitresultsline)
+
+        valenceprmlist[valkey].append(valencestring)
 
     return valenceprmlist
 
@@ -385,8 +458,11 @@ def ConstructTorsionTorsionLineFromFragment(poltype,key,classkeytofragmentfilena
         gridline=gridline.replace('\n','')
         valencestring+=gridline+','
     valencestring=valencestring[:-1]
-    if valencestring not in valenceprmlist: 
-        valenceprmlist.append(valencestring)
+    if key not in valenceprmlist.keys():
+        valenceprmlist[key]=[] 
+
+    if valencestring not in valenceprmlist[key]: 
+        valenceprmlist[key].append(valencestring)
 
     return valenceprmlist
 
@@ -554,7 +630,7 @@ def PartitionResources(poltype):
 
 def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog,fragmol,parentdir,vdwfragment,strfragvdwatomindex,onlyfittorsions,jobtoinputfilepaths):
     tempmaxmem,tempmaxdisk,tempnumproc=PartitionResources(poltype)
-    poltypeinput={'deleteallnonqmfiles':poltype.deleteallnonqmfiles,'debugmode':poltype.debugmode,'username':poltype.username,'atmidx':poltype.prmstartidx,'parentname':poltype.parentname,'use_gau_vdw':poltype.use_gau_vdw,'use_qmopt_vdw':poltype.use_qmopt_vdw,'onlyvdwatomindex':poltype.onlyvdwatomindex,'tordebugmode':poltype.tordebugmode,'dontdovdwscan':poltype.dontdovdwscan,'refinenonaroringtors':poltype.refinenonaroringtors,'tortor':poltype.tortor,'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':tempnumproc,'maxmem':tempmaxmem,'maxdisk':tempmaxdisk,'printoutput':True}
+    poltypeinput={'deleteallnonqmfiles':poltype.deleteallnonqmfiles,'debugmode':poltype.debugmode,'username':poltype.username,'atmidx':poltype.prmstartidx,'parentname':poltype.parentname,'use_gau_vdw':poltype.use_gau_vdw,'use_qmopt_vdw':poltype.use_qmopt_vdw,'onlyvdwatomindex':poltype.onlyvdwatomindex,'tordebugmode':poltype.tordebugmode,'dovdwscan':poltype.dovdwscan,'refinenonaroringtors':poltype.refinenonaroringtors,'tortor':poltype.tortor,'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':tempnumproc,'maxmem':tempmaxmem,'maxdisk':tempmaxdisk,'printoutput':True}
     if strfragrotbndindexes!=None:
         poltypeinput['onlyrotbndslist']=strfragrotbndindexes
         rotbnds=strfragrotbndindexes.split(',')

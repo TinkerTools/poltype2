@@ -62,7 +62,7 @@ consumptionratio     Default % of resources to use on node if not specified by u
                      Default=.8
 
 deleteallnonqmfiles  This will delete all non-qm log files (sometimes errors require restarting and deleting the correct files).
-                     Default=False
+                     Default=True
 
 email                Email address to send crash reports to, will send email when poltype job finished.
                      Default=None
@@ -260,7 +260,7 @@ transferqmequilvalues     specifies to tranfer QM equilbrium angle and bond leng
 
 ### Van der Waals Parameterization.
 ```
-dontdovdwscan            specifies to not refine initial guess vdw parameters from database assignment.
+dovdwscan                specifies to not refine initial guess vdw parameters from database assignment.
                          Default=False
 
 onlyvdwatomindex         Only probe one vdw atom index on molecule.

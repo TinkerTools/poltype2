@@ -283,7 +283,7 @@ def DetermineMaxRanges(poltype,torset,optmol,bondtopology):
         phaselists.append(phaselist)
     phaseanglelist=numpy.array(list(product(*phaselists)))
     designatexyz='_determine_maxrange'
-    keybase=poltype.key4fname
+    keybase=poltype.key6fname
     keybasepath='../'
     failedgridpoints=[]
     if poltype.skipgridsearch==False:

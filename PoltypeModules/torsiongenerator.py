@@ -392,8 +392,8 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
         prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology) # sometimes extra bonds are made when atoms get too close during minimization
         prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
         
-        torxyzfname,tmpkeyfname,torminlogfname=tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,'_preQMOPTprefit',poltype.key4fname,'../')
-        prevstrctfname,torxyzfname,newtorxyzfname,keyfname,failedcheck=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,'_preQMOPTprefit',poltype.key4fname,'../',torxyzfname,tmpkeyfname,torminlogfname)
+        torxyzfname,tmpkeyfname,torminlogfname=tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,'_preQMOPTprefit',poltype.key6fname,'../')
+        prevstrctfname,torxyzfname,newtorxyzfname,keyfname,failedcheck=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,'_preQMOPTprefit',poltype.key6fname,'../',torxyzfname,tmpkeyfname,torminlogfname)
         toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
         term=AnalyzeTerm(poltype,toralzfname)
         if term==False:
@@ -1860,7 +1860,7 @@ def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetf
 
 
 
-def RemoveDuplicateRotatableBondTypes(poltype):
+def RemoveDuplicateRotatableBondTypes(poltype,torlist):
     tortorotbnd={}
     for key,tors in poltype.rotbndlist.items():
         for tor in tors:
@@ -1872,10 +1872,10 @@ def RemoveDuplicateRotatableBondTypes(poltype):
         tor=list(tor)
         if classkey not in classkeylist:
             classkeylist.append(classkey)
-            if tuple(tor) in poltype.torlist or tuple(tor[::-1]) in poltype.torlist:
+            if tuple(tor) in torlist or tuple(tor[::-1]) in torlist:
                 newlist.append(tor)
-    poltype.torlist=newlist[:] 
-    return poltype.torlist,poltype.rotbndlist 
+    torlist=newlist[:] 
+    return torlist,poltype.rotbndlist 
 
 
 

@@ -948,12 +948,8 @@ def GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_
         wstring=''
     figfname+=wstring+'.png'
     Sx = numpy.array(cls_angle_dict[tup])
-    out=[]
-        
-    out.append(cls_angle_dict[tup])
     for clskey in classkeylist:
         fitfunc_dict[clskey] = fitfunc(poltype,'eval',torgen.rads(poltype,Sx),torset,torprmdict,debug=False)
-        out.append(fitfunc_dict[clskey])
         if clskey in clskeyswithbadfits:
             def RMSD(c):
                 return numpy.sqrt(numpy.mean(numpy.square(numpy.add(weightlist*(numpy.subtract(fitfunc_dict[clskey],tor_energy_list)),c))))
@@ -965,7 +961,6 @@ def GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_
         result=fmin(RMSD,.5)
         minRMSD=RMSD(result[0])
 
-    out.append(tor_energy_list)
     numprms=1 # offset parameter incldued with torsion force constant parameters
     for classkey in torprmdict:
         numprms+= len(torprmdict[classkey]['prmdict'].keys())
@@ -1218,6 +1213,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         a. Get each energy profile (MM pre, MM post, QM)
         b. Plot the profiles
     """
+    classkeytofitresults={}
     # for each main torsion
     for torset in poltype.torlist:
         if torset not in poltype.nonaroringtorsets and len(torset)==2 and poltype.torfit1Drotonly==True:
@@ -1355,15 +1351,18 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         figfname=figfname[:-1]
         if clskey in clskeyswithbadfits:
             wstring='_use_weights'
+            ostring='Boltzmann Fit'
         else:
             wstring=''
+            ostring=''
         figfname+=wstring+'.png'
         dim=len(mang_list[0])
         datapts=len(mm_energy_list)
         numprms=None 
-        
-        print('Torset',torset,'RMSD(MM2,QM)',minRMSD)
-        poltype.WriteToLog('Torset'+str(torset)+' RMSD(MM2,QM) '+str(minRMSD))
+        for testkey in fitfunc_dict.keys():
+            thestring='Torsion '+str(testkey)+' RMSD(MM2,QM) '+str(minRMSD)+' '+'RelativeRMSD(MM2,QM) '+str(minRMSDRel)+' '+ostring+'\n'
+            poltype.WriteToLog(thestring)
+            classkeytofitresults[testkey]=thestring
         if dim==1: 
             fig = plt.figure(figsize=(10,10))
             ax = fig.add_subplot(111)
@@ -1434,14 +1433,12 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         torgen.write_arr_to_file(poltype,txtfname,out)
         if float(minRMSD)>poltype.maxtorRMSPD and float(minRMSDRel)>poltype.maxtorRMSPDRel:
             poltype.WriteToLog('Absolute or Relative RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol '+'RMSPDRel ='+str(minRMSDRel)+' tolerance is '+str(poltype.maxtorRMSPDRel))
-            print('RMSPD of QM and MM torsion profiles is high, RMSPD = '+ str(minRMSD)+' Tolerance is '+str(poltype.maxtorRMSPD)+' kcal/mol ')
-
             if poltype.suppresstorfiterr==False and count>0 and bypassrmsd==False and poltype.tordebugmode==False and clskey in clskeyswithbadfits:
                 raise ValueError('RMSPD of QM and MM torsion profile is high, tried fitting to minima and failed, RMSPD = '+str(minRMSD)+','+str(minRMSDRel))
             
             
             clskeyswithbadfits.append(clskey)
-    return clskeyswithbadfits
+    return clskeyswithbadfits,classkeytofitresults
                  
 
 def TransformDeleteIdx(del_ang_idx,indicesalreadyremoved):
@@ -1514,8 +1511,8 @@ def process_rot_bond_tors(poltype,mol):
     tmpkey1fname = tordir + '/' + tmpkey1basename
     assert os.path.isdir(tordir), \
        "ERROR: Directory '%s' does not exist" % (tordir) +' '+os.getcwd()
-    # copy *.key_4 to the directory qm-torsion
-    shutil.copy(poltype.key4fname, tmpkey1fname)
+    # copy *.key_5 to the directory qm-torsion
+    shutil.copy(poltype.key6fname, tmpkey1fname)
     # change directory to qm-torsion
     os.chdir(tordir)
 
@@ -1544,19 +1541,44 @@ def process_rot_bond_tors(poltype,mol):
         if len(poltype.torlist)!=0:
             PostfitMinAlz(poltype,tmpkey2basename,'')
         # evaluate the new parameters
-        clskeyswithbadfits=eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename,count,clskeyswithbadfits,torsettobypassrmsd,classkeylisttoindicesalreadydicremoved,indicesremoveddic)
+        clskeyswithbadfits,classkeytofitresults=eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename,count,clskeyswithbadfits,torsettobypassrmsd,classkeylisttoindicesalreadydicremoved,indicesremoveddic)
         if len(clskeyswithbadfits)==0:
             break
         count+=1
-   
+    WriteOutFitResults(poltype,tmpkey2basename,classkeytofitresults)
     if poltype.torfit1Drotonly==True and poltype.tortor==True:
         poltype.torfit1Drotonly=False
         poltype.torfit2Drotonly=True 
         cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,indicesremoveddic,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified,classkeylisttoindicesalreadydicremoved= get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,'_postQMOPTpostfit')
         PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,mol,tmpkey2basename,indicesremoveddic,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified)
 
-    shutil.copy(tmpkey2basename,'../' + poltype.key5fname)
+    shutil.copy(tmpkey2basename,'../' + poltype.key7fname)
     os.chdir('..')
+
+
+def WriteOutFitResults(poltype,tmpkey2basename,classkeytofitresults):
+    temp=open(tmpkey2basename,'r')
+    results=temp.readlines()
+    temp.close()
+    tempname=tmpkey2basename.replace('.key','_TEMP.key')
+    temp=open(tempname,'w')
+    for line in results:
+        linesplit=line.split()
+        if 'torsion' in line and '#' not in line:
+            fwd='%d %d %d %d' % (int(linesplit[1]), int(linesplit[2]), int(linesplit[3]), int(linesplit[4]))       
+            fwdsplit=fwd.split() 
+            revsplit=fwdsplit[::-1]
+            rev='%d %d %d %d' % (int(revsplit[0]), int(revsplit[1]), int(revsplit[2]), int(revsplit[3]))
+            for classkey,fitresults in classkeytofitresults.items():
+                if classkey==fwd or classkey==rev:
+                    newresults='# '+fitresults
+                    temp.write(newresults)     
+
+        temp.write(line)
+    temp.close()
+    os.remove(tmpkey2basename)
+    os.rename(tempname,tmpkey2basename)
+
 
 def RemoveFiles(poltype,string,occurance):
     files=os.listdir()
