@@ -2174,7 +2174,9 @@ class PolarizableTyper():
         (torlist, self.rotbndlist,hydtorsions,nonaroringtorlist) = torgen.get_torlist(self,mol,torsionsmissing)
         if atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False: 
             self.dontfrag=True
+
         torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules
+
         torlist=[tuple(i) for i in torlist]
         torlist=[tuple([i]) for i in torlist]
         self.torsettovariabletorlist={}
