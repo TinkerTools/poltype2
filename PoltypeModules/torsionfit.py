@@ -1190,7 +1190,7 @@ def AssignZeros(poltype,array):
     return newarray
 
 
-def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename,count,clskeyswithbadfits,torsettobypassrmsd,classkeylisttoindicesalreadydicremoved,classkeylisttoindicesremoved):
+def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename,count,clskeyswithbadfits,torsettobypassrmsd,classkeylisttoindicesalreadydicremoved,classkeylisttoindicesremoved,write_prm_dict):
     """
     Intent: 
     For each torsion whose parameters were fit for:
@@ -1359,10 +1359,15 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         dim=len(mang_list[0])
         datapts=len(mm_energy_list)
         numprms=None 
-        for testkey in fitfunc_dict.keys():
-            thestring='Torsion '+str(testkey)+' RMSD(MM2,QM) '+str(minRMSD)+' '+'RelativeRMSD(MM2,QM) '+str(minRMSDRel)+' '+ostring+'\n'
-            poltype.WriteToLog(thestring)
-            classkeytofitresults[testkey]=thestring
+        clskeysplit=clskey.split()
+        middle=[clskeysplit[1],clskeysplit[2]]
+        for testkey in write_prm_dict.keys():
+            testkeysplit=testkey.split()
+            themiddle=[testkeysplit[1],testkeysplit[2]]
+            if middle==themiddle or middle==themiddle[::-1]:
+                thestring='Torsion '+str(testkey)+' RMSD(MM2,QM) '+str(minRMSD)+' '+'RelativeRMSD(MM2,QM) '+str(minRMSDRel)+' '+ostring+'\n'
+                poltype.WriteToLog(thestring)
+                classkeytofitresults[testkey]=thestring
         if dim==1: 
             fig = plt.figure(figsize=(10,10))
             ax = fig.add_subplot(111)
@@ -1541,7 +1546,7 @@ def process_rot_bond_tors(poltype,mol):
         if len(poltype.torlist)!=0:
             PostfitMinAlz(poltype,tmpkey2basename,'')
         # evaluate the new parameters
-        clskeyswithbadfits,classkeytofitresults=eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename,count,clskeyswithbadfits,torsettobypassrmsd,classkeylisttoindicesalreadydicremoved,indicesremoveddic)
+        clskeyswithbadfits,classkeytofitresults=eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename,count,clskeyswithbadfits,torsettobypassrmsd,classkeylisttoindicesalreadydicremoved,indicesremoveddic,write_prm_dict)
         if len(clskeyswithbadfits)==0:
             break
         count+=1
