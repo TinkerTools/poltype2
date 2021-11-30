@@ -61,7 +61,7 @@ def GrabKeysFromValue(poltype,dic,thevalue):
     return keylist
 
 
-def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor,openkey,newkey):
+def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor,openkey,newkey,rotbndindextoparentrotbndindexes):
     valenceprmlist={}
     parentsymmtorlist=[]
     allparenttortorskeys=[]
@@ -72,7 +72,8 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
         if '_' not in firstfrag:
             vdwfragment=True
         if vdwfragment==False:
-            tors,maintortors,tortor,nonaroringfrag,tortoequivtor=GrabParentTorsions(poltype,rotbndindextoringtor,array)
+            parentrotbndindexes=rotbndindextoparentrotbndindexes[firstfrag]
+            tors,maintortors,tortor,nonaroringfrag,tortoequivtor=GrabParentTorsions(poltype,rotbndindextoringtor,array,parentrotbndindexes)
             if len(maintortors)>0:
                 firsttor=maintortors[0]
                 secondtor=maintortors[1]
@@ -706,6 +707,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
     jobtooutputlog={}
     jobtoinputfilepaths={}
     listofrotbndindexes=[]
+    rotbndindextoparentrotbndindexes={}
     for arrayidx in range(len(equivalentrotbndindexarrays)):
         array=equivalentrotbndindexarrays[arrayidx]
         strfragrotbndindexes=''
@@ -771,7 +773,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             strfragrotbndindexes=None
 
         strparentrotbndindexes=strparentrotbndindexes[:-1]
-        
+        rotbndindextoparentrotbndindexes[equivalentrotbndindex]=strparentrotbndindexes   
         parentindextofragindex=rotbndindextoparentindextofragindex[equivalentrotbndindex]
         fragindextoparentindex={v: k for k, v in parentindextofragindex.items()}
         for parentindex,fragindex in parentindextofragindex.items():
@@ -807,7 +809,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         strfragvdwatomindex=None
         onlyfittorsions=[]
         if vdwfragment==False:
-            tors,maintortors,tortor,nonaroringfrag,tortoequivtor=GrabParentTorsions(poltype,rotbndindextoringtor,array)
+            tors,maintortors,tortor,nonaroringfrag,tortoequivtor=GrabParentTorsions(poltype,rotbndindextoringtor,array,strparentrotbndindexes)
             for torsion in tors:
                 equivtorsion=tortoequivtor[tuple(torsion)]
                 rdkittorsion=[k-1 for k in equivtorsion]
@@ -889,7 +891,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
     finishedjobs,errorjobs=SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
     os.chdir(parentdir)
 
-    return equivalentrotbndindexarrays,rotbndindextoringtor
+    return equivalentrotbndindexarrays,rotbndindextoringtor,rotbndindextoparentrotbndindexes
 
 
 def ConvertSameBondTypes(poltype,rotbndindexes,parentindextofragindex,otherparentindextofragindex,othermolindextoequivmolindex):
@@ -962,7 +964,7 @@ def GenerateSMARTSPositionStringAndAtomIndices(poltype,torsion,parentindextofrag
     return smilesposstring,fragtorstring
 
 
-def GrabParentTorsions(poltype,rotbndindextoringtor,array):
+def GrabParentTorsions(poltype,rotbndindextoringtor,array,strparentrotbndindexes):
     tors=[]
     tortor=False
     nonaroringfrag=False
@@ -972,6 +974,7 @@ def GrabParentTorsions(poltype,rotbndindextoringtor,array):
     for i in range(len(array)):
         rotbndindex=array[i]
         rotkey=rotbndindex.replace('_',' ')
+        firstfragtors=[]
         if rotbndindex in rotbndindextoringtor.keys():
             nonaroringfrag=True
             torset=rotbndindextoringtor[rotbndindex]
@@ -995,8 +998,8 @@ def GrabParentTorsions(poltype,rotbndindextoringtor,array):
 
                 maintortors.append(keytors[0])
                 tors.extend(keytors)
-        if i==0:
-            firstfragtors=tors[:]
+        if rotkey in strparentrotbndindexes:
+            firstfragtors.extend(tors)
         for tor in tors:
             symtypes=[poltype.idxtosymclass[idx] for idx in tor]
             parenttorsiontotypetorsion[tuple(tor)]=tuple(symtypes)
@@ -1011,6 +1014,7 @@ def GrabParentTorsions(poltype,rotbndindextoringtor,array):
                     typetorsiontoparenttorsions[typetor].append(othertor)
     tortoequivtor={}
     for typetor,parenttors in typetorsiontoparenttorsions.items():
+        firstfragtor=None
         for j in range(len(parenttors)):
             parenttor=parenttors[j]
             if parenttor in firstfragtors:
