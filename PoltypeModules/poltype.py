@@ -2080,7 +2080,16 @@ class PolarizableTyper():
 
         if os.path.isfile(self.tortormissingfilename):
             tortorsmissing=databaseparser.ReadTorTorList(self,self.tortormissingfilename)
-        esp.SPForDMA(self,optmol,mol)
+        try:
+            esp.SPForDMA(self,optmol,mol)
+        except:
+            if self.use_gaus==False: 
+                self.use_gaus=True
+                esp.SPForDMA(self,optmol,mol) 
+                self.use_gaus=False
+            else:
+                traceback.print_exc(file=sys.stdout)
+                sys.exit()
 
         # Obtain multipoles from Gaussian fchk file using GDMA
     
@@ -2120,10 +2129,10 @@ class PolarizableTyper():
              try:
                  esp.SPForESP(self,optmol,mol) 
              except:
-                 if self.use_gaus==True: # if gaussian failed try psi4
-                     self.use_gaus=False
-                     esp.SPForESP(self,optmol,mol) 
+                 if self.use_gaus==False: 
                      self.use_gaus=True
+                     esp.SPForESP(self,optmol,mol) 
+                     self.use_gaus=False
                  else:
                      traceback.print_exc(file=sys.stdout)
                      sys.exit()
