@@ -4630,7 +4630,8 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         angleprmstotransferinfo=MapParameterLineToTransferInfo(poltype,angleprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips,anglepoltypeclassestosmartsatomordersext,newanglepoltypeclassestocomments,newanglepoltypeclassestosmartslist,arotorsionlinetodescrips,missingvdwtypes,torsionsmissing,missingbondpoltypeclasses,missinganglepoltypeclasses)
         strbndprmstotransferinfo=MapParameterLineToTransferInfo(poltype,strbndprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips,strbndpoltypeclassestosmartsatomordersext,newstrbndpoltypeclassestocomments,newstrbndpoltypeclassestosmartslist,arotorsionlinetodescrips,missingvdwtypes,torsionsmissing,missingbondpoltypeclasses,missinganglepoltypeclasses)
         torsionprmstotransferinfo=MapParameterLineToTransferInfo(poltype,torsionprms,torsionpoltypeclassestoparametersmartsatomorders,torsionpoltypeclassestosmartsatomorders,torsionpoltypeclassestoelementtinkerdescrips,torsionpoltypeclassestosmartsatomordersext,{},{},arotorsionlinetodescrips,missingvdwtypes,torsionsmissing,missingbondpoltypeclasses,missinganglepoltypeclasses)
-        vdwprmstotransferinfo=AddParentVdwTransferInfo(poltype,parentvdwtransferinfo,vdwprmstotransferinfo)
+        if poltype.isfragjob==True and len(poltype.onlyrotbndslist)!=0:
+            vdwprmstotransferinfo=AddParentVdwTransferInfo(poltype,parentvdwtransferinfo,vdwprmstotransferinfo)
         WriteOutList(poltype,torsionsmissing,poltype.torsionsmissingfilename)
         WriteDictionaryToFile(poltype,torsionkeystringtoparameters,poltype.torsionprmguessfilename)
         WriteOutList(poltype,missingvdwatomindices,poltype.vdwmissingfilename)
