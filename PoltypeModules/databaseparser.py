@@ -2267,7 +2267,7 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
             linesplit=line.split()
             vdwtype=int(linesplit[1])
             if vdwtype in missingvdwtypes:
-                extraline+='# Missing vdw parameters, will attempt to fit parameters'
+                extraline+='# Missing vdw parameters'
 
         if 'angle' in line:
             linesplit=line.split()
@@ -4271,6 +4271,77 @@ def GenerateRdkitMolObjectsParameterSMARTS(poltype,parametersmartslist):
 
     return parametersmartstordkitmol
 
+
+def GrabVdwParametersFromParent(poltype,oldvdwprms):
+    parentdir=os.path.abspath(os.path.join(os.getcwd(),"../.."))
+    currentdir=os.getcwd()
+    parenttypestofragtypes=json.load(open("parentsymclasstofragsymclasses.txt"))
+    os.chdir(parentdir)
+    files=os.listdir()
+    for f in files:
+        if 'postfitvdw' in f:
+            vdwkey=f
+    parenttypes=list(parenttypestofragtypes.keys())
+    parenttypes=[str(i) for i in parenttypes]
+    fragtypes=[list(parenttypestofragtypes.values())]
+    new=[]
+    for fragtype in fragtypes:
+        for actualtype in fragtype:
+            new.append(str(actualtype[0]))
+    parentvdwtransferinfo={}
+    fragtypes=new[:]
+    vdwprms=GrabVdwParametersFromKeyFile(poltype,vdwkey,parenttypes)
+    os.chdir(currentdir)
+    newvdwprms=[]
+    for oldvdwprmline in oldvdwprms:
+        linesplit=oldvdwprmline.split()
+        typenum=linesplit[1]
+        if typenum not in fragtypes:
+            newvdwprms.append(oldvdwprmline)
+    for vdwprmline in vdwprms:
+        linesplit=vdwprmline.split()
+        typenum=linesplit[1]
+        fragtype=str(parenttypestofragtypes[typenum][0])
+        linesplit[1]=fragtype
+        otherline='# Transferring from parent vdw type '+typenum+'\n'
+        parentvdwtransferinfo[fragtype]=otherline
+        newline=' '.join(linesplit)+'\n'
+        newvdwprms.append(newline)
+
+    return newvdwprms,parentvdwtransferinfo
+
+
+def GrabVdwParametersFromKeyFile(poltype,vdwkey,parenttypes):
+    vdwprms=[]
+    temp=open(vdwkey,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        linesplit=line.split()
+        if 'vdw ' in line:
+            typenum=linesplit[1]
+            for parenttype in parenttypes:
+                if str(parenttype)==typenum:
+                    vdwprms.append(line)
+
+    return vdwprms
+
+
+
+def AddParentVdwTransferInfo(poltype,parentvdwtransferinfo,vdwprmstotransferinfo):
+    for line in vdwprmstotransferinfo.keys():
+        linesplit=line.split()
+        typenum=linesplit[1]
+        if str(typenum) in parentvdwtransferinfo.keys():
+            otherline=parentvdwtransferinfo[typenum]
+            vdwprmstotransferinfo[line]+=otherline
+
+
+
+    return vdwprmstotransferinfo
+
+
+
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False):
 
     if polarize==True:
@@ -4533,6 +4604,8 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         if len(missingopbendprmindices)!=0:
             newopbendprms,defaultvalues=DefaultOPBendParameters(poltype,missingopbendprmindices,mol,opbendbondindicestotrigonalcenterbools)
             opbendprms.extend(newopbendprms)
+        if poltype.isfragjob==True and len(poltype.onlyrotbndslist)!=0:
+            vdwprms,parentvdwtransferinfo=GrabVdwParametersFromParent(poltype,vdwprms)
         polarprmstotransferinfo=MapParameterLineToTransferInfo(poltype,newpolarprms,{},{},{},{},newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist,arotorsionlinetodescrips,missingvdwtypes,torsionsmissing,missingbondpoltypeclasses,missinganglepoltypeclasses)
         vdwprmstotransferinfo=MapParameterLineToTransferInfo(poltype,vdwprms,atompoltypeclasstoparametersmartsatomorder,atompoltypeclasstosmartsatomorder,atompoltypeclassestoelementtinkerdescrip,vdwpoltypeclassestosmartsatomordersext,{},{},arotorsionlinetodescrips,missingvdwtypes,torsionsmissing,missingbondpoltypeclasses,missinganglepoltypeclasses)
         if poltype.forcefield=='AMOEBA+':
@@ -4557,6 +4630,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         angleprmstotransferinfo=MapParameterLineToTransferInfo(poltype,angleprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips,anglepoltypeclassestosmartsatomordersext,newanglepoltypeclassestocomments,newanglepoltypeclassestosmartslist,arotorsionlinetodescrips,missingvdwtypes,torsionsmissing,missingbondpoltypeclasses,missinganglepoltypeclasses)
         strbndprmstotransferinfo=MapParameterLineToTransferInfo(poltype,strbndprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips,strbndpoltypeclassestosmartsatomordersext,newstrbndpoltypeclassestocomments,newstrbndpoltypeclassestosmartslist,arotorsionlinetodescrips,missingvdwtypes,torsionsmissing,missingbondpoltypeclasses,missinganglepoltypeclasses)
         torsionprmstotransferinfo=MapParameterLineToTransferInfo(poltype,torsionprms,torsionpoltypeclassestoparametersmartsatomorders,torsionpoltypeclassestosmartsatomorders,torsionpoltypeclassestoelementtinkerdescrips,torsionpoltypeclassestosmartsatomordersext,{},{},arotorsionlinetodescrips,missingvdwtypes,torsionsmissing,missingbondpoltypeclasses,missinganglepoltypeclasses)
+        vdwprmstotransferinfo=AddParentVdwTransferInfo(poltype,parentvdwtransferinfo,vdwprmstotransferinfo)
         WriteOutList(poltype,torsionsmissing,poltype.torsionsmissingfilename)
         WriteDictionaryToFile(poltype,torsionkeystringtoparameters,poltype.torsionprmguessfilename)
         WriteOutList(poltype,missingvdwatomindices,poltype.vdwmissingfilename)
