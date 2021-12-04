@@ -766,7 +766,7 @@ class PolarizableTyper():
             self.torspbasisset = 'MINIX'
 
 
-
+        self.startdir=os.getcwd()
         self.SanitizeAllQMMethods()
         if self.readinionly==True:
             return
@@ -1292,7 +1292,12 @@ class PolarizableTyper():
             Ftime=os.path.getmtime(logfname)
             reltime=time.time()-Ftime
             htime=reltime*0.000277778
-            updatetime=.25 # hours. sometimes psi4 gives return code 0 even though program crashes
+            if ('opt-' in logfname or 'sp-' in logfname):
+                updatetime=.25
+            elif 'poltype' in logfname:
+                updatetime=2.5 # poltype log wont update entire time QM running so needs to be longer
+            else:
+                updatetime=1 # parent QM can take longer dependeing on resources, poltype log can take a while as well to finish QM
             foundendgau=False # sometimes gaussian comments have keyword Error, ERROR in them
             foundhf=False
             for line in open(logfname):
@@ -1328,10 +1333,10 @@ class PolarizableTyper():
             if error==True:
                 term=False # sometimes psi4 geometry opt not fully converge but says successfully exiting etc..
                 message='Error '+errorline+ 'logpath='+logfname
-            if error==False and term==False and htime>=updatetime and ('opt-' in logfname or 'sp-' in logfname):
+            if error==False and term==False and htime>=updatetime:
                 error=True
                 message='Error '+'Job has not been updated in '+str(updatetime)+' hours'+' last update time = '+str(htime)+' hours'+' logname='+logfname
-            if error==True and term==False and skiperrors==False:
+            if error==True and term==False:
                 if errormessages!=None:
                     if message not in errormessages:
                         self.WriteToLog(message) 
@@ -1752,7 +1757,7 @@ class PolarizableTyper():
         deletearray=[]
         files=os.listdir()
         for f in files:
-            if not os.path.isdir(f) and 'nohup' not in f and f[0]!='.':
+            if not os.path.isdir(f) and 'nohup' not in f and f[0]!='.' and f!='parentvdw.key':
                 fsplit=f.split('.')
                 if len(fsplit)>1:
                     end=fsplit[1]
@@ -2519,10 +2524,10 @@ if __name__ == '__main__':
         except:
             traceback.print_exc(file=sys.stdout)
             text = str(traceback.format_exc())
-            if os.path.exists(poltype.scrtmpdirgau):
-                shutil.rmtree(poltype.scrtmpdirgau)
-            if os.path.exists(poltype.scrtmpdirpsi4):
-                shutil.rmtree(poltype.scrtmpdirpsi4)
+            #if os.path.exists(poltype.scrtmpdirgau):
+            #    shutil.rmtree(poltype.scrtmpdirgau)
+            #if os.path.exists(poltype.scrtmpdirpsi4):
+            #    shutil.rmtree(poltype.scrtmpdirpsi4)
             if poltype.email!=None:
                 password='amoebaisbest'
                 fromaddr = 'poltypecrashreportnoreply@gmail.com'

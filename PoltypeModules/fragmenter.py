@@ -821,6 +821,8 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         os.chdir(head)
         if vdwfragment==False:
             MakeFileName(poltype,strparentrotbndindexes,'torsions.txt')
+    
+
         
         WriteDictionaryToFile(poltype,fragidxtosymclass,"fragidxtosymclass.txt")
         WriteDictionaryToFile(poltype,parentsymclasstofragsymclasses,"parentsymclasstofragsymclasses.txt")
@@ -845,6 +847,9 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         onlyfittorsions=[]
         equivalentmolstruct=ReadToOBMol(poltype,fragmentfilepath)
         if vdwfragment==False:
+            vdwkeypath=os.path.join(poltype.startdir,poltype.key5fname) 
+            shutil.copy(vdwkeypath,'parentvdw.key')
+            print('vdwkeypath',vdwkeypath,flush=True)
             tors,maintortors,tortor,nonaroringfrag,rotbndindextotors=GrabParentTorsions(poltype,rotbndindextoringtor,array,strparentrotbndindexes)
             for rotbndindex,tors in rotbndindextotors.items():
                 otherparentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]

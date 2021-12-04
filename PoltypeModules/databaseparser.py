@@ -4273,14 +4273,9 @@ def GenerateRdkitMolObjectsParameterSMARTS(poltype,parametersmartslist):
 
 
 def GrabVdwParametersFromParent(poltype,oldvdwprms):
-    parentdir=os.path.abspath(os.path.join(os.getcwd(),"../.."))
     currentdir=os.getcwd()
     parenttypestofragtypes=json.load(open("parentsymclasstofragsymclasses.txt"))
-    os.chdir(parentdir)
-    files=os.listdir()
-    for f in files:
-        if 'postfitvdw' in f:
-            vdwkey=f
+    vdwkey='parentvdw.key'
     parenttypes=list(parenttypestofragtypes.keys())
     parenttypes=[str(i) for i in parenttypes]
     fragtypes=[list(parenttypestofragtypes.values())]
@@ -4340,6 +4335,43 @@ def AddParentVdwTransferInfo(poltype,parentvdwtransferinfo,vdwprmstotransferinfo
 
     return vdwprmstotransferinfo
 
+def AddTrivialOPBendForAmine(poltype,opbendprms,mol):
+    atomiter=openbabel.OBMolAtomIter(mol)
+    for atom in atomiter:
+        atomidx=atom.GetIdx()
+        atomicnum=atom.GetAtomicNum()
+        if atomicnum==7:
+            hcount=0
+            neighbs=[natom for natom in openbabel.OBAtomAtomIter(atom)]
+            atomidxtoatomicnum={}
+            for neighb in neighbs:
+                natomidx=neighb.GetIdx()
+                natomicnum=neighb.GetAtomicNum()
+                atomidxtoatomicnum[natomidx]=natomicnum
+                if natomicnum==1:
+                    hcount+=1
+            if hcount==2:
+                for natomidx,atomicnum in atomidxtoatomicnum.items():
+                    if atomicnum!=1:
+                        theidx=natomidx
+                    elif atomicnum==1:
+                        oidx=natomidx
+                indices=[theidx,atomidx]
+                symclasses=[poltype.idxtosymclass[i] for i in indices]
+                symclasses=[str(i) for i in symclasses]
+                string=' '.join(symclasses)
+                string='opbend '+string+' 0 0 0'+'\n'
+                opbendprms.append(string)
+                indices=[oidx,atomidx]
+                symclasses=[poltype.idxtosymclass[i] for i in indices]
+                symclasses=[str(i) for i in symclasses]
+                string=' '.join(symclasses)
+                string='opbend '+string+' 0 0 0'+'\n'
+                opbendprms.append(string)
+
+
+
+    return opbendprms
 
 
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False):
@@ -4604,6 +4636,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         if len(missingopbendprmindices)!=0:
             newopbendprms,defaultvalues=DefaultOPBendParameters(poltype,missingopbendprmindices,mol,opbendbondindicestotrigonalcenterbools)
             opbendprms.extend(newopbendprms)
+        opbendprms=AddTrivialOPBendForAmine(poltype,opbendprms,mol)
         if poltype.isfragjob==True and len(poltype.onlyrotbndslist)!=0:
             vdwprms,parentvdwtransferinfo=GrabVdwParametersFromParent(poltype,vdwprms)
         polarprmstotransferinfo=MapParameterLineToTransferInfo(poltype,newpolarprms,{},{},{},{},newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist,arotorsionlinetodescrips,missingvdwtypes,torsionsmissing,missingbondpoltypeclasses,missinganglepoltypeclasses)
