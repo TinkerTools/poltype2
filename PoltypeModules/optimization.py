@@ -605,7 +605,26 @@ def FindTorsionRestraints(poltype,mol):
             angletol=2
             if np.abs(180-firstangle)<=3.5 or np.abs(180-secondangle)<=3.5:
                 continue
-
+            rtbatomicnum=t2.GetAtomicNum()
+            rtcatomicnum=t3.GetAtomicNum()
+            if rtbatomicnum==6:
+                iteratomatom = openbabel.OBAtomAtomIter(t2)
+                hcount=0
+                for nrtb in iteratomatom:
+                    nrtbatomicnum=nrtb.GetAtomicNum()
+                    if nrtbatomicnum==1:
+                        hcount+=1
+                if hcount==3:
+                    continue 
+            if rtcatomicnum==6:
+                iteratomatom = openbabel.OBAtomAtomIter(t3)
+                hcount=0
+                for nrtc in iteratomatom:
+                    nrtcatomicnum=nrtc.GetAtomicNum()
+                    if nrtcatomicnum==1:
+                        hcount+=1
+                if hcount==3:
+                    continue
             t2idx=t2.GetIdx()
             t3idx=t3.GetIdx()
             babelfirst=[t2idx,t3idx]

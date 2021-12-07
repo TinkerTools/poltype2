@@ -1905,6 +1905,11 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             if poltype.rotalltors==True and ringbond==False:
                 if torsionindices not in torsionsmissing:
                     torsionsmissing.append(torsionindices)
+            if len(poltype.onlyrotbndslist)!=0:
+                if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
+
+                    if torsionindices not in torsionsmissing:
+                        torsionsmissing.append(torsionindices)
     return torsionsmissing,poormatchingaromatictorsions,poormatchingpartialaromatictorsions,torsionstozerooutduetocolinear 
 
 

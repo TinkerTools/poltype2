@@ -373,35 +373,34 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     poltype.localframe2[atomidx - 1]=newsorteduniquetypeneighbsnorepeat[1] 
     # write out the local frames
     iteratom = openbabel.OBMolAtomIter(mol)
-    if not os.path.isfile(poltype.peditinfile):
-        f = open (poltype.peditinfile, 'w')
-        if poltype.usepoleditframes==False:
-            for a in iteratom:
-                if not idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
-                    f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " " + str(poltype.localframe2[a.GetIdx() - 1]) + "\n")
-                elif idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
-                    bisectidxs=idxtobisectidxs[a.GetIdx()]
-                    f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " -" + str(bisectidxs[0])+ " -" + str(bisectidxs[1]) + "\n")
-                else:
-                    trisecidxs=idxtotrisectidxs[a.GetIdx()]
-                    f.write(str(a.GetIdx()) + " -" + str(trisecidxs[0])+ " -" + str(trisecidxs[1]) + " -" + str(trisecidxs[2])+ "\n")
+    f = open (poltype.peditinfile, 'w')
+    if poltype.usepoleditframes==False:
+        for a in iteratom:
+            if not idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
+                f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " " + str(poltype.localframe2[a.GetIdx() - 1]) + "\n")
+            elif idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
+                bisectidxs=idxtobisectidxs[a.GetIdx()]
+                f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " -" + str(bisectidxs[0])+ " -" + str(bisectidxs[1]) + "\n")
+            else:
+                trisecidxs=idxtotrisectidxs[a.GetIdx()]
+                f.write(str(a.GetIdx()) + " -" + str(trisecidxs[0])+ " -" + str(trisecidxs[1]) + " -" + str(trisecidxs[2])+ "\n")
 
 
 
-        f.write("\n")
-        f.write('A'+'\n')
+    f.write("\n")
+    f.write('A'+'\n')
 
-        #Find aromatic carbon, halogens, and bonded hydrogens to correct polarizability
-        iteratom = openbabel.OBMolAtomIter(mol)
-        writesection=True
-        lines=[]
-        for index,prm in polarindextopolarizeprm.items():
-           line=str(index)+' '+str(prm)+'\n'
-           lines.append(line) 
-        
-        if writesection:
-            for line in lines:
-                f.write(line)
+    #Find aromatic carbon, halogens, and bonded hydrogens to correct polarizability
+    iteratom = openbabel.OBMolAtomIter(mol)
+    writesection=True
+    lines=[]
+    for index,prm in polarindextopolarizeprm.items():
+       line=str(index)+' '+str(prm)+'\n'
+       lines.append(line) 
+    
+    if writesection:
+        for line in lines:
+            f.write(line)
 
         
 

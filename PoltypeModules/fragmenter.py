@@ -849,7 +849,6 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         if vdwfragment==False:
             vdwkeypath=os.path.join(poltype.startdir,poltype.key5fname) 
             shutil.copy(vdwkeypath,'parentvdw.key')
-            print('vdwkeypath',vdwkeypath,flush=True)
             tors,maintortors,tortor,nonaroringfrag,rotbndindextotors=GrabParentTorsions(poltype,rotbndindextoringtor,array,strparentrotbndindexes)
             for rotbndindex,tors in rotbndindextotors.items():
                 otherparentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]

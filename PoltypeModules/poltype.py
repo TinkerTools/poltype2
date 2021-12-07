@@ -413,7 +413,7 @@ class PolarizableTyper():
                         else:
                             self.homodimers=self.GrabBoolValue(a)
 
-                    elif "optonly" in newline:
+                    elif "optonly" in newline and 'gaus' not in newline:
                         if '=' not in line:
                             self.optonly = True
                         else:
@@ -1287,17 +1287,28 @@ class PolarizableTyper():
         """
         error=False
         term=False
+        lastupdatetofilename={}
+        curdir=os.getcwd()
+        logpath=os.path.split(logfname)[0]
+        if logpath!='':
+            os.chdir(logpath)
+        files=os.listdir()
+        for f in files:
+            try:
+                Ftime=os.path.getmtime(f)
+                reltime=time.time()-Ftime
+                htime=reltime*0.000277778
+                lastupdatetofilename[htime]=f
+            except:
+                pass
+        os.chdir(curdir)
+        htime=min(lastupdatetofilename.keys())
         if os.path.isfile(logfname):
             head,tail=os.path.split(logfname)
-            Ftime=os.path.getmtime(logfname)
-            reltime=time.time()-Ftime
-            htime=reltime*0.000277778
             if ('opt-' in logfname or 'sp-' in logfname):
                 updatetime=.25
-            elif 'poltype' in logfname:
-                updatetime=2.5 # poltype log wont update entire time QM running so needs to be longer
             else:
-                updatetime=1 # parent QM can take longer dependeing on resources, poltype log can take a while as well to finish QM
+                updatetime=2.5 # parent QM can take longer dependeing on resources, poltype log can take a while as well to finish QM
             foundendgau=False # sometimes gaussian comments have keyword Error, ERROR in them
             foundhf=False
             for line in open(logfname):
@@ -2002,10 +2013,9 @@ class PolarizableTyper():
                 if bond in bondtopoopt or bond[::-1] in bondtopoopt:
                     pass
                 else:
-                    if self.debugmode==False:
+                    if self.deletedfiles==True:
                         raise ValueError('Bond does not exist after optimization !'+str(bond))
                     else:
-                        self.debugmode=False
                         self.deletedfiles=True
                         self.DeleteAllFiles()
                         self.GenerateParameters()
@@ -2014,10 +2024,9 @@ class PolarizableTyper():
                 if bond in bondtopo or bond[::-1] in bondtopo:
                     pass
                 else:
-                    if self.debugmode==False:
+                    if self.deletedfiles==True:
                         raise ValueError('Bond created after optimization !'+str(bond))
                     else:
-                        self.debugmode=False
                         self.deletedfiles=True
                         self.DeleteAllFiles()
                         self.GenerateParameters()
@@ -2121,7 +2130,6 @@ class PolarizableTyper():
             mpole.prepend_keyfile(self,self.keyfnamefrompoledit,optmol)
             mpole.SanitizeMultipoleFrames(self,self.keyfnamefrompoledit)
             shutil.copy(self.keyfnamefrompoledit,self.keyfname)
-
         self.issane=self.CheckFileSanity()
         if self.issane==False:
             self.deletedfiles=True
@@ -2433,9 +2441,9 @@ class PolarizableTyper():
                 else:
                     if f!='Fragments':
                         shutil.rmtree(f)
-            elif '.' in f and not os.path.isdir(f):
+            elif '.' in f and not os.path.isdir(f) and f!='parentvdw.key':
                 ext=f.split('.')[1]
-                if ext!='sdf' and ext!='ini' and 'nohup' not in f and f[0]!='.':
+                if ext!='txt' and ext!='mol' and ext!='sdf' and ext!='ini' and 'nohup' not in f and f[0]!='.':
                     os.remove(f)
 
     def CheckFileSanity(self):

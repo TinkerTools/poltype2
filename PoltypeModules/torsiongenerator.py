@@ -920,7 +920,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                     except:
                         if outputlog not in finishedjobs:
                             finishedjobs.append(outputlog)
-                        phsang=optlogtophaseanglm[outputlog]
+                        phsang=optlogtophaseangle[outputlog]
                         newphaseangles.append(phsang)
 
         poltype.torsettophaselist[tuple(torset)]=newphaseangles          
@@ -969,6 +969,34 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         fulllistofjobs.extend(listofjobs)
         fulljobtolog.update(jobtolog)
 
+
+
+    
+    jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMSPJobToLog'+'_'+poltype.molecprefix
+    if poltype.externalapi!=None:
+        if len(fulllistofjobs)!=0:
+            call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
+        ofinshedjobs,oerrorjobs=poltype.WaitForTermination(fulljobtooutputlog,False)
+    else:
+        ofinishedjobs,oerrorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
+
+    for torset in poltype.torlist:
+        newphaselist=[]
+        flatphaselist=poltype.torsettophaselist[tuple(torset)]
+        qme_list,qang_list,WBOarray,energytophaseangle = torfit.compute_qm_tor_energy(poltype,torset,optmol,flatphaselist)
+        qm_energy_list = [en - min(qme_list) for en in qme_list]
+        for eidx in range(len(qm_energy_list)):
+            e=qm_energy_list[eidx]
+            abse=qme_list[eidx]
+            angle=energytophaseangle[abse]
+            
+            if e>50:
+                pass
+            else:
+                newphaselist.append(angle)
+        poltype.torsettophaselist[tuple(torset)]=newphaselist
+        test=poltype.torsettophaselist[tuple(torset)]
+
     for torset in poltype.torlist:
         variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
@@ -981,13 +1009,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                 if optoutputlog in finishedjobs and outputlog not in errorjobs:
                     phaseangles=outputlogtophaseangles[outputlog]
                     poltype.optoutputtotorsioninfo[outputlog]= [torset,optmol,variabletorlist,phaseangles,bondtopology,optoutputlog]
-    jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMSPJobToLog'+'_'+poltype.molecprefix
-    if poltype.externalapi!=None:
-        if len(fulllistofjobs)!=0:
-            call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
-        finshedjobs,errorjobs=poltype.WaitForTermination(fulljobtooutputlog,False)
-    else:
-        finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
     os.chdir('..')
 
 
