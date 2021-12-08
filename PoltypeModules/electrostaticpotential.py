@@ -234,15 +234,18 @@ def CheckRMSPD(poltype):
         temp.close()
         if rmspdexists==True:
             relRMSPD=ComputeRelativeRMSPD(poltype)
-            if relRMSPD>1: # greater than 1% relative error
-                if float(RMSPD)>poltype.maxRMSPD:
-                    poltype.failedrmspd=True
-                    poltype.WriteToLog('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
-                    warnings.warn('Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
-                    if poltype.issane==True and poltype.skipespfiterror==False:
-                        raise ValueError(os.getcwd()+' '+'Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
-                else:
-                    poltype.WriteToLog('RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol ')
+            reltol=10
+            string1='Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol '+ 'and relative RMSPD='+str(relRMSPD)+' relative tolerance is '+str(reltol)+'%'
+            string2='RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol '+ 'and relative RMSPD='+str(relRMSPD)+' relative tolerance is '+str(reltol)+'%'
+
+            if float(RMSPD)>poltype.maxRMSPD and relRMSPD>reltol:
+                poltype.failedrmspd=True
+                poltype.WriteToLog(string1)
+                warnings.warn(string1)
+                if poltype.issane==True and poltype.skipespfiterror==False:
+                    raise ValueError(os.getcwd()+string1)
+            else:
+                poltype.WriteToLog(string2)
 
     return rmspdexists
 

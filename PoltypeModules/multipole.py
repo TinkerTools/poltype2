@@ -6,8 +6,8 @@ import openbabel
 import shutil
 import re
 from collections import deque
-
-
+from itertools import product,permutations
+import numpy as np
 
 def AddPolarizeCommentsToKey(poltype,keyfilename,polartypetotransferinfo):
     temp=open(keyfilename,'r')
@@ -190,7 +190,9 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                 neighbsofneighbwithoutatom=RemoveFromList(poltype,neighbsofneighb,atom)
                 neighbswithoutatom=RemoveFromList(poltype,atomneighbs,atom)
                 uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom=list(set([poltype.idxtosymclass[b.GetIdx()] for b in neighbsofneighbwithoutatom]))
-                if highestsymneighbnorepeatval==3 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbnorepeat)]): # then this is like the H on Ammonia and we can use z-then bisector
+
+                neighbindices=list([b.GetIdx() for b in atomneighbs])
+                if highestsymneighbnorepeatval==3 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbnorepeat)]) and numhydsneighb==3: # then this is like the H on Ammonia and we can use z-then bisector
                     poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                     idxtobisecthenzbool[atomidx]=True
                     bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
@@ -290,7 +292,7 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     poltype.localframe2[atomidx - 1] = 0
                     lfzerox[atomidx - 1]=True
                     atomindextoremovedipquad[atomidx]=True
-                elif CheckIfAllAtomsSameClass(poltype,atomneighbs) and val==3: # then this is like Ammonia and we can use a trisector here which behaves like Z-only
+                elif CheckIfAllAtomsSameClass(poltype,atomneighbs) and val==3 and numhyds==3: # then this is like Ammonia and we can use a trisector here which behaves like Z-only
                     idxtotrisecbool[atomidx]=True
                     trisectidxs=[atm.GetIdx() for atm in atomneighbs]
                     idxtotrisectidxs[atomidx]=trisectidxs
@@ -331,6 +333,43 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                         newneighbs=RemoveFromList(poltype,neighboffirstneighbs,atom)
                         newsorteduniquetypeneighbsnorepeat=FindUniqueNonRepeatingNeighbors(poltype,newneighbs)
                         sorteduniquetypeneighbsnorepeat+=newsorteduniquetypeneighbsnorepeat
+                    if len(sorteduniquetypeneighbsnorepeat)>=2:
+                        aatomidx=atomidx
+                        batomidx=sorteduniquetypeneighbsnorepeat[0]
+                        catomidx=sorteduniquetypeneighbsnorepeat[1]
+                        theindices=[aatomidx,batomidx,catomidx]
+                        linear=False
+                        combs=permutations(theindices)
+                        for comb in combs:
+                            atoms=[mol.GetAtom(k) for k in comb]
+                            aatom=atoms[0]
+                            batom=atoms[1]
+                            catom=atoms[2] 
+                            angle=mol.GetAngle(aatom,batom,catom)
+                            if angle<0:
+                                angle=angle+360
+                            angletol=3.5
+                            if np.abs(180-angle)<=angletol:
+                                linear=True
+                        if linear==True:
+                            poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
+                            poltype.localframe2[atomidx - 1] = 0
+                            lfzerox[atomidx - 1]=True
+                            foundcase=True
+                            continue
+                    else:
+                        neighbs=[]
+                        for n in openbabel.OBAtomAtomIter(atom):
+                            neighbs.append(n)
+                        neighbindices=[k.GetIdx() for k in neighbs]
+                        poltype.localframe1[atomidx-1]=neighbindices[0]
+                        poltype.localframe2[atomidx - 1] = 0
+                        lfzerox[atomidx - 1]=True
+                        foundcase=True
+                        continue
+
+
+
                     sorteduniquetypeneighbsnorepeattypes=[poltype.idxtosymclass[i] for i in sorteduniquetypeneighbsnorepeat]
                     indicesofsametypetomove=[]
                     atomtype=poltype.idxtosymclass[atomidx]
