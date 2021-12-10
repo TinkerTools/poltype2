@@ -21,6 +21,7 @@ import shutil
 import copy
 import traceback
 import apicall as call
+from scipy.interpolate import interp1d
 
 
 def CheckAllVdwTypesExist(poltype,keyfilename):
@@ -613,8 +614,7 @@ def PlotEnergyVsDistance(poltype,distarray,prefix,radii,depths,reds,vdwtypesarra
 
     def RMSD(c):
         return np.sqrt(np.mean(np.square(np.add(np.subtract(np.array(energyarray),np.array(qmenergyarray)),c))))
-
-
+    
     r_squared = round(coefficient_of_determination(energyarray,qmenergyarray),2)
     result=fmin(RMSD,.5)
     minRMSD=round(RMSD(result[0]),2)
@@ -633,8 +633,16 @@ def PlotEnergyVsDistance(poltype,distarray,prefix,radii,depths,reds,vdwtypesarra
         red=reds[i]
         cur='Radius=%s, Depth=%s ,Red=%s'%(round(rad,2),round(depth,2),round(red,2))
         string+=cur
-    plt.plot(distarray,energyarray,'--bo',label='MM ,'+string)
-    plt.plot(distarray,qmenergyarray,'--ro',label='QM')
+    plt.plot(distarray,energyarray,'bo',label='MM ,'+string)
+    plt.plot(distarray,qmenergyarray,'ro',label='QM')
+    xpoints=np.array([distarray[i] for i in range(len(distarray))])
+    x_new = np.linspace(xpoints.min(),xpoints.max(),500)
+    f = interp1d(xpoints,energyarray, kind='quadratic')
+    y_smooth=f(x_new)
+    plt.plot(x_new,y_smooth,color='blue')
+    f = interp1d(xpoints,qmenergyarray, kind='quadratic')
+    y_smooth=f(x_new)
+    plt.plot(x_new,y_smooth,color='red')
     plt.plot()
     plt.ylabel('Energy (kcal/mol)')
     plt.xlabel('Distance Angstrom '+'RMSD=%s, R^2=%s'%(minRMSD,r_squared))

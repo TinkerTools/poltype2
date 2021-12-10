@@ -2918,7 +2918,8 @@ def FindMissingParameters(poltype,indicestosmartsatomorders,rdkitmol,mol,indexto
         check=CheckIfNeighborsExistInSMARTMatch(poltype,nindexes,matcharray)
         if check==False or '*' in smarts or '~' in smarts:
             if len(indices)==1: # vdw
-                if poltype.onlyvdwatomindex==None:
+                index=indices[0]
+                if poltype.onlyvdwatomindex==index:
                     missing.append(indices)
                 else:
                     idx=indices[0]+1
@@ -2926,6 +2927,12 @@ def FindMissingParameters(poltype,indicestosmartsatomorders,rdkitmol,mol,indexto
                         missing.append(indices)
             else:
                 missing.append(indices)
+        else:
+            if len(indices)==1: # vdw
+                index=indices[0]
+                if poltype.onlyvdwatomindex==index:
+                    missing.append(indices)
+
 
 
 
