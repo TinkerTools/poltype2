@@ -3368,7 +3368,9 @@ def ReadDatabaseSmartsMapPolarize(poltype,databasepath): # smartsString classNam
         linesplit=line.split()
         if len(linesplit)>0:
             first=linesplit[0]
-            if '#' not in first:
+            if '# ' in first or first=='#':
+                continue
+            else:
                 smarts=linesplit[0]
                 if RepresentsInt(linesplit[1])==True:
                     tinkerclass=int(linesplit[1])
@@ -3390,6 +3392,8 @@ def MatchAllSmartsToAtomIndices(poltype,smartstoatomclass): #rdkit 0 index based
         isaro=atom.GetIsAromatic()
     for smarts in smartstoatomclass.keys():
         substructure = Chem.MolFromSmarts(smarts)
+        
+        atomclass=smartstoatomclass[smarts]
         diditmatch=poltype.rdkitmol.HasSubstructMatch(substructure)
         if diditmatch==True:
             matches=list(poltype.rdkitmol.GetSubstructMatches(substructure))
@@ -4393,14 +4397,12 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
 
         smartstoatomclasspolar, atomclasstocommentpolar=ReadDatabaseSmartsMapPolarize(poltype,poltype.latestsmallmoleculesmartstotypespolarize) 
         atomclasstoatomclass=dict(zip(atomclasstocommentpolar.keys(),atomclasstocommentpolar.keys()))
-
         atomindextoallsmartspolar,atomindextoallsmartsmatchespolar=MatchAllSmartsToAtomIndices(poltype,smartstoatomclasspolar)
         smartstocomment=MapSMARTSToComments(poltype,smartstoatomclasspolar,atomclasstoatomclass)
         atomcommentstolistofsmartslist,atomindicestolistofatomcomments=MapIndicesToCommentsAtom(poltype,atomindextoallsmartspolar,smartstocomment,listofatomsforprm)
         atomindicestolistofatomcomments,atomcommentstoparameters=SearchForParametersViaCommentsPolarize(poltype,atomcommentstolistofsmartslist,atomindicestolistofatomcomments)
         atomindicestocomments,atomindicestosmartslist=FindBestSMARTSMatch(poltype,atomindicestolistofatomcomments,atomcommentstolistofsmartslist)
         newpolarindicestopoltypeclasses,newpolarprms,newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist=GrabNewParametersPolarize(poltype,atomindicestocomments,atomcommentstoparameters,'polarize',atomindicestosmartslist,atomclasstocommentpolar) 
-
         polarprmstotransferinfo=MapParameterLineToTransferInfo(poltype,newpolarprms,{},{},{},{},newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist,{},[],[],[],[])
         polarindextopolarizeprm=GetPolarIndexToPolarizePrm(poltype,polarprmstotransferinfo)
         polartypetotransferinfo=ExtractTransferInfo(poltype,polarprmstotransferinfo)
