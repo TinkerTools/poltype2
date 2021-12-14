@@ -984,10 +984,20 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         newphaselist=[]
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
         qme_list,qang_list,WBOarray,energytophaseangle = torfit.compute_qm_tor_energy(poltype,torset,optmol,flatphaselist)
-        qm_energy_list = [en - min(qme_list) for en in qme_list]
-        for eidx in range(len(qm_energy_list)):
+        newqmelist=[] 
+        for eidx in range(len(qme_list)):
+            e=qme_list[eidx]
+            angle=energytophaseangle[e]
+            
+            if e==None:
+                pass
+            else:
+                newqmelist.append(e)
+
+        qm_energy_list = [en - min(newqmelist) for en in newqmelist]
+        for eidx in range(len(newqmelist)):
             e=qm_energy_list[eidx]
-            abse=qme_list[eidx]
+            abse=newqmelist[eidx]
             angle=energytophaseangle[abse]
             
             if e>50:
