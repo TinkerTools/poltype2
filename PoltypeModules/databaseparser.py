@@ -850,6 +850,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                         for idx in ls:
                             if idx not in match:
                                 goodmatch=False
+
                             else:
                                 matchidx=match.index(idx)
                                 matchidxs.append(matchidx)
@@ -1949,8 +1950,9 @@ def ZeroOutMissingStrbnd(poltype,anglemissingtinkerclassestopoltypeclasses,strbn
 
     return newstrbndprms
 
-def AssignAngleGuessParameters(poltype,angletinkerclassestoexampleindices,anglemissingtinkerclassestopoltypeclasses,angleprms):
+def AssignAngleGuessParameters(poltype,anglemissingtinkerclassestopoltypeclasses,angleprms,indextoneighbidxs):
     newangleprms=[]
+
     for line in angleprms:
         linesplit=line.split()
         classes=tuple([int(linesplit[1]),int(linesplit[2]),int(linesplit[3])])
@@ -1961,11 +1963,19 @@ def AssignAngleGuessParameters(poltype,angletinkerclassestoexampleindices,anglem
             elif classes[::-1] in sublist: 
                 found=True
             if found==True:
-                if tinkerclasses in angletinkerclassestoexampleindices.keys(): 
-                    exampleindices=angletinkerclassestoexampleindices[tinkerclasses]
-                elif tinkerclasses[::-1] in angletinkerclassestoexampleindices.keys(): 
-                    exampleindices=angletinkerclassestoexampleindices[tinkerclasses[::-1]]
-
+                indices=[]
+                for poltypeclass in classes:
+                    keylist=GrabKeysFromValue(poltype,poltype.idxtosymclass,poltypeclass)
+                    indices.append(keylist)
+                exampleindices=None
+                combs = list(itertools.product(*indices))
+                for comb in combs:
+                    poscomb=[np.abs(i) for i in comb]
+                    poscomb=[k-1 for k in poscomb]
+                    checkconsec=CheckIfAtomsConnected(poltype,poscomb,indextoneighbidxs)
+                    if checkconsec==True:
+                        exampleindices=[k-1 for k in comb]
+                        break 
                 atoms=[poltype.rdkitmol.GetAtomWithIdx(k) for k in exampleindices]
                 atomicnums=[a.GetAtomicNum() for a in atoms]
                 atomicval=[a.GetExplicitValence() for a in atoms]
@@ -1978,7 +1988,22 @@ def AssignAngleGuessParameters(poltype,angletinkerclassestoexampleindices,anglem
 
     return newangleprms
 
-def AssignBondGuessParameters(poltype,bondtinkerclassestoexampleindices,bondmissingtinkerclassestopoltypeclasses,bondprms):
+
+def CheckIfAtomsConnected(poltype,poscomb,endindextoneighbs):
+    checkconsec=True
+    if len(poscomb)>1:
+        for i in range(len(poscomb)-1):
+            index=poscomb[i]
+            nextindex=poscomb[i+1]
+            indexneighbs=endindextoneighbs[index]
+            if nextindex not in indexneighbs:
+                checkconsec=False
+
+
+
+    return checkconsec
+
+def AssignBondGuessParameters(poltype,bondmissingtinkerclassestopoltypeclasses,bondprms,indextoneighbidxs):
     newbondprms=[]
     for line in bondprms:
         linesplit=line.split()
@@ -1990,10 +2015,19 @@ def AssignBondGuessParameters(poltype,bondtinkerclassestoexampleindices,bondmiss
             elif classes[::-1] in sublist: 
                 found=True
             if found==True:
-                if tinkerclasses in bondtinkerclassestoexampleindices.keys(): 
-                    exampleindices=bondtinkerclassestoexampleindices[tinkerclasses]
-                elif tinkerclasses[::-1] in bondtinkerclassestoexampleindices.keys(): 
-                    exampleindices=bondtinkerclassestoexampleindices[tinkerclasses[::-1]]
+                indices=[]
+                for poltypeclass in classes:
+                    keylist=GrabKeysFromValue(poltype,poltype.idxtosymclass,poltypeclass)
+                    indices.append(keylist)
+                exampleindices=None
+                combs = list(itertools.product(*indices))
+                for comb in combs:
+                    poscomb=[np.abs(i) for i in comb]
+                    poscomb=[k-1 for k in poscomb]
+                    checkconsec=CheckIfAtomsConnected(poltype,poscomb,indextoneighbidxs)
+                    if checkconsec==True:
+                        exampleindices=[k-1 for k in comb]
+                        break 
 
                 atoms=[poltype.rdkitmol.GetAtomWithIdx(k) for k in exampleindices]
                 atomicnums=[a.GetAtomicNum() for a in atoms]
@@ -2281,7 +2315,7 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
             c=int(linesplit[3])
             ls=[a,b,c]
             if ls in missinganglepoltypeclasses or ls[::-1] in missinganglepoltypeclasses:
-                extraline+='# Missing angle parameters, assigning default parameters'
+                extraline+='# Missing angle parameters, assigning default parameters via element and valence'
                 warn=True
 
         if 'strbnd' in line:
@@ -2299,7 +2333,7 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
             b=int(linesplit[2])
             ls=[a,b]
             if ls in missingbondpoltypeclasses or ls[::-1] in missingbondpoltypeclasses:
-                extraline+='# Missing bond parameters, assigning default parameters'
+                extraline+='# Missing bond parameters, assigning default parameters via element and valence'
                 warn=True
 
         if 'torsion' in line:
@@ -2914,17 +2948,17 @@ def FindMissingParameters(poltype,indicestosmartsatomorders,rdkitmol,mol,indexto
                 matcharray=match
                 break
 
-   
+         
         check=CheckIfNeighborsExistInSMARTMatch(poltype,nindexes,matcharray)
         if check==False or '*' in smarts or '~' in smarts:
             if len(indices)==1: # vdw
                 index=indices[0]
-                if poltype.onlyvdwatomindex==index:
-                    missing.append(indices)
-                else:
+                if poltype.onlyvdwatomindex!=None:
                     idx=indices[0]+1
                     if idx==poltype.onlyvdwatomindex:
                         missing.append(indices)
+                else:
+                    missing.append(indices)
             else:
                 missing.append(indices)
         else:
@@ -2988,7 +3022,6 @@ def TinkerClassesToTrigonalCenter(poltype,opbendbondindicestotinkerclasses,opben
         opbendtinkerclassestotrigonalcenterbools[tuple(revtinkerclasses)]=revboolarray
 
     return opbendtinkerclassestotrigonalcenterbools
-
 
 
 def FilterDictionaries(poltype,dics,ls):
@@ -4044,9 +4077,12 @@ def RemovePoltypeClassesFromNewMatches(poltype,missingtinkerclassestopoltypeclas
 
     newmissingtinkerclassestopoltypeclasses={}
     for missingtinkerclasses,poltypeclasses in missingtinkerclassestopoltypeclasses.items():
-        poltypeclasses=tuple(poltypeclasses)
-        if poltypeclasses in poltypeclassestoparametersmartsatomorders.keys() or poltypeclasses[::-1] in poltypeclassestoparametersmartsatomorders.keys():
-            newmissingtinkerclassestopoltypeclasses[missingtinkerclasses]=poltypeclasses    
+        for polcls in poltypeclasses:
+            tuppolcls=tuple([tuple(polcls)])
+            if tuppolcls in poltypeclassestoparametersmartsatomorders.keys() or tuppolcls[::-1] in poltypeclassestoparametersmartsatomorders.keys():
+                if missingtinkerclasses not in newmissingtinkerclassestopoltypeclasses.keys():
+                    newmissingtinkerclassestopoltypeclasses[missingtinkerclasses]=[]
+                newmissingtinkerclassestopoltypeclasses[missingtinkerclasses].append(polcls)
   
 
     return newmissingtinkerclassestopoltypeclasses
@@ -4550,13 +4586,12 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         torsionsmissing=FindAdjacentMissingTorsionsForTorTor(poltype,torsionsmissing,totalbondscollector,tortorsmissing)
         atomindextosmartsatomorder=AddExternalDatabaseMatches(poltype, atomindextosmartsatomorder,vdwindicestoextsmarts,vdwsmartsatomordertoparameters)
         vdwmissing=FindMissingParameters(poltype,formissingvdwindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
+ 
         missingvdwatomindices=ReduceMissingVdwByTypes(poltype,vdwmissing)
         bondmissing=FindMissingParameters(poltype,formissingbondindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
         anglemissing=FindMissingParameters(poltype,formissingangleindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
         anglemissingindicestotinkerclasses=PruneDictionary(poltype,anglemissing,angleindicestotinkerclasses)
-        angletinkerclassestoexampleindices=ReverseDictionary(poltype,angleindicestotinkerclasses)
         bondmissingindicestotinkerclasses=PruneDictionary(poltype,bondmissing,bondindicestotinkerclasses)
-        bondtinkerclassestoexampleindices=ReverseDictionary(poltype,bondmissingindicestotinkerclasses)
         torsionsmissingindicestotinkerclasses=PruneDictionary(poltype,torsionsmissing,torsionindicestotinkerclasses)
         
         torsionszerooutindicestotinkerclasses=PruneDictionary(poltype,torsionstozerooutduetocolinear,torsionindicestotinkerclasses)
@@ -4579,9 +4614,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
 
         arotorsionsmissingtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,arotorsionsmissingindicestotinkerclasses)
         partialarotorsionsmissingtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,partialarotorsionsmissingindicestotinkerclasses)
-
         anglemissingtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,anglemissingindicestotinkerclasses)
-        
         bondmissingtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,bondmissingindicestotinkerclasses)
         bondpoltypeclassestotinkerclasses=ReverseDictionaryValueList(poltype,bondtinkerclassestopoltypeclasses)
         torsionpoltypeclassestoparametersmartsatomorders=ConvertIndicesDictionaryToPoltypeClasses(poltype,torsionindicestoparametersmartsatomorders,torsionindicestotinkerclasses,torsiontinkerclassestopoltypeclasses)
@@ -4621,12 +4654,13 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         tortorprms=[]
         tortorprms,tortorpoltypeclassestosmartsatomordersext=AddExternalDatabaseSMARTSMatchParameters(poltype,tortorprms,tortorindicestoextsmarts,tortorsmartsatomordertoparameters,'tortors',tortorindicestoextsmartsatomorders,tortorsmartsatomordertogrid)
         anglemissingtinkerclassestopoltypeclasses=RemovePoltypeClassesFromNewMatches(poltype,anglemissingtinkerclassestopoltypeclasses,anglepoltypeclassestoparametersmartsatomorders)
+
         bondmissingtinkerclassestopoltypeclasses=RemovePoltypeClassesFromNewMatches(poltype,bondmissingtinkerclassestopoltypeclasses,bondpoltypeclassestoparametersmartsatomorders)
         missinganglepoltypeclasses=ExtractMissingPoltypeClasses(poltype,anglemissingtinkerclassestopoltypeclasses)
         missingbondpoltypeclasses=ExtractMissingPoltypeClasses(poltype,bondmissingtinkerclassestopoltypeclasses)
         strbndprms=ZeroOutMissingStrbnd(poltype,anglemissingtinkerclassestopoltypeclasses,strbndprms)
-        angleprms=AssignAngleGuessParameters(poltype,angletinkerclassestoexampleindices,anglemissingtinkerclassestopoltypeclasses,angleprms)
-        bondprms=AssignBondGuessParameters(poltype,bondtinkerclassestoexampleindices,bondmissingtinkerclassestopoltypeclasses,bondprms)
+        angleprms=AssignAngleGuessParameters(poltype,anglemissingtinkerclassestopoltypeclasses,angleprms,indextoneighbidxs)
+        bondprms=AssignBondGuessParameters(poltype,bondmissingtinkerclassestopoltypeclasses,bondprms,indextoneighbidxs)
         angleprms.extend(newangleprms)
         bondprms.extend(newbondprms)
         strbndprms.extend(newstrbndprms)
