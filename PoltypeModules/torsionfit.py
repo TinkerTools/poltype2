@@ -1373,6 +1373,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
                 poltype.WriteToLog(thestring)
                 classkeytofitresults[testkey]=thestring
         if dim==1: 
+            numpy.savetxt('qmarray_'+str(b)+'-'+str(c)+'.txt',qm_energy_list)
             fig = plt.figure(figsize=(10,10))
             ax = fig.add_subplot(111)
             # energy profiles: mm (pre-fit), mm (post-fit), qm

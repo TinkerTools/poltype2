@@ -235,8 +235,8 @@ def CheckRMSPD(poltype):
         if rmspdexists==True:
             relRMSPD=ComputeRelativeRMSPD(poltype)
             reltol=10
-            string1='Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol '+ 'and relative RMSPD='+str(relRMSPD)+' relative tolerance is '+str(reltol)+'%'
-            string2='RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol '+ 'and relative RMSPD='+str(relRMSPD)+' relative tolerance is '+str(reltol)+'%'
+            string1='Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol '+ 'and relative RMSPD='+str(relRMSPD)+'% relative tolerance is '+str(reltol)+'%'
+            string2='RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol '+ 'and relative RMSPD='+str(relRMSPD)+'% relative tolerance is '+str(reltol)+'%'
 
             if float(RMSPD)>poltype.maxRMSPD and relRMSPD>reltol:
                 poltype.failedrmspd=True
@@ -283,7 +283,7 @@ def ComputeRelativeRMSPD(poltype):
     def RMSDRel(c):
         return np.sqrt(np.mean(np.square(np.add(np.divide(model-target,target),c))))
     resultRel=fmin(RMSDRel,.5)
-    minRMSDRel=RMSDRel(resultRel[0])*100
+    minRMSDRel=round(RMSDRel(resultRel[0])*100,2)
     return minRMSDRel
 
 

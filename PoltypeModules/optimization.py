@@ -536,6 +536,8 @@ def StructureMinimization(poltype,torsionrestraints):
     poltype.WriteToLog("")
     poltype.WriteToLog("=========================================================")
     poltype.WriteToLog("Minimizing structure\n")
+    if poltype.isfragjob==True:
+        torsionrestraints=[] 
     AddTorsionRestraints(poltype,poltype.key7fname,torsionrestraints)
     shutil.copy(poltype.xyzoutfile,poltype.tmpxyzfile)
     shutil.copy(poltype.key7fname,poltype.tmpkeyfile)

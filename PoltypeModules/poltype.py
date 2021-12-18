@@ -2225,7 +2225,6 @@ class PolarizableTyper():
         self.nonaroringtorsets=[]
         self.classkeytoinitialprmguess={}
         self.nonarotortotorsbeingfit={}
-
         
 
 
@@ -2311,6 +2310,7 @@ class PolarizableTyper():
         string='Poltype has completed successfully, but this software is still under active development. It is your responsibility to check your own final parameters, while we are still in development phase.'
         warnings.warn(string)
         self.WriteToLog(string)
+        self.CopyFitPlots()
         if self.email!=None:
             moleculename=self.molstructfname.replace('.sdf','')
             password='amoebaisbest'
@@ -2522,7 +2522,68 @@ class PolarizableTyper():
         s.sendmail(fromaddr, [toaddr],text)
         s.quit()
 
- 
+    def CollectElectrostaticDipoleFitLines(self):
+        temp=open(self.logfname,'r')
+        results=temp.readlines()
+        temp.close()  
+        fitlines=[]
+        for line in results:
+            if 'RMSPD =' in line or 'QMDipole' in line or 'RMSD of QM and MM' in line:
+                fitlines.append(line)
+
+
+        return fitlines
+
+
+    def Instructions(self):
+        instructions=[]
+        line='Please ensure that the Root Mean Square Deviation (RMSD) between QM (red curve) and MM2 post-fit torsion (blue curve) has a decent fit.'+'\n'
+        instructions.append(line) 
+        line='Plots with *energy* contain the QM energy vs dihedral angle vs MM2 energy vs dihedral angle'+'\n'
+        instructions.append(line)
+        line='Plots with *fit* contain the QM-MM1 (prefit torsion energy) vs dihedral angle and the fit spline'+'\n'
+        instructions.append(line)
+        line='The first two numbers in plot are the rotatable bond in the parent, last two are the rotatable bond in the fragment'+'\n' 
+        instructions.append(line)
+        line='Plots with _use_weights in the filename are Boltzman fitted plots'+'\n'
+        instructions.append(line)
+        line='Please ensure that the QM dipole and MM dipole match reasonably well'+'\n'
+        instructions.append(line)
+      
+        line='Please ensure that the RMSD between average QM potential and average MM potential is small'+'\n'
+        instructions.append(line)
+
+        return instructions
+
+    def CopyFitPlots(self):
+        plots=[]
+        fold='OPENME'
+        thecurdir=os.getcwd()
+        for root, subdirs, files in os.walk(os.getcwd()):
+            for d in subdirs:
+                curdir=os.getcwd()
+                path=os.path.join(root, d)
+                os.chdir(path)
+                if fold in path:
+                    continue
+                files=os.listdir()
+                for f in files:
+                    if '.png' in f and ('energy' in f or 'fit' in f or 'water' in f):
+                        plots.append(os.path.join(path,f))
+        os.chdir(thecurdir)
+        if not os.path.isdir(fold):
+            os.mkdir(fold)
+        for path in plots:
+            shutil.copy(path,fold)
+        fitlines=self.CollectElectrostaticDipoleFitLines()
+        instructions=self.Instructions()
+        os.chdir(fold)
+        temp=open("README.txt",'w')
+        for line in instructions:
+            temp.write(line)
+        for line in fitlines:
+            temp.write(line)
+        temp.close()
 
 if __name__ == '__main__':
     def RunPoltype():
