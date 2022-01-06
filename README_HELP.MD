@@ -351,5 +351,59 @@ If there are no python errors as shown above, please read *-poltype.log to trace
 * If the number of expected atoms connected to an atom type are not found, it is possible either the incorrect PDB atom label was used for that protonation state or there is a missing/extra hydrogen.
 
 * If restarting poltype job after error delete the ModifiedPrm.prm file in poltype directory before restarting.
- 
 
+### ForceBalance Poltype Wrapper
+ 
+* Install modified forcebalance for Tinker9 GPU dynamics
+```
+cd ~
+git clone https://github.com/bdw2292/forcebalance.git
+```
+
+* Make sure to copy files from modified forcebalance to conda site packages (for example mine are located /home/bdw2292/miniconda3/envs/FBTest/lib/python3.8/site-packages/forcebalance/) 
+```
+cp ~/forcebalance/src/*py /home/bdw2292/miniconda3/envs/amoebamdpoltype/lib/python3.6/site-packages/forcebalance/
+cp ~/forcebalance/src/data/*py /home/bdw2292/miniconda3/envs/amoebamdpoltype/lib/python3.6/site-packages/forcebalance/data/
+
+```
+
+* Example input
+```
+poltypepathlist=/home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CH3Cl,/home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CH2Cl2,/home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CHCl3 
+csvexpdatafile=ExpHalogenData.csv
+vdwtypeslist=401 402 403, 401 402 403 , 401 402 403  
+liquid_prod_time=.5                 
+gas_prod_time=.5
+WQ_PORT=9013
+```
+* Example CSV File in ForceBalanceWrapperExamples folder
+* Only use WQ_PORT for parralel jobs, otherwise default is serial on single node
+* Dont let property values be blank for some TP points (need value for FB to read).
+* If using csvexpdatafile, please use correct units as below and the column headers in example csv file, make sure the molecule name under the Name column are same as poltype molecule folder name
+* By default all types in key files are reassigned new type numbers so there is no overlap while fitting together. So input types will be converted internally.
+* temperature_list, pressure_list and density_list are required.
+* Density units are Kg/m^3
+* Enthalpy of vaporization units kJ/mol
+* Thermal expansion units 1/K
+* Isothermal compressibility units are 1/bar
+* Isobaric heat capacity units are kJ/mol.K
+* pressure units are atm
+* Experimental data can be found at https://webbook.nist.gov/ or https://www.aiche.org/dippr
+* QM energies from dimers in poltype (normalized) >=15 kcal/mol are removed and not use for forcebalance.
+```
+poltypepathlist                                      Comma seperated list of Paths to completed poltypejobs
+vdwtypes                                             Comma seperated list of vdw types lists to parameterize
+WQ_PORT                                              Port number for work queue to connect to workers on nodes
+liquid_equ_steps                                     Equilibrium steps MD 
+liquid_prod_steps                                    Production dynamic steps MD
+liquid_timestep                                      Time step for liquid MD
+liquid_interval                                      How often frames written out, in ps
+gas_equ_steps                                        Equilibrium steps MD 
+gas_prod_steps                                       Production dynamic steps MD
+gas_timestep                                          
+gas_interval                                         How often frames written out, in ps
+md_threads                                           CPU cores
+liquid_prod_time                                     Total time liquid sim
+gas_prod_time                                        Total time gas sim
+debugmode                                            Sets MD to very short time for testing ForceBalance (.001 ns)
+```
