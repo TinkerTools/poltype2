@@ -267,6 +267,8 @@ onlyvdwatomindex         Only probe one vdw atom index on molecule.
 
 accuratevdwsp            Use CBS extraction on MP2 with counterpoise on basis sets aug-cc-pV[TQ]Z.
                          Default=False
+
+onlyvdwatomlist          List of Van der Waals atom indices to use in VdW refinement.
 ```
 
 ### Misc.

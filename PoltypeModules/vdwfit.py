@@ -1519,6 +1519,11 @@ def CheckIfFittingCompleted(poltype,prefix):
             break
     return check
 
+
+def intersection(poltype,lst1, lst2):
+    lst3 = [value for value in lst1 if value in lst2]
+    return lst3
+
 def CombineProbesThatNeedToBeFitTogether(poltype,probeindices,moleculeindices,fullprefixarrays,fulldistarrays,alloutputfilenames):
 
     newprobeindices=[]
@@ -1527,23 +1532,64 @@ def CombineProbesThatNeedToBeFitTogether(poltype,probeindices,moleculeindices,fu
     newdistarrays=[]
     newoutputfilenames=[]
     indextoindexlist={}
+    molindextotypenum={}
+    group=[]
     for i in range(len(moleculeindices)):
         moleculelist=moleculeindices[i]
-        firstindex=moleculelist[0]
-        if i not in indextoindexlist.keys():
-            indextoindexlist[i]=[i]
-        for j in range(len(moleculeindices)):
-            othermoleculelist=moleculeindices[j]
-            otherfirstindex=othermoleculelist[0]
-            if j not in indextoindexlist.keys():
-                indextoindexlist[j]=[j]
-            if firstindex==otherfirstindex and i!=j:
-                groupedindices=[i,j]
-                for idx in groupedindices:
-                    if idx not in indextoindexlist[i]:
-                        indextoindexlist[i].append(idx)
-                    if idx not in indextoindexlist[j]:
-                        indextoindexlist[j].append(idx)
+        index=moleculelist[0]
+        typenum=poltype.idxtosymclass[index]
+        checkboth=False
+        filename=fullprefixarrays[i][0]
+        if 'water' not in filename:
+            checkboth=True
+        probelist=probeindices[i]
+        probeindex=probelist[0]
+        molindextotypenum[index]=typenum
+        ls=[index]
+        if checkboth==True:
+            newindex=int(probeindex-len(poltype.idxtosymclass.keys()))
+            typenum=poltype.idxtosymclass[newindex]   
+            molindextotypenum[probeindex]=typenum
+            ls.append(probeindex)
+        group.append(ls)
+    groupsym=[]
+    for i in range(len(group)):
+        ls=group[i]
+        symls=[molindextotypenum[k] for k in ls]
+        groupsym.append(symls)
+    indicesgrouped=[]
+    for i in range(len(groupsym)):
+        symls=groupsym[i]
+        ls=group[i]
+        for j in range(len(groupsym)):
+            if j!=i:
+                othersymls=groupsym[j]
+                otherls=group[j]
+                
+                inter=intersection(poltype,symls, othersymls)  
+                index=ls[0]
+                otherindex=otherls[0]
+                if len(inter)!=0:
+                    if i not in indextoindexlist.keys():
+                        indextoindexlist[i]=[]
+                    if i not in indextoindexlist[i]:
+                        indextoindexlist[i].append(i)
+                    if j not in indextoindexlist[i]:
+                        indextoindexlist[i].append(j)
+                    if index not in indicesgrouped:
+                        indicesgrouped.append(index)
+                    if otherindex not in indicesgrouped:
+                        indicesgrouped.append(otherindex)
+    for i in range(len(group)):
+        ls=group[i]
+        index=ls[0]
+        if index not in indicesgrouped:
+            indicesgrouped.append(index)
+            if index not in indextoindexlist.keys():
+                indextoindexlist[i]=[]
+            indextoindexlist[i].append(i)
+
+
     indicesalreadydone=[]
     for index,indexlist in indextoindexlist.items():
         if index not in indicesalreadydone:
@@ -1876,7 +1922,6 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     if dothefit==True:
         probeindices,moleculeindices=RemoveIgnoredIndices(poltype,probeindices,moleculeindices,moleculeprobeindicestoignore)
         newprobeindices,newmoleculeindices,newprefixarrays,newdistarrays,newoutputfilenames=CombineProbesThatNeedToBeFitTogether(poltype,probeindices,moleculeindices,fullprefixarrays,fulldistarrays,alloutputfilenames)
-
         for k in range(len(newprobeindices)):
             goodfit=False
             count=1
@@ -1891,7 +1936,6 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             flat_distarrays = [item for sublist in subdistarrays for item in sublist]
             flat_filenames = [item for sublist in subfilenames for item in sublist]
             flat_filenames = [item for sublist in flat_filenames for item in sublist]
-
             while goodfit==False:
                 if count>2:
                     break
