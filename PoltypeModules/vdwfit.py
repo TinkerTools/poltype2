@@ -1455,9 +1455,6 @@ def GenerateInitialProbeStructures(poltype,missingvdwatomindices):
             if 'water' in prob:
                 probeidxtosymclass=GrabWaterTypes(poltype)
             prob_spots = CheckBuriedAtoms(poltype,prob_spots,probemol,zeroindex=True)
-            if 'water' not in prob:
-                mol_spots = CheckBuriedAtoms(poltype,mol_spots,poltype.mol,zeroindex=True) 
-
             for p1 in mol_spots:
                 probelist=[]
                 probeindiceslist=[]
@@ -1484,7 +1481,6 @@ def GenerateInitialProbeStructures(poltype,missingvdwatomindices):
                 probeindices.append(probeindiceslist)
                 moldimernames.append(probelist)
                 numberprobeatoms.append(probemol.NumAtoms())
-
     return moldimernames,probeindices,moleculeindices,numberprobeatoms
 
 
@@ -1611,21 +1607,24 @@ def CheckIfProbeIsTooFar(poltype,mol,probeindex,moleculeindex,probeatoms):
     moleculeatomcoords=np.array([moleculeatom.GetX(),moleculeatom.GetY(),moleculeatom.GetZ()])
     probeatomcoords=np.array([probeatom.GetX(),probeatom.GetY(),probeatom.GetZ()])
     dist=np.linalg.norm(probeatomcoords-moleculeatomcoords)
+
     if dist>=7:
+    
         checktoofar=True
     atomiter=openbabel.OBMolAtomIter(mol)
     total=0
     for atom in atomiter:
         total+=1
-
+    tol=.5
     maxatomindex=total-probeatoms-1
     atomiter=openbabel.OBMolAtomIter(mol)
     for atom in atomiter:
         atomindex=atom.GetIndex()
-        if atomindex!=(moleculeindex-1) and atomindex<=maxatomindex:
+        theatomindex=atomindex+1
+        if theatomindex!=(moleculeindex) and atomindex<=maxatomindex:
             othermoleculeatomcoords=np.array([atom.GetX(),atom.GetY(),atom.GetZ()])
             otherdist=np.linalg.norm(probeatomcoords-othermoleculeatomcoords)
-            if otherdist<dist:
+            if otherdist+tol<dist:
                 checktoofar=True
 
 
@@ -1720,7 +1719,6 @@ def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprob
         newprobeindices.append(tempnewprobeindices)
         newmoleculeindices.append(tempnewmoleculeindices)
         newnumberprobeatoms.append(tempprobeatoms)
-
     return newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms
 
 def WriteFittingResults(poltype,keyname,classkeytofitresults):
@@ -1934,7 +1932,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
                         minreds.append(minred)
                         maxreds.append(maxred)
                     if 'water' not in prefix:
-                        adjustedprobeindex=probeindex-len(poltype.idxtosymclass.keys())
+                        adjustedprobeindex=int(probeindex-len(poltype.idxtosymclass.keys()))
                         vdwtype=poltype.idxtosymclass[adjustedprobeindex]
                         atom=poltype.mol.GetAtom(adjustedprobeindex)
                         valence=atom.GetValence()
