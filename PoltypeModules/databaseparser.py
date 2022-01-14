@@ -1846,6 +1846,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
 
         if '~' in smarts or '*' in smarts:
             check=False
+ 
         if ringbond==True:
             atomindices=RingAtomicIndices(poltype,mol)
             ring=GrabRingAtomIndicesFromInputIndex(poltype,babelindices[1],atomindices)
@@ -2715,39 +2716,182 @@ def GrabAllPossibleMoleculeIndices(poltype,typeindices):
     return listofmoleculeindices
 
 
-def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters):
+def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,indextoneighbidxs,torsionindicestoextsmarts=None):
     indicestoextsmartsmatchlength={}
     indicestoextsmarts={}
     indicestoextsmartsatomorder={}
+    indicestosmartslist={}
+    indicestomatchlist={}
+    indicestoatomorderlist={}
+    restrictedsmarts=[]
+    newdic={}
+    if torsionindicestoextsmarts!=None:
+        for torsionindices,extsmarts in torsionindicestoextsmarts.items():
+            if extsmarts not in restrictedsmarts:
+                restrictedsmarts.append(extsmarts)
     for smartsatomorder,parameters in smartsatomordertoparameters.items():
         smarts=smartsatomorder[0]
+        if len(restrictedsmarts)!=0:
+            if smarts not in restrictedsmarts:
+                continue 
         atomorderlist=smartsatomorder[1]
         substructure = Chem.MolFromSmarts(smarts)
-        diditmatch=poltype.rdkitmol.HasSubstructMatch(substructure)
-        if diditmatch==True:
-            matches=poltype.rdkitmol.GetSubstructMatches(substructure)
-            for match in matches:
-                indices=list(range(len(match)))
-                smartsindextomoleculeindex=dict(zip(indices,match)) 
-                smartsindexlist=[i-1 for i in atomorderlist] 
-                moleculeindices=tuple([smartsindextomoleculeindex[i] for i in smartsindexlist])
-                enter=False
-                if moleculeindices not in indicestoextsmartsmatchlength.keys():
-                    enter=True
-                    
-                else:
-                    if len(smarts)>len(indicestoextsmarts[moleculeindices]):
-                       enter=True 
-                if enter==True:
-                    babelindices=[i+1 for i in moleculeindices]
-                    typeindices=[poltype.idxtosymclass[i] for i in babelindices]
-                    listofmoleculeindices=GrabAllPossibleMoleculeIndices(poltype,typeindices) 
-                    for babelindices in listofmoleculeindices:
-                        moleculeindices=tuple([i-1 for i in babelindices])
-                        indicestoextsmartsmatchlength[moleculeindices]=len(match)
-                        indicestoextsmarts[moleculeindices]=smarts
-                        indicestoextsmartsatomorder[moleculeindices]=smartsatomorder
-    return indicestoextsmartsmatchlength,indicestoextsmarts,indicestoextsmartsatomorder
+        mols = [rdkitmol,substructure]
+        res=rdFMCS.FindMCS(mols)
+        atomnum=res.numAtoms
+        smartsmcs=res.smartsString
+        diditmatch=False
+        if atomnum>len(atomorderlist):
+            mcssubstructure = Chem.MolFromSmarts(smartsmcs)
+            mcsmatches=substructure.GetSubstructMatches(mcssubstructure)
+            mcsmatch=mcsmatches[0]
+            mcsindices=list(range(len(mcsmatch)))
+            mcssmartsindextosmartsmolindex=dict(zip(mcsindices,mcsmatch)) 
+            smartsmolindexlist=[i-1 for i in atomorderlist]
+            foundindices=True
+            for i in smartsmolindexlist:
+                if i not in mcssmartsindextosmartsmolindex.values():
+                    foundindices=False
+            if foundindices==True:
+                matches=rdkitmol.GetSubstructMatches(mcssubstructure)
+                if len(matches)>0:
+                    thematch=matches[0]
+                    theindices=list(range(len(thematch)))
+                    mcssmartsindextomolindex=dict(zip(theindices,thematch)) 
+                    smartsmolindextomcssmartsindex={v: k for k, v in mcssmartsindextosmartsmolindex.items()} 
+                    mcssmartsindices=[smartsmolindextomcssmartsindex[i] for i in smartsmolindexlist]
+                    indices=[mcssmartsindextomolindex[i] for i in mcssmartsindices]
+                    mcsorder=[i+1 for i in indices]
+                    for match in matches:
+                        allin=True
+                        for idx in indices:
+                            if idx not in match:
+                                allin=False
+                        if allin==True:
+                            matcharray=match
+                            break
+                    nindexes=[]
+                    for idx in indices: 
+                        neighborindexes=indextoneighbidxs[idx]
+                        for nidx in neighborindexes:
+                            if nidx not in nindexes:
+                                nindexes.append(nidx)
+                            if len(indices)==1 and len(neighborindexes)==1:
+                                nneighborindexes=indextoneighbidxs[nidx]
+                                for nnidx in nneighborindexes:
+                                    if nnidx not in nindexes:
+                                        nindexes.append(nnidx)
+        
+                    diditmatch=CheckIfNeighborsExistInSMARTMatch(poltype,nindexes,matcharray)       
+                    if diditmatch==True:
+                        moleculeindices=tuple(indices)
+                        if len(indices)==4: # then torsion matches need to be consistent for all torsion around bond
+                            b=indices[1]
+                            c=indices[2]
+                            batombabel=poltype.mol.GetAtom(b+1)
+                            catombabel=poltype.mol.GetAtom(c+1)
+                            bisinring=batombabel.IsInRing()
+                            cisinring=catombabel.IsInRing()
+                            bhyb=batombabel.GetHyb()
+                            chyb=catombabel.GetHyb()
+                            if (bisinring==True and cisinring==True) and (bhyb==2 and chyb==2):
+                                continue
+    
+                        if moleculeindices not in indicestosmartslist.keys():
+                            indicestosmartslist[moleculeindices]=[]
+                            indicestomatchlist[moleculeindices]=[]
+                            indicestoatomorderlist[moleculeindices]=[]
+
+
+                        if smartsmcs not in indicestosmartslist[moleculeindices]:
+                            mcssmartsatomorder=tuple([smartsmcs,tuple(mcsorder)])
+                            indicestosmartslist[moleculeindices].append(smartsmcs)
+                            indicestomatchlist[moleculeindices].append(matcharray)
+                            indicestoatomorderlist[moleculeindices].append(mcssmartsatomorder)
+                            newdic[mcssmartsatomorder]=parameters
+    rotatablebondtosmartslist={}
+    for moleculeindices,smartslist in indicestosmartslist.items():
+        if len(moleculeindices)==4: 
+            b=moleculeindices[1]
+            c=moleculeindices[2]
+            if b<c:
+                rotbnd=[b,c]
+            elif b>c:
+                rotbnd=[c,b]
+            else:
+                rotbnd=[b,c] 
+            rotbnd=tuple(rotbnd)
+            if rotbnd not in rotatablebondtosmartslist.keys():
+                rotatablebondtosmartslist[rotbnd]=[]
+            for smarts in smartslist:
+                if smarts not in rotatablebondtosmartslist[rotbnd]:
+                    rotatablebondtosmartslist[rotbnd].append(smarts)
+    rotatablebondtotruesmartslist={}
+    for rotbnd,allsmartslist in rotatablebondtosmartslist.items():
+        for smarts in allsmartslist:
+            allin=True
+            for moleculeindices,smartslist in indicestosmartslist.items():
+                if len(moleculeindices)==4: 
+                   b=moleculeindices[1]
+                   c=moleculeindices[2]
+                   if b<c:
+                       otherrotbnd=[b,c]
+                   elif b>c:
+                       otherrotbnd=[c,b]
+                   else:
+                       otherrotbnd=[b,c] 
+                   otherrotbnd=tuple(otherrotbnd)
+                   if rotbnd==otherrotbnd: 
+                       if smarts not in smartslist:
+                           allin=False
+            if allin==True: 
+                if rotbnd not in rotatablebondtotruesmartslist.keys():
+                    rotatablebondtotruesmartslist[rotbnd]=[]
+                if smarts not in rotatablebondtotruesmartslist[rotbnd]:
+                    rotatablebondtotruesmartslist[rotbnd].append(smarts)
+
+    rotatablebondtotruesmarts={}
+    for rotbnd,smartslist in rotatablebondtotruesmartslist.items():
+        smartslistlen=[len(i) for i in smartslist]
+        maxlen=max(smartslistlen)
+        maxidx=smartslistlen.index(maxlen)
+        maxsmarts=smartslist[maxidx]
+        rotatablebondtotruesmarts[rotbnd]=maxsmarts
+
+    for moleculeindices,smartslist in indicestosmartslist.items():
+       if len(moleculeindices)==4: 
+           b=moleculeindices[1]
+           c=moleculeindices[2]
+           if b<c:
+               rotbnd=[b,c]
+           elif b>c:
+               rotbnd=[c,b]
+           else:
+               rotbnd=[b,c] 
+           rotbnd=tuple(rotbnd)
+           maxsmarts=rotatablebondtotruesmarts[rotbnd]
+           
+       else:
+           smartslistlen=[len(i) for i in smartslist]
+           maxlen=max(smartslistlen)
+           maxidx=smartslistlen.index(maxlen)
+           maxsmarts=smartslist[maxidx]
+
+       smartsidx=smartslist.index(maxsmarts)
+       smarts=maxsmarts
+       matcharray=indicestomatchlist[moleculeindices][smartsidx]
+       smartsatomorder=indicestoatomorderlist[moleculeindices][smartsidx]
+       babelindices=[i+1 for i in moleculeindices]
+       typeindices=[poltype.idxtosymclass[i] for i in babelindices]
+       listofmoleculeindices=GrabAllPossibleMoleculeIndices(poltype,typeindices) 
+       for babelindices in listofmoleculeindices:
+           moleculeindices=tuple([i-1 for i in babelindices])
+           if moleculeindices not in indicestoextsmarts.keys() and moleculeindices[::-1] not in indicestoextsmarts.keys():
+               indicestoextsmartsmatchlength[moleculeindices]=len(matcharray)
+               indicestoextsmarts[moleculeindices]=smarts
+               indicestoextsmartsatomorder[moleculeindices]=smartsatomorder
+    smartsatomordertoparameters.update(newdic)
+    return indicestoextsmartsmatchlength,indicestoextsmarts,indicestoextsmartsatomorder,smartsatomordertoparameters
 
 def CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,indicestoextsmartsmatchlength,indicesforprmtoparametersmarts,indicesforprmtosmarts,indicestoextsmarts,indicesforprmtomatchallneighbs,indicestoextsmartsatomorders):
     newindicestoextsmarts={}
@@ -2757,27 +2901,39 @@ def CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,indicestoextsmartsm
             smartsls=indicesforprmtosmarts[indices]
             smarts=smartsls[0]
             matchallneighbs=indicesforprmtomatchallneighbs[indices]
-            smartsatomorder=indicestoextsmartsatomorders[indices]
+            if indices in indicestoextsmartsatomorders.keys():
+                smartsatomorder=indicestoextsmartsatomorders[indices]
+                extsmarts=indicestoextsmarts[indices]
+            else:
+                smartsatomorder=indicestoextsmartsatomorders[indices[::-1]]
+                extsmarts=indicestoextsmarts[indices[::-1]]
             poormatch=True
             substructure = Chem.MolFromSmarts(smarts)
             substructurenumatoms=substructure.GetNumAtoms()
             if extsmartsmatchlength>substructurenumatoms or poormatch==True:
                 del indicesforprmtosmarts[indices]
                 del indicesforprmtoparametersmarts[indices]
-                newindicestoextsmarts[indices]=indicestoextsmarts[indices]
+                newindicestoextsmarts[indices]=extsmarts
                 newindicestoextsmartsatomorder[indices]=smartsatomorder
         elif indices[::-1] in indicesforprmtoparametersmarts.keys():
             smartsls=indicesforprmtosmarts[indices[::-1]]
             smarts=smartsls[0]
             matchallneighbs=indicesforprmtomatchallneighbs[indices[::-1]]
-            smartsatomorder=indicestoextsmartsatomorders[indices[::-1]]
+            if indices[::-1] in indicestoextsmartsatomorders.keys():
+                smartsatomorder=indicestoextsmartsatomorders[indices[::-1]]
+                extsmarts=indicestoextsmarts[indices[::-1]]
+            else:
+                smartsatomorder=indicestoextsmartsatomorders[indices]
+                extsmarts=indicestoextsmarts[indices]
+
             poormatch=True
             substructure = Chem.MolFromSmarts(smarts)
             substructurenumatoms=substructure.GetNumAtoms()
             if extsmartsmatchlength>substructurenumatoms:
                 del indicesforprmtosmarts[indices[::-1]]
                 del indicesforprmtoparametersmarts[indices[::-1]]
-                newindicestoextsmarts[indices[::-1]]=indicestoextsmarts[indices[::-1]]
+                 
+                newindicestoextsmarts[indices[::-1]]=extsmarts
                 newindicestoextsmartsatomorder[indices[::-1]]=smartsatomorder
     return indicesforprmtoparametersmarts,indicesforprmtosmarts,newindicestoextsmarts,newindicestoextsmartsatomorder
 
@@ -2789,6 +2945,7 @@ def AddExternalDatabaseSMARTSMatchParameters(poltype,prms,indicestoextsmarts,sma
         for smartsatomorder,parameters in smartsatomordertoparameters.items():
             smarts=smartsatomorder[0]
             atomorder=smartsatomorder[1]
+            
             if smarts==extsmarts and atomorder==theatomorder:
                 line=keyword+' '
                 babelindices=[i+1 for i in indices]
@@ -2819,13 +2976,13 @@ def AddExternalDatabaseSMARTSMatchParameters(poltype,prms,indicestoextsmarts,sma
                         line+=str(prm)+' '+str(phase)+' '+str(fold)+' ' 
                     line+='\n' 
 
-
                 else:
                
                     for prm in parameters:
                         line+=str(prm)+' '
                     line+='\n' 
                 prms.append(line)
+
                 poltypeclassestosmartsatomordersext[tuple([tuple(poltypeclasses)])]=smartsatomorder
     return prms,poltypeclassestosmartsatomordersext
 
@@ -4521,15 +4678,16 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         parametersmartstomaxcommonsubstructuresmarts,maxatomsize=FindMaximumCommonSubstructures(poltype,parametersmartslist,rdkitmol)
         if len(list(parametersmartstomaxcommonsubstructuresmarts.keys()))!=0:
              parametersmartslist=list(parametersmartstomaxcommonsubstructuresmarts.keys())
-        bondindicestoextsmartsmatchlength,bondindicestoextsmarts,bondindicestoextsmartsatomorder=MatchExternalSMARTSToMolecule(poltype,rdkitmol,bondsmartsatomordertoparameters)
-        angleindicestoextsmartsmatchlength,angleindicestoextsmarts,angleindicestoextsmartsatomorder=MatchExternalSMARTSToMolecule(poltype,rdkitmol,anglesmartsatomordertoparameters)
-        strbndindicestoextsmartsmatchlength,strbndindicestoextsmarts,strbndindicestoextsmartsatomorder=MatchExternalSMARTSToMolecule(poltype,rdkitmol,strbndsmartsatomordertoparameters)
-        torsionindicestoextsmartsmatchlength,torsionindicestoextsmarts,torsionindicestoextsmartsatomorders=MatchExternalSMARTSToMolecule(poltype,rdkitmol,torsionsmartsatomordertoparameters)
+        indextoneighbidxs=FindAllNeighborIndexes(poltype,rdkitmol)
+        bondindicestoextsmartsmatchlength,bondindicestoextsmarts,bondindicestoextsmartsatomorder,bondsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,bondsmartsatomordertoparameters,indextoneighbidxs)
+        angleindicestoextsmartsmatchlength,angleindicestoextsmarts,angleindicestoextsmartsatomorder,anglesmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,anglesmartsatomordertoparameters,indextoneighbidxs)
+        strbndindicestoextsmartsmatchlength,strbndindicestoextsmarts,strbndindicestoextsmartsatomorder,strbndsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,strbndsmartsatomordertoparameters,indextoneighbidxs)
+        torsionindicestoextsmartsmatchlength,torsionindicestoextsmarts,torsionindicestoextsmartsatomorders,torsionsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,torsionsmartsatomordertoparameters,indextoneighbidxs)
 
-        opbendindicestoextsmartsmatchlength,opbendindicestoextsmarts,opbendindicestoextsmartsatomorder=MatchExternalSMARTSToMolecule(poltype,rdkitmol,opbendsmartsatomordertoparameters)
-        vdwindicestoextsmartsmatchlength,vdwindicestoextsmarts,vdwindicestoextsmartsatomorder=MatchExternalSMARTSToMolecule(poltype,rdkitmol,vdwsmartsatomordertoparameters)
-        tortorindicestoextsmartsmatchlength,tortorindicestoextsmarts,tortorindicestoextsmartsatomorders=MatchExternalSMARTSToMolecule(poltype,rdkitmol,tortorsmartsatomordertoparameters)
-       
+
+        opbendindicestoextsmartsmatchlength,opbendindicestoextsmarts,opbendindicestoextsmartsatomorder,opbendsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,opbendsmartsatomordertoparameters,indextoneighbidxs)
+        vdwindicestoextsmartsmatchlength,vdwindicestoextsmarts,vdwindicestoextsmartsatomorder,vdwsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,vdwsmartsatomordertoparameters,indextoneighbidxs,torsionindicestoextsmarts)
+        tortorindicestoextsmartsmatchlength,tortorindicestoextsmarts,tortorindicestoextsmartsatomorders,tortorsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,tortorsmartsatomordertoparameters,indextoneighbidxs)
         parametersmartstordkitmol=GenerateRdkitMolObjectsParameterSMARTS(poltype,parametersmartslist)
         atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,atomindicesforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofatomsforprm,parametersmartslist,mol,parametersmartstordkitmol)
  
@@ -4539,7 +4697,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts,planaranglesforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofanglesforprm,parametersmartslist,mol,parametersmartstordkitmol)
         torsionsforprmtoparametersmarts,torsionsforprmtosmarts,torsionsforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listoftorsionsforprm,parametersmartslist,mol,parametersmartstordkitmol)
         atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,vdwindicestoextsmarts,vdwindicestoextsmartsatomorder=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,vdwindicestoextsmartsmatchlength,atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,vdwindicestoextsmarts,atomindicesforprmtomatchallneighbs,vdwindicestoextsmartsatomorder)
- 
         bondsforprmtoparametersmarts,bondsforprmtosmarts,bondindicestoextsmarts,bondindicestoextsmartsatomorder=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,bondindicestoextsmartsmatchlength,bondsforprmtoparametersmarts,bondsforprmtosmarts,bondindicestoextsmarts,bondsforprmtomatchallneighbs,bondindicestoextsmartsatomorder)
 
         planarbondsforprmtoparametersmarts,planarbondsforprmtosmarts,planarbondindicestoextsmarts,planarbondindicestoextsmartsatomorder=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,bondindicestoextsmartsmatchlength,planarbondsforprmtoparametersmarts,planarbondsforprmtosmarts,bondindicestoextsmarts,planarbondsforprmtomatchallneighbs,bondindicestoextsmartsatomorder)
@@ -4549,7 +4706,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts,planarangleindicestoextsmarts,planarangleindicestoextsmartsatomorder=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,angleindicestoextsmartsmatchlength,planaranglesforprmtoparametersmarts,planaranglesforprmtosmarts,angleindicestoextsmarts,planaranglesforprmtomatchallneighbs,angleindicestoextsmartsatomorder)
 
         torsionsforprmtoparametersmarts,torsionsforprmtosmarts,torsionindicestoextsmarts,torsionindicestoextsmartsatomorder=CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,torsionindicestoextsmartsmatchlength,torsionsforprmtoparametersmarts,torsionsforprmtosmarts,torsionindicestoextsmarts,torsionsforprmtomatchallneighbs,torsionindicestoextsmartsatomorders)
-        
         torsionindicestoextsmartsatomorders=TrimDictionary(poltype,torsionindicestoextsmartsatomorders,torsionindicestoextsmarts)
         atomindextotinkertype,atomindextotinkerclass,atomindextoparametersmartsatomorder,atomindextoelementtinkerdescrip,atomindextosmartsatomorder=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
  
@@ -4574,7 +4730,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         formissingangleindicestosmartsatomorders=RemoveIndicesMatchedFromNewDatabase(poltype,angleindicestosmartsatomorders,newangleindicestopoltypeclasses) 
         formissingbondindicestosmartsatomorders=RemoveIndicesMatchedFromNewDatabase(poltype,bondindicestosmartsatomorders,newbondindicestopoltypeclasses)
         formissingvdwindicestosmartsatomorders=RemoveIndicesMatchedFromExternalDatabase(poltype,atomindextosmartsatomorder,vdwindicestoextsmarts) 
-        indextoneighbidxs=FindAllNeighborIndexes(poltype,rdkitmol)
         bondindicestosmartsatomorders=originalbondindicestosmartsatomorders.copy()
         angleindicestosmartsatomorders=originalangleindicestosmartsatomorders.copy()
 

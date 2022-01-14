@@ -607,8 +607,12 @@ def FindTorsionRestraints(poltype,mol):
             angletol=2
             if np.abs(180-firstangle)<=3.5 or np.abs(180-secondangle)<=3.5:
                 continue
+            rtaatomicnum=t1.GetAtomicNum()
             rtbatomicnum=t2.GetAtomicNum()
             rtcatomicnum=t3.GetAtomicNum()
+            rtdatomicnum=t4.GetAtomicNum()
+            if (rtaatomicnum==7 and rtbatomicnum==7 and rtcatomicnum==7) or (rtbatomicnum==7 and rtcatomicnum==7 and rtdatomicnum==7):
+                continue # sometimes nitrogens in chain very stiff double bonds then become linear during opt
             if rtbatomicnum==6:
                 iteratomatom = openbabel.OBAtomAtomIter(t2)
                 hcount=0

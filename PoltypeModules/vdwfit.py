@@ -1452,31 +1452,45 @@ def GenerateInitialProbeStructures(poltype,missingvdwatomindices):
                 probeidx=keys[0]-1 # shift to 0 index
                 if probeidx not in prob_spots:
                     prob_spots.append(probeidx)
+            addprobetype=False
             if 'water' in prob:
                 probeidxtosymclass=GrabWaterTypes(poltype)
+            else:
+                addprobetype=True
             prob_spots = CheckBuriedAtoms(poltype,prob_spots,probemol,zeroindex=True)
+            alreadyused=[]
             for p1 in mol_spots:
                 probelist=[]
                 probeindiceslist=[]
                 moleculeindiceslist=[]
+                moltype=poltype.idxtosymclass[p1+1]
+                newls=[moltype]
                 for p2 in prob_spots:
-                    e1=atoms1[p1]
-                    e2=atoms2[p2]
-                    if e1=='H' and e2=='H':
+                    if addprobetype==True:
+                        probetype=probeidxtosymclass[p2+1]
+                        newls.append(probetype)
+                    setls=set(newls)
+                    if setls in alreadyused and len(setls)>1:
                         continue
-                    dimer = mol[:-4] + "-" + probename[:-4] + "_" + str("%d_%d"%(p1+1,len(atoms1)+p2+1)) + ".xyz"
-                    minstructs=optimizedimers(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,poltype.mol,probemol,probeidxtosymclass)
-                    probelist.append(minstructs)
-                    probevalue=p2+1+len(atoms1)
-                    ls=[]
-                    for k in range(len(minstructs)):
-                        ls.append(probevalue)
-                    probeindiceslist.append(ls)
-                    molvalue=p1+1
-                    ls=[]
-                    for k in range(len(minstructs)):
-                        ls.append(molvalue)
-                    moleculeindiceslist.append(ls)
+                    else:
+                        alreadyused.append(setls)
+                        e1=atoms1[p1]
+                        e2=atoms2[p2]
+                        if e1=='H' and e2=='H':
+                            continue
+                        dimer = mol[:-4] + "-" + probename[:-4] + "_" + str("%d_%d"%(p1+1,len(atoms1)+p2+1)) + ".xyz"
+                        minstructs=optimizedimers(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,poltype.mol,probemol,probeidxtosymclass)
+                        probelist.append(minstructs)
+                        probevalue=p2+1+len(atoms1)
+                        ls=[]
+                        for k in range(len(minstructs)):
+                            ls.append(probevalue)
+                        probeindiceslist.append(ls)
+                        molvalue=p1+1
+                        ls=[]
+                        for k in range(len(minstructs)):
+                            ls.append(molvalue)
+                        moleculeindiceslist.append(ls)
                 moleculeindices.append(moleculeindiceslist)
                 probeindices.append(probeindiceslist)
                 moldimernames.append(probelist)
@@ -1655,7 +1669,7 @@ def CheckIfProbeIsTooFar(poltype,mol,probeindex,moleculeindex,probeatoms):
     dist=np.linalg.norm(probeatomcoords-moleculeatomcoords)
 
     if dist>=7:
-    
+
         checktoofar=True
     atomiter=openbabel.OBMolAtomIter(mol)
     total=0
@@ -1673,7 +1687,6 @@ def CheckIfProbeIsTooFar(poltype,mol,probeindex,moleculeindex,probeatoms):
             if otherdist+tol<dist:
                 checktoofar=True
 
-
     return checktoofar
 
 
@@ -1683,10 +1696,10 @@ def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprob
     newprobeindices=[]
     newmoleculeindices=[]
     newnumberprobeatoms=[]
-    moleculeindextofilenamearray={}
-    moleculeindextoenergyarray={}
-    moleculeindextoprobeindexarray={}
-    moleculeindextonumberofprobeatoms={}
+    dimertypetofilenamearray={}
+    dimertypetoenergyarray={}
+    dimertypetoprobeindexarray={}
+    dimertypetonumberofprobeatoms={}
     obConversion = openbabel.OBConversion()
 
     for i in range(len(probeindices)):
@@ -1710,6 +1723,7 @@ def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprob
             obConversion.ReadFile(mol, newfilename)
             checktoofar=CheckIfProbeIsTooFar(poltype,mol,probeindex,moleculeindex,probeatoms)
             if checktoofar==True:
+                
                 continue
             filenameout=filename.replace('.xyz_2','.alz')
             term,error=poltype.CheckNormalTermination(filenameout)
@@ -1719,28 +1733,40 @@ def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprob
                 cmdstr=poltype.analyzeexe+' '+filename+' '+'-k '+poltype.key4fname +' e '+'> '+filenameout
                 poltype.call_subsystem([cmdstr],True)
             energy=ReadIntermolecularEnergyMM(poltype,filenameout)
-            if moleculeindex not in moleculeindextofilenamearray.keys():
-                moleculeindextofilenamearray[moleculeindex]=[]
-            moleculeindextofilenamearray[moleculeindex].append(newfilename)
-            if moleculeindex not in moleculeindextoenergyarray.keys():
-                moleculeindextoenergyarray[moleculeindex]=[]
-            moleculeindextoenergyarray[moleculeindex].append(energy)
-            if moleculeindex not in moleculeindextoprobeindexarray.keys():
-                moleculeindextoprobeindexarray[moleculeindex]=[]
-            moleculeindextoprobeindexarray[moleculeindex].append(probeindex)
-            if moleculeindex not in moleculeindextonumberofprobeatoms.keys():
-                moleculeindextonumberofprobeatoms[moleculeindex]=[]
-            moleculeindextonumberofprobeatoms[moleculeindex].append(probeatoms)
+            hetero=True
+            if 'water'not in newfilename:
+                hetero=False
+            if hetero==True:
+                dimertype=tuple([moleculeindex,probeindex,hetero])
+            else:
+                dimertype=tuple([moleculeindex]) # keep only one of water orientations
+            if dimertype not in dimertypetofilenamearray.keys():
+                dimertypetofilenamearray[dimertype]=[]
+            dimertypetofilenamearray[dimertype].append(newfilename)
+            if dimertype not in dimertypetoenergyarray.keys():
+                dimertypetoenergyarray[dimertype]=[]
+            dimertypetoenergyarray[dimertype].append(energy)
+            if dimertype not in dimertypetoprobeindexarray.keys():
+                dimertypetoprobeindexarray[dimertype]=[]
+            dimertypetoprobeindexarray[dimertype].append(probeindex)
+            if dimertype not in dimertypetonumberofprobeatoms.keys():
+                dimertypetonumberofprobeatoms[dimertype]=[]
+            dimertypetonumberofprobeatoms[dimertype].append(probeatoms)
+    newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms=SortStructuresViaEnergy(poltype,newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms,dimertypetoenergyarray,dimertypetofilenamearray,dimertypetoprobeindexarray,dimertypetonumberofprobeatoms)
+    
+    return newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms
 
-    for moleculeindex,energyarray in moleculeindextoenergyarray.items():
+def SortStructuresViaEnergy(poltype,newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms,dimertypetoenergyarray,dimertypetofilenamearray,dimertypetoprobeindexarray,dimertypetonumberofprobeatoms):
+    for dimertype,energyarray in dimertypetoenergyarray.items():
+        moleculeindex=dimertype[0]
         s = np.array(energyarray)
         sort_index = np.argsort(s)
-        filenamearray=np.array(moleculeindextofilenamearray[moleculeindex])
+        filenamearray=np.array(dimertypetofilenamearray[dimertype])
         filenamearray=filenamearray[sort_index]
-        probeindexarray=moleculeindextoprobeindexarray[moleculeindex]
+        probeindexarray=dimertypetoprobeindexarray[dimertype]
         probeindexarray=np.array(probeindexarray)
         probeindexarray=probeindexarray[sort_index]
-        probeatomarray=moleculeindextonumberofprobeatoms[moleculeindex]
+        probeatomarray=dimertypetonumberofprobeatoms[dimertype]
         probeatomarray=np.array(probeatomarray)
         probeatomarray=probeatomarray[sort_index]
         count=0
@@ -1765,7 +1791,9 @@ def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprob
         newprobeindices.append(tempnewprobeindices)
         newmoleculeindices.append(tempnewmoleculeindices)
         newnumberprobeatoms.append(tempprobeatoms)
+
     return newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms
+
 
 def WriteFittingResults(poltype,keyname,classkeytofitresults):
     temp=open(keyname,'r')
@@ -1824,7 +1852,6 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
 
     dimerfiles,probeindices,moleculeindices,numberprobeatoms=GenerateInitialProbeStructures(poltype,missingvdwatomindices)
     dimerfiles,probeindices,moleculeindices,numberprobeatoms=FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprobeatoms)
-
     obConversion = openbabel.OBConversion()
     checkarray=[]
     fullprefixarrays=[]
