@@ -644,7 +644,7 @@ def FindTorsionRestraints(poltype,mol):
     return torsionrestraints
 
 def GeometryOptimization(poltype,mol,loose=False,checkbonds=True,modred=True,bondanglerestraints=None,skipscferror=False,charge=None,skiperrors=False,overridecheckterm=False): # specify charge instead of reading from mol if charge!=None
-    if bondanglerestraints!=None or poltype.isfragjob==True: # then vdw opt
+    if bondanglerestraints!=None or poltype.isfragjob==True or poltype.generateextendedconf==False: # then vdw opt
         pass
         torsionrestraints=[]
     else: # see if need to restrain torsion in extended conformation

@@ -144,6 +144,8 @@ use_qmopt_vdw        Use QM opt after MM opt for vdw dimer.
 use_gau_vdw          Use Gaussian for vdw QM if detected in envioronment.
                      Default=False
 
+generateextendedconf Use extended conformation for geometry optimization with torsions restrained.
+                     Default=True
 ```
 
 ### Distributed Multipole Analysis (DMA) and Electrostatic Single Point (ESP) Inputs
