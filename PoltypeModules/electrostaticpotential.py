@@ -234,7 +234,7 @@ def CheckRMSPD(poltype):
         temp.close()
         if rmspdexists==True:
             relRMSPD=ComputeRelativeRMSPD(poltype)
-            reltol=10
+            reltol=3
             string1='Warning: RMSPD of QM and MM optimized structures is high, RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol '+ 'and relative RMSPD='+str(relRMSPD)+'% relative tolerance is '+str(reltol)+'%'
             string2='RMSPD = '+ RMSPD+' Absolute tolerance is '+str(poltype.maxRMSPD)+' kcal/mol '+ 'and relative RMSPD='+str(relRMSPD)+'% relative tolerance is '+str(reltol)+'%'
 

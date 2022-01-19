@@ -2870,8 +2870,15 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
            else:
                rotbnd=[b,c] 
            rotbnd=tuple(rotbnd)
-           maxsmarts=rotatablebondtotruesmarts[rotbnd]
-           
+           if rotbnd in rotatablebondtotruesmarts.keys():
+               maxsmarts=rotatablebondtotruesmarts[rotbnd]
+           else:
+               smartslistlen=[len(i) for i in smartslist]
+               maxlen=max(smartslistlen)
+               maxidx=smartslistlen.index(maxlen)
+               maxsmarts=smartslist[maxidx]
+      
+    
        else:
            smartslistlen=[len(i) for i in smartslist]
            maxlen=max(smartslistlen)
