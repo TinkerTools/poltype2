@@ -92,6 +92,9 @@ addhydrogens         Adds hydrogens to unprotonated atoms.
 
 parentjobsatsametime Number of parent molecules at sametime, informs poltype how much resources to divide from available on the host.
                      Default=1
+
+genprotstatesonly    Output protonation states (at pH=7) in mol files(ProtonationState_0.mol, ...) and then exit.
+                     Default=False
 ```
 
 * Note for very large molecules initial opt, DMA and ESP may require large amounts of memory if quantum job consistently crashes
