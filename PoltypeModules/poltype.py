@@ -2479,8 +2479,8 @@ class PolarizableTyper():
             if self.firsterror==True:
                 raise ValueError('Missing vdw parameters '+str(missingvdw))
             else:
-                self.firsterror=False
                 self.DeleteFilesWithExtension(['key','xyz','key_2','key_3','key_4','key_5','xyz_2'])
+                self.firsterror=True
                 self.GenerateParameters()
 
 
@@ -2488,8 +2488,8 @@ class PolarizableTyper():
             if self.firsterror==True:
                 raise ValueError('Missing multipole parameters '+str(missingmpole))
             else:
-                self.firsterror=False
                 self.DeleteFilesWithExtension(['key','xyz','key_2','key_3','key_4','key_5','xyz_2'])
+                self.firsterror=True
                 self.GenerateParameters()
 
 
