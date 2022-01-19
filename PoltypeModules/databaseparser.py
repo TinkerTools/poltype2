@@ -2744,71 +2744,72 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
         if atomnum>len(atomorderlist):
             mcssubstructure = Chem.MolFromSmarts(smartsmcs)
             mcsmatches=substructure.GetSubstructMatches(mcssubstructure)
-            mcsmatch=mcsmatches[0]
-            mcsindices=list(range(len(mcsmatch)))
-            mcssmartsindextosmartsmolindex=dict(zip(mcsindices,mcsmatch)) 
-            smartsmolindexlist=[i-1 for i in atomorderlist]
-            foundindices=True
-            for i in smartsmolindexlist:
-                if i not in mcssmartsindextosmartsmolindex.values():
-                    foundindices=False
-            if foundindices==True:
-                matches=rdkitmol.GetSubstructMatches(mcssubstructure)
-                if len(matches)>0:
-                    thematch=matches[0]
-                    theindices=list(range(len(thematch)))
-                    mcssmartsindextomolindex=dict(zip(theindices,thematch)) 
-                    smartsmolindextomcssmartsindex={v: k for k, v in mcssmartsindextosmartsmolindex.items()} 
-                    mcssmartsindices=[smartsmolindextomcssmartsindex[i] for i in smartsmolindexlist]
-                    indices=[mcssmartsindextomolindex[i] for i in mcssmartsindices]
-                    mcsorder=[i+1 for i in indices]
-                    for match in matches:
-                        allin=True
-                        for idx in indices:
-                            if idx not in match:
-                                allin=False
-                        if allin==True:
-                            matcharray=match
-                            break
-                    nindexes=[]
-                    for idx in indices: 
-                        neighborindexes=indextoneighbidxs[idx]
-                        for nidx in neighborindexes:
-                            if nidx not in nindexes:
-                                nindexes.append(nidx)
-                            if len(indices)==1 and len(neighborindexes)==1:
-                                nneighborindexes=indextoneighbidxs[nidx]
-                                for nnidx in nneighborindexes:
-                                    if nnidx not in nindexes:
-                                        nindexes.append(nnidx)
+            if len(mcsmatches)>0:
+                mcsmatch=mcsmatches[0]
+                mcsindices=list(range(len(mcsmatch)))
+                mcssmartsindextosmartsmolindex=dict(zip(mcsindices,mcsmatch)) 
+                smartsmolindexlist=[i-1 for i in atomorderlist]
+                foundindices=True
+                for i in smartsmolindexlist:
+                    if i not in mcssmartsindextosmartsmolindex.values():
+                        foundindices=False
+                if foundindices==True:
+                    matches=rdkitmol.GetSubstructMatches(mcssubstructure)
+                    if len(matches)>0:
+                        thematch=matches[0]
+                        theindices=list(range(len(thematch)))
+                        mcssmartsindextomolindex=dict(zip(theindices,thematch)) 
+                        smartsmolindextomcssmartsindex={v: k for k, v in mcssmartsindextosmartsmolindex.items()} 
+                        mcssmartsindices=[smartsmolindextomcssmartsindex[i] for i in smartsmolindexlist]
+                        indices=[mcssmartsindextomolindex[i] for i in mcssmartsindices]
+                        mcsorder=[i+1 for i in indices]
+                        for match in matches:
+                            allin=True
+                            for idx in indices:
+                                if idx not in match:
+                                    allin=False
+                            if allin==True:
+                                matcharray=match
+                                break
+                        nindexes=[]
+                        for idx in indices: 
+                            neighborindexes=indextoneighbidxs[idx]
+                            for nidx in neighborindexes:
+                                if nidx not in nindexes:
+                                    nindexes.append(nidx)
+                                if len(indices)==1 and len(neighborindexes)==1:
+                                    nneighborindexes=indextoneighbidxs[nidx]
+                                    for nnidx in nneighborindexes:
+                                        if nnidx not in nindexes:
+                                            nindexes.append(nnidx)
         
-                    diditmatch=CheckIfNeighborsExistInSMARTMatch(poltype,nindexes,matcharray)       
-                    if diditmatch==True:
-                        moleculeindices=tuple(indices)
-                        if len(indices)==4: # then torsion matches need to be consistent for all torsion around bond
-                            b=indices[1]
-                            c=indices[2]
-                            batombabel=poltype.mol.GetAtom(b+1)
-                            catombabel=poltype.mol.GetAtom(c+1)
-                            bisinring=batombabel.IsInRing()
-                            cisinring=catombabel.IsInRing()
-                            bhyb=batombabel.GetHyb()
-                            chyb=catombabel.GetHyb()
-                            if (bisinring==True and cisinring==True) and (bhyb==2 and chyb==2):
-                                continue
+                        diditmatch=CheckIfNeighborsExistInSMARTMatch(poltype,nindexes,matcharray)       
+                        if diditmatch==True:
+                            moleculeindices=tuple(indices)
+                            if len(indices)==4: # then torsion matches need to be consistent for all torsion around bond
+                                b=indices[1]
+                                c=indices[2]
+                                batombabel=poltype.mol.GetAtom(b+1)
+                                catombabel=poltype.mol.GetAtom(c+1)
+                                bisinring=batombabel.IsInRing()
+                                cisinring=catombabel.IsInRing()
+                                bhyb=batombabel.GetHyb()
+                                chyb=catombabel.GetHyb()
+                                if (bisinring==True and cisinring==True) and (bhyb==2 and chyb==2):
+                                    continue
     
-                        if moleculeindices not in indicestosmartslist.keys():
-                            indicestosmartslist[moleculeindices]=[]
-                            indicestomatchlist[moleculeindices]=[]
-                            indicestoatomorderlist[moleculeindices]=[]
+                            if moleculeindices not in indicestosmartslist.keys():
+                                indicestosmartslist[moleculeindices]=[]
+                                indicestomatchlist[moleculeindices]=[]
+                                indicestoatomorderlist[moleculeindices]=[]
 
 
-                        if smartsmcs not in indicestosmartslist[moleculeindices]:
-                            mcssmartsatomorder=tuple([smartsmcs,tuple(mcsorder)])
-                            indicestosmartslist[moleculeindices].append(smartsmcs)
-                            indicestomatchlist[moleculeindices].append(matcharray)
-                            indicestoatomorderlist[moleculeindices].append(mcssmartsatomorder)
-                            newdic[mcssmartsatomorder]=parameters
+                            if smartsmcs not in indicestosmartslist[moleculeindices]:
+                                mcssmartsatomorder=tuple([smartsmcs,tuple(mcsorder)])
+                                indicestosmartslist[moleculeindices].append(smartsmcs)
+                                indicestomatchlist[moleculeindices].append(matcharray)
+                                indicestoatomorderlist[moleculeindices].append(mcssmartsatomorder)
+                                newdic[mcssmartsatomorder]=parameters
     rotatablebondtosmartslist={}
     for moleculeindices,smartslist in indicestosmartslist.items():
         if len(moleculeindices)==4: 
