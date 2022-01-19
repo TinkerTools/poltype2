@@ -427,7 +427,10 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
 
 
     f.write("\n")
-    f.write('A'+'\n')
+    if poltype.forcefield.upper() in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
+       f.write('P\n')
+    else:
+       f.write('A\n')
 
     #Find aromatic carbon, halogens, and bonded hydrogens to correct polarizability
     iteratom = openbabel.OBMolAtomIter(mol)
