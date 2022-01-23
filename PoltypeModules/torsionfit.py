@@ -971,16 +971,28 @@ def GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_
     datapts=len(mm_energy_list)
     poltype.WriteToLog('Torsions being fit '+string+' RMSD(QM-MM1)'+str(minRMSD))
     if dim==1:
+        first=numpy.array([Sx[i][0] for i in range(len(Sx))])
+         
         xpoints=numpy.unique(numpy.array([Sx[i][0] for i in range(len(Sx))]))
+        if len(xpoints)<len(first):
+            useunique=True
+        else:
+            useunique=False
         x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
         fig = plt.figure(figsize=(10,10))
         ax = fig.add_subplot(111)
         l1, = ax.plot(Sx,fitfunc_dict[clskey],'ro',color='red',label='Fit')
-        f = interp1d(xpoints,numpy.unique(numpy.array(fitfunc_dict[clskey])), kind='quadratic')
+        if useunique==True:
+            fitarray=numpy.unique(numpy.array(fitfunc_dict[clskey]))
+            torarray=numpy.unique(numpy.array(tor_energy_list))
+        else:
+            fitarray=numpy.array(fitfunc_dict[clskey])
+            torarray=numpy.array(tor_energy_list)
+        f = interp1d(xpoints,fitarray, kind='quadratic')
         y_smooth=f(x_new)
         ax.plot(x_new,y_smooth,color='red')
         l2, = ax.plot(Sx,tor_energy_list,'bo',color='blue',label='QM-MM1')
-        f = interp1d(xpoints,numpy.unique(numpy.array(tor_energy_list)), kind='quadratic')
+        f = interp1d(xpoints,torarray, kind='quadratic')
         y_smooth=f(x_new)
         ax.plot(x_new,y_smooth,color='blue')
 

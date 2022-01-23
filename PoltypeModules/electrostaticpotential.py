@@ -420,12 +420,13 @@ def ElectrostaticPotentialFitting(poltype):
 
 
 def ElectrostaticPotentialComparison(poltype):
-    poltype.WriteToLog("")
-    poltype.WriteToLog("=========================================================")
-    poltype.WriteToLog("Electrostatic Potential Comparison\n")
-    cmd=poltype.potentialexe + ' 5 ' + poltype.xyzoutfile + ' ' + '-k'+' '+ poltype.key3fname+' '+ poltype.qmesp2fname + ' N > RMSPD.txt'
-    poltype.call_subsystem([cmd],True)
-    rmspdexists=CheckRMSPD(poltype)
+    if poltype.deleteallnonqmfiles==True: 
+        poltype.WriteToLog("")
+        poltype.WriteToLog("=========================================================")
+        poltype.WriteToLog("Electrostatic Potential Comparison\n")
+        cmd=poltype.potentialexe + ' 5 ' + poltype.xyzoutfile + ' ' + '-k'+' '+ poltype.key3fname+' '+ poltype.qmesp2fname + ' N > RMSPD.txt'
+        poltype.call_subsystem([cmd],True)
+        rmspdexists=CheckRMSPD(poltype)
 
 def SPForDMA(poltype,optmol,mol):
     if poltype.use_gaus==False or poltype.use_gausoptonly==True:

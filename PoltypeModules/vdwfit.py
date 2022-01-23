@@ -1668,7 +1668,7 @@ def CheckIfProbeIsTooFar(poltype,mol,probeindex,moleculeindex,probeatoms):
     probeatomcoords=np.array([probeatom.GetX(),probeatom.GetY(),probeatom.GetZ()])
     dist=np.linalg.norm(probeatomcoords-moleculeatomcoords)
 
-    if dist>=7:
+    if dist>=5:
 
         checktoofar=True
     atomiter=openbabel.OBMolAtomIter(mol)
