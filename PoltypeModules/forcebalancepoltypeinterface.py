@@ -12,12 +12,14 @@ from rdkit import Chem
 import subprocess
 import itertools 
 import csv
-
+import time
 
 
 def GrabMoleculeOrder(poltypepathlist,nametopropsarray):
     nametoarrayindexorder={}
     for name in nametopropsarray.keys():
+        if name=='':
+            continue
         foundname=False
         for poltypepathidx in range(len(poltypepathlist)):
             poltypepath=poltypepathlist[poltypepathidx]
@@ -99,6 +101,8 @@ def ReadCSVFile(csvfileread,poltypepathlist):
         for rowidx in range(1,len(reader)):
             row=reader[rowidx]
             name=row[nameindex]
+            if name=='':
+                continue
             temp=CheckNoneValue(row[tempindex])
             pressure=CheckNoneValue(row[pressureindex])
             density=CheckNoneValue(row[densityindex])
@@ -365,7 +369,7 @@ def ReadInPoltypeFiles(poltypepathlist):
     xyzfilelist=[]
     molnamelist=[]
     molfilelist=[]
-
+    finalxyzfilelist=[]
     for poltypepath in poltypepathlist:
         dimertinkerxyzfiles=[]
         dimerenergies=[]
@@ -373,9 +377,10 @@ def ReadInPoltypeFiles(poltypepathlist):
         curdir=os.getcwd()
         os.chdir(poltypepath)
         keyfile=os.path.join(poltypepath,'final.key')
-        xyzfile=os.path.join(poltypepath,'final.xyz')
-        if not os.path.exists(keyfile) or not os.path.exists(xyzfile):
+        finalxyzfile=os.path.join(poltypepath,'final.xyz')
+        if not os.path.exists(keyfile) or not os.path.exists(finalxyzfile):
             raise ValueError('Final xyz or keyfile does not exist in '+str(poltypepath))
+        logtoxyz={}
         if os.path.isdir('vdw'):
             os.chdir('vdw')
             files=os.listdir()
@@ -383,8 +388,11 @@ def ReadInPoltypeFiles(poltypepathlist):
             for f in files:
                 if spext in f:
                     tempxyzfile=f.replace(spext,'.xyz')
-                    dimertinkerxyzfiles.append(os.path.join(os.getcwd(),tempxyzfile))
-                    dimersplogfiles.append(os.path.join(os.getcwd(),f))
+                    xyzfile=os.path.join(os.getcwd(),tempxyzfile)
+                    logfile=os.path.join(os.getcwd(),f)
+                    dimertinkerxyzfiles.append(xyzfile)
+                    dimersplogfiles.append(logfile)
+                    logtoxyz[logfile]=xyzfile
             os.chdir('..')
         else:
             raise ValueError('vdw folder does not exist for '+poltypepath)
@@ -399,18 +407,24 @@ def ReadInPoltypeFiles(poltypepathlist):
                     molfile=f
 
 
-        dimerenergies=ReadQMLogFile(dimersplogfiles)
+        dimerenergies,dimersplogfiles=ReadQMLogFile(dimersplogfiles)
         molfile=os.path.join(poltypepath,molfile)
         os.chdir(curdir)
-        dimertinkerxyzfileslist.append(dimertinkerxyzfiles)
+        newdimertinkerxyzfiles=[]
+        for log,xyz in logtoxyz.items():
+            if log in dimersplogfiles:
+                newdimertinkerxyzfiles.append(xyz)
+                   
+        dimertinkerxyzfileslist.append(newdimertinkerxyzfiles)
         dimerenergieslist.append(dimerenergies)
         dimersplogfileslist.append(dimersplogfiles)
         keyfilelist.append(keyfile)
+        finalxyzfilelist.append(finalxyzfile)
         xyzfilelist.append(xyzfile)
         molnamelist.append(molname)
         molfilelist.append(molfile)
 
-    return keyfilelist,xyzfilelist,dimertinkerxyzfileslist,dimerenergieslist,molnamelist,molfilelist,dimersplogfileslist
+    return keyfilelist,xyzfilelist,dimertinkerxyzfileslist,dimerenergieslist,molnamelist,molfilelist,dimersplogfileslist,finalxyzfilelist
  
 
 def GrabMonomerEnergy(line,Hartree2kcal_mol):
@@ -434,15 +448,19 @@ def CheckIfLogFileUsingGaussian(f):
 def ReadQMLogFile(dimersplogfiles):
     Hartree2kcal_mol=627.5095
     dimerenergies=[]
+    newdimersplogfiles=[]
     for f in dimersplogfiles:
+        interenergy=None
         use_gaus=CheckIfLogFileUsingGaussian(f)
         tmpfh=open(f,'r')
         if use_gaus==True:
             frag1calc=False
             frag2calc=False
+            found=False
             for line in tmpfh:
                 if 'Counterpoise: corrected energy =' in line:
                     dimerenergy=float(line.split()[4])*Hartree2kcal_mol
+                    found=True
                 elif 'Counterpoise: doing DCBS calculation for fragment   1' in line:
                     frag1calc=True
                     frag2calc=False
@@ -454,17 +472,20 @@ def ReadQMLogFile(dimersplogfiles):
                         frag1energy=GrabMonomerEnergy(line,Hartree2kcal_mol)
                     elif frag2calc:
                         frag2energy=GrabMonomerEnergy(line,Hartree2kcal_mol)
-            interenergy=dimerenergy-(frag1energy+frag2energy)
+            if found==True:
+                interenergy=dimerenergy-(frag1energy+frag2energy)
         else:
             for line in tmpfh:
                 if 'CP Energy =' in line and 'print' not in line:
                     linesplit=line.split()
                     interenergy=float(linesplit[3])*Hartree2kcal_mol
-        dimerenergies.append(interenergy)     
+        if interenergy!=None:
+            dimerenergies.append(interenergy)    
+            newdimersplogfiles.append(f)
         tmpfh.close()
     
 
-    return dimerenergies
+    return dimerenergies,newdimersplogfiles
 
 
 def GrabVdwTypeLinesFromFinalKey(keyfilelist,vdwtypeslist):
@@ -485,7 +506,7 @@ def GrabVdwTypeLinesFromFinalKey(keyfilelist,vdwtypeslist):
 
     return vdwtypelineslist
 
-def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogether,keyfilelines,addwaterprms):
+def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogether,keyfilelines,addwaterprms,prmfilelines):
     try:
         length=len(fittypestogether)
         array=np.array(fittypestogether)
@@ -542,7 +563,7 @@ def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogethe
                 line+='\n'
                 vdwtypetoline[int(vdwtype)]=line
 
-
+    molprmfilepath=os.path.join(os.getcwd(),moleculeprmfilename)
     temp=open(moleculeprmfilename,'w')
     for vdwtype,line in vdwtypetoline.items():
         temp.write(line)
@@ -554,9 +575,13 @@ def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogethe
         waterlines=WaterParameters()
         for line in waterlines:
             temp.write(line+'\n')
+    temp.write('\n')
+    for line in prmfilelines:
+        temp.write(line) 
     temp.close()
     temp.close()
     os.chdir('..')
+    return molprmfilepath
     
 def RemoveKeyWord(keypath,keystring):
     read=open(keypath,'r')
@@ -666,13 +691,17 @@ def ComputeBoxLength(xyzfile):
     aaxis = 2*float(vdwcutoff)+longestdim+4
     return aaxis
 
-def CreateSolventBox(axis,molnumber,prmfilepath,xyzeditpath,tinkerxyzname,molname,keyfilels):
+def CreateSolventBox(axis,molnumber,prmfilepath,xyzeditpath,tinkerxyzname,molname,keyfilels,molprmfilepath):
+    
     head,tail=os.path.split(tinkerxyzname)
     key=tail.replace('.xyz','.key')
-    temp=open(key,'a')
+    temp=open(key,'w')
     for line in keyfilels:
         temp.write(line)
+    temp.flush()
+    os.fsync(temp.fileno())
     temp.close()
+    time.sleep(1)
     print('Creating Solvent Box For '+tinkerxyzname,flush=True)
     temp=open('xyzedit.in','w')
     temp.write(tail+'\n')
@@ -684,14 +713,9 @@ def CreateSolventBox(axis,molnumber,prmfilepath,xyzeditpath,tinkerxyzname,molnam
     temp.write(prmfilepath+'\n')
     temp.close()
     cmdstr=xyzeditpath+' '+'<'+' '+'xyzedit.in'
-    call_subsystem(cmdstr,wait=True)    
+    call_subsystem(cmdstr,wait=True)
     os.replace(tail+'_2',molname+'_liquid.xyz') 
     liquidxyzfile=os.path.join(os.getcwd(),molname+'_liquid.xyz')
-    #os.remove(tail)
-    os.remove(key)
-    with open(key, 'w') as fp:
-        pass  
-
     return liquidxyzfile
 
 def call_subsystem(cmdstr,wait=False):
@@ -786,12 +810,41 @@ def GenerateNewKeyFile(keyfile,prmfilepath,moleculeprmfilename,axis,addwaterprms
 
     return liquidkeyfile
 
-def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist,indextogeneratecsv,keyfilelines):
+
+def Minimize(liquidxyzfile,keyfile,minimizepath,prmfilepath):
+    head,tail=os.path.split(prmfilepath)
+    newprmfilepath=os.path.join(os.getcwd(),tail)
+    shutil.copy(prmfilepath,newprmfilepath)
+    minimizecmd=minimizepath+' '+liquidxyzfile+' '+'-k'+' '+keyfile+' '+'10'+ ' > '+liquidxyzfile.replace('.xyz','min.out')
+    call_subsystem(minimizecmd,wait=True)
+    minxyz=liquidxyzfile.replace('.xyz','.xyz_2')
+    os.remove(liquidxyzfile)
+    os.replace(minxyz,liquidxyzfile) 
+
+
+
+
+def RemoveBoxLine(xyzfile):
+    tempname=xyzfile.replace('.xyz','_TEMP.xyz')
+    temp=open(xyzfile,'r')
+    results=temp.readlines()
+    temp.close()
+    temp=open(tempname,'w')
+    for line in results:
+        if '90.00' not in line:
+            temp.write(line)
+    temp.close()
+    os.remove(xyzfile)
+    os.replace(tempname,xyzfile)
+
+
+def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist,indextogeneratecsv,keyfilelines,minimizepath,molprmfilepath,finalxyzfilelist):
     gaskeyfilelist=[]
     gasxyzfilelist=[]
     liquidkeyfilelist=[]
     liquidxyzfilelist=[] 
     datacsvpathlist=[]
+    print('finalxyzfilelist',finalxyzfilelist)
     for i in range(len(rdkitmollist)):
         gencsv=indextogeneratecsv[i]
         rdkitmol=rdkitmollist[i]
@@ -799,27 +852,29 @@ def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfile
         keyfile=keyfilelist[i]
         molname=molnamelist[i]
         keyfilels=keyfilelines[i]
+        finalxyzfile=finalxyzfilelist[i]
+        gaskeyfile=keyfile
+        gasxyzfile=finalxyzfile
+        print('gasxyzfile',gasxyzfile)
         if gencsv==True:
             density=float(densitylist[i])
             mass=Descriptors.ExactMolWt(rdkitmol)*1.66054*10**(-27) # convert daltons to Kg
-            axis=ComputeBoxLength(xyzfile)
+            axis=ComputeBoxLength(gasxyzfile)
             boxlength=axis*10**-10 # convert angstroms to m
             numbermolecules=int(density*boxlength**3/mass)
-            liquidxyzfile=CreateSolventBox(axis,numbermolecules,prmfilepath,xyzeditpath,xyzfile,molname,keyfilels)
+            liquidkeyfile=GenerateNewKeyFile(keyfile,prmfilepath,moleculeprmfilename,axis,addwaterprms,molname)
+            liquidxyzfile=CreateSolventBox(axis,numbermolecules,prmfilepath,xyzeditpath,gasxyzfile,molname,keyfilels,molprmfilepath)
+            #Minimize(liquidxyzfile,liquidkeyfile,minimizepath,molprmfilepath)
         else:
             liquidxyzfile=None
-        gaskeyfile=keyfile
-        gasxyzfile=xyzfile
+            liquidkeyfile=None
+        
         
         name='data'+'_'+molname+'.csv'
         if os.path.exists(name):
             datacsvpath=os.path.join(os.getcwd(),name)
         else:
             datacsvpath=None
-        if gencsv==True: 
-            liquidkeyfile=GenerateNewKeyFile(keyfile,prmfilepath,moleculeprmfilename,axis,addwaterprms,molname)
-        else:
-            liquidkeyfile=None
         gaskeyfilelist.append(gaskeyfile)
         gasxyzfilelist.append(gasxyzfile)
         liquidkeyfilelist.append(liquidkeyfile)
@@ -1042,7 +1097,7 @@ def GrabMaxTypeNumber(parameterfile):
     results=temp.readlines()
     temp.close()
     for line in results:
-        if 'atom' in line:
+        if 'atom' in line and '#' not in line:
             linesplit=line.split()
             atomtype=int(linesplit[1])
             if atomtype>maxnumberfromprm:
@@ -1055,7 +1110,7 @@ def GrabMinTypeNumber(parameterfile):
     results=temp.readlines()
     temp.close()
     for line in results:
-        if 'atom' in line:
+        if 'atom' in line and '#' not in line:
             linesplit=line.split()
             atomtype=int(linesplit[1])
             if atomtype<minnumberfromprm:
@@ -1236,9 +1291,10 @@ def GenerateQMFolderToCSVIndex(qmfolderlist):
         index+=1
     return qmfoldertoindex
 
-def CopyFilesMoveParameters(keyfilelist,molnamelist,oldtypetonewtypelist,xyzfilelist):
+def CopyFilesMoveParameters(keyfilelist,molnamelist,oldtypetonewtypelist,xyzfilelist,finalxyzfilelist):
     newxyzfilelist=[]
     newkeyfilelist=[]
+    newfinalxyzfilelist=[]
     for i in range(len(keyfilelist)):
         key=keyfilelist[i]
         molname=molnamelist[i]
@@ -1249,6 +1305,11 @@ def CopyFilesMoveParameters(keyfilelist,molnamelist,oldtypetonewtypelist,xyzfile
         shutil.copy(key,newkey)
         newkeyfilelist.append(newkey)
         newxyzfilelist.append(newxyz)
+        finalxyz=finalxyzfilelist[i]
+        head,tail=os.path.split(finalxyz)
+        newfinalxyzpath=os.path.join(os.getcwd(),molname+tail)
+        shutil.copy(finalxyz,newfinalxyzpath)
+        newfinalxyzfilelist.append(newfinalxyzpath)
     keyfilelines=[]
     for i in range(len(newkeyfilelist)):
         newkey=newkeyfilelist[i]
@@ -1269,6 +1330,8 @@ def CopyFilesMoveParameters(keyfilelist,molnamelist,oldtypetonewtypelist,xyzfile
             pass  
         newresults=results[atomidx:]
         ShiftXYZTypes(newxyz,oldtypetonewtype)
+        finalxyz=newfinalxyzfilelist[i]
+        ShiftXYZTypes(finalxyz,oldtypetonewtype)
         for lineidx in range(len(newresults)):
             line=newresults[lineidx]
             linesplit=re.split(r'(\s+)', line) 
@@ -1288,7 +1351,7 @@ def CopyFilesMoveParameters(keyfilelist,molnamelist,oldtypetonewtypelist,xyzfile
         keyfilelines.append(newresults)
          
 
-    return newkeyfilelist,newxyzfilelist,keyfilelines
+    return newkeyfilelist,newxyzfilelist,keyfilelines,newfinalxyzfilelist
 
 
 def RemoveExtraFiles():
@@ -1346,9 +1409,13 @@ def ShiftDimerXYZTypes(dimertinkerxyzfileslist,oldtypetonewtypelist):
 
     return newdimertinkerxyzfileslist
 
+def ReadPRMFile(prmfilepath):
+    prmfilelines=[]
+    temp=open(prmfilepath,'r')
+    prmfilelines=temp.readlines()
+    temp.close()
 
-
-
+    return prmfilelines
 
 def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_prod_steps,gas_timestep,gas_interval,md_threads,liquid_prod_time,gas_prod_time,WQ_PORT,csvexpdatafile,fittypestogether):
     
@@ -1385,7 +1452,7 @@ def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liq
         nametopropsarray=ReadCSVFile(csvexpdatafile,poltypepathlist)
         nametoarrayindexorder=GrabMoleculeOrder(poltypepathlist,nametopropsarray)
         temperature_list,pressure_list,enthalpy_of_vaporization_list,heat_capacity_at_constant_pressure_list,density_list=GrabArrayInputs(nametopropsarray,nametoarrayindexorder)
-       
+ 
     if temperature_list==None:
         raise ValueError('No temperature data')
     if pressure_list==None:
@@ -1444,29 +1511,32 @@ def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liq
     
     listoftptopropdics=CombineData(temperature_list,pressure_list,enthalpy_of_vaporization_list,enthalpy_of_vaporization_err_list,surface_tension_list,surface_tension_err_list,relative_permittivity_list,relative_permittivity_err_list,isothermal_compressibility_list,isothermal_compressibility_err_list,isobaric_coefficient_of_volume_expansion_list,isobaric_coefficient_of_volume_expansion_err_list,heat_capacity_at_constant_pressure_list,heat_capacity_at_constant_pressure_err_list,density_list,density_err_list,citation_list)
     if poltypepathlist!=None:
-        keyfilelist,xyzfilelist,dimertinkerxyzfileslist,dimerenergieslist,molnamelist,molfilelist,dimersplogfileslist=ReadInPoltypeFiles(poltypepathlist)
+        keyfilelist,xyzfilelist,dimertinkerxyzfileslist,dimerenergieslist,molnamelist,molfilelist,dimersplogfileslist,finalxyzfilelist=ReadInPoltypeFiles(poltypepathlist)
+
         oldtypetonewtypelist=GenerateTypeMaps(keyfilelist)
         vdwtypelineslist=GrabVdwTypeLinesFromFinalKey(keyfilelist,vdwtypeslist)
         vdwtypelineslist=ShiftVdwTypesLines(vdwtypelineslist,oldtypetonewtypelist)
         fittypestogether=ShiftTypes(fittypestogether,oldtypetonewtypelist)
         vdwtypeslist=ShiftTypes(vdwtypeslist,oldtypetonewtypelist)
-        keyfilelist,xyzfilelist,keyfilelines=CopyFilesMoveParameters(keyfilelist,molnamelist,oldtypetonewtypelist,xyzfilelist)
+        keyfilelist,xyzfilelist,keyfilelines,newfinalxyzfilelist=CopyFilesMoveParameters(keyfilelist,molnamelist,oldtypetonewtypelist,xyzfilelist,finalxyzfilelist)
         dimertinkerxyzfileslist=ShiftDimerXYZTypes(dimertinkerxyzfileslist,oldtypetonewtypelist)
         dimertinkerxyzfileslist,dimerenergieslist=FilterHighEnergy(dimertinkerxyzfileslist,dimerenergieslist,dimersplogfileslist)
         dimertinkerxyzfileslist,dimerenergieslist=SeperateHomoDimerAndWater(dimertinkerxyzfileslist,dimerenergieslist)
         indextogeneratecsv=GenerateLiquidCSVFile(nvtprops,listoftptopropdics,molnamelist)
         densitylist=GrabNumericDensity(density_list)
         prmfilepath=os.path.join(os.path.split(__file__)[0],'amoebabio18.prm')
+        prmfilelines=ReadPRMFile(prmfilepath)
         optimizefilepath=os.path.join(os.path.split(__file__)[0],'optimize.in')
         xyzeditpath='xyzedit'
+        minimizepath='minimize'
         tinkerdir=None
         xyzeditpath=SanitizeMMExecutable(xyzeditpath,tinkerdir)
         moleculeprmfilename='molecule.prm'
         
-        GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogether,keyfilelines,addwaterprms)
+        molprmfilepath=GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogether,keyfilelines,addwaterprms,prmfilelines)
         rdkitmollist=GenerateRdkitMolList(molfilelist)
         atomnumlist=[rdkitmol.GetNumAtoms() for rdkitmol in rdkitmollist]
-        gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,liquidxyzfilelist,datacsvpathlist=GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist,indextogeneratecsv,keyfilelines)
+        gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,liquidxyzfilelist,datacsvpathlist=GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist,indextogeneratecsv,keyfilelines,minimizepath,molprmfilepath,newfinalxyzfilelist)
         liquidfolder='Liquid'
         qmfolder='QM'
         
