@@ -2723,8 +2723,9 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
     indicestosmartslist={}
     indicestomatchlist={}
     indicestoatomorderlist={}
+    indicestosmartsatomorder={}
+    indicestoprmlist={}
     restrictedsmarts=[]
-    newdic={}
     if poltype.quickdatabasesearch==False:
         if torsionindicestoextsmarts!=None:
             for torsionindices,extsmarts in torsionindicestoextsmarts.items():
@@ -2803,14 +2804,16 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                                     indicestosmartslist[moleculeindices]=[]
                                     indicestomatchlist[moleculeindices]=[]
                                     indicestoatomorderlist[moleculeindices]=[]
-
+                                    indicestoprmlist[moleculeindices]=[]
+                                    indicestosmartsatomorder[moleculeindices]=[]
 
                                 if smartsmcs not in indicestosmartslist[moleculeindices]:
                                     mcssmartsatomorder=tuple([smartsmcs,tuple(mcsorder)])
                                     indicestosmartslist[moleculeindices].append(smartsmcs)
                                     indicestomatchlist[moleculeindices].append(matcharray)
                                     indicestoatomorderlist[moleculeindices].append(mcssmartsatomorder)
-                                    newdic[mcssmartsatomorder]=parameters
+                                    indicestosmartsatomorder[moleculeindices].append(smartsatomorder)
+                                    indicestoprmlist[moleculeindices].append(parameters)
         rotatablebondtosmartslist={}
         for moleculeindices,smartslist in indicestosmartslist.items():
             if len(moleculeindices)==4: 
@@ -2885,11 +2888,17 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                maxlen=max(smartslistlen)
                maxidx=smartslistlen.index(maxlen)
                maxsmarts=smartslist[maxidx]
+           for j in range(len(indicestosmartsatomorder[moleculeindices])):
+               originalsmartsatomorder=indicestosmartsatomorder[moleculeindices][j]
+               thesmarts=indicestosmartslist[moleculeindices][j]
+               if thesmarts==maxsmarts: 
+                   break
 
-           smartsidx=smartslist.index(maxsmarts)
+
            smarts=maxsmarts
-           matcharray=indicestomatchlist[moleculeindices][smartsidx]
-           smartsatomorder=indicestoatomorderlist[moleculeindices][smartsidx]
+           matcharray=indicestomatchlist[moleculeindices][j]
+           smartsatomorder=indicestoatomorderlist[moleculeindices][j]
+           prms=indicestoprmlist[moleculeindices][j]
            babelindices=[i+1 for i in moleculeindices]
            typeindices=[poltype.idxtosymclass[i] for i in babelindices]
            listofmoleculeindices=GrabAllPossibleMoleculeIndices(poltype,typeindices) 
@@ -2899,7 +2908,7 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                    indicestoextsmartsmatchlength[moleculeindices]=len(matcharray)
                    indicestoextsmarts[moleculeindices]=smarts
                    indicestoextsmartsatomorder[moleculeindices]=smartsatomorder
-        smartsatomordertoparameters.update(newdic)
+                   smartsatomordertoparameters[smartsatomorder]=prms
     return indicestoextsmartsmatchlength,indicestoextsmarts,indicestoextsmartsatomorder,smartsatomordertoparameters
 
 def CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,indicestoextsmartsmatchlength,indicesforprmtoparametersmarts,indicesforprmtosmarts,indicestoextsmarts,indicesforprmtomatchallneighbs,indicestoextsmartsatomorders):

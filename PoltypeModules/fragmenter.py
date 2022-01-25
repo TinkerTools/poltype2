@@ -240,15 +240,16 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
                     elif 'vdw' in line and '#' not in line:
                         for clskey,smrts in classkeytosmarts.items():
                             pass
-                        
+                        linesplit=line.split() 
                         fragclasskey=linesplit[1]
                         for fragidx,symclass in fragidxtosymclass.items():
                             if symclass==int(fragclasskey):
                                 break
                         fragsymclass=int(fragclasskey)
                         prms=linesplit[2:]
-                        if int(fragidx) in fragindextosmartspos.keys():
-                            smartspos=fragindextosmartspos[int(fragidx)]
+                        fragidx=int(fragidx)-1
+                        if fragidx in fragindextosmartspos.keys():
+                            smartspos=fragindextosmartspos[fragidx]
                             smilesposarray=[smartspos]
                             smilesposarray=[str(i) for i in smilesposarray]
                             smilespos=','.join(smilesposarray)
@@ -260,6 +261,7 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
                             if smrts not in smartstovdwlinelist.keys():
                                 smartstovdwlinelist[smrts]=[]
                             smartstovdwlinelist[smrts].append(valencestring)
+                           
                         for ls in parentsymclasstofragsymclasses.values():
                             first=ls[0]
                             if fragsymclass in ls:
@@ -374,7 +376,6 @@ def ConstructVdwLineFromFragment(poltype,key,classkeytofragmentfilename,classkey
         temp.write(line)
     if key not in valenceprmlist.keys():
         valenceprmlist[key]=[] 
-
     if valencestring not in valenceprmlist[key]: 
         if fitresultsline!='':
             valenceprmlist[key].append(fitresultsline)
