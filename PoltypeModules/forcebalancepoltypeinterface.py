@@ -342,18 +342,19 @@ def WriteCSVFile(listoftpdics,nvtprops,molname):
 def GenerateLiquidCSVFile(nvtprops,listoftptopropdics,molnamelist):
     indextogeneratecsv={}
     for i in range(len(molnamelist)):
-        tptoproptovalue=listoftptopropdics[i]
         allunknown=True
-        for tp,proptovalue in tptoproptovalue.items():
-            t=tp[0]
-            p=tp[1]
-            if t!='UNK' and p!='UNK':
-                allunknown=False
+        if len(listoftptopropdics)==len(molnamelist):
+            tptoproptovalue=listoftptopropdics[i]
+            for tp,proptovalue in tptoproptovalue.items():
+                t=tp[0]
+                p=tp[1]
+                if t!='UNK' and p!='UNK':
+                    allunknown=False
 
-        molname=molnamelist[i]
-        if allunknown==False:
-            tptoproptovalue=AddDefaultValues(tptoproptovalue)
-            WriteCSVFile([tptoproptovalue],nvtprops,molname)
+            molname=molnamelist[i]
+            if allunknown==False:
+                tptoproptovalue=AddDefaultValues(tptoproptovalue)
+                WriteCSVFile([tptoproptovalue],nvtprops,molname)
         if allunknown==False:
             gencsv=True
         else:
@@ -844,7 +845,6 @@ def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfile
     liquidkeyfilelist=[]
     liquidxyzfilelist=[] 
     datacsvpathlist=[]
-    print('finalxyzfilelist',finalxyzfilelist)
     for i in range(len(rdkitmollist)):
         gencsv=indextogeneratecsv[i]
         rdkitmol=rdkitmollist[i]
@@ -855,7 +855,6 @@ def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfile
         finalxyzfile=finalxyzfilelist[i]
         gaskeyfile=keyfile
         gasxyzfile=finalxyzfile
-        print('gasxyzfile',gasxyzfile)
         if gencsv==True:
             density=float(densitylist[i])
             mass=Descriptors.ExactMolWt(rdkitmol)*1.66054*10**(-27) # convert daltons to Kg
@@ -1141,9 +1140,16 @@ def GenerateTypeMaps(keyfilelist):
         maxtype=max(shiftedtypes)
         currentmax=maxtype
         oldtypetonewtype=dict(zip(types,shiftedtypes))
+        temp={}
+        for oldtype,newtype in oldtypetonewtype.items():
+            negold=-oldtype
+            negnew=-newtype
+            temp[negold]=negnew
+        oldtypetonewtype.update(temp)
         oldtypetonewtypelist.append(oldtypetonewtype)
         prevmaxnumberfromkey=maxnumberfromkey
         prevminnumberfromkey=minnumberfromkey
+        
     return oldtypetonewtypelist
 
 def ShiftVdwTypesLines(vdwtypelineslist,oldtypetonewtypelist):
@@ -1338,7 +1344,8 @@ def CopyFilesMoveParameters(keyfilelist,molnamelist,oldtypetonewtypelist,xyzfile
             willchange=False
             for eidx in range(len(linesplit)):
                 e=linesplit[eidx]
-                if e.isdigit():
+                othere=e.replace('-','')
+                if othere.isdigit():
                     test=int(e)
                     if test in oldtypetonewtype.keys():
                         newtype=oldtypetonewtype[test]
