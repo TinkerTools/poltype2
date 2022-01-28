@@ -2630,13 +2630,16 @@ def ReadExternalDatabase(poltype):
     torsionsmartsatomordertoparameters={}
     tortorsmartsatomordertoparameters={}
     tortorsmartsatomordertogrid={}
-
+    smartsatomordertotorvdwdb={}
     opbendsmartsatomordertoparameters={}
     vdwsmartsatomordertoparameters={}
+    founddelim=False
     for line in results:
         linesplit=line.split()
         if len(linesplit)==0:
             continue
+        if 'DELIM' in line:
+            founddelim=True
         if linesplit[0]=='#':
             continue
         keyword=linesplit[0]
@@ -2671,7 +2674,11 @@ def ReadExternalDatabase(poltype):
             prmstringsplits=[s.lstrip().rstrip().split() for s in prmstringlist]
             tortorsmartsatomordertoparameters[smartsatomorder]=prmstringsplits
             tortorsmartsatomordertogrid[smartsatomorder]=grid
-    return bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters,tortorsmartsatomordertoparameters,tortorsmartsatomordertogrid
+        if founddelim==True:
+            smartsatomordertotorvdwdb[smartsatomorder]=True
+        else:
+            smartsatomordertotorvdwdb[smartsatomorder]=False
+    return bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters,tortorsmartsatomordertoparameters,tortorsmartsatomordertogrid,smartsatomordertotorvdwdb
 
 
 def ConvertToPoltypeClasses(poltype,torsionsmissing):
@@ -2716,7 +2723,7 @@ def GrabAllPossibleMoleculeIndices(poltype,typeindices):
     return listofmoleculeindices
 
 
-def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,indextoneighbidxs,torsionindicestoextsmarts=None):
+def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,indextoneighbidxs,smartsatomordertotorvdwdb,torsionindicestoextsmarts=None):
     indicestoextsmartsmatchlength={}
     indicestoextsmarts={}
     indicestoextsmartsatomorder={}
@@ -2733,8 +2740,10 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                     restrictedsmarts.append(extsmarts)
         for smartsatomorder,parameters in smartsatomordertoparameters.items():
             smarts=smartsatomorder[0]
+            fromtorvdwdb=smartsatomordertotorvdwdb[smartsatomorder]
+            
             if len(restrictedsmarts)!=0:
-                if smarts not in restrictedsmarts:
+                if smarts not in restrictedsmarts and fromtorvdwdb==True:
                     continue 
             atomorderlist=smartsatomorder[1]
             substructure = Chem.MolFromSmarts(smarts)
@@ -2743,7 +2752,8 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
             atomnum=res.numAtoms
             smartsmcs=res.smartsString
             diditmatch=False
-            if atomnum>len(atomorderlist):
+            if atomnum>=len(atomorderlist):
+
                 mcssubstructure = Chem.MolFromSmarts(smartsmcs)
                 mcsmatches=substructure.GetSubstructMatches(mcssubstructure)
                 if len(mcsmatches)>0:
@@ -2785,7 +2795,9 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                                             if nnidx not in nindexes:
                                                 nindexes.append(nnidx)
             
-                            diditmatch=CheckIfNeighborsExistInSMARTMatch(poltype,nindexes,matcharray)       
+                            diditmatch=CheckIfNeighborsExistInSMARTMatch(poltype,nindexes,matcharray)   
+                            if fromtorvdwdb==False:
+                                diditmatch=True # only care about neighbor matching for large SMARTS from part of DB genreated by fragmenter, top of DB can have shorter SMARTS 
                             if diditmatch==True:
                                 moleculeindices=tuple(indices)
                                 if len(indices)==4: # then torsion matches need to be consistent for all torsion around bond
@@ -4670,7 +4682,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         newpolarindicestopoltypeclasses,newpolarprms,newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist=GrabNewParametersPolarize(poltype,atomindicestocomments,atomcommentstoparameters,'polarize',atomindicestosmartslist,atomclasstocommentpolar) 
         smartstoatomclass, atomclasstoclassname, atomclasstocomment=ReadDatabaseSmartsMap(poltype,poltype.latestsmallmoleculesmartstotinkerclass) 
         atomindextoallsmarts,atomindextoallsmartsmatches=MatchAllSmartsToAtomIndices(poltype,smartstoatomclass)
-        bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters,tortorsmartsatomordertoparameters,tortorsmartsatomordertogrid=ReadExternalDatabase(poltype)
+        bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters,tortorsmartsatomordertoparameters,tortorsmartsatomordertogrid,smartsatomordertotorvdwdb=ReadExternalDatabase(poltype)
         smartsatomordertoelementtinkerdescrip=ReadSmallMoleculeLib(poltype,poltype.smallmoleculesmartstotinkerdescrip)
         elementtinkerdescriptotinkertype,tinkertypetoclass=GrabTypeAndClassNumbers(poltype,poltype.smallmoleculeprmlib)
         planarbonds=GrabPlanarBonds(poltype,listofbondsforprm,mol)
@@ -4697,15 +4709,15 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         if len(list(parametersmartstomaxcommonsubstructuresmarts.keys()))!=0:
              parametersmartslist=list(parametersmartstomaxcommonsubstructuresmarts.keys())
         indextoneighbidxs=FindAllNeighborIndexes(poltype,rdkitmol)
-        bondindicestoextsmartsmatchlength,bondindicestoextsmarts,bondindicestoextsmartsatomorder,bondsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,bondsmartsatomordertoparameters,indextoneighbidxs)
-        angleindicestoextsmartsmatchlength,angleindicestoextsmarts,angleindicestoextsmartsatomorder,anglesmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,anglesmartsatomordertoparameters,indextoneighbidxs)
-        strbndindicestoextsmartsmatchlength,strbndindicestoextsmarts,strbndindicestoextsmartsatomorder,strbndsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,strbndsmartsatomordertoparameters,indextoneighbidxs)
-        torsionindicestoextsmartsmatchlength,torsionindicestoextsmarts,torsionindicestoextsmartsatomorders,torsionsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,torsionsmartsatomordertoparameters,indextoneighbidxs)
+        bondindicestoextsmartsmatchlength,bondindicestoextsmarts,bondindicestoextsmartsatomorder,bondsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,bondsmartsatomordertoparameters,indextoneighbidxs,smartsatomordertotorvdwdb)
+        angleindicestoextsmartsmatchlength,angleindicestoextsmarts,angleindicestoextsmartsatomorder,anglesmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,anglesmartsatomordertoparameters,indextoneighbidxs,smartsatomordertotorvdwdb)
+        strbndindicestoextsmartsmatchlength,strbndindicestoextsmarts,strbndindicestoextsmartsatomorder,strbndsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,strbndsmartsatomordertoparameters,indextoneighbidxs,smartsatomordertotorvdwdb)
+        torsionindicestoextsmartsmatchlength,torsionindicestoextsmarts,torsionindicestoextsmartsatomorders,torsionsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,torsionsmartsatomordertoparameters,indextoneighbidxs,smartsatomordertotorvdwdb)
 
 
-        opbendindicestoextsmartsmatchlength,opbendindicestoextsmarts,opbendindicestoextsmartsatomorder,opbendsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,opbendsmartsatomordertoparameters,indextoneighbidxs)
-        vdwindicestoextsmartsmatchlength,vdwindicestoextsmarts,vdwindicestoextsmartsatomorder,vdwsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,vdwsmartsatomordertoparameters,indextoneighbidxs,torsionindicestoextsmarts)
-        tortorindicestoextsmartsmatchlength,tortorindicestoextsmarts,tortorindicestoextsmartsatomorders,tortorsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,tortorsmartsatomordertoparameters,indextoneighbidxs)
+        opbendindicestoextsmartsmatchlength,opbendindicestoextsmarts,opbendindicestoextsmartsatomorder,opbendsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,opbendsmartsatomordertoparameters,indextoneighbidxs,smartsatomordertotorvdwdb)
+        vdwindicestoextsmartsmatchlength,vdwindicestoextsmarts,vdwindicestoextsmartsatomorder,vdwsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,vdwsmartsatomordertoparameters,indextoneighbidxs,smartsatomordertotorvdwdb,torsionindicestoextsmarts)
+        tortorindicestoextsmartsmatchlength,tortorindicestoextsmarts,tortorindicestoextsmartsatomorders,tortorsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,tortorsmartsatomordertoparameters,indextoneighbidxs,smartsatomordertotorvdwdb)
         parametersmartstordkitmol=GenerateRdkitMolObjectsParameterSMARTS(poltype,parametersmartslist)
         atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,atomindicesforprmtomatchallneighbs=MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listofatomsforprm,parametersmartslist,mol,parametersmartstordkitmol)
  
