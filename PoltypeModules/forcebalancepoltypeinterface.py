@@ -43,7 +43,7 @@ def GrabArrayInputs(nametopropsarray,nametoarrayindexorder):
     pressurestring='Pressure (atm)'
     densitystring='Density (Kg/m^3)'
     enthalpystring='Enthalpy (kJ/mol)'
-    heatcapstring='Heat Capacity (Isobaric kJ/mol.K)'
+    heatcapstring='Heat Capacity (Isobaric cal/mol.K)'
     sortednametoarrayindexorder={k: v for k, v in sorted(arrayindexordertoname.items(), key=lambda item: item[0])}
     for arrayidx,name in sortednametoarrayindexorder.items():
         propsdict=nametopropsarray[name]
@@ -90,7 +90,7 @@ def ReadCSVFile(csvfileread,poltypepathlist):
         pressurestring='Pressure (atm)'
         densitystring='Density (Kg/m^3)'
         enthalpystring='Enthalpy (kJ/mol)'
-        heatcapstring='Heat Capacity (Isobaric kJ/mol.K)'
+        heatcapstring='Heat Capacity (Isobaric cal/mol.K)'
         nameindex=FindIndexWithString(namestring,header)
         tempindex=FindIndexWithString(tempstring,header)
         pressureindex=FindIndexWithString(pressurestring,header)
