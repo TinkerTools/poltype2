@@ -431,7 +431,7 @@ def ReadInPoltypeFiles(poltypepathlist):
 def GrabMonomerEnergy(line,Hartree2kcal_mol):
     linesplit=line.split()
     energy=float(linesplit[4]) 
-    monomerenergy=(energy)*Hartree2kcal_mol
+    monomerenergy=(energy)
     return monomerenergy
 
 def CheckIfLogFileUsingGaussian(f):
@@ -460,7 +460,7 @@ def ReadQMLogFile(dimersplogfiles):
             found=False
             for line in tmpfh:
                 if 'Counterpoise: corrected energy =' in line:
-                    dimerenergy=float(line.split()[4])*Hartree2kcal_mol
+                    dimerenergy=float(line.split()[4])
                     found=True
                 elif 'Counterpoise: doing DCBS calculation for fragment   1' in line:
                     frag1calc=True
@@ -479,7 +479,7 @@ def ReadQMLogFile(dimersplogfiles):
             for line in tmpfh:
                 if 'CP Energy =' in line and 'print' not in line:
                     linesplit=line.split()
-                    interenergy=float(linesplit[3])*Hartree2kcal_mol
+                    interenergy=float(linesplit[3])
         if interenergy!=None:
             dimerenergies.append(interenergy)    
             newdimersplogfiles.append(f)
@@ -916,13 +916,14 @@ def GenerateQMTargetsFolder(dimertinkerxyzfileslist,dimerenergieslist,liquidkeyf
                 newenergyarray=[]
                 arr=np.arange(0,len(dimertinkerxyzfiles))
                 arcwriter=open('all.arc','w')
+         
                 for i in range(len(arr)):
                     value=arr[i]
                     tinkerxyzfile=dimertinkerxyzfiles[i]
                     dimerenergy=dimerenergies[i]
                     head,tail=os.path.split(tinkerxyzfile)
                     tinkerxyzfileprefix=tail.split('.')[0]
-                    newname=tinkerxyzfileprefix+str(value)
+                    newname=tail+' '+str(value)
                     temp=open(tinkerxyzfile,'r')
                     results=temp.readlines()
                     temp.close() 
@@ -935,7 +936,6 @@ def GenerateQMTargetsFolder(dimertinkerxyzfileslist,dimerenergieslist,liquidkeyf
                     newenergyarray.append(dimerenergy) 
                     for line in results:
                         arcwriter.write(line)
-                
                 arcwriter.close()
                 energywriter=open('qdata.txt','w')
                 for i in range(len(arr)):
@@ -1519,7 +1519,6 @@ def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liq
     listoftptopropdics=CombineData(temperature_list,pressure_list,enthalpy_of_vaporization_list,enthalpy_of_vaporization_err_list,surface_tension_list,surface_tension_err_list,relative_permittivity_list,relative_permittivity_err_list,isothermal_compressibility_list,isothermal_compressibility_err_list,isobaric_coefficient_of_volume_expansion_list,isobaric_coefficient_of_volume_expansion_err_list,heat_capacity_at_constant_pressure_list,heat_capacity_at_constant_pressure_err_list,density_list,density_err_list,citation_list)
     if poltypepathlist!=None:
         keyfilelist,xyzfilelist,dimertinkerxyzfileslist,dimerenergieslist,molnamelist,molfilelist,dimersplogfileslist,finalxyzfilelist=ReadInPoltypeFiles(poltypepathlist)
-
         oldtypetonewtypelist=GenerateTypeMaps(keyfilelist)
         vdwtypelineslist=GrabVdwTypeLinesFromFinalKey(keyfilelist,vdwtypeslist)
         vdwtypelineslist=ShiftVdwTypesLines(vdwtypelineslist,oldtypetonewtypelist)
