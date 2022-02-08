@@ -274,6 +274,8 @@ accuratevdwsp            Use CBS extraction on MP2 with counterpoise on basis se
                          Default=False
 
 onlyvdwatomlist          List of Van der Waals atom indices to use in VdW refinement.
+
+addlonepairvdwsites      Add dimer ab initio near lone pair sites on target molecule atom.
 ```
 
 ### Misc.

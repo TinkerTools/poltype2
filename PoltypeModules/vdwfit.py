@@ -1023,94 +1023,6 @@ def GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indext
     return indexpairtoreferencedistance,indexpairtobounds,distpairs
 
 
-def GenerateReferenceAngles(poltype,p2,atoms2,p1,atoms1,mol,probemol,indextoreferencecoordinate):
-    indicestoreferenceangleprobe={}
-    indicestoreferenceanglemoleculeneighb={}
-    indicestoreferenceanglemoleculeneighbneighb={}
-    acceptorindex=p1
-    shiftedp2=len(atoms1)+p2
-    donorindex=shiftedp2
-    donorneighbs=[]
-    probeidxtosymclass,symmetryclass=symm.gen_canonicallabels(poltype,probemol) 
-    acceptoratom=mol.GetAtom(p1+1)
-    acceptorhyb=acceptoratom.GetHyb()
-    donoratom=probemol.GetAtom(p2+1)
-    probeneighbs=[]
-    atomatomiter=openbabel.OBAtomAtomIter(donoratom)
-    for atom in atomatomiter:
-        probeneighbs.append(atom.GetIdx())
-    acceptorneighbs=[]
-    atomatomiter=openbabel.OBAtomAtomIter(acceptoratom)
-    for atom in atomatomiter:
-        acceptorneighbs.append(atom.GetIdx())
-
-    probeneighbsymclasses=[probeidxtosymclass[i] for i in probeneighbs] 
-    probeneighbsymclassesset=list(set(probeneighbsymclasses))
-    probeneighbatoms=[probemol.GetAtom(i) for i in probeneighbs]
-    acceptorneighbatoms=[mol.GetAtom(i) for i in acceptorneighbs]
-    probeneighbs=[i-1+len(atoms1) for i in probeneighbs] # shift to 0 index, shift passed first molecule
-    acceptorneighbs=[i-1 for i in acceptorneighbs]
-    donorcoordinate=indextoreferencecoordinate[donorindex]
-    acceptorcoordinate=indextoreferencecoordinate[acceptorindex]
-    for donorneighbindex in probeneighbs:
-        if len(probeneighbs)==2 and len(probeneighbsymclassesset)==1:
-            angleatoms=[probeneighbatoms[0],donoratom,probeneighbatoms[1]]
-            bisectangle=probemol.GetAngle(angleatoms[0],angleatoms[1],angleatoms[2])
-            angle=180-.5*bisectangle 
-            angleindices=tuple([donorneighbindex,donorindex,acceptorindex])
-            indicestoreferenceangleprobe[angleindices]=angle
-
-        elif len(probeneighbs)==1:
-            angle=180
-            angleindices=tuple([donorneighbindex,donorindex,acceptorindex])
-            indicestoreferenceangleprobe[angleindices]=angle
-
-        else:
-
-            donorneighbcoordinate=indextoreferencecoordinate[donorneighbindex]
-            donortoacceptor=acceptorcoordinate-donorcoordinate
-            donortodonorneighb=donorneighbcoordinate-donorcoordinate
-            donortoacceptornormed=donortoacceptor/np.linalg.norm(donortoacceptor)
-            donortodonorneighbnormed=donortodonorneighb/np.linalg.norm(donortodonorneighb) 
-            angle=np.arccos(np.dot(donortoacceptornormed,donortodonorneighbnormed))
-            angleindices=tuple([donorneighbindex,donorindex,acceptorindex])
-            indicestoreferenceangleprobe[angleindices]=angle
-
-
-    ls=[]
-    allflat=True
-    if len(acceptorneighbs)!=1 and acceptorhyb==2:
-        angle=90
-        for acceptorneighbindex in acceptorneighbs:
-            acceptorneighbatom=mol.GetAtom(acceptorneighbindex+1)
-            acceptorneighbhyb=acceptorneighbatom.GetHyb()
-            if acceptorneighbhyb==2:
-                angleindices=tuple([donorindex,acceptorindex,acceptorneighbindex])
-                ls.append(angleindices)
-            else:
-                allflat=False
-    if allflat==True:
-        angle=90
-        for angleindices in ls:
-            indicestoreferenceanglemoleculeneighb[angleindices]=angle
-
-    elif len(acceptorneighbs)==1:
-        neighb=acceptorneighbatoms[0]
-        atomatomiter=openbabel.OBAtomAtomIter(neighb)
-        neighbofneighbsatoms=[]
-        for atom in atomatomiter:
-            neighbofneighbsatoms.append(atom)
-        for atom in neighbofneighbsatoms:
-            atomidx=atom.GetIdx()
-            if (atomidx-1)!=acceptorindex:
-                angleatoms=[atom,neighb,acceptoratom] 
-                angle=mol.GetAngle(angleatoms[0],angleatoms[1],angleatoms[2])
-                angleindices=tuple([atomidx-1,neighb.GetIdx()-1,acceptorindex,donorindex]) # acceptorindex and donorindex colinear here, but need both to get correct distance information for law of cosines
-                indicestoreferenceanglemoleculeneighbneighb[angleindices]=angle
-
-    return indicestoreferenceangleprobe,indicestoreferenceanglemoleculeneighb,indicestoreferenceanglemoleculeneighbneighb
-
-
 def GrabPairwiseDistance(pair,indexpairtoreferencedistance):
     if pair in indexpairtoreferencedistance.keys():
         distance=indexpairtoreferencedistance[pair]
@@ -1315,8 +1227,6 @@ def MinimizeDimer(poltype,inputxyz,keyfile):
     return finaloutputxyz
 
 
-
-
 def ConvertTinktoXYZ(poltype,filename,newfilename):
     temp=open(os.getcwd()+r'/'+filename,'r')
     tempwrite=open(os.getcwd()+r'/'+newfilename,'w')
@@ -1339,45 +1249,8 @@ def ConvertTinktoXYZ(poltype,filename,newfilename):
     tempwrite.close()
 
 
-def GrabAngleRestraints(poltype,indicestoangle,p1,p2shifted,p1babel,p2babel,probeidxtosymclass,angleratio,angleforceconstant,anglereslist,atoms1,restraints):
-    inputpair=tuple([p1,p2shifted])
-    indices,angleguesses=GrabAngle(inputpair,indicestoangle)
-    for i in range(len(indices)):
-        tup=indices[i]
-        angle=angleguesses[i]
-        babelindices=[j+1 for j in tup]
-        classes=[]
-        lower,upper=GrabUpperLowerBounds(poltype,angle,angleratio,angle=True)
-        resstring='RESTRAIN-ANGLE '+str(babelindices[0])+' '+str(babelindices[1])+' '+str(babelindices[2])+' '+str(angleforceconstant)+' '+str(lower)+' '+str(upper)+'\n'
-        anglereslist.append(resstring)
-        restraints.append(babelindices)
-         
-
-    return anglereslist,restraints
-
-def GrabAngle(inputpair,indicestoangle):
-    indices=[]
-    angleguesses=[]
-    for tupindices,angle in indicestoangle.items():
-        a=inputpair[0]
-        b=inputpair[1]
-        if a in tupindices and b in tupindices:
-            indices.append(tupindices[:2+1])
-            angleguesses.append(angle)
-
- 
-    return indices,angleguesses
 
 
-def GrabUpperLowerBounds(poltype,guess,ratio,angle=False):
-    if angle==False:
-        lower=guess-guess*ratio
-        upper=guess+guess*ratio
-    else:
-        lower=guess-360*ratio
-        upper=guess+360*ratio
-
-    return lower,upper
 
 def GenerateProbePathNames(poltype,vdwprobenames,moleculexyz):
     probepaths=[]
@@ -1690,6 +1563,167 @@ def CheckIfProbeIsTooFar(poltype,mol,probeindex,moleculeindex,probeatoms):
     return checktoofar
 
 
+def LonePairAboveBelowPlane(moleculeatom,mol,moleculeatomcoords,moleculeindex):
+    atomiter=openbabel.OBAtomAtomIter(moleculeatom)
+    natoms=[]
+    found=False
+    for natom in atomiter:
+        natomisinring=natom.IsInRing()
+        if natomisinring==True:
+            atomatomiter=openbabel.OBAtomAtomIter(natom)
+            for nnatom in atomatomiter:
+                nnatomidx=nnatom.GetIdx()
+                if nnatomidx!=moleculeindex and nnatom.IsInRing()==True:
+                    natoms.append(natom)
+                    natoms.append(nnatom)
+                    found=True 
+                    break
+            if found==True:
+                break
+    npos=[np.array([natom.GetX(),natom.GetY(),natom.GetZ()]) for natom in natoms]
+    displacements=[pos-moleculeatomcoords for pos in npos]
+    dists=[np.linalg.norm(natomcoords-moleculeatomcoords) for natomcoords in npos]
+    lonepairvec=np.zeros(3)
+    unitvectors=[]
+    for i in range(len(displacements)):
+        disp=displacements[i]
+        dist=dists[i]
+        unitvec=disp/dist
+        unitvectors.append(unitvec)
+    crossprod=np.cross(unitvectors[0],unitvectors[1])
+    lonepairvecs=[crossprod,-1*crossprod]
+    return lonepairvecs
+
+def LonePairBisector(moleculeatom,mol,moleculeatomcoords,moleculeindex):
+    atomiter=openbabel.OBAtomAtomIter(moleculeatom)
+    natoms=[]
+    for natom in atomiter:
+        natoms.append(natom)
+    npos=[np.array([natom.GetX(),natom.GetY(),natom.GetZ()]) for natom in natoms]
+    displacements=[pos-moleculeatomcoords for pos in npos]
+    dists=[np.linalg.norm(natomcoords-moleculeatomcoords) for natomcoords in npos]
+    lonepairvec=np.zeros(3)
+    unitvectors=[]
+    for i in range(len(displacements)):
+        disp=displacements[i]
+        dist=dists[i]
+        unitvec=disp/dist
+        unitvectors.append(unitvec)
+    disp=unitvectors[0]-unitvectors[1]
+    disp=.5*disp
+    lonepairvec=disp-moleculeatomcoords
+    norm=np.linalg.norm(lonepairvec)
+    lonepairvec=-1*lonepairvec/norm 
+    lonepairvecs=[lonepairvec]
+    return lonepairvecs
+
+
+def AddLonePairPoints(poltype,newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms,moleculeindex,probeindex,mol,probeatoms,newfilename):
+    added=False
+    moleculeatom=mol.GetAtom(moleculeindex)
+    atomicnum=moleculeatom.GetAtomicNum()
+    val=moleculeatom.GetValence()
+    atomisinring=moleculeatom.IsInRing()
+    probeatom=mol.GetAtom(probeindex)
+    moleculeatomcoords=np.array([moleculeatom.GetX(),moleculeatom.GetY(),moleculeatom.GetZ()])
+    probeatomcoords=np.array([probeatom.GetX(),probeatom.GetY(),probeatom.GetZ()])
+    molprobedist=np.linalg.norm(probeatomcoords-moleculeatomcoords)
+    singlepairangle=22.5*0.0174533 # +/- angle from middle
+    doublepairangle=60*0.0174533 # +/- angle from middle
+    triplepairangle=22.5*0.0174533 # +/- angle from midle pair, just treat as 3 seperate cones
+    if poltype.addlonepairvdwsites==True:
+        check=False
+        if atomicnum==7 and val==3 and atomisinring==False:
+            angle=singlepairangle
+            atomiter=openbabel.OBAtomAtomIter(moleculeatom)
+            natoms=[]
+            for natom in atomiter:
+                natoms.append(natom)
+            npos=[np.array([natom.GetX(),natom.GetY(),natom.GetZ()]) for natom in natoms]
+            displacements=[pos-moleculeatomcoords for pos in npos]
+            dists=[np.linalg.norm(natomcoords-moleculeatomcoords) for natomcoords in npos]
+            lonepairvec=np.zeros(3)
+            for i in range(len(displacements)):
+                disp=displacements[i]
+                dist=dists[i]
+                unitvec=disp/dist
+                lonepairvec+=unitvec 
+                norm=np.linalg.norm(lonepairvec)
+                lonepairvec=lonepairvec/norm
+            lonepairvec=-1*lonepairvec 
+            check=True
+            lonepairvecs=[lonepairvec]
+
+        elif atomicnum==7 and val==3 and atomisinring==True:
+            angle=singlepairangle
+            check=True
+            lonepairvecs=LonePairAboveBelowPlane(moleculeatom,mol,moleculeatomcoords,moleculeindex)
+
+        elif atomicnum==7 and val==2 and atomisinring==True:
+            angle=singlepairangle
+            check=True
+            lonepairvecs=LonePairAboveBelowPlane(moleculeatom,mol,moleculeatomcoords,moleculeindex)
+
+
+        elif atomicnum==8 or atomicnum==16 and atomisinring==True:
+            angle=singlepairangle
+            check=True
+            lonepairvecs=LonePairAboveBelowPlane(moleculeatom,mol,moleculeatomcoords,moleculeindex)
+
+
+        elif atomicnum==8 or atomicnum==16 and atomisinring==False:
+            angle=doublepairangle
+            check=True
+            lonepairvecs=LonePairBisector(moleculeatom,mol,moleculeatomcoords,moleculeindex)
+
+        elif atomicnum==9 or atomicnum==17 or atomicnum==35 or atomicnum==53:
+            angle=triplepairangle
+            check=True
+            atomiter=openbabel.OBAtomAtomIter(moleculeatom)
+            natoms=[]
+            for natom in atomiter:
+                natoms.append(natom)
+            npos=[np.array([natom.GetX(),natom.GetY(),natom.GetZ()]) for natom in natoms]
+            displacements=[pos-moleculeatomcoords for pos in npos]
+            dists=[np.linalg.norm(natomcoords-moleculeatomcoords) for natomcoords in npos]
+            unitvector=displacements[0]/dists[0]
+            lonepairvec=-1*unitvector
+            ux=lonepairvec[0]
+            uy=lonepairvec[1]
+            uz=lonepairvec[2]
+            x=ux
+            y=uy
+            z=-(ux*x+uy*y)/uz
+            anothervec=np.array([x,y,z])
+            norm=np.linalg.norm(anothervec)
+            anothervec=anothervec/norm 
+            lonepairvecs=[lonepairvec,anothervec]
+
+        if check==True:
+            foundone=False
+            for i in range(len(lonepairvecs)):
+                lonepairvec=lonepairvecs[i]
+                x1=moleculeatomcoords
+                x2=x1+lonepairvec
+                x0=probeatomcoords
+                d=np.linalg.norm(np.cross(x2-x1,x1-x0))/np.linalg.norm(x2-x1)
+                t=-1*np.dot(x1-x0,x2-x1)/np.linalg.norm(x2-x1)**2
+                hvec=x1+t*lonepairvec
+                h=np.linalg.norm(hvec-x1)
+                R=h*np.tan(angle)
+                if R<=d:
+                    added=True
+                    newdimerfiles.append([newfilename])
+                    newprobeindices.append([probeindex])
+                    newmoleculeindices.append([moleculeindex])
+                    newnumberprobeatoms.append([probeatoms]) 
+                if added==True:
+                    break
+
+
+    return newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms,added
+
+
 
 def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprobeatoms):
     newdimerfiles=[]
@@ -1701,7 +1735,7 @@ def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprob
     dimertypetoprobeindexarray={}
     dimertypetonumberofprobeatoms={}
     obConversion = openbabel.OBConversion()
-
+    moleculeindextoaddedlonepair={}
     for i in range(len(probeindices)):
         filenameslistoflist=dimerfiles[i]
         probeindexlistoflist=probeindices[i]
@@ -1714,7 +1748,7 @@ def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprob
             filename=filenameslist[j]
             probeindex=probeindexlist[j]
             moleculeindex=moleculeindexlist[j]
-            
+            added=False 
             newfilename=filename.replace('.xyz_2','cart.xyz')
             ConvertTinktoXYZ(poltype,filename,newfilename)
             mol = openbabel.OBMol()
@@ -1723,7 +1757,6 @@ def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprob
             obConversion.ReadFile(mol, newfilename)
             checktoofar=CheckIfProbeIsTooFar(poltype,mol,probeindex,moleculeindex,probeatoms)
             if checktoofar==True:
-                
                 continue
             filenameout=filename.replace('.xyz_2','.alz')
             term,error=poltype.CheckNormalTermination(filenameout)
@@ -1740,20 +1773,26 @@ def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprob
                 dimertype=tuple([moleculeindex,probeindex,hetero])
             else:
                 dimertype=tuple([moleculeindex]) # keep only one of water orientations
-            if dimertype not in dimertypetofilenamearray.keys():
-                dimertypetofilenamearray[dimertype]=[]
-            dimertypetofilenamearray[dimertype].append(newfilename)
-            if dimertype not in dimertypetoenergyarray.keys():
-                dimertypetoenergyarray[dimertype]=[]
-            dimertypetoenergyarray[dimertype].append(energy)
-            if dimertype not in dimertypetoprobeindexarray.keys():
-                dimertypetoprobeindexarray[dimertype]=[]
-            dimertypetoprobeindexarray[dimertype].append(probeindex)
-            if dimertype not in dimertypetonumberofprobeatoms.keys():
-                dimertypetonumberofprobeatoms[dimertype]=[]
-            dimertypetonumberofprobeatoms[dimertype].append(probeatoms)
+            if moleculeindex not in moleculeindextoaddedlonepair.keys():
+                moleculeindextoaddedlonepair[moleculeindex]=False
+            if moleculeindextoaddedlonepair[moleculeindex]==False:
+                newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms,added=AddLonePairPoints(poltype,newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms,moleculeindex,probeindex,mol,probeatoms,newfilename)
+            if added==False:
+                if dimertype not in dimertypetofilenamearray.keys():
+                    dimertypetofilenamearray[dimertype]=[]
+                dimertypetofilenamearray[dimertype].append(newfilename)
+                if dimertype not in dimertypetoenergyarray.keys():
+                    dimertypetoenergyarray[dimertype]=[]
+                dimertypetoenergyarray[dimertype].append(energy)
+                if dimertype not in dimertypetoprobeindexarray.keys():
+                    dimertypetoprobeindexarray[dimertype]=[]
+                dimertypetoprobeindexarray[dimertype].append(probeindex)
+                if dimertype not in dimertypetonumberofprobeatoms.keys():
+                    dimertypetonumberofprobeatoms[dimertype]=[]
+                dimertypetonumberofprobeatoms[dimertype].append(probeatoms)
+            else:
+                moleculeindextoaddedlonepair[moleculeindex]=True
     newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms=SortStructuresViaEnergy(poltype,newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms,dimertypetoenergyarray,dimertypetofilenamearray,dimertypetoprobeindexarray,dimertypetonumberofprobeatoms)
-    
     return newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms
 
 def SortStructuresViaEnergy(poltype,newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms,dimertypetoenergyarray,dimertypetofilenamearray,dimertypetoprobeindexarray,dimertypetonumberofprobeatoms):
@@ -1852,6 +1891,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
 
     dimerfiles,probeindices,moleculeindices,numberprobeatoms=GenerateInitialProbeStructures(poltype,missingvdwatomindices)
     dimerfiles,probeindices,moleculeindices,numberprobeatoms=FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprobeatoms)
+
     obConversion = openbabel.OBConversion()
     checkarray=[]
     fullprefixarrays=[]
