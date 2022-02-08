@@ -280,6 +280,9 @@ addlonepairvdwsites      Add dimer ab initio near lone pair sites on target mole
 
 ### Misc.
 ```
+sleeptime                Number of seconds to wait before each loop iteration in job submission queue.
+                         Default=5
+
 keyfiletoaddtodatabase   specifies to add keyfile parameters to amoeba09 parameter file, located in ParameterFiles/.
                          Default=None
 
