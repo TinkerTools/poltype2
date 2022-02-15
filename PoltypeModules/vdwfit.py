@@ -651,6 +651,7 @@ def PlotEnergyVsDistance(poltype,distarray,prefix,radii,depths,reds,vdwtypesarra
 
 
 def ReadIntermolecularEnergyMM(poltype,filename):
+    energy=None
     with open(filename,'r') as f:
         results=f.readlines()
         for line in results:
@@ -1211,19 +1212,26 @@ def optimizedimers(poltype,atoms1, atoms2, coords1, coords2, p1, p2, oridimer,vd
         probeatoms=len(atoms2)
         ConvertProbeDimerXYZToTinkerXYZ(poltype,dimer,poltype.xyzoutfile,outputxyz,waterbool,probeatoms)
         outputxyz=MinimizeDimer(poltype,outputxyz,poltype.key4fname)
-        minstructs.append(outputxyz)
+        if outputxyz!=None:
+            minstructs.append(outputxyz)
     return minstructs
 
 def MinimizeDimer(poltype,inputxyz,keyfile):
     torminlogfname=inputxyz.replace('.xyz','.out')
     mincmdstr = poltype.minimizeexe+' '+inputxyz+' -k '+keyfile+' 0.1'+' '+'>'+torminlogfname
     term,error=poltype.CheckNormalTermination(torminlogfname)
+    errorjobs=[]
     if term==True and error==False:
         pass
     else:
-        poltype.call_subsystem([mincmdstr],True)
-
-    finaloutputxyz=inputxyz+'_2'
+        poltype.call_subsystem([mincmdstr],False)
+        temp={mincmdstr:torminlogfname} 
+        finishedjobs,errorjobs=poltype.WaitForTermination(temp,True)
+        print('done waiting',inputxyz,flush=True)
+    if len(errorjobs)==0:
+        finaloutputxyz=inputxyz+'_2'
+    else:
+        finaloutputxyz=None
     return finaloutputxyz
 
 
@@ -1349,7 +1357,7 @@ def GenerateInitialProbeStructures(poltype,missingvdwatomindices):
                         alreadyused.append(setls)
                         e1=atoms1[p1]
                         e2=atoms2[p2]
-                        if e1=='H' and e2=='H':
+                        if (e1=='H' and e2=='H') or (e1=='O' and e2=='O'):
                             continue
                         dimer = mol[:-4] + "-" + probename[:-4] + "_" + str("%d_%d"%(p1+1,len(atoms1)+p2+1)) + ".xyz"
                         minstructs=optimizedimers(poltype,atoms1, atoms2, coords1, coords2, p1, p2, dimer,vdwradius,poltype.mol,probemol,probeidxtosymclass)
@@ -1412,7 +1420,6 @@ def intersection(poltype,lst1, lst2):
     return lst3
 
 def CombineProbesThatNeedToBeFitTogether(poltype,probeindices,moleculeindices,fullprefixarrays,fulldistarrays,alloutputfilenames):
-
     newprobeindices=[]
     newmoleculeindices=[]
     newprefixarrays=[]
@@ -1472,7 +1479,7 @@ def CombineProbesThatNeedToBeFitTogether(poltype,probeindices,moleculeindices,fu
         index=ls[0]
         if index not in indicesgrouped:
             indicesgrouped.append(index)
-            if index not in indextoindexlist.keys():
+            if i not in indextoindexlist.keys():
                 indextoindexlist[i]=[]
             indextoindexlist[i].append(i)
 
@@ -1533,16 +1540,14 @@ def RemoveIgnoredIndices(poltype,probeindices,moleculeindices,moleculeprobeindic
     return finalprobeindices,finalmoleculeindices
 
 
-def CheckIfProbeIsTooFar(poltype,mol,probeindex,moleculeindex,probeatoms):
+def CheckIfProbeIsTooFarOrTooClose(poltype,mol,probeindex,moleculeindex,probeatoms):
     checktoofar=False
     moleculeatom=mol.GetAtom(moleculeindex)
     probeatom=mol.GetAtom(probeindex)
     moleculeatomcoords=np.array([moleculeatom.GetX(),moleculeatom.GetY(),moleculeatom.GetZ()])
     probeatomcoords=np.array([probeatom.GetX(),probeatom.GetY(),probeatom.GetZ()])
     dist=np.linalg.norm(probeatomcoords-moleculeatomcoords)
-
-    if dist>=5:
-
+    if dist>=5 or dist<1.6:
         checktoofar=True
     atomiter=openbabel.OBMolAtomIter(mol)
     total=0
@@ -1550,6 +1555,7 @@ def CheckIfProbeIsTooFar(poltype,mol,probeindex,moleculeindex,probeatoms):
         total+=1
     tol=.5
     maxatomindex=total-probeatoms-1
+    print('maxatomindex',maxatomindex)
     atomiter=openbabel.OBMolAtomIter(mol)
     for atom in atomiter:
         atomindex=atom.GetIndex()
@@ -1557,8 +1563,13 @@ def CheckIfProbeIsTooFar(poltype,mol,probeindex,moleculeindex,probeatoms):
         if theatomindex!=(moleculeindex) and atomindex<=maxatomindex:
             othermoleculeatomcoords=np.array([atom.GetX(),atom.GetY(),atom.GetZ()])
             otherdist=np.linalg.norm(probeatomcoords-othermoleculeatomcoords)
+            print('atomindex',atomindex,'theatomindex',theatomindex,'moleculeindex',moleculeindex,'probeindex',probeindex)
+            print('dist',dist,'otherdist',otherdist)
             if otherdist+tol<dist:
                 checktoofar=True
+        
+
+
 
     return checktoofar
 
@@ -1755,7 +1766,8 @@ def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprob
             inFormat = obConversion.FormatFromExt(newfilename)
             obConversion.SetInFormat(inFormat)
             obConversion.ReadFile(mol, newfilename)
-            checktoofar=CheckIfProbeIsTooFar(poltype,mol,probeindex,moleculeindex,probeatoms)
+            print('newfilename',newfilename)
+            checktoofar=CheckIfProbeIsTooFarOrTooClose(poltype,mol,probeindex,moleculeindex,probeatoms)
             if checktoofar==True:
                 continue
             filenameout=filename.replace('.xyz_2','.alz')
@@ -1766,6 +1778,8 @@ def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprob
                 cmdstr=poltype.analyzeexe+' '+filename+' '+'-k '+poltype.key4fname +' e '+'> '+filenameout
                 poltype.call_subsystem([cmdstr],True)
             energy=ReadIntermolecularEnergyMM(poltype,filenameout)
+            if energy==None:
+                continue
             hetero=True
             if 'water'not in newfilename:
                 hetero=False
@@ -1793,6 +1807,7 @@ def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprob
             else:
                 moleculeindextoaddedlonepair[moleculeindex]=True
     newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms=SortStructuresViaEnergy(poltype,newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms,dimertypetoenergyarray,dimertypetofilenamearray,dimertypetoprobeindexarray,dimertypetonumberofprobeatoms)
+    print('newdimerfiles',newdimerfiles)
     return newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms
 
 def SortStructuresViaEnergy(poltype,newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms,dimertypetoenergyarray,dimertypetofilenamearray,dimertypetoprobeindexarray,dimertypetonumberofprobeatoms):
@@ -1930,12 +1945,13 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             prefix=filename.replace('.xyz','')
             check=CheckIfFittingCompleted(poltype,prefix)
             checkarray.append(check)
-            poltype.comoptfname=prefix+'-opt.com'
-            poltype.chkoptfname=prefix+'-opt.chk'
-            poltype.fckoptfname=prefix+'-opt.fchk'
-            poltype.logoptfname=prefix+'-opt.log'
-            poltype.gausoptfname=prefix+'-opt.log'
             if poltype.use_qmopt_vdw==True:
+                poltype.comoptfname=prefix+'-opt.com'
+                poltype.chkoptfname=prefix+'-opt.chk'
+                poltype.fckoptfname=prefix+'-opt.fchk'
+                poltype.logoptfname=prefix+'-opt.log'
+                poltype.gausoptfname=prefix+'-opt.log'
+
                 optmol,error = opt.GeometryOptimization(poltype,mol,loose=True,checkbonds=False,modred=False,bondanglerestraints=restraints,skipscferror=False,charge=totchg,skiperrors=True)
                 if error==True:
                     moleculeprobeindicestoignore.append([moleculeindex,probeindex])

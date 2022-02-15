@@ -507,15 +507,36 @@ def GrabVdwTypeLinesFromFinalKey(keyfilelist,vdwtypeslist):
 
     return vdwtypelineslist
 
-def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogether,keyfilelines,addwaterprms,prmfilelines):
+def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogether,keyfilelines,addwaterprms,prmfilelines,vdwprmtypestofit,vdwtypestoeval,vdwtypeslist):
+    vdwtypetoindex={'S':2,'T':3,'D':4}
+    prmtypestofit=[vdwtypetoindex[i] for i in vdwprmtypestofit]
+    prmtypestoeval=[vdwtypetoindex[i] for i in vdwtypestoeval]
+    transferprmstofit=[]
+    for index in vdwtypetoindex.values():
+        if index not in prmtypestoeval:
+            if index==4:
+                 if 4 in prmtypestofit:
+                     transferprmstofit.append(index)
+
+            else:
+                transferprmstofit.append(index)
     try:
         length=len(fittypestogether)
-        array=np.array(fittypestogether)
-        array=np.transpose(array)
+        indextogroup={}
+        array=[]
+        for i in range(len(fittypestogether)):
+            row=fittypestogether[i]
+            for j in range(len(row)):
+                if j not in indextogroup.keys():
+                    indextogroup[j]=[]
+                value=row[j]
+                indextogroup[j].append(value)
+        for index,group in indextogroup.items():
+            array.append(group)
+                 
                 
     except:
         array=[]
-
     if not os.path.isdir('forcefield'):
         os.mkdir('forcefield')
     os.chdir('forcefield')
@@ -537,10 +558,15 @@ def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogethe
             linesplit.append('#')
             if vdwtype not in typestonothaveprmkeyword:
                 linesplit.append('PRM')
-                linesplit.append('2')
-                linesplit.append('3')
+                if 2 in prmtypestofit:
+                    linesplit.append('2')
+                if 3 in prmtypestofit:
+                    linesplit.append('3')
                 if linelen==5 and last!=1:
-                    linesplit.append('4')
+                    if 4 in prmtypestofit:
+                        linesplit.append('4')
+                    else:
+                        linesplit[4]='1'
             if linelen==5 and last!=1:
                 vdwtypetored[vdwtype]=True
             else:
@@ -556,10 +582,19 @@ def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogethe
                 line=vdwtypetoline[int(vdwtype)]
                 red=vdwtypetored[int(vdwtype)]
                 line=line.replace('\n','')
-                line+=" EVAL 2 PRM['VDWS/%s']"%(str(firsttype)) 
-                line+=" 3 PRM['VDWT/%s']"%(str(firsttype)) 
+                if len(transferprmstofit)!=0:
+                    line+=" PRM"
+                    for idx in transferprmstofit:
+                        line+=' '+str(idx) 
+   
+                line+=" EVAL "
+                if 2 in prmtypestoeval:
+                    line+="2 PRM['VDWS/%s']"%(str(firsttype)) 
+                if 3 in prmtypestoeval:
+                    line+=" 3 PRM['VDWT/%s']"%(str(firsttype)) 
                 if red==True:
-                    line+=" 4 PRM['VDWD/%s']"%(str(firsttype)) 
+                    if 4 in prmtypestoeval:
+                        line+=" 4 PRM['VDWD/%s']"%(str(firsttype)) 
 
                 line+='\n'
                 vdwtypetoline[int(vdwtype)]=line
@@ -581,6 +616,9 @@ def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogethe
         temp.write(line) 
     temp.close()
     temp.close()
+    for vdwtypes in vdwtypeslist:
+        CommentOutVdwLines(molprmfilepath,vdwtypes)
+        time.sleep(1)
     os.chdir('..')
     return molprmfilepath
     
@@ -602,12 +640,16 @@ def CommentOutVdwLines(keypath,vdwtypes):
     read=open(keypath,'r')
     results=read.readlines()
     read.close()
-    tempname=keypath.replace('.key','-t.key')
+    if '.key' in keypath:
+        tempname=keypath.replace('.key','-t.key')
+    else:
+        tempname=keypath.replace('.prm','-t.prm')
+
     temp=open(tempname,'w')
     for lineidx in range(len(results)):
         line=results[lineidx]
         for vdwtype in vdwtypes:
-            if str(vdwtype) in line and 'vdw' in line:
+            if str(vdwtype) in line and 'vdw' in line and 'PRM' not in line and 'EVAL' not in line:
                 newline='# '+line
                 results[lineidx]=newline
     for line in results:
@@ -839,6 +881,33 @@ def RemoveBoxLine(xyzfile):
     os.replace(tempname,xyzfile)
 
 
+def AddKeyWord(keypath,string):
+    read=open(keypath,'r')
+    results=read.readlines()
+    read.close()
+    tempkeyname=keypath.replace('.key','-t.key')
+    temp=open(tempkeyname,'w')
+    temp.write(string)
+    for line in results:
+        temp.write(line)
+    temp.close()
+    os.remove(keypath)
+    os.rename(tempkeyname,keypath)
+
+def RemoveKeyWord(keypath,keystring):
+    read=open(keypath,'r')
+    results=read.readlines()
+    read.close()
+    tempname=keypath.replace('.key','-t.key')
+    temp=open(tempname,'w')
+    for line in results:
+        if keystring not in line:
+            temp.write(line)
+    temp.close()
+    os.remove(keypath)
+    os.rename(tempname,keypath)
+
+
 def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist,indextogeneratecsv,keyfilelines,minimizepath,molprmfilepath,finalxyzfilelist):
     gaskeyfilelist=[]
     gasxyzfilelist=[]
@@ -863,7 +932,10 @@ def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfile
             numbermolecules=int(density*boxlength**3/mass)
             liquidkeyfile=GenerateNewKeyFile(keyfile,prmfilepath,moleculeprmfilename,axis,addwaterprms,molname)
             liquidxyzfile=CreateSolventBox(axis,numbermolecules,prmfilepath,xyzeditpath,gasxyzfile,molname,keyfilels,molprmfilepath)
-            #Minimize(liquidxyzfile,liquidkeyfile,minimizepath,molprmfilepath)
+            AddKeyWord(liquidkeyfile,'polarizeterm none'+'\n')
+            Minimize(liquidxyzfile,liquidkeyfile,minimizepath,molprmfilepath)
+            RemoveKeyWord(liquidkeyfile,'polarizeterm')
+            Minimize(liquidxyzfile,liquidkeyfile,minimizepath,molprmfilepath)
         else:
             liquidxyzfile=None
             liquidkeyfile=None
@@ -1365,10 +1437,10 @@ def RemoveExtraFiles():
     files=os.listdir()
     for f in files:
         if not os.path.isdir(f):
-            if '.' in f:
+            if '.' in f and 'nohup' not in f:
                 fsplit=f.split('.')
                 ext=fsplit[-1]
-                if ext=='key' or 'xyz' in ext or f=='xyzedit.in' or ('data' in f and 'csv' in f):
+                if ext=='key' or 'xyz' in ext or f=='xyzedit.in' or ('data' in f and 'csv' in f) or ext=='out' or ext=='prm':
                     os.remove(f)
 
 
@@ -1424,7 +1496,7 @@ def ReadPRMFile(prmfilepath):
 
     return prmfilelines
 
-def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_prod_steps,gas_timestep,gas_interval,md_threads,liquid_prod_time,gas_prod_time,WQ_PORT,csvexpdatafile,fittypestogether):
+def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_prod_steps,gas_timestep,gas_interval,md_threads,liquid_prod_time,gas_prod_time,WQ_PORT,csvexpdatafile,fittypestogether,vdwprmtypestofit,vdwtypestoeval):
     
 
     debugmode=False
@@ -1539,7 +1611,7 @@ def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liq
         xyzeditpath=SanitizeMMExecutable(xyzeditpath,tinkerdir)
         moleculeprmfilename='molecule.prm'
         
-        molprmfilepath=GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogether,keyfilelines,addwaterprms,prmfilelines)
+        molprmfilepath=GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogether,keyfilelines,addwaterprms,prmfilelines,vdwprmtypestofit,vdwtypestoeval,vdwtypeslist)
         rdkitmollist=GenerateRdkitMolList(molfilelist)
         atomnumlist=[rdkitmol.GetNumAtoms() for rdkitmol in rdkitmollist]
         gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,liquidxyzfilelist,datacsvpathlist=GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist,indextogeneratecsv,keyfilelines,minimizepath,molprmfilepath,newfinalxyzfilelist)

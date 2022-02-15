@@ -366,18 +366,6 @@ If there are no python errors as shown above, please read *-poltype.log to trace
 
 ### ForceBalance Poltype Wrapper
  
-* Install modified forcebalance for Tinker9 GPU dynamics
-```
-cd ~
-git clone https://github.com/bdw2292/forcebalance.git
-```
-
-* Make sure to copy files from modified forcebalance to conda site packages (for example mine are located /home/bdw2292/miniconda3/envs/FBTest/lib/python3.8/site-packages/forcebalance/) 
-```
-cp ~/forcebalance/src/*py /home/bdw2292/miniconda3/envs/amoebamdpoltype/lib/python3.6/site-packages/forcebalance/
-cp ~/forcebalance/src/data/*py /home/bdw2292/miniconda3/envs/amoebamdpoltype/lib/python3.6/site-packages/forcebalance/data/
-
-```
 
 * Example input
 ```
@@ -418,4 +406,15 @@ md_threads                                           CPU cores
 liquid_prod_time                                     Total time liquid sim
 gas_prod_time                                        Total time gas sim
 debugmode                                            Sets MD to very short time for testing ForceBalance (.001 ns)
+vdwprmtypestofit                                     Sets allowed parameter types for all vdw parameters to fit for vdw (radius S, depth  T, shift D), default=S,T,D . Default makes all vdw parameter types able to be fit.
+vdwtypestoeval                           For parameters being fixed, this tells poltype which ones to fix (while the first instance of parameters is fit), default all parameters are evaluated besides for instance vdwtypestoeval=S,T,D. 
+
+
+```
+
+* View ForceBalance results
+```
+conda activate pymolenv
+python /home/bdw2292/poltype2/PoltypeModules/plotFBresults.py /home/bdw2292/FBJobs/
+ 
 ```

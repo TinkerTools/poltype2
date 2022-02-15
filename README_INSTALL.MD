@@ -108,3 +108,33 @@ export PATH=/opt/gdma/gdma-2.3.3/bin/:$PATH # example GDMA directory
 export PSI_SCRATCH=/scratch/$myusername/ # example PSI4 scratch directory
 ```
 
+
+### ForceBalance Wrapper Setup
+* Install modified forcebalance for Tinker9 GPU dynamics
+```
+cd ~
+git clone https://github.com/bdw2292/forcebalance.git
+```
+
+* Make sure to copy files from modified forcebalance to conda site packages (for example mine are located /home/bdw2292/miniconda3/envs/FBTest/lib/python3.8/site-packages/forcebalance/) 
+```
+conda install -c conda-forge forcebalance --yes
+cp ~/forcebalance/src/*py /home/bdw2292/miniconda3/envs/amoebamdpoltype/lib/python3.6/site-packages/forcebalance/
+cp ~/forcebalance/src/data/*py /home/bdw2292/miniconda3/envs/amoebamdpoltype/lib/python3.6/site-packages/forcebalance/data/
+
+```
+
+
+### ForceBalance Results Viewing
+* Envioronment for generating images with PyMol and matplotlib
+
+```
+conda create --name pymolenv --yes
+conda activate pymolenv
+conda install -c conda-forge -c schrodinger pymol-bundle --yes
+conda install -c conda-forge matplotlib --yes
+conda install -c anaconda scipy --yes
+conda install -c anaconda scikit-learn --yes
+```
+* Make sure license file is located in /home/USERNAME/.pymol/license.lic
+
