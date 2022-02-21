@@ -935,7 +935,7 @@ def WriteOutParamTable(moltotypetoprms,moltotypetoelement):
     tempname='SummaryParams.csv'
     with open(tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        header=['Name','Element','Radius','Depth','Shrink']
+        header=['Name','Element','Radius','Depth','Reduction']
         energy_writer.writerow(header)
         for mol,typetoprms in moltotypetoprms.items():
             typetoelement=moltotypetoelement[mol]

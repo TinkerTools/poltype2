@@ -2041,7 +2041,8 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
                     vdwtype=poltype.idxtosymclass[moleculeindex]
                     atom=poltype.mol.GetAtom(moleculeindex)
                     valence=atom.GetValence()
-                    if valence==1:
+                    atomicnum=atom.GetAtomicNum()
+                    if valence==1 and atomicnum!=8 and atomicnum!=16:
                        fitred=True
                     else:
                        fitred=False

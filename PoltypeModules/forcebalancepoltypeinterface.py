@@ -562,16 +562,22 @@ def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogethe
                     linesplit.append('2')
                 if 3 in prmtypestofit:
                     linesplit.append('3')
-                if linelen==5 and last!=1:
-                    if 4 in prmtypestofit:
-                        linesplit.append('4')
-                    else:
-                        linesplit[4]='1'
+                if 4 in prmtypestofit:
+                    if linelen==5 and last!=1:
+                        if 4 in prmtypestofit:
+                            linesplit.append('4')
+                        else:
+                            linesplit[4]='1'
+                else:
+                    linesplit[4]='1'
+            
             if linelen==5 and last!=1:
                 vdwtypetored[vdwtype]=True
             else:
                 vdwtypetored[vdwtype]=False
-
+            if 4 not in prmtypestofit:
+                linesplit[4]='1'
+                vdwtypetored[vdwtype]=False
             newline=' '.join(linesplit)+'\n'
             vdwtypetoline[vdwtype]=newline   
     if len(array)!=0:
