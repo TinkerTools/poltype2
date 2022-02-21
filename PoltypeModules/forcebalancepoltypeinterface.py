@@ -649,7 +649,7 @@ def CommentOutVdwLines(keypath,vdwtypes):
     for lineidx in range(len(results)):
         line=results[lineidx]
         for vdwtype in vdwtypes:
-            if str(vdwtype) in line and 'vdw' in line and 'PRM' not in line and 'EVAL' not in line:
+            if (' '+str(vdwtype)+' ') in line and 'vdw' in line and 'PRM' not in line and 'EVAL' not in line:
                 newline='# '+line
                 results[lineidx]=newline
     for line in results:

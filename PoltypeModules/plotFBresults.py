@@ -8,6 +8,10 @@ from math import sqrt
 import csv
 from scipy.interpolate import interp1d
 from matplotlib.pyplot import cm
+from openbabel import openbabel
+from PyAstronomy import pyasl
+import mdtraj as md
+import csv
 
 fbdir=sys.argv[1]
 
@@ -46,13 +50,13 @@ def GrabResultsAllMolecules(outputfiles):
     qmdiclist=[]
     newoutputfiles=[]
     for outputfile in outputfiles:
-        #try:
-        tpdic,qmdic,outputfile=GrabResults(outputfile)
-        tpdiclist.append(tpdic)
-        qmdiclist.append(qmdic)
-        newoutputfiles.append(outputfile)
-        #except:
-            #pass
+        try:
+            tpdic,qmdic,outputfile=GrabResults(outputfile)
+            tpdiclist.append(tpdic)
+            qmdiclist.append(qmdic)
+            newoutputfiles.append(outputfile)
+        except:
+            pass
     return tpdiclist,qmdiclist,newoutputfiles
 
 def GrabResults(outputfile):
@@ -138,23 +142,96 @@ def GrabResults(outputfile):
     return tpdic,qmdic,outputfile
 
 
-def PlotAllFBJobs(tpdiclist,qmtargetnamedic):
+def PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoindices):
+    nametotptofinalprops={}
     for tpdic in tpdiclist:
-        PlotFBLiq(tpdic)
+        nametotptofinalprops=PlotFBLiq(tpdic,nametotptofinalprops)
+    nametofigs={}
+    nametoaxes={}
     for qmtarget,targetdic in qmtargetnamedic.items():
         namesplit=qmtarget.split('-')
+        name='-'.join(namesplit[:-2])
+        namesplit=name.split('-')
+        if name.count('-')>=2:
+            name='-'.join(namesplit[:-1])
+        namesplit=name.split('_')
         name=namesplit[0]
-        if not os.path.isdir(name):
-            os.mkdir(name)
-        os.chdir(name)
-        PlotFBQM(qmtarget,targetdic)
-        os.chdir('..')
+        if name not in nametofigs.keys():
+            fig = plt.figure()
+            ax1 = fig.add_subplot(111)
+            nametofigs[name]=fig
+            nametoaxes[name]=ax1
 
-def PlotFBQM(qmtarget,targetdic):
+        
+        filenametoformula=nametofilenametoformula[name]
+        n=len(list(filenametoformula.keys()))
+        color = list(iter(cm.rainbow(np.linspace(0, 1, n))))
+        filenametocolor=dict(zip(filenametoformula.keys(),color))
+        if qmtarget in filenametoformula.keys():
+            indices=truenametoindices[qmtarget] 
+            namepath=os.path.join(os.getcwd(),name)
+            if not os.path.isdir(namepath):
+                os.mkdir(name)
+            os.chdir(name)
+            formula=filenametoformula[qmtarget] 
+            c=filenametocolor[qmtarget]
+            x,rmsvalues=PlotFBQM(targetdic,formula,indices)
+            nametoaxes[name].scatter(x,rmsvalues, s=10, c=c,marker="s", label=formula)
+            x=np.array(x)
+            x_new = np.linspace(x.min(),x.max(),500)
+            try:
+                f = interp1d(x,rmsvalues, kind='quadratic')
+                y_smooth=f(x_new)
+                nametoaxes[name].plot(x_new,y_smooth,color=c)
+            except:
+                pass
+            ykey='RMSE Interaction Energy (kcal/mol)'
+            xkey='Iteration'
+            nametoaxes[name].set_ylabel(ykey,fontsize=12)
+            nametoaxes[name].set_xlabel(xkey,fontsize=12)
+            newtitle=name+' RMSE Interaction Energy Vs Iteration'
+            nametoaxes[name].set_title(newtitle)
+            nametoaxes[name].legend()
+            imagename=newtitle+'.png'
+            nametofigs[name].savefig(imagename)
+            os.chdir('..')
+
+    return nametotptofinalprops
+
+def GrabStructure(formula):
+    files=os.listdir()
+    for f in files:
+        if formula in f and '.xyz' in f and 'tinkermincart' not in f:
+            return f
+
+def GrabMolecule(newname):
+    obConversion = openbabel.OBConversion()
+    newmol = openbabel.OBMol()
+    inFormat = obConversion.FormatFromExt(newname)
+    obConversion.SetInFormat(inFormat)
+    obConversion.ReadFile(newmol,newname)
+    return newmol
+
+
+def GrabDistanceAndElements(mol,indices):
+    atoms=[mol.GetAtom(i) for i in indices]
+    coords=[np.array([atom.GetX(),atom.GetY(),atom.GetZ()]) for atom in atoms]
+    distance=np.linalg.norm(coords[0]-coords[1])
+    atomicnums=[atom.GetAtomicNum() for atom in atoms]
+    an = pyasl.AtomicNo()
+    elements=[an.getElSymbol(atomicnum) for atomicnum in atomicnums]
+    prefix='-'.join(elements)
+    return distance,prefix
+
+def PlotFBQM(targetdic,formula,indices):
     distances=targetdic['Distances']
     refvalues=np.transpose(np.array(targetdic['Ref']))
     calcvalues=np.transpose(np.array(targetdic['Calc']))
     rmsvalues=[]
+    struct=GrabStructure(formula)
+    mol=GrabMolecule(struct)
+    distance,prefix=GrabDistanceAndElements(mol,indices)
+    distances=np.array(distances)*distance
     for i in range(len(refvalues)):
         refs=refvalues[i]
         calcs=calcvalues[i]
@@ -162,25 +239,29 @@ def PlotFBQM(qmtarget,targetdic):
         rmsvalues.append(rms)
         label1='AMOEBA'
         label2='Target'
-        ykey='Interaction Energy'
-        xkey='Relative Distance'
+        ykey='Interaction Energy (kcal/mol)'
+        xkey=prefix+' Distance (Angstroms)'
         labels=[label1,label2]
-        title=qmtarget+' Iter='+str(i)
+        title=formula+' Interaction Energy Vs Distance'
         if i==len(refvalues)-1:
-            ScatterPlot2D(title,distances,calcs,refs,xkey,ykey,labels)
+            if len(distances)==len(calcs):
+                ScatterPlot2D(title,distances,calcs,refs,xkey,ykey,labels)
+                title=formula+' AMOEBA Energy Vs QM Energy'
+                ykey='AMOEBA Interaction Energy (kcal/mol)'
+                xkey='QM Interaction Energy (kcal/mol)'
+                labels=[label1]
+                ScatterPlot1D(title,refs,calcs,xkey,ykey,labels,interpolate=False,correlation=True)
     x=list(range(len(rmsvalues)))
     label1='RMSE Interaction Energy'
-    ykey='RMSE Interaction Energy'
+    ykey='RMSE Interaction Energy (kcal/mol)'
     xkey='Iteration'
     labels=[label1]
-    title=qmtarget+' RMSE vs Iteration'
-    ScatterPlot1D(title,x,rmsvalues,xkey,ykey,labels)
-
-    
-         
+    title=formula+' RMSE vs Iteration'
+    #ScatterPlot1D(title,x,rmsvalues,xkey,ykey,labels)
+    return x,rmsvalues
 
 
-def PlotFBLiq(tpdic):
+def PlotFBLiq(tpdic,nametotptofinalprops):
     for name in tpdic.keys():
         dic=tpdic[name]
         if not os.path.isdir(name):
@@ -190,11 +271,17 @@ def PlotFBLiq(tpdic):
         color = iter(cm.rainbow(np.linspace(0, 1, n)))
         proptofigs={}
         proptoaxes={}
+        if name not in nametotptofinalprops.keys():
+            nametotptofinalprops[name]={}
         for tp in dic.keys():
             innerdic=dic[tp]
             c = next(color)
+            if tp not in nametotptofinalprops[name].keys():
+                nametotptofinalprops[name][tp]={}
             for property in innerdic.keys():
                 relprop=property+'RelativeError'
+                if property not in nametotptofinalprops[name][tp].keys():
+                    nametotptofinalprops[name][tp][property]={}
                 if property not in proptofigs.keys():
                     fig = plt.figure()
                     ax1 = fig.add_subplot(111)
@@ -213,21 +300,25 @@ def PlotFBLiq(tpdic):
                 calcarray=np.array(innermostdic[calckey])
                 if property=='Enthalpy':
                     scale=0.239006 # convert kj to kcal
+                    units='(kcal/mol)'
                 else:
                     scale=1
+                    units='$kg/m^3$'
                 refarray=scale*refarray
                 calcarray=scale*calcarray
+                nametotptofinalprops[name][tp][property][refkey]=refarray[-1]
+                nametotptofinalprops[name][tp][property][calckey]=calcarray[-1]
                 err=np.abs(refarray-calcarray)
                 relerr=100*(err/refarray)
                 label1=property+' AMOEBA'
                 label2=property+' Target'
-                ykey=property
+                ykey=property+units
                 xkey='Iterations'
                 labels=[label1,label2]
                 string='T=%s,P=%s'%(str(tp[0]),str(tp[1]))
                 title=name+' '+property+' '+string
                 x=list(range(len(refarray)))
-                ScatterPlot2D(title,x,calcarray,refarray,xkey,ykey,labels)
+                #ScatterPlot2D(title,x,calcarray,refarray,xkey,ykey,labels)
                 proptoaxes[property].scatter(x,calcarray, s=10, c=c, marker="s", label='AMOEBA '+string)
                 proptoaxes[property].scatter(x,refarray, s=10, c=c, marker="o", label='Target '+string)              
                 proptoaxes[property].set_ylabel(ykey,fontsize=12)
@@ -239,19 +330,25 @@ def PlotFBLiq(tpdic):
                 refarray=np.array(refarray)
                 calcarray=np.array(calcarray)
                 x_new = np.linspace(x.min(),x.max(),500)
-                f = interp1d(x,calcarray, kind='quadratic')
-                y_smooth=f(x_new)
-                proptoaxes[property].plot(x_new,y_smooth,color=c)
-                f = interp1d(x,refarray, kind='quadratic')
-                y_smooth=f(x_new)
-                proptoaxes[property].plot(x_new,y_smooth,color=c)
+                try:
+                    f = interp1d(x,calcarray, kind='quadratic')
+                    y_smooth=f(x_new)
+                    proptoaxes[property].plot(x_new,y_smooth,color=c)
+                    f = interp1d(x,refarray, kind='quadratic')
+                    y_smooth=f(x_new)
+                    proptoaxes[property].plot(x_new,y_smooth,color=c)
+                except:
+                    pass
                 imagename=newtitle+'.png'
                 proptofigs[property].savefig(imagename)
                 proptoaxes[relprop].scatter(x,relerr, s=10, c=c, marker="s", label=string)
-                f = interp1d(x,relerr, kind='quadratic')
-                y_smooth=f(x_new)
-                proptoaxes[relprop].plot(x_new,y_smooth,color=c)
-                ykey='Relative Error '+property
+                try:
+                    f = interp1d(x,relerr, kind='quadratic')
+                    y_smooth=f(x_new)
+                    proptoaxes[relprop].plot(x_new,y_smooth,color=c)
+                except:
+                    pass
+                ykey='Relative Error '+property+units
                 proptoaxes[relprop].set_ylabel(ykey,fontsize=12)
                 proptoaxes[relprop].set_xlabel(xkey,fontsize=12)
                 newtitle=name+' '+'Relative Error '+property
@@ -262,6 +359,7 @@ def PlotFBLiq(tpdic):
 
  
         os.chdir('..')
+    return nametotptofinalprops
 
 def ScatterPlot2D(title,x,y1,y2,xkey,ykey,labels):
     x=np.array(x)
@@ -289,7 +387,7 @@ def ScatterPlot2D(title,x,y1,y2,xkey,ykey,labels):
     plt.savefig(imagename)
 
 
-def ScatterPlot1D(title,x,y1,xkey,ykey,labels):
+def ScatterPlot1D(title,x,y1,xkey,ykey,labels,interpolate=True,correlation=False):
     x=np.array(x)
     y1=np.array(y1)
     plt.figure()
@@ -301,26 +399,84 @@ def ScatterPlot1D(title,x,y1,xkey,ykey,labels):
     plt.title(title)
     x=np.array(x)
     x_new = np.linspace(x.min(),x.max(),500)
-    try:
-        f = interp1d(x,y1, kind='quadratic')
-        y_smooth=f(x_new)
-        plt.plot(x_new,y_smooth,color='red')
-    except:
-        pass
+    if interpolate==True:
+        try:
+            f = interp1d(x,y1, kind='quadratic')
+            y_smooth=f(x_new)
+            plt.plot(x_new,y_smooth,color='red')
+        except:
+            pass
+    if correlation==True:
+        slope, intercept, r_value, p_value, std_err = stats.linregress(x,y1)
+        rsquare=round(r_value*r_value,2)
+        ax.text(0.1, .9,'$R^2$=%s'%(rsquare),horizontalalignment="center",verticalalignment="center",transform = ax.transAxes)
+        ax.plot(np.array(x), slope*np.array(x) + intercept,'k-')
+
     plt.savefig(imagename)
 
+
+def GrabFinalNeatLiquidTrajectories(jobdirs):
+    moltotptoarc={}
+    ext='.arc'
+    curdir=os.getcwd()
+    for i in range(len(jobdirs)):
+        jobdir=jobdirs[i]
+        os.chdir(jobdir)
+        if os.path.isdir('optimize.tmp'):
+            os.chdir('optimize.tmp')
+            files=os.listdir()
+            for f in files:
+                if 'Liquid' in f:
+                    os.chdir(f)
+                    namesplit=f.split('_')
+                    name=namesplit[1]
+                    if name not in moltotptoarc.keys():
+                        moltotptoarc[name]={}
+                    newfiles=os.listdir()
+                    numtofolder={}
+                    for newf in newfiles:
+                        if 'iter' in newf:
+                            split=newf.split('_')
+                            num=int(split[1])
+                            numtofolder[num]=newf
+                    maxnum=max(numtofolder.keys())
+                    maxfolder=numtofolder[maxnum]
+                    os.chdir(maxfolder)
+                    morefiles=os.listdir()
+                    for finalf in morefiles:
+                        if os.path.isdir(finalf):
+                            os.chdir(finalf)
+                            evenmorefiles=os.listdir()
+                            for last in evenmorefiles:
+                                 if ext in last and 'gas' not in last:
+                                     path=os.path.join(os.getcwd(),last)
+                                     moltotptoarc[name][finalf]=path
+ 
+                            os.chdir('..')
+
+
+   
+
+
+                    os.chdir('..') 
+              
+
+ 
+                    os.chdir('..')
+    os.chdir(curdir)
+    return moltotptoarc
 
 
 def GrabDimerDistanceInfo(qmdiclist,jobdirs):
     qmtargetnamedic={}
     nametodimerstructs={}
+    truenametoindices={}
     for i in range(len(jobdirs)):
         jobdir=jobdirs[i]
         os.chdir(jobdir)
         qmdic=qmdiclist[i]
         if os.path.isdir('targets'):
             os.chdir('targets')
-           
             for name in qmdic.keys():
                 namedic=qmdic[name]
                 os.chdir(name)
@@ -348,9 +504,13 @@ def GrabDimerDistanceInfo(qmdiclist,jobdirs):
                         indextoname[index]=dimername
                     else:
                         tinkxyzlines.append(line)
+                if num==1:
+                    dimernametotinkxyzlines[dimername]=tinkxyzlines      
                 split=name.split('_')
                 truename='_'.join(split[1:-1]) 
-                nametodimerstructs[truename]=dimernametotinkxyzlines
+                if truename not in nametodimerstructs.keys():
+                    nametodimerstructs[truename]={}
+                nametodimerstructs[truename].update(dimernametotinkxyzlines)
                 indextotruename={}
                 indextodistance={}
                 for index,name in indextoname.items():
@@ -373,21 +533,29 @@ def GrabDimerDistanceInfo(qmdiclist,jobdirs):
                     sortedindices=list(sortedindextodistance.keys())
                     sortedindices=[int(k) for k in sortedindices]
                     sorteddistances=list(sortedindextodistance.values())
-                    valuedic=[namedic[k] for k in sortedindices]
-                    refvalues=[k['Ref'] for k in valuedic]
-                    calcvalues=[k['Calc'] for k in valuedic]
-                    if truename not in qmtargetnamedic.keys():
-                        qmtargetnamedic[truename]={}
-                    if 'Distances' not in qmtargetnamedic[truename].keys():
-                        qmtargetnamedic[truename]['Distances']=sorteddistances
-                    if 'Ref' not in qmtargetnamedic[truename].keys():
-                        qmtargetnamedic[truename]['Ref']=refvalues
-                    if 'Calc' not in qmtargetnamedic[truename].keys():
-                        qmtargetnamedic[truename]['Calc']=calcvalues
+                    try:
+                        valuedic=[namedic[k] for k in sortedindices]
+                        refvalues=[k['Ref'] for k in valuedic]
+                        calcvalues=[k['Calc'] for k in valuedic]
+                        if truename not in qmtargetnamedic.keys():
+                            qmtargetnamedic[truename]={}
+                            split=truename.split('_')
+                            indices=[split[-3],split[-2]]
+                            indices=[int(i) for i in indices]
+
+                            truenametoindices[truename]=indices
+                        if 'Distances' not in qmtargetnamedic[truename].keys():
+                            qmtargetnamedic[truename]['Distances']=sorteddistances
+                        if 'Ref' not in qmtargetnamedic[truename].keys():
+                            qmtargetnamedic[truename]['Ref']=refvalues
+                        if 'Calc' not in qmtargetnamedic[truename].keys():
+                            qmtargetnamedic[truename]['Calc']=calcvalues
+                    except:
+                        pass
             
                 os.chdir('..')
 
-    return qmtargetnamedic,nametodimerstructs 
+    return qmtargetnamedic,nametodimerstructs,truenametoindices 
 
 
 def Chunks(lst, n):
@@ -400,20 +568,110 @@ def ChunksList(gen):
         newlst.append(item)
     return newlst
 
-def PlotAllDimers(nametodimerstructs):
+def PlotAllDimers(nametodimerstructs,truenametoindices):
+    nametofilenametoformula={} 
     for name in nametodimerstructs.keys():
         dic=nametodimerstructs[name]
         if not os.path.isdir(name):
             os.mkdir(name)
         os.chdir(name)
         filenames=[]
+        filenametoformula={}
+        count=0
+        allindices=[]
         for dimername,tinkerxyzlines in dic.items():
+            split=dimername.split('_')
+            truename='_'.join(split[0:-1]) 
+            indices=truenametoindices[truename]
+            allindices.append(indices)
             WriteFile(dimername,tinkerxyzlines)
             newfilename=dimername.replace('.xyz','cartesian.xyz')
             ConvertTinkerXYZToCartesian(dimername,newfilename)
-            filenames.append(newfilename) 
-        PlotDimers3D(filenames)
+            monomer=GrabMonomer(newfilename)
+            monomerformula=GetMonomerFormula(monomer)
+            dimerformula=GetDimerFormula(monomerformula,newfilename)
+            os.remove(monomer)
+            os.remove(dimername)
+            dimerformula+='_'+str(count)
+            renamedfile=dimerformula+'.xyz'
+            os.rename(newfilename,renamedfile) 
+            filenames.append(renamedfile) 
+            dimersplit=dimername.split('_')
+            dimer='_'.join(dimersplit[:-1])
+            filenametoformula[dimer]=dimerformula
+            count+=1
+        nametofilenametoformula[name]=filenametoformula
+        PlotDimers3D(filenames,allindices)
         os.chdir('..')
+    return nametofilenametoformula
+
+
+def GetMonomerFormula(monomer):
+    monomerformula=''
+    temp=open(monomer,'r')
+    results=temp.readlines()
+    temp.close()
+    elementcounts={}
+    for line in results:
+        linesplit=line.split()
+        if len(linesplit)>1:
+            element=linesplit[0]
+            if element not in elementcounts.keys():
+                elementcounts[element]=1
+            else:
+                elementcounts[element]+=1 
+    sortedelementcounts=sorted(elementcounts.keys(), key=lambda x:x.lower())
+    for element in sortedelementcounts:
+        counts=elementcounts[element]
+        total=str(counts)
+        if counts==1:
+            total=''
+        monomerformula+=element+total
+
+    return monomerformula
+
+
+def GetDimerFormula(monomerformula,newfilename):
+    dimerformula=''
+    if 'water' in newfilename:
+        dimerformula+=monomerformula+'-'+'H2O'
+    else:
+        dimerformula+=monomerformula+'-'+monomerformula
+    return dimerformula
+
+
+def GrabMonomer(filename):
+    temp=open(filename,'r')
+    results=temp.readlines()
+    temp.close()
+    indextolines={}
+    count=0
+    for lineidx in range(len(results)):
+        line=results[lineidx]
+        if lineidx==0:
+            linesplit=line.split()
+            atomnum=int(linesplit[0])
+
+            if 'water' in filename:
+                newatomnum=atomnum-3
+            else:
+                newatomnum=int(atomnum/2)
+        elif lineidx==1:
+            pass
+        else:
+            linesplit=line.split()
+            if len(linesplit)>1:
+                count+=1  
+                if count<=newatomnum:
+                    indextolines[count]=line
+    monomer=filename.replace('.xyz','monomer.xyz')
+    temp=open(monomer,'w')
+    temp.write(str(newatomnum)+'\n') 
+    temp.write('\n')
+    for index,line in indextolines.items():
+        temp.write(line)
+    temp.close()
+    return monomer
 
 
 def WriteFile(dimername,tinkerxyzlines):
@@ -446,21 +704,40 @@ def ConvertTinkerXYZToCartesian(filename,newfilename):
     tempwrite.close()
 
 
-def PlotDimers3D(filenamearray):
+
+def SmallestDivisor(n):
+    a=[]
+    for i in range(2,n+1):
+        if(n%i==0):
+            a.append(i)
+    a.sort()
+    return a[0]
+
+def PlotDimers3D(filenamearray,allindices):
     from pymol import cmd,preset,util
     from PIL import Image
     from pymol.vfont import plain
     from pymol.cgo import CYLINDER,cyl_text
-    molsperrow=2
-    molsPerImage=molsperrow**2
-    imagesize=400
+    molsPerImage=len(filenamearray)
+    if (molsPerImage % 2) == 0 or (molsPerImage ** 0.5) % 1==0:
+        n=molsPerImage
+    else:
+        n=molsPerImage+1 
+    molsperrow=SmallestDivisor(n)
+    if n==2:
+        molsperrow=1
+    imagesize=1180
+    dpi=300
     filenamechunks=ChunksList(Chunks(filenamearray,molsPerImage))
+    indiceschunks=ChunksList(Chunks(allindices,molsPerImage))
     prevmatslen=len(filenamechunks[0])
     for i in range(len(filenamechunks)):
         filenamesublist=filenamechunks[i]
+        indicessublist=indiceschunks[i]
         imagenames=[]
         for j in range(len(filenamesublist)):
             filename=filenamesublist[j]
+            indices=indicessublist[j]
             ls=range(len(filenamesublist))
             chunks=ChunksList(Chunks(ls,molsperrow))
             indextorow={}
@@ -468,7 +745,6 @@ def PlotDimers3D(filenamearray):
                 row=chunks[rowidx]
                 for j in row:
                     indextorow[j]=rowidx
-
             
             fileprefix=filename.split('.')[0]
             imagename=fileprefix+'_3D.'+'png'
@@ -482,9 +758,14 @@ def PlotDimers3D(filenamearray):
             cmd.set('label_size',26) 
             cmd.set('depth_cue',0)
             cmd.set('ray_trace_fog',0) 
-            cmd.zoom()
-            cmd.ray(imagesize,imagesize)
-            cmd.png(imagename, imagesize,imagesize)
+            firstidx=indices[0]
+            secondidx=indices[1]
+            firstlab=str(firstidx)
+            secondlab=str(secondidx)
+            lab=firstlab+'-'+secondlab
+            cmd.distance(lab,'index '+firstlab,'index '+secondlab)
+            cmd.zoom(lab)
+            cmd.png(imagename, imagesize,imagesize,dpi,1)
             cmd.save(fileprefix+'_3D.'+'pse')
         if i>0:
             factor=1
@@ -500,7 +781,8 @@ def PlotDimers3D(filenamearray):
             imagename=imagenames[index]
             image=Image.open(imagename)
             indextoimage[index]=image
-        dest = Image.new('RGB', (imagesize*molsperrow,imagesize*molsperrow))
+        cols=len(set(list(indextorow.values())))
+        dest = Image.new('RGB', (imagesize*molsperrow,imagesize*cols))
         for j in range(len(filenamesublist)):
             row=indextorow[j]
             x=(j-molsperrow*(row))*imagesize
@@ -509,13 +791,277 @@ def PlotDimers3D(filenamearray):
         dest.show()
         dest.save(basename+'.png')
 
+def ParseXYZ(xyzpath):
+    temp=open(xyzpath,'r')
+    results=temp.readlines()
+    temp.close()
+    indextoconn={}
+    indextoelement={}
+    for lineidx in range(len(results)):
+        line=results[lineidx]
+        linesplit=line.split()
+        if lineidx==0:
+            totalatomnum=int(linesplit[0])
+        if len(linesplit)>1 and '90.00' not in line:
+            index=int(linesplit[0])
+            element=linesplit[1]
+            indextoelement[index]=element
+            conn=linesplit[6:]
+            conn=[int(i) for i in conn]
+            indextoconn[index]=conn
+    groups=[]
+    for index,conn in indextoconn.items():
+        current=[index]+conn
+        found=False
+        for grpidx in range(len(groups)):
+            breakout=False
+            grp=groups[grpidx]
+            for idx in current:
+                if idx in grp: 
+                    breakout=True
+            if breakout==True:
+                found=True
+                break
+        if found==True:
+            for idx in current:
+                if idx not in grp:
+                    grp.append(idx)
+            groups[grpidx]=grp
+
+        else:
+            groups.append(current) 
+    numatomspermol=len(groups[0])
+    nummolecules=len(groups)
+
+    return nummolecules,numatomspermol,indextoelement
+
+def PlotAllRDFs(moltotptoarc,neatliqnametoindices):
+    for mol,tptoarc in moltotptoarc.items():
+        if not os.path.isdir(mol):
+            os.mkdir(mol)
+        os.chdir(mol)
+        if not os.path.isdir('RDF'):
+            os.mkdir('RDF')
+        os.chdir('RDF')
+        if mol in neatliqnametoindices.keys():
+            indicesarray=neatliqnametoindices[mol]
+            for tp,arcpath in tptoarc.items():
+                t = md.load_arc(arcpath)
+                xyzpath=arcpath.replace('.arc','.xyz')
+                nummolecules,numatomspermol,indextoelement=ParseXYZ(xyzpath)
+                pairs,indicesmats,dimerformula=GeneratePairs(nummolecules,numatomspermol,indextoelement,indicesarray)
+                for i in range(len(pairs)):
+                    indicesmat=indicesmats[i]
+                    pair=pairs[i] 
+                    PlotRDF(mol,tp,t,indicesmat,pair,dimerformula)
+        os.chdir('..')
+        os.chdir('..')
+
+
+def GeneratePairs(nummolecules,numatomspermol,indextoelement,indicesarray):
+    elementcounts={}
+    for index,element in indextoelement.items():
+        if index>numatomspermol:
+            break
+        if element not in elementcounts.keys():
+            elementcounts[element]=1
+        else:
+            elementcounts[element]+=1
+        
+    sortedelementcounts=sorted(elementcounts.keys(), key=lambda x:x.lower())
+    monomerformula=''
+    for element in sortedelementcounts:
+        counts=elementcounts[element]
+        total=str(counts)
+        if counts==1:
+            total=''
+        monomerformula+=element+total
+    dimerformula=monomerformula+'-'+monomerformula
+    pairs=[]
+    indicesmats=[]
+    for indices in indicesarray:
+        first=indices[0]
+        last=indices[1]
+        mat=[]
+        for i in range(nummolecules-1):
+            newlast=last+numatomspermol 
+            newpair=[first,newlast]
+            mat.append(newpair)
+        firstelement=indextoelement[first]
+        lastelement=indextoelement[last]
+        pair=firstelement+'..'+lastelement
+        pairs.append(pair) 
+        indicesmats.append(mat) 
+
+    return pairs,indicesmats,dimerformula
+
+
+def PlotRDF(mol,tp,t,indicesmat,pair,dimerformula):
+    plt.figure()
+    title=mol+' '+dimerformula+' '+pair+' '+tp+' '+'RDF'
+    imagename=title+'.png'
+    r_max = 1
+    r_min = 0.01
+    rdf=md.compute_rdf(t,indicesmat,(r_min, r_max))
+    plt.plot(*rdf, color='black',label="mdtraj", alpha=0.5)
+    ykey='RDF'
+    xkey='Distance (nm)'+' '+pair
+    plt.ylabel(ykey,fontsize=12)
+    plt.xlabel(xkey,fontsize=12)
+    plt.title(title)
+    plt.show()
+    plt.savefig(imagename)
+
+
+def ExtractNeatLiquidIndices(truenametoindices):
+    neatliqnametoindices={}
+    for truename,indices in truenametoindices.items():
+        if 'water' in truename:
+            continue
+        namesplit=truename.split('-')
+        name='-'.join(namesplit[:-2])
+        namesplit=name.split('-')
+        if name.count('-')>=2:
+            name='-'.join(namesplit[:-1])
+        namesplit=name.split('_')
+        name=namesplit[0]
+        if name not in neatliqnametoindices.keys():
+             neatliqnametoindices[name]=[]
+        neatliqnametoindices[name].append(indices)
+    return neatliqnametoindices
+
+
+def WriteOutParamTable(moltotypetoprms,moltotypetoelement):
+    tempname='SummaryParams.csv'
+    with open(tempname, mode='w') as energy_file:
+        energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        header=['Name','Element','Radius','Depth','Shrink']
+        energy_writer.writerow(header)
+        for mol,typetoprms in moltotypetoprms.items():
+            typetoelement=moltotypetoelement[mol]
+            for type,prms in typetoprms.items():
+                array=[]
+                element=typetoelement[type]
+                radius=round(prms[0],3)
+                depth=round(prms[1],3)
+                shrink=round(prms[2],3)
+                array.append(mol)
+                array.append(element)
+                array.append(radius)
+                array.append(depth)
+                array.append(shrink)
+                energy_writer.writerow(array)  
+
+
+def WriteOutPropTable(nametotptofinalprops):
+    tempname='SummaryProps.csv'
+    with open(tempname, mode='w') as energy_file:
+        energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        header=['Name','Temperature','Pressure','Density Ref','Density Calc','Enthalpy Ref','Enthalpy Calc']
+        energy_writer.writerow(header)
+        for name,tptofinalprops in nametotptofinalprops.items():
+            for tp, finalprops in tptofinalprops.items():
+                array=[0]*len(header)
+                temp=tp[0]
+                pressure=tp[1]
+                array[0]=name
+                array[1]=temp
+                array[2]=pressure
+                for propname,dic in finalprops.items():
+                    for key,value in dic.items():
+                        thename=propname+' '+key
+                        headeridx=header.index(thename)
+                        array[headeridx]=round(value,3)
+                energy_writer.writerow(array) 
+
+
+def GrabFinalParameters(jobdirs):
+    prmfiles=[]
+    curdir=os.getcwd()
+    for jobdir in jobdirs:
+        os.chdir(jobdir)
+        if os.path.isdir('result'):
+            os.chdir('result')
+            if os.path.isdir('optimize'):
+                os.chdir('optimize')
+                files=os.listdir()
+                numtoprmfilepath={}
+                for f in files: 
+                    if '.prm' in f and '_' in f:
+                        split=f.split('_')
+                        suffix=split[1].replace('.prm','')   
+                        num=int(suffix)
+                        prmfilepath=os.path.join(os.getcwd(),f)
+                        numtoprmfilepath[num]=prmfilepath
+                maxnum=max(numtoprmfilepath.keys())
+                maxprmfilepath=numtoprmfilepath[maxnum]
+                prmfiles.append(maxprmfilepath) 
+
+    os.chdir(curdir)
+    return prmfiles
+
+
+def GrabParameterValues(prmfiles):
+    moltotypetoprms={}
+    moltotypetoelement={}
+    for prmfile in prmfiles:
+        temp=open(prmfile,'r')
+        results=temp.readlines()
+        temp.close()
+        foundatomblock=False
+        typetoprms={}
+        typetoelement={}
+        moltotypes={}
+        for line in results:
+            linesplit=line.split()
+            if len(linesplit)>1:
+                first=linesplit[0]
+                if first=='atom':
+                    foundatomblock=True
+                    typenum=linesplit[1]
+                    element=linesplit[3]
+                    typetoelement[typenum]=element
+                    mol=linesplit[4].replace('"','')
+                    if mol not in moltotypes.keys():
+                        moltotypes[mol]=[]
+                    moltotypes[mol].append(typenum)      
+                if foundatomblock==False:
+                    typenum=linesplit[1]
+                    radius=float(linesplit[2])
+                    depth=float(linesplit[3])
+                    try:
+                        shift=float(linesplit[4])
+                    except:
+                        shift=1
+                    typetoprms[typenum]=[radius,depth,shift]
+        for mol,types in moltotypes.items():
+            if mol not in moltotypetoprms.keys():
+                moltotypetoprms[mol]={}
+                moltotypetoelement[mol]={}
+            for type in types: 
+                if type in typetoprms.keys():
+                    prms=typetoprms[type]
+                    moltotypetoprms[mol][type]=prms
+                    moltotypetoelement[mol][type]=typetoelement[type] 
+
+    return moltotypetoprms,moltotypetoelement
+
+
 curdir=os.getcwd()
 jobdirs=GrabJobDirectories(fbdir)
 outputfiles=GrabOutputFiles(jobdirs)
 outputfilestojobdir=dict(zip(outputfiles,jobdirs))
 tpdiclist,qmdiclist,newoutputfiles=GrabResultsAllMolecules(outputfiles)
 jobdirs=[outputfilestojobdir[i] for i in newoutputfiles]
-qmtargetnamedic,nametodimerstructs=GrabDimerDistanceInfo(qmdiclist,jobdirs)
+qmtargetnamedic,nametodimerstructs,truenametoindices=GrabDimerDistanceInfo(qmdiclist,jobdirs)
+neatliqnametoindices=ExtractNeatLiquidIndices(truenametoindices)
 os.chdir(curdir)
-PlotAllFBJobs(tpdiclist,qmtargetnamedic)
-#PlotAllDimers(nametodimerstructs)
+nametofilenametoformula=PlotAllDimers(nametodimerstructs,truenametoindices)
+nametotptofinalprops=PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoindices)
+WriteOutPropTable(nametotptofinalprops)
+moltotptoarc=GrabFinalNeatLiquidTrajectories(jobdirs)
+PlotAllRDFs(moltotptoarc,neatliqnametoindices)
+prmfiles=GrabFinalParameters(jobdirs)
+moltotypetoprms,moltotypetoelement=GrabParameterValues(prmfiles)
+WriteOutParamTable(moltotypetoprms,moltotypetoelement)
+

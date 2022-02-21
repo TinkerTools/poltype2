@@ -135,6 +135,9 @@ conda install -c conda-forge -c schrodinger pymol-bundle --yes
 conda install -c conda-forge matplotlib --yes
 conda install -c anaconda scipy --yes
 conda install -c anaconda scikit-learn --yes
+conda install -c conda-forge openbabel --yes
+pip install PyAstronomy
+conda install -c conda-forge mdtraj --yes
 ```
 * Make sure license file is located in /home/USERNAME/.pymol/license.lic
 
