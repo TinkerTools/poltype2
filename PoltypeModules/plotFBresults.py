@@ -144,6 +144,7 @@ def GrabResults(outputfile):
 
 def PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoindices):
     nametotptofinalprops={}
+    nametoformulatormse={}
     for tpdic in tpdiclist:
         nametotptofinalprops=PlotFBLiq(tpdic,nametotptofinalprops)
     nametofigs={}
@@ -194,9 +195,12 @@ def PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoin
             nametoaxes[name].legend()
             imagename=newtitle+'.png'
             nametofigs[name].savefig(imagename)
+            if name not in nametoformulatormse.keys():
+                nametoformulatormse[name]={}
+            nametoformulatormse[name][formula]=rmsvalues[-1]
             os.chdir('..')
 
-    return nametotptofinalprops
+    return nametotptofinalprops,nametoformulatormse
 
 def GrabStructure(formula):
     files=os.listdir()
@@ -1047,6 +1051,20 @@ def GrabParameterValues(prmfiles):
     return moltotypetoprms,moltotypetoelement
 
 
+def WriteOutQMTable(nametoformulatormse):
+    tempname='SummaryQM.csv'
+    with open(tempname, mode='w') as energy_file:
+        energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        header=['Name','Dimer Name','RMSE']
+        energy_writer.writerow(header)
+        for name,formulatormse in nametoformulatormse.items():
+            for formula,rmse in formulatormse.items():
+                array=[name,formula,rmse]
+                energy_writer.writerow(array)
+
+                     
+
+
 curdir=os.getcwd()
 jobdirs=GrabJobDirectories(fbdir)
 outputfiles=GrabOutputFiles(jobdirs)
@@ -1057,11 +1075,11 @@ qmtargetnamedic,nametodimerstructs,truenametoindices=GrabDimerDistanceInfo(qmdic
 neatliqnametoindices=ExtractNeatLiquidIndices(truenametoindices)
 os.chdir(curdir)
 nametofilenametoformula=PlotAllDimers(nametodimerstructs,truenametoindices)
-nametotptofinalprops=PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoindices)
+nametotptofinalprops,nametoformulatormse=PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoindices)
 WriteOutPropTable(nametotptofinalprops)
 moltotptoarc=GrabFinalNeatLiquidTrajectories(jobdirs)
 PlotAllRDFs(moltotptoarc,neatliqnametoindices)
 prmfiles=GrabFinalParameters(jobdirs)
 moltotypetoprms,moltotypetoelement=GrabParameterValues(prmfiles)
 WriteOutParamTable(moltotypetoprms,moltotypetoelement)
-
+WriteOutQMTable(nametoformulatormse)
