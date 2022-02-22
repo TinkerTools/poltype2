@@ -1128,7 +1128,7 @@ def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderl
             results.append('type Interaction_TINKER'+'\n')
             results.append('weight .5'+'\n')
             results.append('energy_denom 1.0'+'\n')
-            results.append('energy_upper 20.0'+'\n')
+            results.append('energy_upper 10.0'+'\n')
             results.append('attenuate'+'\n')
             lastindex=str(atomnum)
             newindex=str(atomnum+1)
@@ -1150,7 +1150,7 @@ def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderl
                 results.append('$target'+'\n')
                 results.append('name '+liquidfolder+'\n')
                 results.append('type Liquid_TINKER'+'\n')
-                results.append('weight 1.0'+'\n')
+                results.append('weight 2.5'+'\n')
                 results.append('w_rho 1.0'+'\n')
                 results.append('w_hvap 1.0'+'\n')
                 results.append('liquid_equ_steps '+str(liquid_equ_steps)+'\n')
@@ -1264,7 +1264,7 @@ def ShiftTypes(typeslist,oldtypetonewtypelist):
     return newtypeslist
 
 def FilterHighEnergy(dimertinkerxyzfileslist,dimerenergieslist,dimersplogfileslist):
-    tol=15 # kcal/mol
+    tol=10 # kcal/mol
     newdimertinkerxyzfileslistoflist=[]
     newdimerenergieslistoflist=[]
     for j in range(len(dimertinkerxyzfileslist)):

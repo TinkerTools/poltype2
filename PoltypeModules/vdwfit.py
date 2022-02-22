@@ -222,7 +222,7 @@ def myFUNC(params,poltype,vdwtypes,idxtotype,count):
     return weightlist*(current-target)
 
 def ScreenHighEnergyPoints(poltype,current,target,distarray=None):
-    tol=15
+    tol=10
     newcurrent=[]
     newtarget=[]
     newdistarray=[]
@@ -947,7 +947,7 @@ def GrabVdwParameters(poltype,vdwtype):
                 maxvdwdepth=depth+.1*depth
                 if depth>maxvdwdepth:
                     depth=maxvdwdepth-.001
-                if len(linesplit)==5:
+                if len(linesplit)==5 and poltype.fitred==True:
                     red=float(linesplit[4])
                 else:
                     red=1
@@ -1227,7 +1227,6 @@ def MinimizeDimer(poltype,inputxyz,keyfile):
         poltype.call_subsystem([mincmdstr],False)
         temp={mincmdstr:torminlogfname} 
         finishedjobs,errorjobs=poltype.WaitForTermination(temp,True)
-        print('done waiting',inputxyz,flush=True)
     if len(errorjobs)==0:
         finaloutputxyz=inputxyz+'_2'
     else:
@@ -1901,7 +1900,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     poltype.SanitizeAllQMMethods()
     paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebabio18.prm"
     ReplaceParameterFileHeader(poltype,paramhead,poltype.key4fname)
-    array=[.8,.9,1,1.1,1.2]
+    array=[.8,.85,.9,1,1.1,1.2,1.4]
 
 
     dimerfiles,probeindices,moleculeindices,numberprobeatoms=GenerateInitialProbeStructures(poltype,missingvdwatomindices)
@@ -2042,7 +2041,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
                     atom=poltype.mol.GetAtom(moleculeindex)
                     valence=atom.GetValence()
                     atomicnum=atom.GetAtomicNum()
-                    if valence==1 and atomicnum!=8 and atomicnum!=16:
+                    if valence==1 and atomicnum!=8 and atomicnum!=16 and poltype.fitred==True:
                        fitred=True
                     else:
                        fitred=False
