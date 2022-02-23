@@ -1265,6 +1265,7 @@ def ShiftTypes(typeslist,oldtypetonewtypelist):
 
 def FilterHighEnergy(dimertinkerxyzfileslist,dimerenergieslist,dimersplogfileslist):
     tol=10 # kcal/mol
+    Hartree2kcal_mol=627.5095
     newdimertinkerxyzfileslistoflist=[]
     newdimerenergieslistoflist=[]
     for j in range(len(dimertinkerxyzfileslist)):
@@ -1297,8 +1298,8 @@ def FilterHighEnergy(dimertinkerxyzfileslist,dimerenergieslist,dimersplogfilesli
 
         for prefix,energyarray in prefixtoenergylist.items():
             normenergyarray=prefixtoenergylist[prefix]
+            normenergyarray=[Hartree2kcal_mol*k for k in normenergyarray]
             energyarray=prefixtooriginalenergylist[prefix]
-
             xyzfilelist=prefixtoxyzfilelist[prefix]
             for eidx in range(len(normenergyarray)):
                 e=normenergyarray[eidx]
@@ -1605,6 +1606,7 @@ def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liq
         keyfilelist,xyzfilelist,keyfilelines,newfinalxyzfilelist=CopyFilesMoveParameters(keyfilelist,molnamelist,oldtypetonewtypelist,xyzfilelist,finalxyzfilelist)
         dimertinkerxyzfileslist=ShiftDimerXYZTypes(dimertinkerxyzfileslist,oldtypetonewtypelist)
         dimertinkerxyzfileslist,dimerenergieslist=FilterHighEnergy(dimertinkerxyzfileslist,dimerenergieslist,dimersplogfileslist)
+
         dimertinkerxyzfileslist,dimerenergieslist=SeperateHomoDimerAndWater(dimertinkerxyzfileslist,dimerenergieslist)
         indextogeneratecsv=GenerateLiquidCSVFile(nvtprops,listoftptopropdics,molnamelist)
         densitylist=GrabNumericDensity(density_list)

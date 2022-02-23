@@ -2744,7 +2744,9 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
             
             if len(restrictedsmarts)!=0:
                 if smarts not in restrictedsmarts and fromtorvdwdb==True:
-                    continue 
+                    continue
+            if len(restrictedsmarts)==0 and fromtorvdwdb==True:
+                continue 
             atomorderlist=smartsatomorder[1]
             substructure = Chem.MolFromSmarts(smarts)
             mols = [rdkitmol,substructure]
@@ -2752,6 +2754,9 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
             atomnum=res.numAtoms
             smartsmcs=res.smartsString
             diditmatch=False
+            diditmatchexactly=rdkitmol.HasSubstructMatch(substructure)
+            if fromtorvdwdb==False and diditmatchexactly==False:
+                continue
             if atomnum>=len(atomorderlist):
 
                 mcssubstructure = Chem.MolFromSmarts(smartsmcs)

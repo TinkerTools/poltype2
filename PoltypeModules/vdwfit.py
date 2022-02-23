@@ -1554,7 +1554,6 @@ def CheckIfProbeIsTooFarOrTooClose(poltype,mol,probeindex,moleculeindex,probeato
         total+=1
     tol=.5
     maxatomindex=total-probeatoms-1
-    print('maxatomindex',maxatomindex)
     atomiter=openbabel.OBMolAtomIter(mol)
     for atom in atomiter:
         atomindex=atom.GetIndex()
@@ -1562,8 +1561,6 @@ def CheckIfProbeIsTooFarOrTooClose(poltype,mol,probeindex,moleculeindex,probeato
         if theatomindex!=(moleculeindex) and atomindex<=maxatomindex:
             othermoleculeatomcoords=np.array([atom.GetX(),atom.GetY(),atom.GetZ()])
             otherdist=np.linalg.norm(probeatomcoords-othermoleculeatomcoords)
-            print('atomindex',atomindex,'theatomindex',theatomindex,'moleculeindex',moleculeindex,'probeindex',probeindex)
-            print('dist',dist,'otherdist',otherdist)
             if otherdist+tol<dist:
                 checktoofar=True
         
@@ -1765,7 +1762,6 @@ def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprob
             inFormat = obConversion.FormatFromExt(newfilename)
             obConversion.SetInFormat(inFormat)
             obConversion.ReadFile(mol, newfilename)
-            print('newfilename',newfilename)
             checktoofar=CheckIfProbeIsTooFarOrTooClose(poltype,mol,probeindex,moleculeindex,probeatoms)
             if checktoofar==True:
                 continue
@@ -1806,7 +1802,6 @@ def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprob
             else:
                 moleculeindextoaddedlonepair[moleculeindex]=True
     newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms=SortStructuresViaEnergy(poltype,newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms,dimertypetoenergyarray,dimertypetofilenamearray,dimertypetoprobeindexarray,dimertypetonumberofprobeatoms)
-    print('newdimerfiles',newdimerfiles)
     return newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms
 
 def SortStructuresViaEnergy(poltype,newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms,dimertypetoenergyarray,dimertypetofilenamearray,dimertypetoprobeindexarray,dimertypetonumberofprobeatoms):
@@ -2068,7 +2063,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
                         else:
                            fitred=False
 
-                        if vdwtype not in vdwtypesarray:
+                        if vdwtype not in vdwtypesarray and adjustedprobeindex in missingvdwatomindices:
                             vdwtypesarray.append(vdwtype)
                             fitredboolarray.append(fitred)
                             initialvdwradius,initialvdwdepth,minvdwradius,maxvdwradius,minvdwdepth,maxvdwdepth,red,minred,maxred=GrabVdwParameters(poltype,vdwtype)
