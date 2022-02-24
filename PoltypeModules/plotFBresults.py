@@ -12,6 +12,12 @@ from openbabel import openbabel
 from PyAstronomy import pyasl
 import mdtraj as md
 import csv
+from pymol import cmd,preset,util
+from PIL import Image
+from pymol.vfont import plain
+from pymol.cgo import CYLINDER,cyl_text
+
+
 
 fbdir=sys.argv[1]
 
@@ -43,6 +49,61 @@ def GrabOutputFiles(jobdirs):
                 outputfiles.append(filepath)
 
     return outputfiles
+
+
+def GrabCubeFiles(jobdirs):
+    nametocubefiles={}
+    curdir=os.getcwd()
+    for path in jobdirs:
+        os.chdir(path)
+        files=os.listdir()
+        array=[]
+        for f in files:
+            if f=='ESP.cube' or f=='Dt.cube':
+                filepath=os.path.join(path,f)
+                array.append(filepath)
+            if '-esp.log' in f:
+                name=f.replace('-esp.log','')
+        if len(array)!=0:
+            nametocubefiles[name]=array
+
+    
+
+    os.chdir(curdir)
+    return nametocubefiles
+
+
+def GrabPoltypeDirectories(jobdirs):
+    poltypedirs=[]
+    curdir=os.getcwd()
+    for path in jobdirs:
+        os.chdir(path)
+        files=os.listdir()
+        for f in files:
+            if 'poltype.ini' in f:
+                filepath=os.path.join(path,f)
+                paths=ReadInputGrabPaths(filepath)
+                poltypedirs.extend(paths)
+
+
+    os.chdir(curdir)
+    return poltypedirs
+
+
+def ReadInputGrabPaths(filepath):
+    temp=open(filepath,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        if 'poltypepathlist' in line:
+            split=line.split('=')
+            res=split[1]
+            paths=res.split(',')
+            paths=[a.replace('\n','') for a in paths]
+            paths=[a.strip() for a in paths] 
+
+
+    return paths
 
 
 def GrabResultsAllMolecules(outputfiles):
@@ -572,6 +633,18 @@ def ChunksList(gen):
         newlst.append(item)
     return newlst
 
+
+def PlotAllESPSurfaces(nametocubefiles):
+    for name in nametocubefiles.keys():
+        cubefiles=nametocubefiles[name]
+        if not os.path.isdir(name):
+            os.mkdir(name)
+        os.chdir(name)
+        PlotESPSurfaces(name,cubefiles)
+        os.chdir('..')
+
+
+
 def PlotAllDimers(nametodimerstructs,truenametoindices):
     nametofilenametoformula={} 
     for name in nametodimerstructs.keys():
@@ -717,11 +790,32 @@ def SmallestDivisor(n):
     a.sort()
     return a[0]
 
+
+def PlotESPSurfaces(name,cubefiles):
+    imagesize=1180
+    dpi=300
+    imagename=name+'_ESP.'+'png'
+    cmd.delete('all')
+    for filename in cubefiles:
+        cmd.load(filename)
+    preset.ball_and_stick(selection='all', mode=1)
+    cmd.bg_color("white")
+    cmd.color("grey50","all")
+    util.cnc("all")
+    cmd.set('label_size',26) 
+    cmd.set('depth_cue',0)
+    cmd.set('ray_trace_fog',0) 
+    cmd.isosurface('Dt2','Dt', 0.001)
+    cmd.ramp_new('espcol', 'ESP', [-.01,-.005,0,.005,.01], ['red','orange', 'yellow','green', 'blue'])
+    cmd.set('surface_color', 'espcol', 'Dt2')
+    cmd.zoom()
+    cmd.disable('espcol')
+    cmd.png(imagename, imagesize,imagesize,dpi,1)
+    cmd.save(name+'_ESP.'+'pse')
+
+
+
 def PlotDimers3D(filenamearray,allindices):
-    from pymol import cmd,preset,util
-    from PIL import Image
-    from pymol.vfont import plain
-    from pymol.cgo import CYLINDER,cyl_text
     molsPerImage=len(filenamearray)
     if (molsPerImage % 2) == 0 or (molsPerImage ** 0.5) % 1==0:
         n=molsPerImage
@@ -997,9 +1091,10 @@ def GrabFinalParameters(jobdirs):
                         num=int(suffix)
                         prmfilepath=os.path.join(os.getcwd(),f)
                         numtoprmfilepath[num]=prmfilepath
-                maxnum=max(numtoprmfilepath.keys())
-                maxprmfilepath=numtoprmfilepath[maxnum]
-                prmfiles.append(maxprmfilepath) 
+                if len(numtoprmfilepath.keys())>0:
+                    maxnum=max(numtoprmfilepath.keys())
+                    maxprmfilepath=numtoprmfilepath[maxnum]
+                    prmfiles.append(maxprmfilepath) 
 
     os.chdir(curdir)
     return prmfiles
@@ -1083,3 +1178,6 @@ prmfiles=GrabFinalParameters(jobdirs)
 moltotypetoprms,moltotypetoelement=GrabParameterValues(prmfiles)
 WriteOutParamTable(moltotypetoprms,moltotypetoelement)
 WriteOutQMTable(nametoformulatormse)
+poltypedirs=GrabPoltypeDirectories(jobdirs)
+nametocubefiles=GrabCubeFiles(poltypedirs)
+PlotAllESPSurfaces(nametocubefiles)

@@ -391,9 +391,10 @@ def ReadInPoltypeFiles(poltypepathlist):
                     tempxyzfile=f.replace(spext,'.xyz')
                     xyzfile=os.path.join(os.getcwd(),tempxyzfile)
                     logfile=os.path.join(os.getcwd(),f)
-                    dimertinkerxyzfiles.append(xyzfile)
-                    dimersplogfiles.append(logfile)
-                    logtoxyz[logfile]=xyzfile
+                    if os.path.isfile(xyzfile):
+                        dimertinkerxyzfiles.append(xyzfile)
+                        dimersplogfiles.append(logfile)
+                        logtoxyz[logfile]=xyzfile
             os.chdir('..')
         else:
             raise ValueError('vdw folder does not exist for '+poltypepath)
