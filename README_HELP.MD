@@ -167,6 +167,10 @@ dmabasisset       specifies basis set to use for quantum that generates initial 
                   Default=6-311G**
 espbasisset       specifies basis set to use for quantum intended for refined multipoles. 
                   Default=6-311++G(2d,2p)
+
+
+numespconfs       specifies number of conformations to be used for ESP potential fitting. Rdkit conformors are evaluated via MMFF94 energies and numespconfs-1 most favorable conformations are picked to add to fitting (with first being most extended conformation). 
+                  Default=1
 ```
 
 ### Torsion Parameterization

@@ -14,30 +14,38 @@ import warnings
 from rdkit.Chem import rdmolfiles
 from rdkit import Chem
 
-def GeometryOPTWrapper(poltype,mol):
-    try:
-        optmol,error,torsionrestraints = GeometryOptimization(poltype,mol)
-    except:
-        redo=False
-        if poltype.fullopt==True:
-            if poltype.pcm==True:
-                 # Gaussian would have been used first if was detected. 
-                 poltype.pcm=False
-                 poltype.optpcm=False
-                 redo=True
+def GeometryOPTWrapper(poltype,molist):
+    optmolist=[]
+    errorlist=[]
+    torsionrestraintslist=[]
+    for molidx in range(len(molist)):
+        mol=molist[molidx]
+        suf=str(molidx+1)
+        try:
+            optmol,error,torsionrestraints = GeometryOptimization(poltype,mol,suffix=suf)
+        except:
+            redo=False
+            if poltype.fullopt==True:
+                if poltype.pcm==True:
+                     # Gaussian would have been used first if was detected. 
+                     poltype.pcm=False
+                     poltype.optpcm=False
+                     redo=True
+                else:
+                    if poltype.optmethod=='MP2' and (poltype.use_gaus==False and poltype.use_gausoptonly==False) and poltype.foundgauss==True:
+                        redo=True
+                        poltype.use_gausoptonly=True
+
+            if redo==True:
+                shutil.copy(poltype.logoptfname,poltype.logoptfname.replace('.log','_failed.log'))
+                optmolist,errorlist,torsionrestraintslist = GeometryOPTWrapper(poltype,molist) # recursive call allows for muliple attempts
             else:
-                if poltype.optmethod=='MP2' and (poltype.use_gaus==False and poltype.use_gausoptonly==False) and poltype.foundgauss==True:
-                    redo=True
-                    poltype.use_gausoptonly=True
-
-        if redo==True:
-            shutil.copy(poltype.logoptfname,poltype.logoptfname.replace('.log','_failed.log'))
-            optmol,error,torsionrestraints = GeometryOPTWrapper(poltype,mol) # recursive call allows for muliple attempts
-        else:
-            traceback.print_exc(file=sys.stdout)
-            sys.exit()
-
-    return optmol,error,torsionrestraints
+                traceback.print_exc(file=sys.stdout)
+                sys.exit()
+        optmolist.append(optmol)
+        errorlist.append(error)
+        torsionrestraintslist.append(torsionrestraints)   
+    return optmolist,errorlist,torsionrestraintslist
  
 
 
@@ -440,68 +448,9 @@ def write_com_header(poltype,comfname,chkfname,maxdisk,maxmem,numproc):
     tmpfh.write("%Nproc=" + str(numproc) + "\n")
     tmpfh.close()
 
-def AverageBondTableLength(poltype,elementsbondorder,ringbond,hybs):
-    elementstobondordertolength={tuple([15,17,1]):2.043,tuple([15,8,1]):2.21,tuple([15,8,1]):1.65,tuple([1,1,1]):.74,tuple([9,9,1]):1.42,tuple([17,17,1]):1.99,tuple([35,35,1]):2.28,tuple([53,53,1]):2.67,tuple([1,6,1]):1.10,tuple([1,7,1]):1.00,tuple([1,8,1]):.97,tuple([1,9,1]):.92,tuple([6,6,1]):1.54,tuple([6,7,1]):1.47,tuple([6,8,1]):1.43,tuple([7,7,1]):1.45,tuple([8,8,1]):1.45,tuple([1,6,1]):1.10,tuple([6,6,2]):1.34,tuple([6,6,3]):1.20,tuple([6,7,2]):1.28,tuple([6,8,2]):1.20,tuple([6,8,3]):1.13,tuple([7,7,2]):1.23,tuple([7,7,3]):1.10,tuple([8,8,2]):1.21,tuple([1,9,1]):.92,tuple([1,17,1]):1.27,tuple([1,35,1]):1.41,tuple([1,53,1]):1.61,tuple([6,16,1]):1.82,tuple([1,6,1]):1.10,tuple([6,9,1]):1.35,tuple([6,17,1]):1.77,tuple([6,35,1]):1.94,tuple([6,53,1]):2.14}
-    
-    found=False
-    length=None
-    rev=tuple([elementsbondorder[1],elementsbondorder[0],elementsbondorder[2]])
-    if elementsbondorder in elementstobondordertolength.keys():
-        length=elementstobondordertolength[elementsbondorder]
-        found=True
-    elif rev in elementstobondordertolength.keys():
-        length=elementstobondordertolength[rev]
-        found=True
-    if ringbond==True:
-        if hybs[0]==2 and hybs[1]==2:
-            if elementsbondorder[0]==6 and elementsbondorder[1]==6:
-                length=1.41
-                found=True
-            else:
-                found=False
-                length=None
 
 
-    if found==False:
-        tol=.1 # extreme case if any missing above
-    else:
-        tol=.05 # test this may increase tolerance later
-    return tol,length
 
-
-def CompareBondLengths(poltype,inioptmol,optmol,outputlog):
-    isnear=True
-    for inib in openbabel.OBMolBondIter(inioptmol):
-        beg = inib.GetBeginAtomIdx()
-        end = inib.GetEndAtomIdx()
-        b=optmol.GetBond(beg,end)
-        if b==None:
-            isnear=False
-            break
-        ringbond=inib.IsInRing()
-        idxs=[beg,end]
-        atoms=[inioptmol.GetAtom(i) for i in idxs]
-        hybs=[a.GetHyb() for a in atoms]
-        begatom=optmol.GetAtom(beg)
-        endatom=optmol.GetAtom(end)
-        begatomicnum=begatom.GetAtomicNum()
-        endatomicnum=endatom.GetAtomicNum()
-        bondorder=b.GetBondOrder()
-        elementsbondorder=tuple([begatomicnum,endatomicnum,bondorder])
-        tol,length=AverageBondTableLength(poltype,elementsbondorder,ringbond,hybs)
-        blength=b.GetLength()
-        iniblength=b.GetLength()
-        if length!=None:
-            diff=np.abs(length-blength)
-        else:
-            diff=np.abs(iniblength-blength)
-
-        if diff>=tol:
-            string='Bond lengths changed too much for '+str(beg)+' '+str(end)+' difference is '+str(diff)+" tolerance is "+str(tol)+' current bond length is '+str(blength)+' initial bond length is '+str(iniblength)+' internal table bond length is '+str(length)+'. Will try to redo QM opt for '+str(outputlog)
-            poltype.WriteToLog(string)
-            warnings.warn(string) 
-            isnear=False
-    return isnear
 
 
 
@@ -643,32 +592,36 @@ def FindTorsionRestraints(poltype,mol):
 
     return torsionrestraints
 
-def GeometryOptimization(poltype,mol,loose=False,checkbonds=True,modred=True,bondanglerestraints=None,skipscferror=False,charge=None,skiperrors=False,overridecheckterm=False): # specify charge instead of reading from mol if charge!=None
+def GeometryOptimization(poltype,mol,suffix='1',loose=False,checkbonds=True,modred=True,bondanglerestraints=None,skipscferror=False,charge=None,skiperrors=False,overridecheckterm=False): # specify charge instead of reading from mol if charge!=None
     if bondanglerestraints!=None or poltype.isfragjob==True or poltype.generateextendedconf==False: # then vdw opt
         pass
         torsionrestraints=[]
     else: # see if need to restrain torsion in extended conformation
         torsionrestraints=FindTorsionRestraints(poltype,mol)
+
+    logoptfname=poltype.logoptfname.replace('_1','_'+suffix)
+    comoptfname=poltype.comoptfname.replace('_1','_'+suffix)
+    chkoptfname=poltype.chkoptfname.replace('_1','_'+suffix)
+
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt
-        term,error=poltype.CheckNormalTermination(poltype.logoptfname,errormessages=None,skiperrors=True)
+        term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)
         if not term or overridecheckterm==True:
             
             poltype.WriteToLog("NEED QM Density Matrix: Executing Gaussian Opt and SP")
-            mystruct = load_structfile(poltype,poltype.molstructfname)
-            gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol,modred,torsionrestraints)
-            cmdstr = 'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + poltype.comoptfname
-            jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
+            gen_optcomfile(poltype,comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,chkoptfname,mol,modred,torsionrestraints)
+            cmdstr = 'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + comoptfname
+            jobtooutputlog={cmdstr:os.getcwd()+r'/'+logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdirgau
             jobtologlistfilepathprefix=os.getcwd()+r'/'+'optimization_jobtolog_'+poltype.molecprefix 
-            inputfilepath=os.path.join(os.getcwd(),poltype.comoptfname)
+            inputfilepath=os.path.join(os.getcwd(),comoptfname)
             jobtoinputfilepaths={cmdstr:[inputfilepath]}
-            jobtooutputfiles={cmdstr:[poltype.logoptfname]}
+            jobtooutputfiles={cmdstr:[logoptfname]}
             jobtoabsolutebinpath={cmdstr:poltype.which(poltype.gausexe)}
             if poltype.checkinputonly==True:
                 sys.exit()
-            if os.path.isfile(poltype.chkoptfname) and os.path.isfile(poltype.logoptfname):
-                os.remove(poltype.logoptfname) # if chk point exists just remove logfile, there could be error in it and we dont want WaitForTermination to catch error before job is resubmitted by daemon 
+            if os.path.isfile(chkoptfname) and os.path.isfile(logoptfname):
+                os.remove(logoptfname) # if chk point exists just remove logfile, there could be error in it and we dont want WaitForTermination to catch error before job is resubmitted by daemon 
             if poltype.externalapi==None:
                 finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,True) # have to skip errors because setting optmaxcycle to low number in gaussian causes it to crash
             else:
@@ -676,42 +629,42 @@ def GeometryOptimization(poltype,mol,loose=False,checkbonds=True,modred=True,bon
                     call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilepathprefix)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
 
-            cmdstr = poltype.formchkexe + " " + poltype.chkoptfname
+            cmdstr = poltype.formchkexe + " " + chkoptfname
             poltype.call_subsystem([cmdstr],True)
-        term,error=poltype.CheckNormalTermination(poltype.logoptfname,errormessages=None,skiperrors=True)
+        term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)
         if error and term==False and skiperrors==False:
             if poltype.fullopt==True:
-                poltype.RaiseOutputFileError(poltype.logoptfname) 
-        optmol =  load_structfile(poltype,poltype.logoptfname)
+                poltype.RaiseOutputFileError(logoptfname) 
+        optmol =  load_structfile(poltype,logoptfname)
         optmol=rebuild_bonds(poltype,optmol,mol)
         
            
     else:
 
-        gen_optcomfile(poltype,poltype.comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkoptfname,mol,modred,torsionrestraints)
-        term,error=poltype.CheckNormalTermination(poltype.logoptfname,errormessages=None,skiperrors=True)
+        gen_optcomfile(poltype,comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,chkoptfname,mol,modred,torsionrestraints)
+        term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)
         modred=False
 
-        inputname,outputname=CreatePsi4OPTInputFile(poltype,poltype.comoptfname,poltype.comoptfname,mol,modred,bondanglerestraints,skipscferror,charge,loose,torsionrestraints)
+        inputname,outputname=CreatePsi4OPTInputFile(poltype,comoptfname,comoptfname,mol,modred,bondanglerestraints,skipscferror,charge,loose,torsionrestraints)
         if term==False or overridecheckterm==True:
             
             poltype.WriteToLog("Calling: " + "Psi4 Optimization")
-            cmdstr='psi4 '+inputname+' '+poltype.logoptfname
-            jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logoptfname}
+            cmdstr='psi4 '+inputname+' '+logoptfname
+            jobtooutputlog={cmdstr:os.getcwd()+r'/'+logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdirpsi4
             jobtologlistfilepathprefix=os.getcwd()+r'/'+'optimization_jobtolog_'+poltype.molecprefix
             inputfilepath=os.path.join(os.getcwd(),inputname)
             jobtoinputfilepaths={cmdstr:[inputfilepath]}
-            jobtooutputfiles={cmdstr:[poltype.logoptfname]}
+            jobtooutputfiles={cmdstr:[logoptfname]}
             jobtoabsolutebinpath={cmdstr:poltype.which('psi4')}
 
             if poltype.checkinputonly==True:
                 sys.exit()
 
 
-            if os.path.isfile(poltype.logoptfname):
-                os.remove(poltype.logoptfname)
+            if os.path.isfile(logoptfname):
+                os.remove(logoptfname)
             if poltype.externalapi==None:
                 finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,skiperrors)
             else:
@@ -719,15 +672,15 @@ def GeometryOptimization(poltype,mol,loose=False,checkbonds=True,modred=True,bon
                     call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilepathprefix)
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
 
-        term,error=poltype.CheckNormalTermination(poltype.logoptfname,None,skiperrors) # now grabs final structure when finished with QM if using Psi4
+        term,error=poltype.CheckNormalTermination(logoptfname,None,skiperrors) # now grabs final structure when finished with QM if using Psi4
         if error and term==False and skiperrors==False:
             if poltype.fullopt==True: # if not doing full opt, assume it did input number of cycles and check if structure is reasonable, otherwise if doing full optcheck if error and crash
-                poltype.RaiseOutputFileError(poltype.logoptfname) 
-        GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'),mol)
-        optmol =  load_structfile(poltype,poltype.logoptfname.replace('.log','.xyz'))
+                poltype.RaiseOutputFileError(logoptfname) 
+        GrabFinalXYZStructure(poltype,logoptfname,logoptfname.replace('.log','.xyz'),mol)
+        optmol =  load_structfile(poltype,logoptfname.replace('.log','.xyz'))
         optmol=rebuild_bonds(poltype,optmol,mol)
-
-    GrabFinalXYZStructure(poltype,poltype.logoptfname,poltype.logoptfname.replace('.log','.xyz'),mol)
+    optmol.SetTotalCharge(mol.GetTotalCharge())
+    GrabFinalXYZStructure(poltype,logoptfname,logoptfname.replace('.log','.xyz'),mol)
     return optmol,error,torsionrestraints
 
 

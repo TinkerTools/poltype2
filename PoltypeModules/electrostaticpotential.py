@@ -26,7 +26,7 @@ def CheckIfLogFileUsingGaussian(poltype,f):
     return use_gaus
 
 
-def gen_esp_grid(poltype,mol):
+def gen_esp_grid(poltype,mol,gridnamelist,espnamelist,fchknamelist,cubenamelist):
     """
     Intent: Find the QM Electrostatic Potential Grid which can be used for multipole fitting
     Input:
@@ -44,40 +44,59 @@ def gen_esp_grid(poltype,mol):
        "(2) Get QM Potential from a Gaussian Cube File"
        Outputs *.cube_2
     """
+    potnamelist=[]
     use_gaus=CheckIfLogFileUsingGaussian(poltype,poltype.logespfname)
     if use_gaus==False:
-        Vvals,gridpts=GrabGridData(poltype)
+        for i in range(len(gridnamelist)):
+            gridname=gridnamelist[i]
+            espname=espnamelist[i]
+            fchkname=fchknamelist[i]
+            cubename=cubenamelist[i]
+            potfile=cubename.replace('.cube','.pot')
+            Vvals,gridpts=GrabGridData(poltype,gridname,espname)
 
-        # Generate a "cube" file.  I have no idea what the format should be (it's not a
-        # regular cube file) so I reverse engineered one by looking at TINKER source.
-        with open(poltype.qmespfname, 'w') as fp:
-            fp.write(" %s/%s potential calculation\n\n" % (poltype.espmethod,poltype.espbasisset))
-            fp.write("%5d\n%5d\n\n\n" % (0,len(Vvals)))
-            for xyz,v in zip(gridpts, Vvals):
-                fp.write("%s %s\n" % (xyz.rstrip(), v))
-        
-    if not os.path.isfile(poltype.qmespfname):
-        fckfname = poltype.fckespfname
-        if not poltype.espfit:
-            fckfname = poltype.fckdmafname
+            # Generate a "cube" file.  I have no idea what the format should be (it's not a
+            # regular cube file) so I reverse engineered one by looking at TINKER source.
+            with open(cubename, 'w') as fp:
+                fp.write(" %s/%s potential calculation\n\n" % (poltype.espmethod,poltype.espbasisset))
+                fp.write("%5d\n%5d\n\n\n" % (0,len(Vvals)))
+                for xyz,v in zip(gridpts, Vvals):
+                    fp.write("%s %s\n" % (xyz.rstrip(), v))
+            if not os.path.isfile(potfile):
+                genqmpotcmd = poltype.potentialexe + " 2 " + cubename
+                poltype.call_subsystem([genqmpotcmd],True)
+            potnamelist.append(potfile)
 
-        if not os.path.isfile(fckfname):
-            fckfname = os.path.splitext(fckfname)[0]
+    for i in range(len(gridnamelist)):
+        gridname=gridnamelist[i]
+        espname=espnamelist[i]
+        fchkname=fchknamelist[i]
+        cubename=cubenamelist[i]
+        potfile=cubename.replace('.cube','.pot') 
+        if not os.path.isfile(cubename):
+            fckfname = fchkname
+            if not poltype.espfit:
+                fckfname = poltype.fckdmafname
 
-        assert os.path.isfile(fckfname), "Error: " + fckfname + " does not exist."+' '+os.getcwd()
-        if poltype.espmethod=='MP2':
-            densitystring='MP2'
-        else:
-            densitystring='SCF'
-        gencubecmd = poltype.cubegenexe + " 0 potential=%s "%(densitystring) + fckfname + " " + poltype.qmespfname + " -5 h < " + poltype.espgrdfname
-        poltype.call_subsystem([gencubecmd],True)
+            if not os.path.isfile(fckfname):
+                fckfname = os.path.splitext(fckfname)[0]
+
+            assert os.path.isfile(fckfname), "Error: " + fckfname + " does not exist."+' '+os.getcwd()
+            if poltype.espmethod=='MP2':
+                densitystring='MP2'
+            else:
+                densitystring='SCF'
+            gencubecmd = poltype.cubegenexe + " 0 potential=%s "%(densitystring) + fckfname + " " + cubename + " -5 h < " + gridname
+            poltype.call_subsystem([gencubecmd],True)
     # Run potential
-    if not os.path.isfile(poltype.qmesp2fname):
-        genqmpotcmd = poltype.potentialexe + " 2 " + poltype.qmespfname
-        poltype.call_subsystem([genqmpotcmd],True)
+            if not os.path.isfile(potfile):
+                genqmpotcmd = poltype.potentialexe + " 2 " + cubename
+                poltype.call_subsystem([genqmpotcmd],True)
+            potnamelist.append(potfile)
+    return potnamelist
        
-def GrabGridData(poltype):
-    temp=open('grid_esp.dat','r')
+def GrabGridData(poltype,gridname,espname):
+    temp=open(espname,'r')
     results=temp.readlines()
     temp.close()
     Vvals=[]
@@ -87,7 +106,7 @@ def GrabGridData(poltype):
             Vvals.append(linesplit[0])
         
     poltype.WriteToLog("Calling: " + "Generating CUBE File from PSI4")
-    with open('grid.dat', 'r') as fp:
+    with open(gridname, 'r') as fp:
         gridpts = fp.readlines()
     return Vvals,gridpts
 
@@ -404,10 +423,25 @@ def GenerateElementToBasisSetLines(poltype,basissetfile):
             lines.append(line)
     return elementtobasissetlines
  
+def CombineFiles(poltype,namelist,name):
+    totalresults=[]
+    for fname in namelist:
+        temp=open(fname,'r')
+        results=temp.readlines()
+        temp.close()
+        totalresults.extend(results)
+    temp=open(name,'w')
+    for line in totalresults:
+        temp.write(line)
+    temp.close()
+    return name
 
 
-def ElectrostaticPotentialFitting(poltype):
-    optmpolecmd = poltype.potentialexe + " 6 " + poltype.xyzoutfile + " -k " + poltype.key2fnamefromavg + " " + poltype.qmesp2fname + " N "+str(poltype.espgrad)
+
+def ElectrostaticPotentialFitting(poltype,xyzfnamelist,keyfnamelist,potnamelist):
+    combinedxyz=CombineFiles(poltype,xyzfnamelist,'combined.xyz')
+    combinedpot=CombineFiles(poltype,potnamelist,'combined.pot')
+    optmpolecmd = poltype.potentialexe + " 6 " + combinedxyz + " -k " + poltype.key2fnamefromavg + " " + combinedpot + " N "+str(poltype.espgrad)
     if poltype.deletedfiles==True:
         poltype.call_subsystem([optmpolecmd],True)
     else:
@@ -417,14 +451,15 @@ def ElectrostaticPotentialFitting(poltype):
             poltype.DeleteFilesWithExtension(['key','xyz','key_2','xyz_2'])
             poltype.deletedfiles=True
             poltype.GenerateParameters()
+    shutil.copy(combinedxyz.replace('.xyz','.key'),poltype.key3fnamefrompot)
+    return combinedxyz,combinedpot
 
-
-def ElectrostaticPotentialComparison(poltype):
+def ElectrostaticPotentialComparison(poltype,combinedxyz,combinedpot):
     if poltype.deleteallnonqmfiles==True: 
         poltype.WriteToLog("")
         poltype.WriteToLog("=========================================================")
         poltype.WriteToLog("Electrostatic Potential Comparison\n")
-        cmd=poltype.potentialexe + ' 5 ' + poltype.xyzoutfile + ' ' + '-k'+' '+ poltype.key3fname+' '+ poltype.qmesp2fname + ' N > RMSPD.txt'
+        cmd=poltype.potentialexe + ' 5 ' + combinedxyz + ' ' + '-k'+' '+ poltype.key3fname+' '+ combinedpot + ' N > RMSPD.txt'
         poltype.call_subsystem([cmd],True)
         rmspdexists=CheckRMSPD(poltype)
 
@@ -489,70 +524,101 @@ def SPForDMA(poltype,optmol,mol):
                 poltype.RaiseOutputFileError(poltype.logdmafname) 
 
 
-def SPForESP(poltype,optmol,mol):
-    if not os.path.isfile(poltype.espgrdfname):
-        gengridcmd = poltype.potentialexe + " 1 " + poltype.xyzfname+' -k '+poltype.keyfname
-        poltype.call_subsystem([gengridcmd],True)
-    if poltype.use_gaus==False or poltype.use_gausoptonly==True:
-        shutil.copy(poltype.espgrdfname, 'grid.dat') 
-        inputname,outputname=CreatePsi4ESPInputFile(poltype,poltype.logoptfname.replace('.log','.xyz'),poltype.comespfname,mol,poltype.maxdisk,poltype.maxmem,poltype.numproc,poltype.totalcharge,True)
-        term,error=poltype.CheckNormalTermination(outputname,errormessages=None,skiperrors=True)
-        if term==False:
-            poltype.WriteToLog("Calling: " + "Psi4 Gradient for ESP")
-            cmdstr='psi4 '+inputname+' '+outputname
-            jobtooutputlog={cmdstr:os.getcwd()+r'/'+outputname}
-            jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
-            scratchdir=poltype.scrtmpdirpsi4
-            jobtologlistfilenameprefix=os.getcwd()+r'/'+'esp_jobtolog_'+poltype.molecprefix 
-            inputfilepath=os.path.join(os.getcwd(),inputname)
-            anotherinputfile=os.path.join(os.getcwd(),'grid.dat')
-            jobtoinputfilepaths={cmdstr:[inputfilepath,anotherinputfile]}
-            jobtooutputfiles={cmdstr:[outputname,poltype.fckespfname,'grid_esp.dat']}
-            jobtoabsolutebinpath={cmdstr:poltype.which('psi4')}
+def SPForESP(poltype,optmolist,molist,xyzfnamelist,keyfnamelist):
+    gridnamelist=[]
+    espnamelist=[] 
+    fchknamelist=[]
+    cubenamelist=[]
+    for i in range(len(optmolist)):
+        optmol=optmolist[i]
+        mol=molist[i]
+        xyzfname=xyzfnamelist[i]
+        keyfname=keyfnamelist[i]
+        if i==0:
+            suffix=''
+           
+        else:
+            suffix='_'+str(i+1)
+        optsuffix='_'+str(i+1)
+
+        logoptfname=poltype.logoptfname.replace('_1.log',optsuffix+'.log')
+        comespfname=poltype.comespfname.replace('.com',suffix+'.com')
+        fckespfname=poltype.fckespfname.replace('.fchk',suffix+'.fchk')
+        chkespfname=poltype.chkespfname.replace('.chk',suffix+'.chk')
+        logespfname=poltype.logespfname.replace('.log',suffix+'.log')
+        cubename=poltype.qmespfname.replace('.cube',suffix+'.cube')
+        cubenamelist.append(cubename)
+        fchknamelist.append(fckespfname)
+        espgrdfname=xyzfname.replace('.xyz','.grid')
+        gridnamelist.append(espgrdfname)
+        espname=espgrdfname.replace('.grid','esp.dat')
+        espnamelist.append(espname)
+        if not os.path.isfile(espgrdfname):
+            gengridcmd = poltype.potentialexe + " 1 " + xyzfname+' -k '+keyfname
+            poltype.call_subsystem([gengridcmd],True)
+        if poltype.use_gaus==False or poltype.use_gausoptonly==True:
+            shutil.copy(espgrdfname, 'grid.dat') 
+            inputname,outputname=CreatePsi4ESPInputFile(poltype,logoptfname.replace('.log','.xyz'),comespfname,mol,poltype.maxdisk,poltype.maxmem,poltype.numproc,poltype.totalcharge,True)
+            term,error=poltype.CheckNormalTermination(outputname,errormessages=None,skiperrors=True)
+            if term==False:
+                poltype.WriteToLog("Calling: " + "Psi4 Gradient for ESP")
+                cmdstr='psi4 '+inputname+' '+outputname
+                jobtooutputlog={cmdstr:os.getcwd()+r'/'+outputname}
+                jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
+                scratchdir=poltype.scrtmpdirpsi4
+                jobtologlistfilenameprefix=os.getcwd()+r'/'+'esp_jobtolog_'+poltype.molecprefix 
+                inputfilepath=os.path.join(os.getcwd(),inputname)
+                anotherinputfile=os.path.join(os.getcwd(),'grid.dat')
+                jobtoinputfilepaths={cmdstr:[inputfilepath,anotherinputfile]}
+                jobtooutputfiles={cmdstr:[outputname,fckespfname,'grid_esp.dat']}
+                jobtoabsolutebinpath={cmdstr:poltype.which('psi4')}
 
 
-            if poltype.externalapi!=None:
-                if len(jobtooutputlog.keys())!=0:
-                    call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
-                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
-            else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False,wait=True)
+                if poltype.externalapi!=None:
+                    if len(jobtooutputlog.keys())!=0:
+                        call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
+                    finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
+                else:
+                    finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False,wait=True)
 
-            term,error=poltype.CheckNormalTermination(outputname)
-            if error:
-                poltype.RaiseOutputFileError(outputname) 
-
-
-    else:
-        term,error=poltype.CheckNormalTermination(poltype.logespfname,errormessages=None,skiperrors=True)
-        if poltype.espfit and not term:
-            poltype.WriteToLog("Calling: " + "Gaussian for ESP")
-            gen_comfile(poltype,poltype.comespfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkespfname,poltype.comtmp,optmol)
-            cmdstr = poltype.gausexe + " " + poltype.comespfname
-            jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logespfname}
-            jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
-            scratchdir=poltype.scrtmpdirgau
-            jobtologlistfilenameprefix=os.getcwd()+r'/'+'esp_jobtolog_'+poltype.molecprefix
-            inputfilepath=os.path.join(os.getcwd(),poltype.comespfname)
-            jobtoinputfilepaths={cmdstr:[inputfilepath]}
-            jobtooutputfiles={cmdstr:[poltype.logespfname,poltype.chkespfname]}
-            jobtoabsolutebinpath={cmdstr:poltype.which(poltype.gausexe)}
+                term,error=poltype.CheckNormalTermination(outputname)
+                if error:
+                    poltype.RaiseOutputFileError(outputname)
+                shutil.copy('grid_esp.dat',espname) 
 
 
-            if poltype.externalapi!=None:
-                if len(jobtooutputlog.keys())!=0:
-                    call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
-                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
-            else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False,wait=True)
+        else:
+            term,error=poltype.CheckNormalTermination(logespfname,errormessages=None,skiperrors=True)
+            if poltype.espfit and not term:
+                poltype.WriteToLog("Calling: " + "Gaussian for ESP")
+                gen_comfile(poltype,comespfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,chkespfname,poltype.comtmp,optmol)
+                cmdstr = poltype.gausexe + " " + comespfname
+                jobtooutputlog={cmdstr:os.getcwd()+r'/'+logespfname}
+                jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
+                scratchdir=poltype.scrtmpdirgau
+                jobtologlistfilenameprefix=os.getcwd()+r'/'+'esp_jobtolog_'+poltype.molecprefix
+                inputfilepath=os.path.join(os.getcwd(),comespfname)
+                jobtoinputfilepaths={cmdstr:[inputfilepath]}
+                jobtooutputfiles={cmdstr:[logespfname,chkespfname]}
+                jobtoabsolutebinpath={cmdstr:poltype.which(poltype.gausexe)}
 
-            cmdstr = poltype.formchkexe + " " + poltype.chkespfname
-            poltype.call_subsystem([cmdstr],True)
-            term,error=poltype.CheckNormalTermination(poltype.logespfname)
-            if error:
-                poltype.RaiseOutputFileError(poltype.logespfname)
+
+                if poltype.externalapi!=None:
+                    if len(jobtooutputlog.keys())!=0:
+                        call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
+                    finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
+                else:
+                    finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False,wait=True)
+
+                cmdstr = poltype.formchkexe + " " + chkespfname
+                poltype.call_subsystem([cmdstr],True)
+                term,error=poltype.CheckNormalTermination(logespfname)
+                if error:
+                    poltype.RaiseOutputFileError(logespfname)
 
     sys.stdout.flush()
+    return gridnamelist,espnamelist,fchknamelist,cubenamelist
+
 
 def CheckIfLogFileIsGaussian(poltype,logname):
     gaus=False
