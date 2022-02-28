@@ -973,21 +973,13 @@ def GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_
     if dim==1:
         first=numpy.array([Sx[i][0] for i in range(len(Sx))])
          
-        xpoints=numpy.unique(numpy.array([Sx[i][0] for i in range(len(Sx))]))
-        if len(xpoints)<len(first):
-            useunique=True
-        else:
-            useunique=False
+        xpoints=numpy.array([Sx[i][0] for i in range(len(Sx))])
         x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
         fig = plt.figure(figsize=(10,10))
         ax = fig.add_subplot(111)
         l1, = ax.plot(Sx,fitfunc_dict[clskey],'ro',color='red',label='Fit')
-        if useunique==True:
-            fitarray=numpy.unique(numpy.array(fitfunc_dict[clskey]))
-            torarray=numpy.unique(numpy.array(tor_energy_list))
-        else:
-            fitarray=numpy.array(fitfunc_dict[clskey])
-            torarray=numpy.array(tor_energy_list)
+        fitarray=numpy.array(fitfunc_dict[clskey])
+        torarray=numpy.array(tor_energy_list)
         f = interp1d(xpoints,fitarray, kind='quadratic')
         y_smooth=f(x_new)
         ax.plot(x_new,y_smooth,color='red')
@@ -1390,23 +1382,23 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             ax = fig.add_subplot(111)
             # energy profiles: mm (pre-fit), mm (post-fit), qm
             line1, =ax.plot(mang_list,mm_energy_list,'go',color='green',label='MM1 (prefit)')
-            xpoints=numpy.unique(numpy.array([mang_list[i][0] for i in range(len(mang_list))]))
+            xpoints=numpy.array([mang_list[i][0] for i in range(len(mang_list))])
             x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
-            f = interp1d(xpoints,numpy.unique(numpy.array(mm_energy_list)), kind='quadratic')
+            f = interp1d(xpoints,numpy.array(mm_energy_list), kind='quadratic')
             y_smooth=f(x_new)
             ax.plot(x_new,y_smooth,color='green')
 
             line2, =ax.plot(m2ang_list,mm2_energy_list,'ro',color='red',label='MM2 (postfit)')
-            xpoints=numpy.unique(numpy.array([m2ang_list[i][0] for i in range(len(m2ang_list))]))
+            xpoints=numpy.array([m2ang_list[i][0] for i in range(len(m2ang_list))])
             x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
-            f = interp1d(xpoints,numpy.unique(numpy.array(mm2_energy_list)), kind='quadratic')
+            f = interp1d(xpoints,numpy.array(mm2_energy_list), kind='quadratic')
             y_smooth=f(x_new)
             ax.plot(x_new,y_smooth,color='red')
 
             line3, =ax.plot(qang_list,qm_energy_list,'bo',color='blue',label='QM')
-            xpoints=numpy.unique(numpy.array([qang_list[i][0] for i in range(len(qang_list))]))
+            xpoints=numpy.array([qang_list[i][0] for i in range(len(qang_list))])
             x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
-            f = interp1d(xpoints,numpy.unique(numpy.array(qm_energy_list)), kind='quadratic')
+            f = interp1d(xpoints,numpy.array(qm_energy_list), kind='quadratic')
             y_smooth=f(x_new)
             ax.plot(x_new,y_smooth,color='blue')
 
@@ -1414,9 +1406,9 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
 
             # mm + fit
             line4, =ax.plot(mang_list,ff_list,'mo',color='magenta',label='MM1+Fit')
-            xpoints=numpy.unique(numpy.array([mang_list[i][0] for i in range(len(mang_list))]))
+            xpoints=numpy.array([mang_list[i][0] for i in range(len(mang_list))])
             x_new = numpy.linspace(xpoints.min(), xpoints.max(),500)
-            f = interp1d(xpoints,numpy.unique(numpy.array(ff_list)), kind='quadratic')
+            f = interp1d(xpoints,numpy.array(ff_list), kind='quadratic')
             y_smooth=f(x_new)
             ax.plot(x_new,y_smooth,color='magenta')
 
@@ -1424,9 +1416,9 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             # make a plot with different y-axis using second axis object
             try:
                 line5, =ax2.plot(qang_list,WBOarray,'yo',color='yellow',label='WBO')
-                xpoints=numpy.unique(numpy.array([qang_list[i][0] for i in range(len(qang_list))]))
+                xpoints=numpy.array([qang_list[i][0] for i in range(len(qang_list))])
                 x_new = numpy.linspace(xpoints.min(), xpoints.max(),500)
-                ypoints=numpy.unique(numpy.array([WBOarray[i][0] for i in range(len(WBOarray))]))
+                ypoints=numpy.array([WBOarray[i][0] for i in range(len(WBOarray))])
                 f = interp1d(xpoints,ypoints, kind='quadratic')
                 y_smooth=f(x_new)
                 ax2.plot(x_new,y_smooth,color='yellow')
