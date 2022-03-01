@@ -585,7 +585,7 @@ def SPForESP(poltype,optmolist,molist,xyzfnamelist,keyfnamelist):
                 if error:
                     poltype.RaiseOutputFileError(outputname)
             
-            shutil.copy('grid_esp.dat',espname) 
+                shutil.copy('grid_esp.dat',espname) 
 
 
         else:
