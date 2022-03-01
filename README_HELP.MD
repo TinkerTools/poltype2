@@ -29,11 +29,8 @@ python /path_to_poltype/poltype.py --help
 ```
 
 ### Recommended Protocol (esp for charged molecules)
-* For molecules that are neutral and not Zwitterion (total charge can be 0), PSI4 for all QM steps (psi4 is default behaviour).
-* For molecules with more than 1 charge center within 3 bond distances away, POLTYPE turns on (implicit solvent) for QM optimization and torsion energy scan (MM/Tinker is set to use Generalized Kirkwood implicit solvation to be consistent)). DMA & ESP fitting of multipoles always in gas-phase. In case PCM is not on automatically for your molecules, you can mannually add options ot turn on PCM (optpcm=True, toroptpcm=True, torsppcm=True). If gaussian is detected in enviorment, then gaussian will be used for PCM computations such as initial geometry optimization, torsion geometry optimization and torsion SP. 
-* PSI4 PCM optimzation or single point energy calculation of large molecules may be problematic. In that case, you may consider to use Gaussian (if concentrated charge centers are detected and Gaussian is found in envioronment, then Gaussian is used by default).
-* The most expensive calculation in POLTYPE is the ESP (MP2/aug-cc-pvtz). For large molecules, Gaussain requires large memeory and disk, Psi4 is an order og magnitude faster for MP2 (default is psi4).
-* Speical cases for zwitter ions
+* The most expensive calculation in POLTYPE is the ESP (MP2/aug-cc-pvtz). For large molecules, Gaussain requires large memeory and disk, Psi4 is an order of magnitude faster for MP2 (default is psi4).
+* PCM is turned on by default when zwitterions are detected
   ** If you need to use Gaussain (PSI4 PCM failed), and do not have suffcient mem/disk, you could lower the basis set to 6-311++G(2d,2p).
   ** another possibility is to (use_gausoptonly. This will use Gaussian for all opt jobs but PSi4 for DMA and ESP QM.  
 
@@ -77,11 +74,8 @@ jobsatsametime       Parralelize your QM and fragment poltype jobs for local hos
 externalapi          Specifies path to external API used for submitting quantum jobs on a cluster. Parralelize QM jobs and fragment poltype jobs on cluseter. For fragment jobs, if you wish to make fragment poltype jobs consume less memory then the parent job on the cluster, also add the keyword "jobsatsametime", this will divide parent memory by "jobsatsametime", (number of processors will be rounded to integer).
                      Default=None.
 
-username             Needed for RenLabCluster daemon (externalapi keyword). This will inform the daemon which username to submit jobs for the queuing system.
-                     Default=None
 
-
-fragmentjobslocal Run fragment jobs on localhost even when externalapi keyword is active
+fragmentjobslocal    Run fragment jobs on localhost even when externalapi keyword is active
                      Default=False
 
 coresperjob          Number of cores for jobs in parralel
@@ -99,23 +93,18 @@ genprotstatesonly    Output protonation states (at pH=7) in mol files(Protonatio
 
 * Note for very large molecules initial opt, DMA and ESP may require large amounts of memory if quantum job consistently crashes
 
-#### Most Common Input Example
+#### Minimal Input Example
 __All input arguments are specified in poltype.ini file__
 ```
 structure=methylamine.sdf
-numproc=4
-maxmem=20GB
-maxdisk=100GB
 ```
 * All booleans can switch their truth value, i.e., dontfrag=True or dontfrag=False
 
-####Submitting Quantum Jobs Externally
+#### Submitting Quantum Jobs Externally
 ```
 externalapi       specifies path to external API used for submitting quantum jobs on a cluster. 
                   Default=None.
 
-username          Needed for RenLabCluster daemon (externalapi keyword). This will inform the daemon which username to submit jobs for the queuing system.
-                  Default=None
 ```
 
 ### Geometry Optimization
@@ -238,33 +227,11 @@ nonaroringtor1Dscan This keyword will cut a non-aromatic ring and spin the torsi
                     Default=False  
 ```
 
-### Modified Amino Acids
-```
-modifiedresiduepdbcode    specifies three letter modified amino acid PDB code. 
-                          No default.
-mutatedsidechain          specifies modified amino acid structure (*.sdf) to replace with existing side chain. 
-                          Structure most include side chain of modified AA, connecting to Ca, which is connected
-                          to NH2 and COH for protein alignment. 
-                          No default.
-mutatedresiduenumber      specifies which amino acid residue will be replaced with mutated side chain. 
-                          No default.
-unmodifiedproteinpdbname  specifies the PDB (with protonation states already assigned), with un-modified 
-                          amino acids. 
-                          No default.
-modifiedproteinpdbname    specifies the PDB with modified amino acids, if not replacing existing side chain, or 
-                          this was already done. 
-                          No default.
-amoebabioprmpath          speicfies the path to amoebabio18.prm file for stitching parameters from existing 
-                          protein/NA parameters to mutated parameters. 
-                          No default.
-```
 
 ### Atom Typing
 ```
 atmidx                    specifies which number to start poltype type numbers from. 
                           Default=401
-transferqmequilvalues     specifies to tranfer QM equilbrium angle and bond lengths
-                          Default=True
 ```
 
 ### Van der Waals Parameterization.
@@ -322,51 +289,10 @@ Minimal examples are any example folder in Examples/, that contain Symmetry as t
 
 ### Common Errors
 
-* If QM and MM molecular dipole moments are too different, a ValueError will be raised.
-
-* If QM and MM optimized root mean square difference (RMSD) is too high, a ValueError will be raised.
-   * If -opt.log coordinates are not the same as .XYZ file coordinates then this is can cause this error.
-
-* If QM and MM root mean square potential difference (RMSPD) is too high, a ValueError will be raised.
-
-* If QM and MM for torsion fitting is too high, a ValueError will be raised. If for some reason you wish to remove an energy pointfrom the fitting, you can locate the corresponding SP QM log file and delete all of the text in it.
-
-* If your Tinker version is less than 8.7, a ValueError will be raised.
-
-* If using modifiedresidues library and a type number for the given atom index and PDB atom label are not found in the library, a ValueError will be raised. 
-
 * If POLTYPE crashes, you do not need to delete any quantum data or tinker data, POLTYPE will recognize that the file exists and attempt to continue with it.
 
-* Error: segmentation violation, this usually means an issue related to memory (not enough RAM or disk). However since we terminate optimization after few cycles (default 5), Gaussian will throw this error in poltype.log. Poltype will ignore this if it also sees 5 opt cycles completed sucessfully. 
+* Error: segmentation violation, this usually means an issue related to memory (not enough RAM or disk).  
 
-
-
-### Less Common Errors
-*********************************************
-* Error! The bond connectivity before and after structure optimization is different. Check to see if hydrogens are other atoms pop off during optimization.
-* If your RMSPD is too high and also you have a molecule of high symmetry, please check frame definitions and alter them as needed using POLEDIT and POTENTIAL command in Tinker to change frames/combine multipoles and refit to electrostatic potential. See Symmetry examples under Examples folder. We believe all symmetry cases are already covered by POLTYPE.
-
-* If you are concerned with vdw parameters, you may check again QM dimer (your_molecule-water) structure and energy.
-
-
-If there are no python errors as shown above, please read *-poltype.log to traceback and see the last command executed. 
-
-* First try and run the command from terminal manually to reproduce the error
-
-* Next have a reference poltype job from the Examples folder that has successfully completed
-
-* Compare the inputs of the command to the inputs in successful poltype job. Look for anything different that might cause the error.
-
-* Try googling issue such as error in Psi4/Gaussian log file
-
-### Modified Amino Acid Errors:
-* Typically errors here that appear as undefined types or missing parameters in the final key files are a result of inconsistency between the atom label and residue label in the input PDB file and the atom label, residue label in the library lib.bio18_conv1.txt used to convert atomlabel, residue label to type numbers.
-
-* Delete any atoms at end of PDB not a part of a full residue (like an alpha carbon at the very end).
-
-* If the number of expected atoms connected to an atom type are not found, it is possible either the incorrect PDB atom label was used for that protonation state or there is a missing/extra hydrogen.
-
-* If restarting poltype job after error delete the ModifiedPrm.prm file in poltype directory before restarting.
 
 ### ForceBalance Poltype Wrapper
  
