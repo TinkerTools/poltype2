@@ -2513,6 +2513,7 @@ class PolarizableTyper():
                 obConversion.SetInFormat(inFormat)
                 obConversion.ReadFile(othermol, self.molstructfname)
                 othermol=self.SetDefaultCoordinatesBabel(othermol,indextocoordinates)
+                othermol.SetTotalCharge(self.totalcharge)
                 molist.append(othermol)
 
         return molist
