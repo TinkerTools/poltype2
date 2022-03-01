@@ -137,6 +137,7 @@ def GrabResults(outputfile):
                 prevprevlinesplit=prevprevline.split()
                 refkeyword='Ref'
                 calckeyword='Calc'
+                errorkeyword='CalcErr'
                 prevprevprevline=results[lineidx-3]
                 prevprevprevlinesplit=prevprevprevline.split()
                 foundQM=False
@@ -181,9 +182,14 @@ def GrabResults(outputfile):
                     tpdic[name][tp][property][refkeyword]=[]
                 if calckeyword not in tpdic[name][tp][property].keys():
                     tpdic[name][tp][property][calckeyword]=[]
+                if errorkeyword not in tpdic[name][tp][property].keys():
+                    tpdic[name][tp][property][errorkeyword]=[]
+
                 ref=float(linesplit[3])
                 calc=float(linesplit[4])
+                error=float(linesplit[6])
                 tpdic[name][tp][property][refkeyword].append(ref)
+                tpdic[name][tp][property][errorkeyword].append(error)
                 tpdic[name][tp][property][calckeyword].append(calc)
             elif foundQM==True:
                 if targetname not in qmdic.keys():
@@ -367,9 +373,11 @@ def PlotFBLiq(tpdic,nametotptofinalprops):
 
                 innermostdic=innerdic[property]
                 refkey='Ref'
-                calckey='Calc' 
+                calckey='Calc'
+                errkey='CalcErr' 
                 refarray=np.array(innermostdic[refkey])
                 calcarray=np.array(innermostdic[calckey])
+                errarray=np.array(innermostdic[errkey])
                 if property=='Enthalpy':
                     scale=0.239006 # convert kj to kcal
                     units='(kcal/mol)'
@@ -380,6 +388,7 @@ def PlotFBLiq(tpdic,nametotptofinalprops):
                 calcarray=scale*calcarray
                 nametotptofinalprops[name][tp][property][refkey]=refarray[-1]
                 nametotptofinalprops[name][tp][property][calckey]=calcarray[-1]
+                nametotptofinalprops[name][tp][property][errkey]=errarray[-1]
                 err=np.abs(refarray-calcarray)
                 relerr=100*(err/refarray)
                 label1=property+' AMOEBA'
@@ -391,8 +400,9 @@ def PlotFBLiq(tpdic,nametotptofinalprops):
                 title=name+' '+property+' '+string
                 x=list(range(len(refarray)))
                 #ScatterPlot2D(title,x,calcarray,refarray,xkey,ykey,labels)
-                proptoaxes[property].scatter(x,calcarray, s=10, c=c, marker="s", label='AMOEBA '+string)
-                proptoaxes[property].scatter(x,refarray, s=10, c=c, marker="o", label='Target '+string)              
+                proptoaxes[property].scatter(x,calcarray, s=10, c=c, marker="o", label='AMOEBA '+string)
+                proptoaxes[property].errorbar(x, calcarray, yerr=errarray,c=c, fmt="o")
+                proptoaxes[property].scatter(x,refarray, s=10, c=c, marker="s", label='Target '+string)              
                 proptoaxes[property].set_ylabel(ykey,fontsize=12)
                 proptoaxes[property].set_xlabel(xkey,fontsize=12)
                 newtitle=name+' '+property
@@ -1060,11 +1070,69 @@ def WriteOutParamTable(moltotypetoprms,moltotypetoelement):
                 energy_writer.writerow(array)  
 
 
+def PlotLiquidPropsVsTemp(nametotptofinalprops):
+    curdir=os.getcwd()
+    nametotemparray={}
+    nametoproptokeytoarray={}
+    for name,tptofinalprops in nametotptofinalprops.items():
+        if not os.path.isdir(name):
+            os.mkdir(name)
+        os.chdir(name)
+        temparray=[]
+        proptokeytoarray={}
+        for tp, finalprops in tptofinalprops.items():
+            temp=tp[0]
+            pressure=tp[1]
+            temparray.append(temp)
+            for propname,dic in finalprops.items():
+                if propname not in proptokeytoarray.keys():
+                    proptokeytoarray[propname]={}
+                for key,value in dic.items():
+                    if key not in proptokeytoarray[propname].keys():
+                        proptokeytoarray[propname][key]=[]
+                    proptokeytoarray[propname][key].append(value)
+        
+        for propname in proptokeytoarray.keys():
+            if propname=='Enthalpy':
+                units='(kcal/mol)'
+            else:
+                units='$kg/m^3$'
+            xkey='Temperature (K)'
+            ykey=propname+' '+units
+
+            fig = plt.figure()
+            ax1 = fig.add_subplot(111)
+            innerdic=proptokeytoarray[propname]
+            calcarray=innerdic['Calc']
+            refarray=innerdic['Ref']
+            calcerrarray=innerdic['CalcErr']   
+            ax1.scatter(temparray,calcarray, s=10, c='red', marker="o", label='AMOEBA')
+            ax1.errorbar(temparray, calcarray, yerr=calcerrarray,c='red', fmt="o")
+            ax1.scatter(temparray,refarray, s=10, c='blue', marker="s", label='Target')              
+            ax1.set_ylabel(ykey,fontsize=12)
+            ax1.set_xlabel(xkey,fontsize=12)
+            newtitle=name+' '+propname+ ' Vs Temperature'
+            ax1.set_title(newtitle)
+            ax1.legend()
+            x=np.array(temparray)
+            refarray=np.array(refarray)
+            calcarray=np.array(calcarray)
+            x_new = np.linspace(x.min(),x.max(),500)
+            imagename=newtitle+'.png'
+            fig.savefig(imagename)
+
+
+        nametoproptokeytoarray[name]=proptokeytoarray
+        nametotemparray[name]=temparray
+
+        os.chdir('..')
+    os.chdir(curdir)
+
 def WriteOutPropTable(nametotptofinalprops,moltomaxiter):
     tempname='SummaryProps.csv'
     with open(tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        header=['Name','Temperature','Pressure','Density Ref','Density Calc','Density Error','Density RelError','Enthalpy Ref','Enthalpy Calc','Enthalpy Error','Enthalpy RelError','Max Iter']
+        header=['Name','Temperature','Pressure','Density Ref','Density Calc','Density CalcErr','Density Error','Density RelError','Enthalpy Ref','Enthalpy Calc','Enthalpy CalcErr','Enthalpy Error','Enthalpy RelError','Max Iter']
         energy_writer.writerow(header)
         for name,tptofinalprops in nametotptofinalprops.items():
             maxiter=moltomaxiter[name]
@@ -1209,3 +1277,4 @@ WriteOutQMTable(nametoformulatormse,nametoformulatomse)
 poltypedirs=GrabPoltypeDirectories(jobdirs)
 nametocubefiles=GrabCubeFiles(poltypedirs)
 PlotAllESPSurfaces(nametocubefiles)
+PlotLiquidPropsVsTemp(nametotptofinalprops)
