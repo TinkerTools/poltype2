@@ -584,7 +584,8 @@ def SPForESP(poltype,optmolist,molist,xyzfnamelist,keyfnamelist):
                 term,error=poltype.CheckNormalTermination(outputname)
                 if error:
                     poltype.RaiseOutputFileError(outputname)
-                shutil.copy('grid_esp.dat',espname) 
+            
+            shutil.copy('grid_esp.dat',espname) 
 
 
         else:

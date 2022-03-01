@@ -18,11 +18,12 @@ def GeometryOPTWrapper(poltype,molist):
     optmolist=[]
     errorlist=[]
     torsionrestraintslist=[]
+    totcharge=molist[0].GetTotalCharge()
     for molidx in range(len(molist)):
         mol=molist[molidx]
         suf=str(molidx+1)
         try:
-            optmol,error,torsionrestraints = GeometryOptimization(poltype,mol,suffix=suf)
+            optmol,error,torsionrestraints = GeometryOptimization(poltype,mol,totcharge,suffix=suf)
         except:
             redo=False
             if poltype.fullopt==True:
@@ -592,7 +593,7 @@ def FindTorsionRestraints(poltype,mol):
 
     return torsionrestraints
 
-def GeometryOptimization(poltype,mol,suffix='1',loose=False,checkbonds=True,modred=True,bondanglerestraints=None,skipscferror=False,charge=None,skiperrors=False,overridecheckterm=False): # specify charge instead of reading from mol if charge!=None
+def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds=True,modred=True,bondanglerestraints=None,skipscferror=False,charge=None,skiperrors=False,overridecheckterm=False): # specify charge instead of reading from mol if charge!=None
     if bondanglerestraints!=None or poltype.isfragjob==True or poltype.generateextendedconf==False: # then vdw opt
         pass
         torsionrestraints=[]
@@ -679,7 +680,7 @@ def GeometryOptimization(poltype,mol,suffix='1',loose=False,checkbonds=True,modr
         GrabFinalXYZStructure(poltype,logoptfname,logoptfname.replace('.log','.xyz'),mol)
         optmol =  load_structfile(poltype,logoptfname.replace('.log','.xyz'))
         optmol=rebuild_bonds(poltype,optmol,mol)
-    optmol.SetTotalCharge(mol.GetTotalCharge())
+    optmol.SetTotalCharge(totcharge)
     GrabFinalXYZStructure(poltype,logoptfname,logoptfname.replace('.log','.xyz'),mol)
     return optmol,error,torsionrestraints
 
