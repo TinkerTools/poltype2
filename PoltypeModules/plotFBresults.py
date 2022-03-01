@@ -206,6 +206,7 @@ def GrabResults(outputfile):
 def PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoindices):
     nametotptofinalprops={}
     nametoformulatormse={}
+    nametoformulatomse={}
     for tpdic in tpdiclist:
         nametotptofinalprops=PlotFBLiq(tpdic,nametotptofinalprops)
     nametofigs={}
@@ -237,7 +238,7 @@ def PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoin
             os.chdir(name)
             formula=filenametoformula[qmtarget] 
             c=filenametocolor[qmtarget]
-            x,rmsvalues=PlotFBQM(targetdic,formula,indices)
+            x,rmsvalues,msvalues=PlotFBQM(targetdic,formula,indices)
             nametoaxes[name].scatter(x,rmsvalues, s=10, c=c,marker="s", label=formula)
             x=np.array(x)
             x_new = np.linspace(x.min(),x.max(),500)
@@ -258,10 +259,12 @@ def PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoin
             nametofigs[name].savefig(imagename)
             if name not in nametoformulatormse.keys():
                 nametoformulatormse[name]={}
+                nametoformulatomse[name]={}
             nametoformulatormse[name][formula]=rmsvalues[-1]
+            nametoformulatomse[name][formula]=msvalues[-1]
             os.chdir('..')
 
-    return nametotptofinalprops,nametoformulatormse
+    return nametotptofinalprops,nametoformulatormse,nametoformulatomse
 
 def GrabStructure(formula):
     files=os.listdir()
@@ -293,15 +296,19 @@ def PlotFBQM(targetdic,formula,indices):
     refvalues=np.transpose(np.array(targetdic['Ref']))
     calcvalues=np.transpose(np.array(targetdic['Calc']))
     rmsvalues=[]
+    msvalues=[]
     struct=GrabStructure(formula)
     mol=GrabMolecule(struct)
     distance,prefix=GrabDistanceAndElements(mol,indices)
     distances=np.array(distances)*distance
     for i in range(len(refvalues)):
-        refs=refvalues[i]
-        calcs=calcvalues[i]
+        refs=np.array(refvalues[i])
+        calcs=np.array(calcvalues[i])
         rms = sqrt(mean_squared_error(calcs, refs))
         rmsvalues.append(rms)
+        diff=calcs-refs
+        ms=np.mean(diff)
+        msvalues.append(ms)
         label1='AMOEBA'
         label2='Target'
         ykey='Interaction Energy (kcal/mol)'
@@ -323,7 +330,7 @@ def PlotFBQM(targetdic,formula,indices):
     labels=[label1]
     title=formula+' RMSE vs Iteration'
     #ScatterPlot1D(title,x,rmsvalues,xkey,ykey,labels)
-    return x,rmsvalues
+    return x,rmsvalues,msvalues
 
 
 def PlotFBLiq(tpdic,nametotptofinalprops):
@@ -482,6 +489,7 @@ def ScatterPlot1D(title,x,y1,xkey,ykey,labels,interpolate=True,correlation=False
 
 def GrabFinalNeatLiquidTrajectories(jobdirs):
     moltotptoarc={}
+    moltomaxiter={}
     ext='.arc'
     curdir=os.getcwd()
     for i in range(len(jobdirs)):
@@ -505,6 +513,7 @@ def GrabFinalNeatLiquidTrajectories(jobdirs):
                             num=int(split[1])
                             numtofolder[num]=newf
                     maxnum=max(numtofolder.keys())
+                    moltomaxiter[name]=maxnum
                     maxfolder=numtofolder[maxnum]
                     os.chdir(maxfolder)
                     morefiles=os.listdir()
@@ -529,7 +538,7 @@ def GrabFinalNeatLiquidTrajectories(jobdirs):
  
                     os.chdir('..')
     os.chdir(curdir)
-    return moltotptoarc
+    return moltotptoarc,moltomaxiter
 
 
 def GrabDimerDistanceInfo(qmdiclist,jobdirs):
@@ -1051,25 +1060,43 @@ def WriteOutParamTable(moltotypetoprms,moltotypetoelement):
                 energy_writer.writerow(array)  
 
 
-def WriteOutPropTable(nametotptofinalprops):
+def WriteOutPropTable(nametotptofinalprops,moltomaxiter):
     tempname='SummaryProps.csv'
     with open(tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        header=['Name','Temperature','Pressure','Density Ref','Density Calc','Enthalpy Ref','Enthalpy Calc']
+        header=['Name','Temperature','Pressure','Density Ref','Density Calc','Density Error','Density RelError','Enthalpy Ref','Enthalpy Calc','Enthalpy Error','Enthalpy RelError','Max Iter']
         energy_writer.writerow(header)
         for name,tptofinalprops in nametotptofinalprops.items():
+            maxiter=moltomaxiter[name]
+
             for tp, finalprops in tptofinalprops.items():
                 array=[0]*len(header)
+                headeridx=header.index('Max Iter')
+                array[headeridx]=maxiter
                 temp=tp[0]
                 pressure=tp[1]
                 array[0]=name
                 array[1]=temp
                 array[2]=pressure
                 for propname,dic in finalprops.items():
+                    all=[]
                     for key,value in dic.items():
                         thename=propname+' '+key
                         headeridx=header.index(thename)
-                        array[headeridx]=round(value,3)
+                        value=round(value,3)
+                        array[headeridx]=value
+                        all.append(value)
+                        if key=='Ref':
+                            truevalue=value
+                    error=all[0]-all[1]
+                    error=np.abs(round(error,2))
+                    relerror=round((100*error)/truevalue,2)
+                    thename=propname+' '+'Error'
+                    headeridx=header.index(thename)
+                    array[headeridx]=error
+                    thename=propname+' '+'RelError'
+                    headeridx=header.index(thename)
+                    array[headeridx]=relerror
                 energy_writer.writerow(array) 
 
 
@@ -1146,15 +1173,16 @@ def GrabParameterValues(prmfiles):
     return moltotypetoprms,moltotypetoelement
 
 
-def WriteOutQMTable(nametoformulatormse):
+def WriteOutQMTable(nametoformulatormse,nametoformulatomse):
     tempname='SummaryQM.csv'
     with open(tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        header=['Name','Dimer Name','RMSE']
+        header=['Name','Dimer Name','RMSE','MSE']
         energy_writer.writerow(header)
         for name,formulatormse in nametoformulatormse.items():
             for formula,rmse in formulatormse.items():
-                array=[name,formula,rmse]
+                mse=nametoformulatomse[name][formula]
+                array=[name,formula,round(rmse,2),round(mse,2)]
                 energy_writer.writerow(array)
 
                      
@@ -1170,14 +1198,14 @@ qmtargetnamedic,nametodimerstructs,truenametoindices=GrabDimerDistanceInfo(qmdic
 neatliqnametoindices=ExtractNeatLiquidIndices(truenametoindices)
 os.chdir(curdir)
 nametofilenametoformula=PlotAllDimers(nametodimerstructs,truenametoindices)
-nametotptofinalprops,nametoformulatormse=PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoindices)
-WriteOutPropTable(nametotptofinalprops)
-moltotptoarc=GrabFinalNeatLiquidTrajectories(jobdirs)
+nametotptofinalprops,nametoformulatormse,nametoformulatomse=PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoindices)
+moltotptoarc,moltomaxiter=GrabFinalNeatLiquidTrajectories(jobdirs)
+WriteOutPropTable(nametotptofinalprops,moltomaxiter)
 PlotAllRDFs(moltotptoarc,neatliqnametoindices)
 prmfiles=GrabFinalParameters(jobdirs)
 moltotypetoprms,moltotypetoelement=GrabParameterValues(prmfiles)
 WriteOutParamTable(moltotypetoprms,moltotypetoelement)
-WriteOutQMTable(nametoformulatormse)
+WriteOutQMTable(nametoformulatormse,nametoformulatomse)
 poltypedirs=GrabPoltypeDirectories(jobdirs)
 nametocubefiles=GrabCubeFiles(poltypedirs)
 PlotAllESPSurfaces(nametocubefiles)
