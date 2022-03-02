@@ -1773,25 +1773,7 @@ class PolarizableTyper():
 
     
 
-    def CheckIfTorsionUndefined(self,listoftorsionsforprm,conf): # sometimes rdkit conformation has 3 linear atoms
-        isitsafe=True
-        for tor in listoftorsionsforprm:
-            middle=[tor[1],tor[2]]
-            firstangle=rdMolTransforms.GetAngleDeg(conf,tor[0],tor[1],tor[2])
-            secondangle=rdMolTransforms.GetAngleDeg(conf,tor[1],tor[2],tor[3])
-
-            if firstangle<0:
-                firstangle=firstangle+360
-            if secondangle<0:
-                secondangle=secondangle+360
-            angletol=2
-            if np.abs(180-firstangle)<=2 or np.abs(180-secondangle)<=2:
-                isitsafe=False
-                break
-
-        return isitsafe
-
-
+    
 
     def GenerateExtendedConformer(self,rdkitmol,mol):
         numconf=100 # just try this
@@ -1807,9 +1789,6 @@ class PolarizableTyper():
             name="conftest.mol"
             rdmolfiles.MolToMolFile(rdkitmol,name,confId=i)
             mol=rdmolfiles.MolFromMolFile(name,removeHs=False)
-            isitsafe=self.CheckIfTorsionUndefined(listoftorsionsforprm,conf)
-            if isitsafe==False:
-                continue
             maxdist=self.FindLongestDistanceInMolecule(mol)
             disttoconf[maxdist]=i
             energytoconf[energy]=i
