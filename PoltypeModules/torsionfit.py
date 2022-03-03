@@ -25,6 +25,7 @@ def CheckGeometricRestraintEnergy(poltype,alzfile):
     temp=open(alzfile,'r')
     results=temp.readlines()
     temp.close()
+    energy=0
     for line in results:
         if 'Geometric Restraints' in line:
             linesplit=line.split()
@@ -1230,6 +1231,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         tmpkeyfname = 'tmp.key'
         qm_energy_list,qang_list,WBOarray,energytophaseangle = compute_qm_tor_energy(poltype,torset,mol,flatphaselist)
         mm_energy_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,'_preQMOPTprefit',flatphaselist,False,tmpkeyfname)
+        prepostmm_energy_list,prepostmang_list,preposttor_e_list = compute_mm_tor_energy(poltype,mol,torset,'_preQMOPTpostfit',flatphaselist,False,tmpkeyfname)
         mm2_energy_list,m2ang_list,tor_e_list2 = compute_mm_tor_energy(poltype,mol,torset,'_postQMOPTpostfit',flatphaselist,True,tmpkey2basename)
 
         if len(poltype.onlyfittorstogether)!=0:
@@ -1242,7 +1244,6 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             torang = mol.GetTorsion(a,b,c,d)
             atmnuma = mol.GetAtom(a).GetAtomicNum()
             atmnumd = mol.GetAtom(d).GetAtomicNum()
-
             # clskey
             clskey = torgen.get_class_key(poltype,a, b, c, d)
             classkeylist.append(clskey)
@@ -1259,11 +1260,13 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         originalmm2ang_list=m2ang_list.copy()
         originalmm2_energy_list=mm2_energy_list.copy()
         originalmm_energy_list=mm_energy_list.copy()
+        originalprepostmm_energy_list=prepostmm_energy_list.copy()
         originalqm_energy_list=qm_energy_list.copy()
-        arrays=AssignZeros(poltype,[originalmm_energy_list,originalqm_energy_list,originalmm2_energy_list])
+        arrays=AssignZeros(poltype,[originalmm_energy_list,originalqm_energy_list,originalmm2_energy_list,originalprepostmm_energy_list])
         originalmm_energy_list=arrays[0]
         originalqm_energy_list=arrays[1]
         originalmm2_energy_list=arrays[2]
+        originalprepostmm_energy_list=arrays[3]
         originaltor_e_list=tor_e_list.copy()
         originaltor_e_list2=tor_e_list2.copy()
         originalWBOarray=WBOarray.copy()
@@ -1312,12 +1315,16 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]
         mm2_energy_list = [en - min(mm2_energy_list) for en in mm2_energy_list]
+        prepostmm_energy_list = [en - min(prepostmm_energy_list) for en in prepostmm_energy_list]
+
 
         originalmm2_energy_list=ConvertNoneToZero(poltype,originalmm2_energy_list)
         originalmm_energy_list=ConvertNoneToZero(poltype,originalmm_energy_list)
+        originalprepostmm_energy_list=ConvertNoneToZero(poltype,originalprepostmm_energy_list)
 
         originalmm2_energy_list= [en - min(originalmm2_energy_list) for en in originalmm2_energy_list]
         originalmm_energy_list= [en - min(originalmm_energy_list) for en in originalmm_energy_list]
+        originalprepostmm_energy_list= [en - min(originalprepostmm_energy_list) for en in originalprepostmm_energy_list]
 
         originalff_list = [aa+bb for (aa,bb) in zip(originalmm_energy_list,originalfitfuncarray)]
         # find the difference between the two energy due to torsion profiles 
@@ -1412,10 +1419,19 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             y_smooth=f(x_new)
             ax.plot(x_new,y_smooth,color='magenta')
 
+            # prefit tinker XYZ structure but with postfit parameters
+            line5, =ax.plot(prepostmang_list,prepostmm_energy_list,'o',color='black',label='MM1XYZMM2Prm')
+            xpoints=numpy.array([prepostmang_list[i][0] for i in range(len(mang_list))])
+            x_new = numpy.linspace(xpoints.min(), xpoints.max(),500)
+            f = interp1d(xpoints,numpy.array(prepostmm_energy_list), kind='quadratic')
+            y_smooth=f(x_new)
+            ax.plot(x_new,y_smooth,color='black')
+
+
             ax2=ax.twinx()
             # make a plot with different y-axis using second axis object
             try:
-                line5, =ax2.plot(qang_list,WBOarray,'yo',color='yellow',label='WBO')
+                line6, =ax2.plot(qang_list,WBOarray,'yo',color='yellow',label='WBO')
                 xpoints=numpy.array([qang_list[i][0] for i in range(len(qang_list))])
                 x_new = numpy.linspace(xpoints.min(), xpoints.max(),500)
                 ypoints=numpy.array([WBOarray[i][0] for i in range(len(WBOarray))])
@@ -1428,7 +1444,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
                 pass
             ax.set_xlabel('Dihedral Angle')
             ax.set_ylabel('SP Energy (kcal/mol)')
-            plt.legend(handles=[line1,line2,line3,line4,line5],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
+            plt.legend(handles=[line1,line2,line3,line4,line5,line6],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
 
             fig = plt.gcf()
             plt.show()
@@ -1608,13 +1624,17 @@ def RemoveFiles(poltype,string,occurance):
 def PostfitMinAlz(poltype,keybasename,keybasepath):
     for outputlog in poltype.optoutputtotorsioninfo.keys():
         term,error=poltype.CheckNormalTermination(outputlog)
-        [torset,optmol,variabletorlist,phaseangles,bondtopology,optoutputlog]=poltype.optoutputtotorsioninfo[outputlog]
+        [torset,optmol,variabletorlist,phaseangles,bondtopology,optoutputlog,initialxyz]=poltype.optoutputtotorsioninfo[outputlog]
         if term==True:   
             if not poltype.use_gaus:
                 cartxyzname=optoutputlog.replace('.log','.xyz')
                 cartxyz,torxyzfname=torgen.tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,cartxyzname,poltype.torsionrestraint,'_postQMOPTpostfit',keybasename,keybasepath,bondtopology)
+                cartxyz,torxyzfname=torgen.tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,cartxyzname,poltype.torsionrestraint,'_preQMOPTpostfit',keybasename,keybasepath,bondtopology,tinkerxyz=initialxyz,minimize=False)
+
             else:
                 cartxyz,torxyzfname=torgen.tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,outputlog,poltype.torsionrestraint,'_postQMOPTpostfit',keybasename,keybasepath,bondtopology)
+                cartxyz,torxyzfname=torgen.tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,outputlog,poltype.torsionrestraint,'_preQMOPTpostfit',keybasename,keybasepath,bondtopology,tinkerxyz=initialxyz,minimize=False)
+
 
 def DecomposeTorsionTorsion(poltype,optmol):
     torstoadd=[]

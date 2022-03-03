@@ -107,6 +107,7 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,varia
     inputfilepaths=[]
     outputfilenames=[]
     executables=[]
+    outputlogtoinitialxyz={}
     for i in range(len(listofstructurestorunQM)):
         torxyzfname=listofstructurestorunQM[i]
         phaseangles=phaselist[i]
@@ -126,7 +127,8 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,varia
             outputlogs.append(outputlog)
         optlogtophaseangle[outputlog]=phaseangles
         initialstructures.append(torxyzfname)   
-    return outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures,optlogtophaseangle,inputfilepaths,outputfilenames,executables
+        outputlogtoinitialxyz[outputlog]=torxyzfname
+    return outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures,optlogtophaseangle,inputfilepaths,outputfilenames,executables,outputlogtoinitialxyz
 
 def CheckIfPsi4Log(poltype,outputlog):
     check=False
@@ -392,7 +394,7 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
         prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology) # sometimes extra bonds are made when atoms get too close during minimization
         prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
         
-        torxyzfname,tmpkeyfname,torminlogfname=tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,'_preQMOPTprefit',poltype.key6fname,'../')
+        torxyzfname,tmpkeyfname,torminlogfname=tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,'_preQMOPTprefit',poltype.key6fname,'../')
         prevstrctfname,torxyzfname,newtorxyzfname,keyfname,failedcheck=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,'_preQMOPTprefit',poltype.key6fname,'../',torxyzfname,tmpkeyfname,torminlogfname)
         toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
         term=AnalyzeTerm(poltype,toralzfname)
@@ -423,12 +425,19 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
 
 
 
-def tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,prevstrctfname,torsionrestraint,designatexyz,keybase,keybasepath,bondtopology):
+def tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,prevstrctfname,torsionrestraint,designatexyz,keybase,keybasepath,bondtopology,tinkerxyz=None,minimize=True):
     prevstruct = opt.load_structfile(poltype,prevstrctfname) 
     prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
     prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology)
-    torxyzfname,tmpkeyfname,torminlogfname=tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseangles,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath)
-    cartxyz,torxyzfname,newtorxyzfname,keyfname,failedcheck=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseangles,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath,torxyzfname,tmpkeyfname,torminlogfname)
+    torxyzfname,tmpkeyfname,torminlogfname=tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseangles,torsionrestraint,designatexyz,keybase,keybasepath)
+    if tinkerxyz!=None:
+        shutil.copy(tinkerxyz,torxyzfname)
+    newtorxyzfname=torxyzfname
+    keyfname=tmpkeyfname
+    shutil.copy(keybasepath+keybase,keyfname)
+    cartxyz=None
+    if minimize==True:
+        cartxyz,torxyzfname,newtorxyzfname,keyfname,failedcheck=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseangles,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath,torxyzfname,tmpkeyfname,torminlogfname)
     toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
     term=AnalyzeTerm(poltype,toralzfname)
     if term==False:
@@ -448,13 +457,13 @@ def AnalyzeTerm(poltype,filename):
     return term
 
 def tinker_analyze(poltype,torxyzfname,keyfname,toralzfname):
-    alzcmdstr=poltype.analyzeexe+' -k '+keyfname+' '+torxyzfname+' ed > %s' % toralzfname
+    alzcmdstr=poltype.analyzeexe+' '+torxyzfname+' '+'-k '+keyfname+' ed > %s' % toralzfname
     poltype.call_subsystem([alzcmdstr],False)
     temp={alzcmdstr:toralzfname} 
     finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
 
 
-def tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath):
+def tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,designatexyz,keybase,keybasepath):
     prefix='%s-opt-' % (poltype.molecprefix)
     postfix='%s.xyz' % (designatexyz)
     torxyzfname,angles=GenerateFilename(poltype,torset,phaseanglelist,prefix,postfix,optmol)
@@ -768,7 +777,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     poltype.tensorphases={}
     torsettooutputlogtoinitialstructure={}
     torsettoinistructophaselist={}
-    
+    totaloutputlogtoinitialxyz={} 
     optlogtophaseangle={}
     for torset in poltype.torlist:
         phaseangles=[0]*len(torset)
@@ -836,14 +845,14 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
 
         poltype.SanitizeAllQMMethods()
         
-        outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures,optlogtophaseangle,inputfilepaths,outputfilenames,executables=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol,'1',optlogtophaseangle)
+        outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures,optlogtophaseangle,inputfilepaths,outputfilenames,executables,outputlogtoinitialxyz=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol,'1',optlogtophaseangle)
         torsettooptoutputlogs[tuple(torset)]=outputlogs
         dictionary = dict(zip(outputlogs,initialstructures))  
         torsettooutputlogtoinitialstructure[tuple(torset)].update(dictionary)
         inistructophaselist = dict(zip(initialstructures,flatphaselist))  
         torsettoinistructophaselist[tuple(torset)]=inistructophaselist
         lognames=[]
-        
+        totaloutputlogtoinitialxyz.update(outputlogtoinitialxyz)
         for jobidx in range(len(listofjobs)):
             job=listofjobs[jobidx]
             log=jobtooutputlog[job]
@@ -1018,7 +1027,8 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                 outputlog=optlogtosplog[optoutputlog]
                 if optoutputlog in finishedjobs and outputlog not in errorjobs:
                     phaseangles=outputlogtophaseangles[outputlog]
-                    poltype.optoutputtotorsioninfo[outputlog]= [torset,optmol,variabletorlist,phaseangles,bondtopology,optoutputlog]
+                    initialxyz=totaloutputlogtoinitialxyz[optoutputlog]
+                    poltype.optoutputtotorsioninfo[outputlog]= [torset,optmol,variabletorlist,phaseangles,bondtopology,optoutputlog,initialxyz]
     os.chdir('..')
 
 

@@ -51,30 +51,35 @@ def GrabOutputFiles(jobdirs):
     return outputfiles
 
 
-def GrabCubeFiles(jobdirs):
+def GrabCubeFiles(groupedpoltypedirs):
     nametocubefiles={}
     curdir=os.getcwd()
-    for path in jobdirs:
-        os.chdir(path)
-        files=os.listdir()
-        array=[]
-        for f in files:
-            if f=='ESP.cube' or f=='Dt.cube':
-                filepath=os.path.join(path,f)
-                array.append(filepath)
-            if '-esp.log' in f:
-                name=f.replace('-esp.log','')
-        if len(array)!=0:
-            nametocubefiles[name]=array
-
+    groupednames=[]
+    for grp in groupedpoltypedirs:
+        newgrp=[]
+        for path in grp:
+            os.chdir(path)
+            files=os.listdir()
+            array=[]
+            for f in files:
+                if f=='ESP.cube' or f=='Dt.cube':
+                    filepath=os.path.join(path,f)
+                    array.append(filepath)
+                if '-esp.log' in f:
+                    name=f.replace('-esp.log','')
+                    newgrp.append(name)
+            if len(array)!=0:
+                nametocubefiles[name]=array
+        groupednames.append(newgrp)
     
 
     os.chdir(curdir)
-    return nametocubefiles
+    return nametocubefiles,groupednames
 
 
 def GrabPoltypeDirectories(jobdirs):
     poltypedirs=[]
+    groupedpoltypedirs=[]
     curdir=os.getcwd()
     for path in jobdirs:
         os.chdir(path)
@@ -84,10 +89,10 @@ def GrabPoltypeDirectories(jobdirs):
                 filepath=os.path.join(path,f)
                 paths=ReadInputGrabPaths(filepath)
                 poltypedirs.extend(paths)
-
+                groupedpoltypedirs.append(paths)
 
     os.chdir(curdir)
-    return poltypedirs
+    return poltypedirs,groupedpoltypedirs
 
 
 def ReadInputGrabPaths(filepath):
@@ -309,7 +314,9 @@ def PlotFBQM(targetdic,formula,indices):
     distances=np.array(distances)*distance
     for i in range(len(refvalues)):
         refs=np.array(refvalues[i])
+        refs=refs-min(refs)
         calcs=np.array(calcvalues[i])
+        calcs=calcs-min(calcs)
         rms = sqrt(mean_squared_error(calcs, refs))
         rmsvalues.append(rms)
         diff=calcs-refs
@@ -697,7 +704,7 @@ def PlotAllDimers(nametodimerstructs,truenametoindices):
             filenametoformula[dimer]=dimerformula
             count+=1
         nametofilenametoformula[name]=filenametoformula
-        PlotDimers3D(filenames,allindices)
+        #PlotDimers3D(filenames,allindices)
         os.chdir('..')
     return nametofilenametoformula
 
@@ -1128,6 +1135,10 @@ def PlotLiquidPropsVsTemp(nametotptofinalprops):
         os.chdir('..')
     os.chdir(curdir)
 
+    return nametotemparray,nametoproptokeytoarray
+
+
+
 def WriteOutPropTable(nametotptofinalprops,moltomaxiter):
     tempname='SummaryProps.csv'
     with open(tempname, mode='w') as energy_file:
@@ -1254,6 +1265,61 @@ def WriteOutQMTable(nametoformulatormse,nametoformulatomse):
                 energy_writer.writerow(array)
 
                      
+def PlotLiquidPropsVsTempForGroups(nametotemparray,nametoproptokeytoarray,groupednames):
+    grptoproptofig={}
+    grptoproptoaxes={}
+    for grp in groupednames:
+        
+        if len(grp)>1:
+            grp=tuple(grp)
+            n=len(grp)
+            color = cm.rainbow(np.linspace(0, 1, n))
+            if grp not in grptoproptofig.keys():
+                grptoproptofig[grp]={}
+                grptoproptoaxes[grp]={}
+            totalname=''
+            for name in grp:
+                if name in nametotemparray.keys():
+                    totalname+=name+','
+            totalname=totalname[:-1]
+            for nameidx in range(len(grp)):
+                name=grp[nameidx]
+                if name in nametotemparray.keys():
+                    temparray=nametotemparray[name]
+                    string=' '+name        
+                    proptokeytoarray=nametoproptokeytoarray[name]
+                    c=color[nameidx]
+                    for propname in proptokeytoarray.keys():
+                        if propname not in grptoproptofig[grp].keys():
+                            fig = plt.figure()
+                            ax1 = fig.add_subplot(111)
+                            grptoproptofig[grp][propname]=fig
+                            grptoproptoaxes[grp][propname]=ax1
+
+                        if propname=='Enthalpy':
+                            units='(kcal/mol)'
+                        else:
+                            units='$kg/m^3$'
+                        xkey='Temperature (K)'
+                        ykey=propname+' '+units
+
+                        innerdic=proptokeytoarray[propname]
+                        calcarray=innerdic['Calc']
+                        refarray=innerdic['Ref']
+                        calcerrarray=innerdic['CalcErr']   
+                        grptoproptoaxes[grp][propname].scatter(temparray,calcarray, s=10, c=c, marker="o", label='AMOEBA'+string)
+                        grptoproptoaxes[grp][propname].errorbar(temparray, calcarray, yerr=calcerrarray,c=c, fmt="o")
+                        grptoproptoaxes[grp][propname].scatter(temparray,refarray, s=10, c=c, marker="s", label='Target'+string)              
+                        grptoproptoaxes[grp][propname].set_ylabel(ykey,fontsize=12)
+                        grptoproptoaxes[grp][propname].set_xlabel(xkey,fontsize=12)
+                        newtitle=totalname+' '+propname+ ' Vs Temperature'
+                        grptoproptoaxes[grp][propname].set_title(newtitle)
+                        grptoproptoaxes[grp][propname].legend()
+                        imagename=newtitle+'.png'
+                        grptoproptofig[grp][propname].savefig(imagename)
+
+
+
 
 
 curdir=os.getcwd()
@@ -1274,7 +1340,9 @@ prmfiles=GrabFinalParameters(jobdirs)
 moltotypetoprms,moltotypetoelement=GrabParameterValues(prmfiles)
 WriteOutParamTable(moltotypetoprms,moltotypetoelement)
 WriteOutQMTable(nametoformulatormse,nametoformulatomse)
-poltypedirs=GrabPoltypeDirectories(jobdirs)
-nametocubefiles=GrabCubeFiles(poltypedirs)
-PlotAllESPSurfaces(nametocubefiles)
-PlotLiquidPropsVsTemp(nametotptofinalprops)
+poltypedirs,groupedpoltypedirs=GrabPoltypeDirectories(jobdirs)
+nametocubefiles,groupednames=GrabCubeFiles(groupedpoltypedirs)
+#PlotAllESPSurfaces(nametocubefiles)
+nametotemparray,nametoproptokeytoarray=PlotLiquidPropsVsTemp(nametotptofinalprops)
+PlotLiquidPropsVsTempForGroups(nametotemparray,nametoproptokeytoarray,groupednames)
+

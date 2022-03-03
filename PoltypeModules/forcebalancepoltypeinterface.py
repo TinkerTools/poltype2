@@ -37,13 +37,11 @@ def GrabArrayInputs(nametopropsarray,nametoarrayindexorder):
     temperature_list=[]
     pressure_list=[]
     enthalpy_of_vaporization_list=[]
-    heat_capacity_at_constant_pressure_list=[]
     density_list=[]
     tempstring='Temperature (K)'
     pressurestring='Pressure (atm)'
     densitystring='Density (Kg/m^3)'
     enthalpystring='Enthalpy (kJ/mol)'
-    heatcapstring='Heat Capacity (Isobaric cal/mol.K)'
     sortednametoarrayindexorder={k: v for k, v in sorted(arrayindexordertoname.items(), key=lambda item: item[0])}
     for arrayidx,name in sortednametoarrayindexorder.items():
         propsdict=nametopropsarray[name]
@@ -51,14 +49,12 @@ def GrabArrayInputs(nametopropsarray,nametoarrayindexorder):
         pressure=propsdict[pressurestring]
         density=propsdict[densitystring]
         enthalpy=propsdict[enthalpystring]
-        heatcap=propsdict[heatcapstring]
         temperature_list.append(temp)
         pressure_list.append(pressure)
         enthalpy_of_vaporization_list.append(enthalpy)
-        heat_capacity_at_constant_pressure_list.append(heatcap)
         density_list.append(density)   
 
-    return temperature_list,pressure_list,enthalpy_of_vaporization_list,heat_capacity_at_constant_pressure_list,density_list
+    return temperature_list,pressure_list,enthalpy_of_vaporization_list,density_list
 
 
 def FindIndexWithString(string,array):
@@ -90,13 +86,11 @@ def ReadCSVFile(csvfileread,poltypepathlist):
         pressurestring='Pressure (atm)'
         densitystring='Density (Kg/m^3)'
         enthalpystring='Enthalpy (kJ/mol)'
-        heatcapstring='Heat Capacity (Isobaric cal/mol.K)'
         nameindex=FindIndexWithString(namestring,header)
         tempindex=FindIndexWithString(tempstring,header)
         pressureindex=FindIndexWithString(pressurestring,header)
         densityindex=FindIndexWithString(densitystring,header)
         enthalpyindex=FindIndexWithString(enthalpystring,header)
-        heatcapindex=FindIndexWithString(heatcapstring,header)
         nametopropsarray={} 
         for rowidx in range(1,len(reader)):
             row=reader[rowidx]
@@ -107,7 +101,6 @@ def ReadCSVFile(csvfileread,poltypepathlist):
             pressure=CheckNoneValue(row[pressureindex])
             density=CheckNoneValue(row[densityindex])
             enthalpy=CheckNoneValue(row[enthalpyindex])
-            heatcap=CheckNoneValue(row[heatcapindex])
             if name not in nametopropsarray.keys():
                 nametopropsarray[name]={}
             if tempstring not in nametopropsarray[name].keys():
@@ -122,9 +115,6 @@ def ReadCSVFile(csvfileread,poltypepathlist):
             if enthalpystring not in nametopropsarray[name].keys():
                 nametopropsarray[name][enthalpystring]=[]
             nametopropsarray[name][enthalpystring].append(enthalpy)
-            if heatcapstring not in nametopropsarray[name].keys():
-                nametopropsarray[name][heatcapstring]=[]
-            nametopropsarray[name][heatcapstring].append(heatcap)
         for path in poltypepathlist:
             head,name=os.path.split(path)
             if name not in nametopropsarray.keys():
@@ -137,8 +127,6 @@ def ReadCSVFile(csvfileread,poltypepathlist):
                 nametopropsarray[name][densitystring]=[]
             if enthalpystring not in nametopropsarray[name].keys():
                 nametopropsarray[name][enthalpystring]=[]
-            if heatcapstring not in nametopropsarray[name].keys():
-                nametopropsarray[name][heatcapstring]=[]
 
 
     return nametopropsarray
@@ -568,16 +556,16 @@ def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogethe
                         if 4 in prmtypestofit:
                             linesplit.append('4')
                         else:
-                            linesplit[4]='1'
+                            linesplit[4]='1 #'
                 else:
-                    linesplit[4]='1'
+                    linesplit[4]='1 #'
             
             if linelen==5 and last!=1:
                 vdwtypetored[vdwtype]=True
             else:
                 vdwtypetored[vdwtype]=False
             if 4 not in prmtypestofit:
-                linesplit[4]='1'
+                linesplit[4]='1 #'
                 vdwtypetored[vdwtype]=False
             newline=' '.join(linesplit)+'\n'
             vdwtypetoline[vdwtype]=newline   
@@ -590,7 +578,7 @@ def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogethe
                 red=vdwtypetored[int(vdwtype)]
                 line=line.replace('\n','')
                 if len(transferprmstofit)!=0:
-                    line+=" PRM"
+                    line+="PRM"
                     for idx in transferprmstofit:
                         line+=' '+str(idx) 
    
@@ -1538,7 +1526,7 @@ def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liq
     if csvexpdatafile!=None:
         nametopropsarray=ReadCSVFile(csvexpdatafile,poltypepathlist)
         nametoarrayindexorder=GrabMoleculeOrder(poltypepathlist,nametopropsarray)
-        temperature_list,pressure_list,enthalpy_of_vaporization_list,heat_capacity_at_constant_pressure_list,density_list=GrabArrayInputs(nametopropsarray,nametoarrayindexorder)
+        temperature_list,pressure_list,enthalpy_of_vaporization_list,density_list=GrabArrayInputs(nametopropsarray,nametoarrayindexorder)
  
     if temperature_list==None:
         raise ValueError('No temperature data')
