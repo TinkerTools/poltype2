@@ -223,7 +223,7 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
     rows1=list([i[1] for i in rows])
     return rows1,rows0,WBOarray,energytophaseangle
 
-def compute_mm_tor_energy(poltype,mol,torset,designatexyz,flatphaselist,readangles=False,keyfile = None):
+def compute_mm_tor_energy(poltype,mol,torset,designatexyz,flatphaselist,keyfile = None):
     """
     Intent: Use tinker analyze to find the Pre-fit MM Energy vs. Dihedral Angle profile
     Input:
@@ -255,9 +255,6 @@ def compute_mm_tor_energy(poltype,mol,torset,designatexyz,flatphaselist,readangl
         newtorxyzfname=torxyzfname.replace('.xyz','.xyz_2')
         toralzfname = os.path.splitext(torxyzfname)[0] + '.alz'
         tot_energy,tor_energy=GrabTinkerEnergy(poltype,toralzfname)
-        if readangles==True:
-            if os.path.isfile(newtorxyzfname):
-                angles=ReadAnglesFromOutputFile(poltype,torset,newtorxyzfname)
         energy_list.append(tot_energy)
         torse_list.append(tor_energy)
         angle_list.append(angles)
@@ -460,7 +457,7 @@ def get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,fileprefix):
         classkeylist=[]
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
         qme_list,qang_list,WBOarray,energytophaseangle = compute_qm_tor_energy(poltype,torset,mol,flatphaselist)
-        mme_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,fileprefix,flatphaselist,False,tmpkey1basename)
+        mme_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,fileprefix,flatphaselist,tmpkey1basename)
         if len(poltype.onlyfittorstogether)!=0:
             torset=tuple(poltype.onlyfittorstogether)
 
@@ -1230,9 +1227,9 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
 
         tmpkeyfname = 'tmp.key'
         qm_energy_list,qang_list,WBOarray,energytophaseangle = compute_qm_tor_energy(poltype,torset,mol,flatphaselist)
-        mm_energy_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,'_preQMOPTprefit',flatphaselist,False,tmpkeyfname)
-        prepostmm_energy_list,prepostmang_list,preposttor_e_list = compute_mm_tor_energy(poltype,mol,torset,'_preQMOPTpostfit',flatphaselist,False,tmpkeyfname)
-        mm2_energy_list,m2ang_list,tor_e_list2 = compute_mm_tor_energy(poltype,mol,torset,'_postQMOPTpostfit',flatphaselist,True,tmpkey2basename)
+        mm_energy_list,mang_list,tor_e_list = compute_mm_tor_energy(poltype,mol,torset,'_preQMOPTprefit',flatphaselist,tmpkeyfname)
+        prepostmm_energy_list,prepostmang_list,preposttor_e_list = compute_mm_tor_energy(poltype,mol,torset,'_preQMOPTpostfit',flatphaselist,tmpkeyfname)
+        mm2_energy_list,m2ang_list,tor_e_list2 = compute_mm_tor_energy(poltype,mol,torset,'_postQMOPTpostfit',flatphaselist,tmpkey2basename)
 
         if len(poltype.onlyfittorstogether)!=0:
             torset=tuple(poltype.onlyfittorstogether)

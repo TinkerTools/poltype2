@@ -704,7 +704,7 @@ def PlotAllDimers(nametodimerstructs,truenametoindices):
             filenametoformula[dimer]=dimerformula
             count+=1
         nametofilenametoformula[name]=filenametoformula
-        #PlotDimers3D(filenames,allindices)
+        PlotDimers3D(filenames,allindices)
         os.chdir('..')
     return nametofilenametoformula
 
@@ -1342,7 +1342,7 @@ WriteOutParamTable(moltotypetoprms,moltotypetoelement)
 WriteOutQMTable(nametoformulatormse,nametoformulatomse)
 poltypedirs,groupedpoltypedirs=GrabPoltypeDirectories(jobdirs)
 nametocubefiles,groupednames=GrabCubeFiles(groupedpoltypedirs)
-#PlotAllESPSurfaces(nametocubefiles)
+PlotAllESPSurfaces(nametocubefiles)
 nametotemparray,nametoproptokeytoarray=PlotLiquidPropsVsTemp(nametotptofinalprops)
 PlotLiquidPropsVsTempForGroups(nametotemparray,nametoproptokeytoarray,groupednames)
 
