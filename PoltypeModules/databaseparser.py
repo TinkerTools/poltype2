@@ -48,50 +48,51 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
                 for line,transferinfo in amoebaplusvdwprmstotransferinfo.items():
                     f.write(transferinfo)
                     f.write(line)
+                    f.write('\n')
 
             else:
                 for line,transferinfo in vdwprmstotransferinfo.items():
                     f.write(transferinfo)
                     f.write(line)
-            f.write('\n')
+                    f.write('\n')
             for line,transferinfo in bondprmstotransferinfo.items():
                 f.write(transferinfo)
                 f.write(line)
-            f.write('\n')
+                f.write('\n')
             for line,transferinfo in angleprmstotransferinfo.items():
                 f.write(transferinfo)
                 f.write(line)
-            f.write('\n')
+                f.write('\n')
             for line,transferinfo in strbndprmstotransferinfo.items():
                 f.write(transferinfo)
                 f.write(line)
-            f.write('\n')
+                f.write('\n')
             for line,transferinfo in opbendprmstotransferinfo.items():
                 f.write(transferinfo)
                 f.write(line)
-            f.write('\n')
+                f.write('\n')
             for line,transferinfo in torsionprmstotransferinfo.items():
                 f.write(transferinfo)
                 f.write(line)
-            f.write('\n')
+                f.write('\n')
             for line in soluteprms:
                 f.write(line)
-            f.write('\n')
+                f.write('\n')
             for line,transferinfo in tortorprmstotransferinfo.items():
                 if 'tortors' in line:
                     f.write(transferinfo)
                 f.write(line)
-            f.write('\n')
+                f.write('\n')
 
             if poltype.forcefield=='AMOEBA+':
                 for line,transferinfo in ctprmstotransferinfo.items():
                     f.write(transferinfo)
                     f.write(line)
-                f.write('\n')
+                    f.write('\n')
                 for line,transferinfo in cpprmstotransferinfo.items():
                     f.write(transferinfo)
                     f.write(line)
-                f.write('\n')
+                    f.write('\n')
                 for line,transferinfo in bondcfprmstotransferinfo.items():
                     f.write(transferinfo)
                     f.write(line)
@@ -99,7 +100,7 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
                 for line,transferinfo in anglecfprmstotransferinfo.items():
                     f.write(transferinfo)
                     f.write(line)
-                f.write('\n')
+                    f.write('\n')
 
 
                                     
@@ -2307,7 +2308,7 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
             linesplit=line.split()
             vdwtype=int(linesplit[1])
             if vdwtype in missingvdwtypes:
-                extraline+='# Missing vdw parameters'
+                extraline+='# Missing vdw parameters'+'\n'
 
         if 'angle' in line:
             linesplit=line.split()
@@ -2316,7 +2317,7 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
             c=int(linesplit[3])
             ls=[a,b,c]
             if ls in missinganglepoltypeclasses or ls[::-1] in missinganglepoltypeclasses:
-                extraline+='# Missing angle parameters, assigning default parameters via element and valence'
+                extraline+='# Missing angle parameters, assigning default parameters via element and valence'+'\n'
                 warn=True
 
         if 'strbnd' in line:
@@ -2326,7 +2327,7 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
             c=int(linesplit[3])
             ls=[a,b,c]
             if ls in missinganglepoltypeclasses or ls[::-1] in missinganglepoltypeclasses:
-                extraline+='# Missing strbnd parameters, zeroing out parameters'
+                extraline+='# Missing strbnd parameters, zeroing out parameters'+'\n'
                 warn=True
         if 'bond' in line:
             linesplit=line.split()
@@ -2334,7 +2335,7 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
             b=int(linesplit[2])
             ls=[a,b]
             if ls in missingbondpoltypeclasses or ls[::-1] in missingbondpoltypeclasses:
-                extraline+='# Missing bond parameters, assigning default parameters via element and valence'
+                extraline+='# Missing bond parameters, assigning default parameters via element and valence'+'\n'
                 warn=True
 
         if 'torsion' in line:
@@ -2345,9 +2346,9 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
             d=int(linesplit[4])
             ls=[a,b,c,d]
             if ls in torsionsmissing or ls[::-1] in torsionsmissing:
-                extraline+='# Missing torsion parameters, will attempt to fit parameters'
+                extraline+='# Missing torsion parameters, will attempt to fit parameters'+'\n'
 
-        extraline+='\n'
+        #extraline+='\n'
         transferinfoline+=extraline
         if warn==True:
             poltype.WriteToLog(transferinfoline)
