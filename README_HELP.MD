@@ -196,6 +196,10 @@ onlyrotbndslist   specifies to only rotate bonds in the list, onlyrotbndlist=1 2
 tortor            specifies to sample the torsion-torsion potential energy surface for two adjecent and                                rotatable dihedrals
                   Default=False
 
+onlyrottortorlist specifies list of tortors to rotate. "onlyrottortorlist=b1 c1 d1 , b2 c2 d2" where b1,c1,d1 belong tor tortor a1,b1,c1,d1,e1.
+                  Default=None
+  
+
 fitfirsttorsionfoldphase specifies to add a phase fitting parameter to the first cosine term in the torsion fitting                           function
                          Default=False
 

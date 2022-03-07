@@ -1721,7 +1721,19 @@ def FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertop
         foundtortormissing=CheckIfRotatableBondInMissingTorTors(poltype,[bnew-1,c],[c,dnew-1],tortorsmissing)
         foundtortor=CheckIfRotatableBondInMissingTorTors(poltype,[bnew-1,c],[c,dnew-1],tortorsfound)
         if foundtortormissing==False and foundtortor==False:
-            tortorsmissing.append(indices)
+            if len(poltype.onlyrottortorlist)==0:
+                tortorsmissing.append(indices)
+            else:
+                ls=[b+1,c+1,d+1]
+                if ls in poltype.onlyrottortorlist or ls[::-1] in poltype.onlyrottortorlist:
+                    tortorsmissing.append(indices)
+
+        else:
+            ls=[b+1,c+1,d+1]
+            if ls in poltype.onlyrottortorlist or ls[::-1] in poltype.onlyrottortorlist:
+                tortorsmissing.append(indices)
+
+
     return tortorsmissing
 
 def CheckIfRotatableBondsInOnlyRotBnds(poltype,first,second):
@@ -4771,7 +4783,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
 
         totalbondscollector=FindAllConsecutiveRotatableBonds(poltype,mol,listofbondsforprm)
         tortorsmissing=FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertoparameters,rdkitmol,mol,indextoneighbidxs,totalbondscollector)
-        
         torsionindicestosmartsatomorders=AddDictionaryItems(poltype,torsionindicestosmartsatomorders,torsionindicestoextsmartsatomorders)
         torsionsmissing,poormatchingaromatictorsions,poormatchingpartialaromatictorsions,torsionstozerooutduetocolinear=FindMissingTorsions(poltype,torsionindicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs)
         torsionsmissing=FindAdjacentMissingTorsionsForTorTor(poltype,torsionsmissing,totalbondscollector,tortorsmissing)
