@@ -251,19 +251,6 @@ class PolarizableTyper():
         self.gentorsion=gentorsion
         self.gaustorerror=gaustorerror
         self.torsionrestraint=torsionrestraint
-        if onlyrotbndslist==None:
-            self.onlyrotbndslist=[]
-        else:
-           
-            self.onlyrotbndslist=onlyrotbndslist.split(',')
-            templist=[]
-            for ele in self.onlyrotbndslist:
-                nums=ele.lstrip().rstrip().split()
-                temp=[]
-                for e in nums:
-                    temp.append(int(e))
-                templist.append(temp)
-            self.onlyrotbndslist=templist
         self.rotalltors=rotalltors
         self.dontdotor=dontdotor
         self.dontdotorfit=dontdotorfit
@@ -726,8 +713,6 @@ class PolarizableTyper():
                                 temp.append(int(e))
                             templist.append(temp)
                         self.onlyrottortorlist=templist
-
-
 
                     elif "onlyfittorstogether" in newline:
                         self.onlyfittorstogether=a.split(',')

@@ -1118,7 +1118,7 @@ def PlotLiquidPropsVsTemp(nametotptofinalprops):
             ax1.scatter(temparray,refarray, s=10, c='blue', marker="s", label='Target')              
             ax1.set_ylabel(ykey,fontsize=12)
             ax1.set_xlabel(xkey,fontsize=12)
-            newtitle=name+' '+propname+ ' Vs Temperature'
+            newtitle=name+' '+propname+ ' Vs T'
             ax1.set_title(newtitle)
             ax1.legend()
             x=np.array(temparray)
@@ -1312,7 +1312,7 @@ def PlotLiquidPropsVsTempForGroups(nametotemparray,nametoproptokeytoarray,groupe
                         grptoproptoaxes[grp][propname].scatter(temparray,refarray, s=10, c=c, marker="s", label='Target'+string)              
                         grptoproptoaxes[grp][propname].set_ylabel(ykey,fontsize=12)
                         grptoproptoaxes[grp][propname].set_xlabel(xkey,fontsize=12)
-                        newtitle=totalname+' '+propname+ ' Vs Temperature'
+                        newtitle=totalname+' '+propname+ ' Vs T'
                         grptoproptoaxes[grp][propname].set_title(newtitle)
                         grptoproptoaxes[grp][propname].legend()
                         imagename=newtitle+'.png'

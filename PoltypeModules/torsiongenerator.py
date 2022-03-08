@@ -199,7 +199,7 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     foundatomblock=False
     writeres=False
     rotbndtorescount={}
-    maxrotbnds=2
+    maxrotbnds=1
 
     for k in range(len(results)):
         line=results[k]
@@ -479,13 +479,14 @@ def tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseangl
 def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath,torxyzfname,tmpkeyfname,torminlogfname):
     save_structfile(poltype,prevstruct,torxyzfname)
     shutil.copy(keybasepath+keybase, tmpkeyfname)
+    RemoveStringFromKeyfile(poltype,tmpkeyfname,'restrain-torsion')
     tmpkeyfh = open(tmpkeyfname,'a')
     restlist=[]
     count=0
     torsiontophaseangle={}
     torsiontomaintor={}
     rotbndtorescount={}
-    maxrotbnds=3
+    maxrotbnds=1
     for i in range(len(torset)):
         tor=torset[i]
         a,b,c,d=tor[0:4]
@@ -513,66 +514,78 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
             continue 
         torsiontophaseangle[tuple([a,b,c,d])]=round((torang+phaseangle)%360)
         torsiontomaintor[tuple([a,b,c,d])]=True
+        if b<c:
+            rotbnd=tuple([b,c])
+        else:
+            rotbnd=tuple([c,b])
+        if rotbnd not in rotbndtorescount.keys():
+            rotbndtorescount[rotbnd]=0
+        if rotbndtorescount[rotbnd]>=maxrotbnds:
+            continue
+        rotbndtorescount[rotbnd]+=1
+
         tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (a,b,c,d,torsionrestraint,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
-        for key in poltype.rotbndlist.keys():
-            torlist=poltype.rotbndlist[key]
-            count=0
-            for res in torlist:
-                resa,resb,resc,resd = res[0:4]
-                indices=[resa,resb,resc,resd]
-                totalatoms=optmol.NumAtoms()
-                allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,optmol)
-                allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,optmol)
-                aatom=optmol.GetAtom(resa)
-                datom=optmol.GetAtom(resd)
-                batom=optmol.GetAtom(resb)
-                catom=optmol.GetAtom(resc)
 
-                aatomicnum=aatom.GetAtomicNum()
-                datomicnum=datom.GetAtomicNum()
-                if (aatomicnum==1 or datomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
+
+    for key in poltype.rotbndlist.keys():
+        torlist=poltype.rotbndlist[key]
+        count=0
+        for res in torlist:
+            resa,resb,resc,resd = res[0:4]
+            indices=[resa,resb,resc,resd]
+            totalatoms=optmol.NumAtoms()
+            allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,optmol)
+            allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,optmol)
+            aatom=optmol.GetAtom(resa)
+            datom=optmol.GetAtom(resd)
+            batom=optmol.GetAtom(resb)
+            catom=optmol.GetAtom(resc)
+
+            aatomicnum=aatom.GetAtomicNum()
+            datomicnum=datom.GetAtomicNum()
+            if (aatomicnum==1 or datomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
+                continue
+            if (allhydtorsoneside==True or allhydtors==True) and (aatomicnum==1 or datomicnum==1):
+
+           
+                if count>=1:
                     continue
-                if (allhydtorsoneside==True or allhydtors==True) and (aatomicnum==1 or datomicnum==1):
+                count+=1
 
-               
-                    if count>=1:
+            firstangle=optmol.GetAngle(aatom,batom,catom)
+            secondangle=optmol.GetAngle(batom,catom,datom)
+            if firstangle<0:
+                firstangle=firstangle+360
+            if secondangle<0:
+                secondangle=secondangle+360
+            angletol=3.5
+            if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
+                continue 
+            if res not in restlist:
+                if (resa,resb,resc,resd) not in torset and (resd,resc,resb,resa) not in torset and (resa,resb,resc,resd) not in variabletorlist and (resd,resc,resb,resa) not in variabletorlist:
+                    if resb<resc:
+                        rotbnd=tuple([resb,resc])
+                    else:
+                        rotbnd=tuple([resc,resb])
+                    if rotbnd not in rotbndtorescount.keys():
+                        rotbndtorescount[rotbnd]=0
+                    if rotbndtorescount[rotbnd]>=maxrotbnds:
                         continue
-                    count+=1
+                    if (b==resb and c==resc) or (b==resc and c==resb):
+                        secondang = optmol.GetTorsion(resa,resb,resc,resd)
+                        string='restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (resa,resb,resc,resd,torsionrestraint,round((secondang+phaseangle)%360),round((secondang+phaseangle)%360))
+                        tmpkeyfh.write(string)
+                        torsiontophaseangle[tuple([resa,resb,resc,resd])]=round((secondang+phaseangle)%360)
+                        torsiontomaintor[tuple([resa,resb,resc,resd])]=False
+                    else:
+                        string='restrain-torsion %d %d %d %d %f\n' % (resa,resb,resc,resd,torsionrestraint)
+                        tmpkeyfh.write(string)
+                        secondang = optmol.GetTorsion(resa,resb,resc,resd)
+                        torsiontophaseangle[tuple([resa,resb,resc,resd])]=round((secondang)%360)
+                        torsiontomaintor[tuple([resa,resb,resc,resd])]=False
 
-                firstangle=optmol.GetAngle(aatom,batom,catom)
-                secondangle=optmol.GetAngle(batom,catom,datom)
-                if firstangle<0:
-                    firstangle=firstangle+360
-                if secondangle<0:
-                    secondangle=secondangle+360
-                angletol=3.5
-                if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
-                    continue 
-                if res not in restlist:
-                    if (resa,resb,resc,resd) not in torset and (resd,resc,resb,resa) not in torset and (resa,resb,resc,resd) not in variabletorlist and (resd,resc,resb,resa) not in variabletorlist:
-                        if resb<resc:
-                            rotbnd=tuple([resb,resc])
-                        else:
-                            rotbnd=tuple([resc,resb])
-                        if rotbnd not in rotbndtorescount.keys():
-                            rotbndtorescount[rotbnd]=0
-                        if rotbndtorescount[rotbnd]>=maxrotbnds:
-                            continue
-                        if (b==resb and c==resc) or (b==resc and c==resb):
-                            secondang = optmol.GetTorsion(resa,resb,resc,resd)
-
-                            tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (resa,resb,resc,resd,torsionrestraint,round((secondang+phaseangle)%360),round((secondang+phaseangle)%360)))
-                            
-                            torsiontophaseangle[tuple([resa,resb,resc,resd])]=round((secondang+phaseangle)%360)
-                            torsiontomaintor[tuple([resa,resb,resc,resd])]=False
-                        else:
-                            tmpkeyfh.write('restrain-torsion %d %d %d %d %f\n' % (resa,resb,resc,resd,torsionrestraint))
-                            secondang = optmol.GetTorsion(resa,resb,resc,resd)
-                            torsiontophaseangle[tuple([resa,resb,resc,resd])]=round((secondang)%360)
-                            torsiontomaintor[tuple([resa,resb,resc,resd])]=False
-
-                        rotbndtorescount[rotbnd]+=1
-                        restlist.append(res)
+                    rotbndtorescount[rotbnd]+=1
+                    restlist.append(res)
     tmpkeyfh.close()
     mincmdstr = poltype.minimizeexe+' '+torxyzfname+' -k '+tmpkeyfname+' 0.1'+' '+'>'+torminlogfname
     term,error=poltype.CheckNormalTermination(torminlogfname)
@@ -1389,7 +1402,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     iteratom = openbabel.OBMolAtomIter(optmol)
     etab = openbabel.OBElementTable()
     rotbndtorescount={}
-    maxrotbnds=2
+    maxrotbnds=1
 
     if os.path.isfile(torxyzfname):
         xyzstr = open(torxyzfname,'r')
