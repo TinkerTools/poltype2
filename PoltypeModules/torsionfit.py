@@ -968,6 +968,8 @@ def GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_
     string=' , '.join(list(torprmdict.keys()))
     datapts=len(mm_energy_list)
     poltype.WriteToLog('Torsions being fit '+string+' RMSD(QM-MM1)'+str(minRMSD))
+    tor_energy_list=[i-min(tor_energy_list) for i in tor_energy_list]
+    fitfunc_dict[clskey]=[i-min(fitfunc_dict[clskey]) for i in fitfunc_dict[clskey]]
     if dim==1:
         first=numpy.array([Sx[i][0] for i in range(len(Sx))])
          
