@@ -987,6 +987,8 @@ def GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_
         ax.plot(x_new,y_smooth,color='blue')
 
         plt.legend(handles=[l1,l2],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=2)
+        ax.set_xlabel('Dihedral Angle (degrees)')
+        ax.set_ylabel('Energy (kcal/mol)')
 
         ax.text(0.05, 1.1, 'Torsions Being Fit =%s'%(string), transform=ax.transAxes, fontsize=10,verticalalignment='top')
         ax.text(0, -0.1, 'FoldNum=%s NumPrms=%s DataPts=%s RMSD(fit,QM-MM1),Abs=%s'%(str(len(poltype.nfoldlist)),str(numprms),str(len(mm_energy_list)),round(minRMSD,2)), transform=ax.transAxes, fontsize=10,verticalalignment='bottom')
@@ -1439,8 +1441,8 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
                 ax2.set_ylabel("WBO",color="blue",fontsize=14)
             except:
                 pass
-            ax.set_xlabel('Dihedral Angle')
-            ax.set_ylabel('SP Energy (kcal/mol)')
+            ax.set_xlabel('Dihedral Angle (degrees)')
+            ax.set_ylabel('Energy (kcal/mol)')
             plt.legend(handles=[line1,line2,line3,line4,line5,line6],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
 
             fig = plt.gcf()
