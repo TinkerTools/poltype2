@@ -367,7 +367,6 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
     center=prevstrctfname
     prevphaseanglelist=None
     energyarray=[]
-    failedgridpoints=[]
     newphaselist=[]
         
     for rowindex in range(len(phaselist)): # we need to send back minimized structure in XYZ (not tinker) format to load for next tinker minimization,but append the xyz_2 tinker XYZ file so that com file can be generated from that 
@@ -400,17 +399,17 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
         term=AnalyzeTerm(poltype,toralzfname)
         if term==False:
             tinker_analyze(poltype,newtorxyzfname,keyfname,toralzfname)
-        if term==False:
-            failedgridpoints.append(phaseanglelist)
-        else:
-            tot_energy,tor_energy=torfit.GrabTinkerEnergy(poltype,toralzfname)
-            if failedcheck==False:
-                energyarray.append(tot_energy)
-           
+        term=AnalyzeTerm(poltype,toralzfname)
+
+        tot_energy,tor_energy=torfit.GrabTinkerEnergy(poltype,toralzfname)
+        if tot_energy==None:
+            tot_energy=0
+        if failedcheck==True:
+            tot_energy=0
+        energyarray.append(tot_energy)
         cartxyz=ConvertTinktoXYZ(poltype,newtorxyzfname,newtorxyzfname.replace('.xyz_2','_cart.xyz'))
-        if failedcheck==False:
-            newphaselist.append(phaseanglelist)
-            tinkerstructnamelist.append(newtorxyzfname)
+        newphaselist.append(phaseanglelist)
+        tinkerstructnamelist.append(newtorxyzfname)
         try:
             if len(phaseanglelist)==2: # then check for new center make sure hopping around 2D grid correctly (clockwise then counterclockwise)
                 a=phaseanglelist[0]
@@ -421,7 +420,7 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
             pass
 
         prevphaseanglelist=phaseanglelist
-    return tinkerstructnamelist,failedgridpoints,numpy.array(energyarray),numpy.array(newphaselist)
+    return tinkerstructnamelist,numpy.array(energyarray),numpy.array(newphaselist)
 
 
 
@@ -598,7 +597,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
     filename=torxyzfname+'_2'
     newfilename=filename.replace('.xyz_2','_xyzformat.xyz')
     cartxyz=ConvertTinktoXYZ(poltype,torxyzfname+'_2',newfilename)
-    failedcheck=CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle,torsiontomaintor) 
+    failedcheck=CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle,torsiontomaintor)
     return cartxyz,torxyzfname,torxyzfname+'_2',tmpkeyfname,failedcheck
 
 def CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle,torsiontomaintor):
@@ -743,6 +742,16 @@ def ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz):
         temp.write(line)
     temp.close()
 
+def RemoveBadPoints(poltype,listoftinkertorstructures,energyarray,flatphaselist):
+    indices=numpy.nonzero(energyarray)
+    newlistoftinkertorstructures=numpy.array(listoftinkertorstructures)[indices]
+    newenergyarray=numpy.array(energyarray)[indices]
+    newflatphaselist=numpy.array(flatphaselist)[indices] 
+    return newlistoftinkertorstructures,newenergyarray,newflatphaselist
+
+
+
+
 
 def gen_torsion(poltype,optmol,torsionrestraint,mol):
     """
@@ -830,7 +839,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         poltype.idealangletensor[tuple(truetorset)]=idealangletensor
         minstrctfname = prevstrctfname
         prevstrctfname = minstrctfname
-        listoftinkertorstructures,failedgridpoints,energyarray,flatphaselist=tinker_minimize_angles(poltype,torset,optmol,variabletorlist,flatphaselist,prevstrctfname,torsionrestraint,bondtopology)
+        listoftinkertorstructures,energyarray,flatphaselist=tinker_minimize_angles(poltype,torset,optmol,variabletorlist,flatphaselist,prevstrctfname,torsionrestraint,bondtopology)
         if len(torset)==2 and torset not in poltype.nonaroringtorsets:
             indicestokeep,firsttorindices,secondtorindices=Determine1DTorsionSlicesOnTorTorSurface(poltype,energyarray,flatphaselist,torset)
             flatphaselist,listoftinkertorstructures=RemoveTorTorPoints(poltype,energyarray,flatphaselist,indicestokeep,listoftinkertorstructures)
@@ -842,6 +851,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                     poltype.torsettophaselist[tuple([tor])]=secondtorindices
 
         else:
+            listoftinkertorstructures,energyarray,flatphaselist=RemoveBadPoints(poltype,listoftinkertorstructures,energyarray,flatphaselist)
             gridspacing=int(len(flatphaselist)/poltype.defaultmaxtorsiongridpoints)
             if gridspacing>1: 
                 locstoremove=[]
@@ -2042,7 +2052,7 @@ def Determine1DTorsionSlicesOnTorTorSurface(poltype,energyarray,phaseanglelist,t
     arraylength=len(energyarray)
     sqrt=int(numpy.sqrt(arraylength))
     energymatrix=energyarray.reshape((sqrt,sqrt))
-    minvalue=numpy.amin(energymatrix)
+    minvalue=numpy.amin(energymatrix[numpy.nonzero(energymatrix)])
     minindices=numpy.transpose(numpy.where(energymatrix==minvalue))[0]
     rowindex=minindices[0]
     colindex=minindices[1]
@@ -2051,14 +2061,21 @@ def Determine1DTorsionSlicesOnTorTorSurface(poltype,energyarray,phaseanglelist,t
     colslice=phaseanglematrix[:,colindex,:]
     for phase in rowslice:
         phase=phase.tolist()
-        indicestokeep.append(phase)
-        secondtorindices.append(phase)
+        indices=numpy.where(numpy.all(phaseanglematrix==phase,axis=1))
+        energyvalue=energymatrix[indices][0]
+        if energyvalue!=0: 
+            indicestokeep.append(phase)
+            secondtorindices.append(phase)
     poltype.torsettotortorphaseindicestokeep[tuple([torset[1]])]=secondtorindices
 
     for phase in colslice:
         phase=phase.tolist()
-        indicestokeep.append(phase)
-        firsttorindices.append(phase)
+        indices=numpy.where(numpy.all(phaseanglematrix==phase,axis=1))
+        energyvalue=energymatrix[indices][0]
+
+        if energyvalue!=0: 
+            indicestokeep.append(phase)
+            firsttorindices.append(phase)
     poltype.torsettotortorphaseindicestokeep[tuple([torset[0]])]=firsttorindices
     return indicestokeep,firsttorindices,secondtorindices
 

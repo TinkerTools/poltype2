@@ -175,9 +175,9 @@ dontdotor         specifies poltype to skip torsion spinning.
                   Default=False
 dontdotorfit      specifies poltype to skip torsion fitting. 
                   Default=False
-torsionrestraint  specifies how many kcals/mol to restrain other torsions around rotatable bond to be at 
+torsionrestraint  specifies how many kcals/mol/rad^2 to restrain other torsions around rotatable bond to be at 
                   current dihedral angle. 
-                  Default=.1
+                  Default=328.280354574
 foldnum           specifies the number of fourier terms used in torsion fitting.
                   Default=3
 tordatapointsnum  specifies the number of quantum jobs to sample along the dihedral angle for all torsions.
