@@ -577,9 +577,9 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
                         torsiontophaseangle[tuple([resa,resb,resc,resd])]=round((secondang+phaseangle)%360)
                         torsiontomaintor[tuple([resa,resb,resc,resd])]=False
                     else:
-                        string='restrain-torsion %d %d %d %d %f\n' % (resa,resb,resc,resd,torsionrestraint)
-                        tmpkeyfh.write(string)
                         secondang = optmol.GetTorsion(resa,resb,resc,resd)
+                        string='restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (resa,resb,resc,resd,torsionrestraint,round((secondang)%360),round((secondang)%360))
+                        tmpkeyfh.write(string)
                         torsiontophaseangle[tuple([resa,resb,resc,resd])]=round((secondang)%360)
                         torsiontomaintor[tuple([resa,resb,resc,resd])]=False
 
@@ -748,9 +748,6 @@ def RemoveBadPoints(poltype,listoftinkertorstructures,energyarray,flatphaselist)
     newenergyarray=numpy.array(energyarray)[indices]
     newflatphaselist=numpy.array(flatphaselist)[indices] 
     return newlistoftinkertorstructures,newenergyarray,newflatphaselist
-
-
-
 
 
 def gen_torsion(poltype,optmol,torsionrestraint,mol):
