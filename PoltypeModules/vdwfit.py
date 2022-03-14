@@ -91,6 +91,9 @@ def writePRM(poltype,params,vdwtypes,idxtotype):
         rFile=open(poltype.key4fname,'r')
         vdwtype=vdwtypes[i]
         vartype=idxtotype[i]
+        vdwradius=None
+        vdwdepth=None
+        vdwred=1
         if vartype=='rad':
             vdwradius=params[i]
 
@@ -104,36 +107,44 @@ def writePRM(poltype,params,vdwtypes,idxtotype):
             else:
                 vdwred=1
 
-
         elif vartype=='red':
             vdwred=params[i]
-        if vdwradius!=None and vdwdepth!=None and vdwred!=None:
-            for line in rFile.readlines():
-                linesplit=line.split()
-                if 'vdw' in line:
-                    if linesplit[1]==vdwtype:
-                        newline="vdw %s %s %s %s \n"%(vdwtype,vdwradius, vdwdepth,vdwred)
-                        vdwtypetonewline[vdwtype]=newline
-                        oFile.write(newline)
-                    else:
-                        notinline=True
-                        for othertype in vdwtypesalreadyfit:
-                            if linesplit[1]==othertype:
-                                notinline=False
-                                break
-                        if notinline==True:
-                            oFile.write(line)
-                        else:
-                            newline=vdwtypetonewline[othertype]
-                            oFile.write(newline)
 
+        for line in rFile.readlines():
+            linesplit=line.split()
+            if 'vdw' in line and '#' not in line:
+                if len(linesplit)!=5:
+                    linesplit.append('1')
+                line=' '.join(linesplit)+'\n' 
+                if linesplit[1]==vdwtype:
+                    if vdwradius!=None:
+                        linesplit[2]=str(vdwradius)
+                    if vdwdepth!=None:
+                        linesplit[3]=str(vdwdepth)
+                    if vdwred!=None:
+                        linesplit[4]=str(vdwred)
+                    newline=' '.join(linesplit)+'\n' 
+                    vdwtypetonewline[vdwtype]=newline
+                    oFile.write(newline)
                 else:
-                    oFile.write(line)
+                    notinline=True
+                    for othertype in vdwtypesalreadyfit:
+                        if linesplit[1]==othertype:
+                            notinline=False
+                            break
+                    if notinline==True:
+                        oFile.write(line)
+                    else:
+                        newline=vdwtypetonewline[othertype]
+                        oFile.write(newline)
 
-            vdwtypesalreadyfit.append(vdwtype)
-            vdwradius=None
-            vdwdepth=None
-            vdwred=None
+            else:
+                oFile.write(line)
+
+        vdwtypesalreadyfit.append(vdwtype)
+        vdwradius=None
+        vdwdepth=None
+        vdwred=None
     oFile.flush()
     os.fsync(oFile.fileno())
     oFile.close()
@@ -332,35 +343,12 @@ def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count,classkeytofitresults,all
 
 def VDWOptimizer(poltype,count,fitredboolarray):
     x0 = []
-
     curvdwtypes=readOneColumn("INITIAL.PRM", 1)
     vdwtypes=[]
     temp=open("INITIAL.PRM",'r')
     lines = temp.readlines()
     idxtotype={}
     count=0
-    for lineidx in range(len(lines)):
-        fitredbool=fitredboolarray[lineidx]
-        line=lines[lineidx]
-        x0.append(float(line.split()[2]))
-        idxtotype[count]='rad'
-        count+=1
-        x0.append(float(line.split()[3]))
-        idxtotype[count]='depth'
-        count+=1
-
-        if fitredbool==True:
-            x0.append(float(line.split()[4]))
-            idxtotype[count]='red'
-            count+=1
-
-        vdwtype=curvdwtypes[lineidx]
-        vdwtypes.append(vdwtype)
-        vdwtypes.append(vdwtype)
-        if fitredbool==True:
-            vdwtypes.append(vdwtype)
-
-    x0 = np.array(x0)
     rmax=readOneColumn("INITIAL.PRM", 6)
     rmax=[float(i) for i in rmax]
     rmin=readOneColumn("INITIAL.PRM", 5)
@@ -378,6 +366,8 @@ def VDWOptimizer(poltype,count,fitredboolarray):
     l3=list(zip(redmin, redmax))
     lower=[]
     upper=[]
+    rmintovdwtypes=dict(zip(rmin,curvdwtypes))  
+    vdwtypestoprmsremove={}
     for i in range(len(l1)):
         fitredbool=fitredboolarray[i]
         l1bound=l1[i]
@@ -388,17 +378,56 @@ def VDWOptimizer(poltype,count,fitredboolarray):
         l2lower=l2bound[0] 
         l2upper=l2bound[1] 
         l3lower=l3bound[0] 
-        l3upper=l3bound[1] 
-        lower.append(l1lower)
-        lower.append(l2lower)
+        l3upper=l3bound[1]
+        
+        vdwtype=rmintovdwtypes[l1lower]
+        if vdwtype not in vdwtypestoprmsremove.keys():
+            vdwtypestoprmsremove[vdwtype]=[]
+        if l1lower!=l1upper: 
+            lower.append(l1lower)
+        else:
+            vdwtypestoprmsremove[vdwtype].append('S')
+        if l2lower!=l2upper:
+            lower.append(l2lower)
+        else:
+            vdwtypestoprmsremove[vdwtype].append('T')
+
         if fitredbool==True:
             lower.append(l3lower)
-        upper.append(l1upper)
-        upper.append(l2upper)
+        if l1lower!=l1upper:
+            upper.append(l1upper)
+        if l2lower!=l2upper:
+            upper.append(l2upper)
         if fitredbool==True:
             upper.append(l3upper)
     MyBounds=[lower,upper]
     MyBounds=tuple(MyBounds)
+    for lineidx in range(len(lines)):
+        vdwtype=curvdwtypes[lineidx]
+        fitredbool=fitredboolarray[lineidx]
+        line=lines[lineidx]
+        prmstoremove=vdwtypestoprmsremove[vdwtype]
+        radius=float(line.split()[2])
+        depth=float(line.split()[3])
+        red=float(line.split()[4])
+        if 'S' not in prmstoremove:
+            x0.append(radius)
+            idxtotype[count]='rad'
+            count+=1
+            vdwtypes.append(vdwtype)
+
+        if 'T' not in prmstoremove:
+            x0.append(depth)
+            idxtotype[count]='depth'
+            count+=1
+            vdwtypes.append(vdwtype)
+        if fitredbool==True:
+            x0.append(red)
+            idxtotype[count]='red'
+            count+=1
+            vdwtypes.append(vdwtype)
+
+    x0 = np.array(x0)
     ''' local optimization method can be BFGS, CG, Newton-CG, L-BFGS-B,etc.., see here\
     https://docs.scipy.org/doc/scipy-0.19.1/reference/generated/scipy.optimize.minimize.html'''
     errorfunc= lambda p, poltype, vdwtypes,idxtotype,count: (myFUNC(p,poltype,vdwtypes,idxtotype,count))
@@ -935,16 +964,28 @@ def GrabVdwParameters(poltype,vdwtype):
     temp=open(poltype.key4fname,'r')
     results=temp.readlines()
     temp.close()
+    if 'S' in poltype.vdwprmtypestofit:
+        radbound=.1
+    else:
+        radbound=0
+    if 'T' in poltype.vdwprmtypestofit:
+        depthbound=.1
+    else:
+        depthbound=0
     for line in results:
         if 'vdw' in line:
             if str(vdwtype) in line:
+                if str(vdwtype) in poltype.fixvdwtyperadii:
+                    rbound=0
+                else:
+                    rbound=radbound
                 linesplit=line.split()
                 radius=float(linesplit[2])
-                minvdwradius=radius-.1*radius
-                maxvdwradius=radius+.1*radius
+                minvdwradius=radius-rbound*radius
+                maxvdwradius=radius+rbound*radius
                 depth=float(linesplit[3])
-                minvdwdepth=depth-.1*depth
-                maxvdwdepth=depth+.1*depth
+                minvdwdepth=depth-depthbound*depth
+                maxvdwdepth=depth+depthbound*depth
                 if depth>maxvdwdepth:
                     depth=maxvdwdepth-.001
                 if len(linesplit)==5 and poltype.fitred==True:
