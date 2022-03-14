@@ -467,10 +467,10 @@ def SPForDMA(poltype,optmol,mol):
     if poltype.use_gaus==False or poltype.use_gausoptonly==True:
 
         gen_comfile(poltype,poltype.comdmafname.replace('.com','_temp.com'),poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkdmafname,poltype.comtmp,optmol)
-        poltype.WriteToLog("Calling: " + "Psi4 Gradient for DMA")
         term,error=poltype.CheckNormalTermination(poltype.logdmafname,errormessages=None,skiperrors=True)
         inputname=CreatePsi4DMAInputFile(poltype,poltype.logoptfname.replace('.log','.xyz'),poltype.comdmafname,mol)
         if term==False:
+            poltype.WriteToLog("Calling: " + "Psi4 Gradient for DMA")
             cmdstr='psi4 '+inputname+' '+poltype.logdmafname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logdmafname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}

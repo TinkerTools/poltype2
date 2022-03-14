@@ -1492,7 +1492,7 @@ def ReadPRMFile(prmfilepath):
 
     return prmfilelines
 
-def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_prod_steps,gas_timestep,gas_interval,md_threads,liquid_prod_time,gas_prod_time,WQ_PORT,csvexpdatafile,fittypestogether,vdwprmtypestofit,vdwtypestoeval):
+def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_prod_steps,gas_timestep,gas_interval,md_threads,liquid_prod_time,gas_prod_time,WQ_PORT,csvexpdatafile,fittypestogether,vdwprmtypestofit,vdwtypestoeval,liquid_equ_time,gas_equ_time):
     
 
     debugmode=False
@@ -1503,6 +1503,8 @@ def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liq
      
     gas_prod_steps=int(1000000*gas_prod_time/gas_timestep)
     liquid_prod_steps=int(1000000*liquid_prod_time/liquid_timestep)
+    gas_equ_steps=int(1000000*gas_equ_time/gas_timestep)
+    liquid_equ_steps=int(1000000*liquid_equ_time/liquid_timestep)
 
     temperature_list=None
     pressure_list=None

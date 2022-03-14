@@ -1696,6 +1696,8 @@ def FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertop
                     tortorsmissing.append(tortorindices)
                 else:
                     tortorsfound.append(tortorindices)
+    if poltype.onlyrotbndslist==None:
+        poltype.onlyrotbndslist=[]
     for bndlist in totalbondscollector:
         first=bndlist[0]
         second=bndlist[1]

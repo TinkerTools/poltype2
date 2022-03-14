@@ -251,6 +251,9 @@ accuratevdwsp            Use CBS extraction on MP2 with counterpoise on basis se
 onlyvdwatomlist          List of Van der Waals atom indices to use in VdW refinement.
 
 addlonepairvdwsites      Add dimer ab initio near lone pair sites on target molecule atom.
+
+fixvdwtyperadii          List of vdwtypes to fix radius in fitting (can let other vdw parameters fit)
+                         Default=[]
 ```
 
 ### Misc.
@@ -329,8 +332,10 @@ gas_prod_steps                                       Production dynamic steps MD
 gas_timestep                                          
 gas_interval                                         How often frames written out, in ps
 md_threads                                           CPU cores
-liquid_prod_time                                     Total time liquid sim
-gas_prod_time                                        Total time gas sim
+liquid_prod_time                                     Total time liquid sim production
+gas_prod_time                                        Total time gas sim production
+liquid_equ_time                                      Total time liquid sim equilibriation
+gas_equ_time                                        Total time gas sim equilibriation
 debugmode                                            Sets MD to very short time for testing ForceBalance (.001 ns)
 vdwprmtypestofit                                     Sets allowed parameter types for all vdw parameters to fit for vdw (radius S, depth  T, shift D), default=S,T,D . Default makes all vdw parameter types able to be fit.
 vdwtypestoeval                           For parameters being fixed, this tells poltype which ones to fix (while the first instance of parameters is fit), default all parameters are evaluated besides for instance vdwtypestoeval=S,T,D. 
