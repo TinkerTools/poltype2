@@ -1381,6 +1381,8 @@ class PolarizableTyper():
         listoffilepaths=self.TabulateLogs(thepath)
         listoflistofcputimes=self.TabulateCPUTimes(listoffilepaths)
         listofcputimes=[sum(ls) for ls in listoflistofcputimes]
+        if len(listofcputimes)==0:
+            return 
         average=np.mean(listofcputimes)
         mintime=min(listofcputimes)
         maxtime=max(listofcputimes)
