@@ -69,7 +69,7 @@ def gen_esp_grid(poltype,mol,gridnamelist,espnamelist,fchknamelist,cubenamelist)
 
     for i in range(len(gridnamelist)):
         gridname=gridnamelist[i]
-        espname=espnamelist[i]c
+        espname=espnamelist[i]
         fchkname=fchknamelist[i]
         cubename=cubenamelist[i]
         potfile=cubename.replace('.cube','.pot') 
