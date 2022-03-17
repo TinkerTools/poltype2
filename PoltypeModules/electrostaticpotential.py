@@ -133,10 +133,10 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
     temp.write('set freeze_core True'+'\n')
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
     temp.write("set cubeprop_tasks ['esp']"+'\n')
-
+    temp.write('set basis %s '%(poltype.espbasisset)+'\n')
     if poltype.allowradicals==True:
         temp.write('set reference uhf '+'\n')
-        temp.write("G, wfn = gradient('%s/%s', return_wfn=True)" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
+        temp.write("G, wfn = gradient('%s', return_wfn=True)" % (poltype.espmethod.lower())+'\n')
     else:
         spacedformulastr=mol.GetSpacedFormula()
         if ('I ' in spacedformulastr):
@@ -147,7 +147,7 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
             temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
         else:
 
-            temp.write("E, wfn = properties('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
+            temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
     temp.write('cubeprop(wfn)'+'\n')
     temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
 
@@ -182,10 +182,11 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     temp.write('set freeze_core True'+'\n')
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
     temp.write("set cubeprop_tasks ['esp']"+'\n')
+    temp.write('set basis %s '%(poltype.dmabasisset)+'\n')
     if poltype.allowradicals==True:
         temp.write('set reference uhf '+'\n')
 
-        temp.write("G, wfn = gradient('%s/%s', return_wfn=True)" % (poltype.dmamethod.lower(),poltype.dmabasisset)+'\n')
+        temp.write("G, wfn = gradient('%s', return_wfn=True)" % (poltype.dmamethod.lower())+'\n')
     else:
         spacedformulastr=mol.GetSpacedFormula()
         if ('I ' in spacedformulastr):
@@ -197,7 +198,7 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
 
         else:
 
-            temp.write("E, wfn = properties('%s/%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower(),poltype.dmabasisset)+'\n')
+            temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower())+'\n')
     temp.write('cubeprop(wfn)'+'\n')
     temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
     header=poltype.molstructfname.split('.')[0]
