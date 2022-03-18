@@ -368,7 +368,6 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
     prevphaseanglelist=None
     energyarray=[]
     newphaselist=[]
-        
     for rowindex in range(len(phaselist)): # we need to send back minimized structure in XYZ (not tinker) format to load for next tinker minimization,but append the xyz_2 tinker XYZ file so that com file can be generated from that 
         phaseanglelist=phaselist[rowindex]
         count+=1
@@ -660,6 +659,7 @@ def GenerateFilename(poltype,torset,phaseangles,prefix,postfix,mol):
 def GeneratePhaseLists(poltype,torset,optmol):
     phaselists=[]
     currentanglelist=[]
+    sizearray=[]
     for tor in torset:
         a,b,c,d = tor[0:4]
         torang = optmol.GetTorsion(a,b,c,d)
@@ -689,8 +689,9 @@ def GeneratePhaseLists(poltype,torset,optmol):
         for index in removeindices: # should only be 1
             del full[index]
         phaselists.append(full)
+        sizearray.append(len(full))
     currentanglelist=numpy.array(currentanglelist)
-    return phaselists,currentanglelist
+    return phaselists,currentanglelist,sizearray
 
 
 def ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz):
@@ -823,7 +824,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         optnumtotorsettofulloutputlogs['1'][tuple(torset)]=[]
         optnumtotorsettofulloutputlogs['2'][tuple(torset)]=[]
         variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
-        phaselists,currentanglelist=GeneratePhaseLists(poltype,torset,optmol) 
+        phaselists,currentanglelist,sizearray=GeneratePhaseLists(poltype,torset,optmol)
         flatphaselist=numpy.array(list(product(*phaselists)))
         if len(poltype.onlyfittorstogether)!=0:
             truetorset=tuple(poltype.onlyfittorstogether)
@@ -838,7 +839,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         prevstrctfname = minstrctfname
         listoftinkertorstructures,energyarray,flatphaselist=tinker_minimize_angles(poltype,torset,optmol,variabletorlist,flatphaselist,prevstrctfname,torsionrestraint,bondtopology)
         if len(torset)==2 and torset not in poltype.nonaroringtorsets:
-            indicestokeep,firsttorindices,secondtorindices=Determine1DTorsionSlicesOnTorTorSurface(poltype,energyarray,flatphaselist,torset)
+            indicestokeep,firsttorindices,secondtorindices=Determine1DTorsionSlicesOnTorTorSurface(poltype,energyarray,flatphaselist,torset,sizearray)
             flatphaselist,listoftinkertorstructures=RemoveTorTorPoints(poltype,energyarray,flatphaselist,indicestokeep,listoftinkertorstructures)
             for toridx in range(len(torset)):
                 tor=torset[toridx]
@@ -2042,18 +2043,17 @@ def FlattenArray(poltype,flatphaselist):
     flatphaselist= flatphaselist.reshape(-1, flatphaselist.shape[-1])
     return flatphaselist 
 
-def Determine1DTorsionSlicesOnTorTorSurface(poltype,energyarray,phaseanglelist,torset):
+def Determine1DTorsionSlicesOnTorTorSurface(poltype,energyarray,phaseanglelist,torset,sizearray):
     indicestokeep=[]
     firsttorindices=[]
     secondtorindices=[]
     arraylength=len(energyarray)
-    sqrt=int(numpy.sqrt(arraylength))
-    energymatrix=energyarray.reshape((sqrt,sqrt))
+    energymatrix=energyarray.reshape((sizearray[0],sizearray[1]))
     minvalue=numpy.amin(energymatrix[numpy.nonzero(energymatrix)])
     minindices=numpy.transpose(numpy.where(energymatrix==minvalue))[0]
     rowindex=minindices[0]
     colindex=minindices[1]
-    phaseanglematrix=phaseanglelist.reshape((sqrt,sqrt,2))
+    phaseanglematrix=phaseanglelist.reshape((sizearray[0],sizearray[1],2))
     rowslice=phaseanglematrix[rowindex,:,:]
     colslice=phaseanglematrix[:,colindex,:]
     for phase in rowslice:
