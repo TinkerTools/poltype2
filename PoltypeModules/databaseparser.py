@@ -1864,6 +1864,10 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
  
         if ringbond==True:
             atomindices=RingAtomicIndices(poltype,mol)
+            rings=GrabAllRingsContainingIndices(poltype,atomindices,babelindices)
+            if len(rings)==1 and poltype.dontfrag==False:
+                if len(rings[0])>7: # special case where whole molecule is a ring then dont consider ring bond
+                    ringbond=False
             ring=GrabRingAtomIndicesFromInputIndex(poltype,babelindices[1],atomindices)
             ringtorindices=GrabIndicesInRing(poltype,babelindices,ring)
         
@@ -1928,7 +1932,16 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                     if torsionindices not in torsionsmissing:
                         torsionsmissing.append(torsionindices)
     return torsionsmissing,poormatchingaromatictorsions,poormatchingpartialaromatictorsions,torsionstozerooutduetocolinear 
-
+def GrabAllRingsContainingIndices(poltype,atomindices,babelindices):
+    rings=[]
+    for ring in atomindices:
+        allin=True
+        for atomindex in babelindices:
+            if atomindex not in ring:
+                allin=False
+        if allin==True:
+            rings.append(ring)
+    return rings
 
 def FindAllNeighborIndexes(poltype,rdkitmol):
     indextoneighbidxs={}
@@ -2085,6 +2098,7 @@ def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopolt
     poorpartialarohydcounttoprms={0:[.854,-.374,.108],1:[0,0,.108],2:[0,0,.299]}
     poorarohydcounttodescrips={0:["Benzene C","Benzene C","Benzene C","Benzene C"],1:["Benzene HC","Benzene C","Benzene C","Benzene C"],2:["Benzene HC","Benzene C","Benzene C","Benzene HC"]}
     poorpartialarohydcounttodescrips={0:["Alkane -CH2-","Alkane -CH2-","Alkane -CH2-","Alkane -CH2-"],1:["Alkane -H2C-","Alkane -CH2-","Alkane -CH2-","Alkane -CH2-"],2:["Alkane -H2C-","Alkane -CH2-","Alkane -CH2-","Alkane -H2C-"]}
+    extra='# Ring bond detected '+'\n'
     arotorsionlinetodescrips={} 
     hydclasses=[]
     for atom in poltype.rdkitmol.GetAtoms():
@@ -2128,7 +2142,7 @@ def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopolt
             splitafter[12]=str(prms[2])
             newlinesplit=newlinesplit[:10]+splitafter
             line=''.join(newlinesplit)
-            arotorsionlinetodescrips[line]=descrips
+            arotorsionlinetodescrips[line]=[extra,descrips]
         newtorsionprms.append(line)
 
     return newtorsionprms,arotorsionlinetodescrips
@@ -2281,8 +2295,10 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
 
         else:
             if line in arotorsionlinetodescrips.keys():
-                descrips=arotorsionlinetodescrips[line]
-                transferinfoline='# Transferring from '+str(descrips)+'\n' 
+                tup=arotorsionlinetodescrips[line]
+                extra=tup[0]
+                descrips=tup[1]
+                transferinfoline=extra+'# Transferring from '+str(descrips)+'\n' 
             else:
                 poltypeclasses,subpoltypeclasses=SearchForPoltypeClasses(poltype,line,poltypeclassestoparametersmartsatomorders.keys())
                 if poltypeclasses==None:

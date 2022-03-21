@@ -2335,9 +2335,7 @@ class PolarizableTyper():
         (torlist, self.rotbndlist,hydtorsions,nonaroringtorlist) = torgen.get_torlist(self,mol,torsionsmissing)
         if atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False: 
             self.dontfrag=True
-
         torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules
-
         torlist=[tuple(i) for i in torlist]
         torlist=[tuple([i]) for i in torlist]
         self.torsettovariabletorlist={}
@@ -2390,7 +2388,7 @@ class PolarizableTyper():
         torgen.DefaultMaxRange(self,self.torlist)
         if self.refinenonaroringtors==True and self.dontfrag==False:
             rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
-        if self.isfragjob==False and not os.path.isfile(self.key7fname) and self.dontfrag==False and (self.dontdotor==False):
+        if self.isfragjob==False and not os.path.isfile(self.key7fname) and self.dontfrag==False and (self.dontdotor==False) and len(self.torlist)!=0:
             WBOmatrix,outputname,error=frag.GenerateWBOMatrix(self,self.rdkitmol,self.mol,self.logoptfname.replace('.log','.xyz'))
             highlightbonds=[]
             for torset in self.torlist:
@@ -2401,7 +2399,7 @@ class PolarizableTyper():
             frag.Draw2DMoleculeWithWBO(self,WBOmatrix,self.molstructfname.replace('.sdf',''),self.rdkitmol,bondindexlist=highlightbonds,imgsize=1500)       
             rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor=frag.GenerateFragments(self,self.mol,self.torlist,WBOmatrix,missingvdwatomsets,nonaroringtorlist) # returns list of bond indexes that need parent molecule to do torsion scan for (fragment generated was same as the parent0
             equivalentrotbndindexarrays,rotbndindextoringtor,rotbndindextoparentrotbndindexes,rotbndindextosmartsindexarray=frag.SpawnPoltypeJobsForFragments(self,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor)
-        if self.dontfrag==False and self.isfragjob==False and not os.path.isfile(self.key7fname) and (self.dontdotor==False):
+        if self.dontfrag==False and self.isfragjob==False and not os.path.isfile(self.key7fname) and (self.dontdotor==False) and len(self.torlist)!=0:
             frag.GrabVdwAndTorsionParametersFromFragments(self,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor,self.key6fname,self.key7fname,rotbndindextoparentrotbndindexes,rotbndindextosmartsindexarray) # just dump to key_6 since does not exist for parent molecule
         else:
             # Torsion scanning then fitting. *.key_7 will contain updated torsions

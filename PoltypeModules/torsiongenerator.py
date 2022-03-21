@@ -795,6 +795,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     bondtopology=GenerateBondTopology(poltype,optmol)
     poltype.idealangletensor={}
     poltype.tensorphases={}
+    poltype.tensorphasesshape={}
     torsettooutputlogtoinitialstructure={}
     torsettoinistructophaselist={}
     totaloutputlogtoinitialxyz={} 
@@ -832,6 +833,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             truetorset=torset[:]
 
         poltype.tensorphases[tuple(truetorset)]=flatphaselist
+        poltype.tensorphasesshape[tuple(truetorset)]=sizearray
         flatphaselist=FlattenArray(poltype,flatphaselist)
         idealangletensor=flatphaselist+currentanglelist
         poltype.idealangletensor[tuple(truetorset)]=idealangletensor
@@ -1206,6 +1208,12 @@ def get_torlist(poltype,mol,missed_torsions):
         if not skiptorsion:
             torlist.append(unq)
         # store torsion in rotbndlist
+        if ringbond==True:
+            atomindices=databaseparser.RingAtomicIndices(poltype,mol)
+            therings=databaseparser.GrabAllRingsContainingIndices(poltype,atomindices,babelindices)
+            if len(therings)==1 and poltype.dontfrag==False:
+                if len(therings[0])>7: # special case where whole molecule is a ring then dont consider ring bond
+                    ringbond=False
         if ringbond==True:
             continue
         rotbndlist[rotbndkey] = []
@@ -1936,7 +1944,7 @@ def RemoveDuplicateRotatableBondTypes(poltype,torlist):
             if classkey not in classkeylist:
                 classkeylist.append(classkey)
                 newlist.append(tor)
-            
+    
     torlist=newlist[:] 
     return torlist,poltype.rotbndlist 
 
