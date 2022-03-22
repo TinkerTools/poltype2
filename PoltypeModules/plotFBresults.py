@@ -1098,6 +1098,7 @@ def ExtractNeatLiquidIndices(truenametoindices):
 
 def WriteOutParamTable(moltotypetoprms,moltotypetoelement):
     tempname='SummaryParams.csv'
+    nametoallprmlines={}
     with open(tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         header=['Name','Element','Radius','Depth','Reduction']
@@ -1115,7 +1116,12 @@ def WriteOutParamTable(moltotypetoprms,moltotypetoelement):
                 array.append(radius)
                 array.append(depth)
                 array.append(shrink)
-                energy_writer.writerow(array)  
+                energy_writer.writerow(array) 
+                if mol not in nametoallprmlines.keys():
+                    nametoallprmlines[mol]=[]
+                nametoallprmlines[mol].append(array)
+
+    return nametoallprmlines
 
 
 def PlotLiquidPropsVsTemp(nametotptofinalprops):
@@ -1186,12 +1192,17 @@ def WriteOutPropTable(nametotptofinalprops,moltomaxiter):
     densityrelerrors=[]
     enthalpyerrors=[]
     enthalpyrelerrors=[]
+    nametopropavgerrors={}
     with open(tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         header=['Name','Temperature','Pressure','Density Ref','Density Calc','Density CalcErr','Density Error','Density RelError','Enthalpy Ref','Enthalpy Calc','Enthalpy CalcErr','Enthalpy Error','Enthalpy RelError','Max Iter']
         energy_writer.writerow(header)
         for name,tptofinalprops in nametotptofinalprops.items():
             maxiter=moltomaxiter[name]
+            namedensityerrors=[]
+            namedensityrelerrors=[]
+            nameenthalpyerrors=[]
+            nameenthalpyrelerrors=[]
 
             for tp, finalprops in tptofinalprops.items():
                 array=[0]*len(header)
@@ -1224,11 +1235,24 @@ def WriteOutPropTable(nametotptofinalprops,moltomaxiter):
                     if propname=='Density':
                         densityerrors.append(error)
                         densityrelerrors.append(relerror)
+                        namedensityerrors.append(error)
+                        namedensityrelerrors.append(relerror)
                     elif propname=='Enthalpy':
                         enthalpyerrors.append(error)
                         enthalpyrelerrors.append(relerror)
-
-                energy_writer.writerow(array) 
+                        nameenthalpyerrors.append(error)
+                        nameenthalpyrelerrors.append(relerror)
+                energy_writer.writerow(array)
+            nameavedensityerr=np.mean(np.array(namedensityerrors))
+            nameavedensityrelerr=np.mean(np.array(namedensityrelerrors))
+            nameaveenthalpyerr=np.mean(np.array(nameenthalpyerrors))
+            nameaveenthalpyrelerr=np.mean(np.array(nameenthalpyrelerrors))
+            if name not in nametopropavgerrors.keys():
+                nametopropavgerrors[name]={}
+            nametopropavgerrors[name]['DensityErr']=nameavedensityerr
+            nametopropavgerrors[name]['DensityRelErr']=nameavedensityrelerr
+            nametopropavgerrors[name]['EnthalpyErr']=nameaveenthalpyerr
+            nametopropavgerrors[name]['EnthalpyRelErr']=nameaveenthalpyrelerr
 
     avedensityerr=np.mean(np.array(densityerrors))
     avedensityrelerr=np.mean(np.array(densityrelerrors))
@@ -1238,7 +1262,7 @@ def WriteOutPropTable(nametotptofinalprops,moltomaxiter):
     print('Average Relative Density Error ',avedensityrelerr)
     print('Average Enthalpy Error ',aveenthalpyerr)
     print('Average Relative Enthalpy Error ',aveenthalpyrelerr)
-
+    return nametopropavgerrors
 
 
 def GrabFinalParameters(jobdirs):
@@ -1289,6 +1313,7 @@ def GrabParameterValues(prmfiles):
                     element=linesplit[3]
                     typetoelement[typenum]=element
                     mol=linesplit[4].replace('"','')
+                    mol=mol.replace('_3D','')
                     if mol not in moltotypes.keys():
                         moltotypes[mol]=[]
                     moltotypes[mol].append(typenum)      
@@ -1385,22 +1410,81 @@ def ComputeQMAverages(nametoformulatormse):
     rmsehomodimers=[]
     rmseheterodimers=[]
     rmsealldimers=[]
+    nametodimerqmerror={}
     for name,formulatormse in nametoformulatormse.items():
+        namermsehomodimers=[]
+        namermseheterodimers=[]
+        namermsealldimers=[]
+
         for formula,rmse in formulatormse.items():
             homo=True
             if 'H2O' in formula:
                 homo=False
             if homo==True:
                 rmsehomodimers.append(rmse)
+                namermsehomodimers.append(rmse)
             else:
                 rmseheterodimers.append(rmse)
+                namermseheterodimers.append(rmse)
             rmsealldimers.append(rmse)
+            namermsealldimers.append(rmse)
+        if len(namermsehomodimers)!=0:
+            namehomoaverage=np.mean(np.array(namermsehomodimers))
+        else:
+            namehomoaverage=0
+        nameheteroaverage=np.mean(np.array(namermseheterodimers))
+        nameallaverage=np.mean(np.array(namermsealldimers))
+        if name not in nametodimerqmerror.keys():
+            nametodimerqmerror[name]={}
+        nametodimerqmerror[name]['homo']=namehomoaverage
+        nametodimerqmerror[name]['hetero']=nameheteroaverage
+        nametodimerqmerror[name]['all']=nameallaverage
     homoaverage=np.mean(np.array(rmsehomodimers))
     heteroaverage=np.mean(np.array(rmseheterodimers))
     allaverage=np.mean(np.array(rmsealldimers))
     print('Homodimer average RMSE ',homoaverage)
     print('Heterodimer average RMSE ',heteroaverage)
     print('Dimer average RMSE ',allaverage)
+    return nametodimerqmerror
+
+def WriteOutParamAndAvgErrorTable(nametopropavgerrors,nametodimerqmerror,nametoallprmlines):
+    tempname='SummaryParamsAvgPropErrorQMError.csv'
+    with open(tempname, mode='w') as energy_file:
+        energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        header=['Name','Element','Radius','Depth','Reduction','Homo RMSE','Hetero RMSE','All RMSE','Density Err','Density RelErr','Enthalpy Err','Enthalpy RelErr']
+        energy_writer.writerow(header)
+        for name,prmlines in nametoallprmlines.items():
+            dimerqmerrors=nametodimerqmerror[name]
+            homoavg=round(dimerqmerrors['homo'],2)
+            heteroavg=round(dimerqmerrors['hetero'],2)
+            allavg=round(dimerqmerrors['all'],2)
+            newprmlines=[]
+            for array in prmlines:
+                array.append(homoavg)
+                array.append(heteroavg)
+                array.append(allavg)
+                newprmlines.append(array)
+            finalprmlines=[]
+            if name in nametopropavgerrors.keys():
+                propavgerrors=nametopropavgerrors[name]
+                densityavgerr=round(propavgerrors['DensityErr'],2)
+                densityavgrelerr=round(propavgerrors['DensityRelErr'],2)
+                enthalpyavgerr=round(propavgerrors['EnthalpyErr'],2)
+                enthalpyavgrelerr=round(propavgerrors['EnthalpyRelErr'],2)
+                for array in newprmlines:
+                    array.append(densityavgerr)
+                    array.append(densityavgrelerr)
+                    array.append(enthalpyavgerr)
+                    array.append(enthalpyavgrelerr)
+                    finalprmlines.append(array)
+            else:
+                for array in newprmlines:
+                    finalprmlines.append(array)
+
+            for array in finalprmlines: 
+                energy_writer.writerow(array)
+
+
 
 
 curdir=os.getcwd()
@@ -1415,15 +1499,17 @@ os.chdir(curdir)
 nametofilenametoformula=PlotAllDimers(nametodimerstructs,truenametoindices)
 nametotptofinalprops,nametoformulatormse,nametoformulatomse=PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoindices)
 moltotptoarc,moltomaxiter=GrabFinalNeatLiquidTrajectories(jobdirs)
-WriteOutPropTable(nametotptofinalprops,moltomaxiter)
+nametopropavgerrors=WriteOutPropTable(nametotptofinalprops,moltomaxiter)
 PlotAllRDFs(moltotptoarc,neatliqnametoindices)
 prmfiles=GrabFinalParameters(jobdirs)
 moltotypetoprms,moltotypetoelement=GrabParameterValues(prmfiles)
-WriteOutParamTable(moltotypetoprms,moltotypetoelement)
+nametoallprmlines=WriteOutParamTable(moltotypetoprms,moltotypetoelement)
 WriteOutQMTable(nametoformulatormse,nametoformulatomse)
 poltypedirs,groupedpoltypedirs=GrabPoltypeDirectories(jobdirs)
 nametocubefiles,groupednames=GrabCubeFiles(groupedpoltypedirs)
 PlotAllESPSurfaces(nametocubefiles)
 nametotemparray,nametoproptokeytoarray=PlotLiquidPropsVsTemp(nametotptofinalprops)
 PlotLiquidPropsVsTempForGroups(nametotemparray,nametoproptokeytoarray,groupednames)
-ComputeQMAverages(nametoformulatormse)
+nametodimerqmerror=ComputeQMAverages(nametoformulatormse)
+WriteOutParamAndAvgErrorTable(nametopropavgerrors,nametodimerqmerror,nametoallprmlines)
+
