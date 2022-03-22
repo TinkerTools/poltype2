@@ -16,7 +16,7 @@ from pymol import cmd,preset,util
 from PIL import Image
 from pymol.vfont import plain
 from pymol.cgo import CYLINDER,cyl_text
-
+import itertools
 
 
 fbdir=sys.argv[1]
@@ -215,6 +215,7 @@ def GrabResults(outputfile):
 
 
 def PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoindices):
+    
     nametotptofinalprops={}
     nametoformulatormse={}
     nametoformulatomse={}
@@ -236,7 +237,6 @@ def PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoin
             nametofigs[name]=fig
             nametoaxes[name]=ax1
 
-        
         filenametoformula=nametofilenametoformula[name]
         n=len(list(filenametoformula.keys()))
         color = list(iter(cm.rainbow(np.linspace(0, 1, n))))
@@ -624,28 +624,27 @@ def GrabDimerDistanceInfo(qmdiclist,jobdirs):
                     sortedindices=list(sortedindextodistance.keys())
                     sortedindices=[int(k) for k in sortedindices]
                     sorteddistances=list(sortedindextodistance.values())
-                    try:
-                        valuedic=[namedic[k] for k in sortedindices]
-                        refvalues=[k['Ref'] for k in valuedic]
-                        calcvalues=[k['Calc'] for k in valuedic]
-                        if truename not in qmtargetnamedic.keys():
-                            qmtargetnamedic[truename]={}
-                            split=truename.split('_')
-                            indices=[split[-3],split[-2]]
-                            indices=[int(i) for i in indices]
+                    #try:
+                    valuedic=[namedic[k] for k in sortedindices]
+                    refvalues=[k['Ref'] for k in valuedic]
+                    calcvalues=[k['Calc'] for k in valuedic]
+                    if truename not in qmtargetnamedic.keys():
+                        qmtargetnamedic[truename]={}
+                        split=truename.split('_')
+                        indices=[split[-3],split[-2]]
+                        indices=[int(i) for i in indices]
 
-                            truenametoindices[truename]=indices
-                        if 'Distances' not in qmtargetnamedic[truename].keys():
-                            qmtargetnamedic[truename]['Distances']=sorteddistances
-                        if 'Ref' not in qmtargetnamedic[truename].keys():
-                            qmtargetnamedic[truename]['Ref']=refvalues
-                        if 'Calc' not in qmtargetnamedic[truename].keys():
-                            qmtargetnamedic[truename]['Calc']=calcvalues
-                    except:
-                        pass
+                        truenametoindices[truename]=indices
+                    if 'Distances' not in qmtargetnamedic[truename].keys():
+                        qmtargetnamedic[truename]['Distances']=sorteddistances
+                    if 'Ref' not in qmtargetnamedic[truename].keys():
+                        qmtargetnamedic[truename]['Ref']=refvalues
+                    if 'Calc' not in qmtargetnamedic[truename].keys():
+                        qmtargetnamedic[truename]['Calc']=calcvalues
+                    #except:
+                    #    pass
             
                 os.chdir('..')
-
     return qmtargetnamedic,nametodimerstructs,truenametoindices 
 
 
@@ -852,6 +851,7 @@ def PlotDimers3D(filenamearray,allindices):
         molsperrow=1
     imagesize=1180
     dpi=300
+    size=FindDimensionsOfMolecule(filenamearray[0])
     filenamechunks=ChunksList(Chunks(filenamearray,molsPerImage))
     indiceschunks=ChunksList(Chunks(allindices,molsPerImage))
     prevmatslen=len(filenamechunks[0])
@@ -888,7 +888,7 @@ def PlotDimers3D(filenamearray,allindices):
             secondlab=str(secondidx)
             lab=firstlab+'-'+secondlab
             cmd.distance(lab,'index '+firstlab,'index '+secondlab)
-            cmd.zoom(lab)
+            cmd.zoom(lab,size,0,0)
             cmd.png(imagename, imagesize,imagesize,dpi,1)
             cmd.save(fileprefix+'_3D.'+'pse')
         if i>0:
@@ -914,6 +914,47 @@ def PlotDimers3D(filenamearray,allindices):
             dest.paste(indextoimage[j],(x,y))
         dest.show()
         dest.save(basename+'.png')
+
+
+def FindDimensionsOfMolecule(xyzfile):
+    veclist=[]
+    temp=open(xyzfile,'r')
+    results=temp.readlines()
+    temp.close()
+    count=0
+    for line in results:
+        linesplit=line.split()
+        if len(linesplit)==1:
+            atomnum=int(linesplit[0])
+            if 'H20' in xyzfile:
+                maxatomnum=atomnum-3
+            else:
+                maxatomnum=int(atomnum/2)
+        if len(linesplit)>1: # not line containing number of atoms
+            if count>=maxatomnum:
+                break
+            vec=np.array([float(linesplit[1]),float(linesplit[2]),float(linesplit[3])])
+            veclist.append(vec)
+            count+=1
+
+    pairs=list(itertools.combinations(veclist, 2))
+    disttodiffvec={}
+    
+    for pairidx in range(len(pairs)):
+        pair=pairs[pairidx]
+        progress=(pairidx*100)/len(pairs)
+        diff=np.array(pair[0])-np.array(pair[1])
+        dist=np.linalg.norm(diff)
+        
+        disttodiffvec[dist]=diff
+    distlist=list(disttodiffvec.keys())
+    if len(distlist)!=0:
+        mindist=np.amax(np.array(distlist))
+        diffvec=disttodiffvec[mindist]
+    else:
+        mindist=0
+    return mindist
+
 
 def ParseXYZ(xyzpath):
     temp=open(xyzpath,'r')
@@ -1141,6 +1182,10 @@ def PlotLiquidPropsVsTemp(nametotptofinalprops):
 
 def WriteOutPropTable(nametotptofinalprops,moltomaxiter):
     tempname='SummaryProps.csv'
+    densityerrors=[]
+    densityrelerrors=[]
+    enthalpyerrors=[]
+    enthalpyrelerrors=[]
     with open(tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         header=['Name','Temperature','Pressure','Density Ref','Density Calc','Density CalcErr','Density Error','Density RelError','Enthalpy Ref','Enthalpy Calc','Enthalpy CalcErr','Enthalpy Error','Enthalpy RelError','Max Iter']
@@ -1176,7 +1221,24 @@ def WriteOutPropTable(nametotptofinalprops,moltomaxiter):
                     thename=propname+' '+'RelError'
                     headeridx=header.index(thename)
                     array[headeridx]=relerror
+                    if propname=='Density':
+                        densityerrors.append(error)
+                        densityrelerrors.append(relerror)
+                    elif propname=='Enthalpy':
+                        enthalpyerrors.append(error)
+                        enthalpyrelerrors.append(relerror)
+
                 energy_writer.writerow(array) 
+
+    avedensityerr=np.mean(np.array(densityerrors))
+    avedensityrelerr=np.mean(np.array(densityrelerrors))
+    aveenthalpyerr=np.mean(np.array(enthalpyerrors))
+    aveenthalpyrelerr=np.mean(np.array(enthalpyrelerrors))
+    print('Average Density Error ',avedensityerr)
+    print('Average Relative Density Error ',avedensityrelerr)
+    print('Average Enthalpy Error ',aveenthalpyerr)
+    print('Average Relative Enthalpy Error ',aveenthalpyrelerr)
+
 
 
 def GrabFinalParameters(jobdirs):
@@ -1319,7 +1381,26 @@ def PlotLiquidPropsVsTempForGroups(nametotemparray,nametoproptokeytoarray,groupe
                         grptoproptofig[grp][propname].savefig(imagename)
 
 
-
+def ComputeQMAverages(nametoformulatormse):
+    rmsehomodimers=[]
+    rmseheterodimers=[]
+    rmsealldimers=[]
+    for name,formulatormse in nametoformulatormse.items():
+        for formula,rmse in formulatormse.items():
+            homo=True
+            if 'H2O' in formula:
+                homo=False
+            if homo==True:
+                rmsehomodimers.append(rmse)
+            else:
+                rmseheterodimers.append(rmse)
+            rmsealldimers.append(rmse)
+    homoaverage=np.mean(np.array(rmsehomodimers))
+    heteroaverage=np.mean(np.array(rmseheterodimers))
+    allaverage=np.mean(np.array(rmsealldimers))
+    print('Homodimer average RMSE ',homoaverage)
+    print('Heterodimer average RMSE ',heteroaverage)
+    print('Dimer average RMSE ',allaverage)
 
 
 curdir=os.getcwd()
@@ -1345,4 +1426,4 @@ nametocubefiles,groupednames=GrabCubeFiles(groupedpoltypedirs)
 PlotAllESPSurfaces(nametocubefiles)
 nametotemparray,nametoproptokeytoarray=PlotLiquidPropsVsTemp(nametotptofinalprops)
 PlotLiquidPropsVsTempForGroups(nametotemparray,nametoproptokeytoarray,groupednames)
-
+ComputeQMAverages(nametoformulatormse)

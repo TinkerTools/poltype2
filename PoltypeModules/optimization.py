@@ -659,7 +659,6 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
             jobtoinputfilepaths={cmdstr:[inputfilepath]}
             jobtooutputfiles={cmdstr:[logoptfname]}
             jobtoabsolutebinpath={cmdstr:poltype.which('psi4')}
-
             if poltype.checkinputonly==True:
                 sys.exit()
 

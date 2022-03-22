@@ -856,6 +856,9 @@ class PolarizableTyper():
 
         if self.jobsatsametime!=0:
             self.maximizejobsatsametime=False
+        else:
+            if self.isfragjob==True:
+                self.jobsatsametime=1
 
         
         if self.maxdisk==None and self.molstructfname!=None:
@@ -1266,7 +1269,6 @@ class PolarizableTyper():
        errorjobs=[]
        submittedjobs=[]
        errormessages=[]
-           
        while len(finishedjobs)!=len(list(fulljobtooutputlog.keys())):
            for job,outputlog in fulljobtooutputlog.items():
                if job not in finishedjobs:
