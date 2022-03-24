@@ -169,7 +169,7 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
         for atom in openbabel.OBMolAtomIter(mol):
             atomidx=atom.GetIdx()
             hyb=atom.GetHyb()
-            val=atom.GetValence()
+            val=atom.GetExplicitValence()
             atomicnum=atom.GetAtomicNum()
             atomneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(atom)]
             neighbtypes=list([poltype.idxtosymclass[b.GetIdx()] for b in atomneighbs])
@@ -184,7 +184,7 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                 highestsymneighbnorepeathyb=highestsymneighbnorepeat.GetHyb()
                 highestsymneighbnorepeatatomicnum=highestsymneighbnorepeat.GetAtomicNum()
                 numhydsneighb=GrabNumberOfConnectedHydrogens(poltype,highestsymneighbnorepeat)
-                highestsymneighbnorepeatval=highestsymneighbnorepeat.GetValence()
+                highestsymneighbnorepeatval=highestsymneighbnorepeat.GetExplicitValence()
                 neighbsofneighb=[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbnorepeat)]
                 uniqueneighbtypesofhighestsymneighbnorepeat=list(set([poltype.idxtosymclass[b.GetIdx()] for b in neighbsofneighb]))
                 neighbsofneighbwithoutatom=RemoveFromList(poltype,neighbsofneighb,atom)
@@ -278,7 +278,7 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
 
 
             if foundcase==False:
-                if val==1 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(atomneighbs[0])]) and atomneighbs[0].GetValence()==4: # then this is like H in Methane, we want Z-only
+                if val==1 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(atomneighbs[0])]) and atomneighbs[0].GetExplicitValence()==4: # then this is like H in Methane, we want Z-only
                  
                     poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                     poltype.localframe2[atomidx - 1] = 0

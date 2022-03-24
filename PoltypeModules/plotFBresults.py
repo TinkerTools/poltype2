@@ -19,8 +19,6 @@ from pymol.cgo import CYLINDER,cyl_text
 import itertools
 
 
-fbdir=sys.argv[1]
-
 
 def GrabJobDirectories(fbdir):
     jobdirs=[]
@@ -1124,6 +1122,68 @@ def WriteOutParamTable(moltotypetoprms,moltotypetoelement):
     return nametoallprmlines
 
 
+
+def PlotLiquidPropsCorrelation(nametotptofinalprops):
+    curdir=os.getcwd()
+    for name,tptofinalprops in nametotptofinalprops.items():
+        if not os.path.isdir(name):
+            os.mkdir(name)
+        os.chdir(name)
+        n=len(list(tptofinalprops.keys()))
+        color = iter(cm.rainbow(np.linspace(0, 1, n)))
+        proptofigs={}
+        proptoaxes={}
+        propnametocalcs={}
+        propnametorefs={}
+        propnametotitle={}
+        for tp,proptodic in tptofinalprops.items():
+            string='T=%s,P=%s'%(str(tp[0]),str(tp[1]))
+            c = next(color)
+            for propname in proptodic.keys():
+                if propname not in proptofigs.keys():
+                    fig = plt.figure()
+                    ax1 = fig.add_subplot(111)
+                    proptofigs[propname]=fig
+                    proptoaxes[propname]=ax1
+
+                if propname=='Enthalpy':
+                    units='(kcal/mol)'
+                else:
+                    units='$kg/m^3$'
+                xkey=propname+' '+'AMOEBA'+' '+units
+                ykey=propname+' '+'Target'+' '+units
+                innerdic=proptodic[propname]
+                calcarray=innerdic['Calc']
+                refarray=innerdic['Ref']
+                calcerrarray=innerdic['CalcErr']   
+                proptoaxes[propname].scatter(calcarray,refarray, s=10, c=c, marker="o", label=string)
+                proptoaxes[propname].errorbar(calcarray, refarray, yerr=calcerrarray,c=c, fmt="o")
+                proptoaxes[propname].set_ylabel(ykey,fontsize=12)
+                proptoaxes[propname].set_xlabel(xkey,fontsize=12)
+                newtitle=name+' '+propname+ ' AMOEBA Vs Target'
+                proptoaxes[propname].set_title(newtitle)
+                proptoaxes[propname].legend()
+                if propname not in propnametocalcs.keys():
+                    propnametocalcs[propname]=[]
+                    propnametorefs[propname]=[]
+                propnametocalcs[propname].append(calcarray)
+                propnametorefs[propname].append(refarray)
+                propnametotitle[propname]=newtitle
+        for propname,calcarray in propnametocalcs.items():
+            refarray=propnametorefs[propname]
+            newtitle=propnametotitle[propname]
+            slope, intercept, r_value, p_value, std_err = stats.linregress(calcarray,refarray)
+            rsquare=round(r_value*r_value,2)
+            imagename=newtitle+'.png'
+            newtitle+=' $R^2$=%s'%(rsquare)
+            proptoaxes[propname].plot(np.array(calcarray), slope*np.array(calcarray) + intercept,'k-')
+
+            proptoaxes[propname].set_title(newtitle)
+            proptofigs[propname].savefig(imagename)
+        
+
+    os.chdir(curdir)
+
 def PlotLiquidPropsVsTemp(nametotptofinalprops):
     curdir=os.getcwd()
     nametotemparray={}
@@ -1351,7 +1411,91 @@ def WriteOutQMTable(nametoformulatormse,nametoformulatomse):
                 array=[name,formula,round(rmse,2),round(mse,2)]
                 energy_writer.writerow(array)
 
-                     
+                    
+def PlotLiquidPropsCorrelationForGroups(nametotptofinalprops,groupednames,nametotemparray):
+    grptoproptofig={}
+    grptoproptoaxes={}
+    grptopropnametocalc={}
+    grptopropnametorefs={}
+    grptopropnametotitle={}
+    for grp in groupednames:
+        n=0
+        if len(grp)>1:
+            grp=tuple(grp)
+            for name in grp:
+                if name in nametotptofinalprops.keys():
+                    tptofinalprops=nametotptofinalprops[name]
+                    n+=len(list(tptofinalprops.keys()))
+            color = cm.rainbow(np.linspace(0, 1, n))
+            if grp not in grptoproptofig.keys():
+                grptoproptofig[grp]={}
+                grptoproptoaxes[grp]={}
+            totalname=''
+            for name in grp:
+                if name in nametotemparray.keys():
+                    totalname+=name+','
+            totalname=totalname[:-1]
+            count=0
+            for nameidx in range(len(grp)):
+                name=grp[nameidx]
+                string=' '+name
+                if name in nametotptofinalprops.keys():
+                    tptofinalprops=nametotptofinalprops[name]
+                    for tp,proptodic in tptofinalprops.items():
+                        newstring=string+' T=%s'%(str(tp[0]))
+                        c=color[count]
+                        count+=1
+                        for propname in proptodic.keys():
+                            if propname not in grptoproptofig[grp].keys():
+                                 fig = plt.figure()
+                                 ax1 = fig.add_subplot(111)
+                                 grptoproptofig[grp][propname]=fig
+                                 grptoproptoaxes[grp][propname]=ax1
+                            if propname=='Enthalpy':
+                                units='(kcal/mol)'
+                            else:
+                                units='$kg/m^3$'
+                            xkey=propname+' '+'AMOEBA'+' '+units
+                            ykey=propname+' '+'Target'+' '+units
+                            innerdic=proptodic[propname]
+                            calcarray=innerdic['Calc']
+                            refarray=innerdic['Ref']
+                            calcerrarray=innerdic['CalcErr']   
+                            grptoproptoaxes[grp][propname].scatter(calcarray,refarray, s=10, c=c, marker="o", label=newstring)
+                            grptoproptoaxes[grp][propname].errorbar(calcarray, refarray, yerr=calcerrarray,c=c, fmt="o")
+                            grptoproptoaxes[grp][propname].set_ylabel(ykey,fontsize=12)
+                            grptoproptoaxes[grp][propname].set_xlabel(xkey,fontsize=12)
+                            newtitle=totalname+' '+propname+ ' AMOEBA Vs Target'
+                            grptoproptoaxes[grp][propname].set_title(newtitle)
+                            grptoproptoaxes[grp][propname].legend()
+                            if grp not in grptopropnametocalc.keys():
+                                grptopropnametocalc[grp]={}
+                                grptopropnametorefs[grp]={}
+                                grptopropnametotitle[grp]={}
+                            if propname not in grptopropnametocalc[grp].keys():
+                                grptopropnametocalc[grp][propname]=[]
+                                grptopropnametorefs[grp][propname]=[]
+                                grptopropnametotitle[grp][propname]={}
+                            grptopropnametocalc[grp][propname].append(calcarray)
+                            grptopropnametorefs[grp][propname].append(refarray)
+                            grptopropnametotitle[grp][propname]=newtitle
+    for grp,propnametocalc in grptopropnametocalc.items():
+        propnametorefs=grptopropnametorefs[grp] 
+        propnametotitle=grptopropnametotitle[grp]
+        for propname,calcarray in propnametocalc.items():
+            refarray=propnametorefs[propname]
+            title=propnametotitle[propname]
+            slope, intercept, r_value, p_value, std_err = stats.linregress(calcarray,refarray)
+            rsquare=round(r_value*r_value,5)
+            newtitle=title+' $R^2$=%s'%(rsquare)
+            grptoproptoaxes[grp][propname].plot(np.array(calcarray), slope*np.array(calcarray) + intercept,'k-')
+            grptoproptoaxes[grp][propname].set_title(newtitle)
+            imagename=title+'.png'
+            grptoproptofig[grp][propname].savefig(imagename)
+
+
+
+ 
 def PlotLiquidPropsVsTempForGroups(nametotemparray,nametoproptokeytoarray,groupednames):
     grptoproptofig={}
     grptoproptoaxes={}
@@ -1451,7 +1595,7 @@ def WriteOutParamAndAvgErrorTable(nametopropavgerrors,nametodimerqmerror,nametoa
     tempname='SummaryParamsAvgPropErrorQMError.csv'
     with open(tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        header=['Name','Element','Radius','Depth','Reduction','Homo RMSE','Hetero RMSE','All RMSE','Density Err','Density RelErr','Enthalpy Err','Enthalpy RelErr']
+        header=['Name','Element','Rad','Dep','Red','Homo RMSE','Hetero RMSE','QM RMSE','Density Err','Density RelErr','Enthalpy Err','Enthalpy RelErr']
         energy_writer.writerow(header)
         for name,prmlines in nametoallprmlines.items():
             dimerqmerrors=nametodimerqmerror[name]
@@ -1485,31 +1629,32 @@ def WriteOutParamAndAvgErrorTable(nametopropavgerrors,nametodimerqmerror,nametoa
                 energy_writer.writerow(array)
 
 
+def PlotForceBalanceResults(fbdir):
 
-
-curdir=os.getcwd()
-jobdirs=GrabJobDirectories(fbdir)
-outputfiles=GrabOutputFiles(jobdirs)
-outputfilestojobdir=dict(zip(outputfiles,jobdirs))
-tpdiclist,qmdiclist,newoutputfiles=GrabResultsAllMolecules(outputfiles)
-jobdirs=[outputfilestojobdir[i] for i in newoutputfiles]
-qmtargetnamedic,nametodimerstructs,truenametoindices=GrabDimerDistanceInfo(qmdiclist,jobdirs)
-neatliqnametoindices=ExtractNeatLiquidIndices(truenametoindices)
-os.chdir(curdir)
-nametofilenametoformula=PlotAllDimers(nametodimerstructs,truenametoindices)
-nametotptofinalprops,nametoformulatormse,nametoformulatomse=PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoindices)
-moltotptoarc,moltomaxiter=GrabFinalNeatLiquidTrajectories(jobdirs)
-nametopropavgerrors=WriteOutPropTable(nametotptofinalprops,moltomaxiter)
-PlotAllRDFs(moltotptoarc,neatliqnametoindices)
-prmfiles=GrabFinalParameters(jobdirs)
-moltotypetoprms,moltotypetoelement=GrabParameterValues(prmfiles)
-nametoallprmlines=WriteOutParamTable(moltotypetoprms,moltotypetoelement)
-WriteOutQMTable(nametoformulatormse,nametoformulatomse)
-poltypedirs,groupedpoltypedirs=GrabPoltypeDirectories(jobdirs)
-nametocubefiles,groupednames=GrabCubeFiles(groupedpoltypedirs)
-PlotAllESPSurfaces(nametocubefiles)
-nametotemparray,nametoproptokeytoarray=PlotLiquidPropsVsTemp(nametotptofinalprops)
-PlotLiquidPropsVsTempForGroups(nametotemparray,nametoproptokeytoarray,groupednames)
-nametodimerqmerror=ComputeQMAverages(nametoformulatormse)
-WriteOutParamAndAvgErrorTable(nametopropavgerrors,nametodimerqmerror,nametoallprmlines)
-
+    curdir=os.getcwd()
+    jobdirs=GrabJobDirectories(fbdir)
+    outputfiles=GrabOutputFiles(jobdirs)
+    outputfilestojobdir=dict(zip(outputfiles,jobdirs))
+    tpdiclist,qmdiclist,newoutputfiles=GrabResultsAllMolecules(outputfiles)
+    jobdirs=[outputfilestojobdir[i] for i in newoutputfiles]
+    qmtargetnamedic,nametodimerstructs,truenametoindices=GrabDimerDistanceInfo(qmdiclist,jobdirs)
+    neatliqnametoindices=ExtractNeatLiquidIndices(truenametoindices)
+    os.chdir(curdir)
+    nametofilenametoformula=PlotAllDimers(nametodimerstructs,truenametoindices)
+    nametotptofinalprops,nametoformulatormse,nametoformulatomse=PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoindices)
+    moltotptoarc,moltomaxiter=GrabFinalNeatLiquidTrajectories(jobdirs)
+    nametopropavgerrors=WriteOutPropTable(nametotptofinalprops,moltomaxiter)
+    PlotAllRDFs(moltotptoarc,neatliqnametoindices)
+    prmfiles=GrabFinalParameters(jobdirs)
+    moltotypetoprms,moltotypetoelement=GrabParameterValues(prmfiles)
+    nametoallprmlines=WriteOutParamTable(moltotypetoprms,moltotypetoelement)
+    WriteOutQMTable(nametoformulatormse,nametoformulatomse)
+    poltypedirs,groupedpoltypedirs=GrabPoltypeDirectories(jobdirs)
+    nametocubefiles,groupednames=GrabCubeFiles(groupedpoltypedirs)
+    PlotAllESPSurfaces(nametocubefiles)
+    nametotemparray,nametoproptokeytoarray=PlotLiquidPropsVsTemp(nametotptofinalprops)
+    PlotLiquidPropsCorrelation(nametotptofinalprops)
+    PlotLiquidPropsCorrelationForGroups(nametotptofinalprops,groupednames,nametotemparray)
+    PlotLiquidPropsVsTempForGroups(nametotemparray,nametoproptokeytoarray,groupednames)
+    nametodimerqmerror=ComputeQMAverages(nametoformulatormse)
+    WriteOutParamAndAvgErrorTable(nametopropavgerrors,nametodimerqmerror,nametoallprmlines)

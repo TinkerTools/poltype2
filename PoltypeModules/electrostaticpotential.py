@@ -13,6 +13,7 @@ import openbabel
 import shlex
 import warnings
 from scipy.optimize import fmin
+from PyAstronomy import pyasl
 
 def CheckIfLogFileUsingGaussian(poltype,f):
     use_gaus=False
@@ -175,6 +176,7 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
         linesplit=line.split()
         if len(linesplit)==4 and '#' not in line:
             temp.write(line)
+    temp.write('no_reorient'+'\n')
     temp.write('}'+'\n')
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
@@ -374,9 +376,9 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
 
     iteratombab = openbabel.OBMolAtomIter(mol)
     tmpfh = open(comfname, "a")
-    etab = openbabel.OBElementTable()
+    an = pyasl.AtomicNo()
     for atm in iteratombab:
-        tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), atm.x(), atm.y(), atm.z()))
+        tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (an.getElSymbol(atm.GetAtomicNum()), atm.x(), atm.y(), atm.z()))
 
 
     tmpfh.write('\n')
@@ -446,12 +448,12 @@ def ElectrostaticPotentialFitting(poltype,xyzfnamelist,keyfnamelist,potnamelist)
     if poltype.deletedfiles==True:
         poltype.call_subsystem([optmpolecmd],True)
     else:
-        try:
-            poltype.call_subsystem([optmpolecmd],True)
-        except:
-            poltype.DeleteFilesWithExtension(['key','xyz','key_2','xyz_2'])
-            poltype.deletedfiles=True
-            poltype.GenerateParameters()
+        #try:
+        poltype.call_subsystem([optmpolecmd],True)
+        #except:
+        #    poltype.DeleteFilesWithExtension(['key','xyz','key_2','xyz_2'])
+        #    poltype.deletedfiles=True
+        #    poltype.GenerateParameters()
     shutil.copy(combinedxyz.replace('.xyz','.key'),poltype.key3fnamefrompot)
     return combinedxyz,combinedpot
 
@@ -672,13 +674,13 @@ def CheckDipoleMoments(poltype,optmol):
         time.sleep(1)
     torgen.RemoveStringFromKeyfile(poltype,poltype.tmpkeyfile,'solvate')
     cmd=poltype.analyzeexe + ' ' + poltype.xyzoutfile+' '+'-k'+' '+poltype.tmpkeyfile + ' em | grep -A11 Charge'+'>'+'MMDipole.txt'
-    try: 
-        poltype.call_subsystem([cmd],True)
+    #try: 
+    poltype.call_subsystem([cmd],True)
 
-    except: # in case old key_4,key_5 files not working delete and restart
+    #except: # in case old key_4,key_5 files not working delete and restart
         #poltype.DeleteFilesWithExtension(['key_4','key_5'])
         #poltype.GenerateParameters()
-        pass
+    #    pass
     while not os.path.isfile('MMDipole.txt'):
         time.sleep(1)
     temp=open('MMDipole.txt','r')

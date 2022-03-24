@@ -13,12 +13,14 @@ import traceback
 import warnings
 from rdkit.Chem import rdmolfiles
 from rdkit import Chem
+from PyAstronomy import pyasl
 
 def GeometryOPTWrapper(poltype,molist):
     optmolist=[]
     errorlist=[]
     torsionrestraintslist=[]
     totcharge=molist[0].GetTotalCharge()
+    redo=False
     for molidx in range(len(molist)):
         mol=molist[molidx]
         suf=str(molidx+1)
@@ -43,9 +45,10 @@ def GeometryOPTWrapper(poltype,molist):
             else:
                 traceback.print_exc(file=sys.stdout)
                 sys.exit()
-        optmolist.append(optmol)
-        errorlist.append(error)
-        torsionrestraintslist.append(torsionrestraints)   
+        if redo==False:
+            optmolist.append(optmol)
+            errorlist.append(error)
+            torsionrestraintslist.append(torsionrestraints)   
     return optmolist,errorlist,torsionrestraintslist
  
 
@@ -344,9 +347,9 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
 
     iteratombab = openbabel.OBMolAtomIter(molecule)
     tmpfh = open(comfname, "a")
-    etab = openbabel.OBElementTable()
+    an = pyasl.AtomicNo()
     for atm in iteratombab:
-        tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (etab.GetSymbol(atm.GetAtomicNum()), atm.x(), atm.y(), atm.z()))
+        tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (an.getElSymbol(atm.GetAtomicNum()), atm.x(), atm.y(), atm.z()))
     tmpfh.write('\n')
     
     if ('I ' in spacedformulastr):
@@ -515,8 +518,8 @@ def FindTorsionRestraints(poltype,mol):
     for b in openbabel.OBMolBondIter(mol):
         t2 = b.GetBeginAtom()
         t3 = b.GetEndAtom()
-        t2val=t2.GetValence()
-        t3val=t3.GetValence()
+        t2val=t2.GetExplicitValence()
+        t3val=t3.GetExplicitValence()
         if t2val<2 or t3val<2:
             continue 
         ringbond=b.IsInRing()
@@ -533,8 +536,8 @@ def FindTorsionRestraints(poltype,mol):
             isrot=b.IsRotor()
             t2 = b.GetBeginAtom()
             t3 = b.GetEndAtom()
-            t2val=t2.GetValence()
-            t3val=t3.GetValence()
+            t2val=t2.GetExplicitValence()
+            t3val=t3.GetExplicitValence()
             if t2val<2 or t3val<2:
                 continue 
             ringbond=b.IsInRing()
@@ -713,11 +716,11 @@ def rebuild_bonds(poltype,newmol, refmol):
         beg = b.GetBeginAtomIdx()
         end = b.GetEndAtomIdx()
         if not newmol.GetBond(beg,end):
-            newmol.AddBond(beg,end, b.GetBO(), b.GetFlags())
+            newmol.AddBond(beg,end, b.GetBondOrder(), b.GetFlags())
         else:
             newb=newmol.GetBond(beg,end)
             bondorder=newb.GetBondOrder()
-            newb.SetBondOrder(b.GetBO())
+            newb.SetBondOrder(b.GetBondOrder())
 
     return newmol
 

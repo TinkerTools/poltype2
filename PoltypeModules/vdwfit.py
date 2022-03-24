@@ -22,7 +22,7 @@ import copy
 import traceback
 import apicall as call
 from scipy.interpolate import interp1d
-
+from PyAstronomy import pyasl
 
 def CheckAllVdwTypesExist(poltype,keyfilename):
     temp=open(keyfilename,'r')
@@ -880,10 +880,10 @@ def WriteOutCartesianXYZ(poltype,mol,filename):
     atomcounter=0
     coordarray=[]
     atomiter=openbabel.OBMolAtomIter(mol)
-    etab = openbabel.OBElementTable()
+    an = pyasl.AtomicNo()
     for atom in atomiter:
         atomcounter+=1
-        atomsymb=etab.GetSymbol(atom.GetAtomicNum())
+        atomsymb=an.getElSymbol(atom.GetAtomicNum())
         x=str(atom.GetX())
         y=str(atom.GetY())
         z=str(atom.GetZ())
@@ -1325,7 +1325,7 @@ def CheckBuriedAtoms(poltype,indexarray,molecule,zeroindex=False):
         else:
             idx=index+1
         atom=molecule.GetAtom(idx)
-        valence=atom.GetValence()
+        valence=atom.GetExplicitValence()
         hyb=atom.GetHyb() 
         if valence==4 and hyb==3:
             indicestodelete.append(i)
@@ -1670,7 +1670,7 @@ def AddLonePairPoints(poltype,newdimerfiles,newprobeindices,newmoleculeindices,n
     added=False
     moleculeatom=mol.GetAtom(moleculeindex)
     atomicnum=moleculeatom.GetAtomicNum()
-    val=moleculeatom.GetValence()
+    val=moleculeatom.GetExplicitValence()
     atomisinring=moleculeatom.IsInRing()
     probeatom=mol.GetAtom(probeindex)
     moleculeatomcoords=np.array([moleculeatom.GetX(),moleculeatom.GetY(),moleculeatom.GetZ()])
@@ -1918,7 +1918,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
     os.chdir(vdwfoldername) 
     poltype.optmaxcycle=400
     poltype.optmethod='wB97X-D'
-    if poltype.accuratevdwsp==True and not ('I ' in poltype.mol.GetSpacedFormula()):
+    if poltype.accuratevdwsp==True:
         poltype.espmethod='MP2'
         poltype.espbasisset="aug-cc-pV[TQ]Z"
 
@@ -2075,7 +2075,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
                     moleculeindex=flat_moleculeindices[probeidx]
                     vdwtype=poltype.idxtosymclass[moleculeindex]
                     atom=poltype.mol.GetAtom(moleculeindex)
-                    valence=atom.GetValence()
+                    valence=atom.GetExplicitValence()
                     atomicnum=atom.GetAtomicNum()
                     if valence==1 and atomicnum!=8 and atomicnum!=16 and poltype.fitred==True:
                        fitred=True
@@ -2098,7 +2098,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
                         adjustedprobeindex=int(probeindex-len(poltype.idxtosymclass.keys()))
                         vdwtype=poltype.idxtosymclass[adjustedprobeindex]
                         atom=poltype.mol.GetAtom(adjustedprobeindex)
-                        valence=atom.GetValence()
+                        valence=atom.GetExplicitValence()
                         if valence==1:
                            fitred=True
                         else:

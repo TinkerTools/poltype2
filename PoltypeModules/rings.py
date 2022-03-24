@@ -69,7 +69,7 @@ def AllPossiblePuckeringLocationsForRing(poltype,ringtors,tortoneighbtors,mol):
             tor=comb[i]
             a,b,c,d=tor[:]
             bond=mol.GetBond(b,c)      
-            bo=bond.GetBO()
+            bo=bond.GetBondOrder()
             if bo>1:
                 goodcomb=False
             else:      

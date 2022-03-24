@@ -99,7 +99,7 @@ def fitfunc (poltype,parms, x,torset, torprmdict,keyonlylist=None,nfoldonlylist=
                         prm = torprm['prmdict'][nfold]
                         # not called by 'eval'
                         evaluate=True
-                        if parms is not 'eval':
+                        if parms!='eval':
                             # get prm from parms array
                             prm = parms[torprm['prmdict'][nfold]]
                             evaluate=False
@@ -115,7 +115,7 @@ def fitfunc (poltype,parms, x,torset, torprmdict,keyonlylist=None,nfoldonlylist=
 
     if parms is 'eval' and 'offset' in torprm:
         offset = torprm['offset']
-    if parms is not 'eval':
+    if parms!='eval':
         offset = parms[-1]
     if type(offset)==list:
         if len(tor_energy_array)==len(offset):

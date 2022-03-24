@@ -343,9 +343,7 @@ vdwtypestoeval                           For parameters being fixed, this tells 
 
 ```
 
-* View ForceBalance results
+* Plot and tabulate ForceBalance results
 ```
-conda activate pymolenv
-python /home/bdw2292/poltype2/PoltypeModules/plotFBresults.py /home/bdw2292/FBJobs/
- 
+forcebalancejobsdir=Path_to_force_balance_jobs
 ```

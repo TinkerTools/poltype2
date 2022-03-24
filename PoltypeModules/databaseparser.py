@@ -1576,8 +1576,8 @@ def FindAllConsecutiveRotatableBonds(poltype,mol,listofbondsforprm):
         c=rotbnd[1]+1
         batom=poltype.mol.GetAtom(b)
         catom=poltype.mol.GetAtom(c)
-        bval=batom.GetValence()
-        cval=catom.GetValence()
+        bval=batom.GetExplicitValence()
+        cval=catom.GetExplicitValence()
         if bval<2 or cval<2:
             continue
         newrotbnds.append(rotbnd)
@@ -1822,7 +1822,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         if bondorder!=1 and ringbond==False: # then dont zero out
             continue 
         
-        atomvals=[a.GetValence() for a in babelatoms]
+        atomvals=[a.GetExplicitValence() for a in babelatoms]
         atomnums=[a.GetAtomicNum() for a in babelatoms]
         batomnum=atomnums[1]
         catomnum=atomnums[2]
