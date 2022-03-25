@@ -56,10 +56,165 @@ from email.mime.base import MIMEBase
 import psutil
 import multiprocessing
 import plotFBresults
+import annihilation as ann
+import tables 
+import boxsetup as box
+import time
+import pdbxyz
+import restraints
+import openbabel
+import plots
+import mutation as mutate
+import submitjobs as submit
+import keyfilemodifications as keymods
+import re
+from scipy.optimize import fmin
+import pylab as plt
+from scipy.interpolate import interp1d
+from rdkit.Chem import AllChem, rdMolAlign
+from rdkit.Chem import rdFMCS
+import parametercomparison
 
 
 class PolarizableTyper():
-    def __init__(self,forcebalancejobsdir=None,fixvdwtyperadii=[],maxjobsatsametime=10,liquid_equ_time=.5,gas_equ_time=.5,onlyrottortorlist=[],numespconfs=1,fitred=False,vdwtypestoeval=['S','T','D'],vdwprmtypestofit=['S','T'],lastlogfileupdatetime=1,addlonepairvdwsites=False,quickdatabasesearch=False,genprotstatesonly=False,generateextendedconf=True,onlyvdwatomlist=None,poltypepathlist=None,vdwtypeslist=None,fittypestogether=None,csvexpdatafile=None,liquid_equ_steps=500000,liquid_prod_steps=5000000,liquid_timestep=1.0,liquid_interval=0.1,gas_equ_steps=500000,gas_prod_steps=5000000,gas_timestep=1.0,gas_interval=0.1,md_threads=4,liquid_prod_time=5,gas_prod_time=5,WQ_PORT=None,parentjobsatsametime=1,coresperjob=2,addhydrogens=False,maximizejobsatsametime=True,consumptionratio=.8,scratchpath='/scratch',nonaroringtor1Dscan=False,skipespfiterror=False,vdwmaxqmstartingpointspertype=1,vdwmaxtinkergridpoints=50,smallmoleculefragmenter=False,fragmentjobslocal=False,toroptdebugmode=False,debugmode=False,fragmenterdebugmode=False,jobsatsametime=0,usepoleditframes=False,databasematchonly=False,setupfragjobsonly=False,allowradicals=False,checkinputonly=False,esprestweight=1,espgrad=.1,issane=True,deletedfiles=False,onlyfittorstogether=[],parentname=None,addhydrogentononcharged=True,accuratevdwsp=False,inputmoleculefolderpaths=None,email=None,firstoptfinished=False,optonly=False,onlyvdwatomindex=None,use_qmopt_vdw=False,use_gau_vdw=False,dontusepcm=False,deleteallnonqmfiles=True,totalcharge=None,torspbasissethalogen="6-311G*",homodimers=False,tortormissingfilename='tortormissing.txt',tordebugmode=False,amoebapluscfsmartstocommentmap=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoebapluscfsmartstocomment.txt',amoebapluscfprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'cfprmlib.txt',amoebaplusnonbondedprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoebaplusnonbonded.prm',amoebaplusnonbondedsmartstocommentmap=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoebaplusnonbonded.txt',smartstosoluteradiimap=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'SMARTsToSoluteRadiiMap.txt',latestsmallmoleculepolarizeprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21polarize.prm',latestsmallmoleculesmartstotypespolarize=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21polarcommenttoparameters.txt',latestsmallmoleculesmartstotinkerclass=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21smartstoclass.txt',latestsmallmoleculeprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21.prm',boltzmantemp=8,dovdwscan=False,vdwprobepathname=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/VdwProbes/',vdwprobenames=['water'],use_gausgeomoptonly=False,maxtorRMSPDRel=.2,vdwmissingfilename='missingvdw.txt',databaseprmfilename='database.prm',tortor=False,torfit2Drotonly=False,torfit1Drotonly=False,externalparameterdatabase=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'externalparameterdatabase.txt',fitfirsttorsionfoldphase=False,keyfiletoaddtodatabase=None,skipgridsearch=True,torsionprmguessfilename='torsionprmguess.txt',defaultmaxtorsiongridpoints=40,torsionsmissingfilename='torsionsmissing.txt',smallmoleculemm3prmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'mm3.prm',smallmoleculesmartstomm3descrip=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'smartstomm3typedescrip.txt',absdipoletol=.5,transferanyhydrogentor=True,smallmoleculesmartstotinkerdescrip=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'smartstoamoebatypedescrip.txt',smallmoleculeprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba09.prm',torspbasissetfile='6-311+g_st_.0.gbs',toroptbasissetfile='6-311g_st_.0.gbs',optbasissetfile='6-311g_st_.0.gbs',dmabasissetfile='6-311g_st__st_.0.gbs',espbasissetfile='aug-cc-pvtz.1.gbs',iodinetorspbasissetfile='def2-svp.1.gbs',iodinetoroptbasissetfile='def2-svp.1.gbs',iodineoptbasissetfile='def2-svp.1.gbs',iodinedmabasissetfile='def2-svp.1.gbs',iodineespbasissetfile='def2-tzvpp.1.gbs',basissetpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/'+'BasisSets/',refinenonaroringtors=False,maxgrowthcycles=4,use_gauPCM=False,fitqmdipole=False,scfmaxiter=500,suppresstorfiterr=False,obminimizeexe='obminimize',readinionly=False,suppressdipoleerr=False,topologylib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ModifiedResidueLibraries/residue_connect.txt",poltypepath=os.path.abspath(os.path.split(__file__)[0]),WBOtol=.05,dontfrag=False,isfragjob=False,dipoletol=.5,externalapi=None,printoutput=False,poltypeini=True,structure=None,prmstartidx=401,numproc=None,maxmem=None,maxdisk=None,gausdir=None,gdmadir=None,tinkerdir=None,scratchdir="/scratch",paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebabio18_header.prm",gausexe=None,formchkexe='formchk',cubegenexe='cubegen',gdmaexe='gdma',avgmpolesexe=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/PoltypeModules/avgmpoles.pl",peditexe='poledit.x',potentialexe='potential.x',minimizeexe='minimize.x',analyzeexe='analyze.x',superposeexe='superpose.x',defopbendval=0.20016677990819662,Hartree2kcal_mol=627.5095,optbasisset='6-31G*',toroptbasisset='6-311G',dmabasisset='6-311G**',espbasisset="aug-cc-pVTZ",torspbasisset="6-311+G*",optmethod='MP2',toroptmethod='wB97X-D',torspmethod='wB97X-D',dmamethod='MP2',espmethod='MP2',qmonly = False,espfit = True,parmtors = True,foldnum=3,foldoffsetlist = [ 0.0, 180.0, 0.0, 180.0, 0.0, 180.0 ],torlist = None,rotbndlist = None,maxRMSD=1,maxRMSPD=1,maxtorRMSPD=1.8,tordatapointsnum=None,gentorsion=False,gaustorerror=False,torsionrestraint=.1*3282.80354574,onlyrotbndslist=[],rotalltors=False,dontdotor=False,dontdotorfit=False,toroptpcm=False,optpcm=False,torsppcm=False,use_gaus=False,use_gausoptonly=False,freq=False,postfit=False,bashrcpath=None,amoebabioprmpath=None,libpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ModifiedResidueLibraries/lib.bio18_conv1.txt",SMARTSToTypelibpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ModifiedResidueLibraries/SMARTSToTypeLib.txt',ModifiedResiduePrmPath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/ModifiedResidue.prm',modifiedproteinpdbname=None,unmodifiedproteinpdbname=None,mutatedsidechain=None,mutatedresiduenumber=None,modifiedresiduepdbcode=None,optmaxcycle=400,torkeyfname=None,gausoptcoords='',forcefield="AMOEBA",helpfile='README.md',versionfile='version.md',sleeptime=.1):
+    def __init__(self,templateligandxyzfilename=None,templateligandfilename=None,salthfe=True,runjobslocally=True,gpucardnumber=0,density=None,neatliquidsim=False,amoeba09prmfilepath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoeba09.prm",bgnstatestructurefile=None,endstatestructurefile=None,redobar=False,rotateframes=False,perturbedkeyfilename=None,writeinputfiles=False,compareparameters=False,energycutoff=.5,printjobsleft=False,cpujobsonly=False,minfinished=False,fep=False,submitlocally=None,numinterpolsforperturbkeyfiles=None,checktraj=False,expfreeenergy=None,pathtosims=None,simulationstostopfolderpath=None,equilfinished=False,perturbkeyfilelist=None,boxonly=False,preequilboxpath=os.path.join(os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir)),'waterhuge.xyz'),usepreequilibriatedbox=True,lastNVTequiltime=.5,norotrestrainsphereradius=2,aaxis=None,baxis=None,caxis=None,prodmdfinished=False,numproc=None,usetinkerforthermoprops=False,productiondynamicsNVT=False,generateinputfilesonly=False,annihilatorpath=os.path.abspath(os.path.split(__file__)[0]),changegasphaseintegrator=False,annihilatevdw=True,endstatekey=None,bgnstatekey=None,endstatexyz=None,bgnstatexyz=None,restrainreceptorligand=True,mutlambdascheme=[],minonly=False,usegpu=True,truedynamicpath=None,truebarpath=None,equilonly=False,binding=False,proddyngrprests=True,equilrestrainsphereradius=2,restrainpositionconstant=5.0,ligandfilename=None,tightmincriteria=1,loosemincriteria=10,rescorrection=0,anglerestraintconstant=0.003046,pdbxyzpath='pdbxyz',distancerestraintconstant=10.0,poleditpath='poledit',minimizepath='minimize',analyzepath='analyze',potentialpath='potential',averageenergies=False,complexedproteinpdbname=None,uncomplexedproteinpdbname=None,addphysioions=True,equilibriatescheme=[50,100,150,200,300,300],equilibriaterestscheme=[5,2,1,.5,.1,0],prmfilepath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebabio18.prm",keyfilename=None,xyzfilename=None,restrainatomsduringminimization=True,restrainatomgroup1=None,restrainatomgroup2=None,ligandxyzfilename=None,receptorligandxyzfilename=None,xyzeditpath='xyzedit',lowerperf=7,upperperf=12,torsionrestlist=None,estatlambdascheme=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1],vdwlambdascheme=[0,.45,.52,.56,.58,.6,.62,.64,.67,.7,.75,.8,.85,.9,.95,1,1,1,1,1,1,1,1,1,1,1],restlambdascheme=[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],torsionrestscheme=[.1,.95,.09,.08,.075,.07,.06,.055,.05,.04,.035,.03,.02,.015,.01,0,0,0,0,0,0,0,0,0,0,0],waitingtime=5,receptorcharge=0,ligandcharge=None,barpath='bar',dynamicpath='dynamic',analyzeommpath='analyze_gpu',barommpath='bar_gpu',dynamicommpath='dynamic_gpu',complexation=False,solvation=False,flatbotrest=True,logname='TINKER.log',equilwritefreq=100,proddynwritefreq=2,equiltimeNVT=4,equiltimeNPT=1,equiltimestep=2,proddyntimestep=2,proddyntime=5,pressure=1,NVTensem=2,NPTensem=4,vdwcutoff=12,ewaldcutoff=7,polareps=0.00001,barostatmethod='montecarlo',integrator='RESPA',thermostat='BUSSI',listofsaltcons='[KCl]=100',forcebalancejobsdir=None,fixvdwtyperadii=[],maxjobsatsametime=10,liquid_equ_time=.5,gas_equ_time=.5,onlyrottortorlist=[],numespconfs=1,fitred=False,vdwtypestoeval=['S','T','D'],vdwprmtypestofit=['S','T'],lastlogfileupdatetime=1,addlonepairvdwsites=False,quickdatabasesearch=False,genprotstatesonly=False,generateextendedconf=True,onlyvdwatomlist=None,poltypepathlist=None,vdwtypeslist=None,fittypestogether=None,csvexpdatafile=None,liquid_equ_steps=500000,liquid_prod_steps=5000000,liquid_timestep=1.0,liquid_interval=0.1,gas_equ_steps=500000,gas_prod_steps=5000000,gas_timestep=1.0,gas_interval=0.1,md_threads=4,liquid_prod_time=5,gas_prod_time=5,WQ_PORT=None,parentjobsatsametime=1,coresperjob=2,addhydrogens=False,maximizejobsatsametime=True,consumptionratio=.8,scratchpath='/scratch',nonaroringtor1Dscan=False,skipespfiterror=False,vdwmaxqmstartingpointspertype=1,vdwmaxtinkergridpoints=50,smallmoleculefragmenter=False,fragmentjobslocal=False,toroptdebugmode=False,debugmode=False,fragmenterdebugmode=False,jobsatsametime=0,usepoleditframes=False,databasematchonly=False,setupfragjobsonly=False,allowradicals=False,checkinputonly=False,esprestweight=1,espgrad=.1,issane=True,deletedfiles=False,onlyfittorstogether=[],parentname=None,addhydrogentononcharged=True,accuratevdwsp=False,inputmoleculefolderpaths=None,email=None,firstoptfinished=False,optonly=False,onlyvdwatomindex=None,use_qmopt_vdw=False,use_gau_vdw=False,dontusepcm=False,deleteallnonqmfiles=True,totalcharge=None,torspbasissethalogen="6-311G*",homodimers=False,tortormissingfilename='tortormissing.txt',tordebugmode=False,amoebapluscfsmartstocommentmap=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoebapluscfsmartstocomment.txt',amoebapluscfprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'cfprmlib.txt',amoebaplusnonbondedprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoebaplusnonbonded.prm',amoebaplusnonbondedsmartstocommentmap=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoebaplusnonbonded.txt',smartstosoluteradiimap=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'SMARTsToSoluteRadiiMap.txt',latestsmallmoleculepolarizeprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21polarize.prm',latestsmallmoleculesmartstotypespolarize=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21polarcommenttoparameters.txt',latestsmallmoleculesmartstotinkerclass=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21smartstoclass.txt',latestsmallmoleculeprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21.prm',boltzmantemp=8,dovdwscan=False,vdwprobepathname=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/VdwProbes/',vdwprobenames=['water'],use_gausgeomoptonly=False,maxtorRMSPDRel=.2,vdwmissingfilename='missingvdw.txt',databaseprmfilename='database.prm',tortor=False,torfit2Drotonly=False,torfit1Drotonly=False,externalparameterdatabase=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'externalparameterdatabase.txt',fitfirsttorsionfoldphase=False,keyfiletoaddtodatabase=None,skipgridsearch=True,torsionprmguessfilename='torsionprmguess.txt',defaultmaxtorsiongridpoints=40,torsionsmissingfilename='torsionsmissing.txt',smallmoleculemm3prmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'mm3.prm',smallmoleculesmartstomm3descrip=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'smartstomm3typedescrip.txt',absdipoletol=.5,transferanyhydrogentor=True,smallmoleculesmartstotinkerdescrip=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'smartstoamoebatypedescrip.txt',smallmoleculeprmlib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba09.prm',torspbasissetfile='6-311+g_st_.0.gbs',toroptbasissetfile='6-311g_st_.0.gbs',optbasissetfile='6-311g_st_.0.gbs',dmabasissetfile='6-311g_st__st_.0.gbs',espbasissetfile='aug-cc-pvtz.1.gbs',iodinetorspbasissetfile='def2-svp.1.gbs',iodinetoroptbasissetfile='def2-svp.1.gbs',iodineoptbasissetfile='def2-svp.1.gbs',iodinedmabasissetfile='def2-svp.1.gbs',iodineespbasissetfile='def2-tzvpp.1.gbs',basissetpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/'+'BasisSets/',refinenonaroringtors=False,maxgrowthcycles=4,use_gauPCM=False,fitqmdipole=False,scfmaxiter=500,suppresstorfiterr=False,obminimizeexe='obminimize',readinionly=False,suppressdipoleerr=False,topologylib=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ModifiedResidueLibraries/residue_connect.txt",poltypepath=os.path.abspath(os.path.split(__file__)[0]),WBOtol=.05,dontfrag=False,isfragjob=False,dipoletol=.5,externalapi=None,printoutput=False,poltypeini=True,structure=None,prmstartidx=401,maxmem=None,maxdisk=None,gausdir=None,gdmadir=None,tinkerdir=None,scratchdir="/scratch",paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebabio18_header.prm",gausexe=None,formchkexe='formchk',cubegenexe='cubegen',gdmaexe='gdma',avgmpolesexe=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/PoltypeModules/avgmpoles.pl",peditexe='poledit.x',potentialexe='potential.x',minimizeexe='minimize.x',analyzeexe='analyze.x',superposeexe='superpose.x',defopbendval=0.20016677990819662,Hartree2kcal_mol=627.5095,optbasisset='6-31G*',toroptbasisset='6-311G',dmabasisset='6-311G**',espbasisset="aug-cc-pVTZ",torspbasisset="6-311+G*",optmethod='MP2',toroptmethod='wB97X-D',torspmethod='wB97X-D',dmamethod='MP2',espmethod='MP2',qmonly = False,espfit = True,parmtors = True,foldnum=3,foldoffsetlist = [ 0.0, 180.0, 0.0, 180.0, 0.0, 180.0 ],torlist = None,rotbndlist = None,maxRMSD=1,maxRMSPD=1,maxtorRMSPD=1.8,tordatapointsnum=None,gentorsion=False,gaustorerror=False,torsionrestraint=.1*3282.80354574,onlyrotbndslist=[],rotalltors=False,dontdotor=False,dontdotorfit=False,toroptpcm=False,optpcm=False,torsppcm=False,use_gaus=False,use_gausoptonly=False,freq=False,postfit=False,bashrcpath=None,amoebabioprmpath=None,libpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ModifiedResidueLibraries/lib.bio18_conv1.txt",SMARTSToTypelibpath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ModifiedResidueLibraries/SMARTSToTypeLib.txt',ModifiedResiduePrmPath=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/ModifiedResidue.prm',modifiedproteinpdbname=None,unmodifiedproteinpdbname=None,mutatedsidechain=None,mutatedresiduenumber=None,modifiedresiduepdbcode=None,optmaxcycle=400,torkeyfname=None,gausoptcoords='',forcefield="AMOEBA",helpfile='README.md',versionfile='version.md',sleeptime=.1):
+        self.templateligandxyzfilename=templateligandxyzfilename
+        self.templateligandfilename=templateligandfilename
+        self.salthfe=salthfe
+        self.analyzeommpath=analyzeommpath
+        self.runjobslocally=runjobslocally
+        self.gpucardnumber=gpucardnumber
+        self.density=density
+        self.neatliquidsim=neatliquidsim
+        self.amoeba09prmfilepath=amoeba09prmfilepath
+        self.bgnstatestructurefile=bgnstatestructurefile
+        self.endstatestructurefile=endstatestructurefile
+        self.redobar=redobar
+        self.rotateframes=rotateframes
+        self.perturbedkeyfilename=perturbedkeyfilename
+        self.torsionrestlist=torsionrestlist
+        self.torsionrestscheme=torsionrestscheme
+        self.writeinputfiles=writeinputfiles
+        self.compareparameters=compareparameters
+        self.energycutoff=energycutoff
+        self.potentialpath=potentialpath
+        self.poleditpath=poleditpath
+        self.printjobsleft=printjobsleft
+        self.cpujobsonly=cpujobsonly
+        self.minfinished=minfinished
+        self.fep=fep
+        self.submitlocally=submitlocally
+        self.numinterpolsforperturbkeyfiles=numinterpolsforperturbkeyfiles
+        self.checktraj=checktraj
+        self.expfreeenergy=expfreeenergy
+        self.pathtosims=pathtosims
+        self.simulationstostopfolderpath=simulationstostopfolderpath
+        self.equilfinished=equilfinished
+        self.perturbkeyfilelist=perturbkeyfilelist
+        self.boxonly=boxonly
+        self.preequilboxpath=preequilboxpath
+        self.usepreequilibriatedbox=usepreequilibriatedbox
+        self.lastNVTequiltime=lastNVTequiltime
+        self.norotrestrainsphereradius=norotrestrainsphereradius
+        self.aaxis=aaxis
+        self.baxis=baxis
+        self.caxis=caxis
+        self.prodmdfinished=prodmdfinished
+        self.usetinkerforthermoprops=usetinkerforthermoprops
+        self.productiondynamicsNVT=productiondynamicsNVT
+        self.analyzepath=analyzepath
+        self.generateinputfilesonly=generateinputfilesonly
+        self.annihilatorpath=annihilatorpath
+        self.changegasphaseintegrator=changegasphaseintegrator
+        self.annihilatevdw=annihilatevdw
+        self.binding=binding
+        self.endstatekey=endstatekey
+        self.bgnstatekey=bgnstatekey
+        self.endstatexyz=endstatexyz
+        self.bgnstatexyz=bgnstatexyz
+        self.restrainreceptorligand=restrainreceptorligand
+        self.mutlambdascheme=mutlambdascheme
+        self.minonly=minonly
+        self.usegpu=usegpu
+        self.truedynamicpath=truedynamicpath
+        self.truebarpath=truebarpath
+        self.equilonly=equilonly
+        self.proddyngrprests=proddyngrprests
+        self.equilrestrainsphereradius=equilrestrainsphereradius
+        self.equilibriaterestscheme=equilibriaterestscheme
+        self.restrainpositionconstant=restrainpositionconstant
+        self.ligandfilename=ligandfilename
+        self.loosemincriteria=loosemincriteria
+        self.tightmincriteria=tightmincriteria
+        self.rescorrection=rescorrection
+        self.anglerestraintconstant=anglerestraintconstant
+        self.pdbxyzpath=pdbxyzpath
+        self.distancerestraintconstant=distancerestraintconstant
+        self.minimizepath=minimizepath
+        self.averageenergies=averageenergies
+        self.complexedproteinpdbname=complexedproteinpdbname
+        self.uncomplexedproteinpdbname=uncomplexedproteinpdbname
+        self.addphysioions=addphysioions
+        self.equilibriatescheme=equilibriatescheme
+        self.prmfilepath=prmfilepath
+        self.keyfilename=keyfilename
+        self.xyzfilename=xyzfilename
+        self.externalapi=externalapi
+        self.restrainatomgroup1=restrainatomgroup1
+        self.restrainatomgroup2=restrainatomgroup2
+        self.restrainatomsduringminimization=restrainatomsduringminimization
+        self.ligandxyzfilename=ligandxyzfilename
+        self.receptorligandxyzfilename=receptorligandxyzfilename
+        self.lowerperf=lowerperf
+        self.upperperf=upperperf 
+        self.barommpath=barommpath
+        self.dynamicommpath=dynamicommpath
+        self.barpath=barpath
+        self.dynamicpath=dynamicpath
+
+        self.xyzeditpath=xyzeditpath
+        self.simpath=os.getcwd()        
+        self.simname=os.path.basename(self.simpath)
+
+        self.complexation=complexation
+        self.solvation=solvation
+        self.flatbotrest=flatbotrest
+
+        self.logname=logname
+
+        self.equilwritefreq=equilwritefreq # in picoseconds
+        self.proddynwritefreq=proddynwritefreq # in picoseconds
+        self.equiltimeNVT=equiltimeNVT # in ns
+        self.equiltimeNPT=equiltimeNPT # ns
+        self.equiltimestep=equiltimestep # fs
+        self.proddyntimestep=proddyntimestep # fs
+        self.proddyntime=proddyntime # ns
+        self.pressure=pressure 
+        self.NVTensem=NVTensem
+        self.NPTensem=NPTensem
+        self.proddynensem=NVTensem
+        self.vdwcutoff=vdwcutoff
+        self.ewaldcutoff=ewaldcutoff
+        self.polareps=polareps
+
+        self.barostatmethod=barostatmethod
+        self.integrator=integrator
+        self.thermostat=thermostat
+
+        self.listofsaltcons=listofsaltcons   # default physiological concentrations
+        self.ligandcharge=ligandcharge
+        self.receptorcharge=receptorcharge
+        self.waitingtime=waitingtime # time in minutes, to wait to check if all jobs have terminated
+        self.estatlambdascheme=estatlambdascheme[::-1]
+        self.vdwlambdascheme=vdwlambdascheme[::-1]
+        self.restlambdascheme=restlambdascheme[::-1]
+        self.elementsymtocharge={'K':1,'Cl':-1,'Mg':2,'Li':1,'Na':1,'Rb':1,'Cs':1,'Be':2,'Ca':2,'Zn':2}
+        self.elementsymtomass={'H':1.00794,'HN':1.00794,'HO':1.00794,'O':15.9994,'OH':15.9994,'N':14.0067,'C':12.0107,'CA':12.0107,'F':18.9984032,'Cl':35.453,'Cl-':35.453,'S':32.065,'P':30.9737,'Na':22.98976,'K':39.0983,'Ca':40.078,'Mg':24.305,'Mg+':24.305,'K+':39.0983}
+        if self.usepreequilibriatedbox==True:
+            self.equiltimeNVT=2
+            self.equiltimeNPT=1
+            self.lastNVTequiltime=.5
+        
         self.forcebalancejobsdir=forcebalancejobsdir
         self.fixvdwtyperadii=fixvdwtyperadii
         self.onlyrotbndslist=onlyrotbndslist
@@ -307,7 +462,288 @@ class PolarizableTyper():
                     else:
                         newline=line
 
-                    if "rotalltors" in newline:
+                    if 'uncomplexedproteinpdbname' in newline:
+                        self.uncomplexedproteinpdbname=a
+                    elif 'templateligandxyzfilename' in newline:
+                        self.templateligandxyzfilename=a
+                    elif 'templateligandfilename' in newline:
+                        self.templateligandfilename=a
+                    elif 'prmfilepath' in newline:
+                        self.prmfilepath=a
+                    elif 'gpucardnumber' in newline:
+                        self.gpucardnumber=int(a)
+                    elif "printjobsleft" in newline:
+                        if '=' not in line:
+                            self.printjobsleft = True
+                        else:
+                            self.printjobsleft=self.GrabBoolValue(a)
+                    elif "salthfe" in newline:
+                        if '=' not in line:
+                            self.salthfe = True
+                        else:
+                            self.salthfe=self.GrabBoolValue(a)
+
+                    elif "submitlocally" in newline:
+                        if '=' not in line:
+                            self.submitlocally = True
+                        else:
+                            self.submitlocally=self.GrabBoolValue(a)
+
+                    elif "neatliquidsim" in newline:
+                        if '=' not in line:
+                            self.neatliquidsim = True
+                        else:
+                            self.neatliquidsim=self.GrabBoolValue(a)
+
+                    elif "redobar" in newline:
+                        if '=' not in line:
+                            self.redobar = True
+                        else:
+                            self.redobar=self.GrabBoolValue(a)
+                    elif "rotateframes" in newline:
+                        if '=' not in line:
+                            self.rotateframes = True
+                        else:
+                            self.rotateframes=self.GrabBoolValue(a)
+                    elif "checktraj" in newline:
+                        if '=' not in line:
+                            self.checktraj = True
+                        else:
+                            self.checktraj=self.GrabBoolValue(a)
+                    elif "cpujobsonly" in newline:
+                        if '=' not in line:
+                            self.cpujobsonly = True
+                        else:
+                            self.cpujobsonly=self.GrabBoolValue(a)
+                    elif "writeinputfiles" in newline:
+                        if '=' not in line:
+                            self.writeinputfiles = True
+                        else:
+                            self.writeinputfiles=self.GrabBoolValue(a)
+                    elif "compareparameters" in newline:
+                        if '=' not in line:
+                            self.compareparameters = True
+                        else:
+                            self.compareparameters=self.GrabBoolValue(a)
+
+                    elif 'expfreeenergy' in newline:
+                        self.expfreeenergy=a
+                    elif 'pathtosims' in newline:
+                        self.pathtosims=a
+                    elif 'perturbedkeyfilename' in newline:
+                        self.perturbedkeyfilename=a
+                    elif 'bgnstatestructurefile' in newline:
+                        self.bgnstatestructurefile=a
+                    elif 'endstatestructurefile' in newline:
+                        self.endstatestructurefile=a
+                    elif 'simulationstostopfolderpath' in newline:
+                        self.simulationstostopfolderpath=a
+                    elif 'aaxis' in newline:
+                        self.aaxis=float(a)
+                    elif 'energycutoff' in newline:
+                        self.energycutoff=float(a)
+                    elif 'baxis' in newline:
+                        self.baxis=float(a)
+                    elif 'caxis' in newline:
+                        self.caxis=float(a)
+                    elif 'density' in newline:
+                        self.density=float(a)
+                    elif "usepreequilibriatedbox" in newline:
+                        if '=' not in line:
+                            self.usepreequilibriatedbox = True
+                        else:
+                            self.usepreequilibriatedbox=self.GrabBoolValue(a)
+                    elif "equilfinished" in newline:
+                        if '=' not in line:
+                            self.equilfinished = True
+                        else:
+                            self.equilfinished=self.GrabBoolValue(a)
+                    elif "minfinished" in newline:
+                        if '=' not in line:
+                            self.minfinished = True
+                        else:
+                            self.minfinished=self.GrabBoolValue(a)
+                    elif "boxonly" in newline:
+                        if '=' not in line:
+                            self.boxonly = True
+                        else:
+                            self.boxonly=self.GrabBoolValue(a)
+                    elif "fep" in newline:
+                        if '=' not in line:
+                            self.fep = True
+                        else:
+                            self.fep=self.GrabBoolValue(a)
+                    elif "generateinputfilesonly" in newline:
+                        if '=' not in line:
+                            self.generateinputfilesonly = True
+                        else:
+                            self.generateinputfilesonly=self.GrabBoolValue(a)
+                    elif "productiondynamicsNVT" in newline:
+                        if '=' not in line:
+                            self.productiondynamicsNVT = True
+                        else:
+                            self.productiondynamicsNVT=self.GrabBoolValue(a)
+                    elif "usetinkerforthermoprops" in newline:
+                        if '=' not in line:
+                            self.usetinkerforthermoprops = True
+                        else:
+                            self.usetinkerforthermoprops=self.GrabBoolValue(a)
+                    elif 'binding' in newline:
+                        self.binding=True
+                        self.solvation=True
+                        self.complexation=True
+                    elif "changegasphaseintegrator" in newline:
+                        if '=' not in line:
+                            self.changegasphaseintegrator = True
+                        else:
+                            self.changegasphaseintegrator=self.GrabBoolValue(a)
+                    elif "prodmdfinished" in newline:
+                        if '=' not in line:
+                            self.prodmdfinished = True
+                        else:
+                            self.prodmdfinished=self.GrabBoolValue(a)
+                    elif 'complexedproteinpdbname' in newline:
+                        self.complexedproteinpdbname=a
+                    elif 'dynamicpath' in newline:
+                        self.dynamicpath=a
+                    elif 'dynamicommpath' in newline:
+                        self.dynamicommpath=a
+                    elif 'externalapi' in newline:
+                        self.externalapi=a
+                    elif 'bashrcpath' in newline:
+                        self.bashrcpath=a
+                    elif 'restrainatomgroup1' in newline:
+                        self.restrainatomgroup1=[int(i) for i in commalist]
+                    elif 'perturbkeyfilelist' in newline:
+                        self.perturbkeyfilelist=commalist
+                    elif 'numinterpolsforperturbkeyfiles' in newline:
+                        self.numinterpolsforperturbkeyfiles=commalist
+                    elif 'restrainatomgroup2' in newline:
+                        self.restrainatomgroup2=[int(i) for i in commalist]
+                    elif 'torsionrestlist' in newline:
+                        self.torsionrestlist=commalist
+                        templist=[]
+                        for ele in self.torsionrestlist:
+                            paths=ele.lstrip().rstrip().split()
+                            temp=[]
+                            for e in paths:
+                                temp.append(e)
+                            templist.append(temp)
+                        self.torsionrestlist=templist
+                    elif "flatbotrest" in newline:
+                        if '=' not in line:
+                            self.flatbotrest = True
+                        else:
+                            self.flatbotrest=self.GrabBoolValue(a)
+
+                    elif "useproddyngrprests" in newline:
+                        if '=' not in line:
+                            self.useproddyngrprests = True
+                        else:
+                            self.useproddyngrprests=self.GrabBoolValue(a)
+                    elif "restrainreceptorligand" in newline:
+                        if '=' not in line:
+                            self.restrainreceptorligand = True
+                        else:
+                            self.restrainreceptorligand=self.GrabBoolValue(a)
+                    elif "restrainreceptorligand" in newline:
+                        if '=' not in newline:
+                            self.restrainreceptorligand = True
+                        else:
+                            self.restrainreceptorligand=self.GrabBoolValue(a)
+                    elif "annihilatevdw" in newline:
+                        if '=' not in line:
+                            self.annihilatevdw = True
+                        else:
+                            self.annihilatevdw=self.GrabBoolValue(a)
+                    elif "proddynensem" in newline:
+                        self.proddynensem = a
+                    elif ("keyfilename") in newline:
+                        self.keyfilename = a
+                    elif ("ligandcharge") in newline:
+                        self.ligandcharge = int(a)
+                    elif ("tightmincriteria") in newline:
+                        self.tightmincriteria = float(a)
+                    elif ("restrainpositionconstant") in newline:
+                        self.restrainpositionconstant = float(a)
+                    elif ("loosemincriteria") in newline:
+                        self.loosemincriteria = float(a)
+                    elif ("equilrestrainsphereradius") in newline:
+                        self.equilrestrainsphereradius = float(a)
+                    elif ("barostatmethod") in newline:
+                        self.barostatmethod = a
+                    elif ("receptorcharge") in newline:
+                        self.receptorcharge = float(a)
+                    elif ("waitingtime") in newline:
+                        self.waitingtime = float(a)
+                    elif ("listofsaltcons") in newline:
+                        self.listofsaltcons = a
+                    elif ("ligandxyzfilename") in newline and "receptor" not in newline:
+                        self.ligandxyzfilename = a
+                    elif ("ligandfilename") in newline:
+                        self.ligandfilename = a
+                    elif ("receptorligandxyzfilename") in newline:
+                        self.receptorligandxyzfilename = a
+                    elif ("integrator") in newline:
+                        self.integrator = a
+                    elif ("thermostat") in newline:
+                        self.thermostat = a
+                    elif ("vdwcutoff") in newline:
+                        self.vdwcutoff = a
+                    elif ("ewaldcutoff") in newline:
+                        self.ewaldcutoff = a
+                    elif ("polareps") in newline:
+                        self.polareps = a
+                    elif ("bgnstatexyz") in newline:
+                        self.bgnstatexyz = a
+                    elif ("endstatexyz") in newline:
+                        self.endstatexyz = a
+                    elif ("bgnstatekey") in newline:
+                        self.bgnstatekey = a
+                    elif ("endstatekey") in newline:
+                        self.endstatekey = a
+                    elif ("distancerestraintconstant") in newline:
+                        self.distancerestraintconstant= float(a)
+                    elif ("anglerestraintconstant") in newline:
+                        self.anglerestraintconstant= float(a)
+                    elif ("equilibriatescheme") in newline:
+                        self.equilibriatescheme=commalist
+                    elif ("mutlambdascheme") in newline:
+                        self.mutlambdascheme=commalist
+                    elif ("restlambdascheme") in newline:
+                        self.restlambdascheme=commalist
+                    elif ("vdwlambdascheme") in newline:
+                        self.vdwlambdascheme=commalist
+                    elif ("estatlambdascheme") in newline:
+                        self.estatlambdascheme=commalist
+                    elif ("torsionrestscheme") in newline:
+                        self.torsionrestscheme=commalist
+                    elif ("equilwritefreq") in newline:
+                        self.equilwritefreq= a
+                    elif ("equiltimestep") in newline:
+                        self.equiltimestep= int(a)
+                    elif ("proddyntimestep") in newline:
+                        self.proddyntimestep= int(a)
+                    elif ("equiltimeNPT") in newline:
+                        self.equiltimeNPT= float(a)
+                    elif ("proddynwritefreq") in newline:
+                        self.proddynwritefreq= a
+                    elif ("proddyntime") in newline:
+                        self.proddyntime= float(a)
+                    elif ("complexation") in newline:
+                        self.complexation=True
+                    elif ("solvation") in newline:
+                        self.solvation=True
+                    elif ("equiltimeNVT") in newline:
+                        self.equiltimeNVT= float(a)
+                    elif ("equilonly") in newline:
+                        self.equilonly=True
+                    elif ("minonly") in newline:
+                        self.minonly=True
+                    elif ("equilrestlambdascheme") in newline:
+                        self.equilrestlambdascheme=commalist
+
+                    elif "rotalltors" in newline:
                         if '=' not in line:
                             self.rotalltors = True
                         else:
@@ -907,6 +1343,13 @@ class PolarizableTyper():
         if self.forcebalancejobsdir!=None:
             plotFBresults.PlotForceBalanceResults(self.forcebalancejobsdir)
             sys.exit()
+        if self.compareparameters==True:
+            self.MolecularDynamics()
+            sys.exit()
+        if self.ligandxyzfilename!=None and (self.binding==True or self.solvation==True or self.neatliquidsim==True):
+            self.MolecularDynamics()
+            sys.exit()
+
         head, self.molstructfname = os.path.split(self.molstructfname)
         self.molecprefix =  os.path.splitext(self.molstructfname)[0]
         self.initialize()
@@ -924,6 +1367,629 @@ class PolarizableTyper():
         
         if not __name__ == '__main__':
             params=self.main()
+
+
+    def MolecularDynamics(self):
+        if self.neatliquidsim==True and self.preequilboxpath==preequilboxpath: # if default water box
+            self.usepreequilibriatedbox=False # then make new neat liquid box from scratch
+
+        head,tail=os.path.split(self.prmfilepath)
+        newpath=os.path.join(os.getcwd(),tail)
+        if self.prmfilepath!=newpath or head!=None:
+            shutil.copy(self.prmfilepath,newpath)
+        self.prmfilepath=tail
+        if self.simulationstostopfolderpath!=None:
+            self.StopSimulations(self.simulationstostopfolderpath)
+            sys.exit()
+        if int(self.estatlambdascheme[0])!=1 or int(self.vdwlambdascheme[0])!=1 and self.solvation==True:
+            raise ValueError('Please start with 1 on left side of lambdascheme and 0 on right. This way for solvation can add extra steps correctly')
+        if self.ligandxyzfilename==None:
+            self.ligandxyzfilename='None'
+        self.logname=os.path.basename(os.getcwd())+'_'+self.logname 
+        self.outputpath=os.path.join(os.getcwd(),'')
+        self.logfh=open(self.outputpath+self.logname,'a+')
+        self.SanitizeMMExecutables()
+        if not (self.which(self.dynamicommpath)) and self.externalapi==None:
+            self.usegpu=False
+        foundgpukey=False
+        if 'GPUDYNAMICS' in os.environ.keys():
+            foundgpukey=True
+            self.usegpu=True
+            if self.externalapi==None and self.submitlocally==None:
+                self.submitlocally=True
+            if self.submitlocally==True:
+                string='export CUDA_DEVICE_ORDER=PCI_BUS_ID '+' ; '+' export CUDA_VISIBLE_DEVICES='+str(self.gpucardnumber)
+        if self.submitlocally!=True:
+            self.submitlocally=False
+        if not (self.which(self.dynamicommpath)) and foundgpukey==False:
+            self.localdynamicpath=self.dynamicpath
+            self.localbarpath=self.barpath
+        else:
+            self.localdynamicpath=self.dynamicommpath
+            self.localbarpath=self.barommpath
+        if self.usegpu==True:
+            self.truedynamicpath=self.dynamicommpath
+            self.truebarpath=self.barommpath
+            self.trueanalyzepath=self.analyzeommpath
+        else:
+            self.truedynamicpath=self.dynamicpath
+            self.truebarpath=self.barpath
+            self.trueanalyzepath=self.analyzepath
+        self.CleanUpFiles()
+        self.CheckTinkerVersion()
+        if self.perturbedkeyfilename!=None:
+            self.compareparameters=True
+
+        if self.bgnstatexyz!=None and self.bgnstatekey!=None and self.endstatexyz!=None and self.endstatekey!=None and self.compareparameters==True: 
+            parametercomparison.CompareBgnEndParameters(self)
+            if self.perturbedkeyfilename==None:
+                sys.exit()
+
+
+        if self.ligandxyzfilename!=None and self.templateligandxyzfilename!=None:
+            self.AlignLigandXYZToTemplateXYZ()
+            sys.exit()
+
+        if self.binding==False and self.solvation==False and self.neatliquidsim==False:
+            raise ValueError('Please choose either solvation or binding, or neat liquid simulation mode')
+        self.simfoldname=''
+        self.boxfilename='box.xyz'
+        self.masterdict={}
+        self.masterdict['energy']={}
+        self.masterdict['freeenergy']={}
+        self.masterdict['summary']={}
+        self.masterdict['lambda']={}
+
+        if self.complexation==True and self.solvation==False:
+            self.ligandindices=[[]]
+        elif self.solvation==True and self.complexation==False:
+            self.ligandindices=[[]]
+        elif self.solvation==True and self.complexation==True:
+            self.ligandindices=[[],[]]
+        elif self.solvation==False and self.complexation==False and self.neatliquidsim==True:
+            self.ligandindices=[[]]
+
+        if self.complexation==True and self.complexedproteinpdbname!=None: 
+
+            pdbxyz.GenerateProteinTinkerXYZFile(self)
+        elif self.complexation==True and self.uncomplexedproteinpdbname==None and self.complexedproteinpdbname==None and self.receptorligandxyzfilename==None: 
+            raise ValueError('Missing complexed proteinpdbname')
+        if self.ligandfilename!=None:
+            self.ReadLigandCharge()
+
+        if self.neatliquidsim==True:
+            self.estatlambdascheme=[1]
+            self.vdwlambdascheme=[1]
+            self.restlambdascheme=[1]
+            self.restrainatomsduringminimization=False
+
+        self.originalestatlambdascheme=self.estatlambdascheme[:]
+        self.originalvdwlambdascheme=self.vdwlambdascheme[:]
+        self.originalrestlambdascheme=self.restlambdascheme[:]
+        self.originaltorsionrestscheme=self.torsionrestscheme[:]
+
+        self.originalkeyfilename=self.keyfilename
+        self.checkneedregrow=self.CheckIfNeedRegrowForSolvation()
+        self.CheckReceptorLigandXYZFile() # sometimes user have box info on top
+        self.CheckInputXYZKeyFiles()
+
+        if self.checkneedregrow==True:
+            regrowelelambdascheme=self.estatlambdascheme[::-1]
+            regrowvdwlambdascheme=self.vdwlambdascheme[::-1]
+            self.estatlambdascheme=[self.estatlambdascheme,regrowelelambdascheme]
+            self.vdwlambdascheme=[self.vdwlambdascheme,regrowvdwlambdascheme]
+            self.restlambdascheme=[self.restlambdascheme,self.restlambdascheme]
+            self.torsionrestscheme=[self.torsionrestscheme,self.torsionrestscheme]
+        else:
+            self.estatlambdascheme=[self.estatlambdascheme]
+            self.vdwlambdascheme=[self.vdwlambdascheme]
+            self.restlambdascheme=[self.restlambdascheme]
+            self.torsionrestscheme=[self.torsionrestscheme]
+
+        if self.ligandcharge==None: # assume since no input given
+            self.ligandcharge=0
+
+        head,self.foldername=os.path.split(os.getcwd())
+        if self.complexation==True and self.solvation==False:
+            self.bufferlen=[20]
+            self.systemcharge=[self.receptorcharge+self.ligandcharge]
+            self.ligandchargelist=[self.ligandcharge]
+            self.xyzfilename=[self.receptorligandxyzfilename]
+            self.iontypetoionnumberneut=[{}]
+            self.iontypetoionnumberphysio=[{}]
+            self.lambdafolderlist=[[]] 
+            self.proddynoutfilepath=[[]]
+            self.baroutputfilepath=[[]]
+            self.barfilepath=[[]]
+            self.thermooutputfilepath=[[]]
+            self.secondarcpaths=[[]]
+            self.firstarcpaths=[[]]
+            self.tabledictkeysused=[[]]
+            self.tabledict=[{}]
+            self.simfoldname=['Comp'+self.simfoldname]
+            self.boxfilename=[self.foldername+'_comp'+self.boxfilename]
+            self.newkeyfilename=[self.foldername+'_comp'+'.key']
+            self.WriteToLog('Complexation job')
+            self.tightminoutput=[self.foldername+'_comp'+'tightmin.out']
+            self.looseminoutput=[self.foldername+'_comp'+'loosemin.out']
+            self.freeenergy=[[]]
+            self.freeenergylist=[[]]
+            self.overlaplist=[[]]
+            self.freeenergyerrorlist=[[]]
+            self.freeenergyfwd=[[]]
+            self.freeenergylistfwd=[[]]
+            self.freeenergyerrorlistfwd=[[]]
+            self.freeenergybwd=[[]]
+            self.freeenergylistbwd=[[]]
+            self.freeenergyerrorlistbwd=[[]]
+            self.freeenergyviabariter=[[]]
+            self.freeenergylistviabariter=[[]]
+            self.freeenergyerrorlistviabariter=[[]]
+            self.freeenergyviabootstrap=[[]]
+            self.freeenergylistviabootstrap=[[]]
+            self.freeenergyerrorlistviabootstrap=[[]]
+            self.enthalpy=[[]]
+            self.enthalpylist=[[]]
+            self.enthalpyerrorlist=[[]]
+            self.enthalpyerrorlisttotal=[[]]
+            self.entropy=[[]]
+            self.entropylist=[[]]
+            self.entropyerrorlist=[[]]
+            self.entropyerrorlisttotal=[[]]
+            self.freeenergyerror=[[]]
+            self.enthalpyerror=[[]]
+            self.entropyerror=[[]]
+            self.masterdict['boxinfo']=[{}]
+
+        elif self.solvation==True and self.complexation==False:
+            self.bufferlen=[2*float(self.vdwcutoff)+6]
+            self.systemcharge=[self.ligandcharge]
+            self.ligandchargelist=[self.ligandcharge]
+            self.xyzfilename=[self.ligandxyzfilename]
+            self.iontypetoionnumberneut=[{}]
+            self.iontypetoionnumberphysio=[{}]
+            self.lambdafolderlist=[[]]
+            self.proddynoutfilepath=[[]]
+            self.baroutputfilepath=[[]]
+            self.barfilepath=[[]]
+            self.thermooutputfilepath=[[]]
+            self.secondarcpaths=[[]]
+            self.firstarcpaths=[[]]
+            self.tabledictkeysused=[[]]
+            self.tabledict=[{}]
+            self.simfoldname=['Solv'+self.simfoldname]
+            self.boxfilename=[self.foldername+'_solv'+self.boxfilename]
+            self.newkeyfilename=[self.foldername+'_solv'+'.key']
+            self.WriteToLog('Solvation job')
+            self.tightminoutput=[self.foldername+'_solv'+'tightmin.out']
+            self.looseminoutput=[self.foldername+'_solv'+'loosemin.out']
+            self.freeenergy=[[]]
+            self.freeenergylist=[[]]
+            self.overlaplist=[[]]
+            self.freeenergyerrorlist=[[]]
+            self.freeenergyfwd=[[]]
+            self.freeenergylistfwd=[[]]
+            self.freeenergyerrorlistfwd=[[]]
+            self.freeenergybwd=[[]]
+            self.freeenergylistbwd=[[]]
+            self.freeenergyerrorlistbwd=[[]]
+            self.freeenergyviabariter=[[]]
+            self.freeenergylistviabariter=[[]]
+            self.freeenergyerrorlistviabariter=[[]]
+            self.freeenergyviabootstrap=[[]]
+            self.freeenergylistviabootstrap=[[]]
+            self.freeenergyerrorlistviabootstrap=[[]]
+            self.enthalpy=[[]]
+            self.enthalpylist=[[]]
+            self.enthalpyerrorlist=[[]]
+            self.enthalpyerrorlisttotal=[[]]
+            self.entropy=[[]]
+            self.entropylist=[[]]
+            self.entropyerrorlist=[[]]
+            self.entropyerrorlisttotal=[[]]
+            self.freeenergyerror=[[]]
+            self.enthalpyerror=[[]]
+            self.entropyerror=[[]]
+            self.masterdict['boxinfo']=[{}]
+
+
+        elif self.solvation==False and self.complexation==False and self.neatliquidsim==True:
+            self.bufferlen=[2*float(self.vdwcutoff)+6]
+            self.systemcharge=[self.ligandcharge]
+            self.xyzfilename=[self.ligandxyzfilename]
+            self.iontypetoionnumberneut=[{}]
+            self.iontypetoionnumberphysio=[{}]
+            self.lambdafolderlist=[[]]
+            self.proddynoutfilepath=[[]]
+            self.baroutputfilepath=[[]]
+            self.barfilepath=[[]]
+            self.thermooutputfilepath=[[]]
+            self.secondarcpaths=[[]]
+            self.firstarcpaths=[[]]
+            self.tabledictkeysused=[[]]
+            self.tabledict=[{}]
+            self.simfoldname=['NeatLiq'+self.simfoldname]
+            self.boxfilename=[self.foldername+'_neatliq'+self.boxfilename]
+            self.newkeyfilename=[self.foldername+'_neatliq'+'.key']
+            self.WriteToLog('Neat Liquid job')
+            self.tightminoutput=[self.foldername+'_neatliq'+'tightmin.out']
+            self.looseminoutput=[self.foldername+'_neatliq'+'loosemin.out']
+            self.masterdict['boxinfo']=[{}]
+
+        elif self.solvation==True and self.complexation==True:
+            self.bufferlen=[20,20+6]
+            self.systemcharge=[self.receptorcharge+self.ligandcharge,self.ligandcharge]
+            self.ligandchargelist=[self.ligandcharge,self.ligandcharge]
+            self.xyzfilename=[self.receptorligandxyzfilename,self.ligandxyzfilename]
+            self.iontypetoionnumberneut=[{},{}]
+            self.iontypetoionnumberphysio=[{},{}]
+            self.lambdafolderlist=[[],[]]
+            self.proddynoutfilepath=[[],[]]
+            self.baroutputfilepath=[[],[]]
+            self.barfilepath=[[],[]]
+            self.thermooutputfilepath=[[],[]]
+            self.secondarcpaths=[[],[]]
+            self.firstarcpaths=[[],[]]
+            self.tabledictkeysused=[[],[]]
+            self.tabledict=[{},{}]
+            self.simfoldname=['Comp'+self.simfoldname,'Solv'+self.simfoldname]
+            self.boxfilename=[self.foldername+'_comp'+self.boxfilename,self.foldername+'_solv'+self.boxfilename]
+            self.newkeyfilename=[self.foldername+'_comp'+'.key',self.foldername+'_solv'+'.key']
+            self.WriteToLog('Binding job')
+            self.tightminoutput=[self.foldername+'_comp'+'tightmin.out',self.foldername+'_solv'+'tightmin.out']
+            self.looseminoutput=[self.foldername+'_comp'+'loosemin.out',self.foldername+'_solv'+'loosemin.out']
+            self.freeenergy=[[],[]]
+            self.freeenergylist=[[],[]]
+            self.overlaplist=[[],[]]
+            self.freeenergyerrorlist=[[],[]]
+            self.freeenergyfwd=[[],[]]
+            self.freeenergylistfwd=[[],[]]
+            self.freeenergyerrorlistfwd=[[],[]]
+            self.freeenergybwd=[[],[]]
+            self.freeenergylistbwd=[[],[]]
+            self.freeenergyerrorlistbwd=[[],[]]
+            self.freeenergyviabariter=[[],[]]
+            self.freeenergylistviabariter=[[],[]]
+            self.freeenergyerrorlistviabariter=[[],[]]
+            self.freeenergyviabootstrap=[[],[]]
+            self.freeenergylistviabootstrap=[[],[]]
+            self.freeenergyerrorlistviabootstrap=[[],[]]
+            self.enthalpy=[[],[]]
+            self.enthalpylist=[[],[]]
+            self.enthalpyerrorlist=[[],[]]
+            self.enthalpyerrorlisttotal=[[],[]]
+            self.entropy=[[],[]]
+            self.entropylist=[[],[]]
+            self.entropyerrorlist=[[],[]]
+            self.entropyerrorlisttotal=[[],[]]
+            self.freeenergyerror=[[],[]]
+            self.enthalpyerror=[[],[]]
+            self.entropyerror=[[],[]]
+            self.masterdict['boxinfo']=[{},{}]
+
+        if self.pathtosims!=None:
+            tables.GrabSimDataFromPathList(self)
+            plots.PlotEnergyData(self)
+            sys.exit()
+        if self.perturbkeyfilelist!=None:
+            ls=[i+1 for i in range(len(self.perturbkeyfilelist))]
+            self.perturbkeyfilelisttokeyindex=dict(zip(self.perturbkeyfilelist,ls)) 
+            if self.numinterpolsforperturbkeyfiles==None:
+                self.numinterpolsforperturbkeyfiles=[1 for i in range(len(self.perturbkeyfilelist))]
+            else:
+                self.numinterpolsforperturbkeyfiles=[int(i) for i in self.numinterpolsforperturbkeyfiles]
+            self.perturbkeyfilelisttointerpolations=dict(zip(self.perturbkeyfilelist,self.numinterpolsforperturbkeyfiles))
+            if self.fep==True:
+                self.submitlocally=True
+
+        for i in range(len(self.newkeyfilename)):
+            newkeyfilename=self.newkeyfilename[i]
+            shutil.copy(self.keyfilename,newkeyfilename)
+        if self.complexation==True and self.solvation==False:
+            self.keyfilename=[[self.foldername+'_comp'+'.key']]
+            if self.perturbkeyfilelist!=None:
+                for keyname,index in self.perturbkeyfilelisttokeyindex.items():
+                    numinterpols=self.perturbkeyfilelisttointerpolations[keyname]
+                    for k in range(numinterpols):
+                        newkeyname=self.foldername+'_comp'+'.key'
+                        shutil.copy(keyname,newkeyname)
+                        self.keyfilename[0].append(newkeyname)
+            confignamelist=[i.replace('.key','_config.key') for i in self.keyfilename[0]]
+            lambdanamelist=[i.replace('.key','_lambda.key') for i in self.keyfilename[0]]
+            self.configkeyfilename=[confignamelist]
+            self.lambdakeyfilename=[lambdanamelist]
+
+        elif self.solvation==True and self.complexation==False:
+            self.keyfilename=[[self.foldername+'_solv'+'.key']]
+            if self.perturbkeyfilelist!=None:
+                for keyname,index in self.perturbkeyfilelisttokeyindex.items():
+                    numinterpols=self.perturbkeyfilelisttointerpolations[keyname]
+                    for k in range(numinterpols):
+                        newkeyname=self.foldername+'_solv'+'.key'
+                        shutil.copy(keyname,newkeyname)
+                        self.keyfilename[0].append(newkeyname)
+            confignamelist=[i.replace('.key','_config.key') for i in self.keyfilename[0]]
+            lambdanamelist=[i.replace('.key','_lambda.key') for i in self.keyfilename[0]]
+            self.configkeyfilename=[confignamelist]
+            self.lambdakeyfilename=[lambdanamelist]
+
+
+        elif self.solvation==False and self.complexation==False and self.neatliquidsim==True:
+            self.keyfilename=[[self.foldername+'_neatliq'+'.key']]
+            if self.perturbkeyfilelist!=None:
+                for keyname,index in self.perturbkeyfilelisttokeyindex.items():
+                    numinterpols=self.perturbkeyfilelisttointerpolations[keyname]
+                    for k in range(numinterpols):
+                        newkeyname=self.foldername+'_neatliq'+'.key'
+                        shutil.copy(keyname,newkeyname)
+                        self.keyfilename[0].append(newkeyname)
+            confignamelist=[i.replace('.key','_config.key') for i in self.keyfilename[0]]
+            lambdanamelist=[i.replace('.key','_lambda.key') for i in self.keyfilename[0]]
+            self.configkeyfilename=[confignamelist]
+            self.lambdakeyfilename=[lambdanamelist]
+
+
+        elif self.solvation==True and self.complexation==True:
+            self.keyfilename=[[self.foldername+'_comp'+'.key'],[self.foldername+'_solv'+'.key']]
+            if self.perturbkeyfilelist!=None:
+                for keyname,index in self.perturbkeyfilelisttokeyindex.items():
+                    numinterpols=self.perturbkeyfilelisttointerpolations[keyname]
+                    for k in range(numinterpols):
+                        newkeyname=self.foldername+'_comp'+'.key'
+                        shutil.copy(keyname,newkeyname)
+                        self.keyfilename[0].append(newkeyname)
+                        newkeyname=self.foldername+'_solv'+'.key'
+                        shutil.copy(keyname,newkeyname)
+                        self.keyfilename[1].append(newkeyname)
+            confignamelistcomp=[i.replace('.key','_config.key') for i in self.keyfilename[0]]
+            lambdanamelistcomp=[i.replace('.key','_lambda.key') for i in self.keyfilename[0]]
+            confignamelistsolv=[i.replace('.key','_config.key') for i in self.keyfilename[1]]
+            lambdanamelistsolv=[i.replace('.key','_lambda.key') for i in self.keyfilename[1]]
+            self.configkeyfilename=[confignamelistcomp,confignamelistsolv]
+            self.lambdakeyfilename=[lambdanamelistcomp,lambdanamelistsolv]
+
+        self.elementsymtotinktype={'K':box.GrabTypeNumber(self,'Potassium Ion K+'),'Cl':box.GrabTypeNumber(self,'Chloride Ion Cl-'),'Mg':box.GrabTypeNumber(self,'Magnesium Ion Mg+2'),'Li':box.GrabTypeNumber(self,'Lithium Ion Li+'),'Na':box.GrabTypeNumber(self,'Sodium Ion Na+'),'Rb':box.GrabTypeNumber(self,'Rubidium Ion Rb+'),'Cs':box.GrabTypeNumber(self,'Cesium Ion Cs+'),'Be':box.GrabTypeNumber(self,'Beryllium Ion Be+2'),'Ca':box.GrabTypeNumber(self,'Calcium Ion Ca+2'),'Zn':box.GrabTypeNumber(self,'Zinc Ion Zn+2'),'Mg+':box.GrabTypeNumber(self,'Magnesium Ion Mg+2')}
+        self.ReadWaterFromPRMFile()
+        
+        self.equilstepsNVT=str(int((self.equiltimeNVT*1000000)/self.equiltimestep/len(self.equilibriatescheme)-1)) # convert ns to fs divide by the length of temperature scheme
+        self.lastequilstepsNVT=str(int((self.lastNVTequiltime*1000000)/self.equiltimestep))
+        self.equilstepsNPT=str(int((self.equiltimeNPT*1000000)/self.equiltimestep))
+        self.proddynframenum=str(int(float(self.proddyntime)/(float(self.proddynwritefreq)*0.001)))
+        self.proddynsteps=str(int((self.proddyntime*1000000)/self.proddyntimestep))
+        self.equilframenumNPT=int((float(self.equiltimeNPT))/(float(self.equilwritefreq)*0.001))
+        self.equilframenumNVT=int((float(self.equiltimeNVT+self.lastNVTequiltime))/(float(self.equilwritefreq)*0.001))
+        self.equilframenum=self.equilframenumNPT+self.equilframenumNVT
+        self.proddynframenum=int((self.proddyntime)/float(self.proddynwritefreq)*0.001)
+        self.minboxfilename=[i.replace('.xyz','min.xyz') for i in self.boxfilename]
+        self.minboxfilenamepymol=[i.replace('.xyz','_pymol.xyz') for i in self.minboxfilename]
+        self.equilboxfilename=[i.replace('.xyz','equil.xyz') for i in self.boxfilename]
+        self.proddynboxfilename=[i.replace('.xyz','proddyn.xyz') for i in self.boxfilename]
+        self.proddynboxfilenamepymol=[i.replace('.xyz','_pymol.xyz') for i in self.proddynboxfilename]
+        self.equilarcboxfilename=[i.replace('.xyz','.arc') for i in self.equilboxfilename]
+        self.proddynarcboxfilename=[i.replace('.xyz','.arc') for i in self.proddynboxfilename]
+        self.proddynboxkeyfilename=[i.replace('.xyz','.key') for i in self.proddynboxfilename]
+        self.equiljobsfilename=self.foldername+'_equiljobs.txt'
+        self.proddynjobsfilename=self.foldername+'_proddynamicsjobs.txt'
+        self.barjobsfilename=self.foldername+'_barjobs.txt'
+        self.freeenergyjobsfilename=self.foldername+'_freeenergyjobs.txt'
+        self.tightminjobsfilename=self.foldername+'_tightboxminjobs.txt'
+        self.looseminjobsfilename=self.foldername+'_looseboxminjobs.txt'
+        self.analyzejobsfilename=self.foldername+'_analyzejobs.txt'
+              
+ 
+        self.solviontocount=self.DetermineIonsForChargedSolvation()
+        if len(self.solviontocount.keys())!=0 and self.salthfe==True: # then need to add counter ions free energy sims
+            self.estatlambdascheme.append(self.originalestatlambdascheme)
+            self.vdwlambdascheme.append(self.originalvdwlambdascheme)
+            self.restlambdascheme.append(self.originalrestlambdascheme)
+            self.ionboxfilename='ionbox.xyz'
+            self.ionkeyfilename='ion'+self.configkeyfilename[0][0]
+            self.systemcharge.append(self.ligandcharge)
+
+        self.equiloutputarray=[]
+        self.equiloutputstepsarray=[]
+        for i in range(len(self.simfoldname)):
+            simfold=self.simfoldname[i]
+            templist=[]
+            tempsteps=[]
+            for temp in self.equilibriatescheme:
+                templist.append(self.outputpath+self.simname+'_'+simfold+'_'+str(temp)+'_'+self.equilstepsNVT+'_NVT.out')
+                tempsteps.append(self.equilstepsNVT)
+
+            templist.append(self.outputpath+self.simname+'_'+simfold+'_'+str(temp)+'_'+self.equilstepsNPT+'_NPT.out')
+            tempsteps.append(self.equilstepsNPT)
+
+            self.equiloutputarray.append(templist)
+            self.equiloutputstepsarray.append(tempsteps)
+        self.nextfiletofinish=self.equiloutputarray[0]
+        if self.productiondynamicsNVT==True:
+            self.proddynensem=self.NPVTensem
+        else:
+            self.proddynensem=self.NPTensem
+        mut=False
+        regrowelelambdascheme=[]
+        regrowvdwlambdascheme=[]
+        self.foldernametolambdakeyfilename={}
+        self.foldernametonuminterpols={}
+        self.foldernametointerpolindex={}
+        if len(self.mutlambdascheme)==0:
+            for simfoldidx in range(len(self.simfoldname)):
+                simfold=self.simfoldname[simfoldidx]
+                templambdafolderlistoflist=[]
+                tempproddynoutfilepathlistoflist=[]
+                lambdakeyfilelist=self.lambdakeyfilename[simfoldidx]
+                for k in range(len(self.vdwlambdascheme)):
+                    vdwlambdascheme=self.vdwlambdascheme[k]
+                    estatlambdascheme=self.estatlambdascheme[k]
+                    restlambdascheme=self.restlambdascheme[k]
+                    tempproddynoutfilepath=[]
+                    templambdafolderlist=[]
+
+                    for i in range(len(vdwlambdascheme)):
+                        elelamb=estatlambdascheme[i]
+                        vdwlamb=vdwlambdascheme[i]
+                        rest=restlambdascheme[i]
+                        lambdakeyfilename=lambdakeyfilelist[0]
+                        if 'Comp' in simfold:
+                            fold=simfold+"E%s_V%s_R%s"%(elelamb,vdwlamb,rest)
+                        else:
+                            if k==0:
+                                fold=simfold+"E%s_V%s"%(elelamb,vdwlamb)
+                            elif k==1 and self.checkneedregrow==True:
+                                fold=simfold+"E%s_V%s_Gas"%(elelamb,vdwlamb)
+                            elif k==2 and self.checkneedregrow==True:
+                                fold=simfold+"E%s_V%s_Ion"%(elelamb,vdwlamb)
+                            elif k==1 and self.checkneedregrow==False:
+                                fold=simfold+"E%s_V%s_Ion"%(elelamb,vdwlamb)
+
+                        self.foldernametolambdakeyfilename[fold]=lambdakeyfilename
+                        templambdafolderlist.append(fold)
+                        outputfilepath=os.getcwd()+'/'+simfold+'/'+fold+'/'
+                        outputfilepath+=self.foldername+'_'+fold+'.out'
+                        tempproddynoutfilepath.append(outputfilepath)
+                    
+                    if self.perturbkeyfilelist!=None:
+                        if k==0:
+                            elelamb=estatlambdascheme[0]
+                            vdwlamb=vdwlambdascheme[0]
+                            rest=restlambdascheme[0]
+                        elif k==1:
+                            elelamb=estatlambdascheme[-1]
+                            vdwlamb=vdwlambdascheme[-1]
+                            rest=restlambdascheme[-1]
+                        count=1
+                        for keyfilename,index in self.perturbkeyfilelisttokeyindex.items():
+                            numinterpols=self.perturbkeyfilelisttointerpolations[keyfilename]
+                            for r in range(numinterpols):
+                                lambdakeyfilename=lambdakeyfilelist[count]
+                                split=keyfilename.split('.')
+                                keyprefix=split[0]
+                                count+=1
+                                interpolindex=r+1
+                                interpolrate=int(((interpolindex/numinterpols)*100))
+                                if 'Comp' in simfold:
+                                   fold=simfold+"E%s_V%s_R%s_Key_%s_Ipl%s"%(elelamb,vdwlamb,rest,str(keyprefix),str(interpolrate))
+                                else:
+                                   if k==0:
+                                       fold=simfold+"E%s_V%s_Key_%s_Ipl%s"%(elelamb,vdwlamb,str(keyprefix),str(interpolrate))
+                                   elif k==1:
+                                       fold=simfold+"E%s_V%s_Gas_Key_%s_Ipl%s"%(elelamb,vdwlamb,str(keyprefix),str(interpolrate))
+                                   else:
+                                       continue
+                                self.foldernametolambdakeyfilename[fold]=lambdakeyfilename
+                                self.foldernametonuminterpols[fold]=numinterpols
+                                self.foldernametointerpolindex[fold]=interpolindex
+                                if k==0:
+                                    self.estatlambdascheme[k].insert(0,elelamb)
+                                    self.vdwlambdascheme[k].insert(0,vdwlamb)
+                                    self.restlambdascheme[k].insert(0,rest)
+                                    templambdafolderlist.insert(0,fold) 
+
+                                elif k==1:
+                                    self.estatlambdascheme[k].append(elelamb)
+                                    self.vdwlambdascheme[k].append(vdwlamb)
+                                    self.restlambdascheme[k].append(rest)
+                                    templambdafolderlist.append(fold) 
+                                if self.fep==False:
+                                    outputfilepath=os.getcwd()+'/'+simfold+'/'+fold+'/'
+                                    outputfilepath+=self.foldername+'_'+fold+'.out'
+                                    tempproddynoutfilepath.append(outputfilepath)
+
+
+                    templambdafolderlistoflist.append(templambdafolderlist)
+                    tempproddynoutfilepathlistoflist.append(tempproddynoutfilepath)
+                self.proddynoutfilepath[simfoldidx]=tempproddynoutfilepathlistoflist
+                self.lambdafolderlist[simfoldidx]=templambdafolderlistoflist
+                
+        else:
+            mut=True
+            index=0
+            for i in range(len(self.mutlambdascheme)):
+                mutlambda=self.mutlambdascheme[i]
+                fold=self.simfoldname+"Mut%s"%(mutlambda)
+                self.lambdafolderlist[index].append(fold)
+                outputfilepath=os.getcwd()+'/'+self.simfoldname+'/'+fold+'/'
+                outputfilepath+=self.foldername+'_'+fold+'.out'
+                self.proddynoutfilepath[index].append(outputfilepath)
+        if mut==True:
+            mutate.SingleTopologyMutationProtocol(self)
+       
+
+        
+ 
+        for k in range(len(self.lambdafolderlist)): # stop before last one because using i+1 for grabbing next index
+            listoffolderlist=self.lambdafolderlist[k]
+            foldname=self.simfoldname[k]
+            proddynarcboxfilename=self.proddynarcboxfilename[k]
+            secondarcpathslistoflist=[] 
+            firstarcpathslistoflist=[] 
+            barfilepathlistoflist=[]
+            baroutputfilepathlistoflist=[]
+            thermooutputfilepathlistoflist=[]
+            for j in range(len(listoffolderlist)):
+                folderlist=listoffolderlist[j]
+                secondarcpathslist=[] 
+                firstarcpathslist=[] 
+                barfilepathlist=[]
+                baroutputfilepathlist=[]
+                thermooutputfilepathlist=[]
+
+                for i in range(len(folderlist)-1):
+                    firstfoldname=folderlist[i]
+                    secondfoldname=folderlist[i+1]
+
+                    firstarcpath=self.outputpath+foldname+r'/'+firstfoldname+'/'+proddynarcboxfilename.replace(self.foldername+'_',self.foldername+'_'+firstfoldname+'_').replace('0.','0-')
+
+
+                    secondarcpath=self.outputpath+foldname+r'/'+secondfoldname+'/'+proddynarcboxfilename.replace(self.foldername+'_',self.foldername+'_'+secondfoldname+'_').replace('0.','0-')
+
+
+                    secondarcpathslist.append(secondarcpath)
+                    firstarcpathslist.append(firstarcpath)
+
+
+                    baroutputfilepath=self.outputpath+foldname+r'/'+secondfoldname+'/'+self.foldername+'_'+firstfoldname+secondfoldname+'BAR1.out'
+                    thermooutputfilepath=baroutputfilepath.replace('BAR1.out','BAR2.out')
+                    barfilepath=baroutputfilepath.replace('BAR1.out','.bar')
+                    barfilepathlist.append(barfilepath)
+                    baroutputfilepathlist.append(baroutputfilepath)
+                    thermooutputfilepathlist.append(thermooutputfilepath)
+                secondarcpathslistoflist.append(secondarcpathslist)
+                firstarcpathslistoflist.append(firstarcpathslist)
+                barfilepathlistoflist.append(barfilepathlist)
+                baroutputfilepathlistoflist.append(baroutputfilepathlist)
+                thermooutputfilepathlistoflist.append(thermooutputfilepathlist)
+            self.secondarcpaths[k]=secondarcpathslistoflist
+            self.firstarcpaths[k]=firstarcpathslistoflist
+            self.barfilepath[k]=barfilepathlistoflist
+            self.baroutputfilepath[k]=baroutputfilepathlistoflist
+            self.thermooutputfilepath[k]=thermooutputfilepathlistoflist
+        
+
+        self.RotateTranslateInertialFrame()
+
+        for i in range(len(self.tabledict)):
+            self.tabledict[i]['Prod MD Ensemb']=self.proddynensem
+            self.tabledict[i]['Prod MD Time']=self.proddyntime
+            self.tabledict[i]['Prod MD Steps']=self.proddynsteps
+            self.tabledict[i]['Dynamic Writeout Frequency (ps)']=self.proddynwritefreq
+            self.tabledict[i]['Dynamic Time Step (fs)']=self.equiltimestep
+            self.tabledict[i]['Equil Time NPT']=self.equiltimeNPT
+            self.tabledict[i]['Equil Time NVT']=self.equiltimeNVT
+            self.tabledict[i]['Ligand Charge']=self.ligandcharge
+            self.tabledict[i]['Ligand Name']=self.ligandxyzfilename.replace('.xyz','')
+            if self.expfreeenergy!=None:
+                self.tabledict[i][u'ΔGᵉˣᵖ']=self.expfreeenergy
+            if self.complexation==True:
+                self.tabledict[i]['Receptor Charge']=self.receptorcharge
+                if self.uncomplexedproteinpdbname!=None:
+                    self.tabledict[i]['Receptor Name']=self.uncomplexedproteinpdbname.replace('.pdb','')
+                elif self.receptorligandxyzfilename!=None and self.uncomplexedproteinpdbname==None: 
+                    self.tabledict[i]['Receptor Name']=self.receptorligandxyzfilename.replace('.xyz','')
+
+        
+        tables.WriteTableUpdateToLog(self)
+        ann.main(self)
 
 
     def GrabProtStates(self,m):
@@ -997,12 +2063,15 @@ class PolarizableTyper():
         return method
  
 
-    def WriteToLog(self,string):
+    def WriteToLog(self,string,prin=False):
         now = time.strftime("%c",time.localtime())
+        if not isinstance(string, str):
+            string=string.decode("utf-8")
         self.logfh.write(now+' '+string+'\n')
         self.logfh.flush()
         os.fsync(self.logfh.fileno())
-
+        if prin==True:
+            print(now+' '+ string + "\n")
         
     def SanitizeMMExecutables(self):
         self.peditexe=self.SanitizeMMExecutable(self.peditexe)
@@ -1010,37 +2079,18 @@ class PolarizableTyper():
         self.minimizeexe=self.SanitizeMMExecutable(self.minimizeexe)
         self.analyzeexe=self.SanitizeMMExecutable(self.analyzeexe)
         self.superposeexe=self.SanitizeMMExecutable(self.superposeexe)
+        self.xyzeditpath=self.SanitizeMMExecutable(self.xyzeditpath)
+        self.barpath=self.SanitizeMMExecutable(self.barpath)
+        self.dynamicpath=self.SanitizeMMExecutable(self.dynamicpath)
+        self.minimizepath=self.SanitizeMMExecutable(self.minimizepath)
+        self.pdbxyzpath=self.SanitizeMMExecutable(self.pdbxyzpath)
+        self.analyzepath=self.SanitizeMMExecutable(self.analyzepath)
+        self.potentialpath=self.SanitizeMMExecutable(self.potentialpath)
+        self.poleditpath=self.SanitizeMMExecutable(self.poleditpath)
 
-    def SanitizeMMExecutable(self, executable):
-        # Try to find Tinker executable with/without suffix
-        if self.tinkerdir is None:
-            self.tinkerdir = os.getenv("TINKERDIR", default="")
-        exe = os.path.join(self.tinkerdir, executable)
-        if self.which(exe) is None:
-            exe = exe[:-2] if exe.endswith('.x') else exe + '.x'
-            if self.which(exe) is None:
-                print("ERROR: Cannot find Tinker {} executable".format(exe))
-                sys.exit(2)
-        return exe
+    
 
-    def which(self,program):
-        def is_exe(fpath):
-            try:
-                 return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
-            except:
-                 return None
     
-        fpath, fname = os.path.split(program)
-        if fpath:
-            if is_exe(program):
-                return program
-        else:
-            for path in os.environ["PATH"].split(os.pathsep):
-                exe_file = os.path.join(path, program)
-                if is_exe(exe_file):
-                    return exe_file
-    
-        return None
 
     def initialize(self):
         """
@@ -2455,6 +3505,17 @@ class PolarizableTyper():
                 self.SendFinalReportEmail(TEXT,fromaddr,toaddr,password,moleculename)
             except:
                 pass
+        if (self.binding==True or self.solvation==True or self.neatliquidsim==True):
+            self.ligandxyzfilename=self.tmpxyzfile
+            self.keyfilename=self.tmpkeyfile
+            newfolder='Sim'
+            if not os.path.exists(newfolder):
+                os.mkdir(newfolder)
+            os.chdir(newfolder)
+            shutil.copy(self.ligandxyzfilename,os.path.join(newfolder,self.ligandxyzfilename))
+            shutil.copy(self.keyfilename,os.path.join(newfolder,self.keyfilename))
+            self.MolecularDynamics()
+
 
 
     def GenerateDuplicateXYZsFromOPTs(self,xyzfname,keyfname,optmolist):
@@ -2779,6 +3840,669 @@ class PolarizableTyper():
         for line in fitlines:
             temp.write(line)
         temp.close()
+
+    def StopSimulations(self,simulationstostopfolderpath):
+        for root, subdirs, files in os.walk(simulationstostopfolderpath):
+            for d in subdirs:
+                curdir=os.getcwd()
+                path=os.path.join(root, d)
+                os.chdir(path)
+                files=os.listdir()
+                for f in files:
+                    if '.arc' in f:
+                        split=f.split('.')
+                        prefix=split[0]
+                        endname=prefix+'.end'
+                        endname=os.path.join(path,endname)
+                        with open(endname, 'w') as fp:
+                            pass
+
+                    if os.path.isdir(f):
+                        os.chdir(f)
+                        newfiles=os.listdir()
+                        for newf in newfiles:
+                            if '.arc' in newf:
+                                split=newf.split('.')
+                                prefix=split[0]
+                                endname=prefix+'.end'
+                                with open(endname, 'w') as fp:
+                                    pass
+                    os.chdir('..')
+                os.chdir(curdir)
+
+
+    def ReadWaterFromPRMFile(self):
+        temp=open(self.prmfilepath,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            if 'atom' in line:
+                linesplit=line.split()
+                oxygen='"AMOEBA Water O"'
+                hydrogen='"AMOEBA Water H"'
+                typenum=int(linesplit[1])
+                if oxygen in line:
+                    self.waterOtypenum=typenum
+                elif hydrogen in line:
+                    self.waterHtypenum=typenum
+
+    def RotateTranslateInertialFrame(self):
+        if self.receptorligandxyzfilename!=None:
+            filename='xyzedit.in'
+            temp=open(filename,'w')
+            temp.write('14'+'\n')
+            temp.write('\n')
+            temp.close()
+            cmdstr=self.xyzeditpath+' '+self.receptorligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'<'+' '+filename
+            
+            submit.call_subsystem(self,cmdstr,wait=True)    
+            endsplit=self.receptorligandxyzfilename.split('.')
+            end=endsplit[1]
+            if '_' in end:
+                newsplit=end.split('_')
+                count=int(newsplit[1])
+            else:
+                count=1
+            newcount=str(count+1)
+            filename=self.receptorligandxyzfilename
+            if filename[-2]=='_':
+                filename=filename[:-2]
+            newfilename=filename+'_'+newcount
+            os.remove(self.receptorligandxyzfilename)
+            os.rename(newfilename,self.receptorligandxyzfilename)
+
+
+    def CheckFloat(self,string):
+        try:
+            float(string)
+            return True
+        except:
+            return False
+
+    def CheckReceptorLigandXYZFile(self):
+        if self.receptorligandxyzfilename!=None:
+            temp=open(self.receptorligandxyzfilename,'r')
+            results=temp.readlines()
+            temp.close()
+            tempname=self.receptorligandxyzfilename.replace('.xyz','-t.xyz')
+            temp=open(tempname,'w')
+            for line in results:
+                linesplit=line.split() 
+                isboxline=True
+                if len(linesplit)==6:
+                    for e in linesplit:
+                        if self.CheckFloat(e)==False:
+                            isboxline=False
+                else:
+                    isboxline=False
+                if isboxline==True:
+                    continue
+                else:
+                    temp.write(line)
+            temp.close()
+            os.remove(self.receptorligandxyzfilename)
+            os.rename(tempname,self.receptorligandxyzfilename)
+                    
+                     
+
+ 
+    def CleanUpFiles(self):
+        files=os.listdir()
+        for f in files:
+            if 'water.xyz_' in f or self.ligandxyzfilename+'_' in f or 'key_' in f:
+                os.remove(f)
+            if self.receptorligandxyzfilename!=None:
+                if self.receptorligandxyzfilename+'_' in f:
+                    os.remove(f)
+
+    
+ 
+        
+    def SanitizeMMExecutable(self, executable):
+        # Try to find Tinker executable with/without suffix
+        if self.which(executable)!=None:
+            return executable
+        if self.tinkerdir is None:
+            self.tinkerdir = os.getenv("TINKERDIR", default="")
+        exe = os.path.join(self.tinkerdir, executable)
+        if self.which(exe) is None:
+            exe = exe[:-2] if exe.endswith('.x') else exe + '.x'
+            if self.which(exe) is None:
+                print("ERROR: Cannot find Tinker {} executable".format(executable))
+                sys.exit(2)
+        return exe
+
+    def which(self,program):
+        def is_exe(fpath):
+            try:
+                 return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+            except:
+                 return None
+    
+        fpath, fname = os.path.split(program)
+        if fpath:
+            result=is_exe(program)
+            if result:
+                return program
+        else:
+            for path in os.environ["PATH"].split(os.pathsep):
+                exe_file = os.path.join(path, program)
+                result=is_exe(exe_file)
+                if result:
+                    return exe_file
+    
+        return None
+
+    def ReadReceptorCharge(self):
+        pdbmol=openbabel.OBMol()
+        obConversion = openbabel.OBConversion()
+        obConversion.SetInFormat('pdb')
+        obConversion.ReadFile(pdbmol,self.uncomplexedproteinpdbname)
+        chg=pdbmol.GetTotalCharge()
+        self.receptorcharge=chg 
+
+
+    def ReadLigandOBMol(self,structfname):
+        tmpconv = openbabel.OBConversion()
+        inFormat = openbabel.OBConversion.FormatFromExt(structfname)
+        tmpconv.SetInFormat(inFormat)
+        tmpmol = openbabel.OBMol()
+        tmpconv.ReadFile(tmpmol, structfname)
+        return tmpmol
+
+    def ReadLigandRdkitMol(self,ligandfilename):
+        tmpmol=self.ReadLigandOBMol(ligandfilename)
+        tmpconv = openbabel.OBConversion()
+        tmpconv.SetOutFormat('mol')
+        temp=ligandfilename.replace('.sdf','.mol')
+        tmpconv.WriteFile(tmpmol, temp)
+        mol=rdmolfiles.MolFromMolFile(temp,removeHs=False,sanitize=False)
+
+
+        return mol
+
+
+    def ReadLigandCharge(self):
+        tmpmol=self.ReadLigandRdkitMol(self.ligandfilename)
+        tmpmol,atomindextoformalcharge=self.CheckLigandInputCharge(tmpmol)
+
+    def PymolReadableFile(self,tinkerxyzfilename,outputname):
+        if os.path.exists(tinkerxyzfilename):
+            temp=open(tinkerxyzfilename,'r')
+            results=temp.readlines()
+            temp.close()
+            temp=open(outputname,'w')
+            for line in results:
+                linesplit=line.split()
+                writeline=True
+                if len(linesplit)==6:
+                    second=linesplit[1]
+                    try:
+                        conv=float(second)
+                        writeline=False
+                    except:
+                        continue
+                if writeline==True:
+                    temp.write(line)
+            temp.close()
+
+    def ConvertTinkerXYZToCartesianXYZ(self,tinkerxyzfilename):
+        xyzfilename=tinkerxyzfilename.replace('.xyz','_cart.xyz')
+        temp=open(tinkerxyzfilename,'r')
+        tempwrite=open(xyzfilename,'w')
+        results=temp.readlines()
+        for lineidx in range(len(results)):
+            line=results[lineidx]
+            if lineidx==0:
+                linesplit=line.split()
+                tempwrite.write(linesplit[0]+'\n')
+                tempwrite.write('\n')
+                tempwrite.flush()
+                os.fsync(tempwrite.fileno())
+            else:
+                linesplit=line.split()
+                if len(linesplit)>1:
+                    newline=linesplit[1]+' '+linesplit[2]+' '+linesplit[3]+' '+linesplit[4]+'\n'
+                    tempwrite.write(newline)
+                    tempwrite.flush()
+                    os.fsync(tempwrite.fileno())
+        temp.close()
+        tempwrite.close()
+        return xyzfilename
+
+
+    def CheckIfNeedRegrowForSolvation(self):
+        needregrow=False
+        if self.solvation==True:
+            if self.binding==False and self.annihilatevdw==True:
+                xyzfilename=self.ConvertTinkerXYZToCartesianXYZ(self.ligandxyzfilename)
+                tmpmol=self.ReadLigandOBMol(xyzfilename)
+                atomiter=openbabel.OBMolAtomIter(tmpmol)
+                for atom in atomiter:
+                    atomidx=atom.GetIdx()
+                    iteratomatom = openbabel.OBAtomAtomIter(atom)
+                    for natom in iteratomatom:
+                        natomidx=natom.GetIdx()
+                        iteratomatomatom = openbabel.OBAtomAtomIter(natom)
+                        for nnatom in iteratomatomatom:
+                            nnatomidx=nnatom.GetIdx()
+                            if nnatomidx!=atomidx: 
+                                iteratomatomatomatom = openbabel.OBAtomAtomIter(nnatom)
+                                for nnnatom in iteratomatomatomatom:
+                                    nnnatomidx=nnnatom.GetIdx()
+                                    if nnnatomidx!=natomidx:
+                                        needregrow=True
+
+
+        return needregrow 
+
+
+    def CheckLigandInputCharge(self,molecule):
+        array=[]
+        totchg=0
+        atomindextoformalcharge={}
+        atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
+        for atom in molecule.GetAtoms():
+            atomidx=atom.GetIdx()
+            atomnum=atom.GetAtomicNum()
+            val=atom.GetExplicitValence()
+            valtochg=atomicnumtoformalchg[atomnum]
+            if val not in valtochg.keys(): # then assume chg=0
+                chg=0
+            else:
+                chg=valtochg[val]
+            polneighb=False
+            if atomnum==6:
+                for natom in atom.GetNeighbors():
+                    natomicnum=natom.GetAtomicNum()
+                    if natomicnum==7 or natomicnum==8 or natomicnum==16:
+                        polneighb=True
+                if polneighb and val==3:
+                    chg=1
+            atom.SetFormalCharge(chg) 
+            atom.SetNumRadicalElectrons(0)
+            atomindextoformalcharge[atomidx]=chg
+            totchg+=chg
+            string='Atom index = '+str(atomidx+1)+' Atomic Number = ' +str(atomnum)+ ' Valence = '+str(val)+ ' Formal charge = '+str(chg)
+            array.append(string)
+        if self.ligandcharge!=None: 
+            if self.ligandcharge!=totchg:
+                for row in array:
+                    print(row,flush=True)
+                raise ValueError('Valence is not consistent with input total charge')
+        else:
+            self.ligandcharge=totchg
+        return molecule,atomindextoformalcharge
+
+
+    def CheckTinkerVersion(self):
+        cmdstr=self.analyzepath+' '+os.path.abspath(os.path.join(self.annihilatorpath, os.pardir))+r'/VersionFiles/'+'water.xyz'+' '+'-k'+' '+os.path.abspath(os.path.join(self.annihilatorpath, os.pardir))+r'/VersionFiles/'+'water.key'+' '+'e'+'>'+' '+'version.out'
+        
+        self.WriteToLog(cmdstr)
+        try:
+            returned_value = subprocess.call(cmdstr, shell=True)
+        except:
+            raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())      
+        temp=open('version.out','r')
+        results=temp.readlines()
+        temp.close()
+        latestversion = False
+        for line in results:
+            if "Version" in line:
+                linesplit = line.split()
+                self.versionnum = linesplit[2]
+                if version.parse(self.versionnum) >= version.parse("8.9.4"):
+                    latestversion = True
+                    break
+
+        if not latestversion:
+            raise ValueError("Notice: Not latest working version of tinker (8.9.4)"+' '+os.getcwd())
+      
+
+    def GrabLigandIndices(self,xyzfilename):
+        indices=[]
+        starttype=401 # assume ligand starts at 401
+        temp=open(xyzfilename,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            linesplit=line.split()
+            isboxline=True
+            if len(linesplit)==6:
+                for e in linesplit:
+                    if self.CheckFloat(e)==False:
+                        isboxline=False
+            else:
+                isboxline=False
+            if len(linesplit)>1 and isboxline==False:
+                typenum=int(linesplit[5])
+                index=int(linesplit[0])
+                if typenum>=starttype:
+                    indices.append(index)
+        return indices
+        
+    def GrabTypeNumbers(self,xyzfilename,indices=None):   
+        temp=open(xyzfilename,'r')
+        results=temp.readlines()
+        temp.close()
+        typenums=[]
+        for line in results:
+            linesplit=line.split()
+            isboxline=True
+            if len(linesplit)==6:
+                for e in linesplit:
+                    if self.CheckFloat(e)==False:
+                        isboxline=False
+            else:
+                isboxline=False
+            if len(linesplit)>1 and isboxline==False:
+                typenum=int(linesplit[5])
+                index=int(linesplit[0])
+                if indices!=None:
+                    if index in indices:
+                        typenums.append(typenum)
+                else:
+                    typenums.append(typenum)
+        return typenums 
+
+    def GrabCoordinates(self,xyzfilename,indices=None):
+        temp=open(xyzfilename,'r')
+        results=temp.readlines()
+        temp.close()
+        coords=[]
+        for line in results:
+            linesplit=line.split()
+            isboxline=True
+            if len(linesplit)==6:
+                for e in linesplit:
+                    if self.CheckFloat(e)==False:
+                        isboxline=False
+            else:
+                isboxline=False
+            if len(linesplit)>1 and isboxline==False:
+                typenum=int(linesplit[5])
+                index=int(linesplit[0])
+                coord=[float(linesplit[2]),float(linesplit[3]),float(linesplit[4])]
+                try:
+                    if index in indices:
+                        coords.append(coord)
+                except:
+                    coords.append(coord)
+        return coords
+
+
+    def CompareTypes(self,receptorligandtypes,ligandtypes):
+        for i in range(len(receptorligandtypes)):
+            receptorligandtype=receptorligandtypes[i]
+            ligandtype=ligandtypes[i]
+            if receptorligandtype!=ligandtype:
+                raise ValueError('Ligand XYZ and Receptor-Ligand XYZ dont have the same type number order!')
+
+    def RewriteCoordinates(self,xyzfilename,coords):
+        temp=open(xyzfilename,'r')
+        results=temp.readlines()
+        temp.close()
+        tempname=xyzfilename.replace('.xyz','-t.xyz')
+        temp=open(tempname,'w')
+        count=0
+        for line in results:
+            linesplit=line.split()
+            isboxline=True
+            if len(linesplit)==6:
+                for e in linesplit:
+                    if self.CheckFloat(e)==False:
+                        isboxline=False
+            else:
+                isboxline=False
+            if len(linesplit)>1 and isboxline==False:
+                coord=coords[count]
+                count+=1
+                linesplit[2]=str(coord[0])
+                linesplit[3]=str(coord[1])
+                linesplit[4]=str(coord[2])
+                line=' '.join(linesplit)+'\n'
+            if isboxline==False:
+                temp.write(line)
+        temp.close()
+        os.remove(xyzfilename)
+        os.rename(tempname,xyzfilename)
+
+
+    def ReadCharge(self,output):
+        temp=open(output,'r')
+        results=temp.readlines()
+        temp.close()
+        chg=0
+        for line in results:
+            if 'Total Electric Charge :' in line:
+                linesplit=line.split()
+                chg=int(round(float(linesplit[-2])))
+        return chg
+
+    def CheckInputXYZKeyFiles(self):
+        keymods.RemoveKeyWord(self,self.originalkeyfilename,'parameters')
+        keymods.RemoveKeyWord(self,self.originalkeyfilename,'axis')
+        keymods.RemoveKeyWord(self,self.originalkeyfilename,'ewald')
+        keymods.RemoveKeyWord(self,self.originalkeyfilename,'pme-grid')
+        keymods.RemoveKeyWord(self,self.originalkeyfilename,'pme-order')
+        keymods.RemoveKeyWord(self,self.originalkeyfilename,'cutoff')
+        keymods.RemoveKeyWord(self,self.originalkeyfilename,'thermostat')
+        keymods.RemoveKeyWord(self,self.originalkeyfilename,'integrator')
+        keymods.RemoveKeyWord(self,self.originalkeyfilename,'ligand')
+        keymods.RemoveKeyWord(self,self.originalkeyfilename,'verbose')
+        keymods.RemoveKeyWord(self,self.originalkeyfilename,'archive')
+        keymods.RemoveKeyWord(self,self.originalkeyfilename,'neighbor-list')
+        keymods.RemoveKeyWord(self,self.originalkeyfilename,'polar-eps')
+        keymods.RemoveKeyWord(self,self.originalkeyfilename,'polar-predict')
+        keymods.RemoveKeyWord(self,self.originalkeyfilename,'heavy-hydrogen')
+        keymods.RemoveKeyWord(self,self.originalkeyfilename,'omp-threads')
+        string='parameters '+self.prmfilepath+'\n'
+        keymods.AddKeyWord(self,self.originalkeyfilename,string)
+        if self.receptorligandxyzfilename!=None and self.ligandxyzfilename!=None:
+            indices=self.GrabLigandIndices(self.receptorligandxyzfilename)
+            receptorligandtypes=self.GrabTypeNumbers(self.receptorligandxyzfilename,indices)   
+            ligandtypes=self.GrabTypeNumbers(self.ligandxyzfilename)   
+            self.CompareTypes(receptorligandtypes,ligandtypes)
+        if self.receptorligandxyzfilename!=None and self.originalkeyfilename!=None: 
+            
+
+            cmdstr=self.trueanalyzepath+' '+self.receptorligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'e'
+            submit.call_subsystem(self,cmdstr,wait=True)    
+            cmdstr=self.trueanalyzepath+' '+self.receptorligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'m'+'> alz.out'
+            submit.call_subsystem(self,cmdstr,wait=True)    
+            self.complexcharge=self.ReadCharge('alz.out')
+
+        if self.ligandxyzfilename!=None and self.originalkeyfilename!=None: 
+            cmdstr=self.trueanalyzepath+' '+self.ligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'e'
+            submit.call_subsystem(self,cmdstr,wait=True)    
+            cmdstr=self.trueanalyzepath+' '+self.ligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'m'+'> alz.out'
+            submit.call_subsystem(self,cmdstr,wait=True)    
+            self.ligandcharge=self.ReadCharge('alz.out')
+            if self.receptorligandxyzfilename!=None:
+                self.receptorcharge=self.complexcharge-self.ligandcharge
+        if self.receptorligandxyzfilename!=None and self.ligandxyzfilename!=None:
+            indices=self.GrabLigandIndices(self.receptorligandxyzfilename)
+            coords=self.GrabCoordinates(self.receptorligandxyzfilename,indices)
+            self.RewriteCoordinates(self.ligandxyzfilename,coords)
+
+    def DetermineIonsForChargedSolvation(self):
+        solviontocount={}
+        self.addsolvionwindows=False
+        if self.binding==False and self.solvation==True and self.salthfe==True:
+            for i in range(len(self.systemcharge)):
+                chg=int(self.systemcharge[i])
+                if chg>0:
+                    iontypenumber=self.elementsymtotinktype['Cl']
+                elif chg<0:
+                    iontypenumber=self.elementsymtotinktype['K']
+                else:
+                    continue
+                count=np.abs(chg)
+                solviontocount[iontypenumber]=count
+                self.addsolvionwindows=True
+        return solviontocount    
+
+    def ChangeTypeNumbers(self,xyzfile,elementtotype):
+        temp=open(xyzfile,'r')
+        results=temp.readlines()
+        temp.close()
+        tempname=xyzfile.replace('.xyz','_new.xyz')
+        temp=open(tempname,'w')
+        for lineidx in range(len(results)):
+            line=results[lineidx]
+            linesplit=line.split()
+            isboxline=True
+            if len(linesplit)==6:
+                for e in linesplit:
+                    if self.CheckFloat(e)==False:
+                        isboxline=False
+            else:
+                isboxline=False
+            if isboxline==False and lineidx!=0:
+                element=linesplit[1] 
+                typenum=elementtotype[element]
+                linesplit[5]=str(typenum)
+                line=' '.join(linesplit)+'\n'
+            temp.write(line)
+        temp.close()
+        return tempname
+    
+    def ModifyBoxSizeInXYZFile(self,xyzfile,boxsize):
+        temp=open(xyzfile,'r')
+        results=temp.readlines()
+        temp.close()
+        tempname=xyzfile.replace('.xyz','_new.xyz')
+        temp=open(tempname,'w')
+        for lineidx in range(len(results)):
+            line=results[lineidx]
+            linesplit=line.split()
+            isboxline=True
+            if len(linesplit)==6:
+                for e in linesplit:
+                    if self.CheckFloat(e)==False:
+                        isboxline=False
+            else:
+                isboxline=False
+            if isboxline==True:
+                linesplit[0]=str(boxsize[0])
+                linesplit[1]=str(boxsize[1])
+                linesplit[2]=str(boxsize[2])
+                line=' '.join(linesplit)+'\n'
+            temp.write(line)
+        temp.close()
+        os.remove(xyzfile)
+        os.rename(tempname,xyzfile)
+
+    def TrimPreEquilibriatedBox(self,boxsize):
+        xyzfile=self.preequilboxpath
+        split=os.path.split(xyzfile)
+        xyzfilename=split[1]
+        shutil.copy(xyzfile,os.path.join(self.simpath,xyzfilename))    
+        elementtotype={'O':self.waterOtypenum,'H':self.waterHtypenum}
+        filename=self.ChangeTypeNumbers(xyzfilename,elementtotype)
+        self.ModifyBoxSizeInXYZFile(filename,boxsize)
+        newboxsize=[2+i for i in boxsize]
+        self.RemoveWaterOutsideBox(filename,boxsize)
+        self.ModifyBoxSizeInXYZFile(filename,newboxsize)
+        os.rename(filename,'water.xyz_2') # for xyzedit lib
+
+    def RemoveWaterOutsideBox(self,xyzfilename,boxsize):
+        tempfile=open('xyzedit.in','w')
+        tempfile.write('17'+'\n')
+        tempfile.write(str(boxsize[0])+','+str(boxsize[1])+','+str(boxsize[2])+'\n')
+        tempfile.write('\n')
+        tempfile.close()
+        cmdstr=self.xyzeditpath +' '+xyzfilename+' '+self.prmfilepath+' '+' < xyzedit.in '
+        submit.call_subsystem(self,cmdstr,wait=True)    
+        newname=xyzfilename+'_2'
+        os.rename(newname,xyzfilename)
+
+
+    def ConvertTinktoXYZ(self,filename,newfilename):
+        temp=open(os.getcwd()+r'/'+filename,'r')
+        tempwrite=open(os.getcwd()+r'/'+newfilename,'w')
+        results=temp.readlines()
+        for lineidx in range(len(results)):
+            line=results[lineidx]
+            if lineidx==0:
+                linesplit=line.split()
+                tempwrite.write(linesplit[0]+'\n')
+                tempwrite.write('\n')
+                tempwrite.flush()
+                os.fsync(tempwrite.fileno())
+            else:
+                linesplit=line.split()
+                if len(linesplit)>1:
+                    newline=linesplit[1]+' '+linesplit[2]+' '+linesplit[3]+' '+linesplit[4]+'\n'
+                    tempwrite.write(newline)
+                    tempwrite.flush()
+                    os.fsync(tempwrite.fileno())
+        temp.close()
+        tempwrite.close()
+        return newfilename
+    
+
+    def AlignLigandXYZToTemplateXYZ(self):
+        ligandcartxyz=self.ConvertTinktoXYZ(self.ligandxyzfilename,self.ligandxyzfilename.replace('.xyz','_cart.xyz'))
+        templateligandcartxyz=self.ConvertTinktoXYZ(self.templateligandxyzfilename,self.templateligandxyzfilename.replace('.xyz','_cart.xyz'))
+        obConversion = openbabel.OBConversion()
+        ref = openbabel.OBMol()
+        mol = openbabel.OBMol()
+        inFormat = obConversion.FormatFromExt(ligandcartxyz)
+        obConversion.SetInFormat(inFormat)
+        obConversion.ReadFile(mol, ligandcartxyz)
+        obConversion.ReadFile(ref, templateligandcartxyz)
+        obConversion.SetOutFormat('mol')
+        molfile=ligandcartxyz.replace('_cart.xyz','.mol')
+        reffile=templateligandcartxyz.replace('_cart.xyz','.mol')
+        obConversion.WriteFile(mol,molfile)
+        obConversion.WriteFile(ref,reffile)
+        mol=Chem.MolFromMolFile(molfile,removeHs=False,sanitize=False)
+        ref=Chem.MolFromMolFile(reffile,removeHs=False,sanitize=False)
+        for bond in mol.GetBonds():
+            if bond.IsInRing()==False:
+                bond.SetBondType(Chem.BondType.SINGLE)
+        for bond in ref.GetBonds():
+            if bond.IsInRing()==False:
+                bond.SetBondType(Chem.BondType.SINGLE)
+
+        self.ligandcharge=None
+        mol,atomindextoformalcharge=self.CheckLigandInputCharge(mol)
+        self.ligandcharge=None
+        ref,atomindextoformalcharge=self.CheckLigandInputCharge(ref)
+        self.ligandcharge=None
+        Chem.SanitizeMol(mol)
+        Chem.SanitizeMol(ref)
+        confnum=1000
+        AllChem.EmbedMultipleConfs(mol, confnum)
+        mcs = rdFMCS.FindMCS([ref,mol])
+        patt = Chem.MolFromSmarts(mcs.smartsString)
+        atomnum=mcs.numAtoms
+        refMatch = ref.GetSubstructMatch(patt)
+        mv = mol.GetSubstructMatch(patt)
+        rmstocid={}
+        for cid in range(confnum):
+            rms = AllChem.AlignMol(mol,ref,prbCid=cid,atomMap=list(zip(mv,refMatch)))
+            rmstocid[rms]=cid
+        minrms=min(rmstocid.keys())
+        mincid=rmstocid[minrms]
+        indextocoords={}
+        for atom in mol.GetAtoms():
+            atomidx=atom.GetIdx()
+            pos = mol.GetConformer(mincid).GetAtomPosition(atomidx)
+            X=pos.x
+            Y=pos.y
+            Z=pos.z
+            atomindex=atomidx+1 
+            indextocoords[atomindex]=[X,Y,Z]
+        name=self.ligandxyzfilename.replace('.xyz','_aligned.xyz')
+        self.ReplaceXYZCoords(self.ligandxyzfilename,indextocoords,name,replace=False)
+        alignedligandcartxyz=self.ConvertTinktoXYZ(name,name.replace('.xyz','_cart.xyz'))
+ 
+    
+    def CallAnalyze(self,statexyz,statekey,alzout,analyzepath,option):
+        cmdstr=analyzepath+' '+statexyz+' '+'-k'+' '+statekey+' '+option+' > '+alzout
+        submit.call_subsystem(self,cmdstr,True,False,alzout) 
 
 if __name__ == '__main__':
     def RunPoltype():

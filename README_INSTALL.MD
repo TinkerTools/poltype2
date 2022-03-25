@@ -28,48 +28,45 @@ cd source
 * Open Makefile and comment out default operating system (MAC, unless you have mac)
 * Uncomment the default linux installation lines
 * Keep the RENAME line commented out
-
-* Download GDMA-2.3 and greater
-* Ren lab users can just add the following lines to your poltype .bashrc
-```shell
-export GDMADIR=/opt/gdma/gdma-2.3.3/bin/
-export PATH=/opt/gdma/gdma-2.3.3/bin/:$PATH
 ```
 
-* If you dont have a GitHub account, make one
-* Click the watch button on https://github.com/pren/poltype for important updates
+## Tinker GPU Installation
+* Install tinker CPU first 
+```
+git clone git@github.com:TinkerTools/tinker9.git
+cd tinker9
+cp -r TinkerCPU/* tinker/.
+mkdir compile
+cd compile
+export CUDAHOME=/usr/local/cuda-10.2
+export CUDACXX=$CUDAHOME/bin/nvcc
+export FC=/usr/bin/gfortran
+export CXX=/usr/bin/g++
+export ACC=/home/liuchw/shared/nvidia/hpc_sdk/Linux_x86_64/21.1/compilers/bin/nvc++
+export opt=release
+export host=0
+export prec=m
+export compute_capability=80
+export cuda_dir=$CUDAHOME
+export CMAKEHOME=/home/liuchw/shared/cmake3.12/bin/
+$CMAKEHOME/cmake ../
+make -j
+```
 
 
-* Download POLTYPE
-
-* Simply using the following git command
+### Python Envioronment
+* Simply using the following git command to download Poltype
 ```shell
 git clone https://github.com/TinkerTools/poltype2.git master
 ```
-* Make sure you are on a node with an updated OS (as much as possible)
 
-
-* Install anaconda 
-
-https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html
-
-Miniconda installer for Linux. (We also use Anaconda)
-In your terminal window, run:
-Miniconda:
-```shell
-bash Miniconda3-latest-Linux-x86_64.sh
-```
-You can install system wide or in your own directory (e.g /home/username/miniconda3/bin). If you do the later, make sure conda is in your PATH.
-
-(For Anaconda: `bash Anaconda-latest-Linux-x86_64.sh`. We installed system wide conda: /opt/software/anaconda/)
-
-You may need to run "conda init bash" and then source ~/.bashrc first.
-
-After you have conda in your PATH, run the following commands. These will be installed under "/home/username/miniconda3/". You can use the provided `environment.yml` file to create a conda environment named "poltype" with `conda env create -f environment.yml`, or run the following commands:
+* Install anaconda https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html
+* You may need to run "conda init bash" and then source ~/.bashrc first.
+* After you have conda in your PATH, run the following commands. These will be installed under "/home/username/miniconda3/". You can use the provided `environment.yml` file to create a conda environment named "poltype" with `conda env create -f environment.yml`, or run the following commands:
 
 ```shell
-conda create -n poltype python=3.8 psi4 -c psi4 --yes
-conda activate poltype
+conda create -n amoebamdpoltype python=3.8 --yes
+conda activate amoebamdpoltype
 conda install scipy --yes
 conda install matplotlib --yes
 conda install -c conda-forge openbabel --yes
@@ -84,34 +81,114 @@ pip install PyAstronomy
 conda install -c conda-forge -c schrodinger pymol-bundle --yes
 conda install -c anaconda scikit-learn --yes
 conda install -c conda-forge mdtraj --yes
-conda upgrade numpy
+conda upgrade numpy --yes
+conda install -c conda-forge forcebalance --yes
+conda install -c conda-forge pymbar --yes
+conda install -c anaconda packaging --yes
+conda install -c conda-forge tqdm --yes
+conda install -c psi4 psi4 --yes
 ```
 
 ### Environment var for running POLTYPE:
  Create environments for Tinker,Gaussian 09,and GDMA. Put these in a file and source it before running POLTYPE
 
+* Download GDMA-2.3 and greater
 * Note do not put source in your default .bashrc profile
 * Note do not keep multiple sources for different purposes (unless necessary) in the same .bashrc source file, this can cause internal conflicts to arise
 
 * Example bashrc
 ```shell
-conda activate poltype  # relative conda path for user installed conda
-OSVERSION=`cat /etc/system-release` # OS version for TINKER paths
+OSVERSION=`cat /etc/system-release`
 place="${OSVERSION//[!0-9]/}"
 OSVERSION=${place::1}
-if [ $OSVERSION == 8 ] ; then
-    export PATH=/home/bdw2292/NewestTinkerOS8/bin/:$PATH # example tinker path
+VAL=`nvidia-smi &> /dev/null; echo $?`
+
+if [ $VAL != 0 ]; then
+  echo -e "\e[101mCUDA utility not installed on `hostname`\e[0m"
+  declare -i VALUE=0
 else
-    export PATH=/home/bdw2292/NewestTinker/bin/:$PATH # example tinker path
+
+  for dir in /usr/local/*;
+  do
+      SUB='cuda'
+      if [[ "$dir" == *"$SUB"* ]]; then
+        VALUE=`echo $dir | tr -dc '0-9'`
+      fi
+       
+  done
+  
+
+  if [ $VALUE == 102 ] ; then
+       export TINKERGPUDIR=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda10.2/
+       function dynamic_gpu () {
+           local TINKER9=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda10.2
+       
+           $TINKER9/dynamic9.sh $@ 
+       }
+       export -f dynamic_gpu
+       
+       function bar_gpu () {
+           local TINKER9=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda10.2
+       
+           $TINKER9/bar9.sh $@  
+       }
+       export -f bar_gpu
+       
+       function analyze_gpu () {
+           local TINKER9=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda10.2
+       
+           $TINKER9/analyze9.sh $@
+       }
+       export -f analyze_gpu
+       export GPUDYNAMICS=True # need this for ForceBalance to let program know to use dynamic_gpu
+  elif [ $VALUE == 112 ] ; then
+       export TINKERGPUDIR=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda11.2
+       function dynamic_gpu () {
+           local TINKER9=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda11.2
+       
+           $TINKER9/dynamic9.sh $@
+       }
+       export -f dynamic_gpu
+       
+       function bar_gpu () {
+           local TINKER9=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda11.2
+       
+           $TINKER9/bar9.sh $@
+       }
+       export -f bar_gpu
+       
+       function analyze_gpu () {
+           local TINKER9=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda11.2
+       
+           $TINKER9/analyze9.sh $@
+       }
+       export -f analyze_gpu
+       
+       export GPUDYNAMICS=True
+  fi
+
+ 
+
+
+fi
+if [ $OSVERSION == 8 ] ; then
+    export PATH=/home/bdw2292/NewestTinkerOS8/bin/:$PATH
+    export TINKERPATH=/home/bdw2292/NewestTinkerOS8/bin/ # this is for ForceBalance to recognize tinker path in different nodes
+     
+else
+    export PATH=/home/bdw2292/NewestTinker/bin/:$PATH
+    export TINKERPATH=/home/bdw2292/NewestTinker/bin/
+
 fi
 
-export myusername=`whoami` 
-export g09root=/opt/g09gh/gaussian # example gaussian executable
-source $g09root/g09/bsd/g09.profile # example bashrc for gaussian
-export GAUSS_SCRDIR=/scratch/$myusername/ # example scratch directory
-export GDMADIR=/opt/gdma/gdma-2.3.3/bin/ # example GDMA directory
-export PATH=/opt/gdma/gdma-2.3.3/bin/:$PATH # example GDMA directory
-export PSI_SCRATCH=/scratch/$myusername/ # example PSI4 scratch directory
+export myusername=`whoami`
+conda activate amoebamdpoltype
+export g09root=/opt/g09gh/gaussian
+source $g09root/g09/bsd/g09.profile
+export GAUSS_SCRDIR=/scratch/$myusername/
+export GDMADIR=/opt/gdma/gdma-2.3.3/bin/
+export PATH=/opt/gdma/gdma-2.3.3/bin/:$PATH
+export PSI_SCRATCH=/scratch/$myusername/
 ```
 
 
@@ -133,5 +210,5 @@ cp ~/forcebalance/src/data/*py /home/bdw2292/miniconda3/envs/amoebamdpoltype/lib
 
 ### ForceBalance Results Viewing
 
-* Make sure license file is located in /home/USERNAME/.pymol/license.lic
+* Make sure pymol license file is located in /home/USERNAME/.pymol/license.lic
 

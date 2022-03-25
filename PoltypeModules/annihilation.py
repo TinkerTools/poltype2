@@ -1,0 +1,44 @@
+import os
+import sys
+import time
+import shutil
+import numpy as np
+import boxsetup as box
+import keyfilemodifications as keymods
+import minimization as mini     
+import bar
+import restraints as res
+import plots
+import tables
+import productiondynamics as prod
+import equilbriation as equil
+
+
+def main(poltype):
+    for i in range(len(poltype.keyfilename)):
+        keylist=poltype.keyfilename[i]
+        configkeylist=poltype.configkeyfilename[i]
+        for k in range(len(keylist)):
+            firstkey=keylist[k]
+            secondkey=configkeylist[k]
+            shutil.copy(firstkey,secondkey)
+    for keylist in poltype.configkeyfilename:
+        for key in keylist:
+            keymods.RemoveKeyWord(poltype,key,'parameters')
+            keymods.RemoveKeyWord(poltype,key,'TARGET-DIPOLE')
+            keymods.RemoveKeyWord(poltype,key,'OPENMP-THREADS')
+            keymods.InsertKeyfileHeader(poltype,key)    
+
+    box.BoxSetupProtocol(poltype)
+    if poltype.generateinputfilesonly==True:
+        sys.exit()
+    mini.CheapMinimizationProtocol(poltype)
+    if poltype.equiltimeNVT!=0 and poltype.equiltimeNPT!=0:
+        equil.EquilibriationProtocol(poltype)
+    if poltype.proddyntime!=0:
+        prod.ProductionDynamicsProtocol(poltype) 
+        bar.BARProtocol(poltype)  
+        tables.GenerateSimInfoTable(poltype)
+        plots.PlotEnergyData(poltype)
+    poltype.WriteToLog('AMOEBA Annihilator is complete. Your molecule just got annihilated!',prin=True)
+

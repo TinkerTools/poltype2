@@ -6,7 +6,6 @@
 * [Geometry Optimization](#geometry-optimization)
 * [Distributed Multipole Analysis (DMA) and Electrostatic Single Point (ESP) Inputs](#distributed-multipole-analysis-(dma)-and-electrostatic-single-point-(esp)-inputs)
 * [Torsion Parameterization](#torsion-parameterization)
-* [Modified Amino Acids](#modified-amino-acids)
 * [FAQ](#faq)
 * [Tips](#tips)
 * [Common Errors](#common-errors)
@@ -346,4 +345,289 @@ vdwtypestoeval                           For parameters being fixed, this tells 
 * Plot and tabulate ForceBalance results
 ```
 forcebalancejobsdir=Path_to_force_balance_jobs
+```
+
+### Minimum Input Example Binding
+* Input inside poltype.ini
+* Make sure pdb files (complexed and uncomplexed) have no missing residues or atoms  
+* Dont need to add ligandcharge, receptorcharge if can read from ligandxyz, receptorligandxyz, ligandfilename or complexedproteinpdbnamei
+* Always be sure to source Tinker CPU and conda environment
+```
+complexedproteinpdbname=anilinecomp.pdb 
+binding
+keyfilename=aniline.key
+ligandxyzfilename=aniline.xyz
+numproc=1 # not needed but default of 1 is slower for CPU
+```
+or
+* Make sure if using custom receptor parameters, then either adding to keyfilename or in prmfilepath
+```
+receptorligandxyzfilename=complex.xyz
+prmfilepath=prmfile with absolute path #for receptor
+binding
+keyfilename=complex.key 
+ligandxyzfilename=ligand.xyz
+```
+or
+```
+receptorligandxyzfilename=complex.xyz
+binding
+prmfilepath=prmfile with absolute path #for receptor
+keyfilename=ligand.key
+ligandxyzfilename=ligand.xyz
+```
+
+### Minimum Input Example Solvation
+* Input inside poltype.ini
+
+```
+solvation
+keyfilename=aniline.key
+ligandxyzfilename=aniline.xyz
+salthfe=True # if want salt HFE, if want ion component only, set this to False
+```
+
+### Minimum Input Example Neat Liquid  
+```
+neatliquidsim
+density=997
+keyfilename=aniline.key
+ligandxyzfilename=aniline.xyz
+equilibriatescheme=50,100,150,200,300,300
+```
+
+
+### Usage
+* Navigate to file with poltype.ini
+```
+nohup python ~/poltype2/PoltypeModules/poltype.py &
+ 
+```
+* If you dont want to submit any jobs locally (you have your own submission script), then add keyword "submitlocally=False"
+
+### Binding Inputs
+```
+binding                                 Compute solvation and complexation free energies then combine results in output CSV files. 
+                                        Default=False
+
+pathtosims                              Path to folder containing subfolders of simulations for combining simulation data into one spreadsheet. Will exit program after combining data. 
+                                        Default=None
+complexedproteinpdbname                 Complexed protein PDB file, needed for extracting the ligand and converting to tinker XYZ file. Make sure no atoms are missing!! Tinker will try and add missing atoms and this will cause issues with trying to retain coordinates from input PDB file. Atom order between ligand in this file and ligandxyzfile needs to be same. 
+                                        Default=None
+receptorligandxyzfilename               This tinker XYZ file contains ligand and protein, automatically is generated when the above complexedproteinpdbname is given.
+                                        Default=None 
+```
+### Box Setup Inputs
+```
+density                                 density of neat liquid box in kg/m^3.
+                                        Default=None
+
+aaxis                                   Fixed box size for aaxis of PBC box. If not used, will be determined automatically.     
+                                        Default=None 
+baxis                                   Fixed box size for baxis of PBC box. If not used, will be determined automatically.     
+                                        Default=None 
+
+caxis                                   Fixed box size for caxis of PBC box. If not used, will be determined automatically.     
+                                        Default=None 
+
+listofsaltcons                          Salt concentration for physiological systems. Units in mM
+                                        Default=[KCl]=100   
+
+usepreequilibriatedbox                  Use preequilibriated box and then cut default equilibriation time in half.
+                                        Default=False   
+
+boxonly                                 Stop program after making box.
+                                        Default=False           
+```
+### Minimization Inputs
+```
+restrainpositionconstant                Restraint position force constant during minimization for freezing the ligand and protein. Units in kcal/mol/Ang^2.  
+                                        Default=1 
+loosemincriteria                        Convergence criteria for minimization, loose criteria. Units kcal/mol.
+                                        Default=10
+tightmincriteria                        Convergence criteria for minimization, tight criteria. Units kcal/mol.
+                                        Default=1
+
+minonly                                 Specifies to quit after minimization is complete.
+                                        Default=False
+```
+### Restraint Inputs
+```
+restrainatomgroup1                      Group of atoms (protein or ligand) used for tinker group restraints. If not specified, will be automatically determine (for group restraints during equilbriation).
+                                        Default=None 
+restrainatomgroup2                      Group of atoms (protein or ligand) used for tinker group restraints. If not specified, will be automatically determine (for group restraints during equilbriation). 
+                                        Default=None
+flatbotrest                             Determines whether to use flatbottom potential with group restraints.
+                                        Default=True 
+distancerestraintconstant               Restraint constant for restrain-distance keyword during production dynamics. Units in kcal/mol/Ang^2. 
+                                        Default=10.
+anglerestraintconstant                  Restraint constant for restrain-angle and restrain-torsion during production dynamics. Units in kcal/mol/deg^2.
+                                        Default=0.003046
+```
+
+### Equilibriation Inputs
+```
+equilrestrainsphereradius               Sphere radius for protein atoms to restrain position during equilibriation. Units angstroms.
+                                        Default=2
+equiltimeNVT                            Total time in NVT ensemble during equilbriation (for all temperatures combined except last temperature which is repeated by default). Units in ns.
+                                        Default=4
+equilrestlambdascheme                   Group restraint force constants used during equilibriation (NVT).
+                                        Default=5,2,1,.5,.1,0
+equilibriatescheme                      Temperature used for each NVT step during equilibriation. Units in K. 
+                                        Default=50,100,150,200,300,300
+equilwritefreq                          How often to write out new frame during equilbriation MD. Units in ps.
+                                        Default=100                            
+equiltimestep                           MD time step during equilbriation. Units in fs.
+                                        Default=2
+equiltimeNPT                            Total time in NPT ensemble (will determine average box length if using NVT production dynamics). Units in ns.
+                                        Default=1
+barostatmethod                          The barostat method used during NPT.
+                                        Default=montecarlo
+
+lastNVTequiltime                        Make last NVT equilibriation time longer than the previous ones. The previous ones are computed as equiltimeNVT/number_temperatures.
+                                        Default=.5 ns
+
+equilonly                               Stop program after equilibriation and setup for production dynamics.
+                                        Default=False
+```
+### Production Dynamics Inputs
+```
+productiondynamicsNVT                   Whether or not to use NVT ensemble during production dynamics. If on then will use NPT after equilbriating to determine average box size. 
+                                        Default=False
+
+useproddyngrprests                      Determiens whether to use group restraints or not during production dynamics.If not, then use distance, angle and torsion restraints.
+                                        Default=True
+restlambdascheme                        Restraint lambda scheme during production dynamics.
+                                        Default=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0
+vdwlambdascheme                         Van der Waals lambda scheme during production dynamics. 
+                                        Default=0,.45,.52,.56,.58,.6,.62,.64,.67,.7,.75,.8,.85,.9,.95,1,1,1,1,1,1,1,1,1,1,1,1
+estatlambdascheme                       Electrostatics lambda scheme during production dynamics.
+                                        Default=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1,1
+proddynwritefreq                        How often to write out new frame during production dynamics MD. Units in ps.
+                                        Default=2
+proddyntime                             Total time to run production dynamics (in NVT). Units in ns.
+                                        Default=5
+proddyntimestep                         MD time step during production dynamics. Units in fs.
+                                        Default=2
+integrator                              MD integrator method.
+                                        Default=RESPA
+thermostat                              Thermostat method during NVT MD.
+                                        Default=BUSSI
+vdwcutoff                               Cutoff radius for van der Waals interactions. Units in angstroms.
+                                        Default=12
+ewaldcutoff                             Cutoff radius for electrostatic interactions. Units in angstroms.
+                                        Default=7
+polareps                                Grid spacing for electrostatic potential surface.
+                                        Default=.00001
+```
+### Generic Inputs 
+```
+neatliquidsim                           Specifies to do neat liquid simualtion or not.
+
+complexation                            Specifies to do complexation simulations or not.
+                                        Default=False
+solvation                               Specifies to do solvation simulations or not.
+                                        Default=False
+salthfe                                 Specifies whether to compute salthfe or only ion HFE. Salt HFE just adds another box with opposite charged ion to thermodynamic cycle. 
+                                        Default=True
+
+ligandxyzfilename                       Input tinker XYZ filename for the ligand.
+                                        Default=None
+templateligandxyzfilename               Input template tinker XYZ filename for aligning ligandxyzfilename to templateligandxyzfilename.
+                                        Default=None 
+
+keyfilename                             Input tinker key file for the ligand parameters.
+                                        Default=None
+ligandcharge                            Input charge for ligand. If ligandfilename is given, charge will be read from file instead.
+                                        Default=None
+ligandfilename                          Ligand structure file containing bond order of ligand. Charge will be automatically guessed from valence if not input via keyword
+                                        Default=None
+templateligandfilename                  Template ligand structure file containing bond order of ligand. Charge will be automatically guessed from valence if not input via keyword
+                                        Default=None
+
+receptorcharge                          Input charge for protein. If uncomplexedproteinpdbname is given, receptorcharge is read from file.
+                                        Default=None
+```
+
+### Misc. Inputs
+```
+email                                   Emails address if annihilator crashes
+
+externalapi                             External script path for submitting MD jobs. Used with submitjobs.py. 
+                                        If user creates their own submission script, must edit submitjobs.py to work with it. Default is to submit jobs on local node.“The submission script needs to be able to handle
+correct assignment of tinker envioronments on whichever CPU/GPU cluster it operates on. If using RenLabCluster please read the file on https://github.com/bdw2292/RenLabCluster”. If you use this keyword you do not need to locally source a bashrc for GPU tinker. Example “externalapi=/home/bdw2292/ClusterDaemon/manager.py”
+
+                                        Default=None
+
+restrainreceptorligand                  Use any restraints between ligand and protein (for example if ligand                                            is covalently bonded).
+                                        Default=True
+
+generateinputfilesonly                  Quit program after generating water box file.
+                                        Default=False
+
+numproc                                 Number of threads to use for CPU dynamics.
+                                        Default=1
+
+prmfilepath                             Path to parameters
+                                        Default=amoebabio18.prm
+
+perturbkeyfilelist                      Comma seperated list of keyfiles to add to end state and perturb with BAR. Right most item in the list is the end state. By default, arc file from nearestneighboring trajectory is used if fep is turned on, otherwise running MD for new state is default. By default bar jobs will be submitted locally if this keyword is turned on (faster then going through daemon) and MD is not needed to be redone (if fep is turned on). If on GPU and detect gpu bar then will use that locally rather than cpu bar. 
+                                        Default=None
+
+numinterpolsforperturbkeyfiles          Comma seperated list of number of interpolations per key file in perturbkeyfilelist (they should be same length). Use 1 for keyfiles that need only one interpolation (just between neighboring states), otherwise parameters will be interpolated via step=(b-a)/n where n is number of interpolations for that keyfile.
+                                        Default is 1 for all keys in perturbkeyfilelist
+simulationstostopfolderpath             A directory containing subdirectories of annihilator jobs, recursive search will and *.end files to each folder with an *.arc file to stop simulations. Upon restarting annihilator all *.end files that are in folders are automatically removed.
+                                        Default=None
+
+expfreeenergy                           Experimental free energy for comparison in output tables
+                                        Default=None
+
+
+fep                                     Used with perturbkeyfilelist keyword, fep specifies to copy nearest MD trajectory instead of running MD for each new keyfile to be perturbed.
+                                        Default=False 
+
+checktraj                               Specifies to check each trajectory for any corruption and delete if found
+                                        Default=False (slow to read each arc file)
+
+redobar                                 Delete all .bar, and BAR output files then resubmit BAR jobs.
+                                        Default=False
+```
+
+### Mutation Inputs
+```
+bgnstatekey                             First state key file for mutation.
+                                        Default=None
+
+endstatekey                             End state key file for mutation.
+                                        Default=None
+
+bgnstatexyz                             First state xyz file for mutation.
+                                        Default=None
+
+endstatexyz                             End state xyz file for mutation.
+                                        Default=None
+
+bgnstatestructurefile                   Begin structurefile with bond orders since babel sometimes cannot guess correct bond orders from XYZ file.
+                                        Default=None
+
+
+endstatestructurefile                   End structurefile with bond orders since babel sometimes cannot guess correct bond orders from XYZ file.
+                                        Default=None
+
+mutlambdascheme                         Lambda scheme (from 0 to 1) of mutation of any parameters between begin and 
+                                        end state keyfiles.
+                                        Default=[]
+
+compareparameters                       Compare parameters with analyze and print parameters if energy difference is > energy cutoff.
+                                        Default=False
+
+energycutoff                            For comparing parameters.
+                                        Default=.5 kcal/mol
+
+perturbedkeyfilename                    Filename desired if you want to convert two molecules with different parameter sets/tyepnumbers/atom orders to the same atom order/ type numbers as endstatexyz/endstatekey. This key can be used with perturbkeyfilelist for perturbation to a different parameter set. perturbedkeyfilename needs to be used with keywords bgnstatekey,bgnstatexyz,endstatekey,endstatexyz, where the endstatexyz and endstatekey are the atom orders and type numbers you wish to convert your bgnstatekey parameters to. For example if you wish to use "perturbkeyfilelist", then can put perturbkeyfilelist=perturbedkeyfilename (the filename not variable name).
+                                        Default=None
+
+
+rotateframes                            Rotate frames from bgnstatekey to endstatekey.
+                                        Default=False
 ```
