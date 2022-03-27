@@ -376,9 +376,9 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
 
     iteratombab = openbabel.OBMolAtomIter(mol)
     tmpfh = open(comfname, "a")
-    an = pyasl.AtomicNo()
     for atm in iteratombab:
-        tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (an.getElSymbol(atm.GetAtomicNum()), atm.x(), atm.y(), atm.z()))
+        symb=poltype.indextoatomicsymbol[atm.GetIdx()]
+        tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (symb, atm.x(), atm.y(), atm.z()))
 
 
     tmpfh.write('\n')

@@ -24,7 +24,7 @@ import shlex
 import itertools
 import apicall as call
 import math
-
+import re
 
 def AssignTotalCharge(poltype,molecule,babelmolecule):
     atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
@@ -1175,7 +1175,6 @@ def GenerateFrag(poltype,molindexlist,mol,torset):
         spinmult=atm.GetSpinMultiplicity()
         atm.SetFormalCharge(formalcharge)
 
-
     bondstoremove=[]
     
     atomswithcutbonds=[]
@@ -1239,10 +1238,7 @@ def GenerateFrag(poltype,molindexlist,mol,torset):
 
 
 
-    atomiter=openbabel.OBMolAtomIter(em)
-    for atom in atomiter:
-        atomidx=atom.GetIdx()
-        formalcharge=atom.GetFormalCharge()
+
     bonditer=openbabel.OBMolBondIter(poltype.mol)
     for bond in bonditer:
         oendidx = bond.GetEndAtomIdx()
@@ -1267,10 +1263,10 @@ def GenerateFrag(poltype,molindexlist,mol,torset):
     
 
 
-
     filename='frag.mol'
     WriteOBMolToMol(poltype,em,filename)
-    indextocoordinates=GrabIndexToCoordinates(poltype,em) # need to convert indexes now
+    RemoveRadicals(poltype,filename)
+    indextocoordinates=GrabIndexToCoordinates(poltype,em) 
     nem=ReadToOBMol(poltype,filename)
     nem.AddHydrogens()
     filename='fragalladdedhyd.mol'
@@ -1323,6 +1319,21 @@ def GenerateFrag(poltype,molindexlist,mol,torset):
     newmol=AssignTotalCharge(poltype,newmol,nem)
     return newmol,rdkitoldindextonewindex
 
+
+def RemoveRadicals(poltype,filename):
+    temp=open(filename,'r')
+    results=temp.readlines()
+    temp.close()
+    temp=open(filename,'w')
+    for line in results:
+        linesplit=line.split()
+        if len(linesplit)==16:
+            nicesplit=re.split(r'(\s+)', line)
+            nicesplit[20]='0'
+            line=''.join(nicesplit)
+        temp.write(line)
+    temp.close()
+
 def UpdateAtomNumbers(poltype,indextocoordinates):
     newindextocoordinates={}
     ls=list(indextocoordinates.keys())
@@ -1355,6 +1366,8 @@ def WriteOBMolToMol(poltype,mol,outputname):
 
 def WriteRdkitMolToMolFile(poltype,mol,outputname):
     rdmolfiles.MolToMolFile(mol,outputname,kekulize=True)
+    rdmolfiles.MolToMolFile(mol,outputname,kekulize=False)
+
 
 def ReadRdkitMolFromMolFile(poltype,inputname):
     rdkitmol=rdmolfiles.MolFromMolFile(inputname,sanitize=False)
