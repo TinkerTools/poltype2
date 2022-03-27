@@ -518,8 +518,8 @@ def FindTorsionRestraints(poltype,mol):
     for b in openbabel.OBMolBondIter(mol):
         t2 = b.GetBeginAtom()
         t3 = b.GetEndAtom()
-        t2val=t2.GetExplicitValence()
-        t3val=t3.GetExplicitValence()
+        t2val=len([neighb for neighb in openbabel.OBAtomAtomIter(t2)])
+        t3val=len([neighb for neighb in openbabel.OBAtomAtomIter(t3)])
         if t2val<2 or t3val<2:
             continue 
         ringbond=b.IsInRing()
@@ -536,8 +536,8 @@ def FindTorsionRestraints(poltype,mol):
             isrot=b.IsRotor()
             t2 = b.GetBeginAtom()
             t3 = b.GetEndAtom()
-            t2val=t2.GetExplicitValence()
-            t3val=t3.GetExplicitValence()
+            t2val=len([neighb for neighb in openbabel.OBAtomAtomIter(t2)])
+            t3val=len([neighb for neighb in openbabel.OBAtomAtomIter(t3)])
             if t2val<2 or t3val<2:
                 continue 
             ringbond=b.IsInRing()

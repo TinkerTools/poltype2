@@ -871,7 +871,6 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
 
         torprmdict,write_prm_dict,classkeytofoldtophase=FillInDictionariesParameterEstimates(poltype,torprmdict,p1,write_prm_dict)
         torsettobypassrmsd[torset]=bypassrmsd
-
         GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_dict,torprmdict,mm_energy_list,tor_energy_list,flatphaselist,qm_energy_list,tup,indicesremoveddic,cls_angle_dict_unmodified,qm_energy_list_unmodified,mm_energy_list_unmodified,clskeyswithbadfits,weightlist,torsions)
     return write_prm_dict,fitfunc_dict,torsettobypassrmsd,classkeytofoldtophase
 

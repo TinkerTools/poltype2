@@ -1150,8 +1150,8 @@ def get_torlist(poltype,mol,missed_torsions):
         t2idx=t2.GetIdx()
         t3idx=t3.GetIdx()
         bnd=[t2idx,t3idx]
-        t2val=t2.GetExplicitValence()
-        t3val=t3.GetExplicitValence()
+        t2val=len([neighb for neighb in openbabel.OBAtomAtomIter(t2)])
+        t3val=len([neighb for neighb in openbabel.OBAtomAtomIter(t3)])
 
         if BO>1:
             continue
@@ -1243,8 +1243,8 @@ def get_all_torsions(poltype,mol):
         t3 = bond.GetEndAtom()
         t2idx=t2.GetIdx()
         t3idx=t3.GetIdx()
-        t2val=t2.GetExplicitValence()
-        t3val=t3.GetExplicitValence()
+        t2val=len([neighb for neighb in openbabel.OBAtomAtomIter(t2)])
+        t3val=len([neighb for neighb in openbabel.OBAtomAtomIter(t3)])
         if (t2val>=2 and t3val>=2):
             t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
             unq=get_uniq_rotbnd(poltype,t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx())

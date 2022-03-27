@@ -1284,7 +1284,7 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         inFormat = obConversion.FormatFromExt(fragmentfilepath)
         obConversion.SetInFormat(inFormat)
         obConversion.ReadFile(fragbabelmol, fragmentfilepath)
-        fragidxtosymclass,symmetryclass=symm.gen_canonicallabels(poltype,fragbabelmol)
+        fragidxtosymclass,symmetryclass=symm.gen_canonicallabels(poltype,fragbabelmol,rdkitmol=structure)
         smartindices=[moleculeindextosmartsindex[i] for i in atomindices]
         substructure = Chem.MolFromSmarts(smartsfortransfer)
         matches=structure.GetSubstructMatches(substructure)
@@ -1456,6 +1456,7 @@ def AddOptimizedAngleLengths(poltype,optmol,angleprms,anglelistbabel):
         allangles=FilterList(poltype,allangles,anglelistbabel)
         tot=0
         for angle in allangles:
+            angle=[int(i) for i in angle]
             a = optmol.GetAtom(angle[0])
             b = optmol.GetAtom(angle[1])
             c = optmol.GetAtom(angle[2])
@@ -1576,8 +1577,8 @@ def FindAllConsecutiveRotatableBonds(poltype,mol,listofbondsforprm):
         c=rotbnd[1]+1
         batom=poltype.mol.GetAtom(b)
         catom=poltype.mol.GetAtom(c)
-        bval=batom.GetExplicitValence()
-        cval=catom.GetExplicitValence()
+        bval=len([neighb for neighb in openbabel.OBAtomAtomIter(batom)])
+        cval=len([neighb for neighb in openbabel.OBAtomAtomIter(batom)])
         if bval<2 or cval<2:
             continue
         newrotbnds.append(rotbnd)
@@ -1822,7 +1823,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         if bondorder!=1 and ringbond==False: # then dont zero out
             continue 
         
-        atomvals=[a.GetExplicitValence() for a in babelatoms]
+        atomvals=[len([neighb for neighb in openbabel.OBAtomAtomIter(a)]) for a in babelatoms]
         atomnums=[a.GetAtomicNum() for a in babelatoms]
         batomnum=atomnums[1]
         catomnum=atomnums[2]
@@ -2004,7 +2005,8 @@ def AssignAngleGuessParameters(poltype,anglemissingtinkerclassestopoltypeclasses
                     checkconsec=CheckIfAtomsConnected(poltype,poscomb,indextoneighbidxs)
                     if checkconsec==True:
                         exampleindices=[k-1 for k in comb]
-                        break 
+                        break
+                exampleindices=[int(i) for i in exampleindices]
                 atoms=[poltype.rdkitmol.GetAtomWithIdx(k) for k in exampleindices]
                 atomicnums=[a.GetAtomicNum() for a in atoms]
                 atomicval=[a.GetExplicitValence() for a in atoms]
@@ -2057,7 +2059,7 @@ def AssignBondGuessParameters(poltype,bondmissingtinkerclassestopoltypeclasses,b
                     if checkconsec==True:
                         exampleindices=[k-1 for k in comb]
                         break 
-
+                exampleindices=[int(i) for i in exampleindices]
                 atoms=[poltype.rdkitmol.GetAtomWithIdx(k) for k in exampleindices]
                 atomicnums=[a.GetAtomicNum() for a in atoms]
                 atomicval=[a.GetExplicitValence() for a in atoms]
@@ -2506,7 +2508,7 @@ def DefaultOPBendParameters(poltype,missingopbendprmindices,mol,opbendbondindice
         poltypeclasses=[poltype.idxtosymclass[i] for i in babelindices]
         boolarray=opbendbondindicestotrigonalcenterbools[opbendprmindices]
         if boolarray[1]==True:
-            atomindex=babelindices[1] 
+            atomindex=int(babelindices[1])
             atom=mol.GetAtom(atomindex)
             neighbs=list(openbabel.OBAtomAtomIter(atom))
             if len(neighbs)==3:

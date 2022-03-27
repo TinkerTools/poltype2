@@ -1325,7 +1325,7 @@ def CheckBuriedAtoms(poltype,indexarray,molecule,zeroindex=False):
         else:
             idx=index+1
         atom=molecule.GetAtom(idx)
-        valence=atom.GetExplicitValence()
+        valence=len([neighb for neighb in openbabel.OBAtomAtomIter(atom)])
         hyb=atom.GetHyb() 
         if valence==4 and hyb==3:
             indicestodelete.append(i)
@@ -1670,7 +1670,7 @@ def AddLonePairPoints(poltype,newdimerfiles,newprobeindices,newmoleculeindices,n
     added=False
     moleculeatom=mol.GetAtom(moleculeindex)
     atomicnum=moleculeatom.GetAtomicNum()
-    val=moleculeatom.GetExplicitValence()
+    val=len([neighb for neighb in openbabel.OBAtomAtomIter(moleucleatom)])
     atomisinring=moleculeatom.IsInRing()
     probeatom=mol.GetAtom(probeindex)
     moleculeatomcoords=np.array([moleculeatom.GetX(),moleculeatom.GetY(),moleculeatom.GetZ()])
@@ -2075,7 +2075,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
                     moleculeindex=flat_moleculeindices[probeidx]
                     vdwtype=poltype.idxtosymclass[moleculeindex]
                     atom=poltype.mol.GetAtom(moleculeindex)
-                    valence=atom.GetExplicitValence()
+                    valence=len([neighb for neighb in openbabel.OBAtomAtomIter(atom)])
                     atomicnum=atom.GetAtomicNum()
                     if valence==1 and atomicnum!=8 and atomicnum!=16 and poltype.fitred==True:
                        fitred=True
@@ -2098,7 +2098,7 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
                         adjustedprobeindex=int(probeindex-len(poltype.idxtosymclass.keys()))
                         vdwtype=poltype.idxtosymclass[adjustedprobeindex]
                         atom=poltype.mol.GetAtom(adjustedprobeindex)
-                        valence=atom.GetExplicitValence()
+                        valence=len([neighb for neighb in openbabel.OBAtomAtomIter(atom)])
                         if valence==1:
                            fitred=True
                         else:

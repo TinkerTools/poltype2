@@ -169,9 +169,9 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
         for atom in openbabel.OBMolAtomIter(mol):
             atomidx=atom.GetIdx()
             hyb=atom.GetHyb()
-            val=atom.GetExplicitValence()
             atomicnum=atom.GetAtomicNum()
             atomneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(atom)]
+            val=len(atomneighbs)
             neighbtypes=list([poltype.idxtosymclass[b.GetIdx()] for b in atomneighbs])
             uniqueneighbtypes=list(set([poltype.idxtosymclass[b.GetIdx()] for b in atomneighbs]))
             sorteduniquetypeneighbsnorepeat=FindUniqueNonRepeatingNeighbors(poltype,atomneighbs)
@@ -184,8 +184,8 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                 highestsymneighbnorepeathyb=highestsymneighbnorepeat.GetHyb()
                 highestsymneighbnorepeatatomicnum=highestsymneighbnorepeat.GetAtomicNum()
                 numhydsneighb=GrabNumberOfConnectedHydrogens(poltype,highestsymneighbnorepeat)
-                highestsymneighbnorepeatval=highestsymneighbnorepeat.GetExplicitValence()
                 neighbsofneighb=[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbnorepeat)]
+                highestsymneighbnorepeatval=len(neighbsofneighb)
                 uniqueneighbtypesofhighestsymneighbnorepeat=list(set([poltype.idxtosymclass[b.GetIdx()] for b in neighbsofneighb]))
                 neighbsofneighbwithoutatom=RemoveFromList(poltype,neighbsofneighb,atom)
                 neighbswithoutatom=RemoveFromList(poltype,atomneighbs,atom)
@@ -278,7 +278,8 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
 
 
             if foundcase==False:
-                if val==1 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(atomneighbs[0])]) and atomneighbs[0].GetExplicitValence()==4: # then this is like H in Methane, we want Z-only
+                firstneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(atomneighbs[0])]
+                if val==1 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(atomneighbs[0])]) and len(firstneighbs)==4: # then this is like H in Methane, we want Z-only
                  
                     poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                     poltype.localframe2[atomidx - 1] = 0
