@@ -1262,6 +1262,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         originalmm2_energy_list=mm2_energy_list.copy()
         originalmm_energy_list=mm_energy_list.copy()
         originalprepostmm_energy_list=prepostmm_energy_list.copy()
+        originalprepostmang_list=prepostmang_list.copy()
         originalqm_energy_list=qm_energy_list.copy()
         arrays=AssignZeros(poltype,[originalmm_energy_list,originalqm_energy_list,originalmm2_energy_list,originalprepostmm_energy_list])
         originalmm_energy_list=arrays[0]
@@ -1271,32 +1272,32 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         originaltor_e_list=tor_e_list.copy()
         originaltor_e_list2=tor_e_list2.copy()
         originalWBOarray=WBOarray.copy()
-        originalm2:ng_list=m2ang_list.copy()
+        originalm2ang_list=m2ang_list.copy()
         # remove angles for which energy was unable to be found
         del_ang_list = find_del_list(poltype,originalmm_energy_list,originalmang_list)
         classkeylisttoindicesremoved[tup]=FindRemovedIndices(poltype,originalmang_list,del_ang_list,indicesremoved=classkeylisttoindicesremoved[tup])
-        array=prune_mme_error(poltype,classkeylisttoindicesremoved[tup],originalmang_list,originalmm_energy_list,originalmm2ang_list,originalmm2_energy_list,originalqm_energy_list,originalqang_list,originaltor_e_list,originaltor_e_list2,originalWBOarray)
+        array=prune_mme_error(poltype,classkeylisttoindicesremoved[tup],originalmang_list,originalmm_energy_list,originalmm2ang_list,originalmm2_energy_list,originalqm_energy_list,originalqang_list,originaltor_e_list,originaltor_e_list2,originalWBOarray,originalprepostmm_energy_list,originalprepostmang_list)
 
-        (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=array[:-1][0]
+        (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray,prepostmm_energy_list,prepostmang_list)=array[:-1][0]
 
         x=array[-1]
         del_ang_list = find_del_list(poltype,originalqm_energy_list,originalqang_list)
         classkeylisttoindicesremoved[tup]=FindRemovedIndices(poltype,originalqang_list,del_ang_list,indicesremoved=classkeylisttoindicesremoved[tup])
-        array=prune_qme_error(poltype,classkeylisttoindicesremoved[tup],originalmang_list,originalmm_energy_list,originalmm2ang_list,originalmm2_energy_list,originalqm_energy_list,originalqang_list,originaltor_e_list,originaltor_e_list2,originalWBOarray)
-        (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=array[:-1][0]
+        array=prune_qme_error(poltype,classkeylisttoindicesremoved[tup],originalmang_list,originalmm_energy_list,originalmm2ang_list,originalmm2_energy_list,originalqm_energy_list,originalqang_list,originaltor_e_list,originaltor_e_list2,originalWBOarray,originalprepostmm_energy_list,originalprepostmang_list)
+        (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray,prepostmm_energy_list,prepostmang_list)=array[:-1][0]
 
         x=array[-1]
         del_ang_list = find_del_list(poltype,originalmm2_energy_list,originalmm2ang_list)
         classkeylisttoindicesremoved[tup]=FindRemovedIndices(poltype,originalmm2ang_list,del_ang_list,indicesremoved=classkeylisttoindicesremoved[tup])
-        array=prune_qme_error(poltype,classkeylisttoindicesremoved[tup],originalmang_list,originalmm_energy_list,originalmm2ang_list,originalmm2_energy_list,originalqm_energy_list,originalqang_list,originaltor_e_list,originaltor_e_list2,originalWBOarray)
+        array=prune_qme_error(poltype,classkeylisttoindicesremoved[tup],originalmang_list,originalmm_energy_list,originalmm2ang_list,originalmm2_energy_list,originalqm_energy_list,originalqang_list,originaltor_e_list,originaltor_e_list2,originalWBOarray,originalprepostmm_energy_list,originalprepostmang_list)
          
-        (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=array[:-1][0]
+        (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray,prepostmm_energy_list,prepostmang_list)=array[:-1][0]
 
         x=array[-1]
         del_ang_list = find_del_list(poltype,originalWBOarray,originalqang_list)
         classkeylisttoindicesremoved[tup]=FindRemovedIndices(poltype,originalqang_list,del_ang_list,indicesremoved=classkeylisttoindicesremoved[tup])
-        array=prune_qme_error(poltype,classkeylisttoindicesremoved[tup],originalmang_list,originalmm_energy_list,originalmm2ang_list,originalmm2_energy_list,originalqm_energy_list,originalqang_list,originaltor_e_list,originaltor_e_list2,originalWBOarray)
-        (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray)=array[:-1][0]
+        array=prune_qme_error(poltype,classkeylisttoindicesremoved[tup],originalmang_list,originalmm_energy_list,originalmm2ang_list,originalmm2_energy_list,originalqm_energy_list,originalqang_list,originaltor_e_list,originaltor_e_list2,originalWBOarray,originalprepostmm_energy_list,originalprepostmang_list)
+        (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray,prepostmm_energy_list,prepostmang_list)=array[:-1][0]
         y=array[-1]
 
         classkeylisttoindicesremoved[tup].sort(reverse=True)
@@ -1322,6 +1323,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         originalmm2_energy_list=ConvertNoneToZero(poltype,originalmm2_energy_list)
         originalmm_energy_list=ConvertNoneToZero(poltype,originalmm_energy_list)
         originalprepostmm_energy_list=ConvertNoneToZero(poltype,originalprepostmm_energy_list)
+
 
         originalmm2_energy_list= [en - min(originalmm2_energy_list) for en in originalmm2_energy_list]
         originalmm_energy_list= [en - min(originalmm_energy_list) for en in originalmm_energy_list]

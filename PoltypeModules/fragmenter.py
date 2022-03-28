@@ -732,6 +732,11 @@ def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog,jobtoinputfilepaths,job
 
     return finishedjobs,errorjobs
 
+def ChangeNumpyIntToIntDicKeys(poltype,dic):
+    newdic={}
+    for key,value in dic.items():
+        newdic[int(key)]=value
+    return newdic
 
 
 def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor):
@@ -824,7 +829,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             MakeFileName(poltype,strparentrotbndindexes,'torsions.txt')
     
 
-        
+        fragidxtosymclass=ChangeNumpyIntToIntDicKeys(poltype,fragidxtosymclass) 
         WriteDictionaryToFile(poltype,fragidxtosymclass,"fragidxtosymclass.txt")
         WriteDictionaryToFile(poltype,parentsymclasstofragsymclasses,"parentsymclasstofragsymclasses.txt")
         WriteDictionaryToFile(poltype,parentindextofragindex,"parentindextofragindex.txt")

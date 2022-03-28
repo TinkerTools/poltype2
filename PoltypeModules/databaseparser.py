@@ -1313,9 +1313,6 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
                 elementtinkerdescrip=parametersmartsordertoelementtinkerdescrip[specialindex]
                 for index in indexes:
                     parametersmartsordertoelementtinkerdescrip[index]=elementtinkerdescrip
-        print('atomindices',atomindices)
-        print('parametersmarts',parametersmarts)
-        print('fragidxtosymclass',fragidxtosymclass)
         parametersmartindices=[smartsindextoparametersmartsindex[i] for i in smartindices]
         parametersmartsorders=[i+1 for i in parametersmartindices]
         elementtinkerdescrips=[parametersmartsordertoelementtinkerdescrip[i] for i in parametersmartsorders]
