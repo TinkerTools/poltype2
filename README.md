@@ -3,25 +3,40 @@
 ## 📚 Documentation Overview 
 * Please read 👇🙏
 
-### [Program Installation](README/README_INSTALL.MD)
-### [Program Usage](README/README_HELP.MD)
-### [Preparation](#preparation)
-### [Atom Type Classification](#atom-type-classification)
-### [QM Geometry Optimization](#qm-geometry-optimization)
-### [Electrostatic Parameterization](#electrostatic-parameterization)
-### [Multipole Frame Detection](#multipole-frame-detection)
-### [Database Search](#database-search)
-### [Fragmentation](#fragmentation)
-### [Van der Waals Refinement](#van-der-waals-refinement)
-### [One-dimensional Torsion](#one-dimensional-torsion)
-### [Coupled 2D Torsion-Torsion](#coupled-2D-torsion-torsion)
-### [Non-aromatic Ring Torsions](#non-aromatic-ring-torsions)
-### [AMOEBA+](#amoeba+)
+[💻 Program Installation](README/README_INSTALL.MD)
 
-### 💻 Obejective
+[💻 Program Usage](README/README_HELP.MD)
+
+[Preparation](#preparation)
+
+[⚛️ Atom Type Classification](#atom-type-classification)
+
+[QM Geometry Optimization](#qm-geometry-optimization)
+
+[⚡ Electrostatic Parameterization](#electrostatic-parameterization)
+
+[🔍 Multipole Frame Detection](#multipole-frame-detection)
+
+[🔍 Database Search](#database-search)
+
+[Fragmentation](#fragmentation)
+
+[Van der Waals Refinement](#van-der-waals-refinement)
+
+[One-dimensional Torsion](#one-dimensional-torsion)
+
+[Coupled Torsion Torsion](#coupled-torsion-torsion)
+
+[Non-aromatic Ring Torsions](#non-aromatic-ring-torsions)
+
+[AMOEBA Plus](#amoeba-plus)
+
+### Obejective
 Given an input chemical structure, all parameters can be automatically assigned from a database or derived via fitting to ab initio data generated on the fly. **Fig. 1** depicts an overview of the parameterization process. 
 
-![Poltype Protocol](README/Images/PoltypeFlow.PNG)
+
+<img src="README/Images/PoltypeFlow.PNG" width="40%">
+
 * **Figure 1**. Overview of automated parameterization scheme for Poltype 2. Green boxes indicate input and output. Blue boxes indicate actions performed and the red rhombus indicates and intermediate output.
 
 
@@ -33,7 +48,7 @@ Given an input chemical structure, all parameters can be automatically assigned 
 * Special radical charge states require additional information in the input file specifying which atom is a radical. 
 * Dominant ionization states at pH 7 are enumerated and MOL files are generated via Dimorphite-DL. 
 
-### ⚛️ Atom Type Classification
+### Atom Type Classification
 * A substructure search is done on the input molecule to define atoms that belong to the same atom type. 
 * This is done using an array of graph invariants, such as graph theoretical distance, valence, aromaticity, ring atom, atomic number, bond sum, and formal charge computed via the openbabel toolkit. 
 
@@ -42,7 +57,7 @@ Given an input chemical structure, all parameters can be automatically assigned 
 * Psi4 is used by default over Gaussian because its license is free, and the DF-MP2 method implemented in Psi4 is an order of magnitude faster than conventional MP2 calculations in Gaussian. 
 * If zwitterions are detected, then Polarizable Continuum Model (PCM) is turned on by default for the optimization to prevent hydrogens from escaping the molecule. 
 
-### ⚡ Electrostatic  Parameterization
+### Electrostatic Parameterization
 * Polarization parameters are determined via a database SMARTS string search. 
 * To derive permanent atomic multipoles, an initial gas phase single point calculation done on a MP2/6-311G** level of theory is performed to obtain an electron density. A local frame is then defined via local symmetry of the atom and surrounding neighbors (**Fig 2**.). 
 * Then GDMA is performed to acquire initial atomic multipoles. Due to the loss of accuracy of GDMA assigned multipoles to atoms when basis sets are too large and diffuse, electrostatic potential fitting is required after first performing GDMA on a less diffuse basis set (MP2/6-311G**). 
@@ -50,11 +65,12 @@ Given an input chemical structure, all parameters can be automatically assigned 
 * After this, another single point computation is done at an MP2/aug-cc-pvtz level of theory to attain an accurate electrostatic potential grid. 
 * The initial multipoles with the same atom types are averaged. Electrostatic fitting is then performed on a grid around the molecule with an offset of 1.0 Å apart with 0.1 kcal/mol/electron convergence criteria using the Tinker POTENTIAL program. 
 
-![Multipole Frames](README/Images/Mpole.PNG)
+<img src="README/Images/Mpole.PNG" width="80%">
+
 * **Fig 2.** For a set of atoms {a,b,c},{a,b,c,d}, or {a,b,c,d,e}, local coordinate systems are defined by detecing symmetry and assigning the appropriate coordinate system. The top left of the figure shows the bisector frame (bisecting the angle \angle\ BAC). The top middle shows the z-then-x frame (vector from c to a defines +Z). The top right is the z-only frame (vector from a to b defines +Z). The bottom left shows the bisector-then-x frame, wherein the vector from d to a defines +Z, and the bisector of \angle\ BAC in the plane containg a,b,c defines +X. Finally, the bottom right shows the trisector frame. For Y-axes (not shown), this is defined relative to a right handed coordinate system convention with the exception of z-only, bisector and trisector frames, which have no defined X- or Y-axis.
 
 
-### 🔍 Multipole Frame Detection
+### Multipole Frame Detection
 * Multipole frame detection falls into a few categories: z-only, bisector, trisector, z-then-bisector and z-then-x as illustrated in **Fig. 2.** 
 * The optimal frames are selected automatically based on chemical environment and symmetry. Poltype uses a combination of symmetry type number, atomic number, and number of connected atoms to determine multipole frames for each atom. 
 * Bisector and trisector are similar to z-only in the sense that they both have one direction defined for multipoles (x- and y-axes are arbitrary); however, the bisector and trisector frames contain more information since they allow xx and yy components of quadrupole moment to be independent of each other. For z-only, xx and yy are defined to be of equal value. 
@@ -111,7 +127,8 @@ Given an input chemical structure, all parameters can be automatically assigned 
 
 ### Fragmentation
 
-![Fragmentation Protocol](README/Images/FragFlow.PNG)
+<img src="README/Images/FragFlow.PNG" width="40%">
+
 * **Figure 3** Overview of fragmentation scheme used to obtain torsion parameters for a parent molecule. For the atoms a-b-c-d-e (tor-tor fragments), the rotatable bonds would be b-c and c-d, rather than just b-c for the single torsion a-b-c-d (torsion fragments). Each time fragments are grown, any hydrogens and aromatic rings that are attached are added. Then any bonds cut between new fragment and parent are hydrated. The decision block involves comparing the relative WBO from best fragment to a WBO tolerance to determine if algorithm should continue or exit.
 
 * Quantum computations scale polynomially with increasing basis set size in one’s system, where the degree of scaling varies depending on the QM method. 
@@ -142,7 +159,11 @@ Given an input chemical structure, all parameters can be automatically assigned 
 * Unique SMARTS strings are generated for parameterized fragments that can be added to the fragment database. Van der Waals parameters used for each atom in the torsion fragment are also associated with the torsion SMARTS string parameters in the database.
 
 
-![Fragmentation Example](README/Images/FragExample.PNG)
+
+
+<img src="README/Images/FragExample.PNG" width="70%">
+
+
 * **Figure 4** **A.**  The IN17 molecule that was  given as input to the fragmenter. **B.** The inital fragment growth of bond 1-16 in the parent molecule. (The bond 3-2 in the fragment is equivalent to bond 1-16 in the parent). 
 
 
@@ -160,7 +181,10 @@ Given an input chemical structure, all parameters can be automatically assigned 
 * The fit quality is evaluated via root mean square error (RMSE) and relative RMSE with default tolerances of 1.6 and 0.2, respectively. If the fit quality violates these criteria, then Boltzmann weights (see next section) are applied to the loss function to favor fitting to the minima. 
 * Final RMSE is reported as a comment in the key file proceeding VdW fitting above the parameter line. Example Van der Waals plot for atom index 1 in IN17 (**Fig. 4**) is shown in **Figure 5**.
 
-![Vdw Fit Plot](README/Images/Vdw.PNG)
+
+<img src="README/Images/Vdw.PNG" width="50%">
+
+
 * **Figure 5** Upper panel: Van der Waals water-fragment probe for atom index 1 in IN17 molecule (Figure 4). Bottom panel: the red curve is QM energy vs distance, and the blue curve is the AMOEBA energies vs distance. Distance units are in angstroms. RMSE=1.55 kcal/mol.
 
 ### One-dimensional Torsion
@@ -187,10 +211,11 @@ Given an input chemical structure, all parameters can be automatically assigned 
 * Parameter fit quality is measured via root mean square error and relative root mean square error (RMSE). If the fitting procedure generates a fit that is greater than the RMSE and relative RMSE tolerance values (1.8 and 0.2 respectively), then the parameterization procedure restarts with Boltzmann weights. 
 * Final RMSE is reported in the key file that proceeds torsion fitting as a comment above the parameter line. Example torsion fitting plots are demonstrated for the fragment in **Figure 6**.
 
-![Torsion Fit Evaluation Plot](README/Images/Torsion.PNG)
+<img src="README/Images/Torsion.PNG" width="50%">
+
 * **Figure 6** Fitting results for rotatable bond 3-2 in **Fig. 4.**  Plots of energy (left axis) and WBO (right axis) vs dihedral angle (bottom axis) torsion RMSE=.85 kcal/mol, relative RMSE=.42 kcal/mol. Yellow curve represents WBO, the green curve is AMOEBA prefit total energy, the blue curve is QM total energy, the pink curve is the fitting numerical spline + AMOEBA prefit total energy and the red curve is AMOEBA postfit total energy with an additional minimization with new parameters before evaluating the final AMOEBA energies.
 
-### Coupled 2D Torsion-Torsion
+### Coupled Torsion Torsion
 * Often, 1D torsion scans cannot capture the potential energy surface exactly, due to neighboring dihedral angles not being truly independent of each other. 
 * When only 1D torsion fitting is performed, we are taking only a slice of a higher dimensional potential energy surface involving neighboring dihedral angles. Thus, fitting to a 2D torsion grid enables matching to the QM potential energy surface more exactly than simply fitting 1D torsion. 
 * Generation of AMOEBA optimized structures on the 2D grid is very similar to the 1D tinker grid procedure. After each horizontal 1D slice of clockwise and counterclockwise restrained optimizations are completed, the program returns to the original optimized starting structure and will do a restrained optimization vertically (above center) to the next horizontal 1D slice. 
@@ -208,7 +233,7 @@ Given an input chemical structure, all parameters can be automatically assigned 
 * If the torsion parameters initially assigned via database search are deemed transferable, then the program will do a refinement of parameters during fitting. By default, the boundaries for new parameters are X+/- .3*X, where X is the original parameter value. 
 * Otherwise, they are assigned the value of zero in the prefit tinker key file, and the boundaries are defined the same as in 1D torsion fitting procedure.
 
-### AMOEBA+
+### AMOEBA Plus
 * All the covalent terms including bond, angle, stretch-bend, opbend and torsion will use the same protocols as AMOEBA model. 
 * The non-bonded interaction parameters including atomic polarizability, van der Waals, charge penetration, charge transfer, and geometry dependent charge flux are set to match the AMOEBA+ database parameters. * To this date these parameters are still under development for a series of organic molecules. These parameters will be deposited into Poltype 2 on GitHub on available. 
 
