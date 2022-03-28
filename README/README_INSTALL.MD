@@ -28,7 +28,7 @@ cd source
 * Open Makefile and comment out default operating system (MAC, unless you have mac)
 * Uncomment the default linux installation lines
 * Keep the RENAME line commented out
-```
+
 
 ## Tinker GPU Installation
 * Install tinker CPU first 
