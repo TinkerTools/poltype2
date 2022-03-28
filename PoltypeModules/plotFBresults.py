@@ -1598,10 +1598,14 @@ def WriteOutParamAndAvgErrorTable(nametopropavgerrors,nametodimerqmerror,nametoa
         header=['Name','Element','Rad','Dep','Red','Homo RMSE','Hetero RMSE','QM RMSE','Density Err','Density RelErr','Enthalpy Err','Enthalpy RelErr']
         energy_writer.writerow(header)
         for name,prmlines in nametoallprmlines.items():
-            dimerqmerrors=nametodimerqmerror[name]
-            homoavg=round(dimerqmerrors['homo'],2)
-            heteroavg=round(dimerqmerrors['hetero'],2)
-            allavg=round(dimerqmerrors['all'],2)
+            homoavg=0
+            heteroavg=0
+            allavg=0
+            if name in nametodimerqmerror.keys():
+                dimerqmerrors=nametodimerqmerror[name]
+                homoavg=round(dimerqmerrors['homo'],2)
+                heteroavg=round(dimerqmerrors['hetero'],2)
+                allavg=round(dimerqmerrors['all'],2)
             newprmlines=[]
             for array in prmlines:
                 array.append(homoavg)
