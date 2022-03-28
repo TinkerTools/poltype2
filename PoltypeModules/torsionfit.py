@@ -1300,6 +1300,14 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
         (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray,prepostmm_energy_list,prepostmang_list)=array[:-1][0]
         y=array[-1]
 
+        del_ang_list = find_del_list(poltype,originalprepostmm_energy_list,originalprepostmang_list)
+        classkeylisttoindicesremoved[tup]=FindRemovedIndices(poltype,originalprepostmang_list,del_ang_list,indicesremoved=classkeylisttoindicesremoved[tup])
+        array=prune_qme_error(poltype,classkeylisttoindicesremoved[tup],originalmang_list,originalmm_energy_list,originalmm2ang_list,originalmm2_energy_list,originalqm_energy_list,originalqang_list,originaltor_e_list,originaltor_e_list2,originalWBOarray,originalprepostmm_energy_list,originalprepostmang_list)
+        (mang_list,mm_energy_list,m2ang_list,mm2_energy_list,qm_energy_list,qang_list,tor_e_list,tor_e_list2,WBOarray,prepostmm_energy_list,prepostmang_list)=array[:-1][0]
+        y=array[-1]
+
+
+
         classkeylisttoindicesremoved[tup].sort(reverse=True)
         for del_ang_idx in classkeylisttoindicesremoved[tup]:
             if del_ang_idx not in classkeylisttoindicesalreadydicremoved[tup]: 
