@@ -5,9 +5,14 @@
 
 [💻 Program Installation](README/README_INSTALL.MD)
 
-[💻 Program Usage](README/README_HELP.MD)
 
-[Preparation](#preparation)
+### Automated AMOEBA Ligand Parameterization 
+
+[Parameterization Preparation](#parameterization-preparation)
+
+[Minimum Example Usage Parameterization](#minimum-example-usage-parameterization)
+
+[💻 Advanced Program Usage](README/README_HELP.MD)
 
 [⚛️ Atom Type Classification](#atom-type-classification)
 
@@ -29,7 +34,21 @@
 
 [Non-aromatic Ring Torsions](#non-aromatic-ring-torsions)
 
-[AMOEBA Plus](#amoeba-plus)
+### Automated AMOEBA Molecular Dynamics and Free Energy Prediciton
+
+[Molecular Dynamics Preparation](#molecular-dynamics-preparation)
+
+[Minimum Example Usage Molecular Dynamics](#minimum-example-usage-molecular-dynamics)
+
+[💻 Advanced Program Usage](README/README_HELP.MD)
+
+[Box Setup](#box-setup)
+
+[Minimization](#minimization)
+
+[Equilibration](#equilibration)
+
+[Production Dynamics and Free Energy Prediction](#production-dynamics-and-free-energy-prediction)
 
 ### Obejective
 Given an input chemical structure, all parameters can be automatically assigned from a database or derived via fitting to ab initio data generated on the fly. **Fig. 1** depicts an overview of the parameterization process. 
@@ -41,12 +60,20 @@ Given an input chemical structure, all parameters can be automatically assigned 
 
 
     
-### Preparation
+### Parameterization Preparation
 * The input structure is given to the program as an SDF file. 
 * Formal atom charge will be assigned via the input number of bonds and bond order for surrounding bonds and element of each atom. 
 * Optional keywords exist to add missing hydrogens. 
 * Special radical charge states require additional information in the input file specifying which atom is a radical. 
 * Dominant ionization states at pH 7 are enumerated and MOL files are generated via Dimorphite-DL. 
+
+### Minimum Example Usage Parameterization
+
+__All input arguments are specified in poltype.ini file__
+```
+structure=methylamine.sdf
+```
+
 
 ### Atom Type Classification
 * A substructure search is done on the input molecule to define atoms that belong to the same atom type. 
@@ -236,5 +263,99 @@ Given an input chemical structure, all parameters can be automatically assigned 
 ### AMOEBA Plus
 * All the covalent terms including bond, angle, stretch-bend, opbend and torsion will use the same protocols as AMOEBA model. 
 * The non-bonded interaction parameters including atomic polarizability, van der Waals, charge penetration, charge transfer, and geometry dependent charge flux are set to match the AMOEBA+ database parameters. * To this date these parameters are still under development for a series of organic molecules. These parameters will be deposited into Poltype 2 on GitHub on available. 
+
+
+### Molecular Dynamics Preparation
+* Ligand XYZ and key files are required (such as final.xyz and final.key from Poltype parameterization). 
+* For binding free energy compuations, either a host PDB or premade tinker XYZ is required 
+
+### Minimum Example Usage Molecular Dynamics
+* Inputs are inside poltype.ini
+* Make sure pdb files (complexed and uncomplexed) have no missing residues or atoms.
+* Charge is read from input XYZ files generated.
+* Make sure if using custom receptor parameters, then either adding to keyfilename or in prmfilepath
+* Use submitlocally=False if you do not wish to submit dynamics jobs locally.
+* For HFE, if your ligand is charged and you do not want to compute the salt hydration free energy, add "salthfe=False"
+#### Minimum Input Example Binding
+
+```
+complexedproteinpdbname=anilinecomp.pdb 
+binding
+keyfilename=aniline.key
+ligandxyzfilename=aniline.xyz
+```
+or
+
+```
+receptorligandxyzfilename=complex.xyz
+prmfilepath=prmfile with absolute path #for receptor
+binding
+keyfilename=complex.key 
+ligandxyzfilename=ligand.xyz
+```
+
+#### Minimum Input Example Solvation (HFE)
+
+```
+solvation
+keyfilename=aniline.key
+ligandxyzfilename=aniline.xyz
+```
+
+#### Minimum Input Example Neat Liquid  
+```
+neatliquidsim
+density=997
+keyfilename=aniline.key
+ligandxyzfilename=aniline.xyz
+equilibriatescheme=50,100,150,200,300,300
+```
+
+### Box Setup
+
+*	For binding free energy computation, if a PDB is provided instead of a tinker XYZ file, then the tinker program pdbxyz is used to generate the XYZ file. This may result in adding additional hydrogens if missing from the PDB file (according to the residue label). 
+*	By default, a preequilibrated large water box is used and trimmed to the appropriate box size (determined below). This allows a default total equilibration time of 2 ns in NVT and a final .5 ns in NVT at the last temperature and a final 1 ns of NPT equilibration at the final temperature to determine the box size. Otherwise, defaults are 4 ns for NVT + .5 ns at final NVT temperature and 1 ns for final NPT. 
+*	The box size is computed by taking the longest dimension of protein or ligand and add a buffer length. For proteins-ligand complexes the buffer length is 20 angstroms. For ligand systems, the buffer length is 2*(vdwcutoff)+6, where the vdwcutoff default is 12 angstroms. 
+*	If not using preequilibrated box then,
+ *	The total number of waters based on box volume and the density of water.
+ *	The TINKER program xyzedit is used to create solvent box based on total water number. The ligand, or protein-ligand complex is then soaked in the solvent box.
+*	For binding free energy computations, physiological counterions are added to mimic the interior of a cell. A default of 100 mM of KCl is added.
+*	Additionally for binding free energy computations, neutralizing ions are added to the box in order to ensure the net charge of the box remains 0 during free energy perturbation. The number of ions added is dependent on the net charge of the box system. 
+*	Finally, any neutralizing and physiological ions are added to the box. 
+*	For HFE simulations, if the ligand is charged, by default a box containing counter ions is created and will be added to the thermodynamic cycle to compute the “salt hydration free energy”, which is generally what experimentalists are able to measure. Computing the free energy changes of the counterions will cancel out the charge correction HFE effects that are typically added to obtain HFE of only the charged ligand. 
+* For neat liquid simulation, an input density (via keyword) is required, in order to determine the number of molecules based on density and box volume to add to the box. 
+
+### Minimization
+*	If the box is not square (should be square by default), then check if the length between any two box dimensions is > 10 angstroms. If so, then need to add restraints on two alpha carbons on protein that are on opposite sides to prevent rotation of protein within the rectangular box. Restraints around atoms are added with a default radius of 2 angstroms. 
+*	The protein and ligand is then restrained (or only ligand for solvation) with radius of 0 angstroms (lets the solvent relax). Default restraint force constant is 5 kcal/mol/angstrom. 
+*	The system is then minimized. 
+*	Finally, restrain-position keywords are removed from tinker key files. 
+
+### Equilibration
+*	For binding free energy computations, if restraint groups are not defined by user input, then automatically determine them.
+ *	Currently this is only implemented for protein-ligand binding free energy. 
+ *	The algorithm finds all alpha carbons on protein and iteratively computes COM between a group of alpha carbons from protein and COM of group of ligand atoms. If the distance between the COM of each group is less than tolerance of 2 angstroms the program determines the restraints as acceptable. 
+*	If the COM between the two restraint groups is too far, this can lead to poor convergence for equilibration. 
+*	For the protein-ligand complexation box, the center of mass between groups from minimized system is computed, and restraint keywords are added to the keyfile. The initial distance uses the COM distance from the minimized box system. Flat bottom restraints are used by default. For each temperature, the group restraint constant approaches 0 until equilibrium temperature is reached.  
+*	Additionally, for the protein-ligand complexation box, protein atoms are restrained during equilibration (with a default radius of 2 angstroms) with a force constant that approaches 0 (and starts from 5 kcal/mol/angstrom) as the temperature reaches equilibrium.  
+*	Each simulation corresponding to each temperature, restraint-constant and ensemble (NVT or NPT) tuple are simulated. 50,100,150,200,300,300 is the default temperature scheme for NVT, with a corresponding restraint constant scheme of 5,2,1,.5,.1,0. 
+*	If NVT production dynamics is used (default is NPT production dynamics), the box size from NPT dynamics output is averaged and added to the keyfile. 
+*	Protein atom positions restraints are now removed (only the ones restraining all protein atoms, not for protein rotational restraints). 
+*	The the last frame from dynamics trajectory is used as the starting point for production dynamics. 
+
+
+### Production Dynamics and Free Energy Prediction
+*	BAR is used for alchemical free energy perturbation via electrostatic and van der Waals decoupling between the system and the environment. Typically, the system consists of the ligand, whereas the environment is the host and surrounding water and ions.  The default electrostatic and vdW decoupling scheme consists of 26 windows 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1 for electrostatics and 0,.45,.52,.56,.58,.6,.62,.64,.67,.7,.75,.8,.85,.9,.95,1,1,1,1,1,1,1,1,1,1,1 for vdW. 
+*	For host-guest complexes, there is an additional group restraint scheme, such that at full electrostatics and vdW there are no group restraints. For the rest of the electrostatic and vdW pairs, the restraint is used at 100% (default of 10 kcal/mol/angstrom flat bottom restraint).
+*	A folder for complexation and/or solvation simulations is generated. Keywords for each electrostatic, vdW, restraint force constant tuples are added to the keyfiles in each folder. The last frame from equilibration is copied to each folder as the starting point for production dynamic simulations.
+*	For binding free energy simulations, counterions charges are modified corresponding to each electrostatic lambda step (only N are modified where N is charge of ligand). This allows for the net charge of the box to reman 0 during simulation to avoid charge artifacts from ewald. 
+*	For binding free energy, in the last perturbation step with 0 electrostatics, 0 vdW and full group restraints, a correction for the free energy is added since there should be no interaction between the ligand and protein in the final step. The restraint in the last step is used to improve sampling and the correction is an analytical entropic correction computed automatically. 
+*	For HFE, if the ligand is larger than 4 bonds in end-end distance, than an additional keyword is added to keyfiles to “annihilate” the intramolecular vdW interactions within the ligand during the decoupling process. Then additional folders for regrowing the intramolecular interactions in gas phase are added using the same perturbation scheme above for electrostatics and vdW.
+*	For HFE, if the ligand is charged and if the user wants to compute the salt hydration free energy (enabled by default), then additional folders are added with counterions (number depends on net charge of ligand), using the same electrostatic and vdW scheme as above. These are added to the thermodynamic cycle to cancel out charge HFE correction effects. 
+*	If the user wishes to perturb parameters by addition additional keyfiles, Poltype will interpolate (by default with 1 interpolation between each keyfile) keyfiles and add additional folders allowing perturbation in the thermodynamic cycle to other parameter sets. By default, new dynamics needs to be generated for each perturbed key file, however optionally free energy perturbation can be used instead of BAR, where the dynamics trajectory of the neighboring parameter set in the thermodynamic cycle is used instead. 
+*	By default, NPT is used for production dynamics. 
+*	Output free energy changes, enthalpy changes, entropy changes are recorded and tabulated in CSV files for user convenience. 
+
+
 
 
