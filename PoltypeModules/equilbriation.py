@@ -168,9 +168,11 @@ def ExecuteEquilibriation(poltype):
                 newjobtooutputfiles[job]=jobtooutputfilesdic[job]
                 newjobtoabsolutebinpath[job]=jobtoabsolutebinpathdic[job]
                 if poltype.complexation==True and i==0:
+                    keymods.RemoveKeyWord(poltype,configkeyfilename,'restrain-group')
+                    restraints.AddHarmonicRestrainGroupTermsToKeyFile(poltype,configkeyfilename,poltype.restraintdistance,restrainpositionconstant)
                     keymods.RemoveKeyWord(poltype,configkeyfilename,'restrain-position')
                     totalatomnumberxyzfilename=poltype.totalatomnumberxyzfilename[i]
-                    if restrainpositionconstant!=0 and poltype.restrainreceptorligand==True: # dont add for NPT only NVT
+                    if restrainpositionconstant!=0 and poltype.restrainreceptorligand==True: 
                         resposstring='restrain-position -'+str(1)+' '+str(totalatomnumberxyzfilename-len(ligandindices))+' '+str(restrainpositionconstant)+' '+str(poltype.equilrestrainsphereradius)+'\n'
                         keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
                     resposstring='restrain-position -'+str(poltype.norotpair[0])+' '+str(poltype.norotpair[0])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
@@ -260,8 +262,6 @@ def EquilibriationProtocol(poltype):
         if poltype.complexation==True and poltype.restrainreceptorligand==True: 
             dist=restraints.AverageCOMGroups(poltype,poltype.minboxfilename[0])
             poltype.restraintdistance=dist
-            if poltype.restrainreceptorligand==True:
-                restraints.AddHarmonicRestrainGroupTermsToKeyFile(poltype,poltype.outputpath+poltype.configkeyfilename[0][0],dist)
 
         for i in range(len(poltype.minboxfilename)):
             firstxyz=poltype.minboxfilename[i]
@@ -295,11 +295,8 @@ def EquilibriationProtocol(poltype):
                 poltype.restraintdistance=equildist
                 if poltype.restrainreceptorligand==True:
                     for configkeyfilename in configkeyfilenamelist:
-                        restraints.AddHarmonicRestrainGroupTermsToKeyFile(poltype,poltype.outputpath+configkeyfilename,equildist)
+                        restraints.AddHarmonicRestrainGroupTermsToKeyFile(poltype,poltype.outputpath+configkeyfilename,equildist,poltype.distancerestraintconstant)
                     restraints.GroupRestraintFreeEnergyFix(poltype)
-            elif poltype.complexation==True and poltype.proddyngrprests==False and i==0:
-                if poltype.restrainreceptorligand==True:
-                    restraints.ComputeIdealRestraints(poltype,equilarcboxfilename)
 
             if not os.path.isfile(poltype.outputpath+proddynboxfilenamepymol):
                 poltype.PymolReadableFile(proddynboxfilename,proddynboxfilenamepymol)

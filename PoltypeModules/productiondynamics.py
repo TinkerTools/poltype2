@@ -295,7 +295,7 @@ def ModifyLambdaKeywords(poltype,newfoldpath,newtempkeyfile,elelamb,vdwlamb,resl
                 restrainstring='restrain-groups '+str(group1index)+' '+ str(group2index)+' '+str(constant)+' '+'0'+' '+str(teatherdist)
 
             
-            newkeyfile.write(restrainstring+'\n')        
+            newkeyfile.write(restrainstring+'\n')      
         elif 'restrain-distance' in line:
             index1=linesplit[1]
             index2=linesplit[2]
