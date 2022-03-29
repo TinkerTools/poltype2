@@ -290,4 +290,3 @@ dependencies:
     - bidict==0.22.0
     - pyastronomy==0.17.1
     - quantities==0.13.0
-prefix: /home/bdw2292/miniconda3/envs/newamoebamdpoltype

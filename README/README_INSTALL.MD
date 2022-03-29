@@ -2,15 +2,9 @@
 
 
 ### Required Programs
-* Tinker, version >=8.9.4 (potential fitting errors previous versions)
+* Tinker, version >=8.9.4
 * GDMA, version 2.3 and greater
 * PSI4 (or Gaussian 09/16)
-* scipy
-* matplotlib
-* openbabel, version 2.4
-* rdkit
-* svgutils
-* cairosvg
 
 
 ### Tinker CPU Installation
@@ -60,34 +54,8 @@ make -j
 git clone https://github.com/TinkerTools/poltype2.git master
 ```
 
-* Install anaconda https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html
-* You may need to run "conda init bash" and then source ~/.bashrc first.
-* After you have conda in your PATH, run the following commands. These will be installed under "/home/username/miniconda3/". You can use the provided `environment.yml` file to create a conda environment named "poltype" with `conda env create -f environment.yml`, or run the following commands:
-
-```shell
-conda create -n amoebamdpoltype python=3.8 --yes
-conda activate amoebamdpoltype
-conda install scipy --yes
-conda install matplotlib --yes
-conda install -c conda-forge openbabel --yes
-conda install -c conda-forge rdkit --yes
-conda install -c conda-forge mdanalysis --yes
-conda install -c conda-forge svgutils --yes
-conda install -c conda-forge cairosvg --yes
-conda install -c anaconda psutil --yes
-conda install -c anaconda numpy --yes
-conda install git pip --yes
-pip install PyAstronomy
-conda install -c conda-forge -c schrodinger pymol-bundle --yes
-conda install -c anaconda scikit-learn --yes
-conda install -c conda-forge mdtraj --yes
-conda upgrade numpy --yes
-conda install -c conda-forge forcebalance --yes
-conda install -c conda-forge pymbar --yes
-conda install -c anaconda packaging --yes
-conda install -c conda-forge tqdm --yes
-conda install -c psi4 psi4 --yes
-```
+* Install anaconda
+* You can use the provided `environment.yml` file to create a conda environment named "poltype" with `conda env create -f environment.yml`
 
 ### Environment var for running POLTYPE:
  Create environments for Tinker,Gaussian 09,and GDMA. Put these in a file and source it before running POLTYPE
@@ -98,89 +66,29 @@ conda install -c psi4 psi4 --yes
 
 * Example bashrc
 ```shell
-OSVERSION=`cat /etc/system-release`
-place="${OSVERSION//[!0-9]/}"
-OSVERSION=${place::1}
-VAL=`nvidia-smi &> /dev/null; echo $?`
+function dynamic_gpu () {
+    local TINKER9=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda11.2
 
-if [ $VAL != 0 ]; then
-  echo -e "\e[101mCUDA utility not installed on `hostname`\e[0m"
-  declare -i VALUE=0
-else
+    $TINKER9/dynamic9.sh $@
+}
+export -f dynamic_gpu
 
-  for dir in /usr/local/*;
-  do
-      SUB='cuda'
-      if [[ "$dir" == *"$SUB"* ]]; then
-        VALUE=`echo $dir | tr -dc '0-9'`
-      fi
-       
-  done
-  
+function bar_gpu () {
+    local TINKER9=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda11.2
 
-  if [ $VALUE == 102 ] ; then
-       export TINKERGPUDIR=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda10.2/
-       function dynamic_gpu () {
-           local TINKER9=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda10.2
-       
-           $TINKER9/dynamic9.sh $@ 
-       }
-       export -f dynamic_gpu
-       
-       function bar_gpu () {
-           local TINKER9=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda10.2
-       
-           $TINKER9/bar9.sh $@  
-       }
-       export -f bar_gpu
-       
-       function analyze_gpu () {
-           local TINKER9=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda10.2
-       
-           $TINKER9/analyze9.sh $@
-       }
-       export -f analyze_gpu
-       export GPUDYNAMICS=True # need this for ForceBalance to let program know to use dynamic_gpu
-  elif [ $VALUE == 112 ] ; then
-       export TINKERGPUDIR=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda11.2
-       function dynamic_gpu () {
-           local TINKER9=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda11.2
-       
-           $TINKER9/dynamic9.sh $@
-       }
-       export -f dynamic_gpu
-       
-       function bar_gpu () {
-           local TINKER9=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda11.2
-       
-           $TINKER9/bar9.sh $@
-       }
-       export -f bar_gpu
-       
-       function analyze_gpu () {
-           local TINKER9=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda11.2
-       
-           $TINKER9/analyze9.sh $@
-       }
-       export -f analyze_gpu
-       
-       export GPUDYNAMICS=True
-  fi
+    $TINKER9/bar9.sh $@
+}
+export -f bar_gpu
 
- 
+function analyze_gpu () {
+    local TINKER9=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda11.2
 
+    $TINKER9/analyze9.sh $@
+}
+export -f analyze_gpu
 
-fi
-if [ $OSVERSION == 8 ] ; then
-    export PATH=/home/bdw2292/NewestTinkerOS8/bin/:$PATH
-    export TINKERPATH=/home/bdw2292/NewestTinkerOS8/bin/ # this is for ForceBalance to recognize tinker path in different nodes
-     
-else
-    export PATH=/home/bdw2292/NewestTinker/bin/:$PATH
-    export TINKERPATH=/home/bdw2292/NewestTinker/bin/
-
-fi
-
+export PATH=/home/bdw2292/NewestTinker/bin/:$PATH
+export TINKERPATH=/home/bdw2292/NewestTinker/bin/
 export myusername=`whoami`
 conda activate amoebamdpoltype
 export g09root=/opt/g09gh/gaussian

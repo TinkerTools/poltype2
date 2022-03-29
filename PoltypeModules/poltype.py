@@ -1617,7 +1617,7 @@ class PolarizableTyper():
             self.masterdict['boxinfo']=[{}]
 
         elif self.solvation==True and self.complexation==True:
-            self.bufferlen=[20,20+6]
+            self.bufferlen=[20,2*float(self.vdwcutoff)+6]
             self.systemcharge=[self.receptorcharge+self.ligandcharge,self.ligandcharge]
             self.ligandchargelist=[self.ligandcharge,self.ligandcharge]
             self.xyzfilename=[self.receptorligandxyzfilename,self.ligandxyzfilename]
@@ -3110,7 +3110,11 @@ class PolarizableTyper():
 
                 if "structure" in newline:
                     self.molstructfname = a
-        
+        foldername='Temp'
+        if not os.path.exists(foldername):
+            os.mkdir(foldername)
+        shutil.copy(self.molstructfname,os.path.join(foldername,self.molstructfname))
+        os.chdir(foldername)
         self.totalcharge=None
         if self.deleteallnonqmfiles==True:
             self.DeleteAllNonQMFiles()
@@ -3519,6 +3523,10 @@ class PolarizableTyper():
                 self.SendFinalReportEmail(TEXT,fromaddr,toaddr,password,moleculename)
             except:
                 pass
+        os.chdir('..')
+        previousdir=os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+        shutil.copy(self.tmpxyzfile,os.path.join(previousdir,self.tmpxyzfile))
+        shutil.copy(self.tmpkeyfile,os.path.join(previousdir,self.tmpkeyfile))
         if (self.binding==True or self.solvation==True or self.neatliquidsim==True):
             self.ligandxyzfilename=self.tmpxyzfile
             self.keyfilename=self.tmpkeyfile
