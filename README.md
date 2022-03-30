@@ -79,6 +79,9 @@ structure=methylamine.sdf
 nohup python /path_to_poltype/poltype.py &
 ```
 
+```final.xyz``` and ```final.key``` are the resulting structure and parameter files you will need.
+* After poltype finishes, check the OPENME folder for torsion fitting and ESP fitting results. 
+
 ### Atom Type Classification
 * A substructure search is done on the input molecule to define atoms that belong to the same atom type. 
 * This is done using an array of graph invariants, such as graph theoretical distance, valence, aromaticity, ring atom, atomic number, bond sum, and formal charge computed via the openbabel toolkit. 
