@@ -345,10 +345,10 @@ nohup python /path_to_poltype/poltype.py &
 *	Finally, restrain-position keywords are removed from tinker key files. 
 
 ### Equilibration
-*	For binding free energy computations, if restraint groups are not defined by user input, then automatically determine them.
+*	For binding free energy computations, if restraint groups are not defined by user input, then automatically determine them based on minimized box structure.
  *	The algorithm finds the closest heavy atom to the ligand COM and determines this to be group 1. The algorithm then finds all alpha carbons (or just carbons if not protein) and iteratively computes COM between a possible group (minimum 4 carbons, maximum of 10) of carbons from host and the chosen ligand atom. If the distance between the COM of each group is less than tolerance of 1 angstroms the program determines the restraints as acceptable and uses as group 2. 
 *	If the COM between the two restraint groups is too far, this can lead to poor convergence for equilibration. 
-*	For the protein-ligand complexation box, the center of mass between groups from minimized system is computed, and restraint keywords are added to the keyfile. The initial distance uses the COM distance from the minimized box system. Flat bottom restraints are used by default. For each temperature, the group restraint constant approaches 0 until equilibrium temperature is reached.  
+*   Flat bottom restraints are used by default. For each temperature, the group restraint constant approaches 0 until equilibrium temperature is reached.  
 *	Additionally, for the protein-ligand complexation box, protein atoms are restrained during equilibration (with a default radius of 2 angstroms) with a force constant that approaches 0 (and starts from 5 kcal/mol/angstrom) as the temperature reaches equilibrium.  
 *	Each simulation corresponding to each temperature, restraint-constant and ensemble (NVT or NPT) tuple are simulated. 50,100,150,200,300,300 is the default temperature scheme for NVT, with a corresponding restraint constant scheme of 5,2,1,.5,.1,0. 
 *	If NVT production dynamics is used (default is NPT production dynamics), the box size from NPT dynamics output is averaged and added to the keyfile. 
