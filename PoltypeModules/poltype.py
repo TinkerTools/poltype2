@@ -1331,7 +1331,6 @@ class PolarizableTyper():
             self.torspbasisset = 'MINIX'
 
 
-        self.startdir=os.getcwd()
         self.SanitizeAllQMMethods()
         if self.readinionly==True:
             return
@@ -3115,6 +3114,7 @@ class PolarizableTyper():
             os.mkdir(foldername)
         shutil.copy(self.molstructfname,os.path.join(foldername,self.molstructfname))
         os.chdir(foldername)
+        self.startdir=os.getcwd()
         self.totalcharge=None
         if self.deleteallnonqmfiles==True:
             self.DeleteAllNonQMFiles()
