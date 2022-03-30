@@ -119,13 +119,14 @@ def GroupRestraintFreeEnergyFix(poltype):
     return dg,dh,ds
 
 
-def ComputeIndexToMass(poltype,fxyz):
+def GrabIndexInfo(poltype,fxyz):
     try:
         t = md.load_arc(fxyz)
     except IOError:
         t = md.load(fxyz)
     
     indextomass={}
+    indextosym={}
     indextovec={}
     for a in t.topology.atoms:
         zeroindex=a.index    
@@ -136,10 +137,11 @@ def ComputeIndexToMass(poltype,fxyz):
         vec=vec*10
         indextovec[zeroindex+1]=vec
         indextomass[zeroindex+1]=mass
-    return indextomass,indextovec,t
+        indextosym[zeroindex+1]=atomsymb
+    return indextomass,indextovec,indextosym,t
 
 
-def GrabLigandXYZAndMass(poltype,indextomass,indextovec,indices):
+def GrabXYZAndMass(poltype,indextomass,indextovec,indices):
     atomidxtomassdic={}
     atomidxtovecdic={}
     for index in indices:
@@ -149,11 +151,13 @@ def GrabLigandXYZAndMass(poltype,indextomass,indextovec,indices):
 
     return atomidxtomassdic,atomidxtovecdic
 
-def FindClosestLigandAtomToCOM(poltype,ligandcom,atomidxtovecdic):
+def FindClosestLigandAtomToCOM(poltype,ligandcom,atomidxtovecdic,indextosym):
     disttoatomidx={}
     for atomidx,vec in atomidxtovecdic.items():
-        dist=np.linalg.norm(vec-ligandcom)
-        disttoatomidx[dist]=atomidx
+        symb=indextosym[atomidx]
+        if symb!='H':
+            dist=np.linalg.norm(vec-ligandcom)
+            disttoatomidx[dist]=atomidx
     mindist=min(disttoatomidx.keys())
     ligandatomindex=disttoatomidx[mindist]
 
@@ -175,20 +179,24 @@ def ComputeIdealGroupRestraints(poltype,fxyz):
     nmax=5
     COMthresh=1
     distancecutoff=10
-    indextomass,indextovec,t=ComputeIndexToMass(poltype,fxyz)
-    atomidxtomassdic,atomidxtovecdic=GrabLigandXYZAndMass(poltype,indextomass,indextovec,poltype.ligandindices[0])
+    ligandindices=poltype.ligandindices[0]
+    indextomass,indextovec,indextosym,t=GrabIndexInfo(poltype,fxyz)
+    atomidxtomassdic,atomidxtovecdic=GrabXYZAndMass(poltype,indextomass,indextovec,ligandindices)
     ligandcom=ComputeCOM(poltype,atomidxtovecdic,atomidxtomassdic)       
-    ligandatomindex=FindClosestLigandAtomToCOM(poltype,ligandcom,atomidxtovecdic)
+    ligandatomindex=FindClosestLigandAtomToCOM(poltype,ligandcom,atomidxtovecdic,indextosym)
     poltype.restrainatomgroup1=[ligandatomindex]
     atomnames='CA'
     indices = t.topology.select('name %s'%(atomnames))
+    if len(indices)==0:
+        atomnames='C'
+        indices = t.topology.select('name %s'%(atomnames))
     indices=[i+1 for i in indices]
     ref=indextovec[ligandatomindex]
     allowedindices=[]
     for index in indices:
         vec=indextovec[index]
         dist=np.linalg.norm(vec-ref)
-        if dist<=distancecutoff:
+        if dist<=distancecutoff and index not in ligandindices:
             allowedindices.append(index)
     allcombs=[]
     for n in range(2,nmax+1):
@@ -201,7 +209,7 @@ def ComputeIdealGroupRestraints(poltype,fxyz):
         combtoaveragedistance[tuple(comb)]=averagedistance
     sortedcombtoaveragedistance=dict(sorted(combtoaveragedistance.items(), key=lambda item: item[1]))
     for comb,avgdist in sortedcombtoaveragedistance.items():
-        atomidxtomassdic,atomidxtovecdic=GrabLigandXYZAndMass(poltype,indextomass,indextovec,comb)
+        atomidxtomassdic,atomidxtovecdic=GrabXYZAndMass(poltype,indextomass,indextovec,comb)
         grpcom=ComputeCOM(poltype,atomidxtovecdic,atomidxtomassdic)
         dist=np.linalg.norm(grpcom-ref)
         if dist<COMthresh:
