@@ -73,7 +73,11 @@ __All input arguments are specified in poltype.ini file__
 ```
 structure=methylamine.sdf
 ```
+* Navigate to directory containing poltype.ini and .sdf file, and run:
 
+```shell
+nohup python /path_to_poltype/poltype.py &
+```
 
 ### Atom Type Classification
 * A substructure search is done on the input molecule to define atoms that belong to the same atom type. 
@@ -309,6 +313,12 @@ density=997
 keyfilename=aniline.key
 ligandxyzfilename=aniline.xyz
 equilibriatescheme=50,100,150,200,300,300
+```
+
+* Navigate to directory containing poltype.ini, and run:
+
+```shell
+nohup python /path_to_poltype/poltype.py &
 ```
 
 ### Box Setup
