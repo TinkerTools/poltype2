@@ -176,7 +176,8 @@ def ComputeAverageDistanceFromAtom(poltype,comb,indextovec,ligandatomindex):
 
 
 def ComputeIdealGroupRestraints(poltype,fxyz):
-    nmax=5
+    nmin=4
+    nmax=10
     COMthresh=1
     distancecutoff=10
     ligandindices=poltype.ligandindices[0]
@@ -199,7 +200,7 @@ def ComputeIdealGroupRestraints(poltype,fxyz):
         if dist<=distancecutoff and index not in ligandindices:
             allowedindices.append(index)
     allcombs=[]
-    for n in range(2,nmax+1):
+    for n in range(nmin,nmax+1):
         combs=itertools.combinations(allowedindices, n)
         for comb in combs:
             allcombs.append(list(comb))
