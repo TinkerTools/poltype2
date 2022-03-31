@@ -3086,7 +3086,7 @@ class PolarizableTyper():
         for atm in iteratombab:
             atmnum=atm.GetAtomicNum()
             atmidx=atm.GetIdx()
-            sym=an.getElSymbol(atmidx)
+            sym=an.getElSymbol(atmnum)
             indextoatomicsymbol[atmidx]=sym
 
         return indextoatomicsymbol
