@@ -3109,11 +3109,12 @@ class PolarizableTyper():
 
                 if "structure" in newline:
                     self.molstructfname = a
-        foldername='Temp'
-        if not os.path.exists(foldername):
-            os.mkdir(foldername)
-        shutil.copy(self.molstructfname,os.path.join(foldername,self.molstructfname))
-        os.chdir(foldername)
+        if self.isfragjob==False:
+            foldername='Temp'
+            if not os.path.exists(foldername):
+                os.mkdir(foldername)
+            shutil.copy(self.molstructfname,os.path.join(foldername,self.molstructfname))
+            os.chdir(foldername)
         self.startdir=os.getcwd()
         self.totalcharge=None
         if self.deleteallnonqmfiles==True:
