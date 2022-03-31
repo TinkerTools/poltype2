@@ -1,300 +1,164 @@
-## Help
+## Advanced Usage
 
-* [Running Poltype](#running-poltype)
-* [Input Structure](#input-structure)
-* [Most Common Inputs](#most-common-inputs)
-* [Geometry Optimization](#geometry-optimization)
-* [Distributed Multipole Analysis (DMA) and Electrostatic Single Point (ESP) Inputs](#distributed-multipole-analysis-(dma)-and-electrostatic-single-point-(esp)-inputs)
-* [Torsion Parameterization](#torsion-parameterization)
-* [FAQ](#faq)
-* [Tips](#tips)
-* [Common Errors](#common-errors)
+### Advanced Program Usage Parameterization
 
-### Running POLTYPE
-* Need two input files to run: *.ini and *.sdf. The ini file sets poltype controls and it specifies the molecule in sdf format to be used.
-* Prepare the poltype.ini and sdf file as shown below
-* Navigate to directory containing poltype.ini and .sdf file, and run:
-
-```shell
-nohup python /path_to_poltype/poltype.py &
-```
-
-```final.xyz``` and ```final.key``` are the resulting structure and parameter files you will need.
-* After poltype finishes, check the OPENME folder for torsion fitting and ESP fitting results. 
-
-### Help
-```shell
-python /path_to_poltype/poltype.py --help
-```
-
-### Recommended Protocol (esp for charged molecules)
-* The most expensive calculation in POLTYPE is the ESP (MP2/aug-cc-pvtz). For large molecules, Gaussain requires large memeory and disk, Psi4 is an order of magnitude faster for MP2 (default is psi4).
-* PCM is turned on by default when zwitterions are detected
-  ** If you need to use Gaussain (PSI4 PCM failed), and do not have suffcient mem/disk, you could lower the basis set to 6-311++G(2d,2p).
-  ** another possibility is to (use_gausoptonly. This will use Gaussian for all opt jobs but PSi4 for DMA and ESP QM.  
-
- 
-### Input Structure
-* Use an SDF file format for the input structure.
-* Use totalcharge=charge keyword in .ini file to specify total charge, otherwise poltype will guess based on formal charge from input valence. 
-* Bond topologys (input valence, bond orders and hydrogen atoms) need to be correct for formal charge assignment.
-* If you have a radical, then need to add radical to the input SDF file, otherwise be default poltype will set radicals to zero and guess charge based on input valence.
-
-#### Most Common Inputs
-```
-structure            specifies input structure for poltype, must include total charge information. 
-                     Default=None.
-numproc              specifies number of processors used for running quantum jobs. 
-                     Default=Will be 80% of total available on node
-maxmem               specifies max RAM used for running quantum jobs. 
-                     Default=Will be 80% of total available on node
-maxdisk              specifies max scratch space used for running quantum jobs. 
-                     Default=Will be 80% of total available on node
-
-scratchpath          Path to scratch directory
-                     Default=/scratch
-
-consumptionratio     Default % of resources to use on node if not specified by user
-                     Default=.8
-
-deleteallnonqmfiles  This will delete all non-qm log files (sometimes errors require restarting and deleting the correct files).
-                     Default=True
-
-email                Email address to send crash reports to, will send email when poltype job finished.
-                     Default=None
-
-debugmode            Cheap QM, just to run through and check for any software bugs.
-                     Default=False
-
-jobsatsametime       Parralelize your QM and fragment poltype jobs for local host. 
-                     Default=1
+#### Notes
+* All booleans can switch their truth value, i.e., addhydrogens=True or addhydrogens=False
+* For very large molecules initial opt, DMA and ESP may require large amounts of memory if quantum job consistently crashes
+* Defaults are chosen specifically for maximizing accuracy and efficiency (without sacrificing accuracy)
 
 
-externalapi          Specifies path to external API used for submitting quantum jobs on a cluster. Parralelize QM jobs and fragment poltype jobs on cluseter. For fragment jobs, if you wish to make fragment poltype jobs consume less memory then the parent job on the cluster, also add the keyword "jobsatsametime", this will divide parent memory by "jobsatsametime", (number of processors will be rounded to integer).
-                     Default=None.
+#### Required Inputs
+``structure`` specifies input structure for poltype as an SDF file. Must include bond orders consistent with desired total charge.
+ * Default=None
 
 
-fragmentjobslocal    Run fragment jobs on localhost even when externalapi keyword is active
-                     Default=False
 
-coresperjob          Number of cores for jobs in parralel
-                     Default=2
+#### Controlling Resource Consumption
+``numproc`` specifies the number of processors allowed. Default will be 80% of total available on node.
 
-addhydrogens         Adds hydrogens to unprotonated atoms.
-                     Default=False
-
-parentjobsatsametime Number of parent molecules at sametime, informs poltype how much resources to divide from available on the host.
-                     Default=1
-
-genprotstatesonly    Output protonation states (at pH=7) in mol files(ProtonationState_0.mol, ...) and then exit.
-                     Default=False
-```
-
-* Note for very large molecules initial opt, DMA and ESP may require large amounts of memory if quantum job consistently crashes
-
-#### Minimal Input Example
-__All input arguments are specified in poltype.ini file__
-```
-structure=methylamine.sdf
-```
-* All booleans can switch their truth value, i.e., dontfrag=True or dontfrag=False
-
-#### Submitting Quantum Jobs Externally
-```
-externalapi       specifies path to external API used for submitting quantum jobs on a cluster. 
-                  Default=None.
-
-```
-
-### Geometry Optimization
-```
-optbasisset          specifies basis set for geometry optimization. 
-                     Default=6-31G*
-gausoptcoords        specifies coordinate system used for gaussian geometry optimization. 
-                     Default='' 
-                     (will default to modified redundant internal coordinates).
-freq                 specifies to do a frequency calculation during geometry optimization. Computes true Hessian 
-                     and determines if structure is minimum rather than saddle point, but very expensive. 
-                     Default=False
-optpcm               specifies to use PCM for geometry optimization. 
-                     Default=True if there is no net charge, but some atoms have formal charge.
-optmaxcycle          specifies the number of max cycles or iterations allowed during optimization.
-                     Default=400
-optmethod            specifies quantum method for geometry optimziation. 
-                     Default=MP2
-
-use_gausgeomoptonly  specifies to only use gaussian for initial geometry optimization and Psi4 for all other QM stepsi
-                     Default=False 
-
-dontusepcm           Dont use pcm for any QM calculation.
-                     Default=False
-
-use_qmopt_vdw        Use QM opt after MM opt for vdw dimer.
-                     Default=False
-
-use_gau_vdw          Use Gaussian for vdw QM if detected in envioronment.
-                     Default=False
-
-generateextendedconf Use extended conformation for geometry optimization with torsions restrained.
-                     Default=True
-```
-
-### Distributed Multipole Analysis (DMA) and Electrostatic Single Point (ESP) Inputs
-```
-use_gaus          specifies to use Gaussian for quantum geometry optimzation and SP calculations. 
-                  Default=False
-use_gausoptonly   specifies to use Gaussian for Geometry optimization only and Psi4 for SP calculations. 
-                  Default=False
-qmonly            specifies to run quantum for geometry optimization, DMA SP and ESP SP then quit. 
-                  Default=False.
-dmamethod         specifies which quantum method to use for distributed multipole analysis (DMA). 
-                  Default=MP2
-espmethod         specifies which quantum method to use for refined multipoles. 
-                  Default=MP2
-dmabasisset       specifies basis set to use for quantum that generates initial multipoles. 
-                  Default=6-311G**
-espbasisset       specifies basis set to use for quantum intended for refined multipoles. 
-                  Default=6-311++G(2d,2p)
+``maxmem`` specifies the maximum amount of RAM allowed. Default will be 80% of total available on node.
 
 
-numespconfs       specifies number of conformations to be used for ESP potential fitting. Rdkit conformors are evaluated via MMFF94 energies and numespconfs-1 most favorable conformations are picked to add to fitting (with first being most extended conformation). 
-                  Default=1
-```
+``maxdisk`` specifies maximum scratch space allowed. Default will be 80% of total available on node.
 
-### Torsion Parameterization
-```
-rotalltors        specifies poltype to spin all rotatable bonds instead of transferring torsion parameters if 
-                  found in database. 
-                  Default=False
-torsppcm          specifies poltype to use PCM for torsion SP. 
-                  Default=True if there is net charge
-toroptpcm         specifies poltype to use PCM for torsion optimization. 
-                  Default=True if there is net charge.
-dontdotor         specifies poltype to skip torsion spinning. 
-                  Default=False
-dontdotorfit      specifies poltype to skip torsion fitting. 
-                  Default=False
-torsionrestraint  specifies how many kcals/mol/rad^2 to restrain other torsions around rotatable bond to be at 
-                  current dihedral angle. 
-                  Default=328.280354574
-foldnum           specifies the number of fourier terms used in torsion fitting.
-                  Default=3
-tordatapointsnum  specifies the number of quantum jobs to sample along the dihedral angle for all torsions.
-                  Default=12 if number of torsion parameters to fit is less than 12, else automatically adds more                      points
-torspmethod       specifies the SP method used for getting refined multipoles via fitting to quantum potential. 
-                  Default=wB97XD
-toroptmethod      specifies the opt method used for optimizing the geometry prior to deriving parameters. 
-                  Default=wB97XD
-toroptbasisset    specifies which basis set to use for geometry optimization during torsion parameterization. 
-                  Default=6-31G*
-torspbasisset     specifies which basis set to use for SP during torsion parameterization. 
-                  Default=6-311++G**
-onlyrotbndslist   specifies to only rotate bonds in the list, onlyrotbndlist=1 2, 3 4, 5 6 
-                  Default=[] (empty)
+``scratchpath`` specifies path to scratch directory. Default is /scratch.
 
-tortor            specifies to sample the torsion-torsion potential energy surface for two adjecent and                                rotatable dihedrals
-                  Default=False
+``consumptionratio`` specfies ratio of resources to use on node if not specified by user. Default is .8.
 
-onlyrottortorlist specifies list of tortors to rotate. "onlyrottortorlist=b1 c1 d1 , b2 c2 d2" where b1,c1,d1 belong tor tortor a1,b1,c1,d1,e1.
-                  Default=None
+``coresperjob`` specifies number of cores per job for jobs in parralel. Default is 2.
+
+``jobsatsametime``  specifies how many fragment jobs are allowed to run in parralel on node. Default is int(numproc/coresperjob) for input poltype job but 1 for fragment job.
+
+``coresperjob`` specifies number of cores per job for jobs in parralel. Default is 2.
+
+``parentjobsatsametime`` specifies number of input poltype jobs running on same host, rhis informs poltype how much resources to divide from available on the host. Default is 1.
+
+#### Protonation State
+``addhydrogens`` specifies to adds hydrogens to unprotonated atoms. Default is False.
+
+
+``genprotstatesonly``    specifies to output protonation states (at pH=7) in mol files(ProtonationState_0.mol, ...) and then exit. Default is False.
+
+
+#### Controlling Quantum Packages
+``use_gaus`` specifies to use Gaussian for all QM calculations. Default is False.
+
+
+#### Atom Typing
+
+``atmidx``  specifies which number to start poltype type numbers from. Default is 401.
+
+
+#### Geometry Optimization
+
+``optbasisset`` specifies basis set for geometry optimization. Default is 6-31G*.
+
+``optmethod`` specifies quantum method for geometry optimziation. Default is MP2.
+   
+
+``optpcm`` specifies to use PCM for geometry optimization. Default is True if zwitterion is detected, False if not.
+
+``use_gausoptonly``  specifies to only use gaussian for initial geometry optimization and Psi4 for all other QM steps. Default is False. 
+
+``generateextendedconf`` specifies to use extended conformation for geometry optimization with torsions restrained. Default is True.
+
+
+#### Distributed Multipole Analysis (DMA) and Electrostatic Single Point (ESP) 
+
+
+``dmamethod``  specifies which quantum method to use for distributed multipole analysis (DMA). Default is MP2.
+                  
+``dmabasisset`` specifies basis set to use for quantum that generates initial multipoles. Default is 6-311G**.         
+                  
+``espmethod``   specifies which quantum method to use for electrostatic fitting. Default is MP2.
+
+``espbasisset`` specifies basis set to use for electrostatic fitting. Default is aug-cc-pvtz.
+
+``numespconfs`` specifies number of conformations to be used for ESP potential fitting. Rdkit conformors are evaluated via MMFF94 energies and numespconfs-1 most favorable conformations are picked to add to fitting (with first being most extended conformation). Default is 1.
+
+
+#### Torsion Parameterization
+
+``rotalltors``  specifies poltype to spin all rotatable bonds instead of transferring torsion parameters if found in database. Default is False.
+                  
+``torsppcm``    specifies poltype to use PCM for torsion SP. Default is True if zwitterion is detecter, False otherwise
+
+
+``toroptpcm``   specifies poltype to use PCM for torsion optimization. Default is True if zwitterion is detecter, False otherwise.
+                  
+``dontdotor``   specifies poltype to skip torsion parameterization. Default is False.
+                  
+
+``torsionrestraint``  specifies how many kcals/mol/rad^2 to restrain other torsions around rotatable bond to be at current dihedral angle. Default is 328.280354574.
+
+``foldnum``           specifies the number of fourier terms used in torsion fitting. Default is 3.
+
+``tordatapointsnum``  specifies the number of quantum jobs to sample along the dihedral angle for all torsions. Default is 12 if number of torsion parameters to fit is less than 12, else automatically adds more points.
+
+``toroptmethod`` specifies the opt method used for torsion parameterization. Default is wB97XD.
+
+
+``toroptbasisset``    specifies which basis set to use for geometry optimization during torsion parameterization. Default is 6-31G*.
+
+``torspmethod`` specifies the SP method for torsion parameterization. Default is wB97XD.
+
+``torspbasisset``  specifies which basis set to use for SP during torsion parameterization. Default is 6-311+G*.
+                  
+
+``onlyrotbndslist``   specifies to only rotate bonds in the list, onlyrotbndlist=1 2, 3 4, 5 6 . Default has no value.
+
+``tortor``            specifies to sample the torsion-torsion potential energy surface for two adjecent and rotatable dihedrals. Default is False.
+
+``onlyrottortorlist`` specifies list of tortors to rotate. "onlyrottortorlist=b1 c1 d1 , b2 c2 d2" where b1,c1,d1 belong tor tortor a1,b1,c1,d1,e1. Default has no value.
   
 
-fitfirsttorsionfoldphase specifies to add a phase fitting parameter to the first cosine term in the torsion fitting                           function
-                         Default=False
-
-refinenonaroringtors specifies to pucker and refine torsion parameters on non-aromatic rings.
-                     Default=False
-
-maxgrowthcycles      specifies how many growth cycles are allowed by fragmeneter module.
-                     Default=4
-```
-
-### Fragmenter
-```
-maxgrowthcycles   specifies the maximum number of growth cycles before stopping fragmenter progtocol.
-                  Default=None
-
-dontfrag          specifies to not use fragmenter library for torsion.
-                  Default=False
-
-WBOtol            Tolerance for relative differences in Wiberg bond order between parent and fragment. Still                    trying to figure out the "best" tolerance.
-                  Default=.001
-
-jobsatsametime    How many jobs (QM or fragment poltype jobs) to run in parralel on single node, will distribute resources evenly to each job.
-                  Default=1
-
-fragmentjobslocal   Run fragment jobs on localhost even when externalapi keyword is active
-                    Default=False
-
-nonaroringtor1Dscan This keyword will cut a non-aromatic ring and spin the torsion for a 1D scan. Default behaviour is to transfer alkane torsion parameters.
-                    Default=False  
-```
+``refinenonaroringtors`` specifies to pucker and refine torsion parameters on non-aromatic rings. Default is False.
 
 
-### Atom Typing
-```
-atmidx                    specifies which number to start poltype type numbers from. 
-                          Default=401
-```
+``nonaroringtor1Dscan`` specifies to cut a non-aromatic ring and spin the torsion for a 1D scan. Default behaviour is to transfer alkane torsion parameters.
+                    
 
-### Van der Waals Parameterization.
-```
-dovdwscan                specifies to not refine initial guess vdw parameters from database assignment.
-                         Default=False
 
-onlyvdwatomindex         Only probe one vdw atom index on molecule.
+#### Fragmenter
 
-accuratevdwsp            Use CBS extraction on MP2 with counterpoise on basis sets aug-cc-pV[TQ]Z.
-                         Default=False
+``maxgrowthcycles``   specifies the maximum number of growth cycles before stopping fragmenter progtocol. Default is 4.
 
-onlyvdwatomlist          List of Van der Waals atom indices to use in VdW refinement.
+``dontfrag``          specifies to not fragment input molecule. Default is False.
 
-addlonepairvdwsites      Add dimer ab initio near lone pair sites on target molecule atom.
-
-fixvdwtyperadii          List of vdwtypes to fix radius in fitting (can let other vdw parameters fit)
-                         Default=[]
-```
-
-### Misc.
-```
-sleeptime                Number of seconds to wait before each loop iteration in job submission queue.
-                         Default=5
-
-keyfiletoaddtodatabase   specifies to add keyfile parameters to amoeba09 parameter file, located in ParameterFiles/.
-                         Default=None
-
-deleteallnonqmfiles  This will delete all non-qm log files (sometimes errors require restarting and deleting the correct files).
-                     Default=False
-
-dontusepcm           Dont use pcm for any QM calculation.
-                     Default=False
-
-email                Email address to send crash reports to.
-                     Default=None
-
-inputmoleculefolderpaths   Path to folders containing sdf files for molecules you want to parameterize with poltype. Other settings in poltype.ini file will be written to poltype.ini files in each folder.
-
-debugmode            All QM methods are HF , basis set is MINIX. This is for testing for software crashes, fast QM.
-                     Default=False
-
-```
+``WBOtol``            specifies the tolerance for relative differences in Wiberg bond order between parent and fragment. Default is .05.
 
 
 
-### FAQ
+#### Van der Waals Parameterization.
+
+``dovdwscan``                specifies to not refine initial guess vdw parameters from database assignment with ab initio dimer data. Default is False.
+
+``onlyvdwatomindex`` specifies to probe one vdw atom index on molecule. Default has no value.
+
+``accuratevdwsp``   specifies to use CBS extraction on MP2 with counterpoise on basis sets aug-cc-pV[TQ]Z. Default is False.
+
+``onlyvdwatomlist`` specifies list of Van der Waals atom indices to use in VdW refinement. Default has no value.
+
+``fixvdwtyperadii`` specifies list of vdwtypes to fix radius in fitting (can let other vdw parameters fit). Default has no value.
+
+
+
+#### FAQ
 * Q)If I want to change QM methods/basis set do I need to restart POLTYPE job from scratch?
   A)No, POLTYPE will look for output files from QM (see README.MANIFEST) to see if it needs to perform a job or continue. So you can delete the outputlog file, change your input options and resubmit POLTYPE job.
 
-### Tips
+#### Tips
 * Be careful when changing optimization methods and coordinates without deleting previous XYZ files, DMA and ESP, fchk, cube files, this can cause eletrostaic fitting errors where your grid does not correspond to the potential file from the new coordaintes. 
 
-### Common Errors
+#### Common Errors
 * Error: segmentation violation, this usually means an issue related to memory (not enough RAM or disk).  
 
 
 ### ForceBalance Poltype Wrapper
  
-
+ 
+#### ForceBalance Poltype Wrapper Example
 * Example input
 ```
 poltypepathlist=/home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CH3Cl,/home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CH2Cl2,/home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CHCl3 
@@ -305,329 +169,242 @@ gas_prod_time=.5
 WQ_PORT=9013
 ```
 * Example CSV File in ForceBalanceWrapperExamples folder
-* Only use WQ_PORT for parralel jobs, otherwise default is serial on single node
 * Dont let property values be blank for some TP points (need value for FB to read).
-* If using csvexpdatafile, please use correct units as below and the column headers in example csv file, make sure the molecule name under the Name column are same as poltype molecule folder name
-* By default all types in key files are reassigned new type numbers so there is no overlap while fitting together. So input types will be converted internally.
-* temperature_list, pressure_list and density_list are required.
+* If using ``csvexpdatafile``, please use correct units as below and the column headers in example csv file, make sure the molecule name under the Name column are same as poltype molecule folder name
 * Density units are Kg/m^3
 * Enthalpy of vaporization units kJ/mol
-* Thermal expansion units 1/K
-* Isothermal compressibility units are 1/bar
-* Isobaric heat capacity units are kJ/mol.K
 * pressure units are atm
-* Experimental data can be found at https://webbook.nist.gov/ or https://www.aiche.org/dippr
-* QM energies from dimers in poltype (normalized) >=15 kcal/mol are removed and not use for forcebalance.
-```
-poltypepathlist                                      Comma seperated list of Paths to completed poltypejobs
-vdwtypes                                             Comma seperated list of vdw types lists to parameterize
-WQ_PORT                                              Port number for work queue to connect to workers on nodes
-liquid_equ_steps                                     Equilibrium steps MD 
-liquid_prod_steps                                    Production dynamic steps MD
-liquid_timestep                                      Time step for liquid MD
-liquid_interval                                      How often frames written out, in ps
-gas_equ_steps                                        Equilibrium steps MD 
-gas_prod_steps                                       Production dynamic steps MD
-gas_timestep                                          
-gas_interval                                         How often frames written out, in ps
-md_threads                                           CPU cores
-liquid_prod_time                                     Total time liquid sim production
-gas_prod_time                                        Total time gas sim production
-liquid_equ_time                                      Total time liquid sim equilibriation
-gas_equ_time                                        Total time gas sim equilibriation
-debugmode                                            Sets MD to very short time for testing ForceBalance (.001 ns)
-vdwprmtypestofit                                     Sets allowed parameter types for all vdw parameters to fit for vdw (radius S, depth  T, shift D), default=S,T,D . Default makes all vdw parameter types able to be fit.
-vdwtypestoeval                           For parameters being fixed, this tells poltype which ones to fix (while the first instance of parameters is fit), default all parameters are evaluated besides for instance vdwtypestoeval=S,T,D. 
+* QM energies from dimers in poltype (normalized) >=10 kcal/mol are removed and not use for forcebalance.
+
+#### ForceBalance Poltype Wrapper Keywords
 
 
-```
+``poltypepathlist`` specifies comma seperated list of Paths to completed poltypejobs.
 
-* Plot and tabulate ForceBalance results
-```
-forcebalancejobsdir=Path_to_force_balance_jobs
-```
+``vdwtypes``        specifies comma seperated list of vdw types lists to parameterize.
 
-### Minimum Input Example Binding
-* Input inside poltype.ini
-* Make sure pdb files (complexed and uncomplexed) have no missing residues or atoms  
-* Dont need to add ligandcharge, receptorcharge if can read from ligandxyz, receptorligandxyz, ligandfilename or complexedproteinpdbnamei
-* Always be sure to source Tinker CPU and conda environment
-```
-complexedproteinpdbname=anilinecomp.pdb 
-binding
-keyfilename=aniline.key
-ligandxyzfilename=aniline.xyz
-numproc=1 # not needed but default of 1 is slower for CPU
-```
-or
-* Make sure if using custom receptor parameters, then either adding to keyfilename or in prmfilepath
-```
-receptorligandxyzfilename=complex.xyz
-prmfilepath=prmfile with absolute path #for receptor
-binding
-keyfilename=complex.key 
-ligandxyzfilename=ligand.xyz
-```
-or
-```
-receptorligandxyzfilename=complex.xyz
-binding
-prmfilepath=prmfile with absolute path #for receptor
-keyfilename=ligand.key
-ligandxyzfilename=ligand.xyz
-```
+``WQ_PORT``         specifies port number for work queue to connect to workers on nodes. Only used for job parralelization.
 
-### Minimum Input Example Solvation
-* Input inside poltype.ini
+``liquid_equ_steps`` specifies steps for liquid equilbriation dynamics.
 
-```
-solvation
-keyfilename=aniline.key
-ligandxyzfilename=aniline.xyz
-salthfe=True # if want salt HFE, if want ion component only, set this to False
-```
+``liquid_prod_steps`` specifies steps for liquid production dynamics.
 
-### Minimum Input Example Neat Liquid  
-```
-neatliquidsim
-density=997
-keyfilename=aniline.key
-ligandxyzfilename=aniline.xyz
-equilibriatescheme=50,100,150,200,300,300
-```
+``liquid_timestep``  specifies time step for liquid dynamics.
+
+``liquid_interval`` specifies how often frames written out, in ps for liquid dynamics.
+
+``gas_equ_steps``   specifies steps for gas equilbriation dynamics.
+
+``gas_prod_steps``  specifies steps for gas production dynamics.
+
+``gas_timestep``   specifies time step for gas dynamics.  
+
+``gas_interval``   specifies how often frames written out, in ps for gas dynamics.
+
+``md_threads``  specifies number of CPU threads to use.
+
+``liquid_prod_time`` specifies total time for liquid production dynamics (ns).
+
+``gas_prod_time``   specifies total time for gas production dynamics (ns).
+
+``liquid_equ_time`` specifies total time for liquid equilibriation dynamics (ns).
+
+``gas_equ_time``    specifies total time for gas equilibriation dynamics (ns).
 
 
-### Usage
-* Navigate to file with poltype.ini
-```
-nohup python ~/poltype2/PoltypeModules/poltype.py &
- 
-```
-* If you dont want to submit any jobs locally (you have your own submission script), then add keyword "submitlocally=False"
+``vdwprmtypestofit`` specifies allowed parameter types for all vdw parameters to fit for vdw (radius S, depth  T, shift D), default=S,T,D . Default makes all vdw parameter types able to be fit.
 
-### Binding Inputs
-```
-binding                                 Compute solvation and complexation free energies then combine results in output CSV files. 
-                                        Default=False
+``vdwtypestoeval``  specifies which vdw parmaeters to fix (while the first instance of parameters is fit). Default all parameters are evaluated besides for instance vdwtypestoeval=S,T,D. 
 
-pathtosims                              Path to folder containing subfolders of simulations for combining simulation data into one spreadsheet. Will exit program after combining data. 
-                                        Default=None
-complexedproteinpdbname                 Complexed protein PDB file, needed for extracting the ligand and converting to tinker XYZ file. Make sure no atoms are missing!! Tinker will try and add missing atoms and this will cause issues with trying to retain coordinates from input PDB file. Atom order between ligand in this file and ligandxyzfile needs to be same. 
-                                        Default=None
-receptorligandxyzfilename               This tinker XYZ file contains ligand and protein, automatically is generated when the above complexedproteinpdbname is given.
-                                        Default=None 
-```
-### Box Setup Inputs
-```
-density                                 density of neat liquid box in kg/m^3.
-                                        Default=None
+#### ForceBalance Poltype Wrapper Results
 
-aaxis                                   Fixed box size for aaxis of PBC box. If not used, will be determined automatically.     
-                                        Default=None 
-baxis                                   Fixed box size for baxis of PBC box. If not used, will be determined automatically.     
-                                        Default=None 
-
-caxis                                   Fixed box size for caxis of PBC box. If not used, will be determined automatically.     
-                                        Default=None 
-
-listofsaltcons                          Salt concentration for physiological systems. Units in mM
-                                        Default=[KCl]=100   
-
-usepreequilibriatedbox                  Use preequilibriated box and then cut default equilibriation time in half.
-                                        Default=False   
-
-boxonly                                 Stop program after making box.
-                                        Default=False           
-```
-### Minimization Inputs
-```
-restrainpositionconstant                Restraint position force constant during minimization for freezing the ligand and protein. Units in kcal/mol/Ang^2.  
-                                        Default=1 
-loosemincriteria                        Convergence criteria for minimization, loose criteria. Units kcal/mol.
-                                        Default=10
-tightmincriteria                        Convergence criteria for minimization, tight criteria. Units kcal/mol.
-                                        Default=1
-
-minonly                                 Specifies to quit after minimization is complete.
-                                        Default=False
-```
-### Restraint Inputs
-```
-restrainatomgroup1                      Group of atoms (protein or ligand) used for tinker group restraints. If not specified, will be automatically determine (for group restraints during equilbriation).
-                                        Default=None 
-restrainatomgroup2                      Group of atoms (protein or ligand) used for tinker group restraints. If not specified, will be automatically determine (for group restraints during equilbriation). 
-                                        Default=None
-flatbotrest                             Determines whether to use flatbottom potential with group restraints.
-                                        Default=True 
-distancerestraintconstant               Restraint constant for restrain-distance keyword during production dynamics. Units in kcal/mol/Ang^2. 
-                                        Default=10.
-anglerestraintconstant                  Restraint constant for restrain-angle and restrain-torsion during production dynamics. Units in kcal/mol/deg^2.
-                                        Default=0.003046
-```
-
-### Equilibriation Inputs
-```
-equilrestrainsphereradius               Sphere radius for protein atoms to restrain position during equilibriation. Units angstroms.
-                                        Default=2
-equiltimeNVT                            Total time in NVT ensemble during equilbriation (for all temperatures combined except last temperature which is repeated by default). Units in ns.
-                                        Default=4
-equilrestlambdascheme                   Group restraint force constants used during equilibriation (NVT).
-                                        Default=5,2,1,.5,.1,0
-equilibriatescheme                      Temperature used for each NVT step during equilibriation. Units in K. 
-                                        Default=50,100,150,200,300,300
-equilwritefreq                          How often to write out new frame during equilbriation MD. Units in ps.
-                                        Default=100                            
-equiltimestep                           MD time step during equilbriation. Units in fs.
-                                        Default=2
-equiltimeNPT                            Total time in NPT ensemble (will determine average box length if using NVT production dynamics). Units in ns.
-                                        Default=1
-barostatmethod                          The barostat method used during NPT.
-                                        Default=montecarlo
-
-lastNVTequiltime                        Make last NVT equilibriation time longer than the previous ones. The previous ones are computed as equiltimeNVT/number_temperatures.
-                                        Default=.5 ns
-
-equilonly                               Stop program after equilibriation and setup for production dynamics.
-                                        Default=False
-```
-### Production Dynamics Inputs
-```
-productiondynamicsNVT                   Whether or not to use NVT ensemble during production dynamics. If on then will use NPT after equilbriating to determine average box size. 
-                                        Default=False
-
-useproddyngrprests                      Determiens whether to use group restraints or not during production dynamics.If not, then use distance, angle and torsion restraints.
-                                        Default=True
-restlambdascheme                        Restraint lambda scheme during production dynamics.
-                                        Default=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0
-vdwlambdascheme                         Van der Waals lambda scheme during production dynamics. 
-                                        Default=0,.45,.52,.56,.58,.6,.62,.64,.67,.7,.75,.8,.85,.9,.95,1,1,1,1,1,1,1,1,1,1,1,1
-estatlambdascheme                       Electrostatics lambda scheme during production dynamics.
-                                        Default=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1,1
-proddynwritefreq                        How often to write out new frame during production dynamics MD. Units in ps.
-                                        Default=2
-proddyntime                             Total time to run production dynamics (in NVT). Units in ns.
-                                        Default=5
-proddyntimestep                         MD time step during production dynamics. Units in fs.
-                                        Default=2
-integrator                              MD integrator method.
-                                        Default=RESPA
-thermostat                              Thermostat method during NVT MD.
-                                        Default=BUSSI
-vdwcutoff                               Cutoff radius for van der Waals interactions. Units in angstroms.
-                                        Default=12
-ewaldcutoff                             Cutoff radius for electrostatic interactions. Units in angstroms.
-                                        Default=7
-polareps                                Grid spacing for electrostatic potential surface.
-                                        Default=.00001
-```
-### Generic Inputs 
-```
-neatliquidsim                           Specifies to do neat liquid simualtion or not.
-
-complexation                            Specifies to do complexation simulations or not.
-                                        Default=False
-solvation                               Specifies to do solvation simulations or not.
-                                        Default=False
-salthfe                                 Specifies whether to compute salthfe or only ion HFE. Salt HFE just adds another box with opposite charged ion to thermodynamic cycle. 
-                                        Default=True
-
-ligandxyzfilename                       Input tinker XYZ filename for the ligand.
-                                        Default=None
-templateligandxyzfilename               Input template tinker XYZ filename for aligning ligandxyzfilename to templateligandxyzfilename.
-                                        Default=None 
-
-keyfilename                             Input tinker key file for the ligand parameters.
-                                        Default=None
-ligandcharge                            Input charge for ligand. If ligandfilename is given, charge will be read from file instead.
-                                        Default=None
-ligandfilename                          Ligand structure file containing bond order of ligand. Charge will be automatically guessed from valence if not input via keyword
-                                        Default=None
-templateligandfilename                  Template ligand structure file containing bond order of ligand. Charge will be automatically guessed from valence if not input via keyword
-                                        Default=None
-
-receptorcharge                          Input charge for protein. If uncomplexedproteinpdbname is given, receptorcharge is read from file.
-                                        Default=None
-```
-
-### Misc. Inputs
-```
-email                                   Emails address if annihilator crashes
-
-externalapi                             External script path for submitting MD jobs. Used with submitjobs.py. 
-                                        If user creates their own submission script, must edit submitjobs.py to work with it. Default is to submit jobs on local node.“The submission script needs to be able to handle
-correct assignment of tinker envioronments on whichever CPU/GPU cluster it operates on. If using RenLabCluster please read the file on https://github.com/bdw2292/RenLabCluster”. If you use this keyword you do not need to locally source a bashrc for GPU tinker. Example “externalapi=/home/bdw2292/ClusterDaemon/manager.py”
-
-                                        Default=None
-
-restrainreceptorligand                  Use any restraints between ligand and protein (for example if ligand                                            is covalently bonded).
-                                        Default=True
-
-generateinputfilesonly                  Quit program after generating water box file.
-                                        Default=False
-
-numproc                                 Number of threads to use for CPU dynamics.
-                                        Default=1
-
-prmfilepath                             Path to parameters
-                                        Default=amoebabio18.prm
-
-perturbkeyfilelist                      Comma seperated list of keyfiles to add to end state and perturb with BAR. Right most item in the list is the end state. By default, arc file from nearestneighboring trajectory is used if fep is turned on, otherwise running MD for new state is default. By default bar jobs will be submitted locally if this keyword is turned on (faster then going through daemon) and MD is not needed to be redone (if fep is turned on). If on GPU and detect gpu bar then will use that locally rather than cpu bar. 
-                                        Default=None
-
-numinterpolsforperturbkeyfiles          Comma seperated list of number of interpolations per key file in perturbkeyfilelist (they should be same length). Use 1 for keyfiles that need only one interpolation (just between neighboring states), otherwise parameters will be interpolated via step=(b-a)/n where n is number of interpolations for that keyfile.
-                                        Default is 1 for all keys in perturbkeyfilelist
-simulationstostopfolderpath             A directory containing subdirectories of annihilator jobs, recursive search will and *.end files to each folder with an *.arc file to stop simulations. Upon restarting annihilator all *.end files that are in folders are automatically removed.
-                                        Default=None
-
-expfreeenergy                           Experimental free energy for comparison in output tables
-                                        Default=None
+``forcebalancejobsdir=Path_to_force_balance_jobs`` specifies to grab ForceBalance output files, parse and generate plots and tables.
 
 
-fep                                     Used with perturbkeyfilelist keyword, fep specifies to copy nearest MD trajectory instead of running MD for each new keyfile to be perturbed.
-                                        Default=False 
-
-checktraj                               Specifies to check each trajectory for any corruption and delete if found
-                                        Default=False (slow to read each arc file)
-
-redobar                                 Delete all .bar, and BAR output files then resubmit BAR jobs.
-                                        Default=False
-```
-
-### Mutation Inputs
-```
-bgnstatekey                             First state key file for mutation.
-                                        Default=None
-
-endstatekey                             End state key file for mutation.
-                                        Default=None
-
-bgnstatexyz                             First state xyz file for mutation.
-                                        Default=None
-
-endstatexyz                             End state xyz file for mutation.
-                                        Default=None
-
-bgnstatestructurefile                   Begin structurefile with bond orders since babel sometimes cannot guess correct bond orders from XYZ file.
-                                        Default=None
+### Advanced Program Usage Molecular Dynamics
 
 
-endstatestructurefile                   End structurefile with bond orders since babel sometimes cannot guess correct bond orders from XYZ file.
-                                        Default=None
+#### Binding Inputs
 
-mutlambdascheme                         Lambda scheme (from 0 to 1) of mutation of any parameters between begin and 
-                                        end state keyfiles.
-                                        Default=[]
-
-compareparameters                       Compare parameters with analyze and print parameters if energy difference is > energy cutoff.
-                                        Default=False
-
-energycutoff                            For comparing parameters.
-                                        Default=.5 kcal/mol
-
-perturbedkeyfilename                    Filename desired if you want to convert two molecules with different parameter sets/tyepnumbers/atom orders to the same atom order/ type numbers as endstatexyz/endstatekey. This key can be used with perturbkeyfilelist for perturbation to a different parameter set. perturbedkeyfilename needs to be used with keywords bgnstatekey,bgnstatexyz,endstatekey,endstatexyz, where the endstatexyz and endstatekey are the atom orders and type numbers you wish to convert your bgnstatekey parameters to. For example if you wish to use "perturbkeyfilelist", then can put perturbkeyfilelist=perturbedkeyfilename (the filename not variable name).
-                                        Default=None
+``binding`` specifies to compute solvation and complexation free energies and combine for binding free energy. Default is False.
 
 
-rotateframes                            Rotate frames from bgnstatekey to endstatekey.
-                                        Default=False
-```
+``complexedproteinpdbname``     specifies complexed protein PDB file, needed for extracting the ligand and converting to tinker XYZ file. Make sure no atoms are missing!!. The atom order between ligand in this file and ligandxyzfile (tinker XYZ) needs to be same. Default has no value.
+
+
+``receptorligandxyzfilename``   specifies tinker XYZ file contains ligand and protein. This is automatically generated when the above complexedproteinpdbname is given. Default has no value.
+                                      
+                                      
+#### Solvation Inputs
+``solvation``   specifies to do solvation simulations. Default is False.
+
+``salthfe``     specifies whether to compute salt hydration free energy.  Default is True.
+
+#### Box Setup Inputs
+
+``density`` specifies the density of neat liquid box in kg/m^3. Default has no value.
+
+
+``aaxis``   specifies the fixed box size for aaxis of PBC box. If not used, will be determined automatically. Default has no value.
+
+                                        
+``baxis``   specifies the fixed box size for baxis of PBC box. If not used, will be determined automatically.  Default has no value.
+                                        
+
+``caxis``   specifies the fixed box size for caxis of PBC box. If not used, will be determined automatically. Default has no value.   
+                                        
+
+``listofsaltcons``  specifies the salt concentration for physiological systems. Units in mM. Default is [KCl]=100.
+
+
+``usepreequilibriatedbox``  specifies to use preequilibriated box and then cut default equilibriation time in half. Default is True.
+
+``boxonly`` specifies to stop program after making box. Default is False.           
+
+
+#### Minimization Inputs
+
+``restrainpositionconstant`` specifies the restraint position force constant during minimization for freezing the ligand and protein. Units in kcal/mol/Ang^2.  
+                                        
+``loosemincriteria``    specifies the convergence criteria for minimization, loose criteria. Units kcal/mol. Default is 10.
+
+``minonly`` specifies to quit after minimization is complete. Default is False.
+
+
+#### Restraint Inputs
+
+``restrainatomgroup1``  specifies the group of atoms (protein or ligand) used for tinker group restraints. If not specified, will be automatically determine (for group restraints during equilbriation). Default has no value.
+
+
+``restrainatomgroup2``  specifies the group of atoms (protein or ligand) used for tinker group restraints. If not specified, will be automatically determine (for group restraints during equilbriation). Default has no value.
+
+``flatbotrest``     specifies whether to use flatbottom potential with group restraints. Default is True.
+
+
+``distancerestraintconstant``  specifies the restraint constant for restrain-distance keyword during production dynamics. Units in kcal/mol/Ang^2. Default is 10.
+                         
+
+
+#### Equilibriation Inputs
+
+``equilrestrainsphereradius``   specifies the sphere radius for protein atoms to restrain position during equilibriation. Units angstroms. Default is 2.
+
+``equiltimeNVT`` specifies the total time in NVT ensemble during equilbriation (for all temperatures combined except last temperature which is repeated by default). Units in ns. Default is 4.
+
+
+``equilrestlambdascheme``   specifies the group restraint force constants used during equilibriation (NVT). Default is 5,2,1,.5,.1,0.
+
+
+``equilibriatescheme``  specifies the temperature used for each NVT step during equilibriation. Units in K. Default is 50,100,150,200,300,300
+
+``equilwritefreq``  specifies how often to write out new frame during equilbriation MD. Units in ps. Default is 100.
+
+``equiltimestep``   specifies the MD time step during equilbriation. Units in fs. Default is 2.
+
+
+``equiltimeNPT``    specifies the total time in NPT ensemble (will determine average box length if using NVT production dynamics). Units in ns. Default is 1.
+
+
+``lastNVTequiltime`` specifies the last NVT equilibriation time longer than the previous ones. The previous ones are computed as equiltimeNVT/number_temperatures. Default is .5.
+
+
+``equilonly``   specifies to stop program after equilibriation and setup for production dynamics. Default is False.
+
+
+#### Production Dynamics Inputs
+
+``productiondynamicsNVT``   specifies whether or not to use NVT ensemble during production dynamics. If on then will use NPT after equilbriating to determine average box size. Default is False.
+
+                                    
+``restlambdascheme``    specifies the restraint lambda scheme during production dynamics. Default is 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0.
+
+``vdwlambdascheme``     specifeis the Van der Waals lambda scheme during production dynamics. Default is 0,.45,.52,.56,.58,.6,.62,.64,.67,.7,.75,.8,.85,.9,.95,1,1,1,1,1,1,1,1,1,1,1,1.
+
+``estatlambdascheme``   specifies the electrostatics lambda scheme during production dynamics. Default is 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1,1.
+
+``proddynwritefreq``    specifies how often to write out new frame during production dynamics MD. Units in ps. Default is 2.
+
+``proddyntime``  specifies the total time to run production dynamics (in NVT). Units in ns. Default is 5.
+
+``proddyntimestep`` specifies the MD time step during production dynamics. Units in fs. Default is 2.
+
+
+
+
+#### Generic Inputs 
+
+
+``integrator``  specifies the MD integrator method. Default is RESPA.
+
+``thermostat``  specifies the thermostat method during NVT MD. Default is BUSSI.
+
+
+``vdwcutoff``   specifies the cutoff radius for van der Waals interactions. Units in angstroms. Default is 12.
+
+``ewaldcutoff`` specifies the cutoff radius for electrostatic interactions. Units in angstroms. Default is 7.
+
+``polareps``    specifies the Grid spacing for electrostatic potential surface. Default is .00001.
+
+``neatliquidsim``  specifies to do neat liquid simualtion. Default is False.
+
+
+``ligandxyzfilename``  specifies the input tinker XYZ filename for the ligand. Default has no value.
+
+``templateligandxyzfilename``   specifies input template tinker XYZ filename for aligning ligandxyzfilename to templateligandxyzfilename. Program will quit after alignment. Default has no value. 
+
+``keyfilename`` specifies input tinker key file for the ligand parameters. Default is None.
+
+``externalapi`` specifies external script path for submitting MD jobs. Used with submitjobs.py. If user creates their own submission script, must edit submitjobs.py to work with it. Default is to submit jobs on local node. The submission script needs to be able to handle
+correct assignment of tinker envioronments on whichever CPU/GPU cluster it operates on. If using RenLabCluster please read the file on https://github.com/bdw2292/RenLabCluster. Default has no value.
+
+
+``numproc`` specifies the number of threads to use for CPU dynamics. Default is 1.
+
+``prmfilepath`` specifies the path to parameters. Default is amoebabio18.prm.
+
+``perturbkeyfilelist``  specifies a comma seperated list of keyfiles to add to end state and perturb with BAR. Right most item in the list is the end state. By default, arc file from nearestneighboring trajectory is used if fep is turned on, otherwise running MD for new state is default. Default has no value.
+
+``numinterpolsforperturbkeyfiles``  specifies a comma seperated list of number of interpolations per key file in perturbkeyfilelist (they should be same length). Use 1 for keyfiles that need only one interpolation (just between neighboring states), otherwise parameters will be interpolated via step=(b-a)/n where n is number of interpolations for that keyfile. Default is 1 for all keys in perturbkeyfilelist.
+
+``simulationstostopfolderpath``  specifies a directory containing subdirectories of input jobs, recursive search will and *.end files to each folder with an *.arc file to stop simulations. Upon restarting program all *.end files that are in folders are automatically removed. Default has no value.
+
+``expfreeenergy``  specifies the experimental free energy for comparison in output tables. Default has no value.
+
+
+``fep`` specifies to copy nearest MD trajectory instead of running MD for each new keyfile to be perturbed. Used with perturbkeyfilelist keyword. Default is False. 
+
+
+``checktraj``   specifies to check each trajectory for any corruption and delete if found. Default is False (slow to read each arc file).
+
+``pathtosims``  specifies path to folder containing subfolders of simulations for combining simulation data into one spreadsheet. Will exit program after combining data. Default has no value. 
+
+``barostatmethod``  specifies the barostat method used during NPT. Default is montecarlo.
+
+
+#### Mutation Inputs
+
+``bgnstatekey``  specifies the first state key file for mutation. Default has no value.
+
+``endstatekey``  specifies the end state key file for mutation. Default has no value.
+
+``bgnstatexyz`` specifies the first state xyz file for mutation. Default has no value.
+
+``endstatexyz`` specifies the end state xyz file for mutation. Default has no value.
+
+``bgnstatestructurefile``   specifies the begin structurefile with bond orders since babel sometimes cannot guess correct bond orders from XYZ file. Default has no value.
+
+
+``endstatestructurefile``   specifies the end structurefile with bond orders since babel sometimes cannot guess correct bond orders from XYZ file. Default has no value.
+
+
+``mutlambdascheme``     specifies the lambda scheme (from 0 to 1) of mutation of any parameters between begin and end state keyfiles. Default has no value.
+
+
+``compareparameters``   specifies to compare parameters with analyze and print parameters if energy difference is > energy cutoff. Default is False.
+
+``energycutoff``    specifies the energy cutoff for comparing parameters. Default is .5.
+
+
+``rotateframes``    specifies to rotate multipole frames from bgnstatekey to endstatekey. Default is False.
+
+
