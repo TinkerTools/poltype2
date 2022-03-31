@@ -593,7 +593,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
     else:
         poltype.call_subsystem([mincmdstr],False)
         temp={mincmdstr:torminlogfname} 
-        finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
+        finishedjobs,errorjobs=poltype.WaitForTermination(temp,True)
     filename=torxyzfname+'_2'
     newfilename=filename.replace('.xyz_2','_xyzformat.xyz')
     cartxyz=ConvertTinktoXYZ(poltype,torxyzfname+'_2',newfilename)
@@ -1157,18 +1157,18 @@ def get_torlist(poltype,mol,missed_torsions):
             continue
         ringbond=bond.IsInRing()
         if t2val<2 or t3val<2:
-            continue 
+            continue
         t1,t4 = find_tor_restraint_idx(poltype,mol,t2,t3)
         babelatoms=[t1,t2,t3,t4]
         indices=[a.GetIdx() for a in babelatoms]
         aromatics=[i.IsAromatic() for i in babelatoms]
         hybs=[i.GetHyb() for i in babelatoms]
+
         sortedtor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]])
         foundmissing=False
         if(sortedtor in missed_torsions or sortedtor[::-1] in missed_torsions) and len(poltype.onlyrotbndslist)==0:
             skiptorsion = False
             foundmissing=True
-
         atomindices=rings.NonAromaticRingAtomicIndices(poltype,mol)
         nonarotorsions,nonarotorsionsflat=rings.NonAromaticRingTorsions(poltype,poltype.alltorsionslist,atomindices)
         willrefinenonarotor=False

@@ -3525,9 +3525,10 @@ class PolarizableTyper():
             except:
                 pass
         os.chdir('..')
-        previousdir=os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-        shutil.copy(self.tmpxyzfile,os.path.join(previousdir,self.tmpxyzfile))
-        shutil.copy(self.tmpkeyfile,os.path.join(previousdir,self.tmpkeyfile))
+        if self.isfragjob==False:
+            previousdir=os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+            shutil.copy(self.tmpxyzfile,os.path.join(previousdir,self.tmpxyzfile))
+            shutil.copy(self.tmpkeyfile,os.path.join(previousdir,self.tmpkeyfile))
         if (self.binding==True or self.solvation==True or self.neatliquidsim==True):
             self.ligandxyzfilename=self.tmpxyzfile
             self.keyfilename=self.tmpkeyfile

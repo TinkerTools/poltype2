@@ -41,13 +41,29 @@ def gen_canonicallabels(poltype,mol,rdkitmol=None):
 
            
     groups=[]
+    grouptoheavy={}
     for index,matchingindices in indextomatchingindices.items():
+        atom=rdkitmol.GetAtomWithIdx(index)
+        atomnum=atom.GetAtomicNum()
+        heavy=False
+        if atomnum!=1:
+            heavy=True
         if set(matchingindices) not in groups:
             groups.append(set(matchingindices))
+            grouptoheavy[tuple(set(matchingindices))]=heavy
+    sortedgroups=[]
+    for group,heavy in grouptoheavy.items():
+        if heavy==True:
+            if group not in sortedgroups:
+                sortedgroups.append(group)
+    for group,heavy in grouptoheavy.items():
+        if heavy==False:
+            if group not in sortedgroups:
+                sortedgroups.append(group)
     symclasstogrp={}
     idxtosymclass={}
     symclass=poltype.prmstartidx
-    for grp in groups:
+    for grp in sortedgroups:
         symclasstogrp[symclass]=grp
         symclass+=1
     for symclass,grp in symclasstogrp.items():
