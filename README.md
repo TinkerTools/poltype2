@@ -94,10 +94,11 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 [Production Dynamics and Free Energy Prediction](#production-dynamics-and-free-energy-prediction)
 
+[AMOEBA Publications](#amoeba-publications)
 
 
 
-
+---------------------------------------------------------------------------------------------
 
 
     
@@ -410,4 +411,23 @@ nohup python /path_to_poltype/poltype.py &
 
 
 
+### AMOEBA Publications
+
+#### AMOEBA
+
+Ren, P. Y.; Ponder, J. W., Polarizable atomic multipole water model for molecular mechanics simulation. Journal of Physical Chemistry B 2003, 107 (24), 5933-5947.
+
+Ren, P.; Wu, C.; Ponder, J. W., Polarizable Atomic Multipole-based Molecular Mechanics for Organic Molecules. J Chem Theory Comput 2011, 7 (10), 3143-3161.
+
+Shi, Y.; Xia, Z.; Zhang, J.; Best, R.; Wu, C.; Ponder, J. W.; Ren, P., The Polarizable Atomic Multipole-based AMOEBA Force Field for Proteins. J Chem Theory Comput 2013, 9 (9), 4046-4063.
+
+Zhang, C.; Bell, D.; Harger, M.; Ren, P., Polarizable Multipole-Based Force Field for Aromatic Molecules and Nucleobases. J Chem Theory Comput 2017, 13 (2), 666-678.
+
+Zhang, C.; Lu, C.; Jing, Z.; Wu, C.; Piquemal, J. P.; Ponder, J. W.; Ren, P., AMOEBA Polarizable Atomic Multipole Force Field for Nucleic Acids. J Chem Theory Comput 2018, 14 (4), 2084-2108.
+
+#### AMOEBA+ 
+
+Liu, C.; Piquemal, J. P.; Ren, P., AMOEBA+ Classical Potential for Modeling Molecular Interactions. J Chem Theory Comput 2019.
+
+Liu, C.; Piquemal, J. P.; Ren, P., Implementation of Geometry-Dependent Charge Flux into the Polarizable AMOEBA+ Potential. J Phys Chem Lett 2019, 11, 419-426.
 
