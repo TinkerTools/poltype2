@@ -51,6 +51,8 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 [Parameterization Output Files](#parameterization-output-files)
 
+[Parameterization Sanity Checks](#parameterization-sanity-checks)
+
 ### Automated AMOEBA Ligand Parameterization - How It Works
 
 [⚛️ Atom Type Classification](#atom-type-classification)
@@ -181,6 +183,7 @@ vdw 401 3.8200 0.1010
 * ['[#7](-[#6](-[#6])(-[#1])-[#1])(-[#1])-[#1]', [2]] the first item in this list is a SMARTS string matching to the input molecule, the second item in the list specifies which atom in order (start counting from 1 on the left) that the match for the vdW atom corresponds to. 
 * [['[#7](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H]', [2]]] similarly, the first item in this list is a SMILES from a molecule in the amoeba09 database. The seocnd item in the list is the atom in the SMARTS that the match corresponds to.
 * [[('C', '"Ethyl Amine CH2"')]] this is a list of the atom class descriptions that are matched from the amoeba09 database
+* The first number in the vdW parameter line is radius and the second is the depth parameter
 
 ##### Bond Parameter Definitions Example
 ```
@@ -190,6 +193,7 @@ bond 402 404 326.272386 1.36
 ```
 * This type of comment is a match to the newer "amoeba21" database. 
 * The SMARTS string match environment is given by [CX3](=O)([OH1]) [OX2H1]([C](=O)), where there is a space between the SMARTS for each atom.
+* The first number in the bond parameter line is force constant and the second is the equilbrium bond length
 
 ##### Angle Parameter Definitions Example
 ```
@@ -197,6 +201,7 @@ bond 402 404 326.272386 1.36
 # [406, 402, 404] = [[2], [5], [1]]
 angle 406 402 404 109.848375 123.34
 ```
+* The first number in the angle parameter line is force constant and the second is the equilbrium angle length
 
 ##### Stretch-Bend Parameter Definitions Example
 ```
@@ -205,11 +210,15 @@ angle 406 402 404 109.848375 123.34
 strbnd 406 402 404 7.6289 7.6289
 ```
 
+
 ##### Out-of-Plane Bend Parameter Definitions Example
 ```
 # updated valence parameter database match, comments=C=O, sp2 carbon, carboxylic ester OCO, Oxygen of Carboxylic acid (protonated) SMARTS match = [CX3](=O)([OH1]) [OX2H1]([C](=O))
 # [404, 402] = [[1], [5]]
+opbend 404 402 0 0 116.1422
 ```
+* The first two class numbers are atoms in a trigonal center, the last two 0's are wild card atom classes for any other atom class in the trigonal center
+* The last number is the opbend force constant
 
 ##### Torsion Parameter Definitions Example
 ```
@@ -222,6 +231,7 @@ torsion 403 401 402 404 -3.883 0.0 1 -0.434 180.0 2 4.077 0.0 3
 * The line that starts with "Fitted from Fragment" , indicates which fragment the torsion parameters were derived from (from fragment 5_1_Index_0.mol) for debugging purposes
 * torsion atom indexes = 7,1,2,3, indicates the atom indices that the torsion belongs too in the fragment molecule
 * with smarts torsion indices 5,2,3,4 indicates the atom order in the SMARTS string corresponding to the torsion
+* The torsion parameter line reads as "F Angle Number", where F is the force constant for the cosine term, Angle is the phase angle for the cosine term and Number is the number corresponding to which cosine term (can be up to 6).
 
 ##### Solute Parameter Definitions Example
 ```
@@ -246,7 +256,14 @@ multipole   404  408  402              -0.46637
                                        -0.09766    0.00000    0.53768
 
 ```
+* The first line contain the monopole charge
+* The second line contain the dipole
+* The last lines contain the quadrupole matrix
 
+### Parameterization Sanity Checks
+* Check for 2D coordinates and generates 3D coordinates at begining of program 
+* Check for any missing van der Waals at end of program parameters and raises error
+* Check for any missing multipole parameters at end of program and raises error
 
 
 ### Atom Type Classification
