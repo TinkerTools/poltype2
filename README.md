@@ -43,11 +43,13 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 ### Automated AMOEBA Ligand Parameterization 
 
-[Parameterization Preparation](#parameterization-preparation)
+[Parameterization Input Preparation](#parameterization-input-preparation)
 
 [Minimum Example Usage Parameterization](#minimum-example-usage-parameterization)
 
 [💻 Advanced Program Usage](README/README_HELP.MD)
+
+[Parameterization Output Files](#parameterization-output-files)
 
 ### Automated AMOEBA Ligand Parameterization - How It Works
 
@@ -73,7 +75,7 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 ### Automated AMOEBA Molecular Dynamics and Free Energy Prediciton
 
-[Molecular Dynamics Preparation](#molecular-dynamics-preparation)
+[Molecular Dynamics Input Preparation](#molecular-dynamics-input-preparation)
 
 [Minimum Input Example Binding Free Energy](#minimum-input-example-binding-free-energy)
 
@@ -102,7 +104,7 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 
     
-### Parameterization Preparation
+### Parameterization Input Preparation
 * The input structure is given to the program as an SDF file. 
 * Formal atom charge will be assigned via the input number of bonds and bond order for surrounding bonds and element of each atom. 
 * Optional keywords exist to add missing hydrogens. 
@@ -123,6 +125,113 @@ nohup python /path_to_poltype/poltype.py &
 
 ```final.xyz``` and ```final.key``` are the resulting structure and parameter files you will need.
 * After poltype finishes, check the ``OPENME`` folder for torsion fitting and ESP fitting results. 
+
+### Parameterization Output Files
+
+#### Final XYZ File
+```
+    10
+     1  O      1.251722   -1.128767    0.434331      404    5    10
+     2  O      0.844886    1.092397    0.237216      406    5
+     3  N     -1.815560    0.588102   -0.324599      403    4     8     9
+     4  C     -0.849874   -0.492647   -0.449814      401    3     5     6     7
+     5  C      0.470594   -0.061298    0.132685      402    1     2     4
+     6  H     -1.195550   -1.387129    0.076104      405    4
+     7  H     -0.620445   -0.803981   -1.483080      405    4
+     8  H     -2.537209    0.496409   -1.034572      407    3
+     9  H     -1.333966    1.469038   -0.494689      407    3
+    10  H      2.154510   -0.772681    0.564391      408    1
+```
+
+
+* Total atom number is on the first line.
+* The first column is the atom index.
+* The second column is the atomic symbol.
+* The 3 -5th columns are x,y,z coordinates in Angstrom.
+* The 6th is the “atom type” defined in the *.key file. This is the index tinker uses to assign parameters from the key/parameter file.
+* The 7th – last columns are lists of atom indices that are connected to the current atom index.
+
+#### Final Key File
+
+##### Atom Type Definitions Example
+```
+atom          404    404    O     "glycine             "         8    15.999    2
+atom          406    406    O     "glycine             "         8    15.999    1
+atom          403    403    N     "glycine             "         7    14.007    3
+atom          401    401    C     "glycine             "         6    12.011    4
+atom          402    402    C     "glycine             "         6    12.011    3
+atom          405    405    H     "glycine             "         1     1.008    1
+atom          407    407    H     "glycine             "         1     1.008    1
+atom          408    408    H     "glycine             "         1     1.008    1
+```
+##### Van der Waals Parameter Definitions Example
+
+```
+# matching SMARTS from molecule  [['[#7](-[#6](-[#6])(-[#1])-[#1])(-[#1])-[#1]', [2]]] to SMARTS from parameter file [['[#7](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H]', [2]]] with tinker type descriptions [[('C', '"Ethyl Amine CH2"')]]
+# [401] = [[4]]
+vdw 401 3.8200 0.1010
+```
+
+
+##### Bond Parameter Definitions Example
+```
+# updated valence parameter database match, comments=C=O, sp2 carbon, carboxylic ester OCO, Oxygen of Carboxylic acid (protonated) SMARTS match = [CX3](=O)([OH1]) [OX2H1]([C](=O))
+# [402, 404] = [[5], [1]]
+bond 402 404 326.272386 1.36
+```
+
+##### Angle Parameter Definitions Example
+```
+# updated valence parameter database match, comments=O=C, Oxygen of carbonyl group, Acetic Acid C=O, sp2 carbon, carboxylic ester OCO, Oxygen of Carboxylic acid (protonated) SMARTS match = [OX1]=[CX3][OH1] [CX3](=O)([OH1]) [OX2H1]([C](=O))
+# [406, 402, 404] = [[2], [5], [1]]
+angle 406 402 404 109.848375 123.34
+```
+
+##### Stretch-Bend Parameter Definitions Example
+```
+# updated valence parameter database match, comments=O=C, Oxygen of carbonyl group, Acetic Acid C=O, sp2 carbon, carboxylic ester OCO, Oxygen of Carboxylic acid (protonated) SMARTS match = [OX1]=[CX3][OH1] [CX3](=O)([OH1]) [OX2H1]([C](=O))
+# [406, 402, 404] = [[2], [5], [1]]
+strbnd 406 402 404 7.6289 7.6289
+```
+
+##### Out-of-Plane Bend Parameter Definitions Example
+```
+# updated valence parameter database match, comments=C=O, sp2 carbon, carboxylic ester OCO, Oxygen of Carboxylic acid (protonated) SMARTS match = [CX3](=O)([OH1]) [OX2H1]([C](=O))
+# [404, 402] = [[1], [5]]
+```
+
+##### Torsion Parameter Definitions Example
+```
+# matching SMARTS from molecule  [['[*]~[*]~[*]~[*]', [1, 2, 3, 4]]] to SMARTS from parameter file [['[#6](-[H])(-[H])(-[H])-[#6](-[H])(-[H])(-[H])', [2, 1, 5, 6]]] with tinker type descriptions [[('H', '"Alkane H3C-"'), ('C', '"Alkane CH3-"'), ('C', '"Alkane CH3-"'), ('H', '"Alkane H3C-"')]]
+# [403, 401, 402, 404] = [[3], [4], [5], [1]]
+# Fitted from Fragment  SMARTS [#6](-[#6](-[#8]-[H])=[#8])(-[#7](-[H])-[H])(-[H])-[H] torsion atom indexes = 7,1,2,3 with smarts torsion indices 5,2,3,4 from fragment 5_1_Index_0.mol
+# torsion % [#6](-[#6](-[#8]-[H])=[#8])(-[#7](-[H])-[H])(-[H])-[H] % 5,2,3,4 % -3.883,-0.434,4.077
+torsion 403 401 402 404 -3.883 0.0 1 -0.434 180.0 2 4.077 0.0 3
+```
+
+##### Solute Parameter Definitions Example
+```
+#SOLUTE-SMARTS 408 [#1]([OH1](C=O))
+SOLUTE 408 2.574 2.758 2.9054
+```
+
+##### Polarize Parameter Definitions Example
+```
+# updated valence parameter database match, comments=O on carbonyl group SMARTS match = [OX1]=[CX3]
+# [406] = [[2]]
+polarize           406          0.9138     0.3900 402
+```
+
+##### Multipole Parameter Definitions Example
+```
+# [404] = [[1]]
+multipole   404  408  402              -0.46637
+                                        0.01789    0.00000    0.22745
+                                       -0.04708
+                                        0.00000   -0.49060
+                                       -0.09766    0.00000    0.53768
+
+```
 
 ### Atom Type Classification
 * A substructure search is done on the input molecule to define atoms that belong to the same atom type. 
@@ -314,7 +423,7 @@ nohup python /path_to_poltype/poltype.py &
 * The non-bonded interaction parameters including atomic polarizability, van der Waals, charge penetration, charge transfer, and geometry dependent charge flux are set to match the AMOEBA+ database parameters. * To this date these parameters are still under development for a series of organic molecules. These parameters will be deposited into Poltype 2 on GitHub on available. 
 
 
-### Molecular Dynamics Preparation
+### Molecular Dynamics Input Preparation
 * Ligand XYZ and key files are required (such as final.xyz and final.key from Poltype parameterization). 
 * For binding free energy compuations, either a host PDB or premade tinker XYZ is required 
 * Inputs are inside poltype.ini
