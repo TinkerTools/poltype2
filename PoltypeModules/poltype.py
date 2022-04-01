@@ -1806,8 +1806,6 @@ class PolarizableTyper():
         else:
             self.proddynensem=self.NPTensem
         mut=False
-        regrowelelambdascheme=[]
-        regrowvdwlambdascheme=[]
         self.foldernametolambdakeyfilename={}
         self.foldernametonuminterpols={}
         self.foldernametointerpolindex={}
@@ -1852,7 +1850,7 @@ class PolarizableTyper():
                             elelamb=estatlambdascheme[0]
                             vdwlamb=vdwlambdascheme[0]
                             rest=restlambdascheme[0]
-                        elif k==1:
+                        elif k==1 and self.checkneedregrow==True:
                             elelamb=estatlambdascheme[-1]
                             vdwlamb=vdwlambdascheme[-1]
                             rest=restlambdascheme[-1]
@@ -1884,7 +1882,7 @@ class PolarizableTyper():
                                     self.restlambdascheme[k].insert(0,rest)
                                     templambdafolderlist.insert(0,fold) 
 
-                                elif k==1:
+                                elif k==1 and self.checkneedregrow==True:
                                     self.estatlambdascheme[k].append(elelamb)
                                     self.vdwlambdascheme[k].append(vdwlamb)
                                     self.restlambdascheme[k].append(rest)
@@ -3513,7 +3511,6 @@ class PolarizableTyper():
         string='Poltype has completed successfully, but this software is still under active development. It is your responsibility to check your own final parameters, while we are still in development phase.'
         warnings.warn(string)
         self.WriteToLog(string)
-        self.CopyFitPlots()
         if self.email!=None:
             moleculename=self.molstructfname.replace('.sdf','')
             password='amoebaisbest'
@@ -3524,11 +3521,12 @@ class PolarizableTyper():
                 self.SendFinalReportEmail(TEXT,fromaddr,toaddr,password,moleculename)
             except:
                 pass
-        os.chdir('..')
         if self.isfragjob==False:
             previousdir=os.path.abspath(os.path.join(os.getcwd(), os.pardir))
             shutil.copy(self.tmpxyzfile,os.path.join(previousdir,self.tmpxyzfile))
             shutil.copy(self.tmpkeyfile,os.path.join(previousdir,self.tmpkeyfile))
+
+        self.CopyFitPlots()
         if (self.binding==True or self.solvation==True or self.neatliquidsim==True):
             self.ligandxyzfilename=self.tmpxyzfile
             self.keyfilename=self.tmpkeyfile
@@ -3851,12 +3849,14 @@ class PolarizableTyper():
                     if '.png' in f and ('energy' in f or 'fit' in f or 'water' in f):
                         plots.append(os.path.join(path,f))
         os.chdir(thecurdir)
+        
+        fitlines=self.CollectElectrostaticDipoleFitLines()
+        instructions=self.Instructions()
+        os.chdir('..')
         if not os.path.isdir(fold):
             os.mkdir(fold)
         for path in plots:
             shutil.copy(path,fold)
-        fitlines=self.CollectElectrostaticDipoleFitLines()
-        instructions=self.Instructions()
         os.chdir(fold)
         temp=open("README.txt",'w')
         for line in instructions:
