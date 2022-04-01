@@ -185,6 +185,7 @@ vdw 401 3.8200 0.1010
 * [[('C', '"Ethyl Amine CH2"')]] this is a list of the atom class descriptions that are matched from the amoeba09 database
 * The first number in the vdW parameter line is radius and the second is the depth parameter
 
+
 ##### Bond Parameter Definitions Example
 ```
 # updated valence parameter database match, comments=C=O, sp2 carbon, carboxylic ester OCO, Oxygen of Carboxylic acid (protonated) SMARTS match = [CX3](=O)([OH1]) [OX2H1]([C](=O))
@@ -260,10 +261,86 @@ multipole   404  408  402              -0.46637
 * The second line contain the dipole
 * The last lines contain the quadrupole matrix
 
+#### Poltype Log File
+* Contains useful information on the status of the program and which current step in the flow diagram it is in
+* Will print errors at the bottom of the log file
+* Example flow for water molecule is show below
+1) Geometry Optimization
+2) QM SP for GDMA
+3) Call GDMA using the genreated QM to obtain multipoles
+4) Call POLEDIT for generating initial guess multipoles, polarize parameters 
+5) Average multipole and polarize parameter values via atom type
+6) Compute higher level QM SP for multipole refinement
+7) Generate grid files for multipole fitting
+8) Perform multipole refinement to high level QM
+9) Check multipole fit quality
+10) Add valence parameters to key file
+11) Compare final minimized MM structure to geometry optimized QM structure
+12) Compare QM dipole to MM dipole
+```
+Fri Apr  1 16:27:28 2022 Running on host: node74.bme.utexas.edu
+Fri Apr  1 16:27:28 2022 Calling: Psi4 Optimization
+Fri Apr  1 16:27:28 2022 Percent of jobs finished 0.0
+Fri Apr  1 16:27:28 2022 Calling: psi4 water_3D-opt_1.psi4 water_3D-opt_1.log path = /home/bdw2292/PoltypeJobs/SymmetryWat
+er/Temp
+Optimizer: Optimization complete!
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+Fri Apr  1 16:27:30 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/SymmetryWater/Temp/water_3D-opt_1.log path=
+/home/bdw2292/PoltypeJobs/SymmetryWater/Temp
+Fri Apr  1 16:27:31 2022 Searching database for parameters
+Fri Apr  1 16:27:31 2022 Calling: Psi4 Gradient for DMA
+Fri Apr  1 16:27:31 2022 Percent of jobs finished 0.0
+Fri Apr  1 16:27:31 2022 Calling: psi4 water_3D-dma.psi4 water_3D-dma.log path = /home/bdw2292/PoltypeJobs/SymmetryWater/T
+emp
+Fri Apr  1 16:27:33 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/SymmetryWater/Temp/water_3D-dma.log path=/h
+ome/bdw2292/PoltypeJobs/SymmetryWater/Temp
+Fri Apr  1 16:27:33 2022 NEED DMA: Executing GDMA
+Fri Apr  1 16:27:33 2022 Calling: /opt/gdma/gdma-2.3.3/bin/gdma < water_3D.gdmain > water_3D.gdmaout path = /home/bdw2292/
+PoltypeJobs/SymmetryWater/Temp
+Fri Apr  1 16:27:33 2022 Calling: poledit 1 water_3D.gdmaout /home/bdw2292/poltype2/ParameterFiles/amoebabio18_header.prm
+< water_3D-peditin.txt path = /home/bdw2292/PoltypeJobs/SymmetryWater/Temp
+Fri Apr  1 16:27:45 2022 Calling: /home/bdw2292/poltype2/PoltypeModules/avgmpoles.pl water_3D_prefitmultipole.key water_3D
+.xyz water_3D-groups.txt water_3D.key_2 water_3D.xyz_2 401 path = /home/bdw2292/PoltypeJobs/SymmetryWater/Temp
+Fri Apr  1 16:27:34 2022 Calling: Psi4 Gradient for ESP
+Fri Apr  1 16:27:34 2022 Percent of jobs finished 0.0
+Fri Apr  1 16:27:34 2022 Calling: psi4 water_3D-esp.psi4 water_3D-esp.log path = /home/bdw2292/PoltypeJobs/SymmetryWater/T
+emp
+Fri Apr  1 16:27:45 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/SymmetryWater/Temp/water_3D-esp.log path=/h
+ome/bdw2292/PoltypeJobs/SymmetryWater/Temp
+Fri Apr  1 16:27:45 2022 Calling: Generating CUBE File from PSI4
+Fri Apr  1 16:27:45 2022 Calling: potential 2 water_3D_fortinker.cube path = /home/bdw2292/PoltypeJobs/SymmetryWater/Temp
+Fri Apr  1 16:27:47 2022 Calling: potential 6 combined.xyz -k water_3D.key_2 combined.pot N 0.1 path = /home/bdw2292/Polty
+peJobs/SymmetryWater/Temp
+Fri Apr  1 16:27:47 2022 Electrostatic Potential Comparison
+Fri Apr  1 16:27:47 2022 Calling: potential 5 combined.xyz -k water_3D_postfitmultipole.key combined.pot N > RMSPD.txt path = /home/bdw2292/PoltypeJobs/SymmetryWater/Temp
+Fri Apr  1 16:27:48 2022 RMSPD = 0.0877 Absolute tolerance is 1 kcal/mol and relative RMSPD=0.38% relative tolerance is 3%
+Fri Apr  1 16:27:48 2022 Calling: minimize testbondangleequilvalues.xyz -k testbondangleequilvalues.key 0.1 > testbondangleequilvalues.out path = /home/bdw2292/PoltypeJobs/SymmetryWater/Temp
+Fri Apr  1 16:27:48 2022 Calling: analyze testbondangleequilvalues.xyz_2 -k testbondangleequilvalues.key  d > testbondangleequilvaluesalz.out path = /home/bdw2292/PoltypeJobs/SymmetryWater/Temp
+Fri Apr  1 16:27:49 2022
+Fri Apr  1 16:27:49 2022 =========================================================
+Fri Apr  1 16:27:49 2022 Minimizing structure
+Fri Apr  1 16:27:49 2022 Calling: minimize -k final.key final.xyz 0.1 > Minimized_final.out path = /home/bdw2292/PoltypeJobs/SymmetryWater/Temp
+Fri Apr  1 16:27:49 2022
+Fri Apr  1 16:27:49 2022 =========================================================
+Fri Apr  1 16:27:49 2022 Structure RMSD Comparison
+Fri Apr  1 16:27:49 2022 Calling: superpose water_3D.xyz_2 final.xyz_2 1 N M N 0  > water_3D-superin.txt path = /home/bdw2292/PoltypeJobs/SymmetryWater/Temp
+Fri Apr  1 16:27:49 2022 RMSD = 0.000000 Tolerance is 1
+Fri Apr  1 16:27:49 2022 Calling: analyze water_3D.xyz_2 -k final.key em | grep -A11 Charge>MMDipole.txt path = /home/bdw2292/PoltypeJobs/SymmetryWater/Temp
+Fri Apr  1 16:27:50 2022 Relative error of 0.0005361930294906766 for QMDipole 1.865 and 1.866 for MMDipole  tolerance = 0.5 /home/bdw2292/PoltypeJobs/SymmetryWater/Temp
+Fri Apr  1 16:27:50 2022 Poltype Job Finished
+Fri Apr  1 16:27:50 2022 Poltype parameterization has completed successfully.
+```
+
 ### Parameterization Sanity Checks
+* MM = Molecular Mechanics (AMOEBA model), QM = Quantum Mechanics
 * Check for 2D coordinates and generates 3D coordinates at begining of program 
+* Check to ensure refined multipoles enable MM to model the QM potential grid well and raises error if not
+* Check to ensure QM and MM dipoles are very similar and raise error if not
+* Check to ensure the final minimized MM structure is similar to the geometry optimized QM structure and raises error if not
 * Check for any missing van der Waals at end of program parameters and raises error
 * Check for any missing multipole parameters at end of program and raises error
+
 
 
 ### Atom Type Classification
