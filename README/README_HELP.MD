@@ -2,15 +2,71 @@
 
 ### Advanced Program Usage Parameterization
 
+[Required Inputs Parameterization](#required-inputs-parameterization)
+
+[Controlling Resource Consumption](#controlling-resource-consumption)
+
+[Protonation State](#protonation-state)
+
+[Controlling Quantum Packages](#controlling-quantum-packages)
+
+[Atom Typing](#atom-typing)
+
+[Geometry Optimization](#geometry-optimization)
+
+[Distributed Multipole Analysis and Electrostatic Single Point](#distributed-multipole-analysis-and-electrostatic-single-point)
+
+[Torsion Parameterization](#torsion-parameterization)
+
+[Fragmenter](#fragmenter)
+
+[Van der Waals Parameterization](#van-der-waals-parameterization)
+
+### ForceBalance Poltype Wrapper
+
+[ForceBalance Poltype Wrapper Example](#forcebalance-poltype-wrapper-example)
+
+[ForceBalance Poltype Wrapper Keywords](#forcebalance-poltype-wrapper-keywords)
+
+[ForceBalance Poltype Wrapper Results](#forcebalance-poltype-wrapper-results)
+
+### Advanced Program Usage Molecular Dynamics
+
+[Required Inputs Molecular Dynamics](#required-inputs-molecular-dynamics)
+
+[Binding Free Energy](#binding-free-energy)
+
+[Solvation Free Energy](#solvation-free-energy)
+
+[Neat Liquid Simulation](#neat-liquid-simulation)
+
+[Generic Molecular Dynamics Inputs](#generic-molecular-dynamics-inputs)
+
+[Box Setup](#box-setup)
+
+[Minimization](#minimization)
+
+[Restraints](#restraints)
+
+[Equilibriation](#equilibriation)
+
+[Production Dynamics](#production-dynamics)
+
+[Free Energy](#free-energy)
+
+[Mutation](#mutation)
+
+
 #### Notes
 * All booleans can switch their truth value, i.e., addhydrogens=True or addhydrogens=False
 * For very large molecules initial opt, DMA and ESP may require large amounts of memory if quantum job consistently crashes
 * Defaults are chosen specifically for maximizing accuracy and efficiency (without sacrificing accuracy)
+* Be careful when changing optimization methods and coordinates without deleting previous XYZ files, DMA and ESP, fchk, cube files, this can cause eletrostaic fitting errors where your grid does not correspond to the potential file from the new coordaintes. 
 
 
-#### Required Inputs
-``structure`` specifies input structure for poltype as an SDF file. Must include bond orders consistent with desired total charge.
- * Default=None
+
+#### Required Inputs Parameterization
+``structure`` specifies input structure for poltype as an SDF file. Must include bond orders consistent with desired total charge. Default is None.
 
 
 
@@ -64,7 +120,7 @@
 ``generateextendedconf`` specifies to use extended conformation for geometry optimization with torsions restrained. Default is True.
 
 
-#### Distributed Multipole Analysis (DMA) and Electrostatic Single Point (ESP) 
+#### Distributed Multipole Analysis and Electrostatic Single Point
 
 
 ``dmamethod``  specifies which quantum method to use for distributed multipole analysis (DMA). Default is MP2.
@@ -130,7 +186,7 @@
 
 
 
-#### Van der Waals Parameterization.
+#### Van der Waals Parameterization
 
 ``dovdwscan``                specifies to not refine initial guess vdw parameters from database assignment with ab initio dimer data. Default is False.
 
@@ -143,16 +199,6 @@
 ``fixvdwtyperadii`` specifies list of vdwtypes to fix radius in fitting (can let other vdw parameters fit). Default has no value.
 
 
-
-#### FAQ
-* Q)If I want to change QM methods/basis set do I need to restart POLTYPE job from scratch?
-  A)No, POLTYPE will look for output files from QM (see README.MANIFEST) to see if it needs to perform a job or continue. So you can delete the outputlog file, change your input options and resubmit POLTYPE job.
-
-#### Tips
-* Be careful when changing optimization methods and coordinates without deleting previous XYZ files, DMA and ESP, fchk, cube files, this can cause eletrostaic fitting errors where your grid does not correspond to the potential file from the new coordaintes. 
-
-#### Common Errors
-* Error: segmentation violation, this usually means an issue related to memory (not enough RAM or disk).  
 
 
 ### ForceBalance Poltype Wrapper
@@ -224,7 +270,13 @@ WQ_PORT=9013
 ### Advanced Program Usage Molecular Dynamics
 
 
-#### Binding Inputs
+#### Required Inputs Molecular Dynamics
+``ligandxyzfilename``  specifies the input tinker XYZ filename for the ligand. Default has no value.
+
+``keyfilename`` specifies input tinker key file for the ligand parameters. Default is None.
+
+
+#### Binding Free Energy
 
 ``binding`` specifies to compute solvation and complexation free energies and combine for binding free energy. Default is False.
 
@@ -235,12 +287,44 @@ WQ_PORT=9013
 ``receptorligandxyzfilename``   specifies tinker XYZ file contains ligand and protein. This is automatically generated when the above complexedproteinpdbname is given. Default has no value.
                                       
                                       
-#### Solvation Inputs
+#### Solvation Free Energy
 ``solvation``   specifies to do solvation simulations. Default is False.
 
 ``salthfe``     specifies whether to compute salt hydration free energy.  Default is True.
 
-#### Box Setup Inputs
+#### Neat Liquid Simulation
+
+``neatliquidsim``  specifies to do neat liquid simualtion. Default is False.
+
+#### Generic Molecular Dynamics Inputs 
+
+``integrator``  specifies the MD integrator method. Default is RESPA.
+
+``thermostat``  specifies the thermostat method during NVT MD. Default is BUSSI.
+
+``barostatmethod``  specifies the barostat method used during NPT. Default is montecarlo.
+
+``vdwcutoff``   specifies the cutoff radius for van der Waals interactions. Units in angstroms. Default is 12.
+
+``ewaldcutoff`` specifies the cutoff radius for electrostatic interactions. Units in angstroms. Default is 7.
+
+``polareps``    specifies the Grid spacing for electrostatic potential surface. Default is .00001.
+
+``templateligandxyzfilename``   specifies input template tinker XYZ filename for aligning ligandxyzfilename to templateligandxyzfilename. Program will quit after alignment. Default has no value. 
+
+``externalapi`` specifies external script path for submitting MD jobs. Used with submitjobs.py. If user creates their own submission script, must edit submitjobs.py to work with it. Default is to submit jobs on local node. The submission script needs to be able to handle
+correct assignment of tinker envioronments on whichever CPU/GPU cluster it operates on. If using RenLabCluster please read the file on https://github.com/bdw2292/RenLabCluster. Default has no value.
+
+
+``numproc`` specifies the number of threads to use for CPU dynamics. Default is 1.
+
+``prmfilepath`` specifies the path to parameters. Default is amoebabio18.prm.
+
+``simulationstostopfolderpath``  specifies a directory containing subdirectories of input jobs, recursive search will and *.end files to each folder with an *.arc file to stop simulations. Upon restarting program all *.end files that are in folders are automatically removed. Default has no value.
+
+
+
+#### Box Setup
 
 ``density`` specifies the density of neat liquid box in kg/m^3. Default has no value.
 
@@ -262,7 +346,7 @@ WQ_PORT=9013
 ``boxonly`` specifies to stop program after making box. Default is False.           
 
 
-#### Minimization Inputs
+#### Minimization
 
 ``restrainpositionconstant`` specifies the restraint position force constant during minimization for freezing the ligand and protein. Units in kcal/mol/Ang^2.  
                                         
@@ -271,7 +355,7 @@ WQ_PORT=9013
 ``minonly`` specifies to quit after minimization is complete. Default is False.
 
 
-#### Restraint Inputs
+#### Restraints
 
 ``restrainatomgroup1``  specifies the group of atoms (protein or ligand) used for tinker group restraints. If not specified, will be automatically determine (for group restraints during equilbriation). Default has no value.
 
@@ -285,7 +369,7 @@ WQ_PORT=9013
                          
 
 
-#### Equilibriation Inputs
+#### Equilibriation
 
 ``equilrestrainsphereradius``   specifies the sphere radius for protein atoms to restrain position during equilibriation. Units angstroms. Default is 2.
 
@@ -311,7 +395,7 @@ WQ_PORT=9013
 ``equilonly``   specifies to stop program after equilibriation and setup for production dynamics. Default is False.
 
 
-#### Production Dynamics Inputs
+#### Production Dynamics
 
 ``productiondynamicsNVT``   specifies whether or not to use NVT ensemble during production dynamics. If on then will use NPT after equilbriating to determine average box size. Default is False.
 
@@ -328,60 +412,27 @@ WQ_PORT=9013
 
 ``proddyntimestep`` specifies the MD time step during production dynamics. Units in fs. Default is 2.
 
+``checktraj``   specifies to check each trajectory for any corruption and delete if found. Default is False (slow to read each arc file).
 
 
+#### Free Energy
 
-#### Generic Inputs 
-
-
-``integrator``  specifies the MD integrator method. Default is RESPA.
-
-``thermostat``  specifies the thermostat method during NVT MD. Default is BUSSI.
-
-
-``vdwcutoff``   specifies the cutoff radius for van der Waals interactions. Units in angstroms. Default is 12.
-
-``ewaldcutoff`` specifies the cutoff radius for electrostatic interactions. Units in angstroms. Default is 7.
-
-``polareps``    specifies the Grid spacing for electrostatic potential surface. Default is .00001.
-
-``neatliquidsim``  specifies to do neat liquid simualtion. Default is False.
-
-
-``ligandxyzfilename``  specifies the input tinker XYZ filename for the ligand. Default has no value.
-
-``templateligandxyzfilename``   specifies input template tinker XYZ filename for aligning ligandxyzfilename to templateligandxyzfilename. Program will quit after alignment. Default has no value. 
-
-``keyfilename`` specifies input tinker key file for the ligand parameters. Default is None.
-
-``externalapi`` specifies external script path for submitting MD jobs. Used with submitjobs.py. If user creates their own submission script, must edit submitjobs.py to work with it. Default is to submit jobs on local node. The submission script needs to be able to handle
-correct assignment of tinker envioronments on whichever CPU/GPU cluster it operates on. If using RenLabCluster please read the file on https://github.com/bdw2292/RenLabCluster. Default has no value.
-
-
-``numproc`` specifies the number of threads to use for CPU dynamics. Default is 1.
-
-``prmfilepath`` specifies the path to parameters. Default is amoebabio18.prm.
 
 ``perturbkeyfilelist``  specifies a comma seperated list of keyfiles to add to end state and perturb with BAR. Right most item in the list is the end state. By default, arc file from nearestneighboring trajectory is used if fep is turned on, otherwise running MD for new state is default. Default has no value.
 
 ``numinterpolsforperturbkeyfiles``  specifies a comma seperated list of number of interpolations per key file in perturbkeyfilelist (they should be same length). Use 1 for keyfiles that need only one interpolation (just between neighboring states), otherwise parameters will be interpolated via step=(b-a)/n where n is number of interpolations for that keyfile. Default is 1 for all keys in perturbkeyfilelist.
 
-``simulationstostopfolderpath``  specifies a directory containing subdirectories of input jobs, recursive search will and *.end files to each folder with an *.arc file to stop simulations. Upon restarting program all *.end files that are in folders are automatically removed. Default has no value.
-
 ``expfreeenergy``  specifies the experimental free energy for comparison in output tables. Default has no value.
 
 
-``fep`` specifies to copy nearest MD trajectory instead of running MD for each new keyfile to be perturbed. Used with perturbkeyfilelist keyword. Default is False. 
+``fep`` specifies to copy nearest MD trajectory instead of running MD for each new keyfile to be perturbed. Used with perturbkeyfilelist keyword. Default is False.
 
-
-``checktraj``   specifies to check each trajectory for any corruption and delete if found. Default is False (slow to read each arc file).
 
 ``pathtosims``  specifies path to folder containing subfolders of simulations for combining simulation data into one spreadsheet. Will exit program after combining data. Default has no value. 
 
-``barostatmethod``  specifies the barostat method used during NPT. Default is montecarlo.
 
 
-#### Mutation Inputs
+#### Mutation
 
 ``bgnstatekey``  specifies the first state key file for mutation. Default has no value.
 
