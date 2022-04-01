@@ -28,6 +28,13 @@ Given an input chemical structure, all parameters can be automatically assigned 
 
 * **Figure 1**. Overview of automated parameterization scheme for Poltype 2. Green boxes indicate input and output. Blue boxes indicate actions performed and the red rhombus indicates and intermediate output.
 
+## Please Cite
+
+Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameterization for small molecules. Theor Chem Acc. 2012 Feb 26;131(3):1138. doi: 10.1007/s00214-012-1138-6. PMID: 22505837; PMCID: PMC3322661.
+
+## License
+[Tinker License](https://github.com/TinkerTools/tinker/blob/release/LICENSE.pdf)
+
 ## 📚 Documentation Overview 
 * Please read 👇🙏
 
