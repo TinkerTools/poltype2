@@ -38,7 +38,13 @@
 
 [Molecular Dynamics Preparation](#molecular-dynamics-preparation)
 
-[Minimum Example Usage Molecular Dynamics](#minimum-example-usage-molecular-dynamics)
+[Minimum Input Example Binding Free Energy](#minimum-input-example-binding-free-energy)
+
+[Minimum Input Example Solvation Free Energy](#minimum-input-example-solvation-free-energy)
+
+[Minimum Input Example Neat Liquid Simulation](#minimum-input-example-neat-liquid-simulation)
+
+
 
 [💻 Advanced Program Usage](README/README_HELP.MD)
 
@@ -275,15 +281,14 @@ nohup python /path_to_poltype/poltype.py &
 ### Molecular Dynamics Preparation
 * Ligand XYZ and key files are required (such as final.xyz and final.key from Poltype parameterization). 
 * For binding free energy compuations, either a host PDB or premade tinker XYZ is required 
-
-### Minimum Example Usage Molecular Dynamics
 * Inputs are inside poltype.ini
 * Make sure pdb files (complexed and uncomplexed) have no missing residues or atoms.
 * Charge is read from input XYZ files generated.
 * Make sure if using custom receptor parameters, then either adding to keyfilename or in prmfilepath
 * Use submitlocally=False if you do not wish to submit dynamics jobs locally.
 * For HFE, if your ligand is charged and you do not want to compute the salt hydration free energy, add "salthfe=False"
-#### Minimum Input Example Binding
+
+#### Minimum Input Example Binding Free Energy
 
 ```
 complexedproteinpdbname=anilinecomp.pdb 
@@ -301,7 +306,7 @@ keyfilename=complex.key
 ligandxyzfilename=ligand.xyz
 ```
 
-#### Minimum Input Example Solvation (HFE)
+#### Minimum Input Example Solvation Free Energy
 
 ```
 solvation
@@ -309,7 +314,7 @@ keyfilename=aniline.key
 ligandxyzfilename=aniline.xyz
 ```
 
-#### Minimum Input Example Neat Liquid  
+#### Minimum Input Example Neat Liquid Simulation
 ```
 neatliquidsim
 density=997
