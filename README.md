@@ -1,5 +1,13 @@
 # Automation of AMOEBA Polarizable Force Field for Small Molecules - Poltype 2
 
+## Obejective
+Given an input chemical structure, all parameters can be automatically assigned from a database or derived via fitting to ab initio data generated on the fly. **Fig. 1** depicts an overview of the parameterization process. 
+
+[![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
+
+[![GitHub issues](https://img.shields.io/github/issues/TinkerTools/poltype2)](https://github.com/TinkerTools/poltype2/issues) 
+
+
 ## 📚 Documentation Overview 
 * Please read 👇🙏
 
@@ -13,6 +21,8 @@
 [Minimum Example Usage Parameterization](#minimum-example-usage-parameterization)
 
 [💻 Advanced Program Usage](README/README_HELP.MD)
+
+### Automated AMOEBA Ligand Parameterization - How It Works
 
 [⚛️ Atom Type Classification](#atom-type-classification)
 
@@ -45,8 +55,9 @@
 [Minimum Input Example Neat Liquid Simulation](#minimum-input-example-neat-liquid-simulation)
 
 
-
 [💻 Advanced Program Usage](README/README_HELP.MD)
+
+### Automated AMOEBA Molecular Dynamics and Free Energy Prediciton - How It Works
 
 [Box Setup](#box-setup)
 
@@ -56,8 +67,7 @@
 
 [Production Dynamics and Free Energy Prediction](#production-dynamics-and-free-energy-prediction)
 
-### Obejective
-Given an input chemical structure, all parameters can be automatically assigned from a database or derived via fitting to ab initio data generated on the fly. **Fig. 1** depicts an overview of the parameterization process. 
+
 
 
 <img src="README/Images/PoltypeFlow.PNG" width="40%">
