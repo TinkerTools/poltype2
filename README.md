@@ -164,6 +164,11 @@ atom          405    405    H     "glycine             "         1     1.008    
 atom          407    407    H     "glycine             "         1     1.008    1
 atom          408    408    H     "glycine             "         1     1.008    1
 ```
+* First number is the "type" number and the second number is the "class" number. 
+* Multipole and Polarize parameters always use type numbers due to the highly specific electrostatic envioronment. 
+* All other parameter types use "class" numbers and are less specific.
+* By default, poltype uses the same class numbers as type numbers.
+
 ##### Van der Waals Parameter Definitions Example
 
 ```
@@ -171,7 +176,11 @@ atom          408    408    H     "glycine             "         1     1.008    
 # [401] = [[4]]
 vdw 401 3.8200 0.1010
 ```
-
+* All type lines have a line above indicating which indices it corresponds to ([401] = [[4]]), where type number 401 has indices of 4 that correspond to it.
+* This type of comment is a match to the amoeba09 database of parameters.
+* ['[#7](-[#6](-[#6])(-[#1])-[#1])(-[#1])-[#1]', [2]] the first item in this list is a SMARTS string matching to the input molecule, the second item in the list specifies which atom in order (start counting from 1 on the left) that the match for the vdW atom corresponds to. 
+* [['[#7](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H]', [2]]] similarly, the first item in this list is a SMILES from a molecule in the amoeba09 database. The seocnd item in the list is the atom in the SMARTS that the match corresponds to.
+* [[('C', '"Ethyl Amine CH2"')]] this is a list of the atom class descriptions that are matched from the amoeba09 database
 
 ##### Bond Parameter Definitions Example
 ```
@@ -179,6 +188,8 @@ vdw 401 3.8200 0.1010
 # [402, 404] = [[5], [1]]
 bond 402 404 326.272386 1.36
 ```
+* This type of comment is a match to the newer "amoeba21" database. 
+* The SMARTS string match environment is given by [CX3](=O)([OH1]) [OX2H1]([C](=O)), where there is a space between the SMARTS for each atom.
 
 ##### Angle Parameter Definitions Example
 ```
@@ -208,6 +219,9 @@ strbnd 406 402 404 7.6289 7.6289
 # torsion % [#6](-[#6](-[#8]-[H])=[#8])(-[#7](-[H])-[H])(-[H])-[H] % 5,2,3,4 % -3.883,-0.434,4.077
 torsion 403 401 402 404 -3.883 0.0 1 -0.434 180.0 2 4.077 0.0 3
 ```
+* The line that starts with "Fitted from Fragment" , indicates which fragment the torsion parameters were derived from (from fragment 5_1_Index_0.mol) for debugging purposes
+* torsion atom indexes = 7,1,2,3, indicates the atom indices that the torsion belongs too in the fragment molecule
+* with smarts torsion indices 5,2,3,4 indicates the atom order in the SMARTS string corresponding to the torsion
 
 ##### Solute Parameter Definitions Example
 ```
@@ -232,6 +246,8 @@ multipole   404  408  402              -0.46637
                                        -0.09766    0.00000    0.53768
 
 ```
+
+
 
 ### Atom Type Classification
 * A substructure search is done on the input molecule to define atoms that belong to the same atom type. 
