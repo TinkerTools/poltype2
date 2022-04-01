@@ -42,6 +42,8 @@
 
 [Generic Molecular Dynamics Inputs](#generic-molecular-dynamics-inputs)
 
+[Available Integrators Barostats and Thermostats](#available-integrators-barostats-and-thermostats)
+
 [Box Setup](#box-setup)
 
 [Minimization](#minimization)
@@ -321,6 +323,30 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 ``prmfilepath`` specifies the path to parameters. Default is amoebabio18.prm.
 
 ``simulationstostopfolderpath``  specifies a directory containing subdirectories of input jobs, recursive search will and *.end files to each folder with an *.arc file to stop simulations. Upon restarting program all *.end files that are in folders are automatically removed. Default has no value.
+
+#### Available Integrators Barostats and Thermostats
+
+##### Integrators
+
+* Verlet                    ``integrator=verlet``
+* Beeman                    ``integrator=beeman``
+* RESPA                     ``integrator=respa``
+
+
+##### Barostats
+
+* Berendsen                ``barostat=berendsen``
+* Monte-Carlo              ``barostat=montecarlo``
+* Lagevin                  ``barostat=Langevin``
+
+##### Thermostats
+
+* Bussi-Parrinello          ``thermostat=bussi``
+* Berendsen                 ``thermostat=berendsen``
+* Andersen Stochastic       ``thermostat=andersen``
+* Nose-Hoover               ``thermostat=nose-hoover``
+
+
 
 
 
