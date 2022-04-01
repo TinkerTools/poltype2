@@ -398,7 +398,7 @@ nohup python /path_to_poltype/poltype.py &
 
 
 ### Production Dynamics and Free Energy Prediction
-*	BAR is used for alchemical free energy perturbation via electrostatic and van der Waals decoupling between the system and the environment. Typically, the system consists of the ligand, whereas the environment is the host and surrounding water and ions.  The default electrostatic and vdW decoupling scheme consists of 26 windows 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1 for electrostatics and 0,.45,.52,.56,.58,.6,.62,.64,.67,.7,.75,.8,.85,.9,.95,1,1,1,1,1,1,1,1,1,1,1 for vdW. 
+*	BAR is used for alchemical free energy perturbation via electrostatic and van der Waals decoupling between the system and the environment. Typically, the system consists of the ligand, whereas the environment is the host and surrounding water and ions.  The default electrostatic, vdW and protein-ligand restraints (for binding use restraint scheme) is shown below, where E is for electrostatics, V for van der Waals and R for restraints.
 *	For host-guest complexes, there is an additional group restraint scheme, such that at full electrostatics and vdW there are no group restraints. For the rest of the electrostatic and vdW pairs, the restraint is used at 100% (default of 10 kcal/mol/angstrom flat bottom restraint).
 *	A folder for complexation and/or solvation simulations is generated. Keywords for each electrostatic, vdW, restraint force constant tuples are added to the keyfiles in each folder. The last frame from equilibration is copied to each folder as the starting point for production dynamic simulations.
 *	For binding free energy simulations, counterions charges are modified corresponding to each electrostatic lambda step (only N are modified where N is charge of ligand). This allows for the net charge of the box to reman 0 during simulation to avoid charge artifacts from ewald. 
@@ -409,6 +409,34 @@ nohup python /path_to_poltype/poltype.py &
 *	By default, NPT is used for production dynamics. 
 *	Output free energy changes, enthalpy changes, entropy changes are recorded and tabulated in CSV files for user convenience. 
 
+```
+ E    V    R
+ 1    1    0
+.9    1    1
+.8    1    1
+.7    1    1
+.6    1    1
+.5    1    1
+.4    1    1
+.3    1    1
+.2    1    1
+.1    1    1
+ 0    1    1
+ 0   .95   1
+ 0   .9    1
+ 0   .85   1
+ 0   .75   1
+ 0   .7    1
+ 0   .67   1
+ 0   .64   1
+ 0   .62   1
+ 0   .6    1
+ 0   .58   1
+ 0   .56   1
+ 0   .52   1
+ 0   .45   1
+ 0    0    1
+```
 
 
 ### AMOEBA Publications
