@@ -5,7 +5,23 @@ Given an input chemical structure, all parameters can be automatically assigned 
 
 [![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
 
-[![GitHub issues](https://img.shields.io/github/issues/TinkerTools/poltype2)](https://github.com/TinkerTools/poltype2/issues) 
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
+
+
+[contributors-shield]: https://img.shields.io/github/contributors/TinkerTools/poltype2.svg?style=for-the-badge
+[contributors-url]: https://github.com/TinkerTools/poltype2/forks/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/TinkerTools/poltype2.svg?style=for-the-badge
+[forks-url]: https://github.com/TinkerTools/poltype2/network/members
+[stars-shield]: https://img.shields.io/github/stars/TinkerTools/poltype2.svg?style=for-the-badge
+[stars-url]: https://github.com/TinkerTools/poltype2/stargazers
+[issues-shield]: https://img.shields.io/github/issues/TinkerTools/poltype2.svg?style=for-the-badge
+[issues-url]: https://github.com/TinkerTools/poltype2/issues
+[license-shield]: https://img.shields.io/github/license/TinkerTools/poltype2.svg?style=for-the-badge
+[license-url]: https://github.com/TinkerTools/tinker/blob/release/LICENSE.pdf
 
 
 ## 📚 Documentation Overview 
@@ -96,7 +112,7 @@ nohup python /path_to_poltype/poltype.py &
 ```
 
 ```final.xyz``` and ```final.key``` are the resulting structure and parameter files you will need.
-* After poltype finishes, check the OPENME folder for torsion fitting and ESP fitting results. 
+* After poltype finishes, check the ``OPENME`` folder for torsion fitting and ESP fitting results. 
 
 ### Atom Type Classification
 * A substructure search is done on the input molecule to define atoms that belong to the same atom type. 
