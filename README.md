@@ -43,66 +43,115 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 ### Automated AMOEBA Ligand Parameterization 
 
-[Parameterization Input Preparation](#parameterization-input-preparation)
+#### [Parameterization Input Preparation](#parameterization-input-preparation)
 
-[Minimum Example Usage Parameterization](#minimum-example-usage-parameterization)
+#### [Minimum Example Usage Parameterization](#minimum-example-usage-parameterization)
 
-[💻 Advanced Program Usage](README/README_HELP.MD)
+#### [💻 Advanced Program Usage](README/README_HELP.MD)
 
-[Parameterization Output Files](#parameterization-output-files)
+#### [Parameterization Output Files](#parameterization-output-files)
 
-[Parameterization Sanity Checks](#parameterization-sanity-checks)
+* ##### [Final XYZ File](#final-xyz-file)
+
+* ##### [Final Key File](#final-key-file)
+
+    * ###### [Atom Type Definitions Example](#atom-type-definitions-example)
+
+    * ###### [Van der Waals Parameter Definitions Example](#van-der-waals-parameter-definitions-example)
+
+    * ###### [Bond Parameter Definitions Example](#bond-parameter-definitions-example)
+
+    * ###### [Angle Parameter Definitions Example](#angle-parameter-definitions-example)
+
+    * ###### [Stretch Bend Parameter Definitions Example](#stretch-bend-parameter-definitions-example)
+
+    * ###### [Out of Plane Bend Parameter Definitions Example](#out-of-plane-bend-parameter-definitions-example)
+
+    * ###### [Torsion Parameter Definitions Example](#torsion-parameter-definitions-example)
+
+    * ###### [Solute Parameter Definitions Example](#solute-parameter-definitions-example)
+
+    * ###### [Polarize Parameter Definitions Example](#polarize-parameter-definitions-example)
+
+    * ###### [Multipole Parameter Definitions Example](#multipole-parameter-definitions-example)
+
+* ##### [Poltype Log File](#poltype-log-file)
+
+* ##### [OPENME Plots](#openme-plots)
+
+#### [Parameterization Sanity Checks](#parameterization-sanity-checks)
+
+#### [Parameterization Examples](Examples/Parameterization)
 
 ### Automated AMOEBA Ligand Parameterization - How It Works
 
-[⚛️ Atom Type Classification](#atom-type-classification)
+#### [⚛️ Atom Type Classification](#atom-type-classification)
 
-[QM Geometry Optimization](#qm-geometry-optimization)
+#### [QM Geometry Optimization](#qm-geometry-optimization)
 
-[⚡ Electrostatic Parameterization](#electrostatic-parameterization)
+#### [⚡ Electrostatic Parameterization](#electrostatic-parameterization)
 
-[🔍 Multipole Frame Detection](#multipole-frame-detection)
+* ##### [🔍 Multipole Frame Detection](#multipole-frame-detection)
 
-[🔍 Database Search](#database-search)
+#### [🔍 Database Search](#database-search)
 
-[Fragmentation](#fragmentation)
+* ##### [Polarizability Parameter Search](#polarizability-parameter-search)
 
-[Van der Waals Refinement](#van-der-waals-refinement)
+* ##### [Valence Parameter Search](#valence-parameter-search)
 
-[One-dimensional Torsion](#one-dimensional-torsion)
+* ##### [Van der Waals Parameter Search](#van-der-waals-parameter-search) 
 
-[Coupled Torsion Torsion](#coupled-torsion-torsion)
+* ##### [Torsion Parameter Search](#torsion-parameter-search) 
 
-[Non-aromatic Ring Torsions](#non-aromatic-ring-torsions)
+* ##### [Torsion Torsion Parameter Search](#torsion-torsion-parameter-search) 
+
+#### [Fragmentation](#fragmentation)
+
+#### [Van der Waals Refinement](#van-der-waals-refinement)
+
+#### [One-dimensional Torsion](#one-dimensional-torsion)
+
+#### [Coupled Torsion Torsion](#coupled-torsion-torsion)
+
+#### [Non-aromatic Ring Torsions](#non-aromatic-ring-torsions)
 
 ### Automated AMOEBA Molecular Dynamics and Free Energy Prediciton
 
-[Molecular Dynamics Input Preparation](#molecular-dynamics-input-preparation)
+#### [Molecular Dynamics Input Preparation](#molecular-dynamics-input-preparation)
 
-[Minimum Input Example Binding Free Energy](#minimum-input-example-binding-free-energy)
+#### [Minimum Input Example Binding Free Energy](#minimum-input-example-binding-free-energy)
 
-[Minimum Input Example Solvation Free Energy](#minimum-input-example-solvation-free-energy)
+#### [Minimum Input Example Solvation Free Energy](#minimum-input-example-solvation-free-energy)
 
-[Minimum Input Example Neat Liquid Simulation](#minimum-input-example-neat-liquid-simulation)
+#### [Minimum Input Example Neat Liquid Simulation](#minimum-input-example-neat-liquid-simulation)
 
-[Molecular Dynamics Sanity Checks](#molecular-dynamics-sanity-checks)
+#### [Molecular Dynamics Sanity Checks](#molecular-dynamics-sanity-checks)
 
+#### [Free Energy Output Files](#free-energy-output-files)
 
-[💻 Advanced Program Usage](README/README_HELP.MD)
+#### [Hydration Free Energy Examples](Examples/HFE)
+
+#### [Ion Hydration Free Energy Examples](Examples/IonHFE)
+ 
+#### [Binding Free Energy Examples](Examples/BindingFE)
+
+#### [💻 Advanced Program Usage](README/README_HELP.MD)
 
 ### Automated AMOEBA Molecular Dynamics and Free Energy Prediciton - How It Works
 
-[Box Setup](#box-setup)
+#### [Box Setup](#box-setup)
 
-[Charge Correction For Charged Ligand HFE](#charge-correction-for-charged-ligand-hfe)
+#### [Charge Correction For Charged Ligand HFE](#charge-correction-for-charged-ligand-hfe)
 
-[Minimization](#minimization)
+#### [Minimization](#minimization)
 
-[Equilibration](#equilibration)
+#### [Equilibration](#equilibration)
 
-[Production Dynamics and Free Energy Prediction](#production-dynamics-and-free-energy-prediction)
+#### [Production Dynamics and Free Energy Prediction](#production-dynamics-and-free-energy-prediction)
 
-[AMOEBA Publications](#amoeba-publications)
+#### [Tinker Key Defaults](#tinker-key-defaults)
+
+#### [AMOEBA Publications](#amoeba-publications)
 
 
 
@@ -208,7 +257,7 @@ angle 406 402 404 109.848375 123.34
 ```
 * The first number in the angle parameter line is force constant and the second is the equilbrium angle length
 
-##### Stretch-Bend Parameter Definitions Example
+##### Stretch Bend Parameter Definitions Example
 ```
 # updated valence parameter database match, comments=O=C, Oxygen of carbonyl group, Acetic Acid C=O, sp2 carbon, carboxylic ester OCO, Oxygen of Carboxylic acid (protonated) SMARTS match = [OX1]=[CX3][OH1] [CX3](=O)([OH1]) [OX2H1]([C](=O))
 # [406, 402, 404] = [[2], [5], [1]]
@@ -216,7 +265,7 @@ strbnd 406 402 404 7.6289 7.6289
 ```
 
 
-##### Out-of-Plane Bend Parameter Definitions Example
+##### Out of Plane Bend Parameter Definitions Example
 ```
 # updated valence parameter database match, comments=C=O, sp2 carbon, carboxylic ester OCO, Oxygen of Carboxylic acid (protonated) SMARTS match = [CX3](=O)([OH1]) [OX2H1]([C](=O))
 # [404, 402] = [[1], [5]]
@@ -322,6 +371,9 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 
 ```
 
+#### OPENME Plots
+
+
 ### Parameterization Sanity Checks
 * MM = Molecular Mechanics (AMOEBA model), QM = Quantum Mechanics
 * Check for 2D coordinates and generates 3D coordinates at begining of program 
@@ -334,7 +386,7 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 
 
 ### Atom Type Classification
-* A substructure search is done on the input molecule to define atoms that belong to the same atom type. 
+* Openbabels GraphAutomorphism function is used to find all permutations that map to the equivalent graph. 
 * This is done using an array of graph invariants, such as graph theoretical distance, valence, aromaticity, ring atom, atomic number, bond sum, and formal charge computed via the openbabel toolkit. 
 
 ### QM Geometry Optimization
@@ -355,7 +407,7 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 * **Fig 2.** For a set of atoms {a,b,c},{a,b,c,d}, or {a,b,c,d,e}, local coordinate systems are defined by detecing symmetry and assigning the appropriate coordinate system. The top left of the figure shows the bisector frame (bisecting the angle \angle\ BAC). The top middle shows the z-then-x frame (vector from c to a defines +Z). The top right is the z-only frame (vector from a to b defines +Z). The bottom left shows the bisector-then-x frame, wherein the vector from d to a defines +Z, and the bisector of \angle\ BAC in the plane containg a,b,c defines +X. Finally, the bottom right shows the trisector frame. For Y-axes (not shown), this is defined relative to a right handed coordinate system convention with the exception of z-only, bisector and trisector frames, which have no defined X- or Y-axis.
 
 
-### Multipole Frame Detection
+#### Multipole Frame Detection
 * Multipole frame detection falls into a few categories: z-only, bisector, trisector, z-then-bisector and z-then-x as illustrated in **Fig. 2.** 
 * The optimal frames are selected automatically based on chemical environment and symmetry. Poltype uses a combination of symmetry type number, atomic number, and number of connected atoms to determine multipole frames for each atom. 
 * Bisector and trisector are similar to z-only in the sense that they both have one direction defined for multipoles (x- and y-axes are arbitrary); however, the bisector and trisector frames contain more information since they allow xx and yy components of quadrupole moment to be independent of each other. For z-only, xx and yy are defined to be of equal value. 
@@ -405,7 +457,7 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 * The fitting algorithm will still match the total energy from all torsions around the rotatable bond as close as possible to the QM energy. This reduces the number of parameters needed to be fit in an inherently underdetermined system of non-unique torsion parameters.
 * Partial double bonds in amide and acid functional groups are also removed from torsion parameterization, as they are inherently stiff. * Torsion parameters that are determined to be non-transferable are assigned the value of 0 for all force constants in the key file prior to fitting the torsion parameters to target QM data.
 
-#### Torsion-Torsion Parameter Search
+#### Torsion Torsion Parameter Search
 * Transferable parameters are defined for when all atoms of a-b-c-d-e (torsions a-b-c-d and b-c-d-e) match to the SMARTS string assigned, and all atoms of a-b-c-d-e match (fragment SMARTS database). 
 * If a-b-c-d matches to the database but b-c-d-e does not, and if torsion-torsion parameterization is enabled, a-b-c-d is also determined to be non-transferable, and then the torsion-torsion will be parameterized.
 
@@ -579,6 +631,8 @@ nohup python /path_to_poltype/poltype.py &
 * Check for missing parameters
 * Check total charge of all boxes for binding free energy alchemical perturbation have a net zero charge
 
+### Free Energy Output Files
+
 ### Box Setup
 
 *	For binding free energy computation, if a PDB is provided instead of a tinker XYZ file, then the tinker program pdbxyz is used to generate the XYZ file. This may result in adding additional hydrogens if missing from the PDB file (according to the residue label). 
@@ -661,6 +715,31 @@ nohup python /path_to_poltype/poltype.py &
  0    0    1
 ```
 
+### Tinker Key Defaults
+
+```
+c-axis 34.6
+b-axis 34.6
+a-axis 34.6
+OPENMP-THREADS 1
+polarization MUTUAL
+pme-order 5
+pme-grid 64 64 64 # If speed is a concern, set this mannually to be slightly bigger than simulation box size. E.g. use 64 is box is 62.23 (1.2x is the best but slower). 
+vdw-annihilate
+vdw-correction
+neighbor-list # this below requires your box is twice the cutoff plus 2-3 angstrom buffer (done by default)
+barostat montecarlo
+polar-predict
+polar-eps 1e-05 # the induced dipole convergence threshold
+ewald-cutoff 7 # we use such small cutoff because dipole/quadrupole die off faster than point charge.
+vdw-cutoff 12
+ewald
+thermostat BUSSI
+integrator RESPA #this multi-time step integrator allows TINKER to use 2 fs time step
+archive
+parameters amoebabio18.prm
+digits 8
+```
 
 ### AMOEBA Publications
 
