@@ -611,7 +611,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
         term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)
         if not term or overridecheckterm==True:
             
-            poltype.WriteToLog("NEED QM Density Matrix: Executing Gaussian Opt and SP")
+            poltype.WriteToLog("QM Geometry Optimization")
             gen_optcomfile(poltype,comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,chkoptfname,mol,modred,torsionrestraints)
             cmdstr = 'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + comoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+logoptfname}
@@ -651,8 +651,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
 
         inputname,outputname=CreatePsi4OPTInputFile(poltype,comoptfname,comoptfname,mol,modred,bondanglerestraints,skipscferror,charge,loose,torsionrestraints)
         if term==False or overridecheckterm==True:
-            
-            poltype.WriteToLog("Calling: " + "Psi4 Optimization")
+            poltype.WriteToLog("QM Geometry Optimization")
             cmdstr='psi4 '+inputname+' '+logoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}

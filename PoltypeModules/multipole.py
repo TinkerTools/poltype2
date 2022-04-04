@@ -151,6 +151,8 @@ def GrabNumberOfConnectedHydrogens(poltype,highestsymneighbnorepeat):
 
    
 def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
+    poltype.WriteToLog('Local Frame Symmetry Detection')
+    poltype.WriteToLog('Define Polarization Groups and Polarization Parameters')
     if poltype.usepoleditframes==False:
         lfzerox = [ False ] * mol.NumAtoms()
         atomindextoremovedipquad={} # for methane need to make dipole and quadupole on the carbon zeroed out, will return this for post proccesing the keyfile after poledit is run
@@ -619,7 +621,7 @@ def run_gdma(poltype):
     1. Generates the gdma input file by calling 'gen_gdmain'
     2. Runs the following command: gdma < *.gdmain > *.gdmaout
     """
-    poltype.WriteToLog("NEED DMA: Executing GDMA")
+    poltype.WriteToLog("Gaussian Distributed Multipole Analysis (GDMA)")
 
     if not os.path.isfile(poltype.fckdmafname):
         poltype.fckdmafname = os.path.splitext(poltype.fckdmafname)[0]

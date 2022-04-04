@@ -2342,8 +2342,8 @@ class PolarizableTyper():
                       if len(finishedjobs)!=0:
                           if 'poltype.py' in job:
                               self.ETAQMFinish(thepath,len(fulljobtooutputlog.keys()))
-                      
-                      self.WriteToLog('Percent of jobs finished '+str(ratio))
+                      if len(list(fulljobtooutputlog.keys()))>1: 
+                          self.WriteToLog('Percent of jobs finished '+str(ratio))
                       self.call_subsystem([job],wait,skiperrors)
                       submittedjobs.append(job)
                    
@@ -3212,6 +3212,8 @@ class PolarizableTyper():
         self.canonicallabel = [ 0 ] * mol.NumAtoms()
         self.localframe1 = [ 0 ] * mol.NumAtoms()
         self.localframe2 = [ 0 ] * mol.NumAtoms()
+        self.WriteToLog("Atom Type Classification")
+
         self.idxtosymclass,self.symmetryclass=symm.gen_canonicallabels(self,mol) 
  
         # QM calculations are done here
@@ -3289,7 +3291,7 @@ class PolarizableTyper():
             self.use_gausoptonly=False
             self.use_gaus=False
         if not os.path.isfile(self.key4fname) or not os.path.isfile(self.torsionsmissingfilename) or not os.path.isfile(self.torsionprmguessfilename):
-            self.WriteToLog('Searching database for parameters')
+            self.WriteToLog('Searching Database')
             bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,missingvdwatomindextoneighbors,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo,tortorsmissing=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
         if os.path.isfile(self.torsionsmissingfilename):
             torsionsmissing=databaseparser.ReadTorsionList(self,self.torsionsmissingfilename)
@@ -3368,11 +3370,13 @@ class PolarizableTyper():
         # Does this using the script avgmpoles.pl which is found in the poltype directory
         # Atoms that belong to the same symm class will now have only one common multipole definition
         if not os.path.isfile(self.key2fnamefromavg):
+            self.WriteToLog("Average Multipoles Via Symmetry")
             mpole.AverageMultipoles(self,optmol)
             mpole.AddPolarizeCommentsToKey(self,self.key2fnamefromavg,polartypetotransferinfo)
         fit=False
         if self.espfit and not os.path.isfile(self.key3fname) and self.atomnum!=1:
             xyzfnamelist,keyfnamelist=self.GenerateDuplicateXYZsFromOPTs(self.xyzoutfile,self.key2fnamefromavg,optmolist)   
+            self.WriteToLog("Electrostatic Potential Optimization")
             combinedxyz,combinedpot=esp.ElectrostaticPotentialFitting(self,xyzfnamelist,keyfnamelist,potnamelist) 
             shutil.copy(self.key3fnamefrompot,self.key3fname)
             fit=True
@@ -3430,6 +3434,7 @@ class PolarizableTyper():
 
 
         if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False and (self.dovdwscan==True):
+            self.WriteToLog('Create and Run vdW Fragment Poltype Jobs')
 
             WBOmatrix,outputname,error=frag.GenerateWBOMatrix(self,self.rdkitmol,self.mol,self.logoptfname.replace('.log','.xyz'))
             rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor=frag.GenerateFragments(self,self.mol,self.torlist,WBOmatrix,missingvdwatomsets,nonaroringtorlist) # returns list of bond indexes that need parent molecule to do torsion scan for (fragment generated was same as the parent0
@@ -3453,6 +3458,8 @@ class PolarizableTyper():
         if self.refinenonaroringtors==True and self.dontfrag==False:
             rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
         if self.isfragjob==False and not os.path.isfile(self.key7fname) and self.dontfrag==False and (self.dontdotor==False) and len(self.torlist)!=0:
+            self.WriteToLog('Create and Run Torsion Fragment Poltype Jobs')
+
             WBOmatrix,outputname,error=frag.GenerateWBOMatrix(self,self.rdkitmol,self.mol,self.logoptfname.replace('.log','.xyz'))
             highlightbonds=[]
             for torset in self.torlist:
@@ -3508,9 +3515,6 @@ class PolarizableTyper():
             shutil.rmtree(self.scrtmpdirgau)
         if os.path.exists(self.scrtmpdirpsi4):
             shutil.rmtree(self.scrtmpdirpsi4)
-        string='Poltype parameterization has completed successfully.'
-        warnings.warn(string)
-        self.WriteToLog(string)
         if self.email!=None:
             moleculename=self.molstructfname.replace('.sdf','')
             password='amoebaisbest'

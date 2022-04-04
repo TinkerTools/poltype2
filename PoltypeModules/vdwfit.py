@@ -1907,6 +1907,7 @@ def WriteFittingResults(poltype,keyname,classkeytofitresults):
 
 
 def VanDerWaalsOptimization(poltype,missingvdwatomindices):
+    self.WriteToLog('vdW ab initio Dimer Scan and Fitting')
     poltype.parentdir=os.getcwd()+r'/'
     vdwfoldername='vdw'
     if not os.path.isdir(vdwfoldername):

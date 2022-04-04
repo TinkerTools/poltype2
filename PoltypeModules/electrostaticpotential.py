@@ -473,7 +473,7 @@ def SPForDMA(poltype,optmol,mol):
         term,error=poltype.CheckNormalTermination(poltype.logdmafname,errormessages=None,skiperrors=True)
         inputname=CreatePsi4DMAInputFile(poltype,poltype.logoptfname.replace('.log','.xyz'),poltype.comdmafname,mol)
         if term==False:
-            poltype.WriteToLog("Calling: " + "Psi4 Gradient for DMA")
+            poltype.WriteToLog("Gas Phase Single Point for GDMA")
             cmdstr='psi4 '+inputname+' '+poltype.logdmafname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logdmafname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
@@ -500,6 +500,7 @@ def SPForDMA(poltype,optmol,mol):
     else:
         term,error=poltype.CheckNormalTermination(poltype.logdmafname,errormessages=None,skiperrors=True)
         if not term:
+            poltype.WriteToLog("Gas Phase Single Point for GDMA")
             gen_comfile(poltype,poltype.comdmafname,poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkdmafname,poltype.comtmp,optmol)
             cmdstr = poltype.gausexe + " " + poltype.comdmafname
             
@@ -564,7 +565,7 @@ def SPForESP(poltype,optmolist,molist,xyzfnamelist,keyfnamelist):
             inputname,outputname=CreatePsi4ESPInputFile(poltype,logoptfname.replace('.log','.xyz'),comespfname,mol,poltype.maxdisk,poltype.maxmem,poltype.numproc,poltype.totalcharge,True)
             term,error=poltype.CheckNormalTermination(outputname,errormessages=None,skiperrors=True)
             if term==False:
-                poltype.WriteToLog("Calling: " + "Psi4 Gradient for ESP")
+                poltype.WriteToLog("Gas Phase High Level Single Point for Multipole Refinement")
                 cmdstr='psi4 '+inputname+' '+outputname
                 jobtooutputlog={cmdstr:os.getcwd()+r'/'+outputname}
                 jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
@@ -594,7 +595,7 @@ def SPForESP(poltype,optmolist,molist,xyzfnamelist,keyfnamelist):
         else:
             term,error=poltype.CheckNormalTermination(logespfname,errormessages=None,skiperrors=True)
             if poltype.espfit and not term:
-                poltype.WriteToLog("Calling: " + "Gaussian for ESP")
+                poltype.WriteToLog("Gas Phase High Level Single Point for Multipole Refinement")
                 gen_comfile(poltype,comespfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,chkespfname,poltype.comtmp,optmol)
                 cmdstr = poltype.gausexe + " " + comespfname
                 jobtooutputlog={cmdstr:os.getcwd()+r'/'+logespfname}
