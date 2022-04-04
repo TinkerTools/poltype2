@@ -331,6 +331,8 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 * Verlet                    ``integrator=verlet``
 * Beeman                    ``integrator=beeman``
 * RESPA                     ``integrator=respa``
+* Stochastic                  ``integrator=stochastic`` 
+* Nose-Hoover NPT             ``integrator=nose-hoover``
 
 
 ##### Barostats
@@ -345,6 +347,7 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 * Berendsen                 ``thermostat=berendsen``
 * Andersen Stochastic       ``thermostat=andersen``
 * Nose-Hoover               ``thermostat=nose-hoover``
+
 
 
 
