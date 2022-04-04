@@ -264,7 +264,7 @@ multipole   404  408  402              -0.46637
 #### Poltype Log File
 * Contains useful information on the status of the program and which current step in the flow diagram it is in
 * Will print errors at the bottom of the log file
-* Example flow for water molecule is show below
+* Example poltype.log shown below.
 ```
 Mon Apr  4 11:52:41 2022 Running on host: node74.bme.utexas.edu
 Mon Apr  4 11:52:41 2022 Atom Type Classification
