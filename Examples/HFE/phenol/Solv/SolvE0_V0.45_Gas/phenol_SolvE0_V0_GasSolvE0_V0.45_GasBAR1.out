@@ -1,0 +1,462 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.9.4   September 2021                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      405   405     O     phenol                       8     15.999     2
+      404   404     C     phenol                       6     12.011     3
+      401   401     C     phenol                       6     12.011     3
+      403   403     C     phenol                       6     12.011     3
+      402   402     C     phenol                       6     12.011     3
+      408   408     H     phenol                       1      1.008     1
+      406   406     H     phenol                       1      1.008     1
+      407   407     H     phenol                       1      1.008     1
+      409   409     H     phenol                       1      1.008     1
+
+ Additional Bond Stretching Parameters :
+
+     Atom Classes             K(S)         Length
+
+       404 405             307.150         1.3700
+       409 405             511.460         0.9700
+       401 404             379.094         1.4000
+       403 401             379.094         1.3900
+       408 401             368.093         1.0900
+       402 403             379.094         1.3900
+       406 403             368.093         1.0900
+       407 402             368.093         1.0900
+
+ Additional Angle Bending Parameters :
+
+     Atom Classes             K(B)          Angle
+
+     401 404 405            88.716        119.870
+     409 405 404            49.677        106.787
+     403 401 404            74.631        119.620
+     408 401 404            36.770        119.460
+     401 404 401            74.631        120.270
+     402 403 401            74.631        120.530
+     406 403 401            36.770        119.320
+     408 401 403            36.770        120.920
+     403 402 403            74.631        119.430
+     407 402 403            36.770        120.290
+     406 403 402            36.770        120.140
+
+ Additional Stretch-Bend Parameters :
+
+     Atom Classes          K(SB)-1        K(SB)-2
+
+     401 404 405            20.453         20.453
+     409 405 404            17.318        -17.318
+     403 401 404            20.453         20.453
+     408 401 404            20.453         20.453
+     401 404 401            20.453         20.453
+     402 403 401            20.453         20.453
+     406 403 401            20.453         20.453
+     408 401 403            20.453         20.453
+     403 402 403            20.453         20.453
+     407 402 403            20.453         20.453
+     406 403 402            20.453         20.453
+
+ Additional Out-of-Plane Bend Parameters :
+
+     Atom Classes                   K(OPB)
+
+     405 404   0   0                28.273
+     401 404   0   0                84.886
+     404 401   0   0                84.886
+     403 401   0   0                84.886
+     401 403   0   0                84.886
+     408 401   0   0                72.814
+     402 403   0   0                84.886
+     403 402   0   0                84.886
+     406 403   0   0                72.814
+     407 402   0   0                72.814
+
+ Additional Torsional Parameters :
+
+     Atom Classes     1-Fold    2-Fold    3-Fold    4-Fold    5-Fold    6-Fold
+
+   401 404 405 409   0.00   0  2.08 180  0.00   0  0.00   0  0.00   0  0.00   0
+   403 401 404 405   0.00   0  6.18 180  0.00   0  0.00   0  0.00   0  0.00   0
+   408 401 404 405   0.00   0  6.18 180  0.00   0  0.00   0  0.00   0  0.00   0
+   402 403 401 404  -0.67   0  6.29 180  0.00   0  0.00   0  0.00   0  0.00   0
+   403 401 404 401  -0.67   0  5.72 180  0.00   0  0.00   0  0.00   0  0.00   0
+   403 402 403 401  -0.67   0  6.29 180  0.00   0  0.00   0  0.00   0  0.00   0
+   406 403 401 404   0.55   0  6.82 180 -0.55   0  0.00   0  0.00   0  0.00   0
+   408 401 404 401   0.55   0  6.25 180 -0.55   0  0.00   0  0.00   0  0.00   0
+   407 402 403 401   0.55   0  6.82 180 -0.55   0  0.00   0  0.00   0  0.00   0
+   406 403 402 403   0.55   0 11.38 180 -0.55   0  0.00   0  0.00   0  0.00   0
+   408 401 403 402   0.55   0 11.38 180 -0.55   0  0.00   0  0.00   0  0.00   0
+   406 403 401 408   0.00   0  6.36 180  0.00   0  0.00   0  0.00   0  0.00   0
+   407 402 403 406   0.00   0  6.36 180  0.00   0  0.00   0  0.00   0  0.00   0
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         405      409    404      0   Z-then-X    -0.46429
+                                                   0.16235  0.00000  0.18717
+                                                  -0.00450
+                                                   0.00000 -0.46498
+                                                  -0.06802  0.00000  0.46948
+
+         404      401    401      0   Bisector     0.33494
+                                                   0.00000  0.00000 -0.07119
+                                                  -0.20929
+                                                   0.00000 -0.32070
+                                                   0.00000  0.00000  0.52999
+
+         401      408    403      0   Z-then-X    -0.12421
+                                                   0.10145  0.00000  0.17813
+                                                   0.25046
+                                                   0.00000 -0.16706
+                                                   0.01593  0.00000 -0.08340
+
+         403      406    402      0   Z-then-X     0.08296
+                                                   0.00308  0.00000 -0.12200
+                                                  -0.21100
+                                                   0.00000 -0.39448
+                                                   0.04742  0.00000  0.60548
+
+         402      403    403      0   Bisector    -0.05316
+                                                   0.00000  0.00000 -0.11286
+                                                   0.23168
+                                                   0.00000 -0.22811
+                                                   0.00000  0.00000 -0.00357
+
+         408      401    403      0   Z-then-X     0.00902
+                                                   0.02376  0.00000 -0.17062
+                                                   0.03893
+                                                   0.00000  0.01177
+                                                  -0.01143  0.00000 -0.05070
+
+         406      403    402      0   Z-then-X     0.00755
+                                                   0.01255  0.00000 -0.15814
+                                                   0.12525
+                                                   0.00000 -0.02015
+                                                   0.00744  0.00000 -0.10510
+
+         407      402      0      0   Z-Only       0.00466
+                                                   0.00000  0.00000 -0.18447
+                                                   0.03507
+                                                   0.00000  0.03507
+                                                   0.00000  0.00000 -0.07014
+
+         409      405    404      0   Z-then-X     0.22721
+                                                   0.02996  0.00000 -0.02605
+                                                   0.12347
+                                                   0.00000 -0.13670
+                                                  -0.08050  0.00000  0.01323
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         405             0.812       0.390         409
+         404             2.064       0.390         401
+         401             2.064       0.390         404  403  408
+         403             2.064       0.390         401  402  406
+         402             2.064       0.390         403  407
+         408             0.432       0.390         401
+         406             0.432       0.390         403
+         407             0.432       0.390         402
+         409             0.457       0.390         405
+
+ Additional van der Waals Parameters :
+
+     Atom Class               Size        Epsilon        Reduction
+
+         409                2.6550         0.0135          0.910
+         404                3.8000         0.0910          0.000
+         401                3.8000         0.0910          0.000
+         403                3.8000         0.0910          0.000
+         402                3.8000         0.0910          0.000
+         408                2.9800         0.0260          0.920
+         406                2.9800         0.0260          0.920
+         407                2.9800         0.0260          0.920
+         405                3.3560         0.1188          0.000
+
+ Additional Solvation Parameters :
+
+     Atom Type                PB Size     CS Size     GK Size
+
+         409             2.6533      3.3920      2.9044
+         408             2.5740      2.7580      2.9054
+         406             2.5740      2.7580      2.9054
+         407             2.5740      2.7580      2.9054
+         401             3.8585      3.7660      3.8448
+         404             3.6909      3.7660      4.4258
+         403             3.8286      3.8930      4.5084
+         402             3.8286      3.8930      4.5084
+         405             3.1684      3.1340      3.0999
+
+ Free Energy Perturbation :          1.000 Lambda for Torsional Angles
+ Free Energy Perturbation :          0.450 Lambda for van der Waals
+ Free Energy Perturbation :          0.000 Lambda for Electrostatics
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      405   405     O     phenol                       8     15.999     2
+      404   404     C     phenol                       6     12.011     3
+      401   401     C     phenol                       6     12.011     3
+      403   403     C     phenol                       6     12.011     3
+      402   402     C     phenol                       6     12.011     3
+      408   408     H     phenol                       1      1.008     1
+      406   406     H     phenol                       1      1.008     1
+      407   407     H     phenol                       1      1.008     1
+      409   409     H     phenol                       1      1.008     1
+
+ Additional Bond Stretching Parameters :
+
+     Atom Classes             K(S)         Length
+
+       404 405             307.150         1.3700
+       409 405             511.460         0.9700
+       401 404             379.094         1.4000
+       403 401             379.094         1.3900
+       408 401             368.093         1.0900
+       402 403             379.094         1.3900
+       406 403             368.093         1.0900
+       407 402             368.093         1.0900
+
+ Additional Angle Bending Parameters :
+
+     Atom Classes             K(B)          Angle
+
+     401 404 405            88.716        119.870
+     409 405 404            49.677        106.787
+     403 401 404            74.631        119.620
+     408 401 404            36.770        119.460
+     401 404 401            74.631        120.270
+     402 403 401            74.631        120.530
+     406 403 401            36.770        119.320
+     408 401 403            36.770        120.920
+     403 402 403            74.631        119.430
+     407 402 403            36.770        120.290
+     406 403 402            36.770        120.140
+
+ Additional Stretch-Bend Parameters :
+
+     Atom Classes          K(SB)-1        K(SB)-2
+
+     401 404 405            20.453         20.453
+     409 405 404            17.318        -17.318
+     403 401 404            20.453         20.453
+     408 401 404            20.453         20.453
+     401 404 401            20.453         20.453
+     402 403 401            20.453         20.453
+     406 403 401            20.453         20.453
+     408 401 403            20.453         20.453
+     403 402 403            20.453         20.453
+     407 402 403            20.453         20.453
+     406 403 402            20.453         20.453
+
+ Additional Out-of-Plane Bend Parameters :
+
+     Atom Classes                   K(OPB)
+
+     405 404   0   0                28.273
+     401 404   0   0                84.886
+     404 401   0   0                84.886
+     403 401   0   0                84.886
+     401 403   0   0                84.886
+     408 401   0   0                72.814
+     402 403   0   0                84.886
+     403 402   0   0                84.886
+     406 403   0   0                72.814
+     407 402   0   0                72.814
+
+ Additional Torsional Parameters :
+
+     Atom Classes     1-Fold    2-Fold    3-Fold    4-Fold    5-Fold    6-Fold
+
+   401 404 405 409   0.00   0  2.08 180  0.00   0  0.00   0  0.00   0  0.00   0
+   403 401 404 405   0.00   0  6.18 180  0.00   0  0.00   0  0.00   0  0.00   0
+   408 401 404 405   0.00   0  6.18 180  0.00   0  0.00   0  0.00   0  0.00   0
+   402 403 401 404  -0.67   0  6.29 180  0.00   0  0.00   0  0.00   0  0.00   0
+   403 401 404 401  -0.67   0  5.72 180  0.00   0  0.00   0  0.00   0  0.00   0
+   403 402 403 401  -0.67   0  6.29 180  0.00   0  0.00   0  0.00   0  0.00   0
+   406 403 401 404   0.55   0  6.82 180 -0.55   0  0.00   0  0.00   0  0.00   0
+   408 401 404 401   0.55   0  6.25 180 -0.55   0  0.00   0  0.00   0  0.00   0
+   407 402 403 401   0.55   0  6.82 180 -0.55   0  0.00   0  0.00   0  0.00   0
+   406 403 402 403   0.55   0 11.38 180 -0.55   0  0.00   0  0.00   0  0.00   0
+   408 401 403 402   0.55   0 11.38 180 -0.55   0  0.00   0  0.00   0  0.00   0
+   406 403 401 408   0.00   0  6.36 180  0.00   0  0.00   0  0.00   0  0.00   0
+   407 402 403 406   0.00   0  6.36 180  0.00   0  0.00   0  0.00   0  0.00   0
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         405      409    404      0   Z-then-X    -0.46429
+                                                   0.16235  0.00000  0.18717
+                                                  -0.00450
+                                                   0.00000 -0.46498
+                                                  -0.06802  0.00000  0.46948
+
+         404      401    401      0   Bisector     0.33494
+                                                   0.00000  0.00000 -0.07119
+                                                  -0.20929
+                                                   0.00000 -0.32070
+                                                   0.00000  0.00000  0.52999
+
+         401      408    403      0   Z-then-X    -0.12421
+                                                   0.10145  0.00000  0.17813
+                                                   0.25046
+                                                   0.00000 -0.16706
+                                                   0.01593  0.00000 -0.08340
+
+         403      406    402      0   Z-then-X     0.08296
+                                                   0.00308  0.00000 -0.12200
+                                                  -0.21100
+                                                   0.00000 -0.39448
+                                                   0.04742  0.00000  0.60548
+
+         402      403    403      0   Bisector    -0.05316
+                                                   0.00000  0.00000 -0.11286
+                                                   0.23168
+                                                   0.00000 -0.22811
+                                                   0.00000  0.00000 -0.00357
+
+         408      401    403      0   Z-then-X     0.00902
+                                                   0.02376  0.00000 -0.17062
+                                                   0.03893
+                                                   0.00000  0.01177
+                                                  -0.01143  0.00000 -0.05070
+
+         406      403    402      0   Z-then-X     0.00755
+                                                   0.01255  0.00000 -0.15814
+                                                   0.12525
+                                                   0.00000 -0.02015
+                                                   0.00744  0.00000 -0.10510
+
+         407      402      0      0   Z-Only       0.00466
+                                                   0.00000  0.00000 -0.18447
+                                                   0.03507
+                                                   0.00000  0.03507
+                                                   0.00000  0.00000 -0.07014
+
+         409      405    404      0   Z-then-X     0.22721
+                                                   0.02996  0.00000 -0.02605
+                                                   0.12347
+                                                   0.00000 -0.13670
+                                                  -0.08050  0.00000  0.01323
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         405             0.812       0.390         409
+         404             2.064       0.390         401
+         401             2.064       0.390         404  403  408
+         403             2.064       0.390         401  402  406
+         402             2.064       0.390         403  407
+         408             0.432       0.390         401
+         406             0.432       0.390         403
+         407             0.432       0.390         402
+         409             0.457       0.390         405
+
+ Additional van der Waals Parameters :
+
+     Atom Class               Size        Epsilon        Reduction
+
+         409                2.6550         0.0135          0.910
+         404                3.8000         0.0910          0.000
+         401                3.8000         0.0910          0.000
+         403                3.8000         0.0910          0.000
+         402                3.8000         0.0910          0.000
+         408                2.9800         0.0260          0.920
+         406                2.9800         0.0260          0.920
+         407                2.9800         0.0260          0.920
+         405                3.3560         0.1188          0.000
+
+ Additional Solvation Parameters :
+
+     Atom Type                PB Size     CS Size     GK Size
+
+         409             2.6533      3.3920      2.9044
+         408             2.5740      2.7580      2.9054
+         406             2.5740      2.7580      2.9054
+         407             2.5740      2.7580      2.9054
+         401             3.8585      3.7660      3.8448
+         404             3.6909      3.7660      4.4258
+         403             3.8286      3.8930      4.5084
+         402             3.8286      3.8930      4.5084
+         405             3.1684      3.1340      3.0999
+
+ Free Energy Perturbation :          1.000 Lambda for Torsional Angles
+ Free Energy Perturbation :          0.000 Lambda for van der Waals
+ Free Energy Perturbation :          0.000 Lambda for Electrostatics
+
+ Initial Processing for Trajectory A :
+
+       Completed     100 Coordinate Frames
+       Completed     200 Coordinate Frames
+       Completed     300 Coordinate Frames
+       Completed     400 Coordinate Frames
+       Completed     500 Coordinate Frames
+       Completed     600 Coordinate Frames
+       Completed     700 Coordinate Frames
+       Completed     800 Coordinate Frames
+       Completed     900 Coordinate Frames
+       Completed    1000 Coordinate Frames
+       Completed    1100 Coordinate Frames
+       Completed    1200 Coordinate Frames
+       Completed    1300 Coordinate Frames
+       Completed    1400 Coordinate Frames
+       Completed    1500 Coordinate Frames
+       Completed    1600 Coordinate Frames
+       Completed    1700 Coordinate Frames
+       Completed    1800 Coordinate Frames
+       Completed    1900 Coordinate Frames
+       Completed    2000 Coordinate Frames
+       Completed    2100 Coordinate Frames
+       Completed    2200 Coordinate Frames
+       Completed    2300 Coordinate Frames
+       Completed    2400 Coordinate Frames
+
+ Initial Processing for Trajectory B :
+
+       Completed     100 Coordinate Frames
+       Completed     200 Coordinate Frames
+       Completed     300 Coordinate Frames
+       Completed     400 Coordinate Frames
+       Completed     500 Coordinate Frames
+       Completed     600 Coordinate Frames
+       Completed     700 Coordinate Frames
+       Completed     800 Coordinate Frames
+       Completed     900 Coordinate Frames
+       Completed    1000 Coordinate Frames
+       Completed    1100 Coordinate Frames
+       Completed    1200 Coordinate Frames
+       Completed    1300 Coordinate Frames
+       Completed    1400 Coordinate Frames
+       Completed    1500 Coordinate Frames
+       Completed    1600 Coordinate Frames
+       Completed    1700 Coordinate Frames
+       Completed    1800 Coordinate Frames
+       Completed    1900 Coordinate Frames
+       Completed    2000 Coordinate Frames
+       Completed    2100 Coordinate Frames
+       Completed    2200 Coordinate Frames
+       Completed    2300 Coordinate Frames
+       Completed    2400 Coordinate Frames
+
+ Potential Energy Values Written To :  /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.45_Gas/phenol_Simulation_SolvSimEle0_Vdw0-45_Gas_solvwaterboxproddyn.bar

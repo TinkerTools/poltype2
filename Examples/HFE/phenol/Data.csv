@@ -1,0 +1,24 @@
+,,,,,,,,,,,,,,,,,,,,,,
+Gibbs Free Energy Change Table,,,,,,,,,,,,,,,,,,,,,,
+Name,ΔGˢᵒˡᵛ,ΔGˢᵒˡᵛᵉʳʳ,ΔGᶜᵒᵐᵖᶜᵒʳʳ,ΔGᶜᵒᵐᵖᵘⁿᶜᵒʳʳ,ΔGᶜᵒᵐᵖᶜᵒʳʳᵉʳʳ,ΔGᵃⁿᵃᶜᵒᵐᵖᶜᵒʳʳ,ΔGᵇᶦⁿᵈᶜᵒʳʳ,ΔGᵇᶦⁿᵈᶜᵒʳʳᵉʳʳ,ΔGˢᵒˡᵛᵉˡᵉ,ΔGˢᵒˡᵛᵛᵈʷ,ΔGᶜᵒᵐᵖᵉˡᵉ,ΔGᶜᵒᵐᵖᵛᵈʷ,ΔGⁿᵒⁱᵒⁿ,ΔGᵉˣᵖ,ΔGᵉˡᵉⁿᵒⁱᵒⁿ,ΔGᵛᵈʷⁿᵒⁱᵒⁿ,ΔGᵍᵃˢ,ΔGˢᵒˡ,ΔGᵉˡᵉᵍᵃˢ,ΔGᵉˡᵉˢᵒˡ,ΔGᵛᵈʷᵍᵃˢ,ΔGᵛᵈʷˢᵒˡ
+,-5.487,0.042,,,,,,,-7.673,2.186,,,,,,,-1.975,-3.512,4.44,-12.114,-6.416,8.601
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"Enthalpy, Entropy, Gibbs Energy Change Table",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Name,ΔGˢᵒˡᵛ,ΔGˢᵒˡᵛᵉʳʳ,ΔHˢᵒˡᵛ,ΔHˢᵒˡᵛᵉʳʳ,ΔSˢᵒˡᵛ,ΔSˢᵒˡᵛᵉʳʳ,ΔGᶜᵒᵐᵖᶜᵒʳʳ,ΔGᶜᵒᵐᵖᵘⁿᶜᵒʳʳ,ΔGᶜᵒᵐᵖᶜᵒʳʳᵉʳʳ,ΔHᶜᵒᵐᵖ,ΔHᶜᵒᵐᵖᵉʳʳ,ΔSᶜᵒᵐᵖ,ΔSᶜᵒᵐᵖᵉʳʳ,ΔGᵃⁿᵃᶜᵒᵐᵖᶜᵒʳʳ,ΔGᵇᶦⁿᵈᶜᵒʳʳ,ΔGᵇᶦⁿᵈᶜᵒʳʳᵉʳʳ,ΔHᵇᶦⁿᵈ,ΔHᵇᶦⁿᵈᵉʳʳ,ΔSᵇᶦⁿᵈ,ΔSᵇᶦⁿᵈᵉʳʳ,ΔGˢᵒˡᵛᵉˡᵉ,ΔGˢᵒˡᵛᵛᵈʷ,ΔGᶜᵒᵐᵖᵉˡᵉ,ΔGᶜᵒᵐᵖᵛᵈʷ,ΔGⁿᵒⁱᵒⁿ,ΔGᵉˣᵖ,ΔGᵉˡᵉⁿᵒⁱᵒⁿ,ΔGᵛᵈʷⁿᵒⁱᵒⁿ,ΔGᵍᵃˢ,ΔGˢᵒˡ,ΔGᵉˡᵉᵍᵃˢ,ΔGᵉˡᵉˢᵒˡ,ΔGᵛᵈʷᵍᵃˢ,ΔGᵛᵈʷˢᵒˡ
+,-5.487,0.042,-15794810.201,4849648.701,15794804.713,4849648.701,,,,,,,,,,,,,,,-7.673,2.186,,,,,,,-1.975,-3.512,4.44,-12.114,-6.416,8.601
+,,,,,,,,,,,,,,,,
+Solvation Simulation Info Table,,,,,,,,,,,,,,,,
+Name,Total Atom Number,Average Box Size,Prod MD Ensemb,Prod MD Time,Prod MD Steps,Prod MD Arc File Space,Dynamic Writeout Frequency (ps),Dynamic Time Step (fs),Equil Time NPT,Equil Time NVT,Physio Counterions,Neut Counterions,Ligand Charge,Receptor Charge,Ligand Name,Receptor Name
+,4573.0,,4.0,5.0,2500000.0,0.011,2.0,2.0,1.0,2.0,0.0,0.0,0.0,,final,
+,,,,,,,,,,,,,,,,
+Dynamic Jobs,Modename,Writeout Freq (ps),Dyntamic Time Step (fs),Total Time (ns),Total Dyn Extended Time,Total Dynamic Steps,Total Extended Dynamic Steps,Total ARC File Space Needed
+SolvSim,phenol_Simulation,2,2,5.0,5.0,2500000,2500000,[0.010724595]
+Ele-Lambda,1,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1
+Vdw-Lambda,1,1,1,1,1,1,1,1,1,1,1,0.95,0.9,0.85,0.8,0.75,0.7,0.67,0.64,0.62,0.6,0.58,0.56,0.52,0.45,0,0,0.45,0.52,0.56,0.58,0.6,0.62,0.64,0.67,0.7,0.75,0.8,0.85,0.9,0.95,1,1,1,1,1,1,1,1,1,1,1
+Restraint-Lambda,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+Outputname
+Percent Complete
+Number of Steps Left
+ETA Bounds (days)
+Space Needed Left (GB)
+,,,,,,,,,,,,,,,,

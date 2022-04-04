@@ -40,5 +40,4 @@ def main(poltype):
         bar.BARProtocol(poltype)  
         tables.GenerateSimInfoTable(poltype)
         plots.PlotEnergyData(poltype)
-    poltype.WriteToLog('AMOEBA Annihilator is complete. Your molecule just got annihilated!',prin=True)
 

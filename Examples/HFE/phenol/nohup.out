@@ -1,0 +1,981 @@
+Mon Nov 22 12:06:07 2021 Removing key word from final.key parameters
+
+Mon Nov 22 12:06:07 2021 Removing key word from final.key axis
+
+Mon Nov 22 12:06:07 2021 Removing key word from final.key ewald
+
+Mon Nov 22 12:06:07 2021 Removing key word from final.key pme-grid
+
+Mon Nov 22 12:06:07 2021 Removing key word from final.key pme-order
+
+Mon Nov 22 12:06:07 2021 Removing key word from final.key cutoff
+
+Mon Nov 22 12:06:07 2021 Removing key word from final.key thermostat
+
+Mon Nov 22 12:06:07 2021 Removing key word from final.key integrator
+
+Mon Nov 22 12:06:07 2021 Removing key word from final.key ligand
+
+Mon Nov 22 12:06:07 2021 Removing key word from final.key verbose
+
+Mon Nov 22 12:06:07 2021 Removing key word from final.key archive
+
+Mon Nov 22 12:06:07 2021 Removing key word from final.key neighbor-list
+
+Mon Nov 22 12:06:07 2021 Removing key word from final.key polar-eps
+
+Mon Nov 22 12:06:07 2021 Removing key word from final.key polar-predict
+
+Mon Nov 22 12:06:07 2021 Removing key word from final.key heavy-hydrogen
+
+Mon Nov 22 12:06:07 2021 Removing key word from final.key omp-threads
+
+Mon Nov 22 12:06:07 2021 Adding key words to final.key parameters amoebabio18.prm
+
+
+Mon Nov 22 12:06:09 2021 Removing key word from phenol_Simulation_solvfinal_config.key parameters
+
+Mon Nov 22 12:06:09 2021 Removing key word from phenol_Simulation_solvfinal_config.key TARGET-DIPOLE
+
+Mon Nov 22 12:06:09 2021 Removing key word from phenol_Simulation_solvfinal_config.key OPENMP-THREADS
+
+Mon Nov 22 12:06:09 2021 Adding header to key file phenol_Simulation_solvfinal_config.key
+
+Mon Nov 22 12:06:09 2021 Adding key words to phenol_Simulation_solvfinal_config.key parameters amoebabio18.prm
+
+
+Mon Nov 22 12:06:09 2021 Adding key words to phenol_Simulation_solvfinal_config.key archive
+
+
+Mon Nov 22 12:06:09 2021 Adding key words to phenol_Simulation_solvfinal_config.key integrator RESPA
+
+
+Mon Nov 22 12:06:09 2021 Adding key words to phenol_Simulation_solvfinal_config.key thermostat BUSSI
+
+
+Mon Nov 22 12:06:09 2021 Adding key words to phenol_Simulation_solvfinal_config.key ewald
+
+
+Mon Nov 22 12:06:09 2021 Adding key words to phenol_Simulation_solvfinal_config.key vdw-cutoff 12
+
+
+Mon Nov 22 12:06:09 2021 Adding key words to phenol_Simulation_solvfinal_config.key ewald-cutoff 7
+
+
+Mon Nov 22 12:06:09 2021 Adding key words to phenol_Simulation_solvfinal_config.key polar-eps 1e-05
+
+
+Mon Nov 22 12:06:09 2021 Adding key words to phenol_Simulation_solvfinal_config.key polar-predict
+
+
+Mon Nov 22 12:06:09 2021 Adding key words to phenol_Simulation_solvfinal_config.key barostat montecarlo
+
+
+Mon Nov 22 12:06:09 2021 Adding key words to phenol_Simulation_solvfinal_config.key neighbor-list
+
+
+Mon Nov 22 12:06:09 2021 Adding key words to phenol_Simulation_solvfinal_config.key vdw-correction
+
+
+Mon Nov 22 12:06:09 2021 Adding key words to phenol_Simulation_solvfinal_config.key vdw-annihilate
+
+
+Mon Nov 22 12:06:09 2021 Adding key words to phenol_Simulation_solvfinal_config.key pme-grid 64 64 64
+
+
+Mon Nov 22 12:06:09 2021 Adding key words to phenol_Simulation_solvfinal_config.key pme-order 5
+
+
+Mon Nov 22 12:06:09 2021 Adding key words to phenol_Simulation_solvfinal_config.key polarization MUTUAL
+
+
+Mon Nov 22 12:06:09 2021 Adding key words to phenol_Simulation_solvfinal_config.key OPENMP-THREADS 1
+
+
+Mon Nov 22 12:06:09 2021 Computing volume 
+
+Mon Nov 22 12:06:09 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/phenol_Simulation_solvfinal_config.key a-axis 35.7
+
+
+Mon Nov 22 12:06:09 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/phenol_Simulation_solvfinal_config.key b-axis 35.7
+
+
+Mon Nov 22 12:06:09 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/phenol_Simulation_solvfinal_config.key c-axis 35.7
+
+
+Mon Nov 22 12:06:23 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/phenol_Simulation_solvfinal_config.key restrain-position -1 13 5.0 0
+
+
+Mon Nov 22 12:06:23 2021 Minimizing system 
+
+Mon Nov 22 12:06:23 2021 Loose minimization is not complete 
+
+Mon Nov 22 12:07:53 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/phenol_Simulation_solvfinal_config.key restrain-position
+
+Mon Nov 22 12:07:54 2021 System equilibriation is not complete 
+
+Mon Nov 22 12:19:54 2021 Single system equilibriation job is complete 
+
+Mon Nov 22 12:19:54 2021 System equilibriation is not complete 
+
+Mon Nov 22 12:33:25 2021 Single system equilibriation job is complete 
+
+Mon Nov 22 12:33:25 2021 System equilibriation is not complete 
+
+Mon Nov 22 12:47:56 2021 Single system equilibriation job is complete 
+
+Mon Nov 22 12:47:56 2021 System equilibriation is not complete 
+
+Mon Nov 22 13:00:57 2021 Single system equilibriation job is complete 
+
+Mon Nov 22 13:00:57 2021 System equilibriation is not complete 
+
+Mon Nov 22 13:13:58 2021 Single system equilibriation job is complete 
+
+Mon Nov 22 13:13:58 2021 Single system equilibriation job is complete 
+
+Mon Nov 22 13:13:58 2021 System equilibriation is not complete 
+
+Mon Nov 22 13:55:30 2021 Single system equilibriation job is complete 
+
+Mon Nov 22 13:55:30 2021 System equilibriation is complete 
+
+Mon Nov 22 13:55:30 2021 Extracting the last frame of phenol_Simulation_solvwaterboxequil.arc
+
+Mon Nov 22 13:55:52 2021 Removing key word from phenol_Simulation_solvfinal_config.key restrain
+
+Mon Nov 22 13:55:52 2021 Removing key word from phenol_Simulation_solvfinal_config.key group
+
+Mon Nov 22 13:55:52 2021 Adding key words to phenol_Simulation_solvfinal_lambda.key ligand -1 13
+
+
+Mon Nov 22 13:55:52 2021 Adding key words to phenol_Simulation_solvfinal_lambda.key ele-lambda
+
+
+Mon Nov 22 13:55:52 2021 Adding key words to phenol_Simulation_solvfinal_lambda.key vdw-lambda
+
+
+Mon Nov 22 13:55:52 2021 Setting up dynamics for SolvSim
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0_Gas/phenol_Simulation_SolvSimEle0_Vdw0_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0_Gas/phenol_Simulation_SolvSimEle0_Vdw0_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0_Gas/phenol_Simulation_SolvSimEle0_Vdw0_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0_Gas/phenol_Simulation_SolvSimEle0_Vdw0_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:55 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0_Gas/phenol_Simulation_SolvSimEle0_Vdw0_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.45_Gas/phenol_Simulation_SolvSimEle0_Vdw0-45_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.45_Gas/phenol_Simulation_SolvSimEle0_Vdw0-45_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.45_Gas/phenol_Simulation_SolvSimEle0_Vdw0-45_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.45_Gas/phenol_Simulation_SolvSimEle0_Vdw0-45_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:55 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.45_Gas/phenol_Simulation_SolvSimEle0_Vdw0-45_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.52_Gas/phenol_Simulation_SolvSimEle0_Vdw0-52_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.52_Gas/phenol_Simulation_SolvSimEle0_Vdw0-52_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.52_Gas/phenol_Simulation_SolvSimEle0_Vdw0-52_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.52_Gas/phenol_Simulation_SolvSimEle0_Vdw0-52_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:55 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.52_Gas/phenol_Simulation_SolvSimEle0_Vdw0-52_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.56_Gas/phenol_Simulation_SolvSimEle0_Vdw0-56_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.56_Gas/phenol_Simulation_SolvSimEle0_Vdw0-56_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.56_Gas/phenol_Simulation_SolvSimEle0_Vdw0-56_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.56_Gas/phenol_Simulation_SolvSimEle0_Vdw0-56_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:55 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.56_Gas/phenol_Simulation_SolvSimEle0_Vdw0-56_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.58_Gas/phenol_Simulation_SolvSimEle0_Vdw0-58_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.58_Gas/phenol_Simulation_SolvSimEle0_Vdw0-58_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.58_Gas/phenol_Simulation_SolvSimEle0_Vdw0-58_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.58_Gas/phenol_Simulation_SolvSimEle0_Vdw0-58_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:55 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.58_Gas/phenol_Simulation_SolvSimEle0_Vdw0-58_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.6_Gas/phenol_Simulation_SolvSimEle0_Vdw0-6_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.6_Gas/phenol_Simulation_SolvSimEle0_Vdw0-6_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.6_Gas/phenol_Simulation_SolvSimEle0_Vdw0-6_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.6_Gas/phenol_Simulation_SolvSimEle0_Vdw0-6_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:55 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.6_Gas/phenol_Simulation_SolvSimEle0_Vdw0-6_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.62_Gas/phenol_Simulation_SolvSimEle0_Vdw0-62_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.62_Gas/phenol_Simulation_SolvSimEle0_Vdw0-62_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.62_Gas/phenol_Simulation_SolvSimEle0_Vdw0-62_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:55 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.62_Gas/phenol_Simulation_SolvSimEle0_Vdw0-62_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:55 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.62_Gas/phenol_Simulation_SolvSimEle0_Vdw0-62_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.64_Gas/phenol_Simulation_SolvSimEle0_Vdw0-64_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.64_Gas/phenol_Simulation_SolvSimEle0_Vdw0-64_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.64_Gas/phenol_Simulation_SolvSimEle0_Vdw0-64_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.64_Gas/phenol_Simulation_SolvSimEle0_Vdw0-64_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:56 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.64_Gas/phenol_Simulation_SolvSimEle0_Vdw0-64_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.67_Gas/phenol_Simulation_SolvSimEle0_Vdw0-67_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.67_Gas/phenol_Simulation_SolvSimEle0_Vdw0-67_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.67_Gas/phenol_Simulation_SolvSimEle0_Vdw0-67_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.67_Gas/phenol_Simulation_SolvSimEle0_Vdw0-67_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:56 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.67_Gas/phenol_Simulation_SolvSimEle0_Vdw0-67_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.7_Gas/phenol_Simulation_SolvSimEle0_Vdw0-7_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.7_Gas/phenol_Simulation_SolvSimEle0_Vdw0-7_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.7_Gas/phenol_Simulation_SolvSimEle0_Vdw0-7_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.7_Gas/phenol_Simulation_SolvSimEle0_Vdw0-7_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:56 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.7_Gas/phenol_Simulation_SolvSimEle0_Vdw0-7_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.75_Gas/phenol_Simulation_SolvSimEle0_Vdw0-75_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.75_Gas/phenol_Simulation_SolvSimEle0_Vdw0-75_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.75_Gas/phenol_Simulation_SolvSimEle0_Vdw0-75_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.75_Gas/phenol_Simulation_SolvSimEle0_Vdw0-75_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:56 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.75_Gas/phenol_Simulation_SolvSimEle0_Vdw0-75_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.8_Gas/phenol_Simulation_SolvSimEle0_Vdw0-8_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.8_Gas/phenol_Simulation_SolvSimEle0_Vdw0-8_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.8_Gas/phenol_Simulation_SolvSimEle0_Vdw0-8_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.8_Gas/phenol_Simulation_SolvSimEle0_Vdw0-8_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:56 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.8_Gas/phenol_Simulation_SolvSimEle0_Vdw0-8_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.85_Gas/phenol_Simulation_SolvSimEle0_Vdw0-85_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.85_Gas/phenol_Simulation_SolvSimEle0_Vdw0-85_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.85_Gas/phenol_Simulation_SolvSimEle0_Vdw0-85_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.85_Gas/phenol_Simulation_SolvSimEle0_Vdw0-85_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:56 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.85_Gas/phenol_Simulation_SolvSimEle0_Vdw0-85_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.9_Gas/phenol_Simulation_SolvSimEle0_Vdw0-9_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.9_Gas/phenol_Simulation_SolvSimEle0_Vdw0-9_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.9_Gas/phenol_Simulation_SolvSimEle0_Vdw0-9_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.9_Gas/phenol_Simulation_SolvSimEle0_Vdw0-9_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:56 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.9_Gas/phenol_Simulation_SolvSimEle0_Vdw0-9_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.95_Gas/phenol_Simulation_SolvSimEle0_Vdw0-95_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.95_Gas/phenol_Simulation_SolvSimEle0_Vdw0-95_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.95_Gas/phenol_Simulation_SolvSimEle0_Vdw0-95_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.95_Gas/phenol_Simulation_SolvSimEle0_Vdw0-95_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:56 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.95_Gas/phenol_Simulation_SolvSimEle0_Vdw0-95_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw1_Gas/phenol_Simulation_SolvSimEle0_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw1_Gas/phenol_Simulation_SolvSimEle0_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw1_Gas/phenol_Simulation_SolvSimEle0_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:56 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw1_Gas/phenol_Simulation_SolvSimEle0_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:56 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw1_Gas/phenol_Simulation_SolvSimEle0_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.1_Vdw1_Gas/phenol_Simulation_SolvSimEle0-1_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.1_Vdw1_Gas/phenol_Simulation_SolvSimEle0-1_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.1_Vdw1_Gas/phenol_Simulation_SolvSimEle0-1_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.1_Vdw1_Gas/phenol_Simulation_SolvSimEle0-1_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:57 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.1_Vdw1_Gas/phenol_Simulation_SolvSimEle0-1_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.2_Vdw1_Gas/phenol_Simulation_SolvSimEle0-2_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.2_Vdw1_Gas/phenol_Simulation_SolvSimEle0-2_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.2_Vdw1_Gas/phenol_Simulation_SolvSimEle0-2_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.2_Vdw1_Gas/phenol_Simulation_SolvSimEle0-2_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:57 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.2_Vdw1_Gas/phenol_Simulation_SolvSimEle0-2_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.3_Vdw1_Gas/phenol_Simulation_SolvSimEle0-3_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.3_Vdw1_Gas/phenol_Simulation_SolvSimEle0-3_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.3_Vdw1_Gas/phenol_Simulation_SolvSimEle0-3_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.3_Vdw1_Gas/phenol_Simulation_SolvSimEle0-3_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:57 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.3_Vdw1_Gas/phenol_Simulation_SolvSimEle0-3_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.4_Vdw1_Gas/phenol_Simulation_SolvSimEle0-4_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.4_Vdw1_Gas/phenol_Simulation_SolvSimEle0-4_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.4_Vdw1_Gas/phenol_Simulation_SolvSimEle0-4_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.4_Vdw1_Gas/phenol_Simulation_SolvSimEle0-4_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:57 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.4_Vdw1_Gas/phenol_Simulation_SolvSimEle0-4_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.5_Vdw1_Gas/phenol_Simulation_SolvSimEle0-5_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.5_Vdw1_Gas/phenol_Simulation_SolvSimEle0-5_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.5_Vdw1_Gas/phenol_Simulation_SolvSimEle0-5_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.5_Vdw1_Gas/phenol_Simulation_SolvSimEle0-5_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:57 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.5_Vdw1_Gas/phenol_Simulation_SolvSimEle0-5_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.6_Vdw1_Gas/phenol_Simulation_SolvSimEle0-6_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.6_Vdw1_Gas/phenol_Simulation_SolvSimEle0-6_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.6_Vdw1_Gas/phenol_Simulation_SolvSimEle0-6_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.6_Vdw1_Gas/phenol_Simulation_SolvSimEle0-6_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:57 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.6_Vdw1_Gas/phenol_Simulation_SolvSimEle0-6_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.7_Vdw1_Gas/phenol_Simulation_SolvSimEle0-7_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.7_Vdw1_Gas/phenol_Simulation_SolvSimEle0-7_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.7_Vdw1_Gas/phenol_Simulation_SolvSimEle0-7_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.7_Vdw1_Gas/phenol_Simulation_SolvSimEle0-7_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:57 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.7_Vdw1_Gas/phenol_Simulation_SolvSimEle0-7_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.8_Vdw1_Gas/phenol_Simulation_SolvSimEle0-8_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.8_Vdw1_Gas/phenol_Simulation_SolvSimEle0-8_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.8_Vdw1_Gas/phenol_Simulation_SolvSimEle0-8_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.8_Vdw1_Gas/phenol_Simulation_SolvSimEle0-8_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:57 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.8_Vdw1_Gas/phenol_Simulation_SolvSimEle0-8_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:57 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.9_Vdw1_Gas/phenol_Simulation_SolvSimEle0-9_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:58 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.9_Vdw1_Gas/phenol_Simulation_SolvSimEle0-9_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:58 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.9_Vdw1_Gas/phenol_Simulation_SolvSimEle0-9_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:58 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.9_Vdw1_Gas/phenol_Simulation_SolvSimEle0-9_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:58 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.9_Vdw1_Gas/phenol_Simulation_SolvSimEle0-9_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:58 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle1_Vdw1_Gas/phenol_Simulation_SolvSimEle1_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:55:58 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle1_Vdw1_Gas/phenol_Simulation_SolvSimEle1_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:55:58 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle1_Vdw1_Gas/phenol_Simulation_SolvSimEle1_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:55:58 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle1_Vdw1_Gas/phenol_Simulation_SolvSimEle1_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:55:58 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle1_Vdw1_Gas/phenol_Simulation_SolvSimEle1_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:55:58 2021 Setting up dynamics for SolvSim
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0_Gas/phenol_Simulation_SolvSimEle0_Vdw0_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0_Gas/phenol_Simulation_SolvSimEle0_Vdw0_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0_Gas/phenol_Simulation_SolvSimEle0_Vdw0_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0_Gas/phenol_Simulation_SolvSimEle0_Vdw0_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:01 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0_Gas/phenol_Simulation_SolvSimEle0_Vdw0_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.45_Gas/phenol_Simulation_SolvSimEle0_Vdw0-45_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.45_Gas/phenol_Simulation_SolvSimEle0_Vdw0-45_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.45_Gas/phenol_Simulation_SolvSimEle0_Vdw0-45_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.45_Gas/phenol_Simulation_SolvSimEle0_Vdw0-45_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:01 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.45_Gas/phenol_Simulation_SolvSimEle0_Vdw0-45_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.52_Gas/phenol_Simulation_SolvSimEle0_Vdw0-52_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.52_Gas/phenol_Simulation_SolvSimEle0_Vdw0-52_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.52_Gas/phenol_Simulation_SolvSimEle0_Vdw0-52_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.52_Gas/phenol_Simulation_SolvSimEle0_Vdw0-52_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:01 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.52_Gas/phenol_Simulation_SolvSimEle0_Vdw0-52_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.56_Gas/phenol_Simulation_SolvSimEle0_Vdw0-56_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.56_Gas/phenol_Simulation_SolvSimEle0_Vdw0-56_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.56_Gas/phenol_Simulation_SolvSimEle0_Vdw0-56_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.56_Gas/phenol_Simulation_SolvSimEle0_Vdw0-56_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:01 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.56_Gas/phenol_Simulation_SolvSimEle0_Vdw0-56_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.58_Gas/phenol_Simulation_SolvSimEle0_Vdw0-58_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.58_Gas/phenol_Simulation_SolvSimEle0_Vdw0-58_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.58_Gas/phenol_Simulation_SolvSimEle0_Vdw0-58_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:01 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.58_Gas/phenol_Simulation_SolvSimEle0_Vdw0-58_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:01 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.58_Gas/phenol_Simulation_SolvSimEle0_Vdw0-58_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.6_Gas/phenol_Simulation_SolvSimEle0_Vdw0-6_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.6_Gas/phenol_Simulation_SolvSimEle0_Vdw0-6_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.6_Gas/phenol_Simulation_SolvSimEle0_Vdw0-6_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.6_Gas/phenol_Simulation_SolvSimEle0_Vdw0-6_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:02 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.6_Gas/phenol_Simulation_SolvSimEle0_Vdw0-6_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.62_Gas/phenol_Simulation_SolvSimEle0_Vdw0-62_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.62_Gas/phenol_Simulation_SolvSimEle0_Vdw0-62_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.62_Gas/phenol_Simulation_SolvSimEle0_Vdw0-62_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.62_Gas/phenol_Simulation_SolvSimEle0_Vdw0-62_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:02 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.62_Gas/phenol_Simulation_SolvSimEle0_Vdw0-62_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.64_Gas/phenol_Simulation_SolvSimEle0_Vdw0-64_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.64_Gas/phenol_Simulation_SolvSimEle0_Vdw0-64_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.64_Gas/phenol_Simulation_SolvSimEle0_Vdw0-64_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.64_Gas/phenol_Simulation_SolvSimEle0_Vdw0-64_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:02 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.64_Gas/phenol_Simulation_SolvSimEle0_Vdw0-64_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.67_Gas/phenol_Simulation_SolvSimEle0_Vdw0-67_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.67_Gas/phenol_Simulation_SolvSimEle0_Vdw0-67_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.67_Gas/phenol_Simulation_SolvSimEle0_Vdw0-67_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.67_Gas/phenol_Simulation_SolvSimEle0_Vdw0-67_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:02 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.67_Gas/phenol_Simulation_SolvSimEle0_Vdw0-67_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.7_Gas/phenol_Simulation_SolvSimEle0_Vdw0-7_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.7_Gas/phenol_Simulation_SolvSimEle0_Vdw0-7_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.7_Gas/phenol_Simulation_SolvSimEle0_Vdw0-7_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.7_Gas/phenol_Simulation_SolvSimEle0_Vdw0-7_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:02 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.7_Gas/phenol_Simulation_SolvSimEle0_Vdw0-7_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.75_Gas/phenol_Simulation_SolvSimEle0_Vdw0-75_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.75_Gas/phenol_Simulation_SolvSimEle0_Vdw0-75_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.75_Gas/phenol_Simulation_SolvSimEle0_Vdw0-75_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.75_Gas/phenol_Simulation_SolvSimEle0_Vdw0-75_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:02 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.75_Gas/phenol_Simulation_SolvSimEle0_Vdw0-75_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.8_Gas/phenol_Simulation_SolvSimEle0_Vdw0-8_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.8_Gas/phenol_Simulation_SolvSimEle0_Vdw0-8_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.8_Gas/phenol_Simulation_SolvSimEle0_Vdw0-8_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:02 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.8_Gas/phenol_Simulation_SolvSimEle0_Vdw0-8_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:02 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.8_Gas/phenol_Simulation_SolvSimEle0_Vdw0-8_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.85_Gas/phenol_Simulation_SolvSimEle0_Vdw0-85_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.85_Gas/phenol_Simulation_SolvSimEle0_Vdw0-85_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.85_Gas/phenol_Simulation_SolvSimEle0_Vdw0-85_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.85_Gas/phenol_Simulation_SolvSimEle0_Vdw0-85_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:03 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.85_Gas/phenol_Simulation_SolvSimEle0_Vdw0-85_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.9_Gas/phenol_Simulation_SolvSimEle0_Vdw0-9_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.9_Gas/phenol_Simulation_SolvSimEle0_Vdw0-9_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.9_Gas/phenol_Simulation_SolvSimEle0_Vdw0-9_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.9_Gas/phenol_Simulation_SolvSimEle0_Vdw0-9_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:03 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.9_Gas/phenol_Simulation_SolvSimEle0_Vdw0-9_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.95_Gas/phenol_Simulation_SolvSimEle0_Vdw0-95_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.95_Gas/phenol_Simulation_SolvSimEle0_Vdw0-95_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.95_Gas/phenol_Simulation_SolvSimEle0_Vdw0-95_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.95_Gas/phenol_Simulation_SolvSimEle0_Vdw0-95_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:03 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.95_Gas/phenol_Simulation_SolvSimEle0_Vdw0-95_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw1_Gas/phenol_Simulation_SolvSimEle0_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw1_Gas/phenol_Simulation_SolvSimEle0_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw1_Gas/phenol_Simulation_SolvSimEle0_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw1_Gas/phenol_Simulation_SolvSimEle0_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:03 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw1_Gas/phenol_Simulation_SolvSimEle0_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.1_Vdw1_Gas/phenol_Simulation_SolvSimEle0-1_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.1_Vdw1_Gas/phenol_Simulation_SolvSimEle0-1_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.1_Vdw1_Gas/phenol_Simulation_SolvSimEle0-1_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.1_Vdw1_Gas/phenol_Simulation_SolvSimEle0-1_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:03 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.1_Vdw1_Gas/phenol_Simulation_SolvSimEle0-1_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.2_Vdw1_Gas/phenol_Simulation_SolvSimEle0-2_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.2_Vdw1_Gas/phenol_Simulation_SolvSimEle0-2_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.2_Vdw1_Gas/phenol_Simulation_SolvSimEle0-2_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.2_Vdw1_Gas/phenol_Simulation_SolvSimEle0-2_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:03 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.2_Vdw1_Gas/phenol_Simulation_SolvSimEle0-2_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.3_Vdw1_Gas/phenol_Simulation_SolvSimEle0-3_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.3_Vdw1_Gas/phenol_Simulation_SolvSimEle0-3_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.3_Vdw1_Gas/phenol_Simulation_SolvSimEle0-3_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.3_Vdw1_Gas/phenol_Simulation_SolvSimEle0-3_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:03 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.3_Vdw1_Gas/phenol_Simulation_SolvSimEle0-3_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.4_Vdw1_Gas/phenol_Simulation_SolvSimEle0-4_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.4_Vdw1_Gas/phenol_Simulation_SolvSimEle0-4_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.4_Vdw1_Gas/phenol_Simulation_SolvSimEle0-4_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.4_Vdw1_Gas/phenol_Simulation_SolvSimEle0-4_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:03 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.4_Vdw1_Gas/phenol_Simulation_SolvSimEle0-4_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.5_Vdw1_Gas/phenol_Simulation_SolvSimEle0-5_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.5_Vdw1_Gas/phenol_Simulation_SolvSimEle0-5_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.5_Vdw1_Gas/phenol_Simulation_SolvSimEle0-5_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:03 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.5_Vdw1_Gas/phenol_Simulation_SolvSimEle0-5_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:04 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.5_Vdw1_Gas/phenol_Simulation_SolvSimEle0-5_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.6_Vdw1_Gas/phenol_Simulation_SolvSimEle0-6_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.6_Vdw1_Gas/phenol_Simulation_SolvSimEle0-6_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.6_Vdw1_Gas/phenol_Simulation_SolvSimEle0-6_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.6_Vdw1_Gas/phenol_Simulation_SolvSimEle0-6_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:04 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.6_Vdw1_Gas/phenol_Simulation_SolvSimEle0-6_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.7_Vdw1_Gas/phenol_Simulation_SolvSimEle0-7_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.7_Vdw1_Gas/phenol_Simulation_SolvSimEle0-7_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.7_Vdw1_Gas/phenol_Simulation_SolvSimEle0-7_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.7_Vdw1_Gas/phenol_Simulation_SolvSimEle0-7_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:04 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.7_Vdw1_Gas/phenol_Simulation_SolvSimEle0-7_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.8_Vdw1_Gas/phenol_Simulation_SolvSimEle0-8_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.8_Vdw1_Gas/phenol_Simulation_SolvSimEle0-8_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.8_Vdw1_Gas/phenol_Simulation_SolvSimEle0-8_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.8_Vdw1_Gas/phenol_Simulation_SolvSimEle0-8_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:04 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.8_Vdw1_Gas/phenol_Simulation_SolvSimEle0-8_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.9_Vdw1_Gas/phenol_Simulation_SolvSimEle0-9_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.9_Vdw1_Gas/phenol_Simulation_SolvSimEle0-9_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.9_Vdw1_Gas/phenol_Simulation_SolvSimEle0-9_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.9_Vdw1_Gas/phenol_Simulation_SolvSimEle0-9_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:04 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.9_Vdw1_Gas/phenol_Simulation_SolvSimEle0-9_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle1_Vdw1_Gas/phenol_Simulation_SolvSimEle1_Vdw1_Gas_solvwaterboxproddyn.key axis
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle1_Vdw1_Gas/phenol_Simulation_SolvSimEle1_Vdw1_Gas_solvwaterboxproddyn.key ewald
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle1_Vdw1_Gas/phenol_Simulation_SolvSimEle1_Vdw1_Gas_solvwaterboxproddyn.key cutoff
+
+Mon Nov 22 13:56:04 2021 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle1_Vdw1_Gas/phenol_Simulation_SolvSimEle1_Vdw1_Gas_solvwaterboxproddyn.key correction
+
+Mon Nov 22 13:56:04 2021 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle1_Vdw1_Gas/phenol_Simulation_SolvSimEle1_Vdw1_Gas_solvwaterboxproddyn.key RESPA-INNER 0.1
+
+
+Mon Nov 22 13:56:04 2021 Running production dynamics
+
+Mon Nov 22 13:56:04 2021 System dynamics is not complete 
+
+Mon Nov 22 20:42:51 2021 System dynamics is complete 
+
+Mon Nov 22 20:42:51 2021 Running BAR
+
+Mon Nov 22 20:42:51 2021 Running BAR
+
+Mon Nov 22 20:42:51 2021 BAR is running
+
+Mon Nov 22 20:42:51 2021 BAR is not complete 
+
+Mon Nov 22 21:10:03 2021 BAR is complete
+
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.9_Vdw1/phenol_Simulation_SolvSimEle0-9_Vdw1_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.8_Vdw1/phenol_Simulation_SolvSimEle0-8_Vdw1_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.7_Vdw1/phenol_Simulation_SolvSimEle0-7_Vdw1_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.6_Vdw1/phenol_Simulation_SolvSimEle0-6_Vdw1_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.5_Vdw1/phenol_Simulation_SolvSimEle0-5_Vdw1_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.4_Vdw1/phenol_Simulation_SolvSimEle0-4_Vdw1_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.3_Vdw1/phenol_Simulation_SolvSimEle0-3_Vdw1_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.2_Vdw1/phenol_Simulation_SolvSimEle0-2_Vdw1_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.1_Vdw1/phenol_Simulation_SolvSimEle0-1_Vdw1_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw1/phenol_Simulation_SolvSimEle0_Vdw1_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.95/phenol_Simulation_SolvSimEle0_Vdw0-95_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.9/phenol_Simulation_SolvSimEle0_Vdw0-9_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.85/phenol_Simulation_SolvSimEle0_Vdw0-85_solvwaterboxproddyn.bar
+WARNING: Standard deviation of energy difference (kcal/mol) above threshold (13.429 vs. 2.000)
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.8/phenol_Simulation_SolvSimEle0_Vdw0-8_solvwaterboxproddyn.bar
+WARNING: Difference between forward and backward FEP (kcal/mol)  above threshold (99.379 vs. 1.000)
+WARNING: Standard deviation of energy difference (kcal/mol) above threshold (5.648 vs. 2.000)
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.75/phenol_Simulation_SolvSimEle0_Vdw0-75_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.7/phenol_Simulation_SolvSimEle0_Vdw0-7_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.67/phenol_Simulation_SolvSimEle0_Vdw0-67_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.64/phenol_Simulation_SolvSimEle0_Vdw0-64_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.62/phenol_Simulation_SolvSimEle0_Vdw0-62_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.6/phenol_Simulation_SolvSimEle0_Vdw0-6_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.58/phenol_Simulation_SolvSimEle0_Vdw0-58_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.56/phenol_Simulation_SolvSimEle0_Vdw0-56_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.52/phenol_Simulation_SolvSimEle0_Vdw0-52_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.45/phenol_Simulation_SolvSimEle0_Vdw0-45_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0/phenol_Simulation_SolvSimEle0_Vdw0_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.45_Gas/phenol_Simulation_SolvSimEle0_Vdw0-45_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.52_Gas/phenol_Simulation_SolvSimEle0_Vdw0-52_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.56_Gas/phenol_Simulation_SolvSimEle0_Vdw0-56_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.58_Gas/phenol_Simulation_SolvSimEle0_Vdw0-58_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.6_Gas/phenol_Simulation_SolvSimEle0_Vdw0-6_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.62_Gas/phenol_Simulation_SolvSimEle0_Vdw0-62_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.64_Gas/phenol_Simulation_SolvSimEle0_Vdw0-64_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.67_Gas/phenol_Simulation_SolvSimEle0_Vdw0-67_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.7_Gas/phenol_Simulation_SolvSimEle0_Vdw0-7_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.75_Gas/phenol_Simulation_SolvSimEle0_Vdw0-75_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.8_Gas/phenol_Simulation_SolvSimEle0_Vdw0-8_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.85_Gas/phenol_Simulation_SolvSimEle0_Vdw0-85_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.9_Gas/phenol_Simulation_SolvSimEle0_Vdw0-9_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw0.95_Gas/phenol_Simulation_SolvSimEle0_Vdw0-95_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0_Vdw1_Gas/phenol_Simulation_SolvSimEle0_Vdw1_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.1_Vdw1_Gas/phenol_Simulation_SolvSimEle0-1_Vdw1_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.2_Vdw1_Gas/phenol_Simulation_SolvSimEle0-2_Vdw1_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.3_Vdw1_Gas/phenol_Simulation_SolvSimEle0-3_Vdw1_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.4_Vdw1_Gas/phenol_Simulation_SolvSimEle0-4_Vdw1_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.5_Vdw1_Gas/phenol_Simulation_SolvSimEle0-5_Vdw1_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.6_Vdw1_Gas/phenol_Simulation_SolvSimEle0-6_Vdw1_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.7_Vdw1_Gas/phenol_Simulation_SolvSimEle0-7_Vdw1_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.8_Vdw1_Gas/phenol_Simulation_SolvSimEle0-8_Vdw1_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle0.9_Vdw1_Gas/phenol_Simulation_SolvSimEle0-9_Vdw1_Gas_solvwaterboxproddyn.bar
+f1 /work/bdw2292/OrganicPaperMolecules/phenol/phenol_Simulation/SolvSim/SolvSimEle1_Vdw1_Gas/phenol_Simulation_SolvSimEle1_Vdw1_Gas_solvwaterboxproddyn.bar
+/home/bdw2292/AMOEBAAnnihhilator/AMOEBAAnnihilatorModules/bar.py:746: UserWarning: Forward and Backward pertubations for solvation have detected pertubation greather than 1 kcal/mol difference of 99.379359256632 kcal/mol was detected
+  warnings.warn(string)
+Mon Nov 22 21:10:22 2021 AMOEBA Annihilator is complete. Your molecule just got annihilated!
+
+/home/bdw2292/miniconda3/envs/newamoebamdpoltype/lib/python3.8/site-packages/openbabel/__init__.py:14: UserWarning: "import openbabel" is deprecated, instead use "from openbabel import openbabel"
+  warnings.warn('"import openbabel" is deprecated, instead use "from openbabel import openbabel"')
+/home/bdw2292/poltype2/PoltypeModules/bar.py:486: FutureWarning: Index.__and__ operating as a set operation is deprecated, in the future this will be a logical operation matching Series.__and__.  Use index.intersection(other) instead.
+  if col in (df2.columns & df3.columns):
+/home/bdw2292/poltype2/PoltypeModules/bar.py:486: FutureWarning: Index.__and__ operating as a set operation is deprecated, in the future this will be a logical operation matching Series.__and__.  Use index.intersection(other) instead.
+  if col in (df2.columns & df3.columns):
+/home/bdw2292/poltype2/PoltypeModules/bar.py:749: UserWarning: Forward and Backward pertubations for solvation have detected pertubation greather than 1 kcal/mol difference of 99.38 kcal/mol was detected
+  warnings.warn(string)
+Poltype -- Polarizable atom typer of small molecules for the AMOEBA polarizable force field
+
+Please cite:
+Wu, J.C.; Chattree, G.; Ren, P.Y.; Automation of AMOEBA polarizable force field 
+parameterization for small molecules. Theor Chem Acc. 
+
+Version 2.3.1 May 2021
+
+Copyright (c)  Johnny Wu, Gaurav Chattree, Brandon Walker, Matthew Harger and Pengyu Ren 2019
+
+All Rights Reserved
+##############################################################################################################
+
+Mon Apr  4 15:46:31 2022 Removing key word from final.key parameters
+
+Mon Apr  4 15:46:32 2022 Removing key word from final.key axis
+
+Mon Apr  4 15:46:32 2022 Removing key word from final.key ewald
+
+Mon Apr  4 15:46:32 2022 Removing key word from final.key pme-grid
+
+Mon Apr  4 15:46:32 2022 Removing key word from final.key pme-order
+
+Mon Apr  4 15:46:32 2022 Removing key word from final.key cutoff
+
+Mon Apr  4 15:46:32 2022 Removing key word from final.key thermostat
+
+Mon Apr  4 15:46:32 2022 Removing key word from final.key integrator
+
+Mon Apr  4 15:46:32 2022 Removing key word from final.key ligand
+
+Mon Apr  4 15:46:32 2022 Removing key word from final.key verbose
+
+Mon Apr  4 15:46:32 2022 Removing key word from final.key archive
+
+Mon Apr  4 15:46:32 2022 Removing key word from final.key neighbor-list
+
+Mon Apr  4 15:46:32 2022 Removing key word from final.key polar-eps
+
+Mon Apr  4 15:46:32 2022 Removing key word from final.key polar-predict
+
+Mon Apr  4 15:46:32 2022 Removing key word from final.key heavy-hydrogen
+
+Mon Apr  4 15:46:32 2022 Removing key word from final.key omp-threads
+
+Mon Apr  4 15:46:32 2022 Adding key words to final.key parameters amoebabio18.prm
+
+
+Mon Apr  4 15:46:52 2022 Removing key word from phenol_solv_config.key parameters
+
+Mon Apr  4 15:46:52 2022 Removing key word from phenol_solv_config.key TARGET-DIPOLE
+
+Mon Apr  4 15:46:52 2022 Removing key word from phenol_solv_config.key OPENMP-THREADS
+
+Mon Apr  4 15:46:52 2022 Adding header to key file phenol_solv_config.key
+
+Mon Apr  4 15:46:52 2022 Adding key words to phenol_solv_config.key parameters amoebabio18.prm
+
+
+Mon Apr  4 15:46:52 2022 Adding key words to phenol_solv_config.key archive
+
+
+Mon Apr  4 15:46:52 2022 Adding key words to phenol_solv_config.key integrator RESPA
+
+
+Mon Apr  4 15:46:52 2022 Adding key words to phenol_solv_config.key thermostat BUSSI
+
+
+Mon Apr  4 15:46:52 2022 Adding key words to phenol_solv_config.key ewald
+
+
+Mon Apr  4 15:46:53 2022 Adding key words to phenol_solv_config.key vdw-cutoff 12
+
+
+Mon Apr  4 15:46:53 2022 Adding key words to phenol_solv_config.key ewald-cutoff 7
+
+
+Mon Apr  4 15:46:53 2022 Adding key words to phenol_solv_config.key polar-eps 1e-05
+
+
+Mon Apr  4 15:46:53 2022 Adding key words to phenol_solv_config.key polar-predict
+
+
+Mon Apr  4 15:46:53 2022 Adding key words to phenol_solv_config.key barostat montecarlo
+
+
+Mon Apr  4 15:46:53 2022 Adding key words to phenol_solv_config.key neighbor-list
+
+
+Mon Apr  4 15:46:53 2022 Adding key words to phenol_solv_config.key vdw-correction
+
+
+Mon Apr  4 15:46:53 2022 Adding key words to phenol_solv_config.key vdw-annihilate
+
+
+Mon Apr  4 15:46:54 2022 Adding key words to phenol_solv_config.key pme-grid 64 64 64
+
+
+Mon Apr  4 15:46:54 2022 Adding key words to phenol_solv_config.key pme-order 5
+
+
+Mon Apr  4 15:46:54 2022 Adding key words to phenol_solv_config.key polarization MUTUAL
+
+
+Mon Apr  4 15:46:54 2022 Adding key words to phenol_solv_config.key OPENMP-THREADS 12
+
+
+Mon Apr  4 15:46:54 2022 Computing volume 
+
+Mon Apr  4 15:46:54 2022 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol/phenol_solv_config.key a-axis 35.7
+
+
+Mon Apr  4 15:46:54 2022 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol/phenol_solv_config.key b-axis 35.7
+
+
+Mon Apr  4 15:46:54 2022 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol/phenol_solv_config.key c-axis 35.7
+
+
+Mon Apr  4 15:46:55 2022 Adding key words to /work/bdw2292/OrganicPaperMolecules/phenol/phenol/phenol_solv_config.key restrain-position -1 13 5.0 0
+
+
+Mon Apr  4 15:46:55 2022 Removing key word from /work/bdw2292/OrganicPaperMolecules/phenol/phenol/phenol_solv_config.key restrain-position
+
+Mon Apr  4 15:46:55 2022 Single system equilibriation job is complete 
+
+Mon Apr  4 15:46:55 2022 Single system equilibriation job is complete 
+
+Mon Apr  4 15:46:55 2022 Single system equilibriation job is complete 
+
+Mon Apr  4 15:46:55 2022 Single system equilibriation job is complete 
+
+Mon Apr  4 15:46:55 2022 Single system equilibriation job is complete 
+
+Mon Apr  4 15:46:55 2022 Single system equilibriation job is complete 
+
+Mon Apr  4 15:46:55 2022 Single system equilibriation job is complete 
+
+Mon Apr  4 15:46:55 2022 System equilibriation is complete 
+
+Mon Apr  4 15:46:55 2022 Removing key word from phenol_solv_config.key restrain
+
+Mon Apr  4 15:46:55 2022 Removing key word from phenol_solv_config.key group
+
+Mon Apr  4 15:46:55 2022 Adding key words to phenol_solv_lambda.key ligand -1 13
+
+
+Mon Apr  4 15:46:55 2022 Adding key words to phenol_solv_lambda.key ele-lambda
+
+
+Mon Apr  4 15:46:55 2022 Adding key words to phenol_solv_lambda.key vdw-lambda
+
+
+Mon Apr  4 15:48:01 2022 Production dynamics is not complete ,0.0% of jobs finished
+
+Mon Apr  4 15:48:44 2022 System dynamics is complete 
+
+Mon Apr  4 15:48:47 2022 BAR is running
+
+Mon Apr  4 15:48:47 2022 BAR is not complete ,0% of jobs finished
+
+Mon Apr  4 15:48:59 2022 BAR is complete
+
+WARNING: Standard deviation of energy difference (kcal/mol) above threshold (13.429 vs. 2.000)
+WARNING: Difference between forward and backward FEP (kcal/mol)  above threshold (99.379 vs. 1.000)
+WARNING: Standard deviation of energy difference (kcal/mol) above threshold (5.648 vs. 2.000)
+Mon Apr  4 15:49:50 2022 AMOEBA Annihilator is complete. Your molecule just got annihilated!
+

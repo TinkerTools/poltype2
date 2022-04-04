@@ -1854,6 +1854,15 @@ class PolarizableTyper():
                             elelamb=estatlambdascheme[-1]
                             vdwlamb=vdwlambdascheme[-1]
                             rest=restlambdascheme[-1]
+                        elif k==1 and self.checkneedregrow==False:
+                            elelamb=estatlambdascheme[0]
+                            vdwlamb=vdwlambdascheme[0]
+                            rest=restlambdascheme[0]
+                        elif k==2 and self.checkneedregrow==True:
+                            elelamb=estatlambdascheme[0]
+                            vdwlamb=vdwlambdascheme[0]
+                            rest=restlambdascheme[0]
+
                         count=1
                         for keyfilename,index in self.perturbkeyfilelisttokeyindex.items():
                             numinterpols=self.perturbkeyfilelisttointerpolations[keyfilename]
@@ -1881,12 +1890,23 @@ class PolarizableTyper():
                                     self.vdwlambdascheme[k].insert(0,vdwlamb)
                                     self.restlambdascheme[k].insert(0,rest)
                                     templambdafolderlist.insert(0,fold) 
-
                                 elif k==1 and self.checkneedregrow==True:
                                     self.estatlambdascheme[k].append(elelamb)
                                     self.vdwlambdascheme[k].append(vdwlamb)
                                     self.restlambdascheme[k].append(rest)
                                     templambdafolderlist.append(fold) 
+                                elif k==1 and self.checkneedregrow==False:
+                                    self.estatlambdascheme[k].insert(0,elelamb)
+                                    self.vdwlambdascheme[k].insert(0,vdwlamb)
+                                    self.restlambdascheme[k].insert(0,rest)
+                                    templambdafolderlist.insert(0,fold) 
+                                elif k==2 and self.checkneedregrow==True:
+                                    self.estatlambdascheme[k].insert(0,elelamb)
+                                    self.vdwlambdascheme[k].insert(0,vdwlamb)
+                                    self.restlambdascheme[k].insert(0,rest)
+                                    templambdafolderlist.insert(0,fold) 
+
+
                                 if self.fep==False:
                                     outputfilepath=os.getcwd()+'/'+simfold+'/'+fold+'/'
                                     outputfilepath+=self.foldername+'_'+fold+'.out'

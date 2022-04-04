@@ -1,0 +1,29 @@
+molecule { 
+0 1
+ O    0.009400    0.397700    0.000000
+ H    0.758600   -0.216900    0.000000
+ H   -0.768000   -0.180800    0.000000
+}
+set {
+  geom_maxiter 400
+  g_convergence GAU
+  dynamic_level 1
+}
+memory 49GB
+set_num_threads(12)
+psi4_io.set_default_path("/scratch/bdw2292/Psi4-water_3D")
+for _ in range(1):
+  try:
+    set opt_coordinates both
+    optimize('mp2/6-31G*')
+    break
+  except OptimizationConvergenceError:
+    break
+  else:
+    try:
+      set opt_coordinates cartesian
+      optimize('mp2/6-31G*')
+      break
+    except OptimizationConvergenceError:
+      pass
+clean()
