@@ -43,115 +43,115 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 ### Automated AMOEBA Ligand Parameterization 
 
-#### [Parameterization Input Preparation](#parameterization-input-preparation)
+[Parameterization Input Preparation](#parameterization-input-preparation)
 
-#### [Minimum Example Usage Parameterization](#minimum-example-usage-parameterization)
+[Minimum Example Usage Parameterization](#minimum-example-usage-parameterization)
 
-#### [💻 Advanced Program Usage](README/README_HELP.MD)
+[💻 Advanced Program Usage](README/README_HELP.MD)
 
-#### [Parameterization Output Files](#parameterization-output-files)
+[Parameterization Output Files](#parameterization-output-files)
 
-* ##### [Final XYZ File](#final-xyz-file)
+* [Final XYZ File](#final-xyz-file)
 
-* ##### [Final Key File](#final-key-file)
+*  [Final Key File](#final-key-file)
 
-    * ###### [Atom Type Definitions Example](#atom-type-definitions-example)
+    * [Atom Type Definitions Example](#atom-type-definitions-example)
 
-    * ###### [Van der Waals Parameter Definitions Example](#van-der-waals-parameter-definitions-example)
+    * [Van der Waals Parameter Definitions Example](#van-der-waals-parameter-definitions-example)
 
-    * ###### [Bond Parameter Definitions Example](#bond-parameter-definitions-example)
+    * [Bond Parameter Definitions Example](#bond-parameter-definitions-example)
 
-    * ###### [Angle Parameter Definitions Example](#angle-parameter-definitions-example)
+    * [Angle Parameter Definitions Example](#angle-parameter-definitions-example)
 
-    * ###### [Stretch Bend Parameter Definitions Example](#stretch-bend-parameter-definitions-example)
+    * [Stretch Bend Parameter Definitions Example](#stretch-bend-parameter-definitions-example)
 
-    * ###### [Out of Plane Bend Parameter Definitions Example](#out-of-plane-bend-parameter-definitions-example)
+    * [Out of Plane Bend Parameter Definitions Example](#out-of-plane-bend-parameter-definitions-example)
 
-    * ###### [Torsion Parameter Definitions Example](#torsion-parameter-definitions-example)
+    * [Torsion Parameter Definitions Example](#torsion-parameter-definitions-example)
 
-    * ###### [Solute Parameter Definitions Example](#solute-parameter-definitions-example)
+    * [Solute Parameter Definitions Example](#solute-parameter-definitions-example)
 
-    * ###### [Polarize Parameter Definitions Example](#polarize-parameter-definitions-example)
+    * [Polarize Parameter Definitions Example](#polarize-parameter-definitions-example)
 
-    * ###### [Multipole Parameter Definitions Example](#multipole-parameter-definitions-example)
+    * [Multipole Parameter Definitions Example](#multipole-parameter-definitions-example)
 
-* ##### [Poltype Log File](#poltype-log-file)
+* [Poltype Log File](#poltype-log-file)
 
-* ##### [OPENME Plots](#openme-plots)
+* [OPENME Plots](#openme-plots)
 
-#### [Parameterization Sanity Checks](#parameterization-sanity-checks)
+[Parameterization Sanity Checks](#parameterization-sanity-checks)
 
-#### [Parameterization Examples](Examples/Parameterization)
+[Parameterization Examples](Examples/Parameterization)
 
 ### Automated AMOEBA Ligand Parameterization - How It Works
 
-#### [⚛️ Atom Type Classification](#atom-type-classification)
+[⚛️ Atom Type Classification](#atom-type-classification)
 
-#### [QM Geometry Optimization](#qm-geometry-optimization)
+[QM Geometry Optimization](#qm-geometry-optimization)
 
-#### [⚡ Electrostatic Parameterization](#electrostatic-parameterization)
+[⚡ Electrostatic Parameterization](#electrostatic-parameterization)
 
-* ##### [🔍 Multipole Frame Detection](#multipole-frame-detection)
+* [🔍 Multipole Frame Detection](#multipole-frame-detection)
 
-#### [🔍 Database Search](#database-search)
+[🔍 Database Search](#database-search)
 
-* ##### [Polarizability Parameter Search](#polarizability-parameter-search)
+* [Polarizability Parameter Search](#polarizability-parameter-search)
 
-* ##### [Valence Parameter Search](#valence-parameter-search)
+* [Valence Parameter Search](#valence-parameter-search)
 
-* ##### [Van der Waals Parameter Search](#van-der-waals-parameter-search) 
+* [Van der Waals Parameter Search](#van-der-waals-parameter-search) 
 
-* ##### [Torsion Parameter Search](#torsion-parameter-search) 
+* [Torsion Parameter Search](#torsion-parameter-search) 
 
-* ##### [Torsion Torsion Parameter Search](#torsion-torsion-parameter-search) 
+* [Torsion Torsion Parameter Search](#torsion-torsion-parameter-search) 
 
-#### [Fragmentation](#fragmentation)
+[Fragmentation](#fragmentation)
 
-#### [Van der Waals Refinement](#van-der-waals-refinement)
+[Van der Waals Refinement](#van-der-waals-refinement)
 
-#### [One-dimensional Torsion](#one-dimensional-torsion)
+[One-dimensional Torsion](#one-dimensional-torsion)
 
-#### [Coupled Torsion Torsion](#coupled-torsion-torsion)
+[Coupled Torsion Torsion](#coupled-torsion-torsion)
 
-#### [Non-aromatic Ring Torsions](#non-aromatic-ring-torsions)
+[Non-aromatic Ring Torsions](#non-aromatic-ring-torsions)
 
 ### Automated AMOEBA Molecular Dynamics and Free Energy Prediciton
 
-#### [Molecular Dynamics Input Preparation](#molecular-dynamics-input-preparation)
+[Molecular Dynamics Input Preparation](#molecular-dynamics-input-preparation)
 
-#### [Minimum Input Example Binding Free Energy](#minimum-input-example-binding-free-energy)
+[Minimum Input Example Binding Free Energy](#minimum-input-example-binding-free-energy)
 
-#### [Minimum Input Example Solvation Free Energy](#minimum-input-example-solvation-free-energy)
+[Minimum Input Example Solvation Free Energy](#minimum-input-example-solvation-free-energy)
 
-#### [Minimum Input Example Neat Liquid Simulation](#minimum-input-example-neat-liquid-simulation)
+[Minimum Input Example Neat Liquid Simulation](#minimum-input-example-neat-liquid-simulation)
 
-#### [Molecular Dynamics Sanity Checks](#molecular-dynamics-sanity-checks)
+[Molecular Dynamics Sanity Checks](#molecular-dynamics-sanity-checks)
 
-#### [Free Energy Output Files](#free-energy-output-files)
+[Free Energy Output Files](#free-energy-output-files)
 
-#### [Hydration Free Energy Examples](Examples/HFE)
+[Hydration Free Energy Examples](Examples/HFE)
 
-#### [Ion Hydration Free Energy Examples](Examples/IonHFE)
+[Ion Hydration Free Energy Examples](Examples/IonHFE)
  
-#### [Binding Free Energy Examples](Examples/BindingFE)
+[Binding Free Energy Examples](Examples/BindingFE)
 
-#### [💻 Advanced Program Usage](README/README_HELP.MD)
+[💻 Advanced Program Usage](README/README_HELP.MD)
 
 ### Automated AMOEBA Molecular Dynamics and Free Energy Prediciton - How It Works
 
-#### [Box Setup](#box-setup)
+[Box Setup](#box-setup)
 
-#### [Charge Correction For Charged Ligand HFE](#charge-correction-for-charged-ligand-hfe)
+[Charge Correction For Charged Ligand HFE](#charge-correction-for-charged-ligand-hfe)
 
-#### [Minimization](#minimization)
+[Minimization](#minimization)
 
-#### [Equilibration](#equilibration)
+[Equilibration](#equilibration)
 
-#### [Production Dynamics and Free Energy Prediction](#production-dynamics-and-free-energy-prediction)
+[Production Dynamics and Free Energy Prediction](#production-dynamics-and-free-energy-prediction)
 
-#### [Tinker Key Defaults](#tinker-key-defaults)
+[Tinker Key Defaults](#tinker-key-defaults)
 
-#### [AMOEBA Publications](#amoeba-publications)
+[AMOEBA Publications](#amoeba-publications)
 
 
 
