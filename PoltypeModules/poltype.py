@@ -3508,7 +3508,7 @@ class PolarizableTyper():
             shutil.rmtree(self.scrtmpdirgau)
         if os.path.exists(self.scrtmpdirpsi4):
             shutil.rmtree(self.scrtmpdirpsi4)
-        string='Poltype has completed successfully, but this software is still under active development. It is your responsibility to check your own final parameters, while we are still in development phase.'
+        string='Poltype parameterization has completed successfully.'
         warnings.warn(string)
         self.WriteToLog(string)
         if self.email!=None:

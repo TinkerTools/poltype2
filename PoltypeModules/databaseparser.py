@@ -1575,7 +1575,7 @@ def FindAllConsecutiveRotatableBonds(poltype,mol,listofbondsforprm):
         batom=poltype.mol.GetAtom(b)
         catom=poltype.mol.GetAtom(c)
         bval=len([neighb for neighb in openbabel.OBAtomAtomIter(batom)])
-        cval=len([neighb for neighb in openbabel.OBAtomAtomIter(batom)])
+        cval=len([neighb for neighb in openbabel.OBAtomAtomIter(catom)])
         if bval<2 or cval<2:
             continue
         newrotbnds.append(rotbnd)
