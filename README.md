@@ -24,7 +24,7 @@ Given an input chemical structure, all parameters can be automatically assigned 
 [license-url]: https://github.com/TinkerTools/tinker/blob/release/LICENSE.pdf
 
 
-<img src="README/Images/PoltypeFlow.PNG" width="40%">
+<img src="README/Images/Flow.PNG" width="40%">
 
 * **Figure 1**. Overview of automated parameterization scheme for Poltype 2. Green boxes indicate input and output. Blue boxes indicate actions performed and the red rhombus indicates and intermediate output.
 
