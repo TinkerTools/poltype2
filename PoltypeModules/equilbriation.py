@@ -112,12 +112,17 @@ def ExecuteEquilibriation(poltype):
         equiloutputarray=poltype.equiloutputarray[i]
         equilboxfilename=poltype.equilboxfilename[i]
         configkeyfilename=poltype.configkeyfilename[i][0]
-        cmdstr=EquilbriateDynamicCommand(poltype,poltype.equilstepsNPT,poltype.NPTensem,temp,equiloutputarray[-1],equilboxfilename,configkeyfilename,NPT=True)
-        jobtolog[i][cmdstr]=equiloutputarray[-1]
-        jobtoidx[i][cmdstr]=-1
+        if i==0 and poltype.solvation==True and poltype.addsolvionwindows==True:
+            idx=-2
+        else:
+            idx=-1
+
+        cmdstr=EquilbriateDynamicCommand(poltype,poltype.equilstepsNPT,poltype.NPTensem,temp,equiloutputarray[idx],equilboxfilename,configkeyfilename,NPT=True)
+        jobtolog[i][cmdstr]=equiloutputarray[idx]
+        jobtoidx[i][cmdstr]=idx
         jobtojobpath[i][cmdstr]=poltype.outputpath
         jobtorestconstant[i][cmdstr]=0
-        head,tail=os.path.split(equiloutputarray[-1]) 
+        head,tail=os.path.split(equiloutputarray[idx]) 
         outputfilenames=[tail]
         absbinpath=poltype.which(poltype.truedynamicpath)
         arcname=equilboxfilename.replace('.xyz','.arc')
@@ -131,6 +136,30 @@ def ExecuteEquilibriation(poltype):
         jobtoinputfilepaths[i][cmdstr]=inputfilepaths
         jobtooutputfiles[i][cmdstr]=outputfilenames
         jobtoabsolutebinpath[i][cmdstr]=absbinpath
+
+        if i==0 and poltype.solvation==True and poltype.addsolvionwindows==True:
+            shutil.copy(poltype.ionboxfilename,poltype.ionequilboxfilename)
+            cmdstr=EquilbriateDynamicCommand(poltype,poltype.equilstepsionNPT,poltype.NPTensem,temp,equiloutputarray[-1],poltype.ionequilboxfilename,poltype.ionkeyfilename,NPT=True)
+            jobtolog[i][cmdstr]=equiloutputarray[-1]
+            jobtoidx[i][cmdstr]=-1
+            jobtojobpath[i][cmdstr]=poltype.outputpath
+            jobtorestconstant[i][cmdstr]=0
+            head,tail=os.path.split(equiloutputarray[-1]) 
+            outputfilenames=[tail]
+            absbinpath=poltype.which(poltype.truedynamicpath)
+            arcname=poltype.ionequilboxfilename.replace('.xyz','.arc')
+            dynname=poltype.ionequilboxfilename.replace('.xyz','.dyn')
+            inputfilepaths=[poltype.outputpath+poltype.ionequilboxfilename,poltype.outputpath+poltype.ionkeyfilename,poltype.outputpath+poltype.prmfilepath]
+            if os.path.isfile(poltype.outputpath+arcname):
+                inputfilepaths.append(poltype.outputpath+arcname)
+            if os.path.isfile(poltype.outputpath+dynname):
+                inputfilepaths.append(poltype.outputpath+dynname)
+
+            jobtoinputfilepaths[i][cmdstr]=inputfilepaths
+            jobtooutputfiles[i][cmdstr]=outputfilenames
+            jobtoabsolutebinpath[i][cmdstr]=absbinpath
+
+            
 
     jobtologdic=jobtolog[0]
     for k in range(len(jobtologdic)):
@@ -204,12 +233,12 @@ def ExecuteEquilibriation(poltype):
     poltype.WriteToLog('System equilibriation is complete ',prin=True)
 
 
-def ExtractLastTinkerFrame(poltype,arcfilename,index):
+def ExtractLastTinkerFrame(poltype,arcfilename,newname):
     poltype.WriteToLog('Extracting the last frame of '+arcfilename,prin=True)
     framenum=int(os.path.getsize(poltype.outputpath+arcfilename)/os.path.getsize(poltype.outputpath+arcfilename.replace('.arc','.xyz')))
-    ExtractTinkerFrames(poltype,poltype.outputpath+arcfilename,framenum,framenum,1,framenum,index)
+    ExtractTinkerFrames(poltype,poltype.outputpath+arcfilename,framenum,framenum,1,framenum,newname)
 
-def ExtractTinkerFrames(poltype,arcpath,firstframe,lastframe,framestep,totalnumberframes,index):
+def ExtractTinkerFrames(poltype,arcpath,firstframe,lastframe,framestep,totalnumberframes,newname):
     firstline=True
     framecount=0
     framestoextract=np.arange(firstframe,lastframe+1,framestep)
@@ -252,7 +281,7 @@ def ExtractTinkerFrames(poltype,arcpath,firstframe,lastframe,framestep,totalnumb
                     temp.write(saveline)
                 temp.close()
     if os.path.exists(framename):
-        os.rename(framename,poltype.proddynboxfilename[index])
+        os.rename(framename,newname)
     return
   
 def EquilibriationProtocol(poltype):
@@ -285,7 +314,13 @@ def EquilibriationProtocol(poltype):
             proddynboxfilename=poltype.proddynboxfilename[i]
             proddynboxfilenamepymol=poltype.proddynboxfilenamepymol[i]
             if not os.path.isfile(poltype.outputpath+proddynboxfilename):
-                ExtractLastTinkerFrame(poltype,equilarcboxfilename,i)
+                ExtractLastTinkerFrame(poltype,equilarcboxfilename,poltype.proddynboxfilename[i])
+            if i==0 and poltype.solvation==True and poltype.addsolvionwindows==True:
+                if not os.path.isfile(poltype.outputpath+poltype.ionproddynboxfilename):
+                    ExtractLastTinkerFrame(poltype,poltype.ionequilarcfilename,poltype.ionproddynboxfilename)
+
+            
+
             for configkeyfilename in configkeyfilenamelist:
                 keymods.RemoveKeyWord(poltype,configkeyfilename,'restrain')
                 keymods.RemoveKeyWord(poltype,configkeyfilename,'group')

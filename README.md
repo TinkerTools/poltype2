@@ -129,6 +129,8 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 [Free Energy Output Files](#free-energy-output-files)
 
+[HFE Table Output Example](#hfe-table-output-example)
+
 [Hydration Free Energy Examples](Examples/HFE)
 
 [Ion Hydration Free Energy Examples](Examples/IonHFE)
@@ -637,6 +639,20 @@ nohup python /path_to_poltype/poltype.py &
 * Check total charge of all boxes for binding free energy alchemical perturbation have a net zero charge
 
 ### Free Energy Output Files
+
+#### HFE Table Output Example
+
+<img src="README/Images/GibbsHFE.PNG" width="100%">	
+* Gibbs_Free_Energy_Change_Table.csv
+
+<img src="README/Images/EnergyHFE.PNG" width="100%">	
+* Enthalpy,_Entropy,_Gibbs_Energy_Change_Table.csv
+
+<img src="README/Images/BoxInfoHFE.PNG" width="100%">
+* Solvation_Simulation_Info_Table.csv
+
+<img src="README/Images/BarResultsHFE.PNG" width="100%">	
+* BARResults.csv
 
 ### Box Setup
 

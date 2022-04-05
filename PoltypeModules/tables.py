@@ -67,6 +67,7 @@ def CSVWriter(poltype,tempname,progress=False):
             for path in tabledict.keys():
                 wrotecolumnheaders=wrotecolumnheaderslist[dictidx]
                 table=tabledict[path]
+                table={k: v for k, v in table.items() if v is not None}
                 keylist=list(table.keys())
                 valuelist=list(table.values())
                 for i in range(len(valuelist)):

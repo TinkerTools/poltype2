@@ -39,6 +39,8 @@ def ComputeBoxSize(poltype):
 
              
     poltype.WriteToLog('Longest Dimension '+str(longestdimx)+' '+str(longestdimy)+' '+str(longestdimz))
+   
+
     if poltype.aaxis==None and poltype.baxis==None and poltype.caxis==None:
         poltype.aaxislist=[]
         poltype.baxislist=[]
@@ -51,6 +53,13 @@ def ComputeBoxSize(poltype):
             xvalue=round(xdim+buffervalue,1)
             yvalue=round(ydim+buffervalue,1)
             zvalue=round(zdim+buffervalue,1)
+
+            if poltype.solvation==True and poltype.salthfe==False: # ion component only, then want water box to be big.
+                xvalue=max(xvalue,50)
+                yvalue=max(yvalue,50)
+                zvalue=max(zvalue,50)
+
+
             poltype.aaxislist.append(xvalue)
             poltype.baxislist.append(yvalue)
             poltype.caxislist.append(zvalue)
@@ -452,20 +461,8 @@ def BoxSetupProtocol(poltype):
         keymods.AddKeyWord(poltype,poltype.ionkeyfilename,string)
         filename='water.xyz'
         AddIonsToSolventBox(poltype,filename,poltype.ionkeyfilename,poltype.ionboxfilename,2,poltype.solviontocount,poltype.iontypetoionnumberphysio[-1],False)
-        string='ele-lambda'+'\n'
-        keymods.AddKeyWord(poltype,poltype.ionkeyfilename,string)
-        string='vdw-lambda'+'\n'
-        keymods.AddKeyWord(poltype,poltype.ionkeyfilename,string)
-        typelist=list(poltype.solviontocount.keys())
-        iontypenumber=typelist[0]
-        ioncount=poltype.solviontocount[iontypenumber]
-        ionindexes=GrabIonIndexes(poltype,ioncount,poltype.ionboxfilename,iontypenumber)
-        string='ligand'+' '
-        for idx in ionindexes:
-            string+=str(idx)+','
-        string=string[:-1]
-        string+='\n'
-        keymods.AddKeyWord(poltype,poltype.ionkeyfilename,string)
+
+    
 
     if poltype.boxonly==True:
         sys.exit() 

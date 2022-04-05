@@ -418,6 +418,9 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 ``equiltimeNPT``    specifies the total time in NPT ensemble (will determine average box length if using NVT production dynamics). Units in ns. Default is 1.
 
 
+``equiltimeionNPT``    specifies the total time in NPT ensemble for ion box when computing salt hydration free energy. Units in ns. Default is 1.
+
+
 ``lastNVTequiltime`` specifies the last NVT equilibriation time longer than the previous ones. The previous ones are computed as equiltimeNVT/number_temperatures. Default is .5.
 
 

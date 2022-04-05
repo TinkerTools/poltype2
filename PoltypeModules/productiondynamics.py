@@ -137,6 +137,21 @@ def SearchNearestNonPerturbedFolder(poltype,folderlist,index):
 
 def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynboxfilename,lambdakeyfilenamelist,xyzfilename):
    poltype.WriteToLog('Setting up dynamics for '+simfoldname,prin=True)
+   if poltype.addsolvionwindows==True:
+       string='ele-lambda'+'\n'
+       keymods.AddKeyWord(poltype,poltype.ionkeyfilename,string)
+       string='vdw-lambda'+'\n'
+       keymods.AddKeyWord(poltype,poltype.ionkeyfilename,string)
+       typelist=list(poltype.solviontocount.keys())
+       iontypenumber=typelist[0]
+       ioncount=poltype.solviontocount[iontypenumber]
+       ionindexes=box.GrabIonIndexes(poltype,ioncount,poltype.ionproddynboxfilename,iontypenumber)
+       string='ligand'+' '
+       for idx in ionindexes:
+           string+=str(idx)+','
+       string=string[:-1]
+       string+='\n'
+       keymods.AddKeyWord(poltype,poltype.ionkeyfilename,string)
    if not os.path.isdir(poltype.outputpath+simfoldname):
        os.mkdir(poltype.outputpath+simfoldname)
    os.chdir(poltype.outputpath+simfoldname)
@@ -250,7 +265,7 @@ def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynbo
            elif 'Ion' not in fold and 'Gas' in fold:
                shutil.copyfile(poltype.outputpath+xyzfilename,outputboxname)
            else:
-               shutil.copyfile(poltype.outputpath+poltype.ionboxfilename,outputboxname)
+               shutil.copyfile(poltype.outputpath+poltype.ionproddynboxfilename,outputboxname)
 
            if mut==False:
                ModifyLambdaKeywords(poltype,newfoldpath,newtempkeyfile,elelamb,vdwlamb,reslambda)
@@ -495,12 +510,13 @@ def ProductionDynamicsProtocol(poltype):
                         string='restrain-position '+str(poltype.norotpair[0])+','+str(poltype.norotpair[1])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
                         keymods.AddKeyWord(poltype,lambdakeyfilename,string)
 
-
-        totalionindexes,totalcharge=DetermineIonIndicesToModifyCharge(poltype)
+        if poltype.binding==True:
+            totalionindexes,totalcharge=DetermineIonIndicesToModifyCharge(poltype)
         for i in range(len(poltype.lambdakeyfilename)):
             lambdakeyfilenamelist=poltype.lambdakeyfilename[i]
-            ionindexes=totalionindexes[i]
-            charge=totalcharge[i]
+            if poltype.binding==True:
+                ionindexes=totalionindexes[i]
+                charge=totalcharge[i]
             for j in range(len(lambdakeyfilenamelist)):
                 lambdakeyfilename=lambdakeyfilenamelist[j]
                 if poltype.binding==True:
