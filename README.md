@@ -26,7 +26,7 @@ Given an input chemical structure, all parameters can be automatically assigned 
 
 <img src="README/Images/Flow.PNG" width="80%">
 
-* **Figure 1**. Overview of automated parameterization scheme for Poltype 2. Green boxes indicate input and output. Blue boxes indicate actions performed and the red rhombus indicates and intermediate output.
+* **Figure 1**. Overview of automated parameterization scheme for Poltype 2. Green boxes indicate input and output. Blue boxes indicate actions performed and the red rhombus indicates and intermediate output. BFE is Binding Free Energy and HFE is Hydration Free Energy.
 
 ## Please Cite
 
