@@ -129,7 +129,7 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 [Free Energy Output Files](#free-energy-output-files)
 
-[HFE Table Output Example](#hfe-table-output-example)
+*  [HFE Table Output Example](#hfe-table-output-example)
 
 [Hydration Free Energy Examples](Examples/HFE)
 
@@ -642,16 +642,25 @@ nohup python /path_to_poltype/poltype.py &
 
 #### HFE Table Output Example
 
-<img src="README/Images/GibbsHFE.PNG" width="100%">	
+<img src="README/Images/GibbsHFE.PNG" width="100%">
+
+* Gibbs free energy table 
 * Gibbs_Free_Energy_Change_Table.csv
 
 <img src="README/Images/EnergyHFE.PNG" width="100%">	
+
+* Enthalpy, Entropy and Gibbs free energy table
 * Enthalpy,_Entropy,_Gibbs_Energy_Change_Table.csv
 
 <img src="README/Images/BoxInfoHFE.PNG" width="100%">
+
+* Generic simulation information
 * Solvation_Simulation_Info_Table.csv
 
 <img src="README/Images/BarResultsHFE.PNG" width="100%">	
+
+* Individual BAR step free energy computations
+* Useful for troubleshooting if free energy is incorrect
 * BARResults.csv
 
 ### Box Setup
