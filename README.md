@@ -655,7 +655,9 @@ nohup python /path_to_poltype/poltype.py &
 * ΔGᵛᵈʷˢᵒˡ = Change in Solvation Free Energy Van der Waals Component Solution Phase
 * ΔGˢᵒˡ = Change in Solvation Free Energy Solution Phase
 * ΔGᵍᵃˢ = Change in Solvation Free Energy Gas Phase
-
+* ΔGˢᵒˡᵛᶠʷᵈ = Change in Forward Solvation Free Energy (A->B)
+* ΔGˢᵒˡᵛᵇʷᵈ =  Change in Backword Solvation Free Energy (B->A)
+* SolvOverlap = Solvation Overlap Between Neigboring States, value 0-1
 
 
 
