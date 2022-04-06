@@ -117,6 +117,12 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 ### Automated AMOEBA Molecular Dynamics and Free Energy Prediciton
 
+<img src="https://florentbarbault.files.wordpress.com/2010/09/mova1.gif" width="20%">
+
+* [1](#citations)
+
+
+
 [Molecular Dynamics Input Preparation](#molecular-dynamics-input-preparation)
 
 [Minimum Input Example Binding Free Energy](#minimum-input-example-binding-free-energy)
@@ -811,4 +817,9 @@ Zhang, C.; Lu, C.; Jing, Z.; Wu, C.; Piquemal, J. P.; Ponder, J. W.; Ren, P., AM
 Liu, C.; Piquemal, J. P.; Ren, P., AMOEBA+ Classical Potential for Modeling Molecular Interactions. J Chem Theory Comput 2019.
 
 Liu, C.; Piquemal, J. P.; Ren, P., Implementation of Geometry-Dependent Charge Flux into the Polarizable AMOEBA+ Potential. J Phys Chem Lett 2019, 11, 419-426.
+
+#### Citations
+1. Molecular dynamics. Florent Barbault. (2010, September 10). Retrieved November 8, 2021, from https://florentbarbault.wordpress.com/research/mova-2/. 
+
+
 
