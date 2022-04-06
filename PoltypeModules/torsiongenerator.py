@@ -768,7 +768,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         a. Rotate the torsion value by interval of 30 from 30 to 180, then -30 to -210
         b. Find energy using Gaussian SP
     """
-    self.WriteToLog('Relaxed Torsion Scan and Fitting')
+    poltype.WriteToLog('Relaxed Torsion Scan and Fitting')
     RemoveRedunantTorsionRestraints(poltype)
     if not os.path.isdir('qm-torsion'):
         os.mkdir('qm-torsion')
