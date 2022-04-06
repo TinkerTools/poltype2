@@ -641,6 +641,25 @@ nohup python /path_to_poltype/poltype.py &
 ### Free Energy Output Files
 
 #### HFE Table Output Example
+* ΔGˢᵒˡᵛ = Change in Solvation Free Energy
+* ΔGˢᵒˡᵛᵉʳʳ = Change in Solvation Free Energy Error
+* ΔHˢᵒˡᵛ = Change in Solvation Enthalpy 
+* ΔHˢᵒˡᵛᵉʳʳ = Change in Solvation Enthalpy Error
+* ΔSˢᵒˡᵛ = Change in Solvation Entropy
+* ΔSˢᵒˡᵛᵉʳʳ = Change in Solvation Entropy Error
+* ΔGˢᵒˡᵛᵉˡᵉ = Change in Solvation Free Energy Electrostatic Component
+* ΔGˢᵒˡᵛᵛᵈʷ =  Change in Solvation Free Energy Van der Waals Component
+* ΔGᵉˡᵉᵍᵃˢ =  Change in Solvation Free Energy Electrostatic Component Gas Phase
+* ΔGᵉˡᵉˢᵒˡ =  Change in Solvation Free Energy Electrostatic Component Solution Phase
+* ΔGᵛᵈʷᵍᵃˢ = Change in Solvation Free Energy Van der Waals Component Gas Phase
+* ΔGᵛᵈʷˢᵒˡ = Change in Solvation Free Energy Van der Waals Component Solution Phase
+* ΔGˢᵒˡ = Change in Solvation Free Energy Solution Phase
+* ΔGᵍᵃˢ = Change in Solvation Free Energy Gas Phase
+
+
+
+
+
 
 <img src="README/Images/GibbsHFE.PNG" width="100%">
 
