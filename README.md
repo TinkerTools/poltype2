@@ -24,9 +24,9 @@ Given an input chemical structure, all parameters can be automatically assigned 
 [license-url]: https://github.com/TinkerTools/tinker/blob/release/LICENSE.pdf
 
 
-<img src="README/Images/Flow.PNG" width="40%">
+<img src="README/Images/Flow.PNG" width="80%">
 
-* **Figure 1**. Overview of automated parameterization scheme for Poltype 2. Green boxes indicate input and output. Blue boxes indicate actions performed and the red rhombus indicates and intermediate output.
+* **Figure 1**. Overview of automated parameterization scheme for Poltype 2. Green boxes indicate input and output. Blue boxes indicate actions performed and the red rhombus indicates and intermediate output. BFE is Binding Free Energy and HFE is Hydration Free Energy.
 
 ## Please Cite
 
@@ -641,6 +641,27 @@ nohup python /path_to_poltype/poltype.py &
 ### Free Energy Output Files
 
 #### HFE Table Output Example
+* ΔGˢᵒˡᵛ = Change in Solvation Free Energy
+* ΔGˢᵒˡᵛᵉʳʳ = Change in Solvation Free Energy Error
+* ΔHˢᵒˡᵛ = Change in Solvation Enthalpy 
+* ΔHˢᵒˡᵛᵉʳʳ = Change in Solvation Enthalpy Error
+* ΔSˢᵒˡᵛ = Change in Solvation Entropy
+* ΔSˢᵒˡᵛᵉʳʳ = Change in Solvation Entropy Error
+* ΔGˢᵒˡᵛᵉˡᵉ = Change in Solvation Free Energy Electrostatic Component
+* ΔGˢᵒˡᵛᵛᵈʷ =  Change in Solvation Free Energy Van der Waals Component
+* ΔGᵉˡᵉᵍᵃˢ =  Change in Solvation Free Energy Electrostatic Component Gas Phase
+* ΔGᵉˡᵉˢᵒˡ =  Change in Solvation Free Energy Electrostatic Component Solution Phase
+* ΔGᵛᵈʷᵍᵃˢ = Change in Solvation Free Energy Van der Waals Component Gas Phase
+* ΔGᵛᵈʷˢᵒˡ = Change in Solvation Free Energy Van der Waals Component Solution Phase
+* ΔGˢᵒˡ = Change in Solvation Free Energy Solution Phase
+* ΔGᵍᵃˢ = Change in Solvation Free Energy Gas Phase
+* ΔGˢᵒˡᵛᶠʷᵈ = Change in Forward Solvation Free Energy (A->B)
+* ΔGˢᵒˡᵛᵇʷᵈ =  Change in Backword Solvation Free Energy (B->A)
+* SolvOverlap = Solvation Overlap Between Neigboring States, value 0-1
+
+
+
+
 
 <img src="README/Images/GibbsHFE.PNG" width="100%">
 
