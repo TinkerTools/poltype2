@@ -292,7 +292,7 @@ WQ_PORT=9013
 #### Solvation Free Energy
 ``solvation``   specifies to do solvation simulations. Default is False.
 
-``salthfe``     specifies whether to compute salt hydration free energy.  Default is True.
+``salthfe``     specifies whether to compute salt hydration free energy.  Default is False.
 
 #### Neat Liquid Simulation
 

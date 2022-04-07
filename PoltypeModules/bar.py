@@ -570,7 +570,7 @@ def ComputeThermoProperties(poltype):
             valuelist=valuelist.astype(float)
             se_TdS_list=np.sqrt(valuelist)
             entropyerrorlistoflist.append(se_TdS_list)
-            TdS=dF_all-dH
+            TdS=(dF_all)-(dH)
             totalentropy.append(TdS)
             dF_fwd=np.sum(dF_fwd_list)
             dF_bwd=np.sum(dF_bwd_list)
@@ -1275,7 +1275,7 @@ def FlattenListOfListGenerateBARPairs(poltype,listoflist):
         for i in range(len(ls)-1):
             first=str(ls[i]).replace('Sim','').replace('Vdw','V').replace('Ele','E').replace('Res','R')
             second=str(ls[i+1]).replace('Sim','').replace('Vdw','V').replace('Ele','E').replace('Res','R')
-            new=str(first)+'-'+str(second)
+            new=str(second)+'-'+str(first)
             newflat.append(new)
             temp.append(new)
         newlistoflist.append(temp)

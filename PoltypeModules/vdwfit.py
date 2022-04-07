@@ -1670,7 +1670,7 @@ def AddLonePairPoints(poltype,newdimerfiles,newprobeindices,newmoleculeindices,n
     added=False
     moleculeatom=mol.GetAtom(moleculeindex)
     atomicnum=moleculeatom.GetAtomicNum()
-    val=len([neighb for neighb in openbabel.OBAtomAtomIter(moleucleatom)])
+    val=len([neighb for neighb in openbabel.OBAtomAtomIter(moleculeatom)])
     atomisinring=moleculeatom.IsInRing()
     probeatom=mol.GetAtom(probeindex)
     moleculeatomcoords=np.array([moleculeatom.GetX(),moleculeatom.GetY(),moleculeatom.GetZ()])

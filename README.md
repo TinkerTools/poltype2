@@ -596,7 +596,7 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 * Charge is read from input XYZ files generated.
 * Make sure if using custom receptor parameters, then either adding to keyfilename or in prmfilepath
 * Use submitlocally=False if you do not wish to submit dynamics jobs locally.
-* For HFE, if your ligand is charged and you do not want to compute the salt hydration free energy, add "salthfe=False"
+* For HFE, if your ligand is charged and you want to compute the salt hydration free energy, add "salthfe=True"
 
 #### Minimum Input Example Binding Free Energy
 
