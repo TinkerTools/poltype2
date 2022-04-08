@@ -3187,13 +3187,17 @@ class PolarizableTyper():
         pcm=self.CheckForConcentratedFormalCharges(m,atomindextoformalcharge)
         cpm = copy.deepcopy(m)
         indextocoordslist=[indextocoordinates]
+        iswholemoleculering=self.CheckIfWholeMoleculeIsARing(mol)
+        if iswholemoleculering==True:
+            self.generateextendedconf=False
         if self.firstoptfinished==False and self.isfragjob==False and self.generateextendedconf==True:
             indextocoordslist=self.GenerateExtendedConformer(m,mol)
             indextocoordinates=indextocoordslist[0]
         Chem.GetSymmSSSR(m)
         m.GetRingInfo().NumRings() 
         m=self.AddInputCoordinatesAsDefaultConformer(m,indextocoordinates)
-        rdmolfiles.MolToMolFile(m,'test.mol')
+        if self.generateextendedconf==True:
+            rdmolfiles.MolToMolFile(m,'extendedconf.mol')
         mol,m=self.CheckIsInput2D(mol,obConversion,m)
         if not os.path.exists(self.scrtmpdirpsi4):
             os.mkdir(self.scrtmpdirpsi4)
@@ -3437,6 +3441,9 @@ class PolarizableTyper():
         (torlist, self.rotbndlist,hydtorsions,nonaroringtorlist) = torgen.get_torlist(self,mol,torsionsmissing)
         if atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False: 
             self.dontfrag=True
+
+        if self.dontfrag==True: # if fragmenter is turned off, parition resources by jobs at sametime for parent
+            self.maxmem,self.maxdisk,self.numproc=self.PartitionResources()
         torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules
         torlist=[tuple(i) for i in torlist]
         torlist=[tuple([i]) for i in torlist]
@@ -4565,6 +4572,42 @@ class PolarizableTyper():
     def CallAnalyze(self,statexyz,statekey,alzout,analyzepath,option):
         cmdstr=analyzepath+' '+statexyz+' '+'-k'+' '+statekey+' '+option+' > '+alzout
         submit.call_subsystem(self,cmdstr,True,False,alzout) 
+
+    def ExtractResource(self,string):
+        if 'MB' in string:
+            split=string.split('MB')
+            memstring='MB'
+        elif 'GB' in string:
+            split=string.split('GB')
+            memstring='GB'
+        mem=float(split[0])
+    
+        return mem,memstring
+
+    def PartitionResources(self):
+        maxmem,memstring=self.ExtractResource(self.maxmem)
+        maxmem=maxmem/self.jobsatsametime
+        tempmaxmem=str(maxmem)+memstring
+        maxdisk,diskstring=self.ExtractResource(self.maxdisk)
+        maxdisk=maxdisk/self.jobsatsametime
+        tempmaxdisk=str(maxdisk)+diskstring
+        numproc=math.floor(int(self.numproc)/self.jobsatsametime)
+        tempnumproc=str(numproc)
+    
+        return tempmaxmem,tempmaxdisk,tempnumproc
+
+
+    def CheckIfWholeMoleculeIsARing(self,mol):
+        iswholemoleculering=False
+        atomindices=databaseparser.RingAtomicIndices(self,mol)
+        lengthtoring={}
+        for ring in atomindices:
+            lengthtoring[len(ring)]=ring
+        maxlength=max(lengthtoring.keys())
+        maxring=lengthtoring[maxlength]
+        if len(maxring)>7:
+            iswholemoleculering=True
+        return iswholemoleculering
 
 if __name__ == '__main__':
     def RunPoltype():

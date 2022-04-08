@@ -636,34 +636,15 @@ def CopyAllQMDataAndRename(poltype,molecprefix,parentdir):
     os.chdir(curdir)    
 
 
-def ExtractResource(poltype,string):
-    if 'MB' in string:
-        split=string.split('MB')
-        memstring='MB'
-    elif 'GB' in string:
-        split=string.split('GB')
-        memstring='GB'
-    mem=float(split[0])
-
-    return mem,memstring
 
 
 
-def PartitionResources(poltype):
-    maxmem,memstring=ExtractResource(poltype,poltype.maxmem)
-    maxmem=maxmem/poltype.jobsatsametime
-    tempmaxmem=str(maxmem)+memstring
-    maxdisk,diskstring=ExtractResource(poltype,poltype.maxdisk)
-    maxdisk=maxdisk/poltype.jobsatsametime
-    tempmaxdisk=str(maxdisk)+diskstring
-    numproc=math.floor(int(poltype.numproc)/poltype.jobsatsametime)
-    tempnumproc=str(numproc)
 
-    return tempmaxmem,tempmaxdisk,tempnumproc
+
 
 
 def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog,fragmol,parentdir,vdwfragment,strfragvdwatomindex,onlyfittorsions,jobtoinputfilepaths):
-    tempmaxmem,tempmaxdisk,tempnumproc=PartitionResources(poltype)
+    tempmaxmem,tempmaxdisk,tempnumproc=poltype.PartitionResources()
     poltypeinput={'deleteallnonqmfiles':poltype.deleteallnonqmfiles,'debugmode':poltype.debugmode,'atmidx':poltype.prmstartidx,'parentname':poltype.parentname,'use_gau_vdw':poltype.use_gau_vdw,'use_qmopt_vdw':poltype.use_qmopt_vdw,'onlyvdwatomindex':poltype.onlyvdwatomindex,'tordebugmode':poltype.tordebugmode,'dovdwscan':poltype.dovdwscan,'refinenonaroringtors':poltype.refinenonaroringtors,'tortor':poltype.tortor,'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':tempnumproc,'maxmem':tempmaxmem,'maxdisk':tempmaxdisk,'printoutput':True}
     if strfragrotbndindexes!=None:
         poltypeinput['onlyrotbndslist']=strfragrotbndindexes
