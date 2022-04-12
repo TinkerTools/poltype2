@@ -395,7 +395,7 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 * Check to ensure the final minimized MM structure is similar to the geometry optimized QM structure and raises error if not
 * Check for any missing van der Waals at end of program parameters and raises error
 * Check for any missing multipole parameters at end of program and raises error
-
+* Check for any zeroed out torsion parameters in final key file. Checks if fragmenter is transferring torsion properly.
 
 
 ### Atom Type Classification

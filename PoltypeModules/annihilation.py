@@ -24,9 +24,7 @@ def main(poltype):
             shutil.copy(firstkey,secondkey)
     for keylist in poltype.configkeyfilename:
         for key in keylist:
-            keymods.RemoveKeyWord(poltype,key,'parameters')
-            keymods.RemoveKeyWord(poltype,key,'TARGET-DIPOLE')
-            keymods.RemoveKeyWord(poltype,key,'OPENMP-THREADS')
+            keymods.RemoveKeyWords(poltype,key,['parameters','TARGET-DIPOLE','OPENMP-THREADS'])
             keymods.InsertKeyfileHeader(poltype,key)    
 
     box.BoxSetupProtocol(poltype)

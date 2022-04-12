@@ -1,7 +1,7 @@
 import os
 import sys
 import keyfilemodifications as keymods
-import openbabel
+from openbabel import openbabel
 from rdkit import Chem
 import re
 import itertools
@@ -14,8 +14,8 @@ from scipy.interpolate import interp1d
 from scipy.optimize import fmin
 
 def BgnTypeToNewType(poltype,bgnstatexyz,endstatexyz):
-    bgnstatexyzatominfo,bgnstateindextotypeindex,bgnstateatomnum,bgnindextocoords,bgnindextoneighbs=GrabXYZInfo(poltype,bgnstatexyz)
-    endstatexyzatominfo,endstateindextotypeindex,endstateatomnum,endindextocoords,endindextoneighbs=GrabXYZInfo(poltype,endstatexyz)
+    bgnstatexyzatominfo,bgnstateindextotypeindex,bgnstateatomnum,bgnindextocoords,bgnindextoneighbs,indextosym=GrabXYZInfo(poltype,bgnstatexyz)
+    endstatexyzatominfo,endstateindextotypeindex,endstateatomnum,endindextocoords,endindextoneighbs,indextosym=GrabXYZInfo(poltype,endstatexyz)
     bgnstateindextoendstateindex=BgnIndexToNewIndex(poltype,bgnstatexyz,endstatexyz)
     bgnstatetypeindextoendstatetypeindex={}
     bgnindextoendcoords={}
@@ -42,6 +42,7 @@ def GrabXYZInfo(poltype,xyzfile):
     indextotypeindex={}
     indextocoords={}
     indextoneighbs={}
+    indextosym={}
     for lineidx in range(len(xyzfileresults)):
         line=xyzfileresults[lineidx]
         linesplit=line.split()
@@ -55,13 +56,14 @@ def GrabXYZInfo(poltype,xyzfile):
                 indextotypeindex[index]=typenum
                 xyzatominfo.append(linesplit[2:])
                 indextocoords[index]=coords
+                indextosym[index]=linesplit[1]
                 if len(linesplit)>=6:
                     neighbs=linesplit[6:]
                     neighbs=[int(i) for i in neighbs]
                 else:
                     neighbs=[]
                 indextoneighbs[index]=neighbs
-    return xyzatominfo,indextotypeindex,xyzatomnum,indextocoords,indextoneighbs
+    return xyzatominfo,indextotypeindex,xyzatomnum,indextocoords,indextoneighbs,indextosym
 
 def CorrectBondOrder(poltype,themol,structurefile):
     if structurefile!=None:
@@ -284,8 +286,8 @@ def CompareDihedralScans(poltype,tortypes,analyzepath,newbgnxyzfile,newbgnkeyfil
     endmol,atomindextoformalcharge=poltype.CheckLigandInputCharge(endmol)
     Chem.SanitizeMol(endmol)     
 
-    bgnstatexyzatominfo,bgnstateindextotypeindex,bgnstateatomnum,bgnindextocoords,bgnindextoneighbs=GrabXYZInfo(poltype,newbgnxyzfile)
-    endstatexyzatominfo,endstateindextotypeindex,endstateatomnum,endindextocoords,endindextoneighbs=GrabXYZInfo(poltype,endstatexyz)
+    bgnstatexyzatominfo,bgnstateindextotypeindex,bgnstateatomnum,bgnindextocoords,bgnindextoneighbs,indextosym=GrabXYZInfo(poltype,newbgnxyzfile)
+    endstatexyzatominfo,endstateindextotypeindex,endstateatomnum,endindextocoords,endindextoneighbs,indextosym=GrabXYZInfo(poltype,endstatexyz)
     middletypes=[]
     cutoff=1
     for tortype in tortypes:
@@ -911,7 +913,7 @@ def SanitizeKey(poltype,keyfilename):
     temp.close()
     os.remove(keyfilename)
     os.rename(tempkey,keyfilename)  
-    keymods.RemoveKeyWord(poltype,keyfilename,'parameters')
+    keymods.RemoveKeyWords(poltype,keyfilename,['parameters'])
     string='parameters '+poltype.prmfilepath+'\n'
     keymods.AddKeyWord(poltype,keyfilename,string)
 

@@ -6,7 +6,7 @@ import torsionfit as torfit
 import apicall as call
 import os
 import sys
-import openbabel
+from openbabel import openbabel
 import shutil
 from socket import gethostname
 import re

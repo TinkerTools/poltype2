@@ -9,7 +9,7 @@ import time
 import numpy as np
 import mutation as mutate
 import equilbriation as equil
-
+import mdtraj as md
 
 
 def ExecuteProductionDynamics(poltype):
@@ -52,7 +52,7 @@ def ExecuteProductionDynamics(poltype):
 
 
                cmdstr=ProductionDynamicsCommand(poltype,boxfilename,keyfilename,proddynsteps,ensemble,outputfilepath,dynamicpath,proddyntimestep,nvt)
-               terminate,deletefile=term.CheckFileTermination(poltype,outputfilepath,float(poltype.proddynsteps))
+               terminate,deletefile,error=term.CheckFileTermination(poltype,outputfilepath,float(poltype.proddynsteps))
                recentlyupdated=term.CheckFilesRecentlyUpdated(poltype,[outputfilepath])
                if terminate==False:
                    if recentlyupdated==False and os.path.exists(path+arcfilename): 
@@ -104,13 +104,10 @@ def ProductionDynamicsCommand(poltype,inputxyzname,keyfile,steps,ensemble,output
     return cmdstr
    
 def ModifyKeyForGasPhase(poltype,keyfilepath):
-    keymods.RemoveKeyWord(poltype,keyfilepath,'axis')
-    keymods.RemoveKeyWord(poltype,keyfilepath,'ewald')
-    keymods.RemoveKeyWord(poltype,keyfilepath,'cutoff')
-    keymods.RemoveKeyWord(poltype,keyfilepath,'correction')
+    keymods.RemoveKeyWords(poltype,keyfilepath,['axis','ewald','cutoff','correction'])
     
     if poltype.changegasphaseintegrator==True:
-        keymods.RemoveKeyWord(poltype,keyfilepath,'integrator')
+        keymods.RemoveKeyWords(poltype,keyfilepath,['integrator'])
         string='integrator stochastic'+'\n'
         if not keymods.CheckIfStringAlreadyInKeyfile(poltype,keyfilepath,string):
             keymods.AddKeyWord(poltype,keyfilepath,string)
@@ -195,7 +192,7 @@ def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynbo
                    os.remove(f) # just in case option to stop all simulations was used
                if '.out' in f and "BAR" not in f:
                    outputfile=os.path.join(os.getcwd(),f) 
-                   terminate,deletefile=term.CheckFileTermination(poltype,outputfile,float(poltype.proddynsteps))
+                   terminate,deletefile,error=term.CheckFileTermination(poltype,outputfile,float(poltype.proddynsteps))
                    #if terminate==True:
                    #    continue
            newfoldpath=os.getcwd()+'/'
@@ -263,19 +260,79 @@ def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynbo
                shutil.copyfile(poltype.outputpath+proddynboxfilename,outputboxname)
 
            elif 'Ion' not in fold and 'Gas' in fold:
-               shutil.copyfile(poltype.outputpath+xyzfilename,outputboxname)
+               if poltype.binding==False:
+                   shutil.copyfile(poltype.outputpath+xyzfilename,outputboxname)
+               else:
+                   liquidfoldernames=lambdafolderlist[0]
+                   liquidindex=len(liquidfoldernames)-1-i
+                   liquidfolder=liquidfoldernames[liquidindex]
+                   ligandindices=poltype.ligandindices[index]
+                   solvligandindices=poltype.ligandindices[1]
+                   ligandindicestosolvligandindices=dict(zip(ligandindices,solvligandindices))
+                   ExtractLigandDynamicsFromLiquidBox(poltype,outputboxname,liquidfolder,ligandindices,ligandindicestosolvligandindices) 
            else:
                shutil.copyfile(poltype.outputpath+poltype.ionproddynboxfilename,outputboxname)
 
            if mut==False:
                ModifyLambdaKeywords(poltype,newfoldpath,newtempkeyfile,elelamb,vdwlamb,reslambda)
-           if poltype.binding==True:
+           if poltype.binding==True and 'Gas' not in fold:
                xyzpath=outputboxname
                keypath=newfoldpath+newtempkeyfile
                alzout=newfoldpath+'checknetcharge.alz'
                CheckNetChargeIsZero(poltype,xyzpath,keypath,alzout) 
            os.chdir('..')
    os.chdir('..')
+
+
+def ExtractLigandDynamicsFromLiquidBox(poltype,outputboxname,liquidfolder,ligandindices,ligandindicestosolvligandindices):
+    outputarcname=outputboxname.replace('.xyz','.arc')
+    arcexists=False
+    curdir=os.getcwd()
+    os.chdir('..')
+    os.chdir(liquidfolder)
+    files=os.listdir()
+    for f in files:
+        if '.arc' in f:
+            arcfile=f
+            arcexists=True
+    if arcexists==True:
+        poltype.WriteToLog('Reading in ARC for Gas Phase Extraction '+arcfile,prin=True)
+        indextovecs={}
+        t = md.load_arc(arcfile)
+        for i in range(t.n_frames):
+            for index in ligandindices:
+                zeroindex=index-1
+                vec=t.xyz[i,zeroindex,:]
+                vec=vec*10
+                trueindex=ligandindicestosolvligandindices[index]
+                if trueindex not in indextovecs.keys():
+                    indextovecs[trueindex]=[]
+                indextovecs[trueindex].append(vec)
+
+        totalatomnum=len(ligandindices)
+        WriteOutArcFile(poltype,totalatomnum,indextovecs,poltype.ligandindextoneighbs,poltype.ligandindextosym,poltype.ligandindextotypenum,outputarcname,t.n_frames)
+
+
+    os.chdir(curdir)
+
+def WriteOutArcFile(poltype,totalatomnum,indextovecs,ligandindextoneighbs,ligandindextosym,ligandindextotype,outputarcname,framenum):
+    temp=open(outputarcname,'w')
+    for i in range(framenum):
+        temp.write(str(totalatomnum)+'\n')
+        for index in indextovecs.keys():
+            sym=ligandindextosym[index]
+            neighbs=ligandindextoneighbs[index]
+            typenum=ligandindextotype[index]
+            vecs=indextovecs[index]
+            vec=vecs[i]
+            neighbstring=''
+            for neighb in neighbs:
+                neighbstring+=str(neighb)+' '
+            string=str(index)+' '+sym+' '+str(vec[0])+' '+str(vec[1])+' '+str(vec[2])+' '+str(typenum)+' '+neighbstring +'\n'
+            temp.write(string)
+
+    temp.close()
+
 
 def CheckNetChargeIsZero(poltype,xyzpath,keypath,alzout):
     poltype.CallAnalyze(xyzpath,keypath,alzout,poltype.trueanalyzepath,'m')
@@ -529,9 +586,7 @@ def ProductionDynamicsProtocol(poltype):
             proddynoutfilepathlist=poltype.proddynoutfilepath[i]
             for j in range(len(proddynoutfilepathlist)):
                 proddynoutfilepath=proddynoutfilepathlist[j]
-                if term.CheckFilesTermination(poltype,proddynoutfilepath,poltype.proddynsteps,False,True)[0]==False or poltype.perturbkeyfilelist!=None:
-                    SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynboxfilename,lambdakeyfilenamelist,xyzfilename)
-                    pass
+                SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynboxfilename,lambdakeyfilenamelist,xyzfilename)
         
         ExecuteProductionDynamics(poltype)
         messages=[]
@@ -539,10 +594,11 @@ def ProductionDynamicsProtocol(poltype):
             proddynoutfilepathlist=poltype.proddynoutfilepath[i]
             for j in range(len(proddynoutfilepathlist)):
                 proddynoutfilepath=proddynoutfilepathlist[j]
-                finished=False
-                percentfinished=0.0
+                checkfin=term.CheckFilesTermination(poltype,proddynoutfilepath,poltype.proddynsteps)
+                finished=checkfin[0]
+                percentfinished=checkfin[1]
                 while finished==False:
-                    msg='Production dynamics is not complete ,'+str(percentfinished)+'% of jobs finished'
+                    msg='Production dynamics is not complete, '+str(percentfinished)+'% of jobs finished'
                     if msg not in messages:
                         poltype.WriteToLog(msg,prin=True)
                         messages.append(msg)

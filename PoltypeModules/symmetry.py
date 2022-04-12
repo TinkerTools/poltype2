@@ -1,6 +1,6 @@
 import sys
 import os
-import openbabel
+from openbabel import openbabel
 from rdkit import Chem
 import numpy as np
 from openbabel import pybel

@@ -103,7 +103,11 @@ def CheckFileTermination(poltype,f,steps=None,equil=False,firsttime=True):
                #    deletefile=CheckBARFile(poltype,filepath)
                #    if deletefile==True#:
                #        os.remove(filepath)
+       error=False
        for line in results:
+           if 'INDUCE  --  Warning, Induced Dipoles are not Converged' in line:
+               error=True
+               errorline=line
            if 'Normal Termination' in line or 'Potential Energy Values Written To :' in line or 'Free Energy Difference via BAR' in line:
                term=True
                if 'Potential Energy Values Written To :' in line:
@@ -157,9 +161,10 @@ def CheckFileTermination(poltype,f,steps=None,equil=False,firsttime=True):
                        if foundfilename==True:
                            os.remove(filepath)
                            os.remove(dynpath)
+   if error==True:
+       poltype.WriteToLog('Error Detected '+f+' '+errorline)
 
-
-   return term,deletefile
+   return term,deletefile,error
 
 def CheckFilesTermination(poltype,outputfilepathlist,steps=None,equil=False,firsttime=False):
     finished=True
@@ -168,6 +173,7 @@ def CheckFilesTermination(poltype,outputfilepathlist,steps=None,equil=False,firs
         islist=True
     outputfilestodelete=[]
     jobsfinished=[]
+    anyerrors=False
     for i in range(len(outputfilepathlist)):
         outputfilepath=outputfilepathlist[i]
         if steps!=None:
@@ -177,8 +183,9 @@ def CheckFilesTermination(poltype,outputfilepathlist,steps=None,equil=False,firs
                 truesteps=float(steps[i])
         else:
             truesteps=steps   
-        terminate,deletefile=CheckFileTermination(poltype,outputfilepath,truesteps,equil,firsttime)
-
+        terminate,deletefile,error=CheckFileTermination(poltype,outputfilepath,truesteps,equil,firsttime)
+        if error==True:
+            anyerrors=True
         if deletefile==True:
             outputfilestodelete.append(outputfilepath)
             terminate=False
@@ -190,7 +197,12 @@ def CheckFilesTermination(poltype,outputfilepathlist,steps=None,equil=False,firs
     for filename in outputfilestodelete:
         poltype.WriteToLog('File being deleted '+filename,prin=True)
         os.remove(filename)
-    percentfinished=round((len(jobsfinished)*100)/len(outputfilepathlist),2)
+    if len(outputfilepathlist)==0:
+        percentfinished=100
+    else:
+        percentfinished=round((len(jobsfinished)*100)/len(outputfilepathlist),2)
+    if anyerrors==True:
+        raise ValueError('Errors Detected in Output Files!')
     return finished,percentfinished
 
 

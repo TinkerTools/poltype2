@@ -3,7 +3,7 @@ import torsiongenerator as torgen
 import torsionfit
 import os
 import numpy
-import openbabel
+from openbabel import openbabel
 from rdkit import Chem
 from rdkit.Chem import rdmolfiles
 import shutil

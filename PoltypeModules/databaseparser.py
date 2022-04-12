@@ -5,7 +5,7 @@ import os
 from packaging import version
 import rdkit
 from rdkit.Chem import rdFMCS
-import openbabel
+from openbabel import openbabel
 from rdkit.Chem import rdmolfiles
 import itertools
 import re

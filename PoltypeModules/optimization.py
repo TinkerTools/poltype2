@@ -1,7 +1,7 @@
 import os
 import sys
 from socket import gethostname
-import openbabel
+from openbabel import openbabel
 import re
 import time
 import apicall as call

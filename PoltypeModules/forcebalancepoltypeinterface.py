@@ -3,7 +3,7 @@ import sys
 import csv
 import getopt
 import shutil
-import openbabel
+from openbabel import openbabel
 from rdkit.Chem import rdmolfiles
 from rdkit.Chem import Descriptors
 import re

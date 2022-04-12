@@ -197,9 +197,8 @@ def ExecuteEquilibriation(poltype):
                 newjobtooutputfiles[job]=jobtooutputfilesdic[job]
                 newjobtoabsolutebinpath[job]=jobtoabsolutebinpathdic[job]
                 if poltype.complexation==True and i==0:
-                    keymods.RemoveKeyWord(poltype,configkeyfilename,'restrain-group')
+                    keymods.RemoveKeyWords(poltype,configkeyfilename,['restrain-group','restrain-position'])
                     restraints.AddHarmonicRestrainGroupTermsToKeyFile(poltype,configkeyfilename,poltype.restraintdistance,restrainpositionconstant)
-                    keymods.RemoveKeyWord(poltype,configkeyfilename,'restrain-position')
                     totalatomnumberxyzfilename=poltype.totalatomnumberxyzfilename[i]
                     if restrainpositionconstant!=0 and poltype.restrainreceptorligand==True: 
                         resposstring='restrain-position -'+str(1)+' '+str(totalatomnumberxyzfilename-len(ligandindices))+' '+str(restrainpositionconstant)+' '+str(poltype.equilrestrainsphereradius)+'\n'
@@ -285,7 +284,7 @@ def ExtractTinkerFrames(poltype,arcpath,firstframe,lastframe,framestep,totalnumb
     return
   
 def EquilibriationProtocol(poltype):
-    if poltype.prodmdfinished==False and poltype.equilfinished==False:
+    if poltype.equilfinished==False:
         if poltype.restrainatomgroup1==None and poltype.restrainatomgroup2==None and poltype.complexation==True and poltype.restrainreceptorligand==True:
             restraints.ComputeIdealGroupRestraints(poltype,poltype.minboxfilename[0])
         if poltype.complexation==True and poltype.restrainreceptorligand==True: 
@@ -309,7 +308,7 @@ def EquilibriationProtocol(poltype):
                 aaxis,baxis,caxis=AverageBoxSizeFromNPTArc(poltype,poltype.outputpath+equilarcboxfilename,firstframe,lastframe,1,i)
                 for configkeyfilename in configkeyfilenamelist:
                     
-                    keymods.RemoveKeyWord(poltype,configkeyfilename,'axis')
+                    keymods.RemoveKeyWords(poltype,configkeyfilename,['axis'])
                     keymods.AddKeyWord(poltype,configkeyfilename,'a-axis'+' '+str(aaxis)+'\n')
             proddynboxfilename=poltype.proddynboxfilename[i]
             proddynboxfilenamepymol=poltype.proddynboxfilenamepymol[i]
@@ -322,8 +321,7 @@ def EquilibriationProtocol(poltype):
             
 
             for configkeyfilename in configkeyfilenamelist:
-                keymods.RemoveKeyWord(poltype,configkeyfilename,'restrain')
-                keymods.RemoveKeyWord(poltype,configkeyfilename,'group')
+                keymods.RemoveKeyWords(poltype,configkeyfilename,['restrain','group'])
 
             if poltype.complexation==True and poltype.proddyngrprests==True and i==0:
                 equildist=restraints.AverageCOMGroups(poltype,equilarcboxfilename)

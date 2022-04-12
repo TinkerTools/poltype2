@@ -162,7 +162,7 @@ def ComputeWaterNumber(poltype):
     poltype.WriteToLog('Water Number '+str(poltype.waternum))
 
 def RemoveBoxSizeTerms(poltype,keyfile):
-    keymods.RemoveKeyWord(poltype,keyfile,'axis')
+    keymods.RemoveKeyWords(poltype,keyfile,['axis'])
 
 
 def FindDimensionsOfMoleculeTinker(poltype,structurefilepath):
@@ -456,7 +456,7 @@ def BoxSetupProtocol(poltype):
     if poltype.addsolvionwindows==True:
         newfilename=CreateSolventBox(poltype,ionaxis,ionaxis,ionaxis,ionwaternum,'water.xyz')
         shutil.copy(poltype.configkeyfilename[0][0],poltype.ionkeyfilename)
-        keymods.RemoveKeyWord(poltype,poltype.ionkeyfilename,'axis')
+        keymods.RemoveKeyWords(poltype,poltype.ionkeyfilename,['axis'])
         string='a-axis '+str(ionaxis)+'\n'
         keymods.AddKeyWord(poltype,poltype.ionkeyfilename,string)
         filename='water.xyz'

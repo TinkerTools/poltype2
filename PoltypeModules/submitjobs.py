@@ -64,7 +64,7 @@ def CallJobsSeriallyLocalHost(poltype,jobtolog,jobtojobpath):
     for jobidx in range(len(jobs)):
         job=jobs[jobidx]
         percentcomplete=round((jobidx+1)*100/len(jobs),2)
-        poltype.WriteToLog('Percent of jobs complete ='+str(percentcomplete)+'%')
+        poltype.WriteToLog('Percent of jobs complete = '+str(percentcomplete)+'%')
         jobpath=jobtojobpath[job]
         os.chdir(jobpath)
         call_subsystem(poltype,job,wait=True)

@@ -10,7 +10,7 @@ mpl.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn import *
 import optimization as opt
-import openbabel
+from openbabel import openbabel
 import itertools
 import symmetry as symm
 from socket import gethostname

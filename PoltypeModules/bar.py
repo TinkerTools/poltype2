@@ -640,7 +640,7 @@ def ComputeThermoProperties(poltype):
         table.append(['Vdw-Lambda']+vdwlambdapairlist)
         table.append(['Ele-Lambda']+elelambdapairlist)
         table.append(['Rest-Lambda']+FlattenListOfListGenerateBARPairs(poltype,poltype.restlambdascheme)[0])
- 
+        
         if poltype.solvation==True and poltype.complexation==False:
             table.append(['Folder']+FlattenListOfListGenerateBARPairs(poltype,FlattenListOfList(poltype,poltype.lambdafolderlist))[0])
             solvfreeenergylist=FlattenListOfList(poltype,poltype.freeenergylist[0])
@@ -669,27 +669,8 @@ def ComputeThermoProperties(poltype):
             table.append([u'TΔSˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.entropyerrorlisttotal[0]))
             table.append(['SolvOverlap']+FlattenListOfList(poltype,poltype.overlaplist[0]))
 
-        elif poltype.complexation==True and poltype.solvation==False:
-            table.append(['Folder']+FlattenListOfListGenerateBARPairs(poltype,FlattenListOfList(poltype,poltype.lambdafolderlist))[0])
-            compfreeenergylist=FlattenListOfList(poltype,poltype.freeenergylist[0])
-            totalvdw,totalele,vdwfreeenergynoioncorrection,elefreeenergynoioncorrection,totalfreeenergynoioncorrection,vdwfreeenergynogas,elefreeenergynogas,totalfreeenergynogas,vdwfreeenergygas,elefreeenergygas,totalfreeenergygas=GenerateEleVdwSums(poltype,compfreeenergylist,vdwlambdapairlist,elelambdapairlist,baroutputfilepathlist,solv=False)
-            poltype.tabledict[0][u'ΔGᶜᵒᵐᵖᵉˡᵉ']=totalele
-            poltype.tabledict[0][u'ΔGᶜᵒᵐᵖᵛᵈʷ']=totalvdw
-            fwdenergylist=FlattenListOfList(poltype,poltype.freeenergylistfwd[0])
-            bwdenergylist=FlattenListOfList(poltype,poltype.freeenergylistbwd[0])
-            CheckIfForwardBackwardPertubationsAreSimilar(poltype,fwdenergylist,bwdenergylist,solv=False)
-            table.append([u'ΔGᶜᵒᵐᵖ']+compfreeenergylist)
-            table.append([u'ΔGᶜᵒᵐᵖᵉʳʳ']+FlattenListOfList(poltype,poltype.freeenergyerrorlist[0]))
-            table.append([u'ΔGᶜᵒᵐᵖᶠʷᵈ']+fwdenergylist)
-            table.append([u'ΔGᶜᵒᵐᵖᵇʷᵈ']+bwdenergylist)
-            table.append([u'ΔHᶜᵒᵐᵖ']+FlattenListOfList(poltype,poltype.enthalpylist[0]))
-            table.append([u'ΔHᶜᵒᵐᵖᵉʳʳ']+FlattenListOfList(poltype,poltype.enthalpyerrorlisttotal[0]))
-            table.append([u'TΔSᶜᵒᵐᵖ']+FlattenListOfList(poltype,poltype.entropylist[0]))
-            table.append([u'TΔSᶜᵒᵐᵖᵉʳʳ']+FlattenListOfList(poltype,poltype.entropyerrorlisttotal[0]))
-            table.append(['CompOverlap']+FlattenListOfList(poltype,poltype.overlaplist[0]))
         elif poltype.complexation==True and poltype.solvation==True:
-            table.append(['Folder']+GenerateBARPairs(poltype,FlattenListOfList(poltype,poltype.lambdafolderlist[0])))
-           
+            table.append(['Folder']+GenerateBARPairs(poltype,FlattenListOfList(poltype,poltype.lambdafolderlist[1])))
             compfreeenergylist=FlattenListOfList(poltype,poltype.freeenergylist[0])
             totalvdw,totalele,vdwfreeenergynoioncorrection,elefreeenergynoioncorrection,totalfreeenergynoioncorrection,vdwfreeenergynogas,elefreeenergynogas,totalfreeenergynogas,vdwfreeenergygas,elefreeenergygas,totalfreeenergygas=GenerateEleVdwSums(poltype,compfreeenergylist,vdwlambdapairlist,elelambdapairlist,baroutputfilepathlist,solv=False)
             poltype.tabledict[0][u'ΔGᶜᵒᵐᵖᵉˡᵉ']=totalele
@@ -704,7 +685,6 @@ def ComputeThermoProperties(poltype):
             totalvdw,totalele,vdwfreeenergynoioncorrection,elefreeenergynoioncorrection,totalfreeenergynoioncorrection,vdwfreeenergynogas,elefreeenergynogas,totalfreeenergynogas,vdwfreeenergygas,elefreeenergygas,totalfreeenergygas=GenerateEleVdwSums(poltype,solvfreeenergylist,vdwlambdapairlist,elelambdapairlist,baroutputfilepathlist,solv=True)
             poltype.tabledict[1][u'ΔGˢᵒˡᵛᵉˡᵉ']=totalele
             poltype.tabledict[1][u'ΔGˢᵒˡᵛᵛᵈʷ']=totalvdw
-
             table.append([u'ΔGˢᵒˡᵛ']+FlattenListOfList(poltype,poltype.freeenergylist[1]))
             table.append([u'ΔGˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.freeenergyerrorlist[1]))
             table.append([u'ΔGˢᵒˡᵛᶠʷᵈ']+solvfwdenergylist)
@@ -714,8 +694,7 @@ def ComputeThermoProperties(poltype):
             table.append([u'TΔSˢᵒˡᵛ']+FlattenListOfList(poltype,poltype.entropylist[1]))
             table.append([u'TΔSˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.entropyerrorlisttotal[1]))
             table.append(['SolvOverlap']+FlattenListOfList(poltype,poltype.overlaplist[1]))
-            table.append(['Folder']+GenerateBARPairs(poltype,FlattenListOfList(poltype,poltype.lambdafolderlist[1])))
-
+            table.append(['Folder']+GenerateBARPairs(poltype,FlattenListOfList(poltype,poltype.lambdafolderlist[0])))
             table.append([u'ΔGᶜᵒᵐᵖ']+compfreeenergylist)
             table.append([u'ΔGᶜᵒᵐᵖᵉʳʳ']+FlattenListOfList(poltype,poltype.freeenergyerrorlist[0]))
             table.append([u'ΔGᶜᵒᵐᵖᶠʷᵈ']+compfwdenergylist)
@@ -725,6 +704,8 @@ def ComputeThermoProperties(poltype):
             table.append([u'TΔSᶜᵒᵐᵖ']+FlattenListOfList(poltype,poltype.entropylist[0]))
             table.append([u'TΔSᶜᵒᵐᵖᵉʳʳ']+FlattenListOfList(poltype,poltype.entropyerrorlisttotal[0]))
             table.append(['CompOverlap']+FlattenListOfList(poltype,poltype.overlaplist[0]))
+            for row in table:
+                print(row,flush=True)
         newtable=list(map(list, zip(*table)))
         for row in newtable:
             energy_writer.writerow(row)
@@ -859,13 +840,11 @@ def ExecuteBARSecondOption(poltype,joblistname):
                     barpath=poltype.barpath
                 else:
                     barpath=poltype.truebarpath
-                if poltype.submitlocally==True:
-                    barpath=poltype.localbarpath
 
                 maxframenum=int(os.path.getsize(path+'/'+proddynarcboxfilename)/os.path.getsize(path+'/'+proddynboxfilename))
                 firstframenum=1
                 cmdstr=BARSecondOptionCommand(poltype,barfilepath,firstframenum,maxframenum,outputfilepath,barpath)
-                terminate,deletefile=term.CheckFileTermination(poltype,outputfilepath)
+                terminate,deletefile,error=term.CheckFileTermination(poltype,outputfilepath)
                 if terminate==False:
                     jobtolog[cmdstr]=poltype.outputpath+joblistname
                     jobtojobpath[cmdstr]=path
@@ -909,12 +888,10 @@ def ExecuteBAR(poltype):
                     barpath=poltype.barpath
                 else:
                     barpath=poltype.truebarpath
-                if poltype.submitlocally==True:
-                    barpath=poltype.localbarpath
                 secondarcpath=secondarcpaths[i]
                 firstarcpath=firstarcpaths[i]
                 cmdstr=BARCommand(poltype,secondarcpath,firstarcpath,outputfilepath,barpath)
-                terminate,deletefile=term.CheckFileTermination(poltype,outputfilepath)
+                terminate,deletefile,error=term.CheckFileTermination(poltype,outputfilepath)
                 if poltype.redobar==True:
                     terminate=False 
                 if terminate==False:
@@ -1326,10 +1303,11 @@ def BARProtocol(poltype):
         baroutputfilepathlist=poltype.baroutputfilepath[i]
         for j in range(len(baroutputfilepathlist)):
             baroutputfilepath=baroutputfilepathlist[j]
-            finished=False
-            percentfinished=0
+            checkfin=term.CheckFilesTermination(poltype,baroutputfilepath)
+            finished=checkfin[0]
+            percentfinished=checkfin[1]
             while finished==False:
-                msg='BAR is not complete ,'+str(percentfinished)+'% of jobs finished'
+                msg='BAR is not complete, '+str(percentfinished)+'% of jobs finished'
                 if msg not in messages:
                     poltype.WriteToLog(msg,prin=True)
                     messages.append(msg)

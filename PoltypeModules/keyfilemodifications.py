@@ -52,17 +52,19 @@ def CheckIfStringAlreadyInKeyfile(poltype,keypath,string):
             found=True
     return found
     
-def RemoveKeyWord(poltype,keypath,keystring):
-    poltype.WriteToLog('Removing key word from '+keypath+' '+keystring,prin=True)
-    #newkeyfile=CopyKeyFileAsBackup(poltype,keypath)
-    #poltype.WriteToLog('Making copy of old keyfile '+newkeyfile,prin=True)
+def RemoveKeyWords(poltype,keypath,keystringlist):
+    poltype.WriteToLog('Removing key words from '+keypath+' '+str(keystringlist),prin=True)
     read=open(keypath,'r')
     results=read.readlines()
     read.close()
     tempname=keypath.replace('.key','-t.key')
     temp=open(tempname,'w')
     for line in results:
-        if keystring not in line:
+        write=True
+        for keystring in keystringlist:
+            if keystring in line:
+                write=False
+        if write==True:
             temp.write(line)
     temp.close()
     os.remove(keypath)

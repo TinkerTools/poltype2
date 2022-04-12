@@ -113,7 +113,7 @@ def ExpensiveMinimizationProtocol(poltype):
         output=poltype.tightminoutput[i]
         finished=term.CheckFileTermination(poltype,poltype.outputpath+output)[0]
         if not finished:
-            keymods.RemoveKeyWord(poltype,key,'polarizeterm none') 
+            keymods.RemoveKeyWords(poltype,key,['polarizeterm none']) 
             willsubmit=True
             jobtolog,jobtojobpath,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath=ExecuteTightMinimization(poltype,boxfilename,key,output,jobtolog,jobtojobpath,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath)
     if willsubmit==True:
@@ -138,7 +138,7 @@ def ExpensiveMinimizationProtocol(poltype):
                 os.rename(poltype.outputpath+boxfilename+'_3',poltype.outputpath+minboxfilename)
 
         if poltype.restrainatomsduringminimization:
-            keymods.RemoveKeyWord(poltype,poltype.outputpath+key,'restrain-position')
+            keymods.RemoveKeyWords(poltype,poltype.outputpath+key,['restrain-position'])
 
 def CheapMinimizationProtocol(poltype):
     if poltype.minfinished==False:
@@ -215,7 +215,7 @@ def CheapMinimizationProtocol(poltype):
     
             
             if poltype.restrainatomsduringminimization:
-                keymods.RemoveKeyWord(poltype,poltype.outputpath+key,'restrain-position')
+                keymods.RemoveKeyWords(poltype,poltype.outputpath+key,['restrain-position'])
     
         for i in range(len(poltype.looseminoutput)):
             output=poltype.looseminoutput[i]

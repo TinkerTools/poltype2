@@ -176,7 +176,7 @@
 
 ``nonaroringtor1Dscan`` specifies to cut a non-aromatic ring and spin the torsion for a 1D scan. Default behaviour is to transfer alkane torsion parameters.
                     
-
+``fitfirsttorsionfoldphase`` specifies to add a phase fitting parameter to the first cosine term in the torsion fitting                           function. Default is False.
 
 #### Fragmenter
 
@@ -462,7 +462,7 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 
 ``pathtosims``  specifies path to folder containing subfolders of simulations for combining simulation data into one spreadsheet. Will exit program after combining data. Default has no value. 
 
-
+``extractinterforbinding`` specifies to extract intermoleculer contribution to free energy for each BAR step. By default, annihilation is used which causes inter and intra molecular components to be mixed for binding free energy (gas phase is not computed since it would cancel in thermodynamic cycle). This keyword will extract the ligand dynamics and generate an ARC file for the ligand, run BAR and compute the exact intramolecular component to the free energy and add to spreadsheet.
 
 #### Mutation
 

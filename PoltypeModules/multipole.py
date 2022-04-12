@@ -2,7 +2,7 @@ import electrostaticpotential as esp
 import time
 import os
 import sys
-import openbabel
+from openbabel import openbabel
 import shutil
 import re
 from collections import deque

@@ -2,7 +2,7 @@ from itertools import combinations
 import torsiongenerator as torgen
 import optimization as opt
 import os
-import openbabel
+from openbabel import openbabel
 import numpy
 from itertools import product
 import shutil

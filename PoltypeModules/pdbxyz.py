@@ -1,6 +1,6 @@
 import os
 import submitjobs as submit
-import openbabel
+from openbabel import openbabel
 import re
 
 def GenerateProteinTinkerXYZFile(poltype):

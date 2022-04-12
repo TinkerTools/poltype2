@@ -10,7 +10,7 @@ from scipy.spatial import distance_matrix
 from scipy.cluster.hierarchy import fcluster, leaders, linkage
 from scipy.spatial.distance import pdist
 from collections import Counter, defaultdict
-import openbabel
+from openbabel import openbabel
 import itertools
 
 def ComputeCOM(poltype,atomidxtovecdic,atomidxtomassdic):
