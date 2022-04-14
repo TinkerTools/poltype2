@@ -8,6 +8,7 @@ import re
 from collections import deque
 from itertools import product,permutations
 import numpy as np
+import re
 
 def AddPolarizeCommentsToKey(poltype,keyfilename,polartypetotransferinfo):
     temp=open(keyfilename,'r')
@@ -439,7 +440,9 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
     iteratom = openbabel.OBMolAtomIter(mol)
     writesection=True
     lines=[]
-    for index,prm in polarindextopolarizeprm.items():
+    sortedpolarindexkeys=sorted(polarindextopolarizeprm)
+    for index in sortedpolarindexkeys:
+       prm=polarindextopolarizeprm[index]
        line=str(index)+' '+str(prm)+'\n'
        lines.append(line) 
     
@@ -641,12 +644,12 @@ def run_gdma(poltype):
     assert os.path.getsize(poltype.gdmafname) > 0, "Error: " + os.getcwd() +' '+os.path.basename(poltype.gdmaexe) + " cannot create .gdmaout file."
    
 def AverageMultipoles(poltype,optmol):
-    # gen input file
     gen_avgmpole_groups_file(poltype)
-    # call avgmpoles.pl
     avgmpolecmdstr = poltype.avgmpolesexe + " " + poltype.keyfname + " " + poltype.xyzfname + " " + poltype.grpfname + " " + poltype.key2fnamefromavg + " " + poltype.xyzoutfile + " " + str(poltype.prmstartidx)
     poltype.call_subsystem([avgmpolecmdstr],True)
     prepend_keyfile(poltype,poltype.key2fnamefromavg,optmol,True)
+
+
 
 def gen_avgmpole_groups_file(poltype):
     """

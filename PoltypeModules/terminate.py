@@ -66,6 +66,7 @@ def CheckBARFile(poltype,filepath):
 
 def CheckFileTermination(poltype,f,steps=None,equil=False,firsttime=True):
    term=False
+   error=False
    deletefile=False
    if poltype.checktraj==False:
        firsttime=False

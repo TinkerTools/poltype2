@@ -1817,8 +1817,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         if np.abs(180-firstangle)<=angletol or np.abs(180-secondangle)<=angletol:
             torsionstozerooutduetocolinear.append(torsionindices)
             continue
-        if bondorder!=1 and ringbond==False: # then dont zero out
-            continue 
+         
         
         atomvals=[len([neighb for neighb in openbabel.OBAtomAtomIter(a)]) for a in babelatoms]
         atomnums=[a.GetAtomicNum() for a in babelatoms]
@@ -1871,7 +1870,6 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         
         if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False and ([bbidx,cbidx] not in poltype.onlyrotbndslist and [cbidx,bbidx] not in poltype.onlyrotbndslist):
             continue
-
         if check==False:
             if ringbond==True:
                 if (2 not in hybs): # non-aromatic torsion want parameters for 
@@ -1907,14 +1905,31 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
 
             else:
                 if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
-                    poormatchingpartialaromatictorsions.append(torsionindices)
+                    if hybs[1]==2 and hybs[2]==2:
+                        if torsionindices not in poormatchingaromatictorsions:
+                            poormatchingaromatictorsions.append(torsionindices)
+                    elif (hybs[1]==2 and hybs[2]!=2) or (hybs[1]!=2 and hybs[2]==2):
+                        if torsionindices not in poormatchingpartialaromatictorsions:
+                            poormatchingpartialaromatictorsions.append(torsionindices)
+                    elif (hybs[1]!=2 and hybs[2]!=2) and (hybs[0]==2 or hybs[3]==2):
+                        if torsionindices not in poormatchingpartialaromatictorsions:
+                            poormatchingpartialaromatictorsions.append(torsionindices)
+                    else:
+                        if torsionindices not in poormatchingpartialaromatictorsions:
+                            poormatchingpartialaromatictorsions.append(torsionindices)
+
+
                 else:
                     if len(poltype.onlyrotbndslist)!=0:
                         if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
+                            if bondorder!=1: 
+                                continue
 
                             if torsionindices not in torsionsmissing:
                                 torsionsmissing.append(torsionindices)
                     else:
+                        if bondorder!=1:
+                            continue
                         if torsionindices not in torsionsmissing:
                             torsionsmissing.append(torsionindices)
 
@@ -1922,13 +1937,14 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
 
         else:
             if poltype.rotalltors==True and ringbond==False:
-                if torsionindices not in torsionsmissing:
-                    torsionsmissing.append(torsionindices)
-            if len(poltype.onlyrotbndslist)!=0:
-                if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
-
+                if bondorder!=1:
                     if torsionindices not in torsionsmissing:
                         torsionsmissing.append(torsionindices)
+            if len(poltype.onlyrotbndslist)!=0:
+                if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
+                    if bondorder!=1:
+                        if torsionindices not in torsionsmissing:
+                            torsionsmissing.append(torsionindices)
     return torsionsmissing,poormatchingaromatictorsions,poormatchingpartialaromatictorsions,torsionstozerooutduetocolinear 
 def GrabAllRingsContainingIndices(poltype,atomindices,babelindices):
     rings=[]
@@ -2091,13 +2107,23 @@ def ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,
     return newtorsionprms
 
 
-def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopoltypeclasses,partialarotorsionsmissingtinkerclassestopoltypeclasses,torsionprms): # transfer bezene aromatic torsion paramerers from amoeba09
+def GrabKeysFromValue(poltype,dic,thevalue):
+    keylist=[]
+    for key,value in dic.items():
+        if value==thevalue:
+            keylist.append(key)
+    return keylist
+
+
+def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopoltypeclasses,partialarotorsionsmissingtinkerclassestopoltypeclasses,torsionprms,mol): # transfer bezene aromatic torsion paramerers from amoeba09
     newtorsionprms=[]
     poorarohydcounttoprms={0:[-.67,6.287,0],1:[.55,6.187,-.55],2:[0,6.355,0]}
     poorpartialarohydcounttoprms={0:[.854,-.374,.108],1:[0,0,.108],2:[0,0,.299]}
     poorarohydcounttodescrips={0:["Benzene C","Benzene C","Benzene C","Benzene C"],1:["Benzene HC","Benzene C","Benzene C","Benzene C"],2:["Benzene HC","Benzene C","Benzene C","Benzene HC"]}
     poorpartialarohydcounttodescrips={0:["Alkane -CH2-","Alkane -CH2-","Alkane -CH2-","Alkane -CH2-"],1:["Alkane -H2C-","Alkane -CH2-","Alkane -CH2-","Alkane -CH2-"],2:["Alkane -H2C-","Alkane -CH2-","Alkane -CH2-","Alkane -H2C-"]}
-    extra='# Ring bond detected '+'\n'
+    ringextra='# Ring bond detected for missing torsion'+'\n'
+    doubleextra='# Double bond detected for missing torsion'+'\n'
+    singleextra='# Single bond detected for missing torsion'+'\n'
     arotorsionlinetodescrips={} 
     hydclasses=[]
     for atom in poltype.rdkitmol.GetAtoms():
@@ -2113,6 +2139,20 @@ def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopolt
         b=int(linesplit[2])
         c=int(linesplit[3])
         d=int(linesplit[4])
+        allcombs=[]
+        ls=[b,c]
+        for typenum in ls: 
+            indices=GrabKeysFromValue(poltype,poltype.idxtosymclass,typenum)
+            allcombs.append(indices)
+        combs=list(itertools.product(*allcombs))
+        for comb in combs:
+            bindex=comb[0]
+            cindex=comb[1]
+            bond=mol.GetBond(bindex,cindex)
+            if bond!=None:
+                break 
+        ringbond=bond.IsInRing()
+        bondorder=bond.GetBondOrder()      
         classes=tuple([a,b,c,d])
         hydcount=0
         if a in hydclasses:
@@ -2141,6 +2181,12 @@ def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopolt
             splitafter[12]=str(prms[2])
             newlinesplit=newlinesplit[:10]+splitafter
             line=''.join(newlinesplit)
+            if ringbond==True:
+                extra=ringextra
+            elif ringbond==False and bondorder!=1:
+                extra=doubleextra
+            else:
+                extra=singleextra
             arotorsionlinetodescrips[line]=[extra,descrips]
         newtorsionprms.append(line)
 
@@ -4891,7 +4937,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         angleprms=AddOptimizedAngleLengths(poltype,optmol,angleprms,anglelistbabel)
         torsionsmissingtinkerclassestopoltypeclasses=MergeDictionaries(poltype,torsionszeroouttinkerclassestopoltypeclasses,torsionsmissingtinkerclassestopoltypeclasses)
         torsionprms=ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,torsionprms)
-        torsionprms,arotorsionlinetodescrips=DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopoltypeclasses,partialarotorsionsmissingtinkerclassestopoltypeclasses,torsionprms)
+        torsionprms,arotorsionlinetodescrips=DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopoltypeclasses,partialarotorsionsmissingtinkerclassestopoltypeclasses,torsionprms,mol)
         torsionkeystringtoparameters=GrabTorsionParameterCoefficients(poltype,torsionprms)
         potentialmissingopbendprmtypes=FindPotentialMissingParameterTypes(poltype,opbendprms,planarbondtinkerclassestopoltypeclasses)
         potentialmissingopbendprmindices=ConvertPoltypeClassesToIndices(poltype,potentialmissingopbendprmtypes)
