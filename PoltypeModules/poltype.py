@@ -4247,9 +4247,8 @@ class PolarizableTyper():
             raise ValueError("Notice: Not latest working version of tinker (8.9.4)"+' '+os.getcwd())
       
 
-    def GrabLigandIndices(self,xyzfilename):
+    def GrabLigandIndices(self,xyzfilename,ligandtypes):
         indices=[]
-        starttype=401 # assume ligand starts at 401
         temp=open(xyzfilename,'r')
         results=temp.readlines()
         temp.close()
@@ -4265,7 +4264,7 @@ class PolarizableTyper():
             if len(linesplit)>1 and isboxline==False:
                 typenum=int(linesplit[5])
                 index=int(linesplit[0])
-                if typenum>=starttype:
+                if typenum in ligandtypes:
                     indices.append(index)
         return indices
         
@@ -4372,9 +4371,9 @@ class PolarizableTyper():
         string='parameters '+self.prmfilepath+'\n'
         keymods.AddKeyWord(self,self.originalkeyfilename,string)
         if self.receptorligandxyzfilename!=None and self.ligandxyzfilename!=None:
-            indices=self.GrabLigandIndices(self.receptorligandxyzfilename)
-            receptorligandtypes=self.GrabTypeNumbers(self.receptorligandxyzfilename,indices)   
             ligandtypes=self.GrabTypeNumbers(self.ligandxyzfilename)   
+            indices=self.GrabLigandIndices(self.receptorligandxyzfilename,ligandtypes)
+            receptorligandtypes=self.GrabTypeNumbers(self.receptorligandxyzfilename,indices)
             self.CompareTypes(receptorligandtypes,ligandtypes)
         if self.receptorligandxyzfilename!=None and self.originalkeyfilename!=None: 
             
@@ -4394,7 +4393,8 @@ class PolarizableTyper():
             if self.receptorligandxyzfilename!=None:
                 self.receptorcharge=self.complexcharge-self.ligandcharge
         if self.receptorligandxyzfilename!=None and self.ligandxyzfilename!=None:
-            indices=self.GrabLigandIndices(self.receptorligandxyzfilename)
+            ligandtypes=self.GrabTypeNumbers(self.ligandxyzfilename)
+            indices=self.GrabLigandIndices(self.receptorligandxyzfilename,ligandtypes)
             coords=self.GrabCoordinates(self.receptorligandxyzfilename,indices)
             self.RewriteCoordinates(self.ligandxyzfilename,coords)
 
