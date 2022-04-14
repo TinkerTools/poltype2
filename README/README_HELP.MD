@@ -375,6 +375,8 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 ``boxonly`` specifies to stop program after making box. Default is False.           
 
 
+``addphysioions`` specifies to add physiological ions to box system to mimic envioronment inside cell. Default is KCl at 100mM concentration. 
+
 #### Minimization
 
 ``restrainpositionconstant`` specifies the restraint position force constant during minimization for freezing the ligand and protein. Units in kcal/mol/Ang^2.  

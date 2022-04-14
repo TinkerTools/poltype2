@@ -473,6 +473,13 @@ class PolarizableTyper():
                         self.prmfilepath=a
                     elif 'gpucardnumber' in newline:
                         self.gpucardnumber=int(a)
+
+                    elif "addphysioions" in newline:
+                        if '=' not in line:
+                            self.addphysioions = True
+                        else:
+                            self.addphysioions=self.GrabBoolValue(a)
+
                     elif "printjobsleft" in newline:
                         if '=' not in line:
                             self.printjobsleft = True
