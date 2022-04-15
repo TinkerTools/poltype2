@@ -30,8 +30,8 @@ def KeyLists(poltype):
     lambdakeylist=['Ele-Lambda','Vdw-Lambda','Restraint-Lambda']
 
     boxinfokeylist=['Total Atom Number','Average Box Size','Prod MD Ensemb','Prod MD Time','Prod MD Steps','Prod MD Arc File Space','Dynamic Writeout Frequency (ps)','Dynamic Time Step (fs)','Equil Time NPT','Equil Time NVT','Physio Counterions','Neut Counterions','Ligand Charge','Receptor Charge','Ligand Name','Receptor Name']
-    energykeylist=[u'ΔGˢᵒˡᵛ',u'ΔGˢᵒˡᵛᵉʳʳ',u'ΔHˢᵒˡᵛ',u'ΔHˢᵒˡᵛᵉʳʳ',u'ΔSˢᵒˡᵛ',u'ΔSˢᵒˡᵛᵉʳʳ',u'ΔGᶜᵒᵐᵖᶜᵒʳʳ',u'ΔGᶜᵒᵐᵖᵘⁿᶜᵒʳʳ',u'ΔGᶜᵒᵐᵖᶜᵒʳʳᵉʳʳ',u'ΔHᶜᵒᵐᵖ',u'ΔHᶜᵒᵐᵖᵉʳʳ',u'ΔSᶜᵒᵐᵖ',u'ΔSᶜᵒᵐᵖᵉʳʳ',u'ΔGᵃⁿᵃᶜᵒᵐᵖᶜᵒʳʳ',u'ΔGᵇᶦⁿᵈᶜᵒʳʳ',u'ΔHᵇᶦⁿᵈ',u'ΔHᵇᶦⁿᵈᵉʳʳ',u'ΔSᵇᶦⁿᵈ',u'ΔSᵇᶦⁿᵈᵉʳʳ',u'ΔGˢᵒˡᵛᵉˡᵉ',u'ΔGˢᵒˡᵛᵛᵈʷ',u'ΔGᶜᵒᵐᵖᵉˡᵉ',u'ΔGᶜᵒᵐᵖᵛᵈʷ',u'ΔGⁿᵒⁱᵒⁿ',u'ΔGᵉˣᵖ',u'ΔGᵉˡᵉⁿᵒⁱᵒⁿ',u'ΔGᵛᵈʷⁿᵒⁱᵒⁿ',u'ΔGᵍᵃˢ',u'ΔGˢᵒˡ',u'ΔGᵉˡᵉᵍᵃˢ',u'ΔGᵉˡᵉˢᵒˡ',u'ΔGᵛᵈʷᵍᵃˢ',u'ΔGᵛᵈʷˢᵒˡ']
-    freeenergykeylist=[u'ΔGˢᵒˡᵛ',u'ΔGˢᵒˡᵛᵉʳʳ',u'ΔGᶜᵒᵐᵖᶜᵒʳʳ',u'ΔGᶜᵒᵐᵖᵘⁿᶜᵒʳʳ',u'ΔGᶜᵒᵐᵖᶜᵒʳʳᵉʳʳ',u'ΔGᵃⁿᵃᶜᵒᵐᵖᶜᵒʳʳ',u'ΔGᵇᶦⁿᵈᶜᵒʳʳ',u'ΔGˢᵒˡᵛᵉˡᵉ',u'ΔGˢᵒˡᵛᵛᵈʷ',u'ΔGᶜᵒᵐᵖᵉˡᵉ',u'ΔGᶜᵒᵐᵖᵛᵈʷ',u'ΔGⁿᵒⁱᵒⁿ',u'ΔGᵉˣᵖ',u'ΔGᵉˡᵉⁿᵒⁱᵒⁿ',u'ΔGᵛᵈʷⁿᵒⁱᵒⁿ',u'ΔGᵍᵃˢ',u'ΔGˢᵒˡ',u'ΔGᵉˡᵉᵍᵃˢ',u'ΔGᵉˡᵉˢᵒˡ',u'ΔGᵛᵈʷᵍᵃˢ',u'ΔGᵛᵈʷˢᵒˡ']
+    energykeylist=[u'ΔGˢᵒˡᵛ',u'ΔGˢᵒˡᵛᵉʳʳ',u'ΔHˢᵒˡᵛ',u'ΔHˢᵒˡᵛᵉʳʳ',u'ΔSˢᵒˡᵛ',u'ΔSˢᵒˡᵛᵉʳʳ',u'ΔGᶜᵒᵐᵖᶜᵒʳʳ',u'ΔGᶜᵒᵐᵖᵘⁿᶜᵒʳʳ',u'ΔGᶜᵒᵐᵖᶜᵒʳʳᵉʳʳ',u'ΔHᶜᵒᵐᵖ',u'ΔHᶜᵒᵐᵖᵉʳʳ',u'ΔSᶜᵒᵐᵖ',u'ΔSᶜᵒᵐᵖᵉʳʳ',u'ΔGᵃⁿᵃᶜᵒᵐᵖᶜᵒʳʳ',u'ΔGᵇᶦⁿᵈᶜᵒʳʳ',u'ΔHᵇᶦⁿᵈ',u'ΔHᵇᶦⁿᵈᵉʳʳ',u'ΔSᵇᶦⁿᵈ',u'ΔSᵇᶦⁿᵈᵉʳʳ',u'ΔGˢᵒˡᵛᵉˡᵉ',u'ΔGˢᵒˡᵛᵛᵈʷ',u'ΔGᶜᵒᵐᵖᵉˡᵉ',u'ΔGᶜᵒᵐᵖᵛᵈʷ',u'ΔG',u'ΔGᵉˣᵖ',u'ΔGᵉˡᵉ',u'ΔGᵛᵈʷ',u'ΔGᵍᵃˢ',u'ΔGˢᵒˡ',u'ΔGᵉˡᵉᵍᵃˢ',u'ΔGᵉˡᵉˢᵒˡ',u'ΔGᵛᵈʷᵍᵃˢ',u'ΔGᵛᵈʷˢᵒˡ']
+    freeenergykeylist=[u'ΔGˢᵒˡᵛ',u'ΔGˢᵒˡᵛᵉʳʳ',u'ΔGᶜᵒᵐᵖᶜᵒʳʳ',u'ΔGᶜᵒᵐᵖᵘⁿᶜᵒʳʳ',u'ΔGᶜᵒᵐᵖᶜᵒʳʳᵉʳʳ',u'ΔGᵃⁿᵃᶜᵒᵐᵖᶜᵒʳʳ',u'ΔGᵇᶦⁿᵈᶜᵒʳʳ',u'ΔGˢᵒˡᵛᵉˡᵉ',u'ΔGˢᵒˡᵛᵛᵈʷ',u'ΔGᶜᵒᵐᵖᵉˡᵉ',u'ΔGᶜᵒᵐᵖᵛᵈʷ',u'ΔG',u'ΔGᵉˣᵖ',u'ΔGᵉˡᵉ',u'ΔGᵛᵈʷ',u'ΔGᵍᵃˢ',u'ΔGˢᵒˡ',u'ΔGᵉˡᵉᵍᵃˢ',u'ΔGᵉˡᵉˢᵒˡ',u'ΔGᵛᵈʷᵍᵃˢ',u'ΔGᵛᵈʷˢᵒˡ']
     summarykeylist=[u'ΔGˢᵒˡᵛ',u'ΔGᶜᵒᵐᵖᶜᵒʳʳ',u'ΔGᵃⁿᵃᶜᵒᵐᵖᶜᵒʳʳ',u'ΔGᵇᶦⁿᵈᶜᵒʳʳ']
         
     if poltype.averageenergies==True:
