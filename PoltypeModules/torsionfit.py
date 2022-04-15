@@ -1451,11 +1451,13 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
                 ax2.plot(x_new,y_smooth,color='yellow')
 
                 ax2.set_ylabel("WBO",color="blue",fontsize=14)
+
+                plt.legend(handles=[line1,line2,line3,line4,line5,line6],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=6)
             except:
-                pass
+                plt.legend(handles=[line1,line2,line3,line4,line5],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
+
             ax.set_xlabel('Dihedral Angle (degrees)')
             ax.set_ylabel('Energy (kcal/mol)')
-            plt.legend(handles=[line1,line2,line3,line4,line5,line6],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
 
             fig = plt.gcf()
             plt.show()
