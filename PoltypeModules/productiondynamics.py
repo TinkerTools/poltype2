@@ -103,7 +103,7 @@ def ProductionDynamicsCommand(poltype,inputxyzname,keyfile,steps,ensemble,output
 
     return cmdstr
    
-def ModifyKeyForGasPhase(poltype,keyfilepath):
+def ModifyKeyForGasPhase(poltype,keyfilepath,changeligandindices):
     keymods.RemoveKeyWords(poltype,keyfilepath,['axis','ewald','cutoff','correction'])
     
     if poltype.changegasphaseintegrator==True:
@@ -115,6 +115,11 @@ def ModifyKeyForGasPhase(poltype,keyfilepath):
         string='RESPA-INNER 0.1'+'\n'
         if not keymods.CheckIfStringAlreadyInKeyfile(poltype,keyfilepath,string):
             keymods.AddKeyWord(poltype,keyfilepath,string)
+    if changeligandindices==True:
+        keymods.RemoveKeyWords(poltype,keyfilepath,['ligand'])
+        ligandindices=poltype.ligandindices[1]
+        AddLigandIndices(poltype,ligandindices,keyfilepath)
+
 
 def SearchNearestNonPerturbedFolder(poltype,folderlist,index):
     fold=folderlist[index]
@@ -223,7 +228,13 @@ def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynbo
                else:
                    shutil.copyfile(poltype.outputpath+lambdakeyfilenamelist[0],os.path.join(newfoldpath+newtempkeyfile))
                if 'Gas' in fold:
-                   ModifyKeyForGasPhase(poltype,os.path.join(newfoldpath+newtempkeyfile))
+
+                   if poltype.binding==True:
+                       changeligandindices=True
+                   else:
+                       changeligandindices=False
+                   ModifyKeyForGasPhase(poltype,os.path.join(newfoldpath+newtempkeyfile),changeligandindices)
+
            else:
                arrayoflinearrays=mutate.MutateAllParameters(poltype,poltype.bgnlinetoendline,mutlambda,None,None)
                mutate.GenerateKeyFile(poltype,arrayoflinearrays,os.path.join(newfoldpath+newtempkeyfile))
@@ -542,6 +553,15 @@ def GrabTinkerFiles(poltype):
     return arcpaths,keypaths
 
 
+def AddLigandIndices(poltype,ligandindices,keyfilename):
+    string='ligand'+' '
+    firstligidx=str(ligandindices[0])
+    lastligidx=str(ligandindices[-1])
+    string+='-'+firstligidx+' '+lastligidx+'\n'
+    keymods.AddKeyWord(poltype,keyfilename,string)
+
+
+
 def ProductionDynamicsProtocol(poltype):
     if poltype.prodmdfinished==False:
         if len(poltype.mutlambdascheme)==0:
@@ -554,11 +574,7 @@ def ProductionDynamicsProtocol(poltype):
                     configkeyfilename=configkeyfilenamelist[k]
                     shutil.copyfile(poltype.outputpath+configkeyfilename,poltype.outputpath+lambdakeyfilename)
                     if len(ligandindices)!=0:
-                        string='ligand'+' '
-                        firstligidx=str(ligandindices[0])
-                        lastligidx=str(ligandindices[-1])
-                        string+='-'+firstligidx+' '+lastligidx+'\n'
-                        keymods.AddKeyWord(poltype,lambdakeyfilename,string)
+                        AddLigandIndices(poltype,ligandindices,lambdakeyfilename)
                     string='ele-lambda'+'\n'
                     keymods.AddKeyWord(poltype,lambdakeyfilename,string)
                     string='vdw-lambda'+'\n'

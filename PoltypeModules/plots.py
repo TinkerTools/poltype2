@@ -77,42 +77,42 @@ def PlotEnergyData(poltype):
     width=1
     fig1=plt.figure(figsize=(8, 10))
     
-    solvSarray=[0 if v is None or v is '' else v for v in solvSarray]
+    solvSarray=[0 if v == None or v == '' else v for v in solvSarray]
     solvSarray=[float(i) for i in solvSarray]
-    solvSerrarray=[0 if v is None or v is '' else v for v in solvSerrarray]
+    solvSerrarray=[0 if v == None or v == '' else v for v in solvSerrarray]
     solvSerrarray=[float(i) for i in solvSerrarray]
 
-    solvGerrarray=[0 if v is None or v is '' else v for v in solvGerrarray] 
+    solvGerrarray=[0 if v == None or v == '' else v for v in solvGerrarray] 
     solvGerrarray=[float(i) for i in solvGerrarray]
 
-    solvGarray=[0 if v is None or v is '' else v for v in solvGarray] 
+    solvGarray=[0 if v == None or v == '' else v for v in solvGarray] 
     solvGarray=[float(i) for i in solvGarray]
 
-    solvSarray=[0 if v is None or v is '' else v for v in solvSarray]
+    solvSarray=[0 if v == None or v == '' else v for v in solvSarray]
     solvSarray=[float(i) for i in solvSarray]
 
-    solvHerrarray=[0 if v is None or v is '' else v for v in solvHerrarray]
+    solvHerrarray=[0 if v == None or v == '' else v for v in solvHerrarray]
     solvHerrarray=[float(i) for i in solvHerrarray]
 
-    solvHarray=[0 if v is None or v is '' else v for v in solvHarray]
+    solvHarray=[0 if v == None or v == '' else v for v in solvHarray]
     solvHarray=[float(i) for i in solvHarray]
 
-    compHerrarray=[0 if v is None or v is '' else v for v in compHerrarray]
+    compHerrarray=[0 if v == None or v == '' else v for v in compHerrarray]
     compHerrarray=[float(i) for i in compHerrarray]
 
-    compSerrarray=[0 if v is None or v is '' else v for v in compSerrarray]
+    compSerrarray=[0 if v == None or v == '' else v for v in compSerrarray]
     compSerrarray=[float(i) for i in compSerrarray]
 
-    compGerrarray=[0 if v is None or v is '' else v for v in compGerrarray]
+    compGerrarray=[0 if v == None or v == '' else v for v in compGerrarray]
     compGerrarray=[float(i) for i in compGerrarray]
 
-    compHarray=[0 if v is None or v is '' else v for v in compHarray]
+    compHarray=[0 if v == None or v == '' else v for v in compHarray]
     compHarray=[float(i) for i in compHarray]
 
-    compSarray=[0 if v is None or v is '' else v for v in compSarray]
+    compSarray=[0 if v == None or v == '' else v for v in compSarray]
     compSarray=[float(i) for i in compSarray]
 
-    compGarray=[0 if v is None or v is '' else v for v in compGarray]
+    compGarray=[0 if v == None or v == '' else v for v in compGarray]
     compGarray=[float(i) for i in compGarray]
 
     solvSarray=np.array(solvSarray)*(int(poltype.equilibriatescheme[-1]))
