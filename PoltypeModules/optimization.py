@@ -173,7 +173,7 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     if poltype.freq:
         temp.write('    scf_e,scf_wfn=freq("%s/%s",return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
     temp.write('    break'+'\n')
-    temp.write('  except OptimizationConvergenceError:'+'\n')
+    temp.write('  except:'+'\n')
     temp.write('    break'+'\n')
     if skipscferror==True:
         temp.write('  except SCFConvergenceError:'+'\n')
@@ -190,7 +190,7 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     if poltype.freq:
         temp.write('      scf_e,scf_wfn=freq("%s/%s",return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
     temp.write('      break'+'\n')
-    temp.write('    except OptimizationConvergenceError:'+'\n')
+    temp.write('    except:'+'\n')
     temp.write('      '+'pass'+'\n')
 
     temp.write('clean()'+'\n')
