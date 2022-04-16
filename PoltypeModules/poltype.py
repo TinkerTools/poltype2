@@ -3467,7 +3467,6 @@ class PolarizableTyper():
         (torlist, self.rotbndlist,hydtorsions,nonaroringtorlist) = torgen.get_torlist(self,mol,torsionsmissing)
         if atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False: 
             self.dontfrag=True
-
         if self.dontfrag==True: # if fragmenter is turned off, parition resources by jobs at sametime for parent
             self.maxmem,self.maxdisk,self.numproc=self.PartitionResources()
         torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules

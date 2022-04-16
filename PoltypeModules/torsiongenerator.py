@@ -1114,6 +1114,21 @@ def RdkitIsInRing(poltype,atom):
     return isinringofsize,i
 
 
+def GrabAllRingsContainingMostIndices(poltype,atomindices,babelindices,total):
+    rings=[]
+    for ring in atomindices:
+        array=[True for i in babelindices]
+        for i in range(len(babelindices)):
+            atomindex=babelindices[i]
+            if atomindex not in ring:
+                array[i]=False
+        count=0
+        for value in array:
+            if value==True:
+                count+=1
+        if count>=total:
+            rings.append(ring)
+    return rings
 
 
 
@@ -1212,7 +1227,7 @@ def get_torlist(poltype,mol,missed_torsions):
         # store torsion in rotbndlist
         if ringbond==True:
             atomindices=databaseparser.RingAtomicIndices(poltype,mol)
-            therings=databaseparser.GrabAllRingsContainingIndices(poltype,atomindices,babelindices)
+            therings=GrabAllRingsContainingMostIndices(poltype,atomindices,babelindices,3)
             if len(therings)==1 and poltype.dontfrag==False:
                 if len(therings[0])>7: # special case where whole molecule is a ring then dont consider ring bond
                     ringbond=False
@@ -1928,7 +1943,6 @@ def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetf
         if '!' not in line:
             tmpfh.write(space+line)
     return tmpfh
-
 
 
 def RemoveDuplicateRotatableBondTypes(poltype,torlist):
