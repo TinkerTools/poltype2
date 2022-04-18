@@ -43,14 +43,39 @@ def gen_canonicallabels(poltype,mol,rdkitmol=None):
     groups=[]
     grouptoheavy={}
     for index,matchingindices in indextomatchingindices.items():
+        if set(matchingindices) not in groups:
+            groups.append(set(matchingindices))
+    newgroups=[]
+    newindextomatchingindices={}
+    for group in groups:
+        for index in group:
+            if index not in newindextomatchingindices.keys():
+                newindextomatchingindices[index]=group
+            else:
+                oldgroup=newindextomatchingindices[index]
+                newgroup=oldgroup.union(group)
+                newindextomatchingindices[index]=newgroup
+
+    finalindextomatchingindices={}
+    for index,matchingindices in newindextomatchingindices.items():
+        largest=matchingindices
+        for newindex,newmatchingindices in newindextomatchingindices.items():
+            if index in newmatchingindices:
+                if len(newmatchingindices)>len(largest):
+                    largest=newmatchingindices
+        finalindextomatchingindices[index]=largest
+
+    for index,matchingindices in finalindextomatchingindices.items():
         atom=rdkitmol.GetAtomWithIdx(index)
         atomnum=atom.GetAtomicNum()
         heavy=False
         if atomnum!=1:
             heavy=True
-        if set(matchingindices) not in groups:
-            groups.append(set(matchingindices))
+        if set(matchingindices) not in newgroups:
+            newgroups.append(set(matchingindices))
             grouptoheavy[tuple(set(matchingindices))]=heavy
+        
+        
     sortedgroups=[]
     for group,heavy in grouptoheavy.items():
         if heavy==True:
