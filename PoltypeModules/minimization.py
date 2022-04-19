@@ -41,12 +41,12 @@ def ExpensiveMinimizationProtocol(poltype):
         caxis=poltype.caxislist[0]
         ls=[aaxis,baxis,caxis]
         combs=itertools.combinations(ls, 2)
-        needrot=False
+        poltype.needrot=False
         for comb in combs:
             diff=np.abs(comb[0]-comb[1])
             if diff>10:
-                needrot=True
-        if needrot==True:        
+                poltype.needrot=True
+        if poltype.needrot==True:        
             poltype.norotpair=FindTwoAtomsForRestrainingRotation(poltype) 
             resposstring='restrain-position -'+str(poltype.norotpair[0])+' '+str(poltype.norotpair[0])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
             for keyidx in range(len(poltype.configkeyfilename)):
@@ -149,12 +149,12 @@ def CheapMinimizationProtocol(poltype):
             caxis=poltype.caxislist[0]
             ls=[aaxis,baxis,caxis]
             combs=itertools.combinations(ls, 2)
-            needrot=False
+            poltype.needrot=False
             for comb in combs:
                 diff=np.abs(comb[0]-comb[1])
                 if diff>10:
-                    needrot=True
-            if needrot==True:        
+                    poltype.needrot=True
+            if poltype.needrot==True:        
                 poltype.norotpair=FindTwoAtomsForRestrainingRotation(poltype) 
                 resposstring='restrain-position -'+str(poltype.norotpair[0])+' '+str(poltype.norotpair[0])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
                 for keyidx in range(len(poltype.configkeyfilename)):
@@ -226,7 +226,6 @@ def CheapMinimizationProtocol(poltype):
             if not os.path.isfile(poltype.outputpath+minpymolboxfilename):
                 if os.path.isfile(poltype.outputpath+minboxfilename):
                     poltype.PymolReadableFile(minboxfilename,minpymolboxfilename)
-    
     if poltype.minonly==True:
         sys.exit()
 

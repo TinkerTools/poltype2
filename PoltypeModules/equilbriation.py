@@ -203,10 +203,11 @@ def ExecuteEquilibriation(poltype):
                     if restrainpositionconstant!=0 and poltype.restrainreceptorligand==True: 
                         resposstring='restrain-position -'+str(1)+' '+str(totalatomnumberxyzfilename-len(ligandindices))+' '+str(restrainpositionconstant)+' '+str(poltype.equilrestrainsphereradius)+'\n'
                         keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
-                    resposstring='restrain-position -'+str(poltype.norotpair[0])+' '+str(poltype.norotpair[0])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
-                    keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
-                    resposstring='restrain-position -'+str(poltype.norotpair[1])+' '+str(poltype.norotpair[1])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
-                    keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
+                    if poltype.needrot==True:
+                        resposstring='restrain-position -'+str(poltype.norotpair[0])+' '+str(poltype.norotpair[0])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
+                        keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
+                        resposstring='restrain-position -'+str(poltype.norotpair[1])+' '+str(poltype.norotpair[1])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
+                        keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
         submitjobs.SubmitJobs(poltype,newjobtolog,newjobtojobpath,newjobtoinputfilepaths,newjobtooutputfiles,newjobtoabsolutebinpath,poltype.outputpath+poltype.equiljobsfilename)
         messages=[]
         for i in range(len(poltype.equiloutputarray)):

@@ -16,63 +16,19 @@ def gen_canonicallabels(poltype,mol,rdkitmol=None):
         rdkitmol,atomindextoformalcharge=poltype.CheckInputCharge(rdkitmol)
         poltype.totalcharge=temptotalcharge
         Chem.SanitizeMol(rdkitmol)
-    smi=Chem.MolToSmiles(rdkitmol)
-    smilesorder=rdkitmol.GetProp('_smilesAtomOutputOrder')
-    smilesorder=smilesorder[1:-2]
-    smilesorder=smilesorder.split(',')
-    smilesorder=[int(i) for i in smilesorder]
-    indices=[i.GetIdx() for i in rdkitmol.GetAtoms()]
-    indextotrueindex=dict(zip(indices,smilesorder))
-    pbmol=pybel.readstring("smi", smi)
-    mappings = pybel.ob.vvpairUIntUInt()
-    success = pybel.ob.FindAutomorphisms(pbmol.OBMol, mappings)
-    indextomatchingindices={}
-    for maplist in mappings:
-        for mapitem in maplist:
-            index=indextotrueindex[mapitem[0]]
-            matchingindex=indextotrueindex[mapitem[1]]
+    distmat=Chem.rdmolops.GetDistanceMatrix(rdkitmol)
+    indextomatchingindices=ComputeSymmetryTypes(poltype,distmat,rdkitmol,mol)
 
-            if index not in indextomatchingindices.keys():
-                indextomatchingindices[index]=[]
-            if matchingindex not in indextomatchingindices[index]:
-                indextomatchingindices[index].append(matchingindex)
-            if index not in indextomatchingindices[index]:
-                indextomatchingindices[index].append(index)
-
-           
-    groups=[]
+    groups=[] 
     grouptoheavy={}
     for index,matchingindices in indextomatchingindices.items():
-        if set(matchingindices) not in groups:
-            groups.append(set(matchingindices))
-    newgroups=[]
-    newindextomatchingindices={}
-    for group in groups:
-        for index in group:
-            if index not in newindextomatchingindices.keys():
-                newindextomatchingindices[index]=group
-            else:
-                oldgroup=newindextomatchingindices[index]
-                newgroup=oldgroup.union(group)
-                newindextomatchingindices[index]=newgroup
-
-    finalindextomatchingindices={}
-    for index,matchingindices in newindextomatchingindices.items():
-        largest=matchingindices
-        for newindex,newmatchingindices in newindextomatchingindices.items():
-            if index in newmatchingindices:
-                if len(newmatchingindices)>len(largest):
-                    largest=newmatchingindices
-        finalindextomatchingindices[index]=largest
-
-    for index,matchingindices in finalindextomatchingindices.items():
         atom=rdkitmol.GetAtomWithIdx(index)
         atomnum=atom.GetAtomicNum()
         heavy=False
         if atomnum!=1:
             heavy=True
-        if set(matchingindices) not in newgroups:
-            newgroups.append(set(matchingindices))
+        if set(matchingindices) not in groups:
+            groups.append(set(matchingindices))
             grouptoheavy[tuple(set(matchingindices))]=heavy
         
         
@@ -97,3 +53,50 @@ def gen_canonicallabels(poltype,mol,rdkitmol=None):
     symmetryclass=idxtosymclass.values()
     return idxtosymclass,symmetryclass
 
+
+def ComputeSymmetryTypes(poltype,distmat,rdkitmol,mol):
+    indextomatchingindices={}
+    indextoGI={}
+    for atom in rdkitmol.GetAtoms():
+        atomidx=atom.GetIdx()
+        GI=ComputeGIVector(poltype,atom,rdkitmol,distmat,mol)
+        indextoGI[atomidx]=GI
+
+    for index,GI in indextoGI.items():
+        for oindex,oGI in indextoGI.items():
+            if GI==oGI:
+                if index not in indextomatchingindices.keys():
+                    indextomatchingindices[index]=[]
+                if oindex not in indextomatchingindices[index]:
+                    indextomatchingindices[index].append(oindex)
+
+    return indextomatchingindices
+
+
+def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol):
+    GI=[]
+    atomidx=atom.GetIdx()
+    distances=distmat[atomidx]
+    maxdist=max(distances)
+    GI.append(maxdist)
+    numneighbs=len([natom for natom in atom.GetNeighbors()])
+    neighbatmnums=0
+    for natom in atom.GetNeighbors():
+        natomicnum=natom.GetAtomicNum()
+        natomidx=natom.GetIdx()
+        if natomidx!=atomidx:
+            neighbatmnums+=natomicnum
+            for nnatom in natom.GetNeighbors():
+                nnatomidx=nnatom.GetIdx()
+                nnatomicnum=nnatom.GetAtomicNum()
+                if nnatomidx!=natomidx and nnatomidx!=atomidx:
+                    neighbatmnums+=nnatomicnum
+    GI.append(numneighbs)
+    isaro=atom.GetIsAromatic()
+    isinring=mol.GetAtom(atomidx+1).IsInRing()
+    GI.append(isinring)
+    atomicnum=atom.GetAtomicNum()
+    GI.append(atomicnum)
+    GI.append(neighbatmnums)
+
+    return GI

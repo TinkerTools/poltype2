@@ -3388,8 +3388,6 @@ class PolarizableTyper():
 
         polarindextopolarizeprm,polartypetotransferinfo=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m,polarize=True)
         mpole.gen_peditinfile(self,mol,polarindextopolarizeprm)
-
-        
         
         if (not os.path.isfile(self.xyzfname) or not os.path.isfile(self.keyfname)):
             # Run poledit

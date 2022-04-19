@@ -579,7 +579,7 @@ def ProductionDynamicsProtocol(poltype):
                     keymods.AddKeyWord(poltype,lambdakeyfilename,string)
                     string='vdw-lambda'+'\n'
                     keymods.AddKeyWord(poltype,lambdakeyfilename,string)
-                    if poltype.complexation==True and i==0:
+                    if poltype.complexation==True and i==0 and poltype.needrot==True:
                         string='restrain-position '+str(poltype.norotpair[0])+','+str(poltype.norotpair[1])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
                         keymods.AddKeyWord(poltype,lambdakeyfilename,string)
 
