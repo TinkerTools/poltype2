@@ -150,7 +150,7 @@
 
 ``torsionrestraint``  specifies how many kcals/mol/rad^2 to restrain other torsions around rotatable bond to be at current dihedral angle. Default is 328.280354574.
 
-``foldnum``           specifies the number of fourier terms used in torsion fitting. Default is 3.
+``foldnum``           specifies the number of fourier terms used in torsion fitting. Default is 4.
 
 ``tordatapointsnum``  specifies the number of quantum jobs to sample along the dihedral angle for all torsions. Default is 12 if number of torsion parameters to fit is less than 12, else automatically adds more points.
 
@@ -442,7 +442,7 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 
 ``proddynwritefreq``    specifies how often to write out new frame during production dynamics MD. Units in ps. Default is 2.
 
-``proddyntime``  specifies the total time to run production dynamics (in NVT). Units in ns. Default is 5.
+``proddyntime``  specifies the total time to run production dynamics (in NPT by default) for each lambda. Units in ns. Default is 5.
 
 ``proddyntimestep`` specifies the MD time step during production dynamics. Units in fs. Default is 2.
 
