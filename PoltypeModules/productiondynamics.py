@@ -326,6 +326,7 @@ def ExtractLigandDynamicsFromLiquidBox(poltype,outputboxname,liquidfolder,ligand
 
     os.chdir(curdir)
 
+
 def WriteOutArcFile(poltype,totalatomnum,indextovecs,ligandindextoneighbs,ligandindextosym,ligandindextotype,outputarcname,framenum):
     temp=open(outputarcname,'w')
     for i in range(framenum):

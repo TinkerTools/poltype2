@@ -20,7 +20,9 @@ def GenerateProteinTinkerXYZFile(poltype):
     shift= newuncomplexedatomnum- uncomplexedatomnum
     indextocoordinates=GrabLigandCoordinates(poltype,uncomplexedatomnum,shift)
     poltype.ligandindices[0]=list(indextocoordinates.keys())
-    GenerateComplexedTinkerXYZFile(poltype,poltype.uncomplexedxyzname,indextocoordinates,newuncomplexedatomnum) 
+    GenerateComplexedTinkerXYZFile(poltype,poltype.uncomplexedxyzname,indextocoordinates,newuncomplexedatomnum)
+    ligandindices=poltype.ligandindices[0]
+    GeneratePDBFileFromXYZ(poltype,poltype.complexedxyzname,ligandindices)
  
 def readTXYZ(poltype,TXYZ):
     temp=open(TXYZ,'r')
@@ -126,5 +128,41 @@ def GenerateUncomplexedProteinPDBFromComplexedPDB(poltype):
     obConversion.WriteFile(pdbmol,poltype.uncomplexedproteinpdbname)
     return indextocoordinates
 
+
+def GeneratePDBFileFromXYZ(poltype,xyzfile,ligandindices):
+    cmdstr=poltype.xyzpdbpath+' '+xyzfile+' '+poltype.prmfilepath 
+    submit.call_subsystem(poltype,cmdstr,wait=True)
+    newpdb=xyzfile.replace('.xyz','.pdb')
+    pdbmol=openbabel.OBMol()
+    obConversion = openbabel.OBConversion()
+    obConversion.SetInFormat('pdb')
+    obConversion.ReadFile(pdbmol,newpdb)
+    obConversion.SetOutFormat('xyz')
+    tempname='temp.xyz'
+    obConversion.WriteFile(pdbmol,tempname)
+    obConversion.SetInFormat('xyz')
+    obConversion.SetOutFormat('pdb')
+    finalname='topologyguess.pdb'
+    newpdbmol=openbabel.OBMol()
+    obConversion.ReadFile(newpdbmol,tempname)
+    obConversion.WriteFile(newpdbmol,finalname)
+    tempname=finalname.replace('.pdb','_TEMP.pdb')
+    temp=open(finalname,'r')
+    results=temp.readlines()
+    temp.close()
+    temp=open(tempname,'w')
+    for line in results:
+        linesplit=re.split(r'(\s+)', line)
+        if 'HETATM' in line:
+            othersplit=line.split()
+            index=int(othersplit[1])
+            if index in ligandindices:
+                if 'UNL' in linesplit:
+                    idx=linesplit.index('UNL')
+                    linesplit[idx]='LIG'
+                    line=''.join(linesplit)
+        temp.write(line)
+    temp.close()
+    os.rename(tempname,finalname)
 
 
