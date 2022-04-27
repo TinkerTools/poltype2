@@ -1244,6 +1244,8 @@ def CheckConsecutiveTorsion(poltype,indices,substructure):
 
 
     return consec
+
+
 def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol):
     atomindicestotinkertypes={}
     atomindicestotinkerclasses={}

@@ -114,7 +114,8 @@ def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
             neighbatmnumtocount[natomicnum]=0
         neighbatmnumtocount[natomicnum]+=1
     ls=[]
-    for atmnum,count in neighbatmnumtocount.items():
+    sortedneighbatmnumtocount=dict(sorted(neighbatmnumtocount.items()))
+    for atmnum,count in sortedneighbatmnumtocount.items():
         ls.append(atmnum*count)
     GI.extend(ls)
     isaro=atom.GetIsAromatic()
