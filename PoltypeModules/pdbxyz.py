@@ -2,6 +2,7 @@ import os
 import submitjobs as submit
 from openbabel import openbabel
 import re
+import shutil
 
 def GenerateProteinTinkerXYZFile(poltype):
     if poltype.uncomplexedproteinpdbname==None:
@@ -164,5 +165,9 @@ def GeneratePDBFileFromXYZ(poltype,xyzfile,ligandindices):
         temp.write(line)
     temp.close()
     os.rename(tempname,finalname)
+    if not os.path.isdir(poltype.visfolder):
+        os.mkdir(poltype.visfolder)
+    newpath=os.path.join(poltype.visfolder,finalname)
+    shutil.copy(finalname,newpath)
 
 

@@ -747,7 +747,7 @@ def CreateSolventBox(axis,molnumber,prmfilepath,xyzeditpath,tinkerxyzname,molnam
     temp.write('21'+'\n')
     temp.write(str(molnumber)+'\n')
     temp.write(str(axis)+','+str(axis)+','+str(axis)+'\n')
-    temp.write('Y'+'\n')
+    temp.write('N'+'\n')
     temp.write(prmfilepath+'\n')
     temp.close()
     cmdstr=xyzeditpath+' '+'<'+' '+'xyzedit.in'
