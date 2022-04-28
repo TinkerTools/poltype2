@@ -104,6 +104,7 @@ def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
     neighbs=[natom for natom in atom.GetNeighbors()]
     numneighbs=len(neighbs)
     neighbatmnumtocount={}
+    nneighbatmnumtocount={}
     if len(neighbs)==1:
         theatom=neighbs[0]
     else:
@@ -113,11 +114,22 @@ def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
         if natomicnum not in neighbatmnumtocount.keys():
             neighbatmnumtocount[natomicnum]=0
         neighbatmnumtocount[natomicnum]+=1
+        for nnatom in natom.GetNeighbors():
+            nnatomicnum=nnatom.GetAtomicNum()
+            if nnatomicnum not in nneighbatmnumtocount.keys():
+                nneighbatmnumtocount[nnatomicnum]=0
+            nneighbatmnumtocount[nnatomicnum]+=1
+
     ls=[]
     sortedneighbatmnumtocount=dict(sorted(neighbatmnumtocount.items()))
     for atmnum,count in sortedneighbatmnumtocount.items():
         ls.append(atmnum*count)
     GI.extend(ls)
+    nls=[]
+    sortednneighbatmnumtocount=dict(sorted(nneighbatmnumtocount.items()))
+    for atmnum,count in sortednneighbatmnumtocount.items():
+        nls.append(atmnum*count)
+    GI.extend(nls)
     isaro=atom.GetIsAromatic()
     isinring=mol.GetAtom(atomidx+1).IsInRing()
     GI.append(isinring)
