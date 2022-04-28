@@ -1228,7 +1228,8 @@ def get_torlist(poltype,mol,missed_torsions):
         if ringbond==True:
             atomindices=databaseparser.RingAtomicIndices(poltype,mol)
             therings=GrabAllRingsContainingMostIndices(poltype,atomindices,babelindices,3)
-            if len(therings)==1 and poltype.dontfrag==False:
+
+            if (len(therings)==1 or (hybs[1]!=2 and hybs[2]!=2)) and poltype.dontfrag==False:
                 if len(therings[0])>7: # special case where whole molecule is a ring then dont consider ring bond
                     ringbond=False
         if ringbond==True:
