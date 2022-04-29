@@ -20,8 +20,9 @@ def PlotBARConvergence(poltype):
         solvfreeenergyerror=np.array(poltype.freeenergyerrorconv[0])
         freeenergy=solvfreeenergy
         freeenergyerror=solvfreeenergyerror
+
     divisor=int(poltype.proddyntime/len(freeenergy))
-    x=np.array(list(range(0,poltype.proddyntime,divisor)))
+    x=np.array(list(np.arange(0,poltype.proddyntime,divisor)))
     x+=divisor
     fig = plt.figure()
     ax1 = fig.add_subplot(111)

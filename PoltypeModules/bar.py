@@ -528,7 +528,7 @@ def ComputeThermoProperties(poltype):
     curdir=os.getcwd()
     totalframes=poltype.proddynframenum
     divisor=int(totalframes/poltype.barinterval)
-    framechunks=list(range(divisor,totalframes,divisor))
+    framechunks=list(np.arange(divisor,totalframes,divisor))
     framechunks.append(None)
     poltype.freeenergyconv=[]
     poltype.freeenergyerrorconv=[]
