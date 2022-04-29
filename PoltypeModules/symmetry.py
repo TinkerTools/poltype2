@@ -135,15 +135,5 @@ def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
     GI.append(isinring)
     atomicnum=atom.GetAtomicNum()
     GI.append(atomicnum)
-    if numneighbs==1:
-        neighb=neighbs[0]
-        natomidx=neighb.GetIdx()
-        rings=databaseparser.GrabAllRingsContainingIndices(poltype,atomindices,[natomidx+1])
-    else:
-        rings=databaseparser.GrabAllRingsContainingIndices(poltype,atomindices,[atomidx+1])
-    ringlens=[]
-    if len(rings)>0:
-        for ring in rings:
-            ringlens.append(len(ring))
-    GI.extend(ringlens)
+    
     return GI
