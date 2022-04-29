@@ -5,6 +5,39 @@ import pylab as plt
 import numpy as np
 
 
+def PlotBARConvergence(poltype):
+    if poltype.binding==True:
+        compfreeenergy=np.array(poltype.freeenergyconv[0])
+        solvfreeenergy=np.array(poltype.freeenergyconv[1])
+        compfreeenergyerror=np.array(poltype.freeenergyerrorconv[0])
+        solvfreeenergyerror=np.array(poltype.freeenergyerrorconv[1])
+        bindfreeenergy=compfreeenergy-solvfreeenergy
+        bindfreeenergyerror=np.sqrt(np.square(compfreeenergyerror)+np.square(solvfreeenergyerror))
+        freeenergy=bindfreeenergy
+        freeenergyerror=bindfreeenergyerror
+    else:
+        solvfreeenergy=np.array(poltype.freeenergyconv[0])
+        solvfreeenergyerror=np.array(poltype.freeenergyerrorconv[0])
+        freeenergy=solvfreeenergy
+        freeenergyerror=solvfreeenergyerror
+    divisor=int(poltype.proddyntime/len(freeenergy))
+    x=np.array(list(range(0,poltype.proddyntime,divisor)))
+    x+=divisor
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    ax1.scatter(x,freeenergy, marker="o")
+    ax1.errorbar(x,freeenergy, yerr=freeenergyerror, fmt="o")
+    ax1.set_ylabel('Free Energy (kcal/mol)',fontsize=12)
+    ax1.set_xlabel('Production Time (ns)',fontsize=12)
+    title='Free Energy Convergence'
+    ax1.set_title(title)
+    ax1.legend()
+    imagename=title+'.png'
+    fig.savefig(imagename)
+
+
+
+
 def PlotEnergyData(poltype):
     grabbedenergydict=poltype.masterdict['energy']
     patharray=[]

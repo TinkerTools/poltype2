@@ -311,6 +311,7 @@ def check_data_size(data, ibegin, iend):
       for j in range(len(data)):
         data1[j].append(data[j][i])
   return data1
+
 def get_summary(df1, verbose=True):
   name_val = []
   name_val.append(('dF_equ', df1.loc['equ', 'dF(kcal/mol)']))
@@ -426,9 +427,9 @@ def calc_dg(flist, ibegin=0, iend=-1, nblocks=5, summary=True, verbose=True):
     if len(df2.index) > 1:
       df_out.loc['blockave_%s'%name, :] = compute_block_ave(df2)
   df_out = pd.concat([df_out]+df_blocks)
-  if verbose:
-    print(df_out.to_string(max_rows=len(df_out.index), max_cols=len(df_out.columns)))
-  df_sum = get_summary(df_out)
+  #if verbose:
+  #  print(df_out.to_string(max_rows=len(df_out.index), max_cols=len(df_out.columns)))
+  df_sum = get_summary(df_out,verbose)
   #if summary:
     #print()
     #print(df_sum.to_string(max_rows=len(df_sum.index), max_cols=len(df_sum.columns)))
@@ -525,6 +526,12 @@ def GrabBarFileName(poltype):
 
 def ComputeThermoProperties(poltype):
     curdir=os.getcwd()
+    totalframes=poltype.proddynframenum
+    divisor=int(totalframes/poltype.barinterval)
+    framechunks=list(range(divisor,totalframes,divisor))
+    framechunks.append(None)
+    poltype.freeenergyconv=[]
+    poltype.freeenergyerrorconv=[]
     for i in range(len(poltype.baroutputfilepath)):
         baroutputfilepathlist=poltype.baroutputfilepath[i]
         freeenergylistoflist=[]
@@ -544,7 +551,13 @@ def ComputeThermoProperties(poltype):
         totalfreeenergyfwd=[]
         totalfreeenergybwd=[]
         overlaplistoflist=[]
+        totalfreeenergyconv=[]
+        totalerrorfreeenergyconv=[]
+        poltype.freeenergyconv.append([])
+        poltype.freeenergyerrorconv.append([])
         for j in range(len(baroutputfilepathlist)):
+            totalfreeenergyconv.append([])
+            totalerrorfreeenergyconv.append([])
             baroutputfilepath=baroutputfilepathlist[j]
             barfiles=[]
             for path in baroutputfilepath:
@@ -552,37 +565,46 @@ def ComputeThermoProperties(poltype):
                 os.chdir(head)
                 barfilepath=GrabBarFileName(poltype) 
                 barfiles.append(barfilepath) 
-            dF_equ_list,dF_all_list,se_dF_block_list,se_dF_bar_list,dF_fwd_list,dF_bwd_list,ddF_fwd_bwd_list,dH_list,se_dH_list,sd_dE_list,overlap_all_list,overlap_equ_list,nA_list,nB_list=calc_dg_summary(barfiles, seperate=True, outfile='table.txt', ibegin=0, iend=None, nblocks=5, summary=True, verbose=False)
-            overlaplistoflist.append(overlap_all_list)
-            freeenergylistoflist.append(dF_all_list)
-            freeenergyerrorlistoflist.append(se_dF_bar_list)
-            enthalpylistoflist.append(dH_list)
-            enthalpyerrorlistoflist.append(se_dH_list)
-            TdS_list=np.array(dH_list)-np.array(dF_all_list)
-            entropylistoflist.append(TdS_list)
-            freeenergyfwdlistoflist.append(dF_fwd_list)
-            freeenergybwdlistoflist.append(dF_bwd_list)
-            dF_all=np.sum(dF_all_list)
-            totalfreeenergy.append(dF_all)
-            dH=np.sum(dH_list)
-            totalenthalpy.append(dH)
-            valuelist=np.add(np.square(se_dH_list),np.square(se_dF_bar_list))
-            valuelist=valuelist.astype(float)
-            se_TdS_list=np.sqrt(valuelist)
-            entropyerrorlistoflist.append(se_TdS_list)
-            TdS=(dF_all)-(dH)
-            totalentropy.append(TdS)
-            dF_fwd=np.sum(dF_fwd_list)
-            dF_bwd=np.sum(dF_bwd_list)
-            totalfreeenergyfwd.append(dF_fwd)
-            totalfreeenergybwd.append(dF_bwd)
-            se_dF_bar=np.sqrt(np.sum(np.square(se_dF_bar_list)))
-            se_dH=np.sqrt(np.sum(np.square(se_dH_list)))
-            totalerrorfreeenergy.append(se_dF_bar)
-            totalerrorenthalpy.append(se_dH)
-            se_TdS=np.sqrt(se_dH**2+se_dF_bar**2)
-            totalerrorentropy.append(se_TdS)
-
+            for framenumidx in range(len(framechunks)):
+                framenum=framechunks[framenumidx]
+                verbose=False
+                if framenumidx==len(framechunks)-1:
+                    verbose=True
+                dF_equ_list,dF_all_list,se_dF_block_list,se_dF_bar_list,dF_fwd_list,dF_bwd_list,ddF_fwd_bwd_list,dH_list,se_dH_list,sd_dE_list,overlap_all_list,overlap_equ_list,nA_list,nB_list=calc_dg_summary(barfiles, seperate=True, outfile='table.txt', ibegin=0, iend=framenum, nblocks=5, summary=True, verbose=verbose)
+                if framenumidx==len(framechunks)-1:
+                    overlaplistoflist.append(overlap_all_list)
+                    freeenergylistoflist.append(dF_all_list)
+                    freeenergyerrorlistoflist.append(se_dF_bar_list)
+                    enthalpylistoflist.append(dH_list)
+                    enthalpyerrorlistoflist.append(se_dH_list)
+                    TdS_list=np.array(dH_list)-np.array(dF_all_list)
+                    entropylistoflist.append(TdS_list)
+                    freeenergyfwdlistoflist.append(dF_fwd_list)
+                    freeenergybwdlistoflist.append(dF_bwd_list)
+                    dF_all=np.sum(dF_all_list)
+                    totalfreeenergy.append(dF_all)
+                    dH=np.sum(dH_list)
+                    totalenthalpy.append(dH)
+                    valuelist=np.add(np.square(se_dH_list),np.square(se_dF_bar_list))
+                    valuelist=valuelist.astype(float)
+                    se_TdS_list=np.sqrt(valuelist)
+                    entropyerrorlistoflist.append(se_TdS_list)
+                    TdS=(dF_all)-(dH)
+                    totalentropy.append(TdS)
+                    dF_fwd=np.sum(dF_fwd_list)
+                    dF_bwd=np.sum(dF_bwd_list)
+                    totalfreeenergyfwd.append(dF_fwd)
+                    totalfreeenergybwd.append(dF_bwd)
+                    se_dF_bar=np.sqrt(np.sum(np.square(se_dF_bar_list)))
+                    se_dH=np.sqrt(np.sum(np.square(se_dH_list)))
+                    totalerrorfreeenergy.append(se_dF_bar)
+                    totalerrorenthalpy.append(se_dH)
+                    se_TdS=np.sqrt(se_dH**2+se_dF_bar**2)
+                    totalerrorentropy.append(se_TdS)
+                dF_all=np.sum(dF_all_list)
+                se_dF_bar=np.sqrt(np.sum(np.square(se_dF_bar_list)))
+                totalfreeenergyconv[j].append(dF_all)
+                totalerrorfreeenergyconv[j].append(se_dF_bar)
         poltype.overlaplist[i]=overlaplistoflist
         poltype.freeenergylist[i]=freeenergylistoflist
         poltype.freeenergy[i]=sum(totalfreeenergy)
@@ -600,6 +622,24 @@ def ComputeThermoProperties(poltype):
         poltype.enthalpyerror[i]=np.sqrt(np.sum(np.square(totalerrorenthalpy)))
         poltype.entropyerror[i]=np.sqrt(np.sum(np.square(totalerrorentropy)))
         poltype.freeenergyerror[i]=np.sqrt(np.sum(np.square(totalerrorfreeenergy)))
+        totalfreeenergyconvsum=[]
+        totalerrorfreeenergyconvsum=[]
+        totalfreeenergyconv=np.transpose(np.array(totalfreeenergyconv))
+        totalerrorfreeenergyconv=np.transpose(np.array(totalerrorfreeenergyconv))
+
+        for idx in range(len(totalfreeenergyconv)):
+            freeg=sum(totalfreeenergyconv[idx])
+            freegerrls=totalerrorfreeenergyconv[idx]
+            Sum=0
+            for val in freegerrls:
+                Sum+=val**2
+            freegerr=np.sqrt(Sum)
+            totalfreeenergyconvsum.append(freeg)
+            totalerrorfreeenergyconvsum.append(freegerr)
+        poltype.freeenergyconv[i]=totalfreeenergyconvsum
+        poltype.freeenergyerrorconv[i]=totalerrorfreeenergyconvsum
+
+
         if poltype.solvation==True and poltype.complexation==False:
             poltype.tabledict[i][u'ΔGˢᵒˡᵛ']=poltype.freeenergy[i]
             poltype.tabledict[i][u'ΔGˢᵒˡᵛᵉʳʳ']=poltype.freeenergyerror[i]
@@ -1374,6 +1414,8 @@ def BARProtocol(poltype):
         ComputeThermoProperties(poltype)
     if poltype.complexation==True: 
         poltype.freeenergy[0]=poltype.freeenergy[0]+poltype.rescorrection
+        for idx in range(len(poltype.freeenergyconv[0])):
+            poltype.freeenergyconv[0][idx]+=poltype.rescorrection
         poltype.tabledict[0][u'ΔGᵃⁿᵃᶜᵒᵐᵖᶜᵒʳʳ']=poltype.rescorrection
         poltype.tabledict[0][u'ΔGᶜᵒᵐᵖᶜᵒʳʳ']=poltype.freeenergy[0]
         if poltype.solvation==True: 

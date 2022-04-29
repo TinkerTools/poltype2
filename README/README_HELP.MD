@@ -451,6 +451,7 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 
 #### Free Energy
 
+``barinterval``  specifies how many times to recompute BAR over length of full production trajectory with evenly spaced chunks over the trajectory. Default is 5.
 
 ``perturbkeyfilelist``  specifies a comma seperated list of keyfiles to add to end state and perturb with BAR. Right most item in the list is the end state. By default, arc file from nearestneighboring trajectory is used if fep is turned on, otherwise running MD for new state is default. Default has no value.
 

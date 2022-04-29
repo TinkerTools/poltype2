@@ -126,7 +126,8 @@ def GenerateSimInfoTable(poltype):
     lambdakeylist,boxinfokeylist,energykeylist,freeenergykeylist,summarykeylist,keylist=KeyLists(poltype)
     OrderTableData(poltype,boxinfokeylist,lambdakeylist,energykeylist,freeenergykeylist,summarykeylist,poltype.outputpath)  
     if poltype.binding==True:
-        EnterMatchingData(poltype,poltype.outputpath,poltype.outputpath)      
+        EnterBindData(poltype,poltype.outputpath)      
+    plots.PlotBARConvergence(poltype) 
     tempname='SimData.csv'
     CSVWriter(poltype,tempname,True)
     os.chdir(curdir)
@@ -276,7 +277,7 @@ def GrabSimDataFromPathList(poltype):
                
         OrderTableData(poltype,boxinfokeylist,lambdakeylist,energykeylist,freeenergykeylist,summarykeylist,path)  
         if poltype.binding==True:
-            EnterMatchingData(poltype,path,path) 
+            EnterBindData(poltype,path) 
         ligname=poltype.masterdict['boxinfo'][0][path]['Ligand Name']
         receptorname=poltype.masterdict['boxinfo'][0][path]['Receptor Name']
         freeenergy=poltype.masterdict['energy'][path][u'ΔGᵇᶦⁿᵈᶜᵒʳʳ']
@@ -288,7 +289,6 @@ def GrabSimDataFromPathList(poltype):
     if poltype.binding==True:
         mat,xaxis,yaxis=GenerateFreeEnergyMatrix(poltype,ligandnames,receptornames,bindenergies) 
         plots.PlotHeatmap(poltype,mat,xaxis,yaxis)
-    # now need to try and match existing solvation to complexation data
 
 
     if poltype.averageenergies==True:
@@ -326,26 +326,9 @@ def GrabSimDataFromPathList(poltype):
 
     return
 
-def EnterMatchingData(poltype,path,match):
-    poltype.masterdict['energy'][path][u'ΔSˢᵒˡᵛ']=poltype.masterdict['energy'][match][u'ΔSˢᵒˡᵛ']
-    poltype.masterdict['energy'][path][u'ΔGˢᵒˡᵛ']=poltype.masterdict['energy'][match][u'ΔGˢᵒˡᵛ']
-    poltype.masterdict['freeenergy'][path][u'ΔGˢᵒˡᵛ']=poltype.masterdict['freeenergy'][match][u'ΔGˢᵒˡᵛ']
-    poltype.masterdict['summary'][path][u'ΔGˢᵒˡᵛ']=poltype.masterdict['freeenergy'][match][u'ΔGˢᵒˡᵛ']
-    poltype.masterdict['energy'][path][u'ΔHˢᵒˡᵛ']=poltype.masterdict['energy'][match][u'ΔHˢᵒˡᵛ']
-    poltype.masterdict['energy'][path][u'ΔSˢᵒˡᵛᵉʳʳ']=poltype.masterdict['energy'][match][u'ΔSˢᵒˡᵛᵉʳʳ']
-    poltype.masterdict['energy'][path][u'ΔGˢᵒˡᵛᵉʳʳ']=poltype.masterdict['energy'][match][u'ΔGˢᵒˡᵛᵉʳʳ']
-    poltype.masterdict['freeenergy'][path][u'ΔGˢᵒˡᵛᵉʳʳ']=poltype.masterdict['freeenergy'][match][u'ΔGˢᵒˡᵛᵉʳʳ']
-    poltype.masterdict['energy'][path][u'ΔHˢᵒˡᵛᵉʳʳ']=poltype.masterdict['energy'][match][u'ΔHˢᵒˡᵛᵉʳʳ']
-    
-    poltype.masterdict['energy'][match][u'ΔSᶜᵒᵐᵖ']=poltype.masterdict['energy'][path][u'ΔSᶜᵒᵐᵖ']
-    poltype.masterdict['energy'][match][u'ΔGᶜᵒᵐᵖᶜᵒʳʳ']=poltype.masterdict['energy'][path][u'ΔGᶜᵒᵐᵖᶜᵒʳʳ']
-    poltype.masterdict['freeenergy'][match][u'ΔGᶜᵒᵐᵖᶜᵒʳʳ']=poltype.masterdict['freeenergy'][path][u'ΔGᶜᵒᵐᵖᶜᵒʳʳ']
-    poltype.masterdict['summary'][match][u'ΔGᶜᵒᵐᵖᶜᵒʳʳ']=poltype.masterdict['freeenergy'][path][u'ΔGᶜᵒᵐᵖᶜᵒʳʳ']
-    poltype.masterdict['energy'][match][u'ΔHᶜᵒᵐᵖ']=poltype.masterdict['energy'][path][u'ΔHᶜᵒᵐᵖ']
-    poltype.masterdict['energy'][match][u'ΔSᶜᵒᵐᵖᵉʳʳ']=poltype.masterdict['energy'][path][u'ΔSᶜᵒᵐᵖᵉʳʳ']
-    poltype.masterdict['energy'][match][u'ΔGᶜᵒᵐᵖᶜᵒʳʳᵉʳʳ']=poltype.masterdict['energy'][path][u'ΔGᶜᵒᵐᵖᶜᵒʳʳᵉʳʳ']
-    poltype.masterdict['freeenergy'][match][u'ΔGᶜᵒᵐᵖᶜᵒʳʳᵉʳʳ']=poltype.masterdict['freeenergy'][path][u'ΔGᶜᵒᵐᵖᶜᵒʳʳᵉʳʳ']
-    poltype.masterdict['energy'][match][u'ΔHᶜᵒᵐᵖᵉʳʳ']=poltype.masterdict['energy'][path][u'ΔHᶜᵒᵐᵖᵉʳʳ']
+def EnterBindData(poltype,path):
+    poltype.masterdict['summary'][path][u'ΔGˢᵒˡᵛ']=poltype.masterdict['freeenergy'][path][u'ΔGˢᵒˡᵛ']
+    poltype.masterdict['summary'][path][u'ΔGᶜᵒᵐᵖᶜᵒʳʳ']=poltype.masterdict['freeenergy'][path][u'ΔGᶜᵒᵐᵖᶜᵒʳʳ']
     DelGBind=float(poltype.masterdict['energy'][path][u'ΔGᶜᵒᵐᵖᶜᵒʳʳ'])-float(poltype.masterdict['energy'][path][u'ΔGˢᵒˡᵛ'])
     DelSBind=float(poltype.masterdict['energy'][path][u'ΔSᶜᵒᵐᵖ'])-float(poltype.masterdict['energy'][path][u'ΔSˢᵒˡᵛ'])
     DelHBind=float(poltype.masterdict['energy'][path][u'ΔHᶜᵒᵐᵖ'])-float(poltype.masterdict['energy'][path][u'ΔHˢᵒˡᵛ'])
@@ -367,15 +350,15 @@ def EnterMatchingData(poltype,path,match):
     poltype.masterdict['freeenergy'][path][u'ΔGᵇᶦⁿᵈᶜᵒʳʳ']=str(DelGBind)
     poltype.masterdict['summary'][path][u'ΔGᵇᶦⁿᵈᶜᵒʳʳ']=str(DelGBind)
     poltype.masterdict['freeenergy'][path][u'ΔGᵇᶦⁿᵈᶜᵒʳʳᵉʳʳ']=str(DelGBinderr)
-    poltype.masterdict['energy'][match][u'ΔGᵇᶦⁿᵈᶜᵒʳʳ']=str(DelGBind)
-    poltype.masterdict['energy'][match][u'ΔGᵇᶦⁿᵈᶜᵒʳʳᵉʳʳ']=str(DelGBinderr)
-    poltype.masterdict['energy'][match][u'ΔHᵇᶦⁿᵈ']=str(DelHBind)
-    poltype.masterdict['energy'][match][u'ΔHᵇᶦⁿᵈᵉʳʳ']=str(DelHBinderr)
-    poltype.masterdict['energy'][match][u'ΔSᵇᶦⁿᵈ']=str(DelSBind)
-    poltype.masterdict['energy'][match][u'ΔSᵇᶦⁿᵈᵉʳʳ']=str(DelSBinderr)
-    poltype.masterdict['freeenergy'][match][u'ΔGᵇᶦⁿᵈᶜᵒʳʳ']=str(DelGBind)
-    poltype.masterdict['summary'][match][u'ΔGᵇᶦⁿᵈᶜᵒʳʳ']=str(DelGBind)
-    poltype.masterdict['freeenergy'][match][u'ΔGᵇᶦⁿᵈᶜᵒʳʳᵉʳʳ']=str(DelGBinderr)
+    poltype.masterdict['energy'][path][u'ΔGᵇᶦⁿᵈᶜᵒʳʳ']=str(DelGBind)
+    poltype.masterdict['energy'][path][u'ΔGᵇᶦⁿᵈᶜᵒʳʳᵉʳʳ']=str(DelGBinderr)
+    poltype.masterdict['energy'][path][u'ΔHᵇᶦⁿᵈ']=str(DelHBind)
+    poltype.masterdict['energy'][path][u'ΔHᵇᶦⁿᵈᵉʳʳ']=str(DelHBinderr)
+    poltype.masterdict['energy'][path][u'ΔSᵇᶦⁿᵈ']=str(DelSBind)
+    poltype.masterdict['energy'][path][u'ΔSᵇᶦⁿᵈᵉʳʳ']=str(DelSBinderr)
+    poltype.masterdict['freeenergy'][path][u'ΔGᵇᶦⁿᵈᶜᵒʳʳ']=str(DelGBind)
+    poltype.masterdict['summary'][path][u'ΔGᵇᶦⁿᵈᶜᵒʳʳ']=str(DelGBind)
+    poltype.masterdict['freeenergy'][path][u'ΔGᵇᶦⁿᵈᶜᵒʳʳᵉʳʳ']=str(DelGBinderr)
 
 
 def AverageEnergyList(poltype,enlist,key):
