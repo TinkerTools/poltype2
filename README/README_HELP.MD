@@ -108,6 +108,8 @@
 ``atmidx``  specifies which number to start poltype type numbers from. Default is 401.
 
 
+``usesymtypes`` specifies to use symmetry typing to reduce and average atom types. Default is True.
+
 #### Geometry Optimization
 
 ``optbasisset`` specifies basis set for geometry optimization. Default is 6-31G*.

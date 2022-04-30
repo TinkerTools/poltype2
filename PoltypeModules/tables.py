@@ -403,7 +403,7 @@ def BoltzmannAverage(poltype,enlist):
     return boltzavg  
 
 
-def WriteTableUpdateToLog(poltype):
+def WriteTableUpdateToLog(poltype,verbose=True):
     for i in range(len(poltype.tabledict)):
         table=poltype.tabledict[i]
         tableused=poltype.tabledictkeysused[i]
@@ -411,5 +411,6 @@ def WriteTableUpdateToLog(poltype):
             value=table[key]
             if key not in tableused:
                 poltype.tabledictkeysused[i].append(key)
-                poltype.WriteToLog(key+' = '+str(value))
+                if verbose==True:
+                    poltype.WriteToLog(key+' = '+str(value))
 

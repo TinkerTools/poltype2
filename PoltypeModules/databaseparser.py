@@ -1860,16 +1860,16 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
 
         if '~' in smarts or '*' in smarts:
             check=False
- 
         if ringbond==True:
             atomindices=RingAtomicIndices(poltype,mol)
-            rings=GrabAllRingsContainingIndices(poltype,atomindices,babelindices)
-            if len(rings)==1 and poltype.dontfrag==False:
-                if len(rings[0])>7: # special case where whole molecule is a ring then dont consider ring bond
-                    ringbond=False
+            therings=torgen.GrabAllRingsContainingMostIndices(poltype,atomindices,babelindices,2)
+            if (len(therings)>0) and poltype.dontfrag==False:
+                if len(therings[0])>7: # special case where whole molecule is a ring then dont consider ring bond
+                    if hybs[1]!=2 and hybs[2]!=2:
+                        ringbond=False
+
             ring=GrabRingAtomIndicesFromInputIndex(poltype,babelindices[1],atomindices)
             ringtorindices=GrabIndicesInRing(poltype,babelindices,ring)
-        
         if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False and ([bbidx,cbidx] not in poltype.onlyrotbndslist and [cbidx,bbidx] not in poltype.onlyrotbndslist):
             continue
         if check==False:
@@ -2126,6 +2126,7 @@ def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopolt
     ringextra='# Ring bond detected for missing torsion'+'\n'
     doubleextra='# Double bond detected for missing torsion'+'\n'
     singleextra='# Single bond detected for missing torsion'+'\n'
+    hydextra='# Transferring hydrogen torsion to reduce fit parameters'+'\n'
     arotorsionlinetodescrips={} 
     hydclasses=[]
     for atom in poltype.rdkitmol.GetAtoms():
@@ -2142,19 +2143,34 @@ def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopolt
         c=int(linesplit[3])
         d=int(linesplit[4])
         allcombs=[]
-        ls=[b,c]
+        ls=[a,b,c,d]
         for typenum in ls: 
             indices=GrabKeysFromValue(poltype,poltype.idxtosymclass,typenum)
             allcombs.append(indices)
         combs=list(itertools.product(*allcombs))
         for comb in combs:
-            bindex=comb[0]
-            cindex=comb[1]
-            bond=mol.GetBond(bindex,cindex)
-            if bond!=None:
+            aindex=comb[0]
+            bindex=comb[1]
+            cindex=comb[2]
+            dindex=comb[3]
+            firstbond=mol.GetBond(aindex,bindex)
+            midbond=mol.GetBond(bindex,cindex)
+            lastbond=mol.GetBond(cindex,dindex)
+            if midbond!=None and firstbond!=None and lastbond!=None:
                 break 
-        ringbond=bond.IsInRing()
-        bondorder=bond.GetBondOrder()      
+        babelindices=list(comb)
+        babelatoms=[mol.GetAtom(i) for i in babelindices]
+        hybs=[a.GetHyb() for a in babelatoms]
+        ringbond=midbond.IsInRing()
+        if ringbond==True:
+            atomindices=RingAtomicIndices(poltype,mol)
+            therings=torgen.GrabAllRingsContainingMostIndices(poltype,atomindices,babelindices,2)
+            if (len(therings)>0) and poltype.dontfrag==False:
+                if len(therings[0])>7: # special case where whole molecule is a ring then dont consider ring bond
+                    if hybs[1]!=2 and hybs[2]!=2:
+                        ringbond=False
+
+        bondorder=midbond.GetBondOrder()      
         classes=tuple([a,b,c,d])
         hydcount=0
         if a in hydclasses:
@@ -2189,6 +2205,8 @@ def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopolt
                 extra=doubleextra
             else:
                 extra=singleextra
+            if hydcount>0:
+                extra+=hydextra
             arotorsionlinetodescrips[line]=[extra,descrips]
         newtorsionprms.append(line)
 
@@ -2359,7 +2377,7 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
                         smartslist=newpoltypeclassestosmartslist[poltypeclasses]
                         commentstring=' '.join(comments)
                         smartsliststring=' '.join(smartslist)
-                        transferinfoline='#'+' '+'updated valence parameter database match, comments='+commentstring+' '+'SMARTS match = '+smartsliststring+'\n'
+                        transferinfoline='# amoeba21'+' '+'comments='+commentstring+' '+'SMARTS match = '+smartsliststring+'\n'
                     else:
                         smartsatomorders=poltypeclassestosmartsatomordersext[poltypeclasses]
                         transferinfoline='#'+' '+'matching SMARTS from molecule '+' '+str(smartsatomorders)+' from external database'+'\n'
@@ -2368,7 +2386,7 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
                     parametersmartsatomorders=poltypeclassestoparametersmartsatomorders[poltypeclasses]
                     smartsatomorders=poltypeclassestosmartsatomorders[poltypeclasses]
                     elementtinkerdescrips=poltypeclassestoelementtinkerdescrips[poltypeclasses]
-                    transferinfoline='#'+' '+'matching SMARTS from molecule '+' '+str(smartsatomorders)+' '+'to SMARTS from parameter file'+' '+str(parametersmartsatomorders)+' '+'with tinker type descriptions '+str(elementtinkerdescrips)+'\n'
+                    transferinfoline='# amoeba09'+' '+'matching SMARTS from molecule '+' '+str(smartsatomorders)+' '+'to SMARTS from parameter file'+' '+str(parametersmartsatomorders)+' '+'with tinker type descriptions '+str(elementtinkerdescrips)+'\n'
                     if defaultvalues!=None:
                         for value in defaultvalues:
                             if str(value) in line:
@@ -2379,7 +2397,7 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
                     if '~' in smarts or '*' in smarts:
                         transferinfoline+='# '+'WARNING WILDCARDS USED IN SMARTS PARAMETER MATCHING'+'\n'
                         warn=True
-
+        showtransferinfo=True
         extraline=''
         if 'vdw' in line:
             linesplit=line.split()
@@ -2424,9 +2442,12 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
             ls=[a,b,c,d]
             if ls in torsionsmissing or ls[::-1] in torsionsmissing:
                 extraline+='# Missing torsion parameters, will attempt to fit parameters'+'\n'
+                showtransferinfo=False
 
-        #extraline+='\n'
+
         transferinfoline+=extraline
+        if showtransferinfo==False:
+            transferinfoline=extraline
         if warn==True:
             poltype.WriteToLog(transferinfoline)
             warnings.warn(transferinfoline)
@@ -3664,6 +3685,7 @@ def ReadDatabaseSmartsMapPolarize(poltype,databasepath): # smartsString classNam
 
     smartstoatomclass={}
     atomclasstocomment={}
+    smartstoactualcomment={}
     temp=open(databasepath,'r')
     results=temp.readlines()
     temp.close()
@@ -3683,9 +3705,10 @@ def ReadDatabaseSmartsMapPolarize(poltype,databasepath): # smartsString classNam
                 comment=comment.replace('\n','').replace('#','').lstrip().rstrip()
                 smartstoatomclass[smarts]=tinkerclass
                 atomclasstocomment[tinkerclass]=comment
+                smartstoactualcomment[smarts]=comment
              
 
-    return smartstoatomclass, atomclasstocomment
+    return smartstoatomclass, atomclasstocomment,smartstoactualcomment
  
 def MatchAllSmartsToAtomIndices(poltype,smartstoatomclass): #rdkit 0 index based
     atomindextoallsmarts={}
@@ -4179,7 +4202,7 @@ def GrabNewParameters(poltype,indicestoclasses,classestoparameters,keyword,indic
 
     return indicestopoltypeclasses,newprms,newpoltypeclassestocomments,newpoltypeclassestosmartslist
 
-def GrabNewParametersPolarize(poltype,indicestoclasses,classestoparameters,keyword,indicestosmartslist,atomclasstocomment):
+def GrabNewParametersPolarize(poltype,indicestoclasses,classestoparameters,keyword,indicestosmartslist,smartstoactualcomment):
     indicestopoltypeclasses={}
     newpoltypeclassestocomments={}
     newpoltypeclassestosmartslist={}
@@ -4187,7 +4210,7 @@ def GrabNewParametersPolarize(poltype,indicestoclasses,classestoparameters,keywo
     newprms=[]
     for indices,classes in indicestoclasses.items():
         smartslist=indicestosmartslist[indices]
-        comments=[atomclasstocomment[k] for k in classes]
+        comments=[smartstoactualcomment[k] for k in smartslist]
         babelindices=[k+1 for k in indices]
         poltypeclasses=[poltype.idxtosymclass[k] for k in babelindices]
         indicestopoltypeclasses[indices]=poltypeclasses
@@ -4701,14 +4724,15 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
     if polarize==True:
         listofatomsforprm,listofbondsforprm,listofanglesforprm,listoftorsionsforprm=GrabAtomsForParameters(poltype,mol)
 
-        smartstoatomclasspolar, atomclasstocommentpolar=ReadDatabaseSmartsMapPolarize(poltype,poltype.latestsmallmoleculesmartstotypespolarize) 
+        smartstoatomclasspolar, atomclasstocommentpolar,smartstoactualcomment=ReadDatabaseSmartsMapPolarize(poltype,poltype.latestsmallmoleculesmartstotypespolarize) 
         atomclasstoatomclass=dict(zip(atomclasstocommentpolar.keys(),atomclasstocommentpolar.keys()))
         atomindextoallsmartspolar,atomindextoallsmartsmatchespolar=MatchAllSmartsToAtomIndices(poltype,smartstoatomclasspolar)
         smartstocomment=MapSMARTSToComments(poltype,smartstoatomclasspolar,atomclasstoatomclass)
+
         atomcommentstolistofsmartslist,atomindicestolistofatomcomments=MapIndicesToCommentsAtom(poltype,atomindextoallsmartspolar,smartstocomment,listofatomsforprm)
         atomindicestolistofatomcomments,atomcommentstoparameters=SearchForParametersViaCommentsPolarize(poltype,atomcommentstolistofsmartslist,atomindicestolistofatomcomments)
         atomindicestocomments,atomindicestosmartslist=FindBestSMARTSMatch(poltype,atomindicestolistofatomcomments,atomcommentstolistofsmartslist)
-        newpolarindicestopoltypeclasses,newpolarprms,newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist=GrabNewParametersPolarize(poltype,atomindicestocomments,atomcommentstoparameters,'polarize',atomindicestosmartslist,atomclasstocommentpolar) 
+        newpolarindicestopoltypeclasses,newpolarprms,newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist=GrabNewParametersPolarize(poltype,atomindicestocomments,atomcommentstoparameters,'polarize',atomindicestosmartslist,smartstoactualcomment) 
         polarprmstotransferinfo=MapParameterLineToTransferInfo(poltype,newpolarprms,{},{},{},{},newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist,{},[],[],[],[])
         polarindextopolarizeprm=GetPolarIndexToPolarizePrm(poltype,polarprmstotransferinfo)
         polartypetotransferinfo=ExtractTransferInfo(poltype,polarprmstotransferinfo)
@@ -4755,14 +4779,14 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         atomindextoallsmartssolute=MakeListOfListValues(poltype,atomindextoallsmartssolute)
         atomindicestoindices,atomindicestosmartslist=FindBestSMARTSMatch(poltype,atomindicestolistofatomindices,atomindextoallsmartssolute)
         soluteprms=GenerateSoluteParameters(poltype,atomindicestosmartslist,smartstosoluteradiiprms)
-        smartstoatomclasspolar, atomclasstocommentpolar=ReadDatabaseSmartsMapPolarize(poltype,poltype.latestsmallmoleculesmartstotypespolarize) 
+        smartstoatomclasspolar, atomclasstocommentpolar,smartstoactualcomment=ReadDatabaseSmartsMapPolarize(poltype,poltype.latestsmallmoleculesmartstotypespolarize) 
         atomclasstoatomclass=dict(zip(atomclasstocommentpolar.keys(),atomclasstocommentpolar.keys()))
         atomindextoallsmartspolar,atomindextoallsmartsmatchespolar=MatchAllSmartsToAtomIndices(poltype,smartstoatomclasspolar)
         smartstocomment=MapSMARTSToComments(poltype,smartstoatomclasspolar,atomclasstoatomclass)
         atomcommentstolistofsmartslist,atomindicestolistofatomcomments=MapIndicesToCommentsAtom(poltype,atomindextoallsmartspolar,smartstocomment,listofatomsforprm)
         atomindicestolistofatomcomments,atomcommentstoparameters=SearchForParametersViaCommentsPolarize(poltype,atomcommentstolistofsmartslist,atomindicestolistofatomcomments)
         atomindicestocomments,atomindicestosmartslist=FindBestSMARTSMatch(poltype,atomindicestolistofatomcomments,atomcommentstolistofsmartslist)
-        newpolarindicestopoltypeclasses,newpolarprms,newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist=GrabNewParametersPolarize(poltype,atomindicestocomments,atomcommentstoparameters,'polarize',atomindicestosmartslist,atomclasstocommentpolar) 
+        newpolarindicestopoltypeclasses,newpolarprms,newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist=GrabNewParametersPolarize(poltype,atomindicestocomments,atomcommentstoparameters,'polarize',atomindicestosmartslist,smartstoactualcomment) 
         smartstoatomclass, atomclasstoclassname, atomclasstocomment=ReadDatabaseSmartsMap(poltype,poltype.latestsmallmoleculesmartstotinkerclass) 
         atomindextoallsmarts,atomindextoallsmartsmatches=MatchAllSmartsToAtomIndices(poltype,smartstoatomclass)
         bondsmartsatomordertoparameters,anglesmartsatomordertoparameters,strbndsmartsatomordertoparameters,torsionsmartsatomordertoparameters,opbendsmartsatomordertoparameters,vdwsmartsatomordertoparameters,tortorsmartsatomordertoparameters,tortorsmartsatomordertogrid,smartsatomordertotorvdwdb=ReadExternalDatabase(poltype)

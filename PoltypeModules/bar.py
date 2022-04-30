@@ -670,7 +670,7 @@ def ComputeThermoProperties(poltype):
                 poltype.tabledict[i][u'ΔSˢᵒˡᵛ']=poltype.entropy[i]
                 poltype.tabledict[i][u'ΔSˢᵒˡᵛᵉʳʳ']=poltype.entropyerror[i]
 
-    tables.WriteTableUpdateToLog(poltype)
+    tables.WriteTableUpdateToLog(poltype,verbose=False)
     tempname='BARResults.csv'
     table=[]
     with open(poltype.outputpath+tempname, mode='w') as energy_file:
@@ -691,6 +691,8 @@ def ComputeThermoProperties(poltype):
             totalvdw,totalele,vdwfreeenergynoioncorrection,elefreeenergynoioncorrection,totalfreeenergynoioncorrection,vdwfreeenergynogas,elefreeenergynogas,totalfreeenergynogas,vdwfreeenergygas,elefreeenergygas,totalfreeenergygas=GenerateEleVdwSums(poltype,solvfreeenergylist,vdwlambdapairlist,elelambdapairlist,baroutputfilepathlist)
             fwdenergylist=FlattenListOfList(poltype,poltype.freeenergylistfwd[0])
             bwdenergylist=FlattenListOfList(poltype,poltype.freeenergylistbwd[0])
+            fwdbwddiff=list(np.abs(np.array(fwdenergylist)-np.array(bwdenergylist)))
+            fwdbwddiff=[str(i) for i in fwdbwddiff]
             CheckIfForwardBackwardPertubationsAreSimilar(poltype,fwdenergylist,bwdenergylist)
             poltype.tabledict[0][u'ΔGˢᵒˡᵛᵉˡᵉ']=totalele
             poltype.tabledict[0][u'ΔGˢᵒˡᵛᵛᵈʷ']=totalvdw
@@ -707,6 +709,7 @@ def ComputeThermoProperties(poltype):
             table.append([u'ΔGˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.freeenergyerrorlist[0]))
             table.append([u'ΔGˢᵒˡᵛᶠʷᵈ']+fwdenergylist)
             table.append([u'ΔGˢᵒˡᵛᵇʷᵈ']+bwdenergylist)
+            table.append([u'ΔGˢᵒˡᵛᶠʷᵈᵇʷᵈ']+fwdbwddiff)
             table.append([u'ΔHˢᵒˡᵛ']+FlattenListOfList(poltype,poltype.enthalpylist[0]))
             table.append([u'ΔHˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.enthalpyerrorlisttotal[0]))
             table.append([u'TΔSˢᵒˡᵛ']+FlattenListOfList(poltype,poltype.entropylist[0]))
@@ -728,6 +731,10 @@ def ComputeThermoProperties(poltype):
             CheckIfForwardBackwardPertubationsAreSimilar(poltype,compfwdenergylist,compbwdenergylist)
             solvfwdenergylist=FlattenListOfList(poltype,poltype.freeenergylistfwd[1])
             solvbwdenergylist=FlattenListOfList(poltype,poltype.freeenergylistbwd[1])
+            solvfwdbwddiff=list(np.abs(np.array(solvfwdenergylist)-np.array(solvbwdenergylist)))
+            solvfwdbwddiff=[str(i) for i in solvfwdbwddiff]
+            compfwdbwddiff=list(np.abs(np.array(compfwdenergylist)-np.array(compbwdenergylist)))
+            compfwdbwddiff=[str(i) for i in compfwdbwddiff]
             CheckIfForwardBackwardPertubationsAreSimilar(poltype,solvfwdenergylist,solvbwdenergylist)
             solvfreeenergylist=FlattenListOfList(poltype,poltype.freeenergylist[1])
             totalvdw,totalele,vdwfreeenergynoioncorrection,elefreeenergynoioncorrection,totalfreeenergynoioncorrection,vdwfreeenergynogas,elefreeenergynogas,totalfreeenergynogas,vdwfreeenergygas,elefreeenergygas,totalfreeenergygas=GenerateEleVdwSums(poltype,solvfreeenergylist,vdwlambdapairlist,elelambdapairlist,baroutputfilepathlist)
@@ -749,6 +756,8 @@ def ComputeThermoProperties(poltype):
             table.append([u'ΔGˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.freeenergyerrorlist[1]))
             table.append([u'ΔGˢᵒˡᵛᶠʷᵈ']+solvfwdenergylist)
             table.append([u'ΔGˢᵒˡᵛᵇʷᵈ']+solvbwdenergylist)
+            table.append([u'ΔGˢᵒˡᵛᶠʷᵈᵇʷᵈ']+solvfwdbwddiff)
+
             table.append([u'ΔHˢᵒˡᵛ']+FlattenListOfList(poltype,poltype.enthalpylist[1]))
             table.append([u'ΔHˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.enthalpyerrorlisttotal[1]))
             table.append([u'TΔSˢᵒˡᵛ']+FlattenListOfList(poltype,poltype.entropylist[1]))
@@ -773,6 +782,7 @@ def ComputeThermoProperties(poltype):
             table.append([u'ΔGᶜᵒᵐᵖᵉʳʳ']+FlattenListOfList(poltype,poltype.freeenergyerrorlist[0]))
             table.append([u'ΔGᶜᵒᵐᵖᶠʷᵈ']+compfwdenergylist)
             table.append([u'ΔGᶜᵒᵐᵖᵇʷᵈ']+compbwdenergylist)
+            table.append([u'ΔGᶜᵒᵐᵖᶠʷᵈᵇʷᵈ']+compfwdbwddiff)
             table.append([u'ΔHᶜᵒᵐᵖ']+FlattenListOfList(poltype,poltype.enthalpylist[0]))
             table.append([u'ΔHᶜᵒᵐᵖᵉʳʳ']+FlattenListOfList(poltype,poltype.enthalpyerrorlisttotal[0]))
             table.append([u'TΔSᶜᵒᵐᵖ']+FlattenListOfList(poltype,poltype.entropylist[0]))
@@ -1227,7 +1237,7 @@ def SumTheFreeEnergyStepsFromBAR(poltype):
                 poltype.tabledict[j][u'ΔSˢᵒˡᵛ']=poltype.entropy[j]
                 poltype.tabledict[j][u'ΔSˢᵒˡᵛᵉʳʳ']=poltype.entropyerror[j]
 
-    tables.WriteTableUpdateToLog(poltype)
+    tables.WriteTableUpdateToLog(poltype,verbose=False)
     tempname='BARResults.csv'
     with open(poltype.outputpath+tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -1364,7 +1374,6 @@ def BARProtocol(poltype):
             if term.CheckFilesTermination(poltype,baroutputfilepath)[0]==False or poltype.redobar==True:         
                 ExecuteBAR(poltype)
     
-    poltype.WriteToLog('BAR is running',prin=True)
     messages=[]
     for i in range(len(poltype.baroutputfilepath)):
         baroutputfilepathlist=poltype.baroutputfilepath[i]
@@ -1407,10 +1416,11 @@ def BARProtocol(poltype):
                     finished=checkfin[0]
                     percentfinished=checkfin[1]
 
-    poltype.WriteToLog('BAR is complete',prin=True)
+    poltype.WriteToLog('Generating .bar files is complete',prin=True)
     if poltype.usetinkerforthermoprops==True:
         SumTheFreeEnergyStepsFromBAR(poltype)
     else:
+        poltype.WriteToLog('Computing BAR from .bar files',prin=True)
         ComputeThermoProperties(poltype)
     if poltype.complexation==True: 
         poltype.freeenergy[0]=poltype.freeenergy[0]+poltype.rescorrection

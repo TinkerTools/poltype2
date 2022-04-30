@@ -7,7 +7,7 @@ from openbabel import pybel
 import databaseparser
 
 
-def gen_canonicallabels(poltype,mol,rdkitmol=None):
+def gen_canonicallabels(poltype,mol,rdkitmol=None,usesym=True):
     if rdkitmol==None:
         obConversion = openbabel.OBConversion()
         obConversion.SetOutFormat('mol')
@@ -19,7 +19,7 @@ def gen_canonicallabels(poltype,mol,rdkitmol=None):
         poltype.totalcharge=temptotalcharge
         Chem.SanitizeMol(rdkitmol)
     distmat=Chem.rdmolops.GetDistanceMatrix(rdkitmol)
-    indextomatchingindices=ComputeSymmetryTypes(poltype,distmat,rdkitmol,mol)
+    indextomatchingindices=ComputeSymmetryTypes(poltype,distmat,rdkitmol,mol,usesym)
 
     groups=[] 
     grouptoheavy={}
@@ -55,22 +55,27 @@ def gen_canonicallabels(poltype,mol,rdkitmol=None):
     return idxtosymclass,symmetryclass
 
 
-def ComputeSymmetryTypes(poltype,distmat,rdkitmol,mol):
+def ComputeSymmetryTypes(poltype,distmat,rdkitmol,mol,usesym):
     indextomatchingindices={}
     indextoGI={}
-    atomindices=databaseparser.RingAtomicIndices(poltype,mol)
-    for atom in rdkitmol.GetAtoms():
-        atomidx=atom.GetIdx()
-        GI=ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices)
-        indextoGI[atomidx]=GI
+    if usesym==True:
+        atomindices=databaseparser.RingAtomicIndices(poltype,mol)
+        for atom in rdkitmol.GetAtoms():
+            atomidx=atom.GetIdx()
+            GI=ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices)
+            indextoGI[atomidx]=GI
 
-    for index,GI in indextoGI.items():
-        for oindex,oGI in indextoGI.items():
-            if GI==oGI:
-                if index not in indextomatchingindices.keys():
-                    indextomatchingindices[index]=[]
-                if oindex not in indextomatchingindices[index]:
-                    indextomatchingindices[index].append(oindex)
+        for index,GI in indextoGI.items():
+            for oindex,oGI in indextoGI.items():
+                if GI==oGI:
+                    if index not in indextomatchingindices.keys():
+                        indextomatchingindices[index]=[]
+                    if oindex not in indextomatchingindices[index]:
+                        indextomatchingindices[index].append(oindex)
+    else:
+        for atom in rdkitmol.GetAtoms():
+            atomidx=atom.GetIdx()
+            indextomatchingindices[atomidx]=atomidx
 
     return indextomatchingindices
 
@@ -132,8 +137,30 @@ def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
     GI.extend(nls)
     isaro=atom.GetIsAromatic()
     isinring=mol.GetAtom(atomidx+1).IsInRing()
-    GI.append(isinring)
     atomicnum=atom.GetAtomicNum()
     GI.append(atomicnum)
+    atmnumtocount={}
+    if numneighbs==1:
+       neighb=neighbs[0]
+       natomidx=neighb.GetIdx()
+       rings=databaseparser.GrabAllRingsContainingIndices(poltype,atomindices,[natomidx+1])
+    else:
+       rings=databaseparser.GrabAllRingsContainingIndices(poltype,atomindices,[atomidx+1])
+    if len(rings)>0:
+        for ring in rings:
+            if len(ring)<=7: # openbabel doesnt count all ring memership right someitmes when whole molecule is giant ring
+                for atomindex in ring:
+                    atom=rdkitmol.GetAtomWithIdx(atomindex-1)
+                    atomicnum=atom.GetAtomicNum()
+                    if atomicnum not in atmnumtocount.keys():
+                        atmnumtocount[atomicnum]=0
+                    atmnumtocount[atomicnum]+=1
+        ls=[]
+        sortedatmnumtocount=dict(sorted(atmnumtocount.items()))
+        for atmnum,count in sortedatmnumtocount.items():
+            ls.append(atmnum*count)
+        GI.extend(ls)
+
+
     
     return GI
