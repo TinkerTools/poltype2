@@ -2205,7 +2205,7 @@ def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopolt
                 extra=doubleextra
             else:
                 extra=singleextra
-            if hydcount>0:
+            if hydcount>0 and ringbond==False:
                 extra+=hydextra
             arotorsionlinetodescrips[line]=[extra,descrips]
         newtorsionprms.append(line)
@@ -2403,6 +2403,7 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
             linesplit=line.split()
             vdwtype=int(linesplit[1])
             if vdwtype in missingvdwtypes:
+                warn=True
                 extraline+='# Missing vdw parameters'+'\n'
 
         if 'angle' in line:
@@ -2414,6 +2415,8 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
             if ls in missinganglepoltypeclasses or ls[::-1] in missinganglepoltypeclasses:
                 extraline+='# Missing angle parameters, assigning default parameters via element and valence'+'\n'
                 warn=True
+                showtransferinfo=False
+
 
         if 'strbnd' in line:
             linesplit=line.split()
@@ -2424,6 +2427,8 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
             if ls in missinganglepoltypeclasses or ls[::-1] in missinganglepoltypeclasses:
                 extraline+='# Missing strbnd parameters, zeroing out parameters'+'\n'
                 warn=True
+                showtransferinfo=False
+
         if 'bond' in line:
             linesplit=line.split()
             a=int(linesplit[1])
@@ -2432,6 +2437,8 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
             if ls in missingbondpoltypeclasses or ls[::-1] in missingbondpoltypeclasses:
                 extraline+='# Missing bond parameters, assigning default parameters via element and valence'+'\n'
                 warn=True
+                showtransferinfo=False
+
 
         if 'torsion' in line:
             linesplit=line.split()
