@@ -19,7 +19,7 @@ def CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebi
         if poltype.runjobslocally==True:
             string+=' cd '+outputfilepath+' ; '
         string+=job+' '
-        string+='--numproc='+str(poltype.numproc)+' '+'--disk=0GB'+' '+'--inputfilepaths='+inputfilestr
+        string+='--numproc='+str(1)+' '+'--disk=0GB'+' '+'--inputfilepaths='+inputfilestr
         if poltype.runjobslocally==False:
             string+=' '+'--outputfilepaths='+outputfilestr
         if '_gpu' in job:
