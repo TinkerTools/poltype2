@@ -24,7 +24,7 @@ Given an input chemical structure, all parameters can be automatically assigned 
 [license-url]: https://github.com/TinkerTools/tinker/blob/release/LICENSE.pdf
 
 
-<img src="README/Images/PoltypeFlow.PNG" width="80%">
+<img src="README/Images/PoltypeFlow.PNG" width="60%">
 
 * **Figure 1**. Overview of automated parameterization scheme for Poltype 2. Green boxes indicate input and output. Blue boxes indicate actions performed and the red rhombus indicates and intermediate output. BFE is Binding Free Energy and HFE is Hydration Free Energy.
 
@@ -161,6 +161,9 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 [AMOEBA Publications](#amoeba-publications)
 
+[Developer Notes](#developer-notes)
+
+* [SMARTS Parameter Database](#smarts-parameter-database)
 
 
 ---------------------------------------------------------------------------------------------
@@ -822,4 +825,9 @@ Liu, C.; Piquemal, J. P.; Ren, P., Implementation of Geometry-Dependent Charge F
 1. Molecular dynamics. Florent Barbault. (2010, September 10). Retrieved November 8, 2021, from https://florentbarbault.wordpress.com/research/mova-2/. 
 
 
+### Developer Notes
 
+#### SMARTS Parameter Database
+
+* Poltype generates a file called database.prm that outputs derived torsion parameters in a format that is compatible with poltype database file (under ParameterFiles folder) called externalparameterdatabase.txt
+* SMARTS strings above the # DELIMITER line, do not have the requirement of every atom in the match (1 for vdw, 2 for bond, 3 for angle, 4 for torsion) and its neighbors need to match the SMARTS. Below the # DELIMITER line, it is required that first neighbors of each atom also match to the SMARTS. Add new torsion parameter lines to the bottom of the file.
