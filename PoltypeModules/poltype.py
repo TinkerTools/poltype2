@@ -443,7 +443,7 @@ class PolarizableTyper():
         self.torspmethod=torspmethod                   
         self.dmamethod=dmamethod                    
         self.espmethod=espmethod                 
-        
+                
         opts, xargs = getopt.getopt(sys.argv[1:],'h',["help"])
 
         for o, a in opts:
@@ -1360,7 +1360,7 @@ class PolarizableTyper():
             self.espbasisset = 'MINIX'        
             self.torspbasisset = 'MINIX'
 
-
+        self.cmdtopid={} # for killing pids that have jobs stalled too long
         self.SanitizeAllQMMethods()
         if self.readinionly==True:
             return
@@ -2382,7 +2382,10 @@ class PolarizableTyper():
     
         return newmol,rdkitmol
 
-    
+    def KillErrorJob(self,job):
+        p=self.cmdtopid[job]
+        p.terminate()
+        p.wait()
 
     
     def CallJobsSeriallyLocalHost(self,fulljobtooutputlog,skiperrors,wait=False):
@@ -2403,6 +2406,7 @@ class PolarizableTyper():
                           if job in submittedjobs:
                               submittedjobs.remove(job) 
                   if error==True and job in submittedjobs:
+                      self.KillErrorJob(job) # sometimes tinker jobs or qm just hang and dont want zombie process 
                       if outputlog not in finishedjobs:
                           errorjobs.append(outputlog)
                           finishedjobs.append(outputlog) 
@@ -2541,6 +2545,7 @@ class PolarizableTyper():
                         self.NormalTerm(outputlog)
                         finishedjobs.append(outputlog)
                 elif finished==False and error==True:
+                    self.KillErrorJob(job)
                     if skiperrors==False:
                         if outputlog not in finishedjobs:
                             self.ErrorTerm(outputlog,skiperrors)
@@ -2681,6 +2686,7 @@ class PolarizableTyper():
             self.WriteToLog("Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
             p = subprocess.Popen(cmdstr,shell=True,stdout=self.logfh, stderr=self.logfh)
             procs.append(p)
+            self.cmdtopid[cmdstr]=p
 
         if wait==True:
             exit_codes=[p.wait() for p in procs]

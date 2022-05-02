@@ -1,3 +1,4 @@
+from tqdm import tqdm
 import warnings
 import math
 import sys
@@ -2839,21 +2840,24 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
     indicestosmartsatomorder={}
     indicestoprmlist={}
     restrictedsmarts=[]
+    failedmatches=[]
     if poltype.quickdatabasesearch==False:
         if torsionindicestoextsmarts!=None:
             for torsionindices,extsmarts in torsionindicestoextsmarts.items():
                 if extsmarts not in restrictedsmarts:
                     restrictedsmarts.append(extsmarts)
-        for smartsatomorder,parameters in smartsatomordertoparameters.items():
+        listsmartsatomordertoparameters=list(smartsatomordertoparameters.keys())
+        for k in tqdm(range(len(listsmartsatomordertoparameters)),desc='Searching SMARTS database'):
+            smartsatomorder=listsmartsatomordertoparameters[k]
+            parameters=smartsatomordertoparameters[smartsatomorder]
             smarts=smartsatomorder[0]
             fromtorvdwdb=smartsatomordertotorvdwdb[smartsatomorder]
-            
+            atomorderlist=smartsatomorder[1]
             if len(restrictedsmarts)!=0:
                 if smarts not in restrictedsmarts and fromtorvdwdb==True:
                     continue
-            if len(restrictedsmarts)==0 and fromtorvdwdb==True:
+            if (len(restrictedsmarts)==0 and len(atomorderlist)==1)and fromtorvdwdb==True:
                 continue 
-            atomorderlist=smartsatomorder[1]
             substructure = Chem.MolFromSmarts(smarts)
             mols = [rdkitmol,substructure]
             res=rdFMCS.FindMCS(mols)
@@ -2873,6 +2877,7 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                     mcssmartsindextosmartsmolindex=dict(zip(mcsindices,mcsmatch)) 
                     smartsmolindexlist=[i-1 for i in atomorderlist]
                     foundindices=True
+                    
                     for i in smartsmolindexlist:
                         if i not in mcssmartsindextosmartsmolindex.values():
                             foundindices=False
@@ -2886,6 +2891,7 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                             mcssmartsindices=[smartsmolindextomcssmartsindex[i] for i in smartsmolindexlist]
                             indices=[mcssmartsindextomolindex[i] for i in mcssmartsindices]
                             mcsorder=[i+1 for i in indices]
+                            
                             for match in matches:
                                 allin=True
                                 for idx in indices:
@@ -2906,7 +2912,8 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                                             if nnidx not in nindexes:
                                                 nindexes.append(nnidx)
             
-                            diditmatch=CheckIfNeighborsExistInSMARTMatch(poltype,nindexes,matcharray)   
+                            diditmatch=CheckIfNeighborsExistInSMARTMatch(poltype,nindexes,matcharray)  
+                            
                             if fromtorvdwdb==False:
                                 diditmatch=True # only care about neighbor matching for large SMARTS from part of DB genreated by fragmenter, top of DB can have shorter SMARTS 
                             if diditmatch==True:
@@ -2922,7 +2929,6 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                                     chyb=catombabel.GetHyb()
                                     if (bisinring==True and cisinring==True) and (bhyb==2 and chyb==2):
                                         continue
-        
                                 if moleculeindices not in indicestosmartslist.keys():
                                     indicestosmartslist[moleculeindices]=[]
                                     indicestomatchlist[moleculeindices]=[]
@@ -2937,6 +2943,8 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                                     indicestoatomorderlist[moleculeindices].append(mcssmartsatomorder)
                                     indicestosmartsatomorder[moleculeindices].append(smartsatomorder)
                                     indicestoprmlist[moleculeindices].append(parameters)
+            else:
+                failedmatches.append(smarts)
         rotatablebondtosmartslist={}
         for moleculeindices,smartslist in indicestosmartslist.items():
             if len(moleculeindices)==4: 
@@ -4827,7 +4835,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         angleindicestoextsmartsmatchlength,angleindicestoextsmarts,angleindicestoextsmartsatomorder,anglesmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,anglesmartsatomordertoparameters,indextoneighbidxs,smartsatomordertotorvdwdb)
         strbndindicestoextsmartsmatchlength,strbndindicestoextsmarts,strbndindicestoextsmartsatomorder,strbndsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,strbndsmartsatomordertoparameters,indextoneighbidxs,smartsatomordertotorvdwdb)
         torsionindicestoextsmartsmatchlength,torsionindicestoextsmarts,torsionindicestoextsmartsatomorders,torsionsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,torsionsmartsatomordertoparameters,indextoneighbidxs,smartsatomordertotorvdwdb)
-
 
         opbendindicestoextsmartsmatchlength,opbendindicestoextsmarts,opbendindicestoextsmartsatomorder,opbendsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,opbendsmartsatomordertoparameters,indextoneighbidxs,smartsatomordertotorvdwdb)
         vdwindicestoextsmartsmatchlength,vdwindicestoextsmarts,vdwindicestoextsmartsatomorder,vdwsmartsatomordertoparameters=MatchExternalSMARTSToMolecule(poltype,rdkitmol,vdwsmartsatomordertoparameters,indextoneighbidxs,smartsatomordertotorvdwdb,torsionindicestoextsmarts)
