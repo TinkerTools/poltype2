@@ -86,55 +86,36 @@ def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
     distances=distmat[atomidx]
     indices=np.array(list(range(len(distances))))
     indextodist=dict(zip(indices,distances))
-    newindextodist={}
-    for index,dist in indextodist.items():
-        oatom=rdkitmol.GetAtomWithIdx(int(index))
-        atomicnum=oatom.GetAtomicNum()
-        if atomicnum!=1:
-            newindextodist[index]=dist
+    distancetoatomicnumcounts={}
+    
+    uniquedistances=set(distances)
+    for d in uniquedistances:
+        if d not in distancetoatomicnumcounts.keys():
+            distancetoatomicnumcounts[d]={}
+            atomicnums=[]
+            for index,dist in indextodist.items():
+                oatom=rdkitmol.GetAtomWithIdx(int(index))
+                atomicnum=oatom.GetAtomicNum()
+                if dist==d:
+                    atomicnums.append(atomicnum)
+            uniqueatomicnums=set(atomicnums)
+            atomicnumtocount={}
+            for atomnum in uniqueatomicnums:
+                count=atomicnums.count(atomnum)
+                atomicnumtocount[atomnum]=count
+            distancetoatomicnumcounts[d]=atomicnumtocount
+    sorteddistancetoatomicnumcounts=dict(sorted(distancetoatomicnumcounts.items()))
+    for d,dic in sorteddistancetoatomicnumcounts.items():
+        sortedatomicnumtocount=dict(sorted(dic.items()))
+        ls=[]
+        for atmnum,count in sortedatomicnumtocount.items():
+            ls.append(atmnum*count)
+        GI.extend(ls)
 
-    newdistances=list(newindextodist.values())
-    dtocount={}
-    for d in newdistances:
-        count=list(newdistances).count(d)
-        dtocount[d]=count
 
-    sorteddtocount=dict(sorted(dtocount.items()))
-    distinv=[]
-    for d,count in sorteddtocount.items():
-        distinv.append(d*count)
-    maxdist=max(newdistances)
-    GI.append(maxdist)
-    GI.extend(distinv)
+
     neighbs=[natom for natom in atom.GetNeighbors()]
     numneighbs=len(neighbs)
-    neighbatmnumtocount={}
-    nneighbatmnumtocount={}
-    if len(neighbs)==1:
-        theatom=neighbs[0]
-    else:
-        theatom=atom
-    for natom in theatom.GetNeighbors():
-        natomicnum=natom.GetAtomicNum()
-        if natomicnum not in neighbatmnumtocount.keys():
-            neighbatmnumtocount[natomicnum]=0
-        neighbatmnumtocount[natomicnum]+=1
-        for nnatom in natom.GetNeighbors():
-            nnatomicnum=nnatom.GetAtomicNum()
-            if nnatomicnum not in nneighbatmnumtocount.keys():
-                nneighbatmnumtocount[nnatomicnum]=0
-            nneighbatmnumtocount[nnatomicnum]+=1
-
-    ls=[]
-    sortedneighbatmnumtocount=dict(sorted(neighbatmnumtocount.items()))
-    for atmnum,count in sortedneighbatmnumtocount.items():
-        ls.append(atmnum*count)
-    GI.extend(ls)
-    nls=[]
-    sortednneighbatmnumtocount=dict(sorted(nneighbatmnumtocount.items()))
-    for atmnum,count in sortednneighbatmnumtocount.items():
-        nls.append(atmnum*count)
-    GI.extend(nls)
     isaro=atom.GetIsAromatic()
     isinring=mol.GetAtom(atomidx+1).IsInRing()
     atomicnum=atom.GetAtomicNum()
