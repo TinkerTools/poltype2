@@ -1431,30 +1431,31 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             ax.plot(x_new,y_smooth,color='magenta')
 
             # prefit tinker XYZ structure but with postfit parameters
-            line5, =ax.plot(prepostmang_list,prepostmm_energy_list,'o',color='black',label='MM1XYZMM2Prm')
-            xpoints=numpy.array([prepostmang_list[i][0] for i in range(len(mang_list))])
-            x_new = numpy.linspace(xpoints.min(), xpoints.max(),500)
-            f = interp1d(xpoints,numpy.array(prepostmm_energy_list), kind='quadratic')
-            y_smooth=f(x_new)
-            ax.plot(x_new,y_smooth,color='black')
+            #line5, =ax.plot(prepostmang_list,prepostmm_energy_list,'o',color='black',label='MM1XYZMM2Prm')
+            #xpoints=numpy.array([prepostmang_list[i][0] for i in range(len(mang_list))])
+            #x_new = numpy.linspace(xpoints.min(), xpoints.max(),500)
+            #f = interp1d(xpoints,numpy.array(prepostmm_energy_list), kind='quadratic')
+            #y_smooth=f(x_new)
+            #ax.plot(x_new,y_smooth,color='black')
 
 
-            ax2=ax.twinx()
+            #ax2=ax.twinx()
             # make a plot with different y-axis using second axis object
-            try:
-                line6, =ax2.plot(qang_list,WBOarray,'yo',color='yellow',label='WBO')
-                xpoints=numpy.array([qang_list[i][0] for i in range(len(qang_list))])
-                x_new = numpy.linspace(xpoints.min(), xpoints.max(),500)
-                ypoints=numpy.array([WBOarray[i][0] for i in range(len(WBOarray))])
-                f = interp1d(xpoints,ypoints, kind='quadratic')
-                y_smooth=f(x_new)
-                ax2.plot(x_new,y_smooth,color='yellow')
+            #try:
+            #    line6, =ax2.plot(qang_list,WBOarray,'yo',color='yellow',label='WBO')
+            #    xpoints=numpy.array([qang_list[i][0] for i in range(len(qang_list))])
+            #    x_new = numpy.linspace(xpoints.min(), xpoints.max(),500)
+            #    ypoints=numpy.array([WBOarray[i][0] for i in range(len(WBOarray))])
+            #    f = interp1d(xpoints,ypoints, kind='quadratic')
+            #    y_smooth=f(x_new)
+            #    ax2.plot(x_new,y_smooth,color='yellow')
 
-                ax2.set_ylabel("WBO",color="blue",fontsize=14)
+            #    ax2.set_ylabel("WBO",color="blue",fontsize=14)
 
-                plt.legend(handles=[line1,line2,line3,line4,line5,line6],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=6)
-            except:
-                plt.legend(handles=[line1,line2,line3,line4,line5],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
+            #    plt.legend(handles=[line1,line2,line3,line4,line5,line6],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=6)
+            #except:
+            #    plt.legend(handles=[line1,line2,line3,line4,line5],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
+            plt.legend(handles=[line1,line2,line3,line4],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=4)
 
             ax.set_xlabel('Dihedral Angle (degrees)')
             ax.set_ylabel('Energy (kcal/mol)')
