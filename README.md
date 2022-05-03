@@ -47,6 +47,8 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 [Minimum Example Usage Parameterization](#minimum-example-usage-parameterization)
 
+[Default Resource Consumption](#default-resource-consumption)
+
 [💻 Advanced Program Usage](README/README_HELP.MD)
 
 [Parameterization Output Files](#parameterization-output-files)
@@ -172,6 +174,7 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
     
 ### Parameterization Input Preparation
 * The input structure is given to the program as an SDF file. 
+* If 2D structure is given in the SDF file, poltype will generate 3D coordinates for you.
 * Formal atom charge will be assigned via the input number of bonds and bond order for surrounding bonds and element of each atom. 
 * Optional keywords exist to add missing hydrogens. 
 * Special radical charge states require additional information in the input file specifying which atom is a radical. 
@@ -191,6 +194,11 @@ nohup python /path_to_poltype/poltype.py &
 
 ```final.xyz``` and ```final.key``` are the resulting structure and parameter files you will need.
 * After poltype finishes, check the ``OPENME`` folder for torsion fitting and ESP fitting results. 
+
+### Default Resource Consumption
+* By default, Poltype computes the number of fragment poltype jobs (or any QM job if fragmenter is not being used) to run in parallel as the floor function of the input number of cores divided by the number of cores per job (default of 2). 
+* RAM, cores, and disk space can all be detected and a consumption ratio of 80% is used by default. Fragment RAM, disk, and cores are divided evenly by the number of Poltype jobs in parallel. 
+
 
 ### Parameterization Output Files
 
