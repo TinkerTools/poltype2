@@ -3239,7 +3239,10 @@ class PolarizableTyper():
             indextocoordinates=indextocoordslist[0]
         Chem.GetSymmSSSR(m)
         m.GetRingInfo().NumRings() 
-        m=self.AddInputCoordinatesAsDefaultConformer(m,indextocoordinates)
+        try:
+            m=self.AddInputCoordinatesAsDefaultConformer(m,indextocoordinates)
+        except:
+            pass
         if self.generateextendedconf==True:
             rdmolfiles.MolToMolFile(m,'extendedconf.mol')
         mol,m=self.CheckIsInput2D(mol,obConversion,m)
