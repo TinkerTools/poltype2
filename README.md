@@ -410,8 +410,8 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 
 
 ### Atom Type Classification
-* Openbabels GraphAutomorphism function is used to find all permutations that map to the equivalent graph. 
-* This is done using an array of graph invariants, such as graph theoretical distance, valence, aromaticity, ring atom, atomic number, bond sum, and formal charge computed via the openbabel toolkit. 
+* An array of graph invarients is computed for each atom. If two atoms have the same array then they are considered the same type. For each bond distance away in the graph for some atom, all atom numbers are counted for that bond distance. The counts mulitilplied by the atomic number for each bond distance away is ordered into one long array.
+* Additinal topoligical ring information, condensing the counts of each atomic number for any atom belonging to a ring, or a singly valent atom bonded to a ring is used in the graph invarient array.
 
 ### QM Geometry Optimization
 * An MP2/6-31G* optimization is performed while restraining dihedrals of rotatable bonds in an extended conformation. Multipole parameterization requires an extended conformation. 
@@ -535,7 +535,7 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 * For each atom on the molecule being probed, N possible initial dimers (default N=50) for both water-oxygen facing molecule dimer and N initial dimers for water-hydrogen facing molecule dimer are generated. * An initial 3D mesh grid around the target atom of interest is generated, and initial ideal pairwise distance between water probe atom and molecule atom is computed via combining rule of VdW radii. 
 * The probe molecule searches along the 3D mesh grid for points that are within target distance of the probed atom of interest, while also maintaining a reasonable distance from other atoms in the molecule to prevent steric clashing between the probe and the probed molecule. 
 * The first N points on this grid undergo a Tinker minimization, then the most favorable minimized dimer is chosen as a starting point for QM computations. 
-* The minimized structure is translated in either direction about the minima to determine which points along the pairwise distance energy surface will be sampled (default of 80%, 90%, 100%, 110%, 120% of the minimized pairwise distance). 
+* The minimized structure is translated in either direction about the minima to determine which points along the pairwise distance energy surface will be sampled (default of 80%, 85%, 90%, 100%, 110%, 120%, 140% of the minimized pairwise distance). 
 * Total energies are computed via Tinker ANALYZE for each minimized structure. 
 * Then single point energies for each structure are computed via ωB97X-D/aug-cc-pVDZ level of theory. For more accurate refinement, an optional keyword computes SP at MP2/aug-cc-pV[TQ]Z (only supported for Psi4), where the brackets indicate that two single points are done at triple zeta and quadruple zeta are used for basis set extrapolation to complete basis set energy. 
 * Boundaries for fitting parameters are defined as +/-10% for radius and depth and -20% for reduction factor (used for singly valent atoms). Least squares optimization is performed on the loss function (total Tinker energy minus target QM energy) via scipy least_squares package. * QM energies with values greater than 15 kcal/mol, which typically only occurs very near to the repulsive VdW wall, are removed prior to fitting. 
