@@ -84,7 +84,6 @@ def call_subsystem(poltype,cmdstr,wait=False,skiperrors=False,outputfilename=Non
             check=ParseForErrorsInOutPut(poltype,saved)
         else:
             check=ParseForErrorsInOutPut(poltype,[],outputfilename)
-
         if (p.returncode != 0 and skiperrors==False) or check==False:
             poltype.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
             raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())

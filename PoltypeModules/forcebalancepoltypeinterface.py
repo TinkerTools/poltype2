@@ -1188,16 +1188,13 @@ def GenerateTypeMaps(keyfilelist):
     oldtypetonewtypelist=[]
     currentmin=100000
     currentmax=0
-    firsttime=False
+    shift=0
+    prevmaxnumberfromkey=0
+    prevminnumberfromkey=0
     for keyfilename in keyfilelist:
         maxnumberfromkey=GrabMaxTypeNumber(keyfilename)
         minnumberfromkey=GrabMinTypeNumber(keyfilename)
-
-        if firsttime==True:
-            shift=np.abs(currentmax-maxnumberfromkey)+1+prevmaxnumberfromkey-prevminnumberfromkey
-        else:
-            shift=0
-        firsttime=True
+        shift+=prevmaxnumberfromkey-prevminnumberfromkey+1
         if minnumberfromkey<currentmin:
             currentmin=minnumberfromkey
         if maxnumberfromkey>currentmax:
