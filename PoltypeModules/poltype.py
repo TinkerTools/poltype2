@@ -2382,10 +2382,9 @@ class PolarizableTyper():
     
         return newmol,rdkitmol
 
-    def KillErrorJob(self,job,outputlog):
+    def KillJob(self,job,outputlog):
         p=self.cmdtopid[job]
         pid=p.pid
-        self.WriteToLog('Terminating process PID = '+str(pid)+' job = '+job+' outputlog = '+outputlog)
         p.terminate()
         p.wait()
 
@@ -2402,13 +2401,14 @@ class PolarizableTyper():
                   finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
                   
                   if finished==True:
+                      self.KillJob(job,outputlog)
                       if outputlog not in finishedjobs:
                           finishedjobs.append(outputlog)
                           self.NormalTerm(outputlog)
                           if job in submittedjobs:
                               submittedjobs.remove(job) 
                   if error==True and job in submittedjobs:
-                      self.KillErrorJob(job,outputlog) # sometimes tinker jobs or qm just hang and dont want zombie process 
+                      self.KillJob(job,outputlog) # sometimes tinker jobs or qm just hang and dont want zombie process 
                       if outputlog not in finishedjobs:
                           errorjobs.append(outputlog)
                           finishedjobs.append(outputlog) 
@@ -2543,11 +2543,12 @@ class PolarizableTyper():
                 outputlog=jobtooutputlog[job]
                 finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
                 if finished==True and error==False: # then check if SP has been submitted or not
+                    self.KillJob(job,outputlog)
                     if outputlog not in finishedjobs:
                         self.NormalTerm(outputlog)
                         finishedjobs.append(outputlog)
                 elif finished==False and error==True:
-                    self.KillErrorJob(job,outputlog)
+                    self.KillJob(job,outputlog)
                     if skiperrors==False:
                         if outputlog not in finishedjobs:
                             self.ErrorTerm(outputlog,skiperrors)

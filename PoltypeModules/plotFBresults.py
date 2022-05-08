@@ -321,7 +321,7 @@ def PlotFBQM(targetdic,formula,indices):
         ms=np.mean(diff)
         msvalues.append(ms)
         label1='AMOEBA'
-        label2='Target'
+        label2='QM'
         ykey='Interaction Energy (kcal/mol)'
         xkey=prefix+' Distance (Angstroms)'
         labels=[label1,label2]
@@ -397,7 +397,7 @@ def PlotFBLiq(tpdic,nametotptofinalprops):
                 err=np.abs(refarray-calcarray)
                 relerr=100*(err/refarray)
                 label1=property+' AMOEBA'
-                label2=property+' Target'
+                label2=property+' Exp'
                 ykey=property+units
                 xkey='Iterations'
                 labels=[label1,label2]
@@ -407,7 +407,7 @@ def PlotFBLiq(tpdic,nametotptofinalprops):
                 #ScatterPlot2D(title,x,calcarray,refarray,xkey,ykey,labels)
                 proptoaxes[property].scatter(x,calcarray, s=10, c=c, marker="o", label='AMOEBA '+string)
                 proptoaxes[property].errorbar(x, calcarray, yerr=errarray,c=c, fmt="o")
-                proptoaxes[property].scatter(x,refarray, s=10, c=c, marker="s", label='Target '+string)              
+                proptoaxes[property].scatter(x,refarray, s=10, c=c, marker="s", label='Exp '+string)              
                 proptoaxes[property].set_ylabel(ykey,fontsize=12)
                 proptoaxes[property].set_xlabel(xkey,fontsize=12)
                 newtitle=name+' '+property
@@ -1094,26 +1094,38 @@ def ExtractNeatLiquidIndices(truenametoindices):
     return neatliqnametoindices
 
 
-def WriteOutParamTable(moltotypetoprms,moltotypetoelement):
+def WriteOutParamTable(moltotypetoprms,moltotypetoelement,moltotypetofitrad,moltotypetofitdep,moltotypetofitred):
     tempname='SummaryParams.csv'
     nametoallprmlines={}
     with open(tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        header=['Name','Element','Radius','Depth','Reduction']
+        header=['Name','Element','Radius','Depth','Reduction','Fit Radius','Fit Depth','Fit Reduction']
         energy_writer.writerow(header)
         for mol,typetoprms in moltotypetoprms.items():
             typetoelement=moltotypetoelement[mol]
-            for type,prms in typetoprms.items():
+            typetofitrad=moltotypetofitrad[mol]
+            typetofitdep=moltotypetofitdep[mol]
+            typetofitred=moltotypetofitred[mol]
+            for typenum,prms in typetoprms.items():
                 array=[]
-                element=typetoelement[type]
+                element=typetoelement[typenum]
                 radius=round(prms[0],3)
                 depth=round(prms[1],3)
                 shrink=round(prms[2],3)
+                fitrad=typetofitrad[typenum]
+                fitdep=typetofitdep[typenum]
+                fitred=typetofitred[typenum]
                 array.append(mol)
                 array.append(element)
                 array.append(radius)
                 array.append(depth)
                 array.append(shrink)
+                array.append(fitrad)
+                array.append(fitdep)
+                array.append(fitred)
+
+
+
                 energy_writer.writerow(array) 
                 if mol not in nametoallprmlines.keys():
                     nametoallprmlines[mol]=[]
@@ -1151,7 +1163,7 @@ def PlotLiquidPropsCorrelation(nametotptofinalprops):
                 else:
                     units='$kg/m^3$'
                 xkey=propname+' '+'AMOEBA'+' '+units
-                ykey=propname+' '+'Target'+' '+units
+                ykey=propname+' '+'QM'+' '+units
                 innerdic=proptodic[propname]
                 calcarray=innerdic['Calc']
                 refarray=innerdic['Ref']
@@ -1160,7 +1172,7 @@ def PlotLiquidPropsCorrelation(nametotptofinalprops):
                 proptoaxes[propname].errorbar(calcarray, refarray, yerr=calcerrarray,c=c, fmt="o")
                 proptoaxes[propname].set_ylabel(ykey,fontsize=12)
                 proptoaxes[propname].set_xlabel(xkey,fontsize=12)
-                newtitle=name+' '+propname+ ' AMOEBA Vs Target'
+                newtitle=name+' '+propname+ ' AMOEBA Vs QM'
                 proptoaxes[propname].set_title(newtitle)
                 proptoaxes[propname].legend()
                 if propname not in propnametocalcs.keys():
@@ -1180,6 +1192,9 @@ def PlotLiquidPropsCorrelation(nametotptofinalprops):
 
             proptoaxes[propname].set_title(newtitle)
             proptofigs[propname].savefig(imagename)
+            rms = sqrt(mean_squared_error(calcarray,refarray))
+            print('RMSE for '+str(name)+' '+propname+' '+str(rms))
+
         
 
     os.chdir(curdir)
@@ -1222,7 +1237,7 @@ def PlotLiquidPropsVsTemp(nametotptofinalprops):
             calcerrarray=innerdic['CalcErr']   
             ax1.scatter(temparray,calcarray, s=10, c='red', marker="o", label='AMOEBA')
             ax1.errorbar(temparray, calcarray, yerr=calcerrarray,c='red', fmt="o")
-            ax1.scatter(temparray,refarray, s=10, c='blue', marker="s", label='Target')              
+            ax1.scatter(temparray,refarray, s=10, c='blue', marker="s", label='Exp')              
             ax1.set_ylabel(ykey,fontsize=12)
             ax1.set_xlabel(xkey,fontsize=12)
             newtitle=name+' '+propname+ ' Vs T'
@@ -1352,9 +1367,20 @@ def GrabFinalParameters(jobdirs):
     return prmfiles
 
 
+
+def GrabMolFromTypes(moltotypes,typenum):
+    for mol,types in moltotypes.items():
+        for otypenum in types:
+            if typenum==otypenum:
+                return mol
+
+
 def GrabParameterValues(prmfiles):
     moltotypetoprms={}
     moltotypetoelement={}
+    moltotypetofitrad={}
+    moltotypetofitdep={}
+    moltotypetofitred={}
     for prmfile in prmfiles:
         temp=open(prmfile,'r')
         results=temp.readlines()
@@ -1363,11 +1389,12 @@ def GrabParameterValues(prmfiles):
         typetoprms={}
         typetoelement={}
         moltotypes={}
+        passedatomblock=False
         for line in results:
             linesplit=line.split()
             if len(linesplit)>1:
                 first=linesplit[0]
-                if first=='atom':
+                if first=='atom' and passedatomblock==False and 'AMOEBAWater' not in line:
                     foundatomblock=True
                     typenum=linesplit[1]
                     element=linesplit[3]
@@ -1376,9 +1403,56 @@ def GrabParameterValues(prmfiles):
                     mol=mol.replace('_3D','')
                     if mol not in moltotypes.keys():
                         moltotypes[mol]=[]
-                    moltotypes[mol].append(typenum)      
-                if foundatomblock==False:
+
+                    moltotypes[mol].append(typenum)     
+
+                if 'forcefield' in line:
+                    passedatomblock=True
+        foundatomblock=False
+        passedatomblock=False
+        for line in results:
+            linesplit=line.split()
+            if len(linesplit)>1:
+                first=linesplit[0]
+                if foundatomblock==False and first=='vdw':
                     typenum=linesplit[1]
+                    mol=GrabMolFromTypes(moltotypes,typenum)
+                    if mol not in moltotypetofitrad.keys():
+                        moltotypetofitrad[mol]={}
+                        moltotypetofitdep[mol]={}
+                        moltotypetofitred[mol]={}
+                    fitarray=[]
+                    if 'PRM' in line:
+                        foundprm=False
+                        appendarray=True
+                        for eidx in range(len(linesplit)):
+                            e=linesplit[eidx]
+                            if e=='PRM':
+                                foundprm=True
+                            if foundprm==True and e!='PRM':
+                                if e.isdigit() and appendarray==True:
+                                    fitarray.append(int(e))
+                                else:
+                                    appendarray=False
+                    if 2 in fitarray:
+                        moltotypetofitrad[mol][typenum]=True
+                    else:
+                        moltotypetofitrad[mol][typenum]=False
+
+                    if 3 in fitarray:
+                        moltotypetofitdep[mol][typenum]=True
+                    else:
+                        moltotypetofitdep[mol][typenum]=False
+
+
+                    if 4 in fitarray:
+                        moltotypetofitred[mol][typenum]=True
+                    else:
+                        moltotypetofitred[mol][typenum]=False
+
+                if first=='vdw':
+                    typenum=linesplit[1]
+                    mol=GrabMolFromTypes(moltotypes,typenum)
                     radius=float(linesplit[2])
                     depth=float(linesplit[3])
                     try:
@@ -1386,17 +1460,27 @@ def GrabParameterValues(prmfiles):
                     except:
                         shift=1
                     typetoprms[typenum]=[radius,depth,shift]
+                    if typenum not in moltotypetofitrad[mol].keys():
+                        moltotypetofitrad[mol][typenum]=False
+                    if typenum not in moltotypetofitdep[mol].keys():
+                        moltotypetofitdep[mol][typenum]=False
+                    if typenum not in moltotypetofitred[mol].keys():
+                        moltotypetofitred[mol][typenum]=False
+
+
+
+
         for mol,types in moltotypes.items():
             if mol not in moltotypetoprms.keys():
                 moltotypetoprms[mol]={}
                 moltotypetoelement[mol]={}
-            for type in types: 
-                if type in typetoprms.keys():
-                    prms=typetoprms[type]
-                    moltotypetoprms[mol][type]=prms
-                    moltotypetoelement[mol][type]=typetoelement[type] 
+            for typenum in types: 
+                if typenum in typetoprms.keys():
+                    prms=typetoprms[typenum]
+                    moltotypetoprms[mol][typenum]=prms
+                    moltotypetoelement[mol][typenum]=typetoelement[typenum] 
 
-    return moltotypetoprms,moltotypetoelement
+    return moltotypetoprms,moltotypetoelement,moltotypetofitrad,moltotypetofitdep,moltotypetofitred
 
 
 def WriteOutQMTable(nametoformulatormse,nametoformulatomse):
@@ -1456,7 +1540,7 @@ def PlotLiquidPropsCorrelationForGroups(nametotptofinalprops,groupednames,nameto
                             else:
                                 units='$kg/m^3$'
                             xkey=propname+' '+'AMOEBA'+' '+units
-                            ykey=propname+' '+'Target'+' '+units
+                            ykey=propname+' '+'Exp'+' '+units
                             innerdic=proptodic[propname]
                             calcarray=innerdic['Calc']
                             refarray=innerdic['Ref']
@@ -1465,7 +1549,7 @@ def PlotLiquidPropsCorrelationForGroups(nametotptofinalprops,groupednames,nameto
                             grptoproptoaxes[grp][propname].errorbar(calcarray, refarray, yerr=calcerrarray,c=c, fmt="o")
                             grptoproptoaxes[grp][propname].set_ylabel(ykey,fontsize=12)
                             grptoproptoaxes[grp][propname].set_xlabel(xkey,fontsize=12)
-                            newtitle=totalname+' '+propname+ ' AMOEBA Vs Target'
+                            newtitle=totalname+' '+propname+ ' AMOEBA Vs Exp'
                             grptoproptoaxes[grp][propname].set_title(newtitle)
                             grptoproptoaxes[grp][propname].legend()
                             if grp not in grptopropnametocalc.keys():
@@ -1492,6 +1576,8 @@ def PlotLiquidPropsCorrelationForGroups(nametotptofinalprops,groupednames,nameto
             grptoproptoaxes[grp][propname].set_title(newtitle)
             imagename=title+'.png'
             grptoproptofig[grp][propname].savefig(imagename)
+            rms = sqrt(mean_squared_error(calcarray,refarray))
+            print('RMSE for '+str(grp)+' '+propname+' '+str(rms))
 
 
 
@@ -1540,7 +1626,7 @@ def PlotLiquidPropsVsTempForGroups(nametotemparray,nametoproptokeytoarray,groupe
                         calcerrarray=innerdic['CalcErr']   
                         grptoproptoaxes[grp][propname].scatter(temparray,calcarray, s=10, c=c, marker="o", label='AMOEBA'+string)
                         grptoproptoaxes[grp][propname].errorbar(temparray, calcarray, yerr=calcerrarray,c=c, fmt="o")
-                        grptoproptoaxes[grp][propname].scatter(temparray,refarray, s=10, c=c, marker="s", label='Target'+string)              
+                        grptoproptoaxes[grp][propname].scatter(temparray,refarray, s=10, c=c, marker="s", label='Exp'+string)              
                         grptoproptoaxes[grp][propname].set_ylabel(ykey,fontsize=12)
                         grptoproptoaxes[grp][propname].set_xlabel(xkey,fontsize=12)
                         newtitle=totalname+' '+propname+ ' Vs T'
@@ -1634,7 +1720,6 @@ def WriteOutParamAndAvgErrorTable(nametopropavgerrors,nametodimerqmerror,nametoa
 
 
 def PlotForceBalanceResults(fbdir):
-
     curdir=os.getcwd()
     jobdirs=GrabJobDirectories(fbdir)
     outputfiles=GrabOutputFiles(jobdirs)
@@ -1650,8 +1735,8 @@ def PlotForceBalanceResults(fbdir):
     nametopropavgerrors=WriteOutPropTable(nametotptofinalprops,moltomaxiter)
     PlotAllRDFs(moltotptoarc,neatliqnametoindices)
     prmfiles=GrabFinalParameters(jobdirs)
-    moltotypetoprms,moltotypetoelement=GrabParameterValues(prmfiles)
-    nametoallprmlines=WriteOutParamTable(moltotypetoprms,moltotypetoelement)
+    moltotypetoprms,moltotypetoelement,moltotypetofitrad,moltotypetofitdep,moltotypetofitred=GrabParameterValues(prmfiles)
+    nametoallprmlines=WriteOutParamTable(moltotypetoprms,moltotypetoelement,moltotypetofitrad,moltotypetofitdep,moltotypetofitred)
     WriteOutQMTable(nametoformulatormse,nametoformulatomse)
     poltypedirs,groupedpoltypedirs=GrabPoltypeDirectories(jobdirs)
     nametocubefiles,groupednames=GrabCubeFiles(groupedpoltypedirs)

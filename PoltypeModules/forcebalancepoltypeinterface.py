@@ -556,16 +556,18 @@ def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogethe
                         if 4 in prmtypestofit:
                             linesplit.append('4')
                         else:
-                            linesplit[4]='1 #'
+                            linesplit[4]='1 # '
                 else:
-                    linesplit[4]='1 #'
+                    if linelen==5 and last!=1:
+                        linesplit[4]='1 # '
             
             if linelen==5 and last!=1:
                 vdwtypetored[vdwtype]=True
             else:
                 vdwtypetored[vdwtype]=False
             if 4 not in prmtypestofit:
-                linesplit[4]='1 #'
+                if linelen==5 and last!=1:
+                    linesplit[4]='1 # '
                 vdwtypetored[vdwtype]=False
             newline=' '.join(linesplit)+'\n'
             vdwtypetoline[vdwtype]=newline   
@@ -578,7 +580,7 @@ def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogethe
                 red=vdwtypetored[int(vdwtype)]
                 line=line.replace('\n','')
                 if len(transferprmstofit)!=0:
-                    line+="PRM"
+                    line+=" PRM"
                     for idx in transferprmstofit:
                         line+=' '+str(idx) 
    
@@ -608,12 +610,15 @@ def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogethe
             temp.write(line+'\n')
     temp.write('\n')
     for line in prmfilelines:
-        temp.write(line) 
+        temp.write(line)
+
     temp.close()
     temp.close()
     for vdwtypes in vdwtypeslist:
         CommentOutVdwLines(molprmfilepath,vdwtypes)
         time.sleep(1)
+    time.sleep(2)
+
     os.chdir('..')
     return molprmfilepath
     
@@ -686,6 +691,10 @@ def GenerateLiquidTargetsFolder(gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,
         temp.close() 
         string='parameters '+moleculeprmfilename+'\n'
         AddKeyWord(os.path.join(os.getcwd(),'gas.key'),string)
+        string='digits 8'+'\n'
+        AddKeyWord(os.path.join(os.getcwd(),'gas.key'),string)
+
+
         CommentOutVdwLines(os.path.join(os.getcwd(),'gas.key'),vdwtypes)
         shutil.copy(gasxyzfile,os.path.join(os.getcwd(),'gas.xyz'))
         if liquidkeyfile!=None: 
@@ -796,13 +805,19 @@ def InsertKeyfileHeader(keyfilename,moleculeprmfilename,axis):
     AddKeyWord(keyfilename,string)
     string='vdw-correction'+'\n'
     AddKeyWord(keyfilename,string)
+    string='digits 8'+'\n'
+    AddKeyWord(keyfilename,string)
 
 
 def AddKeyWord(keypath,string):
     read=open(keypath,'r')
     results=read.readlines()
     read.close()
-    tempkeyname=keypath.replace('.key','-t.key')
+    if '.key' in keypath:
+        tempkeyname=keypath.replace('.key','-t.key')
+    else:
+        tempkeyname=keypath.replace('.prm','-t.prm')
+
     temp=open(tempkeyname,'w')
     temp.write(string)
     for line in results:
@@ -849,16 +864,33 @@ def GenerateNewKeyFile(keyfile,prmfilepath,moleculeprmfilename,axis,addwaterprms
     return liquidkeyfile
 
 
-def Minimize(liquidxyzfile,keyfile,minimizepath,prmfilepath):
+def Minimize(liquidxyzfile,keyfile,minimizepath,prmfilepath,check=False):
     head,tail=os.path.split(prmfilepath)
     newprmfilepath=os.path.join(os.getcwd(),tail)
     shutil.copy(prmfilepath,newprmfilepath)
-    minimizecmd=minimizepath+' '+liquidxyzfile+' '+'-k'+' '+keyfile+' '+'10'+ ' > '+liquidxyzfile.replace('.xyz','min.out')
+    outputfile=liquidxyzfile.replace('.xyz','min.out')
+    minimizecmd=minimizepath+' '+liquidxyzfile+' '+'-k'+' '+keyfile+' '+'1'+ ' > '+outputfile
     call_subsystem(minimizecmd,wait=True)
     minxyz=liquidxyzfile.replace('.xyz','.xyz_2')
     os.remove(liquidxyzfile)
-    os.replace(minxyz,liquidxyzfile) 
+    os.replace(minxyz,liquidxyzfile)
+    if check==True:
+        CheckMinimizeOutputFile(outputfile)
 
+
+def CheckMinimizeOutputFile(outputfile):
+    temp=open(outputfile,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        linesplit=line.split()
+        if len(linesplit)==8:
+            if 'D' in linesplit[1]:
+                found=True
+            else:
+                found=False
+    if found==True: # check end of minimize file for large number
+        raise ValueError('Large number detected in minimize output! '+line)
 
 
 
@@ -930,7 +962,7 @@ def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfile
             AddKeyWord(liquidkeyfile,'polarizeterm none'+'\n')
             Minimize(liquidxyzfile,liquidkeyfile,minimizepath,molprmfilepath)
             RemoveKeyWord(liquidkeyfile,'polarizeterm')
-            Minimize(liquidxyzfile,liquidkeyfile,minimizepath,molprmfilepath)
+            Minimize(liquidxyzfile,liquidkeyfile,minimizepath,molprmfilepath,check=True)
         else:
             liquidxyzfile=None
             liquidkeyfile=None
