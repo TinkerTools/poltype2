@@ -1858,7 +1858,6 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                 break
 
         check=CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,matcharray)
-        print('babelindices',babelindices,'check',check)
         if len(poltype.onlyrotbndslist)!=0:
             if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
                 check=False 
