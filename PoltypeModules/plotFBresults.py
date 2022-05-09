@@ -1099,7 +1099,7 @@ def WriteOutParamTable(moltotypetoprms,moltotypetoelement,moltotypetofitrad,molt
     nametoallprmlines={}
     with open(tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        header=['Name','Element','Radius','Depth','Reduction','Fit Radius','Fit Depth','Fit Reduction']
+        header=['Name','Type','Element','Radius','Depth','Reduction','Fit Radius','Fit Depth','Fit Reduction']
         energy_writer.writerow(header)
         for mol,typetoprms in moltotypetoprms.items():
             typetoelement=moltotypetoelement[mol]
@@ -1116,6 +1116,7 @@ def WriteOutParamTable(moltotypetoprms,moltotypetoelement,moltotypetofitrad,molt
                 fitdep=typetofitdep[typenum]
                 fitred=typetofitred[typenum]
                 array.append(mol)
+                array.append(typenum)
                 array.append(element)
                 array.append(radius)
                 array.append(depth)
@@ -1192,7 +1193,7 @@ def PlotLiquidPropsCorrelation(nametotptofinalprops):
 
             proptoaxes[propname].set_title(newtitle)
             proptofigs[propname].savefig(imagename)
-            rms = sqrt(mean_squared_error(calcarray,refarray))
+            rms = round(sqrt(mean_squared_error(calcarray,refarray)),3)
             print('RMSE for '+str(name)+' '+propname+' '+str(rms))
 
         
@@ -1329,10 +1330,10 @@ def WriteOutPropTable(nametotptofinalprops,moltomaxiter):
             nametopropavgerrors[name]['EnthalpyErr']=nameaveenthalpyerr
             nametopropavgerrors[name]['EnthalpyRelErr']=nameaveenthalpyrelerr
 
-    avedensityerr=np.mean(np.array(densityerrors))
-    avedensityrelerr=np.mean(np.array(densityrelerrors))
-    aveenthalpyerr=np.mean(np.array(enthalpyerrors))
-    aveenthalpyrelerr=np.mean(np.array(enthalpyrelerrors))
+    avedensityerr=round(np.mean(np.array(densityerrors)),3)
+    avedensityrelerr=round(np.mean(np.array(densityrelerrors)),3)
+    aveenthalpyerr=round(np.mean(np.array(enthalpyerrors)),3)
+    aveenthalpyrelerr=round(np.mean(np.array(enthalpyrelerrors)),3)
     print('Average Density Error ',avedensityerr)
     print('Average Relative Density Error ',avedensityrelerr)
     print('Average Enthalpy Error ',aveenthalpyerr)
@@ -1576,7 +1577,7 @@ def PlotLiquidPropsCorrelationForGroups(nametotptofinalprops,groupednames,nameto
             grptoproptoaxes[grp][propname].set_title(newtitle)
             imagename=title+'.png'
             grptoproptofig[grp][propname].savefig(imagename)
-            rms = sqrt(mean_squared_error(calcarray,refarray))
+            rms = round(sqrt(mean_squared_error(calcarray,refarray)),3)
             print('RMSE for '+str(grp)+' '+propname+' '+str(rms))
 
 
@@ -1669,9 +1670,9 @@ def ComputeQMAverages(nametoformulatormse):
         nametodimerqmerror[name]['homo']=namehomoaverage
         nametodimerqmerror[name]['hetero']=nameheteroaverage
         nametodimerqmerror[name]['all']=nameallaverage
-    homoaverage=np.mean(np.array(rmsehomodimers))
-    heteroaverage=np.mean(np.array(rmseheterodimers))
-    allaverage=np.mean(np.array(rmsealldimers))
+    homoaverage=round(np.mean(np.array(rmsehomodimers)),3)
+    heteroaverage=round(np.mean(np.array(rmseheterodimers)),3)
+    allaverage=round(np.mean(np.array(rmsealldimers)),3)
     print('Homodimer average RMSE ',homoaverage)
     print('Heterodimer average RMSE ',heteroaverage)
     print('Dimer average RMSE ',allaverage)

@@ -3,6 +3,9 @@ import sys
 import matplotlib
 import pylab as plt
 import numpy as np
+from scipy import stats, optimize, interpolate
+from math import sqrt
+from sklearn.metrics import mean_squared_error
 
 
 def PlotBARConvergence(poltype):
@@ -37,6 +40,44 @@ def PlotBARConvergence(poltype):
     fig.savefig(imagename)
 
 
+def GenerateFreeEnergyScatter(x,y,yerr,imagename):
+    plt.figure()
+    ax = plt.axes()
+    ax.scatter(x,y)
+    slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+    rsquare=round(r_value*r_value,2)
+    rms = sqrt(mean_squared_error(x, y))
+    ax.errorbar(x, y, yerr=yerr, fmt="o")
+    xarray = np.linspace(min(x), max(x), 1000)
+    ax.set_ylabel('AMOEBA Free Energy (kcal/mol)',fontsize=12)
+    ax.set_xlabel('Experimental Free Energy (kcal/mol)',fontsize=12)
+    plt.title('AMOEBA Free Energy vs Experimental Free Energy')
+    plt.show()    
+    plt.savefig(imagename)
+
+
+def PlotFreeEnergyVsExp(poltype):
+    solvGarray=[]
+    solvGerrarray=[]
+    solvGexparray=[]
+    grabbedenergydict=poltype.masterdict['energy']
+    for path in grabbedenergydict.keys():
+        pathdict=grabbedenergydict[path]
+        if u'ΔGˢᵒˡᵛ' in pathdict.keys():
+            solvGarray.append(pathdict[u'ΔGˢᵒˡᵛ'])
+        else:
+            solvGarray.append(0)
+        if u'ΔGˢᵒˡᵛᵉʳʳ' in pathdict.keys():
+            solvGerrarray.append(pathdict[u'ΔGˢᵒˡᵛᵉʳʳ'])
+        else:
+            solvGerrarray.append(0)
+        if u'ΔGᵉˣᵖ' in pathdict.keys():
+            solvGexparray.append(pathdict[u'ΔGᵉˣᵖ'])
+        else:
+            solvGexparray.append(0)
+        if len(solvGarray)!=0 and len(solvGarray)==len(solvGexparray):
+            imagename='AMOEBAFreeEnergyVsExpFreeEnergy.png'
+            GenerateFreeEnergyScatter(solvGexparray,solvGarray,solvGerrarray,imagename)
 
 
 def PlotEnergyData(poltype):

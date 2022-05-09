@@ -1858,6 +1858,10 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                 break
 
         check=CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,matcharray)
+        print('babelindices',babelindices,'check',check)
+        if len(poltype.onlyrotbndslist)!=0:
+            if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
+                check=False 
 
         if '~' in smarts or '*' in smarts:
             check=False
@@ -1873,6 +1877,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             ringtorindices=GrabIndicesInRing(poltype,babelindices,ring)
         if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False and ([bbidx,cbidx] not in poltype.onlyrotbndslist and [cbidx,bbidx] not in poltype.onlyrotbndslist):
             continue
+
         if check==False:
             if ringbond==True:
                 if (2 not in hybs): # non-aromatic torsion want parameters for 

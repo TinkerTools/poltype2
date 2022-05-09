@@ -323,7 +323,7 @@ def GrabSimDataFromPathList(poltype):
    
     tempname='GrabbedSimData.csv'
     CSVWriter(poltype,tempname)
-
+    plots.PlotFreeEnergyVsExp(poltype)
     return
 
 def EnterBindData(poltype,path):
