@@ -2373,11 +2373,14 @@ class PolarizableTyper():
 
         def KillJob(self,job,outputlog):
             p=self.cmdtopid[job]
-            pid=p.pid
-            p.terminate()
-            p.wait()
+            try:
+                p.wait(timeout=1)
+            except subprocess.TimeoutExpired:
+                process = psutil.Process(p.pid)
+                for proc in process.children(recursive=True):
+                    proc.kill()
+                process.kill()
 
-        
         def CallJobsSeriallyLocalHost(self,fulljobtooutputlog,skiperrors,wait=False):
            thepath=os.path.join(os.getcwd(),'Fragments')
            finishedjobs=[]
