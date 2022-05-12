@@ -405,11 +405,12 @@ class PolarizableTyper():
         helpfile:str='README.md'
         versionfile:str='version.md'
         sleeptime:float=.1
-        
+        structure:None=None
+        espextraconflist:list=field(default_factory=lambda : [])
         
         def __post_init__(self): 
         
-        
+            self.molstructfname=self.structure 
             self.simpath=os.getcwd()        
             self.simname=os.path.basename(self.simpath)
             self.estatlambdascheme=self.estatlambdascheme[::-1]
@@ -631,6 +632,9 @@ class PolarizableTyper():
                             self.bashrcpath=a
                         elif 'restrainatomgroup1' in newline:
                             self.restrainatomgroup1=[int(i) for i in commalist]
+                        elif 'espextraconflist' in newline:
+                            self.espextraconflist=a.split(',')
+                            self.espextraconflist=[i.strip() for i in self.espextraconflist]
                         elif 'perturbkeyfilelist' in newline:
                             self.perturbkeyfilelist=commalist
                         elif 'numinterpolsforperturbkeyfiles' in newline:
@@ -2968,7 +2972,34 @@ class PolarizableTyper():
                     vec=np.array([float(pos.x),float(pos.y),float(pos.z)])
                     indextocoordinates[i]=vec
                 indextocoordslist.append(indextocoordinates)
+            if len(self.espextraconflist)!=0:
+                curdir=os.getcwd()
+                os.chdir('..')
+                for filename in self.espextraconflist:
+                    shutil.copy(filename,os.path.join('Temp',filename))
+                os.chdir(curdir)
+                for filename in self.espextraconflist:
+                    indextocoordinates=self.ReadCoordinates(filename)
+                    indextocoordslist.append(indextocoordinates)
+
             return indextocoordslist
+
+
+        def ReadCoordinates(self,filename):
+            indextocoordinates={}
+            obConversion = openbabel.OBConversion()
+            mol = openbabel.OBMol()
+            inFormat = obConversion.FormatFromExt(self.molstructfname)
+            obConversion.SetInFormat(inFormat)
+            obConversion.ReadFile(mol, self.molstructfname)
+            iteratombab = openbabel.OBMolAtomIter(mol)
+            for atm in iteratombab:
+                atmindex=atm.GetIdx()
+                coords=[atm.GetX(),atm.GetY(),atm.GetZ()]
+                indextocoordinates[atmindex-1]=coords
+
+            return indextocoordinates
+
 
         def FindLongestDistanceInMolecule(self,mol):
             veclist=[]
@@ -3244,6 +3275,7 @@ class PolarizableTyper():
                 os.mkdir(self.scrtmpdirgau)
 
             mol=self.SetDefaultCoordinatesBabel(mol,indextocoordinates)
+            print('mol',mol)
             molist=self.GenerateListOfMols(mol,indextocoordslist)
             self.mol=mol
 
