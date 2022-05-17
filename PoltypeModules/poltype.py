@@ -1321,6 +1321,12 @@ class PolarizableTyper():
                 if self.isfragjob==True:
                     self.jobsatsametime=1
 
+            head, self.molstructfname = os.path.split(self.molstructfname)
+            self.molecprefix =  os.path.splitext(self.molstructfname)[0]
+            self.SanitizeAllQMMethods()
+            self.SanitizeMMExecutables()
+            self.copyright()
+            self.initialize()
             
             if self.maxdisk==None and self.molstructfname!=None:
                 stat= os.statvfs(self.scratchpath) 
@@ -1356,9 +1362,7 @@ class PolarizableTyper():
                 self.torspbasisset = 'MINIX'
 
             self.cmdtopid={} # for killing pids that have jobs stalled too long
-            self.SanitizeAllQMMethods()
-            self.SanitizeMMExecutables()
-            self.copyright()
+            
             if self.poltypepathlist!=None:
                 fb.GenerateForceBalanceInputs(self.poltypepathlist,self.vdwtypeslist,self.liquid_equ_steps,self.liquid_prod_steps,self.liquid_timestep,self.liquid_interval,self.gas_equ_steps,self.gas_prod_steps,self.gas_timestep,self.gas_interval,self.md_threads,self.liquid_prod_time,self.gas_prod_time,self.WQ_PORT,self.csvexpdatafile,self.fittypestogether,self.vdwprmtypestofit,self.vdwtypestoeval,self.liquid_equ_time,self.gas_equ_time)
                 sys.exit()
@@ -1372,9 +1376,7 @@ class PolarizableTyper():
                 self.MolecularDynamics()
                 sys.exit()
 
-            head, self.molstructfname = os.path.split(self.molstructfname)
-            self.molecprefix =  os.path.splitext(self.molstructfname)[0]
-            self.initialize()
+            
             if self.isfragjob==False:
                 self.parentname=self.molecprefix
             else:

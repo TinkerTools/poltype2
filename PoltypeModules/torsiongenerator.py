@@ -1442,9 +1442,14 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
         xyzstrl = xyzstr.readlines()
         i = 0
         for atm in iteratom:
+            idx=atm.GetIdx()
+            rdkitidx=idx-1
+            rdkitatom=poltype.rdkitmol.GetAtomWithIdx(rdkitidx)
+            atomicnum=rdkitatom.GetAtomicNum()
+
             i = i + 1
             ln = xyzstrl[i]
-            temp.write('%2s %11.6f %11.6f %11.6f\n' % (an.getElSymbol(atm.GetAtomicNum()), float(ln.split()[2]),float(ln.split()[3]),float(ln.split()[4])))
+            temp.write('%2s %11.6f %11.6f %11.6f\n' % (an.getElSymbol(atomicnum), float(ln.split()[2]),float(ln.split()[3]),float(ln.split()[4])))
         xyzstr.close()
     temp.write('}'+'\n')
 
@@ -1703,9 +1708,13 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
             xyzstrl = xyzstr.readlines()
             i = 0
             for atm in iteratom:
+                idx=atm.GetIdx()
+                rdkitidx=idx-1
+                rdkitatom=poltype.rdkitmol.GetAtomWithIdx(rdkitidx)
+                atomicnum=rdkitatom.GetAtomicNum()
                 i = i + 1
                 ln = xyzstrl[i]
-                tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (an.getElSymbol(atm.GetAtomicNum()), float(ln.split()[2]),float(ln.split()[3]),float(ln.split()[4])))
+                tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (an.getElSymbol(atomicnumnum), float(ln.split()[2]),float(ln.split()[3]),float(ln.split()[4])))
             tmpfh.write('\n')
             xyzstr.close()
     else:
@@ -1782,8 +1791,13 @@ def save_structfile(poltype,molstruct, structfname):
         iteratom = openbabel.OBMolAtomIter(molstruct)
         an = pyasl.AtomicNo()
         tmpfh.write('%6d   %s\n' % (molstruct.NumAtoms(), molstruct.GetTitle()))
+
         for ia in iteratom:
-            tmpfh.write( '%6d %2s %13.6f %11.6f %11.6f %5d' % (ia.GetIdx(), an.getElSymbol(ia.GetAtomicNum()), ia.x(), ia.y(), ia.z(), poltype.idxtosymclass[ia.GetIdx()]))
+            idx=ia.GetIdx()
+            rdkitidx=idx-1
+            rdkitatom=poltype.rdkitmol.GetAtomWithIdx(rdkitidx)
+            atomicnum=rdkitatom.GetAtomicNum()
+            tmpfh.write( '%6d %2s %13.6f %11.6f %11.6f %5d' % (ia.GetIdx(), an.getElSymbol(atomicnum), ia.x(), ia.y(), ia.z(), poltype.idxtosymclass[ia.GetIdx()]))
             iteratomatom = openbabel.OBAtomAtomIter(ia)
             neighbors = []
             for iaa in iteratomatom:
@@ -1880,7 +1894,11 @@ def CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,m
     iteratom = openbabel.OBMolAtomIter(finalstruct)
     an = pyasl.AtomicNo()
     for atm in iteratom:
-        temp.write('%2s %11.6f %11.6f %11.6f\n' % (an.getElSymbol(atm.GetAtomicNum()),atm.GetX(),atm.GetY(),atm.GetZ()))
+        idx=atm.GetIdx()
+        rdkitidx=idx-1
+        rdkitatom=poltype.rdkitmol.GetAtomWithIdx(rdkitidx)
+        atomicnum=rdkitatom.GetAtomicNum()
+        temp.write('%2s %11.6f %11.6f %11.6f\n' % (an.getElSymbol(atomicnum),atm.GetX(),atm.GetY(),atm.GetZ()))
     temp.write('}'+'\n')
     if poltype.torsppcm==True:
         temp.write('set {'+'\n')
