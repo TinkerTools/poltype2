@@ -75,6 +75,7 @@ from rdkit.Chem import rdFMCS
 import parametercomparison
 from PyAstronomy import pyasl
 from dataclasses import dataclass,field
+from pathlib import Path
 
 @dataclass
 class PolarizableTyper():
@@ -242,7 +243,6 @@ class PolarizableTyper():
         addhydrogens:bool=False
         maximizejobsatsametime:bool=True
         consumptionratio:float=.8
-        scratchpath:str='/scratch'
         nonaroringtor1Dscan:bool=False
         skipespfiterror:bool=False
         vdwmaxqmstartingpointspertype:int=1
@@ -501,11 +501,6 @@ class PolarizableTyper():
                             else:
                                 self.extractinterforbinding=self.GrabBoolValue(a)
 
-                        elif "submitlocally" in newline:
-                            if '=' not in line:
-                                self.submitlocally = True
-                            else:
-                                self.submitlocally=self.GrabBoolValue(a)
 
                         elif "neatliquidsim" in newline:
                             if '=' not in line:
@@ -895,8 +890,6 @@ class PolarizableTyper():
                         elif "gas_equ_time" in newline:
                             self.gas_equ_time=float(a)
 
-                        elif "scratchpath" in newline:
-                            self.scratchpath=a
                         elif "jobsatsametime" in newline and 'max' not in newline and 'parentjobsatsametime' not in newline:
                             self.jobsatsametime=int(a)
                         elif "esprestweight" in newline:
@@ -1320,14 +1313,15 @@ class PolarizableTyper():
             else:
                 if self.isfragjob==True:
                     self.jobsatsametime=1
-
-            head, self.molstructfname = os.path.split(self.molstructfname)
-            self.molecprefix =  os.path.splitext(self.molstructfname)[0]
+            if self.molstructfname!=None:
+                head, self.molstructfname = os.path.split(self.molstructfname)
+                self.molecprefix =  os.path.splitext(self.molstructfname)[0]
             self.SanitizeAllQMMethods()
             self.SanitizeMMExecutables()
             self.copyright()
             self.initialize()
-            
+            p = Path(self.scratchdir)
+            self.scratchpath=p.parts[0] 
             if self.maxdisk==None and self.molstructfname!=None:
                 stat= os.statvfs(self.scratchpath) 
                 gb=stat.f_bfree*stat.f_bsize*10**-9

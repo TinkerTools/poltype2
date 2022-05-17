@@ -600,6 +600,7 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 
 
 ### Molecular Dynamics Input Preparation
+* Make a seperate folder from where parameterization files from poltype were made (with new poltype.ini file too)
 * Ligand XYZ and key files are required (such as final.xyz and final.key from Poltype parameterization). 
 * For binding free energy compuations, either a host PDB or premade tinker XYZ is required 
 * Inputs are inside poltype.ini

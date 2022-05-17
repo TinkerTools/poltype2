@@ -80,7 +80,6 @@
 
 ``maxdisk`` specifies maximum scratch space allowed. Default will be 80% of total available on node.
 
-``scratchpath`` specifies path to scratch directory. Default is /scratch.
 
 ``consumptionratio`` specfies ratio of resources to use on node if not specified by user. Default is .8.
 
