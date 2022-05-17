@@ -1320,8 +1320,9 @@ class PolarizableTyper():
             self.SanitizeMMExecutables()
             self.copyright()
             self.initialize()
+            self.init_filenames()
             p = Path(self.scratchdir)
-            self.scratchpath=p.parts[0] 
+            self.scratchpath=p.parent.absolute()
             if self.maxdisk==None and self.molstructfname!=None:
                 stat= os.statvfs(self.scratchpath) 
                 gb=stat.f_bfree*stat.f_bsize*10**-9
@@ -1376,7 +1377,6 @@ class PolarizableTyper():
             else:
                 self.parentname=str(self.parentname)
             
-            self.init_filenames()
  
             # Use openbabel to create a 'mol' object from the input molecular structure file. 
             # Openbabel does not play well with certain molecular structure input files,
@@ -3276,7 +3276,6 @@ class PolarizableTyper():
                 os.mkdir(self.scrtmpdirgau)
 
             mol=self.SetDefaultCoordinatesBabel(mol,indextocoordinates)
-            print('mol',mol)
             molist=self.GenerateListOfMols(mol,indextocoordslist)
             self.mol=mol
 
