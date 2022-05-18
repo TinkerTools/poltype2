@@ -618,8 +618,8 @@ def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogethe
         CommentOutVdwLines(molprmfilepath,vdwtypes)
         time.sleep(1)
     time.sleep(2)
-
     os.chdir('..')
+    shutil.copy(molprmfilepath,os.path.join(os.getcwd(),moleculeprmfilename))
     return molprmfilepath
     
 def RemoveKeyWord(keypath,keystring):
@@ -732,14 +732,17 @@ def FindDimensionsOfMoleculeTinker(structurefilepath):
     mindist=np.amax(np.array(distlist))
     return mindist
 
-def ComputeBoxLength(xyzfile):
+def ComputeBoxLength(xyzfile,addextra=False):
     vdwcutoff=12 #in angstrom
     longestdim=FindDimensionsOfMoleculeTinker(xyzfile)
     aaxis = 2*float(vdwcutoff)+longestdim+4
-    return aaxis
+    finalaxis=aaxis
+    if addextra==True:
+        finalaxis=aaxis+.1*aaxis # add 50%, since some molecules very repulsive such as benzene and need to run NPT dynamics to get correct box size and adequate starting structure for MD
+    return aaxis,finalaxis
 
-def CreateSolventBox(axis,molnumber,prmfilepath,xyzeditpath,tinkerxyzname,molname,keyfilels,molprmfilepath):
-    
+
+def CreateSolventBox(axis,molnumber,prmfilepath,xyzeditpath,tinkerxyzname,molname,keyfilels,molprmfilepath,liquidkeyfile):
     head,tail=os.path.split(tinkerxyzname)
     key=tail.replace('.xyz','.key')
     temp=open(key,'w')
@@ -751,15 +754,12 @@ def CreateSolventBox(axis,molnumber,prmfilepath,xyzeditpath,tinkerxyzname,molnam
     time.sleep(1)
     print('Creating Solvent Box For '+tinkerxyzname,flush=True)
     temp=open('xyzedit.in','w')
-    temp.write(tail+'\n')
-    temp.write(prmfilepath+'\n')
     temp.write('21'+'\n')
     temp.write(str(molnumber)+'\n')
     temp.write(str(axis)+','+str(axis)+','+str(axis)+'\n')
-    temp.write('N'+'\n')
-    temp.write(prmfilepath+'\n')
+    temp.write('Y'+'\n')
     temp.close()
-    cmdstr=xyzeditpath+' '+'<'+' '+'xyzedit.in'
+    cmdstr=xyzeditpath+' '+tail+' '+'-k'+' '+liquidkeyfile+' <'+' '+'xyzedit.in'
     call_subsystem(cmdstr,wait=True)
     os.replace(tail+'_2',molname+'_liquid.xyz') 
     liquidxyzfile=os.path.join(os.getcwd(),molname+'_liquid.xyz')
@@ -786,6 +786,8 @@ def InsertKeyfileHeader(keyfilename,moleculeprmfilename,axis):
     string='a-axis'+' '+str(axis)+'\n'
     AddKeyWord(keyfilename,string)
     string='archive'+'\n'
+    AddKeyWord(keyfilename,string)
+    string='neighbor-list'+'\n'
     AddKeyWord(keyfilename,string)
     string='integrator '+integrator+'\n'
     AddKeyWord(keyfilename,string)
@@ -864,7 +866,7 @@ def GenerateNewKeyFile(keyfile,prmfilepath,moleculeprmfilename,axis,addwaterprms
     return liquidkeyfile
 
 
-def Minimize(liquidxyzfile,keyfile,minimizepath,prmfilepath,check=False):
+def Minimize(liquidxyzfile,keyfile,minimizepath,prmfilepath):
     head,tail=os.path.split(prmfilepath)
     newprmfilepath=os.path.join(os.getcwd(),tail)
     shutil.copy(prmfilepath,newprmfilepath)
@@ -874,24 +876,31 @@ def Minimize(liquidxyzfile,keyfile,minimizepath,prmfilepath,check=False):
     minxyz=liquidxyzfile.replace('.xyz','.xyz_2')
     os.remove(liquidxyzfile)
     os.replace(minxyz,liquidxyzfile)
-    if check==True:
-        CheckMinimizeOutputFile(outputfile)
 
 
-def CheckMinimizeOutputFile(outputfile):
+def Analyze(liquidxyzfile,keyfile,analyzepath,prmfilepath):
+    head,tail=os.path.split(prmfilepath)
+    newprmfilepath=os.path.join(os.getcwd(),tail)
+    shutil.copy(prmfilepath,newprmfilepath)
+    outputfile=liquidxyzfile.replace('.xyz','alz.out')
+    analyzecmd=analyzepath+' '+liquidxyzfile+' '+'-k'+' '+keyfile+' '+'e'+ ' > '+outputfile
+    call_subsystem(analyzecmd,wait=True)
+    CheckBondEnergy(outputfile)
+
+
+def CheckBondEnergy(outputfile):
     temp=open(outputfile,'r')
     results=temp.readlines()
     temp.close()
+    tol=1
     for line in results:
-        linesplit=line.split()
-        if len(linesplit)==8:
-            if 'D' in linesplit[1]:
-                found=True
-            else:
-                found=False
-    if found==True: # check end of minimize file for large number
-        raise ValueError('Large number detected in minimize output! '+line)
-
+        if 'Bond Stretching' in line:
+            linesplit=line.split()
+            intnum=int(linesplit[-1])
+            energy=float(linesplit[-2])
+            energyperbond=energy/intnum
+            if energyperbond>tol:
+                raise ValueError('Bad starting box structure, bond energy per bond is way to high '+str(energyperbond)+' kcal/mol')
 
 
 def RemoveBoxLine(xyzfile):
@@ -935,7 +944,17 @@ def RemoveKeyWord(keypath,keystring):
     os.rename(tempname,keypath)
 
 
-def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist,indextogeneratecsv,keyfilelines,minimizepath,molprmfilepath,finalxyzfilelist):
+def DynamicCommand(dynamicpath,steps,ensemble,temp,outputfilename,boxfilename,configkeyfilename,timestep,writefreq,pressure=None):
+    if pressure==None:
+        cmdstr=dynamicpath+' '+boxfilename+' '+ '-k'+' '+configkeyfilename+' '+str(steps)+' '+ str(timestep)+' '+ str(writefreq)+' '+str(ensemble)+' '+str(temp)+' '+ ' > '+outputfilename  
+    else:
+        cmdstr=dynamicpath+' '+boxfilename+' '+ '-k'+' '+configkeyfilename+' '+str(steps)+' '+ str(timestep)+' '+ str(writefreq)+' '+str(ensemble)+' '+str(temp)+' '+str(pressure)+' '+ ' > '+outputfilename  
+    call_subsystem(cmdstr,wait=True)
+
+
+
+
+def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist,indextogeneratecsv,keyfilelines,minimizepath,molprmfilepath,finalxyzfilelist,analyzepath,dynamicpath):
     gaskeyfilelist=[]
     gasxyzfilelist=[]
     liquidkeyfilelist=[]
@@ -954,15 +973,50 @@ def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfile
         if gencsv==True:
             density=float(densitylist[i])
             mass=Descriptors.ExactMolWt(rdkitmol)*1.66054*10**(-27) # convert daltons to Kg
-            axis=ComputeBoxLength(gasxyzfile)
-            boxlength=axis*10**-10 # convert angstroms to m
-            numbermolecules=int(density*boxlength**3/mass)
-            liquidkeyfile=GenerateNewKeyFile(keyfile,prmfilepath,moleculeprmfilename,axis,addwaterprms,molname)
-            liquidxyzfile=CreateSolventBox(axis,numbermolecules,prmfilepath,xyzeditpath,gasxyzfile,molname,keyfilels,molprmfilepath)
-            AddKeyWord(liquidkeyfile,'polarizeterm none'+'\n')
-            Minimize(liquidxyzfile,liquidkeyfile,minimizepath,molprmfilepath)
-            RemoveKeyWord(liquidkeyfile,'polarizeterm')
-            Minimize(liquidxyzfile,liquidkeyfile,minimizepath,molprmfilepath,check=True)
+            dynamicrelax=True
+            if dynamicrelax==True:
+                axis,finalaxis=ComputeBoxLength(gasxyzfile,addextra=True)
+                boxlength=axis*10**-10 # convert angstroms to m
+                numbermolecules=int(density*boxlength**3/mass)
+                liquidkeyfile=GenerateNewKeyFile(keyfile,prmfilepath,moleculeprmfilename,finalaxis,addwaterprms,molname)
+
+                liquidxyzfile=CreateSolventBox(finalaxis,numbermolecules,prmfilepath,xyzeditpath,gasxyzfile,molname,keyfilels,molprmfilepath,liquidkeyfile)
+                AddKeyWord(liquidkeyfile,'polarizeterm none'+'\n')
+                AddKeyWord(liquidkeyfile,'multipoleterm none'+'\n')
+                Minimize(liquidxyzfile,liquidkeyfile,minimizepath,molprmfilepath)
+                RemoveKeyWord(liquidkeyfile,'multipoleterm')
+                Minimize(liquidxyzfile,liquidkeyfile,minimizepath,molprmfilepath)
+                RemoveKeyWord(liquidkeyfile,'polarizeterm')
+                Minimize(liquidxyzfile,liquidkeyfile,minimizepath,molprmfilepath)
+                # now need to run dynamics to get correct box size
+                AddKeyWord(liquidkeyfile,'polarizeterm none'+'\n')
+                RemoveKeyWord(liquidkeyfile,'barostat')
+                barostatmethod='berendsen'
+                string='barostat'+' '+barostatmethod+'\n'
+                AddKeyWord(liquidkeyfile,string)
+                steps=250000
+                ensemble=4
+                temp=300
+                outputfilename='boxrelax.out'
+                timestep=2
+                writefreq=10 
+                pressure=1
+                DynamicCommand(dynamicpath,steps,ensemble,temp,outputfilename,liquidxyzfile,liquidkeyfile,timestep,writefreq,pressure)
+
+                
+                RemoveKeyWord(liquidkeyfile,'polarizeterm')
+                RemoveKeyWord(liquidkeyfile,'barostat')
+                barostatmethod='montecarlo'
+                string='barostat'+' '+barostatmethod+'\n'
+                AddKeyWord(liquidkeyfile,string)
+                steps=100000
+                outputfilename='finalboxrelax.out'
+                pressure=1
+                DynamicCommand(dynamicpath,steps,ensemble,temp,outputfilename,liquidxyzfile,liquidkeyfile,timestep,writefreq,pressure)
+                arcfilename=liquidxyzfile.replace('.xyz','.arc')
+                framenum=int(os.path.getsize(arcfilename)/os.path.getsize(liquidxyzfile))
+                ExtractTinkerFrames(arcfilename,framenum,framenum,1,framenum,liquidxyzfile)
+            Analyze(liquidxyzfile,liquidkeyfile,analyzepath,molprmfilepath)
         else:
             liquidxyzfile=None
             liquidkeyfile=None
@@ -981,6 +1035,53 @@ def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfile
    
 
     return gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,liquidxyzfilelist,datacsvpathlist
+
+
+def ExtractTinkerFrames(arcpath,firstframe,lastframe,framestep,totalnumberframes,newname):
+    firstline=True
+    framecount=0
+    framestoextract=np.arange(firstframe,lastframe+1,framestep)
+    framearray=[]
+    extractingframe=False
+    with open(arcpath) as infile:
+        for line in infile:
+            if firstline==True:
+                firstlinesplit=line.split()
+                framestring=firstlinesplit[0].lstrip().rstrip()
+                firstline=False
+           
+            linesplit=line.split()
+            if framestring in line and (len(linesplit)==1):
+                extractingframe=False
+                framecount+=1
+                if len(framearray)!=0:
+                    numberofzeroes=len(str(totalnumberframes))-len(str(framecount))
+                    zerostring=''
+                    for i in range(numberofzeroes):
+                        zerostring+='0'
+                    framename=arcpath.replace('.arc','.'+zerostring+str(framecount))
+                    temp=open(framename,'w')
+                    for saveline in framearray:
+                        temp.write(saveline)
+                    temp.close()
+                    framearray=[]
+                if framecount in framestoextract:
+                    extractingframe=True
+            if(extractingframe):
+                framearray.append(line)
+            if len(framearray)!=0: # for last frame
+                numberofzeroes=len(str(totalnumberframes))-len(str(framecount))
+                zerostring=''
+                for i in range(numberofzeroes):
+                    zerostring+='0'
+                framename=arcpath.replace('.arc','.'+zerostring+str(framecount))
+                temp=open(framename,'w')
+                for saveline in framearray:
+                    temp.write(saveline)
+                temp.close()
+    if os.path.exists(framename):
+        os.rename(framename,newname)
+    return
 
 def GenerateQMTargetsFolder(dimertinkerxyzfileslist,dimerenergieslist,liquidkeyfilelist,originalqmfolder,vdwtypeslist,molnamelist):
     qmfolderlist=[]
@@ -1465,7 +1566,7 @@ def RemoveExtraFiles():
             if '.' in f and 'nohup' not in f:
                 fsplit=f.split('.')
                 ext=fsplit[-1]
-                if ext=='key' or 'xyz' in ext or f=='xyzedit.in' or ('data' in f and 'csv' in f) or ext=='out' or ext=='prm':
+                if ext=='key' or 'xyz' in ext or f=='xyzedit.in' or ('data' in f and 'csv' in f) or ext=='out' or ext=='prm' or ext=='arc' or ext=='dyn':
                     os.remove(f)
 
 
@@ -1634,7 +1735,13 @@ def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liq
         prmfilelines=ReadPRMFile(prmfilepath)
         optimizefilepath=os.path.join(os.path.split(__file__)[0],'optimize.in')
         xyzeditpath='xyzedit'
-        minimizepath='minimize'
+        analyzepath='analyze'
+        if 'GPUDYNAMICS' in os.environ.keys(): # lazy gpu detection
+            dynamicpath='dynamic_gpu'
+            minimizepath='minimize_gpu'
+        else:
+            dynamicpath='dynamic'
+            minimizepath='minimize'
         tinkerdir=None
         xyzeditpath=SanitizeMMExecutable(xyzeditpath,tinkerdir)
         moleculeprmfilename='molecule.prm'
@@ -1642,7 +1749,7 @@ def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liq
         molprmfilepath=GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogether,keyfilelines,addwaterprms,prmfilelines,vdwprmtypestofit,vdwtypestoeval,vdwtypeslist)
         rdkitmollist=GenerateRdkitMolList(molfilelist)
         atomnumlist=[rdkitmol.GetNumAtoms() for rdkitmol in rdkitmollist]
-        gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,liquidxyzfilelist,datacsvpathlist=GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist,indextogeneratecsv,keyfilelines,minimizepath,molprmfilepath,newfinalxyzfilelist)
+        gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,liquidxyzfilelist,datacsvpathlist=GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist,indextogeneratecsv,keyfilelines,minimizepath,molprmfilepath,newfinalxyzfilelist,analyzepath,dynamicpath)
         liquidfolder='Liquid'
         qmfolder='QM'
         

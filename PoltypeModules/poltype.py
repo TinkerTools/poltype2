@@ -185,6 +185,7 @@ class PolarizableTyper():
         analyzeommpath:str='analyze_gpu'
         barommpath:str='bar_gpu'
         dynamicommpath:str='dynamic_gpu'
+        minimizeommpath:str='minimize_gpu'
         complexation:bool=False
         solvation:bool=False
         flatbotrest:bool=True
@@ -1429,10 +1430,12 @@ class PolarizableTyper():
                 self.truedynamicpath=self.dynamicommpath
                 self.truebarpath=self.barommpath
                 self.trueanalyzepath=self.analyzeommpath
+                self.trueminimizepath=self.minimizeommpath
             else:
                 self.truedynamicpath=self.dynamicpath
                 self.truebarpath=self.barpath
                 self.trueanalyzepath=self.analyzepath
+                self.trueminimizepath=self.minimizepath
             self.CleanUpFiles()
             self.CheckTinkerVersion()
             if self.perturbedkeyfilename!=None:
@@ -2263,8 +2266,8 @@ class PolarizableTyper():
                     if not os.path.isdir(self.scratchdir):
                         os.mkdir(self.scratchdir)
         
-            
-            self.FileNames()
+            if self.molstructfname!=None: 
+                self.FileNames()
 
         def FileNames(self):
             self.logfname = self.assign_filenames ( "logfname" , "-poltype.log")

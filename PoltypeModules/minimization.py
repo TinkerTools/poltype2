@@ -16,7 +16,7 @@ def ExecuteLooseMinimization(poltype,boxfilename,keyfilename,outputname,jobtolog
     jobtojobpath[cmd]=poltype.outputpath
     jobtoinputfilepaths[cmd]=[poltype.outputpath+boxfilename,poltype.outputpath+keyfilename,poltype.outputpath+poltype.prmfilepath]
     jobtooutputfiles[cmd]=[outputname,boxfilename+'_2']
-    absbinpath=poltype.which(poltype.minimizepath)
+    absbinpath=poltype.which(poltype.trueminimizepath)
     jobtoabsolutebinpath[cmd]=absbinpath
     return jobtolog,jobtojobpath,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath
 
@@ -26,12 +26,12 @@ def ExecuteTightMinimization(poltype,boxfilename,key,output,jobtolog,jobtojobpat
     jobtojobpath[cmd]=poltype.outputpath
     jobtoinputfilepaths[cmd]=[poltype.outputpath+boxfilename+'_2',poltype.outputpath+key,poltype.outputpath+poltype.prmfilepath]
     jobtooutputfiles[cmd]=[output,boxfilename+'_3']
-    absbinpath=poltype.which(poltype.minimizepath)
+    absbinpath=poltype.which(poltype.trueminimizepath)
     jobtoabsolutebinpath[cmd]=absbinpath
     return jobtolog,jobtojobpath,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath      
  
 def MinimizeCommand(poltype,xyzfilename,keyfilename,gradrms,outputfilename):
-    cmd=poltype.minimizepath+' '+xyzfilename+' -k '+keyfilename+' '+str(gradrms)+' '+'> '+outputfilename
+    cmd=poltype.trueminimizepath+' '+xyzfilename+' -k '+keyfilename+' '+str(gradrms)+' '+'> '+outputfilename
     return cmd
 
 def ExpensiveMinimizationProtocol(poltype):

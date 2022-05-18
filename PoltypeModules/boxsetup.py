@@ -271,10 +271,8 @@ def CreateWaterXYZ(poltype):
 
       
 
-def CreateSolventBox(poltype,aaxis,baxis,caxis,waternum,filename):
+def CreateSolventBox(poltype,aaxis,baxis,caxis,waternum,filename,key):
     temp=open(poltype.outputpath+'xyzedit.in','w')
-    temp.write(filename+'\n')
-    temp.write(poltype.prmfilepath+'\n')
     temp.write('21'+'\n')
     temp.write(str(waternum)+'\n')
     if baxis==None:
@@ -283,9 +281,8 @@ def CreateSolventBox(poltype,aaxis,baxis,caxis,waternum,filename):
         caxis=aaxis
     temp.write(str(aaxis)+','+str(baxis)+','+str(caxis)+'\n')
     temp.write('Y'+'\n')
-    temp.write(poltype.prmfilepath+'\n')
     temp.close()
-    cmdstr=poltype.xyzeditpath+' '+'<'+' '+'xyzedit.in'
+    cmdstr=poltype.xyzeditpath+' '+filename+' '+'-k'+' '+key+' <'+' '+'xyzedit.in'
     submit.call_subsystem(poltype,cmdstr,wait=True)    
     newfilename=filename+'_2'
     return newfilename
@@ -407,14 +404,14 @@ def BoxSetupProtocol(poltype):
         if not os.path.isfile(poltype.outputpath+boxxyzfilename):
             if poltype.usepreequilibriatedbox==False:
                 if poltype.neatliquidsim==False:
-                    newfilename=CreateSolventBox(poltype,aaxis,baxis,caxis,poltype.waternum[i],'water.xyz')
+                    newfilename=CreateSolventBox(poltype,aaxis,baxis,caxis,poltype.waternum[i],'water.xyz',key)
                 else:
                     mass=GrabTotalMass(xyzfilename)
                     mass=mass*1.66054*10**(-27) # convert daltons to Kg
                     ls=[aaxis,baxis,caxis]
                     ls=[axis*10**-10 for axis in ls]
                     numbermolecules=int(poltype.density*(ls[0]*ls[1]*ls[2])/mass)
-                    newfilename=CreateSolventBox(poltype,aaxis,baxis,caxis,numbermolecules,xyzfilename)
+                    newfilename=CreateSolventBox(poltype,aaxis,baxis,caxis,numbermolecules,xyzfilename,key)
                     os.rename(newfilename,boxxyzfilename)
 
             else:
@@ -454,11 +451,11 @@ def BoxSetupProtocol(poltype):
 
 
     if poltype.addsolvionwindows==True:
-        newfilename=CreateSolventBox(poltype,ionaxis,ionaxis,ionaxis,ionwaternum,'water.xyz')
         shutil.copy(poltype.configkeyfilename[0][0],poltype.ionkeyfilename)
         keymods.RemoveKeyWords(poltype,poltype.ionkeyfilename,['axis'])
         string='a-axis '+str(ionaxis)+'\n'
         keymods.AddKeyWord(poltype,poltype.ionkeyfilename,string)
+        newfilename=CreateSolventBox(poltype,ionaxis,ionaxis,ionaxis,ionwaternum,'water.xyz',poltype.ionkeyfilename)
         filename='water.xyz'
         AddIonsToSolventBox(poltype,filename,poltype.ionkeyfilename,poltype.ionboxfilename,2,poltype.solviontocount,poltype.iontypetoionnumberphysio[-1],False)
 
