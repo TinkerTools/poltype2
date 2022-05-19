@@ -3227,6 +3227,7 @@ class PolarizableTyper():
                 if not os.path.exists(foldername):
                     os.mkdir(foldername)
                 shutil.copy(self.molstructfname,os.path.join(foldername,self.molstructfname))
+                shutil.copy('poltype.ini',os.path.join(foldername,'poltype.ini'))
                 os.chdir(foldername)
             self.startdir=os.getcwd()
             self.totalcharge=None

@@ -267,16 +267,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     lfzerox[atomidx - 1]=True 
                     foundcase=True
 
-                elif val==1 and highestsymneighbnorepeatval==4 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and numhydsneighb==1: # CH3NH is this right?
-                    poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
-                    poltype.localframe2[atomidx - 1] = 0
-                    lfzerox[atomidx - 1]=True
-                    foundcase=True
-                elif val==1 and highestsymneighbnorepeatval==4 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and numhydsneighb==0: # O=P, is this right?
-                    poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
-                    poltype.localframe2[atomidx - 1] = 0
-                    lfzerox[atomidx - 1]=True
-                    foundcase=True
 
 
 

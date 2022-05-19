@@ -699,7 +699,7 @@ def SetupClusterSubmission(poltype,listofjobs,parentdir):
     return jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix
 
 def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix):
-    
+    poltype.WriteToLog('Submitting Fragment Jobs') 
     if poltype.fragmenterdebugmode==False:
         if poltype.externalapi is not None and poltype.fragmentjobslocal==False:
             call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
