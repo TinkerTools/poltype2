@@ -1485,6 +1485,15 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                 angletol=3.5
                 if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
                     continue
+                if rtb<rtc:
+                    rotbnd=tuple([rtb,rtc])
+                else:
+                    rotbnd=tuple([rtc,rtb])
+                if rotbnd not in rotbndtorescount.keys():
+                    rotbndtorescount[rotbnd]=0
+                if rotbndtorescount[rotbnd]>=maxrotbnds:
+                    continue
+
                 if resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
                     rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
                     if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
@@ -1495,6 +1504,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                         else:
                             temp.write('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
                             firsttor=True
+                        rotbndtorescount[rotbnd]+=1
             
         # Leave all torsions around other rotatable bonds fixed
     for rotkey,torsions in poltype.rotbndlist.items():

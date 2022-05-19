@@ -721,6 +721,7 @@ def ChangeNumpyIntToIntDicKeys(poltype,dic):
 
 
 def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor):
+    poltype.WriteToLog('Spawning Poltype Fragment Jobs')
     parentdir=dirname(abspath(os.getcwd()))
     listofjobs=[]
     jobtooutputlog={}

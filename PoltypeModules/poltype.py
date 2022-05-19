@@ -2392,9 +2392,15 @@ class PolarizableTyper():
            errorjobs=[]
            submittedjobs=[]
            errormessages=[]
+           for job,outputlog in fulljobtooutputlog.items():
+               finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
+               if error==True: # remove log before resubmitting
+                   os.remove(outputlog)
+
            while len(finishedjobs)!=len(list(fulljobtooutputlog.keys())):
                for job,outputlog in fulljobtooutputlog.items():
                    if job not in finishedjobs:
+                      
                       finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
                       
                       if finished==True:
@@ -2535,6 +2541,10 @@ class PolarizableTyper():
             errorjobs=[]
             errormessages=[]
             outputStatusDict = copy.deepcopy(jobtooutputlog)
+            for job,outputlog in fulljobtooutputlog.items():
+               finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
+               if error==True: # remove log before resubmitting
+                   os.remove(outputlog)
             while len(finishedjobs)!=len(jobtooutputlog.keys()):
                 for job in jobtooutputlog.keys():
                     outputlog=jobtooutputlog[job]
