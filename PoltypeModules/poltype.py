@@ -2541,7 +2541,7 @@ class PolarizableTyper():
             errorjobs=[]
             errormessages=[]
             outputStatusDict = copy.deepcopy(jobtooutputlog)
-            for job,outputlog in fulljobtooutputlog.items():
+            for job,outputlog in jobtooutputlog.items():
                finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
                if error==True: # remove log before resubmitting
                    os.remove(outputlog)
