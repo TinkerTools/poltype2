@@ -112,6 +112,7 @@ class PolarizableTyper():
         pathtosims:None=None
         simulationstostopfolderpath:None=None
         equilfinished:bool=False
+        barfilesfinished:bool=False
         perturbkeyfilelist:None=None
         boxonly:bool=False
         preequilboxpath:str=os.path.join(os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir)),'waterhuge.xyz')
@@ -572,6 +573,12 @@ class PolarizableTyper():
                                 self.equilfinished = True
                             else:
                                 self.equilfinished=self.GrabBoolValue(a)
+                        elif "barfilesfinished" in newline:
+                            if '=' not in line:
+                                self.barfilesfinished = True
+                            else:
+                                self.barfilesfinished=self.GrabBoolValue(a)
+
                         elif "minfinished" in newline:
                             if '=' not in line:
                                 self.minfinished = True

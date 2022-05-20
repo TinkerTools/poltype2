@@ -429,7 +429,7 @@ def calc_dg(flist, ibegin=0, iend=-1, nblocks=5, summary=True, verbose=True):
   df_out = pd.concat([df_out]+df_blocks)
   #if verbose:
   #  print(df_out.to_string(max_rows=len(df_out.index), max_cols=len(df_out.columns)))
-  df_sum = get_summary(df_out,verbose)
+  df_sum = summary(df_out,verbose)
   #if summary:
     #print()
     #print(df_sum.to_string(max_rows=len(df_sum.index), max_cols=len(df_sum.columns)))
@@ -1367,30 +1367,31 @@ def DeleteBARFiles(poltype):
    
 
 def BARProtocol(poltype):
-    for i in range(len(poltype.baroutputfilepath)):
-        baroutputfilepathlist=poltype.baroutputfilepath[i]
-        for j in range(len(baroutputfilepathlist)):
-            baroutputfilepath=baroutputfilepathlist[j]
-            if term.CheckFilesTermination(poltype,baroutputfilepath)[0]==False or poltype.redobar==True:         
-                ExecuteBAR(poltype)
-    
-    messages=[]
-    for i in range(len(poltype.baroutputfilepath)):
-        baroutputfilepathlist=poltype.baroutputfilepath[i]
-        for j in range(len(baroutputfilepathlist)):
-            baroutputfilepath=baroutputfilepathlist[j]
-            checkfin=term.CheckFilesTermination(poltype,baroutputfilepath)
-            finished=checkfin[0]
-            percentfinished=checkfin[1]
-            while finished==False:
-                msg='BAR is not complete, '+str(percentfinished)+'% of jobs finished'
-                if msg not in messages:
-                    poltype.WriteToLog(msg,prin=True)
-                    messages.append(msg)
-                time.sleep(poltype.waitingtime)
+    if poltype.barfilesfinished==False:
+        for i in range(len(poltype.baroutputfilepath)):
+            baroutputfilepathlist=poltype.baroutputfilepath[i]
+            for j in range(len(baroutputfilepathlist)):
+                baroutputfilepath=baroutputfilepathlist[j]
+                if term.CheckFilesTermination(poltype,baroutputfilepath)[0]==False or poltype.redobar==True:         
+                    ExecuteBAR(poltype)
+        
+        messages=[]
+        for i in range(len(poltype.baroutputfilepath)):
+            baroutputfilepathlist=poltype.baroutputfilepath[i]
+            for j in range(len(baroutputfilepathlist)):
+                baroutputfilepath=baroutputfilepathlist[j]
                 checkfin=term.CheckFilesTermination(poltype,baroutputfilepath)
                 finished=checkfin[0]
                 percentfinished=checkfin[1]
+                while finished==False:
+                    msg='BAR is not complete, '+str(percentfinished)+'% of jobs finished'
+                    if msg not in messages:
+                        poltype.WriteToLog(msg,prin=True)
+                        messages.append(msg)
+                    time.sleep(poltype.waitingtime)
+                    checkfin=term.CheckFilesTermination(poltype,baroutputfilepath)
+                    finished=checkfin[0]
+                    percentfinished=checkfin[1]
 
     if poltype.usetinkerforthermoprops==True:
         for i in range(len(poltype.thermooutputfilepath)):

@@ -1405,8 +1405,8 @@ def GenerateWBOMatrix(poltype,molecule,moleculebabel,structfname):
     cmdstr='psi4 '+inputname+' '+outputname
     if finished==False:
         try:
-             poltype.WriteToLog('Calling: '+cmdstr)
-             os.system(cmdstr)
+             poltype.call_subsystem([cmdstr],True)
+
              temp={cmdstr:outputname} 
              finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
 
@@ -1417,8 +1417,8 @@ def GenerateWBOMatrix(poltype,molecule,moleculebabel,structfname):
             
     except:
         cmdstr='psi4 '+inputname+' '+outputname
-        os.system(cmdstr)
-        temp={cmdstr:outputname} 
+        temp={cmdstr:outputname}
+        poltype.call_subsystem([cmdstr],True)
         finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
 
         WBOmatrix=GrabWBOMatrixPsi4(poltype,outputname,molecule)
