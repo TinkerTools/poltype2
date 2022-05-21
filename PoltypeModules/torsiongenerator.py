@@ -944,7 +944,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                     try:
                         m=Chem.MolFromMolFile('temp.mol',removeHs=False,sanitize=False)
                         smarts=rdmolfiles.MolToSmarts(m)
-                        if '.' in smarts:
+                        if '.' in smarts and '*.' not in smarts:
                             poltype.WriteToLog('Warining: Fragments detected in file from optimization, will remove point from fitting  '+outputlog)
                         else:
                             if outputlog not in finishedjobs:
@@ -971,7 +971,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     jobtoinputfilepaths={}
     jobtooutputfiles={}
     jobtoabsolutebinpath={}
-
     for torset in poltype.torlist:
         variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
