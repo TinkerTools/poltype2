@@ -11,9 +11,14 @@ def GenerateProteinTinkerXYZFile(poltype):
     poltype.complexedxyzname=poltype.uncomplexedxyzname.replace('.xyz','_comp.xyz')
     poltype.receptorligandxyzfilename=poltype.complexedxyzname
     poltype.ReadReceptorCharge()
-
+    chainnum=DetectNumberOfChains(poltype,poltype.uncomplexedproteinpdbname)
     if not os.path.isfile(poltype.complexedxyzname):
-        cmdstr=poltype.pdbxyzpath+' '+poltype.uncomplexedproteinpdbname+' '+poltype.prmfilepath
+        if chainnum==1:
+
+            cmdstr=poltype.pdbxyzpath+' '+poltype.uncomplexedproteinpdbname+' '+poltype.prmfilepath
+        else:
+            cmdstr=poltype.pdbxyzpath+' '+poltype.uncomplexedproteinpdbname+' '+'ALL'+' '+poltype.prmfilepath
+
         submit.call_subsystem(poltype,cmdstr,wait=True)    
     atoms,coord,order,types,connections=readTXYZ(poltype,poltype.uncomplexedxyzname)
     uncomplexedatomnum=len(proteinindextocoordinates.keys())
@@ -170,4 +175,16 @@ def GeneratePDBFileFromXYZ(poltype,xyzfile,ligandindices):
     newpath=os.path.join(poltype.visfolder,finalname)
     shutil.copy(finalname,newpath)
 
-
+def DetectNumberOfChains(poltype,pdbfile):
+    temp=open(pdbfile,'r')
+    results=temp.readlines()
+    temp.close()
+    chainls=[]
+    for line in results:
+        if 'ATOM' in line:
+            linesplit=line.split()
+            chain=linesplit[4]
+            if chain not in chainls:
+                chainls.append(chain)
+    chainnum=len(chainls)
+    return chainnum
