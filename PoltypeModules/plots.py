@@ -18,12 +18,17 @@ def PlotBARConvergence(poltype):
         bindfreeenergyerror=np.sqrt(np.square(compfreeenergyerror)+np.square(solvfreeenergyerror))
         freeenergy=bindfreeenergy
         freeenergyerror=bindfreeenergyerror
+        PlotFreeEnergyConvergence(poltype,freeenergy,freeenergyerror,'Binding')
+        PlotFreeEnergyConvergence(poltype,solvfreeenergy,solvfreeenergyerror,'Solvation')
+        PlotFreeEnergyConvergence(poltype,compfreeenergy,compfreeenergyerror,'Complexation')
     else:
         solvfreeenergy=np.array(poltype.freeenergyconv[0])
         solvfreeenergyerror=np.array(poltype.freeenergyerrorconv[0])
         freeenergy=solvfreeenergy
         freeenergyerror=solvfreeenergyerror
+        PlotFreeEnergyConvergence(poltype,freeenergy,freeenergyerror,'Solvation')
 
+def PlotFreeEnergyConvergence(poltype,freeenergy,freeenergyerror,prefix):
     divisor=int(poltype.proddyntime/len(freeenergy))
     x=np.array(list(np.arange(0,poltype.proddyntime,divisor)))
     x+=divisor
@@ -31,9 +36,9 @@ def PlotBARConvergence(poltype):
     ax1 = fig.add_subplot(111)
     ax1.scatter(x,freeenergy, marker="o")
     ax1.errorbar(x,freeenergy, yerr=freeenergyerror, fmt="o")
-    ax1.set_ylabel('Free Energy (kcal/mol)',fontsize=12)
+    ax1.set_ylabel( prefix+' Free Energy (kcal/mol)',fontsize=12)
     ax1.set_xlabel('Production Time (ns)',fontsize=12)
-    title='Free Energy Convergence'
+    title=prefix+' Free Energy Convergence'
     ax1.set_title(title)
     ax1.legend()
     imagename=title+'.png'

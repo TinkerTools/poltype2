@@ -3,6 +3,7 @@ import submitjobs as submit
 from openbabel import openbabel
 import re
 import shutil
+import warnings
 
 def GenerateProteinTinkerXYZFile(poltype):
     if poltype.uncomplexedproteinpdbname==None:
@@ -24,6 +25,8 @@ def GenerateProteinTinkerXYZFile(poltype):
     uncomplexedatomnum=len(proteinindextocoordinates.keys())
     newuncomplexedatomnum=len(atoms)
     shift= newuncomplexedatomnum- uncomplexedatomnum
+    if shift!=0:
+        warnings.warn('WARNING! Missing atoms from original PDB have been added by PDBXYZ. Number of atoms added = '+str(shift))
     indextocoordinates=GrabLigandCoordinates(poltype,uncomplexedatomnum,shift)
     poltype.ligandindices[0]=list(indextocoordinates.keys())
     GenerateComplexedTinkerXYZFile(poltype,poltype.uncomplexedxyzname,indextocoordinates,newuncomplexedatomnum)

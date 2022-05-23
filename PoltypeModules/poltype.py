@@ -137,7 +137,7 @@ class PolarizableTyper():
         restrainreceptorligand:bool=True
         mutlambdascheme:list=field(default_factory=lambda : [])
         minonly:bool=False
-        usegpu:bool=True
+        usegpu:bool=False
         truedynamicpath:None=None
         truebarpath:None=None
         equilonly:bool=False
