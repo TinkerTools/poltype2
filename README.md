@@ -123,7 +123,7 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 * [1](#citations)
 
-
+[Protein Input Preparation](#protein-input-preparation)
 
 [Molecular Dynamics Input Preparation](#molecular-dynamics-input-preparation)
 
@@ -598,6 +598,13 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 * All the covalent terms including bond, angle, stretch-bend, opbend and torsion will use the same protocols as AMOEBA model. 
 * The non-bonded interaction parameters including atomic polarizability, van der Waals, charge penetration, charge transfer, and geometry dependent charge flux are set to match the AMOEBA+ database parameters. * To this date these parameters are still under development for a series of organic molecules. These parameters will be deposited into Poltype 2 on GitHub on available. 
 
+
+### Protein Input Preparation
+* If your protein PDB has missing residues, poltype wraps Modeller to fill in missing residues for you (experimental). Need to use keyword ``pdbcode``. This will download the PDB for you, and call modeller, then quit the program after PDB has been filled in and optimized with Modeller. 
+* An academic license file is required after installation of modeller ``conda install -c salilab modeller``, the screen will prompt you which file to insert your license key in.
+* After this check results of output PDB. 
+* Remove the keyword ``pdbcode`` from poltype input file, if you wish to perform further computations. 
+* Protonation state assingment and adding ligand to the protein pocket are next steps for computing binding simulations.
 
 ### Molecular Dynamics Input Preparation
 * Make a seperate folder from where parameterization files from poltype were made (with new poltype.ini file too)

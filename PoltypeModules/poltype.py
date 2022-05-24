@@ -79,6 +79,7 @@ from pathlib import Path
 
 @dataclass
 class PolarizableTyper():
+        pdbcode:None=None
         usesymtypes: bool = True
         barinterval: int =5
         visfolder: str ='VisualizationFiles'
@@ -463,6 +464,8 @@ class PolarizableTyper():
 
                         if 'uncomplexedproteinpdbname' in newline:
                             self.uncomplexedproteinpdbname=a
+                        elif 'pdbcode' in newline:
+                            self.pdbcode=a
                         elif 'templateligandxyzfilename' in newline:
                             self.templateligandxyzfilename=a
                         elif 'barinterval' in newline:
@@ -1476,6 +1479,10 @@ class PolarizableTyper():
                 self.ligandindices=[[],[]]
             elif self.solvation==False and self.complexation==False and self.neatliquidsim==True:
                 self.ligandindices=[[]]
+
+            if self.pdbcode!=None:
+                pdbxyz.FillInMissingResidues(self,self.pdbcode)
+                sys.exit()
 
             if self.complexation==True and self.complexedproteinpdbname!=None: 
 

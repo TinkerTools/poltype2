@@ -32,6 +32,8 @@
 
 ### Advanced Program Usage Molecular Dynamics
 
+[Modeller Inputs](#modeller-inputs)
+
 [Required Inputs Molecular Dynamics](#required-inputs-molecular-dynamics)
 
 [Binding Free Energy](#binding-free-energy)
@@ -274,6 +276,10 @@ WQ_PORT=9013
 
 ### Advanced Program Usage Molecular Dynamics
 
+
+#### Modeller Inputs
+
+``pdbcode`` Takes PDB code, downloads the crystal from RCSB and used Modeller to find missing residues and model them. Fast optimizaiton options are used by default. Missing residue information is found in REMARKS section of PDB which poltype reads. 
 
 #### Required Inputs Molecular Dynamics
 ``ligandxyzfilename``  specifies the input tinker XYZ filename for the ligand. Default has no value.

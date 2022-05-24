@@ -1,8 +1,9 @@
 name: amoebamdpoltype
 channels:
-  - anaconda
   - schrodinger
+  - anaconda
   - psi4
+  - salilab
   - conda-forge
   - defaults
 dependencies:
@@ -28,14 +29,14 @@ dependencies:
   - brotlipy=0.7.0=py38h497a2fe_1003
   - bzip2=1.0.8=h7f98852_4
   - c-ares=1.18.1=h7f98852_0
-  - ca-certificates=2021.10.8=ha878542_0
+  - ca-certificates=2022.5.18.1=ha878542_0
   - cached-property=1.5.2=hd8ed1ab_1
   - cached_property=1.5.2=pyha770c72_1
   - cachetools=5.0.0=pyhd8ed1ab_0
   - cairo=1.16.0=ha12eb4b_1010
   - cairocffi=1.2.0=pyhd8ed1ab_0
   - cairosvg=2.5.2=pyhd8ed1ab_0
-  - certifi=2021.10.8=py38h578d9bd_1
+  - certifi=2022.5.18.1=py38h578d9bd_0
   - cffi=1.15.0=py38h3931269_0
   - cftime=1.6.0=py38h3ec907f_0
   - charset-normalizer=2.0.12=pyhd8ed1ab_0
@@ -86,6 +87,7 @@ dependencies:
   - h5py=3.3.0=nompi_py38h9915d05_100
   - hdf4=4.2.15=h10796ff_3
   - hdf5=1.10.6=nompi_h7c3c948_1111
+  - hdf5-1107=1.10.7=0
   - icu=69.1=h9c3ff4c_0
   - idna=3.3=pyhd8ed1ab_0
   - importlib-metadata=4.11.3=py38h578d9bd_0
@@ -163,6 +165,7 @@ dependencies:
   - mmcif_pdbx=2.0.0=pyh44b312d_0
   - mmtf-python=1.1.2=py_0
   - mock=4.0.3=py38h578d9bd_2
+  - modeller=10.2=py38h9bf148f_1
   - mpeg_encode=1=h14c3975_1
   - mrcfile=1.3.0=pyh44b312d_0
   - msgpack-python=1.0.3=py38h1fd1430_0
@@ -183,7 +186,7 @@ dependencies:
   - oauthlib=3.2.0=pyhd8ed1ab_0
   - openbabel=3.1.1=py38hd2c4bc0_3
   - openjpeg=2.4.0=hb52868f_1
-  - openssl=1.1.1n=h166bdaf_0
+  - openssl=1.1.1o=h166bdaf_0
   - packaging=20.4=py_0
   - pandas=1.4.1=py38h43a58ef_0
   - patsy=0.5.2=pyhd8ed1ab_0
