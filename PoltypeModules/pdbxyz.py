@@ -5,9 +5,6 @@ import re
 import shutil
 import warnings
 import time
-from modeller import *
-from modeller.automodel import *    # Load the AutoModel class
-from Bio.PDB.PDBList import PDBList
 
 
 def GenerateProteinTinkerXYZFile(poltype):
@@ -209,6 +206,8 @@ def DetectNumberOfChains(poltype,pdbfile):
 
 
 def WriteSEQFile(poltype,filename,code):
+    from modeller import Environ,log,Model,Alignment
+    from modeller.automodel import LoopModel,refine    # Loa
     e = Environ()
     m = Model(e, file=filename)
     aln = Alignment(e)
@@ -434,6 +433,8 @@ def WriteAlignmentFileComponent(poltype,temp,results,gapresiduearrays,filledresi
 
 
 def GenerateLoops(poltype,alignmentfilename,newcode,code):
+    from modeller import Environ,log,Model,Alignment
+    from modeller.automodel import LoopModel,refine    # Loa
     log.verbose()
     env = Environ()
     env.io.atom_files_directory = ['.', '../atom_files']
@@ -462,6 +463,10 @@ def GrabLastGeneratedPDB(poltype):
 
 
 def FillInMissingResidues(poltype,code):
+    from modeller import Environ,log,Model,Alignment
+    from modeller.automodel import LoopModel,refine    # Load the AutoModel class
+    from Bio.PDB.PDBList import PDBList
+
     pdbl = PDBList()
     filename = pdbl.retrieve_pdb_file(code, file_format='pdb')
     if '.ent' in filename:
