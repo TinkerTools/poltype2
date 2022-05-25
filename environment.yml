@@ -201,7 +201,7 @@ dependencies:
   - pixman=0.40.0=h36c2ea0_0
   - pluggy=1.0.0=py38h578d9bd_2
   - pmw=2.0.1=py38h578d9bd_1004
-  - propka=3.4.0=py38he5a9106_2
+  - propka=3.4.0=py38h7f3c49e_3
   - psi4=1.5+e9f4d6d=py38hbf93d9d_0
   - psutil=5.7.2=py38h7b6447c_0
   - pthread-stubs=0.4=h36c2ea0_1001

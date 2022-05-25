@@ -411,7 +411,7 @@ class PolarizableTyper():
         sleeptime:float=.1
         structure:None=None
         espextraconflist:list=field(default_factory=lambda : [])
-        
+        usepdb2pqr:bool=False
         def __post_init__(self): 
         
             self.molstructfname=self.structure 
@@ -483,6 +483,12 @@ class PolarizableTyper():
                                 self.addphysioions = True
                             else:
                                 self.addphysioions=self.GrabBoolValue(a)
+                        elif "usepdb2pqr" in newline:
+                            if '=' not in line:
+                                self.usepdb2pqr = True
+                            else:
+                                self.usepdb2pqr=self.GrabBoolValue(a)
+
 
                         elif "usesymtypes" in newline:
                             if '=' not in line:
@@ -1379,7 +1385,7 @@ class PolarizableTyper():
             if self.compareparameters==True:
                 self.MolecularDynamics()
                 sys.exit()
-            if self.ligandxyzfilename!=None and (self.binding==True or self.solvation==True or self.neatliquidsim==True):
+            if self.ligandxyzfilename!=None and (self.binding==True or self.solvation==True or self.neatliquidsim==True) or self.pdbcode!=None or self.usepdb2pqr!=None:
                 self.MolecularDynamics()
                 sys.exit()
 
@@ -1462,7 +1468,7 @@ class PolarizableTyper():
                 self.AlignLigandXYZToTemplateXYZ()
                 sys.exit()
 
-            if self.binding==False and self.solvation==False and self.neatliquidsim==False:
+            if self.binding==False and self.solvation==False and self.neatliquidsim==False and self.usepdb2pqr==False and self.pdbcode==None:
                 raise ValueError('Please choose either solvation or binding, or neat liquid simulation mode')
             self.simfoldname=''
             self.boxfilename='box.xyz'
@@ -1483,6 +1489,10 @@ class PolarizableTyper():
 
             if self.pdbcode!=None:
                 pdbxyz.FillInMissingResidues(self,self.pdbcode)
+                sys.exit()
+
+            if self.usepdb2pqr==True and self.uncomplexedproteinpdbname!=None:
+                pdbxyz.CallPDB2PQR(self,self.uncomplexedproteinpdbname)
                 sys.exit()
 
             if self.complexation==True and self.complexedproteinpdbname!=None: 
@@ -3703,7 +3713,7 @@ class PolarizableTyper():
                 shutil.copy(self.tmpkeyfile,os.path.join(previousdir,self.tmpkeyfile))
 
             self.CopyFitPlots()
-            if (self.binding==True or self.solvation==True or self.neatliquidsim==True):
+            if (self.binding==True or self.solvation==True or self.neatliquidsim==True) or self.usepdb2pqr==True or self.pdbcode!=None:
                 self.ligandxyzfilename=self.tmpxyzfile
                 self.keyfilename=self.tmpkeyfile
                 newfolder='Sim'

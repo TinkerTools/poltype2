@@ -630,6 +630,8 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 * After this check results of output PDB. 
 * Remove the keyword ``pdbcode`` from poltype input file, if you wish to perform further computations. 
 * Protonation state assingment and adding ligand to the protein pocket are next steps for computing binding simulations.
+* ``usepdb2pqr`` keyword can be used with ``uncomplexedproteinpdbname`` to estimate pKa values of titratable residues via propka and then protonate the PDB for you.
+* pdb2pqr can be installed via ``conda install -c conda-forge pdb2pqr`` or use yaml file
 
 ### Molecular Dynamics Input Preparation
 * Make a seperate folder from where parameterization files from poltype were made (with new poltype.ini file too)

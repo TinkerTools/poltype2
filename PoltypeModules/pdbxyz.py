@@ -487,3 +487,9 @@ def FillInMissingResidues(poltype,code):
     GenerateLoops(poltype,alignmentfilename,newcode,code)
     finalpdb=GrabLastGeneratedPDB(poltype)
 
+
+
+def CallPDB2PQR(poltype,pdbfilename):
+    outputfile=pdbfilename.replace('.pdb','.pqr')
+    cmdstr='pdb2pqr30'+' '+pdbfilename+' '+outputfile
+    os.system(cmdstr)

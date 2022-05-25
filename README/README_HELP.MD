@@ -32,7 +32,7 @@
 
 ### Advanced Program Usage Molecular Dynamics
 
-[Modeller Inputs](#modeller-inputs)
+[Protein Preparation Inputs](#protein-preparation-inputs)
 
 [Required Inputs Molecular Dynamics](#required-inputs-molecular-dynamics)
 
@@ -277,9 +277,13 @@ WQ_PORT=9013
 ### Advanced Program Usage Molecular Dynamics
 
 
-#### Modeller Inputs
+#### Protein Preparation Inputs
 
-``pdbcode`` Takes PDB code, downloads the crystal from RCSB and used Modeller to find missing residues and model them. Fast optimizaiton options are used by default. Missing residue information is found in REMARKS section of PDB which poltype reads. Default pdbcode is None.
+``pdbcode`` specifies to take PDB code, downloads the crystal from RCSB and used Modeller to find missing residues and model them. Fast optimizaiton options are used by default. Missing residue information is found in REMARKS section of PDB which poltype reads. Default pdbcode is None.
+
+
+``usepdb2pqr`` specifies to use PDB2PQR program to compute pKa values for titratable residues via propka then will protonate the PDB for you and quit program. Default is False.
+
 
 #### Required Inputs Molecular Dynamics
 ``ligandxyzfilename``  specifies the input tinker XYZ filename for the ligand. Default has no value.
