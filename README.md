@@ -42,7 +42,7 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 ### Features
 * Automated total charge assignment
 * Zwitterion detection
-* Ligand ionization state enumeration
+* Ligand ionization state and tautomer enumeration
 * Smart memory resource defaults for QM jobs
 * Molecule fragmenter to speed up QM
 * Parallelized job submission for QM jobs, fragment jobs
@@ -201,8 +201,9 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 * Special radical charge states require additional information in the input file specifying which atom is a radical. 
 
 ### Ligand Protonation State Generation
-* Dominant ionization states at pH 7 are enumerated and SDF files are generated via Dimorphite-DL. 
-* Use ``genprotstatesonly`` to quit program after generating dominant ionization states at pH=7.
+* Dominant ionization states at pH 7 are enumerated and SDF files are generated via Dimorphite-DL (IonizationState_0.sdf,IonizationState_1.sdf,..). 
+* Tautomer states are enumerated via rdkit and the first tautomer is the canonical tautomer TautomerState_0.sdf
+* Use ``genprotstatesonly`` to quit program after generating dominant ionization states at pH=7 and tautomers.
 
 ### Minimum Example Usage Parameterization
 

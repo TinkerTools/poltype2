@@ -76,6 +76,7 @@ import parametercomparison
 from PyAstronomy import pyasl
 from dataclasses import dataclass,field
 from pathlib import Path
+from rdkit.Chem.MolStandardize import rdMolStandardize
 
 @dataclass
 class PolarizableTyper():
@@ -2097,7 +2098,32 @@ class PolarizableTyper():
                 obConversion.SetOutFormat('sdf')
                 obConversion.WriteFile(mol,sdfmol)
 
-            return finalsmi
+        def GrabTautomers(self,m):
+
+            enumerator = rdMolStandardize.TautomerEnumerator()
+            smi=Chem.MolToSmiles(m)
+            m=Chem.MolFromSmiles(smi) 
+            canon = enumerator.Canonicalize(m)
+            csmi = Chem.MolToSmiles(canon)
+            res = [canon]
+            tauts = enumerator.Enumerate(m)
+            smis = [Chem.MolToSmiles(x) for x in tauts]
+            stpl = sorted((x,y) for x,y in zip(smis,tauts) if x!=csmi)
+            res += [y for x,y in stpl]
+            obConversion = openbabel.OBConversion()
+            for i in range(len(res)):
+                taut=res[i]
+                taut = Chem.AddHs(taut)
+                AllChem.EmbedMolecule(taut)
+                name='TautomerState_'+str(i)+'.mol'
+                rdmolfiles.MolToMolFile(taut,name)
+                sdfmol=name.replace('.mol','.sdf')
+                mol = openbabel.OBMol()
+                obConversion.SetInFormat('mol')
+                obConversion.ReadFile(mol,name)
+                obConversion.SetOutFormat('sdf')
+                obConversion.WriteFile(mol,sdfmol)
+
 
 
 
@@ -3321,6 +3347,7 @@ class PolarizableTyper():
                 databaseparser.AddKeyFileParametersToParameterFile(self,m)   
                 sys.exit()
             self.GrabIonizationStates(m)
+            self.GrabTautomers(m)
             if self.genprotstatesonly==True:
                 sys.exit()
             if ('Br ' in self.mol.GetSpacedFormula()):
