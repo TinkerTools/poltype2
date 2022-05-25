@@ -48,7 +48,7 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 * Parallelized job submission for QM jobs, fragment jobs
 * Psi4/Gaussian quantum packages
 * QM job error handling 
-* QM molecule-water dimer for vdW fitting
+* QM dimer generation for vdW fitting
 * Torsion-Torsion coupling
 * Missing protein residue/loop modelling with Modeller
 * Tinker box set up
@@ -64,7 +64,7 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 [Parameterization Input Preparation](#parameterization-input-preparation)
 
-[Ligand Protonation State Generation](ligand-protonation-state-generation)
+[Ligand Protonation State Generation](#ligand-protonation-state-generation)
 
 [Minimum Example Usage Parameterization](#minimum-example-usage-parameterization)
 
