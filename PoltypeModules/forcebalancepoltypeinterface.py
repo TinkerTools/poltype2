@@ -333,13 +333,13 @@ def GenerateLiquidCSVFile(nvtprops,listoftptopropdics,molnamelist):
         allunknown=True
         if len(listoftptopropdics)==len(molnamelist):
             tptoproptovalue=listoftptopropdics[i]
+            molname=molnamelist[i]
             for tp,proptovalue in tptoproptovalue.items():
                 t=tp[0]
                 p=tp[1]
                 if t!='UNK' and p!='UNK':
                     allunknown=False
 
-            molname=molnamelist[i]
             if allunknown==False:
                 tptoproptovalue=AddDefaultValues(tptoproptovalue)
                 WriteCSVFile([tptoproptovalue],nvtprops,molname)
@@ -892,7 +892,7 @@ def CheckBondEnergy(outputfile):
     temp=open(outputfile,'r')
     results=temp.readlines()
     temp.close()
-    tol=1
+    tol=.5
     for line in results:
         if 'Bond Stretching' in line:
             linesplit=line.split()
@@ -973,7 +973,26 @@ def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfile
         if gencsv==True:
             density=float(densitylist[i])
             mass=Descriptors.ExactMolWt(rdkitmol)*1.66054*10**(-27) # convert daltons to Kg
-            dynamicrelax=True
+
+            axis,finalaxis=ComputeBoxLength(gasxyzfile)
+            boxlength=axis*10**-10 # convert angstroms to m
+            numbermolecules=int(density*boxlength**3/mass)
+            liquidkeyfile=GenerateNewKeyFile(keyfile,prmfilepath,moleculeprmfilename,finalaxis,addwaterprms,molname)
+
+            liquidxyzfile=CreateSolventBox(finalaxis,numbermolecules,prmfilepath,xyzeditpath,gasxyzfile,molname,keyfilels,molprmfilepath,liquidkeyfile)
+            AddKeyWord(liquidkeyfile,'polarizeterm none'+'\n')
+            AddKeyWord(liquidkeyfile,'multipoleterm none'+'\n')
+            Minimize(liquidxyzfile,liquidkeyfile,minimizepath,molprmfilepath)
+            RemoveKeyWord(liquidkeyfile,'multipoleterm')
+            Minimize(liquidxyzfile,liquidkeyfile,minimizepath,molprmfilepath)
+            RemoveKeyWord(liquidkeyfile,'polarizeterm')
+            Minimize(liquidxyzfile,liquidkeyfile,minimizepath,molprmfilepath)
+            dynamicrelax=False
+            try:
+                Analyze(liquidxyzfile,liquidkeyfile,analyzepath,molprmfilepath)
+            except:
+                print('Bond energy check failed, need to relax box more')
+                dynamicrelax=True
             if dynamicrelax==True:
                 axis,finalaxis=ComputeBoxLength(gasxyzfile,addextra=True)
                 boxlength=axis*10**-10 # convert angstroms to m
@@ -1738,7 +1757,7 @@ def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liq
         analyzepath='analyze'
         if 'GPUDYNAMICS' in os.environ.keys(): # lazy gpu detection
             dynamicpath='dynamic_gpu'
-            minimizepath='minimize_gpu'
+            minimizepath='minimize'
         else:
             dynamicpath='dynamic'
             minimizepath='minimize'

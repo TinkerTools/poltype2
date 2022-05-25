@@ -36,7 +36,26 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 [Tinker License](https://github.com/TinkerTools/tinker/blob/release/LICENSE.pdf)
 
 ## 📚 Documentation Overview 
+
 * Please read 👇🙏
+
+### Features
+* Automated total charge assignment
+* Zwitterion detection
+* Ligand ionization state enumeration
+* Smart memory resource defaults for QM jobs
+* Molecule fragmenter to speed up QM
+* Parallelized job submission for QM jobs, fragment jobs
+* Psi4/Gaussian quantum packages
+* QM job error handling 
+* QM molecule-water dimer for vdW fitting
+* Torsion-Torsion coupling
+* Missing protein residue/loop modelling with Modeller
+* Tinker box set up
+* BAR Free energy estimation file setup
+
+
+
 
 [💻 Program Installation](README/README_INSTALL.MD)
 
@@ -44,6 +63,8 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 ### Automated AMOEBA Ligand Parameterization 
 
 [Parameterization Input Preparation](#parameterization-input-preparation)
+
+[Ligand Protonation State Generation](ligand-protonation-state-generation)
 
 [Minimum Example Usage Parameterization](#minimum-example-usage-parameterization)
 
@@ -178,7 +199,10 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 * Formal atom charge will be assigned via the input number of bonds and bond order for surrounding bonds and element of each atom. 
 * Optional keywords exist to add missing hydrogens. 
 * Special radical charge states require additional information in the input file specifying which atom is a radical. 
-* Dominant ionization states at pH 7 are enumerated and MOL files are generated via Dimorphite-DL. 
+
+### Ligand Protonation State Generation
+* Dominant ionization states at pH 7 are enumerated and SDF files are generated via Dimorphite-DL. 
+* Use ``genprotstatesonly`` to quit program after generating dominant ionization states at pH=7.
 
 ### Minimum Example Usage Parameterization
 

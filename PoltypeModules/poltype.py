@@ -2067,7 +2067,7 @@ class PolarizableTyper():
             ann.main(self)
 
 
-        def GrabProtStates(self,m):
+        def GrabIonizationStates(self,m):
             smi=Chem.MolToSmiles(m)
             smiles=[smi]
             mols = [Chem.MolFromSmiles(s) for s in smiles]
@@ -2082,12 +2082,20 @@ class PolarizableTyper():
             )
             
             finalsmi=[Chem.MolToSmiles(m) for m in protonated_mols]
+            obConversion = openbabel.OBConversion()
+            
             for i,mol in enumerate(protonated_mols):
                 mol = Chem.AddHs(mol)
                 AllChem.EmbedMolecule(mol)
                 smi=finalsmi[i]
-                name='ProtonationState_'+str(i)+'.mol'
+                name='IonizationState_'+str(i)+'.mol'
                 rdmolfiles.MolToMolFile(mol,name)
+                sdfmol=name.replace('.mol','.sdf')
+                mol = openbabel.OBMol()
+                obConversion.SetInFormat('mol')
+                obConversion.ReadFile(mol,name)
+                obConversion.SetOutFormat('sdf')
+                obConversion.WriteFile(mol,sdfmol)
 
             return finalsmi
 
@@ -3312,7 +3320,7 @@ class PolarizableTyper():
             if self.keyfiletoaddtodatabase!=None:
                 databaseparser.AddKeyFileParametersToParameterFile(self,m)   
                 sys.exit()
-            self.GrabProtStates(m)
+            self.GrabIonizationStates(m)
             if self.genprotstatesonly==True:
                 sys.exit()
             if ('Br ' in self.mol.GetSpacedFormula()):
