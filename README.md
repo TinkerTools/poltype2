@@ -51,6 +51,7 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 * QM dimer generation for vdW fitting
 * Torsion-Torsion coupling
 * Missing protein residue/loop modelling with Modeller
+* Protein pKa estimation and protonation assignment via PROPKA and PDB2PQR
 * Tinker box set up
 * BAR Free energy estimation file setup
 
