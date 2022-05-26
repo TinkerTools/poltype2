@@ -16,7 +16,7 @@ def GenerateProteinTinkerXYZFile(poltype):
     poltype.ReadReceptorCharge()
     chainnum=DetectNumberOfChains(poltype,poltype.uncomplexedproteinpdbname)
     resarray=FindCurrentResidueArray(poltype,poltype.uncomplexedproteinpdbname)
-    missingresidues=FindMissingResidues(poltype,poltype.uncomplexedproteinpdbname)
+    missingresidues=FindMissingResidues(poltype,resarray)
 
     if not os.path.isfile(poltype.complexedxyzname):
         if chainnum==1:
@@ -234,7 +234,6 @@ def FindCurrentResidueArray(poltype,filename):
 
 def FindMissingResidues(poltype,resarray):
     missingresidues=[]
-    firstres=resarray[0]
     firstres=1 # dont start at first residue found, start at 1
     lastres=resarray[-1]
     allres=list(range(firstres,lastres+1))

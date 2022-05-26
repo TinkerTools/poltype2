@@ -66,31 +66,51 @@ git clone https://github.com/TinkerTools/poltype2.git master
 
 * Example bashrc
 ```shell
-function dynamic_gpu () {
-    local TINKER9=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda11.2
+OSVERSION=`cat /etc/system-release`
+place="${OSVERSION//[!0-9]/}"
+OSVERSION=${place::1}
+VAL=`nvidia-smi &> /dev/null; echo $?`
 
-    $TINKER9/dynamic9.sh $@
-}
-export -f dynamic_gpu
+if [ $VAL != 0 ]; then
+  echo -e "\e[101mCUDA utility not installed on `hostname`\e[0m"
+  declare -i VALUE=0
+else
 
-function bar_gpu () {
-    local TINKER9=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda11.2
+  for dir in /usr/local/*;
+  do
+      SUB='cuda'
+      if [[ "$dir" == *"$SUB"* ]]; then
+        VALUE=`echo $dir | tr -dc '0-9'`
+      fi
+       
+  done
 
-    $TINKER9/bar9.sh $@
-}
-export -f bar_gpu
+  
+  if [ $VALUE == 112 ] ; then
 
-function analyze_gpu () {
-    local TINKER9=/home/liuchw/Softwares/tinkers/Tinker9-latest/build_cuda11.2
+       export PATH=/home/liuchw/Softwares/tinkers/Tinker9/2206/build_cuda11:$PATH
+       export CUDA_DEVICE_ORDER=PCI_BUS_ID
+       export CUDA_VISIBLE_DEVICES=0
 
-    $TINKER9/analyze9.sh $@
-}
-export -f analyze_gpu
+  fi
 
-export PATH=/home/bdw2292/NewestTinker/bin/:$PATH
-export TINKERPATH=/home/bdw2292/NewestTinker/bin/
+ 
+
+
+fi
+if [ $OSVERSION == 8 ] ; then
+    export PATH=/home/bdw2292/NewestTinkerOS8/bin/:$PATH
+    export TINKERPATH=/home/bdw2292/NewestTinkerOS8/bin/ # this is for ForceBalance to recognize tinker path in different nodes
+     
+else
+    export PATH=/home/bdw2292/NewestTinker/bin/:$PATH
+    export TINKERPATH=/home/bdw2292/NewestTinker/bin/
+
+fi
+
+
 export myusername=`whoami`
-conda activate amoebamdpoltype
+conda activate newamoebamdpoltype
 export g09root=/opt/g09gh/gaussian
 source $g09root/g09/bsd/g09.profile
 export GAUSS_SCRDIR=/scratch/$myusername/

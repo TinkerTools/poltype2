@@ -185,10 +185,10 @@ class PolarizableTyper():
         ligandcharge:None=None
         barpath:str='bar'
         dynamicpath:str='dynamic'
-        analyzeommpath:str='analyze_gpu'
-        barommpath:str='bar_gpu'
-        dynamicommpath:str='dynamic_gpu'
-        minimizeommpath:str='minimize_gpu'
+        analyzeommpath:str='analyze9'
+        barommpath:str='bar9'
+        dynamicommpath:str='dynamic9'
+        minimizeommpath:str='minimize9'
         complexation:bool=False
         solvation:bool=False
         flatbotrest:bool=True
@@ -1385,7 +1385,7 @@ class PolarizableTyper():
             if self.compareparameters==True:
                 self.MolecularDynamics()
                 sys.exit()
-            if self.ligandxyzfilename!=None and (self.binding==True or self.solvation==True or self.neatliquidsim==True) or self.pdbcode!=None or self.usepdb2pqr!=None:
+            if self.ligandxyzfilename!=None and (self.binding==True or self.solvation==True or self.neatliquidsim==True) or self.pdbcode!=None or self.usepdb2pqr!=False:
                 self.MolecularDynamics()
                 sys.exit()
 
@@ -1425,16 +1425,14 @@ class PolarizableTyper():
             self.outputpath=os.path.join(os.getcwd(),'')
             self.logfh=open(self.outputpath+self.logname,'a+')
             self.SanitizeMMExecutables()
-            if not (self.which(self.dynamicommpath)) and self.externalapi==None:
-                self.usegpu=False
+
             foundgpukey=False
-            if 'GPUDYNAMICS' in os.environ.keys():
-                foundgpukey=True
+            if (self.which(self.dynamicommpath)):
                 self.usegpu=True
-                if self.externalapi==None and self.submitlocally==None:
-                    self.submitlocally=True
-                if self.submitlocally==True:
-                    string='export CUDA_DEVICE_ORDER=PCI_BUS_ID '+' ; '+' export CUDA_VISIBLE_DEVICES='+str(self.gpucardnumber)
+                foundgpukey=True
+
+            if self.externalapi==None and self.submitlocally==None:
+                self.submitlocally=True
             if self.submitlocally!=True:
                 self.submitlocally=False
             if not (self.which(self.dynamicommpath)) and foundgpukey==False:

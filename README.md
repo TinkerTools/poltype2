@@ -633,8 +633,10 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 * Protonation state assingment and adding ligand to the protein pocket are next steps for computing binding simulations.
 * ``usepdb2pqr`` keyword can be used with ``uncomplexedproteinpdbname`` to estimate pKa values of titratable residues via propka and then protonate the PDB for you.
 * pdb2pqr can be installed via ``conda install -c conda-forge pdb2pqr`` or use yaml file
+* After adding any missing residues and assigning the protonation state, the ligand needs to be added to the protein pocket and given as input ``complexedproteinpdbname`` for binding computations.
 
 ### Molecular Dynamics Input Preparation
+* If Tinker9 executables are in PATH, then program will switch to using analyze9,dynamic9,minimize9, the GPU executables.
 * Make a seperate folder from where parameterization files from poltype were made (with new poltype.ini file too)
 * Ligand XYZ and key files are required (such as final.xyz and final.key from Poltype parameterization). 
 * For binding free energy compuations, either a host PDB or premade tinker XYZ is required 
