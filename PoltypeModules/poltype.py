@@ -1468,6 +1468,7 @@ class PolarizableTyper():
 
             if self.binding==False and self.solvation==False and self.neatliquidsim==False and self.usepdb2pqr==False and self.pdbcode==None:
                 raise ValueError('Please choose either solvation or binding, or neat liquid simulation mode')
+
             self.simfoldname=''
             self.boxfilename='box.xyz'
             self.masterdict={}
@@ -1496,8 +1497,8 @@ class PolarizableTyper():
             if self.complexation==True and self.complexedproteinpdbname!=None: 
 
                 pdbxyz.GenerateProteinTinkerXYZFile(self)
-            elif self.complexation==True and self.uncomplexedproteinpdbname==None and self.complexedproteinpdbname==None and self.receptorligandxyzfilename==None: 
-                raise ValueError('Missing complexed proteinpdbname')
+            elif self.complexation==True  and self.complexedproteinpdbname==None and self.receptorligandxyzfilename==None: 
+                raise ValueError('Missing complexedproteinpdbname, need ligand in complex')
             if self.ligandfilename!=None:
                 self.ReadLigandCharge()
 
