@@ -196,7 +196,7 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
     
 ### Parameterization Input Preparation
 * The input structure can be given as an filetype with bond order information (sdf,mol,pdb,etc..)
-* Cartesian XYZ is not recommended, this will be converted to an SDF file and bond orders will be gussed based on atomic distances.
+* Cartesian XYZ is not recommended, this will be converted to an SDF file and bond orders will be guessed based on atomic distances.
 * If 2D structure is given, poltype will generate 3D coordinates for you.
 * Total charge is determined by computing the formal charge for each atom.
 * Formal atom charge will be assigned via the input number of bonds and bond order for surrounding bonds and element of each atom. 
@@ -633,7 +633,7 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 * After this check results of output PDB. 
 * Remove the keyword ``pdbcode`` from poltype input file, if you wish to perform further computations. 
 * Protonation state assingment and adding ligand to the protein pocket are next steps for computing binding simulations.
-* ``usepdb2pqr`` keyword can be used with ``uncomplexedproteinpdbname`` to estimate pKa values of titratable residues via propka and then protonate the PDB for you.
+* ``usepdb2pqr`` keyword can be used with ``uncomplexedproteinpdbname`` to estimate pKa values of titratable residues via propka and then protonate the PDB for you. The output PDB will have extension "_final.pdb".
 * pdb2pqr can be installed via ``conda install -c conda-forge pdb2pqr`` or use yaml file
 * After adding any missing residues and assigning the protonation state, the ligand needs to be added to the protein pocket and given as input ``complexedproteinpdbname`` for binding computations.
 

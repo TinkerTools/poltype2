@@ -492,3 +492,16 @@ def CallPDB2PQR(poltype,pdbfilename):
     outputfile=pdbfilename.replace('.pdb','.pqr')
     cmdstr='pdb2pqr30'+' '+pdbfilename+' '+outputfile
     os.system(cmdstr)
+    finaloutputfile=outputfile.replace('.pqr','_final.pdb')
+    ConvertPQRToPDB(poltype,outputfile,finaloutputfile)
+
+
+def ConvertPQRToPDB(poltype,outputfile,finaloutputfile):
+    obConversion = openbabel.OBConversion()
+    mol = openbabel.OBMol()
+    inFormat = obConversion.FormatFromExt(outputfile)
+    obConversion.SetInFormat(inFormat)
+    obConversion.ReadFile(mol, outputfile)
+    obConversion.SetOutFormat('pdb')
+    obConversion.WriteFile(mol,finaloutputfile)
+
