@@ -195,8 +195,10 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
     
 ### Parameterization Input Preparation
-* The input structure is given to the program as an SDF file. 
-* If 2D structure is given in the SDF file, poltype will generate 3D coordinates for you.
+* The input structure can be given as an filetype with bond order information (sdf,mol,pdb,etc..)
+* Cartesian XYZ is not recommended, this will be converted to an SDF file and bond orders will be gussed based on atomic distances.
+* If 2D structure is given, poltype will generate 3D coordinates for you.
+* Total charge is determined by computing the formal charge for each atom.
 * Formal atom charge will be assigned via the input number of bonds and bond order for surrounding bonds and element of each atom. 
 * Optional keywords exist to add missing hydrogens. 
 * Special radical charge states require additional information in the input file specifying which atom is a radical. 

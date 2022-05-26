@@ -3260,6 +3260,26 @@ class PolarizableTyper():
 
             return indextoatomicsymbol
 
+
+        def ConvertInputStructureToSDFFormat(self,molstructfname):
+            obConversion = openbabel.OBConversion()
+            mol = openbabel.OBMol()
+            inFormat = obConversion.FormatFromExt(molstructfname)
+            split=molstructfname.split('.')
+            ext=split[-1]
+            if ext!='sdf':
+                obConversion.SetInFormat(ext)
+                obConversion.ReadFile(mol, molstructfname)
+                obConversion.SetOutFormat('sdf')
+                molstructfname=molstructfname.replace('.'+ext,'.sdf')
+                obConversion.WriteFile(mol,molstructfname)
+
+
+
+
+            return molstructfname
+
+
         def GenerateParameters(self):
             
             temp=open(os.getcwd()+r'/'+'poltype.ini','r')
@@ -3278,6 +3298,7 @@ class PolarizableTyper():
 
                     if "structure" in newline:
                         self.molstructfname = a
+            self.molstructfname=self.ConvertInputStructureToSDFFormat(self.molstructfname)
             if self.isfragjob==False:
                 foldername='Temp'
                 if not os.path.exists(foldername):
