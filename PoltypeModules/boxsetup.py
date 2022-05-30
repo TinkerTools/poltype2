@@ -421,6 +421,10 @@ def BoxSetupProtocol(poltype):
                 SoakMoleculeInSolventBox(poltype,xyzfilename,key)
                 AddIonsToSolventBox(poltype,xyzfilename,key,boxxyzfilename,2,poltype.iontypetoionnumberneut[i],poltype.iontypetoionnumberphysio[i])
         RemoveTempFiles(poltype)
+        alzout='CheckEnergies.alz'
+        poltype.CallAnalyze(xyzfilename,key,alzout,poltype.trueanalyzepath,'e')
+        poltype.CheckEnergies(alzout)
+
     poltype.xyzfilesize=[float(os.path.getsize(i)) for i in poltype.boxfilename] # in bytes
     poltype.equilarcfilesize=[i*poltype.equilframenum*10**-9 for i in poltype.xyzfilesize] # in GB
     poltype.singlepertubationfilesize=[i*int(poltype.proddynframenum)*10**-9 for i in poltype.xyzfilesize] # in GB

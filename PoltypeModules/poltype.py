@@ -4508,6 +4508,29 @@ class PolarizableTyper():
                     chg=int(round(float(linesplit[-2])))
             return chg
 
+
+        def CheckEnergies(self,output):
+            temp=open(output,'r')
+            results=temp.readlines()
+            temp.close()
+            tol=.2
+            for line in results:
+                if 'Bond Stretching' in line and 'Parameters' not in line:
+                    linesplit=line.split()
+                    intnum=int(linesplit[-1])
+                    energy=float(linesplit[-2])
+                    energyperbond=energy/intnum
+                    if energyperbond>tol:
+                        raise ValueError('Bad starting box structure, bond energy per bond is way to high '+str(energyperbond)+' kcal/mol')
+
+
+            for line in results:
+                if 'Total Electric Charge :' in line:
+                    linesplit=line.split()
+                    chg=float(linesplit[-2])
+
+
+
         def CheckInputXYZKeyFiles(self):
             keymods.RemoveKeyWords(self,self.originalkeyfilename,['parameters','axis','ewald','pme-grid','pme-order','cutoff','thermostat','integrator','ligand','verbose','archive','neighbor-list','polar-eps','polar-predict','heavy-hydrogen','omp-threads'])
             string='parameters '+self.prmfilepath+'\n'
