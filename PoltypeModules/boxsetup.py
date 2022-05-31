@@ -273,7 +273,7 @@ def CreateWaterXYZ(poltype):
 
 def CreateSolventBox(poltype,aaxis,baxis,caxis,waternum,filename,key):
     temp=open(poltype.outputpath+'xyzedit.in','w')
-    temp.write('21'+'\n')
+    temp.write('23'+'\n')
     temp.write(str(waternum)+'\n')
     if baxis==None:
         baxis=aaxis
@@ -288,7 +288,7 @@ def CreateSolventBox(poltype,aaxis,baxis,caxis,waternum,filename,key):
     return newfilename
  
 def SoakMoleculeInSolventBox(poltype,xyzfilename,keyfilename):
-    cmdstr=poltype.xyzeditpath+' '+xyzfilename+' '+'-k'+' '+keyfilename+' '+'22'+' '+'water.xyz_2'
+    cmdstr=poltype.xyzeditpath+' '+xyzfilename+' '+'-k'+' '+keyfilename+' '+'24'+' '+'water.xyz_2'
     submit.call_subsystem(poltype,cmdstr,wait=True)    
 
 def AddIonToSolventBox(poltype,solutexyzfilename,keyfilename,tinktype,ionnum,count,writesolute=True):
@@ -306,7 +306,7 @@ def AddIonToSolventBox(poltype,solutexyzfilename,keyfilename,tinktype,ionnum,cou
     temp.write(string)
     temp.write('\n')
     temp.close()
-    cmdstr=poltype.xyzeditpath+' '+solutexyzfilename+'_'+str(num)+' '+'-k'+' '+keyfilename+' '+'23'+' '+' < '+inputfile
+    cmdstr=poltype.xyzeditpath+' '+solutexyzfilename+'_'+str(num)+' '+'-k'+' '+keyfilename+' '+'25'+' '+' < '+inputfile
     submit.call_subsystem(poltype,cmdstr,wait=True)    
 
 

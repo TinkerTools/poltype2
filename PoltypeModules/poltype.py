@@ -2255,12 +2255,12 @@ class PolarizableTyper():
                 if "Version" in line:
                     linesplit = line.split()
                     self.versionnum = linesplit[2]
-                    if version.parse(self.versionnum) >= version.parse("8.9.4"):
+                    if version.parse(self.versionnum) >= version.parse("8.10.2"):
                         latestversion = True
                         break
 
             if not latestversion:
-                raise ValueError("Notice: Not latest working version of tinker (8.9.4)"+' '+os.getcwd())
+                raise ValueError("Notice: Not latest working version of tinker (8.10.2)"+' '+os.getcwd())
             
             if self.forcefield.upper() in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
                 self.paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebaplus21_header.prm"
@@ -4513,7 +4513,7 @@ class PolarizableTyper():
             temp=open(output,'r')
             results=temp.readlines()
             temp.close()
-            tol=.2
+            tol=5
             for line in results:
                 if 'Bond Stretching' in line and 'Parameters' not in line:
                     linesplit=line.split()
