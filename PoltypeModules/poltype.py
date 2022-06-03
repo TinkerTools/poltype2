@@ -80,6 +80,7 @@ from rdkit.Chem.MolStandardize import rdMolStandardize
 
 @dataclass
 class PolarizableTyper():
+        indextotypefile:None=None
         pdbcode:None=None
         usesymtypes: bool = True
         barinterval: int =5
@@ -467,6 +468,8 @@ class PolarizableTyper():
                             self.uncomplexedproteinpdbname=a
                         elif 'pdbcode' in newline:
                             self.pdbcode=a
+                        elif 'indextotypefile' in newline:
+                            self.indextotypefile=a
                         elif 'templateligandxyzfilename' in newline:
                             self.templateligandxyzfilename=a
                         elif 'barinterval' in newline:
@@ -3306,6 +3309,9 @@ class PolarizableTyper():
                     os.mkdir(foldername)
                 shutil.copy(self.molstructfname,os.path.join(foldername,self.molstructfname))
                 shutil.copy('poltype.ini',os.path.join(foldername,'poltype.ini'))
+
+                if self.indextotypefile!=None:
+                    shutil.copy(self.indextotypefile,os.path.join(foldername,self.indextotypefile))
                 os.chdir(foldername)
             self.startdir=os.getcwd()
             self.totalcharge=None

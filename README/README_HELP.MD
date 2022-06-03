@@ -111,6 +111,9 @@
 
 ``usesymtypes`` specifies to use symmetry typing to reduce and average atom types. Default is True.
 
+
+``indextotypefile`` specfies to use a file that will read in custom atom index to type number map. Default is None. Example ``indextotypefile=indextotypefile.txt``. For each line in the file, the first item is atom index (starting from 1) and second item is the desired type number.
+
 #### Geometry Optimization
 
 ``optbasisset`` specifies basis set for geometry optimization. Default is 6-31G*.
@@ -478,7 +481,7 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 
 ``pathtosims``  specifies path to folder containing subfolders of simulations for combining simulation data into one spreadsheet. Will exit program after combining data. Default has no value. 
 
-``extractinterforbinding`` specifies to extract intermoleculer contribution to free energy for each BAR step. By default, annihilation is used which causes inter and intra molecular components to be mixed for binding free energy (gas phase is not computed since it would cancel in thermodynamic cycle). This keyword will extract the ligand dynamics and generate an ARC file for the ligand, run BAR and compute the exact intramolecular component to the free energy and add to spreadsheet.
+``extractinterforbinding`` specifies to extract intermoleculer contribution to free energy for each BAR step. By default, annihilation is used which causes inter and intra molecular components to be mixed for binding free energy (gas phase is not computed since it would cancel in thermodynamic cycle). This keyword will extract the ligand dynamics and generate an ARC file for the ligand, run BAR and compute the exact intermolecular component to the free energy and add to spreadsheet.
 
 #### Mutation
 

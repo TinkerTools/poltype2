@@ -51,6 +51,8 @@ def gen_canonicallabels(poltype,mol,rdkitmol=None,usesym=True):
     for symclass,grp in symclasstogrp.items():
         for index in grp:
             idxtosymclass[index+1]=symclass
+    if poltype.indextotypefile!=None:
+        idxtosymclass=ReadCustomIndexToTypeFiles(poltype,poltype.indextotypefile)
     symmetryclass=idxtosymclass.values()
     return idxtosymclass,symmetryclass
 
@@ -78,6 +80,22 @@ def ComputeSymmetryTypes(poltype,distmat,rdkitmol,mol,usesym):
             indextomatchingindices[atomidx]=atomidx
 
     return indextomatchingindices
+
+
+def ReadCustomIndexToTypeFiles(poltype,indextotypefile):
+    indextomatchingindices={}
+    temp=open(indextotypefile,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        linesplit=line.split()
+        if len(linesplit)!=0:
+            index=int(linesplit[0])
+            typenumber=int(linesplit[1])
+            indextomatchingindices[index]=typenumber
+    return indextomatchingindices
+
+
 
 
 def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):

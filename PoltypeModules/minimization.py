@@ -136,6 +136,9 @@ def ExpensiveMinimizationProtocol(poltype):
         if not os.path.isfile(poltype.outputpath+minboxfilename):
             if os.path.exists(poltype.outputpath+boxfilename+'_3'):
                 os.rename(poltype.outputpath+boxfilename+'_3',poltype.outputpath+minboxfilename)
+        alzout='CheckEnergies.alz'
+        poltype.CallAnalyze(poltype.outputpath+minboxfilename,key,alzout,poltype.trueanalyzepath,'e')
+        poltype.CheckEnergies(alzout)
 
         if poltype.restrainatomsduringminimization:
             keymods.RemoveKeyWords(poltype,poltype.outputpath+key,['restrain-position'])
@@ -213,7 +216,10 @@ def CheapMinimizationProtocol(poltype):
     
                 os.rename(poltype.outputpath+boxfilename+'_2',poltype.outputpath+minboxfilename)
     
-            
+            alzout='CheckEnergies.alz'
+            poltype.CallAnalyze(poltype.outputpath+minboxfilename,key,alzout,poltype.trueanalyzepath,'e')
+            poltype.CheckEnergies(alzout)
+
             if poltype.restrainatomsduringminimization:
                 keymods.RemoveKeyWords(poltype,poltype.outputpath+key,['restrain-position'])
     
