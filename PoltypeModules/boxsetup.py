@@ -170,29 +170,33 @@ def FindDimensionsOfMoleculeTinker(poltype,structurefilepath):
     temp=open(structurefilepath,'r')
     results=temp.readlines()
     temp.close()
+    atomindexlist=[]
     for line in results:
         linesplit=line.split()
         if len(linesplit)!=1 and '90.000000' not in line: # not line containing number of atoms
             vec=np.array([float(linesplit[2]),float(linesplit[3]),float(linesplit[4])])
             veclist.append(vec)
-
-    pairs=list(itertools.combinations(veclist, 2))
+            atomindex=int(linesplit[0])
+            atomindexlist.append(atomindex)
+    atompairs=list(itertools.combinations(atomindexlist, 2))
     disttodiffvec={}
-    
-    for pairidx in range(len(pairs)):
-        pair=pairs[pairidx]
-        progress=(pairidx*100)/len(pairs)
-        diff=np.array(pair[0])-np.array(pair[1])
+    disttopairs={} 
+    for pairidx in range(len(atompairs)):
+        atompair=atompairs[pairidx]
+        vec1=veclist[atompair[0]-1]
+        vec2=veclist[atompair[1]-1]
+        diff=np.array(vec1)-np.array(vec2)
         dist=np.linalg.norm(diff)
-        
+        disttopairs[dist]=atompair
         disttodiffvec[dist]=diff
     distlist=list(disttodiffvec.keys())
     if len(distlist)!=0:
-        mindist=np.amax(np.array(distlist))
-        diffvec=disttodiffvec[mindist]
+        maxdist=np.amax(np.array(distlist))
+        diffvec=disttodiffvec[maxdist]
+        pair=disttopairs[maxdist]
     else:
-        mindist=0
-    return mindist
+        maxdist=0
+    return maxdist
 
 def FindDimensionsOfMoleculeTinkerXYZ(poltype,structurefilepath):
     veclist=[]
@@ -203,6 +207,7 @@ def FindDimensionsOfMoleculeTinkerXYZ(poltype,structurefilepath):
         linesplit=line.split()
         if len(linesplit)!=1 and '90.000000' not in line: # not line containing number of atoms
             vec=np.array([float(linesplit[2]),float(linesplit[3]),float(linesplit[4])])
+            typenumber=int(linesplit[5])
             veclist.append(vec)
     xdistlist=[]
     ydistlist=[]
@@ -215,14 +220,19 @@ def FindDimensionsOfMoleculeTinkerXYZ(poltype,structurefilepath):
         zdistlist.append(z)
     maxx=max(xdistlist)
     minx=min(xdistlist)
+    maxxatomindex=xdistlist.index(maxx)+1
+    minxatomindex=xdistlist.index(minx)+1
     x=np.abs(maxx-minx) 
     maxy=max(ydistlist)
     miny=min(ydistlist)
+    maxyatomindex=ydistlist.index(maxy)+1
+    minyatomindex=ydistlist.index(miny)+1
     y=np.abs(maxy-miny) 
     maxz=max(zdistlist)
     minz=min(zdistlist)
+    maxzatomindex=zdistlist.index(maxz)+1
+    minzatomindex=zdistlist.index(minz)+1
     z=np.abs(maxz-minz) 
-
 
     return x,y,z
 

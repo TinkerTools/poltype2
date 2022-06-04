@@ -7,7 +7,7 @@ from openbabel import pybel
 import databaseparser
 
 
-def gen_canonicallabels(poltype,mol,rdkitmol=None,usesym=True):
+def gen_canonicallabels(poltype,mol,rdkitmol=None,usesym=True,isparent=False):
     if rdkitmol==None:
         obConversion = openbabel.OBConversion()
         obConversion.SetOutFormat('mol')
@@ -51,7 +51,7 @@ def gen_canonicallabels(poltype,mol,rdkitmol=None,usesym=True):
     for symclass,grp in symclasstogrp.items():
         for index in grp:
             idxtosymclass[index+1]=symclass
-    if poltype.indextotypefile!=None:
+    if poltype.indextotypefile!=None and isparent==True:
         idxtosymclass=ReadCustomIndexToTypeFiles(poltype,poltype.indextotypefile)
     symmetryclass=idxtosymclass.values()
     return idxtosymclass,symmetryclass

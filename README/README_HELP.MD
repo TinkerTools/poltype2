@@ -386,7 +386,7 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 ``listofsaltcons``  specifies the salt concentration for physiological systems. Units in mM. Default is [KCl]=100.
 
 
-``usepreequilibriatedbox``  specifies to use preequilibriated box and then cut default equilibriation time in half. Default is True.
+``usepreequilibriatedbox``  specifies to use preequilibriated box and then cut default equilibriation time in half. Default is False.
 
 ``boxonly`` specifies to stop program after making box. Default is False.           
 

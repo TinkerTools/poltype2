@@ -200,7 +200,8 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 * If 2D structure is given, poltype will generate 3D coordinates for you.
 * Total charge is determined by computing the formal charge for each atom.
 * Formal atom charge will be assigned via the input number of bonds and bond order for surrounding bonds and element of each atom. 
-* Optional keywords exist to add missing hydrogens. 
+* Optional keywords exist to add missing hydrogens.
+* If carbon or nitrogen are negatively charged, then Poltype will assume you meant to have hydrogens on those atoms and protonate to neutral charge. For all other elements, if there exists a formal charge (due to input bond order and valence electrons of element), then poltype will detect the formal charge for you and compute total charge from sum of each formal atom charge. Warning message is printed when hydrogen atoms are added. 
 * Special radical charge states require additional information in the input file specifying which atom is a radical. 
 
 ### Ligand Protonation State Generation

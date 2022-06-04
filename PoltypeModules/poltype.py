@@ -119,7 +119,7 @@ class PolarizableTyper():
         perturbkeyfilelist:None=None
         boxonly:bool=False
         preequilboxpath:str=os.path.join(os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir)),'waterhuge.xyz')
-        usepreequilibriatedbox:bool=True
+        usepreequilibriatedbox:bool=False
         lastNVTequiltime:float=.5
         norotrestrainsphereradius:float=2
         aaxis:None=None
@@ -3252,15 +3252,14 @@ class PolarizableTyper():
             return mp2failed
 
 
-        def GrabAtomicSymbols(self,mol):
+        def GrabAtomicSymbols(self,rdkitmol):
             indextoatomicsymbol={}
-            iteratombab = openbabel.OBMolAtomIter(mol)
             an = pyasl.AtomicNo()
-            for atm in iteratombab:
+            for atm in rdkitmol.GetAtoms():
                 atmnum=atm.GetAtomicNum()
                 atmidx=atm.GetIdx()
                 sym=an.getElSymbol(atmnum)
-                indextoatomicsymbol[atmidx]=sym
+                indextoatomicsymbol[atmidx+1]=sym
 
             return indextoatomicsymbol
 
@@ -3328,7 +3327,6 @@ class PolarizableTyper():
             inFormat = obConversion.FormatFromExt(self.molstructfname)
             obConversion.SetInFormat(inFormat)
             obConversion.ReadFile(mol, self.molstructfname)
-            self.indextoatomicsymbol=self.GrabAtomicSymbols(mol)
             self.atomnum=mol.NumAtoms() 
             self.logfh = open(self.logfname,"w",buffering=1)
 
@@ -3346,6 +3344,8 @@ class PolarizableTyper():
             if self.addhydrogentononcharged==True and self.isfragjob==False:
                 m = Chem.AddHs(m)
                 AllChem.EmbedMolecule(m)
+
+            self.indextoatomicsymbol=self.GrabAtomicSymbols(m)
             Chem.SanitizeMol(m)
             smarts=rdmolfiles.MolToSmarts(m)
             if '.' in smarts:
@@ -3422,7 +3422,7 @@ class PolarizableTyper():
             self.localframe2 = [ 0 ] * mol.NumAtoms()
             self.WriteToLog("Atom Type Classification")
 
-            self.idxtosymclass,self.symmetryclass=symm.gen_canonicallabels(self,mol,None,self.usesymtypes) 
+            self.idxtosymclass,self.symmetryclass=symm.gen_canonicallabels(self,mol,None,self.usesymtypes,True) 
  
             # QM calculations are done here
             # First the molecule is optimized. (-opt) 
