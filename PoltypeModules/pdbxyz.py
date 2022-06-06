@@ -490,7 +490,7 @@ def FillInMissingResidues(poltype,code):
 
 def CallPDB2PQR(poltype,pdbfilename):
     outputfile=pdbfilename.replace('.pdb','.pqr')
-    cmdstr='pdb2pqr30'+' '+pdbfilename+' '+outputfile
+    cmdstr='pdb2pqr30'+' '+pdbfilename+' '+outputfile+' '+'--titration-state-method=propka'
     os.system(cmdstr)
     finaloutputfile=outputfile.replace('.pqr','_final.pdb')
     ConvertPQRToPDB(poltype,outputfile,finaloutputfile)

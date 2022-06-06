@@ -40,21 +40,25 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 * Please read 👇🙏
 
 ### Features
-* Automated total charge assignment
-* Zwitterion detection
-* Ligand ionization state and tautomer enumeration
-* Smart memory resource defaults for QM jobs
-* Molecule fragmenter to speed up QM
-* Parallelized job submission for QM jobs, fragment jobs
-* Psi4/Gaussian quantum packages
-* QM job error handling 
-* QM dimer generation for vdW fitting
-* Torsion-Torsion coupling
-* Missing protein residue/loop modelling with Modeller
-* Protein pKa estimation and protonation assignment via PROPKA and PDB2PQR
-* Tinker box set up
-* BAR Free energy estimation file setup
 
+
+* Parameterization Input Features
+    * Automated total charge assignment
+    * Dominant ionization state enumeration (pH=7) / tautomer enumeration 
+    * Smart memory resource defaults for QM jobs
+* Parameterization Features
+    * Molecule fragmenter to speed up QM calculations
+    * Parallelized job submission for QM jobs
+    * Psi4/Gaussian quantum package support
+    * QM dimer data generation for vdW fitting
+    * Torsion-Torsion coupling
+    * Expanded torsion database
+* Host-guest Modelling Features
+    * Protein-ligand interaction profiler and visualization with BINANA
+    * Missing residues & loop modeling with Modeller
+    * Protonation assignment via propka/pdb2pqr
+    * Tinker box set up
+    * BAR Free energy estimation file setup
 
 
 
@@ -144,6 +148,8 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 <img src="https://florentbarbault.files.wordpress.com/2010/09/mova1.gif" width="20%">
 
 * [1](#citations)
+
+[Protein Ligand Interaction Visualization](#protein-ligand-interaction-visualization)
 
 [Protein Input Preparation](#protein-input-preparation)
 
@@ -626,6 +632,16 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 ### AMOEBA Plus
 * All the covalent terms including bond, angle, stretch-bend, opbend and torsion will use the same protocols as AMOEBA model. 
 * The non-bonded interaction parameters including atomic polarizability, van der Waals, charge penetration, charge transfer, and geometry dependent charge flux are set to match the AMOEBA+ database parameters. * To this date these parameters are still under development for a series of organic molecules. These parameters will be deposited into Poltype 2 on GitHub on available. 
+
+
+### Protein Ligand Interaction Visualization
+* Navigate to folder VisualizationNotebooks
+* Be sure to install the conda environment (notebookenvironment.yml)
+* Activate the conda environment ``conda activate pymolenv``
+* Move protein-ligand complexed PDB to VisualizationNotebooks folder
+* Launch the jupyter notebook ``jupyter-notebook Protein-Ligand-Interactions.ipunb``
+* Input your complexed PDB name into variable ``ligandreceptorfilename``
+* Run the cell and the output from BINANA interaction profiler is shown. 
 
 
 ### Protein Input Preparation

@@ -1,0 +1,4 @@
+PDBQT files (with polar hydrogens). Three hydrogen bonds, with donors/acceptors
+on both receptor and ligand. Many salt bridges, with negative groups on receptor
+and ligand. Cation/pi, with cations on both receptor and ligand. Pi-pi stacking.
+T-stacking, with cross ring on both receptor and ligand.

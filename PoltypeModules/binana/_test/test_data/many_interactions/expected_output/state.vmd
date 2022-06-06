@@ -1,0 +1,292 @@
+set viewplist {}
+set fixedlist {}
+# Display settings
+display projection   Orthographic
+display depthcue   on
+display cuestart   0.500000
+display cueend     10.000000
+display cuedensity 0.200000
+display cuemode    Exp2
+mol new back_bone.pdb type pdb first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all
+mol delrep 0 top
+mol representation VDW 1.000000 8.000000
+mol color Name
+mol selection {all}
+mol material Opaque
+mol addrep top
+mol selupdate 0 top 0
+mol colupdate 0 top 0
+mol scaleminmax top 0 0.000000 0.000000
+mol smoothrep top 0 0
+mol drawframes top 0 {now}
+mol rename top back_bone.pdb
+molinfo top set drawn 0
+set viewpoints([molinfo top]) {{{1 0 0 -75.1819} {0 1 0 -83.0219} {0 0 1 -119.981} {0 0 0 1}} {{-0.0620057 0.672762 -0.737291 0} {0.428709 0.685044 0.589035 0} {0.90135 -0.279568 -0.33089 0} {0 0 0 1}} {{0.11999 0 0 0} {0 0.11999 0 0} {0 0 0.11999 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+lappend viewplist [molinfo top]
+mol new side_chain.pdb type pdb first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all
+mol delrep 0 top
+mol representation VDW 1.000000 8.000000
+mol color Name
+mol selection {all}
+mol material Opaque
+mol addrep top
+mol selupdate 0 top 0
+mol colupdate 0 top 0
+mol scaleminmax top 0 0.000000 0.000000
+mol smoothrep top 0 0
+mol drawframes top 0 {now}
+mol rename top side_chain.pdb
+molinfo top set drawn 0
+set viewpoints([molinfo top]) {{{1 0 0 -75.1819} {0 1 0 -83.0219} {0 0 1 -119.981} {0 0 0 1}} {{-0.0620057 0.672762 -0.737291 0} {0.428709 0.685044 0.589035 0} {0.90135 -0.279568 -0.33089 0} {0 0 0 1}} {{0.11999 0 0 0} {0 0.11999 0 0} {0 0 0.11999 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+lappend viewplist [molinfo top]
+mol new close_contacts.pdb type pdb first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all
+mol delrep 0 top
+mol representation VDW 1.000000 8.000000
+mol color Name
+mol selection {all}
+mol material Opaque
+mol addrep top
+mol selupdate 0 top 0
+mol colupdate 0 top 0
+mol scaleminmax top 0 0.000000 0.000000
+mol smoothrep top 0 0
+mol drawframes top 0 {now}
+mol rename top close_contacts.pdb
+molinfo top set drawn 0
+set viewpoints([molinfo top]) {{{1 0 0 -75.1819} {0 1 0 -83.0219} {0 0 1 -119.981} {0 0 0 1}} {{-0.0620057 0.672762 -0.737291 0} {0.428709 0.685044 0.589035 0} {0.90135 -0.279568 -0.33089 0} {0 0 0 1}} {{0.11999 0 0 0} {0 0.11999 0 0} {0 0 0.11999 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+lappend viewplist [molinfo top]
+mol new contacts.pdb type pdb first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all
+mol delrep 0 top
+mol representation VDW 0.500000 8.000000
+mol color Name
+mol selection {all}
+mol material Opaque
+mol addrep top
+mol selupdate 0 top 0
+mol colupdate 0 top 0
+mol scaleminmax top 0 0.000000 0.000000
+mol smoothrep top 0 0
+mol drawframes top 0 {now}
+mol rename top contacts.pdb
+molinfo top set drawn 0
+set viewpoints([molinfo top]) {{{1 0 0 -75.1819} {0 1 0 -83.0219} {0 0 1 -119.981} {0 0 0 1}} {{-0.0620057 0.672762 -0.737291 0} {0.428709 0.685044 0.589035 0} {0.90135 -0.279568 -0.33089 0} {0 0 0 1}} {{0.11999 0 0 0} {0 0.11999 0 0} {0 0 0.11999 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+lappend viewplist [molinfo top]
+mol new contacts_alpha_helix.pdb type pdb first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all
+mol delrep 0 top
+mol representation VDW 1.000000 8.000000
+mol color Name
+mol selection {all}
+mol material Opaque
+mol addrep top
+mol selupdate 0 top 0
+mol colupdate 0 top 0
+mol scaleminmax top 0 0.000000 0.000000
+mol smoothrep top 0 0
+mol drawframes top 0 {now}
+mol rename top contacts_alpha_helix.pdb
+molinfo top set drawn 0
+set viewpoints([molinfo top]) {{{1 0 0 -75.1819} {0 1 0 -83.0219} {0 0 1 -119.981} {0 0 0 1}} {{-0.0620057 0.672762 -0.737291 0} {0.428709 0.685044 0.589035 0} {0.90135 -0.279568 -0.33089 0} {0 0 0 1}} {{0.11999 0 0 0} {0 0.11999 0 0} {0 0 0.11999 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+lappend viewplist [molinfo top]
+mol new contacts_beta_sheet.pdb type pdb first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all
+mol delrep 0 top
+mol representation VDW 1.000000 8.000000
+mol color Name
+mol selection {all}
+mol material Opaque
+mol addrep top
+mol selupdate 0 top 0
+mol colupdate 0 top 0
+mol scaleminmax top 0 0.000000 0.000000
+mol smoothrep top 0 0
+mol drawframes top 0 {now}
+mol rename top contacts_beta_sheet.pdb
+molinfo top set drawn 0
+set viewpoints([molinfo top]) {{{1 0 0 -75.1819} {0 1 0 -83.0219} {0 0 1 -119.981} {0 0 0 1}} {{-0.0620057 0.672762 -0.737291 0} {0.428709 0.685044 0.589035 0} {0.90135 -0.279568 -0.33089 0} {0 0 0 1}} {{0.11999 0 0 0} {0 0.11999 0 0} {0 0 0.11999 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+lappend viewplist [molinfo top]
+mol new contacts_other_secondary_structure.pdb type pdb first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all
+mol delrep 0 top
+mol representation VDW 1.000000 8.000000
+mol color Name
+mol selection {all}
+mol material Opaque
+mol addrep top
+mol selupdate 0 top 0
+mol colupdate 0 top 0
+mol scaleminmax top 0 0.000000 0.000000
+mol smoothrep top 0 0
+mol drawframes top 0 {now}
+mol rename top contacts_other_secondary_structure.pdb
+molinfo top set drawn 0
+set viewpoints([molinfo top]) {{{1 0 0 -75.1819} {0 1 0 -83.0219} {0 0 1 -119.981} {0 0 0 1}} {{-0.0620057 0.672762 -0.737291 0} {0.428709 0.685044 0.589035 0} {0.90135 -0.279568 -0.33089 0} {0 0 0 1}} {{0.11999 0 0 0} {0 0.11999 0 0} {0 0 0.11999 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+lappend viewplist [molinfo top]
+mol new hydrophobic.pdb type pdb first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all
+mol delrep 0 top
+mol representation VDW 0.500000 8.000000
+mol color Name
+mol selection {all}
+mol material Opaque
+mol addrep top
+mol selupdate 0 top 0
+mol colupdate 0 top 0
+mol scaleminmax top 0 0.000000 0.000000
+mol smoothrep top 0 0
+mol drawframes top 0 {now}
+mol rename top hydrophobic.pdb
+molinfo top set drawn 0
+set viewpoints([molinfo top]) {{{1 0 0 -75.1819} {0 1 0 -83.0219} {0 0 1 -119.981} {0 0 0 1}} {{-0.0620057 0.672762 -0.737291 0} {0.428709 0.685044 0.589035 0} {0.90135 -0.279568 -0.33089 0} {0 0 0 1}} {{0.11999 0 0 0} {0 0.11999 0 0} {0 0 0.11999 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+lappend viewplist [molinfo top]
+mol new hydrogen_bonds.pdb type pdb first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all
+mol delrep 0 top
+mol representation Licorice 0.300000 10.000000 10.000000
+mol color Name
+mol selection {all}
+mol material Opaque
+mol addrep top
+mol selupdate 0 top 0
+mol colupdate 0 top 0
+mol scaleminmax top 0 0.000000 0.000000
+mol smoothrep top 0 0
+mol drawframes top 0 {now}
+mol rename top hydrogen_bonds.pdb
+molinfo top set drawn 0
+set viewpoints([molinfo top]) {{{1 0 0 -75.1819} {0 1 0 -83.0219} {0 0 1 -119.981} {0 0 0 1}} {{-0.0620057 0.672762 -0.737291 0} {0.428709 0.685044 0.589035 0} {0.90135 -0.279568 -0.33089 0} {0 0 0 1}} {{0.11999 0 0 0} {0 0.11999 0 0} {0 0 0.11999 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+lappend viewplist [molinfo top]
+mol new halogen_bonds.pdb type pdb first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all
+mol delrep 0 top
+mol representation Licorice 0.300000 10.000000 10.000000
+mol color Name
+mol selection {all}
+mol material Opaque
+mol addrep top
+mol selupdate 0 top 0
+mol colupdate 0 top 0
+mol scaleminmax top 0 0.000000 0.000000
+mol smoothrep top 0 0
+mol drawframes top 0 {now}
+mol rename top halogen_bonds.pdb
+molinfo top set drawn 0
+set viewpoints([molinfo top]) {{{1 0 0 -75.1819} {0 1 0 -83.0219} {0 0 1 -119.981} {0 0 0 1}} {{-0.0620057 0.672762 -0.737291 0} {0.428709 0.685044 0.589035 0} {0.90135 -0.279568 -0.33089 0} {0 0 0 1}} {{0.11999 0 0 0} {0 0.11999 0 0} {0 0 0.11999 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+lappend viewplist [molinfo top]
+mol new salt_bridges.pdb type pdb first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all
+mol delrep 0 top
+mol representation Licorice 0.300000 10.000000 10.000000
+mol color Name
+mol selection {all}
+mol material Opaque
+mol addrep top
+mol selupdate 0 top 0
+mol colupdate 0 top 0
+mol scaleminmax top 0 0.000000 0.000000
+mol smoothrep top 0 0
+mol drawframes top 0 {now}
+mol rename top salt_bridges.pdb
+molinfo top set drawn 0
+set viewpoints([molinfo top]) {{{1 0 0 -75.1819} {0 1 0 -83.0219} {0 0 1 -119.981} {0 0 0 1}} {{-0.0620057 0.672762 -0.737291 0} {0.428709 0.685044 0.589035 0} {0.90135 -0.279568 -0.33089 0} {0 0 0 1}} {{0.11999 0 0 0} {0 0.11999 0 0} {0 0 0.11999 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+lappend viewplist [molinfo top]
+mol new metal_coordinations.pdb type pdb first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all
+mol delrep 0 top
+mol representation VDW 1.000000 8.000000
+mol color Name
+mol selection {all}
+mol material Opaque
+mol addrep top
+mol selupdate 0 top 0
+mol colupdate 0 top 0
+mol scaleminmax top 0 0.000000 0.000000
+mol smoothrep top 0 0
+mol drawframes top 0 {now}
+mol rename top metal_coordinations.pdb
+molinfo top set drawn 0
+set viewpoints([molinfo top]) {{{1 0 0 -75.1819} {0 1 0 -83.0219} {0 0 1 -119.981} {0 0 0 1}} {{-0.0620057 0.672762 -0.737291 0} {0.428709 0.685044 0.589035 0} {0.90135 -0.279568 -0.33089 0} {0 0 0 1}} {{0.11999 0 0 0} {0 0.11999 0 0} {0 0 0.11999 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+lappend viewplist [molinfo top]
+mol new cat_pi.pdb type pdb first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all
+mol delrep 0 top
+mol representation Licorice 0.300000 10.000000 10.000000
+mol color Name
+mol selection {all}
+mol material Opaque
+mol addrep top
+mol selupdate 0 top 0
+mol colupdate 0 top 0
+mol scaleminmax top 0 0.000000 0.000000
+mol smoothrep top 0 0
+mol drawframes top 0 {now}
+mol rename top cat_pi.pdb
+molinfo top set drawn 0
+set viewpoints([molinfo top]) {{{1 0 0 -75.1819} {0 1 0 -83.0219} {0 0 1 -119.981} {0 0 0 1}} {{-0.0620057 0.672762 -0.737291 0} {0.428709 0.685044 0.589035 0} {0.90135 -0.279568 -0.33089 0} {0 0 0 1}} {{0.11999 0 0 0} {0 0.11999 0 0} {0 0 0.11999 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+lappend viewplist [molinfo top]
+mol new pi_pi_stacking.pdb type pdb first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all
+mol delrep 0 top
+mol representation Licorice 0.300000 10.000000 10.000000
+mol color Name
+mol selection {all}
+mol material Opaque
+mol addrep top
+mol selupdate 0 top 0
+mol colupdate 0 top 0
+mol scaleminmax top 0 0.000000 0.000000
+mol smoothrep top 0 0
+mol drawframes top 0 {now}
+mol rename top pi_pi_stacking.pdb
+molinfo top set drawn 0
+set viewpoints([molinfo top]) {{{1 0 0 -75.1819} {0 1 0 -83.0219} {0 0 1 -119.981} {0 0 0 1}} {{-0.0620057 0.672762 -0.737291 0} {0.428709 0.685044 0.589035 0} {0.90135 -0.279568 -0.33089 0} {0 0 0 1}} {{0.11999 0 0 0} {0 0.11999 0 0} {0 0 0.11999 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+lappend viewplist [molinfo top]
+mol new T_stacking.pdb type pdb first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all
+mol delrep 0 top
+mol representation Licorice 0.300000 10.000000 10.000000
+mol color Name
+mol selection {all}
+mol material Opaque
+mol addrep top
+mol selupdate 0 top 0
+mol colupdate 0 top 0
+mol scaleminmax top 0 0.000000 0.000000
+mol smoothrep top 0 0
+mol drawframes top 0 {now}
+mol rename top T_stacking.pdb
+molinfo top set drawn 0
+set viewpoints([molinfo top]) {{{1 0 0 -75.1819} {0 1 0 -83.0219} {0 0 1 -119.981} {0 0 0 1}} {{-0.0620057 0.672762 -0.737291 0} {0.428709 0.685044 0.589035 0} {0.90135 -0.279568 -0.33089 0} {0 0 0 1}} {{0.11999 0 0 0} {0 0.11999 0 0} {0 0 0.11999 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+lappend viewplist [molinfo top]
+mol new ligand.pdb type pdb first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all
+mol delrep 0 top
+mol representation CPK 1.000000 0.300000 8.000000 6.000000
+mol color Name
+mol selection {all}
+mol material Opaque
+mol addrep top
+mol selupdate 0 top 0
+mol colupdate 0 top 0
+mol scaleminmax top 0 0.000000 0.000000
+mol smoothrep top 0 0
+mol drawframes top 0 {now}
+mol rename top ligand.pdb
+set viewpoints([molinfo top]) {{{1 0 0 -75.1819} {0 1 0 -83.0219} {0 0 1 -119.981} {0 0 0 1}} {{-0.0620057 0.672762 -0.737291 0} {0.428709 0.685044 0.589035 0} {0.90135 -0.279568 -0.33089 0} {0 0 0 1}} {{0.11999 0 0 0} {0 0.11999 0 0} {0 0 0.11999 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+lappend viewplist [molinfo top]
+set topmol [molinfo top]
+mol new receptor.pdb type pdb first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all
+mol delrep 0 top
+mol representation Lines 3.000000
+mol color Name
+mol selection {all}
+mol material Opaque
+mol addrep top
+mol selupdate 0 top 0
+mol colupdate 0 top 0
+mol scaleminmax top 0 0.000000 0.000000
+mol smoothrep top 0 0
+mol drawframes top 0 {now}
+mol rename top receptor.pdb
+set viewpoints([molinfo top]) {{{1 0 0 -75.1819} {0 1 0 -83.0219} {0 0 1 -119.981} {0 0 0 1}} {{-0.0620057 0.672762 -0.737291 0} {0.428709 0.685044 0.589035 0} {0.90135 -0.279568 -0.33089 0} {0 0 0 1}} {{0.11999 0 0 0} {0 0.11999 0 0} {0 0 0.11999 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+lappend viewplist [molinfo top]
+foreach v $viewplist {
+  molinfo $v set {center_matrix rotate_matrix scale_matrix global_matrix} $viewpoints($v)
+}
+foreach v $fixedlist {
+  molinfo $v set fixed 1
+}
+unset viewplist
+unset fixedlist
+mol top $topmol
+unset topmol
+color Display {Background} white
+display resetview

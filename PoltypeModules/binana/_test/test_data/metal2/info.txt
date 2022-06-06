@@ -1,0 +1,2 @@
+Same as "metal" test, but ligand and receptor reversed. Based on 2M30. PDB files
+(no hydrogens). Includes metal coordination and salt bride with metal.

@@ -1,0 +1,830 @@
+{
+  "activeSiteFlexibility": {
+    "SIDECHAIN_OTHER": 24
+  },
+  "cationPiInteractions": [],
+  "closeContacts": [
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 1406,
+          "atomName": "O",
+          "chain": "A",
+          "resID": 96,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 3.9457052601531233
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 1421,
+          "atomName": "CA",
+          "chain": "A",
+          "resID": 97,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 3.485937033281005
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 1424,
+          "atomName": "CB",
+          "chain": "A",
+          "resID": 97,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 3.585619332834985
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 1425,
+          "atomName": "CG",
+          "chain": "A",
+          "resID": 97,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 3.1269521902325215
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 1426,
+          "atomName": "ND1",
+          "chain": "A",
+          "resID": 97,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 1.974986835399159
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 1428,
+          "atomName": "CE1",
+          "chain": "A",
+          "resID": 97,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 2.8912822414977004
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 1431,
+          "atomName": "HA",
+          "chain": "A",
+          "resID": 97,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 2.601606618995271
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 1432,
+          "atomName": "HB2",
+          "chain": "A",
+          "resID": 97,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 3.691663446198745
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 1435,
+          "atomName": "HE1",
+          "chain": "A",
+          "resID": 97,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 3.177007869049111
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 1468,
+          "atomName": "CD2",
+          "chain": "A",
+          "resID": 100,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 2.9500057627062395
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 1469,
+          "atomName": "CE1",
+          "chain": "A",
+          "resID": 100,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 3.102163922167877
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 1470,
+          "atomName": "NE2",
+          "chain": "A",
+          "resID": 100,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 2.0332422383965976
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 1476,
+          "atomName": "HD2",
+          "chain": "A",
+          "resID": 100,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 3.161728166683533
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 1477,
+          "atomName": "HE1",
+          "chain": "A",
+          "resID": 100,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 3.438283437996349
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 2745,
+          "atomName": "CG",
+          "chain": "B",
+          "resID": 84,
+          "resName": "ASP"
+        }
+      ],
+      "metrics": {
+        "distance": 2.6878173301026256
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 2746,
+          "atomName": "OD1",
+          "chain": "B",
+          "resID": 84,
+          "resName": "ASP"
+        }
+      ],
+      "metrics": {
+        "distance": 2.507389080298465
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 2747,
+          "atomName": "OD2",
+          "chain": "B",
+          "resID": 84,
+          "resName": "ASP"
+        }
+      ],
+      "metrics": {
+        "distance": 2.1392776818356247
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 2775,
+          "atomName": "CB",
+          "chain": "B",
+          "resID": 86,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 3.355510244359267
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 2776,
+          "atomName": "CG",
+          "chain": "B",
+          "resID": 86,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 2.962156140381529
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 2777,
+          "atomName": "ND1",
+          "chain": "B",
+          "resID": 86,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 1.910302593831671
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 2779,
+          "atomName": "CE1",
+          "chain": "B",
+          "resID": 86,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 2.9693544753026746
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 2783,
+          "atomName": "HB2",
+          "chain": "B",
+          "resID": 86,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 2.8637063396933673
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 2784,
+          "atomName": "HB3",
+          "chain": "B",
+          "resID": 86,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 3.9993992048806546
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 2786,
+          "atomName": "HE1",
+          "chain": "B",
+          "resID": 86,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 3.1795265370806454
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    }
+  ],
+  "closestContacts": [
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 1426,
+          "atomName": "ND1",
+          "chain": "A",
+          "resID": 97,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 1.974986835399159
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 1470,
+          "atomName": "NE2",
+          "chain": "A",
+          "resID": 100,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 2.0332422383965976
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 2747,
+          "atomName": "OD2",
+          "chain": "B",
+          "resID": 84,
+          "resName": "ASP"
+        }
+      ],
+      "metrics": {
+        "distance": 2.1392776818356247
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 2777,
+          "atomName": "ND1",
+          "chain": "B",
+          "resID": 86,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 1.910302593831671
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    }
+  ],
+  "electrostaticEnergies": {
+    "C_ZN": 0.0,
+    "H_ZN": 0.0,
+    "N_ZN": 0.0,
+    "O_ZN": 0.0
+  },
+  "halogenBonds": [],
+  "hydrogenBonds": [],
+  "hydrophobicContacts": [],
+  "ligandAtomTypes": {
+    "C": 942,
+    "H": 1546,
+    "N": 282,
+    "O": 280,
+    "S": 6,
+    "ZN": 1
+  },
+  "ligandRotatableBonds": -1,
+  "metalCoordinations": [
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 1426,
+          "atomName": "ND1",
+          "chain": "A",
+          "resID": 97,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 1.974986835399159
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 1470,
+          "atomName": "NE2",
+          "chain": "A",
+          "resID": 100,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 2.0332422383965976
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 2746,
+          "atomName": "OD1",
+          "chain": "B",
+          "resID": 84,
+          "resName": "ASP"
+        }
+      ],
+      "metrics": {
+        "distance": 2.507389080298465
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 2747,
+          "atomName": "OD2",
+          "chain": "B",
+          "resID": 84,
+          "resName": "ASP"
+        }
+      ],
+      "metrics": {
+        "distance": 2.1392776818356247
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    },
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 2777,
+          "atomName": "ND1",
+          "chain": "B",
+          "resID": 86,
+          "resName": "HIS"
+        }
+      ],
+      "metrics": {
+        "distance": 1.910302593831671
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    }
+  ],
+  "piPiStackingInteractions": [],
+  "saltBridges": [
+    {
+      "ligandAtoms": [
+        {
+          "atomIndex": 2745,
+          "atomName": "CG",
+          "chain": "B",
+          "resID": 84,
+          "resName": "ASP"
+        },
+        {
+          "atomIndex": 2746,
+          "atomName": "OD1",
+          "chain": "B",
+          "resID": 84,
+          "resName": "ASP"
+        },
+        {
+          "atomIndex": 2747,
+          "atomName": "OD2",
+          "chain": "B",
+          "resID": 84,
+          "resName": "ASP"
+        }
+      ],
+      "metrics": {
+        "distance": 2.043916889210516
+      },
+      "receptorAtoms": [
+        {
+          "atomIndex": 3059,
+          "atomName": "ZN",
+          "chain": "A",
+          "resID": 201,
+          "resName": "ZN"
+        }
+      ]
+    }
+  ],
+  "tStackingInteractions": []
+}

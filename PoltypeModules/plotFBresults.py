@@ -150,17 +150,17 @@ def GrabResults(outputfile):
                    totalname=prevprevlinesplit[index-1]
                    namesplit=totalname.split('_')
                    name=namesplit[1]
-                   property='Enthalpy'
+                   propertyval='Enthalpy'
                    foundliq=True
                 elif 'Density' in prevprevline:
-                   property='Density'
+                   propertyval='Density'
                    index=prevprevlinesplit.index('Density')
                    totalname=prevprevlinesplit[index-1]
                    namesplit=totalname.split('_')
                    name=namesplit[1]
                    foundliq=True
                 elif 'Interaction Energies' in prevprevline:
-                   property='Interaction Energies'
+                   propertyval='Interaction Energies'
                    index=prevprevprevlinesplit.index('Target:')
                    targetname=prevprevprevlinesplit[index+1]
                    namesplit=targetname.split('_')
@@ -179,21 +179,21 @@ def GrabResults(outputfile):
                 tp=tuple([temp,pressure])
                 if tp not in tpdic[name].keys():
                     tpdic[name][tp]={}
-                if property not in tpdic[name][tp].keys():
-                    tpdic[name][tp][property]={}
-                if refkeyword not in tpdic[name][tp][property].keys():
-                    tpdic[name][tp][property][refkeyword]=[]
-                if calckeyword not in tpdic[name][tp][property].keys():
-                    tpdic[name][tp][property][calckeyword]=[]
-                if errorkeyword not in tpdic[name][tp][property].keys():
-                    tpdic[name][tp][property][errorkeyword]=[]
+                if propertyval not in tpdic[name][tp].keys():
+                    tpdic[name][tp][propertyval]={}
+                if refkeyword not in tpdic[name][tp][propertyval].keys():
+                    tpdic[name][tp][propertyval][refkeyword]=[]
+                if calckeyword not in tpdic[name][tp][propertyval].keys():
+                    tpdic[name][tp][propertyval][calckeyword]=[]
+                if errorkeyword not in tpdic[name][tp][propertyval].keys():
+                    tpdic[name][tp][propertyval][errorkeyword]=[]
 
                 ref=float(linesplit[3])
                 calc=float(linesplit[4])
                 error=float(linesplit[6])
-                tpdic[name][tp][property][refkeyword].append(ref)
-                tpdic[name][tp][property][errorkeyword].append(error)
-                tpdic[name][tp][property][calckeyword].append(calc)
+                tpdic[name][tp][propertyval][refkeyword].append(ref)
+                tpdic[name][tp][propertyval][errorkeyword].append(error)
+                tpdic[name][tp][propertyval][calckeyword].append(calc)
             elif foundQM==True:
                 if targetname not in qmdic.keys():
                     qmdic[targetname]={}
@@ -248,7 +248,7 @@ def PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoin
             formula=filenametoformula[qmtarget] 
             c=filenametocolor[qmtarget]
             x,rmsvalues,msvalues=PlotFBQM(targetdic,formula,indices)
-            nametoaxes[name].scatter(x,rmsvalues, s=10, c=c,marker="s", label=formula)
+            nametoaxes[name].scatter(x,rmsvalues, s=10, c=[c],marker="s", label=formula)
             x=np.array(x)
             x_new = np.linspace(x.min(),x.max(),500)
             try:
@@ -361,29 +361,29 @@ def PlotFBLiq(tpdic,nametotptofinalprops):
             c = next(color)
             if tp not in nametotptofinalprops[name].keys():
                 nametotptofinalprops[name][tp]={}
-            for property in innerdic.keys():
-                relprop=property+'RelativeError'
-                if property not in nametotptofinalprops[name][tp].keys():
-                    nametotptofinalprops[name][tp][property]={}
-                if property not in proptofigs.keys():
+            for propertyval in innerdic.keys():
+                relprop=propertyval+'RelativeError'
+                if propertyval not in nametotptofinalprops[name][tp].keys():
+                    nametotptofinalprops[name][tp][propertyval]={}
+                if propertyval not in proptofigs.keys():
                     fig = plt.figure()
                     ax1 = fig.add_subplot(111)
-                    proptofigs[property]=fig
-                    proptoaxes[property]=ax1
+                    proptofigs[propertyval]=fig
+                    proptoaxes[propertyval]=ax1
                     fig = plt.figure()
                     ax1 = fig.add_subplot(111)
                     proptofigs[relprop]=fig
                     proptoaxes[relprop]=ax1
 
 
-                innermostdic=innerdic[property]
+                innermostdic=innerdic[propertyval]
                 refkey='Ref'
                 calckey='Calc'
                 errkey='CalcErr' 
                 refarray=np.array(innermostdic[refkey])
                 calcarray=np.array(innermostdic[calckey])
                 errarray=np.array(innermostdic[errkey])
-                if property=='Enthalpy':
+                if propertyval=='Enthalpy':
                     scale=0.239006 # convert kj to kcal
                     units='(kcal/mol)'
                 else:
@@ -391,28 +391,28 @@ def PlotFBLiq(tpdic,nametotptofinalprops):
                     units='$kg/m^3$'
                 refarray=scale*refarray
                 calcarray=scale*calcarray
-                nametotptofinalprops[name][tp][property][refkey]=refarray[-1]
-                nametotptofinalprops[name][tp][property][calckey]=calcarray[-1]
-                nametotptofinalprops[name][tp][property][errkey]=errarray[-1]
+                nametotptofinalprops[name][tp][propertyval][refkey]=refarray[-1]
+                nametotptofinalprops[name][tp][propertyval][calckey]=calcarray[-1]
+                nametotptofinalprops[name][tp][propertyval][errkey]=errarray[-1]
                 err=np.abs(refarray-calcarray)
                 relerr=100*(err/refarray)
-                label1=property+' AMOEBA'
-                label2=property+' Exp'
-                ykey=property+units
+                label1=propertyval+' AMOEBA'
+                label2=propertyval+' Exp'
+                ykey=propertyval+units
                 xkey='Iterations'
                 labels=[label1,label2]
                 string='T=%s,P=%s'%(str(tp[0]),str(tp[1]))
-                title=name+' '+property+' '+string
+                title=name+' '+propertyval+' '+string
                 x=list(range(len(refarray)))
                 #ScatterPlot2D(title,x,calcarray,refarray,xkey,ykey,labels)
-                proptoaxes[property].scatter(x,calcarray, s=10, c=c, marker="o", label='AMOEBA '+string)
-                proptoaxes[property].errorbar(x, calcarray, yerr=errarray,c=c, fmt="o")
-                proptoaxes[property].scatter(x,refarray, s=10, c=c, marker="s", label='Exp '+string)              
-                proptoaxes[property].set_ylabel(ykey,fontsize=12)
-                proptoaxes[property].set_xlabel(xkey,fontsize=12)
-                newtitle=name+' '+property
-                proptoaxes[property].set_title(newtitle)
-                proptoaxes[property].legend()
+                proptoaxes[propertyval].scatter(x,calcarray, s=10, c=[c], marker="o", label='AMOEBA '+string)
+                proptoaxes[propertyval].errorbar(x, calcarray, yerr=errarray,c=c, fmt="o")
+                proptoaxes[propertyval].scatter(x,refarray, s=10, c=[c], marker="s", label='Exp '+string)              
+                proptoaxes[propertyval].set_ylabel(ykey,fontsize=12)
+                proptoaxes[propertyval].set_xlabel(xkey,fontsize=12)
+                newtitle=name+' '+propertyval
+                proptoaxes[propertyval].set_title(newtitle)
+                proptoaxes[propertyval].legend()
                 x=np.array(x)
                 refarray=np.array(refarray)
                 calcarray=np.array(calcarray)
@@ -420,25 +420,25 @@ def PlotFBLiq(tpdic,nametotptofinalprops):
                 try:
                     f = interp1d(x,calcarray, kind='quadratic')
                     y_smooth=f(x_new)
-                    proptoaxes[property].plot(x_new,y_smooth,color=c)
+                    proptoaxes[propertyval].plot(x_new,y_smooth,color=c)
                     f = interp1d(x,refarray, kind='quadratic')
                     y_smooth=f(x_new)
-                    proptoaxes[property].plot(x_new,y_smooth,color=c)
+                    proptoaxes[propertyval].plot(x_new,y_smooth,color=c)
                 except:
                     pass
                 imagename=newtitle+'.png'
-                proptofigs[property].savefig(imagename)
-                proptoaxes[relprop].scatter(x,relerr, s=10, c=c, marker="s", label=string)
+                proptofigs[propertyval].savefig(imagename)
+                proptoaxes[relprop].scatter(x,relerr, s=10, c=[c], marker="s", label=string)
                 try:
                     f = interp1d(x,relerr, kind='quadratic')
                     y_smooth=f(x_new)
                     proptoaxes[relprop].plot(x_new,y_smooth,color=c)
                 except:
                     pass
-                ykey='Relative Error '+property+units
+                ykey='Relative Error '+propertyval+units
                 proptoaxes[relprop].set_ylabel(ykey,fontsize=12)
                 proptoaxes[relprop].set_xlabel(xkey,fontsize=12)
-                newtitle=name+' '+'Relative Error '+property
+                newtitle=name+' '+'Relative Error '+propertyval
                 proptoaxes[relprop].set_title(newtitle)
                 proptoaxes[relprop].legend()
                 imagename=newtitle+'.png'
@@ -1169,7 +1169,7 @@ def PlotLiquidPropsCorrelation(nametotptofinalprops):
                 calcarray=innerdic['Calc']
                 refarray=innerdic['Ref']
                 calcerrarray=innerdic['CalcErr']   
-                proptoaxes[propname].scatter(calcarray,refarray, s=10, c=c, marker="o", label=string)
+                proptoaxes[propname].scatter(calcarray,refarray, s=10, c=[c], marker="o", label=string)
                 proptoaxes[propname].errorbar(calcarray, refarray, yerr=calcerrarray,c=c, fmt="o")
                 proptoaxes[propname].set_ylabel(ykey,fontsize=12)
                 proptoaxes[propname].set_xlabel(xkey,fontsize=12)
@@ -1546,7 +1546,7 @@ def PlotLiquidPropsCorrelationForGroups(nametotptofinalprops,groupednames,nameto
                             calcarray=innerdic['Calc']
                             refarray=innerdic['Ref']
                             calcerrarray=innerdic['CalcErr']   
-                            grptoproptoaxes[grp][propname].scatter(calcarray,refarray, s=10, c=c, marker="o", label=newstring)
+                            grptoproptoaxes[grp][propname].scatter(calcarray,refarray, s=10, c=[c], marker="o", label=newstring)
                             grptoproptoaxes[grp][propname].errorbar(calcarray, refarray, yerr=calcerrarray,c=c, fmt="o")
                             grptoproptoaxes[grp][propname].set_ylabel(ykey,fontsize=12)
                             grptoproptoaxes[grp][propname].set_xlabel(xkey,fontsize=12)
@@ -1625,9 +1625,9 @@ def PlotLiquidPropsVsTempForGroups(nametotemparray,nametoproptokeytoarray,groupe
                         calcarray=innerdic['Calc']
                         refarray=innerdic['Ref']
                         calcerrarray=innerdic['CalcErr']   
-                        grptoproptoaxes[grp][propname].scatter(temparray,calcarray, s=10, c=c, marker="o", label='AMOEBA'+string)
+                        grptoproptoaxes[grp][propname].scatter(temparray,calcarray, s=10, c=[c], marker="o", label='AMOEBA'+string)
                         grptoproptoaxes[grp][propname].errorbar(temparray, calcarray, yerr=calcerrarray,c=c, fmt="o")
-                        grptoproptoaxes[grp][propname].scatter(temparray,refarray, s=10, c=c, marker="s", label='Exp'+string)              
+                        grptoproptoaxes[grp][propname].scatter(temparray,refarray, s=10, c=[c], marker="s", label='Exp'+string)              
                         grptoproptoaxes[grp][propname].set_ylabel(ykey,fontsize=12)
                         grptoproptoaxes[grp][propname].set_xlabel(xkey,fontsize=12)
                         newtitle=totalname+' '+propname+ ' Vs T'

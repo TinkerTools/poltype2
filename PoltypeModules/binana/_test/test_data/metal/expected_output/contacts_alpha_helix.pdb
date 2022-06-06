@@ -1,0 +1,16 @@
+ATOM      1  O   ALP A  96      30.491  56.280  47.179                       O
+ATOM      2  CA  ALP A  97      29.164  54.539  45.550                       C
+ATOM      3  CB  ALP A  97      29.258  53.980  44.106                       C
+ATOM      4  CG  ALP A  97      28.248  54.542  43.176                       C
+ATOM      5 ND1  ALP A  97      28.222  55.924  42.879                       N
+ATOM      6 CE1  ALP A  97      27.304  56.109  41.856                       C
+ATOM      7  HA  ALP A  97      29.055  55.613  45.533                       H
+ATOM      8 HB2  ALP A  97      30.305  54.114  43.748                       H
+ATOM      9 HE1  ALP A  97      26.867  57.002  41.418                       H
+ATOM     10  CB  ALP B  86      31.855  56.237  42.811                       C
+ATOM     11  CG  ALP B  86      31.877  57.407  43.737                       C
+ATOM     12 ND1  ALP B  86      30.712  58.073  44.161                       N
+ATOM     13 CE1  ALP B  86      31.167  59.012  45.041                       C
+ATOM     14 HB2  ALP B  86      30.924  55.998  42.438                       H
+ATOM     15 HB3  ALP B  86      32.209  55.312  43.313                       H
+ATOM     16 HE1  ALP B  86      30.442  59.652  45.603                       H
