@@ -100,7 +100,7 @@ else
 fi
 if [ $OSVERSION == 8 ] ; then
     export PATH=/home/bdw2292/NewestTinkerOS8/bin/:$PATH
-    export TINKERPATH=/home/bdw2292/NewestTinkerOS8/bin/ # this is for ForceBalance to recognize tinker path in different nodes
+    export TINKERPATH=/home/bdw2292/LatestTinker/bin/ # this is for ForceBalance to recognize tinker path in different nodes
      
 else
     export PATH=/home/bdw2292/NewestTinker/bin/:$PATH
