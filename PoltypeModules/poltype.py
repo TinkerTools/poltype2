@@ -80,6 +80,7 @@ from rdkit.Chem.MolStandardize import rdMolStandardize
 
 @dataclass
 class PolarizableTyper():
+        indextompoleframefile:None=None
         qmrelativeweight:float=.5
         liqrelativeweight:float=2.5
         enthalpyrelativeweight:float=1
@@ -474,6 +475,8 @@ class PolarizableTyper():
                             self.pdbcode=a
                         elif 'indextotypefile' in newline:
                             self.indextotypefile=a
+                        elif 'indextompoleframefile' in newline:
+                            self.indextompoleframefile=a
                         elif 'qmrelativeweight' in newline:
                             self.qmrelativeweight=float(a)
                         elif 'liqrelativeweight' in newline:
@@ -3334,6 +3337,9 @@ class PolarizableTyper():
 
                 if self.indextotypefile!=None:
                     shutil.copy(self.indextotypefile,os.path.join(foldername,self.indextotypefile))
+                if self.indextompoleframefile!=None:
+                    shutil.copy(self.indextompoleframefile,os.path.join(foldername,self.indextompoleframefile))
+
                 os.chdir(foldername)
             self.startdir=os.getcwd()
             self.totalcharge=None

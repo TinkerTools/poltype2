@@ -110,7 +110,7 @@ fi
 
 
 export myusername=`whoami`
-conda activate newamoebamdpoltype
+conda activate amoebamdpoltype
 export g09root=/opt/g09gh/gaussian
 source $g09root/g09/bsd/g09.profile
 export GAUSS_SCRDIR=/scratch/$myusername/

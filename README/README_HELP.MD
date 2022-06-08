@@ -143,6 +143,7 @@
 
 ``espextraconflist`` specifies list of conformors to add to extended conformation for ESP fitting. Default is to just use extended conformation for ESP fitting. Files can be SDF or any format as long as atom order is same as input molecule atom order.
 
+``indextompoleframefile`` specifies file of multipole frame definitions for each line (exactly how frames are defined in first key file). This will be used instead of poltype frame detection if specified.
 
 #### Torsion Parameterization
 

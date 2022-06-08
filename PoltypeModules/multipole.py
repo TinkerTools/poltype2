@@ -407,17 +407,27 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
     # write out the local frames
     iteratom = openbabel.OBMolAtomIter(mol)
     f = open (poltype.peditinfile, 'w')
-    if poltype.usepoleditframes==False:
-        for a in iteratom:
-            if not idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
-                f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " " + str(poltype.localframe2[a.GetIdx() - 1]) + "\n")
-            elif idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
-                bisectidxs=idxtobisectidxs[a.GetIdx()]
-                f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " -" + str(bisectidxs[0])+ " -" + str(bisectidxs[1]) + "\n")
-            else:
-                trisecidxs=idxtotrisectidxs[a.GetIdx()]
-                f.write(str(a.GetIdx()) + " -" + str(trisecidxs[0])+ " -" + str(trisecidxs[1]) + " -" + str(trisecidxs[2])+ "\n")
 
+
+    if poltype.indextompoleframefile==None:
+        if poltype.usepoleditframes==False:
+            for a in iteratom:
+                if not idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
+                    f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " " + str(poltype.localframe2[a.GetIdx() - 1]) + "\n")
+                elif idxtobisecthenzbool[a.GetIdx()] and not idxtotrisecbool[a.GetIdx()]:
+                    bisectidxs=idxtobisectidxs[a.GetIdx()]
+                    f.write(str(a.GetIdx()) + " " + str(poltype.localframe1[a.GetIdx() - 1]) + " -" + str(bisectidxs[0])+ " -" + str(bisectidxs[1]) + "\n")
+                else:
+                    trisecidxs=idxtotrisectidxs[a.GetIdx()]
+                    f.write(str(a.GetIdx()) + " -" + str(trisecidxs[0])+ " -" + str(trisecidxs[1]) + " -" + str(trisecidxs[2])+ "\n")
+    else:
+        temp=open(poltype.indextompoleframefile,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            linesplit=line.split()
+            if len(linesplit)>0:
+                f.write(line)
 
 
     f.write("\n")
