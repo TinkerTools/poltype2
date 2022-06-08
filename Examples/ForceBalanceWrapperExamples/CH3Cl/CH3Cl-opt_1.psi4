@@ -1,0 +1,31 @@
+molecule { 
+0 1
+Cl    1.654600    0.143200   -0.074400
+ C   -0.122000    0.001700    0.018000
+ H   -0.475400   -0.621700   -0.842400
+ H   -0.438100   -0.524100    0.944600
+ H   -0.619100    1.001000   -0.045800
+}
+set {
+  geom_maxiter 400
+  g_convergence GAU
+  dynamic_level 1
+}
+memory 15GB
+set_num_threads(4)
+psi4_io.set_default_path("/scratch/bdw2292/Psi4-CH3Cl")
+for _ in range(1):
+  try:
+    set opt_coordinates both
+    optimize('mp2/6-31G*')
+    break
+  except OptimizationConvergenceError:
+    break
+  else:
+    try:
+      set opt_coordinates cartesian
+      optimize('mp2/6-31G*')
+      break
+    except OptimizationConvergenceError:
+      pass
+clean()

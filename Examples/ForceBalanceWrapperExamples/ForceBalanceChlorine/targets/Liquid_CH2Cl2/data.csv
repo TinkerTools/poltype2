@@ -1,0 +1,27 @@
+Global,hvap_denom,1
+Global,surf_ten_denom,1
+Global,eps0_denom,1
+Global,kappa_denom,1
+Global,alpha_denom,1
+Global,cp_denom,1
+Global,rho_denom,1
+
+# Ref,
+# 240,1 atm
+# Hvap_err,Eps0_err,Kappa_err,Alpha_err,Cp_err,Rho_err
+# 0,0,0,0,0,0
+
+# Ref,
+# 250,1 atm
+# Hvap_err,Eps0_err,Kappa_err,Alpha_err,Cp_err,Rho_err
+# 0,0,0,0,0,0
+
+# Ref,
+# 260,1 atm
+# Hvap_err,Eps0_err,Kappa_err,Alpha_err,Cp_err,Rho_err
+# 0,0,0,0,0,0
+
+T,P,Hvap,Hvap_wt,Eps0,Eps0_wt,Kappa,Kappa_wt,Alpha,Alpha_wt,Cp,Cp_wt,Rho,Rho_wt
+240,1 atm,32.299,1,,0,,0,,0,,0,1423.5,1
+250,1 atm,31.739,1,,0,,0,,0,,0,1406.1,1
+260,1 atm,31.179,1,,0,,0,,0,,0,1388.4,1

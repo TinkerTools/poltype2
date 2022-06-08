@@ -165,9 +165,11 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 [Free Energy Output Files](#free-energy-output-files)
 
-*  [HFE Table Output Example](#hfe-table-output-example)
+*  [Binding Free Energy Table Output Example](#binding-free-energy-table-output-example)
 
-[Hydration Free Energy Examples](Examples/HFE)
+*  [Hydration Free Energy Table Output Example](#hydration-free-energy-table-output-example)
+
+[Hydration Free Energy Examples](Examples/HydrationFreeEnergy)
 
 [Ion Hydration Free Energy Examples](Examples/IonHFE)
  
@@ -636,9 +638,10 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 
 ### Protein Ligand Interaction Visualization
 * Navigate to folder VisualizationNotebooks
-* Be sure to install the conda environment (notebookenvironment.yml)
+* Be sure to install the conda environment (notebookenvironment.yml),``conda env create -f notebookenvironment.yml``. 
 * Activate the conda environment ``conda activate pymolenv``
-* Move protein-ligand complexed PDB to VisualizationNotebooks folder
+* Move protein-ligand complexed PDB to VisualizationNotebooks folder.
+* Ensure that the residue labels for ligand are labeled as ``LIG``.
 * Launch the jupyter notebook ``jupyter-notebook Protein-Ligand-Interactions.ipynb``
 * Input your complexed PDB name into variable ``ligandreceptorfilename``
 * Run the cell and the output from BINANA interaction profiler is shown. 
@@ -647,11 +650,18 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 ### Protein Input Preparation
 * If your protein PDB has missing residues, poltype wraps Modeller to fill in missing residues for you (experimental). Need to use keyword ``pdbcode``. This will download the PDB for you, and call modeller, then quit the program after PDB has been filled in and optimized with Modeller. 
 * An academic license file is required after installation of modeller ``conda install -c salilab modeller``, the screen will prompt you which file to insert your license key in.
-* After this check results of output PDB. 
+* After this check results of output PDB.
+```
+pdbcode=5l2t
+```
 * Remove the keyword ``pdbcode`` from poltype input file, if you wish to perform further computations. 
 * Protonation state assingment and adding ligand to the protein pocket are next steps for computing binding simulations.
 * ``usepdb2pqr`` keyword can be used with ``uncomplexedproteinpdbname`` to estimate pKa values of titratable residues via propka and then protonate the PDB for you. The output PDB will have extension "_final.pdb".
 * pdb2pqr can be installed via ``conda install -c conda-forge pdb2pqr`` or use yaml file
+```
+uncomplexedproteinpdbname=5l2t_filled.BL00020001.pdb
+usepdb2pqr
+```
 * After adding any missing residues and assigning the protonation state, the ligand needs to be added to the protein pocket and given as input ``complexedproteinpdbname`` for binding computations.
 
 ### Molecular Dynamics Input Preparation
@@ -665,7 +675,7 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 * Make sure if using custom receptor parameters, then either adding to keyfilename or in prmfilepath
 * Use submitlocally=False if you do not wish to submit dynamics jobs locally.
 * For HFE, if your ligand is charged and you want to compute the salt hydration free energy, add "salthfe=True"
-* For running dynamics on a cluster, add keyword ``submitlocally=False``. Then program will wait for you to complete the jobs in text file (output files will be parsed for completion). 
+* For running dynamics manually on a cluster, add keyword ``submitlocally=False``. Then program will wait for you to complete the jobs in text file (such as _proddynamicsjobs.txt). 
 
 #### Minimum Input Example Binding Free Energy
 
@@ -715,24 +725,73 @@ nohup python /path_to_poltype/poltype.py &
 
 ### Free Energy Output Files
 
-#### HFE Table Output Example
-* ΔGˢᵒˡᵛ = Change in Solvation Free Energy
-* ΔGˢᵒˡᵛᵉʳʳ = Change in Solvation Free Energy Error
-* ΔHˢᵒˡᵛ = Change in Solvation Enthalpy 
-* ΔHˢᵒˡᵛᵉʳʳ = Change in Solvation Enthalpy Error
-* ΔSˢᵒˡᵛ = Change in Solvation Entropy
-* ΔSˢᵒˡᵛᵉʳʳ = Change in Solvation Entropy Error
-* ΔGˢᵒˡᵛᵉˡᵉ = Change in Solvation Free Energy Electrostatic Component
-* ΔGˢᵒˡᵛᵛᵈʷ =  Change in Solvation Free Energy Van der Waals Component
-* ΔGᵉˡᵉᵍᵃˢ =  Change in Solvation Free Energy Electrostatic Component Gas Phase
-* ΔGᵉˡᵉˢᵒˡ =  Change in Solvation Free Energy Electrostatic Component Solution Phase
-* ΔGᵛᵈʷᵍᵃˢ = Change in Solvation Free Energy Van der Waals Component Gas Phase
-* ΔGᵛᵈʷˢᵒˡ = Change in Solvation Free Energy Van der Waals Component Solution Phase
-* ΔGˢᵒˡ = Change in Solvation Free Energy Solution Phase
-* ΔGᵍᵃˢ = Change in Solvation Free Energy Gas Phase
-* ΔGˢᵒˡᵛᶠʷᵈ = Change in Forward Solvation Free Energy (A->B)
-* ΔGˢᵒˡᵛᵇʷᵈ =  Change in Backword Solvation Free Energy (B->A)
-* SolvOverlap = Solvation Overlap Between Neigboring States, value 0-1
+
+#### Binding Free Energy Table Output Example
+* ΔGˢᵒˡᵛ = Change in solvation free energy (does not contain gas phase component by default)
+* ΔGˢᵒˡᵛᵉʳʳ = Change in solvation free energy error
+* ΔGᶜᵒᵐᵖᶜᵒʳʳ = Change in complexation free energy with analytical correction
+* ΔGᶜᵒᵐᵖᵘⁿᶜᵒʳʳ = Change in complexation free energy with out analytical correction
+* ΔGᶜᵒᵐᵖᶜᵒʳʳᵉʳʳ = Change in complexation free energy error with analytical correction 
+* ΔGᵃⁿᵃᶜᵒᵐᵖᶜᵒʳʳ = Analytical correction to complexation free energy
+* ΔGᵇᶦⁿᵈᶜᵒʳʳ = Change in binding free energy corrected
+* ΔGᵇᶦⁿᵈᶜᵒʳʳᵉʳʳ = Change in binding free energy corrected error
+* ΔGˢᵒˡᵛᵉˡᵉ = Change in solvation free energy electrostatic component
+* ΔGˢᵒˡᵛᵛᵈʷ =  Change in solvation free energy van der Waals component
+* ΔGᶜᵒᵐᵖᵉˡᵉ = Change in complexation free energy electrostatic component
+* ΔGᶜᵒᵐᵖᵛᵈʷ =  Change in complexation free energy van der Waals component
+* ΔHˢᵒˡᵛ = Change in solvation enthalpy 
+* ΔHˢᵒˡᵛᵉʳʳ = Change in solvation entropy error
+* ΔSˢᵒˡᵛ = Change in solvation entropy
+* ΔSˢᵒˡᵛᵉʳʳ= Change in solvation entropy error
+* ΔHᶜᵒᵐᵖ = Change in complexation enthalpy
+* ΔHᶜᵒᵐᵖᵉʳʳ = Change in complexation enthalpy error
+* ΔSᶜᵒᵐᵖ = Change in complexation entropy
+* ΔSᶜᵒᵐᵖᵉʳʳ = Change in complexation entropy error
+* ΔHᵇᶦⁿᵈ = Change in binding enthalpy
+* ΔHᵇᶦⁿᵈᵉʳʳ = Change in binding enthalpy error
+* ΔSᵇᶦⁿᵈ = Change in binding entropy
+* ΔSᵇᶦⁿᵈᵉʳʳ = Change in binding entropy error
+
+<img src="README/Images/GibbsBindingTable.png" width="100%">
+
+* Gibbs free energy table 
+* Gibbs_Free_Energy_Change_Table.csv
+
+<img src="README/Images/Enthalpy_Entropy.png" width="100%">	
+
+* Enthalpy, Entropy and Gibbs free energy table
+* Enthalpy,_Entropy,_Gibbs_Energy_Change_Table.csv
+
+<img src="README/Images/SolvationSimTable.png" width="100%">
+
+* Generic simulation information
+* Solvation_Simulation_Info_Table.csv
+
+<img src="README/Images/ComplexationSimTable.png" width="100%">
+
+* Generic simulation information
+* Complexation_Simulation_Info_Table.csv
+
+
+
+#### Hydration Free Energy Table Output Example
+* ΔGˢᵒˡᵛ = Change in solvation free energy
+* ΔGˢᵒˡᵛᵉʳʳ = Change in solvation free energy error
+* ΔHˢᵒˡᵛ = Change in solvation enthalpy 
+* ΔHˢᵒˡᵛᵉʳʳ = Change in solvation enthalpy error
+* ΔSˢᵒˡᵛ = Change in solvation entropy
+* ΔSˢᵒˡᵛᵉʳʳ = Change in solvation entropy error
+* ΔGˢᵒˡᵛᵉˡᵉ = Change in solvation free energy electrostatic component
+* ΔGˢᵒˡᵛᵛᵈʷ =  Change in solvation free energy van der Waals component
+* ΔGᵉˡᵉᵍᵃˢ =  Change in solvation free energy electrostatic component gas phase
+* ΔGᵉˡᵉˢᵒˡ =  Change in solvation free energy electrostatic component solution phase
+* ΔGᵛᵈʷᵍᵃˢ = Change in solvation free energy van der Waals component gas phase
+* ΔGᵛᵈʷˢᵒˡ = Change in solvation free energy van der Waals component solution phase
+* ΔGˢᵒˡ = Change in solvation free energy solution phase
+* ΔGᵍᵃˢ = Change in solvation free energy gas phase
+* ΔGˢᵒˡᵛᶠʷᵈ = Change in forward solvation free energy (A->B)
+* ΔGˢᵒˡᵛᵇʷᵈ =  Change in backword solvation free energy (B->A)
+* SolvOverlap = Solvation overlap between neigboring states, value 0-1
 
 
 

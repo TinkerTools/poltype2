@@ -272,13 +272,13 @@ WQ_PORT=9013
 
 ``vdwtypestoeval``  specifies which vdw parmaeters to fix (while the first instance of parameters is fit). Default all parameters are evaluated besides for instance vdwtypestoeval=S,T,D. 
 
-``qmrelativeweight`` specifies relative weight between QM and Liquid target.
+``qmrelativeweight`` specifies relative weight between QM and Liquid target. Default is .05. 
 
-``liqrelativeweight`` specifies relative weight between Liquid and QM target.
+``liqrelativeweight`` specifies relative weight between Liquid and QM target. Default is 2.5. 
 
-``enthalpyrelativeweight`` specifies relative weight between enthalpy and other liquid properties.
+``enthalpyrelativeweight`` specifies relative weight between enthalpy and other liquid properties. Default is 1. 
 
-``densityrelativeweight`` specifies relative weight between density and other liquid properties.
+``densityrelativeweight`` specifies relative weight between density and other liquid properties. Default is .01.
 
 
 #### ForceBalance Poltype Wrapper Results

@@ -1,0 +1,21 @@
+Fri Mar 11 13:24:05 2022 Running on host: node37.bme.utexas.edu
+Fri Mar 11 13:24:05 2022 Calling: Psi4 Gradient for DMA
+Fri Mar 11 13:24:41 2022 
+Fri Mar 11 13:24:41 2022 =========================================================
+Fri Mar 11 13:24:41 2022 Minimizing structure
+
+Fri Mar 11 13:24:41 2022 Calling: minimize -k final.key final.xyz 0.1 > Minimized_final.out path = /home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CCl4
+Fri Mar 11 13:24:42 2022 
+
+Fri Mar 11 13:24:42 2022 =========================================================
+
+Fri Mar 11 13:24:42 2022 Structure RMSD Comparison
+
+
+Fri Mar 11 13:24:42 2022 Calling: superpose CCl4.xyz_2 final.xyz_2 1 N M N 0  > CCl4-superin.txt path = /home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CCl4
+Fri Mar 11 13:24:43 2022 RMSD = 0.000756 Tolerance is 1.6
+Fri Mar 11 13:24:43 2022 Calling: analyze CCl4.xyz_2 -k final.key em | grep -A11 Charge>MMDipole.txt path = /home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CCl4
+Fri Mar 11 13:24:43 2022 Relative error of 0.5 for QMDipole 0.002 and 0.001 for MMDipole  tolerance = 0.13 /home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CCl4
+Fri Mar 11 13:24:43 2022 Poltype Job Finished
+
+Fri Mar 11 13:24:43 2022 Poltype has completed successfully, but this software is still under active development. It is your responsibility to check your own final parameters, while we are still in development phase.

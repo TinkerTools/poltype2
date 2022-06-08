@@ -1,0 +1,46 @@
+parameters /home/bdw2292/poltype2/ParameterFiles/amoebabio18_header.prm
+OPENMP-THREADS 4
+bondterm none
+angleterm none
+torsionterm none
+vdwterm none
+fix-monopole
+digits 8
+potential-offset 1.0
+RESP-WEIGHT 1
+
+atom          402    402    Cl    "CCl4                "        17    35.453    1
+atom          401    401    C     "CCl4                "         6    12.011    4
+
+multipole    402    401      0             -0.03988
+                                      0.00000    0.00000    0.08249
+                                     -0.57596
+                                      0.00000   -0.57596
+                                      0.00000    0.00000    1.15192
+multipole    401    402      0              0.15952
+                                      0.00000    0.00000    0.00019
+                                     -0.00001
+                                      0.00000   -0.00001
+                                      0.00000    0.00000    0.00002
+
+# updated valence parameter database match, comments=Cl connected to non-aromatic atom SMARTS match = [Cl][A]
+
+polarize           402          2.3371     0.3900 401
+# updated valence parameter database match, comments=C on sulfur SMARTS match = [C][F,Cl,Br,I]
+
+polarize           401          1.6196     0.3900 402
+
+#
+# Multipoles from Electrostatic Potential Fitting
+#
+
+multipole   402  401                   -0.03988
+                                        0.00000    0.00000    0.05327
+                                       -0.58038
+                                        0.00000   -0.58038
+                                        0.00000    0.00000    1.16076
+multipole   401  402                    0.15952
+                                        0.00000    0.00000    0.00037
+                                       -0.00002
+                                        0.00000   -0.00002
+                                        0.00000    0.00000    0.00004

@@ -1,0 +1,255 @@
+# ForceBalance input file
+# The octothorpe '#' is a comment symbol
+# Note: If the specified value is 'None' then the option will truly be set to None - not the string 'None'
+# Note: 'Section' option types are more complicated and may require you to read the documentation
+# Note: Boolean option types require no value, the key being present implies 'True'
+
+$options
+# (string) Type of the penalty, L2 or L1 in the optimizer
+penalty_type L2
+finite_difference_h 1e-4
+
+# tinkerpath /home/leeping/opt/tinker-6.1.01-intel/bin
+tinkerpath NONE
+# (allcap) The job type
+jobtype newton
+
+# (list) The names of force fields, corresponding to directory forcefields/file_name.(itp|gen)
+# Make sure to tag the parameters that you wish to optimize
+forcefield
+# (int) Maximum number of steps in an optimization
+maxstep 100
+
+# (float) Factor for multiplicative penalty function in objective function
+penalty_additive 0.01
+
+# Negative trust radius means to search over the Levenberg-Marquardt parameter
+trust0 0.1
+
+# Normalize the objective function using the sum of weights?  I usually don't.
+normalize_weights no
+
+# Disable the rudimentary charge constraint code.  Even if we had charges,
+# I think it's better to use 'evals' to take care of this.
+constrain_charge false
+
+# Priors.  THESE ARE IMPORTANT!  They dictate how much the parameter is allowed to vary,
+# in conjunction with the penalty_additive parameter.
+priors
+   VDWS                                 : 5.0
+   VDWT                                 : 0.5
+   VDWD                                 : 1.0
+/priors
+
+criteria 2
+convergence_objective 1e-1
+convergence_gradient 1e-2
+convergence_step 1e-2
+
+amoeba_pol mutual
+amoeba_eps 1e-5
+
+$end
+
+
+
+# ForceBalance input file
+# The octothorpe '#' is a comment symbol
+# Note: If the specified value is 'None' then the option will truly be set to None - not the string 'None'
+# Note: 'Section' option types are more complicated and may require you to read the documentation
+# Note: Boolean option types require no value, the key being present implies 'True'
+
+$options
+WQ_PORT 9013
+# (string) Type of the penalty, L2 or L1 in the optimizer
+penalty_type L2
+finite_difference_h 1e-4
+
+# tinkerpath /home/leeping/opt/tinker-6.1.01-intel/bin
+tinkerpath NONE
+# (allcap) The job type
+jobtype newton
+
+# (list) The names of force fields, corresponding to directory forcefields/file_name.(itp|gen)
+# Make sure to tag the parameters that you wish to optimize
+forcefield molecule.prm
+# (int) Maximum number of steps in an optimization
+maxstep 100
+
+# (float) Factor for multiplicative penalty function in objective function
+penalty_additive 0.01
+
+# Negative trust radius means to search over the Levenberg-Marquardt parameter
+trust0 0.1
+
+# Normalize the objective function using the sum of weights?  I usually don't.
+normalize_weights no
+
+# Disable the rudimentary charge constraint code.  Even if we had charges,
+# I think it's better to use 'evals' to take care of this.
+constrain_charge false
+
+# Priors.  THESE ARE IMPORTANT!  They dictate how much the parameter is allowed to vary,
+# in conjunction with the penalty_additive parameter.
+priors
+   VDWS                                 : 5.0
+   VDWT                                 : 0.5
+   VDWD                                 : 1.0
+/priors
+
+criteria 2
+convergence_objective 1e-1
+convergence_gradient 1e-2
+convergence_step 1e-2
+
+amoeba_pol mutual
+amoeba_eps 1e-5
+
+$end
+
+
+
+$target
+name QM_CH3Cl_water
+type Interaction_TINKER
+weight 0.5
+energy_denom 1.0
+energy_upper 10.0
+attenuate
+fragment1 1-5
+fragment2 6-8
+$end
+$target
+name Liquid_CH3Cl
+type Liquid_TINKER
+weight 2.5
+w_rho 0.001
+w_hvap 1
+liquid_equ_steps 500000
+liquid_prod_steps 3000000
+liquid_timestep 1.0
+liquid_interval 1
+gas_equ_steps 500000
+gas_prod_steps 3000000
+gas_timestep 1.0
+gas_interval 1
+md_threads 4
+$end
+$target
+name QM_CH3Cl_homodimer
+type Interaction_TINKER
+weight 0.5
+energy_denom 1.0
+energy_upper 10.0
+attenuate
+fragment1 1-5
+fragment2 6-10
+$end
+$target
+name QM_CH2Cl2_water
+type Interaction_TINKER
+weight 0.5
+energy_denom 1.0
+energy_upper 10.0
+attenuate
+fragment1 1-5
+fragment2 6-8
+$end
+$target
+name Liquid_CH2Cl2
+type Liquid_TINKER
+weight 2.5
+w_rho 0.001
+w_hvap 1
+liquid_equ_steps 500000
+liquid_prod_steps 3000000
+liquid_timestep 1.0
+liquid_interval 1
+gas_equ_steps 500000
+gas_prod_steps 3000000
+gas_timestep 1.0
+gas_interval 1
+md_threads 4
+$end
+$target
+name QM_CH2Cl2_homodimer
+type Interaction_TINKER
+weight 0.5
+energy_denom 1.0
+energy_upper 10.0
+attenuate
+fragment1 1-5
+fragment2 6-10
+$end
+$target
+name QM_CHCl3_water
+type Interaction_TINKER
+weight 0.5
+energy_denom 1.0
+energy_upper 10.0
+attenuate
+fragment1 1-5
+fragment2 6-8
+$end
+$target
+name Liquid_CHCl3
+type Liquid_TINKER
+weight 2.5
+w_rho 0.001
+w_hvap 1
+liquid_equ_steps 500000
+liquid_prod_steps 3000000
+liquid_timestep 1.0
+liquid_interval 1
+gas_equ_steps 500000
+gas_prod_steps 3000000
+gas_timestep 1.0
+gas_interval 1
+md_threads 4
+$end
+$target
+name QM_CHCl3_homodimer
+type Interaction_TINKER
+weight 0.5
+energy_denom 1.0
+energy_upper 10.0
+attenuate
+fragment1 1-5
+fragment2 6-10
+$end
+$target
+name QM_CCl4_water
+type Interaction_TINKER
+weight 0.5
+energy_denom 1.0
+energy_upper 10.0
+attenuate
+fragment1 1-5
+fragment2 6-8
+$end
+$target
+name Liquid_CCl4
+type Liquid_TINKER
+weight 2.5
+w_rho 0.001
+w_hvap 1
+liquid_equ_steps 500000
+liquid_prod_steps 3000000
+liquid_timestep 1.0
+liquid_interval 1
+gas_equ_steps 500000
+gas_prod_steps 3000000
+gas_timestep 1.0
+gas_interval 1
+md_threads 4
+$end
+$target
+name QM_CCl4_homodimer
+type Interaction_TINKER
+weight 0.5
+energy_denom 1.0
+energy_upper 10.0
+attenuate
+fragment1 1-5
+fragment2 6-10
+$end

@@ -1,0 +1,23 @@
+molecule { 
+0 1
+ Cl                 -0.3305712     1.3344966     0.3964185
+ Cl                  1.9152338    -0.4658238     0.0056181
+ Cl                 -0.8039666    -1.4804745    -0.1359058
+  C                  0.2708983    -0.3046174     0.6122043
+  H                  0.2919728    -0.5092524     1.6825174
+--
+0 1
+  O                 -1.7565062     3.4122649    -0.4737411
+  H                 -2.4330032     2.7362248    -0.5211352
+  H                 -1.3712436     3.5152058    -1.3441708
+}
+memory 15GB
+set_num_threads(4)
+psi4_io.set_default_path("/scratch/bdw2292/Psi4-CHCl3")
+set maxiter 500
+set freeze_core True
+set PROPERTIES_ORIGIN ["COM"]
+e_dim= energy('mp2/aug-cc-pV[TQ]Z',bsse_type='cp')
+
+psi4.print_out('CP Energy = %10.6f' % (e_dim))
+clean()

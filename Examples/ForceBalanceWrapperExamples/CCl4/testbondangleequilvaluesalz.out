@@ -1,0 +1,149 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.9.4   September 2021                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      402   402     Cl    CCl4                        17     35.453     1
+      401   401     C     CCl4                         6     12.011     4
+
+ Additional Bond Stretching Parameters :
+
+     Atom Classes             K(S)         Length
+
+       401 402             149.323         1.7700
+
+ Additional Angle Bending Parameters :
+
+     Atom Classes             K(B)          Angle
+
+     402 401 402            50.749        109.470
+
+ Additional Stretch-Bend Parameters :
+
+     Atom Classes          K(SB)-1        K(SB)-2
+
+     402 401 402             5.713          5.713
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         402      401      0      0   Z-Only      -0.03988
+                                                   0.00000  0.00000  0.05327
+                                                  -0.58038
+                                                   0.00000 -0.58038
+                                                   0.00000  0.00000  1.16076
+
+         401      402      0      0   Z-Only       0.15952
+                                                   0.00000  0.00000  0.00037
+                                                  -0.00002
+                                                   0.00000 -0.00002
+                                                   0.00000  0.00000  0.00004
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         402             2.337       0.390         401
+         401             1.620       0.390         402
+
+ Additional van der Waals Parameters :
+
+     Atom Class               Size        Epsilon        Reduction
+
+         401                3.6000         0.1040          0.000
+         402                3.8980         0.3190          0.000
+
+ Additional Solvation Parameters :
+
+     Atom Type                PB Size     CS Size     GK Size
+
+         401             3.5795      3.6230      3.6000
+
+ Individual Bond Stretching Interactions :
+
+ Type              Atom Names                      Ideal    Actual      Energy
+
+ Bond            1-Cl       5-C                   1.7700    1.7700      0.0000
+ Bond            2-Cl       5-C                   1.7700    1.7700      0.0000
+ Bond            3-Cl       5-C                   1.7700    1.7700      0.0000
+ Bond            4-Cl       5-C                   1.7700    1.7700      0.0000
+
+ Individual Angle Bending Interactions :
+
+ Type                  Atom Names                  Ideal    Actual      Energy
+
+ Angle           1-Cl       5-C        2-Cl     109.4700  109.4704      0.0000
+ Angle           1-Cl       5-C        3-Cl     109.4700  109.4698      0.0000
+ Angle           1-Cl       5-C        4-Cl     109.4700  109.4753      0.0000
+ Angle           2-Cl       5-C        3-Cl     109.4700  109.4686      0.0000
+ Angle           2-Cl       5-C        4-Cl     109.4700  109.4698      0.0000
+ Angle           3-Cl       5-C        4-Cl     109.4700  109.4735      0.0000
+
+ Individual Stretch-Bend Interactions :
+
+ Type                  Atom Names                  dSB 1     dSB 2      Energy
+
+ StrBend         1-Cl       5-C        2-Cl      -0.0000   -0.0000     -0.0000
+ StrBend         1-Cl       5-C        3-Cl       0.0000   -0.0000     -0.0000
+ StrBend         1-Cl       5-C        4-Cl      -0.0000    0.0000      0.0000
+ StrBend         2-Cl       5-C        3-Cl       0.0000   -0.0000     -0.0000
+ StrBend         2-Cl       5-C        4-Cl       0.0000   -0.0000     -0.0000
+ StrBend         3-Cl       5-C        4-Cl       0.0000    0.0000      0.0000
+
+ Individual Atomic Multipole Interactions :
+
+ Type              Atom Names               Distance        Energy
+
+
+ Determination of SCF Induced Dipole Moments :
+
+    Iter       RMS Residual (Debye)
+
+       1           0.0000000000
+       2           0.0000000000
+       3           0.0000000000
+
+ Induced Dipoles :    Iterations    3       RMS Residual   0.0000000000
+
+ Induced Dipole Moments (Debye) :
+
+    Atom               X            Y            Z           Total
+
+       1            0.0000       0.0000       0.0000        0.0000
+       2            0.0000       0.0000       0.0000        0.0000
+       3            0.0000       0.0000       0.0000        0.0000
+       4            0.0000       0.0000       0.0000        0.0000
+       5            0.0000       0.0000       0.0000        0.0000
+
+ Individual Dipole Polarization Interactions :
+
+ Type              Atom Names               Distance        Energy
+
+
+ Individual van der Waals Interactions :
+
+ Type              Atom Names                    Minimum    Actual      Energy
+
+
+ Total Potential Energy :              0.00000124 Kcal/mole
+
+ Energy Component Breakdown :           Kcal/mole        Interactions
+
+ Bond Stretching                       0.00000054                4
+ Angle Bending                         0.00000066                6
+ Stretch-Bend                          0.00000004                6

@@ -1,0 +1,52 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.9.4   September 2021                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      402   402     Cl    CH3Cl                       17     35.453     1
+      401   401     C     CH3Cl                        6     12.011     4
+      403   403     H     CH3Cl                        1      1.008     1
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      402   402     Cl    CH3Cl                       17     35.453     1
+      401   401     C     CH3Cl                        6     12.011     4
+      403   403     H     CH3Cl                        1      1.008     1
+
+ Structure File 1 :  CH3Cl.xyz_2
+
+ Structure File 2 :  final.xyz_2
+
+ File 1 Frame :     1             File 2 Frame :     1
+
+ Summary of Results from Structural Superposition :
+
+ IMPOSE  --  Input Coordinates                0.002009
+ IMPOSE  --  After Translation                0.001139
+ IMPOSE  --  After Rotation                   0.001139
+
+ Root Mean Square Distance :                  0.001139        1      1
+
+   Atom in the         Atom in the            Distance          Weight
+ First Structure     Second Structure        Separated          in Fit
+
+         1-Cl                1-Cl             0.000663         35.4530
+         2-C                 2-C              0.001956         12.0110
+
+ Root Mean Square Distance :                  0.001139

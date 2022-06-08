@@ -1,0 +1,18 @@
+molecule { 
+0 1
+CL -0.900180827116 -0.507459361340 1.435986710165
+CL -0.713578787470 1.482673317759 -0.649812878936
+CL -0.074095561035 -1.275691315945 -1.223781984740
+CL 1.687885042709 0.300450011522 0.437514642891
+C -0.000087034816 0.000079694023 0.000272496595
+}
+memory 15GB
+set_num_threads(4)
+psi4_io.set_default_path("/scratch/bdw2292/Psi4-CCl4")
+set freeze_core True
+set PROPERTIES_ORIGIN ["COM"]
+set cubeprop_tasks ['esp']
+E, wfn = properties('mp2/6-311G**',properties=['dipole'],return_wfn=True)
+cubeprop(wfn)
+fchk(wfn, "CCl4-dma.fchk")
+clean()

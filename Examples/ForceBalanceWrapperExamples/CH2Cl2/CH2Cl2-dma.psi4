@@ -1,0 +1,18 @@
+molecule { 
+0 1
+CL -1.471689364248 0.195045438238 -0.026316293626
+CL 1.476423361285 0.159223038399 0.006006481174
+C -0.010672975328 -0.795293213701 0.045352323419
+H -0.027427200576 -1.357471844066 0.974725747978
+H -0.009748638351 -1.465283608540 -0.810031526940
+}
+memory 15GB
+set_num_threads(4)
+psi4_io.set_default_path("/scratch/bdw2292/Psi4-CH2Cl2")
+set freeze_core True
+set PROPERTIES_ORIGIN ["COM"]
+set cubeprop_tasks ['esp']
+E, wfn = properties('mp2/6-311G**',properties=['dipole'],return_wfn=True)
+cubeprop(wfn)
+fchk(wfn, "CH2Cl2-dma.fchk")
+clean()

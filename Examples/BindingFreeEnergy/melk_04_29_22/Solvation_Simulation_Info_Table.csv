@@ -1,0 +1,2 @@
+Name,Total Atom Number,Prod MD Ensemb,Prod MD Time,Prod MD Steps,Prod MD Arc File Space,Dynamic Writeout Frequency (ps),Dynamic Time Step (fs),Equil Time NPT,Equil Time NVT,Physio Counterions,Neut Counterions,Ligand Charge,Receptor Charge,Ligand Name,Receptor Name
+,12599.0,4.0,10.0,5000000.0,4.239,2.0,2.0,1.0,2.0,16.0,1.0,1.0,13.0,my_farHonly,melk_in17farH

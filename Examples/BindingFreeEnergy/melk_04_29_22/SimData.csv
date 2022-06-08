@@ -1,0 +1,24 @@
+,,,,,,,,,,,,
+Gibbs Free Energy Change Table,,,,,,,,,,,,
+Name,ΔGˢᵒˡᵛ,ΔGˢᵒˡᵛᵉʳʳ,ΔGᶜᵒᵐᵖᶜᵒʳʳ,ΔGᶜᵒᵐᵖᵘⁿᶜᵒʳʳ,ΔGᶜᵒᵐᵖᶜᵒʳʳᵉʳʳ,ΔGᵃⁿᵃᶜᵒᵐᵖᶜᵒʳʳ,ΔGᵇᶦⁿᵈᶜᵒʳʳ,ΔGˢᵒˡᵛᵉˡᵉ,ΔGˢᵒˡᵛᵛᵈʷ,ΔGᶜᵒᵐᵖᵉˡᵉ,ΔGᶜᵒᵐᵖᵛᵈʷ,ΔGᵇᶦⁿᵈᶜᵒʳʳᵉʳʳ
+,-74.855,0.112,-86.847,-88.81,0.217,1.963,-11.993,-149.693,74.837,-153.811,65.0,0.244
+,,,,,,,,,,,,,,,,,,,,,,,,
+"Enthalpy, Entropy, Gibbs Energy Change Table",,,,,,,,,,,,,,,,,,,,,,,,
+Name,ΔGˢᵒˡᵛ,ΔGˢᵒˡᵛᵉʳʳ,ΔHˢᵒˡᵛ,ΔHˢᵒˡᵛᵉʳʳ,ΔSˢᵒˡᵛ,ΔSˢᵒˡᵛᵉʳʳ,ΔGᶜᵒᵐᵖᶜᵒʳʳ,ΔGᶜᵒᵐᵖᵘⁿᶜᵒʳʳ,ΔGᶜᵒᵐᵖᶜᵒʳʳᵉʳʳ,ΔHᶜᵒᵐᵖ,ΔHᶜᵒᵐᵖᵉʳʳ,ΔSᶜᵒᵐᵖ,ΔSᶜᵒᵐᵖᵉʳʳ,ΔGᵃⁿᵃᶜᵒᵐᵖᶜᵒʳʳ,ΔGᵇᶦⁿᵈᶜᵒʳʳ,ΔHᵇᶦⁿᵈ,ΔHᵇᶦⁿᵈᵉʳʳ,ΔSᵇᶦⁿᵈ,ΔSᵇᶦⁿᵈᵉʳʳ,ΔGˢᵒˡᵛᵉˡᵉ,ΔGˢᵒˡᵛᵛᵈʷ,ΔGᶜᵒᵐᵖᵉˡᵉ,ΔGᶜᵒᵐᵖᵛᵈʷ,ΔGᵇᶦⁿᵈᶜᵒʳʳᵉʳʳ
+,-74.855,0.112,-120.507,15.837,45.652,15.837,-86.847,-88.81,0.217,-28.101,62.912,-60.709,62.913,1.963,-11.993,92.406,64.875,-106.361,64.876,-149.693,74.837,-153.811,65.0,0.244
+,,,,,,,,,,,,,,,
+Complexation Simulation Info Table,,,,,,,,,,,,,,,
+Name,Total Atom Number,Prod MD Ensemb,Prod MD Time,Prod MD Steps,Prod MD Arc File Space,Dynamic Writeout Frequency (ps),Dynamic Time Step (fs),Equil Time NPT,Equil Time NVT,Physio Counterions,Neut Counterions,Ligand Charge,Receptor Charge,Ligand Name,Receptor Name
+,55823.0,4.0,10.0,5000000.0,16.815,2.0,2.0,1.0,2.0,60.0,14.0,1.0,13.0,my_farHonly,melk_in17farH
+,,,,,,,,,,,,,,,
+Solvation Simulation Info Table,,,,,,,,,,,,,,,
+Name,Total Atom Number,Prod MD Ensemb,Prod MD Time,Prod MD Steps,Prod MD Arc File Space,Dynamic Writeout Frequency (ps),Dynamic Time Step (fs),Equil Time NPT,Equil Time NVT,Physio Counterions,Neut Counterions,Ligand Charge,Receptor Charge,Ligand Name,Receptor Name
+,12599.0,4.0,10.0,5000000.0,4.239,2.0,2.0,1.0,2.0,16.0,1.0,1.0,13.0,my_farHonly,melk_in17farH
+,,,,,,,,,,,,,,,
+Dynamic Jobs,Name,Writeout Freq (ps),Dyntamic Time Step (fs),Total Time (ns),Total Dyn Extended Time,Total Dynamic Steps,Total Extended Dynamic Steps,Total ARC File Space Needed
+Comp,melk_04_29_22,2,2,10.0,10.0,5000000,5000000,"[16.815475095, 4.238810415]"
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+Dynamic Jobs,Name,Writeout Freq (ps),Dyntamic Time Step (fs),Total Time (ns),Total Dyn Extended Time,Total Dynamic Steps,Total Extended Dynamic Steps,Total ARC File Space Needed
+Solv,melk_04_29_22,2,2,10.0,10.0,5000000,5000000,"[16.815475095, 4.238810415]"
+,,,,,,,,,,,,,,,

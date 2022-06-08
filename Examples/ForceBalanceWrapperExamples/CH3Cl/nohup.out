@@ -1,0 +1,168 @@
+Poltype -- Polarizable atom typer of small molecules for the AMOEBA polarizable force field
+
+Please cite:
+Wu, J.C.; Chattree, G.; Ren, P.Y.; Automation of AMOEBA polarizable force field 
+parameterization for small molecules. Theor Chem Acc. 
+
+Version 2.3.1 May 2021
+
+Copyright (c)  Johnny Wu, Gaurav Chattree, Brandon Walker, Matthew Harger and Pengyu Ren 2019
+
+All Rights Reserved
+##############################################################################################################
+
+Calling: analyze /home/bdw2292/poltype2/VersionFiles/water.xyz -k /home/bdw2292/poltype2/VersionFiles/water.key e> version.out
+
+For help, use: python dimorphite_dl.py --help
+
+If you use Dimorphite-DL in your research, please cite:
+Ropp PJ, Kaminsky JC, Yablonski S, Durrant JD (2019) Dimorphite-DL: An
+open-source program for enumerating the ionization states of drug-like small
+molecules. J Cheminform 11:14. doi:10.1186/s13321-019-0336-9.
+
+/home/bdw2292/poltype2/PoltypeModules/poltype.py:2471: UserWarning: Poltype has completed successfully, but this software is still under active development. It is your responsibility to check your own final parameters, while we are still in development phase.
+  warnings.warn(string)
+Optimization terminated successfully.
+         Current function value: 0.169861
+         Iterations: 15
+         Function evaluations: 30
+Optimization terminated successfully.
+         Current function value: 0.169861
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.169861
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.063872
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.359945
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.359945
+         Iterations: 15
+         Function evaluations: 30
+Optimization terminated successfully.
+         Current function value: 0.359945
+         Iterations: 15
+         Function evaluations: 30
+Optimization terminated successfully.
+         Current function value: 0.153141
+         Iterations: 15
+         Function evaluations: 30
+Optimization terminated successfully.
+         Current function value: 0.514818
+         Iterations: 14
+         Function evaluations: 28
+Optimization terminated successfully.
+         Current function value: 0.514818
+         Iterations: 17
+         Function evaluations: 34
+Optimization terminated successfully.
+         Current function value: 0.514818
+         Iterations: 17
+         Function evaluations: 34
+Optimization terminated successfully.
+         Current function value: 0.233653
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.402319
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.402319
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.175165
+         Iterations: 16
+         Function evaluations: 32
+Poltype -- Polarizable atom typer of small molecules for the AMOEBA polarizable force field
+
+Please cite:
+Wu, J.C.; Chattree, G.; Ren, P.Y.; Automation of AMOEBA polarizable force field 
+parameterization for small molecules. Theor Chem Acc. 
+
+Version 2.3.1 May 2021
+
+Copyright (c)  Johnny Wu, Gaurav Chattree, Brandon Walker, Matthew Harger and Pengyu Ren 2019
+
+All Rights Reserved
+##############################################################################################################
+
+Calling: analyze /home/bdw2292/poltype2/VersionFiles/water.xyz -k /home/bdw2292/poltype2/VersionFiles/water.key e> version.out
+
+For help, use: python dimorphite_dl.py --help
+
+If you use Dimorphite-DL in your research, please cite:
+Ropp PJ, Kaminsky JC, Yablonski S, Durrant JD (2019) Dimorphite-DL: An
+open-source program for enumerating the ionization states of drug-like small
+molecules. J Cheminform 11:14. doi:10.1186/s13321-019-0336-9.
+
+/home/bdw2292/poltype2/PoltypeModules/poltype.py:2471: UserWarning: Poltype has completed successfully, but this software is still under active development. It is your responsibility to check your own final parameters, while we are still in development phase.
+  warnings.warn(string)
+Optimization terminated successfully.
+         Current function value: 0.169861
+         Iterations: 15
+         Function evaluations: 30
+Optimization terminated successfully.
+         Current function value: 0.169861
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.169861
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.063872
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.359945
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.359945
+         Iterations: 15
+         Function evaluations: 30
+Optimization terminated successfully.
+         Current function value: 0.359945
+         Iterations: 15
+         Function evaluations: 30
+Optimization terminated successfully.
+         Current function value: 0.153141
+         Iterations: 15
+         Function evaluations: 30
+Optimization terminated successfully.
+         Current function value: 0.514818
+         Iterations: 14
+         Function evaluations: 28
+Optimization terminated successfully.
+         Current function value: 0.514818
+         Iterations: 17
+         Function evaluations: 34
+Optimization terminated successfully.
+         Current function value: 0.514818
+         Iterations: 17
+         Function evaluations: 34
+Optimization terminated successfully.
+         Current function value: 0.233653
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.402319
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.402319
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.175165
+         Iterations: 16
+         Function evaluations: 32

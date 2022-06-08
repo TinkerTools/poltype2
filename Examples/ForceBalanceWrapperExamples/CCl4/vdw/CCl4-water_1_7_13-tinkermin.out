@@ -1,0 +1,130 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.9.4   September 2021                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      402   402     Cl    CCl4                        17     35.453     1
+      401   401     C     CCl4                         6     12.011     4
+
+ Additional Bond Stretching Parameters :
+
+     Atom Classes             K(S)         Length
+
+       401 402             149.323         1.7700
+
+ Additional Angle Bending Parameters :
+
+     Atom Classes             K(B)          Angle
+
+     402 401 402            50.749        109.470
+
+ Additional Stretch-Bend Parameters :
+
+     Atom Classes          K(SB)-1        K(SB)-2
+
+     402 401 402             5.713          5.713
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         402      401      0      0   Z-Only      -0.03988
+                                                   0.00000  0.00000  0.05327
+                                                  -0.58038
+                                                   0.00000 -0.58038
+                                                   0.00000  0.00000  1.16076
+
+         401      402      0      0   Z-Only       0.15952
+                                                   0.00000  0.00000  0.00037
+                                                  -0.00002
+                                                   0.00000 -0.00002
+                                                   0.00000  0.00000  0.00004
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         402             2.337       0.390         401
+         401             1.620       0.390         402
+
+ Additional van der Waals Parameters :
+
+     Atom Class               Size        Epsilon        Reduction
+
+         401                3.6000         0.1040          0.000
+         402                3.8980         0.3190          0.000
+
+ Additional Solvation Parameters :
+
+     Atom Type                PB Size     CS Size     GK Size
+
+         401             3.5795      3.6230      3.6000
+
+ Limited Memory BFGS Quasi-Newton Optimization :
+
+ QN Iter     F Value      G RMS      F Move   X Move   Angle  FG Call  Comment
+
+     0      243.4559   305.7157                                   1
+     1       72.6867    79.8245    170.7692   0.1473    0.00      2    Success 
+     2       50.0940    51.6315     22.5927   0.0568    3.52      3    Success 
+     3       32.8245    32.5326     17.2695   0.0665   29.44      4    Success 
+     4       25.5034    74.1219      7.3211   0.0961   35.63      5    Success 
+     5       16.8328    17.4050      8.6705   0.0550   63.30      6    Success 
+     6       14.8493    14.7004      1.9835   0.0408   62.83      7    Success 
+     7       11.6400    15.6213      3.2093   0.0642   58.31      8    Success 
+     8        6.4986    15.4122      5.1413   0.1016   59.64      9    Success 
+     9        2.1508    19.9366      4.3478   0.1473   62.42     10    Success 
+    10       -0.2643    11.0668      2.4151   0.1473   72.60     11    Success 
+    11       -0.4022    14.8932      0.1380   0.0415   67.32     12    Success 
+    12       -0.6272     9.6597      0.2249   0.0032   43.32     13    Success 
+    13       -0.8234     2.5856      0.1962   0.0075   53.25     14    Success 
+    14       -0.8641     2.4024      0.0407   0.0031   43.05     15    Success 
+    15       -0.9334     2.5870      0.0693   0.0068   51.37     16    Success 
+    16       -1.0290     2.3251      0.0956   0.0143   62.15     17    Success 
+    17       -1.0538     1.7634      0.0248   0.0129   75.36     18    Success 
+    18       -1.0636     0.7939      0.0098   0.0025   54.52     19    Success 
+    19       -1.0666     0.5428      0.0030   0.0012   64.71     20    Success 
+    20       -1.0718     0.3921      0.0052   0.0039   69.13     21    Success 
+    21       -1.0802     0.5593      0.0084   0.0090   68.36     22    Success 
+    22       -1.0909     0.5837      0.0107   0.0191   78.91     23    Success 
+    23       -1.0938     0.7181      0.0028   0.0076   80.93     25    Success 
+    24       -1.0980     0.5088      0.0042   0.0082   83.14     26    Success 
+    25       -1.1023     0.4708      0.0043   0.0066   77.03     27    Success 
+    26       -1.1073     0.9510      0.0051   0.0062   73.42     28    Success 
+    27       -1.1153     1.1118      0.0080   0.0087   81.19     29    Success 
+    28       -1.1280     1.6246      0.0127   0.0163   83.65     30    Success 
+    29       -1.1470     1.8660      0.0190   0.0258   85.66     31    Success 
+    30       -1.1702     1.7120      0.0232   0.0386   86.21     32    Success 
+    31       -1.1802     4.1469      0.0100   0.0274   82.90     33    Success 
+    32       -1.1962     3.1738      0.0160   0.0026   76.48     34    Success 
+    33       -1.2193     1.4389      0.0231   0.0061   78.17     35    Success 
+    34       -1.2326     0.7070      0.0133   0.0105   80.46     36    Success 
+    35       -1.2429     0.9225      0.0103   0.0124   79.53     37    Success 
+    36       -1.2581     1.3084      0.0152   0.0200   81.99     38    Success 
+    37       -1.2741     1.2371      0.0160   0.0247   83.24     39    Success 
+    38       -1.2782     0.8933      0.0040   0.0111   80.80     40    Success 
+    39       -1.2814     1.1321      0.0032   0.0120   84.60     41    Success 
+    40       -1.2842     0.3809      0.0028   0.0047   81.27     42    Success 
+    41       -1.2850     0.1802      0.0009   0.0031   83.07     43    Success 
+    42       -1.2857     0.1519      0.0006   0.0053   82.56     44    Success 
+    43       -1.2861     0.0979      0.0004   0.0028   80.01     45   SmallGrad
+
+ LBFGS  --  Normal Termination due to SmallGrad
+
+ Final Function Value :           -1.28611297
+ Final RMS Gradient :              0.09794859
+ Final Gradient Norm :             0.27704046

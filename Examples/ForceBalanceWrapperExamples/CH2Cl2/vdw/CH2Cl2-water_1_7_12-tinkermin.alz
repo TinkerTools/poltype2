@@ -1,0 +1,104 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.9.4   September 2021                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      402   402     Cl    CH2Cl2                      17     35.453     1
+      401   401     C     CH2Cl2                       6     12.011     4
+      403   403     H     CH2Cl2                       1      1.008     1
+
+ Additional Bond Stretching Parameters :
+
+     Atom Classes             K(S)         Length
+
+       401 402             276.477         1.7700
+       403 401             384.844         1.0900
+
+ Additional Angle Bending Parameters :
+
+     Atom Classes             K(B)          Angle
+
+     402 401 402            46.092        113.090
+     403 401 402            45.080        108.250
+     403 401 403            32.984        110.760
+
+ Additional Stretch-Bend Parameters :
+
+     Atom Classes          K(SB)-1        K(SB)-2
+
+     402 401 402             5.713          5.713
+     403 401 402             5.713          5.713
+     403 401 403             5.713          5.713
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         402      401    402      0   Z-then-X    -0.14546
+                                                   0.00326  0.00000  0.12567
+                                                  -0.78473
+                                                   0.00000 -0.75367
+                                                  -0.10104  0.00000  1.53840
+
+         401      402    402      0   Bisector     0.10860
+                                                   0.00000  0.00000  0.37492
+                                                   0.67742
+                                                   0.00000 -0.76666
+                                                   0.00000  0.00000  0.08924
+
+         403      401    403      0   Z-then-X     0.09116
+                                                  -0.01717  0.00000 -0.14164
+                                                   0.05168
+                                                   0.00000  0.00671
+                                                  -0.00365  0.00000 -0.05839
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         402             2.337       0.390         401
+         401             1.620       0.390         402  403
+         403             0.480       0.390         401
+
+ Additional van der Waals Parameters :
+
+     Atom Class               Size        Epsilon        Reduction
+
+         401                3.8200         0.1010          0.000
+         402                3.8980         0.3620          0.000
+         403                2.9600         0.0240          0.920
+
+ Additional Solvation Parameters :
+
+     Atom Type                PB Size     CS Size     GK Size
+
+         403             3.0205      3.8850      4.0505
+         401             3.3025      2.8540      4.9016
+
+ Intermolecular Energy :              -1.99362036 Kcal/mole
+
+ Total Potential Energy :             -1.98278114 Kcal/mole
+
+ Energy Component Breakdown :           Kcal/mole        Interactions
+
+ Bond Stretching                       0.00031894                6
+ Angle Bending                         0.01087658                7
+ Stretch-Bend                         -0.00000506                6
+ Urey-Bradley                         -0.00035124                1
+ Van der Waals                        -0.23968808               15
+ Atomic Multipoles                    -1.46732088               15
+ Polarization                         -0.28661140               15
