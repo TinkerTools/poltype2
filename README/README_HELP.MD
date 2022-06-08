@@ -272,6 +272,15 @@ WQ_PORT=9013
 
 ``vdwtypestoeval``  specifies which vdw parmaeters to fix (while the first instance of parameters is fit). Default all parameters are evaluated besides for instance vdwtypestoeval=S,T,D. 
 
+``qmrelativeweight`` specifies relative weight between QM and Liquid target.
+
+``liqrelativeweight`` specifies relative weight between Liquid and QM target.
+
+``enthalpyrelativeweight`` specifies relative weight between enthalpy and other liquid properties.
+
+``densityrelativeweight`` specifies relative weight between density and other liquid properties.
+
+
 #### ForceBalance Poltype Wrapper Results
 
 ``forcebalancejobsdir=Path_to_force_balance_jobs`` specifies to grab ForceBalance output files, parse and generate plots and tables.

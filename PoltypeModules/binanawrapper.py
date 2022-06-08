@@ -28,11 +28,9 @@ def ExtractMOLObject(ligandreceptorfilename,newpdbfilename,receptor):
         reskey=res.GetName()
 
         if reskey=='LIG' and receptor==True:
-            #pdbmol.DeleteAtom(atm)
             atmindicestodelete.append(atmindex)
         elif reskey!='LIG' and receptor==False:
             atmindicestodelete.append(atmindex)
-            #pdbmol.DeleteAtom(atm)
     atmindicestodelete.sort(reverse=True)
     for atmindex in atmindicestodelete:
         atm=pdbmol.GetAtom(atmindex)
@@ -306,3 +304,9 @@ def PrepareInputs(ligandreceptorfilename):
     hydrophobicatomvecs=GrabAtomVectorsFromIndices([hydrophobicatomindices],pdbmol)[0]
     residtoresname=GrabResidueNames(pdbmol,residcollector)
     return listoffromtoatomvecshbond,listoffromtoatomvecspipi,listoffromtoatomvecststack,listoffromtoatomvecscatpi,listoffromtoatomvecshalbond,listoffromtoatomvecssaltbridge,residcollector,hydrophobicatomvecs,residtoresname
+
+
+def PrepareInputsAndCreateViewer(ligandreceptorfilename):
+    listoffromtoatomvecshbond,listoffromtoatomvecspipi,listoffromtoatomvecststack,listoffromtoatomvecscatpi,listoffromtoatomvecshalbond,listoffromtoatomvecssaltbridge,residcollector,hydrophobicatomvecs,residtoresname=PrepareInputs(ligandreceptorfilename)
+    view=CreateViewer(listoffromtoatomvecshbond,listoffromtoatomvecspipi,listoffromtoatomvecststack,listoffromtoatomvecscatpi,listoffromtoatomvecshalbond,listoffromtoatomvecssaltbridge,residcollector,hydrophobicatomvecs,residtoresname)
+    return view

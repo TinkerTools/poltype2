@@ -639,7 +639,7 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 * Be sure to install the conda environment (notebookenvironment.yml)
 * Activate the conda environment ``conda activate pymolenv``
 * Move protein-ligand complexed PDB to VisualizationNotebooks folder
-* Launch the jupyter notebook ``jupyter-notebook Protein-Ligand-Interactions.ipunb``
+* Launch the jupyter notebook ``jupyter-notebook Protein-Ligand-Interactions.ipynb``
 * Input your complexed PDB name into variable ``ligandreceptorfilename``
 * Run the cell and the output from BINANA interaction profiler is shown. 
 
@@ -665,6 +665,7 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 * Make sure if using custom receptor parameters, then either adding to keyfilename or in prmfilepath
 * Use submitlocally=False if you do not wish to submit dynamics jobs locally.
 * For HFE, if your ligand is charged and you want to compute the salt hydration free energy, add "salthfe=True"
+* For running dynamics on a cluster, add keyword ``submitlocally=False``. Then program will wait for you to complete the jobs in text file (output files will be parsed for completion). 
 
 #### Minimum Input Example Binding Free Energy
 

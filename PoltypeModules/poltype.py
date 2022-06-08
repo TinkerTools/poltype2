@@ -80,6 +80,10 @@ from rdkit.Chem.MolStandardize import rdMolStandardize
 
 @dataclass
 class PolarizableTyper():
+        qmrelativeweight:float=.5
+        liqrelativeweight:float=2.5
+        enthalpyrelativeweight:float=1
+        densityrelativeweight:float=.001
         indextotypefile:None=None
         pdbcode:None=None
         usesymtypes: bool = True
@@ -470,6 +474,14 @@ class PolarizableTyper():
                             self.pdbcode=a
                         elif 'indextotypefile' in newline:
                             self.indextotypefile=a
+                        elif 'qmrelativeweight' in newline:
+                            self.qmrelativeweight=float(a)
+                        elif 'liqrelativeweight' in newline:
+                            self.liqrelativeweight=float(a)
+                        elif 'enthalpyrelativeweight' in newline:
+                            self.enthalpyrelativeweight=float(a)
+                        elif 'densityrelativeweight' in newline:
+                            self.densityrelativeweight=float(a)
                         elif 'templateligandxyzfilename' in newline:
                             self.templateligandxyzfilename=a
                         elif 'barinterval' in newline:
@@ -491,6 +503,11 @@ class PolarizableTyper():
                                 self.usepdb2pqr = True
                             else:
                                 self.usepdb2pqr=self.GrabBoolValue(a)
+                        elif "submitlocally" in newline:
+                            if '=' not in line:
+                                self.submitlocally = True
+                            else:
+                                self.submitlocally=self.GrabBoolValue(a)
 
 
                         elif "usesymtypes" in newline:
@@ -1378,9 +1395,11 @@ class PolarizableTyper():
                 self.torspbasisset = 'MINIX'
 
             self.cmdtopid={} # for killing pids that have jobs stalled too long
-            
+           
+
+
             if self.poltypepathlist!=None:
-                fb.GenerateForceBalanceInputs(self.poltypepathlist,self.vdwtypeslist,self.liquid_equ_steps,self.liquid_prod_steps,self.liquid_timestep,self.liquid_interval,self.gas_equ_steps,self.gas_prod_steps,self.gas_timestep,self.gas_interval,self.md_threads,self.liquid_prod_time,self.gas_prod_time,self.WQ_PORT,self.csvexpdatafile,self.fittypestogether,self.vdwprmtypestofit,self.vdwtypestoeval,self.liquid_equ_time,self.gas_equ_time)
+                fb.GenerateForceBalanceInputs(self.poltypepathlist,self.vdwtypeslist,self.liquid_equ_steps,self.liquid_prod_steps,self.liquid_timestep,self.liquid_interval,self.gas_equ_steps,self.gas_prod_steps,self.gas_timestep,self.gas_interval,self.md_threads,self.liquid_prod_time,self.gas_prod_time,self.WQ_PORT,self.csvexpdatafile,self.fittypestogether,self.vdwprmtypestofit,self.vdwtypestoeval,self.liquid_equ_time,self.gas_equ_time,self.qmrelativeweight,self.liqrelativeweight,self.enthalpyrelativeweight,self.densityrelativeweight)
                 sys.exit()
             if self.forcebalancejobsdir!=None:
                 plotFBresults.PlotForceBalanceResults(self.forcebalancejobsdir)
@@ -3158,8 +3177,12 @@ class PolarizableTyper():
                     fsplit=f.split('.')
                     if len(fsplit)>1:
                         end=fsplit[1]
-                        if 'log' not in end and 'sdf' not in end and 'ini' not in end and 'chk' not in end and 'dat' not in end and 'mol' not in end and 'txt' not in end: 
-                            deletearray.append(f)
+                        if 'log' not in end and 'sdf' not in end and 'ini' not in end and 'chk' not in end and 'dat' not in end and 'mol' not in end and 'txt' not in end:
+                            if self.indextotypefile!=None:
+                                if self.indextotypefile not in f:
+                                    deletearray.append(f)
+                            else:
+                                deletearray.append(f)
             for f in deletearray:
                 os.remove(f)
 

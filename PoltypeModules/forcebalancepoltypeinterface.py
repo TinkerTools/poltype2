@@ -831,25 +831,26 @@ def AddKeyWord(keypath,string):
 
 def WaterParameters():
     lines=[]
-    lines.append('atom        349   90    O     "AMOEBAWaterO"               8    15.999    2')
-    lines.append('atom        350   91    H     "AMOEBAWaterH"               1     1.008    1')
-    lines.append('vdw          90               3.4050     0.1100')
-    lines.append('vdw          91               2.6550     0.0135      0.910')
-    lines.append('bond         90   91          556.85     0.9572')
-    lines.append('angle        91   90   91      48.70     108.50')
-    lines.append('ureybrad     91   90   91      -7.60     1.5537')
-    lines.append('multipole   349 -350 -350              -0.51966')
-    lines.append('                                        0.00000    0.00000    0.14279')
-    lines.append('                                        0.37928')
-    lines.append('                                        0.00000   -0.41809')
-    lines.append('                                       0.00000    0.00000    0.03881')
-    lines.append('multipole   350  349  350               0.25983')
-    lines.append('                                       -0.03859    0.00000   -0.05818')
-    lines.append('                                       -0.03673')
-    lines.append('                                        0.00000   -0.10739')
-    lines.append('                                       -0.00203    0.00000    0.14412')
-    lines.append('polarize    349          0.8370     0.3900    350')
-    lines.append('polarize    350          0.4960     0.3900    349')
+    lines.append('atom          349    90    O     "AMOEBAWaterO"               8    15.995    2')
+    lines.append('atom          350    91    H     "AMOEBAWaterH"               1     1.008    1')
+    lines.append('vdw         90   3.40058   0.06508')
+    lines.append('vdw         91   2.64479   0.02601   0.91233')
+    lines.append('bond          90    91          566.82  0.9571')
+    lines.append('angle         91    90    91     48.98   106.58')
+    lines.append('ureybrad      91    90    91      -12.50     1.5346')
+    lines.append('multipole   349 -350 -350              -0.38282')
+    lines.append('                                 0.00000    0.00000    0.29047')
+    lines.append('                                 0.50815')
+    lines.append('                                 0.00000   -0.68079')
+    lines.append('                                 0.00000    0.00000    0.17264')
+    lines.append('multipole   350  349  350               0.19141')
+    lines.append('                                -0.07281    0.00000   -0.10315')
+    lines.append('                                -0.01564')
+    lines.append('                                 0.00000   -0.10967')
+    lines.append('                                -0.04073    0.00000    0.12531')
+    lines.append('polarize      349           0.9725      0.390    350')
+    lines.append('polarize      350           0.4309      0.390    349 ')
+
     return lines
 
 def GenerateNewKeyFile(keyfile,prmfilepath,moleculeprmfilename,axis,addwaterprms,molname):
@@ -992,7 +993,7 @@ def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfile
                 Analyze(liquidxyzfile,liquidkeyfile,analyzepath,molprmfilepath)
             except:
                 print('Bond energy check failed, need to relax box more')
-                dynamicrelax=True
+                sys.exit()
             if dynamicrelax==True:
                 axis,finalaxis=ComputeBoxLength(gasxyzfile,addextra=True)
                 boxlength=axis*10**-10 # convert angstroms to m
@@ -1238,7 +1239,7 @@ def which(program):
 
 
 
-def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderlist,optimizefilepath,atomnumlist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_timestep,gas_interval,md_threads,indextogeneratecsv,qmfoldertoindex,qmfolderlisttogen,WQ_PORT,gas_prod_steps):
+def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderlist,optimizefilepath,atomnumlist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_timestep,gas_interval,md_threads,indextogeneratecsv,qmfoldertoindex,qmfolderlisttogen,WQ_PORT,gas_prod_steps,qmrelativeweight,liqrelativeweight,enthalpyrelativeweight,densityrelativeweight):
     head,tail=os.path.split(optimizefilepath)
     newoptimizefilepath=os.path.join(os.getcwd(),tail)
     shutil.copy(optimizefilepath,newoptimizefilepath)
@@ -1267,7 +1268,7 @@ def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderl
             results.append('$target'+'\n')
             results.append('name '+qmfolder+'\n')
             results.append('type Interaction_TINKER'+'\n')
-            results.append('weight .5'+'\n')
+            results.append('weight '+str(qmrelativeweight)+'\n')
             results.append('energy_denom 1.0'+'\n')
             results.append('energy_upper 10.0'+'\n')
             results.append('attenuate'+'\n')
@@ -1291,9 +1292,9 @@ def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderl
                 results.append('$target'+'\n')
                 results.append('name '+liquidfolder+'\n')
                 results.append('type Liquid_TINKER'+'\n')
-                results.append('weight 2.5'+'\n')
-                results.append('w_rho 1.0'+'\n')
-                results.append('w_hvap 1.0'+'\n')
+                results.append('weight '+str(liqrelativeweight)+'\n')
+                results.append('w_rho '+str(densityrelativeweight)+'\n')
+                results.append('w_hvap '+str(enthalpyrelativeweight)+'\n')
                 results.append('liquid_equ_steps '+str(liquid_equ_steps)+'\n')
                 results.append('liquid_prod_steps '+str(liquid_prod_steps)+'\n')
                 results.append('liquid_timestep '+str(liquid_timestep)+'\n')
@@ -1641,7 +1642,7 @@ def ReadPRMFile(prmfilepath):
 
     return prmfilelines
 
-def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_prod_steps,gas_timestep,gas_interval,md_threads,liquid_prod_time,gas_prod_time,WQ_PORT,csvexpdatafile,fittypestogether,vdwprmtypestofit,vdwtypestoeval,liquid_equ_time,gas_equ_time):
+def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_prod_steps,gas_timestep,gas_interval,md_threads,liquid_prod_time,gas_prod_time,WQ_PORT,csvexpdatafile,fittypestogether,vdwprmtypestofit,vdwtypestoeval,liquid_equ_time,gas_equ_time,qmrelativeweight,liqrelativeweight,enthalpyrelativeweight,densityrelativeweight):
     
 
     debugmode=False
@@ -1775,5 +1776,5 @@ def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liq
         liquidfolderlist=GenerateLiquidTargetsFolder(gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,liquidxyzfilelist,datacsvpathlist,densitylist,liquidfolder,prmfilepath,moleculeprmfilename,vdwtypeslist,addwaterprms,molnamelist,indextogeneratecsv)
         qmfolderlist,qmfolderlisttogen=GenerateQMTargetsFolder(dimertinkerxyzfileslist,dimerenergieslist,liquidkeyfilelist,qmfolder,vdwtypeslist,molnamelist)    
         qmfoldertoindex=GenerateQMFolderToCSVIndex(qmfolderlist) # need way to keep track of liquid to QM 
-        GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderlist,optimizefilepath,atomnumlist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_timestep,gas_interval,md_threads,indextogeneratecsv,qmfoldertoindex,qmfolderlisttogen,WQ_PORT,gas_prod_steps)
+        GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderlist,optimizefilepath,atomnumlist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_timestep,gas_interval,md_threads,indextogeneratecsv,qmfoldertoindex,qmfolderlisttogen,WQ_PORT,gas_prod_steps,qmrelativeweight,liqrelativeweight,enthalpyrelativeweight,densityrelativeweight)
         RemoveExtraFiles() 
