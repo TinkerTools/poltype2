@@ -3,6 +3,12 @@ import binana
 import py3Dmol
 from openbabel import openbabel
 import numpy as np
+import MDAnalysis as mda
+from MDAnalysis.coordinates import PDB
+import prolif as plf
+from prolif.plotting.network import LigNetwork
+from rdkit import Chem
+from rdkit.Chem import rdmolfiles,AllChem,rdmolops
 
 
 def ExtractLigand(ligandreceptorfilename):
@@ -303,10 +309,89 @@ def PrepareInputs(ligandreceptorfilename):
     hydrophobicatomindices=CombineArrays([allligandatomindiceshydpho,allreceptoratomindiceshydpho])
     hydrophobicatomvecs=GrabAtomVectorsFromIndices([hydrophobicatomindices],pdbmol)[0]
     residtoresname=GrabResidueNames(pdbmol,residcollector)
-    return listoffromtoatomvecshbond,listoffromtoatomvecspipi,listoffromtoatomvecststack,listoffromtoatomvecscatpi,listoffromtoatomvecshalbond,listoffromtoatomvecssaltbridge,residcollector,hydrophobicatomvecs,residtoresname
+    return listoffromtoatomvecshbond,listoffromtoatomvecspipi,listoffromtoatomvecststack,listoffromtoatomvecscatpi,listoffromtoatomvecshalbond,listoffromtoatomvecssaltbridge,residcollector,hydrophobicatomvecs,residtoresname,ligandinputfilename,receptorinputfilename
 
 
 def PrepareInputsAndCreateViewer(ligandreceptorfilename):
-    listoffromtoatomvecshbond,listoffromtoatomvecspipi,listoffromtoatomvecststack,listoffromtoatomvecscatpi,listoffromtoatomvecshalbond,listoffromtoatomvecssaltbridge,residcollector,hydrophobicatomvecs,residtoresname=PrepareInputs(ligandreceptorfilename)
+    listoffromtoatomvecshbond,listoffromtoatomvecspipi,listoffromtoatomvecststack,listoffromtoatomvecscatpi,listoffromtoatomvecshalbond,listoffromtoatomvecssaltbridge,residcollector,hydrophobicatomvecs,residtoresname,ligandinputfilename,receptorinputfilename=PrepareInputs(ligandreceptorfilename)
     view=CreateViewer(listoffromtoatomvecshbond,listoffromtoatomvecspipi,listoffromtoatomvecststack,listoffromtoatomvecscatpi,listoffromtoatomvecshalbond,listoffromtoatomvecssaltbridge,residcollector,hydrophobicatomvecs,residtoresname)
-    return view
+    net=Generate2DInteractionPlot(receptorinputfilename,ligandinputfilename)
+    return view,net
+
+def ConvertPDBToSDF(ligandpdbfilename):
+    ligandsdffilename=ligandpdbfilename.replace('.pdb','.sdf')
+    obConversion = openbabel.OBConversion()
+    pdbmol = openbabel.OBMol()
+    obConversion.SetInFormat('pdb')
+    obConversion.ReadFile(pdbmol,ligandpdbfilename)
+    obConversion.SetInFormat('sdf')
+    obConversion.WriteFile(pdbmol,ligandsdffilename)
+    return ligandsdffilename
+
+def AddProteinBonds(proteinpdbfilename):
+    obConversion = openbabel.OBConversion()
+    newpdbfilename=proteinpdbfilename.replace('.pdb','_final.pdb')
+    pdbmol = openbabel.OBMol()
+    obConversion.SetInFormat('pdb')
+    obConversion.ReadFile(pdbmol,proteinpdbfilename)
+    obConversion.SetInFormat('pdb')
+    obConversion.WriteFile(pdbmol,newpdbfilename)
+    return newpdbfilename
+
+def AssignCharge(m):
+    atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
+    for atom in m.GetAtoms():
+        atomidx=atom.GetIdx()
+        atomnum=atom.GetAtomicNum()
+        val=atom.GetExplicitValence()
+        valtochg=atomicnumtoformalchg[atomnum]
+        radicals=atom.GetNumRadicalElectrons()
+        if val not in valtochg.keys(): # then assume chg=0
+            chg=0
+        else:
+            chg=valtochg[val]
+        polneighb=False
+        if atomnum==6:
+            for natom in atom.GetNeighbors():
+                natomicnum=natom.GetAtomicNum()
+                if natomicnum==7 or natomicnum==8 or natomicnum==16:
+                    polneighb=True
+            if polneighb and val==3:
+                chg=1
+        atom.SetFormalCharge(chg)
+        atom.SetNumRadicalElectrons(0)
+
+    return m
+
+def FileConverter(inputfilename,informat,outformat):
+    outputfilename=inputfilename.replace('.'+informat,'.'+outformat)
+    obConversion = openbabel.OBConversion()
+    mol = openbabel.OBMol()
+    obConversion.SetInFormat(informat)
+    obConversion.ReadFile(mol, inputfilename)
+    obConversion.SetOutFormat(outformat)
+    obConversion.WriteFile(mol,outputfilename)
+    return outputfilename
+
+def AssignFormalCharges(ligandsdffilename):
+    ligandmolfilename=FileConverter(ligandsdffilename,'sdf','mol')
+    m=Chem.MolFromMolFile(ligandmolfilename,removeHs=False,sanitize=False)
+    m=AssignCharge(m)
+    rdmolfiles.MolToMolFile(m,ligandmolfilename)
+    ligandsdffilename=FileConverter(ligandmolfilename,'mol','sdf')
+
+    return ligandsdffilename
+
+
+def Generate2DInteractionPlot(proteinpdbfilename,ligandpdbfilename):
+    proteinpdbfilename=AddProteinBonds(proteinpdbfilename)
+    prot = mda.Universe(proteinpdbfilename,guess_bonds=False)
+    prot = plf.Molecule.from_mda(prot)
+    ligandsdffilename=ConvertPDBToSDF(ligandpdbfilename)
+    ligandsdffilename=AssignFormalCharges(ligandsdffilename)
+    lig_suppl = list(plf.sdf_supplier(ligandsdffilename))
+    fp = plf.Fingerprint()
+    fp.run_from_iterable(lig_suppl, prot)
+    results_df = fp.to_dataframe(return_atoms=True)
+    net = LigNetwork.from_ifp(results_df,lig_suppl[0],kind="frame", frame=0,rotation=270)
+    return net

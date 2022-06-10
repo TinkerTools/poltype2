@@ -1,0 +1,49 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.9.4   September 2021                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      402   402     H     74_Index_0                   1      1.008     1
+      401   401     N     74_Index_0                   7     14.007     4
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      402   402     H     74_Index_0                   1      1.008     1
+      401   401     N     74_Index_0                   7     14.007     4
+
+ Structure File 1 :  74_Index_0.xyz_2
+
+ Structure File 2 :  final.xyz_2
+
+ File 1 Frame :     1             File 2 Frame :     1
+
+ Summary of Results from Structural Superposition :
+
+ IMPOSE  --  Input Coordinates                0.000117
+ IMPOSE  --  After Translation                0.000000
+ IMPOSE  --  After Rotation                   0.000000
+
+ Root Mean Square Distance :                  0.000000        1      1
+
+   Atom in the         Atom in the            Distance          Weight
+ First Structure     Second Structure        Separated          in Fit
+
+         2-N                 2-N              0.000000         14.0070
+
+ Root Mean Square Distance :                  0.000000

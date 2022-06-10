@@ -1,0 +1,238 @@
+parameters /home/bdw2292/poltype2/ParameterFiles/amoebabio18.prm
+OPENMP-THREADS 1
+digits 8
+RESP-WEIGHT 1
+
+#############################
+##                         ##
+##  Literature References  ##
+##                         ##
+#############################
+
+Wu, J.C.; Chattree, G.; Ren, P.Y.; Automation of AMOEBA polarizable force field
+parameters /home/bdw2292/poltype2/ParameterFiles/amoebabio18.prm
+
+atom          401    401    C     "28_Index_0          "         6    12.011    4
+atom          403    403    N     "28_Index_0          "         7    14.007    3
+atom          402    402    C     "28_Index_0          "         6    12.011    4
+atom          405    405    H     "28_Index_0          "         1     1.008    1
+atom          404    404    H     "28_Index_0          "         1     1.008    1
+atom          406    406    H     "28_Index_0          "         1     1.008    1
+
+# matching SMARTS from molecule  [['[#6](-[#6](-[#1])(-[#1])-[#1])(-[#1])(-[#1])-[#7](-[#1])-[#1]', [1]]] to SMARTS from parameter file [['[#7](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H]', [2]]] with tinker type descriptions [[('C', '"Ethyl Amine CH2"')]]
+
+# [401] = [[1]]
+vdw 401 3.8200 0.1010
+# matching SMARTS from molecule  [['[#6](-[#6](-[#1])(-[#1])-[#1])(-[#1])(-[#1])-[#7](-[#1])-[#1]', [2]]] to SMARTS from parameter file [['[#7](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H]', [3]]] with tinker type descriptions [[('C', '"Ethyl Amine CH3"')]]
+
+# [402] = [[3]]
+vdw 402 3.8200 0.1010
+# matching SMARTS from molecule  [['[#6](-[#6](-[#1])(-[#1])-[#1])(-[#1])(-[#1])-[#7](-[#1])-[#1]', [5]]] to SMARTS from parameter file [['[#7](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H]', [6]]] with tinker type descriptions [[('H', '"Ethyl Amine H3C"')]]
+
+# [404] = [[6, 7, 10]]
+vdw 404 2.9600 0.0240 0.920
+# matching SMARTS from molecule  [['[#6](-[#6](-[#1])(-[#1])-[#1])(-[#1])(-[#1])-[#7](-[#1])-[#1]', [8]]] to SMARTS from parameter file [['[#7](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H]', [1]]] with tinker type descriptions [[('N', '"Ethyl Amine N"')]]
+
+# [403] = [[2]]
+vdw 403 3.7100 0.1050
+# matching SMARTS from molecule  [['[#6](-[#6](-[#1])(-[#1])-[#1])(-[#1])(-[#1])-[#7](-[#1])-[#1]', [10]]] to SMARTS from parameter file [['[#7](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H]', [10]]] with tinker type descriptions [[('H', '"Ethyl Amine H2N"')]]
+
+# [406] = [[8, 9]]
+vdw 406 2.7000 0.0200 0.910
+# matching SMARTS from molecule  [['[#6](-[#6](-[#1])(-[#1])-[#1])(-[#1])(-[#1])-[#7](-[#1])-[#1]', [7]]] to SMARTS from parameter file [['[#7](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H]', [8]]] with tinker type descriptions [[('H', '"Ethyl Amine H2C"')]]
+
+# [405] = [[4, 5]]
+vdw 405 2.8800 0.0240 0.910
+
+# updated valence parameter database match, comments=C33, sp3 carbon with 3 Hydrogens C32, sp3 carbon with 2 Hydrogens SMARTS match = [CX4H3] [CX4H2]
+
+# [402, 401] = [[3], [1]]
+bond 402 401 203.311199 1.52
+# updated valence parameter database match, comments=HCH3, H on sp3 carbon, -CH3 C32, sp3 carbon with 2 Hydrogens SMARTS match = [H][CH2] [CX4H2]
+
+# [405, 401] = [[4, 5], [1]]
+bond 405 401 340.532535 1.1
+# updated valence parameter database match, comments=N3, sp3 Nitrogen C32, sp3 carbon with 2 Hydrogens SMARTS match = [NX3] [CX4H2]
+
+# [403, 401] = [[2], [1]]
+bond 403 401 216.460705 1.47
+# updated valence parameter database match, comments=HN, H on Nitrogen N3, sp3 Nitrogen SMARTS match = [H][N] [NX3]
+
+# [406, 403] = [[8, 9], [2]]
+bond 406 403 451.428409 1.02
+# updated valence parameter database match, comments=HCH3, H on sp3 carbon, -CH3 C33, sp3 carbon with 3 Hydrogens SMARTS match = [H][CH3] [CX4H3]
+
+# [404, 402] = [[6, 7, 10], [3]]
+bond 404 402 345.97894 1.09
+
+# updated valence parameter database match, comments=HCH3, H on sp3 carbon, -CH3 C33, sp3 carbon with 3 Hydrogens C32, sp3 carbon with 2 Hydrogens SMARTS match = [H][CH3] [CX4H3] [CX4H2]
+
+# [404, 402, 401] = [[6, 7, 10], [3], [1]]
+angle 404 402 401 50.884753 110.79
+
+# updated valence parameter database match, comments=HN, H on Nitrogen N3, sp3 Nitrogen C32, sp3 carbon with 2 Hydrogens SMARTS match = [H][N] [NX3] [CX4H2]
+
+# Doubling angle force constant because z-then-bisector frame 
+# [406, 403, 401] = [[8, 9], [2], [1]]
+angle 406 403 401 102.47644 109.26
+# updated valence parameter database match, comments=C33, sp3 carbon with 3 Hydrogens C32, sp3 carbon with 2 Hydrogens N3, sp3 Nitrogen SMARTS match = [CX4H3] [CX4H2] [NX3]
+
+# [402, 401, 403] = [[3], [1], [2]]
+angle 402 401 403 98.166177 109.73
+
+# updated valence parameter database match, comments=HCH3, H on sp3 carbon, -CH3 C32, sp3 carbon with 2 Hydrogens N3, sp3 Nitrogen SMARTS match = [H][CH2] [CX4H2] [NX3]
+
+# [405, 401, 403] = [[4, 5], [1], [2]]
+angle 405 401 403 57.277582 110.61
+
+# updated valence parameter database match, comments=HCH3, H on sp3 carbon, -CH3 C32, sp3 carbon with 2 Hydrogens C33, sp3 carbon with 3 Hydrogens SMARTS match = [H][CH2] [CX4H2] [CX4H3]
+
+# [405, 401, 402] = [[4, 5], [1], [3]]
+angle 405 401 402 47.068797 109.58
+
+# updated valence parameter database match, comments=HCH3, H on sp3 carbon, -CH3 C32, sp3 carbon with 2 Hydrogens HCH3, H on sp3 carbon, -CH3 SMARTS match = [H][CH2] [CX4H2] [H][CH2]
+
+# [405, 401, 405] = [[4, 5], [1], [4, 5]]
+angle 405 401 405 30.490529 106.67
+
+# updated valence parameter database match, comments=HCH3, H on sp3 carbon, -CH3 C33, sp3 carbon with 3 Hydrogens HCH3, H on sp3 carbon, -CH3 SMARTS match = [H][CH3] [CX4H3] [H][CH3]
+
+# [404, 402, 404] = [[6, 7, 10], [3], [6, 7, 10]]
+angle 404 402 404 36.406852 108.1
+
+# updated valence parameter database match, comments=HN, H on Nitrogen N3, sp3 Nitrogen HN, H on Nitrogen SMARTS match = [H][N] [NX3] [H][N]
+
+# [406, 403, 406] = [[8, 9], [2], [8, 9]]
+angle 406 403 406 33.455646 105.72
+
+
+# updated valence parameter database match, comments=HCH3, H on sp3 carbon, -CH3 C33, sp3 carbon with 3 Hydrogens C32, sp3 carbon with 2 Hydrogens SMARTS match = [H][CH3] [CX4H3] [CX4H2]
+
+# [404, 402, 401] = [[6, 7, 10], [3], [1]]
+strbnd 404 402 401 5.7126 5.7126
+# updated valence parameter database match, comments=HN, H on Nitrogen N3, sp3 Nitrogen C32, sp3 carbon with 2 Hydrogens SMARTS match = [H][N] [NX3] [CX4H2]
+
+# [406, 403, 401] = [[8, 9], [2], [1]]
+strbnd 406 403 401 22.6877 22.6877
+# updated valence parameter database match, comments=C33, sp3 carbon with 3 Hydrogens C32, sp3 carbon with 2 Hydrogens N3, sp3 Nitrogen SMARTS match = [CX4H3] [CX4H2] [NX3]
+
+# [402, 401, 403] = [[3], [1], [2]]
+strbnd 402 401 403 5.7126 5.7126
+# updated valence parameter database match, comments=HCH3, H on sp3 carbon, -CH3 C32, sp3 carbon with 2 Hydrogens N3, sp3 Nitrogen SMARTS match = [H][CH2] [CX4H2] [NX3]
+
+# [405, 401, 403] = [[4, 5], [1], [2]]
+strbnd 405 401 403 5.7126 5.7126
+# updated valence parameter database match, comments=HCH3, H on sp3 carbon, -CH3 C32, sp3 carbon with 2 Hydrogens C33, sp3 carbon with 3 Hydrogens SMARTS match = [H][CH2] [CX4H2] [CX4H3]
+
+# [405, 401, 402] = [[4, 5], [1], [3]]
+strbnd 405 401 402 5.7126 5.7126
+# updated valence parameter database match, comments=HCH3, H on sp3 carbon, -CH3 C32, sp3 carbon with 2 Hydrogens HCH3, H on sp3 carbon, -CH3 SMARTS match = [H][CH2] [CX4H2] [H][CH2]
+
+# [405, 401, 405] = [[4, 5], [1], [4, 5]]
+strbnd 405 401 405 5.7126 5.7126
+# updated valence parameter database match, comments=HCH3, H on sp3 carbon, -CH3 C33, sp3 carbon with 3 Hydrogens HCH3, H on sp3 carbon, -CH3 SMARTS match = [H][CH3] [CX4H3] [H][CH3]
+
+# [404, 402, 404] = [[6, 7, 10], [3], [6, 7, 10]]
+strbnd 404 402 404 5.7126 5.7126
+# updated valence parameter database match, comments=HN, H on Nitrogen N3, sp3 Nitrogen HN, H on Nitrogen SMARTS match = [H][N] [NX3] [H][N]
+
+# [406, 403, 406] = [[8, 9], [2], [8, 9]]
+strbnd 406 403 406 22.6877 22.6877
+
+
+# matching SMARTS from molecule  [['[#6](-[#6](-[#1])(-[#1])-[#1])(-[#1])(-[#1])-[#7](-[#1])-[#1]', [5, 2, 1, 8]]] to SMARTS from parameter file [['[#7](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H]', [6, 3, 2, 1]]] with tinker type descriptions [[('H', '"Ethyl Amine H3C"'), ('C', '"Ethyl Amine CH3"'), ('C', '"Ethyl Amine CH2"'), ('N', '"Ethyl Amine N"')]]
+
+# [403, 401, 402, 404] = [[2], [1], [3], [6, 7, 10]]
+torsion 403 401 402 404 0.000 0.0 1 0.000 180.0 2 0.374 0.0 3
+# matching SMARTS from molecule  [['[#6](-[#6](-[#1])(-[#1])-[#1])(-[#1])(-[#1])-[#7](-[#1])-[#1]', [5, 2, 1, 7]]] to SMARTS from parameter file [['[#7](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H]', [6, 3, 2, 8]]] with tinker type descriptions [[('H', '"Ethyl Amine H3C"'), ('C', '"Ethyl Amine CH3"'), ('C', '"Ethyl Amine CH2"'), ('H', '"Ethyl Amine H2C"')]]
+
+# [405, 401, 402, 404] = [[4, 5], [1], [3], [6, 7, 10]]
+torsion 405 401 402 404 0.000 0.0 1 0.000 180.0 2 0.299 0.0 3
+# matching SMARTS from molecule  [['[#6](-[#6](-[#1])(-[#1])-[#1])(-[#1])(-[#1])-[#7](-[#1])-[#1]', [10, 8, 1, 2]]] to SMARTS from parameter file [['[#7](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H]', [10, 1, 2, 3]]] with tinker type descriptions [[('H', '"Ethyl Amine H2N"'), ('N', '"Ethyl Amine N"'), ('C', '"Ethyl Amine CH2"'), ('C', '"Ethyl Amine CH3"')]]
+
+# [406, 403, 401, 402] = [[8, 9], [2], [1], [3]]
+torsion 406 403 401 402 -0.107 0.0 1 0.512 180.0 2 0.365 0.0 3
+# matching SMARTS from molecule  [['[#6](-[#6](-[#1])(-[#1])-[#1])(-[#1])(-[#1])-[#7](-[#1])-[#1]', [10, 8, 1, 7]]] to SMARTS from parameter file [['[#7](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H]', [10, 1, 2, 8]]] with tinker type descriptions [[('H', '"Ethyl Amine H2N"'), ('N', '"Ethyl Amine N"'), ('C', '"Ethyl Amine CH2"'), ('H', '"Ethyl Amine H2C"')]]
+
+# [405, 401, 403, 406] = [[4, 5], [1], [2], [8, 9]]
+torsion 405 401 403 406 0.000 0.0 1 0.661 180.0 2 0.288 0.0 3
+
+#SOLUTE-SMARTS 405 [#1]([CH2]([CH3]))
+SOLUTE 405 3.0205 3.885 4.0505
+#SOLUTE-SMARTS 406 [#1]([N;D3]([C]([#1])))
+SOLUTE 406 3.6491 3.404 2.9894
+#SOLUTE-SMARTS 404 [#1][CH3]
+SOLUTE 404 3.143 3.374 4.144
+#SOLUTE-SMARTS 402 [CH3]
+SOLUTE 402 3.5062 3.309 4.536
+#SOLUTE-SMARTS 401 [#6]
+SOLUTE 401 3.3025 2.854 4.9016
+#SOLUTE-SMARTS 403 [N]([C]([#1]))
+SOLUTE 403 2.8836 2.99 3.218
+
+
+
+
+# [401] = [[1]]
+polarize           401          1.6196     0.3900 403 405
+# updated valence parameter database match, comments=N connected to aromatic carbon via double bond SMARTS match = [N][C]
+
+# [403] = [[2]]
+polarize           403          1.1847     0.3900 401 406
+# updated valence parameter database match, comments=C connected to aromatic carbon SMARTS match = [$([C][C])]
+
+# [402] = [[3]]
+polarize           402          1.4150     0.3900 404
+# updated valence parameter database match, comments=H on non-aromatic carbon SMARTS match = [H][C]
+
+# [405] = [[4, 5]]
+polarize           405          0.4803     0.3900 401
+# updated valence parameter database match, comments=H on non-aromatic carbon SMARTS match = [H][C]
+
+# [404] = [[6, 7, 10]]
+polarize           404          0.4803     0.3900 402
+# updated valence parameter database match, comments=H on HI SMARTS match = [H][N]
+
+# [406] = [[8, 9]]
+polarize           406          0.4573     0.3900 403
+
+#
+# Multipoles from Electrostatic Potential Fitting
+#
+
+# [401] = [[1]]
+multipole   401  402  403               0.06962
+                                        0.33075    0.00000   -0.00300
+                                        0.34551
+                                        0.00000   -0.39662
+                                       -0.35167    0.00000    0.05111
+# [403] = [[2]]
+multipole   403  401 -406 -406         -0.30402
+                                        0.20307    0.00000    0.27121
+                                       -0.98548
+                                        0.00000    0.27108
+                                       -0.67646    0.00000    0.71440
+# [402] = [[3]]
+multipole   402  401  403              -0.14602
+                                       -0.00664    0.00000    0.22558
+                                       -0.25672
+                                        0.00000   -0.17248
+                                        0.02377    0.00000    0.42920
+# [405] = [[4, 5]]
+multipole   405  401  405               0.02278
+                                       -0.01379    0.00000   -0.07739
+                                        0.02802
+                                        0.00000    0.05237
+                                        0.01463    0.00000   -0.08039
+# [404] = [[6, 7, 10]]
+multipole   404  402  401               0.05688
+                                        0.00260    0.00000   -0.02115
+                                       -0.04443
+                                        0.00000   -0.02997
+                                        0.00243    0.00000    0.07440
+# [406] = [[8, 9]]
+multipole   406  403  406               0.08211
+                                       -0.01444    0.00000   -0.18392
+                                        0.04035
+                                        0.00000    0.01181
+                                        0.00213    0.00000   -0.05216

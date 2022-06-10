@@ -1,0 +1,119 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.10.2   February 2022                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2022               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      401   401     C     1_7_Index_0_GrowFrag         6     12.011     3
+      402   402     N     1_7_Index_0_GrowFrag         7     14.007     3
+      403   403     C     1_7_Index_0_GrowFrag         6     12.011     3
+      404   404     C     1_7_Index_0_GrowFrag         6     12.011     3
+      418   418     H     1_7_Index_0_GrowFrag         1      1.008     1
+      405   405     C     1_7_Index_0_GrowFrag         6     12.011     3
+      406   406     C     1_7_Index_0_GrowFrag         6     12.011     3
+      407   407     N     1_7_Index_0_GrowFrag         7     14.007     3
+      408   408     C     1_7_Index_0_GrowFrag         6     12.011     3
+      409   409     C     1_7_Index_0_GrowFrag         6     12.011     3
+      410   410     C     1_7_Index_0_GrowFrag         6     12.011     3
+      411   411     C     1_7_Index_0_GrowFrag         6     12.011     3
+      412   412     C     1_7_Index_0_GrowFrag         6     12.011     3
+      413   413     C     1_7_Index_0_GrowFrag         6     12.011     3
+      414   414     C     1_7_Index_0_GrowFrag         6     12.011     3
+      415   415     C     1_7_Index_0_GrowFrag         6     12.011     3
+      419   419     H     1_7_Index_0_GrowFrag         1      1.008     1
+      416   416     O     1_7_Index_0_GrowFrag         8     15.999     1
+      420   420     H     1_7_Index_0_GrowFrag         1      1.008     1
+      421   421     H     1_7_Index_0_GrowFrag         1      1.008     1
+      422   422     H     1_7_Index_0_GrowFrag         1      1.008     1
+      423   423     H     1_7_Index_0_GrowFrag         1      1.008     1
+      424   424     H     1_7_Index_0_GrowFrag         1      1.008     1
+      417   417     N     1_7_Index_0_GrowFrag         7     14.007     3
+      425   425     H     1_7_Index_0_GrowFrag         1      1.008     1
+      426   426     H     1_7_Index_0_GrowFrag         1      1.008     1
+      427   427     H     1_7_Index_0_GrowFrag         1      1.008     1
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      401   401     C     1_7_Index_0_GrowFrag         6     12.011     3
+      402   402     N     1_7_Index_0_GrowFrag         7     14.007     3
+      403   403     C     1_7_Index_0_GrowFrag         6     12.011     3
+      404   404     C     1_7_Index_0_GrowFrag         6     12.011     3
+      418   418     H     1_7_Index_0_GrowFrag         1      1.008     1
+      405   405     C     1_7_Index_0_GrowFrag         6     12.011     3
+      406   406     C     1_7_Index_0_GrowFrag         6     12.011     3
+      407   407     N     1_7_Index_0_GrowFrag         7     14.007     3
+      408   408     C     1_7_Index_0_GrowFrag         6     12.011     3
+      409   409     C     1_7_Index_0_GrowFrag         6     12.011     3
+      410   410     C     1_7_Index_0_GrowFrag         6     12.011     3
+      411   411     C     1_7_Index_0_GrowFrag         6     12.011     3
+      412   412     C     1_7_Index_0_GrowFrag         6     12.011     3
+      413   413     C     1_7_Index_0_GrowFrag         6     12.011     3
+      414   414     C     1_7_Index_0_GrowFrag         6     12.011     3
+      415   415     C     1_7_Index_0_GrowFrag         6     12.011     3
+      419   419     H     1_7_Index_0_GrowFrag         1      1.008     1
+      416   416     O     1_7_Index_0_GrowFrag         8     15.999     1
+      420   420     H     1_7_Index_0_GrowFrag         1      1.008     1
+      421   421     H     1_7_Index_0_GrowFrag         1      1.008     1
+      422   422     H     1_7_Index_0_GrowFrag         1      1.008     1
+      423   423     H     1_7_Index_0_GrowFrag         1      1.008     1
+      424   424     H     1_7_Index_0_GrowFrag         1      1.008     1
+      417   417     N     1_7_Index_0_GrowFrag         7     14.007     3
+      425   425     H     1_7_Index_0_GrowFrag         1      1.008     1
+      426   426     H     1_7_Index_0_GrowFrag         1      1.008     1
+      427   427     H     1_7_Index_0_GrowFrag         1      1.008     1
+
+ Structure File 1 :  1_7_Index_0_GrowFragment_0.xyz_2
+
+ Structure File 2 :  final.xyz_2
+
+ File 1 Frame :     1             File 2 Frame :     1
+
+ Summary of Results from Structural Superposition :
+
+ IMPOSE  --  Input Coordinates                0.265730
+ IMPOSE  --  After Translation                0.262996
+ IMPOSE  --  After Rotation                   0.256518
+
+ Root Mean Square Distance :                  0.256518        1      1
+
+   Atom in the         Atom in the            Distance          Weight
+ First Structure     Second Structure        Separated          in Fit
+
+         1-C                 1-C              0.099820         12.0110
+         2-N                 2-N              0.231975         14.0070
+         3-C                 3-C              0.224513         12.0110
+         4-C                 4-C              0.101179         12.0110
+         6-C                 6-C              0.148682         12.0110
+         7-C                 7-C              0.132187         12.0110
+         8-N                 8-N              0.136373         14.0070
+         9-C                 9-C              0.093747         12.0110
+        10-C                10-C              0.076511         12.0110
+        11-C                11-C              0.179601         12.0110
+        12-C                12-C              0.342850         12.0110
+        13-C                13-C              0.187212         12.0110
+        14-C                14-C              0.483624         12.0110
+        15-C                15-C              0.387737         12.0110
+        16-C                16-C              0.250390         12.0110
+        17-C                17-C              0.286549         12.0110
+        18-C                18-C              0.382450         12.0110
+        19-C                19-C              0.198467         12.0110
+        20-C                20-C              0.244541         12.0110
+        22-O                22-O              0.167890         15.9990
+        32-N                32-N              0.444406         14.0070
+
+ Root Mean Square Distance :                  0.256518

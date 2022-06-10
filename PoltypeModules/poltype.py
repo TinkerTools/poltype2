@@ -34,6 +34,7 @@ import dimorphite_dl
 import forcebalancepoltypeinterface as fb
 import torsiongenerator as torgen
 import symmetry as symm
+import docking
 import torsionfit as torfit
 import optimization as opt
 import electrostaticpotential as esp
@@ -80,11 +81,23 @@ from rdkit.Chem.MolStandardize import rdMolStandardize
 
 @dataclass
 class PolarizableTyper():
+        gridspacing:float=.4
+        nposes:int=10
+        vinaexhaustiveness:int=32
+        dockgridsize:list=field(default_factory=lambda : [20, 20, 20])
+        dockgridcenter:None=None
+        usead4:bool=False
+        usegold:bool=False
+        usevina:bool=False
+        usevinardo:bool=False
+        goldbin:str='gold_auto'
+        dockingenvpath:None=None
+        prepdockscript:str=os.path.join(os.path.split(__file__)[0],'preparedockingfiles.py')
         indextompoleframefile:None=None
         qmrelativeweight:float=.5
         liqrelativeweight:float=2.5
         enthalpyrelativeweight:float=1
-        densityrelativeweight:float=.001
+        densityrelativeweight:float=.01
         indextotypefile:None=None
         pdbcode:None=None
         usesymtypes: bool = True
@@ -495,6 +508,42 @@ class PolarizableTyper():
                             self.prmfilepath=a
                         elif 'gpucardnumber' in newline:
                             self.gpucardnumber=int(a)
+                        elif 'dockgridsize' in newline:
+                            self.dockgridsize=a.split(',')
+                            self.dockgridsize=[i.strip() for i in self.dockgridsize]
+                        elif 'dockgridcenter' in newline:
+                            self.dockgridcenter=a.split(',')
+                            self.dockgridcenter=[i.strip() for i in self.dockgridcenter]
+                        elif 'gridspacing' in newline:
+                            self.gridspacing=int(a)
+                        elif 'nposes' in newline:
+                            self.nposes=int(a)
+                        elif 'vinaexhaustiveness' in newline:
+                            self.vinaexhaustiveness=int(a)
+                        elif 'dockingenvpath' in newline:
+                            self.dockingenvpath=a
+                        elif "usevinardo" in newline:
+                            if '=' not in line:
+                                self.usevinardo = True
+                            else:
+                                self.usevinardo=self.GrabBoolValue(a)
+                        elif "usevina" in newline:
+                            if '=' not in line:
+                                self.usevina = True
+                            else:
+                                self.usevina=self.GrabBoolValue(a)
+
+                        elif "usegold" in newline:
+                            if '=' not in line:
+                                self.usegold = True
+                            else:
+                                self.usegold=self.GrabBoolValue(a)
+                        elif "usead4" in newline:
+                            if '=' not in line:
+                                self.usead4 = True
+                            else:
+                                self.usead4=self.GrabBoolValue(a)
+
 
                         elif "addphysioions" in newline:
                             if '=' not in line:
@@ -1413,7 +1462,9 @@ class PolarizableTyper():
             if self.ligandxyzfilename!=None and (self.binding==True or self.solvation==True or self.neatliquidsim==True) or self.pdbcode!=None or self.usepdb2pqr!=False:
                 self.MolecularDynamics()
                 sys.exit()
-
+            if (self.usead4==True or self.usegold==True or self.usevina==True or self.usevinardo==True) and self.complexedproteinpdbname!=None:
+                docking.DockingWrapper(self.complexedproteinpdbname,self.dockgridcenter,self.dockgridsize,self.vinaexhaustiveness,self.nposes,self.goldbin,self.usevina,self.usead4,self.usevinardo,self.usegold,self.dockingenvpath,self.prepdockscript,self.gridspacing)
+                sys.exit()
             
             if self.isfragjob==False:
                 self.parentname=self.molecprefix

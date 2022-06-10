@@ -1,0 +1,2266 @@
+Wed Jun  8 10:04:53 2022 Running on host: node74.bme.utexas.edu
+Wed Jun  8 10:04:53 2022 Atom Type Classification
+Wed Jun  8 10:04:53 2022 QM Geometry Optimization
+Wed Jun  8 10:04:53 2022 Calling: psi4 25_27_Index_0-opt_1.psi4 25_27_Index_0-opt_1.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0
+Optimizer: Optimization complete!
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+Wed Jun  8 10:22:00 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/25_27_Index_0-opt_1.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0
+Wed Jun  8 10:22:00 2022 Searching Database
+Wed Jun  8 10:24:42 2022 # amoeba09 matching SMARTS from molecule  [['[#6](-[#1])(-[#1])-[#6]-[#7]-[#6]-[#1]', [5]]] to SMARTS from parameter file [['[#8]=[#6](-[#7](-[#6](-[#6](-[H])(-[H])-[H])(-[H])-[H])-[H])-[H]', [3]]] with tinker type descriptions [[('N', '"NMeFormamide N"')]]
+# Missing vdw parameters
+
+Wed Jun  8 10:24:42 2022 # amoeba09 matching SMARTS from molecule  [['[#6]1:[#6](:[#6](:[#6](:[#6](:[#6]:1-[#1])-[#1])-[#1])-[#1])-[#1]', [1]]] to SMARTS from parameter file [['[#6](-[#6]1:[#6](:[#6](:[#6](:[#6](:[#6]:1-[H])-[H])-[H])-[H])-[H])(-[#6](-[H])(-[H])-[H])(-[H])-[H]', [2]]] with tinker type descriptions [[('C', '"Ethylbenzene C1-CH2"')]]
+# Missing vdw parameters
+
+Wed Jun  8 10:24:42 2022 # Missing bond parameters, assigning default parameters via element and valence
+
+Wed Jun  8 10:24:42 2022 # amoeba09 matching SMARTS from molecule  [['[#1]-[#6](-,:[#6]-[#1])-,:[#6](:,-[#7]:,-[#6]-[#1]):[#6]-[#1]', [5, 6]]] to SMARTS from parameter file [['[#7]1(-[#6](-[#6](-[#6](-[#6]-1(-[H])-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H])-[#6](-[H])(-[H])-[H]', [17, 14]]] with tinker type descriptions [[('C', '"4-Ethylimidazole CG"'), ('N', '"4-Ethylimidazole ND"')]]
+# WARNING DEFAULT MM3 OPBEND VALUES USED 
+
+Wed Jun  8 10:24:42 2022 # amoeba09 matching SMARTS from molecule  [['[#1]-[#6](-,:[#6]-[#1])-,:[#6](:,-[#7]:,-[#6]-[#1]):[#6]-[#1]', [5, 6]]] to SMARTS from parameter file [['[#7]1(-[#6](-[#6](-[#6](-[#6]-1(-[H])-[H])(-[H])-[H])(-[H])-[H])(-[H])-[H])-[#6](-[H])(-[H])-[H]', [17, 14]]] with tinker type descriptions [[('C', '"4-Ethylimidazole CG"'), ('N', '"4-Ethylimidazole ND"')]]
+# WARNING DEFAULT MM3 OPBEND VALUES USED 
+
+Wed Jun  8 10:24:42 2022 # Missing angle parameters, assigning default parameters via element and valence
+
+Wed Jun  8 10:24:42 2022 # Missing angle parameters, assigning default parameters via element and valence
+
+Wed Jun  8 10:24:42 2022 # Missing angle parameters, assigning default parameters via element and valence
+
+Wed Jun  8 10:24:42 2022 # Missing angle parameters, assigning default parameters via element and valence
+
+Wed Jun  8 10:24:42 2022 # Missing angle parameters, assigning default parameters via element and valence
+
+Wed Jun  8 10:24:42 2022 # Missing strbnd parameters, zeroing out parameters
+
+Wed Jun  8 10:24:42 2022 # Missing strbnd parameters, zeroing out parameters
+
+Wed Jun  8 10:24:42 2022 # Missing strbnd parameters, zeroing out parameters
+
+Wed Jun  8 10:24:42 2022 # Missing strbnd parameters, zeroing out parameters
+
+Wed Jun  8 10:24:42 2022 # Missing strbnd parameters, zeroing out parameters
+
+Wed Jun  8 10:24:42 2022 Gas Phase Single Point for GDMA
+Wed Jun  8 10:24:42 2022 Calling: psi4 25_27_Index_0-dma.psi4 25_27_Index_0-dma.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0
+Wed Jun  8 10:29:43 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/25_27_Index_0-dma.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0
+Wed Jun  8 10:29:43 2022 Gaussian Distributed Multipole Analysis (GDMA)
+Wed Jun  8 10:29:43 2022 Calling: /opt/gdma/gdma-2.3.3/bin/gdma < 25_27_Index_0.gdmain > 25_27_Index_0.gdmaout path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0
+Wed Jun  8 10:29:44 2022 Local Frame Symmetry Detection
+Wed Jun  8 10:29:44 2022 Define Polarization Groups and Polarization Parameters
+Wed Jun  8 10:29:44 2022 Calling: poledit 1 25_27_Index_0.gdmaout /home/bdw2292/poltype2/ParameterFiles/amoebabio18_header.prm < 25_27_Index_0-peditin.txt path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.10.2   February 2022                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2022               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Global Frame Cartesian Multipole Moments :
+
+ Site:       1         Name:   N         Atomic Number:       7
+
+ Coordinates:           -0.272552       0.283398      -0.738620
+
+ Charge:                 -0.24973
+ Dipole:                 -0.20986        0.22943       -0.10353
+ Quadrupole:             -0.24392
+                          0.07334        0.03312
+                         -0.23733       -0.62646        0.21080
+
+ Site:       2         Name:   C         Atomic Number:       6
+
+ Coordinates:            0.850913      -0.268579      -0.144615
+
+ Charge:                  0.81589
+ Dipole:                  0.00203       -0.15312        0.21438
+ Quadrupole:              0.16901
+                         -0.16223       -0.20290
+                          0.04762       -0.17305        0.03389
+
+ Site:       3         Name:   C         Atomic Number:       6
+
+ Coordinates:            2.159973      -0.041954      -0.899560
+
+ Charge:                 -0.11672
+ Dipole:                  0.24857       -0.21525        0.29771
+ Quadrupole:              0.17503
+                         -0.20919       -0.11984
+                          0.27538       -0.32131       -0.05518
+
+ Site:       4         Name:   N         Atomic Number:       7
+
+ Coordinates:            3.298862      -0.624464      -0.223365
+
+ Charge:                 -0.13969
+ Dipole:                  0.13847        0.73921       -0.19694
+ Quadrupole:              0.22281
+                         -0.34373       -0.45924
+                          0.14606        0.15607        0.23643
+
+ Site:       5         Name:   O         Atomic Number:       8
+
+ Coordinates:            0.794414      -0.907283       0.903383
+
+ Charge:                 -0.73281
+ Dipole:                 -0.04317       -0.12364        0.15845
+ Quadrupole:             -0.54181
+                          0.09106        0.27154
+                          0.09234        0.06536        0.27027
+
+ Site:       6         Name:   H         Atomic Number:       1
+
+ Coordinates:            2.070322      -0.516795      -1.885003
+
+ Charge:                  0.07732
+ Dipole:                 -0.00110       -0.04419       -0.08731
+ Quadrupole:              0.00679
+                         -0.00894       -0.01118
+                          0.02225        0.01323        0.00440
+
+ Site:       7         Name:   H         Atomic Number:       1
+
+ Coordinates:            2.297289       1.042983      -1.088539
+
+ Charge:                 -0.00236
+ Dipole:                 -0.05805        0.10963       -0.03976
+ Quadrupole:             -0.02434
+                          0.04437        0.02915
+                         -0.02498       -0.00613       -0.00481
+
+ Site:       8         Name:   C         Atomic Number:       6
+
+ Coordinates:           -1.520789       0.218381      -0.053552
+
+ Charge:                  0.02151
+ Dipole:                  0.18310        0.02226       -0.07124
+ Quadrupole:              0.20314
+                         -0.00014       -0.34986
+                         -0.12501       -0.06841        0.14671
+
+ Site:       9         Name:   C         Atomic Number:       6
+
+ Coordinates:           -4.007745       0.101823       1.217639
+
+ Charge:                 -0.04737
+ Dipole:                 -0.03778       -0.01848        0.02354
+ Quadrupole:             -0.08212
+                         -0.03185        0.19227
+                         -0.01629       -0.05880       -0.11015
+
+ Site:      10         Name:   C         Atomic Number:       6
+
+ Coordinates:           -3.251715      -1.057798       1.039437
+
+ Charge:                  0.16954
+ Dipole:                  0.14065        0.47606       -0.17480
+ Quadrupole:             -0.54282
+                          0.55696        0.97247
+                         -0.19267       -0.59211       -0.42965
+
+ Site:      11         Name:   C         Atomic Number:       6
+
+ Coordinates:           -3.513330       1.321886       0.759485
+
+ Charge:                 -0.03700
+ Dipole:                 -0.02626        0.02182        0.02965
+ Quadrupole:              0.05125
+                          0.07566       -0.01454
+                         -0.08207       -0.06469       -0.03672
+
+ Site:      12         Name:   C         Atomic Number:       6
+
+ Coordinates:           -2.016281      -1.008792       0.398979
+
+ Charge:                 -0.04951
+ Dipole:                  0.08778       -0.12543        0.03990
+ Quadrupole:              0.11065
+                          0.13166       -0.19548
+                         -0.03002       -0.04828        0.08483
+
+ Site:      13         Name:   C         Atomic Number:       6
+
+ Coordinates:           -2.270165       1.384447       0.131581
+
+ Charge:                 -0.04320
+ Dipole:                 -0.01950        0.01521        0.02136
+ Quadrupole:              0.05435
+                          0.08318        0.11137
+                         -0.12862       -0.07278       -0.16572
+
+ Site:      14         Name:   C         Atomic Number:       6
+
+ Coordinates:           -0.197358       1.136852      -1.920471
+
+ Charge:                 -0.05918
+ Dipole:                 -0.02009       -0.21880        0.26028
+ Quadrupole:             -0.49682
+                          0.07733        0.09326
+                         -0.02018       -0.53110        0.40355
+
+ Site:      15         Name:   C         Atomic Number:       6
+
+ Coordinates:            4.445298      -0.641187      -1.119727
+
+ Charge:                  0.00615
+ Dipole:                 -0.29205        0.00475        0.24277
+ Quadrupole:              0.26381
+                          0.02962       -0.25912
+                         -0.59301       -0.00486       -0.00469
+
+ Site:      16         Name:   C         Atomic Number:       6
+
+ Coordinates:            3.623311       0.111136       0.992418
+
+ Charge:                 -0.02002
+ Dipole:                 -0.08081       -0.18393       -0.29240
+ Quadrupole:             -0.44301
+                          0.18302        0.05124
+                          0.22240        0.40993        0.39176
+
+ Site:      17         Name:   H         Atomic Number:       1
+
+ Coordinates:           -3.630919      -2.013538       1.391994
+
+ Charge:                  0.00873
+ Dipole:                 -0.05894       -0.16234        0.05764
+ Quadrupole:              0.01851
+                         -0.01773       -0.02618
+                         -0.00151        0.01487        0.00767
+
+ Site:      18         Name:   H         Atomic Number:       1
+
+ Coordinates:           -4.089997       2.232795       0.898786
+
+ Charge:                  0.00682
+ Dipole:                 -0.09461        0.15310        0.02234
+ Quadrupole:              0.00737
+                          0.02622       -0.01958
+                         -0.00352       -0.00830        0.01221
+
+ Site:      19         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.430164      -1.909024       0.255570
+
+ Charge:                  0.03347
+ Dipole:                  0.12598       -0.14316       -0.01976
+ Quadrupole:             -0.00033
+                          0.05574       -0.01170
+                          0.00971       -0.00493        0.01203
+
+ Site:      20         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.876447       2.342365      -0.197982
+
+ Charge:                  0.01266
+ Dipole:                  0.07863        0.15495       -0.06910
+ Quadrupole:              0.02005
+                         -0.04652       -0.03106
+                         -0.02708        0.04119        0.01100
+
+ Site:      21         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.191082       1.179589      -2.367024
+
+ Charge:                  0.07320
+ Dipole:                 -0.11802        0.01222       -0.04866
+ Quadrupole:              0.00279
+                          0.00930       -0.01007
+                         -0.00191       -0.00244        0.00728
+
+ Site:      22         Name:   H         Atomic Number:       1
+
+ Coordinates:            0.129963       2.157649      -1.690033
+
+ Charge:                  0.03070
+ Dipole:                  0.03685        0.13149        0.01583
+ Quadrupole:              0.00946
+                         -0.00254       -0.01922
+                         -0.00152        0.01453        0.00976
+
+ Site:      23         Name:   H         Atomic Number:       1
+
+ Coordinates:            0.483757       0.710498      -2.657599
+
+ Charge:                  0.09549
+ Dipole:                  0.10812       -0.04852       -0.01372
+ Quadrupole:             -0.06462
+                         -0.02697       -0.07814
+                          0.07620       -0.02628        0.14275
+
+ Site:      24         Name:   H         Atomic Number:       1
+
+ Coordinates:            4.213121      -1.238972      -2.005434
+
+ Charge:                  0.04614
+ Dipole:                 -0.01520       -0.06291       -0.09986
+ Quadrupole:             -0.00560
+                          0.01029        0.00493
+                          0.00562        0.01127        0.00067
+
+ Site:      25         Name:   H         Atomic Number:       1
+
+ Coordinates:            4.752990       0.368401      -1.449707
+
+ Charge:                 -0.03933
+ Dipole:                  0.07921        0.09088       -0.07075
+ Quadrupole:             -0.03431
+                          0.02272        0.04865
+                          0.04059       -0.02255       -0.01434
+
+ Site:      26         Name:   H         Atomic Number:       1
+
+ Coordinates:            3.879169       1.167327       0.785483
+
+ Charge:                 -0.04744
+ Dipole:                  0.04204        0.13360        0.04089
+ Quadrupole:              0.00729
+                          0.00209        0.04134
+                         -0.02093       -0.03978       -0.04864
+
+ Site:      27         Name:   H         Atomic Number:       1
+
+ Coordinates:            2.778259       0.068639       1.677052
+
+ Charge:                  0.07629
+ Dipole:                 -0.10711       -0.01088        0.07882
+ Quadrupole:              0.01114
+                          0.01059       -0.00713
+                         -0.00343        0.00327       -0.00401
+
+ Site:      28         Name:   H         Atomic Number:       1
+
+ Coordinates:           -4.973961       0.054578       1.712576
+
+ Charge:                  0.00416
+ Dipole:                 -0.16517       -0.00877        0.08452
+ Quadrupole:             -0.02882
+                         -0.00437        0.02791
+                          0.02032       -0.00077        0.00091
+
+ Site:      29         Name:   H         Atomic Number:       1
+
+ Coordinates:            5.291579      -1.104357      -0.606444
+
+ Charge:                  0.05400
+ Dipole:                  0.09797       -0.04786        0.04890
+ Quadrupole:              0.00054
+                         -0.00866        0.00191
+                          0.00983       -0.01178       -0.00246
+
+ Site:      30         Name:   H         Atomic Number:       1
+
+ Coordinates:            4.483364      -0.361533       1.473163
+
+ Charge:                  0.05227
+ Dipole:                  0.09145       -0.04313        0.05886
+ Quadrupole:              0.00337
+                         -0.01283        0.00530
+                          0.00886       -0.00719       -0.00868
+
+ Local Frame Definition for Multipole Sites :
+
+     Atom     Name      Axis Type     Z Axis  X Axis  Y Axis
+
+       1      N         Z-then-X        14       2       0
+       2      C         Z-then-X         5       1       0
+       3      C         Z-then-X         4       2       0
+       4      N         Bisector        15      16       0
+       5      O         Z-then-X         2       1       0
+       6      H         Z-then-X         3       4       0
+       7      H         Z-then-X         3       4       0
+       8      C         Z-then-X         1      12       0
+       9      C         Bisector        10      11       0
+      10      C         Z-then-X        12       9       0
+      11      C         Z-then-X        13       9       0
+      12      C         Z-then-X         8      10       0
+      13      C         Z-then-X         8      11       0
+      14      C         Z-then-X         1       2       0
+      15      C         Z-then-X         4       3       0
+      16      C         Z-then-X         4       3       0
+      17      H         Z-then-X        10      12       0
+      18      H         Z-then-X        11      13       0
+      19      H         Z-then-X        12       8       0
+      20      H         Z-then-X        13       8       0
+      21      H         Z-then-X        14       1       0
+      22      H         Z-then-X        14       1       0
+      23      H         Z-then-X        14       1       0
+      24      H         Z-then-X        15       4       0
+      25      H         Z-then-X        15       4       0
+      26      H         Z-then-X        16       4       0
+      27      H         Z-then-X        16       4       0
+      28      H         Z-then-X         9      10       0
+      29      H         Z-then-X        15       4       0
+      30      H         Z-then-X        16       4       0
+
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Local Frame Definition for Multipole Sites :
+
+     Atom     Name      Axis Type     Z Axis  X Axis  Y Axis
+
+       1      N         Z-then-X        14       8       0
+       2      C         Z-then-X         5       3       0
+       3      C         Z-then-X         4       2       0
+       4      N         Z-Bisect         3      15      16
+       5      O         Z-then-X         2       3       0
+       6      H         Z-then-X         3       7       0
+       7      H         Z-then-X         3       6       0
+       8      C         Bisector        12      13       0
+       9      C         Bisector        10      11       0
+      10      C         Z-then-X        17      12       0
+      11      C         Z-then-X        18      13       0
+      12      C         Z-then-X        19      10       0
+      13      C         Z-then-X        20      11       0
+      14      C         Z-then-X         1       8       0
+      15      C         Z-then-X         4      16       0
+      16      C         Z-then-X         4      15       0
+      17      H         Z-then-X        10      12       0
+      18      H         Z-then-X        11      13       0
+      19      H         Z-then-X        12      10       0
+      20      H         Z-then-X        13      11       0
+      21      H         Z-then-X        14       1       0
+      22      H         Z-then-X        14       1       0
+      23      H         Z-then-X        14       1       0
+      24      H         Z-then-X        15       4       0
+      25      H         Z-then-X        15       4       0
+      26      H         Z-then-X        16       4       0
+      27      H         Z-then-X        16       4       0
+      28      H         Z-Only           9       0       0
+      29      H         Z-then-X        15       4       0
+      30      H         Z-then-X        16       4       0
+
+ Choose Either the AMOEBA or HIPPO Polarization Model [A] :  
+ Polarizability Parameters for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      N            1.0730         0.3900
+       2      C            1.3340         0.3900
+       3      C            1.3340         0.3900
+       4      N            1.0730         0.3900
+       5      O            0.8370         0.3900
+       6      H            0.4960         0.3900
+       7      H            0.4960         0.3900
+       8      C            1.7500         0.3900
+       9      C            1.7500         0.3900
+      10      C            1.7500         0.3900
+      11      C            1.7500         0.3900
+      12      C            1.7500         0.3900
+      13      C            1.7500         0.3900
+      14      C            1.3340         0.3900
+      15      C            1.3340         0.3900
+      16      C            1.3340         0.3900
+      17      H            0.6960         0.3900
+      18      H            0.6960         0.3900
+      19      H            0.6960         0.3900
+      20      H            0.6960         0.3900
+      21      H            0.4960         0.3900
+      22      H            0.4960         0.3900
+      23      H            0.4960         0.3900
+      24      H            0.4960         0.3900
+      25      H            0.4960         0.3900
+      26      H            0.4960         0.3900
+      27      H            0.4960         0.3900
+      28      H            0.6960         0.3900
+      29      H            0.4960         0.3900
+      30      H            0.4960         0.3900
+
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Atomic Polarizabilities for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      N            1.2433         0.3900
+       2      C            2.0645         0.3900
+       3      C            1.6196         0.3900
+       4      N            1.1847         0.3900
+       5      O            0.9138         0.3900
+       6      H            0.4803         0.3900
+       7      H            0.4803         0.3900
+       8      C            2.0645         0.3900
+       9      C            2.0645         0.3900
+      10      C            2.0645         0.3900
+      11      C            2.0645         0.3900
+      12      C            2.0645         0.3900
+      13      C            2.0645         0.3900
+      14      C            1.6196         0.3900
+      15      C            1.6196         0.3900
+      16      C            1.6196         0.3900
+      17      H            0.4318         0.3900
+      18      H            0.4318         0.3900
+      19      H            0.4318         0.3900
+      20      H            0.4318         0.3900
+      21      H            0.4803         0.3900
+      22      H            0.4803         0.3900
+      23      H            0.4803         0.3900
+      24      H            0.4803         0.3900
+      25      H            0.4803         0.3900
+      26      H            0.4803         0.3900
+      27      H            0.4803         0.3900
+      28      H            0.4318         0.3900
+      29      H            0.4803         0.3900
+      30      H            0.4803         0.3900
+
+ Choose Method for Division into Polarization Groups :
+
+    (1) Put All Atoms in One Polarization Group
+    (2) Separate into Groups at Rotatable Bonds
+    (3) Manual Entry of Bonds Separating Groups
+
+ Enter the Number of the Desired Choice [1] :  
+ Polarization Groups for Multipole Sites :
+
+     Atom     Name       Polarization Group Definition
+
+       1      N               2
+       2      C               1     5
+       3      C               4     6     7
+       4      N               3    15    16
+       5      O               2
+       6      H               3
+       7      H               3
+       8      C              12    13
+       9      C              10    11    28
+      10      C               9    12    17
+      11      C               9    13    18
+      12      C               8    10    19
+      13      C               8    11    20
+      14      C              21    22    23
+      15      C               4    24    25    29
+      16      C               4    26    27    30
+      17      H              10
+      18      H              11
+      19      H              12
+      20      H              13
+      21      H              14
+      22      H              14
+      23      H              14
+      24      H              15
+      25      H              15
+      26      H              16
+      27      H              16
+      28      H               9
+      29      H              15
+      30      H              16
+
+ Electrostatic and Polarization Scale Factors :
+
+                    1-2         1-3         1-4         1-5
+
+ M-Scale:         0.0000      0.0000      0.4000      0.8000
+ P-Inter:         0.0000      0.0000      1.0000      1.0000
+ P-Intra:         0.0000      0.0000      0.5000      1.0000
+ W-Scale:         1.0000      1.0000      1.0000      1.0000
+
+                    1-1         1-2         1-3         1-4
+
+ D-Scale:         0.0000      1.0000      1.0000      1.0000
+ U-Scale:         1.0000      1.0000      1.0000      1.0000
+
+ Use Thole Damping:           True
+ Charge Penetration:          False
+ Set D Equal to P:            False
+
+ Determination of Intergroup Induced Dipoles :
+
+    Iter        RMS Change (Debye)
+
+       1           0.0210351865
+       2           0.0066313269
+       3           0.0026426273
+       4           0.0006029643
+       5           0.0002676773
+       6           0.0000731526
+       7           0.0000282551
+       8           0.0000113568
+       9           0.0000029005
+      10           0.0000008577
+
+ Local Frame Intergroup Induced Dipole Moments (Debye) :
+
+    Atom              X           Y           Z         Total
+
+       1           0.0394      0.0842      0.0910      0.1301
+       2           0.3568     -0.0528      0.0513      0.3643
+       3          -0.0875     -0.0477      0.3676      0.3808
+       4          -0.0319     -0.0783     -0.2109      0.2272
+       5           0.0187      0.0286     -0.0104      0.0357
+       6           0.0050     -0.0688     -0.0626      0.0932
+       7           0.0127      0.0393     -0.0683      0.0798
+       8          -0.2534     -0.1806      0.0207      0.3118
+       9          -0.0437      0.0028      0.0430      0.0614
+      10           0.0555      0.0035      0.0087      0.0563
+      11          -0.0012     -0.0031     -0.0646      0.0647
+      12          -0.0989     -0.1564      0.1793      0.2577
+      13           0.0098      0.0375     -0.0558      0.0680
+      14          -0.0108      0.1117      0.2809      0.3025
+      15           0.0501     -0.0386     -0.0575      0.0855
+      16          -0.1135      0.0807     -0.1519      0.2061
+      17           0.0078     -0.0023      0.0118      0.0143
+      18          -0.0037      0.0017      0.0088      0.0097
+      19          -0.0196      0.0513     -0.0338      0.0645
+      20          -0.0087     -0.0015      0.0278      0.0291
+      21          -0.0134      0.0048     -0.0653      0.0669
+      22          -0.0470     -0.0073     -0.0385      0.0612
+      23          -0.0201     -0.0041     -0.0234      0.0311
+      24          -0.0097      0.0127     -0.0014      0.0161
+      25          -0.0023     -0.0102     -0.0021      0.0107
+      26          -0.0165      0.0042      0.0111      0.0203
+      27           0.0757     -0.0302     -0.1027      0.1311
+      28          -0.0005      0.0019      0.0099      0.0101
+      29           0.0020      0.0005     -0.0168      0.0169
+      30          -0.0121      0.0091     -0.0029      0.0154
+
+ Condense Symmetric Atoms to Equivalent Types [Y] :  
+ Remove Multipole Components Zeroed by Symmetry [Y] :  
+ Final Atomic Multipole Moments after Regularization :
+
+ Atom:       1         Name:   N         Atomic Number:       7
+
+ Local Frame:            Z-then-X            14       8       0
+
+ Charge:                 -0.24973
+ Dipole:                  0.23132        0.00000        0.17137
+ Quadrupole:             -0.23824
+                          0.00000       -0.52792
+                         -0.14629        0.00000        0.76616
+
+ Atom:       2         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X             5       3       0
+
+ Charge:                  0.81593
+ Dipole:                 -0.12345        0.00000        0.24218
+ Quadrupole:              0.20346
+                          0.00000       -0.31563
+                          0.11618        0.00000        0.11217
+
+ Atom:       3         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X             4       2       0
+
+ Charge:                 -0.11672
+ Dipole:                  0.17279        0.00000        0.27682
+ Quadrupole:             -0.14906
+                          0.00000       -0.38396
+                          0.11035        0.00000        0.53302
+
+ Atom:       4         Name:   N         Atomic Number:       7
+
+ Local Frame:            Z-Bisect             3      15      16
+
+ Charge:                 -0.13969
+ Dipole:                  0.73716        0.00000        0.36361
+ Quadrupole:             -0.62091
+                          0.00000        0.23910
+                         -0.16354        0.00000        0.38181
+
+ Atom:       5         Name:   O         Atomic Number:       8
+
+ Local Frame:            Z-then-X             2       3       0
+
+ Charge:                 -0.73281
+ Dipole:                 -0.03733        0.00000       -0.19731
+ Quadrupole:             -0.55542
+                          0.00000        0.34738
+                         -0.06154        0.00000        0.20804
+
+ Atom:       6         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             3       7       0
+
+ Charge:                  0.07732
+ Dipole:                 -0.00316        0.00000       -0.07297
+ Quadrupole:             -0.02208
+                          0.00000        0.00767
+                          0.00233        0.00000        0.01441
+
+ Atom:       7         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             3       6       0
+
+ Charge:                 -0.00236
+ Dipole:                  0.01888        0.00000       -0.07990
+ Quadrupole:             -0.00761
+                          0.00000       -0.03356
+                         -0.00016        0.00000        0.04117
+
+ Atom:       8         Name:   C         Atomic Number:       6
+
+ Local Frame:            Bisector            12      13       0
+
+ Charge:                  0.02151
+ Dipole:                  0.00000        0.00000       -0.20437
+ Quadrupole:             -0.32565
+                          0.00000        0.03131
+                          0.00000        0.00000        0.29434
+
+ Atom:       9         Name:   C         Atomic Number:       6
+
+ Local Frame:            Bisector            10      11       0
+
+ Charge:                 -0.04737
+ Dipole:                  0.00000        0.00000       -0.06203
+ Quadrupole:              0.20487
+                          0.00000       -0.13052
+                          0.00000        0.00000       -0.07435
+
+ Atom:      10         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X            17      12       0
+
+ Charge:                  0.16954
+ Dipole:                 -0.06175        0.00000       -0.52778
+ Quadrupole:             -0.70889
+                          0.00000       -0.65467
+                          0.10984        0.00000        1.36356
+
+ Atom:      11         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X            18      13       0
+
+ Charge:                 -0.03700
+ Dipole:                 -0.02024        0.00000        0.06144
+ Quadrupole:              0.15653
+                          0.00000       -0.09015
+                         -0.00646        0.00000       -0.06638
+
+ Atom:      12         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X            19      10       0
+
+ Charge:                 -0.04951
+ Dipole:                  0.06188        0.00000        0.07583
+ Quadrupole:              0.16077
+                          0.00000        0.06487
+                         -0.09033        0.00000       -0.22564
+
+ Atom:      13         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X            20      11       0
+
+ Charge:                 -0.04320
+ Dipole:                  0.02647        0.00000        0.02184
+ Quadrupole:              0.02770
+                          0.00000       -0.22638
+                         -0.06062        0.00000        0.19868
+
+ Atom:      14         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X             1       8       0
+
+ Charge:                 -0.05918
+ Dipole:                 -0.00013        0.00000        0.22918
+ Quadrupole:             -0.51128
+                          0.00000       -0.29297
+                         -0.01142        0.00000        0.80425
+
+ Atom:      15         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X             4      16       0
+
+ Charge:                  0.00614
+ Dipole:                 -0.00989        0.00000        0.40227
+ Quadrupole:             -0.40289
+                          0.00000       -0.33382
+                         -0.00921        0.00000        0.73671
+
+ Atom:      16         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X             4      15       0
+
+ Charge:                 -0.02002
+ Dipole:                  0.04091        0.00000        0.41446
+ Quadrupole:             -0.46067
+                          0.00000       -0.27184
+                         -0.03138        0.00000        0.73251
+
+ Atom:      17         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            10      12       0
+
+ Charge:                  0.00873
+ Dipole:                  0.00220        0.00000       -0.18664
+ Quadrupole:              0.02676
+                          0.00000        0.00944
+                          0.00485        0.00000       -0.03620
+
+ Atom:      18         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            11      13       0
+
+ Charge:                  0.00682
+ Dipole:                  0.00360        0.00000       -0.18482
+ Quadrupole:              0.02701
+                          0.00000        0.00907
+                          0.00220        0.00000       -0.03608
+
+ Atom:      19         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            12      10       0
+
+ Charge:                  0.03347
+ Dipole:                 -0.01418        0.00000       -0.17635
+ Quadrupole:              0.03751
+                          0.00000        0.02300
+                         -0.01579        0.00000       -0.06051
+
+ Atom:      20         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            13      11       0
+
+ Charge:                  0.01266
+ Dipole:                 -0.01429        0.00000       -0.19694
+ Quadrupole:              0.07145
+                          0.00000       -0.00519
+                         -0.00308        0.00000       -0.06626
+
+ Atom:      21         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            14       1       0
+
+ Charge:                  0.07320
+ Dipole:                  0.00412        0.00000       -0.10227
+ Quadrupole:              0.00742
+                          0.00000       -0.00893
+                         -0.00427        0.00000        0.00151
+
+ Atom:      22         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            14       1       0
+
+ Charge:                  0.03070
+ Dipole:                  0.00469        0.00000       -0.12159
+ Quadrupole:              0.00117
+                          0.00000        0.01013
+                         -0.01841        0.00000       -0.01130
+
+ Atom:      23         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            14       1       0
+
+ Charge:                  0.09548
+ Dipole:                  0.05627        0.00000       -0.08656
+ Quadrupole:              0.05373
+                          0.00000       -0.01674
+                          0.06243        0.00000       -0.03699
+
+ Atom:      24         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            15       4       0
+
+ Charge:                  0.04614
+ Dipole:                 -0.00703        0.00000       -0.11795
+ Quadrupole:             -0.00619
+                          0.00000       -0.00977
+                         -0.00791        0.00000        0.01596
+
+ Atom:      25         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            15       4       0
+
+ Charge:                 -0.03933
+ Dipole:                 -0.05936        0.00000       -0.12531
+ Quadrupole:             -0.07081
+                          0.00000        0.01710
+                         -0.02106        0.00000        0.05371
+
+ Atom:      26         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            16       4       0
+
+ Charge:                 -0.04744
+ Dipole:                 -0.06045        0.00000       -0.13401
+ Quadrupole:             -0.06326
+                          0.00000        0.00994
+                         -0.02444        0.00000        0.05332
+
+ Atom:      27         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            16       4       0
+
+ Charge:                  0.07629
+ Dipole:                 -0.02151        0.00000       -0.09276
+ Quadrupole:              0.00496
+                          0.00000       -0.01391
+                         -0.00894        0.00000        0.00895
+
+ Atom:      28         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-Only               9       0       0
+
+ Charge:                  0.00416
+ Dipole:                  0.00000        0.00000       -0.18964
+ Quadrupole:              0.01966
+                          0.00000        0.01966
+                          0.00000        0.00000       -0.03931
+
+ Atom:      29         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            15       4       0
+
+ Charge:                  0.05400
+ Dipole:                 -0.01010        0.00000       -0.11252
+ Quadrupole:             -0.00922
+                          0.00000       -0.00843
+                         -0.00612        0.00000        0.01765
+
+ Atom:      30         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            16       4       0
+
+ Charge:                  0.05227
+ Dipole:                 -0.00575        0.00000       -0.11539
+ Quadrupole:             -0.00918
+                          0.00000       -0.00983
+                         -0.00643        0.00000        0.01901
+Wed Jun  8 10:29:44 2022 Calling: potential 1 25_27_Index_0.xyz -k 25_27_Index_0_prefitmultipole.key path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.10.2   February 2022                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2022               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+        1     1     N     25_27_Index_0                7     14.007     3
+        2     2     C     25_27_Index_0                6     12.011     3
+        3     3     C     25_27_Index_0                6     12.011     4
+        4     4     N     25_27_Index_0                7     14.007     3
+        5     5     O     25_27_Index_0                8     15.999     1
+        6     6     H     25_27_Index_0                1      1.008     1
+        7     7     H     25_27_Index_0                1      1.008     1
+        8     8     C     25_27_Index_0                6     12.011     3
+        9     9     C     25_27_Index_0                6     12.011     3
+       10    10     C     25_27_Index_0                6     12.011     3
+       11    11     C     25_27_Index_0                6     12.011     3
+       12    12     C     25_27_Index_0                6     12.011     3
+       13    13     C     25_27_Index_0                6     12.011     3
+       14    14     C     25_27_Index_0                6     12.011     4
+       15    15     C     25_27_Index_0                6     12.011     4
+       16    16     C     25_27_Index_0                6     12.011     4
+       17    17     H     25_27_Index_0                1      1.008     1
+       18    18     H     25_27_Index_0                1      1.008     1
+       19    19     H     25_27_Index_0                1      1.008     1
+       20    20     H     25_27_Index_0                1      1.008     1
+       21    21     H     25_27_Index_0                1      1.008     1
+       22    22     H     25_27_Index_0                1      1.008     1
+       23    23     H     25_27_Index_0                1      1.008     1
+       24    24     H     25_27_Index_0                1      1.008     1
+       25    25     H     25_27_Index_0                1      1.008     1
+       26    26     H     25_27_Index_0                1      1.008     1
+       27    27     H     25_27_Index_0                1      1.008     1
+       28    28     H     25_27_Index_0                1      1.008     1
+       29    29     H     25_27_Index_0                1      1.008     1
+       30    30     H     25_27_Index_0                1      1.008     1
+
+ Electrostatic Potential Grid Points :                 14519
+
+ Gaussian CUBEGEN Input Written To :   25_27_Index_0.grid
+
+ Next, run the Gaussian CUBEGEN program; for example:
+
+ cubegen 0 potential=MP2 FILE.fchk FILE.cube -5 h < FILE.grid
+
+ Replace FILE with base file name and MP2 with density label;
+ After CUBEGEN, rerun Tinker POTENTIAL program using Option 2
+Wed Jun  8 10:29:44 2022 Gas Phase High Level Single Point for Multipole Refinement
+Wed Jun  8 10:29:44 2022 Calling: psi4 25_27_Index_0-esp.psi4 25_27_Index_0-esp.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0
+Wed Jun  8 12:26:41 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/25_27_Index_0-esp.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0
+Wed Jun  8 12:26:41 2022 Calling: Generating CUBE File from PSI4
+Wed Jun  8 12:26:41 2022 Calling: potential 2 25_27_Index_0_fortinker.cube path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.10.2   February 2022                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2022               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Electrostatic Potential Written To :  25_27_Index_0_fortinker.pot
+Wed Jun  8 12:26:42 2022 Average Multipoles Via Symmetry
+Wed Jun  8 12:26:42 2022 Calling: /home/bdw2292/poltype2/PoltypeModules/avgmpoles.pl 25_27_Index_0_prefitmultipole.key 25_27_Index_0.xyz 25_27_Index_0-groups.txt 25_27_Index_0.key_2 25_27_Index_0.xyz_2 401 path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0
+multipole404403-411-411Wed Jun  8 12:26:44 2022 Electrostatic Potential Optimization
+Wed Jun  8 12:26:44 2022 Calling: potential 6 combined.xyz -k 25_27_Index_0.key_2 combined.pot N 0.1 path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.10.2   February 2022                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2022               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      401   401     N     25_27_Index_0                7     14.007     3
+      402   402     C     25_27_Index_0                6     12.011     3
+      403   403     C     25_27_Index_0                6     12.011     4
+      404   404     N     25_27_Index_0                7     14.007     3
+      405   405     O     25_27_Index_0                8     15.999     1
+      412   412     H     25_27_Index_0                1      1.008     1
+      406   406     C     25_27_Index_0                6     12.011     3
+      407   407     C     25_27_Index_0                6     12.011     3
+      408   408     C     25_27_Index_0                6     12.011     3
+      409   409     C     25_27_Index_0                6     12.011     3
+      410   410     C     25_27_Index_0                6     12.011     4
+      411   411     C     25_27_Index_0                6     12.011     4
+      413   413     H     25_27_Index_0                1      1.008     1
+      414   414     H     25_27_Index_0                1      1.008     1
+      415   415     H     25_27_Index_0                1      1.008     1
+      416   416     H     25_27_Index_0                1      1.008     1
+      417   417     H     25_27_Index_0                1      1.008     1
+
+ Electrostatic Potential Grid Points :                 14519
+
+ Electrostatic Parameter Restraint Value :            1.0000
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      401   401     N     25_27_Index_0                7     14.007     3
+      402   402     C     25_27_Index_0                6     12.011     3
+      403   403     C     25_27_Index_0                6     12.011     4
+      404   404     N     25_27_Index_0                7     14.007     3
+      405   405     O     25_27_Index_0                8     15.999     1
+      412   412     H     25_27_Index_0                1      1.008     1
+      406   406     C     25_27_Index_0                6     12.011     3
+      407   407     C     25_27_Index_0                6     12.011     3
+      408   408     C     25_27_Index_0                6     12.011     3
+      409   409     C     25_27_Index_0                6     12.011     3
+      410   410     C     25_27_Index_0                6     12.011     4
+      411   411     C     25_27_Index_0                6     12.011     4
+      413   413     H     25_27_Index_0                1      1.008     1
+      414   414     H     25_27_Index_0                1      1.008     1
+      415   415     H     25_27_Index_0                1      1.008     1
+      416   416     H     25_27_Index_0                1      1.008     1
+      417   417     H     25_27_Index_0                1      1.008     1
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         401      410    406      0   Z-then-X    -0.24973
+                                                   0.23132  0.00000  0.17137
+                                                  -0.23824
+                                                   0.00000 -0.52792
+                                                  -0.14629  0.00000  0.76616
+
+         402      405    403      0   Z-then-X     0.81593
+                                                  -0.12345  0.00000  0.24218
+                                                   0.20346
+                                                   0.00000 -0.31563
+                                                   0.11618  0.00000  0.11217
+
+         403      404    402      0   Z-then-X    -0.11672
+                                                   0.17279  0.00000  0.27682
+                                                  -0.14906
+                                                   0.00000 -0.38396
+                                                   0.11035  0.00000  0.53302
+
+         404      403    411    411   Z-Bisect    -0.13969
+                                                   0.73716  0.00000  0.36361
+                                                  -0.62091
+                                                   0.00000  0.23910
+                                                  -0.16354  0.00000  0.38181
+
+         405      402    403      0   Z-then-X    -0.73281
+                                                  -0.03733  0.00000 -0.19731
+                                                  -0.55542
+                                                   0.00000  0.34738
+                                                  -0.06154  0.00000  0.20804
+
+         406      409    409      0   Bisector     0.02151
+                                                   0.00000  0.00000 -0.20437
+                                                  -0.32565
+                                                   0.00000  0.03131
+                                                   0.00000  0.00000  0.29434
+
+         407      408    408      0   Bisector    -0.04737
+                                                   0.00000  0.00000 -0.06203
+                                                   0.20487
+                                                   0.00000 -0.13052
+                                                   0.00000  0.00000 -0.07435
+
+         408      413    409      0   Z-then-X     0.06627
+                                                  -0.04099  0.00000 -0.23317
+                                                  -0.27618
+                                                   0.00000 -0.37241
+                                                   0.05169  0.00000  0.64859
+
+         409      414    408      0   Z-then-X    -0.04636
+                                                   0.04417  0.00000  0.04884
+                                                   0.09423
+                                                   0.00000 -0.08075
+                                                  -0.07548  0.00000 -0.01348
+
+         410      401    406      0   Z-then-X    -0.05918
+                                                  -0.00013  0.00000  0.22918
+                                                  -0.51128
+                                                   0.00000 -0.29297
+                                                  -0.01142  0.00000  0.80425
+
+         411      404    411      0   Z-then-X    -0.00694
+                                                   0.01551  0.00000  0.40836
+                                                  -0.43178
+                                                   0.00000 -0.30283
+                                                  -0.02030  0.00000  0.73461
+
+         412      403    412      0   Z-then-X     0.03748
+                                                   0.00786  0.00000 -0.07644
+                                                  -0.01485
+                                                   0.00000 -0.01294
+                                                   0.00109  0.00000  0.02779
+
+         413      408    409      0   Z-then-X     0.00777
+                                                   0.00290  0.00000 -0.18573
+                                                   0.02688
+                                                   0.00000  0.00925
+                                                   0.00352  0.00000 -0.03614
+
+         414      409    408      0   Z-then-X     0.02306
+                                                  -0.01423  0.00000 -0.18665
+                                                   0.05448
+                                                   0.00000  0.00890
+                                                  -0.00944  0.00000 -0.06338
+
+         415      410    401      0   Z-then-X     0.06646
+                                                   0.02169  0.00000 -0.10347
+                                                   0.02077
+                                                   0.00000 -0.00518
+                                                   0.01325  0.00000 -0.01559
+
+         416      411    404      0   Z-then-X     0.02365
+                                                  -0.02737  0.00000 -0.11632
+                                                  -0.02562
+                                                   0.00000 -0.00248
+                                                  -0.01248  0.00000  0.02810
+
+         417      407      0      0   Z-Only       0.00416
+                                                   0.00000  0.00000 -0.18964
+                                                   0.01966
+                                                   0.00000  0.01966
+                                                   0.00000  0.00000 -0.03931
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         401             1.243       0.390         402
+         402             2.064       0.390         401  405
+         403             1.620       0.390         404  412
+         404             1.185       0.390         403  411
+         405             0.914       0.390         402
+         412             0.480       0.390         403
+         406             2.064       0.390         409
+         407             2.064       0.390         408  417
+         408             2.064       0.390         407  409  413
+         409             2.064       0.390         406  408  414
+         410             1.620       0.390         415
+         411             1.620       0.390         404  416
+         413             0.432       0.390         408
+         414             0.432       0.390         409
+         415             0.480       0.390         410
+         416             0.480       0.390         411
+         417             0.432       0.390         407
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1          39        -0.5719         1.0890         1.7253
+        1        2         142        -4.9694        -4.0029         2.0686
+        1        3          23        -0.2498         0.9660         3.1841
+        1        4         215       -18.7339       -15.4201         3.4252
+        1        5         678       -18.3293       -17.8886         1.0468
+        1        6         327         2.7052         5.0794         2.6786
+        1        7         251        11.2777         6.7788         4.7609
+        1        8          44        -9.2247        -9.3555         1.2185
+        1        9         544        -4.6066        -4.6140         0.4899
+        1       10         541        -7.2087        -6.8216         0.7079
+        1       11         536        -3.1970        -3.1325         0.5616
+        1       12         322        -6.7435        -5.7427         1.2517
+        1       13         340        -3.3165        -3.4350         0.8575
+        1       14         392         6.2822         7.0546         1.0857
+        1       15         446        -0.3582         0.3897         2.2598
+        1       16         440        -4.5482        -4.7887         1.8675
+        1       17         872        -1.0937        -0.7044         0.5142
+        1       18         879         2.7331         2.8721         0.3838
+        1       19         537        -5.3568        -4.3467         1.0651
+        1       20         504         5.3092         5.5350         0.7443
+        1       21         603         3.9097         4.7369         0.8635
+        1       22         574         9.3427         7.7725         1.8670
+        1       23         492         7.2902         8.0378         1.1097
+        1       24         721         0.4469         2.3612         2.2867
+        1       25         669         7.0340         3.3950         3.9788
+        1       26         648         5.3915         1.2859         4.3677
+        1       27         411        -8.1407        -8.2666         0.9081
+        1       28         890         0.9064         1.2659         0.4229
+        1       29         719        -0.8493         0.0271         1.5935
+        1       30         720        -2.9252        -2.4513         1.3208
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.6320
+ Average Potential Magnitude for Model :              5.6060
+ Average Potential Value for Target :                -0.5946
+ Average Potential Magnitude for Target :             4.9726
+
+ Average Signed Potential Difference :               -0.0374
+ Average Unsigned Potential Difference :              1.2997
+ Root Mean Square Potential Difference :              1.9021
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter     Atom Type/Class      Category          Value         Fixed
+
+    --            401 Type          Monopole        -0.24973          X
+     1            401 Type          X-Dipole         0.23132
+    --            401 Type          Y-Dipole         0.00000          X
+     2            401 Type          Z-Dipole         0.17137
+     3            401 Type          XX-Quad         -0.23824
+    --            401 Type          XY-Quad          0.00000          X
+     4            401 Type          XZ-Quad         -0.14629
+     5            401 Type          YY-Quad         -0.52792
+    --            401 Type          YZ-Quad          0.00000          X
+    --            401 Type          ZZ-Quad          0.76616
+    --            402 Type          Monopole         0.81593          X
+     6            402 Type          X-Dipole        -0.12345
+    --            402 Type          Y-Dipole         0.00000          X
+     7            402 Type          Z-Dipole         0.24218
+     8            402 Type          XX-Quad          0.20346
+    --            402 Type          XY-Quad          0.00000          X
+     9            402 Type          XZ-Quad          0.11618
+    10            402 Type          YY-Quad         -0.31563
+    --            402 Type          YZ-Quad          0.00000          X
+    --            402 Type          ZZ-Quad          0.11217
+    --            403 Type          Monopole        -0.11672          X
+    11            403 Type          X-Dipole         0.17279
+    --            403 Type          Y-Dipole         0.00000          X
+    12            403 Type          Z-Dipole         0.27682
+    13            403 Type          XX-Quad         -0.14906
+    --            403 Type          XY-Quad          0.00000          X
+    14            403 Type          XZ-Quad          0.11035
+    15            403 Type          YY-Quad         -0.38396
+    --            403 Type          YZ-Quad          0.00000          X
+    --            403 Type          ZZ-Quad          0.53302
+    --            404 Type          Monopole        -0.13969          X
+    16            404 Type          X-Dipole         0.73716
+    --            404 Type          Y-Dipole         0.00000          X
+    17            404 Type          Z-Dipole         0.36361
+    18            404 Type          XX-Quad         -0.62091
+    --            404 Type          XY-Quad          0.00000          X
+    19            404 Type          XZ-Quad         -0.16354
+    20            404 Type          YY-Quad          0.23910
+    --            404 Type          YZ-Quad          0.00000          X
+    --            404 Type          ZZ-Quad          0.38181
+    --            405 Type          Monopole        -0.73281          X
+    21            405 Type          X-Dipole        -0.03733
+    --            405 Type          Y-Dipole         0.00000          X
+    22            405 Type          Z-Dipole        -0.19731
+    23            405 Type          XX-Quad         -0.55542
+    --            405 Type          XY-Quad          0.00000          X
+    24            405 Type          XZ-Quad         -0.06154
+    25            405 Type          YY-Quad          0.34738
+    --            405 Type          YZ-Quad          0.00000          X
+    --            405 Type          ZZ-Quad          0.20804
+    --            412 Type          Monopole         0.03748          X
+    26            412 Type          X-Dipole         0.00786
+    --            412 Type          Y-Dipole         0.00000          X
+    27            412 Type          Z-Dipole        -0.07644
+    28            412 Type          XX-Quad         -0.01485
+    --            412 Type          XY-Quad          0.00000          X
+    29            412 Type          XZ-Quad          0.00109
+    30            412 Type          YY-Quad         -0.01294
+    --            412 Type          YZ-Quad          0.00000          X
+    --            412 Type          ZZ-Quad          0.02779
+    --            406 Type          Monopole         0.02151          X
+    --            406 Type          X-Dipole         0.00000          X
+    --            406 Type          Y-Dipole         0.00000          X
+    31            406 Type          Z-Dipole        -0.20437
+    32            406 Type          XX-Quad         -0.32565
+    --            406 Type          XY-Quad          0.00000          X
+    --            406 Type          XZ-Quad          0.00000          X
+    33            406 Type          YY-Quad          0.03131
+    --            406 Type          YZ-Quad          0.00000          X
+    --            406 Type          ZZ-Quad          0.29434
+    --            407 Type          Monopole        -0.04737          X
+    --            407 Type          X-Dipole         0.00000          X
+    --            407 Type          Y-Dipole         0.00000          X
+    34            407 Type          Z-Dipole        -0.06203
+    35            407 Type          XX-Quad          0.20487
+    --            407 Type          XY-Quad          0.00000          X
+    --            407 Type          XZ-Quad          0.00000          X
+    36            407 Type          YY-Quad         -0.13052
+    --            407 Type          YZ-Quad          0.00000          X
+    --            407 Type          ZZ-Quad         -0.07435
+    --            408 Type          Monopole         0.06627          X
+    37            408 Type          X-Dipole        -0.04099
+    --            408 Type          Y-Dipole         0.00000          X
+    38            408 Type          Z-Dipole        -0.23317
+    39            408 Type          XX-Quad         -0.27618
+    --            408 Type          XY-Quad          0.00000          X
+    40            408 Type          XZ-Quad          0.05169
+    41            408 Type          YY-Quad         -0.37241
+    --            408 Type          YZ-Quad          0.00000          X
+    --            408 Type          ZZ-Quad          0.64859
+    --            409 Type          Monopole        -0.04636          X
+    42            409 Type          X-Dipole         0.04417
+    --            409 Type          Y-Dipole         0.00000          X
+    43            409 Type          Z-Dipole         0.04884
+    44            409 Type          XX-Quad          0.09423
+    --            409 Type          XY-Quad          0.00000          X
+    45            409 Type          XZ-Quad         -0.07548
+    46            409 Type          YY-Quad         -0.08075
+    --            409 Type          YZ-Quad          0.00000          X
+    --            409 Type          ZZ-Quad         -0.01348
+    --            410 Type          Monopole        -0.05918          X
+    47            410 Type          X-Dipole        -0.00013
+    --            410 Type          Y-Dipole         0.00000          X
+    48            410 Type          Z-Dipole         0.22918
+    49            410 Type          XX-Quad         -0.51128
+    --            410 Type          XY-Quad          0.00000          X
+    50            410 Type          XZ-Quad         -0.01142
+    51            410 Type          YY-Quad         -0.29297
+    --            410 Type          YZ-Quad          0.00000          X
+    --            410 Type          ZZ-Quad          0.80425
+    --            411 Type          Monopole        -0.00694          X
+    52            411 Type          X-Dipole         0.01551
+    --            411 Type          Y-Dipole         0.00000          X
+    53            411 Type          Z-Dipole         0.40836
+    54            411 Type          XX-Quad         -0.43178
+    --            411 Type          XY-Quad          0.00000          X
+    55            411 Type          XZ-Quad         -0.02030
+    56            411 Type          YY-Quad         -0.30283
+    --            411 Type          YZ-Quad          0.00000          X
+    --            411 Type          ZZ-Quad          0.73461
+    --            413 Type          Monopole         0.00777          X
+    57            413 Type          X-Dipole         0.00290
+    --            413 Type          Y-Dipole         0.00000          X
+    58            413 Type          Z-Dipole        -0.18573
+    59            413 Type          XX-Quad          0.02688
+    --            413 Type          XY-Quad          0.00000          X
+    60            413 Type          XZ-Quad          0.00352
+    61            413 Type          YY-Quad          0.00925
+    --            413 Type          YZ-Quad          0.00000          X
+    --            413 Type          ZZ-Quad         -0.03613
+    --            414 Type          Monopole         0.02306          X
+    62            414 Type          X-Dipole        -0.01423
+    --            414 Type          Y-Dipole         0.00000          X
+    63            414 Type          Z-Dipole        -0.18665
+    64            414 Type          XX-Quad          0.05448
+    --            414 Type          XY-Quad          0.00000          X
+    65            414 Type          XZ-Quad         -0.00944
+    66            414 Type          YY-Quad          0.00890
+    --            414 Type          YZ-Quad          0.00000          X
+    --            414 Type          ZZ-Quad         -0.06338
+    --            415 Type          Monopole         0.06646          X
+    67            415 Type          X-Dipole         0.02169
+    --            415 Type          Y-Dipole         0.00000          X
+    68            415 Type          Z-Dipole        -0.10347
+    69            415 Type          XX-Quad          0.02077
+    --            415 Type          XY-Quad          0.00000          X
+    70            415 Type          XZ-Quad          0.01325
+    71            415 Type          YY-Quad         -0.00518
+    --            415 Type          YZ-Quad          0.00000          X
+    --            415 Type          ZZ-Quad         -0.01559
+    --            416 Type          Monopole         0.02365          X
+    72            416 Type          X-Dipole        -0.02737
+    --            416 Type          Y-Dipole         0.00000          X
+    73            416 Type          Z-Dipole        -0.11632
+    74            416 Type          XX-Quad         -0.02562
+    --            416 Type          XY-Quad          0.00000          X
+    75            416 Type          XZ-Quad         -0.01248
+    76            416 Type          YY-Quad         -0.00248
+    --            416 Type          YZ-Quad          0.00000          X
+    --            416 Type          ZZ-Quad          0.02810
+    --            417 Type          Monopole         0.00416          X
+    --            417 Type          X-Dipole         0.00000          X
+    --            417 Type          Y-Dipole         0.00000          X
+    77            417 Type          Z-Dipole        -0.18964
+    --            417 Type          XX-Quad          0.01966
+    --            417 Type          XY-Quad          0.00000          X
+    --            417 Type          XZ-Quad          0.00000          X
+    --            417 Type          YY-Quad          0.01966
+    --            417 Type          YZ-Quad          0.00000          X
+    78            417 Type          ZZ-Quad         -0.03932
+
+ Levenberg-Marquardt Nonlinear Least Squares :
+
+ LS Iter     F Value      Total G     Active G    N Active   F Calls
+
+     0    26265.0053    8978.0896    8978.0896        78        79
+     1    11701.3190    3973.2837    3973.2837        78       158
+     2     2703.9227    1072.5893    1072.5893        78       237
+     3      556.3493      68.1906      68.1906        78       316
+     4      395.4253      14.0108      14.0108        78       395
+     5      324.7118       0.0024       0.0024        78       474
+
+ SQUARE  --  Normal Termination of Least Squares
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter     Atom Type/Class      Category          Value         Fixed
+
+    --            401 Type          Monopole        -0.24973          X
+     1            401 Type          X-Dipole         0.12789
+    --            401 Type          Y-Dipole         0.00000          X
+     2            401 Type          Z-Dipole         0.03211
+     3            401 Type          XX-Quad         -0.29422
+    --            401 Type          XY-Quad          0.00000          X
+     4            401 Type          XZ-Quad         -0.24142
+     5            401 Type          YY-Quad         -0.65830
+    --            401 Type          YZ-Quad          0.00000          X
+    --            401 Type          ZZ-Quad          0.95252
+    --            402 Type          Monopole         0.81593          X
+     6            402 Type          X-Dipole        -0.13835
+    --            402 Type          Y-Dipole         0.00000          X
+     7            402 Type          Z-Dipole         0.10518
+     8            402 Type          XX-Quad          0.21474
+    --            402 Type          XY-Quad          0.00000          X
+     9            402 Type          XZ-Quad          0.10436
+    10            402 Type          YY-Quad         -0.33658
+    --            402 Type          YZ-Quad          0.00000          X
+    --            402 Type          ZZ-Quad          0.12184
+    --            403 Type          Monopole        -0.11672          X
+    11            403 Type          X-Dipole         0.23846
+    --            403 Type          Y-Dipole         0.00000          X
+    12            403 Type          Z-Dipole         0.06063
+    13            403 Type          XX-Quad         -0.21090
+    --            403 Type          XY-Quad          0.00000          X
+    14            403 Type          XZ-Quad          0.02856
+    15            403 Type          YY-Quad         -0.36268
+    --            403 Type          YZ-Quad          0.00000          X
+    --            403 Type          ZZ-Quad          0.57358
+    --            404 Type          Monopole        -0.13969          X
+    16            404 Type          X-Dipole         0.23506
+    --            404 Type          Y-Dipole         0.00000          X
+    17            404 Type          Z-Dipole         0.09805
+    18            404 Type          XX-Quad         -1.06826
+    --            404 Type          XY-Quad          0.00000          X
+    19            404 Type          XZ-Quad         -0.69007
+    20            404 Type          YY-Quad          0.21243
+    --            404 Type          YZ-Quad          0.00000          X
+    --            404 Type          ZZ-Quad          0.85583
+    --            405 Type          Monopole        -0.73281          X
+    21            405 Type          X-Dipole        -0.04926
+    --            405 Type          Y-Dipole         0.00000          X
+    22            405 Type          Z-Dipole        -0.13133
+    23            405 Type          XX-Quad         -0.56039
+    --            405 Type          XY-Quad          0.00000          X
+    24            405 Type          XZ-Quad         -0.11696
+    25            405 Type          YY-Quad          0.19836
+    --            405 Type          YZ-Quad          0.00000          X
+    --            405 Type          ZZ-Quad          0.36203
+    --            412 Type          Monopole         0.03748          X
+    26            412 Type          X-Dipole         0.06038
+    --            412 Type          Y-Dipole         0.00000          X
+    27            412 Type          Z-Dipole        -0.11108
+    28            412 Type          XX-Quad          0.09470
+    --            412 Type          XY-Quad          0.00000          X
+    29            412 Type          XZ-Quad          0.09361
+    30            412 Type          YY-Quad          0.03848
+    --            412 Type          YZ-Quad          0.00000          X
+    --            412 Type          ZZ-Quad         -0.13318
+    --            406 Type          Monopole         0.02151          X
+    --            406 Type          X-Dipole         0.00000          X
+    --            406 Type          Y-Dipole         0.00000          X
+    31            406 Type          Z-Dipole        -0.27106
+    32            406 Type          XX-Quad         -0.30010
+    --            406 Type          XY-Quad          0.00000          X
+    --            406 Type          XZ-Quad          0.00000          X
+    33            406 Type          YY-Quad          0.03593
+    --            406 Type          YZ-Quad          0.00000          X
+    --            406 Type          ZZ-Quad          0.26417
+    --            407 Type          Monopole        -0.04737          X
+    --            407 Type          X-Dipole         0.00000          X
+    --            407 Type          Y-Dipole         0.00000          X
+    34            407 Type          Z-Dipole        -0.11257
+    35            407 Type          XX-Quad          0.24829
+    --            407 Type          XY-Quad          0.00000          X
+    --            407 Type          XZ-Quad          0.00000          X
+    36            407 Type          YY-Quad         -0.16785
+    --            407 Type          YZ-Quad          0.00000          X
+    --            407 Type          ZZ-Quad         -0.08044
+    --            408 Type          Monopole         0.06627          X
+    37            408 Type          X-Dipole         0.03182
+    --            408 Type          Y-Dipole         0.00000          X
+    38            408 Type          Z-Dipole        -0.08448
+    39            408 Type          XX-Quad         -0.22625
+    --            408 Type          XY-Quad          0.00000          X
+    40            408 Type          XZ-Quad          0.03686
+    41            408 Type          YY-Quad         -0.39351
+    --            408 Type          YZ-Quad          0.00000          X
+    --            408 Type          ZZ-Quad          0.61976
+    --            409 Type          Monopole        -0.04636          X
+    42            409 Type          X-Dipole        -0.01933
+    --            409 Type          Y-Dipole         0.00000          X
+    43            409 Type          Z-Dipole         0.02863
+    44            409 Type          XX-Quad          0.08093
+    --            409 Type          XY-Quad          0.00000          X
+    45            409 Type          XZ-Quad         -0.05195
+    46            409 Type          YY-Quad         -0.11995
+    --            409 Type          YZ-Quad          0.00000          X
+    --            409 Type          ZZ-Quad          0.03902
+    --            410 Type          Monopole        -0.05918          X
+    47            410 Type          X-Dipole         0.06073
+    --            410 Type          Y-Dipole         0.00000          X
+    48            410 Type          Z-Dipole         0.30978
+    49            410 Type          XX-Quad         -0.40204
+    --            410 Type          XY-Quad          0.00000          X
+    50            410 Type          XZ-Quad          0.03774
+    51            410 Type          YY-Quad         -0.27927
+    --            410 Type          YZ-Quad          0.00000          X
+    --            410 Type          ZZ-Quad          0.68131
+    --            411 Type          Monopole        -0.00694          X
+    52            411 Type          X-Dipole        -0.09892
+    --            411 Type          Y-Dipole         0.00000          X
+    53            411 Type          Z-Dipole         0.30865
+    54            411 Type          XX-Quad         -0.10521
+    --            411 Type          XY-Quad          0.00000          X
+    55            411 Type          XZ-Quad         -0.10303
+    56            411 Type          YY-Quad         -0.39474
+    --            411 Type          YZ-Quad          0.00000          X
+    --            411 Type          ZZ-Quad          0.49995
+    --            413 Type          Monopole         0.00777          X
+    57            413 Type          X-Dipole        -0.00715
+    --            413 Type          Y-Dipole         0.00000          X
+    58            413 Type          Z-Dipole        -0.11788
+    59            413 Type          XX-Quad          0.12448
+    --            413 Type          XY-Quad          0.00000          X
+    60            413 Type          XZ-Quad          0.00015
+    61            413 Type          YY-Quad         -0.06027
+    --            413 Type          YZ-Quad          0.00000          X
+    --            413 Type          ZZ-Quad         -0.06421
+    --            414 Type          Monopole         0.02306          X
+    62            414 Type          X-Dipole         0.03730
+    --            414 Type          Y-Dipole         0.00000          X
+    63            414 Type          Z-Dipole        -0.13613
+    64            414 Type          XX-Quad         -0.02714
+    --            414 Type          XY-Quad          0.00000          X
+    65            414 Type          XZ-Quad         -0.02756
+    66            414 Type          YY-Quad          0.04557
+    --            414 Type          YZ-Quad          0.00000          X
+    --            414 Type          ZZ-Quad         -0.01843
+    --            415 Type          Monopole         0.06646          X
+    67            415 Type          X-Dipole        -0.00593
+    --            415 Type          Y-Dipole         0.00000          X
+    68            415 Type          Z-Dipole        -0.08472
+    69            415 Type          XX-Quad          0.04252
+    --            415 Type          XY-Quad          0.00000          X
+    70            415 Type          XZ-Quad         -0.06862
+    71            415 Type          YY-Quad          0.00439
+    --            415 Type          YZ-Quad          0.00000          X
+    --            415 Type          ZZ-Quad         -0.04691
+    --            416 Type          Monopole         0.02365          X
+    72            416 Type          X-Dipole        -0.03591
+    --            416 Type          Y-Dipole         0.00000          X
+    73            416 Type          Z-Dipole        -0.15288
+    74            416 Type          XX-Quad          0.02757
+    --            416 Type          XY-Quad          0.00000          X
+    75            416 Type          XZ-Quad         -0.12290
+    76            416 Type          YY-Quad          0.08837
+    --            416 Type          YZ-Quad          0.00000          X
+    --            416 Type          ZZ-Quad         -0.11594
+    --            417 Type          Monopole         0.00416          X
+    --            417 Type          X-Dipole         0.00000          X
+    --            417 Type          Y-Dipole         0.00000          X
+    77            417 Type          Z-Dipole        -0.16938
+    --            417 Type          XX-Quad          0.02966
+    --            417 Type          XY-Quad          0.00000          X
+    --            417 Type          XZ-Quad          0.00000          X
+    --            417 Type          YY-Quad          0.02966
+    --            417 Type          YZ-Quad          0.00000          X
+    78            417 Type          ZZ-Quad         -0.05932
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1          39         1.3544         1.0890         0.4018
+        1        2         142        -4.0975        -4.0029         0.2465
+        1        3          23         0.8772         0.9660         0.2554
+        1        4         215       -15.2466       -15.4201         0.2512
+        1        5         678       -17.9466       -17.8886         0.1467
+        1        6         327         4.9803         5.0794         0.1677
+        1        7         251         6.8242         6.7788         0.2456
+        1        8          44        -9.3421        -9.3555         0.3462
+        1        9         544        -4.6455        -4.6140         0.1296
+        1       10         541        -6.9627        -6.8216         0.2126
+        1       11         536        -3.0637        -3.1325         0.1487
+        1       12         322        -5.9429        -5.7427         0.2720
+        1       13         340        -3.2822        -3.4350         0.2552
+        1       14         392         7.0150         7.0546         0.1095
+        1       15         446         0.3065         0.3897         0.1736
+        1       16         440        -4.8411        -4.7887         0.1926
+        1       17         872        -0.7402        -0.7044         0.0737
+        1       18         879         2.8269         2.8721         0.0865
+        1       19         537        -4.3527        -4.3467         0.0993
+        1       20         504         5.4490         5.5350         0.1400
+        1       21         603         4.6806         4.7369         0.1008
+        1       22         574         7.8863         7.7725         0.1413
+        1       23         492         7.8906         8.0378         0.2002
+        1       24         721         2.3421         2.3612         0.0916
+        1       25         669         3.4331         3.3950         0.1251
+        1       26         648         1.2951         1.2859         0.1322
+        1       27         411        -8.2812        -8.2666         0.1264
+        1       28         890         1.2157         1.2659         0.0818
+        1       29         719        -0.1016         0.0271         0.1953
+        1       30         720        -2.5328        -2.4513         0.1488
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.6300
+ Average Potential Magnitude for Model :              4.9614
+ Average Potential Value for Target :                -0.5946
+ Average Potential Magnitude for Target :             4.9726
+
+ Average Signed Potential Difference :               -0.0355
+ Average Unsigned Potential Difference :              0.1044
+ Root Mean Square Potential Difference :              0.1547
+Wed Jun  8 12:26:48 2022 Calling: minimize testbondangleequilvalues.xyz -k testbondangleequilvalues.key 0.1 > testbondangleequilvalues.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0
+Wed Jun  8 12:26:49 2022 Calling: analyze testbondangleequilvalues.xyz_2 -k testbondangleequilvalues.key  d > testbondangleequilvaluesalz.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0
+Wed Jun  8 12:26:49 2022 Relaxed Torsion Scan and Fitting
+Wed Jun  8 12:26:49 2022 Calling: minimize 25_27_Index_0-opt-2-3-179_preQMOPTprefit.xyz -k tmp-2-3-179_preQMOPTprefit.key 0.1 >25_27_Index_0-opt-2-3-179_preQMOPTprefit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:49 2022 Waiting on 25_27_Index_0-opt-2-3-179_preQMOPTprefit.out to begin
+Wed Jun  8 12:26:49 2022 Waiting on 25_27_Index_0-opt-2-3-179_preQMOPTprefit.out for termination 
+Wed Jun  8 12:26:50 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-179_preQMOPTprefit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:50 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-179_preQMOPTprefit.out']
+Wed Jun  8 12:26:50 2022 Calling: analyze 25_27_Index_0-opt-2-3-179_preQMOPTprefit.xyz_2 -k tmp-2-3-179_preQMOPTprefit.key ed > 25_27_Index_0-opt-2-3-179_preQMOPTprefit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:50 2022 Waiting on 25_27_Index_0-opt-2-3-179_preQMOPTprefit.alz to begin
+Wed Jun  8 12:26:50 2022 Waiting on 25_27_Index_0-opt-2-3-179_preQMOPTprefit.alz for termination 
+Wed Jun  8 12:26:50 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-179_preQMOPTprefit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:50 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-179_preQMOPTprefit.alz']
+Wed Jun  8 12:26:50 2022 Calling: minimize 25_27_Index_0-opt-2-3-209_preQMOPTprefit.xyz -k tmp-2-3-209_preQMOPTprefit.key 0.1 >25_27_Index_0-opt-2-3-209_preQMOPTprefit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:50 2022 Waiting on 25_27_Index_0-opt-2-3-209_preQMOPTprefit.out to begin
+Wed Jun  8 12:26:50 2022 Waiting on 25_27_Index_0-opt-2-3-209_preQMOPTprefit.out for termination 
+Wed Jun  8 12:26:51 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-209_preQMOPTprefit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:51 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-209_preQMOPTprefit.out']
+Wed Jun  8 12:26:51 2022 Calling: analyze 25_27_Index_0-opt-2-3-209_preQMOPTprefit.xyz_2 -k tmp-2-3-209_preQMOPTprefit.key ed > 25_27_Index_0-opt-2-3-209_preQMOPTprefit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:51 2022 Waiting on 25_27_Index_0-opt-2-3-209_preQMOPTprefit.alz to begin
+Wed Jun  8 12:26:51 2022 Waiting on 25_27_Index_0-opt-2-3-209_preQMOPTprefit.alz for termination 
+Wed Jun  8 12:26:51 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-209_preQMOPTprefit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:51 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-209_preQMOPTprefit.alz']
+Wed Jun  8 12:26:51 2022 Calling: minimize 25_27_Index_0-opt-2-3-239_preQMOPTprefit.xyz -k tmp-2-3-239_preQMOPTprefit.key 0.1 >25_27_Index_0-opt-2-3-239_preQMOPTprefit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:51 2022 Waiting on 25_27_Index_0-opt-2-3-239_preQMOPTprefit.out to begin
+Wed Jun  8 12:26:52 2022 Waiting on 25_27_Index_0-opt-2-3-239_preQMOPTprefit.out for termination 
+Wed Jun  8 12:26:52 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-239_preQMOPTprefit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:52 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-239_preQMOPTprefit.out']
+Wed Jun  8 12:26:52 2022 Calling: analyze 25_27_Index_0-opt-2-3-239_preQMOPTprefit.xyz_2 -k tmp-2-3-239_preQMOPTprefit.key ed > 25_27_Index_0-opt-2-3-239_preQMOPTprefit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:52 2022 Waiting on 25_27_Index_0-opt-2-3-239_preQMOPTprefit.alz to begin
+Wed Jun  8 12:26:52 2022 Waiting on 25_27_Index_0-opt-2-3-239_preQMOPTprefit.alz for termination 
+Wed Jun  8 12:26:52 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-239_preQMOPTprefit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:53 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-239_preQMOPTprefit.alz']
+Wed Jun  8 12:26:53 2022 Calling: minimize 25_27_Index_0-opt-2-3-269_preQMOPTprefit.xyz -k tmp-2-3-269_preQMOPTprefit.key 0.1 >25_27_Index_0-opt-2-3-269_preQMOPTprefit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:53 2022 Waiting on 25_27_Index_0-opt-2-3-269_preQMOPTprefit.out to begin
+Wed Jun  8 12:26:53 2022 Waiting on 25_27_Index_0-opt-2-3-269_preQMOPTprefit.out for termination 
+Wed Jun  8 12:26:53 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-269_preQMOPTprefit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:53 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-269_preQMOPTprefit.out']
+Wed Jun  8 12:26:53 2022 Calling: analyze 25_27_Index_0-opt-2-3-269_preQMOPTprefit.xyz_2 -k tmp-2-3-269_preQMOPTprefit.key ed > 25_27_Index_0-opt-2-3-269_preQMOPTprefit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:53 2022 Waiting on 25_27_Index_0-opt-2-3-269_preQMOPTprefit.alz to begin
+Wed Jun  8 12:26:53 2022 Waiting on 25_27_Index_0-opt-2-3-269_preQMOPTprefit.alz for termination 
+Wed Jun  8 12:26:54 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-269_preQMOPTprefit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:54 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-269_preQMOPTprefit.alz']
+Wed Jun  8 12:26:54 2022 Calling: minimize 25_27_Index_0-opt-2-3-299_preQMOPTprefit.xyz -k tmp-2-3-299_preQMOPTprefit.key 0.1 >25_27_Index_0-opt-2-3-299_preQMOPTprefit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:54 2022 Waiting on 25_27_Index_0-opt-2-3-299_preQMOPTprefit.out to begin
+Wed Jun  8 12:26:54 2022 Waiting on 25_27_Index_0-opt-2-3-299_preQMOPTprefit.out for termination 
+Wed Jun  8 12:26:54 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-299_preQMOPTprefit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:54 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-299_preQMOPTprefit.out']
+Wed Jun  8 12:26:54 2022 Calling: analyze 25_27_Index_0-opt-2-3-299_preQMOPTprefit.xyz_2 -k tmp-2-3-299_preQMOPTprefit.key ed > 25_27_Index_0-opt-2-3-299_preQMOPTprefit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:54 2022 Waiting on 25_27_Index_0-opt-2-3-299_preQMOPTprefit.alz to begin
+Wed Jun  8 12:26:55 2022 Waiting on 25_27_Index_0-opt-2-3-299_preQMOPTprefit.alz for termination 
+Wed Jun  8 12:26:55 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-299_preQMOPTprefit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:55 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-299_preQMOPTprefit.alz']
+Wed Jun  8 12:26:55 2022 Calling: minimize 25_27_Index_0-opt-2-3-329_preQMOPTprefit.xyz -k tmp-2-3-329_preQMOPTprefit.key 0.1 >25_27_Index_0-opt-2-3-329_preQMOPTprefit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:55 2022 Waiting on 25_27_Index_0-opt-2-3-329_preQMOPTprefit.out to begin
+Wed Jun  8 12:26:55 2022 Waiting on 25_27_Index_0-opt-2-3-329_preQMOPTprefit.out for termination 
+Wed Jun  8 12:26:56 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-329_preQMOPTprefit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:56 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-329_preQMOPTprefit.out']
+Wed Jun  8 12:26:56 2022 Calling: analyze 25_27_Index_0-opt-2-3-329_preQMOPTprefit.xyz_2 -k tmp-2-3-329_preQMOPTprefit.key ed > 25_27_Index_0-opt-2-3-329_preQMOPTprefit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:56 2022 Waiting on 25_27_Index_0-opt-2-3-329_preQMOPTprefit.alz to begin
+Wed Jun  8 12:26:56 2022 Waiting on 25_27_Index_0-opt-2-3-329_preQMOPTprefit.alz for termination 
+Wed Jun  8 12:26:56 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-329_preQMOPTprefit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:56 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-329_preQMOPTprefit.alz']
+Wed Jun  8 12:26:56 2022 Calling: minimize 25_27_Index_0-opt-2-3-359_preQMOPTprefit.xyz -k tmp-2-3-359_preQMOPTprefit.key 0.1 >25_27_Index_0-opt-2-3-359_preQMOPTprefit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:56 2022 Waiting on 25_27_Index_0-opt-2-3-359_preQMOPTprefit.out to begin
+Wed Jun  8 12:26:56 2022 Waiting on 25_27_Index_0-opt-2-3-359_preQMOPTprefit.out for termination 
+Wed Jun  8 12:26:57 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-359_preQMOPTprefit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:57 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-359_preQMOPTprefit.out']
+Wed Jun  8 12:26:57 2022 Calling: analyze 25_27_Index_0-opt-2-3-359_preQMOPTprefit.xyz_2 -k tmp-2-3-359_preQMOPTprefit.key ed > 25_27_Index_0-opt-2-3-359_preQMOPTprefit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:57 2022 Waiting on 25_27_Index_0-opt-2-3-359_preQMOPTprefit.alz for termination 
+Wed Jun  8 12:26:57 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-359_preQMOPTprefit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:57 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-359_preQMOPTprefit.alz']
+Wed Jun  8 12:26:57 2022 Calling: minimize 25_27_Index_0-opt-2-3-149_preQMOPTprefit.xyz -k tmp-2-3-149_preQMOPTprefit.key 0.1 >25_27_Index_0-opt-2-3-149_preQMOPTprefit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:57 2022 Waiting on 25_27_Index_0-opt-2-3-149_preQMOPTprefit.out to begin
+Wed Jun  8 12:26:57 2022 Waiting on 25_27_Index_0-opt-2-3-149_preQMOPTprefit.out for termination 
+Wed Jun  8 12:26:58 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-149_preQMOPTprefit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:58 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-149_preQMOPTprefit.out']
+Wed Jun  8 12:26:58 2022 Calling: analyze 25_27_Index_0-opt-2-3-149_preQMOPTprefit.xyz_2 -k tmp-2-3-149_preQMOPTprefit.key ed > 25_27_Index_0-opt-2-3-149_preQMOPTprefit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:58 2022 Waiting on 25_27_Index_0-opt-2-3-149_preQMOPTprefit.alz for termination 
+Wed Jun  8 12:26:58 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-149_preQMOPTprefit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:58 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-149_preQMOPTprefit.alz']
+Wed Jun  8 12:26:58 2022 Calling: minimize 25_27_Index_0-opt-2-3-119_preQMOPTprefit.xyz -k tmp-2-3-119_preQMOPTprefit.key 0.1 >25_27_Index_0-opt-2-3-119_preQMOPTprefit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:58 2022 Waiting on 25_27_Index_0-opt-2-3-119_preQMOPTprefit.out to begin
+Wed Jun  8 12:26:59 2022 Waiting on 25_27_Index_0-opt-2-3-119_preQMOPTprefit.out for termination 
+Wed Jun  8 12:26:59 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-119_preQMOPTprefit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:59 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-119_preQMOPTprefit.out']
+Wed Jun  8 12:26:59 2022 Calling: analyze 25_27_Index_0-opt-2-3-119_preQMOPTprefit.xyz_2 -k tmp-2-3-119_preQMOPTprefit.key ed > 25_27_Index_0-opt-2-3-119_preQMOPTprefit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:26:59 2022 Waiting on 25_27_Index_0-opt-2-3-119_preQMOPTprefit.alz for termination 
+Wed Jun  8 12:26:59 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-119_preQMOPTprefit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:27:00 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-119_preQMOPTprefit.alz']
+Wed Jun  8 12:27:00 2022 Calling: minimize 25_27_Index_0-opt-2-3-089_preQMOPTprefit.xyz -k tmp-2-3-089_preQMOPTprefit.key 0.1 >25_27_Index_0-opt-2-3-089_preQMOPTprefit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:27:00 2022 Waiting on 25_27_Index_0-opt-2-3-089_preQMOPTprefit.out to begin
+Wed Jun  8 12:27:00 2022 Waiting on 25_27_Index_0-opt-2-3-089_preQMOPTprefit.out for termination 
+Wed Jun  8 12:27:00 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-089_preQMOPTprefit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:27:00 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-089_preQMOPTprefit.out']
+Wed Jun  8 12:27:00 2022 Calling: analyze 25_27_Index_0-opt-2-3-089_preQMOPTprefit.xyz_2 -k tmp-2-3-089_preQMOPTprefit.key ed > 25_27_Index_0-opt-2-3-089_preQMOPTprefit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:27:00 2022 Waiting on 25_27_Index_0-opt-2-3-089_preQMOPTprefit.alz for termination 
+Wed Jun  8 12:27:01 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-089_preQMOPTprefit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:27:01 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-089_preQMOPTprefit.alz']
+Wed Jun  8 12:27:01 2022 Calling: minimize 25_27_Index_0-opt-2-3-059_preQMOPTprefit.xyz -k tmp-2-3-059_preQMOPTprefit.key 0.1 >25_27_Index_0-opt-2-3-059_preQMOPTprefit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:27:01 2022 Waiting on 25_27_Index_0-opt-2-3-059_preQMOPTprefit.out to begin
+Wed Jun  8 12:27:01 2022 Waiting on 25_27_Index_0-opt-2-3-059_preQMOPTprefit.out for termination 
+Wed Jun  8 12:27:01 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-059_preQMOPTprefit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:27:01 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-059_preQMOPTprefit.out']
+Wed Jun  8 12:27:01 2022 Calling: analyze 25_27_Index_0-opt-2-3-059_preQMOPTprefit.xyz_2 -k tmp-2-3-059_preQMOPTprefit.key ed > 25_27_Index_0-opt-2-3-059_preQMOPTprefit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:27:01 2022 Waiting on 25_27_Index_0-opt-2-3-059_preQMOPTprefit.alz for termination 
+Wed Jun  8 12:27:02 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-059_preQMOPTprefit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:27:02 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-059_preQMOPTprefit.alz']
+Wed Jun  8 12:27:02 2022 Calling: minimize 25_27_Index_0-opt-2-3-029_preQMOPTprefit.xyz -k tmp-2-3-029_preQMOPTprefit.key 0.1 >25_27_Index_0-opt-2-3-029_preQMOPTprefit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:27:02 2022 Waiting on 25_27_Index_0-opt-2-3-029_preQMOPTprefit.out to begin
+Wed Jun  8 12:27:02 2022 Waiting on 25_27_Index_0-opt-2-3-029_preQMOPTprefit.out for termination 
+Wed Jun  8 12:27:02 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-029_preQMOPTprefit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:27:03 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-029_preQMOPTprefit.out']
+Wed Jun  8 12:27:03 2022 Calling: analyze 25_27_Index_0-opt-2-3-029_preQMOPTprefit.xyz_2 -k tmp-2-3-029_preQMOPTprefit.key ed > 25_27_Index_0-opt-2-3-029_preQMOPTprefit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:27:03 2022 Waiting on 25_27_Index_0-opt-2-3-029_preQMOPTprefit.alz for termination 
+Wed Jun  8 12:27:03 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-029_preQMOPTprefit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:27:03 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-029_preQMOPTprefit.alz']
+Wed Jun  8 12:27:03 2022 Percent of jobs finished 0.0
+Wed Jun  8 12:27:03 2022 Calling: psi4 25_27_Index_0-opt-1_2-3-179.psi4 25_27_Index_0-opt-1_2-3-179.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Too many bad steps.
+Optimizer: Optimization complete!
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+Wed Jun  8 12:43:29 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-opt-1_2-3-179.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 12:43:29 2022 Percent of jobs finished 8.33
+Wed Jun  8 12:43:29 2022 Calling: psi4 25_27_Index_0-opt-1_2-3-209.psi4 25_27_Index_0-opt-1_2-3-209.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Too many bad steps.
+Optimizer: Optimization complete!
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+Wed Jun  8 13:00:14 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-opt-1_2-3-209.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 13:00:14 2022 Percent of jobs finished 16.67
+Wed Jun  8 13:00:14 2022 Calling: psi4 25_27_Index_0-opt-1_2-3-239.psi4 25_27_Index_0-opt-1_2-3-239.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Too many bad steps.
+Optimizer: Optimization complete!
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+Wed Jun  8 13:16:25 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-opt-1_2-3-239.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 13:16:25 2022 Percent of jobs finished 25.0
+Wed Jun  8 13:16:25 2022 Calling: psi4 25_27_Index_0-opt-1_2-3-269.psi4 25_27_Index_0-opt-1_2-3-269.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Too many bad steps.
+Optimizer: Optimization complete!
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+Wed Jun  8 13:30:56 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-opt-1_2-3-269.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 13:30:56 2022 Percent of jobs finished 33.33
+Wed Jun  8 13:30:56 2022 Calling: psi4 25_27_Index_0-opt-1_2-3-299.psi4 25_27_Index_0-opt-1_2-3-299.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Too many bad steps.
+Optimizer: Optimization complete!
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+Wed Jun  8 13:49:26 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-opt-1_2-3-299.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 13:49:26 2022 Percent of jobs finished 41.67
+Wed Jun  8 13:49:26 2022 Calling: psi4 25_27_Index_0-opt-1_2-3-329.psi4 25_27_Index_0-opt-1_2-3-329.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Too many bad steps.
+Too many bad steps.
+Optimizer: Optimization complete!
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 3: Red. Int. + XYZ, RFO, backsteps, smaller trust.
+Wed Jun  8 14:18:18 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-opt-1_2-3-329.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 14:18:18 2022 Percent of jobs finished 50.0
+Wed Jun  8 14:18:18 2022 Calling: psi4 25_27_Index_0-opt-1_2-3-359.psi4 25_27_Index_0-opt-1_2-3-359.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Too many bad steps.
+Too many bad steps.
+Optimizer: Optimization complete!
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 3: Red. Int. + XYZ, RFO, backsteps, smaller trust.
+Wed Jun  8 14:41:52 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-opt-1_2-3-359.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 14:41:52 2022 Percent of jobs finished 58.33
+Wed Jun  8 14:41:52 2022 Calling: psi4 25_27_Index_0-opt-1_2-3-149.psi4 25_27_Index_0-opt-1_2-3-149.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Too many bad steps.
+Optimizer: Optimization complete!
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+Wed Jun  8 14:56:03 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-opt-1_2-3-149.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 14:56:03 2022 Percent of jobs finished 66.67
+Wed Jun  8 14:56:03 2022 Calling: psi4 25_27_Index_0-opt-1_2-3-119.psi4 25_27_Index_0-opt-1_2-3-119.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Too many bad steps.
+Optimizer: Optimization complete!
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+Wed Jun  8 15:11:48 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-opt-1_2-3-119.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 15:11:48 2022 Percent of jobs finished 75.0
+Wed Jun  8 15:11:48 2022 Calling: psi4 25_27_Index_0-opt-1_2-3-089.psi4 25_27_Index_0-opt-1_2-3-089.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Too many bad steps.
+Optimizer: Optimization complete!
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+Wed Jun  8 15:26:40 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-opt-1_2-3-089.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 15:26:40 2022 Percent of jobs finished 83.33
+Wed Jun  8 15:26:40 2022 Calling: psi4 25_27_Index_0-opt-1_2-3-059.psi4 25_27_Index_0-opt-1_2-3-059.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Too many bad steps.
+Too many bad steps.
+Optimizer: Optimization complete!
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 3: Red. Int. + XYZ, RFO, backsteps, smaller trust.
+Wed Jun  8 15:58:27 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-opt-1_2-3-059.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 15:58:27 2022 Percent of jobs finished 91.67
+Wed Jun  8 15:58:27 2022 Calling: psi4 25_27_Index_0-opt-1_2-3-029.psi4 25_27_Index_0-opt-1_2-3-029.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Too many bad steps.
+Too many bad steps.
+Optimizer: Optimization complete!
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 1: Red. Int., RFO, no backsteps, dynamic trust
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 2: Red. Int., RFO, backsteps, smaller trust.
+At level 3: Red. Int. + XYZ, RFO, backsteps, smaller trust.
+Wed Jun  8 16:25:57 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-opt-1_2-3-029.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:25:58 2022 Percent of jobs finished 0.0
+Wed Jun  8 16:25:58 2022 Calling: psi4 25_27_Index_0-sp-2-3-179.psi4 25_27_Index_0-sp-2-3-179.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:28:18 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-sp-2-3-179.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:28:18 2022 Percent of jobs finished 8.33
+Wed Jun  8 16:28:18 2022 Calling: psi4 25_27_Index_0-sp-2-3-209.psi4 25_27_Index_0-sp-2-3-209.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:30:41 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-sp-2-3-209.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:30:41 2022 Percent of jobs finished 16.67
+Wed Jun  8 16:30:41 2022 Calling: psi4 25_27_Index_0-sp-2-3-239.psi4 25_27_Index_0-sp-2-3-239.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:33:05 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-sp-2-3-239.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:33:05 2022 Percent of jobs finished 25.0
+Wed Jun  8 16:33:05 2022 Calling: psi4 25_27_Index_0-sp-2-3-269.psi4 25_27_Index_0-sp-2-3-269.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:35:27 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-sp-2-3-269.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:35:27 2022 Percent of jobs finished 33.33
+Wed Jun  8 16:35:27 2022 Calling: psi4 25_27_Index_0-sp-2-3-299.psi4 25_27_Index_0-sp-2-3-299.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:37:51 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-sp-2-3-299.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:37:51 2022 Percent of jobs finished 41.67
+Wed Jun  8 16:37:51 2022 Calling: psi4 25_27_Index_0-sp-2-3-329.psi4 25_27_Index_0-sp-2-3-329.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:40:14 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-sp-2-3-329.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:40:14 2022 Percent of jobs finished 50.0
+Wed Jun  8 16:40:14 2022 Calling: psi4 25_27_Index_0-sp-2-3-359.psi4 25_27_Index_0-sp-2-3-359.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:42:36 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-sp-2-3-359.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:42:36 2022 Percent of jobs finished 58.33
+Wed Jun  8 16:42:36 2022 Calling: psi4 25_27_Index_0-sp-2-3-149.psi4 25_27_Index_0-sp-2-3-149.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:45:00 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-sp-2-3-149.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:45:00 2022 Percent of jobs finished 66.67
+Wed Jun  8 16:45:00 2022 Calling: psi4 25_27_Index_0-sp-2-3-119.psi4 25_27_Index_0-sp-2-3-119.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:47:26 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-sp-2-3-119.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:47:26 2022 Percent of jobs finished 75.0
+Wed Jun  8 16:47:26 2022 Calling: psi4 25_27_Index_0-sp-2-3-089.psi4 25_27_Index_0-sp-2-3-089.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:49:55 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-sp-2-3-089.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:49:55 2022 Percent of jobs finished 83.33
+Wed Jun  8 16:49:55 2022 Calling: psi4 25_27_Index_0-sp-2-3-059.psi4 25_27_Index_0-sp-2-3-059.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:52:30 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-sp-2-3-059.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:52:30 2022 Percent of jobs finished 91.67
+Wed Jun  8 16:52:30 2022 Calling: psi4 25_27_Index_0-sp-2-3-029.psi4 25_27_Index_0-sp-2-3-029.log path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:01 2022 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion/25_27_Index_0-sp-2-3-029.log path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:05 2022 Torsions being fit 401 402 403 404 , 405 402 403 404 RMSD(QM-MM1)0.7499909523109678
+Wed Jun  8 16:55:05 2022 Calling: minimize 25_27_Index_0-opt-2-3-179_postQMOPTpostfit.xyz -k tmp-2-3-179_postQMOPTpostfit.key 0.1 >25_27_Index_0-opt-2-3-179_postQMOPTpostfit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:05 2022 Waiting on 25_27_Index_0-opt-2-3-179_postQMOPTpostfit.out to begin
+Wed Jun  8 16:55:05 2022 Waiting on 25_27_Index_0-opt-2-3-179_postQMOPTpostfit.out for termination 
+Wed Jun  8 16:55:05 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-179_postQMOPTpostfit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:06 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-179_postQMOPTpostfit.out']
+Wed Jun  8 16:55:06 2022 Calling: analyze 25_27_Index_0-opt-2-3-179_postQMOPTpostfit.xyz_2 -k tmp-2-3-179_postQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-179_postQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:06 2022 Waiting on 25_27_Index_0-opt-2-3-179_postQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:06 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-179_postQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:06 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-179_postQMOPTpostfit.alz']
+Wed Jun  8 16:55:06 2022 Calling: analyze 25_27_Index_0-opt-2-3-179_preQMOPTpostfit.xyz -k tmp-2-3-179_preQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-179_preQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:06 2022 Waiting on 25_27_Index_0-opt-2-3-179_preQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:06 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-179_preQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:06 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-179_preQMOPTpostfit.alz']
+Wed Jun  8 16:55:07 2022 Calling: minimize 25_27_Index_0-opt-2-3-209_postQMOPTpostfit.xyz -k tmp-2-3-209_postQMOPTpostfit.key 0.1 >25_27_Index_0-opt-2-3-209_postQMOPTpostfit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:07 2022 Waiting on 25_27_Index_0-opt-2-3-209_postQMOPTpostfit.out for termination 
+Wed Jun  8 16:55:07 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-209_postQMOPTpostfit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:07 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-209_postQMOPTpostfit.out']
+Wed Jun  8 16:55:07 2022 Calling: analyze 25_27_Index_0-opt-2-3-209_postQMOPTpostfit.xyz_2 -k tmp-2-3-209_postQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-209_postQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:07 2022 Waiting on 25_27_Index_0-opt-2-3-209_postQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:07 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-209_postQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:08 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-209_postQMOPTpostfit.alz']
+Wed Jun  8 16:55:08 2022 Calling: analyze 25_27_Index_0-opt-2-3-209_preQMOPTpostfit.xyz -k tmp-2-3-209_preQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-209_preQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:08 2022 Waiting on 25_27_Index_0-opt-2-3-209_preQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:08 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-209_preQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:08 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-209_preQMOPTpostfit.alz']
+Wed Jun  8 16:55:08 2022 Calling: minimize 25_27_Index_0-opt-2-3-239_postQMOPTpostfit.xyz -k tmp-2-3-239_postQMOPTpostfit.key 0.1 >25_27_Index_0-opt-2-3-239_postQMOPTpostfit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:08 2022 Waiting on 25_27_Index_0-opt-2-3-239_postQMOPTpostfit.out to begin
+Wed Jun  8 16:55:08 2022 Waiting on 25_27_Index_0-opt-2-3-239_postQMOPTpostfit.out for termination 
+Wed Jun  8 16:55:09 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-239_postQMOPTpostfit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:09 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-239_postQMOPTpostfit.out']
+Wed Jun  8 16:55:09 2022 Calling: analyze 25_27_Index_0-opt-2-3-239_postQMOPTpostfit.xyz_2 -k tmp-2-3-239_postQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-239_postQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:09 2022 Waiting on 25_27_Index_0-opt-2-3-239_postQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:09 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-239_postQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:09 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-239_postQMOPTpostfit.alz']
+Wed Jun  8 16:55:09 2022 Calling: analyze 25_27_Index_0-opt-2-3-239_preQMOPTpostfit.xyz -k tmp-2-3-239_preQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-239_preQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:09 2022 Waiting on 25_27_Index_0-opt-2-3-239_preQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:09 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-239_preQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:10 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-239_preQMOPTpostfit.alz']
+Wed Jun  8 16:55:10 2022 Calling: minimize 25_27_Index_0-opt-2-3-269_postQMOPTpostfit.xyz -k tmp-2-3-269_postQMOPTpostfit.key 0.1 >25_27_Index_0-opt-2-3-269_postQMOPTpostfit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:10 2022 Waiting on 25_27_Index_0-opt-2-3-269_postQMOPTpostfit.out to begin
+Wed Jun  8 16:55:10 2022 Waiting on 25_27_Index_0-opt-2-3-269_postQMOPTpostfit.out for termination 
+Wed Jun  8 16:55:10 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-269_postQMOPTpostfit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:10 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-269_postQMOPTpostfit.out']
+Wed Jun  8 16:55:10 2022 Calling: analyze 25_27_Index_0-opt-2-3-269_postQMOPTpostfit.xyz_2 -k tmp-2-3-269_postQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-269_postQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:10 2022 Waiting on 25_27_Index_0-opt-2-3-269_postQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:11 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-269_postQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:11 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-269_postQMOPTpostfit.alz']
+Wed Jun  8 16:55:11 2022 Calling: analyze 25_27_Index_0-opt-2-3-269_preQMOPTpostfit.xyz -k tmp-2-3-269_preQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-269_preQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:11 2022 Waiting on 25_27_Index_0-opt-2-3-269_preQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:11 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-269_preQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:11 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-269_preQMOPTpostfit.alz']
+Wed Jun  8 16:55:11 2022 Calling: minimize 25_27_Index_0-opt-2-3-299_postQMOPTpostfit.xyz -k tmp-2-3-299_postQMOPTpostfit.key 0.1 >25_27_Index_0-opt-2-3-299_postQMOPTpostfit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:11 2022 Waiting on 25_27_Index_0-opt-2-3-299_postQMOPTpostfit.out to begin
+Wed Jun  8 16:55:11 2022 Waiting on 25_27_Index_0-opt-2-3-299_postQMOPTpostfit.out for termination 
+Wed Jun  8 16:55:12 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-299_postQMOPTpostfit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:12 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-299_postQMOPTpostfit.out']
+Wed Jun  8 16:55:12 2022 Calling: analyze 25_27_Index_0-opt-2-3-299_postQMOPTpostfit.xyz_2 -k tmp-2-3-299_postQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-299_postQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:12 2022 Waiting on 25_27_Index_0-opt-2-3-299_postQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:12 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-299_postQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:12 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-299_postQMOPTpostfit.alz']
+Wed Jun  8 16:55:12 2022 Calling: analyze 25_27_Index_0-opt-2-3-299_preQMOPTpostfit.xyz -k tmp-2-3-299_preQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-299_preQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:12 2022 Waiting on 25_27_Index_0-opt-2-3-299_preQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:13 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-299_preQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:13 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-299_preQMOPTpostfit.alz']
+Wed Jun  8 16:55:13 2022 Calling: minimize 25_27_Index_0-opt-2-3-329_postQMOPTpostfit.xyz -k tmp-2-3-329_postQMOPTpostfit.key 0.1 >25_27_Index_0-opt-2-3-329_postQMOPTpostfit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:13 2022 Waiting on 25_27_Index_0-opt-2-3-329_postQMOPTpostfit.out for termination 
+Wed Jun  8 16:55:13 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-329_postQMOPTpostfit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:14 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-329_postQMOPTpostfit.out']
+Wed Jun  8 16:55:14 2022 Calling: analyze 25_27_Index_0-opt-2-3-329_postQMOPTpostfit.xyz_2 -k tmp-2-3-329_postQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-329_postQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:14 2022 Waiting on 25_27_Index_0-opt-2-3-329_postQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:14 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-329_postQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:14 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-329_postQMOPTpostfit.alz']
+Wed Jun  8 16:55:14 2022 Calling: analyze 25_27_Index_0-opt-2-3-329_preQMOPTpostfit.xyz -k tmp-2-3-329_preQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-329_preQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:14 2022 Waiting on 25_27_Index_0-opt-2-3-329_preQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:14 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-329_preQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:14 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-329_preQMOPTpostfit.alz']
+Wed Jun  8 16:55:15 2022 Calling: minimize 25_27_Index_0-opt-2-3-359_postQMOPTpostfit.xyz -k tmp-2-3-359_postQMOPTpostfit.key 0.1 >25_27_Index_0-opt-2-3-359_postQMOPTpostfit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:15 2022 Waiting on 25_27_Index_0-opt-2-3-359_postQMOPTpostfit.out for termination 
+Wed Jun  8 16:55:15 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-359_postQMOPTpostfit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:15 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-359_postQMOPTpostfit.out']
+Wed Jun  8 16:55:15 2022 Calling: analyze 25_27_Index_0-opt-2-3-359_postQMOPTpostfit.xyz_2 -k tmp-2-3-359_postQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-359_postQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:15 2022 Waiting on 25_27_Index_0-opt-2-3-359_postQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:16 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-359_postQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:16 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-359_postQMOPTpostfit.alz']
+Wed Jun  8 16:55:16 2022 Calling: analyze 25_27_Index_0-opt-2-3-359_preQMOPTpostfit.xyz -k tmp-2-3-359_preQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-359_preQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:16 2022 Waiting on 25_27_Index_0-opt-2-3-359_preQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:16 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-359_preQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:16 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-359_preQMOPTpostfit.alz']
+Wed Jun  8 16:55:16 2022 Calling: minimize 25_27_Index_0-opt-2-3-149_postQMOPTpostfit.xyz -k tmp-2-3-149_postQMOPTpostfit.key 0.1 >25_27_Index_0-opt-2-3-149_postQMOPTpostfit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:16 2022 Waiting on 25_27_Index_0-opt-2-3-149_postQMOPTpostfit.out for termination 
+Wed Jun  8 16:55:17 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-149_postQMOPTpostfit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:17 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-149_postQMOPTpostfit.out']
+Wed Jun  8 16:55:17 2022 Calling: analyze 25_27_Index_0-opt-2-3-149_postQMOPTpostfit.xyz_2 -k tmp-2-3-149_postQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-149_postQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:17 2022 Waiting on 25_27_Index_0-opt-2-3-149_postQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:17 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-149_postQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:17 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-149_postQMOPTpostfit.alz']
+Wed Jun  8 16:55:17 2022 Calling: analyze 25_27_Index_0-opt-2-3-149_preQMOPTpostfit.xyz -k tmp-2-3-149_preQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-149_preQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:17 2022 Waiting on 25_27_Index_0-opt-2-3-149_preQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:18 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-149_preQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:18 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-149_preQMOPTpostfit.alz']
+Wed Jun  8 16:55:18 2022 Calling: minimize 25_27_Index_0-opt-2-3-119_postQMOPTpostfit.xyz -k tmp-2-3-119_postQMOPTpostfit.key 0.1 >25_27_Index_0-opt-2-3-119_postQMOPTpostfit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:18 2022 Waiting on 25_27_Index_0-opt-2-3-119_postQMOPTpostfit.out for termination 
+Wed Jun  8 16:55:18 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-119_postQMOPTpostfit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:18 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-119_postQMOPTpostfit.out']
+Wed Jun  8 16:55:18 2022 Calling: analyze 25_27_Index_0-opt-2-3-119_postQMOPTpostfit.xyz_2 -k tmp-2-3-119_postQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-119_postQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:18 2022 Waiting on 25_27_Index_0-opt-2-3-119_postQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:19 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-119_postQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:19 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-119_postQMOPTpostfit.alz']
+Wed Jun  8 16:55:19 2022 Calling: analyze 25_27_Index_0-opt-2-3-119_preQMOPTpostfit.xyz -k tmp-2-3-119_preQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-119_preQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:19 2022 Waiting on 25_27_Index_0-opt-2-3-119_preQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:19 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-119_preQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:19 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-119_preQMOPTpostfit.alz']
+Wed Jun  8 16:55:19 2022 Calling: minimize 25_27_Index_0-opt-2-3-089_postQMOPTpostfit.xyz -k tmp-2-3-089_postQMOPTpostfit.key 0.1 >25_27_Index_0-opt-2-3-089_postQMOPTpostfit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:19 2022 Waiting on 25_27_Index_0-opt-2-3-089_postQMOPTpostfit.out for termination 
+Wed Jun  8 16:55:20 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-089_postQMOPTpostfit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:20 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-089_postQMOPTpostfit.out']
+Wed Jun  8 16:55:20 2022 Calling: analyze 25_27_Index_0-opt-2-3-089_postQMOPTpostfit.xyz_2 -k tmp-2-3-089_postQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-089_postQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:20 2022 Waiting on 25_27_Index_0-opt-2-3-089_postQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:20 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-089_postQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:20 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-089_postQMOPTpostfit.alz']
+Wed Jun  8 16:55:20 2022 Calling: analyze 25_27_Index_0-opt-2-3-089_preQMOPTpostfit.xyz -k tmp-2-3-089_preQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-089_preQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:20 2022 Waiting on 25_27_Index_0-opt-2-3-089_preQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:21 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-089_preQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:21 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-089_preQMOPTpostfit.alz']
+Wed Jun  8 16:55:21 2022 Calling: minimize 25_27_Index_0-opt-2-3-059_postQMOPTpostfit.xyz -k tmp-2-3-059_postQMOPTpostfit.key 0.1 >25_27_Index_0-opt-2-3-059_postQMOPTpostfit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:21 2022 Waiting on 25_27_Index_0-opt-2-3-059_postQMOPTpostfit.out for termination 
+Wed Jun  8 16:55:21 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-059_postQMOPTpostfit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:22 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-059_postQMOPTpostfit.out']
+Wed Jun  8 16:55:22 2022 Calling: analyze 25_27_Index_0-opt-2-3-059_postQMOPTpostfit.xyz_2 -k tmp-2-3-059_postQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-059_postQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:22 2022 Waiting on 25_27_Index_0-opt-2-3-059_postQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:22 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-059_postQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:22 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-059_postQMOPTpostfit.alz']
+Wed Jun  8 16:55:22 2022 Calling: analyze 25_27_Index_0-opt-2-3-059_preQMOPTpostfit.xyz -k tmp-2-3-059_preQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-059_preQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:22 2022 Waiting on 25_27_Index_0-opt-2-3-059_preQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:22 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-059_preQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:22 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-059_preQMOPTpostfit.alz']
+Wed Jun  8 16:55:22 2022 Calling: minimize 25_27_Index_0-opt-2-3-029_postQMOPTpostfit.xyz -k tmp-2-3-029_postQMOPTpostfit.key 0.1 >25_27_Index_0-opt-2-3-029_postQMOPTpostfit.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:23 2022 Waiting on 25_27_Index_0-opt-2-3-029_postQMOPTpostfit.out for termination 
+Wed Jun  8 16:55:23 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-029_postQMOPTpostfit.out path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:23 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-029_postQMOPTpostfit.out']
+Wed Jun  8 16:55:23 2022 Calling: analyze 25_27_Index_0-opt-2-3-029_postQMOPTpostfit.xyz_2 -k tmp-2-3-029_postQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-029_postQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:23 2022 Waiting on 25_27_Index_0-opt-2-3-029_postQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:23 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-029_postQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:24 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-029_postQMOPTpostfit.alz']
+Wed Jun  8 16:55:24 2022 Calling: analyze 25_27_Index_0-opt-2-3-029_preQMOPTpostfit.xyz -k tmp-2-3-029_preQMOPTpostfit.key ed > 25_27_Index_0-opt-2-3-029_preQMOPTpostfit.alz path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:24 2022 Waiting on 25_27_Index_0-opt-2-3-029_preQMOPTpostfit.alz for termination 
+Wed Jun  8 16:55:24 2022 Normal termination: logfile=25_27_Index_0-opt-2-3-029_preQMOPTpostfit.alz path=/home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0/qm-torsion
+Wed Jun  8 16:55:24 2022 All jobs have terminated ['25_27_Index_0-opt-2-3-029_preQMOPTpostfit.alz']
+Wed Jun  8 16:55:24 2022 Torsion 401 402 403 404 RMSD(MM2,QM) 1.0665848215437663 RelativeRMSD(MM2,QM) 0.14909932194565248 
+
+Wed Jun  8 16:55:24 2022 Torsion 405 402 403 404 RMSD(MM2,QM) 1.0665848215437663 RelativeRMSD(MM2,QM) 0.14909932194565248 
+
+Wed Jun  8 16:55:24 2022 
+Wed Jun  8 16:55:24 2022 =========================================================
+Wed Jun  8 16:55:24 2022 Minimizing structure
+
+Wed Jun  8 16:55:24 2022 Calling: minimize -k final.key final.xyz 0.1 > Minimized_final.out path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0
+Wed Jun  8 16:55:25 2022 
+
+Wed Jun  8 16:55:25 2022 =========================================================
+
+Wed Jun  8 16:55:25 2022 Structure RMSD Comparison
+
+
+Wed Jun  8 16:55:25 2022 Calling: superpose 25_27_Index_0.xyz_2 final.xyz_2 1 N M N 0  > 25_27_Index_0-superin.txt path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0
+Wed Jun  8 16:55:26 2022 RMSD = 0.515624 Tolerance is 1
+Wed Jun  8 16:55:26 2022 Calling: analyze 25_27_Index_0.xyz_2 -k final.key em | grep -A11 Charge>MMDipole.txt path = /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0
+Wed Jun  8 16:55:26 2022 Relative error of 0.000540832882639325 for QMDipole 3.698 and 3.7 for MMDipole  tolerance = 0.5 /home/bdw2292/PoltypeJobs/farH_in17/Temp/Fragments/25_27_Index_0
+Wed Jun  8 16:55:26 2022 Poltype Job Finished
+

@@ -1,0 +1,31 @@
+parameters /home/bdw2292/poltype2/ParameterFiles/amoebabio18_header.prm
+OPENMP-THREADS 1
+bondterm none
+angleterm none
+torsionterm none
+vdwterm none
+fix-monopole
+digits 8
+potential-offset 1.0
+RESP-WEIGHT 1
+
+atom          402    402    H     "43_Index_0          "         1     1.008    1
+atom          401    401    N     "43_Index_0          "         7    14.007    3
+
+multipole    402    401   -402   -402         0.074657
+                                      0.00894    0.00000   -0.17113
+                                     -0.01036
+                                      0.00000    0.00650
+                                      0.02228    0.00000    0.00386
+multipole    401   -402   -402   -402        -0.223970
+                                     -0.00002    0.00000    0.29675
+                                      0.46427
+                                      0.00000    0.46433
+                                      0.00010    0.00000   -0.92860
+
+# updated valence parameter database match, comments=H on HI SMARTS match = [H][NH3]
+
+polarize           402          0.4573     0.3900 401
+# updated valence parameter database match, comments=N on ammonia SMARTS match = [NX3H3]
+
+polarize           401          1.1557     0.3900 402

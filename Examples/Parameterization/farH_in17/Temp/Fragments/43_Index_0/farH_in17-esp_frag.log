@@ -1,0 +1,316 @@
+
+    -----------------------------------------------------------------------
+          Psi4: An Open-Source Ab Initio Electronic Structure Package
+                               Psi4 1.3.2 release
+
+                         Git: Rev {HEAD} ecbda83 
+
+
+    R. M. Parrish, L. A. Burns, D. G. A. Smith, A. C. Simmonett,
+    A. E. DePrince III, E. G. Hohenstein, U. Bozkaya, A. Yu. Sokolov,
+    R. Di Remigio, R. M. Richard, J. F. Gonthier, A. M. James,
+    H. R. McAlexander, A. Kumar, M. Saitow, X. Wang, B. P. Pritchard,
+    P. Verma, H. F. Schaefer III, K. Patkowski, R. A. King, E. F. Valeev,
+    F. A. Evangelista, J. M. Turney, T. D. Crawford, and C. D. Sherrill,
+    J. Chem. Theory Comput. 13(7) pp 3185--3197 (2017).
+    (doi: 10.1021/acs.jctc.7b00174)
+
+
+                         Additional Contributions by
+    P. Kraus, H. Kruse, M. H. Lechner, M. C. Schieber, R. A. Shaw,
+    A. Alenaizan, R. Galvelis, Z. L. Glick, S. Lehtola, and J. P. Misiewicz
+
+    -----------------------------------------------------------------------
+
+
+    Psi4 started on: Thursday, 04 November 2021 02:13PM
+
+    Process ID: 36415
+    Host:       node44.bme.utexas.edu
+    PSIDATADIR: /home/bdw2292/miniconda3/envs/amoebamdpoltype/share/psi4
+    Memory:     500.0 MiB
+    Threads:    1
+    
+  ==> Input File <==
+
+--------------------------------------------------------------------------
+molecule { 
+0 1
+H          2.04670        2.35900        1.59500
+N          2.01500        1.48570        1.02620
+H          1.42100        1.63280        0.21010
+H          1.63500        0.72590        1.59070
+}
+memory 100GB
+set_num_threads(12)
+psi4_io.set_default_path("/scratch/bdw2292/Psi4-farH_in17")
+set maxiter 500
+set freeze_core True
+set PROPERTIES_ORIGIN ["COM"]
+set cubeprop_tasks ['esp']
+E, wfn = properties('hf/MINIX',properties=['dipole'],return_wfn=True)
+cubeprop(wfn)
+fchk(wfn, "farH_in17-esp_frag.fchk")
+oeprop(wfn,"WIBERG_LOWDIN_INDICES","MULLIKEN_CHARGES")
+clean()
+--------------------------------------------------------------------------
+
+  Memory set to  93.132 GiB by Python driver.
+  Threads set to 12 by Python driver.
+
+*** tstart() called on node44.bme.utexas.edu
+*** at Thu Nov  4 14:13:32 2021
+
+   => Loading Basis Set <=
+
+    Name: MINIX
+    Role: ORBITAL
+    Keyword: BASIS
+    atoms 1, 3-4 entry H          line    24 file /home/bdw2292/miniconda3/envs/amoebamdpoltype/share/psi4/basis/minix.gbs 
+    atoms 2      entry N          line    88 file /home/bdw2292/miniconda3/envs/amoebamdpoltype/share/psi4/basis/minix.gbs 
+
+
+         ---------------------------------------------------------
+                                   SCF
+               by Justin Turney, Rob Parrish, Andy Simmonett
+                          and Daniel G. A. Smith
+                              RHF Reference
+                       12 Threads,  95367 MiB Core
+         ---------------------------------------------------------
+
+  ==> Geometry <==
+
+    Molecular point group: c1
+    Full point group: C1
+
+    Geometry (in Angstrom), charge = 0, multiplicity = 1:
+
+       Center              X                  Y                   Z               Mass       
+    ------------   -----------------  -----------------  -----------------  -----------------
+         H            0.087476042593     0.857874724929     0.550024492507     1.007825032230
+         N            0.055776042593    -0.015425275071    -0.018775507493    14.003074004430
+         H           -0.538223957407     0.131674724929    -0.834875507493     1.007825032230
+         H           -0.324223957407    -0.775225275071     0.545724492507     1.007825032230
+
+  Running in c1 symmetry.
+
+  Rotational constants: A =      9.97697  B =      9.73420  C =      5.93962 [cm^-1]
+  Rotational constants: A = 299101.99159  B = 291823.93271  C = 178065.18211 [MHz]
+  Nuclear repulsion =   11.761818767440035
+
+  Charge       = 0
+  Multiplicity = 1
+  Electrons    = 10
+  Nalpha       = 5
+  Nbeta        = 5
+
+  ==> Algorithm <==
+
+  SCF Algorithm Type is DF.
+  DIIS enabled.
+  MOM disabled.
+  Fractional occupation disabled.
+  Guess Type is SAD.
+  Energy threshold   = 1.00e-06
+  Density threshold  = 1.00e-06
+  Integral threshold = 0.00e+00
+
+  ==> Primary Basis <==
+
+  Basis Set: MINIX
+    Blend: MINIX
+    Number of shells: 6
+    Number of basis function: 8
+    Number of Cartesian functions: 8
+    Spherical Harmonics?: true
+    Max angular momentum: 1
+
+   => Loading Basis Set <=
+
+    Name: (MINIX AUX)
+    Role: JKFIT
+    Keyword: DF_BASIS_SCF
+    atoms 1, 3-4 entry H          line    23 file /home/bdw2292/miniconda3/envs/amoebamdpoltype/share/psi4/basis/def2-svp-jkfit.gbs 
+    atoms 2      entry N          line   263 file /home/bdw2292/miniconda3/envs/amoebamdpoltype/share/psi4/basis/def2-svp-jkfit.gbs 
+
+  ==> Pre-Iterations <==
+
+   -------------------------------------------------------
+    Irrep   Nso     Nmo     Nalpha   Nbeta   Ndocc  Nsocc
+   -------------------------------------------------------
+     A          8       8       0       0       0       0
+   -------------------------------------------------------
+    Total       8       8       5       5       5       0
+   -------------------------------------------------------
+
+  ==> Integral Setup <==
+
+  DFHelper Memory: AOs need 0.000 GiB; user supplied 69.849 GiB. Using in-core AOs.
+
+  ==> MemDFJK: Density-Fitted J/K Matrices <==
+
+    J tasked:                   Yes
+    K tasked:                   Yes
+    wK tasked:                   No
+    OpenMP threads:              12
+    Memory [MiB]:             71525
+    Algorithm:                 Core
+    Schwarz Cutoff:           1E-12
+    Mask sparsity (%):       0.0000
+    Fitting Condition:        1E-10
+
+   => Auxiliary Basis Set <=
+
+  Basis Set: (MINIX AUX)
+    Blend: DEF2-SVP-JKFIT
+    Number of shells: 43
+    Number of basis function: 131
+    Number of Cartesian functions: 153
+    Spherical Harmonics?: true
+    Max angular momentum: 4
+
+  Minimum eigenvalue in the overlap matrix is 2.7483329732E-01.
+  Using Symmetric Orthogonalization.
+
+  SCF Guess: Superposition of Atomic Densities via on-the-fly atomic UHF.
+
+  ==> Iterations <==
+
+                           Total Energy        Delta E     RMS |[F,P]|
+
+   @DF-RHF iter SAD:   -54.83671914996864   -5.48367e+01   0.00000e+00 
+   @DF-RHF iter   1:   -55.77995066464381   -9.43232e-01   1.96055e-02 DIIS
+   @DF-RHF iter   2:   -55.79671838015322   -1.67677e-02   4.22679e-03 DIIS
+   @DF-RHF iter   3:   -55.79736720275390   -6.48823e-04   8.59063e-04 DIIS
+   @DF-RHF iter   4:   -55.79740886157339   -4.16588e-05   2.21305e-05 DIIS
+   @DF-RHF iter   5:   -55.79740890832669   -4.67533e-08   5.63523e-06 DIIS
+   @DF-RHF iter   6:   -55.79740891148855   -3.16187e-09   1.49297e-07 DIIS
+  Energy and wave function converged.
+
+
+  ==> Post-Iterations <==
+
+    Orbital Energies [Eh]
+    ---------------------
+
+    Doubly Occupied:                                                      
+
+       1A    -15.339497     2A     -1.097464     3A     -0.595491  
+       4A     -0.589581     5A     -0.388321  
+
+    Virtual:                                                              
+
+       6A      0.644992     7A      0.709321     8A      0.725562  
+
+    Final Occupation by Irrep:
+              A 
+    DOCC [     5 ]
+
+  @DF-RHF Final Energy:   -55.79740891148855
+
+   => Energetics <=
+
+    Nuclear Repulsion Energy =             11.7618187674400350
+    One-Electron Energy =                 -99.0977458605107842
+    Two-Electron Energy =                  31.5385181815821944
+    Total Energy =                        -55.7974089114885601
+
+Computation Completed
+
+
+Properties will be evaluated at  -0.000000,   0.000000,   0.000000 [a0]
+
+Properties computed using the HF density matrix
+
+  Nuclear Dipole Moment: [e a0]
+     X:    -0.7267      Y:     0.2010      Z:     0.2446
+
+  Electronic Dipole Moment: [e a0]
+     X:     0.0926      Y:    -0.0335      Z:    -0.0363
+
+  Dipole Moment: [e a0]
+     X:    -0.6341      Y:     0.1675      Z:     0.2083     Total:     0.6881
+
+  Dipole Moment: [D]
+     X:    -1.6117      Y:     0.4257      Z:     0.5294     Total:     1.7490
+
+
+*** tstop() called on node44.bme.utexas.edu at Thu Nov  4 14:13:34 2021
+Module time:
+	user time   =      10.93 seconds =       0.18 minutes
+	system time =       0.70 seconds =       0.01 minutes
+	total time  =          2 seconds =       0.03 minutes
+Total time:
+	user time   =      10.93 seconds =       0.18 minutes
+	system time =       0.70 seconds =       0.01 minutes
+	total time  =          2 seconds =       0.03 minutes
+  ==> One Electron Grid Properties (v2.0) <==
+
+  ==> CubicScalarGrid <==
+
+    Filepath     = .
+    Total Points =           147345
+    XYZ Blocking =               10
+    X Points     =               47
+    Y Points     =               57
+    Z Points     =               55
+    X Spacing    =        2.000E-01
+    Y Spacing    =        2.000E-01
+    Z Spacing    =        2.000E-01
+    X Minimum    =       -5.026E+00
+    Y Minimum    =       -5.522E+00
+    Z Minimum    =       -5.669E+00
+    X Maximum    =        4.174E+00
+    Y Maximum    =        5.678E+00
+    Z Maximum    =        5.131E+00
+
+  Basis Set: MINIX
+    Blend: MINIX
+    Number of shells: 6
+    Number of basis function: 8
+    Number of Cartesian functions: 8
+    Spherical Harmonics?: true
+    Max angular momentum: 1
+
+
+
+Properties will be evaluated at  -0.000000,   0.000000,   0.000000 [a0]
+OEProp: No title given, name of density matrix used for the following properties is 'SCF density'
+  Mulliken Charges: (a.u.)
+   Center  Symbol    Alpha    Beta     Spin     Total
+       1     H     0.40211  0.40211  0.00000  0.19579
+       2     N     3.79520  3.79520  0.00000 -0.59039
+       3     H     0.40135  0.40135  0.00000  0.19730
+       4     H     0.40135  0.40135  0.00000  0.19730
+
+   Total alpha =  5.00000, Total beta =  5.00000, Total charge = -0.00000
+
+
+
+  Wiberg Bond Indices using Orthogonal Lowdin Orbitals:
+
+  Irrep: 1 Size: 4 x 4
+
+                 1                   2                   3                   4
+
+    1     0.00000000000000     0.98095780452543     0.00007002533749     0.00006980391824
+    2     0.98095780452543     0.00000000000000     0.98145088406958     0.98145307789608
+    3     0.00007002533749     0.98145088406958     0.00000000000000     0.00003451051412
+    4     0.00006980391824     0.98145307789608     0.00003451051412     0.00000000000000
+
+
+
+  Atomic Valences: 
+
+ #  #
+ Irrep: 1
+      1:  0.9810976
+      2:  2.9438618
+      3:  0.9815554
+      4:  0.9815574
+
+
+    Psi4 stopped on: Thursday, 04 November 2021 02:13PM
+    Psi4 wall time for execution: 0:00:03.31
+
+*** Psi4 exiting successfully. Buy a developer a beer!

@@ -1,0 +1,256 @@
+parameters /home/bdw2292/poltype2/ParameterFiles/amoebabio18_header.prm
+OPENMP-THREADS 1
+bondterm none
+angleterm none
+torsionterm none
+vdwterm none
+fix-monopole
+digits 8
+potential-offset 1.0
+RESP-WEIGHT 1
+
+atom          405    405    C     "7_1_Index_0_GrowFrag"         6    12.011    3
+atom          403    403    C     "7_1_Index_0_GrowFrag"         6    12.011    3
+atom          413    413    N     "7_1_Index_0_GrowFrag"         7    14.007    3
+atom          406    406    C     "7_1_Index_0_GrowFrag"         6    12.011    3
+atom          419    419    H     "7_1_Index_0_GrowFrag"         1     1.008    1
+atom          404    404    C     "7_1_Index_0_GrowFrag"         6    12.011    3
+atom          416    416    N     "7_1_Index_0_GrowFrag"         7    14.007    3
+atom          401    401    C     "7_1_Index_0_GrowFrag"         6    12.011    3
+atom          402    402    C     "7_1_Index_0_GrowFrag"         6    12.011    3
+atom         414   414    C     "7_1_Index_0_GrowFrag"         6    12.011    3
+atom         407   407    C     "7_1_Index_0_GrowFrag"         6    12.011    3
+atom         415   415    C     "7_1_Index_0_GrowFrag"         6    12.011    3
+atom         412   412    C     "7_1_Index_0_GrowFrag"         6    12.011    3
+atom         410   410    C     "7_1_Index_0_GrowFrag"         6    12.011    3
+atom         408   408    C     "7_1_Index_0_GrowFrag"         6    12.011    3
+atom         409   409    C     "7_1_Index_0_GrowFrag"         6    12.011    3
+atom         417   417    H     "7_1_Index_0_GrowFrag"         1     1.008    1
+atom         426   426    O     "7_1_Index_0_GrowFrag"         8    15.999    1
+atom         425   425    H     "7_1_Index_0_GrowFrag"         1     1.008    1
+atom         423   423    H     "7_1_Index_0_GrowFrag"         1     1.008    1
+atom         424   424    H     "7_1_Index_0_GrowFrag"         1     1.008    1
+atom         420   420    H     "7_1_Index_0_GrowFrag"         1     1.008    1
+atom         421   421    H     "7_1_Index_0_GrowFrag"         1     1.008    1
+atom         411   411    N     "7_1_Index_0_GrowFrag"         7    14.007    3
+atom         418   418    H     "7_1_Index_0_GrowFrag"         1     1.008    1
+atom         427   427    H     "7_1_Index_0_GrowFrag"         1     1.008    1
+atom         422   422    H     "7_1_Index_0_GrowFrag"         1     1.008    1
+
+multipole    405    401    404             -0.09552
+                                      0.13294    0.00000   -0.14997
+                                      0.09233
+                                      0.00000    0.19102
+                                     -0.40616    0.00000   -0.28335
+multipole    403    414    413              0.30082
+                                      0.42392    0.00000    0.14415
+                                     -0.19163
+                                      0.00000    0.21570
+                                     -0.78136    0.00000   -0.02407
+multipole    413    419    406             -0.36606
+                                      0.14781    0.00000    0.10880
+                                      0.02946
+                                      0.00000   -0.58250
+                                     -0.04725    0.00000    0.55304
+multipole    406   -410   -410             -0.00955
+                                      0.00000    0.00000   -0.15378
+                                     -0.21863
+                                      0.00000   -0.01765
+                                      0.00000    0.00000    0.23628
+multipole    419    413    406              0.15050
+                                     -0.00891    0.00000   -0.03019
+                                      0.02310
+                                      0.00000   -0.03755
+                                     -0.00827    0.00000    0.01445
+multipole    404    418    402             -0.13755
+                                      0.00040    0.00000   -0.06212
+                                     -0.11505
+                                      0.00000   -0.37890
+                                     -0.04896    0.00000    0.49395
+multipole    416    417    402             -0.28753
+                                      0.21678    0.00000    0.04830
+                                      0.07042
+                                      0.00000   -0.77406
+                                     -0.43831    0.00000    0.70364
+multipole    401    426    416              0.79781
+                                      0.23828    0.00000    0.41925
+                                     -0.07672
+                                      0.00000    0.01002
+                                     -0.81724    0.00000    0.06670
+multipole    402    427    416              0.18029
+                                      0.29788    0.00000   -0.23038
+                                      0.23946
+                                      0.00000   -0.35757
+                                     -0.35468    0.00000    0.11811
+multipole    414   -407   -407             -0.11395
+                                      0.00000    0.00000    0.20576
+                                      0.51402
+                                      0.00000    0.16841
+                                      0.00000    0.00000   -0.68243
+multipole    407    425    415             -0.07468
+                                     -0.01256    0.00000    0.04480
+                                      0.04231
+                                      0.00000   -0.02564
+                                     -0.09965    0.00000   -0.01667
+multipole    415    423    412              0.07623
+                                      0.01724    0.00000   -0.23987
+                                     -0.23219
+                                      0.00000   -0.35941
+                                     -0.04694    0.00000    0.59160
+multipole    412   -415   -415             -0.03741
+                                      0.00000    0.00000   -0.02358
+                                      0.21630
+                                      0.00000   -0.13107
+                                      0.00000    0.00000   -0.08523
+multipole    410    420    408             -0.05457
+                                      0.00991    0.00000    0.09446
+                                      0.08740
+                                      0.00000   -0.17636
+                                     -0.07207    0.00000    0.08896
+multipole    408    421    409              0.07129
+                                     -0.02324    0.00000   -0.24491
+                                     -0.47770
+                                      0.00000   -0.65322
+                                      0.03710    0.00000    1.13092
+multipole    409   -408   -408              0.13355
+                                      0.00000    0.00000   -0.16184
+                                     -0.16466
+                                      0.00000   -0.04220
+                                      0.00000    0.00000    0.20686
+multipole    417    416    402              0.10354
+                                     -0.01413    0.00000   -0.21960
+                                      0.03168
+                                      0.00000    0.00851
+                                     -0.01646    0.00000   -0.04019
+multipole    426    401    416             -0.74142
+                                      0.04823    0.00000   -0.30081
+                                     -0.41124
+                                      0.00000    0.43009
+                                      0.16280    0.00000   -0.01885
+multipole    425    407    415              0.02516
+                                     -0.01799    0.00000   -0.17991
+                                      0.06274
+                                      0.00000   -0.00592
+                                     -0.00588    0.00000   -0.05683
+multipole    423    415    412              0.00645
+                                     -0.00577    0.00000   -0.17925
+                                      0.02775
+                                      0.00000    0.01070
+                                     -0.00320    0.00000   -0.03846
+multipole    424    412      0              0.00454
+                                      0.00000    0.00000   -0.18399
+                                      0.01943
+                                      0.00000    0.01943
+                                      0.00000    0.00000   -0.03885
+multipole    420    410    408              0.03640
+                                     -0.05735    0.00000   -0.18819
+                                      0.14010
+                                      0.00000   -0.03695
+                                     -0.05577    0.00000   -0.10315
+multipole    421    408    409             -0.00436
+                                     -0.00564    0.00000   -0.20841
+                                      0.02679
+                                      0.00000    0.01212
+                                     -0.01095    0.00000   -0.03891
+multipole    411   -422   -422             -0.31684
+                                      0.00000    0.00000    0.22308
+                                      0.60662
+                                      0.00000   -0.50560
+                                      0.00000    0.00000   -0.10102
+multipole    418    404    402              0.04259
+                                     -0.03238    0.00000   -0.19673
+                                      0.06197
+                                      0.00000   -0.00005
+                                     -0.01174    0.00000   -0.06192
+multipole    427    402    416              0.02618
+                                     -0.00684    0.00000   -0.19963
+                                      0.02952
+                                      0.00000    0.01530
+                                     -0.00728    0.00000   -0.04482
+multipole    422    411    422              0.10108
+                                     -0.01468    0.00000   -0.11911
+                                     -0.00830
+                                      0.00000   -0.00068
+                                     -0.00443    0.00000    0.00898
+
+# updated valence parameter database match, comments=C on conjugated systems SMARTS match = [C]([C]=[*])([C]=[*])
+
+polarize           405          2.0645     0.3900 404 401
+# updated valence parameter database match, comments=C connected to aromatic carbon SMARTS match = [C][c]
+
+polarize           403          1.4150     0.3900
+# updated valence parameter database match, comments=N connected to aromatic carbon via double bond SMARTS match = [N][C]
+
+polarize           413          1.1847     0.3900 419
+# updated valence parameter database match, comments=C on conjugated systems SMARTS match = [C]([C]=[*])([C]=[*])
+
+polarize           406          2.0645     0.3900 410
+# updated valence parameter database match, comments=H on HI SMARTS match = [H][N]
+
+polarize           419          0.4573     0.3900 413
+# updated valence parameter database match, comments=C on conjugated systems SMARTS match = [C]([C]=[*])([C]=[*])
+
+polarize           404          2.0645     0.3900 405 402 418
+# updated valence parameter database match, comments=N on amide SMARTS match = [NX3]([CX3](=O))
+
+polarize           416          1.2433     0.3900 401 402 417
+# updated valence parameter database match, comments=C on conjugated systems SMARTS match = [C]([C]=[*])([C]=[*])
+
+polarize           401          2.0645     0.3900 405 416 426
+# updated valence parameter database match, comments=C on conjugated systems SMARTS match = [C]([C]=[*])([C]=[*])
+
+polarize           402          2.0645     0.3900 404 416 427
+# updated valence parameter database match, comments=C on conjugated systems SMARTS match = [C]([C]=[*])([C]=[*])
+
+polarize          414          2.0645     0.3900 407
+# updated valence parameter database match, comments=C on conjugated systems SMARTS match = [C]([C]=[*])([C]=[*])
+
+polarize          407          2.0645     0.3900 414 415 425
+# updated valence parameter database match, comments=C on conjugated systems SMARTS match = [C]([C]=[*])([C]=[*])
+
+polarize          415          2.0645     0.3900 407 412 423
+# updated valence parameter database match, comments=C on conjugated systems SMARTS match = [C]([C]=[*])([C]=[*])
+
+polarize          412          2.0645     0.3900 415 424
+# updated valence parameter database match, comments=C on conjugated systems SMARTS match = [C]([C]=[*])([C]=[*])
+
+polarize          410          2.0645     0.3900 406 408 420
+# updated valence parameter database match, comments=C on conjugated systems SMARTS match = [C]([C]=[*])([C]=[*])
+
+polarize          408          2.0645     0.3900 410 409 421
+# updated valence parameter database match, comments=C on conjugated systems SMARTS match = [C]([C]=[*])([C]=[*])
+
+polarize          409          2.0645     0.3900 408
+# updated valence parameter database match, comments=H on HI SMARTS match = [H][N]
+
+polarize          417          0.4573     0.3900 416
+# updated valence parameter database match, comments=O on carbonyl group SMARTS match = [OX1]=[CX3]
+
+polarize          426          0.9138     0.3900 401
+# updated valence parameter database match, comments=H on C=C system SMARTS match = [H][c]
+
+polarize          425          0.4318     0.3900 407
+# updated valence parameter database match, comments=H on C=C system SMARTS match = [H][c]
+
+polarize          423          0.4318     0.3900 415
+# updated valence parameter database match, comments=H on C=C system SMARTS match = [H][c]
+
+polarize          424          0.4318     0.3900 412
+# updated valence parameter database match, comments=H on C=C system SMARTS match = [H][c]
+
+polarize          420          0.4318     0.3900 410
+# updated valence parameter database match, comments=H on C=C system SMARTS match = [H][c]
+
+polarize          421          0.4318     0.3900 408
+# updated valence parameter database match, comments=N connected to aromatic carbon via double bond SMARTS match = [N][c]
+
+polarize          411          1.1847     0.3900 422
+# updated valence parameter database match, comments=H on C=C system SMARTS match = [H][C]=[C]
+
+polarize          418          0.4318     0.3900 404
+# updated valence parameter database match, comments=H on C=C system SMARTS match = [H][C]=[C]
+
+polarize          427          0.4318     0.3900 402
+# updated valence parameter database match, comments=H on HI SMARTS match = [H][N]
+
+polarize          422          0.4573     0.3900 411

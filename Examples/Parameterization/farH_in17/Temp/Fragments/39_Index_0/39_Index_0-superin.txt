@@ -1,0 +1,52 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.9.4   September 2021                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      402   402     O     39_Index_0                   8     15.999     1
+      401   401     C     39_Index_0                   6     12.011     3
+      403   403     H     39_Index_0                   1      1.008     1
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      402   402     O     39_Index_0                   8     15.999     1
+      401   401     C     39_Index_0                   6     12.011     3
+      403   403     H     39_Index_0                   1      1.008     1
+
+ Structure File 1 :  39_Index_0.xyz_2
+
+ Structure File 2 :  final.xyz_2
+
+ File 1 Frame :     1             File 2 Frame :     1
+
+ Summary of Results from Structural Superposition :
+
+ IMPOSE  --  Input Coordinates                0.001110
+ IMPOSE  --  After Translation                0.000131
+ IMPOSE  --  After Rotation                   0.000086
+
+ Root Mean Square Distance :                  0.000086        1      1
+
+   Atom in the         Atom in the            Distance          Weight
+ First Structure     Second Structure        Separated          in Fit
+
+         1-O                 1-O              0.000075         15.9990
+         2-C                 2-C              0.000100         12.0110
+
+ Root Mean Square Distance :                  0.000086

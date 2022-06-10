@@ -1,0 +1,38 @@
+molecule { 
+0 1
+ C   -1.072100   -0.839100   -0.048900
+ C   -1.245900    0.527000   -0.009600
+ C    1.078700    0.826500    0.048600
+ C   -0.177500    1.397800    0.040300
+ C    1.246200   -0.540500    0.009100
+ C    0.180800   -1.413300   -0.040700
+ H   -1.929300   -1.477000   -0.087000
+ H   -2.249300    0.962200   -0.016900
+ H   -0.324900    2.471300    0.070900
+ H    2.246100   -0.937200    0.017600
+ H    0.315000   -2.496600   -0.072000
+ H    1.932300    1.518800    0.088400
+}
+set {
+  geom_maxiter 400
+  g_convergence GAU
+  dynamic_level 1
+}
+memory 8.333333333333334GB
+set_num_threads(1)
+psi4_io.set_default_path("/scratch/bdw2292/Psi4-21_Index_0-farH_in17")
+for _ in range(1):
+  try:
+    set opt_coordinates both
+    optimize('mp2/6-31G*')
+    break
+  except OptimizationConvergenceError:
+    break
+  else:
+    try:
+      set opt_coordinates cartesian
+      optimize('mp2/6-31G*')
+      break
+    except OptimizationConvergenceError:
+      pass
+clean()

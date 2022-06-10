@@ -93,11 +93,8 @@ else
        export CUDA_VISIBLE_DEVICES=0
 
   fi
-
- 
-
-
 fi
+
 if [ $OSVERSION == 8 ] ; then
     export PATH=/home/bdw2292/NewestTinkerOS8/bin/:$PATH
     export TINKERPATH=/home/bdw2292/LatestTinker/bin/ # this is for ForceBalance to recognize tinker path in different nodes
@@ -108,7 +105,7 @@ else
 
 fi
 
-
+export PATH=/opt/CCDC/CCDC2020/Discovery_2020/bin/:$PATH # for GOLD Docking
 export myusername=`whoami`
 conda activate amoebamdpoltype
 export g09root=/opt/g09gh/gaussian

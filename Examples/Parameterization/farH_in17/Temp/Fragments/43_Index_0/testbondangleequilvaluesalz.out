@@ -1,0 +1,143 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.9.4   September 2021                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      402   402     H     43_Index_0                   1      1.008     1
+      401   401     N     43_Index_0                   7     14.007     3
+
+ Additional Bond Stretching Parameters :
+
+     Atom Classes             K(S)         Length
+
+       401 402             468.801         1.0200
+       402 401             468.801         1.0200
+
+ Additional Angle Bending Parameters :
+
+     Atom Classes             K(B)          Angle
+
+     402 401 402           117.764        106.300
+
+ Additional Stretch-Bend Parameters :
+
+     Atom Classes          K(SB)-1        K(SB)-2
+
+     402 401 402            12.725         12.725
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         402      401    402    402   Z-Bisect     0.07466
+                                                  -0.02054  0.00000 -0.17284
+                                                  -0.03699
+                                                   0.00000  0.04874
+                                                   0.02337  0.00000 -0.01175
+
+         401      402    402    402   3-Fold      -0.22398
+                                                   0.00001  0.00000  0.29900
+                                                   0.47534
+                                                   0.00000  0.47525
+                                                   0.00012  0.00000 -0.95059
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         402             0.457       0.390         401
+         401             1.156       0.390         402
+
+ Additional van der Waals Parameters :
+
+     Atom Class               Size        Epsilon        Reduction
+
+         401                3.7100         0.1050          0.000
+         402                2.7000         0.0200          0.910
+
+ Additional Solvation Parameters :
+
+     Atom Type                PB Size     CS Size     GK Size
+
+         402             2.9089      2.8360      3.5214
+         401             3.4243      3.4910      4.2676
+
+ Individual Bond Stretching Interactions :
+
+ Type              Atom Names                      Ideal    Actual      Energy
+
+ Bond            1-H        2-N                   1.0200    1.0200      0.0000
+ Bond            2-N        3-H                   1.0200    1.0200      0.0000
+ Bond            2-N        4-H                   1.0200    1.0200      0.0000
+
+ Individual Angle Bending Interactions :
+
+ Type                  Atom Names                  Ideal    Actual      Energy
+
+ Angle           1-H        2-N        3-H      106.3000  106.3014      0.0000
+ Angle           1-H        2-N        4-H      106.3000  106.3013      0.0000
+ Angle           3-H        2-N        4-H      106.3000  106.3015      0.0000
+
+ Individual Stretch-Bend Interactions :
+
+ Type                  Atom Names                  dSB 1     dSB 2      Energy
+
+ StrBend         1-H        2-N        3-H        0.0000    0.0000      0.0000
+ StrBend         1-H        2-N        4-H        0.0000    0.0000      0.0000
+ StrBend         3-H        2-N        4-H        0.0000    0.0000      0.0000
+
+ Individual Atomic Multipole Interactions :
+
+ Type              Atom Names               Distance        Energy
+
+
+ Determination of SCF Induced Dipole Moments :
+
+    Iter       RMS Residual (Debye)
+
+       1           0.0000000000
+       2           0.0000000000
+       3           0.0000000000
+
+ Induced Dipoles :    Iterations    3       RMS Residual   0.0000000000
+
+ Induced Dipole Moments (Debye) :
+
+    Atom               X            Y            Z           Total
+
+       1            0.0000       0.0000       0.0000        0.0000
+       2            0.0000       0.0000       0.0000        0.0000
+       3            0.0000       0.0000       0.0000        0.0000
+       4            0.0000       0.0000       0.0000        0.0000
+
+ Individual Dipole Polarization Interactions :
+
+ Type              Atom Names               Distance        Energy
+
+
+ Individual van der Waals Interactions :
+
+ Type              Atom Names                    Minimum    Actual      Energy
+
+
+ Total Potential Energy :              0.00000026 Kcal/mole
+
+ Energy Component Breakdown :           Kcal/mole        Interactions
+
+ Bond Stretching                       0.00000004                3
+ Angle Bending                         0.00000021                3
+ Stretch-Bend                          0.00000001                3

@@ -1,0 +1,29 @@
+molecule { 
+1 1
+N         -9.11910        0.13520       -0.32450
+C         -8.43350        0.34930        0.92000
+C         -8.40430        0.70480       -1.44640
+C        -10.41830        0.77560       -0.26350
+H         -9.27360       -0.88310       -0.48290
+H         -8.57130        1.39150        1.26690
+H         -8.93000       -0.30450        1.67690
+H         -9.00400        0.50740       -2.35550
+H         -8.32050        1.78780       -1.34090
+H        -10.70810        1.13950       -1.27760
+H        -11.15320        0.04900        0.16190
+H        -10.30880        1.64690        0.44570
+H         -7.39100        0.14310        0.79530
+H         -7.42550        0.27570       -1.49800
+}
+memory 100GB
+set_num_threads(12)
+psi4_io.set_default_path("/scratch/bdw2292/Psi4-farH_in17")
+set maxiter 500
+set freeze_core True
+set PROPERTIES_ORIGIN ["COM"]
+set cubeprop_tasks ['esp']
+E, wfn = properties('hf/MINIX',properties=['dipole'],return_wfn=True)
+cubeprop(wfn)
+fchk(wfn, "farH_in17-esp_frag.fchk")
+oeprop(wfn,"WIBERG_LOWDIN_INDICES","MULLIKEN_CHARGES")
+clean()

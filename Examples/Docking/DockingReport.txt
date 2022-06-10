@@ -1,0 +1,92 @@
+Docking model : GOLD
+Dictionary structure
+Ranking 1 gold_soln_ligand_m1_3.pdb
+Ranking 2 gold_soln_ligand_m1_4.pdb
+Ranking 3 gold_soln_ligand_m1_1.pdb
+Ranking 4 gold_soln_ligand_m1_2.pdb
+Dictionary complexedstructure
+Ranking 1 gold_soln_ligand_m1_3_receptor.pdb
+Ranking 2 gold_soln_ligand_m1_4_receptor.pdb
+Ranking 3 gold_soln_ligand_m1_1_receptor.pdb
+Ranking 4 gold_soln_ligand_m1_2_receptor.pdb
+Dictionary score
+Ranking 1 124.17
+Ranking 2 123.15
+Ranking 3 121.06
+Ranking 4 79.93
+Docking model : ad4
+Dictionary structure
+Ranking 1 ligand_ad4_1.pdb
+Ranking 2 ligand_ad4_2.pdb
+Ranking 3 ligand_ad4_3.pdb
+Ranking 4 ligand_ad4_4.pdb
+Ranking 5 ligand_ad4_5.pdb
+Ranking 6 ligand_ad4_6.pdb
+Ranking 7 ligand_ad4_7.pdb
+Ranking 8 ligand_ad4_8.pdb
+Ranking 9 ligand_ad4_9.pdb
+Ranking 10 ligand_ad4_10.pdb
+Ranking 11 ligand_ad4_11.pdb
+Dictionary complexedstructure
+Ranking 1 ligand_ad4_1_receptor.pdb
+Ranking 2 ligand_ad4_2_receptor.pdb
+Ranking 3 ligand_ad4_3_receptor.pdb
+Ranking 4 ligand_ad4_4_receptor.pdb
+Ranking 5 ligand_ad4_5_receptor.pdb
+Ranking 6 ligand_ad4_6_receptor.pdb
+Ranking 7 ligand_ad4_7_receptor.pdb
+Ranking 8 ligand_ad4_8_receptor.pdb
+Ranking 9 ligand_ad4_9_receptor.pdb
+Ranking 10 ligand_ad4_10_receptor.pdb
+Ranking 11 ligand_ad4_11_receptor.pdb
+Dictionary score
+Ranking 1 1.1
+Ranking 2 1.11
+Ranking 3 1.1
+Ranking 4 1.1
+Ranking 5 1.11
+Ranking 6 1.11
+Ranking 7 1.11
+Ranking 8 1.1
+Ranking 9 1.1
+Ranking 10 1.1
+Ranking 11 1.11
+Docking model : vina
+Dictionary structure
+Ranking 1 ligand_vina_1.pdb
+Ranking 2 ligand_vina_2.pdb
+Ranking 3 ligand_vina_3.pdb
+Ranking 4 ligand_vina_4.pdb
+Ranking 5 ligand_vina_5.pdb
+Ranking 6 ligand_vina_6.pdb
+Dictionary complexedstructure
+Ranking 1 ligand_vina_1_receptor.pdb
+Ranking 2 ligand_vina_2_receptor.pdb
+Ranking 3 ligand_vina_3_receptor.pdb
+Ranking 4 ligand_vina_4_receptor.pdb
+Ranking 5 ligand_vina_5_receptor.pdb
+Ranking 6 ligand_vina_6_receptor.pdb
+Dictionary score
+Ranking 1 -12.925
+Ranking 2 -10.939
+Ranking 3 -10.808
+Ranking 4 -10.227
+Ranking 5 -10.07
+Docking model : vinardo
+Dictionary structure
+Ranking 1 ligand_vinardo_1.pdb
+Ranking 2 ligand_vinardo_2.pdb
+Ranking 3 ligand_vinardo_3.pdb
+Ranking 4 ligand_vinardo_4.pdb
+Ranking 5 ligand_vinardo_5.pdb
+Dictionary complexedstructure
+Ranking 1 ligand_vinardo_1_receptor.pdb
+Ranking 2 ligand_vinardo_2_receptor.pdb
+Ranking 3 ligand_vinardo_3_receptor.pdb
+Ranking 4 ligand_vinardo_4_receptor.pdb
+Ranking 5 ligand_vinardo_5_receptor.pdb
+Dictionary score
+Ranking 1 -9.644
+Ranking 2 -6.993
+Ranking 3 -6.915
+Ranking 4 -6.818

@@ -1,0 +1,68 @@
+parameters /home/bdw2292/poltype2/ParameterFiles/amoebabio18_header.prm
+OPENMP-THREADS 1
+digits 8
+RESP-WEIGHT 1
+
+atom          402    402    H     "74_Index_0          "         1     1.008    1
+atom          401    401    N     "74_Index_0          "         7    14.007    4
+
+# matching SMARTS from molecule  [['[#7](-[#1])(-[#1])(-[#1])-[#1]', [1]]] to SMARTS from parameter file [['[#7+](-[H])(-[H])(-[H])-[H]', [1]]] with tinker type descriptions [[('N', '"Ammonium Ion N+"')]]
+
+# [401] = [[2]]
+vdw 401 3.7100 0.1050
+# matching SMARTS from molecule  [['[#7](-[#1])(-[#1])(-[#1])-[#1]', [5]]] to SMARTS from parameter file [['[#7+](-[H])(-[H])(-[H])-[H]', [5]]] with tinker type descriptions [[('H', '"Ammonium Ion H4N+"')]]
+
+# [402] = [[1, 3, 4, 5]]
+vdw 402 2.4800 0.0115 0.900
+
+# updated valence parameter database match, comments=N4, Nitrogen in Ammonium H+, H on NH4+, R-NH3+, R2-NH2+, R3-NH+ SMARTS match = [NX4] [H][NX4]
+
+# [401, 402] = [[2], [1, 3, 4, 5]]
+bond 401 402 434.641036 1.03
+# updated valence parameter database match, comments=N4, Nitrogen in Ammonium H+, H on NH4+, R-NH3+, R2-NH2+, R3-NH+ SMARTS match = [NX4] [H][NX4]
+
+# [402, 401] = [[1, 3, 4, 5], [2]]
+bond 402 401 434.641036 1.03
+
+# updated valence parameter database match, comments=H+, H on NH4+, R-NH3+, R2-NH2+, R3-NH+ N4, Nitrogen in Ammonium H+, H on NH4+, R-NH3+, R2-NH2+, R3-NH+ SMARTS match = [H][NX4] [NX4] [H][NX4]
+
+# [402, 401, 402] = [[1, 3, 4, 5], [2], [1, 3, 4, 5]]
+angle 402 401 402 42.12643 109.47
+
+
+# updated valence parameter database match, comments=H+, H on NH4+, R-NH3+, R2-NH2+, R3-NH+ N4, Nitrogen in Ammonium H+, H on NH4+, R-NH3+, R2-NH2+, R3-NH+ SMARTS match = [H][NX4] [NX4] [H][NX4]
+
+# [402, 401, 402] = [[1, 3, 4, 5], [2], [1, 3, 4, 5]]
+strbnd 402 401 402 29.8563 29.8563
+
+
+
+#SOLUTE-SMARTS 402 [#1]([N;D4])
+SOLUTE 402 3.0352 2.686 3.3152
+#SOLUTE-SMARTS 401 [N+]
+SOLUTE 401 2.226 4.7 3.2588
+
+
+
+
+# [402] = [[1, 3, 4, 5]]
+polarize           402          0.4573     0.3900 401
+# [401] = [[2]]
+polarize           401          1.0730     0.3900 402
+
+#
+# Multipoles from Electrostatic Potential Fitting
+#
+
+# [402] = [[1, 3, 4, 5]]
+multipole   402  401                    0.20059
+                                        0.00000    0.00000   -0.19358
+                                        0.01348
+                                        0.00000    0.01348
+                                        0.00000    0.00000   -0.02696
+# [401] = [[2]]
+multipole   401  402                    0.19764
+                                        0.00000    0.00000   -0.00001
+                                        0.00002
+                                        0.00000    0.00002
+                                        0.00000    0.00000   -0.00004

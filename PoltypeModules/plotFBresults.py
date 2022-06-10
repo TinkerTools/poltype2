@@ -114,13 +114,13 @@ def GrabResultsAllMolecules(outputfiles):
     qmdiclist=[]
     newoutputfiles=[]
     for outputfile in outputfiles:
-        try:
-            tpdic,qmdic,outputfile=GrabResults(outputfile)
-            tpdiclist.append(tpdic)
-            qmdiclist.append(qmdic)
-            newoutputfiles.append(outputfile)
-        except:
-            pass
+        #try:
+        tpdic,qmdic,outputfile=GrabResults(outputfile)
+        tpdiclist.append(tpdic)
+        qmdiclist.append(qmdic)
+        newoutputfiles.append(outputfile)
+        #except:
+        #    pass
     return tpdiclist,qmdiclist,newoutputfiles
 
 def GrabResults(outputfile):
@@ -141,10 +141,12 @@ def GrabResults(outputfile):
                 refkeyword='Ref'
                 calckeyword='Calc'
                 errorkeyword='CalcErr'
+                losskeyword='Loss'
                 prevprevprevline=results[lineidx-3]
                 prevprevprevlinesplit=prevprevprevline.split()
                 foundQM=False
                 foundliq=False
+                foundweight=False
                 if 'Enthalpy' in prevprevline:
                    index=prevprevlinesplit.index('Enthalpy')
                    totalname=prevprevlinesplit[index-1]
@@ -167,10 +169,40 @@ def GrabResults(outputfile):
                    name=namesplit[1]
                    foundQM=True
                 continue
+            if 'Property Name' in prevline:
+                foundblock=True
+                foundweight=False
+                foundQM=False
+                foundliq=False
+                prevprevline=results[lineidx-2]
+                prevprevlinesplit=prevprevline.split()
+            if 'Property Name' in prevline and 'Condensed Phase' in prevprevline:
+                foundweight=True
+                index=prevprevlinesplit.index('Condensed')
+                totalname=prevprevlinesplit[index-1]
+                namesplit=totalname.split('_')
+                name=namesplit[1]
+                continue
+                
+
         if '--------------------------------------------------' in line:
             foundblock=False 
         if foundblock==True:
             linesplit=line.split()
+            if foundweight==True:
+                linesplit=line.split()
+                weightkeyword='weight'
+                if 'Density' in line:
+                    propertyval='Density'
+                elif 'Enthalpy' in line:
+                    propertyval='Enthalpy'
+                else:
+                    continue
+
+                weight=float(linesplit[-2])
+                tparray=list(tpdic[name].keys())
+                for tp in tparray:   
+                    tpdic[name][tp][propertyval][weightkeyword]=weight
             if foundliq==True:
                 if name not in tpdic.keys():
                     tpdic[name]={}
@@ -187,13 +219,17 @@ def GrabResults(outputfile):
                     tpdic[name][tp][propertyval][calckeyword]=[]
                 if errorkeyword not in tpdic[name][tp][propertyval].keys():
                     tpdic[name][tp][propertyval][errorkeyword]=[]
+                if losskeyword not in tpdic[name][tp][propertyval].keys():
+                    tpdic[name][tp][propertyval][losskeyword]=[]
 
                 ref=float(linesplit[3])
                 calc=float(linesplit[4])
                 error=float(linesplit[6])
+                loss=float(linesplit[-1])
                 tpdic[name][tp][propertyval][refkeyword].append(ref)
                 tpdic[name][tp][propertyval][errorkeyword].append(error)
                 tpdic[name][tp][propertyval][calckeyword].append(calc)
+                tpdic[name][tp][propertyval][losskeyword].append(loss)
             elif foundQM==True:
                 if targetname not in qmdic.keys():
                     qmdic[targetname]={}
@@ -380,9 +416,13 @@ def PlotFBLiq(tpdic,nametotptofinalprops):
                 refkey='Ref'
                 calckey='Calc'
                 errkey='CalcErr' 
+                losskey='Loss'
+                weightkey='weight'
+                weight=innermostdic[weightkey]
                 refarray=np.array(innermostdic[refkey])
                 calcarray=np.array(innermostdic[calckey])
                 errarray=np.array(innermostdic[errkey])
+                lossarray=np.array(innermostdic[losskey])*weight
                 if propertyval=='Enthalpy':
                     scale=0.239006 # convert kj to kcal
                     units='(kcal/mol)'
@@ -394,6 +434,7 @@ def PlotFBLiq(tpdic,nametotptofinalprops):
                 nametotptofinalprops[name][tp][propertyval][refkey]=refarray[-1]
                 nametotptofinalprops[name][tp][propertyval][calckey]=calcarray[-1]
                 nametotptofinalprops[name][tp][propertyval][errkey]=errarray[-1]
+                nametotptofinalprops[name][tp][propertyval][losskey]=lossarray[-1]
                 err=np.abs(refarray-calcarray)
                 relerr=100*(err/refarray)
                 label1=propertyval+' AMOEBA'
@@ -1271,7 +1312,7 @@ def WriteOutPropTable(nametotptofinalprops,moltomaxiter):
     nametopropavgerrors={}
     with open(tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        header=['Name','Temperature','Pressure','Density Ref','Density Calc','Density CalcErr','Density Error','Density RelError','Enthalpy Ref','Enthalpy Calc','Enthalpy CalcErr','Enthalpy Error','Enthalpy RelError','Max Iter']
+        header=['Name','Temperature','Pressure','Density Ref','Density Calc','Density CalcErr','Density Error','Density RelError','Enthalpy Ref','Enthalpy Calc','Enthalpy CalcErr','Enthalpy Error','Enthalpy RelError','Max Iter','Enthalpy Loss','Density Loss']
         energy_writer.writerow(header)
         for name,tptofinalprops in nametotptofinalprops.items():
             maxiter=moltomaxiter[name]
@@ -1741,7 +1782,7 @@ def PlotForceBalanceResults(fbdir):
     WriteOutQMTable(nametoformulatormse,nametoformulatomse)
     poltypedirs,groupedpoltypedirs=GrabPoltypeDirectories(jobdirs)
     nametocubefiles,groupednames=GrabCubeFiles(groupedpoltypedirs)
-    PlotAllESPSurfaces(nametocubefiles)
+    #PlotAllESPSurfaces(nametocubefiles)
     nametotemparray,nametoproptokeytoarray=PlotLiquidPropsVsTemp(nametotptofinalprops)
     PlotLiquidPropsCorrelation(nametotptofinalprops)
     PlotLiquidPropsCorrelationForGroups(nametotptofinalprops,groupednames,nametotemparray)

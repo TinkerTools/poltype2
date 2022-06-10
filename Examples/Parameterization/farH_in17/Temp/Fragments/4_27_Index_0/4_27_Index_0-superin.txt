@@ -1,0 +1,75 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.10.2   February 2022                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2022               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      401   401     C     4_27_Index_0                 6     12.011     4
+      402   402     N     4_27_Index_0                 7     14.007     3
+      403   403     C     4_27_Index_0                 6     12.011     4
+      404   404     C     4_27_Index_0                 6     12.011     3
+      408   408     H     4_27_Index_0                 1      1.008     1
+      405   405     N     4_27_Index_0                 7     14.007     3
+      406   406     O     4_27_Index_0                 8     15.999     1
+      407   407     C     4_27_Index_0                 6     12.011     4
+      409   409     H     4_27_Index_0                 1      1.008     1
+      410   410     H     4_27_Index_0                 1      1.008     1
+      411   411     H     4_27_Index_0                 1      1.008     1
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      401   401     C     4_27_Index_0                 6     12.011     4
+      402   402     N     4_27_Index_0                 7     14.007     3
+      403   403     C     4_27_Index_0                 6     12.011     4
+      404   404     C     4_27_Index_0                 6     12.011     3
+      408   408     H     4_27_Index_0                 1      1.008     1
+      405   405     N     4_27_Index_0                 7     14.007     3
+      406   406     O     4_27_Index_0                 8     15.999     1
+      407   407     C     4_27_Index_0                 6     12.011     4
+      409   409     H     4_27_Index_0                 1      1.008     1
+      410   410     H     4_27_Index_0                 1      1.008     1
+      411   411     H     4_27_Index_0                 1      1.008     1
+
+ Structure File 1 :  4_27_Index_0.xyz_2
+
+ Structure File 2 :  final.xyz_2
+
+ File 1 Frame :     1             File 2 Frame :     1
+
+ Summary of Results from Structural Superposition :
+
+ IMPOSE  --  Input Coordinates                0.067978
+ IMPOSE  --  After Translation                0.063885
+ IMPOSE  --  After Rotation                   0.050943
+
+ Root Mean Square Distance :                  0.050943        1      1
+
+   Atom in the         Atom in the            Distance          Weight
+ First Structure     Second Structure        Separated          in Fit
+
+         1-C                 1-C              0.056039         12.0110
+         2-N                 2-N              0.046254         14.0070
+         3-C                 3-C              0.032521         12.0110
+         4-C                 4-C              0.038783         12.0110
+         5-C                 5-C              0.057154         12.0110
+         8-N                 8-N              0.052765         14.0070
+         9-O                 9-O              0.043730         15.9990
+        10-C                10-C              0.082276         12.0110
+        13-C                13-C              0.032464         12.0110
+
+ Root Mean Square Distance :                  0.050943

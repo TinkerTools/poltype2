@@ -1,0 +1,113 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.9.4   September 2021                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      402   402     O     39_Index_0                   8     15.999     1
+      401   401     C     39_Index_0                   6     12.011     3
+      403   403     H     39_Index_0                   1      1.008     1
+
+ Additional Bond Stretching Parameters :
+
+     Atom Classes             K(S)         Length
+
+       401 402             705.000         1.2200
+       403 401             339.968         1.1000
+
+ Additional Angle Bending Parameters :
+
+     Atom Classes             K(B)          Angle
+
+     403 401 402            61.150        122.170
+     403 401 403            43.997        115.660
+
+ Additional Stretch-Bend Parameters :
+
+     Atom Classes          K(SB)-1        K(SB)-2
+
+     403 401 402            11.500         11.500
+     403 401 403             7.629          7.629
+
+ Additional Out-of-Plane Bend Parameters :
+
+     Atom Classes                   K(OPB)
+
+     402 401   0   0                43.566
+     403 401   0   0                38.816
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         402      401      0      0   Z-Only      -0.42271
+                                                   0.00000  0.00000  0.10639
+                                                  -0.13177
+                                                   0.00000 -0.13177
+                                                   0.00000  0.00000  0.26354
+
+         401      403    403      0   Bisector     0.46483
+                                                   0.00000  0.00000 -0.29276
+                                                  -0.49534
+                                                   0.00000  0.26203
+                                                   0.00000  0.00000  0.23331
+
+         403      401    403      0   Z-then-X    -0.02106
+                                                   0.03231  0.00000 -0.14697
+                                                  -0.00243
+                                                   0.00000  0.02834
+                                                   0.07228  0.00000 -0.02591
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         402             0.914       0.390         401
+         401             2.064       0.390         402  403
+         403             0.480       0.390         401
+
+ Additional van der Waals Parameters :
+
+     Atom Class               Size        Epsilon        Reduction
+
+         402                3.3000         0.1120          0.000
+         401                3.7800         0.1060          0.000
+         403                2.9200         0.0300          0.920
+
+ Additional Solvation Parameters :
+
+     Atom Type                PB Size     CS Size     GK Size
+
+         403             3.0352      2.6860      3.3152
+         401             2.9301      4.5060      4.2118
+         402             2.9835      3.3560      2.9616
+
+ Limited Memory BFGS Quasi-Newton Optimization :
+
+ QN Iter     F Value      G RMS      F Move   X Move   Angle  FG Call  Comment
+
+     0        0.0097     2.1863                                   1
+     1        0.0034     1.6253      0.0063   0.0014    0.00      3    Success 
+     2        0.0005     0.5044      0.0029   0.0009   36.60      4    Success 
+     3        0.0001     0.1552      0.0004   0.0004   35.04      5    Success 
+     4        0.0001     0.1267      0.0001   0.0001   23.91      6    Success 
+     5        0.0000     0.0275      0.0001   0.0003   24.84      7   SmallGrad
+
+ LBFGS  --  Normal Termination due to SmallGrad
+
+ Final Function Value :            0.00000219
+ Final RMS Gradient :              0.02748520
+ Final Gradient Norm :             0.05497040

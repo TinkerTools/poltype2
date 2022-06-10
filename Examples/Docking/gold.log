@@ -1,0 +1,14 @@
+Beginning ligand file 'ligand.pdb'
+Starting at ligand 1 (byte position -2) in file 'ligand.pdb'
+Finishing at final ligand in file 'ligand.pdb'
+Completed docking of ligand 1 in ligand file 'ligand.pdb' in 32.865872 seconds
+
+Finished GOLD batch job, exiting..
+
+
+--------------------------------------------------------------------------------
+
+* Total run time :                                                              
+  total 43.0648 user 42.3324 sys  0.7324
+
+--------------------------------------------------------------------------------

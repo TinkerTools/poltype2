@@ -1,0 +1,992 @@
+Tue Nov  9 10:08:20 2021 Running on host: node44.bme.utexas.edu
+Tue Nov  9 10:08:20 2021 NEED QM Density Matrix: Executing Gaussian Opt and SP
+Tue Nov  9 10:08:20 2021 Calling: Psi4 Optimization
+Tue Nov  9 10:08:20 2021 Percent of jobs submitted 0.0
+Tue Nov  9 10:08:20 2021 Calling: psi4 16_1_Index_0_GrowFragment_2-opt_1.psi4 16_1_Index_0_GrowFragment_2-opt_1.log path = /home/bdw2292/PoltypeJobs/farH_in17/Fragments/16_1_Index_0/16_1_Index_0_GrowFragment_2
+Tue Nov  9 10:56:15 2021 Percent of jobs submitted 0.0
+Tue Nov  9 10:56:15 2021 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Fragments/16_1_Index_0/16_1_Index_0_GrowFragment_2/16_1_Index_0_GrowFragment_2-opt_1.log path=/home/bdw2292/PoltypeJobs/farH_in17/Fragments/16_1_Index_0/16_1_Index_0_GrowFragment_2
+Tue Nov  9 10:58:33 2021 # matching SMARTS from molecule  [['[H]-[#6](:[#6]):[#6]', [1, 2]]] to SMARTS from parameter file [['[#6](-[#6]1:[#6](:[#6](:[#6](:[#6](:[#6]:1-[H])-[H])-[H])-[H])-[H])(-[#6](-[H])(-[H])-[H])(-[H])-[H]', [8, 7]]] with tinker type descriptions [[('H', '"Ethylbenzene H2"'), ('C', '"Ethylbenzene C2"')]]
+# Missing bond parameters, assigning default parameters
+
+Tue Nov  9 10:58:33 2021 # matching SMARTS from molecule  [['[H]-[#7]-[H]', [1, 2, 3]]] to SMARTS from parameter file [['[H]-[#7](-[H])[#6](-[#7](-[H])-[H])-[#6]1:[#6](:[#6](:[#6](:[#6](:[#6]:1-[H])-[H])-[H])-[H])-[H]', [1, 2, 3]]] with tinker type descriptions [[('H', '"Benzamidine HN"'), ('N', '"Benzamidine N"'), ('H', '"Benzamidine HN"')]]
+# Missing angle parameters, assigning default parameters
+
+Tue Nov  9 10:58:33 2021 # matching SMARTS from molecule  [['[H]-[#7]-[H]', [1, 2, 3]]] to SMARTS from parameter file [['[H]-[#7](-[H])[#6](-[#7](-[H])-[H])-[#6]1:[#6](:[#6](:[#6](:[#6](:[#6]:1-[H])-[H])-[H])-[H])-[H]', [1, 2, 3]]] with tinker type descriptions [[('H', '"Benzamidine HN"'), ('N', '"Benzamidine N"'), ('H', '"Benzamidine HN"')]]
+# Missing strbnd parameters, zeroing out parameters
+
+Tue Nov  9 10:58:33 2021 Calling: Psi4 Gradient for DMA
+Tue Nov  9 10:58:33 2021 Percent of jobs submitted 0.0
+Tue Nov  9 10:58:33 2021 Calling: psi4 16_1_Index_0_GrowFragment_2-dma.psi4 16_1_Index_0_GrowFragment_2-dma.log path = /home/bdw2292/PoltypeJobs/farH_in17/Fragments/16_1_Index_0/16_1_Index_0_GrowFragment_2
+Tue Nov  9 11:08:30 2021 Percent of jobs submitted 0.0
+Tue Nov  9 11:08:30 2021 Normal termination: logfile=/home/bdw2292/PoltypeJobs/farH_in17/Fragments/16_1_Index_0/16_1_Index_0_GrowFragment_2/16_1_Index_0_GrowFragment_2-dma.log path=/home/bdw2292/PoltypeJobs/farH_in17/Fragments/16_1_Index_0/16_1_Index_0_GrowFragment_2
+Tue Nov  9 11:08:30 2021 NEED DMA: Executing GDMA
+Tue Nov  9 11:08:30 2021 Calling: /opt/gdma/gdma-2.3.3/bin/gdma < 16_1_Index_0_GrowFragment_2.gdmain > 16_1_Index_0_GrowFragment_2.gdmaout path = /home/bdw2292/PoltypeJobs/farH_in17/Fragments/16_1_Index_0/16_1_Index_0_GrowFragment_2
+Tue Nov  9 11:08:31 2021 Calling: poledit 1 16_1_Index_0_GrowFragment_2.gdmaout /home/bdw2292/poltype2/ParameterFiles/amoebabio18_header.prm < 16_1_Index_0_GrowFragment_2-peditin.txt path = /home/bdw2292/PoltypeJobs/farH_in17/Fragments/16_1_Index_0/16_1_Index_0_GrowFragment_2
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.9.4   September 2021                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Global Frame Cartesian Multipole Moments :
+
+ Site:       1         Name:   C         Atomic Number:       6
+
+ Coordinates:            2.307559       1.091831       0.465807
+
+ Charge:                  0.15117
+ Dipole:                  0.10317       -0.35170       -0.09963
+ Quadrupole:             -0.26926
+                         -0.59979        0.86256
+                         -0.03488        0.31262       -0.59331
+
+ Site:       2         Name:   C         Atomic Number:       6
+
+ Coordinates:            1.378193       0.076967       0.191493
+
+ Charge:                  0.05926
+ Dipole:                 -0.35826        0.01768       -0.04120
+ Quadrupole:              0.16210
+                         -0.12552       -0.29747
+                          0.07740        0.01831        0.13537
+
+ Site:       3         Name:   N         Atomic Number:       7
+
+ Coordinates:            0.009609       0.424546       0.130286
+
+ Charge:                 -0.33237
+ Dipole:                 -0.10231       -0.32590        0.25974
+ Quadrupole:              0.03605
+                          0.63696        0.39070
+                         -0.25934        0.61579       -0.42675
+
+ Site:       4         Name:   H         Atomic Number:       1
+
+ Coordinates:           -0.267956       0.959884       0.950630
+
+ Charge:                  0.12472
+ Dipole:                 -0.04132        0.06750        0.10331
+ Quadrupole:              0.03842
+                         -0.01712       -0.01456
+                          0.02559        0.01970       -0.02386
+
+ Site:       5         Name:   C         Atomic Number:       6
+
+ Coordinates:           -0.951312      -0.624168      -0.153495
+
+ Charge:                  0.05853
+ Dipole:                  0.01123        0.47451        0.03755
+ Quadrupole:              0.01016
+                          0.41332        0.50430
+                          0.12767       -0.02102       -0.51445
+
+ Site:       6         Name:   C         Atomic Number:       6
+
+ Coordinates:            1.868480      -1.196858      -0.119073
+
+ Charge:                 -0.13953
+ Dipole:                 -0.05149       -0.07619       -0.05265
+ Quadrupole:              0.12694
+                         -0.02805       -0.05964
+                         -0.06350       -0.05378       -0.06730
+
+ Site:       7         Name:   C         Atomic Number:       6
+
+ Coordinates:            3.669930       0.828638       0.502070
+
+ Charge:                 -0.11232
+ Dipole:                  0.14434        0.06585        0.02178
+ Quadrupole:              0.09701
+                         -0.14564        0.00857
+                         -0.02569       -0.00496       -0.10559
+
+ Site:       8         Name:   C         Atomic Number:       6
+
+ Coordinates:            3.239960      -1.453660      -0.101955
+
+ Charge:                  0.11148
+ Dipole:                 -0.11149        0.37236        0.14218
+ Quadrupole:             -0.33181
+                         -0.52512        0.99365
+                         -0.18011        0.46045       -0.66185
+
+ Site:       9         Name:   C         Atomic Number:       6
+
+ Coordinates:            4.162400      -0.446144       0.189106
+
+ Charge:                  0.13153
+ Dipole:                  0.38650       -0.08488        0.07771
+ Quadrupole:              0.20785
+                         -0.12690       -0.16896
+                          0.12503       -0.01331       -0.03888
+
+ Site:      10         Name:   H         Atomic Number:       1
+
+ Coordinates:            1.945230       2.096622       0.675417
+
+ Charge:                 -0.00698
+ Dipole:                 -0.06098        0.17509        0.03484
+ Quadrupole:              0.03351
+                          0.02827       -0.03915
+                          0.00854       -0.00875        0.00564
+
+ Site:      11         Name:   H         Atomic Number:       1
+
+ Coordinates:            1.190233      -2.015371      -0.337881
+
+ Charge:                  0.04673
+ Dipole:                 -0.13251       -0.07472       -0.02605
+ Quadrupole:              0.04196
+                         -0.15613        0.10666
+                         -0.03416        0.04899       -0.14863
+
+ Site:      12         Name:   H         Atomic Number:       1
+
+ Coordinates:            4.366468       1.633653       0.730888
+
+ Charge:                 -0.00764
+ Dipole:                  0.10395        0.14783        0.04315
+ Quadrupole:              0.00971
+                         -0.02963       -0.01823
+                         -0.00539       -0.01139        0.00852
+
+ Site:      13         Name:   H         Atomic Number:       1
+
+ Coordinates:            3.597044      -2.455158      -0.336541
+
+ Charge:                 -0.00762
+ Dipole:                  0.04399       -0.17544       -0.03957
+ Quadrupole:              0.02625
+                          0.01134       -0.03593
+                          0.00652       -0.00965        0.00967
+
+ Site:      14         Name:   N         Atomic Number:       7
+
+ Coordinates:            5.540077      -0.728936       0.275205
+
+ Charge:                 -0.31644
+ Dipole:                  0.09488        0.06699       -0.27107
+ Quadrupole:              0.12349
+                          0.12478        0.47029
+                         -0.11725        0.37189       -0.59378
+
+ Site:      15         Name:   C         Atomic Number:       6
+
+ Coordinates:           -2.364836      -0.092547      -0.208812
+
+ Charge:                 -0.09503
+ Dipole:                  0.15089       -0.15831       -0.07315
+ Quadrupole:              0.26618
+                         -0.15323       -0.08196
+                         -0.02601       -0.09870       -0.18422
+
+ Site:      16         Name:   C         Atomic Number:       6
+
+ Coordinates:           -2.646137       1.275768      -0.251092
+
+ Charge:                 -0.01955
+ Dipole:                  0.08297        0.02287        0.01689
+ Quadrupole:              0.02534
+                         -0.19963        0.09985
+                         -0.00017       -0.05856       -0.12519
+
+ Site:      17         Name:   C         Atomic Number:       6
+
+ Coordinates:           -3.430311      -1.000100      -0.179994
+
+ Charge:                  0.14043
+ Dipole:                 -0.08502        0.44037       -0.01271
+ Quadrupole:             -0.53650
+                         -0.43908        1.17671
+                          0.04168       -0.06761       -0.64020
+
+ Site:      18         Name:   C         Atomic Number:       6
+
+ Coordinates:           -3.967527       1.724431      -0.286564
+
+ Charge:                 -0.00193
+ Dipole:                  0.02409       -0.05829       -0.00416
+ Quadrupole:              0.04993
+                          0.00605        0.16451
+                         -0.00106        0.00363       -0.21444
+
+ Site:      19         Name:   C         Atomic Number:       6
+
+ Coordinates:           -4.748859      -0.554085      -0.222764
+
+ Charge:                 -0.03024
+ Dipole:                 -0.01840       -0.03178        0.00094
+ Quadrupole:              0.03237
+                         -0.13970        0.09326
+                          0.01670       -0.01824       -0.12563
+
+ Site:      20         Name:   C         Atomic Number:       6
+
+ Coordinates:           -5.022250       0.814024      -0.267297
+
+ Charge:                 -0.03404
+ Dipole:                 -0.04078        0.01266        0.00394
+ Quadrupole:             -0.05040
+                          0.09521        0.19718
+                          0.01270       -0.02141       -0.14677
+
+ Site:      21         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.828131       1.988091      -0.302703
+
+ Charge:                  0.00863
+ Dipole:                  0.16760        0.09048       -0.02081
+ Quadrupole:             -0.02014
+                         -0.06844        0.06962
+                          0.01975        0.00311       -0.04948
+
+ Site:      22         Name:   H         Atomic Number:       1
+
+ Coordinates:           -3.223536      -2.068217      -0.128843
+
+ Charge:                 -0.01060
+ Dipole:                  0.02808       -0.18802        0.00890
+ Quadrupole:              0.02608
+                          0.01223       -0.03976
+                         -0.00307        0.00298        0.01367
+
+ Site:      23         Name:   H         Atomic Number:       1
+
+ Coordinates:           -4.171072       2.791925      -0.323352
+
+ Charge:                  0.00425
+ Dipole:                 -0.03191        0.17923       -0.00658
+ Quadrupole:              0.02522
+                          0.00964       -0.03458
+                         -0.00027        0.00184        0.00937
+
+ Site:      24         Name:   H         Atomic Number:       1
+
+ Coordinates:           -5.564058      -1.273215      -0.203798
+
+ Charge:                  0.00374
+ Dipole:                 -0.13643       -0.12234        0.00318
+ Quadrupole:             -0.00764
+                         -0.03223       -0.00226
+                          0.00104        0.00006        0.00990
+
+ Site:      25         Name:   H         Atomic Number:       1
+
+ Coordinates:           -6.050297       1.165906      -0.293323
+
+ Charge:                  0.00328
+ Dipole:                 -0.17486        0.06043       -0.00441
+ Quadrupole:             -0.03125
+                          0.02076        0.02077
+                         -0.00117       -0.00007        0.01048
+
+ Site:      26         Name:   H         Atomic Number:       1
+
+ Coordinates:           -0.688606      -1.052690      -1.129254
+
+ Charge:                  0.06500
+ Dipole:                  0.02521       -0.05057       -0.09339
+ Quadrupole:              0.01006
+                          0.00389       -0.01736
+                          0.01320       -0.00366        0.00730
+
+ Site:      27         Name:   H         Atomic Number:       1
+
+ Coordinates:           -0.911010      -1.456596       0.571371
+
+ Charge:                  0.00637
+ Dipole:                 -0.01710       -0.09031        0.07956
+ Quadrupole:              0.00786
+                         -0.03215       -0.00377
+                          0.00585        0.00014       -0.00409
+
+ Site:      28         Name:   H         Atomic Number:       1
+
+ Coordinates:            6.117449       0.092416       0.123547
+
+ Charge:                  0.09861
+ Dipole:                  0.08691        0.13101       -0.02347
+ Quadrupole:              0.02366
+                          0.00687       -0.00368
+                          0.00194        0.00116       -0.01998
+
+ Site:      29         Name:   H         Atomic Number:       1
+
+ Coordinates:            5.829421      -1.465710      -0.360609
+
+ Charge:                  0.10054
+ Dipole:                  0.03942       -0.11547       -0.10280
+ Quadrupole:              0.01750
+                         -0.01442        0.00088
+                         -0.00097        0.00886       -0.01838
+
+ Local Frame Definition for Multipole Sites :
+
+     Atom     Name      Axis Type     Z Axis  X Axis  Y Axis
+
+       1      C         Z-then-X         2       7       0
+       2      C         Z-then-X         3       1       0
+       3      N         Z-then-X         2       5       0
+       4      H         Z-then-X         3       2       0
+       5      C         Z-then-X         3      15       0
+       6      C         Z-then-X         2       8       0
+       7      C         Z-then-X         9       1       0
+       8      C         Z-then-X         9       6       0
+       9      C         Z-then-X        14       7       0
+      10      H         Z-then-X         1       2       0
+      11      H         Z-then-X         6       2       0
+      12      H         Z-then-X         7       9       0
+      13      H         Z-then-X         8       9       0
+      14      N         Z-then-X         9       7       0
+      15      C         Bisector        16      17       0
+      16      C         Z-then-X        15      18       0
+      17      C         Z-then-X        15      19       0
+      18      C         Z-then-X        16      20       0
+      19      C         Z-then-X        17      20       0
+      20      C         Bisector        18      19       0
+      21      H         Z-then-X        16      15       0
+      22      H         Z-then-X        17      15       0
+      23      H         Z-then-X        18      16       0
+      24      H         Z-then-X        19      17       0
+      25      H         Z-then-X        20      18       0
+      26      H         Z-then-X         5       3       0
+      27      H         Z-then-X         5       3       0
+      28      H         Z-then-X        14       9       0
+      29      H         Z-then-X        14       9       0
+
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Local Frame Definition for Multipole Sites :
+
+     Atom     Name      Axis Type     Z Axis  X Axis  Y Axis
+
+       1      C         Z-then-X        10       7       0
+       2      C         Bisector         1       6       0
+       3      N         Z-then-X         5       4       0
+       4      H         Z-then-X         3       5       0
+       5      C         Z-then-X        15       3       0
+       6      C         Z-then-X        11       8       0
+       7      C         Z-then-X        12       9       0
+       8      C         Z-then-X        13       9       0
+       9      C         Bisector         7       8       0
+      10      H         Z-then-X         1       7       0
+      11      H         Z-then-X         6       8       0
+      12      H         Z-then-X         7       9       0
+      13      H         Z-then-X         8       9       0
+      14      N         Bisector        28      29       0
+      15      C         Z-Bisect         5      16      17
+      16      C         Z-then-X        21      18       0
+      17      C         Z-then-X        22      19       0
+      18      C         Z-then-X        23      20       0
+      19      C         Z-then-X        24      20       0
+      20      C         Bisector        18      19       0
+      21      H         Z-then-X        16      18       0
+      22      H         Z-then-X        17      19       0
+      23      H         Z-then-X        18      20       0
+      24      H         Z-then-X        19      20       0
+      25      H         Z-Only          20       0       0
+      26      H         Z-then-X         5      27       0
+      27      H         Z-then-X         5      26       0
+      28      H         Z-then-X        14      29       0
+      29      H         Z-then-X        14      28       0
+
+ Choose Either the AMOEBA or HIPPO Polarization Model [A] :  
+ Polarizability Parameters for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      C            1.7500         0.3900
+       2      C            1.7500         0.3900
+       3      N            1.0730         0.3900
+       4      H            0.4960         0.3900
+       5      C            1.3340         0.3900
+       6      C            1.7500         0.3900
+       7      C            1.7500         0.3900
+       8      C            1.7500         0.3900
+       9      C            1.7500         0.3900
+      10      H            0.6960         0.3900
+      11      H            0.6960         0.3900
+      12      H            0.6960         0.3900
+      13      H            0.6960         0.3900
+      14      N            1.0730         0.3900
+      15      C            1.7500         0.3900
+      16      C            1.7500         0.3900
+      17      C            1.7500         0.3900
+      18      C            1.7500         0.3900
+      19      C            1.7500         0.3900
+      20      C            1.7500         0.3900
+      21      H            0.6960         0.3900
+      22      H            0.6960         0.3900
+      23      H            0.6960         0.3900
+      24      H            0.6960         0.3900
+      25      H            0.6960         0.3900
+      26      H            0.4960         0.3900
+      27      H            0.4960         0.3900
+      28      H            0.4960         0.3900
+      29      H            0.4960         0.3900
+
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Atomic Polarizabilities for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      C            2.0645         0.3900
+       2      C            2.0645         0.3900
+       3      N            1.1847         0.3900
+       4      H            0.4573         0.3900
+       5      C            1.4150         0.3900
+       6      C            2.0645         0.3900
+       7      C            2.0645         0.3900
+       8      C            2.0645         0.3900
+       9      C            2.0645         0.3900
+      10      H            0.4318         0.3900
+      11      H            0.4318         0.3900
+      12      H            0.4318         0.3900
+      13      H            0.4318         0.3900
+      14      N            1.1847         0.3900
+      15      C            2.0645         0.3900
+      16      C            2.0645         0.3900
+      17      C            2.0645         0.3900
+      18      C            2.0645         0.3900
+      19      C            2.0645         0.3900
+      20      C            2.0645         0.3900
+      21      H            0.4318         0.3900
+      22      H            0.4318         0.3900
+      23      H            0.4318         0.3900
+      24      H            0.4318         0.3900
+      25      H            0.4318         0.3900
+      26      H            0.4803         0.3900
+      27      H            0.4803         0.3900
+      28      H            0.4573         0.3900
+      29      H            0.4573         0.3900
+
+ Choose Method for Division into Polarization Groups :
+
+    (1) Put All Atoms in One Polarization Group
+    (2) Separate into Groups at Rotatable Bonds
+    (3) Manual Entry of Bonds Separating Groups
+
+ Enter the Number of the Desired Choice [1] :  
+ Polarization Groups for Multipole Sites :
+
+     Atom     Name       Polarization Group Definition
+
+       1      C               2     7    10
+       2      C               1     6
+       3      N               4
+       4      H               3
+       5      C              26    27
+       6      C               2     8    11
+       7      C               1     9    12
+       8      C               6     9    13
+       9      C               7     8
+      10      H               1
+      11      H               6
+      12      H               7
+      13      H               8
+      14      N              28    29
+      15      C              16    17
+      16      C              15    18    21
+      17      C              15    19    22
+      18      C              16    20    23
+      19      C              17    20    24
+      20      C              18    19    25
+      21      H              16
+      22      H              17
+      23      H              18
+      24      H              19
+      25      H              20
+      26      H               5
+      27      H               5
+      28      H              14
+      29      H              14
+
+ Electrostatic and Polarization Scale Factors :
+
+                    1-2         1-3         1-4         1-5
+
+ M-Scale:         0.0000      0.0000      0.4000      0.8000
+ P-Inter:         0.0000      0.0000      1.0000      1.0000
+ P-Intra:         0.0000      0.0000      0.5000      1.0000
+ W-Scale:         1.0000      1.0000      1.0000      1.0000
+
+                    1-1         1-2         1-3         1-4
+
+ D-Scale:         0.0000      1.0000      1.0000      1.0000
+ U-Scale:         1.0000      1.0000      1.0000      1.0000
+
+ Use Thole Damping:           True
+ Charge Penetration:          False
+ Set D Equal to P:            False
+
+ Determination of Intergroup Induced Dipoles :
+
+    Iter        RMS Change (Debye)
+
+       1           0.0200197113
+       2           0.0079816240
+       3           0.0024905765
+       4           0.0009639150
+       5           0.0004075869
+       6           0.0001159598
+       7           0.0000360568
+       8           0.0000154890
+       9           0.0000034235
+      10           0.0000012852
+      11           0.0000003562
+
+ Local Frame Intergroup Induced Dipole Moments (Debye) :
+
+    Atom              X           Y           Z         Total
+
+       1          -0.1936      0.0550     -0.2161      0.2953
+       2          -0.0723      0.2630     -0.2348      0.3598
+       3           0.0119     -0.2182     -0.0416      0.2225
+       4          -0.0230     -0.0078     -0.2417      0.2429
+       5           0.5157      0.2106      0.1566      0.5786
+       6          -0.1467      0.0398     -0.1644      0.2239
+       7           0.1920     -0.0336     -0.2118      0.2878
+       8           0.1761      0.0346     -0.2139      0.2792
+       9           0.0162      0.3598     -0.6049      0.7040
+      10           0.0316     -0.0124      0.0525      0.0626
+      11          -0.0005     -0.0059      0.0571      0.0574
+      12          -0.0405      0.0065      0.0696      0.0807
+      13          -0.0354     -0.0084      0.0664      0.0757
+      14           0.0444     -0.0181      0.0613      0.0778
+      15          -0.0150      0.1381     -0.0946      0.1681
+      16           0.1189     -0.0808      0.1001      0.1751
+      17           0.0216     -0.0199     -0.0171      0.0340
+      18          -0.0165      0.0080      0.0071      0.0197
+      19           0.0279     -0.0025      0.0156      0.0321
+      20          -0.0063     -0.0014     -0.0188      0.0199
+      21          -0.0610      0.0357     -0.0391      0.0807
+      22           0.0093     -0.0010     -0.0044      0.0104
+      23           0.0046      0.0012     -0.0071      0.0085
+      24           0.0001     -0.0010     -0.0043      0.0044
+      25           0.0016     -0.0009     -0.0031      0.0036
+      26          -0.0244     -0.0392     -0.0509      0.0687
+      27           0.0136      0.0610     -0.0615      0.0877
+      28           0.0397      0.0316     -0.1108      0.1219
+      29           0.0257     -0.0173     -0.1036      0.1081
+
+ Condense Symmetric Atoms to Equivalent Types [Y] :  
+ Remove Multipole Components Zeroed by Symmetry [Y] :  
+ Final Atomic Multipole Moments after Regularization :
+
+ Atom:       1         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X            10       7       0
+
+ Charge:                  0.15117
+ Dipole:                  0.05024        0.00000       -0.29317
+ Quadrupole:             -0.49852
+                          0.00000       -0.66886
+                         -0.08939        0.00000        1.16738
+
+ Atom:       2         Name:   C         Atomic Number:       6
+
+ Local Frame:            Bisector             1       6       0
+
+ Charge:                  0.05926
+ Dipole:                  0.00000        0.00000       -0.26199
+ Quadrupole:             -0.28477
+                          0.00000        0.09678
+                          0.00000        0.00000        0.18799
+
+ Atom:       3         Name:   N         Atomic Number:       7
+
+ Local Frame:            Z-then-X             5       4       0
+
+ Charge:                 -0.33235
+ Dipole:                  0.16239        0.00000        0.26896
+ Quadrupole:              0.07966
+                          0.00000       -1.00064
+                         -0.14945        0.00000        0.92098
+
+ Atom:       4         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             3       5       0
+
+ Charge:                  0.12472
+ Dipole:                  0.01418        0.00000       -0.03491
+ Quadrupole:             -0.00188
+                          0.00000        0.00818
+                          0.00988        0.00000       -0.00630
+
+ Atom:       5         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X            15       3       0
+
+ Charge:                  0.05853
+ Dipole:                  0.24497        0.00000        0.09344
+ Quadrupole:              0.67534
+                          0.00000       -0.48323
+                         -0.16858        0.00000       -0.19211
+
+ Atom:       6         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X            11       8       0
+
+ Charge:                 -0.13953
+ Dipole:                  0.06988        0.00000        0.16495
+ Quadrupole:              0.08365
+                          0.00000       -0.03777
+                         -0.08979        0.00000       -0.04588
+
+ Atom:       7         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X            12       9       0
+
+ Charge:                 -0.11232
+ Dipole:                 -0.00885        0.00000        0.22893
+ Quadrupole:              0.20310
+                          0.00000       -0.09661
+                          0.02159        0.00000       -0.10649
+
+ Atom:       8         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X            13       9       0
+
+ Charge:                  0.11148
+ Dipole:                 -0.04273        0.00000       -0.32554
+ Quadrupole:             -0.52261
+                          0.00000       -0.77639
+                         -0.01645        0.00000        1.29900
+
+ Atom:       9         Name:   C         Atomic Number:       6
+
+ Local Frame:            Bisector             7       8       0
+
+ Charge:                  0.13153
+ Dipole:                  0.00000        0.00000       -0.15635
+ Quadrupole:             -0.18701
+                          0.00000       -0.05017
+                          0.00000        0.00000        0.23718
+
+ Atom:      10         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             1       7       0
+
+ Charge:                 -0.00698
+ Dipole:                 -0.01066        0.00000       -0.20930
+ Quadrupole:              0.04396
+                          0.00000        0.00707
+                          0.00042        0.00000       -0.05103
+
+ Atom:      11         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             6       8       0
+
+ Charge:                  0.04673
+ Dipole:                 -0.05422        0.00000       -0.16689
+ Quadrupole:              0.22672
+                          0.00000       -0.15686
+                         -0.07078        0.00000       -0.06986
+
+ Atom:      12         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             7       9       0
+
+ Charge:                 -0.00764
+ Dipole:                 -0.00264        0.00000       -0.21223
+ Quadrupole:              0.02640
+                          0.00000        0.01222
+                         -0.01025        0.00000       -0.03862
+
+ Atom:      13         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             8       9       0
+
+ Charge:                 -0.00762
+ Dipole:                 -0.00340        0.00000       -0.21045
+ Quadrupole:              0.02745
+                          0.00000        0.01126
+                         -0.01001        0.00000       -0.03871
+
+ Atom:      14         Name:   N         Atomic Number:       7
+
+ Local Frame:            Bisector            28      29       0
+
+ Charge:                 -0.31644
+ Dipole:                  0.00000        0.00000        0.23257
+ Quadrupole:              0.60223
+                          0.00000       -0.49829
+                          0.00000        0.00000       -0.10394
+
+ Atom:      15         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-Bisect             5      16      17
+
+ Charge:                 -0.09503
+ Dipole:                  0.01985        0.00000        0.23137
+ Quadrupole:             -0.05950
+                          0.00000       -0.26460
+                         -0.00254        0.00000        0.32410
+
+ Atom:      16         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X            21      18       0
+
+ Charge:                 -0.01955
+ Dipole:                 -0.08513        0.00000        0.03733
+ Quadrupole:              0.26912
+                          0.00000       -0.13256
+                          0.01375        0.00000       -0.13656
+
+ Atom:      17         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X            22      19       0
+
+ Charge:                  0.14043
+ Dipole:                 -0.00879        0.00000       -0.44187
+ Quadrupole:             -0.63807
+                          0.00000       -0.64335
+                         -0.08876        0.00000        1.28142
+
+ Atom:      18         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X            23      20       0
+
+ Charge:                 -0.00193
+ Dipole:                 -0.00623        0.00000       -0.06439
+ Quadrupole:              0.05617
+                          0.00000       -0.21376
+                         -0.02676        0.00000        0.15759
+
+ Atom:      19         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X            24      20       0
+
+ Charge:                 -0.03024
+ Dipole:                 -0.02264        0.00000        0.02869
+ Quadrupole:              0.20629
+                          0.00000       -0.12667
+                         -0.01317        0.00000       -0.07962
+
+ Atom:      20         Name:   C         Atomic Number:       6
+
+ Local Frame:            Bisector            18      19       0
+
+ Charge:                 -0.03404
+ Dipole:                  0.00000        0.00000       -0.03522
+ Quadrupole:              0.23014
+                          0.00000       -0.14802
+                          0.00000        0.00000       -0.08212
+
+ Atom:      21         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            16      18       0
+
+ Charge:                  0.00863
+ Dipole:                 -0.01710        0.00000       -0.17122
+ Quadrupole:              0.09925
+                          0.00000       -0.04842
+                         -0.03449        0.00000       -0.05083
+
+ Atom:      22         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            17      19       0
+
+ Charge:                 -0.01060
+ Dipole:                  0.00450        0.00000       -0.18842
+ Quadrupole:              0.02823
+                          0.00000        0.01393
+                          0.00082        0.00000       -0.04216
+
+ Atom:      23         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            18      20       0
+
+ Charge:                  0.00425
+ Dipole:                 -0.00402        0.00000       -0.17936
+ Quadrupole:              0.02666
+                          0.00000        0.00944
+                         -0.00204        0.00000       -0.03610
+
+ Atom:      24         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            19      20       0
+
+ Charge:                  0.00374
+ Dipole:                 -0.00154        0.00000       -0.18158
+ Quadrupole:              0.02738
+                          0.00000        0.00990
+                         -0.00134        0.00000       -0.03728
+
+ Atom:      25         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-Only              20       0       0
+
+ Charge:                  0.00328
+ Dipole:                  0.00000        0.00000       -0.18383
+ Quadrupole:              0.01927
+                          0.00000        0.01927
+                          0.00000        0.00000       -0.03854
+
+ Atom:      26         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             5      27       0
+
+ Charge:                  0.06500
+ Dipole:                  0.01820        0.00000       -0.08878
+ Quadrupole:             -0.00936
+                          0.00000        0.01455
+                          0.01183        0.00000       -0.00519
+
+ Atom:      27         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             5      26       0
+
+ Charge:                  0.00637
+ Dipole:                 -0.01162        0.00000       -0.09545
+ Quadrupole:              0.00522
+                          0.00000       -0.00324
+                         -0.00816        0.00000       -0.00198
+
+ Atom:      28         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            14      29       0
+
+ Charge:                  0.09861
+ Dipole:                 -0.01873        0.00000       -0.11529
+ Quadrupole:             -0.00909
+                          0.00000       -0.00142
+                         -0.00543        0.00000        0.01051
+
+ Atom:      29         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X            14      28       0
+
+ Charge:                  0.10054
+ Dipole:                 -0.01307        0.00000       -0.11865
+ Quadrupole:             -0.00940
+                          0.00000        0.00036
+                         -0.00327        0.00000        0.00904
+Tue Nov  9 11:08:31 2021 Calling: potential 1 16_1_Index_0_GrowFragment_2.xyz -k 16_1_Index_0_GrowFragment_2.key path = /home/bdw2292/PoltypeJobs/farH_in17/Fragments/16_1_Index_0/16_1_Index_0_GrowFragment_2
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.9.4   September 2021                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+        1     1     C     16_1_Index_0_GrowFra         6     12.011     3
+        2     2     C     16_1_Index_0_GrowFra         6     12.011     3
+        3     3     N     16_1_Index_0_GrowFra         7     14.007     3
+        4     4     H     16_1_Index_0_GrowFra         1      1.008     1
+        5     5     C     16_1_Index_0_GrowFra         6     12.011     4
+        6     6     C     16_1_Index_0_GrowFra         6     12.011     3
+        7     7     C     16_1_Index_0_GrowFra         6     12.011     3
+        8     8     C     16_1_Index_0_GrowFra         6     12.011     3
+        9     9     C     16_1_Index_0_GrowFra         6     12.011     3
+       10    10     H     16_1_Index_0_GrowFra         1      1.008     1
+       11    11     H     16_1_Index_0_GrowFra         1      1.008     1
+       12    12     H     16_1_Index_0_GrowFra         1      1.008     1
+       13    13     H     16_1_Index_0_GrowFra         1      1.008     1
+       14    14     N     16_1_Index_0_GrowFra         7     14.007     3
+       15    15     C     16_1_Index_0_GrowFra         6     12.011     3
+       16    16     C     16_1_Index_0_GrowFra         6     12.011     3
+       17    17     C     16_1_Index_0_GrowFra         6     12.011     3
+       18    18     C     16_1_Index_0_GrowFra         6     12.011     3
+       19    19     C     16_1_Index_0_GrowFra         6     12.011     3
+       20    20     C     16_1_Index_0_GrowFra         6     12.011     3
+       21    21     H     16_1_Index_0_GrowFra         1      1.008     1
+       22    22     H     16_1_Index_0_GrowFra         1      1.008     1
+       23    23     H     16_1_Index_0_GrowFra         1      1.008     1
+       24    24     H     16_1_Index_0_GrowFra         1      1.008     1
+       25    25     H     16_1_Index_0_GrowFra         1      1.008     1
+       26    26     H     16_1_Index_0_GrowFra         1      1.008     1
+       27    27     H     16_1_Index_0_GrowFra         1      1.008     1
+       28    28     H     16_1_Index_0_GrowFra         1      1.008     1
+       29    29     H     16_1_Index_0_GrowFra         1      1.008     1
+
+ Electrostatic Potential Grid Points :                 15056
+
+ Gaussian CUBEGEN Input Written To :   16_1_Index_0_GrowFragment_2.grid
+
+ Next, run the Gaussian CUBEGEN program; for example:
+ cubegen 0 potential=MP2 xxx.fchk xxx.cube -5 h < xxx.grid
+
+ See the Gaussian documentation for additional details;
+ After CUBEGEN, rerun Tinker POTENTIAL using Option 2
+Tue Nov  9 11:08:32 2021 Calling: Psi4 Gradient for ESP
+Tue Nov  9 11:08:32 2021 Percent of jobs submitted 0.0
+Tue Nov  9 11:08:32 2021 Calling: psi4 16_1_Index_0_GrowFragment_2-esp.psi4 16_1_Index_0_GrowFragment_2-esp.log path = /home/bdw2292/PoltypeJobs/farH_in17/Fragments/16_1_Index_0/16_1_Index_0_GrowFragment_2

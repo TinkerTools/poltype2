@@ -30,9 +30,14 @@
 
 [ForceBalance Poltype Wrapper Results](#forcebalance-poltype-wrapper-results)
 
-### Advanced Program Usage Molecular Dynamics
+
+### Advanced Program Usage Molecular Modelling
 
 [Protein Preparation Inputs](#protein-preparation-inputs)
+
+[Docking Inputs](#docking-inputs)
+
+### Advanced Program Usage Molecular Dynamics
 
 [Required Inputs Molecular Dynamics](#required-inputs-molecular-dynamics)
 
@@ -296,6 +301,28 @@ WQ_PORT=9013
 
 
 ``usepdb2pqr`` specifies to use PDB2PQR program to compute pKa values for titratable residues via propka then will protonate the PDB for you and quit program. Default is False.
+
+#### Docking Inputs
+
+``dockgridcenter`` specifies center in protein pocket to place ligand for docking. Default will use center of ligand.
+
+``dockgridsize`` specifies how far grid extends for docking. Default is dockgridsize=20,20,20 .
+
+``vinaexhaustiveness`` specifies how exaustive to search on grid for AutoDock Vina and vinardo. Default is 32.
+
+``nposes`` specifies number of poses for docking. Default is 10.
+
+``usevina`` specifies to use AutoDock Vina. Default is False.
+
+``usead4`` specifies to use AutoDock 4. Default is False.
+
+``usevinardo`` specifies to use Vinardo scoring function. Default is False.
+
+``usegold`` specifies to use GOLD. Default is False. 
+
+``dockingenvpath`` specifies path to python 2 conda environment for generating PDBQT files needed for docking. Default is None.
+
+``gridspacing`` specifies grid density for AutoDock 4. Default is .4 angstroms.
 
 
 #### Required Inputs Molecular Dynamics

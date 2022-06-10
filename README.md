@@ -54,7 +54,8 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
     * Torsion-Torsion coupling
     * Expanded torsion database
 * Host-guest Modelling Features
-    * Protein-ligand interaction profiler and visualization with BINANA
+    * Docking with GOLD, AutoDock4, AutoDock Vina, Vinardo
+    * Protein-ligand interaction profiler and visualization with BINANA and ProLif
     * Missing residues & loop modeling with Modeller
     * Protonation assignment via propka/pdb2pqr
     * Tinker box set up
@@ -152,6 +153,8 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 [Protein Ligand Interaction Visualization](#protein-ligand-interaction-visualization)
 
 [Protein Input Preparation](#protein-input-preparation)
+
+[Minimum Input Example Docking](#minimum-input-example-docking)
 
 [Molecular Dynamics Input Preparation](#molecular-dynamics-input-preparation)
 
@@ -637,6 +640,11 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 
 
 ### Protein Ligand Interaction Visualization
+
+<img src="README/Images/3DProLig.png" width="80%">
+<img src="README/Images/2DProLig.png" width="80%">
+
+
 * Navigate to folder VisualizationNotebooks
 * Be sure to install the conda environment (notebookenvironment.yml),``conda env create -f notebookenvironment.yml``. 
 * Activate the conda environment ``conda activate pymolenv``
@@ -644,7 +652,7 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 * Ensure that the residue labels for ligand are labeled as ``LIG``.
 * Launch the jupyter notebook ``jupyter-notebook Protein-Ligand-Interactions.ipynb``
 * Input your complexed PDB name into variable ``ligandreceptorfilename``
-* Run the cell and the output from BINANA interaction profiler is shown. 
+* Run the cell and the output from BINANA interaction profiler and ProLif is shown. 
 
 
 ### Protein Input Preparation
@@ -663,6 +671,25 @@ uncomplexedproteinpdbname=5l2t_filled.BL00020001.pdb
 usepdb2pqr
 ```
 * After adding any missing residues and assigning the protonation state, the ligand needs to be added to the protein pocket and given as input ``complexedproteinpdbname`` for binding computations.
+
+
+### Minimum Input Example Docking
+* If you want to use GOLD, ensure that the bin folder is in your PATH
+* Complexed protein with ligand needs to be provided (this should already be protonated before providing as input)
+* For generating PDBQT files with AutoDock4 and AutoDock Vina, a seperate python 2 environment (dockingprep.yml) needs to be installed and declared in poltype input file.
+* Optional keywords exist to change docking grid center (default is center of ligand from the input protein-ligand complex), docking grid length (how far grid extends), grid spacing (controls point density on grid) and the number of poses generated (default 10).  
+* Final scores, structures and rankings are given in a file called DockingReport.txt 
+
+```
+complexedproteinpdbname=complex.pdb
+dockingenvpath=/home/bdw2292/miniconda3/envs/dockingprep/
+usead4=True
+usevina=True
+usevinardo=True
+usegold=True
+```
+
+
 
 ### Molecular Dynamics Input Preparation
 * If Tinker9 executables are in PATH, then program will switch to using analyze9,dynamic9,minimize9, the GPU executables.

@@ -2,6 +2,7 @@ name: amoebamdpoltype
 channels:
   - schrodinger
   - anaconda
+  - hcc
   - psi4
   - salilab
   - conda-forge
@@ -17,6 +18,7 @@ dependencies:
   - astunparse=1.6.3=pyhd8ed1ab_0
   - async-timeout=4.0.2=pyhd8ed1ab_0
   - attrs=21.4.0=pyhd8ed1ab_0
+  - autodock=4.2.6=hfc679d8_0
   - binutils_impl_linux-64=2.36.1=h193b22a_2
   - biopython=1.79=py38h497a2fe_1
   - blas=1.0=mkl
@@ -293,3 +295,5 @@ dependencies:
     - bidict==0.22.0
     - pyastronomy==0.17.1
     - quantities==0.13.0
+    - vina==1.2.3
+prefix: /home/bdw2292/miniconda3/envs/newamoebamdpoltype
