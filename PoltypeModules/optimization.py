@@ -133,6 +133,7 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
             temp.write('  "'+')'+'\n')
             temp.write('}'+'\n')
     if len(torsionrestraints)!=0:
+        '''
         temp.write('set optking { '+'\n')
         temp.write('  frozen_dihedral = ("'+'\n')
         for residx in range(len(torsionrestraints)):
@@ -145,6 +146,26 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
 
         temp.write('  ")'+'\n')
         temp.write('}'+'\n')
+        '''
+
+        temp.write('geometric_keywords = {'+'\n')
+        temp.write(" 'coordsys' : 'tric',"+'\n')
+        temp.write(" 'constraints' : {"+'\n')
+        for residx in range(len(torsionrestraints)):
+            res=torsionrestraints[residx]
+            rta,rtb,rtc,rtd=res[:]
+            angle=mol.GetTorsion(rta,rtb,rtc,rtd)
+            if angle<0:
+                angle=angle+360
+            if residx>0:
+                temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(angle)))
+            else:
+                temp.write(" 'set' : [{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(angle)))
+
+        temp.write("]"+'\n')
+        temp.write("  }"+'\n')
+        temp.write(" }"+'\n')
+
 
     if poltype.allowradicals==True:
         temp.write('set reference uhf '+'\n')
@@ -153,45 +174,19 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
-    temp.write('for _ in range(1):'+'\n')
-    temp.write('  try:'+'\n')
-    if poltype.optpcm==True:
-        temp.write('    set opt_coordinates cartesian'+'\n')
     spacedformulastr=mol.GetSpacedFormula()
     if ('I ' in spacedformulastr):
         temp.write('    basis {'+'\n')
         temp.write('    ['+' '+poltype.optbasissetfile+' '+poltype.iodineoptbasissetfile +' '+ ']'+'\n')
         temp=ReadInBasisSet(poltype,temp,poltype.optbasissetfile,poltype.iodineoptbasissetfile)
         temp.write('    }'+'\n')
-        temp.write("    optimize('%s')" % (poltype.optmethod.lower())+'\n')
-
-    else:
-
-        if modred==False:
-            temp.write('    set opt_coordinates both'+'\n')
-        temp.write("    optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
+        temp.write("optimize('%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.optmethod.lower(),'geometric')+'\n')
+                                                
+    else:                                       
+                                                
+        temp.write("optimize('%s/%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.optmethod.lower(),poltype.optbasisset,'geometric')+'\n')
     if poltype.freq:
         temp.write('    scf_e,scf_wfn=freq("%s/%s",return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
-    temp.write('    break'+'\n')
-    temp.write('  except:'+'\n')
-    temp.write('    break'+'\n')
-    if skipscferror==True:
-        temp.write('  except SCFConvergenceError:'+'\n')
-        temp.write('    pass'+'\n')
-   
-    temp.write('  else:'+'\n')
-    temp.write('    try:'+'\n')
-    temp.write('      set opt_coordinates cartesian'+'\n')
-    if ('I ' in spacedformulastr):
-        temp.write("      optimize('%s')" % (poltype.optmethod.lower())+'\n')
-    else:
-        temp.write("      optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
-
-    if poltype.freq:
-        temp.write('      scf_e,scf_wfn=freq("%s/%s",return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
-    temp.write('      break'+'\n')
-    temp.write('    except:'+'\n')
-    temp.write('      '+'pass'+'\n')
 
     temp.write('clean()'+'\n')
     temp.close()

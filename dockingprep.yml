@@ -6,4 +6,3 @@ channels:
   - defaults
 dependencies:
   - mgltools=1.5.7=h9ee0642_1
-prefix: /home/bdw2292/miniconda3/envs/dockingprep

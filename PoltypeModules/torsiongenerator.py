@@ -1453,8 +1453,9 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     temp.write('}'+'\n')
 
     # Fix all torsions around the rotatable bond b-c
-    temp.write('set optking { '+'\n')
-    temp.write('  frozen_dihedral = ("'+'\n')
+    temp.write('geometric_keywords = {'+'\n')
+    temp.write(" 'coordsys' : 'tric',"+'\n')
+    temp.write(" 'constraints' : {"+'\n')
     restlist=[]
     firsttor=True
     for i in range(len(torset)):
@@ -1495,14 +1496,19 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
 
                 if resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
                     rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
+                    if rtang<0:
+                        rtang=rtang+360
+
                     if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
                        (optmol.GetAtom(rtd).GetAtomicNum() != 1):
                         restlist.append(resttors)
                         if not firsttor:
-                            temp.write(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
+                            temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(rtang)))
                         else:
-                            temp.write('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
-                            firsttor=True
+                            temp.write(" 'set' : [{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(rtang)))
+                            firsttor=False
+
+
                         rotbndtorescount[rotbnd]+=1
             
         # Leave all torsions around other rotatable bonds fixed
@@ -1571,16 +1577,21 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                 continue
 
             rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
+            if rtang<0:
+                rtang=rtang+360
+
             if resttors not in restlist and resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
                 restlist.append(resttors)
                 if not firsttor:
-                    temp.write(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
+                    temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(rtang)))
                 else:
-                    temp.write('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
-                    firsttor=True
+                    temp.write(" 'set' : [{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(rtang)))
+                    firsttor=False
                 rotbndtorescount[rotbnd]+=1
-    temp.write('  ")'+'\n')
-    temp.write('}'+'\n')
+    temp.write("]"+'\n')
+    temp.write("  }"+'\n')
+    temp.write(" }"+'\n')
+
 
     if poltype.toroptpcm==True:
         temp.write('set {'+'\n')
@@ -1616,41 +1627,19 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
-    temp.write('for _ in range(1):'+'\n')
-    temp.write('  try:'+'\n')
-    if poltype.toroptpcm==True:
-        temp.write('    set opt_coordinates cartesian'+'\n')
     spacedformulastr=optmol.GetSpacedFormula()
     if ('I ' in spacedformulastr):
         temp.write('    basis {'+'\n')
         temp.write('    ['+' '+poltype.toroptbasissetfile+' '+poltype.iodinetoroptbasissetfile +' '+ ']'+'\n')
         temp=ReadInBasisSet(poltype,temp,poltype.toroptbasissetfile,poltype.iodinetoroptbasissetfile,'    ')
         temp.write('    }'+'\n')
-        temp.write('    set opt_coordinates both'+'\n')
-        temp.write("    optimize('%s')" % (poltype.toroptmethod.lower())+'\n')
+        temp.write("optimize('%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.toroptmethod.lower(),'geometric')+'\n')
 
     else:
 
-        temp.write('    set opt_coordinates both'+'\n')
-        temp.write("    optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
+        temp.write("optimize('%s/%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.toroptmethod.lower(),poltype.toroptbasisset,'geometric')+'\n')
     if poltype.freq:
         temp.write('    scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
-    temp.write('    break'+'\n')
-    temp.write('  except OptimizationConvergenceError:'+'\n')
-    temp.write('    break'+'\n')
-    temp.write('  else:'+'\n')
-    temp.write('    try:'+'\n')
-    temp.write('      set opt_coordinates cartesian'+'\n')
-    if ('I ' in spacedformulastr):
-        temp.write("      optimize('%s')" % (poltype.toroptmethod.lower())+'\n')
-    else:
-        temp.write("      optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
-
-    if poltype.freq:
-        temp.write('      scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
-    temp.write('      break'+'\n')
-    temp.write('    except OptimizationConvergenceError:'+'\n')
-    temp.write('      '+'pass'+'\n')
     temp.write('clean()'+'\n')
     temp.close()
     outputname=inputname.replace('.psi4','.log')

@@ -74,6 +74,7 @@ dependencies:
   - gcc_impl_linux-64=11.2.0=h82a94d6_14
   - gcp=2.0.2=he991be0_2
   - gdma=2.2.6=h0e1e685_6
+  - geometric=0.9.7.2=py_0
   - gettext=0.19.8.1=h73d1719_1008
   - giflib=5.2.1=h36c2ea0_2
   - git=2.35.1=pl5321h36853c3_0
@@ -296,4 +297,3 @@ dependencies:
     - pyastronomy==0.17.1
     - quantities==0.13.0
     - vina==1.2.3
-prefix: /home/bdw2292/miniconda3/envs/newamoebamdpoltype

@@ -81,6 +81,8 @@ from rdkit.Chem.MolStandardize import rdMolStandardize
 
 @dataclass
 class PolarizableTyper():
+        targetenthalpyerror:float=.024 # kcal/mol
+        targetdensityerror:float=10 # kg/m^3
         gridspacing:float=.4
         nposes:int=10
         vinaexhaustiveness:int=32
@@ -492,6 +494,10 @@ class PolarizableTyper():
                             self.indextompoleframefile=a
                         elif 'qmrelativeweight' in newline:
                             self.qmrelativeweight=float(a)
+                        elif 'targetenthalpyerror' in newline:
+                            self.targetenthalpyerror=float(a)
+                        elif 'targetdensityerror' in newline:
+                            self.targetdensityerror=float(a)
                         elif 'liqrelativeweight' in newline:
                             self.liqrelativeweight=float(a)
                         elif 'enthalpyrelativeweight' in newline:
@@ -1454,7 +1460,7 @@ class PolarizableTyper():
                 fb.GenerateForceBalanceInputs(self.poltypepathlist,self.vdwtypeslist,self.liquid_equ_steps,self.liquid_prod_steps,self.liquid_timestep,self.liquid_interval,self.gas_equ_steps,self.gas_prod_steps,self.gas_timestep,self.gas_interval,self.md_threads,self.liquid_prod_time,self.gas_prod_time,self.WQ_PORT,self.csvexpdatafile,self.fittypestogether,self.vdwprmtypestofit,self.vdwtypestoeval,self.liquid_equ_time,self.gas_equ_time,self.qmrelativeweight,self.liqrelativeweight,self.enthalpyrelativeweight,self.densityrelativeweight)
                 sys.exit()
             if self.forcebalancejobsdir!=None:
-                plotFBresults.PlotForceBalanceResults(self.forcebalancejobsdir)
+                plotFBresults.PlotForceBalanceResults(self.forcebalancejobsdir,self.targetdensityerror,self.targetenthalpyerror)
                 sys.exit()
             if self.compareparameters==True:
                 self.MolecularDynamics()
@@ -3540,10 +3546,10 @@ class PolarizableTyper():
                     else:
                         if self.deletedfiles==True:
                             raise ValueError('Bond does not exist after optimization !'+str(bond))
-                        else:
-                            self.deletedfiles=True
-                            self.DeleteAllFiles()
-                            self.GenerateParameters()
+                        #else:
+                        #    self.deletedfiles=True
+                        #    self.DeleteAllFiles()
+                        #    self.GenerateParameters()
 
                 for bond in bondtopoopt:
                     if bond in bondtopo or bond[::-1] in bondtopo:
@@ -3551,10 +3557,10 @@ class PolarizableTyper():
                     else:
                         if self.deletedfiles==True:
                             raise ValueError('Bond created after optimization !'+str(bond))
-                        else:
-                            self.deletedfiles=True
-                            self.DeleteAllFiles()
-                            self.GenerateParameters()
+                        #else:
+                        #    self.deletedfiles=True
+                        #    self.DeleteAllFiles()
+                        #    self.GenerateParameters()
 
 
                 
@@ -3562,15 +3568,17 @@ class PolarizableTyper():
             optatomnums=optmol.NumAtoms()
             molatomnums=mol.NumAtoms()
             if optatomnums!=molatomnums: # then program behaviour changed need to restart
-                self.deletedfiles=True
-                self.DeleteAllFiles()
-                self.GenerateParameters()
+                print('atom number before and after is different',flush=True)
+            #    self.deletedfiles=True
+            #    self.DeleteAllFiles()
+            #    self.GenerateParameters()
 
             checkmp2optfailed=self.CheckMP2OptFailed()
             if checkmp2optfailed==True:
-                self.deletedfiles=True
-                self.DeleteAllFiles()
-                self.GenerateParameters()
+                print('mp2 opt failed',flush=True)
+            #    self.deletedfiles=True
+            #    self.DeleteAllFiles()
+            #    self.GenerateParameters()
 
 
             if self.optonly==True:

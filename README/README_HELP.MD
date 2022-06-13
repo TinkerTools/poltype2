@@ -286,6 +286,10 @@ WQ_PORT=9013
 
 ``densityrelativeweight`` specifies relative weight between density and other liquid properties. Default is .01.
 
+``targetdensityerror`` specifies target density error in kg/m^3 for ForceBalance fitting. Default is 10 kg/m^3.
+
+``targetenthalpyerror`` specifies target enthalpy error in kcal/mol for ForceBalance fitting. Default is .024 kcal/mol .  
+
 
 #### ForceBalance Poltype Wrapper Results
 
@@ -438,6 +442,7 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 
 ``minonly`` specifies to quit after minimization is complete. Default is False.
 
+``minfinished`` specifies to skip minimization (for debugging). Default is False. 
 
 #### Restraints
 
@@ -482,6 +487,8 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 ``equilonly``   specifies to stop program after equilibriation and setup for production dynamics. Default is False.
 
 
+``equilfinished`` specifies to skip equilibration (for debugging). Default is False.
+
 #### Production Dynamics
 
 ``productiondynamicsNVT``   specifies whether or not to use NVT ensemble during production dynamics. If on then will use NPT after equilbriating to determine average box size. Default is False.
@@ -501,6 +508,7 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 
 ``checktraj``   specifies to check each trajectory for any corruption and delete if found. Default is False (slow to read each arc file).
 
+``prodmdfinished`` specifies to skip production dynamics (for debugging). Default is False.
 
 #### Free Energy
 
@@ -519,6 +527,8 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 ``pathtosims``  specifies path to folder containing subfolders of simulations for combining simulation data into one spreadsheet. Will exit program after combining data. Default has no value. 
 
 ``extractinterforbinding`` specifies to extract intermoleculer contribution to free energy for each BAR step. By default, annihilation is used which causes inter and intra molecular components to be mixed for binding free energy (gas phase is not computed since it would cancel in thermodynamic cycle). This keyword will extract the ligand dynamics and generate an ARC file for the ligand, run BAR and compute the exact intermolecular component to the free energy and add to spreadsheet.
+
+``barfilesfinished`` specifies to skip BAR (for debugging). Default is False.
 
 #### Mutation
 

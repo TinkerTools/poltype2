@@ -1303,7 +1303,7 @@ def PlotLiquidPropsVsTemp(nametotptofinalprops):
 
 
 
-def WriteOutPropTable(nametotptofinalprops,moltomaxiter):
+def WriteOutPropTable(nametotptofinalprops,moltomaxiter,targetdensityerror,targetenthalpyerror):
     tempname='SummaryProps.csv'
     densityerrors=[]
     densityrelerrors=[]
@@ -1312,7 +1312,7 @@ def WriteOutPropTable(nametotptofinalprops,moltomaxiter):
     nametopropavgerrors={}
     with open(tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        header=['Name','Temperature','Pressure','Density Ref','Density Calc','Density CalcErr','Density Error','Density RelError','Enthalpy Ref','Enthalpy Calc','Enthalpy CalcErr','Enthalpy Error','Enthalpy RelError','Max Iter','Enthalpy Loss','Density Loss']
+        header=['Name','Temperature','Pressure','Density Ref','Density Calc','Density CalcErr','Density Error','Density RelError','Enthalpy Ref','Enthalpy Calc','Enthalpy CalcErr','Enthalpy Error','Enthalpy RelError','Max Iter','Enthalpy Loss','Density Loss','Enthalpy Reached Target?','Density Reached Target?','Enthalpy Target','Density Target']
         energy_writer.writerow(header)
         for name,tptofinalprops in nametotptofinalprops.items():
             maxiter=moltomaxiter[name]
@@ -1342,6 +1342,7 @@ def WriteOutPropTable(nametotptofinalprops,moltomaxiter):
                             truevalue=value
                     error=all[0]-all[1]
                     error=np.abs(round(error,2))
+                    
                     relerror=round((100*error)/truevalue,2)
                     thename=propname+' '+'Error'
                     headeridx=header.index(thename)
@@ -1349,16 +1350,31 @@ def WriteOutPropTable(nametotptofinalprops,moltomaxiter):
                     thename=propname+' '+'RelError'
                     headeridx=header.index(thename)
                     array[headeridx]=relerror
+                    reachedtargeterror=True
                     if propname=='Density':
                         densityerrors.append(error)
                         densityrelerrors.append(relerror)
                         namedensityerrors.append(error)
                         namedensityrelerrors.append(relerror)
+                        targeterror=targetdensityerror
+                        if error>targetdensityerror:
+                            reachedtargeterror=False
                     elif propname=='Enthalpy':
                         enthalpyerrors.append(error)
                         enthalpyrelerrors.append(relerror)
                         nameenthalpyerrors.append(error)
                         nameenthalpyrelerrors.append(relerror)
+                        targeterror=targetenthalpyerror
+                        if error>targetenthalpyerror:
+                            reachedtargeterror=False
+                    thename=propname+' '+'Reached Target?'
+                    headeridx=header.index(thename)
+                    array[headeridx]=reachedtargeterror
+                    thename=propname+' '+'Target'
+                    headeridx=header.index(thename)
+                    array[headeridx]=targeterror
+
+
                 energy_writer.writerow(array)
             nameavedensityerr=np.mean(np.array(namedensityerrors))
             nameavedensityrelerr=np.mean(np.array(namedensityrelerrors))
@@ -1761,7 +1777,7 @@ def WriteOutParamAndAvgErrorTable(nametopropavgerrors,nametodimerqmerror,nametoa
                 energy_writer.writerow(array)
 
 
-def PlotForceBalanceResults(fbdir):
+def PlotForceBalanceResults(fbdir,targetdensityerror,targetenthalpyerror):
     curdir=os.getcwd()
     jobdirs=GrabJobDirectories(fbdir)
     outputfiles=GrabOutputFiles(jobdirs)
@@ -1774,7 +1790,7 @@ def PlotForceBalanceResults(fbdir):
     nametofilenametoformula=PlotAllDimers(nametodimerstructs,truenametoindices)
     nametotptofinalprops,nametoformulatormse,nametoformulatomse=PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoindices)
     moltotptoarc,moltomaxiter=GrabFinalNeatLiquidTrajectories(jobdirs)
-    nametopropavgerrors=WriteOutPropTable(nametotptofinalprops,moltomaxiter)
+    nametopropavgerrors=WriteOutPropTable(nametotptofinalprops,moltomaxiter,targetdensityerror,targetenthalpyerror)
     PlotAllRDFs(moltotptoarc,neatliqnametoindices)
     prmfiles=GrabFinalParameters(jobdirs)
     moltotypetoprms,moltotypetoelement,moltotypetofitrad,moltotypetofitdep,moltotypetofitred=GrabParameterValues(prmfiles)
