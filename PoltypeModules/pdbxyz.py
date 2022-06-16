@@ -6,6 +6,8 @@ import shutil
 import warnings
 import time
 import sys
+from PyAstronomy import pyasl
+import numpy as np
 
 def GenerateProteinTinkerXYZFile(poltype):
     if poltype.uncomplexedproteinpdbname==None:
@@ -41,15 +43,15 @@ def GenerateProteinTinkerXYZFile(poltype):
 
     indextocoordinates=GrabLigandCoordinates(poltype,uncomplexedatomnum,shift)
     poltype.ligandindices[0]=list(indextocoordinates.keys())
-    nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement=GrabNonLigandHETATMInfo(poltype,poltype.complexedproteinpdbname,list(indextocoordinates.keys()),shift) 
+    nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement=GrabNonLigandHETATMInfo(poltype,poltype.complexedproteinpdbname,list(indextocoordinates.keys()),shift,newuncomplexedatomnum) 
     
     GenerateComplexedTinkerXYZFile(poltype,poltype.uncomplexedxyzname,indextocoordinates,newuncomplexedatomnum,nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement)
     ligandindices=poltype.ligandindices[0]
-    GeneratePDBFileFromXYZ(poltype,poltype.complexedxyzname,ligandindices)
+    #GeneratePDBFileFromXYZ(poltype,poltype.complexedxyzname,ligandindices)
 
 
 
-def GrabNonLigandHETATMInfo(poltype,complexedproteinpdbname,ligandindices,shift):
+def GrabNonLigandHETATMInfo(poltype,complexedproteinpdbname,ligandindices,shift,newuncomplexedatomnum):
     nonlighetatmindextocoordinates={}
     nonlighetatmindextotypenum={}
     nonlighetatmindextoconnectivity={}
@@ -62,20 +64,22 @@ def GrabNonLigandHETATMInfo(poltype,complexedproteinpdbname,ligandindices,shift)
     obConversion = openbabel.OBConversion()
     obConversion.SetInFormat('pdb')
     obConversion.ReadFile(pdbmol,complexedproteinpdbname)
-    for line in results:
-        if 'HETATM' in line:
-            linesplit=line.split()
-            index=int(linesplit[1])
-            finalindex=index+shift
-            element=linesplit[2][0]
-            coords=[float(linesplit[5]),float(linesplit[6]),float(linesplit[7])]
-            if finalindex not in ligandindices:
-                nonlighetatmindextocoordinates[finalindex]=coords
-                typenum=GrabNonLigandHETATMType(poltype,element)
-                nonlighetatmindextotypenum[finalindex]=typenum
-                connectivity=GrabConnectivity(poltype,pdbmol,index,shift)
-                nonlighetatmindextoconnectivity[finalindex]=connectivity
-                nonlighetatmindextoelement[finalindex]=element
+    iteratom = openbabel.OBMolAtomIter(pdbmol)
+    an = pyasl.AtomicNo()
+
+    for atom in iteratom:
+        index=atom.GetIdx()
+        atomicnum=atom.GetAtomicNum()
+        coords=[atom.GetX(),atom.GetY(),atom.GetZ()]
+        finalindex=index+shift
+        element=an.getElSymbol(atomicnum)
+        if finalindex not in ligandindices and index>newuncomplexedatomnum:
+            nonlighetatmindextocoordinates[finalindex]=coords
+            typenum=GrabNonLigandHETATMType(poltype,element)
+            nonlighetatmindextotypenum[finalindex]=typenum
+            connectivity=GrabConnectivity(poltype,pdbmol,index,shift)
+            nonlighetatmindextoconnectivity[finalindex]=connectivity
+            nonlighetatmindextoelement[finalindex]=element
 
     return nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement
 
@@ -279,7 +283,7 @@ def DetectNumberOfChains(poltype,pdbfile):
     temp.close()
     chainls=[]
     for line in results:
-        if 'ATOM' in line:
+        if 'ATOM' in line and 'REMARK' not in line:
             linesplit=line.split()
             chain=linesplit[4]
             if chain not in chainls:
