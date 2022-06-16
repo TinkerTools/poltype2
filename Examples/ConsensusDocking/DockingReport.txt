@@ -1,0 +1,224 @@
+Docking model : GOLD
+Ligand : lig1.pdb
+Dictionary structure
+Pose Ranking 1 gold_soln_lig1_m1_6.pdb
+Pose Ranking 2 gold_soln_lig1_m1_5.pdb
+Pose Ranking 3 gold_soln_lig1_m1_1.pdb
+Pose Ranking 4 gold_soln_lig1_m1_9.pdb
+Pose Ranking 5 gold_soln_lig1_m1_2.pdb
+Pose Ranking 6 gold_soln_lig1_m1_10.pdb
+Pose Ranking 7 gold_soln_lig1_m1_4.pdb
+Pose Ranking 8 gold_soln_lig1_m1_7.pdb
+Pose Ranking 9 gold_soln_lig1_m1_8.pdb
+Pose Ranking 10 gold_soln_lig1_m1_3.pdb
+Dictionary complexedstructure
+Pose Ranking 1 gold_soln_lig1_m1_6_complex_receptoronly.pdb
+Pose Ranking 2 gold_soln_lig1_m1_5_complex_receptoronly.pdb
+Pose Ranking 3 gold_soln_lig1_m1_1_complex_receptoronly.pdb
+Pose Ranking 4 gold_soln_lig1_m1_9_complex_receptoronly.pdb
+Pose Ranking 5 gold_soln_lig1_m1_2_complex_receptoronly.pdb
+Pose Ranking 6 gold_soln_lig1_m1_10_complex_receptoronly.pdb
+Pose Ranking 7 gold_soln_lig1_m1_4_complex_receptoronly.pdb
+Pose Ranking 8 gold_soln_lig1_m1_7_complex_receptoronly.pdb
+Pose Ranking 9 gold_soln_lig1_m1_8_complex_receptoronly.pdb
+Pose Ranking 10 gold_soln_lig1_m1_3_complex_receptoronly.pdb
+Dictionary score
+Pose Ranking 1 122.73
+Pose Ranking 2 112.16
+Pose Ranking 3 111.91
+Pose Ranking 4 98.82
+Pose Ranking 5 93.29
+Pose Ranking 6 86.69
+Pose Ranking 7 85.05
+Pose Ranking 8 71.82
+Pose Ranking 9 66.33
+Pose Ranking 10 66.19
+Ligand : lig2.pdb
+Dictionary structure
+Pose Ranking 1 gold_soln_lig2_m1_10.pdb
+Pose Ranking 2 gold_soln_lig2_m1_1.pdb
+Pose Ranking 3 gold_soln_lig2_m1_5.pdb
+Pose Ranking 4 gold_soln_lig2_m1_8.pdb
+Pose Ranking 5 gold_soln_lig2_m1_7.pdb
+Pose Ranking 6 gold_soln_lig2_m1_3.pdb
+Pose Ranking 7 gold_soln_lig2_m1_2.pdb
+Pose Ranking 8 gold_soln_lig2_m1_4.pdb
+Pose Ranking 9 gold_soln_lig2_m1_9.pdb
+Pose Ranking 10 gold_soln_lig2_m1_6.pdb
+Dictionary complexedstructure
+Pose Ranking 1 gold_soln_lig2_m1_10_complex_receptoronly.pdb
+Pose Ranking 2 gold_soln_lig2_m1_1_complex_receptoronly.pdb
+Pose Ranking 3 gold_soln_lig2_m1_5_complex_receptoronly.pdb
+Pose Ranking 4 gold_soln_lig2_m1_8_complex_receptoronly.pdb
+Pose Ranking 5 gold_soln_lig2_m1_7_complex_receptoronly.pdb
+Pose Ranking 6 gold_soln_lig2_m1_3_complex_receptoronly.pdb
+Pose Ranking 7 gold_soln_lig2_m1_2_complex_receptoronly.pdb
+Pose Ranking 8 gold_soln_lig2_m1_4_complex_receptoronly.pdb
+Pose Ranking 9 gold_soln_lig2_m1_9_complex_receptoronly.pdb
+Pose Ranking 10 gold_soln_lig2_m1_6_complex_receptoronly.pdb
+Dictionary score
+Pose Ranking 1 125.9
+Pose Ranking 2 110.72
+Pose Ranking 3 98.14
+Pose Ranking 4 93.0
+Pose Ranking 5 92.57
+Pose Ranking 6 89.94
+Pose Ranking 7 77.15
+Pose Ranking 8 75.46
+Pose Ranking 9 65.15
+Pose Ranking 10 61.74
+Docking model : ad4
+Ligand : lig1.pdb
+Dictionary structure
+Pose Ranking 1 lig1_ad4_1.pdb
+Pose Ranking 2 lig1_ad4_2.pdb
+Pose Ranking 3 lig1_ad4_3.pdb
+Pose Ranking 4 lig1_ad4_4.pdb
+Pose Ranking 5 lig1_ad4_5.pdb
+Pose Ranking 6 lig1_ad4_6.pdb
+Pose Ranking 7 lig1_ad4_7.pdb
+Pose Ranking 8 lig1_ad4_8.pdb
+Pose Ranking 9 lig1_ad4_9.pdb
+Pose Ranking 10 lig1_ad4_10.pdb
+Pose Ranking 11 lig1_ad4_11.pdb
+Dictionary complexedstructure
+Pose Ranking 1 lig1_ad4_1_complex_receptoronly.pdb
+Pose Ranking 2 lig1_ad4_2_complex_receptoronly.pdb
+Pose Ranking 3 lig1_ad4_3_complex_receptoronly.pdb
+Pose Ranking 4 lig1_ad4_4_complex_receptoronly.pdb
+Pose Ranking 5 lig1_ad4_5_complex_receptoronly.pdb
+Pose Ranking 6 lig1_ad4_6_complex_receptoronly.pdb
+Pose Ranking 7 lig1_ad4_7_complex_receptoronly.pdb
+Pose Ranking 8 lig1_ad4_8_complex_receptoronly.pdb
+Pose Ranking 9 lig1_ad4_9_complex_receptoronly.pdb
+Pose Ranking 10 lig1_ad4_10_complex_receptoronly.pdb
+Pose Ranking 11 lig1_ad4_11_complex_receptoronly.pdb
+Dictionary score
+Pose Ranking 1 1.11
+Pose Ranking 2 1.1
+Pose Ranking 3 1.1
+Pose Ranking 4 1.11
+Pose Ranking 5 1.11
+Pose Ranking 6 1.1
+Pose Ranking 7 1.11
+Pose Ranking 8 1.11
+Pose Ranking 9 1.11
+Pose Ranking 10 1.11
+Pose Ranking 11 1.11
+Ligand : lig2.pdb
+Dictionary structure
+Pose Ranking 1 lig2_ad4_1.pdb
+Pose Ranking 2 lig2_ad4_2.pdb
+Pose Ranking 3 lig2_ad4_3.pdb
+Pose Ranking 4 lig2_ad4_4.pdb
+Pose Ranking 5 lig2_ad4_5.pdb
+Pose Ranking 6 lig2_ad4_6.pdb
+Pose Ranking 7 lig2_ad4_7.pdb
+Pose Ranking 8 lig2_ad4_8.pdb
+Pose Ranking 9 lig2_ad4_9.pdb
+Pose Ranking 10 lig2_ad4_10.pdb
+Pose Ranking 11 lig2_ad4_11.pdb
+Dictionary complexedstructure
+Pose Ranking 1 lig2_ad4_1_complex_receptoronly.pdb
+Pose Ranking 2 lig2_ad4_2_complex_receptoronly.pdb
+Pose Ranking 3 lig2_ad4_3_complex_receptoronly.pdb
+Pose Ranking 4 lig2_ad4_4_complex_receptoronly.pdb
+Pose Ranking 5 lig2_ad4_5_complex_receptoronly.pdb
+Pose Ranking 6 lig2_ad4_6_complex_receptoronly.pdb
+Pose Ranking 7 lig2_ad4_7_complex_receptoronly.pdb
+Pose Ranking 8 lig2_ad4_8_complex_receptoronly.pdb
+Pose Ranking 9 lig2_ad4_9_complex_receptoronly.pdb
+Pose Ranking 10 lig2_ad4_10_complex_receptoronly.pdb
+Pose Ranking 11 lig2_ad4_11_complex_receptoronly.pdb
+Dictionary score
+Pose Ranking 1 1.11
+Pose Ranking 2 1.1
+Pose Ranking 3 1.1
+Pose Ranking 4 1.1
+Pose Ranking 5 1.11
+Pose Ranking 6 1.1
+Pose Ranking 7 1.1
+Pose Ranking 8 1.1
+Pose Ranking 9 1.1
+Pose Ranking 10 1.1
+Pose Ranking 11 1.11
+Docking model : vina
+Ligand : lig1.pdb
+Dictionary structure
+Pose Ranking 1 lig1_vina_1.pdb
+Pose Ranking 2 lig1_vina_2.pdb
+Pose Ranking 3 lig1_vina_3.pdb
+Pose Ranking 4 lig1_vina_4.pdb
+Pose Ranking 5 lig1_vina_5.pdb
+Pose Ranking 6 lig1_vina_6.pdb
+Dictionary complexedstructure
+Pose Ranking 1 lig1_vina_1_complex_receptoronly.pdb
+Pose Ranking 2 lig1_vina_2_complex_receptoronly.pdb
+Pose Ranking 3 lig1_vina_3_complex_receptoronly.pdb
+Pose Ranking 4 lig1_vina_4_complex_receptoronly.pdb
+Pose Ranking 5 lig1_vina_5_complex_receptoronly.pdb
+Pose Ranking 6 lig1_vina_6_complex_receptoronly.pdb
+Dictionary score
+Pose Ranking 1 -12.904
+Pose Ranking 2 -10.893
+Pose Ranking 3 -10.777
+Pose Ranking 4 -10.54
+Pose Ranking 5 -10.092
+Ligand : lig2.pdb
+Dictionary structure
+Pose Ranking 1 lig2_vina_1.pdb
+Pose Ranking 2 lig2_vina_2.pdb
+Pose Ranking 3 lig2_vina_3.pdb
+Pose Ranking 4 lig2_vina_4.pdb
+Pose Ranking 5 lig2_vina_5.pdb
+Pose Ranking 6 lig2_vina_6.pdb
+Dictionary complexedstructure
+Pose Ranking 1 lig2_vina_1_complex_receptoronly.pdb
+Pose Ranking 2 lig2_vina_2_complex_receptoronly.pdb
+Pose Ranking 3 lig2_vina_3_complex_receptoronly.pdb
+Pose Ranking 4 lig2_vina_4_complex_receptoronly.pdb
+Pose Ranking 5 lig2_vina_5_complex_receptoronly.pdb
+Pose Ranking 6 lig2_vina_6_complex_receptoronly.pdb
+Dictionary score
+Pose Ranking 1 -13.242
+Pose Ranking 2 -11.222
+Pose Ranking 3 -11.081
+Pose Ranking 4 -10.854
+Pose Ranking 5 -10.545
+Docking model : vinardo
+Ligand : lig1.pdb
+Dictionary structure
+Pose Ranking 1 lig1_vinardo_1.pdb
+Pose Ranking 2 lig1_vinardo_2.pdb
+Pose Ranking 3 lig1_vinardo_3.pdb
+Pose Ranking 4 lig1_vinardo_4.pdb
+Pose Ranking 5 lig1_vinardo_5.pdb
+Dictionary complexedstructure
+Pose Ranking 1 lig1_vinardo_1_complex_receptoronly.pdb
+Pose Ranking 2 lig1_vinardo_2_complex_receptoronly.pdb
+Pose Ranking 3 lig1_vinardo_3_complex_receptoronly.pdb
+Pose Ranking 4 lig1_vinardo_4_complex_receptoronly.pdb
+Pose Ranking 5 lig1_vinardo_5_complex_receptoronly.pdb
+Dictionary score
+Pose Ranking 1 -10.085
+Pose Ranking 2 -7.433
+Pose Ranking 3 -7.347
+Pose Ranking 4 -7.262
+Ligand : lig2.pdb
+Dictionary structure
+Pose Ranking 1 lig2_vinardo_1.pdb
+Pose Ranking 2 lig2_vinardo_2.pdb
+Pose Ranking 3 lig2_vinardo_3.pdb
+Pose Ranking 4 lig2_vinardo_4.pdb
+Pose Ranking 5 lig2_vinardo_5.pdb
+Dictionary complexedstructure
+Pose Ranking 1 lig2_vinardo_1_complex_receptoronly.pdb
+Pose Ranking 2 lig2_vinardo_2_complex_receptoronly.pdb
+Pose Ranking 3 lig2_vinardo_3_complex_receptoronly.pdb
+Pose Ranking 4 lig2_vinardo_4_complex_receptoronly.pdb
+Pose Ranking 5 lig2_vinardo_5_complex_receptoronly.pdb
+Dictionary score
+Pose Ranking 1 -9.862
+Pose Ranking 2 -7.21
+Pose Ranking 3 -7.13
+Pose Ranking 4 -7.05

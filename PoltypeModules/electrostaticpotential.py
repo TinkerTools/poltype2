@@ -652,6 +652,13 @@ def GrabQMDipoles(poltype,optmol,logname):
                 nextlinesplit=nextline.split()
                 dipole=np.array([float(nextlinesplit[1]),float(nextlinesplit[3]),float(nextlinesplit[5])])
 
+        #dipole=[]
+        #for lineidx in range(len(results)):
+        #    line=results[lineidx]
+        #    linesplit=line.split()
+        #    if 'Dipole' in line:
+        #        dipole.append(float(linesplit[-1]))
+        #dipole=np.array(dipole)
                 
     else:
         temp=open(logname,'r')

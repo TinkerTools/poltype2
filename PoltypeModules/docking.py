@@ -2,6 +2,8 @@ from openbabel import openbabel
 import re
 import os
 import numpy as np
+from pathlib import Path
+import sys
 
 '''
 conda install -c hcc autodock --yes
@@ -14,7 +16,7 @@ conda install -c conda-forge openbabel --yes
 
 def ExtractLigand(ligandreceptorfilename):
     ligandpdbfilename='ligand.pdb'
-    receptorpdbfilename='receptor.pdb'
+    receptorpdbfilename=ligandreceptorfilename.replace('.pdb','_receptoronly.pdb')
     receptormol=ExtractMOLObject(ligandreceptorfilename,receptorpdbfilename,receptor=True)
     ligandmol=ExtractMOLObject(ligandreceptorfilename,ligandpdbfilename,receptor=False)
 
@@ -305,11 +307,20 @@ def GrabLigandCentroid(ligandpdbfilename):
 
 
 
-def CombineDockingInfo(modeltodockoutput,modeltoscore,modeltostructure,dockingprogram,modeltocomplexedstructure):
-    modeltodockoutput[dockingprogram]={}
-    modeltodockoutput[dockingprogram]['structure']=modeltostructure
-    modeltodockoutput[dockingprogram]['complexedstructure']=modeltocomplexedstructure
-    modeltodockoutput[dockingprogram]['score']=modeltoscore
+def CombineDockingInfo(modeltodockoutput,modeltoscore,modeltostructure,dockingprogram,modeltocomplexedstructure,ligandpdbfilename):
+    if dockingprogram not in modeltodockoutput.keys():
+        modeltodockoutput[dockingprogram]={}
+    if ligandpdbfilename not in modeltodockoutput[dockingprogram].keys():
+        modeltodockoutput[dockingprogram][ligandpdbfilename]={}
+    if 'structure' not in modeltodockoutput[dockingprogram][ligandpdbfilename].keys():
+        modeltodockoutput[dockingprogram][ligandpdbfilename]['structure']={}
+    if 'complexedstructure' not in modeltodockoutput[dockingprogram][ligandpdbfilename].keys():
+        modeltodockoutput[dockingprogram][ligandpdbfilename]['complexedstructure']={}
+    if 'score' not in modeltodockoutput[dockingprogram][ligandpdbfilename].keys():
+        modeltodockoutput[dockingprogram][ligandpdbfilename]['score']={}
+    modeltodockoutput[dockingprogram][ligandpdbfilename]['structure'].update(modeltostructure)
+    modeltodockoutput[dockingprogram][ligandpdbfilename]['complexedstructure'].update(modeltocomplexedstructure)
+    modeltodockoutput[dockingprogram][ligandpdbfilename]['score'].update(modeltoscore)
 
     return modeltodockoutput
 
@@ -370,52 +381,142 @@ def AddDockedLigandBackInComplex(modeltostructure,receptorpdbfilename):
 
     return modeltocomplexedstructure
 
-def Docking(ligandpdbfilename,receptorpdbfilename,ligandname,receptorname,dockgridcenter,dockgridsize,vinaexhaustiveness,nposes,goldbin,usevina,usead4,usevinardo,usegold,python2path,prepdockscript,gridspacing):
-    modeltodockoutput={}
-   
+def Docking(ligandpdbfilename,receptorpdbfilename,ligandname,receptorname,dockgridcenter,dockgridsize,vinaexhaustiveness,nposes,goldbin,usevina,usead4,usevinardo,usegold,python2path,prepdockscript,gridspacing,modeltodockoutput):
     if usegold==True:
         modeltoscoregold,modeltostructuregold=GOLDDocking(goldbin,ligandpdbfilename,receptorpdbfilename,dockgridcenter,dockgridsize,nposes)
         modeltocomplexedstructuregold=AddDockedLigandBackInComplex(modeltostructuregold,receptorpdbfilename)
-        modeltodockoutput=CombineDockingInfo(modeltodockoutput,modeltoscoregold,modeltostructuregold,'GOLD',modeltocomplexedstructuregold)
+        modeltodockoutput=CombineDockingInfo(modeltodockoutput,modeltoscoregold,modeltostructuregold,'GOLD',modeltocomplexedstructuregold,ligandpdbfilename)
     GeneratePDBQTFiles(python2path,prepdockscript,dockgridcenter,dockgridsize,gridspacing,ligandpdbfilename,receptorpdbfilename)
     if usead4==True:
         modeltoscoread4,modeltostructuread4=AutoDock4(python2path,prepdockscript,dockgridcenter,dockgridsize,gridspacing,ligandpdbfilename,receptorpdbfilename)
         modeltostructuread4=ConvertPDBQTFilesToPDB(modeltostructuread4)
         modeltocomplexedstructuread4=AddDockedLigandBackInComplex(modeltostructuread4,receptorpdbfilename)
-        modeltodockoutput=CombineDockingInfo(modeltodockoutput,modeltoscoread4,modeltostructuread4,'ad4',modeltocomplexedstructuread4)
+        modeltodockoutput=CombineDockingInfo(modeltodockoutput,modeltoscoread4,modeltostructuread4,'ad4',modeltocomplexedstructuread4,ligandpdbfilename)
     if usevina==True:
         modeltoscorevina,modeltostructurevina=AutoDockVinaVinardo('vina',receptorname,ligandname,dockgridcenter,dockgridsize,vinaexhaustiveness,nposes)
         modeltostructurevina=ConvertPDBQTFilesToPDB(modeltostructurevina)
         modeltocomplexedstructurevina=AddDockedLigandBackInComplex(modeltostructurevina,receptorpdbfilename)
-        modeltodockoutput=CombineDockingInfo(modeltodockoutput,modeltoscorevina,modeltostructurevina,'vina',modeltocomplexedstructurevina)
+        modeltodockoutput=CombineDockingInfo(modeltodockoutput,modeltoscorevina,modeltostructurevina,'vina',modeltocomplexedstructurevina,ligandpdbfilename)
     if usevinardo==True:
         modeltoscorevinardo,modeltostructurevinardo=AutoDockVinaVinardo('vinardo',receptorname,ligandname,dockgridcenter,dockgridsize,vinaexhaustiveness,nposes)
         modeltostructurevinardo=ConvertPDBQTFilesToPDB(modeltostructurevinardo)
         modeltocomplexedstructurevinardo=AddDockedLigandBackInComplex(modeltostructurevinardo,receptorpdbfilename)
-        modeltodockoutput=CombineDockingInfo(modeltodockoutput,modeltoscorevinardo,modeltostructurevinardo,'vinardo',modeltocomplexedstructurevinardo)
-    GenerateDockingReport(modeltodockoutput)
+        modeltodockoutput=CombineDockingInfo(modeltodockoutput,modeltoscorevinardo,modeltostructurevinardo,'vinardo',modeltocomplexedstructurevinardo,ligandpdbfilename)
+    return modeltodockoutput
 
 def GenerateDockingReport(modeltodockoutput):
     name='DockingReport.txt'
     temp=open(name,'w')
     for model,dic in modeltodockoutput.items():
         temp.write('Docking model : '+model+'\n')
-        for keyword,innerdic in dic.items():
-            temp.write('Dictionary '+keyword+'\n')
-            for model,value in innerdic.items():
-                temp.write('Ranking '+str(model)+' '+str(value)+'\n')
+        for lig,nextdic in dic.items():
+            temp.write('Ligand : '+lig+'\n')
+            for keyword,innerdic in nextdic.items():
+                temp.write('Dictionary '+keyword+'\n')
+                for model,value in innerdic.items():
+                    temp.write('Pose Ranking '+str(model)+' '+str(value)+'\n')
            
 
     temp.close()
 
-def DockingWrapper(ligandreceptorfilename,dockgridcenter,dockgridsize,vinaexhaustiveness,nposes,goldbin,usevina,usead4,usevinardo,usegold,dockingenvpath,prepdockscript,gridspacing):
+def DetermineScoreTopPoses(modeltodockoutput):
+    modeltoligandtotopposescore={}
+    for model,dic in modeltodockoutput.items():
+        for lig,nextdic in dic.items():
+            for keyword,innerdic in nextdic.items():
+                if keyword=='score':
+                    topscore=innerdic[1]
+                    if model not in modeltoligandtotopposescore.keys():
+                        modeltoligandtotopposescore[model]={}
+                    if lig not in modeltoligandtotopposescore[model].keys():
+                        modeltoligandtotopposescore[model][lig]=topscore
+
+    return modeltoligandtotopposescore
+
+
+def DetermineRanking(modeltoligandtotopposescore):
+    modeltoligandtorank={}
+    for model,ligandtotopposescore in modeltoligandtotopposescore.items():
+        newligandtotopposescore={} # sometimes scoring function is negative sometimes positive so keep all positive
+        for ligand,score in ligandtotopposescore.items():
+            if score<0:
+                score=score*-1
+            newligandtotopposescore[ligand]=score
+        sortedligtoscore={k: v for k, v in sorted(newligandtotopposescore.items(), key=lambda item: item[1],reverse=True)}
+        count=1
+        for sortedlig,score in sortedligtoscore.items():
+            if model not in modeltoligandtorank.keys():
+                modeltoligandtorank[model]={}
+
+            modeltoligandtorank[model][sortedlig]=count
+            count+=1
+    return modeltoligandtorank
+
+
+def ECRScore(rank,ecrexpect,dockingprogram,moleculename,nametomodeltoecrscore):
+    ecrscore=(1/ecrexpect)*np.exp(-rank/ecrexpect)
+    if moleculename not in nametomodeltoecrscore.keys():
+        nametomodeltoecrscore[moleculename]={}
+    nametomodeltoecrscore[moleculename][dockingprogram]=ecrscore
+    return nametomodeltoecrscore
+
+
+def ExponentialConsensusRank(modeltodockoutput,ecrexpect):
+    nametoconsensusrank={}
+    modeltoligandtotopposescore=DetermineScoreTopPoses(modeltodockoutput)
+    modeltoligandtorank=DetermineRanking(modeltoligandtotopposescore)
+    nametomodeltoecrscore={}
+    for model,ligandtorank in modeltoligandtorank.items():
+        for ligand,rank in ligandtorank.items():
+            nametomodeltoecrscore=ECRScore(rank,ecrexpect,model,ligand,nametomodeltoecrscore) 
+    for name,modeltoscore in nametomodeltoecrscore.items():
+        Sum=0
+        for model,score in modeltoscore.items():
+            Sum+=score
+        nametoconsensusrank[name]=Sum
+    sortednametoconsensusrank={k: v for k, v in sorted(nametoconsensusrank.items(), key=lambda item: item[1],reverse=True)}
+    newnametoconsensusrank={}
+    count=1
+    for name,score in sortednametoconsensusrank.items():
+        newnametoconsensusrank[name]=count
+        count+=1
+
+    return newnametoconsensusrank
+
+
+def GenerateConsensusDockingReport(nametoconsensusrank):
+    temp=open('ConsensusDockingReport.txt','w')
+    for name,consensusrank in nametoconsensusrank.items():
+        temp.write('Ligand Name : '+name+' , Consensus Score : '+str(consensusrank)+'\n')
+    temp.close()
+
+
+
+def DockingWrapper(poltype,ligandreceptorfilename,dockgridcenter,dockgridsize,vinaexhaustiveness,nposes,goldbin,usevina,usead4,usevinardo,usegold,dockingenvname,prepdockscript,gridspacing,listofligands,ecrexpect):
+    pythonpath=poltype.which('python')
+    head,tail=os.path.split(pythonpath)
+    pythonpath=Path(head) 
+    envdir=pythonpath.parent.absolute()
+    envpath=Path(envdir)
+    allenvs=envpath.parent.absolute()
+    dockingenvpath=os.path.join(allenvs,dockingenvname)
     python2path=os.path.join(dockingenvpath,'bin')
     python2path=os.path.join(python2path,'python')
     ligandpdbfilename,receptorpdbfilename=ExtractLigand(ligandreceptorfilename)
+    modeltodockoutput={}
     if dockgridcenter==None:
         dockgridcenter=GrabLigandCentroid(ligandpdbfilename)
-    receptorname=receptorpdbfilename.replace('.pdb','.pdbqt')
-    ligandname=ligandpdbfilename.replace('.pdb','.pdbqt')
-    Docking(ligandpdbfilename,receptorpdbfilename,ligandname,receptorname,dockgridcenter,dockgridsize,vinaexhaustiveness,nposes,goldbin,usevina,usead4,usevinardo,usegold,python2path,prepdockscript,gridspacing)
+    for ligand in listofligands:
+        receptorname=receptorpdbfilename.replace('.pdb','.pdbqt')
+        ligandname=ligandpdbfilename.replace('.pdb','.pdbqt')
+        ligandsplit=ligand.split('.')
+        ligandprefix=ligandsplit[:-1]
+        ligandsuffix=ligandsplit[-1]
+        if ligandsuffix!='pdb':
+            ligandpdbfilename=FileConverter(ligand,ligandsuffix,'pdb')
+            ligandname=ligandpdbfilename.replace('.pdb','.pdbqt')
+        modeltodockoutput=Docking(ligandpdbfilename,receptorpdbfilename,ligandname,receptorname,dockgridcenter,dockgridsize,vinaexhaustiveness,nposes,goldbin,usevina,usead4,usevinardo,usegold,python2path,prepdockscript,gridspacing,modeltodockoutput)
 
-
+    GenerateDockingReport(modeltodockoutput)
+    nametoconsensusrank=ExponentialConsensusRank(modeltodockoutput,ecrexpect)
+    GenerateConsensusDockingReport(nametoconsensusrank)

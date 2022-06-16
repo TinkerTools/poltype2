@@ -12,11 +12,9 @@ from openbabel import openbabel
 from PyAstronomy import pyasl
 import mdtraj as md
 import csv
-from pymol import cmd,preset,util
-from PIL import Image
-from pymol.vfont import plain
-from pymol.cgo import CYLINDER,cyl_text
 import itertools
+from PIL import Image
+
 
 
 
@@ -856,6 +854,10 @@ def SmallestDivisor(n):
 
 
 def PlotESPSurfaces(name,cubefiles):
+    from pymol import cmd,preset,util
+    from pymol.vfont import plain
+    from pymol.cgo import CYLINDER,cyl_text
+
     imagesize=1180
     dpi=300
     imagename=name+'_ESP.'+'png'
@@ -880,6 +882,10 @@ def PlotESPSurfaces(name,cubefiles):
 
 
 def PlotDimers3D(filenamearray,allindices):
+    from pymol import cmd,preset,util
+    from pymol.vfont import plain
+    from pymol.cgo import CYLINDER,cyl_text
+
     molsPerImage=len(filenamearray)
     if (molsPerImage % 2) == 0 or (molsPerImage ** 0.5) % 1==0:
         n=molsPerImage
@@ -1302,7 +1308,6 @@ def PlotLiquidPropsVsTemp(nametotptofinalprops):
     return nametotemparray,nametoproptokeytoarray
 
 
-
 def WriteOutPropTable(nametotptofinalprops,moltomaxiter,targetdensityerror,targetenthalpyerror):
     tempname='SummaryProps.csv'
     densityerrors=[]
@@ -1312,7 +1317,7 @@ def WriteOutPropTable(nametotptofinalprops,moltomaxiter,targetdensityerror,targe
     nametopropavgerrors={}
     with open(tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        header=['Name','Temperature','Pressure','Density Ref','Density Calc','Density CalcErr','Density Error','Density RelError','Enthalpy Ref','Enthalpy Calc','Enthalpy CalcErr','Enthalpy Error','Enthalpy RelError','Max Iter','Enthalpy Loss','Density Loss','Enthalpy Reached Target?','Density Reached Target?','Enthalpy Target','Density Target']
+        header=['Name','Temperature','Pressure','Density Ref','Density Calc','Density CalcErr','Density Error','Density RelError','Density Direction','Enthalpy Ref','Enthalpy Calc','Enthalpy CalcErr','Enthalpy Error','Enthalpy RelError','Enthalpy Direction','Max Iter','Enthalpy Loss','Density Loss','Enthalpy Reached Target?','Density Reached Target?','Enthalpy Target','Density Target']
         energy_writer.writerow(header)
         for name,tptofinalprops in nametotptofinalprops.items():
             maxiter=moltomaxiter[name]
@@ -1340,9 +1345,14 @@ def WriteOutPropTable(nametotptofinalprops,moltomaxiter,targetdensityerror,targe
                         all.append(value)
                         if key=='Ref':
                             truevalue=value
-                    error=all[0]-all[1]
-                    error=np.abs(round(error,2))
-                    
+                        elif key=='Calc':
+                            calcvalue=value
+                    direrror=all[0]-all[1]
+                    error=np.abs(round(direrror,2))
+                    if (truevalue-calcvalue)>0:
+                        direction='Underpredicted'
+                    elif (truevalue-calcvalue)<0:
+                        direction='Overpredicted'
                     relerror=round((100*error)/truevalue,2)
                     thename=propname+' '+'Error'
                     headeridx=header.index(thename)
@@ -1373,6 +1383,9 @@ def WriteOutPropTable(nametotptofinalprops,moltomaxiter,targetdensityerror,targe
                     thename=propname+' '+'Target'
                     headeridx=header.index(thename)
                     array[headeridx]=targeterror
+                    thename=propname+' '+'Direction'
+                    headeridx=header.index(thename)
+                    array[headeridx]=direction
 
 
                 energy_writer.writerow(array)

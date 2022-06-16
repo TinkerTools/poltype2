@@ -22,7 +22,18 @@ from rdkit import DataStructs
 import torsiongenerator as torgen
 from itertools import combinations
 import shutil
-  
+ 
+
+def CheckIfStringIsFloat(string):
+    isfloat=False
+    try:
+        float(string)
+        isfloat=True
+    except:
+        pass
+    return isfloat
+
+
 def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo):
     temp=open(vf,'r')
     results=temp.readlines()
@@ -33,8 +44,9 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
     tempname=vf.replace('.key','_temp.key')
     f=open(tempname,'w')
     linestoskip=[]
-    for line in results:
-        if 'atom' in line:
+    for theline in results:
+        linesplit=theline.split()
+        if 'atom' in theline:
             atomline=True
             if foundatomblock==False:
                 foundatomblock=True
@@ -42,40 +54,58 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
                     
         else:
             atomline=False
+
+        if 'polarize' in theline and poltype.writeoutpolarize==False:
+            linestoskip.append(theline)
+        if 'multipole' in theline and poltype.writeoutmultipole==False:
+            linestoskip.append(theline)
+        if len(linesplit)>0:
+            if CheckIfStringIsFloat(linesplit[0])==True and poltype.writeoutmultipole==False:
+                linestoskip.append(theline)
+
+
         if foundatomblock==True and atomline==False and wroteout==False:
             wroteout=True
             f.write('\n')
-            if poltype.forcefield=='AMOEBA+':
-                for line,transferinfo in amoebaplusvdwprmstotransferinfo.items():
-                    f.write(transferinfo)
-                    f.write(line)
-                    f.write('\n')
+            if poltype.writeoutvdw==True:
+                if poltype.forcefield=='AMOEBA+':
+                    for line,transferinfo in amoebaplusvdwprmstotransferinfo.items():
+                        f.write(transferinfo)
+                        f.write(line)
+                        f.write('\n')
 
-            else:
-                for line,transferinfo in vdwprmstotransferinfo.items():
+                else:
+                    for line,transferinfo in vdwprmstotransferinfo.items():
+                        f.write(transferinfo)
+                        f.write(line)
+                        f.write('\n')
+            
+
+            if poltype.writeoutbond==True:
+                for line,transferinfo in bondprmstotransferinfo.items():
                     f.write(transferinfo)
                     f.write(line)
                     f.write('\n')
-            for line,transferinfo in bondprmstotransferinfo.items():
-                f.write(transferinfo)
-                f.write(line)
-                f.write('\n')
-            for line,transferinfo in angleprmstotransferinfo.items():
-                f.write(transferinfo)
-                f.write(line)
-                f.write('\n')
-            for line,transferinfo in strbndprmstotransferinfo.items():
-                f.write(transferinfo)
-                f.write(line)
-                f.write('\n')
-            for line,transferinfo in opbendprmstotransferinfo.items():
-                f.write(transferinfo)
-                f.write(line)
-                f.write('\n')
-            for line,transferinfo in torsionprmstotransferinfo.items():
-                f.write(transferinfo)
-                f.write(line)
-                f.write('\n')
+            if poltype.writeoutangle==True:
+                for line,transferinfo in angleprmstotransferinfo.items():
+                    f.write(transferinfo)
+                    f.write(line)
+                    f.write('\n')
+            if poltype.writeoutstrbnd==True:
+                for line,transferinfo in strbndprmstotransferinfo.items():
+                    f.write(transferinfo)
+                    f.write(line)
+                    f.write('\n')
+            if poltype.writeoutopbend==True:
+                for line,transferinfo in opbendprmstotransferinfo.items():
+                    f.write(transferinfo)
+                    f.write(line)
+                    f.write('\n')
+            if poltype.writeouttorsion==True:
+                for line,transferinfo in torsionprmstotransferinfo.items():
+                    f.write(transferinfo)
+                    f.write(line)
+                    f.write('\n')
             for line in soluteprms:
                 f.write(line)
                 f.write('\n')
@@ -106,8 +136,15 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
 
                                     
         else:
-            if line not in linestoskip:
-                f.write(line)
+            if theline not in linestoskip:
+                f.write(theline)
+    if poltype.inputkeyfile!=None:
+        temp=open(poltype.inputkeyfile,'r')
+        results=temp.readlines()
+        temp.close()
+        for line in results:
+            f.write(line+'\n')
+
     f.close()
     os.rename(tempname,newname)
 
@@ -1793,6 +1830,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             continue
         aidx,bidx,cidx,didx=torsionindices[:]
         babelindices=[i+1 for i in torsionindices]
+
         allhydrogentor=CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
         allhydrogentoroneside=CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol)
         atoma=rdkitmol.GetAtomWithIdx(aidx)
@@ -1859,9 +1897,11 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         if len(poltype.onlyrotbndslist)!=0:
             if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
                 check=False 
-
         if '~' in smarts or '*' in smarts:
             check=False
+        if [bbidx,cbidx] in poltype.dontrotbndslist or [cbidx,bbidx] in poltype.dontrotbndslist:
+            check=True
+
         if ringbond==True:
             atomindices=RingAtomicIndices(poltype,mol)
             therings=torgen.GrabAllRingsContainingMostIndices(poltype,atomindices,babelindices,2)
@@ -4464,7 +4504,7 @@ def ChangeBondAngleEquilValues(poltype,bondtypeindicestonewbondequilvalues,angle
         if '#' not in line:
             found=False
             linesplit=line.split()
-            if 'angle' in line:
+            if 'angle' in line and poltype.writeoutangle==True:
                 typeindices=tuple([int(linesplit[1]),int(linesplit[2]),int(linesplit[3])])
                 if typeindices in angletypeindicestonewbondequilvalues.keys():
                     equilvalue=angletypeindicestonewbondequilvalues[typeindices]
@@ -4479,7 +4519,7 @@ def ChangeBondAngleEquilValues(poltype,bondtypeindicestonewbondequilvalues,angle
                     linesplit[10]=str(equilvalue)
                     line=''.join(linesplit)
                 
-            if 'bond' in line:
+            if 'bond' in line and poltype.writeoutbond==True:
                 typeindices=tuple([int(linesplit[1]),int(linesplit[2])])
                 if typeindices in bondtypeindicestonewbondequilvalues.keys():
                     equilvalue=bondtypeindicestonewbondequilvalues[typeindices]
@@ -4629,15 +4669,17 @@ def StiffenZThenBisectorAngleConstants(poltype,keyfilename):
 
 def GenerateRdkitMolObjectsParameterSMARTS(poltype,parametersmartslist):
     parametersmartstordkitmol={}
-    temptotalcharge=poltype.totalcharge
+    #temptotalcharge=poltype.totalcharge
     for parametersmarts in parametersmartslist:
         prmmol=Chem.MolFromSmarts(parametersmarts)
-        rdmolfiles.MolToMolFile(prmmol,'test.mol')
-        prmmol=Chem.MolFromMolFile('test.mol',removeHs=False,sanitize=False)
-        poltype.totalcharge=None
-        prmmol,atomindextoformalcharge=poltype.CheckInputCharge(prmmol)
-        Chem.SanitizeMol(prmmol)
-        poltype.totalcharge=temptotalcharge
+        #rdmolfiles.MolToMolFile(prmmol,'test.mol')
+        #prmmol=Chem.MolFromMolFile('test.mol',removeHs=False,sanitize=False)
+        #poltype.totalcharge=None
+        #prmmol,atomindextoformalcharge=poltype.CheckInputCharge(prmmol)
+        #print('atomindextoformalcharge',atomindextoformalcharge)
+        #print('parametersmarts',parametersmarts,flush=True)
+        #Chem.SanitizeMol(prmmol)
+        #poltype.totalcharge=temptotalcharge
         parametersmartstordkitmol[parametersmarts]=prmmol
 
     return parametersmartstordkitmol

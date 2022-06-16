@@ -1,0 +1,29 @@
+Traceback (most recent call last):
+  File "/home/bdw2292/miniconda3/envs/newamoebamdpoltype/bin/psi4", line 333, in <module>
+    exec(content)
+  File "<string>", line 59, in <module>
+  File "/home/bdw2292/miniconda3/envs/newamoebamdpoltype/lib//python3.8/site-packages/psi4/driver/driver.py", line 1265, in optimize
+    return optimize_geometric(name, **kwargs)
+  File "/home/bdw2292/miniconda3/envs/newamoebamdpoltype/lib//python3.8/site-packages/psi4/driver/driver.py", line 1058, in optimize_geometric
+    optimizer.evaluateStep()
+  File "/home/bdw2292/miniconda3/envs/newamoebamdpoltype/lib//python3.8/site-packages/geometric/optimize.py", line 1137, in evaluateStep
+    assert self.state == OPT_STATE.NEEDS_EVALUATION
+
+AssertionError
+
+Printing out the relevant lines from the Psithon --> Python processed input file:
+    core.set_global_option("DYNAMIC_LEVEL", 1)
+    core.set_memory_bytes(8666666666)
+    
+    set_num_threads(2)
+    psi4_io.set_default_path("/scratch/bdw2292/Psi4-ModifiedRes")
+--> optimize('wb97x-d/6-311G',engine='geometric',optimizer_keywords=geometric_keywords)
+    clean()
+
+
+!--------------------------------!
+!                                !
+! AssertionError                 !
+!                                !
+!--------------------------------!
+

@@ -118,7 +118,8 @@ export PSI_SCRATCH=/scratch/$myusername/
 
 
 ### ForceBalance Wrapper Setup
-* Install modified forcebalance for Tinker9 GPU dynamics
+* This is optional to speed up ForceBalance, poltype only wraps input and output of ForceBalance however
+* Install modified forcebalance for Tinker9 GPU dynamics 
 ```
 cd ~
 git clone https://github.com/bdw2292/forcebalance.git
@@ -137,3 +138,22 @@ cp ~/forcebalance/src/data/*py /home/bdw2292/miniconda3/envs/amoebamdpoltype/lib
 
 * Make sure pymol license file is located in /home/USERNAME/.pymol/license.lic
 
+
+### Explicit Conda Installation
+* Only do this if .yml file doesnt work
+```
+conda create --name amoebamdpoltype
+conda activate amoebamdpoltype
+conda config --add channels conda-forge
+conda install mdanalysis --yes
+conda install -c conda-forge openbabel --yes
+conda install -c rdkit rdkit --yes
+pip install PyAstronomy
+conda install -c conda-forge svgutils --yes
+conda install -c conda-forge cairosvg --yes
+conda install -c conda-forge psutil --yes
+conda install -c conda-forge mdtraj --yes
+conda install -c conda-forge pymbar --yes
+conda install -c psi4 psi4 –yes
+conda install -c conda-forge geometric --yes
+```

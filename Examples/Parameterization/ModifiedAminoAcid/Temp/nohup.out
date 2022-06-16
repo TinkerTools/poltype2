@@ -1,0 +1,47 @@
+Poltype -- Polarizable atom typer of small molecules for the AMOEBA polarizable force field
+
+Please cite:
+Wu, J.C.; Chattree, G.; Ren, P.Y.; Automation of AMOEBA polarizable force field 
+parameterization for small molecules. Theor Chem Acc. 
+
+Version 2.3.1 May 2021
+
+Copyright (c)  Johnny Wu, Gaurav Chattree, Brandon Walker, Matthew Harger and Pengyu Ren 2019
+
+All Rights Reserved
+##############################################################################################################
+
+Calling: analyze /home/bdw2292/poltype2/VersionFiles/water.xyz -k /home/bdw2292/poltype2/VersionFiles/water.key e> version.out
+Traceback (most recent call last):
+  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 4897, in RunPoltype
+    poltype.main()
+  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 2939, in main
+    knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference,modligidxs=modres.GenerateModifiedProteinPoltypeInput(self)
+  File "/home/bdw2292/poltype2/PoltypeModules/modifiedresidues.py", line 1610, in GenerateModifiedProteinPoltypeInput
+    poltype.modifiedproteinpdbname,charge,connectedatomidx,backboneindexesreference=GenerateModifiedProteinPDB(poltype)
+  File "/home/bdw2292/poltype2/PoltypeModules/modifiedresidues.py", line 1164, in GenerateModifiedProteinPDB
+    sidechainindexes=GrabSideChainIndexes(poltype,int(poltype.mutatedresiduenumber),poltype.unmodifiedproteinpdbname)
+  File "/home/bdw2292/poltype2/PoltypeModules/modifiedresidues.py", line 966, in GrabSideChainIndexes
+    temp=open(pdbname,'r')
+FileNotFoundError: [Errno 2] No such file or directory: 'SNase_WT_H.pdb'
+Traceback (most recent call last):
+  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 4897, in RunPoltype
+    poltype.main()
+  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 2939, in main
+    knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference,modligidxs=modres.GenerateModifiedProteinPoltypeInput(self)
+  File "/home/bdw2292/poltype2/PoltypeModules/modifiedresidues.py", line 1610, in GenerateModifiedProteinPoltypeInput
+    poltype.modifiedproteinpdbname,charge,connectedatomidx,backboneindexesreference=GenerateModifiedProteinPDB(poltype)
+  File "/home/bdw2292/poltype2/PoltypeModules/modifiedresidues.py", line 1164, in GenerateModifiedProteinPDB
+    sidechainindexes=GrabSideChainIndexes(poltype,int(poltype.mutatedresiduenumber),poltype.unmodifiedproteinpdbname)
+  File "/home/bdw2292/poltype2/PoltypeModules/modifiedresidues.py", line 966, in GrabSideChainIndexes
+    temp=open(pdbname,'r')
+FileNotFoundError: [Errno 2] No such file or directory: 'SNase_WT_H.pdb'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 4917, in <module>
+    RunPoltype()
+  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 4916, in RunPoltype
+    raise ValueError('Houston, we have a problem. Buy a developer some coffee!')
+ValueError: Houston, we have a problem. Buy a developer some coffee!

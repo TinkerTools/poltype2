@@ -1601,7 +1601,8 @@ def WriteOutFitResults(poltype,tmpkey2basename,classkeytofitresults):
     temp=open(tempname,'w')
     for line in results:
         linesplit=line.split()
-        if 'torsion' in line and '#' not in line:
+        if 'torsion' in line and '#' not in line and 'unit' not in line:
+            print('line',line)
             fwd='%d %d %d %d' % (int(linesplit[1]), int(linesplit[2]), int(linesplit[3]), int(linesplit[4]))       
             fwdsplit=fwd.split() 
             revsplit=fwdsplit[::-1]

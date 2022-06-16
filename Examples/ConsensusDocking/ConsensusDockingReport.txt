@@ -1,0 +1,2 @@
+Ligand Name : lig2.pdb , Consensus Score : 1
+Ligand Name : lig1.pdb , Consensus Score : 2

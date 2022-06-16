@@ -180,11 +180,19 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
         temp.write('    ['+' '+poltype.optbasissetfile+' '+poltype.iodineoptbasissetfile +' '+ ']'+'\n')
         temp=ReadInBasisSet(poltype,temp,poltype.optbasissetfile,poltype.iodineoptbasissetfile)
         temp.write('    }'+'\n')
-        temp.write("optimize('%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.optmethod.lower(),'geometric')+'\n')
+        if len(torsionrestraints)!=0:
+            temp.write("optimize('%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.optmethod.lower(),'geometric')+'\n')
+        else:
+            temp.write("optimize('%s',engine='%s')" % (poltype.optmethod.lower(),'geometric')+'\n')
+
                                                 
     else:                                       
-                                                
-        temp.write("optimize('%s/%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.optmethod.lower(),poltype.optbasisset,'geometric')+'\n')
+        if len(torsionrestraints)!=0:                                        
+            temp.write("optimize('%s/%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.optmethod.lower(),poltype.optbasisset,'geometric')+'\n')
+
+        else:
+            temp.write("optimize('%s/%s',engine='%s')" % (poltype.optmethod.lower(),poltype.optbasisset,'geometric')+'\n')
+
     if poltype.freq:
         temp.write('    scf_e,scf_wfn=freq("%s/%s",return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
 

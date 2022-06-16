@@ -676,13 +676,12 @@ usepdb2pqr
 ### Minimum Input Example Docking
 * If you want to use GOLD, ensure that the bin folder is in your PATH
 * Complexed protein with ligand needs to be provided (this should already be protonated before providing as input)
-* For generating PDBQT files with AutoDock4 and AutoDock Vina, a seperate python 2 environment (dockingprep.yml) needs to be installed and declared in poltype input file.
+* For generating PDBQT files with AutoDock4 and AutoDock Vina, a seperate python 2 environment (dockingprep.yml) needs to be installed.
 * Optional keywords exist to change docking grid center (default is center of ligand from the input protein-ligand complex), docking grid length (how far grid extends), grid spacing (controls point density on grid) and the number of poses generated (default 10).  
 * Final scores, structures and rankings are given in a file called DockingReport.txt 
 
 ```
 complexedproteinpdbname=complex.pdb
-dockingenvpath=/home/bdw2292/miniconda3/envs/dockingprep/
 usead4=True
 usevina=True
 usevinardo=True
@@ -700,9 +699,8 @@ usegold=True
 * Make sure pdb files (complexed and uncomplexed) have no missing residues or atoms.
 * Charge is read from input XYZ files generated.
 * Make sure if using custom receptor parameters, then either adding to keyfilename or in prmfilepath
-* Use submitlocally=False if you do not wish to submit dynamics jobs locally.
+* Use submitlocally=False if you do not wish to submit dynamics jobs locally. By default this is already False for production dynamics and for BAR, for minimzation and equilbriation, by default this is True and jobs are submited locally. Then program will wait for you to complete the jobs in text file (such as _proddynamicsjobs.txt).
 * For HFE, if your ligand is charged and you want to compute the salt hydration free energy, add "salthfe=True"
-* For running dynamics manually on a cluster, add keyword ``submitlocally=False``. Then program will wait for you to complete the jobs in text file (such as _proddynamicsjobs.txt). 
 
 #### Minimum Input Example Binding Free Energy
 
@@ -848,7 +846,7 @@ nohup python /path_to_poltype/poltype.py &
 ### Box Setup
 
 *	For binding free energy computation, if a PDB is provided instead of a tinker XYZ file, then the tinker program pdbxyz is used to generate the XYZ file. This may result in adding additional hydrogens if missing from the PDB file (according to the residue label). 
-*	By default, a preequilibrated large water box is used and trimmed to the appropriate box size (determined below). This allows a default shorter total equilibration time.
+*	The user can choose a preequilibrated large water box (default is to not use preequilbriated box) to be used and trimmed to the appropriate box size (determined below). This allows a default shorter total equilibration time.
 *	The box size is computed by taking the longest dimension of protein or ligand and add a buffer length. For proteins-ligand complexes the buffer length is 20 angstroms. For ligand systems, the buffer length is 2*(vdwcutoff)+6, where the vdwcutoff default is 12 angstroms. For hydration free energy of charged ligand, the box size is set to max(50,longestdim+2*(vdwcutoff)+6), this is to offset the potential shift due to PME neutralizing plasma and polarization artifacts in PBC (doi: 10.1021/ct500195p). 
 * If not using preequilibrated box then,
   *	The total number of waters based on box volume and the density of water.

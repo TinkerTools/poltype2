@@ -1,8 +1,0 @@
-# File containing a listing of the fitness of the top-ranked
-# individual for each ligand docked in GOLD.
-#
-# Format is:
-#
-#     Score     S(PLP)   S(hbond)     S(cho)   S(metal)  DE(clash)   DE(tors)     intcor     time                               File name                Ligand name
-
-    124.17    -111.85       3.57       0.98       0.00       0.00       1.16       0.98   32.083             './gold_soln_ligand_m1_3.pdb'                '(unknown)'

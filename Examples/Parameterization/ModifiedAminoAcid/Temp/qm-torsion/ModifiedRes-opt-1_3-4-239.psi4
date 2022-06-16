@@ -1,0 +1,43 @@
+molecule { 
+0 1
+ H    1.281274    1.134337   -1.057011
+ H    1.176633    1.247270    0.708133
+ C    0.972914    0.604307   -0.153725
+ S    1.967021   -0.965149    0.009746
+ C    2.796195   -0.626069    1.446713
+ N    3.357792   -0.351937    2.447097
+ C   -1.859652   -1.422535   -1.410251
+ O   -2.718534   -1.488949   -0.524174
+ N   -0.791904   -0.568196   -1.354479
+ H   -0.212877   -0.454958   -2.177256
+ C   -0.516521    0.267402   -0.176565
+ H   -0.796587   -0.319144    0.720248
+ C   -1.344809    1.586526   -0.147341
+ O   -0.804365    2.684861   -0.014418
+ N   -2.684122    1.407617   -0.193927
+ H   -1.876434   -2.059062   -2.306264
+ H   -3.073314    0.478275   -0.076768
+ H   -3.284566    2.216556   -0.140533
+}
+geometric_keywords = {
+ 'coordsys' : 'tric',
+ 'constraints' : {
+ 'set' : [{'type'    : 'dihedral', 'indices' : [ 10 , 2 , 3 , 4 ], 'value' : 179.07492528577407 } 
+ , {'type'    : 'dihedral', 'indices' : [ 3 , 2 , 10 , 8 ], 'value' : 298.17723775823083 } 
+ , {'type'    : 'dihedral', 'indices' : [ 7 , 6 , 8 , 10 ], 'value' : 4.943149374670026 } 
+ , {'type'    : 'dihedral', 'indices' : [ 6 , 8 , 10 , 2 ], 'value' : 154.8774768995518 } 
+ , {'type'    : 'dihedral', 'indices' : [ 2 , 10 , 12 , 13 ], 'value' : 353.7415855499348 } 
+ , {'type'    : 'dihedral', 'indices' : [ 10 , 12 , 14 , 16 ], 'value' : 10.602565146546695 } 
+]
+  }
+ }
+set {
+  geom_maxiter 400
+  g_convergence GAU_LOOSE
+  dynamic_level 1
+}
+memory 8.5GB
+set_num_threads(2)
+psi4_io.set_default_path("/scratch/bdw2292/Psi4-ModifiedRes")
+optimize('wb97x-d/6-311G',engine='geometric',optimizer_keywords=geometric_keywords)
+clean()

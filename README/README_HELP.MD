@@ -16,6 +16,8 @@
 
 [Distributed Multipole Analysis and Electrostatic Single Point](#distributed-multipole-analysis-and-electrostatic-single-point)
 
+[Database Matching](#database-matching)
+
 [Torsion Parameterization](#torsion-parameterization)
 
 [Fragmenter](#fragmenter)
@@ -150,6 +152,27 @@
 
 ``indextompoleframefile`` specifies file of multipole frame definitions for each line (exactly how frames are defined in first key file). This will be used instead of poltype frame detection if specified.
 
+
+#### Database Matching
+
+``writeoutmultipole`` specifies to write out multipole terms in pre-fit vdw key (from database matches). Default is True.
+
+``writeoutbond`` specifies to write out bond terms in pre-fit vdw key (from database matches). Default is True.
+
+``writeoutangle`` specifies to write out angle terms in pre-fit vdw key (from database matches). Default is True.
+
+``writeoutstrbnd`` specifies to write out strbnd terms in pre-fit vdw key (from database matches). Default is True.
+
+``writeoutopbend`` specifies to write out opbend terms in pre-fit vdw key (from database matches). Default is True.
+
+``writeoutvdw`` specifies to write out vdw terms in pre-fit vdw key (from database matches). Default is True.
+
+``writeoutpolarize`` specifies to write out polarize terms in pre-fit vdw key (from database matches). Default is True.
+
+``writeouttorsion`` specifies to write out torsion terms in pre-fit vdw key (from database matches). Default is True.
+
+``inputkeyfile`` specifies a keyfile to append parameters to pre-fit vdw key (from database matches). Default is None.
+
 #### Torsion Parameterization
 
 ``rotalltors``  specifies poltype to spin all rotatable bonds instead of transferring torsion parameters if found in database. Default is False.
@@ -179,6 +202,10 @@
                   
 
 ``onlyrotbndslist``   specifies to only rotate bonds in the list, onlyrotbndlist=1 2, 3 4, 5 6 . Default has no value.
+
+
+``dontrotbndslist``   specifies to not rotate bonds in the list, onlyrotbndlist=1 2, 3 4, 5 6 . Useful for modified AA lib, to tell poltype not to rotate backbone dihedrals. Default has no value.
+
 
 ``tortor``            specifies to sample the torsion-torsion potential energy surface for two adjecent and rotatable dihedrals. Default is False.
 
@@ -288,8 +315,9 @@ WQ_PORT=9013
 
 ``targetdensityerror`` specifies target density error in kg/m^3 for ForceBalance fitting. Default is 10 kg/m^3.
 
-``targetenthalpyerror`` specifies target enthalpy error in kcal/mol for ForceBalance fitting. Default is .024 kcal/mol .  
+``targetenthalpyerror`` specifies target enthalpy error in kcal/mol for ForceBalance fitting. Default is .24 kcal/mol .  
 
+``relaxFBbox`` specifies to equilbriate neat liquid box at room temperature for ForceBalance input files (.5 ns and time step of 2 fs). Default is False.
 
 #### ForceBalance Poltype Wrapper Results
 
@@ -324,9 +352,10 @@ WQ_PORT=9013
 
 ``usegold`` specifies to use GOLD. Default is False. 
 
-``dockingenvpath`` specifies path to python 2 conda environment for generating PDBQT files needed for docking. Default is None.
-
 ``gridspacing`` specifies grid density for AutoDock 4. Default is .4 angstroms.
+
+
+``ecrexpect`` specifies expected value of exponential distribution for exponential conensus ranking. This roughly controls how many molecules will be taken into consideration for consensus. Default is 10.
 
 
 #### Required Inputs Molecular Dynamics

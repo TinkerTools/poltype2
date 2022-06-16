@@ -955,7 +955,7 @@ def DynamicCommand(dynamicpath,steps,ensemble,temp,outputfilename,boxfilename,co
 
 
 
-def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist,indextogeneratecsv,keyfilelines,minimizepath,molprmfilepath,finalxyzfilelist,analyzepath,dynamicpath):
+def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist,indextogeneratecsv,keyfilelines,minimizepath,molprmfilepath,finalxyzfilelist,analyzepath,dynamicpath,relaxFBbox):
     gaskeyfilelist=[]
     gasxyzfilelist=[]
     liquidkeyfilelist=[]
@@ -988,13 +988,12 @@ def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfile
             Minimize(liquidxyzfile,liquidkeyfile,minimizepath,molprmfilepath)
             RemoveKeyWord(liquidkeyfile,'polarizeterm')
             Minimize(liquidxyzfile,liquidkeyfile,minimizepath,molprmfilepath)
-            dynamicrelax=False
             try:
                 Analyze(liquidxyzfile,liquidkeyfile,analyzepath,molprmfilepath)
             except:
                 print('Bond energy check failed, need to relax box more')
                 sys.exit()
-            if dynamicrelax==True:
+            if relaxFBbox==True:
                 axis,finalaxis=ComputeBoxLength(gasxyzfile,addextra=True)
                 boxlength=axis*10**-10 # convert angstroms to m
                 numbermolecules=int(density*boxlength**3/mass)
@@ -1642,7 +1641,7 @@ def ReadPRMFile(prmfilepath):
 
     return prmfilelines
 
-def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_prod_steps,gas_timestep,gas_interval,md_threads,liquid_prod_time,gas_prod_time,WQ_PORT,csvexpdatafile,fittypestogether,vdwprmtypestofit,vdwtypestoeval,liquid_equ_time,gas_equ_time,qmrelativeweight,liqrelativeweight,enthalpyrelativeweight,densityrelativeweight):
+def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_prod_steps,gas_timestep,gas_interval,md_threads,liquid_prod_time,gas_prod_time,WQ_PORT,csvexpdatafile,fittypestogether,vdwprmtypestofit,vdwtypestoeval,liquid_equ_time,gas_equ_time,qmrelativeweight,liqrelativeweight,enthalpyrelativeweight,densityrelativeweight,relaxFBbox):
     
 
     debugmode=False
@@ -1758,7 +1757,7 @@ def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liq
         analyzepath='analyze'
         if 'GPUDYNAMICS' in os.environ.keys(): # lazy gpu detection
             dynamicpath='dynamic_gpu'
-            minimizepath='minimize'
+            minimizepath='minimize_gpu'
         else:
             dynamicpath='dynamic'
             minimizepath='minimize'
@@ -1769,7 +1768,7 @@ def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liq
         molprmfilepath=GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogether,keyfilelines,addwaterprms,prmfilelines,vdwprmtypestofit,vdwtypestoeval,vdwtypeslist)
         rdkitmollist=GenerateRdkitMolList(molfilelist)
         atomnumlist=[rdkitmol.GetNumAtoms() for rdkitmol in rdkitmollist]
-        gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,liquidxyzfilelist,datacsvpathlist=GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist,indextogeneratecsv,keyfilelines,minimizepath,molprmfilepath,newfinalxyzfilelist,analyzepath,dynamicpath)
+        gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,liquidxyzfilelist,datacsvpathlist=GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist,indextogeneratecsv,keyfilelines,minimizepath,molprmfilepath,newfinalxyzfilelist,analyzepath,dynamicpath,relaxFBbox)
         liquidfolder='Liquid'
         qmfolder='QM'
         

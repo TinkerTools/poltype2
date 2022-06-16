@@ -1498,9 +1498,9 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                     rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
                     if rtang<0:
                         rtang=rtang+360
-
-                    if (optmol.GetAtom(rta).GetAtomicNum() != 1) and \
-                       (optmol.GetAtom(rtd).GetAtomicNum() != 1):
+                    if (optmol.GetAtom(rta).GetAtomicNum() == 1) and (optmol.GetAtom(rtd).GetAtomicNum() == 1):
+                        continue
+                    else:
                         restlist.append(resttors)
                         if not firsttor:
                             temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(rtang)))
@@ -1549,7 +1549,6 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                         hcount+=1
                 if hcount==3:
                     continue 
-
             if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
                 continue
             if (allhydtorsoneside==True or allhydtors==True) and (rtaatomicnum==1 or rtdatomicnum==1):

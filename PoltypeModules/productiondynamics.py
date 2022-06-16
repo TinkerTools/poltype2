@@ -564,6 +564,9 @@ def AddLigandIndices(poltype,ligandindices,keyfilename):
 
 
 def ProductionDynamicsProtocol(poltype):
+    if poltype.didinputsubmitlocally==False:
+        poltype.submitlocally=False
+ 
     if poltype.prodmdfinished==False:
         if len(poltype.mutlambdascheme)==0:
             for i in range(len(poltype.lambdakeyfilename)):
