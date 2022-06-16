@@ -143,7 +143,7 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
         results=temp.readlines()
         temp.close()
         for line in results:
-            f.write(line+'\n')
+            f.write(line)
 
     f.close()
     os.rename(tempname,newname)

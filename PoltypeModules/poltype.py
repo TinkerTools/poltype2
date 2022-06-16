@@ -3832,7 +3832,8 @@ class PolarizableTyper():
             
             if not os.path.exists(self.key4fname):
                 databaseparser.appendtofile(self,self.key3fname,self.key4fname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo)
-                databaseparser.StiffenZThenBisectorAngleConstants(self,self.key4fname)
+                if self.writeoutangle==True:
+                    databaseparser.StiffenZThenBisectorAngleConstants(self,self.key4fname)
                 databaseparser.TestBondAngleEquilValues(self)
                 self.AddIndicesToKey(self.key4fname)
                 if self.databasematchonly==True:
