@@ -495,8 +495,6 @@ def StructureMinimization(poltype,torsionrestraints):
     if poltype.isfragjob==True:
         torsionrestraints=[] 
     AddTorsionRestraints(poltype,poltype.key7fname,torsionrestraints)
-    shutil.copy(poltype.xyzoutfile,poltype.tmpxyzfile)
-    shutil.copy(poltype.key7fname,poltype.tmpkeyfile)
     cmd = poltype.minimizeexe+' -k '+poltype.tmpkeyfile+' '+poltype.tmpxyzfile+' 0.1 > Minimized_final.out'
     poltype.call_subsystem([cmd], True)
 

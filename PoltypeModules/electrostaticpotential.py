@@ -645,20 +645,22 @@ def GrabQMDipoles(poltype,optmol,logname):
         temp=open(logname,'r')
         results=temp.readlines()
         temp.close()
+        firstway=False
         for lineidx in range(len(results)):
             line=results[lineidx]
             if 'Dipole Moment: [D]' in line:
+                firstway=True
                 nextline=results[lineidx+1]
                 nextlinesplit=nextline.split()
                 dipole=np.array([float(nextlinesplit[1]),float(nextlinesplit[3]),float(nextlinesplit[5])])
-
-        #dipole=[]
-        #for lineidx in range(len(results)):
-        #    line=results[lineidx]
-        #    linesplit=line.split()
-        #    if 'Dipole' in line:
-        #        dipole.append(float(linesplit[-1]))
-        #dipole=np.array(dipole)
+        if firstway==False:
+            dipole=[]
+            for lineidx in range(len(results)):
+                line=results[lineidx]
+                linesplit=line.split()
+                if 'Dipole' in line:
+                    dipole.append(float(linesplit[-1]))
+            dipole=np.array(dipole)
                 
     else:
         temp=open(logname,'r')
@@ -676,6 +678,8 @@ def GrabQMDipoles(poltype,optmol,logname):
 
 def CheckDipoleMoments(poltype,optmol):
     logname=poltype.logespfname
+    if not os.path.exists(logname):
+        return
     dipole=GrabQMDipoles(poltype,optmol,logname)
     qmdipole=round(np.linalg.norm(dipole),3)
     while not os.path.exists(poltype.tmpkeyfile):

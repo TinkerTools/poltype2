@@ -3507,9 +3507,26 @@ class PolarizableTyper():
                 obConversion.WriteFile(mol,molstructfname)
 
 
-
-
             return molstructfname
+
+
+        def GenerateEntireTinkerXYZ(self,atmindextocoordinates,atmindextotypenum,atmindextoconnectivity,atmindextoelement,filename):
+            temp=open(filename,'w')
+            temp.write(str(len(atmindextocoordinates.keys()))+'\n')
+            for index,coords in atmindextocoordinates.items():
+                typenum=atmindextotypenum[index]
+                conns=atmindextoconnectivity[index]
+                element=atmindextoelement[index]
+                x=coords[0]
+                y=coords[1]
+                z=coords[2]
+                newline='    '+str(index)+'  '+element+'     '+str(x)+'   '+str(y)+'   '+str(z)+'    '+str(typenum)+'     '
+                for con in conns:
+                    newline+=str(con)+'     '
+                newline+='\n'
+                temp.write(newline)
+
+            temp.close()
 
 
         def GenerateParameters(self):
@@ -3676,58 +3693,65 @@ class PolarizableTyper():
 
             torgen.FindPartialDoubleBonds(self,m)
                 
+            if (self.writeoutpolarize==True and self.writeoutmultipole==True):
+                optmolist,errorlist,torsionrestraintslist = opt.GeometryOPTWrapper(self,molist)
+                optmol=optmolist[0]
+                error=errorlist[0]
+                torsionrestraints=torsionrestraintslist[0]
+                for omolidx in range(len(optmolist)):
+                    bgnmol=molist[omolidx]
+                    omol=optmolist[omolidx]
+                    bondtopoopt=torgen.GenerateBondTopology(self,omol)
+                    bondtopoopt=[list(i) for i in bondtopoopt]
+                    bondtopo=torgen.GenerateBondTopology(self,bgnmol)
+                    bondtopo=[list(i) for i in bondtopo]
+                    for bond in bondtopo:
+                        if bond in bondtopoopt or bond[::-1] in bondtopoopt:
+                            pass
+                        else:
+                            if self.deletedfiles==True:
+                                raise ValueError('Bond does not exist after optimization !'+str(bond))
+                            #else:
+                            #    self.deletedfiles=True
+                            #    self.DeleteAllFiles()
+                            #    self.GenerateParameters()
 
-            optmolist,errorlist,torsionrestraintslist = opt.GeometryOPTWrapper(self,molist)
-            optmol=optmolist[0]
-            error=errorlist[0]
-            torsionrestraints=torsionrestraintslist[0]
-            for omolidx in range(len(optmolist)):
-                bgnmol=molist[omolidx]
-                omol=optmolist[omolidx]
-                bondtopoopt=torgen.GenerateBondTopology(self,omol)
-                bondtopoopt=[list(i) for i in bondtopoopt]
-                bondtopo=torgen.GenerateBondTopology(self,bgnmol)
-                bondtopo=[list(i) for i in bondtopo]
-                for bond in bondtopo:
-                    if bond in bondtopoopt or bond[::-1] in bondtopoopt:
-                        pass
-                    else:
-                        if self.deletedfiles==True:
-                            raise ValueError('Bond does not exist after optimization !'+str(bond))
-                        #else:
-                        #    self.deletedfiles=True
-                        #    self.DeleteAllFiles()
-                        #    self.GenerateParameters()
-
-                for bond in bondtopoopt:
-                    if bond in bondtopo or bond[::-1] in bondtopo:
-                        pass
-                    else:
-                        if self.deletedfiles==True:
-                            raise ValueError('Bond created after optimization !'+str(bond))
-                        #else:
-                        #    self.deletedfiles=True
-                        #    self.DeleteAllFiles()
-                        #    self.GenerateParameters()
+                    for bond in bondtopoopt:
+                        if bond in bondtopo or bond[::-1] in bondtopo:
+                            pass
+                        else:
+                            if self.deletedfiles==True:
+                                raise ValueError('Bond created after optimization !'+str(bond))
+                            #else:
+                            #    self.deletedfiles=True
+                            #    self.DeleteAllFiles()
+                            #    self.GenerateParameters()
 
 
-                
+                    
 
-            optatomnums=optmol.NumAtoms()
-            molatomnums=mol.NumAtoms()
-            if optatomnums!=molatomnums: # then program behaviour changed need to restart
-                print('atom number before and after is different',flush=True)
-            #    self.deletedfiles=True
-            #    self.DeleteAllFiles()
-            #    self.GenerateParameters()
+                optatomnums=optmol.NumAtoms()
+                molatomnums=mol.NumAtoms()
+                if optatomnums!=molatomnums: # then program behaviour changed need to restart
+                    print('atom number before and after is different',flush=True)
+                #    self.deletedfiles=True
+                #    self.DeleteAllFiles()
+                #    self.GenerateParameters()
 
-            checkmp2optfailed=self.CheckMP2OptFailed()
-            if checkmp2optfailed==True:
-                print('mp2 opt failed',flush=True)
-            #    self.deletedfiles=True
-            #    self.DeleteAllFiles()
-            #    self.GenerateParameters()
+                checkmp2optfailed=self.CheckMP2OptFailed()
+                if checkmp2optfailed==True:
+                    print('mp2 opt failed',flush=True)
+                #    self.deletedfiles=True
+                #    self.DeleteAllFiles()
+                #    self.GenerateParameters()
 
+            else:
+                optmol=mol
+                tmpconv = openbabel.OBConversion()
+                tmpconv.SetOutFormat('xyz')
+                tmpconv.WriteFile(mol, self.logoptfname.replace('.log','.xyz'))
+                atmindextocoordinates,atmindextoconnectivity,atmindextoelement=self.ExtractMOLInfo(mol)
+                self.GenerateEntireTinkerXYZ(atmindextocoordinates,self.idxtosymclass,atmindextoconnectivity,atmindextoelement,self.xyzfname)
 
             if self.optonly==True:
                 sys.exit()
@@ -3748,7 +3772,8 @@ class PolarizableTyper():
             if os.path.isfile(self.tortormissingfilename):
                 tortorsmissing=databaseparser.ReadTorTorList(self,self.tortormissingfilename)
             #try:
-            esp.SPForDMA(self,optmol,mol)
+            if (self.writeoutpolarize==True and self.writeoutmultipole==True):
+                esp.SPForDMA(self,optmol,mol)
             #except:
             #    if self.use_gaus==False: 
             #        self.use_gaus=True
@@ -3760,31 +3785,29 @@ class PolarizableTyper():
 
             # Obtain multipoles from Gaussian fchk file using GDMA
         
-            if not os.path.isfile(self.gdmafname):
-                mpole.run_gdma(self)
+                if not os.path.isfile(self.gdmafname):
+                    mpole.run_gdma(self)
         
-            # Set up input file for poledit
-            # find multipole local frame definitions
 
-            polarindextopolarizeprm,polartypetotransferinfo=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m,polarize=True)
-            mpole.gen_peditinfile(self,mol,polarindextopolarizeprm)
+                polarindextopolarizeprm,polartypetotransferinfo=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m,polarize=True)
+                mpole.gen_peditinfile(self,mol,polarindextopolarizeprm)
             
-            if (not os.path.isfile(self.xyzfname) or not os.path.isfile(self.keyfname)):
-                # Run poledit
-                cmdstr = self.peditexe + " 1 " + self.gdmafname +' '+self.paramhead+ " < " + self.peditinfile
-                self.call_subsystem([cmdstr],True)
-                # Add header to the key file output by poledit
-                while not os.path.isfile(self.keyfnamefrompoledit):
-                    time.sleep(1)
-                    self.WriteToLog('Waiting for '+self.keyfnamefrompoledit)
-                    
-                mpole.prepend_keyfile(self,self.keyfnamefrompoledit,optmol)
-                mpole.SanitizeMultipoleFrames(self,self.keyfnamefrompoledit)
-                shutil.copy(self.keyfnamefrompoledit,self.keyfname)
+                if (not os.path.isfile(self.xyzfname) or not os.path.isfile(self.keyfname)):
+                    # Run poledit
+                    cmdstr = self.peditexe + " 1 " + self.gdmafname +' '+self.paramhead+ " < " + self.peditinfile
+                    self.call_subsystem([cmdstr],True)
+                    # Add header to the key file output by poledit
+                    while not os.path.isfile(self.keyfnamefrompoledit):
+                        time.sleep(1)
+                        self.WriteToLog('Waiting for '+self.keyfnamefrompoledit)
+                        
+                    mpole.prepend_keyfile(self,self.keyfnamefrompoledit,optmol)
+                    mpole.SanitizeMultipoleFrames(self,self.keyfnamefrompoledit)
+                    shutil.copy(self.keyfnamefrompoledit,self.keyfname)
 
-            xyzfnamelist,keyfnamelist=self.GenerateDuplicateXYZsFromOPTs(self.xyzfname,self.keyfname,optmolist)
+                xyzfnamelist,keyfnamelist=self.GenerateDuplicateXYZsFromOPTs(self.xyzfname,self.keyfname,optmolist)
             # post process local frames written out by poledit
-            if self.atomnum!=1: 
+            if self.atomnum!=1 and (self.writeoutpolarize==True and self.writeoutmultipole==True): 
                  #try:
                  gridnamelist,espnamelist,fchknamelist,cubenamelist=esp.SPForESP(self,optmolist,molist,xyzfnamelist,keyfnamelist) 
                  #except:
@@ -3804,37 +3827,38 @@ class PolarizableTyper():
                    
             
             # generate the electrostatic potential grid used for multipole fitting
-            if self.atomnum!=1: 
-                if not os.path.isfile(self.key3fname):
-                    potnamelist=esp.gen_esp_grid(self,optmol,gridnamelist,espnamelist,fchknamelist,cubenamelist)
-        
-            # Average multipoles based on molecular symmetry
-            # Does this using the script avgmpoles.pl which is found in the poltype directory
-            # Atoms that belong to the same symm class will now have only one common multipole definition
-            if not os.path.isfile(self.key2fnamefromavg):
-                self.WriteToLog("Average Multipoles Via Symmetry")
-                mpole.AverageMultipoles(self,optmol)
-                mpole.AddPolarizeCommentsToKey(self,self.key2fnamefromavg,polartypetotransferinfo)
-            fit=False
-            if self.espfit and not os.path.isfile(self.key3fname) and self.atomnum!=1:
-                xyzfnamelist,keyfnamelist=self.GenerateDuplicateXYZsFromOPTs(self.xyzoutfile,self.key2fnamefromavg,optmolist)   
-                self.WriteToLog("Electrostatic Potential Optimization")
-                combinedxyz,combinedpot=esp.ElectrostaticPotentialFitting(self,xyzfnamelist,keyfnamelist,potnamelist) 
-                shutil.copy(self.key3fnamefrompot,self.key3fname)
-                fit=True
-            elif self.atomnum==1 or self.espfit==False:
-                shutil.copy(self.key2fnamefromavg, self.key3fname)
-            # Remove header terms from the keyfile
-            mpole.rm_esp_terms_keyfile(self,self.key3fname)
-            if fit==True:
+            if (self.writeoutpolarize==True and self.writeoutmultipole==True):
                 if self.atomnum!=1: 
-                    esp.ElectrostaticPotentialComparison(self,combinedxyz,combinedpot) 
+                    if not os.path.isfile(self.key3fname):
+                        potnamelist=esp.gen_esp_grid(self,optmol,gridnamelist,espnamelist,fchknamelist,cubenamelist)
+        
+                # Average multipoles based on molecular symmetry
+                # Does this using the script avgmpoles.pl which is found in the poltype directory
+                # Atoms that belong to the same symm class will now have only one common multipole definition
+                if not os.path.isfile(self.key2fnamefromavg):
+                    self.WriteToLog("Average Multipoles Via Symmetry")
+                    mpole.AverageMultipoles(self,optmol)
+                    mpole.AddPolarizeCommentsToKey(self,self.key2fnamefromavg,polartypetotransferinfo)
+                fit=False
+                if self.espfit and not os.path.isfile(self.key3fname) and self.atomnum!=1:
+                    xyzfnamelist,keyfnamelist=self.GenerateDuplicateXYZsFromOPTs(self.xyzoutfile,self.key2fnamefromavg,optmolist)   
+                    self.WriteToLog("Electrostatic Potential Optimization")
+                    combinedxyz,combinedpot=esp.ElectrostaticPotentialFitting(self,xyzfnamelist,keyfnamelist,potnamelist) 
+                    shutil.copy(self.key3fnamefrompot,self.key3fname)
+                    fit=True
+                elif self.atomnum==1 or self.espfit==False:
+                    shutil.copy(self.key2fnamefromavg, self.key3fname)
+                # Remove header terms from the keyfile
+                mpole.rm_esp_terms_keyfile(self,self.key3fname)
+                if fit==True:
+                    if self.atomnum!=1: 
+                        esp.ElectrostaticPotentialComparison(self,combinedxyz,combinedpot) 
             
             if not os.path.exists(self.key4fname):
                 databaseparser.appendtofile(self,self.key3fname,self.key4fname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo)
                 if self.writeoutangle==True:
                     databaseparser.StiffenZThenBisectorAngleConstants(self,self.key4fname)
-                databaseparser.TestBondAngleEquilValues(self)
+                    databaseparser.TestBondAngleEquilValues(self)
                 self.AddIndicesToKey(self.key4fname)
                 if self.databasematchonly==True:
                     sys.exit()
@@ -3939,21 +3963,23 @@ class PolarizableTyper():
             self.WriteOutLiteratureReferences(self.key7fname) 
             # A series of tests are done so you one can see whether or not the parameterization values
             # found are acceptable and to what degree
-            try:
+            if self.writeoutpolarize==False or self.writeoutmultipole==False:
+                shutil.copy(self.xyzfname,self.xyzoutfile)
+            shutil.copy(self.xyzoutfile,self.tmpxyzfile)
+            shutil.copy(self.key7fname,self.tmpkeyfile)
+
+            if self.writeoutpolarize and self.writeoutmultipole==True:
                 opt.StructureMinimization(self,torsionrestraints)
                 if self.atomnum != 1:
                     opt.gen_superposeinfile(self)
                     opt.CheckRMSD(self)
-            except: # in case old key_4,key_5 files not working delete and restart
-                    #self.DeleteFilesWithExtension(['key_4','key_5'])
-                    #self.GenerateParameters()
-                    pass
 
             if self.torsppcm:
                 torgen.RemoveStringFromKeyfile(self,self.key7fname,'solvate GK')
             if self.atomnum!=1: 
                  esp.CheckDipoleMoments(self,optmol)
-            self.FinalVDWMultipoleCheck(self.tmpkeyfile)
+            if os.path.exists(self.tmpkeyfile):
+                self.FinalVDWMultipoleCheck(self.tmpkeyfile)
             self.WriteToLog('Poltype Job Finished'+'\n')
             
             if os.path.exists(self.scrtmpdirgau):
@@ -3972,8 +3998,10 @@ class PolarizableTyper():
                     pass
             if self.isfragjob==False:
                 previousdir=os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-                shutil.copy(self.tmpxyzfile,os.path.join(previousdir,self.tmpxyzfile))
-                shutil.copy(self.tmpkeyfile,os.path.join(previousdir,self.tmpkeyfile))
+                if os.path.exists(self.tmpxyzfile):
+                     shutil.copy(self.tmpxyzfile,os.path.join(previousdir,self.tmpxyzfile))
+                if os.path.exists(self.tmpkeyfile):
+                     shutil.copy(self.tmpkeyfile,os.path.join(previousdir,self.tmpkeyfile))
 
             self.CopyFitPlots()
             if (self.binding==True or self.solvation==True or self.neatliquidsim==True) or self.usepdb2pqr==True or self.pdbcode!=None:
@@ -4008,6 +4036,42 @@ class PolarizableTyper():
 
 
             return xyzfnamelist,keyfnamelist
+
+
+
+        def ExtractMOLInfo(self,mol):
+            atmindextocoordinates={}
+            atmindextoconnectivity={}
+            atmindextoelement={}
+            iteratom = openbabel.OBMolAtomIter(mol)
+            an = pyasl.AtomicNo()
+            for atom in iteratom:
+                index=atom.GetIdx()
+                atomicnum=atom.GetAtomicNum()
+                coords=[atom.GetX(),atom.GetY(),atom.GetZ()]
+                element=an.getElSymbol(atomicnum)
+                atmindextocoordinates[index]=coords
+                connectivity=self.GrabConnectivity(mol,index)
+                atmindextoconnectivity[index]=connectivity
+                atmindextoelement[index]=element
+
+
+            return atmindextocoordinates,atmindextoconnectivity,atmindextoelement
+
+
+        def GrabConnectivity(self,mol,index):
+            conn=[]
+            bonditer=openbabel.OBMolBondIter(mol)
+            for bond in bonditer:
+                oendidx = bond.GetEndAtomIdx()
+                obgnidx = bond.GetBeginAtomIdx()
+                if oendidx==index:
+                    if obgnidx not in conn:
+                        conn.append(obgnidx)
+                elif obgnidx==index:
+                    if oendidx not in conn:
+                        conn.append(oendidx)
+            return conn
 
 
         def GenerateTinkerXYZ(self,xyzfname,newxyzfname,indextocoordinates):

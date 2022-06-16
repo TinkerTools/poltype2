@@ -35,113 +35,121 @@ def CheckIfStringIsFloat(string):
 
 
 def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo):
-    temp=open(vf,'r')
-    results=temp.readlines()
-    temp.close()
-    foundatomblock=False
-    atomline=False
-    wroteout=False
     tempname=vf.replace('.key','_temp.key')
     f=open(tempname,'w')
-    linestoskip=[]
-    for theline in results:
-        linesplit=theline.split()
-        if 'atom' in theline:
-            atomline=True
-            if foundatomblock==False:
-                foundatomblock=True
+    if poltype.writeoutpolarize==True and poltype.writeoutmultipole==True: 
+        temp=open(vf,'r')
+        results=temp.readlines()
+        temp.close()
+        foundatomblock=False
+        atomline=False
+        wroteout=False
+        linestoskip=[]
+        for theline in results:
+            linesplit=theline.split()
+            if 'atom' in theline:
+                atomline=True
+                if foundatomblock==False:
+                    foundatomblock=True
 
-                    
-        else:
-            atomline=False
+                        
+            else:
+                atomline=False
 
-        if 'polarize' in theline and poltype.writeoutpolarize==False:
-            linestoskip.append(theline)
-        if 'multipole' in theline and poltype.writeoutmultipole==False:
-            linestoskip.append(theline)
-        if len(linesplit)>0:
-            if CheckIfStringIsFloat(linesplit[0])==True and poltype.writeoutmultipole==False:
+            if 'polarize' in theline and poltype.writeoutpolarize==False:
                 linestoskip.append(theline)
+            if 'multipole' in theline and poltype.writeoutmultipole==False:
+                linestoskip.append(theline)
+            if len(linesplit)>0:
+                if CheckIfStringIsFloat(linesplit[0])==True and poltype.writeoutmultipole==False:
+                    linestoskip.append(theline)
 
 
-        if foundatomblock==True and atomline==False and wroteout==False:
-            wroteout=True
-            f.write('\n')
-            if poltype.writeoutvdw==True:
+            if foundatomblock==True and atomline==False and wroteout==False:
+                wroteout=True
+                f.write('\n')
+                if poltype.writeoutvdw==True:
+                    if poltype.forcefield=='AMOEBA+':
+                        for line,transferinfo in amoebaplusvdwprmstotransferinfo.items():
+                            f.write(transferinfo)
+                            f.write(line)
+                            f.write('\n')
+
+                    else:
+                        for line,transferinfo in vdwprmstotransferinfo.items():
+                            f.write(transferinfo)
+                            f.write(line)
+                            f.write('\n')
+                
+
+                if poltype.writeoutbond==True:
+                    for line,transferinfo in bondprmstotransferinfo.items():
+                        f.write(transferinfo)
+                        f.write(line)
+                        f.write('\n')
+                if poltype.writeoutangle==True:
+                    for line,transferinfo in angleprmstotransferinfo.items():
+                        f.write(transferinfo)
+                        f.write(line)
+                        f.write('\n')
+                if poltype.writeoutstrbnd==True:
+                    for line,transferinfo in strbndprmstotransferinfo.items():
+                        f.write(transferinfo)
+                        f.write(line)
+                        f.write('\n')
+                if poltype.writeoutopbend==True:
+                    for line,transferinfo in opbendprmstotransferinfo.items():
+                        f.write(transferinfo)
+                        f.write(line)
+                        f.write('\n')
+                if poltype.writeouttorsion==True:
+                    for line,transferinfo in torsionprmstotransferinfo.items():
+                        f.write(transferinfo)
+                        f.write(line)
+                        f.write('\n')
+                for line in soluteprms:
+                    f.write(line)
+                    f.write('\n')
+                for line,transferinfo in tortorprmstotransferinfo.items():
+                    if 'tortors' in line:
+                        f.write(transferinfo)
+                    f.write(line)
+                    f.write('\n')
+
                 if poltype.forcefield=='AMOEBA+':
-                    for line,transferinfo in amoebaplusvdwprmstotransferinfo.items():
+                    for line,transferinfo in ctprmstotransferinfo.items():
+                        f.write(transferinfo)
+                        f.write(line)
+                        f.write('\n')
+                    for line,transferinfo in cpprmstotransferinfo.items():
+                        f.write(transferinfo)
+                        f.write(line)
+                        f.write('\n')
+                    for line,transferinfo in bondcfprmstotransferinfo.items():
+                        f.write(transferinfo)
+                        f.write(line)
+                    f.write('\n')
+                    for line,transferinfo in anglecfprmstotransferinfo.items():
                         f.write(transferinfo)
                         f.write(line)
                         f.write('\n')
 
-                else:
-                    for line,transferinfo in vdwprmstotransferinfo.items():
-                        f.write(transferinfo)
-                        f.write(line)
-                        f.write('\n')
-            
 
-            if poltype.writeoutbond==True:
-                for line,transferinfo in bondprmstotransferinfo.items():
-                    f.write(transferinfo)
-                    f.write(line)
-                    f.write('\n')
-            if poltype.writeoutangle==True:
-                for line,transferinfo in angleprmstotransferinfo.items():
-                    f.write(transferinfo)
-                    f.write(line)
-                    f.write('\n')
-            if poltype.writeoutstrbnd==True:
-                for line,transferinfo in strbndprmstotransferinfo.items():
-                    f.write(transferinfo)
-                    f.write(line)
-                    f.write('\n')
-            if poltype.writeoutopbend==True:
-                for line,transferinfo in opbendprmstotransferinfo.items():
-                    f.write(transferinfo)
-                    f.write(line)
-                    f.write('\n')
-            if poltype.writeouttorsion==True:
-                for line,transferinfo in torsionprmstotransferinfo.items():
-                    f.write(transferinfo)
-                    f.write(line)
-                    f.write('\n')
-            for line in soluteprms:
-                f.write(line)
-                f.write('\n')
-            for line,transferinfo in tortorprmstotransferinfo.items():
-                if 'tortors' in line:
-                    f.write(transferinfo)
-                f.write(line)
-                f.write('\n')
+                                        
+            else:
+                if theline not in linestoskip:
+                    f.write(theline)
+    if poltype.writeouttorsion==True:
+        for line,transferinfo in torsionprmstotransferinfo.items():
+            f.write(transferinfo)
+            f.write(line)
+            f.write('\n')
 
-            if poltype.forcefield=='AMOEBA+':
-                for line,transferinfo in ctprmstotransferinfo.items():
-                    f.write(transferinfo)
-                    f.write(line)
-                    f.write('\n')
-                for line,transferinfo in cpprmstotransferinfo.items():
-                    f.write(transferinfo)
-                    f.write(line)
-                    f.write('\n')
-                for line,transferinfo in bondcfprmstotransferinfo.items():
-                    f.write(transferinfo)
-                    f.write(line)
-                f.write('\n')
-                for line,transferinfo in anglecfprmstotransferinfo.items():
-                    f.write(transferinfo)
-                    f.write(line)
-                    f.write('\n')
-
-
-                                    
-        else:
-            if theline not in linestoskip:
-                f.write(theline)
     if poltype.inputkeyfile!=None:
         temp=open(poltype.inputkeyfile,'r')
         results=temp.readlines()
         temp.close()
+        f.write("parameters " + poltype.paramhead + "\n")
         for line in results:
             f.write(line)
 

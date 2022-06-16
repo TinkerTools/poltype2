@@ -1,4 +1,4 @@
-name: testpoltype
+name: amoebamdpoltype
 channels:
   - psi4
   - conda-forge
@@ -208,4 +208,3 @@ dependencies:
     - statsmodels==0.13.2
     - tables==3.6.1
     - unicodedata2==14.0.0
-prefix: /home/bdw2292/miniconda3/envs/testpoltype
