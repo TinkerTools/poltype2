@@ -841,6 +841,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         poltype.idealangletensor[tuple(truetorset)]=idealangletensor
         minstrctfname = prevstrctfname
         prevstrctfname = minstrctfname
+
         listoftinkertorstructures,energyarray,flatphaselist=tinker_minimize_angles(poltype,torset,optmol,variabletorlist,flatphaselist,prevstrctfname,torsionrestraint,bondtopology)
         if len(torset)==2 and torset not in poltype.nonaroringtorsets:
             indicestokeep,firsttorindices,secondtorindices=Determine1DTorsionSlicesOnTorTorSurface(poltype,energyarray,flatphaselist,torset,sizearray)
@@ -854,6 +855,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
 
         else:
             listoftinkertorstructures,energyarray,flatphaselist=RemoveBadPoints(poltype,listoftinkertorstructures,energyarray,flatphaselist)
+            
             gridspacing=int(len(flatphaselist)/poltype.defaultmaxtorsiongridpoints)
             if gridspacing>1: 
                 locstoremove=[]
@@ -867,7 +869,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                 flatphaselist = numpy.delete(flatphaselist,locstoremove , axis=0)
                 listoftinkertorstructures=numpy.delete(listoftinkertorstructures,locstoremove,axis=0)
         poltype.torsettophaselist[tuple(torset)]=flatphaselist
-
         poltype.SanitizeAllQMMethods()
         
         outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures,optlogtophaseangle,inputfilepaths,outputfilenames,executables,outputlogtoinitialxyz=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol,'1',optlogtophaseangle)

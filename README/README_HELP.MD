@@ -185,7 +185,7 @@
 ``dontdotor``   specifies poltype to skip torsion parameterization. Default is False.
                   
 
-``torsionrestraint``  specifies how many kcals/mol/rad^2 to restrain other torsions around rotatable bond to be at current dihedral angle. Default is 328.280354574.
+``torsionrestraint``  specifies how many kcals/mol/rad^2 to restrain other torsions around rotatable bond to be at current dihedral angle. Default is 1641.4 (.5 kcal/mol/deg^2).
 
 ``foldnum``           specifies the number of fourier terms used in torsion fitting. Default is 4.
 

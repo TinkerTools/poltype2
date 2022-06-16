@@ -432,7 +432,7 @@ class PolarizableTyper():
         tordatapointsnum:None=None
         gentorsion:bool=False
         gaustorerror:bool=False
-        torsionrestraint:float=.1*3282.80354574
+        torsionrestraint:float=.5*3282.80354574
         onlyrotbndslist:list=field(default_factory=lambda : [])
         rotalltors:bool=False
         dontdotor:bool=False
@@ -3485,6 +3485,7 @@ class PolarizableTyper():
             split=molstructfname.split('.')
             ext=split[-1]
             if ext!='sdf':
+                istinkerxyz=False
                 if ext=='xyz':
                     istinkerxyz=self.CheckIfInputIsTinkerXYZ(molstructfname)
 
