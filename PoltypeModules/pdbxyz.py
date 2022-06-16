@@ -5,7 +5,7 @@ import re
 import shutil
 import warnings
 import time
-
+import sys
 
 def GenerateProteinTinkerXYZFile(poltype):
     if poltype.uncomplexedproteinpdbname==None:
@@ -41,10 +41,73 @@ def GenerateProteinTinkerXYZFile(poltype):
 
     indextocoordinates=GrabLigandCoordinates(poltype,uncomplexedatomnum,shift)
     poltype.ligandindices[0]=list(indextocoordinates.keys())
-    GenerateComplexedTinkerXYZFile(poltype,poltype.uncomplexedxyzname,indextocoordinates,newuncomplexedatomnum)
+    nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement=GrabNonLigandHETATMInfo(poltype,poltype.complexedproteinpdbname,list(indextocoordinates.keys()),shift) 
+    
+    GenerateComplexedTinkerXYZFile(poltype,poltype.uncomplexedxyzname,indextocoordinates,newuncomplexedatomnum,nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement)
     ligandindices=poltype.ligandindices[0]
     GeneratePDBFileFromXYZ(poltype,poltype.complexedxyzname,ligandindices)
- 
+
+
+
+def GrabNonLigandHETATMInfo(poltype,complexedproteinpdbname,ligandindices,shift):
+    nonlighetatmindextocoordinates={}
+    nonlighetatmindextotypenum={}
+    nonlighetatmindextoconnectivity={}
+    nonlighetatmindextoelement={}
+
+    temp=open(complexedproteinpdbname,'r')
+    results=temp.readlines()
+    temp.close()
+    pdbmol=openbabel.OBMol()
+    obConversion = openbabel.OBConversion()
+    obConversion.SetInFormat('pdb')
+    obConversion.ReadFile(pdbmol,complexedproteinpdbname)
+    for line in results:
+        if 'HETATM' in line:
+            linesplit=line.split()
+            index=int(linesplit[1])
+            finalindex=index+shift
+            element=linesplit[2][0]
+            coords=[float(linesplit[5]),float(linesplit[6]),float(linesplit[7])]
+            if finalindex not in ligandindices:
+                nonlighetatmindextocoordinates[finalindex]=coords
+                typenum=GrabNonLigandHETATMType(poltype,element)
+                nonlighetatmindextotypenum[finalindex]=typenum
+                connectivity=GrabConnectivity(poltype,pdbmol,index,shift)
+                nonlighetatmindextoconnectivity[finalindex]=connectivity
+                nonlighetatmindextoelement[finalindex]=element
+
+    return nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement
+
+
+def GrabConnectivity(poltype,pdbmol,index,shift):
+    conn=[]
+    bonditer=openbabel.OBMolBondIter(pdbmol)
+    for bond in bonditer:
+        oendidx = bond.GetEndAtomIdx()
+        obgnidx = bond.GetBeginAtomIdx()
+        if oendidx==index:
+            if obgnidx not in conn:
+                conn.append(obgnidx+shift)
+        elif obgnidx==index:
+            if oendidx not in conn:
+                conn.append(oendidx+shift)
+    return conn
+
+
+
+
+def GrabNonLigandHETATMType(poltype,element): # assumes besides ligand and protein, only water and ions
+    if element=='O':
+        typenum=poltype.waterOtypenum
+    elif element=='H':
+        typenum=poltype.waterHtypenum
+    else:
+        typenum=poltype.elementsymtotinktype[element]
+
+    return typenum
+
+
 def readTXYZ(poltype,TXYZ):
     temp=open(TXYZ,'r')
     lines = temp.readlines()[1:] #TINKER coordinate starts from second line
@@ -67,22 +130,26 @@ def GrabLigandCoordinates(poltype,uncomplexedatomnum,shift): # assumes appended 
     obConversion.SetInFormat('pdb')
     obConversion.ReadFile(pdbmol,poltype.complexedproteinpdbname)
     atomiter=openbabel.OBMolAtomIter(pdbmol)
+    ligandtypes=poltype.GrabTypeNumbers(poltype.ligandxyzfilename)
+    totallig=len(ligandtypes)
+    count=1
     for atom in atomiter:
         atomidx=atom.GetIdx()
-        if atomidx>uncomplexedatomnum:
+        if atomidx>uncomplexedatomnum and count<=totallig: # assumes all water/ions after ligand in pdb 
             coords=[atom.GetX(),atom.GetY(),atom.GetZ()]
             indextocoordinates[atomidx+shift]=coords
+            count+=1
     if len(indextocoordinates.keys())==0:
         raise ValueError('Complexed PDB missing atoms or ligand in Complexed PDB is not appended to the end of file')
     return indextocoordinates    
 
-def GenerateComplexedTinkerXYZFile(poltype,uncomplexedxyzname,indextocoordinates,uncomplexedatomnum):
+def GenerateComplexedTinkerXYZFile(poltype,uncomplexedxyzname,indextocoordinates,uncomplexedatomnum,nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement):
     temp=open(uncomplexedxyzname,'r')
     results=temp.readlines()
     temp.close() 
     atoms,coord,order,types,connections=readTXYZ(poltype,poltype.ligandxyzfilename)
     temp=open(poltype.complexedxyzname,'w')
-    newatomnum=uncomplexedatomnum+len(indextocoordinates)
+    newatomnum=uncomplexedatomnum+len(indextocoordinates)+len(nonlighetatmindextocoordinates.keys())
     for lineidx in range(len(results)):
         line=results[lineidx]
         linesplit=line.split()
@@ -108,6 +175,21 @@ def GenerateComplexedTinkerXYZFile(poltype,uncomplexedxyzname,indextocoordinates
             newline+=str(con)+'     '
         newline+='\n'
         temp.write(newline)
+    for index,coords in nonlighetatmindextocoordinates.items():
+        typenum=nonlighetatmindextotypenum[index]
+        conns=nonlighetatmindextoconnectivity[index]
+        element=nonlighetatmindextoelement[index]
+        x=coords[0]
+        y=coords[1]
+        z=coords[2]
+        newline='    '+str(index)+'  '+element+'     '+str(x)+'   '+str(y)+'   '+str(z)+'    '+str(typenum)+'     '
+        for con in conns:
+            newline+=str(con)+'     '
+        newline+='\n'
+        temp.write(newline)
+
+
+
     temp.close()
 
 def GenerateUncomplexedProteinPDBFromComplexedPDB(poltype):
@@ -189,6 +271,7 @@ def GeneratePDBFileFromXYZ(poltype,xyzfile,ligandindices):
         os.mkdir(poltype.visfolder)
     newpath=os.path.join(poltype.visfolder,finalname)
     shutil.copy(finalname,newpath)
+
 
 def DetectNumberOfChains(poltype,pdbfile):
     temp=open(pdbfile,'r')

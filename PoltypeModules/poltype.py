@@ -1660,6 +1660,10 @@ class PolarizableTyper():
             elif self.solvation==False and self.complexation==False and self.neatliquidsim==True:
                 self.ligandindices=[[]]
 
+            self.elementsymtotinktype={'K':box.GrabTypeNumber(self,'Potassium Ion K+'),'Cl':box.GrabTypeNumber(self,'Chloride Ion Cl-'),'Mg':box.GrabTypeNumber(self,'Magnesium Ion Mg+2'),'Li':box.GrabTypeNumber(self,'Lithium Ion Li+'),'Na':box.GrabTypeNumber(self,'Sodium Ion Na+'),'Rb':box.GrabTypeNumber(self,'Rubidium Ion Rb+'),'Cs':box.GrabTypeNumber(self,'Cesium Ion Cs+'),'Be':box.GrabTypeNumber(self,'Beryllium Ion Be+2'),'Ca':box.GrabTypeNumber(self,'Calcium Ion Ca+2'),'Zn':box.GrabTypeNumber(self,'Zinc Ion Zn+2'),'Mg+':box.GrabTypeNumber(self,'Magnesium Ion Mg+2')}
+            self.ReadWaterFromPRMFile()
+
+
             if self.pdbcode!=None:
                 pdbxyz.FillInMissingResidues(self,self.pdbcode)
                 sys.exit()
@@ -1970,8 +1974,7 @@ class PolarizableTyper():
                 self.configkeyfilename=[confignamelistcomp,confignamelistsolv]
                 self.lambdakeyfilename=[lambdanamelistcomp,lambdanamelistsolv]
 
-            self.elementsymtotinktype={'K':box.GrabTypeNumber(self,'Potassium Ion K+'),'Cl':box.GrabTypeNumber(self,'Chloride Ion Cl-'),'Mg':box.GrabTypeNumber(self,'Magnesium Ion Mg+2'),'Li':box.GrabTypeNumber(self,'Lithium Ion Li+'),'Na':box.GrabTypeNumber(self,'Sodium Ion Na+'),'Rb':box.GrabTypeNumber(self,'Rubidium Ion Rb+'),'Cs':box.GrabTypeNumber(self,'Cesium Ion Cs+'),'Be':box.GrabTypeNumber(self,'Beryllium Ion Be+2'),'Ca':box.GrabTypeNumber(self,'Calcium Ion Ca+2'),'Zn':box.GrabTypeNumber(self,'Zinc Ion Zn+2'),'Mg+':box.GrabTypeNumber(self,'Magnesium Ion Mg+2')}
-            self.ReadWaterFromPRMFile()
+            
             
             self.equilstepsNVT=str(int((self.equiltimeNVT*1000000)/self.equiltimestep/len(self.equilibriatescheme)-1)) # convert ns to fs divide by the length of temperature scheme
             self.lastequilstepsNVT=str(int((self.lastNVTequiltime*1000000)/self.equiltimestep))
