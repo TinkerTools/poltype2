@@ -1248,6 +1248,7 @@ def get_torlist(poltype,mol,missed_torsions):
                 d = iaa2.GetIdx()
                 if ((iaa.GetIdx() != t3.GetIdx() and iaa2.GetIdx() != t2.GetIdx()) and not (iaa.GetIdx() == t1.GetIdx() and iaa2.GetIdx() == t4.GetIdx())) and iaa.GetIdx()!=iaa2.GetIdx(): # also include case for three atom ring
                     rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx()))
+    
     return (torlist ,rotbndlist,hydtorsionlist,nonaroringtorlist)
 
 
@@ -1499,7 +1500,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                     rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
                     if rtang<0:
                         rtang=rtang+360
-                    if (optmol.GetAtom(rta).GetAtomicNum() == 1) and (optmol.GetAtom(rtd).GetAtomicNum() == 1):
+                    if ((optmol.GetAtom(rta).GetAtomicNum() == 1) and (optmol.GetAtom(rtd).GetAtomicNum() == 1) and allhydtors==False):
                         continue
                     else:
                         restlist.append(resttors)

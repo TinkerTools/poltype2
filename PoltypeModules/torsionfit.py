@@ -113,7 +113,7 @@ def fitfunc (poltype,parms, x,torset, torprmdict,keyonlylist=None,nfoldonlylist=
                         tor_energy += tor_func_term (poltype,prm, ang, nfold, clscnt, torgen.rads(poltype,clsangle),torgen.rads(poltype,offset))
             tor_energy_array[j]+=tor_energy
 
-    if parms is 'eval' and 'offset' in torprm:
+    if parms=='eval' and 'offset' in torprm:
         offset = torprm['offset']
     if parms!='eval':
         offset = parms[-1]
@@ -1602,7 +1602,6 @@ def WriteOutFitResults(poltype,tmpkey2basename,classkeytofitresults):
     for line in results:
         linesplit=line.split()
         if 'torsion' in line and '#' not in line and 'unit' not in line:
-            print('line',line)
             fwd='%d %d %d %d' % (int(linesplit[1]), int(linesplit[2]), int(linesplit[3]), int(linesplit[4]))       
             fwdsplit=fwd.split() 
             revsplit=fwdsplit[::-1]

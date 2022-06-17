@@ -1990,15 +1990,17 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
 
         else:
             if poltype.rotalltors==True and ringbond==False:
-                if bondorder!=1:
+                if bondorder<2:
                     if torsionindices not in torsionsmissing:
                         torsionsmissing.append(torsionindices)
             if len(poltype.onlyrotbndslist)!=0:
                 if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
-                    if bondorder!=1:
+                    if bondorder<2:
                         if torsionindices not in torsionsmissing:
                             torsionsmissing.append(torsionindices)
-    return torsionsmissing,poormatchingaromatictorsions,poormatchingpartialaromatictorsions,torsionstozerooutduetocolinear 
+    return torsionsmissing,poormatchingaromatictorsions,poormatchingpartialaromatictorsions,torsionstozerooutduetocolinear
+
+
 def GrabAllRingsContainingIndices(poltype,atomindices,babelindices):
     rings=[]
     for ring in atomindices:
