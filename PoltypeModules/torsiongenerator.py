@@ -1426,7 +1426,7 @@ def ConvertTinktoXYZ(poltype,filename,newfilename):
 
 
 def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt):
-
+    print('phaseangles',phaseangles,flush=True)
     prefix='%s-opt-%s_' % (poltype.molecprefix,currentopt)
     postfix='.psi4'  
     inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
@@ -1464,6 +1464,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
         tor=torset[i]
         a,b,c,d=tor[0:4]
         key=' '.join([str(b),str(c)])
+        phaseangle=phaseangles[i]
         if key in poltype.rotbndlist.keys():
             for resttors in poltype.rotbndlist[key]:
                 rta,rtb,rtc,rtd = resttors
@@ -1500,95 +1501,96 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                     rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
                     if rtang<0:
                         rtang=rtang+360
+
                     if ((optmol.GetAtom(rta).GetAtomicNum() == 1) and (optmol.GetAtom(rtd).GetAtomicNum() == 1) and allhydtors==False):
                         continue
                     else:
                         restlist.append(resttors)
                         if not firsttor:
-                            temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(rtang)))
+                            temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang+phaseangle)%360))))
                         else:
-                            temp.write(" 'set' : [{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(rtang)))
+                            temp.write(" 'set' : [{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang+phaseangle)%360))))
                             firsttor=False
 
 
                         rotbndtorescount[rotbnd]+=1
             
         # Leave all torsions around other rotatable bonds fixed
-    for rotkey,torsions in poltype.rotbndlist.items():
-        count=0
-        for resttors in torsions:
-            rta,rtb,rtc,rtd = resttors
-            indices=[rta,rtb,rtc,rtd]
-            allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,mol)
-            allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,mol)
+        for rotkey,torsions in poltype.rotbndlist.items():
+            count=0
+            for resttors in torsions:
+                rta,rtb,rtc,rtd = resttors
+                indices=[rta,rtb,rtc,rtd]
+                allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,mol)
+                allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,mol)
 
-            aatom=mol.GetAtom(rta)
-            datom=mol.GetAtom(rtd)
-            batom=mol.GetAtom(rtb)
-            catom=mol.GetAtom(rtc)
+                aatom=mol.GetAtom(rta)
+                datom=mol.GetAtom(rtd)
+                batom=mol.GetAtom(rtb)
+                catom=mol.GetAtom(rtc)
 
-            rtaatomicnum=aatom.GetAtomicNum()
-            rtdatomicnum=datom.GetAtomicNum()
+                rtaatomicnum=aatom.GetAtomicNum()
+                rtdatomicnum=datom.GetAtomicNum()
 
 
-            rtbatomicnum=batom.GetAtomicNum()
-            rtcatomicnum=catom.GetAtomicNum()
-            if rtbatomicnum==6:
-                iteratomatom = openbabel.OBAtomAtomIter(batom)
-                hcount=0
-                for nrtb in iteratomatom:
-                    nrtbatomicnum=nrtb.GetAtomicNum()
-                    if nrtbatomicnum==1:
-                        hcount+=1
-                if hcount==3:
-                    continue 
-            if rtcatomicnum==6:
-                iteratomatom = openbabel.OBAtomAtomIter(catom)
-                hcount=0
-                for nrtc in iteratomatom:
-                    nrtcatomicnum=nrtc.GetAtomicNum()
-                    if nrtcatomicnum==1:
-                        hcount+=1
-                if hcount==3:
-                    continue 
-            if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
-                continue
-            if (allhydtorsoneside==True or allhydtors==True) and (rtaatomicnum==1 or rtdatomicnum==1):
-
-           
-                if count>=1:
+                rtbatomicnum=batom.GetAtomicNum()
+                rtcatomicnum=catom.GetAtomicNum()
+                if rtbatomicnum==6:
+                    iteratomatom = openbabel.OBAtomAtomIter(batom)
+                    hcount=0
+                    for nrtb in iteratomatom:
+                        nrtbatomicnum=nrtb.GetAtomicNum()
+                        if nrtbatomicnum==1:
+                            hcount+=1
+                    if hcount==3:
+                        continue 
+                if rtcatomicnum==6:
+                    iteratomatom = openbabel.OBAtomAtomIter(catom)
+                    hcount=0
+                    for nrtc in iteratomatom:
+                        nrtcatomicnum=nrtc.GetAtomicNum()
+                        if nrtcatomicnum==1:
+                            hcount+=1
+                    if hcount==3:
+                        continue 
+                if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
                     continue
-                count+=1
-            firstangle=mol.GetAngle(aatom,batom,catom)
-            secondangle=mol.GetAngle(batom,catom,datom)
-            if firstangle<0:
-                firstangle=firstangle+360
-            if secondangle<0:
-                secondangle=secondangle+360
-            angletol=3.5
-            if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
-                continue
-            if rtb<rtc:
-                rotbnd=tuple([rtb,rtc])
-            else:
-                rotbnd=tuple([rtc,rtb])
-            if rotbnd not in rotbndtorescount.keys():
-                rotbndtorescount[rotbnd]=0
-            if rotbndtorescount[rotbnd]>=maxrotbnds:
-                continue
+                if (allhydtorsoneside==True or allhydtors==True) and (rtaatomicnum==1 or rtdatomicnum==1):
 
-            rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
-            if rtang<0:
-                rtang=rtang+360
-
-            if resttors not in restlist and resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
-                restlist.append(resttors)
-                if not firsttor:
-                    temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(rtang)))
+               
+                    if count>=1:
+                        continue
+                    count+=1
+                firstangle=mol.GetAngle(aatom,batom,catom)
+                secondangle=mol.GetAngle(batom,catom,datom)
+                if firstangle<0:
+                    firstangle=firstangle+360
+                if secondangle<0:
+                    secondangle=secondangle+360
+                angletol=3.5
+                if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
+                    continue
+                if rtb<rtc:
+                    rotbnd=tuple([rtb,rtc])
                 else:
-                    temp.write(" 'set' : [{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(rtang)))
-                    firsttor=False
-                rotbndtorescount[rotbnd]+=1
+                    rotbnd=tuple([rtc,rtb])
+                if rotbnd not in rotbndtorescount.keys():
+                    rotbndtorescount[rotbnd]=0
+                if rotbndtorescount[rotbnd]>=maxrotbnds:
+                    continue
+
+                rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
+                if rtang<0:
+                    rtang=rtang+360
+
+                if resttors not in restlist and resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
+                    restlist.append(resttors)
+                    if not firsttor:
+                        temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang+phaseangle)%360))))
+                    else:
+                        temp.write(" 'set' : [{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang+phaseangle)%360))))
+                        firsttor=False
+                    rotbndtorescount[rotbnd]+=1
     temp.write("]"+'\n')
     temp.write("  }"+'\n')
     temp.write(" }"+'\n')
