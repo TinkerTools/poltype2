@@ -1426,7 +1426,6 @@ def ConvertTinktoXYZ(poltype,filename,newfilename):
 
 
 def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt):
-    print('phaseangles',phaseangles,flush=True)
     prefix='%s-opt-%s_' % (poltype.molecprefix,currentopt)
     postfix='.psi4'  
     inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)

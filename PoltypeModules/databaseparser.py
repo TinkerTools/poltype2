@@ -139,18 +139,31 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
             else:
                 if theline not in linestoskip:
                     f.write(theline)
-    if poltype.writeouttorsion==True:
-        for line,transferinfo in torsionprmstotransferinfo.items():
-            f.write(transferinfo)
-            f.write(line)
-            f.write('\n')
+    
 
     if poltype.inputkeyfile!=None:
+        if poltype.writeouttorsion==True:
+            for line,transferinfo in torsionprmstotransferinfo.items():
+                f.write(transferinfo)
+                f.write(line)
+                f.write('\n')
         temp=open(poltype.inputkeyfile,'r')
         results=temp.readlines()
         temp.close()
         f.write("parameters " + poltype.paramhead + "\n")
-        for line in results:
+        for line in results: # handle case where user gives giant prm file as input
+            linesplit=line.split()
+            if len(linesplit)>1:
+                if linesplit[0]=='torsion':
+                    if poltype.writeouttorsion==True:
+                        for theline,transferinfo in torsionprmstotransferinfo.items():
+                            thelinesplit=theline.split()
+                            tors=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3]),int(linesplit[4])]
+                            thetors=[int(thelinesplit[1]),int(thelinesplit[2]),int(thelinesplit[3]),int(thelinesplit[4])]
+                            if tors==thetors or tors==thetors[::-1]:
+                                line=theline
+                                break
+                    
             f.write(line)
 
     f.close()
