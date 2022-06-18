@@ -1,5 +1,6 @@
 name: amoebamdpoltype
 channels:
+  - hcc
   - psi4
   - conda-forge
   - salilab
@@ -10,6 +11,7 @@ dependencies:
   - ambit=0.6=py310h53dec33_2
   - astunparse=1.6.3=pyhd8ed1ab_0
   - attrs=21.4.0=pyhd8ed1ab_0
+  - autodock=4.2.6=hfc679d8_0
   - blas=1.0=mkl
   - blosc=1.21.1=h83bc5f7_3
   - boost=1.74.0=py310h7c3ba0c_5
@@ -18,7 +20,7 @@ dependencies:
   - brotli-bin=1.0.9=h166bdaf_7
   - bzip2=1.0.8=h7f98852_4
   - c-ares=1.18.1=h7f98852_0
-  - ca-certificates=2022.5.18.1=ha878542_0
+  - ca-certificates=2022.6.15=ha878542_0
   - cached-property=1.5.2=hd8ed1ab_1
   - cached_property=1.5.2=pyha770c72_1
   - cairo=1.16.0=ha61ee94_1011
@@ -170,7 +172,7 @@ dependencies:
   - pip:
     - bidict==0.22.0
     - biopython==1.79
-    - certifi==2022.5.18.1
+    - certifi==2022.6.15
     - cffi==1.15.0
     - cftime==1.6.0
     - fonttools==4.33.3

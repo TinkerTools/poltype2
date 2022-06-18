@@ -116,7 +116,9 @@ class PolarizableTyper():
         usevinardo:bool=False
         goldbin:str='gold_auto'
         dockingenvname:str='dockingprep'
+        pymolenvname:str='oldpy3'
         prepdockscript:str=os.path.join(os.path.split(__file__)[0],'preparedockingfiles.py')
+        pocketscript:str=os.path.join(os.path.split(__file__)[0],'pocketdetection.py')
         indextompoleframefile:None=None
         qmrelativeweight:float=.5
         liqrelativeweight:float=2.5
@@ -455,8 +457,10 @@ class PolarizableTyper():
         structure:None=None
         espextraconflist:list=field(default_factory=lambda : [])
         usepdb2pqr:bool=False
+        inputproddyntime:bool=False
         def __post_init__(self): 
         
+            self.knownresiduesymbs=['A', 'G', 'U', 'A3', 'A5','DA', 'DC', 'DG', 'DT', 'G3', 'G5', 'U3', 'U5','DA3', 'DA5', 'DC3', 'DC5', 'DG3', 'DG5', 'DT3', 'DT5','ALA', 'ARG', 'ASH', 'ASN', 'ASP', 'GLH', 'GLN', 'GLU', 'GLY', 'HID', 'HIE', 'HIS','ILE', 'LEU', 'LYD', 'LYS', 'MET','PHE', 'PRO', 'SER', 'THR', 'TRP', 'TYD', 'TYR', 'VAL', 'CYD', 'CYS']
             self.molstructfname=self.structure 
             self.simpath=os.getcwd()        
             self.simname=os.path.basename(self.simpath)
@@ -934,6 +938,7 @@ class PolarizableTyper():
                             self.proddynwritefreq= a
                         elif ("proddyntime") in newline:
                             self.proddyntime= float(a)
+                            self.inputproddyntime=True
                         elif ("complexation") in newline:
                             self.complexation=True
                         elif ("solvation") in newline:
@@ -1582,7 +1587,8 @@ class PolarizableTyper():
         def MolecularDynamics(self):
             if self.neatliquidsim==True and self.preequilboxpath==preequilboxpath: # if default water box
                 self.usepreequilibriatedbox=False # then make new neat liquid box from scratch
-
+            if self.inputproddyntime==False and self.binding==True:
+                self.proddyntime=10
             head,tail=os.path.split(self.prmfilepath)
             newpath=os.path.join(os.getcwd(),tail)
             if self.prmfilepath!=newpath or head!=None:
@@ -4769,7 +4775,7 @@ class PolarizableTyper():
 
 
         def CompareTypes(self,receptorligandtypes,ligandtypes):
-            for i in range(len(receptorligandtypes)):
+            for i in range(len(ligandtypes)):
                 receptorligandtype=receptorligandtypes[i]
                 ligandtype=ligandtypes[i]
                 if receptorligandtype!=ligandtype:
@@ -5086,6 +5092,95 @@ class PolarizableTyper():
                 if len(maxring)>7:
                     iswholemoleculering=True
             return iswholemoleculering
+
+
+        def ExtractLigand(self,ligandreceptorfilename):
+            ligandpdbfilename='ligand.pdb'
+            receptorpdbfilename=ligandreceptorfilename.replace('.pdb','_receptoronly.pdb')
+            receptormol=self.ExtractMOLObject(ligandreceptorfilename,receptorpdbfilename,receptor=True)
+            ligandmol=self.ExtractMOLObject(ligandreceptorfilename,ligandpdbfilename,receptor=False)
+        
+            self.ConvertUNLToLIG(ligandpdbfilename)
+            return ligandpdbfilename,receptorpdbfilename
+
+        def ExtractMOLObject(self,ligandreceptorfilename,newpdbfilename,receptor):
+            pdbmol=self.GenerateMOLObject(ligandreceptorfilename)
+            iteratom = openbabel.OBMolAtomIter(pdbmol)
+            obConversion = openbabel.OBConversion()
+            obConversion.SetOutFormat('pdb')
+            atmindicestodelete=[]
+        
+            for atm in iteratom:
+                atmindex=atm.GetIdx()
+                res=atm.GetResidue()
+                reskey=res.GetName()
+        
+                if reskey not in self.knownresiduesymbs and receptor==True:
+                    atmindicestodelete.append(atmindex)
+                elif (reskey!='LIG' and reskey!='UNK') and receptor==False:
+                    atmindicestodelete.append(atmindex)
+            atmindicestodelete.sort(reverse=True)
+            for atmindex in atmindicestodelete:
+                atm=pdbmol.GetAtom(atmindex)
+                pdbmol.DeleteAtom(atm)
+            obConversion.WriteFile(pdbmol,newpdbfilename)
+            return pdbmol
+
+        def GenerateMOLObject(self,pdbfilename):
+            obConversion = openbabel.OBConversion()
+            pdbmol = openbabel.OBMol()
+            obConversion.SetInFormat('pdb')
+            obConversion.ReadFile(pdbmol,pdbfilename)
+            return pdbmol
+
+
+        def ConvertUNLToLIG(self,filename):
+            temp=open(filename,'r')
+            results=temp.readlines()
+            temp.close()
+            tempname=filename.replace('.pdb','_TEMP.pdb')
+            temp=open(tempname,'w')
+            for line in results:
+                linesplit=re.split(r'(\s+)', line)
+                if 'UNL' in line:
+                    lineindex=linesplit.index('UNL')
+                    linesplit[lineindex]='LIG'
+                    line=''.join(linesplit)
+                if 'UNK' in line:
+                    lineindex=linesplit.index('UNK')
+                    linesplit[lineindex]='LIG'
+                    line=''.join(linesplit)
+        
+                temp.write(line)
+            temp.close()
+            os.rename(tempname,filename)
+
+
+        def GrabLigandCentroid(self,ligandpdbfilename):
+            pdbmol=self.GenerateMOLObject(ligandpdbfilename)
+            atomvecls=self.GrabAtomPositions(pdbmol)
+            centroid=np.array([0.0,0.0,0.0])
+            for vec in atomvecls:
+                centroid+=np.array(vec)
+            if len(atomvecls)==0:
+                raise ValueError('Ligand in PDB file is not labeled as LIG')
+            centroid=centroid/len(atomvecls)
+        
+            
+            return centroid
+
+        def GrabAtomPositions(self,pdbmol):
+            atomvecls=[]
+            iteratombab = openbabel.OBMolAtomIter(pdbmol)
+            for atm in iteratombab:
+                atmindex=atm.GetIdx()
+                coords=[atm.GetX(),atm.GetY(),atm.GetZ()]
+                atomvecls.append(coords)
+        
+         
+            return atomvecls
+
+
 
 if __name__ == '__main__':
     def RunPoltype():

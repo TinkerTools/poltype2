@@ -691,6 +691,7 @@ usegold=True
 
 
 ### Molecular Dynamics Input Preparation
+* Please ensure that ligand residue is labeled as ``LIG`` in PDB, so as to distinguish between protein, water/ions and ligand in PDB file.
 * If Tinker9 executables are in PATH, then program will switch to using analyze9,dynamic9,minimize9, the GPU executables.
 * Make a seperate folder from where parameterization files from poltype were made (with new poltype.ini file too)
 * Ligand XYZ and key files are required (such as final.xyz and final.key from Poltype parameterization). 
@@ -864,8 +865,7 @@ nohup python /path_to_poltype/poltype.py &
 
 ### Minimization
 *	If the box is not square (should be square by default), then check if the length between any two box dimensions is > 10 angstroms. If so, then need to add restraints on two alpha carbons on protein that are on opposite sides to prevent rotation of protein within the rectangular box. 
-*	Restraints around atoms are added with a default radius of 2 angstroms. 
-*	The protein and ligand is then restrained (or only ligand for solvation) with radius of 0 angstroms (lets the solvent relax). Default restraint force constant is 5 kcal/mol/angstrom. 
+*	The protein, ligand and any waters/ions detected in pocket is then restrained (or only ligand for solvation) with radius of 0 angstroms (lets the solvent relax). Default restraint force constant is 5 kcal/mol/angstrom. 
 *	The system is then minimized to a default gradient of 10 kcal/mol
 
 ### Equilibration
@@ -875,7 +875,7 @@ nohup python /path_to_poltype/poltype.py &
 *   For charged ligand HFE, the ion box equilibriation time is set to 1 ns of only NPT at the equilbrium temperature. 
 *   For water boxes, there is a default total equilibration time of 2 ns in NVT up to and including the final temperature and a final .5 ns in NVT at the last temperature (to add more time in final temperature) and a final 1 ns of NPT equilibration at the final temperature to determine the box size. Otherwise, defaults are 4 ns for NVT + .5 ns at final NVT temperature and 1 ns for final NPT.
 *   Flat bottom restraints are used by default. For each temperature, the group restraint constant approaches 0 until equilibrium temperature is reached.  
-*	Additionally, for the protein-ligand complexation box, protein atoms are restrained during equilibration (with a default radius of 2 angstroms) with a force constant that approaches 0 (and starts from 5 kcal/mol/angstrom) as the temperature reaches equilibrium.  
+*	Additionally, for the protein-ligand complexation box, protein atoms and waters/ions detected in pocket are restrained during equilibration (with a default radius of 2 angstroms) with a force constant that approaches 0 (and starts from 5 kcal/mol/angstrom) as the temperature reaches equilibrium.  
 *	Each simulation corresponding to each temperature, restraint-constant and ensemble (NVT or NPT) tuple are simulated. 50,100,150,200,300,300 is the default temperature scheme for NVT, with a corresponding restraint constant scheme of 5,2,1,.5,.1,0. 
 *	If NVT production dynamics is used (default is NPT production dynamics), the box size from NPT dynamics output is averaged and added to the keyfile. 
 *	Protein atom positions restraints are now removed (only the ones restraining all protein atoms, not for protein rotational restraints). 

@@ -531,7 +531,8 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 
 ``proddynwritefreq``    specifies how often to write out new frame during production dynamics MD. Units in ps. Default is 2.
 
-``proddyntime``  specifies the total time to run production dynamics (in NPT by default) for each lambda. Units in ns. Default is 5.
+
+``proddyntime``  specifies the total time to run production dynamics (in NPT by default) for each lambda. Units in ns. Default is 5 for solvation and 10 ns for binding computations.
 
 ``proddyntimestep`` specifies the MD time step during production dynamics. Units in fs. Default is 2.
 

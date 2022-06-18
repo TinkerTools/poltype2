@@ -5,75 +5,11 @@ import numpy as np
 from pathlib import Path
 import sys
 
-'''
-conda install -c hcc autodock --yes
-conda install -c anaconda pip --yes
-pip install vina
-conda install -c conda-forge openbabel --yes
-'''
 
 
 
-def ExtractLigand(ligandreceptorfilename):
-    ligandpdbfilename='ligand.pdb'
-    receptorpdbfilename=ligandreceptorfilename.replace('.pdb','_receptoronly.pdb')
-    receptormol=ExtractMOLObject(ligandreceptorfilename,receptorpdbfilename,receptor=True)
-    ligandmol=ExtractMOLObject(ligandreceptorfilename,ligandpdbfilename,receptor=False)
-
-    ConvertUNLToLIG(ligandpdbfilename)
-    return ligandpdbfilename,receptorpdbfilename
-
-def GenerateMOLObject(pdbfilename):
-    obConversion = openbabel.OBConversion()
-    pdbmol = openbabel.OBMol()
-    obConversion.SetInFormat('pdb')
-    obConversion.ReadFile(pdbmol,pdbfilename)
-    return pdbmol
-
-def ExtractMOLObject(ligandreceptorfilename,newpdbfilename,receptor):
-    pdbmol=GenerateMOLObject(ligandreceptorfilename)
-    iteratom = openbabel.OBMolAtomIter(pdbmol)
-    obConversion = openbabel.OBConversion()
-    obConversion.SetOutFormat('pdb')
-    atmindicestodelete=[]
-
-    for atm in iteratom:
-        atmindex=atm.GetIdx()
-        res=atm.GetResidue()
-        reskey=res.GetName()
-
-        if reskey=='LIG' and receptor==True:
-            atmindicestodelete.append(atmindex)
-        elif reskey!='LIG' and receptor==False:
-            atmindicestodelete.append(atmindex)
-    atmindicestodelete.sort(reverse=True)
-    for atmindex in atmindicestodelete:
-        atm=pdbmol.GetAtom(atmindex)
-        pdbmol.DeleteAtom(atm)
-    obConversion.WriteFile(pdbmol,newpdbfilename)
-    return pdbmol
 
 
-def ConvertUNLToLIG(filename):
-    temp=open(filename,'r')
-    results=temp.readlines()
-    temp.close()
-    tempname=filename.replace('.pdb','_TEMP.pdb')
-    temp=open(tempname,'w')
-    for line in results:
-        linesplit=re.split(r'(\s+)', line)
-        if 'UNL' in line:
-            lineindex=linesplit.index('UNL')
-            linesplit[lineindex]='LIG'
-            line=''.join(linesplit)
-        if 'UNK' in line:
-            lineindex=linesplit.index('UNK')
-            linesplit[lineindex]='LIG'
-            line=''.join(linesplit)
-
-        temp.write(line)
-    temp.close()
-    os.rename(tempname,filename)
 
 
 def GenerateListString(ls):
@@ -282,28 +218,7 @@ def ParseGOLDOutput(ligandname):
     return modeltoscoregold,modeltostructuregold
 
 
-def GrabAtomPositions(pdbmol):
-    atomvecls=[]
-    iteratombab = openbabel.OBMolAtomIter(pdbmol)
-    for atm in iteratombab:
-        atmindex=atm.GetIdx()
-        coords=[atm.GetX(),atm.GetY(),atm.GetZ()]
-        atomvecls.append(coords)
 
-
-    return atomvecls
-
-
-def GrabLigandCentroid(ligandpdbfilename):
-    pdbmol=GenerateMOLObject(ligandpdbfilename)
-    atomvecls=GrabAtomPositions(pdbmol)
-    centroid=np.array([0.0,0.0,0.0])
-    for vec in atomvecls:
-        centroid+=np.array(vec)
-    centroid=centroid/len(atomvecls)
-
-    
-    return centroid
 
 
 
@@ -364,8 +279,8 @@ def CombineMolObjects(pdbmol,ligmol,complexedstructure):
 
 def GenerateComplex(structure,receptorpdbfilename):
     complexedstructure=structure.replace('.pdb','')+'_'+receptorpdbfilename.replace('.pdb','')+'.pdb'
-    pdbmol=GenerateMOLObject(receptorpdbfilename)
-    ligmol=GenerateMOLObject(structure)
+    pdbmol=poltype.GenerateMOLObject(receptorpdbfilename)
+    ligmol=poltype.GenerateMOLObject(structure)
     CombineMolObjects(pdbmol,ligmol,complexedstructure)
 
     return complexedstructure
@@ -505,7 +420,7 @@ def DockingWrapper(poltype,ligandreceptorfilename,dockgridcenter,dockgridsize,vi
     ligandpdbfilename,receptorpdbfilename=ExtractLigand(ligandreceptorfilename)
     modeltodockoutput={}
     if dockgridcenter==None:
-        dockgridcenter=GrabLigandCentroid(ligandpdbfilename)
+        dockgridcenter=poltype.GrabLigandCentroid(ligandpdbfilename)
     for ligand in listofligands:
         receptorname=receptorpdbfilename.replace('.pdb','.pdbqt')
         ligandname=ligandpdbfilename.replace('.pdb','.pdbqt')

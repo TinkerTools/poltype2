@@ -200,12 +200,30 @@ def ExecuteEquilibriation(poltype):
                     keymods.RemoveKeyWords(poltype,configkeyfilename,['restrain-group','restrain-position'])
                     restraints.AddHarmonicRestrainGroupTermsToKeyFile(poltype,configkeyfilename,poltype.restraintdistance,restrainpositionconstant)
                     totalatomnumberxyzfilename=poltype.totalatomnumberxyzfilename[i]
-                    if restrainpositionconstant!=0 and poltype.restrainreceptorligand==True: 
-                        resposstring='restrain-position -'+str(1)+' '+str(totalatomnumberxyzfilename-len(ligandindices))+' '+str(restrainpositionconstant)+' '+str(poltype.equilrestrainsphereradius)+'\n'
-                        keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
+                    if restrainpositionconstant!=0:
+                        if poltype.restrainreceptorligand==True: 
+                            resposstring='# restrain-position for protein atoms\n'
+                            keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
+
+                            resposstring='restrain-position -'+str(1)+' '+str(poltype.totalproteinnumber)+' '+str(restrainpositionconstant)+' '+str(poltype.equilrestrainsphereradius)+'\n'
+                            keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
+                        for index in poltype.indicestorestrain:
+                            resposstring='# restrain-position for waters and ions in pocket\n'
+                            keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
+
+                            resposstring='restrain-position -'+str(index)+' '+str(index)+' '+str(restrainpositionconstant)+' '+str(poltype.equilrestrainsphereradius)+'\n'
+                            keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
+
+
                     if poltype.needrot==True:
+                        resposstring='# restrain-position for preventing protein from rotating\n'
+                        keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
+
                         resposstring='restrain-position -'+str(poltype.norotpair[0])+' '+str(poltype.norotpair[0])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
                         keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
+                        resposstring='# restrain-position for preventing protein from rotating\n'
+                        keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
+
                         resposstring='restrain-position -'+str(poltype.norotpair[1])+' '+str(poltype.norotpair[1])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
                         keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
         submitjobs.SubmitJobs(poltype,newjobtolog,newjobtojobpath,newjobtoinputfilepaths,newjobtooutputfiles,newjobtoabsolutebinpath,poltype.outputpath+poltype.equiljobsfilename)
@@ -287,7 +305,14 @@ def ExtractTinkerFrames(poltype,arcpath,firstframe,lastframe,framestep,totalnumb
 def EquilibriationProtocol(poltype):
     if poltype.equilfinished==False:
         if poltype.restrainatomgroup1==None and poltype.restrainatomgroup2==None and poltype.complexation==True and poltype.restrainreceptorligand==True:
-            restraints.ComputeIdealGroupRestraints(poltype,poltype.minboxfilename[0])
+            try:
+                restraints.ComputeIdealGroupRestraints(poltype,poltype.minboxfilename[0],nmin=4,sele='CA')
+            except:
+                try:
+                    restraints.ComputeIdealGroupRestraints(poltype,poltype.minboxfilename[0],nmin=4,sele='C')
+                except:
+                    restraints.ComputeIdealGroupRestraints(poltype,poltype.minboxfilename[0],nmin=2,sele='protein')
+
         if poltype.complexation==True and poltype.restrainreceptorligand==True: 
             dist=restraints.AverageCOMGroups(poltype,poltype.minboxfilename[0])
             poltype.restraintdistance=dist

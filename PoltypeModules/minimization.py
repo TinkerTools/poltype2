@@ -34,6 +34,17 @@ def MinimizeCommand(poltype,xyzfilename,keyfilename,gradrms,outputfilename):
     cmd=poltype.trueminimizepath+' '+xyzfilename+' -k '+keyfilename+' '+str(gradrms)+' '+'> '+outputfilename
     return cmd
 
+
+
+def RestrainWatersIonsInPocket(poltype,key):
+    for index in poltype.indicestorestrain:
+        resposstring='# restrain-position for water or ions in pocket\n'
+        keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
+        resposstring='restrain-position -'+str(index)+' '+str(index)+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
+        keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
+
+
+
 def ExpensiveMinimizationProtocol(poltype):
     if poltype.complexation==True:
         aaxis=poltype.aaxislist[0]
@@ -48,23 +59,38 @@ def ExpensiveMinimizationProtocol(poltype):
                 poltype.needrot=True
         if poltype.needrot==True:        
             poltype.norotpair=FindTwoAtomsForRestrainingRotation(poltype) 
-            resposstring='restrain-position -'+str(poltype.norotpair[0])+' '+str(poltype.norotpair[0])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
             for keyidx in range(len(poltype.configkeyfilename)):
                 if keyidx==0:
                     key=poltype.configkeyfilename[keyidx][0]
-                    keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
-            resposstring='restrain-position -'+str(poltype.norotpair[1])+' '+str(poltype.norotpair[1])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
-            for keyidx in range(len(poltype.configkeyfilename)):
-                if keyidx==0:
-                    key=poltype.configkeyfilename[keyidx][0]
+                    resposstring='# restrain-position for preventing protein from rotating\n'
                     keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
 
+                    resposstring='restrain-position -'+str(poltype.norotpair[0])+' '+str(poltype.norotpair[0])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
+                    keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
+
+                    resposstring='# restrain-position for preventing protein from rotating\n'
+                    keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
+
+                    resposstring='restrain-position -'+str(poltype.norotpair[1])+' '+str(poltype.norotpair[1])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
+                    keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
 
     if poltype.restrainatomsduringminimization:
         for keyidx in range(len(poltype.configkeyfilename)):
             key=poltype.configkeyfilename[keyidx][0]
-            resposstring='restrain-position -'+str(1)+' '+str(poltype.totalatomnumberxyzfilename[keyidx])+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
+            ligandindices=poltype.ligandindices[keyidx]
+            resposstring='# restrain-position for protein and ligand atoms\n'
             keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
+
+            
+            if keyidx==0:
+                resposstring='restrain-position -'+str(1)+' '+str(poltype.totalproteinnumber+len(ligandindices))+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
+                keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
+                key=poltype.configkeyfilename[keyidx][0]
+                RestrainWatersIonsInPocket(poltype,key)
+            else:
+                resposstring='restrain-position -'+str(1)+' '+str(len(ligandindices))+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
+                keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
+
     willsubmit=False
     jobtolog={}
     jobtojobpath={}
@@ -157,25 +183,43 @@ def CheapMinimizationProtocol(poltype):
                 diff=np.abs(comb[0]-comb[1])
                 if diff>10:
                     poltype.needrot=True
+
             if poltype.needrot==True:        
                 poltype.norotpair=FindTwoAtomsForRestrainingRotation(poltype) 
-                resposstring='restrain-position -'+str(poltype.norotpair[0])+' '+str(poltype.norotpair[0])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
                 for keyidx in range(len(poltype.configkeyfilename)):
                     if keyidx==0:
                         key=poltype.configkeyfilename[keyidx][0]
+                        resposstring='# restrain-position for preventing protein from rotating\n'
                         keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
-                resposstring='restrain-position -'+str(poltype.norotpair[1])+' '+str(poltype.norotpair[1])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
-                for keyidx in range(len(poltype.configkeyfilename)):
-                    if keyidx==0:
-                        key=poltype.configkeyfilename[keyidx][0]
+
+                        resposstring='restrain-position -'+str(poltype.norotpair[0])+' '+str(poltype.norotpair[0])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
                         keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
+
+                        resposstring='# restrain-position for preventing protein from rotating\n'
+                        keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
+
+                        resposstring='restrain-position -'+str(poltype.norotpair[1])+' '+str(poltype.norotpair[1])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
+                        keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
+
+            
     
     
         if poltype.restrainatomsduringminimization:
             for keyidx in range(len(poltype.configkeyfilename)):
                 key=poltype.configkeyfilename[keyidx][0]
-                resposstring='restrain-position -'+str(1)+' '+str(poltype.totalatomnumberxyzfilename[keyidx])+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
+                resposstring='# restrain-position for protein and ligand atoms\n'
                 keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
+                ligandindices=poltype.ligandindices[keyidx]
+                if keyidx==0:
+                    resposstring='restrain-position -'+str(1)+' '+str(poltype.totalproteinnumber+len(ligandindices))+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
+                    keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
+                    key=poltype.configkeyfilename[keyidx][0]
+                    RestrainWatersIonsInPocket(poltype,key)
+                else:
+                    resposstring='restrain-position -'+str(1)+' '+str(len(ligandindices))+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
+                    keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
+
+
         willsubmit=False
         jobtolog={}
         jobtojobpath={}

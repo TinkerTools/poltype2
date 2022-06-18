@@ -175,30 +175,33 @@ def ComputeAverageDistanceFromAtom(poltype,comb,indextovec,ligandatomindex):
     return averagedist
 
 
-def ComputeIdealGroupRestraints(poltype,fxyz):
-    nmin=4
+def ComputeIdealGroupRestraints(poltype,fxyz,nmin=4,sele='CA'):
     nmax=8
     COMthresh=1
-    distancecutoff=10
+    maxatomcutoff=20
     ligandindices=poltype.ligandindices[0]
     indextomass,indextovec,indextosym,t=GrabIndexInfo(poltype,fxyz)
     atomidxtomassdic,atomidxtovecdic=GrabXYZAndMass(poltype,indextomass,indextovec,ligandindices)
     ligandcom=ComputeCOM(poltype,atomidxtovecdic,atomidxtomassdic)       
     ligandatomindex=FindClosestLigandAtomToCOM(poltype,ligandcom,atomidxtovecdic,indextosym)
     poltype.restrainatomgroup1=[ligandatomindex]
-    atomnames='CA'
-    indices = t.topology.select('name %s'%(atomnames))
-    if len(indices)==0:
-        atomnames='C'
-        indices = t.topology.select('name %s'%(atomnames))
-    indices=[i+1 for i in indices]
+    if sele=='protein':
+        indices=poltype.proteinindices[:]
+    else:
+        indices = t.topology.select('name %s'%(sele))
+        indices=[i+1 for i in indices]
+    newindices=[i for i in indices if i not in ligandindices and i not in poltype.hetatmindices]
     ref=indextovec[ligandatomindex]
-    allowedindices=[]
-    for index in indices:
+    disttoindex={}
+    for index in newindices:
         vec=indextovec[index]
         dist=np.linalg.norm(vec-ref)
-        if dist<=distancecutoff and index not in ligandindices:
-            allowedindices.append(index)
+        disttoindex[dist]=index
+    
+    sortdists=sorted(disttoindex.keys())
+    dists=sortdists[:maxatomcutoff+1]
+    allowedindices=[disttoindex[dist] for dist in dists]
+
     allcombs=[]
     for n in range(nmin,nmax+1):
         combs=itertools.combinations(allowedindices, n)
@@ -209,10 +212,14 @@ def ComputeIdealGroupRestraints(poltype,fxyz):
         averagedistance=ComputeAverageDistanceFromAtom(poltype,comb,indextovec,ligandatomindex)
         combtoaveragedistance[tuple(comb)]=averagedistance
     sortedcombtoaveragedistance=dict(sorted(combtoaveragedistance.items(), key=lambda item: item[1]))
+    foundres=False
     for comb,avgdist in sortedcombtoaveragedistance.items():
         atomidxtomassdic,atomidxtovecdic=GrabXYZAndMass(poltype,indextomass,indextovec,comb)
         grpcom=ComputeCOM(poltype,atomidxtovecdic,atomidxtomassdic)
         dist=np.linalg.norm(grpcom-ref)
         if dist<COMthresh:
+            foundres=True
             poltype.restrainatomgroup2=list(comb)
             break
+    if foundres==False:
+        raise ValueError('Failed to find ideal host-guest restraint')
