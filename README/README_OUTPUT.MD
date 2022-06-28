@@ -222,7 +222,7 @@ Mon Apr  4 11:53:26 2022 Poltype Job Finished
 
 #### OPENME Plots
 
-<img src="README/Images/Torsion.PNG" width="50%">
+<img src="Images/Torsion.PNG" width="50%">
 
 *  Example plot of energy (left axis) and WBO (right axis) vs dihedral angle (bottom axis) torsion RMSE(red,blue)=.85 kcal/mol, relative RMSE=.42 kcal/mol. Yellow curve represents WBO, the green curve is AMOEBA prefit total energy, the blue curve is QM total energy, the pink curve is the fitting numerical spline + AMOEBA prefit total energy and the red curve is AMOEBA postfit total energy with an additional minimization with new parameters before evaluating the final AMOEBA energies.
 *  The post fit red curve should be similar to the blue QM curve if fitting was successful (evaulated by RMSE). 
