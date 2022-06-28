@@ -185,8 +185,8 @@ nohup python /path_to_poltype/poltype.py &
 
 ### Protein Ligand Interaction Visualization
 
-<img src="README/Images/3DProLig.png" width="80%">
-<img src="README/Images/2DProLig.png" width="80%">
+<img src="README/Images/3DProLig.png" width="50%">
+<img src="README/Images/2DProLig.png" width="50%">
 
 
 * Navigate to folder VisualizationNotebooks
