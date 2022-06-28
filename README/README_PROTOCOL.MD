@@ -1,4 +1,4 @@
-<img src="README/Images/PoltypeFlow.PNG" width="60%">
+<img src="Images/PoltypeFlow.PNG" width="60%">
 
 * **Figure 1**. Overview of automated parameterization scheme for Poltype 2. Green boxes indicate input and output. Blue boxes indicate actions performed and the red rhombus indicates and intermediate output. BFE is Binding Free Energy and HFE is Hydration Free Energy.
 
@@ -76,7 +76,7 @@
 * After this, another single point computation is done at an MP2/aug-cc-pvtz level of theory to attain an accurate electrostatic potential grid. 
 * The initial multipoles with the same atom types are averaged. Electrostatic fitting is then performed on a grid around the molecule with an offset of 1.0 Å apart with 0.1 kcal/mol/electron convergence criteria using the Tinker POTENTIAL program. 
 
-<img src="README/Images/Mpole.PNG" width="80%">
+<img src="Images/Mpole.PNG" width="80%">
 
 * **Fig 2.** For a set of atoms {a,b,c},{a,b,c,d}, or {a,b,c,d,e}, local coordinate systems are defined by detecing symmetry and assigning the appropriate coordinate system. The top left of the figure shows the bisector frame (bisecting the angle \angle\ BAC). The top middle shows the z-then-x frame (vector from c to a defines +Z). The top right is the z-only frame (vector from a to b defines +Z). The bottom left shows the bisector-then-x frame, wherein the vector from d to a defines +Z, and the bisector of \angle\ BAC in the plane containg a,b,c defines +X. Finally, the bottom right shows the trisector frame. For Y-axes (not shown), this is defined relative to a right handed coordinate system convention with the exception of z-only, bisector and trisector frames, which have no defined X- or Y-axis.
 
@@ -138,7 +138,7 @@
 
 ### Fragmentation
 
-<img src="README/Images/FragFlow.PNG" width="40%">
+<img src="Images/FragFlow.PNG" width="40%">
 
 * **Figure 3** Overview of fragmentation scheme used to obtain torsion parameters for a parent molecule. For the atoms a-b-c-d-e (tor-tor fragments), the rotatable bonds would be b-c and c-d, rather than just b-c for the single torsion a-b-c-d (torsion fragments). Each time fragments are grown, any hydrogens and aromatic rings that are attached are added. Then any bonds cut between new fragment and parent are hydrated. The decision block involves comparing the relative WBO from best fragment to a WBO tolerance to determine if algorithm should continue or exit.
 
@@ -172,7 +172,7 @@
 
 
 
-<img src="README/Images/FragExample.PNG" width="70%">
+<img src="Images/FragExample.PNG" width="70%">
 
 
 * **Figure 4** **A.**  The IN17 molecule that was  given as input to the fragmenter. **B.** The inital fragment growth of bond 1-16 in the parent molecule. (The bond 3-2 in the fragment is equivalent to bond 1-16 in the parent). 
@@ -193,7 +193,7 @@
 * Final RMSE is reported as a comment in the key file proceeding VdW fitting above the parameter line. Example Van der Waals plot for atom index 1 in IN17 (**Fig. 4**) is shown in **Figure 5**.
 
 
-<img src="README/Images/Vdw.PNG" width="50%">
+<img src="Images/Vdw.PNG" width="50%">
 
 
 * **Figure 5** Upper panel: Van der Waals water-fragment probe for atom index 1 in IN17 molecule (Figure 4). Bottom panel: the red curve is QM energy vs distance, and the blue curve is the AMOEBA energies vs distance. Distance units are in angstroms. RMSE=1.55 kcal/mol.
@@ -222,7 +222,7 @@
 * Parameter fit quality is measured via root mean square error and relative root mean square error (RMSE). If the fitting procedure generates a fit that is greater than the RMSE and relative RMSE (relative to QM) tolerance values (1.8 and 0.2 respectively), then the parameterization procedure restarts with Boltzmann weights. Both RMSE and relative RMSE will also be evalated then with Boltzmann weights. 
 * Final RMSE is reported in the key file that proceeds torsion fitting as a comment above the parameter line. Example torsion fitting plots are demonstrated for the fragment in **Figure 6**.
 
-<img src="README/Images/Torsion.PNG" width="50%">
+<img src="Images/Torsion.PNG" width="50%">
 
 * **Figure 6** Fitting results for rotatable bond 3-2 in **Fig. 4.**  Plots of energy (left axis) and WBO (right axis) vs dihedral angle (bottom axis) torsion RMSE=.85 kcal/mol, relative RMSE=.42 kcal/mol. Yellow curve represents WBO, the green curve is AMOEBA prefit total energy, the blue curve is QM total energy, the pink curve is the fitting numerical spline + AMOEBA prefit total energy and the red curve is AMOEBA postfit total energy with an additional minimization with new parameters before evaluating the final AMOEBA energies.
 
