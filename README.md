@@ -141,10 +141,8 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 *  [Hydration Free Energy Table Output Example](#hydration-free-energy-table-output-example)
 
 [Hydration Free Energy Examples](Examples/HydrationFreeEnergy)
-
-[Ion Hydration Free Energy Examples](Examples/IonHFE)
  
-[Binding Free Energy Examples](Examples/BindingFE)
+[Binding Free Energy Examples](Examples/BindingFreeEnergy)
 
 [💻 Advanced Program Usage](README/README_HELP.MD)
 
