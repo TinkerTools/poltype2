@@ -1619,7 +1619,7 @@ class PolarizableTyper():
                 obConversion.SetOutFormat('mol')
                 molname=xyz.replace('.xyz','.mol')
                 obConversion.WriteFile(ligmol,molname)
-                ligm=Chem.MolFromMolFile(molname,removeHs=True,sanitize=False)
+                ligm=Chem.MolFromMolFile(molname,removeHs=False,sanitize=False)
                 smi=Chem.MolToSmarts(ligm)
                 smi=smi.replace('@','')
                 self.ligandsmileslist.append(smi)

@@ -579,6 +579,7 @@ def BoxSetupProtocol(poltype):
                 poltype.TrimPreEquilibriatedBox(boxsize)
             if poltype.neatliquidsim==False:
                 axis=[aaxis,baxis,caxis]
+                subaxis=[subaaxis,subbaxis,subcaxis]
                 xyztoappend=[]
                 soluteindices=[]
                 atmshift=0
