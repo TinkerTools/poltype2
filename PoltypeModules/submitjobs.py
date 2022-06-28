@@ -100,7 +100,7 @@ def ParseForErrorsInOutPut(poltype,saved,outputfilename=None):
     for line in saved:
         if not isinstance(line, str):
             line=line.decode("utf-8")
-        if 'Tinker is Unable to Continue' in line:
+        if 'Tinker is Unable to Continue' in line or 'Terminating with uncaught exceptio' in line:
             check=False 
 
     return check

@@ -145,17 +145,13 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
             temp.write('['+' '+poltype.espbasissetfile+' '+poltype.iodineespbasissetfile +' '+ ']'+'\n')
             temp=ReadInBasisSet(poltype,temp,poltype.espbasissetfile,poltype.iodineespbasissetfile)
             temp.write('}'+'\n')
-            temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
+        if makecube==True:
+            temp.write("E, wfn = properties('%s',properties=['dipole','GRID_ESP','WIBERG_LOWDIN_INDICES','MULLIKEN_CHARGES'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
         else:
+            temp.write("E, wfn = properties('%s',properties=['dipole','WIBERG_LOWDIN_INDICES','MULLIKEN_CHARGES'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
 
-            temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
     temp.write('cubeprop(wfn)'+'\n')
     temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
-
-    if makecube==True:
-       temp.write('oeprop(wfn,"GRID_ESP","WIBERG_LOWDIN_INDICES","MULLIKEN_CHARGES")'+'\n')
-    else:
-       temp.write('oeprop(wfn,"WIBERG_LOWDIN_INDICES","MULLIKEN_CHARGES")'+'\n')
 
     temp.write('clean()'+'\n')
     temp.close()
@@ -659,7 +655,7 @@ def GrabQMDipoles(poltype,optmol,logname):
                 line=results[lineidx]
                 linesplit=line.split()
                 if 'Dipole' in line:
-                    dipole.append(float(linesplit[-1]))
+                    dipole.append(float(linesplit[-1])*2.5417464519) # lee pings branch affected output somehow sometimes?
             dipole=np.array(dipole)
                 
     else:

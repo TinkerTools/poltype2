@@ -1,21 +1,18 @@
-Wed Jun 15 13:57:18 2022 Running on host: node74.bme.utexas.edu
-Wed Jun 15 13:57:18 2022 Atom Type Classification
-Wed Jun 15 13:57:18 2022 Local Frame Symmetry Detection
-Wed Jun 15 13:57:18 2022 Define Polarization Groups and Polarization Parameters
-Wed Jun 15 13:57:18 2022 
-Wed Jun 15 13:57:18 2022 =========================================================
-Wed Jun 15 13:57:18 2022 Minimizing structure
+Thu Jun 16 12:33:14 2022 Running on host: node74.bme.utexas.edu
+Thu Jun 16 12:33:14 2022 Atom Type Classification
+Thu Jun 16 12:33:14 2022 Local Frame Symmetry Detection
+Thu Jun 16 12:33:14 2022 Define Polarization Groups and Polarization Parameters
+Thu Jun 16 12:33:14 2022 
+Thu Jun 16 12:33:14 2022 =========================================================
+Thu Jun 16 12:33:14 2022 Minimizing structure
 
-Wed Jun 15 13:57:18 2022 Calling: minimize -k final.key final.xyz 0.1 > Minimized_final.out path = /home/bdw2292/poltype2/Examples/Parameterization/ModifiedAminoAcid/Temp
-Wed Jun 15 13:57:24 2022 
+Thu Jun 16 12:33:14 2022 Calling: minimize -k final.key final.xyz 0.1 > Minimized_final.out path = /home/bdw2292/poltype2/Examples/Parameterization/ModifiedAminoAcid/Temp
+Thu Jun 16 12:33:26 2022 
 
-Wed Jun 15 13:57:24 2022 =========================================================
+Thu Jun 16 12:33:26 2022 =========================================================
 
-Wed Jun 15 13:57:24 2022 Structure RMSD Comparison
+Thu Jun 16 12:33:26 2022 Structure RMSD Comparison
 
 
-Wed Jun 15 13:57:24 2022 Calling: superpose ModifiedRes.xyz_2 final.xyz_2 1 N M N 0  > ModifiedRes-superin.txt path = /home/bdw2292/poltype2/Examples/Parameterization/ModifiedAminoAcid/Temp
-Wed Jun 15 13:57:25 2022 RMSD = 0.059315 Tolerance is 1
-Wed Jun 15 13:57:25 2022 Calling: analyze ModifiedRes.xyz_2 -k final.key em | grep -A11 Charge>MMDipole.txt path = /home/bdw2292/poltype2/Examples/Parameterization/ModifiedAminoAcid/Temp
-Wed Jun 15 13:57:26 2022 Poltype Job Finished
-
+Thu Jun 16 12:33:26 2022 Calling: superpose ModifiedRes.xyz_2 final.xyz_2 1 N M N 0  > ModifiedRes-superin.txt path = /home/bdw2292/poltype2/Examples/Parameterization/ModifiedAminoAcid/Temp
+Thu Jun 16 12:33:27 2022 RMSD = 0.059315 Tolerance is 1

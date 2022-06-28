@@ -824,8 +824,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         # 'normalize'
         qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
         for e in qm_energy_list:
-            if e>50:
-                raise ValueError('Energy is greater than 50 kcal/mol for '+str(torset)+' '+str(qm_energy_list)+' '+str(angle_list))
+            if e>55:
+                raise ValueError('Energy is greater than 55 kcal/mol for '+str(torset)+' '+str(qm_energy_list)+' '+str(angle_list))
         mm_energy_list = [en - min(mm_energy_list) for en in mm_energy_list]
 
         weightlist=numpy.exp(-numpy.array(qm_energy_list)/poltype.boltzmantemp)
@@ -963,18 +963,16 @@ def GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_
                 return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.subtract(fitfunc_dict[clskey],tor_energy_list),c))))
         result=fmin(RMSD,.5)
         minRMSD=RMSD(result[0])
-
     numprms=1 # offset parameter incldued with torsion force constant parameters
     for classkey in torprmdict:
         numprms+= len(torprmdict[classkey]['prmdict'].keys())
     string=' , '.join(list(torprmdict.keys()))
     datapts=len(mm_energy_list)
     poltype.WriteToLog('Torsions being fit '+string+' RMSD(QM-MM1)'+str(minRMSD))
-    tor_energy_list=[i-min(tor_energy_list) for i in tor_energy_list]
-    fitfunc_dict[clskey]=[i-min(fitfunc_dict[clskey]) for i in fitfunc_dict[clskey]]
+
+
     if dim==1:
         first=numpy.array([Sx[i][0] for i in range(len(Sx))])
-         
         xpoints=numpy.array([Sx[i][0] for i in range(len(Sx))])
         x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
         fig = plt.figure(figsize=(10,10))
@@ -989,11 +987,9 @@ def GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_
         f = interp1d(xpoints,torarray, kind='quadratic')
         y_smooth=f(x_new)
         ax.plot(x_new,y_smooth,color='blue')
-
         plt.legend(handles=[l1,l2],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=2)
         ax.set_xlabel('Dihedral Angle (degrees)')
         ax.set_ylabel('Energy (kcal/mol)')
-
         ax.text(0.05, 1.1, 'Torsions Being Fit =%s'%(string), transform=ax.transAxes, fontsize=10,verticalalignment='top')
         ax.text(0, -0.1, 'FoldNum=%s NumPrms=%s DataPts=%s RMSD(fit,QM-MM1),Abs=%s'%(str(len(poltype.nfoldlist)),str(numprms),str(len(mm_energy_list)),round(minRMSD,2)), transform=ax.transAxes, fontsize=10,verticalalignment='bottom')
         fig.savefig(figfname)

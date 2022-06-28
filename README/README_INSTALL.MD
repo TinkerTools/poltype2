@@ -55,7 +55,7 @@ git clone https://github.com/TinkerTools/poltype2.git master
 ```
 
 * Install anaconda
-* You can use the provided `environment.yml` file to create a conda environment named "poltype" with `conda env create -f environment.yml`
+* You can use the provided `environment.yml` file (under Environments folder) to create a conda environment named "poltype" with `conda env create -f environment.yml`
 
 ### Environment var for running POLTYPE:
  Create environments for Tinker,Gaussian 09,and GDMA. Put these in a file and source it before running POLTYPE

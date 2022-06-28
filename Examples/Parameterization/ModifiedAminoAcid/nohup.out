@@ -24253,6 +24253,14 @@
   According to the PDB specification,
   columns 77-78 should contain the element symbol of an atom.
   but OpenBabel found '  ' (atom 2286)
+/home/bdw2292/miniconda3/envs/testpoltype/lib/python3.10/site-packages/MDAnalysis/topology/PDBParser.py:317: UserWarning: Element information is missing, elements attribute will not be populated. If needed these can be guessed using MDAnalysis.topology.guessers.
+  warnings.warn("Element information is missing, elements attribute "
+/home/bdw2292/miniconda3/envs/testpoltype/lib/python3.10/site-packages/MDAnalysis/coordinates/PDB.py:749: UserWarning: Unit cell dimensions not found. CRYST1 record set to unitary values.
+  warnings.warn("Unit cell dimensions not found. "
+/home/bdw2292/miniconda3/envs/testpoltype/lib/python3.10/site-packages/MDAnalysis/coordinates/PDB.py:1080: UserWarning: Found no information for attr: 'elements' Using default value of ' '
+  warnings.warn("Found no information for attr: '{}'"
+/home/bdw2292/miniconda3/envs/testpoltype/lib/python3.10/site-packages/MDAnalysis/coordinates/PDB.py:1126: UserWarning: Found missing chainIDs. Corresponding atoms will use value of 'X'
+  warnings.warn("Found missing chainIDs."
 ==============================
 *** Open Babel Warning  in parseAtomRecord
   WARNING: Problems reading a PDB file
@@ -48474,37 +48482,36 @@ Ropp PJ, Kaminsky JC, Yablonski S, Durrant JD (2019) Dimorphite-DL: An
 open-source program for enumerating the ionization states of drug-like small
 molecules. J Cheminform 11:14. doi:10.1186/s13321-019-0336-9.
 
-os.getcwd() /home/bdw2292/poltype2/Examples/Parameterization/ModifiedAminoAcid/Temp
-/home/bdw2292/miniconda3/envs/newamoebamdpoltype/lib/python3.8/site-packages/MDAnalysis/topology/PDBParser.py:317: UserWarning: Element information is missing, elements attribute will not be populated. If needed these can be guessed using MDAnalysis.topology.guessers.
-  warnings.warn("Element information is missing, elements attribute "
-/home/bdw2292/miniconda3/envs/newamoebamdpoltype/lib/python3.8/site-packages/MDAnalysis/coordinates/PDB.py:747: UserWarning: Unit cell dimensions not found. CRYST1 record set to unitary values.
-  warnings.warn("Unit cell dimensions not found. "
-/home/bdw2292/miniconda3/envs/newamoebamdpoltype/lib/python3.8/site-packages/MDAnalysis/coordinates/PDB.py:1078: UserWarning: Found no information for attr: 'elements' Using default value of ' '
-  warnings.warn("Found no information for attr: '{}'"
-/home/bdw2292/miniconda3/envs/newamoebamdpoltype/lib/python3.8/site-packages/MDAnalysis/coordinates/PDB.py:1124: UserWarning: Found missing chainIDs. Corresponding atoms will use value of 'X'
-  warnings.warn("Found missing chainIDs."
 Traceback (most recent call last):
-  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 4915, in RunPoltype
+  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 5030, in RunPoltype
     poltype.main()
-  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 2971, in main
-    modres.GenerateModifiedProteinXYZAndKey(self,knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference,modligidxs)
-  File "/home/bdw2292/poltype2/PoltypeModules/modifiedresidues.py", line 2001, in GenerateModifiedProteinXYZAndKey
-    proidxtoprotype,firstresnum,lastresnum=GrabProteinTypeNumbers(poltype,poltype.modifiedproteinpdbname,knownresiduesymbs,poltype.libpath,modproidxtotypenumber)
-AttributeError: 'PolarizableTyper' object has no attribute 'libpath'
+  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 3022, in main
+    params=self.GenerateParameters()
+  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 3955, in GenerateParameters
+    esp.CheckDipoleMoments(self,optmol)
+  File "/home/bdw2292/poltype2/PoltypeModules/electrostaticpotential.py", line 679, in CheckDipoleMoments
+    dipole=GrabQMDipoles(poltype,optmol,logname)
+  File "/home/bdw2292/poltype2/PoltypeModules/electrostaticpotential.py", line 673, in GrabQMDipoles
+    dipole=np.array([round(dipole[0],3),round(dipole[1],3),round(dipole[2],3)])
+UnboundLocalError: local variable 'dipole' referenced before assignment
 Traceback (most recent call last):
-  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 4915, in RunPoltype
+  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 5030, in RunPoltype
     poltype.main()
-  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 2971, in main
-    modres.GenerateModifiedProteinXYZAndKey(self,knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference,modligidxs)
-  File "/home/bdw2292/poltype2/PoltypeModules/modifiedresidues.py", line 2001, in GenerateModifiedProteinXYZAndKey
-    proidxtoprotype,firstresnum,lastresnum=GrabProteinTypeNumbers(poltype,poltype.modifiedproteinpdbname,knownresiduesymbs,poltype.libpath,modproidxtotypenumber)
-AttributeError: 'PolarizableTyper' object has no attribute 'libpath'
+  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 3022, in main
+    params=self.GenerateParameters()
+  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 3955, in GenerateParameters
+    esp.CheckDipoleMoments(self,optmol)
+  File "/home/bdw2292/poltype2/PoltypeModules/electrostaticpotential.py", line 679, in CheckDipoleMoments
+    dipole=GrabQMDipoles(poltype,optmol,logname)
+  File "/home/bdw2292/poltype2/PoltypeModules/electrostaticpotential.py", line 673, in GrabQMDipoles
+    dipole=np.array([round(dipole[0],3),round(dipole[1],3),round(dipole[2],3)])
+UnboundLocalError: local variable 'dipole' referenced before assignment
 
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 4935, in <module>
+  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 5050, in <module>
     RunPoltype()
-  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 4934, in RunPoltype
+  File "/home/bdw2292/poltype2/PoltypeModules/poltype.py", line 5049, in RunPoltype
     raise ValueError('Houston, we have a problem. Buy a developer some coffee!')
 ValueError: Houston, we have a problem. Buy a developer some coffee!

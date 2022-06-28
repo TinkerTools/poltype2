@@ -359,9 +359,9 @@ WQ_PORT=9013
 
 
 #### Required Inputs Molecular Dynamics
-``ligandxyzfilename``  specifies the input tinker XYZ filename for the ligand. Default has no value.
+``ligandxyzfilenamelist``  specifies the list of input tinker XYZ filename for the ligands. Default has no value.
 
-``keyfilename`` specifies input tinker key file for the ligand parameters. Default is None.
+``keyfilenamelist`` specifies the list of input tinker key file for the ligand parameters. Default is None.
 
 
 #### Binding Free Energy
@@ -374,6 +374,8 @@ WQ_PORT=9013
 
 ``receptorligandxyzfilename``   specifies tinker XYZ file contains ligand and protein. This is automatically generated when the above complexedproteinpdbname is given. Default has no value.
                                       
+
+
                                       
 #### Solvation Free Energy
 ``solvation``   specifies to do solvation simulations. Default is False.
@@ -385,6 +387,9 @@ WQ_PORT=9013
 ``neatliquidsim``  specifies to do neat liquid simualtion. Default is False.
 
 #### Generic Molecular Dynamics Inputs 
+
+``annihilateligandxyzfilenamelist``  specifies the list of input tinker XYZ filename for the ligands that will be disappeared. Default is same as ``ligandxyzfilenamelist``.
+
 
 ``integrator``  specifies the MD integrator method. Default is RESPA.
 
@@ -398,7 +403,7 @@ WQ_PORT=9013
 
 ``polareps``    specifies the Grid spacing for electrostatic potential surface. Default is .00001.
 
-``templateligandxyzfilename``   specifies input template tinker XYZ filename for aligning ligandxyzfilename to templateligandxyzfilename. Program will quit after alignment. Default has no value. 
+``templateligandxyzfilename``   specifies input template tinker XYZ filename for aligning ligandxyzfilenamelist (first item in list) to templateligandxyzfilename. Program will quit after alignment. Default has no value. 
 
 ``externalapi`` specifies external script path for submitting MD jobs. Used with submitjobs.py. If user creates their own submission script, must edit submitjobs.py to work with it. Default is to submit jobs on local node. The submission script needs to be able to handle
 correct assignment of tinker envioronments on whichever CPU/GPU cluster it operates on. If using RenLabCluster please read the file on https://github.com/bdw2292/RenLabCluster. Default has no value.

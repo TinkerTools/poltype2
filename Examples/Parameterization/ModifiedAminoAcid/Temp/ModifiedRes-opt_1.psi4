@@ -34,7 +34,7 @@ geometric_keywords = {
 ]
   }
  }
-memory 51GB
+memory 50GB
 set_num_threads(12)
 psi4_io.set_default_path("/scratch/bdw2292/Psi4-ModifiedRes")
 optimize('mp2/6-31G*',engine='geometric',optimizer_keywords=geometric_keywords)

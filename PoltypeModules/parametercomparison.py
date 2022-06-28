@@ -49,7 +49,7 @@ def GrabXYZInfo(poltype,xyzfile):
         if lineidx==0:
             xyzatomnum=int(linesplit[0])
         else:
-            if len(linesplit)>1:
+            if len(linesplit)>1 and '90.00' not in line:
                 index=int(linesplit[0])
                 typenum=int(linesplit[5])
                 coords=[linesplit[2],linesplit[3],linesplit[4]]

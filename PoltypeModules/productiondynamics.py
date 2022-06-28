@@ -117,8 +117,7 @@ def ModifyKeyForGasPhase(poltype,keyfilepath,changeligandindices):
             keymods.AddKeyWord(poltype,keyfilepath,string)
     if changeligandindices==True:
         keymods.RemoveKeyWords(poltype,keyfilepath,['ligand'])
-        ligandindices=poltype.ligandindices[1]
-        AddLigandIndices(poltype,ligandindices,keyfilepath)
+        AddLigandIndices(poltype,poltype.ligands,keyfilepath)
 
 
 def SearchNearestNonPerturbedFolder(poltype,folderlist,index):
@@ -137,7 +136,44 @@ def SearchNearestNonPerturbedFolder(poltype,folderlist,index):
                 break
     return newfold
 
-def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynboxfilename,lambdakeyfilenamelist,xyzfilename):
+
+
+
+def AppendAllXYZ(poltype,xyzfilenamelist,key):
+    finalxyz='alllig.xyz'
+    if len(xyzfilenamelist)==1:
+        return xyzfilenamelist[0]
+    firstxyz=xyzfilenamelist[0]
+    for i in range(1,len(xyzfilenamelist)):
+        xyz=xyzfilenamelist[i]
+        firstxyz=AppendXYZ(poltype,firstxyz,xyz,key)
+    shutil.copy(firstxyz,finalxyz)
+
+    return finalxyz
+
+
+
+def AppendXYZ(poltype,firstxyz,xyz,key):
+    temp=open(poltype.outputpath+'xyzedit.in','w')
+    temp.write('22'+'\n')
+    temp.write(str(xyz)+'\n')
+    temp.write('\n')
+    temp.close()
+    cmdstr=poltype.xyzeditpath+' '+firstxyz+' '+'-k'+' '+key+' <'+' '+'xyzedit.in'
+    submit.call_subsystem(poltype,cmdstr,wait=True)    
+    if '.xyz_' in firstxyz:
+        split=firstxyz.split('.xyz_')
+        num=split[-1]
+        num=int(num)
+        newxyz=split[:-1]+str(num)
+    else:
+        newxyz=firstxyz+'_2'
+
+    return newxyz
+
+
+
+def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynboxfilename,lambdakeyfilenamelist,xyzfilenamelist):
    poltype.WriteToLog('Setting up dynamics for '+simfoldname,prin=True)
    if poltype.addsolvionwindows==True:
        string='ele-lambda'+'\n'
@@ -217,8 +253,8 @@ def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynbo
                        nextkey=poltype.outputpath+poltype.foldernametolambdakeyfilename[nextfold]
                        poltype.bgnstatekey=thiskey
                        poltype.endstatekey=nextkey
-                       poltype.bgnstatexyz=poltype.ligandxyzfilename
-                       poltype.endstatexyz=poltype.ligandxyzfilename
+                       poltype.bgnstatexyz=poltype.ligandxyzfilenamelist[0]
+                       poltype.endstatexyz=poltype.ligandxyzfilenamelist[0]
                        mutate.SingleTopologyMutationProtocol(poltype)
 
                        arrayoflinearrays=mutate.MutateAllParameters(poltype,poltype.bgnlinetoendline,None,numinterpols,interpolindex)
@@ -272,7 +308,8 @@ def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynbo
 
            elif 'Ion' not in fold and 'Gas' in fold:
                if poltype.binding==False:
-                   shutil.copyfile(poltype.outputpath+xyzfilename,outputboxname)
+                   finalxyz=AppendAllXYZ(poltype,xyzfilenamelist,newfoldpath+newtempkeyfile)
+                   shutil.copyfile(poltype.outputpath+finalxyz,outputboxname)
                else:
                    liquidfoldernames=lambdafolderlist[0]
                    liquidindex=len(liquidfoldernames)-1-i
@@ -290,7 +327,7 @@ def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynbo
                xyzpath=outputboxname
                keypath=newfoldpath+newtempkeyfile
                alzout=newfoldpath+'checknetcharge.alz'
-               CheckNetChargeIsZero(poltype,xyzpath,keypath,alzout) 
+               poltype.CheckNetChargeIsZero(xyzpath,keypath,alzout) 
            os.chdir('..')
    os.chdir('..')
 
@@ -321,13 +358,27 @@ def ExtractLigandDynamicsFromLiquidBox(poltype,outputboxname,liquidfolder,ligand
                 indextovecs[trueindex].append(vec)
 
         totalatomnum=len(ligandindices)
-        WriteOutArcFile(poltype,totalatomnum,indextovecs,poltype.ligandindextoneighbs,poltype.ligandindextosym,poltype.ligandindextotypenum,outputarcname,t.n_frames)
+        WriteOutArcFile(poltype,totalatomnum,indextovecs,poltype.ligandindextoneighbslist,poltype.ligandindextosymlist,poltype.ligandindextotypenumlist,outputarcname,t.n_frames)
 
 
     os.chdir(curdir)
 
 
-def WriteOutArcFile(poltype,totalatomnum,indextovecs,ligandindextoneighbs,ligandindextosym,ligandindextotype,outputarcname,framenum):
+
+def MergeMaps(poltype,diclist):
+    dic={}
+    for d in diclist:
+        dic.update(d)
+
+    return dic
+
+
+
+
+def WriteOutArcFile(poltype,totalatomnum,indextovecs,ligandindextoneighbslist,ligandindextosymlist,ligandindextotypelist,outputarcname,framenum):
+    ligandindextoneighbs=MergeMaps(poltype,ligandindextoneighbslist)
+    ligandindextosym=MergeMaps(poltype,ligandindextosymlist)
+    ligandindextotype=MergeMaps(poltype,ligandindextotypelist)
     temp=open(outputarcname,'w')
     for i in range(framenum):
         temp.write(str(totalatomnum)+'\n')
@@ -346,12 +397,6 @@ def WriteOutArcFile(poltype,totalatomnum,indextovecs,ligandindextoneighbs,ligand
     temp.close()
 
 
-def CheckNetChargeIsZero(poltype,xyzpath,keypath,alzout):
-    poltype.CallAnalyze(xyzpath,keypath,alzout,poltype.trueanalyzepath,'m')
-    charge=poltype.ReadCharge(alzout)
-    if charge!=0:
-        
-        raise ValueError('Net charge is not zero! Net Charge = '+str(charge)+' '+keypath)
 
 
 def ModifyLambdaKeywords(poltype,newfoldpath,newtempkeyfile,elelamb,vdwlamb,reslambda):
@@ -418,10 +463,13 @@ def ModifyLambdaKeywords(poltype,newfoldpath,newtempkeyfile,elelamb,vdwlamb,resl
             if '-' in typeindex:
                 xframeindex=linesplit[2]
                 yframeindex=linesplit[3]
-                chg=float(linesplit[4])
-                chg=chg*(float(elelamb))
-                newline='multipole '+typeindex+' '+xframeindex+' '+yframeindex+' '+str(chg)+'\n'
-                newkeyfile.write(newline) 
+                if int(xframeindex)==0 and int(yframeindex)==0:
+                    chg=float(linesplit[4])
+                    chg=chg*(float(elelamb))
+                    newline='multipole '+typeindex+' '+xframeindex+' '+yframeindex+' '+str(chg)+'\n'
+                    newkeyfile.write(newline)
+                else:
+                    newkeyfile.write(line)
             else:
                 newkeyfile.write(line)
 
@@ -556,9 +604,17 @@ def GrabTinkerFiles(poltype):
 
 def AddLigandIndices(poltype,ligandindices,keyfilename):
     string='ligand'+' '
-    firstligidx=str(ligandindices[0])
-    lastligidx=str(ligandindices[-1])
-    string+='-'+firstligidx+' '+lastligidx+'\n'
+    if len(ligandindices)==1:
+        firstligidx=str(indices[0])
+        lastligidx=str(indices[-1])
+        string+='-'+firstligidx+' '+lastligidx
+    else:
+        for indices in ligandindices:
+            for index in indices:
+                string+=str(index)+','
+        string=string[:-1]
+
+    string+='\n'
     keymods.AddKeyWord(poltype,keyfilename,string)
 
 
@@ -572,13 +628,11 @@ def ProductionDynamicsProtocol(poltype):
             for i in range(len(poltype.lambdakeyfilename)):
                 lambdakeyfilenamelist=poltype.lambdakeyfilename[i]
                 configkeyfilenamelist=poltype.configkeyfilename[i]
-                ligandindices=poltype.ligandindices[i]
                 for k in range(len(lambdakeyfilenamelist)):
                     lambdakeyfilename=lambdakeyfilenamelist[k]
                     configkeyfilename=configkeyfilenamelist[k]
                     shutil.copyfile(poltype.outputpath+configkeyfilename,poltype.outputpath+lambdakeyfilename)
-                    if len(ligandindices)!=0:
-                        AddLigandIndices(poltype,ligandindices,lambdakeyfilename)
+                    AddLigandIndices(poltype,poltype.ligands,lambdakeyfilename)
                     string='ele-lambda'+'\n'
                     keymods.AddKeyWord(poltype,lambdakeyfilename,string)
                     string='vdw-lambda'+'\n'
@@ -602,11 +656,11 @@ def ProductionDynamicsProtocol(poltype):
             lambdafolderlist=poltype.lambdafolderlist[i]
             index=i
             proddynboxfilename=poltype.proddynboxfilename[i]
-            xyzfilename=poltype.xyzfilename[i]
+            xyzfilenamelist=poltype.xyzfilename[i]
             proddynoutfilepathlist=poltype.proddynoutfilepath[i]
             for j in range(len(proddynoutfilepathlist)):
                 proddynoutfilepath=proddynoutfilepathlist[j]
-                SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynboxfilename,lambdakeyfilenamelist,xyzfilename)
+                SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynboxfilename,lambdakeyfilenamelist,xyzfilenamelist)
         
         ExecuteProductionDynamics(poltype)
         messages=[]

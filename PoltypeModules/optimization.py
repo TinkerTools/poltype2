@@ -257,6 +257,9 @@ def GrabFinalXYZStructure(poltype,logname,filename,mol):
         finalmarker=False
         lengthchange=None
         lastsuccessidx=None
+        bohrtoang=.529177
+        scale=1
+        detectbohr=False # PCM module uses Bohr for some reason even though specify angstroms??
         for lineidx in range(len(results)):
             line=results[lineidx]
             if 'Successfully symmetrized geometry' in line:
@@ -265,19 +268,20 @@ def GrabFinalXYZStructure(poltype,logname,filename,mol):
             lastsuccessidx=len(results)-1
         for lineidx in range(len(results)):
             line=results[lineidx]
-            try:
-                if lineidx<lastsuccessidx:
-                    if 'Geometry (in Angstrom)' in line:
-                        lastidx=lineidx
-            except:
-                if lineidx<lastsuccessidx:
-                    if 'Geometry (in Angstrom)' in line:
-                        lastidx=lineidx
+            if lineidx<lastsuccessidx:
+                if 'Geometry (in Angstrom)' in line or 'Geometry (in Bohr)' in line:
+                    lastidx=lineidx
+                if 'Geometry (in Bohr)' in line:
+                    detectbohr=True
+                    scale=bohrtoang
 
         for lineidx in range(len(results)):
             line=results[lineidx]
-            if 'Geometry (in Angstrom)' in line and lineidx==lastidx:
+            if ('Geometry (in Angstrom)' in line or 'Geometry (in Bohr)' in line) and lineidx==lastidx:
                 finalmarker=True
+                if 'Geometry (in Bohr)' in line:
+                    detectbohr=True
+                    scale=bohrtoang
             if finalmarker==True and lineidx>lastidx:    
                 linesplit=line.split()
                 if (len(linesplit)!=4 and len(linesplit)!=5) and lengthchange==False:
@@ -285,7 +289,13 @@ def GrabFinalXYZStructure(poltype,logname,filename,mol):
                     break
                 foundfloat=bool(re.search(r'\d', line))
                 if (len(linesplit)==4 or len(linesplit)==5) and foundfloat==True and 'point' not in line:
-                    temp.write(' '.join(line.lstrip().split()[:3+1])+'\n')
+                    coords=line.lstrip().split()[:3+1]
+                    element=coords[0]
+                    coords=coords[1:]
+                    coords=[float(i) for i in coords]
+                    coords=[i*scale for i in coords]
+                    coords=[str(i) for i in coords]
+                    temp.write(' '.join([element]+coords)+'\n')
                     lengthchange=False
         temp.close()
     elif checkifpsi4==False:
@@ -484,7 +494,7 @@ def CheckRMSD(poltype):
         if float(RMSD)>poltype.maxRMSD:
             poltype.WriteToLog('Warning: RMSD of QM and MM optimized structures is high, RMSD = '+ RMSD+' Tolerance is '+str(poltype.maxRMSD))
 
-            raise ValueError(os.getcwd()+' '+'RMSD of QM and MM optimized structures is high, RMSD = '+str(RMSD))
+            warnings.warn(os.getcwd()+' '+'RMSD of QM and MM optimized structures is high, RMSD = '+str(RMSD))
         else:
             poltype.WriteToLog('RMSD = '+ RMSD+' Tolerance is '+str(poltype.maxRMSD))
 

@@ -198,34 +198,34 @@ def ExecuteEquilibriation(poltype):
                 newjobtoabsolutebinpath[job]=jobtoabsolutebinpathdic[job]
                 if poltype.complexation==True and i==0:
                     keymods.RemoveKeyWords(poltype,configkeyfilename,['restrain-group','restrain-position'])
-                    restraints.AddHarmonicRestrainGroupTermsToKeyFile(poltype,configkeyfilename,poltype.restraintdistance,restrainpositionconstant)
+                    restraints.AddHarmonicRestrainGroupTermsToKeyFile(poltype,configkeyfilename,poltype.allrestraintdistances,restrainpositionconstant,poltype.restrainatomgroup1,poltype.restrainatomgroup2)
                     totalatomnumberxyzfilename=poltype.totalatomnumberxyzfilename[i]
                     if restrainpositionconstant!=0:
                         if poltype.restrainreceptorligand==True: 
-                            resposstring='# restrain-position for protein atoms\n'
-                            keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
+                            
 
                             resposstring='restrain-position -'+str(1)+' '+str(poltype.totalproteinnumber)+' '+str(restrainpositionconstant)+' '+str(poltype.equilrestrainsphereradius)+'\n'
                             keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
+                            resposstring='# restrain-position for protein atoms\n'
+                            keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
+
                         for index in poltype.indicestorestrain:
+                            resposstring='restrain-position -'+str(index)+' '+str(index)+' '+str(restrainpositionconstant)+' '+str(poltype.equilrestrainsphereradius)+'\n'
+                            keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
                             resposstring='# restrain-position for waters and ions in pocket\n'
                             keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
 
-                            resposstring='restrain-position -'+str(index)+' '+str(index)+' '+str(restrainpositionconstant)+' '+str(poltype.equilrestrainsphereradius)+'\n'
-                            keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
-
-
                     if poltype.needrot==True:
-                        resposstring='# restrain-position for preventing protein from rotating\n'
-                        keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
-
+                        
                         resposstring='restrain-position -'+str(poltype.norotpair[0])+' '+str(poltype.norotpair[0])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
                         keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
                         resposstring='# restrain-position for preventing protein from rotating\n'
                         keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
-
                         resposstring='restrain-position -'+str(poltype.norotpair[1])+' '+str(poltype.norotpair[1])+' '+str(poltype.restrainpositionconstant)+' '+str(poltype.norotrestrainsphereradius)+'\n'
                         keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
+                        resposstring='# restrain-position for preventing protein from rotating\n'
+                        keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
+
         submitjobs.SubmitJobs(poltype,newjobtolog,newjobtojobpath,newjobtoinputfilepaths,newjobtooutputfiles,newjobtoabsolutebinpath,poltype.outputpath+poltype.equiljobsfilename)
         messages=[]
         for i in range(len(poltype.equiloutputarray)):
@@ -301,21 +301,49 @@ def ExtractTinkerFrames(poltype,arcpath,firstframe,lastframe,framestep,totalnumb
     if os.path.exists(framename):
         os.rename(framename,newname)
     return
+
+
+
   
 def EquilibriationProtocol(poltype):
     if poltype.equilfinished==False:
         if poltype.restrainatomgroup1==None and poltype.restrainatomgroup2==None and poltype.complexation==True and poltype.restrainreceptorligand==True:
-            try:
-                restraints.ComputeIdealGroupRestraints(poltype,poltype.minboxfilename[0],nmin=4,sele='CA')
-            except:
-                try:
-                    restraints.ComputeIdealGroupRestraints(poltype,poltype.minboxfilename[0],nmin=4,sele='C')
-                except:
-                    restraints.ComputeIdealGroupRestraints(poltype,poltype.minboxfilename[0],nmin=2,sele='protein')
 
-        if poltype.complexation==True and poltype.restrainreceptorligand==True: 
-            dist=restraints.AverageCOMGroups(poltype,poltype.minboxfilename[0])
-            poltype.restraintdistance=dist
+            poltype.restrainatomgroup1=[]
+            poltype.restrainatomgroup2=[]
+            poltype.annihilaterestrainatomgroup1=[]
+            poltype.annihilaterestrainatomgroup2=[]
+
+            for k in range(len(poltype.allligands)):
+                indices=poltype.allligands[k]
+                poltype.WriteToLog('Finding ideal distance group restraints for ligand '+str(indices),prin=True)
+                annihilateindices=False
+                if indices in poltype.ligands:
+                    annihilateindices=True
+                try:
+                    restraints.ComputeIdealGroupRestraints(poltype,indices,poltype.minboxfilename[0],nmin=4,nmax=4,sele='CA',annihilate=annihilateindices)
+                except:
+                    try:
+                        restraints.ComputeIdealGroupRestraints(poltype,indices,poltype.minboxfilename[0],nmin=4,nmax=4,sele='C',annihilate=annihilateindices)
+                    except:
+                        try:
+                            restraints.ComputeIdealGroupRestraints(poltype,indices,poltype.minboxfilename[0],nmin=2,nmax=4,sele='protein',annihilate=annihilateindices)
+                        except:
+                            restraints.ComputeIdealGroupRestraints(poltype,indices,poltype.minboxfilename[0],nmin=1,nmax=1,sele='protein',annihilate=annihilateindices)
+
+
+        if poltype.complexation==True and poltype.restrainreceptorligand==True:
+            poltype.WriteToLog('Averaging COM groups from '+poltype.minboxfilename[0],prin=True)
+            poltype.restraintdistances=[]
+            poltype.allrestraintdistances=[]
+            for idx in range(len(poltype.restrainatomgroup1)):
+                grp1=poltype.restrainatomgroup1[idx]
+                grp2=poltype.restrainatomgroup2[idx]
+                dist=restraints.AverageCOMGroups(poltype,poltype.minboxfilename[0],grp1,grp2)
+                poltype.allrestraintdistances.append(dist)
+                if grp1 in poltype.annihilaterestrainatomgroup1:
+                    poltype.restraintdistances.append(dist)
+        
 
         for i in range(len(poltype.minboxfilename)):
             firstxyz=poltype.minboxfilename[i]
@@ -350,12 +378,18 @@ def EquilibriationProtocol(poltype):
                 keymods.RemoveKeyWords(poltype,configkeyfilename,['restrain','group'])
 
             if poltype.complexation==True and poltype.proddyngrprests==True and i==0:
-                equildist=restraints.AverageCOMGroups(poltype,equilarcboxfilename)
-                poltype.restraintdistance=equildist
+                annihilatedistances=[]
+                poltype.WriteToLog('Averaging COM groups from '+equilarcboxfilename,prin=True)
+                for idx in range(len(poltype.annihilaterestrainatomgroup1)):
+                    grp1=poltype.annihilaterestrainatomgroup1[idx]
+                    grp2=poltype.annihilaterestrainatomgroup2[idx]
+                    equildist=restraints.AverageCOMGroups(poltype,equilarcboxfilename,grp1,grp2)
+                    annihilatedistances.append(equildist)
+
                 if poltype.restrainreceptorligand==True:
                     for configkeyfilename in configkeyfilenamelist:
-                        restraints.AddHarmonicRestrainGroupTermsToKeyFile(poltype,poltype.outputpath+configkeyfilename,equildist,poltype.distancerestraintconstant)
-                    restraints.GroupRestraintFreeEnergyFix(poltype)
+                        restraints.AddHarmonicRestrainGroupTermsToKeyFile(poltype,poltype.outputpath+configkeyfilename,annihilatedistances,poltype.distancerestraintconstant,poltype.annihilaterestrainatomgroup1,poltype.annihilaterestrainatomgroup2)
+                    restraints.GroupRestraintFreeEnergyFix(poltype,annihilatedistances)
 
             if not os.path.isfile(poltype.outputpath+proddynboxfilenamepymol):
                 poltype.PymolReadableFile(proddynboxfilename,proddynboxfilenamepymol)

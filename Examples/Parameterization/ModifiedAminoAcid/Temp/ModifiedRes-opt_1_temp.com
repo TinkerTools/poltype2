@@ -1,7 +1,7 @@
 %RWF=/scratch/bdw2292/Gau-ModifiedRes/,254GB
 %Nosave
 %Chk=ModifiedRes-opt_1.chk
-%Mem=51GB
+%Mem=50GB
 %Nproc=12
 #P opt=(ModRedundant,maxcycles=400,Loose) MP2/6-31G* MaxDisk=254GB 
 

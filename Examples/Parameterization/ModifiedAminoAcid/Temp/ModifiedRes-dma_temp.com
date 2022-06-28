@@ -1,7 +1,7 @@
 %RWF=/scratch/bdw2292/Gau-ModifiedRes/,254GB
 %Nosave
 %Chk=ModifiedRes-dma_temp.chk
-%Mem=51GB
+%Mem=50GB
 %Nproc=12
 #P MP2/6-311G** Sp Density=MP2 MaxDisk=254GB 
 

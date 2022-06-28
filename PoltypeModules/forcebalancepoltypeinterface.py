@@ -1309,64 +1309,7 @@ def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderl
     temp.close()
 
 
-def GrabMaxTypeNumber(parameterfile):
-    maxnumberfromprm=1
-    temp=open(parameterfile,'r')
-    results=temp.readlines()
-    temp.close()
-    for line in results:
-        if 'atom' in line and '#' not in line:
-            linesplit=line.split()
-            atomtype=int(linesplit[1])
-            if atomtype>maxnumberfromprm:
-                maxnumberfromprm=atomtype
-    return maxnumberfromprm
 
-def GrabMinTypeNumber(parameterfile):
-    minnumberfromprm=10000
-    temp=open(parameterfile,'r')
-    results=temp.readlines()
-    temp.close()
-    for line in results:
-        if 'atom' in line and '#' not in line:
-            linesplit=line.split()
-            atomtype=int(linesplit[1])
-            if atomtype<minnumberfromprm:
-                minnumberfromprm=atomtype
-    return minnumberfromprm
-
-
-def GenerateTypeMaps(keyfilelist):
-    oldtypetonewtypelist=[]
-    currentmin=100000
-    currentmax=0
-    shift=0
-    prevmaxnumberfromkey=0
-    prevminnumberfromkey=0
-    for keyfilename in keyfilelist:
-        maxnumberfromkey=GrabMaxTypeNumber(keyfilename)
-        minnumberfromkey=GrabMinTypeNumber(keyfilename)
-        shift+=prevmaxnumberfromkey-prevminnumberfromkey+1
-        if minnumberfromkey<currentmin:
-            currentmin=minnumberfromkey
-        if maxnumberfromkey>currentmax:
-            currentmax=maxnumberfromkey
-        types=np.arange(minnumberfromkey,maxnumberfromkey+1,1)
-        shiftedtypes=types+shift
-        maxtype=max(shiftedtypes)
-        currentmax=maxtype
-        oldtypetonewtype=dict(zip(types,shiftedtypes))
-        temp={}
-        for oldtype,newtype in oldtypetonewtype.items():
-            negold=-oldtype
-            negnew=-newtype
-            temp[negold]=negnew
-        oldtypetonewtype.update(temp)
-        oldtypetonewtypelist.append(oldtypetonewtype)
-        prevmaxnumberfromkey=maxnumberfromkey
-        prevminnumberfromkey=minnumberfromkey
-        
-    return oldtypetonewtypelist
 
 def ShiftVdwTypesLines(vdwtypelineslist,oldtypetonewtypelist):
     newvdwtypelineslist=[]
@@ -1641,7 +1584,7 @@ def ReadPRMFile(prmfilepath):
 
     return prmfilelines
 
-def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_prod_steps,gas_timestep,gas_interval,md_threads,liquid_prod_time,gas_prod_time,WQ_PORT,csvexpdatafile,fittypestogether,vdwprmtypestofit,vdwtypestoeval,liquid_equ_time,gas_equ_time,qmrelativeweight,liqrelativeweight,enthalpyrelativeweight,densityrelativeweight,relaxFBbox):
+def GenerateForceBalanceInputs(poltype,poltypepathlist,vdwtypeslist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_prod_steps,gas_timestep,gas_interval,md_threads,liquid_prod_time,gas_prod_time,WQ_PORT,csvexpdatafile,fittypestogether,vdwprmtypestofit,vdwtypestoeval,liquid_equ_time,gas_equ_time,qmrelativeweight,liqrelativeweight,enthalpyrelativeweight,densityrelativeweight,relaxFBbox):
     
 
     debugmode=False
@@ -1738,7 +1681,7 @@ def GenerateForceBalanceInputs(poltypepathlist,vdwtypeslist,liquid_equ_steps,liq
     listoftptopropdics=CombineData(temperature_list,pressure_list,enthalpy_of_vaporization_list,enthalpy_of_vaporization_err_list,surface_tension_list,surface_tension_err_list,relative_permittivity_list,relative_permittivity_err_list,isothermal_compressibility_list,isothermal_compressibility_err_list,isobaric_coefficient_of_volume_expansion_list,isobaric_coefficient_of_volume_expansion_err_list,heat_capacity_at_constant_pressure_list,heat_capacity_at_constant_pressure_err_list,density_list,density_err_list,citation_list)
     if poltypepathlist!=None:
         keyfilelist,xyzfilelist,dimertinkerxyzfileslist,dimerenergieslist,molnamelist,molfilelist,dimersplogfileslist,finalxyzfilelist=ReadInPoltypeFiles(poltypepathlist)
-        oldtypetonewtypelist=GenerateTypeMaps(keyfilelist)
+        oldtypetonewtypelist=poltype.GenerateTypeMaps(keyfilelist)
         vdwtypelineslist=GrabVdwTypeLinesFromFinalKey(keyfilelist,vdwtypeslist)
         vdwtypelineslist=ShiftVdwTypesLines(vdwtypelineslist,oldtypetonewtypelist)
         fittypestogether=ShiftTypes(fittypestogether,oldtypetonewtypelist)

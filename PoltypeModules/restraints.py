@@ -27,25 +27,32 @@ def ComputeCOM(poltype,atomidxtovecdic,atomidxtomassdic):
     return COM
 
 
-def AddHarmonicRestrainGroupTermsToKeyFile(poltype,keyfilename,teatherdist,restraintconstant):
-    group1string='group '+str(1)+' '
-    group2string='group '+str(2)+' '
-    for num in poltype.restrainatomgroup1:
-        group1string+=str(num)+' '
-    keymods.AddKeyWord(poltype,keyfilename,group1string+'\n')       
-    for num in poltype.restrainatomgroup2:
-        group2string+=str(num)+' '
-    keymods.AddKeyWord(poltype,keyfilename,group2string+'\n')
+def AddHarmonicRestrainGroupTermsToKeyFile(poltype,keyfilename,teatherdistances,restraintconstant,restrainatomgroup1,restrainatomgroup2):
+    count=1
+    for i in range(len(restrainatomgroup1)):
+        teatherdist=teatherdistances[i]
+        first=restrainatomgroup1[i]
+        second=restrainatomgroup2[i]
+        group1string='group '+str(count)+' '
+        group2string='group '+str(count+1)+' '
 
-    if poltype.flatbotrest==False:
-        restrainstring='restrain-groups '+str(1)+' '+ str(2)+' '+str(restraintconstant)+' '+str(teatherdist)+' '+str(teatherdist)
-    else:
-        restrainstring='restrain-groups '+str(1)+' '+ str(2)+' '+str(restraintconstant)+' '+'0'+' '+str(teatherdist)
-    keymods.AddKeyWord(poltype,keyfilename,restrainstring+'\n')
+        for num in first:
+            group1string+=str(num)+' '
+        keymods.AddKeyWord(poltype,keyfilename,group1string+'\n')       
+        for num in second:
+            group2string+=str(num)+' '
+        keymods.AddKeyWord(poltype,keyfilename,group2string+'\n')
+        if poltype.flatbotrest==False:
+            restrainstring='restrain-groups '+str(count)+' '+ str(count+1)+' '+str(restraintconstant)+' '+str(teatherdist)+' '+str(teatherdist)
+        else:
+            restrainstring='restrain-groups '+str(count)+' '+ str(count+1)+' '+str(restraintconstant)+' '+'0'+' '+str(teatherdist)
+        keymods.AddKeyWord(poltype,keyfilename,restrainstring+'\n')
+        count+=2
+
+    
         
     
-def AverageCOMGroups(poltype,filename):
-    poltype.WriteToLog('Averaging COM groups from '+filename,prin=True)
+def AverageCOMGroups(poltype,filename,grp1,grp2):
     try:
         t = md.load_arc(filename)
     except IOError:
@@ -63,14 +70,14 @@ def AverageCOMGroups(poltype,filename):
             atomsymb=a.element.symbol
             mass=poltype.elementsymtomass[atomsymb]
             vec=t.xyz[framecount,zeroindex,:]*10 # convert nm to Angstrom
-            if atomidx in poltype.restrainatomgroup1:
+            if atomidx in grp1:
                 g1atomidxtovecdic[atomidx]=vec
                 g1atomidxtomassdic[atomidx]=mass
-            elif atomidx in poltype.restrainatomgroup2:
+            elif atomidx in grp2:
                 g2atomidxtovecdic[atomidx]=vec
                 g2atomidxtomassdic[atomidx]=mass
 
-        if len(g1atomidxtovecdic.keys())==len(poltype.restrainatomgroup1) and len(g2atomidxtovecdic.keys())==len(poltype.restrainatomgroup2):
+        if len(g1atomidxtovecdic.keys())==len(grp1) and len(g2atomidxtovecdic.keys())==len(grp2):
             g1COM=ComputeCOM(poltype,g1atomidxtovecdic,g1atomidxtomassdic)
             g2COM=ComputeCOM(poltype,g2atomidxtovecdic,g2atomidxtomassdic)
             dispx=g1COM[0]-g2COM[0]
@@ -89,7 +96,7 @@ def AverageCOMGroups(poltype,filename):
 
 
 
-def GroupRestraintFreeEnergyFix(poltype):
+def GroupRestraintFreeEnergyFix(poltype,distances):
     fo=poltype.distancerestraintconstant
     pi=np.pi
     gasconst=8.314/4184
@@ -102,20 +109,21 @@ def GroupRestraintFreeEnergyFix(poltype):
     else:
         ri=poltype.restraintdistance
         fi=poltype.distancerestraintconstant
-
-    ro=poltype.restraintdistance
-    v1 = 2.0*pi*ri*(-2.0+np.exp(-ri**2*fi/kt))*kt/fi + np.sqrt(kt*(pi/fi)**3)*(2.0*fi*ri*ri+kt)*math.erf(ri*np.sqrt(fi/kt))
-    v2 = (4.0*pi/3.0) * (ro**3-ri**3)
-    v3 = np.sqrt(kt*(pi/fo)**3) * (2.0*fo*ro*ro+kt+4.0*ro*np.sqrt(kt*fo/pi))
-    vol = v1 + v2 + v3
-    dv1 = 2.0*pi*ri**3*np.exp(-ri**2*fi/kt)/temp + 2.0*pi*ri*(-2.0+np.exp(-ri**2*fi/kt))*kt/(fi*temp) + 0.5*np.sqrt((pi/fi)**3)*np.sqrt(kt)*(2.0*ri**2*fi+kt)*math.erf(ri*np.sqrt(fi/kt))/temp - pi*ri*np.exp(-ri**2*fi/kt)*(2.0*ri**2*fi+kt)/(fi*temp) + np.sqrt((kt*pi/fi)**3)*math.erf(ri*np.sqrt(fi/kt))/temp
-    dv2 = 0.0
-    dv3 = np.sqrt(kt*(pi/fo)**3)*fo*ro*ro/temp + 4.0*kt*(pi/fo)*ro/temp + 1.5*np.sqrt((kt*pi/fo)**3)/temp
-    dvol = dv1 + dv2 + dv3
-    dg = -kt * np.log(vol/stdcon)
-    ds = -dg/temp + kt*dvol/vol
-    dh = dg + temp*ds
-    poltype.rescorrection=dg
+    poltype.rescorrection=0
+    for dist in distances:
+         ro=dist
+         v1 = 2.0*pi*ri*(-2.0+np.exp(-ri**2*fi/kt))*kt/fi + np.sqrt(kt*(pi/fi)**3)*(2.0*fi*ri*ri+kt)*math.erf(ri*np.sqrt(fi/kt))
+         v2 = (4.0*pi/3.0) * (ro**3-ri**3)
+         v3 = np.sqrt(kt*(pi/fo)**3) * (2.0*fo*ro*ro+kt+4.0*ro*np.sqrt(kt*fo/pi))
+         vol = v1 + v2 + v3
+         dv1 = 2.0*pi*ri**3*np.exp(-ri**2*fi/kt)/temp + 2.0*pi*ri*(-2.0+np.exp(-ri**2*fi/kt))*kt/(fi*temp) + 0.5*np.sqrt((pi/fi)**3)*np.sqrt(kt)*(2.0*ri**2*fi+kt)*math.erf(ri*np.sqrt(fi/kt))/temp - pi*ri*np.exp(-ri**2*fi/kt)*(2.0*ri**2*fi+kt)/(fi*temp) + np.sqrt((kt*pi/fi)**3)*math.erf(ri*np.sqrt(fi/kt))/temp
+         dv2 = 0.0
+         dv3 = np.sqrt(kt*(pi/fo)**3)*fo*ro*ro/temp + 4.0*kt*(pi/fo)*ro/temp + 1.5*np.sqrt((kt*pi/fo)**3)/temp
+         dvol = dv1 + dv2 + dv3
+         dg = -kt * np.log(vol/stdcon)
+         ds = -dg/temp + kt*dvol/vol
+         dh = dg + temp*ds
+         poltype.rescorrection+=dg
     return dg,dh,ds
 
 
@@ -175,16 +183,15 @@ def ComputeAverageDistanceFromAtom(poltype,comb,indextovec,ligandatomindex):
     return averagedist
 
 
-def ComputeIdealGroupRestraints(poltype,fxyz,nmin=4,sele='CA'):
-    nmax=8
+def ComputeIdealGroupRestraints(poltype,ligandindices,fxyz,nmin=4,nmax=8,sele='CA',annihilate=False):
     COMthresh=1
     maxatomcutoff=20
-    ligandindices=poltype.ligandindices[0]
     indextomass,indextovec,indextosym,t=GrabIndexInfo(poltype,fxyz)
     atomidxtomassdic,atomidxtovecdic=GrabXYZAndMass(poltype,indextomass,indextovec,ligandindices)
     ligandcom=ComputeCOM(poltype,atomidxtovecdic,atomidxtomassdic)       
     ligandatomindex=FindClosestLigandAtomToCOM(poltype,ligandcom,atomidxtovecdic,indextosym)
-    poltype.restrainatomgroup1=[ligandatomindex]
+    
+    
     if sele=='protein':
         indices=poltype.proteinindices[:]
     else:
@@ -201,7 +208,6 @@ def ComputeIdealGroupRestraints(poltype,fxyz,nmin=4,sele='CA'):
     sortdists=sorted(disttoindex.keys())
     dists=sortdists[:maxatomcutoff+1]
     allowedindices=[disttoindex[dist] for dist in dists]
-
     allcombs=[]
     for n in range(nmin,nmax+1):
         combs=itertools.combinations(allowedindices, n)
@@ -219,7 +225,22 @@ def ComputeIdealGroupRestraints(poltype,fxyz,nmin=4,sele='CA'):
         dist=np.linalg.norm(grpcom-ref)
         if dist<COMthresh:
             foundres=True
-            poltype.restrainatomgroup2=list(comb)
+            poltype.restrainatomgroup2.append(list(comb))
+            if annihilate==True:
+                poltype.annihilaterestrainatomgroup2.append(list(comb))
+
             break
+        if nmin==1 and len(comb)==1: # last attempt nothing else worked...
+            foundres=True
+            poltype.restrainatomgroup2.append(list(comb))
+            if annihilate==True:
+                poltype.annihilaterestrainatomgroup2.append(list(comb))
+
+            break
+
     if foundres==False:
-        raise ValueError('Failed to find ideal host-guest restraint')
+        raise ValueError('Failed to find ideal host-guest restraint, nmin='+str(nmin)+' , sele='+str(sele))
+    else:
+        poltype.restrainatomgroup1.append([ligandatomindex])
+        if annihilate==True:
+            poltype.annihilaterestrainatomgroup1.append([ligandatomindex])
