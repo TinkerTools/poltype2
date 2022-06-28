@@ -141,24 +141,56 @@ def readTXYZ(poltype,TXYZ):
     return atoms,coord,order, types, connections
 
 
+
+def RemoveFragments(poltype,ligandsmiles):
+    if '.' in ligandsmiles:
+        for eidx in range(len(ligandsmiles)):
+            e=ligandsmiles[eidx]
+            if e=='.':
+                fragidx=eidx
+                break
+        if fragidx>len(ligandsmiles)/2:
+            ligandsmiles=ligandsmiles[:eidx]
+        else:
+            ligandsmiles=ligandsmiles[eidx+1:]
+
+    return ligandsmiles
+
+
 def SMILESMatches(poltype,ligandsmiles,rdkitmol,pdbmol):
-    ligandsmiles=ligandsmiles.replace('=','~').replace('-','~') # sometimes bond order can be different from PDB so remove bond order for detection :)
+    ligandsmiles=ligandsmiles.replace('=','~').replace('-','~').replace('/','') # sometimes bond order can be different from PDB so remove bond order for detection :)
+    ligandsmiles=RemoveFragments(poltype,ligandsmiles)
     p = Chem.MolFromSmarts(ligandsmiles)
+    mols = [rdkitmol,p]
+    res=rdFMCS.FindMCS(mols)
+    smarts=res.smartsString
+    p = Chem.MolFromSmarts(smarts)
     matches=rdkitmol.GetSubstructMatches(p)
     newmatches=[]
     for match in matches:
+        match=GrabAllConnectedAtoms(poltype,rdkitmol,match) # sometimes input smiles doesnt work so use max common substructure but then add back any connected atoms (like hydrogens etc)
         newmatch=[i+1 for i in match]
         newmatches.append(newmatch)
-    if len(newmatches)==0: # rdkit match failed
-        sp = openbabel.OBSmartsPattern()
-        openbabel.OBSmartsPattern.Init(sp,ligandsmiles)
-        diditmatch=sp.Match(pdbmol)
-        newmatches=list(sp.GetMapList())
-
-
-
 
     return newmatches
+
+
+def GrabAllConnectedAtoms(poltype,rdkitmol,match):
+    newmatch=[]
+    newmatch.extend(match)
+    prevlen=0
+    while prevlen!=len(newmatch):
+        for atmindex in newmatch:
+            atom=rdkitmol.GetAtomWithIdx(atmindex)
+            neighbs=atom.GetNeighbors()
+            for natom in neighbs:
+                natomindex=natom.GetIdx()
+                if natomindex not in newmatch:
+                    newmatch.append(natomindex)
+        prevlen=len(newmatch)
+
+    return newmatch
+
 
 
 
@@ -185,6 +217,7 @@ def GrabLigandCoordinates(poltype,proteinatomnum): # appending after protein, be
             for i in match:
                 if i not in allmatches:
                     allmatches.append(i)
+
     for xyz,smiles in poltype.ligandxyztosmiles.items():
         if xyz in poltype.annihilateligandxyzfilenamelist:
             ligxyzfnamelist=[]
