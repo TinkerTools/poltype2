@@ -60,7 +60,6 @@ def GenerateProteinTinkerXYZFile(poltype):
     #ligandindices=poltype.ligandindices[0]
     #GeneratePDBFileFromXYZ(poltype,poltype.complexedxyzname,ligandindices)
 
-
 def GrabNonLigandHETATMInfo(poltype,complexedproteinpdbname,indextocoordinates,proteinindextocoordinates,lastligindex):
     nonlighetatmindextocoordinates={}
     nonlighetatmindextotypenum={}
@@ -173,7 +172,7 @@ def GrabLigandCoordinates(poltype,proteinatomnum): # appending after protein, be
     listofindextopdbindex=[]
     smilestoindicesalreadyused={}
     for ligandsmilesidx in range(len(poltype.ligandsmileslist)):
-        ligandsmiles=poltype.ligandsmileslist[ligandsmilesidx]
+        ligandsmiles=poltype.ligandsmileslist[ligandsmilesidx].replace('=','~').replace('-','~')
         xyz=poltype.ligandxyzfilenamelist[ligandsmilesidx]
         molname=xyz.replace('.xyz','.mol')
         ligm=Chem.MolFromMolFile(molname,removeHs=False,sanitize=False)

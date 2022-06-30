@@ -445,6 +445,19 @@ def GrabTotalMass(xyzfilename):
 
 
 
+
+def WrapStrayAtomsBackInBox(poltype,newname,key):
+    temp=open(poltype.outputpath+'xyzedit.in','w')
+    temp.write('18'+'\n')
+    temp.write('\n')
+    temp.close()
+    cmdstr=poltype.xyzeditpath+' '+newname+' '+'-k'+' '+key+' <'+' '+'xyzedit.in'
+    submit.call_subsystem(poltype,cmdstr,wait=True)   
+    filename=NewTinkerFileName(poltype,newname)
+    return filename
+
+
+
 def ShiftSolventBoxCoordinates(poltype,newfilename,key,shiftvector):
     temp=open(poltype.outputpath+'xyzedit.in','w')
     temp.write('12'+'\n')
@@ -597,7 +610,8 @@ def BoxSetupProtocol(poltype):
                         if k!=maxdir:
                             shiftvector[k]=0
                     newname=SoakMoleculeInSolventBox(poltype,xyzfilename,key,newfilename)
-                    shiftedfilename=ShiftSolventBoxCoordinates(poltype,newname,key,shiftvector)
+                    wrappedname=WrapStrayAtomsBackInBox(poltype,newname,key)
+                    shiftedfilename=ShiftSolventBoxCoordinates(poltype,wrappedname,key,shiftvector)
                     newatomnum=FindNumberTinkerXYZAtoms(poltype,shiftedfilename)
                     atmshift=newatomnum
                     xyztoappend.append(shiftedfilename)
@@ -612,7 +626,8 @@ def BoxSetupProtocol(poltype):
 
                 shutil.copy(newname,boxxyzfilename)
                 alzout='checknetcharge.alz'
-                poltype.CheckNetChargeIsZero(boxxyzfilename,key,alzout) 
+                poltype.CheckNetChargeIsZero(boxxyzfilename,key,alzout)
+
         RemoveTempFiles(poltype)
         
     poltype.xyzfilesize=[float(os.path.getsize(i)) for i in poltype.boxfilename] # in bytes

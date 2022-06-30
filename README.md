@@ -240,6 +240,7 @@ usegold=True
 * Ligand XYZ and key files are required (such as final.xyz and final.key from Poltype parameterization).
 * Besides the ``ligandxyzfilenamelist`` for all ligands, there is also ``annihilateligandxyzfilenamelist`` which tells the program which ligand types to annihilate. By default, annihilateligandxyzfilenamelist=ligandxyzfilenamelist.
 * If there are duplicate molecules (same parameters and XYZ), make copies of each XYZ and key and provide as inputs. The program will then change the type numbers so as none of the individual molecules have overlapping type numbers. This way can choose to disappear one or more of the ligands with the same parameters (but different types). If there are duplicate ligands in your system, please make sure the list order of ``ligandxyzfilenamelist`` and ``annihilateligandxyzfilenamelist`` are the same order as ligands that occur in the input PDB file. This way the program can determine which of the duplicates in ``annihilateligandxyzfilenamelist`` to disappear and distinguish those from other duplicates in ``ligandxyzfilenamelist`` that are not in ``annihilateligandxyzfilenamelist`` 
+* Waters and ions within 8 angstroms of any atom in ligand - protein PDB will automatically be detected and added to protein-ligand XYZ file.
 * For binding free energy compuations, either a host PDB or premade tinker XYZ is required 
 * Inputs are inside poltype.ini
 * Make sure pdb files (complexed and uncomplexed) have no missing residues or atoms.

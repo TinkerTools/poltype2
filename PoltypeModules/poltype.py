@@ -428,7 +428,7 @@ class PolarizableTyper():
         qmonly:bool = False
         espfit:bool = True
         parmtors:bool = True
-        foldnum:int=4
+        foldnum:int=3
         foldoffsetlist:list = field(default_factory=lambda : [ 0.0, 180.0, 0.0, 180.0, 0.0, 180.0 ])
         torlist:None = None
         rotbndlist:None = None
@@ -517,6 +517,7 @@ class PolarizableTyper():
                                             break
                                     linesplit=linesplit[:theidx]
                                     line=' '.join(linesplit)
+                        a=None
                         if '=' in line:
                             linesplit=line.split('=',1)
                             a=linesplit[1].replace('\n','').rstrip().lstrip()
@@ -1699,7 +1700,6 @@ class PolarizableTyper():
 
             self.elementsymtotinktype={'K':box.GrabTypeNumber(self,'Potassium Ion K+'),'Cl':box.GrabTypeNumber(self,'Chloride Ion Cl-'),'Mg':box.GrabTypeNumber(self,'Magnesium Ion Mg+2'),'Li':box.GrabTypeNumber(self,'Lithium Ion Li+'),'Na':box.GrabTypeNumber(self,'Sodium Ion Na+'),'Rb':box.GrabTypeNumber(self,'Rubidium Ion Rb+'),'Cs':box.GrabTypeNumber(self,'Cesium Ion Cs+'),'Be':box.GrabTypeNumber(self,'Beryllium Ion Be+2'),'Ca':box.GrabTypeNumber(self,'Calcium Ion Ca+2'),'Zn':box.GrabTypeNumber(self,'Zinc Ion Zn+2'),'Mg+':box.GrabTypeNumber(self,'Magnesium Ion Mg+2')}
             self.ReadWaterFromPRMFile()
-
             needtoshifttypes=self.CheckIfNeedToShiftTypes(self.keyfilenamelist)
             if needtoshifttypes==True:
                 oldtypetonewtypelist=self.GenerateTypeMaps(self.keyfilenamelist)
@@ -1717,6 +1717,8 @@ class PolarizableTyper():
                 pdbxyz.CallPDB2PQR(self,self.uncomplexedproteinpdbname)
                 sys.exit()
 
+            self.originalkeyfilename=self.AppendKeys(self.keyfilenamelist)
+            mpolearrays=self.CheckInputXYZKeyFiles(ligandonly=True) # check xyz/keys of ligands before making complex XYZ
             if self.complexation==True and self.complexedproteinpdbname!=None: 
 
                 pdbxyz.GenerateProteinTinkerXYZFile(self)
@@ -1739,7 +1741,6 @@ class PolarizableTyper():
             
 
 
-            self.originalkeyfilename=self.AppendKeys(self.keyfilenamelist)
             self.checkneedregrow=self.CheckIfNeedRegrowForSolvation()
             self.CheckReceptorLigandXYZFile() # sometimes user have box info on top
             mpolearrays=self.CheckInputXYZKeyFiles()
@@ -2317,9 +2318,11 @@ class PolarizableTyper():
 
 
         def CheckIfNeedToShiftTypes(self,keyfilenamelist):
+            newlist=keyfilenamelist.copy()
+            newlist.append(self.prmfilepath)
             needtoshifttypes=False
             alltypes=[]
-            for keyfilename in keyfilenamelist:
+            for keyfilename in newlist:
                 maxnumberfromkey=self.GrabMaxTypeNumber(keyfilename)
                 minnumberfromkey=self.GrabMinTypeNumber(keyfilename)
                 types=list(range(minnumberfromkey,maxnumberfromkey+1))
@@ -4911,7 +4914,7 @@ class PolarizableTyper():
 
 
 
-        def CheckInputXYZKeyFiles(self):
+        def CheckInputXYZKeyFiles(self,ligandonly=False):
             keymods.RemoveKeyWords(self,self.originalkeyfilename,['parameters','axis','ewald','pme-grid','pme-order','cutoff','thermostat','integrator','ligand','verbose','archive','neighbor-list','polar-eps','polar-predict','heavy-hydrogen','omp-threads'])
             string='parameters '+self.prmfilepath+'\n'
             keymods.AddKeyWord(self,self.originalkeyfilename,string)
@@ -4921,25 +4924,6 @@ class PolarizableTyper():
                     indices=self.GrabIndicesWithTypeNumber(self.receptorligandxyzfilename,ligandtypes)
                     receptorligandtypes=self.GrabTypeNumbers(self.receptorligandxyzfilename,indices=indices)
                     self.CompareTypes(receptorligandtypes,ligandtypes)
-            if self.receptorligandxyzfilename!=None and self.originalkeyfilename!=None: 
-                
-
-                cmdstr=self.trueanalyzepath+' '+self.receptorligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'e'
-                submit.call_subsystem(self,cmdstr,wait=True)    
-                cmdstr=self.trueanalyzepath+' '+self.receptorligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'m'+'> alz.out'
-                submit.call_subsystem(self,cmdstr,wait=True)    
-                self.complexcharge,resid=self.ReadCharge('alz.out',checkresid=False)
-                if resid!=0:
-                    index,typenum=self.GrabFirstReceptorIndexAndType(self.receptorligandxyzfilename)
-                    mpolearrays=self.GrabMultipoleParameters(self.prmfilepath,typenum)
-                    mpolearrays=self.ModifyIndexAndChargeMultipole(mpolearrays,resid,index)
-                    self.ModifyCharge(self.originalkeyfilename,mpolearrays)
-                    cmdstr=self.trueanalyzepath+' '+self.receptorligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'m'+'> alz.out'
-                    submit.call_subsystem(self,cmdstr,wait=True)    
-                    self.complexcharge,resid=self.ReadCharge('alz.out')
-                else:
-                    mpolearrays=[]
-
 
             if self.ligandxyzfilenamelist!=None and self.originalkeyfilename!=None: 
                 self.otherligcharge=0
@@ -4960,10 +4944,32 @@ class PolarizableTyper():
                     chg,resid=self.ReadCharge('alz.out')
                     self.ligandcharge+=chg
 
+            if ligandonly==True:
+                return []
+            if self.receptorligandxyzfilename!=None and self.originalkeyfilename!=None: 
+                
+
+                cmdstr=self.trueanalyzepath+' '+self.receptorligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'e'
+                submit.call_subsystem(self,cmdstr,wait=True)    
+                cmdstr=self.trueanalyzepath+' '+self.receptorligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'m'+'> alz.out'
+                submit.call_subsystem(self,cmdstr,wait=True)    
+                self.complexcharge,resid=self.ReadCharge('alz.out',checkresid=False)
+                if resid!=0:
+                    index,typenum=self.GrabFirstReceptorIndexAndType(self.receptorligandxyzfilename)
+                    mpolearrays=self.GrabMultipoleParameters(self.prmfilepath,typenum)
+                    mpolearrays=self.ModifyIndexAndChargeMultipole(mpolearrays,resid,index)
+                    self.ModifyCharge(self.originalkeyfilename,mpolearrays)
+                    cmdstr=self.trueanalyzepath+' '+self.receptorligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'m'+'> alz.out'
+                    submit.call_subsystem(self,cmdstr,wait=True)    
+                    self.complexcharge,resid=self.ReadCharge('alz.out')
+                else:
+                    mpolearrays=[]
 
 
-                if self.receptorligandxyzfilename!=None:
-                    self.receptorcharge=self.complexcharge-self.ligandcharge-self.otherligcharge # this includes the charges from ions in pocket initially
+            
+
+            if self.receptorligandxyzfilename!=None:
+                self.receptorcharge=self.complexcharge-self.ligandcharge-self.otherligcharge # this includes the charges from ions in pocket initially
             if self.receptorligandxyzfilename!=None and self.ligandxyzfilenamelist!=None:
                 for xyz in self.ligandxyzfilenamelist:
                     ligandtypes=self.GrabTypeNumbers(xyz)
@@ -5374,6 +5380,8 @@ class PolarizableTyper():
                 linesplitall=re.split(r'(\s+)', line)
                 for i in range(len(linesplitall)):
                     element=linesplitall[i]
+                    if '.xyz' in filename and (i!=12):
+                        continue
                     if self.RepresentsInt(element):
                         oldtypenum=np.abs(int(element))
                         if oldtypenum in oldtypetonewtype.keys():
@@ -5417,16 +5425,18 @@ class PolarizableTyper():
             return minnumberfromprm
 
         def GenerateTypeMaps(self,keyfilelist):
+            newkeyfilelist=keyfilelist.copy()
             oldtypetonewtypelist=[]
             currentmin=100000
             currentmax=0
             shift=0
             prevmaxnumberfromkey=0
             prevminnumberfromkey=0
-            for keyfilename in keyfilelist:
+            originalshift=self.GrabMaxTypeNumber(self.prmfilepath)
+            for keyfilename in newkeyfilelist:
                 maxnumberfromkey=self.GrabMaxTypeNumber(keyfilename)
                 minnumberfromkey=self.GrabMinTypeNumber(keyfilename)
-                shift+=prevmaxnumberfromkey-prevminnumberfromkey+1
+                shift+=prevmaxnumberfromkey-prevminnumberfromkey+1+originalshift
                 if minnumberfromkey<currentmin:
                     currentmin=minnumberfromkey
                 if maxnumberfromkey>currentmax:

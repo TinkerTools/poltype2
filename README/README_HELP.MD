@@ -187,7 +187,7 @@
 
 ``torsionrestraint``  specifies how many kcals/mol/rad^2 to restrain other torsions around rotatable bond to be at current dihedral angle. Default is 1641.4 (.5 kcal/mol/deg^2).
 
-``foldnum``           specifies the number of fourier terms used in torsion fitting. Default is 4.
+``foldnum``           specifies the number of fourier terms used in torsion fitting. Default is 3.
 
 ``tordatapointsnum``  specifies the number of quantum jobs to sample along the dihedral angle for all torsions. Default is 12 if number of torsion parameters to fit is less than 12, else automatically adds more points.
 
