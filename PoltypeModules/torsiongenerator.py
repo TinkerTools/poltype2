@@ -570,6 +570,8 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
                         rotbndtorescount[rotbnd]=0
                     if rotbndtorescount[rotbnd]>=maxrotbnds:
                         continue
+                    
+
                     if (b==resb and c==resc) or (b==resc and c==resb):
                         secondang = optmol.GetTorsion(resa,resb,resc,resd)
                         string='restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (resa,resb,resc,resd,torsionrestraint,round((secondang+phaseangle)%360),round((secondang+phaseangle)%360))
@@ -1455,7 +1457,9 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
             temp.write('%2s %11.6f %11.6f %11.6f\n' % (an.getElSymbol(atomicnum), float(ln.split()[2]),float(ln.split()[3]),float(ln.split()[4])))
         xyzstr.close()
     temp.write('}'+'\n')
-
+    optkingarray=[] # do try/except if lee pings optimizer fails then try optking
+    optkingarray.append('set optking { '+'\n')
+    optkingarray.append('  frozen_dihedral = ("'+'\n')
     # Fix all torsions around the rotatable bond b-c
     temp.write('geometric_keywords = {'+'\n')
     temp.write(" 'coordsys' : 'tric',"+'\n')
@@ -1510,9 +1514,11 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                         restlist.append(resttors)
                         if not firsttor:
                             temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang+phaseangle)%360))))
+                            optkingarray.append(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
                         else:
                             temp.write(" 'set' : [{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang+phaseangle)%360))))
                             firsttor=False
+                            optkingarray.append('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
 
 
                         rotbndtorescount[rotbnd]+=1
@@ -1588,16 +1594,21 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                 if resttors not in restlist and resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
                     restlist.append(resttors)
                     if not firsttor:
-                        temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang+phaseangle)%360))))
+                        temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang)%360))))
+                        optkingarray.append(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
                     else:
-                        temp.write(" 'set' : [{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang+phaseangle)%360))))
+                        temp.write(" 'set' : [{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang)%360))))
                         firsttor=False
+                        optkingarray.append('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
                     rotbndtorescount[rotbnd]+=1
     temp.write("]"+'\n')
     temp.write("  }"+'\n')
     temp.write(" }"+'\n')
-
-
+    optkingarray.append('  ")'+'\n')
+    optkingarray.append('}'+'\n')
+    for line in optkingarray:
+        temp.write(line)
+ 
     if poltype.toroptpcm==True:
         temp.write('set {'+'\n')
         temp.write('  g_convergence GAU_LOOSE'+'\n')
@@ -1638,11 +1649,19 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
         temp.write('    ['+' '+poltype.toroptbasissetfile+' '+poltype.iodinetoroptbasissetfile +' '+ ']'+'\n')
         temp=ReadInBasisSet(poltype,temp,poltype.toroptbasissetfile,poltype.iodinetoroptbasissetfile,'    ')
         temp.write('    }'+'\n')
-        temp.write("optimize('%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.toroptmethod.lower(),'geometric')+'\n')
+        temp.write('try:'+'\n')
+
+        temp.write("    optimize('%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.toroptmethod.lower(),'geometric')+'\n')
+        temp.write('except:'+'\n') 
+        temp.write('    set opt_coordinates both'+'\n')
+        temp.write("    optimize('%s')" % (poltype.toroptmethod.lower())+'\n')
 
     else:
-
-        temp.write("optimize('%s/%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.toroptmethod.lower(),poltype.toroptbasisset,'geometric')+'\n')
+        temp.write('try:'+'\n')
+        temp.write("    optimize('%s/%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.toroptmethod.lower(),poltype.toroptbasisset,'geometric')+'\n')
+        temp.write('except:'+'\n') 
+        temp.write('    set opt_coordinates both'+'\n')
+        temp.write("    optimize('%s/%s')" % (poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
     if poltype.freq:
         temp.write('    scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
     temp.write('clean()'+'\n')

@@ -1717,7 +1717,7 @@ class PolarizableTyper():
                 pdbxyz.CallPDB2PQR(self,self.uncomplexedproteinpdbname)
                 sys.exit()
 
-            self.originalkeyfilename=self.AppendKeys(self.keyfilenamelist)
+            self.originalkeyfilename=self.AppendKeys(self.keyfilenamelist,'ligands.key')
             mpolearrays=self.CheckInputXYZKeyFiles(ligandonly=True) # check xyz/keys of ligands before making complex XYZ
             if self.complexation==True and self.complexedproteinpdbname!=None: 
 
@@ -1959,11 +1959,9 @@ class PolarizableTyper():
 
             for i in range(len(self.newkeyfilename)):
                 newkeyfilename=self.newkeyfilename[i]
-                tempkey=self.AppendKeys(self.keyfilenamelist)
-                shutil.copy(tempkey,newkeyfilename)
+                self.AppendKeys(self.keyfilenamelist,newkeyfilename)
                 if i==0:
                     self.ModifyCharge(newkeyfilename,mpolearrays)
-
             if self.complexation==True and self.solvation==False:
                 self.keyfilename=[[self.foldername+'_comp'+'.key']]
                 if self.perturbkeyfilelist!=None:
@@ -2336,8 +2334,7 @@ class PolarizableTyper():
 
 
 
-        def AppendKeys(self,keyfilenamelist):
-            thekey='ligands.key'
+        def AppendKeys(self,keyfilenamelist,thekey):
             temp=open(thekey,'w')
             for key in keyfilenamelist:
                 othertemp=open(key,'r')
@@ -4512,7 +4509,7 @@ class PolarizableTyper():
                 if filename[-2]=='_':
                     filename=filename[:-2]
                 newfilename=filename+'_'+newcount
-                os.remove(self.receptorligandxyzfilename)
+                #os.remove(self.receptorligandxyzfilename)
                 os.rename(newfilename,self.receptorligandxyzfilename)
 
 
@@ -4948,7 +4945,6 @@ class PolarizableTyper():
                 return []
             if self.receptorligandxyzfilename!=None and self.originalkeyfilename!=None: 
                 
-
                 cmdstr=self.trueanalyzepath+' '+self.receptorligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'e'
                 submit.call_subsystem(self,cmdstr,wait=True)    
                 cmdstr=self.trueanalyzepath+' '+self.receptorligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'m'+'> alz.out'
@@ -4964,7 +4960,6 @@ class PolarizableTyper():
                     self.complexcharge,resid=self.ReadCharge('alz.out')
                 else:
                     mpolearrays=[]
-
 
             
 

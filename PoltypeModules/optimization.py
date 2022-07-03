@@ -133,7 +133,6 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
             temp.write('  "'+')'+'\n')
             temp.write('}'+'\n')
     if len(torsionrestraints)!=0:
-        '''
         temp.write('set optking { '+'\n')
         temp.write('  frozen_dihedral = ("'+'\n')
         for residx in range(len(torsionrestraints)):
@@ -146,7 +145,6 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
 
         temp.write('  ")'+'\n')
         temp.write('}'+'\n')
-        '''
 
         temp.write('geometric_keywords = {'+'\n')
         temp.write(" 'coordsys' : 'tric',"+'\n')
@@ -181,17 +179,32 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
         temp=ReadInBasisSet(poltype,temp,poltype.optbasissetfile,poltype.iodineoptbasissetfile)
         temp.write('    }'+'\n')
         if len(torsionrestraints)!=0:
-            temp.write("optimize('%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.optmethod.lower(),'geometric')+'\n')
-        else:
-            temp.write("optimize('%s',engine='%s')" % (poltype.optmethod.lower(),'geometric')+'\n')
+            temp.write('try:'+'\n')
 
-                                                
+            temp.write("    optimize('%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.optmethod.lower(),'geometric')+'\n')
+            temp.write('except:'+'\n') 
+            temp.write('    set opt_coordinates both'+'\n')
+            temp.write("    optimize('%s')" % (poltype.optmethod.lower())+'\n')
+        else:
+            temp.write('try:'+'\n')
+            temp.write("    optimize('%s',engine='%s')" % (poltype.optmethod.lower(),'geometric')+'\n')
+            temp.write('except:'+'\n') 
+            temp.write('    set opt_coordinates both'+'\n')
+            temp.write("    optimize('%s')" % (poltype.optmethod.lower())+'\n')                                  
+
     else:                                       
-        if len(torsionrestraints)!=0:                                        
-            temp.write("optimize('%s/%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.optmethod.lower(),poltype.optbasisset,'geometric')+'\n')
-
+        if len(torsionrestraints)!=0:     
+            temp.write('try:'+'\n')
+            temp.write("    optimize('%s/%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.optmethod.lower(),poltype.optbasisset,'geometric')+'\n')
+            temp.write('except:'+'\n') 
+            temp.write('    set opt_coordinates both'+'\n')
+            temp.write("    optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
         else:
-            temp.write("optimize('%s/%s',engine='%s')" % (poltype.optmethod.lower(),poltype.optbasisset,'geometric')+'\n')
+            temp.write('try:'+'\n')
+            temp.write("    optimize('%s/%s',engine='%s')" % (poltype.optmethod.lower(),poltype.optbasisset,'geometric')+'\n')
+            temp.write('except:'+'\n') 
+            temp.write('    set opt_coordinates both'+'\n')
+            temp.write("    optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
 
     if poltype.freq:
         temp.write('    scf_e,scf_wfn=freq("%s/%s",return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')

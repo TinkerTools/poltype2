@@ -191,7 +191,6 @@ def ComputeIdealGroupRestraints(poltype,ligandindices,fxyz,nmin=4,nmax=8,sele='C
     ligandcom=ComputeCOM(poltype,atomidxtovecdic,atomidxtomassdic)       
     ligandatomindex=FindClosestLigandAtomToCOM(poltype,ligandcom,atomidxtovecdic,indextosym)
     
-    
     if sele=='protein':
         indices=poltype.proteinindices[:]
     else:

@@ -48,7 +48,7 @@ def GenerateProteinTinkerXYZFile(poltype):
         warnings.warn(string)
         poltype.WriteToLog(string)
 
-    indextocoordinates,annihilateindextocoordinates,lastligindex,allligands,ligands,listofindextopdbindex=GrabLigandCoordinates(poltype,newuncomplexedatomnum)
+    indextocoordinates,annihilateindextocoordinates,lastligindex,allligands,ligands,listofindextopdbindex,diff=GrabLigandCoordinates(poltype,newuncomplexedatomnum)
     poltype.ligandindices[0]=list(annihilateindextocoordinates.keys())
     poltype.allligandindices[0]=list(indextocoordinates.keys())
     poltype.allligands=allligands
@@ -56,7 +56,7 @@ def GenerateProteinTinkerXYZFile(poltype):
     nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement=GrabNonLigandHETATMInfo(poltype,poltype.complexedproteinpdbname,indextocoordinates,proteinindextocoordinates,lastligindex) 
     poltype.hetatmindices=list(nonlighetatmindextocoordinates.keys())
     FindWatersIonsInPocketToRestrain(poltype,nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement,indextocoordinates)
-    GenerateComplexedTinkerXYZFile(poltype,poltype.uncomplexedxyzname,indextocoordinates,newuncomplexedatomnum,nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement,listofindextopdbindex)
+    GenerateComplexedTinkerXYZFile(poltype,poltype.uncomplexedxyzname,indextocoordinates,newuncomplexedatomnum,nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement,listofindextopdbindex,diff)
     #ligandindices=poltype.ligandindices[0]
     #GeneratePDBFileFromXYZ(poltype,poltype.complexedxyzname,ligandindices)
 
@@ -143,7 +143,7 @@ def readTXYZ(poltype,TXYZ):
 
 
 def SMILESMatches(poltype,ligandsmiles,rdkitmol,pdbmol):
-    ligandsmiles=ligandsmiles.replace('=','~').replace('-','~') # sometimes bond order can be different from PDB so remove bond order for detection :)
+    ligandsmiles=ligandsmiles.replace('=','~').replace('-','~').replace('/','') # sometimes bond order can be different from PDB so remove bond order for detection :)
     p = Chem.MolFromSmarts(ligandsmiles)
     matches=rdkitmol.GetSubstructMatches(p)
     newmatches=[]
@@ -172,7 +172,7 @@ def GrabLigandCoordinates(poltype,proteinatomnum): # appending after protein, be
     listofindextopdbindex=[]
     smilestoindicesalreadyused={}
     for ligandsmilesidx in range(len(poltype.ligandsmileslist)):
-        ligandsmiles=poltype.ligandsmileslist[ligandsmilesidx].replace('=','~').replace('-','~')
+        ligandsmiles=poltype.ligandsmileslist[ligandsmilesidx].replace('=','~').replace('-','~').replace('/','')
         xyz=poltype.ligandxyzfilenamelist[ligandsmilesidx]
         molname=xyz.replace('.xyz','.mol')
         ligm=Chem.MolFromMolFile(molname,removeHs=False,sanitize=False)
@@ -200,7 +200,6 @@ def GrabLigandCoordinates(poltype,proteinatomnum): # appending after protein, be
         indextopdbindex=temp[minindex]
         listofindextopdbindex.append(indextopdbindex)
         smilestoindicesalreadyused[ligandsmiles].append(minvalue)
-
     for xyz,smiles in poltype.ligandxyztosmiles.items():
         if xyz in poltype.annihilateligandxyzfilenamelist:
             ligxyzfnamelist=[]
@@ -231,6 +230,12 @@ def GrabLigandCoordinates(poltype,proteinatomnum): # appending after protein, be
                     if match not in ligands:
                         ligands.append(match)
                     truematches.extend(match)
+    ligands=SortLigandIndices(poltype,ligands)
+    allligands=SortLigandIndices(poltype,allligands)
+    firstligindex=allligands[0][0]
+    diff=firstligindex-firstatomidx
+
+    firstatomidx+=diff
     atomiter=openbabel.OBMolAtomIter(pdbmol)
     count=0
     for atom in atomiter:
@@ -239,7 +244,7 @@ def GrabLigandCoordinates(poltype,proteinatomnum): # appending after protein, be
         resname=res.GetName()
         if atomidx in allmatches:
             coords=[atom.GetX(),atom.GetY(),atom.GetZ()]
-            newindex=firstatomidx+count
+            newindex=firstatomidx+count-diff
             indextocoordinates[newindex]=coords
             oldindextonewindex[atomidx]=newindex
             if atomidx in truematches:
@@ -251,22 +256,34 @@ def GrabLigandCoordinates(poltype,proteinatomnum): # appending after protein, be
     for match in allligands:
         newallmatch=[]
         for index in match:
-            newindex=oldindextonewindex[index]
-            newallmatch.append(newindex)
+            nnewindex=oldindextonewindex[index]
+            newallmatch.append(nnewindex)
         newallligands.append(newallmatch)
-
     newligands=[]
     for match in ligands:
         newmatch=[]
         for index in match:
-            newindex=oldindextonewindex[index]
-            newmatch.append(newindex)
+            nnewindex=oldindextonewindex[index]
+            newmatch.append(nnewindex)
         newligands.append(newmatch)
 
-    return indextocoordinates,annihilateindextocoordinates,newindex,newallligands,newligands,listofindextopdbindex   
+    return indextocoordinates,annihilateindextocoordinates,newindex,newallligands,newligands,listofindextopdbindex,diff 
 
 
-def GenerateComplexedTinkerXYZFile(poltype,uncomplexedxyzname,indextocoordinates,uncomplexedatomnum,nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement,listofindextopdbindex):
+def SortLigandIndices(poltype,array):
+    newarray=[]
+    firstindicestoarray={}
+    for ls in array:
+        firstindex=ls[0]
+        firstindicestoarray[firstindex]=ls
+    for key in sorted(firstindicestoarray):
+        newarray.append(firstindicestoarray[key])
+
+
+    return newarray
+
+
+def GenerateComplexedTinkerXYZFile(poltype,uncomplexedxyzname,indextocoordinates,uncomplexedatomnum,nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement,listofindextopdbindex,diff):
     temp=open(uncomplexedxyzname,'r')
     results=temp.readlines()
     temp.close() 
@@ -285,16 +302,16 @@ def GenerateComplexedTinkerXYZFile(poltype,uncomplexedxyzname,indextocoordinates
         xyz=poltype.ligandxyzfilenamelist[xyzidx]
         indextopdbindex=listofindextopdbindex[xyzidx]
         atoms,coord,order,types,connections=readTXYZ(poltype,xyz)
-        lastindex=WriteLigandToXYZ(poltype,temp,atoms,order,lastindex,indextocoordinates,types,connections,indextopdbindex)
+        lastindex=WriteLigandToXYZ(poltype,temp,atoms,order,lastindex,indextocoordinates,types,connections,indextopdbindex,diff)
     WriteHETATMToXYZ(poltype,temp,nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement)
     temp.close()
 
-def WriteLigandToXYZ(poltype,temp,atoms,order,lastindex,indextocoordinates,types,connections,indextopdbindex):
+def WriteLigandToXYZ(poltype,temp,atoms,order,lastindex,indextocoordinates,types,connections,indextopdbindex,diff):
     shift=lastindex
     for idx in range(len(atoms)):
         element=atoms[idx]
         oldindex=int(order[idx])
-        pdbindex=indextopdbindex[oldindex]
+        pdbindex=indextopdbindex[oldindex]-diff
         newindex=oldindex+shift
         coords=indextocoordinates[pdbindex]
         x=coords[0]

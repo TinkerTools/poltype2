@@ -343,13 +343,12 @@ def EquilibriationProtocol(poltype):
                 poltype.allrestraintdistances.append(dist)
                 if grp1 in poltype.annihilaterestrainatomgroup1:
                     poltype.restraintdistances.append(dist)
-        
+             
 
         for i in range(len(poltype.minboxfilename)):
             firstxyz=poltype.minboxfilename[i]
             secondxyz=poltype.equilboxfilename[i]
             shutil.copy(firstxyz,secondxyz)
-
         ExecuteEquilibriation(poltype)
         firstframe=poltype.equilframenum-poltype.equilframenumNPT
         lastframe=poltype.equilframenum
