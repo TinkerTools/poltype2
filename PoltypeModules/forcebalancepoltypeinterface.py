@@ -13,7 +13,7 @@ import subprocess
 import itertools 
 import csv
 import time
-
+import warnings
 
 def GrabMoleculeOrder(poltypepathlist,nametopropsarray):
     nametoarrayindexorder={}
@@ -348,6 +348,14 @@ def GenerateLiquidCSVFile(nvtprops,listoftptopropdics,molnamelist):
         else:
             gencsv=False
         indextogeneratecsv[i]=gencsv
+
+    boolvalues=list(indextogeneratecsv.values())
+    truths=boolvalues.count(True)
+    falacies=boolvalues.count(False)
+    if truths>0:
+        if falacies>0:
+            raise ValueError('Trying to fit some molecules to liquid data and others to only QM')
+
     return indextogeneratecsv
 
 def ReadInPoltypeFiles(poltypepathlist):
@@ -499,6 +507,8 @@ def GrabVdwTypeLinesFromFinalKey(keyfilelist,vdwtypeslist):
 def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogether,keyfilelines,addwaterprms,prmfilelines,vdwprmtypestofit,vdwtypestoeval,vdwtypeslist):
     vdwtypetoindex={'S':2,'T':3,'D':4}
     prmtypestofit=[vdwtypetoindex[i] for i in vdwprmtypestofit]
+    if 2 in prmtypestofit and 3 in prmtypestofit:
+        warnings.warn('WARNING! Fitting radius and depth at same time may lead to parameter compensation')
     prmtypestoeval=[vdwtypetoindex[i] for i in vdwtypestoeval]
     transferprmstofit=[]
     for index in vdwtypetoindex.values():

@@ -134,6 +134,7 @@
 
 ``generateextendedconf`` specifies to use extended conformation for geometry optimization with torsions restrained. Default is True.
 
+``optloose`` specifies to use GAU_LOOSE optimization convergence criteria for psi4 optimization (both first geometry optimzation and for torsion geometry optimization)
 
 #### Distributed Multipole Analysis and Electrostatic Single Point
 

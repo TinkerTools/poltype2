@@ -85,6 +85,7 @@ from operator import itemgetter
 
 @dataclass
 class PolarizableTyper():
+        optloose:bool=True
         inputkeyfile:None=None
         writeoutmultipole:bool=True
         writeoutbond:bool=True
@@ -489,7 +490,11 @@ class PolarizableTyper():
                 self.rotbndlist = []
             else:
                 self.rotbndlist=self.rotbndlist
-               
+            self.torsettototalqmtime={}
+            self.torsettooptqmtime={}
+            self.torsettospqmtime={}
+            self.torsettonumpoints={}
+ 
                     
             opts, xargs = getopt.getopt(sys.argv[1:],'h',["help"])
 
@@ -595,6 +600,13 @@ class PolarizableTyper():
                                 self.writeoutangle = True
                             else:
                                 self.writeoutangle=self.GrabBoolValue(a)
+                        
+                        elif "optloose" in newline:
+                            if '=' not in line:
+                                self.optloose = True
+                            else:
+                                self.optloose=self.GrabBoolValue(a)
+
                         elif "writeoutstrbnd" in newline:
                             if '=' not in line:
                                 self.writeoutstrbnd = True
@@ -1528,13 +1540,12 @@ class PolarizableTyper():
                 gb=stat.f_bfree*stat.f_bsize*10**-9
                 gb=str(int(int(gb*self.consumptionratio)/self.parentjobsatsametime))
                 self.maxdisk=gb+'GB'
-
             if self.maxmem==None:
                 b=psutil.virtual_memory().available
                 gb=b*10**-9
                 gb=str(int(int(gb*self.consumptionratio)/self.parentjobsatsametime))
                 self.maxmem=gb+'GB'
-
+               
             if self.numproc==None:
                 cpu=multiprocessing.cpu_count()
                 cpu=str(int(int(cpu*self.consumptionratio)/self.parentjobsatsametime))
@@ -2818,7 +2829,7 @@ class PolarizableTyper():
             for filepathsidx in range(len(listoffilepaths)):
                 filepaths=listoffilepaths[filepathsidx]
                 cputimearray=[]
-                for logfile in filepaths: 
+                for logfile in filepaths:
                     if os.path.isfile(logfile):
                         with open(logfile) as frb:
                             for line in frb:
@@ -4041,6 +4052,13 @@ class PolarizableTyper():
                  esp.CheckDipoleMoments(self,optmol)
             if os.path.exists(self.tmpkeyfile):
                 self.FinalVDWMultipoleCheck(self.tmpkeyfile)
+            for torset,totaltime in self.torsettototalqmtime.items():
+                sptime=self.torsettospqmtime[torset]
+                opttime=self.torsettooptqmtime[torset]
+                numpoints=self.torsettonumpoints[torset]
+                self.WriteToLog('Total torsion QM time for '+str(torset)+' is '+str(round(totaltime,3))+' hours'+' and '+str(numpoints)+' conformations')
+                self.WriteToLog('OPT torsion QM time for '+str(torset)+' is '+str(round(opttime,3))+' hours'+' and '+str(numpoints)+' conformations')
+                self.WriteToLog('SP torsion QM time for '+str(torset)+' is '+str(round(sptime,3))+' hours'+' and '+str(numpoints)+' conformations')
             self.WriteToLog('Poltype Job Finished'+'\n')
             
             if os.path.exists(self.scrtmpdirgau):
@@ -5229,10 +5247,10 @@ class PolarizableTyper():
 
         def PartitionResources(self):
             maxmem,memstring=self.ExtractResource(self.maxmem)
-            maxmem=maxmem/self.jobsatsametime
+            maxmem=int(maxmem/self.jobsatsametime)
             tempmaxmem=str(maxmem)+memstring
             maxdisk,diskstring=self.ExtractResource(self.maxdisk)
-            maxdisk=maxdisk/self.jobsatsametime
+            maxdisk=int(maxdisk/self.jobsatsametime)
             tempmaxdisk=str(maxdisk)+diskstring
             numproc=math.floor(int(self.numproc)/self.jobsatsametime)
             tempnumproc=str(numproc)

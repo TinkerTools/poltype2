@@ -48,7 +48,7 @@ def GeometryOPTWrapper(poltype,molist):
         if redo==False:
             optmolist.append(optmol)
             errorlist.append(error)
-            torsionrestraintslist.append(torsionrestraints)   
+            torsionrestraintslist.append(torsionrestraints)
     return optmolist,errorlist,torsionrestraintslist
  
 
@@ -73,7 +73,7 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     temp.write('}'+'\n')
     if poltype.optpcm==True:
         temp.write('set {'+'\n')
-        if loose==True:
+        if poltype.optloose==True:
             temp.write('  g_convergence GAU_LOOSE'+'\n')
         else:
             temp.write('  g_convergence GAU'+'\n')
@@ -100,7 +100,7 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     else:
         temp.write('set {'+'\n')
         temp.write('  geom_maxiter '+str(poltype.optmaxcycle)+'\n')
-        if loose==True:
+        if poltype.optloose==True:
             temp.write('  g_convergence GAU_LOOSE'+'\n')
         else:
             temp.write('  g_convergence GAU'+'\n')
@@ -148,6 +148,10 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
 
         temp.write('geometric_keywords = {'+'\n')
         temp.write(" 'coordsys' : 'tric',"+'\n')
+        if poltype.optloose==True:
+            temp.write(" 'convergence_set' : 'GAU_LOOSE',"+'\n')
+            temp.write(" 'convergence_energy' : 1e-4,"+'\n')
+
         temp.write(" 'constraints' : {"+'\n')
         for residx in range(len(torsionrestraints)):
             res=torsionrestraints[residx]

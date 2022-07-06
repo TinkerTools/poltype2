@@ -1,5 +1,6 @@
 import os
 import sys
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats, optimize, interpolate
@@ -14,9 +15,10 @@ import mdtraj as md
 import csv
 import itertools
 from PIL import Image
-
-
-
+import pandas as pd
+import random
+from random import randint
+import shutil
 
 def GrabJobDirectories(fbdir):
     jobdirs=[]
@@ -251,8 +253,10 @@ def PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoin
     nametotptofinalprops={}
     nametoformulatormse={}
     nametoformulatomse={}
+    listofmoleculenametoproptoimagenames=[]
     for tpdic in tpdiclist:
-        nametotptofinalprops=PlotFBLiq(tpdic,nametotptofinalprops)
+        nametotptofinalprops,moleculetoproptoimagenames=PlotFBLiq(tpdic,nametotptofinalprops)
+        listofmoleculenametoproptoimagenames.append(moleculetoproptoimagenames)
     nametofigs={}
     nametoaxes={}
     for qmtarget,targetdic in qmtargetnamedic.items():
@@ -307,7 +311,7 @@ def PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoin
             nametoformulatomse[name][formula]=msvalues[-1]
             os.chdir('..')
 
-    return nametotptofinalprops,nametoformulatormse,nametoformulatomse
+    return nametotptofinalprops,nametoformulatormse,nametoformulatomse,listofmoleculenametoproptoimagenames
 
 def GrabStructure(formula):
     files=os.listdir()
@@ -379,6 +383,7 @@ def PlotFBQM(targetdic,formula,indices):
 
 
 def PlotFBLiq(tpdic,nametotptofinalprops):
+    moleculetoproptoimagenames={}
     for name in tpdic.keys():
         dic=tpdic[name]
         if not os.path.isdir(name):
@@ -465,8 +470,12 @@ def PlotFBLiq(tpdic,nametotptofinalprops):
                     proptoaxes[propertyval].plot(x_new,y_smooth,color=c)
                 except:
                     pass
-                imagename=newtitle+'.png'
+                imagename=newtitle.replace(' ','_')+'.png'
                 proptofigs[propertyval].savefig(imagename)
+                if name not in moleculetoproptoimagenames.keys():
+                    moleculetoproptoimagenames[name]={}
+                moleculetoproptoimagenames[name][propertyval]=os.path.join(os.getcwd(),imagename)
+
                 proptoaxes[relprop].scatter(x,relerr, s=10, c=[c], marker="s", label=string)
                 try:
                     f = interp1d(x,relerr, kind='quadratic')
@@ -485,7 +494,7 @@ def PlotFBLiq(tpdic,nametotptofinalprops):
 
  
         os.chdir('..')
-    return nametotptofinalprops
+    return nametotptofinalprops,moleculetoproptoimagenames
 
 def ScatterPlot2D(title,x,y1,y2,xkey,ykey,labels):
     x=np.array(x)
@@ -1144,42 +1153,52 @@ def ExtractNeatLiquidIndices(truenametoindices):
 def WriteOutParamTable(moltotypetoprms,moltotypetoelement,moltotypetofitrad,moltotypetofitdep,moltotypetofitred):
     tempname='SummaryParams.csv'
     nametoallprmlines={}
+    elementtoprmlines={}
     with open(tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         header=['Name','Type','Element','Radius','Depth','Reduction','Fit Radius','Fit Depth','Fit Reduction']
         energy_writer.writerow(header)
         for mol,typetoprms in moltotypetoprms.items():
             typetoelement=moltotypetoelement[mol]
-            typetofitrad=moltotypetofitrad[mol]
-            typetofitdep=moltotypetofitdep[mol]
-            typetofitred=moltotypetofitred[mol]
-            for typenum,prms in typetoprms.items():
-                array=[]
-                element=typetoelement[typenum]
-                radius=round(prms[0],3)
-                depth=round(prms[1],3)
-                shrink=round(prms[2],3)
-                fitrad=typetofitrad[typenum]
-                fitdep=typetofitdep[typenum]
-                fitred=typetofitred[typenum]
-                array.append(mol)
-                array.append(typenum)
-                array.append(element)
-                array.append(radius)
-                array.append(depth)
-                array.append(shrink)
-                array.append(fitrad)
-                array.append(fitdep)
-                array.append(fitred)
+            if mol in moltotypetofitrad.keys():
+                typetofitrad=moltotypetofitrad[mol]
+                typetofitdep=moltotypetofitdep[mol]
+                typetofitred=moltotypetofitred[mol]
+                for typenum,prms in typetoprms.items():
+                    array=[]
+                    element=typetoelement[typenum]
+                    radius=round(prms[0],3)
+                    depth=round(prms[1],3)
+                    shrink=round(prms[2],3)
+                    fitrad=typetofitrad[typenum]
+                    fitdep=typetofitdep[typenum]
+                    fitred=typetofitred[typenum]
+                    array.append(mol)
+                    array.append(typenum)
+                    array.append(element)
+                    array.append(radius)
+                    array.append(depth)
+                    array.append(shrink)
+                    array.append(fitrad)
+                    array.append(fitdep)
+                    array.append(fitred)
 
 
 
-                energy_writer.writerow(array) 
-                if mol not in nametoallprmlines.keys():
-                    nametoallprmlines[mol]=[]
-                nametoallprmlines[mol].append(array)
+                    energy_writer.writerow(array) 
+                    if mol not in nametoallprmlines.keys():
+                        nametoallprmlines[mol]=[]
+                    nametoallprmlines[mol].append(array)
 
-    return nametoallprmlines
+                    if element not in elementtoprmlines.keys():
+                        elementtoprmlines[element]=[]
+                    elementtoprmlines[element].append(array)
+        energy_writer.writerow([])
+        for element,prmlines in elementtoprmlines.items():
+            for prmline in prmlines:
+                energy_writer.writerow(prmline)
+
+    return nametoallprmlines,elementtoprmlines,tempname
 
 
 
@@ -1408,7 +1427,7 @@ def WriteOutPropTable(nametotptofinalprops,moltomaxiter,targetdensityerror,targe
     print('Average Relative Density Error ',avedensityrelerr)
     print('Average Enthalpy Error ',aveenthalpyerr)
     print('Average Relative Enthalpy Error ',aveenthalpyrelerr)
-    return nametopropavgerrors
+    return nametopropavgerrors,tempname
 
 
 def GrabFinalParameters(jobdirs):
@@ -1565,6 +1584,7 @@ def WriteOutQMTable(nametoformulatormse,nametoformulatomse):
                 mse=nametoformulatomse[name][formula]
                 array=[name,formula,round(rmse,2),round(mse,2)]
                 energy_writer.writerow(array)
+    return tempname
 
                     
 def PlotLiquidPropsCorrelationForGroups(nametotptofinalprops,groupednames,nametotemparray):
@@ -1790,6 +1810,201 @@ def WriteOutParamAndAvgErrorTable(nametopropavgerrors,nametodimerqmerror,nametoa
                 energy_writer.writerow(array)
 
 
+
+def FindSameParameters(prmcsvname):
+    data = pd.read_csv(prmcsvname, quotechar='"', skipinitialspace=True)
+    radiuscol=data.loc[:,['Radius']]
+    depthcol=data.loc[:,['Depth']]
+    redcol=data.loc[:,['Reduction']]
+    raddepred=data.loc[:,['Radius','Depth','Reduction']]
+    dataslicetosameindices=FindSameParametersSingleCol(raddepred)
+    raddatatosameindices=FindSameParametersSingleCol(radiuscol)
+    depdatatosameindices=FindSameParametersSingleCol(depthcol)
+    reddatatosameindices=FindSameParametersSingleCol(redcol)
+    ls=[raddatatosameindices,depdatatosameindices,reddatatosameindices]
+    for dic in ls:
+        for value,loc in dic.items():
+            thevalue=value[0]
+            alreadyhave=False
+            for ovalue,oloc in dataslicetosameindices.items():
+                if thevalue in ovalue:
+                    for locidx in loc:
+                        if locidx in oloc:
+                            alreadyhave=True
+            if alreadyhave==False:
+                dataslicetosameindices[value]=loc
+    return data,dataslicetosameindices
+
+
+def FindSameParametersSingleCol(col):
+    datatosameindices={}
+    values=[]
+    for i in range(len(col)):
+        valuedf=col.iloc[i]
+        temp=[]
+        for k in range(len(valuedf)):
+            value=valuedf.iloc[k]
+            temp.append(value)
+        if temp not in values:
+            values.append(temp)
+    nparray=col.to_numpy()
+    for value in values:
+        indices=np.where((nparray==np.array(value)).all(axis=1))[0]
+        if len(indices)>2: # duplicate tables at bottom but sorted differently
+            datatosameindices[tuple(value)]=list(indices)
+
+
+    return datatosameindices
+
+
+
+def GenerateIndicesToColor(data,dataslicetosameindices):
+    rowindextocolumnindices={}
+    rowindextocolorindex={}
+    header=list(data.head())
+    radidx=header.index('Radius')
+    depidx=header.index('Depth')
+    redidx=header.index('Reduction')
+    ls=[radidx,depidx,redidx]
+    cidx=0
+    for dataslice,sameindices in dataslicetosameindices.items():
+        colindices=tuple(ls[:len(dataslice)])
+        for rowindex in sameindices:
+            if rowindex not in rowindextocolumnindices.keys():
+                rowindextocolumnindices[rowindex]=colindices
+            if rowindex not in rowindextocolorindex.keys():
+                rowindextocolorindex[rowindex]=cidx
+        cidx+=1
+    return rowindextocolumnindices,rowindextocolorindex
+
+def MakeExcelFile(propcsvname,prmcsvname,qmcsvname,rowindextocolumnindices,rowindextocolorindex):
+    from openpyxl.styles import Color, PatternFill, Font, Border
+    from openpyxl.styles import colors
+    from openpyxl.cell import Cell
+    spreadsheet='ParametersQMPropsTable.xlsx' 
+    df = pd.read_csv(prmcsvname)
+    df2=pd.read_csv(propcsvname)
+    df3=pd.read_csv(qmcsvname)
+    colors = (
+    '00000000', '00FFFFFF', '00FF0000', '0000FF00', '000000FF', #0-4
+    '00FFFF00', '00FF00FF', '0000FFFF', '00000000', '00FFFFFF', #5-9
+    '00FF0000', '0000FF00', '000000FF', '00FFFF00', '00FF00FF', #10-14
+    '0000FFFF', '00800000', '00008000', '00000080', '00808000', #15-19
+    '00800080', '00008080', '00C0C0C0', '00808080', '009999FF', #20-24
+    '00993366', '00FFFFCC', '00CCFFFF', '00660066', '00FF8080', #25-29
+    '000066CC', '00CCCCFF', '00000080', '00FF00FF', '00FFFF00', #30-34
+    '0000FFFF', '00800080', '00800000', '00008080', '000000FF', #35-39
+    '0000CCFF', '00CCFFFF', '00CCFFCC', '00FFFF99', '0099CCFF', #40-44
+    '00FF99CC', '00CC99FF', '00FFCC99', '003366FF', '0033CCCC', #45-49
+    '0099CC00', '00FFCC00', '00FF9900', '00FF6600', '00666699', #50-54
+    '00969696', '00003366', '00339966', '00003300', '00333300', #55-59
+    '00993300', '00993366', '00333399', '00333333',  #60-63
+    )
+    
+    no_of_colors=len(set(list(rowindextocolorindex.values())))
+    colorarray=[]
+    count=0
+    for col in colors:
+        if col!='00FFFFFF' and col!='00000000' and col!='00FFFF00' and count<no_of_colors:
+            colorarray.append(col)
+            count+=1
+
+ 
+    with pd.ExcelWriter(spreadsheet, engine="openpyxl") as writer:
+        sheet_name = "Parameters"
+        df.to_excel(writer, sheet_name=sheet_name)
+        sheet = writer.sheets[sheet_name]
+        for rowindex,columnindices in rowindextocolumnindices.items():
+            colorindex=rowindextocolorindex[rowindex]
+            col=colorarray[colorindex]
+            for idx in columnindices:
+                alpha=chr(ord('@')+idx+2)
+                cellnum=alpha+str(rowindex+1+1)
+                cell=sheet[cellnum]
+                cell.font = Font(color=col)   
+        sheet_name = "Properties"
+        df2.to_excel(writer, sheet_name=sheet_name)
+        sheet_name = "QM"
+        df3.to_excel(writer, sheet_name=sheet_name)
+
+
+
+def GenerateImagePropGrid(listofmoleculenametoproptoimagenames):
+    for moleculenametoproptoimagename in listofmoleculenametoproptoimagenames:
+        proptoimages={}
+        molnames=[]
+        for moleculename,proptoimage in moleculenametoproptoimagename.items():
+            molnames.append(moleculename)
+            for prop,image in proptoimage.items():
+                if prop not in proptoimages.keys():
+                    proptoimages[prop]=[]
+                proptoimages[prop].append(image)
+        for prop,images in proptoimages.items():
+            WriteOutGridImage(molnames,images,prop)
+
+
+def WriteOutGridImage(moleculenames,filenamearray,prop):
+    curdir=os.getcwd()
+    molsPerImage=len(filenamearray)
+    if (molsPerImage % 2) == 0 or (molsPerImage ** 0.5) % 1==0:
+        n=molsPerImage
+    else:
+        n=molsPerImage+1 
+    molsperrow=SmallestDivisor(n)
+    if n==2:
+        molsperrow=1
+    ximagesize=640
+    yimagesize=480
+    filenamechunks=ChunksList(Chunks(filenamearray,molsPerImage))
+    prevmatslen=len(filenamechunks[0])
+    for i in range(len(filenamechunks)):
+        filenamesublist=filenamechunks[i]
+        imagenames=[]
+        for j in range(len(filenamesublist)):
+            filename=filenamesublist[j]
+            ls=range(len(filenamesublist))
+            chunks=ChunksList(Chunks(ls,molsperrow))
+            indextorow={}
+            for rowidx in range(len(chunks)):
+                row=chunks[rowidx]
+                for j in row:
+                    indextorow[j]=rowidx
+            
+            fileprefix=filename.split('.')[0]
+            imagename=fileprefix+'.png'
+            imagenames.append(imagename)
+            
+            
+        if i>0:
+            factor=1
+        else:
+            factor=0
+        firstj=i*prevmatslen+factor
+        secondj=firstj+len(filenamesublist)-factor
+        prevmatslen=len(filenamesublist)
+         
+        basename=','.join(moleculenames)+'_'+prop
+        indextoimage={}
+        for index in range(len(filenamesublist)):
+            imagename=imagenames[index]
+            image=Image.open(imagename)
+            indextoimage[index]=image
+        
+        cols=len(set(list(indextorow.values())))
+        dest = Image.new('RGB', (ximagesize*molsperrow,yimagesize*cols))
+        for j in range(len(filenamesublist)):
+            row=indextorow[j]
+            x=(j-molsperrow*(row))*ximagesize
+            y=(row)*yimagesize
+            dest.paste(indextoimage[j],(x,y))
+        dest.show()
+        finalname=basename+'.png'
+        dest.save(finalname)
+        newname=os.path.join(curdir,finalname)
+
+
+
+
 def PlotForceBalanceResults(fbdir,targetdensityerror,targetenthalpyerror):
     curdir=os.getcwd()
     jobdirs=GrabJobDirectories(fbdir)
@@ -1801,20 +2016,24 @@ def PlotForceBalanceResults(fbdir,targetdensityerror,targetenthalpyerror):
     neatliqnametoindices=ExtractNeatLiquidIndices(truenametoindices)
     os.chdir(curdir)
     nametofilenametoformula=PlotAllDimers(nametodimerstructs,truenametoindices)
-    nametotptofinalprops,nametoformulatormse,nametoformulatomse=PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoindices)
+    nametotptofinalprops,nametoformulatormse,nametoformulatomse,listofmoleculenametoproptoimagenames=PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoindices)
     moltotptoarc,moltomaxiter=GrabFinalNeatLiquidTrajectories(jobdirs)
-    nametopropavgerrors=WriteOutPropTable(nametotptofinalprops,moltomaxiter,targetdensityerror,targetenthalpyerror)
+    nametopropavgerrors,propcsvname=WriteOutPropTable(nametotptofinalprops,moltomaxiter,targetdensityerror,targetenthalpyerror)
     PlotAllRDFs(moltotptoarc,neatliqnametoindices)
     prmfiles=GrabFinalParameters(jobdirs)
     moltotypetoprms,moltotypetoelement,moltotypetofitrad,moltotypetofitdep,moltotypetofitred=GrabParameterValues(prmfiles)
-    nametoallprmlines=WriteOutParamTable(moltotypetoprms,moltotypetoelement,moltotypetofitrad,moltotypetofitdep,moltotypetofitred)
-    WriteOutQMTable(nametoformulatormse,nametoformulatomse)
+    nametoallprmlines,elementtoprmlines,prmcsvname=WriteOutParamTable(moltotypetoprms,moltotypetoelement,moltotypetofitrad,moltotypetofitdep,moltotypetofitred)
+    data,dataslicetosameindices=FindSameParameters(prmcsvname)
+    rowindextocolumnindices,rowindextocolorindex=GenerateIndicesToColor(data,dataslicetosameindices) 
+    qmcsvname=WriteOutQMTable(nametoformulatormse,nametoformulatomse)
     poltypedirs,groupedpoltypedirs=GrabPoltypeDirectories(jobdirs)
     nametocubefiles,groupednames=GrabCubeFiles(groupedpoltypedirs)
-    #PlotAllESPSurfaces(nametocubefiles)
+    PlotAllESPSurfaces(nametocubefiles)
     nametotemparray,nametoproptokeytoarray=PlotLiquidPropsVsTemp(nametotptofinalprops)
     PlotLiquidPropsCorrelation(nametotptofinalprops)
     PlotLiquidPropsCorrelationForGroups(nametotptofinalprops,groupednames,nametotemparray)
     PlotLiquidPropsVsTempForGroups(nametotemparray,nametoproptokeytoarray,groupednames)
     nametodimerqmerror=ComputeQMAverages(nametoformulatormse)
     WriteOutParamAndAvgErrorTable(nametopropavgerrors,nametodimerqmerror,nametoallprmlines)
+    MakeExcelFile(propcsvname,prmcsvname,qmcsvname,rowindextocolumnindices,rowindextocolorindex)
+    GenerateImagePropGrid(listofmoleculenametoproptoimagenames) 

@@ -254,25 +254,6 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                         catom=mol.GetAtom(rtc)
                         rtbatomicnum=batom.GetAtomicNum()
                         rtcatomicnum=catom.GetAtomicNum()
-                        if rtbatomicnum==6:
-                            iteratomatom = openbabel.OBAtomAtomIter(batom)
-                            hcount=0
-                            for nrtb in iteratomatom:
-                                nrtbatomicnum=nrtb.GetAtomicNum()
-                                if nrtbatomicnum==1:
-                                    hcount+=1
-                            if hcount==3:
-                                continue 
-                        if rtcatomicnum==6:
-                            iteratomatom = openbabel.OBAtomAtomIter(catom)
-                            hcount=0
-                            for nrtc in iteratomatom:
-                                nrtcatomicnum=nrtc.GetAtomicNum()
-                                if nrtcatomicnum==1:
-                                    hcount+=1
-                            if hcount==3:
-                                continue 
-
                         rtaatomicnum=aatom.GetAtomicNum()
                         rtdatomicnum=datom.GetAtomicNum()
                         if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
@@ -914,53 +895,17 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             phaseangles=inistructophaselist[initialtinkerstructure]
             finished,error=poltype.CheckNormalTermination(outputlog)
             cartxyz=outputlog.replace('.log','.xyz')
-             
-            if finished==False and 'opt' in outputlog and poltype.fullopt==False: # if there is an error, then finished=False
-                bondtoposame=CheckBondTopology(poltype,outputlog,initialtinkerstructure)
-                maxiter=4
-                attempts=0
-                while bondtoposame==False:
-                    if attempts>=maxiter or finished==True:
-                        break
-                    inputname,outputlog,cmdstr,scratchdir,executable=GenerateTorsionOptInputFile(poltype,tinkerxyz,torset,phaseangles,optmol,variabletorlist,mol,'1')
-                    jobtolog={cmdstr:outputlog}
-                    otherfinishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtolog,True)
-                    opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
-                    ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz) 
-                    bondtoposame=CheckBondTopology(poltype,outputlog,initialtinkerstructure)
-                    finished,error=poltype.CheckNormalTermination(outputlog)
-                    attempts+=1
-                if outputlog not in finishedjobs: # assume if not converged in 5 cycles (or 20 etc) then bond lengths are okay, if not torsionfit will catch later
+            if finished==True:
+                opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
+                tinkerxyz=outputlog.replace('.log','_tinker.xyz')
+                ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz)
+                if outputlog not in finishedjobs:
                     finishedjobs.append(outputlog)
+                phsang=optlogtophaseangle[outputlog]
+                newphaseangles.append(phsang)
+                    
 
-            else:
-                if finished==True:
-                    opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
-                    tinkerxyz=outputlog.replace('.log','_tinker.xyz')
-                    ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz)
-                    obConversion = openbabel.OBConversion()
-                    themol = openbabel.OBMol()
-                    obConversion.SetInFormat('xyz')
-                    obConversion.ReadFile(themol, cartxyz)
-                    obConversion.SetOutFormat('mol')
-                    obConversion.WriteFile(themol,'temp.mol')
-                    try:
-                        m=Chem.MolFromMolFile('temp.mol',removeHs=False,sanitize=False)
-                        smarts=rdmolfiles.MolToSmarts(m)
-                        if '.' in smarts and '*.' not in smarts:
-                            poltype.WriteToLog('Warining: Fragments detected in file from optimization, will remove point from fitting  '+outputlog)
-                        else:
-                            if outputlog not in finishedjobs:
-                                finishedjobs.append(outputlog)
-                            phsang=optlogtophaseangle[outputlog]
-                            newphaseangles.append(phsang)
-                    except:
-                        if outputlog not in finishedjobs:
-                            finishedjobs.append(outputlog)
-                        phsang=optlogtophaseangle[outputlog]
-                        newphaseangles.append(phsang)
-
-        poltype.torsettophaselist[tuple(torset)]=newphaseangles          
+        poltype.torsettophaselist[tuple(torset)]=newphaseangles         
     firstfinishedjobs=finishedjobs[:]
     for job in firstfinishedjobs:
         if job not in finishedjobs:
@@ -974,6 +919,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     jobtoinputfilepaths={}
     jobtooutputfiles={}
     jobtoabsolutebinpath={}
+    torsettooptcputime={}
     for torset in poltype.torlist:
         variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
@@ -986,6 +932,9 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                 phaselist=optlogtophaseangle[outputlog]
                 finishedoutputlogs.append(outputlog)
                 finishedflatphaselist.append(phaselist)
+
+        listofcputimesopt=poltype.TabulateCPUTimes([finishedoutputlogs])[0]
+        torsettooptcputime[torset]=listofcputimesopt
         outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangles,optlogtosplog,inputfilepaths,outputfilenames,executables=ExecuteSPJobs(poltype,finishedoutputlogs,finishedflatphaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,mol,optlogtosplog,optlogtophaseangle)
         lognames=[]
         torsettospoutputlogs[tuple(torset)]=outputlogs
@@ -1045,21 +994,37 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                 newphaselist.append(angle)
         poltype.torsettophaselist[tuple(torset)]=newphaselist
         test=poltype.torsettophaselist[tuple(torset)]
-
+    torsettospcputime={}
     for torset in poltype.torlist:
         variabletorlist=poltype.torsettovariabletorlist[tuple(torset)]
         flatphaselist=poltype.torsettophaselist[tuple(torset)]
         outputlogs=torsettospoutputlogs[tuple(torset)]
         optoutputlogs=torsettooptoutputlogs[tuple(torset)]
+        finishedsplogs=[]
         for i in range(len(outputlogs)):
             optoutputlog=optoutputlogs[i]
             if optoutputlog in optlogtosplog.keys():
                 outputlog=optlogtosplog[optoutputlog]
                 if optoutputlog in finishedjobs and outputlog not in errorjobs:
+                    finishedsplogs.append(outputlog)
                     phaseangles=outputlogtophaseangles[outputlog]
                     initialxyz=totaloutputlogtoinitialxyz[optoutputlog]
                     poltype.optoutputtotorsioninfo[outputlog]= [torset,optmol,variabletorlist,phaseangles,bondtopology,optoutputlog,initialxyz]
+
+        torsettospcputime[torset]=poltype.TabulateCPUTimes([finishedsplogs])[0]
     os.chdir('..')
+    
+    for torset,opttimes in torsettooptcputime.items():
+        opttime=numpy.sum(numpy.array(opttimes))
+        poltype.torsettonumpoints[torset]=len(opttimes)
+        sptimes=torsettospcputime[torset]
+        sptime=numpy.sum(numpy.array(sptimes))
+        totaltime=opttime+sptime
+        poltype.torsettototalqmtime[torset]=totaltime
+        poltype.torsettooptqmtime[torset]=opttime
+        poltype.torsettospqmtime[torset]=sptime
+    
+
 
 
 
@@ -1463,6 +1428,9 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     # Fix all torsions around the rotatable bond b-c
     temp.write('geometric_keywords = {'+'\n')
     temp.write(" 'coordsys' : 'tric',"+'\n')
+    if poltype.optloose==True:
+        temp.write(" 'convergence_set' : 'GAU_LOOSE',"+'\n')
+        temp.write(" 'convergence_energy' : 1e-4,"+'\n')
     temp.write(" 'constraints' : {"+'\n')
     restlist=[]
     firsttor=True
@@ -1543,24 +1511,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
 
                 rtbatomicnum=batom.GetAtomicNum()
                 rtcatomicnum=catom.GetAtomicNum()
-                if rtbatomicnum==6:
-                    iteratomatom = openbabel.OBAtomAtomIter(batom)
-                    hcount=0
-                    for nrtb in iteratomatom:
-                        nrtbatomicnum=nrtb.GetAtomicNum()
-                        if nrtbatomicnum==1:
-                            hcount+=1
-                    if hcount==3:
-                        continue 
-                if rtcatomicnum==6:
-                    iteratomatom = openbabel.OBAtomAtomIter(catom)
-                    hcount=0
-                    for nrtc in iteratomatom:
-                        nrtcatomicnum=nrtc.GetAtomicNum()
-                        if nrtcatomicnum==1:
-                            hcount+=1
-                    if hcount==3:
-                        continue 
+                 
                 if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
                     continue
                 if (allhydtorsoneside==True or allhydtors==True) and (rtaatomicnum==1 or rtdatomicnum==1):
@@ -1634,7 +1585,8 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     else:
         temp.write('set {'+'\n')
         temp.write('  geom_maxiter '+str(poltype.optmaxcycle)+'\n')
-        temp.write('  g_convergence GAU_LOOSE'+'\n')
+        if poltype.optloose==True:
+            temp.write('  g_convergence GAU_LOOSE'+'\n')
         temp.write('  dynamic_level 1'+'\n')
         temp.write('}'+'\n')
     if poltype.allowradicals==True:
@@ -1736,7 +1688,7 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
                 atomicnum=rdkitatom.GetAtomicNum()
                 i = i + 1
                 ln = xyzstrl[i]
-                tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (an.getElSymbol(atomicnumnum), float(ln.split()[2]),float(ln.split()[3]),float(ln.split()[4])))
+                tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (an.getElSymbol(atomicnum), float(ln.split()[2]),float(ln.split()[3]),float(ln.split()[4])))
             tmpfh.write('\n')
             xyzstr.close()
     else:
