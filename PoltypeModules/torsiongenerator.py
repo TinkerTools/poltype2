@@ -947,7 +947,8 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                     try:
                         m=Chem.MolFromMolFile('temp.mol',removeHs=False,sanitize=False)
                         smarts=rdmolfiles.MolToSmarts(m)
-                        if '.' in smarts and '*.' not in smarts:
+                        frag_smarts = [_ for _ in smarts.split('.') if _ != '*']
+                        if len(frag_smarts) > 1:
                             poltype.WriteToLog('Warining: Fragments detected in file from optimization, will remove point from fitting  '+outputlog)
                         else:
                             if outputlog not in finishedjobs:
