@@ -142,7 +142,7 @@ cp ~/forcebalance/src/data/*py /home/bdw2292/miniconda3/envs/amoebamdpoltype/lib
 ### Explicit Conda Installation
 * Only do this if .yml file doesnt work
 ```
-conda create --name amoebamdpoltype python=3.7
+conda create --name amoebamdpoltype
 conda activate amoebamdpoltype
 conda config --add channels conda-forge
 conda install mdanalysis --yes

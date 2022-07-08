@@ -6,7 +6,6 @@ channels:
   - salilab
   - defaults
 dependencies:
-  - python=3.7
   - _libgcc_mutex=0.1=conda_forge
   - _openmp_mutex=4.5=2_gnu
   - ambit=0.6=py310h53dec33_2
