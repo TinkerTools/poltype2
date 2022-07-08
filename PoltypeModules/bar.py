@@ -521,7 +521,6 @@ def GrabBarFileName(poltype):
             if 'bar' in f:
                 barfile=f 
     barfilepath=os.path.join(os.getcwd(),barfile)
-
     return barfilepath
 
 def ComputeThermoProperties(poltype):

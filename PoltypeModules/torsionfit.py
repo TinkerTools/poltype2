@@ -1363,6 +1363,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
                 return numpy.sqrt(numpy.mean(numpy.square(numpy.add(numpy.divide(final_relative_tor_energy_list,shifted_qm_energy_list),c))))
             resultRel=fmin(RMSDRel,.5)
             minRMSDRel=RMSDRel(resultRel[0])
+            mm2_energy_list=numpy.add(result[0],mm2_energy_list)
         # output the profiles as plots
 
         figfname = "%s-energy-" % (poltype.molecprefix)

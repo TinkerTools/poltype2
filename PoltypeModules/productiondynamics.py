@@ -604,15 +604,11 @@ def GrabTinkerFiles(poltype):
 
 def AddLigandIndices(poltype,ligandindices,keyfilename):
     string='ligand'+' '
-    if len(ligandindices)==1:
-        firstligidx=str(indices[0])
-        lastligidx=str(indices[-1])
-        string+='-'+firstligidx+' '+lastligidx
-    else:
-        for indices in ligandindices:
-            for index in indices:
-                string+=str(index)+','
-        string=string[:-1]
+    firstindices=ligandindices[0]
+    lastindices=ligandindices[-1]
+    firstligidx=str(firstindices[0])
+    lastligidx=str(lastindices[-1])
+    string+='-'+firstligidx+' '+lastligidx
 
     string+='\n'
     keymods.AddKeyWord(poltype,keyfilename,string)

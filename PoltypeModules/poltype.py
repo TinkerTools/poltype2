@@ -429,7 +429,7 @@ class PolarizableTyper():
         qmonly:bool = False
         espfit:bool = True
         parmtors:bool = True
-        foldnum:int=3
+        foldnum:int=6
         foldoffsetlist:list = field(default_factory=lambda : [ 0.0, 180.0, 0.0, 180.0, 0.0, 180.0 ])
         torlist:None = None
         rotbndlist:None = None
@@ -2971,7 +2971,7 @@ class PolarizableTyper():
                     else:
                         if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line or "LBFGS  --  Normal Termination due to SmallGrad" in line or "Normal termination" in line or 'Normal Termination' in line or 'Total Potential Energy' in line or 'Psi4 stopped on' in line:
                             term=True
-                        if ('Tinker is Unable to Continue' in line or 'error' in line or 'Error' in line or 'ERROR' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line and 'RMS Error' not in line:
+                        if ('Tinker is Unable to Continue' in line or 'error' in line or ' Error ' in line or ' ERROR ' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line and 'RMS Error' not in line:
                             error=True
                             errorline=line
                         if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line or ('OptimizationConvergenceError' in line and 'except' in line) or "Error on total polarization charges" in line or 'Erroneous write' in line:
@@ -4930,7 +4930,7 @@ class PolarizableTyper():
 
 
         def CheckInputXYZKeyFiles(self,ligandonly=False):
-            keymods.RemoveKeyWords(self,self.originalkeyfilename,['parameters','axis','ewald','pme-grid','pme-order','cutoff','thermostat','integrator','ligand','verbose','archive','neighbor-list','polar-eps','polar-predict','heavy-hydrogen','omp-threads'])
+            keymods.RemoveKeyWords(self,self.originalkeyfilename,['parameters','axis','ewald','pme-grid','pme-order','cutoff','thermostat','integrator','ligand','verbose','archive','neighbor-list','polar-eps','polar-predict','heavy-hydrogen','omp-threads','OPENMP-THREADS'])
             string='parameters '+self.prmfilepath+'\n'
             keymods.AddKeyWord(self,self.originalkeyfilename,string)
             if self.receptorligandxyzfilename!=None and self.ligandxyzfilenamelist!=None:
