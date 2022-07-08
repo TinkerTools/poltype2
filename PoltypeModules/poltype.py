@@ -85,6 +85,7 @@ from operator import itemgetter
 
 @dataclass
 class PolarizableTyper():
+        xtbmethod:int=2
         optloose:bool=True
         inputkeyfile:None=None
         writeoutmultipole:bool=True
@@ -565,6 +566,8 @@ class PolarizableTyper():
                             self.templateligandxyzfilename=a
                         elif 'barinterval' in newline:
                             self.barinterval=int(a)
+                        elif 'xtbmethod' in newline:
+                            self.xtbmethod=int(a)
                         elif 'templateligandfilename' in newline:
                             self.templateligandfilename=a
                         elif 'prmfilepath' in newline:
@@ -1554,6 +1557,8 @@ class PolarizableTyper():
                self.jobsatsametime=math.floor(int(self.numproc)/self.coresperjob)
                if self.jobsatsametime>self.maxjobsatsametime:
                    self.jobsatsametime=self.maxjobsatsametime
+            if self.toroptmethod=='xtb':
+                self.jobsatsametime=1 # cant parrelize xtb since coords always written to same file name
             self.firsterror=False
             if self.debugmode==True:
                 self.optmethod="HF"      
@@ -2813,6 +2818,18 @@ class PolarizableTyper():
             seconds=float(timestringsplit[2])*(1/60)*(1/60)
             totaltime=hours+minutes+seconds
             return totaltime
+
+
+        def ConvertTimeStringXTB(self,timestring):
+            timestringsplit=timestring.split(',')
+            days=float(timestringsplit[0].strip().split()[0])*(24)
+            hours=float(timestringsplit[1].strip().split()[0])
+            minutes=float(timestringsplit[2].strip().split()[0])*(1/60)
+            seconds=float(timestringsplit[3].strip().split()[0])*(1/60)*(1/60)
+            totaltime=days+hours+minutes+seconds
+            return totaltime
+
+
         
         def ConvertTimeStringGaussian(self,line):
             linesplit=line.split()
@@ -2844,6 +2861,10 @@ class PolarizableTyper():
                                     cputimearray.append(walltime)
         
                                     break
+                                elif 'wall-time:' in line:
+                                    timestring=' '.join(line.split()[2:])
+                                    walltime=self.ConvertTimeStringXTB(timestring)
+                                    cputimearray.append(walltime)
         
                 listoflistofcputimes.append(cputimearray)
             return listoflistofcputimes
@@ -2969,7 +2990,7 @@ class PolarizableTyper():
                         elif 'Poltype has crashed!' in line:
                             error=True
                     else:
-                        if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line or "LBFGS  --  Normal Termination due to SmallGrad" in line or "Normal termination" in line or 'Normal Termination' in line or 'Total Potential Energy' in line or 'Psi4 stopped on' in line:
+                        if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line or "LBFGS  --  Normal Termination due to SmallGrad" in line or "Normal termination" in line or 'Normal Termination' in line or 'Total Potential Energy' in line or 'Psi4 stopped on' in line or 'finished run' in line:
                             term=True
                         if ('Tinker is Unable to Continue' in line or 'error' in line or ' Error ' in line or ' ERROR ' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line and 'RMS Error' not in line:
                             error=True
@@ -3006,7 +3027,11 @@ class PolarizableTyper():
                     else:
                         self.WriteToLog(message) 
 
-
+            if self.toroptmethod=='xtb' and 'xtb-opt' in logfname and term==True:
+                time.sleep(1) 
+                cartxyz=logfname.replace('.log','.xyz')
+                if not os.path.isfile(cartxyz) and os.path.isfile('xtbopt.xyz'):
+                    shutil.copy('xtbopt.xyz',cartxyz)
             if errormessages!=None:
                 return term,error,errormessages
             else:
@@ -3433,7 +3458,7 @@ class PolarizableTyper():
                     fsplit=f.split('.')
                     if len(fsplit)>1:
                         end=fsplit[1]
-                        if 'log' not in end and 'sdf' not in end and 'ini' not in end and 'chk' not in end and 'dat' not in end and 'mol' not in end and 'txt' not in end and f not in filestonotdelete:
+                        if 'xtb-opt' not in f and 'log' not in end and 'sdf' not in end and 'ini' not in end and 'chk' not in end and 'dat' not in end and 'mol' not in end and 'txt' not in end and f not in filestonotdelete:
                             deletearray.append(f)
             for f in deletearray:
                 os.remove(f)
@@ -3942,7 +3967,7 @@ class PolarizableTyper():
             (torlist, self.rotbndlist,hydtorsions,nonaroringtorlist) = torgen.get_torlist(self,mol,torsionsmissing)
             if atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False: 
                 self.dontfrag=True
-            if self.dontfrag==True: # if fragmenter is turned off, parition resources by jobs at sametime for parent
+            if self.dontfrag==True and self.toroptmethod!='xtb': # if fragmenter is turned off, parition resources by jobs at sametime for parent,cant parralelize xtb since coords always written to same filename
                 self.maxmem,self.maxdisk,self.numproc=self.PartitionResources()
             torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules
             torlist=[tuple(i) for i in torlist]

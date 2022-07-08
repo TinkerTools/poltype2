@@ -116,7 +116,9 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,varia
         finished,error=poltype.CheckNormalTermination(outputlog,errormessages=None,skiperrors=True)
         inputfilepath=os.path.join(os.getcwd(),inputname)
         if finished==True and 'opt' in outputlog:
-            opt.GrabFinalXYZStructure(poltype,outputlog,outputlog.replace('.log','.xyz'),mol)
+            if poltype.toroptmethod!='xtb':
+                opt.GrabFinalXYZStructure(poltype,outputlog,outputlog.replace('.log','.xyz'),mol)
+            
         if finished==False and (poltype.tordebugmode==False and poltype.toroptdebugmode==False):
             listofjobs.append(cmdstr)
             outputfilenames.append(outputlog)
@@ -153,15 +155,25 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
     for i in range(len(optoutputlogs)):
         outputlog=optoutputlogs[i]
         phaseangles=optlogtophaseangle[outputlog]
-        if not poltype.use_gaus:
-            prevstrctfname=outputlog.replace('.log','.xyz')
-            inputname,outputname=CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,mol)
-            cmdstr='psi4 '+inputname+' '+outputname
-            executable='psi4'
+        if poltype.torspmethod!='xtb':
+            if not poltype.use_gaus:
+                prevstrctfname=outputlog.replace('.log','.xyz')
+                inputname,outputname=CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,mol)
+                cmdstr='psi4 '+inputname+' '+outputname
+                executable='psi4'
+            else:
+                inputname,outputname=GenerateTorsionSPInputFileGaus(poltype,torset,optmol,phaseangles,outputlog,mol)
+                cmdstr = 'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
+                executable=poltype.gausexe
         else:
-            inputname,outputname=GenerateTorsionSPInputFileGaus(poltype,torset,optmol,phaseangles,outputlog,mol)
-            cmdstr = 'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
-            executable=poltype.gausexe
+            prevstrctfname=outputlog.replace('.log','.xyz')
+            executable='xtb'
+            prefix='%s-sp-' % (poltype.molecprefix)
+            postfix='.input'  
+            inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
+            outputname=inputname.replace(postfix,'.log')
+            cmdstr=RunXTBSPEnergy(poltype,prevstrctfname,0,mol.GetTotalCharge(),poltype.xtbmethod,outputname)
+
         finished,error=poltype.CheckNormalTermination(outputname,errormessages=None,skiperrors=True)
         inputfilepath=os.path.join(os.getcwd(),inputname)
         if finished==True and error==False:
@@ -310,20 +322,49 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     
 
 def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist,mol,currentopt):
-    if  poltype.use_gaus==False and poltype.use_gausoptonly==False:
-        inputname,outputname=CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt)
-        cmdstr='psi4 '+inputname+' '+outputname
-        executable='psi4'
-    else:
-        inputname,outputname=CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt)
-        cmdstr='GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
-        executable=poltype.gausexe
-    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
-        return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4,executable
+    if poltype.toroptmethod!='xtb':
+        if  poltype.use_gaus==False and poltype.use_gausoptonly==False:
+            inputname,outputname=CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt)
+            cmdstr='psi4 '+inputname+' '+outputname
+            executable='psi4'
+        else:
+            inputname,outputname=CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt)
+            cmdstr='GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
+            executable=poltype.gausexe
+        if poltype.use_gaus==False and poltype.use_gausoptonly==False:
+            return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4,executable
 
+        else:
+            return inputname,outputname,cmdstr,poltype.scrtmpdirgau,executable
     else:
-        return inputname,outputname,cmdstr,poltype.scrtmpdirgau,executable
+        inputstruct=ConvertTinktoXYZ(poltype,torxyzfname,torxyzfname.replace('.xyz','_cart.xyz'))
+        inputmol= opt.load_structfile(poltype,inputstruct)
+        toranglelist=GrabTorsionAngles(poltype,torset,inputmol)
+        prefix='xtb-opt-'
+        postfix='.input'  
+        inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
+        pre=inputname.replace(postfix,'')
+        resfilename=CreateConstraintsFileXTB(poltype,torset,toranglelist,pre)
+        outputname=inputname.replace(postfix,'.log')
+        optxyz,cmdstr=OptimizeXTB(poltype,inputstruct,resfilename,poltype.xtbmethod,outputname,mol.GetTotalCharge(),0)
+        executable='xtb'
+
+        return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4,executable
         
+
+
+def GrabTorsionAngles(poltype,torset,inputmol):
+    toranglelist=[]
+    for i in range(len(torset)):
+        tor=torset[i]
+        a,b,c,d=tor[:]
+        torang = inputmol.GetTorsion(a,b,c,d)
+        if torang<0:
+            torang+=360
+        toranglelist.append(torang)
+
+
+    return toranglelist
 
 def GenerateTorsionSPInputFileGaus(poltype,torset,optmol,phaseangles,prevstrctfname,mol):
     prevstruct = opt.load_structfile(poltype,prevstrctfname)
@@ -896,7 +937,8 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             finished,error=poltype.CheckNormalTermination(outputlog)
             cartxyz=outputlog.replace('.log','.xyz')
             if finished==True:
-                opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
+                if poltype.toroptmethod!='xtb':
+                    opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
                 tinkerxyz=outputlog.replace('.log','_tinker.xyz')
                 ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz)
                 if outputlog not in finishedjobs:
@@ -1399,7 +1441,8 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     prefix='%s-opt-%s_' % (poltype.molecprefix,currentopt)
     postfix='.psi4'  
     inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
-
+    inputstruct=ConvertTinktoXYZ(poltype,torxyzfname,torxyzfname.replace('.xyz','_cart.xyz'))
+    inputmol= opt.load_structfile(poltype,inputstruct)
     temp=open(inputname,'w')
     temp.write('molecule { '+'\n')
     temp.write('%d %d\n' % (mol.GetTotalCharge(),mol.GetTotalSpinMultiplicity()))
@@ -1422,6 +1465,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
             temp.write('%2s %11.6f %11.6f %11.6f\n' % (an.getElSymbol(atomicnum), float(ln.split()[2]),float(ln.split()[3]),float(ln.split()[4])))
         xyzstr.close()
     temp.write('}'+'\n')
+
     optkingarray=[] # do try/except if lee pings optimizer fails then try optking
     optkingarray.append('set optking { '+'\n')
     optkingarray.append('  frozen_dihedral = ("'+'\n')
@@ -1472,7 +1516,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                     continue
 
                 if resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
-                    rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
+                    rtang = inputmol.GetTorsion(rta,rtb,rtc,rtd)
                     if rtang<0:
                         rtang=rtang+360
 
@@ -1481,10 +1525,10 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                     else:
                         restlist.append(resttors)
                         if not firsttor:
-                            temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang+phaseangle)%360))))
+                            temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang)%360))))
                             optkingarray.append(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
                         else:
-                            temp.write(" 'set' : [{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang+phaseangle)%360))))
+                            temp.write(" 'set' : [{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang)%360))))
                             firsttor=False
                             optkingarray.append('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
 
@@ -1538,7 +1582,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
                 if rotbndtorescount[rotbnd]>=maxrotbnds:
                     continue
 
-                rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
+                rtang = inputmol.GetTorsion(rta,rtb,rtc,rtd)
                 if rtang<0:
                     rtang=rtang+360
 
@@ -2138,4 +2182,32 @@ def PrepareTorsionTorsion(poltype,optmol,mol,tortorsmissing):
     tortors=FindMainConsecutiveTorsions(poltype,tortorsmissing)
     for tortor in tortors:
         UpdateTorsionSets(poltype,tortor)
+
+
+def CreateConstraintsFileXTB(poltype,torlist,toranglelist,pre):
+    filename=pre+'_constr.txt'
+    temp=open(filename,'w')
+    temp.write('$constrain'+'\n')
+    temp.write(' force constant=0.05'+'\n')
+    for i in range(len(torlist)):
+        tor=torlist[i]
+        angle=toranglelist[i]
+        string='  dihedral: ' 
+        for index in tor:
+            string+=str(index)+','
+        string+=str(angle)+'\n'
+        temp.write(string)
+    temp.write('$end'+'\n')
+    return filename
+
+
+def OptimizeXTB(poltype,inputstruct,resfilename,xtbmethod,outputname,charge,uhf):
+    cmdstr='xtb' +' '+'--gfn'+' '+str(xtbmethod)+' '+'--chrg'+' '+str(charge)+' '+'--uhf'+' '+str(uhf)+' '+inputstruct+' '+'--opt'+' '+'--input'+' '+resfilename+' > '+outputname
+    optxyz='xtbopt.xyz'
+    return optxyz,cmdstr
+
+
+def RunXTBSPEnergy(poltype,optxyz,uhf,charge,xtbmethod,outputname):
+    cmdstr='xtb'+' '+'--gfn'+' '+str(xtbmethod)+' '+optxyz+' '+'--chrg'+' '+str(charge)+' '+'--uhf'+' '+str(uhf)+' > '+outputname
+    return cmdstr
 

@@ -168,42 +168,45 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
             tor_energy=None
             WBOvalues=None
         else:
-            use_gaus=False
-            use_gaus=CheckIfLogFileUsingGaussian(poltype,minstrctfname)
-            if use_gaus:
-                WBOmatrix=frag.GrabWBOMatrixGaussian(poltype,minstrctfname,poltype.mol)
-            else:
-                WBOmatrix=frag.GrabWBOMatrixPsi4(poltype,minstrctfname,poltype.mol)
-
             WBOvalues=[]
-            for tor in torset:
-                a,b,c,d=tor[:]
-                WBOvalue=WBOmatrix[b-1,c-1]
-                WBOvalues.append(WBOvalue)
-                
-            tmpfh = open(minstrctfname, 'r')
-            tor_energy = None
-            if not use_gaus:
-                mengi=esp.GrabFinalPsi4Energy(poltype,minstrctfname)
-                if mengi==None:
-                    tor_energy=None
+            if poltype.torspmethod!='xtb':
+                use_gaus=False
+                use_gaus=CheckIfLogFileUsingGaussian(poltype,minstrctfname)
+                if use_gaus:
+                    WBOmatrix=frag.GrabWBOMatrixGaussian(poltype,minstrctfname,poltype.mol)
                 else:
-                    tor_energy = float(mengi) * poltype.Hartree2kcal_mol
-            else:
-                for line in tmpfh:
-                    if poltype.torspmethod=='MP2':
-                        m = re.search(r'EUMP2 =\s+(\-*\d+\.\d+D\+\d+)',line)
-                        if not m is None:
-                            mengi = m.group(1).replace('D+', 'E+')
-                            tor_energy = float(mengi) * poltype.Hartree2kcal_mol
+                    WBOmatrix=frag.GrabWBOMatrixPsi4(poltype,minstrctfname,poltype.mol)
+
+                for tor in torset:
+                    a,b,c,d=tor[:]
+                    WBOvalue=WBOmatrix[b-1,c-1]
+                    WBOvalues.append(WBOvalue)
+                    
+                tmpfh = open(minstrctfname, 'r')
+                tor_energy = None
+                if not use_gaus:
+                    mengi=esp.GrabFinalPsi4Energy(poltype,minstrctfname)
+                    if mengi==None:
+                        tor_energy=None
                     else:
-                        if 'SCF Done:' in line:
-                            linesplit=line.split()
-                            result=float(linesplit[4])
-                            tor_energy = result* poltype.Hartree2kcal_mol
+                        tor_energy = float(mengi) * poltype.Hartree2kcal_mol
+                else:
+                    for line in tmpfh:
+                        if poltype.torspmethod=='MP2':
+                            m = re.search(r'EUMP2 =\s+(\-*\d+\.\d+D\+\d+)',line)
+                            if not m is None:
+                                mengi = m.group(1).replace('D+', 'E+')
+                                tor_energy = float(mengi) * poltype.Hartree2kcal_mol
+                        else:
+                            if 'SCF Done:' in line:
+                                linesplit=line.split()
+                                result=float(linesplit[4])
+                                tor_energy = result* poltype.Hartree2kcal_mol
 
 
-            tmpfh.close()
+                tmpfh.close()
+            else:
+                tor_energy=ParseXTBEnergyLog(poltype,minstrctfname)
 
         WBOarray.append(WBOvalues)
         energy_list.append(tor_energy)
@@ -1839,4 +1842,13 @@ def GenerateTorTorClasskey(poltype,firsttor,secondtor,idxtosymclass,mol):
     tortorclskey=' '.join(tortortypeidxs)
     return tortorclskey,tortoratomidxs
 
+def ParseXTBEnergyLog(poltype,outputname):
+    temp=open(outputname,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        if 'TOTAL ENERGY' in line:
+            linesplit=line.split()
+            energy=float(linesplit[-3])*poltype.Hartree2kcal_mol
+    return energy
 

@@ -192,12 +192,13 @@
 
 ``tordatapointsnum``  specifies the number of quantum jobs to sample along the dihedral angle for all torsions. Default is 12 if number of torsion parameters to fit is less than 12, else automatically adds more points.
 
-``toroptmethod`` specifies the opt method used for torsion parameterization. Default is wB97XD.
+``toroptmethod`` specifies the opt method used for torsion parameterization. Default is wB97XD. ``toroptmethod=xtb`` will use semi empirical qm methods (not psi4 or gaussian).
 
+``xtbmethod`` specifies which xtb semi-empirical method to use, must have ``xtb`` turned on for either toroptmethod or torspmethod. Default is 2 (this corresponds to GFN2-xTB). 
 
 ``toroptbasisset``    specifies which basis set to use for geometry optimization during torsion parameterization. Default is 6-31G*.
 
-``torspmethod`` specifies the SP method for torsion parameterization. Default is wB97XD.
+``torspmethod`` specifies the SP method for torsion parameterization. Default is wB97XD.``torspmethod=xtb`` will use semi empirical qm methods (not psi4 or gaussian).
 
 ``torspbasisset``  specifies which basis set to use for SP during torsion parameterization. Default is 6-311+G*.
                   
