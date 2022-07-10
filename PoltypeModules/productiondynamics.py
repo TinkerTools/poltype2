@@ -103,7 +103,7 @@ def ProductionDynamicsCommand(poltype,inputxyzname,keyfile,steps,ensemble,output
 
     return cmdstr
    
-def ModifyKeyForGasPhase(poltype,keyfilepath,changeligandindices):
+def ModifyKeyForGasPhase(poltype,keyfilepath,changeligandindices,index):
     keymods.RemoveKeyWords(poltype,keyfilepath,['axis','ewald','cutoff','correction'])
     
     if poltype.changegasphaseintegrator==True:
@@ -117,7 +117,7 @@ def ModifyKeyForGasPhase(poltype,keyfilepath,changeligandindices):
             keymods.AddKeyWord(poltype,keyfilepath,string)
     if changeligandindices==True:
         keymods.RemoveKeyWords(poltype,keyfilepath,['ligand'])
-        AddLigandIndices(poltype,poltype.ligands,keyfilepath)
+        AddLigandIndices(poltype,[poltype.ligandindices[index]],keyfilepath)
 
 
 def SearchNearestNonPerturbedFolder(poltype,folderlist,index):
@@ -269,7 +269,7 @@ def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynbo
                        changeligandindices=True
                    else:
                        changeligandindices=False
-                   ModifyKeyForGasPhase(poltype,os.path.join(newfoldpath+newtempkeyfile),changeligandindices)
+                   ModifyKeyForGasPhase(poltype,os.path.join(newfoldpath+newtempkeyfile),changeligandindices,index)
 
            else:
                arrayoflinearrays=mutate.MutateAllParameters(poltype,poltype.bgnlinetoendline,mutlambda,None,None)
@@ -628,7 +628,7 @@ def ProductionDynamicsProtocol(poltype):
                     lambdakeyfilename=lambdakeyfilenamelist[k]
                     configkeyfilename=configkeyfilenamelist[k]
                     shutil.copyfile(poltype.outputpath+configkeyfilename,poltype.outputpath+lambdakeyfilename)
-                    AddLigandIndices(poltype,poltype.ligands,lambdakeyfilename)
+                    AddLigandIndices(poltype,[poltype.ligandindices[i]],lambdakeyfilename)
                     string='ele-lambda'+'\n'
                     keymods.AddKeyWord(poltype,lambdakeyfilename,string)
                     string='vdw-lambda'+'\n'

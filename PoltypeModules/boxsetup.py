@@ -378,7 +378,6 @@ def AddIonToSolventBox(poltype,solutexyzfilename,keyfilename,tinktype,ionnum,sol
 
 
 def AddIonsToSolventBox(poltype,solutexyzfilename,keyfilename,iontypetoionnumberneut,iontypetoionnumberphysio,soluteindices,writesolute=True):
-
     iontypetototalionnum=CombineDictionaries(poltype,[iontypetoionnumberneut,iontypetoionnumberphysio])
     for tinktype in iontypetototalionnum.keys():
         ionnum=iontypetototalionnum[tinktype]
@@ -544,10 +543,58 @@ def GrabIndicesFromType(poltype,xyz,types):
     return indices
 
 
+
+def MakeLigandsConsecutive(poltype,finalxyz,allligandtypes):
+    temp=open(finalxyz,'r')
+    results=temp.readlines()
+    temp.close()
+    liglines=[]
+    for lineidx in range(len(results)):
+        line=results[lineidx]
+        linesplit=line.split()
+        if lineidx==0:
+            xyzatomnum=int(linesplit[0])
+        else:
+            if len(linesplit)>1 and '90.00' not in line:
+                index=int(linesplit[0])
+                typenum=int(linesplit[5])
+                if typenum in allligandtypes:
+                    liglines.append(line)
+    tempname=finalxyz.replace('.xyz','_TEMP.xyz')
+    temp=open(tempname,'w')
+    first=False
+    for lineidx in range(len(results)):
+        line=results[lineidx]
+        linesplit=line.split()
+        if lineidx==0:
+            xyzatomnum=int(linesplit[0])
+            temp.write(line)
+        else:
+            if len(linesplit)>1 and '90.00' not in line:
+                if first==False:
+                    for ln in liglines:
+                        temp.write(ln)
+                    first=True
+                if line not in liglines:
+                    temp.write(line)
+            else:
+                temp.write(line)
+    temp.close()
+    os.rename(tempname,finalxyz)
+    return finalxyz
+
+
 def BoxSetupProtocol(poltype):
     poltype.WriteToLog('Computing volume ',prin=True)
     maxdirection,numberofsubboxes,subaaxislist,subbaxislist,subcaxislist,subvolumelist=ComputeBoxSize(poltype)
-
+    ligandtypes=[]
+    allligandtypes=[]
+    for xyz in poltype.ligandxyzfilenamelist:
+        statexyzatominfo,stateindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=parametercomparison.GrabXYZInfo(poltype,xyz)
+        types=list(stateindextotypeindex.values())
+        if xyz in poltype.annihilateligandxyzfilenamelist:
+            ligandtypes.extend(types)
+        allligandtypes.extend(types)
     if poltype.addsolvionwindows==True: # create box file for ions
         ionaxis=poltype.bufferlen[0]
         ionvolume=ionaxis**3
@@ -617,6 +664,8 @@ def BoxSetupProtocol(poltype):
                     xyztoappend.append(shiftedfilename)
                 finalxyz=AppendXYZs(poltype,xyztoappend,key)
                 finalxyz=CorrectVolume(poltype,finalxyz,axis)
+                if i==1 and poltype.binding==True:
+                    finalxyz=MakeLigandsConsecutive(poltype,finalxyz,allligandtypes)
                 keymods.RemoveKeyWords(poltype,key,['axis'])
                 keymods.AddKeyWord(poltype,key,'a-axis '+str(aaxis)+'\n')
                 keymods.AddKeyWord(poltype,key,'b-axis '+str(baxis)+'\n')
@@ -648,14 +697,7 @@ def BoxSetupProtocol(poltype):
     elif poltype.complexation==True and poltype.solvation==True:
         solv=True
         index=1
-    ligandtypes=[]
-    allligandtypes=[]
-    for xyz in poltype.ligandxyzfilenamelist:
-        statexyzatominfo,stateindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=parametercomparison.GrabXYZInfo(poltype,xyz)
-        types=list(stateindextotypeindex.values())
-        if xyz in poltype.annihilateligandxyzfilenamelist:
-            ligandtypes.extend(types)
-        allligandtypes.extend(types)
+    
     if solv==True: 
         thexyz=poltype.boxfilename[index] 
         allligandindices=GrabIndicesFromType(poltype,thexyz,allligandtypes)
