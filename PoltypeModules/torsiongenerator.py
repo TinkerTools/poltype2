@@ -339,12 +339,22 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
     else:
         inputstruct=ConvertTinktoXYZ(poltype,torxyzfname,torxyzfname.replace('.xyz','_cart.xyz'))
         inputmol= opt.load_structfile(poltype,inputstruct)
-        toranglelist=GrabTorsionAngles(poltype,torset,inputmol)
         prefix='xtb-opt-'
         postfix='.input'  
         inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
         pre=inputname.replace(postfix,'')
-        resfilename=CreateConstraintsFileXTB(poltype,torset,toranglelist,pre)
+        newtorset=[]
+        rotbndtorescount={}
+        maxrotbnds=1
+        restlist=[]
+        rottors,rotbndtorescount,restlist=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles)
+        frotors,rotbndtorescount,restlist=FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles)
+        for tor in rottors:
+            newtorset.append(tor)
+        for tor in frotors:
+            newtorset.append(tor)
+        toranglelist=GrabTorsionAngles(poltype,newtorset,inputmol)
+        resfilename=CreateConstraintsFileXTB(poltype,newtorset,toranglelist,pre)
         outputname=inputname.replace(postfix,'.log')
         optxyz,cmdstr=OptimizeXTB(poltype,inputstruct,resfilename,poltype.xtbmethod,outputname,mol.GetTotalCharge(),0)
         executable='xtb'
@@ -1216,7 +1226,7 @@ def get_torlist(poltype,mol,missed_torsions):
 
         if poltype.rotalltors==True:
             skiptorsion=False
-        if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False and onlyrot==False:
+        if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False and onlyrot==False and foundmissing==False:
             skiptorsion=True
         babelindices=[t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()]
         t1atomicnum=t1.GetAtomicNum()
@@ -1260,7 +1270,6 @@ def get_torlist(poltype,mol,missed_torsions):
                 d = iaa2.GetIdx()
                 if ((iaa.GetIdx() != t3.GetIdx() and iaa2.GetIdx() != t2.GetIdx()) and not (iaa.GetIdx() == t1.GetIdx() and iaa2.GetIdx() == t4.GetIdx())) and iaa.GetIdx()!=iaa2.GetIdx(): # also include case for three atom ring
                     rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx()))
-    
     return (torlist ,rotbndlist,hydtorsionlist,nonaroringtorlist)
 
 
@@ -1437,6 +1446,122 @@ def ConvertTinktoXYZ(poltype,filename,newfilename):
     return filename.replace('.xyz_2','_xyzformat.xyz')
 
 
+def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles):
+    rottors=[] 
+    firsttor=True
+    for i in range(len(torset)):
+       tor=torset[i]
+       a,b,c,d=tor[0:4]
+       key=' '.join([str(b),str(c)])
+       phaseangle=phaseangles[i]
+       if key in poltype.rotbndlist.keys():
+           for resttors in poltype.rotbndlist[key]:
+               rta,rtb,rtc,rtd = resttors
+               indices=[rta,rtb,rtc,rtd]
+               allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,inputmol)
+               allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,inputmol)
+               aatom=inputmol.GetAtom(rta)
+               datom=inputmol.GetAtom(rtd)
+               batom=inputmol.GetAtom(rtb)
+               catom=inputmol.GetAtom(rtc)
+               rtaatomicnum=aatom.GetAtomicNum()
+               rtdatomicnum=datom.GetAtomicNum()
+               firstangle=inputmol.GetAngle(aatom,batom,catom)
+               secondangle=inputmol.GetAngle(batom,catom,datom)
+               if firstangle<0:
+                   firstangle=firstangle+360
+               if secondangle<0:
+                   secondangle=secondangle+360
+               angletol=3.5
+               if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
+                   continue
+               if rtb<rtc:
+                   rotbnd=tuple([rtb,rtc])
+               else:
+                   rotbnd=tuple([rtc,rtb])
+               if rotbnd not in rotbndtorescount.keys():
+                   rotbndtorescount[rotbnd]=0
+               if rotbndtorescount[rotbnd]>=maxrotbnds:
+                   continue
+
+               if resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
+                   rtang = inputmol.GetTorsion(rta,rtb,rtc,rtd)
+                   if rtang<0:
+                       rtang=rtang+360
+                   if ((inputmol.GetAtom(rta).GetAtomicNum() == 1) and (inputmol.GetAtom(rtd).GetAtomicNum() == 1) and allhydtors==False):
+                       continue
+                   else:
+                       restlist.append(resttors)
+                       if not firsttor:
+                           rottors.append([rta,rtb,rtc,rtd])
+                       else:
+                           firsttor=False
+                           rottors.insert(0,[rta,rtb,rtc,rtd])
+
+                       rotbndtorescount[rotbnd]+=1
+    return rottors,rotbndtorescount,restlist
+
+
+def FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles):
+    frotors=[]
+    for rotkey,torsions in poltype.rotbndlist.items():
+        count=0
+        for resttors in torsions:
+            rta,rtb,rtc,rtd = resttors
+            indices=[rta,rtb,rtc,rtd]
+            allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,inputmol)
+            allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,inputmol)
+
+            aatom=inputmol.GetAtom(rta)
+            datom=inputmol.GetAtom(rtd)
+            batom=inputmol.GetAtom(rtb)
+            catom=inputmol.GetAtom(rtc)
+
+            rtaatomicnum=aatom.GetAtomicNum()
+            rtdatomicnum=datom.GetAtomicNum()
+
+
+            rtbatomicnum=batom.GetAtomicNum()
+            rtcatomicnum=catom.GetAtomicNum()
+             
+            if (rtaatomicnum==1 and rtdatomicnum==1) and (allhydtors==False):
+                continue
+            if (allhydtorsoneside==True or allhydtors==True) and (rtaatomicnum==1 or rtdatomicnum==1):
+                if count>=1:
+                    continue
+                count+=1
+            firstangle=inputmol.GetAngle(aatom,batom,catom)
+            secondangle=inputmol.GetAngle(batom,catom,datom)
+            if firstangle<0:
+                firstangle=firstangle+360
+            if secondangle<0:
+                secondangle=secondangle+360
+            angletol=3.5
+            if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
+                continue
+            if rtb<rtc:
+                rotbnd=tuple([rtb,rtc])
+            else:
+                rotbnd=tuple([rtc,rtb])
+            if rotbnd not in rotbndtorescount.keys():
+                rotbndtorescount[rotbnd]=0
+            if rotbndtorescount[rotbnd]>=maxrotbnds:
+                continue
+
+            rtang = inputmol.GetTorsion(rta,rtb,rtc,rtd)
+            if rtang<0:
+                rtang=rtang+360
+
+            if resttors not in restlist and resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
+                restlist.append(resttors)
+                frotors.append([rta,rtb,rtc,rtd])
+                rotbndtorescount[rotbnd]+=1
+
+
+
+    return frotors,rotbndtorescount,restlist
+
+
 def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt):
     prefix='%s-opt-%s_' % (poltype.molecprefix,currentopt)
     postfix='.psi4'  
@@ -1447,9 +1572,12 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     temp.write('molecule { '+'\n')
     temp.write('%d %d\n' % (mol.GetTotalCharge(),mol.GetTotalSpinMultiplicity()))
     iteratom = openbabel.OBMolAtomIter(optmol)
+    an = pyasl.AtomicNo()
     rotbndtorescount={}
     maxrotbnds=1
-    an = pyasl.AtomicNo()
+    restlist=[]
+    rottors,rotbndtorescount,restlist=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles)
+    frotors,rotbndtorescount,restlist=FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles)
     if os.path.isfile(torxyzfname):
         xyzstr = open(torxyzfname,'r')
         xyzstrl = xyzstr.readlines()
@@ -1476,126 +1604,31 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
         temp.write(" 'convergence_set' : 'GAU_LOOSE',"+'\n')
         temp.write(" 'convergence_energy' : 1e-4,"+'\n')
     temp.write(" 'constraints' : {"+'\n')
-    restlist=[]
-    firsttor=True
-    for i in range(len(torset)):
-        tor=torset[i]
-        a,b,c,d=tor[0:4]
-        key=' '.join([str(b),str(c)])
-        phaseangle=phaseangles[i]
-        if key in poltype.rotbndlist.keys():
-            for resttors in poltype.rotbndlist[key]:
-                rta,rtb,rtc,rtd = resttors
-                indices=[rta,rtb,rtc,rtd]
-                allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,mol)
-                allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,mol)
+    for i in range(len(rottors)):
+        tor=rottors[i]
+        rta,rtb,rtc,rtd=tor[:]
+        rtang = inputmol.GetTorsion(rta,rtb,rtc,rtd)
+        if rtang<0:
+            rtang=rtang+360
 
-                aatom=mol.GetAtom(rta)
-                datom=mol.GetAtom(rtd)
-                batom=mol.GetAtom(rtb)
-                catom=mol.GetAtom(rtc)
-                rtaatomicnum=aatom.GetAtomicNum()
-                rtdatomicnum=datom.GetAtomicNum()
-
-                firstangle=mol.GetAngle(aatom,batom,catom)
-                secondangle=mol.GetAngle(batom,catom,datom)
-                if firstangle<0:
-                    firstangle=firstangle+360
-                if secondangle<0:
-                    secondangle=secondangle+360
-                angletol=3.5
-                if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
-                    continue
-                if rtb<rtc:
-                    rotbnd=tuple([rtb,rtc])
-                else:
-                    rotbnd=tuple([rtc,rtb])
-                if rotbnd not in rotbndtorescount.keys():
-                    rotbndtorescount[rotbnd]=0
-                if rotbndtorescount[rotbnd]>=maxrotbnds:
-                    continue
-
-                if resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
-                    rtang = inputmol.GetTorsion(rta,rtb,rtc,rtd)
-                    if rtang<0:
-                        rtang=rtang+360
-
-                    if ((optmol.GetAtom(rta).GetAtomicNum() == 1) and (optmol.GetAtom(rtd).GetAtomicNum() == 1) and allhydtors==False):
-                        continue
-                    else:
-                        restlist.append(resttors)
-                        if not firsttor:
-                            temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang)%360))))
-                            optkingarray.append(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
-                        else:
-                            temp.write(" 'set' : [{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang)%360))))
-                            firsttor=False
-                            optkingarray.append('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
+        if i!=0:
+            temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang)%360))))
+            optkingarray.append(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
+        else:
+            temp.write(" 'set' : [{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang)%360))))
+            optkingarray.append('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
 
 
-                        rotbndtorescount[rotbnd]+=1
-            
-        # Leave all torsions around other rotatable bonds fixed
-        for rotkey,torsions in poltype.rotbndlist.items():
-            count=0
-            for resttors in torsions:
-                rta,rtb,rtc,rtd = resttors
-                indices=[rta,rtb,rtc,rtd]
-                allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,mol)
-                allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,mol)
+    for i in range(len(frotors)):
+        tor=frotors[i]
+        rta,rtb,rtc,rtd=tor[:]
+        rtang = inputmol.GetTorsion(rta,rtb,rtc,rtd)
+        if rtang<0:
+            rtang=rtang+360
+        temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang)%360))))
+        optkingarray.append(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
+        
 
-                aatom=mol.GetAtom(rta)
-                datom=mol.GetAtom(rtd)
-                batom=mol.GetAtom(rtb)
-                catom=mol.GetAtom(rtc)
-
-                rtaatomicnum=aatom.GetAtomicNum()
-                rtdatomicnum=datom.GetAtomicNum()
-
-
-                rtbatomicnum=batom.GetAtomicNum()
-                rtcatomicnum=catom.GetAtomicNum()
-                 
-                if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
-                    continue
-                if (allhydtorsoneside==True or allhydtors==True) and (rtaatomicnum==1 or rtdatomicnum==1):
-
-               
-                    if count>=1:
-                        continue
-                    count+=1
-                firstangle=mol.GetAngle(aatom,batom,catom)
-                secondangle=mol.GetAngle(batom,catom,datom)
-                if firstangle<0:
-                    firstangle=firstangle+360
-                if secondangle<0:
-                    secondangle=secondangle+360
-                angletol=3.5
-                if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
-                    continue
-                if rtb<rtc:
-                    rotbnd=tuple([rtb,rtc])
-                else:
-                    rotbnd=tuple([rtc,rtb])
-                if rotbnd not in rotbndtorescount.keys():
-                    rotbndtorescount[rotbnd]=0
-                if rotbndtorescount[rotbnd]>=maxrotbnds:
-                    continue
-
-                rtang = inputmol.GetTorsion(rta,rtb,rtc,rtd)
-                if rtang<0:
-                    rtang=rtang+360
-
-                if resttors not in restlist and resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
-                    restlist.append(resttors)
-                    if not firsttor:
-                        temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang)%360))))
-                        optkingarray.append(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
-                    else:
-                        temp.write(" 'set' : [{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang)%360))))
-                        firsttor=False
-                        optkingarray.append('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
-                    rotbndtorescount[rotbnd]+=1
     temp.write("]"+'\n')
     temp.write("  }"+'\n')
     temp.write(" }"+'\n')

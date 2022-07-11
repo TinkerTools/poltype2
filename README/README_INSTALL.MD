@@ -105,6 +105,7 @@ else
 
 fi
 
+export PATH=/home/bdw2292/miniconda3/envs/xtbenv/bin/:$PATH
 export PATH=/opt/CCDC/CCDC2020/Discovery_2020/bin/:$PATH # for GOLD Docking
 export myusername=`whoami`
 conda activate amoebamdpoltype
@@ -156,5 +157,13 @@ conda install -c conda-forge mdtraj --yes
 conda install -c conda-forge pymbar --yes
 conda install -c psi4 psi4 --yes
 conda install -c conda-forge geometric --yes
+```
+
+### Explicit Conda Installation - XTB
+```
+conda create --name xtbenv
+conda activate xtbenv
 conda install -c conda-forge xtb --yes
 ```
+* add the path to xtb binary in PATH
+

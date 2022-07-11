@@ -248,6 +248,8 @@ usegold=True
 * Make sure if using custom receptor parameters, then either adding to keyfilenamelist or in prmfilepath
 * Use submitlocally=False if you do not wish to submit dynamics jobs locally. By default this is already False for production dynamics and for BAR, for minimzation and equilbriation, by default this is True and jobs are submited locally. Then program will wait for you to complete the jobs in text file (such as _proddynamicsjobs.txt).
 * For HFE, if your ligand is charged and you want to compute the salt hydration free energy, add "salthfe=True"
+* Some files containing .out extensions are used to determine if dynamics has already been done to prevent rerunning dynamics each time program is called. Tinker keys files are always recreated everytime program is rerun. 
+* Minimized and equilibriated PDB (ligand complexed with host) and XYZ structures for viewing in pymol will have extension _pymol in name.
 
 #### Minimum Input Example Binding Free Energy
 
