@@ -123,24 +123,32 @@ def GenerateGOLDConfigurationFile(ligandfilename,receptorfilename,dockgridcenter
     radius=dockgridsize[0]
     conffile='gold.conf'
     temp=open(conffile,'w')
+
     temp.write('  GOLD CONFIGURATION FILE'+'\n')
     temp.write(' AUTOMATIC SETTINGS'+'\n')
     temp.write('autoscale = 1'+'\n')
+
     temp.write(' POPULATION'+'\n')
     temp.write('popsiz = auto'+'\n')
     temp.write('select_pressure = auto'+'\n')
     temp.write('n_islands = auto'+'\n')
     temp.write('maxops = auto'+'\n')
     temp.write('niche_siz = auto'+'\n')
+
     temp.write(' GENETIC OPERATORS'+'\n')
     temp.write('pt_crosswt = auto'+'\n')
     temp.write('allele_mutatewt = auto'+'\n')
     temp.write('migratewt = auto'+'\n')
+
     temp.write(' FLOOD FILL'+'\n')
     temp.write('radius = '+str(radius)+'\n')
-    temp.write('origin = '+str(dockgridcenter[0])+' '+str(dockgridcenter[1])+' '+str(dockgridcenter[2])+'\n')
+    if poltype.covalentdocking==False:
+        temp.write('origin = '+str(dockgridcenter[0])+' '+str(dockgridcenter[1])+' '+str(dockgridcenter[2])+'\n')
+    else:
+        temp.write('floodfill_atom_no = '+str(poltype.prolinkatom)+'\n')
+        temp.write('floodfill_center = atom'+'\n')
     temp.write('do_cavity = 1'+'\n')
-    temp.write('floodfill_atom_no = 0'+'\n')
+
     temp.write(' DATA FILES'+'\n')
     temp.write('ligand_data_file '+ligandfilename+' '+str(nposes)+'\n')
     temp.write('param_file = DEFAULT'+'\n')
@@ -151,6 +159,7 @@ def GenerateGOLDConfigurationFile(ligandfilename,receptorfilename,dockgridcenter
     temp.write('save_lone_pairs = 1'+'\n')
     temp.write('fit_points_file = fit_pts.mol2'+'\n')
     temp.write('read_fitpts = 0'+'\n')
+
     temp.write(' FLAGS'+'\n')
     temp.write('internal_ligand_h_bonds = 0'+'\n')
     temp.write('flip_free_corners = 1'+'\n')
@@ -163,22 +172,33 @@ def GenerateGOLDConfigurationFile(ligandfilename,receptorfilename,dockgridcenter
     temp.write('postprocess_bonds = 1'+'\n')
     temp.write('rotatable_bond_override_file = DEFAULT'+'\n')
     temp.write('solvate_all = 1'+'\n')
+
     temp.write(' TERMINATION'+'\n')
     temp.write('early_termination = 1'+'\n')
     temp.write('n_top_solutions = 3'+'\n')
     temp.write('rms_tolerance = 1.5'+'\n')
+
     temp.write(' CONSTRAINTS'+'\n')
     temp.write('force_constraints = 0'+'\n')
-    temp.write(' COVALENT BONDING'+'\n')
-    temp.write('covalent = 0'+'\n')
+    if poltype.covalentdock==False:
+        temp.write(' COVALENT BONDING'+'\n')
+        temp.write('covalent = 0'+'\n')
+    else:
+        temp.write('covalent = 1'+'\n')
+        temp.write('covalent_protein_atom_no = '+str(poltype.prolinkatom)+'\n')
+        temp.write('covalent_ligand_atom_no = '+str(poltype.liglinkatom)+'\n')
+
+
     temp.write(' SAVE OPTIONS'+'\n')
     temp.write('save_score_in_file = 1'+'\n')
     temp.write('save_protein_torsions = 1'+'\n')
+
     temp.write(' FITNESS FUNCTION SETTINGS'+'\n')
     temp.write('initial_virtual_pt_match_max = 3'+'\n')
     temp.write('relative_ligand_energy = 1'+'\n')
     temp.write('gold_fitfunc_path = plp'+'\n')
     temp.write('score_param_file = DEFAULT'+'\n')
+
     temp.write(' PROTEIN DATA'+'\n')
     temp.write('protein_datafile = '+receptorfilename+'\n')
 

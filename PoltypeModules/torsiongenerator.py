@@ -211,8 +211,13 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     tmpfh = open(tempname, "w")
     foundatomblock=False
     writeres=False
+    inputstruct=ConvertTinktoXYZ(poltype,torxyzfname,torxyzfname.replace('.xyz','_cart.xyz'))
+    inputmol= opt.load_structfile(poltype,inputstruct)
     rotbndtorescount={}
     maxrotbnds=1
+    restlist=[]
+    rottors,rotbndtorescount,restlist=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles)
+    frotors,rotbndtorescount,restlist=FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles)
 
     for k in range(len(results)):
         line=results[k]
@@ -224,91 +229,23 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
             tmpfh.write('\n')
             restlist=[]
             # Fix all torsions around the rotatable bond b-c
-            count=0
-            for i in range(len(torset)):
-                tor=torset[i]
-                a,b,c,d=tor[:]
-                indices=[a,b,c,d]
-                allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,mol)
-                allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,mol)
-
-                aatom=mol.GetAtom(a)
-                datom=mol.GetAtom(d)
-                batom=mol.GetAtom(b)
-                catom=mol.GetAtom(c)
-
-                aatomicnum=aatom.GetAtomicNum()
-                datomicnum=datom.GetAtomicNum()
-
-                firstangle=mol.GetAngle(aatom,batom,catom)
-                secondangle=mol.GetAngle(batom,catom,datom)
-                if firstangle<0:
-                    firstangle=firstangle+360
-                if secondangle<0:
-                    secondangle=secondangle+360
-                angletol=3.5
-                if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
-                    continue
-
-                babelindices=[b,c]
-                string=' '.join([str(b),str(c)])
-                if string in poltype.rotbndlist.keys(): 
-                    tors=poltype.rotbndlist[string]
-                    count=0
-                    for resttors in tors:
-                        rta,rtb,rtc,rtd = resttors
-                        indices=[rta,rtb,rtc,rtd]
-                        allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,mol)
-                        allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,mol)
-                        aatom=mol.GetAtom(rta)
-                        datom=mol.GetAtom(rtd)
-                        batom=mol.GetAtom(rtb)
-                        catom=mol.GetAtom(rtc)
-                        rtbatomicnum=batom.GetAtomicNum()
-                        rtcatomicnum=catom.GetAtomicNum()
-                        rtaatomicnum=aatom.GetAtomicNum()
-                        rtdatomicnum=datom.GetAtomicNum()
-                        if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False and allhydtorsoneside==False):
-                            continue
-                        if (allhydtorsoneside==True or allhydtors==True) and (rtaatomicnum==1 or rtdatomicnum==1):
-
-                      
-                            if count>=1:
-                                continue
-                            count+=1
-                        firstangle=mol.GetAngle(aatom,batom,catom)
-                        secondangle=mol.GetAngle(batom,catom,datom)
-                        if firstangle<0:
-                            firstangle=firstangle+360
-                        if secondangle<0:
-                            secondangle=secondangle+360
-                        angletol=3.5
-                        if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
-                            continue
+            for i in range(len(rottors)):
+                tor=rottors[i]
+                rta,rtb,rtc,rtd=tor[:]
+                rtang = inputmol.GetTorsion(rta,rtb,rtc,rtd)
+                if rtang<0:
+                    rtang=rtang+360
+                tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
 
 
-                        rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
-                        if resttors not in variabletorlist and resttors[::-1] not in variabletorlist and resttors not in restlist:
-                            tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
-                            restlist.append(resttors)
-            # Leave all torsions around other rotatable bonds fixed
-            for rotkey,torsions in poltype.rotbndlist.items():
-                for resttors in torsions:
-                    rta,rtb,rtc,rtd = resttors
-                    if rtb<rtc:
-                        rotbnd=tuple([rtb,rtc])
-                    else:
-                        rotbnd=tuple([rtc,rtb])
-                    if rotbnd not in rotbndtorescount.keys():
-                        rotbndtorescount[rotbnd]=0
-                    if rotbndtorescount[rotbnd]>=maxrotbnds:
-                        continue
+            for i in range(len(frotors)):
+               tor=frotors[i]
+               rta,rtb,rtc,rtd=tor[:]
+               rtang = inputmol.GetTorsion(rta,rtb,rtc,rtd)
+               if rtang<0:
+                   rtang=rtang+360
+               tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
 
-                    rtang = optmol.GetTorsion(rta,rtb,rtc,rtd)
-                    if resttors not in restlist and resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
-                        tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
-                        restlist.append(resttors)
-                        rotbndtorescount[rotbnd]+=1
             
             tmpfh.write("\n")
         else:
@@ -1177,6 +1114,7 @@ def get_torlist(poltype,mol,missed_torsions):
     torlist = []
     hydtorsionlist=[]
     rotbndlist = {}
+    nonrotbndlist={} 
     iterbond = openbabel.OBMolBondIter(mol)
     nonaroringtorlist=[]
     for bond in iterbond:
@@ -1191,8 +1129,7 @@ def get_torlist(poltype,mol,missed_torsions):
         t2val=len([neighb for neighb in openbabel.OBAtomAtomIter(t2)])
         t3val=len([neighb for neighb in openbabel.OBAtomAtomIter(t3)])
 
-        if BO>1:
-            continue
+        
         ringbond=bond.IsInRing()
         if t2val<2 or t3val<2:
             continue
@@ -1207,6 +1144,7 @@ def get_torlist(poltype,mol,missed_torsions):
         if(sortedtor in missed_torsions or sortedtor[::-1] in missed_torsions) and len(poltype.onlyrotbndslist)==0:
             skiptorsion = False
             foundmissing=True
+
         atomindices=rings.NonAromaticRingAtomicIndices(poltype,mol)
         nonarotorsions,nonarotorsionsflat=rings.NonAromaticRingTorsions(poltype,poltype.alltorsionslist,atomindices)
         willrefinenonarotor=False
@@ -1233,7 +1171,7 @@ def get_torlist(poltype,mol,missed_torsions):
         t4atomicnum=t4.GetAtomicNum()
         allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
         allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol)
-        if (t1atomicnum==1 or t4atomicnum==1) and (allhydtors==False and allhydtorsoneside==False) and poltype.rotalltors==False:
+        if (t1atomicnum==1 or t4atomicnum==1) and (allhydtors==False) and poltype.rotalltors==False:
             skiptorsion=True
         if (t1atomicnum==1 or t4atomicnum==1):
             hydtorsionlist.append(sortedtor)
@@ -1241,6 +1179,9 @@ def get_torlist(poltype,mol,missed_torsions):
         if ringbond==True and willrefinenonarotor==False and len(poltype.onlyrotbndslist)==0 and poltype.dontfrag==False and foundmissing==True:
             nonaroringtorlist.append(unq)
             skiptorsion=False
+
+        if BO>1:
+            skiptorsion=True
         rotbndkey = '%d %d' % (unq[1],unq[2])
         # store the torsion and temporary torsion value found by openbabel in torlist
         tor = mol.GetTorsion(t1,t2,t3,t4)
@@ -1256,23 +1197,31 @@ def get_torlist(poltype,mol,missed_torsions):
                         ringbond=False
         if ringbond==True:
             continue
-        rotbndlist[rotbndkey] = []
-        rotbndlist[rotbndkey].append(unq)
-        # write out rotatable bond to log
-        #Find other possible torsions about this rotatable bond
-        iteratomatom = openbabel.OBAtomAtomIter(bond.GetBeginAtom())
-        for iaa in iteratomatom:
-            iteratomatom2 = openbabel.OBAtomAtomIter(bond.GetEndAtom())
-            for iaa2 in iteratomatom2:
-                a = iaa.GetIdx()
-                b = t2.GetIdx()
-                c = t3.GetIdx()
-                d = iaa2.GetIdx()
-                if ((iaa.GetIdx() != t3.GetIdx() and iaa2.GetIdx() != t2.GetIdx()) and not (iaa.GetIdx() == t1.GetIdx() and iaa2.GetIdx() == t4.GetIdx())) and iaa.GetIdx()!=iaa2.GetIdx(): # also include case for three atom ring
-                    rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx()))
-    return (torlist ,rotbndlist,hydtorsionlist,nonaroringtorlist)
+        if skiptorsion==False:
+            rotbndlist[rotbndkey] = []
+            rotbndlist[rotbndkey].append(unq)
+            rotbndlist=FindOtherTorsAboutBond(poltype,rotbndlist,bond,rotbndkey,t1,t2,t3,t4)
+        else: # partial or double bonds or triple bonds or single bond torsions already in database
+            nonrotbndlist[rotbndkey] = []
+            nonrotbndlist[rotbndkey].append(unq)
+            nonrotbndlist=FindOtherTorsAboutBond(poltype,nonrotbndlist,bond,rotbndkey,t1,t2,t3,t4)
 
 
+    return (torlist ,rotbndlist,hydtorsionlist,nonaroringtorlist,nonrotbndlist)
+
+def FindOtherTorsAboutBond(poltype,rotbndlist,bond,rotbndkey,t1,t2,t3,t4):
+    #Find other possible torsions about this rotatable bond
+    iteratomatom = openbabel.OBAtomAtomIter(bond.GetBeginAtom())
+    for iaa in iteratomatom:
+        iteratomatom2 = openbabel.OBAtomAtomIter(bond.GetEndAtom())
+        for iaa2 in iteratomatom2:
+            a = iaa.GetIdx()
+            b = t2.GetIdx()
+            c = t3.GetIdx()
+            d = iaa2.GetIdx()
+            if ((iaa.GetIdx() != t3.GetIdx() and iaa2.GetIdx() != t2.GetIdx()) and not (iaa.GetIdx() == t1.GetIdx() and iaa2.GetIdx() == t4.GetIdx())) and iaa.GetIdx()!=iaa2.GetIdx(): # also include case for three atom ring
+                rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx()))
+    return rotbndlist
 
 def get_all_torsions(poltype,mol):
     poltype.alltorsionslist=[]
@@ -1504,7 +1453,10 @@ def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxr
 
 def FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles):
     frotors=[]
-    for rotkey,torsions in poltype.rotbndlist.items():
+    newdic={}
+    newdic.update(poltype.rotbndlist)
+    newdic.update(poltype.nonrotbndlist)
+    for rotkey,torsions in newdic.items():
         count=0
         for resttors in torsions:
             rta,rtb,rtc,rtd = resttors

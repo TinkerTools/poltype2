@@ -85,6 +85,7 @@ from operator import itemgetter
 
 @dataclass
 class PolarizableTyper():
+        covalentdock:bool=False
         xtbmethod:int=2
         optloose:bool=True
         inputkeyfile:None=None
@@ -588,11 +589,17 @@ class PolarizableTyper():
                             self.vinaexhaustiveness=int(a)
                         elif 'dockingenvname' in newline:
                             self.dockingenvname=a
+
                         elif "writeoutmultipole" in newline:
                             if '=' not in line:
                                 self.writeoutmultipole = True
                             else:
                                 self.writeoutmultipole=self.GrabBoolValue(a)
+                        elif "covalentdock" in newline:
+                            if '=' not in line:
+                                self.covalentdock = True
+                            else:
+                                self.covalentdock=self.GrabBoolValue(a)
                         elif "writeoutbond" in newline:
                             if '=' not in line:
                                 self.writeoutbond = True
@@ -1573,8 +1580,10 @@ class PolarizableTyper():
                 self.torspbasisset = 'MINIX'
 
             self.cmdtopid={} # for killing pids that have jobs stalled too long
-           
-
+            if self.covalentdock==True:
+                self.usevina=False # doesnt have covalent
+                self.usevinardo=False # doesnt have covalent
+                self.usead4=False
 
             if self.poltypepathlist!=None:
                 fb.GenerateForceBalanceInputs(self,self.poltypepathlist,self.vdwtypeslist,self.liquid_equ_steps,self.liquid_prod_steps,self.liquid_timestep,self.liquid_interval,self.gas_equ_steps,self.gas_prod_steps,self.gas_timestep,self.gas_interval,self.md_threads,self.liquid_prod_time,self.gas_prod_time,self.WQ_PORT,self.csvexpdatafile,self.fittypestogether,self.vdwprmtypestofit,self.vdwtypestoeval,self.liquid_equ_time,self.gas_equ_time,self.qmrelativeweight,self.liqrelativeweight,self.enthalpyrelativeweight,self.densityrelativeweight,self.relaxFBbox)
@@ -3526,6 +3535,17 @@ class PolarizableTyper():
                 if atomicnum not in listofallowedatoms:
                     raise ValueError('Element not allowed! '+str(atomicnum)) 
 
+        def CheckForHydrogens(self,m):
+            hashyd=False
+            for atom in m.GetAtoms():
+                atomicnum=atom.GetAtomicNum()
+                if atomicnum==1:
+                    hashyd=True
+            if hashyd==False:
+                string='No hydrogens detected in input file!'
+                warnings.warn(string)
+                self.WriteToLog(string)
+
 
         def CheckMP2OptFailed(self):
             files=os.listdir()
@@ -3712,6 +3732,7 @@ class PolarizableTyper():
             indextocoordinates=self.GrabIndexToCoordinates(mol)
             m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False,sanitize=False)
             self.CheckIfAtomsAreAllowed(m)
+            self.CheckForHydrogens(m)
             m,atomindextoformalcharge=self.CheckInputCharge(m,verbose=True)
             if self.allowradicals==True:
                 self.dontfrag=True # Psi4 doesnt allow UHF and properties (like compute WBO) for fragmenter, so need to turn of fragmenter if radical detected
@@ -3964,7 +3985,7 @@ class PolarizableTyper():
                 torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
             torgen.get_all_torsions(self,mol)
             # Find rotatable bonds for future torsion scans
-            (torlist, self.rotbndlist,hydtorsions,nonaroringtorlist) = torgen.get_torlist(self,mol,torsionsmissing)
+            (torlist, self.rotbndlist,hydtorsions,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,mol,torsionsmissing)
             if atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False: 
                 self.dontfrag=True
             if self.dontfrag==True and self.toroptmethod!='xtb': # if fragmenter is turned off, parition resources by jobs at sametime for parent,cant parralelize xtb since coords always written to same filename
@@ -4019,7 +4040,9 @@ class PolarizableTyper():
             shutil.copy(self.key5fname,self.key6fname)
             self.torlist=torlist[:]
             if self.tortor==True and self.dontdotor==False:
+                print('tortorsmissing',tortorsmissing)
                 torgen.PrepareTorsionTorsion(self,optmol,mol,tortorsmissing)
+                print('self.torlist',self.torlist)
             torgen.DefaultMaxRange(self,self.torlist)
             if self.refinenonaroringtors==True and self.dontfrag==False:
                 rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
@@ -4674,25 +4697,88 @@ class PolarizableTyper():
             tmpmol,atomindextoformalcharge=self.CheckLigandInputCharge(tmpmol)
 
         def PymolReadableFile(self,tinkerxyzfilename,outputname):
-            if os.path.exists(tinkerxyzfilename):
-                temp=open(tinkerxyzfilename,'r')
+            xyzfilename=self.ConvertTinkerXYZToCartesianXYZ(tinkerxyzfilename)
+            os.rename(xyzfilename,outputname)
+            pdbfilename=outputname.replace('.xyz','.pdb')
+            if self.complexedproteinpdbname!=None and 'comp' in tinkerxyzfilename:
+                statexyzatominfo,stateindextotypeindex,stateatomnum,xyzindextocoords,indextoneighbs,indextosym=parametercomparison.GrabXYZInfo(self,tinkerxyzfilename)
+                temp=open(self.complexedproteinpdbname,'r')
                 results=temp.readlines()
                 temp.close()
-                temp=open(outputname,'w')
+                temp=open(pdbfilename,'w')
                 for line in results:
-                    linesplit=line.split()
-                    writeline=True
-                    if len(linesplit)==6:
-                        second=linesplit[1]
-                        try:
-                            conv=float(second)
-                            writeline=False
-                        except:
-                            continue
-                    if writeline==True:
+                    if 'ATOM' in line or "HETATM" in line:
+                        linesplit=line.split()
+                        fullsplit=re.split(r'(\s+)', line)
+                        index=int(line[6:10+1].strip())
+                        xyzindex=self.pdbindextoxyzindex[index]
+                        coords=xyzindextocoords[xyzindex]
+                        x=round(float(coords[0]),3)
+                        xstring=str(x)
+                        xstringsplit=xstring.split('.')
+                        xtail=xstringsplit[1]
+                        diff = 3-len(xtail)
+                        for i in range(1,diff+1):
+                            xstring+='0'
+                        odiff=8-len(xstring)
+                        space=''
+                        for i in range(1,odiff+1):
+                            space+=' '
+                        xstring=space+xstring
+                        y=round(float(coords[1]),3)
+                        ystring=str(y)
+                        ystringsplit=ystring.split('.')
+                        ytail=ystringsplit[1]
+                        diff = 3-len(ytail)
+                        for i in range(1,diff+1):
+                            ystring+='0'
+                        odiff=8-len(ystring)
+                        space=''
+                        for i in range(1,odiff+1):
+                            space+=' '
+                        ystring=space+ystring
+                        z=round(float(coords[2]),3)
+                        zstring=str(z)
+                        zstringsplit=zstring.split('.')
+                        ztail=zstringsplit[1]
+                        diff = 3-len(ztail)
+                        for i in range(1,diff+1):
+                            zstring+='0'
+                        odiff=8-len(zstring)
+                        space=''
+                        for i in range(1,odiff+1):
+                            space+=' '
+                        zstring=space+zstring
+                        line=list(line)
+                        for i in range(30,37+1):
+                            xitem=xstring[i-30]
+                            line[i]=xitem
+                        for i in range(38,45+1):
+                            yitem=ystring[i-38]
+                            line[i]=yitem
+                        for i in range(46,53+1):
+                            zitem=zstring[i-46]
+                            line[i]=zitem
+                        line=''.join(line)
                         temp.write(line)
-                temp.close()
+                    else:
+                        temp.write(line)
 
+
+        def GrabIndexToCoordinatesPymol(self,mol):
+            indextocoords={}
+            for atom in mol.GetAtoms():
+                atomidx=atom.GetIdx()
+                pos = mol.GetConformer(0).GetAtomPosition(atomidx)
+                X=pos.x
+                Y=pos.y
+                Z=pos.z
+                atomindex=atomidx+1 
+                indextocoords[atomindex]=[X,Y,Z]
+        
+            return indextocoords
+
+            
         def ConvertTinkerXYZToCartesianXYZ(self,tinkerxyzfilename):
             xyzfilename=tinkerxyzfilename.replace('.xyz','_cart.xyz')
             temp=open(tinkerxyzfilename,'r')
@@ -4986,6 +5072,8 @@ class PolarizableTyper():
 
             if ligandonly==True:
                 return []
+            mpolearrays=[]
+
             if self.receptorligandxyzfilename!=None and self.originalkeyfilename!=None: 
                 
                 cmdstr=self.trueanalyzepath+' '+self.receptorligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'e'

@@ -674,8 +674,9 @@ def BoxSetupProtocol(poltype):
                 newname=AddIonsToSolventBox(poltype,finalxyz,key,poltype.iontypetoionnumberneut[i],poltype.iontypetoionnumberphysio[i],soluteindices)
 
                 shutil.copy(newname,boxxyzfilename)
-                alzout='checknetcharge.alz'
-                poltype.CheckNetChargeIsZero(boxxyzfilename,key,alzout)
+                if poltype.binding==True:
+                    alzout='checknetcharge.alz'
+                    poltype.CheckNetChargeIsZero(boxxyzfilename,key,alzout)
 
         RemoveTempFiles(poltype)
         

@@ -32,9 +32,11 @@ def GenerateProteinTinkerXYZFile(poltype):
         else:
             cmdstr=poltype.pdbxyzpath+' '+poltype.uncomplexedproteinpdbname+' '+'ALL'+' '+poltype.prmfilepath
 
-        submit.call_subsystem(poltype,cmdstr,wait=True)    
-    atoms,coord,order,types,connections=readTXYZ(poltype,poltype.uncomplexedxyzname)
+        submit.call_subsystem(poltype,cmdstr,wait=True)   
+    
     uncomplexedatomnum=len(proteinindextocoordinates.keys()) # just make sure to move HETATMS between chains after protein xyz
+    proteinpdbindextoxyzindex=MapXYZToPDB(poltype,poltype.uncomplexedproteinpdbname,poltype.uncomplexedxyzname,uncomplexedatomnum)
+    atoms,coord,order,types,connections=readTXYZ(poltype,poltype.uncomplexedxyzname)
     newuncomplexedatomnum=len(atoms)
     poltype.totalproteinnumber=len(atoms)
     poltype.proteinindices=list(range(1,len(atoms)+1))
@@ -53,18 +55,71 @@ def GenerateProteinTinkerXYZFile(poltype):
     poltype.allligandindices[0]=list(indextocoordinates.keys())
     poltype.allligands=allligands
     poltype.ligands=ligands
-    nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement=GrabNonLigandHETATMInfo(poltype,poltype.complexedproteinpdbname,indextocoordinates,proteinindextocoordinates,lastligindex) 
+    nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement,hetatmpdbindextoxyzindex=GrabNonLigandHETATMInfo(poltype,poltype.complexedproteinpdbname,indextocoordinates,proteinindextocoordinates,lastligindex) 
     poltype.hetatmindices=list(nonlighetatmindextocoordinates.keys())
     FindWatersIonsInPocketToRestrain(poltype,nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement,indextocoordinates)
-    GenerateComplexedTinkerXYZFile(poltype,poltype.uncomplexedxyzname,indextocoordinates,newuncomplexedatomnum,nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement,listofindextopdbindex,diff)
-    #ligandindices=poltype.ligandindices[0]
-    #GeneratePDBFileFromXYZ(poltype,poltype.complexedxyzname,ligandindices)
+    ligandpdbindextoxyzindex=GenerateComplexedTinkerXYZFile(poltype,poltype.uncomplexedxyzname,indextocoordinates,newuncomplexedatomnum,nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement,listofindextopdbindex,diff)
+    poltype.pdbindextoxyzindex=CombinePDBMaps(poltype,proteinpdbindextoxyzindex,ligandpdbindextoxyzindex,hetatmpdbindextoxyzindex)
+
+
+def CombinePDBMaps(poltype,proteinpdbindextoxyzindex,ligandpdbindextoxyzindex,hetatmpdbindextoxyzindex):
+    pdbindextoxyzindex={}
+    pdbindextoxyzindex.update(proteinpdbindextoxyzindex)
+    pdbindextoxyzindex.update(ligandpdbindextoxyzindex)
+    pdbindextoxyzindex.update(hetatmpdbindextoxyzindex)
+    return pdbindextoxyzindex
+
+
+def MapXYZToPDB(poltype,uncomplexedproteinpdbname,uncomplexedxyzname,uncomplexedatomnum):
+    pdbrdkitmol=Chem.MolFromPDBFile(uncomplexedproteinpdbname,removeHs=False,sanitize=False)   
+    pdbindextocoords=poltype.GrabIndexToCoordinatesPymol(pdbrdkitmol)
+    xyzfilename=poltype.ConvertTinkerXYZToCartesianXYZ(uncomplexedxyzname)
+    xyzmol=openbabel.OBMol()
+    obConversion = openbabel.OBConversion()
+    obConversion.SetInFormat('xyz')
+    obConversion.ReadFile(xyzmol,xyzfilename)
+    obConversion.SetOutFormat('mol')
+    tempname=xyzfilename.replace('.xyz','.mol')
+    obConversion.WriteFile(xyzmol,tempname)
+    xyzrdkitmol=Chem.MolFromMolFile(tempname,removeHs=False,sanitize=False)
+    xyzindextocoords=poltype.GrabIndexToCoordinatesPymol(xyzrdkitmol)
+    proteinpdbindextoxyzindex=MapXYZCoordstoPDBCoords(poltype,pdbindextocoords,xyzindextocoords,uncomplexedatomnum)
+
+    return proteinpdbindextoxyzindex
+
+
+def MapXYZCoordstoPDBCoords(poltype,pdbindextocoords,xyzindextocoords,uncomplexedatomnum):
+    proteinpdbindextoxyzindex={}
+    for pdbindex,pdbcoords in pdbindextocoords.items():
+        for xyzindex,xyzcoords in xyzindextocoords.items():
+            if pdbcoords==xyzcoords:
+                proteinpdbindextoxyzindex[pdbindex]=xyzindex
+    indices=list(range(1,uncomplexedatomnum+1))
+    for index in indices:
+        if index not in proteinpdbindextoxyzindex.keys():
+            proteinpdbindextoxyzindex[index]=index
+
+    return proteinpdbindextoxyzindex
+
+
+
+
+
+
+
+def ConvertTinkerXYZToPDB(poltype,xyzfile): 
+    cmdstr=poltype.xyzpdbpath+' '+xyzfile+' '+poltype.prmfilepath 
+    submit.call_subsystem(poltype,cmdstr,wait=True)
+    pdbfile=xyzfile.replace('.xyz','.pdb')
+    return pdbfile
+
 
 def GrabNonLigandHETATMInfo(poltype,complexedproteinpdbname,indextocoordinates,proteinindextocoordinates,lastligindex):
     nonlighetatmindextocoordinates={}
     nonlighetatmindextotypenum={}
     nonlighetatmindextoconnectivity={}
     nonlighetatmindextoelement={}
+    pdbindextoxyzindex={}
     temp=open(complexedproteinpdbname,'r')
     results=temp.readlines()
     temp.close()
@@ -91,7 +146,8 @@ def GrabNonLigandHETATMInfo(poltype,complexedproteinpdbname,indextocoordinates,p
             nonlighetatmindextoconnectivity[newindex]=connectivity
             nonlighetatmindextoelement[newindex]=element
             count+=1
-    return nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement
+            pdbindextoxyzindex[index]=newindex
+    return nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement,pdbindextoxyzindex
 
 
 def GrabConnectivity(poltype,pdbmol,index,shift):
@@ -287,6 +343,7 @@ def GenerateComplexedTinkerXYZFile(poltype,uncomplexedxyzname,indextocoordinates
     temp=open(uncomplexedxyzname,'r')
     results=temp.readlines()
     temp.close() 
+    ligandpdbindextoxyzindex={}
     temp=open(poltype.complexedxyzname,'w')
     newatomnum=uncomplexedatomnum+len(indextocoordinates)+len(nonlighetatmindextocoordinates.keys())
     for lineidx in range(len(results)):
@@ -302,11 +359,12 @@ def GenerateComplexedTinkerXYZFile(poltype,uncomplexedxyzname,indextocoordinates
         xyz=poltype.ligandxyzfilenamelist[xyzidx]
         indextopdbindex=listofindextopdbindex[xyzidx]
         atoms,coord,order,types,connections=readTXYZ(poltype,xyz)
-        lastindex=WriteLigandToXYZ(poltype,temp,atoms,order,lastindex,indextocoordinates,types,connections,indextopdbindex,diff)
+        lastindex,ligandpdbindextoxyzindex=WriteLigandToXYZ(poltype,temp,atoms,order,lastindex,indextocoordinates,types,connections,indextopdbindex,diff,ligandpdbindextoxyzindex)
     WriteHETATMToXYZ(poltype,temp,nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement)
     temp.close()
+    return ligandpdbindextoxyzindex
 
-def WriteLigandToXYZ(poltype,temp,atoms,order,lastindex,indextocoordinates,types,connections,indextopdbindex,diff):
+def WriteLigandToXYZ(poltype,temp,atoms,order,lastindex,indextocoordinates,types,connections,indextopdbindex,diff,ligandpdbindextoxyzindex):
     shift=lastindex
     for idx in range(len(atoms)):
         element=atoms[idx]
@@ -314,6 +372,7 @@ def WriteLigandToXYZ(poltype,temp,atoms,order,lastindex,indextocoordinates,types
         pdbindex=indextopdbindex[oldindex]-diff
         newindex=oldindex+shift
         coords=indextocoordinates[pdbindex]
+        ligandpdbindextoxyzindex[indextopdbindex[oldindex]]=newindex
         x=coords[0]
         y=coords[1]
         z=coords[2]
@@ -326,7 +385,7 @@ def WriteLigandToXYZ(poltype,temp,atoms,order,lastindex,indextocoordinates,types
             newline+=str(con)+'     '
         newline+='\n'
         temp.write(newline)
-    return newindex
+    return newindex,ligandpdbindextoxyzindex
 
 def WriteHETATMToXYZ(poltype,temp,nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement):
     for index,coords in nonlighetatmindextocoordinates.items():

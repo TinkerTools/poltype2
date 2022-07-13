@@ -390,7 +390,6 @@ def EquilibriationProtocol(poltype):
                         restraints.AddHarmonicRestrainGroupTermsToKeyFile(poltype,poltype.outputpath+configkeyfilename,annihilatedistances,poltype.distancerestraintconstant,poltype.annihilaterestrainatomgroup1,poltype.annihilaterestrainatomgroup2)
                     restraints.GroupRestraintFreeEnergyFix(poltype,annihilatedistances)
 
-            if not os.path.isfile(poltype.outputpath+proddynboxfilenamepymol):
-                poltype.PymolReadableFile(proddynboxfilename,proddynboxfilenamepymol)
+            poltype.PymolReadableFile(proddynboxfilename,proddynboxfilenamepymol)
 
         

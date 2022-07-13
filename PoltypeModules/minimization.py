@@ -76,19 +76,17 @@ def ExpensiveMinimizationProtocol(poltype):
             
 
             
-            if keyidx==0:
-                for indices in poltype.allligands:
-                   resposstring='restrain-position -'+str(indices[0])+' '+str(indices[-1])+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
-                   keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
+            if keyidx==0 and poltype.binding==True:
+                resposstring='restrain-position -'+str(ligandindices[0])+' '+str(ligandindices[-1])+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
+                keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
 
                 resposstring='restrain-position -'+str(1)+' '+str(poltype.totalproteinnumber)+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
                 keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
                 key=poltype.configkeyfilename[keyidx][0]
                 RestrainWatersIonsInPocket(poltype,key)
             else:
-                for indices in poltype.allligands:
-                    resposstring='restrain-position -'+str(indices[0])+' '+str(indices[-1])+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
-                    keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
+                resposstring='restrain-position -'+str(ligandindices[0])+' '+str(ligandindices[-1])+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
+                keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
 
             resposstring='# restrain-position for protein and ligand atoms\n'
             keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
@@ -208,19 +206,17 @@ def CheapMinimizationProtocol(poltype):
                 
                 ligandindices=poltype.ligandindices[keyidx]
 
-                if keyidx==0:
-                    for indices in poltype.allligands:
-                       resposstring='restrain-position -'+str(indices[0])+' '+str(indices[-1])+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
-                       keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
+                if keyidx==0 and poltype.binding==True:
+                    resposstring='restrain-position -'+str(ligandindices[0])+' '+str(ligandindices[-1])+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
+                    keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
 
                     resposstring='restrain-position -'+str(1)+' '+str(poltype.totalproteinnumber)+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
                     keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
                     key=poltype.configkeyfilename[keyidx][0]
                     RestrainWatersIonsInPocket(poltype,key)
                 else:
-                    for indices in poltype.allligands:
-                        resposstring='restrain-position -'+str(indices[0])+' '+str(indices[-1])+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
-                        keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
+                    resposstring='restrain-position -'+str(ligandindices[0])+' '+str(ligandindices[-1])+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
+                    keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
 
                 resposstring='# restrain-position for protein and ligand atoms\n'
                 keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
@@ -278,9 +274,8 @@ def CheapMinimizationProtocol(poltype):
             boxfilename=poltype.boxfilename[i]
             minpymolboxfilename=poltype.minboxfilenamepymol[i]
             key=poltype.configkeyfilename[i][0]
-            if not os.path.isfile(poltype.outputpath+minpymolboxfilename):
-                if os.path.isfile(poltype.outputpath+minboxfilename):
-                    poltype.PymolReadableFile(minboxfilename,minpymolboxfilename)
+            if os.path.isfile(poltype.outputpath+minboxfilename):
+                poltype.PymolReadableFile(minboxfilename,minpymolboxfilename)
     if poltype.minonly==True:
         sys.exit()
 

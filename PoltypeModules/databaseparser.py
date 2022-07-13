@@ -747,7 +747,6 @@ def GenerateFragmentSMARTS(poltype,ls):
         if isaro==True and isinring==True and hyb==2:
             aromaticindices.append(i)
 
-    
     atomswithcutbonds=[]
     aromaticbonds=[]
     bonditer=poltype.rdkitmol.GetBonds()
@@ -768,7 +767,7 @@ def GenerateFragmentSMARTS(poltype,ls):
             continue
         endidx=oldindextonewindex[oendidx]
         bgnidx=oldindextonewindex[obgnidx]
-        if isinring==True:
+        if isinring==True and endidx in aromaticindices and bgnidx in aromaticindices:
             aromaticbonds.append([endidx,bgnidx]) 
         bondorder=bond.GetBondType()
         mw.AddBond(bgnidx,endidx,bondorder)
@@ -799,7 +798,7 @@ def GenerateFragmentSMARTS(poltype,ls):
 
 def GenerateFragmentSMARTSList(poltype,ls):
     fragsmartslist=[]
-    atomindiceslist=GenerateAllPossibleFragmentIndices(poltype,ls,poltype.rdkitmol,15)
+    atomindiceslist=GenerateAllPossibleFragmentIndices(poltype,ls,poltype.rdkitmol,14)
     for thels in atomindiceslist:
         smarts,smartsfortransfer=GenerateFragmentSMARTS(poltype,thels)
         if smartsfortransfer not in fragsmartslist:
@@ -845,62 +844,36 @@ def GrabAromaticIndices(poltype,match,themol,ls):
 
 
 
-def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,parametersmartstosmartslist,ls,rdkitmol,parametersmartstordkitmol):
+def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,parametersmartstosmartslist,ls,mol,parametersmartstordkitmol,parametersmartstosmartsmatchingtoindices,parametersmartstomolsmatchingtoindices,parametersmartstordkitmolmatchingindices,parametersmartstoprmmolmatchingindices):
     smartsmcstomol={}
     prmsmartstomcssmarts={}
     parametersmartstoscore={}
     parametersmartstonumcommon={}
     parametersmartstootherscore={}
     parametersmartstothefinalscore={}
-
     parametersmartstofoundallneighbs={}
     newls=copy.deepcopy(ls)
     usemcsonly=False
     temptotalcharge=poltype.totalcharge
-    if usemcsonly==False:
-        fragsmartslist=GenerateFragmentSMARTSList(poltype,newls)
-    for parametersmarts in parametersmartslist:
+    for parametersmartsidx in tqdm(range(len(parametersmartslist)),desc='amoeba09 search for '+str(ls)):
+        parametersmarts=parametersmartslist[parametersmartsidx]
         prmmol=Chem.MolFromSmarts(parametersmarts)
         prmmol=parametersmartstordkitmol[parametersmarts]
-        smartsmatchingtoindices=[]
-        molsmatchingtoindices=[]
-        finalfragsmartslist=[]
-        if usemcsonly==False:
-            for fragsmarts in fragsmartslist:
-                fragmol=Chem.MolFromSmarts(fragsmarts)
-                diditmatch=prmmol.HasSubstructMatch(fragmol)
-                if diditmatch==True:
-                    finalfragsmartslist.append(fragsmarts)
-
-        mols = [poltype.rdkitmol,prmmol]
-        res=rdFMCS.FindMCS(mols)
-        atomnum=res.numAtoms
-        smartsmcs=res.smartsString
-            
+        smartsmatchingtoindices=parametersmartstosmartsmatchingtoindices[parametersmarts]
+        molsmatchingtoindices=parametersmartstomolsmatchingtoindices[parametersmarts]
         prmsmartsatomnum=prmmol.GetNumAtoms()
-        mcsmol=Chem.MolFromSmarts(smartsmcs)
-        molsmatchingtoindices.append(mcsmol)
-        smartsmatchingtoindices.append(smartsmcs)
         thesmartstonumneighbs={}
         thesmartstotypescore={}
         thesmartstoelementscore={}
-
         thesmartstothemol={}
-        if usemcsonly==False:
-            for fragsmarts in finalfragsmartslist:
-                fragmol=Chem.MolFromSmarts(fragsmarts)
-                molsmatchingtoindices.append(fragmol)
-                smartsmatchingtoindices.append(fragsmarts)
-         
-        for idx in range(len(smartsmatchingtoindices)):
-            thesmarts=smartsmatchingtoindices[idx]
-            themol=molsmatchingtoindices[idx]
+        for theidx in range(len(smartsmatchingtoindices)):
+            thesmarts=smartsmatchingtoindices[theidx]
+            themol=molsmatchingtoindices[theidx]
             thesmartstothemol[thesmarts]=themol
-            diditmatchprmmol=prmmol.HasSubstructMatch(themol)
-
-            diditmatch=poltype.rdkitmol.HasSubstructMatch(themol)
+            diditmatchprmmol=True
+            diditmatch=True
             if diditmatch==True and diditmatchprmmol==True:
-                matches=poltype.rdkitmol.GetSubstructMatches(themol)
+                matches=parametersmartstordkitmolmatchingindices[parametersmarts][theidx]
                 firstmatch=matches[0]
                 aromaticindices=GrabAromaticIndices(poltype,firstmatch,poltype.rdkitmol,ls)
                 if len(firstmatch)>=len(ls):
@@ -910,7 +883,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                         for idx in ls:
                             if idx not in match:
                                 goodmatch=False
-
+                                break
                             else:
                                 matchidx=match.index(idx)
                                 matchidxs.append(matchidx)
@@ -950,7 +923,6 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                                 if atomtype not in rdkitatomictypetotype.keys():
                                     rdkitatomictypetotype[atomtype]=0
                                 rdkitatomictypetotype[atomtype]+=1
-                        matches=list(poltype.rdkitmol.GetSubstructMatches(themol,maxMatches=10000))
                         sp=openbabel.OBSmartsPattern()
                         openbabel.OBSmartsPattern.Init(sp,thesmarts)
                         diditmatch=sp.Match(poltype.mol)
@@ -977,9 +949,9 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
 
 
                         smartindices=[moleculeindextosmartsindex[i] for i in ls]
-                        matches=prmmol.GetSubstructMatches(themol)
+                        prmmatches=parametersmartstoprmmolmatchingindices[parametersmarts][theidx]
  
-                        firstmatch=TryAndPickMatchWithNeighbors(poltype,matches,smartindices,themol)
+                        firstmatch=TryAndPickMatchWithNeighbors(poltype,prmmatches,smartindices,themol)
                         indices=list(range(len(firstmatch)))
                         smartsindextoparametersmartsindex=dict(zip(indices,firstmatch)) 
                         prmsmartsindices=[smartsindextoparametersmartsindex[i] for i in smartindices]
@@ -1071,7 +1043,6 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
 
     parametersmartstofinalscore={}
     parametersmartstolastscore={}
-
     if len(parametersmartstoscore.keys())>0:
         minscore=max(parametersmartstoscore.values())
         for parametersmarts in parametersmartstoscore.keys():
@@ -1100,7 +1071,6 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                 break
 
         if foundmin==True:
-
             smartls=[smartsmcs,smartsmcs]
             if parametersmarts not in parametersmartstosmartslist.keys():
                 parametersmartstosmartslist[parametersmarts]=smartls
@@ -1201,14 +1171,53 @@ def CheckIfConsecutivelyConnected(poltype,matchidxs,mcsmol):
 
     return goodmatch
 
+
+
+
+
 def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprm,parametersmartslist,mol,parametersmartstordkitmol):
     listforprmtoparametersmarts={}
     listforprmtosmarts={}
     listforprmtomatchallneighbs={}
+    allfragsmartslist=[]
+    for ls in listforprm:
+        fragsmartslist=GenerateFragmentSMARTSList(poltype,ls)
+        for fragsmarts in fragsmartslist:
+            if fragsmarts not in allfragsmartslist:
+                allfragsmartslist.append(fragsmarts)
+    parametersmartstosmartsmatchingtoindices={}
+    parametersmartstomolsmatchingtoindices={}
+    parametersmartstordkitmolmatchingindices={}
+    parametersmartstoprmmolmatchingindices={}
+    for parametersmarts in parametersmartslist:
+        prmmol=parametersmartstordkitmol[parametersmarts]
+        finalfragsmartslist=[]
+        smartsmatchingtoindices=[]
+        molsmatchingtoindices=[]
+        rdkitmolmatchingindices=[]
+        prmmolmatchingindices=[]
+
+        for fragsmarts in allfragsmartslist:
+            fragmol=Chem.MolFromSmarts(fragsmarts)
+            diditmatch=poltype.rdkitmol.HasSubstructMatch(fragmol)
+            if diditmatch==True:
+                diditmatch=prmmol.HasSubstructMatch(fragmol)
+                if diditmatch==True:
+                    matches=list(poltype.rdkitmol.GetSubstructMatches(fragmol,maxMatches=10000))
+                    prmmatches=prmmol.GetSubstructMatches(fragmol)
+                    molsmatchingtoindices.append(fragmol)
+                    smartsmatchingtoindices.append(fragsmarts)
+                    rdkitmolmatchingindices.append(matches)
+                    prmmolmatchingindices.append(prmmatches)
+        parametersmartstosmartsmatchingtoindices[parametersmarts]=smartsmatchingtoindices
+        parametersmartstomolsmatchingtoindices[parametersmarts]=molsmatchingtoindices
+        parametersmartstordkitmolmatchingindices[parametersmarts]=rdkitmolmatchingindices
+        parametersmartstoprmmolmatchingindices[parametersmarts]=prmmolmatchingindices
+
     for ls in listforprm: 
         parametersmartstomatchlen={}
         parametersmartstosmartslist={}
-        parametersmartstosmartslist,parametersmartstofoundallneighbs=MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,parametersmartstosmartslist,ls,mol,parametersmartstordkitmol)
+        parametersmartstosmartslist,parametersmartstofoundallneighbs=MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,parametersmartstosmartslist,ls,mol,parametersmartstordkitmol,parametersmartstosmartsmatchingtoindices,parametersmartstomolsmatchingtoindices,parametersmartstordkitmolmatchingindices,parametersmartstoprmmolmatchingindices)
         
         if len(parametersmartstosmartslist.keys())!=0:
             parametersmartstosmartslen={}
@@ -1679,7 +1688,7 @@ def FindAdjacentMissingTorsionsForTorTor(poltype,torsionsmissing,totalbondscolle
             a=aatom.GetIdx()
             d=datom.GetIdx()
             tor=[a-1,b-1,c-1,d-1]
-            torsionsmissing.append(tor)
+            torsionsmissing.append(tuple(tor))
         elif (foundfirst==True and foundsecond==False and poltype.tortor==True):
             b=second[0]+1
             c=second[1]+1
@@ -1687,7 +1696,7 @@ def FindAdjacentMissingTorsionsForTorTor(poltype,torsionsmissing,totalbondscolle
             a=aatom.GetIdx()
             d=datom.GetIdx()
             tor=[a-1,b-1,c-1,d-1]
-            torsionsmissing.append(tor)
+            torsionsmissing.append(tuple(tor))
         elif (foundfirst==False and foundsecond==False and poltype.tortor==True):
             b=first[0]+1
             c=first[1]+1
@@ -1695,14 +1704,14 @@ def FindAdjacentMissingTorsionsForTorTor(poltype,torsionsmissing,totalbondscolle
             a=aatom.GetIdx()
             d=datom.GetIdx()
             tor=[a-1,b-1,c-1,d-1]
-            torsionsmissing.append(tor)
+            torsionsmissing.append(tuple(tor))
             b=second[0]+1
             c=second[1]+1
             aatom,datom = torgen.find_tor_restraint_idx(poltype,poltype.mol,poltype.mol.GetAtom(b),poltype.mol.GetAtom(c))
             a=aatom.GetIdx()
             d=datom.GetIdx()
             tor=[a-1,b-1,c-1,d-1]
-            torsionsmissing.append(tor)
+            torsionsmissing.append(tuple(tor))
 
     return torsionsmissing
 
@@ -1760,14 +1769,14 @@ def FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertop
         second=bndlist[1]
         babelfirst=[i+1 for i in first]
         babelsecond=[i+1 for i in second]
-        if not (babelfirst in poltype.onlyrotbndslist or babelfirst[::-1] in poltype.onlyrotbndslist):
-            if (babelfirst in poltype.partialdoublebonds or babelfirst[::-1] in poltype.partialdoublebonds):
-                continue
-        if not (babelsecond in poltype.onlyrotbndslist or babelsecond[::-1] in poltype.onlyrotbndslist):
-
-            if (babelsecond in poltype.partialdoublebonds or babelsecond[::-1] in poltype.partialdoublebonds):
-                continue    
-
+        #if not (babelfirst in poltype.onlyrotbndslist or babelfirst[::-1] in poltype.onlyrotbndslist):
+        #    if (babelfirst in poltype.partialdoublebonds or babelfirst[::-1] in poltype.partialdoublebonds):
+        #        continue
+        #if not (babelsecond in poltype.onlyrotbndslist or babelsecond[::-1] in poltype.onlyrotbndslist):
+        
+        #    if (babelsecond in poltype.partialdoublebonds or babelsecond[::-1] in poltype.partialdoublebonds):
+        #        continue    
+        # allow partial double tor-tor until figure out non-adjacent tortor coupling
         b,c=first[:]
         d=second[0]
         aatom,dnewatom = torgen.find_tor_restraint_idx(poltype,poltype.mol,poltype.mol.GetAtom(b+1),poltype.mol.GetAtom(c+1))
@@ -1791,7 +1800,6 @@ def FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertop
             ls=[b+1,c+1,d+1]
             if ls in poltype.onlyrottortorlist or ls[::-1] in poltype.onlyrottortorlist:
                 tortorsmissing.append(indices)
-
 
     return tortorsmissing
 
@@ -1922,7 +1930,6 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             check=False
         if [bbidx,cbidx] in poltype.dontrotbndslist or [cbidx,bbidx] in poltype.dontrotbndslist:
             check=True
-
         if ringbond==True:
             atomindices=RingAtomicIndices(poltype,mol)
             therings=torgen.GrabAllRingsContainingMostIndices(poltype,atomindices,babelindices,2)
@@ -2524,7 +2531,7 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
             ls=[a,b,c,d]
             if ls in torsionsmissing or ls[::-1] in torsionsmissing:
                 extraline+='# Missing torsion parameters, will attempt to fit parameters'+'\n'
-                showtransferinfo=False
+                showtransferinfo=True
 
 
         transferinfoline+=extraline
@@ -3115,6 +3122,8 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                    indicestoextsmartsatomorder[moleculeindices]=smartsatomorder
                    smartsatomordertoparameters[smartsatomorder]=prms
     return indicestoextsmartsmatchlength,indicestoextsmarts,indicestoextsmartsatomorder,smartsatomordertoparameters
+
+
 
 def CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,indicestoextsmartsmatchlength,indicesforprmtoparametersmarts,indicesforprmtosmarts,indicestoextsmarts,indicesforprmtomatchallneighbs,indicestoextsmartsatomorders):
     newindicestoextsmarts={}
@@ -4692,17 +4701,8 @@ def StiffenZThenBisectorAngleConstants(poltype,keyfilename):
 
 def GenerateRdkitMolObjectsParameterSMARTS(poltype,parametersmartslist):
     parametersmartstordkitmol={}
-    #temptotalcharge=poltype.totalcharge
     for parametersmarts in parametersmartslist:
         prmmol=Chem.MolFromSmarts(parametersmarts)
-        #rdmolfiles.MolToMolFile(prmmol,'test.mol')
-        #prmmol=Chem.MolFromMolFile('test.mol',removeHs=False,sanitize=False)
-        #poltype.totalcharge=None
-        #prmmol,atomindextoformalcharge=poltype.CheckInputCharge(prmmol)
-        #print('atomindextoformalcharge',atomindextoformalcharge)
-        #print('parametersmarts',parametersmarts,flush=True)
-        #Chem.SanitizeMol(prmmol)
-        #poltype.totalcharge=temptotalcharge
         parametersmartstordkitmol[parametersmarts]=prmmol
 
     return parametersmartstordkitmol

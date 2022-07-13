@@ -143,7 +143,8 @@ cp ~/forcebalance/src/data/*py /home/bdw2292/miniconda3/envs/amoebamdpoltype/lib
 ### Explicit Conda Installation
 * Only do this if .yml file doesnt work
 ```
-conda create --name amoebamdpoltype
+conda create --name amoebamdpoltype -c psi4 psi4 --yes
+conda install -c conda-forge geometric --yes
 conda activate amoebamdpoltype
 conda config --add channels conda-forge
 conda install mdanalysis --yes
@@ -155,8 +156,6 @@ conda install -c conda-forge cairosvg --yes
 conda install -c conda-forge psutil --yes
 conda install -c conda-forge mdtraj --yes
 conda install -c conda-forge pymbar --yes
-conda install -c psi4 psi4 --yes
-conda install -c conda-forge geometric --yes
 ```
 
 ### Explicit Conda Installation - XTB

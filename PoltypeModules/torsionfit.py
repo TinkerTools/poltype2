@@ -712,7 +712,7 @@ def ModifyInitialGuessAndBoundries(poltype,parameterinfo,pzero,boundstup):
     return pzero,boundstup
 
 
-def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,clskeyswithbadfits,indicesremoveddic,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified):
+def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,clskeyswithbadfits,indicesremoveddic,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified,tmpkey1basename,tmpkey2basename):
     """
     Intent: Uses scipy's optimize.leastsq function to find estimates for the torsion 
     parameters based on energy values found at various angles using qm and mm
@@ -865,7 +865,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
 
             else:
                 errfunc = lambda p, x, z, torprmdict, y: fitfunc(poltype,p, x,z, torprmdict) - y
-            array=optimize.least_squares(errfunc, pzero,jac='2-point', bounds=boundstup,args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
+            array=optimize.least_squares(errfunc, pzero,jac='2-point', bounds=boundstup,verbose=0,args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
             p1=array['x']
             pzero,boundstup,parm_sanitized=CheckFitParameters(poltype,pzero,boundstup,parm_sanitized,refine,keylist,torprmdict,p1,angle_list,torset,max_amp)
             count+=1
@@ -873,6 +873,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         
 
         torprmdict,write_prm_dict,classkeytofoldtophase=FillInDictionariesParameterEstimates(poltype,torprmdict,p1,write_prm_dict)
+        # write out new keyfile, do this after each torsion fitting now for coupled torsion fitting
+        write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename,classkeytofoldtophase)
         torsettobypassrmsd[torset]=bypassrmsd
         GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_dict,torprmdict,mm_energy_list,tor_energy_list,flatphaselist,qm_energy_list,tup,indicesremoveddic,cls_angle_dict_unmodified,qm_energy_list_unmodified,mm_energy_list_unmodified,clskeyswithbadfits,weightlist,torsions)
     return write_prm_dict,fitfunc_dict,torsettobypassrmsd,classkeytofoldtophase
@@ -1570,9 +1572,8 @@ def process_rot_bond_tors(poltype,mol):
         # do the fit
         if count==3:
             break # dont redo fitting forever
-        write_prm_dict,fitfunc_dict,torsettobypassrmsd,classkeytofoldtophase = fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,clskeyswithbadfits,indicesremoveddic,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified)
-        # write out new keyfile
-        write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename,classkeytofoldtophase)
+        write_prm_dict,fitfunc_dict,torsettobypassrmsd,classkeytofoldtophase = fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,clskeyswithbadfits,indicesremoveddic,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified,tmpkey1basename,tmpkey2basename)
+        
 
         RemoveFiles(poltype,'post',2)  
         if len(poltype.torlist)!=0:
@@ -1582,7 +1583,7 @@ def process_rot_bond_tors(poltype,mol):
         if len(clskeyswithbadfits)==0:
             break
         count+=1
-    WriteOutFitResults(poltype,tmpkey2basename,classkeytofitresults)
+    WriteOutFitResults(poltype,tmpkey2basename,classkeytofitresults) # add torsion fitting comments to key file
     if poltype.torfit1Drotonly==True and poltype.tortor==True:
         poltype.torfit1Drotonly=False
         poltype.torfit2Drotonly=True 

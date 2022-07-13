@@ -559,7 +559,7 @@ def FindTorsionRestraints(poltype,mol):
         bondnum+=1
         
 
-    if atomnum>=25 or bondnum>=2:
+    if atomnum>=25 and bondnum>=2:
         for b in openbabel.OBMolBondIter(mol):
             isrot=b.IsRotor()
             t2 = b.GetBeginAtom()
