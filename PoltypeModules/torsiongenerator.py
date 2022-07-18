@@ -24,9 +24,23 @@ import rings
 from PyAstronomy import pyasl
 
 def __init__(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     PolarizableTyper.__init__(poltype)
 
 def RemoveRedunantTorsionRestraints(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     sssr = poltype.mol.GetSSSR()
     ringlist=[]
     for ring in sssr:
@@ -67,12 +81,26 @@ def RemoveRedunantTorsionRestraints(poltype):
                                 poltype.torsettovariabletorlist[torset].append(tor)
         
 def FindWhichRingTorIsIn(poltype,ringlist,atomindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for ring in ringlist:
         if atomindex in ring:
             return tuple(ring)
 
 
 def DefaultMaxRange(poltype,torsions):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltype.rotbndtomaxrange={}
     for torsionset in torsions:
         for torsion in torsionset:
@@ -82,6 +110,13 @@ def DefaultMaxRange(poltype,torsions):
 
 
 def RemoveCommentsFromKeyFile(poltype,keyfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(keyfilename,'r')
     results=temp.readlines()
     temp.close()
@@ -100,6 +135,13 @@ def RemoveCommentsFromKeyFile(poltype,keyfilename):
     shutil.move(tempname, keyfilename)
 
 def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,variabletorlist,torsionrestraint,mol,currentopt,optlogtophaseangle):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     jobtooutputlog={}
     listofjobs=[]
     outputlogs=[]
@@ -134,6 +176,13 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,varia
     return outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures,optlogtophaseangle,inputfilepaths,outputfilenames,executables,outputlogtoinitialxyz
 
 def CheckIfPsi4Log(poltype,outputlog):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     check=False
     temp=open(outputlog,'r')
     results=temp.readlines()
@@ -146,6 +195,13 @@ def CheckIfPsi4Log(poltype,outputlog):
 
 
 def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,mol,optlogtosplog,optlogtophaseangle):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     jobtooutputlog={}
     listofjobs=[]
     outputnames=[]
@@ -197,6 +253,13 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
 
 
 def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
 
     prefix='%s-opt-%s_' % (poltype.molecprefix,currentopt)
     postfix='.com' 
@@ -259,6 +322,13 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     
 
 def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist,mol,currentopt):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if poltype.toroptmethod!='xtb':
         if  poltype.use_gaus==False and poltype.use_gausoptonly==False:
             inputname,outputname=CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt)
@@ -301,6 +371,13 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
 
 
 def GrabTorsionAngles(poltype,torset,inputmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     toranglelist=[]
     for i in range(len(torset)):
         tor=torset[i]
@@ -314,6 +391,13 @@ def GrabTorsionAngles(poltype,torset,inputmol):
     return toranglelist
 
 def GenerateTorsionSPInputFileGaus(poltype,torset,optmol,phaseangles,prevstrctfname,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     prevstruct = opt.load_structfile(poltype,prevstrctfname)
     prefix='%s-sp-' % (poltype.molecprefix)
     postfix='.com' 
@@ -326,6 +410,13 @@ def GenerateTorsionSPInputFileGaus(poltype,torset,optmol,phaseangles,prevstrctfn
 
 
 def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevstrctfname,torsionrestraint,bondtopology):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tinkerstructnamelist=[]
     # load prevstruct
     firsttor=torset[0]
@@ -394,6 +485,13 @@ def tinker_minimize_angles(poltype,torset,optmol,variabletorlist,phaselist,prevs
 
 
 def tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phaseangles,prevstrctfname,torsionrestraint,designatexyz,keybase,keybasepath,bondtopology,tinkerxyz=None,minimize=True):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     prevstruct = opt.load_structfile(poltype,prevstrctfname) 
     prevstruct=opt.rebuild_bonds(poltype,prevstruct,optmol)
     prevstruct = opt.PruneBonds(poltype,prevstruct,bondtopology)
@@ -414,6 +512,13 @@ def tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phas
     return cartxyz,newtorxyzfname
 
 def AnalyzeTerm(poltype,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     term=False
     if os.path.isfile(filename):
         temp=open(filename,'r')
@@ -425,6 +530,13 @@ def AnalyzeTerm(poltype,filename):
     return term
 
 def tinker_analyze(poltype,torxyzfname,keyfname,toralzfname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     alzcmdstr=poltype.analyzeexe+' '+torxyzfname+' '+'-k '+keyfname+' ed > %s' % toralzfname
     poltype.call_subsystem([alzcmdstr],False)
     temp={alzcmdstr:toralzfname} 
@@ -432,6 +544,13 @@ def tinker_analyze(poltype,torxyzfname,keyfname,toralzfname):
 
 
 def tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,designatexyz,keybase,keybasepath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     prefix='%s-opt-' % (poltype.molecprefix)
     postfix='%s.xyz' % (designatexyz)
     torxyzfname,angles=GenerateFilename(poltype,torset,phaseanglelist,prefix,postfix,optmol)
@@ -445,6 +564,13 @@ def tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseangl
 
        
 def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath,torxyzfname,tmpkeyfname,torminlogfname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     save_structfile(poltype,prevstruct,torxyzfname)
     shutil.copy(keybasepath+keybase, tmpkeyfname)
     RemoveStringFromKeyfile(poltype,tmpkeyfname,'restrain-torsion')
@@ -572,6 +698,13 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
     return cartxyz,torxyzfname,torxyzfname+'_2',tmpkeyfname,failedcheck
 
 def CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle,torsiontomaintor):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     inimol = opt.load_structfile(poltype,cartxyz)
     tol=4
     fail=False
@@ -601,6 +734,13 @@ def CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle,torsiont
     return fail
 
 def GenerateFilename(poltype,torset,phaseangles,prefix,postfix,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     oldtorset=torset[:]
     if torset in poltype.torsettofilenametorset.keys():
         tortorindex=poltype.torsettotortorindex[torset]
@@ -629,6 +769,13 @@ def GenerateFilename(poltype,torset,phaseangles,prefix,postfix,mol):
 
 
 def GeneratePhaseLists(poltype,torset,optmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     phaselists=[]
     currentanglelist=[]
     sizearray=[]
@@ -667,6 +814,13 @@ def GeneratePhaseLists(poltype,torset,optmol):
 
 
 def ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open('../'+poltype.xyzfname,'r')
     results=temp.readlines()
     temp.close() 
@@ -716,6 +870,13 @@ def ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz):
     temp.close()
 
 def RemoveBadPoints(poltype,listoftinkertorstructures,energyarray,flatphaselist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indices=numpy.nonzero(energyarray)
     newlistoftinkertorstructures=numpy.array(listoftinkertorstructures)[indices]
     newenergyarray=numpy.array(energyarray)[indices]
@@ -1018,6 +1179,13 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
 
 
 def CheckBondTopology(poltype,outputlog,initialtinkerstructure):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     bondtoposame=True
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
         fname=outputlog.replace('.log','.xyz')
@@ -1033,6 +1201,13 @@ def CheckBondTopology(poltype,outputlog,initialtinkerstructure):
     return bondtoposame
 
 def GenerateBondTopology(poltype,optmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     bondtopology=[]
     iterbond=openbabel.OBMolBondIter(optmol) # iterator for all bond objects in the molecule
     for bond in iterbond:
@@ -1045,6 +1220,13 @@ def GenerateBondTopology(poltype,optmol):
 
 
 def FindPartialDoubleBonds(poltype,rdkitmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltype.partialdoublebonds=[]
     amidesmarts='[NX3][CX3](=[OX1])'
     acidsmarts='[*][CX3](=O)[OX2]'
@@ -1064,6 +1246,13 @@ def FindPartialDoubleBonds(poltype,rdkitmol):
                 poltype.partialdoublebonds.append(babelbond)
 
 def RdkitIsInRing(poltype,atom):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     isinringofsize=False
     i=None
     for i in range(3,13+1):
@@ -1074,6 +1263,13 @@ def RdkitIsInRing(poltype,atom):
 
 
 def GrabAllRingsContainingMostIndices(poltype,atomindices,babelindices,total):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     rings=[]
     for ring in atomindices:
         array=[True for i in babelindices]
@@ -1210,6 +1406,13 @@ def get_torlist(poltype,mol,missed_torsions):
     return (torlist ,rotbndlist,hydtorsionlist,nonaroringtorlist,nonrotbndlist)
 
 def FindOtherTorsAboutBond(poltype,rotbndlist,bond,rotbndkey,t1,t2,t3,t4):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     #Find other possible torsions about this rotatable bond
     iteratomatom = openbabel.OBAtomAtomIter(bond.GetBeginAtom())
     for iaa in iteratomatom:
@@ -1224,6 +1427,13 @@ def FindOtherTorsAboutBond(poltype,rotbndlist,bond,rotbndkey,t1,t2,t3,t4):
     return rotbndlist
 
 def get_all_torsions(poltype,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltype.alltorsionslist=[]
     iterbond = openbabel.OBMolBondIter(mol)
     for bond in iterbond:
@@ -1256,6 +1466,13 @@ def get_all_torsions(poltype,mol):
 
 
 def get_torlist_opt_angle(poltype,optmol, torlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tmplist = []
     for tor in torlist:
         a,b,c,d=obatom2idx(poltype,tor[0:4])
@@ -1264,6 +1481,13 @@ def get_torlist_opt_angle(poltype,optmol, torlist):
     return tmplist
 
 def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltype.rotbndtoanginc={}
     poltype.torsionsettonumptsneeded={}
     # if here are multiple torsions to fit per rotatable bond, make sure there are enough angles for QM profile to do fitting
@@ -1360,6 +1584,13 @@ def find_tor_restraint_idx(poltype,mol,b1,b2):
 
 
 def GrabFirstHeavyAtomIdx(poltype,indices,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atoms=[mol.GetAtom(i) for i in indices]
     atomicnums=[a.GetAtomicNum() for a in atoms]
     
@@ -1373,6 +1604,13 @@ def GrabFirstHeavyAtomIdx(poltype,indices,mol):
 
 
 def ConvertTinktoXYZ(poltype,filename,newfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(os.getcwd()+r'/'+filename,'r')
     tempwrite=open(os.getcwd()+r'/'+newfilename,'w')
     results=temp.readlines()
@@ -1396,6 +1634,13 @@ def ConvertTinktoXYZ(poltype,filename,newfilename):
 
 
 def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     rottors=[] 
     firsttor=True
     for i in range(len(torset)):
@@ -1452,6 +1697,13 @@ def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxr
 
 
 def FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     frotors=[]
     newdic={}
     newdic.update(poltype.rotbndlist)
@@ -1515,6 +1767,13 @@ def FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotb
 
 
 def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     prefix='%s-opt-%s_' % (poltype.molecprefix,currentopt)
     postfix='.psi4'  
     inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
@@ -1756,6 +2015,13 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
 
 
 def GenerateElementToBasisSetLines(poltype,basissetfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     elementtobasissetlines={}
     temp=open(basissetfile,'r')
     results=temp.readlines()
@@ -1815,6 +2081,13 @@ def save_structfile(poltype,molstruct, structfname):
     return tmpconv.WriteFile(molstruct, structfname)
 
 def save_structfileXYZ(poltype,molstruct, structfname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
         
     tmpconv = openbabel.OBConversion()
     tmpconv.SetOutFormat('xyz')
@@ -1822,7 +2095,11 @@ def save_structfileXYZ(poltype,molstruct, structfname):
 
 def get_class_key(poltype,a, b, c, d):
     """
-    Intent: Given a set of atom idx's, return the class key for the set (the class numbers of the atoms appended together)
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
     """
     cla = poltype.idxtosymclass[a]
     clb = poltype.idxtosymclass[b]
@@ -1834,8 +2111,11 @@ def get_class_key(poltype,a, b, c, d):
 
 def get_uniq_rotbnd(poltype,a, b, c, d):
     """
-    Intent: Return the atom idx's defining a rotatable bond in the order of the class key
-    found by 'get_class_key'
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
     """
     cla = poltype.idxtosymclass[a]
     clb = poltype.idxtosymclass[b]
@@ -1849,8 +2129,11 @@ def get_uniq_rotbnd(poltype,a, b, c, d):
 
 def obatom2idx(poltype,obatoms):
     """
-    Intent: Given a list of OBAtom objects, return a list of their corresponding idx's
-    Referenced By: get_torlist_opt_angle
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
     """
     atmidxlist = []
     for obatm in obatoms:
@@ -1859,7 +2142,11 @@ def obatom2idx(poltype,obatoms):
 
 def rads(poltype,degrees):
     """
-    Intent: Convert degrees to radians
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
     """
     if type(degrees) == type(list):
         return [ deg * numpy.pi / 180 for deg in degrees ]
@@ -1887,6 +2174,14 @@ def write_arr_to_file(poltype,fname, array_list):
     return 
 
 def CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,mol,makecube=None):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     prefix='%s-sp-'%(poltype.molecprefix)
     postfix='.psi4'  
     inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
@@ -1950,6 +2245,14 @@ def CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,m
 
 
 def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetfile,space):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     newtemp=open(poltype.basissetpath+normalelementbasissetfile,'r')
     results=newtemp.readlines()
     newtemp.close()
@@ -1968,6 +2271,14 @@ def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetf
 
 
 def RemoveDuplicateRotatableBondTypes(poltype,torlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     tortorotbnd={}
     for key,tors in poltype.rotbndlist.items():
         for tor in tors:
@@ -1989,7 +2300,11 @@ def RemoveDuplicateRotatableBondTypes(poltype,torlist):
 
 def PrependStringToKeyfile(poltype,keyfilename,string):
     """
-    Intent: Adds a header to the key file given by 'keyfilename'
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
     """
     tmpfname = keyfilename + "_tmp"
     tmpfh = open(tmpfname, "w")
@@ -2002,7 +2317,11 @@ def PrependStringToKeyfile(poltype,keyfilename,string):
 
 def RemoveStringFromKeyfile(poltype,keyfilename,string):
     """
-    Intent: Adds a header to the key file given by 'keyfilename'
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
     """
     tmpfname = keyfilename + "_tmp"
     tmpfh = open(tmpfname, "w")
@@ -2020,6 +2339,13 @@ def RemoveStringFromKeyfile(poltype,keyfilename,string):
 
 
 def UpdateMaxRange(poltype,torsion,maxrange):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     a,b,c,d=torsion[0:4]
     key=str(b)+' '+str(c)
     poltype.rotbndtomaxrange[key]=maxrange
@@ -2031,6 +2357,13 @@ def UpdateMaxRange(poltype,torsion,maxrange):
 
 
 def FindMainConsecutiveTorsions(poltype,tortorsmissing):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tortors=[]
     for tortor in tortorsmissing:
         a,b,c,d,e=tortor[:]
@@ -2063,6 +2396,13 @@ def FindMainConsecutiveTorsions(poltype,tortorsmissing):
     return tortors
 
 def RemoveRotatableBondFromTorlist(poltype,tor):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indicestoremove=[]
     rotbnd=[tor[1],tor[2]]
     for grpidx in range(len(poltype.torlist)):
@@ -2078,6 +2418,13 @@ def RemoveRotatableBondFromTorlist(poltype,tor):
 
 
 def UpdateTorsionSets(poltype,tortor):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for tor in tortor:
         torset=tuple([tuple(tor)])
         RemoveRotatableBondFromTorlist(poltype,tor)
@@ -2085,10 +2432,24 @@ def UpdateTorsionSets(poltype,tortor):
     poltype.torlist.append(tuple(tortor))
 
 def FlattenArray(poltype,flatphaselist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     flatphaselist= flatphaselist.reshape(-1, flatphaselist.shape[-1])
     return flatphaselist 
 
 def Determine1DTorsionSlicesOnTorTorSurface(poltype,energyarray,phaseanglelist,torset,sizearray):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indicestokeep=[]
     firsttorindices=[]
     secondtorindices=[]
@@ -2122,6 +2483,13 @@ def Determine1DTorsionSlicesOnTorTorSurface(poltype,energyarray,phaseanglelist,t
     return indicestokeep,firsttorindices,secondtorindices
 
 def RemoveTorTorPoints(poltype,energyarray,phaseanglelist,indicestokeep,listofstructurestorunQM):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     energyarray=numpy.array(energyarray)
     listofstructurestorunQM=numpy.array(listofstructurestorunQM)
     sortedenergyarrayindices=numpy.argsort(energyarray)
@@ -2164,12 +2532,26 @@ def RemoveTorTorPoints(poltype,energyarray,phaseanglelist,indicestokeep,listofst
             
 
 def PrepareTorsionTorsion(poltype,optmol,mol,tortorsmissing):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tortors=FindMainConsecutiveTorsions(poltype,tortorsmissing)
     for tortor in tortors:
         UpdateTorsionSets(poltype,tortor)
 
 
 def CreateConstraintsFileXTB(poltype,torlist,toranglelist,pre):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     filename=pre+'_constr.txt'
     temp=open(filename,'w')
     temp.write('$constrain'+'\n')
@@ -2187,12 +2569,26 @@ def CreateConstraintsFileXTB(poltype,torlist,toranglelist,pre):
 
 
 def OptimizeXTB(poltype,inputstruct,resfilename,xtbmethod,outputname,charge,uhf):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     cmdstr='xtb' +' '+'--gfn'+' '+str(xtbmethod)+' '+'--chrg'+' '+str(charge)+' '+'--uhf'+' '+str(uhf)+' '+inputstruct+' '+'--opt'+' '+'--input'+' '+resfilename+' > '+outputname
     optxyz='xtbopt.xyz'
     return optxyz,cmdstr
 
 
 def RunXTBSPEnergy(poltype,optxyz,uhf,charge,xtbmethod,outputname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     cmdstr='xtb'+' '+'--gfn'+' '+str(xtbmethod)+' '+optxyz+' '+'--chrg'+' '+str(charge)+' '+'--uhf'+' '+str(uhf)+' > '+outputname
     return cmdstr
 

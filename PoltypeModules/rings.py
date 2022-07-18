@@ -9,6 +9,13 @@ import shutil
 import sys
 
 def NonAromaticRingAtomicIndices(poltype,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     sssr = mol.GetSSSR()
     atomindices=[]
     for ring in sssr:
@@ -21,6 +28,13 @@ def NonAromaticRingAtomicIndices(poltype,mol):
     return atomindices
 
 def GrabRingAtomIndices(poltype,mol,ring):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ringatomindices=[]
     atomiter=openbabel.OBMolAtomIter(mol)
     for atom in atomiter:
@@ -31,6 +45,13 @@ def GrabRingAtomIndices(poltype,mol,ring):
 
 
 def NonAromaticRingTorsions(poltype,torsions,atomindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     nonarotorsions=[]
     nonarotorsionsflat=[]
     for ring in atomindices:
@@ -44,6 +65,13 @@ def NonAromaticRingTorsions(poltype,torsions,atomindices):
     return nonarotorsions,nonarotorsionsflat
 
 def isTorsionInNonAromaticRing(poltype,torsion,ring):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     firstatomindex=torsion[0]
     secondatomindex=torsion[1]
     thirdatomindex=torsion[2]
@@ -54,12 +82,33 @@ def isTorsionInNonAromaticRing(poltype,torsion,ring):
     return nonaro
 
 def TotalParametersToFitForNonAromaticRing(poltype,ringtors): # symmetry class key, not atom indices
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     return len(ringtors)*poltype.foldnum+1 #number of torsions x # cosine terms +1 extra profile shift parameter
 
 def TotalDatapointsForNonAromaticRing(poltype,numparameters):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     return numparameters+1 # +1 so dont overfit
 
 def AllPossiblePuckeringLocationsForRing(poltype,ringtors,tortoneighbtors,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     numbertors=len(ringtors)-3 
     combs=list(combinations(ringtors,numbertors))
     finalcombs=[]
@@ -84,6 +133,13 @@ def AllPossiblePuckeringLocationsForRing(poltype,ringtors,tortoneighbtors,mol):
     return finalcombs
 
 def NeighboringTorsion(poltype,ringtors,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tortoneighbtors={}
     for tor in ringtors:
         a,b,c,d=tor[:]
@@ -96,6 +152,13 @@ def NeighboringTorsion(poltype,ringtors,mol):
     return tortoneighbtors
 
 def IterativeOverNeighborsOfEndTorsionAtoms(poltype,atomidx,ringtors,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     finaltors=[]
     atom=mol.GetAtom(atomidx)        
     atomatomiter=openbabel.OBAtomAtomIter(atom)
@@ -106,6 +169,13 @@ def IterativeOverNeighborsOfEndTorsionAtoms(poltype,atomidx,ringtors,mol):
     return finaltors
     
 def CheckForNeighboringTorsions(poltype,natomidx,ringtors):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ntors=[]
     for tor in ringtors:
         a,b,c,d=tor[:]
@@ -115,22 +185,57 @@ def CheckForNeighboringTorsions(poltype,natomidx,ringtors):
 
 
 def DatapointsPerTorsionForNonArtomaticRing(poltype,ringtors,totaldatapoints):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     return int(totaldatapoints/len(ringtors))
 
 def PhasePerTorsionForNonAromaticRing(poltype,dataptspertorsion,maxrange):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     return int(maxrange/dataptspertorsion)
 
 def UpdateAngleIncrement(poltype,phase,torsion):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     a,b,c,d=torsion[0:4]
     key=str(b)+' '+str(c)
     poltype.rotbndtoanginc[key]=phase
 
 def UpdateMaxRange(poltype,torsion,maxrange):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     a,b,c,d=torsion[0:4]
     key=str(b)+' '+str(c)
     poltype.rotbndtomaxrange[key]=maxrange
 
 def UpdateTorsionSets(poltype,comb,nonarotors):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
      
     for tor in nonarotors:
         a,b,c,d=tor[:] 
@@ -149,6 +254,13 @@ def UpdateTorsionSets(poltype,comb,nonarotors):
     poltype.nonaroringtorsets.append(comb)
 
 def UpdateVariableTorsions(poltype,comb,nonarotors,atomindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ringindices=atomindices[0]
     newlist=[]
     othertors=[]
@@ -255,6 +367,13 @@ def UpdateVariableTorsions(poltype,comb,nonarotors,atomindices):
     return newcomb
 
 def DetermineMaxRanges(poltype,torset,optmol,bondtopology):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     phaseangles=[0]*len(torset)
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
         prefix='%s-opt-' % (poltype.molecprefix)
@@ -313,6 +432,13 @@ def DetermineMaxRanges(poltype,torset,optmol,bondtopology):
         UpdateMaxRange(poltype,torsion,maxrange)
 
 def RefineNonAromaticRingTorsions(poltype,mol,optmol,classkeytotorsionparametersguess):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if not os.path.isdir('qm-torsion'):
         os.mkdir('qm-torsion')
 

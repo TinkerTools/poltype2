@@ -12,9 +12,14 @@ import pymbar
 import warnings
 
 def convert_1d(arr):
-  '''
-  convert nx2 array to nx1 array of the difference
-  '''
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: convert nx2 array to nx1 array of the difference
+  """
+
   if len(arr.shape) == 1:
     arr1 = arr
   elif len(arr.shape) ==2 and arr.shape[1] == 2:
@@ -24,9 +29,13 @@ def convert_1d(arr):
   return arr1
   
 def calc_eff_size(arr, equil=False):
-  '''
-  return t0, g
-  '''
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   arr1 = convert_1d(arr)
   if len(arr1) == 0:
     return 0, 1
@@ -47,6 +56,13 @@ def calc_eff_size(arr, equil=False):
   return t0, g
 
 def resample(arr, n, uniform=False):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   if uniform:
     idx = np.array((np.arange(n, dtype=int)*(len(arr)-1))//(n-1), dtype=int)
     return arr[idx]
@@ -54,6 +70,13 @@ def resample(arr, n, uniform=False):
     return arr[np.random.randint(0, len(arr), n, dtype=int)]
     
 def subsample1(arr1, equil=False, corr=True, skip=0, last=None, n_aug=1, uniform=True):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   '''
   equil: discard equilibration samples
   corr: compute correlation
@@ -82,6 +105,13 @@ def subsample1(arr1, equil=False, corr=True, skip=0, last=None, n_aug=1, uniform
   return arr1c, t1 + skip, last, g1
 
 def subsample_arrays(arr1s, **kwargs):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   arr2s = []
   # t0, t1, g, n
   tgn = np.zeros((len(arr1s), 4))
@@ -100,6 +130,13 @@ def subsample_arrays(arr1s, **kwargs):
   return arr2, t1, t2, g1
 
 def subsample(arr, equil=False, corr=True):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   arr1 = convert_1d(arr)
   NBLOCK = 71
   nskip = max(1, len(arr1)//NBLOCK)
@@ -113,13 +150,34 @@ def subsample(arr, equil=False, corr=True):
   return [_+t0 for _ in indices]
 
 def get_index_summary(indices):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   return '(%d,%d,%d)'%(indices[0], indices[-1], indices[1]-indices[0])
 
 def get_index_summary2(idx1, idx2):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   msg = 'A:%s B:%s'%(get_index_summary(idx1), get_index_summary(idx2))
   return msg
 
 def read_tinker_bars(inplist, temp=298, press=1.0, ibegin=0, iend=-1):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   u1s = []
   u2s = []
   temps = []
@@ -138,6 +196,13 @@ def read_tinker_bars(inplist, temp=298, press=1.0, ibegin=0, iend=-1):
   return u1s, u2s, temps
 
 def read_tinker_bar(inp, temp=298, press=1.0):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   #beta = 1.0/(8.314*temp/4184)
   # bar * ang^3 in kcal/mol
   PV_UNIT_CONV = 1e5*1e-30/4184*6.02e23
@@ -172,6 +237,13 @@ def read_tinker_bar(inp, temp=298, press=1.0):
     return u1, u2, temp1
 
 def calc_tinker_pv(arr1, press=1.0):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   PV_UNIT_CONV = 1e5*1e-30/4184*6.02e23
   if arr1.shape[1] >= 4:
     pv1 = press*arr1[:, 3:4]*PV_UNIT_CONV
@@ -180,24 +252,59 @@ def calc_tinker_pv(arr1, press=1.0):
   return pv1
 
 def calc_tinker_reduced(arr1, beta, press=1.0):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   pv1 = calc_tinker_pv(arr1, press=press)
   u1 = beta*(arr1[:, 1:3] + pv1)
   return u1
 
 def concat_arr(arr1, arr2, idx1, idx2):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   msg = get_index_summary2(idx1, idx2)
   return (np.concatenate((arr1[idx1], arr2[idx2]), axis=0).transpose(), [len(idx1), len(idx2)], msg)
 
 def tinker_to_mbar(arr1, arr2, equil=False, corr=True):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   assert len(arr1.shape) == 2 and arr1.shape[1] == 2
   idx1 = subsample(arr1[:, 1] - arr1[:, 0], equil=equil, corr=corr)
   idx2 = subsample(arr2[:, 1] - arr2[:, 0], equil=equil, corr=corr)
   return concat_arr(arr1, arr2, idx1, idx2)
 
 def arr_to_mbar(arr1, arr2):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   return (np.concatenate((arr1, arr2), axis=0).transpose(), [len(arr1), len(arr2)])
 
 def exp_ave(ener, return_sd=True, ener_unit=1):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   if len(ener) == 0:
     return np.nan, 0
   emin = np.min(ener)
@@ -208,6 +315,13 @@ def exp_ave(ener, return_sd=True, ener_unit=1):
   return eave*ener_unit
 
 def calc_mbar(u_kn, N_k, teff=1, temp=298):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   #data = concat_arr(arr1, arr2, idx1, idx2)
   #cols = 'dF(kcal/mol) se_dF(kcal/mol) dH se_dH TdS se_TdS dF_fwd dF_bwd dE_fwd dE_bwd sd_dE_fwd sd_dE_bwd p_A(traj_B) p_B(traj_A) eig_overlap'.split()
   cols = 'dF(kcal/mol) se_dF(kcal/mol) dH TdS se_dH dF_fwd dF_bwd dE_fwd dE_bwd sd_dE_fwd sd_dE_bwd overlap'.split()
@@ -236,6 +350,13 @@ def calc_mbar(u_kn, N_k, teff=1, temp=298):
 
 
 def get_bar_res(data, ishift=0, **kwargs):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   '''
   data: [array1, array2, temp]
   return 1 row of data frame
@@ -258,6 +379,13 @@ def get_bar_res(data, ishift=0, **kwargs):
 
 
 def compute_total_sd(df1):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   ''' compute sum on df columns
   sqrt(sum of squares) for 'sd_XXX', 'se_XXX'
   mininum for 'overlap*'
@@ -273,6 +401,13 @@ def compute_total_sd(df1):
   return arr1
 
 def compute_block_ave(df1):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   ''' compute average on df columns
   if df contains se_XXX and XXX, se_XXX will be calculated by the stderr of XXX
   '''
@@ -284,6 +419,13 @@ def compute_block_ave(df1):
   return arr1
 
 def sum_df_list(dflist):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   ''' compute sum for list of dfs
   sqrt(sum of squares) for 'sd_XXX', 'se_XXX'
   mininum for 'overlap*' '*overlap'
@@ -305,6 +447,13 @@ def sum_df_list(dflist):
   return df3
 
 def check_data_size(data, ibegin, iend):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   data1 = [[], [], []]
   for i in range(len(data[0])):
     if len(data[0][i][ibegin:iend]) + len(data[1][i][ibegin:iend]) > 0:
@@ -313,6 +462,13 @@ def check_data_size(data, ibegin, iend):
   return data1
 
 def get_summary(df1, verbose=True):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   name_val = []
   name_val.append(('dF_equ', df1.loc['equ', 'dF(kcal/mol)']))
   name_val.append(('dF_all', df1.loc['all', 'dF(kcal/mol)']))
@@ -362,6 +518,13 @@ def get_summary(df1, verbose=True):
   return df2
 
 def calc_dg(flist, ibegin=0, iend=-1, nblocks=5, summary=True, verbose=True):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   NBLOCK = nblocks
   NMIN = 100
   names = 'all uncorr equ'.split()
@@ -436,8 +599,23 @@ def calc_dg(flist, ibegin=0, iend=-1, nblocks=5, summary=True, verbose=True):
   return df_out, df_sum, (namesb, df_blocks)
 
 def add_line(inp):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   return '\n'+'*'*8+' '+inp+' '+'*'*8+'\n'
+
 def list_to_string(alist, maxl=12):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   if len(alist) == 0:
     return '[]'
   def trim(s):
@@ -449,6 +627,13 @@ def list_to_string(alist, maxl=12):
   return '[%s ... %s]'%(trim(str(alist[0])), trim(str(alist[-1])))
 
 def calc_dg_summary(flist, seperate=False, outfile=None, **kwargs):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   '''
   wrapper for calc_dg
 
@@ -513,6 +698,13 @@ def calc_dg_summary(flist, seperate=False, outfile=None, **kwargs):
 
 
 def GrabBarFileName(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     files=os.listdir()
     for f in files:
         if '.' in f:
@@ -524,6 +716,13 @@ def GrabBarFileName(poltype):
     return barfilepath
 
 def ComputeThermoProperties(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     curdir=os.getcwd()
     totalframes=poltype.proddynframenum
     divisor=int(totalframes/poltype.barinterval)
@@ -795,6 +994,13 @@ def ComputeThermoProperties(poltype):
 
 
 def CheckIfForwardBackwardPertubationsAreSimilar(poltype,fwdenergylist,bwdenergylist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tol=1
     for i in range(len(fwdenergylist)):
         fwdenergy=fwdenergylist[i]
@@ -807,6 +1013,13 @@ def CheckIfForwardBackwardPertubationsAreSimilar(poltype,fwdenergylist,bwdenergy
             poltype.WriteToLog(string)
 
 def DecomposeLambdaArray(poltype,lambdals):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indiceschange=[]
     indicesconstant=[]
     most_common = max(lambdals, key = lambdals.count)
@@ -821,6 +1034,13 @@ def DecomposeLambdaArray(poltype,lambdals):
 
 
 def GenerateEleVdwSums(poltype,freeenergylist,vdwlambdapairlist,elelambdapairlist,baroutputfilepathlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indiceslist=[]
     count=0
     eleboundaryindices=[]
@@ -893,6 +1113,13 @@ def GenerateEleVdwSums(poltype,freeenergylist,vdwlambdapairlist,elelambdapairlis
 
 
 def ExecuteBARSecondOption(poltype,joblistname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     jobtolog={}
     jobtojobpath={}
     jobtoinputfilepaths={}
@@ -937,11 +1164,25 @@ def ExecuteBARSecondOption(poltype,joblistname):
         submitjobs.SubmitJobs(poltype,jobtolog,jobtojobpath,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,poltype.outputpath+joblistname)
 
 def BARSecondOptionCommand(poltype,barfilepath,firstframenum,maxframenum,outputname,barpath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     head,tail=os.path.split(outputname)
     cmdstr=barpath+' '+'2'+' '+barfilepath+' '+str(firstframenum)+' '+str(maxframenum)+' '+'1'+' '+str(firstframenum)+' '+str(maxframenum)+' '+'1'+' > '+tail
     return cmdstr
 
 def ExecuteBAR(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     jobtolog={}
     jobtojobpath={}
     jobtoinputfilepaths={}
@@ -1001,11 +1242,25 @@ def ExecuteBAR(poltype):
         submitjobs.SubmitJobs(poltype,jobtolog,jobtojobpath,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,poltype.outputpath+poltype.barjobsfilename,jobtooutputpath)
 
 def BARCommand(poltype,secondarcpath,firstarcpath,outputfilepath,barpath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     head,tail=os.path.split(outputfilepath)
     cmdstr=barpath+' '+'1'+' '+secondarcpath+' '+str(poltype.equilibriatescheme[-1])+' '+firstarcpath+' '+str(poltype.equilibriatescheme[-1])+' N'+' > '+tail
     return cmdstr
 
 def SumTheFreeEnergyStepsFromBAR(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for j in range(len(poltype.simfoldname)):
         simfoldname=poltype.simfoldname[j]
         os.chdir(poltype.outputpath+simfoldname)
@@ -1308,6 +1563,13 @@ def SumTheFreeEnergyStepsFromBAR(poltype):
             energy_writer.writerow(row)
             
 def FlattenListOfList(poltype,listoflist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     flat=[item for sublist in listoflist for item in sublist]
     newflat=[]
     for item in flat:
@@ -1320,6 +1582,19 @@ def FlattenListOfList(poltype,listoflist):
     return newflat
 
 def FlattenListOfListGenerateBARPairs(poltype,listoflist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """   """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newflat=[]
     newlistoflist=[]
     for j in range(len(listoflist)):
@@ -1336,6 +1611,13 @@ def FlattenListOfListGenerateBARPairs(poltype,listoflist):
 
 
 def GenerateBARPairs(poltype,ls):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newflat=[]
     for i in range(len(ls)-1):
         first=ls[i]
@@ -1345,6 +1627,13 @@ def GenerateBARPairs(poltype,ls):
     return newflat
 
 def DeleteBARFiles(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for j in range(len(poltype.simfoldname)):
        simfoldname=poltype.simfoldname[j]
        os.chdir(poltype.outputpath+simfoldname)
@@ -1366,6 +1655,13 @@ def DeleteBARFiles(poltype):
    
 
 def BARProtocol(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if poltype.barfilesfinished==False:
         for i in range(len(poltype.baroutputfilepath)):
             baroutputfilepathlist=poltype.baroutputfilepath[i]

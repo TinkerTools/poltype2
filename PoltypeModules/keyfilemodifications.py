@@ -2,6 +2,13 @@ import os
 import shutil
    
 def CopyKeyFileAsBackup(poltype,keypath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     maxnumber=FindCurrentLastKeyFile(poltype,keypath)
     newkeyfile=keypath+'_'+str(maxnumber+1)
     if not os.path.exists('BackupKeys'):
@@ -11,6 +18,13 @@ def CopyKeyFileAsBackup(poltype,keypath):
     return newkeyfile
 
 def FindCurrentLastKeyFile(poltype,keypath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     files=os.listdir()
     head,tail=os.path.split(keypath)
     maxnumber=0
@@ -27,6 +41,13 @@ def FindCurrentLastKeyFile(poltype,keypath):
         
  
 def AddKeyWord(poltype,keypath,string):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     #newkeyfile=CopyKeyFileAsBackup(poltype,keypath)
     poltype.WriteToLog('Adding key words to '+keypath+' '+string,prin=True)
     #poltype.WriteToLog('Making copy of old keyfile '+newkeyfile,prin=True)
@@ -43,6 +64,13 @@ def AddKeyWord(poltype,keypath,string):
     os.rename(tempkeyname,keypath)
 
 def CheckIfStringAlreadyInKeyfile(poltype,keypath,string):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     found=False
     temp=open(keypath,'r')
     results=temp.readlines()
@@ -53,6 +81,13 @@ def CheckIfStringAlreadyInKeyfile(poltype,keypath,string):
     return found
     
 def RemoveKeyWords(poltype,keypath,keystringlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltype.WriteToLog('Removing key words from '+keypath+' '+str(keystringlist),prin=True)
     read=open(keypath,'r')
     results=read.readlines()
@@ -71,6 +106,13 @@ def RemoveKeyWords(poltype,keypath,keystringlist):
     os.rename(tempname,keypath)  
     
 def InsertKeyfileHeader(poltype,keyfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltype.WriteToLog('Adding header to key file '+keyfilename,prin=True)
     string='parameters '+poltype.prmfilepath+'\n'
     if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
@@ -132,10 +174,24 @@ def InsertKeyfileHeader(poltype,keyfilename):
 
 
 def AddMultipoleDefinitionsForIonIndices(poltype,ionindexes,charge,keyfilepath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for ionindex in ionindexes:
         AddIonMultipoleDefinition(poltype,ionindex,charge,keyfilepath)
 
 def AddIonMultipoleDefinition(poltype,ionindex,charge,keyfilepath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(keyfilepath,'a')
     chgline='multipole '+'-'+str(ionindex)+'   0   0                '+str(charge)+'\n'
     temp.write(chgline)

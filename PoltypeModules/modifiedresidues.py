@@ -13,6 +13,13 @@ from rdkit.Chem import rdFMCS
 import databaseparser as db
 
 def GenIndexToTypeIndexDic(poltype,tinkxyzfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(tinkxyzfile,'r')
     xyzresults=temp.readlines()
     temp.close()
@@ -27,6 +34,13 @@ def GenIndexToTypeIndexDic(poltype,tinkxyzfile):
     return idxtotypeidx
 
 def IsItABoundaryAtom(poltype,neighbidxs,modproidxs,proOBmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     foundbound=False
     for neighbidx in neighbidxs:
         if neighbidx not in modproidxs: # then this is an atom still inside MCS on ligand side and we define this as boundary atom
@@ -34,6 +48,13 @@ def IsItABoundaryAtom(poltype,neighbidxs,modproidxs,proOBmol):
     return foundbound
 
 def GrabModifiedResidueProteinIndexes(poltype,modifiedproteinpdbname,knownresiduesymbs,totalatomnumber):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(modifiedproteinpdbname,'r')
     results=temp.readlines()
     temp.close()
@@ -56,6 +77,13 @@ def GrabModifiedResidueProteinIndexes(poltype,modifiedproteinpdbname,knownresidu
     return modproidxs,modresnumber,modresiduelabel
 
 def GrabPDBInfo(poltype,pdbfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     # first grab the first residue number, then grab the last residue number
     temp=open(pdbfilename,'r')
     results=temp.readlines()
@@ -84,6 +112,19 @@ def GrabPDBInfo(poltype,pdbfilename):
 
 
 def PreservePDBAtomLabels(poltype,pdbfilename,idxtoatomlabel):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """   """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tempname=pdbfilename.replace('.pdb','_temp.pdb')
     ftemp=open(tempname,'w')
     temp=open(pdbfilename,'r')
@@ -121,6 +162,13 @@ def PreservePDBAtomLabels(poltype,pdbfilename,idxtoatomlabel):
             
 
 def GrabProteinTypeNumbers(poltype,pdbfilename,knownresiduesymbs,libpath,modproidxtotypenumber):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
 
     proidxtothreelettercode,proidxtoatomlabel,proidxtoresnum,firstresnum,lastresnum=GrabPDBInfo(poltype,pdbfilename)
 
@@ -157,6 +205,13 @@ def GrabProteinTypeNumbers(poltype,pdbfilename,knownresiduesymbs,libpath,modproi
 
 
 def GrabTypeLibIdxs(poltype,reslabel,libpath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomlabeltoprotypeidx={}
     temp=open(libpath,'r')
     results=temp.readlines()
@@ -175,6 +230,13 @@ def GrabTypeLibIdxs(poltype,reslabel,libpath):
 
 
 def GenerateXYZFile(poltype,molstruct, structfname,idxtoatomlabel): # dont use idxtoatomlabel, just use element symbol
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tmpconv = openbabel.OBConversion()
     tmpfh = open(structfname, "w")
     iteratom = openbabel.OBMolAtomIter(molstruct)
@@ -199,6 +261,13 @@ def GenerateXYZFile(poltype,molstruct, structfname,idxtoatomlabel): # dont use i
 
 
 def GenerateIdxToAtomLabel(poltype,pdbname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     idxtoatomlabel={}
     temp=open(pdbname,'r')
     results=temp.readlines()
@@ -212,6 +281,13 @@ def GenerateIdxToAtomLabel(poltype,pdbname):
     return idxtoatomlabel
                     
 def GenerateProteinTinkerXYZFile(poltype,modifiedproteinpdbname,modproidxtotypenumber,prmfilepath,proidxtoprotype,knownresiduesymbs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if not os.path.isfile(modifiedproteinpdbname):
         newpdbname=GeneratePDBTopologyFile(poltype,modifiedproteinpdbname)
     else:
@@ -253,6 +329,13 @@ def GenerateProteinTinkerXYZFile(poltype,modifiedproteinpdbname,modproidxtotypen
     return structfname,firstresnum,lastresnum
 
 def GrabProteinParameterTypeNumbers(poltype,prmfilepath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     proteinprmtypenumbers=[]
     temp=open(prmfilepath,'r')
     results=temp.readline()
@@ -266,6 +349,13 @@ def GrabProteinParameterTypeNumbers(poltype,prmfilepath):
 
 
 def GrabLigandParameterTypeNumbers(poltype,key5fname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ligandtypenumbers=[]
     temp=open(key5fname,'r')
     results=temp.readline()
@@ -280,6 +370,13 @@ def GrabLigandParameterTypeNumbers(poltype,key5fname):
 
 
 def AssignNewTypeNumbers(poltype,modproidxs,ligidxtotypeidx,proidxtoligidx):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     modproidxtotypenumber={}
     for proidx in modproidxs:
         ligidx=proidxtoligidx[proidx]
@@ -290,6 +387,13 @@ def AssignNewTypeNumbers(poltype,modproidxs,ligidxtotypeidx,proidxtoligidx):
 
 
 def GrabTinkerClassNumber(poltype,boundtype,prmfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(prmfile,'r')
     results=temp.readlines()
     temp.close()
@@ -305,6 +409,13 @@ def GrabTinkerClassNumber(poltype,boundtype,prmfile):
 
 
 def GrabLigandTypeToBoundryTypeForKeyFile(poltype,listofvalterms,proidxtoligidx,ligidxtotypeidx,proidxtotypeidx,prmfile,modproidxs,mincorenumber,maxcorenumber): # be careful because need to convert type number to class number for valence only if it is a protein type number (poltype type numbers are the same as class numbers) terms!
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     valligtypestoboundtypes={}
     for val in listofvalterms:
         valtype=[]
@@ -334,6 +445,13 @@ def GrabLigandTypeToBoundryTypeForKeyFile(poltype,listofvalterms,proidxtoligidx,
 
 
 def GrabPrmClassToBoundryClassForPrmFile(poltype,listofvalterms,proidxtoligidx,ligidxtotypeidx,proidxtotypeidx,prmfile,modproidxs,proboundidxtoprotype,prmtypetoprmclass,mincorenumber,maxcorenumber): # be careful because need to convert type number to class number for valence only if it is a protein type number (poltype type numbers are the same as class numbers) terms!
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     prmclassestoboundclasses={}
     for val in listofvalterms:
         valtype=[]
@@ -374,6 +492,13 @@ def GrabPrmClassToBoundryClassForPrmFile(poltype,listofvalterms,proidxtoligidx,l
 
 
 def GrabParametersFromKeyFile(poltype,key,torsionligtypestoboundtypesforkey,ligboundaryatomtypes,poltypetoprmtype,atomtypetoframedef,mincorenumber,maxcorenumber):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     
     temp=open(key,'r')
     results=temp.readlines()
@@ -457,6 +582,13 @@ def GrabParametersFromKeyFile(poltype,key,torsionligtypestoboundtypesforkey,ligb
 
 
 def CountNumberPoltypeNums(poltype,typelist,mincorenumber,maxcorenumber):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     count=0
     for typenum in typelist:
         if typenum>=mincorenumber and typenum<=maxcorenumber:
@@ -464,6 +596,13 @@ def CountNumberPoltypeNums(poltype,typelist,mincorenumber,maxcorenumber):
     return count
 
 def CountNumberOfNonPoltypeNums(poltype,typelist,mincorenumber,maxcorenumber):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     count=0
     for typenum in typelist:
         if typenum<mincorenumber or typenum>maxcorenumber:
@@ -472,6 +611,13 @@ def CountNumberOfNonPoltypeNums(poltype,typelist,mincorenumber,maxcorenumber):
 
 
 def GrabIdxsFromType(poltype,ligtypes,ligidxtotypeidx):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ligidxs=[]
     typenums=[]
     for typenum in ligtypes:
@@ -486,6 +632,13 @@ def GrabIdxsFromType(poltype,ligtypes,ligidxtotypeidx):
 
 
 def GrabMultipoleFrameDefintions(poltype,key,boundaryatomidxs,ligidxtotypeidx,proidxtoprotype,modproidxs,ligidxtoproidx,prosideboundligidx,proboundidxtoprotype,mincorenumber,maxcorenumber,modligidxs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     boundaryatomtypeidxs=[ligidxtotypeidx[i] for i in boundaryatomidxs]
     temp=open(key,'r')
     results=temp.readlines()
@@ -539,6 +692,13 @@ def GrabMultipoleFrameDefintions(poltype,key,boundaryatomidxs,ligidxtotypeidx,pr
 
 
 def WriteNewKeyFile(poltype,atomdefs,bondprms,angleprms,torsionprms,strbndprms,opbendprms,polarizeprms,vdwprms,mpoleprms,writekey,prmfilepath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     # assumes that there is white space at end of every parameter block, just add a line to key_5
     temp=open(writekey,'a')
     temp.write('\n\n\n\n\n\n\n\n\n\n')
@@ -678,6 +838,13 @@ def WriteNewKeyFile(poltype,atomdefs,bondprms,angleprms,torsionprms,strbndprms,o
 
 
 def GenerateFragBabel(poltype,molindexlist,pdbname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomidxstoremove=[]
     pdbmol=openbabel.OBMol()
     obConversion = openbabel.OBConversion()
@@ -697,6 +864,13 @@ def GenerateFragBabel(poltype,molindexlist,pdbname):
     return pdbmol
 
 def GenerateFragRdkit(poltype,molindexlist,rdkitmol,pdbname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     conf = rdkitmol.GetConformer()
     atomidxstoremove=[]
     for atom in rdkitmol.GetAtoms():
@@ -712,6 +886,13 @@ def GenerateFragRdkit(poltype,molindexlist,rdkitmol,pdbname):
 
 
 def OldIndexToNewIndexBabel(poltype,pdbname,fragmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     parentindextofragindex={}
     positiontoparentindex={}
     pdbmol=openbabel.OBMol()
@@ -735,6 +916,13 @@ def OldIndexToNewIndexBabel(poltype,pdbname,fragmol):
     return parentindextofragindex
 
 def OldIndexToNewIndexRdkit(poltype,pdbname,fragmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     parentindextofragindex={}
     positiontoparentindex={}
     pdbmol=Chem.rdmolfiles.MolFromPDBFile(pdbname,removeHs=False,sanitize=False)
@@ -757,6 +945,13 @@ def OldIndexToNewIndexRdkit(poltype,pdbname,fragmol):
 
 
 def NeighboringModResidueAtomIndexes(poltype,modresnumber,modifiedproteinpdbname,modproidxs,proOBmol,proboundidxs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     neighbidxs=[]
     temp=open(modifiedproteinpdbname,'r')
     results=temp.readlines()
@@ -784,6 +979,13 @@ def NeighboringModResidueAtomIndexes(poltype,modresnumber,modifiedproteinpdbname
 
 
 def FindBoundaryAtomIdxs(poltype,proOBmol,modproidxs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     proboundaryatomidxs=[]
     for atom in openbabel.OBMolAtomIter(proOBmol):
         atomidx=atom.GetIdx()
@@ -797,6 +999,13 @@ def FindBoundaryAtomIdxs(poltype,proOBmol,modproidxs):
     return proboundaryatomidxs
 
 def CountNumberOfAtomsInModifiedResidue(poltype,atomidxlist,modproidxs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     count=0
     for idx in atomidxlist:
         if idx in modproidxs:
@@ -804,6 +1013,13 @@ def CountNumberOfAtomsInModifiedResidue(poltype,atomidxlist,modproidxs):
     return count
 
 def CountNumberOfAtomsInBoundryList(poltype,atomidxlist,proboundidxs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     count=0
     for idx in atomidxlist:
         if idx in proboundidxs:
@@ -812,6 +1028,13 @@ def CountNumberOfAtomsInBoundryList(poltype,atomidxlist,proboundidxs):
 
 
 def GrabAtomsForValenceTermsAcrossBoundary(poltype,ligOBmol,proOBmol,ligidxtoproidx,proboundidxs,boundaryatomidxs,modproidxs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     # now we can define arrays to collect bonds, angles and torsions
     listoftorsionsforkey=[]
     listofbondsforprm=[]
@@ -859,6 +1082,13 @@ def GrabAtomsForValenceTermsAcrossBoundary(poltype,ligOBmol,proOBmol,ligidxtopro
 
 
 def GrabPolarizeBoundaryLigTypeToProType(poltype,ligOBmol,proOBmol,modproidxs,boundaryatomidxs,prosideboundligidx):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ligtypes=[] # need to know list of indexes that polarize terms needs to be changed
     # be careful we also want to use protein types instead of ligand types for the atom type being polarized if across the boundary on the protein side
     ligtypetoprotype={} # use this for converting ligtypes that should be protypes to protypes
@@ -892,10 +1122,24 @@ def GrabPolarizeBoundaryLigTypeToProType(poltype,ligOBmol,proOBmol,modproidxs,bo
 
 
 def GrabKnownResidueSymbs(poltype): # if adding parameters to the library then need to 
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     
     return poltype.knownresiduesymbs
 
 def MatchCorrectProteinAtomsToCorrespondingHydrogen(poltype,proboundidxs,proOBmol,polOBmol,proidxtoligidx,ligidxtoproidx):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomiter=openbabel.OBMolAtomIter(proOBmol)
     for atom in atomiter:
         atomidx=atom.GetIdx()
@@ -921,6 +1165,13 @@ def MatchCorrectProteinAtomsToCorrespondingHydrogen(poltype,proboundidxs,proOBmo
 
 
 def GrabCarbonylCarbonAndAmideNitrogen(poltype,modresnumber,pdbname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     backboneprobound=[]
     temp=open(pdbname,'r')
     results=temp.readlines()
@@ -950,6 +1201,13 @@ def GrabCarbonylCarbonAndAmideNitrogen(poltype,modresnumber,pdbname):
 
 
 def CheckIfSMARTSInLibrary(poltype,SMARTSToTypelibpath,smarts):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     check=False
     if os.path.isfile(SMARTSToTypelibpath):
         temp=open(SMARTSToTypelibpath,'r')
@@ -961,6 +1219,13 @@ def CheckIfSMARTSInLibrary(poltype,SMARTSToTypelibpath,smarts):
     return check
 
 def GrabSideChainIndexes(poltype,residuenumber,pdbname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     sidechainindexes=[]
     temp=open(pdbname,'r')
     results=temp.readlines()
@@ -976,6 +1241,13 @@ def GrabSideChainIndexes(poltype,residuenumber,pdbname):
     return sidechainindexes
 
 def GrabPDBIndexes(poltype,residuenumber,pdbname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indexes=[]
     temp=open(pdbname,'r')
     results=temp.readlines()
@@ -990,6 +1262,13 @@ def GrabPDBIndexes(poltype,residuenumber,pdbname):
     return indexes
 
 def FindAtomIndexesToKeepAfterMutation(poltype,residuenumber,atomindexlist,pdbname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indexestokeep=[]
     temp=open(pdbname,'r')
     results=temp.readlines()
@@ -1004,6 +1283,13 @@ def FindAtomIndexesToKeepAfterMutation(poltype,residuenumber,atomindexlist,pdbna
     return indexestokeep
 
 def ModifyAlignmentPDB(poltype,pdbname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(pdbname,'r')
     results=temp.readlines()
     temp.close()
@@ -1035,6 +1321,13 @@ def ModifyAlignmentPDB(poltype,pdbname):
     os.rename(tempname,pdbname)
 
 def FindCorrectReferenceIndexes(poltype,allindexes,pdbindexes):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     backboneindexesreference=[]
     for match in allindexes:
         foundmatch=True
@@ -1047,6 +1340,13 @@ def FindCorrectReferenceIndexes(poltype,allindexes,pdbindexes):
         return None
 
 def GrabModifiedResidueLines(poltype,pdbname,resid):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     lines=[]
     temp=open(pdbname,'r')
     results=temp.readlines()
@@ -1066,6 +1366,13 @@ def GrabModifiedResidueLines(poltype,pdbname,resid):
     return lines
 
 def GrabChainId(poltype,resid,pdbname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(pdbname,'r')
     results=temp.readlines()
     temp.close()
@@ -1081,6 +1388,13 @@ def GrabChainId(poltype,resid,pdbname):
 
             
 def ModifyChainIdentifier(poltype,lines,chainid):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newlines=[]
     for line in lines:
         newline=line[:21]+chainid+line[22:]
@@ -1089,6 +1403,13 @@ def ModifyChainIdentifier(poltype,lines,chainid):
             
 
 def MoveModifiedLines(poltype,lines,resid,pdbname,firstresnumber):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(pdbname,'r')
     results=temp.readlines()
     temp.close()
@@ -1124,6 +1445,13 @@ def MoveModifiedLines(poltype,lines,resid,pdbname,firstresnumber):
 
 
 def DeleteHydrogensAttachedToBackbone(poltype,molobj,indexlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     dellist=[]
     for index in indexlist:
         atom=molobj.GetAtom(index)
@@ -1139,6 +1467,13 @@ def DeleteHydrogensAttachedToBackbone(poltype,molobj,indexlist):
 
 
 def SwapDictionaryKeys(poltype,refdic,swapdic):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newdic={}
     for key in list(refdic.keys()):
         if key in swapdic.keys():
@@ -1148,6 +1483,13 @@ def SwapDictionaryKeys(poltype,refdic,swapdic):
     return newdic
 
 def MissingIndexes(poltype,proidxtoatomlabel):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     missingproidxs=[]
     minproidx=min(list(proidxtoatomlabel.keys()))
     maxproidx=max(list(proidxtoatomlabel.keys()))
@@ -1160,6 +1502,13 @@ def MissingIndexes(poltype,proidxtoatomlabel):
 
 
 def GenerateModifiedProteinPDB(poltype):      
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     sidechainindexes=GrabSideChainIndexes(poltype,int(poltype.mutatedresiduenumber),poltype.unmodifiedproteinpdbname)
     atomindexestokeepafter=FindAtomIndexesToKeepAfterMutation(poltype,int(poltype.mutatedresiduenumber),sidechainindexes,poltype.unmodifiedproteinpdbname) # only do this for indexes after residue
     unmodpdbmol=openbabel.OBMol()
@@ -1241,6 +1590,13 @@ def GenerateModifiedProteinPDB(poltype):
 
 
 def ConnectSideChainToBackbone(poltype,pdbfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     pdbmol=openbabel.OBMol()
     obConversion = openbabel.OBConversion()
     obConversion.SetInFormat('pdb')
@@ -1323,6 +1679,13 @@ def ConnectSideChainToBackbone(poltype,pdbfilename):
  
 
 def GeneratePDBTopologyFile(poltype,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     finalmol=openbabel.OBMol() # need to pass through babel again to change atom indexes
     obConversion = openbabel.OBConversion()
     obConversion.SetInFormat('pdb')
@@ -1341,6 +1704,13 @@ def GeneratePDBTopologyFile(poltype,filename):
     return poltype.modifiedproteinpdbname
 
 def GeneratePDBTopologyObject(poltype,molecule,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     molecule.BeginModify()
     molecule=RemoveAllBonds(poltype,molecule)
     smartstoatomorder,smartstobondtopo,smartstolabel,canonicallabels=ParseTopologyLib(poltype)
@@ -1349,6 +1719,13 @@ def GeneratePDBTopologyObject(poltype,molecule,filename):
 
 
 def BuildPDBTopology(poltype,finalmol,smartstoatomorder,smartstobondtopo,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tempmol=openbabel.OBMol() # need to pass through babel again to change atom indexes
     obConversion = openbabel.OBConversion()
     obConversion.SetInFormat('pdb')
@@ -1392,6 +1769,13 @@ def BuildPDBTopology(poltype,finalmol,smartstoatomorder,smartstobondtopo,filenam
  
 
 def AppendLinesToFile(poltype,lines,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(filename,'a')
     temp.write('\n')
     for line in lines:
@@ -1399,6 +1783,13 @@ def AppendLinesToFile(poltype,lines,filename):
     temp.close()
 
 def IsStringInFile(poltype,string,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(filename,'r')
     results=temp.readlines()
     temp.close()
@@ -1409,6 +1800,13 @@ def IsStringInFile(poltype,string,filename):
     return check
 
 def ParseTopologyLib(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     smartstoatomorder={}
     smartstobondtopo={}
     smartstolabel={}
@@ -1445,6 +1843,13 @@ def ParseTopologyLib(poltype):
     return smartstoatomorder,smartstobondtopo,smartstolabel,canonicallabels
 
 def RemoveAllBonds(poltype,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     bonditer=openbabel.OBMolBondIter(mol)
     bondlist=[]
     for bond in bonditer:
@@ -1467,6 +1872,13 @@ def RemoveAllBonds(poltype,mol):
     return mol
 
 def GetAtomLabel(poltype,residue,atomidx):
+     """
+     Intent:
+     Input:
+     Output:
+     Referenced By: 
+     Description: 
+     """
      for atom in openbabel.OBResidueAtomIter(residue):
          atName = residue.GetAtomID(atom)
          if atom.GetIdx()==atomidx:
@@ -1475,12 +1887,26 @@ def GetAtomLabel(poltype,residue,atomidx):
 
 
 def mol_with_atom_index(poltype,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atoms = mol.GetNumAtoms()
     for idx in range( atoms ):
         mol.GetAtomWithIdx( idx ).SetProp( 'molAtomMapNumber', str( mol.GetAtomWithIdx( idx ).GetIdx()+1 ) )
     return mol
 
 def ConvertSDFToMOL(poltype,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tmpconv = openbabel.OBConversion()
     tmpconv.SetInFormat('sdf')
     molbabel=openbabel.OBMol()
@@ -1491,6 +1917,13 @@ def ConvertSDFToMOL(poltype,filename):
     return structfname
 
 def ConvertToSDF(poltype,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tmpconv = openbabel.OBConversion()
     inFormat = tmpconv.FormatFromExt(filename)
     tmpconv.SetInFormat(inFormat)
@@ -1505,6 +1938,13 @@ def ConvertToSDF(poltype,filename):
 
 
 def GrabConnectRecord(poltype,molfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if '.sdf' not in molfile:
         molfile=ConvertToSDF(poltype,molfile)
 
@@ -1521,6 +1961,13 @@ def GrabConnectRecord(poltype,molfile):
     return lines
 
 def GrabAtomOrder(poltype,smirks):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomorder=[]
     for i in range(len(smirks)):
         e=smirks[i]
@@ -1536,6 +1983,13 @@ def GrabAtomOrder(poltype,smirks):
 
 
 def GrabAtomIndex(poltype,i,smirks):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     num=[]
     for j in range(i,len(smirks)):
         char=smirks[j]
@@ -1547,6 +2001,13 @@ def GrabAtomIndex(poltype,i,smirks):
     return atomindex 
 
 def MatchSMARTSOB(poltype,smarts,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     obConversion = openbabel.OBConversion()
     mol = openbabel.OBMol()
     inFormat = obConversion.FormatFromExt(filename)
@@ -1558,15 +2019,36 @@ def MatchSMARTSOB(poltype,smarts,filename):
     return diditmatch
 
 def MatchSMARTSrdkit(poltype,smarts,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     mol=Chem.rdmolfiles.MolFromPDBFile(filename,removeHs=False,sanitize=False)
     p = Chem.MolFromSmarts(smarts)
     diditmatchrdkit=mol.HasSubstructMatch(p)
     return diditmatchrdkit
 
 def ChiralFilter(poltype,smarts):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     return smarts.replace('@','')
 
 def LibAddition(poltype,filename,label): 
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     lines=[]
     mol=Chem.rdmolfiles.MolFromPDBFile(filename,removeHs=False)
     smarts=Chem.rdmolfiles.MolToSmarts(mol)
@@ -1594,6 +2076,13 @@ def LibAddition(poltype,filename,label):
 
 
 def GrabFirstResidueNumber(poltype,pdbname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(pdbname,'r')
     results=temp.readlines()
     temp.close()
@@ -1604,6 +2093,13 @@ def GrabFirstResidueNumber(poltype,pdbname):
 
 
 def GenerateModifiedProteinPoltypeInput(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
 
     if poltype.unmodifiedproteinpdbname!=None:
         poltype.modifiedproteinpdbname,charge,connectedatomidx,backboneindexesreference=GenerateModifiedProteinPDB(poltype)
@@ -1686,6 +2182,13 @@ def GenerateModifiedProteinPoltypeInput(poltype):
     return knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference,modligidxs
 
 def AddTotalCharge(poltype,charge,molecule):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomiter=openbabel.OBMolAtomIter(molecule)
     for atom in atomiter:
         if atom.GetIdx()==1:
@@ -1695,6 +2198,13 @@ def AddTotalCharge(poltype,charge,molecule):
 
 
 def DeleteAtomIndexes(poltype,idxstodelete,molecule):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     sortedatomidxstoremove=sorted(idxstodelete, reverse=True)
     for index in sortedatomidxstoremove:
         atom=molecule.GetAtom(index)
@@ -1702,6 +2212,13 @@ def DeleteAtomIndexes(poltype,idxstodelete,molecule):
     return molecule
 
 def GrabAtomIndexesToDelete(poltype,pdbfilename,positions,molecule):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newpositions,backboneidxs=GrabPositions(poltype,pdbfilename)
     idxstodelete=[]
     temp=open(pdbfilename,'r')
@@ -1721,6 +2238,13 @@ def GrabAtomIndexesToDelete(poltype,pdbfilename,positions,molecule):
     return idxstodelete
 
 def IsAtomConnectedToBackboneAtom(poltype,position,backboneidxs,molecule):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomiter=openbabel.OBMolAtomIter(molecule)
     check=False
     for atom in atomiter:
@@ -1736,6 +2260,13 @@ def IsAtomConnectedToBackboneAtom(poltype,position,backboneidxs,molecule):
 
 
 def GrabPositions(poltype,pdbfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     positions=[]
     backboneidxs=[]
     temp=open(pdbfilename,'r')
@@ -1757,6 +2288,13 @@ def GrabPositions(poltype,pdbfilename):
 
 
 def GrabLibraryInfo(poltype,proidxtoprotype,modresiduelabel,proOBmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     modresiduedic={}
     temp=open(poltype.modifiedproteinpdbname,'r')
     results=temp.readlines()
@@ -1792,6 +2330,13 @@ def GrabLibraryInfo(poltype,proidxtoprotype,modresiduelabel,proOBmol):
     return modresiduedic
 
 def GenerateLibFileToAdd(poltype,modresiduedic,modresiduelabel):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tempname='ModifiedResidueLibAddition.txt'
     temp=open(tempname,'w')
     temp2=open(poltype.libpath,'a')
@@ -1832,6 +2377,13 @@ def GenerateLibFileToAdd(poltype,modresiduedic,modresiduelabel):
 
 
 def GrabProSideBoundIdxs(poltype,proOBmol,boundaryatomidxs,ligidxtoproidx,modproidxs,proidxtoligidx):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     prosideboundligidx=[]
     for index in boundaryatomidxs:
         proindex=ligidxtoproidx[index]
@@ -1846,6 +2398,13 @@ def GrabProSideBoundIdxs(poltype,proOBmol,boundaryatomidxs,ligidxtoproidx,modpro
 
 
 def GrabPolarizeNeighbors(poltype,ligtype,keyfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(keyfile,'r')
     results=temp.readlines()
     temp.close()
@@ -1858,7 +2417,14 @@ def GrabPolarizeNeighbors(poltype,ligtype,keyfile):
                 ligneighbs=[int(i) for i in stringneighbs]
     return ligneighbs
 
-def GrabResidueTypesToPolarizeTypesAcrossBoundary(poltype,boundaryatomidxs,ligidxtotypeidx,proidxtoprotype,ligidxtoproidx,key,mincorenumber,maxcorenumber):    
+def GrabResidueTypesToPolarizeTypesAcrossBoundary(poltype,boundaryatomidxs,ligidxtotypeidx,proidxtoprotype,ligidxtoproidx,key,mincorenumber,maxcorenumber):   
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     prmtypetopoltype={} # this dictionary has keys as prm type numbers that need poltype type numbers appended to their definition in the new key file to handle boundaries
     for ligidx in boundaryatomidxs:
         ligtype=ligidxtotypeidx[ligidx]
@@ -1873,6 +2439,13 @@ def GrabResidueTypesToPolarizeTypesAcrossBoundary(poltype,boundaryatomidxs,ligid
     return prmtypetopoltype
 
 def GrabPolarizeDefinitionLinesFromPrmFile(poltype,prmtypetopoltype,proprmfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     prmtypetoprmdeflines={}
     temp=open(proprmfile,'r')
     results=temp.readlines()
@@ -1886,6 +2459,13 @@ def GrabPolarizeDefinitionLinesFromPrmFile(poltype,prmtypetopoltype,proprmfile):
     return prmtypetoprmdeflines
 
 def AppendPoltypeTypeNumbers(poltype,prmtypetoprmdeflines,prmtypetopoltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newprmdeflines=[]
     for prmtype in prmtypetoprmdeflines.keys():
         prmdefline=prmtypetoprmdeflines[prmtype]
@@ -1896,6 +2476,13 @@ def AppendPoltypeTypeNumbers(poltype,prmtypetoprmdeflines,prmtypetopoltype):
 
 
 def GrabClassNumbersForProtein(poltype,proidxtoprotype,check):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     prmtypetoprmclass={}
     if check==False:
         temp=open(poltype.prmfilepath,'r')
@@ -1917,6 +2504,13 @@ def GrabClassNumbersForProtein(poltype,proidxtoprotype,check):
     return prmtypetoprmclass
 
 def GrabProBoundIdxToProType(poltype,proboundidxs,proOBmol,modproidxs,proidxtotypeidx,transferableidxs,transferableidxsformatching,firstresnum,lastresnum):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     
     proboundidxtoprotype={}
     rdkittransferableidxs=[i-1 for i in transferableidxsformatching]
@@ -1965,6 +2559,13 @@ def GrabProBoundIdxToProType(poltype,proboundidxs,proOBmol,modproidxs,proidxtoty
 
 
 def ReadSMARTSToTypeLib(poltype,smarts,modmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ligidxtotypeidx={}
     temp=open(poltype.SMARTSToTypelibpath,'r')
     results=temp.readlines()
@@ -1983,6 +2584,13 @@ def ReadSMARTSToTypeLib(poltype,smarts,modmol):
 
        
 def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference,modligidxs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
 
     obConversion = openbabel.OBConversion()
     ligOBmol = openbabel.OBMol()
@@ -2089,6 +2697,13 @@ def GenerateModifiedProteinXYZAndKey(poltype,knownresiduesymbs,modproidxs,probou
 
 
 def AddHydrogensAndBackBoneOnConnectedAtomIdxToGetRightClass(poltype,connectedatomidx,proOBmol,backboneindexesreference):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     transferableidxsformatching=[connectedatomidx]
     transferableidxsformatching.extend(backboneindexesreference)
     hydidxs=[]
@@ -2105,6 +2720,13 @@ def AddHydrogensAndBackBoneOnConnectedAtomIdxToGetRightClass(poltype,connectedat
    
 
 def GetIdxsFromListOfTorsionsForPrm(poltype,listoftorsionsforprm):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     transferableidxs=[]
     for torsion in listoftorsionsforprm:
         for idx in torsion:
@@ -2114,10 +2736,24 @@ def GetIdxsFromListOfTorsionsForPrm(poltype,listoftorsionsforprm):
 
 
 def CallAnalyze(poltype,xyzfile,keyfile,option,outfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     cmdstr=poltype.analyzeexe+' '+xyzfile+' '+'-k'+' '+keyfile+' '+option+' > '+outfile
     return cmdstr
 
 def ReadAnalyzeOutput(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     error=False
     temp=open('alz.out','r')
     results=temp.readlines()
@@ -2128,6 +2764,13 @@ def ReadAnalyzeOutput(poltype):
     return error
 
 def ShiftDictionaryValueTypes(poltype,dictionary,oldtypetonewtype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for key,value in dictionary.items():
         if value in oldtypetonewtype.keys():
             newvalue=oldtypetonewtype[value]
@@ -2140,6 +2783,13 @@ def ShiftDictionaryValueTypes(poltype,dictionary,oldtypetonewtype):
     
 
 def GrabMaxTypeNumberModifiedCore(poltype,parameterfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     maxnumberfromprm=1
     temp=open(parameterfile,'r')
     results=temp.readlines()
@@ -2153,6 +2803,13 @@ def GrabMaxTypeNumberModifiedCore(poltype,parameterfile):
     return maxnumberfromprm
 
 def GrabMinTypeNumberModifiedCore(poltype,parameterfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     minnumberfromprm=10000
     temp=open(parameterfile,'r')
     results=temp.readlines()
@@ -2168,6 +2825,13 @@ def GrabMinTypeNumberModifiedCore(poltype,parameterfile):
 
 
 def GenerateSMARTSToTypeFileToAdd(poltype,modmol,ligidxtotypeidx,smarts):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     libname='SMARTSToType.txt'
     grabmatch=MatchSMARTSToOBMol(poltype,smarts,modmol)
     atompostotype={}
@@ -2186,6 +2850,13 @@ def GenerateSMARTSToTypeFileToAdd(poltype,modmol,ligidxtotypeidx,smarts):
     temp2.close()
 
 def MatchSMARTSToOBMol(poltype,smarts,modmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     sp = openbabel.OBSmartsPattern()
     openbabel.OBSmartsPattern.Init(sp,smarts)
     diditmatch=sp.Match(modmol)
@@ -2199,6 +2870,13 @@ def MatchSMARTSToOBMol(poltype,smarts,modmol):
         return None
 
 def MatchSMARTSToPDB(poltype,smarts,modmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     sp = openbabel.OBSmartsPattern()
     openbabel.OBSmartsPattern.Init(sp,smarts)
     diditmatch=sp.Match(modmol)
@@ -2219,6 +2897,13 @@ def MatchSMARTSToPDB(poltype,smarts,modmol):
 
 
 def MatchSMARTSToOBMolGrabAllMatches(poltype,smarts,modmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     sp = openbabel.OBSmartsPattern()
     openbabel.OBSmartsPattern.Init(sp,smarts)
     diditmatch=sp.Match(modmol)
@@ -2234,6 +2919,13 @@ def MatchSMARTSToOBMolGrabAllMatches(poltype,smarts,modmol):
         return None 
 
 def BabelGenerateMol2File(poltype,pdbfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tmpconv = openbabel.OBConversion()
     tmpconv.SetInFormat('pdb')
     molbabel=openbabel.OBMol()
@@ -2245,6 +2937,13 @@ def BabelGenerateMol2File(poltype,pdbfile):
 
 
 def ReadTotalProteinChargeBeforeMerge(poltype,mol2file):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(mol2file,'r')
     results=temp.readlines()
     temp.close()
@@ -2257,6 +2956,13 @@ def ReadTotalProteinChargeBeforeMerge(poltype,mol2file):
     return totalchg
 
 def ReadTotalProteinChargeAfterMerge(poltype,alzfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(alzfile,'r')
     results=temp.readlines()
     temp.close()
@@ -2267,9 +2973,23 @@ def ReadTotalProteinChargeAfterMerge(poltype,alzfile):
     return chg
 
 def ChargeToRedistribute(poltype,proteinchargebeforemerge,ligandcharge,proteinchargeaftermerge):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     return proteinchargeaftermerge-(proteinchargebeforemerge+ligandcharge)
 
 def ReadMonopolesFromMultipolesAcrossBoundary(poltype,keyfile,mincorenumber,maxcorenumber):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(keyfile,'r')
     results=temp.readlines()
     temp.close()
@@ -2286,6 +3006,13 @@ def ReadMonopolesFromMultipolesAcrossBoundary(poltype,keyfile,mincorenumber,maxc
     return monopoles
 
 def ModifyMonopoles(poltype,monopoles,chgtoredistribute):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     nummonopoles=len(monopoles)
     chgpermonopole=chgtoredistribute/nummonopoles 
     modmonopoles=[]
@@ -2303,6 +3030,13 @@ def ModifyMonopoles(poltype,monopoles,chgtoredistribute):
 
 
 def ModifyMonopolesFromMultipolesAcrossBoundary(poltype,keyfile,modmonopoles,mincorenumber,maxcorenumber):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(keyfile,'r')
     results=temp.readlines()
     temp.close()
@@ -2328,6 +3062,13 @@ def ModifyMonopolesFromMultipolesAcrossBoundary(poltype,keyfile,modmonopoles,min
     os.rename(tempname,keyfile)
 
 def CorrectTotalCharge(poltype,pdbfile,writekey,protinkxyz,mincorenumber,maxcorenumber):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     mol2file=BabelGenerateMol2File(poltype,pdbfile)
     proteinchargebeforemerge=ReadTotalProteinChargeBeforeMerge(poltype,mol2file)
     alzfile='alz_charge.out'

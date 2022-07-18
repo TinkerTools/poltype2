@@ -3,6 +3,13 @@ import sys
 import subprocess
 
 def CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,jobinfofilepath,makejobfileonly,jobtooutputfilepath=None):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(jobinfofilepath,'w')
     for job,inputfilepaths in jobtoinputfilepaths.items():
         if jobtooutputfilepath!=None:
@@ -50,6 +57,13 @@ def CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebi
 
 
 def SubmitJobs(poltype,jobtolog,jobtojobpath,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,jobinfofilepath,jobtooutputfilepath=None,makejobfileonly=False):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if len(jobtolog.keys())!=0:
         CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,jobinfofilepath,makejobfileonly,jobtooutputfilepath)
     if makejobfileonly==True:
@@ -59,6 +73,13 @@ def SubmitJobs(poltype,jobtolog,jobtojobpath,jobtoinputfilepaths,jobtooutputfile
 
 
 def CallJobsSeriallyLocalHost(poltype,jobtolog,jobtojobpath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     curdir=os.getcwd()
     jobs=list(jobtolog.keys())
     for jobidx in range(len(jobs)):
@@ -71,6 +92,13 @@ def CallJobsSeriallyLocalHost(poltype,jobtolog,jobtojobpath):
     os.chdir(curdir)
 
 def call_subsystem(poltype,cmdstr,wait=False,skiperrors=False,outputfilename=None):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltype.WriteToLog("Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
     p = subprocess.Popen(cmdstr, shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     
@@ -89,6 +117,13 @@ def call_subsystem(poltype,cmdstr,wait=False,skiperrors=False,outputfilename=Non
             raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
 
 def ParseForErrorsInOutPut(poltype,saved,outputfilename=None):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     check=True
     if outputfilename==None:
         pass

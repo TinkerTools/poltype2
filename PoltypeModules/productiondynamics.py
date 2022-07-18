@@ -13,6 +13,13 @@ import mdtraj as md
 
 
 def ExecuteProductionDynamics(poltype):
+   """
+   Intent:
+   Input:
+   Output:
+   Referenced By: 
+   Description: 
+   """
    jobtolog={}
    jobtojobpath={}
    jobtoinputfilepaths={}
@@ -95,6 +102,13 @@ def ExecuteProductionDynamics(poltype):
        sys.exit()
 
 def ProductionDynamicsCommand(poltype,inputxyzname,keyfile,steps,ensemble,outputpath,dynamicpath,proddyntimestep,nvt):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     head,tail=os.path.split(outputpath) 
     if nvt==True:
         cmdstr=dynamicpath+' '+inputxyzname+' -k ' + keyfile + ' '+str(steps)+' '+str(proddyntimestep)+' '+str(poltype.proddynwritefreq)+' '+str(ensemble)+' '+str(poltype.equilibriatescheme[-1])+' '+' > '+tail
@@ -104,6 +118,13 @@ def ProductionDynamicsCommand(poltype,inputxyzname,keyfile,steps,ensemble,output
     return cmdstr
    
 def ModifyKeyForGasPhase(poltype,keyfilepath,changeligandindices,index):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     keymods.RemoveKeyWords(poltype,keyfilepath,['axis','ewald','cutoff','correction'])
     
     if poltype.changegasphaseintegrator==True:
@@ -121,6 +142,13 @@ def ModifyKeyForGasPhase(poltype,keyfilepath,changeligandindices,index):
 
 
 def SearchNearestNonPerturbedFolder(poltype,folderlist,index):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     fold=folderlist[index]
     invertedlist=folderlist[::-1]
     invertedindex=invertedlist.index(fold)
@@ -140,6 +168,13 @@ def SearchNearestNonPerturbedFolder(poltype,folderlist,index):
 
 
 def AppendAllXYZ(poltype,xyzfilenamelist,key):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     finalxyz='alllig.xyz'
     if len(xyzfilenamelist)==1:
         return xyzfilenamelist[0]
@@ -154,6 +189,13 @@ def AppendAllXYZ(poltype,xyzfilenamelist,key):
 
 
 def AppendXYZ(poltype,firstxyz,xyz,key):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(poltype.outputpath+'xyzedit.in','w')
     temp.write('22'+'\n')
     temp.write(str(xyz)+'\n')
@@ -174,6 +216,13 @@ def AppendXYZ(poltype,firstxyz,xyz,key):
 
 
 def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynboxfilename,lambdakeyfilenamelist,xyzfilenamelist):
+   """
+   Intent:
+   Input:
+   Output:
+   Referenced By: 
+   Description: 
+   """
    poltype.WriteToLog('Setting up dynamics for '+simfoldname,prin=True)
    if poltype.addsolvionwindows==True:
        string='ele-lambda'+'\n'
@@ -333,6 +382,13 @@ def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynbo
 
 
 def ExtractLigandDynamicsFromLiquidBox(poltype,outputboxname,liquidfolder,ligandindices,ligandindicestosolvligandindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     outputarcname=outputboxname.replace('.xyz','.arc')
     arcexists=False
     curdir=os.getcwd()
@@ -366,6 +422,13 @@ def ExtractLigandDynamicsFromLiquidBox(poltype,outputboxname,liquidfolder,ligand
 
 
 def MergeMaps(poltype,diclist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     dic={}
     for d in diclist:
         dic.update(d)
@@ -376,6 +439,13 @@ def MergeMaps(poltype,diclist):
 
 
 def WriteOutArcFile(poltype,totalatomnum,indextovecs,ligandindextoneighbslist,ligandindextosymlist,ligandindextotypelist,outputarcname,framenum):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ligandindextoneighbs=MergeMaps(poltype,ligandindextoneighbslist)
     ligandindextosym=MergeMaps(poltype,ligandindextosymlist)
     ligandindextotype=MergeMaps(poltype,ligandindextotypelist)
@@ -400,6 +470,13 @@ def WriteOutArcFile(poltype,totalatomnum,indextovecs,ligandindextoneighbslist,li
 
 
 def ModifyLambdaKeywords(poltype,newfoldpath,newtempkeyfile,elelamb,vdwlamb,reslambda):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(newfoldpath+newtempkeyfile,'r')
     results=temp.readlines()
     temp.close()
@@ -483,6 +560,13 @@ def ModifyLambdaKeywords(poltype,newfoldpath,newtempkeyfile,elelamb,vdwlamb,resl
 
  
 def CheckLastNumberDynamicStepsCompleted(poltype,outputfilepath):
+   """
+   Intent:
+   Input:
+   Output:
+   Referenced By: 
+   Description: 
+   """
    steps=None
    if os.path.isfile(outputfilepath):
        temp=open(outputfilepath,'r')
@@ -498,6 +582,13 @@ def CheckLastNumberDynamicStepsCompleted(poltype,outputfilepath):
 
 
 def DetermineIonIndicesToModifyCharge(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     totalionindexes=[]
     totalcharge=[]
     if poltype.addsolvionwindows==False:
@@ -524,78 +615,46 @@ def DetermineIonIndicesToModifyCharge(poltype):
     return totalionindexes,totalcharge
 
 
-def GrabDipoleArrays(poltype):
-    arcpaths,keypaths=GrabTinkerFiles(poltype)
-    arcpath=arcpaths[0]
-    keypath=keypaths[0]
-    alzout='traj.alz'
-    if not os.path.isfile(alzout):
-        poltype.CallAnalyze(arcpath,keypath,alzout,poltype.trueanalyzepath,'m')
-    Dx,Dy,Dz=GrabDipoleArrayFromTrajectory(alzout)
-
-    return Dx,Dy,Dz,arcpath
-
-def GrabDipoleArrayFromTrajectory(alzout):
-    Dx=[]
-    Dy=[]
-    Dz=[]
-    temp=open(alzout,'r')
-    results=temp.readlines()
-    temp.close()
-    for line in results:
-        if 'Dipole X,Y,Z-Components :' in line:
-            linesplit=line.split() 
-            x=float(linesplit[-3])
-            y=float(linesplit[-2])
-            z=float(linesplit[-1])
-            Dx.append(x)
-            Dy.append(y)
-            Dz.append(z)
-
-
-    return np.array(Dx),np.array(Dy),np.array(Dz)
-
-
-def ComputeDielectricConstant(poltype,Dx,Dy,Dz,V):
-    V=np.array(V)
-    V=V*10**-30 # convert to cubic meters
-    conv=3.336*10**-30 # convert debye to Cm
-    Dx=Dx*conv
-    Dy=Dy*conv
-    Dz=Dz*conv
-    vacperm=8.8541878128*10**-12
-    bolts=1.380649*10**-23
-    prefactor=1/(3*vacperm*bolts)
-    D2 = np.mean(Dx**2)+np.mean(Dy**2)+np.mean(Dz**2)-np.mean(Dx)**2-np.mean(Dy)**2-np.mean(Dz)**2
-    dielectric = 1.0 + prefactor*(D2/np.mean(V))/float(poltype.equilibriatescheme[-1])
-    msg='Dielectric constant = '+str(dielectric)
-    poltype.WriteToLog(msg,prin=True)
-
-
 
 def GrabTinkerFiles(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     arcpaths=[]
     keypaths=[]
     curdir=os.getcwd()
-    for i in range(len(poltype.lambdakeyfilename)):
+    for i in range(len(poltype.lambdakeyfilename)): # Comp,Solv or just NeatLiq
         simfoldname=poltype.simfoldname[i]
         os.chdir(poltype.outputpath+simfoldname)
         lambdafolderlist=poltype.lambdafolderlist[i]
-        for k in range(len(lambdafolderlist)):
+        temparc=[]
+        tempkey=[]
+        for k in range(len(lambdafolderlist)): # Lambda Liq, Lambda Gas
             folderlist=lambdafolderlist[k]
             estatlambdascheme=poltype.estatlambdascheme[k]
             vdwlambdascheme=poltype.vdwlambdascheme[k]
             restlambdascheme=poltype.restlambdascheme[k]
-            for j in range(len(folderlist)):
+            temparc2=[]
+            tempkey2=[]
+            for j in range(len(folderlist)): # Lambda List
                 fold=folderlist[j]
                 os.chdir(fold)
                 files=os.listdir()
                 for f in files:
                     path=os.path.join(os.getcwd(),f)
                     if '.key' in f:
-                        keypaths.append(path)
+                        tempkey2.append(path)
                     if '.arc' in f:
-                        arcpaths.append(path)
+                        temparc2.append(path)
+                os.chdir('..')
+            temparc.append(temparc2)
+            tempkey.append(tempkey2)
+        arcpaths.append(temparc)
+        keypaths.append(tempkey)
 
 
     os.chdir(curdir)
@@ -603,6 +662,13 @@ def GrabTinkerFiles(poltype):
 
 
 def AddLigandIndices(poltype,ligandindices,keyfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     string='ligand'+' '
     firstindices=ligandindices[0]
     lastindices=ligandindices[-1]
@@ -616,11 +682,18 @@ def AddLigandIndices(poltype,ligandindices,keyfilename):
 
 
 def ProductionDynamicsProtocol(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if poltype.didinputsubmitlocally==False:
         poltype.submitlocally=False
  
     if poltype.prodmdfinished==False:
-        if len(poltype.mutlambdascheme)==0:
+        if len(poltype.mutlambdascheme)==0 and poltype.neatliquidsim==False:
             for i in range(len(poltype.lambdakeyfilename)):
                 lambdakeyfilenamelist=poltype.lambdakeyfilename[i]
                 configkeyfilenamelist=poltype.configkeyfilename[i]
@@ -676,11 +749,117 @@ def ProductionDynamicsProtocol(poltype):
                     checkfin=term.CheckFilesTermination(poltype,proddynoutfilepath,poltype.proddynsteps)
                     finished=checkfin[0]
                     percentfinished=checkfin[1]
+            if poltype.generatepdbtrajs==True and poltype.complexation==True and i==0:
+                arcpaths,keypaths=GrabTinkerFiles(poltype)
+                liqarcpath=arcpaths[0][0][0]
+                pdbfilename=liqarcpath.replace('.arc','.pdb')
+                poltype.GeneratePDBFromARC(liqarcpath,pdbfilename)
+
 
         poltype.WriteToLog('System dynamics is complete ',prin=True)
     if poltype.neatliquidsim==True:
-        Dx,Dy,Dz,arcpath=GrabDipoleArrays(poltype)
-        aaxis,baxis,caxis=equil.AverageBoxSizeFromNPTArc(poltype,arcpath,1,10000000,1,None)
-        V=aaxis*baxis*caxis
-        ComputeDielectricConstant(poltype,Dx,Dy,Dz,V)
+        arcpaths,keypaths=GrabTinkerFiles(poltype)
+        liqarcpath=arcpaths[0][0][0]
+        liqxyzpath=liqarcpath.replace('.arc','.xyz')
+        liqkeypath=keypaths[0][0][0]
+        gasarcpath=arcpaths[0][1][0]
+        gasxyzpath=gasarcpath.replace('.arc','.xyz')
+        gaskeypath=keypaths[0][1][0]
+        aaxis,baxis,caxis,aaxisarray,baxisarray,caxisarray=equil.AverageBoxSizeFromNPTArc(poltype,liqarcpath,1,10000000,1,None)
+        aaxisarray=aaxisarray*10**-10 # convert to m
+        baxisarray=baxisarray*10**-10
+        caxisarray=caxisarray*10**-10
+        aaxis=aaxis**10**-10
+        baxis=baxis**10**-10
+        caxis=caxis**10**-10
+        vavg=aaxis*baxis*caxis
+        mass,nummols=GrabSystemMass(poltype,liqxyzpath,liqkeypath)
+        avgdensity,stddev=ComputeDensity(poltype,mass,aaxisarray,baxisarray,caxisarray)
+        poltype.WriteToLog('Average density is (kg/m^3) '+str(avgdensity)+' +/- '+str(stddev)) 
+        avgliqenergy,stddevliqenergy=GrabEnergy(poltype,liqarcpath,liqkeypath)
+        avggasenergy,stddevgasenergy=GrabEnergy(poltype,gasarcpath,gaskeypath)
+        R = 1.98720425864083 * 0.001 
+        T = float(poltype.equilibriatescheme[-1])
+        avgliqenergy=avgliqenergy/nummols
+        stddevliqenergy=stddevliqenergy/nummols
+        Hvap = (-avgliqenergy + avggasenergy + R*T)
+        Hvaperr=np.sqrt(np.square(avgliqenergy)+np.square(stddevgasenergy))
+        poltype.WriteToLog('Average Hvap is (kcal/mol) '+str(Hvap)+' +/- '+str(Hvaperr)) 
         sys.exit()
+
+
+
+def ComputeDensity(poltype,mass,aaxisarray,baxisarray,caxisarray):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    densityarray=[]
+    for i in range(len(aaxisarray)):
+        a=aaxisarray[i]
+        b=baxisarray[i]
+        c=caxisarray[i]
+        v=a*b*c
+        d=mass/v
+        densityarray.append(d)
+    densityarray=np.array(densityarray)
+    avgdensity=np.mean(densityarray)
+    stddev=np.std(densityarray)/np.sqrt(np.size(densityarray))
+
+    return avgdensity,stddev
+
+
+def GrabSystemMass(poltype,xyzpath,keypath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    alzout='xyz.alz'
+    if not os.path.isfile(alzout):
+        poltype.CallAnalyze(xyzpath,keypath,alzout,poltype.analyzepath,'G')
+    temp=open(alzout,'r')
+    results=temp.readlines()
+    temp.close()
+    for line in results:
+        linesplit=line.split()
+        if 'Total System Mass' in line:
+            mass=float(linesplit[-1])*.001*(1/(6.0221408*10**23)) # kg
+        if 'Number of Molecules' in line:
+            nummols=int(linesplit[-1])
+
+    return mass,nummols
+
+
+
+def GrabEnergy(poltype,arcpath,keypath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    alzout='energy.alz'
+    poltype.CallAnalyze(arcpath,keypath,alzout,poltype.trueanalyzepath,'E')
+    temp=open(alzout,'r')
+    results=temp.readlines()
+    temp.close()
+    energyarray=[]
+    for line in results:
+        if 'Total Potential Energy : ' in line:
+            linesplit=line.split()
+            energy=float(linesplit[-2])
+            energyarray.append(energy)
+    energyarray=np.array(energyarray)
+    avgliqenergy=np.mean(energyarray)
+    stddevliqenergy=np.std(energyarray)/np.sqrt(np.size(energyarray))
+
+    return avgliqenergy,stddevliqenergy
+
+

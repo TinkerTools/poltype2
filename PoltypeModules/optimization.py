@@ -16,6 +16,13 @@ from rdkit import Chem
 from PyAstronomy import pyasl
 
 def GeometryOPTWrapper(poltype,molist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     optmolist=[]
     errorlist=[]
     torsionrestraintslist=[]
@@ -54,6 +61,13 @@ def GeometryOPTWrapper(poltype,molist):
 
 
 def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondanglerestraints,skipscferror,chg,loose,torsionrestraints=[]):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tempread=open(comfilecoords,'r')
     results=tempread.readlines()
     tempread.close()
@@ -219,6 +233,13 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     return inputname,outputname
 
 def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newtemp=open(poltype.basissetpath+normalelementbasissetfile,'r')
     results=newtemp.readlines()
     newtemp.close()
@@ -238,6 +259,13 @@ def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetf
 
 
 def NumberInLine(poltype,line):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     numinline=False
     linesplit=line.split()
     for e in linesplit:
@@ -251,6 +279,13 @@ def NumberInLine(poltype,line):
 
 
 def CheckIfPsi4Log(poltype,outputlog):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     check=False
     temp=open(outputlog,'r')
     results=temp.readlines()
@@ -263,6 +298,13 @@ def CheckIfPsi4Log(poltype,outputlog):
 
 
 def GrabFinalXYZStructure(poltype,logname,filename,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     checkifpsi4=CheckIfPsi4Log(poltype,logname)
     if checkifpsi4==True:
         temp=open(logname,'r')
@@ -435,6 +477,13 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
 
 
 def GenerateElementToBasisSetLines(poltype,basissetfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     elementtobasissetlines={}
     temp=open(basissetfile,'r')
     results=temp.readlines()
@@ -462,6 +511,13 @@ def GenerateElementToBasisSetLines(poltype,basissetfile):
      
  
 def gen_opt_str(poltype,optimizeoptlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     optstr = "#P opt"
     if optimizeoptlist:
         optstr += "=(" + ','.join(optimizeoptlist) + ")"
@@ -469,8 +525,11 @@ def gen_opt_str(poltype,optimizeoptlist):
 
 def write_com_header(poltype,comfname,chkfname,maxdisk,maxmem,numproc):
     """
-    Intent: Add header to *.com file
-    Referenced By: gen_optcomfile
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
     """
     tmpfh = open(comfname, "w")
     assert tmpfh, "Cannot create file: " + comfname+' '+os.getcwd()
@@ -490,7 +549,11 @@ def write_com_header(poltype,comfname,chkfname,maxdisk,maxmem,numproc):
 
 def gen_superposeinfile(poltype):
     """
-    Intent: Initialize superpose input file (for tinker's superpose) 
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
     """
     poltype.WriteToLog("\n")
     poltype.WriteToLog("=========================================================\n")
@@ -500,6 +563,14 @@ def gen_superposeinfile(poltype):
 
 
 def CheckRMSD(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     RMSD=None
     for line in open(poltype.superposeinfile,'r'):
         if 'Root Mean' in line:
@@ -516,6 +587,14 @@ def CheckRMSD(poltype):
             poltype.WriteToLog('RMSD = '+ RMSD+' Tolerance is '+str(poltype.maxRMSD))
 
 def StructureMinimization(poltype,torsionrestraints):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     poltype.WriteToLog("")
     poltype.WriteToLog("=========================================================")
     poltype.WriteToLog("Minimizing structure\n")
@@ -530,6 +609,14 @@ def StructureMinimization(poltype,torsionrestraints):
 
 
 def AddTorsionRestraints(poltype,keyname,torsionrestraints):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     tmpfh=open(keyname,'a')
     for res in torsionrestraints:
         a,b,c,d=res[:]
@@ -537,6 +624,14 @@ def AddTorsionRestraints(poltype,keyname,torsionrestraints):
     tmpfh.close()
 
 def FindTorsionRestraints(poltype,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     torsionrestraints=[]
     atomiter=openbabel.OBMolAtomIter(mol)
     atomnum=0
@@ -625,6 +720,14 @@ def FindTorsionRestraints(poltype,mol):
     return torsionrestraints
 
 def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds=True,modred=True,bondanglerestraints=None,skipscferror=False,charge=None,skiperrors=False,overridecheckterm=False): # specify charge instead of reading from mol if charge!=None
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     if bondanglerestraints!=None or poltype.isfragjob==True or poltype.generateextendedconf==False: # then vdw opt
         pass
         torsionrestraints=[]
@@ -738,6 +841,13 @@ def load_structfile(poltype,structfname):
     return tmpmol
 
 def rebuild_bonds(poltype,newmol, refmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
 
     for b in openbabel.OBMolBondIter(refmol):
         beg = b.GetBeginAtomIdx()
@@ -753,6 +863,14 @@ def rebuild_bonds(poltype,newmol, refmol):
 
 
 def PruneBonds(poltype,mol,bondtopology):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     molindexlist=[]
     atomitermol=openbabel.OBMolAtomIter(mol)
     for atom in atomitermol:

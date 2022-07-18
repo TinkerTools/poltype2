@@ -6,6 +6,13 @@ import getopt
 
 
 def CallFPocket(bindir,pdbfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     binpath=os.path.join(bindir,'fpocket')
     descname='pocket_descriptors.csv'
     outputfolder=pdbfile.replace('.pdb','_out')
@@ -15,6 +22,13 @@ def CallFPocket(bindir,pdbfile):
 
 
 def GrabPocketGrid(outputfolder):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     extending=5
     pocketnumtocenter={}
     pocketnumtosize={}
@@ -45,6 +59,13 @@ def GrabPocketGrid(outputfolder):
 
 
 def WriteDictionaryToFile(dic,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     with open(filename, 'w') as convert_file:
         convert_file.write(json.dumps(dic))
 

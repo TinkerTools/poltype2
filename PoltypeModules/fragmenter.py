@@ -27,6 +27,13 @@ import math
 import re
 
 def AssignTotalCharge(poltype,molecule,babelmolecule):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
     totchg=Chem.rdmolops.GetFormalCharge(molecule)
     totchg=0
@@ -54,6 +61,13 @@ def AssignTotalCharge(poltype,molecule,babelmolecule):
 
 
 def GrabKeysFromValue(poltype,dic,thevalue):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     keylist=[]
     for key,value in dic.items():
         if value==thevalue:
@@ -62,6 +76,13 @@ def GrabKeysFromValue(poltype,dic,thevalue):
 
 
 def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor,openkey,newkey,rotbndindextoparentrotbndindexes,rotbndindextosmartsindexarray):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     valenceprmlist={}
     parentsymmtorlist=[]
     allparenttortorskeys=[]
@@ -349,6 +370,13 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
 
 
 def ConstructVdwLineFromFragment(poltype,key,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarraycollected,classkeytosmartscollected,classkeytoatomindexescollected,temp,valenceprmlist,fitline,classkeytofitresults,writeout=True):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     filename=classkeytofragmentfilename[key]
     prms=classkeytoparameters[key]
     parameters=' '.join(prms)
@@ -388,6 +416,13 @@ def ConstructVdwLineFromFragment(poltype,key,classkeytofragmentfilename,classkey
 
 
 def WriteOutDatabaseLines(poltype,valenceprmlist,valkeytosmarts,smartstovdwlinelist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newtemp=open(poltype.databaseprmfilename,'w')
     for key,ls in valenceprmlist.items():
         for line in ls:
@@ -406,6 +441,13 @@ def WriteOutDatabaseLines(poltype,valenceprmlist,valkeytosmarts,smartstovdwlinel
 
 
 def WriteGridPoints(poltype,key,tortorclasskeytogridlinesarray,temp):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     gridarray=tortorclasskeytogridlinesarray[key]
     for line in gridarray:
         temp.write(line)
@@ -414,6 +456,13 @@ def WriteGridPoints(poltype,key,tortorclasskeytogridlinesarray,temp):
 
 
 def ParseGridLines(poltype,results,lineidx):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     gridlinesarray=[]
     for lineindex in range(len(results)):
         line=results[lineindex]
@@ -427,6 +476,13 @@ def ParseGridLines(poltype,results,lineidx):
     return gridlinesarray
 
 def ConstructTorsionLineFromFragment(poltype,key,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarraycollected,classkeytosmartscollected,classkeytotorsionindexescollected,temp,valenceprmlist,fitline,classkeytofitresults,valkey,valkeytosmarts):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     filename=classkeytofragmentfilename[key]
     prms=classkeytoparameters[key]
     parameters=' '.join(prms)
@@ -472,6 +528,13 @@ def ConstructTorsionLineFromFragment(poltype,key,classkeytofragmentfilename,clas
 
 
 def ConstructTorsionTorsionLineFromFragment(poltype,key,classkeytofragmentfilename,tortorclasskeytogridpts,tortorclasskeytosmartsposarraycollected,tortorclasskeytosmartscollected,tortorclasskeytotorsionindexescollected,temp,valenceprmlist,fitline,tortorclasskeytogridlinesarray):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     filename=classkeytofragmentfilename[key]
     gridpts=tortorclasskeytogridpts[key]
     gridptsarray=[str(i) for i in gridpts]
@@ -504,6 +567,13 @@ def ConstructTorsionTorsionLineFromFragment(poltype,key,classkeytofragmentfilena
 
 
 def GrabWBOMatrixGaussian(poltype,outputlog,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     try:
         WBOmatrix=numpy.empty((mol.GetNumAtoms(),mol.GetNumAtoms()))
     except Exception:
@@ -537,6 +607,13 @@ def GrabWBOMatrixGaussian(poltype,outputlog,mol):
     return WBOmatrix
 
 def GrabWBOMatrixPsi4(poltype,outputlog,molecule):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     try:
         WBOmatrix=numpy.empty((molecule.GetNumAtoms(),molecule.GetNumAtoms()))
     except Exception:
@@ -576,6 +653,13 @@ def AllIntegers(poltype,testlist):
 
 
 def FindEquivalentFragments(poltype,fragmentarray,namearray,parentindextofragindexarray):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     equivalentnamesarray=[]
     equivalentnamesarrayset=[]
     nametoparentindextofragindex=dict(zip(namearray,parentindextofragindexarray))
@@ -617,12 +701,26 @@ def FindEquivalentFragments(poltype,fragmentarray,namearray,parentindextofragind
 
 
 def FindRotatableBond(poltype,fragmol,rotbndindextofragment,temp):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for rotbndindex in rotbndindextofragment.keys():
         m=rotbndindextofragment[rotbndindex]
         if len(m.GetAtoms())==len(fragmol.GetAtoms()) and rotbndindex not in temp:
             return rotbndindex
 
 def CopyAllQMDataAndRename(poltype,molecprefix,parentdir):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     curdir=os.getcwd()
     os.chdir(parentdir)
     files=os.listdir()
@@ -644,6 +742,13 @@ def CopyAllQMDataAndRename(poltype,molecprefix,parentdir):
 
 
 def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog,fragmol,parentdir,vdwfragment,strfragvdwatomindex,onlyfittorsions,jobtoinputfilepaths):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tempmaxmem,tempmaxdisk,tempnumproc=poltype.PartitionResources()
     poltypeinput={'deleteallnonqmfiles':poltype.deleteallnonqmfiles,'debugmode':poltype.debugmode,'atmidx':poltype.prmstartidx,'parentname':poltype.parentname,'use_gau_vdw':poltype.use_gau_vdw,'use_qmopt_vdw':poltype.use_qmopt_vdw,'onlyvdwatomindex':poltype.onlyvdwatomindex,'tordebugmode':poltype.tordebugmode,'dovdwscan':poltype.dovdwscan,'refinenonaroringtors':poltype.refinenonaroringtors,'tortor':poltype.tortor,'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':tempnumproc,'maxmem':tempmaxmem,'maxdisk':tempmaxdisk,'printoutput':True}
     if strfragrotbndindexes!=None:
@@ -687,6 +792,13 @@ def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog
 
 
 def SetupClusterSubmission(poltype,listofjobs,parentdir):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     jobtologlistfilenameprefix=os.path.join(parentdir,'FragmentJobToLog'+'_'+poltype.molecprefix)
     jobtooutputfiles={}
     jobtoabsolutebinpath={}
@@ -699,6 +811,13 @@ def SetupClusterSubmission(poltype,listofjobs,parentdir):
     return jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix
 
 def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltype.WriteToLog('Submitting Fragment Jobs') 
     if poltype.fragmenterdebugmode==False:
         if poltype.externalapi is not None and poltype.fragmentjobslocal==False:
@@ -714,6 +833,13 @@ def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog,jobtoinputfilepaths,job
     return finishedjobs,errorjobs
 
 def ChangeNumpyIntToIntDicKeys(poltype,dic):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newdic={}
     for key,value in dic.items():
         newdic[int(key)]=value
@@ -721,6 +847,13 @@ def ChangeNumpyIntToIntDicKeys(poltype,dic):
 
 
 def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltype.WriteToLog('Spawning Poltype Fragment Jobs')
     parentdir=dirname(abspath(os.getcwd()))
     listofjobs=[]
@@ -931,6 +1064,13 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
 
 
 def MatchOBMols(poltype,molstruct,equivalentmolstruct,parentindextofragindex,equivalentparentindextofragindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     fragindices=list(parentindextofragindex.values())
     equivalentfragindices=list(equivalentparentindextofragindex.values())
     indextoreferenceindex={}
@@ -960,6 +1100,13 @@ def MatchOBMols(poltype,molstruct,equivalentmolstruct,parentindextofragindex,equ
 
 
 def ConvertSameBondTypes(poltype,rotbndindexes,parentindextofragindex,otherparentindextofragindex,othermolindextoequivmolindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     foundall=True
     for index in rotbndindexes:
         if index not in parentindextofragindex.keys():
@@ -982,6 +1129,13 @@ def ConvertSameBondTypes(poltype,rotbndindexes,parentindextofragindex,otherparen
 
 
 def CheckIfIndicesBonded(poltype,comb,themol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     bonded=False
     firstatomidx=comb[0]
     secondatomidx=comb[1]
@@ -998,6 +1152,13 @@ def CheckIfIndicesBonded(poltype,comb,themol):
 
 
 def GenerateAtomIndexToSMARTSPosition(poltype,fragidxarray):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomindextosmartspos={}
     totalatoms=len(fragidxarray)
     for i in range(totalatoms):
@@ -1010,6 +1171,13 @@ def GenerateAtomIndexToSMARTSPosition(poltype,fragidxarray):
     return atomindextosmartspos
 
 def GenerateSMARTSPositionStringAndAtomIndices(poltype,torsion,parentindextofragindex,fragidxarray):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     smilesposarray=[]
     fragtor=[]
     for index in torsion:
@@ -1027,6 +1195,13 @@ def GenerateSMARTSPositionStringAndAtomIndices(poltype,torsion,parentindextofrag
 
 
 def GrabParentTorsions(poltype,rotbndindextoringtor,array,strparentrotbndindexes):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tors=[]
     tortor=False
     nonaroringfrag=False
@@ -1066,6 +1241,13 @@ def GrabParentTorsions(poltype,rotbndindextoringtor,array,strparentrotbndindexes
 
 
 def CountUnderscores(poltype,string):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     count=0
     for e in string:
         if e=='_':
@@ -1073,18 +1255,39 @@ def CountUnderscores(poltype,string):
     return count
 
 def MakeFileName(poltype,string,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(filename,'w')
     temp.write(string+'\n')
     temp.close()
 
 
 def WriteDictionaryToFile(poltype,dictionary,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     with open(filename,'w') as f: 
         json.dump(dictionary, f)
 
 
 
 def GrabAtomOrder(poltype,smirks):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomorder=[]
     for i in range(len(smirks)):
         e=smirks[i]
@@ -1100,6 +1303,13 @@ def GrabAtomOrder(poltype,smirks):
 
 
 def GrabAtomIndex(poltype,i,smirks):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     num=[]
     for j in range(i,len(smirks)):
         char=smirks[j]
@@ -1111,6 +1321,13 @@ def GrabAtomIndex(poltype,i,smirks):
     return atomindex
 
 def GrabIndexToCoordinates(poltype,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indextocoordinates={}
     iteratom = openbabel.OBMolAtomIter(mol)
     for atom in iteratom:
@@ -1120,6 +1337,13 @@ def GrabIndexToCoordinates(poltype,mol):
     return indextocoordinates
 
 def AddInputCoordinatesAsDefaultConformer(poltype,m,indextocoordinates):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     conf = m.GetConformer()
     for i in range(m.GetNumAtoms()):
         x,y,z = indextocoordinates[i]
@@ -1128,6 +1352,13 @@ def AddInputCoordinatesAsDefaultConformer(poltype,m,indextocoordinates):
 
 
 def GrabNeigbsBabel(poltype,atomidx):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     neigbindexes=[]
     atom=poltype.mol.GetAtom(atomidx)
     atomatomiter=openbabel.OBAtomAtomIter(atom)
@@ -1139,6 +1370,13 @@ def GrabNeigbsBabel(poltype,atomidx):
 
 
 def GenerateFrag(poltype,molindexlist,mol,torset):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     vdwfrag=True
     for tor in torset:
         if len(tor)>1:
@@ -1308,6 +1546,13 @@ def GenerateFrag(poltype,molindexlist,mol,torset):
 
 
 def RemoveRadicals(poltype,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(filename,'r')
     results=temp.readlines()
     temp.close()
@@ -1322,6 +1567,13 @@ def RemoveRadicals(poltype,filename):
     temp.close()
 
 def UpdateAtomNumbers(poltype,indextocoordinates):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newindextocoordinates={}
     ls=list(indextocoordinates.keys())
     for i in range(len(ls)):
@@ -1333,6 +1585,13 @@ def UpdateAtomNumbers(poltype,indextocoordinates):
 
 
 def WriteOBMolToSDF(poltype,mol,outputname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tmpconv = openbabel.OBConversion()
     tmpconv.SetOutFormat('sdf')
     atomiter=openbabel.OBMolAtomIter(mol)
@@ -1341,26 +1600,61 @@ def WriteOBMolToSDF(poltype,mol,outputname):
 
 
 def WriteOBMolToXYZ(poltype,mol,outputname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tmpconv = openbabel.OBConversion()
     tmpconv.SetOutFormat('xyz')
     tmpconv.WriteFile(mol,outputname)
 
 
 def WriteOBMolToMol(poltype,mol,outputname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tmpconv = openbabel.OBConversion()
     tmpconv.SetOutFormat('mol')
     tmpconv.WriteFile(mol,outputname)
 
 def WriteRdkitMolToMolFile(poltype,mol,outputname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     rdmolfiles.MolToMolFile(mol,outputname,kekulize=True)
     rdmolfiles.MolToMolFile(mol,outputname,kekulize=False)
 
 
 def ReadRdkitMolFromMolFile(poltype,inputname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     rdkitmol=rdmolfiles.MolFromMolFile(inputname,sanitize=False)
     return rdkitmol
 
 def ReadMolFileToOBMol(poltype,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tmpconv = openbabel.OBConversion()
     tmpconv.SetInFormat('mol')
     fragmolbabel=openbabel.OBMol()
@@ -1368,6 +1662,13 @@ def ReadMolFileToOBMol(poltype,filename):
     return fragmolbabel
 
 def ReadToOBMol(poltype,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tmpconv = openbabel.OBConversion()
     inFormat = tmpconv.FormatFromExt(filename)
     tmpconv.SetInFormat(inFormat)
@@ -1378,12 +1679,26 @@ def ReadToOBMol(poltype,filename):
 
 
 def mol_with_atom_index(poltype,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atoms = mol.GetNumAtoms()
     for idx in range( atoms ):
         mol.GetAtomWithIdx( idx ).SetProp( 'molAtomMapNumber', str( mol.GetAtomWithIdx( idx ).GetIdx()+1 ) )
     return mol
 
 def mol_with_atom_index_removed(poltype,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atoms = mol.GetNumAtoms()
     for idx in range( atoms ):
         atom=mol.GetAtomWithIdx(idx)
@@ -1393,6 +1708,13 @@ def mol_with_atom_index_removed(poltype,mol):
 
 
 def GenerateWBOMatrix(poltype,molecule,moleculebabel,structfname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     error=False
     WBOmatrix=None
     curespmethod=poltype.espmethod
@@ -1431,6 +1753,13 @@ def GenerateWBOMatrix(poltype,molecule,moleculebabel,structfname):
 
 
 def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets,nonaroringtorlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
 
     newdir='Fragments'
     if not os.path.isdir(newdir):
@@ -1638,6 +1967,13 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets,non
 
 
 def GenerateFakeTorset(poltype,mol,parentindextofragindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     bonditer=openbabel.OBMolBondIter(poltype.mol)
     for bond in bonditer:
         oendidx = bond.GetEndAtomIdx()
@@ -1654,6 +1990,13 @@ def GenerateFakeTorset(poltype,mol,parentindextofragindex):
 
   
 def RemoveTempFolders(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     foldstoremove=[]
     folds=os.listdir()
     for f in folds:
@@ -1663,6 +2006,13 @@ def RemoveTempFolders(poltype):
         shutil.rmtree(f)
 
 def ReduceParentMatrix(poltype,parentindextofragindex,fragWBOmatrix,parentWBOmatrix):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     reducedparentWBOmatrix=numpy.copy(fragWBOmatrix)
     fragindextoparentindex={v: k for k, v in parentindextofragindex.items()}
     for i in range(len(fragWBOmatrix)):
@@ -1679,6 +2029,13 @@ def ReduceParentMatrix(poltype,parentindextofragindex,fragWBOmatrix,parentWBOmat
     return reducedparentWBOmatrix
 
 def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,torset,fragfoldername,growfragments,growfragmoltoWBOmatrices,growfragmoltofragfoldername,growfragmoltobondindexlist,fragspath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     fragfoldernamepath=os.getcwd()
     fragmentsforcomb=growfragments.copy()
     fragmentsforcombwbo=[WBOdifference]
@@ -1792,6 +2149,13 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,torset,fra
 
 
 def GrowPossibleFragmentAtomIndexes(poltype,rdkitmol,indexes):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     possiblefragatmidxs=[]
     comblist=[]
     for bond in rdkitmol.GetBonds():
@@ -1861,6 +2225,13 @@ def GrowPossibleFragmentAtomIndexes(poltype,rdkitmol,indexes):
 
 
 def WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWBOmatrix,WBOdifference,parentindextofragindex,torset,fragmoltoWBOmatrices,fragmoltobondindexlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     highlightbonds=[]
     structfnamemol=fragfoldername+'.mol'
     tmpconv = openbabel.OBConversion()
@@ -1886,6 +2257,13 @@ def WriteOutFragmentInputs(poltype,fragmol,fragfoldername,fragWBOmatrix,parentWB
     return fragmoltoWBOmatrices,fragmoltobondindexlist
 
 def FirstPassAtomIndexes(poltype,tor):
+   """
+   Intent:
+   Input:
+   Output:
+   Referenced By: 
+   Description: 
+   """
    molindexlist=[i-1 for i in tor]
    if len(molindexlist)==4: # then add all a,d for a-b-c-d, this way if a is H, then neighbors of the other a still get added to fragment
        for atom in poltype.rdkitmol.GetAtoms():
@@ -1947,10 +2325,24 @@ def FirstPassAtomIndexes(poltype,tor):
    return molindexlist
 
 def Chunks(poltype,lst, n):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
 def ChunksList(poltype,gen):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newlst=[]
     for item in gen:
         newlst.append(item)
@@ -1958,6 +2350,13 @@ def ChunksList(poltype,gen):
 
 
 def Draw2DMoleculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragfoldername,fragmoltobondindexlist,torset,basestr):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
 
     bondlistoflists=[]
     for frag in fragments:
@@ -2079,6 +2478,13 @@ def Draw2DMoleculesWithWBO(poltype,fragments,fragmoltoWBOmatrices,fragmoltofragf
 
 
 def Draw2DMoleculeWithWBO(poltype,WBOmatrix,basename,mol,bondindexlist=None,smirks=None,imgsize=None):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     mol=mol_with_atom_index(poltype,mol)
     rdDepictor.Compute2DCoords(mol)
     if imgsize==None:
@@ -2140,6 +2546,13 @@ def Draw2DMoleculeWithWBO(poltype,WBOmatrix,basename,mol,bondindexlist=None,smir
 
 
 def RingAtomicIndices(poltype,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     sssr = mol.GetSSSR()
     atomindices=[]
     for ring in sssr:
@@ -2148,6 +2561,13 @@ def RingAtomicIndices(poltype,mol):
     return atomindices
 
 def GrabRingAtomIndicesFromInputIndex(poltype,atomindexlist,atomindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ringtocount={}
     for ring in atomindices:
         count=0
@@ -2166,6 +2586,13 @@ def GrabRingAtomIndicesFromInputIndex(poltype,atomindexlist,atomindices):
     return ring
 
 def GrabRingAtomIndices(poltype,mol,ring):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ringatomindices=[]
     atomiter=openbabel.OBMolAtomIter(mol)
     for atom in atomiter:
@@ -2177,6 +2604,13 @@ def GrabRingAtomIndices(poltype,mol,ring):
 
 
 def GrabAromaticAtoms(poltype,neighbatomidx):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomindices=RingAtomicIndices(poltype,poltype.mol)
     ring=GrabRingAtomIndicesFromInputIndex(poltype,[neighbatomidx],atomindices)
     aromaticindexes=[]
@@ -2195,6 +2629,13 @@ def GrabAromaticAtoms(poltype,neighbatomidx):
 
 
 def PlotFragmenterResults(poltype,WBOdiffarray,molarray):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     fig=plt.figure()
     basename='NumberofAtomsVSWBODifference'
     plt.plot(WBOdiffarray,[m.GetNumAtoms() for m in molarray],'.')

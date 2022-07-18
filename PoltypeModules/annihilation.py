@@ -15,6 +15,13 @@ import equilbriation as equil
 
 
 def main(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for i in range(len(poltype.keyfilename)):
         keylist=poltype.keyfilename[i]
         configkeylist=poltype.configkeyfilename[i]

@@ -12,6 +12,13 @@ from rdkit.Chem import rdmolfiles,AllChem,rdmolops
 
 
 def ExtractLigand(ligandreceptorfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ligandpdbfilename='ligand.pdb'
     receptorpdbfilename='receptor.pdb'
     receptormol=ExtractMOLObject(ligandreceptorfilename,receptorpdbfilename,receptor=True)
@@ -22,6 +29,13 @@ def ExtractLigand(ligandreceptorfilename):
 
 
 def ExtractMOLObject(ligandreceptorfilename,newpdbfilename,receptor):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     pdbmol=GenerateMOLObject(ligandreceptorfilename)
     iteratom = openbabel.OBMolAtomIter(pdbmol)
     obConversion = openbabel.OBConversion()
@@ -47,6 +61,13 @@ def ExtractMOLObject(ligandreceptorfilename,newpdbfilename,receptor):
 
 
 def GrabAtomValues(listofdics,key):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     values=[]
     for subitm in listofdics:
         for subkey,subvalue in subitm.items():
@@ -56,6 +77,13 @@ def GrabAtomValues(listofdics,key):
     return values
 
 def GrabFromToAtomIndex(fromatomindices,fromatomnames,toatomindices,listofelements):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for j in range(len(fromatomindices)):
         atomindex=fromatomindices[j]
         atomname=fromatomnames[j]
@@ -71,6 +99,13 @@ def GrabFromToAtomIndex(fromatomindices,fromatomnames,toatomindices,listofelemen
 
 
 def GrabDirectedBondFromToAtomIndices(allligandatomindices,allligandatomnames,allreceptoratomindices,allreceptoratomnames,listofelements):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     listoffromtoatomindices=[]
     for i in range(len(allligandatomindices)):
         ligandatomindices=allligandatomindices[i]
@@ -87,6 +122,13 @@ def GrabDirectedBondFromToAtomIndices(allligandatomindices,allligandatomnames,al
     return listoffromtoatomindices
 
 def GrabLigandReceptorAtomIndices(data,datakey,trueligandatomindices,residcollector):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     allligandatomindices=[]
     allreceptoratomindices=[]
     allligandatomnames=[]
@@ -113,12 +155,26 @@ def GrabLigandReceptorAtomIndices(data,datakey,trueligandatomindices,residcollec
     return allligandatomindices,allreceptoratomindices,allligandatomnames,allreceptoratomnames,residcollector
 
 def WritePDBFile(pdb_txt,pdbfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(pdbfilename,'w')
     for l in pdb_txt.split("\n") :
         temp.write(l+'\n')
     temp.close()
 
 def GenerateMOLObject(pdbfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     obConversion = openbabel.OBConversion()
     pdbmol = openbabel.OBMol()
     obConversion.SetInFormat('pdb')
@@ -126,6 +182,13 @@ def GenerateMOLObject(pdbfilename):
     return pdbmol
 
 def GrabAtomVectorsFromIndices(listoffromtoatomindices,pdbmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     listoffromtoatomvecs=[]
     for atomindices in listoffromtoatomindices:
         atomveclist=[]
@@ -138,6 +201,13 @@ def GrabAtomVectorsFromIndices(listoffromtoatomindices,pdbmol):
     return listoffromtoatomvecs
 
 def GrabLigandAtomIndices(pdbmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ligandatomindices=[]
     iteratom = openbabel.OBMolAtomIter(pdbmol)
     for atm in iteratom:
@@ -152,6 +222,13 @@ def GrabLigandAtomIndices(pdbmol):
 
 
 def GrabResidueNames(pdbmol,residcollector):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     residtoresname={}
     iteratom = openbabel.OBMolAtomIter(pdbmol)
     passedlig=False
@@ -170,6 +247,13 @@ def GrabResidueNames(pdbmol,residcollector):
 
 
 def ShiftIndices(allligandatomindices,ligandatomindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newallligandatomindices=[]
     for atomls in allligandatomindices:
         newatomls=[]
@@ -184,6 +268,13 @@ def ShiftIndices(allligandatomindices,ligandatomindices):
 
 
 def ComputePositionCenter(allatomvecs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     allcentroids=[]
     for atomvecls in allatomvecs:
         centroid=np.array([0.0,0.0,0.0])
@@ -197,6 +288,13 @@ def ComputePositionCenter(allatomvecs):
 
 
 def CombineLigandReceptorVecs(ligandvecs,receptorvecs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     listoffromtoatomvecs=[]
     for i in range(len(ligandvecs)):
         ligandvec=ligandvecs[i]
@@ -207,6 +305,13 @@ def CombineLigandReceptorVecs(ligandvecs,receptorvecs):
 
 
 def GrabToFromVectorsFromCentroid(data,datakey,ligandatomindices,residcollector,pdbmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     allligandatomindices,allreceptoratomindices,allligandatomnames,allreceptoratomnames,residcollector=GrabLigandReceptorAtomIndices(data,datakey,ligandatomindices,residcollector)
     allligandatomvecs=GrabAtomVectorsFromIndices(allligandatomindices,pdbmol)
     allreceptoratomvecs=GrabAtomVectorsFromIndices(allreceptoratomindices,pdbmol)
@@ -219,6 +324,13 @@ def GrabToFromVectorsFromCentroid(data,datakey,ligandatomindices,residcollector,
 
 
 def GrabToFromVectorsFromDirectedBonds(data,datakey,ligandatomindices,residcollector,pdbmol,listofelements):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     allligandatomindices,allreceptoratomindices,allligandatomnames,allreceptoratomnames,residcollector=GrabLigandReceptorAtomIndices(data,datakey,ligandatomindices,residcollector)
     listoffromtoatomindices=GrabDirectedBondFromToAtomIndices(allligandatomindices,allligandatomnames,allreceptoratomindices,allreceptoratomnames,listofelements)
     listoffromtoatomvecs=GrabAtomVectorsFromIndices(listoffromtoatomindices,pdbmol)
@@ -227,6 +339,13 @@ def GrabToFromVectorsFromDirectedBonds(data,datakey,ligandatomindices,residcolle
 
 
 def CombineArrays(listoflists):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     hydrophobicatomindices=[]
     for largels in listoflists:
         for ls in largels:
@@ -240,6 +359,13 @@ def CombineArrays(listoflists):
 
 
 def CreateViewDictionaries(listoffromtoatomvecshbond,listoffromtoatomvecspipi,listoffromtoatomvecststack,listoffromtoatomvecscatpi,listoffromtoatomvecshalbond,listoffromtoatomvecssaltbridge):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     colordic={"CCN":'red','SAL':'red','PIS':'blue','PIT':"aqua","PIC":'navy',"MTL":'purple',"HYD":'grey',"HBN":"black","HALBN":'green'}
     dasheddic={"CCN":False,'SAL':True,'PIS':True,'PIT':True,"PIC":True,"MTL":False,"HYD":False,"HBN":False,'HALBN':False}
     labeldic={"CCN":'Closest contacts','SAL':'Salt bridge','PIS':'pi-pi stacking','PIT':"T-stacking","PIC":'cation-pi',"MTL":'metal coordination',"HYD":'hydrophobic contacts',"HBN":"hydrogen bond",'HALBN':'halogen bond'}
@@ -248,6 +374,13 @@ def CreateViewDictionaries(listoffromtoatomvecshbond,listoffromtoatomvecspipi,li
 
 
 def CreateViewer(listoffromtoatomvecshbond,listoffromtoatomvecspipi,listoffromtoatomvecststack,listoffromtoatomvecscatpi,listoffromtoatomvecshalbond,listoffromtoatomvecssaltbridge,residcollector,hydrophobicatomvecs,residtoresname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ligandinputfilename='ligand.pdb'
     receptorinputfilename='receptor.pdb'
     ligand, receptor = binana.load_ligand_receptor.from_files(ligandinputfilename,receptorinputfilename)
@@ -283,6 +416,13 @@ def CreateViewer(listoffromtoatomvecshbond,listoffromtoatomvecspipi,listoffromto
     return view
 
 def PrepareInputs(ligandreceptorfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ligandinputfilename,receptorinputfilename=ExtractLigand(ligandreceptorfilename)
     residcollector=[]
     ligand, receptor = binana.load_ligand_receptor.from_files(ligandinputfilename,receptorinputfilename)
@@ -313,12 +453,26 @@ def PrepareInputs(ligandreceptorfilename):
 
 
 def PrepareInputsAndCreateViewer(ligandreceptorfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     listoffromtoatomvecshbond,listoffromtoatomvecspipi,listoffromtoatomvecststack,listoffromtoatomvecscatpi,listoffromtoatomvecshalbond,listoffromtoatomvecssaltbridge,residcollector,hydrophobicatomvecs,residtoresname,ligandinputfilename,receptorinputfilename=PrepareInputs(ligandreceptorfilename)
     view=CreateViewer(listoffromtoatomvecshbond,listoffromtoatomvecspipi,listoffromtoatomvecststack,listoffromtoatomvecscatpi,listoffromtoatomvecshalbond,listoffromtoatomvecssaltbridge,residcollector,hydrophobicatomvecs,residtoresname)
     net=Generate2DInteractionPlot(receptorinputfilename,ligandinputfilename)
     return view,net
 
 def ConvertPDBToSDF(ligandpdbfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ligandsdffilename=ligandpdbfilename.replace('.pdb','.sdf')
     obConversion = openbabel.OBConversion()
     pdbmol = openbabel.OBMol()
@@ -329,6 +483,13 @@ def ConvertPDBToSDF(ligandpdbfilename):
     return ligandsdffilename
 
 def AddProteinBonds(proteinpdbfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     obConversion = openbabel.OBConversion()
     newpdbfilename=proteinpdbfilename.replace('.pdb','_final.pdb')
     pdbmol = openbabel.OBMol()
@@ -339,6 +500,13 @@ def AddProteinBonds(proteinpdbfilename):
     return newpdbfilename
 
 def AssignCharge(m):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
     for atom in m.GetAtoms():
         atomidx=atom.GetIdx()
@@ -364,6 +532,13 @@ def AssignCharge(m):
     return m
 
 def FileConverter(inputfilename,informat,outformat):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     outputfilename=inputfilename.replace('.'+informat,'.'+outformat)
     obConversion = openbabel.OBConversion()
     mol = openbabel.OBMol()
@@ -374,6 +549,13 @@ def FileConverter(inputfilename,informat,outformat):
     return outputfilename
 
 def AssignFormalCharges(ligandsdffilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ligandmolfilename=FileConverter(ligandsdffilename,'sdf','mol')
     m=Chem.MolFromMolFile(ligandmolfilename,removeHs=False,sanitize=False)
     m=AssignCharge(m)
@@ -384,6 +566,13 @@ def AssignFormalCharges(ligandsdffilename):
 
 
 def Generate2DInteractionPlot(proteinpdbfilename,ligandpdbfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     proteinpdbfilename=AddProteinBonds(proteinpdbfilename)
     prot = mda.Universe(proteinpdbfilename,guess_bonds=False)
     prot = plf.Molecule.from_mda(prot)

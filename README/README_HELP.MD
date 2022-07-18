@@ -417,6 +417,10 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 
 ``simulationstostopfolderpath``  specifies a directory containing subdirectories of input jobs, recursive search will and *.end files to each folder with an *.arc file to stop simulations. Upon restarting program all *.end files that are in folders are automatically removed. Default has no value.
 
+``generatepdbtrajs`` specifies to convert ARC to PDB trajectory for equilibriated ARC and production dynamics ARC with full electrostatics and vdW. Default is False. Needs to be used with complexedproteinpdbname.
+
+``removesolventpdbtraj`` specifies to remove solvent (water/ions) from PDB trajectory. Used with ``generatepdbtrajs``. Default is True.
+
 #### Available Integrators Barostats and Thermostats
 
 ##### Integrators
@@ -525,6 +529,9 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 
 ``equilfinished`` specifies to skip equilibration (for debugging). Default is False.
 
+
+``complexationonly`` specifies to only do equilibriation dynamics for complexation of host and guest (no solvation of ligand). Default is False.
+
 #### Production Dynamics
 
 ``productiondynamicsNVT``   specifies whether or not to use NVT ensemble during production dynamics. If on then will use NPT after equilbriating to determine average box size. Default is False.
@@ -547,6 +554,10 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 
 ``prodmdfinished`` specifies to skip production dynamics (for debugging). Default is False.
 
+``alchemical`` specifies to do alchemical perturbation. Can turn this off if only want production dynamics will full electrostatics and vdw interactions turned on. Default is True.
+
+
+``complexationonly`` specifies to only do production dynamics for complexation of host and guest (no solvation of ligand). Default is False.
 #### Free Energy
 
 ``barinterval``  specifies how many times to recompute BAR over length of full production trajectory with evenly spaced chunks over the trajectory. Default is 5.

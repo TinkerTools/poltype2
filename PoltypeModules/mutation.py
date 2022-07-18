@@ -7,6 +7,13 @@ import terminate as term
 import sys
 
 def SingleTopologyMutationProtocol(poltype):
+   """
+   Intent:
+   Input:
+   Output:
+   Referenced By: 
+   Description: 
+   """
    bgnstatexyzatominfo,bgnstateindextotypeindex,bgnstateatomnum=GrabXYZInfo(poltype,poltype.bgnstatexyz)
    endstatexyzatominfo,endstateindextotypeindex,endstateatomnum=GrabXYZInfo(poltype,poltype.endstatexyz)
    poltype.bgnstatetypeindextoendstatetypeindex={}
@@ -18,6 +25,13 @@ def SingleTopologyMutationProtocol(poltype):
 
 
 def GrabXYZInfo(poltype,xyzfile):
+   """
+   Intent:
+   Input:
+   Output:
+   Referenced By: 
+   Description: 
+   """
    temp=open(poltype.outputpath+xyzfile,'r')
    xyzfileresults=temp.readlines()
    temp.close()
@@ -38,6 +52,13 @@ def GrabXYZInfo(poltype,xyzfile):
 
 
 def GenerateKeyFile(poltype,arrayoflinearrays,keyfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(keyfilename,'w')
     for array in arrayoflinearrays:
         for line in array:
@@ -46,6 +67,13 @@ def GenerateKeyFile(poltype,arrayoflinearrays,keyfilename):
     temp.close()
 
 def RepresentsInt(s):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     try: 
         int(s)
         return True
@@ -53,6 +81,13 @@ def RepresentsInt(s):
         return False
 
 def GrabBgnToEndPrms(poltype,bgnstatetypeindextoendstatetypeindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     bgnatomdefs,bgnbondprms,bgnangleprms,bgntorsionprms,bgnstrbndprms,bgnpitorsprms,bgnmpoleprms,bgnpolarizeprms,bgnopbendprms,bgnvdwprms=GrabParameters(poltype,poltype.bgnstatekey,bgnstatetypeindextoendstatetypeindex.keys(),bgnstatetypeindextoendstatetypeindex.keys())
     bgnlinetoendline={}
     for line in bgnatomdefs:
@@ -246,16 +281,37 @@ def GrabBgnToEndPrms(poltype,bgnstatetypeindextoendstatetypeindex):
     return finalbgnlinetoendline
 
 def AppendParametersIfRightTypeOrClass(poltype,listtocheck,refindexes,listtoappend,line):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for idx in listtocheck:
         if idx in refindexes and line not in listtoappend:
             listtoappend.append(line)
     return listtoappend
 
 def MutateParameter(poltype,bgnprm,endprm,mutlambda):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     return float(mutlambda)*float(bgnprm)+(1-float(mutlambda))*float(endprm)
 
 
 def ModifyParameterLine(linesplit):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     line=' '.join(linesplit)
     newlinesplit=line.split()
     if 'torsion' in line:
@@ -298,6 +354,13 @@ def ModifyParameterLine(linesplit):
     return linesplit
 
 def MutateParameterInLine(poltype,bgnlinesplit,endlinesplit,lineidxs,mutlambda,numinterpols,interpolindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     bgnlastindex=len(bgnlinesplit)-1
     endlastindex=len(endlinesplit)-1
 
@@ -330,6 +393,13 @@ def MutateParameterInLine(poltype,bgnlinesplit,endlinesplit,lineidxs,mutlambda,n
     return mutline
 
 def MutateAllParameters(poltype,bgnlinetoendline,mutlambda,numinterpols,interpolindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     arrayofbgnprmarrays=GrabParameters(poltype,poltype.bgnstatekey,poltype.bgnstatetypeindextoendstatetypeindex.keys(),poltype.bgnstatetypeindextoendstatetypeindex.keys())
     mutarrayofprmarrays=[]
     for arrayidx in range(len(arrayofbgnprmarrays)):
@@ -339,6 +409,13 @@ def MutateAllParameters(poltype,bgnlinetoendline,mutlambda,numinterpols,interpol
     return mutarrayofprmarrays
 
 def MutateParameters(poltype,bgnstateprmlines,bgnlinetoendline,mutlambda,numinterpols,interpolindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     mutprmlines=[]
     for i in range(len(bgnstateprmlines)):
         bgnline=bgnstateprmlines[i]
@@ -395,6 +472,13 @@ def MutateParameters(poltype,bgnstateprmlines,bgnlinetoendline,mutlambda,numinte
     return mutprmlines
 
 def GrabParameters(poltype,filename,types,classes):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomdefs=[]
     bondprms=[]
     angleprms=[]

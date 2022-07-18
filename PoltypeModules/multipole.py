@@ -9,8 +9,16 @@ from collections import deque
 from itertools import product,permutations
 import numpy as np
 import re
+import parametercomparison
 
 def AddPolarizeCommentsToKey(poltype,keyfilename,polartypetotransferinfo):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(keyfilename,'r')
     results=temp.readlines()
     temp.close()
@@ -34,6 +42,13 @@ def AddPolarizeCommentsToKey(poltype,keyfilename,polartypetotransferinfo):
 
 
 def SanitizeMultipoleFrames(poltype,keyfilename): # pearl script for averging only understands 0 and not empty spaces for parsing
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(keyfilename,'r')
     results=temp.readlines()
     temp.close()
@@ -55,6 +70,13 @@ def SanitizeMultipoleFrames(poltype,keyfilename): # pearl script for averging on
     os.rename(tempname,keyfilename)
 
 def CheckIfAllAtomsSameClass(poltype,classlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     allsymm=True
     if len(classlist)>=1:
         firstsymm=poltype.idxtosymclass[classlist[0].GetIdx()]
@@ -66,6 +88,13 @@ def CheckIfAllAtomsSameClass(poltype,classlist):
     return allsymm
 
 def RemoveFromList(poltype,atomlist,atm):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newatmlist=[]
     idx=atm.GetIdx()
     for newatm in atomlist:
@@ -75,6 +104,13 @@ def RemoveFromList(poltype,atomlist,atm):
 
 
 def AtLeastOneHeavyLf1NeighbNotAtom(poltype,lf1atom,atom):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     foundatleastoneheavy=False
     checkneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(lf1atom)]
     for neighb in checkneighbs:
@@ -84,6 +120,13 @@ def AtLeastOneHeavyLf1NeighbNotAtom(poltype,lf1atom,atom):
 
 
 def AtLeastOneHeavyNeighb(poltype,atom):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     foundatleastoneheavy=False
     checkneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(atom)]
     for neighb in checkneighbs:
@@ -93,12 +136,26 @@ def AtLeastOneHeavyNeighb(poltype,atom):
 
 
 def GrabHeavyAtomIdx(poltype,lf1atom,atom):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     checkneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(lf1atom)]
     for neighb in checkneighbs:
         if neighb.GetIdx()!=atom.GetIdx() and neighb.GetAtomicNum()!=1:
             return neighb.GetIdx()
 
 def FindUniqueNonRepeatingNeighbors(poltype,nlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     d={}
     for b in nlist:
         typenum= poltype.idxtosymclass[b.GetIdx()]
@@ -115,6 +172,13 @@ def FindUniqueNonRepeatingNeighbors(poltype,nlist):
     return sorteduniquetypeneighbsnorepeat
 
 def GrabIndexFromUniqueTypeNumber(poltype,nlist,typenum):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for b in nlist:
         idx=b.GetIdx()
         typenumber= poltype.idxtosymclass[idx]
@@ -122,6 +186,13 @@ def GrabIndexFromUniqueTypeNumber(poltype,nlist,typenum):
             return idx
 
 def GrabIndexesFromUniqueTypeNumber(poltype,nlist,typenum):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     idxlist=[]
     for b in nlist:
         idx=b.GetIdx()
@@ -135,6 +206,13 @@ def GrabIndexesFromUniqueTypeNumber(poltype,nlist,typenum):
 
 
 def CheckIfNeighbHasSameType(poltype,a,neighbs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     check=False
     reftype=poltype.idxtosymclass[a.GetIdx()]
     neighbtypes=[poltype.idxtosymclass[b.GetIdx()] for b in neighbs]
@@ -143,6 +221,13 @@ def CheckIfNeighbHasSameType(poltype,a,neighbs):
     return check
 
 def GrabNumberOfConnectedHydrogens(poltype,highestsymneighbnorepeat):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbnorepeat)]
     hydnum=0
     for atom in atomneighbs:
@@ -152,6 +237,13 @@ def GrabNumberOfConnectedHydrogens(poltype,highestsymneighbnorepeat):
 
    
 def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltype.WriteToLog('Local Frame Symmetry Detection')
     poltype.WriteToLog('Define Polarization Groups and Polarization Parameters')
     if poltype.usepoleditframes==False:
@@ -470,7 +562,11 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
 
 def rm_esp_terms_keyfile(poltype,keyfilename):
     """
-    Intent: Remove unnecessary terms from the key file
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
     """
     tmpfname = keyfilename + "_tmp"
     temp=open(tmpfname,'w')
@@ -509,7 +605,11 @@ def rm_esp_terms_keyfile(poltype,keyfilename):
     
 def prepend_keyfile(poltype,keyfilename,optmol,dipole=False):
     """
-    Intent: Adds a header to the key file given by 'keyfilename'
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
     """
     while not os.path.isfile(keyfilename):
         time.sleep(5)
@@ -540,6 +640,14 @@ def prepend_keyfile(poltype,keyfilename,optmol,dipole=False):
 
 
 def CheckFileForString(poltype,filetocheck):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     temp=open(filetocheck,'r')
     results=temp.readlines()
     temp.close()
@@ -644,12 +752,34 @@ def run_gdma(poltype):
     assert os.path.getsize(poltype.gdmafname) > 0, "Error: " + os.getcwd() +' '+os.path.basename(poltype.gdmaexe) + " cannot create .gdmaout file."
    
 def AverageMultipoles(poltype,optmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     gen_avgmpole_groups_file(poltype)
     avgmpolecmdstr = poltype.avgmpolesexe + " " + poltype.keyfname + " " + poltype.xyzfname + " " + poltype.grpfname + " " + poltype.key2fnamefromavg + " " + poltype.xyzoutfile + " " + str(poltype.prmstartidx)
-    poltype.call_subsystem([avgmpolecmdstr],True)
+    poltype.call_subsystem([avgmpolecmdstr],True)    
     prepend_keyfile(poltype,poltype.key2fnamefromavg,optmol,True)
-
-
+    statexyzatominfo,oldindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=parametercomparison.GrabXYZInfo(poltype,poltype.xyzoutfile)
+    babelindextoneighbs={}
+    atomiter=openbabel.OBMolAtomIter(optmol)
+    for atom in atomiter:
+        atomidx=atom.GetIdx()
+        iteratomatom = openbabel.OBAtomAtomIter(atom)
+        for natom in iteratomatom:
+            natomidx=natom.GetIdx()
+            if atomidx not in babelindextoneighbs.keys():
+                babelindextoneighbs[atomidx]=[]
+            babelindextoneighbs[atomidx].append(natomidx)
+    for atomidx in babelindextoneighbs.keys():
+        babelneighbs=set(babelindextoneighbs[atomidx])
+        tinkneighbs=set(indextoneighbs[atomidx])
+        if babelneighbs!=tinkneighbs:
+            string='Neighbors for atom index '+str(atomidx)+' not consistent between tinker = '+str(tinkneighbs)+' and babel = '+str(babelneighbs)
+            raise ValueError(string) 
 
 def gen_avgmpole_groups_file(poltype):
     """

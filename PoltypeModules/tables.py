@@ -7,6 +7,13 @@ import numpy as np
 import plots
 
 def GenerateAnnihilationProgressTable(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     totaltable=[]
     tableheader=['Dynamic Jobs','Name','Writeout Freq (ps)','Dyntamic Time Step (fs)','Total Time (ns)','Total Dyn Extended Time','Total Dynamic Steps','Total Extended Dynamic Steps','Total ARC File Space Needed']
     for j in range(len( poltype.simfoldname)):
@@ -20,12 +27,26 @@ def GenerateAnnihilationProgressTable(poltype):
     return totaltable
 
 def ComputeDynamicsTime(poltype,timeleft):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     upper=timeleft/poltype.lowerperf
     lower=timeleft/poltype.upperperf
     return lower,upper
 
 
 def KeyLists(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     
     lambdakeylist=['Ele-Lambda','Vdw-Lambda','Restraint-Lambda']
 
@@ -48,6 +69,13 @@ def KeyLists(poltype):
 
 
 def CSVWriter(poltype,tempname,progress=False):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     with open(tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         grabbedfreeenergydict=poltype.masterdict['freeenergy']
@@ -110,6 +138,13 @@ def CSVWriter(poltype,tempname,progress=False):
 
 
 def WriteOutTable(poltype,allvaluerows,summary,keyrowlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tempname=summary.replace(' ','_')+'.csv'
     with open(tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -120,6 +155,13 @@ def WriteOutTable(poltype,allvaluerows,summary,keyrowlist):
 
 
 def GenerateSimInfoTable(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     
     curdir=os.getcwd()
     os.chdir(poltype.outputpath)
@@ -134,6 +176,13 @@ def GenerateSimInfoTable(poltype):
 
 
 def OrderTableData(poltype,boxinfokeylist,lambdakeylist,energykeylist,freeenergykeylist,summarykeylist,path):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for i in range(len(poltype.masterdict['boxinfo'])):
         if path not in poltype.masterdict['boxinfo'][i].keys():
             poltype.masterdict['boxinfo'][i][path]={}
@@ -194,6 +243,13 @@ def OrderTableData(poltype,boxinfokeylist,lambdakeylist,energykeylist,freeenergy
 
 
 def GenerateFreeEnergyMatrix(poltype,ligandnames,receptornames,bindenergies):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     uniquereceptors=len(set(receptornames))
     uniqueligands=len(ligandnames)
     mat=np.array((uniquereceptors,uniqueligands),dtype=float)
@@ -229,6 +285,13 @@ def GenerateFreeEnergyMatrix(poltype,ligandnames,receptornames,bindenergies):
     return mat,xaxis,yaxis
 
 def GrabSimDataFromPathList(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     
     topdir=os.getcwd()
     poltype.simpathlist=[]
@@ -327,6 +390,13 @@ def GrabSimDataFromPathList(poltype):
     return
 
 def EnterBindData(poltype,path):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltype.masterdict['summary'][path][u'ΔGˢᵒˡᵛ']=poltype.masterdict['freeenergy'][path][u'ΔGˢᵒˡᵛ']
     poltype.masterdict['summary'][path][u'ΔGᶜᵒᵐᵖᶜᵒʳʳ']=poltype.masterdict['freeenergy'][path][u'ΔGᶜᵒᵐᵖᶜᵒʳʳ']
     DelGBind=float(poltype.masterdict['energy'][path][u'ΔGᶜᵒᵐᵖᶜᵒʳʳ'])-float(poltype.masterdict['energy'][path][u'ΔGˢᵒˡᵛ'])
@@ -362,6 +432,13 @@ def EnterBindData(poltype,path):
 
 
 def AverageEnergyList(poltype,enlist,key):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if 'G' in key:
         poltype.deltaGaverage=TotalBindingAffinity(poltype,enlist)
     elif 'H' in key:
@@ -370,6 +447,13 @@ def AverageEnergyList(poltype,enlist,key):
         poltype.deltaSaverage=(poltype.deltaHaverage-poltype.deltaGaverage)/int(poltype.equilibriatescheme[-1])
 
 def TotalBindingAffinity(poltype,enlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     kB=0.0019872041 # kcal/molK
     T=int(poltype.equilibriatescheme[-1])
     sumboltzfactors=0
@@ -379,6 +463,13 @@ def TotalBindingAffinity(poltype,enlist):
     return totalsum
 
 def TotalBindingAffinityError(poltype,enlist,errlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     kB=0.0019872041 # kcal/molK
     T=int(poltype.equilibriatescheme[-1])
     Sum=0
@@ -390,6 +481,13 @@ def TotalBindingAffinityError(poltype,enlist,errlist):
 
                 
 def BoltzmannAverage(poltype,enlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     kB=0.0019872041
     T=int(poltype.equilibriatescheme[-1])
     sumboltzfactors=0
@@ -404,6 +502,13 @@ def BoltzmannAverage(poltype,enlist):
 
 
 def WriteTableUpdateToLog(poltype,verbose=True):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for i in range(len(poltype.tabledict)):
         table=poltype.tabledict[i]
         tableused=poltype.tabledictkeysused[i]

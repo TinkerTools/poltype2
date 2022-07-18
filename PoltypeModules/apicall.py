@@ -3,6 +3,13 @@ import sys
 import subprocess
 
 def CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobinfofilenameprefix,jobtooutputfilepath={}):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltype.WriteToLog('Calling external API ')
     jobinfofilepath=jobinfofilenameprefix+'.txt'
     temp=open(jobinfofilepath,'w')

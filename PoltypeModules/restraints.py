@@ -14,6 +14,13 @@ from openbabel import openbabel
 import itertools
 
 def ComputeCOM(poltype,atomidxtovecdic,atomidxtomassdic):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     num=np.array([0,0,0],dtype='float64')
     temp=np.array([0,0,0],dtype='float64')
     totmass=0
@@ -28,6 +35,13 @@ def ComputeCOM(poltype,atomidxtovecdic,atomidxtomassdic):
 
 
 def AddHarmonicRestrainGroupTermsToKeyFile(poltype,keyfilename,teatherdistances,restraintconstant,restrainatomgroup1,restrainatomgroup2):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     count=1
     for i in range(len(restrainatomgroup1)):
         teatherdist=teatherdistances[i]
@@ -53,6 +67,13 @@ def AddHarmonicRestrainGroupTermsToKeyFile(poltype,keyfilename,teatherdistances,
         
     
 def AverageCOMGroups(poltype,filename,grp1,grp2):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     try:
         t = md.load_arc(filename)
     except IOError:
@@ -97,6 +118,13 @@ def AverageCOMGroups(poltype,filename,grp1,grp2):
 
 
 def GroupRestraintFreeEnergyFix(poltype,distances):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     fo=poltype.distancerestraintconstant
     pi=np.pi
     gasconst=8.314/4184
@@ -128,6 +156,13 @@ def GroupRestraintFreeEnergyFix(poltype,distances):
 
 
 def GrabIndexInfo(poltype,fxyz):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     try:
         t = md.load_arc(fxyz)
     except IOError:
@@ -150,6 +185,13 @@ def GrabIndexInfo(poltype,fxyz):
 
 
 def GrabXYZAndMass(poltype,indextomass,indextovec,indices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomidxtomassdic={}
     atomidxtovecdic={}
     for index in indices:
@@ -160,6 +202,13 @@ def GrabXYZAndMass(poltype,indextomass,indextovec,indices):
     return atomidxtomassdic,atomidxtovecdic
 
 def FindClosestLigandAtomToCOM(poltype,ligandcom,atomidxtovecdic,indextosym):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     disttoatomidx={}
     for atomidx,vec in atomidxtovecdic.items():
         symb=indextosym[atomidx]
@@ -173,6 +222,13 @@ def FindClosestLigandAtomToCOM(poltype,ligandcom,atomidxtovecdic,indextosym):
 
 
 def ComputeAverageDistanceFromAtom(poltype,comb,indextovec,ligandatomindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ref=indextovec[ligandatomindex]
     distances=[]
     for index in comb:
@@ -184,6 +240,13 @@ def ComputeAverageDistanceFromAtom(poltype,comb,indextovec,ligandatomindex):
 
 
 def ComputeIdealGroupRestraints(poltype,ligandindices,fxyz,nmin=4,nmax=8,sele='CA',annihilate=False):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     COMthresh=1
     maxatomcutoff=20
     indextomass,indextovec,indextosym,t=GrabIndexInfo(poltype,fxyz)
@@ -192,7 +255,7 @@ def ComputeIdealGroupRestraints(poltype,ligandindices,fxyz,nmin=4,nmax=8,sele='C
     ligandatomindex=FindClosestLigandAtomToCOM(poltype,ligandcom,atomidxtovecdic,indextosym)
     
     if sele=='protein':
-        indices=poltype.proteinindices[:]
+        indices=poltype.receptorindices[:]
     else:
         indices = t.topology.select('name %s'%(sele))
         indices=[i+1 for i in indices]

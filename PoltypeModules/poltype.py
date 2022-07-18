@@ -85,6 +85,10 @@ from operator import itemgetter
 
 @dataclass
 class PolarizableTyper():
+        complexationonly:bool=False
+        removesolventpdbtraj:bool=True
+        generatepdbtrajs:bool=False
+        alchemical:bool=True
         covalentdock:bool=False
         xtbmethod:int=2
         optloose:bool=True
@@ -465,8 +469,19 @@ class PolarizableTyper():
         espextraconflist:list=field(default_factory=lambda : [])
         usepdb2pqr:bool=False
         inputproddyntime:bool=False
+        inputequiltimeNVT:bool=False
+        inputequiltimeNPT:bool=False
+        inputlastNVTequiltime:bool=False
+        indicestorestrain:list=field(default_factory=lambda : [])
+        hetatmindices:list=field(default_factory=lambda : [])
         def __post_init__(self): 
-        
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             self.knownresiduesymbs=['A', 'G', 'U', 'A3', 'A5','DA', 'DC', 'DG', 'DT', 'G3', 'G5', 'U3', 'U5','DA3', 'DA5', 'DC3', 'DC5', 'DG3', 'DG5', 'DT3', 'DT5','ALA', 'ARG', 'ASH', 'ASN', 'ASP', 'GLH', 'GLN', 'GLU', 'GLY', 'HID', 'HIE', 'HIS','ILE', 'LEU', 'LYD', 'LYS', 'MET','PHE', 'PRO', 'SER', 'THR', 'TRP', 'TYD', 'TYR', 'VAL', 'CYD', 'CYS']
             self.molstructfname=self.structure 
             self.simpath=os.getcwd()        
@@ -531,6 +546,7 @@ class PolarizableTyper():
                             newline=linesplit[0]
                             if a=='None':
                                 continue
+                            commalist=a.split(',')
                         else:
                             newline=line
 
@@ -589,167 +605,73 @@ class PolarizableTyper():
                             self.vinaexhaustiveness=int(a)
                         elif 'dockingenvname' in newline:
                             self.dockingenvname=a
-
+                        elif "complexationonly" in newline:
+                            self.complexationonly=self.SetDefaultBool(line,a,True)
+                        elif "generatepdbtrajs" in newline:
+                            self.generatepdbtrajs=self.SetDefaultBool(line,a,True)
+                        elif "removesolventpdbtraj" in newline:
+                            self.removesolventpdbtraj=self.SetDefaultBool(line,a,True)
                         elif "writeoutmultipole" in newline:
-                            if '=' not in line:
-                                self.writeoutmultipole = True
-                            else:
-                                self.writeoutmultipole=self.GrabBoolValue(a)
+                            self.writeoutmultipole=self.SetDefaultBool(line,a,True)
+                        elif "alchemical" in newline:
+                            self.alchemical=self.SetDefaultBool(line,a,True)
                         elif "covalentdock" in newline:
-                            if '=' not in line:
-                                self.covalentdock = True
-                            else:
-                                self.covalentdock=self.GrabBoolValue(a)
+                            self.covalentdock=self.SetDefaultBool(line,a,True)
                         elif "writeoutbond" in newline:
-                            if '=' not in line:
-                                self.writeoutbond = True
-                            else:
-                                self.writeoutbond=self.GrabBoolValue(a)
+                            self.writeoutbond=self.SetDefaultBool(line,a,True)
                         elif "writeoutangle" in newline:
-                            if '=' not in line:
-                                self.writeoutangle = True
-                            else:
-                                self.writeoutangle=self.GrabBoolValue(a)
-                        
+                            self.writeoutangle=self.SetDefaultBool(line,a,True)
                         elif "optloose" in newline:
-                            if '=' not in line:
-                                self.optloose = True
-                            else:
-                                self.optloose=self.GrabBoolValue(a)
-
+                            self.optloose=self.SetDefaultBool(line,a,True)
                         elif "writeoutstrbnd" in newline:
-                            if '=' not in line:
-                                self.writeoutstrbnd = True
-                            else:
-                                self.writeoutstrbnd=self.GrabBoolValue(a)
+                            self.writeoutstrbnd=self.SetDefaultBool(line,a,True)
                         elif "writeoutopbend" in newline:
-                            if '=' not in line:
-                                self.writeoutopbend = True
-                            else:
-                                self.writeoutopbend=self.GrabBoolValue(a)
+                            self.writeoutopbend=self.SetDefaultBool(line,a,True)
                         elif "writeoutvdw" in newline:
-                            if '=' not in line:
-                                self.writeoutvdw = True
-                            else:
-                                self.writeoutvdw=self.GrabBoolValue(a)
+                            self.writeoutvdw=self.SetDefaultBool(line,a,True)
                         elif "writeoutpolarize" in newline:
-                            if '=' not in line:
-                                self.writeoutpolarize = True
-                            else:
-                                self.writeoutpolarize=self.GrabBoolValue(a)
+                            self.writeoutpolarize=self.SetDefaultBool(line,a,True)
                         elif "writeouttorsion" in newline:
-                            if '=' not in line:
-                                self.writeouttorsion = True
-                            else:
-                                self.writeouttorsion=self.GrabBoolValue(a)
-
-
+                            self.writeouttorsion=self.SetDefaultBool(line,a,True)
                         elif "usevinardo" in newline:
-                            if '=' not in line:
-                                self.usevinardo = True
-                            else:
-                                self.usevinardo=self.GrabBoolValue(a)
+                            self.usevinardo=self.SetDefaultBool(line,a,True)
                         elif "usevina" in newline:
-                            if '=' not in line:
-                                self.usevina = True
-                            else:
-                                self.usevina=self.GrabBoolValue(a)
-
+                            self.usevina=self.SetDefaultBool(line,a,True)
                         elif "usegold" in newline:
-                            if '=' not in line:
-                                self.usegold = True
-                            else:
-                                self.usegold=self.GrabBoolValue(a)
+                            self.usegold=self.SetDefaultBool(line,a,True)
                         elif "usead4" in newline:
-                            if '=' not in line:
-                                self.usead4 = True
-                            else:
-                                self.usead4=self.GrabBoolValue(a)
-
-
+                            self.usead4=self.SetDefaultBool(line,a,True)
                         elif "addphysioions" in newline:
-                            if '=' not in line:
-                                self.addphysioions = True
-                            else:
-                                self.addphysioions=self.GrabBoolValue(a)
+                            self.addphysioions=self.SetDefaultBool(line,a,True)
                         elif "usepdb2pqr" in newline:
-                            if '=' not in line:
-                                self.usepdb2pqr = True
-                            else:
-                                self.usepdb2pqr=self.GrabBoolValue(a)
+                            self.usepdb2pqr=self.SetDefaultBool(line,a,True)
                         elif "submitlocally" in newline:
-                            if '=' not in line:
-                                self.submitlocally = True
-                            else:
-                                self.submitlocally=self.GrabBoolValue(a)
                             self.didinputsubmitlocally=True
-
+                            self.submitlocally=self.SetDefaultBool(line,a,True)
                         elif "usesymtypes" in newline:
-                            if '=' not in line:
-                                self.usesymtypes = True
-                            else:
-                                self.usesymtypes=self.GrabBoolValue(a)
-
+                            self.usesymtypes=self.SetDefaultBool(line,a,True)
                         elif "printjobsleft" in newline:
-                            if '=' not in line:
-                                self.printjobsleft = True
-                            else:
-                                self.printjobsleft=self.GrabBoolValue(a)
+                            self.printjobsleft=self.SetDefaultBool(line,a,True)
                         elif "salthfe" in newline:
-                            if '=' not in line:
-                                self.salthfe = True
-                            else:
-                                self.salthfe=self.GrabBoolValue(a)
+                            self.salthfe=self.SetDefaultBool(line,a,True)
                         elif "relaxFBbox" in newline:
-                            if '=' not in line:
-                                self.relaxFBbox = True
-                            else:
-                                self.relaxFBbox=self.GrabBoolValue(a)
-
+                            self.relaxFBbox=self.SetDefaultBool(line,a,True)
                         elif "extractinterforbinding" in newline:
-                            if '=' not in line:
-                                self.extractinterforbinding = True
-                            else:
-                                self.extractinterforbinding=self.GrabBoolValue(a)
-
-
+                            self.extractinterforbinding=self.SetDefaultBool(line,a,True)
                         elif "neatliquidsim" in newline:
-                            if '=' not in line:
-                                self.neatliquidsim = True
-                            else:
-                                self.neatliquidsim=self.GrabBoolValue(a)
-
+                            self.neatliquidsim=self.SetDefaultBool(line,a,True)
                         elif "redobar" in newline:
-                            if '=' not in line:
-                                self.redobar = True
-                            else:
-                                self.redobar=self.GrabBoolValue(a)
+                            self.redobar=self.SetDefaultBool(line,a,True)
                         elif "rotateframes" in newline:
-                            if '=' not in line:
-                                self.rotateframes = True
-                            else:
-                                self.rotateframes=self.GrabBoolValue(a)
+                            self.rotateframes=self.SetDefaultBool(line,a,True)
                         elif "checktraj" in newline:
-                            if '=' not in line:
-                                self.checktraj = True
-                            else:
-                                self.checktraj=self.GrabBoolValue(a)
+                            self.checktraj=self.SetDefaultBool(line,a,True)
                         elif "cpujobsonly" in newline:
-                            if '=' not in line:
-                                self.cpujobsonly = True
-                            else:
-                                self.cpujobsonly=self.GrabBoolValue(a)
+                            self.cpujobsonly=self.SetDefaultBool(line,a,True)
                         elif "writeinputfiles" in newline:
-                            if '=' not in line:
-                                self.writeinputfiles = True
-                            else:
-                                self.writeinputfiles=self.GrabBoolValue(a)
+                            self.writeinputfiles=self.SetDefaultBool(line,a,True)
                         elif "compareparameters" in newline:
-                            if '=' not in line:
-                                self.compareparameters = True
-                            else:
-                                self.compareparameters=self.GrabBoolValue(a)
-
+                            self.compareparameters=self.SetDefaultBool(line,a,True)
                         elif 'expfreeenergy' in newline:
                             self.expfreeenergy=a
                         elif 'pathtosims' in newline:
@@ -773,65 +695,31 @@ class PolarizableTyper():
                         elif 'density' in newline:
                             self.density=float(a)
                         elif "usepreequilibriatedbox" in newline:
-                            if '=' not in line:
-                                self.usepreequilibriatedbox = True
-                            else:
-                                self.usepreequilibriatedbox=self.GrabBoolValue(a)
+                            self.usepreequilibriatedbox=self.SetDefaultBool(line,a,True)
                         elif "equilfinished" in newline:
-                            if '=' not in line:
-                                self.equilfinished = True
-                            else:
-                                self.equilfinished=self.GrabBoolValue(a)
+                            self.equilfinished=self.SetDefaultBool(line,a,True)
                         elif "barfilesfinished" in newline:
-                            if '=' not in line:
-                                self.barfilesfinished = True
-                            else:
-                                self.barfilesfinished=self.GrabBoolValue(a)
-
+                            self.barfilesfinished=self.SetDefaultBool(line,a,True)
                         elif "minfinished" in newline:
-                            if '=' not in line:
-                                self.minfinished = True
-                            else:
-                                self.minfinished=self.GrabBoolValue(a)
+                            self.minfinished=self.SetDefaultBool(line,a,True)
                         elif "boxonly" in newline:
-                            if '=' not in line:
-                                self.boxonly = True
-                            else:
-                                self.boxonly=self.GrabBoolValue(a)
+                            self.boxonly=self.SetDefaultBool(line,a,True)
                         elif "fep" in newline:
-                            if '=' not in line:
-                                self.fep = True
-                            else:
-                                self.fep=self.GrabBoolValue(a)
+                            self.fep=self.SetDefaultBool(line,a,True)
                         elif "generateinputfilesonly" in newline:
-                            if '=' not in line:
-                                self.generateinputfilesonly = True
-                            else:
-                                self.generateinputfilesonly=self.GrabBoolValue(a)
+                            self.generateinputfilesonly=self.SetDefaultBool(line,a,True)
                         elif "productiondynamicsNVT" in newline:
-                            if '=' not in line:
-                                self.productiondynamicsNVT = True
-                            else:
-                                self.productiondynamicsNVT=self.GrabBoolValue(a)
+                            self.productiondynamicsNVT=self.SetDefaultBool(line,a,True)
                         elif "usetinkerforthermoprops" in newline:
-                            if '=' not in line:
-                                self.usetinkerforthermoprops = True
-                            else:
-                                self.usetinkerforthermoprops=self.GrabBoolValue(a)
+                            self.usetinkerforthermoprops=self.SetDefaultBool(line,a,True)
                         elif 'binding' in newline:
                             self.binding=True
                             self.solvation=True
                             self.complexation=True
                         elif "changegasphaseintegrator" in newline:
-                            if '=' not in line:
-                                self.changegasphaseintegrator = True
-                            else:
-                                self.changegasphaseintegrator=self.GrabBoolValue(a)
+                            self.changegasphaseintegrator=self.SetDefaultBool(line,a,True)
                         elif "prodmdfinished" in newline:
-                            if '=' not in line:
-                                self.prodmdfinished = True
-                            else:
-                                self.prodmdfinished=self.GrabBoolValue(a)
+                            self.prodmdfinished=self.SetDefaultBool(line,a,True)
                         elif 'complexedproteinpdbname' in newline:
                             self.complexedproteinpdbname=a
                         elif 'dynamicpath' in newline:
@@ -864,31 +752,13 @@ class PolarizableTyper():
                                 templist.append(temp)
                             self.torsionrestlist=templist
                         elif "flatbotrest" in newline:
-                            if '=' not in line:
-                                self.flatbotrest = True
-                            else:
-                                self.flatbotrest=self.GrabBoolValue(a)
-
+                            self.flatbotrest=self.SetDefaultBool(line,a,True)
                         elif "useproddyngrprests" in newline:
-                            if '=' not in line:
-                                self.useproddyngrprests = True
-                            else:
-                                self.useproddyngrprests=self.GrabBoolValue(a)
+                            self.useproddyngrprests=self.SetDefaultBool(line,a,True)
                         elif "restrainreceptorligand" in newline:
-                            if '=' not in line:
-                                self.restrainreceptorligand = True
-                            else:
-                                self.restrainreceptorligand=self.GrabBoolValue(a)
-                        elif "restrainreceptorligand" in newline:
-                            if '=' not in newline:
-                                self.restrainreceptorligand = True
-                            else:
-                                self.restrainreceptorligand=self.GrabBoolValue(a)
+                            self.restrainreceptorligand=self.SetDefaultBool(line,a,True)
                         elif "annihilatevdw" in newline:
-                            if '=' not in line:
-                                self.annihilatevdw = True
-                            else:
-                                self.annihilatevdw=self.GrabBoolValue(a)
+                            self.annihilatevdw=self.SetDefaultBool(line,a,True)
                         elif "proddynensem" in newline:
                             self.proddynensem = a
                         elif ("keyfilenamelist") in newline:
@@ -961,6 +831,7 @@ class PolarizableTyper():
                             self.proddyntimestep= int(a)
                         elif ("equiltimeNPT") in newline:
                             self.equiltimeNPT= float(a)
+                            self.inputequiltimeNPT=True
                         elif ("equiltimeionNPT") in newline:
                             self.equiltimeionNPT= float(a)
                         elif ("proddynwritefreq") in newline:
@@ -974,8 +845,10 @@ class PolarizableTyper():
                             self.solvation=True
                         elif ("equiltimeNVT") in newline:
                             self.equiltimeNVT= float(a)
+                            self.inputequiltimeNVT=True
                         elif ("lastNVTequiltime") in newline:
                             self.lastNVTequiltime= float(a)
+                            self.lastNVTequiltime=True
                         elif ("equilonly") in newline:
                             self.equilonly=True
                         elif ("minonly") in newline:
@@ -984,11 +857,7 @@ class PolarizableTyper():
                             self.equilrestlambdascheme=commalist
 
                         elif "rotalltors" in newline:
-                            if '=' not in line:
-                                self.rotalltors = True
-                            else:
-                                self.rotalltors=self.GrabBoolValue(a)
-
+                            self.rotalltors=self.SetDefaultBool(line,a,True)
 
                         elif "vdwprmtypestofit" in newline:
                             self.vdwprmtypestofit=a.split(',')
@@ -998,103 +867,42 @@ class PolarizableTyper():
                             self.fixvdwtyperadii=a.split(',')
                             self.fixvdwtyperadii=[i.strip() for i in self.fixvdwtyperadii]
 
-
-
                         elif "vdwtypestoeval" in newline:
                             self.vdwtypestoeval=a.split(',')
                             self.vdwtypestoeval=[i.strip() for i in self.vdwtypestoeval]
-
-
                         elif "addlonepairvdwsites" in newline:
-                            if '=' not in line:
-                                self.addlonepairvdwsites = True
-                            else:
-                                self.addlonepairvdwsites=self.GrabBoolValue(a)
-
-
+                            self.addlonepairvdwsites=self.SetDefaultBool(line,a,True)
                         elif "genprotstatesonly" in newline:
-                            if '=' not in line:
-                                self.genprotstatesonly = True
-                            else:
-                                self.genprotstatesonly=self.GrabBoolValue(a)
-
+                            self.genprotstatesonly=self.SetDefaultBool(line,a,True)
                         elif "quickdatabasesearch" in newline:
-                            if '=' not in line:
-                                self.quickdatabasesearch = True
-                            else:
-                                self.quickdatabasesearch=self.GrabBoolValue(a)
-
+                            self.quickdatabasesearch=self.SetDefaultBool(line,a,True)
                         elif "fitred" in newline:
-                            if '=' not in line:
-                                self.fitred = True
-                            else:
-                                self.fitred=self.GrabBoolValue(a)
-
+                            self.fitred=self.SetDefaultBool(line,a,True)
                         elif "onlyvdwatomlist" in newline:
                             self.onlyvdwatomlist=a.split(',')
                             self.onlyvdwatomlist=[i.strip() for i in self.onlyvdwatomlist]
                             self.onlyvdwatomlist=[int(i) for i in self.onlyvdwatomlist]
 
                         elif "usepoleditframes" in newline:
-                            if '=' not in line:
-                                self.usepoleditframes = True
-                            else:
-                                self.usepoleditframes=self.GrabBoolValue(a)
-
+                            self.usepoleditframes=self.SetDefaultBool(line,a,True)
                         elif "generateextendedconf" in newline:
-                            if '=' not in line:
-                                self.generateextendedconf = True
-                            else:
-                                self.generateextendedconf=self.GrabBoolValue(a)
-
-
+                            self.generateextendedconf=self.SetDefaultBool(line,a,True)
                         elif "addhydrogens" in newline:
-                            if '=' not in line:
-                                self.addhydrogens = True
-                            else:
-                                self.addhydrogens=self.GrabBoolValue(a)
-
+                            self.addhydrogens=self.SetDefaultBool(line,a,True)
                         elif "nonaroringtor1Dscan" in newline:
-                            if '=' not in line:
-                                self.nonaroringtor1Dscan = True
-                            else:
-                                self.nonaroringtor1Dscan=self.GrabBoolValue(a)
-
+                            self.nonaroringtor1Dscan=self.SetDefaultBool(line,a,True)
                         elif "fragmenterdebugmode" in newline:
-                            if '=' not in line:
-                                self.fragmenterdebugmode = True
-                            else:
-                                self.fragmenterdebugmode=self.GrabBoolValue(a)
+                            self.fragmenterdebugmode=self.SetDefaultBool(line,a,True)
                         elif "skipespfiterror" in newline:
-                            if '=' not in line:
-                                self.skipespfiterror = True
-                            else:
-                                self.skipespfiterror=self.GrabBoolValue(a)
-
+                            self.skipespfiterror=self.SetDefaultBool(line,a,True)
                         elif "fragmentjobslocal" in newline:
-                            if '=' not in line:
-                                self.fragmentjobslocal = True
-                            else:
-                                self.fragmentjobslocal=self.GrabBoolValue(a)
+                            self.fragmentjobslocal=self.SetDefaultBool(line,a,True)
                         elif "smallmoleculefragmenter" in newline:
-                            if '=' not in line:
-                                self.smallmoleculefragmenter = True
-                            else:
-                                self.smallmoleculefragmenter=self.GrabBoolValue(a)
-
-
+                            self.smallmoleculefragmenter=self.SetDefaultBool(line,a,True)
                         elif "debugmode" in newline and 'fragmenterdebugmode' not in line and 'tordebugmode' not in line and 'toroptdebugmode' not in line:
-                            if '=' not in line:
-                                self.debugmode = True
-                            else:
-                                self.debugmode=self.GrabBoolValue(a)
-
+                            self.debugmode=self.SetDefaultBool(line,a,True)
                         elif "toroptdebugmode" in newline:
-                            if '=' not in line:
-                                self.toroptdebugmode = True
-                            else:
-                                self.toroptdebugmode=self.GrabBoolValue(a)
-
+                            self.toroptdebugmode=self.SetDefaultBool(line,a,True)
                         elif "totalcharge" in newline:
                             self.totalcharge=int(a)
                         elif "lastlogfileupdatetime" in newline:
@@ -1121,17 +929,9 @@ class PolarizableTyper():
                         elif "checkinputonly" in newline:
                             self.checkinputonly=True
                         elif "setupfragjobsonly" in newline:
-                            if '=' not in line:
-                                self.setupfragjobsonly = True
-                            else:
-                                self.setupfragjobsonly=self.GrabBoolValue(a)
-
+                            self.setupfragjobsonly=self.SetDefaultBool(line,a,True)
                         elif "databasematchonly" in newline:
-                            if '=' not in line:
-                                self.databasematchonly = True
-                            else:
-                                self.databasematchonly=self.GrabBoolValue(a)
-
+                            self.databasematchonly=self.SetDefaultBool(line,a,True)
                         elif "onlyvdwatomindex" in newline:
                             self.onlyvdwatomindex=int(a)
                         elif "parentjobsatsametime" in newline:
@@ -1139,91 +939,37 @@ class PolarizableTyper():
                         elif "coresperjob" in newline:
                             self.coresperjob=int(a)
                         elif "deleteallnonqmfiles" in newline:
-                            if '=' not in line:
-                                self.deleteallnonqmfiles = True
-                            else:
-                                self.deleteallnonqmfiles=self.GrabBoolValue(a)
-
+                            self.deleteallnonqmfiles=self.SetDefaultBool(line,a,True)
                         elif "addhydrogentononcharged" in newline:
-                            if '=' not in line:
-                                self.addhydrogentononcharged = True
-                            else:
-                                self.addhydrogentononcharged=self.GrabBoolValue(a)
-
-
+                            self.addhydrogentononcharged=self.SetDefaultBool(line,a,True)
                         elif "firstoptfinished" in newline:
-                            if '=' not in line:
-                                self.firstoptfinished = True
-                            else:
-                                self.firstoptfinished=self.GrabBoolValue(a)
+                            self.firstoptfinished=self.SetDefaultBool(line,a,True)
                         elif "accuratevdwsp" in newline:
-                            if '=' not in line:
-                                self.accuratevdwsp = True
-                            else:
-                                self.accuratevdwsp=self.GrabBoolValue(a)
-
+                            self.accuratevdwsp=self.SetDefaultBool(line,a,True)
                         elif "homodimers" in newline:
-                            if '=' not in line:
-                                self.homodimers = True
-                            else:
-                                self.homodimers=self.GrabBoolValue(a)
-
+                            self.homodimers=self.SetDefaultBool(line,a,True)
                         elif "optonly" in newline and 'gaus' not in newline:
-                            if '=' not in line:
-                                self.optonly = True
-                            else:
-                                self.optonly=self.GrabBoolValue(a)
-
+                            self.optonly=self.SetDefaultBool(line,a,True)
                         elif "use_qmopt_vdw" in newline:
-                            if '=' not in line:
-                                self.use_qmopt_vdw = True
-                            else:
-                               self.use_qmopt_vdw=self.GrabBoolValue(a)
-
-
+                            self.use_qmopt_vdw=self.SetDefaultBool(line,a,True)
                         elif "use_gausgeomoptonly" in newline:
-                            if '=' not in line:
-                                self.use_gausgeomoptonly = True
-                            else:
-                                self.use_gausgeomoptonly=self.GrabBoolValue(a)
+                            self.use_gausgeomoptonly=self.SetDefaultBool(line,a,True)
                         elif "use_gau_vdw" in newline:
-                            if '=' not in line:
-                                self.use_gau_vdw = True
-                            else:
-                                self.use_gau_vdw=self.GrabBoolValue(a)
-
-
+                            self.use_gau_vdw=self.SetDefaultBool(line,a,True)
                         elif "tortor" in newline and 'only' not in newline:
-                            if '=' not in line:
-                                self.tortor = True
-                            else:
-                                self.tortor=self.GrabBoolValue(a)
-
+                            self.tortor=self.SetDefaultBool(line,a,True)
                         elif "tordebugmode" in newline:
-                            if '=' not in line:
-                                self.tordebugmode = True
-                            else:
-                                self.tordebugmode=self.GrabBoolValue(a)
+                            self.tordebugmode=self.SetDefaultBool(line,a,True)
                         elif "keyfiletoaddtodatabase" in newline:
                             self.keyfiletoaddtodatabase=a
                         elif "email" in newline:
                             self.email=a
                         elif "refinenonaroringtors" in newline:
-                            if '=' not in line:
-                                self.refinenonaroringtors = True
-                            else:
-                                self.refinenonaroringtors=self.GrabBoolValue(a)
+                            self.refinenonaroringtors=self.SetDefaultBool(line,a,True)
                         elif "fitfirsttorsionfoldphase" in newline:
-                            if '=' not in line:
-                                self.fitfirsttorsionfoldphase = True
-                            else:
-                                self.fitfirsttorsionfoldphase=self.GrabBoolValue(a)
-
+                            self.fitfirsttorsionfoldphase=self.SetDefaultBool(line,a,True)
                         elif "fitqmdipole" in newline:
-                            if '=' not in line:
-                                self.fitqmdipole = True
-                            else:
-                                self.fitqmdipole=self.GrabBoolValue(a)
+                            self.fitqmdipole=self.SetDefaultBool(line,a,True)
                         elif "maxgrowthcycles" in newline:
                             self.maxgrowthcycles=int(a)
                         elif 'maxtorRMSPDRel' in newline:
@@ -1241,18 +987,9 @@ class PolarizableTyper():
                         elif 'maxtorRMSPD' in newline:
                             self.maxtorRMSPD=float(a)
                         elif "use_gauPCM" in newline:
-                            if '=' not in line:
-                                self.use_gauPCM = True
-                            else:
-                                self.use_gauPCM=self.GrabBoolValue(a)
-
+                            self.use_gauPCM=self.SetDefaultBool(line,a,True)
                         elif "espfit" in newline:
-                            if '=' not in line:
-                                self.espfit = True
-                            else:
-                                self.espfit=self.GrabBoolValue(a)
-
-
+                            self.espfit=self.SetDefaultBool(line,a,True)
                         elif 'poltypepath' in newline and 'poltypepathlist' not in newline:
                             self.poltypepath=a
                         elif 'paramhead' in newline:
@@ -1261,38 +998,22 @@ class PolarizableTyper():
                             self.inputmoleculefolderpaths=a
                         elif 'WBOtol' in newline:
                             self.WBOtol=float(a)
-
                         elif 'scfmaxiter' in newline:
                             self.scfmaxiter=a
                         elif 'printoutput' in newline:
-                            if '=' not in line:
-                                self.printoutput=True
-                            else:
-                                self.printoutput=self.GrabBoolValue(a)
+                            self.printoutput=self.SetDefaultBool(line,a,True)
                         elif 'suppressdipoleerr' in newline:
-                            if '=' not in line:
-                                self.suppressdipoleerr=True
-                            else:
-                                self.suppressdipoleerr=self.GrabBoolValue(a)
+                            self.suppressdipoleerr=self.SetDefaultBool(line,a,True)
                         elif 'isfragjob' in newline:
-                            if '=' not in line:
-                                self.isfragjob=True
-                            else:
-                                self.isfragjob=self.GrabBoolValue(a)
+                            self.isfragjob=self.SetDefaultBool(line,a,True)
                         elif "dontfrag" in newline:
-                            if '=' not in line:
-                                self.dontfrag=True
-                            else:
-                                self.dontfrag=self.GrabBoolValue(a)
+                            self.dontfrag=self.SetDefaultBool(line,a,True)
                         elif "externalapi" in newline and a!='None':
                             self.externalapi=a
                         elif "gausoptcoords" in newline:
                             self.gausoptcoords = a
                         elif "suppresstorfiterr" in newline:
-                            if '=' not in line:
-                                self.suppresstorfiterr=True
-                            else:
-                                self.suppresstorfiterr=self.GrabBoolValue(a)
+                            self.suppresstorfiterr=self.SetDefaultBool(line,a,True)
                         elif "toroptbasisset" in newline:
                             self.toroptbasisset = a
                         elif "modifiedresiduepdbcode" in newline:
@@ -1314,59 +1035,25 @@ class PolarizableTyper():
                         elif "structure" in newline:
                             self.molstructfname = a
                         elif "dontusepcm" in newline:
-                            if '=' not in line:
-                                self.dontusepcm = True
-                            else: 
-                                self.dontusepcm=self.GrabBoolValue(a)
-
+                            self.dontusepcm=self.SetDefaultBool(line,a,True)
                         elif "torsppcm" in newline:
-                            if '=' not in line:
-                                self.torsppcm = True
-                            else: 
-                                self.torsppcm=self.GrabBoolValue(a)
+                            self.torsppcm=self.SetDefaultBool(line,a,True)
                         elif "freq" in newline:
-                            if '=' not in line:
-                                self.freq = True
-                            else:
-                                self.freq=self.GrabBoolValue(a)
+                            self.freq=self.SetDefaultBool(line,a,True)
                         elif "optpcm" in newline and 'tor' not in line:
-                            if '=' not in line:
-                                self.optpcm = True
-                            else:
-                                self.optpcm=self.GrabBoolValue(a)
+                            self.optpcm=self.SetDefaultBool(line,a,True)
                         elif "toroptpcm" in newline:
-                            if '=' not in line:
-                                self.optpcm = True
-                            else:
-                                self.optpcm=self.GrabBoolValue(a)
+                            self.toroptpcm=self.SetDefaultBool(line,a,True)
                         elif "use_gaus" in newline and 'opt' not in newline:
-                            if '=' not in line:
-                                self.use_gaus = True
-                            else:
-                                self.use_gaus=self.GrabBoolValue(a)
+                            self.use_gaus=self.SetDefaultBool(line,a,True)
                         elif "use_gausoptonly" in newline:
-                            if '=' not in line:
-                                self.use_gausoptonly = True
-                            else:
-                                self.use_gausoptonly=self.GrabBoolValue(a)
+                            self.use_gausoptonly=self.SetDefaultBool(line,a,True)
                         elif "dontdotor" in newline:
-                            if '=' not in line:
-                                self.dontdotor = True
-                            else:
-                                self.dontdotor=self.GrabBoolValue(a)
-
+                            self.dontdotor=self.SetDefaultBool(line,a,True)
                         elif "dovdwscan" in newline:
-                            if '=' not in line:
-                                self.dovdwscan = True
-                            else:
-                                self.dovdwscan=self.GrabBoolValue(a)
-
-
+                            self.dovdwscan=self.SetDefaultBool(line,a,True)
                         elif "dontdotorfit" in newline:
-                            if '=' not in line:
-                                self.dontdotorfit = True
-                            else:
-                                self.dontdotorfit=self.GrabBoolValue(a)
+                            self.dontdotorfit=self.SetDefaultBool(line,a,True)
                         elif "optmaxcycle" in newline:
                             self.optmaxcycle = int(a)
                         elif "torsionrestraint" in newline:
@@ -1476,10 +1163,7 @@ class PolarizableTyper():
                         elif "forcefield" in newline:
                             self.forcefield = a
                         elif "qmonly" in newline:
-                            if '=' not in line:
-                                self.qmonly = True
-                            else:
-                                self.qmonly = self.GrabBoolValue(a)
+                            self.qmonly=self.SetDefaultBool(line,a,True)
                         elif "sleeptime" in newline:
                             self.sleeptime = float(a)
                         elif  "poltypepathlist" in newline:
@@ -1617,10 +1301,23 @@ class PolarizableTyper():
 
 
         def MolecularDynamics(self):
-            if self.neatliquidsim==True and self.preequilboxpath==preequilboxpath: # if default water box
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
+            ob_log = openbabel.OBMessageHandler()
+            ob_log.SetOutputLevel(0)
+            ob_log.StopLogging()
+
+            if self.neatliquidsim==True: 
                 self.usepreequilibriatedbox=False # then make new neat liquid box from scratch
             if self.inputproddyntime==False and self.binding==True:
                 self.proddyntime=10
+
+
             head,tail=os.path.split(self.prmfilepath)
             newpath=os.path.join(os.getcwd(),tail)
             if self.prmfilepath!=newpath or head!=None:
@@ -1726,6 +1423,19 @@ class PolarizableTyper():
             self.elementsymtotinktype={'K':box.GrabTypeNumber(self,'Potassium Ion K+'),'Cl':box.GrabTypeNumber(self,'Chloride Ion Cl-'),'Mg':box.GrabTypeNumber(self,'Magnesium Ion Mg+2'),'Li':box.GrabTypeNumber(self,'Lithium Ion Li+'),'Na':box.GrabTypeNumber(self,'Sodium Ion Na+'),'Rb':box.GrabTypeNumber(self,'Rubidium Ion Rb+'),'Cs':box.GrabTypeNumber(self,'Cesium Ion Cs+'),'Be':box.GrabTypeNumber(self,'Beryllium Ion Be+2'),'Ca':box.GrabTypeNumber(self,'Calcium Ion Ca+2'),'Zn':box.GrabTypeNumber(self,'Zinc Ion Zn+2'),'Mg+':box.GrabTypeNumber(self,'Magnesium Ion Mg+2')}
             self.ReadWaterFromPRMFile()
             needtoshifttypes=self.CheckIfNeedToShiftTypes(self.keyfilenamelist)
+            if self.receptorligandxyzfilename!=None:
+                oldtypelist,ligatomnums=self.GrabLigandTypesInfoForIndicesExtraction(self.ligandxyzfilenamelist)
+                indextooldtype,complexligands,solvligands=self.ExtractLigandIndicesFromComplexXYZ(self.receptorligandxyzfilename,oldtypelist,ligatomnums)
+                self.allligands=[]
+                self.allligands.extend(complexligands)
+                self.allligands.extend(solvligands)
+                oldtypelist,ligatomnums=self.GrabLigandTypesInfoForIndicesExtraction(self.annihilateligandxyzfilenamelist)
+                indextooldtype,complexligands,solvligands=self.ExtractLigandIndicesFromComplexXYZ(self.receptorligandxyzfilename,oldtypelist,ligatomnums)
+                self.ligands=[]
+                self.ligands.extend(complexligands)
+                self.ligands.extend(solvligands)
+
+
             if needtoshifttypes==True:
                 oldtypetonewtypelist=self.GenerateTypeMaps(self.keyfilenamelist)
                 for i in range(len(oldtypetonewtypelist)):
@@ -1734,6 +1444,12 @@ class PolarizableTyper():
                     xyz=self.ligandxyzfilenamelist[i]
                     self.ShiftParameterTypes(key,oldindextonewindex)
                     self.ShiftParameterTypes(xyz,oldindextonewindex)
+                    
+                if self.receptorligandxyzfilename!=None:
+                    indextonewtype,complexligands,solvligands=self.ExtractLigandIndicesFromComplexXYZ(self.receptorligandxyzfilename,oldtypetonewtypelist,ligatomnums)
+                    self.ShiftParameterTypesComplexXYZ(self.receptorligandxyzfilename,indextonewtype)
+               
+
             if self.pdbcode!=None:
                 pdbxyz.FillInMissingResidues(self,self.pdbcode)
                 sys.exit()
@@ -1752,12 +1468,30 @@ class PolarizableTyper():
             if self.ligandfilename!=None:
                 self.ReadLigandCharge()
 
+
+
+            if self.alchemical==False:
+                self.estatlambdascheme=[1]
+                self.vdwlambdascheme=[1]
+                self.restlambdascheme=[1]
+
+            self.addgas=False
             if self.neatliquidsim==True:
                 self.estatlambdascheme=[1]
                 self.vdwlambdascheme=[1]
                 self.restlambdascheme=[1]
                 self.restrainatomsduringminimization=False
+                if self.inputproddyntime==False:
+                    self.proddyntime=3
+                if self.inputequiltimeNVT==False:
+                    self.equiltimeNVT=2
+                if self.inputequiltimeNPT==False:
+                    self.equiltimeNPT=.5
+                if self.inputlastNVTequiltime==False:
+                    self.lastNVTequiltime=.5
 
+
+                self.addgas=True
             self.originalestatlambdascheme=self.estatlambdascheme[:]
             self.originalvdwlambdascheme=self.vdwlambdascheme[:]
             self.originalrestlambdascheme=self.restlambdascheme[:]
@@ -1769,7 +1503,6 @@ class PolarizableTyper():
             self.checkneedregrow=self.CheckIfNeedRegrowForSolvation()
             self.CheckReceptorLigandXYZFile() # sometimes user have box info on top
             mpolearrays=self.CheckInputXYZKeyFiles()
-            self.addgas=False
             if (self.extractinterforbinding==True and self.binding==True) or self.checkneedregrow==True:
                 self.addgas=True
             if self.addgas:
@@ -1788,6 +1521,8 @@ class PolarizableTyper():
 
             if self.ligandcharge==None: # assume since no input given
                 self.ligandcharge=0
+            if self.complexationonly==True:
+                self.solvation=False
 
             head,self.foldername=os.path.split(os.getcwd())
             if self.complexation==True and self.solvation==False:
@@ -2341,8 +2076,15 @@ class PolarizableTyper():
 
 
         def CheckIfNeedToShiftTypes(self,keyfilenamelist):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             newlist=keyfilenamelist.copy()
-            newlist.append(self.prmfilepath)
+            #newlist.append(self.prmfilepath) can only go to 1000 for atom classes in tinker so for now dont shift by max of prm file
             needtoshifttypes=False
             alltypes=[]
             for keyfilename in newlist:
@@ -2352,6 +2094,7 @@ class PolarizableTyper():
                 for typenum in types:
                     if typenum in alltypes:
                         needtoshifttypes=True
+                        break
                     alltypes.append(typenum)
 
 
@@ -2360,6 +2103,13 @@ class PolarizableTyper():
 
 
         def AppendKeys(self,keyfilenamelist,thekey):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(thekey,'w')
             for key in keyfilenamelist:
                 othertemp=open(key,'r')
@@ -2376,6 +2126,13 @@ class PolarizableTyper():
 
 
         def GrabIonizationStates(self,m):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             smi=Chem.MolToSmiles(m)
             smiles=[smi]
             mols = [Chem.MolFromSmiles(s) for s in smiles]
@@ -2406,6 +2163,13 @@ class PolarizableTyper():
                 obConversion.WriteFile(mol,sdfmol)
 
         def GrabTautomers(self,m):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
 
             enumerator = rdMolStandardize.TautomerEnumerator()
             smi=Chem.MolToSmiles(m)
@@ -2435,6 +2199,13 @@ class PolarizableTyper():
 
 
         def ReturnListOfList(self,string):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             newlist=string.split(',')
             templist=[]
             for ele in newlist:
@@ -2449,6 +2220,13 @@ class PolarizableTyper():
 
 
         def SanitizeAllQMMethods(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             self.optmethod=self.SanitizeQMMethod(self.optmethod,True)                 
             self.toroptmethod=self.SanitizeQMMethod(self.toroptmethod,True)                  
             self.torspmethod=self.SanitizeQMMethod(self.torspmethod,False)                    
@@ -2456,13 +2234,44 @@ class PolarizableTyper():
             self.espmethod=self.SanitizeQMMethod(self.espmethod,False)     
            
         def GrabBoolValue(self, value):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             if value.lower() == 'true':
                 return True
             if value.lower() == 'false':
                 return False
             raise ValueError('Could not convert "{}" into a boolean!'.format(value))
 
+        def SetDefaultBool(self,line,a,truthvalue):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
+            if '=' not in line:
+                value = truthvalue
+            else:
+                value=self.GrabBoolValue(a)
+            return value
+
+
+
+
         def SanitizeQMMethod(self,method,optmethodbool):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             if method[-1]=='D': # assume DFT, gaussian likes D, PSI4 likes -D
                 if method[-2]=='-':
                     if self.use_gaus or self.use_gausoptonly and optmethodbool==True:
@@ -2480,6 +2289,13 @@ class PolarizableTyper():
  
 
         def WriteToLog(self,string,prin=False):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             now = time.strftime("%c",time.localtime())
             if not isinstance(string, str):
                 string=string.decode("utf-8")
@@ -2490,6 +2306,13 @@ class PolarizableTyper():
                 print(now+' '+ string + "\n")
             
         def SanitizeMMExecutables(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             self.peditexe=self.SanitizeMMExecutable(self.peditexe)
             self.potentialexe=self.SanitizeMMExecutable(self.potentialexe)
             self.minimizeexe=self.SanitizeMMExecutable(self.minimizeexe)
@@ -2625,6 +2448,13 @@ class PolarizableTyper():
                 self.FileNames()
 
         def FileNames(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             self.logfname = self.assign_filenames ( "logfname" , "-poltype.log")
             self.chkname = self.assign_filenames ( "chkname" , ".chk")
             self.fname = self.assign_filenames ( "fname" , ".fchk")
@@ -2681,20 +2511,48 @@ class PolarizableTyper():
 
 
         def assign_filenames (self,filename,suffix):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             if filename in globals():
                 return eval(filename)
             else:
                 return self.molecprefix + suffix
         
         def printfile(self,filename):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             with open(os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+filename,'r') as f:
                 print(f.read(), end='')
         
         def copyright(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             self.printfile(self.versionfile)
         
             
         def CheckIsInput2D(self,mol,obConversion,rdkitmol):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             is2d=True
             for atom in openbabel.OBMolAtomIter(mol):
                 zcoord=atom.GetZ()
@@ -2728,6 +2586,13 @@ class PolarizableTyper():
 
 
         def KillJob(self,job,outputlog):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             p=self.cmdtopid[job]
             try:
                 p.wait(timeout=1)
@@ -2739,6 +2604,13 @@ class PolarizableTyper():
 
         
         def CallJobsSeriallyLocalHost(self,fulljobtooutputlog,skiperrors,wait=False):
+           """
+           Intent:
+           Input:
+           Output:
+           Referenced By: 
+           Description: 
+           """
            thepath=os.path.join(os.getcwd(),'Fragments')
            finishedjobs=[]
            errorjobs=[]
@@ -2785,6 +2657,13 @@ class PolarizableTyper():
            return finishedjobs,errorjobs
 
         def TabulateLogs(self,thepath):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             listoffilepaths=[]
             os.chdir(thepath)
             files=os.listdir()
@@ -2797,6 +2676,13 @@ class PolarizableTyper():
             return listoffilepaths
         
         def GrabLogFilePaths(self,path):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             filepaths=[]
             for root, subdirs, files in os.walk(path):
                 finishedpoltype=False
@@ -2821,6 +2707,13 @@ class PolarizableTyper():
             return filepaths
         
         def ConvertTimeString(self,timestring):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             timestringsplit=timestring.split(':')
             hours=float(timestringsplit[0])
             minutes=float(timestringsplit[1])*(1/60)
@@ -2830,6 +2723,13 @@ class PolarizableTyper():
 
 
         def ConvertTimeStringXTB(self,timestring):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             timestringsplit=timestring.split(',')
             days=float(timestringsplit[0].strip().split()[0])*(24)
             hours=float(timestringsplit[1].strip().split()[0])
@@ -2841,6 +2741,13 @@ class PolarizableTyper():
 
         
         def ConvertTimeStringGaussian(self,line):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             linesplit=line.split()
             days=float(linesplit[3])*24
             hours=float(linesplit[5])
@@ -2850,6 +2757,13 @@ class PolarizableTyper():
             return walltime
         
         def TabulateCPUTimes(self,listoffilepaths):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             n=5
             listoflistofcputimes=[]
             for filepathsidx in range(len(listoffilepaths)):
@@ -2880,6 +2794,13 @@ class PolarizableTyper():
         
         
         def ETAQMFinish(self,thepath,numberofmolstotal):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             listoffilepaths=self.TabulateLogs(thepath)
             listoflistofcputimes=self.TabulateCPUTimes(listoffilepaths)
             listofcputimes=[sum(ls) for ls in listoflistofcputimes]
@@ -2898,6 +2819,13 @@ class PolarizableTyper():
             self.WriteToLog(string)
 
         def CallJobsLocalHost(self,fulljobtooutputlog,skiperrors):
+           """
+           Intent:
+           Input:
+           Output:
+           Referenced By: 
+           Description: 
+           """
            for job in fulljobtooutputlog.keys():
                self.call_subsystem([job],False,skiperrors)
            finishedjobs,errorjobs=self.WaitForTermination(fulljobtooutputlog,skiperrors)
@@ -2905,6 +2833,13 @@ class PolarizableTyper():
 
 
         def WaitForTermination(self,jobtooutputlog,skiperrors):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             finishedjobs=[]
             errorjobs=[]
             errormessages=[]
@@ -2952,6 +2887,13 @@ class PolarizableTyper():
             return finishedjobs,errorjobs
 
         def CycleCount(self,logname):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(logname,'r')
             results=temp.readlines()
             temp.close()
@@ -2964,7 +2906,11 @@ class PolarizableTyper():
 
         def CheckNormalTermination(self,logfname,errormessages=None,skiperrors=False): # needs to handle error checking now
             """
-            Intent: Checks the *.log file for normal termination
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
             """
             error=False
             term=False
@@ -3050,16 +2996,37 @@ class PolarizableTyper():
         
             
         def NormalTerm(self,logfname):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             self.WriteToLog("Normal termination: logfile=%s path=%s" % (logfname,os.getcwd()))
         
         
         def ErrorTerm(self,logfname,skiperrors):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             string="ERROR termination: logfile=%s path=%s" % (logfname,os.getcwd())
             self.WriteToLog(string)
             if skiperrors==False:
                 raise ValueError(string)
 
         def call_subsystem(self,cmdstrs,wait=False,skiperrors=False):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             if self.printoutput==True:
                 for cmdstr in cmdstrs:
                     print("Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
@@ -3084,6 +3051,13 @@ class PolarizableTyper():
                             self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
 
         def WriteOutLiteratureReferences(self,keyfilename): # to use ParmEd on key file need Literature References delimited for parsing
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(keyfilename,'r')
             results=temp.readlines()
             temp.close()
@@ -3110,9 +3084,23 @@ class PolarizableTyper():
             os.replace(tempname,keyfilename)    
 
         def RaiseOutputFileError(self,logname):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             raise ValueError('An error occured for '+logname) 
 
         def WritePoltypeInitializationFile(self,poltypeinput):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             inifilepath=os.getcwd()+r'/'+'poltype.ini'
             temp=open(inifilepath,'w')
             for key,value in poltypeinput.items():
@@ -3123,6 +3111,13 @@ class PolarizableTyper():
             return inifilepath
 
         def CheckTorsionParameters(self,keyfilename,torsionsmissing,hydtorsions): # dont check torsions skipped due to rule that if a-b-c-d, a or d is hydroten and not all possible a and d around b-c is hydrogen then torsion is skipped, if database transfers all zeros do not check
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(keyfilename,'r')
             results=temp.readlines()
             temp.close()
@@ -3150,7 +3145,13 @@ class PolarizableTyper():
                         
 
         def main(self):
-            
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """   
              
             if (self.modifiedproteinpdbname!=None or self.unmodifiedproteinpdbname!=None):
                 knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference,modligidxs=modres.GenerateModifiedProteinPoltypeInput(self)
@@ -3171,6 +3172,13 @@ class PolarizableTyper():
         
         
         def GrabIndexToCoordinates(self,mol):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             indextocoordinates={}
             iteratom = openbabel.OBMolAtomIter(mol)
             for atom in iteratom:
@@ -3181,6 +3189,13 @@ class PolarizableTyper():
             return indextocoordinates
 
         def AddInputCoordinatesAsDefaultConformer(self,m,indextocoordinates):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             conf = m.GetConformer()
             for i in range(m.GetNumAtoms()):
                 x,y,z = indextocoordinates[i]
@@ -3191,6 +3206,13 @@ class PolarizableTyper():
                    
 
         def CheckIfCartesianXYZ(self,f):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             check=True
             temp=open(f,'r')
             results=temp.readlines()
@@ -3202,6 +3224,13 @@ class PolarizableTyper():
             return check
 
         def RemoveCartesianXYZFiles(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             files=os.listdir()
             for f in files:
                 filename, file_extension = os.path.splitext(f)
@@ -3213,6 +3242,13 @@ class PolarizableTyper():
                
         
         def CheckInputCharge(self,molecule,verbose=False):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             array=[]
             totchg=0
             atomindextoformalcharge={}
@@ -3308,6 +3344,13 @@ class PolarizableTyper():
         
 
         def GenerateExtendedConformer(self,rdkitmol,mol):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             numconf=100 # just try this
             AllChem.EmbedMultipleConfs(rdkitmol, numConfs=numconf,useExpTorsionAnglePrefs=True,useBasicKnowledge=True)
             energies = AllChem.MMFFOptimizeMoleculeConfs(rdkitmol,maxIters=2000, nonBondedThresh=100.0)
@@ -3372,6 +3415,13 @@ class PolarizableTyper():
 
 
         def ReadCoordinates(self,filename):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             indextocoordinates={}
             obConversion = openbabel.OBConversion()
             mol = openbabel.OBMol()
@@ -3388,6 +3438,13 @@ class PolarizableTyper():
 
 
         def FindLongestDistanceInMolecule(self,mol):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             veclist=[]
             for i in range(len(mol.GetAtoms())):
                 pos = mol.GetConformer().GetAtomPosition(i) 
@@ -3403,6 +3460,13 @@ class PolarizableTyper():
             return maxdist
         
         def SetDefaultCoordinatesBabel(self,mol,indextocoordinates):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             for index,coords in indextocoordinates.items():
                 atom=mol.GetAtom(index+1)
                 x=coords[0]
@@ -3412,6 +3476,13 @@ class PolarizableTyper():
             return mol
 
         def CheckForConcentratedFormalCharges(self,m,atomindextoformalcharge):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             chargedindices=[]
             pcm=False
             for atomindex,chg in atomindextoformalcharge.items():
@@ -3437,6 +3508,13 @@ class PolarizableTyper():
                     
                         
         def DeleteAllNonQMFiles(self,folderpath=None):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             tempdir=os.getcwd()
             if folderpath!=None:
                 os.chdir(folderpath)
@@ -3453,6 +3531,13 @@ class PolarizableTyper():
             os.chdir(tempdir)
            
         def DeleteNonQMFiles(self,directory):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             tempdir=os.getcwd()
             os.chdir(directory)
             deletearray=[]
@@ -3475,6 +3560,13 @@ class PolarizableTyper():
             os.chdir(tempdir) 
 
         def ResourceInputs(self,jobpaths,ramalljobs,diskalljobs,numprocalljobs):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             scratchspacelist=[]
             ramlist=[]
             numproclist=[]
@@ -3486,6 +3578,13 @@ class PolarizableTyper():
             return scratchspacelist,ramlist,numproclist
 
         def GenerateDaemonInput(self,joblist,outputlogpath,scratchspacelist,ramlist,numproclist,jobpaths,inputdaemonfilepath):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             head,tail=os.path.split(outputlogpath)
             os.chdir(head)
             temp=open(inputdaemonfilepath,'w')
@@ -3501,6 +3600,13 @@ class PolarizableTyper():
 
 
         def CreatePoltypeInputFilesMultipleMolecules(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             dic={'externalapi':self.externalapi,'accuratevdwsp':self.accuratevdwsp,'email':self.email,'firstoptfinished':self.firstoptfinished,'optonly':self.optonly,'onlyvdwatomindex':self.onlyvdwatomindex,'use_qmopt_vdw':self.use_qmopt_vdw,'use_gau_vdw':self.use_gau_vdw,'dontusepcm':self.dontusepcm,'deleteallnonqmfiles':self.deleteallnonqmfiles,'totalcharge':self.totalcharge,'torspbasissethalogen':self.torspbasissethalogen,'homodimers':self.homodimers,'boltzmantemp':self.boltzmantemp,'dovdwscan':self.dovdwscan,'use_gausgeomoptonly':self.use_gausgeomoptonly,'maxtorRMSPDRel':self.maxtorRMSPDRel,'tortor':self.tortor,'fitfirsttorsionfoldphase':self.fitfirsttorsionfoldphase,'defaultmaxtorsiongridpoints':self.defaultmaxtorsiongridpoints,'absdipoletol':self.absdipoletol,'refinenonaroringtors':self.refinenonaroringtors,'maxgrowthcycles':self.maxgrowthcycles,'use_gauPCM':self.use_gauPCM,'fitqmdipole':self.fitqmdipole,'WBOtol':self.WBOtol,'dontfrag':self.dontfrag,'dipoletol':self.dipoletol,'numproc':self.numproc,'maxmem':self.maxmem,'maxdisk':self.maxdisk,'optbasisset':self.optbasisset,'toroptbasisset':self.toroptbasisset,'dmabasisset':self.dmabasisset,'espbasisset':self.espbasisset,'torspbasisset':self.torspbasisset,'optmethod':self.optmethod,'toroptmethod':self.toroptmethod,'torspmethod':self.torspmethod,'dmamethod':self.dmamethod,'espmethod':self.espmethod,'qmonly' : self.qmonly,'espfit' : self.espfit,'foldnum':self.foldnum,'maxRMSD':self.maxRMSD,'maxRMSPD':self.maxRMSPD,'maxtorRMSPD':self.maxtorRMSPD,'tordatapointsnum':self.tordatapointsnum,'torsionrestraint':self.torsionrestraint,'rotalltors':self.rotalltors,'dontdotor':self.dontdotor,'dontdotorfit':self.dontdotorfit,'toroptpcm':self.toroptpcm,'optpcm':self.optpcm,'torsppcm':self.torsppcm,'use_gaus':self.use_gaus,'use_gausoptonly':self.use_gausoptonly,'freq':self.freq,'optmaxcycle':self.optmaxcycle,'forcefield':self.forcefield}
             os.chdir(self.inputmoleculefolderpaths)
             files=os.listdir()
@@ -3529,6 +3635,13 @@ class PolarizableTyper():
             sys.exit()
 
         def CheckIfAtomsAreAllowed(self,m):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             listofallowedatoms=[1,6,7,8,15,16,17,35,53,9]
             for atom in m.GetAtoms():
                 atomicnum=atom.GetAtomicNum()
@@ -3536,6 +3649,13 @@ class PolarizableTyper():
                     raise ValueError('Element not allowed! '+str(atomicnum)) 
 
         def CheckForHydrogens(self,m):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             hashyd=False
             for atom in m.GetAtoms():
                 atomicnum=atom.GetAtomicNum()
@@ -3548,6 +3668,13 @@ class PolarizableTyper():
 
 
         def CheckMP2OptFailed(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             files=os.listdir()
             mp2failed=False
             found=False
@@ -3573,6 +3700,13 @@ class PolarizableTyper():
 
 
         def GrabAtomicSymbols(self,rdkitmol):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             indextoatomicsymbol={}
             an = pyasl.AtomicNo()
             for atm in rdkitmol.GetAtoms():
@@ -3585,6 +3719,13 @@ class PolarizableTyper():
 
 
         def CheckIfInputIsTinkerXYZ(self,molstructfname):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             istinkxyz=False
             temp=open(molstructfname,'r')
             results=temp.readlines()
@@ -3599,6 +3740,13 @@ class PolarizableTyper():
 
 
         def GenerateIndexToTypeFile(self,indextotype):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             filename='indextotype.txt'
             temp=open(filename,'w')
             for index,typenum in indextotype.items():
@@ -3608,6 +3756,13 @@ class PolarizableTyper():
 
 
         def GrabIndexToType(self,molstrucfname):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             indextotype={}
             temp=open(molstrucfname,'r')
             results=temp.readlines()
@@ -3626,6 +3781,13 @@ class PolarizableTyper():
 
 
         def ConvertInputStructureToSDFFormat(self,molstructfname):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             obConversion = openbabel.OBConversion()
             mol = openbabel.OBMol()
             inFormat = obConversion.FormatFromExt(molstructfname)
@@ -3655,6 +3817,13 @@ class PolarizableTyper():
 
 
         def GenerateEntireTinkerXYZ(self,atmindextocoordinates,atmindextotypenum,atmindextoconnectivity,atmindextoelement,filename):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(filename,'w')
             temp.write(str(len(atmindextocoordinates.keys()))+'\n')
             for index,coords in atmindextocoordinates.items():
@@ -3674,6 +3843,13 @@ class PolarizableTyper():
 
 
         def GenerateParameters(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             
             temp=open(os.getcwd()+r'/'+'poltype.ini','r')
             results=temp.readlines()
@@ -4147,6 +4323,13 @@ class PolarizableTyper():
 
 
         def GenerateDuplicateXYZsFromOPTs(self,xyzfname,keyfname,optmolist):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             xyzfnamelist=[]
             keyfnamelist=[]
             for optmolidx in range(len(optmolist)):
@@ -4169,6 +4352,13 @@ class PolarizableTyper():
 
 
         def ExtractMOLInfo(self,mol):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             atmindextocoordinates={}
             atmindextoconnectivity={}
             atmindextoelement={}
@@ -4189,6 +4379,13 @@ class PolarizableTyper():
 
 
         def GrabConnectivity(self,mol,index):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             conn=[]
             bonditer=openbabel.OBMolBondIter(mol)
             for bond in bonditer:
@@ -4204,6 +4401,13 @@ class PolarizableTyper():
 
 
         def GenerateTinkerXYZ(self,xyzfname,newxyzfname,indextocoordinates):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(xyzfname,'r')
             results=temp.readlines()
             temp.close()
@@ -4222,6 +4426,13 @@ class PolarizableTyper():
 
 
         def GenerateListOfMols(self,mol,indextocoordslist):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             molist=[mol]
             obConversion = openbabel.OBConversion()
             for i in range(len(indextocoordslist)):
@@ -4239,6 +4450,13 @@ class PolarizableTyper():
 
 
         def FinalVDWMultipoleCheck(self,keyfile):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(keyfile,'r')
             results=temp.readlines()
             temp.close()
@@ -4288,6 +4506,13 @@ class PolarizableTyper():
 
 
         def AddIndicesToKey(self,keyfilename):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(keyfilename,'r')
             results=temp.readlines()
             temp.close()
@@ -4324,6 +4549,13 @@ class PolarizableTyper():
 
 
         def GrabKeysFromValue(self,dic,thevalue):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             keylist=[]
             for key,value in dic.items():
                 if value==thevalue:
@@ -4332,6 +4564,13 @@ class PolarizableTyper():
 
 
         def DeleteFilesWithExtension(self,ls):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             files=os.listdir()
             for f in files:
                 if '.' in f and not os.path.isdir(f):
@@ -4340,6 +4579,13 @@ class PolarizableTyper():
                         os.remove(f)
 
         def DeleteFilesWithString(self,ls):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             files=os.listdir()
             for f in files:
                 for string in ls:
@@ -4348,6 +4594,13 @@ class PolarizableTyper():
 
 
         def DeleteAllFiles(self,deletefragments=False):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             files=os.listdir()
             for f in files:
                 if os.path.isdir(f):
@@ -4362,6 +4615,14 @@ class PolarizableTyper():
                         os.remove(f)
 
         def CheckFileSanity(self):
+
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             optxyzname=self.logoptfname.replace('.log','.xyz')
             temp=open(optxyzname,'r')
             results=temp.readlines()
@@ -4410,6 +4671,13 @@ class PolarizableTyper():
 
         
         def SendCrashReportEmail(self,TEXT,fromaddr,toaddr,password,filename):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             msg = MIMEMultipart()
             msg['From'] = fromaddr
             msg['To'] = toaddr
@@ -4425,6 +4693,13 @@ class PolarizableTyper():
 
  
         def SendFinalReportEmail(self,TEXT,fromaddr,toaddr,password,moleculename):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             msg = MIMEMultipart()
             msg['From'] = fromaddr
             msg['To'] = toaddr
@@ -4439,6 +4714,13 @@ class PolarizableTyper():
             s.quit()
 
         def CollectElectrostaticDipoleFitLines(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             files=os.listdir()
             for f in files:
                 if 'poltype.log' in f:
@@ -4456,6 +4738,13 @@ class PolarizableTyper():
 
 
         def Instructions(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             instructions=[]
             line='Please ensure that the Root Mean Square Deviation (RMSD) between QM (red curve) and MM2 post-fit torsion (blue curve) has a decent fit.'+'\n'
             instructions.append(line) 
@@ -4476,6 +4765,13 @@ class PolarizableTyper():
             return instructions
 
         def CopyFitPlots(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             plots=[]
             fold='OPENME'
             thecurdir=os.getcwd()
@@ -4509,6 +4805,13 @@ class PolarizableTyper():
             os.chdir(thecurdir)
 
         def StopSimulations(self,simulationstostopfolderpath):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             for root, subdirs, files in os.walk(simulationstostopfolderpath):
                 for d in subdirs:
                     curdir=os.getcwd()
@@ -4539,6 +4842,13 @@ class PolarizableTyper():
 
 
         def ReadWaterFromPRMFile(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(self.prmfilepath,'r')
             results=temp.readlines()
             temp.close()
@@ -4554,6 +4864,13 @@ class PolarizableTyper():
                         self.waterHtypenum=typenum
 
         def RotateTranslateInertialFrame(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             if self.receptorligandxyzfilename!=None:
                 filename='xyzedit.in'
                 temp=open(filename,'w')
@@ -4580,6 +4897,13 @@ class PolarizableTyper():
 
 
         def CheckFloat(self,string):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             try:
                 float(string)
                 return True
@@ -4587,6 +4911,13 @@ class PolarizableTyper():
                 return False
 
         def CheckReceptorLigandXYZFile(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             if self.receptorligandxyzfilename!=None:
                 temp=open(self.receptorligandxyzfilename,'r')
                 results=temp.readlines()
@@ -4614,6 +4945,13 @@ class PolarizableTyper():
 
  
         def CleanUpFiles(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             files=os.listdir()
             for f in files:
                 for xyz in self.ligandxyzfilenamelist:
@@ -4629,6 +4967,13 @@ class PolarizableTyper():
  
             
         def SanitizeMMExecutable(self, executable):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             # Try to find Tinker executable with/without suffix
             if self.which(executable)!=None:
                 return executable
@@ -4643,7 +4988,21 @@ class PolarizableTyper():
             return exe
 
         def which(self,program):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             def is_exe(fpath):
+                """
+                Intent:
+                Input:
+                Output:
+                Referenced By: 
+                Description: 
+                """
                 try:
                      return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
                 except:
@@ -4664,6 +5023,13 @@ class PolarizableTyper():
             return None
 
         def ReadReceptorCharge(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             pdbmol=openbabel.OBMol()
             obConversion = openbabel.OBConversion()
             obConversion.SetInFormat('pdb')
@@ -4673,6 +5039,13 @@ class PolarizableTyper():
 
 
         def ReadLigandOBMol(self,structfname):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             tmpconv = openbabel.OBConversion()
             inFormat = openbabel.OBConversion.FormatFromExt(structfname)
             tmpconv.SetInFormat(inFormat)
@@ -4681,6 +5054,13 @@ class PolarizableTyper():
             return tmpmol
 
         def ReadLigandRdkitMol(self,ligandfilename):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             tmpmol=self.ReadLigandOBMol(ligandfilename)
             tmpconv = openbabel.OBConversion()
             tmpconv.SetOutFormat('mol')
@@ -4693,79 +5073,209 @@ class PolarizableTyper():
 
 
         def ReadLigandCharge(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             tmpmol=self.ReadLigandRdkitMol(self.ligandfilename)
             tmpmol,atomindextoformalcharge=self.CheckLigandInputCharge(tmpmol)
 
+
+        def PDBCoordinate(self,coords,index):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
+            x=round(float(coords[index]),3)
+            xstring=str(x)
+            xstringsplit=xstring.split('.')
+            xtail=xstringsplit[1]
+            diff = 3-len(xtail)
+            for i in range(1,diff+1):
+                xstring+='0'
+            odiff=8-len(xstring)
+            space=''
+            for i in range(1,odiff+1):
+                space+=' '
+            xstring=space+xstring
+            return xstring
+        
+        def WritePDBString(self,string,line,firstindex,lastindex):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
+            for i in range(firstindex,lastindex+1):
+                xitem=string[i-firstindex]
+                line[i]=xitem
+
+            return line
+
+        def GrabPDBLines(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
+            temp=open(self.complexedproteinpdbname,'r')
+            results=temp.readlines()
+            temp.close()
+            pdbindextopdbline={}
+            for line in results:
+                if 'ATOM' in line or 'HETATM' in line:
+                    index=int(line[6:10+1].strip())
+                    pdbindextopdbline[index]=line
+            return pdbindextopdbline
+
+        def WritePDBCONECTRecord(self,temp,indextoconn):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
+            for index,conns in indextoconn.items():
+                if len(conns)!=0:
+                    shift=0
+                    string='CONECT                                                                       '
+                    string=list(string)
+                    indexstring=str(index)
+                    odiff=5-len(indexstring)
+                    space=''
+                    for i in range(1,odiff+1):
+                        space+=' '
+                    indexstring=space+indexstring
+                    self.WritePDBString(indexstring,string,6+shift,10+shift)
+                    shift+=5
+                    for idx in conns:
+                        indexstring=str(idx)
+                        odiff=5-len(indexstring)
+                        space=''
+                        for i in range(1,odiff+1):
+                            space+=' '
+                        indexstring=space+indexstring
+                        self.WritePDBString(indexstring,string,6+shift,10+shift)
+                        shift+=5
+                    string=''.join(string)+'\n'
+                    temp.write(string)
+            temp.write('ENDMDL'+'\n')
+
+
+        def GeneratePDBFromARC(self,tinkerxyzfilename,pdbfilename):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
+            temp=open(tinkerxyzfilename,'r')
+            results=temp.readlines()
+            temp.close()
+            pdbindextopdbline=self.GrabPDBLines()
+            temp=open(pdbfilename,'w')
+            hetatmstring='HETATM22011  H   UNK  1334      -6.447 -12.617  22.452'+'\n'
+            xyzindextopdbindex={v: k for k, v in self.pdbindextoxyzindex.items()}
+            indextoconn={}
+            first=True
+            temp.write('MODEL'+'\n')
+            for line in results:
+                linesplit=line.split()
+                cont=False
+                if '90.000' not in line and len(linesplit)>1:
+                    first=False
+                    xyzindex=int(linesplit[0])
+                    element=linesplit[1]
+                    conns=linesplit[6:]
+                    conns=[int(i) for i in conns]
+                    if xyzindex in xyzindextopdbindex.keys():
+                        pdbindex=xyzindextopdbindex[xyzindex]
+                        pdbline=pdbindextopdbline[pdbindex]
+                        residuenum=int(pdbline[22:25+1].strip())
+                        lastres=residuenum
+                    else:
+                        if self.removesolventpdbtraj==True:
+                            cont=True
+                            continue
+                        pdbline=hetatmstring
+                        residuenum=lastres+1
+                    if cont==False:
+                        indextoconn[xyzindex]=conns
+                        fullsplit=re.split(r'(\s+)', pdbline)
+                        pdbline=list(pdbline)
+                        indexstring=str(xyzindex)
+                        odiff=5-len(indexstring)
+                        space=''
+                        for i in range(1,odiff+1):
+                            space+=' '
+                        indexstring=space+indexstring
+                        self.WritePDBString(indexstring,pdbline,6,10)
+                        elementstring=str(element)
+                        odiff=4-len(elementstring)
+                        space=''
+                        for i in range(1,odiff+1):
+                            space+=' '
+                        elementstring=elementstring+space
+                        self.WritePDBString(elementstring,pdbline,12,15)
+                        residuestring=str(residuenum)
+                        odiff=4-len(residuestring)
+                        space=''
+                        for i in range(1,odiff+1):
+                            space+=' '
+                        residuestring=space+residuestring
+                        self.WritePDBString(residuestring,pdbline,22,25)
+                        coords=[float(linesplit[2]),float(linesplit[3]),float(linesplit[4])]        
+                        xstring=self.PDBCoordinate(coords,0)
+                        ystring=self.PDBCoordinate(coords,1)
+                        zstring=self.PDBCoordinate(coords,2)
+                        self.WritePDBString(xstring,pdbline,30,37)
+                        self.WritePDBString(ystring,pdbline,38,45)
+                        self.WritePDBString(zstring,pdbline,46,53)
+                        pdbline=''.join(pdbline)
+                        temp.write(pdbline)
+                elif '90.000' in line and first==False:
+                    self.WritePDBCONECTRecord(temp,indextoconn)
+                    temp.write('MODEL'+'\n')
+            self.WritePDBCONECTRecord(temp,indextoconn)
+            temp.write('ENDMDL'+'\n')
+            temp.close()
+
+
         def PymolReadableFile(self,tinkerxyzfilename,outputname):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             xyzfilename=self.ConvertTinkerXYZToCartesianXYZ(tinkerxyzfilename)
             os.rename(xyzfilename,outputname)
             pdbfilename=outputname.replace('.xyz','.pdb')
             if self.complexedproteinpdbname!=None and 'comp' in tinkerxyzfilename:
-                statexyzatominfo,stateindextotypeindex,stateatomnum,xyzindextocoords,indextoneighbs,indextosym=parametercomparison.GrabXYZInfo(self,tinkerxyzfilename)
-                temp=open(self.complexedproteinpdbname,'r')
-                results=temp.readlines()
-                temp.close()
-                temp=open(pdbfilename,'w')
-                for line in results:
-                    if 'ATOM' in line or "HETATM" in line:
-                        linesplit=line.split()
-                        fullsplit=re.split(r'(\s+)', line)
-                        index=int(line[6:10+1].strip())
-                        xyzindex=self.pdbindextoxyzindex[index]
-                        coords=xyzindextocoords[xyzindex]
-                        x=round(float(coords[0]),3)
-                        xstring=str(x)
-                        xstringsplit=xstring.split('.')
-                        xtail=xstringsplit[1]
-                        diff = 3-len(xtail)
-                        for i in range(1,diff+1):
-                            xstring+='0'
-                        odiff=8-len(xstring)
-                        space=''
-                        for i in range(1,odiff+1):
-                            space+=' '
-                        xstring=space+xstring
-                        y=round(float(coords[1]),3)
-                        ystring=str(y)
-                        ystringsplit=ystring.split('.')
-                        ytail=ystringsplit[1]
-                        diff = 3-len(ytail)
-                        for i in range(1,diff+1):
-                            ystring+='0'
-                        odiff=8-len(ystring)
-                        space=''
-                        for i in range(1,odiff+1):
-                            space+=' '
-                        ystring=space+ystring
-                        z=round(float(coords[2]),3)
-                        zstring=str(z)
-                        zstringsplit=zstring.split('.')
-                        ztail=zstringsplit[1]
-                        diff = 3-len(ztail)
-                        for i in range(1,diff+1):
-                            zstring+='0'
-                        odiff=8-len(zstring)
-                        space=''
-                        for i in range(1,odiff+1):
-                            space+=' '
-                        zstring=space+zstring
-                        line=list(line)
-                        for i in range(30,37+1):
-                            xitem=xstring[i-30]
-                            line[i]=xitem
-                        for i in range(38,45+1):
-                            yitem=ystring[i-38]
-                            line[i]=yitem
-                        for i in range(46,53+1):
-                            zitem=zstring[i-46]
-                            line[i]=zitem
-                        line=''.join(line)
-                        temp.write(line)
-                    else:
-                        temp.write(line)
+                self.GeneratePDBFromARC(tinkerxyzfilename,pdbfilename)   
 
 
         def GrabIndexToCoordinatesPymol(self,mol):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             indextocoords={}
             for atom in mol.GetAtoms():
                 atomidx=atom.GetIdx()
@@ -4780,6 +5290,13 @@ class PolarizableTyper():
 
             
         def ConvertTinkerXYZToCartesianXYZ(self,tinkerxyzfilename):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             xyzfilename=tinkerxyzfilename.replace('.xyz','_cart.xyz')
             temp=open(tinkerxyzfilename,'r')
             tempwrite=open(xyzfilename,'w')
@@ -4805,6 +5322,13 @@ class PolarizableTyper():
 
 
         def CheckIfNeedRegrowForSolvation(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             needregrow=False
             if self.solvation==True:
                 if self.binding==False and self.annihilatevdw==True:
@@ -4832,6 +5356,13 @@ class PolarizableTyper():
 
 
         def CheckLigandInputCharge(self,molecule):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             array=[]
             totchg=0
             atomindextoformalcharge={}
@@ -4870,6 +5401,13 @@ class PolarizableTyper():
 
 
         def CheckTinkerVersion(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             cmdstr=self.analyzepath+' '+os.path.abspath(os.path.join(self.annihilatorpath, os.pardir))+r'/VersionFiles/'+'water.xyz'+' '+'-k'+' '+os.path.abspath(os.path.join(self.annihilatorpath, os.pardir))+r'/VersionFiles/'+'water.key'+' '+'e'+'>'+' '+'version.out'
             
             self.WriteToLog(cmdstr)
@@ -4894,6 +5432,13 @@ class PolarizableTyper():
           
 
         def GrabIndicesWithTypeNumber(self,xyzfilename,ligandtypes):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             indices=[]
             temp=open(xyzfilename,'r')
             results=temp.readlines()
@@ -4914,7 +5459,14 @@ class PolarizableTyper():
                         indices.append(index)
             return indices
             
-        def GrabTypeNumbers(self,xyzfilename,indices=None):   
+        def GrabTypeNumbers(self,xyzfilename,indices=None):  
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(xyzfilename,'r')
             results=temp.readlines()
             temp.close()
@@ -4939,6 +5491,13 @@ class PolarizableTyper():
             return typenums 
 
         def GrabCoordinates(self,xyzfilename,indices=None):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(xyzfilename,'r')
             results=temp.readlines()
             temp.close()
@@ -4965,6 +5524,13 @@ class PolarizableTyper():
 
 
         def CompareTypes(self,receptorligandtypes,ligandtypes):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             for i in range(len(ligandtypes)):
                 receptorligandtype=receptorligandtypes[i]
                 ligandtype=ligandtypes[i]
@@ -4972,6 +5538,13 @@ class PolarizableTyper():
                     raise ValueError('Ligand XYZ and Receptor-Ligand XYZ dont have the same type number order!')
 
         def RewriteCoordinates(self,xyzfilename,coords):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(xyzfilename,'r')
             results=temp.readlines()
             temp.close()
@@ -5002,6 +5575,13 @@ class PolarizableTyper():
 
 
         def ReadCharge(self,output,checkresid=True):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(output,'r')
             results=temp.readlines()
             temp.close()
@@ -5019,6 +5599,13 @@ class PolarizableTyper():
 
 
         def CheckEnergies(self,output):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(output,'r')
             results=temp.readlines()
             temp.close()
@@ -5041,16 +5628,26 @@ class PolarizableTyper():
 
 
         def CheckInputXYZKeyFiles(self,ligandonly=False):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             keymods.RemoveKeyWords(self,self.originalkeyfilename,['parameters','axis','ewald','pme-grid','pme-order','cutoff','thermostat','integrator','ligand','verbose','archive','neighbor-list','polar-eps','polar-predict','heavy-hydrogen','omp-threads','OPENMP-THREADS'])
             string='parameters '+self.prmfilepath+'\n'
             keymods.AddKeyWord(self,self.originalkeyfilename,string)
             if self.receptorligandxyzfilename!=None and self.ligandxyzfilenamelist!=None:
                 for xyz in self.ligandxyzfilenamelist:
-                    ligandtypes=self.GrabTypeNumbers(xyz)  
+                    ligandtypes=self.GrabTypeNumbers(xyz) 
                     indices=self.GrabIndicesWithTypeNumber(self.receptorligandxyzfilename,ligandtypes)
                     receptorligandtypes=self.GrabTypeNumbers(self.receptorligandxyzfilename,indices=indices)
                     self.CompareTypes(receptorligandtypes,ligandtypes)
-
+                receptortypes=list(range(1,348+1))
+                receptorindices=self.GrabIndicesWithTypeNumber(self.receptorligandxyzfilename,receptortypes)
+                self.totalreceptornumber=len(receptorindices)
+                self.receptorindices=list(range(1,self.totalreceptornumber+1))
             if self.ligandxyzfilenamelist!=None and self.originalkeyfilename!=None: 
                 self.otherligcharge=0
                 self.ligandcharge=0
@@ -5106,6 +5703,13 @@ class PolarizableTyper():
 
 
         def GrabFirstReceptorIndexAndType(self,xyzfilename):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(xyzfilename,'r')
             results=temp.readlines()
             temp.close()
@@ -5121,6 +5725,13 @@ class PolarizableTyper():
 
 
         def GrabMultipoleParameters(self,prmfilepath,typenum):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             mpolearrays=[]
             temp=open(prmfilepath,'r')
             results=temp.readlines()
@@ -5145,6 +5756,13 @@ class PolarizableTyper():
 
 
         def ModifyIndexAndChargeMultipole(self,mpolearrays,resid,index):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             for idx in range(len(mpolearrays)):
                 line=mpolearrays[idx]
                 if 'multipole' in line:
@@ -5162,6 +5780,13 @@ class PolarizableTyper():
 
 
         def ModifyCharge(self,keyfilename,mpolearrays):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(keyfilename,'a')
             for line in mpolearrays:
                 temp.write(line)
@@ -5169,6 +5794,13 @@ class PolarizableTyper():
 
 
         def DetermineIonsForChargedSolvation(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             solviontocount={}
             self.addsolvionwindows=False
             if self.binding==False and self.solvation==True and self.salthfe==True:
@@ -5186,6 +5818,13 @@ class PolarizableTyper():
             return solviontocount    
 
         def ChangeTypeNumbers(self,xyzfile,elementtotype):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(xyzfile,'r')
             results=temp.readlines()
             temp.close()
@@ -5211,6 +5850,13 @@ class PolarizableTyper():
             return tempname
         
         def ModifyBoxSizeInXYZFile(self,xyzfile,boxsize):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(xyzfile,'r')
             results=temp.readlines()
             temp.close()
@@ -5237,6 +5883,13 @@ class PolarizableTyper():
             os.rename(tempname,xyzfile)
 
         def TrimPreEquilibriatedBox(self,boxsize):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             xyzfile=self.preequilboxpath
             split=os.path.split(xyzfile)
             xyzfilename=split[1]
@@ -5250,6 +5903,13 @@ class PolarizableTyper():
             os.rename(filename,'water.xyz_2') # for xyzedit lib
 
         def RemoveWaterOutsideBox(self,xyzfilename,boxsize):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             tempfile=open('xyzedit.in','w')
             tempfile.write('17'+'\n')
             tempfile.write(str(boxsize[0])+','+str(boxsize[1])+','+str(boxsize[2])+'\n')
@@ -5262,6 +5922,13 @@ class PolarizableTyper():
 
 
         def ConvertTinktoXYZ(self,filename,newfilename):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(os.getcwd()+r'/'+filename,'r')
             tempwrite=open(os.getcwd()+r'/'+newfilename,'w')
             results=temp.readlines()
@@ -5286,6 +5953,13 @@ class PolarizableTyper():
         
 
         def AlignLigandXYZToTemplateXYZ(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             ligandcartxyz=self.ConvertTinktoXYZ(self.ligandxyzfilenamelist[0],self.ligandxyzfilenamelist[0].replace('.xyz','_cart.xyz'))
             templateligandcartxyz=self.ConvertTinktoXYZ(self.templateligandxyzfilename,self.templateligandxyzfilename.replace('.xyz','_cart.xyz'))
             obConversion = openbabel.OBConversion()
@@ -5344,10 +6018,24 @@ class PolarizableTyper():
  
         
         def CallAnalyze(self,statexyz,statekey,alzout,analyzepath,option):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             cmdstr=analyzepath+' '+statexyz+' '+'-k'+' '+statekey+' '+option+' > '+alzout
             submit.call_subsystem(self,cmdstr,True,False,alzout) 
 
         def ExtractResource(self,string):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             if 'MB' in string:
                 split=string.split('MB')
                 memstring='MB'
@@ -5359,6 +6047,13 @@ class PolarizableTyper():
             return mem,memstring
 
         def PartitionResources(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             maxmem,memstring=self.ExtractResource(self.maxmem)
             maxmem=int(maxmem/self.jobsatsametime)
             tempmaxmem=str(maxmem)+memstring
@@ -5372,6 +6067,13 @@ class PolarizableTyper():
 
 
         def CheckIfWholeMoleculeIsARing(self,mol):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             iswholemoleculering=False
             atomindices=databaseparser.RingAtomicIndices(self,mol)
             lengthtoring={}
@@ -5386,6 +6088,13 @@ class PolarizableTyper():
 
 
         def ExtractLigand(self,ligandreceptorfilename,coordinates):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             ligandpdbfilename='ligand.pdb'
             receptorpdbfilename=ligandreceptorfilename.replace('.pdb','_receptoronly.pdb')
             receptormol=self.ExtractMOLObject(ligandreceptorfilename,receptorpdbfilename,coordinates=None,receptor=True)
@@ -5395,6 +6104,13 @@ class PolarizableTyper():
             return ligandpdbfilename,receptorpdbfilename
 
         def ExtractMOLObject(self,ligandreceptorfilename,newpdbfilename,coordinates,receptor):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             pdbmol=self.GenerateMOLObject(ligandreceptorfilename)
             iteratom = openbabel.OBMolAtomIter(pdbmol)
             obConversion = openbabel.OBConversion()
@@ -5418,6 +6134,13 @@ class PolarizableTyper():
             return pdbmol
 
         def GenerateMOLObject(self,pdbfilename):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             obConversion = openbabel.OBConversion()
             pdbmol = openbabel.OBMol()
             obConversion.SetInFormat('pdb')
@@ -5426,6 +6149,13 @@ class PolarizableTyper():
 
 
         def ConvertUNLToLIG(self,filename):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             temp=open(filename,'r')
             results=temp.readlines()
             temp.close()
@@ -5448,6 +6178,13 @@ class PolarizableTyper():
 
 
         def GrabLigandCentroid(self,ligandpdbfilename):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             pdbmol=self.GenerateMOLObject(ligandpdbfilename)
             atomvecls=self.GrabAtomPositions(pdbmol)
             centroid=np.array([0.0,0.0,0.0])
@@ -5462,6 +6199,13 @@ class PolarizableTyper():
 
 
         def GrabAtomPositions(self,pdbmol):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             atomvecls=[]
             iteratombab = openbabel.OBMolAtomIter(pdbmol)
             for atm in iteratombab:
@@ -5474,6 +6218,13 @@ class PolarizableTyper():
 
 
         def FindConsecutiveIndices(self,nums):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             consec=[nums[0]]
             allconsec=[]
             for i in range(1,len(nums)):
@@ -5489,6 +6240,13 @@ class PolarizableTyper():
 
 
         def RepresentsInt(self,s):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             try: 
                 int(s)
                 return True
@@ -5496,7 +6254,111 @@ class PolarizableTyper():
                 return False
 
 
+        def ExtractLigandIndicesFromComplexXYZ(self,receptorligandxyzfilename,oldtypetonewtypelist,ligatomnums):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
+            statexyzatominfo,oldindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=parametercomparison.GrabXYZInfo(self,receptorligandxyzfilename)
+            listofindextooldtypes=[]
+            indextonewtype={}
+            complexligands=[]
+            for oldtypetonewtypeidx in range(len(oldtypetonewtypelist)):
+                oldtypetonewtype=oldtypetonewtypelist[oldtypetonewtypeidx]
+                atomnum=ligatomnums[oldtypetonewtypeidx]
+                indextooldtypenum={}
+                if oldtypetonewtypeidx!=0:
+                    previousindextooldtypes=listofindextooldtypes[:oldtypetonewtypeidx-1+1]
+                else:
+                    previousindextooldtypes=[]
+                previousindices=[]
+                for oindextooldtypenum in previousindextooldtypes:
+                    previousindices.extend(oindextooldtypenum.keys()) 
+                for oldindex,typeindex in oldindextotypeindex.items():
+                    if typeindex in oldtypetonewtype.keys() and len(indextooldtypenum.keys())<atomnum and oldindex not in previousindices:
+                        indextooldtypenum[oldindex]=typeindex
+                        newtype=oldtypetonewtype[typeindex]
+                        indextonewtype[oldindex]=newtype
+                listofindextooldtypes.append(indextooldtypenum)
+                complexligands.append(list(indextooldtypenum.keys()))
+            solvligands=[]
+            count=1
+            for ligand in complexligands:
+                lig=[]
+                for i in range(len(ligand)):
+                    lig.append(count)
+                    count+=1
+                solvligands.append(lig)
+            
+
+            return indextonewtype,complexligands,solvligands
+
+
+        def GrabLigandTypesInfoForIndicesExtraction(self,ligandxyzfilenamelist):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
+            oldtypelist=[]
+            ligatomnums=[]
+            for xyz in ligandxyzfilenamelist:
+                ligandtypes=self.GrabTypeNumbers(xyz) 
+                oldtypetooldtype=dict(zip(ligandtypes,ligandtypes))
+                oldtypelist.append(oldtypetooldtype)
+                statexyzatominfo,oldindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=parametercomparison.GrabXYZInfo(self,xyz)
+                ligatomnums.append(stateatomnum)
+
+
+            return oldtypelist,ligatomnums
+
+
+        def ShiftParameterTypesComplexXYZ(self,receptorligandxyzfilename,indextonewtype):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
+            tempname=receptorligandxyzfilename+"_TEMP"
+            temp=open(receptorligandxyzfilename,'r')
+            results=temp.readlines()
+            temp.close()
+            temp=open(tempname,'w')
+            for line in results:
+                linesplitall=re.split(r'(\s+)', line)
+                linesplit=line.split()
+                for i in range(len(linesplitall)):
+                    element=linesplitall[i]
+                    if '.xyz' in receptorligandxyzfilename and (i!=12):
+                        continue
+                    if self.RepresentsInt(element):
+                        oldtypenum=np.abs(int(element))
+                        index=int(linesplit[0])
+                        if index in indextonewtype.keys():
+                            typenum=indextonewtype[index]
+                            linesplitall[i]=str(typenum)
+                line=''.join(linesplitall)
+                temp.write(line)
+            temp.close()
+            os.rename(tempname,receptorligandxyzfilename)
+
+
+
         def ShiftParameterTypes(self,filename,oldtypetonewtype):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             tempname=filename+"_TEMP"
             temp=open(filename,'r')
             results=temp.readlines()
@@ -5525,6 +6387,13 @@ class PolarizableTyper():
 
 
         def GrabMaxTypeNumber(self,parameterfile):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             maxnumberfromprm=1
             temp=open(parameterfile,'r')
             results=temp.readlines()
@@ -5538,6 +6407,13 @@ class PolarizableTyper():
             return maxnumberfromprm
         
         def GrabMinTypeNumber(self,parameterfile):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             minnumberfromprm=10000
             temp=open(parameterfile,'r')
             results=temp.readlines()
@@ -5551,6 +6427,13 @@ class PolarizableTyper():
             return minnumberfromprm
 
         def GenerateTypeMaps(self,keyfilelist):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             newkeyfilelist=keyfilelist.copy()
             oldtypetonewtypelist=[]
             currentmin=100000
@@ -5558,7 +6441,8 @@ class PolarizableTyper():
             shift=0
             prevmaxnumberfromkey=0
             prevminnumberfromkey=0
-            originalshift=self.GrabMaxTypeNumber(self.prmfilepath)
+            #originalshift=self.GrabMaxTypeNumber(self.prmfilepath)
+            originalshift=0 # cant shift because max 1000 for atom classes in tinker
             for keyfilename in newkeyfilelist:
                 maxnumberfromkey=self.GrabMaxTypeNumber(keyfilename)
                 minnumberfromkey=self.GrabMinTypeNumber(keyfilename)
@@ -5586,6 +6470,13 @@ class PolarizableTyper():
 
 
         def CheckNetChargeIsZero(self,xyzpath,keypath,alzout):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
             self.CallAnalyze(xyzpath,keypath,alzout,self.trueanalyzepath,'m')
             charge,resid=self.ReadCharge(alzout)
             if charge!=0:
@@ -5595,6 +6486,13 @@ class PolarizableTyper():
 
 if __name__ == '__main__':
     def RunPoltype():
+        """
+        Intent:
+        Input:
+        Output:
+        Referenced By: 
+        Description: 
+        """
         poltype=PolarizableTyper() 
         try:
             poltype.main()

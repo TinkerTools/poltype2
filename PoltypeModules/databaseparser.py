@@ -25,6 +25,13 @@ import shutil
  
 
 def CheckIfStringIsFloat(string):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     isfloat=False
     try:
         float(string)
@@ -35,6 +42,13 @@ def CheckIfStringIsFloat(string):
 
 
 def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tempname=vf.replace('.key','_temp.key')
     f=open(tempname,'w')
     if poltype.writeoutpolarize==True and poltype.writeoutmultipole==True: 
@@ -170,6 +184,13 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
     os.rename(tempname,newname)
 
 def ReadSmallMoleculeLib(poltype,filepath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(filepath,'r')
     results=temp.readlines()
     temp.close()
@@ -193,6 +214,13 @@ def ReadSmallMoleculeLib(poltype,filepath):
     return smartsatomordertoelementtinkerdescrip
 
 def GrabParameters(poltype,fname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomdefs=[]
     bondprms=[]
     angleprms=[]
@@ -231,6 +259,13 @@ def GrabParameters(poltype,fname):
     return atomdefs,bondprms,angleprms,torsionprms,strbndprms,opbendprms,polarizeprms,vdwprms,mpoleprms
  
 def ShiftPoltypeNumbers(poltype,filename,keyfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     oldtypetonewtype={}
     maxnumberfromprm=GrabMaxTypeNumber(poltype,filename)
     maxnumberfromkey=GrabMaxTypeNumber(poltype,keyfilename)
@@ -246,6 +281,13 @@ def ShiftPoltypeNumbers(poltype,filename,keyfilename):
     return oldtypetonewtype,shift
 
 def GrabMaxTypeNumber(poltype,parameterfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     maxnumberfromprm=1
     temp=open(parameterfile,'r')
     results=temp.readlines()
@@ -259,6 +301,13 @@ def GrabMaxTypeNumber(poltype,parameterfile):
     return maxnumberfromprm
 
 def GrabMinTypeNumber(poltype,parameterfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     minnumberfromprm=10000
     temp=open(parameterfile,'r')
     results=temp.readlines()
@@ -272,6 +321,13 @@ def GrabMinTypeNumber(poltype,parameterfile):
     return minnumberfromprm
 
 def ShiftParameterDefintions(poltype,parameterarray,oldtypetonewtype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newparameterarray=[]
     for array in parameterarray:
         newarray=[]
@@ -298,6 +354,13 @@ def ShiftParameterDefintions(poltype,parameterarray,oldtypetonewtype):
     return newparameterarray
 
 def WriteToPrmFile(poltype,atomdefs,bondprms,angleprms,torsionprms,strbndprms,opbendprms,polarizeprms,vdwprms,mpoleprms,prmpath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     # assumes that there is white space at end of every parameter block, just add a line to key_5
     temp=open(prmpath,'r')
     results=temp.readlines()
@@ -464,6 +527,13 @@ def WriteToPrmFile(poltype,atomdefs,bondprms,angleprms,torsionprms,strbndprms,op
     os.rename(newprmname,prmpath)
 
 def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendtinkerclassestopoltypeclasses,opbendtinkerclassestotrigonalcenterbools,angletinkerclassestopoltypeclasses,torsiontinkerclassestopoltypeclasses,poltypetoprmtype,atomtinkerclasstopoltypeclass,typestoframedefforprmfile,fname,skipmultipole=False):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(fname,'r') 
     results=temp.readlines()
     temp.close()
@@ -653,6 +723,13 @@ def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendti
 
 
 def GrabTypeAndClassNumbers(poltype,prmfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(prmfile,'r')
     results=temp.readlines()
     temp.close()
@@ -674,6 +751,13 @@ def GrabTypeAndClassNumbers(poltype,prmfile):
 
 
 def GrabAtomsForParameters(poltype,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     # now we can define arrays to collect bonds, angles and torsions
     listoftorsionsforprm=[]
     listofbondsforprm=[]
@@ -707,6 +791,13 @@ def GrabAtomsForParameters(poltype,mol):
 
 
 def ExtendByNeighbors(poltype,ls):    
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     extendneighbofneighb=False
     if len(ls)==1:
         extendneighbofneighb=True 
@@ -731,6 +822,13 @@ def ExtendByNeighbors(poltype,ls):
 
 
 def GenerateFragmentSMARTS(poltype,ls):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newmol = Chem.Mol()
     mw = Chem.RWMol(newmol)
     # need to treat ring bonds as aromatic since all transferred parameters from amoeba09 are aromatic rings
@@ -797,6 +895,13 @@ def GenerateFragmentSMARTS(poltype,ls):
 
 
 def GenerateFragmentSMARTSList(poltype,ls):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     fragsmartslist=[]
     atomindiceslist=GenerateAllPossibleFragmentIndices(poltype,ls,poltype.rdkitmol,14)
     for thels in atomindiceslist:
@@ -809,6 +914,13 @@ def GenerateFragmentSMARTSList(poltype,ls):
 
 
 def FindHowManyBondTypes(poltype,trymol,atomidx):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     numsinglebonds=0
     numaromaticbonds=0
     numdoublebonds=0
@@ -833,6 +945,13 @@ def FindHowManyBondTypes(poltype,trymol,atomidx):
 
 
 def GrabAromaticIndices(poltype,match,themol,ls):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     aromaticindices=[]
     for index in match:
         atom=themol.GetAtomWithIdx(index)
@@ -845,6 +964,13 @@ def GrabAromaticIndices(poltype,match,themol,ls):
 
 
 def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,parametersmartstosmartslist,ls,mol,parametersmartstordkitmol,parametersmartstosmartsmatchingtoindices,parametersmartstomolsmatchingtoindices,parametersmartstordkitmolmatchingindices,parametersmartstoprmmolmatchingindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     smartsmcstomol={}
     prmsmartstomcssmarts={}
     parametersmartstoscore={}
@@ -1099,6 +1225,13 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
 
 
 def GenerateAllPossibleFragmentIndices(poltype,ls,rdkitmol,maxatomsize):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomindiceslist=[copy.deepcopy(ls)]
     oldindexlist=copy.deepcopy(ls)
     indexlist=[]
@@ -1132,6 +1265,13 @@ def GenerateAllPossibleFragmentIndices(poltype,ls,rdkitmol,maxatomsize):
 
 
 def GrabNeighboringIndexes(poltype,indexlist,rdkitmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     neighborindexes=[]
     for index in indexlist:
         atom=rdkitmol.GetAtomWithIdx(index)
@@ -1143,6 +1283,13 @@ def GrabNeighboringIndexes(poltype,indexlist,rdkitmol):
 
 
 def CountRingsInSMARTS(poltype,parametersmarts):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     closedbrack=True
     numbers=[]
     for e in parametersmarts:
@@ -1158,6 +1305,13 @@ def CountRingsInSMARTS(poltype,parametersmarts):
     return rings
 
 def CheckIfConsecutivelyConnected(poltype,matchidxs,mcsmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     goodmatch=True
     for i in range(len(matchidxs)-1):
         matchidx=matchidxs[i]
@@ -1176,6 +1330,13 @@ def CheckIfConsecutivelyConnected(poltype,matchidxs,mcsmol):
 
 
 def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprm,parametersmartslist,mol,parametersmartstordkitmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     listforprmtoparametersmarts={}
     listforprmtosmarts={}
     listforprmtomatchallneighbs={}
@@ -1250,6 +1411,13 @@ def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprm,parametersmartsli
 
 
 def CountRings(poltype,smartsfortransfer):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     counts=0
     for idx in range(len(smartsfortransfer)):
         e=smartsfortransfer[idx]
@@ -1262,6 +1430,13 @@ def CountRings(poltype,smartsfortransfer):
 
 
 def CheckMatch(poltype,match,atomindices,smarts,substructure):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     allin=True
     for idx in atomindices:
         if idx not in match:
@@ -1280,6 +1455,13 @@ def CheckMatch(poltype,match,atomindices,smarts,substructure):
     return validmatch 
        
 def CheckConsecutiveTorsion(poltype,indices,substructure):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     consec=True
     if len(indices)==2:
         a,b=indices[:]
@@ -1313,6 +1495,13 @@ def CheckConsecutiveTorsion(poltype,indices,substructure):
 
 
 def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomindicestotinkertypes={}
     atomindicestotinkerclasses={}
     atomindicestoparametersmartsatomorders={}
@@ -1399,6 +1588,13 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
     return atomindicestotinkertypes,atomindicestotinkerclasses,atomindicestoparametersmartsatomorders,atomindicestoelementtinkerdescrips,atomindicestosmartsatomorders
 
 def TryAndPickMatchWithNeighbors(poltype,matches,smartindices,substructure):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     extendedsmartindices=[]
     for idx in smartindices:
         atom=substructure.GetAtomWithIdx(idx)
@@ -1422,6 +1618,13 @@ def TryAndPickMatchWithNeighbors(poltype,matches,smartindices,substructure):
         
 
 def GrabSMARTSList(poltype,smartsatomordertoelementtinkerdescrip):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     smartslist=[]
     for smartsatomorder in smartsatomordertoelementtinkerdescrip.keys():
         smarts=smartsatomorder[0]
@@ -1430,6 +1633,13 @@ def GrabSMARTSList(poltype,smartsatomordertoelementtinkerdescrip):
     return smartslist 
 
 def CheckForPlanerAngles(poltype,listofanglesforprm,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     listofanglesthatneedplanarkeyword=[]
     shoulduseanglep = version.parse(poltype.versionnum) >= version.parse("8.7")
     for ls in listofanglesforprm:
@@ -1446,6 +1656,13 @@ def CheckForPlanerAngles(poltype,listofanglesforprm,mol):
     return listofanglesthatneedplanarkeyword
 
 def ModifyAngleKeywords(poltype,angleprms,listofanglesthatneedplanarkeywordtinkerclassestopoltypeclasses):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newangleprms=[]
     for line in angleprms:
         found=False
@@ -1472,6 +1689,13 @@ def ModifyAngleKeywords(poltype,angleprms,listofanglesthatneedplanarkeywordtinke
     return newangleprms
 
 def FilterList(poltype,allitems,listbabel):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newallitems=[]
     for ls in allitems:
         revls=ls[::-1]
@@ -1480,6 +1704,13 @@ def FilterList(poltype,allitems,listbabel):
     return newallitems
 
 def AddOptimizedBondLengths(poltype,optmol,bondprms,bondlistbabel):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newbondprms=[]
     for line in bondprms:
         linesplit=line.split()
@@ -1508,6 +1739,13 @@ def AddOptimizedBondLengths(poltype,optmol,bondprms,bondlistbabel):
       
 
 def AddOptimizedAngleLengths(poltype,optmol,angleprms,anglelistbabel):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newangleprms=[]
     for line in angleprms:
         linesplit=line.split()
@@ -1544,6 +1782,13 @@ def AddOptimizedAngleLengths(poltype,optmol,angleprms,anglelistbabel):
 
 
 def GrabKeysFromValue(poltype,dic,thevalue):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     keylist=[]
     for key,value in dic.items():
         if value==thevalue:
@@ -1552,6 +1797,13 @@ def GrabKeysFromValue(poltype,dic,thevalue):
           
 
 def CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     allhydrogentor=True
     atomobjects=[mol.GetAtom(i) for i in babelindices]
     a,b,c,d=atomobjects[:]
@@ -1581,6 +1833,13 @@ def CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol):
     return allhydrogentor    
 
 def CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     allhydrogentoroneside=True
     atomobjects=[mol.GetAtom(i) for i in babelindices]
     a,b,c,d=atomobjects[:]
@@ -1635,6 +1894,13 @@ def CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol):
 
 
 def FindAllConsecutiveRotatableBonds(poltype,mol,listofbondsforprm):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     totalbondscollector=[]
     newrotbnds=[]
     for rotbnd in listofbondsforprm:
@@ -1673,6 +1939,13 @@ def FindAllConsecutiveRotatableBonds(poltype,mol,listofbondsforprm):
     return totalbondscollector
 
 def FindAdjacentMissingTorsionsForTorTor(poltype,torsionsmissing,totalbondscollector,tortorsmissing):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for bndlist in totalbondscollector:
         first=bndlist[0]
         second=bndlist[1]
@@ -1716,6 +1989,13 @@ def FindAdjacentMissingTorsionsForTorTor(poltype,torsionsmissing,totalbondscolle
     return torsionsmissing
 
 def CheckIfRotatableBondInMissingTorsions(poltype,rotbnd,torsionsmissing):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     found=False
     for tor in torsionsmissing:
         bnd=[tor[1],tor[2]]
@@ -1725,6 +2005,13 @@ def CheckIfRotatableBondInMissingTorsions(poltype,rotbnd,torsionsmissing):
     return found
 
 def CheckIfRotatableBondInMissingTorTors(poltype,firstbnd,secondbnd,tortormissing):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     foundtortormissing=False
     for tortor in tortormissing:
         first=[tortor[1],tortor[2]]
@@ -1737,6 +2024,13 @@ def CheckIfRotatableBondInMissingTorTors(poltype,firstbnd,secondbnd,tortormissin
     return foundtortormissing
 
 def FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertoparameters,rdkitmol,mol,indextoneighbidxs,totalbondscollector):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tortorsmissing=[]
     tortorsfound=[]
     for tortorindices,extsmarts in tortorindicestoextsmarts.items(): #only for ones that have match
@@ -1804,6 +2098,13 @@ def FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertop
     return tortorsmissing
 
 def CheckIfRotatableBondsInOnlyRotBnds(poltype,first,second):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     inonlyrotbnds=True
     first=[i+1 for i in first]
     second=[i+1 for i in second]
@@ -1816,6 +2117,13 @@ def CheckIfRotatableBondsInOnlyRotBnds(poltype,first,second):
 
 
 def RingAtomicIndices(poltype,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     sssr = mol.GetSSSR()
     atomindices=[]
     for ring in sssr:
@@ -1824,6 +2132,13 @@ def RingAtomicIndices(poltype,mol):
     return atomindices
 
 def GrabRingAtomIndices(poltype,mol,ring):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ringatomindices=[]
     atomiter=openbabel.OBMolAtomIter(mol)
     for atom in atomiter:
@@ -1833,6 +2148,13 @@ def GrabRingAtomIndices(poltype,mol,ring):
     return ringatomindices
 
 def GrabRingAtomIndicesFromInputIndex(poltype,atomindex,atomindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for ring in atomindices:
         if atomindex in ring:
             return ring
@@ -1841,6 +2163,13 @@ def GrabRingAtomIndicesFromInputIndex(poltype,atomindex,atomindices):
     return ring
 
 def GrabIndicesInRing(poltype,babelindices,ring):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ringtorindices=[]
     for index in ring:
         if index in babelindices:
@@ -1850,6 +2179,13 @@ def GrabIndicesInRing(poltype,babelindices,ring):
 
 
 def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,indextoneighbidxs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     torsionsmissing=[]
     poormatchingaromatictorsions=[]
     poormatchingpartialaromatictorsions=[]
@@ -2022,6 +2358,13 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
 
 
 def GrabAllRingsContainingIndices(poltype,atomindices,babelindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     rings=[]
     for ring in atomindices:
         allin=True
@@ -2033,6 +2376,13 @@ def GrabAllRingsContainingIndices(poltype,atomindices,babelindices):
     return rings
 
 def FindAllNeighborIndexes(poltype,rdkitmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indextoneighbidxs={}
     for atm in rdkitmol.GetAtoms():
         atmidx=atm.GetIdx()
@@ -2047,6 +2397,13 @@ def FindAllNeighborIndexes(poltype,rdkitmol):
     return indextoneighbidxs
 
 def CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,smartsindexes):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     check=True
     for idx in neighborindexes:
         if idx not in smartsindexes:
@@ -2054,6 +2411,13 @@ def CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,smartsindexes):
     return check
 
 def ZeroOutMissingStrbnd(poltype,anglemissingtinkerclassestopoltypeclasses,strbndprms):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newstrbndprms=[]
     for line in strbndprms:
         linesplit=line.split()
@@ -2069,6 +2433,13 @@ def ZeroOutMissingStrbnd(poltype,anglemissingtinkerclassestopoltypeclasses,strbn
     return newstrbndprms
 
 def AssignAngleGuessParameters(poltype,anglemissingtinkerclassestopoltypeclasses,angleprms,indextoneighbidxs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newangleprms=[]
 
     for line in angleprms:
@@ -2109,6 +2480,13 @@ def AssignAngleGuessParameters(poltype,anglemissingtinkerclassestopoltypeclasses
 
 
 def CheckIfAtomsConnected(poltype,poscomb,endindextoneighbs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     checkconsec=True
     if len(poscomb)>1:
         for i in range(len(poscomb)-1):
@@ -2123,6 +2501,13 @@ def CheckIfAtomsConnected(poltype,poscomb,endindextoneighbs):
     return checkconsec
 
 def AssignBondGuessParameters(poltype,bondmissingtinkerclassestopoltypeclasses,bondprms,indextoneighbidxs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newbondprms=[]
     for line in bondprms:
         linesplit=line.split()
@@ -2164,6 +2549,13 @@ def AssignBondGuessParameters(poltype,bondmissingtinkerclassestopoltypeclasses,b
 
 
 def ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,torsionprms):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newtorsionprms=[]
     for line in torsionprms:
         linesplit=line.split()
@@ -2183,6 +2575,13 @@ def ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,
 
 
 def GrabKeysFromValue(poltype,dic,thevalue):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     keylist=[]
     for key,value in dic.items():
         if value==thevalue:
@@ -2191,6 +2590,13 @@ def GrabKeysFromValue(poltype,dic,thevalue):
 
 
 def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopoltypeclasses,partialarotorsionsmissingtinkerclassestopoltypeclasses,torsionprms,mol): # transfer bezene aromatic torsion paramerers from amoeba09
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newtorsionprms=[]
     poorarohydcounttoprms={0:[-.67,6.287,0],1:[.55,6.187,-.55],2:[0,6.355,0]}
     poorpartialarohydcounttoprms={0:[.854,-.374,.108],1:[0,0,.108],2:[0,0,.299]}
@@ -2287,6 +2693,13 @@ def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopolt
 
 
 def GrabTorsionParameterCoefficients(poltype,torsionprms):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     torsionkeystringtoparameters={}
     for line in torsionprms:
         linesplit=line.split() 
@@ -2302,6 +2715,13 @@ def GrabTorsionParameterCoefficients(poltype,torsionprms):
     return torsionkeystringtoparameters
 
 def PruneDictionary(poltype,keysubset,dic):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newdic={}
     removeditems=[]
     for key in keysubset:
@@ -2319,6 +2739,13 @@ def PruneDictionary(poltype,keysubset,dic):
 
 
 def TinkerClassesToPoltypeClasses(poltype,indicestotinkerclasses,formatorder=True):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tinkerclassestopoltypeclasses={}
     poltypeclassesalreadyassigned=[]
     for indices,tinkerclasses in indicestotinkerclasses.items():
@@ -2360,6 +2787,13 @@ def TinkerClassesToPoltypeClasses(poltype,indicestotinkerclasses,formatorder=Tru
 
 
 def ConvertIndicesDictionaryToPoltypeClasses(poltype,indicestovalue,indicestotinkerclasses,tinkerclassestopoltypeclasses):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltypeclassestovalue={}
     for indices,value in indicestovalue.items():
         if indices in indicestotinkerclasses.keys():
@@ -2382,6 +2816,13 @@ def ConvertIndicesDictionaryToPoltypeClasses(poltype,indicestovalue,indicestotin
     return poltypeclassestovalue 
 
 def CheckIfStringInStringList(poltype,string,stringlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     found=False
     for e in stringlist:
         if e==string:
@@ -2389,6 +2830,13 @@ def CheckIfStringInStringList(poltype,string,stringlist):
     return found
 
 def GrabTypesFromPrmLine(poltype,ls):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     typenums=[]
     for e in ls:
         isint=RepresentsInt(e)  
@@ -2403,6 +2851,13 @@ def GrabTypesFromPrmLine(poltype,ls):
 
 
 def SearchForPoltypeClasses(poltype,prmline,poltypeclasseslist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     listofpoltypeclasses=None
     poltypeclasses=None
     allin=None
@@ -2429,6 +2884,13 @@ def SearchForPoltypeClasses(poltype,prmline,poltypeclasseslist):
 
 
 def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsatomorders,poltypeclassestosmartsatomorders,poltypeclassestoelementtinkerdescrips,poltypeclassestosmartsatomordersext,newpoltypeclassestocomments,newpoltypeclassestosmartslist,arotorsionlinetodescrips,missingvdwtypes,torsionsmissing,missingbondpoltypeclasses,missinganglepoltypeclasses,defaultvalues=None,keyword=None):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     prmstotransferinfo={}
     for line in prms:
         warn=False
@@ -2545,6 +3007,13 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
     return prmstotransferinfo
 
 def FindMaximumCommonSubstructures(poltype,parametersmartslist,rdkitmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     parametersmartstomaxcommonsubstructure={}
     maxatomsize=0
     for parametersmarts in parametersmartslist:
@@ -2559,6 +3028,13 @@ def FindMaximumCommonSubstructures(poltype,parametersmartslist,rdkitmol):
     return parametersmartstomaxcommonsubstructure,maxatomsize 
 
 def GrabPlanarBonds(poltype,listofbondsforprm,mol): # used for checking missing opbend parameters later
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     planarbonds=[]
     for bond in listofbondsforprm:
         revbond=bond[::-1]
@@ -2588,6 +3064,13 @@ def GrabPlanarBonds(poltype,listofbondsforprm,mol): # used for checking missing 
 
 
 def FindPotentialMissingParameterTypes(poltype,prms,tinkerclassestopoltypeclasses):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltypeclasseslist=list(tinkerclassestopoltypeclasses.values())
     newpoltypeclasseslist=[]
     for poltypeclassesls in poltypeclasseslist:
@@ -2615,6 +3098,13 @@ def FindPotentialMissingParameterTypes(poltype,prms,tinkerclassestopoltypeclasse
 
 
 def ConvertPoltypeClassesToIndices(poltype,missingprmtypes):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     missingprmindices=[]
     for poltypeclasses in missingprmtypes:
         indices=[]
@@ -2631,6 +3121,13 @@ def ConvertPoltypeClassesToIndices(poltype,missingprmtypes):
     return finallist
 
 def FilterIndices(poltype,potentialmissingprmindices,indices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     missingprmindices=[]
     for prmindices in potentialmissingprmindices:
         if list(prmindices) in indices:
@@ -2639,6 +3136,13 @@ def FilterIndices(poltype,potentialmissingprmindices,indices):
         
 
 def GrabTypeAndDescriptions(poltype,prmfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     elementmm3descriptomm3type={}
     temp=open(prmfile,'r')
     results=temp.readlines()
@@ -2656,6 +3160,13 @@ def GrabTypeAndDescriptions(poltype,prmfile):
 
 
 def DefaultOPBendParameters(poltype,missingopbendprmindices,mol,opbendbondindicestotrigonalcenterbools):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newopbendprms=[]
     defaultvalues=[]
     for opbendprmindices in missingopbendprmindices:
@@ -2702,11 +3213,25 @@ def DefaultOPBendParameters(poltype,missingopbendprmindices,mol,opbendbondindice
 
 
 def WriteOutList(poltype,ls,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     with open(filename, 'w') as filehandle:
         for listitem in ls:
             filehandle.write('%s\n' % listitem)
 
 def ReadTorsionList(poltype,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newls=[]
     if os.stat(filename).st_size != 0:
         with open(filename, 'r') as filehandle:
@@ -2721,6 +3246,13 @@ def ReadTorsionList(poltype,filename):
 
 
 def ReadTorTorList(poltype,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newls=[]
     if os.stat(filename).st_size != 0:
         with open(filename, 'r') as filehandle:
@@ -2736,6 +3268,13 @@ def ReadTorTorList(poltype,filename):
 
 
 def ReadVdwList(poltype,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newls=[]
     if os.stat(filename).st_size != 0:
         with open(filename, 'r') as filehandle:
@@ -2747,6 +3286,13 @@ def ReadVdwList(poltype,filename):
 
 
 def CheckIfParametersExist(poltype,potentialmissingindices,prms):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     missingprmindices=[]
     for indices in potentialmissingindices:
         babelindices=[i+1 for i in indices]
@@ -2763,12 +3309,33 @@ def CheckIfParametersExist(poltype,potentialmissingindices,prms):
     return missingprmindices
                 
 def WriteDictionaryToFile(poltype,dic,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     json.dump(dic, open(filename,'w'))        
 
 def ReadDictionaryFromFile(poltype,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     return json.load(open(filename))
 
 def GenerateSMARTSMatchLine(poltype,rdkitmol,rdkitindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     smarts=rdmolfiles.MolToSmarts(rdkitmol)
     smartsmol=Chem.MolFromSmarts(smarts)
     matches=rdkitmol.GetSubstructMatches(smartsmol)
@@ -2780,6 +3347,13 @@ def GenerateSMARTSMatchLine(poltype,rdkitmol,rdkitindex):
     return string
 
 def GenerateAtomSMARTSMap(poltype,rdkitmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     lines=[]
     descrip='"%s"'% poltype.molecprefix
     for atom in rdkitmol.GetAtoms():
@@ -2791,6 +3365,13 @@ def GenerateAtomSMARTSMap(poltype,rdkitmol):
     return lines        
 
 def AppendToSMARTSMapFile(poltype,lines,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(filename,'a')
     for line in lines:
         temp.write(line)
@@ -2800,6 +3381,13 @@ def AppendToSMARTSMapFile(poltype,lines,filename):
 
 
 def AddKeyFileParametersToParameterFile(poltype,rdkitmol):   
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomdefs,bondprms,angleprms,torsionprms,strbndprms,opbendprms,polarizeprms,vdwprms,mpoleprms=GrabParameters(poltype,poltype.keyfiletoaddtodatabase)
     oldtypetonewtype,shift=ShiftPoltypeNumbers(poltype,poltype.smallmoleculeprmlib,poltype.keyfiletoaddtodatabase)
     result=ShiftParameterDefintions(poltype,[atomdefs,bondprms,angleprms,torsionprms,strbndprms,opbendprms,polarizeprms,vdwprms,mpoleprms],oldtypetonewtype)
@@ -2809,6 +3397,13 @@ def AddKeyFileParametersToParameterFile(poltype,rdkitmol):
     AppendToSMARTSMapFile(poltype,lines,poltype.smallmoleculesmartstotinkerdescrip)
 
 def ReadExternalDatabase(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(poltype.externalparameterdatabase,'r')
     results=temp.readlines()
     temp.close()
@@ -2870,6 +3465,13 @@ def ReadExternalDatabase(poltype):
 
 
 def ConvertToPoltypeClasses(poltype,torsionsmissing):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newtorsionsmissing=[]
     for sublist in torsionsmissing:
         newsublist=[i+1 for i in sublist]
@@ -2892,6 +3494,13 @@ def ConvertToPoltypeClasses(poltype,torsionsmissing):
 
 
 def GrabKeysFromValue(poltype,dic,thevalue):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     keylist=[]
     for key,value in dic.items():
         if value==thevalue:
@@ -2901,6 +3510,13 @@ def GrabKeysFromValue(poltype,dic,thevalue):
 
 
 def GrabAllPossibleMoleculeIndices(poltype,typeindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     thelist=[]
     for typenum in typeindices:
         allindices=GrabKeysFromValue(poltype,poltype.idxtosymclass,typenum)
@@ -2912,6 +3528,13 @@ def GrabAllPossibleMoleculeIndices(poltype,typeindices):
 
 
 def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,indextoneighbidxs,smartsatomordertotorvdwdb,torsionindicestoextsmarts=None):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indicestoextsmartsmatchlength={}
     indicestoextsmarts={}
     indicestoextsmartsatomorder={}
@@ -3126,6 +3749,13 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
 
 
 def CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,indicestoextsmartsmatchlength,indicesforprmtoparametersmarts,indicesforprmtosmarts,indicestoextsmarts,indicesforprmtomatchallneighbs,indicestoextsmartsatomorders):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newindicestoextsmarts={}
     newindicestoextsmartsatomorder={}
     for indices,extsmartsmatchlength in indicestoextsmartsmatchlength.items():
@@ -3170,6 +3800,13 @@ def CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,indicestoextsmartsm
     return indicesforprmtoparametersmarts,indicesforprmtosmarts,newindicestoextsmarts,newindicestoextsmartsatomorder
 
 def AddExternalDatabaseSMARTSMatchParameters(poltype,prms,indicestoextsmarts,smartsatomordertoparameters,keyword,indicestoextsmartsatomorder,smartsatomordertogrid=None):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltypeclassestosmartsatomordersext={}
     for indices,extsmarts in indicestoextsmarts.items():
         thesmartsatomorder=indicestoextsmartsatomorder[indices]
@@ -3220,6 +3857,13 @@ def AddExternalDatabaseSMARTSMatchParameters(poltype,prms,indicestoextsmarts,sma
 
 
 def FilterBondSMARTSEnviorment(poltype,bondindicestosmartsatomorders,bondindicestotinkerclasses):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     opbendbondindicestosmartsatomorders={}
     opbendbondindicestotinkerclasses={}
     for bondindices,smartsatomorders in bondindicestosmartsatomorders.items(): 
@@ -3239,6 +3883,13 @@ def FilterBondSMARTSEnviorment(poltype,bondindicestosmartsatomorders,bondindices
     return opbendbondindicestotinkerclasses,opbendbondindicestosmartsatomorders
 
 def CountBrackets(poltype,string):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     count=0
     for e in string:
         if e=='[':
@@ -3246,6 +3897,13 @@ def CountBrackets(poltype,string):
     return count
 
 def CheckTrigonalCenters(poltype,listofbondsforprm,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     opbendbondindicestotrigonalcenterbools={}
     for bondindices in listofbondsforprm:
         bondindices=tuple(bondindices)
@@ -3278,6 +3936,13 @@ def CheckTrigonalCenters(poltype,listofbondsforprm,mol):
 
 
 def CorrectPitorEnergy(poltype,torsionprms,torsiontopitor):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newtorsionprms=[]
     torsiontocount={}
     middletocount={}
@@ -3312,6 +3977,13 @@ def CorrectPitorEnergy(poltype,torsionprms,torsiontopitor):
 
 
 def FindMissingParameters(poltype,indicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     missing=[]
     for indices,smartsatomorders in indicestosmartsatomorders.items():
         nindexes=[]
@@ -3363,6 +4035,13 @@ def FindMissingParameters(poltype,indicestosmartsatomorders,rdkitmol,mol,indexto
     return missing
 
 def ReduceMissingVdwByTypes(poltype,vdwmissing):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     reducedvdwmissing=[]
     typesfound=[]
     for vdwarray in vdwmissing:
@@ -3379,6 +4058,13 @@ def ReduceMissingVdwByTypes(poltype,vdwmissing):
 
 
 def ConvertToBabelList(poltype,listforprm):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     babellist=[]
     for ls in listforprm:
         babells=[i+1 for i in ls]
@@ -3389,6 +4075,13 @@ def ConvertToBabelList(poltype,listforprm):
 
 
 def AddReverseKeys(poltype,tinkerclassestopoltypeclasses):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newtinkerclassestopoltypeclasses={}
     for tinkerclasses,poltypeclasses in tinkerclassestopoltypeclasses.items():
         revtinkerclasses=tinkerclasses[::-1]
@@ -3402,6 +4095,13 @@ def AddReverseKeys(poltype,tinkerclassestopoltypeclasses):
 
 
 def TinkerClassesToTrigonalCenter(poltype,opbendbondindicestotinkerclasses,opbendbondindicestotrigonalcenterbools):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     opbendtinkerclassestotrigonalcenterbools={}
     for bondindices,tinkerclasses in opbendbondindicestotinkerclasses.items():
         boolarray=opbendbondindicestotrigonalcenterbools[bondindices]
@@ -3414,6 +4114,13 @@ def TinkerClassesToTrigonalCenter(poltype,opbendbondindicestotinkerclasses,opben
 
 
 def FilterDictionaries(poltype,dics,ls):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newdics=[]
     for dic in dics:
         newdic={}
@@ -3424,6 +4131,13 @@ def FilterDictionaries(poltype,dics,ls):
     return newdics
 
 def ConvertListOfListToListOfTuples(poltype,listoflist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     listoftuples=[]
     for item in listoflist:
         tup=tuple(item)
@@ -3432,6 +4146,13 @@ def ConvertListOfListToListOfTuples(poltype,listoflist):
 
 
 def AddExternalDatabaseMatches(poltype, indicestosmartsatomorder,extindicestoextsmarts,smartsatomordertoparameters):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newindicestosmartsatomorder=indicestosmartsatomorder.copy()
     for smartsatomorder in smartsatomordertoparameters.keys():
         smarts=smartsatomorder[0]
@@ -3442,6 +4163,13 @@ def AddExternalDatabaseMatches(poltype, indicestosmartsatomorder,extindicestoext
     return newindicestosmartsatomorder   
    
 def AngleGuess(poltype,ita,itb,itc,iva,ivb,ivc):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     radian=57.29577951
     angunit = 1.0 / radian**2
     if (itb==6):
@@ -3596,6 +4324,13 @@ def AngleGuess(poltype,ita,itb,itc,iva,ivb,ivc):
  
  
 def BondGuess(poltype,ita,itb,iva,ivb):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     bndunit=1
     if (ita==1):
          if (itb==6):
@@ -3732,6 +4467,13 @@ def BondGuess(poltype,ita,itb,iva,ivb):
     return bndguess 
 
 def ReverseDictionaryValueList(poltype,keytovalues):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     valuetokey={}
     for key,value in keytovalues.items():
         for ls in value:
@@ -3739,12 +4481,26 @@ def ReverseDictionaryValueList(poltype,keytovalues):
     return valuetokey
 
 def ReverseDictionary(poltype,keytovalues):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     valuetokey={}
     for key,value in keytovalues.items():
         valuetokey[tuple(value)]=list(key)
     return valuetokey
 
 def RepresentsInt(s):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     try: 
         int(s)
         return True
@@ -3752,6 +4508,13 @@ def RepresentsInt(s):
         return False
 
 def ReadDatabaseSmartsMap(poltype,databasepath): # smartsString classNumber className # comments
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
 
     smartstoatomclass={}
     atomclasstoclassname={}
@@ -3780,6 +4543,13 @@ def ReadDatabaseSmartsMap(poltype,databasepath): # smartsString classNumber clas
     return smartstoatomclass, atomclasstoclassname, atomclasstocomment
  
 def ReadDatabaseSmartsMapPolarize(poltype,databasepath): # smartsString className # comments
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
 
     smartstoatomclass={}
     atomclasstocomment={}
@@ -3809,6 +4579,13 @@ def ReadDatabaseSmartsMapPolarize(poltype,databasepath): # smartsString classNam
     return smartstoatomclass, atomclasstocomment,smartstoactualcomment
  
 def MatchAllSmartsToAtomIndices(poltype,smartstoatomclass): #rdkit 0 index based
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomindextoallsmarts={}
     atomindextoallsmartsmatches={}
     for atom in poltype.rdkitmol.GetAtoms():
@@ -3834,6 +4611,13 @@ def MatchAllSmartsToAtomIndices(poltype,smartstoatomclass): #rdkit 0 index based
 
 
 def MapIndicesToCommentsAtom(poltype,atomindextoallsmarts,smartstocomment,listofatomsforprm):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomcommentstolistofsmartslist={}
     atomindicestolistofatomcomments={}
     for atoms in listofatomsforprm:
@@ -3858,6 +4642,13 @@ def MapIndicesToCommentsAtom(poltype,atomindextoallsmarts,smartstocomment,listof
 
 
 def MapIndicesToCommentsBondAngle(poltype,atomindextoallsmarts,smartstocomment,listofbondsforprm,listofanglesforprm):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     bondcommentstolistofsmartslist={}
     bondindicestolistofbondcomments={}
     for bond in listofbondsforprm:
@@ -3916,6 +4707,13 @@ def MapIndicesToCommentsBondAngle(poltype,atomindextoallsmarts,smartstocomment,l
 
 
 def MapIndicesToClasses(poltype,atomindextoallsmarts,smartstoatomclass,listofbondsforprm,listofanglesforprm,planarbonds):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     bondclassestolistofsmartslist={}
     angleclassestolistofsmartslist={}
     strbndclassestolistofsmartslist={}
@@ -3996,6 +4794,13 @@ def MapIndicesToClasses(poltype,atomindextoallsmarts,smartstoatomclass,listofbon
     return bondclassestolistofsmartslist,angleclassestolistofsmartslist,strbndclassestolistofsmartslist,opbendclassestolistofsmartslist,bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses
 
 def SearchForParametersViaCommentsPolarize(poltype,atomcommentstolistofsmartslist,atomindicestolistofatomcomments):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomcommentstoparameters={}
     temp=open(poltype.latestsmallmoleculepolarizeprmlib,'r')
     results=temp.readlines()
@@ -4012,6 +4817,13 @@ def SearchForParametersViaCommentsPolarize(poltype,atomcommentstolistofsmartslis
 
 
 def SearchForParametersViaCommentsNonBondedAMOEBAPlus(poltype,atomcommentstolistofsmartslist,atomindicestolistofatomcomments):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomcommentstocpparameters={}
     atomcommentstoctparameters={}
     atomcommentstovdwparameters={}
@@ -4046,6 +4858,13 @@ def SearchForParametersViaCommentsNonBondedAMOEBAPlus(poltype,atomcommentstolist
 
 
 def SearchForParametersViaCommentsChargeFlux(poltype,bondcommentstolistofsmartslist,bondindicestolistofbondcomments,anglecommentstolistofsmartslist,angleindicestolistofanglecomments):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     bondcommentstocfparameters={}
     anglecommentstocfparameters={}
     temp=open(poltype.amoebapluscfprmlib,'r')
@@ -4074,6 +4893,13 @@ def SearchForParametersViaCommentsChargeFlux(poltype,bondcommentstolistofsmartsl
 
 
 def SearchForParameters(poltype,bondclassestolistofsmartslist,angleclassestolistofsmartslist,strbndclassestolistofsmartslist,opbendclassestolistofsmartslist,bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     bondclassestoparameters={}
     angleclassestoparameters={}
     strbndclassestoparameters={}
@@ -4108,6 +4934,13 @@ def SearchForParameters(poltype,bondclassestolistofsmartslist,angleclassestolist
     return bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses,bondclassestoparameters,angleclassestoparameters,strbndclassestoparameters,opbendclassestoparameters
 
 def RemoveIndicesThatDontHaveParameters(poltype,indicestolistofclasses,classestolistofsmartslist,classestoparameters,prin=False):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indicestodelete=[]
     for i in range(len(indicestolistofclasses.keys())):
         indices=list(indicestolistofclasses.keys())[i]
@@ -4129,6 +4962,13 @@ def RemoveIndicesThatDontHaveParameters(poltype,indicestolistofclasses,classesto
     return indicestolistofclasses
 
 def FindBestSMARTSMatch(poltype,indicestolistofclasses,classestolistofsmartslist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indicestoclasses={}
     indicestosmartslist={}
     for indices,listofclasses in indicestolistofclasses.items():
@@ -4150,6 +4990,13 @@ def FindBestSMARTSMatch(poltype,indicestolistofclasses,classestolistofsmartslist
     return indicestoclasses,indicestosmartslist
 
 def DetermineBestSMARTSMatch(poltype,listoffragments,listofclasses,listofsmartslist):  
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tanimotoarray=[]     
     for i in range(len(listoffragments)):
         fragment=listoffragments[i]
@@ -4179,6 +5026,13 @@ def DetermineBestSMARTSMatch(poltype,listoffragments,listofclasses,listofsmartsl
 
 
 def ChooseMostDescriptiveSMARTSList(poltype,smartslisttocompare):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     lengtharray=[]
     for smartslist in smartslisttocompare:
         lengths=[len(e) for e in smartslist]
@@ -4191,6 +5045,13 @@ def ChooseMostDescriptiveSMARTSList(poltype,smartslisttocompare):
 
 
 def CreateFragment(poltype,matchedindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     m = Chem.Mol()
     em = Chem.EditableMol(m)
     oldindextonewindex={}
@@ -4219,6 +5080,13 @@ def CreateFragment(poltype,matchedindices):
 
 
 def MatchAllSMARTS(poltype,smartslist,indices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     matchedindices=[]
     for idx in range(len(smartslist)):
         smarts=smartslist[idx]
@@ -4241,6 +5109,13 @@ def MatchAllSMARTS(poltype,smartslist,indices):
 
 
 def GrabNewParameters(poltype,indicestoclasses,classestoparameters,keyword,indicestosmartslist,atomclasstocomment,opbendbondindicestotrigonalcenterbools=None):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indicestopoltypeclasses={}
     newpoltypeclassestocomments={}
     newpoltypeclassestosmartslist={}
@@ -4301,6 +5176,13 @@ def GrabNewParameters(poltype,indicestoclasses,classestoparameters,keyword,indic
     return indicestopoltypeclasses,newprms,newpoltypeclassestocomments,newpoltypeclassestosmartslist
 
 def GrabNewParametersPolarize(poltype,indicestoclasses,classestoparameters,keyword,indicestosmartslist,smartstoactualcomment):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indicestopoltypeclasses={}
     newpoltypeclassestocomments={}
     newpoltypeclassestosmartslist={}
@@ -4336,6 +5218,13 @@ def GrabNewParametersPolarize(poltype,indicestoclasses,classestoparameters,keywo
 
 
 def RemoveOldParametersKeepNewParameters(poltype,prms,newindicestopoltypeclasses,keyword,poltypeclassestoparametersmartsatomorders,poltypeclassestosmartsatomorders,poltypeclassestoelementtinkerdescrips,removefromdic=True):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newpoltypeclassestoparametersmartsatomorders=copy.deepcopy(poltypeclassestoparametersmartsatomorders)
     newpoltypeclassestosmartsatomorders=copy.deepcopy(poltypeclassestosmartsatomorders)
     newpoltypeclassestoelementtinkerdescrips=copy.deepcopy(poltypeclassestoelementtinkerdescrips) 
@@ -4389,6 +5278,13 @@ def RemoveOldParametersKeepNewParameters(poltype,prms,newindicestopoltypeclasses
     return newprms,newpoltypeclassestoparametersmartsatomorders,newpoltypeclassestosmartsatomorders,newpoltypeclassestoelementtinkerdescrips
 
 def MapSMARTSToComments(poltype,smartstoatomclasspolar,atomclasstocommentpolar):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     smartstocomment={}
     for smarts,atomclass in smartstoatomclasspolar.items():
         comment=atomclasstocommentpolar[atomclass]
@@ -4397,6 +5293,13 @@ def MapSMARTSToComments(poltype,smartstoatomclasspolar,atomclasstocommentpolar):
     return smartstocomment
 
 def GrabSmartsToSoluteRadiiMap(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     smartstosoluteradiiprms={}
     temp=open(poltype.smartstosoluteradiimap,'r')
     results=temp.readlines()
@@ -4410,6 +5313,13 @@ def GrabSmartsToSoluteRadiiMap(poltype):
 
 
 def MakeListOfListValues(poltype,keytovalue):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newkeytovalue={}
     for key,value in keytovalue.items():
         newvalues=[]
@@ -4421,6 +5331,13 @@ def MakeListOfListValues(poltype,keytovalue):
     return newkeytovalue
 
 def GenerateSoluteParameters(poltype,atomindicestosmartslist,smartstosoluteradiiprms):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     soluteprms=[]
     for atomindices,smartslist in atomindicestosmartslist.items():
         atomindex=atomindices[0]
@@ -4438,6 +5355,13 @@ def GenerateSoluteParameters(poltype,atomindicestosmartslist,smartstosoluteradii
     return soluteprms
 
 def RemoveIndicesMatchedFromNewDatabase(poltype,indicestosmartsatomorders,indicestopoltypeclasses):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     removelist=[]
     for indices,smartsatomorders in indicestosmartsatomorders.items():
         if indices in indicestopoltypeclasses.keys() or indices[::-1] in indicestopoltypeclasses.keys():
@@ -4450,6 +5374,13 @@ def RemoveIndicesMatchedFromNewDatabase(poltype,indicestosmartsatomorders,indice
 
 
 def TrimDictionary(poltype,dictotrim,dicref):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     keylist=[]
     for key,value in dictotrim.items():
         if key not in dicref.keys() and key[::-1] not in dicref.keys():
@@ -4459,12 +5390,26 @@ def TrimDictionary(poltype,dictotrim,dicref):
     return dictotrim
 
 def AddDictionaryItems(poltype,dictoaddto,dicref):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for key,value in dicref.items():
         dictoaddto[key]=value
     return dictoaddto
 
 
 def RemovePoltypeClassesFromNewMatches(poltype,missingtinkerclassestopoltypeclasses,poltypeclassestoparametersmartsatomorders):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
 
     newmissingtinkerclassestopoltypeclasses={}
     for missingtinkerclasses,poltypeclasses in missingtinkerclassestopoltypeclasses.items():
@@ -4479,6 +5424,13 @@ def RemovePoltypeClassesFromNewMatches(poltype,missingtinkerclassestopoltypeclas
     return newmissingtinkerclassestopoltypeclasses
 
 def ExtractMissingPoltypeClasses(poltype,missingtinkerclassestopoltypeclasses):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     missingpoltypeclasses=[]
     for tinkerclasses,poltypeclassesls in missingtinkerclassestopoltypeclasses.items():
         for cls in poltypeclassesls:
@@ -4487,6 +5439,13 @@ def ExtractMissingPoltypeClasses(poltype,missingtinkerclassestopoltypeclasses):
 
 
 def MergeDictionaries(poltype,add,addto):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for key,value in add.items():
         addto[key]=value
 
@@ -4494,6 +5453,13 @@ def MergeDictionaries(poltype,add,addto):
 
 
 def GetPolarIndexToPolarizePrm(poltype,polarprmstotransferinfo):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     polarindextopolarizeprm={}
     for line in polarprmstotransferinfo.keys():
         linesplit=line.split()
@@ -4509,6 +5475,13 @@ def GetPolarIndexToPolarizePrm(poltype,polarprmstotransferinfo):
 
 
 def TestBondAngleEquilValues(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tmpkeyfile='testbondangleequilvalues.key'
     tmpxyzfile='testbondangleequilvalues.xyz'
     alzout='testbondangleequilvaluesalz.out'
@@ -4527,6 +5500,13 @@ def TestBondAngleEquilValues(poltype):
     ChangeBondAngleEquilValues(poltype,bondtypeindicestonewbondequilvalues,angletypeindicestonewbondequilvalues)
 
 def ChangeBondAngleEquilValues(poltype,bondtypeindicestonewbondequilvalues,angletypeindicestonewbondequilvalues): 
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(poltype.key4fname,'r')
     results=temp.readlines()
     temp.close()
@@ -4573,6 +5553,13 @@ def ChangeBondAngleEquilValues(poltype,bondtypeindicestonewbondequilvalues,angle
 
 
 def ConvertIndicesToTypeIndices(poltype,indicestonewequilvalues):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     typeindicestonewequilvalues={}
     for indices,newequilvalues in indicestonewequilvalues.items():
         typeindices=[]
@@ -4586,6 +5573,13 @@ def ConvertIndicesToTypeIndices(poltype,indicestonewequilvalues):
 
 
 def CheckBondAngleDeviationsFromQM(poltype,alzout):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     bondindicestonewbondequilvalues={}
     angleindicestonewbondequilvalues={}
     temp=open(alzout,'r')
@@ -4625,6 +5619,13 @@ def CheckBondAngleDeviationsFromQM(poltype,alzout):
     return bondindicestonewbondequilvalues,angleindicestonewbondequilvalues
 
 def GrabIndicesAndEquilValues(linesplit,indexlist,equilindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indices=[]
     for index in indexlist:
         indexele=linesplit[index] 
@@ -4637,6 +5638,13 @@ def GrabIndicesAndEquilValues(linesplit,indexlist,equilindices):
     return indices,qmequil,currentequil
 
 def RemoveIndicesMatchedFromExternalDatabase(poltype,indicestosmartsatomorder,indicestoextsmarts):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
 
     missingindicestosmartsatomorders={}
     for indices,smartsatomorder in indicestosmartsatomorder.items():
@@ -4648,6 +5656,13 @@ def RemoveIndicesMatchedFromExternalDatabase(poltype,indicestosmartsatomorder,in
 
 
 def ExtractTransferInfo(poltype,polarprmstotransferinfo):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     polartypetotransferinfo={}
     for polarprms,transferinfo in polarprmstotransferinfo.items():
         linesplit=polarprms.split()
@@ -4658,6 +5673,13 @@ def ExtractTransferInfo(poltype,polarprmstotransferinfo):
 
 
 def StiffenZThenBisectorAngleConstants(poltype,keyfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(keyfilename,'r')
     results=temp.readlines()
     temp.close()
@@ -4700,6 +5722,13 @@ def StiffenZThenBisectorAngleConstants(poltype,keyfilename):
 
 
 def GenerateRdkitMolObjectsParameterSMARTS(poltype,parametersmartslist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     parametersmartstordkitmol={}
     for parametersmarts in parametersmartslist:
         prmmol=Chem.MolFromSmarts(parametersmarts)
@@ -4709,6 +5738,13 @@ def GenerateRdkitMolObjectsParameterSMARTS(poltype,parametersmartslist):
 
 
 def GrabVdwParametersFromParent(poltype,oldvdwprms):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     currentdir=os.getcwd()
     parenttypestofragtypes=json.load(open("parentsymclasstofragsymclasses.txt"))
     vdwkey='parentvdw.key'
@@ -4743,6 +5779,13 @@ def GrabVdwParametersFromParent(poltype,oldvdwprms):
 
 
 def GrabVdwParametersFromKeyFile(poltype,vdwkey,parenttypes):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     vdwprms=[]
     temp=open(vdwkey,'r')
     results=temp.readlines()
@@ -4760,6 +5803,13 @@ def GrabVdwParametersFromKeyFile(poltype,vdwkey,parenttypes):
 
 
 def AddParentVdwTransferInfo(poltype,parentvdwtransferinfo,vdwprmstotransferinfo):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for line in vdwprmstotransferinfo.keys():
         linesplit=line.split()
         typenum=linesplit[1]
@@ -4772,6 +5822,13 @@ def AddParentVdwTransferInfo(poltype,parentvdwtransferinfo,vdwprmstotransferinfo
     return vdwprmstotransferinfo
 
 def AddTrivialOPBendForAmine(poltype,opbendprms,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomiter=openbabel.OBMolAtomIter(mol)
     for atom in atomiter:
         atomidx=atom.GetIdx()
@@ -4810,6 +5867,13 @@ def AddTrivialOPBendForAmine(poltype,opbendprms,mol):
     return opbendprms
 
 def GenerateTinkerClassesToPoltypeClasses(poltype,indices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tinkerclassestopoltypeclasses={}
     for indexls in indices:
         indexls=[i+1 for i in indexls]
@@ -4822,6 +5886,13 @@ def GenerateTinkerClassesToPoltypeClasses(poltype,indices):
 
 
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
 
     if polarize==True:
         listofatomsforprm,listofbondsforprm,listofanglesforprm,listoftorsionsforprm=GrabAtomsForParameters(poltype,mol)

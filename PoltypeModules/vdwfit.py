@@ -25,6 +25,13 @@ from scipy.interpolate import interp1d
 from PyAstronomy import pyasl
 
 def CheckAllVdwTypesExist(poltype,keyfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(keyfilename,'r')
     results=temp.readlines()
     temp.close()
@@ -44,6 +51,13 @@ def CheckAllVdwTypesExist(poltype,keyfilename):
             raise ValueError('Missing vdwtype in keyfile '+str(atomtype)) 
 
 def best_fit_slope_and_intercept(xs,ys):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     xs=np.array(xs)
     ys=np.array(ys)
     m = (((mean(xs)*mean(ys)) - mean(xs*ys)) /
@@ -52,11 +66,25 @@ def best_fit_slope_and_intercept(xs,ys):
     return m, b
 
 def squared_error(ys_orig,ys_line):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ys_orig=np.array(ys_orig)
     ys_line=np.array(ys_line)
     return sum((ys_line - ys_orig) * (ys_line - ys_orig))
 
 def coefficient_of_determination(ys_orig,ys_line):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     y_mean_line = [mean(ys_orig) for y in ys_orig]
     squared_error_regr = squared_error(ys_orig, ys_line)
     squared_error_y_mean = squared_error(ys_orig, y_mean_line)
@@ -69,6 +97,13 @@ def coefficient_of_determination(ys_orig,ys_line):
     return value 
 
 def MeanError(data,pred):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     Sum=0
     for i in range(len(data)):
         true=data[i]
@@ -81,6 +116,13 @@ def MeanError(data,pred):
 
 
 def writePRM(poltype,params,vdwtypes,idxtotype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     vdwradius=None
     vdwdepth=None
     vdwred=None
@@ -155,6 +197,13 @@ def writePRM(poltype,params,vdwtypes,idxtotype):
     return
 
 def readOneColumn(filename,columnnumber,prefix=None):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(filename,'r')
     results=temp.readlines()
     temp.close()
@@ -169,6 +218,13 @@ def readOneColumn(filename,columnnumber,prefix=None):
     return array
      
 def NormalizeTarget(poltype,filename,aprefix=None):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     prefixarray=readOneColumn(filename,0)
     energyarray=readOneColumn(filename,1)
     energyarray=[float(i) for i in energyarray]
@@ -197,6 +253,13 @@ def NormalizeTarget(poltype,filename,aprefix=None):
 
 
 def myFUNC(params,poltype,vdwtypes,idxtotype,count):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     params=list(params)
     writePRM(poltype,params,vdwtypes,idxtotype)
     target = NormalizeTarget(poltype,'QM_DATA')
@@ -233,6 +296,13 @@ def myFUNC(params,poltype,vdwtypes,idxtotype,count):
     return weightlist*(current-target)
 
 def ScreenHighEnergyPoints(poltype,current,target,distarray=None):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tol=10
     newcurrent=[]
     newtarget=[]
@@ -259,6 +329,13 @@ def ScreenHighEnergyPoints(poltype,current,target,distarray=None):
 
 
 def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count,classkeytofitresults,allprefix=False):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if allprefix==False:
         target= NormalizeTarget(poltype,'QM_DATA',prefix)
         current=NormalizeTarget(poltype,'SP.dat',prefix)
@@ -342,6 +419,13 @@ def PlotQMVsMMEnergy(poltype,vdwtypesarray,prefix,count,classkeytofitresults,all
 
 
 def VDWOptimizer(poltype,count,fitredboolarray):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     x0 = []
     curvdwtypes=readOneColumn("INITIAL.PRM", 1)
     vdwtypes=[]
@@ -466,6 +550,13 @@ def VDWOptimizer(poltype,count,fitredboolarray):
 
 
 def MoveDimerAboutMinima(poltype,txyzFile,outputprefixname,nAtomsFirst,atomidx1,atomidx2,equildistance,array):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     fnamearray=[]
     for i in range(len(array)):
         frac=array[i]
@@ -512,6 +603,13 @@ def MoveDimerAboutMinima(poltype,txyzFile,outputprefixname,nAtomsFirst,atomidx1,
 
 
 def ConvertProbeDimerXYZToTinkerXYZ(poltype,inputxyz,tttxyz,outputxyz,waterbool,probeatoms):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(inputxyz,'r')
     resultsinputxyz=temp.readlines()
     temp.close()
@@ -595,6 +693,13 @@ def ConvertProbeDimerXYZToTinkerXYZ(poltype,inputxyz,tttxyz,outputxyz,waterbool,
     outfile.close()
 
 def CheckIfLogFileUsingGaussian(poltype,f):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     use_gaus=False
     temp=open(f,'r')
     results=temp.readlines()
@@ -608,6 +713,13 @@ def CheckIfLogFileUsingGaussian(poltype,f):
 
 
 def ReadCounterPoiseAndWriteQMData(poltype,logfilelist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open('QM_DATA','w')
     for f in logfilelist:
         use_gaus=False
@@ -634,6 +746,13 @@ def ReadCounterPoiseAndWriteQMData(poltype,logfilelist):
 
 
 def PlotEnergyVsDistance(poltype,distarray,prefix,radii,depths,reds,vdwtypesarray,count):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     vdwtypes=[str(i) for i in vdwtypesarray]
     vdwtypestring=','.join(vdwtypes)
     qmenergyarray = NormalizeTarget(poltype,'QM_DATA',prefix)
@@ -680,6 +799,13 @@ def PlotEnergyVsDistance(poltype,distarray,prefix,radii,depths,reds,vdwtypesarra
 
 
 def ReadIntermolecularEnergyMM(poltype,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     energy=None
     with open(filename,'r') as f:
         results=f.readlines()
@@ -690,6 +816,13 @@ def ReadIntermolecularEnergyMM(poltype,filename):
     return energy
 
 def ReadAnalyzeEnergiesWriteOut(poltype,filenamelist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open('SP.dat','w')
     for filename in filenamelist:
         energy=ReadIntermolecularEnergyMM(poltype,filename)
@@ -698,6 +831,13 @@ def ReadAnalyzeEnergiesWriteOut(poltype,filenamelist):
 
 
 def WriteInitialPrmFile(poltype,vdwtypesarray,initialradii,initialdepths,minradii,maxradii,mindepths,maxdepths,initialreds,minreds,maxreds):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
 
     temp=open('INITIAL.PRM','w')
     for i in range(len(vdwtypesarray)):
@@ -717,6 +857,13 @@ def WriteInitialPrmFile(poltype,vdwtypesarray,initialradii,initialdepths,minradi
     temp.close()
 
 def readTXYZ(poltype,TXYZ):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(TXYZ,'r')
     lines = temp.readlines()[1:] #TINKER coordinate starts from second line
     atoms=[];coord=[]
@@ -731,6 +878,13 @@ def readTXYZ(poltype,TXYZ):
     return atoms,coord,order, types, connections
 
 def TXYZ2COM(poltype,TXYZ,comfname,chkname,maxdisk,maxmem,numproc,mol,probeatoms):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     data = readTXYZ(poltype,TXYZ)
     atoms = data[0];coord = data[1]
     opt.write_com_header(poltype,comfname,chkname,maxdisk,maxmem,numproc)
@@ -787,6 +941,13 @@ def TXYZ2COM(poltype,TXYZ,comfname,chkname,maxdisk,maxmem,numproc,mol,probeatoms
     tmpfh.close()
 
 def GenerateElementToBasisSetLines(poltype,basissetfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     elementtobasissetlines={}
     temp=open(basissetfile,'r')
     results=temp.readlines()
@@ -806,6 +967,13 @@ def GenerateElementToBasisSetLines(poltype,basissetfile):
  
 
 def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetfile,space):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newtemp=open(poltype.basissetpath+normalelementbasissetfile,'r')
     results=newtemp.readlines()
     newtemp.close()
@@ -826,6 +994,13 @@ def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetf
 
 
 def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc,probeatoms):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     data = readTXYZ(poltype,TXYZ)
     atoms = data[0];coord = data[1]
     mul=mol.GetTotalSpinMultiplicity()
@@ -876,6 +1051,13 @@ def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc,probeatoms):
 
 
 def WriteOutCartesianXYZ(poltype,mol,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     output=open(filename,'w')
     atomcounter=0
     coordarray=[]
@@ -897,6 +1079,13 @@ def WriteOutCartesianXYZ(poltype,mol,filename):
 
 
 def GenerateSPInputFiles(poltype,filenamearray,mol,probeatoms):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     qmfilenamearray=[]
     for filename in filenamearray:
         if poltype.use_gaus==True:
@@ -910,6 +1099,13 @@ def GenerateSPInputFiles(poltype,filenamearray,mol,probeatoms):
 
 
 def ExecuteSPJobs(poltype,qmfilenamearray,prefix):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     jobtooutputlog={}
     listofjobs=[]
     fulljobtooutputlog={}
@@ -960,6 +1156,13 @@ def ExecuteSPJobs(poltype,qmfilenamearray,prefix):
 
 
 def GrabVdwParameters(poltype,vdwtype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     CheckAllVdwTypesExist(poltype,poltype.key4fname)
     temp=open(poltype.key4fname,'r')
     results=temp.readlines()
@@ -998,6 +1201,13 @@ def GrabVdwParameters(poltype,vdwtype):
 
 
 def GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indextotargetatom,indextoreferenceelement,vdwradius):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indexpairtoreferencedistance={}
     indexpairtobounds={}
     indices=list(indextoreferencecoordinate.keys())
@@ -1066,6 +1276,13 @@ def GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indext
 
 
 def GrabPairwiseDistance(pair,indexpairtoreferencedistance):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if pair in indexpairtoreferencedistance.keys():
         distance=indexpairtoreferencedistance[pair]
     elif pair[::-1] in indexpairtoreferencedistance.keys():
@@ -1075,6 +1292,13 @@ def GrabPairwiseDistance(pair,indexpairtoreferencedistance):
 
 
 def GenerateInitialDictionaries(coords1,coords2,atoms1,atoms2,p1,p2):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indextoreferencecoordinate={}
     indextoreferenceelement={}
     indextomolecule={}
@@ -1111,6 +1335,13 @@ def GenerateInitialDictionaries(coords1,coords2,atoms1,atoms2,p1,p2):
 
 
 def Generate3DMeshGrid(poltype,moleculecoords,probecoords):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     grid=[]
     meshsize=.5 # angstroms, half smallest bond length
     maxdistmolecule,maxcoordmolecule=FindLongestDistanceInMolecule(poltype,moleculecoords)
@@ -1127,6 +1358,13 @@ def Generate3DMeshGrid(poltype,moleculecoords,probecoords):
 
 
 def FindLongestDistanceInMolecule(poltype,coords):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     veclist=[]
     for i in range(len(coords)):
         vec=coords[i]
@@ -1144,6 +1382,13 @@ def FindLongestDistanceInMolecule(poltype,coords):
     return maxdist,maxcoord
 
 def GrabMoleculeCoords(poltype,indextoreferencecoordinate,indextomolecule,moleculekey):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     moleculeatoms=[]
     for i in indextoreferencecoordinate.keys():
         molecule=indextomolecule[i]
@@ -1153,6 +1398,13 @@ def GrabMoleculeCoords(poltype,indextoreferencecoordinate,indextomolecule,molecu
     return coords,moleculeatoms
 
 def FindBestGridPoints(poltype,x,y,z,moleculecoords,probecoords,indextoreferencecoordinate,refcoord,refdistance):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     bestgridpoints=[]
     maxdistprobe,maxcoordprobe=FindLongestDistanceInMolecule(poltype,probecoords)
     differencetopoint={}
@@ -1193,6 +1445,13 @@ def FindBestGridPoints(poltype,x,y,z,moleculecoords,probecoords,indextoreference
 
 
 def TranslateProbe(poltype,indextoreferencecoordinate,bestgridpoint,probecoords,probeatoms,probedonorindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     transvec=np.array(bestgridpoint)-np.array(indextoreferencecoordinate[probedonorindex]) 
     for i in range(len(probecoords)): 
         probecoord=probecoords[i]
@@ -1204,6 +1463,13 @@ def TranslateProbe(poltype,indextoreferencecoordinate,bestgridpoint,probecoords,
 
 
 def GenerateStartingDimers(poltype,indextoreferencecoordinate,indexpairtoreferencedistance,distpairs,indextomolecule):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     moleculecoords,moleculeatoms=GrabMoleculeCoords(poltype,indextoreferencecoordinate,indextomolecule,'molecule1')
     probecoords,probeatoms=GrabMoleculeCoords(poltype,indextoreferencecoordinate,indextomolecule,'molecule2')
     x,y,z=Generate3DMeshGrid(poltype,moleculecoords,probecoords) 
@@ -1231,6 +1497,13 @@ def GenerateStartingDimers(poltype,indextoreferencecoordinate,indexpairtoreferen
 
 
 def optimizedimers(poltype,atoms1, atoms2, coords1, coords2, p1, p2, oridimer,vdwradius,mol,probemol,probeidxtosymclass):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indextoreferencecoordinate,indextoreferenceelement,indextomolecule,indextotargetatom=GenerateInitialDictionaries(coords1,coords2,atoms1,atoms2,p1,p2) 
     indexpairtoreferencedistance,indexpairtobounds,distpairs=GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indextotargetatom,indextoreferenceelement,vdwradius)
     indexpairtoreferencedistanceoriginal=indexpairtoreferencedistance.copy()
@@ -1258,6 +1531,13 @@ def optimizedimers(poltype,atoms1, atoms2, coords1, coords2, p1, p2, oridimer,vd
     return minstructs
 
 def MinimizeDimer(poltype,inputxyz,keyfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     torminlogfname=inputxyz.replace('.xyz','.out')
     mincmdstr = poltype.minimizeexe+' '+inputxyz+' -k '+keyfile+' 0.1'+' '+'>'+torminlogfname
     term,error=poltype.CheckNormalTermination(torminlogfname)
@@ -1276,6 +1556,13 @@ def MinimizeDimer(poltype,inputxyz,keyfile):
 
 
 def ConvertTinktoXYZ(poltype,filename,newfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(os.getcwd()+r'/'+filename,'r')
     tempwrite=open(os.getcwd()+r'/'+newfilename,'w')
     results=temp.readlines()
@@ -1301,6 +1588,13 @@ def ConvertTinktoXYZ(poltype,filename,newfilename):
 
 
 def GenerateProbePathNames(poltype,vdwprobenames,moleculexyz):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     probepaths=[]
     if 'water' in vdwprobenames:
         path=poltype.vdwprobepathname+'water.xyz'
@@ -1311,12 +1605,26 @@ def GenerateProbePathNames(poltype,vdwprobenames,moleculexyz):
 
 
 def readXYZ(poltype,xyz):
+  """
+  Intent:
+  Input:
+  Output:
+  Referenced By: 
+  Description: 
+  """
   atoms  = np.loadtxt(xyz, usecols=(0,), dtype='str', unpack=True, skiprows=2)
   coords = np.loadtxt(xyz, usecols=(1,2,3), dtype='float', unpack=False, skiprows=2)
   return atoms,coords
 
 
 def CheckBuriedAtoms(poltype,indexarray,molecule,zeroindex=False):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indicestodelete=[]
     for i in range(len(indexarray)):
         index=indexarray[i]
@@ -1336,11 +1644,25 @@ def CheckBuriedAtoms(poltype,indexarray,molecule,zeroindex=False):
 
 
 def GrabWaterTypes(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     probeidxtosymclass={1:349,2:350,3:350}
     return probeidxtosymclass
 
 
 def GenerateInitialProbeStructures(poltype,missingvdwatomindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     molecules = [poltype.xyzfname]
     probes = GenerateProbePathNames(poltype,poltype.vdwprobenames,poltype.xyzfname)
     vdwradius = {"H" : 1.20, "Li": 1.82, "Na": 2.27, "K": 2.75, "Rb": 3.03, "Cs": 3.43, \
@@ -1422,6 +1744,13 @@ def GenerateInitialProbeStructures(poltype,missingvdwatomindices):
 
 
 def GrabKeysFromValue(poltype,dic,thevalue):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     keylist=[]
     for key,value in dic.items():
         if value==thevalue:
@@ -1430,6 +1759,13 @@ def GrabKeysFromValue(poltype,dic,thevalue):
 
 
 def ReplaceParameterFileHeader(poltype,paramhead,keyfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tempname='temp.key'
     temp=open(keyfile,'r')
     results=temp.readlines()
@@ -1446,6 +1782,13 @@ def ReplaceParameterFileHeader(poltype,paramhead,keyfile):
     os.rename(tempname,keyfile)
   
 def CheckIfFittingCompleted(poltype,prefix):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     check=False
     files=os.listdir()
     for f in files:
@@ -1456,10 +1799,24 @@ def CheckIfFittingCompleted(poltype,prefix):
 
 
 def intersection(poltype,lst1, lst2):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     lst3 = [value for value in lst1 if value in lst2]
     return lst3
 
 def CombineProbesThatNeedToBeFitTogether(poltype,probeindices,moleculeindices,fullprefixarrays,fulldistarrays,alloutputfilenames):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newprobeindices=[]
     newmoleculeindices=[]
     newprefixarrays=[]
@@ -1555,6 +1912,13 @@ def CombineProbesThatNeedToBeFitTogether(poltype,probeindices,moleculeindices,fu
  
 
 def RemoveIgnoredIndices(poltype,probeindices,moleculeindices,moleculeprobeindicestoignore):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     finalprobeindices=[]
     finalmoleculeindices=[]
     for i in range(len(probeindices)):
@@ -1581,6 +1945,13 @@ def RemoveIgnoredIndices(poltype,probeindices,moleculeindices,moleculeprobeindic
 
 
 def CheckIfProbeIsTooFarOrTooClose(poltype,mol,probeindex,moleculeindex,probeatoms):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     checktoofar=False
     moleculeatom=mol.GetAtom(moleculeindex)
     probeatom=mol.GetAtom(probeindex)
@@ -1612,6 +1983,13 @@ def CheckIfProbeIsTooFarOrTooClose(poltype,mol,probeindex,moleculeindex,probeato
 
 
 def LonePairAboveBelowPlane(moleculeatom,mol,moleculeatomcoords,moleculeindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomiter=openbabel.OBAtomAtomIter(moleculeatom)
     natoms=[]
     found=False
@@ -1643,6 +2021,13 @@ def LonePairAboveBelowPlane(moleculeatom,mol,moleculeatomcoords,moleculeindex):
     return lonepairvecs
 
 def LonePairBisector(moleculeatom,mol,moleculeatomcoords,moleculeindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomiter=openbabel.OBAtomAtomIter(moleculeatom)
     natoms=[]
     for natom in atomiter:
@@ -1667,6 +2052,13 @@ def LonePairBisector(moleculeatom,mol,moleculeatomcoords,moleculeindex):
 
 
 def AddLonePairPoints(poltype,newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms,moleculeindex,probeindex,mol,probeatoms,newfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     added=False
     moleculeatom=mol.GetAtom(moleculeindex)
     atomicnum=moleculeatom.GetAtomicNum()
@@ -1774,6 +2166,13 @@ def AddLonePairPoints(poltype,newdimerfiles,newprobeindices,newmoleculeindices,n
 
 
 def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprobeatoms):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newdimerfiles=[]
     newprobeindices=[]
     newmoleculeindices=[]
@@ -1846,6 +2245,13 @@ def FindMinimumPoints(poltype,dimerfiles,probeindices,moleculeindices,numberprob
     return newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms
 
 def SortStructuresViaEnergy(poltype,newdimerfiles,newprobeindices,newmoleculeindices,newnumberprobeatoms,dimertypetoenergyarray,dimertypetofilenamearray,dimertypetoprobeindexarray,dimertypetonumberofprobeatoms):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for dimertype,energyarray in dimertypetoenergyarray.items():
         moleculeindex=dimertype[0]
         s = np.array(energyarray)
@@ -1885,6 +2291,13 @@ def SortStructuresViaEnergy(poltype,newdimerfiles,newprobeindices,newmoleculeind
 
 
 def WriteFittingResults(poltype,keyname,classkeytofitresults):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(keyname,'r')
     results=temp.readlines()
     temp.close()
@@ -1907,6 +2320,13 @@ def WriteFittingResults(poltype,keyname,classkeytofitresults):
 
 
 def VanDerWaalsOptimization(poltype,missingvdwatomindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltype.WriteToLog('vdW ab initio Dimer Scan and Fitting')
     poltype.parentdir=os.getcwd()+r'/'
     vdwfoldername='vdw'

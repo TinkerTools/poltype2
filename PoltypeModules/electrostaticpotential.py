@@ -16,6 +16,13 @@ from scipy.optimize import fmin
 from PyAstronomy import pyasl
 
 def CheckIfLogFileUsingGaussian(poltype,f):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     use_gaus=False
     temp=open(f,'r')
     results=temp.readlines()
@@ -28,6 +35,13 @@ def CheckIfLogFileUsingGaussian(poltype,f):
 
 
 def gen_esp_grid(poltype,mol,gridnamelist,espnamelist,fchknamelist,cubenamelist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     """
     Intent: Find the QM Electrostatic Potential Grid which can be used for multipole fitting
     Input:
@@ -97,6 +111,13 @@ def gen_esp_grid(poltype,mol,gridnamelist,espnamelist,fchknamelist,cubenamelist)
     return potnamelist
        
 def GrabGridData(poltype,gridname,espname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(espname,'r')
     results=temp.readlines()
     temp.close()
@@ -114,6 +135,13 @@ def GrabGridData(poltype,gridname,espname):
 
       
 def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,numproc,charge,makecube=None):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tempread=open(comfilecoords,'r')
     results=tempread.readlines()
     tempread.close()
@@ -160,6 +188,13 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
 
 
 def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tempread=open(comfilecoords,'r')
     results=tempread.readlines()
     tempread.close()
@@ -205,6 +240,13 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     return inputname
 
 def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newtemp=open(poltype.basissetpath+normalelementbasissetfile,'r')
     results=newtemp.readlines()
     newtemp.close()
@@ -225,6 +267,13 @@ def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetf
 
 
 def GrabFinalPsi4Energy(poltype,logname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     energy=None
     temp=open(logname,'r')
     results=temp.readlines()
@@ -241,6 +290,13 @@ def GrabFinalPsi4Energy(poltype,logname):
     return energy
             
 def CheckRMSPD(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     rmspdexists=False
     poltype.failedrmspd=False
     if os.path.isfile('RMSPD.txt'):
@@ -268,6 +324,13 @@ def CheckRMSPD(poltype):
     return rmspdexists
 
 def IsFloat(poltype,string):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     isfloat=False
     try:
         float(string)
@@ -277,6 +340,13 @@ def IsFloat(poltype,string):
     return isfloat
 
 def ComputeRelativeRMSPD(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     target=[]
     model=[]
     if os.path.isfile('RMSPD.txt'):
@@ -405,6 +475,13 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
 
 
 def GenerateElementToBasisSetLines(poltype,basissetfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     elementtobasissetlines={}
     temp=open(basissetfile,'r')
     results=temp.readlines()
@@ -423,6 +500,13 @@ def GenerateElementToBasisSetLines(poltype,basissetfile):
     return elementtobasissetlines
  
 def CombineFiles(poltype,namelist,name):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     totalresults=[]
     for fname in namelist:
         temp=open(fname,'r')
@@ -438,6 +522,13 @@ def CombineFiles(poltype,namelist,name):
 
 
 def ElectrostaticPotentialFitting(poltype,xyzfnamelist,keyfnamelist,potnamelist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     combinedxyz=CombineFiles(poltype,xyzfnamelist,'combined.xyz')
     combinedpot=CombineFiles(poltype,potnamelist,'combined.pot')
     optmpolecmd = poltype.potentialexe + " 6 " + combinedxyz + " -k " + poltype.key2fnamefromavg + " " + combinedpot + " N "+str(poltype.espgrad)
@@ -453,7 +544,16 @@ def ElectrostaticPotentialFitting(poltype,xyzfnamelist,keyfnamelist,potnamelist)
     shutil.copy(combinedxyz.replace('.xyz','.key'),poltype.key3fnamefrompot)
     return combinedxyz,combinedpot
 
+
+
 def ElectrostaticPotentialComparison(poltype,combinedxyz,combinedpot):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if poltype.deleteallnonqmfiles==True: 
         poltype.WriteToLog("")
         poltype.WriteToLog("=========================================================")
@@ -463,6 +563,13 @@ def ElectrostaticPotentialComparison(poltype,combinedxyz,combinedpot):
         rmspdexists=CheckRMSPD(poltype)
 
 def SPForDMA(poltype,optmol,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if poltype.use_gaus==False or poltype.use_gausoptonly==True:
 
         gen_comfile(poltype,poltype.comdmafname.replace('.com','_temp.com'),poltype.numproc,poltype.maxmem,poltype.maxdisk,poltype.chkdmafname,poltype.comtmp,optmol)
@@ -525,6 +632,13 @@ def SPForDMA(poltype,optmol,mol):
 
 
 def SPForESP(poltype,optmolist,molist,xyzfnamelist,keyfnamelist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     gridnamelist=[]
     espnamelist=[] 
     fchknamelist=[]
@@ -622,6 +736,13 @@ def SPForESP(poltype,optmolist,molist,xyzfnamelist,keyfnamelist):
 
 
 def CheckIfLogFileIsGaussian(poltype,logname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     gaus=False
     temp=open(logname,'r')
     results=temp.readlines()
@@ -635,6 +756,13 @@ def CheckIfLogFileIsGaussian(poltype,logname):
 
 
 def GrabQMDipoles(poltype,optmol,logname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     gaus=False
     gaus=CheckIfLogFileIsGaussian(poltype,logname)
     if gaus==False:
@@ -673,6 +801,13 @@ def GrabQMDipoles(poltype,optmol,logname):
 
 
 def CheckDipoleMoments(poltype,optmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     logname=poltype.logespfname
     if not os.path.exists(logname):
         return
@@ -719,6 +854,13 @@ def CheckDipoleMoments(poltype,optmol):
 
 
 def ConvertDipoleToCOMFrame(poltype,dipole,optmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     nucsum = 0.0
     masssum=0.0
     atomiter=openbabel.OBMolAtomIter(optmol)

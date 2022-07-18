@@ -9,9 +9,17 @@ import keyfilemodifications as keymods
 import os
 import restraints
 import sys
-
+import mdtraj as md
+import warnings
 
 def AverageBoxSizeFromNPTArc(poltype,arcpath,firstframe,lastframe,framestep,index):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     firstline=True
     framecount=0
     framestoextract=np.arange(firstframe,lastframe+1,framestep)
@@ -37,17 +45,27 @@ def AverageBoxSizeFromNPTArc(poltype,arcpath,firstframe,lastframe,framestep,inde
             if framestring in line and (len(linesplit)==1):
                 extractingframe=False
                 framecount+=1
-    aaxisaverage=np.mean(np.array(aaxisarray))
-    baxisaverage=np.mean(np.array(baxisarray))
-    caxisaverage=np.mean(np.array(caxisarray))
+    aaxisarray=np.array(aaxisarray)
+    baxisarray=np.array(baxisarray)
+    caxisarray=np.array(caxisarray)
+    aaxisaverage=np.mean(aaxisarray)
+    baxisaverage=np.mean(baxisarray)
+    caxisaverage=np.mean(caxisarray)
     if index!=None: 
         poltype.tabledict[index]['Average Box Size']=aaxisaverage
         tables.WriteTableUpdateToLog(poltype)
-    return aaxisaverage,baxisaverage,caxisaverage
+    return aaxisaverage,baxisaverage,caxisaverage,aaxisarray,baxisarray,caxisarray
 
 
 
 def EquilbriateDynamicCommand(poltype,steps,ensemble,temp,outputfilename,equilboxfilename,configkeyfilename,NPT=False):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     head,tail=os.path.split(outputfilename)
     outputfilename=tail
     if NPT==False:
@@ -58,6 +76,13 @@ def EquilbriateDynamicCommand(poltype,steps,ensemble,temp,outputfilename,equilbo
     return cmdstr         
 
 def ExecuteEquilibriation(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     jobtolog=[]
     jobtoidx=[]
     jobtojobpath=[]
@@ -204,7 +229,7 @@ def ExecuteEquilibriation(poltype):
                         if poltype.restrainreceptorligand==True: 
                             
 
-                            resposstring='restrain-position -'+str(1)+' '+str(poltype.totalproteinnumber)+' '+str(restrainpositionconstant)+' '+str(poltype.equilrestrainsphereradius)+'\n'
+                            resposstring='restrain-position -'+str(1)+' '+str(poltype.totalreceptornumber)+' '+str(restrainpositionconstant)+' '+str(poltype.equilrestrainsphereradius)+'\n'
                             keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
                             resposstring='# restrain-position for protein atoms\n'
                             keymods.AddKeyWord(poltype,poltype.outputpath+configkeyfilename,resposstring)
@@ -252,11 +277,25 @@ def ExecuteEquilibriation(poltype):
 
 
 def ExtractLastTinkerFrame(poltype,arcfilename,newname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltype.WriteToLog('Extracting the last frame of '+arcfilename,prin=True)
     framenum=int(os.path.getsize(poltype.outputpath+arcfilename)/os.path.getsize(poltype.outputpath+arcfilename.replace('.arc','.xyz')))
     ExtractTinkerFrames(poltype,poltype.outputpath+arcfilename,framenum,framenum,1,framenum,newname)
 
 def ExtractTinkerFrames(poltype,arcpath,firstframe,lastframe,framestep,totalnumberframes,newname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     firstline=True
     framecount=0
     framestoextract=np.arange(firstframe,lastframe+1,framestep)
@@ -303,9 +342,51 @@ def ExtractTinkerFrames(poltype,arcpath,firstframe,lastframe,framestep,totalnumb
     return
 
 
+def CheckPocketWaterIons(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
+    hetatmindextofirstcoords={}
+    t = md.load_arc(poltype.minboxfilename[0])
+    for framecount in range(t.n_frames):
+        for a in t.topology.atoms:
+            zeroindex=a.index    
+            atomidx=zeroindex+1
+            if atomidx in poltype.hetatmindices:
+                vec=t.xyz[framecount,zeroindex,:]*10
+                if framecount==0:
+                    hetatmindextofirstcoords[atomidx]=vec
+
+    t = md.load_arc(poltype.equilarcboxfilename[0])
+    tol=.5
+    for framecount in range(t.n_frames):
+        for a in t.topology.atoms:
+            zeroindex=a.index    
+            atomidx=zeroindex+1
+            if atomidx in poltype.hetatmindices:
+                vec=t.xyz[framecount,zeroindex,:]*10
+                firstvec=hetatmindextofirstcoords[atomidx]
+                dist=np.linalg.norm(firstvec-vec)
+                if dist>poltype.equilrestrainsphereradius+tol:
+                    string='HETATM index '+str(atomidx)+' has moved more than '+str(poltype.equilrestrainsphereradius)+' angstroms away from original spot ('+str(dist)+' angstroms) !. Frame number is '+str(framecount)
+                    warnings.warn(string)
+                    poltype.WriteToLog(string)
+
 
   
 def EquilibriationProtocol(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if poltype.equilfinished==False:
         if poltype.restrainatomgroup1==None and poltype.restrainatomgroup2==None and poltype.complexation==True and poltype.restrainreceptorligand==True:
 
@@ -358,7 +439,7 @@ def EquilibriationProtocol(poltype):
             
             if poltype.productiondynamicsNVT==True:
 
-                aaxis,baxis,caxis=AverageBoxSizeFromNPTArc(poltype,poltype.outputpath+equilarcboxfilename,firstframe,lastframe,1,i)
+                aaxis,baxis,caxis,aaxisarray,baxisarray,caxisarray=AverageBoxSizeFromNPTArc(poltype,poltype.outputpath+equilarcboxfilename,firstframe,lastframe,1,i)
                 for configkeyfilename in configkeyfilenamelist:
                     
                     keymods.RemoveKeyWords(poltype,configkeyfilename,['axis'])
@@ -389,7 +470,12 @@ def EquilibriationProtocol(poltype):
                     for configkeyfilename in configkeyfilenamelist:
                         restraints.AddHarmonicRestrainGroupTermsToKeyFile(poltype,poltype.outputpath+configkeyfilename,annihilatedistances,poltype.distancerestraintconstant,poltype.annihilaterestrainatomgroup1,poltype.annihilaterestrainatomgroup2)
                     restraints.GroupRestraintFreeEnergyFix(poltype,annihilatedistances)
+            if poltype.complexation==True and i==0:
+                CheckPocketWaterIons(poltype)
 
-            poltype.PymolReadableFile(proddynboxfilename,proddynboxfilenamepymol)
-
+            if not os.path.isfile(proddynboxfilenamepymol):
+                poltype.PymolReadableFile(proddynboxfilename,proddynboxfilenamepymol)
+                if poltype.generatepdbtrajs==True and poltype.complexation==True and i==0:
+                    pdbfilename=equilarcboxfilename.replace('.arc','.pdb')
+                    poltype.GeneratePDBFromARC(equilarcboxfilename,pdbfilename)
         

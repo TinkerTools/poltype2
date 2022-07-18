@@ -16,6 +16,13 @@ from rdkit.Chem import rdmolfiles
 
 
 def GenerateProteinTinkerXYZFile(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     proteinindextocoordinates=GenerateUncomplexedProteinPDBFromComplexedPDB(poltype)
     poltype.uncomplexedxyzname=poltype.uncomplexedproteinpdbname.replace('.pdb','.xyz')
     poltype.complexedxyzname=poltype.uncomplexedxyzname.replace('.xyz','_comp.xyz')
@@ -38,8 +45,8 @@ def GenerateProteinTinkerXYZFile(poltype):
     proteinpdbindextoxyzindex=MapXYZToPDB(poltype,poltype.uncomplexedproteinpdbname,poltype.uncomplexedxyzname,uncomplexedatomnum)
     atoms,coord,order,types,connections=readTXYZ(poltype,poltype.uncomplexedxyzname)
     newuncomplexedatomnum=len(atoms)
-    poltype.totalproteinnumber=len(atoms)
-    poltype.proteinindices=list(range(1,len(atoms)+1))
+    poltype.totalreceptornumber=len(atoms)
+    poltype.receptorindices=list(range(1,len(atoms)+1))
     shift= newuncomplexedatomnum- uncomplexedatomnum
     if shift!=0:
         string='WARNING! Missing atoms from original PDB have been added by PDBXYZ. Number of atoms added = '+str(shift)
@@ -63,6 +70,13 @@ def GenerateProteinTinkerXYZFile(poltype):
 
 
 def CombinePDBMaps(poltype,proteinpdbindextoxyzindex,ligandpdbindextoxyzindex,hetatmpdbindextoxyzindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     pdbindextoxyzindex={}
     pdbindextoxyzindex.update(proteinpdbindextoxyzindex)
     pdbindextoxyzindex.update(ligandpdbindextoxyzindex)
@@ -71,6 +85,13 @@ def CombinePDBMaps(poltype,proteinpdbindextoxyzindex,ligandpdbindextoxyzindex,he
 
 
 def MapXYZToPDB(poltype,uncomplexedproteinpdbname,uncomplexedxyzname,uncomplexedatomnum):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     pdbrdkitmol=Chem.MolFromPDBFile(uncomplexedproteinpdbname,removeHs=False,sanitize=False)   
     pdbindextocoords=poltype.GrabIndexToCoordinatesPymol(pdbrdkitmol)
     xyzfilename=poltype.ConvertTinkerXYZToCartesianXYZ(uncomplexedxyzname)
@@ -89,6 +110,13 @@ def MapXYZToPDB(poltype,uncomplexedproteinpdbname,uncomplexedxyzname,uncomplexed
 
 
 def MapXYZCoordstoPDBCoords(poltype,pdbindextocoords,xyzindextocoords,uncomplexedatomnum):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     proteinpdbindextoxyzindex={}
     for pdbindex,pdbcoords in pdbindextocoords.items():
         for xyzindex,xyzcoords in xyzindextocoords.items():
@@ -108,6 +136,13 @@ def MapXYZCoordstoPDBCoords(poltype,pdbindextocoords,xyzindextocoords,uncomplexe
 
 
 def ConvertTinkerXYZToPDB(poltype,xyzfile): 
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     cmdstr=poltype.xyzpdbpath+' '+xyzfile+' '+poltype.prmfilepath 
     submit.call_subsystem(poltype,cmdstr,wait=True)
     pdbfile=xyzfile.replace('.xyz','.pdb')
@@ -115,6 +150,13 @@ def ConvertTinkerXYZToPDB(poltype,xyzfile):
 
 
 def GrabNonLigandHETATMInfo(poltype,complexedproteinpdbname,indextocoordinates,proteinindextocoordinates,lastligindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     nonlighetatmindextocoordinates={}
     nonlighetatmindextotypenum={}
     nonlighetatmindextoconnectivity={}
@@ -151,6 +193,13 @@ def GrabNonLigandHETATMInfo(poltype,complexedproteinpdbname,indextocoordinates,p
 
 
 def GrabConnectivity(poltype,pdbmol,index,shift):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     conn=[]
     bonditer=openbabel.OBMolBondIter(pdbmol)
     for bond in bonditer:
@@ -171,6 +220,13 @@ def GrabConnectivity(poltype,pdbmol,index,shift):
 
 
 def GrabNonLigandHETATMType(poltype,element): # assumes besides ligand and protein, only water and ions
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if element=='O':
         typenum=poltype.waterOtypenum
     elif element=='H':
@@ -182,6 +238,13 @@ def GrabNonLigandHETATMType(poltype,element): # assumes besides ligand and prote
 
 
 def readTXYZ(poltype,TXYZ):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(TXYZ,'r')
     lines = temp.readlines()[1:] #TINKER coordinate starts from second line
     atoms=[];coord=[]
@@ -199,6 +262,13 @@ def readTXYZ(poltype,TXYZ):
 
 
 def SMILESMatches(poltype,ligandsmiles,rdkitmol,pdbmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ligandsmiles=ligandsmiles.replace('=','~').replace('-','~').replace('/','') # sometimes bond order can be different from PDB so remove bond order for detection :)
     p = Chem.MolFromSmarts(ligandsmiles)
     matches=rdkitmol.GetSubstructMatches(p)
@@ -213,6 +283,13 @@ def SMILESMatches(poltype,ligandsmiles,rdkitmol,pdbmol):
 
 
 def GrabLigandCoordinates(poltype,proteinatomnum): # appending after protein, before pocket water and ions
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     firstatomidx=proteinatomnum+1
     indextocoordinates={}
     annihilateindextocoordinates={}
@@ -327,6 +404,13 @@ def GrabLigandCoordinates(poltype,proteinatomnum): # appending after protein, be
 
 
 def SortLigandIndices(poltype,array):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newarray=[]
     firstindicestoarray={}
     for ls in array:
@@ -340,6 +424,13 @@ def SortLigandIndices(poltype,array):
 
 
 def GenerateComplexedTinkerXYZFile(poltype,uncomplexedxyzname,indextocoordinates,uncomplexedatomnum,nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement,listofindextopdbindex,diff):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(uncomplexedxyzname,'r')
     results=temp.readlines()
     temp.close() 
@@ -365,6 +456,13 @@ def GenerateComplexedTinkerXYZFile(poltype,uncomplexedxyzname,indextocoordinates
     return ligandpdbindextoxyzindex
 
 def WriteLigandToXYZ(poltype,temp,atoms,order,lastindex,indextocoordinates,types,connections,indextopdbindex,diff,ligandpdbindextoxyzindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     shift=lastindex
     for idx in range(len(atoms)):
         element=atoms[idx]
@@ -388,6 +486,13 @@ def WriteLigandToXYZ(poltype,temp,atoms,order,lastindex,indextocoordinates,types
     return newindex,ligandpdbindextoxyzindex
 
 def WriteHETATMToXYZ(poltype,temp,nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for index,coords in nonlighetatmindextocoordinates.items():
         typenum=nonlighetatmindextotypenum[index]
         conns=nonlighetatmindextoconnectivity[index]
@@ -403,6 +508,13 @@ def WriteHETATMToXYZ(poltype,temp,nonlighetatmindextocoordinates,nonlighetatmind
 
 
 def GenerateUncomplexedProteinPDBFromComplexedPDB(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     uncomplexedatomindices=[]
     indextocoordinates={}
     temp=open(poltype.complexedproteinpdbname,'r')
@@ -444,6 +556,13 @@ def GenerateUncomplexedProteinPDBFromComplexedPDB(poltype):
 
 
 def GeneratePDBFileFromXYZ(poltype,xyzfile,ligandindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     cmdstr=poltype.xyzpdbpath+' '+xyzfile+' '+poltype.prmfilepath 
     submit.call_subsystem(poltype,cmdstr,wait=True)
     newpdb=xyzfile.replace('.xyz','.pdb')
@@ -485,6 +604,13 @@ def GeneratePDBFileFromXYZ(poltype,xyzfile,ligandindices):
 
 
 def DetectNumberOfChains(poltype,pdbfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(pdbfile,'r')
     results=temp.readlines()
     temp.close()
@@ -500,6 +626,13 @@ def DetectNumberOfChains(poltype,pdbfile):
 
 
 def WriteSEQFile(poltype,filename,code):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     from modeller import Environ,log,Model,Alignment
     from modeller.automodel import LoopModel,refine    # Loa
     e = Environ()
@@ -512,6 +645,13 @@ def WriteSEQFile(poltype,filename,code):
 
 
 def FindCurrentResidueArray(poltype,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(filename,'r')
     results=temp.readlines()
     temp.close()
@@ -526,6 +666,13 @@ def FindCurrentResidueArray(poltype,filename):
 
 
 def FindMissingResidues(poltype,resarray):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     missingresidues=[]
     firstres=1 # dont start at first residue found, start at 1
     lastres=resarray[-1]
@@ -541,6 +688,13 @@ def FindMissingResidues(poltype,resarray):
 
 
 def GrabLetterSequence(poltype,seqfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     lettersequence=[]
     chainsequence=[]
     temp=open(seqfilename,'r')
@@ -573,6 +727,13 @@ def GrabLetterSequence(poltype,seqfilename):
 
 
 def GrabMissingLetterSequence(poltype,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     chainlettertonum={'A':0,'B':1,'C':2,'D':3}
     resnumtomissingthreeletter={}
     resnumtomissingchainseq={}
@@ -601,6 +762,13 @@ def GrabMissingLetterSequence(poltype,filename):
 
 
 def ConvertThreeLetterToSingleLetter(poltype,resnumtomissingthreeletter,threelettercodetosinglelettercode):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     resnumtomissingsingleletter={}
     for resnum,threeletter in resnumtomissingthreeletter.items():
         singleletter=threelettercodetosinglelettercode[threeletter]
@@ -610,6 +778,13 @@ def ConvertThreeLetterToSingleLetter(poltype,resnumtomissingthreeletter,threelet
 
 
 def CombineData(poltype,resnumtomissingsingleletter,resnumtocurrentsingleletter,resnumtomissingchainseq,resnumtocurrentchainseq):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     resnumtochainseq={}
     resnumtomissing={}
     resnumtosingleletter={}
@@ -630,6 +805,13 @@ def CombineData(poltype,resnumtomissingsingleletter,resnumtocurrentsingleletter,
 
 
 def SortByKey(dic):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newdic={}
     for key in sorted(dic):
         newdic[key]=dic[key]
@@ -638,6 +820,13 @@ def SortByKey(dic):
 
 
 def GenerateGapAndFilledArrays(poltype,resnumtochainseq,resnumtomissing,resnumtosingleletter):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     gapresiduearrays=[]
     filledresiduearrays=[]
     chainseqtoresnums={}
@@ -670,6 +859,13 @@ def GenerateGapAndFilledArrays(poltype,resnumtochainseq,resnumtomissing,resnumto
 
 
 def GenerateAlignmentFile(poltype,resnumtochainseq,resnumtomissing,resnumtosingleletter,seqfilename,code):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     gapresiduearrays,filledresiduearrays=GenerateGapAndFilledArrays(poltype,resnumtochainseq,resnumtomissing,resnumtosingleletter)
     alignmentfilename='alignment.ali'
     temp=open(seqfilename,'r')
@@ -685,6 +881,13 @@ def GenerateAlignmentFile(poltype,resnumtochainseq,resnumtomissing,resnumtosingl
     return alignmentfilename,newcode
 
 def WriteAlignmentFileComponent(poltype,temp,results,gapresiduearrays,filledresiduearrays,code,newcode,filled=False):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     count=0
     for line in results:
         linesplit=line.split()
@@ -725,6 +928,14 @@ def WriteAlignmentFileComponent(poltype,temp,results,gapresiduearrays,filledresi
 
 
 def GenerateLoops(poltype,alignmentfilename,newcode,code):
+
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     from modeller import Environ,log,Model,Alignment
     from modeller.automodel import LoopModel,refine    # Loa
     log.verbose()
@@ -742,6 +953,13 @@ def GenerateLoops(poltype,alignmentfilename,newcode,code):
 
 
 def GrabLastGeneratedPDB(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     files=os.listdir()
     timetofilename={}
     for f in files:
@@ -755,6 +973,13 @@ def GrabLastGeneratedPDB(poltype):
 
 
 def FillInMissingResidues(poltype,code):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     from modeller import Environ,log,Model,Alignment
     from modeller.automodel import LoopModel,refine    # Load the AutoModel class
     from Bio.PDB.PDBList import PDBList
@@ -782,6 +1007,13 @@ def FillInMissingResidues(poltype,code):
 
 
 def CallPDB2PQR(poltype,pdbfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     outputfile=pdbfilename.replace('.pdb','.pqr')
     cmdstr='pdb2pqr30'+' '+pdbfilename+' '+outputfile+' '+'--titration-state-method=propka'
     os.system(cmdstr)
@@ -790,6 +1022,13 @@ def CallPDB2PQR(poltype,pdbfilename):
 
 
 def ConvertPQRToPDB(poltype,outputfile,finaloutputfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     obConversion = openbabel.OBConversion()
     mol = openbabel.OBMol()
     inFormat = obConversion.FormatFromExt(outputfile)
@@ -801,17 +1040,38 @@ def ConvertPQRToPDB(poltype,outputfile,finaloutputfile):
 
 
 def CallFpocket(poltype,pythonpath,binpath,complexedproteinpdbname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     cmdstr=pythonpath+' '+poltype.pocketscript+' '+'--bindir='+binpath+' '+'--pdbfile='+complexedproteinpdbname
     os.system(cmdstr)
 
 
 def ReadDictionaryFromFile(jsonfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     with open(jsonfile, 'r') as j:
         dic = json.loads(j.read())
     return dic
 
 
 def ReadPocketGrids(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     pocketnumtocenter=ReadDictionaryFromFile('pocketnumtocenter.json')
     pocketnumtosize=ReadDictionaryFromFile('pocketnumtosize.json')
     return pocketnumtocenter,pocketnumtosize
@@ -819,6 +1079,13 @@ def ReadPocketGrids(poltype):
 
 
 def GrabCorrectPocketGrid(ligcenter,pocketnumtocenter,pocketnumtosize):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     difftopocketnum={}
     for pocketnum,center in pocketnumtocenter.items():
         diff=np.linalg.norm(center-ligcenter) 
@@ -832,6 +1099,13 @@ def GrabCorrectPocketGrid(ligcenter,pocketnumtocenter,pocketnumtosize):
 
 
 def Grid(center,size):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     half=size/2
     minsize=center-half
     maxsize=center+half
@@ -846,6 +1120,13 @@ def Grid(center,size):
 
 
 def DeterminePocketGrid(poltype,indextocoordinates):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     #pythonpath=poltype.which('python')
     #head,tail=os.path.split(pythonpath)
     #pythonpath=Path(head) 
@@ -866,6 +1147,13 @@ def DeterminePocketGrid(poltype,indextocoordinates):
 
 
 def ComputeGridAroundLigand(poltype,indextocoordinates,size):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     xcol=[]
     ycol=[]
     zcol=[]
@@ -892,6 +1180,13 @@ def ComputeGridAroundLigand(poltype,indextocoordinates,size):
 
 
 def SearchInGridIndicesToRestrain(poltype,nonlighetatmindextocoordinates,nonlighetatmindextoelement,minx,maxx,miny,maxy,minz,maxz):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for index,coords in nonlighetatmindextocoordinates.items():
         element=nonlighetatmindextoelement[index]
         if element!='H': # for water only restrain oxygens
@@ -900,6 +1195,13 @@ def SearchInGridIndicesToRestrain(poltype,nonlighetatmindextocoordinates,nonligh
 
 
 def FindWatersIonsInPocketToRestrain(poltype,nonlighetatmindextocoordinates,nonlighetatmindextotypenum,nonlighetatmindextoconnectivity,nonlighetatmindextoelement,indextocoordinates):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltype.indicestorestrain=[]
     indices=list(indextocoordinates.keys())
     for indices in poltype.allligands:

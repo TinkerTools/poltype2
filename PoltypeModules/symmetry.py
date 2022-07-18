@@ -8,6 +8,13 @@ import databaseparser
 
 
 def gen_canonicallabels(poltype,mol,rdkitmol=None,usesym=True,isparent=False):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if rdkitmol==None:
         obConversion = openbabel.OBConversion()
         obConversion.SetOutFormat('mol')
@@ -58,6 +65,13 @@ def gen_canonicallabels(poltype,mol,rdkitmol=None,usesym=True,isparent=False):
 
 
 def ComputeSymmetryTypes(poltype,distmat,rdkitmol,mol,usesym):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indextomatchingindices={}
     indextoGI={}
     if usesym==True:
@@ -83,6 +97,13 @@ def ComputeSymmetryTypes(poltype,distmat,rdkitmol,mol,usesym):
 
 
 def ReadCustomIndexToTypeFiles(poltype,indextotypefile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indextomatchingindices={}
     temp=open(indextotypefile,'r')
     results=temp.readlines()
@@ -99,6 +120,13 @@ def ReadCustomIndexToTypeFiles(poltype,indextotypefile):
 
 
 def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     GI=[]
     atomidx=atom.GetIdx()
     distances=distmat[atomidx]

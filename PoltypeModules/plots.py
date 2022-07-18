@@ -9,6 +9,13 @@ from sklearn.metrics import mean_squared_error
 
 
 def PlotBARConvergence(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if poltype.binding==True:
         compfreeenergy=np.array(poltype.freeenergyconv[0])
         solvfreeenergy=np.array(poltype.freeenergyconv[1])
@@ -29,6 +36,13 @@ def PlotBARConvergence(poltype):
         PlotFreeEnergyConvergence(poltype,freeenergy,freeenergyerror,'Solvation')
 
 def PlotFreeEnergyConvergence(poltype,freeenergy,freeenergyerror,prefix):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     divisor=int(poltype.proddyntime/len(freeenergy))
     x=np.array(list(np.arange(0,poltype.proddyntime,divisor)))
     x+=divisor
@@ -46,6 +60,13 @@ def PlotFreeEnergyConvergence(poltype,freeenergy,freeenergyerror,prefix):
 
 
 def GenerateFreeEnergyScatter(x,y,yerr,imagename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     plt.figure()
     ax = plt.axes()
     ax.scatter(x,y)
@@ -62,6 +83,13 @@ def GenerateFreeEnergyScatter(x,y,yerr,imagename):
 
 
 def PlotFreeEnergyVsExp(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     solvGarray=[]
     solvGerrarray=[]
     solvGexparray=[]
@@ -86,6 +114,13 @@ def PlotFreeEnergyVsExp(poltype):
 
 
 def PlotEnergyData(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     grabbedenergydict=poltype.masterdict['energy']
     patharray=[]
     solvHarray=[]
@@ -249,6 +284,13 @@ def PlotEnergyData(poltype):
         fig3.savefig(poltype.outputpath+'BindBarPlot.png')
 
 def PlotHeatmap(poltype,matrix,xaxis,yaxis):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     shp=matrix.shape
     if len(shp)==2:
         fig, ax = plt.subplots()

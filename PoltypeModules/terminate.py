@@ -5,6 +5,13 @@ import math
 
 
 def CheckTrajectory(poltype,traj):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     foundatomnum=False
     badtraj=False
     poltype.WriteToLog('Checking for issues in trajectory '+traj,prin=True)
@@ -50,6 +57,13 @@ def CheckTrajectory(poltype,traj):
     return badtraj
 
 def CheckBARFile(poltype,filepath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(filepath,'r')
     results=temp.readlines()
     temp.close()
@@ -65,6 +79,13 @@ def CheckBARFile(poltype,filepath):
     return deletefile
 
 def CheckFileTermination(poltype,f,steps=None,equil=False,firsttime=True):
+   """
+   Intent:
+   Input:
+   Output:
+   Referenced By: 
+   Description: 
+   """
    term=False
    error=False
    deletefile=False
@@ -168,6 +189,13 @@ def CheckFileTermination(poltype,f,steps=None,equil=False,firsttime=True):
    return term,deletefile,error
 
 def CheckFilesTermination(poltype,outputfilepathlist,steps=None,equil=False,firsttime=False):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     finished=True
     islist=False
     if type(steps)==list:
@@ -208,6 +236,13 @@ def CheckFilesTermination(poltype,outputfilepathlist,steps=None,equil=False,firs
 
 
 def CheckFileRecentlyUpdated(poltype,outputfilepath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     updated=False
     if os.path.isfile(outputfilepath):
         Ftime=os.path.getmtime(outputfilepath)
@@ -221,6 +256,13 @@ def CheckFileRecentlyUpdated(poltype,outputfilepath):
 
 
 def CheckFilesRecentlyUpdated(poltype,outputfilepathlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     recentlyupdated=False
     for i in range(len(outputfilepathlist)):
         outputfilepath=outputfilepathlist[i]

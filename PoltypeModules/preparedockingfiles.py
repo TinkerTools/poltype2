@@ -13,6 +13,13 @@ conda install -c bioconda mgltools --yes
 
 
 def receptorprep_usage():
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     print("Usage: prepare_receptor4.py -r filename")
     print()
     print("    Description of command...")
@@ -54,6 +61,13 @@ def receptorprep_usage():
 
 
 def PrepareReceptorPDBQT(cmdstr):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     from MolKit import Read
     import MolKit.molecule
     import MolKit.protein
@@ -189,6 +203,13 @@ def PrepareReceptorPDBQT(cmdstr):
 
 
 def gridprep_usage():
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     print("Usage: prepare_gpf4.py -l pdbqt_file -r pdbqt_file ")
     print("     -l ligand_filename")
     print("     -r receptor_filename")
@@ -210,6 +231,13 @@ def gridprep_usage():
 
 
 def ligandprep_usage():
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ("Print helpful, accurate usage statement to stdout.")
     print("Usage: prepare_ligand4.py -l filename")
     print()
@@ -241,6 +269,13 @@ def ligandprep_usage():
     print("                      (default is not to do this)")
 
 def prmfile_usage():
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     print("Usage: prepare_dpf4.py -l pdbqt_file -r pdbqt_file")
     print("    -l ligand_filename")
     print("    -r receptor_filename")
@@ -264,6 +299,13 @@ def prmfile_usage():
 
 
 def PrepareParameterFile(cmdstr):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
 
     import string
     import os.path
@@ -422,6 +464,13 @@ def PrepareParameterFile(cmdstr):
 
 
 def PrepareLigandPDBQT(cmdstr):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     import os 
     from MolKit import Read
     from AutoDockTools.MoleculePreparation import AD4LigandPreparation
@@ -597,6 +646,13 @@ def PrepareLigandPDBQT(cmdstr):
 
 
 def PrepareGridParameterFile(cmdstr):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     import string
     import os.path
     import glob
@@ -699,6 +755,13 @@ def PrepareGridParameterFile(cmdstr):
 
 
 def PrepareDockingFiles(ligandinputfilename,receptorinputfilename,dockgridcenter,dockgridsize,spacing):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
 
     cmdstr='python prepare_receptor4.py -r '+receptorinputfilename
     receptorname=receptorinputfilename.replace('.pdb','.pdbqt')

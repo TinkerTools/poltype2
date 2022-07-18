@@ -11,6 +11,13 @@ import numpy as np
 
 
 def ExecuteLooseMinimization(poltype,boxfilename,keyfilename,outputname,jobtolog,jobtojobpath,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     cmd=MinimizeCommand(poltype,boxfilename,keyfilename,poltype.loosemincriteria,outputname)
     jobtolog[cmd]=poltype.outputpath+poltype.looseminjobsfilename
     jobtojobpath[cmd]=poltype.outputpath
@@ -21,6 +28,13 @@ def ExecuteLooseMinimization(poltype,boxfilename,keyfilename,outputname,jobtolog
     return jobtolog,jobtojobpath,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath
 
 def ExecuteTightMinimization(poltype,boxfilename,key,output,jobtolog,jobtojobpath,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     cmd=MinimizeCommand(poltype,boxfilename+'_2',key,poltype.tightmincriteria,output)
     jobtolog[cmd]=poltype.outputpath+poltype.tightminjobsfilename
     jobtojobpath[cmd]=poltype.outputpath
@@ -31,12 +45,26 @@ def ExecuteTightMinimization(poltype,boxfilename,key,output,jobtolog,jobtojobpat
     return jobtolog,jobtojobpath,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath      
  
 def MinimizeCommand(poltype,xyzfilename,keyfilename,gradrms,outputfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     cmd=poltype.trueminimizepath+' '+xyzfilename+' -k '+keyfilename+' '+str(gradrms)+' '+'> '+outputfilename
     return cmd
 
 
 
 def RestrainWatersIonsInPocket(poltype,key):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for index in poltype.indicestorestrain:
         resposstring='restrain-position -'+str(index)+' '+str(index)+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
         keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
@@ -45,6 +73,13 @@ def RestrainWatersIonsInPocket(poltype,key):
 
 
 def ExpensiveMinimizationProtocol(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if poltype.complexation==True:
         aaxis=poltype.aaxislist[0]
         baxis=poltype.baxislist[0]
@@ -80,7 +115,7 @@ def ExpensiveMinimizationProtocol(poltype):
                 resposstring='restrain-position -'+str(ligandindices[0])+' '+str(ligandindices[-1])+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
                 keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
 
-                resposstring='restrain-position -'+str(1)+' '+str(poltype.totalproteinnumber)+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
+                resposstring='restrain-position -'+str(1)+' '+str(poltype.totalreceptornumber)+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
                 keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
                 key=poltype.configkeyfilename[keyidx][0]
                 RestrainWatersIonsInPocket(poltype,key)
@@ -170,6 +205,13 @@ def ExpensiveMinimizationProtocol(poltype):
             keymods.RemoveKeyWords(poltype,poltype.outputpath+key,['restrain-position'])
 
 def CheapMinimizationProtocol(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if poltype.minfinished==False:
         
         if poltype.complexation==True:
@@ -210,7 +252,7 @@ def CheapMinimizationProtocol(poltype):
                     resposstring='restrain-position -'+str(ligandindices[0])+' '+str(ligandindices[-1])+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
                     keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
 
-                    resposstring='restrain-position -'+str(1)+' '+str(poltype.totalproteinnumber)+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
+                    resposstring='restrain-position -'+str(1)+' '+str(poltype.totalreceptornumber)+' '+str(poltype.restrainpositionconstant)+' '+'0'+'\n'
                     keymods.AddKeyWord(poltype,poltype.outputpath+key,resposstring)
                     key=poltype.configkeyfilename[keyidx][0]
                     RestrainWatersIonsInPocket(poltype,key)
@@ -274,16 +316,27 @@ def CheapMinimizationProtocol(poltype):
             boxfilename=poltype.boxfilename[i]
             minpymolboxfilename=poltype.minboxfilenamepymol[i]
             key=poltype.configkeyfilename[i][0]
-            if os.path.isfile(poltype.outputpath+minboxfilename):
+            if os.path.isfile(poltype.outputpath+minboxfilename) and not os.path.isfile(minpymolboxfilename):
                 poltype.PymolReadableFile(minboxfilename,minpymolboxfilename)
     if poltype.minonly==True:
         sys.exit()
 
 
 def FindTwoAtomsForRestrainingRotation(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     t = md.load_arc(poltype.boxfilename[0])
     atomnames='CA'
     indices = t.topology.select('name %s'%(atomnames))
+    if len(indices)==0: # dna
+        atomnames='C'
+        indices = t.topology.select('name %s'%(atomnames))
+
     indices=[i+1 for i in indices]
     coords=poltype.GrabCoordinates(poltype.boxfilename[0],indices)
     pairs=list(itertools.combinations(coords, 2))

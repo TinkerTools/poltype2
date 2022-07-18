@@ -13,11 +13,27 @@ import sys
 
 
 def GenerateListString(ls):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     ls=[str(i) for i in ls]
     string=','.join(ls)
     return string
 
 def GenerateCommandString(python2path,preparescript,dockgridcenter,dockgridsize,gridspacing,ligandpdbfilename,receptorpdbfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     cmdstr=''
     dockinggridstring=GenerateListString(dockgridcenter)
     dockinggridsizestring=GenerateListString(dockgridsize)
@@ -26,15 +42,39 @@ def GenerateCommandString(python2path,preparescript,dockgridcenter,dockgridsize,
 
 
 def GenerateGridFile(receptorgridname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     cmdstr='autogrid4 '+'-p '+receptorgridname
     os.system(cmdstr)
 
 
 def RunAutoDock4(ad4parameterfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     cmdstr='autodock4 '+'-p '+ad4parameterfilename
     os.system(cmdstr)
 
 def GeneratePDBQTFiles(python2path,prepdockscript,dockgridcenter,dockgridsize,gridspacing,ligandpdbfilename,receptorpdbfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
 
     cmdstr=GenerateCommandString(python2path,prepdockscript,dockgridcenter,dockgridsize,gridspacing,ligandpdbfilename,receptorpdbfilename)
 
@@ -43,6 +83,14 @@ def GeneratePDBQTFiles(python2path,prepdockscript,dockgridcenter,dockgridsize,gr
 
 
 def AutoDock4(python2path,prepdockscript,dockgridcenter,dockgridsize,gridspacing,ligandpdbfilename,receptorpdbfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     receptorname=receptorpdbfilename.replace('.pdb','.pdbqt')
     ligandname=ligandpdbfilename.replace('.pdb','.pdbqt')
     receptorgridname=receptorpdbfilename.replace('.pdb','.gpf')
@@ -55,6 +103,14 @@ def AutoDock4(python2path,prepdockscript,dockgridcenter,dockgridsize,gridspacing
 
 
 def GenerateIndividualLigandFiles(outputposes,dockingprogram,ligandname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     temp=open(outputposes,'r')
     results=temp.readlines()
     temp.close()
@@ -107,6 +163,14 @@ def GenerateIndividualLigandFiles(outputposes,dockingprogram,ligandname):
     return modeltoscore,modeltostructure
 
 def AutoDockVinaVinardo(dockingprogram,receptorname,ligandname,dockgridcenter,dockgridsize,vinaexhaustiveness,nposes):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     outputposes=ligandname.replace('.pdbqt','_'+dockingprogram+'_out'+'.pdbqt')
     from vina import Vina
     v = Vina(sf_name=dockingprogram,verbosity=1)
@@ -120,6 +184,14 @@ def AutoDockVinaVinardo(dockingprogram,receptorname,ligandname,dockgridcenter,do
 
 
 def GenerateGOLDConfigurationFile(ligandfilename,receptorfilename,dockgridcenter,dockgridsize,nposes):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     radius=dockgridsize[0]
     conffile='gold.conf'
     temp=open(conffile,'w')
@@ -205,11 +277,27 @@ def GenerateGOLDConfigurationFile(ligandfilename,receptorfilename,dockgridcenter
     return conffile
 
 def GenerateGOLDCommand(goldbin,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     cmdstr=goldbin+' '+filename
     return cmdstr
 
 
 def GOLDDocking(goldbin,ligandname,receptorname,dockgridcenter,dockgridsize,nposes):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     filename=GenerateGOLDConfigurationFile(ligandname,receptorname,dockgridcenter,dockgridsize,nposes)
     cmdstr=GenerateGOLDCommand(goldbin,filename)
     os.system(cmdstr)
@@ -217,6 +305,14 @@ def GOLDDocking(goldbin,ligandname,receptorname,dockgridcenter,dockgridsize,npos
     return modeltoscoregold,modeltostructuregold
 
 def ParseGOLDOutput(ligandname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     modeltoscoregold={}
     modeltostructuregold={}
     ligandprefix=ligandname.replace('.pdb','')
@@ -243,6 +339,14 @@ def ParseGOLDOutput(ligandname):
 
 
 def CombineDockingInfo(modeltodockoutput,modeltoscore,modeltostructure,dockingprogram,modeltocomplexedstructure,ligandpdbfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     if dockingprogram not in modeltodockoutput.keys():
         modeltodockoutput[dockingprogram]={}
     if ligandpdbfilename not in modeltodockoutput[dockingprogram].keys():
@@ -261,6 +365,14 @@ def CombineDockingInfo(modeltodockoutput,modeltoscore,modeltostructure,dockingpr
 
 
 def FileConverter(inputfilename,informat,outformat):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     outputfilename=inputfilename.replace('.'+informat,'.'+outformat)
     obConversion = openbabel.OBConversion()
     mol = openbabel.OBMol()
@@ -272,6 +384,14 @@ def FileConverter(inputfilename,informat,outformat):
 
 
 def ConvertPDBQTFilesToPDB(modeltostructure):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     newmodeltostructure={}
     for model,structure in modeltostructure.items():
         newstructure=FileConverter(structure,'pdbqt','pdb')
@@ -281,6 +401,14 @@ def ConvertPDBQTFilesToPDB(modeltostructure):
 
 
 def CombineMolObjects(pdbmol,ligmol,complexedstructure):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     iteratombab = openbabel.OBMolAtomIter(ligmol)
     for atm in iteratombab:
         pdbmol.AddAtom(atm)
@@ -298,6 +426,14 @@ def CombineMolObjects(pdbmol,ligmol,complexedstructure):
 
 
 def GenerateComplex(structure,receptorpdbfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     complexedstructure=structure.replace('.pdb','')+'_'+receptorpdbfilename.replace('.pdb','')+'.pdb'
     pdbmol=poltype.GenerateMOLObject(receptorpdbfilename)
     ligmol=poltype.GenerateMOLObject(structure)
@@ -308,6 +444,14 @@ def GenerateComplex(structure,receptorpdbfilename):
 
 
 def AddDockedLigandBackInComplex(modeltostructure,receptorpdbfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     modeltocomplexedstructure={}
     for model,structure in modeltostructure.items():
         complexedstructure=GenerateComplex(structure,receptorpdbfilename)
@@ -317,6 +461,14 @@ def AddDockedLigandBackInComplex(modeltostructure,receptorpdbfilename):
     return modeltocomplexedstructure
 
 def Docking(ligandpdbfilename,receptorpdbfilename,ligandname,receptorname,dockgridcenter,dockgridsize,vinaexhaustiveness,nposes,goldbin,usevina,usead4,usevinardo,usegold,python2path,prepdockscript,gridspacing,modeltodockoutput):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     if usegold==True:
         modeltoscoregold,modeltostructuregold=GOLDDocking(goldbin,ligandpdbfilename,receptorpdbfilename,dockgridcenter,dockgridsize,nposes)
         modeltocomplexedstructuregold=AddDockedLigandBackInComplex(modeltostructuregold,receptorpdbfilename)
@@ -340,6 +492,14 @@ def Docking(ligandpdbfilename,receptorpdbfilename,ligandname,receptorname,dockgr
     return modeltodockoutput
 
 def GenerateDockingReport(modeltodockoutput):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     name='DockingReport.txt'
     temp=open(name,'w')
     for model,dic in modeltodockoutput.items():
@@ -355,6 +515,14 @@ def GenerateDockingReport(modeltodockoutput):
     temp.close()
 
 def DetermineScoreTopPoses(modeltodockoutput):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     modeltoligandtotopposescore={}
     for model,dic in modeltodockoutput.items():
         for lig,nextdic in dic.items():
@@ -370,6 +538,14 @@ def DetermineScoreTopPoses(modeltodockoutput):
 
 
 def DetermineRanking(modeltoligandtotopposescore):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     modeltoligandtorank={}
     for model,ligandtotopposescore in modeltoligandtotopposescore.items():
         newligandtotopposescore={} # sometimes scoring function is negative sometimes positive so keep all positive
@@ -389,6 +565,14 @@ def DetermineRanking(modeltoligandtotopposescore):
 
 
 def ECRScore(rank,ecrexpect,dockingprogram,moleculename,nametomodeltoecrscore):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     ecrscore=(1/ecrexpect)*np.exp(-rank/ecrexpect)
     if moleculename not in nametomodeltoecrscore.keys():
         nametomodeltoecrscore[moleculename]={}
@@ -397,6 +581,15 @@ def ECRScore(rank,ecrexpect,dockingprogram,moleculename,nametomodeltoecrscore):
 
 
 def ExponentialConsensusRank(modeltodockoutput,ecrexpect):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    
+
     nametoconsensusrank={}
     modeltoligandtotopposescore=DetermineScoreTopPoses(modeltodockoutput)
     modeltoligandtorank=DetermineRanking(modeltoligandtotopposescore)
@@ -420,6 +613,14 @@ def ExponentialConsensusRank(modeltodockoutput,ecrexpect):
 
 
 def GenerateConsensusDockingReport(nametoconsensusrank):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     temp=open('ConsensusDockingReport.txt','w')
     for name,consensusrank in nametoconsensusrank.items():
         temp.write('Ligand Name : '+name+' , Consensus Score : '+str(consensusrank)+'\n')
@@ -428,6 +629,14 @@ def GenerateConsensusDockingReport(nametoconsensusrank):
 
 
 def DockingWrapper(poltype,ligandreceptorfilename,dockgridcenter,dockgridsize,vinaexhaustiveness,nposes,goldbin,usevina,usead4,usevinardo,usegold,dockingenvname,prepdockscript,gridspacing,listofligands,ecrexpect):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     pythonpath=poltype.which('python')
     head,tail=os.path.split(pythonpath)
     pythonpath=Path(head) 

@@ -12,6 +12,13 @@ import parametercomparison
 import time
 
 def ComputeBoxSize(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     longestdimx=[]
     longestdimy=[]
     longestdimz=[]
@@ -22,7 +29,7 @@ def ComputeBoxSize(poltype):
         longestdimylist=[]
         longestdimzlist=[]
         for xyz in xyzfilenamelist:
-            if poltype.complexation==True and poltype.solvation==True:
+            if poltype.complexation==True:
 
                 if i==0: # complexation
                     x,y,z=FindDimensionsOfMoleculeTinkerXYZ(poltype,poltype.outputpath+xyz)
@@ -97,6 +104,15 @@ def ComputeBoxSize(poltype):
         poltype.aaxislist=[poltype.aaxis,poltype.aaxis]
         poltype.baxislist=[poltype.baxis,poltype.baxis]
         poltype.caxislist=[poltype.caxis,poltype.caxis]
+        subaaxislist=[poltype.aaxis,poltype.aaxis]
+        subbaxislist=[poltype.baxis,poltype.baxis]
+        subcaxislist=[poltype.caxis,poltype.caxis]
+        suballdim=[poltype.aaxis,poltype.baxis,poltype.caxis]
+        maxdim=max(suballdim)
+        maxidx=suballdim.index(maxdim)
+        maxdirection=[maxidx,maxidx]
+        numberofsubboxes=[1,1]
+
 
     for i in range(len(poltype.tabledict)):
         poltype.tabledict[i]['Initial Box Length']=str(poltype.aaxislist[i])+','+str(poltype.baxislist[i])+','+str(poltype.caxislist[i])
@@ -128,6 +144,13 @@ def ComputeBoxSize(poltype):
     return maxdirection,numberofsubboxes,subaaxislist,subbaxislist,subcaxislist,subvolumelist
  
 def ComputePhysiologicalIonNumber(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     
     if poltype.addphysioions==True:
         if poltype.binding==True:
@@ -165,6 +188,13 @@ def ComputePhysiologicalIonNumber(poltype):
         tables.WriteTableUpdateToLog(poltype)
 
 def ComputeNeutralizingIonNumber(poltype,systemcharge): # this can be just ligand charge or ligand and receptor charge depending on whether this is complexation or solvation    
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tinktypetoelementsym={v: k for k, v in poltype.elementsymtotinktype.items()}
     for i in range(len(systemcharge)):
         chg=systemcharge[i]
@@ -193,16 +223,37 @@ def ComputeNeutralizingIonNumber(poltype,systemcharge): # this can be just ligan
 
 
 def ComputeWaterNumber(poltype,subvolumelist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltype.waternum=[int(round(.0334*i)) for i in poltype.volume] # number of waters per cubic angstroms
     poltype.WriteToLog('Water Number '+str(poltype.waternum))
     subwaternum=[int(round(.0334*i)) for i in subvolumelist]
     return subwaternum
 
 def RemoveBoxSizeTerms(poltype,keyfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     keymods.RemoveKeyWords(poltype,keyfile,['axis'])
 
 
 def FindDimensionsOfMoleculeTinker(poltype,structurefilepath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     veclist=[]
     temp=open(structurefilepath,'r')
     results=temp.readlines()
@@ -236,6 +287,13 @@ def FindDimensionsOfMoleculeTinker(poltype,structurefilepath):
     return maxdist
 
 def FindDimensionsOfMoleculeTinkerXYZ(poltype,structurefilepath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     veclist=[]
     temp=open(structurefilepath,'r')
     results=temp.readlines()
@@ -278,6 +336,13 @@ def FindDimensionsOfMoleculeTinkerXYZ(poltype,structurefilepath):
 
 
 def TotalAtomNumber(poltype,xyzfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atomnum=[]
     for subls in xyzfilename:
         tot=0
@@ -298,6 +363,13 @@ def TotalAtomNumber(poltype,xyzfilename):
 
 
 def FindNumberTinkerXYZAtoms(poltype,xyzfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(poltype.outputpath+xyzfilename,'r')
     results=temp.readlines()
     temp.close()
@@ -305,6 +377,13 @@ def FindNumberTinkerXYZAtoms(poltype,xyzfilename):
     return atomnum
 
 def GrabTypeNumber(poltype,typedescrip):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(poltype.prmfilepath,'r')
     results=temp.readlines()
     temp.close()
@@ -315,6 +394,13 @@ def GrabTypeNumber(poltype,typedescrip):
     return typenum
    
 def CreateWaterXYZ(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(poltype.outputpath+'water.xyz','w')
     temp.write('3'+'\n')
     temp.write('1  O      8.019814    5.892935    0.449481   '+str(poltype.waterOtypenum)+'     2     3'+'\n')
@@ -325,6 +411,13 @@ def CreateWaterXYZ(poltype):
       
 
 def CreateSolventBox(poltype,aaxis,baxis,caxis,waternum,filename,key):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newfilename=filename+'_2'
     if not os.path.isfile(newfilename):
         temp=open(poltype.outputpath+'xyzedit.in','w')
@@ -344,12 +437,26 @@ def CreateSolventBox(poltype,aaxis,baxis,caxis,waternum,filename,key):
 
 
 def SoakMoleculeInSolventBox(poltype,xyzfilename,keyfilename,solventbox):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     cmdstr=poltype.xyzeditpath+' '+xyzfilename+' '+'-k'+' '+keyfilename+' '+'24'+' '+solventbox
     submit.call_subsystem(poltype,cmdstr,wait=True)    
     newname=NewTinkerFileName(poltype,xyzfilename)
     return newname
 
 def AddIonToSolventBox(poltype,solutexyzfilename,keyfilename,tinktype,ionnum,soluteindices,writesolute=True):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     inputfile='xyzedit'+'.in'
     temp=open(poltype.outputpath+inputfile,'w')
     if writesolute==True:
@@ -378,6 +485,13 @@ def AddIonToSolventBox(poltype,solutexyzfilename,keyfilename,tinktype,ionnum,sol
 
 
 def AddIonsToSolventBox(poltype,solutexyzfilename,keyfilename,iontypetoionnumberneut,iontypetoionnumberphysio,soluteindices,writesolute=True):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     iontypetototalionnum=CombineDictionaries(poltype,[iontypetoionnumberneut,iontypetoionnumberphysio])
     for tinktype in iontypetototalionnum.keys():
         ionnum=iontypetototalionnum[tinktype]
@@ -387,6 +501,13 @@ def AddIonsToSolventBox(poltype,solutexyzfilename,keyfilename,iontypetoionnumber
 
 
 def CombineDictionaries(poltype,diclist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     combined={}
     for dic in diclist:
         for key,value in dic.items():
@@ -398,6 +519,13 @@ def CombineDictionaries(poltype,diclist):
 
 
 def RemoveTempFiles(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     files=os.listdir()
     for f in files:
         if '.' in f:
@@ -408,6 +536,13 @@ def RemoveTempFiles(poltype):
 
 
 def GrabIonIndexes(poltype,ionnumber,boxfilename,iontypenumber):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ionindexes=[]
     count=0     
     temp=open(boxfilename,'r')
@@ -426,6 +561,13 @@ def GrabIonIndexes(poltype,ionnumber,boxfilename,iontypenumber):
     return ionindexes
 
 def GrabTotalMass(xyzfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     symboltomass = {'H': 1.007825, 'C': 12.01, 'O': 15.9994, 'N': 14.0067, 'S': 31.972071,'P': 30.973762,'F':18.998,'Cl':35.453,'Br':79.904,'I':126.904}
     temp=open(xyzfilename,'r')
     results=temp.readlines()
@@ -446,6 +588,13 @@ def GrabTotalMass(xyzfilename):
 
 
 def WrapStrayAtomsBackInBox(poltype,newname,key):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(poltype.outputpath+'xyzedit.in','w')
     temp.write('18'+'\n')
     temp.write('\n')
@@ -458,6 +607,13 @@ def WrapStrayAtomsBackInBox(poltype,newname,key):
 
 
 def ShiftSolventBoxCoordinates(poltype,newfilename,key,shiftvector):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(poltype.outputpath+'xyzedit.in','w')
     temp.write('12'+'\n')
     temp.write(str(shiftvector[0])+' '+str(shiftvector[1])+' '+str(shiftvector[2])+'\n')
@@ -470,6 +626,13 @@ def ShiftSolventBoxCoordinates(poltype,newfilename,key,shiftvector):
 
 
 def NewTinkerFileName(poltype,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     time.sleep(1)
     prevcount=1
     numtofiles={}
@@ -494,6 +657,13 @@ def NewTinkerFileName(poltype,filename):
 
 
 def AppendXYZs(poltype,xyztoappend,key):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     firstxyz=xyztoappend[0]
     for i in range(1,len(xyztoappend)):
         xyz=xyztoappend[i]
@@ -503,6 +673,13 @@ def AppendXYZs(poltype,xyztoappend,key):
 
 
 def AppendXYZ(poltype,firstxyz,xyz,key):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(poltype.outputpath+'xyzedit.in','w')
     temp.write('22'+'\n')
     temp.write(str(xyz)+'\n')
@@ -515,6 +692,13 @@ def AppendXYZ(poltype,firstxyz,xyz,key):
 
 
 def CorrectVolume(poltype,xyz,axis):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tempxyz=xyz.replace('.xyz','_TEMP.xyz')
     temp=open(xyz,'r')
     results=temp.readlines()
@@ -534,6 +718,13 @@ def CorrectVolume(poltype,xyz,axis):
 
 
 def GrabIndicesFromType(poltype,xyz,types):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indices=[]
     statexyzatominfo,stateindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=parametercomparison.GrabXYZInfo(poltype,xyz)
     for stateindex,typeindex in stateindextotypeindex.items():
@@ -545,6 +736,13 @@ def GrabIndicesFromType(poltype,xyz,types):
 
 
 def MakeLigandsConsecutive(poltype,finalxyz,allligandtypes):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(finalxyz,'r')
     results=temp.readlines()
     temp.close()
@@ -585,6 +783,13 @@ def MakeLigandsConsecutive(poltype,finalxyz,allligandtypes):
 
 
 def BoxSetupProtocol(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltype.WriteToLog('Computing volume ',prin=True)
     maxdirection,numberofsubboxes,subaaxislist,subbaxislist,subcaxislist,subvolumelist=ComputeBoxSize(poltype)
     ligandtypes=[]
@@ -617,7 +822,8 @@ def BoxSetupProtocol(poltype):
         subaaxis=subaaxislist[i]
         subbaxis=subbaxislist[i]
         subcaxis=subcaxislist[i]
-        subwater=subwaternum[i]
+        if poltype.neatliquidsim==False:
+            subwater=subwaternum[i]
         maxdir=maxdirection[i]
         numboxes=numberofsubboxes[i]
         if not os.path.isfile(poltype.outputpath+boxxyzfilename):

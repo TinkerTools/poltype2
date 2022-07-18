@@ -14,6 +14,14 @@ from scipy.interpolate import interp1d
 from scipy.optimize import fmin
 
 def BgnTypeToNewType(poltype,bgnstatexyz,endstatexyz):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     bgnstatexyzatominfo,bgnstateindextotypeindex,bgnstateatomnum,bgnindextocoords,bgnindextoneighbs,indextosym=GrabXYZInfo(poltype,bgnstatexyz)
     endstatexyzatominfo,endstateindextotypeindex,endstateatomnum,endindextocoords,endindextoneighbs,indextosym=GrabXYZInfo(poltype,endstatexyz)
     bgnstateindextoendstateindex=BgnIndexToNewIndex(poltype,bgnstatexyz,endstatexyz)
@@ -35,6 +43,14 @@ def BgnTypeToNewType(poltype,bgnstatexyz,endstatexyz):
 
 
 def GrabXYZInfo(poltype,xyzfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     temp=open(xyzfile,'r')
     xyzfileresults=temp.readlines()
     temp.close()
@@ -66,6 +82,14 @@ def GrabXYZInfo(poltype,xyzfile):
     return xyzatominfo,indextotypeindex,xyzatomnum,indextocoords,indextoneighbs,indextosym
 
 def CorrectBondOrder(poltype,themol,structurefile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     if structurefile!=None:
         obConversion = openbabel.OBConversion()
         mol = openbabel.OBMol()
@@ -89,6 +113,14 @@ def CorrectBondOrder(poltype,themol,structurefile):
 
 
 def BgnIndexToNewIndex(poltype,bgnstatexyz,endstatexyz):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     bgncartxyz=poltype.ConvertTinktoXYZ(bgnstatexyz,bgnstatexyz.replace('.xyz','_cart.xyz'))
     endcartxyz=poltype.ConvertTinktoXYZ(endstatexyz,endstatexyz.replace('.xyz','_cart.xyz'))
     obConversion = openbabel.OBConversion()
@@ -120,6 +152,14 @@ def BgnIndexToNewIndex(poltype,bgnstatexyz,endstatexyz):
     return bgnstateindextoendstateindex
 
 def UpdateXYZAndKeyFiles(poltype,bgnstatetypeindextoendstatetypeindex,bgnstatexyz,bgnstatekey,bgnindextoendcoords):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     
     tempbgnstatexyz=bgnstatexyz.replace('.xyz','_TEMP.xyz')
     ReplaceXYZCoords(poltype,bgnstatexyz,bgnindextoendcoords,tempbgnstatexyz)
@@ -130,6 +170,14 @@ def UpdateXYZAndKeyFiles(poltype,bgnstatetypeindextoendstatetypeindex,bgnstatexy
     return newbgnxyzfile,newbgnkeyfile
 
 def ReplaceXYZCoords(poltype,bgnstatexyz,bgnindextoendcoords,tempname,replace=True):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     temp=open(bgnstatexyz,'r')
     results=temp.readlines()
     temp.close()
@@ -154,6 +202,14 @@ def ReplaceXYZCoords(poltype,bgnstatexyz,bgnindextoendcoords,tempname,replace=Tr
 
 
 def ReplaceKeywordsInFile(poltype,bgnstate,newbgnfile,bgnstatetypeindextoendstatetypeindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     temp=open(bgnstate,'r')
     results=temp.readlines()
     temp.close()
@@ -173,6 +229,14 @@ def ReplaceKeywordsInFile(poltype,bgnstate,newbgnfile,bgnstatetypeindextoendstat
 
 
 def CompareParameters(poltype,endstatexyz,endstatekey,newbgnxyzfile,newbgnkeyfile,bgnstatetypeindextoendstatetypeindex,bgnstateindextotypeindex,endstateindextotypeindex,analyzepath,energycutoff,bgnstatekey,potentialexe,poleditpath,endindextoneighbs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     endalzout='endkeyalz.out'
     poltype.CallAnalyze(endstatexyz,endstatekey,endalzout,analyzepath,'d')
     endvdwindicestoenergy,endbondindicestoenergy,endangleindicestoenergy,endopbendindicestoenergy,endtorsionindicestoenergy=GrabOutput(poltype,endalzout) 
@@ -234,6 +298,14 @@ def CompareParameters(poltype,endstatexyz,endstatekey,newbgnxyzfile,newbgnkeyfil
     CompareDihedralScans(poltype,tortypes,analyzepath,newbgnxyzfile,newbgnkeyfile,endstatexyz,endstatekey)
 
 def FindTransferTorsions(poltype,torsionindicestocommentslist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     transfertors=[]
     fittors=[]
     for torsionindices,commentslist in torsionindicestocommentslist.items():
@@ -262,6 +334,14 @@ def FindTransferTorsions(poltype,torsionindicestocommentslist):
     return transfertors
 
 def GrabTorsionIndices(poltype,stateindextotypeindex,indextoneighbs,tortype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     allindices=[]
     for typenum in tortype:
         indexes=GrabKeysFromValue(poltype,stateindextotypeindex,typenum)
@@ -277,6 +357,14 @@ def GrabTorsionIndices(poltype,stateindextotypeindex,indextoneighbs,tortype):
 
 
 def CompareDihedralScans(poltype,tortypes,analyzepath,newbgnxyzfile,newbgnkeyfile,endstatexyz,endstatekey):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     xyzfilename=poltype.ConvertTinkerXYZToCartesianXYZ(newbgnxyzfile)
     bgnmol=poltype.ReadLigandRdkitMol(xyzfilename)
     bgnmol,atomindextoformalcharge=poltype.CheckLigandInputCharge(bgnmol)
@@ -323,6 +411,14 @@ def CompareDihedralScans(poltype,tortypes,analyzepath,newbgnxyzfile,newbgnkeyfil
 
 
 def PlotConformationalEnergy(poltype,dihedral_energies_bgn,dihedral_energies_end,tortype,dihedral_degrees):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     newbgn=[]
     newend=[]
     newdeg=[]
@@ -371,6 +467,14 @@ def PlotConformationalEnergy(poltype,dihedral_energies_bgn,dihedral_energies_end
 
 
 def FindAMOEBA09Matches(poltype,typetoprmlinelist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     typeprmtoamoeba09matchlist=[]
     temp=open(poltype.amoeba09prmfilepath,'r')
     results=temp.readlines()
@@ -446,6 +550,14 @@ def FindAMOEBA09Matches(poltype,typetoprmlinelist):
 
 
 def FindComments(poltype,typeindicestoenergylist,statekey,prmtypes):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     temp=open(statekey,'r')
     results=temp.readlines()
     temp.close()
@@ -506,6 +618,14 @@ def FindComments(poltype,typeindicestoenergylist,statekey,prmtypes):
 
 
 def CompareVDW(poltype,bgnvdwtypetoprmline,endvdwtypetoprmline,bgnstatetypeindextoendstatetypeindex,bgnstateindextotypeindex,endstateindextotypeindex,vdwbgntypeindicestocomments,vdwendtypeindicestocomments,vdwbgntypeprmtoamoeba09match,vdwendtypeprmtoamoeba09match):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     for bgntype,bgnprmline in bgnvdwtypetoprmline.items():
         endtype=bgnstatetypeindextoendstatetypeindex[bgntype[0]]
         endtype=tuple([endtype])
@@ -550,6 +670,14 @@ def CompareVDW(poltype,bgnvdwtypetoprmline,endvdwtypetoprmline,bgnstatetypeindex
                 print('amoeba09 match '+str(ls))
 
 def GrabEndFrames(poltype,endstatekey,bgnstatetypeindextoendstatetypeindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     typenumtoframe={}
     temp=open(endstatekey,'r')
     results=temp.readlines()
@@ -566,6 +694,14 @@ def GrabEndFrames(poltype,endstatekey,bgnstatetypeindextoendstatetypeindex):
     return typenumtoframe
 
 def CompareESP(poltype,newbgnxyzfile,newbgnkeyfile,endstatexyz,endstatekey,potentialexe,analyzepath,bgnstatetypeindextoendstatetypeindex,endstateindextotypeindex,poleditpath,endindextoneighbs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     newbgnxyzfilename=newbgnxyzfile.replace('.xyz','_potentialcompare.xyz')
     newbgnkeyfilename=newbgnkeyfile.replace('.key','_potentialcompare.key')
     shutil.copy(endstatexyz,newbgnxyzfilename) # need same atom order
@@ -584,6 +720,14 @@ def CompareESP(poltype,newbgnxyzfile,newbgnkeyfile,endstatexyz,endstatekey,poten
     return newbgnkeyfilename
 
 def RotateBeginKeyFrames(poltype,poleditpath,atomindextoframeindices,bgnxyzfilename,bgnkeyfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     temp=open('poledit.in','w')
     for atomindex,frameindices in atomindextoframeindices.items():
         frameindices=[str(i) for i in frameindices]
@@ -600,6 +744,14 @@ def RotateBeginKeyFrames(poltype,poleditpath,atomindextoframeindices,bgnxyzfilen
 
 
 def ConvertTypesToIndices(poltype,endstateindextotypeindex,typenumtoframe,endindextoneighbs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     atomindextoframeindices={}
     for typenum,frame in typenumtoframe.items():
         allindices=[]
@@ -628,6 +780,14 @@ def ConvertTypesToIndices(poltype,endstateindextotypeindex,typenumtoframe,endind
     return atomindextoframeindices
 
 def CheckIfAtomsConnected(poltype,poscomb,endindextoneighbs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     checkconsec=True
     if len(poscomb)>1:
         for i in range(len(poscomb)-1):
@@ -644,6 +804,14 @@ def CheckIfAtomsConnected(poltype,poscomb,endindextoneighbs):
 
 
 def GrabKeysFromValue(poltype,dic,thevalue):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     keylist=[]
     for key,value in dic.items():
         if value==thevalue:
@@ -652,6 +820,14 @@ def GrabKeysFromValue(poltype,dic,thevalue):
 
 
 def AddPairVdwParameterLines(poltype,vdwtypetoprmline,stateindextotypeindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     newvdwtypetoprmline={}
     vdwtypes=[]
     for vdwtype,prmline in vdwtypetoprmline.items():
@@ -674,6 +850,14 @@ def AddPairVdwParameterLines(poltype,vdwtypetoprmline,stateindextotypeindex):
     return newvdwtypetoprmline
 
 def GrabParameterLines(poltype,statekey,string,prmtypes):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     typeindicestoprmline={}
     classtotypes={}
     temp=open(statekey,'r')
@@ -726,6 +910,14 @@ def GrabParameterLines(poltype,statekey,string,prmtypes):
     return typeindicestoprmline
 
 def TypeIndicesToIndices(poltype,typenums,idxtosymclass):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     allindices=[]
     for typenum in typenums: 
         indexes=GrabKeysFromValue(poltype,idxtosymclass,typenum)
@@ -734,6 +926,14 @@ def TypeIndicesToIndices(poltype,typenums,idxtosymclass):
 
 
 def CompareEnergies(poltype,endtypeindicestoenergylist,bgntypeindicestoenergylist,bgnstatetypeindextoendstatetypeindex,energycutoff,stringlist,endtypetoprmlinelist,bgntypetoprmlinelist,bgnstateindextotypeindex,endstateindextotypeindex,bgntypeindicestocommentslist,endtypeindicestocommentslist,bgntypeprmtoamoeba09matchlist,endtypeprmtoamoeba09matchlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     
     for i in range(len(endtypeindicestoenergylist)):
         endtypeindicestoenergy=endtypeindicestoenergylist[i]
@@ -798,6 +998,14 @@ def CompareEnergies(poltype,endtypeindicestoenergylist,bgntypeindicestoenergylis
 
 
 def ConvertIndicesToTypes(poltype,indicestoenergy,indextotypeindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     typeindicestoenergy={}
     for indices,energy in indicestoenergy.items():
         typeindices=[]
@@ -818,6 +1026,14 @@ def ConvertIndicesToTypes(poltype,indicestoenergy,indextotypeindex):
 
 
 def GrabTinkerEnergy(poltype,alzfname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     tot_energy = None
     if os.path.isfile(alzfname):  
         tmpfh = open(alzfname, 'r')
@@ -830,6 +1046,14 @@ def GrabTinkerEnergy(poltype,alzfname):
 
 
 def GrabOutput(poltype,alzout):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     
     vdwindicestoenergy={}
     bondindicestoenergy={}
@@ -870,6 +1094,14 @@ def GrabOutput(poltype,alzout):
     return vdwindicestoenergy,bondindicestoenergy,angleindicestoenergy,opbendindicestoenergy,torsionindicestoenergy
 
 def GrabIndicesAndEnergy(poltype,linesplit,indexlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     indices=[]
     for index in indexlist:
         indexele=linesplit[index] 
@@ -881,6 +1113,14 @@ def GrabIndicesAndEnergy(poltype,linesplit,indexlist):
 
 
 def SanitizeKey(poltype,keyfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     temp=open(keyfilename,'r')
     results=temp.readlines()
     temp.close()
@@ -919,6 +1159,14 @@ def SanitizeKey(poltype,keyfilename):
 
 
 def CompareBgnEndParameters(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     SanitizeKey(poltype,poltype.bgnstatekey)
     SanitizeKey(poltype,poltype.endstatekey)
     bgnstatetypeindextoendstatetypeindex,bgnstateindextotypeindex,endstateindextotypeindex,bgnindextoendcoords,typestocopy,endindextoneighbs=BgnTypeToNewType(poltype,poltype.bgnstatexyz,poltype.endstatexyz)
@@ -929,6 +1177,14 @@ def CompareBgnEndParameters(poltype):
 
 
 def DihedralAngleScan(poltype,xyzfilename,keyfilename,torsion,mol,analyzepath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     rdkittorsion=[i-1 for i in torsion]
     a,b,c,d=rdkittorsion[:]
     dihedral_energies = []

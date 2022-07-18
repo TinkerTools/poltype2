@@ -16,6 +16,13 @@ import time
 import warnings
 
 def GrabMoleculeOrder(poltypepathlist,nametopropsarray):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     nametoarrayindexorder={}
     for name in nametopropsarray.keys():
         if name=='':
@@ -33,6 +40,13 @@ def GrabMoleculeOrder(poltypepathlist,nametopropsarray):
 
 
 def GrabArrayInputs(nametopropsarray,nametoarrayindexorder):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     arrayindexordertoname = {v: k for k, v in nametoarrayindexorder.items()}
     temperature_list=[]
     pressure_list=[]
@@ -58,6 +72,13 @@ def GrabArrayInputs(nametopropsarray,nametoarrayindexorder):
 
 
 def FindIndexWithString(string,array):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     found=False
     for i in range(len(array)):
         e=array[i]
@@ -70,6 +91,13 @@ def FindIndexWithString(string,array):
 
 
 def CheckNoneValue(value):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     try:
         float(value)
     except:
@@ -78,6 +106,13 @@ def CheckNoneValue(value):
 
 
 def ReadCSVFile(csvfileread,poltypepathlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     with open(csvfileread, newline='') as csvfile:
         reader = list(csv.reader(csvfile, delimiter=',', quotechar='|'))
         header=reader[0]
@@ -134,6 +169,13 @@ def ReadCSVFile(csvfileread,poltypepathlist):
 
 
 def ShapeOfArray(array):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     dimlist=[]
     rows=len(array)
     dimlist.append(rows)
@@ -144,6 +186,13 @@ def ShapeOfArray(array):
     return dimlist
 
 def CheckInputShapes(listofarrays):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     combs=itertools.combinations(listofarrays, 2)
     for comb in combs:
         arr1=comb[0]
@@ -154,6 +203,13 @@ def CheckInputShapes(listofarrays):
             raise ValueError('Input dimensions for Temperature, Pressure or Density are not the same') 
 
 def GenerateNoneList(targetshape):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ls=[]
     rows=targetshape[0]
     cols=targetshape[1:]
@@ -169,6 +225,13 @@ def GenerateNoneList(targetshape):
 
 
 def CombineData(temperature_list,pressure_list,enthalpy_of_vaporization_list,enthalpy_of_vaporization_err_list,surface_tension_list,surface_tension_err_list,relative_permittivity_list,relative_permittivity_err_list,isothermal_compressibility_list,isothermal_compressibility_err_list,isobaric_coefficient_of_volume_expansion_list,isobaric_coefficient_of_volume_expansion_err_list,heat_capacity_at_constant_pressure_list,heat_capacity_at_constant_pressure_err_list,density_list,density_err_list,citation_list):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     listoftptopropdics=[]
     for i in range(len(temperature_list)):
         temperatures=temperature_list[i]
@@ -233,6 +296,13 @@ def CombineData(temperature_list,pressure_list,enthalpy_of_vaporization_list,ent
 
        
 def AddDefaultValues(tptoproptovalue):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for tp,proptovalue in tptoproptovalue.items():
         globaldic={}
         defaultdenomvalue=1
@@ -263,6 +333,13 @@ def AddDefaultValues(tptoproptovalue):
 
 
 def WriteCSVFile(listoftpdics,nvtprops,molname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     firsttpdic=listoftpdics[0]
     firsttpdicvalues=list(firsttpdic.values())
     firsttppointvalues=firsttpdicvalues[0]
@@ -328,6 +405,13 @@ def WriteCSVFile(listoftpdics,nvtprops,molname):
                         
 
 def GenerateLiquidCSVFile(nvtprops,listoftptopropdics,molnamelist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indextogeneratecsv={}
     for i in range(len(molnamelist)):
         allunknown=True
@@ -359,6 +443,13 @@ def GenerateLiquidCSVFile(nvtprops,listoftptopropdics,molnamelist):
     return indextogeneratecsv
 
 def ReadInPoltypeFiles(poltypepathlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     dimertinkerxyzfileslist=[]
     dimerenergieslist=[]
     dimersplogfileslist=[]
@@ -426,12 +517,26 @@ def ReadInPoltypeFiles(poltypepathlist):
  
 
 def GrabMonomerEnergy(line,Hartree2kcal_mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     linesplit=line.split()
     energy=float(linesplit[4]) 
     monomerenergy=(energy)
     return monomerenergy
 
 def CheckIfLogFileUsingGaussian(f):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     use_gaus=False
     temp=open(f,'r')
     results=temp.readlines()
@@ -444,6 +549,13 @@ def CheckIfLogFileUsingGaussian(f):
 
  
 def ReadQMLogFile(dimersplogfiles):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     Hartree2kcal_mol=627.5095
     dimerenergies=[]
     newdimersplogfiles=[]
@@ -487,6 +599,13 @@ def ReadQMLogFile(dimersplogfiles):
 
 
 def GrabVdwTypeLinesFromFinalKey(keyfilelist,vdwtypeslist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     vdwtypelineslist=[]
     for i in range(len(keyfilelist)):
         vdwtypelines=[]
@@ -505,6 +624,13 @@ def GrabVdwTypeLinesFromFinalKey(keyfilelist,vdwtypeslist):
     return vdwtypelineslist
 
 def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogether,keyfilelines,addwaterprms,prmfilelines,vdwprmtypestofit,vdwtypestoeval,vdwtypeslist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     vdwtypetoindex={'S':2,'T':3,'D':4}
     prmtypestofit=[vdwtypetoindex[i] for i in vdwprmtypestofit]
     if 2 in prmtypestofit and 3 in prmtypestofit:
@@ -633,6 +759,13 @@ def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogethe
     return molprmfilepath
     
 def RemoveKeyWord(keypath,keystring):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     read=open(keypath,'r')
     results=read.readlines()
     read.close()
@@ -647,6 +780,13 @@ def RemoveKeyWord(keypath,keystring):
 
 
 def CommentOutVdwLines(keypath,vdwtypes):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     read=open(keypath,'r')
     results=read.readlines()
     read.close()
@@ -673,6 +813,13 @@ def CommentOutVdwLines(keypath,vdwtypes):
 
 
 def GenerateLiquidTargetsFolder(gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,liquidxyzfilelist,datacsvpathlist,densitylist,originalliquidfolder,prmfilepath,moleculeprmfilename,vdwtypeslist,addwaterprms,molnamelist,indextogeneratecsv):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     liquidfolderlist=[]
     for i in range(len(gaskeyfilelist)):
         gencsv=indextogeneratecsv[i]
@@ -722,6 +869,13 @@ def GenerateLiquidTargetsFolder(gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,
     return liquidfolderlist
 
 def FindDimensionsOfMoleculeTinker(structurefilepath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     veclist=[]
     temp=open(structurefilepath,'r')
     results=temp.readlines()
@@ -743,6 +897,13 @@ def FindDimensionsOfMoleculeTinker(structurefilepath):
     return mindist
 
 def ComputeBoxLength(xyzfile,addextra=False):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     vdwcutoff=12 #in angstrom
     longestdim=FindDimensionsOfMoleculeTinker(xyzfile)
     aaxis = 2*float(vdwcutoff)+longestdim+4
@@ -753,6 +914,13 @@ def ComputeBoxLength(xyzfile,addextra=False):
 
 
 def CreateSolventBox(axis,molnumber,prmfilepath,xyzeditpath,tinkerxyzname,molname,keyfilels,molprmfilepath,liquidkeyfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     head,tail=os.path.split(tinkerxyzname)
     key=tail.replace('.xyz','.key')
     temp=open(key,'w')
@@ -776,6 +944,13 @@ def CreateSolventBox(axis,molnumber,prmfilepath,xyzeditpath,tinkerxyzname,molnam
     return liquidxyzfile
 
 def call_subsystem(cmdstr,wait=False):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     print('Calling: '+cmdstr,flush=True)
     p = subprocess.Popen(cmdstr, shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if wait==True:
@@ -785,6 +960,13 @@ def call_subsystem(cmdstr,wait=False):
 
 
 def InsertKeyfileHeader(keyfilename,moleculeprmfilename,axis):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     ewaldcutoff=7
     integrator="RESPA"
     thermostat="BUSSI"
@@ -822,6 +1004,13 @@ def InsertKeyfileHeader(keyfilename,moleculeprmfilename,axis):
 
 
 def AddKeyWord(keypath,string):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     read=open(keypath,'r')
     results=read.readlines()
     read.close()
@@ -840,6 +1029,13 @@ def AddKeyWord(keypath,string):
 
 
 def WaterParameters():
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     lines=[]
     lines.append('atom          349    90    O     "AMOEBAWaterO"               8    15.995    2')
     lines.append('atom          350    91    H     "AMOEBAWaterH"               1     1.008    1')
@@ -864,6 +1060,13 @@ def WaterParameters():
     return lines
 
 def GenerateNewKeyFile(keyfile,prmfilepath,moleculeprmfilename,axis,addwaterprms,molname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     liquidkeyfile=shutil.copy(keyfile,os.path.join(os.getcwd(),molname+'_liquid.key'))
     RemoveKeyWord(liquidkeyfile,'parameters')
     temp=open(prmfilepath,'r')
@@ -878,6 +1081,13 @@ def GenerateNewKeyFile(keyfile,prmfilepath,moleculeprmfilename,axis,addwaterprms
 
 
 def Minimize(liquidxyzfile,keyfile,minimizepath,prmfilepath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     head,tail=os.path.split(prmfilepath)
     newprmfilepath=os.path.join(os.getcwd(),tail)
     shutil.copy(prmfilepath,newprmfilepath)
@@ -890,6 +1100,13 @@ def Minimize(liquidxyzfile,keyfile,minimizepath,prmfilepath):
 
 
 def Analyze(liquidxyzfile,keyfile,analyzepath,prmfilepath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     head,tail=os.path.split(prmfilepath)
     newprmfilepath=os.path.join(os.getcwd(),tail)
     shutil.copy(prmfilepath,newprmfilepath)
@@ -900,6 +1117,13 @@ def Analyze(liquidxyzfile,keyfile,analyzepath,prmfilepath):
 
 
 def CheckBondEnergy(outputfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(outputfile,'r')
     results=temp.readlines()
     temp.close()
@@ -915,6 +1139,13 @@ def CheckBondEnergy(outputfile):
 
 
 def RemoveBoxLine(xyzfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tempname=xyzfile.replace('.xyz','_TEMP.xyz')
     temp=open(xyzfile,'r')
     results=temp.readlines()
@@ -929,6 +1160,13 @@ def RemoveBoxLine(xyzfile):
 
 
 def AddKeyWord(keypath,string):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     read=open(keypath,'r')
     results=read.readlines()
     read.close()
@@ -942,6 +1180,13 @@ def AddKeyWord(keypath,string):
     os.rename(tempkeyname,keypath)
 
 def RemoveKeyWord(keypath,keystring):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     read=open(keypath,'r')
     results=read.readlines()
     read.close()
@@ -956,6 +1201,13 @@ def RemoveKeyWord(keypath,keystring):
 
 
 def DynamicCommand(dynamicpath,steps,ensemble,temp,outputfilename,boxfilename,configkeyfilename,timestep,writefreq,pressure=None):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if pressure==None:
         cmdstr=dynamicpath+' '+boxfilename+' '+ '-k'+' '+configkeyfilename+' '+str(steps)+' '+ str(timestep)+' '+ str(writefreq)+' '+str(ensemble)+' '+str(temp)+' '+ ' > '+outputfilename  
     else:
@@ -966,6 +1218,13 @@ def DynamicCommand(dynamicpath,steps,ensemble,temp,outputfilename,boxfilename,co
 
 
 def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist,indextogeneratecsv,keyfilelines,minimizepath,molprmfilepath,finalxyzfilelist,analyzepath,dynamicpath,relaxFBbox):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     gaskeyfilelist=[]
     gasxyzfilelist=[]
     liquidkeyfilelist=[]
@@ -1067,6 +1326,13 @@ def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfile
 
 
 def ExtractTinkerFrames(arcpath,firstframe,lastframe,framestep,totalnumberframes,newname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     firstline=True
     framecount=0
     framestoextract=np.arange(firstframe,lastframe+1,framestep)
@@ -1113,6 +1379,13 @@ def ExtractTinkerFrames(arcpath,firstframe,lastframe,framestep,totalnumberframes
     return
 
 def GenerateQMTargetsFolder(dimertinkerxyzfileslist,dimerenergieslist,liquidkeyfilelist,originalqmfolder,vdwtypeslist,molnamelist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     qmfolderlist=[]
     qmfolderlisttogen={}
     for j in range(len(dimertinkerxyzfileslist)):
@@ -1187,6 +1460,13 @@ def GenerateQMTargetsFolder(dimertinkerxyzfileslist,dimerenergieslist,liquidkeyf
     return qmfolderlist,qmfolderlisttogen
 
 def ReadLigandOBMol(structfname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tmpconv = openbabel.OBConversion()
     inFormat = openbabel.OBConversion.FormatFromExt(structfname)
     tmpconv.SetInFormat(inFormat)
@@ -1196,6 +1476,13 @@ def ReadLigandOBMol(structfname):
 
 
 def GenerateRdkitMol(ligandfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tmpmol=ReadLigandOBMol(ligandfilename)
     tmpconv = openbabel.OBConversion()
     tmpconv.SetOutFormat('mol')
@@ -1206,6 +1493,13 @@ def GenerateRdkitMol(ligandfilename):
 
 
 def GenerateRdkitMolList(ligandfilenamelist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     rdkitmollist=[]
     for ligandfilename in ligandfilenamelist:
         rdkitmol=GenerateRdkitMol(ligandfilename)
@@ -1214,6 +1508,13 @@ def GenerateRdkitMolList(ligandfilenamelist):
 
 
 def SanitizeMMExecutable(executable,tinkerdir):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     # Try to find Tinker executable with/without suffix
     if which(executable)!=None:
         return executable
@@ -1228,6 +1529,13 @@ def SanitizeMMExecutable(executable,tinkerdir):
     return exe
 
 def which(program):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     def is_exe(fpath):
         try:
              return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
@@ -1249,6 +1557,13 @@ def which(program):
 
 
 def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderlist,optimizefilepath,atomnumlist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_timestep,gas_interval,md_threads,indextogeneratecsv,qmfoldertoindex,qmfolderlisttogen,WQ_PORT,gas_prod_steps,qmrelativeweight,liqrelativeweight,enthalpyrelativeweight,densityrelativeweight):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     head,tail=os.path.split(optimizefilepath)
     newoptimizefilepath=os.path.join(os.getcwd(),tail)
     shutil.copy(optimizefilepath,newoptimizefilepath)
@@ -1322,6 +1637,13 @@ def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderl
 
 
 def ShiftVdwTypesLines(vdwtypelineslist,oldtypetonewtypelist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newvdwtypelineslist=[]
     for i in range(len(vdwtypelineslist)):
         newvdwtypelines=[]
@@ -1339,6 +1661,13 @@ def ShiftVdwTypesLines(vdwtypelineslist,oldtypetonewtypelist):
     return newvdwtypelineslist 
 
 def ShiftTypes(typeslist,oldtypetonewtypelist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if typeslist==None:
         return typeslist
     newtypeslist=[]
@@ -1355,6 +1684,13 @@ def ShiftTypes(typeslist,oldtypetonewtypelist):
     return newtypeslist
 
 def FilterHighEnergy(dimertinkerxyzfileslist,dimerenergieslist,dimersplogfileslist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tol=10 # kcal/mol
     Hartree2kcal_mol=627.5095
     newdimertinkerxyzfileslistoflist=[]
@@ -1409,6 +1745,13 @@ def FilterHighEnergy(dimertinkerxyzfileslist,dimerenergieslist,dimersplogfilesli
 
 
 def GrabNumericDensity(density_list):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     densitylist=[]
     for ls in density_list:
         if len(ls)!=0:
@@ -1424,6 +1767,13 @@ def GrabNumericDensity(density_list):
 
 
 def SeperateHomoDimerAndWater(dimertinkerxyzfileslist,dimerenergieslist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newdimertinkerxyzfileslist=[]
     newdimerenergieslist=[]
     for i in range(len(dimertinkerxyzfileslist)):
@@ -1451,6 +1801,13 @@ def SeperateHomoDimerAndWater(dimertinkerxyzfileslist,dimerenergieslist):
 
 
 def GenerateQMFolderToCSVIndex(qmfolderlist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     qmfoldertoindex={}
     prefixtoarray={}
     for i in range(len(qmfolderlist)):
@@ -1468,6 +1825,13 @@ def GenerateQMFolderToCSVIndex(qmfolderlist):
     return qmfoldertoindex
 
 def CopyFilesMoveParameters(keyfilelist,molnamelist,oldtypetonewtypelist,xyzfilelist,finalxyzfilelist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newxyzfilelist=[]
     newkeyfilelist=[]
     newfinalxyzfilelist=[]
@@ -1532,6 +1896,13 @@ def CopyFilesMoveParameters(keyfilelist,molnamelist,oldtypetonewtypelist,xyzfile
 
 
 def RemoveExtraFiles():
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     files=os.listdir()
     for f in files:
         if not os.path.isdir(f):
@@ -1543,6 +1914,13 @@ def RemoveExtraFiles():
 
 
 def ShiftXYZTypes(newxyz,oldtypetonewtype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(newxyz,'r')
     newresults=temp.readlines()
     temp.close()
@@ -1570,6 +1948,13 @@ def ShiftXYZTypes(newxyz,oldtypetonewtype):
 
 
 def ShiftDimerXYZTypes(dimertinkerxyzfileslist,oldtypetonewtypelist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newdimertinkerxyzfileslist=[]
     for i in range(len(dimertinkerxyzfileslist)):
         subls=dimertinkerxyzfileslist[i]
@@ -1587,6 +1972,13 @@ def ShiftDimerXYZTypes(dimertinkerxyzfileslist,oldtypetonewtypelist):
     return newdimertinkerxyzfileslist
 
 def ReadPRMFile(prmfilepath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     prmfilelines=[]
     temp=open(prmfilepath,'r')
     prmfilelines=temp.readlines()
@@ -1595,6 +1987,13 @@ def ReadPRMFile(prmfilepath):
     return prmfilelines
 
 def GenerateForceBalanceInputs(poltype,poltypepathlist,vdwtypeslist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_prod_steps,gas_timestep,gas_interval,md_threads,liquid_prod_time,gas_prod_time,WQ_PORT,csvexpdatafile,fittypestogether,vdwprmtypestofit,vdwtypestoeval,liquid_equ_time,gas_equ_time,qmrelativeweight,liqrelativeweight,enthalpyrelativeweight,densityrelativeweight,relaxFBbox):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     
 
     debugmode=False

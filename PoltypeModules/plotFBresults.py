@@ -21,6 +21,13 @@ from random import randint
 import shutil
 
 def GrabJobDirectories(fbdir):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     jobdirs=[]
     files=os.listdir(fbdir)
     for f in files:
@@ -37,6 +44,13 @@ def GrabJobDirectories(fbdir):
 
 
 def GrabOutputFiles(jobdirs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     outputfiles=[]
     for path in jobdirs:
         os.chdir(path)
@@ -50,6 +64,13 @@ def GrabOutputFiles(jobdirs):
 
 
 def GrabCubeFiles(groupedpoltypedirs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     nametocubefiles={}
     curdir=os.getcwd()
     groupednames=[]
@@ -76,6 +97,13 @@ def GrabCubeFiles(groupedpoltypedirs):
 
 
 def GrabPoltypeDirectories(jobdirs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     poltypedirs=[]
     groupedpoltypedirs=[]
     curdir=os.getcwd()
@@ -94,6 +122,13 @@ def GrabPoltypeDirectories(jobdirs):
 
 
 def ReadInputGrabPaths(filepath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(filepath,'r')
     results=temp.readlines()
     temp.close()
@@ -110,6 +145,13 @@ def ReadInputGrabPaths(filepath):
 
 
 def GrabResultsAllMolecules(outputfiles):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tpdiclist=[]
     qmdiclist=[]
     newoutputfiles=[]
@@ -124,6 +166,13 @@ def GrabResultsAllMolecules(outputfiles):
     return tpdiclist,qmdiclist,newoutputfiles
 
 def GrabResults(outputfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tpdic={}
     qmdic={}
     temp=open(outputfile,'r')
@@ -249,6 +298,13 @@ def GrabResults(outputfile):
 
 
 def PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     
     nametotptofinalprops={}
     nametoformulatormse={}
@@ -314,12 +370,26 @@ def PlotAllFBJobs(tpdiclist,qmtargetnamedic,nametofilenametoformula,truenametoin
     return nametotptofinalprops,nametoformulatormse,nametoformulatomse,listofmoleculenametoproptoimagenames
 
 def GrabStructure(formula):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     files=os.listdir()
     for f in files:
         if formula in f and '.xyz' in f and 'tinkermincart' not in f:
             return f
 
 def GrabMolecule(newname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     obConversion = openbabel.OBConversion()
     newmol = openbabel.OBMol()
     inFormat = obConversion.FormatFromExt(newname)
@@ -329,6 +399,13 @@ def GrabMolecule(newname):
 
 
 def GrabDistanceAndElements(mol,indices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     atoms=[mol.GetAtom(i) for i in indices]
     coords=[np.array([atom.GetX(),atom.GetY(),atom.GetZ()]) for atom in atoms]
     distance=np.linalg.norm(coords[0]-coords[1])
@@ -339,6 +416,13 @@ def GrabDistanceAndElements(mol,indices):
     return distance,prefix
 
 def PlotFBQM(targetdic,formula,indices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     distances=targetdic['Distances']
     refvalues=np.transpose(np.array(targetdic['Ref']))
     calcvalues=np.transpose(np.array(targetdic['Calc']))
@@ -383,6 +467,13 @@ def PlotFBQM(targetdic,formula,indices):
 
 
 def PlotFBLiq(tpdic,nametotptofinalprops):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     moleculetoproptoimagenames={}
     for name in tpdic.keys():
         dic=tpdic[name]
@@ -497,6 +588,13 @@ def PlotFBLiq(tpdic,nametotptofinalprops):
     return nametotptofinalprops,moleculetoproptoimagenames
 
 def ScatterPlot2D(title,x,y1,y2,xkey,ykey,labels):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     x=np.array(x)
     y1=np.array(y1)
     y2=np.array(y2)
@@ -523,6 +621,13 @@ def ScatterPlot2D(title,x,y1,y2,xkey,ykey,labels):
 
 
 def ScatterPlot1D(title,x,y1,xkey,ykey,labels,interpolate=True,correlation=False):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     x=np.array(x)
     y1=np.array(y1)
     plt.figure()
@@ -551,6 +656,13 @@ def ScatterPlot1D(title,x,y1,xkey,ykey,labels,interpolate=True,correlation=False
 
 
 def GrabFinalNeatLiquidTrajectories(jobdirs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     moltotptoarc={}
     moltomaxiter={}
     ext='.arc'
@@ -605,6 +717,13 @@ def GrabFinalNeatLiquidTrajectories(jobdirs):
 
 
 def GrabDimerDistanceInfo(qmdiclist,jobdirs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     qmtargetnamedic={}
     nametodimerstructs={}
     truenametoindices={}
@@ -695,10 +814,24 @@ def GrabDimerDistanceInfo(qmdiclist,jobdirs):
 
 
 def Chunks(lst, n):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
 def ChunksList(gen):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newlst=[]
     for item in gen:
         newlst.append(item)
@@ -706,6 +839,13 @@ def ChunksList(gen):
 
 
 def PlotAllESPSurfaces(nametocubefiles):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for name in nametocubefiles.keys():
         cubefiles=nametocubefiles[name]
         if not os.path.isdir(name):
@@ -717,6 +857,13 @@ def PlotAllESPSurfaces(nametocubefiles):
 
 
 def PlotAllDimers(nametodimerstructs,truenametoindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     nametofilenametoformula={} 
     for name in nametodimerstructs.keys():
         dic=nametodimerstructs[name]
@@ -755,6 +902,13 @@ def PlotAllDimers(nametodimerstructs,truenametoindices):
 
 
 def GetMonomerFormula(monomer):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     monomerformula=''
     temp=open(monomer,'r')
     results=temp.readlines()
@@ -780,6 +934,13 @@ def GetMonomerFormula(monomer):
 
 
 def GetDimerFormula(monomerformula,newfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     dimerformula=''
     if 'water' in newfilename:
         dimerformula+=monomerformula+'-'+'H2O'
@@ -789,6 +950,13 @@ def GetDimerFormula(monomerformula,newfilename):
 
 
 def GrabMonomer(filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(filename,'r')
     results=temp.readlines()
     temp.close()
@@ -823,6 +991,13 @@ def GrabMonomer(filename):
 
 
 def WriteFile(dimername,tinkerxyzlines):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(dimername,'w')
     for line in tinkerxyzlines:
         temp.write(line)
@@ -831,6 +1006,13 @@ def WriteFile(dimername,tinkerxyzlines):
 
 
 def ConvertTinkerXYZToCartesian(filename,newfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(filename,'r')
     tempwrite=open(newfilename,'w')
     results=temp.readlines()
@@ -854,6 +1036,13 @@ def ConvertTinkerXYZToCartesian(filename,newfilename):
 
 
 def SmallestDivisor(n):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     a=[]
     for i in range(2,n+1):
         if(n%i==0):
@@ -863,6 +1052,13 @@ def SmallestDivisor(n):
 
 
 def PlotESPSurfaces(name,cubefiles):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     from pymol import cmd,preset,util
     from pymol.vfont import plain
     from pymol.cgo import CYLINDER,cyl_text
@@ -891,6 +1087,13 @@ def PlotESPSurfaces(name,cubefiles):
 
 
 def PlotDimers3D(filenamearray,allindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     from pymol import cmd,preset,util
     from pymol.vfont import plain
     from pymol.cgo import CYLINDER,cyl_text
@@ -971,6 +1174,13 @@ def PlotDimers3D(filenamearray,allindices):
 
 
 def FindDimensionsOfMolecule(xyzfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     veclist=[]
     temp=open(xyzfile,'r')
     results=temp.readlines()
@@ -1011,6 +1221,13 @@ def FindDimensionsOfMolecule(xyzfile):
 
 
 def ParseXYZ(xyzpath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(xyzpath,'r')
     results=temp.readlines()
     temp.close()
@@ -1055,6 +1272,13 @@ def ParseXYZ(xyzpath):
     return nummolecules,numatomspermol,indextoelement
 
 def PlotAllRDFs(moltotptoarc,neatliqnametoindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for mol,tptoarc in moltotptoarc.items():
         if not os.path.isdir(mol):
             os.mkdir(mol)
@@ -1078,6 +1302,13 @@ def PlotAllRDFs(moltotptoarc,neatliqnametoindices):
 
 
 def GeneratePairs(nummolecules,numatomspermol,indextoelement,indicesarray):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     elementcounts={}
     for index,element in indextoelement.items():
         if index>numatomspermol:
@@ -1116,6 +1347,13 @@ def GeneratePairs(nummolecules,numatomspermol,indextoelement,indicesarray):
 
 
 def PlotRDF(mol,tp,t,indicesmat,pair,dimerformula):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     plt.figure()
     title=mol+' '+dimerformula+' '+pair+' '+tp+' '+'RDF'
     imagename=title+'.png'
@@ -1133,6 +1371,13 @@ def PlotRDF(mol,tp,t,indicesmat,pair,dimerformula):
 
 
 def ExtractNeatLiquidIndices(truenametoindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     neatliqnametoindices={}
     for truename,indices in truenametoindices.items():
         if 'water' in truename:
@@ -1151,6 +1396,13 @@ def ExtractNeatLiquidIndices(truenametoindices):
 
 
 def WriteOutParamTable(moltotypetoprms,moltotypetoelement,moltotypetofitrad,moltotypetofitdep,moltotypetofitred):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tempname='SummaryParams.csv'
     nametoallprmlines={}
     elementtoprmlines={}
@@ -1203,6 +1455,13 @@ def WriteOutParamTable(moltotypetoprms,moltotypetoelement,moltotypetofitrad,molt
 
 
 def PlotLiquidPropsCorrelation(nametotptofinalprops):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     curdir=os.getcwd()
     for name,tptofinalprops in nametotptofinalprops.items():
         if not os.path.isdir(name):
@@ -1267,6 +1526,13 @@ def PlotLiquidPropsCorrelation(nametotptofinalprops):
     os.chdir(curdir)
 
 def PlotLiquidPropsVsTemp(nametotptofinalprops):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     curdir=os.getcwd()
     nametotemparray={}
     nametoproptokeytoarray={}
@@ -1328,6 +1594,13 @@ def PlotLiquidPropsVsTemp(nametotptofinalprops):
 
 
 def WriteOutPropTable(nametotptofinalprops,moltomaxiter,targetdensityerror,targetenthalpyerror):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tempname='SummaryProps.csv'
     densityerrors=[]
     densityrelerrors=[]
@@ -1431,6 +1704,13 @@ def WriteOutPropTable(nametotptofinalprops,moltomaxiter,targetdensityerror,targe
 
 
 def GrabFinalParameters(jobdirs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     prmfiles=[]
     curdir=os.getcwd()
     for jobdir in jobdirs:
@@ -1459,6 +1739,13 @@ def GrabFinalParameters(jobdirs):
 
 
 def GrabMolFromTypes(moltotypes,typenum):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for mol,types in moltotypes.items():
         for otypenum in types:
             if typenum==otypenum:
@@ -1466,6 +1753,13 @@ def GrabMolFromTypes(moltotypes,typenum):
 
 
 def GrabParameterValues(prmfiles):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     moltotypetoprms={}
     moltotypetoelement={}
     moltotypetofitrad={}
@@ -1574,6 +1868,13 @@ def GrabParameterValues(prmfiles):
 
 
 def WriteOutQMTable(nametoformulatormse,nametoformulatomse):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tempname='SummaryQM.csv'
     with open(tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -1588,6 +1889,13 @@ def WriteOutQMTable(nametoformulatormse,nametoformulatomse):
 
                     
 def PlotLiquidPropsCorrelationForGroups(nametotptofinalprops,groupednames,nametotemparray):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     grptoproptofig={}
     grptoproptoaxes={}
     grptopropnametocalc={}
@@ -1674,6 +1982,13 @@ def PlotLiquidPropsCorrelationForGroups(nametotptofinalprops,groupednames,nameto
 
  
 def PlotLiquidPropsVsTempForGroups(nametotemparray,nametoproptokeytoarray,groupednames):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     grptoproptofig={}
     grptoproptoaxes={}
     for grp in groupednames:
@@ -1728,6 +2043,13 @@ def PlotLiquidPropsVsTempForGroups(nametotemparray,nametoproptokeytoarray,groupe
 
 
 def ComputeQMAverages(nametoformulatormse):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     rmsehomodimers=[]
     rmseheterodimers=[]
     rmsealldimers=[]
@@ -1769,6 +2091,13 @@ def ComputeQMAverages(nametoformulatormse):
     return nametodimerqmerror
 
 def WriteOutParamAndAvgErrorTable(nametopropavgerrors,nametodimerqmerror,nametoallprmlines):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tempname='SummaryParamsAvgPropErrorQMError.csv'
     with open(tempname, mode='w') as energy_file:
         energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -1812,6 +2141,13 @@ def WriteOutParamAndAvgErrorTable(nametopropavgerrors,nametodimerqmerror,nametoa
 
 
 def FindSameParameters(prmcsvname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     data = pd.read_csv(prmcsvname, quotechar='"', skipinitialspace=True)
     radiuscol=data.loc[:,['Radius']]
     depthcol=data.loc[:,['Depth']]
@@ -1837,6 +2173,13 @@ def FindSameParameters(prmcsvname):
 
 
 def FindSameParametersSingleCol(col):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     datatosameindices={}
     values=[]
     for i in range(len(col)):
@@ -1859,6 +2202,13 @@ def FindSameParametersSingleCol(col):
 
 
 def GenerateIndicesToColor(data,dataslicetosameindices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     rowindextocolumnindices={}
     rowindextocolorindex={}
     header=list(data.head())
@@ -1878,6 +2228,13 @@ def GenerateIndicesToColor(data,dataslicetosameindices):
     return rowindextocolumnindices,rowindextocolorindex
 
 def MakeExcelFile(propcsvname,prmcsvname,qmcsvname,rowindextocolumnindices,rowindextocolorindex):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     from openpyxl.styles import Color, PatternFill, Font, Border
     from openpyxl.styles import colors
     from openpyxl.cell import Cell
@@ -1930,6 +2287,13 @@ def MakeExcelFile(propcsvname,prmcsvname,qmcsvname,rowindextocolumnindices,rowin
 
 
 def GenerateImagePropGrid(listofmoleculenametoproptoimagenames):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for moleculenametoproptoimagename in listofmoleculenametoproptoimagenames:
         proptoimages={}
         molnames=[]
@@ -1944,6 +2308,13 @@ def GenerateImagePropGrid(listofmoleculenametoproptoimagenames):
 
 
 def WriteOutGridImage(moleculenames,filenamearray,prop):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     curdir=os.getcwd()
     molsPerImage=len(filenamearray)
     if (molsPerImage % 2) == 0 or (molsPerImage ** 0.5) % 1==0:
@@ -2006,6 +2377,13 @@ def WriteOutGridImage(moleculenames,filenamearray,prop):
 
 
 def PlotForceBalanceResults(fbdir,targetdensityerror,targetenthalpyerror):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     curdir=os.getcwd()
     jobdirs=GrabJobDirectories(fbdir)
     outputfiles=GrabOutputFiles(jobdirs)

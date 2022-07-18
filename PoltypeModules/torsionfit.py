@@ -22,6 +22,13 @@ import databaseparser
 
 
 def CheckGeometricRestraintEnergy(poltype,alzfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(alzfile,'r')
     results=temp.readlines()
     temp.close()
@@ -35,7 +42,11 @@ def CheckGeometricRestraintEnergy(poltype,alzfile):
 
 def insert_torprmdict_angle(poltype,angle, angledict):
     """
-    Intent: Increase the count of this angle by one
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
     """
     anglekey = int(angle)
     if anglekey in angledict:
@@ -124,6 +135,13 @@ def fitfunc (poltype,parms, x,torset, torprmdict,keyonlylist=None,nfoldonlylist=
 
 
 def CheckIfLogFileUsingGaussian(poltype,f):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     use_gaus=False
     temp=open(f,'r')
     results=temp.readlines()
@@ -275,6 +293,13 @@ def compute_mm_tor_energy(poltype,mol,torset,designatexyz,flatphaselist,keyfile 
 
 
 def ReadAnglesFromOutputFile(poltype,torset,newtorxyzfname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     cartxyz=torgen.ConvertTinktoXYZ(poltype,newtorxyzfname,newtorxyzfname.replace('.xyz','_cart.xyz'))
     angles=[]
     themol = opt.load_structfile(poltype,cartxyz)
@@ -290,6 +315,13 @@ def ReadAnglesFromOutputFile(poltype,torset,newtorxyzfname):
 
 
 def GrabTinkerEnergy(poltype,toralzfname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     tot_energy = None
     tor_energy = None
     if os.path.isfile(toralzfname):  
@@ -327,6 +359,13 @@ def find_del_list(poltype,mme_list,current_ang_list):
     return del_ang_list
 
 def sum_xy_list(poltype,x1,y1,x2,y2):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for xx in x1:
         if xx in x2:
             idx1 = x1.index(xx)
@@ -335,9 +374,12 @@ def sum_xy_list(poltype,x1,y1,x2,y2):
 
 def find_least_connected_torsion(poltype,torprmdict,toralreadyremovedlist):
     """
-    Find least connected torsion (i.e. the two outer atoms have the highest summed class number)
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
     """
-
     least_connected_tor = None
     highest_clssum = 0
     keylist = torprmdict.keys()
@@ -396,6 +438,13 @@ def prune_qme_error(poltype,indicesremoved,*arr_list):
 
     
 def FindRemovedIndices(poltype,ang_list,del_ang_list,indicesremoved=None):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     if indicesremoved!=None:
         pass
     else:
@@ -638,6 +687,13 @@ def insert_torprmdict(poltype,mol, torprmdict,max_amp):
 
 
 def GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     lowerbounds=[]
     upperbounds=[]
     for chkclskey in torprmdict:
@@ -683,6 +739,13 @@ def GenerateBoundaries(poltype,max_amp,refine,initialprms,torprmdict):
     return tuple(bounds)
        
 def GenerateNewParmGuessAndBounds(poltype,parm):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     bounds=[]
     if parm<0:
         newparmguess=-1.5
@@ -696,6 +759,13 @@ def GenerateNewParmGuessAndBounds(poltype,parm):
 
 
 def ModifyInitialGuessAndBoundries(poltype,parameterinfo,pzero,boundstup):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     boundstup=list(boundstup)
     lowerbounds=boundstup[0]
     upperbounds=boundstup[1]
@@ -882,6 +952,13 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
 
 
 def CheckFitParameters(poltype,pzero,boundstup,parm_sanitized,refine,keylist,torprmdict,p1,angle_list,torset,max_amp):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     foldtoparmslist={}
     parameterinfo=[]
     parmtokey={}
@@ -942,6 +1019,13 @@ def CheckFitParameters(poltype,pzero,boundstup,parm_sanitized,refine,keylist,tor
 
 
 def GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_dict,torprmdict,mm_energy_list,tor_energy_list,flatphaselist,qm_energy_list,tup,indicesremoveddic,cls_angle_dict_unmodified,qm_energy_list_unmodified,mm_energy_list_unmodified,clskeyswithbadfits,weightlist,torsions):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     dim=len(cls_angle_dict[tup][0])
     figfname = '%s-fit-' % (poltype.molecprefix)
     for i in range(len(torset)):
@@ -1012,6 +1096,13 @@ def GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_
 
 
 def FillInDictionariesParameterEstimates(poltype,torprmdict,p1,write_prm_dict):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     classkeytofoldtophase={}
     for chkclskey in torprmdict:
         classkeytofoldtophase[chkclskey]=poltype.foldoffsetlist.copy()
@@ -1046,6 +1137,13 @@ def FillInDictionariesParameterEstimates(poltype,torprmdict,p1,write_prm_dict):
 
 
 def PlotHeatmap(poltype,plottortorclskey,idealanglematrix,actualanglematrix,matrix,title,figfname,numprms,datapts,minRMSD,textstring=None):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     fig, ax = plt.subplots()
     im = ax.imshow(matrix)
     figfname=plottortorclskey+'_'+figfname
@@ -1091,6 +1189,13 @@ def PlotHeatmap(poltype,plottortorclskey,idealanglematrix,actualanglematrix,matr
 
 
 def FillInEnergyTensors(poltype,phaseanglearray,actualanglearray,tor_energy_list,qm_energy_list,mm_energy_list,torset,indicesremoved,actualanglearrayunmodified,tor_energy_list_unmodified,qm_energy_list_unmodified,mm_energy_list_unmodified):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
 
     phasetensor=poltype.tensorphases[torset]
     shape=list(phasetensor.shape)[:-1]
@@ -1129,7 +1234,11 @@ def FillInEnergyTensors(poltype,phaseanglearray,actualanglearray,tor_energy_list
 
 def write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename,classkeytofoldtophase):
     """
-    Intent: Output the new key file based on parameters in write_prm_dict
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
     """
     tmpfh1 = open(tmpkey1basename, "r")
     tmpfh2 = open(tmpkey2basename, "w")
@@ -1171,6 +1280,13 @@ def write_key_file(poltype,write_prm_dict,tmpkey1basename,tmpkey2basename,classk
     tmpfh2.close()
 
 def ConvertNoneToZero(poltype,listinput):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indices=[]
     for i in range(len(listinput)):
         value=listinput[i]
@@ -1183,6 +1299,13 @@ def ConvertNoneToZero(poltype,listinput):
     return listinput
 
 def AssignZeros(poltype,array):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newarray=[]
     allindices=[]
     for ls in array:
@@ -1481,6 +1604,13 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
                  
 
 def TransformDeleteIdx(del_ang_idx,indicesalreadyremoved):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     indicesleftofindex=0
     for index in indicesalreadyremoved:
         if index<del_ang_idx:
@@ -1595,6 +1725,13 @@ def process_rot_bond_tors(poltype,mol):
 
 
 def WriteOutFitResults(poltype,tmpkey2basename,classkeytofitresults):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(tmpkey2basename,'r')
     results=temp.readlines()
     temp.close()
@@ -1619,6 +1756,13 @@ def WriteOutFitResults(poltype,tmpkey2basename,classkeytofitresults):
 
 
 def RemoveFiles(poltype,string,occurance):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     files=os.listdir()
     for f in files:
         count = f.count(string)  
@@ -1627,6 +1771,13 @@ def RemoveFiles(poltype,string,occurance):
 
 
 def PostfitMinAlz(poltype,keybasename,keybasepath):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     for outputlog in poltype.optoutputtotorsioninfo.keys():
         term,error=poltype.CheckNormalTermination(outputlog)
         [torset,optmol,variabletorlist,phaseangles,bondtopology,optoutputlog,initialxyz]=poltype.optoutputtotorsioninfo[outputlog]
@@ -1642,6 +1793,13 @@ def PostfitMinAlz(poltype,keybasename,keybasepath):
 
 
 def DecomposeTorsionTorsion(poltype,optmol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     torstoadd=[]
     for torset in poltype.torlist:
         if torset not in poltype.nonaroringtorsets and len(torset)==2:
@@ -1657,6 +1815,13 @@ def DecomposeTorsionTorsion(poltype,optmol):
 
 
 def FlipAngleValues(poltype,array):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     newarray=[]
     for i in range(len(array)):
         angtup=array[i]
@@ -1677,6 +1842,13 @@ def FlipAngleValues(poltype,array):
 
 
 def PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,mol,tmpkey2basename,indicesremoved,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(tmpkey2basename,'a')
     for torset in poltype.torlist:
         if torset not in poltype.nonaroringtorsets and len(torset)==2:
@@ -1826,6 +1998,13 @@ def PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle
     temp.close()
 
 def GenerateTorTorClasskey(poltype,firsttor,secondtor,idxtosymclass,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     rdkitfirsttor=[i-1 for i in firsttor]
     rdkitsecondtor=[i-1 for i in secondtor]
     paths=Chem.rdmolops.FindAllPathsOfLengthN(mol,5,useBonds=False,useHs=True)
@@ -1844,6 +2023,13 @@ def GenerateTorTorClasskey(poltype,firsttor,secondtor,idxtosymclass,mol):
     return tortorclskey,tortoratomidxs
 
 def ParseXTBEnergyLog(poltype,outputname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
     temp=open(outputname,'r')
     results=temp.readlines()
     temp.close()
