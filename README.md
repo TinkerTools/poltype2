@@ -229,6 +229,7 @@ usepdb2pqr
 
 ```
 complexedproteinpdbname=complex.pdb
+listofligands=lig1.sdf,lig2.sdf
 usead4=True
 usevina=True
 usevinardo=True

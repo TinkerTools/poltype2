@@ -757,6 +757,8 @@ def ProductionDynamicsProtocol(poltype):
 
 
         poltype.WriteToLog('System dynamics is complete ',prin=True)
+    if poltype.alchemical==False:
+        sys.exit()
     if poltype.neatliquidsim==True:
         arcpaths,keypaths=GrabTinkerFiles(poltype)
         liqarcpath=arcpaths[0][0][0]
@@ -783,7 +785,7 @@ def ProductionDynamicsProtocol(poltype):
         avgliqenergy=avgliqenergy/nummols
         stddevliqenergy=stddevliqenergy/nummols
         Hvap = (-avgliqenergy + avggasenergy + R*T)
-        Hvaperr=np.sqrt(np.square(avgliqenergy)+np.square(stddevgasenergy))
+        Hvaperr=np.sqrt(np.square(stddevliqenergy)+np.square(stddevgasenergy))
         poltype.WriteToLog('Average Hvap is (kcal/mol) '+str(Hvap)+' +/- '+str(Hvaperr)) 
         sys.exit()
 

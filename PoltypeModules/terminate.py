@@ -165,11 +165,12 @@ def CheckFileTermination(poltype,f,steps=None,equil=False,firsttime=True):
                totalframes=math.floor(totaltime/writefreq)
                stepsperframe=int(writefreq/stepsize)
                tolratio=(stepsperframe*totalframes)/steps
-               
                linesplit=line.split()
                try:
                    stepnum=float(linesplit[-3])
                    ratio=np.abs(stepnum)/steps
+                   if ratio>1: # when lower MD time from previous run
+                       term=True
                    if np.abs(ratio-tolratio)<.01:       
                        term=True
 
@@ -177,6 +178,8 @@ def CheckFileTermination(poltype,f,steps=None,equil=False,firsttime=True):
                        if not os.path.isfile(filepath): 
 
                            term=False
+                   if term==True:
+                       break
                except:
                    deletefile=True 
                    if firsttime==True:

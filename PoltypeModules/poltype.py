@@ -1282,7 +1282,7 @@ class PolarizableTyper():
                 self.MolecularDynamics()
                 sys.exit()
             if (self.usead4==True or self.usegold==True or self.usevina==True or self.usevinardo==True) and self.complexedproteinpdbname!=None:
-                docking.DockingWrapper(self,self.complexedproteinpdbname,self.dockgridcenter,self.dockgridsize,self.vinaexhaustiveness,self.nposes,self.goldbin,self.usevina,self.usead4,self.usevinardo,self.usegold,self.dockingenvname,self.prepdockscript,self.gridspacing,self.listofligands,self.ecrexpect)
+                docking.DockingWrapper(self,self.complexedproteinpdbname,self.dockgridcenter,self.dockgridsize,self.vinaexhaustiveness,self.nposes,self.goldbin,self.usevina,self.usead4,self.usevinardo,self.usegold,self.dockingenvname,self.prepdockscript,self.gridspacing,self.listofligands,self.ecrexpect,self.covalentdock,self.knownresiduesymbs)
                 sys.exit()
             
             if self.isfragjob==False:
@@ -6087,7 +6087,7 @@ class PolarizableTyper():
             return iswholemoleculering
 
 
-        def ExtractLigand(self,ligandreceptorfilename,coordinates):
+        def ExtractLigand(self,ligandreceptorfilename,coordinates=None,indicestokeep=[]):
             """
             Intent:
             Input:
@@ -6097,13 +6097,13 @@ class PolarizableTyper():
             """
             ligandpdbfilename='ligand.pdb'
             receptorpdbfilename=ligandreceptorfilename.replace('.pdb','_receptoronly.pdb')
-            receptormol=self.ExtractMOLObject(ligandreceptorfilename,receptorpdbfilename,coordinates=None,receptor=True)
-            ligandmol=self.ExtractMOLObject(ligandreceptorfilename,ligandpdbfilename,coordinates=coordinates,receptor=False)
+            receptormol=self.ExtractMOLObject(ligandreceptorfilename,receptorpdbfilename,None,True,indicestokeep)
+            ligandmol=self.ExtractMOLObject(ligandreceptorfilename,ligandpdbfilename,coordinates,False,indicestokeep)
         
             self.ConvertUNLToLIG(ligandpdbfilename)
             return ligandpdbfilename,receptorpdbfilename
 
-        def ExtractMOLObject(self,ligandreceptorfilename,newpdbfilename,coordinates,receptor):
+        def ExtractMOLObject(self,ligandreceptorfilename,newpdbfilename,coordinates,receptor,indicestokeep):
             """
             Intent:
             Input:
@@ -6111,6 +6111,7 @@ class PolarizableTyper():
             Referenced By: 
             Description: 
             """
+            commonhetatmsymbs=['HOH']
             pdbmol=self.GenerateMOLObject(ligandreceptorfilename)
             iteratom = openbabel.OBMolAtomIter(pdbmol)
             obConversion = openbabel.OBConversion()
@@ -6124,8 +6125,12 @@ class PolarizableTyper():
                 if reskey not in self.knownresiduesymbs and receptor==True:
                     atmindicestodelete.append(atmindex)
                 elif receptor==False:
-                    if coords not in coordinates:
-                        atmindicestodelete.append(atmindex)
+                    if coordinates!=None:
+                        if coords not in coordinates:
+                            atmindicestodelete.append(atmindex)
+                    else:
+                        if (reskey in self.knownresiduesymbs or reskey in commonhetatmsymbs) and atmindex not in indicestokeep:
+                            atmindicestodelete.append(atmindex)
             atmindicestodelete.sort(reverse=True)
             for atmindex in atmindicestodelete:
                 atm=pdbmol.GetAtom(atmindex)

@@ -286,8 +286,15 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                 neighbswithoutatom=RemoveFromList(poltype,atomneighbs,atom)
                 uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom=list(set([poltype.idxtosymclass[b.GetIdx()] for b in neighbsofneighbwithoutatom]))
                 neighbindices=list([b.GetIdx() for b in atomneighbs])
-                
-                if highestsymneighbnorepeatval==3 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbnorepeat)]) and numhydsneighb==3: # then this is like the H on Ammonia and we can use z-then bisector
+               
+
+                if atomicnum==7 and val==1:
+                    poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
+                    poltype.localframe2[atomidx - 1] = 0
+                    lfzerox[atomidx - 1]=True
+                    foundcase=True
+
+                elif highestsymneighbnorepeatval==3 and CheckIfAllAtomsSameClass(poltype,[neighb for neighb in openbabel.OBAtomAtomIter(highestsymneighbnorepeat)]) and numhydsneighb==3: # then this is like the H on Ammonia and we can use z-then bisector
                     poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                     idxtobisecthenzbool[atomidx]=True
                     bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
@@ -311,7 +318,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
                     foundcase=True
 
-
                 elif (val==3 and len(uniqueneighbtypes)==2 and (highestsymneighbnorepeatval==4) and hyb!=2) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==3 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==2: # ethylamine
                         neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
                         bisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
@@ -320,16 +326,13 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                         foundcase=True
                         idxtobisecthenzbool[atomidx]=True
 
-
                     # now make sure neighboring atom (lf1) also is using z-then-bisector
                 elif val==1 and highestsymneighbnorepeatval==3 and numhydsneighb==1 and len(uniqueneighbtypes)==1 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and highestsymneighbnorepeatatomicnum==7: #dimethylamine
                     idxtobisecthenzbool[atomidx]=True
-
                     bisectidxs=[atm.GetIdx() for atm in neighbsofneighbwithoutatom]
                     idxtobisectidxs[atomidx]=bisectidxs
                     poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
                     foundcase=True
-
                 elif val==3 and highestsymneighbnorepeatval==1 and numhydsneighb==0 and len(uniqueneighbtypes)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==1 and atomicnum==7: #dimethylamine
                     idxtobisecthenzbool[atomidx]=True
 
@@ -338,7 +341,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     idxtobisectidxs[atomidx]=bisectidxs
                     poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
                     foundcase=True
-
                 elif val==1 and highestsymneighbnorepeatval==3 and len(uniqueneighbtypes)==1 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1: # H on benzene
                     poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                     poltype.localframe2[atomidx - 1] = 0
@@ -350,7 +352,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     lfzerox[atomidx - 1]=True
                     foundcase=True
 
-
                 elif val==4 and len(uniqueneighbtypes)==2 and (len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==0 or len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1): # N(CH3)(CH3)(CH3)H
                     neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
                     idxtotrisecbool[atomidx]=True
@@ -358,7 +359,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     idxtotrisectidxs[atomidx]=trisectidxs
                     lfzerox[atomidx - 1]=True 
                     foundcase=True
-
 
 
 
@@ -383,7 +383,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     trisectidxs=[atm.GetIdx() for atm in atomneighbs]
                     idxtotrisectidxs[atomidx]=trisectidxs
                     lfzerox[atomidx - 1]=True # need to zero out the x components just like for z-only case
-            
                 elif (val==2 and CheckIfAllAtomsSameClass(poltype,atomneighbs)) or (val==4 and len(uniqueneighbtypes)==2) and len(sorteduniquetypeneighbsnorepeat)==0:  # then this is like middle propane carbon or oxygen in water
                     idxlist=GrabIndexesFromUniqueTypeNumber(poltype,atomneighbs,uniqueneighbtypes[0])
                     poltype.localframe1[atomidx-1]=-1*idxlist[0]
@@ -392,7 +391,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                     poltype.localframe2[atomidx - 1] = 0
                     lfzerox[atomidx - 1]=True
-            
 
                 elif len(uniqueneighbtypes)==2 and val==3: # benzene, one carbon in aniline
                     typenumtocnt={}
@@ -408,7 +406,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     idxlist=GrabIndexesFromUniqueTypeNumber(poltype,atomneighbs,typenum)
                     poltype.localframe1[atomidx-1]=-1*idxlist[0]
                     poltype.localframe2[atomidx-1]=-1*idxlist[1]
-
 
 
                 else:
@@ -435,7 +432,7 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                             if angle<0:
                                 angle=angle+360
                             angletol=3.5
-                            if np.abs(180-angle)<=angletol:
+                            if np.abs(angle)<=angletol:
                                 linear=True
                         if linear==True:
                             poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]

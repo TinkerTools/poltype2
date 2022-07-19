@@ -9,11 +9,11 @@ import databaseparser
 
 def gen_canonicallabels(poltype,mol,rdkitmol=None,usesym=True,isparent=False):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Using ring membership, and graph distance to all other elements compute symmetry type.
+    Input: Openbabel MOL object.
+    Output: Dictionary of atom index to symmetry type.
+    Referenced By: GenerateParameters in poltype.py 
+    Description: First find matching indices via symmetry type, then sort atom types so that groups of heavier atoms get lower type numbers. Optionally read in custom index to type number file if user provides input. 
     """
     if rdkitmol==None:
         obConversion = openbabel.OBConversion()
@@ -66,10 +66,10 @@ def gen_canonicallabels(poltype,mol,rdkitmol=None,usesym=True,isparent=False):
 
 def ComputeSymmetryTypes(poltype,distmat,rdkitmol,mol,usesym):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Define symmetry type by a graph invarient vector. If two atoms have the same GI vector than they have the same type.
+    Input: Pairwise distance matrix, MOL object 
+    Output: Dictionary of atom index to matching atom indices
+    Referenced By: gen_canonicallabels
     Description: 
     """
     indextomatchingindices={}

@@ -8,10 +8,6 @@ import sys
 
 
 
-
-
-
-
 def GenerateListString(ls):
     """
     Intent:
@@ -183,7 +179,7 @@ def AutoDockVinaVinardo(dockingprogram,receptorname,ligandname,dockgridcenter,do
     return modeltoscore,modeltostructure
 
 
-def GenerateGOLDConfigurationFile(ligandfilename,receptorfilename,dockgridcenter,dockgridsize,nposes):
+def GenerateGOLDConfigurationFile(ligandfilename,receptorfilename,dockgridcenter,dockgridsize,nposes,covalentdock,prolinkatom=None,liglinkatom=None):
     """
     Intent:
     Input:
@@ -214,10 +210,10 @@ def GenerateGOLDConfigurationFile(ligandfilename,receptorfilename,dockgridcenter
 
     temp.write(' FLOOD FILL'+'\n')
     temp.write('radius = '+str(radius)+'\n')
-    if poltype.covalentdocking==False:
+    if covalentdock==False:
         temp.write('origin = '+str(dockgridcenter[0])+' '+str(dockgridcenter[1])+' '+str(dockgridcenter[2])+'\n')
     else:
-        temp.write('floodfill_atom_no = '+str(poltype.prolinkatom)+'\n')
+        temp.write('floodfill_atom_no = '+str(prolinkatom)+'\n')
         temp.write('floodfill_center = atom'+'\n')
     temp.write('do_cavity = 1'+'\n')
 
@@ -252,13 +248,13 @@ def GenerateGOLDConfigurationFile(ligandfilename,receptorfilename,dockgridcenter
 
     temp.write(' CONSTRAINTS'+'\n')
     temp.write('force_constraints = 0'+'\n')
-    if poltype.covalentdock==False:
+    if covalentdock==False:
         temp.write(' COVALENT BONDING'+'\n')
         temp.write('covalent = 0'+'\n')
     else:
         temp.write('covalent = 1'+'\n')
-        temp.write('covalent_protein_atom_no = '+str(poltype.prolinkatom)+'\n')
-        temp.write('covalent_ligand_atom_no = '+str(poltype.liglinkatom)+'\n')
+        temp.write('covalent_protein_atom_no = '+str(prolinkatom)+'\n')
+        temp.write('covalent_ligand_atom_no = '+str(liglinkatom)+'\n')
 
 
     temp.write(' SAVE OPTIONS'+'\n')
@@ -289,7 +285,7 @@ def GenerateGOLDCommand(goldbin,filename):
     return cmdstr
 
 
-def GOLDDocking(goldbin,ligandname,receptorname,dockgridcenter,dockgridsize,nposes):
+def GOLDDocking(goldbin,ligandname,receptorname,dockgridcenter,dockgridsize,nposes,covalentdocking,prolinkatom=None,liglinkatom=None):
     """
     Intent:
     Input:
@@ -297,12 +293,38 @@ def GOLDDocking(goldbin,ligandname,receptorname,dockgridcenter,dockgridsize,npos
     Referenced By: 
     Description: 
     """
+    ligandname=ConvertToMol2(ligandname)
+    receptorname=ConvertToMol2(receptorname) # GOLD needs mol2 for typing
 
-    filename=GenerateGOLDConfigurationFile(ligandname,receptorname,dockgridcenter,dockgridsize,nposes)
+    filename=GenerateGOLDConfigurationFile(ligandname,receptorname,dockgridcenter,dockgridsize,nposes,covalentdocking,prolinkatom,liglinkatom)
     cmdstr=GenerateGOLDCommand(goldbin,filename)
     os.system(cmdstr)
     modeltoscoregold,modeltostructuregold=ParseGOLDOutput(ligandname)
     return modeltoscoregold,modeltostructuregold
+
+
+
+
+def ConvertToMol2(name):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    namesplit=name.split('.')
+    end=namesplit[-1]
+    newname=name.replace('.'+end,'.mol2')
+    obConversion = openbabel.OBConversion()
+    mol = openbabel.OBMol()
+    obConversion.SetInFormat(end)
+    obConversion.ReadFile(mol, name)
+    obConversion.SetOutFormat('mol2')
+    obConversion.WriteFile(mol,newname)
+    return newname
+
+
 
 def ParseGOLDOutput(ligandname):
     """
@@ -315,7 +337,7 @@ def ParseGOLDOutput(ligandname):
 
     modeltoscoregold={}
     modeltostructuregold={}
-    ligandprefix=ligandname.replace('.pdb','')
+    ligandprefix=ligandname.replace('.mol2','')
     outputname=ligandprefix+'_m1'+'.rnk'
     temp=open(outputname,'r')
     results=temp.readlines()
@@ -323,13 +345,14 @@ def ParseGOLDOutput(ligandname):
     count=1
     for line in results:
         linesplit=line.split()
-        if len(linesplit)==10:
-            score=float(linesplit[1])
-            model=int(linesplit[0])
-            structurename='gold_soln_'+ligandprefix+'_m1_'+str(model)+'.pdb'
-            modeltoscoregold[count]=score
-            modeltostructuregold[count]=structurename
-            count+=1
+        if len(linesplit)>1:
+            if linesplit[0].isdigit()==True:
+                score=float(linesplit[1])
+                model=int(linesplit[0])
+                structurename='gold_soln_'+ligandprefix+'_m1_'+str(model)+'.mol2'
+                modeltoscoregold[count]=score
+                modeltostructuregold[count]=structurename
+                count+=1
 
     return modeltoscoregold,modeltostructuregold
 
@@ -425,6 +448,36 @@ def CombineMolObjects(pdbmol,ligmol,complexedstructure):
 
 
 
+def ConvertUNLToLIG(filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    temp=open(filename,'r')
+    results=temp.readlines()
+    temp.close()
+    tempname=filename.replace('.pdb','_TEMP.pdb')
+    temp=open(tempname,'w')
+    for line in results:
+        linesplit=re.split(r'(\s+)', line)
+        if 'UNL' in line:
+            lineindex=linesplit.index('UNL')
+            linesplit[lineindex]='LIG'
+            line=''.join(linesplit)
+        if 'UNK' in line:
+            lineindex=linesplit.index('UNK')
+            linesplit[lineindex]='LIG'
+            line=''.join(linesplit)
+    
+        temp.write(line)
+    temp.close()
+    os.rename(tempname,filename)
+
+
+
 def GenerateComplex(structure,receptorpdbfilename):
     """
     Intent:
@@ -433,14 +486,32 @@ def GenerateComplex(structure,receptorpdbfilename):
     Referenced By: 
     Description: 
     """
-
+    namesplit=structure.split('.')
+    end=namesplit[-1]
+    if end!='pdb':
+        structure=FileConverter(structure,end,'pdb')
     complexedstructure=structure.replace('.pdb','')+'_'+receptorpdbfilename.replace('.pdb','')+'.pdb'
-    pdbmol=poltype.GenerateMOLObject(receptorpdbfilename)
-    ligmol=poltype.GenerateMOLObject(structure)
+    pdbmol=GenerateMOLObject(receptorpdbfilename)
+    ligmol=GenerateMOLObject(structure)
     CombineMolObjects(pdbmol,ligmol,complexedstructure)
 
     return complexedstructure
 
+def GenerateMOLObject(pdbfilename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    namesplit=pdbfilename.split('.')
+    end=namesplit[-1]
+    obConversion = openbabel.OBConversion()
+    pdbmol = openbabel.OBMol()
+    obConversion.SetInFormat(end)
+    obConversion.ReadFile(pdbmol,pdbfilename)
+    return pdbmol
 
 
 def AddDockedLigandBackInComplex(modeltostructure,receptorpdbfilename):
@@ -460,7 +531,7 @@ def AddDockedLigandBackInComplex(modeltostructure,receptorpdbfilename):
 
     return modeltocomplexedstructure
 
-def Docking(ligandpdbfilename,receptorpdbfilename,ligandname,receptorname,dockgridcenter,dockgridsize,vinaexhaustiveness,nposes,goldbin,usevina,usead4,usevinardo,usegold,python2path,prepdockscript,gridspacing,modeltodockoutput):
+def Docking(ligandpdbfilename,receptorpdbfilename,ligandname,receptorname,dockgridcenter,dockgridsize,vinaexhaustiveness,nposes,goldbin,usevina,usead4,usevinardo,usegold,python2path,prepdockscript,gridspacing,modeltodockoutput,covalentdock,prolinkatom=None,liglinkatom=None):
     """
     Intent:
     Input:
@@ -470,7 +541,7 @@ def Docking(ligandpdbfilename,receptorpdbfilename,ligandname,receptorname,dockgr
     """
 
     if usegold==True:
-        modeltoscoregold,modeltostructuregold=GOLDDocking(goldbin,ligandpdbfilename,receptorpdbfilename,dockgridcenter,dockgridsize,nposes)
+        modeltoscoregold,modeltostructuregold=GOLDDocking(goldbin,ligandpdbfilename,receptorpdbfilename,dockgridcenter,dockgridsize,nposes,covalentdock,prolinkatom,liglinkatom)
         modeltocomplexedstructuregold=AddDockedLigandBackInComplex(modeltostructuregold,receptorpdbfilename)
         modeltodockoutput=CombineDockingInfo(modeltodockoutput,modeltoscoregold,modeltostructuregold,'GOLD',modeltocomplexedstructuregold,ligandpdbfilename)
     GeneratePDBQTFiles(python2path,prepdockscript,dockgridcenter,dockgridsize,gridspacing,ligandpdbfilename,receptorpdbfilename)
@@ -627,8 +698,77 @@ def GenerateConsensusDockingReport(nametoconsensusrank):
     temp.close()
 
 
+def FindProteinLinkAtomIndex(ligandreceptorfilename,knownresiduesymbs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    
+    obConversion = openbabel.OBConversion()
+    pdbmol = openbabel.OBMol()
+    obConversion.SetInFormat('pdb')
+    obConversion.ReadFile(pdbmol,ligandreceptorfilename)
+    iteratom = openbabel.OBMolAtomIter(pdbmol)
+    atmindices=[]
+    commonhetatmsymbs=['HOH']
+    for atm in iteratom:
+        atmindex=atm.GetIdx()
+        res=atm.GetResidue()
+        reskey=res.GetName()
+        coords=[atm.GetX(),atm.GetY(),atm.GetZ()]
+        if reskey not in knownresiduesymbs and reskey not in commonhetatmsymbs:
+            atmindices.append(atmindex)
+    breakout=False
+    for atmindex in atmindices:
+        atom=pdbmol.GetAtom(atmindex)
+        coords=[atom.GetX(),atom.GetY(),atom.GetZ()]
+        iteratomatom = openbabel.OBAtomAtomIter(atom)
+        for natom in iteratomatom:
+            nres=natom.GetResidue()
+            nreskey=nres.GetName()
+            coords=[natom.GetX(),natom.GetY(),natom.GetZ()]
 
-def DockingWrapper(poltype,ligandreceptorfilename,dockgridcenter,dockgridsize,vinaexhaustiveness,nposes,goldbin,usevina,usead4,usevinardo,usegold,dockingenvname,prepdockscript,gridspacing,listofligands,ecrexpect):
+            if nreskey in knownresiduesymbs:
+                natomidx=natom.GetIdx()
+                prolinkatom=natomidx
+                procoords=coords
+                breakout=True
+                break
+        if breakout==True:
+            break
+    return prolinkatom,procoords
+
+
+
+def FindLinkLigandIndex(ligandpdbfilename,procoords):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    obConversion = openbabel.OBConversion()
+    ligmol = openbabel.OBMol()
+    obConversion.SetInFormat('pdb')
+    obConversion.ReadFile(ligmol,ligandpdbfilename)
+    iteratom = openbabel.OBMolAtomIter(ligmol)
+    for atm in iteratom:
+        atmindex=atm.GetIdx()
+        coords=[atm.GetX(),atm.GetY(),atm.GetZ()]
+        if coords==procoords:
+            liglinkatom=atmindex
+            break
+    return liglinkatom
+
+
+
+
+
+def DockingWrapper(poltype,ligandreceptorfilename,dockgridcenter,dockgridsize,vinaexhaustiveness,nposes,goldbin,usevina,usead4,usevinardo,usegold,dockingenvname,prepdockscript,gridspacing,listofligands,ecrexpect,covalentdock,knownresiduesymbs):
     """
     Intent:
     Input:
@@ -646,10 +786,19 @@ def DockingWrapper(poltype,ligandreceptorfilename,dockgridcenter,dockgridsize,vi
     dockingenvpath=os.path.join(allenvs,dockingenvname)
     python2path=os.path.join(dockingenvpath,'bin')
     python2path=os.path.join(python2path,'python')
-    ligandpdbfilename,receptorpdbfilename=ExtractLigand(ligandreceptorfilename)
+    if covalentdock==True:
+        prolinkatom,procoords=FindProteinLinkAtomIndex(ligandreceptorfilename,knownresiduesymbs)
+    ligandpdbfilename,receptorpdbfilename=poltype.ExtractLigand(ligandreceptorfilename,indicestokeep=[prolinkatom])
     modeltodockoutput={}
     if dockgridcenter==None:
         dockgridcenter=poltype.GrabLigandCentroid(ligandpdbfilename)
+    if covalentdock==True:
+        listofligands=[ligandpdbfilename]
+        liglinkatom=FindLinkLigandIndex(ligandpdbfilename,procoords)
+    else:
+        prolinkatom=None
+        liglinkatom=None
+
     for ligand in listofligands:
         receptorname=receptorpdbfilename.replace('.pdb','.pdbqt')
         ligandname=ligandpdbfilename.replace('.pdb','.pdbqt')
@@ -659,7 +808,7 @@ def DockingWrapper(poltype,ligandreceptorfilename,dockgridcenter,dockgridsize,vi
         if ligandsuffix!='pdb':
             ligandpdbfilename=FileConverter(ligand,ligandsuffix,'pdb')
             ligandname=ligandpdbfilename.replace('.pdb','.pdbqt')
-        modeltodockoutput=Docking(ligandpdbfilename,receptorpdbfilename,ligandname,receptorname,dockgridcenter,dockgridsize,vinaexhaustiveness,nposes,goldbin,usevina,usead4,usevinardo,usegold,python2path,prepdockscript,gridspacing,modeltodockoutput)
+        modeltodockoutput=Docking(ligandpdbfilename,receptorpdbfilename,ligandname,receptorname,dockgridcenter,dockgridsize,vinaexhaustiveness,nposes,goldbin,usevina,usead4,usevinardo,usegold,python2path,prepdockscript,gridspacing,modeltodockoutput,covalentdock,prolinkatom,liglinkatom)
 
     GenerateDockingReport(modeltodockoutput)
     nametoconsensusrank=ExponentialConsensusRank(modeltodockoutput,ecrexpect)
