@@ -67,10 +67,13 @@ def gen_canonicallabels(poltype,mol,rdkitmol=None,usesym=True,isparent=False):
 def ComputeSymmetryTypes(poltype,distmat,rdkitmol,mol,usesym):
     """
     Intent: Define symmetry type by a graph invarient vector. If two atoms have the same GI vector than they have the same type.
-    Input: Pairwise distance matrix, MOL object 
+    Input: Pairwise topological distance matrix, MOL object 
     Output: Dictionary of atom index to matching atom indices
     Referenced By: gen_canonicallabels
     Description: 
+    1. Compute GI vector for every atom
+    2. Iterate over GI vectors for each atom and check if their is GI vector match, if so add to same group
+    3. If usesym==False then use atom index instead of type numbers.
     """
     indextomatchingindices={}
     indextoGI={}
@@ -98,11 +101,11 @@ def ComputeSymmetryTypes(poltype,distmat,rdkitmol,mol,usesym):
 
 def ReadCustomIndexToTypeFiles(poltype,indextotypefile):
     """
-    Intent:
-    Input:
+    Intent: If user provides file mapping atom index to type, read that in as symmetry types.
+    Input: indextotypefile
     Output:
-    Referenced By: 
-    Description: 
+    Referenced By: gen_canonicallabels
+    Description: indextomatchingindices
     """
     indextomatchingindices={}
     temp=open(indextotypefile,'r')
@@ -122,10 +125,16 @@ def ReadCustomIndexToTypeFiles(poltype,indextotypefile):
 def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
     """
     Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Input: Atom of interest object, rdkit MOL object, pairwise topological distance matrix, openbabel MOL object, list of list of ring atomic indices.
+    Output: Graph Invariant Vector
+    Referenced By: ComputeSymmetryTypes
+    Description:
+    1. Grab topological distances to every other atom in graph.  
+    2. Determine unique topological distances from atom.
+    3. For each unique topological distance from atom, find all other atoms at same distance away and save the atomic number of that atom.
+    4. Then count how many atoms of same atomic number are at that distance away from original atom.
+    5. Now for every distance d, away from atom of interest a, you have a map of atomic number to number of occurances at that distance. This is in essence what the symmetry type number is.
+    6.
     """
     GI=[]
     atomidx=atom.GetIdx()
