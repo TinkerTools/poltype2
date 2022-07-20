@@ -133,7 +133,7 @@ def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
     2. Determine unique topological distances from atom.
     3. For each unique topological distance from atom, find all other atoms at same distance away and save the atomic number of that atom.
     4. Then count how many atoms of same atomic number are at that distance away from original atom.
-    5. Now for every distance d, away from atom of interest a, you have a map of atomic number to number of occurances at that distance. This is in essence what the symmetry type number is.
+    5. Now for every distance d, away from atom of interest a, you have a map of atomic number to number of occurances of atomic number at that distance. This is in essence what the symmetry type number is.
     6.
     """
     GI=[]

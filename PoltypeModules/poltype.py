@@ -3273,7 +3273,7 @@ class PolarizableTyper():
                         chg=1
                 string='Atom index = '+str(atomidx+1)+' Atomic Number = ' +str(atomnum)+ ' Valence = '+str(val)+ ' Formal charge = '+str(chg)
                 array.append(string)
-                if atomnum==6 and val==3 and (self.addhydrogentononcharged==True or self.addhydrogens==True)  and radicals==0:
+                if atomnum==6 and val<4 and (self.addhydrogentononcharged==True or self.addhydrogens==True)  and radicals==0:
                     if verbose==True:
                         warnings.warn('WARNING! Strange valence for Carbon, will assume missing hydrogens and add'+string) 
                         self.WriteToLog('WARNING! Strange valence for Carbon, will assume missing hydrogens and add '+string)
