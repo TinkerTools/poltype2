@@ -166,3 +166,11 @@ conda install -c conda-forge xtb --yes
 ```
 * add the path to xtb binary in PATH
 
+
+### Explicit Conda Installation - ANI
+```
+conda install -c conda-forge ase --yes
+conda install -c conda-forge torchani --yes
+conda install -c conda-forge openbabel --yes
+```
+* Install via ani.yml file

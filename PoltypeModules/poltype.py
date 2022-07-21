@@ -85,6 +85,9 @@ from operator import itemgetter
 
 @dataclass
 class PolarizableTyper():
+        anienvname:str='ani'
+        anifmax=.05
+        anipath:str=os.path.join(os.path.abspath(os.path.split(__file__)[0]),'ani.py')
         complexationonly:bool=False
         removesolventpdbtraj:bool=True
         generatepdbtrajs:bool=False
@@ -476,11 +479,13 @@ class PolarizableTyper():
         hetatmindices:list=field(default_factory=lambda : [])
         def __post_init__(self): 
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Post initialization variables (things you want internal variables but not necesarrily user input). Also for reading input poltype.ini file and changing variable defaults.
+            Input: Default variables from self object
+            Output: Variables modified by input file and other variables internally used
+            Referenced By: N/A 
             Description: 
+            1. Initialize some internal variables not used by user input
+            2. Read input poltype.ini file and change variable defaults
             """
             self.knownresiduesymbs=['A', 'G', 'U', 'A3', 'A5','DA', 'DC', 'DG', 'DT', 'G3', 'G5', 'U3', 'U5','DA3', 'DA5', 'DC3', 'DC5', 'DG3', 'DG5', 'DT3', 'DT5','ALA', 'ARG', 'ASH', 'ASN', 'ASP', 'GLH', 'GLN', 'GLU', 'GLY', 'HID', 'HIE', 'HIS','ILE', 'LEU', 'LYD', 'LYS', 'MET','PHE', 'PRO', 'SER', 'THR', 'TRP', 'TYD', 'TYR', 'VAL', 'CYD', 'CYS']
             self.molstructfname=self.structure 
@@ -1302,15 +1307,28 @@ class PolarizableTyper():
 
         def MolecularDynamics(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Handles initializing more variables for MD simulations/FEP
+            Input: Variables from poltype.ini file and other default variables
+            Output: Variables needed for molecular dynamics/FEP then calls functions for molecular dynamics/FEP
+            Referenced By: __post_init__ 
+            Description:
+            1. Change default production dynamics time if no previous input was given and running binding free energy simulations.
+            2. Copy prmfilepath (default amoebabio18) to current directory (so dont have to have full path in tinker key file for parameters).
+            3. If user inputs for stopping simulations, then call function to stop simulations (generates .end files in appropriate folders) then quit poltype.
+            4. Copy ligandxyzfilenamelist to annihilateligandxyzfilenamelist if annihilateligandxyzfilenamelist is not specified by default.
+            5. Read in tinker XYZ files in ligandxyzfilenamelist and convert to SMILES strings to be later used for detection in input PDB files.
+            6. Create log file for simulations/FEP
+            7. Change tinker executable names to reflect what is in the PATH (sometimes people use analyze.x vs analyze etc)
+            8. Determine if should use GPU executable names (rather than CPU executables) based on if GPU executable is in PATH.
+            9. Determine whether to submit jobs locally or not based on if keywords are enabled such as submitlocally and externalapi.
+            10. Remove old intermediate files from previous run such as *.xyz_* etc..)
+            11. Check if using a tinker version that is up to date enough to be consistent with poltype
+            12. If appropriate inputs are given (two keys and two xyz) for parameter comparison then call parameter comparison module and quit poltype.
+            13. Initialize variables to be filled in later in the program stack. Read water/Ions parameter type numbers from prmfilepath.
+            14. If receptorligandxyzfilename is given as input, determine ligand indices for complexation box from input file ( and what the indices should be for solvation box as well).
+            15. If there are overlapping types in input ligandxyzfilenamelist/keyfilenamelist then shift the types so that they are no longer overlapping. Do the same for receptorligandxyzfilename if this is provided as input.
+            16. 
             """
-            ob_log = openbabel.OBMessageHandler()
-            ob_log.SetOutputLevel(0)
-            ob_log.StopLogging()
 
             if self.neatliquidsim==True: 
                 self.usepreequilibriatedbox=False # then make new neat liquid box from scratch
@@ -3032,10 +3050,11 @@ class PolarizableTyper():
                     print("Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
             procs=[]
             for cmdstr in cmdstrs:
-                self.WriteToLog("Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
-                p = subprocess.Popen(cmdstr,shell=True,stdout=self.logfh, stderr=self.logfh)
-                procs.append(p)
-                self.cmdtopid[cmdstr]=p
+                if cmdstr!='':
+                    self.WriteToLog("Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
+                    p = subprocess.Popen(cmdstr,shell=True,stdout=self.logfh, stderr=self.logfh)
+                    procs.append(p)
+                    self.cmdtopid[cmdstr]=p
 
             if wait==True:
                 exit_codes=[p.wait() for p in procs]
@@ -3552,7 +3571,7 @@ class PolarizableTyper():
                     fsplit=f.split('.')
                     if len(fsplit)>1:
                         end=fsplit[1]
-                        if 'xtb-opt' not in f and 'log' not in end and 'sdf' not in end and 'ini' not in end and 'chk' not in end and 'dat' not in end and 'mol' not in end and 'txt' not in end and f not in filestonotdelete:
+                        if 'AMOEBA-opt' not in f and 'ANI-opt' not in f and 'xtb-opt' not in f and 'log' not in end and 'sdf' not in end and 'ini' not in end and 'chk' not in end and 'dat' not in end and 'mol' not in end and 'txt' not in end and f not in filestonotdelete:
                             deletearray.append(f)
             for f in deletearray:
                 os.remove(f)
@@ -3647,6 +3666,24 @@ class PolarizableTyper():
                 atomicnum=atom.GetAtomicNum()
                 if atomicnum not in listofallowedatoms:
                     raise ValueError('Element not allowed! '+str(atomicnum)) 
+
+
+        def CheckIfAtomsAreAllowedANI(self,m):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
+            if self.toroptmethod=='ANI' or self.torspmethod=='ANI':
+                listofallowedatoms=[1,6,7,8,9,17,16]
+                for atom in m.GetAtoms():
+                    atomicnum=atom.GetAtomicNum()
+                    if atomicnum not in listofallowedatoms:
+                        raise ValueError('Element not allowed for ANI! '+str(atomicnum)) 
+
+
 
         def CheckForHydrogens(self,m):
             """
@@ -3908,6 +3945,7 @@ class PolarizableTyper():
             indextocoordinates=self.GrabIndexToCoordinates(mol)
             m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False,sanitize=False)
             self.CheckIfAtomsAreAllowed(m)
+            self.CheckIfAtomsAreAllowedANI(m)
             self.CheckForHydrogens(m)
             m,atomindextoformalcharge=self.CheckInputCharge(m,verbose=True)
             if self.allowradicals==True:

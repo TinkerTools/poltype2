@@ -134,7 +134,8 @@ def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
     3. For each unique topological distance from atom, find all other atoms at same distance away and save the atomic number of that atom.
     4. Then count how many atoms of same atomic number are at that distance away from original atom.
     5. Now for every distance d, away from atom of interest a, you have a map of atomic number to number of occurances of atomic number at that distance. This is in essence what the symmetry type number is.
-    6.
+    6. Now for each d, 0-max(d), sort the map of atomic number to occurances and add to one large array. Need to sort since the maps may have different order but same information (could be same type but have maps in different order).
+    7. If you are a singly valent atom such as hydrogen check for ring membership of neighbor else check ring membership of atom of interest and add the ring atoms it belongs to to the GI array. 
     """
     GI=[]
     atomidx=atom.GetIdx()
