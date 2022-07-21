@@ -85,6 +85,8 @@ from operator import itemgetter
 
 @dataclass
 class PolarizableTyper():
+        toroptmethodlist:list=field(default_factory=lambda : [])
+        torspmethodlist:list=field(default_factory=lambda : [])
         anienvname:str='ani'
         anifmax=.05
         anipath:str=os.path.join(os.path.abspath(os.path.split(__file__)[0]),'ani.py')
@@ -564,6 +566,13 @@ class PolarizableTyper():
                         elif 'listofligands' in newline:
                             self.listofligands=a.split(',')
                             self.listofligands=[i.strip() for i in self.listofligands]
+                        
+                        elif 'toroptmethodlist' in newline:
+                            self.toroptmethodlist=a.split(',')
+                            self.toroptmethodlist=[i.strip() for i in self.toroptmethodlist]
+                        elif 'torspmethodlist' in newline:
+                            self.torspmethodlist=a.split(',')
+                            self.torspmethodlist=[i.strip() for i in self.torspmethodlist]
                         elif 'pdbcode' in newline:
                             self.pdbcode=a
                         elif 'indextotypefile' in newline:
@@ -1217,6 +1226,10 @@ class PolarizableTyper():
                     foundfinaltor=True
             if foundfinal==True and foundfinaltor==True:
                 self.deleteallnonqmfiles=False # keep this on during development phase        
+            if len(self.toroptmethodlist)==0:
+                self.toroptmethodlist.append(self.toroptmethod)
+            if len(self.torspmethodlist)==0:
+                self.torspmethodlist.append(self.torspmethod)
 
 
             if self.jobsatsametime!=0:
@@ -1253,7 +1266,7 @@ class PolarizableTyper():
                self.jobsatsametime=math.floor(int(self.numproc)/self.coresperjob)
                if self.jobsatsametime>self.maxjobsatsametime:
                    self.jobsatsametime=self.maxjobsatsametime
-            if self.toroptmethod=='xtb':
+            if self.toroptmethod=='xtb' or 'xtb' in self.toroptmethodlist:
                 self.jobsatsametime=1 # cant parrelize xtb since coords always written to same file name
             self.firsterror=False
             if self.debugmode==True:
@@ -4202,7 +4215,7 @@ class PolarizableTyper():
             (torlist, self.rotbndlist,hydtorsions,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,mol,torsionsmissing)
             if atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False: 
                 self.dontfrag=True
-            if self.dontfrag==True and self.toroptmethod!='xtb': # if fragmenter is turned off, parition resources by jobs at sametime for parent,cant parralelize xtb since coords always written to same filename
+            if self.dontfrag==True and self.toroptmethod!='xtb' and 'xtb' not in self.toroptmethodlist: # if fragmenter is turned off, parition resources by jobs at sametime for parent,cant parralelize xtb since coords always written to same filename
                 self.maxmem,self.maxdisk,self.numproc=self.PartitionResources()
             torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules
             torlist=[tuple(i) for i in torlist]
@@ -4254,9 +4267,7 @@ class PolarizableTyper():
             shutil.copy(self.key5fname,self.key6fname)
             self.torlist=torlist[:]
             if self.tortor==True and self.dontdotor==False:
-                print('tortorsmissing',tortorsmissing)
                 torgen.PrepareTorsionTorsion(self,optmol,mol,tortorsmissing)
-                print('self.torlist',self.torlist)
             torgen.DefaultMaxRange(self,self.torlist)
             if self.refinenonaroringtors==True and self.dontfrag==False:
                 rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
@@ -4280,7 +4291,10 @@ class PolarizableTyper():
                 if not os.path.isfile(self.key7fname):
                     if len(self.torlist)!=0:
                         # torsion scanning
-                        torgen.gen_torsion(self,optmol,self.torsionrestraint,mol)
+                        for r in range(len(self.toroptmethodlist)):
+                            self.toroptmethod=self.toroptmethodlist[r]
+                            self.torspmethod=self.torspmethodlist[r]
+                            torgen.gen_torsion(self,optmol,self.torsionrestraint,mol)
                         # torsion fitting
                         if self.dontdotorfit==True:
                             shutil.copy(self.key6fname,self.key7fname)

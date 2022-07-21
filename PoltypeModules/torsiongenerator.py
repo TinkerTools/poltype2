@@ -226,7 +226,7 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
         elif poltype.torspmethod=='xtb':
             prevstrctfname=outputlog.replace('.log','.xyz')
             executable='xtb'
-            prefix='%s-sp-' % (poltype.molecprefix)
+            prefix='%s-%s-sp-' % (poltype.toroptmethod,poltype.torspmethod)
             postfix='.input'  
             inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
             outputname=inputname.replace(postfix,'.log')
@@ -235,7 +235,7 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
         elif poltype.torspmethod=='ANI':
             prevstrctfname=outputlog.replace('.log','.xyz')
             executable='ANI'
-            prefix='%s-sp-' % (poltype.molecprefix)
+            prefix='%s-%s-sp-' % (poltype.toroptmethod,poltype.torspmethod)
             postfix='.input'  
             inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
             outputname=inputname.replace(postfix,'.log')
@@ -272,7 +272,7 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     Description: 
     """
 
-    prefix='%s-opt-%s_' % (poltype.molecprefix,currentopt)
+    prefix='%s-opt-%s_' % (poltype.toroptmethod,currentopt)
     postfix='.com' 
     toroptcomfname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
     strctfname = os.path.splitext(toroptcomfname)[0] + '.log'
@@ -357,7 +357,7 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
     elif poltype.toroptmethod=='xtb':
         inputstruct=ConvertTinktoXYZ(poltype,torxyzfname,torxyzfname.replace('.xyz','_cart.xyz'))
         inputmol= opt.load_structfile(poltype,inputstruct)
-        prefix='xtb-opt-'
+        prefix=poltype.toroptmethod+'-opt-'
         postfix='.input'  
         inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
         pre=inputname.replace(postfix,'')
@@ -382,7 +382,7 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
 
         inputstruct=ConvertTinktoXYZ(poltype,torxyzfname,torxyzfname.replace('.xyz','_cart.xyz'))
         inputmol= opt.load_structfile(poltype,inputstruct)
-        prefix='ANI-opt-'
+        prefix=poltype.toroptmethod+'-opt-'
         postfix='.input'  
         inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
         pre=inputname.replace(postfix,'')
@@ -408,7 +408,7 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
     elif poltype.toroptmethod=='AMOEBA':
         inputstruct=ConvertTinktoXYZ(poltype,torxyzfname,torxyzfname.replace('.xyz','_cart.xyz'))
         inputmol= opt.load_structfile(poltype,inputstruct)
-        prefix='AMOEBA-opt-'
+        prefix=poltype.toroptmethod+'-opt-'
         postfix='.input'  
         inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
         outputname=inputname.replace(postfix,'.log')
@@ -462,7 +462,7 @@ def GenerateTorsionSPInputFileGaus(poltype,torset,optmol,phaseangles,prevstrctfn
     Description: 
     """
     prevstruct = opt.load_structfile(poltype,prevstrctfname)
-    prefix='%s-sp-' % (poltype.molecprefix)
+    prefix='%s-%s-sp-' % (poltype.toroptmethod,poltype.torspmethod)
     postfix='.com' 
     torspcomfname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
 
@@ -1111,7 +1111,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                 if poltype.toroptmethod!='xtb' and poltype.toroptmethod!='ANI' and poltype.toroptmethod!='AMOEBA':
                     opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
                 tinkerxyz=outputlog.replace('.log','_tinker.xyz')
-                print('cartxyz',cartxyz)
                 ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz)
                 if outputlog not in finishedjobs:
                     finishedjobs.append(outputlog)
@@ -1838,7 +1837,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     Referenced By: 
     Description: 
     """
-    prefix='%s-opt-%s_' % (poltype.molecprefix,currentopt)
+    prefix='%s-opt-%s_' % (poltype.toroptmethod,currentopt)
     postfix='.psi4'  
     inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
     inputstruct=ConvertTinktoXYZ(poltype,torxyzfname,torxyzfname.replace('.xyz','_cart.xyz'))
@@ -2245,8 +2244,7 @@ def CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,m
     Referenced By: 
     Description: 
     """
-
-    prefix='%s-sp-'%(poltype.molecprefix)
+    prefix='%s-%s-sp-' % (poltype.toroptmethod,poltype.torspmethod)
     postfix='.psi4'  
     inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
     finalstruct= opt.load_structfile(poltype,prevstrctfname)

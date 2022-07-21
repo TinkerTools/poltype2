@@ -19,7 +19,7 @@ import databaseparser as db
 from copy import deepcopy
 from rdkit import Chem
 import databaseparser
-
+from matplotlib.pyplot import cm
 
 def CheckGeometricRestraintEnergy(poltype,alzfile):
     """
@@ -178,7 +178,7 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
     WBOarray=[]
     phaseangle_list=[]
     for phaseangles in flatphaselist:
-        prefix='%s-sp-'%(poltype.molecprefix)
+        prefix='%s-%s-sp-' % (poltype.toroptmethod,poltype.torspmethod)
         postfix='.log' 
         minstrctfname,angles=torgen.GenerateFilename(poltype,torset,phaseangles,prefix,postfix,mol)
         if not os.path.exists(minstrctfname): # if optimization failed then SP file will not exist
@@ -1323,6 +1323,65 @@ def AssignZeros(poltype,array):
     return newarray
 
 
+def PlotTorOptMethodListEnergies(poltype,mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
+    for torset in poltype.torlist:
+        flatphaselist=poltype.torsettophaselist[tuple(torset)]
+        energyarrays=[]
+        spmethod=[]
+        optmethod=[]
+        anglelists=[]
+        for r in range(len(poltype.toroptmethodlist)):
+            poltype.toroptmethod=poltype.toroptmethodlist[r]
+            poltype.torspmethod=poltype.torspmethodlist[r]
+            qm_energy_list,qang_list,WBOarray,energytophaseangle = compute_qm_tor_energy(poltype,torset,mol,flatphaselist)
+            qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
+            energyarrays.append(qm_energy_list)
+            spmethod.append(poltype.torspmethod)
+            optmethod.append(poltype.toroptmethod)
+            anglelists.append(qang_list)
+
+        fig = plt.figure(figsize=(10,10))
+        ax = fig.add_subplot(111)
+        figfname = "%s-energylist-" % (poltype.molecprefix)
+        for tor in torset:
+            a,b,c,d = tor[0:4]
+            figfname+="%d-%d" % (b,c)
+            figfname+='_'
+        figfname=figfname[:-1]
+        hand=[]
+        n=len(energyarrays)
+        colors = list(iter(cm.rainbow(numpy.linspace(0, 1, n))))
+
+        for i in range(len(energyarrays)):
+            col=colors[i]
+            sp=spmethod[i]
+            opt=optmethod[i]
+            qm_energy_list=energyarrays[i]
+            qang_list=anglelists[i]
+            line1, =ax.plot(qang_list,qm_energy_list,'go',color=col,label=opt+'-'+sp)
+            hand.append(line1)
+            xpoints=numpy.array([qang_list[i][0] for i in range(len(qang_list))])
+            x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
+            f = interp1d(xpoints,numpy.array(qm_energy_list), kind='quadratic')
+            y_smooth=f(x_new)
+            ax.plot(x_new,y_smooth,color=col)
+        plt.legend(handles=hand,loc='best')
+        ax.set_xlabel('Dihedral Angle (degrees)')
+        ax.set_ylabel('Energy (kcal/mol)')
+        fig = plt.gcf()
+        plt.show()
+        fig.savefig(figfname)
+
+
+
 def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename,count,clskeyswithbadfits,torsettobypassrmsd,classkeylisttoindicesalreadydicremoved,classkeylisttoindicesremoved,write_prm_dict):
     """
     Intent: 
@@ -1721,7 +1780,7 @@ def process_rot_bond_tors(poltype,mol):
         poltype.torfit2Drotonly=True 
         cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,indicesremoveddic,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified,classkeylisttoindicesalreadydicremoved= get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,'_postQMOPTpostfit')
         PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,mol,tmpkey2basename,indicesremoveddic,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified)
-
+    PlotTorOptMethodListEnergies(poltype,mol)
     shutil.copy(tmpkey2basename,'../' + poltype.key7fname)
     os.chdir('..')
 
