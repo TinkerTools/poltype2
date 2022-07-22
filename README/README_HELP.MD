@@ -421,7 +421,7 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 
 ``simulationstostopfolderpath``  specifies a directory containing subdirectories of input jobs, recursive search will and *.end files to each folder with an *.arc file to stop simulations. Upon restarting program all *.end files that are in folders are automatically removed. Default has no value.
 
-``generatepdbtrajs`` specifies to convert ARC to PDB trajectory for equilibriated ARC and production dynamics ARC with full electrostatics and vdW. Default is False. Needs to be used with complexedproteinpdbname.
+``generatepdbtrajs`` specifies to convert ARC to PDB trajectory for equilibriated ARC and production dynamics ARC with full electrostatics and vdW. Default is True. Needs to be used with complexedproteinpdbname.
 
 ``removesolventpdbtraj`` specifies to remove solvent (water/ions) from PDB trajectory. Used with ``generatepdbtrajs``. Default is True.
 

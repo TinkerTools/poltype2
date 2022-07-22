@@ -1065,7 +1065,18 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                 listoftinkertorstructures=numpy.delete(listoftinkertorstructures,locstoremove,axis=0)
         poltype.torsettophaselist[tuple(torset)]=flatphaselist
         poltype.SanitizeAllQMMethods()
-        
+        if poltype.isfragjob==False and poltype.toroptmethod!='xtb' and poltype.partition==False: # cant parralelize xtb because of how it creates same outputname for optimzation
+            poltype.jobsatsametime=poltype.tempjobsatsametime
+            poltype.maxmem,poltype.maxdisk,poltype.numproc=poltype.PartitionResources()
+            poltype.partition=True
+        elif poltype.isfragjob==False and poltype.toroptmethod=='xtb':
+            poltype.jobsatsametime=1
+            poltype.maxmem=poltype.tempmaxmem
+            poltype.maxdisk=poltype.tempmaxdisk
+            poltype.numproc=poltype.tempnumproc
+            poltype.partition=False
+
+
         outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures,optlogtophaseangle,inputfilepaths,outputfilenames,executables,outputlogtoinitialxyz=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol,'1',optlogtophaseangle)
         torsettooptoutputlogs[tuple(torset)]=outputlogs
         dictionary = dict(zip(outputlogs,initialstructures))  
@@ -1168,8 +1179,12 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         fulljobtolog.update(jobtolog)
 
 
+    if poltype.isfragjob==False and poltype.partition==False: # if xtb parrellizatoin turned off, turn back on parrelaxation for sp
+        poltype.jobsatsametime=poltype.tempjobsatsametime
+        poltype.maxmem,poltype.maxdisk,poltype.numproc=poltype.PartitionResources()
+        poltype.partition=True
 
-    
+
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMSPJobToLog'+'_'+poltype.molecprefix
     if poltype.externalapi!=None:
         if len(fulllistofjobs)!=0:

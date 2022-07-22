@@ -208,10 +208,9 @@ def ExecuteEquilibriation(poltype):
             restrainpositionconstant=jobtorestconstantdic[job]
             outarray=[equiloutputarray[idx]]
             finished=term.CheckFilesTermination(poltype,outarray,stepsarray,True)[0]
-            recentlyupdated=term.CheckFilesRecentlyUpdated(poltype,outarray)
             configkeyfilename=poltype.configkeyfilename[i][0]
             ligandindices=poltype.ligandindices[i]
-            if finished==False and recentlyupdated==False:
+            if finished==False:
                 files=os.listdir()
                 for f in files:
                     if '.end' in f:
@@ -473,9 +472,8 @@ def EquilibriationProtocol(poltype):
             if poltype.complexation==True and i==0:
                 CheckPocketWaterIons(poltype)
 
-            if not os.path.isfile(proddynboxfilenamepymol):
-                poltype.PymolReadableFile(proddynboxfilename,proddynboxfilenamepymol)
-                if poltype.generatepdbtrajs==True and poltype.complexation==True and i==0:
-                    pdbfilename=equilarcboxfilename.replace('.arc','.pdb')
-                    poltype.GeneratePDBFromARC(equilarcboxfilename,pdbfilename)
+            poltype.PymolReadableFile(proddynboxfilename,proddynboxfilenamepymol)
+            if poltype.generatepdbtrajs==True and poltype.complexation==True and i==0:
+                pdbfilename=equilarcboxfilename.replace('.arc','.pdb')
+                poltype.GeneratePDBFromARC(equilarcboxfilename,pdbfilename)
         

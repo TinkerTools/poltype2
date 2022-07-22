@@ -92,7 +92,7 @@ class PolarizableTyper():
         anipath:str=os.path.join(os.path.abspath(os.path.split(__file__)[0]),'ani.py')
         complexationonly:bool=False
         removesolventpdbtraj:bool=True
-        generatepdbtrajs:bool=False
+        generatepdbtrajs:bool=True
         alchemical:bool=True
         covalentdock:bool=False
         xtbmethod:int=2
@@ -1266,6 +1266,11 @@ class PolarizableTyper():
                self.jobsatsametime=math.floor(int(self.numproc)/self.coresperjob)
                if self.jobsatsametime>self.maxjobsatsametime:
                    self.jobsatsametime=self.maxjobsatsametime
+               self.tempjobsatsametime=self.jobsatsametime
+               self.tempmaxmem=self.maxmem
+               self.tempmaxdisk=self.maxdisk
+               self.tempnumproc=self.numproc
+               self.partition=False
             if self.toroptmethod=='xtb' or 'xtb' in self.toroptmethodlist:
                 self.jobsatsametime=1 # cant parrelize xtb since coords always written to same file name
             self.firsterror=False
@@ -4217,6 +4222,8 @@ class PolarizableTyper():
                 self.dontfrag=True
             if self.dontfrag==True and self.toroptmethod!='xtb' and 'xtb' not in self.toroptmethodlist: # if fragmenter is turned off, parition resources by jobs at sametime for parent,cant parralelize xtb since coords always written to same filename
                 self.maxmem,self.maxdisk,self.numproc=self.PartitionResources()
+                self.partition=True
+
             torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules
             torlist=[tuple(i) for i in torlist]
             torlist=[tuple([i]) for i in torlist]
@@ -4836,7 +4843,7 @@ class PolarizableTyper():
                         continue
                     files=os.listdir()
                     for f in files:
-                        if '.png' in f and ('energy' in f or 'fit' in f or 'water' in f):
+                        if '.png' in f and ('energy' in f or 'fit' in f or 'water' in f) or '.csv' in f:
                             plots.append(os.path.join(path,f))
             os.chdir(thecurdir)
             
@@ -5242,7 +5249,18 @@ class PolarizableTyper():
             xyzindextopdbindex={v: k for k, v in self.pdbindextoxyzindex.items()}
             indextoconn={}
             first=True
-            temp.write('MODEL'+'\n')
+            modelnum=1
+            modelstring='MODEL                                            '+'\n'
+            modelstring=list(modelstring)
+            modelnumstring=str(modelnum)
+            odiff=4-len(modelnumstring)
+            space=''
+            for i in range(1,odiff+1):
+                space+=' '
+            modelnumstring=space+modelnumstring
+            self.WritePDBString(modelnumstring,modelstring,10,13)
+            modelstring=''.join(modelstring)
+            temp.write(modelstring)
             for line in results:
                 linesplit=line.split()
                 cont=False
@@ -5298,8 +5316,20 @@ class PolarizableTyper():
                         pdbline=''.join(pdbline)
                         temp.write(pdbline)
                 elif '90.000' in line and first==False:
+                    modelnum+=1
                     self.WritePDBCONECTRecord(temp,indextoconn)
-                    temp.write('MODEL'+'\n')
+                    modelstring='MODEL                                            '+'\n'
+                    modelstring=list(modelstring)
+                    modelnumstring=str(modelnum)
+                    odiff=4-len(modelnumstring)
+                    space=''
+                    for i in range(1,odiff+1):
+                        space+=' '
+                    modelnumstring=space+modelnumstring
+                    self.WritePDBString(modelnumstring,modelstring,10,13)
+                    modelstring=''.join(modelstring)
+                    temp.write(modelstring)
+
             self.WritePDBCONECTRecord(temp,indextoconn)
             temp.write('ENDMDL'+'\n')
             temp.close()

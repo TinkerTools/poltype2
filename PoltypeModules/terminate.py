@@ -238,40 +238,4 @@ def CheckFilesTermination(poltype,outputfilepathlist,steps=None,equil=False,firs
     return finished,percentfinished
 
 
-def CheckFileRecentlyUpdated(poltype,outputfilepath):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    updated=False
-    if os.path.isfile(outputfilepath):
-        Ftime=os.path.getmtime(outputfilepath)
-        reltime=time.time()-Ftime
-        htime=reltime*0.000277778
-        updatetime=.25 # hours.
-        if htime<updatetime:
-            updated=True
 
-    return updated
-
-
-def CheckFilesRecentlyUpdated(poltype,outputfilepathlist):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    recentlyupdated=False
-    for i in range(len(outputfilepathlist)):
-        outputfilepath=outputfilepathlist[i]
-        updated=CheckFileRecentlyUpdated(poltype,outputfilepath)
-        if updated==True:
-            recentlyupdated=True
-            break
-
-    return recentlyupdated

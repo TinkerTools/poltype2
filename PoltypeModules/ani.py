@@ -127,7 +127,7 @@ def OptimizeANI(xyzfile,outputfile,outputoptxyz,fmax,listofindices):
     atomicsymbs=GrabAtomicSymbs(xyzfile)
     atomicsymbs=''.join(atomicsymbs)
     newatomicvecls=[tuple(i) for i in atomicvecls]
-    molecule = Atoms(atomicsymbs,positions=newatomicvecls,calculator=torchani.models.ANI1ccx().ase())
+    molecule = Atoms(atomicsymbs,positions=newatomicvecls,calculator=torchani.models.ANI2x().ase())
     ls=[]
     for indices in listofindices: 
         dihedral = [molecule.get_dihedral(*indices), indices] 

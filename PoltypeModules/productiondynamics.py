@@ -60,10 +60,8 @@ def ExecuteProductionDynamics(poltype):
 
                cmdstr=ProductionDynamicsCommand(poltype,boxfilename,keyfilename,proddynsteps,ensemble,outputfilepath,dynamicpath,proddyntimestep,nvt)
                terminate,deletefile,error=term.CheckFileTermination(poltype,outputfilepath,float(poltype.proddynsteps))
-               recentlyupdated=term.CheckFilesRecentlyUpdated(poltype,[outputfilepath])
                if terminate==False:
-                   if recentlyupdated==False and os.path.exists(path+arcfilename): 
-                       shutil.copy(outputfilepath,path+fold+'_PreviousOutput.out')
+                   if os.path.exists(os.path.join(path,arcfilename)): 
                        stepstaken=CheckLastNumberDynamicStepsCompleted(poltype,outputfilepath) # make copy of old output file and save
                        newstepstotake=int(proddynsteps)-stepstaken
                        cmdstr=ProductionDynamicsCommand(poltype,arcfilename,keyfilename,newstepstotake,ensemble,outputfilepath,dynamicpath,proddyntimestep,nvt)

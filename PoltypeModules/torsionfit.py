@@ -20,6 +20,7 @@ from copy import deepcopy
 from rdkit import Chem
 import databaseparser
 from matplotlib.pyplot import cm
+import pandas as pd
 
 def CheckGeometricRestraintEnergy(poltype,alzfile):
     """
@@ -1359,6 +1360,8 @@ def PlotTorOptMethodListEnergies(poltype,mol):
         hand=[]
         n=len(energyarrays)
         colors = list(iter(cm.rainbow(numpy.linspace(0, 1, n))))
+        txtfile=figfname+'.csv'
+        array=[]
 
         for i in range(len(energyarrays)):
             col=colors[i]
@@ -1366,13 +1369,25 @@ def PlotTorOptMethodListEnergies(poltype,mol):
             opt=optmethod[i]
             qm_energy_list=energyarrays[i]
             qang_list=anglelists[i]
-            line1, =ax.plot(qang_list,qm_energy_list,'go',color=col,label=opt+'-'+sp)
+            newqanglist=[ang[0] for ang in qang_list]
+            lab=opt+'-'+sp
+            energylab='Eng-'+lab
+            anglab='Ang-'+lab
+            angrow=[anglab]+newqanglist
+            engrow=[energylab]+qm_energy_list
+            array.append(angrow)
+            array.append(engrow)
+            line1, =ax.plot(qang_list,qm_energy_list,'go',color=col,label=lab)
             hand.append(line1)
             xpoints=numpy.array([qang_list[i][0] for i in range(len(qang_list))])
             x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
             f = interp1d(xpoints,numpy.array(qm_energy_list), kind='quadratic')
             y_smooth=f(x_new)
             ax.plot(x_new,y_smooth,color=col)
+        array=numpy.array(array)
+        tarray=numpy.transpose(array)
+        df = pd.DataFrame(tarray, columns = tarray[0]) 
+        df.to_csv(txtfile)
         plt.legend(handles=hand,loc='best')
         ax.set_xlabel('Dihedral Angle (degrees)')
         ax.set_ylabel('Energy (kcal/mol)')
