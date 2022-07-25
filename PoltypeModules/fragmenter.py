@@ -328,7 +328,7 @@ def GrabVdwAndTorsionParametersFromFragments(poltype,rotbndindextofragmentfilepa
     for line in results:
         fitline="# Fitted from Fragment "
         linesplit=line.split()
-        if 'torsion' in line and '#' not in line and 'Missing' not in line:
+        if line.strip().startswith('torsion') and '#' not in line and 'Missing' not in line:
             typea=int(linesplit[1])
             typeb=int(linesplit[2])
             typec=int(linesplit[3])
