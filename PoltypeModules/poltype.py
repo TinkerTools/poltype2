@@ -1342,30 +1342,42 @@ class PolarizableTyper():
             10. Remove old intermediate files from previous run such as *.xyz_* etc..)
             11. Check if using a tinker version that is up to date enough to be consistent with poltype
             12. If appropriate inputs are given (two keys and two xyz) for parameter comparison then call parameter comparison module and quit poltype.
-            13. Initialize variables to be filled in later in the program stack. Read water/Ions parameter type numbers from prmfilepath.
-            14. If receptorligandxyzfilename is given as input, determine ligand indices for complexation box from input file ( and what the indices should be for solvation box as well).
-            15. If there are overlapping types in input ligandxyzfilenamelist/keyfilenamelist then shift the types so that they are no longer overlapping. Do the same for receptorligandxyzfilename if this is provided as input.
-            16. 
+            13. If the appropriate inputs are given for aligning a ligand to template ligand, then perform alignment in pocket and quit poltype. 
+            14. Initialize variables to be filled in later in the program stack. Read water/Ions parameter type numbers from prmfilepath.
+            15. If receptorligandxyzfilename is given as input, determine ligand indices for complexation box from input file ( and what the indices should be for solvation box as well).
+            16. If there are overlapping types in input ligandxyzfilenamelist/keyfilenamelist then shift the types so that they are no longer overlapping. Do the same for receptorligandxyzfilename if this is provided as input.
+            17. If pdbcode for crystal is given, download and fill in missing residues via Modeller and quit program.
+            18. If user has inputs to use pdb2pqr to protonate protein (via proPka) then call pdb2pqr and quit program.
+            19. Append all keys from keyfilenamelist into one key file. Check to ensure net charge is an integer, if not then pick some multipoles on host (protein) and add residual charge onto the protein multipole to ensure net charge is an integer.  
+            20. If inputs for host-guest tinker XYZ are not given, then generate from complexed PDB.
+            21. If alchemical=False (user doesnt wasnt to run FEP, just dynamics) then set internal lambda schedules to only include one step.
             """
-
+            # STEP 1
             if self.neatliquidsim==True: 
                 self.usepreequilibriatedbox=False # then make new neat liquid box from scratch
             if self.inputproddyntime==False and self.binding==True:
                 self.proddyntime=10
 
+            # STEP 2
 
             head,tail=os.path.split(self.prmfilepath)
             newpath=os.path.join(os.getcwd(),tail)
             if self.prmfilepath!=newpath or head!=None:
                 shutil.copy(self.prmfilepath,newpath)
             self.prmfilepath=tail
+            # STEP 3
+
             if self.simulationstostopfolderpath!=None:
                 self.StopSimulations(self.simulationstostopfolderpath)
                 sys.exit()
+            # STEP 4
+
             if self.annihilateligandxyzfilenamelist==None:
                 self.annihilateligandxyzfilenamelist=self.ligandxyzfilenamelist.copy()
             if int(self.estatlambdascheme[0])!=1 or int(self.vdwlambdascheme[0])!=1 and self.solvation==True:
                 raise ValueError('Please start with 1 on left side of lambdascheme and 0 on right. This way for solvation can add extra steps correctly')
+            # STEP 5
+
             obConversion = openbabel.OBConversion()
             self.ligandsmileslist=[]
             self.annihilateligandsmileslist=[]
@@ -1386,16 +1398,21 @@ class PolarizableTyper():
                 if xyz in self.annihilateligandxyzfilenamelist:
                     self.annihilateligandsmileslist.append(smi)
 
+            # STEP 6
 
             self.logname=os.path.basename(os.getcwd())+'_'+self.logname 
             self.outputpath=os.path.join(os.getcwd(),'')
             self.logfh=open(self.outputpath+self.logname,'a+')
+            # STEP 7
+
             self.SanitizeMMExecutables()
+            # STEP 8
 
             foundgpukey=False
             if (self.which(self.dynamicommpath)):
                 self.usegpu=True
                 foundgpukey=True
+            # STEP 9
 
             if self.externalapi==None and self.submitlocally==None:
                 self.submitlocally=True
@@ -1417,8 +1434,15 @@ class PolarizableTyper():
                 self.truebarpath=self.barpath
                 self.trueanalyzepath=self.analyzepath
                 self.trueminimizepath=self.minimizepath
+            # STEP 10
+
             self.CleanUpFiles()
+            # STEP 11
+
             self.CheckTinkerVersion()
+
+            # STEP 12
+
             if self.perturbedkeyfilename!=None:
                 self.compareparameters=True
 
@@ -1427,13 +1451,19 @@ class PolarizableTyper():
                 if self.perturbedkeyfilename==None:
                     sys.exit()
 
+            # STEP 13
 
             if self.ligandxyzfilenamelist!=None and self.templateligandxyzfilename!=None:
                 self.AlignLigandXYZToTemplateXYZ()
                 sys.exit()
 
+
+
             if self.binding==False and self.solvation==False and self.neatliquidsim==False and self.usepdb2pqr==False and self.pdbcode==None:
                 raise ValueError('Please choose either solvation or binding, or neat liquid simulation mode')
+
+
+            # STEP 14
 
             self.simfoldname=''
             self.boxfilename='box.xyz'
@@ -1458,7 +1488,10 @@ class PolarizableTyper():
 
             self.elementsymtotinktype={'K':box.GrabTypeNumber(self,'Potassium Ion K+'),'Cl':box.GrabTypeNumber(self,'Chloride Ion Cl-'),'Mg':box.GrabTypeNumber(self,'Magnesium Ion Mg+2'),'Li':box.GrabTypeNumber(self,'Lithium Ion Li+'),'Na':box.GrabTypeNumber(self,'Sodium Ion Na+'),'Rb':box.GrabTypeNumber(self,'Rubidium Ion Rb+'),'Cs':box.GrabTypeNumber(self,'Cesium Ion Cs+'),'Be':box.GrabTypeNumber(self,'Beryllium Ion Be+2'),'Ca':box.GrabTypeNumber(self,'Calcium Ion Ca+2'),'Zn':box.GrabTypeNumber(self,'Zinc Ion Zn+2'),'Mg+':box.GrabTypeNumber(self,'Magnesium Ion Mg+2')}
             self.ReadWaterFromPRMFile()
-            needtoshifttypes=self.CheckIfNeedToShiftTypes(self.keyfilenamelist)
+
+            # STEP 15
+
+
             if self.receptorligandxyzfilename!=None:
                 oldtypelist,ligatomnums=self.GrabLigandTypesInfoForIndicesExtraction(self.ligandxyzfilenamelist)
                 indextooldtype,complexligands,solvligands=self.ExtractLigandIndicesFromComplexXYZ(self.receptorligandxyzfilename,oldtypelist,ligatomnums)
@@ -1472,6 +1505,10 @@ class PolarizableTyper():
                 self.ligands.extend(solvligands)
 
 
+            # STEP 16
+
+
+            needtoshifttypes=self.CheckIfNeedToShiftTypes(self.keyfilenamelist)
             if needtoshifttypes==True:
                 oldtypetonewtypelist=self.GenerateTypeMaps(self.keyfilenamelist)
                 for i in range(len(oldtypetonewtypelist)):
@@ -1484,32 +1521,46 @@ class PolarizableTyper():
                 if self.receptorligandxyzfilename!=None:
                     indextonewtype,complexligands,solvligands=self.ExtractLigandIndicesFromComplexXYZ(self.receptorligandxyzfilename,oldtypetonewtypelist,ligatomnums)
                     self.ShiftParameterTypesComplexXYZ(self.receptorligandxyzfilename,indextonewtype)
-               
+
+            # STEP 17
+              
 
             if self.pdbcode!=None:
                 pdbxyz.FillInMissingResidues(self,self.pdbcode)
                 sys.exit()
 
+            # STEP 18
+
+
             if self.usepdb2pqr==True and self.uncomplexedproteinpdbname!=None:
                 pdbxyz.CallPDB2PQR(self,self.uncomplexedproteinpdbname)
                 sys.exit()
 
+
+            # STEP 19
+
             self.originalkeyfilename=self.AppendKeys(self.keyfilenamelist,'ligands.key')
             mpolearrays=self.CheckInputXYZKeyFiles(ligandonly=True) # check xyz/keys of ligands before making complex XYZ
+
+
+            # STEP 20
+
             if self.complexation==True and self.complexedproteinpdbname!=None: 
 
                 pdbxyz.GenerateProteinTinkerXYZFile(self)
             elif self.complexation==True  and self.complexedproteinpdbname==None and self.receptorligandxyzfilename==None: 
                 raise ValueError('Missing complexedproteinpdbname, need ligand in complex')
-            if self.ligandfilename!=None:
-                self.ReadLigandCharge()
 
+
+            # STEP 21
 
 
             if self.alchemical==False:
                 self.estatlambdascheme=[1]
                 self.vdwlambdascheme=[1]
                 self.restlambdascheme=[0]
+
+
 
             self.addgas=False
             if self.neatliquidsim==True:
@@ -5129,18 +5180,6 @@ class PolarizableTyper():
 
 
             return mol
-
-
-        def ReadLigandCharge(self):
-            """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
-            """
-            tmpmol=self.ReadLigandRdkitMol(self.ligandfilename)
-            tmpmol,atomindextoformalcharge=self.CheckLigandInputCharge(tmpmol)
 
 
         def PDBCoordinate(self,coords,index):

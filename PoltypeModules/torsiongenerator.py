@@ -2632,7 +2632,7 @@ def CreateConstraintsFileXTB(poltype,torlist,toranglelist,pre):
     filename=pre+'_constr.txt'
     temp=open(filename,'w')
     temp.write('$constrain'+'\n')
-    temp.write(' force constant=0.05'+'\n')
+    temp.write(' force constant=0.5'+'\n')
     for i in range(len(torlist)):
         tor=torlist[i]
         angle=toranglelist[i]

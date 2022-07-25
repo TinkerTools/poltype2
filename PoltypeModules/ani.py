@@ -135,12 +135,16 @@ def OptimizeANI(xyzfile,outputfile,outputoptxyz,fmax,listofindices):
     c = FixInternals(dihedrals_deg=ls)
     molecule.set_constraint(c)
     dyn = BFGS(molecule,trajectory=outputfile)
-    dyn.run(fmax=fmax)
-    traj = Trajectory(outputfile)
-    atoms=traj[-1]
-    pos=atoms.get_positions()
-    GenerateOptimizedStructureXYZ(atomicsymbs,pos,outputoptxyz)
-    GenerateOptimizedLogFile(outputoptxyz.replace('.xyz','.log')) # just need to make fake log so poltype can read termination signal
+    try:
+        dyn.run(fmax=fmax)
+        traj = Trajectory(outputfile)
+        atoms=traj[-1]
+        pos=atoms.get_positions()
+        GenerateOptimizedStructureXYZ(atomicsymbs,pos,outputoptxyz)
+        GenerateOptimizedLogFile(outputoptxyz.replace('.xyz','.log')) # just need to make fake log so poltype can read termination signal
+    except:
+        GenerateOptimizedLogFile(outputoptxyz.replace('.xyz','.log'),error=True)
+
 
 def GenerateOptimizedStructureXYZ(atomicsymbs,pos,outputoptxyz):
     """
@@ -161,7 +165,7 @@ def GenerateOptimizedStructureXYZ(atomicsymbs,pos,outputoptxyz):
 
     temp.close()
 
-def GenerateOptimizedLogFile(logname):
+def GenerateOptimizedLogFile(logname,error=None):
     """
     Intent:
     Input:
@@ -170,7 +174,11 @@ def GenerateOptimizedLogFile(logname):
     Description: 
     """
     temp=open(logname,'w')
-    temp.write("Normal termination"+'\n') 
+    if error==None:
+        temp.write("Normal termination"+'\n')
+    else:
+        temp.write("error"+'\n')
+
     temp.close()
 
 

@@ -1324,6 +1324,25 @@ def AssignZeros(poltype,array):
     return newarray
 
 
+
+def ExtractFinalValues(poltype,thelist,indices):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    newlist=[]
+    for i in range(len(thelist)):
+        value=thelist[i]
+        if i not in indices:
+            newlist.append(value)
+
+
+    return newlist
+
+
 def PlotTorOptMethodListEnergies(poltype,mol):
     """
     Intent:
@@ -1339,15 +1358,40 @@ def PlotTorOptMethodListEnergies(poltype,mol):
         spmethod=[]
         optmethod=[]
         anglelists=[]
+        new_qm_energy_arrays=[] # if one method has None, then remove that point across all methods
+        new_qanglist=[]
+        indices=[]
+        for r in range(len(poltype.toroptmethodlist)):
+            poltype.toroptmethod=poltype.toroptmethodlist[r]
+            poltype.torspmethod=poltype.torspmethodlist[r]
+            spmethod.append(poltype.torspmethod)
+            optmethod.append(poltype.toroptmethod)
+
+            qm_energy_list,qang_list,WBOarray,energytophaseangle = compute_qm_tor_energy(poltype,torset,mol,flatphaselist)
+            for i in range(len(qm_energy_list)):
+                eng=qm_energy_list[i]
+                if eng==None:
+                    if i not in indices:
+                        indices.append(i)
+
         for r in range(len(poltype.toroptmethodlist)):
             poltype.toroptmethod=poltype.toroptmethodlist[r]
             poltype.torspmethod=poltype.torspmethodlist[r]
             qm_energy_list,qang_list,WBOarray,energytophaseangle = compute_qm_tor_energy(poltype,torset,mol,flatphaselist)
+            finalqm_energy_list=ExtractFinalValues(poltype,qm_energy_list,indices)
+            new_qm_energy_arrays.append(finalqm_energy_list)
+            finalqang_list=ExtractFinalValues(poltype,qang_list,indices)
+            new_qanglist.append(finalqang_list)
+
+
+        for r in range(len(poltype.toroptmethodlist)):
+            qm_energy_list=new_qm_energy_arrays[r]
+            qang_list=new_qanglist[r]
             qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
             energyarrays.append(qm_energy_list)
-            spmethod.append(poltype.torspmethod)
-            optmethod.append(poltype.toroptmethod)
             anglelists.append(qang_list)
+
+
 
         fig = plt.figure(figsize=(10,10))
         ax = fig.add_subplot(111)
