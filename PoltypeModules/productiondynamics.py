@@ -61,8 +61,10 @@ def ExecuteProductionDynamics(poltype):
                cmdstr=ProductionDynamicsCommand(poltype,boxfilename,keyfilename,proddynsteps,ensemble,outputfilepath,dynamicpath,proddyntimestep,nvt)
                terminate,deletefile,error=term.CheckFileTermination(poltype,outputfilepath,float(poltype.proddynsteps))
                if terminate==False:
-                   if os.path.exists(os.path.join(path,arcfilename)): 
-                       stepstaken=CheckLastNumberDynamicStepsCompleted(poltype,outputfilepath) # make copy of old output file and save
+                   if os.path.exists(os.path.join(path,arcfilename)):
+                       stepstaken,dynoutfiles=CheckLastNumberDynamicsStepsCompletedAllTimes(poltype)
+                       newfile=GenerateBackupDynFile(poltype,dynoutfiles)
+                       shutil.copy(outputfilepath,newfile)
                        newstepstotake=int(proddynsteps)-stepstaken
                        cmdstr=ProductionDynamicsCommand(poltype,arcfilename,keyfilename,newstepstotake,ensemble,outputfilepath,dynamicpath,proddyntimestep,nvt)
                    if '_gpu' in cmdstr and poltype.cpujobsonly==True:
@@ -861,5 +863,48 @@ def GrabEnergy(poltype,arcpath,keypath):
     stddevliqenergy=np.std(energyarray)/np.sqrt(np.size(energyarray))
 
     return avgliqenergy,stddevliqenergy
+
+def CheckLastNumberDynamicStepsCompleted(poltype,outputfilepath):
+   steps=None
+   if os.path.isfile(outputfilepath):
+       temp=open(outputfilepath,'r')
+       results=temp.readlines()
+       temp.close()
+       for line in results:
+           if 'Dynamics Steps' in line:
+               linesplit=line.split()
+               if linesplit[-3].isdigit():
+                   steps=int(linesplit[-3])
+       return steps
+   return steps
+
+
+def CheckLastNumberDynamicsStepsCompletedAllTimes(poltype):
+    files=os.listdir()
+    total=0
+    dynoutfiles=[]
+    for f in files:
+        if '.out' in f:
+            stepstaken=CheckLastNumberDynamicStepsCompleted(poltype,f)
+            total+=stepstaken
+            dynoutfiles.append(f)
+    return total,dynoutfiles
+
+
+def GenerateBackupDynFile(poltype,dynoutfiles):
+    highestnum=0
+    for f in dynoutfiles:
+        split=f.split('.out')
+        pre=split[0]
+        if pre.isdigit():
+            dig=int(pre)
+            if dig>highestnum:
+                highestnum=dig
+    if highestnum==0:
+        highestnum=1
+    else:
+        highestnum+=1
+    newfile=str(highestnum)+'.out'
+    return newfile
 
 

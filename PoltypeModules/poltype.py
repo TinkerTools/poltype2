@@ -1509,13 +1509,13 @@ class PolarizableTyper():
             if self.alchemical==False:
                 self.estatlambdascheme=[1]
                 self.vdwlambdascheme=[1]
-                self.restlambdascheme=[1]
+                self.restlambdascheme=[0]
 
             self.addgas=False
             if self.neatliquidsim==True:
                 self.estatlambdascheme=[1]
                 self.vdwlambdascheme=[1]
-                self.restlambdascheme=[1]
+                self.restlambdascheme=[0]
                 self.restrainatomsduringminimization=False
                 if self.inputproddyntime==False:
                     self.proddyntime=3
@@ -3160,7 +3160,7 @@ class PolarizableTyper():
             temp.close()
             for lineidx in range(len(results)):
                 line=results[lineidx]
-                if 'torsion' in line and '#' not in line and 'Missing' not in line and 'none' not in line and 'unit' not in line:
+                if line.strip().startswith('torsion') and '#' not in line and 'Missing' not in line and 'none' not in line and 'unit' not in line:
                     allzero=True
                     linesplit=line.split()
                     ls=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3]),int(linesplit[4])]
