@@ -156,6 +156,7 @@ conda install -c conda-forge cairosvg --yes
 conda install -c conda-forge psutil --yes
 conda install -c conda-forge mdtraj --yes
 conda install -c conda-forge pymbar --yes
+conda install -c salilab modeller --yes
 ```
 
 ### Explicit Conda Installation - XTB

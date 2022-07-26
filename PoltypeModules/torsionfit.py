@@ -173,7 +173,6 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
     Description: Read in the *-sp-*.log files created in 'gen_torsion', find the energy
     values, and store them in a list.
     """
-
     energy_list = []
     angle_list = []
     WBOarray=[]
@@ -239,7 +238,17 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
     if torset in poltype.torsionsettonumptsneeded.keys():
         prmnum=poltype.torsionsettonumptsneeded[torset]
         if normalpts<prmnum:
-            raise ValueError('Too many missing QM SP energy values for torsion set = '+str(torset)+' , need '+str(prmnum)+' points') 
+            string='Too many missing QM SP energy values for torsion set = '+str(torset)+' , need '+str(prmnum)+' points, only have '+str(normalpts)+' points'
+            try:
+                raise ValueError(string)
+            except:
+                os.chdir('..')
+                poltype.WriteToLog(string)
+                poltype.WriteToLog('Trying XTB torsion optimization instead')
+                poltype.toroptmethod='xtb'
+                poltype.toroptmethodlist=[poltype.toroptmethod]
+                poltype.GenerateParameters()
+
     rows = zip(*[angle_list, energy_list])
     energytophaseangle=dict(zip(energy_list,phaseangle_list))
     rows=sorted(rows)
@@ -1804,7 +1813,6 @@ def process_rot_bond_tors(poltype,mol):
     shutil.copy(poltype.key6fname, tmpkey1fname)
     # change directory to qm-torsion
     os.chdir(tordir)
-
     # Group all rotatable bonds with the same classes and identify
     # the torsion parameters that need to be fitted.
 

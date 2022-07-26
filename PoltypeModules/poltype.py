@@ -1372,7 +1372,7 @@ class PolarizableTyper():
                 sys.exit()
             # STEP 4
 
-            if self.annihilateligandxyzfilenamelist==None:
+            if self.annihilateligandxyzfilenamelist==None and self.ligandxyzfilenamelist!=None:
                 self.annihilateligandxyzfilenamelist=self.ligandxyzfilenamelist.copy()
             if int(self.estatlambdascheme[0])!=1 or int(self.vdwlambdascheme[0])!=1 and self.solvation==True:
                 raise ValueError('Please start with 1 on left side of lambdascheme and 0 on right. This way for solvation can add extra steps correctly')
@@ -1382,21 +1382,22 @@ class PolarizableTyper():
             self.ligandsmileslist=[]
             self.annihilateligandsmileslist=[]
             self.ligandxyztosmiles={}
-            for xyz in self.ligandxyzfilenamelist:
-                ligmol = openbabel.OBMol()
-                obConversion.SetInFormat('xyz')
-                newname=self.ConvertTinkerXYZToCartesianXYZ(xyz)
-                obConversion.ReadFile(ligmol, newname)
-                obConversion.SetOutFormat('mol')
-                molname=xyz.replace('.xyz','.mol')
-                obConversion.WriteFile(ligmol,molname)
-                ligm=Chem.MolFromMolFile(molname,removeHs=False,sanitize=False)
-                smi=Chem.MolToSmarts(ligm)
-                smi=smi.replace('@','')
-                self.ligandsmileslist.append(smi)
-                self.ligandxyztosmiles[xyz]=smi
-                if xyz in self.annihilateligandxyzfilenamelist:
-                    self.annihilateligandsmileslist.append(smi)
+            if self.ligandxyzfilenamelist!=None:
+                for xyz in self.ligandxyzfilenamelist:
+                    ligmol = openbabel.OBMol()
+                    obConversion.SetInFormat('xyz')
+                    newname=self.ConvertTinkerXYZToCartesianXYZ(xyz)
+                    obConversion.ReadFile(ligmol, newname)
+                    obConversion.SetOutFormat('mol')
+                    molname=xyz.replace('.xyz','.mol')
+                    obConversion.WriteFile(ligmol,molname)
+                    ligm=Chem.MolFromMolFile(molname,removeHs=False,sanitize=False)
+                    smi=Chem.MolToSmarts(ligm)
+                    smi=smi.replace('@','')
+                    self.ligandsmileslist.append(smi)
+                    self.ligandxyztosmiles[xyz]=smi
+                    if xyz in self.annihilateligandxyzfilenamelist:
+                        self.annihilateligandsmileslist.append(smi)
 
             # STEP 6
 
@@ -2170,19 +2171,21 @@ class PolarizableTyper():
             Referenced By: 
             Description: 
             """
-            newlist=keyfilenamelist.copy()
-            #newlist.append(self.prmfilepath) can only go to 1000 for atom classes in tinker so for now dont shift by max of prm file
+
             needtoshifttypes=False
-            alltypes=[]
-            for keyfilename in newlist:
-                maxnumberfromkey=self.GrabMaxTypeNumber(keyfilename)
-                minnumberfromkey=self.GrabMinTypeNumber(keyfilename)
-                types=list(range(minnumberfromkey,maxnumberfromkey+1))
-                for typenum in types:
-                    if typenum in alltypes:
-                        needtoshifttypes=True
-                        break
-                    alltypes.append(typenum)
+            if keyfilenamelist!=None: 
+                newlist=keyfilenamelist.copy()
+                #newlist.append(self.prmfilepath) can only go to 1000 for atom classes in tinker so for now dont shift by max of prm file
+                alltypes=[]
+                for keyfilename in newlist:
+                    maxnumberfromkey=self.GrabMaxTypeNumber(keyfilename)
+                    minnumberfromkey=self.GrabMinTypeNumber(keyfilename)
+                    types=list(range(minnumberfromkey,maxnumberfromkey+1))
+                    for typenum in types:
+                        if typenum in alltypes:
+                            needtoshifttypes=True
+                            break
+                        alltypes.append(typenum)
 
 
             return needtoshifttypes
@@ -3956,7 +3959,6 @@ class PolarizableTyper():
             Referenced By: 
             Description: 
             """
-            
             temp=open(os.getcwd()+r'/'+'poltype.ini','r')
             results=temp.readlines()
             temp.close()
@@ -5064,9 +5066,10 @@ class PolarizableTyper():
             """
             files=os.listdir()
             for f in files:
-                for xyz in self.ligandxyzfilenamelist:
-                    if xyz+'_' in f:
-                        os.remove(f)
+                if self.ligandxyzfilenamelist!=None:
+                    for xyz in self.ligandxyzfilenamelist:
+                        if xyz+'_' in f:
+                            os.remove(f)
                 if 'water.xyz_' in f or 'key_' in f:
                     os.remove(f)
                 if self.receptorligandxyzfilename!=None:
