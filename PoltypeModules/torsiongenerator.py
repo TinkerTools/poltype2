@@ -564,6 +564,7 @@ def tinker_minimize_analyze_QM_Struct(poltype,torset,optmol,variabletorlist,phas
     newtorxyzfname=torxyzfname
     keyfname=tmpkeyfname
     shutil.copy(keybasepath+keybase,keyfname)
+    
     cartxyz=None
     if minimize==True:
         cartxyz,torxyzfname,newtorxyzfname,keyfname,failedcheck=tinker_minimize(poltype,torset,optmol,variabletorlist,phaseangles,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath,torxyzfname,tmpkeyfname,torminlogfname)
@@ -600,6 +601,11 @@ def tinker_analyze(poltype,torxyzfname,keyfname,toralzfname):
     Referenced By: 
     Description: 
     """
+    if poltype.torsppcm==True:
+        PrependStringToKeyfile(poltype,keyfname,'solvate GK')
+    else:
+        RemoveStringFromKeyfile(poltype,keyfname,'solvate GK')
+
     alzcmdstr=poltype.analyzeexe+' '+torxyzfname+' '+'-k '+keyfname+' ed > %s' % toralzfname
     poltype.call_subsystem([alzcmdstr],False)
     temp={alzcmdstr:toralzfname} 
@@ -637,6 +643,10 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
     save_structfile(poltype,prevstruct,torxyzfname)
     shutil.copy(keybasepath+keybase, tmpkeyfname)
     RemoveStringFromKeyfile(poltype,tmpkeyfname,'restrain-torsion')
+    if poltype.toroptpcm==True:
+        PrependStringToKeyfile(poltype,tmpkeyfname,'solvate GK')
+    else:
+        RemoveStringFromKeyfile(poltype,tmpkeyfname,'solvate GK')
     tmpkeyfh = open(tmpkeyfname,'a')
     restlist=[]
     count=0
@@ -1069,6 +1079,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             poltype.jobsatsametime=poltype.tempjobsatsametime
             poltype.maxmem,poltype.maxdisk,poltype.numproc=poltype.PartitionResources()
             poltype.partition=True
+
         elif poltype.isfragjob==False and poltype.toroptmethod=='xtb':
             poltype.jobsatsametime=1
             poltype.maxmem=poltype.tempmaxmem
@@ -1076,6 +1087,12 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             poltype.numproc=poltype.tempnumproc
             poltype.partition=False
 
+        if poltype.toroptmethod=='ANI' or poltype.toroptmethod=='xtb':
+            poltype.toroptpcm=False
+            poltype.torsppcm=False
+        else:
+            poltype.toroptpcm=poltype.temptoroptpcm
+            poltype.torsppcm=poltype.temptorsppcm
 
         outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures,optlogtophaseangle,inputfilepaths,outputfilenames,executables,outputlogtoinitialxyz=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol,'1',optlogtophaseangle)
         torsettooptoutputlogs[tuple(torset)]=outputlogs
@@ -1928,7 +1945,10 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
  
     if poltype.toroptpcm==True:
         temp.write('set {'+'\n')
-        temp.write('  g_convergence GAU_LOOSE'+'\n')
+        temp.write('  MAX_FORCE_G_CONVERGENCE 2.5e-2'+'\n')
+        temp.write('  RMS_FORCE_G_CONVERGENCE 1.7e-2'+'\n')
+        temp.write('  MAX_DISP_G_CONVERGENCE 1e-1'+'\n')
+        temp.write('  RMS_DISP_G_CONVERGENCE 6.7e-2'+'\n')
         temp.write('  scf_type pk'+'\n')
         temp.write('  pcm true'+'\n')
         temp.write('  pcm_scf_type total '+'\n')
@@ -2679,7 +2699,17 @@ def OptimizeXTB(poltype,inputstruct,resfilename,xtbmethod,outputname,charge,uhf)
     Referenced By: 
     Description: 
     """
-    cmdstr='xtb' +' '+'--gfn'+' '+str(xtbmethod)+' '+'--chrg'+' '+str(charge)+' '+'--uhf'+' '+str(uhf)+' '+inputstruct+' '+'--opt'+' '+'--input'+' '+resfilename+' > '+outputname
+    pythonpath=poltype.which('python')
+    head,tail=os.path.split(pythonpath)
+    pythonpath=Path(head) 
+    envdir=pythonpath.parent.absolute()
+    envpath=Path(envdir)
+    allenvs=envpath.parent.absolute()
+    xtbenvpath=os.path.join(allenvs,poltype.xtbenvname)
+    pythonpath=os.path.join(xtbenvpath,'bin')
+    xtbpath=os.path.join(pythonpath,'xtb')
+
+    cmdstr=xtbpath +' '+'--gfn'+' '+str(xtbmethod)+' '+'--chrg'+' '+str(charge)+' '+'--uhf'+' '+str(uhf)+' '+inputstruct+' '+'--opt'+' '+'--input'+' '+resfilename+' > '+outputname
     optxyz='xtbopt.xyz'
     return optxyz,cmdstr
 
@@ -2692,7 +2722,17 @@ def RunXTBSPEnergy(poltype,optxyz,uhf,charge,xtbmethod,outputname):
     Referenced By: 
     Description: 
     """
-    cmdstr='xtb'+' '+'--gfn'+' '+str(xtbmethod)+' '+optxyz+' '+'--chrg'+' '+str(charge)+' '+'--uhf'+' '+str(uhf)+' > '+outputname
+    pythonpath=poltype.which('python')
+    head,tail=os.path.split(pythonpath)
+    pythonpath=Path(head) 
+    envdir=pythonpath.parent.absolute()
+    envpath=Path(envdir)
+    allenvs=envpath.parent.absolute()
+    xtbenvpath=os.path.join(allenvs,poltype.xtbenvname)
+    pythonpath=os.path.join(xtbenvpath,'bin')
+    xtbpath=os.path.join(pythonpath,'xtb')
+
+    cmdstr=xtbpath+' '+'--gfn'+' '+str(xtbmethod)+' '+optxyz+' '+'--chrg'+' '+str(charge)+' '+'--uhf'+' '+str(uhf)+' > '+outputname
     return cmdstr
 
 

@@ -85,9 +85,11 @@ from operator import itemgetter
 
 @dataclass
 class PolarizableTyper():
+        makexyzonly:bool=False
         toroptmethodlist:list=field(default_factory=lambda : [])
         torspmethodlist:list=field(default_factory=lambda : [])
         anienvname:str='ani'
+        xtbenvname:str='xtbenv'
         anifmax=.05
         anipath:str=os.path.join(os.path.abspath(os.path.split(__file__)[0]),'ani.py')
         complexationonly:bool=False
@@ -554,6 +556,7 @@ class PolarizableTyper():
                             if a=='None':
                                 continue
                             commalist=a.split(',')
+                            commalist=[k.strip() for k in commalist]
                         else:
                             newline=line
 
@@ -619,6 +622,8 @@ class PolarizableTyper():
                             self.vinaexhaustiveness=int(a)
                         elif 'dockingenvname' in newline:
                             self.dockingenvname=a
+                        elif "makexyzonly" in newline:
+                            self.makexyzonly=self.SetDefaultBool(line,a,True)
                         elif "complexationonly" in newline:
                             self.complexationonly=self.SetDefaultBool(line,a,True)
                         elif "generatepdbtrajs" in newline:
@@ -776,7 +781,7 @@ class PolarizableTyper():
                         elif "proddynensem" in newline:
                             self.proddynensem = a
                         elif ("keyfilenamelist") in newline:
-                            self.keyfilenamelist=a.split(',')
+                            self.keyfilenamelist=commalist
                         elif ("ligandcharge") in newline:
                             self.ligandcharge = int(a)
                         elif ("tightmincriteria") in newline:
@@ -796,9 +801,9 @@ class PolarizableTyper():
                         elif ("listofsaltcons") in newline:
                             self.listofsaltcons = a
                         elif ("ligandxyzfilenamelist") in newline and "receptor" not in newline and 'annihilate' not in newline:
-                            self.ligandxyzfilenamelist=a.split(',')
+                            self.ligandxyzfilenamelist=commalist
                         elif ("annihilateligandxyzfilenamelist") in newline and "receptor" not in newline:
-                            self.annihilateligandxyzfilenamelist=a.split(',')
+                            self.annihilateligandxyzfilenamelist=commalist
                         elif ("ligandfilename") in newline:
                             self.ligandfilename = a
                         elif ("receptorligandxyzfilename") in newline:
@@ -1549,6 +1554,7 @@ class PolarizableTyper():
             if self.complexation==True and self.complexedproteinpdbname!=None: 
 
                 pdbxyz.GenerateProteinTinkerXYZFile(self)
+
             elif self.complexation==True  and self.complexedproteinpdbname==None and self.receptorligandxyzfilename==None: 
                 raise ValueError('Missing complexedproteinpdbname, need ligand in complex')
 
@@ -3576,25 +3582,26 @@ class PolarizableTyper():
             """
             chargedindices=[]
             pcm=False
-            for atomindex,chg in atomindextoformalcharge.items():
-                if chg!=0:
-                    chargedindices.append(atomindex)
-            for atomindex in chargedindices:
-                atom=m.GetAtomWithIdx(atomindex)
-                for atm in atom.GetNeighbors():
-                    atmidx=atm.GetIdx()
-                    if atmidx in chargedindices:
-                        pcm=True
-                    for natm in atm.GetNeighbors():
-                        natmidx=natm.GetIdx()
-                        if natmidx!=atomindex:
-                            if natmidx in chargedindices:
-                                pcm=True
-                            for nnatm in natm.GetNeighbors():
-                                nnatmidx=nnatm.GetIdx()
-                                if nnatmidx!=atmidx:
-                                    if nnatmidx in chargedindices:
-                                        pcm=True
+            if self.hashyd==True:
+                for atomindex,chg in atomindextoformalcharge.items():
+                    if chg!=0:
+                        chargedindices.append(atomindex)
+                for atomindex in chargedindices:
+                    atom=m.GetAtomWithIdx(atomindex)
+                    for atm in atom.GetNeighbors():
+                        atmidx=atm.GetIdx()
+                        if atmidx in chargedindices:
+                            pcm=True
+                        for natm in atm.GetNeighbors():
+                            natmidx=natm.GetIdx()
+                            if natmidx!=atomindex:
+                                if natmidx in chargedindices:
+                                    pcm=True
+                                for nnatm in natm.GetNeighbors():
+                                    nnatmidx=nnatm.GetIdx()
+                                    if nnatmidx!=atmidx:
+                                        if nnatmidx in chargedindices:
+                                            pcm=True
             return pcm 
                     
                         
@@ -3765,12 +3772,12 @@ class PolarizableTyper():
             Referenced By: 
             Description: 
             """
-            hashyd=False
+            self.hashyd=False
             for atom in m.GetAtoms():
                 atomicnum=atom.GetAtomicNum()
                 if atomicnum==1:
-                    hashyd=True
-            if hashyd==False:
+                    self.hashyd=True
+            if self.hashyd==False:
                 string='No hydrogens detected in input file!'
                 warnings.warn(string)
                 self.WriteToLog(string)
@@ -4076,6 +4083,8 @@ class PolarizableTyper():
                 self.optpcm=True
                 self.torsppcm=True
 
+            self.temptorsppcm=self.torsppcm
+            self.temptoroptpcm=self.toroptpcm
             
             if self.use_gauPCM==True:
                 self.use_gausoptonly=False
@@ -4266,8 +4275,6 @@ class PolarizableTyper():
                 if self.databasematchonly==True:
                     sys.exit()
 
-            if self.torsppcm:
-                torgen.PrependStringToKeyfile(self,self.key4fname,'solvate GK')
             torgen.get_all_torsions(self,mol)
             # Find rotatable bonds for future torsion scans
             (torlist, self.rotbndlist,hydtorsions,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,mol,torsionsmissing)
@@ -4382,8 +4389,6 @@ class PolarizableTyper():
                     opt.gen_superposeinfile(self)
                     opt.CheckRMSD(self)
 
-            if self.torsppcm:
-                torgen.RemoveStringFromKeyfile(self,self.key7fname,'solvate GK')
             if self.atomnum!=1: 
                  esp.CheckDipoleMoments(self,optmol)
             if os.path.exists(self.tmpkeyfile):
@@ -5070,7 +5075,7 @@ class PolarizableTyper():
                     for xyz in self.ligandxyzfilenamelist:
                         if xyz+'_' in f:
                             os.remove(f)
-                if 'water.xyz_' in f or 'key_' in f:
+                if 'water.xyz_' in f or 'key_' in f or 'uncomplexed.' in f:
                     os.remove(f)
                 if self.receptorligandxyzfilename!=None:
                     if self.receptorligandxyzfilename+'_' in f:

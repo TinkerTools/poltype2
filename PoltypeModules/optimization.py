@@ -87,10 +87,11 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     temp.write('}'+'\n')
     if poltype.optpcm==True:
         temp.write('set {'+'\n')
-        if poltype.optloose==True:
-            temp.write('  g_convergence GAU_LOOSE'+'\n')
-        else:
-            temp.write('  g_convergence GAU'+'\n')
+        temp.write('  MAX_FORCE_G_CONVERGENCE 2.5e-2'+'\n')
+        temp.write('  RMS_FORCE_G_CONVERGENCE 1.7e-2'+'\n')
+        temp.write('  MAX_DISP_G_CONVERGENCE 1e-1'+'\n')
+        temp.write('  RMS_DISP_G_CONVERGENCE 6.7e-2'+'\n')
+
 
         temp.write('  scf_type pk'+'\n')
         temp.write('  pcm true'+'\n')

@@ -259,16 +259,16 @@ usegold=True
 #### Minimum Input Example Binding Free Energy
 
 ```
-complexedproteinpdbname=anilinecomp.pdb 
+complexedproteinpdbname=complex.pdb 
 binding
-keyfilenamelist=aniline.key
-ligandxyzfilenamelist=aniline.xyz
+keyfilenamelist=Mol1.key , Mol2.key
+ligandxyzfilenamelist=Mol1.xyz , Mol2.xyz
 ```
 or
 
 ```
 receptorligandxyzfilename=complex.xyz
-prmfilepath=prmfile with absolute path #for receptor
+prmfilepath=prmfile # with absolute path for receptor
 binding
 keyfilenamelist=complex.key 
 ligandxyzfilenamelist=ligand.xyz
@@ -278,16 +278,16 @@ ligandxyzfilenamelist=ligand.xyz
 
 ```
 solvation
-keyfilenamelist=aniline.key
-ligandxyzfilenamelist=aniline.xyz
+keyfilenamelist=Mol.key
+ligandxyzfilenamelist=Mol.xyz
 ```
 
 #### Minimum Input Example Neat Liquid Simulation
 ```
 neatliquidsim
 density=997
-keyfilenamelist=aniline.key
-ligandxyzfilenamelist=aniline.xyz
+keyfilenamelist=Mol.key
+ligandxyzfilenamelist=Mol.xyz
 equilibriatescheme=50,100,150,200,300,300
 ```
 

@@ -896,7 +896,7 @@ def PlotAllDimers(nametodimerstructs,truenametoindices):
             filenametoformula[dimer]=dimerformula
             count+=1
         nametofilenametoformula[name]=filenametoformula
-        PlotDimers3D(filenames,allindices)
+        #PlotDimers3D(filenames,allindices)
         os.chdir('..')
     return nametofilenametoformula
 
@@ -1103,6 +1103,7 @@ def PlotDimers3D(filenamearray,allindices):
         n=molsPerImage
     else:
         n=molsPerImage+1 
+    print('n',n)
     molsperrow=SmallestDivisor(n)
     if n==2:
         molsperrow=1
@@ -2321,9 +2322,10 @@ def WriteOutGridImage(moleculenames,filenamearray,prop):
         n=molsPerImage
     else:
         n=molsPerImage+1 
-    molsperrow=SmallestDivisor(n)
-    if n==2:
+    if n==2 or n==1:
         molsperrow=1
+    else:
+        molsperrow=SmallestDivisor(n)
     ximagesize=640
     yimagesize=480
     filenamechunks=ChunksList(Chunks(filenamearray,molsPerImage))
@@ -2406,7 +2408,7 @@ def PlotForceBalanceResults(fbdir,targetdensityerror,targetenthalpyerror):
     qmcsvname=WriteOutQMTable(nametoformulatormse,nametoformulatomse)
     poltypedirs,groupedpoltypedirs=GrabPoltypeDirectories(jobdirs)
     nametocubefiles,groupednames=GrabCubeFiles(groupedpoltypedirs)
-    PlotAllESPSurfaces(nametocubefiles)
+    #PlotAllESPSurfaces(nametocubefiles)
     nametotemparray,nametoproptokeytoarray=PlotLiquidPropsVsTemp(nametotptofinalprops)
     PlotLiquidPropsCorrelation(nametotptofinalprops)
     PlotLiquidPropsCorrelationForGroups(nametotptofinalprops,groupednames,nametotemparray)

@@ -456,6 +456,9 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 
 #### Box Setup
 
+
+``makexyzonly`` specifies to only generate tinker XYZ from ``complexedproteinpdbname``, ``ligandxyzfilenamelist`` and ``keyfilenamelist`` then the program will exit. 
+
 ``density`` specifies the density of neat liquid box in kg/m^3. Default has no value.
 
 
