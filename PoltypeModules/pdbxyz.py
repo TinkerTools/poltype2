@@ -172,6 +172,7 @@ def GrabNonLigandHETATMInfo(poltype,complexedproteinpdbname,indextocoordinates,p
     an = pyasl.AtomicNo()
     firstindex=lastligindex+1
     count=0
+    nonionelements=['H','S','C','O','Cl','I','Br','F','N']
     for atom in iteratom:
         index=atom.GetIdx()
         atomicnum=atom.GetAtomicNum()
@@ -184,8 +185,33 @@ def GrabNonLigandHETATMInfo(poltype,complexedproteinpdbname,indextocoordinates,p
             if typenum==None:
                 continue
             nonlighetatmindextotypenum[newindex]=typenum
-            shift=newindex-index # check will this work 
-            connectivity=GrabConnectivity(poltype,pdbmol,index,shift)
+            shift=newindex-index 
+            if element in nonionelements:
+                connectivity,atomicnums,oldconn=GrabConnectivity(poltype,pdbmol,index,shift)
+            else:
+                connectivity=[]
+            if element=='O': # if like some buffer molecule user forgot to add to ligandxyzfilenamelist, make sure O only for water
+                watero=True
+                for oatomicnum in atomicnums:
+                    if oatomicnum!=1:
+                        watero=False
+                if watero==False:
+                    continue
+            if element=='H': # could be H on non ligand molecule (besides water)
+                neighb=oldconn[0]
+                natomicnum=atomicnums[0]
+                if natomicnum!=8:
+                    continue
+                oconnectivity,oatomicnums,ooldconn=GrabConnectivity(poltype,pdbmol,neighb,shift)
+                watero=True
+                for oatomicnum in oatomicnums:
+                    if oatomicnum!=1:
+                        watero=False
+                if watero==False:
+                    continue
+
+
+                     
             nonlighetatmindextoconnectivity[newindex]=connectivity
             nonlighetatmindextoelement[newindex]=element
             count+=1
@@ -202,20 +228,31 @@ def GrabConnectivity(poltype,pdbmol,index,shift):
     Description: 
     """
     conn=[]
+    oldconn=[]
+    els=[]
     bonditer=openbabel.OBMolBondIter(pdbmol)
     for bond in bonditer:
         oendidx = bond.GetEndAtomIdx()
         obgnidx = bond.GetBeginAtomIdx()
+        obgnatom=pdbmol.GetAtom(obgnidx)
+        oendatom=pdbmol.GetAtom(oendidx)
+        obgnatomicnum=obgnatom.GetAtomicNum()
+        oendatomicnum=oendatom.GetAtomicNum()
+
         bnd=[oendidx,obgnidx]
         if oendidx==index:
             newbgn=obgnidx+shift
             if newbgn not in conn:
                 conn.append(newbgn)
+                els.append(obgnatomicnum)
+                oldconn.append(obgnidx)
         elif obgnidx==index:
             newend=oendidx+shift
             if newend not in conn:
                 conn.append(newend)
-    return conn
+                els.append(oendatomicnum)
+                oldconn.append(oendidx)
+    return conn,els,oldconn
 
 
 
