@@ -290,7 +290,7 @@ def CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     rotbndtorescount={}
     maxrotbnds=1
     restlist=[]
-    rottors,rotbndtorescount,restlist=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles)
+    rottors,rotbndtorescount,restlist,rotphases=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles)
     frotors,rotbndtorescount,restlist=FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles)
 
     for k in range(len(results)):
@@ -365,7 +365,7 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
         rotbndtorescount={}
         maxrotbnds=1
         restlist=[]
-        rottors,rotbndtorescount,restlist=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles)
+        rottors,rotbndtorescount,restlist,rotphases=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles)
         frotors,rotbndtorescount,restlist=FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles)
         for tor in rottors:
             newtorset.append(tor)
@@ -390,7 +390,7 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
         rotbndtorescount={}
         maxrotbnds=1
         restlist=[]
-        rottors,rotbndtorescount,restlist=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles)
+        rottors,rotbndtorescount,restlist,rotphases=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles)
         frotors,rotbndtorescount,restlist=FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles)
         for tor in rottors:
             newtorset.append(tor)
@@ -648,6 +648,34 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
     else:
         RemoveStringFromKeyfile(poltype,tmpkeyfname,'solvate GK')
     tmpkeyfh = open(tmpkeyfname,'a')
+
+    rotbndtorescount={}
+    maxrotbnds=1
+    restlist=[]
+    rottors,rotbndtorescount,restlist,rotphases=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,optmol,restlist,phaseanglelist)
+    frotors,rotbndtorescount,restlist=FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,optmol,restlist,phaseanglelist)
+
+    for i in range(len(rottors)):
+        tor=rottors[i]
+        rta,rtb,rtc,rtd=tor[:]
+        torang = optmol.GetTorsion(rta,rtb,rtc,rtd)
+        phaseangle=rotphases[i]
+        if torang<0:
+            torang=torang+360
+        tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (rta,rtb,rtc,rtd,torsionrestraint,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
+
+
+    for i in range(len(frotors)):
+        tor=frotors[i]
+        rta,rtb,rtc,rtd=tor[:]
+        torang = optmol.GetTorsion(rta,rtb,rtc,rtd)
+        if torang<0:
+            torang=torang+360
+        tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (rta,rtb,rtc,rtd,torsionrestraint,round((torang)%360),round((torang)%360)))
+
+
+
+
     restlist=[]
     count=0
     torsiontophaseangle={}
@@ -1738,6 +1766,7 @@ def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxr
     """
     rottors=[] 
     firsttor=True
+    phases=[]
     for i in range(len(torset)):
        tor=torset[i]
        a,b,c,d=tor[0:4]
@@ -1783,12 +1812,14 @@ def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxr
                        restlist.append(resttors)
                        if not firsttor:
                            rottors.append([rta,rtb,rtc,rtd])
+                           phases.append(phaseangle)
                        else:
                            firsttor=False
                            rottors.insert(0,[rta,rtb,rtc,rtd])
+                           phases.insert(0,phaseangle)
 
                        rotbndtorescount[rotbnd]+=1
-    return rottors,rotbndtorescount,restlist
+    return rottors,rotbndtorescount,restlist,phases
 
 
 def FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles):
@@ -1882,7 +1913,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     rotbndtorescount={}
     maxrotbnds=1
     restlist=[]
-    rottors,rotbndtorescount,restlist=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles)
+    rottors,rotbndtorescount,restlist,rotphases=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles)
     frotors,rotbndtorescount,restlist=FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles)
     if os.path.isfile(torxyzfname):
         xyzstr = open(torxyzfname,'r')

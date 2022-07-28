@@ -1240,7 +1240,7 @@ class PolarizableTyper():
             if self.jobsatsametime!=0:
                 self.maximizejobsatsametime=False
             else:
-                if self.isfragjob==True:
+                if self.isfragjob==True and self.jobsatsametime==0:
                     self.jobsatsametime=1
             if self.molstructfname!=None:
                 head, self.molstructfname = os.path.split(self.molstructfname)
