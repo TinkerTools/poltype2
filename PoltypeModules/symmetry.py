@@ -61,7 +61,6 @@ def gen_canonicallabels(poltype,mol,rdkitmol=None,usesym=True,isparent=False):
     if poltype.indextotypefile!=None and isparent==True:
         idxtosymclass=ReadCustomIndexToTypeFiles(poltype,poltype.indextotypefile)
     symmetryclass=idxtosymclass.values()
-    sys.exit()
     return idxtosymclass,symmetryclass
 
 
