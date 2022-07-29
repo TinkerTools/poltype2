@@ -1483,17 +1483,15 @@ def get_torlist(poltype,mol,missed_torsions):
 
         if poltype.rotalltors==True:
             skiptorsion=False
+
         if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False and onlyrot==False and foundmissing==False:
             skiptorsion=True
         babelindices=[t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()]
+        
         t1atomicnum=t1.GetAtomicNum()
         t4atomicnum=t4.GetAtomicNum()
         allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
         allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol)
-        if (t1atomicnum==1 or t4atomicnum==1) and (allhydtors==False) and poltype.rotalltors==False:
-            skiptorsion=True
-        if (t1atomicnum==1 or t4atomicnum==1):
-            hydtorsionlist.append(sortedtor)
         unq=get_uniq_rotbnd(poltype,t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx())
         if ringbond==True and willrefinenonarotor==False and len(poltype.onlyrotbndslist)==0 and poltype.dontfrag==False and foundmissing==True:
             nonaroringtorlist.append(unq)

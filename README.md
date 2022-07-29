@@ -215,7 +215,6 @@ pdbcode=5l2t
 * pdb2pqr can be installed via ``conda install -c conda-forge pdb2pqr`` or use yaml file
 ```
 uncomplexedproteinpdbname=5l2t_filled.BL00020001.pdb
-usepdb2pqr
 ```
 * After adding any missing residues and assigning the protonation state, the ligand needs to be added to the protein pocket and given as input ``complexedproteinpdbname`` for binding computations.
 
@@ -260,7 +259,6 @@ usegold=True
 
 ```
 complexedproteinpdbname=complex.pdb 
-binding
 keyfilenamelist=Mol1.key , Mol2.key
 ligandxyzfilenamelist=Mol1.xyz , Mol2.xyz
 ```
@@ -269,7 +267,6 @@ or
 ```
 receptorligandxyzfilename=complex.xyz
 prmfilepath=prmfile # with absolute path for receptor
-binding
 keyfilenamelist=complex.key 
 ligandxyzfilenamelist=ligand.xyz
 ```
@@ -277,14 +274,12 @@ ligandxyzfilenamelist=ligand.xyz
 #### Minimum Input Example Solvation Free Energy
 
 ```
-solvation
 keyfilenamelist=Mol.key
 ligandxyzfilenamelist=Mol.xyz
 ```
 
 #### Minimum Input Example Neat Liquid Simulation
 ```
-neatliquidsim
 density=997
 keyfilenamelist=Mol.key
 ligandxyzfilenamelist=Mol.xyz

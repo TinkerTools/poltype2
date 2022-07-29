@@ -662,8 +662,6 @@ class PolarizableTyper():
                             self.usead4=self.SetDefaultBool(line,a,True)
                         elif "addphysioions" in newline:
                             self.addphysioions=self.SetDefaultBool(line,a,True)
-                        elif "usepdb2pqr" in newline:
-                            self.usepdb2pqr=self.SetDefaultBool(line,a,True)
                         elif "submitlocally" in newline:
                             self.didinputsubmitlocally=True
                             self.submitlocally=self.SetDefaultBool(line,a,True)
@@ -677,8 +675,6 @@ class PolarizableTyper():
                             self.relaxFBbox=self.SetDefaultBool(line,a,True)
                         elif "extractinterforbinding" in newline:
                             self.extractinterforbinding=self.SetDefaultBool(line,a,True)
-                        elif "neatliquidsim" in newline:
-                            self.neatliquidsim=self.SetDefaultBool(line,a,True)
                         elif "redobar" in newline:
                             self.redobar=self.SetDefaultBool(line,a,True)
                         elif "rotateframes" in newline:
@@ -731,10 +727,6 @@ class PolarizableTyper():
                             self.productiondynamicsNVT=self.SetDefaultBool(line,a,True)
                         elif "usetinkerforthermoprops" in newline:
                             self.usetinkerforthermoprops=self.SetDefaultBool(line,a,True)
-                        elif 'binding' in newline:
-                            self.binding=True
-                            self.solvation=True
-                            self.complexation=True
                         elif "changegasphaseintegrator" in newline:
                             self.changegasphaseintegrator=self.SetDefaultBool(line,a,True)
                         elif "prodmdfinished" in newline:
@@ -860,8 +852,6 @@ class PolarizableTyper():
                             self.inputproddyntime=True
                         elif ("complexation") in newline:
                             self.complexation=True
-                        elif ("solvation") in newline:
-                            self.solvation=True
                         elif ("equiltimeNVT") in newline:
                             self.equiltimeNVT= float(a)
                             self.inputequiltimeNVT=True
@@ -1296,6 +1286,22 @@ class PolarizableTyper():
                 self.usevina=False # doesnt have covalent
                 self.usevinardo=False # doesnt have covalent
                 self.usead4=False
+            if (self.usead4==True or self.usegold==True or self.usevina==True or self.usevinardo==True):
+                self.docking=True
+            else:
+                self.docking=False
+            if (self.complexedproteinpdbname!=None or self.receptorligandxyzfilename!=None) and self.docking==False:
+                self.binding=True
+                self.solvation=True
+                self.complexation=True
+
+            if self.binding==False:
+                if self.density!=None:
+                    self.neatliquidsim=True
+            if self.binding==False and self.neatliquidsim==False and self.docking==False:
+                self.solvation=True
+            if self.uncomplexedproteinpdbname!=None:
+                self.usepdb2pqr=True
 
             if self.poltypepathlist!=None:
                 fb.GenerateForceBalanceInputs(self,self.poltypepathlist,self.vdwtypeslist,self.liquid_equ_steps,self.liquid_prod_steps,self.liquid_timestep,self.liquid_interval,self.gas_equ_steps,self.gas_prod_steps,self.gas_timestep,self.gas_interval,self.md_threads,self.liquid_prod_time,self.gas_prod_time,self.WQ_PORT,self.csvexpdatafile,self.fittypestogether,self.vdwprmtypestofit,self.vdwtypestoeval,self.liquid_equ_time,self.gas_equ_time,self.qmrelativeweight,self.liqrelativeweight,self.enthalpyrelativeweight,self.densityrelativeweight,self.relaxFBbox)
@@ -1309,7 +1315,7 @@ class PolarizableTyper():
             if self.ligandxyzfilenamelist!=None and (self.binding==True or self.solvation==True or self.neatliquidsim==True) or self.pdbcode!=None or self.usepdb2pqr!=False:
                 self.MolecularDynamics()
                 sys.exit()
-            if (self.usead4==True or self.usegold==True or self.usevina==True or self.usevinardo==True) and self.complexedproteinpdbname!=None:
+            if (self.docking==True) and self.complexedproteinpdbname!=None:
                 docking.DockingWrapper(self,self.complexedproteinpdbname,self.dockgridcenter,self.dockgridsize,self.vinaexhaustiveness,self.nposes,self.goldbin,self.usevina,self.usead4,self.usevinardo,self.usegold,self.dockingenvname,self.prepdockscript,self.gridspacing,self.listofligands,self.ecrexpect,self.covalentdock,self.knownresiduesymbs)
                 sys.exit()
             
@@ -1356,6 +1362,17 @@ class PolarizableTyper():
             19. Append all keys from keyfilenamelist into one key file. Check to ensure net charge is an integer, if not then pick some multipoles on host (protein) and add residual charge onto the protein multipole to ensure net charge is an integer.  
             20. If inputs for host-guest tinker XYZ are not given, then generate from complexed PDB.
             21. If alchemical=False (user doesnt wasnt to run FEP, just dynamics) then set internal lambda schedules to only include one step.
+            22. If user wants neat liquid simulation, adjust defaults for equilibriation and production dynamics length. Only incllude dynamics for 100% electrostatics and 100% vdW.
+            23. Check if need solvation gas phase regrowth for hydration free energy computations. Some molecules are small enough so that the vdW interactions dont exist. If small enough dont need gas phase vdW regrowth step.
+            24. If user gives complexed host-guest tinker XYZ file and box info is on the top of the file, remove the box info.
+            25. Ensure no undefined parameters for all key files, and make sure net charge of receptor is an integer, if not add residual charge to one of receptor multipoles and will append modified multipoles to complexation tinker key file. 
+            26. If need to add gas phase vdW regrowth, adjust variables for electrostatic and vdW lambda schedules. 
+            27. Set up variables such as system total charge, number of ions needed, filenames, variables used for free energy, enthalpy, entropy computations.
+            28. If pathtosims is specified, then combine simulation table data from other simulation output tables (different simulation folders) and add into combined table. Generate combined plots as well.
+            29. If perturbkeyfilelist is specified, then set up variables for determining filenames, folders and number of interpolations needed later.
+            30. Append all keys from keyfilenamelist into keys for solvation/complexation. Append any additional modified multipoles needed to ensure net charge of receptor is an integer. 
+            31.   
+
             """
             # STEP 1
             if self.neatliquidsim==True: 
@@ -1568,6 +1585,7 @@ class PolarizableTyper():
                 self.restlambdascheme=[0]
 
 
+            # STEP 22
 
             self.addgas=False
             if self.neatliquidsim==True:
@@ -1583,8 +1601,6 @@ class PolarizableTyper():
                     self.equiltimeNPT=.5
                 if self.inputlastNVTequiltime==False:
                     self.lastNVTequiltime=.5
-
-
                 self.addgas=True
             self.originalestatlambdascheme=self.estatlambdascheme[:]
             self.originalvdwlambdascheme=self.vdwlambdascheme[:]
@@ -1593,10 +1609,20 @@ class PolarizableTyper():
 
             
 
+            # STEP 23
+
 
             self.checkneedregrow=self.CheckIfNeedRegrowForSolvation()
+
+            # STEP 24
+
             self.CheckReceptorLigandXYZFile() # sometimes user have box info on top
+            
+            # STEP 25
             mpolearrays=self.CheckInputXYZKeyFiles()
+
+            # STEP 26
+
             if (self.extractinterforbinding==True and self.binding==True) or self.checkneedregrow==True:
                 self.addgas=True
             if self.addgas:
@@ -1613,11 +1639,11 @@ class PolarizableTyper():
                 self.restlambdascheme=[self.restlambdascheme]
                 self.torsionrestscheme=[self.torsionrestscheme]
 
-            if self.ligandcharge==None: # assume since no input given
-                self.ligandcharge=0
             if self.complexationonly==True:
                 self.solvation=False
 
+            # STEP 27 
+ 
             head,self.foldername=os.path.split(os.getcwd())
             if self.complexation==True and self.solvation==False:
                 self.bufferlen=[20]
@@ -1796,10 +1822,15 @@ class PolarizableTyper():
                 self.entropyerror=[[],[]]
                 self.masterdict['boxinfo']=[{},{}]
 
+            # STEP 28
+
             if self.pathtosims!=None:
                 tables.GrabSimDataFromPathList(self)
                 plots.PlotEnergyData(self)
                 sys.exit()
+
+            # STEP 29
+
             if self.perturbkeyfilelist!=None:
                 ls=[i+1 for i in range(len(self.perturbkeyfilelist))]
                 self.perturbkeyfilelisttokeyindex=dict(zip(self.perturbkeyfilelist,ls)) 
@@ -1808,8 +1839,10 @@ class PolarizableTyper():
                 else:
                     self.numinterpolsforperturbkeyfiles=[int(i) for i in self.numinterpolsforperturbkeyfiles]
                 self.perturbkeyfilelisttointerpolations=dict(zip(self.perturbkeyfilelist,self.numinterpolsforperturbkeyfiles))
-                if self.fep==True:
+                if self.fep==True: # if fep keyword is used then dont need to run dynamics only BAR, so submit jobs on current node
                     self.submitlocally=True
+
+            # STEP 30
 
             for i in range(len(self.newkeyfilename)):
                 newkeyfilename=self.newkeyfilename[i]

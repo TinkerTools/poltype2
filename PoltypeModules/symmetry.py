@@ -61,6 +61,7 @@ def gen_canonicallabels(poltype,mol,rdkitmol=None,usesym=True,isparent=False):
     if poltype.indextotypefile!=None and isparent==True:
         idxtosymclass=ReadCustomIndexToTypeFiles(poltype,poltype.indextotypefile)
     symmetryclass=idxtosymclass.values()
+    sys.exit()
     return idxtosymclass,symmetryclass
 
 
@@ -161,16 +162,37 @@ def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
                 atomicnumtocount[atomnum]=count
             distancetoatomicnumcounts[d]=atomicnumtocount
     sorteddistancetoatomicnumcounts=dict(sorted(distancetoatomicnumcounts.items()))
+    
     for d,dic in sorteddistancetoatomicnumcounts.items():
         sortedatomicnumtocount=dict(sorted(dic.items()))
         ls=[]
         for atmnum,count in sortedatomicnumtocount.items():
             ls.append(atmnum*count)
         GI.extend(ls)
+    
 
 
+    neighbs=[natom for natom in atom.GetNeighbors()] # now need to include bond order information to atomic element for neighhbors since found special case that didnt work
+    neighbindices=[natom.GetIdx() for natom in neighbs]
+    BOdictocount={}
+    for nidx in neighbindices:
+        bondindices=[nidx,atomidx]
+        bond=rdkitmol.GetBondBetweenAtoms(bondindices[0],bondindices[1])
+        BO=bond.GetBondTypeAsDouble()
+        natom=rdkitmol.GetAtomWithIdx(nidx)
+        natomicnum=natom.GetAtomicNum()
+        ls=tuple([natomicnum,BO])
+        if ls not in BOdictocount.keys():
+            BOdictocount[ls]=1
+        else:
+            BOdictocount[ls]+=1
+    BOarrays=[]
+    for BOls,count in BOdictocount.items():
+        newls=BOls+tuple([count])
+        BOarrays.append(newls)
+    BOarrays.sort()
+    GI.extend(BOarrays) 
 
-    neighbs=[natom for natom in atom.GetNeighbors()]
     numneighbs=len(neighbs)
     isaro=atom.GetIsAromatic()
     isinring=mol.GetAtom(atomidx+1).IsInRing()
@@ -199,5 +221,4 @@ def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
         GI.extend(ls)
 
 
-    
     return GI
