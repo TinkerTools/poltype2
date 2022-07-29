@@ -157,6 +157,7 @@ conda install -c conda-forge mdtraj --yes
 conda install -c conda-forge pymbar --yes
 conda install -c salilab modeller --yes
 conda install -c anaconda openpyxl --yes
+conda install -c conda-forge pdb2pqr --yes
 ```
 
 ### Explicit Conda Installation - XTB

@@ -1,4 +1,4 @@
-name: amoebamdpoltype
+name: amoebamdpoltypetestfinal
 channels:
   - anaconda
   - psi4
@@ -18,19 +18,22 @@ dependencies:
   - boost-cpp=1.74.0=h75c5d50_8
   - brotli=1.0.9=h166bdaf_7
   - brotli-bin=1.0.9=h166bdaf_7
+  - brotlipy=0.7.0=py39hb9d737c_1004
   - bzip2=1.0.8=h7f98852_4
   - c-ares=1.18.1=h7f98852_0
-  - ca-certificates=2022.4.26=h06a4308_0
+  - ca-certificates=2022.6.15=ha878542_0
   - cached-property=1.5.2=hd8ed1ab_1
   - cached_property=1.5.2=pyha770c72_1
   - cairo=1.16.0=ha61ee94_1011
   - cairocffi=1.3.0=pyhd8ed1ab_0
   - cairosvg=2.5.2=pyhd8ed1ab_0
-  - certifi=2022.6.15=py39h06a4308_0
+  - certifi=2022.6.15=py39hf3d152e_0
   - cffi=1.15.1=py39he91dace_0
   - cftime=1.6.1=py39hd257fcd_0
+  - charset-normalizer=2.1.0=pyhd8ed1ab_0
   - chemps2=1.8.11=hbe8a562_0
   - colorama=0.4.5=pyhd8ed1ab_0
+  - cryptography=37.0.1=py39h9ce1e76_0
   - cssselect2=0.2.1=pyh9f0ad1d_1
   - curl=7.83.1=h2283fc2_0
   - cycler=0.11.0=pyhd8ed1ab_0
@@ -63,6 +66,7 @@ dependencies:
   - hdf5=1.10.6=nompi_h3c11f04_101
   - hdf5-1107=1.10.7=0
   - icu=70.1=h27087fc_0
+  - idna=3.3=pyhd8ed1ab_0
   - importlib-metadata=4.11.4=py39hf3d152e_0
   - importlib_metadata=4.11.4=hd8ed1ab_0
   - importlib_resources=5.8.0=pyhd8ed1ab_0
@@ -118,6 +122,7 @@ dependencies:
   - mkl-service=2.4.0=py39h7e14d7c_0
   - mkl_fft=1.3.1=py39h0c7bc48_1
   - mkl_random=1.2.2=py39hde0f152_0
+  - mmcif_pdbx=2.0.0=pyh44b312d_0
   - mmtf-python=1.1.3=pyhd8ed1ab_0
   - mock=4.0.3=py39hf3d152e_3
   - modeller=10.3=py39h9bf148f_1
@@ -139,11 +144,13 @@ dependencies:
   - patsy=0.5.2=pyhd8ed1ab_0
   - pcmsolver=1.2.1.1=py39h92d4acf_3
   - pcre=8.45=h9c3ff4c_0
+  - pdb2pqr=3.4.1=pyhd8ed1ab_0
   - pillow=9.2.0=py39hae2aec6_0
   - pint=0.17=pyhd8ed1ab_0
   - pip=22.1.2=pyhd8ed1ab_0
   - pixman=0.40.0=h36c2ea0_0
   - pluggy=1.0.0=py39hf3d152e_3
+  - propka=3.4.0=py39hef51801_3
   - psi4=1.6.1+5b9f6e3=py39h1bd450f_0
   - psutil=5.9.1=py39hb9d737c_0
   - pthread-stubs=0.4=h36c2ea0_1001
@@ -153,7 +160,9 @@ dependencies:
   - pycparser=2.21=pyhd8ed1ab_0
   - pydantic=1.9.1=py39hb9d737c_0
   - pymbar=3.0.7=py39hd257fcd_0
+  - pyopenssl=22.0.0=pyhd8ed1ab_0
   - pyparsing=3.0.9=pyhd8ed1ab_0
+  - pysocks=1.7.1=py39hf3d152e_5
   - pytables=3.6.1=py39h77479fe_1
   - pytest=7.1.2=py39hf3d152e_0
   - python=3.9.13=h2660328_0_cpython
@@ -166,6 +175,7 @@ dependencies:
   - rdkit=2022.03.4=py39h89e00b9_0
   - readline=8.1.2=h0f457ee_0
   - reportlab=3.5.68=py39he59360d_1
+  - requests=2.28.1=pyhd8ed1ab_0
   - scikit-learn=1.0.2=py39h51133e4_1
   - scipy=1.7.3=py39hc147768_0
   - seaborn=0.11.2=hd8ed1ab_0
@@ -189,6 +199,7 @@ dependencies:
   - typing_extensions=4.3.0=pyha770c72_0
   - tzdata=2022a=h191b570_0
   - unicodedata2=14.0.0=py39hb9d737c_1
+  - urllib3=1.26.11=pyhd8ed1ab_0
   - webencodings=0.5.1=py_1
   - wheel=0.37.1=pyhd8ed1ab_0
   - xorg-kbproto=1.0.7=h7f98852_1002
@@ -211,3 +222,4 @@ dependencies:
     - bidict==0.22.0
     - pyastronomy==0.17.1
     - quantities==0.13.0
+prefix: /home/bdw2292/miniconda3/envs/amoebamdpoltypetestfinal

@@ -559,27 +559,6 @@ def ModifyLambdaKeywords(poltype,newfoldpath,newtempkeyfile,elelamb,vdwlamb,resl
     newkeyfile.close()
 
  
-def CheckLastNumberDynamicStepsCompleted(poltype,outputfilepath):
-   """
-   Intent:
-   Input:
-   Output:
-   Referenced By: 
-   Description: 
-   """
-   steps=None
-   if os.path.isfile(outputfilepath):
-       temp=open(outputfilepath,'r')
-       results=temp.readlines()
-       temp.close()
-       for line in results:
-           if 'Dynamics Steps' in line:
-               linesplit=line.split()
-               if linesplit[-3].isdigit():
-                   steps=int(linesplit[-3])
-       return steps
-   return steps
-
 
 def DetermineIonIndicesToModifyCharge(poltype):
     """
@@ -865,7 +844,15 @@ def GrabEnergy(poltype,arcpath,keypath):
     return avgliqenergy,stddevliqenergy
 
 def CheckLastNumberDynamicStepsCompleted(poltype,outputfilepath):
-   steps=None
+   """
+   Intent:
+   Input:
+   Output:
+   Referenced By: 
+   Description: 
+   """
+
+   steps=0
    if os.path.isfile(outputfilepath):
        temp=open(outputfilepath,'r')
        results=temp.readlines()
@@ -880,6 +867,14 @@ def CheckLastNumberDynamicStepsCompleted(poltype,outputfilepath):
 
 
 def CheckLastNumberDynamicsStepsCompletedAllTimes(poltype):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     files=os.listdir()
     total=0
     dynoutfiles=[]
@@ -892,6 +887,14 @@ def CheckLastNumberDynamicsStepsCompletedAllTimes(poltype):
 
 
 def GenerateBackupDynFile(poltype,dynoutfiles):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
     highestnum=0
     for f in dynoutfiles:
         split=f.split('.out')

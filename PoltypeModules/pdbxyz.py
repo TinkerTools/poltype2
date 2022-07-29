@@ -29,8 +29,6 @@ def GenerateProteinTinkerXYZFile(poltype):
     poltype.receptorligandxyzfilename=poltype.complexedxyzname
     poltype.ReadReceptorCharge()
     chainnum=DetectNumberOfChains(poltype,poltype.uncomplexedproteinpdbname)
-    resarray=FindCurrentResidueArray(poltype,poltype.uncomplexedproteinpdbname)
-    missingresidues=FindMissingResidues(poltype,resarray)
     if chainnum==1:
 
         cmdstr=poltype.pdbxyzpath+' '+poltype.uncomplexedproteinpdbname+' '+poltype.prmfilepath
@@ -50,11 +48,7 @@ def GenerateProteinTinkerXYZFile(poltype):
         string='WARNING! Missing atoms from original PDB have been added by PDBXYZ. Number of atoms added = '+str(shift)
         warnings.warn(string)
         poltype.WriteToLog(string)
-    if len(missingresidues)!=0:
-        string="WARNING! Residues are missing "+str(missingresidues)
-        warnings.warn(string)
-        poltype.WriteToLog(string)
-
+    
     indextocoordinates,annihilateindextocoordinates,lastligindex,allligands,ligands,listofindextopdbindex,diff,ligandpdbindextoxyzindex=GrabLigandCoordinates(poltype,newuncomplexedatomnum)
     poltype.ligandindices[0]=list(annihilateindextocoordinates.keys())
     poltype.allligandindices[0]=list(indextocoordinates.keys())
@@ -684,7 +678,7 @@ def WriteSEQFile(poltype,filename,code):
     Description: 
     """
     from modeller import Environ,log,Model,Alignment
-    from modeller.automodel import LoopModel,refine    # Loa
+    from modeller.automodel import LoopModel,refine    
     e = Environ()
     m = Model(e, file=filename)
     aln = Alignment(e)
@@ -694,7 +688,7 @@ def WriteSEQFile(poltype,filename,code):
     return seqfilename
 
 
-def FindCurrentResidueArray(poltype,filename):
+def FindCurrentResidueArray(poltype,filename,chaintomissingresnums={}):
     """
     Intent:
     Input:
@@ -702,39 +696,35 @@ def FindCurrentResidueArray(poltype,filename):
     Referenced By: 
     Description: 
     """
+    chaintocurrentresnumtothreeletter={}
+    chainlettertonum={'A':0,'B':1,'C':2,'D':3}
     temp=open(filename,'r')
     results=temp.readlines()
     temp.close()
-    resarray=[]
+    threeletterseq=[]
+    chainseq=[]
+    resnumseq=[]
     for line in results:
         linesplit=line.split()
         if 'ATOM' in line and line[:4]=='ATOM':
             resnum=int(line[22:26])
-            if resnum not in resarray:
-                resarray.append(resnum)
-    return resarray
-
-
-def FindMissingResidues(poltype,resarray):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    missingresidues=[]
-    firstres=1 # dont start at first residue found, start at 1
-    lastres=resarray[-1]
-    allres=list(range(firstres,lastres+1))
-    for res in allres:
-        if res not in resarray:
-            missingresidues.append(res)
-
-
-
-    return missingresidues
-
+            chain=line[21]
+            chainnum=chainlettertonum[chain]
+            resname=line[17:21].strip()
+            foundmissing=False
+            if chainnum in chaintomissingresnums.keys():
+                missingresnums=chaintomissingresnums[chainnum]
+                if resnum in missingresnums:
+                    foundmissing=True
+            if foundmissing==False:
+                if chainnum not in chaintocurrentresnumtothreeletter.keys():
+                    chaintocurrentresnumtothreeletter[chainnum]={}
+                if resnum not in chaintocurrentresnumtothreeletter[chainnum].keys():
+                    chaintocurrentresnumtothreeletter[chainnum][resnum]=resname
+                    threeletterseq.append(resname)
+                    chainseq.append(chainnum)
+                    resnumseq.append(resnum)
+    return chaintocurrentresnumtothreeletter,threeletterseq,chainseq,resnumseq
 
 
 def GrabLetterSequence(poltype,seqfilename):
@@ -745,35 +735,31 @@ def GrabLetterSequence(poltype,seqfilename):
     Referenced By: 
     Description: 
     """
+    letterindextolineindex={}
     lettersequence=[]
-    chainsequence=[]
+    listoflettersequence=[]
     temp=open(seqfilename,'r')
     results=temp.readlines()
     temp.close()
-    count=0
+    lineidx=0
+    lettercount=0
     for line in results:
         linesplit=line.split()
         if len(linesplit)!=0:
-            if len(linesplit)==1:
+            if len(linesplit)==1 and ';' not in line and '>' not in line:
                 letters=linesplit[0]
                 array=[]
-                allalpha=True
                 for e in letters:
                     if e.isalpha():
                         array.append(e)
-                    else:
-                        if e!='*':
-                            allalpha=False
-                            break
-                if allalpha==True:
-                    lettersequence.extend(array)
-                    chainseq=[count]*len(array)
-                    chainsequence.extend(chainseq)
-                    count+=1
+                lettersequence.extend(array)
+                listoflettersequence.append(array)
+                for e in array:
+                    letterindextolineindex[lettercount]=lineidx
+                    lettercount+=1
+                lineidx+=1
 
-
-
-    return lettersequence,chainsequence
+    return lettersequence,letterindextolineindex,listoflettersequence
 
 
 def GrabMissingLetterSequence(poltype,filename):
@@ -785,33 +771,36 @@ def GrabMissingLetterSequence(poltype,filename):
     Description: 
     """
     chainlettertonum={'A':0,'B':1,'C':2,'D':3}
-    resnumtomissingthreeletter={}
-    resnumtomissingchainseq={}
+    chaintoresnumtomissingthreeletter={}
+    chaintomissingresnums={}
     temp=open(filename,'r')
     results=temp.readlines()
     temp.close()
     foundmissresline=False
     for line in results:
         linesplit=line.split()
-        if 'M RES C SSSEQI' in line:
+        if 'M RES C SSSEQI' in line and len(linesplit)==6:
             foundmissresline=True
         if foundmissresline==True and len(linesplit)==5:
             threeletercode=linesplit[2]
             chain=linesplit[-2]
             chainnum=chainlettertonum[chain]
             resnum=int(linesplit[-1])
-            resnumtomissingthreeletter[resnum]=threeletercode
-            resnumtomissingchainseq[resnum]=chainnum
+            if chainnum not in chaintoresnumtomissingthreeletter.keys():
+                chaintoresnumtomissingthreeletter[chainnum]={}
+                chaintomissingresnums[chainnum]=[]
+            chaintoresnumtomissingthreeletter[chainnum][resnum]=threeletercode
+            chaintomissingresnums[chainnum].append(resnum)
         elif foundmissresline==True and len(linesplit)!=5:
             if 'M RES C SSSEQI' not in line:
                 foundmissresline==False
                 break
 
 
-    return resnumtomissingthreeletter,resnumtomissingchainseq
+    return chaintoresnumtomissingthreeletter,chaintomissingresnums
 
 
-def ConvertThreeLetterToSingleLetter(poltype,resnumtomissingthreeletter,threelettercodetosinglelettercode):
+def ConvertThreeLetterToSingleLetter(poltype,chaintoresnumtomissingthreeletter,threelettercodetosinglelettercode):
     """
     Intent:
     Input:
@@ -819,15 +808,18 @@ def ConvertThreeLetterToSingleLetter(poltype,resnumtomissingthreeletter,threelet
     Referenced By: 
     Description: 
     """
-    resnumtomissingsingleletter={}
-    for resnum,threeletter in resnumtomissingthreeletter.items():
-        singleletter=threelettercodetosinglelettercode[threeletter]
-        resnumtomissingsingleletter[resnum]=singleletter
-    return resnumtomissingsingleletter
+    chaintoresnumtomissingsingleletter={}
+    for chain,resnumtomissingthreeletter in chaintoresnumtomissingthreeletter.items():
+        chaintoresnumtomissingsingleletter[chain]={}
+        for resnum,threeletter in resnumtomissingthreeletter.items():
+            singleletter=threelettercodetosinglelettercode[threeletter]
+            chaintoresnumtomissingsingleletter[chain][resnum]=singleletter
+
+    return chaintoresnumtomissingsingleletter
 
 
 
-def CombineData(poltype,resnumtomissingsingleletter,resnumtocurrentsingleletter,resnumtomissingchainseq,resnumtocurrentchainseq):
+def CombineData(poltype,chaintoresnumtomissingsingleletter,chaintocurrentresnumtosingleletter):
     """
     Intent:
     Input:
@@ -835,23 +827,28 @@ def CombineData(poltype,resnumtomissingsingleletter,resnumtocurrentsingleletter,
     Referenced By: 
     Description: 
     """
-    resnumtochainseq={}
-    resnumtomissing={}
-    resnumtosingleletter={}
-    for resnum,missingsingleletter in resnumtomissingsingleletter.items():
-        resnumtomissing[resnum]=True
-        resnumtosingleletter[resnum]=missingsingleletter
-        resnumtochainseq[resnum]=resnumtomissingchainseq[resnum]
+    chaintoresnumtomissing={}
+    chaintoresnumtosingleletter={}
+    for chainnum,resnumtomissingsingleletter in chaintoresnumtomissingsingleletter.items():
+        for resnum,missingsingleletter in resnumtomissingsingleletter.items():
+            if chainnum not in chaintoresnumtomissing.keys():
+                chaintoresnumtomissing[chainnum]={}
+            chaintoresnumtomissing[chainnum][resnum]=True
+            if chainnum not in chaintoresnumtosingleletter.keys():
+                chaintoresnumtosingleletter[chainnum]={}
+            chaintoresnumtosingleletter[chainnum][resnum]=missingsingleletter
 
-    for resnum,currentsingleletter in resnumtocurrentsingleletter.items():
-        resnumtomissing[resnum]=False
-        resnumtosingleletter[resnum]=currentsingleletter
-        chainseq=resnumtocurrentchainseq[resnum]
-        resnumtochainseq[resnum]=chainseq
-            
+    for chainnum,resnumtocurrentsingleletter in chaintocurrentresnumtosingleletter.items():
+        for resnum,currentsingleletter in resnumtocurrentsingleletter.items():
+            if chainnum not in chaintoresnumtomissing.keys():
+                chaintoresnumtomissing[chainnum]={}
+            chaintoresnumtomissing[chainnum][resnum]=False
+            if chainnum not in chaintoresnumtosingleletter.keys():
+                chaintoresnumtosingleletter[chainnum]={}
+            chaintoresnumtosingleletter[chainnum][resnum]=currentsingleletter
 
 
-    return SortByKey(resnumtochainseq),SortByKey(resnumtomissing),SortByKey(resnumtosingleletter)
+    return chaintoresnumtomissing,chaintoresnumtosingleletter
 
 
 def SortByKey(dic):
@@ -869,7 +866,7 @@ def SortByKey(dic):
 
 
 
-def GenerateGapAndFilledArrays(poltype,resnumtochainseq,resnumtomissing,resnumtosingleletter):
+def GenerateGapAndFilledArrays(poltype,chaintoresnumtomissing,chaintoresnumtosingleletter,chainnumtoresnumtolineindex,listoflineindextochainnumresnum):
     """
     Intent:
     Input:
@@ -879,18 +876,16 @@ def GenerateGapAndFilledArrays(poltype,resnumtochainseq,resnumtomissing,resnumto
     """
     gapresiduearrays=[]
     filledresiduearrays=[]
-    chainseqtoresnums={}
-    for resnum,chainseq in resnumtochainseq.items():
-        if chainseq not in chainseqtoresnums.keys():
-            chainseqtoresnums[chainseq]=[]
-        if resnum not in chainseqtoresnums[chainseq]:
-            chainseqtoresnums[chainseq].append(resnum)
-
-    for chainseq,resnums in chainseqtoresnums.items():
+    lineindextogapresarray={}
+    lineindextofilledresarray={}
+    for chainnum, resnumtosingleletter in chaintoresnumtosingleletter.items():
+        resnums=list(resnumtosingleletter.keys())
+        resnumtomissing=chaintoresnumtomissing[chainnum]
         sortedresnums=sorted(resnums)
         gapresarray=[]
         filledresarray=[]
         for resnum in sortedresnums:
+            lineindex=chainnumtoresnumtolineindex[chainnum][resnum]
             missing=resnumtomissing[resnum]
             singleletter=resnumtosingleletter[resnum]
             if missing==True:
@@ -899,16 +894,20 @@ def GenerateGapAndFilledArrays(poltype,resnumtochainseq,resnumtomissing,resnumto
             else:
                 gaplet=singleletter
                 filledlet=singleletter
-            gapresarray.append(gaplet)
-            filledresarray.append(filledlet)
-        gapresiduearrays.append(gapresarray)
-        filledresiduearrays.append(filledresarray)
-            
+            if lineindex not in lineindextogapresarray.keys():
+                lineindextogapresarray[lineindex]=[]
+                lineindextofilledresarray[lineindex]=[]
 
+            lineindextogapresarray[lineindex].append(gaplet)
+            lineindextofilledresarray[lineindex].append(filledlet)
+    for lineindex,gapresarray in lineindextogapresarray.items():
+        filledresarray=lineindextofilledresarray[lineindex]
+        filledresiduearrays.append(filledresarray)
+        gapresiduearrays.append(gapresarray)
     return gapresiduearrays,filledresiduearrays
 
 
-def GenerateAlignmentFile(poltype,resnumtochainseq,resnumtomissing,resnumtosingleletter,seqfilename,code):
+def GenerateAlignmentFile(poltype,chaintoresnumtomissing,chaintoresnumtosingleletter,seqfilename,code,chainnumtoresnumtolineindex,listoflineindextochainnumresnum):
     """
     Intent:
     Input:
@@ -916,7 +915,7 @@ def GenerateAlignmentFile(poltype,resnumtochainseq,resnumtomissing,resnumtosingl
     Referenced By: 
     Description: 
     """
-    gapresiduearrays,filledresiduearrays=GenerateGapAndFilledArrays(poltype,resnumtochainseq,resnumtomissing,resnumtosingleletter)
+    gapresiduearrays,filledresiduearrays=GenerateGapAndFilledArrays(poltype,chaintoresnumtomissing,chaintoresnumtosingleletter,chainnumtoresnumtolineindex,listoflineindextochainnumresnum)
     alignmentfilename='alignment.ali'
     temp=open(seqfilename,'r')
     results=temp.readlines()
@@ -942,38 +941,28 @@ def WriteAlignmentFileComponent(poltype,temp,results,gapresiduearrays,filledresi
     for line in results:
         linesplit=line.split()
         if len(linesplit)!=0:
-            if len(linesplit)==1:
+            if len(linesplit)==1 and '>' not in line:
                 letters=linesplit[0]
                 array=[]
-                allalpha=True
-                for e in letters:
-                    if e.isalpha():
-                        array.append(e)
-                    else:
-                        if e!='*':
-                            allalpha=False
-                            break
-                if allalpha==True:
-                    gapresarray=gapresiduearrays[count]
-                    filledresarray=filledresiduearrays[count]
-                    gapstring=''.join(gapresarray)
-                    filledstring=''.join(filledresarray)
-                    if count==len(gapresiduearrays)-1:
-                        gapstring+='*'
-                        filledstring+='*'
-                    gapstring+='\n'
-                    filledstring+='\n'
-                    if filled==False:
-                        temp.write(gapstring) 
-                    else:
-                        temp.write(filledstring)
-                    count+=1
+                gapresarray=gapresiduearrays[count]
+                filledresarray=filledresiduearrays[count]
+                gapstring=''.join(gapresarray)
+                filledstring=''.join(filledresarray)
+                if count==len(gapresiduearrays)-1:
+                    gapstring+='*'
+                    filledstring+='*'
+                gapstring+='\n'
+                filledstring+='\n'
+                if filled==False:
+                    temp.write(gapstring) 
                 else:
-                    if filled==True:
-                        if code in line:
-                            line=line.replace(code,newcode)
-                    temp.write(line)
+                    temp.write(filledstring)
+                count+=1
             else:
+                if filled==True:
+                    if code in line:
+                        line=line.replace(code,newcode)
+
                 temp.write(line)
 
 
@@ -1042,17 +1031,65 @@ def FillInMissingResidues(poltype,code):
         filename=newfilename
     threelettercodetosinglelettercode= {'CYS': 'C', 'ASP': 'D', 'SER': 'S', 'GLN': 'Q', 'LYS': 'K','ILE': 'I', 'PRO': 'P', 'THR': 'T', 'PHE': 'F', 'ASN': 'N', 'GLY': 'G', 'HIS': 'H', 'LEU': 'L', 'ARG': 'R', 'TRP': 'W', 'ALA': 'A', 'VAL':'V', 'GLU': 'E', 'TYR': 'Y', 'MET': 'M'}
     seqfilename=WriteSEQFile(poltype,filename,code)
-    resarray=FindCurrentResidueArray(poltype,filename)
-    missingresidues=FindMissingResidues(poltype,resarray)
-    lettersequence,chainsequence=GrabLetterSequence(poltype,seqfilename)
-    resnumtomissingthreeletter,resnumtomissingchainseq=GrabMissingLetterSequence(poltype,filename)
-    resnumtocurrentsingleletter=dict(zip(resarray,lettersequence))
-    resnumtocurrentchainseq=dict(zip(resarray,chainsequence))
-    resnumtomissingsingleletter=ConvertThreeLetterToSingleLetter(poltype,resnumtomissingthreeletter,threelettercodetosinglelettercode)
-    resnumtochainseq,resnumtomissing,resnumtosingleletter=CombineData(poltype,resnumtomissingsingleletter,resnumtocurrentsingleletter,resnumtomissingchainseq,resnumtocurrentchainseq)
-    alignmentfilename,newcode=GenerateAlignmentFile(poltype,resnumtochainseq,resnumtomissing,resnumtosingleletter,seqfilename,code)
+    lettersequence,letterindextolineindex,listoflettersequence=GrabLetterSequence(poltype,seqfilename)
+    chaintoresnumtomissingthreeletter,chaintomissingresnums=GrabMissingLetterSequence(poltype,filename)
+    chaintocurrentresnumtothreeletter,threeletterseq,chainseq,resnumseq=FindCurrentResidueArray(poltype,filename,chaintomissingresnums)
+
+    chaintoresnumtomissingsingleletter=ConvertThreeLetterToSingleLetter(poltype,chaintoresnumtomissingthreeletter,threelettercodetosinglelettercode)
+    chaintocurrentresnumtosingleletter=ConvertThreeLetterToSingleLetter(poltype,chaintocurrentresnumtothreeletter,threelettercodetosinglelettercode)
+    singleletterseqfrompdb=[threelettercodetosinglelettercode[i] for i in threeletterseq]
+
+    chaintoresnumtomissing,chaintoresnumtosingleletter=CombineData(poltype,chaintoresnumtomissingsingleletter,chaintocurrentresnumtosingleletter)
+    chainnumtoresnumtolineindex,listoflineindextochainnumresnum=MapSeqFileToChainRes(poltype,listoflettersequence,chainseq,resnumseq,chaintoresnumtomissing)
+    alignmentfilename,newcode=GenerateAlignmentFile(poltype,chaintoresnumtomissing,chaintoresnumtosingleletter,seqfilename,code,chainnumtoresnumtolineindex,listoflineindextochainnumresnum)
     GenerateLoops(poltype,alignmentfilename,newcode,code)
     finalpdb=GrabLastGeneratedPDB(poltype)
+
+
+def MapSeqFileToChainRes(poltype,listoflettersequence,chainseq,resnumseq,chaintoresnumtomissing):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    listoflineindextochainnumresnum=[]
+    chainnumtoresnumtolineindex={}
+    count=0
+    for lsidx in range(len(listoflettersequence)):
+        ls=listoflettersequence[lsidx]
+        lineindextochainnumres={}
+        for i in range(len(ls)):
+            letter=ls[i]
+            chainnum=chainseq[count]
+            resnum=resnumseq[count]
+            if chainnum not in chainnumtoresnumtolineindex.keys():
+                chainnumtoresnumtolineindex[chainnum]={}
+            chainnumtoresnumtolineindex[chainnum][resnum]=lsidx
+            lineindextochainnumres[i]=[chainnum,resnum]
+            count+=1
+        listoflineindextochainnumresnum.append(lineindextochainnumres)
+    for chain,resnumtomissing in chaintoresnumtomissing.items():
+        for resnum,missing in resnumtomissing.items():
+            if missing==True:
+                if resnum not in chainnumtoresnumtolineindex[chain].keys():
+                    closestnonmissingresnum=FindClosestResnum(poltype,chainnumtoresnumtolineindex[chain],resnum)
+                    lineindex=chainnumtoresnumtolineindex[chain][closestnonmissingresnum]
+                    chainnumtoresnumtolineindex[chain][resnum]=lineindex
+    return chainnumtoresnumtolineindex,listoflineindextochainnumresnum
+
+
+
+def FindClosestResnum(poltype,resnumtolineindex,resnum):
+    difftoresnum={}
+    for oresnum,lineindex in resnumtolineindex.items():
+        diff=oresnum-resnum
+        difftoresnum[diff]=oresnum
+    mindiff=min(difftoresnum.keys())
+    closestnonmissingresnum=difftoresnum[mindiff]
+
+    return closestnonmissingresnum
 
 
 

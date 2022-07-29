@@ -242,12 +242,15 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
             try:
                 raise ValueError(string)
             except:
-                os.chdir('..')
                 poltype.WriteToLog(string)
-                poltype.WriteToLog('Trying XTB torsion optimization instead')
-                poltype.toroptmethod='xtb'
-                poltype.toroptmethodlist=[poltype.toroptmethod]
-                poltype.GenerateParameters()
+                if len(poltype.toroptmethodlist)==1:
+                    os.chdir('..')
+                    poltype.WriteToLog('Trying XTB torsion optimization instead')
+                    poltype.toroptmethod='xtb'
+                    poltype.toroptmethodlist=[poltype.toroptmethod]
+                    poltype.GenerateParameters()
+                else:
+                    poltype.torfit=False
 
     rows = zip(*[angle_list, energy_list])
     energytophaseangle=dict(zip(energy_list,phaseangle_list))
@@ -1370,9 +1373,9 @@ def PlotTorOptMethodListEnergies(poltype,mol):
         new_qm_energy_arrays=[] # if one method has None, then remove that point across all methods
         new_qanglist=[]
         indices=[]
-        for r in range(len(poltype.toroptmethodlist)):
-            poltype.toroptmethod=poltype.toroptmethodlist[r]
-            poltype.torspmethod=poltype.torspmethodlist[r]
+        for r in range(len(poltype.temptoroptmethodlist)):
+            poltype.toroptmethod=poltype.temptoroptmethodlist[r]
+            poltype.torspmethod=poltype.temptorspmethodlist[r]
             spmethod.append(poltype.torspmethod)
             optmethod.append(poltype.toroptmethod)
 
@@ -1383,9 +1386,9 @@ def PlotTorOptMethodListEnergies(poltype,mol):
                     if i not in indices:
                         indices.append(i)
 
-        for r in range(len(poltype.toroptmethodlist)):
-            poltype.toroptmethod=poltype.toroptmethodlist[r]
-            poltype.torspmethod=poltype.torspmethodlist[r]
+        for r in range(len(poltype.temptoroptmethodlist)):
+            poltype.toroptmethod=poltype.temptoroptmethodlist[r]
+            poltype.torspmethod=poltype.temptorspmethodlist[r]
             qm_energy_list,qang_list,WBOarray,energytophaseangle = compute_qm_tor_energy(poltype,torset,mol,flatphaselist)
             finalqm_energy_list=ExtractFinalValues(poltype,qm_energy_list,indices)
             new_qm_energy_arrays.append(finalqm_energy_list)
@@ -1393,7 +1396,7 @@ def PlotTorOptMethodListEnergies(poltype,mol):
             new_qanglist.append(finalqang_list)
 
 
-        for r in range(len(poltype.toroptmethodlist)):
+        for r in range(len(poltype.temptoroptmethodlist)):
             qm_energy_list=new_qm_energy_arrays[r]
             qang_list=new_qanglist[r]
             qm_energy_list = [en - min(qm_energy_list) for en in qm_energy_list]
@@ -1434,9 +1437,12 @@ def PlotTorOptMethodListEnergies(poltype,mol):
             hand.append(line1)
             xpoints=numpy.array([qang_list[i][0] for i in range(len(qang_list))])
             x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
-            f = interp1d(xpoints,numpy.array(qm_energy_list), kind='quadratic')
-            y_smooth=f(x_new)
-            ax.plot(x_new,y_smooth,color=col)
+            try:
+                f = interp1d(xpoints,numpy.array(qm_energy_list), kind='quadratic')
+                y_smooth=f(x_new)
+                ax.plot(x_new,y_smooth,color=col)
+            except:
+                pass
         array=numpy.array(array)
         tarray=numpy.transpose(array)
         df = pd.DataFrame(tarray, columns = tarray[0]) 
@@ -1824,31 +1830,32 @@ def process_rot_bond_tors(poltype,mol):
     cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,indicesremoveddic, cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified,classkeylisttoindicesalreadydicremoved= get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,'_preQMOPTprefit')
     # if the fit has not been done already
     clskeyswithbadfits=[]
+    if poltype.torfit==True:
+        count=0
+        while 1:
+            # do the fit
+            if count==3:
+                break # dont redo fitting forever
+            write_prm_dict,fitfunc_dict,torsettobypassrmsd,classkeytofoldtophase = fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,clskeyswithbadfits,indicesremoveddic,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified,tmpkey1basename,tmpkey2basename)
+            
 
-    count=0
-    while 1:
-        # do the fit
-        if count==3:
-            break # dont redo fitting forever
-        write_prm_dict,fitfunc_dict,torsettobypassrmsd,classkeytofoldtophase = fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,clskeyswithbadfits,indicesremoveddic,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified,tmpkey1basename,tmpkey2basename)
-        
+            RemoveFiles(poltype,'post',2)  
+            if len(poltype.torlist)!=0:
+                PostfitMinAlz(poltype,tmpkey2basename,'')
+            # evaluate the new parameters
+            clskeyswithbadfits,classkeytofitresults=eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename,count,clskeyswithbadfits,torsettobypassrmsd,classkeylisttoindicesalreadydicremoved,indicesremoveddic,write_prm_dict)
+            if len(clskeyswithbadfits)==0:
+                break
+            count+=1
+        WriteOutFitResults(poltype,tmpkey2basename,classkeytofitresults) # add torsion fitting comments to key file
+        if poltype.torfit1Drotonly==True and poltype.tortor==True:
+            poltype.torfit1Drotonly=False
+            poltype.torfit2Drotonly=True 
+            cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,indicesremoveddic,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified,classkeylisttoindicesalreadydicremoved= get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,'_postQMOPTpostfit')
+            PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,mol,tmpkey2basename,indicesremoveddic,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified)
 
-        RemoveFiles(poltype,'post',2)  
-        if len(poltype.torlist)!=0:
-            PostfitMinAlz(poltype,tmpkey2basename,'')
-        # evaluate the new parameters
-        clskeyswithbadfits,classkeytofitresults=eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename,count,clskeyswithbadfits,torsettobypassrmsd,classkeylisttoindicesalreadydicremoved,indicesremoveddic,write_prm_dict)
-        if len(clskeyswithbadfits)==0:
-            break
-        count+=1
-    WriteOutFitResults(poltype,tmpkey2basename,classkeytofitresults) # add torsion fitting comments to key file
-    if poltype.torfit1Drotonly==True and poltype.tortor==True:
-        poltype.torfit1Drotonly=False
-        poltype.torfit2Drotonly=True 
-        cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,indicesremoveddic,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified,classkeylisttoindicesalreadydicremoved= get_qmmm_rot_bond_energy(poltype,mol,tmpkey1basename,'_postQMOPTpostfit')
-        PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,mol,tmpkey2basename,indicesremoveddic,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified)
+        shutil.copy(tmpkey2basename,'../' + poltype.key7fname)
     PlotTorOptMethodListEnergies(poltype,mol)
-    shutil.copy(tmpkey2basename,'../' + poltype.key7fname)
     os.chdir('..')
 
 

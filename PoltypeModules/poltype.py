@@ -85,6 +85,7 @@ from operator import itemgetter
 
 @dataclass
 class PolarizableTyper():
+        torfit:bool=False
         makexyzonly:bool=False
         toroptmethodlist:list=field(default_factory=lambda : [])
         torspmethodlist:list=field(default_factory=lambda : [])
@@ -1225,7 +1226,8 @@ class PolarizableTyper():
                 self.toroptmethodlist.append(self.toroptmethod)
             if len(self.torspmethodlist)==0:
                 self.torspmethodlist.append(self.torspmethod)
-
+            self.temptoroptmethodlist=self.toroptmethodlist[:]
+            self.temptorspmethodlist=self.torspmethodlist[:]
 
             if self.jobsatsametime!=0:
                 self.maximizejobsatsametime=False
@@ -1298,7 +1300,7 @@ class PolarizableTyper():
             if self.binding==False:
                 if self.density!=None:
                     self.neatliquidsim=True
-            if self.binding==False and self.neatliquidsim==False and self.docking==False:
+            if self.binding==False and self.neatliquidsim==False and self.docking==False and self.molstructfname==None:
                 self.solvation=True
             if self.uncomplexedproteinpdbname!=None:
                 self.usepdb2pqr=True
@@ -1371,8 +1373,10 @@ class PolarizableTyper():
             28. If pathtosims is specified, then combine simulation table data from other simulation output tables (different simulation folders) and add into combined table. Generate combined plots as well.
             29. If perturbkeyfilelist is specified, then set up variables for determining filenames, folders and number of interpolations needed later.
             30. Append all keys from keyfilenamelist into keys for solvation/complexation. Append any additional modified multipoles needed to ensure net charge of receptor is an integer. 
-            31.   
-
+            31. Setup keyfile names to be used later on.
+            32. Compute step number for dynamics based on dynamic time and time step. Setup box filenames and output files for each dynamic step.
+            33. Setup folder names for production dynamics and production dynamics outputfile names. 
+            34. Setup production dynamic ARC file paths (for BAR input) and BAR output filepath names. 
             """
             # STEP 1
             if self.neatliquidsim==True: 
@@ -1849,6 +1853,10 @@ class PolarizableTyper():
                 self.AppendKeys(self.keyfilenamelist,newkeyfilename)
                 if i==0:
                     self.ModifyCharge(newkeyfilename,mpolearrays)
+
+            # STEP 31
+
+
             if self.complexation==True and self.solvation==False:
                 self.keyfilename=[[self.foldername+'_comp'+'.key']]
                 if self.perturbkeyfilelist!=None:
@@ -1912,7 +1920,8 @@ class PolarizableTyper():
                 self.configkeyfilename=[confignamelistcomp,confignamelistsolv]
                 self.lambdakeyfilename=[lambdanamelistcomp,lambdanamelistsolv]
 
-            
+            # STEP 32 
+
             
             self.equilstepsNVT=str(int((self.equiltimeNVT*1000000)/self.equiltimestep/len(self.equilibriatescheme)-1)) # convert ns to fs divide by the length of temperature scheme
             self.lastequilstepsNVT=str(int((self.lastNVTequiltime*1000000)/self.equiltimestep))
@@ -1939,8 +1948,6 @@ class PolarizableTyper():
             self.tightminjobsfilename=self.foldername+'_tightboxminjobs.txt'
             self.looseminjobsfilename=self.foldername+'_looseboxminjobs.txt'
             self.analyzejobsfilename=self.foldername+'_analyzejobs.txt'
-                  
- 
             self.solviontocount=self.DetermineIonsForChargedSolvation()
             if len(self.solviontocount.keys())!=0 and self.salthfe==True: # then need to add counter ions free energy sims
                 self.estatlambdascheme.append(self.originalestatlambdascheme)
@@ -1971,6 +1978,9 @@ class PolarizableTyper():
                     tempsteps.append(self.equilstepsionNPT)
                 self.equiloutputarray.append(templist)
                 self.equiloutputstepsarray.append(tempsteps)
+
+
+            # STEP 33
 
 
             self.nextfiletofinish=self.equiloutputarray[0]
@@ -2109,6 +2119,7 @@ class PolarizableTyper():
             if mut==True:
                 mutate.SingleTopologyMutationProtocol(self)
            
+            # STEP 34
 
             
  
@@ -4404,7 +4415,8 @@ class PolarizableTyper():
                         shutil.copy(self.key6fname,self.key7fname)           
            
 
-
+            if self.torfit==False:
+                sys.exit()
  
             if self.isfragjob==False and self.dontdotor==False:
                 self.CheckTorsionParameters(self.key7fname,torsionsmissing,hydtorsions)
