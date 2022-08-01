@@ -79,11 +79,12 @@ def ComputeSymmetryTypes(poltype,distmat,rdkitmol,mol,usesym):
     indextoGI={}
     if usesym==True:
         atomindices=databaseparser.RingAtomicIndices(poltype,mol)
+        # STEP 1
         for atom in rdkitmol.GetAtoms():
             atomidx=atom.GetIdx()
             GI=ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices)
             indextoGI[atomidx]=GI
-
+        # STEP 2
         for index,GI in indextoGI.items():
             for oindex,oGI in indextoGI.items():
                 if GI==oGI:
@@ -92,6 +93,7 @@ def ComputeSymmetryTypes(poltype,distmat,rdkitmol,mol,usesym):
                     if oindex not in indextomatchingindices[index]:
                         indextomatchingindices[index].append(oindex)
     else:
+        # STEP 3
         for atom in rdkitmol.GetAtoms():
             atomidx=atom.GetIdx()
             indextomatchingindices[atomidx]=atomidx
@@ -135,16 +137,19 @@ def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
     4. Then count how many atoms of same atomic number are at that distance away from original atom.
     5. Now for every distance d, away from atom of interest a, you have a map of atomic number to number of occurances of atomic number at that distance. This is in essence what the symmetry type number is.
     6. Now for each d, 0-max(d), sort the map of atomic number to occurances and add to one large array. Need to sort since the maps may have different order but same information (could be same type but have maps in different order).
-    7. If you are a singly valent atom such as hydrogen check for ring membership of neighbor else check ring membership of atom of interest and add the ring atoms it belongs to to the GI array. 
+    7. For bond around atom, determine atomic number and bond order, then count the number of occurances of that bond and bond order for atom of interest. Then append to GI vector. 
+    8. If you are a singly valent atom such as hydrogen check for ring membership of neighbor else check ring membership of atom of interest and add the ring atoms it belongs to to the GI array. 
     """
     GI=[]
     atomidx=atom.GetIdx()
+    # STEP 1
     distances=distmat[atomidx]
     indices=np.array(list(range(len(distances))))
     indextodist=dict(zip(indices,distances))
     distancetoatomicnumcounts={}
-    
+    # STEP 2
     uniquedistances=set(distances)
+    # STEP 3
     for d in uniquedistances:
         if d not in distancetoatomicnumcounts.keys():
             distancetoatomicnumcounts[d]={}
@@ -159,9 +164,11 @@ def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
             for atomnum in uniqueatomicnums:
                 count=atomicnums.count(atomnum)
                 atomicnumtocount[atomnum]=count
+            # STEP 4
             distancetoatomicnumcounts[d]=atomicnumtocount
+    # STEP 5
     sorteddistancetoatomicnumcounts=dict(sorted(distancetoatomicnumcounts.items()))
-    
+    # STEP 6 
     for d,dic in sorteddistancetoatomicnumcounts.items():
         sortedatomicnumtocount=dict(sorted(dic.items()))
         ls=[]
@@ -170,7 +177,7 @@ def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
         GI.extend(ls)
     
 
-
+    # STEP 7
     neighbs=[natom for natom in atom.GetNeighbors()] # now need to include bond order information to atomic element for neighhbors since found special case that didnt work
     neighbindices=[natom.GetIdx() for natom in neighbs]
     BOdictocount={}
@@ -192,6 +199,8 @@ def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
     BOarrays.sort()
     GI.extend(BOarrays) 
 
+
+    # STEP 8
     numneighbs=len(neighbs)
     isaro=atom.GetIsAromatic()
     isinring=mol.GetAtom(atomidx+1).IsInRing()

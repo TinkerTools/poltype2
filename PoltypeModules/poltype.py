@@ -85,7 +85,7 @@ from operator import itemgetter
 
 @dataclass
 class PolarizableTyper():
-        torfit:bool=False
+        torfit:bool=True
         makexyzonly:bool=False
         toroptmethodlist:list=field(default_factory=lambda : [])
         torspmethodlist:list=field(default_factory=lambda : [])
@@ -1376,7 +1376,11 @@ class PolarizableTyper():
             31. Setup keyfile names to be used later on.
             32. Compute step number for dynamics based on dynamic time and time step. Setup box filenames and output files for each dynamic step.
             33. Setup folder names for production dynamics and production dynamics outputfile names. 
-            34. Setup production dynamic ARC file paths (for BAR input) and BAR output filepath names. 
+            34. Setup production dynamic ARC file paths (for BAR input) and BAR output filepath names.
+            35. Rotate into inertial frame. This will make it easier to compute longest length for determining box size later.
+            36. Write relevant variables to internal dictionary to be later printed out in CSV files.
+            37. Grab properties of ligand XYZ files to later be used when writing out PDB trajectories for equilbriated ARC and production dynamics ARC.
+            38. Call annihilator.py (which calls minimization, equilbritation, production dynamics and BAR etc..)
             """
             # STEP 1
             if self.neatliquidsim==True: 
@@ -2171,8 +2175,11 @@ class PolarizableTyper():
                 self.baroutputfilepath[k]=baroutputfilepathlistoflist
                 self.thermooutputfilepath[k]=thermooutputfilepathlistoflist
             
+            # STEP 35
 
             self.RotateTranslateInertialFrame()
+
+            # STEP 36
 
             for i in range(len(self.tabledict)):
                 self.tabledict[i]['Prod MD Ensemb']=self.proddynensem
@@ -2197,6 +2204,9 @@ class PolarizableTyper():
 
             
             tables.WriteTableUpdateToLog(self)
+
+            # STEP 37
+
             self.ligandindextoneighbslist=[]
             self.ligandindextosymlist=[]
             self.ligandindextotypenumlist=[]
@@ -2207,6 +2217,8 @@ class PolarizableTyper():
                 self.ligandindextosymlist.append(indextosym)
                 self.ligandindextotypenumlist.append(stateindextotypeindex)
 
+            # STEP 38
+
             ann.main(self)
 
 
@@ -2215,22 +2227,30 @@ class PolarizableTyper():
 
         def CheckIfNeedToShiftTypes(self,keyfilenamelist):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Sometimes keyfiles may have overlapping types but user wants to treat two ligands differently (dissapear only one etc). So then need to check if type numbers are overlapping and change them if so.
+            Input: List of keyfile names
+            Output: Boolean determining if need to shift type numbers or not.
+            Referenced By: MolecularDynamics 
+            Description:
+            1. If keyfilenamelist is given as input.
+            2. Iterate over list of keyfilenames and determine the max and min type number.
+            3. Determine the range of types for the max and min type numbers. 
+            4. Iterate over the types and save new types to an array. If encounter existing type already in array then need to shift type numbers.  
             """
 
             needtoshifttypes=False
+            # STEP 1
             if keyfilenamelist!=None: 
                 newlist=keyfilenamelist.copy()
                 #newlist.append(self.prmfilepath) can only go to 1000 for atom classes in tinker so for now dont shift by max of prm file
                 alltypes=[]
+                # STEP 2
                 for keyfilename in newlist:
                     maxnumberfromkey=self.GrabMaxTypeNumber(keyfilename)
                     minnumberfromkey=self.GrabMinTypeNumber(keyfilename)
+                    # STEP 3
                     types=list(range(minnumberfromkey,maxnumberfromkey+1))
+                    # STEP 4
                     for typenum in types:
                         if typenum in alltypes:
                             needtoshifttypes=True
@@ -2244,17 +2264,21 @@ class PolarizableTyper():
 
         def AppendKeys(self,keyfilenamelist,thekey):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Append all keys from keyfilenamelist into a single key file.
+            Input: List of key files and output keyfilename.
+            Output: Final appended keyfile.
+            Referenced By: MolecularDynamics 
             Description: 
+            1. For each key in keyfilenamelist, read the lines into an array. 
+            2. For each line in array, append to final keyfile.
             """
             temp=open(thekey,'w')
+            # STEP 1
             for key in keyfilenamelist:
                 othertemp=open(key,'r')
                 results=othertemp.readlines()
                 othertemp.close()
+                # STEP 2
                 for line in results:
                     temp.write(line)
 
@@ -2262,24 +2286,27 @@ class PolarizableTyper():
 
             return thekey
 
-
-
-
         def GrabIonizationStates(self,m):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Determine ionization-protonation states from input molecule using Dimorphite-DL.
+            Input: Rdkit molecule object.
+            Output: MOL and SDF files for dominant ionization states.
+            Referenced By: GenerateParameters 
             Description: 
+            1. Convert input molecules to SMILES.
+            2. Convert back to MOL object.
+            3. Call dimorphite_dl with input SMILES and pH range.
+            4. For each MOL object geneated by Dimorphite, now convert to MOL and SDF files. 
             """
             smi=Chem.MolToSmiles(m)
+            # STEP 1
             smiles=[smi]
+            # STEP 2
             mols = [Chem.MolFromSmiles(s) for s in smiles]
             for i, mol in enumerate(mols):
                 mol.SetProp("msg","Orig SMILES: " + smiles[i])
                 
-            
+            # STEP 3 
             protonated_mols = dimorphite_dl.run_with_mol_list(
                 mols,
                 min_ph=6.9,
@@ -2288,7 +2315,7 @@ class PolarizableTyper():
             
             finalsmi=[Chem.MolToSmiles(m) for m in protonated_mols]
             obConversion = openbabel.OBConversion()
-            
+            # STEP 4 
             for i,mol in enumerate(protonated_mols):
                 mol = Chem.AddHs(mol)
                 AllChem.EmbedMolecule(mol)
@@ -2304,24 +2331,37 @@ class PolarizableTyper():
 
         def GrabTautomers(self,m):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Tautomers are another possible protonation state not handled by Dimorphite-DL. This is experimental (there may be better tools) using rdkit method to determine "canonical tautomer" or what it considers to be most probably tautomer. The first one generated (TautomerState_0..) is the canonical tautomer and the rest are just enumerated possilbilities.
+            Input: Rdkit MOL object. 
+            Output: MOL and SDF Files for tautomer states. 
+            Referenced By: GenerateParameters 
             Description: 
+            1. Call rdkit tautomer enumerator. 
+            2. Convert molecule to SMILES and back to rdkit mol object. 
+            3. Determine canonical tautormer.
+            4. Enumerate tautomers from rdkit mol obkect. 
+            5. Convert tautomers to SMILES.
+            6. Sort SMILES so that the canonical tautomer is first.
+            7. Iterate over SMILES and then output MOL and SDF files.
             """
-
+            # STEP 1
             enumerator = rdMolStandardize.TautomerEnumerator()
+            # STEP 2
             smi=Chem.MolToSmiles(m)
-            m=Chem.MolFromSmiles(smi) 
+            m=Chem.MolFromSmiles(smi)
+            # STEP 3
             canon = enumerator.Canonicalize(m)
             csmi = Chem.MolToSmiles(canon)
             res = [canon]
+            # STEP 4
             tauts = enumerator.Enumerate(m)
+            # STEP 5
             smis = [Chem.MolToSmiles(x) for x in tauts]
+            # STEP 6
             stpl = sorted((x,y) for x,y in zip(smis,tauts) if x!=csmi)
             res += [y for x,y in stpl]
             obConversion = openbabel.OBConversion()
+            # STEP 7
             for i in range(len(res)):
                 taut=res[i]
                 taut = Chem.AddHs(taut)
@@ -2340,19 +2380,27 @@ class PolarizableTyper():
 
         def ReturnListOfList(self,string):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Some input keywords require a list of list datatype. Example onlyrottortorlist=b1 c1 d1 , b2 c2 d2 . Outer list is comma seperated and inner list is space seperated.
+            Input: String from reading poltype.ini
+            Output: List of list
+            Referenced By: _post_init
+            Description:
+            1. Split string by comma into a list.
+            2. For each item in list, strip front and end extra spaces. Then split by space.
+            3. For each item in spaced list, append to inner list.
+            4. Append inner list to outerlist.
             """
+            # STEP 1
             newlist=string.split(',')
             templist=[]
             for ele in newlist:
+                # STEP 2
                 nums=ele.lstrip().rstrip().split()
                 temp=[]
+                # STEP 3
                 for e in nums:
                     temp.append(int(e))
+                # STEP 4
                 templist.append(temp)
             newlist=templist
             return newlist
@@ -2361,26 +2409,30 @@ class PolarizableTyper():
 
         def SanitizeAllQMMethods(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Some qm methods between Gaussian and Psi4 have different syntax (like wB97XD vs wB97X-D), so just fix it depending on what user inputs and whatever user wants for QM package (Gaussian or Psi4 etc).
+            Input: Internal variables to the self object.
+            Output: Changed internal variables (relating to torspmethod,toroptmethod, optmethod etc). 
+            Referenced By: _post_init, GenerateParameters()
             Description: 
+            1. Call SanitizeQMMethod for optmethod, toroptmethod, torspmethod, dmamethod, espmethod.
             """
             self.optmethod=self.SanitizeQMMethod(self.optmethod,True)                 
             self.toroptmethod=self.SanitizeQMMethod(self.toroptmethod,True)                  
             self.torspmethod=self.SanitizeQMMethod(self.torspmethod,False)                    
             self.dmamethod=self.SanitizeQMMethod(self.dmamethod,False)                      
             self.espmethod=self.SanitizeQMMethod(self.espmethod,False)     
-           
+
+
         def GrabBoolValue(self, value):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Poltype uses can change variables in input file, this function reads the boolean string.
+            Input: String from poltype input file.
+            Output: Boolean value for variable.
+            Referenced By: _post_init
             Description: 
+            1. Convert string to all lower case, if true, set to True, if false set to False.
             """
+            # STEP 1
             if value.lower() == 'true':
                 return True
             if value.lower() == 'false':

@@ -156,13 +156,13 @@ def GrabResultsAllMolecules(outputfiles):
     qmdiclist=[]
     newoutputfiles=[]
     for outputfile in outputfiles:
-        #try:
-        tpdic,qmdic,outputfile=GrabResults(outputfile)
-        tpdiclist.append(tpdic)
-        qmdiclist.append(qmdic)
-        newoutputfiles.append(outputfile)
-        #except:
-        #    pass
+        try:
+            tpdic,qmdic,outputfile=GrabResults(outputfile)
+            tpdiclist.append(tpdic)
+            qmdiclist.append(qmdic)
+            newoutputfiles.append(outputfile)
+        except:
+            pass
     return tpdiclist,qmdiclist,newoutputfiles
 
 def GrabResults(outputfile):
