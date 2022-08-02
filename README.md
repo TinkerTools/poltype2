@@ -217,6 +217,12 @@ pdbcode=5l2t
 uncomplexedproteinpdbname=5l2t_filled.BL00020001.pdb
 ```
 * After adding any missing residues and assigning the protonation state, the ligand needs to be added to the protein pocket and given as input ``complexedproteinpdbname`` for binding computations.
+* If your protonated uncomplexedproteinpdbname now no longer has ligands, can add them back with alignment procedure in poltype to generate a new complexedproteinpdbname as follows.
+```
+complexedproteinpdbname=pdb3srd.pdb
+uncomplexedproteinpdbname=3srd_filled.BL00020001_final.pdb
+```
+* Output file will contain _align.pdb, this aligns complexedproteinpdbname to the uncomplexedproteinpdbname and then adds ligands. 
 
 
 ### Minimum Input Example Docking

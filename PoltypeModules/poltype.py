@@ -85,6 +85,7 @@ from operator import itemgetter
 
 @dataclass
 class PolarizableTyper():
+        alignPDB:bool=False
         torfit:bool=True
         makexyzonly:bool=False
         toroptmethodlist:list=field(default_factory=lambda : [])
@@ -1302,8 +1303,10 @@ class PolarizableTyper():
                     self.neatliquidsim=True
             if self.binding==False and self.neatliquidsim==False and self.docking==False and self.molstructfname==None:
                 self.solvation=True
-            if self.uncomplexedproteinpdbname!=None:
+            if self.uncomplexedproteinpdbname!=None and self.complexedproteinpdbname==None:
                 self.usepdb2pqr=True
+            if self.uncomplexedproteinpdbname!=None and self.complexedproteinpdbname!=None:
+                self.alignPDB=True
 
             if self.poltypepathlist!=None:
                 fb.GenerateForceBalanceInputs(self,self.poltypepathlist,self.vdwtypeslist,self.liquid_equ_steps,self.liquid_prod_steps,self.liquid_timestep,self.liquid_interval,self.gas_equ_steps,self.gas_prod_steps,self.gas_timestep,self.gas_interval,self.md_threads,self.liquid_prod_time,self.gas_prod_time,self.WQ_PORT,self.csvexpdatafile,self.fittypestogether,self.vdwprmtypestofit,self.vdwtypestoeval,self.liquid_equ_time,self.gas_equ_time,self.qmrelativeweight,self.liqrelativeweight,self.enthalpyrelativeweight,self.densityrelativeweight,self.relaxFBbox)
@@ -1314,7 +1317,7 @@ class PolarizableTyper():
             if self.compareparameters==True:
                 self.MolecularDynamics()
                 sys.exit()
-            if self.ligandxyzfilenamelist!=None and (self.binding==True or self.solvation==True or self.neatliquidsim==True) or self.pdbcode!=None or self.usepdb2pqr!=False:
+            if self.ligandxyzfilenamelist!=None and (self.binding==True or self.solvation==True or self.neatliquidsim==True) or self.pdbcode!=None or self.usepdb2pqr!=False or self.alignPDB==True:
                 self.MolecularDynamics()
                 sys.exit()
             if (self.docking==True) and self.complexedproteinpdbname!=None:
@@ -1488,8 +1491,9 @@ class PolarizableTyper():
                 self.AlignLigandXYZToTemplateXYZ()
                 sys.exit()
 
-
-
+            if self.alignPDB==True:
+                self.AlignComplexedPDBToUnComplexedPDB()
+                sys.exit()
             if self.binding==False and self.solvation==False and self.neatliquidsim==False and self.usepdb2pqr==False and self.pdbcode==None:
                 raise ValueError('Please choose either solvation or binding, or neat liquid simulation mode')
 
@@ -2441,37 +2445,47 @@ class PolarizableTyper():
 
         def SetDefaultBool(self,line,a,truthvalue):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Set default boolean value for variables if =True or = False is not given in the input file.
+            Input: Line from input file, default truth value. 
+            Output: Boolean value.
+            Referenced By: _post_init
+            Description:
+            1. If truth value not in input line, then set to default truth value.
+            2. If truth value in input line, then set to that truth value.
             """
+            # STEP 1
             if '=' not in line:
                 value = truthvalue
+            # STEP 2
             else:
                 value=self.GrabBoolValue(a)
             return value
 
 
-
-
         def SanitizeQMMethod(self,method,optmethodbool):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Some qm methods between Gaussian and Psi4 have different syntax (like wB97XD vs wB97X-D), so just fix it depending on what user inputs and whatever user wants for QM package (Gaussian or Psi4 etc).
+            Input: QM method string, boolean to determine how to output new QM method.  
+            Output: New QM method string.
+            Referenced By: SanitizeAllQMMethods
+            Description:
+            1. If DFT method.
+            2. If - in method.
+            3. If using Gaussian replace -D with D.
+            4. If using Psi4, eSanitizeAllQMMethodsce D with -D
             """
+            # STEP 1
             if method[-1]=='D': # assume DFT, gaussian likes D, PSI4 likes -D
+                # STEP 2
                 if method[-2]=='-':
+                    # STEP 3
                     if self.use_gaus or self.use_gausoptonly and optmethodbool==True:
                         method=method.replace('-D','D')
                     if self.use_gaus and optmethodbool==False:
                         method=method.replace('-D','D')
 
                 else:
+                    # STEP 4
                     if not self.use_gaus and not self.use_gausoptonly and optmethodbool==True:
                         method=method.replace('D','-D')
                     if not (self.use_gaus) and optmethodbool==False:
@@ -2482,28 +2496,36 @@ class PolarizableTyper():
 
         def WriteToLog(self,string,prin=False):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Write string to log file.   
+            Input: String.
+            Output: N/A
+            Referenced By: Many functions throughout poltype. 
             Description: 
+            1. Grab currrent time.
+            2. Write out current time and input string to log file.
+            3. Flush to disk.
             """
+            # STEP 1
             now = time.strftime("%c",time.localtime())
             if not isinstance(string, str):
                 string=string.decode("utf-8")
+            # STEP 2
             self.logfh.write(now+' '+string+'\n')
+            # STEP 3
             self.logfh.flush()
             os.fsync(self.logfh.fileno())
             if prin==True:
                 print(now+' '+ string + "\n")
-            
+           
+
         def SanitizeMMExecutables(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Sometimes tinker installations have .x in tinker binary executable (analyze vs analyze.x), so detect which one is needed.
+            Input: Self object variables (containing executable names).
+            Output: Updated self object variables with new executable names. 
+            Referenced By: _post_init, MolecularDynamics 
+            Description:
+            1. 
             """
             self.peditexe=self.SanitizeMMExecutable(self.peditexe)
             self.potentialexe=self.SanitizeMMExecutable(self.potentialexe)
@@ -6176,8 +6198,78 @@ class PolarizableTyper():
             temp.close()
             tempwrite.close()
             return newfilename
-        
+       
 
+        def AlignComplexedPDBToUnComplexedPDB(self):
+            """
+            Intent: After adding missing residues and assigning protonation state, may need to add ligands back in original PDB. So this requires an allignment procedure.
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
+            obConversion = openbabel.OBConversion()
+            ref = openbabel.OBMol()
+            mol = openbabel.OBMol()
+            inFormat = obConversion.FormatFromExt(self.uncomplexedproteinpdbname)
+            obConversion.SetInFormat(inFormat)
+            obConversion.ReadFile(mol, self.complexedproteinpdbname)
+            obConversion.ReadFile(ref, self.uncomplexedproteinpdbname)
+            aligner = openbabel.OBAlign(False, False)
+            aligner.SetRefMol(ref)
+            aligner.SetTargetMol(mol)
+            aligner.Align()
+            aligner.UpdateCoords(mol)
+            hetatmids=self.GrabHETATMS(mol)
+            ref=self.AddHETATMSToPDB(ref,mol,hetatmids)
+
+
+
+            obConversion.SetOutFormat('pdb')
+            newmolfile=self.uncomplexedproteinpdbname.replace('.pdb','_aligned.pdb')
+            obConversion.WriteFile(ref,newmolfile)
+
+
+        def AddHETATMSToPDB(self,ref,mol,hetatmids):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
+            for atomindex in hetatmids:
+                atom=mol.GetAtom(atomindex)
+                ref.AddAtom(atom)
+
+
+            return ref
+
+
+        def GrabHETATMS(self,mol):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
+            hetatmids=[]
+            iteratom = openbabel.OBMolAtomIter(mol)
+            for atm in iteratom:
+                atmindex=atm.GetIdx()
+                res=atm.GetResidue()
+                reskey=res.GetName()
+
+                if reskey not in self.knownresiduesymbs:
+                    hetatmids.append(atmindex)
+
+
+            return hetatmids
+
+
+
+            
         def AlignLigandXYZToTemplateXYZ(self):
             """
             Intent:
