@@ -133,12 +133,11 @@ def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
     Description:
     1. Grab topological distances to every other atom in graph.  
     2. Determine unique topological distances from atom.
-    3. For each unique topological distance from atom, find all other atoms at same distance away and save the atomic number of that atom.
-    4. Then count how many atoms of same atomic number are at that distance away from original atom.
-    5. Now for every distance d, away from atom of interest a, you have a map of atomic number to number of occurances of atomic number at that distance. This is in essence what the symmetry type number is.
+    3. For each unique topological distance from atom, find all other atoms at same distance away and save the atomic number of that atom. Also save the neighboring environment (all first neighbors) of that atomic number at distance d away. 
+    4. Then count how many atoms of same atomic number and neiboring enviorment are at that distance away from original atom.
+    5. Now for every distance d, away from atom of interest a, you have a map of atomic number to number of occurances of atomic number (with neiboring environment) at that distance. This is in essence what the symmetry type number is.
     6. Now for each d, 0-max(d), sort the map of atomic number to occurances and add to one large array. Need to sort since the maps may have different order but same information (could be same type but have maps in different order).
-    7. For bond around atom, determine atomic number and bond order, then count the number of occurances of that bond and bond order for atom of interest. Then append to GI vector. 
-    8. If you are a singly valent atom such as hydrogen check for ring membership of neighbor else check ring membership of atom of interest and add the ring atoms it belongs to to the GI array. 
+    7. If you are a singly valent atom such as hydrogen check for ring membership of neighbor else check ring membership of atom of interest and add the ring atoms it belongs to to the GI array. 
     """
     GI=[]
     atomidx=atom.GetIdx()
@@ -146,61 +145,55 @@ def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
     distances=distmat[atomidx]
     indices=np.array(list(range(len(distances))))
     indextodist=dict(zip(indices,distances))
-    distancetoatomicnumcounts={}
+    distancetoatomicnumneighbstocount={}
     # STEP 2
     uniquedistances=set(distances)
     # STEP 3
     for d in uniquedistances:
-        if d not in distancetoatomicnumcounts.keys():
-            distancetoatomicnumcounts[d]={}
-            atomicnums=[]
+        if d not in distancetoatomicnumneighbstocount.keys():
+            distancetoatomicnumneighbstocount[d]={}
+            atomicnumneighbstocount={}
             for index,dist in indextodist.items():
                 oatom=rdkitmol.GetAtomWithIdx(int(index))
                 atomicnum=oatom.GetAtomicNum()
                 if dist==d:
-                    atomicnums.append(atomicnum)
-            uniqueatomicnums=set(atomicnums)
-            atomicnumtocount={}
-            for atomnum in uniqueatomicnums:
-                count=atomicnums.count(atomnum)
-                atomicnumtocount[atomnum]=count
+                    natomicnumtocount={}
+                    natomicnums=[]
+                    for natom in oatom.GetNeighbors():
+                        natomicnum=natom.GetAtomicNum()
+                        natomicnums.append(natomicnum)
+                    uniquenatomicnums=set(natomicnums)
+                    for natomnum in uniquenatomicnums:
+                        count=natomicnums.count(natomnum)
+                        natomicnumtocount[natomnum]=count
+                    sortednatomicnumtocount=dict(sorted(natomicnumtocount.items()))
+                    ls=[atomicnum]
+                    for atmnum,count in sortednatomicnumtocount.items():
+                        ls.append(atmnum*count)
+                    ls=tuple(ls)
+                    if ls not in atomicnumneighbstocount.keys():
+                        atomicnumneighbstocount[ls]=0
+                    atomicnumneighbstocount[ls]+=1
+                    
             # STEP 4
-            distancetoatomicnumcounts[d]=atomicnumtocount
+            distancetoatomicnumneighbstocount[d]=atomicnumneighbstocount
     # STEP 5
-    sorteddistancetoatomicnumcounts=dict(sorted(distancetoatomicnumcounts.items()))
+    sorteddistancetoatomicnumcounts=dict(sorted(distancetoatomicnumneighbstocount.items()))
+
     # STEP 6 
     for d,dic in sorteddistancetoatomicnumcounts.items():
-        sortedatomicnumtocount=dict(sorted(dic.items()))
-        ls=[]
-        for atmnum,count in sortedatomicnumtocount.items():
-            ls.append(atmnum*count)
-        GI.extend(ls)
+        newls=[]
+        for neighbnum,count in dic.items():
+            newls.extend(list(neighbnum)+[count])
+
+        GI.extend(newls)
+    
+
+    neighbs=[natom for natom in atom.GetNeighbors()] # now need to include bond order information to atomic element for neighhbors since found special case that didnt work
+    neighbindices=[natom.GetIdx() for natom in neighbs]
     
 
     # STEP 7
-    neighbs=[natom for natom in atom.GetNeighbors()] # now need to include bond order information to atomic element for neighhbors since found special case that didnt work
-    neighbindices=[natom.GetIdx() for natom in neighbs]
-    BOdictocount={}
-    for nidx in neighbindices:
-        bondindices=[nidx,atomidx]
-        bond=rdkitmol.GetBondBetweenAtoms(bondindices[0],bondindices[1])
-        BO=bond.GetBondTypeAsDouble()
-        natom=rdkitmol.GetAtomWithIdx(nidx)
-        natomicnum=natom.GetAtomicNum()
-        ls=tuple([natomicnum,BO])
-        if ls not in BOdictocount.keys():
-            BOdictocount[ls]=1
-        else:
-            BOdictocount[ls]+=1
-    BOarrays=[]
-    for BOls,count in BOdictocount.items():
-        newls=BOls+tuple([count])
-        BOarrays.append(newls)
-    BOarrays.sort()
-    GI.extend(BOarrays) 
-
-
-    # STEP 8
     numneighbs=len(neighbs)
     isaro=atom.GetIsAromatic()
     isinring=mol.GetAtom(atomidx+1).IsInRing()

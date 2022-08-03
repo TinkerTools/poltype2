@@ -103,6 +103,7 @@
 #### Protonation State
 ``addhydrogens`` specifies to adds hydrogens to unprotonated atoms. Default is False.
 
+``addhydrogentocharged`` specifies to add hydrogens to charged atoms. Default is True.
 
 ``genprotstatesonly``    specifies to output protonation states (at pH=7) in mol files(ProtonationState_0.mol, ...) and then exit. Default is False.
 

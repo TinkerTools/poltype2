@@ -589,7 +589,7 @@ def rm_esp_terms_keyfile(poltype,keyfilename):
                         passedatomblock=True
                     if linesplit[0]=='polarize':
                         foundpolarize=True
-                    if passedatomblock==True and foundpolarize==False: # then old multipoles
+                    if passedatomblock==True and foundpolarize==False and linesplit[0]!='#': # then old multipoles
                         pass
                     else:
                         temp.write(line)

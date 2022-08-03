@@ -334,7 +334,7 @@ class PolarizableTyper():
         deletedfiles:bool=False
         onlyfittorstogether:list=field(default_factory=lambda : [])
         parentname:None=None
-        addhydrogentononcharged:bool=True
+        addhydrogentocharged:bool=True
         accuratevdwsp:bool=False
         inputmoleculefolderpaths:None=None
         email:None=None
@@ -951,8 +951,8 @@ class PolarizableTyper():
                             self.coresperjob=int(a)
                         elif "deleteallnonqmfiles" in newline:
                             self.deleteallnonqmfiles=self.SetDefaultBool(line,a,True)
-                        elif "addhydrogentononcharged" in newline:
-                            self.addhydrogentononcharged=self.SetDefaultBool(line,a,True)
+                        elif "addhydrogentocharged" in newline:
+                            self.addhydrogentocharged=self.SetDefaultBool(line,a,True)
                         elif "firstoptfinished" in newline:
                             self.firstoptfinished=self.SetDefaultBool(line,a,True)
                         elif "accuratevdwsp" in newline:
@@ -3479,16 +3479,16 @@ class PolarizableTyper():
                 else:
                     chg=valtochg[val]
                 polneighb=False
-                if atomnum==6:
+                if atomnum==6 or atomnum==7:
                     for natom in atom.GetNeighbors():
                         natomicnum=natom.GetAtomicNum()
                         if natomicnum==7 or natomicnum==8 or natomicnum==16:
                             polneighb=True
-                    if polneighb and val==3:
+                    if polneighb and val==3 and atomnum==6:
                         chg=1
                 string='Atom index = '+str(atomidx+1)+' Atomic Number = ' +str(atomnum)+ ' Valence = '+str(val)+ ' Formal charge = '+str(chg)
                 array.append(string)
-                if atomnum==6 and val<4 and (self.addhydrogentononcharged==True or self.addhydrogens==True)  and radicals==0:
+                if atomnum==6 and val<4 and (self.addhydrogentocharged==True or self.addhydrogens==True)  and radicals==0 and polneighb==False:
                     if verbose==True:
                         warnings.warn('WARNING! Strange valence for Carbon, will assume missing hydrogens and add'+string) 
                         self.WriteToLog('WARNING! Strange valence for Carbon, will assume missing hydrogens and add '+string)
@@ -3497,7 +3497,7 @@ class PolarizableTyper():
                     atom.SetFormalCharge(chg)
 
 
-                elif atomnum==7 and val==2 and (self.addhydrogentononcharged==True or self.addhydrogens==True) and radicals==0:
+                elif atomnum==7 and val==2 and (self.addhydrogentocharged==True or self.addhydrogens==True) and radicals==0 and polneighb==False:
                     if verbose==True:
                         warnings.warn('WARNING! Strange valence for Nitrogen, will assume missing hydrogens and add'+string) 
                         self.WriteToLog('WARNING! Strange valence for Nitrogen, will assume missing hydrogens and add '+string)
@@ -3521,7 +3521,7 @@ class PolarizableTyper():
                     self.allowradicals=True
 
                     atom.SetFormalCharge(0)
-                    self.addhydrogentononcharged=False
+                    self.addhydrogentocharged=False
 
                 elif atomnum==8 and val==2 and radicals==1:
                     if verbose==True:
@@ -3536,7 +3536,7 @@ class PolarizableTyper():
                         self.WriteToLog('WARNING! Strange valence for Oxygen, will assume radical and set charge to +0')
                     self.allowradicals=True
                     atom.SetFormalCharge(0)
-                    self.addhydrogentononcharged=False
+                    self.addhydrogentocharged=False
 
                 else:
                     atom.SetFormalCharge(chg)
@@ -4147,7 +4147,7 @@ class PolarizableTyper():
             if self.allowradicals==True:
                 self.dontfrag=True # Psi4 doesnt allow UHF and properties (like compute WBO) for fragmenter, so need to turn of fragmenter if radical detected
             m.UpdatePropertyCache()
-            if self.addhydrogentononcharged==True and self.isfragjob==False:
+            if self.addhydrogentocharged==True and self.isfragjob==False:
                 m = Chem.AddHs(m)
                 AllChem.EmbedMolecule(m)
 
@@ -4228,7 +4228,6 @@ class PolarizableTyper():
             self.WriteToLog("Atom Type Classification")
 
             self.idxtosymclass,self.symmetryclass=symm.gen_canonicallabels(self,mol,None,self.usesymtypes,True) 
- 
             # QM calculations are done here
             # First the molecule is optimized. (-opt) 
             # This optimized molecule is stored in the structure optmol

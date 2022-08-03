@@ -1,5 +1,31 @@
 
 # smartsString 																	typeName     			# comments
+
+[C][SX1-1]                                                                C(S-)  # SP3 Carbon with negatively charged sulfur 
+[CX3+1]                                                                   C+     # SP3 Carbon with positive formal charge 
+[c][n][nX2-1]                                                             Car-   # aromatic Carbon connected to nitogen connected to another nitrogen with valence of 2.
+[C][NX4+1]                                                                Cn+    # SP3 Carbon connected to positively charged nitrogen 
+[CX3][OX1-1]                                                              Co-    # SP2 Carbon connected to negatively charged oxygen 
+[CX3]([OX1-1])[OX2]                                                       Coo-   # SP2 Carbon connected to two oxygens and one negative charge 
+[CX3]([OX1])([OX1-1])[OX1-1]                                              Cooo-  # SP2 Carbon with three oxygens and one negative charge 
+[H][NX4+1]                                                                Hn+    # Hydrogen attached to positively charged nitrogen 
+[H][O][P]                                                                 Hop    # Hydrogen attached to oxygen-phosphoruos 
+[NX4+1]                                                                   NX4+   # Nitrogen connected to 4 things 
+[n][nX2-1]                                                                Nar-   # aromatic nitrogen connected to another nitrogen with valence of 2 
+[NX3+1]=[CX3]                                                             Nc+    # N with valence of 4 connected to sp2 c. 
+[O]([C])[P]                                                               O(C)P  # Oxygen connected to carbon and phosphourous
+[O]([H])[P]                                                               O(H)P  # Oxygen connected to H and P 
+[OX1-1]                                                                   O-     # Oxygen valence of one
+[OX1-1][CX3][OX1]                                                         Oc-    # Oxygen with valence of one connected to sp2 C which connects to another oxygen of valence 1
+[OX1](=[CX3])([OX1-1])([OX1-1])                                           Oc-2   # Oxygen with valence of one connected to sp2 carbon which connects to two more oxygen, one of them with valence of 1 and another with double bond. 
+[OX1-1][O]                                                                Oo-    # Oxygen with valence of one connected to another oxygen 
+[OX1-1][P]                                                                Op-    # Oxygen with valence of one connected to P 
+[OX1-1][S]                                                                Os-    # Oxygen with valence of one connected to sulfur 
+[PX4]([O])([O])([O])[O]                                                   Po4    # Phosphourous connected to 4 oxygens 
+[SX1-1]                                                                   S-     # Sulfur with valence of one
+[SX4](=[OX1])(=[OX1])[OX1-1]                                              So3-   # Sulfur connected to three oxygens with two of them having a valence of one
+
+
 [H]                           					          H*              # H*, wild matching Hydrogen
 [C]                           					          C*              # C*, wild matching Carbon
 [N]                           					          N*              # N*, wild matching Nitrogen

@@ -146,7 +146,7 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 * Optional keywords exist to add missing hydrogens.
 * If carbon or nitrogen are negatively charged, then Poltype will assume you meant to have hydrogens on those atoms and protonate to neutral charge. For all other elements, if there exists a formal charge (due to input bond order and valence electrons of element), then poltype will detect the formal charge for you and compute total charge from sum of each formal atom charge. Warning message is printed when hydrogen atoms are added. 
 * Special radical charge states require additional information in the input file specifying which atom is a radical. 
-
+* If you do not want charged atoms to be protonated then use ``addhydrogentocharged=False``
 ### Ligand Protonation State Generation
 * Dominant ionization states at pH 7 are enumerated and SDF files are generated via Dimorphite-DL (IonizationState_0.sdf,IonizationState_1.sdf,..). 
 * Tautomer states are enumerated via rdkit and the first tautomer is the canonical tautomer TautomerState_0.sdf

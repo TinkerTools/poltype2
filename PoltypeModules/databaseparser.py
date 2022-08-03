@@ -4588,9 +4588,6 @@ def MatchAllSmartsToAtomIndices(poltype,smartstoatomclass): #rdkit 0 index based
     """
     atomindextoallsmarts={}
     atomindextoallsmartsmatches={}
-    for atom in poltype.rdkitmol.GetAtoms():
-        atomindex=atom.GetIdx()
-        isaro=atom.GetIsAromatic()
     for smarts in smartstoatomclass.keys():
         substructure = Chem.MolFromSmarts(smarts)
         
@@ -4598,7 +4595,12 @@ def MatchAllSmartsToAtomIndices(poltype,smartstoatomclass): #rdkit 0 index based
         diditmatch=poltype.rdkitmol.HasSubstructMatch(substructure)
         if diditmatch==True:
             matches=list(poltype.rdkitmol.GetSubstructMatches(substructure))
+            newmatches=[]
             for match in matches:
+                if len(match)>1:
+                    newmatches.append(match)
+                    newmatches.append(match[::-1])
+            for match in newmatches:
                 atomindex=match[0]
                 if atomindex not in atomindextoallsmarts.keys():
                     atomindextoallsmarts[atomindex]=[]
@@ -5885,6 +5887,44 @@ def GenerateTinkerClassesToPoltypeClasses(poltype,indices):
     return tinkerclassestopoltypeclasses
 
 
+
+def ForceSameResonanceTypesSameMatches(poltype,atomindicestocomments,atomindicestosmartslist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
+    for atomindices,comments in atomindicestocomments.items():
+        smartslist=atomindicestosmartslist[atomindices]
+        atomindex=atomindices[0]
+        atomtype=poltype.idxtosymclass[atomindex+1]
+        equivalentindices=[]
+        for idx,typenum in poltype.idxtosymclass.items():
+            if typenum==atomtype:
+                equivalentindices.append(idx-1)
+        equivalentindextosmartslist={}
+        for idx in equivalentindices:
+            oatomindices=tuple([idx])
+            osmartslist=atomindicestosmartslist[oatomindices]
+            equivalentindextosmartslist[oatomindices]=osmartslist
+        lentoidx={}
+        for eidx,smartslist in equivalentindextosmartslist.items():
+            length=len(smartslist[0])
+            lentoidx[length]=eidx
+        maxlen=max(lentoidx.keys())
+        maxidx=lentoidx[maxlen]
+        maxsmartslist=atomindicestosmartslist[maxidx]
+        maxcomments=atomindicestocomments[maxidx]
+        atomindicestocomments[atomindices]=maxcomments
+        atomindicestosmartslist[atomindices]=maxsmartslist
+
+
+    return atomindicestocomments,atomindicestosmartslist
+
+
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False):
     """
     Intent:
@@ -5899,12 +5939,13 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
 
         smartstoatomclasspolar, atomclasstocommentpolar,smartstoactualcomment=ReadDatabaseSmartsMapPolarize(poltype,poltype.latestsmallmoleculesmartstotypespolarize) 
         atomclasstoatomclass=dict(zip(atomclasstocommentpolar.keys(),atomclasstocommentpolar.keys()))
+       
         atomindextoallsmartspolar,atomindextoallsmartsmatchespolar=MatchAllSmartsToAtomIndices(poltype,smartstoatomclasspolar)
         smartstocomment=MapSMARTSToComments(poltype,smartstoatomclasspolar,atomclasstoatomclass)
-
         atomcommentstolistofsmartslist,atomindicestolistofatomcomments=MapIndicesToCommentsAtom(poltype,atomindextoallsmartspolar,smartstocomment,listofatomsforprm)
         atomindicestolistofatomcomments,atomcommentstoparameters=SearchForParametersViaCommentsPolarize(poltype,atomcommentstolistofsmartslist,atomindicestolistofatomcomments)
         atomindicestocomments,atomindicestosmartslist=FindBestSMARTSMatch(poltype,atomindicestolistofatomcomments,atomcommentstolistofsmartslist)
+        atomindicestocomments,atomindicestosmartslist=ForceSameResonanceTypesSameMatches(poltype,atomindicestocomments,atomindicestosmartslist)
         newpolarindicestopoltypeclasses,newpolarprms,newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist=GrabNewParametersPolarize(poltype,atomindicestocomments,atomcommentstoparameters,'polarize',atomindicestosmartslist,smartstoactualcomment) 
         polarprmstotransferinfo=MapParameterLineToTransferInfo(poltype,newpolarprms,{},{},{},{},newpolarpoltypecommentstocomments,newpolarpoltypecommentstosmartslist,{},[],[],[],[])
         polarindextopolarizeprm=GetPolarIndexToPolarizePrm(poltype,polarprmstotransferinfo)
