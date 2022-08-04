@@ -59,7 +59,8 @@ def ExecuteProductionDynamics(poltype):
 
 
                cmdstr=ProductionDynamicsCommand(poltype,boxfilename,keyfilename,proddynsteps,ensemble,outputfilepath,dynamicpath,proddyntimestep,nvt)
-               terminate,deletefile,error=term.CheckFileTermination(poltype,outputfilepath,float(poltype.proddynsteps))
+               shift,dynoutfiles=CheckLastNumberDynamicsStepsCompletedAllTimes(poltype,exception=outputfilepath)
+               terminate,deletefile,error=term.CheckFileTermination(poltype,outputfilepath,float(poltype.proddynsteps),False,True,shift)
                if terminate==False:
                    if os.path.exists(os.path.join(path,arcfilename)):
                        stepstaken,dynoutfiles=CheckLastNumberDynamicsStepsCompletedAllTimes(poltype)
@@ -866,7 +867,7 @@ def CheckLastNumberDynamicStepsCompleted(poltype,outputfilepath):
    return steps
 
 
-def CheckLastNumberDynamicsStepsCompletedAllTimes(poltype):
+def CheckLastNumberDynamicsStepsCompletedAllTimes(poltype,exception=None):
     """
     Intent:
     Input:
@@ -879,10 +880,15 @@ def CheckLastNumberDynamicsStepsCompletedAllTimes(poltype):
     total=0
     dynoutfiles=[]
     for f in files:
+        if exception!=None:
+            if f in exception:
+                continue
         if '.out' in f:
+
             stepstaken=CheckLastNumberDynamicStepsCompleted(poltype,f)
             total+=stepstaken
             dynoutfiles.append(f)
+
     return total,dynoutfiles
 
 

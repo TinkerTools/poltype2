@@ -85,6 +85,7 @@ from operator import itemgetter
 
 @dataclass
 class PolarizableTyper():
+        xtbtorresconstant:float=.5
         alignPDB:bool=False
         torfit:bool=True
         makexyzonly:bool=False
@@ -584,6 +585,8 @@ class PolarizableTyper():
                             self.indextotypefile=a
                         elif 'indextompoleframefile' in newline:
                             self.indextompoleframefile=a
+                        elif 'xtbtorresconstant' in newline:
+                            self.xtbtorresconstant=float(a)
                         elif 'qmrelativeweight' in newline:
                             self.qmrelativeweight=float(a)
                         elif 'ecrexpect' in newline:

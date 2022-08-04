@@ -78,7 +78,7 @@ def CheckBARFile(poltype,filepath):
         deletefile=True
     return deletefile
 
-def CheckFileTermination(poltype,f,steps=None,equil=False,firsttime=True):
+def CheckFileTermination(poltype,f,steps=None,equil=False,firsttime=True,shift=0):
    """
    Intent:
    Input:
@@ -167,7 +167,7 @@ def CheckFileTermination(poltype,f,steps=None,equil=False,firsttime=True):
                tolratio=(stepsperframe*totalframes)/steps
                linesplit=line.split()
                try:
-                   stepnum=float(linesplit[-3])
+                   stepnum=float(linesplit[-3])+shift
                    ratio=np.abs(stepnum)/steps
                    if ratio>1: # when lower MD time from previous run
                        term=True

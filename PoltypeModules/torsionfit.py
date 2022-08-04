@@ -238,7 +238,7 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
     if torset in poltype.torsionsettonumptsneeded.keys():
         prmnum=poltype.torsionsettonumptsneeded[torset]
         if normalpts<prmnum:
-            string='Too many missing QM SP energy values for torsion set = '+str(torset)+' , need '+str(prmnum)+' points, only have '+str(normalpts)+' points'
+            string='Too many missing QM SP energy values for torsion set = '+str(torset)+' , need '+str(prmnum)+' points, only have '+str(normalpts)+' points'+' optmethod is '+poltype.toroptmethod
             try:
                 raise ValueError(string)
             except:
