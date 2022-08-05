@@ -59,7 +59,8 @@ def ExecuteProductionDynamics(poltype):
 
 
                cmdstr=ProductionDynamicsCommand(poltype,boxfilename,keyfilename,proddynsteps,ensemble,outputfilepath,dynamicpath,proddyntimestep,nvt)
-               shift,dynoutfiles=CheckLastNumberDynamicsStepsCompletedAllTimes(poltype,exception=outputfilepath)
+               head,tail=os.path.split(outputfilepath)
+               shift,dynoutfiles=CheckLastNumberDynamicsStepsCompletedAllTimes(poltype,exception=tail)
                terminate,deletefile,error=term.CheckFileTermination(poltype,outputfilepath,float(poltype.proddynsteps),False,True,shift)
                if terminate==False:
                    if os.path.exists(os.path.join(path,arcfilename)):
@@ -881,7 +882,7 @@ def CheckLastNumberDynamicsStepsCompletedAllTimes(poltype,exception=None):
     dynoutfiles=[]
     for f in files:
         if exception!=None:
-            if f in exception:
+            if f==exception:
                 continue
         if '.out' in f:
 
