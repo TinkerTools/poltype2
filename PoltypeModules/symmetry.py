@@ -61,6 +61,7 @@ def gen_canonicallabels(poltype,mol,rdkitmol=None,usesym=True,isparent=False):
     if poltype.indextotypefile!=None and isparent==True:
         idxtosymclass=ReadCustomIndexToTypeFiles(poltype,poltype.indextotypefile)
     symmetryclass=idxtosymclass.values()
+
     return idxtosymclass,symmetryclass
 
 
@@ -186,6 +187,7 @@ def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
         for neighbnum,count in dic.items():
             newls.extend(list(neighbnum)+[count])
 
+        newls.sort()
         GI.extend(newls)
     
 

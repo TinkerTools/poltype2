@@ -1508,7 +1508,6 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
     atomindicestoelementtinkerdescrips={}
     atomindicestosmartsatomorders={}
     for atomindices,parametersmarts in atomindicesforprmtoparametersmarts.items():
-        
         smartsls=atomindicesforprmtosmarts[atomindices]
         smarts=smartsls[0]
         smartsfortransfer=smartsls[1]
@@ -1555,11 +1554,8 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
             atomorderlist=parametersmartsatomorderlist[1]
             if prmsmarts==parametersmarts:
                 atomorderlist=parametersmartsatomorderlist[1]
-
                 for atomorder in atomorderlist:
-                    
                     parametersmartsordertoelementtinkerdescrip[atomorder]=elementtinkerdescrip 
-
         for fragidx,symclass in fragidxtosymclass.items():
             indexes=GrabKeysFromValue(poltype,fragidxtosymclass,symclass)
             specialindex=None
@@ -1573,7 +1569,6 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         parametersmartindices=[smartsindextoparametersmartsindex[i] for i in smartindices]
         parametersmartsorders=[i+1 for i in parametersmartindices]
         elementtinkerdescrips=[parametersmartsordertoelementtinkerdescrip[i] for i in parametersmartsorders]
-        
         tinkertypes=[elementtinkerdescriptotinkertype[i] for i in elementtinkerdescrips]
         tinkerclasses=[tinkertypetoclass[i] for i in tinkertypes]
         tinkerclasses=[int(i) for i in tinkerclasses]

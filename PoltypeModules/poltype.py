@@ -4030,7 +4030,7 @@ class PolarizableTyper():
             inFormat = obConversion.FormatFromExt(molstructfname)
             split=molstructfname.split('.')
             ext=split[-1]
-            if ext!='sdf':
+            if ext!='sdf' and ext!='mol':
                 istinkerxyz=False
                 if ext=='xyz':
                     istinkerxyz=self.CheckIfInputIsTinkerXYZ(molstructfname)
@@ -4134,6 +4134,7 @@ class PolarizableTyper():
             inFormat = obConversion.FormatFromExt(self.molstructfname)
             obConversion.SetInFormat(inFormat)
             obConversion.ReadFile(mol, self.molstructfname)
+
             self.atomnum=mol.NumAtoms() 
             self.logfh = open(self.logfname,"w",buffering=1)
 
@@ -4398,6 +4399,7 @@ class PolarizableTyper():
             torgen.get_all_torsions(self,mol)
             # Find rotatable bonds for future torsion scans
             (torlist, self.rotbndlist,hydtorsions,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,mol,torsionsmissing)
+
             if atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False: 
                 self.dontfrag=True
             if self.dontfrag==True and self.toroptmethod!='xtb' and 'xtb' not in self.toroptmethodlist: # if fragmenter is turned off, parition resources by jobs at sametime for parent,cant parralelize xtb since coords always written to same filename

@@ -91,6 +91,8 @@ def fitfunc (poltype,parms, x,torset, torprmdict,keyonlylist=None,nfoldonlylist=
     """
     tor_energy_array = [ 0.0 ] * len(x)
     offset = 0
+    print('torset',torset)
+    print('torprmdict',torprmdict)
     for clskey,torprm in torprmdict.items():
         if keyonlylist!=None:
             if clskey not in keyonlylist:
@@ -238,7 +240,7 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
     if torset in poltype.torsionsettonumptsneeded.keys():
         prmnum=poltype.torsionsettonumptsneeded[torset]
         if normalpts<prmnum:
-            string='Too many missing QM SP energy values for torsion set = '+str(torset)+' , need '+str(prmnum)+' points, only have '+str(normalpts)+' points'+' optmethod is '+poltype.toroptmethod
+            string='Too many missing QM SP energy values for torsion set = '+str(torset)+' , need '+str(prmnum)+' points, only have '+str(normalpts)+' points'+' optmethod is '+poltype.toroptmethod+' sp method is '+poltype.torspmethod
             try:
                 raise ValueError(string)
             except:
@@ -1435,9 +1437,9 @@ def PlotTorOptMethodListEnergies(poltype,mol):
             array.append(engrow)
             line1, =ax.plot(qang_list,qm_energy_list,'go',color=col,label=lab)
             hand.append(line1)
-            xpoints=numpy.array([qang_list[i][0] for i in range(len(qang_list))])
-            x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
             try:
+                xpoints=numpy.array([qang_list[i][0] for i in range(len(qang_list))])
+                x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
                 f = interp1d(xpoints,numpy.array(qm_energy_list), kind='quadratic')
                 y_smooth=f(x_new)
                 ax.plot(x_new,y_smooth,color=col)

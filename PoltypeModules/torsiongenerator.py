@@ -1669,9 +1669,17 @@ def find_tor_restraint_idx(poltype,mol,b1,b2):
     b1idx = b1.GetIdx()
     b2idx = b2.GetIdx()
     iteratomatom1 = openbabel.OBAtomAtomIter(b1)
-    b1nbridx = list(map(lambda x: x.GetIdx(), iteratomatom1))
+    b1nbridx=[]
+    for natom in iteratomatom1:
+        natomidx=natom.GetIdx()
+        b1nbridx.append(natomidx)
     iteratomatom2 = openbabel.OBAtomAtomIter(b2)
-    b2nbridx = list(map(lambda x: x.GetIdx(), iteratomatom2))
+    b2nbridx=[]
+    for nnatom in iteratomatom2:
+        nnatomidx=nnatom.GetIdx()
+        b2nbridx.append(nnatomidx)
+
+
     b1len=len(b1nbridx)
     b2len=len(b2nbridx)
     shift=False
