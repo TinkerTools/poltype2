@@ -119,6 +119,7 @@ class PolarizableTyper():
         mutatedresiduenumber:None=None
         modifiedresiduepdbcode:str='MOD'
         ModifiedResiduePrmPath:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/ModifiedResidue.prm'
+        libpath:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ModifiedResidueLibraries/lib.bio18_conv1.txt'
         SMARTSToTypelibpath:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ModifiedResidueLibraries/SMARTSToTypeLib.txt'
         topologylibpath:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ModifiedResidueLibraries/residue_connect.txt"
         ecrexpect:float=10
@@ -138,7 +139,7 @@ class PolarizableTyper():
         dockingenvname:str='dockingprep'
         pymolenvname:str='oldpy3'
         prepdockscript:str=os.path.join(os.path.split(__file__)[0],'preparedockingfiles.py')
-        pocketscript:str=os.path.join(os.path.split(__file__)[0],'pocketdetection.py')
+        pymolscript:str=os.path.join(os.path.split(__file__)[0],'pymolfunctions.py')
         indextompoleframefile:None=None
         qmrelativeweight:float=.5
         liqrelativeweight:float=2.5
@@ -345,7 +346,7 @@ class PolarizableTyper():
         use_qmopt_vdw:bool=False
         use_gau_vdw:bool=False
         dontusepcm:bool=False
-        deleteallnonqmfiles:bool=True
+        deleteallnonqmfiles:bool=False
         totalcharge:None=None
         torspbasissethalogen:str="6-311G*"
         homodimers:bool=False
@@ -438,7 +439,7 @@ class PolarizableTyper():
         espbasisset:str="aug-cc-pVTZ"
         torspbasisset:str="6-311+G*"
         optmethod:str='MP2'
-        toroptmethod:str='wB97X-D'
+        toroptmethod:str='xtb'
         torspmethod:str='wB97X-D'
         dmamethod:str='MP2'
         espmethod:str='MP2'
@@ -1315,7 +1316,16 @@ class PolarizableTyper():
                 fb.GenerateForceBalanceInputs(self,self.poltypepathlist,self.vdwtypeslist,self.liquid_equ_steps,self.liquid_prod_steps,self.liquid_timestep,self.liquid_interval,self.gas_equ_steps,self.gas_prod_steps,self.gas_timestep,self.gas_interval,self.md_threads,self.liquid_prod_time,self.gas_prod_time,self.WQ_PORT,self.csvexpdatafile,self.fittypestogether,self.vdwprmtypestofit,self.vdwtypestoeval,self.liquid_equ_time,self.gas_equ_time,self.qmrelativeweight,self.liqrelativeweight,self.enthalpyrelativeweight,self.densityrelativeweight,self.relaxFBbox)
                 sys.exit()
             if self.forcebalancejobsdir!=None:
-                plotFBresults.PlotForceBalanceResults(self.forcebalancejobsdir,self.targetdensityerror,self.targetenthalpyerror)
+                pythonpath=self.which('python')
+                head,tail=os.path.split(pythonpath)
+                pythonpath=Path(head) 
+                envdir=pythonpath.parent.absolute()
+                envpath=Path(envdir)
+                allenvs=envpath.parent.absolute()
+                pymolenvpath=os.path.join(allenvs,self.pymolenvname)
+                python2path=os.path.join(pymolenvpath,'bin')
+                python2path=os.path.join(python2path,'python')
+                plotFBresults.PlotForceBalanceResults(self.forcebalancejobsdir,self.targetdensityerror,self.targetenthalpyerror,self.pymolscript,python2path)
                 sys.exit()
             if self.compareparameters==True:
                 self.MolecularDynamics()
@@ -1399,7 +1409,9 @@ class PolarizableTyper():
             head,tail=os.path.split(self.prmfilepath)
             newpath=os.path.join(os.getcwd(),tail)
             if self.prmfilepath!=newpath or head!=None:
-                shutil.copy(self.prmfilepath,newpath)
+                checkpath=os.path.join(os.getcwd(),self.prmfilepath)
+                if checkpath!=newpath:
+                    shutil.copy(self.prmfilepath,newpath)
             self.prmfilepath=tail
             # STEP 3
 
@@ -1449,6 +1461,8 @@ class PolarizableTyper():
             if (self.which(self.dynamicommpath)):
                 self.usegpu=True
                 foundgpukey=True
+            if self.externalapi!=None:
+                self.runjobslocally=False 
             # STEP 9
 
             if self.externalapi==None and self.submitlocally==None:
@@ -2528,7 +2542,7 @@ class PolarizableTyper():
             Output: Updated self object variables with new executable names. 
             Referenced By: _post_init, MolecularDynamics 
             Description:
-            1. 
+            1. Call SanitizeMMExecutable for all tinker executables used. 
             """
             self.peditexe=self.SanitizeMMExecutable(self.peditexe)
             self.potentialexe=self.SanitizeMMExecutable(self.potentialexe)
@@ -2551,11 +2565,21 @@ class PolarizableTyper():
         def initialize(self):
             """
             Intent: Initialize all paths to needed executables
-            Input:
-            Output:
+            Input: Self object with variable paths
+            Output: Modified self object with variable paths
             Referenced By: main
-            Description: -
+            Description: 
+            1. Determine if Gaussian is in PATH  
+            2. Find cubegen,formchk executables in PATH
+            3. Determine tinker version and check if it satisfies the current minimum tinker version requirement
+            4. If using AMOEBA+ forcefield, then switch parameter header file to AMOEBA+ parameter header file.
+            5. For tinker executables, join exectuable name with bin directory from PATH.
+            6. If cant find tinker exeutable, then crash program.
+            7. Search for GDMA in PATH, if cant find then crash program.
+            8. Search for Psi4 in PATH, if cant find then crash program.
+            9. If Gaussian scratch directory is defined and folder doesnt exist, make a folder.
             """
+            # STEP 1
             self.foundgauss=False
             if self.gausdir is None:
                 self.gausdir = ""
@@ -2570,7 +2594,7 @@ class PolarizableTyper():
                         self.gausdir = os.path.dirname(gausexe)
                         self.foundgauss=True
                         break
-
+            # STEP 2
             if self.use_gaus or self.use_gausoptonly:
                 if self.which(os.path.join(self.gausdir, self.gausexe)) is None:
                     print("ERROR: Invalid Gaussian directory: ", self.gausdir)
@@ -2578,7 +2602,7 @@ class PolarizableTyper():
                 self.cubegenexe = os.path.join(self.gausdir,self.cubegenexe)
                 self.formchkexe = os.path.join(self.gausdir,self.formchkexe)
 
-
+            # STEP 3
             cmdstr=self.analyzeexe+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/VersionFiles/'+'water.xyz'+' '+'-k'+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/VersionFiles/'+'water.key'+' '+'e'+'>'+' '+'version.out'
             try:
                 print('Calling: '+cmdstr) 
@@ -2599,9 +2623,11 @@ class PolarizableTyper():
 
             if not latestversion:
                 raise ValueError("Notice: Not latest working version of tinker (8.10.2)"+' '+os.getcwd())
-            
+           
+            # STEP 4
             if self.forcefield.upper() in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
                 self.paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebaplus21_header.prm"
+            # STEP 5
             if ("TINKERDIR" in os.environ):
                 self.tinkerdir = os.environ["TINKERDIR"]
                 self.peditexe = os.path.join(self.tinkerdir,self.peditexe)
@@ -2609,14 +2635,14 @@ class PolarizableTyper():
                 self.minimizeexe = os.path.join(self.tinkerdir,self.minimizeexe)
                 self.analyzeexe = os.path.join(self.tinkerdir,self.analyzeexe)
                 self.superposeexe = os.path.join(self.tinkerdir,self.superposeexe)
-        
+            # STEP 6 
             if (not self.which(self.analyzeexe)):
                 print("ERROR: Cannot find TINKER analyze executable")
                 sys.exit(2)
                 
                 
                 
-
+            # STEP 7
             if self.gdmadir is None:
                 self.gdmadir = os.getenv("GDMADIR", default="")
             self.gdmaexe = os.path.join(self.gdmadir, self.gdmaexe) 
@@ -2624,12 +2650,12 @@ class PolarizableTyper():
                 print("ERROR: Cannot find GDMA executable")
                 sys.exit(2)
 
-
+            # STEP 8
             if (not self.which('psi4')):
                 print("ERROR: Cannot find PSI4 executable")
                 sys.exit(2)
              
-
+            # STEP 9
             if self.use_gaus or self.use_gausoptonly:
                 if ("GAUSS_SCRDIR" in os.environ):
                     self.scratchdir = os.environ["GAUSS_SCRDIR"]
@@ -2642,14 +2668,16 @@ class PolarizableTyper():
         
         def init_filenames (self):
             """
-            Intent: Initialize file names
-            Input:
-            Output:
+            Intent: Initialize file names and scrath folders.
+            Input: Self object.
+            Output: Updated self object. 
             Referenced By: main
-            Description: -
+            Description: 
+            1. If gaussian or psi4, then create scratch folder if folder does not already exist.
+            2. Initialize all filenames. 
             """
         
-        
+            # STEP 1 
             if ("GAUSS_SCRDIR" in os.environ):
                 self.scratchdir = os.environ["GAUSS_SCRDIR"].rstrip('//')
                 if not os.path.isdir(self.scratchdir):
@@ -2660,18 +2688,20 @@ class PolarizableTyper():
                     self.scratchdir = os.environ["PSI_SCRATCH"]
                     if not os.path.isdir(self.scratchdir):
                         os.mkdir(self.scratchdir)
-        
+            # STEP 2
             if self.molstructfname!=None: 
                 self.FileNames()
 
         def FileNames(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Initialize filenames.
+            Input: Self object.
+            Output: Updated self object. 
+            Referenced By: init_filenames
+            Description:
+            1. For each file name (logs, keys, xyz files etc...), call assign_filenames taking variable name and suffix as inputs.  
             """
+            # STEP 1
             self.logfname = self.assign_filenames ( "logfname" , "-poltype.log")
             self.chkname = self.assign_filenames ( "chkname" , ".chk")
             self.fname = self.assign_filenames ( "fname" , ".fchk")
@@ -2695,7 +2725,6 @@ class PolarizableTyper():
             self.key5fname = self.assign_filenames ( "key5fname" , "_postfitvdw.key")
             self.key6fname= self.assign_filenames ( "key6fname" , "_prefittorsion.key")
             self.key7fname= self.assign_filenames ( "key7fname" , "_postfittorsion.key")
-
             self.xyzoutfile = self.assign_filenames ( "xyzoutfile" , ".xyz_2")
             if self.isfragjob==False:
                 self.scrtmpdirgau = self.scratchdir.rstrip('//') + '/Gau-' + self.molecprefix
@@ -2729,12 +2758,14 @@ class PolarizableTyper():
 
         def assign_filenames (self,filename,suffix):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Assign filename
+            Input: filename string and suffix
+            Output: filename variable
+            Referenced By: FileNames 
+            Description:
+            1. Return variablename of molecule prefix and input suffix
             """
+            # STEP 1
             if filename in globals():
                 return eval(filename)
             else:
@@ -2742,48 +2773,60 @@ class PolarizableTyper():
         
         def printfile(self,filename):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Print filename contents
+            Input: filename
+            Output: filename contents written to standard output.
+            Referenced By: copyright 
+            Description:
+            1. Open filename and print file contents
             """
+            # STEP 1
             with open(os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+filename,'r') as f:
                 print(f.read(), end='')
-        
+       
+
         def copyright(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Print version file and copyright info
+            Input: Self object
+            Output: Contents of version file printed to standard output.
+            Referenced By: GenerateParameters() 
             Description: 
+            1. Call printfile on poltype version file
             """
+            # STEP 1
             self.printfile(self.versionfile)
         
             
         def CheckIsInput2D(self,mol,obConversion,rdkitmol):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Check if input structure has only 2D coordinates, if so then generate 3D coordinates
+            Input: Openbabel mol object, openbabel conversion object, rdkit mol object
+            Output: Updated mol objects (if they needed 3D coordinates generated) 
+            Referenced By: GenerateParameters() 
+            Description:
+            1. Determine if 2D only by checking if all Z coordinates are 0.
+            2. If detect 2D coordinates, generate new filename for 3D coordinates and update filenames.
+            3. Call EmbedMolecule to generate 3D coordinates
+            4. Write molecule to new filename.
             """
+            # STEP 1
             is2d=True
             for atom in openbabel.OBMolAtomIter(mol):
                 zcoord=atom.GetZ()
                 if zcoord!=0:
                     is2d=False
             if is2d==True: 
+                # STEP 2
                 molprefix=self.molstructfname.split('.')[0]
                 newname=molprefix+'_3D'+'.mol'
                 self.molstructfname=newname
                 self.molecprefix =  os.path.splitext(self.molstructfname)[0]
                 self.FileNames()
-
                 rdmolfiles.MolToMolFile(rdkitmol,'test.mol',kekulize=True)
+                # STEP 3
                 AllChem.EmbedMolecule(rdkitmol)
+                # STEP 4
                 rdmolfiles.MolToMolFile(rdkitmol,newname,kekulize=True)
                 newmol = openbabel.OBMol()
                 inFormat = obConversion.FormatFromExt(newname)
@@ -2804,16 +2847,22 @@ class PolarizableTyper():
 
         def KillJob(self,job,outputlog):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Sometimes even after log file has termination, the process can still be zombie so kill the job.
+            Input: self object, command string (job)
+            Output: N/A
+            Referenced By: CallJobsSeriallyLocalHost, WaitForTermination
+            Description:
+            1. Optain process from dictionary of command string to process
+            2. Try to terminate with p.wait
+            3. If that fails, try sending kill signal to all children of process
             """
+            # STEP 1
             p=self.cmdtopid[job]
             try:
+                # STEP 2
                 p.wait(timeout=1)
             except subprocess.TimeoutExpired:
+                # STEP 3
                 process = psutil.Process(p.pid)
                 for proc in process.children(recursive=True):
                     proc.kill()
@@ -2822,35 +2871,46 @@ class PolarizableTyper():
         
         def CallJobsSeriallyLocalHost(self,fulljobtooutputlog,skiperrors,wait=False):
            """
-           Intent:
-           Input:
-           Output:
-           Referenced By: 
+           Intent: Call jobs serially if jobsatsametime=1, else submit in parralel. 
+           Input: Dictionary of command string to output log, boolean if should skip errors, boolean if should wai Dictionary of command string to output log, boolean if should skip errors, boolean if should wait for process to finish before moving on.
+           Output: List of finished jobs, list of errorjobs. 
+           Referenced By: Many functions in poltype
            Description: 
+           1. Initialize empty arrays for fininshed and error jobs and submitted jobs.
+           2. Remove any log files from previous runs that failed.
+           3. While the number of finished jobs are not the same as number of input jobs
+           4. Iterative over jobs, 
+           5. If job is not finished (in finished array), if job is finished call KillJob, append to finishedjobs array, remove from submittedjobs array. Write to a log file that job finished successfully.
+           6. If job has an error, call KillJob, append to errorjobs and finishedjobs array, remove from submittedjobs array. Write to log file that job had an error.
+           7. If job isnt finished and submitted and number of current submitted jobs is not greater than number of allowed jobs at same time, then submit job.
            """
            thepath=os.path.join(os.getcwd(),'Fragments')
+           # STEP 1
            finishedjobs=[]
            errorjobs=[]
            submittedjobs=[]
            errormessages=[]
+           # STEP 2
            for job,outputlog in fulljobtooutputlog.items():
                finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
                if error==True: # remove log before resubmitting
                    os.remove(outputlog)
-
+           # STEP 3
            while len(finishedjobs)!=len(list(fulljobtooutputlog.keys())):
+               # STEP 4
                for job,outputlog in fulljobtooutputlog.items():
                    if job not in finishedjobs:
                       
                       finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
-                      
+                      # STEP 5
                       if finished==True:
                           self.KillJob(job,outputlog)
                           if outputlog not in finishedjobs:
                               finishedjobs.append(outputlog)
                               self.NormalTerm(outputlog)
                               if job in submittedjobs:
-                                  submittedjobs.remove(job) 
+                                  submittedjobs.remove(job)
+                      # STEP 6
                       if error==True and job in submittedjobs:
                           self.KillJob(job,outputlog) # sometimes tinker jobs or qm just hang and dont want zombie process 
                           if outputlog not in finishedjobs:
@@ -2858,6 +2918,7 @@ class PolarizableTyper():
                               finishedjobs.append(outputlog) 
                               self.ErrorTerm(outputlog,skiperrors)
                               submittedjobs.remove(job)
+                      # STEP 7
                       if job not in submittedjobs and len(submittedjobs)<self.jobsatsametime and finished==False and outputlog not in finishedjobs:
                           count=len(finishedjobs)
                           ratio=round((100*count)/len(fulljobtooutputlog.keys()),2)
@@ -2875,17 +2936,23 @@ class PolarizableTyper():
 
         def TabulateLogs(self,thepath):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Collect log files into arrays for later evaluating how much time QM took
+            Input: Path to where QM log files are
+            Output: listoffilepaths
+            Referenced By: ETAQMFinish
+            Description:
+            1. List all files in directory
+            2. Iterate over files, 
+            3. If its a directory, then call GrabLogFilePaths and append file paths to array listoffilepaths.
             """
             listoffilepaths=[]
             os.chdir(thepath)
+            # STEP 1
             files=os.listdir()
+            # STEP 2
             for f in files:
                 path=os.path.join(thepath,f)
+                # STEP 3
                 if os.path.isdir(path):
                     logfilepaths=self.GrabLogFilePaths(path)
                     if len(logfilepaths)!=0:
@@ -2894,24 +2961,32 @@ class PolarizableTyper():
         
         def GrabLogFilePaths(self,path):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Given input directory, find all sub directories and QM log files within them.
+            Input: Directory
+            Output: QM log filepaths
+            Referenced By: TabulateLogs
+            Description:
+            1. Iterate over all sub directories of input directory
+            2. Determine if its a finished poltype job (has final.key), if not skip sub directory
+            3. For any QM log files in top directory, append to array
+            4. For any QM log files in subdirectories if current directory append to array.
             """
             filepaths=[]
+            # STEP 1
             for root, subdirs, files in os.walk(path):
+                # STEP 2
                 finishedpoltype=False
                 for f in files:
                     if 'final.key' in f:
                         finishedpoltype=True
                 if finishedpoltype==False:
                     continue
+                # STEP 3
                 for f in files:
                     if '.log' in f and '_frag' not in f and 'poltype' not in f:
                         filepath=os.path.join(path, f)  
                         filepaths.append(filepath)
+                # STEP 4
                 for d in subdirs:
                     curdir=os.getcwd()
                     path=os.path.join(root, d)
@@ -2925,33 +3000,51 @@ class PolarizableTyper():
         
         def ConvertTimeString(self,timestring):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Convert time string from log file into one number in units of hours.
+            Input: timestring
+            Output: totaltime in hours
+            Referenced By: TabulateCPUTimes
+            Description:
+            1. Grab hours string
+            2. Grab minutes string, convert to hours
+            3. Grab seconds string, convert to hours
+            4. Add all times together
             """
             timestringsplit=timestring.split(':')
+            # STEP 1
             hours=float(timestringsplit[0])
+            # STEP 2
             minutes=float(timestringsplit[1])*(1/60)
+            # STEP 3
             seconds=float(timestringsplit[2])*(1/60)*(1/60)
+            # STEP 4
             totaltime=hours+minutes+seconds
             return totaltime
 
 
         def ConvertTimeStringXTB(self,timestring):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Convert time string from log file into one number in units of hours for XTB.
+            Input: timestring
+            Output: totaltime in hours
+            Referenced By: TabulateCPUTimes
+            Description:
+            1. Grab days string, convert to hours
+            2. Grab hours string
+            3. Grab minutes string, convert to hours
+            4. Grab seconds string, convert to hours
+            5. Add all times together
             """
             timestringsplit=timestring.split(',')
+            # STEP 1
             days=float(timestringsplit[0].strip().split()[0])*(24)
+            # STEP 2
             hours=float(timestringsplit[1].strip().split()[0])
+            # STEP 3
             minutes=float(timestringsplit[2].strip().split()[0])*(1/60)
+            # STEP 4
             seconds=float(timestringsplit[3].strip().split()[0])*(1/60)*(1/60)
+            # STEP 5
             totaltime=days+hours+minutes+seconds
             return totaltime
 
@@ -2959,36 +3052,53 @@ class PolarizableTyper():
         
         def ConvertTimeStringGaussian(self,line):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Convert time string from log file into one number in units of hours for Gaussian.
+            Input: timestring
+            Output: walltime in hours
+            Referenced By: TabulateCPUTimes
             Description: 
+            1. Grab days string, convert to hours
+            2. Grab hours string
+            3. Grab minutes string, convert to hours
+            4. Grab seconds string, convert to hours
+            5. Add all times together
             """
             linesplit=line.split()
+            # STEP 1
             days=float(linesplit[3])*24
+            # STEP 2
             hours=float(linesplit[5])
+            # STEP 3
             minutes=float(linesplit[7])*(1/60)
+            # STEP 4
             seconds=float(linesplit[9])*(1/60)*(1/60)
+            # STEP 5
             walltime=days+hours+minutes+seconds
             return walltime
         
         def TabulateCPUTimes(self,listoffilepaths):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Iterate over list of filepaths, determine wall time and append to array of wall times.
+            Input: listoffilepaths
+            Output: listoflistofcputimes
+            Referenced By: ETAQMFinish
+            Description:
+            1. Initalize array of CPU wall times
+            2. Iterate over array of array of filepaths
+            3. Iterate over filepaths
+            4. Read the timestring appropriately for each log file depending on which program was used (Gaussian,Psi4, XTB) 
             """
-            n=5
+            # STEP 1
             listoflistofcputimes=[]
+            # STEP 2
             for filepathsidx in range(len(listoffilepaths)):
                 filepaths=listoffilepaths[filepathsidx]
                 cputimearray=[]
+                # STEP 3
                 for logfile in filepaths:
                     if os.path.isfile(logfile):
                         with open(logfile) as frb:
+                            # STEP 4
                             for line in frb:
                                 if 'wall time' in line:
                                     timestring=line.split()[-1]
@@ -3012,68 +3122,79 @@ class PolarizableTyper():
         
         def ETAQMFinish(self,thepath,numberofmolstotal):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Attempt to give an ETA for QM log files to finish based on averaging time from previously finished log file. 
+            Input: Fragments directory with subdirectory of QM log files, total QM jobs
+            Output: Updated poltype log file with ETA for QM to finish
+            Referenced By: CallJobsSeriallyLocalHost
+            Description:
+            1. Call TabulateLogs and grab listoffilepaths
+            2. Call TabulateCPUTimes with listoffilepaths
+            3. Add up the total time for each array in listoflistofcputimes
+            4. Compute the min,max and average for QM times.
+            5. Based on the jobs left for current jobs being submitted, and average QM time, compute avevage time to complete remaining jobs.
+            6. Write the result to poltype log file
             """
+            # STEP 1
             listoffilepaths=self.TabulateLogs(thepath)
+            # STEP 2
             listoflistofcputimes=self.TabulateCPUTimes(listoffilepaths)
+            # STEP 3
             listofcputimes=[sum(ls) for ls in listoflistofcputimes]
             if len(listofcputimes)==0:
                 return 
+            # STEP 4
             average=np.mean(listofcputimes)
             mintime=min(listofcputimes)
             maxtime=max(listofcputimes)
             ls=[mintime,average,maxtime]
             string='Min, Average, Max time for jobs to finish '+str(ls)+' hours'
             self.WriteToLog(string)
-
+            # STEP 5
             jobsleft=int(numberofmolstotal)-len(listoffilepaths)
             timeleft=average*jobsleft
+            # STEP 6
             string='There are '+str(jobsleft)+' jobs left, with ETA='+str(timeleft)+',hours for all jobs to finish'
             self.WriteToLog(string)
 
-        def CallJobsLocalHost(self,fulljobtooutputlog,skiperrors):
-           """
-           Intent:
-           Input:
-           Output:
-           Referenced By: 
-           Description: 
-           """
-           for job in fulljobtooutputlog.keys():
-               self.call_subsystem([job],False,skiperrors)
-           finishedjobs,errorjobs=self.WaitForTermination(fulljobtooutputlog,skiperrors)
-           return finishedjobs,errorjobs
-
-
         def WaitForTermination(self,jobtooutputlog,skiperrors):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Wait for jobs to finish before executing other parts of program
+            Input: dictionary of command strings to outputlofs, boolean if should skip errors (dont crash if there is error)
+            Output: finishedjobs, errorjobs
+            Referenced By: Many functions in poltype 
+            Description:
+            1. Initialize empty arrays
+            2. Remove any previously submitted jobs that failed (from previous poltype runs)
+            3. While the number of finished jobs is not the same as the number of input jobs
+            4. Iterate over input jobs
+            5. If job is finished without errors, then call KillJob and append to finishedjobs array, call NormalTerm
+            6. If job is finished with errors, then call KillJob and append to finishedjobsarray and errorjobsarray, if skiperrors is False, then append to errorjobs and call ErrorTerm
+            7. If job is not finished and has no errors, write to poltype log that waiting on job to finish
+            8. After all jobs are finished write all jobs are finished to poltype log
             """
+            # STEP 1
             finishedjobs=[]
             errorjobs=[]
             errormessages=[]
             outputStatusDict = copy.deepcopy(jobtooutputlog)
+            # STEP 2
             for job,outputlog in jobtooutputlog.items():
                finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
                if error==True: # remove log before resubmitting
                    os.remove(outputlog)
+            # STEP 3
             while len(finishedjobs)!=len(jobtooutputlog.keys()):
+                # STEP 4
                 for job in jobtooutputlog.keys():
                     outputlog=jobtooutputlog[job]
                     finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
+                    # STEP 5
                     if finished==True and error==False: # then check if SP has been submitted or not
                         self.KillJob(job,outputlog)
                         if outputlog not in finishedjobs:
                             self.NormalTerm(outputlog)
                             finishedjobs.append(outputlog)
+                    # STEP 6
                     elif finished==False and error==True:
                         self.KillJob(job,outputlog)
                         if skiperrors==False:
@@ -3083,7 +3204,7 @@ class PolarizableTyper():
                                 errorjobs.append(outputlog)
                         else:
                             finishedjobs.append(outputlog)
-
+                    # STEP 7
                     elif finished==False and error==False:
                         if not os.path.isfile(outputlog):
                             printStr='Waiting on '+outputlog+' '+'to begin'
@@ -3100,28 +3221,13 @@ class PolarizableTyper():
                                 finishedjobs.append(outputlog)
         
                 time.sleep(self.sleeptime) # how often to check logs (default every 30 s)
+            # STEP 8
             self.WriteToLog('All jobs have terminated '+str(finishedjobs))
             return finishedjobs,errorjobs
 
-        def CycleCount(self,logname):
-            """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
-            """
-            temp=open(logname,'r')
-            results=temp.readlines()
-            temp.close()
-            count=0
-            for line in results:
-                if 'Converged' in line or 'Convergence Check' in line:
-                    count+=1
-            return count
+        
 
-
-        def CheckNormalTermination(self,logfname,errormessages=None,skiperrors=False): # needs to handle error checking now
+        def CheckNormalTermination(self,logfname,errormessages=None,skiperrors=False): 
             """
             Intent:
             Input:
@@ -4545,8 +4651,8 @@ class PolarizableTyper():
                      shutil.copy(self.tmpxyzfile,os.path.join(previousdir,self.tmpxyzfile))
                 if os.path.exists(self.tmpkeyfile):
                      shutil.copy(self.tmpkeyfile,os.path.join(previousdir,self.tmpkeyfile))
-
             self.CopyFitPlots()
+            os.chdir('..')
             if (self.binding==True or self.solvation==True or self.neatliquidsim==True) or self.usepdb2pqr==True or self.pdbcode!=None:
                 self.ligandxyzfilenamelist=[self.tmpxyzfile]
                 self.keyfilename=self.tmpkeyfile
@@ -5888,6 +5994,9 @@ class PolarizableTyper():
             Description: 
             """
             keymods.RemoveKeyWords(self,self.originalkeyfilename,['parameters','axis','ewald','pme-grid','pme-order','cutoff','thermostat','integrator','ligand','verbose','archive','neighbor-list','polar-eps','polar-predict','heavy-hydrogen','omp-threads','OPENMP-THREADS'])
+            head,tail=os.path.split(self.prmfilepath)
+            if head=='':
+                self.prmfilepath=os.path.join(os.getcwd(),self.prmfilepath)
             string='parameters '+self.prmfilepath+'\n'
             keymods.AddKeyWord(self,self.originalkeyfilename,string)
             if self.receptorligandxyzfilename!=None and self.ligandxyzfilenamelist!=None:

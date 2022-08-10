@@ -29,7 +29,7 @@ def CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebi
         string+='--numproc='+str(1)+' '+'--disk=0GB'+' '+'--inputfilepaths='+inputfilestr
         if poltype.runjobslocally==False:
             string+=' '+'--outputfilepaths='+outputfilestr
-        if '_gpu' in job:
+        if '9 ' in job:
             string+=' '+'--gpujob'
             string+=' --ram=0GB'
         else:

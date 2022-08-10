@@ -195,7 +195,7 @@
 
 ``tordatapointsnum``  specifies the number of quantum jobs to sample along the dihedral angle for all torsions. Default is 12 if number of torsion parameters to fit is less than 12, else automatically adds more points.
 
-``toroptmethod`` specifies the opt method used for torsion parameterization. Default is wB97XD. ``toroptmethod=xtb`` will use semi empirical qm methods (not psi4 or gaussian). ``toroptmethod=ANI`` will use ANI for structure optimization. If ``toroptmethod=AMOEBA`` then AMOEBA minimized structure will be used instead of QM opt structure.
+``toroptmethod`` specifies the opt method used for torsion parameterization. Default is xtb. ``toroptmethod=xtb`` will use semi empirical qm methods (not psi4 or gaussian). ``toroptmethod=ANI`` will use ANI for structure optimization. If ``toroptmethod=AMOEBA`` then AMOEBA minimized structure will be used instead of QM opt structure.
 
 ``toroptmethodlist`` specifies a list of opt methods to use and can compare QM energy torsion profiles. By default ``toroptmethodlist`` only has ``toroptmethod`` as just one item in list.
 

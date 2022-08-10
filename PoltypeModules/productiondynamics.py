@@ -44,7 +44,11 @@ def ExecuteProductionDynamics(poltype):
                    nvt=True
                    ensemble=2
                else:
-                   dynamicpath=poltype.truedynamicpath
+                   if poltype.externalapi!=None:
+                       dynamicpath=poltype.dynamicommpath
+                   else:
+                       dynamicpath=poltype.truedynamicpath
+
                    proddynsteps=poltype.proddynsteps
                    proddyntimestep=poltype.proddyntimestep
                    nvt=poltype.productiondynamicsNVT

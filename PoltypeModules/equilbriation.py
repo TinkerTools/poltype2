@@ -66,12 +66,17 @@ def EquilbriateDynamicCommand(poltype,steps,ensemble,temp,outputfilename,equilbo
     Referenced By: 
     Description: 
     """
+    if poltype.externalapi!=None:
+        dynamicpath=poltype.dynamicommpath
+    else:
+        dynamicpath=poltype.truedynamicpath
+
     head,tail=os.path.split(outputfilename)
     outputfilename=tail
     if NPT==False:
-        cmdstr=poltype.truedynamicpath+' '+equilboxfilename+' '+ '-k'+' '+configkeyfilename+' '+str(steps)+' '+ str(poltype.equiltimestep)+' '+ str(poltype.equilwritefreq)+' '+str(ensemble)+' '+str(temp)+' '+ ' > '+outputfilename  
+        cmdstr=dynamicpath+' '+equilboxfilename+' '+ '-k'+' '+configkeyfilename+' '+str(steps)+' '+ str(poltype.equiltimestep)+' '+ str(poltype.equilwritefreq)+' '+str(ensemble)+' '+str(temp)+' '+ ' > '+outputfilename  
     else:
-        cmdstr=poltype.truedynamicpath+' '+equilboxfilename+' '+ '-k'+' '+configkeyfilename+' '+str(steps)+' '+ str(poltype.equiltimestep)+' '+ str(poltype.equilwritefreq)+' '+str(ensemble)+' '+str(temp)+' '+str(poltype.pressure)+' '+ ' > '+outputfilename  
+        cmdstr=dynamicpath+' '+equilboxfilename+' '+ '-k'+' '+configkeyfilename+' '+str(steps)+' '+ str(poltype.equiltimestep)+' '+ str(poltype.equilwritefreq)+' '+str(ensemble)+' '+str(temp)+' '+str(poltype.pressure)+' '+ ' > '+outputfilename  
 
     return cmdstr         
 

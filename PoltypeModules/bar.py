@@ -1204,7 +1204,10 @@ def ExecuteBAR(poltype):
                 if 'Gas' in tail:
                     barpath=poltype.barpath
                 else:
-                    barpath=poltype.truebarpath
+                    if poltype.externalapi!=None:
+                        barpath=poltype.barommpath
+                    else:
+                        barpath=poltype.truebarpath
                 secondarcpath=secondarcpaths[i]
                 firstarcpath=firstarcpaths[i]
                 cmdstr=BARCommand(poltype,secondarcpath,firstarcpath,outputfilepath,barpath)

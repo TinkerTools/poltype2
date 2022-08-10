@@ -1126,65 +1126,6 @@ def ConvertPQRToPDB(poltype,outputfile,finaloutputfile):
 
 
 
-def CallFpocket(poltype,pythonpath,binpath,complexedproteinpdbname):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    cmdstr=pythonpath+' '+poltype.pocketscript+' '+'--bindir='+binpath+' '+'--pdbfile='+complexedproteinpdbname
-    os.system(cmdstr)
-
-
-def ReadDictionaryFromFile(jsonfile):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    with open(jsonfile, 'r') as j:
-        dic = json.loads(j.read())
-    return dic
-
-
-def ReadPocketGrids(poltype):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    pocketnumtocenter=ReadDictionaryFromFile('pocketnumtocenter.json')
-    pocketnumtosize=ReadDictionaryFromFile('pocketnumtosize.json')
-    return pocketnumtocenter,pocketnumtosize
-
-
-
-def GrabCorrectPocketGrid(ligcenter,pocketnumtocenter,pocketnumtosize):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    difftopocketnum={}
-    for pocketnum,center in pocketnumtocenter.items():
-        diff=np.linalg.norm(center-ligcenter) 
-        difftopocketnum[diff]=pocketnum
-    mindiff=min(difftopocketnum.keys())
-    minpocketnum=difftopocketnum[mindiff]
-    center=np.array(pocketnumtocenter[minpocketnum])
-    size=np.array(pocketnumtosize[minpocketnum])
-    return center,size
-
-
-
 def Grid(center,size):
     """
     Intent:
@@ -1214,20 +1155,8 @@ def DeterminePocketGrid(poltype,indextocoordinates):
     Referenced By: 
     Description: 
     """
-    #pythonpath=poltype.which('python')
-    #head,tail=os.path.split(pythonpath)
-    #pythonpath=Path(head) 
-    #envdir=pythonpath.parent.absolute()
-    #envpath=Path(envdir)
-    #allenvs=envpath.parent.absolute()
-    #oldenvpath=os.path.join(allenvs,poltype.pymolenvname)
-    #binpath=os.path.join(oldenvpath,'bin')
-    #pythonpath=os.path.join(binpath,'python')
-    #CallFpocket(poltype,pythonpath,binpath,poltype.complexedproteinpdbname)
-    #pocketnumtocenter,pocketnumtosize=ReadPocketGrids(poltype)
     ligandpdbfilename,receptorpdbfilename=poltype.ExtractLigand(poltype.complexedproteinpdbname,list(indextocoordinates.values()))
     center=poltype.GrabLigandCentroid(ligandpdbfilename)
-    #center,size=GrabCorrectPocketGrid(ligcenter,pocketnumtocenter,pocketnumtosize)
     size=ComputeGridAroundLigand(poltype,indextocoordinates,center)
     minx,maxx,miny,maxy,minz,maxz=Grid(center,size)
     return minx,maxx,miny,maxy,minz,maxz

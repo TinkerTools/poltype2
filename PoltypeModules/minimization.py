@@ -52,7 +52,11 @@ def MinimizeCommand(poltype,xyzfilename,keyfilename,gradrms,outputfilename):
     Referenced By: 
     Description: 
     """
-    cmd=poltype.trueminimizepath+' '+xyzfilename+' -k '+keyfilename+' '+str(gradrms)+' '+'> '+outputfilename
+    if poltype.externalapi!=None:
+        minimizepath=poltype.minimizeommpath
+    else:
+        minimizepath=poltype.trueminimizepath
+    cmd=minimizepath+' '+xyzfilename+' -k '+keyfilename+' '+str(gradrms)+' '+'> '+outputfilename
     return cmd
 
 

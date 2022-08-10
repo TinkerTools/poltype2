@@ -655,6 +655,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
     rottors,rotbndtorescount,restlist,rotphases=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,optmol,restlist,phaseanglelist)
     frotors,rotbndtorescount,restlist=FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,optmol,restlist,phaseanglelist)
 
+
     for i in range(len(rottors)):
         tor=rottors[i]
         rta,rtb,rtc,rtd=tor[:]
@@ -672,7 +673,6 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
         if torang<0:
             torang=torang+360
         tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (rta,rtb,rtc,rtd,torsionrestraint,round((torang)%360),round((torang)%360)))
-
 
 
 
@@ -1514,6 +1514,8 @@ def get_torlist(poltype,mol,missed_torsions):
                         ringbond=False
         if ringbond==True:
             continue
+        
+
         if skiptorsion==False:
             rotbndlist[rotbndkey] = []
             rotbndlist[rotbndkey].append(unq)
@@ -1522,7 +1524,13 @@ def get_torlist(poltype,mol,missed_torsions):
             nonrotbndlist[rotbndkey] = []
             nonrotbndlist[rotbndkey].append(unq)
             nonrotbndlist=FindOtherTorsAboutBond(poltype,nonrotbndlist,bond,rotbndkey,t1,t2,t3,t4)
-
+    for nonarotors in nonarotorsions:
+        x=len(nonarotors)-3
+        for i in range(0,x):
+            nonarotor=nonarotors[i]
+            rotbndkey = '%d %d' % (nonarotor[1],nonarotor[2])
+            nonrotbndlist[rotbndkey] = []
+            nonrotbndlist[rotbndkey].append(nonarotor)
 
     return (torlist ,rotbndlist,hydtorsionlist,nonaroringtorlist,nonrotbndlist)
 
