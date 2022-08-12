@@ -423,6 +423,10 @@ def WriteOutDatabaseLines(poltype,valenceprmlist,valkeytosmarts,smartstovdwlinel
     Referenced By: 
     Description: 
     """
+    print('valenceprmlist',valenceprmlist)
+    print('valkeytosmarts',valkeytosmarts)
+    print('smartstovdwlinelist',smartstovdwlinelist)
+
     newtemp=open(poltype.databaseprmfilename,'w')
     for key,ls in valenceprmlist.items():
         for line in ls:
@@ -483,16 +487,23 @@ def ConstructTorsionLineFromFragment(poltype,key,classkeytofragmentfilename,clas
     Referenced By: 
     Description: 
     """
+    print('valkey &&&',valkey)
+    print('key',key)
     filename=classkeytofragmentfilename[key]
+    print('filename',filename)
     prms=classkeytoparameters[key]
+    print('prms',prms)
     parameters=' '.join(prms)
     torline='torsion '+key+' '+parameters+'\n'
+    print('torline',torline)
     smartspos=classkeytosmartsposarraycollected[key]
+    print('smartspos',smartspos)
     smarts=classkeytosmartscollected[key]
+    print('smarts',smarts)
     torsionindexes=classkeytotorsionindexescollected[key]
+    print('torsionindexes',torsionindexes)
     if key in classkeytofitresults.keys():
         fitresultsline=classkeytofitresults[key]
-        
     else:
         fitresultsline='' 
     fitline+=' SMARTS '+smarts+' torsion atom indexes = '+torsionindexes+' with smarts torsion indices '+smartspos+' from fragment '+filename+"\n"
@@ -512,6 +523,8 @@ def ConstructTorsionLineFromFragment(poltype,key,classkeytofragmentfilename,clas
     temp.write(fitline)
     if fitresultsline!='':
         temp.write(fitresultsline)
+    print('valencestring',valencestring)
+    print('smarts',smarts)
     temp.write('# '+valencestring)
     temp.write(torline)
     if valkey not in valenceprmlist.keys():
@@ -750,7 +763,7 @@ def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog
     Description: 
     """
     tempmaxmem,tempmaxdisk,tempnumproc=poltype.PartitionResources()
-    poltypeinput={'deleteallnonqmfiles':poltype.deleteallnonqmfiles,'debugmode':poltype.debugmode,'atmidx':poltype.prmstartidx,'parentname':poltype.parentname,'use_gau_vdw':poltype.use_gau_vdw,'use_qmopt_vdw':poltype.use_qmopt_vdw,'onlyvdwatomindex':poltype.onlyvdwatomindex,'tordebugmode':poltype.tordebugmode,'dovdwscan':poltype.dovdwscan,'refinenonaroringtors':poltype.refinenonaroringtors,'tortor':poltype.tortor,'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':tempnumproc,'maxmem':tempmaxmem,'maxdisk':tempmaxdisk,'printoutput':True,'toroptmethodlist':','.join(poltype.toroptmethodlist),'torspmethodlist':','.join(poltype.torspmethodlist)}
+    poltypeinput={'xtbtorresconstant':poltype.xtbtorresconstant,'deleteallnonqmfiles':poltype.deleteallnonqmfiles,'debugmode':poltype.debugmode,'atmidx':poltype.prmstartidx,'parentname':poltype.parentname,'use_gau_vdw':poltype.use_gau_vdw,'use_qmopt_vdw':poltype.use_qmopt_vdw,'onlyvdwatomindex':poltype.onlyvdwatomindex,'tordebugmode':poltype.tordebugmode,'dovdwscan':poltype.dovdwscan,'refinenonaroringtors':poltype.refinenonaroringtors,'tortor':poltype.tortor,'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':tempnumproc,'maxmem':tempmaxmem,'maxdisk':tempmaxdisk,'printoutput':True,'toroptmethodlist':','.join(poltype.toroptmethodlist),'torspmethodlist':','.join(poltype.torspmethodlist)}
     if strfragrotbndindexes!=None:
         poltypeinput['onlyrotbndslist']=strfragrotbndindexes
         rotbnds=strfragrotbndindexes.split(',')

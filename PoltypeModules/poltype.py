@@ -4630,7 +4630,9 @@ class PolarizableTyper():
                 self.WriteToLog('OPT torsion QM time for '+str(torset)+' is '+str(round(opttime,3))+' hours'+' and '+str(numpoints)+' conformations')
                 self.WriteToLog('SP torsion QM time for '+str(torset)+' is '+str(round(sptime,3))+' hours'+' and '+str(numpoints)+' conformations')
             self.WriteToLog('Poltype Job Finished'+'\n')
-            
+            if self.isfragjob==False and self.dontfrag==True:
+                self.WriteOutDatabaseParameterLines()
+
             if os.path.exists(self.scrtmpdirgau):
                 shutil.rmtree(self.scrtmpdirgau)
             if os.path.exists(self.scrtmpdirpsi4):
@@ -6917,6 +6919,137 @@ class PolarizableTyper():
             charge,resid=self.ReadCharge(alzout)
             if charge!=0:
                 raise ValueError('Net charge is not zero! Net Charge = '+str(charge)+' '+keypath)
+
+
+        def WriteOutDatabaseParameterLines(self):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
+            newkey=self.tmpkeyfile.replace('.key','_TEMP.key')
+            temp=open(self.tmpkeyfile,'r')
+            results=temp.readlines()
+            temp.close()
+            temp=open(newkey,'w')
+            smartstovdwlinelist={}
+            valenceprmlist={}
+            valkeytosmarts={}
+            classkeytoparameters={}
+            classkeytosmartsposarray={}
+            classkeytosmarts={}
+            classkeytotorsionindexes={}
+            trueotherparentindextofragindex={}
+            classkeytofragmentfilename={}
+            classkeytofitresults={}
+            for idx,symclass in self.idxtosymclass.items():
+                trueotherparentindextofragindex[idx-1]=idx-1
+            m=frag.mol_with_atom_index(self,self.rdkitmol)
+            fragsmirks=rdmolfiles.MolToSmarts(m)
+            fragidxarray=frag.GrabAtomOrder(self,fragsmirks)
+            tempmol=frag.mol_with_atom_index_removed(self,self.rdkitmol) 
+            fragsmarts=rdmolfiles.MolToSmarts(tempmol)
+            fragindextosmartspos=frag.GenerateAtomIndexToSMARTSPosition(self,fragidxarray)
+            for rotbnd,tors in self.rotbndlist.items():
+                for torsion in tors:
+                    classkey=torgen.get_class_key(self,torsion[0],torsion[1],torsion[2],torsion[3])
+                    smilesposstring,fragtorstring=frag.GenerateSMARTSPositionStringAndAtomIndices(self,torsion,trueotherparentindextofragindex,fragidxarray)
+                    classkeytosmartsposarray[classkey]=smilesposstring
+                    classkeytosmarts[classkey]=fragsmarts
+                    classkeytotorsionindexes[classkey]=fragtorstring
+                    classkeytofragmentfilename[classkey]=self.molstructfname
+
+            for lineidx in range(len(results)):
+                line=results[lineidx]
+                newline=line.strip()
+                linesplit=newline.split()
+                if line.strip().startswith('torsion') and '#' not in line and 'Missing' not in line:
+                    typea=int(linesplit[1])
+                    typeb=int(linesplit[2])
+                    typec=int(linesplit[3])
+                    typed=int(linesplit[4])
+                    prms=linesplit[5:]
+                    tor=[typea,typeb,typec,typed]
+                    torkey='%d %d %d %d' % (typea, typeb, typec, typed)
+                    revtorkey='%d %d %d %d' % (typed, typec, typeb, typea)
+                    if torkey in classkeytofragmentfilename.keys():
+                        classkey=torkey
+                    elif revtorkey in classkeytofragmentfilename.keys():
+                        classkey=revtorkey
+                    else:
+                        continue
+                    classkeytoparameters[classkey]=prms
+                elif 'vdw' in line and '#' not in line:
+                    for clskey,smrts in classkeytosmarts.items():
+                        pass
+                    linesplit=line.split() 
+                    fragclasskey=linesplit[1]
+                    for fragidx,symclass in self.idxtosymclass.items():
+                        if symclass==int(fragclasskey):
+                            break
+                    fragsymclass=int(fragclasskey)
+                    prms=linesplit[2:]
+                    fragidx=int(fragidx)-1
+                    if fragidx in fragindextosmartspos.keys():
+                        smartspos=fragindextosmartspos[fragidx]
+                        smilesposarray=[smartspos]
+                        smilesposarray=[str(i) for i in smilesposarray]
+                        smilespos=','.join(smilesposarray)
+                        valencestring='vdw'+' % '+smrts+' % '+smilespos+' % '
+                        for prm in prms:
+                            valencestring+=prm+','
+                        valencestring=valencestring[:-1]
+                        valencestring+='\n'
+                        if smrts not in smartstovdwlinelist.keys():
+                            smartstovdwlinelist[smrts]=[]
+                        smartstovdwlinelist[smrts].append(valencestring)
+
+                elif 'RMSD(MM2,QM)' in line:
+                    typea=int(linesplit[2])
+                    typeb=int(linesplit[3])
+                    typec=int(linesplit[4])
+                    typed=int(linesplit[5])
+                    tor=[typea,typeb,typec,typed]
+                    torkey='%d %d %d %d' % (typea, typeb, typec, typed)
+                    revtorkey='%d %d %d %d' % (typed, typec, typeb, typea)
+                    if torkey in classkeytofragmentfilename.keys():
+                        classkey=torkey
+                    elif revtorkey in classkeytofragmentfilename.keys():
+                        classkey=revtorkey
+                    else:
+                        continue
+
+                    classkeytofitresults[classkey]=' '.join(linesplit)+'\n'
+
+
+            for line in results:
+                fitline="# Fitted from Fragment "
+                linesplit=line.split()
+                if line.strip().startswith('torsion') and '#' not in line and 'Missing' not in line:
+                    typea=int(linesplit[1])
+                    typeb=int(linesplit[2])
+                    typec=int(linesplit[3])
+                    typed=int(linesplit[4])
+                    torkey='%d %d %d %d' % (typea, typeb, typec, typed)
+                    rev='%d %d %d %d' % (typed,typec,typeb,typea)
+                    if typeb<typec:
+                        valkey=tuple([typeb,typec])
+                    else:
+                        valkey=tuple([typec,typeb])
+                    if torkey in classkeytoparameters.keys():
+                        valenceprmlist,valkeytosmarts=frag.ConstructTorsionLineFromFragment(self,torkey,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarray,classkeytosmarts,classkeytotorsionindexes,temp,valenceprmlist,fitline,classkeytofitresults,valkey,valkeytosmarts)
+
+                    elif rev in classkeytoparameters.keys():
+                        valenceprmlist,valkeytosmarts=frag.ConstructTorsionLineFromFragment(self,rev,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarray,classkeytosmarts,classkeytotorsionindexes,temp,valenceprmlist,fitline,classkeytofitresults,valkey,valkeytosmarts)
+
+                    else:
+                        temp.write(line)
+
+
+            temp.close()
+            frag.WriteOutDatabaseLines(self,valenceprmlist,valkeytosmarts,smartstovdwlinelist)
 
 
 

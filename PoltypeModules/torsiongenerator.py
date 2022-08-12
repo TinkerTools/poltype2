@@ -798,6 +798,55 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
     failedcheck=CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle,torsiontomaintor)
     return cartxyz,torxyzfname,torxyzfname+'_2',tmpkeyfname,failedcheck
 
+
+def CheckIfQMOptReachedTargetDihedral(poltype,cartxyz,initialtinkerstructure,torset,optmol,variabletorlist,phaseanglelist):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    inicartxyz=ConvertTinktoXYZ(poltype,initialtinkerstructure,initialtinkerstructure.replace('.xyz','_cart.xyz'))
+    inioptmol = opt.load_structfile(poltype,inicartxyz)
+    optmol = opt.load_structfile(poltype,cartxyz)
+    tol=4
+    rotbndtorescount={}
+    maxrotbnds=1
+    restlist=[]
+    rottors,rotbndtorescount,restlist,rotphases=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,optmol,restlist,phaseanglelist)
+    frotors,rotbndtorescount,restlist=FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,optmol,restlist,phaseanglelist)
+    rottors.extend(frotors)
+    for tor in rottors:
+        a,b,c,d=tor[:]
+        iniang = inioptmol.GetTorsion(a,b,c,d)
+        if iniang<0:
+            iniang=iniang+360
+        iniang=iniang % 360
+        if iniang>180:
+            shift=360
+        else:
+            shift=0
+        reducediniang=iniang-shift
+        optang = optmol.GetTorsion(a,b,c,d)
+        if optang<0:
+            optang=optang+360
+        optang=optang % 360
+        if optang>180:
+            shift=360
+        else:
+            shift=0
+
+        reducedoptang=optang-shift
+        diff= numpy.abs(reducedoptang-reducediniang) # if one is close to 360 (358) but other is close to 0 (1 etc)
+        firstdiff=numpy.abs(optang-iniang)
+        if firstdiff>tol and diff>tol: # then optimization for ANI or XTB failed to reach target dihedral
+            string='Torsion did not reach target dihedral angle! torsion = '+str(tor)+' tinker minimized dihedral angle is '+str(iniang) +' but the optimized dihedral angle is at '+str(optang)+', tinker structure is '+inicartxyz+' , opt strucuture is '+cartxyz
+            raise ValueError(string)
+
+
+
+
 def CheckIfReachedTargetPhaseAngles(poltype,cartxyz,torsiontophaseangle,torsiontomaintor):
     """
     Intent:
@@ -1166,6 +1215,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             if finished==True:
                 if poltype.toroptmethod!='xtb' and poltype.toroptmethod!='ANI' and poltype.toroptmethod!='AMOEBA':
                     opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
+                CheckIfQMOptReachedTargetDihedral(poltype,cartxyz,initialtinkerstructure,torset,optmol,variabletorlist,phaseangles) # QM usually freezes dof but xtb and ANI does not freeze so need to add check now.
                 tinkerxyz=outputlog.replace('.log','_tinker.xyz')
                 ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz)
                 if outputlog not in finishedjobs:
@@ -1301,27 +1351,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
 
 
 
-def CheckBondTopology(poltype,outputlog,initialtinkerstructure):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    bondtoposame=True
-    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
-        fname=outputlog.replace('.log','.xyz')
-    else:
-        fname=outputlog
-    optmol = opt.load_structfile(poltype,fname)
-    cartxyz=ConvertTinktoXYZ(poltype,initialtinkerstructure,initialtinkerstructure.replace('.xyz','_cart.xyz'))
-    inioptmol = opt.load_structfile(poltype,cartxyz)
-    isnear=opt.CompareBondLengths(poltype,inioptmol,optmol,outputlog)
-    if isnear==False:
-        bondtoposame=False
-
-    return bondtoposame
 
 def GenerateBondTopology(poltype,optmol):
     """
