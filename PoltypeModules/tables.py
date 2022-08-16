@@ -361,7 +361,8 @@ def GrabSimDataFromPathList(poltype):
             poltype.masterdict['energy'][path][u'ΔSᵇᶦⁿᵈᵃᵛᵍ']=poltype.deltaSaverage
 
 
-   
+    tempname='GrabbedSimData.csv'
+    CSVWriter(poltype,tempname)   
     plots.PlotFreeEnergyVsExp(poltype)
     return
 

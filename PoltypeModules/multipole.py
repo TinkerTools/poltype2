@@ -286,7 +286,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                 neighbswithoutatom=RemoveFromList(poltype,atomneighbs,atom)
                 uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom=list(set([poltype.idxtosymclass[b.GetIdx()] for b in neighbsofneighbwithoutatom]))
                 neighbindices=list([b.GetIdx() for b in atomneighbs])
-
                 if atomicnum==7 and val==1:
                     poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                     poltype.localframe2[atomidx - 1] = 0
@@ -348,11 +347,9 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     lfzerox[atomidx - 1]=True
                     foundcase=True
                 elif val==4 and len(uniqueneighbtypes)==2 and (len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==0 or len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1): # N(CH3)(CH3)(CH3)H
-                    neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
-                    idxtotrisecbool[atomidx]=True
-                    trisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
-                    idxtotrisectidxs[atomidx]=trisectidxs
-                    lfzerox[atomidx - 1]=True 
+                    poltype.localframe1[atomidx-1]=highestsymneighbnorepeat.GetIdx()
+                    poltype.localframe2[atomidx - 1] = 0
+                    lfzerox[atomidx - 1]=True
                     foundcase=True
 
 

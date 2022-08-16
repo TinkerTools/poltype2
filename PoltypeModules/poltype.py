@@ -4523,7 +4523,6 @@ class PolarizableTyper():
                 if fit==True:
                     if self.atomnum!=1: 
                         esp.ElectrostaticPotentialComparison(self,combinedxyz,combinedpot) 
-            
             if not os.path.exists(self.key4fname):
                 databaseparser.appendtofile(self,self.key3fname,self.key4fname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo)
                 if self.writeoutangle==True:
