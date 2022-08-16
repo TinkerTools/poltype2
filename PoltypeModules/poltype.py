@@ -3212,7 +3212,9 @@ class PolarizableTyper():
             for job,outputlog in jobtooutputlog.items():
                finished,error,errormessages=self.CheckNormalTermination(outputlog,errormessages,skiperrors)
                if error==True: # remove log before resubmitting
+                   self.WriteToLog('Removing old outputlog that failed '+outputlog)
                    os.remove(outputlog)
+            time.sleep(1)
             # STEP 3
             while len(finishedjobs)!=len(jobtooutputlog.keys()):
                 # STEP 4
@@ -3301,7 +3303,7 @@ class PolarizableTyper():
                     else:
                         if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line or "LBFGS  --  Normal Termination due to SmallGrad" in line or "Normal termination" in line or 'Normal Termination' in line or 'Total Potential Energy' in line or 'Psi4 stopped on' in line or 'finished run' in line:
                             term=True
-                        if ('Tinker is Unable to Continue' in line or 'error' in line or ' Error ' in line or ' ERROR ' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line) and 'DIIS' not in line and 'mpi' not in line and 'RMS Error' not in line:
+                        if ('Tinker is Unable to Continue' in line or 'error' in line or ' Error ' in line or ' ERROR ' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line or 'Optimization failed to converge!' in line) and 'DIIS' not in line and 'mpi' not in line and 'RMS Error' not in line:
                             error=True
                             errorline=line
                         if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line or ('OptimizationConvergenceError' in line and 'except' in line) or "Error on total polarization charges" in line or 'Erroneous write' in line:
@@ -4660,7 +4662,7 @@ class PolarizableTyper():
                 self.WriteToLog('OPT torsion QM time for '+str(torset)+' is '+str(round(opttime,3))+' hours'+' and '+str(numpoints)+' conformations')
                 self.WriteToLog('SP torsion QM time for '+str(torset)+' is '+str(round(sptime,3))+' hours'+' and '+str(numpoints)+' conformations')
             self.WriteToLog('Poltype Job Finished'+'\n')
-            if self.isfragjob==False and self.dontfrag==True:
+            if self.isfragjob==False and self.dontfrag==True and len(self.torlist)!=0:
                 self.WriteOutDatabaseParameterLines()
 
             if os.path.exists(self.scrtmpdirgau):
@@ -7081,7 +7083,8 @@ class PolarizableTyper():
 
 
             temp.close()
-            frag.WriteOutDatabaseLines(self,valenceprmlist,valkeytosmarts,smartstovdwlinelist)
+            if len(self.torlist)!=0:
+                frag.WriteOutDatabaseLines(self,valenceprmlist,valkeytosmarts,smartstovdwlinelist)
 
 
 
