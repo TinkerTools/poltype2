@@ -888,7 +888,10 @@ def BoxSetupProtocol(poltype):
         
     poltype.xyzfilesize=[float(os.path.getsize(i)) for i in poltype.boxfilename] # in bytes
     poltype.equilarcfilesize=[i*poltype.equilframenum*10**-9 for i in poltype.xyzfilesize] # in GB
-    poltype.singlepertubationfilesize=[i*int(poltype.proddynframenum)*10**-9 for i in poltype.xyzfilesize] # in GB
+    poltype.singlepertubationfilesize=[]
+    for i in range(len(poltype.xyzfilesize)):
+        filesize=poltype.xyzfilesize[i]
+        poltype.singlepertubationfilesize.append(filesize*int(poltype.proddynframenum[i])*10**-9)
     poltype.totalperturbationfilesize=[len(poltype.estatlambdascheme)*i for i in poltype.singlepertubationfilesize] # in GB
     poltype.totalfilesize=[]
     for i in range(len(poltype.equilarcfilesize)):

@@ -5,26 +5,10 @@ import productiondynamics as prod
 import terminate as term
 import numpy as np
 import plots
+import pandas as pd
 
-def GenerateAnnihilationProgressTable(poltype):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    totaltable=[]
-    tableheader=['Dynamic Jobs','Name','Writeout Freq (ps)','Dyntamic Time Step (fs)','Total Time (ns)','Total Dyn Extended Time','Total Dynamic Steps','Total Extended Dynamic Steps','Total ARC File Space Needed']
-    for j in range(len( poltype.simfoldname)):
-        simfoldname=poltype.simfoldname[j].replace('Sim','')
-        lambdafolderlistoflist=poltype.lambdafolderlist[j]
-        proddynoutfilepathlist=poltype.proddynoutfilepath[j]
-        tableheader2=[simfoldname,poltype.simname,poltype.proddynwritefreq,poltype.proddyntimestep,poltype.proddyntime,poltype.proddyntime,poltype.proddynsteps,poltype.proddynsteps,poltype.totalfilesize]
-        tabledata=[tableheader,tableheader2]
-        totaltable.append(tabledata) 
 
-    return totaltable
+
 
 def ComputeDynamicsTime(poltype,timeleft):
     """
@@ -127,14 +111,8 @@ def CSVWriter(poltype,tempname,progress=False):
                 energy_writer.writerow(valuerowlist)
                 allvaluerows.append(valuerowlist) 
             WriteOutTable(poltype,allvaluerows,summary,keyrowlist)
-        if progress==True:
-            progtables=GenerateAnnihilationProgressTable(poltype)
-            if progtables!=None:
-                for progtable in progtables:
-                    energy_writer.writerow(emptyline)
-                    for row in progtable:
-                        energy_writer.writerow(row)
-                    energy_writer.writerow(emptyline)
+        
+    GenerateExcelFile(poltype)
 
 
 def WriteOutTable(poltype,allvaluerows,summary,keyrowlist):
@@ -167,7 +145,7 @@ def GenerateSimInfoTable(poltype):
     os.chdir(poltype.outputpath)
     lambdakeylist,boxinfokeylist,energykeylist,freeenergykeylist,summarykeylist,keylist=KeyLists(poltype)
     OrderTableData(poltype,boxinfokeylist,lambdakeylist,energykeylist,freeenergykeylist,summarykeylist,poltype.outputpath)  
-    if poltype.binding==True:
+    if poltype.binding==True and poltype.complexationonly==False:
         EnterBindData(poltype,poltype.outputpath)      
     plots.PlotBARConvergence(poltype) 
     tempname='SimData.csv'
@@ -384,8 +362,6 @@ def GrabSimDataFromPathList(poltype):
 
 
    
-    tempname='GrabbedSimData.csv'
-    CSVWriter(poltype,tempname)
     plots.PlotFreeEnergyVsExp(poltype)
     return
 
@@ -518,4 +494,36 @@ def WriteTableUpdateToLog(poltype,verbose=True):
                 poltype.tabledictkeysused[i].append(key)
                 if verbose==True:
                     poltype.WriteToLog(key+' = '+str(value))
+
+
+def GenerateExcelFile(poltype):
+    from openpyxl.styles import Color, PatternFill, Font, Border
+    from openpyxl.styles import colors
+    from openpyxl.cell import Cell
+    from openpyxl.worksheet.dimensions import ColumnDimension, DimensionHolder
+    from openpyxl.utils import get_column_letter
+    spreadsheet='SimulationResults.xlsx'
+    files=os.listdir()
+    csvfiles=[]
+    for f in files:
+        if ".csv" in f and 'SimData' not in f:
+            csvfiles.append(f)
+
+    with pd.ExcelWriter(spreadsheet, engine="openpyxl") as writer:
+        for f in csvfiles:
+            df = pd.read_csv(f)
+            split=f.split('.csv')
+            sheet_name = split[0]
+            df.to_excel(writer, sheet_name=sheet_name)
+            sheet = writer.sheets[sheet_name]
+            column_widths = []
+            for row in sheet.iter_rows():
+                for i, cell in enumerate(row):
+                    try:
+                        column_widths[i] = max(column_widths[i], len(str(cell.value)))
+                    except IndexError:
+                        column_widths.append(len(str(cell.value)))
+            
+            for i, column_width in enumerate(column_widths):
+                sheet.column_dimensions[get_column_letter(i + 1)].width = column_width
 

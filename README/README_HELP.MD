@@ -428,6 +428,8 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 
 ``removesolventpdbtraj`` specifies to remove solvent (water/ions) from PDB trajectory. Used with ``generatepdbtrajs``. Default is True.
 
+``useuniquefilenames`` specifies to use uniquefilenames for simulation files. Default is False, to make copying files between different folders easier.
+
 #### Available Integrators Barostats and Thermostats
 
 ##### Integrators
@@ -554,6 +556,10 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 ``estatlambdascheme``   specifies the electrostatics lambda scheme during production dynamics. Default is 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1,1.
 
 ``proddynwritefreq``    specifies how often to write out new frame during production dynamics MD. Units in ps. Default is 2.
+
+``compproddyntime``  specifies the total time to run production dynamics (in NPT by default) for each lambda. Units in ns. Default is 10.
+
+``solvproddyntime``  specifies the total time to run production dynamics (in NPT by default) for each lambda. Units in ns. Default is 5.
 
 
 ``proddyntime``  specifies the total time to run production dynamics (in NPT by default) for each lambda. Units in ns. Default is 5 for solvation and 10 ns for binding computations.

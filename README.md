@@ -396,7 +396,7 @@ nohup python /path_to_poltype/poltype.py &
 
 * Individual BAR step free energy computations
 * Useful for troubleshooting if free energy is incorrect
-* BARResults.csv
+* CompBARResults.csv,SolvBARResults.csv
 
 
 

@@ -16,7 +16,7 @@ def PlotBARConvergence(poltype):
     Referenced By: 
     Description: 
     """
-    if poltype.binding==True:
+    if poltype.binding==True and poltype.complexationonly==False:
         compfreeenergy=np.array(poltype.freeenergyconv[0])
         solvfreeenergy=np.array(poltype.freeenergyconv[1])
         compfreeenergyerror=np.array(poltype.freeenergyerrorconv[0])
@@ -25,17 +25,17 @@ def PlotBARConvergence(poltype):
         bindfreeenergyerror=np.sqrt(np.square(compfreeenergyerror)+np.square(solvfreeenergyerror))
         freeenergy=bindfreeenergy
         freeenergyerror=bindfreeenergyerror
-        PlotFreeEnergyConvergence(poltype,freeenergy,freeenergyerror,'Binding')
-        PlotFreeEnergyConvergence(poltype,solvfreeenergy,solvfreeenergyerror,'Solvation')
-        PlotFreeEnergyConvergence(poltype,compfreeenergy,compfreeenergyerror,'Complexation')
+        PlotFreeEnergyConvergence(poltype,freeenergy,freeenergyerror,'Binding',0)
+        PlotFreeEnergyConvergence(poltype,compfreeenergy,compfreeenergyerror,'Complexation',0)
+        PlotFreeEnergyConvergence(poltype,freeenergy,freeenergyerror,'Solvation',1)
     else:
         solvfreeenergy=np.array(poltype.freeenergyconv[0])
         solvfreeenergyerror=np.array(poltype.freeenergyerrorconv[0])
         freeenergy=solvfreeenergy
         freeenergyerror=solvfreeenergyerror
-        PlotFreeEnergyConvergence(poltype,freeenergy,freeenergyerror,'Solvation')
+        PlotFreeEnergyConvergence(poltype,freeenergy,freeenergyerror,'Solvation',0)
 
-def PlotFreeEnergyConvergence(poltype,freeenergy,freeenergyerror,prefix):
+def PlotFreeEnergyConvergence(poltype,freeenergy,freeenergyerror,prefix,index):
     """
     Intent:
     Input:
@@ -43,8 +43,8 @@ def PlotFreeEnergyConvergence(poltype,freeenergy,freeenergyerror,prefix):
     Referenced By: 
     Description: 
     """
-    divisor=int(poltype.proddyntime/len(freeenergy))
-    x=np.array(list(np.arange(0,poltype.proddyntime,divisor)))
+    divisor=int(poltype.proddyntimearray[index]/len(freeenergy))
+    x=np.array(list(np.arange(0,poltype.proddyntimearray[index],divisor)))
     x+=divisor
     fig = plt.figure()
     ax1 = fig.add_subplot(111)

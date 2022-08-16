@@ -724,13 +724,14 @@ def ComputeThermoProperties(poltype):
     Description: 
     """
     curdir=os.getcwd()
-    totalframes=poltype.proddynframenum
-    divisor=int(totalframes/poltype.barinterval)
-    framechunks=list(np.arange(divisor,totalframes,divisor))
-    framechunks.append(None)
+    
     poltype.freeenergyconv=[]
     poltype.freeenergyerrorconv=[]
     for i in range(len(poltype.baroutputfilepath)):
+        totalframes=int(poltype.proddynframenum[i])
+        divisor=int(totalframes/poltype.barinterval)
+        framechunks=list(np.arange(divisor,totalframes,divisor))
+        framechunks.append(None)
         baroutputfilepathlist=poltype.baroutputfilepath[i]
         freeenergylistoflist=[]
         freeenergyerrorlistoflist=[]
@@ -869,126 +870,140 @@ def ComputeThermoProperties(poltype):
                 poltype.tabledict[i][u'ΔSˢᵒˡᵛᵉʳʳ']=poltype.entropyerror[i]
 
     tables.WriteTableUpdateToLog(poltype,verbose=False)
-    tempname='BARResults.csv'
-    table=[]
-    with open(poltype.outputpath+tempname, mode='w') as energy_file:
-        energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        vdwlambdapairlist,vdwlambdapairlistoflist=FlattenListOfListGenerateBARPairs(poltype,poltype.vdwlambdascheme)
-        elelambdapairlist,elelambdapairlistoflist=FlattenListOfListGenerateBARPairs(poltype,poltype.estatlambdascheme)
-        table.append(['Vdw-Lambda']+vdwlambdapairlist)
-        table.append(['Ele-Lambda']+elelambdapairlist)
-        table.append(['Rest-Lambda']+FlattenListOfListGenerateBARPairs(poltype,poltype.restlambdascheme)[0])
-        
-        if poltype.solvation==True and poltype.complexation==False:
-            barpairs=[]
-            for ls in poltype.lambdafolderlist[0]:
-                pairs=GenerateBARPairs(poltype,ls)
-                barpairs.extend(pairs)
-            table.append(['Folder']+barpairs)
-            solvfreeenergylist=FlattenListOfList(poltype,poltype.freeenergylist[0])
-            totalvdw,totalele,vdwfreeenergynoioncorrection,elefreeenergynoioncorrection,totalfreeenergynoioncorrection,vdwfreeenergynogas,elefreeenergynogas,totalfreeenergynogas,vdwfreeenergygas,elefreeenergygas,totalfreeenergygas=GenerateEleVdwSums(poltype,solvfreeenergylist,vdwlambdapairlist,elelambdapairlist,baroutputfilepathlist)
-            fwdenergylist=FlattenListOfList(poltype,poltype.freeenergylistfwd[0])
-            bwdenergylist=FlattenListOfList(poltype,poltype.freeenergylistbwd[0])
-            fwdbwddiff=list(np.abs(np.array(fwdenergylist)-np.array(bwdenergylist)))
-            fwdbwddiff=[str(i) for i in fwdbwddiff]
-            CheckIfForwardBackwardPertubationsAreSimilar(poltype,fwdenergylist,bwdenergylist)
-            poltype.tabledict[0][u'ΔGˢᵒˡᵛᵉˡᵉ']=totalele
-            poltype.tabledict[0][u'ΔGˢᵒˡᵛᵛᵈʷ']=totalvdw
-            poltype.tabledict[0][u'ΔG']=totalfreeenergynoioncorrection
-            poltype.tabledict[0][u'ΔGᵉˡᵉ']=elefreeenergynoioncorrection
-            poltype.tabledict[0][u'ΔGᵛᵈʷ']=vdwfreeenergynoioncorrection
-            poltype.tabledict[0][u'ΔGᵍᵃˢ']=totalfreeenergygas
-            poltype.tabledict[0][u'ΔGˢᵒˡ']=totalfreeenergynogas
-            poltype.tabledict[0][u'ΔGᵉˡᵉᵍᵃˢ']=elefreeenergygas
-            poltype.tabledict[0][u'ΔGᵉˡᵉˢᵒˡ']=elefreeenergynogas
-            poltype.tabledict[0][u'ΔGᵛᵈʷᵍᵃˢ']=vdwfreeenergygas
-            poltype.tabledict[0][u'ΔGᵛᵈʷˢᵒˡ']=vdwfreeenergynogas
-            table.append([u'ΔGˢᵒˡᵛ']+solvfreeenergylist)
-            table.append([u'ΔGˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.freeenergyerrorlist[0]))
-            table.append([u'ΔGˢᵒˡᵛᶠʷᵈ']+fwdenergylist)
-            table.append([u'ΔGˢᵒˡᵛᵇʷᵈ']+bwdenergylist)
-            table.append([u'ΔGˢᵒˡᵛᶠʷᵈᵇʷᵈ']+fwdbwddiff)
-            table.append([u'ΔHˢᵒˡᵛ']+FlattenListOfList(poltype,poltype.enthalpylist[0]))
-            table.append([u'ΔHˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.enthalpyerrorlisttotal[0]))
-            table.append([u'TΔSˢᵒˡᵛ']+FlattenListOfList(poltype,poltype.entropylist[0]))
-            table.append([u'TΔSˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.entropyerrorlisttotal[0]))
-            table.append(['SolvOverlap']+FlattenListOfList(poltype,poltype.overlaplist[0]))
+    comptable=[]
+    solvtable=[]
 
-        elif poltype.complexation==True and poltype.solvation==True:
-            barpairs=[]
-            for ls in poltype.lambdafolderlist[1]:
-                pairs=GenerateBARPairs(poltype,ls)
-                barpairs.extend(pairs)
-            table.append(['Folder']+barpairs)
-            compfreeenergylist=FlattenListOfList(poltype,poltype.freeenergylist[0])
-            totalvdw,totalele,vdwfreeenergynoioncorrection,elefreeenergynoioncorrection,totalfreeenergynoioncorrection,vdwfreeenergynogas,elefreeenergynogas,totalfreeenergynogas,vdwfreeenergygas,elefreeenergygas,totalfreeenergygas=GenerateEleVdwSums(poltype,compfreeenergylist,vdwlambdapairlist,elelambdapairlist,baroutputfilepathlist)
-            poltype.tabledict[0][u'ΔGᶜᵒᵐᵖᵉˡᵉ']=totalele
-            poltype.tabledict[0][u'ΔGᶜᵒᵐᵖᵛᵈʷ']=totalvdw
-            compfwdenergylist=FlattenListOfList(poltype,poltype.freeenergylistfwd[0])
-            compbwdenergylist=FlattenListOfList(poltype,poltype.freeenergylistbwd[0])
-            CheckIfForwardBackwardPertubationsAreSimilar(poltype,compfwdenergylist,compbwdenergylist)
-            solvfwdenergylist=FlattenListOfList(poltype,poltype.freeenergylistfwd[1])
-            solvbwdenergylist=FlattenListOfList(poltype,poltype.freeenergylistbwd[1])
-            solvfwdbwddiff=list(np.abs(np.array(solvfwdenergylist)-np.array(solvbwdenergylist)))
-            solvfwdbwddiff=[str(i) for i in solvfwdbwddiff]
-            compfwdbwddiff=list(np.abs(np.array(compfwdenergylist)-np.array(compbwdenergylist)))
-            compfwdbwddiff=[str(i) for i in compfwdbwddiff]
-            CheckIfForwardBackwardPertubationsAreSimilar(poltype,solvfwdenergylist,solvbwdenergylist)
-            solvfreeenergylist=FlattenListOfList(poltype,poltype.freeenergylist[1])
-            totalvdw,totalele,vdwfreeenergynoioncorrection,elefreeenergynoioncorrection,totalfreeenergynoioncorrection,vdwfreeenergynogas,elefreeenergynogas,totalfreeenergynogas,vdwfreeenergygas,elefreeenergygas,totalfreeenergygas=GenerateEleVdwSums(poltype,solvfreeenergylist,vdwlambdapairlist,elelambdapairlist,baroutputfilepathlist)
-            poltype.tabledict[1][u'ΔGˢᵒˡᵛᵉˡᵉ']=totalele
-            poltype.tabledict[1][u'ΔGˢᵒˡᵛᵛᵈʷ']=totalvdw
+    
+    vdwlambdapairlist,vdwlambdapairlistoflist=FlattenListOfListGenerateBARPairs(poltype,poltype.vdwlambdascheme)
+    elelambdapairlist,elelambdapairlistoflist=FlattenListOfListGenerateBARPairs(poltype,poltype.estatlambdascheme)
+    comptable.append(['Vdw-Lambda']+vdwlambdapairlist)
+    comptable.append(['Ele-Lambda']+elelambdapairlist)
+    comptable.append(['Rest-Lambda']+FlattenListOfListGenerateBARPairs(poltype,poltype.restlambdascheme)[0])
+    solvtable.append(['Vdw-Lambda']+vdwlambdapairlist)
+    solvtable.append(['Ele-Lambda']+elelambdapairlist)
+    solvtable.append(['Rest-Lambda']+FlattenListOfListGenerateBARPairs(poltype,poltype.restlambdascheme)[0])
 
-            if poltype.addgas==True:
-                solvlists=poltype.freeenergylist[1]
-                liq=solvlists[0]
-                gas=solvlists[1]
-                empty=[None for i in gas]
-                inter=liq+gas[::-1]
-                inter=[round(i,2) for i in inter]
-                inter=[str(i) for i in inter]+empty
+    if poltype.solvation==True and poltype.complexation==False:
+        barpairs=[]
+        for ls in poltype.lambdafolderlist[0]:
+            pairs=GenerateBARPairs(poltype,ls)
+            barpairs.extend(pairs)
+        solvtable.append(['Folder']+barpairs)
+        solvfreeenergylist=FlattenListOfList(poltype,poltype.freeenergylist[0])
+        totalvdw,totalele,vdwfreeenergynoioncorrection,elefreeenergynoioncorrection,totalfreeenergynoioncorrection,vdwfreeenergynogas,elefreeenergynogas,totalfreeenergynogas,vdwfreeenergygas,elefreeenergygas,totalfreeenergygas=GenerateEleVdwSums(poltype,solvfreeenergylist,vdwlambdapairlist,elelambdapairlist,baroutputfilepathlist)
+        fwdenergylist=FlattenListOfList(poltype,poltype.freeenergylistfwd[0])
+        bwdenergylist=FlattenListOfList(poltype,poltype.freeenergylistbwd[0])
+        fwdbwddiff=list(np.abs(np.array(fwdenergylist)-np.array(bwdenergylist)))
+        fwdbwddiff=[str(i) for i in fwdbwddiff]
+        CheckIfForwardBackwardPertubationsAreSimilar(poltype,fwdenergylist,bwdenergylist)
+        poltype.tabledict[0][u'ΔGˢᵒˡᵛᵉˡᵉ']=totalele
+        poltype.tabledict[0][u'ΔGˢᵒˡᵛᵛᵈʷ']=totalvdw
+        poltype.tabledict[0][u'ΔG']=totalfreeenergynoioncorrection
+        poltype.tabledict[0][u'ΔGᵉˡᵉ']=elefreeenergynoioncorrection
+        poltype.tabledict[0][u'ΔGᵛᵈʷ']=vdwfreeenergynoioncorrection
+        poltype.tabledict[0][u'ΔGᵍᵃˢ']=totalfreeenergygas
+        poltype.tabledict[0][u'ΔGˢᵒˡ']=totalfreeenergynogas
+        poltype.tabledict[0][u'ΔGᵉˡᵉᵍᵃˢ']=elefreeenergygas
+        poltype.tabledict[0][u'ΔGᵉˡᵉˢᵒˡ']=elefreeenergynogas
+        poltype.tabledict[0][u'ΔGᵛᵈʷᵍᵃˢ']=vdwfreeenergygas
+        poltype.tabledict[0][u'ΔGᵛᵈʷˢᵒˡ']=vdwfreeenergynogas
+        solvtable.append([u'ΔGˢᵒˡᵛ']+solvfreeenergylist)
+        solvtable.append([u'ΔGˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.freeenergyerrorlist[0]))
+        solvtable.append([u'ΔGˢᵒˡᵛᶠʷᵈ']+fwdenergylist)
+        solvtable.append([u'ΔGˢᵒˡᵛᵇʷᵈ']+bwdenergylist)
+        solvtable.append([u'ΔGˢᵒˡᵛᶠʷᵈᵇʷᵈ']+fwdbwddiff)
+        solvtable.append([u'ΔHˢᵒˡᵛ']+FlattenListOfList(poltype,poltype.enthalpylist[0]))
+        solvtable.append([u'ΔHˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.enthalpyerrorlisttotal[0]))
+        solvtable.append([u'TΔSˢᵒˡᵛ']+FlattenListOfList(poltype,poltype.entropylist[0]))
+        solvtable.append([u'TΔSˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.entropyerrorlisttotal[0]))
+        solvtable.append(['SolvOverlap']+FlattenListOfList(poltype,poltype.overlaplist[0]))
 
-            table.append([u'ΔGˢᵒˡᵛ']+FlattenListOfList(poltype,poltype.freeenergylist[1]))
-            if poltype.addgas==True:
-                table.append([u'ΔGˢᵒˡᵛⁱⁿᵗᵉʳ']+inter)
-            table.append([u'ΔGˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.freeenergyerrorlist[1]))
-            table.append([u'ΔGˢᵒˡᵛᶠʷᵈ']+solvfwdenergylist)
-            table.append([u'ΔGˢᵒˡᵛᵇʷᵈ']+solvbwdenergylist)
-            table.append([u'ΔGˢᵒˡᵛᶠʷᵈᵇʷᵈ']+solvfwdbwddiff)
+    elif poltype.complexation==True and poltype.solvation==True:
+        barpairs=[]
+        for ls in poltype.lambdafolderlist[1]:
+            pairs=GenerateBARPairs(poltype,ls)
+            barpairs.extend(pairs)
+        solvtable.append(['Folder']+barpairs)
+        compfreeenergylist=FlattenListOfList(poltype,poltype.freeenergylist[0])
+        totalvdw,totalele,vdwfreeenergynoioncorrection,elefreeenergynoioncorrection,totalfreeenergynoioncorrection,vdwfreeenergynogas,elefreeenergynogas,totalfreeenergynogas,vdwfreeenergygas,elefreeenergygas,totalfreeenergygas=GenerateEleVdwSums(poltype,compfreeenergylist,vdwlambdapairlist,elelambdapairlist,baroutputfilepathlist)
+        poltype.tabledict[0][u'ΔGᶜᵒᵐᵖᵉˡᵉ']=totalele
+        poltype.tabledict[0][u'ΔGᶜᵒᵐᵖᵛᵈʷ']=totalvdw
+        compfwdenergylist=FlattenListOfList(poltype,poltype.freeenergylistfwd[0])
+        compbwdenergylist=FlattenListOfList(poltype,poltype.freeenergylistbwd[0])
+        CheckIfForwardBackwardPertubationsAreSimilar(poltype,compfwdenergylist,compbwdenergylist)
+        solvfwdenergylist=FlattenListOfList(poltype,poltype.freeenergylistfwd[1])
+        solvbwdenergylist=FlattenListOfList(poltype,poltype.freeenergylistbwd[1])
+        solvfwdbwddiff=list(np.abs(np.array(solvfwdenergylist)-np.array(solvbwdenergylist)))
+        solvfwdbwddiff=[str(i) for i in solvfwdbwddiff]
+        compfwdbwddiff=list(np.abs(np.array(compfwdenergylist)-np.array(compbwdenergylist)))
+        compfwdbwddiff=[str(i) for i in compfwdbwddiff]
+        CheckIfForwardBackwardPertubationsAreSimilar(poltype,solvfwdenergylist,solvbwdenergylist)
+        solvfreeenergylist=FlattenListOfList(poltype,poltype.freeenergylist[1])
+        totalvdw,totalele,vdwfreeenergynoioncorrection,elefreeenergynoioncorrection,totalfreeenergynoioncorrection,vdwfreeenergynogas,elefreeenergynogas,totalfreeenergynogas,vdwfreeenergygas,elefreeenergygas,totalfreeenergygas=GenerateEleVdwSums(poltype,solvfreeenergylist,vdwlambdapairlist,elelambdapairlist,baroutputfilepathlist)
+        poltype.tabledict[1][u'ΔGˢᵒˡᵛᵉˡᵉ']=totalele
+        poltype.tabledict[1][u'ΔGˢᵒˡᵛᵛᵈʷ']=totalvdw
 
-            table.append([u'ΔHˢᵒˡᵛ']+FlattenListOfList(poltype,poltype.enthalpylist[1]))
-            table.append([u'ΔHˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.enthalpyerrorlisttotal[1]))
-            table.append([u'TΔSˢᵒˡᵛ']+FlattenListOfList(poltype,poltype.entropylist[1]))
-            table.append([u'TΔSˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.entropyerrorlisttotal[1]))
-            table.append(['SolvOverlap']+FlattenListOfList(poltype,poltype.overlaplist[1]))
-            barpairs=[]
-            for ls in poltype.lambdafolderlist[0]:
-                pairs=GenerateBARPairs(poltype,ls)
-                barpairs.extend(pairs)
-            if poltype.addgas==True:
-                complists=poltype.freeenergylist[0]
-                liq=solvlists[0]
-                gas=solvlists[1]
-                empty=[None for i in gas]
-                inter=liq+gas[::-1]
-                inter=[round(i,2) for i in inter]
-                inter=[str(i) for i in inter]+empty
-            table.append(['Folder']+barpairs)
-            table.append([u'ΔGᶜᵒᵐᵖ']+compfreeenergylist)
-            if poltype.addgas==True:
-                table.append([u'ΔGᶜᵒᵐᵖⁱⁿᵗᵉʳ']+inter)
-            table.append([u'ΔGᶜᵒᵐᵖᵉʳʳ']+FlattenListOfList(poltype,poltype.freeenergyerrorlist[0]))
-            table.append([u'ΔGᶜᵒᵐᵖᶠʷᵈ']+compfwdenergylist)
-            table.append([u'ΔGᶜᵒᵐᵖᵇʷᵈ']+compbwdenergylist)
-            table.append([u'ΔGᶜᵒᵐᵖᶠʷᵈᵇʷᵈ']+compfwdbwddiff)
-            table.append([u'ΔHᶜᵒᵐᵖ']+FlattenListOfList(poltype,poltype.enthalpylist[0]))
-            table.append([u'ΔHᶜᵒᵐᵖᵉʳʳ']+FlattenListOfList(poltype,poltype.enthalpyerrorlisttotal[0]))
-            table.append([u'TΔSᶜᵒᵐᵖ']+FlattenListOfList(poltype,poltype.entropylist[0]))
-            table.append([u'TΔSᶜᵒᵐᵖᵉʳʳ']+FlattenListOfList(poltype,poltype.entropyerrorlisttotal[0]))
-            table.append(['CompOverlap']+FlattenListOfList(poltype,poltype.overlaplist[0]))
-        newtable=list(map(list, zip(*table)))
-        for row in newtable:
-            energy_writer.writerow(row)
+        if poltype.addgas==True:
+            solvlists=poltype.freeenergylist[1]
+            liq=solvlists[0]
+            gas=solvlists[1]
+            empty=[None for i in gas]
+            inter=liq+gas[::-1]
+            inter=[round(i,2) for i in inter]
+            inter=[str(i) for i in inter]+empty
+
+        solvtable.append([u'ΔGˢᵒˡᵛ']+FlattenListOfList(poltype,poltype.freeenergylist[1]))
+        if poltype.addgas==True:
+            solvtable.append([u'ΔGˢᵒˡᵛⁱⁿᵗᵉʳ']+inter)
+        solvtable.append([u'ΔGˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.freeenergyerrorlist[1]))
+        solvtable.append([u'ΔGˢᵒˡᵛᶠʷᵈ']+solvfwdenergylist)
+        solvtable.append([u'ΔGˢᵒˡᵛᵇʷᵈ']+solvbwdenergylist)
+        solvtable.append([u'ΔGˢᵒˡᵛᶠʷᵈᵇʷᵈ']+solvfwdbwddiff)
+
+        solvtable.append([u'ΔHˢᵒˡᵛ']+FlattenListOfList(poltype,poltype.enthalpylist[1]))
+        solvtable.append([u'ΔHˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.enthalpyerrorlisttotal[1]))
+        solvtable.append([u'TΔSˢᵒˡᵛ']+FlattenListOfList(poltype,poltype.entropylist[1]))
+        solvtable.append([u'TΔSˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.entropyerrorlisttotal[1]))
+        solvtable.append(['SolvOverlap']+FlattenListOfList(poltype,poltype.overlaplist[1]))
+        barpairs=[]
+        for ls in poltype.lambdafolderlist[0]:
+            pairs=GenerateBARPairs(poltype,ls)
+            barpairs.extend(pairs)
+        if poltype.addgas==True:
+            complists=poltype.freeenergylist[0]
+            liq=solvlists[0]
+            gas=solvlists[1]
+            empty=[None for i in gas]
+            inter=liq+gas[::-1]
+            inter=[round(i,2) for i in inter]
+            inter=[str(i) for i in inter]+empty
+        comptable.append(['Folder']+barpairs)
+        comptable.append([u'ΔGᶜᵒᵐᵖ']+compfreeenergylist)
+        if poltype.addgas==True:
+            comptable.append([u'ΔGᶜᵒᵐᵖⁱⁿᵗᵉʳ']+inter)
+        comptable.append([u'ΔGᶜᵒᵐᵖᵉʳʳ']+FlattenListOfList(poltype,poltype.freeenergyerrorlist[0]))
+        comptable.append([u'ΔGᶜᵒᵐᵖᶠʷᵈ']+compfwdenergylist)
+        comptable.append([u'ΔGᶜᵒᵐᵖᵇʷᵈ']+compbwdenergylist)
+        comptable.append([u'ΔGᶜᵒᵐᵖᶠʷᵈᵇʷᵈ']+compfwdbwddiff)
+        comptable.append([u'ΔHᶜᵒᵐᵖ']+FlattenListOfList(poltype,poltype.enthalpylist[0]))
+        comptable.append([u'ΔHᶜᵒᵐᵖᵉʳʳ']+FlattenListOfList(poltype,poltype.enthalpyerrorlisttotal[0]))
+        comptable.append([u'TΔSᶜᵒᵐᵖ']+FlattenListOfList(poltype,poltype.entropylist[0]))
+        comptable.append([u'TΔSᶜᵒᵐᵖᵉʳʳ']+FlattenListOfList(poltype,poltype.entropyerrorlisttotal[0]))
+        comptable.append(['CompOverlap']+FlattenListOfList(poltype,poltype.overlaplist[0]))
+        newcomptable=list(map(list, zip(*comptable)))
+        newsolvtable=list(map(list, zip(*solvtable)))
+
+        tempname='CompBARResults.csv'
+        with open(poltype.outputpath+tempname, mode='w') as energy_file:
+            energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            for row in newcomptable:
+                energy_writer.writerow(row)
+
+        tempname='SolvBARResults.csv'
+        with open(poltype.outputpath+tempname, mode='w') as energy_file:
+            energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            for row in newsolvtable:
+                energy_writer.writerow(row)
 
     os.chdir(curdir)
 

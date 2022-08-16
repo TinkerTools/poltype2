@@ -85,6 +85,8 @@ from operator import itemgetter
 
 @dataclass
 class PolarizableTyper():
+        skipchargecheck:bool=False
+        useuniquefilenames:bool=False # if users want to have unique filenames for molecular dynamics/BAR otherwise keep same filename to make copying easier from folder to folder
         xtbtorresconstant:float=.5
         alignPDB:bool=False
         torfit:bool=True
@@ -268,6 +270,8 @@ class PolarizableTyper():
         equiltimestep:float=2
         proddyntimestep:float=2
         proddyntime:float=5
+        compproddyntime:float=10
+        solvproddyntime:float=5
         pressure:float=1
         NVTensem:int=2
         NPTensem:int=4
@@ -628,6 +632,10 @@ class PolarizableTyper():
                             self.vinaexhaustiveness=int(a)
                         elif 'dockingenvname' in newline:
                             self.dockingenvname=a
+                        elif "skipchargecheck" in newline:
+                            self.skipchargecheck=self.SetDefaultBool(line,a,True)
+                        elif "useuniquefilenames" in newline:
+                            self.useuniquefilenames=self.SetDefaultBool(line,a,True)
                         elif "makexyzonly" in newline:
                             self.makexyzonly=self.SetDefaultBool(line,a,True)
                         elif "complexationonly" in newline:
@@ -853,9 +861,13 @@ class PolarizableTyper():
                             self.equiltimeionNPT= float(a)
                         elif ("proddynwritefreq") in newline:
                             self.proddynwritefreq= a
-                        elif ("proddyntime") in newline:
+                        elif ("proddyntime") in newline and 'comp' not in newline and 'solv' not in newline:
                             self.proddyntime= float(a)
                             self.inputproddyntime=True
+                        elif ("compproddyntime") in newline:
+                            self.compproddyntime= float(a)
+                        elif ("solvproddyntime") in newline:
+                            self.solvproddyntime= float(a)
                         elif ("complexation") in newline:
                             self.complexation=True
                         elif ("equiltimeNVT") in newline:
@@ -1401,9 +1413,11 @@ class PolarizableTyper():
             # STEP 1
             if self.neatliquidsim==True: 
                 self.usepreequilibriatedbox=False # then make new neat liquid box from scratch
-            if self.inputproddyntime==False and self.binding==True:
-                self.proddyntime=10
+            if self.inputproddyntime==True:
+                self.compproddyntime=self.proddyntime
+                self.solvproddyntime=self.proddyntime
 
+           
             # STEP 2
 
             head,tail=os.path.split(self.prmfilepath)
@@ -1672,10 +1686,16 @@ class PolarizableTyper():
                 self.solvation=False
 
             # STEP 27 
- 
-            head,self.foldername=os.path.split(os.getcwd())
+            if self.useuniquefilenames==True:
+                head,self.foldername=os.path.split(os.getcwd())
+            else:
+                self.foldername='MD'
             if self.complexation==True and self.solvation==False:
                 self.bufferlen=[20]
+
+                self.proddynsteps=[str(int((self.compproddyntime*1000000)/self.proddyntimestep))]
+                self.proddynframenum=[str(int(float(self.compproddyntime)/(float(self.proddynwritefreq)*0.001)))]
+                self.proddyntimearray=[self.compproddyntime]
                 self.systemcharge=[self.receptorcharge+self.ligandcharge+self.otherligcharge]
                 self.ligandchargelist=[self.ligandcharge]
                 self.xyzfilename=[[self.receptorligandxyzfilename]]
@@ -1726,6 +1746,9 @@ class PolarizableTyper():
                 self.masterdict['boxinfo']=[{}]
 
             elif self.solvation==True and self.complexation==False:
+                self.proddynsteps=[str(int((self.solvproddyntime*1000000)/self.proddyntimestep))]
+                self.proddynframenum=[str(int(float(self.solvproddyntime)/(float(self.proddynwritefreq)*0.001)))]
+                self.proddyntimearray=[self.solvproddyntime]
                 self.bufferlen=[2*float(self.vdwcutoff)+6]
                 self.systemcharge=[self.ligandcharge]
                 self.ligandchargelist=[self.ligandcharge]
@@ -1778,6 +1801,9 @@ class PolarizableTyper():
 
 
             elif self.solvation==False and self.complexation==False and self.neatliquidsim==True:
+                self.proddynsteps=[str(int((self.proddyntime*1000000)/self.proddyntimestep))]
+                self.proddynframenum=[str(int(float(self.proddyntime)/(float(self.proddynwritefreq)*0.001)))]
+                self.proddyntimearray=[self.proddyntime]
                 self.bufferlen=[2*float(self.vdwcutoff)+6]
                 self.systemcharge=[self.ligandcharge]
                 self.xyzfilename=[self.annihilateligandxyzfilenamelist]
@@ -1801,6 +1827,9 @@ class PolarizableTyper():
                 self.masterdict['boxinfo']=[{}]
 
             elif self.solvation==True and self.complexation==True:
+                self.proddynsteps=[str(int((self.compproddyntime*1000000)/self.proddyntimestep)),str(int((self.solvproddyntime*1000000)/self.proddyntimestep))]
+                self.proddynframenum=[str(int(float(self.compproddyntime)/(float(self.proddynwritefreq)*0.001))),str(int(float(self.solvproddyntime)/(float(self.proddynwritefreq)*0.001)))]
+                self.proddyntimearray=[self.compproddyntime,self.solvproddyntime]
                 self.bufferlen=[20,2*float(self.vdwcutoff)+6]
                 self.systemcharge=[self.receptorcharge+self.ligandcharge+self.otherligcharge,self.ligandcharge]
                 self.ligandchargelist=[self.ligandcharge,self.ligandcharge]
@@ -1952,12 +1981,9 @@ class PolarizableTyper():
             self.lastequilstepsNVT=str(int((self.lastNVTequiltime*1000000)/self.equiltimestep))
             self.equilstepsNPT=str(int((self.equiltimeNPT*1000000)/self.equiltimestep))
             self.equilstepsionNPT=str(int((self.equiltimeionNPT*1000000)/self.equiltimestep))
-            self.proddynframenum=str(int(float(self.proddyntime)/(float(self.proddynwritefreq)*0.001)))
-            self.proddynsteps=str(int((self.proddyntime*1000000)/self.proddyntimestep))
             self.equilframenumNPT=int((float(self.equiltimeNPT))/(float(self.equilwritefreq)*0.001))
             self.equilframenumNVT=int((float(self.equiltimeNVT+self.lastNVTequiltime))/(float(self.equilwritefreq)*0.001))
             self.equilframenum=self.equilframenumNPT+self.equilframenumNVT
-            self.proddynframenum=int((self.proddyntime)/(float(self.proddynwritefreq)*0.001))
             self.minboxfilename=[i.replace('.xyz','min.xyz') for i in self.boxfilename]
             self.minboxfilenamepymol=[i.replace('.xyz','_pymol.xyz') for i in self.minboxfilename]
             self.equilboxfilename=[i.replace('.xyz','equil.xyz') for i in self.boxfilename]
@@ -2204,8 +2230,7 @@ class PolarizableTyper():
 
             for i in range(len(self.tabledict)):
                 self.tabledict[i]['Prod MD Ensemb']=self.proddynensem
-                self.tabledict[i]['Prod MD Time']=self.proddyntime
-                self.tabledict[i]['Prod MD Steps']=self.proddynsteps
+                self.tabledict[i]['Solv Prod MD Time']=self.solvproddyntime
                 self.tabledict[i]['Dynamic Writeout Frequency (ps)']=self.proddynwritefreq
                 self.tabledict[i]['Dynamic Time Step (fs)']=self.equiltimestep
                 self.tabledict[i]['Equil Time NPT']=self.equiltimeNPT
@@ -2217,11 +2242,17 @@ class PolarizableTyper():
                 if self.expfreeenergy!=None:
                     self.tabledict[i][u'ΔGᵉˣᵖ']=self.expfreeenergy
                 if self.complexation==True:
+                    self.tabledict[i]['Comp Prod MD Time']=self.compproddyntime
+                    self.tabledict[i]['Comp Prod MD Steps']=self.proddynsteps[0]
+                    if self.complexationonly==False: 
+                        self.tabledict[i]['Solv Prod MD Steps']=self.proddynsteps[1]
                     self.tabledict[i]['Receptor Charge']=self.receptorcharge
                     if self.uncomplexedproteinpdbname!=None:
                         self.tabledict[i]['Receptor Name']=self.uncomplexedproteinpdbname.replace('.pdb','')
                     elif self.receptorligandxyzfilename!=None and self.uncomplexedproteinpdbname==None: 
                         self.tabledict[i]['Receptor Name']=self.receptorligandxyzfilename.replace('.xyz','')
+                else:
+                    self.tabledict[i]['Solv Prod MD Steps']=self.proddynsteps[1]
 
             
             tables.WriteTableUpdateToLog(self)
@@ -4429,7 +4460,7 @@ class PolarizableTyper():
         
 
                 polarindextopolarizeprm,polartypetotransferinfo=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m,polarize=True)
-                mpole.gen_peditinfile(self,mol,polarindextopolarizeprm)
+                lfzerox=mpole.gen_peditinfile(self,mol,polarindextopolarizeprm)
             
                 if (not os.path.isfile(self.xyzfname) or not os.path.isfile(self.keyfname)):
                     # Run poledit
@@ -4442,8 +4473,8 @@ class PolarizableTyper():
                         
                     mpole.prepend_keyfile(self,self.keyfnamefrompoledit,optmol)
                     mpole.SanitizeMultipoleFrames(self,self.keyfnamefrompoledit)
+                    mpole.post_proc_localframes(self,self.keyfnamefrompoledit, lfzerox)
                     shutil.copy(self.keyfnamefrompoledit,self.keyfname)
-
                 xyzfnamelist,keyfnamelist=self.GenerateDuplicateXYZsFromOPTs(self.xyzfname,self.keyfname,optmolist)
             # post process local frames written out by poledit
             if self.atomnum!=1 and (self.writeoutpolarize==True and self.writeoutmultipole==True): 
@@ -5942,6 +5973,8 @@ class PolarizableTyper():
             Referenced By: 
             Description: 
             """
+            if self.skipchargecheck==True:
+                checkresid=False
             temp=open(output,'r')
             results=temp.readlines()
             temp.close()

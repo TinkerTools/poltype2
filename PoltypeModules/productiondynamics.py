@@ -40,7 +40,7 @@ def ExecuteProductionDynamics(poltype):
                if 'Gas' in outputfilepath:
                    dynamicpath=poltype.dynamicpath
                    proddyntimestep=1
-                   proddynsteps=str(int((poltype.proddyntime*1000000)/proddyntimestep)) # hard code .1 for Gas phase no shielding from box
+                   proddynsteps=str(int((poltype.proddyntimearray[j]*1000000)/proddyntimestep)) # hard code .1 for Gas phase no shielding from box
                    nvt=True
                    ensemble=2
                else:
@@ -49,7 +49,7 @@ def ExecuteProductionDynamics(poltype):
                    else:
                        dynamicpath=poltype.truedynamicpath
 
-                   proddynsteps=poltype.proddynsteps
+                   proddynsteps=poltype.proddynsteps[j]
                    proddyntimestep=poltype.proddyntimestep
                    nvt=poltype.productiondynamicsNVT
                    ensemble=poltype.proddynensem
@@ -288,7 +288,7 @@ def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynbo
                    os.remove(f) # just in case option to stop all simulations was used
                if '.out' in f and "BAR" not in f:
                    outputfile=os.path.join(os.getcwd(),f) 
-                   terminate,deletefile,error=term.CheckFileTermination(poltype,outputfile,float(poltype.proddynsteps))
+                   terminate,deletefile,error=term.CheckFileTermination(poltype,outputfile,float(poltype.proddynsteps[k]))
                    #if terminate==True:
                    #    continue
            newfoldpath=os.getcwd()+'/'
@@ -382,7 +382,8 @@ def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynbo
                xyzpath=outputboxname
                keypath=newfoldpath+newtempkeyfile
                alzout=newfoldpath+'checknetcharge.alz'
-               poltype.CheckNetChargeIsZero(xyzpath,keypath,alzout) 
+               if self.skipchargecheck==False:
+                   poltype.CheckNetChargeIsZero(xyzpath,keypath,alzout) 
            os.chdir('..')
    os.chdir('..')
 
@@ -722,7 +723,7 @@ def ProductionDynamicsProtocol(poltype):
             proddynoutfilepathlist=poltype.proddynoutfilepath[i]
             for j in range(len(proddynoutfilepathlist)):
                 proddynoutfilepath=proddynoutfilepathlist[j]
-                checkfin=term.CheckFilesTermination(poltype,proddynoutfilepath,poltype.proddynsteps)
+                checkfin=term.CheckFilesTermination(poltype,proddynoutfilepath,poltype.proddynsteps[i])
                 finished=checkfin[0]
                 percentfinished=checkfin[1]
                 while finished==False:
@@ -731,7 +732,7 @@ def ProductionDynamicsProtocol(poltype):
                         poltype.WriteToLog(msg,prin=True)
                         messages.append(msg)
                     time.sleep(poltype.waitingtime)
-                    checkfin=term.CheckFilesTermination(poltype,proddynoutfilepath,poltype.proddynsteps)
+                    checkfin=term.CheckFilesTermination(poltype,proddynoutfilepath,poltype.proddynsteps[i])
                     finished=checkfin[0]
                     percentfinished=checkfin[1]
             if poltype.generatepdbtrajs==True and poltype.complexation==True and i==0:

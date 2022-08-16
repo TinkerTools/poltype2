@@ -286,7 +286,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                 neighbswithoutatom=RemoveFromList(poltype,atomneighbs,atom)
                 uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom=list(set([poltype.idxtosymclass[b.GetIdx()] for b in neighbsofneighbwithoutatom]))
                 neighbindices=list([b.GetIdx() for b in atomneighbs])
-               
 
                 if atomicnum==7 and val==1:
                     poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
@@ -305,7 +304,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     poltype.localframe2[atomidx - 1] = 0
                     lfzerox[atomidx - 1]=True
                     foundcase=True
-                    
                 elif ((val==4 and len(uniqueneighbtypes)==2 and highestsymneighbnorepeatval==3 and highestsymneighbnorepeathyb!=2) or (val==3 and hyb!=2 and len(uniqueneighbtypes)==2 and (highestsymneighbnorepeatval==3 or highestsymneighbnorepeatval==4))) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1 and (numhyds==2 or numhydsneighb==2):  # then this is like methyl-amine and we can use the two atoms with same symmetry class to do a z-then-bisector, need len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1 otherwise hits dimethylamine. Need to specify numhyds otherwise will hit nitrobenzene N/C
                     idxtobisecthenzbool[atomidx]=True
                     if atomicnum==6:
@@ -317,7 +315,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     idxtobisectidxs[atomidx]=bisectidxs
                     poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
                     foundcase=True
-
                 elif (val==3 and len(uniqueneighbtypes)==2 and (highestsymneighbnorepeatval==4) and hyb!=2) and len(uniqueneighbtypesofhighestsymneighbnorepeat)==3 and len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==2: # ethylamine
                         neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
                         bisectidxs=[atm.GetIdx() for atm in neighbswithoutatom]
@@ -325,7 +322,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                         poltype.localframe1[atomidx - 1] = highestsymneighbnorepeatidx
                         foundcase=True
                         idxtobisecthenzbool[atomidx]=True
-
                     # now make sure neighboring atom (lf1) also is using z-then-bisector
                 elif val==1 and highestsymneighbnorepeatval==3 and numhydsneighb==1 and len(uniqueneighbtypes)==1 and len(uniqueneighbtypesofhighestsymneighbnorepeat)==2 and highestsymneighbnorepeatatomicnum==7: #dimethylamine
                     idxtobisecthenzbool[atomidx]=True
@@ -351,7 +347,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     poltype.localframe2[atomidx - 1] = 0
                     lfzerox[atomidx - 1]=True
                     foundcase=True
-
                 elif val==4 and len(uniqueneighbtypes)==2 and (len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==0 or len(uniqueneighbtypesofhighestsymneighbnorepeatwithoutatom)==1): # N(CH3)(CH3)(CH3)H
                     neighbswithoutatom=RemoveFromList(poltype,atomneighbs,highestsymneighbnorepeat)
                     idxtotrisecbool[atomidx]=True
@@ -359,7 +354,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     idxtotrisectidxs[atomidx]=trisectidxs
                     lfzerox[atomidx - 1]=True 
                     foundcase=True
-
 
 
             if foundcase==False:
@@ -391,7 +385,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     poltype.localframe1[atomidx-1]=sorteduniquetypeneighbsnorepeat[0]
                     poltype.localframe2[atomidx - 1] = 0
                     lfzerox[atomidx - 1]=True
-
                 elif len(uniqueneighbtypes)==2 and val==3: # benzene, one carbon in aniline
                     typenumtocnt={}
                     neighbtypes=[poltype.idxtosymclass[b.GetIdx()] for b in atomneighbs]
@@ -407,7 +400,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                     poltype.localframe1[atomidx-1]=-1*idxlist[0]
                     poltype.localframe2[atomidx-1]=-1*idxlist[1]
 
-
                 else:
                     if len(sorteduniquetypeneighbsnorepeat)==1:
                         neighboffirstneighbs=[]
@@ -415,6 +407,9 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                             neighboffirstneighbs.append(n)
                         newneighbs=RemoveFromList(poltype,neighboffirstneighbs,atom)
                         newsorteduniquetypeneighbsnorepeat=FindUniqueNonRepeatingNeighbors(poltype,newneighbs)
+                        indices=[atom.GetIdx() for atom in neighboffirstneighbs]
+                        indices=[atom.GetIdx() for atom in newneighbs]
+
                         sorteduniquetypeneighbsnorepeat+=newsorteduniquetypeneighbsnorepeat
                     if len(sorteduniquetypeneighbsnorepeat)>=2:
                         aatomidx=atomidx
@@ -554,8 +549,91 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
         os.fsync(f.fileno())
 
         f.close()
+    return lfzerox
     
 
+def post_proc_localframes(poltype,keyfilename, lfzerox):
+    """
+    Intent: This method runs after the tinker tool Poledit has run and created an
+    initial *.key file. The local frames for each multipole are "post processed".
+    Zeroed out x-components of the local frame are set back to their original values
+    If certain multipole values were not zeroed out by poltype this method zeroes them out
+    Input:
+       keyfilename: string containing file name of *.key file
+       lfzerox: array containing a boolean about whether the x-component of the local frame
+                for a given atom should be zeroed or not. Filled in method 'gen_peditin'.
+                'lfzerox' is true for atoms that are only bound to one other atom (valence = 1)
+                that have more than one possible choice for the x-component of their local frame
+    Output: *.key file is edited
+    Referenced By: main
+    Description:
+    1. Move the original *.key file to *.keyb
+    2. Create new empty file *.key
+    3. Iterate through the lines of *.keyb.
+        a. If poledit wrote out the local frame with an x-component missing or as 0
+        Then rewrite it with the original x-component (lf2) found in gen_peditin
+        b. If poledit did not zero out the local frame x-component for an atom but
+        lfzerox is true, zero out the necessary multipole components manually
+    4.  Write the edited multipole information to *.key
+    """
+    # mv *.key to *.keyb
+    tmpfname = keyfilename + "b"
+    shutil.move(keyfilename, tmpfname)
+    keyfh = open(tmpfname)
+    lines = keyfh.readlines()
+    newlines = []
+    # open *.key which is currently empty
+    tmpfh = open(keyfilename, "w")
+    mpolelines = 0
+    # iterate over lines in the *.key file
+
+    for ln1 in range(len(lines)):
+        # skip over the lines containing multipole values
+        if mpolelines > 0:
+            mpolelines -= 1
+            continue
+        elif 'multipole' in lines[ln1]:
+            # Check what poledit wrote as localframe2
+            tmplst = lines[ln1].split()
+            if len(tmplst) == 5:
+                (keywd,atmidx,lf1,lf2,chg) = tmplst
+            elif len(tmplst) == 6:
+                (keywd,atmidx,lf1,lf2,lf3,chg) = tmplst
+
+            elif len(tmplst) == 4:
+                (keywd,atmidx,lf1,chg) = tmplst
+                lf2 = '0'
+            # manually zero out components of the multipole if they were not done by poledit
+            if lfzerox[int(atmidx) - 1]:
+                tmpmp = list(map(float, lines[ln1+1].split()))
+                tmpmp[0] = 0.
+                lines[ln1+1] = '%46.5f %10.5f %10.5f\n' % tuple(tmpmp)
+                tmpmp = list(map(float, lines[ln1+4].split()))
+                tmpmp[0] = 0.
+                lines[ln1+4] = '%46.5f %10.5f %10.5f\n' % tuple(tmpmp)
+
+
+            if len(tmplst) == 4:
+                linesplit=re.split(r'(\s+)', lines[ln1])
+                newtmplist=linesplit[:len(linesplit)-4]
+                newtmplist.append('    0')
+                newtmplist.append(linesplit[-4])
+                newtmplist.append(linesplit[-3])
+                newtmplist.append(linesplit[-2])
+                templine=''.join(newtmplist)
+                newlines.extend(templine)
+                newlines.extend(lines[ln1+1:ln1+5])
+            else:
+                newlines.extend(lines[ln1:ln1+5])
+            mpolelines = 4
+        # append any lines unrelated to multipoles as is
+        else:
+            newlines.append(lines[ln1])
+    # write out the new lines to *.key
+    for nline in newlines:
+        tmpfh.write(nline)
+    tmpfh.close()
+    keyfh.close()
 
 def rm_esp_terms_keyfile(poltype,keyfilename):
     """
