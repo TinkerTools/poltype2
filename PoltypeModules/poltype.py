@@ -342,7 +342,6 @@ class PolarizableTyper():
         parentname:None=None
         addhydrogentocharged:bool=True
         accuratevdwsp:bool=False
-        inputmoleculefolderpaths:None=None
         email:None=None
         firstoptfinished:bool=False
         optonly:bool=False
@@ -502,7 +501,6 @@ class PolarizableTyper():
             self.knownresiduesymbs=['A', 'G', 'U', 'A3', 'A5','DA', 'DC', 'DG', 'DT', 'G3', 'G5', 'U3', 'U5','DA3', 'DA5', 'DC3', 'DC5', 'DG3', 'DG5', 'DT3', 'DT5','ALA', 'ARG', 'ASH', 'ASN', 'ASP', 'GLH', 'GLN', 'GLU', 'GLY', 'HID', 'HIE', 'HIS','ILE', 'LEU', 'LYD', 'LYS', 'MET','PHE', 'PRO', 'SER', 'THR', 'TRP', 'TYD', 'TYR', 'VAL', 'CYD', 'CYS']
             self.molstructfname=self.structure 
             self.simpath=os.getcwd()        
-            self.simname=os.path.basename(self.simpath)
             self.estatlambdascheme=self.estatlambdascheme[::-1]
             self.vdwlambdascheme=self.vdwlambdascheme[::-1]
             self.restlambdascheme=self.restlambdascheme[::-1]
@@ -1021,8 +1019,6 @@ class PolarizableTyper():
                             self.poltypepath=a
                         elif 'paramhead' in newline:
                             self.paramhead = a
-                        elif 'inputmoleculefolderpaths' in newline:
-                            self.inputmoleculefolderpaths=a
                         elif 'WBOtol' in newline:
                             self.WBOtol=float(a)
                         elif 'scfmaxiter' in newline:
@@ -2018,10 +2014,10 @@ class PolarizableTyper():
                 templist=[]
                 tempsteps=[]
                 for temp in self.equilibriatescheme:
-                    templist.append(self.outputpath+self.simname+'_'+simfold+'_'+str(temp)+'_'+self.equilstepsNVT+'_NVT.out')
+                    templist.append(self.outputpath+self.foldername+'_'+simfold+'_'+str(temp)+'_'+self.equilstepsNVT+'_NVT.out')
                     tempsteps.append(self.equilstepsNVT)
 
-                templist.append(self.outputpath+self.simname+'_'+simfold+'_'+str(temp)+'_'+self.equilstepsNPT+'_NPT.out')
+                templist.append(self.outputpath+self.foldername+'_'+simfold+'_'+str(temp)+'_'+self.equilstepsNPT+'_NPT.out')
                 tempsteps.append(self.equilstepsNPT)
 
                 if i==0 and self.solvation==True and self.addsolvionwindows==True:
@@ -2252,7 +2248,7 @@ class PolarizableTyper():
                     elif self.receptorligandxyzfilename!=None and self.uncomplexedproteinpdbname==None: 
                         self.tabledict[i]['Receptor Name']=self.receptorligandxyzfilename.replace('.xyz','')
                 else:
-                    self.tabledict[i]['Solv Prod MD Steps']=self.proddynsteps[1]
+                    self.tabledict[i]['Solv Prod MD Steps']=self.proddynsteps[0]
 
             
             tables.WriteTableUpdateToLog(self)
@@ -3262,11 +3258,17 @@ class PolarizableTyper():
 
         def CheckNormalTermination(self,logfname,errormessages=None,skiperrors=False): 
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Check for normal termination or errors in output files from tinker, psi4, gaussian, xtb and ANI. 
+            Input: Output logname, boolean if should skip any errors. For torsion jobs, sometimes want to skip over optimization errors and remove point from dihedral energy surface so the whole program doesnt crash if a single point crashes.
+            Output: Boolean if job terminated and boolean if job has error
+            Referenced By: CallJobsSeriallyLocalHost
             Description: 
+            1. Check the last update time of files in directory and store in dictionary.
+            2. Determine latest updated filetime from all files
+            3. Determine updatetime based on if torsion QM log file or other file. Sometimes QM jobs will crash but not send error signal or any output in outputlog, so then need to have update time if not terminated and not updated in updatetime then the job is determined to have failed.
+            4. Read lines from output file and check for normal termination text strings or if there was an error.
+            5. If error occured, write out line containing error to poltype log file.
+            6. xtb only outputs the same filename for optimization jobs, so be sure to copy to desired filename after job finishes. 
             """
             error=False
             term=False
@@ -3275,6 +3277,7 @@ class PolarizableTyper():
             logpath=os.path.split(logfname)[0]
             if logpath!='':
                 os.chdir(logpath)
+            # STEP 1
             files=os.listdir()
             for f in files:
                 try:
@@ -3285,15 +3288,18 @@ class PolarizableTyper():
                 except:
                     pass
             os.chdir(curdir)
+            # STEP 2
             htime=min(lastupdatetofilename.keys())
             if os.path.isfile(logfname):
                 head,tail=os.path.split(logfname)
+                # STEP 3
                 if ('opt-' in logfname or 'sp-' in logfname):
                     updatetime=self.lastlogfileupdatetime
                 else:
                     updatetime=2.5 # parent QM can take longer dependeing on resources, poltype log can take a while as well to finish QM
                 foundendgau=False # sometimes gaussian comments have keyword Error, ERROR in them
                 foundhf=False
+                # STEP 4
                 for line in open(logfname):
                     if 'poltype' in tail:
                         if 'Poltype Job Finished' in line:
@@ -3323,7 +3329,7 @@ class PolarizableTyper():
                 if self.debugmode==False and foundhf==True:
                     term=False
                         
-
+                # STEP 5
                 if error==True:
                     term=False # sometimes psi4 geometry opt not fully converge but says successfully exiting etc..
                     message='Error '+errorline+ 'logpath='+logfname
@@ -3337,7 +3343,7 @@ class PolarizableTyper():
                             errormessages.append(message)
                     else:
                         self.WriteToLog(message) 
-
+            # STEP 6
             if self.toroptmethod=='xtb' and 'xtb-opt' in logfname and term==True:
                 time.sleep(1) 
                 cartxyz=logfname.replace('.log','.xyz')
@@ -3353,22 +3359,26 @@ class PolarizableTyper():
             
         def NormalTerm(self,logfname):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: If job completes sucessfully write that it finished to poltype log file.
+            Input: output job filename
+            Output: String written to poltype log file.
+            Referenced By: CallJobsSeriallyLocalHost, CheckNormalTermination
             Description: 
+            1. Write termination signal to poltype log file 
             """
+            # STEP 1
             self.WriteToLog("Normal termination: logfile=%s path=%s" % (logfname,os.getcwd()))
         
         
         def ErrorTerm(self,logfname,skiperrors):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: If job has an error, write that the job has an error to poltype log file.
+            Input: output job filename and boolean to crash program or not
+            Output: String written to poltype log file.
+            Referenced By: CallJobsSeriallyLocalHost, CheckNormalTermination
             Description: 
+            1. Write error to poltype log file
+            2. If boolean to skip errors is False, then crash the program
             """
             string="ERROR termination: logfile=%s path=%s" % (logfname,os.getcwd())
             self.WriteToLog(string)
@@ -3377,28 +3387,37 @@ class PolarizableTyper():
 
         def call_subsystem(self,cmdstrs,wait=False,skiperrors=False):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Submit job on local node.
+            Input: List of job command strings, boolean if should wait for job to complete before continuing program and boolean to crash or not crash program if receive error signal from subprocess.
+            Output: - 
+            Referenced By: CallJobsSeriallyLocalHost, many other functions throughout poltype
             Description: 
+            1. Write to poltype log that will submit job
+            2. Submit job on local host and save PID. Sometimes after job finishes zombie process remains so need PID to kill after seeing termination signal in output log file.
+            3. If wait boolean is True then wait for job to finish executing
+            4. If received an error code and boolean for skipping crashed jobs is False, then crash program. 
             """
             if self.printoutput==True:
                 for cmdstr in cmdstrs:
-                    print("Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
+                    print("Submitting: " + cmdstr+' '+'path'+' = '+os.getcwd())
             procs=[]
             for cmdstr in cmdstrs:
                 if cmdstr!='':
-                    self.WriteToLog("Calling: " + cmdstr+' '+'path'+' = '+os.getcwd())
+
+                    # STEP 1
+                    self.WriteToLog("Submitting: " + cmdstr+' '+'path'+' = '+os.getcwd())
+                    # STEP 2
                     p = subprocess.Popen(cmdstr,shell=True,stdout=self.logfh, stderr=self.logfh)
                     procs.append(p)
                     self.cmdtopid[cmdstr]=p
 
             if wait==True:
+                # STEP 3
                 exit_codes=[p.wait() for p in procs]
                 for i in range(len(procs)):
                     exitcode=exit_codes[i]
                     cmdstr=cmdstrs[i] 
+                    # STEP 4
                     if skiperrors==False:
                         if exitcode != 0:
                             self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
@@ -3407,22 +3426,29 @@ class PolarizableTyper():
                         if exitcode != 0:
                             self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
 
-        def WriteOutLiteratureReferences(self,keyfilename): # to use ParmEd on key file need Literature References delimited for parsing
+        def WriteOutLiteratureReferences(self,keyfilename): 
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Write references to key file
+            Input: Keyfilename
+            Output: Updated keyfile with references
+            Referenced By: GenerateParameters 
             Description: 
+            1. Read in key file contents to array
+            2. Open temporary keyfile 
+            3. Iterate over original keyfile lines and after passing atom block then write out references
+            4. Replace temporary keyfile with original keyfile 
             """
+            # STEP 1
             temp=open(keyfilename,'r')
             results=temp.readlines()
             temp.close()
+            # STEP 2
             tempname=keyfilename.replace('.key','_temp.key')
             temp=open(tempname,'w')
             foundatomblock=False
             for i in range(len(results)):
                 line=results[i]
+                # STEP 3
                 if 'atom' in line and foundatomblock==False:
                     foundatomblock=True
                     temp.write('#############################'+'\n')
@@ -3431,35 +3457,35 @@ class PolarizableTyper():
                     temp.write('##                         ##'+'\n')
                     temp.write('#############################'+'\n')
                     temp.write('\n')
+                    temp.write('Walker, B., Liu, C., Wait, E., Ren, P., J. Comput. Chem. 2022, 1. https://doi.org/10.1002/jcc.26954'+'\n')
+
+                    temp.write('\n')
                     temp.write('Wu, J.C.; Chattree, G.; Ren, P.Y.; Automation of AMOEBA polarizable force field'+'\n')
                     temp.write('parameterization for small molecules. Theor Chem Acc.'+'\n')
                     temp.write('\n')
                     temp.write(line)
                 else:
                     temp.write(line)
+            # STEP 4
             os.remove(keyfilename)
             os.replace(tempname,keyfilename)    
 
-        def RaiseOutputFileError(self,logname):
-            """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
-            """
-            raise ValueError('An error occured for '+logname) 
+        
 
         def WritePoltypeInitializationFile(self,poltypeinput):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Write poltype.ini file for fragmenter jobs
+            Input: Dictionary of poltype variable strings and variable inputs
+            Output: poltype.ini file
+            Referenced By: FragmentJobSetup in fragmenter.py
+            Description:
+            1. Open filename poltype.ini
+            2. Iterate over dictionary of poltype inputs and write out values to poltype.ini file 
             """
+            # STEP 1
             inifilepath=os.getcwd()+r'/'+'poltype.ini'
             temp=open(inifilepath,'w')
+            # STEP 2
             for key,value in poltypeinput.items():
                 if value!=None:
                     line=key+'='+str(value)+'\n'
@@ -3467,25 +3493,32 @@ class PolarizableTyper():
             temp.close()
             return inifilepath
 
-        def CheckTorsionParameters(self,keyfilename,torsionsmissing,hydtorsions): # dont check torsions skipped due to rule that if a-b-c-d, a or d is hydroten and not all possible a and d around b-c is hydrogen then torsion is skipped, if database transfers all zeros do not check
+        def CheckTorsionParameters(self,keyfilename,torsionsmissing): 
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Sanity check to see if torsions parameters that wanted to be parameterized are all zero (something went wrong with fragmenter or fitting).
+            Input: Keyfilename and array of torsions that were parameterized
+            Output: -
+            Referenced By: GenerateParameters 
+            Description:
+            1. Read contents of keyfile to array
+            2. Iterate over array and search for lines with torsion parameters
+            3. If torsion in line is one of the torsions that parameters were derived for check the force constant coefficents to see if all of them are zero
+            4. If all of them are 0, then crash the program  
             """
+            # STEP 1
             temp=open(keyfilename,'r')
             results=temp.readlines()
             temp.close()
+            # STEP 2
             for lineidx in range(len(results)):
                 line=results[lineidx]
+                # STEP 3
                 if line.strip().startswith('torsion') and '#' not in line and 'Missing' not in line and 'none' not in line and 'unit' not in line:
                     allzero=True
                     linesplit=line.split()
                     ls=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3]),int(linesplit[4])]
                     revls=ls[::-1]
-                    if (ls in torsionsmissing or revls in torsionsmissing) and (ls not in hydtorsions or revls not in hydtorsions):
+                    if (ls in torsionsmissing or revls in torsionsmissing):
                         pass
                     else:
                         continue
@@ -3495,6 +3528,7 @@ class PolarizableTyper():
                     for prm in newprms:
                         if prm!=0:
                             allzero=False
+                    # STEP 4
                     if allzero==True:
                         self.WriteToLog("torsion parameters are all zero "+line+' path ='+os.getcwd())
                         raise ValueError("torsion parameters are all zero "+line+' path ='+os.getcwd())
@@ -3503,13 +3537,16 @@ class PolarizableTyper():
 
         def main(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Determine if should generate input molecule from modified amino acids inputs or just call GenerateParameters on input molecule.
+            Input: Self object
+            Output: - 
+            Referenced By: RunPoltype
             Description: 
+            1. If inputs for modified amino acid module are given then call module to generate molecule to parameterize and call GenerateParameters
+            2. Otherwise call GenerateParameters on input structure 
+            3. If inputs for modified amino acid module are given and parameters for generated molecule finished then call function to generate protein tinker XYZ file
             """   
-             
+            # STEP 1
             if (self.modifiedproteinpdbname!=None or self.unmodifiedproteinpdbname!=None):
                 knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference,modligidxs=modres.GenerateModifiedProteinPoltypeInput(self)
                 self.molstructfname=molname
@@ -3520,25 +3557,30 @@ class PolarizableTyper():
                 if check==False:
                     params=self.GenerateParameters()
             else:
+               # STEP 2
                params= self.GenerateParameters()
                return params
 
-        
+            # STEP 3 
             if (self.modifiedproteinpdbname!=None or self.unmodifiedproteinpdbname!=None):
                 modres.GenerateModifiedProteinXYZAndKey(self,knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference,modligidxs)
         
         
         def GrabIndexToCoordinates(self,mol):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Rdkit by default doesnt always use input conformation, so read coordinates from openbabel MOL object into dictionary to later be used to force rdkit first conformor to have those coordinates.
+            Input: Openbabel mol object
+            Output: dictionary of atom index to coordinates
+            Referenced By: GenerateParameters 
             Description: 
+            1. Iterate over atoms in mol objcet
+            2. Determine atom index, coordinates and save into dictionary
             """
             indextocoordinates={}
+            # STEP 1
             iteratom = openbabel.OBMolAtomIter(mol)
             for atom in iteratom:
+                # STEP 2
                 atomidx=atom.GetIdx()
                 rdkitindex=atomidx-1
                 coords=[atom.GetX(),atom.GetY(),atom.GetZ()]
@@ -3547,51 +3589,65 @@ class PolarizableTyper():
 
         def AddInputCoordinatesAsDefaultConformer(self,m,indextocoordinates):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Set default conformor coordinates for rdkit
+            Input: Rdkit mol object and dictionary of rdkit atom index to coordinates from input structure
+            Output: Updated rdkit mol object
+            Referenced By: GenerateParameters 
+            Description:
+            1. Initialize conformor object
+            2. Iterate over rdkit atoms and set coordinates to coordinates from input dictionary 
             """
+            # STEP 1
             conf = m.GetConformer()
+            # STEP 2
             for i in range(m.GetNumAtoms()):
                 x,y,z = indextocoordinates[i]
                 conf.SetAtomPosition(i,Point3D(x,y,z))
 
             return m 
 
-                   
-
         def CheckIfCartesianXYZ(self,f):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Sometimes user will have cartesian XYZ for input structure in same folder but tinker generates same filename extension .xyz so need to delete cartesian XYZ file.
+            Input: filename
+            Output: boolean if cartesian XYZ or not
+            Referenced By: RemoveCartesianXYZFiles
+            Description:
+            1. Assume file is cartesian XYZ
+            2. If number of items in line are greater than 4, then it is not cartesian XYZ file 
             """
+            # STEP 1
             check=True
             temp=open(f,'r')
             results=temp.readlines()
             temp.close()
             for line in results:
                 linesplit=line.split()
+                # STEP 2
                 if len(linesplit)>4:
                     check=False
             return check
 
         def RemoveCartesianXYZFiles(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Remove cartesian XYZ files so that they dont interfere with tinker XYZ files that have same filename extension.
+            Input: Self object
+            Output: - 
+            Referenced By: GenerateParameters
             Description: 
+            1. Generate list of filesnames in current directory
+            2. Iterate over files and check filename extension
+            3. If filename extension is xyz and its not output from QM optimzation
+            4. If filename is cartesian xyz (as opposed to tinker) then remove file 
             """
+            # STEP 1
             files=os.listdir()
             for f in files:
+                # STEP 2
                 filename, file_extension = os.path.splitext(f)
+                # STEP 3
                 if file_extension=='.xyz' and 'opt' not in filename:
+                    # STEP 4
                     check=self.CheckIfCartesianXYZ(f)
                     if check==True:
                         os.remove(f)
@@ -3600,17 +3656,29 @@ class PolarizableTyper():
         
         def CheckInputCharge(self,molecule,verbose=False):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Assign formal charges to mol object so that users dont have to
+            Input: rdkit mol object
+            Output: Updated rdkit mol object and dictionary of rdkit atom index to formal charge 
+            Referenced By: GenerateParameters 
             Description: 
+            1. Initialize dictionary of atomic number to dictionary of valence to formal charge
+            2. Iterate over rdkit atoms and grab atomic number, explicit valence and determine what the formal charge should be from dictionary of valence to formal charge for that atomic number.
+            3. Special case if atom is carbon or nitrogen and if neighbors contain nitrogen, oyxgen or sulfur (polarizable atoms) then if carbon and explicit valence only 3, give formal charge of +1 (more stable then -1 case)
+            4. If carbon has valence less than 4 and doesnt have polarizable neighbors then add hydrogens 
+            5. If nitorgen has valence of 2 and no polariable neighbors, then add hydrogens
+            6. If oxygen has valence of 1 and user specifies to protonate unfilled valence states with "addhydrogens" then add hydrogen to oxygen
+            7. If nitrogen with valence of 2 and a radical is detected set the formal charge to 0 
+            8. If oxygen with valence of 2 and a radical is detected set formal charge to 1 
+            9. If oxygen with valence of 1 and a radical is detected set formal charge to 0
+            10. Otherwise set atom formal charge to formal charge detected earlier 
             """
             array=[]
             totchg=0
             atomindextoformalcharge={}
+            # STEP 1
             atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
             for atom in molecule.GetAtoms():
+                # STEP 2
                 atomidx=atom.GetIdx()
                 atomnum=atom.GetAtomicNum()
                 val=atom.GetExplicitValence()
@@ -3620,6 +3688,7 @@ class PolarizableTyper():
                     chg=0
                 else:
                     chg=valtochg[val]
+                # STEP 3
                 polneighb=False
                 if atomnum==6 or atomnum==7:
                     for natom in atom.GetNeighbors():
@@ -3630,6 +3699,7 @@ class PolarizableTyper():
                         chg=1
                 string='Atom index = '+str(atomidx+1)+' Atomic Number = ' +str(atomnum)+ ' Valence = '+str(val)+ ' Formal charge = '+str(chg)
                 array.append(string)
+                # STEP 4
                 if atomnum==6 and val<4 and (self.addhydrogentocharged==True or self.addhydrogens==True)  and radicals==0 and polneighb==False:
                     if verbose==True:
                         warnings.warn('WARNING! Strange valence for Carbon, will assume missing hydrogens and add'+string) 
@@ -3638,7 +3708,7 @@ class PolarizableTyper():
                     chg=0
                     atom.SetFormalCharge(chg)
 
-
+                # STEP 5
                 elif atomnum==7 and val==2 and (self.addhydrogentocharged==True or self.addhydrogens==True) and radicals==0 and polneighb==False:
                     if verbose==True:
                         warnings.warn('WARNING! Strange valence for Nitrogen, will assume missing hydrogens and add'+string) 
@@ -3646,7 +3716,7 @@ class PolarizableTyper():
                     atom.SetNumRadicalElectrons(0)
                     chg=0
                     atom.SetFormalCharge(chg)
-
+                # STEP 6
                 elif atomnum==8 and val==1 and (self.addhydrogens==True) and radicals==0:
                     if verbose==True:
                         warnings.warn('WARNING! Strange valence for Oxygen, will assume missing hydrogens and add'+string) 
@@ -3655,7 +3725,7 @@ class PolarizableTyper():
                     chg=0
                     atom.SetFormalCharge(chg)
 
-
+                # STEP 7
                 elif atomnum==7 and val==2 and radicals==1:
                     if verbose==True:
                         warnings.warn('WARNING! Strange valence for Nitrogen, will assume radical and set charge to zero') 
@@ -3664,7 +3734,7 @@ class PolarizableTyper():
 
                     atom.SetFormalCharge(0)
                     self.addhydrogentocharged=False
-
+                # STEP 8
                 elif atomnum==8 and val==2 and radicals==1:
                     if verbose==True:
                         warnings.warn('WARNING! Strange valence for Oxygen, will assume radical and set charge to +1') 
@@ -3672,6 +3742,7 @@ class PolarizableTyper():
                     self.allowradicals=True
 
                     atom.SetFormalCharge(1)
+                # STEP 9
                 elif atomnum==8 and val==1 and radicals==1:
                     if verbose==True:
                         warnings.warn('WARNING! Strange valence for Oxygen, will assume radical and set charge to +1') 
@@ -3681,6 +3752,7 @@ class PolarizableTyper():
                     self.addhydrogentocharged=False
 
                 else:
+                    # STEP 10
                     atom.SetFormalCharge(chg)
                     if self.allowradicals==False:
                         atom.SetNumRadicalElectrons(0)
@@ -3702,19 +3774,27 @@ class PolarizableTyper():
 
         def GenerateExtendedConformer(self,rdkitmol,mol):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: When deriving multipoles, dont want to have folded conformation where densities from other parts of the molecule overlap. So instead try to find most extended conformor and then will freeze dihedrals during QM opt.
+            Input: Rdkit mol and openbabel mol
+            Output: Dictionary of atomic index to coordinates.
+            Referenced By: GenerateParameters
             Description: 
+            1. Call EmbedMultipleConfs to add many conformors to rdkit object.
+            2. Grab energy of all confomrors with MMFF94 force field
+            3. Iterate over all conformors and determine max distance in molecule and energy of molecule and save in dictionaries.
+            4. Make the first confomor the maxdistance conformor, 
+            5. If user input wants multiple confomors for multipole parameterization then use the next lowest energy confomors (not necearrily maximaly extended conformation) as well.
+            6. Save coordinates of conformations in dictionary for later use in QM optimzation  
             """
             numconf=100 # just try this
+            # STEP 1
             AllChem.EmbedMultipleConfs(rdkitmol, numConfs=numconf,useExpTorsionAnglePrefs=True,useBasicKnowledge=True)
+            # STEP 2
             energies = AllChem.MMFFOptimizeMoleculeConfs(rdkitmol,maxIters=2000, nonBondedThresh=100.0)
             confs=rdkitmol.GetConformers()
-            listofatomsforprm,listofbondsforprm,listofanglesforprm,listoftorsionsforprm=databaseparser.GrabAtomsForParameters(self,mol)
             disttoconf={}
             energytoconf={}
+            # STEP 3
             for i in range(len(confs)):
                 conf=confs[i]
                 energy=energies[i][1]
@@ -3738,10 +3818,11 @@ class PolarizableTyper():
             sortedenergy=sorted(newenergytoconf)
             sortedconf=[newenergytoconf[i] for i in sortedenergy]
             sortedenergytoconf=dict(zip(sortedenergy,sortedconf))
-            
+            # STEP 4 
             confslist=[confindex]
             numextraconfs=self.numespconfs-1
             count=1
+            # STEP 5
             for energy,idx in sortedenergytoconf.items():
                 if idx not in confslist:
                     if count>numextraconfs:
@@ -3758,6 +3839,7 @@ class PolarizableTyper():
                     vec=np.array([float(pos.x),float(pos.y),float(pos.z)])
                     indextocoordinates[i]=vec
                 indextocoordslist.append(indextocoordinates)
+            # STEP 6
             if len(self.espextraconflist)!=0:
                 curdir=os.getcwd()
                 os.chdir('..')
@@ -3773,22 +3855,28 @@ class PolarizableTyper():
 
         def ReadCoordinates(self,filename):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Read coordinates from .mol file generated by GenerateExtendedConformer, then save in dictionary to later be used by QM geometry optimization
+            Input: .mol filename
+            Output: Dictionary of atomic index to coordinates
+            Referenced By: GenerateExtendedConformer
             Description: 
+            1. Read in .mol file to openbabel mol object
+            2. Iterate over mol object atoms
+            3. Save atom index and coordinates in dictionary
             """
+            # STEP 1
             indextocoordinates={}
             obConversion = openbabel.OBConversion()
             mol = openbabel.OBMol()
             inFormat = obConversion.FormatFromExt(self.molstructfname)
             obConversion.SetInFormat(inFormat)
             obConversion.ReadFile(mol, self.molstructfname)
+            # STEP 2
             iteratombab = openbabel.OBMolAtomIter(mol)
             for atm in iteratombab:
                 atmindex=atm.GetIdx()
                 coords=[atm.GetX(),atm.GetY(),atm.GetZ()]
+                # STEP 3
                 indextocoordinates[atmindex-1]=coords
 
             return indextocoordinates
@@ -3796,67 +3884,92 @@ class PolarizableTyper():
 
         def FindLongestDistanceInMolecule(self,mol):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: For the given conformation, compute the longest pairwise atom-atom distance
+            Input: Rdkit mol object
+            Output: Maximum pairwise distance
+            Referenced By: GenerateExtendedConformer
             Description: 
+            1. Store all atom positions into an array
+            2. Generate all pairwise combinations of coordinate vectors
+            3. Iterate over all pairwise combinations of coordinate vectors and compute the distance, then store in array
+            4. Determine the maximum pairwise distance from array of pairwise distances
             """
+            # STEP 1
             veclist=[]
             for i in range(len(mol.GetAtoms())):
                 pos = mol.GetConformer().GetAtomPosition(i) 
                 vec=np.array([float(pos.x),float(pos.y),float(pos.z)])
                 veclist.append(vec)
+            # STEP 2
             pairs=list(itertools.combinations(veclist, 2))
             distlist=[]
+            # STEP 3
             for pairidx in range(len(pairs)):
                 pair=pairs[pairidx]
                 dist=np.linalg.norm(np.array(pair[0])-np.array(pair[1]))
                 distlist.append(dist)
+            # STEP 4
             maxdist=np.amax(np.array(distlist))
             return maxdist
         
         def SetDefaultCoordinatesBabel(self,mol,indextocoordinates):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Need to update openbabel mol object coordinates with coordinates of the extended conformation generated.
+            Input: openbabel mol object, dictionary of atomic index to coordinates
+            Output: Updated mol object
+            Referenced By: GenerateParameters, GenerateListOfMols
             Description: 
+            1. Iterate over atom index to coordinates dictionary
+            2. Save coordinates from dictionary to mol atom oject
             """
+            # STEP 1
             for index,coords in indextocoordinates.items():
                 atom=mol.GetAtom(index+1)
                 x=coords[0]
                 y=coords[1]
                 z=coords[2]
+                # STEP 2
                 atom.SetVector(x,y,z)
             return mol
 
         def CheckForConcentratedFormalCharges(self,m,atomindextoformalcharge):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Often if a zwitterion is present or highly concentrated charge like phosphate group is present with nearby hydrogens, the hydrogens can migrate to the highly charged regions during QM optimization. So need to determine when there is concentrated formal charge and then turn on PCM for qm geometry optimization. 
+            Input: Rdkit mol object, dictionary of atomic index to formal charge 
+            Output: Boolean specifying if should use PCM or not.
+            Referenced By: GenerateParameters 
             Description: 
+            1. If the molecule contains hydrogens, then continue, else dont use PCM
+            2. Iterate over dictionary of atomic index to formal charges and save atomic indices that have formal charges to an array.
+            3. Iterate over array of charged atomic indices
+            4. Iterate over neighbors of each charged atomic index, if any neighbor also contains a formal charge, then need to use PCM
+            5. Iterate over neighbors of the first neighbors, if atomindex is not original charged index but has formal charge then need to use PCM.
+            6. Iterate over neighbors of the second neighbors, if atomindex is not the first neighbor but has formal charge then need to use PCM.
+
             """
             chargedindices=[]
             pcm=False
+            # STEP 1
             if self.hashyd==True:
+                # STEP 2
                 for atomindex,chg in atomindextoformalcharge.items():
                     if chg!=0:
                         chargedindices.append(atomindex)
+                # STEP 3
                 for atomindex in chargedindices:
                     atom=m.GetAtomWithIdx(atomindex)
+                    # STEP 4
                     for atm in atom.GetNeighbors():
                         atmidx=atm.GetIdx()
                         if atmidx in chargedindices:
                             pcm=True
+                        # STEP 5
                         for natm in atm.GetNeighbors():
                             natmidx=natm.GetIdx()
                             if natmidx!=atomindex:
                                 if natmidx in chargedindices:
                                     pcm=True
+                                # STEP 6
                                 for nnatm in natm.GetNeighbors():
                                     nnatmidx=nnatm.GetIdx()
                                     if nnatmidx!=atmidx:
@@ -3867,20 +3980,26 @@ class PolarizableTyper():
                         
         def DeleteAllNonQMFiles(self,folderpath=None):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Sometimes if there is issue with non-qm (tinker files etc) then easier to autodelete instead of user manually needing to know which files to delete before starting parameterization, so this will auto delete non-qm log files.
+            Input: -  
+            Output: -
+            Referenced By: GenerateParameters 
             Description: 
+            1. In current directory call  DeleteNonQMFiles
+            2. If qm-torsion folder exists, navigate to that folder and call DeleteNonQMFiles
+            3. If vdw folder exists, navigate to that folder and call DeleteNonQMFiles
             """
+            # STEP 1
             tempdir=os.getcwd()
             if folderpath!=None:
                 os.chdir(folderpath)
             self.DeleteNonQMFiles(os.getcwd()) 
+            # STEP 2
             if os.path.isdir('qm-torsion'):
                 os.chdir('qm-torsion')
                 self.DeleteNonQMFiles(os.getcwd()) 
                 os.chdir('..')
+            # STEP 3
             if os.path.isdir('vdw'):
                 os.chdir('vdw')
                 self.DeleteNonQMFiles(os.getcwd()) 
@@ -3890,21 +4009,28 @@ class PolarizableTyper():
            
         def DeleteNonQMFiles(self,directory):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Delete all non-QM log files in directory
+            Input: directory
+            Output: - 
+            Referenced By: DeleteAllNonQMFiles
+            Description:
+            1. Change to new directory
+            2. If user inputs certain files in poltype.ini, dont delete them by appending to array of files to not delete.
+            3. Iterate over files and target files that are not related to qm log files or their associated outputs (.chk,.dat). Dont delete output AMOEBA, xtb or ANI output files also. Save files to be deleted to an array.
+            4. Iterate over array of files to delete and delete them. 
             """
+            # STEP 1
             tempdir=os.getcwd()
             os.chdir(directory)
             deletearray=[]
             files=os.listdir()
             filestonotdelete=[]
+            # STEP 2
             if self.indextotypefile!=None:
                 filestonotdelete.append(self.indextotypefile)
             if self.inputkeyfile!=None:
                 filestonotdelete.append(self.inputkeyfile)
+            # STEP 3
             for f in files:
                 if not os.path.isdir(f) and 'nohup' not in f and f[0]!='.' and f!='parentvdw.key':
                     fsplit=f.split('.')
@@ -3912,112 +4038,53 @@ class PolarizableTyper():
                         end=fsplit[1]
                         if 'AMOEBA-opt' not in f and 'ANI-opt' not in f and 'xtb-opt' not in f and 'log' not in end and 'sdf' not in end and 'ini' not in end and 'chk' not in end and 'dat' not in end and 'mol' not in end and 'txt' not in end and f not in filestonotdelete:
                             deletearray.append(f)
+            # STEP 4
             for f in deletearray:
                 os.remove(f)
 
             os.chdir(tempdir) 
 
-        def ResourceInputs(self,jobpaths,ramalljobs,diskalljobs,numprocalljobs):
-            """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
-            """
-            scratchspacelist=[]
-            ramlist=[]
-            numproclist=[]
-            for i in range(len(jobpaths)):
-                scratchspacelist.append(diskalljobs)
-                ramlist.append(ramalljobs)
-                numproclist.append(numprocalljobs)
         
-            return scratchspacelist,ramlist,numproclist
-
-        def GenerateDaemonInput(self,joblist,outputlogpath,scratchspacelist,ramlist,numproclist,jobpaths,inputdaemonfilepath):
-            """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
-            """
-            head,tail=os.path.split(outputlogpath)
-            os.chdir(head)
-            temp=open(inputdaemonfilepath,'w')
-            for i in range(len(joblist)):
-                job=joblist[i]
-                scratchspace=scratchspacelist[i]
-                ram=ramlist[i]
-                numproc=numproclist[i]
-                jobpath=jobpaths[i]
-                string='--job='+job+' '+'--numproc='+str(1)+' '+'--ram=10GB'+' '+'--disk=0GB'+' '+'--inputfilepaths='+os.path.join(jobpath,'poltype.ini')+' '+'\n'
-                temp.write(string)
-            temp.close()
-
-
-        def CreatePoltypeInputFilesMultipleMolecules(self):
-            """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
-            """
-            dic={'externalapi':self.externalapi,'accuratevdwsp':self.accuratevdwsp,'email':self.email,'firstoptfinished':self.firstoptfinished,'optonly':self.optonly,'onlyvdwatomindex':self.onlyvdwatomindex,'use_qmopt_vdw':self.use_qmopt_vdw,'use_gau_vdw':self.use_gau_vdw,'dontusepcm':self.dontusepcm,'deleteallnonqmfiles':self.deleteallnonqmfiles,'totalcharge':self.totalcharge,'torspbasissethalogen':self.torspbasissethalogen,'homodimers':self.homodimers,'boltzmantemp':self.boltzmantemp,'dovdwscan':self.dovdwscan,'use_gausgeomoptonly':self.use_gausgeomoptonly,'maxtorRMSPDRel':self.maxtorRMSPDRel,'tortor':self.tortor,'fitfirsttorsionfoldphase':self.fitfirsttorsionfoldphase,'defaultmaxtorsiongridpoints':self.defaultmaxtorsiongridpoints,'absdipoletol':self.absdipoletol,'refinenonaroringtors':self.refinenonaroringtors,'maxgrowthcycles':self.maxgrowthcycles,'use_gauPCM':self.use_gauPCM,'fitqmdipole':self.fitqmdipole,'WBOtol':self.WBOtol,'dontfrag':self.dontfrag,'dipoletol':self.dipoletol,'numproc':self.numproc,'maxmem':self.maxmem,'maxdisk':self.maxdisk,'optbasisset':self.optbasisset,'toroptbasisset':self.toroptbasisset,'dmabasisset':self.dmabasisset,'espbasisset':self.espbasisset,'torspbasisset':self.torspbasisset,'optmethod':self.optmethod,'toroptmethod':self.toroptmethod,'torspmethod':self.torspmethod,'dmamethod':self.dmamethod,'espmethod':self.espmethod,'qmonly' : self.qmonly,'espfit' : self.espfit,'foldnum':self.foldnum,'maxRMSD':self.maxRMSD,'maxRMSPD':self.maxRMSPD,'maxtorRMSPD':self.maxtorRMSPD,'tordatapointsnum':self.tordatapointsnum,'torsionrestraint':self.torsionrestraint,'rotalltors':self.rotalltors,'dontdotor':self.dontdotor,'dontdotorfit':self.dontdotorfit,'toroptpcm':self.toroptpcm,'optpcm':self.optpcm,'torsppcm':self.torsppcm,'use_gaus':self.use_gaus,'use_gausoptonly':self.use_gausoptonly,'freq':self.freq,'optmaxcycle':self.optmaxcycle,'forcefield':self.forcefield}
-            os.chdir(self.inputmoleculefolderpaths)
-            files=os.listdir()
-            jobpaths=[]
-            joblist=[]
-            for f in files:
-                if os.path.isdir(f):
-                    os.chdir(f)
-                    subfiles=os.listdir()
-                    for subf in subfiles:
-                        if '.sdf' in subf:
-                            dic['structure']=subf
-                            inifilepath=self.WritePoltypeInitializationFile(dic)
-                            curdir=os.getcwd()
-                            jobpaths.append(curdir)
-                            poltypefilepath=os.path.join(self.poltypepath,'poltype.py')
-                            joblist.append('cd '+curdir+' '+'&&'+' '+'python '+poltypefilepath)
-
-                    os.chdir('..')
-            if self.externalapi!=None:
-                outputlogfilepath=os.path.join(self.inputmoleculefolderpaths,'outputlog.txt')
-                inputdaemonfilepath=os.path.join(self.inputmoleculefolderpaths,'jobinfo.txt')
-                scratchspacelist,ramlist,numproclist=self.ResourceInputs(jobpaths,self.maxmem,self.maxdisk,self.numproc)
-                self.GenerateDaemonInput(joblist,outputlogfilepath,scratchspacelist,ramlist,numproclist,jobpaths,inputdaemonfilepath)
-
-            sys.exit()
-
         def CheckIfAtomsAreAllowed(self,m):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: AMOEBA only supports certain atom types (not all elements possible have atom types), so check if the input molecule contains any elements outside current types allowed and if it doesnt exist, then crash the program.
+            Input: Rdkit mol object
+            Output: -
+            Referenced By: GenerateParameters 
             Description: 
+            1. Hard code list of allowed elements.
+            2. Iterate over mol object atoms and get the atomic number.
+            3. If the atomic number is not in list of allowed atomic numbers, then raise error and crash the program.
             """
+            # STEP 1
             listofallowedatoms=[1,6,7,8,15,16,17,35,53,9]
+            # STEP 2
             for atom in m.GetAtoms():
                 atomicnum=atom.GetAtomicNum()
+                # STEP 3
                 if atomicnum not in listofallowedatoms:
                     raise ValueError('Element not allowed! '+str(atomicnum)) 
 
 
         def CheckIfAtomsAreAllowedANI(self,m):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: ANI-2 doesnt allow certain elements (Phosphorous, Iodine, Bromine etc...), so if the user sets the torsion OPT methods to use ANI-2, ensure that the input molecule has allowed elements. If not, then crash the program.
+            Input: Rdkit mol object
+            Output: -
+            Referenced By: GenerateParameters 
             Description: 
+            1. If user specifies to use ANI-2 then continue, else return
+            2. Hard code list of allowed elements for ANI-2
+            3. Iterate over mol object atoms
+            4. Get the atomic number and if doesnt exist in list of allowed atomic numbers, then raise error and crash the program. 
             """
+            # STEP 1
             if self.toroptmethod=='ANI' or self.torspmethod=='ANI':
+                # STEP 2
                 listofallowedatoms=[1,6,7,8,9,17,16]
+                # STEP 3
                 for atom in m.GetAtoms():
+                    # STEP 4
                     atomicnum=atom.GetAtomicNum()
                     if atomicnum not in listofallowedatoms:
                         raise ValueError('Element not allowed for ANI! '+str(atomicnum)) 
@@ -4026,68 +4093,50 @@ class PolarizableTyper():
 
         def CheckForHydrogens(self,m):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Sometimes user may download a structure that does not contain hydrogens, so check for hydrogens and print warning if any hydrogens are missing from the input structure. 
+            Input: Rdkit mol object
+            Output: -
+            Referenced By: GenerateParameters
+            Description:
+            1. Assume there are no hydrogens
+            2. Iterate over mol object atoms
+            3. If atomic number is a hydrogen then assumption is wrong
+            4. If no hydrogens were found, then print warning in log file and to standard output 
             """
+            # STEP 1
             self.hashyd=False
+            # STEP 2
             for atom in m.GetAtoms():
                 atomicnum=atom.GetAtomicNum()
+                # STEP 3
                 if atomicnum==1:
                     self.hashyd=True
+            # STEP 4
             if self.hashyd==False:
                 string='No hydrogens detected in input file!'
                 warnings.warn(string)
                 self.WriteToLog(string)
 
 
-        def CheckMP2OptFailed(self):
-            """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
-            """
-            files=os.listdir()
-            mp2failed=False
-            found=False
-            for f in files:
-                if 'opt' in f and ('.com' in f or '.psi4' in f) and '_temp' not in f:
-                    found=True
-                    break
-            if found==True:
-                temp=open(f,'r')
-                results=temp.readlines()
-                temp.close()
-                foundHF=False
-                foundminix=False
-                for line in results:
-                    if 'optimize' in line or 'opt' in line:
-                        if 'hf' in line or 'HF' in line:
-                            foundHF=True
-                        if 'minix' in line or 'MINIX' in line:
-                            foundminix=True 
-                if foundHF==True and foundminix==False:
-                    mp2failed=True
-            return mp2failed
-
-
         def GrabAtomicSymbols(self,rdkitmol):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Save dictionary of atomic index to atomic symbol for later use when generating Gaussian and Psi4 input files
+            Input: Rdkit mol object
+            Output: dictionary of atomic index to atomic symbol
+            Referenced By: GenerateParameters 
+            Description:
+            1. Iterate over mol object
+            2. Get atomic number
+            3. Use pyastronomy lib to convert atomic number to atomic symbol and then save in dictionary 
             """
             indextoatomicsymbol={}
             an = pyasl.AtomicNo()
+            # STEP 1
             for atm in rdkitmol.GetAtoms():
+                # STEP 2
                 atmnum=atm.GetAtomicNum()
                 atmidx=atm.GetIdx()
+                # STEP 3
                 sym=an.getElSymbol(atmnum)
                 indextoatomicsymbol[atmidx+1]=sym
 
@@ -4096,19 +4145,25 @@ class PolarizableTyper():
 
         def CheckIfInputIsTinkerXYZ(self,molstructfname):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Determine if the input structure is tinker XYZ or not
+            Input: Input structure file
+            Output: boolean specifying if the structure is tinker XYZ format or not
+            Referenced By: ConvertInputStructureToSDFFormat
             Description: 
+            1. Assume that the input structure is not tinker XYZ
+            2. Iterate over lines of file
+            3. If there are more than 4 entries in line (cartesian XYZ has 4), then it must be a tinker XYZ file. 
             """
+            # STEP 1
             istinkxyz=False
             temp=open(molstructfname,'r')
             results=temp.readlines()
             temp.close()
+            # STEP 2
             for line in results:
                 linesplit=line.split()
                 if len(linesplit)>1:
+                    # STEP 3
                     if len(linesplit)>4:
                         istinkxyz=True
 
@@ -4117,15 +4172,21 @@ class PolarizableTyper():
 
         def GenerateIndexToTypeFile(self,indextotype):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: If user gives tinker XYZ as input, need to save type information to a file and give it to poltype to read in and use instead of default symmetry type detection. 
+            Input: Dictionary of atom index to type numbers
+            Output: Filename to be processed by poltype later
+            Referenced By: ConvertInputStructureToSDFFormat
             Description: 
+            1. Create file handle for filename
+            2. Iterate over dictionary of atom index to type number
+            3. Write out atomic index and type number to the filename 
             """
             filename='indextotype.txt'
+            # STEP 1
             temp=open(filename,'w')
+            # STEP 2
             for index,typenum in indextotype.items():
+                # STEP 3
                 temp.write(str(index)+' '+str(typenum)+'\n')
             temp.close()
             return filename
@@ -4133,24 +4194,28 @@ class PolarizableTyper():
 
         def GrabIndexToType(self,molstrucfname):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Read tinker XYZ file and save atomic index to type information into a dictionary
+            Input: Tinker XYZ file
+            Output: Dictionary of atomic index to type number
+            Referenced By: ConvertInputStructureToSDFFormat
             Description: 
+            1. Iterate over lines of tinker XYZ file
+            2. Grab atomic index and type number
+            3. Save in dictionary
             """
             indextotype={}
             temp=open(molstrucfname,'r')
             results=temp.readlines()
             temp.close()
+            # STEP 1
             for line in results:
                 linesplit=line.split()
                 if len(linesplit)>=5:
+                    # STEP 2
                     index=int(linesplit[0])
                     typenum=int(linesplit[5])
+                    # STEP 3
                     indextotype[index]=typenum
-
-
 
             return indextotype
 
@@ -4158,23 +4223,30 @@ class PolarizableTyper():
 
         def ConvertInputStructureToSDFFormat(self,molstructfname):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Users may give many different possible file formats for the input structure.
+            Input: Input structure file
+            Output: Converted structure file
+            Referenced By: GenerateParameters
             Description: 
+            1. If not .mol or .sdf file format (.mol is defauled for fragment job inputs)
+            2. Check if input is tinker XYZ file
+            3. If file is tinker XYZ, then need to convert to cartesian XYZ and save the type information for later use to ensure that poltype doesnt use default symmetry typing. Otherwise read in structure file to openbabel mol object.
+            4. Convert mol object to output SDF file format. 
             """
             obConversion = openbabel.OBConversion()
             mol = openbabel.OBMol()
             inFormat = obConversion.FormatFromExt(molstructfname)
             split=molstructfname.split('.')
             ext=split[-1]
+            # STEP 1
             if ext!='sdf' and ext!='mol':
+                # STEP 2
                 istinkerxyz=False
                 if ext=='xyz':
                     istinkerxyz=self.CheckIfInputIsTinkerXYZ(molstructfname)
 
                 obConversion.SetInFormat(ext)
+                # STEP 3
                 if istinkerxyz==False:
                     obConversion.ReadFile(mol, molstructfname)
                 else:
@@ -4183,7 +4255,7 @@ class PolarizableTyper():
                     indextotype=self.GrabIndexToType(molstructfname)
                     filename=self.GenerateIndexToTypeFile(indextotype) 
                     self.indextotypefile=filename
-
+                # STEP 4
                 obConversion.SetOutFormat('sdf')
                 molstructfname=molstructfname.replace('.'+ext,'.sdf')
                 obConversion.WriteFile(mol,molstructfname)
@@ -4194,21 +4266,27 @@ class PolarizableTyper():
 
         def GenerateEntireTinkerXYZ(self,atmindextocoordinates,atmindextotypenum,atmindextoconnectivity,atmindextoelement,filename):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: If user chooses to skip multipole derivation (which requires QM optimization and running GDMA, poledit, which produces the first tinker XYZ file), then need to generate a tinker XYZ file using input mol object coordinates
+            Input: Dictionary of atomic index to coordinates, dictionary of atomic index to type number, dictionary of atomic index to connectivity, dictionary of atomic index to element, filename of tinker XYZ to be made
+            Output: - 
+            Referenced By: GenerateParameters
             Description: 
+            1. Write the total atom number at the top of the tinker XYZ file
+            2. Iterate over dictionary of atomic index to coordinates, grab type number, connectivity and element symbol from other dictionaries.
+            3. Construct line in format of tinker XYZ and write line to file. 
             """
             temp=open(filename,'w')
+            # STEP 1
             temp.write(str(len(atmindextocoordinates.keys()))+'\n')
             for index,coords in atmindextocoordinates.items():
+                # STEP 2
                 typenum=atmindextotypenum[index]
                 conns=atmindextoconnectivity[index]
                 element=atmindextoelement[index]
                 x=coords[0]
                 y=coords[1]
                 z=coords[2]
+                # STEP 3
                 newline='    '+str(index)+'  '+element+'     '+str(x)+'   '+str(y)+'   '+str(z)+'    '+str(typenum)+'     '
                 for con in conns:
                     newline+=str(con)+'     '
@@ -4220,10 +4298,10 @@ class PolarizableTyper():
 
         def GenerateParameters(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Assign parameters from database and/or derive them from ab initio QM computations
+            Input: Self object
+            Output: - 
+            Referenced By: main  
             Description: 
             """
             temp=open(os.getcwd()+r'/'+'poltype.ini','r')
@@ -4262,8 +4340,6 @@ class PolarizableTyper():
             self.totalcharge=None
             if self.deleteallnonqmfiles==True:
                 self.DeleteAllNonQMFiles()
-            if self.inputmoleculefolderpaths!=None:
-                self.CreatePoltypeInputFilesMultipleMolecules() 
             if self.optmaxcycle>=100:
                 self.fullopt=True
             else:
@@ -4536,7 +4612,7 @@ class PolarizableTyper():
 
             torgen.get_all_torsions(self,mol)
             # Find rotatable bonds for future torsion scans
-            (torlist, self.rotbndlist,hydtorsions,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,mol,torsionsmissing)
+            (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,mol,torsionsmissing)
 
             if atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False: 
                 self.dontfrag=True
@@ -4635,7 +4711,7 @@ class PolarizableTyper():
                 sys.exit()
  
             if self.isfragjob==False and self.dontdotor==False:
-                self.CheckTorsionParameters(self.key7fname,torsionsmissing,hydtorsions)
+                self.CheckTorsionParameters(self.key7fname,torsionsmissing)
             self.WriteOutLiteratureReferences(self.key7fname) 
             # A series of tests are done so you one can see whether or not the parameterization values
             # found are acceptable and to what degree

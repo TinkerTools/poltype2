@@ -135,7 +135,9 @@ def ParseForErrorsInOutPut(poltype,saved,outputfilename=None):
     for line in saved:
         if not isinstance(line, str):
             line=line.decode("utf-8")
-        if 'Tinker is Unable to Continue' in line or 'Terminating with uncaught exceptio' in line:
+        if 'Tinker is Unable to Continue' in line or 'Terminating with uncaught exceptio' in line or 'OLDATM  --  A PDB Atom of Biotype' in line:
+            poltype.WriteToLog(line)
+            print(line)
             check=False 
 
     return check

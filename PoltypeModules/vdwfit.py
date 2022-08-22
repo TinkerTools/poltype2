@@ -1039,8 +1039,8 @@ def CreatePsi4SPInputFile(poltype,TXYZ,mol,maxdisk,maxmem,numproc,probeatoms):
     else:
         temp.write("e_dim= energy('%s/%s',bsse_type='cp')" % (poltype.espmethod.lower(),poltype.espbasisset)+'\n')
     temp.write('\n')
-    temp.write("psi4.print_out('CP Energy = %10.6f' % (e_dim))"+'\n')
     temp.write('clean()'+'\n')
+    temp.write("psi4.print_out('CP Energy = %10.6f' % (e_dim))"+'\n')
     temp.close()
     temp=open(inputname,'r')
     results=temp.readlines()

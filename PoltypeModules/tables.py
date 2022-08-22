@@ -76,12 +76,24 @@ def CSVWriter(poltype,tempname,progress=False):
         for dictidx in range(len(grabbeddictlist)):
             tabledict=grabbeddictlist[dictidx]
             allvaluerows=[]
+            lentokeylist={} # if some molecules have more informatoin in tables (i.e. one uses gas phase another does not) then need to find max keylist and use as column header
             for path in tabledict.keys():
-                wrotecolumnheaders=wrotecolumnheaderslist[dictidx]
                 table=tabledict[path]
                 table={k: v for k, v in table.items() if v is not None}
                 keylist=list(table.keys())
-                valuelist=list(table.values())
+                lentokeylist[len(keylist)]=keylist
+            maxkeylen=max(lentokeylist.keys())
+            maxkeylist=lentokeylist[maxkeylen]
+
+            for path in tabledict.keys():
+                wrotecolumnheaders=wrotecolumnheaderslist[dictidx]
+                table=tabledict[path]
+                valuelist=[]
+                for key in maxkeylist:
+                    if key in table.keys():
+                        valuelist.append(table[key])
+                    else:
+                        valuelist.append(None)
                 for i in range(len(valuelist)):
                     value=valuelist[i]
                     if value!=None:
@@ -95,7 +107,7 @@ def CSVWriter(poltype,tempname,progress=False):
                         
 
                 keyrowlist=['Name']
-                keyrowlist.extend(keylist)
+                keyrowlist.extend(maxkeylist)
                 emptyline=[None]*len(keyrowlist)
                 summaryline=[None]*len(keyrowlist)
                 summary=tablesummarylist[dictidx]
@@ -282,7 +294,6 @@ def GrabSimDataFromPathList(poltype):
             for f in files:
                 if 'SimData.csv' in f:
                     poltype.simpathlist.append(path)
-
     lambdakeylist,boxinfokeylist,energykeylist,freeenergykeylist,summarykeylist,keylist=KeyLists(poltype)
     ligandnames=[]
     receptornames=[]
@@ -295,7 +306,7 @@ def GrabSimDataFromPathList(poltype):
             for row in csv_reader:
                 rows.append(row)
             for k in range(len(poltype.tabledict)):
-                tabledict=poltype.tabledict[k]
+                tabledict={}
                 for i in range(len(rows)):
                     row=rows[i]
                     for j in range(len(row)):
@@ -314,7 +325,6 @@ def GrabSimDataFromPathList(poltype):
 
                             tabledict[col]=colvalue
                 poltype.tabledict[k]=tabledict
-       
                
         OrderTableData(poltype,boxinfokeylist,lambdakeylist,energykeylist,freeenergykeylist,summarykeylist,path)  
         if poltype.binding==True:

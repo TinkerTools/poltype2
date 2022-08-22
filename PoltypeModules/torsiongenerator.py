@@ -1461,7 +1461,6 @@ def get_torlist(poltype,mol,missed_torsions):
     """
     torlist = []
     nonarotorsions=[]
-    hydtorsionlist=[]
     rotbndlist = {}
     nonrotbndlist={} 
     iterbond = openbabel.OBMolBondIter(mol)
@@ -1562,7 +1561,7 @@ def get_torlist(poltype,mol,missed_torsions):
             nonrotbndlist[rotbndkey] = []
             nonrotbndlist[rotbndkey].append(nonarotor)
 
-    return (torlist ,rotbndlist,hydtorsionlist,nonaroringtorlist,nonrotbndlist)
+    return (torlist ,rotbndlist,nonaroringtorlist,nonrotbndlist)
 
 def FindOtherTorsAboutBond(poltype,rotbndlist,bond,rotbndkey,t1,t2,t3,t4):
     """

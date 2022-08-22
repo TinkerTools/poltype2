@@ -14,6 +14,45 @@ from rdkit import Chem
 from rdkit.Chem import rdFMCS
 from rdkit.Chem import rdmolfiles
 
+def AddMissingHeavyAtoms(poltype,filename):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    cmdstr='pdbfixer '+filename+' --add-atoms=heavy'
+    os.system(cmdstr)
+    outputpdb='output.pdb'
+    os.rename(outputpdb,filename)
+
+
+
+def FindMissingResidues(poltype,chaintocurrentresnumtothreeletter):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    chainnumtolet={0:'A',1:'B',2:'C',3:'D'}
+    chaintomissingresidues={}
+    for chainnum,currentresnumtothreeletter in  chaintocurrentresnumtothreeletter.items():
+        resarray=list(currentresnumtothreeletter.keys())
+        firstres=min(resarray) 
+        lastres=max(resarray)
+        missingresidues=[]
+        allres=list(range(firstres,lastres+1))
+        for res in allres:
+            if res not in resarray:
+                missingresidues.append(res)
+        chaintomissingresidues[chainnumtolet[chainnum]]=missingresidues
+
+
+
+    return chaintomissingresidues
 
 def GenerateProteinTinkerXYZFile(poltype):
     """
@@ -24,6 +63,7 @@ def GenerateProteinTinkerXYZFile(poltype):
     Description: 
     """
     proteinindextocoordinates=GenerateUncomplexedProteinPDBFromComplexedPDB(poltype)
+    AddMissingHeavyAtoms(poltype,poltype.uncomplexedproteinpdbname)
     poltype.uncomplexedxyzname=poltype.uncomplexedproteinpdbname.replace('.pdb','.xyz')
     poltype.complexedxyzname=poltype.uncomplexedxyzname.replace('.xyz','_comp.xyz')
     poltype.receptorligandxyzfilename=poltype.complexedxyzname
@@ -34,6 +74,17 @@ def GenerateProteinTinkerXYZFile(poltype):
         cmdstr=poltype.pdbxyzpath+' '+poltype.uncomplexedproteinpdbname+' '+poltype.prmfilepath
     else:
         cmdstr=poltype.pdbxyzpath+' '+poltype.uncomplexedproteinpdbname+' '+'ALL'+' '+poltype.prmfilepath
+
+
+    chaintocurrentresnumtothreeletter,threeletterseq,chainseq,resnumseq=FindCurrentResidueArray(poltype,poltype.uncomplexedproteinpdbname)
+    chaintomissingresidues=FindMissingResidues(poltype,chaintocurrentresnumtothreeletter)
+
+    for chain,missingresidues in chaintomissingresidues.items():
+        if len(missingresidues)!=0:
+            string="WARNING! Residues are missing from PDB, chain = "+chain+' missing residues = '+str(missingresidues)
+            warnings.warn(string)
+            poltype.WriteToLog(string)
+
 
     submit.call_subsystem(poltype,cmdstr,wait=True)   
     

@@ -65,7 +65,7 @@ def ExecuteProductionDynamics(poltype):
                cmdstr=ProductionDynamicsCommand(poltype,boxfilename,keyfilename,proddynsteps,ensemble,outputfilepath,dynamicpath,proddyntimestep,nvt)
                head,tail=os.path.split(outputfilepath)
                shift,dynoutfiles=CheckLastNumberDynamicsStepsCompletedAllTimes(poltype,exception=tail)
-               terminate,deletefile,error=term.CheckFileTermination(poltype,outputfilepath,float(poltype.proddynsteps),False,True,shift)
+               terminate,deletefile,error=term.CheckFileTermination(poltype,outputfilepath,float(poltype.proddynsteps[j]),False,True,shift)
                if terminate==False:
                    if os.path.exists(os.path.join(path,arcfilename)):
                        stepstaken,dynoutfiles=CheckLastNumberDynamicsStepsCompletedAllTimes(poltype)
@@ -288,7 +288,7 @@ def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynbo
                    os.remove(f) # just in case option to stop all simulations was used
                if '.out' in f and "BAR" not in f:
                    outputfile=os.path.join(os.getcwd(),f) 
-                   terminate,deletefile,error=term.CheckFileTermination(poltype,outputfile,float(poltype.proddynsteps[k]))
+                   terminate,deletefile,error=term.CheckFileTermination(poltype,outputfile,float(poltype.proddynsteps[index]))
                    #if terminate==True:
                    #    continue
            newfoldpath=os.getcwd()+'/'

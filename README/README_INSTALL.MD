@@ -158,6 +158,7 @@ conda install -c conda-forge pymbar --yes
 conda install -c salilab modeller --yes
 conda install -c anaconda openpyxl --yes
 conda install -c conda-forge pdb2pqr --yes
+conda install -c conda-forge pdbfixer --yes
 ```
 
 ### Explicit Conda Installation - XTB

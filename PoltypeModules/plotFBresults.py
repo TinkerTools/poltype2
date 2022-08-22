@@ -21,7 +21,6 @@ from random import randint
 import shutil
 from pathlib import Path
 
-
 def GrabJobDirectories(fbdir):
     """
     Intent:
@@ -295,7 +294,6 @@ def GrabResults(outputfile):
                     qmdic[targetname][label][calckeyword]=[]
                 qmdic[targetname][label][refkeyword].append(ref)
                 qmdic[targetname][label][calckeyword].append(calc)
- 
     return tpdic,qmdic,outputfile
 
 
@@ -912,14 +910,12 @@ def CallPlotDimers3D(filenames,allindices,pymolscript,python2path):
         allindicesstring+=innerstring+ ','
     allindicesstring=allindicesstring[:-1]
     cmdstr=python2path+' '+pymolscript+' '+'--filenames='+filenamestring+' '+'--allindices='+allindicesstring
-    print('cmdstr',cmdstr,flush=True)
     os.system(cmdstr)
 
 
 def CallPlotESPSurfaces(name,cubefiles,pymolscript,python2path):
     cubefilestring=','.join(cubefiles)
     cmdstr=python2path+' '+pymolscript+' '+'--cubefiles='+cubefilestring+' '+'--name='+name
-    print('cmdstr',cmdstr,flush=True)
     os.system(cmdstr)
 
 
