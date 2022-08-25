@@ -341,9 +341,9 @@ def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynbo
                os.chdir(newfold)
                otherfoldpath=os.getcwd()+'/'
                os.chdir(curdir)
-               tempoutputboxname=os.path.join(otherfoldpath+proddynboxfilename.replace(poltype.foldername+'_',poltype.foldername+'_'+fold+'_').replace('0.','0-'))
+               tempoutputboxname=os.path.join(otherfoldpath+proddynboxfilename.replace(poltype.foldername+'_',poltype.foldername+'_'+newfold+'_').replace('0.','0-'))
                lastarcpath=tempoutputboxname.replace('.xyz','.arc')
-               outputsignalfile=outputarcname.replace('.arc','.fep')
+               outputsignalfile=outputarcname.replace('.arc','.fep') # if fep=False and this file exists, then delete arc file automatically and redo with actual MD
                if poltype.fep==True:
                    if not os.path.isfile(outputarcname):
                        poltype.WriteToLog('Copying arc file from  '+lastarcpath+' to '+outputarcname,prin=True)

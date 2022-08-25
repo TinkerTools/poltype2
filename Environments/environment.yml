@@ -1,4 +1,4 @@
-name: amoebamdpoltypetestfinal
+name: amoebamdpoltype
 channels:
   - anaconda
   - psi4
@@ -8,11 +8,15 @@ channels:
 dependencies:
   - _libgcc_mutex=0.1=conda_forge
   - _openmp_mutex=4.5=2_kmp_llvm
+  - aiohttp=3.8.1=py39hb9d737c_1
+  - aiosignal=1.2.0=pyhd8ed1ab_0
   - ambit=0.6=py39h53dec33_2
   - astunparse=1.6.3=pyhd8ed1ab_0
+  - async-timeout=4.0.2=pyhd8ed1ab_0
   - attrs=21.4.0=pyhd8ed1ab_0
   - biopython=1.79=py39hb9d737c_2
   - blas=1.0=mkl
+  - blinker=1.4=py_1
   - blosc=1.21.1=h83bc5f7_3
   - boost=1.74.0=py39h5472131_5
   - boost-cpp=1.74.0=h75c5d50_8
@@ -24,6 +28,7 @@ dependencies:
   - ca-certificates=2022.6.15=ha878542_0
   - cached-property=1.5.2=hd8ed1ab_1
   - cached_property=1.5.2=pyha770c72_1
+  - cachetools=5.2.0=pyhd8ed1ab_0
   - cairo=1.16.0=ha61ee94_1011
   - cairocffi=1.3.0=pyhd8ed1ab_0
   - cairosvg=2.5.2=pyhd8ed1ab_0
@@ -32,17 +37,22 @@ dependencies:
   - cftime=1.6.1=py39hd257fcd_0
   - charset-normalizer=2.1.0=pyhd8ed1ab_0
   - chemps2=1.8.11=hbe8a562_0
+  - click=8.1.3=py39hf3d152e_0
   - colorama=0.4.5=pyhd8ed1ab_0
+  - conda-pack=0.7.0=pyh6c4a22f_0
   - cryptography=37.0.1=py39h9ce1e76_0
   - cssselect2=0.2.1=pyh9f0ad1d_1
+  - cudatoolkit=11.7.0=hd8887f6_10
   - curl=7.83.1=h2283fc2_0
   - cycler=0.11.0=pyhd8ed1ab_0
   - defusedxml=0.7.1=pyhd8ed1ab_0
   - dftd3=3.2.1=h84218bc_2
+  - dill=0.3.5.1=pyhd8ed1ab_0
   - dkh=1.2=h173d85e_2
   - et_xmlfile=1.1.0=py39h06a4308_0
   - expat=2.4.8=h27087fc_0
   - fasteners=0.17.3=pyhd8ed1ab_0
+  - fftw=3.3.9=h27cfd23_1
   - font-ttf-dejavu-sans-mono=2.37=hab24e00_0
   - font-ttf-inconsolata=3.000=h77eed37_0
   - font-ttf-source-code-pro=2.038=h77eed37_0
@@ -52,15 +62,19 @@ dependencies:
   - fonts-conda-forge=1=0
   - fonttools=4.34.4=py39hb9d737c_0
   - freetype=2.10.4=h0708190_1
+  - frozenlist=1.3.1=py39hb9d737c_0
   - gau2grid=2.0.7=hd18ef5c_0
   - gcp=2.0.2=he991be0_2
   - gdma=2.2.6=h0e1e685_6
   - geometric=0.9.7.2=py_0
   - gettext=0.19.8.1=h73d1719_1008
   - giflib=5.2.1=h36c2ea0_2
+  - google-auth=2.10.0=pyh6c4a22f_0
+  - google-auth-oauthlib=0.5.2=pyhd8ed1ab_0
   - greenlet=1.1.2=py39h5a03fae_2
   - griddataformats=1.0.1=pyhd8ed1ab_0
   - gsd=2.5.3=py39hd257fcd_0
+  - gspread=5.4.0=pyh6c4a22f_0
   - h5py=3.2.1=nompi_py39h98ba4bc_100
   - hdf4=4.2.15=h10796ff_3
   - hdf5=1.10.6=nompi_h3c11f04_101
@@ -128,23 +142,30 @@ dependencies:
   - modeller=10.3=py39h9bf148f_1
   - mrcfile=1.4.0=pyhd8ed1ab_0
   - msgpack-python=1.0.4=py39hf939315_0
+  - multidict=6.0.2=py39hb9d737c_1
   - munkres=1.1.4=pyh9f0ad1d_0
   - ncurses=6.3=h27087fc_1
+  - ndcctools=7.4.11=py39h084f619_0
   - netcdf4=1.5.7=py39ha0f2276_1
   - networkx=2.8.4=pyhd8ed1ab_0
   - numexpr=2.8.3=py39h807cd23_0
   - numpy=1.22.3=py39he7a7128_0
   - numpy-base=1.22.3=py39hf524024_0
+  - oauthlib=3.2.0=pyhd8ed1ab_0
+  - ocl-icd=2.3.1=h7f98852_0
+  - ocl-icd-system=1.0.0=1
   - openbabel=3.1.1=py39h71cce9b_4
   - openjpeg=2.4.0=hb52868f_1
+  - openmm=7.6.0=py39h71eca04_0
   - openpyxl=3.0.9=pyhd3eb1b0_0
-  - openssl=3.0.5=h166bdaf_0
+  - openssl=3.0.5=h166bdaf_1
   - packaging=21.3=pyhd8ed1ab_0
   - pandas=1.4.3=py39h1832856_0
   - patsy=0.5.2=pyhd8ed1ab_0
   - pcmsolver=1.2.1.1=py39h92d4acf_3
   - pcre=8.45=h9c3ff4c_0
   - pdb2pqr=3.4.1=pyhd8ed1ab_0
+  - pdbfixer=1.8.1=pyh6c4a22f_0
   - pillow=9.2.0=py39hae2aec6_0
   - pint=0.17=pyhd8ed1ab_0
   - pip=22.1.2=pyhd8ed1ab_0
@@ -156,9 +177,12 @@ dependencies:
   - pthread-stubs=0.4=h36c2ea0_1001
   - py=1.11.0=pyh6c4a22f_0
   - py-cpuinfo=8.0.0=pyhd8ed1ab_0
+  - pyasn1=0.4.8=py_0
+  - pyasn1-modules=0.2.7=py_0
   - pycairo=1.21.0=py39h0934665_1
   - pycparser=2.21=pyhd8ed1ab_0
   - pydantic=1.9.1=py39hb9d737c_0
+  - pyjwt=2.4.0=pyhd8ed1ab_0
   - pymbar=3.0.7=py39hd257fcd_0
   - pyopenssl=22.0.0=pyhd8ed1ab_0
   - pyparsing=3.0.9=pyhd8ed1ab_0
@@ -169,6 +193,7 @@ dependencies:
   - python-dateutil=2.8.2=pyhd8ed1ab_0
   - python_abi=3.9=2_cp39
   - pytz=2022.1=pyhd8ed1ab_0
+  - pyu2f=0.1.5=pyhd8ed1ab_0
   - pyyaml=6.0=py39hb9d737c_4
   - qcelemental=0.25.0=pyhd8ed1ab_0
   - qcengine=0.24.0=pyhd8ed1ab_0
@@ -176,6 +201,8 @@ dependencies:
   - readline=8.1.2=h0f457ee_0
   - reportlab=3.5.68=py39he59360d_1
   - requests=2.28.1=pyhd8ed1ab_0
+  - requests-oauthlib=1.3.1=pyhd8ed1ab_0
+  - rsa=4.9=pyhd8ed1ab_0
   - scikit-learn=1.0.2=py39h51133e4_1
   - scipy=1.7.3=py39hc147768_0
   - seaborn=0.11.2=hd8ed1ab_0
@@ -215,6 +242,7 @@ dependencies:
   - xorg-xproto=7.0.31=h7f98852_1007
   - xz=5.2.5=h516909a_1
   - yaml=0.2.5=h7f98852_2
+  - yarl=1.7.2=py39hb9d737c_2
   - zipp=3.8.0=pyhd8ed1ab_0
   - zlib=1.2.12=h166bdaf_2
   - zstd=1.5.2=h8a70e8d_2
@@ -222,4 +250,3 @@ dependencies:
     - bidict==0.22.0
     - pyastronomy==0.17.1
     - quantities==0.13.0
-prefix: /home/bdw2292/miniconda3/envs/amoebamdpoltypetestfinal

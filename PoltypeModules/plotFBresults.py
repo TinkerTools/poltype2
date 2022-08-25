@@ -434,9 +434,7 @@ def PlotFBQM(targetdic,formula,indices):
     distances=np.array(distances)*distance
     for i in range(len(refvalues)):
         refs=np.array(refvalues[i])
-        refs=refs-min(refs)
         calcs=np.array(calcvalues[i])
-        calcs=calcs-min(calcs)
         rms = sqrt(mean_squared_error(calcs, refs))
         rmsvalues.append(rms)
         diff=calcs-refs

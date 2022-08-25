@@ -983,8 +983,8 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
     temptotalcharge=poltype.totalcharge
     for parametersmartsidx in tqdm(range(len(parametersmartslist)),desc='amoeba09 search for '+str(ls)):
         parametersmarts=parametersmartslist[parametersmartsidx]
-        prmmol=Chem.MolFromSmarts(parametersmarts)
         prmmol=parametersmartstordkitmol[parametersmarts]
+        Chem.SanitizeMol(prmmol)
         smartsmatchingtoindices=parametersmartstosmartsmatchingtoindices[parametersmarts]
         molsmatchingtoindices=parametersmartstomolsmatchingtoindices[parametersmarts]
         prmsmartsatomnum=prmmol.GetNumAtoms()
@@ -1001,6 +1001,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
             if diditmatch==True and diditmatchprmmol==True:
                 matches=parametersmartstordkitmolmatchingindices[parametersmarts][theidx]
                 firstmatch=matches[0]
+                
                 aromaticindices=GrabAromaticIndices(poltype,firstmatch,poltype.rdkitmol,ls)
                 if len(firstmatch)>=len(ls):
                     for match in matches:
@@ -1030,11 +1031,22 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                         if goodmatch==True:
                              
                             break
+                    
                     prmmolnumrings=CountRingsInSMARTS(poltype,parametersmarts)
                     molnumrings=CalcNumRings(poltype.rdkitmol)
                     if prmmolnumrings>molnumrings:
                         goodmatch=False
+
+
                     if goodmatch==True:
+                        rdkitatoms=[poltype.rdkitmol.GetAtomWithIdx(r) for r in firstmatch]
+                        rdkithybs=[r.GetHybridization() for r in rdkitatoms]
+                        rdkitmatch=copy.deepcopy(firstmatch)
+                        idx=ls[0]
+                            
+
+
+
                         rdkitatomictypetotype={}
                         rdkitatomicnumtonum={}
                         for atom in poltype.rdkitmol.GetAtoms():
@@ -1081,12 +1093,17 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                         indices=list(range(len(firstmatch)))
                         smartsindextoparametersmartsindex=dict(zip(indices,firstmatch)) 
                         prmsmartsindices=[smartsindextoparametersmartsindex[i] for i in smartindices]
-                        aromaticprmsmartsindices=[smartsindextoparametersmartsindex[i] for i in aromaticsmartindices]
-
-                        
-                        aromaticprmindices=GrabAromaticIndices(poltype,aromaticprmsmartsindices,prmmol,ls)
-                        if len(aromaticprmindices)!=len(aromaticprmsmartsindices) and len(ls)==1:
+                        prmatoms=[prmmol.GetAtomWithIdx(r) for r in firstmatch]
+                        prmhybs=[r.GetHybridization() for r in prmatoms]
+                        allhybssame=True
+                        for r in range(len(rdkithybs)):
+                            rdkithyb=rdkithybs[r]
+                            prmhyb=prmhybs[r]
+                            if rdkithyb!=prmhyb:
+                                allhybssame=False
+                        if allhybssame==False:
                             continue
+                        
                         prmsmartsatomicnumtonum={}
                         for atomicnum,num in rdkitatomicnumtonum.items():
                             if atomicnum not in prmsmartsatomicnumtonum.keys():
@@ -1379,7 +1396,7 @@ def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprm,parametersmartsli
         parametersmartstomatchlen={}
         parametersmartstosmartslist={}
         parametersmartstosmartslist,parametersmartstofoundallneighbs=MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,parametersmartstosmartslist,ls,mol,parametersmartstordkitmol,parametersmartstosmartsmatchingtoindices,parametersmartstomolsmatchingtoindices,parametersmartstordkitmolmatchingindices,parametersmartstoprmmolmatchingindices)
-        
+
         if len(parametersmartstosmartslist.keys())!=0:
             parametersmartstosmartslen={}
             for prmsmarts,newls in parametersmartstosmartslist.items():
@@ -1404,6 +1421,7 @@ def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprm,parametersmartsli
             smarts=smarts[:-1]
             maxsmartsls=[smarts,smarts]
             maxprmsmarts='[#6](-[H])(-[H])(-[H])-[#6](-[H])(-[H])(-[H])'
+        
         listforprmtoparametersmarts[tuple(ls)]=maxprmsmarts
         listforprmtosmarts[tuple(ls)]=maxsmartsls
         listforprmtomatchallneighbs[tuple(ls)]=matchallneighbs

@@ -143,7 +143,7 @@ class PolarizableTyper():
         prepdockscript:str=os.path.join(os.path.split(__file__)[0],'preparedockingfiles.py')
         pymolscript:str=os.path.join(os.path.split(__file__)[0],'pymolfunctions.py')
         indextompoleframefile:None=None
-        qmrelativeweight:float=.5
+        qmrelativeweight:float=1
         liqrelativeweight:float=2.5
         enthalpyrelativeweight:float=1
         densityrelativeweight:float=.01
@@ -302,14 +302,14 @@ class PolarizableTyper():
         vdwtypeslist:None=None
         fittypestogether:None=None
         csvexpdatafile:None=None
-        liquid_equ_steps:float=500000
-        liquid_prod_steps:float=5000000
-        liquid_timestep:float=1.0
-        liquid_interval:float=1
-        gas_equ_steps:float=500000
-        gas_prod_steps:float=5000000
-        gas_timestep:float=1.0
-        gas_interval:float=1
+        liquid_equ_steps:float=200000
+        liquid_prod_steps:float=2000000
+        liquid_timestep:float=2.0
+        liquid_interval:float=2
+        gas_equ_steps:float=200000
+        gas_prod_steps:float=2000000
+        gas_timestep:float=2.0
+        gas_interval:float=2
         md_threads:int=4
         liquid_prod_time:float=5
         gas_prod_time:float=5
@@ -1906,14 +1906,13 @@ class PolarizableTyper():
 
             # STEP 31
 
-
             if self.complexation==True and self.solvation==False:
                 self.keyfilename=[[self.foldername+'_comp'+'.key']]
                 if self.perturbkeyfilelist!=None:
                     for keyname,index in self.perturbkeyfilelisttokeyindex.items():
                         numinterpols=self.perturbkeyfilelisttointerpolations[keyname]
                         for k in range(numinterpols):
-                            newkeyname=self.foldername+'_comp'+'.key'
+                            newkeyname=self.foldername+'_'+str(k)+'_comp'+'.key'
                             shutil.copy(keyname,newkeyname)
                             self.keyfilename[0].append(newkeyname)
                 confignamelist=[i.replace('.key','_config.key') for i in self.keyfilename[0]]
@@ -1927,7 +1926,7 @@ class PolarizableTyper():
                     for keyname,index in self.perturbkeyfilelisttokeyindex.items():
                         numinterpols=self.perturbkeyfilelisttointerpolations[keyname]
                         for k in range(numinterpols):
-                            newkeyname=self.foldername+'_solv'+'.key'
+                            newkeyname=self.foldername+'_'+str(k)+'_solv'+'.key'
                             shutil.copy(keyname,newkeyname)
                             self.keyfilename[0].append(newkeyname)
                 confignamelist=[i.replace('.key','_config.key') for i in self.keyfilename[0]]
@@ -1942,7 +1941,7 @@ class PolarizableTyper():
                     for keyname,index in self.perturbkeyfilelisttokeyindex.items():
                         numinterpols=self.perturbkeyfilelisttointerpolations[keyname]
                         for k in range(numinterpols):
-                            newkeyname=self.foldername+'_neatliq'+'.key'
+                            newkeyname=self.foldername+'_'+str(k)+'_neatliq'+'.key'
                             shutil.copy(keyname,newkeyname)
                             self.keyfilename[0].append(newkeyname)
                 confignamelist=[i.replace('.key','_config.key') for i in self.keyfilename[0]]
@@ -1957,7 +1956,7 @@ class PolarizableTyper():
                     for keyname,index in self.perturbkeyfilelisttokeyindex.items():
                         numinterpols=self.perturbkeyfilelisttointerpolations[keyname]
                         for k in range(numinterpols):
-                            newkeyname=self.foldername+'_comp'+'.key'
+                            newkeyname=self.foldername+'_'+str(k)+'_comp'+'.key'
                             shutil.copy(keyname,newkeyname)
                             self.keyfilename[0].append(newkeyname)
                             newkeyname=self.foldername+'_solv'+'.key'
@@ -1971,7 +1970,6 @@ class PolarizableTyper():
                 self.lambdakeyfilename=[lambdanamelistcomp,lambdanamelistsolv]
 
             # STEP 32 
-
             
             self.equilstepsNVT=str(int((self.equiltimeNVT*1000000)/self.equiltimestep/len(self.equilibriatescheme)-1)) # convert ns to fs divide by the length of temperature scheme
             self.lastequilstepsNVT=str(int((self.lastNVTequiltime*1000000)/self.equiltimestep))
@@ -2266,7 +2264,6 @@ class PolarizableTyper():
                 self.ligandindextotypenumlist.append(stateindextotypeindex)
 
             # STEP 38
-
             ann.main(self)
 
 
@@ -2331,7 +2328,6 @@ class PolarizableTyper():
                     temp.write(line)
 
             temp.close()
-
             return thekey
 
         def GrabIonizationStates(self,m):
@@ -4303,23 +4299,10 @@ class PolarizableTyper():
             Output: - 
             Referenced By: main  
             Description: 
+            1. Convert input structure to SDF format
+            2. If not a fragment job, then make a folder called Temp, copy input files into Temp and perform poltype calculations within this folder. This way when return final.xyz and final.key to the user it is a lot less messy. 
             """
-            temp=open(os.getcwd()+r'/'+'poltype.ini','r')
-            results=temp.readlines()
-            temp.close()
-            for line in results:
-                if '#' not in line and line!='\n':
-                    if '=' in line:
-                        linesplit=line.split('=',1)
-                        a=linesplit[1].replace('\n','').rstrip().lstrip()
-                        newline=linesplit[0]
-                        if a=='None':
-                            continue
-                    else:
-                        newline=line
-
-                    if "structure" in newline:
-                        self.molstructfname = a
+            # STEP 1 
             self.molstructfname=self.ConvertInputStructureToSDFFormat(self.molstructfname)
             if self.isfragjob==False:
                 foldername='Temp'

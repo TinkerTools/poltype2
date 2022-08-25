@@ -918,6 +918,13 @@ def ComputeThermoProperties(poltype):
         solvtable.append([u'TΔSˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.entropyerrorlisttotal[0]))
         solvtable.append(['SolvOverlap']+FlattenListOfList(poltype,poltype.overlaplist[0]))
 
+        newsolvtable=list(map(list, zip(*solvtable)))
+        tempname='SolvBARResults.csv'
+        with open(poltype.outputpath+tempname, mode='w') as energy_file:
+            energy_writer = csv.writer(energy_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            for row in newsolvtable:
+                energy_writer.writerow(row)
+
     elif poltype.complexation==True and poltype.solvation==True:
         barpairs=[]
         for ls in poltype.lambdafolderlist[1]:
@@ -1746,5 +1753,6 @@ def BARProtocol(poltype):
             poltype.tabledict[1][u'ΔGᵃⁿᵃᶜᵒᵐᵖᶜᵒʳʳ']=poltype.rescorrection
             poltype.tabledict[1][u'ΔGᶜᵒᵐᵖᶜᵒʳʳ']=poltype.freeenergy[0]
     #DeleteBARFiles(poltype) # if want to add more time to MD, then delete BAR files, so when run again, BAR is recomputed from new files
+    poltype.WriteToLog('Job is complete your molecule has been annihilated!',prin=True)
 
 

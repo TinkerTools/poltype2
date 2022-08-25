@@ -91,8 +91,6 @@ def fitfunc (poltype,parms, x,torset, torprmdict,keyonlylist=None,nfoldonlylist=
     """
     tor_energy_array = [ 0.0 ] * len(x)
     offset = 0
-    print('torset',torset)
-    print('torprmdict',torprmdict)
     for clskey,torprm in torprmdict.items():
         if keyonlylist!=None:
             if clskey not in keyonlylist:
@@ -1857,7 +1855,8 @@ def process_rot_bond_tors(poltype,mol):
             PrepareTorTorSplineInput(poltype,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_dict,mol,tmpkey2basename,indicesremoveddic,cls_angle_dict_unmodified,cls_mm_engy_dict_unmodified,cls_qm_engy_dict_unmodified)
 
         shutil.copy(tmpkey2basename,'../' + poltype.key7fname)
-    PlotTorOptMethodListEnergies(poltype,mol)
+    if len(poltype.toroptmethodlist)>1:
+        PlotTorOptMethodListEnergies(poltype,mol)
     os.chdir('..')
 
 
