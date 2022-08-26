@@ -2183,8 +2183,8 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     spacedformulastr=optmol.GetSpacedFormula()
     if ('I ' in spacedformulastr):
         temp.write('    basis {'+'\n')
-        temp.write('    ['+' '+poltype.toroptbasissetfile+' '+poltype.iodinetoroptbasissetfile +' '+ ']'+'\n')
-        temp=ReadInBasisSet(poltype,temp,poltype.toroptbasissetfile,poltype.iodinetoroptbasissetfile,'    ')
+        temp.write('assign '+poltype.toroptbasisset+'\n')
+        temp.write('assign I '+poltype.iodinetoroptbasisset+'\n')
         temp.write('    }'+'\n')
         temp.write('try:'+'\n')
 
@@ -2524,8 +2524,8 @@ def CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,m
     spacedformulastr=optmol.GetSpacedFormula()
     if ('I ' in spacedformulastr):
         temp.write('basis {'+'\n')
-        temp.write('['+' '+poltype.torspbasissetfile+' '+poltype.iodinetorspbasissetfile +' '+ ']'+'\n')
-        temp=ReadInBasisSet(poltype,temp,poltype.torspbasissetfile,poltype.iodinetorspbasissetfile,'')
+        temp.write('       assign '+poltype.torspbasisset+'\n')
+        temp.write('       assign I '+poltype.iodinetorspbasisset+'\n')
         temp.write('}'+'\n')
         temp.write("E, wfn = energy('%s',return_wfn=True)" % (poltype.torspmethod.lower())+'\n')
 
@@ -2539,31 +2539,6 @@ def CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,m
     outputname=os.path.splitext(inputname)[0] + '.log'
     return inputname,outputname
 
-
-def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetfile,space):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-
-    newtemp=open(poltype.basissetpath+normalelementbasissetfile,'r')
-    results=newtemp.readlines()
-    newtemp.close()
-    for line in results:
-        if '!' not in line:
-            tmpfh.write(space+line)
-
-
-    newtemp=open(poltype.basissetpath+otherelementbasissetfile,'r')
-    results=newtemp.readlines()
-    newtemp.close()
-    for line in results:
-        if '!' not in line:
-            tmpfh.write(space+line)
-    return tmpfh
 
 
 def RemoveDuplicateRotatableBondTypes(poltype,torlist):

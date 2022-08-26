@@ -394,10 +394,13 @@ class PolarizableTyper():
         dmabasissetfile:str='6-311g_st__st_.0.gbs'
         espbasissetfile:str='aug-cc-pvtz.1.gbs'
         iodinetorspbasissetfile:str='def2-svp.1.gbs'
+        iodinetorspbasisset:str='def2-svp'
         iodinetoroptbasissetfile:str='def2-svp.1.gbs'
+        iodinetoroptbasisset:str='def2-svp'
         iodineoptbasissetfile:str='def2-svp.1.gbs'
         iodinedmabasissetfile:str='def2-svp.1.gbs'
         iodineespbasissetfile:str='def2-tzvpp.1.gbs'
+        iodineespbasisset:str='def2-tzvpp'
         basissetpath:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/'+'BasisSets/'
         refinenonaroringtors:bool=False
         maxgrowthcycles:int=4
@@ -439,6 +442,7 @@ class PolarizableTyper():
         optbasisset:str='6-31G*'
         toroptbasisset:str='6-311G'
         dmabasisset:str='6-311G**'
+        iodinedmabasisset:str='def2-svp'
         espbasisset:str="aug-cc-pVTZ"
         torspbasisset:str="6-311+G*"
         optmethod:str='MP2'
@@ -4760,14 +4764,16 @@ class PolarizableTyper():
                 self.MolecularDynamics()
 
 
-
         def GenerateDuplicateXYZsFromOPTs(self,xyzfname,keyfname,optmolist):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: If user gives multipole parameters as input, then need to skip calling poledit to generate tinker XYZ file, so this method makes tinker XYZ file for you. 
+            Input: Tinker XYZ name, tinker key name, list of optimized mol objects (need many when fitting several conformations for multipole).
+            Output: list of tinker XYZs and list of tinker keys used as input for generating QM input for electrostatic surface potential fitting for multipole parameters. 
+            Referenced By: GenerateParameters
+            Description:
+            1.  Iterate over all mol objects
+            2.  Extract the atom indices and coordinates
+            3.   
             """
             xyzfnamelist=[]
             keyfnamelist=[]
@@ -4783,8 +4789,6 @@ class PolarizableTyper():
                 self.GenerateTinkerXYZ(xyzfname,newxyzfname,indextocoordinates)
                 xyzfnamelist.append(newxyzfname)
                 keyfnamelist.append(keyfname)
-
-
 
             return xyzfnamelist,keyfnamelist
 

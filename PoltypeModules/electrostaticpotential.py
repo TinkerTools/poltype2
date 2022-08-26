@@ -170,8 +170,8 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
         spacedformulastr=mol.GetSpacedFormula()
         if ('I ' in spacedformulastr):
             temp.write('basis {'+'\n')
-            temp.write('['+' '+poltype.espbasissetfile+' '+poltype.iodineespbasissetfile +' '+ ']'+'\n')
-            temp=ReadInBasisSet(poltype,temp,poltype.espbasissetfile,poltype.iodineespbasissetfile)
+            temp.write('assign '+poltype.espbasisset+'\n')
+            temp.write('assign I '+poltype.iodineespbasisset+'\n')
             temp.write('}'+'\n')
         if makecube==True:
             temp.write("E, wfn = properties('%s',properties=['dipole','GRID_ESP','WIBERG_LOWDIN_INDICES','MULLIKEN_CHARGES'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
@@ -215,7 +215,6 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     temp.write('set freeze_core True'+'\n')
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
     temp.write("set cubeprop_tasks ['esp']"+'\n')
-    temp.write('set basis %s '%(poltype.dmabasisset)+'\n')
     if poltype.allowradicals==True:
         temp.write('set reference uhf '+'\n')
 
@@ -224,8 +223,8 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
         spacedformulastr=mol.GetSpacedFormula()
         if ('I ' in spacedformulastr):
             temp.write('basis {'+'\n')
-            temp.write('['+' '+poltype.dmabasissetfile+' '+poltype.iodinedmabasissetfile +' '+ ']'+'\n')
-            temp=ReadInBasisSet(poltype,temp,poltype.dmabasissetfile,poltype.iodinedmabasissetfile)
+            temp.write('assign '+poltype.dmabasisset+'\n')
+            temp.write('assign I '+poltype.iodinedmabasisset+'\n')
             temp.write('}'+'\n')
             temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower())+'\n')
 
@@ -239,29 +238,7 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     temp.close()
     return inputname
 
-def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetfile):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    newtemp=open(poltype.basissetpath+normalelementbasissetfile,'r')
-    results=newtemp.readlines()
-    newtemp.close()
-    for line in results:
-        if '!' not in line:
-            tmpfh.write(line)
 
-
-    newtemp=open(poltype.basissetpath+otherelementbasissetfile,'r')
-    results=newtemp.readlines()
-    newtemp.close()
-    for line in results:
-        if '!' not in line:
-            tmpfh.write(line)
-    return tmpfh
 
 
 
@@ -396,7 +373,6 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
     #NOTE: Need to pass parameter to specify basis set
     if ('dma' in comfname):
         if ('I ' in poltype.mol.GetSpacedFormula()):
-            poltype.dmabasisset='gen'
             iodinebasissetfile=poltype.iodinedmabasissetfile 
             basissetfile=poltype.dmabasissetfile 
             #poltype.dmamethod='wB97XD'
@@ -497,6 +473,8 @@ def GenerateElementToBasisSetLines(poltype,basissetfile):
             lines=[line]
         else:
             lines.append(line)
+
+
     return elementtobasissetlines
  
 def CombineFiles(poltype,namelist,name):
