@@ -398,6 +398,7 @@ class PolarizableTyper():
         iodinetoroptbasissetfile:str='def2-svp.1.gbs'
         iodinetoroptbasisset:str='def2-svp'
         iodineoptbasissetfile:str='def2-svp.1.gbs'
+        iodineoptbasisset:str='def2-svp'
         iodinedmabasissetfile:str='def2-svp.1.gbs'
         iodineespbasissetfile:str='def2-tzvpp.1.gbs'
         iodineespbasisset:str='def2-tzvpp'
@@ -4398,6 +4399,9 @@ class PolarizableTyper():
             self.GrabTautomers(m)
             if self.genprotstatesonly==True:
                 sys.exit()
+            if ('I ' in self.mol.GetSpacedFormula()):
+                self.optmethod='wB97X-D'
+
             if ('Br ' in self.mol.GetSpacedFormula()):
                 self.torspbasisset=self.torspbasissethalogen
             self.pcm=False
@@ -4773,13 +4777,16 @@ class PolarizableTyper():
             Description:
             1.  Iterate over all mol objects
             2.  Extract the atom indices and coordinates
-            3.   
+            3.  Tinker XYZ may already exist for first opt conformation, so append to list, else need to generate tinker XYZ fysing coordinates from optmol (other conformorations) and use initial tinker XYZ as template 
             """
             xyzfnamelist=[]
             keyfnamelist=[]
+            # STEP 1
             for optmolidx in range(len(optmolist)):
                 optmol=optmolist[optmolidx]
+                # STEP 2
                 indextocoordinates=self.GrabIndexToCoordinates(optmol)
+                # STEP 3
                 if optmolidx==0:
                     xyzfnamelist.append(xyzfname)
                     keyfnamelist.append(keyfname)
@@ -4793,25 +4800,30 @@ class PolarizableTyper():
             return xyzfnamelist,keyfnamelist
 
 
-
         def ExtractMOLInfo(self,mol):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Used for when need to extract information from mol object and then can later be used for generating tinker XYZ
+            Input: mol object
+            Output: Dictionaries mapping atom indices to coordinates,connectivity and elements
+            Referenced By: GenerateParameters 
             Description: 
+            1. Iterate over mol objec atoms
+            2. Extract index, element symbol, coordinates
+            3. Save information to dictionaries
             """
             atmindextocoordinates={}
             atmindextoconnectivity={}
             atmindextoelement={}
             iteratom = openbabel.OBMolAtomIter(mol)
             an = pyasl.AtomicNo()
+            # STEP 1
             for atom in iteratom:
+                # STEP 2
                 index=atom.GetIdx()
                 atomicnum=atom.GetAtomicNum()
                 coords=[atom.GetX(),atom.GetY(),atom.GetZ()]
                 element=an.getElSymbol(atomicnum)
+                # STEP 3
                 atmindextocoordinates[index]=coords
                 connectivity=self.GrabConnectivity(mol,index)
                 atmindextoconnectivity[index]=connectivity
@@ -4823,17 +4835,23 @@ class PolarizableTyper():
 
         def GrabConnectivity(self,mol,index):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Grab connecting atom indices to input atom. Useful for reconstructing tinker XYZs.
+            Input: mol object and atom of interest
+            Output: List of atom indices connected to atom index of interest
+            Referenced By: ExtractMOLInfo
             Description: 
+            1. Iterate over all bonds
+            2. Extract bond atom indices (a,b)
+            3. If a is atom index of interest, append b, else if b is atom index of interest. append a
             """
             conn=[]
+            # STEP 1
             bonditer=openbabel.OBMolBondIter(mol)
             for bond in bonditer:
+                # STEP 2
                 oendidx = bond.GetEndAtomIdx()
                 obgnidx = bond.GetBeginAtomIdx()
+                # STEP 3
                 if oendidx==index:
                     if obgnidx not in conn:
                         conn.append(obgnidx)
@@ -4842,44 +4860,60 @@ class PolarizableTyper():
                         conn.append(oendidx)
             return conn
 
-
         def GenerateTinkerXYZ(self,xyzfname,newxyzfname,indextocoordinates):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Generate Tinker XYZ for other conformations needed for multipole fitting
+            Input: Template tinker XYZ name, new tinker XYZ name, dictionary of atom indices to coordinates
+            Output: -
+            Referenced By: GenerateDuplicateXYZsFromOPTs
             Description: 
+            1. Read in lines of template tinker XYZ into array (results)
+            2. Iterate over array (results)
+            3. If line contains coordinate information, extract current atom index from line then extract coordinates from dictionary
+            4. Replace old coordinates with new coordinates
+            5. Write new line to new file
             """
+            # STEP 1
             temp=open(xyzfname,'r')
             results=temp.readlines()
             temp.close()
             temp=open(newxyzfname,'w')
+            # STEP 2
             for line in results:
                 linesplit=line.split()
                 if len(linesplit)>1:
+                    # STEP 3
                     index=int(linesplit[0])
                     coords=indextocoordinates[index-1]
+                    # STEP 4
                     linesplit[2]=str(coords[0])
                     linesplit[3]=str(coords[1]) 
                     linesplit[4]=str(coords[2])
                     line=' '.join(linesplit)+'\n'
+                # STEP 5
                 temp.write(line)
             temp.close()
 
 
         def GenerateListOfMols(self,mol,indextocoordslist):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Need many mol objects for each QM geometry optimization, when you want to fit multipoles with many conformations
+            Input: mol object, list of dictionaries mapping atom indices to coordinates for different conformations
+            Output: List of mol objects
+            Referenced By: GenerateParameters 
             Description: 
+            1. First item in list needs to be the original mol object (extended conformation)
+            2. Iterate over list of dictionaries
+            3. For all other conformations in list, read in initial SDF file, then change coordinates based on dictionary information
+            4. Append updated mol object to list of mol objects 
             """
+            # STEP 1
             molist=[mol]
             obConversion = openbabel.OBConversion()
+            # STEP 2
             for i in range(len(indextocoordslist)):
                 if i!=0:
+                    # STEP 3
                     indextocoordinates=indextocoordslist[i] 
                     othermol = openbabel.OBMol()
                     inFormat = obConversion.FormatFromExt(self.molstructfname)
@@ -4887,6 +4921,7 @@ class PolarizableTyper():
                     obConversion.ReadFile(othermol, self.molstructfname)
                     othermol=self.SetDefaultCoordinatesBabel(othermol,indextocoordinates)
                     othermol.SetTotalCharge(self.totalcharge)
+                    # STEP 4
                     molist.append(othermol)
 
             return molist
@@ -4894,22 +4929,31 @@ class PolarizableTyper():
 
         def FinalVDWMultipoleCheck(self,keyfile):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Sanity check to ensure no vdw parameters or multipoles are missing from final tinker key file. Tinker will not give undefined parameter error if vdw parameters are missing!
+            Input: Keyfile
+            Output: - 
+            Referenced By: GenerateParameters 
+            Description:
+            1. Read in keyfile contents to an array (results)
+            2. Extract type numbers from dictionary idxtosymclass 
+            3. Initialize arrays to not found any vdw/mpole parameters
+            4. Iterate over results array and if detect vdw or multipole parameters, set array values to True
+            5. If any values in array are False (missing) for vdw or multipole, then raise Error 
             """
+            # STEP 1
             temp=open(keyfile,'r')
             results=temp.readlines()
             temp.close()
             vdwtypetofound={}
             mpoletypetofound={}
+            # STEP 2
             typenums=list(self.idxtosymclass.values())
+            # STEP 3
             for typenum in typenums:
                 typenum=str(typenum)
                 vdwtypetofound[typenum]=False
                 mpoletypetofound[typenum]=False
+            # STEP 4
             for line in results:
                 if '#' not in line:
                     if 'vdw' in line or 'multipole' in line:
@@ -4919,7 +4963,7 @@ class PolarizableTyper():
                             vdwtypetofound[typenum]=True
                         elif 'multipole' in line:
                             mpoletypetofound[typenum]=True
-
+            # STEP 5
             missingvdw=[]
             missingmpole=[]
             for typenum,found in vdwtypetofound.items():
@@ -4931,30 +4975,21 @@ class PolarizableTyper():
                     missingmpole.append(typenum)
 
             if len(missingvdw)!=0:
-                if self.firsterror==True:
-                    raise ValueError('Missing vdw parameters '+str(missingvdw))
-                else:
-                    self.DeleteFilesWithExtension(['key','xyz','key_2','key_3','key_4','key_5','xyz_2'])
-                    self.firsterror=True
-                    self.GenerateParameters()
+                raise ValueError('Missing vdw parameters '+str(missingvdw))
 
 
             if len(missingmpole)!=0:
-                if self.firsterror==True:
-                    raise ValueError('Missing multipole parameters '+str(missingmpole))
-                else:
-                    self.DeleteFilesWithExtension(['key','xyz','key_2','key_3','key_4','key_5','xyz_2'])
-                    self.firsterror=True
-                    self.GenerateParameters()
+                raise ValueError('Missing multipole parameters '+str(missingmpole))
 
 
         def AddIndicesToKey(self,keyfilename):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Its confusing to look at type numbers and compare to structure visualization, so add comments to keyfile that inform user of which atom indices correspond to which atom types
+            Input: Keyfile
+            Output: -
+            Referenced By: GenerateParameters 
             Description: 
+            1. 
             """
             temp=open(keyfilename,'r')
             results=temp.readlines()

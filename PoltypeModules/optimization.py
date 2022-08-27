@@ -85,6 +85,8 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
         if len(linesplit)==4 and '#' not in line:
             temp.write(line)
     temp.write('}'+'\n')
+
+    spacedformulastr=mol.GetSpacedFormula()
     if poltype.optpcm==True:
         temp.write('set {'+'\n')
         temp.write('  MAX_FORCE_G_CONVERGENCE 2.5e-2'+'\n')
@@ -186,17 +188,15 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
 
     if poltype.allowradicals==True:
         temp.write('set reference uhf '+'\n')
-
-
+    
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
-    spacedformulastr=mol.GetSpacedFormula()
     if ('I ' in spacedformulastr):
-        temp.write('    basis {'+'\n')
-        temp.write('    ['+' '+poltype.optbasissetfile+' '+poltype.iodineoptbasissetfile +' '+ ']'+'\n')
-        temp=ReadInBasisSet(poltype,temp,poltype.optbasissetfile,poltype.iodineoptbasissetfile)
-        temp.write('    }'+'\n')
+        temp.write('basis {'+'\n')
+        temp.write('assign '+poltype.optbasisset+'\n')
+        temp.write('assign I '+poltype.iodineoptbasisset+'\n')
+        temp.write('}'+'\n')
         if len(torsionrestraints)!=0:
             temp.write('try:'+'\n')
 
@@ -233,29 +233,6 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     outputname=os.path.splitext(inputname)[0] + '.log'
     return inputname,outputname
 
-def ReadInBasisSet(poltype,tmpfh,normalelementbasissetfile,otherelementbasissetfile):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    newtemp=open(poltype.basissetpath+normalelementbasissetfile,'r')
-    results=newtemp.readlines()
-    newtemp.close()
-    for line in results:
-        if '!' not in line:
-            tmpfh.write('    '+line)
-
-
-    newtemp=open(poltype.basissetpath+otherelementbasissetfile,'r')
-    results=newtemp.readlines()
-    newtemp.close()
-    for line in results:
-        if '!' not in line:
-            tmpfh.write('    '+line)
-    return tmpfh
 
 
 
@@ -397,7 +374,8 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
     optstr=gen_opt_str(poltype,optimizeoptlist)
     if ('I ' in spacedformulastr):
         prevoptbasisset=poltype.optbasisset
-        poltype.optbasisset='gen'
+        if (poltype.use_gaus==True or poltype.use_gausoptonly==True):
+            poltype.optbasisset='gen'
     if poltype.freq==True:
         if poltype.optpcm==True:
             optstring= "%s %s/%s freq SCRF=(PCM)" % (optstr,poltype.optmethod,poltype.optbasisset)
@@ -776,7 +754,6 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
         
            
     else:
-
         gen_optcomfile(poltype,comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,chkoptfname,mol,modred,torsionrestraints)
         term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)
         modred=False

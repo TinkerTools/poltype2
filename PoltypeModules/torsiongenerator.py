@@ -2182,10 +2182,10 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
     spacedformulastr=optmol.GetSpacedFormula()
     if ('I ' in spacedformulastr):
-        temp.write('    basis {'+'\n')
+        temp.write('basis {'+'\n')
         temp.write('assign '+poltype.toroptbasisset+'\n')
         temp.write('assign I '+poltype.iodinetoroptbasisset+'\n')
-        temp.write('    }'+'\n')
+        temp.write('}'+'\n')
         temp.write('try:'+'\n')
 
         temp.write("    optimize('%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.toroptmethod.lower(),'geometric')+'\n')
