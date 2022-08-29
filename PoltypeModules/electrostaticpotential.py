@@ -215,6 +215,7 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     temp.write('set freeze_core True'+'\n')
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
     temp.write("set cubeprop_tasks ['esp']"+'\n')
+    temp.write('set basis %s '%(poltype.dmabasisset)+'\n')
     if poltype.allowradicals==True:
         temp.write('set reference uhf '+'\n')
 

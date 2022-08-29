@@ -64,7 +64,7 @@ def SubmitJobs(poltype,jobtolog,jobtojobpath,jobtoinputfilepaths,jobtooutputfile
     Referenced By: 
     Description: 
     """
-    if len(jobtolog.keys())!=0 and self.externalapi!=None:
+    if len(jobtolog.keys())!=0 and poltype.externalapi!=None:
         CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,jobinfofilepath,makejobfileonly,jobtooutputfilepath)
     if makejobfileonly==True:
         sys.exit()
