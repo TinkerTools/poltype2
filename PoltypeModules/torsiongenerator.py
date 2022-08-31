@@ -2109,6 +2109,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
         temp.write(" 'convergence_set' : 'GAU_LOOSE',"+'\n')
         temp.write(" 'convergence_energy' : 1e-4,"+'\n')
     temp.write(" 'constraints' : {"+'\n')
+    first=True
     for i in range(len(rottors)):
         tor=rottors[i]
         rta,rtb,rtc,rtd=tor[:]
@@ -2116,13 +2117,13 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
         if rtang<0:
             rtang=rtang+360
 
-        if i!=0:
+        if first==False:
             temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang)%360))))
             optkingarray.append(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
         else:
             temp.write(" 'set' : [{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang)%360))))
             optkingarray.append('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
-
+            first=False
 
     for i in range(len(frotors)):
         tor=frotors[i]
@@ -2130,9 +2131,14 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
         rtang = inputmol.GetTorsion(rta,rtb,rtc,rtd)
         if rtang<0:
             rtang=rtang+360
-        temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang)%360))))
-        optkingarray.append(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
-        
+        if first==False:
+            temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang)%360))))
+            optkingarray.append(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
+        else:
+            temp.write(" 'set' : [{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(round((rtang)%360))))
+            optkingarray.append('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
+            first=False
+
 
     temp.write("]"+'\n')
     temp.write("  }"+'\n')
