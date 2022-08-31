@@ -144,7 +144,7 @@ class PolarizableTyper():
         pymolscript:str=os.path.join(os.path.split(__file__)[0],'pymolfunctions.py')
         indextompoleframefile:None=None
         qmrelativeweight:float=1
-        liqrelativeweight:float=2.5
+        liqrelativeweight:float=1.5
         enthalpyrelativeweight:float=1
         densityrelativeweight:float=.01
         indextotypefile:None=None
@@ -368,7 +368,6 @@ class PolarizableTyper():
         dovdwscan:bool=False
         vdwprobepathname:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/VdwProbes/'
         vdwprobenames:list=field(default_factory=lambda : ['water'])
-        use_gausgeomoptonly:bool=False
         maxtorRMSPDRel:float=.2
         vdwmissingfilename:str='missingvdw.txt'
         databaseprmfilename:str='database.prm'
@@ -377,7 +376,6 @@ class PolarizableTyper():
         torfit1Drotonly:bool=False
         externalparameterdatabase:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'externalparameterdatabase.txt'
         fitfirsttorsionfoldphase:bool=False
-        keyfiletoaddtodatabase:None=None
         skipgridsearch:bool=True
         torsionprmguessfilename:str='torsionprmguess.txt'
         defaultmaxtorsiongridpoints:int=40
@@ -982,16 +980,12 @@ class PolarizableTyper():
                             self.optonly=self.SetDefaultBool(line,a,True)
                         elif "use_qmopt_vdw" in newline:
                             self.use_qmopt_vdw=self.SetDefaultBool(line,a,True)
-                        elif "use_gausgeomoptonly" in newline:
-                            self.use_gausgeomoptonly=self.SetDefaultBool(line,a,True)
                         elif "use_gau_vdw" in newline:
                             self.use_gau_vdw=self.SetDefaultBool(line,a,True)
                         elif "tortor" in newline and 'only' not in newline:
                             self.tortor=self.SetDefaultBool(line,a,True)
                         elif "tordebugmode" in newline:
                             self.tordebugmode=self.SetDefaultBool(line,a,True)
-                        elif "keyfiletoaddtodatabase" in newline:
-                            self.keyfiletoaddtodatabase=a
                         elif "email" in newline:
                             self.email=a
                         elif "refinenonaroringtors" in newline:
@@ -2782,7 +2776,11 @@ class PolarizableTyper():
             self.chkespfname = self.assign_filenames ( "chkespfname" , "-esp.chk")
             self.fckespfname = self.assign_filenames ( "fckespfname" , "-esp.fchk")
             self.logespfname = self.assign_filenames ( "logespfname" , "-esp.log")
-
+            self.comoptfname=self.firstcomoptfname 
+            self.chkoptfname=self.firstchkoptfname 
+            self.fckoptfname=self.firstfckoptfname
+            self.logoptfname=self.firstlogoptfname 
+            self.gausoptfname=self.firstgausoptfname
 
         def assign_filenames (self,filename,suffix):
             """
@@ -4305,10 +4303,56 @@ class PolarizableTyper():
             Referenced By: main  
             Description: 
             1. Convert input structure to SDF format
-            2. If not a fragment job, then make a folder called Temp, copy input files into Temp and perform poltype calculations within this folder. This way when return final.xyz and final.key to the user it is a lot less messy. 
+            2. If not a fragment job, then make a folder called Temp, copy input files into Temp and perform poltype calculations within this folder. This way when return final.xyz and final.key to the user it is a lot less messy.
+            3. If user specifies to delete all non QM files, then delete them.
+            4. Read in SDF file to openbabel mol object
+            5. Initialize poltype.log file handle
+            6. Convert SDF to MOL file, so rdkit mol object can be generated (has different functions available than openbabel)
+            7. Check if input atoms are allowed (by current types in AMOEBA), if ANI-2 is used, check if input atoms are allowed. If there are no hydrogens in the molecule just print a warning to log file and standard output.
+            8. Determine formal charges and total charge from input SDF file, in some cases such as nitrogen or carbon unprotonated, then will automatically add hydrogen. 
+            9. Check for multiple fragments in input file, if detected, then crash program.
+            10. Determine if need to use PCM based on if any hydrogens and concentrated formal charges. 
+            11. Initialize array containing atomic indices to coordinates for each conformation that will be used for multipole fitting (can fit many conformations)
+            12. Determine if the whole molecule is one giant ring (like host etc), then dont want to generate extended conformations (cause issues in rdkit)
+            13. If molecule input is 2D coordinates, generate 3D coordinates
+            14. Generate extended conformation via rdkit and also if user specifies, add more conformations for multipole fitting.
+            15. Update rdkit object with extended conformation coordinates
+            16. If scratch directories dont exist, then make them.
+            17. Generate ionization states and enumerate tautomers, if user only wants to generate protonation states, then exit. 
+            18. Iodine requires def2 basis sets with ECP and ECP-MP2 analytical gradients are not implemented in psi4, so if Iodine is detected in molecule, then change default basis set from MP2 to wB97X-D
+            19. The default basis set for torsion SP, doesnt have Br, so remove the + and use slightly lower basis set.
+            20. Remove any cartesian XYZ files, as they interfere with tinker XYZ files (same extension) 
+            21. Compute symmetry type numbers for input molecule. 
+            22. Find partial double bonds in molecule, for later use in deciding which torsions to transfer and fit from database
+            23. For each conformation needed to be fit for multipoles, compute the QM geometry optimization. Then afterwords check to ensure no bonds were created/broken if so, then crash the program.
+            24. If user is providing multipole and polarize parameter to poltype, then dont need to run QM geometry optimization so generate a fake geometry opt XYZ output file from input coordinates.
+            25. If user wants to only do geometry optimzation then quit program
+            26. Search database for parameters to be later appended to keyfile.
+            27. Compute QM needed for GDMA to determine initial multipole parameters
+            28. Run GDMA from output of QM in previous step
+            29. Grab polarize parameters from database, to be used as input for poledit to generate first tinker XYZ and key files
+            30. Generate poledit input file, using polarize parameters as inputs. Multipole symmetry frame detection is used also. 
+            31. Run poledit to generate first tinker XYZ and key file
+            32. Append header to keyfile, replace empty spaces in multipole frame definition with zeroes, alzo ensure x components of multipole that need to be zeroed out are zeroed out prior to averaging then electrostatic potential fitting.
+            33. If the user requested multiple conformations for multipole fitting, then use the first generated tinker XYZ as a template and generate the other tinker XYZs using optimized coordinates from each conformation.
+            34. Compute high level QM for generating electrostatic potential grid for multipole fitting later
+            35. Generate the electrostatic potential grid using output from QM computed in last step
+            36. Average multipole and polarize parameters via atom types 
+            37. Add comments to key file for polarize parameters section
+            38. Electrostatic potential fitting
+            39. Remove header from output key file
+            40. Append database parameters to keyfile
+            41. Determine list of rotatable bonds that need to have parameters derived based on what was found from database matching, list will be used by fragmenter later. Determine how many points on dihedral surface need to sample based on number of torsions around rotatable bond that need to be derived and how many cosine terms used for fitting. 
+            42. Turn off fragmenter if number of atoms < 25
+            43. If there are missing vdw parameters and the user specifies to fit vdw parameters, then add relevant atom indices to be probed into array for fragmenter to handle later. 
+            44. If user specifies to fit vdw parameters, then call the fragmenter and generate fragment jobs, then run the fragment poltype jobs. 
+            45. If user specifies to fit vdw parameters, now parse the output key files from vdw fragmentjobs and update parent key with vdw parameters derived in fragment.
+            46. If user specifies to do tor-tor, then add list of rotatble bonds to array for fragmenter to later fragment.
+            47. 
             """
             # STEP 1 
             self.molstructfname=self.ConvertInputStructureToSDFFormat(self.molstructfname)
+            # STEP 2
             if self.isfragjob==False:
                 foldername='Temp'
                 if not os.path.exists(foldername):
@@ -4324,32 +4368,31 @@ class PolarizableTyper():
                     shutil.copy(self.inputkeyfile,os.path.join(foldername,self.inputkeyfile))
 
                 os.chdir(foldername)
-            self.startdir=os.getcwd()
             self.totalcharge=None
+            # STEP 3
             if self.deleteallnonqmfiles==True:
                 self.DeleteAllNonQMFiles()
-            if self.optmaxcycle>=100:
-                self.fullopt=True
-            else:
-                self.fullopt=False
+            # STEP 4
             obConversion = openbabel.OBConversion()
             mol = openbabel.OBMol()
             inFormat = obConversion.FormatFromExt(self.molstructfname)
             obConversion.SetInFormat(inFormat)
             obConversion.ReadFile(mol, self.molstructfname)
-
-            self.atomnum=mol.NumAtoms() 
+            self.atomnum=mol.NumAtoms()
+            # STEP 5 
             self.logfh = open(self.logfname,"w",buffering=1)
-
+            # STEP 6
             self.molstructfnamemol=self.molstructfname.replace('.sdf','.mol')
             if '.mol' not in self.molstructfname: 
                 obConversion.SetOutFormat('mol')
                 obConversion.WriteFile(mol,self.molstructfnamemol)
             indextocoordinates=self.GrabIndexToCoordinates(mol)
             m=Chem.MolFromMolFile(self.molstructfnamemol,removeHs=False,sanitize=False)
+            # STEP 7
             self.CheckIfAtomsAreAllowed(m)
             self.CheckIfAtomsAreAllowedANI(m)
             self.CheckForHydrogens(m)
+            # STEP 8
             m,atomindextoformalcharge=self.CheckInputCharge(m,verbose=True)
             if self.allowradicals==True:
                 self.dontfrag=True # Psi4 doesnt allow UHF and properties (like compute WBO) for fragmenter, so need to turn of fragmenter if radical detected
@@ -4357,53 +4400,14 @@ class PolarizableTyper():
             if self.addhydrogentocharged==True and self.isfragjob==False:
                 m = Chem.AddHs(m)
                 AllChem.EmbedMolecule(m)
-
             self.indextoatomicsymbol=self.GrabAtomicSymbols(m)
             Chem.SanitizeMol(m)
+            # STEP 9
             smarts=rdmolfiles.MolToSmarts(m)
             if '.' in smarts:
                 raise ValueError('Multiple fragments detectected in input molecule')
+            # STEP 10
             pcm=self.CheckForConcentratedFormalCharges(m,atomindextoformalcharge)
-            cpm = copy.deepcopy(m)
-            indextocoordslist=[indextocoordinates]
-            iswholemoleculering=self.CheckIfWholeMoleculeIsARing(mol)
-            if iswholemoleculering==True:
-                self.generateextendedconf=False
-            if self.firstoptfinished==False and self.isfragjob==False and self.generateextendedconf==True:
-                indextocoordslist=self.GenerateExtendedConformer(m,mol)
-                indextocoordinates=indextocoordslist[0]
-            Chem.GetSymmSSSR(m)
-            m.GetRingInfo().NumRings() 
-            try:
-                m=self.AddInputCoordinatesAsDefaultConformer(m,indextocoordinates)
-            except:
-                pass
-            if self.generateextendedconf==True:
-                rdmolfiles.MolToMolFile(m,'extendedconf.mol')
-            mol,m=self.CheckIsInput2D(mol,obConversion,m)
-            if not os.path.exists(self.scrtmpdirpsi4):
-                os.mkdir(self.scrtmpdirpsi4)
-            if not os.path.exists(self.scrtmpdirgau):
-                os.mkdir(self.scrtmpdirgau)
-
-            mol=self.SetDefaultCoordinatesBabel(mol,indextocoordinates)
-            molist=self.GenerateListOfMols(mol,indextocoordslist)
-            self.mol=mol
-
-            self.rdkitmol=m
-            self.mol.SetTotalCharge(self.totalcharge)
-            if self.keyfiletoaddtodatabase!=None:
-                databaseparser.AddKeyFileParametersToParameterFile(self,m)   
-                sys.exit()
-            self.GrabIonizationStates(m)
-            self.GrabTautomers(m)
-            if self.genprotstatesonly==True:
-                sys.exit()
-            if ('I ' in self.mol.GetSpacedFormula()):
-                self.optmethod='wB97X-D'
-
-            if ('Br ' in self.mol.GetSpacedFormula()):
-                self.torspbasisset=self.torspbasissethalogen
             self.pcm=False
             if pcm==True and self.dontusepcm==False:
                 self.pcm=True
@@ -4419,43 +4423,68 @@ class PolarizableTyper():
                 self.use_gaus=True
                 self.SanitizeAllQMMethods()
 
-            atomiter=openbabel.OBMolAtomIter(self.mol)
-            atomnum=0
-            for atom in atomiter:
-                atomnum+=1
-                atomidx=atom.GetIdx()
-                atomicnum=atom.GetAtomicNum()
+            # STEP 11 
+            indextocoordslist=[indextocoordinates]
+            # STEP 12
+            iswholemoleculering=self.CheckIfWholeMoleculeIsARing(mol)
+            if iswholemoleculering==True:
+                self.generateextendedconf=False
+            # STEP 13
+            mol,m=self.CheckIsInput2D(mol,obConversion,m)
+            # STEP 14
+            if self.firstoptfinished==False and self.isfragjob==False and self.generateextendedconf==True:
+                indextocoordslist=self.GenerateExtendedConformer(m,mol)
+                indextocoordinates=indextocoordslist[0]
+            # STEP 15
+            Chem.GetSymmSSSR(m)
+            m.GetRingInfo().NumRings() 
+            try:
+                m=self.AddInputCoordinatesAsDefaultConformer(m,indextocoordinates)
+            except:
+                pass
+            if self.generateextendedconf==True:
+                rdmolfiles.MolToMolFile(m,'extendedconf.mol')
 
+            mol=self.SetDefaultCoordinatesBabel(mol,indextocoordinates)
+            # STEP 16 
+            if not os.path.exists(self.scrtmpdirpsi4):
+                os.mkdir(self.scrtmpdirpsi4)
+            if not os.path.exists(self.scrtmpdirgau):
+                os.mkdir(self.scrtmpdirgau)
 
-            self.RemoveCartesianXYZFiles()
- 
-            self.WriteToLog("Running on host: " + gethostname())
-            # Initializing arrays
+            molist=self.GenerateListOfMols(mol,indextocoordslist)
+            self.mol=mol
+            self.rdkitmol=m
+            self.mol.SetTotalCharge(self.totalcharge)
             
+            # STEP 17
+            self.GrabIonizationStates(m)
+            self.GrabTautomers(m)
+            if self.genprotstatesonly==True:
+                sys.exit()
+            # STEP 18
+            if ('I ' in self.mol.GetSpacedFormula()):
+                self.optmethod='wB97X-D'
+            # STEP 19
+            if ('Br ' in self.mol.GetSpacedFormula()):
+                self.torspbasisset=self.torspbasissethalogen
+            
+            # STEP 20
+            self.RemoveCartesianXYZFiles()
+            self.WriteToLog("Running on host: " + gethostname())
+            # STEP 21
             self.canonicallabel = [ 0 ] * mol.NumAtoms()
             self.localframe1 = [ 0 ] * mol.NumAtoms()
             self.localframe2 = [ 0 ] * mol.NumAtoms()
             self.WriteToLog("Atom Type Classification")
-
             self.idxtosymclass,self.symmetryclass=symm.gen_canonicallabels(self,mol,None,self.usesymtypes,True) 
-            # QM calculations are done here
-            # First the molecule is optimized. (-opt) 
-            # This optimized molecule is stored in the structure optmol
-            # Then the electron density matrix is found (-dma)
-            # This is used by GDMA to find multipoles
-            # Then information for generating the electrostatic potential grid is found (-esp)
-            # This information is used by cubegen
-            self.comoptfname=self.firstcomoptfname 
-            self.chkoptfname=self.firstchkoptfname 
-            self.fckoptfname=self.firstfckoptfname
-            self.logoptfname=self.firstlogoptfname 
-            self.gausoptfname=self.firstgausoptfname 
+            
+             
 
-            if self.use_gausgeomoptonly==True:
-                self.use_gausoptonly=True
-
-            torgen.FindPartialDoubleBonds(self,m)
-                
+            # STEP 22
+            torgen.FindPartialDoubleBonds(self,m) # need to find something to hardcode transfer for partial double amide/acid, currently will derive torsion parameters if doesnt find "good" match in torsion database
+            
+            # STEP 23    
             if (self.writeoutpolarize==True and self.writeoutmultipole==True):
                 optmolist,errorlist,torsionrestraintslist = opt.GeometryOPTWrapper(self,molist)
                 optmol=optmolist[0]
@@ -4485,18 +4514,17 @@ class PolarizableTyper():
 
 
             else:
+                # STEP 24
                 optmol=mol
                 tmpconv = openbabel.OBConversion()
                 tmpconv.SetOutFormat('xyz')
                 tmpconv.WriteFile(mol, self.logoptfname.replace('.log','.xyz'))
                 atmindextocoordinates,atmindextoconnectivity,atmindextoelement=self.ExtractMOLInfo(mol)
                 self.GenerateEntireTinkerXYZ(atmindextocoordinates,self.idxtosymclass,atmindextoconnectivity,atmindextoelement,self.xyzfname)
-
+            # STEP 25
             if self.optonly==True:
                 sys.exit()
-            if self.use_gausgeomoptonly==True:
-                self.use_gausoptonly=False
-                self.use_gaus=False
+            # STEP 26
             if not os.path.isfile(self.key4fname) or not os.path.isfile(self.torsionsmissingfilename) or not os.path.isfile(self.torsionprmguessfilename):
                 self.WriteToLog('Searching Database')
                 bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,missingvdwatomindextoneighbors,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo,tortorsmissing=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
@@ -4510,74 +4538,59 @@ class PolarizableTyper():
                 missingvdwatomindices=self.onlyvdwatomlist[:]
             if os.path.isfile(self.tortormissingfilename):
                 tortorsmissing=databaseparser.ReadTorTorList(self,self.tortormissingfilename)
-            #try:
+
+            # STEP 27
             if (self.writeoutpolarize==True and self.writeoutmultipole==True):
                 esp.SPForDMA(self,optmol,mol)
-            #except:
-            #    if self.use_gaus==False: 
-            #        self.use_gaus=True
-            #        esp.SPForDMA(self,optmol,mol) 
-            #        self.use_gaus=False
-            #    else:
-            #        traceback.print_exc(file=sys.stdout)
-            #        sys.exit()
+            
 
-            # Obtain multipoles from Gaussian fchk file using GDMA
-        
+                # STEP 28 
                 if not os.path.isfile(self.gdmafname):
                     mpole.run_gdma(self)
         
-
+                # STEP 29
                 polarindextopolarizeprm,polartypetotransferinfo=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m,polarize=True)
+                # STEP 30
                 lfzerox=mpole.gen_peditinfile(self,mol,polarindextopolarizeprm)
             
                 if (not os.path.isfile(self.xyzfname) or not os.path.isfile(self.keyfname)):
-                    # Run poledit
+                    # STEP 31
                     cmdstr = self.peditexe + " 1 " + self.gdmafname +' '+self.paramhead+ " < " + self.peditinfile
                     self.call_subsystem([cmdstr],True)
                     # Add header to the key file output by poledit
                     while not os.path.isfile(self.keyfnamefrompoledit):
                         time.sleep(1)
                         self.WriteToLog('Waiting for '+self.keyfnamefrompoledit)
-                        
+                    # STEP 32 
                     mpole.prepend_keyfile(self,self.keyfnamefrompoledit,optmol)
                     mpole.SanitizeMultipoleFrames(self,self.keyfnamefrompoledit)
                     mpole.post_proc_localframes(self,self.keyfnamefrompoledit, lfzerox)
                     shutil.copy(self.keyfnamefrompoledit,self.keyfname)
+                # STEP 33
                 xyzfnamelist,keyfnamelist=self.GenerateDuplicateXYZsFromOPTs(self.xyzfname,self.keyfname,optmolist)
-            # post process local frames written out by poledit
+            # STEP 34
             if self.atomnum!=1 and (self.writeoutpolarize==True and self.writeoutmultipole==True): 
-                 #try:
                  gridnamelist,espnamelist,fchknamelist,cubenamelist=esp.SPForESP(self,optmolist,molist,xyzfnamelist,keyfnamelist) 
-                 #except:
-                 #    if self.use_gaus==False: 
-                 #        self.use_gaus=True
-                 #        gridnamelist,espnamelist,fchknamelist,cubenamelist=esp.SPForESP(self,optmolist,molist,xyzfnamelist,keyfnamelist) 
-                 #        self.use_gaus=False
-                 #    else:
-                 #        traceback.print_exc(file=sys.stdout)
-                 #        sys.exit()
 
-            # End here if qm calculations were all that needed to be done 
             if self.qmonly:
                 self.WriteToLog("poltype QM-only complete.")
                 sys.exit(0)
         
                    
             
-            # generate the electrostatic potential grid used for multipole fitting
             if (self.writeoutpolarize==True and self.writeoutmultipole==True):
-                if self.atomnum!=1: 
+                if self.atomnum!=1:
+ 
+                # STEP 35
                     if not os.path.isfile(self.key3fname):
                         potnamelist=esp.gen_esp_grid(self,optmol,gridnamelist,espnamelist,fchknamelist,cubenamelist)
-        
-                # Average multipoles based on molecular symmetry
-                # Does this using the script avgmpoles.pl which is found in the poltype directory
-                # Atoms that belong to the same symm class will now have only one common multipole definition
+                # STEP 36  
                 if not os.path.isfile(self.key2fnamefromavg):
                     self.WriteToLog("Average Multipoles Via Symmetry")
                     mpole.AverageMultipoles(self,optmol)
+                    # STEP 37
                     mpole.AddPolarizeCommentsToKey(self,self.key2fnamefromavg,polartypetotransferinfo)
+                # STEP 38
                 fit=False
                 if self.espfit and not os.path.isfile(self.key3fname) and self.atomnum!=1:
                     xyzfnamelist,keyfnamelist=self.GenerateDuplicateXYZsFromOPTs(self.xyzoutfile,self.key2fnamefromavg,optmolist)   
@@ -4588,10 +4601,12 @@ class PolarizableTyper():
                 elif self.atomnum==1 or self.espfit==False:
                     shutil.copy(self.key2fnamefromavg, self.key3fname)
                 # Remove header terms from the keyfile
+                # STEP 39
                 mpole.rm_esp_terms_keyfile(self,self.key3fname)
                 if fit==True:
                     if self.atomnum!=1: 
-                        esp.ElectrostaticPotentialComparison(self,combinedxyz,combinedpot) 
+                        esp.ElectrostaticPotentialComparison(self,combinedxyz,combinedpot)
+            # STEP 40
             if not os.path.exists(self.key4fname):
                 databaseparser.appendtofile(self,self.key3fname,self.key4fname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo)
                 if self.writeoutangle==True:
@@ -4600,17 +4615,9 @@ class PolarizableTyper():
                 self.AddIndicesToKey(self.key4fname)
                 if self.databasematchonly==True:
                     sys.exit()
-
+            # STEP 41
             torgen.get_all_torsions(self,mol)
-            # Find rotatable bonds for future torsion scans
             (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,mol,torsionsmissing)
-
-            if atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False: 
-                self.dontfrag=True
-            if self.dontfrag==True and self.toroptmethod!='xtb' and 'xtb' not in self.toroptmethodlist: # if fragmenter is turned off, parition resources by jobs at sametime for parent,cant parralelize xtb since coords always written to same filename
-                self.maxmem,self.maxdisk,self.numproc=self.PartitionResources()
-                self.partition=True
-
             torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules
             torlist=[tuple(i) for i in torlist]
             torlist=[tuple([i]) for i in torlist]
@@ -4622,15 +4629,6 @@ class PolarizableTyper():
             self.rotbndtoanginc=torgen.DetermineAngleIncrementAndPointsNeededForEachTorsionSet(self,mol,self.rotbndlist)
             if self.dontdotor==True:
                 torlist=[]
-            
-            # add missingvdwindices to torlist (for fragmenter input)
-            missingvdwatomsets=[]
-            if self.isfragjob==False and self.dovdwscan==True:
-                for vdwatomindex in missingvdwatomindices:
-                    ls=tuple([tuple([vdwatomindex])])
-                    missingvdwatomsets.append(ls)
-                    self.torlist.append(ls)
-  
             self.torsettofilenametorset={}
             self.torsettotortorindex={}
             self.torsettotortorphaseindicestokeep={}
@@ -4638,15 +4636,34 @@ class PolarizableTyper():
             self.nonaroringtorsets=[]
             self.classkeytoinitialprmguess={}
             self.nonarotortotorsbeingfit={}
+            # STEP 42
+            if self.atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False: 
+                self.dontfrag=True
+            if self.dontfrag==True and self.toroptmethod!='xtb' and 'xtb' not in self.toroptmethodlist: # if fragmenter is turned off, parition resources by jobs at sametime for parent,cant parralelize xtb since coords always written to same filename
+                self.maxmem,self.maxdisk,self.numproc=self.PartitionResources()
+                self.partition=True
+
+
+            
+            # STEP 43
+            missingvdwatomsets=[]
+            if self.isfragjob==False and self.dovdwscan==True:
+                for vdwatomindex in missingvdwatomindices:
+                    ls=tuple([tuple([vdwatomindex])])
+                    missingvdwatomsets.append(ls)
+                    self.torlist.append(ls)
+  
+            
             
 
-
+            # STEP 44
             if self.isfragjob==False and not os.path.isfile(self.key5fname) and self.dontfrag==False and (self.dovdwscan==True):
                 self.WriteToLog('Create and Run vdW Fragment Poltype Jobs')
 
                 WBOmatrix,outputname,error=frag.GenerateWBOMatrix(self,self.rdkitmol,self.mol,self.logoptfname.replace('.log','.xyz'))
                 rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor=frag.GenerateFragments(self,self.mol,self.torlist,WBOmatrix,missingvdwatomsets,nonaroringtorlist) # returns list of bond indexes that need parent molecule to do torsion scan for (fragment generated was same as the parent0
                 equivalentrotbndindexarrays,rotbndindextoringtor,rotbndindextoparentrotbndindexes,rotbndindextosmartsindexarray=frag.SpawnPoltypeJobsForFragments(self,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor)
+            # STEP 45
             if self.dontfrag==False and self.isfragjob==False and not os.path.isfile(self.key5fname) and (self.dovdwscan==True):
                 frag.GrabVdwAndTorsionParametersFromFragments(self,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor,self.key4fname,self.key5fname,rotbndindextoparentrotbndindexes,rotbndindextosmartsindexarray) # just dump to key_5 since does not exist for parent molecule
             else:         
@@ -4658,11 +4675,14 @@ class PolarizableTyper():
                         vdwfit.VanDerWaalsOptimization(self,missingvdwatomindices)
                 else:
                     shutil.copy(self.key4fname,self.key5fname)
+
+            # STEP 46
             shutil.copy(self.key5fname,self.key6fname)
             self.torlist=torlist[:]
             if self.tortor==True and self.dontdotor==False:
                 torgen.PrepareTorsionTorsion(self,optmol,mol,tortorsmissing)
             torgen.DefaultMaxRange(self,self.torlist)
+
             if self.refinenonaroringtors==True and self.dontfrag==False:
                 rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
             if self.isfragjob==False and not os.path.isfile(self.key7fname) and self.dontfrag==False and (self.dontdotor==False) and len(self.torlist)!=0:

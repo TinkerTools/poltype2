@@ -35,16 +35,15 @@ def GeometryOPTWrapper(poltype,molist):
             optmol,error,torsionrestraints = GeometryOptimization(poltype,mol,totcharge,suffix=suf)
         except:
             redo=False
-            if poltype.fullopt==True:
-                if poltype.pcm==True:
-                     # Gaussian would have been used first if was detected. 
-                     poltype.pcm=False
-                     poltype.optpcm=False
-                     redo=True
-                else:
-                    if poltype.optmethod=='MP2' and (poltype.use_gaus==False and poltype.use_gausoptonly==False) and poltype.foundgauss==True:
-                        redo=True
-                        poltype.use_gausoptonly=True
+            if poltype.pcm==True:
+                 # Gaussian would have been used first if was detected. 
+                 poltype.pcm=False
+                 poltype.optpcm=False
+                 redo=True
+            else:
+                if poltype.optmethod=='MP2' and (poltype.use_gaus==False and poltype.use_gausoptonly==False) and poltype.foundgauss==True:
+                    redo=True
+                    poltype.use_gausoptonly=True
 
             if redo==True:
                 shutil.copy(poltype.logoptfname,poltype.logoptfname.replace('.log','_failed.log'))
@@ -747,8 +746,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
             poltype.call_subsystem([cmdstr],True)
         term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)
         if error and term==False and skiperrors==False:
-            if poltype.fullopt==True:
-                poltype.RaiseOutputFileError(logoptfname) 
+            poltype.RaiseOutputFileError(logoptfname) 
         optmol =  load_structfile(poltype,logoptfname)
         optmol=rebuild_bonds(poltype,optmol,mol)
         
@@ -785,8 +783,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
 
         term,error=poltype.CheckNormalTermination(logoptfname,None,skiperrors) # now grabs final structure when finished with QM if using Psi4
         if error and term==False and skiperrors==False:
-            if poltype.fullopt==True: # if not doing full opt, assume it did input number of cycles and check if structure is reasonable, otherwise if doing full optcheck if error and crash
-                poltype.RaiseOutputFileError(logoptfname) 
+            poltype.RaiseOutputFileError(logoptfname) 
         GrabFinalXYZStructure(poltype,logoptfname,logoptfname.replace('.log','.xyz'),mol)
         optmol =  load_structfile(poltype,logoptfname.replace('.log','.xyz'))
         optmol=rebuild_bonds(poltype,optmol,mol)

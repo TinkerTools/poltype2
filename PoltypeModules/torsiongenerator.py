@@ -1931,7 +1931,7 @@ def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxr
                    rtang = inputmol.GetTorsion(rta,rtb,rtc,rtd)
                    if rtang<0:
                        rtang=rtang+360
-                   if ((inputmol.GetAtom(rta).GetAtomicNum() == 1) and (inputmol.GetAtom(rtd).GetAtomicNum() == 1) and allhydtors==False and nitrogenhydtor==False):
+                   if ((inputmol.GetAtom(rta).GetAtomicNum() == 1) or (inputmol.GetAtom(rtd).GetAtomicNum() == 1) and allhydtors==False and nitrogenhydtor==False):
                        continue
                    else:
                        restlist.append(resttors)
@@ -2008,7 +2008,7 @@ def FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotb
                     triplet=tuple([rtd,rtc,rtb])
 
 
-            if (rtaatomicnum==1 and rtdatomicnum==1) and (allhydtors==False) and nitrogenhydtor==False:
+            if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False) and nitrogenhydtor==False:
                 continue
             if (allhydtorsoneside==True or allhydtors==True) and (rtaatomicnum==1 or rtdatomicnum==1) and nitrogenhydtor==False:
                 if count>=1:
