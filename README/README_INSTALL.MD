@@ -97,11 +97,9 @@ fi
 
 if [ $OSVERSION == 8 ] ; then
     export PATH=/home/bdw2292/NewestTinkerOS8/bin/:$PATH
-    export TINKERPATH=/home/bdw2292/LatestTinker/bin/ # this is for ForceBalance to recognize tinker path in different nodes
      
 else
     export PATH=/home/bdw2292/NewestTinker/bin/:$PATH
-    export TINKERPATH=/home/bdw2292/NewestTinker/bin/
 
 fi
 
@@ -115,28 +113,6 @@ export GDMADIR=/opt/gdma/gdma-2.3.3/bin/
 export PATH=/opt/gdma/gdma-2.3.3/bin/:$PATH
 export PSI_SCRATCH=/scratch/$myusername/
 ```
-
-
-### ForceBalance Wrapper Setup
-* This is optional to speed up ForceBalance, poltype only wraps input and output of ForceBalance however
-* Install modified forcebalance for Tinker9 GPU dynamics 
-```
-cd ~
-git clone https://github.com/bdw2292/forcebalance.git
-```
-
-* Make sure to copy files from modified forcebalance to conda site packages (for example mine are located /home/bdw2292/miniconda3/envs/FBTest/lib/python3.8/site-packages/forcebalance/) 
-```
-conda install -c conda-forge forcebalance --yes
-cp ~/forcebalance/src/*py /home/bdw2292/miniconda3/envs/amoebamdpoltype/lib/python3.6/site-packages/forcebalance/
-cp ~/forcebalance/src/data/*py /home/bdw2292/miniconda3/envs/amoebamdpoltype/lib/python3.6/site-packages/forcebalance/data/
-
-```
-
-
-### ForceBalance Results Viewing
-
-* Make sure pymol license file is located in /home/USERNAME/.pymol/license.lic
 
 
 ### Explicit Conda Installation

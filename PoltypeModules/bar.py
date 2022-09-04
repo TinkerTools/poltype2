@@ -1704,7 +1704,7 @@ def BARProtocol(poltype):
                 finished=checkfin[0]
                 percentfinished=checkfin[1]
                 while finished==False:
-                    msg='BAR is not complete, '+str(percentfinished)+'% of jobs finished'
+                    msg='BAR is not complete, '+str(percentfinished)+'% of jobs finished out of a total = '+str(len(baroutputfilepath))+ ' jobs '
                     if msg not in messages:
                         poltype.WriteToLog(msg,prin=True)
                         messages.append(msg)

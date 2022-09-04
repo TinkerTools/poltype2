@@ -514,12 +514,7 @@ def ElectrostaticPotentialFitting(poltype,xyzfnamelist,keyfnamelist,potnamelist)
     if poltype.deletedfiles==True:
         poltype.call_subsystem([optmpolecmd],True)
     else:
-        #try:
         poltype.call_subsystem([optmpolecmd],True)
-        #except:
-        #    poltype.DeleteFilesWithExtension(['key','xyz','key_2','xyz_2'])
-        #    poltype.deletedfiles=True
-        #    poltype.GenerateParameters()
     shutil.copy(combinedxyz.replace('.xyz','.key'),poltype.key3fnamefrompot)
     return combinedxyz,combinedpot
 
@@ -796,13 +791,8 @@ def CheckDipoleMoments(poltype,optmol):
         time.sleep(1)
     torgen.RemoveStringFromKeyfile(poltype,poltype.tmpkeyfile,'solvate')
     cmd=poltype.analyzeexe + ' ' + poltype.xyzoutfile+' '+'-k'+' '+poltype.tmpkeyfile + ' em | grep -A11 Charge'+'>'+'MMDipole.txt'
-    #try: 
     poltype.call_subsystem([cmd],True)
 
-    #except: # in case old key_4,key_5 files not working delete and restart
-        #poltype.DeleteFilesWithExtension(['key_4','key_5'])
-        #poltype.GenerateParameters()
-    #    pass
     while not os.path.isfile('MMDipole.txt'):
         time.sleep(1)
     temp=open('MMDipole.txt','r')
@@ -822,10 +812,6 @@ def CheckDipoleMoments(poltype,optmol):
                 if poltype.esprestweight==.1:
                     string='Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+'is bigger than '+str(poltype.dipoletol)+' '+os.getcwd()
                     raise ValueError(string)
-                #else:
-                #    poltype.esprestweight=poltype.esprestweight-.1
-                #    poltype.DeleteFilesWithExtension(['key_4','key_5','key_3','key_2'])
-                #    poltype.GenerateParameters()
 
             else:
                  string='Relative error of '+str(ratio)+' for QMDipole '+str(qmdipole)+' and '+str(mmdipole)+' for MMDipole '+' tolerance = '+str(poltype.dipoletol)+' '+os.getcwd()

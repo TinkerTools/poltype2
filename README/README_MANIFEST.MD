@@ -51,17 +51,6 @@ RMSPD.txt           Textfile computing the root mean square potential difference
 * -poltype.log        Poltype workflow, computations and external calls are shown in here.
 * torsionprmguess.txt Used for storing torsion parameters needed for ring puckering of non-aromatic torsion                                refinement in rings.py module
 
-### Modified Residue Libraries
-
-* residue_connect.txt Topology stored as SMART strings for every NA and AA residue. Immediately after # is the reisude
-                    PDB code. The next line is the SMARTS string. The following line is the atom index corresponding to
-                    the SMARTS string. There is a connect block defining bonds and bond order as well.
-                    amoebabio18.prm and new paramters are appended.
-* lib.bio18_conv1.txt A library containing a map for PDB records to amoebabio18 paramter types for NA's and AA's. The 
-                    first number after atom is the type number, the second number after atom is the class number. The
-                    matching atom PDB label is after the class number. The residue PDB code is defined after # at the
-                    top of each block in library.
-* SMARTSToTypeLib.txt A text file mapping each atom in the modified residue stored as a SMARTS string to its corresponding atom type. 
 
 
 ### qm-torsion
@@ -160,24 +149,15 @@ b_c_* = the middle two atoms involved in all torsions for a given torsion scan s
 ### Parameter Files
 * ModifiedResidue.prm       Modified residue parameters are added to this paramter file. This is originally a copy of 
 * amoeba09.prm              Small molecule parameters that databaseparser uses to assign molecules.
-* amoebabio18.prm           Contains protein parameters used by modifiedresidue library.
+* amoebabio18.prm           Contains protein parameters used by molecular dynamics for proteins/DNA.
 * amoebabio18_header.prm    Header file added to each key file in poltype.
 * externalparameterdatabase.txt External database for adding parameters that databaseparser can assign to molecules.
 * mm3.prm                   Parameters from MM3 force field.
 * smartstoamoebatypedescrip.txt Dictionary mapping of SMART string to tinker description in amoeba09.prm, used for                                   assigning parameters to molecules in databaseparser.
 
 
-### Basis Sets
-* Various basis sets used by Psi4 and Gaussian when Iodine is present in the molecule.
-
-
-### Version Files
-* water.xyz Used to determine tinker version by calling analyze program.
-* water.key Used to determine tinker version by calling analyze program.
-
 ### Poltype Modules
 * symmetry.py                Handles detecting symmetry in input molecule.
-* modifiedresidues.py        Handles parameterizing new amino acid side chains and stitching parameters from                                      amoebabio18.prm for parts of molecule already parameterized.
 
 * multipole.py               Handles multipole frame definitions and GDMA.
 * databaseparser.py          Database for searching valence parameters via SMART string matching to input                                         molecule.
@@ -192,28 +172,4 @@ b_c_* = the middle two atoms involved in all torsions for a given torsion scan s
 * test_poltype.py            Handles unittesting for POLTYPE modules.
 
 ### Poltype Examples
-* ExternalAPIExample                      Example Daemon for jub submission to be used with externalapi command
-                                        and bashrcpath command.
-* MethanolTorsionGaus                     Shows example of torsion fitting with various torsion options using Gaussian.
-* MethylamineGaus                         Shows example using Gaussian without torsion fitting.
-* MethylamineGausOptOnly                  Shows example using Gaussian for optimization but Psi4 for SP.
-* MethanolFitRotBndsList                  Shows example of using the option fitrotbndslist.
-* MethanolOnlyRotBnd                      Shows example of torsion fitting using the option onlyrotbnd.
-* MethylamineGeometryOptimizationOptions  Shows example of using various geometry optimzation options.
-* MethanolTorsion                         Shows example of torsion fitting with various torsion options using Psi4.
-* ModifiedAminoAcid                       Shows example of replacing amino acid side chain with mutated amino acid side chain
-                                        and generates parameters.
-* SymmetryMethylamine                     Shows example of Z-then-bisector symmetry using neighbors of neighbors.
-* SymmetryMethane                         Shows example of Z-only symmetry using four same neighbors.
-* SymmetryWater                           Shows example of Z-then-bisector symmetry using immediate neighbors.
-* SymmetryAcetamide                       Shows example of Z-then-x symmetry using neighbor of neighbor.
-* SymmetryEthene                          Shows example of Z-only symmetry with three neighbors (two are same).
-* SymmetryMethanol                        Shows example of Z-then-x symmetry using immediate neighbors.
-* SymmetryAmmonia                         Shows example of trisector symmetry.
-* SymmetryAniline                         Shows example of Z-only symmetry using three neighbors (two are same).
-* SymmetryDiMethylPhosphate0H             Shows example of bisector frame for P multipole frame.
-* SymmetryMethylDihydrogenPhosphate       Shows example of choosing correctly z-then-x for P multipole frame.
-* SymmetryDiMethylPhosphate1H             Shows example of z-then-x chosen correctly for all multipole frames.
-* SymmetryTriMethylPhosphate              Shows example of z-only on lone oxygen and for P as well.
-* SymmetryMonoMethylPhosphate1H           Shows example of correct z-then-x frame.
-* SymmetryMonoMethylPhosphate0H           Shows example of correct z-then-x frame.
+

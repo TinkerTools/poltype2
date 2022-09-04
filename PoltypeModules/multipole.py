@@ -9,7 +9,6 @@ from collections import deque
 from itertools import product,permutations
 import numpy as np
 import re
-import parametercomparison
 
 def AddPolarizeCommentsToKey(poltype,keyfilename,polartypetotransferinfo):
     """
@@ -809,11 +808,7 @@ def run_gdma(poltype):
     if not os.path.isfile(poltype.fckdmafname):
         poltype.fckdmafname = os.path.splitext(poltype.fckdmafname)[0]
 
-    #try:
     assert os.path.isfile(poltype.fckdmafname), "Error: " + poltype.fckdmafname + " does not exist."+' '+os.getcwd()
-    #except:
-    #    poltype.DeleteFilesWithString(['dma'])
-    #    poltype.GenerateParameters()
 
     poltype.gdmainfname = poltype.assign_filenames ( "gdmainfname" , ".gdmain")
     gen_gdmain(poltype,poltype.gdmainfname,poltype.molecprefix,poltype.fckdmafname,poltype.dmamethod)
@@ -835,7 +830,7 @@ def AverageMultipoles(poltype,optmol):
     avgmpolecmdstr = poltype.avgmpolesexe + " " + poltype.keyfname + " " + poltype.xyzfname + " " + poltype.grpfname + " " + poltype.key2fnamefromavg + " " + poltype.xyzoutfile + " " + str(poltype.prmstartidx)
     poltype.call_subsystem([avgmpolecmdstr],True)    
     prepend_keyfile(poltype,poltype.key2fnamefromavg,optmol,True)
-    statexyzatominfo,oldindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=parametercomparison.GrabXYZInfo(poltype,poltype.xyzoutfile)
+    statexyzatominfo,oldindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=poltype.GrabXYZInfo(poltype.xyzoutfile)
     babelindextoneighbs={}
     atomiter=openbabel.OBMolAtomIter(optmol)
     for atom in atomiter:

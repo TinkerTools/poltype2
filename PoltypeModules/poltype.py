@@ -17,7 +17,6 @@
 # GNU General Public License for more details.
 #
 ##################################################################
-import modifiedresidues as modres
 import warnings
 import math
 import traceback
@@ -32,7 +31,6 @@ import copy
 import getopt
 import databaseparser
 import dimorphite_dl
-import forcebalancepoltypeinterface as fb
 import torsiongenerator as torgen
 import symmetry as symm
 import docking
@@ -57,7 +55,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 import psutil
 import multiprocessing
-import plotFBresults
 import annihilation as ann
 import tables 
 import boxsetup as box
@@ -65,7 +62,6 @@ import time
 import pdbxyz
 import restraints
 import plots
-import mutation as mutate
 import submitjobs as submit
 import keyfilemodifications as keymods
 import re
@@ -74,7 +70,6 @@ import pylab as plt
 from scipy.interpolate import interp1d
 from rdkit.Chem import AllChem, rdMolAlign
 from rdkit.Chem import rdFMCS
-import parametercomparison
 from PyAstronomy import pyasl
 from dataclasses import dataclass,field
 from pathlib import Path
@@ -115,15 +110,6 @@ class PolarizableTyper():
         writeouttorsion:bool=True
         dontrotbndslist:list=field(default_factory=lambda : [])
         relaxFBbox:bool=False
-        modifiedproteinpdbname:None=None
-        unmodifiedproteinpdbname:None=None
-        mutatedsidechain:None=None
-        mutatedresiduenumber:None=None
-        modifiedresiduepdbcode:str='MOD'
-        ModifiedResiduePrmPath:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/ModifiedResidue.prm'
-        libpath:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ModifiedResidueLibraries/lib.bio18_conv1.txt'
-        SMARTSToTypelibpath:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ModifiedResidueLibraries/SMARTSToTypeLib.txt'
-        topologylibpath:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ModifiedResidueLibraries/residue_connect.txt"
         ecrexpect:float=10
         listofligands:list=field(default_factory=lambda : [])
         targetenthalpyerror:float=.24 # kcal/mol
@@ -139,9 +125,7 @@ class PolarizableTyper():
         usevinardo:bool=False
         goldbin:str='gold_auto'
         dockingenvname:str='dockingprep'
-        pymolenvname:str='oldpy3'
         prepdockscript:str=os.path.join(os.path.split(__file__)[0],'preparedockingfiles.py')
-        pymolscript:str=os.path.join(os.path.split(__file__)[0],'pymolfunctions.py')
         indextompoleframefile:None=None
         qmrelativeweight:float=1
         liqrelativeweight:float=1.5
@@ -163,14 +147,11 @@ class PolarizableTyper():
         density:None=None
         neatliquidsim:bool=False
         amoeba09prmfilepath:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoeba09.prm"
-        bgnstatestructurefile:None=None
         endstatestructurefile:None=None
         redobar:bool=False
         rotateframes:bool=False
         perturbedkeyfilename:None=None
         writeinputfiles:bool=False
-        compareparameters:bool=False
-        energycutoff:float=.5
         printjobsleft:bool=False
         cpujobsonly:bool=False
         minfinished:bool=False
@@ -206,7 +187,6 @@ class PolarizableTyper():
         endstatexyz:None=None
         bgnstatexyz:None=None
         restrainreceptorligand:bool=True
-        mutlambdascheme:list=field(default_factory=lambda : [])
         minonly:bool=False
         usegpu:bool=False
         truedynamicpath:None=None
@@ -282,11 +262,8 @@ class PolarizableTyper():
         integrator:str='RESPA'
         thermostat:str='BUSSI'
         listofsaltcons:str='[KCl]=100'
-        forcebalancejobsdir:None=None
         fixvdwtyperadii:list=field(default_factory=lambda : [])
         maxjobsatsametime:float=10
-        liquid_equ_time:float=.5
-        gas_equ_time:float=.5
         onlyrottortorlist:list=field(default_factory=lambda : [])
         numespconfs:int=1
         fitred:bool=False
@@ -298,22 +275,6 @@ class PolarizableTyper():
         genprotstatesonly:bool=False
         generateextendedconf:bool=True
         onlyvdwatomlist:None=None
-        poltypepathlist:None=None
-        vdwtypeslist:None=None
-        fittypestogether:None=None
-        csvexpdatafile:None=None
-        liquid_equ_steps:float=200000
-        liquid_prod_steps:float=2000000
-        liquid_timestep:float=2.0
-        liquid_interval:float=2
-        gas_equ_steps:float=200000
-        gas_prod_steps:float=2000000
-        gas_timestep:float=2.0
-        gas_interval:float=2
-        md_threads:int=4
-        liquid_prod_time:float=5
-        gas_prod_time:float=5
-        WQ_PORT:None=None
         parentjobsatsametime:int=1
         coresperjob:int=2
         addhydrogens:bool=False
@@ -700,18 +661,12 @@ class PolarizableTyper():
                             self.cpujobsonly=self.SetDefaultBool(line,a,True)
                         elif "writeinputfiles" in newline:
                             self.writeinputfiles=self.SetDefaultBool(line,a,True)
-                        elif "compareparameters" in newline:
-                            self.compareparameters=self.SetDefaultBool(line,a,True)
                         elif 'expfreeenergy' in newline:
                             self.expfreeenergy=a
                         elif 'pathtosims' in newline:
                             self.pathtosims=a
                         elif 'perturbedkeyfilename' in newline:
                             self.perturbedkeyfilename=a
-                        elif 'bgnstatestructurefile' in newline:
-                            self.bgnstatestructurefile=a
-                        elif 'endstatestructurefile' in newline:
-                            self.endstatestructurefile=a
                         elif 'simulationstostopfolderpath' in newline:
                             self.simulationstostopfolderpath=a
                         elif 'aaxis' in newline:
@@ -839,8 +794,6 @@ class PolarizableTyper():
                             self.anglerestraintconstant= float(a)
                         elif ("equilibriatescheme") in newline:
                             self.equilibriatescheme=commalist
-                        elif ("mutlambdascheme") in newline:
-                            self.mutlambdascheme=commalist
                         elif ("restlambdascheme") in newline:
                             self.restlambdascheme=commalist
                         elif ("vdwlambdascheme") in newline:
@@ -935,25 +888,16 @@ class PolarizableTyper():
                             self.totalcharge=int(a)
                         elif "lastlogfileupdatetime" in newline:
                             self.lastlogfileupdatetime=int(a)
-
                         elif "numespconfs" in newline:
                             self.numespconfs=int(a)
-
                         elif "consumptionratio" in newline:
                             self.consumptionratio=float(a)
-                        elif "liquid_equ_time" in newline:
-                            self.liquid_equ_time=float(a)
-                        elif "gas_equ_time" in newline:
-                            self.gas_equ_time=float(a)
-
                         elif "jobsatsametime" in newline and 'max' not in newline and 'parentjobsatsametime' not in newline:
                             self.jobsatsametime=int(a)
                         elif "esprestweight" in newline:
                             self.esprestweight=float(a)
                         elif "espgrad" in newline:
                             self.espgrad=a
-                        elif "forcebalancejobsdir" in newline:
-                            self.forcebalancejobsdir=a
                         elif "checkinputonly" in newline:
                             self.checkinputonly=True
                         elif "setupfragjobsonly" in newline:
@@ -1038,22 +982,10 @@ class PolarizableTyper():
                             self.suppresstorfiterr=self.SetDefaultBool(line,a,True)
                         elif "toroptbasisset" in newline:
                             self.toroptbasisset = a
-                        elif "modifiedresiduepdbcode" in newline:
-                            self.modifiedresiduepdbcode = a
-                        elif "mutatedsidechain" in newline:
-                            self.mutatedsidechain = a
-                        elif "mutatedresiduenumber" in newline:
-                            self.mutatedresiduenumber = a
-                        elif "unmodifiedproteinpdbname" in newline:
-                            self.unmodifiedproteinpdbname = a
-                            self.molstructfname='ModifiedRes.sdf'
                         elif "dmamethod" in newline:
                             self.dmamethod =a
                         elif "bashrcpath" in newline and a!='None':
                             self.bashrcpath = a
-                        elif "modifiedproteinpdbname" in newline:
-                            self.modifiedproteinpdbname = a
-                            self.molstructfname='ModifiedRes.sdf'
                         elif "structure" in newline:
                             self.molstructfname = a
                         elif "dontusepcm" in newline:
@@ -1188,38 +1120,6 @@ class PolarizableTyper():
                             self.qmonly=self.SetDefaultBool(line,a,True)
                         elif "sleeptime" in newline:
                             self.sleeptime = float(a)
-                        elif  "poltypepathlist" in newline:
-                            self.poltypepathlist=a.split(',')
-                        elif "csvexpdatafile" in newline:
-                            self.csvexpdatafile=a
-                        elif "fittypestogether" in newline:
-                            self.fittypestogether=self.ReturnListOfList(a)
-                        elif "vdwtypeslist" in newline:
-                            self.vdwtypeslist=self.ReturnListOfList(a)
-                        elif "liquid_equ_steps" in newline:
-                            self.liquid_equ_steps=int(a)
-                        elif 'liquid_prod_steps' in newline:
-                            self.liquid_prod_steps=int(a) 
-                        elif 'liquid_timestep' in newline:
-                            self.liquid_timestep=int(a)
-                        elif 'liquid_interval' in newline:
-                            self.liquid_interval=float(a)
-                        elif 'gas_equ_steps' in newline:
-                            self.gas_equ_steps=int(a)
-                        elif 'gas_prod_steps' in newline:
-                            self.gas_prod_steps=int(a)
-                        elif 'gas_timestep' in newline:
-                            self.gas_timestep=float(a)
-                        elif 'gas_interval' in newline:
-                            self.gas_interval=float(a)
-                        elif 'md_threads' in newline:
-                            self.md_threads=int(a)
-                        elif 'liquid_prod_time' in newline:
-                            self.liquid_prod_time=float(a)
-                        elif 'gas_prod_time' in newline:
-                            self.gas_prod_time=float(a)
-                        elif 'WQ_PORT' in newline:
-                            self.WQ_PORT=a
                         else:
                             print('Unrecognized '+line)
                             sys.exit()
@@ -1319,24 +1219,7 @@ class PolarizableTyper():
             if self.uncomplexedproteinpdbname!=None and self.complexedproteinpdbname!=None:
                 self.alignPDB=True
 
-            if self.poltypepathlist!=None:
-                fb.GenerateForceBalanceInputs(self,self.poltypepathlist,self.vdwtypeslist,self.liquid_equ_steps,self.liquid_prod_steps,self.liquid_timestep,self.liquid_interval,self.gas_equ_steps,self.gas_prod_steps,self.gas_timestep,self.gas_interval,self.md_threads,self.liquid_prod_time,self.gas_prod_time,self.WQ_PORT,self.csvexpdatafile,self.fittypestogether,self.vdwprmtypestofit,self.vdwtypestoeval,self.liquid_equ_time,self.gas_equ_time,self.qmrelativeweight,self.liqrelativeweight,self.enthalpyrelativeweight,self.densityrelativeweight,self.relaxFBbox)
-                sys.exit()
-            if self.forcebalancejobsdir!=None:
-                pythonpath=self.which('python')
-                head,tail=os.path.split(pythonpath)
-                pythonpath=Path(head) 
-                envdir=pythonpath.parent.absolute()
-                envpath=Path(envdir)
-                allenvs=envpath.parent.absolute()
-                pymolenvpath=os.path.join(allenvs,self.pymolenvname)
-                python2path=os.path.join(pymolenvpath,'bin')
-                python2path=os.path.join(python2path,'python')
-                plotFBresults.PlotForceBalanceResults(self.forcebalancejobsdir,self.targetdensityerror,self.targetenthalpyerror,self.pymolscript,python2path)
-                sys.exit()
-            if self.compareparameters==True:
-                self.MolecularDynamics()
-                sys.exit()
+            
             if self.ligandxyzfilenamelist!=None and (self.binding==True or self.solvation==True or self.neatliquidsim==True) or self.pdbcode!=None or self.usepdb2pqr!=False or self.alignPDB==True:
                 self.MolecularDynamics()
                 sys.exit()
@@ -1377,33 +1260,32 @@ class PolarizableTyper():
             9. Determine whether to submit jobs locally or not based on if keywords are enabled such as submitlocally and externalapi.
             10. Remove old intermediate files from previous run such as *.xyz_* etc..)
             11. Check if using a tinker version that is up to date enough to be consistent with poltype
-            12. If appropriate inputs are given (two keys and two xyz) for parameter comparison then call parameter comparison module and quit poltype.
-            13. If the appropriate inputs are given for aligning a ligand to template ligand, then perform alignment in pocket and quit poltype. 
-            14. Initialize variables to be filled in later in the program stack. Read water/Ions parameter type numbers from prmfilepath.
-            15. If receptorligandxyzfilename is given as input, determine ligand indices for complexation box from input file ( and what the indices should be for solvation box as well).
-            16. If there are overlapping types in input ligandxyzfilenamelist/keyfilenamelist then shift the types so that they are no longer overlapping. Do the same for receptorligandxyzfilename if this is provided as input.
-            17. If pdbcode for crystal is given, download and fill in missing residues via Modeller and quit program.
-            18. If user has inputs to use pdb2pqr to protonate protein (via proPka) then call pdb2pqr and quit program.
-            19. Append all keys from keyfilenamelist into one key file. Check to ensure net charge is an integer, if not then pick some multipoles on host (protein) and add residual charge onto the protein multipole to ensure net charge is an integer.  
-            20. If inputs for host-guest tinker XYZ are not given, then generate from complexed PDB.
-            21. If alchemical=False (user doesnt wasnt to run FEP, just dynamics) then set internal lambda schedules to only include one step.
-            22. If user wants neat liquid simulation, adjust defaults for equilibriation and production dynamics length. Only incllude dynamics for 100% electrostatics and 100% vdW.
-            23. Check if need solvation gas phase regrowth for hydration free energy computations. Some molecules are small enough so that the vdW interactions dont exist. If small enough dont need gas phase vdW regrowth step.
-            24. If user gives complexed host-guest tinker XYZ file and box info is on the top of the file, remove the box info.
-            25. Ensure no undefined parameters for all key files, and make sure net charge of receptor is an integer, if not add residual charge to one of receptor multipoles and will append modified multipoles to complexation tinker key file. 
-            26. If need to add gas phase vdW regrowth, adjust variables for electrostatic and vdW lambda schedules. 
-            27. Set up variables such as system total charge, number of ions needed, filenames, variables used for free energy, enthalpy, entropy computations.
-            28. If pathtosims is specified, then combine simulation table data from other simulation output tables (different simulation folders) and add into combined table. Generate combined plots as well.
-            29. If perturbkeyfilelist is specified, then set up variables for determining filenames, folders and number of interpolations needed later.
-            30. Append all keys from keyfilenamelist into keys for solvation/complexation. Append any additional modified multipoles needed to ensure net charge of receptor is an integer. 
-            31. Setup keyfile names to be used later on.
-            32. Compute step number for dynamics based on dynamic time and time step. Setup box filenames and output files for each dynamic step.
-            33. Setup folder names for production dynamics and production dynamics outputfile names. 
-            34. Setup production dynamic ARC file paths (for BAR input) and BAR output filepath names.
-            35. Rotate into inertial frame. This will make it easier to compute longest length for determining box size later.
-            36. Write relevant variables to internal dictionary to be later printed out in CSV files.
-            37. Grab properties of ligand XYZ files to later be used when writing out PDB trajectories for equilbriated ARC and production dynamics ARC.
-            38. Call annihilator.py (which calls minimization, equilbritation, production dynamics and BAR etc..)
+            12. If the appropriate inputs are given for aligning a ligand to template ligand, then perform alignment in pocket and quit poltype. 
+            13. Initialize variables to be filled in later in the program stack. Read water/Ions parameter type numbers from prmfilepath.
+            14. If receptorligandxyzfilename is given as input, determine ligand indices for complexation box from input file ( and what the indices should be for solvation box as well).
+            15. If there are overlapping types in input ligandxyzfilenamelist/keyfilenamelist then shift the types so that they are no longer overlapping. Do the same for receptorligandxyzfilename if this is provided as input.
+            16. If pdbcode for crystal is given, download and fill in missing residues via Modeller and quit program.
+            17. If user has inputs to use pdb2pqr to protonate protein (via proPka) then call pdb2pqr and quit program.
+            18. Append all keys from keyfilenamelist into one key file. Check to ensure net charge is an integer, if not then pick some multipoles on host (protein) and add residual charge onto the protein multipole to ensure net charge is an integer.  
+            19. If inputs for host-guest tinker XYZ are not given, then generate from complexed PDB.
+            20. If alchemical=False (user doesnt wasnt to run FEP, just dynamics) then set internal lambda schedules to only include one step.
+            21. If user wants neat liquid simulation, adjust defaults for equilibriation and production dynamics length. Only incllude dynamics for 100% electrostatics and 100% vdW.
+            22. Check if need solvation gas phase regrowth for hydration free energy computations. Some molecules are small enough so that the vdW interactions dont exist. If small enough dont need gas phase vdW regrowth step.
+            23. If user gives complexed host-guest tinker XYZ file and box info is on the top of the file, remove the box info.
+            24. Ensure no undefined parameters for all key files, and make sure net charge of receptor is an integer, if not add residual charge to one of receptor multipoles and will append modified multipoles to complexation tinker key file. 
+            25. If need to add gas phase vdW regrowth, adjust variables for electrostatic and vdW lambda schedules. 
+            26. Set up variables such as system total charge, number of ions needed, filenames, variables used for free energy, enthalpy, entropy computations.
+            27. If pathtosims is specified, then combine simulation table data from other simulation output tables (different simulation folders) and add into combined table. Generate combined plots as well.
+            28. If perturbkeyfilelist is specified, then set up variables for determining filenames, folders and number of interpolations needed later.
+            29. Append all keys from keyfilenamelist into keys for solvation/complexation. Append any additional modified multipoles needed to ensure net charge of receptor is an integer. 
+            30. Setup keyfile names to be used later on.
+            31. Compute step number for dynamics based on dynamic time and time step. Setup box filenames and output files for each dynamic step.
+            32. Setup folder names for production dynamics and production dynamics outputfile names. 
+            33. Setup production dynamic ARC file paths (for BAR input) and BAR output filepath names.
+            34. Rotate into inertial frame. This will make it easier to compute longest length for determining box size later.
+            35. Write relevant variables to internal dictionary to be later printed out in CSV files.
+            36. Grab properties of ligand XYZ files to later be used when writing out PDB trajectories for equilbriated ARC and production dynamics ARC.
+            37. Call annihilator.py (which calls minimization, equilbritation, production dynamics and BAR etc..)
             """
             # STEP 1
             if self.neatliquidsim==True: 
@@ -1501,15 +1383,6 @@ class PolarizableTyper():
 
             self.CheckTinkerVersion()
 
-            # STEP 12
-
-            if self.perturbedkeyfilename!=None:
-                self.compareparameters=True
-
-            if self.bgnstatexyz!=None and self.bgnstatekey!=None and self.endstatexyz!=None and self.endstatekey!=None and self.compareparameters==True: 
-                parametercomparison.CompareBgnEndParameters(self)
-                if self.perturbedkeyfilename==None:
-                    sys.exit()
 
             # STEP 13
 
@@ -2032,136 +1905,123 @@ class PolarizableTyper():
                 self.proddynensem=self.NPVTensem
             else:
                 self.proddynensem=self.NPTensem
-            mut=False
             self.foldernametolambdakeyfilename={}
             self.foldernametonuminterpols={}
             self.foldernametointerpolindex={}
-            if len(self.mutlambdascheme)==0:
-                for simfoldidx in range(len(self.simfoldname)):
-                    simfold=self.simfoldname[simfoldidx]
-                    templambdafolderlistoflist=[]
-                    tempproddynoutfilepathlistoflist=[]
-                    lambdakeyfilelist=self.lambdakeyfilename[simfoldidx]
-                    for k in range(len(self.vdwlambdascheme)):
-                        vdwlambdascheme=self.vdwlambdascheme[k]
-                        estatlambdascheme=self.estatlambdascheme[k]
-                        restlambdascheme=self.restlambdascheme[k]
-                        tempproddynoutfilepath=[]
-                        templambdafolderlist=[]
-                        for i in range(len(vdwlambdascheme)):
-                            elelamb=estatlambdascheme[i]
-                            vdwlamb=vdwlambdascheme[i]
-                            rest=restlambdascheme[i]
-                            lambdakeyfilename=lambdakeyfilelist[0]
-                            if 'Comp' in simfold:
-                                if k==0:
-                                    fold=simfold+"E%s_V%s_R%s"%(elelamb,vdwlamb,rest)
-                                elif k==1 and self.addgas==True:
-                                    fold=simfold+"E%s_V%s_R%s_Gas"%(elelamb,vdwlamb,rest)
-                            else:
-                                if k==0:
-                                    fold=simfold+"E%s_V%s"%(elelamb,vdwlamb)
-                                elif k==1 and self.addgas==True:
-                                    fold=simfold+"E%s_V%s_Gas"%(elelamb,vdwlamb)
-                                elif k==2 and self.addgas==True:
-                                    fold=simfold+"E%s_V%s_Ion"%(elelamb,vdwlamb)
-                                elif k==1 and self.addgas==False:
-                                    fold=simfold+"E%s_V%s_Ion"%(elelamb,vdwlamb)
-
-                            self.foldernametolambdakeyfilename[fold]=lambdakeyfilename
-                            templambdafolderlist.append(fold)
-                            outputfilepath=os.getcwd()+'/'+simfold+'/'+fold+'/'
-                            outputfilepath+=self.foldername+'_'+fold+'.out'
-                            if k==1 and (self.extractinterforbinding==True and self.binding==True):
-                                pass
-                            else:
-                                tempproddynoutfilepath.append(outputfilepath)
-                        
-                        if self.perturbkeyfilelist!=None:
+            for simfoldidx in range(len(self.simfoldname)):
+                simfold=self.simfoldname[simfoldidx]
+                templambdafolderlistoflist=[]
+                tempproddynoutfilepathlistoflist=[]
+                lambdakeyfilelist=self.lambdakeyfilename[simfoldidx]
+                for k in range(len(self.vdwlambdascheme)):
+                    vdwlambdascheme=self.vdwlambdascheme[k]
+                    estatlambdascheme=self.estatlambdascheme[k]
+                    restlambdascheme=self.restlambdascheme[k]
+                    tempproddynoutfilepath=[]
+                    templambdafolderlist=[]
+                    for i in range(len(vdwlambdascheme)):
+                        elelamb=estatlambdascheme[i]
+                        vdwlamb=vdwlambdascheme[i]
+                        rest=restlambdascheme[i]
+                        lambdakeyfilename=lambdakeyfilelist[0]
+                        if 'Comp' in simfold:
                             if k==0:
-                                elelamb=estatlambdascheme[0]
-                                vdwlamb=vdwlambdascheme[0]
-                                rest=restlambdascheme[0]
+                                fold=simfold+"E%s_V%s_R%s"%(elelamb,vdwlamb,rest)
                             elif k==1 and self.addgas==True:
-                                elelamb=estatlambdascheme[-1]
-                                vdwlamb=vdwlambdascheme[-1]
-                                rest=restlambdascheme[-1]
-                            elif k==1 and self.addgas==False:
-                                elelamb=estatlambdascheme[0]
-                                vdwlamb=vdwlambdascheme[0]
-                                rest=restlambdascheme[0]
+                                fold=simfold+"E%s_V%s_R%s_Gas"%(elelamb,vdwlamb,rest)
+                        else:
+                            if k==0:
+                                fold=simfold+"E%s_V%s"%(elelamb,vdwlamb)
+                            elif k==1 and self.addgas==True:
+                                fold=simfold+"E%s_V%s_Gas"%(elelamb,vdwlamb)
                             elif k==2 and self.addgas==True:
-                                elelamb=estatlambdascheme[0]
-                                vdwlamb=vdwlambdascheme[0]
-                                rest=restlambdascheme[0]
+                                fold=simfold+"E%s_V%s_Ion"%(elelamb,vdwlamb)
+                            elif k==1 and self.addgas==False:
+                                fold=simfold+"E%s_V%s_Ion"%(elelamb,vdwlamb)
 
-                            count=1
-                            for keyfilename,index in self.perturbkeyfilelisttokeyindex.items():
-                                numinterpols=self.perturbkeyfilelisttointerpolations[keyfilename]
-                                for r in range(numinterpols):
-                                    lambdakeyfilename=lambdakeyfilelist[count]
-                                    split=keyfilename.split('.')
-                                    keyprefix=split[0]
-                                    count+=1
-                                    interpolindex=r+1
-                                    interpolrate=int(((interpolindex/numinterpols)*100))
-                                    if 'Comp' in simfold:
-                                       fold=simfold+"E%s_V%s_R%s_Key_%s_Ipl%s"%(elelamb,vdwlamb,rest,str(keyprefix),str(interpolrate))
-                                    else:
-                                       if k==0:
-                                           fold=simfold+"E%s_V%s_Key_%s_Ipl%s"%(elelamb,vdwlamb,str(keyprefix),str(interpolrate))
-                                       elif k==1:
-                                           fold=simfold+"E%s_V%s_Gas_Key_%s_Ipl%s"%(elelamb,vdwlamb,str(keyprefix),str(interpolrate))
-                                       else:
-                                           continue
-                                    self.foldernametolambdakeyfilename[fold]=lambdakeyfilename
-                                    self.foldernametonuminterpols[fold]=numinterpols
-                                    self.foldernametointerpolindex[fold]=interpolindex
-                                    if k==0:
-                                        self.estatlambdascheme[k].insert(0,elelamb)
-                                        self.vdwlambdascheme[k].insert(0,vdwlamb)
-                                        self.restlambdascheme[k].insert(0,rest)
-                                        templambdafolderlist.insert(0,fold) 
-                                    elif k==1 and self.addgas==True:
-                                        self.estatlambdascheme[k].append(elelamb)
-                                        self.vdwlambdascheme[k].append(vdwlamb)
-                                        self.restlambdascheme[k].append(rest)
-                                        templambdafolderlist.append(fold) 
-                                    elif k==1 and self.addgas==False:
-                                        self.estatlambdascheme[k].insert(0,elelamb)
-                                        self.vdwlambdascheme[k].insert(0,vdwlamb)
-                                        self.restlambdascheme[k].insert(0,rest)
-                                        templambdafolderlist.insert(0,fold) 
-                                    elif k==2 and self.addgas==True:
-                                        self.estatlambdascheme[k].insert(0,elelamb)
-                                        self.vdwlambdascheme[k].insert(0,vdwlamb)
-                                        self.restlambdascheme[k].insert(0,rest)
-                                        templambdafolderlist.insert(0,fold) 
-
-
-                                    if self.fep==False:
-                                        outputfilepath=os.getcwd()+'/'+simfold+'/'+fold+'/'
-                                        outputfilepath+=self.foldername+'_'+fold+'.out'
-                                        tempproddynoutfilepath.append(outputfilepath)
-
-
-                        templambdafolderlistoflist.append(templambdafolderlist)
-                        tempproddynoutfilepathlistoflist.append(tempproddynoutfilepath)
-                    self.proddynoutfilepath[simfoldidx]=tempproddynoutfilepathlistoflist
-                    self.lambdafolderlist[simfoldidx]=templambdafolderlistoflist
+                        self.foldernametolambdakeyfilename[fold]=lambdakeyfilename
+                        templambdafolderlist.append(fold)
+                        outputfilepath=os.getcwd()+'/'+simfold+'/'+fold+'/'
+                        outputfilepath+=self.foldername+'_'+fold+'.out'
+                        if k==1 and (self.extractinterforbinding==True and self.binding==True):
+                            pass
+                        else:
+                            tempproddynoutfilepath.append(outputfilepath)
                     
-            else:
-                mut=True
-                index=0
-                for i in range(len(self.mutlambdascheme)):
-                    mutlambda=self.mutlambdascheme[i]
-                    fold=self.simfoldname+"Mut%s"%(mutlambda)
-                    self.lambdafolderlist[index].append(fold)
-                    outputfilepath=os.getcwd()+'/'+self.simfoldname+'/'+fold+'/'
-                    outputfilepath+=self.foldername+'_'+fold+'.out'
-                    self.proddynoutfilepath[index].append(outputfilepath)
-            if mut==True:
-                mutate.SingleTopologyMutationProtocol(self)
+                    if self.perturbkeyfilelist!=None:
+                        if k==0:
+                            elelamb=estatlambdascheme[0]
+                            vdwlamb=vdwlambdascheme[0]
+                            rest=restlambdascheme[0]
+                        elif k==1 and self.addgas==True:
+                            elelamb=estatlambdascheme[-1]
+                            vdwlamb=vdwlambdascheme[-1]
+                            rest=restlambdascheme[-1]
+                        elif k==1 and self.addgas==False:
+                            elelamb=estatlambdascheme[0]
+                            vdwlamb=vdwlambdascheme[0]
+                            rest=restlambdascheme[0]
+                        elif k==2 and self.addgas==True:
+                            elelamb=estatlambdascheme[0]
+                            vdwlamb=vdwlambdascheme[0]
+                            rest=restlambdascheme[0]
+
+                        count=1
+                        for keyfilename,index in self.perturbkeyfilelisttokeyindex.items():
+                            numinterpols=self.perturbkeyfilelisttointerpolations[keyfilename]
+                            for r in range(numinterpols):
+                                lambdakeyfilename=lambdakeyfilelist[count]
+                                split=keyfilename.split('.')
+                                keyprefix=split[0]
+                                count+=1
+                                interpolindex=r+1
+                                interpolrate=int(((interpolindex/numinterpols)*100))
+                                if 'Comp' in simfold:
+                                   fold=simfold+"E%s_V%s_R%s_Key_%s_Ipl%s"%(elelamb,vdwlamb,rest,str(keyprefix),str(interpolrate))
+                                else:
+                                   if k==0:
+                                       fold=simfold+"E%s_V%s_Key_%s_Ipl%s"%(elelamb,vdwlamb,str(keyprefix),str(interpolrate))
+                                   elif k==1:
+                                       fold=simfold+"E%s_V%s_Gas_Key_%s_Ipl%s"%(elelamb,vdwlamb,str(keyprefix),str(interpolrate))
+                                   else:
+                                       continue
+                                self.foldernametolambdakeyfilename[fold]=lambdakeyfilename
+                                self.foldernametonuminterpols[fold]=numinterpols
+                                self.foldernametointerpolindex[fold]=interpolindex
+                                if k==0:
+                                    self.estatlambdascheme[k].insert(0,elelamb)
+                                    self.vdwlambdascheme[k].insert(0,vdwlamb)
+                                    self.restlambdascheme[k].insert(0,rest)
+                                    templambdafolderlist.insert(0,fold) 
+                                elif k==1 and self.addgas==True:
+                                    self.estatlambdascheme[k].append(elelamb)
+                                    self.vdwlambdascheme[k].append(vdwlamb)
+                                    self.restlambdascheme[k].append(rest)
+                                    templambdafolderlist.append(fold) 
+                                elif k==1 and self.addgas==False:
+                                    self.estatlambdascheme[k].insert(0,elelamb)
+                                    self.vdwlambdascheme[k].insert(0,vdwlamb)
+                                    self.restlambdascheme[k].insert(0,rest)
+                                    templambdafolderlist.insert(0,fold) 
+                                elif k==2 and self.addgas==True:
+                                    self.estatlambdascheme[k].insert(0,elelamb)
+                                    self.vdwlambdascheme[k].insert(0,vdwlamb)
+                                    self.restlambdascheme[k].insert(0,rest)
+                                    templambdafolderlist.insert(0,fold) 
+
+
+                                if self.fep==False:
+                                    outputfilepath=os.getcwd()+'/'+simfold+'/'+fold+'/'
+                                    outputfilepath+=self.foldername+'_'+fold+'.out'
+                                    tempproddynoutfilepath.append(outputfilepath)
+
+
+                    templambdafolderlistoflist.append(templambdafolderlist)
+                    tempproddynoutfilepathlistoflist.append(tempproddynoutfilepath)
+                self.proddynoutfilepath[simfoldidx]=tempproddynoutfilepathlistoflist
+                self.lambdafolderlist[simfoldidx]=templambdafolderlistoflist
+                
+            
            
             # STEP 34
 
@@ -2257,7 +2117,7 @@ class PolarizableTyper():
             self.ligandindextotypenumlist=[]
 
             for xyz in self.annihilateligandxyzfilenamelist:
-                statexyzatominfo,stateindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=parametercomparison.GrabXYZInfo(self,xyz)
+                statexyzatominfo,stateindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=self.GrabXYZInfo(xyz)
                 self.ligandindextoneighbslist.append(indextoneighbs)
                 self.ligandindextosymlist.append(indextosym)
                 self.ligandindextotypenumlist.append(stateindextotypeindex)
@@ -3536,33 +3396,16 @@ class PolarizableTyper():
 
         def main(self):
             """
-            Intent: Determine if should generate input molecule from modified amino acids inputs or just call GenerateParameters on input molecule.
+            Intent: Call GenerateParameters.
             Input: Self object
             Output: - 
             Referenced By: RunPoltype
             Description: 
-            1. If inputs for modified amino acid module are given then call module to generate molecule to parameterize and call GenerateParameters
-            2. Otherwise call GenerateParameters on input structure 
-            3. If inputs for modified amino acid module are given and parameters for generated molecule finished then call function to generate protein tinker XYZ file
+            1. Call GenerateParameters
             """   
             # STEP 1
-            if (self.modifiedproteinpdbname!=None or self.unmodifiedproteinpdbname!=None):
-                knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference,modligidxs=modres.GenerateModifiedProteinPoltypeInput(self)
-                self.molstructfname=molname
-                head, self.molstructfname = os.path.split(self.molstructfname)
-                self.molecprefix =  os.path.splitext(self.molstructfname)[0]
+            params= self.GenerateParameters()
 
-            if (self.modifiedproteinpdbname!=None or self.unmodifiedproteinpdbname!=None): # if already have core parameters in modified prm database then dont regenerate parameters
-                if check==False:
-                    params=self.GenerateParameters()
-            else:
-               # STEP 2
-               params= self.GenerateParameters()
-               return params
-
-            # STEP 3 
-            if (self.modifiedproteinpdbname!=None or self.unmodifiedproteinpdbname!=None):
-                modres.GenerateModifiedProteinXYZAndKey(self,knownresiduesymbs,modproidxs,proboundidxs,boundaryatomidxs,proOBmol,molname,modresiduelabel,proidxtoligidx,ligidxtoproidx,modmol,smarts,check,connectedatomidx,backboneindexesreference,modligidxs)
         
         
         def GrabIndexToCoordinates(self,mol):
@@ -4348,7 +4191,18 @@ class PolarizableTyper():
             44. If user specifies to fit vdw parameters, then call the fragmenter and generate fragment jobs, then run the fragment poltype jobs. 
             45. If user specifies to fit vdw parameters, now parse the output key files from vdw fragmentjobs and update parent key with vdw parameters derived in fragment.
             46. If user specifies to do tor-tor, then add list of rotatble bonds to array for fragmenter to later fragment.
-            47. 
+            47. If user specifies to refine non-aromatic ring torsions, then determine the torsions in non-aromatic rings that need to be puckered and add to array that fragmenter will use to fragment later. 
+            48. Create and run torsion fragment poltype jobs
+            49. Grab torsion parameters from fragment jobs and add to parent key file
+            50. Sanity check, ensure torsion parameters are not zeroed out (indicates some fragmenter or parsing issue)
+            51. Minimize tinker XYZ with final parameters and restrain same dihedrals restrained during QM geometry optimzation, compute RMSD to qm geometry optimized structure and ensure its not too high, otherwise crash program. 
+            52. Compute the QM dipole MM dipole moment and compare them, ensure the difference in magnitude is not too different, otherwise crash program.   
+            53. Check for any missing vdw or multipole parameters in final key file, tinker will not crash if missing vdw parameters.
+            54. Log how much time torsion opt and SP jobs took in poltype log file.
+            55. If the fragmenter was not used but torsion parameters were derived, write out database.prm file of parameters in format needed to be added to database.
+            56. Delete scratch files used during QM calculations
+            57. If user specifies to send email about job being finished, then send email
+            58. Copy final XYZ and key files to top directory, where user submits jobs. Also copy torsion plots to OPENME folder.
             """
             # STEP 1 
             self.molstructfname=self.ConvertInputStructureToSDFFormat(self.molstructfname)
@@ -4682,9 +4536,10 @@ class PolarizableTyper():
             if self.tortor==True and self.dontdotor==False:
                 torgen.PrepareTorsionTorsion(self,optmol,mol,tortorsmissing)
             torgen.DefaultMaxRange(self,self.torlist)
-
+            # STEP 47
             if self.refinenonaroringtors==True and self.dontfrag==False:
                 rings.RefineNonAromaticRingTorsions(self,mol,optmol,classkeytotorsionparametersguess)
+            # STEP 48
             if self.isfragjob==False and not os.path.isfile(self.key7fname) and self.dontfrag==False and (self.dontdotor==False) and len(self.torlist)!=0:
                 self.WriteToLog('Create and Run Torsion Fragment Poltype Jobs')
 
@@ -4698,6 +4553,7 @@ class PolarizableTyper():
                 frag.Draw2DMoleculeWithWBO(self,WBOmatrix,self.molstructfname.replace('.sdf',''),self.rdkitmol,bondindexlist=highlightbonds,imgsize=1500)       
                 rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor=frag.GenerateFragments(self,self.mol,self.torlist,WBOmatrix,missingvdwatomsets,nonaroringtorlist) # returns list of bond indexes that need parent molecule to do torsion scan for (fragment generated was same as the parent0
                 equivalentrotbndindexarrays,rotbndindextoringtor,rotbndindextoparentrotbndindexes,rotbndindextosmartsindexarray=frag.SpawnPoltypeJobsForFragments(self,rotbndindextoparentindextofragindex,rotbndindextofragment,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor)
+            # STEP 49
             if self.dontfrag==False and self.isfragjob==False and not os.path.isfile(self.key7fname) and (self.dontdotor==False) and len(self.torlist)!=0:
                 frag.GrabVdwAndTorsionParametersFromFragments(self,rotbndindextofragmentfilepath,equivalentrotbndindexarrays,rotbndindextoringtor,self.key6fname,self.key7fname,rotbndindextoparentrotbndindexes,rotbndindextosmartsindexarray) # just dump to key_6 since does not exist for parent molecule
             else:
@@ -4720,27 +4576,27 @@ class PolarizableTyper():
 
             if self.torfit==False:
                 sys.exit()
- 
+            # STEP 50 
             if self.isfragjob==False and self.dontdotor==False:
                 self.CheckTorsionParameters(self.key7fname,torsionsmissing)
             self.WriteOutLiteratureReferences(self.key7fname) 
-            # A series of tests are done so you one can see whether or not the parameterization values
-            # found are acceptable and to what degree
             if self.writeoutpolarize==False or self.writeoutmultipole==False:
                 shutil.copy(self.xyzfname,self.xyzoutfile)
             shutil.copy(self.xyzoutfile,self.tmpxyzfile)
             shutil.copy(self.key7fname,self.tmpkeyfile)
-
+            # STEP 51
             if self.writeoutpolarize and self.writeoutmultipole==True:
                 opt.StructureMinimization(self,torsionrestraints)
                 if self.atomnum != 1:
                     opt.gen_superposeinfile(self)
                     opt.CheckRMSD(self)
-
+            # STEP 52
             if self.atomnum!=1: 
                  esp.CheckDipoleMoments(self,optmol)
+            # STEP 53
             if os.path.exists(self.tmpkeyfile):
                 self.FinalVDWMultipoleCheck(self.tmpkeyfile)
+            # STEP 54
             for torset,totaltime in self.torsettototalqmtime.items():
                 sptime=self.torsettospqmtime[torset]
                 opttime=self.torsettooptqmtime[torset]
@@ -4749,13 +4605,15 @@ class PolarizableTyper():
                 self.WriteToLog('OPT torsion QM time for '+str(torset)+' is '+str(round(opttime,3))+' hours'+' and '+str(numpoints)+' conformations')
                 self.WriteToLog('SP torsion QM time for '+str(torset)+' is '+str(round(sptime,3))+' hours'+' and '+str(numpoints)+' conformations')
             self.WriteToLog('Poltype Job Finished'+'\n')
+            # STEP 55
             if self.isfragjob==False and self.dontfrag==True and len(self.torlist)!=0:
                 self.WriteOutDatabaseParameterLines()
-
+            # STEP 56
             if os.path.exists(self.scrtmpdirgau):
                 shutil.rmtree(self.scrtmpdirgau)
             if os.path.exists(self.scrtmpdirpsi4):
                 shutil.rmtree(self.scrtmpdirpsi4)
+            # STEP 57
             if self.email!=None:
                 moleculename=self.molstructfname.replace('.sdf','')
                 password='amoebaisbest'
@@ -4763,9 +4621,10 @@ class PolarizableTyper():
                 toaddr = self.email
                 TEXT='Molecule has finished parameterization'
                 try: 
-                    self.SendFinalReportEmail(TEXT,fromaddr,toaddr,password,moleculename)
+                    self.SendReportEmail(TEXT,fromaddr,toaddr,password,moleculename,'Poltype Finished Report ')
                 except:
                     pass
+            # STEP 58
             if self.isfragjob==False:
                 previousdir=os.path.abspath(os.path.join(os.getcwd(), os.pardir))
                 if os.path.exists(self.tmpxyzfile):
@@ -4774,18 +4633,7 @@ class PolarizableTyper():
                      shutil.copy(self.tmpkeyfile,os.path.join(previousdir,self.tmpkeyfile))
             self.CopyFitPlots()
             os.chdir('..')
-            if (self.binding==True or self.solvation==True or self.neatliquidsim==True) or self.usepdb2pqr==True or self.pdbcode!=None:
-                self.ligandxyzfilenamelist=[self.tmpxyzfile]
-                self.keyfilename=self.tmpkeyfile
-                newfolder='Sim'
-                if not os.path.exists(newfolder):
-                    os.mkdir(newfolder)
-                os.chdir(newfolder)
-                for xyz in self.ligandxyzfilenamelist:
-                    shutil.copy(xyz,os.path.join(newfolder,xyz))
-                for key in self.keyfilenamelist:
-                    shutil.copy(key,os.path.join(newfolder,key))
-                self.MolecularDynamics()
+            
 
 
         def GenerateDuplicateXYZsFromOPTs(self,xyzfname,keyfname,optmolist):
@@ -5009,8 +4857,12 @@ class PolarizableTyper():
             Output: -
             Referenced By: GenerateParameters 
             Description: 
-            1. 
+            1. Read in input keyfile to array
+            2. For each parameter line, determine the indices (1,2,3 etc..) and extract type numbers from the line
+            3. For each type number, determine all possible atom indices for that type number. 
+            4. Construct a string with all possible atom indices for each type number and add as a comment to new keyfile.
             """
+            # STEP 1
             temp=open(keyfilename,'r')
             results=temp.readlines()
             temp.close()
@@ -5018,6 +4870,7 @@ class PolarizableTyper():
             temp=open(tempname,'w')
            
             for line in results:
+                # STEP 2
                 if '#' not in line and 'none' not in line:
                     indices=[]
                     if 'multipole ' in line or 'polarize ' in line or 'vdw ' in line:
@@ -5029,6 +4882,7 @@ class PolarizableTyper():
                     elif 'torsion ' in line:
                         indices=[1,2,3,4]
                     if len(indices)!=0:
+                        # STEP 3
                         allindices=[]
                         linesplit=line.split()
                         typenums=[linesplit[i] for i in indices]
@@ -5036,6 +4890,7 @@ class PolarizableTyper():
                         for typenum in typenums: 
                             indexes=self.GrabKeysFromValue(self.idxtosymclass,typenum)
                             allindices.append(indexes)
+                        # STEP 4
                         string='# '+str(typenums) +' = '+str(allindices)+'\n'
                         temp.write(string)
                 temp.write(line)
@@ -5048,177 +4903,66 @@ class PolarizableTyper():
 
         def GrabKeysFromValue(self,dic,thevalue):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: For example, want to determine atomic indices that map to type number starting with information only of type number. Then need to find all possible keys (atomic indices) that map to value (type number).
+            Input: Dictionary of keys to values, the desired value that want to search all keys that map to 
+            Output: List of keys that map to desired value
+            Referenced By: AddIndicesToKey
             Description: 
+            1. Iterate over key, value pairs in dictionary
+            2. If the current value is equivalent to the desired value, then append key to array
+            3. Return array of keys
             """
             keylist=[]
+            # STEP 1
             for key,value in dic.items():
+                # STEP 2
                 if value==thevalue:
                     keylist.append(key)
+            # STEP 3
             return keylist
 
-
-        def DeleteFilesWithExtension(self,ls):
-            """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
-            """
-            files=os.listdir()
-            for f in files:
-                if '.' in f and not os.path.isdir(f):
-                    ext=f.split('.')[1]
-                    if ext in ls:
-                        os.remove(f)
-
-        def DeleteFilesWithString(self,ls):
-            """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
-            """
-            files=os.listdir()
-            for f in files:
-                for string in ls:
-                    if string in f:
-                        os.remove(f)
-
-
-        def DeleteAllFiles(self,deletefragments=False):
-            """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
-            """
-            files=os.listdir()
-            for f in files:
-                if os.path.isdir(f):
-                    if deletefragments==True:
-                        shutil.rmtree(f)
-                    else:
-                        if f!='Fragments':
-                            shutil.rmtree(f)
-                elif '.' in f and not os.path.isdir(f) and f!='parentvdw.key':
-                    ext=f.split('.')[1]
-                    if ext!='txt' and ext!='mol' and ext!='sdf' and ext!='ini' and 'nohup' not in f and f[0]!='.':
-                        os.remove(f)
-
-        def CheckFileSanity(self):
-
-            """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
-            """
-            optxyzname=self.logoptfname.replace('.log','.xyz')
-            temp=open(optxyzname,'r')
-            results=temp.readlines()
-            temp.close()
-            atomindextocoords={}
-            atomcount=1
-            for line in results:
-                linesplit=line.split()
-                if len(linesplit)==1:
-                    optatomnum=int(linesplit[0])
-                else:
-                    if len(linesplit)==4:
-                        coords=[float(linesplit[1]),float(linesplit[2]),float(linesplit[3])]
-                        atomindextocoords[atomcount]=coords
-                        atomcount+=1
-            temp=open(self.xyzfname,'r')
-            results=temp.readlines()
-            temp.close()
-            tinkatomindextocoords={}
-            atomcount=1
-            for line in results:
-                linesplit=line.split()
-                if len(linesplit)==1:
-                    atomnum=int(linesplit[0])
-                else:
-                    coords=[float(linesplit[2]),float(linesplit[3]),float(linesplit[4])]
-                    tinkatomindextocoords[atomcount]=coords
-                    atomcount+=1
-            issane=True
-            if optatomnum!=atomnum:
-                warnings.warn('Tinker XYZ file and OPT XYZ file are not same atom number, program changes have been made between runs, need to delete and restart parameterization')
-                issane=False
-            else:
-                for atomnum,optcoord in atomindextocoords.items():
-                    tinkcoord=tinkatomindextocoords[atomnum]
-                    for i in range(len(optcoord)):
-                        optnum=optcoord[i]
-                        tinknum=tinkcoord[i]
-                        if np.abs(optnum-tinknum)>.01:
-                            issane=False
-                            break
-                if issane==False:
-                    warnings.warn('Tinker XYZ file and OPT XYZ file are not same coordinates, program changes have been made between runs, need to delete and restart parameterization')
-                    sys.exit()
-            return issane
-
         
-        def SendCrashReportEmail(self,TEXT,fromaddr,toaddr,password,filename):
+        def SendReportEmail(self,TEXT,fromaddr,toaddr,password,filename,subject):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: If user gives email as input and poltype crashes, then send email report that crashed. 
+            Input: Email text, from address, to address, password and filename that has error.
+            Output: -
+            Referenced By: RunPoltype
+            Description:
+            1. Initialize email object
+            2. Enter from address, to address, subject and message into email object 
+            3. Initialize server object that contacts gmail, enter from address and password, then login
+            4. Send message and close server object
             """
+            # STEP 1
             msg = MIMEMultipart()
+            # STEP 2
             msg['From'] = fromaddr
             msg['To'] = toaddr
-            msg['Subject'] = 'Poltype Crash Report '+filename
+            msg['Subject'] = subject+filename
             message = TEXT
             msg.attach(MIMEText(message, 'plain'))
+            # STEP 3
             s = smtplib.SMTP_SSL('smtp.gmail.com')
             s.ehlo()
             s.login(fromaddr,password)
             text = msg.as_string()
+            # STEP 4
             s.sendmail(fromaddr, [toaddr],text)
             s.quit()
 
- 
-        def SendFinalReportEmail(self,TEXT,fromaddr,toaddr,password,moleculename):
-            """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
-            """
-            msg = MIMEMultipart()
-            msg['From'] = fromaddr
-            msg['To'] = toaddr
-            msg['Subject'] = 'Poltype Finished Report '+moleculename
-            message = TEXT
-            msg.attach(MIMEText(message, 'plain'))
-            s = smtplib.SMTP_SSL('smtp.gmail.com')
-            s.ehlo()
-            s.login(fromaddr,password)
-            text = msg.as_string()
-            s.sendmail(fromaddr, [toaddr],text)
-            s.quit()
 
         def CollectElectrostaticDipoleFitLines(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Users are too lazy to read poltype log file for information about electrostatic fitting etc.., so copy relevent information to a textfile and put in the OPENME folder, in the hope that they will read it there.
+            Input: - 
+            Output: Array of lines containing relevant information
+            Referenced By: CopyFitPlots
             Description: 
+            1. Iterate over lines of poltype log
+            2. If results for electrostatic potential fitting or comparison to dipole moments between QM and MM is printed then grab those lines and append to an array.
             """
+            # STEP 1
             files=os.listdir()
             for f in files:
                 if 'poltype.log' in f:
@@ -5226,6 +4970,7 @@ class PolarizableTyper():
             temp=open(name,'r')
             results=temp.readlines()
             temp.close()  
+            # STEP 2
             fitlines=[]
             for line in results:
                 if 'RMSPD =' in line or 'QMDipole' in line or 'RMSD of QM and MM' in line:
@@ -5237,12 +4982,14 @@ class PolarizableTyper():
 
         def Instructions(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Attempt to make it easier for users to understand plots and fitting information in OPENME, without them having to read the documentation README.MD . 
+            Input: -
+            Output: Array of lines containing instructions of how to interpret results in OPENME folder
+            Referenced By: CopyFitPlots
             Description: 
+            1. Hard code instructions and then append to array
             """
+            # STEP 1
             instructions=[]
             line='Please ensure that the Root Mean Square Deviation (RMSD) between QM (red curve) and MM2 post-fit torsion (blue curve) has a decent fit.'+'\n'
             instructions.append(line) 
@@ -5264,15 +5011,22 @@ class PolarizableTyper():
 
         def CopyFitPlots(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Users will likely be unfamiliar find commands or where to find plots or too lazy to find, so grab all plots in one folder called OPENME in top directory. 
+            Input: -
+            Output: -
+            Referenced By: GenerateParameters 
             Description: 
+            1. Walk along all sub directories and look for any png files, csv files then append to array
+            2. Collect electrostatic fitting results from poltype log file
+            3. Collect instructions for how to interpret OPENME results
+            4. Create folder OPENME (if doesnt exist)
+            5. Copy plots found to OPENME folder
+            6. Create text file in OPENME folder and write out results from fitting and instructions on how to interpret fitting results and also how to interpret plot results. 
             """
             plots=[]
             fold='OPENME'
             thecurdir=os.getcwd()
+            # STEP 1
             for root, subdirs, files in os.walk(os.getcwd()):
                 for d in subdirs:
                     curdir=os.getcwd()
@@ -5285,15 +5039,19 @@ class PolarizableTyper():
                         if '.png' in f and ('energy' in f or 'fit' in f or 'water' in f) or '.csv' in f:
                             plots.append(os.path.join(path,f))
             os.chdir(thecurdir)
-            
+            # STEP 2 
             fitlines=self.CollectElectrostaticDipoleFitLines()
+            # STEP 3
             instructions=self.Instructions()
             os.chdir('..')
+            # STEP 4
             if not os.path.isdir(fold):
                 os.mkdir(fold)
+            # STEP 5
             for path in plots:
                 shutil.copy(path,fold)
             os.chdir(fold)
+            # STEP 6
             temp=open("README.txt",'w')
             for line in instructions:
                 temp.write(line)
@@ -5304,12 +5062,15 @@ class PolarizableTyper():
 
         def StopSimulations(self,simulationstostopfolderpath):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: If user wants to stop all simulations, then go into each folder and add a *.end file, tinker will then terminate dynamics safely without corrupting arc or dyn files accidentally. 
+            Input: Folder path with subdirectories containing simulation folders (with arcs etc...)
+            Output: - 
+            Referenced By: MolecularDynamics
             Description: 
+            1. Walk over all subdirectories from input filepath
+            2. If .arc file is detected within current folder or subfolder, add a file with .end into the folder 
             """
+            # STEP 1
             for root, subdirs, files in os.walk(simulationstostopfolderpath):
                 for d in subdirs:
                     curdir=os.getcwd()
@@ -5317,6 +5078,7 @@ class PolarizableTyper():
                     os.chdir(path)
                     files=os.listdir()
                     for f in files:
+                        # STEP 2
                         if '.arc' in f:
                             split=f.split('.')
                             prefix=split[0]
@@ -5324,7 +5086,7 @@ class PolarizableTyper():
                             endname=os.path.join(path,endname)
                             with open(endname, 'w') as fp:
                                 pass
-
+                        # STEP 2
                         if os.path.isdir(f):
                             os.chdir(f)
                             newfiles=os.listdir()
@@ -5341,16 +5103,20 @@ class PolarizableTyper():
 
         def ReadWaterFromPRMFile(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Grab water parameters from prmfile, if user specifices older prmfile, the type numbers may be different, so need to parse via tinker type description rather than hard coded type numbers.
+            Input: -
+            Output: -
+            Referenced By: MolecularDynamics 
             Description: 
+            1. Read lines of prmfilepath into an array
+            2. Iterate over lines in array and if detect line with water hydrogen or water oxygen description, then save the type numbers to variable names for later use
             """
+            # STEP 1
             temp=open(self.prmfilepath,'r')
             results=temp.readlines()
             temp.close()
             for line in results:
+                # STEP 2
                 if 'atom' in line:
                     linesplit=line.split()
                     oxygen='"AMOEBA Water O"'
@@ -5363,21 +5129,26 @@ class PolarizableTyper():
 
         def RotateTranslateInertialFrame(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Rotate into inertial frame to make it easier to compute appropriate dimensions for box based on max length of the molecule. 
+            Input: - 
+            Output: - 
+            Referenced By: MolecularDynamics 
             Description: 
+            1. Create filename with inputs for xyzedit program
+            2. Call xyzedit with input file created
+            3. Rename output filename (which may have _2 etc) after to the original intended filename  
             """
             if self.receptorligandxyzfilename!=None:
+                # STEP 1
                 filename='xyzedit.in'
                 temp=open(filename,'w')
                 temp.write('14'+'\n')
                 temp.write('\n')
                 temp.close()
                 cmdstr=self.xyzeditpath+' '+self.receptorligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'<'+' '+filename
-                
-                submit.call_subsystem(self,cmdstr,wait=True)    
+                # STEP 2 
+                submit.call_subsystem(self,cmdstr,wait=True)   
+                # STEP 3 
                 endsplit=self.receptorligandxyzfilename.split('.')
                 end=endsplit[1]
                 if '_' in end:
@@ -5390,17 +5161,18 @@ class PolarizableTyper():
                 if filename[-2]=='_':
                     filename=filename[:-2]
                 newfilename=filename+'_'+newcount
-                #os.remove(self.receptorligandxyzfilename)
                 os.rename(newfilename,self.receptorligandxyzfilename)
 
 
         def CheckFloat(self,string):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Just quick check to see if character in file is float or not, for example when want to determine if line contains box size information or not
+            Input: String
+            Output: Boolean determining if string is float or not
+            Referenced By: Various functions for modifying/reading arc/xyz files 
             Description: 
+            1. try to convert string to a float, if it works return True
+            2. If try fails, then return False
             """
             try:
                 float(string)
@@ -5410,13 +5182,17 @@ class PolarizableTyper():
 
         def CheckReceptorLigandXYZFile(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: If user has box information on the top in input file (copied from some arc etc), then remove it.
+            Input: -
+            Output: -
+            Referenced By: MolecularDynamics 
+            Description:
+            1. Read lines of xyz file into array
+            2. Iterate over lines of array, then check if there is any box information (6 items, all floats)
+            3. Skip over box information and write all other lines to new file, then rename to original filename 
             """
             if self.receptorligandxyzfilename!=None:
+                # STEP 1
                 temp=open(self.receptorligandxyzfilename,'r')
                 results=temp.readlines()
                 temp.close()
@@ -5425,12 +5201,14 @@ class PolarizableTyper():
                 for line in results:
                     linesplit=line.split() 
                     isboxline=True
+                    # STEP 2
                     if len(linesplit)==6:
                         for e in linesplit:
                             if self.CheckFloat(e)==False:
                                 isboxline=False
                     else:
                         isboxline=False
+                    # STEP 3
                     if isboxline==True:
                         continue
                     else:
@@ -5444,13 +5222,15 @@ class PolarizableTyper():
  
         def CleanUpFiles(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Remove intermediate files from tinker computations (usually the last one is copied and/or renamed to desired filename)
+            Input: - 
+            Output: -
+            Referenced By: MolecularDynamics
             Description: 
+            1. Iterate over all files in directory, remove any .xyz_ files or key_ files 
             """
             files=os.listdir()
+            # STEP 1
             for f in files:
                 if self.ligandxyzfilenamelist!=None:
                     for xyz in self.ligandxyzfilenamelist:
@@ -5467,15 +5247,18 @@ class PolarizableTyper():
             
         def SanitizeMMExecutable(self, executable):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Sometimes tinker binaries are installed with program.x rather than just program, so need a function that chooses correctly based on what is in PATH.
+            Input: Executable name
+            Output: New executable name
+            Referenced By: GenerateParameters, _post_init_
             Description: 
+            1. If input executable is found in PATH, then return executable 
+            2. If not, check for executable with .x in TINKERDIR and return that executable 
             """
-            # Try to find Tinker executable with/without suffix
+            # STEP 1
             if self.which(executable)!=None:
                 return executable
+            # STEP 2
             if self.tinkerdir is None:
                 self.tinkerdir = os.getenv("TINKERDIR", default="")
             exe = os.path.join(self.tinkerdir, executable)
@@ -5488,31 +5271,29 @@ class PolarizableTyper():
 
         def which(self,program):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Look for executable in PATH
+            Input: executable name
+            Output: Executable name (if found in PATH), else return None
+            Referenced By: SanitizeMMExecutable
             Description: 
+            1. Define function that tries to see if function is in PATH
+            2. First call function is_exe to check if program is found in PATH
+            3. If not found, then itetate over all paths in PATH, and check if the program can be found in any of those paths 
             """
+            # STEP 1
             def is_exe(fpath):
-                """
-                Intent:
-                Input:
-                Output:
-                Referenced By: 
-                Description: 
-                """
                 try:
                      return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
                 except:
                      return None
-        
+            # STEP 2
             fpath, fname = os.path.split(program)
             if fpath:
                 result=is_exe(program)
                 if result:
                     return program
             else:
+                # STEP 3
                 for path in os.environ["PATH"].split(os.pathsep):
                     exe_file = os.path.join(path, program)
                     result=is_exe(exe_file)
@@ -5521,131 +5302,167 @@ class PolarizableTyper():
         
             return None
 
-        def ReadReceptorCharge(self):
-            """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
-            """
-            pdbmol=openbabel.OBMol()
-            obConversion = openbabel.OBConversion()
-            obConversion.SetInFormat('pdb')
-            obConversion.ReadFile(pdbmol,self.uncomplexedproteinpdbname)
-            chg=pdbmol.GetTotalCharge()
-            self.receptorcharge=chg 
-
+        
 
         def ReadLigandOBMol(self,structfname):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Convert xyz->mol object to easily probe molecular properties. For example when converting tinker XYZ-> cartesian xyz, then want to convert cartesian xyz to openbabel mol object. 
+            Input: Filename
+            Output: openbabel mol object
+            Referenced By: ReadLigandRdkitMol
+            Description:
+            1. Initialize openbabel conversion object
+            2. Set input format based on file extension
+            3. Create new openbabel mol object and read in filename to mol object 
             """
+            # STEP 1
             tmpconv = openbabel.OBConversion()
+            # STEP 2
             inFormat = openbabel.OBConversion.FormatFromExt(structfname)
             tmpconv.SetInFormat(inFormat)
+            # STEP 3
             tmpmol = openbabel.OBMol()
             tmpconv.ReadFile(tmpmol, structfname)
             return tmpmol
 
         def ReadLigandRdkitMol(self,ligandfilename):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Convert xyz->mol object to easily probe molecular properties. For example when converting tinker XYZ-> cartesian xyz, then want to convert cartesian xyz to rdkit mol object. 
+            Input: Filename
+            Output: rdkit mol object
+            Referenced By: Parameter comparison module 
+            Description:
+            1. First generate openbabel object
+            2. Convert openbabel object to .mol file
+            3. Read .mol file into rdkit object (they have more limited ways of reading in filetypes than openbabel) 
             """
+            # STEP 1
             tmpmol=self.ReadLigandOBMol(ligandfilename)
+            # STEP 2
             tmpconv = openbabel.OBConversion()
             tmpconv.SetOutFormat('mol')
             temp=ligandfilename.replace('.sdf','.mol')
             tmpconv.WriteFile(tmpmol, temp)
+            # STEP 3
             mol=rdmolfiles.MolFromMolFile(temp,removeHs=False,sanitize=False)
-
 
             return mol
 
 
         def PDBCoordinate(self,coords,index):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Need to format PDB files very strictly based on correct column number. This formats coordinate string for PDB files exactly. 
+            Input: Input coordinates, Index for coordinates (for x,y, or z coord)
+            Output: String formatted for coordinate to be added to PDB file
+            Referenced By: GeneratePDBFromARC
             Description: 
+            1. Extract coordinate via index
+            2. Convert coordinate to string
+            3. Split string via decimal place
+            4. Save the string after the decimal
+            5. Determine the number of 0's that need to be appended after words based on length of the string after decimal
+            6. Append the appropriate number of 0's after decimal place
+            7. Determine the number of empty spaces that need to be appended to front of string based on the current total length of string (only 8 characters allowed max). 
+            8. Append empty spaces to front of string based on length determined in last step. 
+            9. Return string 
             """
+            # STEP 1
             x=round(float(coords[index]),3)
+            # STEP 2
             xstring=str(x)
+            # STEP 3
             xstringsplit=xstring.split('.')
+            # STEP 4
             xtail=xstringsplit[1]
+            # STEP 5
             diff = 3-len(xtail)
+            # STEP 6
             for i in range(1,diff+1):
                 xstring+='0'
+            # STEP 7
             odiff=8-len(xstring)
+            # STEP 8
             space=''
             for i in range(1,odiff+1):
                 space+=' '
             xstring=space+xstring
+            # STEP 9
             return xstring
-        
+       
+ 
         def WritePDBString(self,string,line,firstindex,lastindex):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Need to input string exactly in right columns for line that will go into PDB file.
+            Input: String to add to line, original line, first and last indices of where string will go into line
+            Output: Modified line
+            Referenced By: GeneratePDBFromARC
             Description: 
+            1. Iterate over indices in between firstindex and last index
+            2. For each character in input string, assign charcter to index in line 
             """
+            # STEP 1
             for i in range(firstindex,lastindex+1):
+                # STEP 2
                 xitem=string[i-firstindex]
                 line[i]=xitem
 
             return line
 
+
         def GrabPDBLines(self):
             """
-            Intent:
-            Input:
+            Intent: Generate dictionary of pdbindex to pdb line, for use in generating PDB trajectory from tinker ARC
+            Input: -
             Output:
-            Referenced By: 
+            Referenced By: GeneratePDBFromARC
             Description: 
+            1. Iterate over lines of PDB file
+            2. If ATOM or HETATM in line, grab index
+            3. Store index and line into dictionary 
             """
+            # STEP 1
             temp=open(self.complexedproteinpdbname,'r')
             results=temp.readlines()
             temp.close()
             pdbindextopdbline={}
+            # STEP 2
             for line in results:
                 if 'ATOM' in line or 'HETATM' in line:
                     index=int(line[6:10+1].strip())
+                    # STEP 3
                     pdbindextopdbline[index]=line
             return pdbindextopdbline
 
         def WritePDBCONECTRecord(self,temp,indextoconn):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Add CONECT records to PDB file 
+            Input: filehandle, dictionary of atomindex to connected atom indices
+            Output: - 
+            Referenced By: GeneratePDBFromARC
             Description: 
+            1. Iterate over dictionary of index to connected indices
+            2. For each index, create a string and append empty spaces in front of string such that the total length is 5
+            3. Write the index string to the CONECT line string
+            4. For all connected indices, do the same, create string of length 5 and add in write place to CONECT string
+            5. Write line to filehandle 
             """
+            # STEP 1
             for index,conns in indextoconn.items():
                 if len(conns)!=0:
                     shift=0
                     string='CONECT                                                                       '
                     string=list(string)
+                    # STEP 2
                     indexstring=str(index)
                     odiff=5-len(indexstring)
                     space=''
                     for i in range(1,odiff+1):
                         space+=' '
                     indexstring=space+indexstring
+                    # STEP 3
                     self.WritePDBString(indexstring,string,6+shift,10+shift)
                     shift+=5
+                    # STEP 4
                     for idx in conns:
                         indexstring=str(idx)
                         odiff=5-len(indexstring)
@@ -5656,26 +5473,46 @@ class PolarizableTyper():
                         self.WritePDBString(indexstring,string,6+shift,10+shift)
                         shift+=5
                     string=''.join(string)+'\n'
+                    # STEP 5
                     temp.write(string)
             temp.write('ENDMDL'+'\n')
 
 
         def GeneratePDBFromARC(self,tinkerxyzfilename,pdbfilename):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Convert tinker XYZ or tinker ARC into PDB trajectory
+            Input: tinker file, desired pdbfilename
+            Output: -
+            Referenced By: PymolReadableFile
             Description: 
+            1. Iterate over lines of tinker file and save in array
+            2. Grab dictionary of PDB index to pdb line from pdbfilename
+            3. Save generic HETATM string for use in converting lines in tinker XYZ that were not originally in the input PDB (such as waters or ions etc).
+            4. Create dictionary of tinker XYZ index to PDB index
+            5. Append current model number to top of PDB file
+            6. Iterate over tinker XYZ lines 
+            7. Extact current element, XYZ index, and connected XYZ indices and pdbline from dictionary of tinker xyz index to PDB line
+            8. Save connected indices in dictionry for later
+            9. Add index formatted corectly to PDB line
+            10. Add element, formatted correctly to PDB line
+            11. Add residue, formatted correctly to PDB line 
+            12. Add tinker coordinates, formatted correctly to PDB line
+            13. Write connect record and then update model number and write model line to PDB file everytime box information is detected in tinker file
+            14. Write final connect record and ENDMDL after looping over all tinker XYZs in ARC  
             """
+            # STEP 1
             temp=open(tinkerxyzfilename,'r')
             results=temp.readlines()
             temp.close()
+            # STEP 2
             pdbindextopdbline=self.GrabPDBLines()
             temp=open(pdbfilename,'w')
+            # STEP 3 
             hetatmstring='HETATM22011  H   UNK  1334      -6.447 -12.617  22.452'+'\n'
+            # STEP 4
             xyzindextopdbindex={v: k for k, v in self.pdbindextoxyzindex.items()}
             indextoconn={}
+            # STEP 5
             first=True
             modelnum=1
             modelstring='MODEL                                            '+'\n'
@@ -5689,11 +5526,13 @@ class PolarizableTyper():
             self.WritePDBString(modelnumstring,modelstring,10,13)
             modelstring=''.join(modelstring)
             temp.write(modelstring)
+            # STEP 6
             for line in results:
                 linesplit=line.split()
                 cont=False
                 if '90.000' not in line and len(linesplit)>1:
                     first=False
+                    # STEP 7
                     xyzindex=int(linesplit[0])
                     element=linesplit[1]
                     conns=linesplit[6:]
@@ -5710,7 +5549,9 @@ class PolarizableTyper():
                         pdbline=hetatmstring
                         residuenum=lastres+1
                     if cont==False:
+                        # STEP 8
                         indextoconn[xyzindex]=conns
+                        # STEP 9
                         fullsplit=re.split(r'(\s+)', pdbline)
                         pdbline=list(pdbline)
                         indexstring=str(xyzindex)
@@ -5720,6 +5561,7 @@ class PolarizableTyper():
                             space+=' '
                         indexstring=space+indexstring
                         self.WritePDBString(indexstring,pdbline,6,10)
+                        # STEP 10
                         elementstring=str(element)
                         odiff=4-len(elementstring)
                         space=''
@@ -5727,6 +5569,7 @@ class PolarizableTyper():
                             space+=' '
                         elementstring=elementstring+space
                         self.WritePDBString(elementstring,pdbline,12,15)
+                        # STEP 11
                         residuestring=str(residuenum)
                         odiff=4-len(residuestring)
                         space=''
@@ -5734,6 +5577,7 @@ class PolarizableTyper():
                             space+=' '
                         residuestring=space+residuestring
                         self.WritePDBString(residuestring,pdbline,22,25)
+                        # STEP 12
                         coords=[float(linesplit[2]),float(linesplit[3]),float(linesplit[4])]        
                         xstring=self.PDBCoordinate(coords,0)
                         ystring=self.PDBCoordinate(coords,1)
@@ -5744,6 +5588,7 @@ class PolarizableTyper():
                         pdbline=''.join(pdbline)
                         temp.write(pdbline)
                 elif '90.000' in line and first==False:
+                    # STEP 13
                     modelnum+=1
                     self.WritePDBCONECTRecord(temp,indextoconn)
                     modelstring='MODEL                                            '+'\n'
@@ -5757,7 +5602,7 @@ class PolarizableTyper():
                     self.WritePDBString(modelnumstring,modelstring,10,13)
                     modelstring=''.join(modelstring)
                     temp.write(modelstring)
-
+            # STEP 14
             self.WritePDBCONECTRecord(temp,indextoconn)
             temp.write('ENDMDL'+'\n')
             temp.close()
@@ -5765,35 +5610,45 @@ class PolarizableTyper():
 
         def PymolReadableFile(self,tinkerxyzfilename,outputname):
             """
-            Intent:
-            Input:
+            Intent: Convert tinker XYZ/ARC -> PDB trajectory, so can visualize in popular visualization software
+            Input: Tinker xyz filename, output name for pymol readable file
             Output:
-            Referenced By: 
+            Referenced By: Various python modules for when converting tinker XYZ-> PDB, such as minimized XYZ, final frame of equilibriated XYZ and even ARC for production dynamics with full electrostatics and van der waals interactions.  
             Description: 
+            1. Convert tinker XYZ to cartesian XYZ
+            2. If complexed XYZ/ARC file then generate PDB trajectory
             """
+            # STEP 1
             xyzfilename=self.ConvertTinkerXYZToCartesianXYZ(tinkerxyzfilename)
             os.rename(xyzfilename,outputname)
             pdbfilename=outputname.replace('.xyz','.pdb')
+            # STEP 2
             if self.complexedproteinpdbname!=None and 'comp' in tinkerxyzfilename:
                 self.GeneratePDBFromARC(tinkerxyzfilename,pdbfilename)   
 
 
         def GrabIndexToCoordinatesPymol(self,mol):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Grab coordinates from mol object
+            Input: rdkit mol object
+            Output: Dictionary of atom index to coordinates
+            Referenced By: pdbxyz module
+            Description:
+            1. Iterate over atoms in mol object
+            2. Grab atom position from default conformer
+            3. Save the coordinates into dictionary
             """
             indextocoords={}
+            # STEP 1
             for atom in mol.GetAtoms():
                 atomidx=atom.GetIdx()
+                # STEP 2
                 pos = mol.GetConformer(0).GetAtomPosition(atomidx)
                 X=pos.x
                 Y=pos.y
                 Z=pos.z
                 atomindex=atomidx+1 
+                # STEP 3
                 indextocoords[atomindex]=[X,Y,Z]
         
             return indextocoords
@@ -5801,19 +5656,26 @@ class PolarizableTyper():
             
         def ConvertTinkerXYZToCartesianXYZ(self,tinkerxyzfilename):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Convert tinker XYZ to cartesian XYZ, which then enables creating mol object for processing topology information easier.
+            Input: Tinker XYZ file
+            Output: Cartesian XYZ file
+            Referenced By: Various functions
             Description: 
+            1. Create cartesian XYZ filename
+            2. Loop over lines of tinker XYZ
+            3. Write out total atom number
+            4. Write out only element, and coordinates in new line to cartesian XYZ file 
             """
+            # STEP 1
             xyzfilename=tinkerxyzfilename.replace('.xyz','_cart.xyz')
             temp=open(tinkerxyzfilename,'r')
             tempwrite=open(xyzfilename,'w')
             results=temp.readlines()
+            # STEP 2
             for lineidx in range(len(results)):
                 line=results[lineidx]
                 if lineidx==0:
+                    # STEP 3
                     linesplit=line.split()
                     tempwrite.write(linesplit[0]+'\n')
                     tempwrite.write('\n')
@@ -5822,6 +5684,7 @@ class PolarizableTyper():
                 else:
                     linesplit=line.split()
                     if len(linesplit)>1:
+                        # STEP 4
                         newline=linesplit[1]+' '+linesplit[2]+' '+linesplit[3]+' '+linesplit[4]+'\n'
                         tempwrite.write(newline)
                         tempwrite.flush()
@@ -5833,31 +5696,43 @@ class PolarizableTyper():
 
         def CheckIfNeedRegrowForSolvation(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: If molecule is small enough, vdw interactions will not be needed (need at least 4 atoms across to feel vdw interactions). If small enough, then for hydration free energy, dont need to use vdw-annihilate or regrow vdw with gas phase. 
+            Input: - 
+            Output: Boolean to see if need to regrow vdw interactions in gas phase for HFE
+            Referenced By: MolecularDynamics
             Description: 
+            1. Assume do not need to regrow
+            2. Iterate over neighors
+            3. Iterate over neighbors of neighbors
+            4. Iterate over neighbors of neighbors of neighbors
+            5. Iterate over neighbors of previous neighbors again...
+            6. If atom index is not repeated, then molecule is big enough to require gas phase vdw regrowth for HFE  
             """
+            # STEP 1
             needregrow=False
             if self.solvation==True:
                 if self.binding==False and self.annihilatevdw==True:
                     for xyz in self.ligandxyzfilenamelist:
                         xyzfilename=self.ConvertTinkerXYZToCartesianXYZ(xyz)
                         tmpmol=self.ReadLigandOBMol(xyzfilename)
+                        # STEP 2
                         atomiter=openbabel.OBMolAtomIter(tmpmol)
                         for atom in atomiter:
                             atomidx=atom.GetIdx()
                             iteratomatom = openbabel.OBAtomAtomIter(atom)
+                            # STEP 3
                             for natom in iteratomatom:
                                 natomidx=natom.GetIdx()
                                 iteratomatomatom = openbabel.OBAtomAtomIter(natom)
+                                # STEP 4
                                 for nnatom in iteratomatomatom:
                                     nnatomidx=nnatom.GetIdx()
                                     if nnatomidx!=atomidx: 
+                                        # STEP 5
                                         iteratomatomatomatom = openbabel.OBAtomAtomIter(nnatom)
                                         for nnnatom in iteratomatomatomatom:
                                             nnnatomidx=nnnatom.GetIdx()
+                                            # STEP 6
                                             if nnnatomidx!=natomidx:
                                                 needregrow=True
 
@@ -5865,66 +5740,28 @@ class PolarizableTyper():
             return needregrow 
 
 
-        def CheckLigandInputCharge(self,molecule):
-            """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
-            """
-            array=[]
-            totchg=0
-            atomindextoformalcharge={}
-            atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
-            for atom in molecule.GetAtoms():
-                atomidx=atom.GetIdx()
-                atomnum=atom.GetAtomicNum()
-                val=atom.GetExplicitValence()
-                valtochg=atomicnumtoformalchg[atomnum]
-                if val not in valtochg.keys(): # then assume chg=0
-                    chg=0
-                else:
-                    chg=valtochg[val]
-                polneighb=False
-                if atomnum==6:
-                    for natom in atom.GetNeighbors():
-                        natomicnum=natom.GetAtomicNum()
-                        if natomicnum==7 or natomicnum==8 or natomicnum==16:
-                            polneighb=True
-                    if polneighb and val==3:
-                        chg=1
-                atom.SetFormalCharge(chg) 
-                atom.SetNumRadicalElectrons(0)
-                atomindextoformalcharge[atomidx]=chg
-                totchg+=chg
-                string='Atom index = '+str(atomidx+1)+' Atomic Number = ' +str(atomnum)+ ' Valence = '+str(val)+ ' Formal charge = '+str(chg)
-                array.append(string)
-            if self.ligandcharge!=None: 
-                if self.ligandcharge!=totchg:
-                    for row in array:
-                        print(row,flush=True)
-                    raise ValueError('Valence is not consistent with input total charge')
-            else:
-                self.ligandcharge=totchg
-            return molecule,atomindextoformalcharge
-
-
         def CheckTinkerVersion(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Need to ensure user doesnt have a tinker version that is too old and incompatible with poltype
+            Input: -
+            Output: -
+            Referenced By: MolecularDynamics
             Description: 
+            1. Use water.xyz and water.key in VersionFiles folder to construct a command for the analyze program
+            2. Call analyze with command
+            3. Read output file and parse for version number
+            4. If the version number is less than required value, then just crash poltype 
             """
+            # STEP 1
             cmdstr=self.analyzepath+' '+os.path.abspath(os.path.join(self.annihilatorpath, os.pardir))+r'/VersionFiles/'+'water.xyz'+' '+'-k'+' '+os.path.abspath(os.path.join(self.annihilatorpath, os.pardir))+r'/VersionFiles/'+'water.key'+' '+'e'+'>'+' '+'version.out'
             
             self.WriteToLog(cmdstr)
+            # STEP 2
             try:
                 returned_value = subprocess.call(cmdstr, shell=True)
             except:
                 raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())      
+            # STEP 3
             temp=open('version.out','r')
             results=temp.readlines()
             temp.close()
@@ -5936,25 +5773,30 @@ class PolarizableTyper():
                     if version.parse(self.versionnum) >= version.parse("8.9.4"):
                         latestversion = True
                         break
-
+            # STEP 4
             if not latestversion:
                 raise ValueError("Notice: Not latest working version of tinker (8.9.4)"+' '+os.getcwd())
           
 
         def GrabIndicesWithTypeNumber(self,xyzfilename,ligandtypes):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Find all atom indices corresponding to input type numbers, used when comparing types between input ligand tinker XYZ files as well as receptor-ligand tinker XYZ files (type numbers may be inconsistent or out of order etc). 
+            Input: Tinker xyz filename, array of type numbers
+            Output: array of atomic indices
+            Referenced By: CheckInputXYZKeyFiles
+            Description:
+            1. Iterate over lines of tinker XYZ file
+            2. Determine if line contains box information
+            3. If not a box line, extract type number and index, if type number is in input array of type numbers then append index to array of indices. 
             """
             indices=[]
             temp=open(xyzfilename,'r')
             results=temp.readlines()
             temp.close()
+            # STEP 1
             for line in results:
                 linesplit=line.split()
+                # STEP 2
                 isboxline=True
                 if len(linesplit)==6:
                     for e in linesplit:
@@ -5963,6 +5805,7 @@ class PolarizableTyper():
                 else:
                     isboxline=False
                 if len(linesplit)>1 and isboxline==False:
+                    # STEP 3
                     typenum=int(linesplit[5])
                     index=int(linesplit[0])
                     if typenum in ligandtypes:
@@ -5971,16 +5814,20 @@ class PolarizableTyper():
             
         def GrabTypeNumbers(self,xyzfilename,indices=None):  
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Grab all type numbers from tinker XYZ file
+            Input: tinker xyz filename
+            Output: array of type numbers
+            Referenced By: CheckInputXYZKeyFiles
             Description: 
+            1. Iterate over lines of tinker XYZ file
+            2. If line does not contain box information
+            3. Extract type number and append to array
             """
             temp=open(xyzfilename,'r')
             results=temp.readlines()
             temp.close()
             typenums=[]
+            # STEP 1
             for line in results:
                 linesplit=line.split()
                 isboxline=True
@@ -5990,7 +5837,9 @@ class PolarizableTyper():
                             isboxline=False
                 else:
                     isboxline=False
+                # STEP 2
                 if len(linesplit)>1 and isboxline==False:
+                    # STEP 3
                     typenum=int(linesplit[5])
                     index=int(linesplit[0])
                     if indices!=None:
@@ -6002,16 +5851,20 @@ class PolarizableTyper():
 
         def GrabCoordinates(self,xyzfilename,indices=None):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Want to grab coordinates from complexed XYZ, want to make sure solvation XYZ has same initial coordinates.
+            Input: Tinker xyz filename, optionally input array of indices
+            Output: Array of coordinates
+            Referenced By: CheckInputXYZKeyFiles, minimization module - FindTwoAtomsForRestrainingRotation
+            Description:
+            1. Iterate over tinker XYZ
+            2. If not box line, then grab coordinates
+            3. Append coordinates to array of coordinates
             """
             temp=open(xyzfilename,'r')
             results=temp.readlines()
             temp.close()
             coords=[]
+            # STEP 1
             for line in results:
                 linesplit=line.split()
                 isboxline=True
@@ -6021,9 +5874,11 @@ class PolarizableTyper():
                             isboxline=False
                 else:
                     isboxline=False
+                # STEP 2
                 if len(linesplit)>1 and isboxline==False:
                     typenum=int(linesplit[5])
                     index=int(linesplit[0])
+                    # STEP 3
                     coord=[float(linesplit[2]),float(linesplit[3]),float(linesplit[4])]
                     try:
                         if index in indices:
@@ -6035,11 +5890,14 @@ class PolarizableTyper():
 
         def CompareTypes(self,receptorligandtypes,ligandtypes):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Ensure type numbers in receptor-ligand XYZ are same as from input ligand tinker XYZ file.
+            Input: Array of receptorligand types, array of ligand types
+            Output: -
+            Referenced By: CheckInputXYZKeyFiles
+            Description:
+            1. Iterate over ligandtypes
+            2. Extract corresponding receptorligand type
+            3. If the types are not the same, raise error and crash program
             """
             for i in range(len(ligandtypes)):
                 receptorligandtype=receptorligandtypes[i]
@@ -6049,11 +5907,15 @@ class PolarizableTyper():
 
         def RewriteCoordinates(self,xyzfilename,coords):
             """
-            Intent:
-            Input:
+            Intent: Update coordinates in tinker XYZ with new coordinates, for example if want solvation XYZ to have same coordinates as ligand in complexed-ligand tinker XYZ
+            Input: Tinker xyz filename, array of coordinates
             Output:
-            Referenced By: 
+            Referenced By: CheckInputXYZKeyFiles
             Description: 
+            1. Iterate over tinker XYZ
+            2. If not box line, then grab coordinates from input array of coordinates
+            3. Add coordinates to line
+            4. Write out new line with updated coordinates
             """
             temp=open(xyzfilename,'r')
             results=temp.readlines()
@@ -6061,8 +5923,10 @@ class PolarizableTyper():
             tempname=xyzfilename.replace('.xyz','-t.xyz')
             temp=open(tempname,'w')
             count=0
+            # STEP 1
             for line in results:
                 linesplit=line.split()
+                # STEP 2
                 isboxline=True
                 if len(linesplit)==6:
                     for e in linesplit:
@@ -6070,6 +5934,7 @@ class PolarizableTyper():
                             isboxline=False
                 else:
                     isboxline=False
+                # STEP 3
                 if len(linesplit)>1 and isboxline==False:
                     coord=coords[count]
                     count+=1
@@ -6078,6 +5943,7 @@ class PolarizableTyper():
                     linesplit[4]=str(coord[2])
                     line=' '.join(linesplit)+'\n'
                 if isboxline==False:
+                    # STEP 4
                     temp.write(line)
             temp.close()
             os.remove(xyzfilename)
@@ -6086,9 +5952,9 @@ class PolarizableTyper():
 
         def ReadCharge(self,output,checkresid=True):
             """
-            Intent:
-            Input:
-            Output:
+            Intent: Read charge from output using tinker analyze. For example, want to ensure total charge is integer or for some systems need to ensure net charge is 0.
+            Input: Output from tinker analyze
+            Output: Total charge and residual charge (left over from nearest integer).
             Referenced By: 
             Description: 
             """
@@ -6569,9 +6435,9 @@ class PolarizableTyper():
                     bond.SetBondType(Chem.BondType.SINGLE)
 
             self.ligandcharge=None
-            mol,atomindextoformalcharge=self.CheckLigandInputCharge(mol)
+            mol,atomindextoformalcharge=self.CheckInputCharge(mol)
             self.ligandcharge=None
-            ref,atomindextoformalcharge=self.CheckLigandInputCharge(ref)
+            ref,atomindextoformalcharge=self.CheckInputCharge(ref)
             self.ligandcharge=None
             Chem.SanitizeMol(mol)
             Chem.SanitizeMol(ref)
@@ -6852,7 +6718,7 @@ class PolarizableTyper():
             Referenced By: 
             Description: 
             """
-            statexyzatominfo,oldindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=parametercomparison.GrabXYZInfo(self,receptorligandxyzfilename)
+            statexyzatominfo,oldindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=self.GrabXYZInfo(receptorligandxyzfilename)
             listofindextooldtypes=[]
             indextonewtype={}
             complexligands=[]
@@ -6901,7 +6767,7 @@ class PolarizableTyper():
                 ligandtypes=self.GrabTypeNumbers(xyz) 
                 oldtypetooldtype=dict(zip(ligandtypes,ligandtypes))
                 oldtypelist.append(oldtypetooldtype)
-                statexyzatominfo,oldindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=parametercomparison.GrabXYZInfo(self,xyz)
+                statexyzatominfo,oldindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=self.GrabXYZInfo(xyz)
                 ligatomnums.append(stateatomnum)
 
 
@@ -7073,6 +6939,47 @@ class PolarizableTyper():
                 raise ValueError('Net charge is not zero! Net Charge = '+str(charge)+' '+keypath)
 
 
+        def GrabXYZInfo(self,xyzfile):
+            """
+            Intent:
+            Input:
+            Output:
+            Referenced By: 
+            Description: 
+            """
+        
+            temp=open(xyzfile,'r')
+            xyzfileresults=temp.readlines()
+            temp.close()
+            xyzatominfo=[]
+            indextotypeindex={}
+            indextocoords={}
+            indextoneighbs={}
+            indextosym={}
+            for lineidx in range(len(xyzfileresults)):
+                line=xyzfileresults[lineidx]
+                linesplit=line.split()
+                if lineidx==0:
+                    xyzatomnum=int(linesplit[0])
+                else:
+                    if len(linesplit)>1 and '90.00' not in line:
+                        index=int(linesplit[0])
+                        typenum=int(linesplit[5])
+                        coords=[linesplit[2],linesplit[3],linesplit[4]]
+                        indextotypeindex[index]=typenum
+                        xyzatominfo.append(linesplit[2:])
+                        indextocoords[index]=coords
+                        indextosym[index]=linesplit[1]
+                        if len(linesplit)>=6:
+                            neighbs=linesplit[6:]
+                            neighbs=[int(i) for i in neighbs]
+                        else:
+                            neighbs=[]
+                        indextoneighbs[index]=neighbs
+            return xyzatominfo,indextotypeindex,xyzatomnum,indextocoords,indextoneighbs,indextosym
+
+
+
         def WriteOutDatabaseParameterLines(self):
             """
             Intent:
@@ -7233,7 +7140,7 @@ if __name__ == '__main__':
                 poltype.WriteToLog(text)
                 poltype.WriteToLog('Poltype has crashed!')
                 try:
-                    poltype.SendCrashReportEmail(text,fromaddr,toaddr,password,filename)
+                    poltype.SendReportEmail(text,fromaddr,toaddr,password,filename,'Poltype Crash Report ')
                 except:
                     pass
             raise ValueError('Houston, we have a problem. Buy a developer some coffee!')

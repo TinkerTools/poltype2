@@ -248,10 +248,6 @@ def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynbo
    if not os.path.isdir(poltype.outputpath+simfoldname):
        os.mkdir(poltype.outputpath+simfoldname)
    os.chdir(poltype.outputpath+simfoldname)
-   if len(poltype.mutlambdascheme)==0:
-       mut=False
-   else:
-       mut=True
    for k in range(len(lambdafolderlist)):
        folderlist=lambdafolderlist[k]
        estatlambdascheme=poltype.estatlambdascheme[k]
@@ -269,11 +265,8 @@ def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynbo
            fold=folderlist[i]
            if fold in foldtonextfold.keys():
                nextfold=foldtonextfold[fold]
-           if mut==False:
-               elelamb=estatlambdascheme[i]
-               vdwlamb=vdwlambdascheme[i]
-           else:
-               mutlambda=poltype.mutlambdascheme[i]
+           elelamb=estatlambdascheme[i]
+           vdwlamb=vdwlambdascheme[i]
            if poltype.complexation==True and poltype.restrainreceptorligand==True and index==0:
                reslambda=restlambdascheme[i]
            else:
@@ -294,42 +287,37 @@ def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynbo
            newfoldpath=os.getcwd()+'/'
            newtempkeyfile=proddynboxfilename.replace('.xyz','.key').replace(poltype.foldername+'_',poltype.foldername+'_'+fold+'_').replace('0.','0-')
 
-           if mut==False:
-               if 'Ion' in fold:
-                   shutil.copyfile(poltype.outputpath+poltype.ionkeyfilename,os.path.join(newfoldpath+newtempkeyfile))
+           if 'Ion' in fold:
+               shutil.copyfile(poltype.outputpath+poltype.ionkeyfilename,os.path.join(newfoldpath+newtempkeyfile))
 
-               elif 'Key' in fold:
-                   numinterpols=poltype.foldernametonuminterpols[fold]
-                   interpolindex=poltype.foldernametointerpolindex[fold]
-                   if numinterpols==1 or i==0 or i==len(folderlist)-1:
-                       shutil.copyfile(poltype.outputpath+poltype.foldernametolambdakeyfilename[fold],os.path.join(newfoldpath+newtempkeyfile))
-                   else:
-                       thiskey=poltype.outputpath+poltype.foldernametolambdakeyfilename[fold]
-                       nextkey=poltype.outputpath+poltype.foldernametolambdakeyfilename[nextfold]
-                       poltype.bgnstatekey=thiskey
-                       poltype.endstatekey=nextkey
-                       poltype.bgnstatexyz=poltype.ligandxyzfilenamelist[0]
-                       poltype.endstatexyz=poltype.ligandxyzfilenamelist[0]
-                       mutate.SingleTopologyMutationProtocol(poltype)
-
-                       arrayoflinearrays=mutate.MutateAllParameters(poltype,poltype.bgnlinetoendline,None,numinterpols,interpolindex)
-                       mutate.GenerateKeyFile(poltype,arrayoflinearrays,os.path.join(newfoldpath+newtempkeyfile))
-                       keymods.InsertKeyfileHeader(poltype,os.path.join(newfoldpath+newtempkeyfile))
-
+           elif 'Key' in fold:
+               numinterpols=poltype.foldernametonuminterpols[fold]
+               interpolindex=poltype.foldernametointerpolindex[fold]
+               if numinterpols==1 or i==0 or i==len(folderlist)-1:
+                   shutil.copyfile(poltype.outputpath+poltype.foldernametolambdakeyfilename[fold],os.path.join(newfoldpath+newtempkeyfile))
                else:
-                   shutil.copyfile(poltype.outputpath+lambdakeyfilenamelist[0],os.path.join(newfoldpath+newtempkeyfile))
-               if 'Gas' in fold:
+                   thiskey=poltype.outputpath+poltype.foldernametolambdakeyfilename[fold]
+                   nextkey=poltype.outputpath+poltype.foldernametolambdakeyfilename[nextfold]
+                   poltype.bgnstatekey=thiskey
+                   poltype.endstatekey=nextkey
+                   poltype.bgnstatexyz=poltype.ligandxyzfilenamelist[0]
+                   poltype.endstatexyz=poltype.ligandxyzfilenamelist[0]
+                   mutate.SingleTopologyMutationProtocol(poltype)
 
-                   if poltype.binding==True:
-                       changeligandindices=True
-                   else:
-                       changeligandindices=False
-                   ModifyKeyForGasPhase(poltype,os.path.join(newfoldpath+newtempkeyfile),changeligandindices,index)
+                   arrayoflinearrays=mutate.MutateAllParameters(poltype,poltype.bgnlinetoendline,None,numinterpols,interpolindex)
+                   mutate.GenerateKeyFile(poltype,arrayoflinearrays,os.path.join(newfoldpath+newtempkeyfile))
+                   keymods.InsertKeyfileHeader(poltype,os.path.join(newfoldpath+newtempkeyfile))
 
            else:
-               arrayoflinearrays=mutate.MutateAllParameters(poltype,poltype.bgnlinetoendline,mutlambda,None,None)
-               mutate.GenerateKeyFile(poltype,arrayoflinearrays,os.path.join(newfoldpath+newtempkeyfile))
-               keymods.InsertKeyfileHeader(poltype,os.path.join(newfoldpath+newtempkeyfile))
+               shutil.copyfile(poltype.outputpath+lambdakeyfilenamelist[0],os.path.join(newfoldpath+newtempkeyfile))
+           if 'Gas' in fold:
+
+               if poltype.binding==True:
+                   changeligandindices=True
+               else:
+                   changeligandindices=False
+               ModifyKeyForGasPhase(poltype,os.path.join(newfoldpath+newtempkeyfile),changeligandindices,index)
+
 
            outputboxname=os.path.join(newfoldpath+proddynboxfilename.replace(poltype.foldername+'_',poltype.foldername+'_'+fold+'_').replace('0.','0-'))
 
@@ -376,13 +364,12 @@ def SetupProductionDynamics(poltype,simfoldname,lambdafolderlist,index,proddynbo
            else:
                shutil.copyfile(poltype.outputpath+poltype.ionproddynboxfilename,outputboxname)
 
-           if mut==False:
-               ModifyLambdaKeywords(poltype,newfoldpath,newtempkeyfile,elelamb,vdwlamb,reslambda)
+           ModifyLambdaKeywords(poltype,newfoldpath,newtempkeyfile,elelamb,vdwlamb,reslambda)
            if poltype.binding==True and 'Gas' not in fold:
                xyzpath=outputboxname
                keypath=newfoldpath+newtempkeyfile
                alzout=newfoldpath+'checknetcharge.alz'
-               if self.skipchargecheck==False:
+               if poltype.skipchargecheck==False:
                    poltype.CheckNetChargeIsZero(xyzpath,keypath,alzout) 
            os.chdir('..')
    os.chdir('..')
@@ -679,7 +666,7 @@ def ProductionDynamicsProtocol(poltype):
         poltype.submitlocally=False
  
     if poltype.prodmdfinished==False:
-        if len(poltype.mutlambdascheme)==0 and poltype.neatliquidsim==False:
+        if poltype.neatliquidsim==False:
             for i in range(len(poltype.lambdakeyfilename)):
                 lambdakeyfilenamelist=poltype.lambdakeyfilename[i]
                 configkeyfilenamelist=poltype.configkeyfilename[i]
@@ -727,7 +714,7 @@ def ProductionDynamicsProtocol(poltype):
                 finished=checkfin[0]
                 percentfinished=checkfin[1]
                 while finished==False:
-                    msg='Production dynamics is not complete, '+str(percentfinished)+'% of jobs finished'
+                    msg='Production dynamics is not complete, '+str(percentfinished)+'% of jobs finished out of a total = '+str(len(proddynoutfilepath))+ ' jobs '
                     if msg not in messages:
                         poltype.WriteToLog(msg,prin=True)
                         messages.append(msg)

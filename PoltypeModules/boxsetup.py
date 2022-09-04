@@ -8,7 +8,6 @@ import numpy as np
 import shutil
 import sys
 from rdkit.Chem import rdmolfiles
-import parametercomparison
 import time
 
 def ComputeBoxSize(poltype):
@@ -726,7 +725,7 @@ def GrabIndicesFromType(poltype,xyz,types):
     Description: 
     """
     indices=[]
-    statexyzatominfo,stateindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=parametercomparison.GrabXYZInfo(poltype,xyz)
+    statexyzatominfo,stateindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=poltype.GrabXYZInfo(xyz)
     for stateindex,typeindex in stateindextotypeindex.items():
         if typeindex in types:
             indices.append(stateindex)
@@ -795,7 +794,7 @@ def BoxSetupProtocol(poltype):
     ligandtypes=[]
     allligandtypes=[]
     for xyz in poltype.ligandxyzfilenamelist:
-        statexyzatominfo,stateindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=parametercomparison.GrabXYZInfo(poltype,xyz)
+        statexyzatominfo,stateindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=poltype.GrabXYZInfo(xyz)
         types=list(stateindextotypeindex.values())
         if xyz in poltype.annihilateligandxyzfilenamelist:
             ligandtypes.extend(types)

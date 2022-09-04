@@ -67,7 +67,6 @@ def GenerateProteinTinkerXYZFile(poltype):
     poltype.uncomplexedxyzname=poltype.uncomplexedproteinpdbname.replace('.pdb','.xyz')
     poltype.complexedxyzname=poltype.uncomplexedxyzname.replace('.xyz','_comp.xyz')
     poltype.receptorligandxyzfilename=poltype.complexedxyzname
-    poltype.ReadReceptorCharge()
     chainnum=DetectNumberOfChains(poltype,poltype.uncomplexedproteinpdbname)
     if chainnum==1:
 

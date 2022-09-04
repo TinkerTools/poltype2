@@ -24,14 +24,6 @@
 
 [Van der Waals Parameterization](#van-der-waals-parameterization)
 
-### ForceBalance Poltype Wrapper
-
-[ForceBalance Poltype Wrapper Example](#forcebalance-poltype-wrapper-example)
-
-[ForceBalance Poltype Wrapper Keywords](#forcebalance-poltype-wrapper-keywords)
-
-[ForceBalance Poltype Wrapper Results](#forcebalance-poltype-wrapper-results)
-
 
 ### Advanced Program Usage Molecular Modelling
 
@@ -65,7 +57,6 @@
 
 [Free Energy](#free-energy)
 
-[Mutation](#mutation)
 
 
 #### Notes
@@ -249,88 +240,6 @@
 ``onlyvdwatomlist`` specifies list of Van der Waals atom indices to use in VdW refinement. Default has no value.
 
 ``fixvdwtyperadii`` specifies list of vdwtypes to fix radius in fitting (can let other vdw parameters fit). Default has no value.
-
-
-
-
-### ForceBalance Poltype Wrapper
- 
- 
-#### ForceBalance Poltype Wrapper Example
-* Example input
-```
-poltypepathlist=/home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CH3Cl,/home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CH2Cl2,/home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CHCl3 
-csvexpdatafile=ExpHalogenData.csv
-vdwtypeslist=401 402 403, 401 402 403 , 401 402 403  
-liquid_prod_time=.5                 
-gas_prod_time=.5
-WQ_PORT=9013
-```
-* Example CSV File in ForceBalanceWrapperExamples folder
-* Dont let property values be blank for some TP points (need value for FB to read).
-* If using ``csvexpdatafile``, please use correct units as below and the column headers in example csv file, make sure the molecule name under the Name column are same as poltype molecule folder name
-* Density units are Kg/m^3
-* Enthalpy of vaporization units kJ/mol
-* pressure units are atm
-* QM energies from dimers in poltype (normalized) >=10 kcal/mol are removed and not use for forcebalance.
-
-#### ForceBalance Poltype Wrapper Keywords
-
-
-``poltypepathlist`` specifies comma seperated list of Paths to completed poltypejobs.
-
-``vdwtypes``        specifies comma seperated list of vdw types lists to parameterize.
-
-``WQ_PORT``         specifies port number for work queue to connect to workers on nodes. Only used for job parralelization.
-
-``liquid_equ_steps`` specifies steps for liquid equilbriation dynamics.
-
-``liquid_prod_steps`` specifies steps for liquid production dynamics.
-
-``liquid_timestep``  specifies time step for liquid dynamics.
-
-``liquid_interval`` specifies how often frames written out, in ps for liquid dynamics.
-
-``gas_equ_steps``   specifies steps for gas equilbriation dynamics.
-
-``gas_prod_steps``  specifies steps for gas production dynamics.
-
-``gas_timestep``   specifies time step for gas dynamics.  
-
-``gas_interval``   specifies how often frames written out, in ps for gas dynamics.
-
-``md_threads``  specifies number of CPU threads to use.
-
-``liquid_prod_time`` specifies total time for liquid production dynamics (ns).
-
-``gas_prod_time``   specifies total time for gas production dynamics (ns).
-
-``liquid_equ_time`` specifies total time for liquid equilibriation dynamics (ns).
-
-``gas_equ_time``    specifies total time for gas equilibriation dynamics (ns).
-
-
-``vdwprmtypestofit`` specifies allowed parameter types for all vdw parameters to fit for vdw (radius S, depth  T, shift D), default=S,T,D . Default makes all vdw parameter types able to be fit.
-
-``vdwtypestoeval``  specifies which vdw parmaeters to fix (while the first instance of parameters is fit). Default all parameters are evaluated besides for instance vdwtypestoeval=S,T,D. 
-
-``qmrelativeweight`` specifies relative weight between QM and Liquid target. Default is .05. 
-
-``liqrelativeweight`` specifies relative weight between Liquid and QM target. Default is 2.5. 
-
-``enthalpyrelativeweight`` specifies relative weight between enthalpy and other liquid properties. Default is 1. 
-
-``densityrelativeweight`` specifies relative weight between density and other liquid properties. Default is .01.
-
-``targetdensityerror`` specifies target density error in kg/m^3 for ForceBalance fitting. Default is 10 kg/m^3.
-
-``targetenthalpyerror`` specifies target enthalpy error in kcal/mol for ForceBalance fitting. Default is .24 kcal/mol .  
-
-``relaxFBbox`` specifies to equilbriate neat liquid box at room temperature for ForceBalance input files (.5 ns and time step of 2 fs). Default is False.
-
-#### ForceBalance Poltype Wrapper Results
-
-``forcebalancejobsdir=Path_to_force_balance_jobs`` specifies to grab ForceBalance output files, parse and generate plots and tables.
 
 
 ### Advanced Program Usage Molecular Dynamics
@@ -593,31 +502,5 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 ``extractinterforbinding`` specifies to extract intermoleculer contribution to free energy for each BAR step. By default, annihilation is used which causes inter and intra molecular components to be mixed for binding free energy (gas phase is not computed since it would cancel in thermodynamic cycle). This keyword will extract the ligand dynamics and generate an ARC file for the ligand, run BAR and compute the exact intermolecular component to the free energy and add to spreadsheet.
 
 ``barfilesfinished`` specifies to skip BAR (for debugging). Default is False.
-
-#### Mutation
-
-``bgnstatekey``  specifies the first state key file for mutation. Default has no value.
-
-``endstatekey``  specifies the end state key file for mutation. Default has no value.
-
-``bgnstatexyz`` specifies the first state xyz file for mutation. Default has no value.
-
-``endstatexyz`` specifies the end state xyz file for mutation. Default has no value.
-
-``bgnstatestructurefile``   specifies the begin structurefile with bond orders since babel sometimes cannot guess correct bond orders from XYZ file. Default has no value.
-
-
-``endstatestructurefile``   specifies the end structurefile with bond orders since babel sometimes cannot guess correct bond orders from XYZ file. Default has no value.
-
-
-``mutlambdascheme``     specifies the lambda scheme (from 0 to 1) of mutation of any parameters between begin and end state keyfiles. Default has no value.
-
-
-``compareparameters``   specifies to compare parameters with analyze and print parameters if energy difference is > energy cutoff. Default is False.
-
-``energycutoff``    specifies the energy cutoff for comparing parameters. Default is .5.
-
-
-``rotateframes``    specifies to rotate multipole frames from bgnstatekey to endstatekey. Default is False.
 
 
