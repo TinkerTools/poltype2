@@ -704,7 +704,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
             firstangle=firstangle+360
         if secondangle<0:
             secondangle=secondangle+360
-        angletol=3.5
+        angletol=5.3
         if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
             continue 
         torsiontophaseangle[tuple([a,b,c,d])]=round((torang+phaseangle)%360)
@@ -753,7 +753,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
                 firstangle=firstangle+360
             if secondangle<0:
                 secondangle=secondangle+360
-            angletol=3.5
+            angletol=5.3
             if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
                 continue 
             if res not in restlist:
@@ -810,16 +810,19 @@ def CheckIfQMOptReachedTargetDihedral(poltype,cartxyz,initialtinkerstructure,tor
     inicartxyz=ConvertTinktoXYZ(poltype,initialtinkerstructure,initialtinkerstructure.replace('.xyz','_cart.xyz'))
     inioptmol = opt.load_structfile(poltype,inicartxyz)
     optmol = opt.load_structfile(poltype,cartxyz)
-    tol=4
+    tol=1
     rotbndtorescount={}
     maxrotbnds=1
     restlist=[]
     rottors,rotbndtorescount,restlist,rotphases=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,optmol,restlist,phaseanglelist)
     frotors,rotbndtorescount,restlist=FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,optmol,restlist,phaseanglelist)
-    rottors.extend(frotors)
-    for tor in rottors:
-        a,b,c,d=tor[:]
+    newarray=[]
+    newarray.extend(rottors)
+    newarray.extend(frotors)
+    for thetor in newarray:
+        a,b,c,d=thetor[:]
         iniang = inioptmol.GetTorsion(a,b,c,d)
+        tempiniang=iniang
         if iniang<0:
             iniang=iniang+360
         iniang=iniang % 360
@@ -829,6 +832,7 @@ def CheckIfQMOptReachedTargetDihedral(poltype,cartxyz,initialtinkerstructure,tor
             shift=0
         reducediniang=iniang-shift
         optang = optmol.GetTorsion(a,b,c,d)
+        tempoptang=optang
         if optang<0:
             optang=optang+360
         optang=optang % 360
@@ -841,7 +845,7 @@ def CheckIfQMOptReachedTargetDihedral(poltype,cartxyz,initialtinkerstructure,tor
         diff= numpy.abs(reducedoptang-reducediniang) # if one is close to 360 (358) but other is close to 0 (1 etc)
         firstdiff=numpy.abs(optang-iniang)
         if firstdiff>tol and diff>tol: # then optimization for ANI or XTB failed to reach target dihedral
-            string='Torsion did not reach target dihedral angle! torsion = '+str(tor)+' tinker minimized dihedral angle is '+str(iniang) +' but the optimized dihedral angle is at '+str(optang)+', tinker structure is '+inicartxyz+' , opt strucuture is '+cartxyz
+            string='Torsion did not reach target dihedral angle! torsion = '+str(thetor)+' tinker minimized dihedral angle is '+str(iniang) +' but the optimized dihedral angle is at '+str(optang)+', tinker structure is '+inicartxyz+' , opt strucuture is '+cartxyz
             raise ValueError(string)
 
 
@@ -1899,7 +1903,7 @@ def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxr
                    firstangle=firstangle+360
                if secondangle<0:
                    secondangle=secondangle+360
-               angletol=3.5
+               angletol=5.3
                if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
                    continue
                if rtb<rtc:
@@ -2020,7 +2024,7 @@ def FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotb
                 firstangle=firstangle+360
             if secondangle<0:
                 secondangle=secondangle+360
-            angletol=3.5
+            angletol=5.3
             if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
                 continue
             if rtb<rtc:

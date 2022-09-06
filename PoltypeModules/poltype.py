@@ -5441,41 +5441,55 @@ class PolarizableTyper():
             Referenced By: GeneratePDBFromARC
             Description: 
             1. Iterate over dictionary of index to connected indices
-            2. For each index, create a string and append empty spaces in front of string such that the total length is 5
-            3. Write the index string to the CONECT line string
-            4. For all connected indices, do the same, create string of length 5 and add in write place to CONECT string
-            5. Write line to filehandle 
+            2. Generate string by calling CONECTRecord
+            3. Write line to filehandle 
             """
             # STEP 1
             for index,conns in indextoconn.items():
                 if len(conns)!=0:
-                    shift=0
-                    string='CONECT                                                                       '
-                    string=list(string)
                     # STEP 2
-                    indexstring=str(index)
-                    odiff=5-len(indexstring)
-                    space=''
-                    for i in range(1,odiff+1):
-                        space+=' '
-                    indexstring=space+indexstring
+                    string=self.CONECTRecord(conns,index)
                     # STEP 3
-                    self.WritePDBString(indexstring,string,6+shift,10+shift)
-                    shift+=5
-                    # STEP 4
-                    for idx in conns:
-                        indexstring=str(idx)
-                        odiff=5-len(indexstring)
-                        space=''
-                        for i in range(1,odiff+1):
-                            space+=' '
-                        indexstring=space+indexstring
-                        self.WritePDBString(indexstring,string,6+shift,10+shift)
-                        shift+=5
-                    string=''.join(string)+'\n'
-                    # STEP 5
                     temp.write(string)
             temp.write('ENDMDL'+'\n')
+
+        def CONECTRecord(self,conns,index):
+            """
+            Intent: Add CONECT records to PDB file 
+            Input: filehandle, dictionary of atomindex to connected atom indices
+            Output: - 
+            Referenced By: GeneratePDBFromARC
+            Description: 
+            1. For each index, create a string and append empty spaces in front of string such that the total length is 5
+            2. Write the index string to the CONECT line string
+            3. For all connected indices, do the same, create string of length 5 and add in write place to CONECT string
+            """
+
+            shift=0
+            string='CONECT                                                                       '
+            string=list(string)
+            # STEP 1
+            indexstring=str(index)
+            odiff=5-len(indexstring)
+            space=''
+            for i in range(1,odiff+1):
+                space+=' '
+            indexstring=space+indexstring
+            # STEP 2
+            self.WritePDBString(indexstring,string,6+shift,10+shift)
+            shift+=5
+            # STEP 3
+            for idx in conns:
+                indexstring=str(idx)
+                odiff=5-len(indexstring)
+                space=''
+                for i in range(1,odiff+1):
+                    space+=' '
+                indexstring=space+indexstring
+                self.WritePDBString(indexstring,string,6+shift,10+shift)
+                shift+=5
+            string=''.join(string)+'\n'
+            return string
 
 
         def GeneratePDBFromARC(self,tinkerxyzfilename,pdbfilename):

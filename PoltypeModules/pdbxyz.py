@@ -54,6 +54,60 @@ def FindMissingResidues(poltype,chaintocurrentresnumtothreeletter):
 
     return chaintomissingresidues
 
+
+def RemoveTERRecords(poltype,complexedproteinpdbname):
+    """
+    Intent: TER Records shift the ATOM/HETATM and CONECT records after TER line, shift back so as to not mess up current method of mapping tinker XYZ index -> PDB index
+    Input: Complexed PDB
+    Output:
+    Referenced By: GenerateProteinTinkerXYZFile
+    Description: 
+    """
+
+    tempname=complexedproteinpdbname.replace('.pdb','_TEMP.pdb')
+    temp=open(complexedproteinpdbname,'r')
+    results=temp.readlines()
+    temp.close()
+    temp=open(tempname,'w')
+    passedTER=False
+    terindex=None
+    for line in results:
+        if 'TER' in line:
+            passedTER=True
+            terindex=int(line.split()[1])
+        elif passedTER==True and ('ATOM' in line or 'HETATM' in line):
+            newindex=int(line[6:11].strip())-1
+            fullsplit=re.split(r'(\s+)', line)
+            line=list(line)
+            indexstring=str(newindex)
+            odiff=5-len(indexstring)
+            space=''
+            for i in range(1,odiff+1):
+                space+=' '
+            indexstring=space+indexstring
+            poltype.WritePDBString(indexstring,line,6,10)
+            line=''.join(line)
+            temp.write(line)
+        elif passedTER==True and 'CONECT' in line:
+            index=int(line[6:11].strip())
+            if index>=terindex:
+                newindex=index-1
+            else:
+                newindex=index
+            conns=line.split()[2:]
+            conns=[int(i) for i in conns]
+            newconns=[]
+            for idx in conns:
+                if idx>=terindex:
+                    idx=idx-1
+                newconns.append(idx)
+            line=poltype.CONECTRecord(newconns,newindex)
+            temp.write(line)
+
+        else:
+            temp.write(line)
+    os.rename(tempname,complexedproteinpdbname)
+
 def GenerateProteinTinkerXYZFile(poltype):
     """
     Intent:
@@ -62,6 +116,7 @@ def GenerateProteinTinkerXYZFile(poltype):
     Referenced By: 
     Description: 
     """
+    RemoveTERRecords(poltype,poltype.complexedproteinpdbname)
     proteinindextocoordinates=GenerateUncomplexedProteinPDBFromComplexedPDB(poltype)
     AddMissingHeavyAtoms(poltype,poltype.uncomplexedproteinpdbname)
     poltype.uncomplexedxyzname=poltype.uncomplexedproteinpdbname.replace('.pdb','.xyz')

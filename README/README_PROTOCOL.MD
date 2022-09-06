@@ -378,9 +378,6 @@ Liu, C.; Piquemal, J. P.; Ren, P., AMOEBA+ Classical Potential for Modeling Mole
 
 Liu, C.; Piquemal, J. P.; Ren, P., Implementation of Geometry-Dependent Charge Flux into the Polarizable AMOEBA+ Potential. J Phys Chem Lett 2019, 11, 419-426.
 
-#### Citations
-1. Molecular dynamics. Florent Barbault. (2010, September 10). Retrieved November 8, 2021, from https://florentbarbault.wordpress.com/research/mova-2/. 
-
 
 ### Developer Notes
 

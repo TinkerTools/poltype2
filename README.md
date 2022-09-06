@@ -401,5 +401,7 @@ nohup python /path_to_poltype/poltype.py &
 
 
 
+#### Citations
+1. Molecular dynamics. Florent Barbault. (2010, September 10). Retrieved November 8, 2021, from https://florentbarbault.wordpress.com/research/mova-2/. 
 
 
