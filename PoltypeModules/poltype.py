@@ -1393,8 +1393,6 @@ class PolarizableTyper():
             if self.alignPDB==True:
                 self.AlignComplexedPDBToUnComplexedPDB()
                 sys.exit()
-            if self.binding==False and self.solvation==False and self.neatliquidsim==False and self.usepdb2pqr==False and self.pdbcode==None:
-                raise ValueError('Please choose either solvation or binding, or neat liquid simulation mode')
 
 
             # STEP 14
@@ -4471,7 +4469,7 @@ class PolarizableTyper():
                     sys.exit()
             # STEP 41
             torgen.get_all_torsions(self,mol)
-            (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,mol,torsionsmissing)
+            (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,optmol,torsionsmissing)
             torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules
             torlist=[tuple(i) for i in torlist]
             torlist=[tuple([i]) for i in torlist]
@@ -5967,22 +5965,32 @@ class PolarizableTyper():
         def ReadCharge(self,output,checkresid=True):
             """
             Intent: Read charge from output using tinker analyze. For example, want to ensure total charge is integer or for some systems need to ensure net charge is 0.
-            Input: Output from tinker analyze
+            Input: Output from tinker analyze, boolean specifying to check for residual charge and crash if not integer
             Output: Total charge and residual charge (left over from nearest integer).
-            Referenced By: 
+            Referenced By: CheckNetChargeIsZero,CheckInputXYZKeyFiles
             Description: 
+            1. If boolean specifies to skip checking charge, then dont crash program (for debugging purposes) 
+            2. Read in results from analyze output
+            3. Iterate over results and extract total charge 
+            4. Check for residual charge
+            5. If boolean specifies to crash for residual charge and there is residual charge, crash program
             """
+            # STEP 1
             if self.skipchargecheck==True:
                 checkresid=False
+            # STEP 2
             temp=open(output,'r')
             results=temp.readlines()
             temp.close()
             chg=0
+            # STEP 3
             for line in results:
                 if 'Total Electric Charge :' in line:
                     linesplit=line.split()
                     chg=float(linesplit[-2])
+            # STEP 4
             resid=int(round(chg))-chg
+            # STEP 5
             if checkresid==True:
                 if resid!=0:
                     raise ValueError('Charge is not integer! '+output+' '+str(chg)+' '+'residual charge is '+str(resid))
@@ -5992,40 +6000,49 @@ class PolarizableTyper():
 
         def CheckEnergies(self,output):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Used after minimizing box to determine if box setup or minimization did not perform well (bond energy per bond is too high)
+            Input: Outputfile from Tinker analyze
+            Output: -
+            Referenced By: minimization.py - CheapMinimizationProtocol
             Description: 
+            1. Define tolerance of 5 kcal/mol/bond
+            2. Iterate over results of tinker analyze output
+            3. Extract Bond Stretching Energies
+            4. Divide Bond energies by total number of bonds
+            5. If bond energy per bond is greater than tolerance, then something is definitely wrong with setup.  
             """
             temp=open(output,'r')
             results=temp.readlines()
             temp.close()
+            # STEP 1
             tol=5
+            # STEP 2
             for line in results:
                 if 'Bond Stretching' in line and 'Parameters' not in line:
                     linesplit=line.split()
                     intnum=int(linesplit[-1])
+                    # STEP 3
                     energy=float(linesplit[-2])
+                    # STEP 4
                     energyperbond=energy/intnum
+                    # STEP 5
                     if energyperbond>tol:
                         raise ValueError('Bad starting box structure, bond energy per bond is way to high '+str(energyperbond)+' kcal/mol')
 
 
-            for line in results:
-                if 'Total Electric Charge :' in line:
-                    linesplit=line.split()
-                    chg=float(linesplit[-2])
 
 
 
         def CheckInputXYZKeyFiles(self,ligandonly=False):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Append all keys from keyfilenamelist into one key file. Check to ensure net charge is an integer, if not then pick some multipoles on host (protein) and add residual charge onto the protein multipole to ensure net charge is an integer.
+            Input: Boolean to only check ligand XYZs/keys (want to check ligand tinker files before making complex XYZ and key) 
+            Output: Array of multipole parameters that may need to be added if there is residual charge (not integer net charge) 
+            Referenced By: MolecularDynamics 
             Description: 
+            1. Remove typical header keywords from keyfile input. Sometimes users copy from other source with header information.
+            2. Add parameter file key word to header 
+            3. Iterate over all input ligand XYZ/keys 
             """
             keymods.RemoveKeyWords(self,self.originalkeyfilename,['parameters','axis','ewald','pme-grid','pme-order','cutoff','thermostat','integrator','ligand','verbose','archive','neighbor-list','polar-eps','polar-predict','heavy-hydrogen','omp-threads','OPENMP-THREADS'])
             head,tail=os.path.split(self.prmfilepath)
