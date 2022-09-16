@@ -219,6 +219,8 @@
                     
 ``fitfirsttorsionfoldphase`` specifies to add a phase fitting parameter to the first cosine term in the torsion fitting                           function. Default is False.
 
+``maxtorresnitrogen`` specifies number of dihedral restraints per rotatable bond for rotatable bonds that contain nitrogen dihedrals with hydrogens. Default is 1. For comparing different optimizers that may shift heavy atoms differently can set higher.  
+
 #### Fragmenter
 
 ``maxgrowthcycles``   specifies the maximum number of growth cycles before stopping fragmenter progtocol. Default is 4.

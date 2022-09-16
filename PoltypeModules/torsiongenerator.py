@@ -220,7 +220,9 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
                 cmdstr='psi4 '+inputname+' '+outputname
                 executable='psi4'
             else:
-                inputname,outputname=GenerateTorsionSPInputFileGaus(poltype,torset,optmol,phaseangles,outputlog,mol)
+                print('outputlog',outputlog)
+                cartxyz=outputlog.replace('.log','.xyz')
+                inputname,outputname=GenerateTorsionSPInputFileGaus(poltype,torset,optmol,phaseangles,cartxyz,mol)
                 cmdstr = 'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
                 executable=poltype.gausexe
         elif poltype.torspmethod=='xtb':
@@ -1103,7 +1105,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         optnumtofulllistofjobs['1'].extend(listofjobs)
         fulljobtolog.update(jobtolog) 
         fulljobtooutputlog.update(jobtooutputlog)
-
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMOptJobToLog'+'_1'+'_'+poltype.molecprefix
     if poltype.externalapi!=None:
         if len(optnumtofulllistofjobs['1'])!=0:
@@ -1789,6 +1790,8 @@ def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxr
        a,b,c,d=tor[0:4]
        key=' '.join([str(b),str(c)])
        phaseangle=phaseangles[i]
+       themaxrotbnds=maxrotbnds
+       finishednitrogenhydres=False
        if key in poltype.rotbndlist.keys():
            newtorsions=SortTorsions(poltype,poltype.rotbndlist[key],inputmol)
            for resttors in newtorsions:
@@ -1807,7 +1810,7 @@ def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxr
 
                nitrogenhydtor=False
                nitrogentwohydtor=False
-               if (rtbatomicnum==7 and rtaatomicnum==1):
+               if (rtbatomicnum==7 and rtaatomicnum==1) and finishednitrogenhydres==False:
                    nitrogenhydtor=True
                    numhyds=0
                    iteratomatom = openbabel.OBAtomAtomIter(batom)
@@ -1818,7 +1821,7 @@ def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxr
                    if numhyds==2:
                        nitrogentwohydtor=True
                        triplet=tuple([rta,rtb,rtc])
-               if (rtcatomicnum==7 and rtdatomicnum==1):
+               if (rtcatomicnum==7 and rtdatomicnum==1) and finishednitrogenhydres==False:
                    nitrogenhydtor=True
                    numhyds=0
                    iteratomatom = openbabel.OBAtomAtomIter(catom)
@@ -1829,7 +1832,6 @@ def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxr
                    if numhyds==2:
                        nitrogentwohydtor=True
                        triplet=tuple([rtd,rtc,rtb])
-
                firstangle=inputmol.GetAngle(aatom,batom,catom)
                secondangle=inputmol.GetAngle(batom,catom,datom)
 
@@ -1851,7 +1853,7 @@ def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxr
                    rtang = inputmol.GetTorsion(rta,rtb,rtc,rtd)
                    if rtang<0:
                        rtang=rtang+360
-                   if (((inputmol.GetAtom(rta).GetAtomicNum() == 1) or (inputmol.GetAtom(rtd).GetAtomicNum() == 1)) and allhydtors==False and nitrogenhydtor==False):
+                   if (((inputmol.GetAtom(rta).GetAtomicNum() == 1) and (inputmol.GetAtom(rtd).GetAtomicNum() == 1)) and allhydtors==False and nitrogenhydtor==False):
                        continue
                    else:
                        if rotbnd not in rotbndtorescount.keys():
@@ -1860,18 +1862,27 @@ def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxr
                            if rotbnd not in rotbndtohydrescount.keys():
                                rotbndtohydrescount[rotbnd]=0
                            if rotbndtohydrescount[rotbnd]>=maxrotbnds and nitrogentwohydtor==False:
+                               finishednitrogenhydres=True
                                continue
                            if nitrogentwohydtor==True:
                                if triplet not in hydtriplettocount.keys():
                                    hydtriplettocount[triplet]=0
-                               if hydtriplettocount[triplet]>=maxrotbnds:
+
+                               if hydtriplettocount[triplet]>=maxrotbnds+numpy.abs(maxrotbnds-themaxrotbnds):
+                                   finishednitrogenhydres=True
                                    continue
                                hydtriplettocount[triplet]+=1
                            rotbndtohydrescount[rotbnd]+=1
+                           themaxrotbnds=poltype.maxtorresnitrogen
                        else:
-                           
-                           if rotbndtorescount[rotbnd]>=maxrotbnds:
-                               continue
+
+                           if nitrogentwohydtor==True:
+                               if rotbndtorescount[rotbnd]>=themaxrotbnds+maxrotbnds-themaxrotbnds:
+                                   continue
+
+                           else:
+                               if rotbndtorescount[rotbnd]>=themaxrotbnds:
+                                   continue
                        restlist.append(resttors)
                        torsiontophaseangle[tuple([rta,rtb,rtc,rtd])]=round((rtang+phaseangle)%360)
                        torsiontomaintor[tuple([rta,rtb,rtc,rtd])]=True
@@ -1882,7 +1893,6 @@ def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxr
                            firsttor=False
                            rottors.insert(0,[rta,rtb,rtc,rtd])
                            phases.insert(0,phaseangle)
-                       
                        rotbndtorescount[rotbnd]+=1
     if len(rottors)==0:
         raise ValueError('Need at least one torsion restraint per rotatable bond')
@@ -1904,29 +1914,25 @@ def FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotb
     newdic.update(poltype.rotbndlist)
     newdic.update(poltype.nonrotbndlist)
     for rotkey,torsions in newdic.items():
-        count=0
         newtorsions=SortTorsions(poltype,torsions,inputmol)
+        finishednitrogenhydres=False
+        themaxrotbnds=maxrotbnds
         for resttors in newtorsions:
             rta,rtb,rtc,rtd = resttors
             indices=[rta,rtb,rtc,rtd]
             allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,inputmol)
             allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,inputmol)
-
             aatom=inputmol.GetAtom(rta)
             datom=inputmol.GetAtom(rtd)
             batom=inputmol.GetAtom(rtb)
             catom=inputmol.GetAtom(rtc)
-
             rtaatomicnum=aatom.GetAtomicNum()
             rtdatomicnum=datom.GetAtomicNum()
-
-
             rtbatomicnum=batom.GetAtomicNum()
             rtcatomicnum=catom.GetAtomicNum()
-
             nitrogenhydtor=False
             nitrogentwohydtor=False
-            if (rtbatomicnum==7 and rtaatomicnum==1):
+            if (rtbatomicnum==7 and rtaatomicnum==1) and finishednitrogenhydres==False:
                 nitrogenhydtor=True
                 numhyds=0
                 iteratomatom = openbabel.OBAtomAtomIter(batom)
@@ -1937,7 +1943,7 @@ def FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotb
                 if numhyds==2:
                     nitrogentwohydtor=True
                     triplet=tuple([rta,rtb,rtc])
-            if (rtcatomicnum==7 and rtdatomicnum==1):
+            if (rtcatomicnum==7 and rtdatomicnum==1) and finishednitrogenhydres==False:
                 nitrogenhydtor=True
                 numhyds=0
                 iteratomatom = openbabel.OBAtomAtomIter(catom)
@@ -1949,13 +1955,8 @@ def FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotb
                     nitrogentwohydtor=True
                     triplet=tuple([rtd,rtc,rtb])
 
-
-            if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False) and nitrogenhydtor==False:
+            if (rtaatomicnum==1 and rtdatomicnum==1) and (allhydtors==False) and nitrogenhydtor==False:
                 continue
-            if (allhydtorsoneside==True or allhydtors==True) and (rtaatomicnum==1 or rtdatomicnum==1) and nitrogenhydtor==False:
-                if count>=1:
-                    continue
-                count+=1
             firstangle=inputmol.GetAngle(aatom,batom,catom)
             secondangle=inputmol.GetAngle(batom,catom,datom)
             if firstangle<0:
@@ -1971,28 +1972,39 @@ def FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotb
                 rotbnd=tuple([rtc,rtb])
             if rotbnd not in rotbndtorescount.keys():
                 rotbndtorescount[rotbnd]=0
+
             if nitrogenhydtor==True:
                 if rotbnd not in rotbndtohydrescount.keys():
                     rotbndtohydrescount[rotbnd]=0
 
                 if rotbndtohydrescount[rotbnd]>=maxrotbnds and nitrogentwohydtor==False:
+                    finishednitrogenhydres=True
                     continue
                 if nitrogentwohydtor==True:
+
                     if triplet not in hydtriplettocount.keys():
                         hydtriplettocount[triplet]=0
-                    if hydtriplettocount[triplet]>=maxrotbnds:
+
+                    if hydtriplettocount[triplet]>=maxrotbnds+numpy.abs(maxrotbnds-themaxrotbnds):
+                        finishednitrogenhydres=True
                         continue
                     hydtriplettocount[triplet]+=1
                 rotbndtohydrescount[rotbnd]+=1
-                rotbndtorescount[rotbnd]+=1
+                themaxrotbnds=poltype.maxtorresnitrogen
+
             else:
-                if rotbndtorescount[rotbnd]>=maxrotbnds:
-                    continue
+
+                if nitrogentwohydtor==True:
+                    if rotbndtorescount[rotbnd]>=themaxrotbnds+maxrotbnds-themaxrotbnds:
+                        continue
+
+                else:
+                    if rotbndtorescount[rotbnd]>=themaxrotbnds:
+                        continue
 
             rtang = inputmol.GetTorsion(rta,rtb,rtc,rtd)
             if rtang<0:
                 rtang=rtang+360
-
             if resttors not in restlist and resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
                 torsiontophaseangle[tuple([rta,rtb,rtc,rtd])]=round((rtang)%360)
                 torsiontomaintor[tuple([rta,rtb,rtc,rtd])]=False

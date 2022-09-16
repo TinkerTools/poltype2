@@ -80,6 +80,7 @@ from operator import itemgetter
 
 @dataclass
 class PolarizableTyper():
+        maxtorresnitrogen:int=1
         skipchargecheck:bool=False
         useuniquefilenames:bool=False # if users want to have unique filenames for molecular dynamics/BAR otherwise keep same filename to make copying easier from folder to folder
         xtbtorresconstant:float=.5
@@ -572,6 +573,8 @@ class PolarizableTyper():
                             self.templateligandxyzfilename=a
                         elif 'barinterval' in newline:
                             self.barinterval=int(a)
+                        elif 'maxtorresnitrogen' in newline:
+                            self.maxtorresnitrogen=int(a)
                         elif 'xtbmethod' in newline:
                             self.xtbmethod=int(a)
                         elif 'templateligandfilename' in newline:
@@ -6116,21 +6119,25 @@ class PolarizableTyper():
 
         def GrabFirstReceptorIndexAndType(self,xyzfilename):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: When want to deposit residual charge on protein to ensure net charge is an integer. Just pick an atom (hydrogen) on protein and then grab that multipole later on for adding residual charge. This funciton only grabs index and type number.
+            Input: Tinker XYZ 
+            Output: index and type number of atom to deposit residual charge on
+            Referenced By: CheckInputXYZKeyFiles
             Description: 
+            1. Iterate over results of tinker XYZ file.
+            2. If encounter a hydrogen atom return index and type number 
             """
             temp=open(xyzfilename,'r')
             results=temp.readlines()
             temp.close()
+            # STEP 1
             for line in results:
                 linesplit=line.split()
                 if len(linesplit)>1 and '90.0' not in line:
                     index=int(linesplit[0])
                     element=linesplit[1]
                     typenum=int(linesplit[5])
+                    # STEP 2
                     if element=='H':
                         return index,typenum
 
@@ -6138,21 +6145,27 @@ class PolarizableTyper():
 
         def GrabMultipoleParameters(self,prmfilepath,typenum):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Grab the multipole parameters that will be modified to deposit residual charge upon.
+            Input: Tinker parameter file, type number specifying which multipole parameters to grab.
+            Output: Array of multipole parameters
+            Referenced By: CheckInputXYZKeyFiles
             Description: 
+            1. Iterate over parameter file
+            2. If multipole keyword is detected and the desired type number corresponds to that multipole parameter
+            3. Grab all the associated lines then append to an array
             """
             mpolearrays=[]
             temp=open(prmfilepath,'r')
             results=temp.readlines()
             temp.close()
+            # STEP 1
             for lineidx in range(len(results)):
                 line=results[lineidx]
+                # STEP 2
                 if 'multipole' in line:
                     linesplit=line.split()
                     if linesplit[1]==str(typenum):
+                        # STEP 3
                         mpolearrays.append(line)
                         dip=results[lineidx+1]
                         firstquad=results[lineidx+2]
@@ -6163,61 +6176,75 @@ class PolarizableTyper():
                         mpolearrays.append(secondquad)
                         mpolearrays.append(thirdquad)
 
-
             return mpolearrays
 
 
         def ModifyIndexAndChargeMultipole(self,mpolearrays,resid,index):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Modify multipole parameters to ensure there is no net residual charge (net charge is integer).
+            Input: Array of multipole parameters, residual charge to add, atom index of atom that is being modified (tinker allows putting two copies of mlutipole parameters but if you specify atom index instead of type only affects that atom).
+            Output: Modifed array of multipole parameters.
+            Referenced By: CheckInputXYZKeyFiles
+            Description:
+            1. Iterate over array of multipole parameters
+            2. If line contains multipole keyword (also has charge in that line)
+            3. Then modify charge by adding residual and add atom index instead of type number
+            4. Append back to array
             """
+            # STEP 1
             for idx in range(len(mpolearrays)):
                 line=mpolearrays[idx]
+                # STEP 2
                 if 'multipole' in line:
                     chargelinesplit=line.split()
+                    # STEP 3
                     chargelinesplit[1]='-'+str(index)
                     charge=float(chargelinesplit[-1])
                     charge=str(charge+resid)
                     chargelinesplit[-1]=charge
                     chargeline=' '.join(chargelinesplit)+'\n'
+                    # STEP 4
                     mpolearrays[idx]=chargeline 
 
             return mpolearrays
 
 
-
-
         def ModifyCharge(self,keyfilename,mpolearrays):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Append array of modified multipole parameters to keyfile.
+            Input: Tinker key file, array of modified multipole parameters
+            Output: -
+            Referenced By: CheckInputXYZKeyFiles , MolecularDynamics
+            Description:
+            1. Iterate over lines in array of multipole parameters 
+            2. Append line to key file
             """
             temp=open(keyfilename,'a')
+            # STEP 1
             for line in mpolearrays:
+                # STEP 2
                 temp.write(line)
             temp.close()
 
 
         def DetermineIonsForChargedSolvation(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: If user specifies to compute the "salt" hydration free energy, charged HFE + HFE of ions with that net charge, then this function computes the ions that need to be added for the HFE of ions box. 
+            Input: - 
+            Output: Dictionary of ion type number to number of ions needed to be added to box  
+            Referenced By: MolecularDynamics 
+            Description:
+            1. If user wants to compute the salt hydration free energy
+            2. If there is a positive net charge, grab Cl type number, negative net charge, grab K type number.
+            3. Store type number in dictionary along with magnitude of charge (represents number of ions needed to be added).  
             """
             solviontocount={}
             self.addsolvionwindows=False
+            # STEP 1
             if self.binding==False and self.solvation==True and self.salthfe==True:
                 for i in range(len(self.systemcharge)):
                     chg=int(self.systemcharge[i])
+                    # STEP 2
                     if chg>0:
                         iontypenumber=self.elementsymtotinktype['Cl']
                     elif chg<0:
@@ -6225,27 +6252,35 @@ class PolarizableTyper():
                     else:
                         continue
                     count=np.abs(chg)
+                    # STEP 3
                     solviontocount[iontypenumber]=count
                     self.addsolvionwindows=True
             return solviontocount    
 
         def ChangeTypeNumbers(self,xyzfile,elementtotype):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Preequilbriated box may be using water type numbers from another parameter file, so need to change type numbers to ensure its consistent with input parameter file.
+            Input: Tinker XYZ file, dictionary of element to tinker type number
+            Output: Updated XYZ filename
+            Referenced By: TrimPreEquilibriatedBox
             Description: 
+            1. Iterate over XYZ file
+            2. If line is not a line containing boxinformation and its not the first line (atom number)
+            3. Extract the element from the line
+            4. Determine type number from the input dictionary and extracted element
+            5. Insert new type number into new line and write to file
             """
             temp=open(xyzfile,'r')
             results=temp.readlines()
             temp.close()
             tempname=xyzfile.replace('.xyz','_new.xyz')
             temp=open(tempname,'w')
+            # STEP 1
             for lineidx in range(len(results)):
                 line=results[lineidx]
                 linesplit=line.split()
                 isboxline=True
+                # STEP 2
                 if len(linesplit)==6:
                     for e in linesplit:
                         if self.CheckFloat(e)==False:
@@ -6253,9 +6288,12 @@ class PolarizableTyper():
                 else:
                     isboxline=False
                 if isboxline==False and lineidx!=0:
+                    # STEP 3
                     element=linesplit[1] 
+                    # STEP 4
                     typenum=elementtotype[element]
                     linesplit[5]=str(typenum)
+                    # STEP 5
                     line=' '.join(linesplit)+'\n'
                 temp.write(line)
             temp.close()
@@ -6263,20 +6301,26 @@ class PolarizableTyper():
         
         def ModifyBoxSizeInXYZFile(self,xyzfile,boxsize):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Change the box size dimensions, needed for when trimming the pre-equilibriated box.
+            Input: Tinker XYZ box file, new box size
+            Output: -
+            Referenced By: TrimPreEquilibriatedBox
             Description: 
+            1. Iterate over box file
+            2. If line contains box information
+            3. Modify the line to contain new box size information
+            4. Write new line to file
             """
             temp=open(xyzfile,'r')
             results=temp.readlines()
             temp.close()
             tempname=xyzfile.replace('.xyz','_new.xyz')
             temp=open(tempname,'w')
+            # STEP 1
             for lineidx in range(len(results)):
                 line=results[lineidx]
                 linesplit=line.split()
+                # STEP 2
                 isboxline=True
                 if len(linesplit)==6:
                     for e in linesplit:
@@ -6285,10 +6329,12 @@ class PolarizableTyper():
                 else:
                     isboxline=False
                 if isboxline==True:
+                    # STEP 3
                     linesplit[0]=str(boxsize[0])
                     linesplit[1]=str(boxsize[1])
                     linesplit[2]=str(boxsize[2])
                     line=' '.join(linesplit)+'\n'
+                # STEP 4
                 temp.write(line)
             temp.close()
             os.remove(xyzfile)
@@ -6296,56 +6342,83 @@ class PolarizableTyper():
 
         def TrimPreEquilibriatedBox(self,boxsize):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Instead of minimizing new box and equilbriating for long period, it is sometimes easier to trim a larger pre-equibriated box to new box sixe and equilbriate for a shorter time.
+            Input: New desired box size
+            Output: - 
+            Referenced By: BoxSetupProtocol in boxsetup.py
+            Description:
+            1. Copy pre-equilbriated box from poltype source to current directory 
+            2. Change type numbers of water to refelect current parameter file
+            3. Change the size of the boxfile to desired box size
+            4. Increase box size slightly to accomdate water that will be removed outside of input box size (some may be across original boundary) 
+            5. Remove waters outside of original box size
+            6. Modify box file to new box size again
             """
             xyzfile=self.preequilboxpath
             split=os.path.split(xyzfile)
             xyzfilename=split[1]
+            # STEP 1
             shutil.copy(xyzfile,os.path.join(self.simpath,xyzfilename))    
             elementtotype={'O':self.waterOtypenum,'H':self.waterHtypenum}
+            # STEP 2
             filename=self.ChangeTypeNumbers(xyzfilename,elementtotype)
+            # STEP 3
             self.ModifyBoxSizeInXYZFile(filename,boxsize)
+            # STEP 4
             newboxsize=[2+i for i in boxsize]
+            # STEP 5
             self.RemoveWaterOutsideBox(filename,boxsize)
+            # STEP 6
             self.ModifyBoxSizeInXYZFile(filename,newboxsize)
             os.rename(filename,'water.xyz_2') # for xyzedit lib
 
         def RemoveWaterOutsideBox(self,xyzfilename,boxsize):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Needed when trimming pre-equilbriated box. Remove waters outside of desired box size. 
+            Input: XYZ box file, desired box size.
+            Output: -
+            Referenced By: TrimPreEquilibriatedBox
+            Description:
+            1. Create input file to call xyzedit
+            2. Write the appropriate options for removing water outside box size
+            3. Generate command string to call xyzedit with filename generated as input
+            4. Submit command to system
+            5. Rename the new filename to original input filename
             """
+            # STEP 1
             tempfile=open('xyzedit.in','w')
+            # STEP 2
             tempfile.write('17'+'\n')
             tempfile.write(str(boxsize[0])+','+str(boxsize[1])+','+str(boxsize[2])+'\n')
             tempfile.write('\n')
             tempfile.close()
+            # STEP 3
             cmdstr=self.xyzeditpath +' '+xyzfilename+' '+self.prmfilepath+' '+' < xyzedit.in '
-            submit.call_subsystem(self,cmdstr,wait=True)    
+            # STEP 4
+            submit.call_subsystem(self,cmdstr,wait=True)   
+            # STEP 5
             newname=xyzfilename+'_2'
             os.rename(newname,xyzfilename)
 
 
         def ConvertTinktoXYZ(self,filename,newfilename):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: For when user wants to align a new ligand tinker XYZ to a template tinker XYZ. Need to convert tinker XYZ to cartesian XYZ as an intermediate for processing with toolkits such as rdkit.
+            Input: Tinker XYZ, new filename for cartesian XYZ
+            Output: Cartesian xyz filename generated
+            Referenced By: AlignLigandXYZToTemplateXYZ
             Description: 
+            1. Iterate over tinker XYZ
+            2. If line with atom number, then write that line to new file
+            3. If line with coordiantes and type information and connectivity, extract only the element and coordiantes and write to the new file
             """
             temp=open(os.getcwd()+r'/'+filename,'r')
             tempwrite=open(os.getcwd()+r'/'+newfilename,'w')
             results=temp.readlines()
+            # STEP 1
             for lineidx in range(len(results)):
                 line=results[lineidx]
+                # STEP 2
                 if lineidx==0:
                     linesplit=line.split()
                     tempwrite.write(linesplit[0]+'\n')
@@ -6353,6 +6426,7 @@ class PolarizableTyper():
                     tempwrite.flush()
                     os.fsync(tempwrite.fileno())
                 else:
+                    # STEP 3
                     linesplit=line.split()
                     if len(linesplit)>1:
                         newline=linesplit[1]+' '+linesplit[2]+' '+linesplit[3]+' '+linesplit[4]+'\n'
@@ -6367,28 +6441,41 @@ class PolarizableTyper():
         def AlignComplexedPDBToUnComplexedPDB(self):
             """
             Intent: After adding missing residues and assigning protonation state, may need to add ligands back in original PDB. So this requires an allignment procedure.
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Input: -
+            Output: -
+            Referenced By: MolecularDynamics 
+            Description:
+            1. Initialize a reference and current mol object
+            2. Read in complexed protein PDB to current mol and uncomplexed PDB to reference mol object
+            3. Call openbabel aligment object and set the reference and target mol objects
+            4. Align the mol objects
+            5. Update coordiantes in target mol file
+            6. Grab HETATM indices from mol object
+            7. Add those indices along with coordinates from mol object (that was aligned to ref) to the uncomplexed PDB
+            8. Write out new PDB with uncomplex structure that has aligned ligand from complexed structure.
             """
+            # STEP 1
             obConversion = openbabel.OBConversion()
             ref = openbabel.OBMol()
             mol = openbabel.OBMol()
+            # STEP 2
             inFormat = obConversion.FormatFromExt(self.uncomplexedproteinpdbname)
             obConversion.SetInFormat(inFormat)
             obConversion.ReadFile(mol, self.complexedproteinpdbname)
             obConversion.ReadFile(ref, self.uncomplexedproteinpdbname)
+            # STEP 3
             aligner = openbabel.OBAlign(False, False)
             aligner.SetRefMol(ref)
             aligner.SetTargetMol(mol)
+            # STEP 4
             aligner.Align()
+            # STEP 5
             aligner.UpdateCoords(mol)
+            # STEP 6
             hetatmids=self.GrabHETATMS(mol)
+            # STEP 7
             ref=self.AddHETATMSToPDB(ref,mol,hetatmids)
-
-
-
+            # STEP 8
             obConversion.SetOutFormat('pdb')
             newmolfile=self.uncomplexedproteinpdbname.replace('.pdb','_aligned.pdb')
             obConversion.WriteFile(ref,newmolfile)
@@ -6396,11 +6483,14 @@ class PolarizableTyper():
 
         def AddHETATMSToPDB(self,ref,mol,hetatmids):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Grab atoms from one mol and add to another (when adding aligned ligand in complexed PDB to uncomplexed PDB)
+            Input: reference and current mol objects, array of ligand atom indices
+            Output: updated reference mol object
+            Referenced By: AlignComplexedPDBToUnComplexedPDB
             Description: 
+            1. Iterate over array of ligand atom indices 
+            2. Grab atom from current mol object with given atom index in array
+            3. Add that atom to reference mol object
             """
             for atomindex in hetatmids:
                 atom=mol.GetAtom(atomindex)
@@ -6412,45 +6502,63 @@ class PolarizableTyper():
 
         def GrabHETATMS(self,mol):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Determine ligand indices from PDB mol object, needed for when adding aligned ligand to complexed PDB to uncomplexed PDB
+            Input: mol object
+            Output: Array of PDB ligand indices
+            Referenced By: AlignComplexedPDBToUnComplexedPDB
+            Description:
+            1. Iterate over atoms of mol object
+            2. Grab residue information
+            3. If residue is not in canoncical residue symbols, then it must be ligand
+            4. Append atom index to array
             """
             hetatmids=[]
             iteratom = openbabel.OBMolAtomIter(mol)
+            # STEP 1
             for atm in iteratom:
                 atmindex=atm.GetIdx()
+                # STEP 2
                 res=atm.GetResidue()
                 reskey=res.GetName()
-
+                # STEP 3
                 if reskey not in self.knownresiduesymbs:
+                    # STEP 4
                     hetatmids.append(atmindex)
 
 
             return hetatmids
 
-
-
             
         def AlignLigandXYZToTemplateXYZ(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: User may wish to align a ligand XYZ to a template ligand XYZ in protein pocket for example.
+            Input: -
+            Output: -
+            Referenced By: MolecularDynamics 
             Description: 
+            1. Convert input ligand XYZ and template ligand XYZ into cartesian XYZ files ( to be processed by chemoinformatic tookkits)
+            2. Generate reference and current mol objects
+            3. Read in cartesian XYZs into mol objects
+            4. Convert cartesian XYZs into MOL format with babel (to be read in by rdkit, rdkit doesnt read cartesian) 
+            5. Read in MOL files into rdkit mol objects
+            6. Remove bond topology information to make matching easier (sometimes cartesian->MOL creates wrong bond information that doesnt match so remove)
+            7. Sanitize the rdkit mol objects (assign formal charges otherwise rdkit complain)
+            8. Embed many conformations into target mol object (this will allow finding best conformation that matches to other mol)
+            9.
             """
+            # STEP 1
             ligandcartxyz=self.ConvertTinktoXYZ(self.ligandxyzfilenamelist[0],self.ligandxyzfilenamelist[0].replace('.xyz','_cart.xyz'))
             templateligandcartxyz=self.ConvertTinktoXYZ(self.templateligandxyzfilename,self.templateligandxyzfilename.replace('.xyz','_cart.xyz'))
+            # STEP 2
             obConversion = openbabel.OBConversion()
             ref = openbabel.OBMol()
             mol = openbabel.OBMol()
+            # STEP 3
             inFormat = obConversion.FormatFromExt(ligandcartxyz)
             obConversion.SetInFormat(inFormat)
             obConversion.ReadFile(mol, ligandcartxyz)
             obConversion.ReadFile(ref, templateligandcartxyz)
+            # STEP 4
             obConversion.SetOutFormat('mol')
             molfile=ligandcartxyz.replace('_cart.xyz','.mol')
             reffile=templateligandcartxyz.replace('_cart.xyz','.mol')
