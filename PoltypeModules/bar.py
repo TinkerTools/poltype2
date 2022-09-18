@@ -1031,7 +1031,7 @@ def CheckOverLapValues(poltype,overlaplist,barpairs):
         valuelist=overlaplist[i]
         barpair=barpairs[i]
         for value in valuelist:
-            if value<tol:
+            if float(value)<tol:
                 string='WARNING: Overlap between neighboring states is too small '+str(value)+' neighboring states are '+barpair+' tolerance is '+str(tol)
                 warnings.warn(string)
                 poltype.WriteToLog(string)
@@ -1282,6 +1282,8 @@ def ExecuteBAR(poltype):
                             thepath=os.path.join(os.getcwd(),f)
                             poltype.WriteToLog('Removing file '+thepath,prin=True)
                             os.remove(f) # sometimes BAR fails and want to delete bad .bar files
+                        if "BAR" in f and '.out' in f and poltype.redobar==True:
+                            os.remove(f)
                     os.chdir(curdir)
         os.chdir('..')
     if len(jobtolog.keys())!=0:
@@ -1716,7 +1718,6 @@ def BARProtocol(poltype):
                 baroutputfilepath=baroutputfilepathlist[j]
                 if term.CheckFilesTermination(poltype,baroutputfilepath)[0]==False or poltype.redobar==True:         
                     ExecuteBAR(poltype)
-        
         messages=[]
         for i in range(len(poltype.baroutputfilepath)):
             baroutputfilepathlist=poltype.baroutputfilepath[i]
