@@ -505,4 +505,4 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 
 ``barfilesfinished`` specifies to skip BAR (for debugging). Default is False.
 
-
+``redobar`` specifies to delete .bar files and redo BAR!

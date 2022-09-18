@@ -514,7 +514,7 @@ def get_summary(df1, verbose=True):
           _direct = 'above'
         else:
           _direct = 'below'
-        print("WARNING: %s %s %s (%.3f vs. %.3f)"%(_name,  _direct, 'threshold', val, _thr))
+        #print("WARNING: %s %s %s (%.3f vs. %.3f)"%(_name,  _direct, 'threshold', val, _thr))
   return df2
 
 def calc_dg(flist, ibegin=0, iend=-1, nblocks=5, summary=True, verbose=True):
@@ -917,7 +917,7 @@ def ComputeThermoProperties(poltype):
         solvtable.append([u'TΔSˢᵒˡᵛ']+FlattenListOfList(poltype,poltype.entropylist[0]))
         solvtable.append([u'TΔSˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.entropyerrorlisttotal[0]))
         solvtable.append(['SolvOverlap']+FlattenListOfList(poltype,poltype.overlaplist[0]))
-
+        CheckOverLapValues(poltype,poltype.overlaplist[0],barpairs)
         newsolvtable=list(map(list, zip(*solvtable)))
         tempname='SolvBARResults.csv'
         with open(poltype.outputpath+tempname, mode='w') as energy_file:
@@ -972,6 +972,7 @@ def ComputeThermoProperties(poltype):
         solvtable.append([u'TΔSˢᵒˡᵛ']+FlattenListOfList(poltype,poltype.entropylist[1]))
         solvtable.append([u'TΔSˢᵒˡᵛᵉʳʳ']+FlattenListOfList(poltype,poltype.entropyerrorlisttotal[1]))
         solvtable.append(['SolvOverlap']+FlattenListOfList(poltype,poltype.overlaplist[1]))
+        CheckOverLapValues(poltype,poltype.overlaplist[1],barpairs)
         barpairs=[]
         for ls in poltype.lambdafolderlist[0]:
             pairs=GenerateBARPairs(poltype,ls)
@@ -997,6 +998,7 @@ def ComputeThermoProperties(poltype):
         comptable.append([u'TΔSᶜᵒᵐᵖ']+FlattenListOfList(poltype,poltype.entropylist[0]))
         comptable.append([u'TΔSᶜᵒᵐᵖᵉʳʳ']+FlattenListOfList(poltype,poltype.entropyerrorlisttotal[0]))
         comptable.append(['CompOverlap']+FlattenListOfList(poltype,poltype.overlaplist[0]))
+        CheckOverLapValues(poltype,poltype.overlaplist[0],barpairs)
         newcomptable=list(map(list, zip(*comptable)))
         newsolvtable=list(map(list, zip(*solvtable)))
 
@@ -1013,6 +1015,26 @@ def ComputeThermoProperties(poltype):
                 energy_writer.writerow(row)
 
     os.chdir(curdir)
+
+
+
+def CheckOverLapValues(poltype,overlaplist,barpairs):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    tol=.3
+    for i in range(len(overlaplist)):
+        valuelist=overlaplist[i]
+        barpair=barpairs[i]
+        for value in valuelist:
+            if value<tol:
+                string='WARNING: Overlap between neighboring states is too small '+str(value)+' neighboring states are '+barpair+' tolerance is '+str(tol)
+                warnings.warn(string)
+                poltype.WriteToLog(string)
 
 
 def CheckIfForwardBackwardPertubationsAreSimilar(poltype,fwdenergylist,bwdenergylist):
