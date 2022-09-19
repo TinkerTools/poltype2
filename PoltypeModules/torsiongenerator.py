@@ -220,7 +220,6 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
                 cmdstr='psi4 '+inputname+' '+outputname
                 executable='psi4'
             else:
-                print('outputlog',outputlog)
                 cartxyz=outputlog.replace('.log','.xyz')
                 inputname,outputname=GenerateTorsionSPInputFileGaus(poltype,torset,optmol,phaseangles,cartxyz,mol)
                 cmdstr = 'GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
@@ -1469,10 +1468,9 @@ def get_torlist(poltype,mol,missed_torsions):
         newtorset=[]
         torsiontophaseangle={}
         torsiontomaintor={}
-
-        rottors,rotbndtorescount,restlist,rotphases,torsiontophaseangle,torsiontomaintor=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,mol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor)
+        rottors,rotbndtorescount,restlist,rotphases,torsiontophaseangle,torsiontomaintor=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,mol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor,crash=False)
         frotors,rotbndtorescount,restlist,torsiontophaseangle,torsiontomaintor=FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,mol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor)
-        
+         
         for tor in rottors:
             newtorset.append(tor)
         for tor in frotors:
@@ -1499,6 +1497,7 @@ def get_torlist(poltype,mol,missed_torsions):
             rotbndkey = '%d %d' % (nonarotor[1],nonarotor[2])
             poltype.nonrotbndlist[rotbndkey] = []
             poltype.nonrotbndlist[rotbndkey].append(nonarotor)
+
 
     return (torlist,poltype.rotbndlist,nonaroringtorlist,poltype.nonrotbndlist)
 
@@ -1771,7 +1770,7 @@ def SortTorsions(poltype,torsionlist,inputmol):
 
     return newtorsionlist
 
-def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor):
+def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor,crash=True):
     """
     Intent:
     Input:
@@ -1848,7 +1847,6 @@ def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxr
                    rotbnd=tuple([rtc,rtb])
                
 
-
                if resttors not in variabletorlist and resttors[::-1] not in variabletorlist:
                    rtang = inputmol.GetTorsion(rta,rtb,rtc,rtd)
                    if rtang<0:
@@ -1894,7 +1892,7 @@ def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxr
                            rottors.insert(0,[rta,rtb,rtc,rtd])
                            phases.insert(0,phaseangle)
                        rotbndtorescount[rotbnd]+=1
-    if len(rottors)==0:
+    if len(rottors)==0 and crash==True:
         raise ValueError('Need at least one torsion restraint per rotatable bond')
     return rottors,rotbndtorescount,restlist,phases,torsiontophaseangle,torsiontomaintor
 

@@ -6544,7 +6544,9 @@ class PolarizableTyper():
             6. Remove bond topology information to make matching easier (sometimes cartesian->MOL creates wrong bond information that doesnt match so remove)
             7. Sanitize the rdkit mol objects (assign formal charges otherwise rdkit complain)
             8. Embed many conformations into target mol object (this will allow finding best conformation that matches to other mol)
-            9.
+            9. Compute RMSD between template XYZ and each conformor of input XYZ, then choose conformer with minimum RMSD 
+            10.Update XYZ coordinates in tinker files with conformer coordinates
+            11.Convert tinker XYZ coordaintes to cartesian XYZ  
             """
             # STEP 1
             ligandcartxyz=self.ConvertTinktoXYZ(self.ligandxyzfilenamelist[0],self.ligandxyzfilenamelist[0].replace('.xyz','_cart.xyz'))
@@ -6564,15 +6566,17 @@ class PolarizableTyper():
             reffile=templateligandcartxyz.replace('_cart.xyz','.mol')
             obConversion.WriteFile(mol,molfile)
             obConversion.WriteFile(ref,reffile)
+            # STEP 5
             mol=Chem.MolFromMolFile(molfile,removeHs=False,sanitize=False)
             ref=Chem.MolFromMolFile(reffile,removeHs=False,sanitize=False)
+            # STEP 6
             for bond in mol.GetBonds():
                 if bond.IsInRing()==False:
                     bond.SetBondType(Chem.BondType.SINGLE)
             for bond in ref.GetBonds():
                 if bond.IsInRing()==False:
                     bond.SetBondType(Chem.BondType.SINGLE)
-
+            # STEP 7
             self.ligandcharge=None
             mol,atomindextoformalcharge=self.CheckInputCharge(mol)
             self.ligandcharge=None
@@ -6580,6 +6584,7 @@ class PolarizableTyper():
             self.ligandcharge=None
             Chem.SanitizeMol(mol)
             Chem.SanitizeMol(ref)
+            # STEP 8
             confnum=1000
             AllChem.EmbedMultipleConfs(mol, confnum)
             mcs = rdFMCS.FindMCS([ref,mol])
@@ -6587,12 +6592,14 @@ class PolarizableTyper():
             atomnum=mcs.numAtoms
             refMatch = ref.GetSubstructMatch(patt)
             mv = mol.GetSubstructMatch(patt)
+            # STEP 9
             rmstocid={}
             for cid in range(confnum):
                 rms = AllChem.AlignMol(mol,ref,prbCid=cid,atomMap=list(zip(mv,refMatch)))
                 rmstocid[rms]=cid
             minrms=min(rmstocid.keys())
             mincid=rmstocid[minrms]
+            # STEP 10
             indextocoords={}
             for atom in mol.GetAtoms():
                 atomidx=atom.GetIdx()
@@ -6604,49 +6611,64 @@ class PolarizableTyper():
                 indextocoords[atomindex]=[X,Y,Z]
             name=self.ligandxyzfilenamelist[0].replace('.xyz','_aligned.xyz')
             self.ReplaceXYZCoords(self.ligandxyzfilenamelist[0],indextocoords,name,replace=False)
+            # STEP 11
             alignedligandcartxyz=self.ConvertTinktoXYZ(name,name.replace('.xyz','_cart.xyz'))
  
         
         def CallAnalyze(self,statexyz,statekey,alzout,analyzepath,option):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Call analyze for many purposes, checking parameters are defined, checking energy components or total charge.
+            Input: XYZ file, key file, analyze output file, analyze bin path, analyze option
+            Output: - 
+            Referenced By: Many functions 
             Description: 
+            1. Construct command string for analyze
+            2. Submit command to call_subsystem  
             """
+            # STEP 1
             cmdstr=analyzepath+' '+statexyz+' '+'-k'+' '+statekey+' '+option+' > '+alzout
+            # STEP 2
             submit.call_subsystem(self,cmdstr,True,False,alzout) 
 
         def ExtractResource(self,string):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Exract resource value from string (if need to change or convert units) 
+            Input: String with value + memory unit appended
+            Output: value, memory unit
+            Referenced By: PartitionResources
             Description: 
+            1. Parse for cases of MB and GB
+            2. Extract memory string and convert memory to float 
             """
+            # STEP 1
             if 'MB' in string:
                 split=string.split('MB')
                 memstring='MB'
             elif 'GB' in string:
                 split=string.split('GB')
                 memstring='GB'
+            # STEP 2
             mem=float(split[0])
         
             return mem,memstring
 
         def PartitionResources(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: For running QM jobs in parralel, need to take total resources allocated to parent job and split amongst many fragment poltype jobs (or if fragmenter turned off, then parralelize to many QM jobs of parent at same time)
+            Input: -
+            Output: Modified resources, paritioned by number of jobs that can be run at same time
+            Referenced By: GenerateParameters 
+            Description:
+            1. Extract the memory values of RAM
+            2. Divide that by number of jobs at sametime
+            3. Repeat for Disk and number of processors 
             """
+            # STEP 1
             maxmem,memstring=self.ExtractResource(self.maxmem)
+            # STEP 2
             maxmem=int(maxmem/self.jobsatsametime)
             tempmaxmem=str(maxmem)+memstring
+            # STEP 3
             maxdisk,diskstring=self.ExtractResource(self.maxdisk)
             maxdisk=int(maxdisk/self.jobsatsametime)
             tempmaxdisk=str(maxdisk)+diskstring
@@ -6655,20 +6677,25 @@ class PolarizableTyper():
         
             return tempmaxmem,tempmaxdisk,tempnumproc
 
-
         def CheckIfWholeMoleculeIsARing(self,mol):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Dont want to generate extended conformers if whole molecule is one giant ring
+            Input: babel mol object 
+            Output: Boolean specifying is whole molecule is one ring
+            Referenced By: GenerateParameters
             Description: 
+            1. Call function RingAtomicIndices to find which atoms belong to rings
+            2. For each ring found, determinte its length and add to dictionary
+            3. If find a ring length greater than 7 (lazy detection, dont find large than 7 atom rings), then whole molecule is a ring. 
             """
             iswholemoleculering=False
+            # STEP 1
             atomindices=databaseparser.RingAtomicIndices(self,mol)
+            # STEP 2
             lengthtoring={}
             for ring in atomindices:
                 lengthtoring[len(ring)]=ring
+            # STEP 3
             if len(lengthtoring.keys())>0:
                 maxlength=max(lengthtoring.keys())
                 maxring=lengthtoring[maxlength]
@@ -6679,8 +6706,8 @@ class PolarizableTyper():
 
         def ExtractLigand(self,ligandreceptorfilename,coordinates=None,indicestokeep=[]):
             """
-            Intent:
-            Input:
+            Intent: Used by BINANA wrapper to extract ligand from PDB 
+            Input: ligand-receptor PDB file name, optional coordinates
             Output:
             Referenced By: 
             Description: 
@@ -6692,6 +6719,7 @@ class PolarizableTyper():
         
             self.ConvertUNLToLIG(ligandpdbfilename)
             return ligandpdbfilename,receptorpdbfilename
+
 
         def ExtractMOLObject(self,ligandreceptorfilename,newpdbfilename,coordinates,receptor,indicestokeep):
             """
