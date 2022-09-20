@@ -984,7 +984,6 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
     for parametersmartsidx in tqdm(range(len(parametersmartslist)),desc='amoeba09 search for '+str(ls)):
         parametersmarts=parametersmartslist[parametersmartsidx]
         prmmol=parametersmartstordkitmol[parametersmarts]
-        Chem.SanitizeMol(prmmol)
         smartsmatchingtoindices=parametersmartstosmartsmatchingtoindices[parametersmarts]
         molsmatchingtoindices=parametersmartstomolsmatchingtoindices[parametersmarts]
         prmsmartsatomnum=prmmol.GetNumAtoms()
@@ -4595,22 +4594,28 @@ def MatchAllSmartsToAtomIndices(poltype,smartstoatomclass): #rdkit 0 index based
             matches=list(poltype.rdkitmol.GetSubstructMatches(substructure))
             newmatches=[]
             for match in matches:
-                if len(match)>1:
-                    newmatches.append(match)
-                    lastatom=match[-1]
-                    firstatom=match[0]
-                    firsttype=poltype.idxtosymclass[firstatom+1]
-                    secondtype=poltype.idxtosymclass[lastatom+1]
-                    if firsttype==secondtype:
-                        newmatches.append(match[::-1])
+                newmatches.append(match)
+                lastatom=match[-1]
+                firstatom=match[0]
+                firsttype=poltype.idxtosymclass[firstatom+1]
+                secondtype=poltype.idxtosymclass[lastatom+1]
+                if firsttype==secondtype:
+                    newmatches.append(match[::-1])
+                otheratomindices=[firstatom]
+                for idx,typenum in poltype.idxtosymclass.items():
+                    rdkitidx=idx-1
+                    if typenum==firsttype and rdkitidx!=firstatom:
+                        otheratomindices.append(rdkitidx)
+
             for match in newmatches:
-                atomindex=match[0]
-                if atomindex not in atomindextoallsmarts.keys():
-                    atomindextoallsmarts[atomindex]=[]
-                    atomindextoallsmartsmatches[atomindex]=[] 
-                atomindextoallsmarts[atomindex].append(smarts) 
-                if match not in atomindextoallsmartsmatches[atomindex]:
-                    atomindextoallsmartsmatches[atomindex].append(match)   
+                for atomindex in otheratomindices:
+                    if atomindex not in atomindextoallsmarts.keys():
+                        atomindextoallsmarts[atomindex]=[]
+                        atomindextoallsmartsmatches[atomindex]=[] 
+                    if smarts not in atomindextoallsmarts[atomindex]:
+                        atomindextoallsmarts[atomindex].append(smarts) 
+                    if match not in atomindextoallsmartsmatches[atomindex]:
+                        atomindextoallsmartsmatches[atomindex].append(match)   
                
     return atomindextoallsmarts,atomindextoallsmartsmatches
 
@@ -5735,9 +5740,16 @@ def GenerateRdkitMolObjectsParameterSMARTS(poltype,parametersmartslist):
     Description: 
     """
     parametersmartstordkitmol={}
+    temptotalcharge=poltype.totalcharge
     for parametersmarts in parametersmartslist:
         prmmol=Chem.MolFromSmarts(parametersmarts)
+        prmmol.UpdatePropertyCache()
+        poltype.totalcharge=None
+        prmmol,atomindextoformalcharge=poltype.CheckInputCharge(prmmol)
+        Chem.SanitizeMol(prmmol)
+        poltype.totalcharge=temptotalcharge
         parametersmartstordkitmol[parametersmarts]=prmmol
+
 
     return parametersmartstordkitmol
 
@@ -5949,6 +5961,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         atomcommentstolistofsmartslist,atomindicestolistofatomcomments=MapIndicesToCommentsAtom(poltype,atomindextoallsmartspolar,smartstocomment,listofatomsforprm)
         atomindicestolistofatomcomments,atomcommentstoparameters=SearchForParametersViaCommentsPolarize(poltype,atomcommentstolistofsmartslist,atomindicestolistofatomcomments)
         atomindicestocomments,atomindicestosmartslist=FindBestSMARTSMatch(poltype,atomindicestolistofatomcomments,atomcommentstolistofsmartslist)
+
         atomindicestocomments,atomindicestosmartslist=ForceSameResonanceTypesSameMatches(poltype,atomindicestocomments,atomindicestosmartslist)
 
 
