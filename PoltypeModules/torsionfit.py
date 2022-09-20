@@ -111,7 +111,7 @@ def fitfunc (poltype,parms, x,torset, torprmdict,keyonlylist=None,nfoldonlylist=
                         prm = torprm['prmdict'][nfold]
                         # not called by 'eval'
                         evaluate=True
-                        if parms!='eval':
+                        if type(parms)!=str:
                             # get prm from parms array
                             prm = parms[torprm['prmdict'][nfold]]
                             evaluate=False
@@ -125,9 +125,9 @@ def fitfunc (poltype,parms, x,torset, torprmdict,keyonlylist=None,nfoldonlylist=
                         tor_energy += tor_func_term (poltype,prm, ang, nfold, clscnt, torgen.rads(poltype,clsangle),torgen.rads(poltype,offset))
             tor_energy_array[j]+=tor_energy
 
-    if parms=='eval' and 'offset' in torprm:
+    if type(parms)==str and 'offset' in torprm:
         offset = torprm['offset']
-    if parms!='eval':
+    if type(parms)!=str:
         offset = parms[-1]
     if type(offset)==list:
         if len(tor_energy_array)==len(offset):
@@ -1659,21 +1659,21 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             fig = plt.figure(figsize=(10,10))
             ax = fig.add_subplot(111)
             # energy profiles: mm (pre-fit), mm (post-fit), qm
-            line1, =ax.plot(mang_list,mm_energy_list,'go',color='green',label='MM1 (prefit)')
+            line1, =ax.plot(mang_list,mm_energy_list,'o',color='green',label='MM1 (prefit)')
             xpoints=numpy.array([mang_list[i][0] for i in range(len(mang_list))])
             x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
             f = interp1d(xpoints,numpy.array(mm_energy_list), kind='quadratic')
             y_smooth=f(x_new)
             ax.plot(x_new,y_smooth,color='green')
 
-            line2, =ax.plot(m2ang_list,mm2_energy_list,'ro',color='red',label='MM2 (postfit)')
+            line2, =ax.plot(m2ang_list,mm2_energy_list,'o',color='red',label='MM2 (postfit)')
             xpoints=numpy.array([m2ang_list[i][0] for i in range(len(m2ang_list))])
             x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
             f = interp1d(xpoints,numpy.array(mm2_energy_list), kind='quadratic')
             y_smooth=f(x_new)
             ax.plot(x_new,y_smooth,color='red')
 
-            line3, =ax.plot(qang_list,qm_energy_list,'bo',color='blue',label='QM')
+            line3, =ax.plot(qang_list,qm_energy_list,'o',color='blue',label='QM')
             xpoints=numpy.array([qang_list[i][0] for i in range(len(qang_list))])
             x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
             f = interp1d(xpoints,numpy.array(qm_energy_list), kind='quadratic')
@@ -1683,7 +1683,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             ax.text(0.05, 1.1, 'RMSD(MM2,QM)=%s , RMSDRel(MM2,QM)=%s'%(round(minRMSD,2),round(minRMSDRel,2)), transform=ax.transAxes, fontsize=12,verticalalignment='top')
 
             # mm + fit
-            line4, =ax.plot(mang_list,ff_list,'mo',color='magenta',label='MM1+Fit')
+            line4, =ax.plot(mang_list,ff_list,'o',color='magenta',label='MM1+Fit')
             xpoints=numpy.array([mang_list[i][0] for i in range(len(mang_list))])
             x_new = numpy.linspace(xpoints.min(), xpoints.max(),500)
             f = interp1d(xpoints,numpy.array(ff_list), kind='quadratic')

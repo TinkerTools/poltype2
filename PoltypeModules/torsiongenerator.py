@@ -713,7 +713,10 @@ def CheckIfQMOptReachedTargetDihedral(poltype,cartxyz,initialtinkerstructure,tor
     inicartxyz=ConvertTinktoXYZ(poltype,initialtinkerstructure,initialtinkerstructure.replace('.xyz','_cart.xyz'))
     inioptmol = opt.load_structfile(poltype,inicartxyz)
     optmol = opt.load_structfile(poltype,cartxyz)
-    tol=1
+    if poltype.toroptmethod!='xtb' and poltype.toroptmethod!='AMOEBA':
+        tol=1
+    else:
+        tol=3
     rotbndtorescount={}
     maxrotbnds=1
     restlist=[]
@@ -1488,8 +1491,6 @@ def get_torlist(poltype,mol,missed_torsions):
             unq=get_uniq_rotbnd(poltype,atoms[0].GetIdx(),atoms[1].GetIdx(),atoms[2].GetIdx(),atoms[3].GetIdx())
             if not skiptorsion:
                 torlist.append(unq)
-        else:
-            raise ValueError('Cant find restraint with rotatble bond '+key)
     for nonarotors in nonarotorsions:
         x=len(nonarotors)-3
         for i in range(0,x):
@@ -1840,6 +1841,7 @@ def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxr
                    secondangle=secondangle+360
                angletol=5.3
                if numpy.abs(180-firstangle)<=angletol or numpy.abs(180-secondangle)<=angletol:
+                   crash=False
                    continue
                if rtb<rtc:
                    rotbnd=tuple([rtb,rtc])

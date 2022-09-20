@@ -83,7 +83,7 @@ class PolarizableTyper():
         maxtorresnitrogen:int=1
         skipchargecheck:bool=False
         useuniquefilenames:bool=False # if users want to have unique filenames for molecular dynamics/BAR otherwise keep same filename to make copying easier from folder to folder
-        xtbtorresconstant:float=.5
+        xtbtorresconstant:float=.7
         alignPDB:bool=False
         torfit:bool=True
         makexyzonly:bool=False
@@ -1183,8 +1183,6 @@ class PolarizableTyper():
                self.tempmaxdisk=self.maxdisk
                self.tempnumproc=self.numproc
                self.partition=False
-            if self.toroptmethod=='xtb' or 'xtb' in self.toroptmethodlist:
-                self.jobsatsametime=1 # cant parrelize xtb since coords always written to same file name
             self.firsterror=False
             if self.debugmode==True:
                 self.optmethod="HF"      
@@ -4223,6 +4221,7 @@ class PolarizableTyper():
                     shutil.copy(self.inputkeyfile,os.path.join(foldername,self.inputkeyfile))
 
                 os.chdir(foldername)
+            self.startdir=os.getcwd()
             self.totalcharge=None
             # STEP 3
             if self.deleteallnonqmfiles==True:
@@ -6706,86 +6705,119 @@ class PolarizableTyper():
 
         def ExtractLigand(self,ligandreceptorfilename,coordinates=None,indicestokeep=[]):
             """
-            Intent: Used by BINANA wrapper to extract ligand from PDB 
+            Intent: Used for docking module and pdbxyz module to extract the ligand from PDB into seperate files.
             Input: ligand-receptor PDB file name, optional coordinates
-            Output:
-            Referenced By: 
-            Description: 
+            Output: ligand only PDB, receptor only PDB
+            Referenced By:  docking.py - DockingWrapper , pdbxyz.py - DeterminePocketGrid
+            Description:
+            1. Call ExtractMOLObject for receptor, using known residue symbols only
+            2. Call ExtractMOLObject for ligand, grabbing any atoms with unknown residues
+            3. Convert residue name UNL to LIG, for other parts of program to read ligand easier in PDB
             """
             ligandpdbfilename='ligand.pdb'
             receptorpdbfilename=ligandreceptorfilename.replace('.pdb','_receptoronly.pdb')
+            # STEP 1
             receptormol=self.ExtractMOLObject(ligandreceptorfilename,receptorpdbfilename,None,True,indicestokeep)
+            # STEP 2
             ligandmol=self.ExtractMOLObject(ligandreceptorfilename,ligandpdbfilename,coordinates,False,indicestokeep)
-        
+            # STEP 3
             self.ConvertUNLToLIG(ligandpdbfilename)
             return ligandpdbfilename,receptorpdbfilename
 
 
         def ExtractMOLObject(self,ligandreceptorfilename,newpdbfilename,coordinates,receptor,indicestokeep):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Extract either ligand or receptor from PDB file, then create new PDB file.
+            Input: ligand-receptor PDB filename, new PDB filename, array of coordinates to only include certain atoms, boolean if grabbing receptor or ligand, array of indices to keep 
+            Output: Extracted mol object
+            Referenced By: ExtractLigand
+            Description:
+            1. Define common HETATM symbols such as water
+            2. Generate mol object from ligand-receptor PDB
+            3. Iterate over atoms
+            4. Grab residue information from atom
+            5. If not in known residue symbols and trying to extract receptor, then add atom to array of atoms to remove
+            6. If extracting ligand, if coordinates array is given, delete any atoms not in coordinates array. Otherwise if residue is a known residue symbol or common HETATM symbol, then append atoms to array to delete. 
+            7. Remove atoms that should be deleted
+            8. Write out new PDB file
             """
+            # STEP 1
             commonhetatmsymbs=['HOH']
+            # STEP 2
             pdbmol=self.GenerateMOLObject(ligandreceptorfilename)
             iteratom = openbabel.OBMolAtomIter(pdbmol)
             obConversion = openbabel.OBConversion()
             obConversion.SetOutFormat('pdb')
             atmindicestodelete=[]
+            # STEP 3
             for atm in iteratom:
                 atmindex=atm.GetIdx()
+                # STEP 4
                 res=atm.GetResidue()
                 reskey=res.GetName()
                 coords=[atm.GetX(),atm.GetY(),atm.GetZ()]
+                # STEP 5
                 if reskey not in self.knownresiduesymbs and receptor==True:
                     atmindicestodelete.append(atmindex)
                 elif receptor==False:
+                    # STEP 6
                     if coordinates!=None:
                         if coords not in coordinates:
                             atmindicestodelete.append(atmindex)
                     else:
                         if (reskey in self.knownresiduesymbs or reskey in commonhetatmsymbs) and atmindex not in indicestokeep:
                             atmindicestodelete.append(atmindex)
+            # STEP 7
             atmindicestodelete.sort(reverse=True)
             for atmindex in atmindicestodelete:
                 atm=pdbmol.GetAtom(atmindex)
                 pdbmol.DeleteAtom(atm)
+            # STEP 8
             obConversion.WriteFile(pdbmol,newpdbfilename)
             return pdbmol
 
         def GenerateMOLObject(self,pdbfilename):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Convert PDB file into mol object
+            Input: PDB filename
+            Output: PDB mol object
+            Referenced By: GrabLigandCentroid,ExtractMOLObject
+            Description:
+            1. Call conversion object from openbabel
+            2. Create empty mol object
+            3. Set input format for converter
+            4. Read in PDB file into mol file via converter
             """
+            # STEP 1
             obConversion = openbabel.OBConversion()
+            # STEP 2
             pdbmol = openbabel.OBMol()
+            # STEP 3
             obConversion.SetInFormat('pdb')
+            # STEP 4
             obConversion.ReadFile(pdbmol,pdbfilename)
             return pdbmol
 
 
         def ConvertUNLToLIG(self,filename):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Make it more clear in PDB file what is ligand by changing residue name to LIG
+            Input: PDB filename
+            Output: Modified PDB filename
+            Referenced By: ExtractLigand
             Description: 
+            1. Iterate over results of PDB filename
+            2. If UNL detected in spot for residue name or UNK detected, then replace with LIG
             """
             temp=open(filename,'r')
             results=temp.readlines()
             temp.close()
             tempname=filename.replace('.pdb','_TEMP.pdb')
             temp=open(tempname,'w')
+            # STEP 1
             for line in results:
                 linesplit=re.split(r'(\s+)', line)
+                # STEP 2
                 if 'UNL' in line:
                     lineindex=linesplit.index('UNL')
                     linesplit[lineindex]='LIG'
@@ -6802,14 +6834,20 @@ class PolarizableTyper():
 
         def GrabLigandCentroid(self,ligandpdbfilename):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Grab centroid of ligand, used for defining a pocket grid to detect any ions/waters near ligand that should be kept when running simulations.  
+            Input: Ligand PDB filename
+            Output: Coordinates of ligand centroid
+            Referenced By: pdbxyz.py - DeterminePocketGrid , docking.py - DockingWrapper 
+            Description:
+            1. Call GenerateMOLObject to grab mol from ligand PDB
+            2. Call GrabAtomPositions to determine atomic coordinates
+            3. Compute centroid of atomic positions
             """
+            # STEP 1
             pdbmol=self.GenerateMOLObject(ligandpdbfilename)
+            # STEP 2
             atomvecls=self.GrabAtomPositions(pdbmol)
+            # STEP 3
             centroid=np.array([0.0,0.0,0.0])
             for vec in atomvecls:
                 centroid+=np.array(vec)
@@ -6817,82 +6855,89 @@ class PolarizableTyper():
                 raise ValueError('Ligand in PDB file is not labeled as LIG')
             centroid=centroid/len(atomvecls)
         
-            
             return centroid
 
 
         def GrabAtomPositions(self,pdbmol):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Grab atomic coordinates from mol object
+            Input: mol object
+            Output: Array of atomic coordinates
+            Referenced By: GrabLigandCentroid
+            Description:
+            1. Iterate over atoms in mol object
+            2. Grab atom coordinates
+            3. Append to array of atomic coordinates
             """
             atomvecls=[]
             iteratombab = openbabel.OBMolAtomIter(pdbmol)
+            # STEP 1
             for atm in iteratombab:
                 atmindex=atm.GetIdx()
+                # STEP 2
                 coords=[atm.GetX(),atm.GetY(),atm.GetZ()]
+                # STEP 3
                 atomvecls.append(coords)
         
          
             return atomvecls
 
 
-        def FindConsecutiveIndices(self,nums):
-            """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
-            """
-            consec=[nums[0]]
-            allconsec=[]
-            for i in range(1,len(nums)):
-                num=nums[i]
-                prevnum=nums[i-1]
-                if num==prevnum+1:
-                    consec.append(num)
-                else:
-                    allconsec.append(consec)
-                    consec=[num]
-            allconsec.append(consec)
-            return allconsec
-
+        
 
         def RepresentsInt(self,s):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Detect integers in tinker XYZ/keys for modification purposes
+            Input: String
+            Output: Boolean specifying if an integer or not
+            Referenced By: ShiftParameterTypesComplexXYZ,ShiftParameterTypes
+            Description:
+            1. Try to convert type to integer if it works return True
+            2. If it fails, return False 
             """
+            # STEP 1
             try: 
                 int(s)
                 return True
+            # STEP 2
             except ValueError:
                 return False
 
 
         def ExtractLigandIndicesFromComplexXYZ(self,receptorligandxyzfilename,oldtypetonewtypelist,ligatomnums):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Need indices of ligands that will be annihilated and indices of ligands that will not be annihilated. Need to keep track of indices for restraints of knowing which atoms to define with "ligand" keyword. Also used for shifting type numbers if any types are overlapping in input ligand keys (generating index->new type dictionary)  
+            Input: receptor-ligand tinker XYZ, array of old type to new type dictionaries.
+            Output: dictionary of atom index to new type number, ligand indices in receptor-ligand complex, ligand indices not in complex 
+            Referenced By: MolecularDynamics 
             Description: 
+            1. Extract old index to type index from input tinker XYZ
+            2. Define list of index to old types to keep track of previous indices used to assist with only adding correct ligand indices for each ligand into seperate arrays (reading all ligand indices from one complexed XYZ file) 
+            3. Iterate over array of dictionaries old type -> new type (one for each ligand)
+            4. Grab current old type -> new type dictionary
+            5. Grab atom number of current ligand
+            6. Define empty dictionary indextooldtypenum to keep track of number of atoms adding (stop when reach atom number of current ligand)
+            7. Get array of previous atom indices used to assist in making sure only correct atom indices are added for each seperate ligand in their own arrays.
+            8. Iterate over dictionary of old index -> type index (from tinker XYZ)
+            9. If type index in current ligand dictionary of old type -> new type and current length of indextooldtypenum hasnt reached current atom number for current ligand and indices havent been previously used then add information to indextooldtypenum (contains information of ligand indices seperated into individual dictionaries for each ligand) and indextonewtype for shifting paramteer types later.
+            10. Extract ligand indices from indextooldtypenum into seperate arrays and save in complexligands array
+            11. Generate the equivalent ligand indices from in complex but for solvation phase (assume indices are on top of box file and solvent after) 
             """
+            # STEP 1
             statexyzatominfo,oldindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=self.GrabXYZInfo(receptorligandxyzfilename)
+            # STEP 2
             listofindextooldtypes=[]
             indextonewtype={}
             complexligands=[]
+            # STEP 3
             for oldtypetonewtypeidx in range(len(oldtypetonewtypelist)):
+                # STEP 4
                 oldtypetonewtype=oldtypetonewtypelist[oldtypetonewtypeidx]
+                # STEP 5
                 atomnum=ligatomnums[oldtypetonewtypeidx]
+                # STEP 6
                 indextooldtypenum={}
+                # STEP 7
                 if oldtypetonewtypeidx!=0:
                     previousindextooldtypes=listofindextooldtypes[:oldtypetonewtypeidx-1+1]
                 else:
@@ -6900,13 +6945,17 @@ class PolarizableTyper():
                 previousindices=[]
                 for oindextooldtypenum in previousindextooldtypes:
                     previousindices.extend(oindextooldtypenum.keys()) 
+                # STEP 8
                 for oldindex,typeindex in oldindextotypeindex.items():
+                    # STEP 9
                     if typeindex in oldtypetonewtype.keys() and len(indextooldtypenum.keys())<atomnum and oldindex not in previousindices:
                         indextooldtypenum[oldindex]=typeindex
                         newtype=oldtypetonewtype[typeindex]
                         indextonewtype[oldindex]=newtype
+                # STEP 10
                 listofindextooldtypes.append(indextooldtypenum)
                 complexligands.append(list(indextooldtypenum.keys()))
+            # STEP 11
             solvligands=[]
             count=1
             for ligand in complexligands:
@@ -6922,19 +6971,29 @@ class PolarizableTyper():
 
         def GrabLigandTypesInfoForIndicesExtraction(self,ligandxyzfilenamelist):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Grab type numbers and atom numbers for each ligand in input tinker XYZ list. This will be used for generating list of complexed ligand indices and solvation ligand indices. Need to keep track of indices for restraints of knowing which atoms to define with "ligand" keyword. 
+            Input: List of tinker XYZs for each ligand
+            Output: List of type numbers, list of atom numbers
+            Referenced By: MolecularDynamics 
             Description: 
+            1. Iterate over list of tinker XYZ
+            2. Call GrabTypeNumbers to grab type numbers
+            3. Append information about type numbers to array
+            4. Call GrabXYZInfo to extract total atom number
+            5. Save atom number information to array 
             """
             oldtypelist=[]
             ligatomnums=[]
+            # STEP 1
             for xyz in ligandxyzfilenamelist:
+                # STEP 2
                 ligandtypes=self.GrabTypeNumbers(xyz) 
                 oldtypetooldtype=dict(zip(ligandtypes,ligandtypes))
+                # STEP 3
                 oldtypelist.append(oldtypetooldtype)
+                # STEP 4
                 statexyzatominfo,oldindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=self.GrabXYZInfo(xyz)
+                # STEP 5
                 ligatomnums.append(stateatomnum)
 
 
@@ -6943,29 +7002,39 @@ class PolarizableTyper():
 
         def ShiftParameterTypesComplexXYZ(self,receptorligandxyzfilename,indextonewtype):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: If duplicate ligands have overlapping types, then shift them to be different (in case users wants to only annihilate one and not a duplicate). So need to shift types in tinker XYZ also. 
+            Input: Receptor-ligand XYZ file, dictionary of index to new type (replaces old type) 
+            Output: - 
+            Referenced By: MolecularDynamics
             Description: 
+            1. Iterate over lines of tinker XYZ
+            2. Iterate over strings in each line
+            3. If string is integer, grab atom index
+            4. Grab new type number from dicionary indextonewtype
+            5. Replace new type in line
             """
             tempname=receptorligandxyzfilename+"_TEMP"
             temp=open(receptorligandxyzfilename,'r')
             results=temp.readlines()
             temp.close()
             temp=open(tempname,'w')
+            # STEP 1
             for line in results:
                 linesplitall=re.split(r'(\s+)', line)
                 linesplit=line.split()
+                # STEP 2
                 for i in range(len(linesplitall)):
                     element=linesplitall[i]
                     if '.xyz' in receptorligandxyzfilename and (i!=12):
                         continue
                     if self.RepresentsInt(element):
                         oldtypenum=np.abs(int(element))
+                        # STEP 3
                         index=int(linesplit[0])
                         if index in indextonewtype.keys():
+                            # STEP 4
                             typenum=indextonewtype[index]
+                            # STEP 5
                             linesplitall[i]=str(typenum)
                 line=''.join(linesplitall)
                 temp.write(line)
@@ -6976,32 +7045,44 @@ class PolarizableTyper():
 
         def ShiftParameterTypes(self,filename,oldtypetonewtype):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Shift key/XYZ types if overlapping (only for ligand XYZ/keys not complex)
+            Input: Tinker key or XYZ, dictionary of old type to new type
+            Output: - 
+            Referenced By: MolecularDynamics 
             Description: 
+            1. Iterate over lines of tinker XYZ
+            2. Iterate over strings in each line
+            3. If string is integer, grab type from line
+            4. Grab new type number from dicionary oldtypetonewtype
+            5. If - in front of type (multipoles), then add back in front of new type
+            6. Update line with new type number 
             """
             tempname=filename+"_TEMP"
             temp=open(filename,'r')
             results=temp.readlines()
             temp.close()
             temp=open(tempname,'w')
+            # STEP 1
             for line in results:
                 linesplitall=re.split(r'(\s+)', line)
+                # STEP 2
                 for i in range(len(linesplitall)):
                     element=linesplitall[i]
                     if '.xyz' in filename and (i!=12):
                         continue
                     if self.RepresentsInt(element):
+                        # STEP 3
                         oldtypenum=np.abs(int(element))
                         if oldtypenum in oldtypetonewtype.keys():
+                            # STEP 4
                             newtypenum=oldtypetonewtype[oldtypenum]
                             typenum=newtypenum
                         else:
                             typenum=oldtypenum
+                        # STEP 5
                         if '-' in element:
                             typenum=-typenum
+                        # STEP 6
                         linesplitall[i]=str(typenum)
                 line=''.join(linesplitall)
                 temp.write(line)
@@ -7011,31 +7092,43 @@ class PolarizableTyper():
 
         def GrabMaxTypeNumber(self,parameterfile):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Need max type number for shifting type numbers (dont want overlapping types for same duplicate ligands if want to disappear one and not the duplicate etc). 
+            Input: parameter or key file
+            Output: max type number
+            Referenced By: CheckIfNeedToShiftTypes, GenerateTypeMaps
             Description: 
+            1. Assume max type number is 1
+            2. Iterate over lines of file
+            3. If atom keyword in line and its not a comment, then grab atom type number
+            4. If atom type is greater than current max, update the max type 
             """
+            # STEP 1
             maxnumberfromprm=1
             temp=open(parameterfile,'r')
             results=temp.readlines()
             temp.close()
+            # STEP 2
             for line in results:
+                # STEP 3
                 if 'atom' in line and '#' not in line:
                     linesplit=line.split()
                     atomtype=int(linesplit[1])
+                    # STEP 4
                     if atomtype>maxnumberfromprm:
                         maxnumberfromprm=atomtype
             return maxnumberfromprm
         
         def GrabMinTypeNumber(self,parameterfile):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: Need min type number for shifting type numbers (dont want overlapping types for same duplicate ligands if want to disappear one and not the duplicate etc). 
+            Input: parameter or key file
+            Output: min type number
+            Referenced By: CheckIfNeedToShiftTypes, GenerateTypeMaps
             Description: 
+            1. Assume min type number is 10000
+            2. Iterate over lines of file
+            3. If atom keyword in line and its not a comment, then grab atom type number
+            4. If atom type is smaller than current min, update the min type 
             """
             minnumberfromprm=10000
             temp=open(parameterfile,'r')
@@ -7051,11 +7144,12 @@ class PolarizableTyper():
 
         def GenerateTypeMaps(self,keyfilelist):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
+            Intent: This creates old type -> new type dictionaries for each ligand, for shifting parameter types. 
+            Input: List of ligand key files
+            Output: List of old type -> new type dictionaries for each ligand. 
+            Referenced By: MolecularDynamics
             Description: 
+            1.
             """
             newkeyfilelist=keyfilelist.copy()
             oldtypetonewtypelist=[]
