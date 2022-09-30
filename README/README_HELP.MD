@@ -341,6 +341,8 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 
 ``useuniquefilenames`` specifies to use uniquefilenames for simulation files. Default is False, to make copying files between different folders easier.
 
+``heavyhyd`` specifies to use heavy-hydrogen tinker command
+
 #### Available Integrators Barostats and Thermostats
 
 ##### Integrators

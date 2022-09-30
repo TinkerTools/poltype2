@@ -80,6 +80,7 @@ from operator import itemgetter
 
 @dataclass
 class PolarizableTyper():
+        heavyhyd:bool=False
         maxtorresnitrogen:int=1
         skipchargecheck:bool=False
         useuniquefilenames:bool=False # if users want to have unique filenames for molecular dynamics/BAR otherwise keep same filename to make copying easier from folder to folder
@@ -597,6 +598,8 @@ class PolarizableTyper():
                             self.vinaexhaustiveness=int(a)
                         elif 'dockingenvname' in newline:
                             self.dockingenvname=a
+                        elif "heavyhyd" in newline:
+                            self.heavyhyd=self.SetDefaultBool(line,a,True)
                         elif "skipchargecheck" in newline:
                             self.skipchargecheck=self.SetDefaultBool(line,a,True)
                         elif "useuniquefilenames" in newline:
@@ -7149,7 +7152,16 @@ class PolarizableTyper():
             Output: List of old type -> new type dictionaries for each ligand. 
             Referenced By: MolecularDynamics
             Description: 
-            1.
+            1. Iterate over array of key files
+            2. Grab min and max type number from key file
+            3. Define shift as previous max type - previous min type + 1
+            4. If min from key is smaller than current min, then update current min. 
+            5. If max from key is greater than current max, then update current max. 
+            6. Generate all types from min type from key and max type from key
+            7. Shift all the types by the shift value defined earlier
+            8. Create dictionary of old types -> shifted types
+            9. Append dictionary to list of dictionaries
+            10.Update previousmaxnumberfromkey and previousminnumberfromkey 
             """
             newkeyfilelist=keyfilelist.copy()
             oldtypetonewtypelist=[]
@@ -7160,26 +7172,36 @@ class PolarizableTyper():
             prevminnumberfromkey=0
             #originalshift=self.GrabMaxTypeNumber(self.prmfilepath)
             originalshift=0 # cant shift because max 1000 for atom classes in tinker
+            # STEP 1
             for keyfilename in newkeyfilelist:
+                # STEP 2
                 maxnumberfromkey=self.GrabMaxTypeNumber(keyfilename)
                 minnumberfromkey=self.GrabMinTypeNumber(keyfilename)
+                # STEP 3
                 shift+=prevmaxnumberfromkey-prevminnumberfromkey+1+originalshift
+                # STEP 4
                 if minnumberfromkey<currentmin:
                     currentmin=minnumberfromkey
+                # STEP 5
                 if maxnumberfromkey>currentmax:
                     currentmax=maxnumberfromkey
+                # STEP 6
                 types=np.arange(minnumberfromkey,maxnumberfromkey+1,1)
+                # STEP 7
                 shiftedtypes=types+shift
                 maxtype=max(shiftedtypes)
                 currentmax=maxtype
+                # STEP 8
                 oldtypetonewtype=dict(zip(types,shiftedtypes))
                 temp={}
                 for oldtype,newtype in oldtypetonewtype.items():
-                    negold=-oldtype
+                    negold=-oldtype # for when multipoles have - in front of type number
                     negnew=-newtype
                     temp[negold]=negnew
                 oldtypetonewtype.update(temp)
+                # STEP 9
                 oldtypetonewtypelist.append(oldtypetonewtype)
+                # STEP 10
                 prevmaxnumberfromkey=maxnumberfromkey
                 prevminnumberfromkey=minnumberfromkey
                 
@@ -7188,27 +7210,36 @@ class PolarizableTyper():
 
         def CheckNetChargeIsZero(self,xyzpath,keypath,alzout):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Binding simulations require net charge to be 0, otherwise ewald artifcacts. Just use this as sanity check.  
+            Input: Tinker XYZ, tinker key, name for tinker analyze output
+            Output: - 
+            Referenced By: boxsetup.py - BoxSetUpProtocol , productiondynamics.py - SetupProductionDynamics 
+            Description:
+            1. Call CallAnalyze with xyz,key and name of analyze output. Use option m for checking net charge. 
+            2. Read the charge and any residual charge by calling ReadCharge
+            3. If the charge is not 0, then raise error
             """
+            # STEP 1
             self.CallAnalyze(xyzpath,keypath,alzout,self.trueanalyzepath,'m')
+            # STEP 2
             charge,resid=self.ReadCharge(alzout)
             if charge!=0:
+                # STEP 3
                 raise ValueError('Net charge is not zero! Net Charge = '+str(charge)+' '+keypath)
 
 
         def GrabXYZInfo(self,xyzfile):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Grab information from tinker XYZ file.  
+            Input: Tinker xyz file
+            Output: array of coordinates, types and connectivity, dictionary of index to type number , tinker xyz atom number, dictionary of index to atomic coordinates, dictionary of index to connected indices , dictionary of index to symbol
+            Referenced By: ExtractLigandIndicesFromComplexXYZ, MolecularDynamics
+            Description:
+            1. Iterate over lines of tinker XYZ
+            2. If first line, grab total atom number
+            3. Otherwise, grab index, type number, coordinates, connected indices, atomic symbol
+            4. Add all the information into respecive arrays/dictionaries
             """
-        
             temp=open(xyzfile,'r')
             xyzfileresults=temp.readlines()
             temp.close()
@@ -7217,16 +7248,20 @@ class PolarizableTyper():
             indextocoords={}
             indextoneighbs={}
             indextosym={}
+            # STEP 1
             for lineidx in range(len(xyzfileresults)):
                 line=xyzfileresults[lineidx]
                 linesplit=line.split()
                 if lineidx==0:
+                    # STEP 2
                     xyzatomnum=int(linesplit[0])
                 else:
                     if len(linesplit)>1 and '90.00' not in line:
+                        # STEP 3
                         index=int(linesplit[0])
                         typenum=int(linesplit[5])
                         coords=[linesplit[2],linesplit[3],linesplit[4]]
+                        # STEP 4
                         indextotypeindex[index]=typenum
                         xyzatominfo.append(linesplit[2:])
                         indextocoords[index]=coords
@@ -7243,11 +7278,28 @@ class PolarizableTyper():
 
         def WriteOutDatabaseParameterLines(self):
             """
-            Intent:
-            Input:
-            Output:
-            Referenced By: 
-            Description: 
+            Intent: Need a way to collect torsion parameters and put into format poltype database can read (this is only called when fragmenter is not used).
+            Input: - 
+            Output: -
+            Referenced By: GenerateParameters 
+            Description:
+            1. Grab array of atom indices that correpond to each atom in SMARTS (fragidxarray) 
+            2. Grab fragment SMARTS
+            3. Make dictionary of atom index to atom order in SMARTS (starting from 1,2,..)
+            4. Iterate over all torsions
+            5. Generate class key (type numbers) for the torsion
+            6. Generate smilesposstring (torsion indices in SMARTS atom order starting from 1,..) and fragtorstring (atom indices of torsion)  
+            7. Iterate over final key file
+            8. Extract torsion class key (all torsion types) from each line that has torsion key word and check if in dictionary of torsions that were fit
+            9. Save parameters for classkeys found that were fit
+            10.If vdw keyword in line extract type and find corresponding atom index to that type. 
+            11.If atom index was a vdw type being fit, then
+            12.Construct comment line with vdw SMARTS, atom index in SMARTS, and parameters
+            13.If comment containing quality of fit information is detected for classkey, then save it to add to database file later
+            14.Iterate over final key file
+            15.Extract torsion class key (all torsion types) from each line that has torsion key word and check if in dictionary of torsions that were fit
+            16.If torsions were fit, then using information contstructed earlier make comment line with torsion SMARTS, positions of torsion in SMARTS and parameters to add to database file.
+            17. Write out all generated lines to database file
             """
             newkey=self.tmpkeyfile.replace('.key','_TEMP.key')
             temp=open(self.tmpkeyfile,'r')
@@ -7268,24 +7320,31 @@ class PolarizableTyper():
                 trueotherparentindextofragindex[idx-1]=idx-1
             m=frag.mol_with_atom_index(self,self.rdkitmol)
             fragsmirks=rdmolfiles.MolToSmarts(m)
+            # STEP 1
             fragidxarray=frag.GrabAtomOrder(self,fragsmirks)
             tempmol=frag.mol_with_atom_index_removed(self,self.rdkitmol) 
+            # STEP 2
             fragsmarts=rdmolfiles.MolToSmarts(tempmol)
+            # STEP 3
             fragindextosmartspos=frag.GenerateAtomIndexToSMARTSPosition(self,fragidxarray)
+            # STEP 4
             for rotbnd,tors in self.rotbndlist.items():
                 for torsion in tors:
+                    # STEP 5
                     classkey=torgen.get_class_key(self,torsion[0],torsion[1],torsion[2],torsion[3])
+                    # STEP 6
                     smilesposstring,fragtorstring=frag.GenerateSMARTSPositionStringAndAtomIndices(self,torsion,trueotherparentindextofragindex,fragidxarray)
                     classkeytosmartsposarray[classkey]=smilesposstring
                     classkeytosmarts[classkey]=fragsmarts
                     classkeytotorsionindexes[classkey]=fragtorstring
                     classkeytofragmentfilename[classkey]=self.molstructfname
-
+            # STEP 7
             for lineidx in range(len(results)):
                 line=results[lineidx]
                 newline=line.strip()
                 linesplit=newline.split()
                 if line.strip().startswith('torsion') and '#' not in line and 'Missing' not in line:
+                    # STEP 8
                     typea=int(linesplit[1])
                     typeb=int(linesplit[2])
                     typec=int(linesplit[3])
@@ -7300,10 +7359,12 @@ class PolarizableTyper():
                         classkey=revtorkey
                     else:
                         continue
+                    # STEP 9
                     classkeytoparameters[classkey]=prms
                 elif 'vdw' in line and '#' not in line:
                     for clskey,smrts in classkeytosmarts.items():
                         pass
+                    # STEP 10
                     linesplit=line.split() 
                     fragclasskey=linesplit[1]
                     for fragidx,symclass in self.idxtosymclass.items():
@@ -7312,7 +7373,9 @@ class PolarizableTyper():
                     fragsymclass=int(fragclasskey)
                     prms=linesplit[2:]
                     fragidx=int(fragidx)-1
+                    # STEP 11
                     if fragidx in fragindextosmartspos.keys():
+                        # STEP 12
                         smartspos=fragindextosmartspos[fragidx]
                         smilesposarray=[smartspos]
                         smilesposarray=[str(i) for i in smilesposarray]
@@ -7327,6 +7390,7 @@ class PolarizableTyper():
                         smartstovdwlinelist[smrts].append(valencestring)
 
                 elif 'RMSD(MM2,QM)' in line:
+                    # STEP 13
                     typea=int(linesplit[2])
                     typeb=int(linesplit[3])
                     typec=int(linesplit[4])
@@ -7343,11 +7407,12 @@ class PolarizableTyper():
 
                     classkeytofitresults[classkey]=' '.join(linesplit)+'\n'
 
-
+            # STEP 14
             for line in results:
                 fitline="# Fitted from Fragment "
                 linesplit=line.split()
                 if line.strip().startswith('torsion') and '#' not in line and 'Missing' not in line:
+                    # STEP 15
                     typea=int(linesplit[1])
                     typeb=int(linesplit[2])
                     typec=int(linesplit[3])
@@ -7358,6 +7423,7 @@ class PolarizableTyper():
                         valkey=tuple([typeb,typec])
                     else:
                         valkey=tuple([typec,typeb])
+                    # STEP 16
                     if torkey in classkeytoparameters.keys():
                         valenceprmlist,valkeytosmarts=frag.ConstructTorsionLineFromFragment(self,torkey,classkeytofragmentfilename,classkeytoparameters,classkeytosmartsposarray,classkeytosmarts,classkeytotorsionindexes,temp,valenceprmlist,fitline,classkeytofitresults,valkey,valkeytosmarts)
 
@@ -7369,6 +7435,7 @@ class PolarizableTyper():
 
 
             temp.close()
+            # STEP 17
             if len(self.torlist)!=0:
                 frag.WriteOutDatabaseLines(self,valenceprmlist,valkeytosmarts,smartstovdwlinelist)
 
@@ -7377,22 +7444,30 @@ class PolarizableTyper():
 if __name__ == '__main__':
     def RunPoltype():
         """
-        Intent:
-        Input:
-        Output:
-        Referenced By: 
+        Intent: Call main poltype function, if error print error stack trace.
+        Input: -
+        Output: -
+        Referenced By:  -
         Description: 
+        1. Try to run poltype
+        2. If program crashes
+        3. If scratch directories exist, remove them
+        4. If email is given as input send email report of crash 
         """
         poltype=PolarizableTyper() 
+        # STEP 1
         try:
             poltype.main()
         except:
+            # STEP 2
             traceback.print_exc(file=sys.stdout)
             text = str(traceback.format_exc())
+            # STEP 3
             if os.path.exists(poltype.scrtmpdirgau):
                 shutil.rmtree(poltype.scrtmpdirgau)
             if os.path.exists(poltype.scrtmpdirpsi4):
                 shutil.rmtree(poltype.scrtmpdirpsi4)
+            # STEP 4
             if poltype.email!=None:
                 password='amoebaisbest'
                 fromaddr = 'poltypecrashreportnoreply@gmail.com'

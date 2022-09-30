@@ -26,28 +26,47 @@ import shutil
 
 def CheckIfStringIsFloat(string):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Check if string is float value
+    Input: String
+    Output: boolean indicating if string is a float or not
+    Referenced By: appendtofile
     Description: 
+    1. Assume is not float
+    2. Try to convert to float, if works set boolean to True
+    3. If fail return boolean
     """
+    # STEP 1
     isfloat=False
+    # STEP 2
     try:
         float(string)
         isfloat=True
     except:
+        # STEP 3
         pass
     return isfloat
 
 
 def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Append the parameters found from database search to key file
+    Input: Original key file, new name of updated key file, various dictionaries of parameters to comments about 
+    Output: -  
+    Referenced By: poltype.py - GenerateParameters 
     Description: 
+    1. Iterate over lines of key files 
+    2. Detect when find atom block and when after atom block
+    3. If polarize or multipole in line, skip this line (only adding valence and vdw parameters for AMOEBA from database here).
+    4. If AMOEBA+ forcefield, write out AMOEBA+ vdw, else write out AMOEBA vdw
+    5. Write out bond parameters
+    6. Write out angle parameters
+    7. Write out stretch bend parameters
+    8. Write out op-bend parameters
+    9. Write out torsion parameters
+    10.Write out solute parameters
+    11.Write out tor-tor parameters
+    12.If AMOEBA+ forcefield, write out charge penetration, charge transfer and charge flux parameters
+    13.If user gives key file parameters as input to write in, then write those to key file
     """
     tempname=vf.replace('.key','_temp.key')
     f=open(tempname,'w')
@@ -59,8 +78,10 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
         atomline=False
         wroteout=False
         linestoskip=[]
+        # STEP 1
         for theline in results:
             linesplit=theline.split()
+            # STEP 2
             if 'atom' in theline:
                 atomline=True
                 if foundatomblock==False:
@@ -69,7 +90,7 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
                         
             else:
                 atomline=False
-
+            # STEP 3
             if 'polarize' in theline and poltype.writeoutpolarize==False:
                 linestoskip.append(theline)
             if 'multipole' in theline and poltype.writeoutmultipole==False:
@@ -82,6 +103,7 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
             if foundatomblock==True and atomline==False and wroteout==False:
                 wroteout=True
                 f.write('\n')
+                # STEP 4
                 if poltype.writeoutvdw==True:
                     if poltype.forcefield=='AMOEBA+':
                         for line,transferinfo in amoebaplusvdwprmstotransferinfo.items():
@@ -95,41 +117,47 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
                             f.write(line)
                             f.write('\n')
                 
-
+                # STEP 5
                 if poltype.writeoutbond==True:
                     for line,transferinfo in bondprmstotransferinfo.items():
                         f.write(transferinfo)
                         f.write(line)
                         f.write('\n')
+                # STEP 6 
                 if poltype.writeoutangle==True:
                     for line,transferinfo in angleprmstotransferinfo.items():
                         f.write(transferinfo)
                         f.write(line)
                         f.write('\n')
+                # STEP 7
                 if poltype.writeoutstrbnd==True:
                     for line,transferinfo in strbndprmstotransferinfo.items():
                         f.write(transferinfo)
                         f.write(line)
                         f.write('\n')
+                # STEP 8
                 if poltype.writeoutopbend==True:
                     for line,transferinfo in opbendprmstotransferinfo.items():
                         f.write(transferinfo)
                         f.write(line)
                         f.write('\n')
+                # STEP 9
                 if poltype.writeouttorsion==True:
                     for line,transferinfo in torsionprmstotransferinfo.items():
                         f.write(transferinfo)
                         f.write(line)
                         f.write('\n')
+                # STEP 10
                 for line in soluteprms:
                     f.write(line)
                     f.write('\n')
+                # STEP 11
                 for line,transferinfo in tortorprmstotransferinfo.items():
                     if 'tortors' in line:
                         f.write(transferinfo)
                     f.write(line)
                     f.write('\n')
-
+                # STEP 12
                 if poltype.forcefield=='AMOEBA+':
                     for line,transferinfo in ctprmstotransferinfo.items():
                         f.write(transferinfo)
@@ -154,7 +182,7 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
                 if theline not in linestoskip:
                     f.write(theline)
     
-
+    # STEP 13
     if poltype.inputkeyfile!=None:
         if poltype.writeouttorsion==True:
             for line,transferinfo in torsionprmstotransferinfo.items():
@@ -185,41 +213,63 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
 
 def ReadSmallMoleculeLib(poltype,filepath):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Read amoeba09 SMARTS, atom order -> amoeba09 tinker description file
+    Input: Filepath
+    Output: Dictionary of SMARTS, atom order -> amoeba09 tinker description
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over lines of file  
+    2. Grab symbol
+    3. Grab tinker description
+    4. Grab SMARTS string
+    5. Grab atom order list
+    6. Put items in dictionary 
     """
     temp=open(filepath,'r')
     results=temp.readlines()
     temp.close()
     smartsatomordertoelementtinkerdescrip={}
+    # STEP 1
     for lineidx in range(len(results)):
         line=results[lineidx]
         linesplit=line.split()
         if len(linesplit)==0:
             continue
+        # STEP 2
         elementsymb=linesplit[0]
         newline=' '.join(linesplit[1:])
         newsplit=newline.split('%')
+        # STEP 3
         tinkerdescrip=newsplit[0].lstrip().rstrip()
+        # STEP 4
         smarts=newsplit[1].lstrip().rstrip()
+        # STEP 5
         atomindices=newsplit[2].lstrip().rstrip()
         atomorderlist=atomindices.split()
         atomorderlist=tuple([int(i) for i in atomorderlist])
         ls=[smarts,atomorderlist]
         newls=[elementsymb,tinkerdescrip]
+        # STEP 6
         smartsatomordertoelementtinkerdescrip[tuple(ls)]=tuple(newls)
     return smartsatomordertoelementtinkerdescrip
 
 def GrabParameters(poltype,fname):
     """
-    Intent:
+    Intent: Grab parameters from parameter file
     Input:
     Output:
-    Referenced By: 
+    Referenced By: mutation.py GrabBgnToEndPrms
     Description: 
+    1. Iterate over lines of key file
+    2. If atom keyword, save atom line
+    3. If bond keyword, save bond parameter line
+    4. If angle keyword, save angle parameter line
+    5. If torsion keyword, save torsion parameter line
+    6. If strbnd keyword, save stretch bend parameter line
+    7. If opbend keyword, save opbend parameter line
+    8. If polarize keyword, save polarize parameter line
+    9. If vdw keyword, save vdw parameter line
+    10. If multipole keyword, save multipole parameter lines 
     """
     atomdefs=[]
     bondprms=[]
@@ -233,24 +283,34 @@ def GrabParameters(poltype,fname):
     temp=open(fname,'r')
     results=temp.readlines()
     temp.close()
+    # STEP 1
     for lineidx in range(len(results)):
         line=results[lineidx]
+        # STEP 2
         if 'atom' in line:
             atomdefs.append(line)
+        # STEP 3
         elif 'bond' in line:
             bondprms.append(line)
+        # STEP 4
         elif 'angle' in line or 'anglep' in line:
             angleprms.append(line)
+        # STEP 5
         elif 'torsion' in line:
             torsionprms.append(line) 
+        # STEP 6
         elif 'strbnd' in line:
             strbndprms.append(line)
+        # STEP 7
         elif 'opbend' in line:
             opbendprms.append(line)
+        # STEP 8
         elif 'polarize' in line:
             polarizeprms.append(line)
+        # STEP 9
         elif 'vdw' in line: 
             vdwprms.append(line)
+        # STEP 10
         elif 'multipole' in line:
             mpolelist=[line,results[lineidx+1],results[lineidx+2],results[lineidx+3],results[lineidx+4]]
             for mpoleline in mpolelist:
@@ -258,281 +318,23 @@ def GrabParameters(poltype,fname):
 
     return atomdefs,bondprms,angleprms,torsionprms,strbndprms,opbendprms,polarizeprms,vdwprms,mpoleprms
  
-def ShiftPoltypeNumbers(poltype,filename,keyfilename):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    oldtypetonewtype={}
-    maxnumberfromprm=GrabMaxTypeNumber(poltype,filename)
-    maxnumberfromkey=GrabMaxTypeNumber(poltype,keyfilename)
-    minnumberfromkey=GrabMinTypeNumber(poltype,keyfilename)
-    typenumbers=list(range(minnumberfromkey,maxnumberfromkey+1))
-    newmaxnumber=maxnumberfromprm+1
-    shift=minnumberfromkey-newmaxnumber
-    oldtypetonewtype={}
-    for typenum in typenumbers:
-        newtypenum=typenum-shift
-        oldtypetonewtype[typenum]=newtypenum
-
-    return oldtypetonewtype,shift
-
-def GrabMaxTypeNumber(poltype,parameterfile):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    maxnumberfromprm=1
-    temp=open(parameterfile,'r')
-    results=temp.readlines()
-    temp.close()
-    for line in results:
-        if 'atom' in line:
-            linesplit=line.split()
-            atomtype=int(linesplit[1])
-            if atomtype>maxnumberfromprm:
-                maxnumberfromprm=atomtype
-    return maxnumberfromprm
-
-def GrabMinTypeNumber(poltype,parameterfile):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    minnumberfromprm=10000
-    temp=open(parameterfile,'r')
-    results=temp.readlines()
-    temp.close()
-    for line in results:
-        if 'atom' in line:
-            linesplit=line.split()
-            atomtype=int(linesplit[1])
-            if atomtype<minnumberfromprm:
-                minnumberfromprm=atomtype
-    return minnumberfromprm
-
-def ShiftParameterDefintions(poltype,parameterarray,oldtypetonewtype):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    newparameterarray=[]
-    for array in parameterarray:
-        newarray=[]
-        for line in array:
-            try:
-                linesplitall=re.split(r'(\s+)', line)
-            except:
-                print('Error ',line)
-            for i in range(len(linesplitall)):
-                element=linesplitall[i]
-                if RepresentsInt(element):
-                    oldtypenum=np.abs(int(element))
-                    if oldtypenum in oldtypetonewtype.keys():
-                        newtypenum=oldtypetonewtype[oldtypenum]
-                        typenum=newtypenum
-                    else:
-                        typenum=oldtypenum
-                    if '-' in element:
-                        typenum=-typenum
-                    linesplitall[i]=str(typenum)
-            newline=''.join(linesplitall)
-            newarray.append(newline)
-        newparameterarray.append(newarray)
-    return newparameterarray
-
-def WriteToPrmFile(poltype,atomdefs,bondprms,angleprms,torsionprms,strbndprms,opbendprms,polarizeprms,vdwprms,mpoleprms,prmpath):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    # assumes that there is white space at end of every parameter block, just add a line to key_5
-    temp=open(prmpath,'r')
-    results=temp.readlines()
-    temp.close()
-    lastidx=len(results)-1
-    newprmname=prmpath.replace('.prm','_temp.prm')
-    temp=open(newprmname,'w')
-    linelist=[]
-    firstpassatomdef=False
-    firstpassbond=False
-    firstpassangle=False
-    firstpasstorsion=False
-    firstpassstrbnd=False
-    firstpasspolarize=False
-    firstpassvdw=False
-    firstpassmpole=False
-    firstpassopbend=False
-    passedatomdefblock=False
-    passedbondblock=False
-    passedangleblock=False
-    passedtorsionblock=False
-    passedstrbndblock=False
-    passedpolarizeblock=False
-    passedvdwblock=False
-    passedmpoleblock=False
-    passedopbendblock=False
-
-    
-    for lineidx in range(len(results)):
-        line=results[lineidx]
-        if 'type' not in line and 'cubic' not in line and 'quartic' not in line and 'pentic' not in line and 'sextic' not in line and 'unit' not in line and 'scale' not in line:
-            prewhitespacelinesplit=re.split(r'(\s+)', line)
-            if 'atom' in line and firstpassatomdef==False:
-                firstpassatomdef=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'atom' not in line and firstpassatomdef==True and passedatomdefblock==False:
-                passedatomdefblock=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-                for atomdef in atomdefs:
-                    temp.write(atomdef)
-                temp.write(line)
-            elif 'vdw' in line and firstpassvdw==False:
-                firstpassvdw=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'vdw' not in line and firstpassvdw==True and passedvdwblock==False:
-                passedvdwblock=True
-                for vdwline in vdwprms:
-                    temp.write(vdwline)
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'bond' in line and firstpassbond==False:
-                firstpassbond=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'bond' not in line and firstpassbond==True and passedbondblock==False:
-                passedbondblock=True
-                for bondline in bondprms:
-                    temp.write(bondline)
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'angle' in line and firstpassangle==False:
-                firstpassangle=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'angle' not in line and firstpassangle==True and passedangleblock==False:
-                passedangleblock=True
-                for angleline in angleprms:
-                    temp.write(angleline)
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'torsion' in line and firstpasstorsion==False:
-                firstpasstorsion=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'torsion' not in line and firstpasstorsion==True and passedtorsionblock==False:
-                passedtorsionblock=True
-                for torsionline in torsionprms:
-                    temp.write(torsionline)
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'strbnd' in line and firstpassstrbnd==False:
-                firstpassstrbnd=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'strbnd' not in line and firstpassstrbnd==True and passedstrbndblock==False:
-                passedstrbndblock=True
-                for strbndline in strbndprms:
-                    temp.write(strbndline)
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'polarize' in line and firstpasspolarize==False:
-                firstpasspolarize=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'polarize' not in line and firstpasspolarize==True and passedpolarizeblock==False:
-                passedpolarizeblock=True
-                for polarizeline in polarizeprms:
-                    temp.write(polarizeline)
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'opbend' in line and firstpassopbend==False:
-                firstpassopbend=True
-                temp.write(line)
-            elif 'opbend' not in line and firstpassopbend==True and passedopbendblock==False:
-                passedopbendblock=True
-                for opbendline in opbendprms:
-                    temp.write(opbendline)
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'multipole' in line and firstpassmpole==False:
-                firstpassmpole=True
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-            elif 'multipole' not in line and firstpassmpole==True and passedmpoleblock==False and line=='\n':
-                passedmpoleblock=True
-                for mpoleline in mpoleprms:
-                    temp.write(mpoleline)
-            else:
-                temp.write(line)
-                temp.flush()
-                os.fsync(temp.fileno())
-                sys.stdout.flush()
-
-    temp.flush()
-    os.fsync(temp.fileno())
-    sys.stdout.flush()
-    temp.close()
-    os.remove(prmpath)
-    os.rename(newprmname,prmpath)
-
 def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendtinkerclassestopoltypeclasses,opbendtinkerclassestotrigonalcenterbools,angletinkerclassestopoltypeclasses,torsiontinkerclassestopoltypeclasses,poltypetoprmtype,atomtinkerclasstopoltypeclass,typestoframedefforprmfile,fname,skipmultipole=False):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Grab parameters from amoeba09 parameter file.
+    Input: dictionaries of tinker class -> poltype class numbers for each parameter type
+    Output: arrays of parameter lines for each parameter type in amoeba09
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over lines of parameter file
+    2. If bond keyword in line, check if bond classes are in input dictionaries and if so, save parameter line 
+    3. If angle keyword in line, check if angle classes are in input dictionaries and if so, save parameter line 
+    4. If torsion keyword in line, check if torsion classes are in input dictionaries and if so, save parameter line 
+    5. If strbnd keyword in line, check if strbnd classes are in input dictionaries and if so, save parameter line 
+    6. If opbend keyword in line, check if opbend classes are in input dictionaries and if so, save parameter line 
+    7. If multipole keyword in line, check if multipole classes are in input dictionaries and if so, save parameter line 
+    8. If polarize keyword in line, check if polarize classes are in input dictionaries and if so, save parameter line 
+    9. If vdw keyword in line, check if vdw classes are in input dictionaries and if so, save parameter line 
+    10. If pitor keyword in line, check if middle two classes are in torsion input dictionaries, if so map parameter line to torsion parameters (later on will modify torsion parameters to account for not adding pitor parameters to keyfile)
     """
     temp=open(fname,'r') 
     results=temp.readlines()
@@ -546,13 +348,14 @@ def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendti
     polarizeprms=[]
     vdwprms=[]
     torsiontopitor={}
-
+    # STEP 1
     for lineidx in range(len(results)):
         line=results[lineidx]
         linesplit=line.split()
         linesplitall=re.split(r'(\s+)', line)
         if '#' in line:
             continue
+        # STEP 2
         if 'bond' in line and 'cubic' not in line and 'quartic' not in line:
             bondclasslist=[int(linesplit[1]),int(linesplit[2])]
             foundbond=False
@@ -568,7 +371,8 @@ def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendti
                     linesplitall[2]=str(boundcls[0])    
                     linesplitall[4]=str(boundcls[1])  
                     newline=''.join(linesplitall)
-                    bondprms.append(newline)           
+                    bondprms.append(newline)    
+        # STEP 3       
         elif 'angle-cubic' not in line and 'angle-quartic' not in line and 'pentic' not in line and 'sextic' not in line and ('angle' in line or 'anglep' in line) :
             angleclasslist=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3])]
             foundangle=False
@@ -586,7 +390,7 @@ def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendti
                     linesplitall[6]=str(boundcls[2])
                     newline=''.join(linesplitall)
                     angleprms.append(newline) 
-        
+        # STEP 4 
         elif 'torsion' in line and 'torsionunit' not in line:
             torsionclasslist=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3]),int(linesplit[4])]
             foundtorsion=False
@@ -612,7 +416,7 @@ def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendti
 
                     newline=''.join(linesplitall)
                     torsionprms.append(newline)
-
+        # STEP 5
         elif 'strbnd' in line:
             angleclasslist=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3])]
             foundstrbnd=False
@@ -639,7 +443,7 @@ def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendti
                     strbndprms.append(newline) 
 
                
-        
+        # STEP 6 
         elif 'opbend' in line and 'opbendtype' not in line and 'cubic' not in line and 'quartic' not in line and 'pentic' not in line and 'sextic' not in line:
             bondclasslist=[int(linesplit[1]),int(linesplit[2])]
             foundopbend=False
@@ -661,7 +465,7 @@ def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendti
                     newline=''.join(linesplitall)
                     if boolarray[1]==True: 
                         opbendprms.append(newline)
-
+        # STEP 7
         elif 'multipole' in line and skipmultipole==False:
             newlinesplit=linesplit[1:-1]
             frames=[int(i) for i in newlinesplit]
@@ -688,14 +492,14 @@ def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendti
                 mpolelist=[newline,results[lineidx+1],results[lineidx+2],results[lineidx+3],results[lineidx+4]]
                 for mpoleline in mpolelist:
                     mpoleprms.append(mpoleline)
-
+        # STEP 8 
         elif 'polarize' in line: 
             atomtype=int(linesplit[1])
             if atomtype in poltypetoprmtype.keys():
                 prmtype=poltypetoprmtype[atomtype]
                 newline=line.replace('\n','')+' '+str(prmtype)+'\n'
                 polarizeprms.append(newline)
-         
+        # STEP 9 
         elif 'vdw' in line and 'type' not in line and 'scale' not in line: 
             atomclass=int(linesplit[1])
             atomclasslist=tuple([atomclass])
@@ -706,7 +510,7 @@ def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendti
                         linesplit[1]=str(prmclass)
                         newline=' '.join(linesplit)+'\n'
                         vdwprms.append(newline)
-
+        # STEP 10
         elif 'pitor' in line:
             linesplit=line.split()
             b=linesplit[1]
@@ -724,26 +528,38 @@ def GrabParametersFromPrmFile(poltype,bondtinkerclassestopoltypeclasses,opbendti
 
 def GrabTypeAndClassNumbers(poltype,prmfile):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Grab dictionaries of tinker element description -> tinker type and tinker type -> tinker class from amoeba09 parameter file. 
+    Input: amoeba09 parameterfile
+    Output: dictionaries of tinker element description -> tinker type and tinker type -> tinker class 
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over lines of parameter file, if atom keyword is in line
+    2. Grab tinker type
+    3. Grab class type
+    4. Grab element
+    5. Grab tinker description
+    6. Put everything into dictionaries 
     """
     temp=open(prmfile,'r')
     results=temp.readlines()
     temp.close()
     elementtinkerdescriptotinkertype={}
     tinkertypetoclass={}
+    # STEP 1
     for line in results:
         if 'atom' in line:
             linesplit=line.split()    
             newlinesplit=linesplit[1:-3]
+            # STEP 2
             tinkertype=newlinesplit[0]
+            # STEP 3
             classtype=newlinesplit[1]
+            # STEP 4
             element=newlinesplit[2]
+            # STEP 5
             tinkerdescrip=' '.join(newlinesplit[3:])
             ls=[element,tinkerdescrip]
+            # STEP 6
             elementtinkerdescriptotinkertype[tuple(ls)]=tinkertype
             tinkertypetoclass[tinkertype]=classtype
     return elementtinkerdescriptotinkertype,tinkertypetoclass
@@ -752,26 +568,33 @@ def GrabTypeAndClassNumbers(poltype,prmfile):
 
 def GrabAtomsForParameters(poltype,mol):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Need a list of atoms, bonds, angles and torsions for input molecule to process and parse database later.
+    Input: Openbabel mol object
+    Output: list of atoms, bonds, angles and torsions
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
     Description: 
+    1. Iterate over atoms append atom indices to atom array
+    2. Iterate over neighbor of atoms and if bond (atom,natom) hasnt been found append to array
+    3. Iterate over neighbor of neighbor and if first atom and neighbor of neighbor are not same atoms, append angle to array
+    4. Iterate over neighbors again to find torsion, make sure no indices are repeating, and append torsion to array
     """
     # now we can define arrays to collect bonds, angles and torsions
     listoftorsionsforprm=[]
     listofbondsforprm=[]
     listofanglesforprm=[]
     listofatomsforprm=[]
+    # STEP 1
     for atom in openbabel.OBMolAtomIter(mol):
         atomidx=atom.GetIdx()-1
         listofatomsforprm.append([atomidx])
         neighbs=[natom for natom in openbabel.OBAtomAtomIter(atom)]
+        # STEP 2
         for natom in neighbs:
             nidx=natom.GetIdx()-1
             bondset=[nidx,atomidx]
             if bondset not in listofbondsforprm and bondset[::-1] not in listofbondsforprm:
                 listofbondsforprm.append(bondset)
+            # STEP 3
             nextneighbs=[nextatom for nextatom in openbabel.OBAtomAtomIter(natom)]
             for nextneighb in nextneighbs:
                 nextneighbidx=nextneighb.GetIdx()-1
@@ -780,6 +603,7 @@ def GrabAtomsForParameters(poltype,mol):
                     if angleset not in listofanglesforprm and angleset[::-1] not in listofanglesforprm:
                         listofanglesforprm.append(angleset)
                     nextnextneighbs=[nextnextatom for nextnextatom in openbabel.OBAtomAtomIter(nextneighb)]
+                    # STEP 4
                     for nextnextatom in nextnextneighbs:
                         nextnextatomidx=nextnextatom.GetIdx()-1
                         if nextnextatomidx!=nidx and nextnextatomidx!=atomidx:                
@@ -792,24 +616,32 @@ def GrabAtomsForParameters(poltype,mol):
 
 def ExtendByNeighbors(poltype,ls):    
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Add neighbors to input array, when wanting to check if neighbors exist in SMARTS match
+    Input: Array of atom indices
+    Output: Array of atom indices plus neighbors
+    Referenced By: MatchAllPossibleSMARTSToParameterSMARTS
     Description: 
+    1. If input array is of length 1 (vdw atom matches) want neighbor of neighbors also (so match neighbor of neighbor on hydrogen for example to get enough information if match is correct)
+    2. Iterate over atom indices in input array
+    3. Iterate over neighboring atom indices of atom index and append to new array
+    4. If input array is of length 1 also iterate over neighbor of neighbors and append indices to new array 
     """
+    # STEP 1
     extendneighbofneighb=False
     if len(ls)==1:
         extendneighbofneighb=True 
     newls=[]
+    # STEP 2
     for atomidx in ls:
         if atomidx not in newls:
             newls.append(atomidx)
         atom=poltype.rdkitmol.GetAtomWithIdx(atomidx)
+        # STEP 3
         for natom in atom.GetNeighbors():
             natomidx=natom.GetIdx()
             if natomidx not in newls:
-                newls.append(natomidx)      
+                newls.append(natomidx)     
+            # STEP 4 
             if extendneighbofneighb==True and len(atom.GetNeighbors())==1:
                 for nnatom in natom.GetNeighbors():
                     nnatomidx=nnatom.GetIdx()
@@ -823,22 +655,38 @@ def ExtendByNeighbors(poltype,ls):
 
 def GenerateFragmentSMARTS(poltype,ls):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: When matching input molecule to database need a way to take part of input molecule, convert to SMARTS to attempt SMARTS matching. This functions generate SMARTS from input array of atom indices in molecule. 
+    Input: Array of atom indices from input molecule
+    Output: SMART string, second SMARTS that is modified so that any atoms that were aromatic in original mol are aromatic in SMARTS
+    Referenced By: GenerateFragmentSMARTSList
+    Description:
+    1. Create new mol object
+    2. Iterate over input array of atom indices
+    3. Grab the atom object from input molecule and add atom to newly created mol object
+    4. Keep track of old atom index and new atom index in dicttoinary
+    5. Keep track if atom is aromatic atom or not in original molecule
+    6. Iterate over bonds
+    7. If one atom is in new molecule and but the other atom is not, then keep track of this bond as a cut bond. If both are in new molecule then add bond to new molecule.
+    8. Generate SMARTS from new mol  
+    9. Iterate back over atoms in new mol and if they were aromatic atoms in original molecule, make them aromatic in new mol
+    10.Iterate back over bonds in new mol and if they were aromatic bonds in original molecule, make them aromatic in new mol 
+    11.Generate new SMARTS from modified mol (containing aromaticity information)
     """
+    # STEP 1
     newmol = Chem.Mol()
     mw = Chem.RWMol(newmol)
     # need to treat ring bonds as aromatic since all transferred parameters from amoeba09 are aromatic rings
     oldindextonewindex={}
     aromaticindices=[]
+    # STEP 2
     for i,idx in enumerate(ls):
+        # STEP 3
         oldatom=poltype.rdkitmol.GetAtomWithIdx(idx)
         mw.AddAtom(oldatom)
+        # STEP 4
         oldindextonewindex[idx]=i
         oldatombabel=poltype.mol.GetAtom(idx+1)
+        # STEP 5
         isaro=oldatombabel.IsAromatic()
         isinring=oldatombabel.IsInRing()
         hyb=oldatombabel.GetHyb()
@@ -848,11 +696,13 @@ def GenerateFragmentSMARTS(poltype,ls):
     atomswithcutbonds=[]
     aromaticbonds=[]
     bonditer=poltype.rdkitmol.GetBonds()
+    # STEP 6
     for bond in bonditer:
         oendidx = bond.GetEndAtomIdx()
         obgnidx = bond.GetBeginAtomIdx()
         babelbond=poltype.mol.GetBond(oendidx+1,obgnidx+1)
         isinring=babelbond.IsInRing()
+        # STEP 7
         if oendidx in oldindextonewindex.keys() and obgnidx not in oldindextonewindex.keys():
             if oldindextonewindex[oendidx] not in atomswithcutbonds:
                 atomswithcutbonds.append(oldindextonewindex[oendidx])
@@ -869,42 +719,43 @@ def GenerateFragmentSMARTS(poltype,ls):
             aromaticbonds.append([endidx,bgnidx]) 
         bondorder=bond.GetBondType()
         mw.AddBond(bgnidx,endidx,bondorder)
-
+    # STEP 8
     smarts=rdmolfiles.MolToSmarts(mw)
+    # STEP 9
     for atom in mw.GetAtoms():
         atomidx=atom.GetIdx()
         if atomidx in aromaticindices:
             atom.SetIsAromatic(True)
-
+    # STEP 10
     for bond in mw.GetBonds():
         endidx = bond.GetEndAtomIdx()
         bgnidx = bond.GetBeginAtomIdx()
         temp=[endidx,bgnidx]
         if temp in aromaticbonds or temp[::-1] in aromaticbonds:
             bond.SetIsAromatic(True)
+    # STEP 11
     smartsfortransfer=rdmolfiles.MolToSmarts(mw)
-    testmol=Chem.MolFromSmarts(smartsfortransfer)
-    diditmatch=mw.HasSubstructMatch(testmol)
-    atomicnumtosymbol={6:'c',7:'n',8:'o'}
     
     return smarts,smartsfortransfer
 
 
-
-
-
-
 def GenerateFragmentSMARTSList(poltype,ls):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: When wanting to find matches to amoeba09 database, need a way to generate many SMARTS of varying lengths centered around inpyt atom indices from input molecule. This is sort of like maximum common substructure search but only centered on atom desired so need custom code. 
+    Input: List of atom indices from input molecule want to generate SMARTS strings for
+    Output: List of SMARTS strings containing matches to part of molecule with input atom indices
+    Referenced By: MatchAtomIndicesSMARTSToParameterSMARTS
     Description: 
+    1. Generate all possible fragment indices containing input atom indices up to length 14 (4 SP3 atoms for torsion have max 14 atoms)
+    2. Iterate over each list of atom indices just generated
+    3. Generate a SMARTS string for each one and append to array 
     """
     fragsmartslist=[]
+    # STEP 1
     atomindiceslist=GenerateAllPossibleFragmentIndices(poltype,ls,poltype.rdkitmol,14)
+    # STEP 2
     for thels in atomindiceslist:
+        # STEP 3
         smarts,smartsfortransfer=GenerateFragmentSMARTS(poltype,thels)
         if smartsfortransfer not in fragsmartslist:
             fragsmartslist.append(smartsfortransfer)
@@ -915,20 +766,27 @@ def GenerateFragmentSMARTSList(poltype,ls):
 
 def FindHowManyBondTypes(poltype,trymol,atomidx):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Want to define a "type" that does not take into account global symmetry but only surrounding envioronment. Define it with atomicnumber, number of single,aromatic, double and triple bonds.
+    Input: Mol object, atom index that want a type for
+    Output: The atom type (array of atomic number, number of bond types for each bond type for that atom)
+    Referenced By: MatchAllPossibleSMARTSToParameterSMARTS
     Description: 
+    1. Grab the atom of interest from input atom index and mol object
+    2. Iterate over neighbors of atom of interest
+    3. Grab bond type and increase count of respective bond type (single, aromatic, double, triple)
+    4. Construct atom type using information of atomic number as well as how many single, aromatic, double and triple bonds.
     """
     numsinglebonds=0
     numaromaticbonds=0
     numdoublebonds=0
     numtriplebonds=0
+    # STEP 1
     atom=trymol.GetAtomWithIdx(atomidx)
+    # STEP 2
     for natom in atom.GetNeighbors():
         natomidx=natom.GetIdx()
         bond=trymol.GetBondBetweenAtoms(atomidx,natomidx)
+        # STEP 3
         bondtype=bond.GetBondTypeAsDouble() 
         if bondtype==1:
             numsinglebonds+=1
@@ -939,37 +797,47 @@ def FindHowManyBondTypes(poltype,trymol,atomidx):
         elif bondtype==3:
             numtriplebonds+=1
     atomicnum=atom.GetAtomicNum()
+    # STEP 4
     atomtype=tuple([atomicnum,numsinglebonds,numaromaticbonds,numdoublebonds,numtriplebonds])
 
     return atomtype
 
 
-def GrabAromaticIndices(poltype,match,themol,ls):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    aromaticindices=[]
-    for index in match:
-        atom=themol.GetAtomWithIdx(index)
-        isinring=atom.IsInRing()
-        hyb=atom.GetHybridization()
-        if isinring==True and str(hyb)==str(Chem.HybridizationType.SP2):
-            aromaticindices.append(index)
-    return aromaticindices
-
-
 
 def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,parametersmartstosmartslist,ls,mol,parametersmartstordkitmol,parametersmartstosmartsmatchingtoindices,parametersmartstomolsmatchingtoindices,parametersmartstordkitmolmatchingindices,parametersmartstoprmmolmatchingindices):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: For a given input array of atom indices (one for atom, two for bond, three for angle etc) then try to match SMARTS containing those indices to amoeba09 database in order to find parameters suitable to the given environment.  
+    Input: List of SMARTS strings from amoeba09, dictionary mapping amoeba09 SMARTS to final matched SMARTS from input molecule, input list of atom indices from molecule trying to find SMARTS matches to amoeba09 for, mol object, dictionary of amoeba09 SMARTS -> mol object, dictionary of amoeba09 SMARTS ->  matching indices of input molecule,  dictionary of amoeba09 SMARTS ->  matching indices of SMARTS generated from input molecule
+    Output: dictionary mapping amoeba09 SMARTS to final matched SMARTS from input molecule, dictionary mapping amoeba09 SMARTS to boolean specifying if the SMARTS matches all neighbors of input list of atom indices in input molecule
+    Referenced By: MatchAtomIndicesSMARTSToParameterSMARTS
     Description: 
+    1. Iterate over amoeba09 SMARTS
+    2. Grab amoeba09 SMARTS
+    3. Grab mol object for amoeba09 SMARTS
+    4. Grab list of SMARTS that matched to amoeba09 SMARTS
+    5. Grab list of mols from SMARTS that matched to amoeba09 SMARTS
+    6. Iterate over list of SMARTS that matched to amoeba09 SMARTS
+    7. Grab SMARTS that matched to amoeba09 SMARTS
+    8. Grab corresponding mol object for that SMARTS 
+    9. Assume the SMARTS match is a "good" match for now
+    10.Grab the first match of input molecule indices that matched from SMARTS 
+    11.If the number of atoms in match is greater than or equal to number of atoms in input array of atom indices
+    12.Iterate over all matches
+    13.If there is an atom index in ls (input list of atom indices wish to find amoeba09 parameters for) that does not exist in match, then this is not a "good" match and skip that one. 
+    14.Check if the matches are consecutively connected in the input molecule (otherwise SMARTS match wouldnt make sense)
+    15.Define new array that includes neighbors of (ls) input array of atom indices. Determine if the match contains all the neighbors or not.
+    16. Sanity check to ensure the number of rings in amoeba09 SMARTS doesnt exceed number of rings in SMARTS match from input mol (redundant now?)
+    17. Grab the hybridizations of each atom in input molecule that matched to SMARTS, later will use to filter if match has same hybridzation as amoeba09 SMARTS
+    18. Count the number of times each "type" defined by FindHowManyBondTypes, occurs for array of input atom indices + neighbors. Will later use as filtration step for potential SMARTS matches to amoeba09 parameter SMARTS
+    19. Match generated SMARTS to input molecule
+    20. Iterate over matches and if all indices in input array exist in match and match indices are consecutive
+    21. Generate dictionary of input molecule index to SMARTS index (the atom matched in input molecule to index of atom in SMARTS)
+    22. Grab indices that map current SMARTS to current amoeba09 SMARTS
+    23. SMARTS matching from current SMARTS->amoeba09 SMARTS returns many matches, try and pick one that includes most neighbors from input array of atom indices from input molecule
+    24. Skip any matches that dont have correct hybridization between input molecule atoms and atoms matched with amoeba09 SMARTS
+    25. Compute various "scores" for filtering out possible SMARTS that match to amoeba09 SMARTS to find the "best" match. The first score is how many atoms from input array + neighbors are included in match (want to maximize this), the second score is the difference between number of local "types" in input molecule vs "types" in amoeba09 SMARTS (want to minimize this, a difference of 0 means molecule must be the same), the third score is the difference between number of each atomic number occuring in input molecule vs amoeba09 SMARTS (want to minimize).
+    26. Apply filters sequentially.
+    27. If no good matches are found in case of vdw matches, just try and match element only and keep as match (better than wild card match). 
     """
     smartsmcstomol={}
     prmsmartstomcssmarts={}
@@ -979,33 +847,42 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
     parametersmartstothefinalscore={}
     parametersmartstofoundallneighbs={}
     newls=copy.deepcopy(ls)
-    usemcsonly=False
-    temptotalcharge=poltype.totalcharge
+    # STEP 1
     for parametersmartsidx in tqdm(range(len(parametersmartslist)),desc='amoeba09 search for '+str(ls)):
+        # STEP 2
         parametersmarts=parametersmartslist[parametersmartsidx]
+        # STEP 3
         prmmol=parametersmartstordkitmol[parametersmarts]
+        # STEP 4
         smartsmatchingtoindices=parametersmartstosmartsmatchingtoindices[parametersmarts]
+        # STEP 5
         molsmatchingtoindices=parametersmartstomolsmatchingtoindices[parametersmarts]
         prmsmartsatomnum=prmmol.GetNumAtoms()
         thesmartstonumneighbs={}
         thesmartstotypescore={}
         thesmartstoelementscore={}
         thesmartstothemol={}
+        # STEP 6
         for theidx in range(len(smartsmatchingtoindices)):
+            # STEP 7
             thesmarts=smartsmatchingtoindices[theidx]
+            # STEP 8
             themol=molsmatchingtoindices[theidx]
             thesmartstothemol[thesmarts]=themol
+            # STEP 9
             diditmatchprmmol=True
             diditmatch=True
             if diditmatch==True and diditmatchprmmol==True:
                 matches=parametersmartstordkitmolmatchingindices[parametersmarts][theidx]
+                # STEP 10
                 firstmatch=matches[0]
-                
-                aromaticindices=GrabAromaticIndices(poltype,firstmatch,poltype.rdkitmol,ls)
+                # STEP 11 
                 if len(firstmatch)>=len(ls):
+                    # STEP 12
                     for match in matches:
                         goodmatch=True
                         matchidxs=[]
+                        # STEP 13
                         for idx in ls:
                             if idx not in match:
                                 goodmatch=False
@@ -1013,9 +890,10 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                             else:
                                 matchidx=match.index(idx)
                                 matchidxs.append(matchidx)
-
+                        # STEP 14
                         if len(ls)>1 and goodmatch==True:
                             goodmatch=CheckIfConsecutivelyConnected(poltype,matchidxs,themol)
+                        # STEP 15
                         newls=ExtendByNeighbors(poltype,ls) 
                         score=0 
                         allneighbsin=True
@@ -1030,7 +908,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                         if goodmatch==True:
                              
                             break
-                    
+                    # STEP 16 
                     prmmolnumrings=CountRingsInSMARTS(poltype,parametersmarts)
                     molnumrings=CalcNumRings(poltype.rdkitmol)
                     if prmmolnumrings>molnumrings:
@@ -1038,6 +916,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
 
 
                     if goodmatch==True:
+                        # STEP 17
                         rdkitatoms=[poltype.rdkitmol.GetAtomWithIdx(r) for r in firstmatch]
                         rdkithybs=[r.GetHybridization() for r in rdkitatoms]
                         rdkitmatch=copy.deepcopy(firstmatch)
@@ -1045,7 +924,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                             
 
 
-
+                        # STEP 18
                         rdkitatomictypetotype={}
                         rdkitatomicnumtonum={}
                         for atom in poltype.rdkitmol.GetAtoms():
@@ -1060,6 +939,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                                 if atomtype not in rdkitatomictypetotype.keys():
                                     rdkitatomictypetotype[atomtype]=0
                                 rdkitatomictypetotype[atomtype]+=1
+                        # STEP 19 
                         sp=openbabel.OBSmartsPattern()
                         openbabel.OBSmartsPattern.Init(sp,thesmarts)
                         diditmatch=sp.Match(poltype.mol)
@@ -1071,24 +951,22 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                         for newmtch in newbabelmatches:
                             if newmtch not in matches:
                                 matches.append(newmtch)
+                        # STEP 20
                         for match in matches:
                             validmatch=CheckMatch(poltype,match,ls,thesmarts,themol)
                             if validmatch==True:
                                indices=list(range(len(match)))
                                smartsindextomoleculeindex=dict(zip(indices,match)) 
                                moleculeindextosmartsindex={v: k for k, v in smartsindextomoleculeindex.items()}
-                        newaromaticindices=[]
-                        for index in aromaticindices:
-                            if index in moleculeindextosmartsindex.keys():
-                                newaromaticindices.append(index)
-
-                        aromaticsmartindices=[moleculeindextosmartsindex[i] for i in newaromaticindices]
 
 
+                        # STEP 21
                         smartindices=[moleculeindextosmartsindex[i] for i in ls]
+                        # STEP 22
                         prmmatches=parametersmartstoprmmolmatchingindices[parametersmarts][theidx]
- 
+                        # STEP 23 
                         firstmatch=TryAndPickMatchWithNeighbors(poltype,prmmatches,smartindices,themol)
+                        # STEP 24
                         indices=list(range(len(firstmatch)))
                         smartsindextoparametersmartsindex=dict(zip(indices,firstmatch)) 
                         prmsmartsindices=[smartsindextoparametersmartsindex[i] for i in smartindices]
@@ -1102,7 +980,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                                 allhybssame=False
                         if allhybssame==False:
                             continue
-                        
+                        # STEP 25 
                         prmsmartsatomicnumtonum={}
                         for atomicnum,num in rdkitatomicnumtonum.items():
                             if atomicnum not in prmsmartsatomicnumtonum.keys():
@@ -1182,7 +1060,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
                     parametersmartstothefinalscore[parametersmarts]=thesmartstoelementscore[thesmarts]
                     break
     foundmin=False
-
+    # STEP 26
     parametersmartstofinalscore={}
     parametersmartstolastscore={}
     if len(parametersmartstoscore.keys())>0:
@@ -1217,6 +1095,7 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
             if parametersmarts not in parametersmartstosmartslist.keys():
                 parametersmartstosmartslist[parametersmarts]=smartls
     else:
+        # STEP 27
         if len(ls)==1:
             atom=poltype.rdkitmol.GetAtomWithIdx(ls[0])
             atomicnum=atom.GetAtomicNum()
@@ -1242,24 +1121,33 @@ def MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,paramete
 
 def GenerateAllPossibleFragmentIndices(poltype,ls,rdkitmol,maxatomsize):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: When generating SMARTS from input molecule to match to amoeba09 SMARTS, need to generate many atomic indices first for each possible SMARTS.
+    Input: Input array of atom indices from input molecule, mol object, maximum number of atoms to search out in molecule.
+    Output: List of list of atomic indices each containing input array of atom indices
+    Referenced By: GenerateFragmentSMARTSList
     Description: 
+    1. Start with list of current atom indices
+    2. Define a second list that will constantly be updated with more atoms and stop when the lists are the same. After first iteration set oldindexlist=indexlist, if at end of iteration, no new neighbors are added, then will exit while loop.
+    3. If length of list is greater than maxatomsize or if searched further than two neighbors away, then quit
+    4. Grab neighboring indices and for each neighbor, generate a list of original atom indices+some of neigbors, append to list of atom indices to generate SMARTS from
+    5. Add neighboring indices to indexlist 
     """
+    # STEP 1
     atomindiceslist=[copy.deepcopy(ls)]
     oldindexlist=copy.deepcopy(ls)
     indexlist=[]
     count=0
     neighbcount=0
+    # STEP 2
     while set(oldindexlist)!=set(indexlist):
         if count!=0:
             oldindexlist=copy.deepcopy(indexlist)
+        # STEP 3
         if len(oldindexlist)>maxatomsize:
             break
         if neighbcount>=2:
             break
+        # STEP 4
         neighborindexes=GrabNeighboringIndexes(poltype,oldindexlist,rdkitmol)
         neighbcount+=1
        
@@ -1271,6 +1159,7 @@ def GenerateAllPossibleFragmentIndices(poltype,ls,rdkitmol,maxatomsize):
                 if newcomb not in atomindiceslist:
                     atomindiceslist.append(newcomb)
         count+=1
+        # STEP 5
         newindexlist=copy.deepcopy(oldindexlist)
         for index in neighborindexes:
             if index not in newindexlist:
@@ -1282,17 +1171,23 @@ def GenerateAllPossibleFragmentIndices(poltype,ls,rdkitmol,maxatomsize):
 
 def GrabNeighboringIndexes(poltype,indexlist,rdkitmol):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Grab neighboring indices for when generating all possible SMARTS to match to a trial amoeba09 SMARTS.
+    Input: Array of atom indices, mol object
+    Output: Array of neighboring atom indices
+    Referenced By: GenerateAllPossibleFragmentIndices
     Description: 
+    1. Iterate over atom indices in input list
+    2. Grab neighbors of each atom
+    3. Append to array of neighbors 
     """
     neighborindexes=[]
+    # STEP 1
     for index in indexlist:
         atom=rdkitmol.GetAtomWithIdx(index)
+        # STEP 2
         for natom in atom.GetNeighbors():
             natomidx=natom.GetIdx()
+            # STEP 3
             if natomidx not in neighborindexes and natomidx not in indexlist:
                 neighborindexes.append(natomidx)
     return neighborindexes
@@ -1300,15 +1195,20 @@ def GrabNeighboringIndexes(poltype,indexlist,rdkitmol):
 
 def CountRingsInSMARTS(poltype,parametersmarts):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Sanity check to ensure number of rings in amoeba09 SMARTS, doesnt exceed number of rings in input molecule 
+    Input: SMARTS strings
+    Output: Number of rings
+    Referenced By: MatchAllPossibleSMARTSToParameterSMARTS
     Description: 
+    1. Iterate over SMARTS characters
+    2. Search for when after ] bracket (after atom) and if there is a digit after that (specifies ring number), append to array of ring numbers
+    3. Return length of ring numbers array 
     """
     closedbrack=True
     numbers=[]
+    # STEP 1
     for e in parametersmarts:
+        # STEP 2
         if e=='[':
             closedbrack=False
         elif e==']':
@@ -1317,24 +1217,35 @@ def CountRingsInSMARTS(poltype,parametersmarts):
             if closedbrack==True:
                 if e not in numbers:
                     numbers.append(e)
+    # STEP 3
     rings=len(numbers)
     return rings
 
 def CheckIfConsecutivelyConnected(poltype,matchidxs,mcsmol):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Check if indices in match are consecutively connected (needed for adequate SMARTS match to amoeba09 SMARTS).
+    Input: Array of indices in SMARTS that match to input molecule, mol from SMARTS 
+    Output: Boolean specifying if all indices are consecutive or not.
+    Referenced By: MatchAllPossibleSMARTSToParameterSMARTS
     Description: 
+    1. Iterate over atom indices (except last one)
+    2. Grab atom from SMARTS mol that corresponds to index
+    3. Grab next index
+    4. Grab neighboring indices of current index
+    5. If the next atom index in sequence does not exist in neighboring indices of current index, then the match is not consecutively connected. 
     """
     goodmatch=True
+    # STEP 1
     for i in range(len(matchidxs)-1):
         matchidx=matchidxs[i]
+        # STEP 2
         atom=mcsmol.GetAtomWithIdx(matchidx)
+        # STEP 3
         nextmatchidx=matchidxs[i+1]
         natoms=atom.GetNeighbors()
+        # STEP 4
         natomidxs=[a.GetIdx() for a in natoms]
+        # STEP 5
         if nextmatchidx not in natomidxs:
             goodmatch=False
 
@@ -1347,25 +1258,41 @@ def CheckIfConsecutivelyConnected(poltype,matchidxs,mcsmol):
 
 def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprm,parametersmartslist,mol,parametersmartstordkitmol):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: For each list of atom indices (all atoms, all bonds, all angles etc), find the "best" amoeba09 SMARTS match. 
+    Input: List of list of atom indices, list of all amoeba09 SMARTS, mol object, dictionary of amoeba09 SMARTS to corresponding mol object.
+    Output: Dictionary of atom indices (vdw, bond, angle, torsion) -> best amoeba09 SMARTS match, Dictionary of atom indices (vdw, bond, angle, torsion) -> boolean if amoeba09 SMARTS matches to all neighbors of atom indices 
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over each list of atom indices
+    2. For each list of atom indices, generate a list of potential SMARTS to match to any amoeba09 SMARTS
+    3. Save results in list for later 
+    4. Iterate over list of amoeba09 SMARTS
+    5. Iterate over list of all possible SMARTS to match to current amoeba09 SMARTS
+    6. If the current SMARTS matches to both input molecule and to amoeba09 SMARTS molecule, then will save for later filtering
+    7. Save SMARTS match results in dictionaries for later processing and filtering
+    8. Iterate over each list of atom indices again
+    9. Call MatchAllPossibleSMARTSToParameterSMARTS using current list of atom indices and the saved list of amoeba09 SMARTS and potential SMARTS matches from input molecule. This will output the "best" SMARTS match for each amoeba09 SMARTS.
+    10. Choose the amoeba09 SMARTS, that has the largest SMARTS matching to it (most information in input molecule environment)
+    11. If no match was found, assign a wildcard SMARTS (worst case)  
     """
     listforprmtoparametersmarts={}
     listforprmtosmarts={}
     listforprmtomatchallneighbs={}
     allfragsmartslist=[]
+    # STEP 1
     for ls in listforprm:
+        # STEP 2
         fragsmartslist=GenerateFragmentSMARTSList(poltype,ls)
+        # STEP 3
         for fragsmarts in fragsmartslist:
             if fragsmarts not in allfragsmartslist:
                 allfragsmartslist.append(fragsmarts)
+
     parametersmartstosmartsmatchingtoindices={}
     parametersmartstomolsmatchingtoindices={}
     parametersmartstordkitmolmatchingindices={}
     parametersmartstoprmmolmatchingindices={}
+    # STEP 4
     for parametersmarts in parametersmartslist:
         prmmol=parametersmartstordkitmol[parametersmarts]
         finalfragsmartslist=[]
@@ -1373,10 +1300,11 @@ def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprm,parametersmartsli
         molsmatchingtoindices=[]
         rdkitmolmatchingindices=[]
         prmmolmatchingindices=[]
-
+        # STEP 5
         for fragsmarts in allfragsmartslist:
             fragmol=Chem.MolFromSmarts(fragsmarts)
             diditmatch=poltype.rdkitmol.HasSubstructMatch(fragmol)
+            # STEP 6
             if diditmatch==True:
                 diditmatch=prmmol.HasSubstructMatch(fragmol)
                 if diditmatch==True:
@@ -1386,16 +1314,18 @@ def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprm,parametersmartsli
                     smartsmatchingtoindices.append(fragsmarts)
                     rdkitmolmatchingindices.append(matches)
                     prmmolmatchingindices.append(prmmatches)
+        # STEP 7
         parametersmartstosmartsmatchingtoindices[parametersmarts]=smartsmatchingtoindices
         parametersmartstomolsmatchingtoindices[parametersmarts]=molsmatchingtoindices
         parametersmartstordkitmolmatchingindices[parametersmarts]=rdkitmolmatchingindices
         parametersmartstoprmmolmatchingindices[parametersmarts]=prmmolmatchingindices
-
-    for ls in listforprm: 
+    # STEP 8
+    for ls in listforprm:
+        # STEP 9 
         parametersmartstomatchlen={}
         parametersmartstosmartslist={}
         parametersmartstosmartslist,parametersmartstofoundallneighbs=MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,parametersmartstosmartslist,ls,mol,parametersmartstordkitmol,parametersmartstosmartsmatchingtoindices,parametersmartstomolsmatchingtoindices,parametersmartstordkitmolmatchingindices,parametersmartstoprmmolmatchingindices)
-
+        # STEP 10
         if len(parametersmartstosmartslist.keys())!=0:
             parametersmartstosmartslen={}
             for prmsmarts,newls in parametersmartstosmartslist.items():
@@ -1412,6 +1342,7 @@ def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprm,parametersmartsli
             maxsmartsls=parametersmartstosmartslist[maxprmsmarts]
             matchallneighbs=parametersmartstofoundallneighbs[maxprmsmarts]
         else:
+            # STEP 11
             matchallneighbs=False
             wild='[*]'
             smarts=''
@@ -1427,43 +1358,35 @@ def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprm,parametersmartsli
     return listforprmtoparametersmarts,listforprmtosmarts,listforprmtomatchallneighbs
 
 
-def CountRings(poltype,smartsfortransfer):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    counts=0
-    for idx in range(len(smartsfortransfer)):
-        e=smartsfortransfer[idx]
-        if e=='1':
-            preve=smartsfortransfer[idx-1]
-            if preve!='#':
-                counts+=1
-    return counts
-
-
 
 def CheckMatch(poltype,match,atomindices,smarts,substructure):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Want to ensure that when matching SMARTS to input molecule, the atom indices list (vdw, bond, angle etc) are all consecutively matched in the SMARTS match. 
+    Input: Array of indices in input molecule that correspond to the SMARTS match, array of indices of interest from input molecule, SMARTS string, mol for SMARTS string 
+    Output: Boolean specifying if match is consecutive or not
+    Referenced By: MatchAllPossibleSMARTSToParameterSMARTS , GenerateAtomIndexToAtomTypeAndClassForAtomList
     Description: 
+    1. If all indices in molecule of interest are not in match array, then its not a valid match to begin with
+    2. Assume indices are consecutive
+    3. For each index in indices of interest, find location of that index in match array
+    4. Save each location found in new array
+    5. Now using the mol and location indices array, check if each atom that should be consecutive is consecutive in that match array, this will return boolean if consecutive or not
     """
+    # STEP 1
     allin=True
     for idx in atomindices:
         if idx not in match:
             allin=False
+    # STEP 2
     validmatch=True
     if allin==True:
         indices=[]
+        # STEP 3
         for idx in atomindices:
             matchidx=match.index(idx)
+            # STEP 4
             indices.append(matchidx)
+        # STEP 5
         checkconsec=CheckConsecutiveTorsion(poltype,indices,substructure)
         if checkconsec==False:
             validmatch=False
@@ -1473,19 +1396,23 @@ def CheckMatch(poltype,match,atomindices,smarts,substructure):
        
 def CheckConsecutiveTorsion(poltype,indices,substructure):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Check for each parameter type, bond, angle, torsion, if the match to SMARTS is consecutive. 
+    Input: Array of atom indices of interest in molecule sorted by location found in SMARTS match, mol for SMARTS
+    Output: Boolean if consecutive or not
+    Referenced By: CheckMatch
     Description: 
+    1. For bond, just check if there exists bond between indices or not
+    2. For angle, just check if there exists bonds between a,b and b,c or not
+    3. For torsion, just check if there exists bonds between a,b and b,c and c,d or not
     """
     consec=True
+    # STEP 1
     if len(indices)==2:
         a,b=indices[:]
         bond=substructure.GetBondBetweenAtoms(a,b)
         if bond==None:
             consec=False
-
+    # STEP 2
     elif len(indices)==3:
         a,b,c=indices[:]
         bond=substructure.GetBondBetweenAtoms(a,b)
@@ -1494,7 +1421,7 @@ def CheckConsecutiveTorsion(poltype,indices,substructure):
         bond=substructure.GetBondBetweenAtoms(b,c)
         if bond==None:
             consec=False
-
+    # STEP 3
     elif len(indices)==4: 
         a,b,c,d=indices[:]
         bond=substructure.GetBondBetweenAtoms(a,b)
@@ -1513,22 +1440,42 @@ def CheckConsecutiveTorsion(poltype,indices,substructure):
 
 def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtoparametersmarts,atomindicesforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: For each list of atom indices with the "best" amoeba09 SMARTS match, determine the tinker type and class number and store in dictionaries for later use.
+    Input: Dictionary of atom indices -> "best" amoeba09 SMARTS ,  Dictionary of atom indices -> "best" SMARTS that matches to amoeba09 SMARTS and input molecule, dictionary of amoeba09 SMARTS, element -> tinker type description, dictionary of element tinker description -> tinker type, dictionary of tinker type -> tinker class, input mol object
+    Output: Dictionary of atom indices -> tinker types, Dictionary of atom indices -> tinker classes, Dictionary of atom indices -> amoeba09 SMARTS + atom order, Dictionary of atom indices -> tinker description + element, Dictionary of atom indices -> SMARTS + atom order
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over dictionary of list of atom indices to best amoeba09 SMARTS
+    2. Grab corresponding best SMARTS match to input molecule 
+    3. Generate mol object from SMARTS
+    4. Generate matches between SMARTS and input molecule
+    5. Iterate over matches
+    6. Check if match is valid (consecutively matches atom indices in molecule).
+    7. If match is valid, then generate a dictionary of input molecule index -> index of match in SMARTS 
+    8. Generate rdkit mol object from amoeba09 SMARTS
+    9. Output .mol file and have babel read as input to generate babel mol object
+    10. Compute dictionary of atom index (in amoeba09 SMARTS) -> type number, will later use to help matching indices of same atom type 
+    11. Generate matches for SMARTS to amoeba09 SMARTS
+    12. Try and pick match from 11. that includes neighbors of atom indices of interest in SMARTS
+    13. Generate dictionary of SMARTS atom index -> amoeba09 SMARTS atom index
+    14. Generate a dictionary of amoeba09 SMARTS and atom order (location of atoms of interest in amoeba09 SMARTS) -> element + tinker description using input dictionaries and current amoeba09 SMARTS
+    15. Using the type dictionary generated earlier, iterate over amoeba09 molecule and for atoms of same type, fill in dictionary from 14 with information of atoms having same type
+    16. Using dictionary from 15 and input dictionaries, fill in desired dictionaries mapping atom indices -> tinker types/classes/amoeba09 SMARTS/SMARTS  
     """
     atomindicestotinkertypes={}
     atomindicestotinkerclasses={}
     atomindicestoparametersmartsatomorders={}
     atomindicestoelementtinkerdescrips={}
     atomindicestosmartsatomorders={}
+    # STEP 1
     for atomindices,parametersmarts in atomindicesforprmtoparametersmarts.items():
+        # STEP 2
         smartsls=atomindicesforprmtosmarts[atomindices]
         smarts=smartsls[0]
         smartsfortransfer=smartsls[1]
+        # STEP 3
         substructure = Chem.MolFromSmarts(smarts)
+        # STEP 4
         matches=list(rdkitmol.GetSubstructMatches(substructure,maxMatches=10000))
         sp=openbabel.OBSmartsPattern()
         openbabel.OBSmartsPattern.Init(sp,smarts)
@@ -1541,30 +1488,39 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
         for newmtch in newbabelmatches:
             if newmtch not in matches:
                 matches.append(newmtch)
+        # STEP 5
         for match in matches:
+            # STEP 6
             validmatch=CheckMatch(poltype,match,atomindices,smarts,substructure)
+            # STEP 7
             if validmatch==True:
                indices=list(range(len(match)))
                smartsindextomoleculeindex=dict(zip(indices,match)) 
                moleculeindextosmartsindex={v: k for k, v in smartsindextomoleculeindex.items()}
+        # STEP 8
         structure = Chem.MolFromSmarts(parametersmarts)
         fragmentfilepath='fragment.mol'
         if os.path.isfile(fragmentfilepath):
             os.remove(fragmentfilepath)
+        # STEP 9
         rdmolfiles.MolToMolFile(structure,fragmentfilepath)
         obConversion = openbabel.OBConversion()
         fragbabelmol = openbabel.OBMol()
         inFormat = obConversion.FormatFromExt(fragmentfilepath)
         obConversion.SetInFormat(inFormat)
         obConversion.ReadFile(fragbabelmol, fragmentfilepath)
+        # STEP 10
         fragidxtosymclass,symmetryclass=symm.gen_canonicallabels(poltype,fragbabelmol,rdkitmol=structure)
         smartindices=[moleculeindextosmartsindex[i] for i in atomindices]
+        # STEP 11
         substructure = Chem.MolFromSmarts(smartsfortransfer)
         matches=structure.GetSubstructMatches(substructure)
-
+        # STEP 12
         firstmatch=TryAndPickMatchWithNeighbors(poltype,matches,smartindices,substructure)
         indices=list(range(len(firstmatch)))
+        # STEP 13
         smartsindextoparametersmartsindex=dict(zip(indices,firstmatch)) 
+        # STEP 14
         parametersmartsordertoelementtinkerdescrip={}
         for parametersmartsatomorderlist,elementtinkerdescrip in smartsatomordertoelementtinkerdescrip.items():
             prmsmarts=parametersmartsatomorderlist[0]
@@ -1573,6 +1529,7 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
                 atomorderlist=parametersmartsatomorderlist[1]
                 for atomorder in atomorderlist:
                     parametersmartsordertoelementtinkerdescrip[atomorder]=elementtinkerdescrip 
+        # STEP 15
         for fragidx,symclass in fragidxtosymclass.items():
             indexes=GrabKeysFromValue(poltype,fragidxtosymclass,symclass)
             specialindex=None
@@ -1583,6 +1540,7 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
                 elementtinkerdescrip=parametersmartsordertoelementtinkerdescrip[specialindex]
                 for index in indexes:
                     parametersmartsordertoelementtinkerdescrip[index]=elementtinkerdescrip
+        # STEP 16
         parametersmartindices=[smartsindextoparametersmartsindex[i] for i in smartindices]
         parametersmartsorders=[i+1 for i in parametersmartindices]
         elementtinkerdescrips=[parametersmartsordertoelementtinkerdescrip[i] for i in parametersmartsorders]
@@ -1601,12 +1559,15 @@ def GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,atomindicesforprmtopa
 
 def TryAndPickMatchWithNeighbors(poltype,matches,smartindices,substructure):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Trying to pick a match from SMARTS -> amoeba09 SMARTS that includes more neighbors (corresponds to including more neighbors of input molecule around atom indices of interest)
+    Input: List of list of atom indices that match to amoeba09 SMARTS from SMARTS, the indices in SMARTS that correspond to same indices of interst in input molecule 
+    Output: Match that attempt to include neighbors of SMARTS mol matches to indices of interest in input molecule 
+    Referenced By: MatchAllPossibleSMARTSToParameterSMARTS,GenerateAtomIndexToAtomTypeAndClassForAtomList
+    Description:
+    1. Generate array of atom indices from SMARTS mol that include neighbors of input smartindices
+    2. Iterate over each match and check if all indices from step 1. are included in match. If so, then use this match. 
     """
+    # STEP 1
     extendedsmartindices=[]
     for idx in smartindices:
         atom=substructure.GetAtomWithIdx(idx)
@@ -1615,6 +1576,7 @@ def TryAndPickMatchWithNeighbors(poltype,matches,smartindices,substructure):
             natmidx=natm.GetIdx()
             if natmidx not in extendedsmartindices:
                 extendedsmartindices.append(natmidx)
+    # STEP 2
     for match in matches:
         indices=list(range(len(match)))
         smartsindextoparametersmartsindex=dict(zip(indices,match)) 
@@ -1631,35 +1593,44 @@ def TryAndPickMatchWithNeighbors(poltype,matches,smartindices,substructure):
 
 def GrabSMARTSList(poltype,smartsatomordertoelementtinkerdescrip):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Just extract SMARTS list from dictionary containing SMARTS + atom order -> element + tinker description
+    Input: dictionary containing SMARTS + atom order -> element + tinker description
+    Output: list of SMARTS
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over input dictionary
+    2. Extract SMARTS from key
+    3. Save to list 
     """
     smartslist=[]
+    # STEP 1
     for smartsatomorder in smartsatomordertoelementtinkerdescrip.keys():
+        # STEP 2
         smarts=smartsatomorder[0]
+        # STEP 3
         if smarts not in smartslist:
             smartslist.append(smarts)
     return smartslist 
 
 def CheckForPlanerAngles(poltype,listofanglesforprm,mol):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Tinker requires angle parameters that should be planer to be anglep rather than just angle, so need to detect this.
+    Input: List of all angles in input molecule, mol object
+    Output: List of angles in input molecule that are planar
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over each angle in molecule
+    2. Check if the hybridization of the middle atom is SP2, if so and that atom has 3 neighbors, then this is a planar angle. 
     """
     listofanglesthatneedplanarkeyword=[]
-    shoulduseanglep = version.parse(poltype.versionnum) >= version.parse("8.7")
+    # STEP 1
     for ls in listofanglesforprm:
         a = mol.GetAtom(ls[0]+1)
         b = mol.GetAtom(ls[1]+1)
         c = mol.GetAtom(ls[2]+1)
+        # STEP 2
         anglep=False
-        if b.GetHyb()==2 and shoulduseanglep==True: # only for SP2 hyb middle atoms use angp
+        if b.GetHyb()==2: # only for SP2 hyb middle atoms use angp
             neighbs=list(openbabel.OBAtomAtomIter(b))
             if len(neighbs)==3:
                 anglep=True
@@ -1669,18 +1640,27 @@ def CheckForPlanerAngles(poltype,listofanglesforprm,mol):
 
 def ModifyAngleKeywords(poltype,angleprms,listofanglesthatneedplanarkeywordtinkerclassestopoltypeclasses):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Modify angle parameters taken from prm file to have anglep keyword if the angle is planer in input molecule
+    Input: Array of angle parameter lines, dictionary of planar angles tinker classes -> poltype classes 
+    Output: Modified array of angle parameter lines
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over each angle parameter line
+    2. Grab array of tinker classes from parameter line
+    3. Iterate over input dictionary
+    4. If there is a match between tinker classes in parameter line and current iteration over dictionary, then replace angle with anglep 
+    5. Append modified parameter line to array
     """
     newangleprms=[]
+    # STEP 1
     for line in angleprms:
         found=False
         linesplit=line.split()
+        # STEP 2
         temp=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3])]
+        # STEP 3
         for ls,polclassesls in listofanglesthatneedplanarkeywordtinkerclassestopoltypeclasses.items():
+            # STEP 4
             inline=True
             for i in temp:
                 if i not in polclassesls:
@@ -1696,54 +1676,73 @@ def ModifyAngleKeywords(poltype,angleprms,listofanglesthatneedplanarkeywordtinke
 
         if found==False:
             newline=newline.replace('anglep','angle')
-
+        # STEP 5
         newangleprms.append(newline)
     return newangleprms
 
 def FilterList(poltype,allitems,listbabel):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: When wanting to replace bond length/angle lengths with QM optimized bond length/angle lengths, need a way to grab all bonds of same type but also ensure they are physically connected ( you can enumerate many combinations of indices for each bond type but not all are physically connected). 
+    Input: All possible bonds/angles, list of physical bonds/angles
+    Output: List of bonds/angles with same types that are also in input molecule
+    Referenced By: AddOptimizedBondLengths , AddOptimizedAngleLengths
     Description: 
+    1. Iterate over each bond/angle in input list
+    2. Check if the bond/angle exists in molecule, if so append to array 
     """
     newallitems=[]
+    # STEP 1
     for ls in allitems:
         revls=ls[::-1]
-        if list(ls) in listbabel or list(revls) in listbabel:
+        # STEP 2
+        if list(ls) in listbabel or list(revls) in listbabel: # need to check reverse too
             newallitems.append(ls)
     return newallitems
 
 def AddOptimizedBondLengths(poltype,optmol,bondprms,bondlistbabel):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Modify bond parameters to use QM geometry optimized bond length values 
+    Input: QM optimized mol object, list of bond parameter lines, list of bonds in in put molecule
+    Output: Modified list of bond parameters
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over list of bond parameter lines
+    2. Grab poltype classes from parameter line
+    3. For each poltype class, generate list of atom indices that have same type
+    4. Now generate all combinations of indices that share same type
+    5. Filter indices that arent consective in the molecule
+    6. Grab the bond lengths for each bond in list of bonds with same types
+    7. Average the bond lengths
+    8. Replace bond length in parameter line with the average bond length 
     """
     newbondprms=[]
+    # STEP 1
     for line in bondprms:
         linesplit=line.split()
+        # STEP 2
         bondtypes=[int(linesplit[1]),int(linesplit[2])]
         bondindices=[]
+        # STEP 3
         for prmtype in bondtypes:
             keylist=GrabKeysFromValue(poltype,poltype.idxtosymclass,prmtype)
             bondindices.append(keylist)
+        # STEP 4
         allbonds = list(itertools.product(bondindices[0], bondindices[1]))
         allbonds=[x for x in allbonds if len(x) == len(set(x))]
+        # STEP 5
         allbonds=FilterList(poltype,allbonds,bondlistbabel)
         tot=0
-
+        # STEP 6
         for bond in allbonds:
             blen = optmol.GetBond(int(bond[0]),int(bond[1])).GetLength()
             tot+=blen
         if len(allbonds)==0:
             pass 
         else:
+            # STEP 7
             avgbondlength=round(tot/len(allbonds),2)
             linesplit=re.split(r'(\s+)', line)   
+            # STEP 8
             linesplit[8]=str(avgbondlength)
             line=''.join(linesplit)
         newbondprms.append(line)

@@ -163,7 +163,7 @@ def InsertKeyfileHeader(poltype,keyfilename):
     if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
         AddKeyWord(poltype,keyfilename,string)
     string='heavy-hydrogen'+'\n'
-    if poltype.equiltimestep>=3 and poltype.proddyntimestep>=3:
+    if poltype.heavyhyd==True:
        if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
            AddKeyWord(poltype,keyfilename,string)
     if poltype.externalapi==None:

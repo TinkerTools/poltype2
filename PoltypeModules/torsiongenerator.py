@@ -1141,6 +1141,12 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     for job in firstfinishedjobs:
         if job not in finishedjobs:
             finishedjobs.append(job)
+
+
+    if poltype.isfragjob==False and poltype.partition==False: # if xtb parrellizatoin turned off, turn back on parrelaxation for sp
+        poltype.jobsatsametime=poltype.tempjobsatsametime
+        poltype.maxmem,poltype.maxdisk,poltype.numproc=poltype.PartitionResources()
+        poltype.partition=True
     fulllistofjobs=[]
     fulljobtolog={}
     fulljobtooutputlog={}
@@ -1186,10 +1192,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         fulljobtolog.update(jobtolog)
 
 
-    if poltype.isfragjob==False and poltype.partition==False: # if xtb parrellizatoin turned off, turn back on parrelaxation for sp
-        poltype.jobsatsametime=poltype.tempjobsatsametime
-        poltype.maxmem,poltype.maxdisk,poltype.numproc=poltype.PartitionResources()
-        poltype.partition=True
+    
 
 
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMSPJobToLog'+'_'+poltype.molecprefix
