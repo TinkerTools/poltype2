@@ -1502,7 +1502,6 @@ def get_torlist(poltype,mol,missed_torsions):
             poltype.nonrotbndlist[rotbndkey] = []
             poltype.nonrotbndlist[rotbndkey].append(nonarotor)
 
-
     return (torlist,poltype.rotbndlist,nonaroringtorlist,poltype.nonrotbndlist)
 
 def FindOtherTorsAboutBond(poltype,rotbndlist,bond,rotbndkey,t1,t2,t3,t4):
@@ -1523,7 +1522,11 @@ def FindOtherTorsAboutBond(poltype,rotbndlist,bond,rotbndkey,t1,t2,t3,t4):
             c = t3.GetIdx()
             d = iaa2.GetIdx()
             if ((iaa.GetIdx() != t3.GetIdx() and iaa2.GetIdx() != t2.GetIdx()) and not (iaa.GetIdx() == t1.GetIdx() and iaa2.GetIdx() == t4.GetIdx())) and iaa.GetIdx()!=iaa2.GetIdx(): # also include case for three atom ring
-                rotbndlist[rotbndkey].append(get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx()))
+                unq=get_uniq_rotbnd(poltype,iaa.GetIdx(),t2.GetIdx(),t3.GetIdx(),iaa2.GetIdx())
+                testkey='%d %d' % (unq[1],unq[2])
+                if testkey!=rotbndkey:
+                    unq=unq[::-1]
+                rotbndlist[rotbndkey].append(unq)
     return rotbndlist
 
 def get_all_torsions(poltype,mol):

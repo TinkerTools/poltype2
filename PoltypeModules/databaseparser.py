@@ -1751,24 +1751,38 @@ def AddOptimizedBondLengths(poltype,optmol,bondprms,bondlistbabel):
 
 def AddOptimizedAngleLengths(poltype,optmol,angleprms,anglelistbabel):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Modify angle parameters to use QM geometry optimized angle length values 
+    Input: QM optimized mol object, list of angle parameter lines, list of angles in in put molecule
+    Output: Modified list of angle parameters
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over list of angle parameter lines
+    2. Grab poltype classes from parameter line
+    3. For each poltype class, generate list of atom indices that have same type
+    4. Now generate all combinations of indices that share same type
+    5. Filter indices that arent consective in the molecule
+    6. Grab the angle lengths for each angle in list of angles with same types
+    7. Average the angle lengths
+    8. Replace angle length in parameter line with the average angle length 
     """
     newangleprms=[]
+    # STEP 1
     for line in angleprms:
         linesplit=line.split()
+        # STEP 2
         angletypes=[int(linesplit[1]),int(linesplit[2]),int(linesplit[3])]
         angleindices=[]
+        # STEP 3
         for prmtype in angletypes:
             keylist=GrabKeysFromValue(poltype,poltype.idxtosymclass,prmtype)
             angleindices.append(keylist)
+        # STEP 4
         allangles = list(itertools.product(angleindices[0], angleindices[1],angleindices[2]))
         allangles=[x for x in allangles if len(x) == len(set(x))]
+        # STEP 5
         allangles=FilterList(poltype,allangles,anglelistbabel)
         tot=0
+        # STEP 6
         for angle in allangles:
             angle=[int(i) for i in angle]
             a = optmol.GetAtom(angle[0])
@@ -1779,6 +1793,7 @@ def AddOptimizedAngleLengths(poltype,optmol,angleprms,anglelistbabel):
         if len(allangles)==0:
             pass
         else:
+            # STEP 7
             avganglelength=round(tot/len(allangles),2)
             linesplit=re.split(r'(\s+)', line)
             linesplit=linesplit[:11]
@@ -1787,34 +1802,29 @@ def AddOptimizedAngleLengths(poltype,optmol,angleprms,anglelistbabel):
             linesplit[10]=str(avganglelength)
             line=''.join(linesplit)
         line+='\n'
+        # STEP 8
         newangleprms.append(line)
     return newangleprms
  
 
 
-def GrabKeysFromValue(poltype,dic,thevalue):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    keylist=[]
-    for key,value in dic.items():
-        if value==thevalue:
-            keylist.append(key)
-    return keylist
-          
+         
 
 def CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: For determining the correct restraints (usually only want heavy atoms unless special case like hydrogens on Nitrogen atoms), also for determining in some case for torsion missing from database and on a ring that has heavy atoms (not all hydrogen torsion) then can transfer something simple depending on hybridization of atoms on ring.  
+    Input: Atom indices for torsion, mol object
+    Output: Boolean specifying if all torsion around rotatable bond are hydrogen torsions.
+    Referenced By: FindMissingTorsion, torsiongenerator.py - get_torlist , RotatableBondRestraints ,  FrozenBondRestraints 
+    Description:
+    1. Assume all torsions are hydrogen torsions
+    2. Iterate over neighbors of b in a-b-c-d
+    3. Iterate over neighbors of c in a-b-c-d
+    4. Find new a' and d' such that a is not a' and d is not d' and append torsion to list
+    5. For each torsion in list grab atomic numbers of a and d
+    6. If there exists a torsion with atomic numbers on a/d not a hydrogen then not all torsions are hydrogen torsions 
     """
+    # STEP 1
     allhydrogentor=True
     atomobjects=[mol.GetAtom(i) for i in babelindices]
     a,b,c,d=atomobjects[:]
@@ -1825,32 +1835,44 @@ def CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol):
         allhydrogentor=False
     else:
         torlist=[]
+        # STEP 2
         iteratomatom = openbabel.OBAtomAtomIter(b)
         for iaa in iteratomatom:
+            # STEP 3
             iteratomatom2 = openbabel.OBAtomAtomIter(c)
             for iaa2 in iteratomatom2:
                 ta = iaa.GetIdx()
                 tb = bidx
                 tc = cidx
                 td = iaa2.GetIdx()
+                # STEP 4
                 if ((ta != tc and td != tb) and not (ta == aidx and td == didx)):
                     torlist.append([ta,tb,tc,td])
+        # STEP 5
         for tor in torlist:
             atoms=[mol.GetAtom(i) for i in tor]
             aatomnum=atoms[0].GetAtomicNum()
             datomnum=atoms[3].GetAtomicNum()
+            # STEP 6
             if aatomnum!=1 or datomnum!=1:
                 allhydrogentor=False
     return allhydrogentor    
 
 def CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: For determining the correct restraints (usually only want heavy atoms unless special case like hydrogens on Nitrogen atoms), also for determining in some case for torsion missing from database and on a ring that has heavy atoms (not all hydrogen torsion) then can transfer something simple depending on hybridization of atoms on ring.
+    Input: Atom indices for torsion, mol object  
+    Output: Boolean specifying if all a (or d) in a-b-c-d have hydrogen torsion only on one side.
+    Referenced By: FindMissingTorsion, torsiongenerator.py - get_torlist , RotatableBondRestraints ,  FrozenBondRestraints 
+    Description:
+    1. Assume there is only hydrogen torsion on one side
+    2. Iterate over neighbors of b in a-b-c-d
+    3. Iterate over neighbors of c in a-b-c-d
+    4. Find new a' and d' such that a is not a' and d is not d' and append torsion to list
+    5. For each torsion in list grab atomic numbers of a and d
+    6. If both a and d are not hydrogens, then there doesnt exist all hydrogen torsion on one side   
     """
+    # STEP 1
     allhydrogentoroneside=True
     atomobjects=[mol.GetAtom(i) for i in babelindices]
     a,b,c,d=atomobjects[:]
@@ -1861,75 +1883,69 @@ def CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol):
         allhydrogentoroneside=False
     else:
         torlist=[]
-        
+        # STEP 2 
         iteratomatom = openbabel.OBAtomAtomIter(b)
         for iaa in iteratomatom:
+            # STEP 3
             iteratomatom2 = openbabel.OBAtomAtomIter(c)
             for iaa2 in iteratomatom2:
                 ta = iaa.GetIdx()
                 tb = bidx
                 tc = cidx
                 td = iaa2.GetIdx()
+                # STEP 4
                 if ((ta != tc and td != tb) and not (ta == aidx and td == didx)):
                     torlist.append([ta,tb,tc,td])
+        # STEP 5
         for tor in torlist:
             atoms=[mol.GetAtom(i) for i in tor]
             aatomnum=atoms[0].GetAtomicNum()
             datomnum=atoms[3].GetAtomicNum()
+            # STEP 6
             if aatomnum!=1 and datomnum!=1:
                 allhydrogentoroneside=False
-    catomicnum=c.GetAtomicNum()
-    batomicnum=b.GetAtomicNum()
-    bhydcount=0
-    iteratomatom = openbabel.OBAtomAtomIter(b)
-    for iaa in iteratomatom:
-        atomicnum=iaa.GetAtomicNum()
-        if atomicnum==1:
-            bhydcount+=1
-
-    chydcount=0
-    iteratomatom = openbabel.OBAtomAtomIter(c)
-    for iaa in iteratomatom:
-        atomicnum=iaa.GetAtomicNum()
-        if atomicnum==1:
-            chydcount+=1
-    if batomicnum==6 and bhydcount==3:
-        allhydrogentoroneside=False
-
-    if catomicnum==6 and chydcount==3:
-        allhydrogentoroneside=False
-
-
+    
 
     return allhydrogentoroneside
 
 
 def FindAllConsecutiveRotatableBonds(poltype,mol,listofbondsforprm):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Important for determining missing tor-tor parameters if user decided they wanted tor-tor parameterization
+    Input: Mol object, list of bonds in molecule
+    Output: Array of consecutive rotatable bonds [[b1,c1],[b2,c2],...] 
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
     Description: 
+    1. Iterate over list of bonds
+    2. Grab the valence for b and c, if either valence is 1, then it must not be rotatable
+    3. Append rotatable bond to new array
+    4. Generate all pair combinations of rotatable bonds from previous array
+    5. If the current pair of rotatable bonds shares an atom index, then they are consecutive, 
+    6. If no atoms in the rotatable bond pair are in a ring, then append to array of consecutive rotatable bonds. 
     """
     totalbondscollector=[]
     newrotbnds=[]
+    # STEP 1
     for rotbnd in listofbondsforprm:
         b=rotbnd[0]+1
         c=rotbnd[1]+1
         batom=poltype.mol.GetAtom(b)
         catom=poltype.mol.GetAtom(c)
+        # STEP 2
         bval=len([neighb for neighb in openbabel.OBAtomAtomIter(batom)])
         cval=len([neighb for neighb in openbabel.OBAtomAtomIter(catom)])
         if bval<2 or cval<2:
             continue
+        # STEP 3
         newrotbnds.append(rotbnd)
+    # STEP 4
     combs=list(combinations(newrotbnds,2)) 
     for comb in combs:
         firstbnd=comb[0]
         secondbnd=comb[1]
         total=firstbnd[:]+secondbnd[:]
         totalset=set(total)
+        # STEP 5
         if len(totalset)==3:
             if firstbnd[-1]!=secondbnd[-1] and firstbnd[0]!=secondbnd[-1] and firstbnd[0]!=secondbnd[0]:
                 secondbnd=secondbnd[::-1]
@@ -1943,6 +1959,7 @@ def FindAllConsecutiveRotatableBonds(poltype,mol,listofbondsforprm):
             catomindex=firstbnd[1]+1
             catom=poltype.mol.GetAtom(catomindex)
             isinring=catom.IsInRing()
+            # STEP 6
             if isinring==True:
                 continue
            
@@ -1951,37 +1968,37 @@ def FindAllConsecutiveRotatableBonds(poltype,mol,listofbondsforprm):
 
 def FindAdjacentMissingTorsionsForTorTor(poltype,torsionsmissing,totalbondscollector,tortorsmissing):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: If one torsion is missing but an adjacent torsion is not, then consider that tor-tor to be missing. Since that tor-tor is missing, then need to also scan the torsion that was determined to not be missing at first.   
+    Input: Array of missing torsions, array of all consecutive rotatable bonds, array of missing tor-tors.
+    Output: Updated missing torsions array
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over list of consecutive rotatable bonds
+    2. For each bond, check if they are in torsionsmissing array
+    3. Also check if the tor-tor is missing, if not then can skip this tor-tor
+    4. If either the first bond is missing and second is not or second is missing and first is not then add the missing torsion to missing torsion array
     """
+    # STEP 1
     for bndlist in totalbondscollector:
         first=bndlist[0]
         second=bndlist[1]
+        # STEP 2
         foundfirst=CheckIfRotatableBondInMissingTorsions(poltype,first,torsionsmissing) 
-        foundsecond=CheckIfRotatableBondInMissingTorsions(poltype,second,torsionsmissing) 
+        foundsecond=CheckIfRotatableBondInMissingTorsions(poltype,second,torsionsmissing)
+        # STEP 3
         foundtortormissing=CheckIfRotatableBondInMissingTorTors(poltype,first,second,tortorsmissing)
         if foundtortormissing==False:
             continue
+        # STEP 4
         if (foundfirst==False and foundsecond==True and poltype.tortor==True):
-            b=first[0]+1
-            c=first[1]+1
+            b=second[0]+1
+            c=second[1]+1
             aatom,datom = torgen.find_tor_restraint_idx(poltype,poltype.mol,poltype.mol.GetAtom(b),poltype.mol.GetAtom(c))
             a=aatom.GetIdx()
             d=datom.GetIdx()
             tor=[a-1,b-1,c-1,d-1]
             torsionsmissing.append(tuple(tor))
         elif (foundfirst==True and foundsecond==False and poltype.tortor==True):
-            b=second[0]+1
-            c=second[1]+1
-            aatom,datom = torgen.find_tor_restraint_idx(poltype,poltype.mol,poltype.mol.GetAtom(b),poltype.mol.GetAtom(c))
-            a=aatom.GetIdx()
-            d=datom.GetIdx()
-            tor=[a-1,b-1,c-1,d-1]
-            torsionsmissing.append(tuple(tor))
-        elif (foundfirst==False and foundsecond==False and poltype.tortor==True):
             b=first[0]+1
             c=first[1]+1
             aatom,datom = torgen.find_tor_restraint_idx(poltype,poltype.mol,poltype.mol.GetAtom(b),poltype.mol.GetAtom(c))
@@ -1989,27 +2006,29 @@ def FindAdjacentMissingTorsionsForTorTor(poltype,torsionsmissing,totalbondscolle
             d=datom.GetIdx()
             tor=[a-1,b-1,c-1,d-1]
             torsionsmissing.append(tuple(tor))
-            b=second[0]+1
-            c=second[1]+1
-            aatom,datom = torgen.find_tor_restraint_idx(poltype,poltype.mol,poltype.mol.GetAtom(b),poltype.mol.GetAtom(c))
-            a=aatom.GetIdx()
-            d=datom.GetIdx()
-            tor=[a-1,b-1,c-1,d-1]
-            torsionsmissing.append(tuple(tor))
+        
 
     return torsionsmissing
 
 def CheckIfRotatableBondInMissingTorsions(poltype,rotbnd,torsionsmissing):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Check if input rotatable bond exists in any torsions in missing torsion array
+    Input: Rotatable bond array, array of missing torsions
+    Output: Boolean specifying if found rotatable bond in array of missing torsions
+    Referenced By: FindAdjacentMissingTorsionsForTorTor
     Description: 
+    1. Assume it doesnt exist in missing torsion array
+    2. Iterate over array of missing torsions
+    3. Grab the bond from current torsion
+    4. If the input rotatable bond is same (or reverse) of current bond then it was found 
     """
+    # STEP 1
     found=False
+    # STEP 2
     for tor in torsionsmissing:
+        # STEP 3
         bnd=[tor[1],tor[2]]
+        # STEP 4
         if bnd==rotbnd or bnd[::-1]==rotbnd:
             found=True
             break
@@ -2017,16 +2036,24 @@ def CheckIfRotatableBondInMissingTorsions(poltype,rotbnd,torsionsmissing):
 
 def CheckIfRotatableBondInMissingTorTors(poltype,firstbnd,secondbnd,tortormissing):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Check if rotatable bonds are in missing tor-tor array. 
+    Input: First rotatable bond in tor-tor, second rotatable bond in tor-tor
+    Output: Boolean specifying if the rotatable bonds were found in missing tor-tor array or not.
+    Referenced By: FindAdjacentMissingTorsionsForTorTor
     Description: 
+    1. Assume the rotatable bond pair does not exist in missing tor-tor array
+    2. Iterate over missing tor-tors
+    3. Extract current first and second rotatable bonds
+    4. If the current first rotatable bond matches input first rotatable bond and current second bond matches input second bond (or current first matches second input and current second matches first input), then determine the tor-tor to be found in missing tor-tor array 
     """
+    # STEP 1
     foundtortormissing=False
+    # STEP 2
     for tortor in tortormissing:
+        # STEP 3
         first=[tortor[1],tortor[2]]
         second=[tortor[2],tortor[3]]
+        # STEP 4
         if (first==firstbnd or first[::-1]==firstbnd) and (second==secondbnd or second[::-1]==secondbnd):
             foundtortormissing=True
         elif (first==secondbnd or first[::-1]==secondbnd) and (second==firstbnd or second[::-1]==firstbnd):
@@ -2036,18 +2063,33 @@ def CheckIfRotatableBondInMissingTorTors(poltype,firstbnd,secondbnd,tortormissin
 
 def FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertoparameters,rdkitmol,mol,indextoneighbidxs,totalbondscollector):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Determine which tor-tors are missing from database (which determines which ones are needed to be parameterized).  
+    Input: Dictionary of tor-tor atom indices to SMARTS from database, dictionary of tor-tor SMARTS + atom order -> array of tor-tor parameter lines, rkdit mol object, openbabel mol object, dictionary of atom index -> neighboring indices, array of consecutive rotatable bonds 
+    Output: Array of missing tor-tors
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over dictionary of tor-tor atom indices -> SMARTS
+    2. Iterate over dictionary of tor-tor SMARTS + atom order -> tor-tor parameters
+    3. If the SMARTS from both dictoinaries match then
+    4. Determine the neighboring atom indices of all atom indices from the current tor-tor
+    5. Match the SMARTS to input molecule
+    6. Check if the matched atom indices from SMARTS contain all of the neighbors found
+    7. If they contain all neighbors then tor-tor is determined not to be missing, if they do then its determined to be missing
+    8. For tor-tors not in database, need to iterate over array of consecutive rotatable bonds to determine if need to add tor-tor to array ofmissing tor-tors
+    9. Grab the first and second rotatatable bonds for current tor-tor
+    10. If tor-tor was not already found in database earlier and also not already appended to array of missing tor-tors, then append the tor-tor to array of missing tor-tors
+    11. If tor-tor is in onlyrottortorlist array then add to array of missing tor-tors 
     """
     tortorsmissing=[]
     tortorsfound=[]
+    # STEP 1
     for tortorindices,extsmarts in tortorindicestoextsmarts.items(): #only for ones that have match
+        # STEP 2
         for tortorsmartsatomorder,parameters in tortorsmartsatomordertoparameters.items():
             smarts=tortorsmartsatomorder[0]
+            # STEP 3
             if smarts==extsmarts:
+                # STEP 4
                 aidx,bidx,cidx,didx,eidx=tortorindices[:]
                 firstneighborindexes=indextoneighbidxs[aidx]
                 secondneighborindexes=indextoneighbidxs[bidx]
@@ -2056,32 +2098,29 @@ def FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertop
                 fifthneighborindexes=indextoneighbidxs[eidx]
                 neighborindexes=firstneighborindexes+secondneighborindexes+thirdneighborindexes+fourthneighborindexes+fifthneighborindexes
                 substructure = Chem.MolFromSmarts(smarts)
+                # STEP 5
                 matches=rdkitmol.GetSubstructMatches(substructure)
                 matcharray=[]
                 for match in matches:
                     for idx in match:
                         if idx not in matcharray:
                             matcharray.append(idx)
+                # STEP 6
                 check=CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,matcharray)
+                # STEP 7
                 if check==False:
                     tortorsmissing.append(tortorindices)
                 else:
                     tortorsfound.append(tortorindices)
     if poltype.onlyrotbndslist==None:
         poltype.onlyrotbndslist=[]
+    # STEP 8
     for bndlist in totalbondscollector:
+        # STEP 9
         first=bndlist[0]
         second=bndlist[1]
         babelfirst=[i+1 for i in first]
         babelsecond=[i+1 for i in second]
-        #if not (babelfirst in poltype.onlyrotbndslist or babelfirst[::-1] in poltype.onlyrotbndslist):
-        #    if (babelfirst in poltype.partialdoublebonds or babelfirst[::-1] in poltype.partialdoublebonds):
-        #        continue
-        #if not (babelsecond in poltype.onlyrotbndslist or babelsecond[::-1] in poltype.onlyrotbndslist):
-        
-        #    if (babelsecond in poltype.partialdoublebonds or babelsecond[::-1] in poltype.partialdoublebonds):
-        #        continue    
-        # allow partial double tor-tor until figure out non-adjacent tortor coupling
         b,c=first[:]
         d=second[0]
         aatom,dnewatom = torgen.find_tor_restraint_idx(poltype,poltype.mol,poltype.mol.GetAtom(b+1),poltype.mol.GetAtom(c+1))
@@ -2091,6 +2130,7 @@ def FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertop
         bnew=bnewatom.GetIdx()
         e=eatom.GetIdx()
         indices=[a-1,b,c,d,e-1]
+        # STEP 10
         foundtortormissing=CheckIfRotatableBondInMissingTorTors(poltype,[bnew-1,c],[c,dnew-1],tortorsmissing)
         foundtortor=CheckIfRotatableBondInMissingTorTors(poltype,[bnew-1,c],[c,dnew-1],tortorsfound)
         if foundtortormissing==False and foundtortor==False:
@@ -2102,71 +2142,70 @@ def FindMissingTorTors(poltype,tortorindicestoextsmarts,tortorsmartsatomordertop
                     tortorsmissing.append(indices)
 
         else:
+            # STEP 11
             ls=[b+1,c+1,d+1]
             if ls in poltype.onlyrottortorlist or ls[::-1] in poltype.onlyrottortorlist:
                 tortorsmissing.append(indices)
 
     return tortorsmissing
 
-def CheckIfRotatableBondsInOnlyRotBnds(poltype,first,second):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    inonlyrotbnds=True
-    first=[i+1 for i in first]
-    second=[i+1 for i in second]
-    if (first in poltype.onlyrotbndslist or first[::-1] in poltype.onlyrotbndslist) and (second in poltype.onlyrotbndslist or second[::-1] in poltype.onlyrotbndslist):
-        pass
-    else:
-        inonlyrotbnds=False
-
-    return inonlyrotbnds 
-
 
 def RingAtomicIndices(poltype,mol):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Grab all rings in input molecule
+    Input: mol object
+    Output: List of list of ring atomic indices
+    Referenced By: FindMissingTorsions , DefaultAromaticMissingTorsions
     Description: 
+    1. Call SSSR method
+    2. Iterate over ring objects
+    3. Grab atomic indices for current ring
+    4. Append ring atomic indices to array 
     """
+    # STEP 1
     sssr = mol.GetSSSR()
     atomindices=[]
+    # STEP 2
     for ring in sssr:
+        # STEP 3
         ringatomindices=GrabRingAtomIndices(poltype,mol,ring)
+        # STEP 4
         atomindices.append(ringatomindices)        
     return atomindices
 
 def GrabRingAtomIndices(poltype,mol,ring):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: For a given ring object, extract atomic indices
+    Input: Mol object, ring object
+    Output: Array of ring atomic indices
+    Referenced By: RingAtomicIndices
     Description: 
+    1. Iterate over mol object
+    2. If atom is in ring object, then append to array
     """
     ringatomindices=[]
     atomiter=openbabel.OBMolAtomIter(mol)
+    # STEP 1
     for atom in atomiter:
         atomidx=atom.GetIdx()
+        # STEP 2
         if ring.IsInRing(atomidx)==True:
             ringatomindices.append(atomidx)
     return ringatomindices
 
 def GrabRingAtomIndicesFromInputIndex(poltype,atomindex,atomindices):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Only return ring that contains the input atom index
+    Input: Atom index of interest, array of rings
+    Output: Ring of interest
+    Referenced By: FindMissingTorsions
     Description: 
+    1. Iterate over rings in array of rings
+    2. If atom index of interest is in ring, then return ring 
     """
+    # STEP 1
     for ring in atomindices:
+        # STEP 2
         if atomindex in ring:
             return ring
 
@@ -2175,14 +2214,18 @@ def GrabRingAtomIndicesFromInputIndex(poltype,atomindex,atomindices):
 
 def GrabIndicesInRing(poltype,babelindices,ring):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Grab only the indices from input array that are in input ring 
+    Input: Array of atom indices, ring indices
+    Output: Array of indices from babelindices that are in ring
+    Referenced By: FindMissingTorsions
     Description: 
+    1. Iterate over indices in ring
+    2. If index is also in input array of atom indices, then save in new array
     """
     ringtorindices=[]
+    # STEP 1
     for index in ring:
+        # STEP 2
         if index in babelindices:
             ringtorindices.append(index)
 
@@ -2191,11 +2234,12 @@ def GrabIndicesInRing(poltype,babelindices,ring):
 
 def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,indextoneighbidxs):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Determine which torsions are missing and hence need to be parameterized. 
+    Input: Dictionary of torsion atomic indices -> amoeba09 SMARTS + atom order, rdkit mol object, openbabel mol object, dictionary of atom index -> neighboring indices 
+    Output: Array of missing torsion indices
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
     Description: 
+    1. 
     """
     torsionsmissing=[]
     poormatchingaromatictorsions=[]
@@ -2584,20 +2628,6 @@ def ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,
 
     return newtorsionprms
 
-
-def GrabKeysFromValue(poltype,dic,thevalue):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    keylist=[]
-    for key,value in dic.items():
-        if value==thevalue:
-            keylist.append(key)
-    return keylist
 
 
 def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopoltypeclasses,partialarotorsionsmissingtinkerclassestopoltypeclasses,torsionprms,mol): # transfer bezene aromatic torsion paramerers from amoeba09
@@ -3492,14 +3522,18 @@ def ConvertToPoltypeClasses(poltype,torsionsmissing):
 
 def GrabKeysFromValue(poltype,dic,thevalue):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Given a dictionary value such as type number, find all corresponding keys or atom indices that map to that type number.
+    Input: Dictionary, value of interest
+    Output: List of keys corresponding to value of interest 
+    Referenced By: Many functions
+    Description:
+    1. Iterate over dictionary 
+    2. If current value equals value of interest, then append current key to list
     """
     keylist=[]
+    # STEP 1
     for key,value in dic.items():
+        # STEP 2
         if value==thevalue:
             keylist.append(key)
     return keylist
