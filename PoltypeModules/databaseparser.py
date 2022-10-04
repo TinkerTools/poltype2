@@ -2239,13 +2239,24 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
     Output: Array of missing torsion indices
     Referenced By: GrabSmallMoleculeAMOEBAParameters
     Description: 
-    1. 
+    1. Iterate over torsion atomic indices and amoeba09 SMARTS
+    2. If user specifies to not parameterize torsion, then dont add any torsions to array of missing torsions.
+    3. If detect linear angle (for example nitrile group) then dont want to parameterize torsion. 
+    4. Check if the amoeba09 SMARTS match contains all neighbors of the torsion, if not the match is "bad"
+    5. If user specifies to parameterize torsions about rotatable bond in onlyrotbndslist, then add torsion to array of missing torsions
+    6. If there exists a * or ~ then the SMARTS transfer is determined to be "bad"
+    7. If user specifies to not parameterize torsion in dontrotbndslist, then transfer the amoeba09 SMARTS match
+    8. Check for special case when whole molecule is a giant ring (then set ringbond=False)
+    9. If SMARTS
+    10.If bond is ring bond and the torsion contains no SP2 atoms, then want to transfer non-aromatic torsion parameters. Transfer hydrogen torsion from alkane. If user specifies to scan ring bond, can add to list and poltype will fragment molecule, otherwise will transfer heavy torsion from alkane also.  
     """
     torsionsmissing=[]
     poormatchingaromatictorsions=[]
     poormatchingpartialaromatictorsions=[]
     torsionstozerooutduetocolinear=[]
+    # STEP 1
     for torsionindices,smartsenv in torsionindicestoparametersmartsenv.items():
+        # STEP 2
         if poltype.dontdotor==True:
             continue
         aidx,bidx,cidx,didx=torsionindices[:]
@@ -2266,6 +2277,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
 
         middlebond=mol.GetBond(babelindices[1],babelindices[2])
         ringbond=middlebond.IsInRing()
+        # STEP 3
         firstangle=mol.GetAngle(aatom,batom,catom)
         secondangle=mol.GetAngle(batom,catom,datom)
         if firstangle<0:
@@ -2296,6 +2308,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
         hybs=[a.GetHyb() for a in babelatoms]
         hybb=hybs[1]
         hybc=hybs[2]
+        # STEP 4
         firstneighborindexes=indextoneighbidxs[aidx]
         secondneighborindexes=indextoneighbidxs[bidx]
         thirdneighborindexes=indextoneighbidxs[cidx]
@@ -2314,13 +2327,17 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                 break
 
         check=CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,matcharray)
+        # STEP 5
         if len(poltype.onlyrotbndslist)!=0:
             if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
                 check=False 
+        # STEP 6
         if '~' in smarts or '*' in smarts:
             check=False
+        # STEP 7
         if [bbidx,cbidx] in poltype.dontrotbndslist or [cbidx,bbidx] in poltype.dontrotbndslist:
             check=True
+        # STEP 8
         if ringbond==True:
             atomindices=RingAtomicIndices(poltype,mol)
             therings=torgen.GrabAllRingsContainingMostIndices(poltype,atomindices,babelindices,2)
@@ -2333,9 +2350,10 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
             ringtorindices=GrabIndicesInRing(poltype,babelindices,ring)
         if (bnd in poltype.partialdoublebonds or bnd[::-1] in poltype.partialdoublebonds) and poltype.rotalltors==False and ([bbidx,cbidx] not in poltype.onlyrotbndslist and [cbidx,bbidx] not in poltype.onlyrotbndslist) and check==True:
             continue
-
+        # STEP 9
         if check==False:
             if ringbond==True:
+                # STEP 10    
                 if (2 not in hybs): # non-aromatic torsion want parameters for 
                     if poltype.transferanyhydrogentor==True and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
                         poormatchingpartialaromatictorsions.append(torsionindices)
@@ -5748,7 +5766,7 @@ def StiffenZThenBisectorAngleConstants(poltype,keyfilename):
             indices=[int(i) for i in indices]
             indices=tuple(indices)
             for angle in angles:
-                if angle==indices or angle==indices[::-1]:
+                if angle[1]==indices[1]:
                     value=float(linesplit[4])
                     value=str(2*value)
                     linesplit[4]=value
