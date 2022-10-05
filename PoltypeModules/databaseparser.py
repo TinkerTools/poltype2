@@ -2247,8 +2247,13 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
     6. If there exists a * or ~ then the SMARTS transfer is determined to be "bad"
     7. If user specifies to not parameterize torsion in dontrotbndslist, then transfer the amoeba09 SMARTS match
     8. Check for special case when whole molecule is a giant ring (then set ringbond=False)
-    9. If SMARTS
-    10.If bond is ring bond and the torsion contains no SP2 atoms, then want to transfer non-aromatic torsion parameters. Transfer hydrogen torsion from alkane. If user specifies to scan ring bond, can add to list and poltype will fragment molecule, otherwise will transfer heavy torsion from alkane also.  
+    9. If SMARTS is "bad" transfer
+    10.If bond is ring bond and the torsion contains no SP2 atoms, then want to transfer non-aromatic torsion parameters. Transfer hydrogen torsion from alkane. If user specifies to scan ring bond, can add to list and poltype will fragment molecule, otherwise will transfer heavy torsion from alkane also. 
+    11. If ring bond and also middle two atoms are SP2, then transfer torsion from benzene
+    12. If one of the middle atoms is SP2, or both are not SP2 then transfer torsion from alkane. 
+    13. If middle bond is not in a ring, and torsion is a hydrogen torsion, then if middle two atoms are both SP2 transfer from benzene, else transfer from alkane
+    14. For heavy torsion not in ring, append to array of missing torsions (if not double/triple bond).
+    15. Otherwise if the SMARTS transfer is "good", check if user specified to parameterize all torsions or this specific torsion, then append torsion to array of missing torsions in this case 
     """
     torsionsmissing=[]
     poormatchingaromatictorsions=[]
@@ -2374,10 +2379,11 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                         else:
                             poormatchingpartialaromatictorsions.append(torsionindices)
 
-                        
+                # STEP 11        
                 elif hybs[1]==2 and hybs[2]==2:
                     if torsionindices not in poormatchingaromatictorsions:
                         poormatchingaromatictorsions.append(torsionindices)
+                # STEP 12
                 elif (hybs[1]==2 and hybs[2]!=2) or (hybs[1]!=2 and hybs[2]==2):
                     if torsionindices not in poormatchingpartialaromatictorsions:
                         poormatchingpartialaromatictorsions.append(torsionindices)
@@ -2386,6 +2392,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                         poormatchingpartialaromatictorsions.append(torsionindices)
 
             else:
+                # STEP 13
                 if poltype.transferanyhydrogentor==True and poltype.rotalltors==False and (atomicnumatoma==1 or atomicnumatomd==1) and (allhydrogentor==False and allhydrogentoroneside==False): # then here transfer torsion because can pick up most QM-MM on heavy atoms, less parameters to fit
                     if hybs[1]==2 and hybs[2]==2:
                         if torsionindices not in poormatchingaromatictorsions:
@@ -2402,6 +2409,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
 
 
                 else:
+                    # STEP 14
                     if len(poltype.onlyrotbndslist)!=0:
                         if [bbidx,cbidx] in poltype.onlyrotbndslist or [cbidx,bbidx] in poltype.onlyrotbndslist:
                             if bondorder!=1: 
@@ -2416,7 +2424,7 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                             torsionsmissing.append(torsionindices)
 
                     continue
-
+        # STEP 15
         else:
             if poltype.rotalltors==True and ringbond==False:
                 if bondorder<2:
@@ -2432,37 +2440,52 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
 
 def GrabAllRingsContainingIndices(poltype,atomindices,babelindices):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Needed to check if whole molecule is one big ring or not.   
+    Input: Array of rings, array of atomic indices corresponding to torsion 
+    Output: Array of rings containing atomic indices from torsion
+    Referenced By: DefaultAromaticMissingTorsions, FindMissingTorsions
+    Description:
+    1. Iterate over rings in array of rings
+    2. Assume all atomic indices exist in ring
+    3. Iterate over atomic indices in array of atomic indices, if atomic index doesnt exist in ring, then not all indices are in ring
+    4. If all atomic indices are in ring, then append ring to array of rings 
     """
     rings=[]
+    # STEP 1
     for ring in atomindices:
+        # STEP 2
         allin=True
+        # STEP 3
         for atomindex in babelindices:
             if atomindex not in ring:
                 allin=False
+        # STEP 4
         if allin==True:
             rings.append(ring)
     return rings
 
+
 def FindAllNeighborIndexes(poltype,rdkitmol):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Used for checking if SMARTS match contains all neighbors of atom indices attempting to match parameters for
+    Input: Rdkit mol object
+    Output: Dictionary of atomic indices -> neighboring atomic indices
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
     Description: 
+    1. Iterate over atoms in mol object
+    2. Iterate over neighboring atoms for current atom
+    3. Append all neighbors to dictionary for current atom index entry 
     """
     indextoneighbidxs={}
+    # STEP 1
     for atm in rdkitmol.GetAtoms():
         atmidx=atm.GetIdx()
         if atmidx not in indextoneighbidxs.keys():
             indextoneighbidxs[atmidx]=[]
+        # STEP 2
         for neighbatm in atm.GetNeighbors():
             neighbatmidx=neighbatm.GetIdx()
+            # STEP 3
             if neighbatmidx not in indextoneighbidxs[atmidx]:
                 indextoneighbidxs[atmidx].append(neighbatmidx)
             
@@ -2471,60 +2494,89 @@ def FindAllNeighborIndexes(poltype,rdkitmol):
 
 def CheckIfNeighborsExistInSMARTMatch(poltype,neighborindexes,smartsindexes):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Check to see if atomic indices from SMARTS match contain neighboring indices for parameters being assigned
+    Input: Array of neighboring indices, array of indices from SMARTS match
+    Output: Boolean specifying if all neighbors exist in SMARTS match or notn
+    Referenced By: FindMissingTorsions , MatchExternalSMARTSToMolecule , FindMissingParameters
     Description: 
+    1. Assume all neighbors exist in SMARTS match
+    2. Iterate over neighboring indices
+    3. If index not in neighboring indices, then not all neighbors exist in SMARTS match 
     """
+    # STEP 1
     check=True
+    # STEP 2
     for idx in neighborindexes:
+        # STEP 3
         if idx not in smartsindexes:
             check=False
     return check
 
 def ZeroOutMissingStrbnd(poltype,anglemissingtinkerclassestopoltypeclasses,strbndprms):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: When SMARTS matches for strbnd are not "good" then instead of assigning generic parameters, zero this term out 
+    Input: Dictionary of missing angle indices -> corresponding poltype type numbers , array of strbnd parameter lines 
+    Output: Modifed array of strbnd parameter lines
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over strbnd parameter lines
+    2. Grab the classes from parameter line
+    3. Iterate over keys from dictionary of missing angle indices
+    4. If there is a match, then modify parameters in line to be 0
+    5. Append to array of modified strbnd parameter lines
     """
     newstrbndprms=[]
+    # STEP 1
     for line in strbndprms:
         linesplit=line.split()
+        # STEP 2
         classes=tuple([int(linesplit[1]),int(linesplit[2]),int(linesplit[3])])
+        # STEP 3
         for sublist in anglemissingtinkerclassestopoltypeclasses.values():
+            # STEP 4
             if classes in sublist or classes[::-1] in sublist: 
                 newlinesplit=re.split(r'(\s+)', line)
                 newlinesplit[8]='0'
                 newlinesplit[10]='0'
                 line=''.join(newlinesplit)
+        # STEP 5
         newstrbndprms.append(line)
 
     return newstrbndprms
 
 def AssignAngleGuessParameters(poltype,anglemissingtinkerclassestopoltypeclasses,angleprms,indextoneighbidxs):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: For angle parameters that have a "bad" SMARTS match, just assign generic angle parameters based on element and valance 
+    Input: Dictionary of missing atomic angle indices -> poltype classes, array of angle parameter lines, dictionary of atomic index -> neighboring atomic indices
+    Output: Modified array of angle parameters
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over array of angle parameters lines
+    2. Extract classes from the line 
+    3. Iterate over dictionary of missing angle indices
+    4. If the classes exist in current dictionary item
+    5. Grab all atomic indices that have the same atom types
+    6. Extract atomic numbers and explict valencies for each atomic index
+    7. Generate angle guess parameters based on atomic numbers and valencies 
+    8. Update the line with parameter guess
+    9. Append line to modified angle parameter array 
     """
     newangleprms=[]
-
+    # STEP 1
     for line in angleprms:
         linesplit=line.split()
+        # STEP 2
         classes=tuple([int(linesplit[1]),int(linesplit[2]),int(linesplit[3])])
+        # STEP 3
         for tinkerclasses,sublist in anglemissingtinkerclassestopoltypeclasses.items():
+            # STEP 4
             found=False
             if classes in sublist:
                 found=True
             elif classes[::-1] in sublist: 
                 found=True
             if found==True:
+                # STEP 5
                 indices=[]
                 for poltypeclass in classes:
                     keylist=GrabKeysFromValue(poltype,poltype.idxtosymclass,poltypeclass)
@@ -2538,15 +2590,18 @@ def AssignAngleGuessParameters(poltype,anglemissingtinkerclassestopoltypeclasses
                     if checkconsec==True:
                         exampleindices=[k-1 for k in comb]
                         break
+                # STEP 6
                 exampleindices=[int(i) for i in exampleindices]
                 atoms=[poltype.rdkitmol.GetAtomWithIdx(k) for k in exampleindices]
                 atomicnums=[a.GetAtomicNum() for a in atoms]
                 atomicval=[a.GetExplicitValence() for a in atoms]
-
+                # STEP 7
                 angleguess=AngleGuess(poltype,atomicnums[0],atomicnums[1],atomicnums[2],atomicval[0],atomicval[1],atomicval[2])
+                # STEP 8
                 newlinesplit=re.split(r'(\s+)', line)
                 newlinesplit[8]=str(angleguess)
                 line=''.join(newlinesplit)
+        # STEP 9
         newangleprms.append(line)
 
     return newangleprms
@@ -2554,18 +2609,26 @@ def AssignAngleGuessParameters(poltype,anglemissingtinkerclassestopoltypeclasses
 
 def CheckIfAtomsConnected(poltype,poscomb,endindextoneighbs):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: When generating all combinations of atomic indices that map to same type numbers, only pick tuples of indices that are conseuctively connected (otherwise doesnt exist) 
+    Input: Array of atom indices, dictionary of atomic index -> neighboring indices
+    Output: Boolean that specifies if all atoms are consecutively connected or not
+    Referenced By: AssignBondGuessParameters , AssignAngleGuessParameters
+    Description:
+    1. Assume that atoms are consecutively connected
+    2. Iterate over indices in array of atomic indices
+    3. Grab neighboring indices
+    4. If the next index in array of atomic indices is not in neighbors, then indices are not consecutive 
     """
+    # STEP 1
     checkconsec=True
     if len(poscomb)>1:
+        # STEP 2
         for i in range(len(poscomb)-1):
             index=poscomb[i]
             nextindex=poscomb[i+1]
+            # STEP 3
             indexneighbs=endindextoneighbs[index]
+            # STEP 4
             if nextindex not in indexneighbs:
                 checkconsec=False
 
@@ -2575,23 +2638,37 @@ def CheckIfAtomsConnected(poltype,poscomb,endindextoneighbs):
 
 def AssignBondGuessParameters(poltype,bondmissingtinkerclassestopoltypeclasses,bondprms,indextoneighbidxs):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: For bond parameters that have a "bad" SMARTS match, just assign generic bond parameters based on element and valance 
+    Input: Dictionary of missing atomic bond indices -> poltype classes, array of bond parameter lines, dictionary of atomic index -> neighboring atomic indices
+    Output: Modified array of bond parameters
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over array of bond parameters lines
+    2. Extract classes from the line 
+    3. Iterate over dictionary of missing angle indices
+    4. If the classes exist in current dictionary item
+    5. Grab all atomic indices that have the same atom types
+    6. Extract atomic numbers and explict valencies for each atomic index
+    7. Generate bond guess parameters based on atomic numbers and valencies 
+    8. Update the line with parameter guess
+    9. Append line to modified bond parameter array 
     """
     newbondprms=[]
+    # STEP 1
     for line in bondprms:
         linesplit=line.split()
+        # STEP 2
         classes=tuple([int(linesplit[1]),int(linesplit[2])])
+        # STEP 3
         for tinkerclasses,sublist in bondmissingtinkerclassestopoltypeclasses.items():
+            # STEP 4
             found=False
             if classes in sublist:
                 found=True
             elif classes[::-1] in sublist: 
                 found=True
             if found==True:
+                # STEP 5
                 indices=[]
                 for poltypeclass in classes:
                     keylist=GrabKeysFromValue(poltype,poltype.idxtosymclass,poltypeclass)
@@ -2605,15 +2682,18 @@ def AssignBondGuessParameters(poltype,bondmissingtinkerclassestopoltypeclasses,b
                     if checkconsec==True:
                         exampleindices=[k-1 for k in comb]
                         break 
+                # STEP 6
                 exampleindices=[int(i) for i in exampleindices]
                 atoms=[poltype.rdkitmol.GetAtomWithIdx(k) for k in exampleindices]
                 atomicnums=[a.GetAtomicNum() for a in atoms]
                 atomicval=[a.GetExplicitValence() for a in atoms]
-
+                # STEP 7
                 bondguess=BondGuess(poltype,atomicnums[0],atomicnums[1],atomicval[0],atomicval[1])
+                # STEP 8
                 newlinesplit=re.split(r'(\s+)', line)
                 newlinesplit[6]=str(bondguess)
                 line=''.join(newlinesplit)
+        # STEP 9
         newbondprms.append(line)
 
     return newbondprms
@@ -2623,17 +2703,26 @@ def AssignBondGuessParameters(poltype,bondmissingtinkerclassestopoltypeclasses,b
 
 def ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,torsionprms):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: For torsions that need to be fit, need to zero out the torsion parameters prior to fitting. 
+    Input: Dictionary of missing torsion tinker classes -> poltype types, array of torsion parameter lines
+    Output: Modifed array of torsion parameter lines
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
     Description: 
+    1. Iterate over array of torsion parameter lines
+    2. Extract classes from current parameter line
+    3. Iterate over dictionary items
+    4. If current classes exist in current dictionary item, then zero out the parameters in the line
+    5. Append modified line to array of modified torsion parameter lines 
     """
     newtorsionprms=[]
+    # STEP 1
     for line in torsionprms:
         linesplit=line.split()
+        # STEP 2
         classes=tuple([int(linesplit[1]),int(linesplit[2]),int(linesplit[3]),int(linesplit[4])])
+        # STEP 3
         for sublist in torsionsmissingtinkerclassestopoltypeclasses.values():
+            # STEP 4
             if classes in sublist or classes[::-1] in sublist: 
                 newlinesplit=re.split(r'(\s+)', line)
                 splitafter=newlinesplit[10:]
@@ -2642,6 +2731,7 @@ def ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,
                 splitafter[12]='0'
                 newlinesplit=newlinesplit[:10]+splitafter
                 line=''.join(newlinesplit)
+        # STEP 5
         newtorsionprms.append(line)
 
     return newtorsionprms
@@ -2650,12 +2740,24 @@ def ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,
 
 def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopoltypeclasses,partialarotorsionsmissingtinkerclassestopoltypeclasses,torsionprms,mol): # transfer bezene aromatic torsion paramerers from amoeba09
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Some torsions parameters need to transfer from alkane or from benezne, this function hardcodes that torsion transfer
+    Input: Dictionary of torsions that need benzene transfer tinker classes -> poltype types, dictionary of torsion tinker classes that need alkane transfer -> poltype types , array of torsion parameter lines, mol object
+    Output: Modified torsion parameter line array
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
     Description: 
+    1. Define hardcoded parameters and tinker type descriptions (for adding helpful comments to parameter transfer in key file)
+    2. Find all hydrogens types there are in the molecule, will help with counting how many hydrogen classes in torsion
+    3. Iterate over lines of torsion parameter array
+    4. Extract torsion classes from parameter line
+    5. Determine possible corresponding atomic indices from classes
+    6. Determine hybridization of atoms in torsion and if a ring bond or not
+    7. Count how many hydrogens in current torsion 
+    8. Check if curren torsion is in either dictionary for benzene transfers or alkane transfers, if so determine which parameters to transfer and which comments to add based on number of hydrogens
+    9. Update current torsion line with new parameters
+    10. If torsion is on ring bond and depending on bond order (if double/triple etc), then add extra comment about bond order to key file 
+    11. Append modified torsion to array of modified torsion parameter lines
     """
+    # STEP 1
     newtorsionprms=[]
     poorarohydcounttoprms={0:[-.67,6.287,0],1:[.55,6.187,-.55],2:[0,6.355,0]}
     poorpartialarohydcounttoprms={0:[.854,-.374,.108],1:[0,0,.108],2:[0,0,.299]}
@@ -2666,6 +2768,7 @@ def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopolt
     singleextra='# Single bond detected for missing torsion'+'\n'
     hydextra='# Transferring hydrogen torsion to reduce fit parameters'+'\n'
     arotorsionlinetodescrips={} 
+    # STEP 2
     hydclasses=[]
     for atom in poltype.rdkitmol.GetAtoms():
         atomicnum=atom.GetAtomicNum()
@@ -2673,8 +2776,9 @@ def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopolt
         symclass=poltype.idxtosymclass[babelindex]
         if atomicnum==1:
             hydclasses.append(symclass)
-    
+    # STEP 3 
     for line in torsionprms:
+        # STEP 4
         linesplit=line.split()
         a=int(linesplit[1])
         b=int(linesplit[2])
@@ -2682,6 +2786,7 @@ def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopolt
         d=int(linesplit[4])
         allcombs=[]
         ls=[a,b,c,d]
+        # STEP 5
         for typenum in ls: 
             indices=GrabKeysFromValue(poltype,poltype.idxtosymclass,typenum)
             allcombs.append(indices)
@@ -2696,6 +2801,7 @@ def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopolt
             lastbond=mol.GetBond(cindex,dindex)
             if midbond!=None and firstbond!=None and lastbond!=None:
                 break 
+        # STEP 6
         babelindices=list(comb)
         babelatoms=[mol.GetAtom(i) for i in babelindices]
         hybs=[a.GetHyb() for a in babelatoms]
@@ -2710,11 +2816,13 @@ def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopolt
 
         bondorder=midbond.GetBondOrder()      
         classes=tuple([a,b,c,d])
+        # STEP 7
         hydcount=0
         if a in hydclasses:
             hydcount+=1
         if d in hydclasses:
             hydcount+=1
+        # STEP 8
         found=False
         for sublist in arotorsionsmissingtinkerclassestopoltypeclasses.values():
             if classes in sublist or classes[::-1] in sublist: 
@@ -2728,7 +2836,7 @@ def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopolt
                 prms=poorpartialarohydcounttoprms[hydcount]
                 descrips=poorpartialarohydcounttodescrips[hydcount]
                 break
-
+        # STEP 9
         if found==True:
             newlinesplit=re.split(r'(\s+)', line)
             splitafter=newlinesplit[10:]
@@ -2737,6 +2845,7 @@ def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopolt
             splitafter[12]=str(prms[2])
             newlinesplit=newlinesplit[:10]+splitafter
             line=''.join(newlinesplit)
+            # STEP 10 
             if ringbond==True:
                 extra=ringextra
             elif ringbond==False and bondorder!=1:
@@ -2746,6 +2855,7 @@ def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopolt
             if hydcount>0 and ringbond==False:
                 extra+=hydextra
             arotorsionlinetodescrips[line]=[extra,descrips]
+        # STEP 11
         newtorsionprms.append(line)
 
     return newtorsionprms,arotorsionlinetodescrips
@@ -2753,21 +2863,27 @@ def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopolt
 
 def GrabTorsionParameterCoefficients(poltype,torsionprms):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: When want to refine non-aromatic ring torsion parameters
+    Input: Array of torsion parameter lines
+    Output: Dictionary of torsion classes -> parameters
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
     Description: 
+    1. Iterate over array of torsion parameters
+    2. Grab torsion classes from current parameter line and also parameters
+    3. Append classes and parameters to dictionary 
     """
     torsionkeystringtoparameters={}
+    # STEP 1
     for line in torsionprms:
-        linesplit=line.split() 
+        linesplit=line.split()
+        # STEP 2
         key = '%s %s %s %s' % (linesplit[1], linesplit[2], linesplit[3], linesplit[4])
         parameters=[float(linesplit[5]),float(linesplit[8]),float(linesplit[11])]
         allzero=True
         for prm in parameters:
             if prm!=0:
                 allzero=False
+        # STEP 3
         if allzero==False:
             torsionkeystringtoparameters[key]=parameters
        

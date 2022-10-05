@@ -2166,6 +2166,7 @@ def ParseXTBEnergyLog(poltype,outputname):
     Referenced By: 
     Description: 
     """
+    energy=None # error handling if xtb fails
     temp=open(outputname,'r')
     results=temp.readlines()
     temp.close()
