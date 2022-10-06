@@ -326,7 +326,7 @@ def GrabFinalXYZStructure(poltype,logname,filename,mol):
                 foundfloat=bool(re.search(r'\d', line))
                 if (len(linesplit)==4 or len(linesplit)==5) and foundfloat==True and 'point' not in line:
                     coords=line.lstrip().split()[:3+1]
-                    element=coords[0]
+                    element=coords[0].replace('BR','Br').replace('CL','Cl')
                     coords=coords[1:]
                     coords=[float(i) for i in coords]
                     coords=[i*scale for i in coords]
