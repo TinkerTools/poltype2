@@ -2891,15 +2891,21 @@ def GrabTorsionParameterCoefficients(poltype,torsionprms):
 
 def PruneDictionary(poltype,keysubset,dic):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Want to make a dictionary that is a subset of input dictionary with only keys given as input, for example only want dictionary of missing bonds/angles from dictionary of all bonds/angles. 
+    Input: Array of keys that is subset of keys in input dictionary, input dictionary
+    Output: Subset dictionary of input dictionary, array of keys not included in subet
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over array of keys
+    2. If key (or the reverse) is in the dictionary then
+    3. Append key and value to new dictionary
+    4. Append removed key to array of removed keys
     """
     newdic={}
     removeditems=[]
+    # STEP 1
     for key in keysubset:
+        # STEP 2 & 3
         if key in dic.keys():
             value=dic[key]
             newdic[key]=value
@@ -2908,6 +2914,7 @@ def PruneDictionary(poltype,keysubset,dic):
             value=dic[key[::-1]]
             newdic[key]=value
         else:
+            # STEP 4
             removeditems.append(key)
 
     return newdic,removeditems
@@ -2915,20 +2922,27 @@ def PruneDictionary(poltype,keysubset,dic):
 
 def TinkerClassesToPoltypeClasses(poltype,indicestotinkerclasses,formatorder=True):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Make a dictionary of tinker classes (for vdw/bond/angle/torsion) -> list of all poltype types that match in molecule
+    Input: Dictionary of atomic indices -> tinker classes, boolean that gives canonical ordering to tinker classes tuple and poltype types tuple
+    Output: Dictionary of tinker classes (for vdw/bond/angle/torsion) -> list of all poltype types that match in molecule
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over dictionary of atomic indices to tinker classes
+    2. Generate poltype types from atomic indices and internal dictionary of atomic index -> poltype type
+    3. Give canoncal ordering to tinker classes and poltype types
+    4. Append poltype types array to dictionary
     """
     tinkerclassestopoltypeclasses={}
     poltypeclassesalreadyassigned=[]
+    # STEP 1
     for indices,tinkerclasses in indicestotinkerclasses.items():
+        # STEP 2
         babelindices=[i+1 for i in indices]
         poltypeclasses=[poltype.idxtosymclass[i] for i in babelindices]
         revtinkerclasses=tinkerclasses[::-1]
         if poltypeclasses in poltypeclassesalreadyassigned:
             continue
+        # STEP 3
         if formatorder==True:
             if len(indices)>1:
                 first=int(tinkerclasses[0])
@@ -2952,7 +2966,8 @@ def TinkerClassesToPoltypeClasses(poltype,indicestotinkerclasses,formatorder=Tru
                             tinkerclasses=tinkerclasses[::-1]
                             poltypeclasses=poltypeclasses[::-1]
 
-        poltypeclassesalreadyassigned.append(poltypeclasses)                
+        poltypeclassesalreadyassigned.append(poltypeclasses)         
+        # STEP 4
         if tuple(tinkerclasses) not in tinkerclassestopoltypeclasses.keys():
             tinkerclassestopoltypeclasses[tuple(tinkerclasses)]=[]
         if tuple(poltypeclasses) not in tinkerclassestopoltypeclasses[tuple(tinkerclasses)]: 
@@ -2963,24 +2978,34 @@ def TinkerClassesToPoltypeClasses(poltype,indicestotinkerclasses,formatorder=Tru
 
 def ConvertIndicesDictionaryToPoltypeClasses(poltype,indicestovalue,indicestotinkerclasses,tinkerclassestopoltypeclasses):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Convert dictionary of atomic indices -> values to poltype types -> value
+    Input: Dictionary of atomic indices -> value, dictionary of atomic indices -> tinker classes, dictionary of tinker classes -> poltype types
+    Output: Dictionary of poltype classes -> value
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over dictionary of atomic indices -> value
+    2. If indices are in dictionary of indices -> tinker classes then
+    3. Extract list of poltype type arrays from tinker classes
+    4. Compute the poltype types for the current atomic indices
+    5. If there is match between current poltype types and the ones from indices-> tinker classes dictionary then append to new dictionary 
     """
     poltypeclassestovalue={}
+    # STEP 1
     for indices,value in indicestovalue.items():
+        # STEP 2
         if indices in indicestotinkerclasses.keys():
             tinkerclasses=tuple(indicestotinkerclasses[indices])
+            # STEP 3
             if tinkerclasses in tinkerclassestopoltypeclasses.keys():
                 poltypeclasses=tuple(tinkerclassestopoltypeclasses[tinkerclasses])
             elif tinkerclasses[::-1] in tinkerclassestopoltypeclasses.keys():
                 poltypeclasses=tuple(tinkerclassestopoltypeclasses[tinkerclasses[::-1]])
             else:
                 continue
+            # STEP 4
             babelindices=[i+1 for i in indices]
             symclasses=tuple([poltype.idxtosymclass[i] for i in babelindices])
+            # STEP 5
             for ls in poltypeclasses:
                 if ls==symclasses or ls==symclasses[::-1]:
                     ls=tuple([ls])
@@ -2990,33 +3015,25 @@ def ConvertIndicesDictionaryToPoltypeClasses(poltype,indicestovalue,indicestotin
                             poltypeclassestovalue[ls].append(value)
     return poltypeclassestovalue 
 
-def CheckIfStringInStringList(poltype,string,stringlist):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    found=False
-    for e in stringlist:
-        if e==string:
-            found=True
-    return found
-
 def GrabTypesFromPrmLine(poltype,ls):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Used for when searching for poltype types dictionary items that contain types from parameter line
+    Input: Array of strings from parameter line
+    Output: The type numbers from parameter line
+    Referenced By: SearchForPoltypeClasses
+    Description:
+    1. Iterate over strings in array
+    2. Keep only strings that are integers (types/classes are integers)
+    3. Keep only types up to certain length in array (integers can also be in parameter line like torsion has integers for phase etc) 
     """
     typenums=[]
+    # STEP 1
     for e in ls:
         isint=RepresentsInt(e)  
+        # STEP 2
         if isint==True:
-            typenums.append(e) 
+            typenums.append(e)
+    # STEP 3
     if len(typenums)>=4:
         if typenums[-2]=='0' and typenums[-1]=='0':
             typenums=typenums[:2]
@@ -3027,19 +3044,29 @@ def GrabTypesFromPrmLine(poltype,ls):
 
 def SearchForPoltypeClasses(poltype,prmline,poltypeclasseslist):
     """
-    Intent:
-    Input:
+    Intent: Given a parameter line, extract poltype types from list of poltype types. 
+    Input: Parameter line, list of list of poltype types (for vdw or bond or angle or torsion)
     Output:
-    Referenced By: 
-    Description: 
+    Referenced By: FindPotentialMissingParameterTypes , MapParameterLineToTransferInfo
+    Description:
+    1. Extract type numbers from input parameter line
+    2. Iterate over array of poltype types array
+    3. Iterate over each poltype types array in list
+    4. Check for a match between type numbers from parameter line and current types in iteration
+    5. If there is a match return current poltype types array and list of poltype types array
+    6. If no matches return None
     """
     listofpoltypeclasses=None
     poltypeclasses=None
     allin=None
     prmlinesplit=prmline.split()
+    # STEP 1
     typenums=GrabTypesFromPrmLine(poltype,prmlinesplit)
+    # STEP 2
     for listofpoltypeclasses in poltypeclasseslist:
+        # STEP 3
         for poltypeclasses in listofpoltypeclasses:
+            # STEP 4
             allin=True
             if int(typenums[0])!=poltypeclasses[0]: # then try flipping
                 poltypeclasses=poltypeclasses[::-1]
@@ -3048,8 +3075,10 @@ def SearchForPoltypeClasses(poltype,prmline,poltypeclasseslist):
                 otherpoltypeclass=poltypeclasses[i]
                 if poltypeclass!=otherpoltypeclass:
                     allin=False 
+            # STEP 5
             if allin==True:
                 return listofpoltypeclasses,poltypeclasses
+    # STEP 6
     if allin!=None:
         if allin==False:
             listofpoltypeclasses=None
@@ -3060,62 +3089,75 @@ def SearchForPoltypeClasses(poltype,prmline,poltypeclasseslist):
 
 def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsatomorders,poltypeclassestosmartsatomorders,poltypeclassestoelementtinkerdescrips,poltypeclassestosmartsatomordersext,newpoltypeclassestocomments,newpoltypeclassestosmartslist,arotorsionlinetodescrips,missingvdwtypes,torsionsmissing,missingbondpoltypeclasses,missinganglepoltypeclasses,defaultvalues=None,keyword=None):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Want to add comments to key file when adding parameters from database so user can read and understand where parameters came from.  
+    Input: Array of parameter lines, dictionary of poltypes types -> amoeba09 SMARTS + atom orders, dictionary of poltypes types -> SMARTS (that matches input molecule) + atom orders, dictionary of poltype types -> element + amoeba09 tinker description, dictionary of poltype types -> SMARTS (from external database of SMARTS) + atom order, dictionary of poltype types -> comments (from amoeba21 database), dictionary of poltypes types -> SMARTS (from amoeba21 database), dictionary of torsion parameter line -> comment (from missing torsions transfering from alkane/benzene), array of missing vdw types, array of missing torsions, array of missing bonds types, array of missing angle types, keyword boolean to specify if using default values, keyword boolean to specify if transfering comments for tor-tor 
+    Output: Dictionary of paramteter line to add to key -> array of comment lines to add above parameter line
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over array of parameter lines
+    2. Check if parameter line is in dictionary of torsion parameter line -> comment (from missing torsions transfering from alkane/benzene), if so extract the comments from dictionary
+    3. If not, then check if parameter line is in amoeba09 SMARTS dictionary
+    4. If not, then check if parameter line is in external SMARTS dictionary
+    5. If not, then check if parameter line is in amoeba21 dictionary
+    6. Construct comments appropriate to which database the parameters came from.
+    7. If default values are used for bond/angle/opbend, then add comment for warning in key file
+    8. Check for missing vdw/bond/angle/strbnd/torsion parameters and add comment in key file that parameters are missing from database 
     """
     prmstotransferinfo={}
+    # STEP 1
     for line in prms:
         warn=False
+        # STEP 2
         if keyword!=None:
-            if keyword not in line:
-                transferinfo='# blank'
-            else:
-                poltypeclasses,subpoltypeclasses=SearchForPoltypeClasses(poltype,line,poltypeclassestosmartsatomordersext.keys())
-                smartsatomorders=poltypeclassestosmartsatomordersext[poltypeclasses]
-                transferinfoline='#'+' '+'matching SMARTS from molecule '+' '+str(smartsatomorders)+' from external database'+'\n'
-
+           if keyword not in line:
+               transferinfo='# blank'
+           else:
+               poltypeclasses,subpoltypeclasses=SearchForPoltypeClasses(poltype,line,poltypeclassestosmartsatomordersext.keys())
+               smartsatomorders=poltypeclassestosmartsatomordersext[poltypeclasses]
+               transferinfoline='#'+' '+'matching SMARTS from molecule '+' '+str(smartsatomorders)+' from external database'+'\n'
         else:
-            if line in arotorsionlinetodescrips.keys():
-                tup=arotorsionlinetodescrips[line]
-                extra=tup[0]
-                descrips=tup[1]
-                transferinfoline=extra+'# Transferring from '+str(descrips)+'\n' 
-            else:
-                poltypeclasses,subpoltypeclasses=SearchForPoltypeClasses(poltype,line,poltypeclassestoparametersmartsatomorders.keys())
-                if poltypeclasses==None:
-                         
-                    poltypeclasses,subpoltypeclasses=SearchForPoltypeClasses(poltype,line,poltypeclassestosmartsatomordersext.keys())
+           if line in arotorsionlinetodescrips.keys():
+               tup=arotorsionlinetodescrips[line]
+               extra=tup[0]
+               descrips=tup[1]
+               transferinfoline=extra+'# Transferring from '+str(descrips)+'\n' 
+           else:
+               # STEP 3 
+               poltypeclasses,subpoltypeclasses=SearchForPoltypeClasses(poltype,line,poltypeclassestoparametersmartsatomorders.keys())
+               if poltypeclasses==None:
+                   # STEP 4    
+                   poltypeclasses,subpoltypeclasses=SearchForPoltypeClasses(poltype,line,poltypeclassestosmartsatomordersext.keys())
+                   # STEP 5
+                   if poltypeclasses==None:
+                       poltypeclasses,subpoltypeclasses=SearchForPoltypeClasses(poltype,line,newpoltypeclassestocomments.keys())
+                       # STEP 6
+                       comments=newpoltypeclassestocomments[poltypeclasses]
+                       smartslist=newpoltypeclassestosmartslist[poltypeclasses]
+                       commentstring=' '.join(comments)
+                       smartsliststring=' '.join(smartslist)
+                       transferinfoline='# amoeba21'+' '+'comments='+commentstring+' '+'SMARTS match = '+smartsliststring+'\n'
+                   else:
+                       smartsatomorders=poltypeclassestosmartsatomordersext[poltypeclasses]
+                       transferinfoline='#'+' '+'matching SMARTS from molecule '+' '+str(smartsatomorders)+' from external database'+'\n'
 
-                    if poltypeclasses==None:
-                        poltypeclasses,subpoltypeclasses=SearchForPoltypeClasses(poltype,line,newpoltypeclassestocomments.keys())
-
-                        comments=newpoltypeclassestocomments[poltypeclasses]
-                        smartslist=newpoltypeclassestosmartslist[poltypeclasses]
-                        commentstring=' '.join(comments)
-                        smartsliststring=' '.join(smartslist)
-                        transferinfoline='# amoeba21'+' '+'comments='+commentstring+' '+'SMARTS match = '+smartsliststring+'\n'
-                    else:
-                        smartsatomorders=poltypeclassestosmartsatomordersext[poltypeclasses]
-                        transferinfoline='#'+' '+'matching SMARTS from molecule '+' '+str(smartsatomorders)+' from external database'+'\n'
-
-                else:
-                    parametersmartsatomorders=poltypeclassestoparametersmartsatomorders[poltypeclasses]
-                    smartsatomorders=poltypeclassestosmartsatomorders[poltypeclasses]
-                    elementtinkerdescrips=poltypeclassestoelementtinkerdescrips[poltypeclasses]
-                    transferinfoline='# amoeba09'+' '+'matching SMARTS from molecule '+' '+str(smartsatomorders)+' '+'to SMARTS from parameter file'+' '+str(parametersmartsatomorders)+' '+'with tinker type descriptions '+str(elementtinkerdescrips)+'\n'
-                    if defaultvalues!=None:
-                        for value in defaultvalues:
-                            if str(value) in line:
-                                warn=True
-                    if warn==True:
-                        transferinfoline+='# '+'WARNING DEFAULT MM3 OPBEND VALUES USED '+'\n'
-                    smarts=smartsatomorders[0]
-                    if '~' in smarts or '*' in smarts:
-                        transferinfoline+='# '+'WARNING WILDCARDS USED IN SMARTS PARAMETER MATCHING'+'\n'
-                        warn=True
+               else:
+                   # STEP 6
+                   parametersmartsatomorders=poltypeclassestoparametersmartsatomorders[poltypeclasses]
+                   smartsatomorders=poltypeclassestosmartsatomorders[poltypeclasses]
+                   elementtinkerdescrips=poltypeclassestoelementtinkerdescrips[poltypeclasses]
+                   transferinfoline='# amoeba09'+' '+'matching SMARTS from molecule '+' '+str(smartsatomorders)+' '+'to SMARTS from parameter file'+' '+str(parametersmartsatomorders)+' '+'with tinker type descriptions '+str(elementtinkerdescrips)+'\n'
+                   # STEP 7
+                   if defaultvalues!=None:
+                       for value in defaultvalues:
+                           if str(value) in line:
+                               warn=True
+                   if warn==True:
+                       transferinfoline+='# '+'WARNING DEFAULT MM3 OPBEND VALUES USED '+'\n'
+                   smarts=smartsatomorders[0]
+                   if '~' in smarts or '*' in smarts:
+                       transferinfoline+='# '+'WARNING WILDCARDS USED IN SMARTS PARAMETER MATCHING'+'\n'
+                       warn=True
+        # STEP 8
         showtransferinfo=True
         extraline=''
         if 'vdw' in line:
@@ -3183,37 +3225,50 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
 
 def FindMaximumCommonSubstructures(poltype,parametersmartslist,rdkitmol):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Reduce the amount of amoeba09 SMARTS matching, by only trying amoeba09 SMARTS that have common substructure with input molecule. 
+    Input: List of amoeba09 SMARTS, rdkit mol object
+    Output: Dictionary of amoeba09 SMARTS -> maximum common substructure, maximum number of atoms from common substructure 
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over amoeba09 SMARTS array
+    2. Compute max common substructure between mol and amoeba09 SMARTS
+    3. Compute atom size and extract the SMARTS from max common substructure
+    4. If there is a common substructure, save the substructure SMARTS and amoeba09 SMARTS in a dictionary
     """
     parametersmartstomaxcommonsubstructure={}
     maxatomsize=0
+    # STEP 1
     for parametersmarts in parametersmartslist:
+        # STEP 2
         mols = [rdkitmol,Chem.MolFromSmarts(parametersmarts)]
         res=rdFMCS.FindMCS(mols)
+        # STEP 3
         atomnum=res.numAtoms
         smartsmcs=res.smartsString
         if atomnum>0:
             if atomnum>maxatomsize:
                 maxatomsize=atomnum
+            # STEP 4
             parametersmartstomaxcommonsubstructure[parametersmarts]=smartsmcs
     return parametersmartstomaxcommonsubstructure,maxatomsize 
 
 def GrabPlanarBonds(poltype,listofbondsforprm,mol): # used for checking missing opbend parameters later
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Need to know which bonds are planar for finding opbend parameters
+    Input: Array of bonds in mol, mol object
+    Output: Array of planar bonds
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over array of bonds in mol
+    2. Check if the bond (or its reverse) has last atom as SP2 and connected to 3 atoms (or if in aromatic ring)
+    3. If so then append to array of planar bonds
     """
     planarbonds=[]
+    # STEP 1
     for bond in listofbondsforprm:
         revbond=bond[::-1]
         totalbonds=[bond,revbond]
+        # STEP 2
         for lsidx in range(len(totalbonds)):
             bond=totalbonds[lsidx]
             a = mol.GetAtom(bond[0]+1)
@@ -3225,27 +3280,36 @@ def GrabPlanarBonds(poltype,listofbondsforprm,mol): # used for checking missing 
             if ainring==True and binring==True:
                 if aisaromatic==True or bisaromatic==True:
                     if bond not in planarbonds:
+                        # STEP 3
                         planarbonds.append(bond)
                 else:
                     if b.GetHyb()==2 and len(list(openbabel.OBAtomAtomIter(b)))==3:
                         if bond not in planarbonds:
+                            # STEP 3
                             planarbonds.append(bond)
 
             else:
                 if b.GetHyb()==2 and len(list(openbabel.OBAtomAtomIter(b)))==3:
                     if bond not in planarbonds:
+                        # STEP 3
                         planarbonds.append(bond)
     return planarbonds 
 
 
 def FindPotentialMissingParameterTypes(poltype,prms,tinkerclassestopoltypeclasses):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Want to find missing opbend parameter types by first searching for opbend parameter types in dictionary of planar bonds -> poltype types
+    Input: Array of opbend parameter lines, dictionary of tinker classes -> poltype types for planar bonds
+    Output: Array of potential missing opbend parameters (need further filtering)
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Get array of every poltype types array from array poltype types (flattening list)
+    2. Iterate over array of opbend parameter lines
+    3. Search for poltype types array in and see if there is match to parameter line
+    4. If there is a match append to array of parameters found
+    5. Iterate over poltypes types arrays if they dont exist in found parameter array, then append to missing parameter array 
     """
+    # STEP 1
     poltypeclasseslist=list(tinkerclassestopoltypeclasses.values())
     newpoltypeclasseslist=[]
     for poltypeclassesls in poltypeclasseslist:
@@ -3255,15 +3319,19 @@ def FindPotentialMissingParameterTypes(poltype,prms,tinkerclassestopoltypeclasse
         newpoltypeclasseslist.append(newpoltypeclassesls)
     missingprms=[]
     foundprms=[]
+    # STEP 2
     for line in prms:
+        # STEP 3
         poltypeclassesls,subpoltypeclasses=SearchForPoltypeClasses(poltype,line,newpoltypeclasseslist)
         linesplit=line.split()
         prms=[int(linesplit[1]),int(linesplit[2])]
         if poltypeclassesls!=None:
+            # STEP 4
             for poltypeclasses in poltypeclassesls:
                 poltypeclasses=tuple([int(i) for i in poltypeclasses])
                 if poltypeclasses[0]==prms[0] and poltypeclasses[1]==prms[1]:
                     foundprms.append(poltypeclasses) 
+    # STEP 5
     for poltypeclassesls in newpoltypeclasseslist:
         for poltypeclasses in poltypeclassesls:
             if poltypeclasses not in foundprms and poltypeclasses not in missingprms:
@@ -3271,23 +3339,32 @@ def FindPotentialMissingParameterTypes(poltype,prms,tinkerclassestopoltypeclasse
  
     return missingprms 
 
-
 def ConvertPoltypeClassesToIndices(poltype,missingprmtypes):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Function to convert poltypes types -> back into indices 
+    Input: Array of missing parameter types
+    Output: Array of indices matching poltype types  
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over array of poltype type arrays
+    2. Iterate over array of poltype types
+    3. Grab all possible atomic indices from poltype type number
+    4. Append indices to array of indices 
+    5. Generate all combinations of indices (multiple occurances of types in different parts of molecule)
     """
     missingprmindices=[]
+    # STEP 1
     for poltypeclasses in missingprmtypes:
         indices=[]
+        # STEP 2
         for poltypeclass in poltypeclasses:
+            # STEP 3
             keylist=GrabKeysFromValue(poltype,poltype.idxtosymclass,poltypeclass)
             keylist=[i-1 for i in keylist]
             indices.append(keylist)
+        # STEP 4
         missingprmindices.append(indices)
+    # STEP 5
     finallist=[]
     for indices in missingprmindices:
         combs = list(itertools.product(*indices))
@@ -3297,63 +3374,55 @@ def ConvertPoltypeClassesToIndices(poltype,missingprmtypes):
 
 def FilterIndices(poltype,potentialmissingprmindices,indices):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Remove potential missing opbend parameters unless they have a planar bond
+    Input: Array of bond indices for opbend, array of planar bond indices 
+    Output: Modified array of bond indices for opbend
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over array of opbend bond indices
+    2. Check if indices are in planar indices, if so append to new array
     """
     missingprmindices=[]
+    # STEP 1
     for prmindices in potentialmissingprmindices:
+        # STEP 2
         if list(prmindices) in indices:
             missingprmindices.append(prmindices)
     return missingprmindices
         
 
-def GrabTypeAndDescriptions(poltype,prmfile):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    elementmm3descriptomm3type={}
-    temp=open(prmfile,'r')
-    results=temp.readlines()
-    temp.close()
-    for line in results:
-        if 'atom' in line and 'piatom' not in line:
-            linesplit=line.split()    
-            newlinesplit=linesplit[1:-3]
-            mm3type=newlinesplit[0]
-            element=newlinesplit[1]
-            mm3descrip=' '.join(newlinesplit[2:])
-            ls=[element,mm3descrip]
-            elementmm3descriptomm3type[tuple(ls)]=mm3type
-    return elementmm3descriptomm3type 
-
-
 def DefaultOPBendParameters(poltype,missingopbendprmindices,mol,opbendbondindicestotrigonalcenterbools):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: For missing opbend parameters, assign default MM3 values
+    Input: Array of missing opbend parameter indices, mol object, dictionary of bond indices -> boolean if its trigonal center or not
+    Output: Array of opbend parameters, default values assigned used later for adding comments in key 
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over array of missing bond indices
+    2. Compute poltype types from current bond indices
+    3. Check if the b in a-b is trigonal center
+    4. If so, then if check if 3 neighbors (might be redundant) 
+    5. If carbon bonded to double bonded oxygen (carbonyl), then assign corresponding MM3 parameters
+    6. If nitro group, assign corresponding MM3 parameters
+    7. Otherwise assign very generic MM3 parameters for all other cases
     """
     newopbendprms=[]
     defaultvalues=[]
+    # STEP 1
     for opbendprmindices in missingopbendprmindices:
+        # STEP 2
         babelindices=[i+1 for i in opbendprmindices]
         poltypeclasses=[poltype.idxtosymclass[i] for i in babelindices]
         boolarray=opbendbondindicestotrigonalcenterbools[opbendprmindices]
+        # STEP 3
         if boolarray[1]==True:
             atomindex=int(babelindices[1])
             atom=mol.GetAtom(atomindex)
             neighbs=list(openbabel.OBAtomAtomIter(atom))
+            # STEP 4
             if len(neighbs)==3:
                 atomnum=atom.GetAtomicNum()
+                # STEP 5
                 if atomnum==6:
                     match=False
                     for natom in neighbs:
@@ -3367,6 +3436,7 @@ def DefaultOPBendParameters(poltype,missingopbendprmindices,mol,opbendbondindice
                         opbendvalue=round(1*71.94,2)
                     else:
                         opbendvalue=round(.2*71.94,2)
+                # STEP 6
                 elif atomnum==7:
                     count=0
                     for natom in neighbs:
@@ -3377,6 +3447,7 @@ def DefaultOPBendParameters(poltype,missingopbendprmindices,mol,opbendbondindice
                         opbendvalue=round(1.5*71.94,2)
                     else:
                         opbendvalue=round(.05*71.94,2)
+                # STEP 7
                 else:
                     opbendvalue=round(poltype.defopbendval*71.94,2)
 
@@ -3389,31 +3460,41 @@ def DefaultOPBendParameters(poltype,missingopbendprmindices,mol,opbendbondindice
 
 def WriteOutList(poltype,ls,filename):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Write out array to output file
+    Input: Array, output filename
+    Output: -
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over each item in list
+    2. Write out item to filename as new line
     """
     with open(filename, 'w') as filehandle:
+        # STEP 1
         for listitem in ls:
+            # STEP 2
             filehandle.write('%s\n' % listitem)
 
 def ReadTorsionList(poltype,filename):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Read back torsion list from output file
+    Input: filename containing missing torsions 
+    Output: Array of missing torsoins
+    Referenced By: poltype.py - GenerateParameters
+    Description:
+    1. Iterate over lines of file
+    2. Remove brackets and split string by comma into array
+    3. Convert items in array to integer and append list to list of list
     """
     newls=[]
     if os.stat(filename).st_size != 0:
         with open(filename, 'r') as filehandle:
+            # STEP 1
             for line in filehandle:
+                # STEP 2
                 current = line[:-1]
                 current=current.replace('[','').replace(']','')
                 current=current.split(',')
+                # STEP 3
                 current=[int(i) for i in current]
                 newls.append(current)
 
@@ -3422,11 +3503,14 @@ def ReadTorsionList(poltype,filename):
 
 def ReadTorTorList(poltype,filename):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Read tor-tor from output filename into array
+    Input: Output filename
+    Output: Array of missing tor-tor 
+    Referenced By: poltype.py - GenerateParameters
+    Description:
+    1. Iterate over lines of file
+    2. Remove brackets and split string by comma into array
+    3. Convert items in array to integer and append list to list of list
     """
     newls=[]
     if os.stat(filename).st_size != 0:
@@ -3441,20 +3525,23 @@ def ReadTorTorList(poltype,filename):
     return newls
 
 
-
 def ReadVdwList(poltype,filename):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Read missing vdw from filename
+    Input: Output filename of missing vdw atom indices
+    Output: Array of missing vdw atom indices
+    Referenced By: poltype.py - GenerateParameters
+    Description:
+    1. Iterate over lines in file
+    2. Convert string to integer and append to array
     """
     newls=[]
     if os.stat(filename).st_size != 0:
         with open(filename, 'r') as filehandle:
+            # STEP 1
             for line in filehandle:
                 current = line[:-1]
+                # STEP 2
                 newls.append(int(current))
 
     return newls
@@ -3462,35 +3549,49 @@ def ReadVdwList(poltype,filename):
 
 def CheckIfParametersExist(poltype,potentialmissingindices,prms):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: If a given opbend indices are not in given opbend parameters then it must be missing.
+    Input: Array of potential missing opbend indices, array of parameter lines
+    Output: Array of missing opbend parameter indices  
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over array of missing opbend indices
+    2. Convert indices -> poltype types
+    3. Iterate over lines in input parameter lines
+    4. Grab the types from parameter lines
+    5. If there is a match between types, then the parameters are determined to be found
+    6. If not found, append indices to array of missing opbend parameter indices
     """
     missingprmindices=[]
+    # STEP 1
     for indices in potentialmissingindices:
+        # STEP 2
         babelindices=[i+1 for i in indices]
         symtypes=[poltype.idxtosymclass[i] for i in babelindices]
         found=False
         symtypes=[str(i) for i in symtypes]
+        # STEP 3
         for prmline in prms:
             linesplit=prmline.split()
+            # STEP 4
             parms=[linesplit[1],linesplit[2]]
+            # STEP 5
             if parms[0]==symtypes[0] and parms[1]==symtypes[1]:
                found=True
+        # STEP 6
         if found==False:
             missingprmindices.append(indices)
     return missingprmindices
                 
 def WriteDictionaryToFile(poltype,dic,filename):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Write contents of dictionary (such as torsion types -> parameters for non-aromatic torsion ring refinement) to disk
+    Input: Dictoinary, filename
+    Output: - 
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
     Description: 
+    1. Dump dictionary to filename
     """
+    # STEP 1
     json.dump(dic, open(filename,'w'))        
 
 def ReadDictionaryFromFile(poltype,filename):
@@ -3498,7 +3599,7 @@ def ReadDictionaryFromFile(poltype,filename):
     Intent:
     Input:
     Output:
-    Referenced By: 
+    Referenced By: poltype.py - GenerateParameters
     Description: 
     """
     return json.load(open(filename))
@@ -3676,16 +3777,24 @@ def GrabKeysFromValue(poltype,dic,thevalue):
 
 def GrabAllPossibleMoleculeIndices(poltype,typeindices):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Grab all possible atomic indices that map to input type numbers
+    Input: Array of type numbers
+    Output: Array of atomic indices that map to input type numbers
+    Referenced By: MatchExternalSMARTSToMolecule
+    Description:
+    1. Iterate over each type number in input type array
+    2. Grab all atomic indices that correspond to the type number
+    3. Append to array
+    4. Generate all combinations of indices that map to type numbers
     """
     thelist=[]
+    # STEP 1
     for typenum in typeindices:
+        # STEP 2
         allindices=GrabKeysFromValue(poltype,poltype.idxtosymclass,typenum)
+        # STEP 3
         thelist.append(allindices)
+    # STEP 4
     listofmoleculeindices=list(itertools.product(*thelist))
 
 
@@ -3694,9 +3803,9 @@ def GrabAllPossibleMoleculeIndices(poltype,typeindices):
 
 def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,indextoneighbidxs,smartsatomordertotorvdwdb,torsionindicestoextsmarts=None):
     """
-    Intent:
-    Input:
-    Output:
+    Intent: Take database of external SMARTS for all parameter types and attempt to match to input molecule
+    Input: Rdkit mol object, dictionary of SMARTS + atom order -> parameters, dictionary of atom index -> neighboring atom indices, dictionary of SMARTS + atom order -> boolean if came from SMILES database or logical SMARTS database (in same file),  
+    Output: Dictionary of atomic indices (atom/bond/angle/torsion) -> SMARTS length , Dictionary of atomic indices -> SMARTS, Dictionary of atomic indices -> SMARTS + atom order , Dictionary of SMARTS + atom order -> parameters
     Referenced By: 
     Description: 
     """
@@ -4261,9 +4370,9 @@ def AddReverseKeys(poltype,tinkerclassestopoltypeclasses):
 
 def TinkerClassesToTrigonalCenter(poltype,opbendbondindicestotinkerclasses,opbendbondindicestotrigonalcenterbools):
     """
-    Intent:
-    Input:
-    Output:
+    Intent: Convert dictionary of opbend bond indices -> trigonal center to dictionary of opbend tinker classes -> trigional centers  
+    Input: Dictionary of opbend bond indices -> trigonal center
+    Output: Dictionary of opbend tinker classes -> trigional centers
     Referenced By: 
     Description: 
     """
