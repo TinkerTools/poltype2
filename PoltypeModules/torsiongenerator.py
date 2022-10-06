@@ -1957,7 +1957,7 @@ def FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotb
                     nitrogentwohydtor=True
                     triplet=tuple([rtd,rtc,rtb])
 
-            if (rtaatomicnum==1 and rtdatomicnum==1) or (allhydtors==False and allhydtorsoneside==False) and nitrogenhydtor==False and themaxrotbnds==1:
+            if (rtaatomicnum==1 or rtdatomicnum==1) and (allhydtors==False and allhydtorsoneside==False) and nitrogenhydtor==False and themaxrotbnds==1:
                 continue
             firstangle=inputmol.GetAngle(aatom,batom,catom)
             secondangle=inputmol.GetAngle(batom,catom,datom)
