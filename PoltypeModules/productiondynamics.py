@@ -64,11 +64,11 @@ def ExecuteProductionDynamics(poltype):
 
                cmdstr=ProductionDynamicsCommand(poltype,boxfilename,keyfilename,proddynsteps,ensemble,outputfilepath,dynamicpath,proddyntimestep,nvt)
                head,tail=os.path.split(outputfilepath)
-               shift,dynoutfiles=CheckLastNumberDynamicsStepsCompletedAllTimes(poltype,exception=tail)
+               shift,dynoutfiles=term.CheckLastNumberDynamicsStepsCompletedAllTimes(poltype,path,exception=tail)
                terminate,deletefile,error=term.CheckFileTermination(poltype,outputfilepath,float(poltype.proddynsteps[j]),False,True,shift)
                if terminate==False:
                    if os.path.exists(os.path.join(path,arcfilename)):
-                       stepstaken,dynoutfiles=CheckLastNumberDynamicsStepsCompletedAllTimes(poltype)
+                       stepstaken,dynoutfiles=term.CheckLastNumberDynamicsStepsCompletedAllTimes(poltype,path)
                        newfile=GenerateBackupDynFile(poltype,dynoutfiles)
                        shutil.copy(outputfilepath,newfile)
                        newstepstotake=int(proddynsteps)-stepstaken
@@ -724,9 +724,10 @@ def ProductionDynamicsProtocol(poltype):
                     percentfinished=checkfin[1]
             if poltype.generatepdbtrajs==True and poltype.complexation==True and i==0:
                 arcpaths,keypaths=GrabTinkerFiles(poltype)
-                liqarcpath=arcpaths[0][0][0]
-                pdbfilename=liqarcpath.replace('.arc','.pdb')
-                poltype.GeneratePDBFromARC(liqarcpath,pdbfilename)
+                if len(arcpaths[0][0])>0:
+                    liqarcpath=arcpaths[0][0][0]
+                    pdbfilename=liqarcpath.replace('.arc','.pdb')
+                    poltype.GeneratePDBFromARC(liqarcpath,pdbfilename)
 
 
         poltype.WriteToLog('System dynamics is complete ',prin=True)
@@ -836,53 +837,6 @@ def GrabEnergy(poltype,arcpath,keypath):
     stddevliqenergy=np.std(energyarray)/np.sqrt(np.size(energyarray))
 
     return avgliqenergy,stddevliqenergy
-
-def CheckLastNumberDynamicStepsCompleted(poltype,outputfilepath):
-   """
-   Intent:
-   Input:
-   Output:
-   Referenced By: 
-   Description: 
-   """
-
-   steps=0
-   if os.path.isfile(outputfilepath):
-       temp=open(outputfilepath,'r')
-       results=temp.readlines()
-       temp.close()
-       for line in results:
-           if 'Dynamics Steps' in line:
-               linesplit=line.split()
-               if linesplit[-3].isdigit():
-                   steps=int(linesplit[-3])
-       return steps
-   return steps
-
-
-def CheckLastNumberDynamicsStepsCompletedAllTimes(poltype,exception=None):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-
-    files=os.listdir()
-    total=0
-    dynoutfiles=[]
-    for f in files:
-        if exception!=None:
-            if f==exception:
-                continue
-        if '.out' in f:
-
-            stepstaken=CheckLastNumberDynamicStepsCompleted(poltype,f)
-            total+=stepstaken
-            dynoutfiles.append(f)
-
-    return total,dynoutfiles
 
 
 def GenerateBackupDynFile(poltype,dynoutfiles):

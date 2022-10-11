@@ -80,6 +80,7 @@ from operator import itemgetter
 
 @dataclass
 class PolarizableTyper():
+        needrot:bool=False
         heavyhyd:bool=False
         maxtorresnitrogen:int=1
         skipchargecheck:bool=False

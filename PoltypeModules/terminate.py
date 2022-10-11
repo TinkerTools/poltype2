@@ -174,10 +174,10 @@ def CheckFileTermination(poltype,f,steps=None,equil=False,firsttime=True,shift=0
                    if np.abs(ratio-tolratio)<.01:       
                        term=True
 
-                   if foundfilename==True and term==True:
-                       if not os.path.isfile(filepath): 
-
-                           term=False
+                   #if foundfilename==True and term==True:
+                   #    if not os.path.isfile(filepath): 
+                   #
+                   #        term=False
                    if term==True:
                        break
                except:
@@ -214,8 +214,10 @@ def CheckFilesTermination(poltype,outputfilepathlist,steps=None,equil=False,firs
             else:
                 truesteps=float(steps[i])
         else:
-            truesteps=steps   
-        terminate,deletefile,error=CheckFileTermination(poltype,outputfilepath,truesteps,equil,firsttime)
+            truesteps=steps  
+        head,tail=os.path.split(outputfilepath)
+        shift,dynoutfiles=CheckLastNumberDynamicsStepsCompletedAllTimes(poltype,head,exception=tail)
+        terminate,deletefile,error=CheckFileTermination(poltype,outputfilepath,truesteps,equil,firsttime,shift)
         if error==True:
             anyerrors=True
         if deletefile==True:
@@ -237,5 +239,51 @@ def CheckFilesTermination(poltype,outputfilepathlist,steps=None,equil=False,firs
         raise ValueError('Errors Detected in Output Files!')
     return finished,percentfinished
 
+
+def CheckLastNumberDynamicStepsCompleted(poltype,outputfilepath):
+   """
+   Intent:
+   Input:
+   Output:
+   Referenced By: 
+   Description: 
+   """
+
+   steps=0
+   if os.path.isfile(outputfilepath):
+       temp=open(outputfilepath,'r')
+       results=temp.readlines()
+       temp.close()
+       for line in results:
+           if 'Dynamics Steps' in line:
+               linesplit=line.split()
+               if linesplit[-3].isdigit():
+                   steps=int(linesplit[-3])
+       return steps
+   return steps
+
+
+def CheckLastNumberDynamicsStepsCompletedAllTimes(poltype,path,exception=None):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
+    files=os.listdir(path)
+    total=0
+    dynoutfiles=[]
+    for f in files:
+        if exception!=None:
+            if f==exception:
+                continue
+        if '.out' in f:
+            stepstaken=CheckLastNumberDynamicStepsCompleted(poltype,os.path.join(path,f))
+            total+=stepstaken
+            dynoutfiles.append(f)
+
+    return total,dynoutfiles
 
 

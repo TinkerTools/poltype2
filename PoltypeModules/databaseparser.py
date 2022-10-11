@@ -3596,75 +3596,28 @@ def WriteDictionaryToFile(poltype,dic,filename):
 
 def ReadDictionaryFromFile(poltype,filename):
     """
-    Intent:
-    Input:
-    Output:
+    Intent: Read dictionary of torsion -> torsion parameter guess for non-aromatic ring refinement
+    Input: Filename to read in dictionary values
+    Output: Dictionary of torsion -> parameter transfer from database
     Referenced By: poltype.py - GenerateParameters
     Description: 
+    1. Load dictionary from file
     """
     return json.load(open(filename))
-
-def GenerateSMARTSMatchLine(poltype,rdkitmol,rdkitindex):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    smarts=rdmolfiles.MolToSmarts(rdkitmol)
-    smartsmol=Chem.MolFromSmarts(smarts)
-    matches=rdkitmol.GetSubstructMatches(smartsmol)
-    for match in matches:
-        lastmatch=match
-    lastindex=lastmatch.index(rdkitindex)
-    atomorder=lastindex+1
-    string='%'+' '+smarts+' % '+str(atomorder)
-    return string
-
-def GenerateAtomSMARTSMap(poltype,rdkitmol):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    lines=[]
-    descrip='"%s"'% poltype.molecprefix
-    for atom in rdkitmol.GetAtoms():
-        atomidx=atom.GetIdx()
-        symbol=atom.GetSymbol()
-        string=GenerateSMARTSMatchLine(poltype,rdkitmol,atomidx)
-        line=' '+symbol+' '+descrip+' '+string+'\n'
-        lines.append(line)
-    return lines        
-
-def AppendToSMARTSMapFile(poltype,lines,filename):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    temp=open(filename,'a')
-    for line in lines:
-        temp.write(line)
-    temp.close()
-
-
-
 
 
 
 def ReadExternalDatabase(poltype):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Read database of SMARTS for all parameters (supersedes all other databases)
+    Input: -
+    Output: For each parameter type, a dictionary of SMARTS + atom order in SMARTS -> parameters
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
     Description: 
+    1. Iterate over lines of database file
+    2. Determine if in first part of database (logical SMARTS only) or second part SMILES + atom order only
+    3. Determine the keyword (which parameter type) and also the SMARTS + atom order and the parameters
+    4. Based on keyword put SMARTS + atom order and parameters in appropriate dictionary, tor-tor requires extra formatting due to the nature of how syntax is when you input it into the keyfile
     """
     temp=open(poltype.externalparameterdatabase,'r')
     results=temp.readlines()
@@ -3679,14 +3632,17 @@ def ReadExternalDatabase(poltype):
     opbendsmartsatomordertoparameters={}
     vdwsmartsatomordertoparameters={}
     founddelim=False
+    # STEP 1
     for line in results:
         linesplit=line.split()
         if len(linesplit)==0:
             continue
+        # STEP 2
         if 'DELIM' in line:
             founddelim=True
         if linesplit[0]=='#':
             continue
+        # STEP 3
         keyword=linesplit[0]
         linesplit=linesplit[1:]
         newline=' '.join(linesplit)
@@ -3699,6 +3655,7 @@ def ReadExternalDatabase(poltype):
         prmstringlist=prmstring.split(',')
         prmlist=[float(i) for i in prmstringlist] 
         smartsatomorder=tuple([smarts,atomorderlist])
+        # STEP 4
         if keyword=='bond':
             bondsmartsatomordertoparameters[smartsatomorder]=prmlist
         elif keyword=='angle':
@@ -3728,21 +3685,27 @@ def ReadExternalDatabase(poltype):
 
 def ConvertToPoltypeClasses(poltype,torsionsmissing):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Convert missing torsion in atom indices to atom types instead 
+    Input: Array of missing torsions (in atomic indices)
+    Output: Array of missing torsions (in atomic types) 
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over torsions in array of missing torsions
+    2. Use canonical algorithm for determining a and d for representing the torsions around bond b-c
+    3. Convert atomic indices to atomic types and append to array of missing torsion types 
     """
     newtorsionsmissing=[]
+    # STEP 1
     for sublist in torsionsmissing:
         newsublist=[i+1 for i in sublist]
         a,b,c,d=newsublist[:]
         batom=poltype.mol.GetAtom(b)
         catom=poltype.mol.GetAtom(c)
+        # STEP 2
         aatom,datom = torgen.find_tor_restraint_idx(poltype,poltype.mol,batom,catom)
         newa=aatom.GetIdx()
         newd=datom.GetIdx()
+        # STEP 3
         sorttor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[a],poltype.idxtosymclass[b],poltype.idxtosymclass[c],poltype.idxtosymclass[d]])
         newsorttor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[newa],poltype.idxtosymclass[b],poltype.idxtosymclass[c],poltype.idxtosymclass[newd]])
 
@@ -3806,8 +3769,17 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
     Intent: Take database of external SMARTS for all parameter types and attempt to match to input molecule
     Input: Rdkit mol object, dictionary of SMARTS + atom order -> parameters, dictionary of atom index -> neighboring atom indices, dictionary of SMARTS + atom order -> boolean if came from SMILES database or logical SMARTS database (in same file),  
     Output: Dictionary of atomic indices (atom/bond/angle/torsion) -> SMARTS length , Dictionary of atomic indices -> SMARTS, Dictionary of atomic indices -> SMARTS + atom order , Dictionary of SMARTS + atom order -> parameters
-    Referenced By: 
-    Description: 
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. If already matched torsion external SMARTS and trying to match vdw SMARTS, only match vdw SMARTS consistent with vdw from torsion SMARTS (make an array of SMARTS that only has matches from torsion parameters)
+    2. Iterate over dictionary of SMARTS+atom orders
+    3. Try to match only vdw from torsion matches in DrugBank database set
+    4. If logical SMARTS (above the database from DrugBank in file), then if not exact match, skip (where as from DrugBank molecules dont need exact match, only torsion+neighbors etc)
+    5. Try to match the maximum common substructure between DrugBank SMILES and input molecule to input molecule and generate map from index in max common substructure SMARTS -> atom index in input molecule
+    6. Based on that map and input atom order asscoiated with DrugBank smiles, determine if all atom indices in input molecule (for torsion or vdw) exist in that match
+    7. Now determine if all neighbors exist in the SMARTS match also, otherwise its not "transferable" enough
+    8. If SMARTS (logical smarts exact match) or SMILES from DrugBank matches input indices+neighbors, then append match and parameters and SMARTS to dictionaries 
+    9. Want to ensure that  
     """
     indicestoextsmartsmatchlength={}
     indicestoextsmarts={}
@@ -3819,22 +3791,25 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
     indicestoprmlist={}
     restrictedsmarts=[]
     failedmatches=[]
-    if poltype.quickdatabasesearch==False:
+    if poltype.quickdatabasesearch==False: # debugging keyword 
+        # STEP 1
         if torsionindicestoextsmarts!=None:
             for torsionindices,extsmarts in torsionindicestoextsmarts.items():
                 if extsmarts not in restrictedsmarts:
                     restrictedsmarts.append(extsmarts)
         listsmartsatomordertoparameters=list(smartsatomordertoparameters.keys())
+        # STEP 2
         for k in tqdm(range(len(listsmartsatomordertoparameters)),desc='Searching SMARTS database'):
             smartsatomorder=listsmartsatomordertoparameters[k]
             parameters=smartsatomordertoparameters[smartsatomorder]
             smarts=smartsatomorder[0]
             fromtorvdwdb=smartsatomordertotorvdwdb[smartsatomorder]
             atomorderlist=smartsatomorder[1]
+            # STEP 3
             if len(restrictedsmarts)!=0:
-                if smarts not in restrictedsmarts and fromtorvdwdb==True:
+                if smarts not in restrictedsmarts and fromtorvdwdb==True: # try to keep vdw matches consistent with torsion matches in DrugBank testing set
                     continue
-            if (len(restrictedsmarts)==0 and len(atomorderlist)==1)and fromtorvdwdb==True:
+            if (len(restrictedsmarts)==0 and len(atomorderlist)==1) and fromtorvdwdb==True:
                 continue 
             substructure = Chem.MolFromSmarts(smarts)
             mols = [rdkitmol,substructure]
@@ -3843,13 +3818,15 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
             smartsmcs=res.smartsString
             diditmatch=False
             diditmatchexactly=rdkitmol.HasSubstructMatch(substructure)
+            # STEP 4
             if fromtorvdwdb==False and diditmatchexactly==False:
                 continue
             if atomnum>=len(atomorderlist):
-
+                # STEP 5
                 mcssubstructure = Chem.MolFromSmarts(smartsmcs)
                 mcsmatches=substructure.GetSubstructMatches(mcssubstructure)
                 if len(mcsmatches)>0:
+                    # STEP 6
                     mcsmatch=mcsmatches[0]
                     mcsindices=list(range(len(mcsmatch)))
                     mcssmartsindextosmartsmolindex=dict(zip(mcsindices,mcsmatch)) 
@@ -3860,6 +3837,7 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                         if i not in mcssmartsindextosmartsmolindex.values():
                             foundindices=False
                     if foundindices==True:
+                        # STEP 7
                         matches=rdkitmol.GetSubstructMatches(mcssubstructure)
                         if len(matches)>0:
                             thematch=matches[0]
@@ -3905,8 +3883,9 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                                     cisinring=catombabel.IsInRing()
                                     bhyb=batombabel.GetHyb()
                                     chyb=catombabel.GetHyb()
-                                    if (bisinring==True and cisinring==True) and (bhyb==2 and chyb==2):
+                                    if (bisinring==True and cisinring==True) and (bhyb==2 and chyb==2): # dont transfer to SP2 torsion from database, let this case be handled by benzene transfer (easier to understand in output file also)
                                         continue
+                                # STEP 8
                                 if moleculeindices not in indicestosmartslist.keys():
                                     indicestosmartslist[moleculeindices]=[]
                                     indicestomatchlist[moleculeindices]=[]
@@ -3941,7 +3920,7 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                     if smarts not in rotatablebondtosmartslist[rotbnd]:
                         rotatablebondtosmartslist[rotbnd].append(smarts)
         rotatablebondtotruesmartslist={}
-        for rotbnd,allsmartslist in rotatablebondtosmartslist.items():
+        for rotbnd,allsmartslist in rotatablebondtosmartslist.items(): # all SMARTS matches per rot bnd
             for smarts in allsmartslist:
                 allin=True
                 for moleculeindices,smartslist in indicestosmartslist.items():
@@ -3955,7 +3934,7 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                        else:
                            otherrotbnd=[b,c] 
                        otherrotbnd=tuple(otherrotbnd)
-                       if rotbnd==otherrotbnd: 
+                       if rotbnd==otherrotbnd: # if same rotbond and found other match not in  
                            if smarts not in smartslist:
                                allin=False
                 if allin==True: 
