@@ -13,6 +13,42 @@ import shutil
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = torchani.models.ANI2x(periodic_table_index=True).to(device)
 
+def GenerateMOLObject(xyzfile):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
+    obConversion = openbabel.OBConversion()
+    mol = openbabel.OBMol()
+    obConversion.SetInFormat('xyz')
+    obConversion.ReadFile(mol,xyzfile)
+    return mol
+
+
+def BabelCoordsAtomicNums(mol):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    atomvecls=[]
+    atomicnums=[]
+    iteratombab = openbabel.OBMolAtomIter(mol)
+    for atm in iteratombab:
+        atmindex=atm.GetIdx()
+        coords=[atm.GetX(),atm.GetY(),atm.GetZ()]
+        atomvecls.append(coords)
+        atomicnum=atm.GetAtomicNum()
+        atomicnums.append(atomicnum)
+
+    return atomvecls,atomicnums
+
 
 
 def GenerateSpeciesAndCoordinatesForANI(xyzfile):
