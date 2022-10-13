@@ -3779,7 +3779,9 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
     6. Based on that map and input atom order asscoiated with DrugBank smiles, determine if all atom indices in input molecule (for torsion or vdw) exist in that match
     7. Now determine if all neighbors exist in the SMARTS match also, otherwise its not "transferable" enough
     8. If SMARTS (logical smarts exact match) or SMILES from DrugBank matches input indices+neighbors, then append match and parameters and SMARTS to dictionaries 
-    9. Want to ensure that  
+    9. Organize SMARTS in dictionaries around rotatable bond (if multiple matches were found), then want to choose matches that are largest == more transferable
+    10. Choose best smarts match by longest length
+    11. Input the best SMARTS match into dictionaries, if another atomic indices pair has same type, then also add matches for those indices too  
     """
     indicestoextsmartsmatchlength={}
     indicestoextsmarts={}
@@ -3902,6 +3904,7 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                                     indicestoprmlist[moleculeindices].append(parameters)
             else:
                 failedmatches.append(smarts)
+        # STEP 9
         rotatablebondtosmartslist={}
         for moleculeindices,smartslist in indicestosmartslist.items():
             if len(moleculeindices)==4: 
@@ -3920,7 +3923,7 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                     if smarts not in rotatablebondtosmartslist[rotbnd]:
                         rotatablebondtosmartslist[rotbnd].append(smarts)
         rotatablebondtotruesmartslist={}
-        for rotbnd,allsmartslist in rotatablebondtosmartslist.items(): # all SMARTS matches per rot bnd
+        for rotbnd,allsmartslist in rotatablebondtosmartslist.items(): # this section appears to be redundant
             for smarts in allsmartslist:
                 allin=True
                 for moleculeindices,smartslist in indicestosmartslist.items():
@@ -3942,7 +3945,7 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                         rotatablebondtotruesmartslist[rotbnd]=[]
                     if smarts not in rotatablebondtotruesmartslist[rotbnd]:
                         rotatablebondtotruesmartslist[rotbnd].append(smarts)
-
+        # STEP 10
         rotatablebondtotruesmarts={}
         for rotbnd,smartslist in rotatablebondtotruesmartslist.items():
             smartslistlen=[len(i) for i in smartslist]
@@ -3982,7 +3985,7 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
                if thesmarts==maxsmarts: 
                    break
 
-
+           # STEP 11
            smarts=maxsmarts
            matcharray=indicestomatchlist[moleculeindices][j]
            smartsatomorder=indicestoatomorderlist[moleculeindices][j]
@@ -4003,19 +4006,23 @@ def MatchExternalSMARTSToMolecule(poltype,rdkitmol,smartsatomordertoparameters,i
 
 def CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,indicestoextsmartsmatchlength,indicesforprmtoparametersmarts,indicesforprmtosmarts,indicestoextsmarts,indicesforprmtomatchallneighbs,indicestoextsmartsatomorders):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: If have amoeba09 match and match from external smarts, then just use match from external database
+    Input: dictionary of atomic indices -> SMARTS match length, dictionary of atomic indices -> amoeba09 SMILES , dictionary of atomic indices -> SMARTS that matches to input molecule and amoeba09 SMILES , dicionary of atomic indices -> SMARTS matches from external database, dictionary of atomic indices for amoeba09 matches -> boolean if it matched all neighbors , dictionary of atomic indices -> external SMARTS database matches + atom order
+    Output: modified dictionary of atomic indices -> amoeba09 SMILES  , modified dictionary of atomic indices -> SMARTS that matches to input molecule and amoeba09 SMILES , modified dicionary of atomic indices -> SMARTS matches from external database , modified dictionary of atomic indices -> external SMARTS database matches + atom order
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over dicionary of atomic indices -> external SMARTS match length
+    2. If there is also a match in amoeba09 database for those atomic indices
+    3. Remove indices from amoeba09 matches dictionary 
     """
     newindicestoextsmarts={}
     newindicestoextsmartsatomorder={}
+    # STEP 1
     for indices,extsmartsmatchlength in indicestoextsmartsmatchlength.items():
+        # STEP 2
         if indices in indicesforprmtoparametersmarts.keys():
             smartsls=indicesforprmtosmarts[indices]
             smarts=smartsls[0]
-            matchallneighbs=indicesforprmtomatchallneighbs[indices]
             if indices in indicestoextsmartsatomorders.keys():
                 smartsatomorder=indicestoextsmartsatomorders[indices]
                 extsmarts=indicestoextsmarts[indices]
@@ -4025,6 +4032,7 @@ def CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,indicestoextsmartsm
             poormatch=True
             substructure = Chem.MolFromSmarts(smarts)
             substructurenumatoms=substructure.GetNumAtoms()
+            # STEP 3
             if extsmartsmatchlength>substructurenumatoms or poormatch==True:
                 del indicesforprmtosmarts[indices]
                 del indicesforprmtoparametersmarts[indices]
@@ -4033,7 +4041,7 @@ def CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,indicestoextsmartsm
         elif indices[::-1] in indicesforprmtoparametersmarts.keys():
             smartsls=indicesforprmtosmarts[indices[::-1]]
             smarts=smartsls[0]
-            matchallneighbs=indicesforprmtomatchallneighbs[indices[::-1]]
+            # STEP 3
             if indices[::-1] in indicestoextsmartsatomorders.keys():
                 smartsatomorder=indicestoextsmartsatomorders[indices[::-1]]
                 extsmarts=indicestoextsmarts[indices[::-1]]
@@ -4054,21 +4062,29 @@ def CompareParameterSMARTSMatchToExternalSMARTSMatch(poltype,indicestoextsmartsm
 
 def AddExternalDatabaseSMARTSMatchParameters(poltype,prms,indicestoextsmarts,smartsatomordertoparameters,keyword,indicestoextsmartsatomorder,smartsatomordertogrid=None):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: If match exists for atomic indices from external SMARTS database, then take those parameters and update them in array of parameter lines (previous array of parameter lines would have been from amoeba09)
+    Input: Array of parameter lines, dictionary of atomic indices -> SMARTS from external database, dictionary of SMARTS + atom order -> parameters , keyword (need to add extra info depending on if opbend, torsion or tor-tors matches), dictionary of atom ic indices to SMARTS + atom order from external database, dictionary of SMARTS + atom order -> dihedral angle energy grid (for tor-tor) 
+    Output: Modified array of parameter lines , dictionary of poltype types -> SMARTS + atom order from external database
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over dictionary of indices -> SMARTS matches
+    2. Iterate over dictionary of SMARTS + atom order -> parameters
+    3. If same SMARTS and atoms matching in SMARTS then 
+    4. Construct parameter line based on keyword (tinker has specific format for each keyword)
+    5. Add modified parameter line to array of parameter lines, also append match information to dictionary of poltype types -> SMARTS + atom order from external database
     """
     poltypeclassestosmartsatomordersext={}
+    # STEP 1
     for indices,extsmarts in indicestoextsmarts.items():
         thesmartsatomorder=indicestoextsmartsatomorder[indices]
         theatomorder=thesmartsatomorder[1]
+        # STEP 2
         for smartsatomorder,parameters in smartsatomordertoparameters.items():
             smarts=smartsatomorder[0]
             atomorder=smartsatomorder[1]
-            
+            # STEP 3       
             if smarts==extsmarts and atomorder==theatomorder:
+                # STEP 4
                 line=keyword+' '
                 babelindices=[i+1 for i in indices]
                 poltypeclasses=[poltype.idxtosymclass[i] for i in babelindices]
@@ -4102,68 +4118,65 @@ def AddExternalDatabaseSMARTSMatchParameters(poltype,prms,indicestoextsmarts,sma
                
                     for prm in parameters:
                         line+=str(prm)+' '
-                    line+='\n' 
+                    line+='\n'
+                # STEP 5 
                 prms.append(line)
 
                 poltypeclassestosmartsatomordersext[tuple([tuple(poltypeclasses)])]=smartsatomorder
     return prms,poltypeclassestosmartsatomordersext
 
 
-def FilterBondSMARTSEnviorment(poltype,bondindicestosmartsatomorders,bondindicestotinkerclasses):
+def ExtractOpbendFromBond(poltype,bondindicestosmartsatomorders,bondindicestotinkerclasses):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Convert dictionaries of bond indices -> SMARTS atom order to dictionaries of opbend indices -> SMARTS atom order and opbend indices -> tinker classes
+    Input: Dictionaries of bond indices -> SMARTS atom order, dictionary of bond indices -> tinker classes
+    Output: opbebd indices -> tinker classes, opbend indices -> SMARTS + atom orders 
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
     Description: 
+    1. Iterate over dictionary of bond indices -> SMARTS + atom orders
+    2. Extract tinker classes to add to dictionary of indices -> tinker classes 
+    3. Opbend is directionally important depending on which atom is trigonal center , so add bond indices + reverse and will check later which one is needed for opbend (second atom should be trigonal center)
     """
     opbendbondindicestosmartsatomorders={}
     opbendbondindicestotinkerclasses={}
+    # STEP 1
     for bondindices,smartsatomorders in bondindicestosmartsatomorders.items(): 
         smarts=smartsatomorders[0]
-        brackcount=CountBrackets(poltype,smarts)
         revbondindices=bondindices[::-1]
-        if brackcount==2:
-            pass
-        else:
-            temp=bondindicestotinkerclasses[bondindices]
-            revtemp=temp[::-1]
-            opbendbondindicestotinkerclasses[bondindices]=temp
-            opbendbondindicestotinkerclasses[revbondindices]=revtemp
-            opbendbondindicestosmartsatomorders[bondindices]=smartsatomorders 
-            opbendbondindicestosmartsatomorders[revbondindices]=smartsatomorders 
+        # STEP 2
+        temp=bondindicestotinkerclasses[bondindices]
+        revtemp=temp[::-1]
+        # STEP 3
+        opbendbondindicestotinkerclasses[bondindices]=temp
+        opbendbondindicestotinkerclasses[revbondindices]=revtemp
+        opbendbondindicestosmartsatomorders[bondindices]=smartsatomorders 
+        opbendbondindicestosmartsatomorders[revbondindices]=smartsatomorders 
 
     return opbendbondindicestotinkerclasses,opbendbondindicestosmartsatomorders
 
-def CountBrackets(poltype,string):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    count=0
-    for e in string:
-        if e=='[':
-            count+=1
-    return count
 
 def CheckTrigonalCenters(poltype,listofbondsforprm,mol):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Determine which of the possible opbend bond indices orientiation are trigonal centers ( need to know to put in correct format in the keyfile) 
+    Input: List of bonds in input molecule, mol object
+    Output: opbend bond indices -> boolean of which atoms in the bond are trigonal centers
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
     Description: 
+    1. Iterate over all bonds in input molecule 
+    2. Iterate over all atoms in bond
+    3. If SP2 atom and also have 3 neighbors then it is a trigonal center (except if amine which may accidentally have hydrogens in plane and babel might think its SP2).
+    4. Append array of booleans to dictionary 
     """
     opbendbondindicestotrigonalcenterbools={}
+    # STEP 1
     for bondindices in listofbondsforprm:
         bondindices=tuple(bondindices)
         boolarray=[]
         babelindices=[i+1 for i in bondindices]
-        atoms=[mol.GetAtom(i) for i in babelindices]     
+        atoms=[mol.GetAtom(i) for i in babelindices]    
+        # STEP 2 
         for a in atoms:
+            # STEP 3
             hyb=a.GetHyb()
             numhyds=0
             neighbs=list(openbabel.OBAtomAtomIter(a))
@@ -4181,6 +4194,7 @@ def CheckTrigonalCenters(poltype,listofbondsforprm,mol):
                     boolarray.append(True)
             else:
                 boolarray.append(False)
+        # STEP 4
         opbendbondindicestotrigonalcenterbools[bondindices]=boolarray
         revboolarray=boolarray[::-1]
         revbondindices=bondindices[::-1]
@@ -4190,16 +4204,22 @@ def CheckTrigonalCenters(poltype,listofbondsforprm,mol):
 
 def CorrectPitorEnergy(poltype,torsionprms,torsiontopitor):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: If input torsion parameters also have pitor from amoeba09 (term no longer used for aromatic torsion), then want to add contribution of pitor back to the second torsion term instead of including pitor in the key file
+    Input: Array of torsion parameters lines, dictionary of torsion parameter line -> pitor line (if there was match)
+    Output: Modified array of torsion parameter lines
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
     Description: 
+    1. Determine how many times the middle bond in torsion occurs out of all pitor matches, will use this to determine how many torsion will partition the pitor parameter into and add evenly to each torsion around bond.
+    2. Iterate over each line in torsion parameter array
+    3. Grab pitorsion line that corresponds to match in dictionary (if that torsion has a match)
+    4. Take pitor parameter and divide it by the number of torsions that occur around bond
+    5. Modify the torsion parameter line second parameter (dominant in SP2 torsions) with addition of pitor 
+     
     """
     newtorsionprms=[]
     torsiontocount={}
     middletocount={}
-     
+    # STEP 1 
     for torsion in torsiontopitor.keys():
         middle=tuple([torsion[1],torsion[2]])
         if middle not in middletocount.keys():
@@ -4209,10 +4229,12 @@ def CorrectPitorEnergy(poltype,torsionprms,torsiontopitor):
         middle=tuple([torsion[1],torsion[2]])
         count=middletocount[middle]
         torsiontocount[torsion]=count
+    # STEP 2
     for torline in torsionprms:
         torlinesplit=torline.split()
         tor=tuple([int(torlinesplit[1]),int(torlinesplit[2]),int(torlinesplit[3]),int(torlinesplit[4])])
         if tor in torsiontopitor:
+            # STEP 3
             if tor in torsiontopitor.keys():
                 pitorline=torsiontopitor[tor]
             else:
@@ -4220,9 +4242,11 @@ def CorrectPitorEnergy(poltype,torsionprms,torsiontopitor):
 
             count=torsiontocount[tor]
             pitorlinesplit=pitorline.split()
+            # STEP 4
             prm=float(pitorlinesplit[3])/count
             torprm=float(torlinesplit[8])
             newtorprm=prm+torprm
+            # STEP 5
             torlinesplit[8]=str(newtorprm)
         torline=' '.join(torlinesplit)+'\n'
         newtorsionprms.append(torline)
@@ -4231,14 +4255,21 @@ def CorrectPitorEnergy(poltype,torsionprms,torsiontopitor):
 
 def FindMissingParameters(poltype,indicestosmartsatomorders,rdkitmol,mol,indextoneighbidxs):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Determine if parameters are missing for bond, angle or vdw via if SMARTS matches neighbors or not
+    Input: Dictionary of atomic indices -> SMARTS + atom order, rdkit mol object, openbabel mol object, dictionary of atomic index -> neighboring atomic indices 
+    Output: Array of missing atomic indices for either, bond, angle or vdw
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over dictionary of atomic indices -> SMARTS + atom order
+    2. If vdw and valance ==1 (like hydrogen), then grab neighbors of neighbors, else just grab neighbors of indices (otherwise not enough information to check if hydrogen match is transferable just by neighboring atom)
+    3. Match the SMARTS to input molecule and check if at a minimum the atomic indices exist in match
+    4. If so, also check if all neighboring indices exist in the match.
+    5. If not then add to array of missing indices (special case if user specifies to only determine certain atoms as missing vdw) (fragmenter uses this when want fragment job for only vdw dimer QM of certain atom)  
     """
     missing=[]
+    # STEP 1
     for indices,smartsatomorders in indicestosmartsatomorders.items():
+        # STEP 2
         nindexes=[]
         for idx in indices: 
             neighborindexes=indextoneighbidxs[idx]
@@ -4252,6 +4283,7 @@ def FindMissingParameters(poltype,indicestosmartsatomorders,rdkitmol,mol,indexto
                             nindexes.append(nnidx) 
         smarts=smartsatomorders[0]
         substructure = Chem.MolFromSmarts(smarts)
+        # STEP 3
         matches=rdkitmol.GetSubstructMatches(substructure)
         for match in matches:
             allin=True
@@ -4262,8 +4294,9 @@ def FindMissingParameters(poltype,indicestosmartsatomorders,rdkitmol,mol,indexto
                 matcharray=match
                 break
 
-         
+        # STEP 4 
         check=CheckIfNeighborsExistInSMARTMatch(poltype,nindexes,matcharray)
+        # STEP 5
         if check==False or '*' in smarts or '~' in smarts:
             if len(indices)==1: # vdw
                 index=indices[0]
@@ -4282,25 +4315,28 @@ def FindMissingParameters(poltype,indicestosmartsatomorders,rdkitmol,mol,indexto
                     missing.append(indices)
 
 
-
-
-
     return missing
 
 def ReduceMissingVdwByTypes(poltype,vdwmissing):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: If vdw missing for atoms of same type, just choose one to keep as missing (will use later in fragmenter if user specifies to generate dimer QM)
+    Input: Array of missing vdw atom indices 
+    Output: Modified array of missing vdw atom indices 
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over array of missing vdw atom indices
+    2. For each atom index, determine type number and append to an array
+    3. If the same type has already occured in array, then skip atom index, else append atom index to new array of missing vdw atom indices 
     """
     reducedvdwmissing=[]
     typesfound=[]
+    # STEP 1
     for vdwarray in vdwmissing:
         vdwatomidx=vdwarray[0]
         vdwbabelidx=vdwatomidx+1
+        # STEP 2
         vdwtype=poltype.idxtosymclass[vdwbabelidx]
+        # STEP 3
         if vdwtype in typesfound:
             continue
         else:
@@ -4312,14 +4348,18 @@ def ReduceMissingVdwByTypes(poltype,vdwmissing):
 
 def ConvertToBabelList(poltype,listforprm):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: just convert rdkit indices -> babel indices for bond and angle list
+    Input: Array of bond or angles in molecule
+    Output: Array of bond or angles with shifted indices (add +1)
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over each bond or angle in list of bonds/angles
+    2. Shift indices by +1 and append to new array 
     """
     babellist=[]
+    # STEP 1
     for ls in listforprm:
+        # STEP 2
         babells=[i+1 for i in ls]
         babellist.append(babells)
 
@@ -4329,14 +4369,18 @@ def ConvertToBabelList(poltype,listforprm):
 
 def AddReverseKeys(poltype,tinkerclassestopoltypeclasses):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: For opbend tinker classes -> poltype classes , add reverse keys until determine which orientation is correct (opbend needs second class to be trigonal center) 
+    Input: opbend tinker classes -> poltype classes
+    Output: New dictionary of tinker classes -> poltype classes 
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
     Description: 
+    1. Iterate over dictionary of opbend tinker classes -> poltype classes
+    2. Take the reverse of the tinker classes key and append both to new dictionary 
     """
     newtinkerclassestopoltypeclasses={}
+    # STEP 1
     for tinkerclasses,poltypeclasses in tinkerclassestopoltypeclasses.items():
+        # STEP 2
         revtinkerclasses=tinkerclasses[::-1]
         revpoltypeclasses=[]
         for ls in poltypeclasses:
@@ -4352,12 +4396,18 @@ def TinkerClassesToTrigonalCenter(poltype,opbendbondindicestotinkerclasses,opben
     Intent: Convert dictionary of opbend bond indices -> trigonal center to dictionary of opbend tinker classes -> trigional centers  
     Input: Dictionary of opbend bond indices -> trigonal center
     Output: Dictionary of opbend tinker classes -> trigional centers
-    Referenced By: 
-    Description: 
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over dictionary of opbend bond indices -> tinker classes
+    2. Determine the array of trigonal center booleans from input dictionary and bond indices
+    3. Save boolean array in new dictionary with tinker classes as the key 
     """
     opbendtinkerclassestotrigonalcenterbools={}
+    # STEP 1
     for bondindices,tinkerclasses in opbendbondindicestotinkerclasses.items():
+        # STEP 2
         boolarray=opbendbondindicestotrigonalcenterbools[bondindices]
+        # STEP 3
         opbendtinkerclassestotrigonalcenterbools[tuple(tinkerclasses)]=boolarray
         revtinkerclasses=tinkerclasses[::-1]
         revboolarray=boolarray[::-1]
@@ -4368,31 +4418,41 @@ def TinkerClassesToTrigonalCenter(poltype,opbendbondindicestotinkerclasses,opben
 
 def FilterDictionaries(poltype,dics,ls):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Remove keys in input list of dictionaries that are not in input list (want only planar bonds in dictionary for opbend)
+    Input: List of dictionaries for opbend, list of planar bond indices 
+    Output: Modified array of dictionaries
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
     Description: 
+    1. Iterate over array of dictionaries  
+    2. For each key in dictionary if key is not in input list of keys then dont add to new dictionary
+    3. Append new dictionary to new array of dictionaries 
     """
     newdics=[]
+    # STEP 1
     for dic in dics:
         newdic={}
+        # STEP 2
         for key,value in dic.items():
             if key in ls:
                 newdic[key]=value
+        # STEP 3
         newdics.append(newdic)
     return newdics
 
 def ConvertListOfListToListOfTuples(poltype,listoflist):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Sometimes need tuple for adding to dictionary keys, do this for planar bonds 
+    Input: List of planar bonds ( a list) 
+    Output: List of tuples
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
     Description: 
+    1. Iterate over list of list
+    2. Convert list to tuple and append to new array 
     """
     listoftuples=[]
+    # STEP 1
     for item in listoflist:
+        # STEP 2
         tup=tuple(item)
         listoftuples.append(tup)
     return listoftuples
@@ -4400,16 +4460,20 @@ def ConvertListOfListToListOfTuples(poltype,listoflist):
 
 def AddExternalDatabaseMatches(poltype, indicestosmartsatomorder,extindicestoextsmarts,smartsatomordertoparameters):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Add matches from external SMARTS database for vdw to dictionary of atom index > SMARTS + atom order (which originally only had amoeba09 SMARTS matches). 
+    Input: dictionary of atom index > SMARTS + atom order , dictionary of atom indices -> SMARTS from external database match, dictionary of SMARTS + atom order -> parameters from external datbase match
+    Output: modified dictionary of atom index > SMARTS + atom order
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over dictionary of SMARTS + atom order -> parameters from external database match
+    2. If find match in atom indices -> SMARTS from external database, then add atom indices and SMARTS to dictionary of atom index > SMARTS + atom order
     """
     newindicestosmartsatomorder=indicestosmartsatomorder.copy()
+    # STEP 1
     for smartsatomorder in smartsatomordertoparameters.keys():
         smarts=smartsatomorder[0]
         for indices,extsmarts in extindicestoextsmarts.items():
+            # STEP 2
             if smarts==extsmarts:
                 newindicestosmartsatomorder[indices]=list(smartsatomorder)         
         
@@ -4417,11 +4481,12 @@ def AddExternalDatabaseMatches(poltype, indicestosmartsatomorder,extindicestoext
    
 def AngleGuess(poltype,ita,itb,itc,iva,ivb,ivc):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: If missing angle parameters, want to assign generic values based on element and valence (from tinker program valence)
+    Input: Atomic numbers for three atoms, valencies for three atoms 
+    Output: Angle force constant parameter guess
+    Referenced By: AssignAngleGuessParameters
+    Description:
+    1. Copied special cases from valence program in tinker 
     """
     radian=57.29577951
     angunit = 1.0 / radian**2
@@ -4578,11 +4643,12 @@ def AngleGuess(poltype,ita,itb,itc,iva,ivb,ivc):
  
 def BondGuess(poltype,ita,itb,iva,ivb):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: If bond parameters are missing, then assign generic defaults based on atomic number and valencies
+    Input: Atomic numbers and valencies
+    Output: Bond force constant
+    Referenced By: AssignBondGuessParameters
+    Description:
+    1. Copied special cases from valence program in tinker 
     """
     bndunit=1
     if (ita==1):
@@ -4719,66 +4785,46 @@ def BondGuess(poltype,ita,itb,iva,ivb):
     bndguess = bndguess / bndunit
     return bndguess 
 
-def ReverseDictionaryValueList(poltype,keytovalues):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    valuetokey={}
-    for key,value in keytovalues.items():
-        for ls in value:
-            valuetokey[tuple(ls)]=list(key)
-    return valuetokey
-
-def ReverseDictionary(poltype,keytovalues):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    valuetokey={}
-    for key,value in keytovalues.items():
-        valuetokey[tuple(value)]=list(key)
-    return valuetokey
-
 def RepresentsInt(s):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Various functions when parsing parmaters and want to check if string is an integer or not
+    Input: String
+    Output: Boolean specifying if string is an integer or not
+    Referenced By: Many functions
     Description: 
+    1. Try to convert string to integer, if successful return True
+    2. If fail, return False
     """
+    # STEP 1
     try: 
         int(s)
         return True
+    # STEP 2
     except ValueError:
         return False
 
 def ReadDatabaseSmartsMap(poltype,databasepath): # smartsString classNumber className # comments
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: For AMOEBA+ parameters and latest bond/angle/strbnd/opbend AMOEBA parameters read in map of SMARTS -> atom class and atom class -> description and atom class -> comment
+    Input: Database file
+    Output: map of SMARTS -> atom class and atom class -> description and atom class -> comment
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
     Description: 
+    1. Iterate over lines in database file
+    2. Grab the SMARTS, tinker name/description and comment and put them into dictionaries 
     """
-
     smartstoatomclass={}
     atomclasstoclassname={}
     atomclasstocomment={}
     temp=open(databasepath,'r')
     results=temp.readlines()
     temp.close()
+    # STEP 1
     for line in results:
         linesplit=line.split()
         if len(linesplit)>0:
             first=linesplit[0]
+            # STEP 2
             if '#' not in first:
                 smarts=linesplit[0]
                 if RepresentsInt(linesplit[1])==True:
@@ -4797,23 +4843,26 @@ def ReadDatabaseSmartsMap(poltype,databasepath): # smartsString classNumber clas
  
 def ReadDatabaseSmartsMapPolarize(poltype,databasepath): # smartsString className # comments
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Read polarize parameter database
+    Input: Database file
+    Output: SMARTS -> atom class , atomclasstocomment , smartstoactualcomment
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over lines in database file
+    2. Grab the SMARTS, tinker name/description and comment and put them into dictionaries 
     """
-
     smartstoatomclass={}
     atomclasstocomment={}
     smartstoactualcomment={}
     temp=open(databasepath,'r')
     results=temp.readlines()
     temp.close()
+    # STEP 1
     for line in results:
         linesplit=line.split()
         if len(linesplit)>0:
             first=linesplit[0]
+            # STEP 2
             if '# ' in first or first=='#':
                 continue
             else:
@@ -4827,34 +4876,39 @@ def ReadDatabaseSmartsMapPolarize(poltype,databasepath): # smartsString classNam
                 smartstoatomclass[smarts]=tinkerclass
                 atomclasstocomment[tinkerclass]=comment
                 smartstoactualcomment[smarts]=comment
-             
 
     return smartstoatomclass, atomclasstocomment,smartstoactualcomment
  
 def MatchAllSmartsToAtomIndices(poltype,smartstoatomclass): #rdkit 0 index based
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Given input SMARTS from database, attempt to match to input molecule
+    Input: Dictionary of SMARTS -> atom class
+    Output: Dictionary of atom index -> SMARTS that matched, dictionary of atom index -> list of SMARTS matches (array of indices in input molecule corresponding to SMARTS that matched)
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over SMARTS in dictionary of SMARTS -> atom class
+    2. Check if the SMARTS matches to the input molecule
+    3. Find other atoms with same type and want to ensure matches for all atoms of same type are included (where as rdkit only return match for one atom out of group of same type).
     """
     atomindextoallsmarts={}
     atomindextoallsmartsmatches={}
+    # STEP 1
     for smarts in smartstoatomclass.keys():
         substructure = Chem.MolFromSmarts(smarts)
         atomclass=smartstoatomclass[smarts]
         diditmatch=poltype.rdkitmol.HasSubstructMatch(substructure)
+        # STEP 2
         if diditmatch==True:
             matches=list(poltype.rdkitmol.GetSubstructMatches(substructure))
             newmatches=[]
+            # STEP 3
             for match in matches:
                 newmatches.append(match)
                 lastatom=match[-1]
                 firstatom=match[0]
                 firsttype=poltype.idxtosymclass[firstatom+1]
                 secondtype=poltype.idxtosymclass[lastatom+1]
-                if firsttype==secondtype:
+                if firsttype==secondtype: # special case where both ends of match are same type but the match only returns one way so need to add reverse match also
                     newmatches.append(match[::-1])
                 otheratomindices=[firstatom]
                 for idx,typenum in poltype.idxtosymclass.items():
@@ -4877,19 +4931,25 @@ def MatchAllSmartsToAtomIndices(poltype,smartstoatomclass): #rdkit 0 index based
 
 def MapIndicesToCommentsAtom(poltype,atomindextoallsmarts,smartstocomment,listofatomsforprm):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: From SMARTS matches found, construct maps of comments -> all SMARTS with same comment and map of atom indices -> list of comments (that correpsond to SMARTS that were matched) 
+    Input: Dictionary of atom index -> SMARTS list, dictionary of SMARTS -> comment, list of all atom indexes in molecule 
+    Output: maps of comments -> all SMARTS with same comment and map of atom indices -> list of comments (that correpsond to SMARTS that were matched) 
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over atoms in list of atom indices
+    2. If atom index in dictionary of atom index -> SMARTS list
+    3. Using map of SMARTS -> comments, add items to dictionaries 
     """
     atomcommentstolistofsmartslist={}
     atomindicestolistofatomcomments={}
+    # STEP 1
     for atoms in listofatomsforprm:
         aindex=atoms[0]
+        # STEP 2
         if aindex in atomindextoallsmarts.keys():
             asmartslist=atomindextoallsmarts[aindex]
             combs = list(itertools.product(asmartslist)) 
+            # STEP 3
             for comb in combs:
                 asmarts=comb[0]
                 acomment=smartstocomment[asmarts]
@@ -4908,20 +4968,32 @@ def MapIndicesToCommentsAtom(poltype,atomindextoallsmarts,smartstocomment,listof
 
 def MapIndicesToCommentsBondAngle(poltype,atomindextoallsmarts,smartstocomment,listofbondsforprm,listofanglesforprm):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
+    Intent: Using dictionaries that map to only each atom for SMARTS etc, construct dictionaries for bond and angle matches   
+    Input: Dictionary of atom index -> list of SMARTS, dicionary of SMARTS -> comment, list of all bonds in molecule, list of all angles in molecule 
+    Output: Map of array of comments for each atom in bond -> list of SMARTS , map of bond indices -> list of comments , Map of array of comments for each atom in bond -> list of SMARTS , map of bond indices -> list of comments
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
     Description: 
+    1. Iterate over list bonds in molecule
+    2. Grab the SMARTS list for each atom in the bond
+    3. Generate combination of all SMARTS for each list
+    4. For each combination of SMARTS, grab the corresponding comments and add information into dictionaries
+    5. Iterate over list angles in molecule
+    6. Grab the SMARTS list for each atom in the angle
+    7. Generate combination of all SMARTS for each list
+    8. For each combination of SMARTS, grab the corresponding comments and add information into dictionaries
     """
     bondcommentstolistofsmartslist={}
     bondindicestolistofbondcomments={}
+    # STEP 1
     for bond in listofbondsforprm:
         aindex=bond[0] 
         bindex=bond[1] 
+        # STEP 2
         asmartslist=atomindextoallsmarts[aindex]
         bsmartslist=atomindextoallsmarts[bindex]
+        # STEP 3
         combs = list(itertools.product(asmartslist,bsmartslist)) 
+        # STEP 4
         for comb in combs:
             asmarts=comb[0]
             bsmarts=comb[1]
@@ -4940,14 +5012,18 @@ def MapIndicesToCommentsBondAngle(poltype,atomindextoallsmarts,smartstocomment,l
 
     anglecommentstolistofsmartslist={}
     angleindicestolistofanglecomments={}
+    # STEP 5
     for angle in listofanglesforprm:
         aindex=angle[0] 
         bindex=angle[1] 
         cindex=angle[2] 
+        # STEP 6
         asmartslist=atomindextoallsmarts[aindex]
         bsmartslist=atomindextoallsmarts[bindex]
         csmartslist=atomindextoallsmarts[cindex]
+        # STEP 7
         combs = list(itertools.product(asmartslist,bsmartslist,csmartslist)) 
+        # STEP 8
         for comb in combs:
             asmarts=comb[0]
             bsmarts=comb[1]
@@ -4973,11 +5049,19 @@ def MapIndicesToCommentsBondAngle(poltype,atomindextoallsmarts,smartstocomment,l
 
 def MapIndicesToClasses(poltype,atomindextoallsmarts,smartstoatomclass,listofbondsforprm,listofanglesforprm,planarbonds):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Convert dictionaries that have atomic indices as keys to having class numbers as keys instead (parameters map from class numbers)  
+    Input: Dictionary of atom index -> SMARTS list, dictionary of SMARTS -> atom class , list of bonds in molecule, list of angles in molecule, list of planar bonds in molecule 
+    Output: Dictionaries of classes -> SMARTS list for bond/angle/strbnd/opbend and dictionaries of indices -> list of all classes (for each SMARTS that matched) for bond/angle/strbnd/opbend  
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over all bonds in molecule
+    2. If bond exists in dictionary of atomindex -> SMARTS list
+    3. Generate all combinations of SMARTS for each atom in bond
+    4. For each combination find the class number and then store in dictionary 
+    5. Iterate over all angles in molecule
+    6. If angle exists in dictionary of atomindex -> SMARTS list
+    7. Generate all combinations of SMARTS for each atom in angle
+    8. For each combination find the class number and then store in dictionary 
     """
     bondclassestolistofsmartslist={}
     angleclassestolistofsmartslist={}
@@ -4987,13 +5071,17 @@ def MapIndicesToClasses(poltype,atomindextoallsmarts,smartstoatomclass,listofbon
     angleindicestolistofangleclasses={}
     strbndindicestolistofstrbndclasses={}
     opbendindicestolistofopbendclasses={}
+    # STEP 1
     for bond in listofbondsforprm:
         aindex=bond[0]
         bindex=bond[1] 
+        # STEP 2 
         if aindex in atomindextoallsmarts.keys() and bindex in atomindextoallsmarts.keys():
             asmartslist=atomindextoallsmarts[aindex]
-            bsmartslist=atomindextoallsmarts[bindex]   
+            bsmartslist=atomindextoallsmarts[bindex]
+            # STEP 3
             combs = list(itertools.product(asmartslist, bsmartslist)) 
+            # STEP 4
             for comb in combs:
                 asmarts=comb[0]
                 bsmarts=comb[1]
@@ -5021,16 +5109,19 @@ def MapIndicesToClasses(poltype,atomindextoallsmarts,smartstoatomclass,listofbon
                     if bondclasses not in opbendindicestolistofopbendclasses[tuple(bond)]:
                         opbendindicestolistofopbendclasses[tuple(bond)].append(bondclasses)    
 
-
+    # STEP 5
     for angle in listofanglesforprm:
         aindex=angle[0]
         bindex=angle[1] 
         cindex=angle[2] 
+        # STEP 6
         if aindex in atomindextoallsmarts.keys() and bindex in atomindextoallsmarts.keys() and cindex in atomindextoallsmarts.keys():
             asmartslist=atomindextoallsmarts[aindex]
             bsmartslist=atomindextoallsmarts[bindex]   
             csmartslist=atomindextoallsmarts[cindex]   
+            # STEP 7
             combs = list(itertools.product(asmartslist,bsmartslist,csmartslist)) 
+            # STEP 8
             for comb in combs:
                 asmarts=comb[0]
                 bsmarts=comb[1]
@@ -5060,12 +5151,15 @@ def MapIndicesToClasses(poltype,atomindextoallsmarts,smartstoatomclass,listofbon
 
 def SearchForParametersViaCommentsPolarize(poltype,atomcommentstolistofsmartslist,atomindicestolistofatomcomments):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: The naming is odd here, comments in this function are really like a pseudo SMARTS string that tells what the type is. These "pseudo smarts" (just a name) are associated with the parameters in the parameter file. 
+    Input: Dictionary of atom comments -> list of SMARTS , dictionary of atom indices -> list of comments  
+    Output: Modified dictionary of atom indices -> atom comments , dictionary of comment -> parameters  
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Generate dictionary of atom indices -> list of comments by reading database file
+    2. Modify dictionary of atom indices -> atom comments to only include entries that have parameters associated with comments
     """
+    # STEP 1
     atomcommentstoparameters={}
     temp=open(poltype.latestsmallmoleculepolarizeprmlib,'r')
     results=temp.readlines()
@@ -5076,18 +5170,20 @@ def SearchForParametersViaCommentsPolarize(poltype,atomcommentstolistofsmartslis
             comment=linesplit[0]
             prm=linesplit[1]
             atomcommentstoparameters[tuple([comment])]=[prm]
-
+    # STEP 2
     atomindicestolistofatomcomments=RemoveIndicesThatDontHaveParameters(poltype,atomindicestolistofatomcomments,atomcommentstolistofsmartslist,atomcommentstoparameters,prin=True)
     return atomindicestolistofatomcomments,atomcommentstoparameters
 
 
 def SearchForParametersViaCommentsNonBondedAMOEBAPlus(poltype,atomcommentstolistofsmartslist,atomindicestolistofatomcomments):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Generate dictionaries of comments -> parmeters and dictionaries of atom indices -> comments for charge penetration, charge transfer and vdw. 
+    Input: Dictionary of atom comments -> list of SMARTS , dictionary of atom indices -> list of atom comments 
+    Output: Modified dictionary of atom comments -> list of SMARTS, dictionary of atom indices -> list of atom comments for charge penetration, charge transfer and vdw. 
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Generate dictionaries of comments -> parameters by reading parameter file 
+    2. Modify dictionary of atom indices -> atom comments to only include entries that have parameters associated with comments
     """
     atomcommentstocpparameters={}
     atomcommentstoctparameters={}
@@ -5095,7 +5191,7 @@ def SearchForParametersViaCommentsNonBondedAMOEBAPlus(poltype,atomcommentstolist
     atomindicestolistofatomcommentscp=atomindicestolistofatomcomments.copy()
     atomindicestolistofatomcommentsct=atomindicestolistofatomcomments.copy()
     atomindicestolistofatomcommentsvdw=atomindicestolistofatomcomments.copy()
-
+    # STEP 1
     temp=open(poltype.amoebaplusnonbondedprmlib,'r')
     results=temp.readlines()
     temp.close()
@@ -5112,7 +5208,7 @@ def SearchForParametersViaCommentsNonBondedAMOEBAPlus(poltype,atomcommentstolist
             atomcommentstoctparameters[tuple([comment])]=ctprms
             atomcommentstovdwparameters[tuple([comment])]=vdwprms
 
-
+    # STEP 2
     atomindicestolistofatomcommentscp=RemoveIndicesThatDontHaveParameters(poltype,atomindicestolistofatomcommentscp,atomcommentstolistofsmartslist,atomcommentstocpparameters)
     atomindicestolistofatomcommentsct=RemoveIndicesThatDontHaveParameters(poltype,atomindicestolistofatomcommentsct,atomcommentstolistofsmartslist,atomcommentstoctparameters)
     atomindicestolistofatomcommentsvdw=RemoveIndicesThatDontHaveParameters(poltype,atomindicestolistofatomcommentsvdw,atomcommentstolistofsmartslist,atomcommentstovdwparameters)
@@ -5124,11 +5220,13 @@ def SearchForParametersViaCommentsNonBondedAMOEBAPlus(poltype,atomcommentstolist
 
 def SearchForParametersViaCommentsChargeFlux(poltype,bondcommentstolistofsmartslist,bondindicestolistofbondcomments,anglecommentstolistofsmartslist,angleindicestolistofanglecomments):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Generate dictionaries of comments -> parameters for charge flux, and indices -> comments for bond and angle (both needed in charge flux) 
+    Input: Dictionary of comments -> list of SMARTS for bonds and angles, dictionary of indices -> comments for bonds and angles
+    Output: Dictionaries of comments -> parameters for charge flux, and indices -> comments for bond and angle (both needed in charge flux)
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Generate dictionaries of comments -> parameters for charge flux by reading parameter file
+    2. Modify dictionary of atom indices -> atom comments to only include entries that have parameters associated with comments
     """
     bondcommentstocfparameters={}
     anglecommentstocfparameters={}
@@ -5159,9 +5257,9 @@ def SearchForParametersViaCommentsChargeFlux(poltype,bondcommentstolistofsmartsl
 
 def SearchForParameters(poltype,bondclassestolistofsmartslist,angleclassestolistofsmartslist,strbndclassestolistofsmartslist,opbendclassestolistofsmartslist,bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses):
     """
-    Intent:
-    Input:
-    Output:
+    Intent: Generate dictionaries of classes -> parameters for bond/angle/strbnd/opbend
+    Input: Dictionaries of classes to list of SMARTS for bond/angle/strbnd/opbend and dictionaries of indices -> classes for bond/angle/strbnd/opbend 
+    Output: Modified dictionaries of indices -> classes,  dictionaries of classes -> parameters for bond/angle/strbnd/opbend
     Referenced By: 
     Description: 
     """
@@ -6333,7 +6431,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         bondindicestotinkertypes,bondindicestotinkerclasses,bondindicestoparametersmartsatomorders,bondindicestoelementtinkerdescrips,bondindicestosmartsatomorders=GenerateAtomIndexToAtomTypeAndClassForAtomList(poltype,bondsforprmtoparametersmarts,bondsforprmtosmarts,smartsatomordertoelementtinkerdescrip,elementtinkerdescriptotinkertype,tinkertypetoclass,rdkitmol)
 
  
-        opbendbondindicestotinkerclasses,opbendbondindicestosmartsatomorders=FilterBondSMARTSEnviorment(poltype,bondindicestosmartsatomorders,bondindicestotinkerclasses)
+        opbendbondindicestotinkerclasses,opbendbondindicestosmartsatomorders=ExtractOpbendFromBond(poltype,bondindicestosmartsatomorders,bondindicestotinkerclasses)
 
         newplanarbonds=ConvertListOfListToListOfTuples(poltype,planarbonds)
         newdics=FilterDictionaries(poltype,[opbendbondindicestotinkerclasses,opbendbondindicestosmartsatomorders],newplanarbonds)
@@ -6376,7 +6474,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         opbendtinkerclassestotrigonalcenterbools=TinkerClassesToTrigonalCenter(poltype,opbendbondindicestotinkerclasses,opbendbondindicestotrigonalcenterbools)
 
         angletinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,angleindicestotinkerclasses)
-        anglepoltypeclassestotinkerclasses=ReverseDictionaryValueList(poltype,angletinkerclassestopoltypeclasses)
 
         planarangletinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,planarangleindicestotinkerclasses)
         torsiontinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,torsionindicestotinkerclasses)
@@ -6387,7 +6484,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         partialarotorsionsmissingtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,partialarotorsionsmissingindicestotinkerclasses)
         anglemissingtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,anglemissingindicestotinkerclasses)
         bondmissingtinkerclassestopoltypeclasses=TinkerClassesToPoltypeClasses(poltype,bondmissingindicestotinkerclasses)
-        bondpoltypeclassestotinkerclasses=ReverseDictionaryValueList(poltype,bondtinkerclassestopoltypeclasses)
         torsionpoltypeclassestoparametersmartsatomorders=ConvertIndicesDictionaryToPoltypeClasses(poltype,torsionindicestoparametersmartsatomorders,torsionindicestotinkerclasses,torsiontinkerclassestopoltypeclasses)
         torsionpoltypeclassestosmartsatomorders=ConvertIndicesDictionaryToPoltypeClasses(poltype,torsionindicestosmartsatomorders,torsionindicestotinkerclasses,torsiontinkerclassestopoltypeclasses)
         torsionpoltypeclassestoelementtinkerdescrips=ConvertIndicesDictionaryToPoltypeClasses(poltype,torsionindicestoelementtinkerdescrips,torsionindicestotinkerclasses,torsiontinkerclassestopoltypeclasses)

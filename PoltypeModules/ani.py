@@ -2,53 +2,17 @@ import torch
 import torchani
 from openbabel import openbabel
 from ase.optimize import BFGS
-from ase import Atoms
+from ase import Atoms, Atom
 from ase.io.trajectory import Trajectory
 from ase.constraints import FixInternals
 import getopt
 import sys
-
-
+from ase.io import read, write
+import shutil
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = torchani.models.ANI2x(periodic_table_index=True).to(device)
 
-
-def GenerateMOLObject(xyzfile):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-
-    obConversion = openbabel.OBConversion()
-    mol = openbabel.OBMol()
-    obConversion.SetInFormat('xyz')
-    obConversion.ReadFile(mol,xyzfile)
-    return mol
-
-
-def BabelCoordsAtomicNums(mol):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    atomvecls=[]
-    atomicnums=[]
-    iteratombab = openbabel.OBMolAtomIter(mol)
-    for atm in iteratombab:
-        atmindex=atm.GetIdx()
-        coords=[atm.GetX(),atm.GetY(),atm.GetZ()]
-        atomvecls.append(coords)
-        atomicnum=atm.GetAtomicNum()
-        atomicnums.append(atomicnum)
-
-    return atomvecls,atomicnums
 
 
 def GenerateSpeciesAndCoordinatesForANI(xyzfile):
@@ -93,27 +57,6 @@ def GenerateSPLogFile(logname,energy):
     temp.close()
 
 
-def GrabAtomicSymbs(xyzfile):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    atomicsymbs=[]
-    temp=open(xyzfile,'r')
-    results=temp.readlines()
-    temp.close()
-    for line in results:
-        linesplit=line.split()
-        if len(linesplit)>1:
-            a=linesplit[0]
-            atomicsymbs.append(a)
-
-
-    return atomicsymbs
-
 def OptimizeANI(xyzfile,outputfile,outputoptxyz,fmax,listofindices):
     """
     Intent:
@@ -122,12 +65,10 @@ def OptimizeANI(xyzfile,outputfile,outputoptxyz,fmax,listofindices):
     Referenced By: 
     Description: 
     """
-    mol=GenerateMOLObject(xyzfile)
-    atomicvecls,atomicnums=BabelCoordsAtomicNums(mol)
-    atomicsymbs=GrabAtomicSymbs(xyzfile)
-    atomicsymbs=''.join(atomicsymbs)
-    newatomicvecls=[tuple(i) for i in atomicvecls]
-    molecule = Atoms(atomicsymbs,positions=newatomicvecls,calculator=torchani.models.ANI2x().ase())
+    molecule = read(xyzfile)
+    molecule.set_calculator(torchani.models.ANI2x().ase())
+
+    #molecule = Atoms(atomicsymbs,positions=newatomicvecls,calculator=torchani.models.ANI2x().ase())
     ls=[]
     for indices in listofindices: 
         dihedral = [molecule.get_dihedral(*indices), indices] 
@@ -182,6 +123,16 @@ def GenerateOptimizedLogFile(logname,error=None):
     temp.close()
 
 
+
+def SanitizeXYZ(inputxyz):
+    if '.xyz_2' in inputxyz:
+        newxyz=inputxyz.replace('.xyz_2','.xyz')
+        shutil.copy(inputxyz,newxyz)
+        return newxyz
+    else:
+        return inputxyz
+
+
 def ReadRestraintFile(inputres):
     """
     Intent:
@@ -220,7 +171,7 @@ for o, a in opt_list:
         outputlogname=a
 
 
-
+inputxyz=SanitizeXYZ(inputxyz)
 if opt==True:
     listofindices=ReadRestraintFile(inputres)
     outputfile=inputxyz.replace('.xyz','.traj')
