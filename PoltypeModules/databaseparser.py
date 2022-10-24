@@ -4408,12 +4408,25 @@ def TinkerClassesToTrigonalCenter(poltype,opbendbondindicestotinkerclasses,opben
         # STEP 2
         boolarray=opbendbondindicestotrigonalcenterbools[bondindices]
         # STEP 3
-        opbendtinkerclassestotrigonalcenterbools[tuple(tinkerclasses)]=boolarray
+        append=True
+        if tuple(tinkerclasses) in opbendtinkerclassestotrigonalcenterbools.keys(): # sometimes different parts of molecule match to same amoeba09 opbend but one may be trigonal center and another may not be (if ring can pucker etc), so when mapping tinker classes -> list of poltype classes, need to enfore keeping any dictionary entry that says tinkerclass is not trigonal center. For the trigonal center that also matched to same amoeba09 tinker classes, those parameters will be "determined missing" then defaults added for that one later.
+            prevboolarray=opbendtinkerclassestotrigonalcenterbools[tuple(tinkerclasses)]
+            prevfalsecount=prevboolarray.count(False)
+            falsecount=boolarray.count(False)
+            if prevfalsecount>falsecount:
+                append=False
+        if append==True:
+            opbendtinkerclassestotrigonalcenterbools[tuple(tinkerclasses)]=boolarray
+            temp=opbendtinkerclassestotrigonalcenterbools[tuple(tinkerclasses)]
+    newopbendtinkerclassestotrigonalcenterbools={}
+    for tinkerclasses in opbendtinkerclassestotrigonalcenterbools.keys():
+        boolarray=opbendtinkerclassestotrigonalcenterbools[tuple(tinkerclasses)]
         revtinkerclasses=tinkerclasses[::-1]
         revboolarray=boolarray[::-1]
-        opbendtinkerclassestotrigonalcenterbools[tuple(revtinkerclasses)]=revboolarray
+        newopbendtinkerclassestotrigonalcenterbools[tuple(revtinkerclasses)]=revboolarray
+        newopbendtinkerclassestotrigonalcenterbools[tuple(tinkerclasses)]=boolarray
 
-    return opbendtinkerclassestotrigonalcenterbools
+    return newopbendtinkerclassestotrigonalcenterbools
 
 
 def FilterDictionaries(poltype,dics,ls):
@@ -5253,15 +5266,15 @@ def SearchForParametersViaCommentsChargeFlux(poltype,bondcommentstolistofsmartsl
     return bondindicestolistofbondcomments,bondcommentstocfparameters,angleindicestolistofanglecomments,anglecommentstocfparameters
 
 
-
-
 def SearchForParameters(poltype,bondclassestolistofsmartslist,angleclassestolistofsmartslist,strbndclassestolistofsmartslist,opbendclassestolistofsmartslist,bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses):
     """
     Intent: Generate dictionaries of classes -> parameters for bond/angle/strbnd/opbend
     Input: Dictionaries of classes to list of SMARTS for bond/angle/strbnd/opbend and dictionaries of indices -> classes for bond/angle/strbnd/opbend 
     Output: Modified dictionaries of indices -> classes,  dictionaries of classes -> parameters for bond/angle/strbnd/opbend
-    Referenced By: 
-    Description: 
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Generate dictionaries of classes -> parameters for bond/angle/strbnd/opbend by reading in parameterfile
+    2. Modify dictionaries of atom indices -> atom comments to only include entries that have parameters associated with comments
     """
     bondclassestoparameters={}
     angleclassestoparameters={}
@@ -5270,6 +5283,7 @@ def SearchForParameters(poltype,bondclassestolistofsmartslist,angleclassestolist
     temp=open(poltype.latestsmallmoleculeprmlib,'r')
     results=temp.readlines()
     temp.close()
+    # STEP 1
     for line in results:
         linesplit=line.split()
         if 'bond' in line:
@@ -5288,8 +5302,8 @@ def SearchForParameters(poltype,bondclassestolistofsmartslist,angleclassestolist
             bondclasses=tuple([int(linesplit[1]),int(linesplit[2])]) 
             prms=[float(linesplit[5])]
             opbendclassestoparameters[bondclasses]=prms
+    # STEP 2
     bondindicestolistofbondclasses=RemoveIndicesThatDontHaveParameters(poltype,bondindicestolistofbondclasses,bondclassestolistofsmartslist,bondclassestoparameters)
-
     angleindicestolistofangleclasses=RemoveIndicesThatDontHaveParameters(poltype,angleindicestolistofangleclasses,angleclassestolistofsmartslist,angleclassestoparameters)
     strbndindicestolistofstrbndclasses=RemoveIndicesThatDontHaveParameters(poltype,strbndindicestolistofstrbndclasses,strbndclassestolistofsmartslist,strbndclassestoparameters)
     opbendindicestolistofopbendclasses=RemoveIndicesThatDontHaveParameters(poltype,opbendindicestolistofopbendclasses,opbendclassestolistofsmartslist,opbendclassestoparameters)
@@ -5298,20 +5312,25 @@ def SearchForParameters(poltype,bondclassestolistofsmartslist,angleclassestolist
 
 def RemoveIndicesThatDontHaveParameters(poltype,indicestolistofclasses,classestolistofsmartslist,classestoparameters,prin=False):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Just check to ensure that assigned class has parameters in parameter file (like a sanity check)
+    Input: Dictionary of indices -> list of classes, dictionary of classes -> list of SMARTS, dictionary of classes -> parmaters
+    Output: Modified indices -> list of classes
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over dictionary of indices -> list of classes
+    2. For each classes in list of classes, check if there exists parameters in dictionary of classes -> parameters
+    3. If parameters dont exist, then want to remove classes from final dictionary
     """
     indicestodelete=[]
+    # STEP 1
     for i in range(len(indicestolistofclasses.keys())):
         indices=list(indicestolistofclasses.keys())[i]
         listofclasses=indicestolistofclasses[indices]
         classesmissing=[]
         classesexisting=[]
-        
+        # STEP 2
         for classes in listofclasses:
+            # STEP 3
             if classes not in classestoparameters.keys() and classes[::-1] not in classestoparameters.keys():
                 classesmissing.append(classes)
                
@@ -5326,27 +5345,43 @@ def RemoveIndicesThatDontHaveParameters(poltype,indicestolistofclasses,classesto
 
 def FindBestSMARTSMatch(poltype,indicestolistofclasses,classestolistofsmartslist):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: When have several possible SMARTS matches to choose from, want to choose the one with the largest SMARTS string which corresponds to more specificity about envioroment and is more transferable. 
+    Input: Dictionary of indices -> list of classes, dictionary of classes -> list of SMARTS
+    Output: Dictionary of indices -> classes, dictionary of indices -> SMARTS
+    Referenced By: GrabSmallMoleculeAMOEBAParameters
+    Description:
+    1. Iterate over dictionary of indices -> list of classes
+    2. For each classes in list of classes, find list of SMARTS that all map to those classes
+    3. Iterate over SMARTS in list of SMARTS
+    4. Find all atom indices that are matched from list of SMARTS
+    5. Create a fragment molecule from input molecule with only those indices that were matched
+    6. Save the molecule and SMARTS list in array
+    7. For each SMARTS list and fragment generated, determine the best SMARTS match via tanimoto similarity between input molecule and generated fragment molecule
+    8. Save best SMARTS list (like for bond there are two SMARTS per atom) and assicated classes in dicitonaries 
     """
     indicestoclasses={}
     indicestosmartslist={}
+    # STEP 1
     for indices,listofclasses in indicestolistofclasses.items():
         fragmentsarray=[]
         classesarray=[]
         smartslistarray=[] 
+        # STEP 2
         for classes in listofclasses:
             listofsmartslist=classestolistofsmartslist[classes]
+            # STEP 3
             for smartslist in listofsmartslist:
+                # STEP 4
                 matchedindices=MatchAllSMARTS(poltype,smartslist,indices) 
+                # STEP 5
                 fragmentmol=CreateFragment(poltype,matchedindices)
+                # STEP 6
                 fragmentsarray.append(fragmentmol)
                 classesarray.append(classes)
                 smartslistarray.append(smartslist)
-        classes,smartslist=DetermineBestSMARTSMatch(poltype,fragmentsarray,classesarray,smartslistarray)         
+        # STEP 7
+        classes,smartslist=DetermineBestSMARTSMatch(poltype,fragmentsarray,classesarray,smartslistarray)        
+        # STEP 8
         indicestoclasses[indices]=classes
         indicestosmartslist[indices]=smartslist
 
@@ -5354,23 +5389,36 @@ def FindBestSMARTSMatch(poltype,indicestolistofclasses,classestolistofsmartslist
 
 def DetermineBestSMARTSMatch(poltype,listoffragments,listofclasses,listofsmartslist):  
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: Want to find array of SMARTS (one for each atom in bond or angle etc) that has closest match to input molecule. 
+    Input: List of fragments, list of classes, list of SMARTS lists
+    Output: Best classes and best smarts list
+    Referenced By: FindBestSMARTSMatch
+    Description:
+    1. Iterate over list of fragment molecules
+    2. Grab list of classes and SMARTS that correspond
+    3. Compute fingerprints via rdkit for input molecule and fragment molecule
+    4. Compute tanimoto similairty between input molecule and fragment then save in array for finding closest match
+    5. Grab max tanimoto value
+    6. If two matches have same tanimoto simliairty value, then choose the SMARTS that is largest (count length of all SMARTS in list)  
+    7. Otherwise choose SMARTS list with highest tanimoto value 
     """
-    tanimotoarray=[]     
+    tanimotoarray=[]    
+    # STEP 1
     for i in range(len(listoffragments)):
         fragment=listoffragments[i]
+        # STEP 2
         classes=listofclasses[i]
         smartslist=listofsmartslist[i]
         ms=[poltype.rdkitmol,fragment]
+        # STEP 3
         fps = [Chem.RDKFingerprint(x) for x in ms]
+        # STEP 4
         tanimoto=DataStructs.FingerprintSimilarity(fps[0],fps[1], metric=DataStructs.DiceSimilarity) 
         tanimotoarray.append(tanimoto)
+    # STEP 5
     maxvalue=max(tanimotoarray)
     nums=tanimotoarray.count(maxvalue)
+    # STEP 6
     if nums>1:
         smartslisttocompare=[]
         for i in range(len(listofsmartslist)):
@@ -5382,6 +5430,7 @@ def DetermineBestSMARTSMatch(poltype,listoffragments,listofclasses,listofsmartsl
         index=listofsmartslist.index(smartslist)
         classes=listofclasses[index]
     else:
+        # STEP 7
         maxindex=tanimotoarray.index(maxvalue)
         classes=listofclasses[maxindex]
         smartslist=listofsmartslist[maxindex]
@@ -5390,17 +5439,23 @@ def DetermineBestSMARTSMatch(poltype,listoffragments,listofclasses,listofsmartsl
 
 def ChooseMostDescriptiveSMARTSList(poltype,smartslisttocompare):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: If two molecules have same tanimoto similarity to input molecule then count the length of all SMARTS in SMARTS list and choose the ones with largest length (more descriptive envioronment)
+    Input: list of SMARTS list
+    Output: SMARTS list that is most descriptive 
+    Referenced By: DetermineBestSMARTSMatch
+    Description:
+    1. Iterate over SMARTS lists
+    2. Compute the total length and save in array
+    3. Find the max length and then grab the SMARTS list with max length
     """
     lengtharray=[]
+    # STEP 1
     for smartslist in smartslisttocompare:
+        # STEP 2
         lengths=[len(e) for e in smartslist]
         total=sum(lengths)
         lengtharray.append(total)
+    # STEP 3
     maxlength=max(lengtharray)
     maxidx=lengtharray.index(maxlength)
     smartslist=smartslisttocompare[maxidx]
@@ -6382,7 +6437,6 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         smartsatomordertoelementtinkerdescrip=ReadSmallMoleculeLib(poltype,poltype.smallmoleculesmartstotinkerdescrip)
         elementtinkerdescriptotinkertype,tinkertypetoclass=GrabTypeAndClassNumbers(poltype,poltype.smallmoleculeprmlib)
         planarbonds=GrabPlanarBonds(poltype,listofbondsforprm,mol)
-
         bondclassestolistofsmartslist,angleclassestolistofsmartslist,strbndclassestolistofsmartslist,opbendclassestolistofsmartslist,bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses=MapIndicesToClasses(poltype,atomindextoallsmarts,smartstoatomclass,listofbondsforprm,listofanglesforprm,planarbonds)
         bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses,bondclassestoparameters,angleclassestoparameters,strbndclassestoparameters,opbendclassestoparameters=SearchForParameters(poltype,bondclassestolistofsmartslist,angleclassestolistofsmartslist,strbndclassestolistofsmartslist,opbendclassestolistofsmartslist,bondindicestolistofbondclasses,angleindicestolistofangleclasses,strbndindicestolistofstrbndclasses,opbendindicestolistofopbendclasses)
         bondindicestoclasses,bondindicestosmartslist=FindBestSMARTSMatch(poltype,bondindicestolistofbondclasses,bondclassestolistofsmartslist)
@@ -6506,6 +6560,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         torsionprms=CorrectPitorEnergy(poltype,torsionprms,torsiontopitor)
         angleprms,anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips=RemoveOldParametersKeepNewParameters(poltype,angleprms,newangleindicestopoltypeclasses,'angle',anglepoltypeclassestoparametersmartsatomorders,anglepoltypeclassestosmartsatomorders,anglepoltypeclassestoelementtinkerdescrips)
         opbendprms,blankbondpoltypeclassestoparametersmartsatomorders,blankbondpoltypeclassestosmartsatomorders,blankbondpoltypeclassestoelementtinkerdescrips=RemoveOldParametersKeepNewParameters(poltype,opbendprms,newopbendindicestopoltypeclasses,'opbend',bondpoltypeclassestoparametersmartsatomorders,bondpoltypeclassestosmartsatomorders,bondpoltypeclassestoelementtinkerdescrips)
+        
         opbendpoltypeclassestosmartsatomorders=bondpoltypeclassestosmartsatomorders.copy()
         opbendpoltypeclassestoelementtinkerdescrips=bondpoltypeclassestoelementtinkerdescrips.copy()
         bondprms,bondpoltypeclassestoparametersmartsatomorders,bondpoltypeclassestosmartsatomorders,bondpoltypeclassestoelementtinkerdescrips=RemoveOldParametersKeepNewParameters(poltype,bondprms,newbondindicestopoltypeclasses,'bond',bondpoltypeclassestoparametersmartsatomorders,bondpoltypeclassestosmartsatomorders,bondpoltypeclassestoelementtinkerdescrips)
