@@ -168,7 +168,7 @@
 
 #### Torsion Parameterization
 
-``xtbtorresconstant`` specifies torsion restraint force constant for restraining dihedrals in xtb. Default is .5 kcal/mol/deg^2.
+``xtbtorresconstant`` specifies torsion restraint force constant for restraining dihedrals in xtb. Default is 5 kcal/mol/deg^2.
 
 ``rotalltors``  specifies poltype to spin all rotatable bonds instead of transferring torsion parameters if found in database. Default is False.
                   

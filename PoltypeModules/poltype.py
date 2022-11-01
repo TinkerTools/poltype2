@@ -85,7 +85,7 @@ class PolarizableTyper():
         maxtorresnitrogen:int=1
         skipchargecheck:bool=False
         useuniquefilenames:bool=False # if users want to have unique filenames for molecular dynamics/BAR otherwise keep same filename to make copying easier from folder to folder
-        xtbtorresconstant:float=.7
+        xtbtorresconstant:float=5
         alignPDB:bool=False
         torfit:bool=True
         makexyzonly:bool=False
@@ -2746,16 +2746,17 @@ class PolarizableTyper():
             3. If that fails, try sending kill signal to all children of process
             """
             # STEP 1
-            p=self.cmdtopid[job]
-            try:
-                # STEP 2
-                p.wait(timeout=1)
-            except subprocess.TimeoutExpired:
-                # STEP 3
-                process = psutil.Process(p.pid)
-                for proc in process.children(recursive=True):
-                    proc.kill()
-                process.kill()
+            if job in self.cmdtopid.keys():
+                p=self.cmdtopid[job]
+                try:
+                    # STEP 2
+                    p.wait(timeout=1)
+                except subprocess.TimeoutExpired:
+                    # STEP 3
+                    process = psutil.Process(p.pid)
+                    for proc in process.children(recursive=True):
+                        proc.kill()
+                    process.kill()
 
         
         def CallJobsSeriallyLocalHost(self,fulljobtooutputlog,skiperrors,wait=False):
