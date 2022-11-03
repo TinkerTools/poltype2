@@ -80,6 +80,18 @@ from operator import itemgetter
 
 @dataclass
 class PolarizableTyper():
+        xyzedittranslatevalue:str=''
+        xyzeditstrayvalue:str=''
+        xyzeditappendvalue:str=''
+        xyzeditperiodicvalue:str=''
+        xyzeditsoakvalue:str=''
+        xyzeditionvalue:str=''
+        xyzedittranslatestring:str='Translate All Atoms by an X,Y,Z-Vector'
+        xyzeditstraystring:str='Move Stray Molecules into Periodic Box'
+        xyzeditappendstring:str='Append a Second XYZ File to Current One'
+        xyzeditperiodicstring:str='Create and Fill a Periodic Boundary Box'
+        xyzeditsoakstring:str='Soak Current Molecule in Box of Solvent'
+        xyzeditionstring:str='Place Monoatomic Ions around a Solute'
         needrot:bool=False
         heavyhyd:bool=False
         maxtorresnitrogen:int=1
@@ -1254,6 +1266,7 @@ class PolarizableTyper():
             Output: Variables needed for molecular dynamics/FEP then calls functions for molecular dynamics/FEP
             Referenced By: __post_init__ 
             Description:
+            0. Determine xyzedit options, numbers keep changing but the string doesnt so parse the text to get options.
             1. Change default production dynamics time if no previous input was given and running binding free energy simulations.
             2. Copy prmfilepath (default amoebabio18) to current directory (so dont have to have full path in tinker key file for parameters).
             3. If user inputs for stopping simulations, then call function to stop simulations (generates .end files in appropriate folders) then quit poltype.
@@ -1292,6 +1305,8 @@ class PolarizableTyper():
             36. Grab properties of ligand XYZ files to later be used when writing out PDB trajectories for equilbriated ARC and production dynamics ARC.
             37. Call annihilator.py (which calls minimization, equilbritation, production dynamics and BAR etc..)
             """
+            # STEP 0
+            self.DetermineXYZEditOptions()
             # STEP 1
             if self.neatliquidsim==True: 
                 self.usepreequilibriatedbox=False # then make new neat liquid box from scratch
@@ -7441,6 +7456,39 @@ class PolarizableTyper():
             if len(self.torlist)!=0:
                 frag.WriteOutDatabaseLines(self,valenceprmlist,valkeytosmarts,smartstovdwlinelist)
 
+        def DetermineXYZEditOptions(self):
+            """
+            Intent: Parse xyzedit options via hardcoded text to determine which values to use for xyzedit
+            Input: -
+            Output: -
+            Referenced By:  MolecularDynamics
+            Description: 
+            1. Call xyzedit
+            2. Parse output for keywords and save options
+            """
+            xyzout='xyzout.txt'
+            blanktxt='blank.txt'
+            temp=open(blanktxt,'w')
+            temp.write('\n')
+            temp.close()
+            cmdstr=self.xyzeditpath+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/VersionFiles/'+'water.xyz'+' '+'>'+' '+xyzout
+            returned_value = subprocess.call(cmdstr, shell=True)
+            temp=open(xyzout,'r')
+            results=temp.readlines()
+            temp.close()
+            for line in results:
+                if self.xyzedittranslatestring in line:
+                    self.xyzedittranslatevalue=line.split()[0].replace('(','').replace(')','')
+                if self.xyzeditstraystring in line:
+                    self.xyzeditstrayvalue=line.split()[0].replace('(','').replace(')','')
+                if self.xyzeditappendstring in line:
+                    self.xyzeditappendvalue=line.split()[0].replace('(','').replace(')','')
+                if self.xyzeditperiodicstring in line:
+                    self.xyzeditperiodicvalue=line.split()[0].replace('(','').replace(')','')
+                if self.xyzeditsoakstring in line:
+                    self.xyzeditsoakvalue=line.split()[0].replace('(','').replace(')','')
+                if self.xyzeditionstring in line:
+                    self.xyzeditionvalue=line.split()[0].replace('(','').replace(')','')
 
 
 if __name__ == '__main__':

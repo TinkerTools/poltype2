@@ -420,7 +420,7 @@ def CreateSolventBox(poltype,aaxis,baxis,caxis,waternum,filename,key):
     newfilename=filename+'_2'
     if not os.path.isfile(newfilename):
         temp=open(poltype.outputpath+'xyzedit.in','w')
-        temp.write('23'+'\n')
+        temp.write(poltype.xyzeditperiodicvalue+'\n')
         temp.write(str(waternum)+'\n')
         if baxis==None:
             baxis=aaxis
@@ -443,7 +443,7 @@ def SoakMoleculeInSolventBox(poltype,xyzfilename,keyfilename,solventbox):
     Referenced By: 
     Description: 
     """
-    cmdstr=poltype.xyzeditpath+' '+xyzfilename+' '+'-k'+' '+keyfilename+' '+'24'+' '+solventbox
+    cmdstr=poltype.xyzeditpath+' '+xyzfilename+' '+'-k'+' '+keyfilename+' '+poltype.xyzeditsoakvalue+' '+solventbox
     submit.call_subsystem(poltype,cmdstr,wait=True)    
     newname=NewTinkerFileName(poltype,xyzfilename)
     return newname
@@ -477,7 +477,7 @@ def AddIonToSolventBox(poltype,solutexyzfilename,keyfilename,tinktype,ionnum,sol
     temp.write(string)
     temp.write('\n')
     temp.close()
-    cmdstr=poltype.xyzeditpath+' '+solutexyzfilename+' '+'-k'+' '+keyfilename+' '+'25'+' '+' < '+inputfile
+    cmdstr=poltype.xyzeditpath+' '+solutexyzfilename+' '+'-k'+' '+keyfilename+' '+poltype.xyzeditionvalue+' '+' < '+inputfile
     submit.call_subsystem(poltype,cmdstr,wait=True)    
     newsolutexyzfilename=NewTinkerFileName(poltype,solutexyzfilename)
     return newsolutexyzfilename
@@ -595,7 +595,7 @@ def WrapStrayAtomsBackInBox(poltype,newname,key):
     Description: 
     """
     temp=open(poltype.outputpath+'xyzedit.in','w')
-    temp.write('18'+'\n')
+    temp.write(poltype.xyzeditstrayvalue+'\n')
     temp.write('\n')
     temp.close()
     cmdstr=poltype.xyzeditpath+' '+newname+' '+'-k'+' '+key+' <'+' '+'xyzedit.in'
@@ -614,7 +614,7 @@ def ShiftSolventBoxCoordinates(poltype,newfilename,key,shiftvector):
     Description: 
     """
     temp=open(poltype.outputpath+'xyzedit.in','w')
-    temp.write('12'+'\n')
+    temp.write(poltype.xyzedittranslatevalue+'\n')
     temp.write(str(shiftvector[0])+' '+str(shiftvector[1])+' '+str(shiftvector[2])+'\n')
     temp.write('\n')
     temp.close()
@@ -680,7 +680,7 @@ def AppendXYZ(poltype,firstxyz,xyz,key):
     Description: 
     """
     temp=open(poltype.outputpath+'xyzedit.in','w')
-    temp.write('22'+'\n')
+    temp.write(xyzeditappendvalue+'\n')
     temp.write(str(xyz)+'\n')
     temp.write('\n')
     temp.close()
