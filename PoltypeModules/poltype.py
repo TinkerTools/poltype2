@@ -2826,12 +2826,13 @@ class PolarizableTyper():
                       # STEP 7
                       if job not in submittedjobs and len(submittedjobs)<self.jobsatsametime and finished==False and outputlog not in finishedjobs:
                           count=len(finishedjobs)
+                          jobsleft=len(fulljobtooutputlog.keys())-count
                           ratio=round((100*count)/len(fulljobtooutputlog.keys()),2)
                           if len(finishedjobs)!=0:
                               if 'poltype.py' in job:
                                   self.ETAQMFinish(thepath,len(fulljobtooutputlog.keys()))
                           if len(list(fulljobtooutputlog.keys()))>1: 
-                              self.WriteToLog('Percent of jobs finished '+str(ratio))
+                              self.WriteToLog('Percent of jobs finished '+str(ratio)+', jobs left = '+str(jobsleft))
                           self.call_subsystem([job],wait,skiperrors)
                           submittedjobs.append(job)
                        
@@ -7512,6 +7513,7 @@ if __name__ == '__main__':
             # STEP 2
             traceback.print_exc(file=sys.stdout)
             text = str(traceback.format_exc())
+            poltype.WriteToLog(text)
             # STEP 3
             if os.path.exists(poltype.scrtmpdirgau):
                 shutil.rmtree(poltype.scrtmpdirgau)

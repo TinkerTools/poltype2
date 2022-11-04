@@ -375,7 +375,6 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
         rottors,rotbndtorescount,restlist,rotphases,torsiontophaseangle,torsiontomaintor=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor)
         frotors,rotbndtorescount,restlist,torsiontophaseangle,torsiontomaintor=FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor)
         
-        
         for tor in rottors:
             newtorset.append(tor)
         for tor in frotors:
@@ -710,9 +709,33 @@ def CheckIfQMOptReachedTargetDihedral(poltype,cartxyz,initialtinkerstructure,tor
     Referenced By: 
     Description: 
     """
+
+
     inicartxyz=ConvertTinktoXYZ(poltype,initialtinkerstructure,initialtinkerstructure.replace('.xyz','_cart.xyz'))
     inioptmol = opt.load_structfile(poltype,inicartxyz)
     optmol = opt.load_structfile(poltype,cartxyz)
+    bondtopoopt=GenerateBondTopology(poltype,inioptmol)
+    bondtopoopt=[list(i) for i in bondtopoopt]
+    bondtopo=GenerateBondTopology(poltype,optmol)
+    bondtopo=[list(i) for i in bondtopo]
+    diff=False
+    for bond in bondtopo:
+        if bond in bondtopoopt or bond[::-1] in bondtopoopt:
+            pass
+        else:
+            diff=True
+
+    for bond in bondtopoopt:
+        if bond in bondtopo or bond[::-1] in bondtopo:
+            pass
+        else:
+            diff=True
+    if diff==True:
+        shutil.copy(inicartxyz,cartxyz) # if bond broken by xtb, use AMOEBA min structure
+
+        return 
+
+
     if poltype.toroptmethod!='xtb' and poltype.toroptmethod!='AMOEBA':
         tol=1
     else:
@@ -753,8 +776,8 @@ def CheckIfQMOptReachedTargetDihedral(poltype,cartxyz,initialtinkerstructure,tor
         reducedoptang=optang-shift
         diff= numpy.abs(reducedoptang-reducediniang) # if one is close to 360 (358) but other is close to 0 (1 etc)
         firstdiff=numpy.abs(optang-iniang)
+        string='Torsion did not reach target dihedral angle! torsion = '+str(thetor)+' tinker minimized dihedral angle is '+str(iniang) +' but the optimized dihedral angle is at '+str(optang)+', tinker structure is '+inicartxyz+' , opt strucuture is '+cartxyz
         if firstdiff>tol and diff>tol: # then optimization for ANI or XTB failed to reach target dihedral
-            string='Torsion did not reach target dihedral angle! torsion = '+str(thetor)+' tinker minimized dihedral angle is '+str(iniang) +' but the optimized dihedral angle is at '+str(optang)+', tinker structure is '+inicartxyz+' , opt strucuture is '+cartxyz
             raise ValueError(string)
 
 
