@@ -680,7 +680,7 @@ def AppendXYZ(poltype,firstxyz,xyz,key):
     Description: 
     """
     temp=open(poltype.outputpath+'xyzedit.in','w')
-    temp.write(xyzeditappendvalue+'\n')
+    temp.write(poltype.xyzeditappendvalue+'\n')
     temp.write(str(xyz)+'\n')
     temp.write('\n')
     temp.close()

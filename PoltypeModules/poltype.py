@@ -7468,11 +7468,11 @@ class PolarizableTyper():
             2. Parse output for keywords and save options
             """
             xyzout='xyzout.txt'
-            blanktxt='blank.txt'
+            blanktxt='blankxyzeditinput.txt'
             temp=open(blanktxt,'w')
             temp.write('\n')
             temp.close()
-            cmdstr=self.xyzeditpath+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/VersionFiles/'+'water.xyz'+' '+'>'+' '+xyzout
+            cmdstr=self.xyzeditpath+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/VersionFiles/'+'water.xyz'+' '+'<'+' '+blanktxt+' '+'>'+' '+xyzout
             returned_value = subprocess.call(cmdstr, shell=True)
             temp=open(xyzout,'r')
             results=temp.readlines()
