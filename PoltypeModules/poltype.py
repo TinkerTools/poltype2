@@ -94,7 +94,7 @@ class PolarizableTyper():
         xyzeditionstring:str='Place Monoatomic Ions around a Solute'
         needrot:bool=False
         heavyhyd:bool=False
-        maxtorresnitrogen:int=1
+        maxtorresnitrogen:int=2
         skipchargecheck:bool=False
         useuniquefilenames:bool=False # if users want to have unique filenames for molecular dynamics/BAR otherwise keep same filename to make copying easier from folder to folder
         xtbtorresconstant:float=5
