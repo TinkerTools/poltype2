@@ -76,7 +76,8 @@ from pathlib import Path
 from rdkit.Chem.MolStandardize import rdMolStandardize
 from itertools import groupby
 from operator import itemgetter
-
+from rdkit.Chem import rdDistGeom
+from itertools import product,combinations
 
 @dataclass
 class PolarizableTyper():
@@ -340,11 +341,11 @@ class PolarizableTyper():
         latestsmallmoleculesmartstotypespolarize:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21polarcommenttoparameters.txt'
         latestsmallmoleculesmartstotinkerclass:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21smartstoclass.txt'
         latestsmallmoleculeprmlib:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21.prm'
-        boltzmantemp:float=8
+        boltzmantemp:float=40
         dovdwscan:bool=False
         vdwprobepathname:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/VdwProbes/'
         vdwprobenames:list=field(default_factory=lambda : ['water'])
-        maxtorRMSPDRel:float=.2
+        maxtorRMSPDRel:float=.1
         vdwmissingfilename:str='missingvdw.txt'
         databaseprmfilename:str='database.prm'
         tortor:bool=False
@@ -434,7 +435,7 @@ class PolarizableTyper():
         rotbndlist:None = None
         maxRMSD:float=1
         maxRMSPD:float=1
-        maxtorRMSPD:float=1.8
+        maxtorRMSPD:float=1
         tordatapointsnum:None=None
         gentorsion:bool=False
         gaustorerror:bool=False
@@ -505,7 +506,6 @@ class PolarizableTyper():
             self.torsettooptqmtime={}
             self.torsettospqmtime={}
             self.torsettonumpoints={}
- 
                     
             opts, xargs = getopt.getopt(sys.argv[1:],'h',["help"])
 
@@ -3630,9 +3630,218 @@ class PolarizableTyper():
                 self.totalcharge=totchg 
             return molecule,atomindextoformalcharge
 
-        
 
-        
+        def DetermineSymmetryMetric(self,rdkitmol,prin):
+            rotbnd=self.onlyrotbndslist[0]
+            a=rotbnd[0]-1
+            b=rotbnd[1]-1
+            # need to choose best neighbor to define a plane to project 3D coordinates onto
+            allneighbs=[]
+            for atomindex in rotbnd:
+                atom=rdkitmol.GetAtomWithIdx(atomindex-1)
+                neighbs=atom.GetNeighbors()
+                for natom in neighbs:
+                    natomindex=natom.GetIdx()
+                    if natomindex!=a and natomindex!=b:
+                        allneighbs.append(natom)
+            foundc=False
+            for natom in allneighbs:
+                hyb=natom.GetHybridization()
+                if hyb==Chem.HybridizationType.SP2:
+                    c=natom.GetIdx()
+                    foundc=True
+                    break
+            if foundc==False:
+                c=allneighbs[0].GetIdx() # if not a ring, just pick any neighbor for plane right now. If see more examples can refine later
+            
+            apos = rdkitmol.GetConformer().GetAtomPosition(a) 
+            A=np.array([float(apos.x),float(apos.y),float(apos.z)])
+            bpos = rdkitmol.GetConformer().GetAtomPosition(b) 
+            B=np.array([float(bpos.x),float(bpos.y),float(bpos.z)])
+            cpos = rdkitmol.GetConformer().GetAtomPosition(c) 
+            C=np.array([float(cpos.x),float(cpos.y),float(cpos.z)])
+            BA=B-A
+            CA=C-A
+            u1=BA/np.linalg.norm(BA)
+            uCA=CA/np.linalg.norm(CA)
+            u2=uCA-(np.dot(uCA,u1)/np.dot(u1,u1))*u1
+            dotprod=np.dot(u1,u2)
+            atomindextoprojcoords={}
+            for atom in rdkitmol.GetAtoms():
+                atomidx=atom.GetIdx()
+                pos = rdkitmol.GetConformer().GetAtomPosition(atomidx) 
+                r=np.array([float(pos.x),float(pos.y),float(pos.z)])-A # shift coordinate system to be on top of A
+                a1=np.dot(u1,r)
+                a2=np.dot(u2,r)
+                atomindextoprojcoords[atomidx]=[a1,a2]
+            perpindicularsum=0 # make sure all projected distances in perpinducular direction are as close to 0 as possible
+            for atomindex,coords in atomindextoprojcoords.items():
+                    perpindicularsum+=coords[1]
+            perpindicularsum=np.abs(perpindicularsum)
+            return perpindicularsum
+
+        def GenerateConformers(self,rdkitmol,mol):
+            AllChem.EmbedMolecule(rdkitmol,randomSeed=10) 
+            conformer=rdkitmol.GetConformer(0)
+            m2=copy.deepcopy(rdkitmol)
+            mp = AllChem.MMFFGetMoleculeProperties(m2)
+            mp.SetMMFFOopTerm(False)
+            ffm = AllChem.MMFFGetMoleculeForceField(m2, mp)
+            confid=0
+            bondcutoff=2
+            rotbnds=[]
+            frobnds=[]
+            distmat=Chem.rdmolops.GetDistanceMatrix(rdkitmol) # bond distance matrix
+            rotbnd=self.onlyrotbndslist[0]
+            t2idx=rotbnd[0]
+            t3idx=rotbnd[1]
+            bond=rdkitmol.GetBondBetweenAtoms(t2idx-1,t3idx-1)
+            bondidx=bond.GetIdx()
+            bondrow=distmat[bondidx]
+            for bondidx in range(len(bondrow)):
+                bonddist=bondrow[bondidx]
+                bond=bondrow[bondidx]
+                bond=rdkitmol.GetBondWithIdx(bondidx)
+                bgnatom=bond.GetBeginAtom()
+                endatom=bond.GetEndAtom()
+                bgnatomidx=bgnatom.GetIdx()
+                endatomidx=endatom.GetIdx()
+                key='%d %d' % (bgnatomidx+1,endatomidx+1)
+                revkey='%d %d' % (endatomidx+1,bgnatomidx+1)
+                found=False
+                if key in self.rotbndlist.keys():
+                    thekey=key
+                    found=True
+                elif revkey in self.rotbndlist.keys():
+                    thekey=revkey
+                    found=True
+                if found==True:
+                    if bonddist>=bondcutoff:
+                        frobnds.append(thekey)
+                    else:
+                        rotbnds.append(thekey)
+                
+
+            key='%d %d' % (t2idx,t3idx)
+            revkey='%d %d' % (t3idx,t2idx)
+            angles=range(0,379,1)
+            courseangles=range(0,370,10)
+            phaselists=[]
+            rotkeytoindex={}
+            for rotbndkeyidx in range(len(self.rotbndlist.keys())): # first one is b-c that will derive torsion
+                rotkey=list(self.rotbndlist.keys())[rotbndkeyidx]
+                if rotbndkeyidx==0:
+                    phaselists.append(angles)
+                    rotkeytoindex[rotkey]=rotbndkeyidx
+                else:
+                    if rotkey in rotbnds:
+                        phaselists.append(courseangles)
+                        rotkeytoindex[rotbndkeyidx]=rotkey
+            phaselist=np.array(list(product(*phaselists)))
+            t2=mol.GetAtom(t2idx)
+            t3=mol.GetAtom(t3idx)
+            t1,t4 = torgen.find_tor_restraint_idx(self,mol,t2,t3)
+            torset=tuple([[t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx()]])
+            phaseangles=[0]
+            rotbndtorescount={}
+            maxrotbnds=1
+            restlist=[]
+            variabletorlist=[]
+            newtorset=[]
+            torsiontophaseangle={}
+            torsiontomaintor={}
+            rottors,rotbndtorescount,restlist,rotphases,torsiontophaseangle,torsiontomaintor=torgen.RotatableBondRestraints(self,torset,variabletorlist,rotbndtorescount,maxrotbnds,mol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor,crash=False)
+            frotors,rotbndtorescount,restlist,torsiontophaseangle,torsiontomaintor=torgen.FrozenBondRestraints(self,torset,variabletorlist,rotbndtorescount,maxrotbnds,mol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor)
+            tortophase={}
+            tortoangle={}
+            alltors=[]
+            alltors.extend(rottors)
+            alltors.extend(frotors)
+            for tor in alltors:
+                tor=[i-1 for i in tor]
+                a=rdMolTransforms.GetDihedralDeg(conformer, tor[0],tor[1],tor[2],tor[3])
+                if a<0:
+                    a+=360
+                tortoangle[tuple(tor)]=a
+            firsttor=rottors[0]
+            firsttor=[i-1 for i in firsttor] 
+            firstangle=tortoangle[tuple(firsttor)]
+            for i in range(len(rottors)):
+                rottor=rottors[i]
+                rottor=[j-1 for j in rottor]
+                if i!=0:
+                    a=tortoangle[tuple(rottor)]
+                    phase=firstangle-a
+                else:
+                    phase=0
+                tortophase[tuple(rottor)]=phase
+            for angletup in phaselist:
+                    
+                confid+=1
+                ff2 = AllChem.MMFFGetMoleculeForceField(m2, mp)
+                for j in range(len(rottors)):
+                    rottor=rottors[j]
+                    rottor=[i-1 for i in rottor]
+                    phase=tortophase[tuple(rottor)]
+                    rotkey='%d %d' % (rottor[1]+1,rottor[2]+1)
+                    angleidx=rotkeytoindex[rotkey]
+                    angle=angletup[angleidx]
+                    ff2.MMFFAddTorsionConstraint(rottor[0],rottor[1],rottor[2],rottor[3], False, angle+phase - .1, angle+phase + .1, 100.0)
+
+                for j in range(len(frotors)):
+                    frotor=frotors[j]
+                    frotor=[i-1 for i in frotor]
+                    currentangle=tortoangle[tuple(frotor)]
+                    rotkey='%d %d' % (frotor[1]+1,frotor[2]+1)
+                    if rotkey in rotkeytoindex.keys():
+                        angleidx=rotkeytoindex[rotkey]
+                        angle=angletup[angleidx]
+                    else:
+                        angle=currentangle
+
+                    ff2.MMFFAddTorsionConstraint(frotor[0],frotor[1],frotor[2],frotor[3], False, angle - .1, angle + .1, 100.0)
+
+
+
+                ff2.Minimize()
+                xyz=ff2.Positions()
+                new_conf = Chem.Conformer(rdkitmol.GetNumAtoms())
+                for i in range(rdkitmol.GetNumAtoms()):
+                    new_conf.SetAtomPosition(i, (m2.GetConformer(-1).GetAtomPosition(i)))
+                new_conf.SetId(confid)
+                rdkitmol.AddConformer(new_conf) 
+
+            return rdkitmol
+
+        def GenerateMaxSymmetryConformer(self,rdkitmol,mol):
+            rdkitmol=self.GenerateConformers(rdkitmol,mol) 
+            confs=rdkitmol.GetConformers()
+            symmetrictoconf={}
+            for i in range(len(confs)):
+                conf=confs[i]
+                name="conftest"+".mol"
+                rdmolfiles.MolToMolFile(rdkitmol,name,confId=i)
+                mol=rdmolfiles.MolFromMolFile(name,removeHs=False)
+                prin=False
+                symmetric=self.DetermineSymmetryMetric(mol,prin)
+                symmetrictoconf[symmetric]=i
+            minsymmetric=min(symmetrictoconf.keys())
+            confindex=symmetrictoconf[minsymmetric]
+            name="bestconf.mol"
+            rdmolfiles.MolToMolFile(rdkitmol,name,confId=confindex)
+            confslist=[confindex]
+            indextocoordslist=[]
+            for confindex in confslist:
+                indextocoordinates={}
+                rdmolfiles.MolToMolFile(rdkitmol,name,confId=confindex)
+                mol=rdmolfiles.MolFromMolFile(name,removeHs=False)
+                for i in range(len(mol.GetAtoms())):
+                    pos = mol.GetConformer().GetAtomPosition(i) 
+                    vec=np.array([float(pos.x),float(pos.y),float(pos.z)])
+                    indextocoordinates[i]=vec
+                indextocoordslist.append(indextocoordinates)
+            return indextocoordslist
+
 
         def GenerateExtendedConformer(self,rdkitmol,mol):
             """
@@ -4178,15 +4387,16 @@ class PolarizableTyper():
             11. Initialize array containing atomic indices to coordinates for each conformation that will be used for multipole fitting (can fit many conformations)
             12. Determine if the whole molecule is one giant ring (like host etc), then dont want to generate extended conformations (cause issues in rdkit)
             13. If molecule input is 2D coordinates, generate 3D coordinates
-            14. Generate extended conformation via rdkit and also if user specifies, add more conformations for multipole fitting.
-            15. Update rdkit object with extended conformation coordinates
-            16. If scratch directories dont exist, then make them.
-            17. Generate ionization states and enumerate tautomers, if user only wants to generate protonation states, then exit. 
-            18. Iodine requires def2 basis sets with ECP and ECP-MP2 analytical gradients are not implemented in psi4, so if Iodine is detected in molecule, then change default basis set from MP2 to wB97X-D
-            19. The default basis set for torsion SP, doesnt have Br, so remove the + and use slightly lower basis set.
-            20. Remove any cartesian XYZ files, as they interfere with tinker XYZ files (same extension) 
-            21. Compute symmetry type numbers for input molecule. 
-            22. Find partial double bonds in molecule, for later use in deciding which torsions to transfer and fit from database
+            14. Compute symmetry type numbers for input molecule. 
+            
+            15. Find partial double bonds in molecule, for later use in deciding which torsions to transfer and fit from database, also generate list of torsions for rotatable bonds for generating Max symmetry conformer. 
+            16. Generate extended conformation via rdkit and also if user specifies, add more conformations for multipole fitting. Generate max symmetry conformer for fragment job. 
+            17. Update rdkit object with extended conformation coordinates
+            18. If scratch directories dont exist, then make them.
+            19. Generate ionization states and enumerate tautomers, if user only wants to generate protonation states, then exit. 
+            20. Iodine requires def2 basis sets with ECP and ECP-MP2 analytical gradients are not implemented in psi4, so if Iodine is detected in molecule, then change default basis set from MP2 to wB97X-D
+            21. The default basis set for torsion SP, doesnt have Br, so remove the + and use slightly lower basis set.
+            22. Remove any cartesian XYZ files, as they interfere with tinker XYZ files (same extension) 
             23. For each conformation needed to be fit for multipoles, compute the QM geometry optimization. Then afterwords check to ensure no bonds were created/broken if so, then crash the program.
             24. If user is providing multipole and polarize parameter to poltype, then dont need to run QM geometry optimization so generate a fake geometry opt XYZ output file from input coordinates.
             25. If user wants to only do geometry optimzation then quit program
@@ -4306,11 +4516,26 @@ class PolarizableTyper():
                 self.generateextendedconf=False
             # STEP 13
             mol,m=self.CheckIsInput2D(mol,obConversion,m)
+
             # STEP 14
+            self.canonicallabel = [ 0 ] * mol.NumAtoms()
+            self.localframe1 = [ 0 ] * mol.NumAtoms()
+            self.localframe2 = [ 0 ] * mol.NumAtoms()
+            self.WriteToLog("Atom Type Classification")
+            self.idxtosymclass,self.symmetryclass=symm.gen_canonicallabels(self,mol,None,self.usesymtypes,True)
+            
+            # STEP 15
+            torgen.FindPartialDoubleBonds(self,m,mol) # need to find something to hardcode transfer for partial double amide/acid, currently will derive torsion parameters if doesnt find "good" match in torsion database
+            torgen.get_all_torsions(self,mol)
+            (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,mol,[],[],allmissing=True) # need to call this to get self.rotbndlist to generate restraints for N-dimensional scan in GenerateMaxSymmetryConformer
+            # STEP 16
             if self.firstoptfinished==False and self.isfragjob==False and self.generateextendedconf==True:
                 indextocoordslist=self.GenerateExtendedConformer(m,mol)
                 indextocoordinates=indextocoordslist[0]
-            # STEP 15
+            if self.isfragjob==True and len(self.onlyrotbndslist)!=0:
+                indextocoordslist=self.GenerateMaxSymmetryConformer(m,mol)
+                indextocoordinates=indextocoordslist[0]
+            # STEP 17
             Chem.GetSymmSSSR(m)
             m.GetRingInfo().NumRings() 
             try:
@@ -4321,7 +4546,7 @@ class PolarizableTyper():
                 rdmolfiles.MolToMolFile(m,'extendedconf.mol')
 
             mol=self.SetDefaultCoordinatesBabel(mol,indextocoordinates)
-            # STEP 16 
+            # STEP 18 
             if not os.path.exists(self.scrtmpdirpsi4):
                 os.mkdir(self.scrtmpdirpsi4)
             if not os.path.exists(self.scrtmpdirgau):
@@ -4332,33 +4557,26 @@ class PolarizableTyper():
             self.rdkitmol=m
             self.mol.SetTotalCharge(self.totalcharge)
             
-            # STEP 17
+            # STEP 19
             self.GrabIonizationStates(m)
             self.GrabTautomers(m)
             if self.genprotstatesonly==True:
                 sys.exit()
-            # STEP 18
+            # STEP 20
             if ('I ' in self.mol.GetSpacedFormula()):
                 self.optmethod='wB97X-D'
-            # STEP 19
+            # STEP 21
             if ('Br ' in self.mol.GetSpacedFormula()):
                 self.torspbasisset=self.torspbasissethalogen
             
-            # STEP 20
+            # STEP 22
             self.RemoveCartesianXYZFiles()
             self.WriteToLog("Running on host: " + gethostname())
-            # STEP 21
-            self.canonicallabel = [ 0 ] * mol.NumAtoms()
-            self.localframe1 = [ 0 ] * mol.NumAtoms()
-            self.localframe2 = [ 0 ] * mol.NumAtoms()
-            self.WriteToLog("Atom Type Classification")
-            self.idxtosymclass,self.symmetryclass=symm.gen_canonicallabels(self,mol,None,self.usesymtypes,True) 
+             
             
              
 
-            # STEP 22
-            torgen.FindPartialDoubleBonds(self,m) # need to find something to hardcode transfer for partial double amide/acid, currently will derive torsion parameters if doesnt find "good" match in torsion database
-            
+                        
             # STEP 23    
             if (self.writeoutpolarize==True and self.writeoutmultipole==True):
                 optmolist,errorlist,torsionrestraintslist = opt.GeometryOPTWrapper(self,molist)
@@ -4491,8 +4709,7 @@ class PolarizableTyper():
                 if self.databasematchonly==True:
                     sys.exit()
             # STEP 41
-            torgen.get_all_torsions(self,mol)
-            (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,optmol,torsionsmissing)
+            (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,optmol,torsionsmissing,self.onlyrotbndslist)
             torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules
             torlist=[tuple(i) for i in torlist]
             torlist=[tuple([i]) for i in torlist]

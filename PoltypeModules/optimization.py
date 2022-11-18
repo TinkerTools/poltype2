@@ -574,8 +574,6 @@ def StructureMinimization(poltype,torsionrestraints):
     poltype.WriteToLog("")
     poltype.WriteToLog("=========================================================")
     poltype.WriteToLog("Minimizing structure\n")
-    if poltype.isfragjob==True:
-        torsionrestraints=[] 
     AddTorsionRestraints(poltype,poltype.key7fname,torsionrestraints)
     cmd = poltype.minimizeexe+' -k '+poltype.tmpkeyfile+' '+poltype.tmpxyzfile+' 0.1 > Minimized_final.out'
     poltype.call_subsystem([cmd], True)
@@ -630,7 +628,7 @@ def FindTorsionRestraints(poltype,mol):
         bondnum+=1
         
 
-    if atomnum>=25 and bondnum>=2:
+    if bondnum>=2:
         for b in openbabel.OBMolBondIter(mol):
             isrot=b.IsRotor()
             t2 = b.GetBeginAtom()
@@ -665,24 +663,7 @@ def FindTorsionRestraints(poltype,mol):
             rtdatomicnum=t4.GetAtomicNum()
             if (rtaatomicnum==7 and rtbatomicnum==7 and rtcatomicnum==7) or (rtbatomicnum==7 and rtcatomicnum==7 and rtdatomicnum==7):
                 continue # sometimes nitrogens in chain very stiff double bonds then become linear during opt
-            if rtbatomicnum==6:
-                iteratomatom = openbabel.OBAtomAtomIter(t2)
-                hcount=0
-                for nrtb in iteratomatom:
-                    nrtbatomicnum=nrtb.GetAtomicNum()
-                    if nrtbatomicnum==1:
-                        hcount+=1
-                if hcount==3:
-                    continue 
-            if rtcatomicnum==6:
-                iteratomatom = openbabel.OBAtomAtomIter(t3)
-                hcount=0
-                for nrtc in iteratomatom:
-                    nrtcatomicnum=nrtc.GetAtomicNum()
-                    if nrtcatomicnum==1:
-                        hcount+=1
-                if hcount==3:
-                    continue
+            
             t2idx=t2.GetIdx()
             t3idx=t3.GetIdx()
             babelfirst=[t2idx,t3idx]
@@ -690,7 +671,19 @@ def FindTorsionRestraints(poltype,mol):
                 continue
             t1idx=t1.GetIdx()
             t4idx=t4.GetIdx()
-            torsionrestraints.append([t1idx,t2idx,t3idx,t4idx])
+            torset=tuple([[t1idx,t2idx,t3idx,t4idx]])
+            phaseangles=[0]
+            rotbndtorescount={}
+            maxrotbnds=1
+            restlist=[]
+            variabletorlist=[]
+            newtorset=[]
+            torsiontophaseangle={}
+            torsiontomaintor={}
+            rottors,rotbndtorescount,restlist,rotphases,torsiontophaseangle,torsiontomaintor=torgen.RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,mol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor,crash=False)
+            frotors,rotbndtorescount,restlist,torsiontophaseangle,torsiontomaintor=torgen.FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,mol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor)
+            for rottor in rottors:
+                torsionrestraints.append(rottor)
 
 
     return torsionrestraints
@@ -704,7 +697,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
     Description: 
     """
 
-    if bondanglerestraints!=None or poltype.isfragjob==True or poltype.generateextendedconf==False: # then vdw opt
+    if bondanglerestraints!=None or poltype.generateextendedconf==False: # then vdw opt
         pass
         torsionrestraints=[]
     else: # see if need to restrain torsion in extended conformation

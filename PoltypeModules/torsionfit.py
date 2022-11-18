@@ -946,7 +946,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             # torprmdict: torsion information 
             # y: tor_energy_list
             if useweights==True: 
-                errfunc = lambda p, x, z, torprmdict, y: weightlist*(fitfunc(poltype,p, x,z, torprmdict) - y)
+                errfunc = lambda p, x, z, torprmdict, y: (fitfunc(poltype,p, x,z, torprmdict) - weightlist*y)
 
             else:
                 errfunc = lambda p, x, z, torprmdict, y: fitfunc(poltype,p, x,z, torprmdict) - y
@@ -1059,7 +1059,7 @@ def GeneratePlots(poltype,cls_angle_dict,torset,useweights,classkeylist,fitfunc_
         fitfunc_dict[clskey] = fitfunc(poltype,'eval',torgen.rads(poltype,Sx),torset,torprmdict,debug=False)
         if clskey in clskeyswithbadfits:
             def RMSD(c):
-                return numpy.sqrt(numpy.mean(numpy.square(numpy.add(weightlist*(numpy.subtract(fitfunc_dict[clskey],tor_energy_list)),c))))
+                return numpy.sqrt(numpy.mean(numpy.square(numpy.add((numpy.subtract(fitfunc_dict[clskey],weightlist*tor_energy_list)),c))))
 
 
         else:

@@ -219,7 +219,7 @@
 * The error is defined as the difference between QM and MM arrays, where MM is the prefit torsion AMOEBA energy array. The loss function is then the difference between the AMOEBA torsion equation and the error. 
 * This loss function is minimized via least squares regression (implemented in scipy). 
 * The parameter quality is then evaluated by iteratively modifying the keyfiles; each QM-optimized structure is Tinker minimized with the new parameters, then the resulting Tinker minimized structure’s total energy is computed with the new parameters. 
-* Parameter fit quality is measured via root mean square error and relative root mean square error (RMSE). If the fitting procedure generates a fit that is greater than the RMSE and relative RMSE (relative to QM) tolerance values (1.8 and 0.2 respectively), then the parameterization procedure restarts with Boltzmann weights. Both RMSE and relative RMSE will also be evalated then with Boltzmann weights. 
+* Parameter fit quality is measured via root mean square error and relative root mean square error (RMSE). If the fitting procedure generates a fit that is greater than the RMSE and relative RMSE (relative to QM) tolerance values (1 and 0.1 respectively), then the parameterization procedure restarts with Boltzmann weights. Both RMSE and relative RMSE will also be evalated then with Boltzmann weights. 
 * Final RMSE is reported in the key file that proceeds torsion fitting as a comment above the parameter line. Example torsion fitting plots are demonstrated for the fragment in **Figure 6**.
 
 <img src="Images/Torsion.PNG" width="50%">

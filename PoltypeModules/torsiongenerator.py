@@ -1310,7 +1310,7 @@ def GenerateBondTopology(poltype,optmol):
     return bondtopology
 
 
-def FindPartialDoubleBonds(poltype,rdkitmol):
+def FindPartialDoubleBonds(poltype,rdkitmol,mol):
     """
     Intent:
     Input:
@@ -1326,7 +1326,7 @@ def FindPartialDoubleBonds(poltype,rdkitmol):
         smarts=smartslist[smartsidx]
         sp = openbabel.OBSmartsPattern()
         openbabel.OBSmartsPattern.Init(sp,smarts)
-        diditmatch=sp.Match(poltype.mol)
+        diditmatch=sp.Match(mol)
         matches=sp.GetMapList()
         for match in matches:
             if smartsidx==0:
@@ -1378,7 +1378,7 @@ def GrabAllRingsContainingMostIndices(poltype,atomindices,babelindices,total):
 
 
 
-def get_torlist(poltype,mol,missed_torsions):
+def get_torlist(poltype,mol,missed_torsions,onlyrotbndslist,allmissing=False):
     """
     Intent: Find unique rotatable bonds.
     Input:
@@ -1401,7 +1401,7 @@ def get_torlist(poltype,mol,missed_torsions):
     torlist = []
     nonarotorsions=[]
     poltype.rotbndlist = {}
-    poltype.nonrotbndlist={} 
+    poltype.nonrotbndlist={}
     iterbond = openbabel.OBMolBondIter(mol)
     nonaroringtorlist=[]
     for bond in iterbond:
@@ -1428,7 +1428,7 @@ def get_torlist(poltype,mol,missed_torsions):
 
         sortedtor=torfit.sorttorsion(poltype,[poltype.idxtosymclass[t1.GetIdx()],poltype.idxtosymclass[t2.GetIdx()],poltype.idxtosymclass[t3.GetIdx()],poltype.idxtosymclass[t4.GetIdx()]])
         foundmissing=False
-        if(sortedtor in missed_torsions or sortedtor[::-1] in missed_torsions) and len(poltype.onlyrotbndslist)==0:
+        if(sortedtor in missed_torsions or sortedtor[::-1] in missed_torsions) and len(onlyrotbndslist)==0:
             skiptorsion = False
             foundmissing=True
 
@@ -1444,7 +1444,7 @@ def get_torlist(poltype,mol,missed_torsions):
                             willrefinenonarotor=True                
 
         onlyrot=False
-        if [t2.GetIdx(),t3.GetIdx()] in poltype.onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in poltype.onlyrotbndslist:
+        if [t2.GetIdx(),t3.GetIdx()] in onlyrotbndslist or [t3.GetIdx(),t2.GetIdx()] in onlyrotbndslist:
             skiptorsion = False
             
             onlyrot=True
@@ -1461,7 +1461,7 @@ def get_torlist(poltype,mol,missed_torsions):
         allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
         allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol)
         unq=get_uniq_rotbnd(poltype,t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx())
-        if ringbond==True and willrefinenonarotor==False and len(poltype.onlyrotbndslist)==0 and poltype.dontfrag==False and foundmissing==True:
+        if ringbond==True and willrefinenonarotor==False and len(onlyrotbndslist)==0 and poltype.dontfrag==False and foundmissing==True:
             nonaroringtorlist.append(unq)
             skiptorsion=False
 
@@ -1477,7 +1477,7 @@ def get_torlist(poltype,mol,missed_torsions):
                         ringbond=False
         if ringbond==True:
             continue
-        if skiptorsion==False:
+        if skiptorsion==False or allmissing==True:
             poltype.rotbndlist[rotbndkey] = []
             poltype.rotbndlist[rotbndkey].append(unq)
             poltype.rotbndlist=FindOtherTorsAboutBond(poltype,poltype.rotbndlist,bond,rotbndkey,t1,t2,t3,t4)
