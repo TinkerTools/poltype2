@@ -3701,7 +3701,10 @@ class PolarizableTyper():
             for bondidx in range(len(bondrow)):
                 bonddist=bondrow[bondidx]
                 bond=bondrow[bondidx]
-                bond=rdkitmol.GetBondWithIdx(bondidx)
+                try:
+                    bond=rdkitmol.GetBondWithIdx(bondidx)
+                except:
+                    continue
                 bgnatom=bond.GetBeginAtom()
                 endatom=bond.GetEndAtom()
                 bgnatomidx=bgnatom.GetIdx()
@@ -3728,15 +3731,18 @@ class PolarizableTyper():
             courseangles=range(0,370,10)
             phaselists=[]
             rotkeytoindex={}
+            count=0
             for rotbndkeyidx in range(len(self.rotbndlist.keys())): # first one is b-c that will derive torsion
                 rotkey=list(self.rotbndlist.keys())[rotbndkeyidx]
                 if rotbndkeyidx==0:
                     phaselists.append(angles)
                     rotkeytoindex[rotkey]=rotbndkeyidx
+                    count+=1
                 else:
                     if rotkey in rotbnds:
                         phaselists.append(courseangles)
-                        rotkeytoindex[rotbndkeyidx]=rotkey
+                        rotkeytoindex[rotkey]=count
+                        count+=1
             phaselist=np.array(list(product(*phaselists)))
             t2=mol.GetAtom(t2idx)
             t3=mol.GetAtom(t3idx)
