@@ -130,6 +130,7 @@
 
 #### Distributed Multipole Analysis and Electrostatic Single Point
 
+``usepoleditframes`` specifies to use POLEDIT frames rather than poltype frame detection. Default is True.
 
 ``dmamethod``  specifies which quantum method to use for distributed multipole analysis (DMA). Default is MP2.
                   

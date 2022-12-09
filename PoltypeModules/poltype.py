@@ -306,7 +306,7 @@ class PolarizableTyper():
         debugmode:bool=False
         fragmenterdebugmode:bool=False
         jobsatsametime:int=0
-        usepoleditframes:bool=False
+        usepoleditframes:bool=True
         databasematchonly:bool=False
         setupfragjobsonly:bool=False
         allowradicals:bool=False
