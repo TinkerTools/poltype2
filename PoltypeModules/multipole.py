@@ -245,8 +245,8 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
     """
     poltype.WriteToLog('Local Frame Symmetry Detection')
     poltype.WriteToLog('Define Polarization Groups and Polarization Parameters')
+    lfzerox = [ False ] * mol.NumAtoms()
     if poltype.usepoleditframes==False:
-        lfzerox = [ False ] * mol.NumAtoms()
         atomindextoremovedipquad={} # for methane need to make dipole and quadupole on the carbon zeroed out, will return this for post proccesing the keyfile after poledit is run
         atomindextoremovedipquadcross={}
         atomtypetospecialtrace={} # for H on CH4 need to make sure Qxx=Qyy=-1/2*Qzz

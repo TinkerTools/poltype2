@@ -630,6 +630,9 @@ def FindTorsionRestraints(poltype,mol):
 
     if bondnum>=2:
         for b in openbabel.OBMolBondIter(mol):
+            BO=b.GetBondOrder()
+            if BO>1: # dont restrain double bonds
+                continue
             isrot=b.IsRotor()
             t2 = b.GetBeginAtom()
             t3 = b.GetEndAtom()
