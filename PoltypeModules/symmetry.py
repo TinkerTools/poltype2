@@ -76,6 +76,7 @@ def ComputeSymmetryTypes(poltype,distmat,rdkitmol,mol,usesym):
     2. Iterate over GI vectors for each atom and check if their is GI vector match, if so add to same group
     3. If usesym==False then use atom index instead of type numbers.
     """
+    fprints = fingerprint(mol)
     indextomatchingindices={}
     indextoGI={}
     if usesym==True:
@@ -83,7 +84,7 @@ def ComputeSymmetryTypes(poltype,distmat,rdkitmol,mol,usesym):
         # STEP 1
         for atom in rdkitmol.GetAtoms():
             atomidx=atom.GetIdx()
-            GI=ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices)
+            GI=fprints[atomidx]
             indextoGI[atomidx]=GI
         # STEP 2
         for index,GI in indextoGI.items():
@@ -123,105 +124,93 @@ def ReadCustomIndexToTypeFiles(poltype,indextotypefile):
     return indextomatchingindices
 
 
+def fingerprint(mol):
+  fprints = []
+  iteratombab = openbabel.OBMolAtomIter(mol)
+  atoms = []
+  elements = []
+  for atm in iteratombab:
+      atoms.append(str(atm.GetIdx()))
+      elements.append(str(atm.GetAtomicNum()))
+  
+  connections = []
+  for atomidx in atoms:
+    atomidx=int(atomidx)
+    conns=[]
+    iterbond = openbabel.OBMolBondIter(mol) 
+    for bond in iterbond:
+        bgnidx=bond.GetBeginAtomIdx()
+        endidx=bond.GetEndAtomIdx()
+        if bgnidx==atomidx:
+            if endidx not in conns:
+                conns.append(str(endidx))
+        elif endidx==atomidx:
+            if bgnidx not in conns:
+                conns.append(str(bgnidx))
+    connections.append(conns)
+  
 
+  
+  
+  atom_ele_dict = dict(zip(atoms, elements))
+  atom_con_dict = {}
+  for atom, con in zip(atoms,connections):
+    con_ele = [atom_ele_dict[c] for c in con] 
+    constr = ''.join(sorted(con_ele)) 
+    atom_con_dict[atom] = constr
 
-def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
-    """
-    Intent:
-    Input: Atom of interest object, rdkit MOL object, pairwise topological distance matrix, openbabel MOL object, list of list of ring atomic indices.
-    Output: Graph Invariant Vector
-    Referenced By: ComputeSymmetryTypes
-    Description:
-    1. Grab topological distances to every other atom in graph.  
-    2. Determine unique topological distances from atom.
-    3. For each unique topological distance from atom, find all other atoms at same distance away and save the atomic number of that atom. Also save the neighboring environment (all first neighbors) of that atomic number at distance d away. 
-    4. Then count how many atoms of same atomic number and neiboring enviorment are at that distance away from original atom.
-    5. Now for every distance d, away from atom of interest a, you have a map of atomic number to number of occurances of atomic number (with neiboring environment) at that distance. This is in essence what the symmetry type number is.
-    6. Now for each d, 0-max(d), sort the map of atomic number to occurances and add to one large array. Need to sort since the maps may have different order but same information (could be same type but have maps in different order).
-    7. If you are a singly valent atom such as hydrogen check for ring membership of neighbor else check ring membership of atom of interest and add the ring atoms it belongs to to the GI array. 
-    """
-    GI=[]
-    atomidx=atom.GetIdx()
-    # STEP 1
-    distances=distmat[atomidx]
-    indices=np.array(list(range(len(distances))))
-    indextodist=dict(zip(indices,distances))
-    distancetoatomicnumneighbstocount={}
-    # STEP 2
-    uniquedistances=set(distances)
-    # STEP 3
-    for d in uniquedistances:
-        if d not in distancetoatomicnumneighbstocount.keys():
-            distancetoatomicnumneighbstocount[d]={}
-            atomicnumneighbstocount={}
-            for index,dist in indextodist.items():
-                oatom=rdkitmol.GetAtomWithIdx(int(index))
-                atomicnum=oatom.GetAtomicNum()
-                if dist==d:
-                    natomicnumtocount={}
-                    natomicnums=[]
-                    for natom in oatom.GetNeighbors():
-                        natomicnum=natom.GetAtomicNum()
-                        natomicnums.append(natomicnum)
-                    uniquenatomicnums=set(natomicnums)
-                    for natomnum in uniquenatomicnums:
-                        count=natomicnums.count(natomnum)
-                        natomicnumtocount[natomnum]=count
-                    sortednatomicnumtocount=dict(sorted(natomicnumtocount.items()))
-                    ls=[atomicnum]
-                    for atmnum,count in sortednatomicnumtocount.items():
-                        ls.append(atmnum*count)
-                    ls=tuple(ls)
-                    if ls not in atomicnumneighbstocount.keys():
-                        atomicnumneighbstocount[ls]=0
-                    atomicnumneighbstocount[ls]+=1
-                    
-            # STEP 4
-            distancetoatomicnumneighbstocount[d]=atomicnumneighbstocount
-    # STEP 5
-    sorteddistancetoatomicnumcounts=dict(sorted(distancetoatomicnumneighbstocount.items()))
+  level = 5 
+  if level > 1:
+    atom_con_dict2 = {}
+    for atom, con in zip(atoms,connections):
+      eles = []
+      cons = []
+      for c in con:
+        eles.append(atom_ele_dict[c])
+        cons.append(c)
+      cons = [x for _,x in sorted(zip(eles,cons))]
+      newstr = ''.join([atom_con_dict[c] for c in cons])
+      atom_con_dict2[atom] = ''.join(sorted(newstr))
 
-    # STEP 6 
-    for d,dic in sorteddistancetoatomicnumcounts.items():
-        newls=[]
-        for neighbnum,count in dic.items():
-            newls.extend(list(neighbnum)+[count])
+  # level 3 is good for chain molecules 
+  if level > 2:
+    atom_con_dict3 = {}
+    for atom, con in zip(atoms,connections):
+      eles = []
+      cons = []
+      for c in con:
+        eles.append(atom_ele_dict[c])
+        cons.append(c)
+      cons = [x for _,x in sorted(zip(eles,cons))]
+      newstr = ''.join([atom_con_dict2[c] for c in cons])
+      atom_con_dict3[atom] = ''.join(sorted(newstr))
 
-        newls.sort()
-        GI.extend(newls)
-    
-
-    neighbs=[natom for natom in atom.GetNeighbors()] # now need to include bond order information to atomic element for neighhbors since found special case that didnt work
-    neighbindices=[natom.GetIdx() for natom in neighbs]
-    
-
-    # STEP 7
-    numneighbs=len(neighbs)
-    isaro=atom.GetIsAromatic()
-    isinring=mol.GetAtom(atomidx+1).IsInRing()
-    atomicnum=atom.GetAtomicNum()
-    GI.append(atomicnum)
-    atmnumtocount={}
-    if numneighbs==1:
-       neighb=neighbs[0]
-       natomidx=neighb.GetIdx()
-       rings=databaseparser.GrabAllRingsContainingIndices(poltype,atomindices,[natomidx+1])
-    else:
-       rings=databaseparser.GrabAllRingsContainingIndices(poltype,atomindices,[atomidx+1])
-    if len(rings)>0:
-        for ring in rings:
-            if len(ring)<=7: # openbabel doesnt count all ring memership right someitmes when whole molecule is giant ring
-                for atomindex in ring:
-                    atom=rdkitmol.GetAtomWithIdx(atomindex-1)
-                    atomicnum=atom.GetAtomicNum()
-                    if atomicnum not in atmnumtocount.keys():
-                        atmnumtocount[atomicnum]=0
-                    atmnumtocount[atomicnum]+=1
-        ls=[]
-        sortedatmnumtocount=dict(sorted(atmnumtocount.items()))
-        for atmnum,count in sortedatmnumtocount.items():
-            ls.append(atmnum*count)
-        GI.extend(ls)
-
-
-    return GI
+  # level 4 is needed for ring molecules 
+  if level > 3:
+    atom_con_dict4 = {}
+    for atom, con in zip(atoms,connections):
+      eles = []
+      cons = []
+      for c in con:
+        eles.append(atom_ele_dict[c])
+        cons.append(c)
+      cons = [x for _,x in sorted(zip(eles,cons))]
+      newstr = ''.join([atom_con_dict3[c] for c in cons])
+      atom_con_dict4[atom] = ''.join(sorted(newstr))
+  
+  if level > 4:
+    atom_con_dict5 = {}
+    for atom, con in zip(atoms,connections):
+      eles = []
+      cons = []
+      for c in con:
+        eles.append(atom_ele_dict[c])
+        cons.append(c)
+      cons = [x for _,x in sorted(zip(eles,cons))]
+      newstr = ''.join([atom_con_dict4[c] for c in cons])
+      atom_con_dict5[atom] = ''.join(sorted(newstr))
+  
+  for atom in atoms:
+    fprints.append(atom_ele_dict[atom] + '-' + str(''.join(sorted(atom_con_dict[atom] + atom_con_dict2[atom] + atom_con_dict3[atom] + atom_con_dict4[atom] + atom_con_dict5[atom]))))
+  
+  return fprints
