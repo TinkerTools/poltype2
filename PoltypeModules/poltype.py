@@ -3689,6 +3689,7 @@ class PolarizableTyper():
             ffm = AllChem.MMFFGetMoleculeForceField(m2, mp)
             confid=0
             bondcutoff=2
+            dim=1
             rotbnds=[]
             frobnds=[]
             distmat=Chem.rdmolops.GetDistanceMatrix(rdkitmol) # bond distance matrix
@@ -3724,7 +3725,6 @@ class PolarizableTyper():
                     else:
                         rotbnds.append(thekey)
                 
-
             key='%d %d' % (t2idx,t3idx)
             revkey='%d %d' % (t3idx,t2idx)
             angles=range(0,379,1)
@@ -3736,13 +3736,16 @@ class PolarizableTyper():
                 rotkey=list(self.rotbndlist.keys())[rotbndkeyidx]
                 if rotbndkeyidx==0:
                     phaselists.append(angles)
-                    rotkeytoindex[rotkey]=rotbndkeyidx
-                    count+=1
+                    if count<dim:
+                        rotkeytoindex[rotkey]=rotbndkeyidx
+                        count+=1
                 else:
                     if rotkey in rotbnds:
                         phaselists.append(courseangles)
-                        rotkeytoindex[rotkey]=count
-                        count+=1
+                        if count <dim:
+                            rotkeytoindex[rotkey]=count
+                            count+=1
+            phaselists=phaselists[:dim]
             phaselist=np.array(list(product(*phaselists)))
             t2=mol.GetAtom(t2idx)
             t3=mol.GetAtom(t3idx)
@@ -3790,9 +3793,10 @@ class PolarizableTyper():
                     rottor=[i-1 for i in rottor]
                     phase=tortophase[tuple(rottor)]
                     rotkey='%d %d' % (rottor[1]+1,rottor[2]+1)
-                    angleidx=rotkeytoindex[rotkey]
-                    angle=angletup[angleidx]
-                    ff2.MMFFAddTorsionConstraint(rottor[0],rottor[1],rottor[2],rottor[3], False, angle+phase - .1, angle+phase + .1, 100.0)
+                    if rotkey in rotkeytoindex.keys():
+                        angleidx=rotkeytoindex[rotkey]
+                        angle=angletup[angleidx]
+                        ff2.MMFFAddTorsionConstraint(rottor[0],rottor[1],rottor[2],rottor[3], False, angle+phase - .1, angle+phase + .1, 100.0)
 
                 for j in range(len(frotors)):
                     frotor=frotors[j]
@@ -4529,7 +4533,6 @@ class PolarizableTyper():
             self.localframe2 = [ 0 ] * mol.NumAtoms()
             self.WriteToLog("Atom Type Classification")
             self.idxtosymclass,self.symmetryclass=symm.gen_canonicallabels(self,mol,None,self.usesymtypes,True)
-            
             # STEP 15
             torgen.FindPartialDoubleBonds(self,m,mol) # need to find something to hardcode transfer for partial double amide/acid, currently will derive torsion parameters if doesnt find "good" match in torsion database
             torgen.get_all_torsions(self,mol)
@@ -4550,7 +4553,6 @@ class PolarizableTyper():
                 pass
             if self.generateextendedconf==True:
                 rdmolfiles.MolToMolFile(m,'extendedconf.mol')
-
             mol=self.SetDefaultCoordinatesBabel(mol,indextocoordinates)
             # STEP 18 
             if not os.path.exists(self.scrtmpdirpsi4):
@@ -4562,7 +4564,6 @@ class PolarizableTyper():
             self.mol=mol
             self.rdkitmol=m
             self.mol.SetTotalCharge(self.totalcharge)
-            
             # STEP 19
             self.GrabIonizationStates(m)
             self.GrabTautomers(m)
