@@ -2418,8 +2418,8 @@ def FindMissingTorsions(poltype,torsionindicestoparametersmartsenv,rdkitmol,mol,
                             if torsionindices not in torsionsmissing:
                                 torsionsmissing.append(torsionindices)
                     else:
-                        if bondorder!=1:
-                            continue
+                        if bondorder!=1: # for double/triple bond transfer something stiff (benzene heavy torsion) if missing parameters
+                            poormatchingaromatictorsions.append(torsionindices)
                         if torsionindices not in torsionsmissing:
                             torsionsmissing.append(torsionindices)
 

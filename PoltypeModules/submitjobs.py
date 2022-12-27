@@ -69,10 +69,10 @@ def SubmitJobs(poltype,jobtolog,jobtojobpath,jobtoinputfilepaths,jobtooutputfile
     if makejobfileonly==True:
         sys.exit()
     if poltype.submitlocally==True:
-        CallJobsSeriallyLocalHost(poltype,jobtolog,jobtojobpath)
+        CallJobsSeriallyLocalHost(poltype,jobtolog,jobtojobpath,jobtooutputfiles)
 
 
-def CallJobsSeriallyLocalHost(poltype,jobtolog,jobtojobpath):
+def CallJobsSeriallyLocalHost(poltype,jobtolog,jobtojobpath,jobtooutputfiles):
     """
     Intent:
     Input:
@@ -84,6 +84,24 @@ def CallJobsSeriallyLocalHost(poltype,jobtolog,jobtojobpath):
     jobs=list(jobtolog.keys())
     for jobidx in range(len(jobs)):
         job=jobs[jobidx]
+        remainingjobs=len(jobs)-(jobidx+1)+1
+        outputfiles=jobtooutputfiles[job]
+        for outputfile in outputfiles:
+            if 'Solv' in outputfile:
+                jobtype='Solv'
+            elif 'Comp' in outputfile:
+                jobtype='Comp'
+            else:
+                continue
+            totaltime,outputfiletype,freq,serial=poltype.GrabOutputFileTypeAndTime(outputfile,jobtype,jobidx,jobs)
+            ETA=totaltime
+            ETA_string=poltype.ETAString(ETA)
+            poltype.WriteToLog('Job: '+job+' ETA: '+ETA_string)
+            totalETA=ETA*remainingjobs
+            ETA_string=poltype.ETAString(totalETA)
+            poltype.WriteToLog('Jobtype: '+outputfiletype+' ETA: '+ETA_string)
+            
+
         percentcomplete=round((jobidx+1)*100/len(jobs),2)
         poltype.WriteToLog('Percent of jobs complete = '+str(percentcomplete)+'%')
         jobpath=jobtojobpath[job]

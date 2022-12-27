@@ -38,6 +38,11 @@ def main(poltype):
     if poltype.generateinputfilesonly==True:
         sys.exit()
     mini.CheapMinimizationProtocol(poltype)
+    if poltype.estimatedynamictime==True:
+        poltype.EstimateDynamicTime()
+    poltype.ReportETA()
+    if poltype.estimatedynamictimeonly==True:
+        sys.exit()
     if poltype.equiltimeNVT!=0 and poltype.equiltimeNPT!=0:
         equil.EquilibriationProtocol(poltype)
     if poltype.proddyntime!=0:

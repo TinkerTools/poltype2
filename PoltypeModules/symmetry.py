@@ -5,6 +5,8 @@ from rdkit import Chem
 import numpy as np
 from openbabel import pybel
 import databaseparser
+import networkx as nx
+import networkx.algorithms.isomorphism as iso
 
 
 def gen_canonicallabels(poltype,mol,rdkitmol=None,usesym=True,isparent=False):
@@ -61,7 +63,6 @@ def gen_canonicallabels(poltype,mol,rdkitmol=None,usesym=True,isparent=False):
     if poltype.indextotypefile!=None and isparent==True:
         idxtosymclass=ReadCustomIndexToTypeFiles(poltype,poltype.indextotypefile)
     symmetryclass=idxtosymclass.values()
-
     return idxtosymclass,symmetryclass
 
 
@@ -72,34 +73,62 @@ def ComputeSymmetryTypes(poltype,distmat,rdkitmol,mol,usesym):
     Output: Dictionary of atom index to matching atom indices
     Referenced By: gen_canonicallabels
     Description: 
-    1. Compute GI vector for every atom
-    2. Iterate over GI vectors for each atom and check if their is GI vector match, if so add to same group
-    3. If usesym==False then use atom index instead of type numbers.
+    1. Iterate over all nodes twice, generate two copies of the original graph. For each copy, delete the node currently being iterated on. If the two graphs are isomorphic then they must be the same "type". 
     """
-    fprints = fingerprint(mol)
     indextomatchingindices={}
-    indextoGI={}
     if usesym==True:
-        atomindices=databaseparser.RingAtomicIndices(poltype,mol)
         # STEP 1
-        for atom in rdkitmol.GetAtoms():
-            atomidx=atom.GetIdx()
-            GI=fprints[atomidx]
-            indextoGI[atomidx]=GI
-        # STEP 2
-        for index,GI in indextoGI.items():
-            for oindex,oGI in indextoGI.items():
-                if GI==oGI:
-                    if index not in indextomatchingindices.keys():
-                        indextomatchingindices[index]=[]
-                    if oindex not in indextomatchingindices[index]:
-                        indextomatchingindices[index].append(oindex)
+        G = nx.Graph()
+        iteratombab = openbabel.OBMolAtomIter(mol)
+        for atm in iteratombab:
+            G.add_nodes_from([(atm.GetIdx(), {"atomicnum": atm.GetAtomicNum()})])
+        
+        iterbond = openbabel.OBMolBondIter(mol) 
+        for bond in iterbond:
+            bgnidx=bond.GetBeginAtomIdx()
+            endidx=bond.GetEndAtomIdx()
+            G.add_edge(bgnidx, endidx)
+
+        atomic_nums = nx.get_node_attributes(G, "atomicnum")
+        center=nx.center(G)
+        pairs=[]
+        for node in G.nodes():
+            if node-1 not in indextomatchingindices.keys():
+                indextomatchingindices[node-1]=[]
+            if node-1 not in indextomatchingindices[node-1]:
+                indextomatchingindices[node-1].append(node-1)
+            for onode in G.nodes():
+                if onode-1 not in indextomatchingindices.keys():
+                    indextomatchingindices[onode-1]=[]
+                if onode-1 not in indextomatchingindices[onode-1]:
+                    indextomatchingindices[onode-1].append(onode-1)
+                node_deg=G.degree(node)
+                onode_deg=G.degree(onode)
+                if node_deg==onode_deg:
+                    node_atomic_num=atomic_nums[node]
+                    onode_atomic_num=atomic_nums[onode]
+                    if node_atomic_num==onode_atomic_num:
+                        pair=set([node,onode])
+                        if node!=onode and pair not in pairs:
+                            node_dist=[nx.shortest_path_length(G, source=node, target=i) for i in center].sort()
+                            onode_dist=[nx.shortest_path_length(G, source=onode, target=i) for i in center].sort()
+                            if node_dist==onode_dist:
+                                G1=G.copy()
+                                G2=G.copy()
+                                G1.remove_node(node)
+                                G2.remove_node(onode)
+                                isiso=nx.is_isomorphic(G1,G2) # makes database searching a bit slower cause isomorphism checking is slow, but this is general solution
+                                pairs.append(pair)
+                                if isiso==True:
+                                    if onode-1 not in indextomatchingindices[node-1]:
+                                        indextomatchingindices[node-1].append(onode-1)
+                                    if node-1 not in indextomatchingindices[onode-1]:
+                                        indextomatchingindices[onode-1].append(node-1)
     else:
-        # STEP 3
+        # STEP 2
         for atom in rdkitmol.GetAtoms():
             atomidx=atom.GetIdx()
             indextomatchingindices[atomidx]=atomidx
-
     return indextomatchingindices
 
 
@@ -123,94 +152,3 @@ def ReadCustomIndexToTypeFiles(poltype,indextotypefile):
             indextomatchingindices[index]=typenumber
     return indextomatchingindices
 
-
-def fingerprint(mol):
-  fprints = []
-  iteratombab = openbabel.OBMolAtomIter(mol)
-  atoms = []
-  elements = []
-  for atm in iteratombab:
-      atoms.append(str(atm.GetIdx()))
-      elements.append(str(atm.GetAtomicNum()))
-  
-  connections = []
-  for atomidx in atoms:
-    atomidx=int(atomidx)
-    conns=[]
-    iterbond = openbabel.OBMolBondIter(mol) 
-    for bond in iterbond:
-        bgnidx=bond.GetBeginAtomIdx()
-        endidx=bond.GetEndAtomIdx()
-        if bgnidx==atomidx:
-            if endidx not in conns:
-                conns.append(str(endidx))
-        elif endidx==atomidx:
-            if bgnidx not in conns:
-                conns.append(str(bgnidx))
-    connections.append(conns)
-  
-
-  
-  
-  atom_ele_dict = dict(zip(atoms, elements))
-  atom_con_dict = {}
-  for atom, con in zip(atoms,connections):
-    con_ele = [atom_ele_dict[c] for c in con] 
-    constr = ''.join(sorted(con_ele)) 
-    atom_con_dict[atom] = constr
-
-  level = 5 
-  if level > 1:
-    atom_con_dict2 = {}
-    for atom, con in zip(atoms,connections):
-      eles = []
-      cons = []
-      for c in con:
-        eles.append(atom_ele_dict[c])
-        cons.append(c)
-      cons = [x for _,x in sorted(zip(eles,cons))]
-      newstr = ''.join([atom_con_dict[c] for c in cons])
-      atom_con_dict2[atom] = ''.join(sorted(newstr))
-
-  # level 3 is good for chain molecules 
-  if level > 2:
-    atom_con_dict3 = {}
-    for atom, con in zip(atoms,connections):
-      eles = []
-      cons = []
-      for c in con:
-        eles.append(atom_ele_dict[c])
-        cons.append(c)
-      cons = [x for _,x in sorted(zip(eles,cons))]
-      newstr = ''.join([atom_con_dict2[c] for c in cons])
-      atom_con_dict3[atom] = ''.join(sorted(newstr))
-
-  # level 4 is needed for ring molecules 
-  if level > 3:
-    atom_con_dict4 = {}
-    for atom, con in zip(atoms,connections):
-      eles = []
-      cons = []
-      for c in con:
-        eles.append(atom_ele_dict[c])
-        cons.append(c)
-      cons = [x for _,x in sorted(zip(eles,cons))]
-      newstr = ''.join([atom_con_dict3[c] for c in cons])
-      atom_con_dict4[atom] = ''.join(sorted(newstr))
-  
-  if level > 4:
-    atom_con_dict5 = {}
-    for atom, con in zip(atoms,connections):
-      eles = []
-      cons = []
-      for c in con:
-        eles.append(atom_ele_dict[c])
-        cons.append(c)
-      cons = [x for _,x in sorted(zip(eles,cons))]
-      newstr = ''.join([atom_con_dict4[c] for c in cons])
-      atom_con_dict5[atom] = ''.join(sorted(newstr))
-  
-  for atom in atoms:
-    fprints.append(atom_ele_dict[atom] + '-' + str(''.join(sorted(atom_con_dict[atom] + atom_con_dict2[atom] + atom_con_dict3[atom] + atom_con_dict4[atom] + atom_con_dict5[atom]))))
-  
-  return fprints

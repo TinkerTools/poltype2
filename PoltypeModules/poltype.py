@@ -17,6 +17,7 @@
 # GNU General Public License for more details.
 #
 ##################################################################
+import csv
 import warnings
 import math
 import traceback
@@ -78,9 +79,14 @@ from itertools import groupby
 from operator import itemgetter
 from rdkit.Chem import rdDistGeom
 from itertools import product,combinations
+import productiondynamics as prod
 
 @dataclass
 class PolarizableTyper():
+        numbergpus:int=1 # for estimating ETA for dynamics
+        estimatedynamictimeonly:bool=False
+        etafilename:str='ETA.csv'
+        estimatedynamictime:bool=True
         xyzedittranslatevalue:str=''
         xyzeditstrayvalue:str=''
         xyzeditappendvalue:str=''
@@ -490,6 +496,8 @@ class PolarizableTyper():
                 self.equiltimeNVT=2
                 self.equiltimeNPT=1
                 self.lastNVTequiltime=.5
+
+            
             
             
             self.nfoldlist =  list(range(1,self.foldnum+1))
@@ -611,6 +619,10 @@ class PolarizableTyper():
                             self.vinaexhaustiveness=int(a)
                         elif 'dockingenvname' in newline:
                             self.dockingenvname=a
+                        elif "estimatedynamictime" in newline and 'estimatedynamictimeonly' not in newline:
+                            self.estimatedynamictime=self.SetDefaultBool(line,a,True)
+                        elif "estimatedynamictimeonly" in newline:
+                            self.estimatedynamictimeonly=self.SetDefaultBool(line,a,True)
                         elif "heavyhyd" in newline:
                             self.heavyhyd=self.SetDefaultBool(line,a,True)
                         elif "skipchargecheck" in newline:
@@ -827,6 +839,8 @@ class PolarizableTyper():
                             self.equiltimestep= int(a)
                         elif ("proddyntimestep") in newline:
                             self.proddyntimestep= int(a)
+                        elif ("numbergpus") in newline:
+                            self.numbergpus= int(a)
                         elif ("equiltimeNPT") in newline:
                             self.equiltimeNPT= float(a)
                             self.inputequiltimeNPT=True
@@ -7714,6 +7728,166 @@ class PolarizableTyper():
                     self.xyzeditsoakvalue=line.split()[0].replace('(','').replace(')','')
                 if self.xyzeditionstring in line:
                     self.xyzeditionvalue=line.split()[0].replace('(','').replace(')','')
+
+
+        def ReadGPUPerformance(self,outputpath):
+            temp=open(outputpath,'r')
+            results=temp.readlines()
+            temp.close()
+            for line in results:
+                if 'Performance' in line:
+                    linesplit=line.split()
+                    return float(linesplit[-1])
+
+        def ETAString(self,ETA):
+            day = ETA // (24 * 3600)
+            ETA = ETA % (24 * 3600)
+            hour = ETA // 3600
+            ETA %= 3600
+            minutes = ETA // 60
+            ETA %= 60
+            seconds = ETA
+            ETA_string="d:h:m:s-> %d:%d:%d:%d" % (day, hour, minutes, seconds)
+            return ETA_string
+
+
+        def GrabOutputFileTypeAndTime(self,filename,jobtype,index,outputlist):
+            if '_NVT.out' in filename:
+                if index==len(outputlist)-2: # last NVT
+                    totaltime=self.lastNVTequiltime
+                    outputfiletype=jobtype+'_'+'LastNVTEquilibriation'
+                    freq=1
+                    serial='True'
+                else:
+                    totaltime=self.equiltimeNVT
+                    outputfiletype=jobtype+'_'+'InitialNVTEquilibriation'
+                    freq=1
+                    serial='True'
+
+            elif '_NPT.out' in filename:
+                totaltime=self.equiltimeNPT
+                outputfiletype=jobtype+'_'+'NPTEquilibriation'
+                freq=1
+                serial='True'
+
+            elif 'E' in filename and 'V' in filename and 'Gas' not in filename:
+                totaltime=self.proddyntime
+                outputfiletype=jobtype+'_'+'ProductionDynamics'
+                freq=len(self.estatlambdascheme[0])+len(self.vdwlambdascheme[0])
+                serial='False'
+
+            else:
+                totaltime=None
+                outputfiletype=None
+                freq=None
+                serial=None
+
+
+            return totaltime,outputfiletype,freq,serial
+
+
+        def ReportETA(self):
+            if os.path.isfile(self.etafilename):
+                with open(self.etafilename) as csv_file:
+                    csv_reader = csv.reader(csv_file, delimiter=',')
+                    line_count = 0
+                    totaleta=0
+                    for row in csv_reader:
+                        if line_count == 0:
+                            pass
+                        else:
+                            jobtype,eta,freq,serial=row
+                            tempeta=float(eta)*int(freq)
+                            if serial=='False':
+                                tempeta=tempeta/self.numbergpus
+                            ETA_string=self.ETAString(tempeta)
+                            self.WriteToLog('JobType: '+jobtype+' ETA: '+ETA_string)
+                            totaleta+=tempeta
+                        line_count += 1
+                ETA_string=self.ETAString(totaleta)
+                self.WriteToLog('Number of GPUs '+str(self.numbergpus))
+                self.WriteToLog('Total ETA: '+ETA_string)
+
+
+        def EstimateDynamicTime(self):
+            if self.externalapi!=None:
+                dynamicpath=self.dynamicommpath
+            else:
+                dynamicpath=self.truedynamicpath
+            nvt=self.productiondynamicsNVT
+            ensemble=self.proddynensem
+            proddyntimestep=self.proddyntimestep # fs
+            totaltime=.01 * 1000000 # fs
+            self.proddynwritefreq=(totaltime*.001) / 10
+            steps=int(totaltime/proddyntimestep)
+            outputpaths=[]
+            for i in range(len(self.minboxfilename)):
+                minboxfilename=self.minboxfilename[i]
+                key=self.configkeyfilename[i][0]
+                outputpath='QuickMD_'+str(i)+'.out'
+                outputpaths.append(outputpath)
+                if not os.path.isfile(outputpath):
+                    cmdstr=prod.ProductionDynamicsCommand(self,minboxfilename,key,steps,ensemble,outputpath,dynamicpath,proddyntimestep,nvt)
+                    submit.call_subsystem(self,cmdstr,wait=True)
+            jobtypetoperf={}
+            for i,outputpath in enumerate(outputpaths):
+                if i==0 and self.binding is True:
+                    jobtype='Comp'
+                elif i==1 and self.binding is True:
+                    jobtype='Solv'
+                else: # solvation
+                    jobtype='Solv'
+                perf=self.ReadGPUPerformance(outputpath)
+                jobtypetoperf[jobtype]=perf
+
+            fields=['JobType','ETA','Occurance','Serial']
+            with open(self.etafilename, 'w') as csvfile:  
+                csvwriter = csv.writer(csvfile)  
+                csvwriter.writerow(fields)
+                for i,outputlist in enumerate(self.equiloutputarray):
+                    if i==0 and self.binding is True:
+                        jobtype='Comp'
+                    elif i==1 and self.binding is True:
+                        jobtype='Solv'
+                    else: # solvation
+                        jobtype='Solv'
+                    perf=jobtypetoperf[jobtype]
+                    outputfiletypetoeta={}
+                    outputfiletypetofreq={}
+                    outputfiletypetoserial={}
+                    for j,outputfile in enumerate(outputlist):
+                        head,tail=os.path.split(outputfile)
+                        totaltime,outputfiletype,freq,serial=self.GrabOutputFileTypeAndTime(tail,jobtype,j,outputlist)
+                        ETA=(totaltime/perf)*86400 # seconds
+                        ETA_string=self.ETAString(ETA)
+                        outputfiletypetoeta[outputfiletype]=ETA
+                        outputfiletypetofreq[outputfiletype]=freq
+                        outputfiletypetoserial[outputfiletype]=serial
+                for j in range(len(self.simfoldname)):
+                    simfoldname=self.simfoldname[j]
+                    perf=jobtypetoperf[simfoldname]
+                    proddynoutfilepathlistoflist=self.proddynoutfilepath[j]
+                    for k in range(len(proddynoutfilepathlistoflist)):
+                        proddynoutfilepath=proddynoutfilepathlistoflist[k]
+                        for i in range(len(proddynoutfilepath)):
+                            outputfilepath=proddynoutfilepath[i]
+                            head,tail=os.path.split(outputfilepath)
+                            totaltime,outputfiletype,freq,serial=self.GrabOutputFileTypeAndTime(tail,jobtype,i,proddynoutfilepath)
+                            if totaltime!=None:
+                                ETA=(totaltime/perf)*86400 # seconds
+                                ETA_string=self.ETAString(ETA)
+                                outputfiletypetoeta[outputfiletype]=ETA
+                                outputfiletypetofreq[outputfiletype]=freq
+                                outputfiletypetoserial[outputfiletype]=serial
+                
+                for outputfiletype,ETA in outputfiletypetoeta.items():
+                    freq=outputfiletypetofreq[outputfiletype]
+                    serial=outputfiletypetoserial[outputfiletype]
+                    row=[outputfiletype,ETA,freq,serial]
+                    csvwriter.writerow(row)
+            
+            
+
 
 
 if __name__ == '__main__':

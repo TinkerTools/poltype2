@@ -344,6 +344,10 @@ correct assignment of tinker envioronments on whichever CPU/GPU cluster it opera
 
 ``heavyhyd`` specifies to use heavy-hydrogen tinker command
 
+``estimatedynamictimeonly`` specifies to quit program after estimating time to run simulations on current GPU. Default is False.
+
+``numbergpus`` specifies number of identical GPU's to use for estimating dynamic time. Default is 1. 
+
 #### Available Integrators Barostats and Thermostats
 
 ##### Integrators
