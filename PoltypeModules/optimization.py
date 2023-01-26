@@ -148,42 +148,28 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
                 temp.write('   '+resstring)
             temp.write('  "'+')'+'\n')
             temp.write('}'+'\n')
+    temp.write('geometric_keywords = {'+'\n')
+    temp.write(" 'coordsys' : 'tric',"+'\n')
+    temp.write(" 'convergence_cmax' : 1e0,"+'\n')
+    if poltype.optloose:
+        temp.write(" 'convergence_set' : 'GAU_LOOSE',"+'\n')
+        temp.write(" 'convergence_energy' : 1e-4,"+'\n')
+
     if len(torsionrestraints)!=0:
-        temp.write('set optking { '+'\n')
-        temp.write('  frozen_dihedral = ("'+'\n')
-        for residx in range(len(torsionrestraints)):
-            res=torsionrestraints[residx]
-            rta,rtb,rtc,rtd=res[:]
-            if residx>0:
-                temp.write(', %d %d %d %d\n' % (rta,rtb,rtc,rtd))
-            else:
-                temp.write('    %d %d %d %d\n' % (rta,rtb,rtc,rtd))
+        temp.write(" 'constraints' : {\n 'set' : [\n")
+        geometric_list = []
+        for res in torsionrestraints:
+            angle = mol.GetTorsion(res[0], res[1], res[2], res[3]) % 360
+            _str = "{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], "%tuple([_-1 for _ in res[0:4]]) \
+               + "'value' : %.4f } \n"%(angle)
+            geometric_list.append(_str)
+        temp.write("       " + "     , ".join(geometric_list) + "    ]\n  }\n")
+    temp.write("}"+'\n')
 
-        temp.write('  ")'+'\n')
-        temp.write('}'+'\n')
-
-        temp.write('geometric_keywords = {'+'\n')
-        temp.write(" 'coordsys' : 'tric',"+'\n')
-        if poltype.optloose==True:
-            temp.write(" 'convergence_set' : 'GAU_LOOSE',"+'\n')
-            temp.write(" 'convergence_energy' : 1e-4,"+'\n')
-
-        temp.write(" 'constraints' : {"+'\n')
-        for residx in range(len(torsionrestraints)):
-            res=torsionrestraints[residx]
-            rta,rtb,rtc,rtd=res[:]
-            angle=mol.GetTorsion(rta,rtb,rtc,rtd)
-            if angle<0:
-                angle=angle+360
-            if residx>0:
-                temp.write(" , {'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(angle)))
-            else:
-                temp.write(" 'set' : [{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], 'value' : %s } \n" % (rta-1,rtb-1,rtc-1,rtd-1,str(angle)))
-
-        temp.write("]"+'\n')
-        temp.write("  }"+'\n')
-        temp.write(" }"+'\n')
-
+    if len(torsionrestraints)!=0:
+        temp.write("""set optking { \n  frozen_dihedral = ("\n""")
+        temp.write(''.join(['   %d %d %d %d\n'%tuple(res[0:4]) for res in torsionrestraints]))
+        temp.write("""  ")\n}\n""")
 
     if poltype.allowradicals==True:
         temp.write('set reference uhf '+'\n')
@@ -191,38 +177,24 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     temp.write('memory '+poltype.maxmem+'\n')
     temp.write('set_num_threads(%s)'%(poltype.numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
+    temp.write('basis {'+'\n')
+    temp.write('assign '+poltype.optbasisset+'\n')
     if ('I ' in spacedformulastr):
-        temp.write('basis {'+'\n')
-        temp.write('assign '+poltype.optbasisset+'\n')
         temp.write('assign I '+poltype.iodineoptbasisset+'\n')
-        temp.write('}'+'\n')
-        if len(torsionrestraints)!=0:
-            temp.write('try:'+'\n')
+    temp.write('}'+'\n')
 
-            temp.write("    optimize('%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.optmethod.lower(),'geometric')+'\n')
-            temp.write('except:'+'\n') 
-            temp.write('    set opt_coordinates both'+'\n')
-            temp.write("    optimize('%s')" % (poltype.optmethod.lower())+'\n')
-        else:
-            temp.write('try:'+'\n')
-            temp.write("    optimize('%s',engine='%s')" % (poltype.optmethod.lower(),'geometric')+'\n')
-            temp.write('except:'+'\n') 
-            temp.write('    set opt_coordinates both'+'\n')
-            temp.write("    optimize('%s')" % (poltype.optmethod.lower())+'\n')                                  
+    temp.write("opt_finished = False\n")
+    if poltype.use_psi4_geometric_opt:
+        temp.write("if not opt_finished:\n")
+        temp.write("    ener, opt_hist = optimize('%s',engine='%s',optimizer_keywords=geometric_keywords, return_history=True)\n" % (poltype.optmethod.lower(),'geometric'))
+        temp.write("    opt_finished = len(opt_hist['energy']) < %d\n"%(poltype.optmaxcycle))
+    temp.write("if not opt_finished:\n")
+    temp.write("    try:\n")
+    temp.write("        optimize('%s')\n" % (poltype.optmethod.lower()))
+    temp.write("    except:\n")
+    temp.write("        set opt_coordinates both\n")
+    temp.write("        optimize('%s')\n" % (poltype.optmethod.lower()))
 
-    else:                                       
-        if len(torsionrestraints)!=0:     
-            temp.write('try:'+'\n')
-            temp.write("    optimize('%s/%s',engine='%s',optimizer_keywords=geometric_keywords)" % (poltype.optmethod.lower(),poltype.optbasisset,'geometric')+'\n')
-            temp.write('except:'+'\n') 
-            temp.write('    set opt_coordinates both'+'\n')
-            temp.write("    optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
-        else:
-            temp.write('try:'+'\n')
-            temp.write("    optimize('%s/%s',engine='%s')" % (poltype.optmethod.lower(),poltype.optbasisset,'geometric')+'\n')
-            temp.write('except:'+'\n') 
-            temp.write('    set opt_coordinates both'+'\n')
-            temp.write("    optimize('%s/%s')" % (poltype.optmethod.lower(),poltype.optbasisset)+'\n')
 
     if poltype.freq:
         temp.write('    scf_e,scf_wfn=freq("%s/%s",return_wfn=True)'%(poltype.optmethod.lower(),poltype.optbasisset)+'\n')
@@ -753,7 +725,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
         inputname,outputname=CreatePsi4OPTInputFile(poltype,comoptfname,comoptfname,mol,modred,bondanglerestraints,skipscferror,charge,loose,torsionrestraints)
         if term==False or overridecheckterm==True:
             poltype.WriteToLog("QM Geometry Optimization")
-            cmdstr='psi4 '+inputname+' '+logoptfname
+            cmdstr=' '.join(['psi4 ',poltype.psi4_args,inputname,logoptfname])
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdirpsi4

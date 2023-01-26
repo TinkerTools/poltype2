@@ -551,7 +551,7 @@ def SPForDMA(poltype,optmol,mol):
         inputname=CreatePsi4DMAInputFile(poltype,poltype.logoptfname.replace('.log','.xyz'),poltype.comdmafname,mol)
         if term==False:
             poltype.WriteToLog("Gas Phase Single Point for GDMA")
-            cmdstr='psi4 '+inputname+' '+poltype.logdmafname
+            cmdstr=' '.join(['psi4 ',poltype.psi4_args,inputname,poltype.logdmafname])
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+poltype.logdmafname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
             scratchdir=poltype.scrtmpdirpsi4
@@ -650,7 +650,7 @@ def SPForESP(poltype,optmolist,molist,xyzfnamelist,keyfnamelist):
             term,error=poltype.CheckNormalTermination(outputname,errormessages=None,skiperrors=True)
             if term==False:
                 poltype.WriteToLog("Gas Phase High Level Single Point for Multipole Refinement")
-                cmdstr='psi4 '+inputname+' '+outputname
+                cmdstr=' '.join(['psi4 ',poltype.psi4_args,inputname,outputname])
                 jobtooutputlog={cmdstr:os.getcwd()+r'/'+outputname}
                 jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
                 scratchdir=poltype.scrtmpdirpsi4

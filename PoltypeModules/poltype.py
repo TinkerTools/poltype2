@@ -308,6 +308,7 @@ class PolarizableTyper():
         vdwmaxtinkergridpoints:int=50
         smallmoleculefragmenter:bool=False
         fragmentjobslocal:bool=False
+        psi4_args:str=" --loglevel 30 "
         toroptdebugmode:bool=False
         debugmode:bool=False
         fragmenterdebugmode:bool=False
@@ -455,6 +456,7 @@ class PolarizableTyper():
         torsppcm:bool=False
         use_gaus:bool=False
         use_gausoptonly:bool=False
+        use_psi4_geometric_opt:bool=True
         freq:bool=False
         postfit:bool=False
         bashrcpath:None=None
@@ -1035,6 +1037,8 @@ class PolarizableTyper():
                             self.use_gaus=self.SetDefaultBool(line,a,True)
                         elif "use_gausoptonly" in newline:
                             self.use_gausoptonly=self.SetDefaultBool(line,a,True)
+                        elif "use_psi4_geometric_opt" in newline:
+                            self.use_psi4_geometric_opt=self.SetDefaultBool(line,a,True)
                         elif "dontdotor" in newline:
                             self.dontdotor=self.SetDefaultBool(line,a,True)
                         elif "dovdwscan" in newline:

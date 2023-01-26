@@ -750,7 +750,11 @@ def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog
     Description: 
     """
     tempmaxmem,tempmaxdisk,tempnumproc=poltype.PartitionResources()
-    poltypeinput={'maxtorresnitrogen':poltype.maxtorresnitrogen,'xtbtorresconstant':poltype.xtbtorresconstant,'deleteallnonqmfiles':poltype.deleteallnonqmfiles,'debugmode':poltype.debugmode,'atmidx':poltype.prmstartidx,'parentname':poltype.parentname,'use_gau_vdw':poltype.use_gau_vdw,'use_qmopt_vdw':poltype.use_qmopt_vdw,'onlyvdwatomindex':poltype.onlyvdwatomindex,'tordebugmode':poltype.tordebugmode,'dovdwscan':poltype.dovdwscan,'refinenonaroringtors':poltype.refinenonaroringtors,'tortor':poltype.tortor,'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':tempnumproc,'maxmem':tempmaxmem,'maxdisk':tempmaxdisk,'printoutput':True,'toroptmethodlist':','.join(poltype.toroptmethodlist),'torspmethodlist':','.join(poltype.torspmethodlist)}
+    inherited_keywords = ['maxtorresnitrogen','xtbtorresconstant','deleteallnonqmfiles','debugmode','parentname','use_gau_vdw','use_qmopt_vdw','onlyvdwatomindex','tordebugmode','dovdwscan','refinenonaroringtors','tortor','maxgrowthcycles','toroptmethod','torspmethod','espmethod','dmamethod','optmethod','toroptbasisset','torspbasisset','espbasisset','dmabasisset','optbasisset','optmaxcycle','bashrcpath','externalapi','use_gaus','use_gausoptonly','use_psi4_geometric_opt', 'poltypepath']
+    frag_keywords = {'atmidx':poltype.prmstartidx,'suppressdipoleerr':'True','isfragjob':True,'structure':tail,'numproc':tempnumproc,'maxmem':tempmaxmem,'maxdisk':tempmaxdisk,'printoutput':True,'toroptmethodlist':','.join(poltype.toroptmethodlist),'torspmethodlist':','.join(poltype.torspmethodlist)}
+    poltypeinput = {_key:poltype.__dict__[_key] for _key in inherited_keywords if (_key in poltype.__dict__)}
+    poltypeinput.update(frag_keywords)
+    #poltypeinput={'maxtorresnitrogen':poltype.maxtorresnitrogen,'xtbtorresconstant':poltype.xtbtorresconstant,'deleteallnonqmfiles':poltype.deleteallnonqmfiles,'debugmode':poltype.debugmode,'atmidx':poltype.prmstartidx,'parentname':poltype.parentname,'use_gau_vdw':poltype.use_gau_vdw,'use_qmopt_vdw':poltype.use_qmopt_vdw,'onlyvdwatomindex':poltype.onlyvdwatomindex,'tordebugmode':poltype.tordebugmode,'dovdwscan':poltype.dovdwscan,'refinenonaroringtors':poltype.refinenonaroringtors,'tortor':poltype.tortor,'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':tempnumproc,'maxmem':tempmaxmem,'maxdisk':tempmaxdisk,'printoutput':True,'toroptmethodlist':','.join(poltype.toroptmethodlist),'torspmethodlist':','.join(poltype.torspmethodlist)}
     if strfragrotbndindexes!=None:
         poltypeinput['onlyrotbndslist']=strfragrotbndindexes
         rotbnds=strfragrotbndindexes.split(',')
@@ -1724,7 +1728,7 @@ def GenerateWBOMatrix(poltype,molecule,moleculebabel,structfname):
     charge=Chem.rdmolops.GetFormalCharge(molecule)
     inputname,outputname=esp.CreatePsi4ESPInputFile(poltype,structfname,poltype.comespfname.replace('.com','_frag.com'),moleculebabel,poltype.maxdisk,poltype.maxmem,poltype.numproc,charge,False)
     finished,error=poltype.CheckNormalTermination(outputname)
-    cmdstr='psi4 '+inputname+' '+outputname
+    cmdstr=' '.join(['psi4 ',poltype.psi4_args,inputname,outputname])
     if finished==False:
         try:
              poltype.call_subsystem([cmdstr],True)
@@ -1738,7 +1742,7 @@ def GenerateWBOMatrix(poltype,molecule,moleculebabel,structfname):
         WBOmatrix=GrabWBOMatrixPsi4(poltype,outputname,molecule)
             
     except:
-        cmdstr='psi4 '+inputname+' '+outputname
+        cmdstr=' '.join(['psi4 ',poltype.psi4_args,inputname,outputname])
         temp={cmdstr:outputname}
         poltype.call_subsystem([cmdstr],True)
         finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)

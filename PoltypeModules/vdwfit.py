@@ -1122,7 +1122,7 @@ def ExecuteSPJobs(poltype,qmfilenamearray,prefix):
             scratchdir=poltype.scrtmpdirgau
         else:
             outputname=filename.replace('.psi4','.log')
-            cmdstr='psi4 '+filename+' '+outputname
+            cmdstr=' '.join(['psi4 ',poltype.psi4_args,filename,outputname])
             executable='psi4'
             scratchdir=poltype.scrtmpdirpsi4
         abspath=poltype.which(executable)

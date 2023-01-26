@@ -136,9 +136,45 @@ def ComputeSymmetryTypes_v1(poltype,distmat,rdkitmol,mol,usesym):
     Output: Dictionary of atom index to matching atom indices
     Referenced By: gen_canonicallabels
     Description: 
-    1. Iterate over all nodes twice, generate two copies of the original graph. For each copy, delete the node currently being iterated on. If the two graphs are isomorphic then they must be the same "type". 
+    1. Compute GI vector for every atom
+    2. Iterate over GI vectors for each atom and check if their is GI vector match, if so add to same group
+    3. If usesym==False then use atom index instead of type numbers.
     """
     indextomatchingindices={}
+    indextoGI={}
+    if usesym==True:
+        atomindices=databaseparser.RingAtomicIndices(poltype,mol)
+        # STEP 1
+        for atom in rdkitmol.GetAtoms():
+            atomidx=atom.GetIdx()
+            GI=ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices)
+            indextoGI[atomidx]=GI
+        # STEP 2
+        for index,GI in indextoGI.items():
+            for oindex,oGI in indextoGI.items():
+                if GI==oGI:
+                    if index not in indextomatchingindices.keys():
+                        indextomatchingindices[index]=[]
+                    if oindex not in indextomatchingindices[index]:
+                        indextomatchingindices[index].append(oindex)
+    else:
+        # STEP 3
+        for atom in rdkitmol.GetAtoms():
+            atomidx=atom.GetIdx()
+            indextomatchingindices[atomidx]=atomidx
+
+    return indextomatchingindices
+def ComputeSymmetryTypes(mol,usesym):
+    """
+    Intent: Define symmetry type by a graph invarient vector. If two atoms have the same GI vector than they have the same type.
+    Input: Pairwise topological distance matrix, MOL object 
+    Output: Dictionary of atom index to matching atom indices
+    Referenced By: gen_canonicallabels
+    Description: 
+    1. Iterate over all nodes twice, generate two copies of the original graph. For each copy, delete the node currently being iterated on. If the two graphs are isomorphic then they must be the same "type". 
+    """
+    natoms = mol.NumAtoms()
+    indextomatchingindices={_:[_] for _ in range(natoms)}
     if usesym==True:
         # STEP 1
         G = nx.Graph()
@@ -153,45 +189,34 @@ def ComputeSymmetryTypes_v1(poltype,distmat,rdkitmol,mol,usesym):
             G.add_edge(bgnidx, endidx)
 
         atomic_nums = nx.get_node_attributes(G, "atomicnum")
+        atom_match = iso.numerical_node_match('atomicnum', 0)
         center=nx.center(G)
-        pairs=[]
+        #page_rank = nx.pagerank(G)
+        node_fps = {}
         for node in G.nodes():
-            if node-1 not in indextomatchingindices.keys():
-                indextomatchingindices[node-1]=[]
-            if node-1 not in indextomatchingindices[node-1]:
-                indextomatchingindices[node-1].append(node-1)
-            for onode in G.nodes():
-                if onode-1 not in indextomatchingindices.keys():
-                    indextomatchingindices[onode-1]=[]
-                if onode-1 not in indextomatchingindices[onode-1]:
-                    indextomatchingindices[onode-1].append(onode-1)
-                node_deg=G.degree(node)
-                onode_deg=G.degree(onode)
-                if node_deg==onode_deg:
-                    node_atomic_num=atomic_nums[node]
-                    onode_atomic_num=atomic_nums[onode]
-                    if node_atomic_num==onode_atomic_num:
-                        pair=set([node,onode])
-                        if node!=onode and pair not in pairs:
-                            node_dist=[nx.shortest_path_length(G, source=node, target=i) for i in center].sort()
-                            onode_dist=[nx.shortest_path_length(G, source=onode, target=i) for i in center].sort()
-                            if node_dist==onode_dist:
-                                G1=G.copy()
-                                G2=G.copy()
-                                G1.remove_node(node)
-                                G2.remove_node(onode)
-                                isiso=nx.is_isomorphic(G1,G2) # makes database searching a bit slower cause isomorphism checking is slow, but this is general solution
-                                pairs.append(pair)
-                                if isiso==True:
-                                    if onode-1 not in indextomatchingindices[node-1]:
-                                        indextomatchingindices[node-1].append(onode-1)
-                                    if node-1 not in indextomatchingindices[onode-1]:
-                                        indextomatchingindices[onode-1].append(node-1)
-    else:
-        # STEP 2
-        for atom in rdkitmol.GetAtoms():
-            atomidx=atom.GetIdx()
-            indextomatchingindices[atomidx]=atomidx
+            center_dist = min([nx.shortest_path_length(G, source=node, target=node0) for node0 in center])
+            node_fps[node] = [atomic_nums[node], G.degree[node], center_dist]
+        node_list = sorted(list(G.nodes()))
+        assert node_list == list(range(1, len(node_list)+1))
+        G_list = []
+        for node in node_list:
+            G1 = G.copy()
+            G1.remove_node(node)
+            G_list.append(G1)
+
+        for i1 in range(len(node_list)):
+            node1 = i1 + 1
+            for i2 in range(i1+1, len(node_list)):
+                node2 = node_list[i2]
+                if node_fps[node1] != node_fps[node2]:
+                    continue
+                if not nx.faster_could_be_isomorphic(G_list[i1], G_list[i2]):
+                    continue
+                flag_iso = nx.is_isomorphic(G_list[i1], G_list[i2],
+                                 node_match=atom_match)  # makes database searching a bit slower cause isomorphism checking is slow, but this is general
+                if flag_iso:
+                    indextomatchingindices[i1].append(i2)
+                    indextomatchingindices[i2].append(i1)
     return indextomatchingindices
 
 
