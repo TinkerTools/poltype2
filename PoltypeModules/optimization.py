@@ -672,8 +672,9 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
     Description: 
     """
 
-    if bondanglerestraints!=None or poltype.generateextendedconf==False: # then vdw opt
-        pass
+    NATOM_SMALL = 25
+    if bondanglerestraints!=None or poltype.generateextendedconf==False or \
+      (poltype.isfragjob and mol.NumAtoms() < NATOM_SMALL and not poltype.generate_symm_frag_conf): # then vdw opt
         torsionrestraints=[]
     else: # see if need to restrain torsion in extended conformation
         torsionrestraints=FindTorsionRestraints(poltype,mol)

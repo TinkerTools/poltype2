@@ -79,6 +79,7 @@ from itertools import groupby
 from operator import itemgetter
 from rdkit.Chem import rdDistGeom
 from itertools import product,combinations
+import random
 import productiondynamics as prod
 
 @dataclass
@@ -296,6 +297,7 @@ class PolarizableTyper():
         quickdatabasesearch:bool=False
         genprotstatesonly:bool=False
         generateextendedconf:bool=True
+        generate_symm_frag_conf:bool=False
         onlyvdwatomlist:None=None
         parentjobsatsametime:int=1
         coresperjob:int=2
@@ -903,6 +905,8 @@ class PolarizableTyper():
                             self.usepoleditframes=self.SetDefaultBool(line,a,True)
                         elif "generateextendedconf" in newline:
                             self.generateextendedconf=self.SetDefaultBool(line,a,True)
+                        elif "generate_symm_frag_conf" in newline:
+                            self.generate_symm_frag_conf=self.SetDefaultBool(line,a,True)
                         elif "addhydrogens" in newline:
                             self.addhydrogens=self.SetDefaultBool(line,a,True)
                         elif "nonaroringtor1Dscan" in newline:
@@ -3698,7 +3702,7 @@ class PolarizableTyper():
             perpindicularsum=np.abs(perpindicularsum)
             return perpindicularsum
 
-        def GenerateConformers(self,rdkitmol,mol):
+        def GenerateConformers(self,rdkitmol,mol, maxconfs=1000):
             AllChem.EmbedMolecule(rdkitmol,randomSeed=10) 
             conformer=rdkitmol.GetConformer(0)
             m2=copy.deepcopy(rdkitmol)
@@ -3707,7 +3711,7 @@ class PolarizableTyper():
             ffm = AllChem.MMFFGetMoleculeForceField(m2, mp)
             confid=0
             bondcutoff=2
-            dim=1
+            ndim=1
             rotbnds=[]
             frobnds=[]
             distmat=Chem.rdmolops.GetDistanceMatrix(rdkitmol) # bond distance matrix
@@ -3745,26 +3749,29 @@ class PolarizableTyper():
                 
             key='%d %d' % (t2idx,t3idx)
             revkey='%d %d' % (t3idx,t2idx)
-            angles=range(0,379,1)
+            angles=range(0,360,1)
             courseangles=range(0,370,10)
             phaselists=[]
             rotkeytoindex={}
             count=0
             for rotbndkeyidx in range(len(self.rotbndlist.keys())): # first one is b-c that will derive torsion
                 rotkey=list(self.rotbndlist.keys())[rotbndkeyidx]
+                if count>=ndim:
+                    break
                 if rotbndkeyidx==0:
                     phaselists.append(angles)
-                    if count<dim:
-                        rotkeytoindex[rotkey]=rotbndkeyidx
-                        count+=1
+                    rotkeytoindex[rotkey]=rotbndkeyidx
+                    count+=1
                 else:
                     if rotkey in rotbnds:
                         phaselists.append(courseangles)
-                        if count <dim:
-                            rotkeytoindex[rotkey]=count
-                            count+=1
-            phaselists=phaselists[:dim]
-            phaselist=np.array(list(product(*phaselists)))
+                        rotkeytoindex[rotkey]=count
+                        count+=1
+            phaselists=phaselists[:ndim]
+            phaselist=(list(product(*phaselists)))
+            if len(phaselist) > maxconfs:
+                phaselist = random.sample(phaselist, k=maxconfs)
+            phaselist = np.asarray(phaselist)
             t2=mol.GetAtom(t2idx)
             t3=mol.GetAtom(t3idx)
             t1,t4 = torgen.find_tor_restraint_idx(self,mol,t2,t3)
@@ -4559,7 +4566,8 @@ class PolarizableTyper():
             if self.firstoptfinished==False and self.isfragjob==False and self.generateextendedconf==True:
                 indextocoordslist=self.GenerateExtendedConformer(m,mol)
                 indextocoordinates=indextocoordslist[0]
-            if self.isfragjob==True and len(self.onlyrotbndslist)!=0:
+            if self.isfragjob==True and self.generate_symm_frag_conf and len(self.onlyrotbndslist)!=0:
+                self.WriteToLog("Generating Max Symmetry Conformer")
                 indextocoordslist=self.GenerateMaxSymmetryConformer(m,mol)
                 indextocoordinates=indextocoordslist[0]
             # STEP 17
