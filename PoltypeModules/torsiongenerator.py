@@ -2147,18 +2147,23 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     temp.write("opt_finished = False\n")
     if poltype.use_psi4_geometric_opt:
         temp.write("if not opt_finished:\n")
-        temp.write("    ener, opt_hist = optimize('%s',engine='%s',optimizer_keywords=geometric_keywords, return_history=True)" % (poltype.toroptmethod.lower(),'geometric')+'\n')
-        temp.write("    opt_finished = len(opt_hist['energy']) < %d\n"%(poltype.optmaxcycle))
+        temp.write("    try:\n")
+        temp.write("        ener, opt_hist = optimize('%s',engine='%s',optimizer_keywords=geometric_keywords, return_history=True)" % (poltype.toroptmethod.lower(),'geometric')+'\n')
+        temp.write("        opt_finished = len(opt_hist['energy']) < %d\n"%(poltype.optmaxcycle))
+        temp.write("    except Exception as e:\n")
+        temp.write("        core.print_out('Exception:', e)\n")
     temp.write("if not opt_finished:\n")
     temp.write("    try:\n")
     temp.write("        optimize('%s')" % (poltype.toroptmethod.lower())+'\n')
     temp.write("    except:\n")
     temp.write("        set opt_coordinates both\n")
     temp.write("        optimize('%s')" % (poltype.toroptmethod.lower())+'\n')
+    temp.write("    opt_finished = True\n")
 
     if poltype.freq:
         temp.write('    scf_e,scf_wfn=freq(%s/%s,return_wfn=True)'%(poltype.toroptmethod.lower(),poltype.toroptbasisset)+'\n')
     temp.write('clean()'+'\n')
+    temp.write("assert opt_finished\n\n")
     temp.close()
     outputname=inputname.replace('.psi4','.log')
     return inputname,outputname

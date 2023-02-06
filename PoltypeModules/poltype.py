@@ -3155,7 +3155,69 @@ class PolarizableTyper():
             self.WriteToLog('All jobs have terminated '+str(finishedjobs))
             return finishedjobs,errorjobs
 
-        
+
+        @staticmethod
+        def DetectFileType(logfname):
+            """
+            Intent: check file type
+            Input: log file path
+            Referenced By: CheckLogfileStatus
+            Description: 
+            1. Define the patterns for each file type, and the detection threshold for number of patterns 
+            2. Count the number of matched patterns, and return the file type of the threshold is reached 
+            """
+            file_type = 'other'
+            patt_thr = {'psi4':3, 'gau':3}
+            patt_count = {_:set() for _ in patt_thr}
+            patt_list = []
+            patt_list.append(('psi4', 'header', re.compile('^\s+Psi4\: An Open-Source Ab Initio Electronic Structure Package')))
+            patt_list.append(('psi4', 'date', re.compile('^\s+Psi4 (started|stopped) on: ')))
+            patt_list.append(('psi4', 'tstart', re.compile('^\*\*\* (tstart|tstop)\(\) called on')))
+            patt_list.append(('psi4', 'time', re.compile('^\s+total time  =\s+\S+ seconds =\s+\S+ minutes')))
+            patt_list.append(('psi4', 'basis', re.compile('^\s+=> Loading Basis Set <=')))
+            patt_list.append(('psi4', 'normal_term', re.compile('^\*\*\* Psi4 exiting successfully.')))
+            patt_list.append(('psi4', 'error_term', re.compile('^\*\*\* Psi4 encountered an error.')))
+            patt_list = [_ for _ in patt_list if _[0] in patt_thr]
+            with open(logfname) as fh:
+                for line in fh:
+                    for prog, entry, patt in patt_list:
+                        if patt.match(line) is not None:
+                            patt_count[prog].add(entry)
+                            if len(patt_count[prog]) >= patt_thr[prog]:
+                                file_type = prog
+                                return file_type
+            return file_type
+
+        def CheckLogfileStatus(self, logfname, file_type=None):
+            """
+            Intent: check for normal terminatino in output files from psi4
+            Input: log file path
+            Referenced By: CheckNormalTermination
+            Description: 
+            1. Define the status of several items by using regex
+            2. Go through each line of input file, and update the status of each item
+            3. Determine whether the job is terminated and wether there is error
+            """
+            if file_type is None:
+                file_type = self.DetectFileType(logfname)
+            patt_map = {'psi4':[]}
+            patt_map['psi4'].append(('normal_term', True, re.compile('^\*\*\* Psi4 exiting successfully.')))
+            patt_map['psi4'].append(('error_term', True, re.compile('^\*\*\* Psi4 encountered an error.')))
+            patt_map['psi4'].append(('error_term', True, re.compile('^Traceback \(most recent call last\):')))
+            patt_map['psi4'].append(('opt', 'error', re.compile('(^\s+Optimization failed to converge!\s+~|Could not converge geometry optimization in \d+ iterations.)')))
+            patt_map['psi4'].append(('opt', 'success', re.compile('(^\s+Optimization converged!\s+~|^\s+Final optimized geometry)')))
+            log_status = {}
+            if file_type in patt_map:
+                with open(logfname) as fh:
+                    for line in fh:
+                        for entry, status, patt in patt_map[file_type]:
+                            if patt.match(line) is not None:
+                                log_status[entry] = status
+            flag_error = log_status.get('error_term', False)
+            flag_term = log_status.get('normal_term', False)
+            if flag_term and log_status.get('opt', '') == 'error':
+                flag_error = True
+            return flag_term, flag_error
 
         def CheckNormalTermination(self,logfname,errormessages=None,skiperrors=False): 
             """
@@ -3227,6 +3289,10 @@ class PolarizableTyper():
                                 error=False
                         if ('hf/MINIX' in line or 'HF/gen' in line) and '_frag' not in logfname:
                             foundhf=True
+                file_type = self.DetectFileType(logfname)
+                if file_type == 'psi4':
+                    term, error = self.CheckLogfileStatus(logfname, file_type=file_type)
+                    
                 if self.debugmode==False and foundhf==True:
                     term=False
                         
