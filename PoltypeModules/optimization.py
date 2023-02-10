@@ -190,7 +190,7 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
         temp.write("        ener, opt_hist = optimize('%s',engine='%s',optimizer_keywords=geometric_keywords, return_history=True)\n" % (poltype.optmethod.lower(),'geometric'))
         temp.write("        opt_finished = len(opt_hist['energy']) < %d\n"%(poltype.optmaxcycle))
         temp.write("    except Exception as e:\n")
-        temp.write("        core.print_out('Exception:', e)\n")
+        temp.write("        core.print_out('Exception: %s'%(e))\n")
     temp.write("if not opt_finished:\n")
     temp.write("    try:\n")
     temp.write("        optimize('%s')\n" % (poltype.optmethod.lower()))

@@ -2151,7 +2151,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
         temp.write("        ener, opt_hist = optimize('%s',engine='%s',optimizer_keywords=geometric_keywords, return_history=True)" % (poltype.toroptmethod.lower(),'geometric')+'\n')
         temp.write("        opt_finished = len(opt_hist['energy']) < %d\n"%(poltype.optmaxcycle))
         temp.write("    except Exception as e:\n")
-        temp.write("        core.print_out('Exception:', e)\n")
+        temp.write("        core.print_out('Exception: %s'%(e))\n")
     temp.write("if not opt_finished:\n")
     temp.write("    try:\n")
     temp.write("        optimize('%s')" % (poltype.toroptmethod.lower())+'\n')
