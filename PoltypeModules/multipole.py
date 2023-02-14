@@ -733,7 +733,7 @@ def CheckFileForString(poltype,filetocheck):
     return string
 
 
-def gen_gdmain(poltype,gdmainfname,molecprefix,fname,dmamethod):
+def gen_gdmain(poltype,gdmainfname,molecprefix,fname,dmamethod,new_gdma):
     """
     Intent: Generate GDMA input file for the molecule
     Input:
@@ -776,15 +776,20 @@ def gen_gdmain(poltype,gdmainfname,molecprefix,fname,dmamethod):
     tmpfh.write("Angstrom\n")
     tmpfh.write("AU\n")
     tmpfh.write("Multipoles\n")
-    tmpfh.write("Switch 0\n") # v1.3, comment out for v2.2
-    tmpfh.write("Limit 2\n")
-    tmpfh.write("Punch " + punfname + "\n")
-    tmpfh.write("Radius H 0.65\n")
-    tmpfh.write("Radius S 0.80\n")
-    tmpfh.write("Radius P 0.75\n")
-    tmpfh.write("Radius Cl 1.0\n")
-    tmpfh.write("Radius Br 1.1\n")
-    tmpfh.write("Radius I 1.3\n")
+    if not new_gdma:
+      tmpfh.write("Switch 0\n") # v1.3, comment out for v2.2
+      tmpfh.write("Limit 2\n")
+      tmpfh.write("Punch " + punfname + "\n")
+      tmpfh.write("Radius H 0.65\n")
+      tmpfh.write("Radius S 0.80\n")
+      tmpfh.write("Radius P 0.75\n")
+      tmpfh.write("Radius Cl 1.0\n")
+      tmpfh.write("Radius Br 1.1\n")
+      tmpfh.write("Radius I 1.3\n")
+    else:
+      tmpfh.write("Switch 4\n") # new gdma procedure 
+      tmpfh.write("Limit 2\n")
+      tmpfh.write("Punch " + punfname + "\n")
     tmpfh.write("\n")
     tmpfh.write("Start\n")
     tmpfh.write("\n")
@@ -811,7 +816,7 @@ def run_gdma(poltype):
     assert os.path.isfile(poltype.fckdmafname), "Error: " + poltype.fckdmafname + " does not exist."+' '+os.getcwd()
 
     poltype.gdmainfname = poltype.assign_filenames ( "gdmainfname" , ".gdmain")
-    gen_gdmain(poltype,poltype.gdmainfname,poltype.molecprefix,poltype.fckdmafname,poltype.dmamethod)
+    gen_gdmain(poltype,poltype.gdmainfname,poltype.molecprefix,poltype.fckdmafname,poltype.dmamethod,poltype.new_gdma)
 
     cmdstr = poltype.gdmaexe + " < " + poltype.gdmainfname + " > " + poltype.gdmafname
     poltype.call_subsystem([cmdstr],True)
