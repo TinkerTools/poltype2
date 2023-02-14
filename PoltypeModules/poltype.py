@@ -347,6 +347,7 @@ class PolarizableTyper():
         amoebaplusnonbondedsmartstocommentmap:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoebaplusnonbonded.txt'
         smartstosoluteradiimap:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'SMARTsToSoluteRadiiMap.txt'
         latestsmallmoleculepolarizeprmlib:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21polarize.prm'
+        updatedsmallmoleculepolarizeprmlib:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba_and_amoebaplus_polarize.prm'
         latestsmallmoleculesmartstotypespolarize:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21polarcommenttoparameters.txt'
         latestsmallmoleculesmartstotinkerclass:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21smartstoclass.txt'
         latestsmallmoleculeprmlib:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21.prm'

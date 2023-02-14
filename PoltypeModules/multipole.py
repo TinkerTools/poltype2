@@ -3,6 +3,7 @@ import time
 import os
 import sys
 from openbabel import openbabel
+from openbabel import pybel
 import shutil
 import re
 from collections import deque
@@ -517,34 +518,53 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
        f.write('A\n')
 
     #Find aromatic carbon, halogens, and bonded hydrogens to correct polarizability
-    iteratom = openbabel.OBMolAtomIter(mol)
-    writesection=True
-    lines=[]
-    sortedpolarindexkeys=sorted(polarindextopolarizeprm)
-    for index in sortedpolarindexkeys:
-       prm=polarindextopolarizeprm[index]
-       line=str(index)+' '+str(prm)+'\n'
-       lines.append(line) 
+    #iteratom = openbabel.OBMolAtomIter(mol)
+    #writesection=True
+    #lines=[]
+    #sortedpolarindexkeys=sorted(polarindextopolarizeprm)
+    #for index in sortedpolarindexkeys:
+    #   prm=polarindextopolarizeprm[index]
+    #   line=str(index)+' '+str(prm)+'\n'
+    #   lines.append(line) 
+    #
+    #if writesection:
+    #    for line in lines:
+    #        f.write(line)
     
-    if writesection:
-        for line in lines:
-            f.write(line)
+    # this is to fix the issue that poltype only use part of the new polarizability
+    # which led to mixing of both the old and new sets of parameters
 
-        
+    # Chengwen Liu
+    # Feb, 2023
+    for mol in pybel.readfile('sdf', poltype.molstructfname):
+      natoms = len(mol.atoms)
+      atoms = list(range(1, natoms+1)) 
+      polarDict = dict.fromkeys(atoms, 0)
+      lines = open(poltype.updatedsmallmoleculepolarizeprmlib).readlines()
+      for line in lines:
+        d = line.split()
+        smt = d[0]
+        pol = d[2]
+        smarts = pybel.Smarts(smt)
+        match = smarts.findall(mol)
+        if match:
+          for i in range(len(match)):	
+            polarDict[match[i][0]] = pol
+    for k,v in polarDict.items():  
+      f.write(f"{k} {v}\n")
+    
+    f.write("\n")
+    f.flush()
+    os.fsync(f.fileno())
+    f.write("2\n")
+    f.write("N\n")
+    f.write("Y\n")
 
 
-        f.write("\n")
-        f.flush()
-        os.fsync(f.fileno())
-        f.write("2\n")
-        f.write("N\n")
-        f.write("Y\n")
+    f.flush()
+    os.fsync(f.fileno())
 
-
-        f.flush()
-        os.fsync(f.fileno())
-
-        f.close()
+    f.close()
     return lfzerox
     
 

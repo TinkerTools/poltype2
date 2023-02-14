@@ -1,0 +1,73 @@
+[H]                              H*     0.450 # H*, wild matching Hydrogen
+[C]                              C*     1.500 # C*, wild matching Carbon
+[N]                              N*     1.315 # N*, wild matching Nitrogen
+[O]                              O*     0.866 # O*, wild matching Oxygen
+[S]                              S*     3.202 # S*, wild matching Sulfur
+[H][C]                      Hnonpol     0.480 # H on non-aromatic carbon
+[H][O]                       Hpolar     0.457 # H on non-aromatic oxygen
+[H][N]                       Hpolar     0.457 # H on non-aromatic nitrogen
+[H][S]                       Hpolar     0.457 # H on non-aromatic sulfur
+[H][NH3]                     Hpolar     0.457 # H on ammonia
+[H][F]                       Hpolar     0.457 # H on HF
+[H][Cl]                      Hpolar     0.457 # H on HCl
+[H][Br]                      Hpolar     0.457 # H on HBr
+[H][I]                       Hpolar     0.457 # H on HI
+[H][c]                          Har     0.432 # H on aromatic carbon
+[H][n]                          Har     0.432 # H on aromatic nitrogen
+[H][o]                          Har     0.432 # H on aromatic oxygen
+[H][C]=[C]                      Har     0.432 # H on C=C system
+[H][OH2]                         HW     0.428 # H on Water
+[$([C][C])]                 Cnonpol     1.415 # C on non-aromatic carbon
+[C][c]                      Cnonpol     1.415 # C connected to aromatic carbon
+[C][O]                       Cpolar     1.620 # C on non-aromatic oxygen
+[C][o]                       Cpolar     1.620 # C on aromatic oxygen
+[C][N]                       Cpolar     1.620 # C on non-aromatic nitrogen
+[C][n]                       Cpolar     1.620 # C on aromatic nitrogen
+[C][F,Cl,Br,I]               Cpolar     1.620 # C connected to F,Cl,Br,I
+[C]=[N]                      Cpolar     1.620 # C connected to nitrogen via double bond
+[C][S]                       Cpolar     1.620 # C on sulfur
+[c]                             Car     2.065 # C on aromatic system
+[CX3](=O)                       Car     2.065 # C on carbonyl O
+[$([CX3]=[CX3])]                Car     2.065 # C on C=C
+[C]([C]=[*])([C]=[*])           Car     2.065 # C on conjugated systems
+[CH4]                          Cch4     1.341 # C on methane
+[$([C]#[*])]                    Csp     2.202 # C of tripole bond, C#C, C#N, etc
+[N][C]                      Nnonpol     1.185 # N on non-aromatic carbon
+[N][c]                      Nnonpol     1.185 # N connected to aromatic carbon via single bond
+[N]=[c]                     Nnonpol     1.185 # N connected to aromatic carbon via double bond
+[N][S]                       Npolar     1.444 # N connected to sulfur
+[$([N][N])]                  Npolar     1.444 # N connected to non-aromatic nitrogen via single bond
+[N]=[N]                      Npolar     1.444 # N connected to non-aromatic nitrogen via double bond
+[N][n]                       Npolar     1.444 # N connected to aromatic nitrogen via single bond
+[n]                             Nar     1.702 # N on aromatic system
+[N]=[C]                         Nar     1.702 # N on double bond N=C
+[NX3]([CX3](=O))               Nsp2     1.243 # N on amide
+[N]#[*]                         Nsp     1.158 # N of tripole bond, N#N, N#C, etc
+[NX3H3]                        Nnh3     1.156 # N on ammonia
+[O][CX4]                    Ononpol     0.812 # O on non-polar carbon
+[O][c]                      Ononpol     0.812 # O connected to aromatic carbon via single bond
+[O]=[c]                     Ononpol     0.812 # O connected to aromatic carbon via double bond
+[O][N]                       Opolar     0.858 # O connected to non-aromatic nitrogen
+[O][n]                       Opolar     0.858 # O connected to aromatic nitrogen
+[o]                             Oar     0.832 # O on aromatic system
+[OX2][CX3]                      Oar     0.832 # O connected to carbonyl group
+[OX1]=[CX3]                   Osp2c     0.914 # O on carbonyl group
+[OX2][S]                     O-sulf     0.847 # O on O-S bond
+[OX1]=[S]                    O=sulf     0.859 # O on O=S bond
+[OX2H2]                          OW     0.976 # O on Water
+[$([OH1][C]=[O])]            Ohacid     0.832 # O of acid with H
+[S][C]                      Snonpol     3.406 # S on non-polar carbon via single bond
+[S]=[C]                     Snonpol     3.406 # S on non-polar carbon via double bond
+[S][N]                       Spolar     2.994 # S connected to nitrogen
+[S][O]                       Spolar     2.994 # S connected to oxygen
+[S]=[O]                      Spolar     2.994 # S connected to oxygen via double bond
+[s]                             Sar     3.206 # S on aromatic system
+[F][A]                       Fnonar     0.348 # F connected to non-aromatic atom
+[F][a]                          Far     0.309 # F connected to aromatic atom
+[Cl][A]                     Clnonar     2.337 # Cl connected to non-aromatic atom
+[Cl][a]                        Clar     2.567 # Cl connected to aromatic atom
+[Br][A]                     Brnonar     3.526 # Br connected to non-aromatic atom
+[Br][a]                        Brar     4.132 # Br connected to aromatic atom
+[I][A]                       Inonar     5.424 # I connected to non-aromatic atom
+[I][a]                          Iar     5.482 # I connected to aromatic atom
+[P]                             P       1.432 # P 
