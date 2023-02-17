@@ -440,7 +440,7 @@ class PolarizableTyper():
         qmonly:bool = False
         espfit:bool = True
         parmtors:bool = True
-        foldnum:int=6
+        foldnum:int=3
         foldoffsetlist:list = field(default_factory=lambda : [ 0.0, 180.0, 0.0, 180.0, 0.0, 180.0 ])
         torlist:None = None
         rotbndlist:None = None
