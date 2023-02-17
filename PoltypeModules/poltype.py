@@ -451,6 +451,7 @@ class PolarizableTyper():
         gentorsion:bool=False
         gaustorerror:bool=False
         torsionrestraint:float=.5*3282.80354574
+        torsionprmrestraintfactor:float=1.0
         onlyrotbndslist:list=field(default_factory=lambda : [])
         rotalltors:bool=False
         dontdotor:bool=False
@@ -1057,6 +1058,8 @@ class PolarizableTyper():
                             self.optmaxcycle = int(a)
                         elif "torsionrestraint" in newline:
                             self.torsionrestraint=float(a)
+                        elif "torsionprmrestraintfactor" in newline:
+                            self.torsionprmrestraintfactor=float(a)
                         elif 'maxtorRMSPDRel' in newline:
                             self.maxtorRMSPDRel=float(a)
                         elif "foldnum" in newline:

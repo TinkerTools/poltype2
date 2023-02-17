@@ -934,6 +934,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         bypassrmsd=False
         maxiter=5
         count=0
+        restraint_factor = poltype.torsionprmrestraintfactor
         while not parm_sanitized:
             if count>=maxiter:
                 break
@@ -945,17 +946,20 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             # x: angle list
             # torprmdict: torsion information 
             # y: tor_energy_list
+            
+            ### add parameter restraint in fitfunc
             if useweights==True: 
-                errfunc = lambda p, x, z, torprmdict, y: (fitfunc(poltype,p, x,z, torprmdict) - weightlist*y)
+                errfunc = lambda p, x, z, torprmdict, y: numpy.array(list(fitfunc(poltype,p, x,z, torprmdict) - weightlist*y) + list(numpy.array(p) * restraint_factor))
 
             else:
-                errfunc = lambda p, x, z, torprmdict, y: fitfunc(poltype,p, x,z, torprmdict) - y
+                errfunc = lambda p, x, z, torprmdict, y: numpy.array(list(fitfunc(poltype,p, x,z, torprmdict) - y) + list(numpy.array(p) * restraint_factor))
+            
+
             array=optimize.least_squares(errfunc, pzero,jac='2-point', bounds=boundstup,verbose=0,args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
             p1=array['x']
             pzero,boundstup,parm_sanitized=CheckFitParameters(poltype,pzero,boundstup,parm_sanitized,refine,keylist,torprmdict,p1,angle_list,torset,max_amp)
             count+=1
  
-        
 
         torprmdict,write_prm_dict,classkeytofoldtophase=FillInDictionariesParameterEstimates(poltype,torprmdict,p1,write_prm_dict)
         # write out new keyfile, do this after each torsion fitting now for coupled torsion fitting
