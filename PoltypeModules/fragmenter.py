@@ -25,6 +25,7 @@ import itertools
 import apicall as call
 import math
 import re
+import time
 
 def AssignTotalCharge(poltype,molecule,babelmolecule):
     """
@@ -1078,13 +1079,18 @@ def MatchOBMols(poltype,molstruct,equivalentmolstruct,parentindextofragindex,equ
     fragindices=list(parentindextofragindex.values())
     equivalentfragindices=list(equivalentparentindextofragindex.values())
     indextoreferenceindex={}
-    tmpconv = openbabel.OBConversion()
-    tmpconv.SetOutFormat('mol')
+    #tmpconv = openbabel.OBConversion()
+    #tmpconv.SetOutFormat('mol')
+    #outputname='temp.mol'
+    #tmpconv.WriteFile(equivalentmolstruct,outputname)
+    # openbabel.OBConversion generated file sometimes may have bad valence for N
+    # here I use obabel to convert directly --Chengwen Liu
     outputname='temp.mol'
-    tmpconv.WriteFile(equivalentmolstruct,outputname)
+    cmdstr = f"obabel -ixyz geom.xyz -O {outputname} -h; wait"
+    os.system(cmdstr)
     newmol=rdmolfiles.MolFromMolFile(outputname,removeHs=False)
     smarts=rdmolfiles.MolToSmarts(newmol).replace('@','')
-    tmpconv.WriteFile(molstruct,outputname)
+    #tmpconv.WriteFile(molstruct,outputname)
     molstructrdkit=rdmolfiles.MolFromMolFile(outputname,removeHs=False)
     p = Chem.MolFromSmarts(smarts)
     matches=molstructrdkit.GetSubstructMatches(p)
