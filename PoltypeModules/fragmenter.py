@@ -979,7 +979,11 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
                 otherparentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
                 otherfragmentfilepath=rotbndindextofragmentfilepath[rotbndindex]        
                 molstruct=ReadToOBMol(poltype,otherfragmentfilepath)
-                indextoreferenceindex=MatchOBMols(poltype,molstruct,equivalentmolstruct,otherparentindextofragindex,parentindextofragindex)              
+                if fragmentfilepath == otherfragmentfilepath:
+                    indextoreferenceindex={_:_ for _ in range(molstruct.NumAtoms())}
+                else:
+                    poltype.WriteToLog('Matching equivalent fragments: %s, %s'%(fragmentfilepath,otherfragmentfilepath))
+                    indextoreferenceindex=MatchOBMols(molstruct,equivalentmolstruct)              
                 for torsion in tors:
                     rdkittorsion=[k-1 for k in torsion]
                     trueotherparentindextofragindex={}
@@ -1067,38 +1071,23 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
     return equivalentrotbndindexarrays,rotbndindextoringtor,rotbndindextoparentrotbndindexes,rotbndindextosmartsindexarray
 
 
-def MatchOBMols(poltype,molstruct,equivalentmolstruct,parentindextofragindex,equivalentparentindextofragindex):
+def MatchOBMols(molstruct,equivalentmolstruct):
     """
-    Intent:
+    Intent: Map between atom indices in two equivalent but possibly reordered OBMols
     Input:
     Output:
     Referenced By: 
     Description: 
     """
-    fragindices=list(parentindextofragindex.values())
-    equivalentfragindices=list(equivalentparentindextofragindex.values())
     indextoreferenceindex={}
-    tmpconv = openbabel.OBConversion()
-    tmpconv.SetOutFormat('mol')
-    outputname='temp.mol'
-    tmpconv.WriteFile(equivalentmolstruct,outputname)
-    newmol=rdmolfiles.MolFromMolFile(outputname,removeHs=False)
-    smarts=rdmolfiles.MolToSmarts(newmol).replace('@','')
-    tmpconv.WriteFile(molstruct,outputname)
-    molstructrdkit=rdmolfiles.MolFromMolFile(outputname,removeHs=False)
-    p = Chem.MolFromSmarts(smarts)
-    matches=molstructrdkit.GetSubstructMatches(p)
-    for othermatch in matches: 
-       indices=list(range(len(othermatch)))
-       smartsindextomoleculeindex=dict(zip(indices,othermatch)) 
-       matches=newmol.GetSubstructMatches(p)
-       for match in matches: 
-           indices=list(range(len(match)))
-           smartsindextoequivalentmoleculeindex=dict(zip(indices,match)) 
-           moleculeindextosmartsindex={v: k for k, v in smartsindextomoleculeindex.items()}
-           for moleculeindex,smartsindex in moleculeindextosmartsindex.items():
-               refindex=smartsindextoequivalentmoleculeindex[smartsindex]
-               indextoreferenceindex[moleculeindex]=refindex
+    newmol = OBMolToRDMol(ResetOBMolBond(equivalentmolstruct), removeHs=False)
+    molstructrdkit = OBMolToRDMol(ResetOBMolBond(molstruct), removeHs=False)
+    p = newmol
+    matches=molstructrdkit.GetSubstructMatches(p, useChirality=False)
+    matches_new = newmol.GetSubstructMatches(p, useChirality=False)
+    for match in matches: 
+       for match_new in matches_new: 
+           indextoreferenceindex.update(dict(zip(match, match_new)))
    
     return indextoreferenceindex
 
@@ -1680,6 +1669,50 @@ def ReadToOBMol(poltype,filename):
     tmpconv.ReadFile(fragmolbabel,filename)
     return fragmolbabel
 
+def ReadCoordToOBMol(filename):
+    """
+    Intent: Read coordinates and infer bond order using OB
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    conv1 = openbabel.OBConversion()
+    inFormat = conv1.FormatFromExt(filename)
+    conv1.SetInFormat(inFormat)
+
+    mol1=openbabel.OBMol()
+    conv1.ReadFile(mol1,filename)
+
+    mol2 = ResetOBMolBond(mol1)
+
+    return mol2
+
+def ResetOBMolBond(obmol):
+    """
+    Intent: infer bond order from coordinates
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    TMP_FORMAT = 'xyz'
+    conv1 = openbabel.OBConversion()
+    conv1.SetInFormat(TMP_FORMAT)
+    conv1.SetOutFormat(TMP_FORMAT)
+
+    mol_str = conv1.WriteString(obmol)
+    mol2=openbabel.OBMol()
+    conv1.ReadString(mol2, mol_str)
+    return mol2
+
+def OBMolToRDMol(obmol, tmpFormat='mol', **kwargs):
+    conv1 = openbabel.OBConversion()
+    conv1.SetOutFormat(tmpFormat)
+    mol_str = conv1.WriteString(obmol)
+
+    rdkitmol = Chem.MolFromMolBlock(mol_str, **kwargs)
+    return rdkitmol
 
 
 def mol_with_atom_index(poltype,mol):
