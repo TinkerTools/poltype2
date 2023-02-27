@@ -808,10 +808,10 @@ def gen_gdmain(poltype,gdmainfname,molecprefix,fname,dmamethod,new_gdma):
     tmpfh.write("Radius O   0.65\n")  # GDMA suggested
     tmpfh.write("Radius F   0.65\n")  # GDMA suggested
     tmpfh.write("Radius Cl  1.11\n")  # GDMA suggested
-    tmpfh.write("Radius Br  1.32\n")  # Scaled based on Cl
-    tmpfh.write("Radius I   1.62\n")  # Scaled based on Cl
-    tmpfh.write("Radius S   1.22\n")  # Scaled based on Cl
-    tmpfh.write("Radius P   1.38\n")  # Scaled based on Cl
+    tmpfh.write("Radius Br  1.15\n")  # Scaled based on Cl, vdw-radii
+    tmpfh.write("Radius I   1.20\n")  # Scaled based on Cl, vdw-radii
+    tmpfh.write("Radius S   1.11\n")  # Scaled based on Cl, vdw-radii
+    tmpfh.write("Radius P   1.20\n")  # Scaled based on Cl, vdw-radii
     tmpfh.write("\n")
     tmpfh.write("Start\n")
     tmpfh.write("\n")
