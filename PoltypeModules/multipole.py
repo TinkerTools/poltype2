@@ -800,12 +800,12 @@ def gen_gdmain(poltype,gdmainfname,molecprefix,fname,dmamethod,new_gdma):
       tmpfh.write("Switch 0\n") # v1.3, comment out for v2.2
       tmpfh.write("Limit 2\n")
       tmpfh.write("Punch " + punfname + "\n")
-      f.write("Radius H 0.65\n")
-      f.write("Radius S 0.80\n")
-      f.write("Radius P 0.75\n")
-      f.write("Radius Cl 1.0\n")
-      f.write("Radius Br 1.1\n")
-      f.write("Radius I 1.3\n")
+      tmpfh.write("Radius H 0.65\n")
+      tmpfh.write("Radius S 0.80\n")
+      tmpfh.write("Radius P 0.75\n")
+      tmpfh.write("Radius Cl 1.0\n")
+      tmpfh.write("Radius Br 1.1\n")
+      tmpfh.write("Radius I 1.3\n")
     else:
       tmpfh.write("Switch 4\n") 
       tmpfh.write("Limit 2\n")
