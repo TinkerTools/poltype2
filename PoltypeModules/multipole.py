@@ -798,20 +798,28 @@ def gen_gdmain(poltype,gdmainfname,molecprefix,fname,dmamethod,new_gdma):
     tmpfh.write("Multipoles\n")
     if not new_gdma:
       tmpfh.write("Switch 0\n") # v1.3, comment out for v2.2
+      tmpfh.write("Limit 2\n")
+      tmpfh.write("Punch " + punfname + "\n")
+      f.write("Radius H 0.65\n")
+      f.write("Radius S 0.80\n")
+      f.write("Radius P 0.75\n")
+      f.write("Radius Cl 1.0\n")
+      f.write("Radius Br 1.1\n")
+      f.write("Radius I 1.3\n")
     else:
       tmpfh.write("Switch 4\n") 
-    tmpfh.write("Limit 2\n")
-    tmpfh.write("Punch " + punfname + "\n")
-    tmpfh.write("Radius H   0.325\n") # GDMA suggested
-    tmpfh.write("Radius C   0.65\n")  # GDMA suggested
-    tmpfh.write("Radius N   0.65\n")  # GDMA suggested
-    tmpfh.write("Radius O   0.65\n")  # GDMA suggested
-    tmpfh.write("Radius F   0.65\n")  # GDMA suggested
-    tmpfh.write("Radius Cl  1.11\n")  # GDMA suggested
-    tmpfh.write("Radius Br  1.15\n")  # Scaled based on Cl, vdw-radii
-    tmpfh.write("Radius I   1.20\n")  # Scaled based on Cl, vdw-radii
-    tmpfh.write("Radius S   1.11\n")  # Scaled based on Cl, vdw-radii
-    tmpfh.write("Radius P   1.20\n")  # Scaled based on Cl, vdw-radii
+      tmpfh.write("Limit 2\n")
+      tmpfh.write("Punch " + punfname + "\n")
+      tmpfh.write("Radius H   0.325\n") # GDMA suggested
+      tmpfh.write("Radius C   0.65\n")  # GDMA suggested
+      tmpfh.write("Radius N   0.65\n")  # GDMA suggested
+      tmpfh.write("Radius O   0.65\n")  # GDMA suggested
+      tmpfh.write("Radius F   0.65\n")  # GDMA suggested
+      tmpfh.write("Radius Cl  1.11\n")  # GDMA suggested
+      tmpfh.write("Radius Br  1.15\n")  # Scaled based on Cl, vdw-radii
+      tmpfh.write("Radius I   1.20\n")  # Scaled based on Cl, vdw-radii
+      tmpfh.write("Radius S   1.11\n")  # Scaled based on Cl, vdw-radii
+      tmpfh.write("Radius P   1.20\n")  # Scaled based on Cl, vdw-radii
     tmpfh.write("\n")
     tmpfh.write("Start\n")
     tmpfh.write("\n")
