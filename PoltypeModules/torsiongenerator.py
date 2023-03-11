@@ -2106,7 +2106,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
         temp.write('  RMS_FORCE_G_CONVERGENCE 1.7e-2'+'\n')
         temp.write('  MAX_DISP_G_CONVERGENCE 1e-1'+'\n')
         temp.write('  RMS_DISP_G_CONVERGENCE 6.7e-2'+'\n')
-        temp.write('  scf_type pk'+'\n')
+        temp.write('  scf_type df'+'\n')
         temp.write('  pcm true'+'\n')
         temp.write('  pcm_scf_type total '+'\n')
         temp.write('  geom_maxiter '+str(poltype.optmaxcycle)+'\n')
@@ -2458,7 +2458,7 @@ def CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,m
     temp.write('}'+'\n')
     if poltype.torsppcm==True:
         temp.write('set {'+'\n')
-        temp.write(' scf_type pk'+'\n')
+        temp.write(' scf_type df'+'\n')
         temp.write(' pcm true'+'\n')
         temp.write(' pcm_scf_type total '+'\n')
         temp.write('}'+'\n')
