@@ -418,6 +418,7 @@ class PolarizableTyper():
         cubegenexe:str='cubegen'
         gdmaexe:str='gdma'
         new_gdma:bool=False
+        sameleveldmaesp:bool=False
         avgmpolesexe:str=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/PoltypeModules/avgmpoles.pl"
         peditexe:str='poledit.x'
         potentialexe:str='potential.x'
@@ -1028,6 +1029,8 @@ class PolarizableTyper():
                             self.dmamethod =a
                         elif 'new_gdma' in newline:
                             self.new_gdma=self.SetDefaultBool(line,a,True)
+                        elif 'sameleveldmaesp' in newline:
+                            self.sameleveldmaesp=self.SetDefaultBool(line,a,True)
                         elif "bashrcpath" in newline and a!='None':
                             self.bashrcpath = a
                         elif "structure" in newline:
@@ -1229,6 +1232,9 @@ class PolarizableTyper():
                self.tempnumproc=self.numproc
                self.partition=False
             self.firsterror=False
+            if self.sameleveldmaesp==True:
+                self.dmamethod=self.espmethod
+                self.dmabasisset=self.espbasisset
             if self.debugmode==True:
                 self.optmethod="HF"      
                 self.toroptmethod="HF"         
