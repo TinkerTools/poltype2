@@ -183,7 +183,6 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
       temp.write('cubeprop(wfn)'+'\n')
     temp.write("wfn = psi4.core.Wavefunction.from_file('dma.wfn.npy')\n")
     temp.write('oeprop(wfn,"GRID_ESP","WIBERG_LOWDIN_INDICES","MULLIKEN_CHARGES")\n')
-    temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
 
     temp.write('clean()'+'\n')
     temp.close()
@@ -240,6 +239,9 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
     temp.write("wfn.to_file('dma.wfn')\n")
     temp.write('cubeprop(wfn)'+'\n')
     temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
+    if poltype.sameleveldmaesp:
+        temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com','').replace('-dma', '-esp'))+'\n')
+      
     header=poltype.molstructfname.split('.')[0]
     temp.write('clean()'+'\n')
     temp.close()
