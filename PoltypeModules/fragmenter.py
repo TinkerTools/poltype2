@@ -753,7 +753,7 @@ def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog
     """
     tempmaxmem,tempmaxdisk,tempnumproc=poltype.PartitionResources()
     inherited_keywords = ['maxtorresnitrogen','xtbtorresconstant','deleteallnonqmfiles','debugmode','parentname','use_gau_vdw','use_qmopt_vdw','onlyvdwatomindex','tordebugmode','dovdwscan','refinenonaroringtors','tortor','maxgrowthcycles','toroptmethod','torspmethod','espmethod','dmamethod','optmethod','toroptbasisset','torspbasisset','espbasisset','dmabasisset','optbasisset','optmaxcycle','bashrcpath','externalapi','use_gaus','use_gausoptonly','use_psi4_geometric_opt', 'poltypepath']
-    inherited_keywords += ['foldnum', 'new_gdma', 'torsionprmrestraintfactor', 'sameleveldmaesp']
+    inherited_keywords += ['foldnum', 'new_gdma', 'torsionprmrestraintfactor', 'sameleveldmaesp', 'adaptiveespbasisset']
     frag_keywords = {'atmidx':poltype.prmstartidx,'suppressdipoleerr':'True','isfragjob':True,'structure':tail,'numproc':tempnumproc,'maxmem':tempmaxmem,'maxdisk':tempmaxdisk,'printoutput':True,'toroptmethodlist':','.join(poltype.toroptmethodlist),'torspmethodlist':','.join(poltype.torspmethodlist)}
     poltypeinput = {_key:poltype.__dict__[_key] for _key in inherited_keywords if (_key in poltype.__dict__)}
     poltypeinput.update(frag_keywords)
