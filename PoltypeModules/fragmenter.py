@@ -25,6 +25,8 @@ import itertools
 import apicall as call
 import math
 import re
+import networkx as nx
+from networkx.algorithms import isomorphism
 
 def AssignTotalCharge(poltype,molecule,babelmolecule):
     """
@@ -971,7 +973,7 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         strfragvdwatomindex=None
         fragindextoparentindex={v: k for k, v in parentindextofragindex.items()}
         onlyfittorsions=[]
-        equivalentmolstruct=ReadToOBMol(poltype,fragmentfilepath)
+        #equivalentmolstruct=ReadToOBMol(poltype,fragmentfilepath)
         if vdwfragment==False:
             vdwkeypath=os.path.join(poltype.startdir,poltype.key5fname) 
             shutil.copy(vdwkeypath,'parentvdw.key')
@@ -979,12 +981,10 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             for rotbndindex,tors in rotbndindextotors.items():
                 otherparentindextofragindex=rotbndindextoparentindextofragindex[rotbndindex]
                 otherfragmentfilepath=rotbndindextofragmentfilepath[rotbndindex]        
-                molstruct=ReadToOBMol(poltype,otherfragmentfilepath)
-                if fragmentfilepath == otherfragmentfilepath:
-                    indextoreferenceindex={_:_ for _ in range(molstruct.NumAtoms())}
-                else:
-                    poltype.WriteToLog('Matching equivalent fragments: %s, %s'%(fragmentfilepath,otherfragmentfilepath))
-                    indextoreferenceindex=MatchOBMols(molstruct,equivalentmolstruct)              
+                #molstruct=ReadToOBMol(poltype,otherfragmentfilepath)
+                indextoreferenceindex=MatchMolFiles(poltype, otherfragmentfilepath,fragmentfilepath)              
+                if indextoreferenceindex is None or len(indextoreferenceindex) == 0:
+                    raise ValueError('Failed to match equivalent fragments %s, %s'%(fragmentfilepath,otherfragmentfilepath))
                 for torsion in tors:
                     rdkittorsion=[k-1 for k in torsion]
                     trueotherparentindextofragindex={}
@@ -1072,7 +1072,51 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
     return equivalentrotbndindexarrays,rotbndindextoringtor,rotbndindextoparentrotbndindexes,rotbndindextosmartsindexarray
 
 
-def MatchOBMols(molstruct,equivalentmolstruct):
+def MatchOBMolsBySubstruct(molstruct,equivalentmolstruct):
+    """
+    Intent: Map equivalent structures by RDKit substruct matching
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    indextoreferenceindex={}
+    newmol = OBMolToRDMol(ResetOBMolBond(equivalentmolstruct), tmpFormat='pdb', removeHs=False)
+    molstructrdkit = OBMolToRDMol(ResetOBMolBond(molstruct), tmpFormat='pdb', removeHs=False)
+    if newmol is None or molstructrdkit is None:
+        return indextoreferenceindex
+    p = newmol
+    matches = molstructrdkit.GetSubstructMatches(p, useChirality=False)
+    matches_new = newmol.GetSubstructMatches(p, useChirality=False)
+    if len(matches) == 0 or len(matches_new) == 0:
+        return indextoreferenceindex
+    indextoreferenceindex=dict(zip(matches[0], matches_new[0]))
+    return indextoreferenceindex
+
+def MatchOBMolsByOB(mol1, mol2):
+    """
+    Intent: Map equivalent structures by OpenBabel IsomorphismMapper
+    """
+    query = openbabel.CompileMoleculeQuery(mol1)
+    mapper = openbabel.OBIsomorphismMapper.GetInstance(query)
+    mapping = openbabel.vpairUIntUInt()
+    mapper.MapFirst(mol2, mapping)
+    return dict(mapping)
+
+def MatchOBMolsByGraph(mol1, mol2):
+    g1 = OBMolToGraph(mol1)
+    g2 = OBMolToGraph(mol2)
+    atom_match = isomorphism.numerical_node_match('atomicnum', 0)
+    GM = isomorphism.GraphMatcher(g1, g2, node_match=atom_match)
+    GM.is_isomorphic()
+
+    return {_key-1:_val-1 for (_key,_val) in GM.mapping.items()}
+
+def MatchRDMols(rdmol1, rdmol2):
+    match = rdmol2.GetSubstructMatch(rdmol1)
+    return dict(enumerate(match))
+
+def MatchMolFiles(poltype, molfile1, molfile2):
     """
     Intent: Map between atom indices in two equivalent but possibly reordered OBMols
     Input:
@@ -1080,17 +1124,31 @@ def MatchOBMols(molstruct,equivalentmolstruct):
     Referenced By: 
     Description: 
     """
-    indextoreferenceindex={}
-    newmol = OBMolToRDMol(ResetOBMolBond(equivalentmolstruct), removeHs=False)
-    molstructrdkit = OBMolToRDMol(ResetOBMolBond(molstruct), removeHs=False)
-    p = newmol
-    matches=molstructrdkit.GetSubstructMatches(p, useChirality=False)
-    matches_new = newmol.GetSubstructMatches(p, useChirality=False)
-    for match in matches: 
-       for match_new in matches_new: 
-           indextoreferenceindex.update(dict(zip(match, match_new)))
-   
-    return indextoreferenceindex
+    obmol1 = ReadToOBMol(poltype, molfile1)
+    obmol2 = ReadToOBMol(poltype, molfile2)
+
+    index_map = {}
+    if molfile1 == molfile2:
+        index_map = {_:_ for _ in range(obmol1.NumAtoms())}
+        return index_map
+    poltype.WriteToLog('Matching equivalent molecules: %s, %s'%(molfile1,molfile2))
+
+    rdmol1 = rdmolfiles.MolFromMolFile(molfile1, removeHs=False)
+    rdmol2 = rdmolfiles.MolFromMolFile(molfile2, removeHs=False)
+
+    if rdmol1 is None:
+        poltype.WriteToLog("Failed to read mol file to RDKit: %s"%(molfile1))
+    elif rdmol2 is None:
+        poltype.WriteToLog("Failed to read mol file to RDKit: %s"%(molfile2))
+    else:
+        index_map = MatchRDMols(rdmol1, rdmol2)
+
+    if len(index_map) == 0:
+        poltype.WriteToLog("Switching to VF2 algorithm for matching")
+        #index_map = MatchOBMolsByOB(obmol1, obmol2)
+        index_map = MatchOBMolsByGraph(obmol1, obmol2)
+
+    return index_map
 
 
 def ConvertSameBondTypes(poltype,rotbndindexes,parentindextofragindex,otherparentindextofragindex,othermolindextoequivmolindex):
@@ -1712,9 +1770,26 @@ def OBMolToRDMol(obmol, tmpFormat='mol', **kwargs):
     conv1.SetOutFormat(tmpFormat)
     mol_str = conv1.WriteString(obmol)
 
-    rdkitmol = Chem.MolFromMolBlock(mol_str, **kwargs)
+    if tmpFormat == 'mol':
+        rdkitmol = Chem.MolFromMolBlock(mol_str, **kwargs)
+    elif tmpFormat == 'pdb':
+        rdkitmol = Chem.rdmolfiles.MolFromPDBBlock(mol_str, **kwargs)
+    else:
+        raise ValueError(f"Format {tmpFormat} not supported by OBMolToRDMol")
     return rdkitmol
 
+def OBMolToGraph(mol):
+    G = nx.Graph()
+    iteratombab = openbabel.OBMolAtomIter(mol)
+    for atm in iteratombab:
+        G.add_nodes_from([(atm.GetIdx(), {"atomicnum": atm.GetAtomicNum()})])
+
+    iterbond = openbabel.OBMolBondIter(mol)
+    for bond in iterbond:
+        bgnidx = bond.GetBeginAtomIdx()
+        endidx = bond.GetEndAtomIdx()
+        G.add_edge(bgnidx, endidx)
+    return G
 
 def mol_with_atom_index(poltype,mol):
     """
