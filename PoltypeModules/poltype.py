@@ -1235,6 +1235,8 @@ class PolarizableTyper():
             if self.sameleveldmaesp==True:
                 self.dmamethod=self.espmethod
                 self.dmabasisset=self.espbasisset
+            if (self.dmamethod.upper() == self.espmethod.upper()) and (self.dmabasisset.upper() == self.espbasisset.upper()):
+                self.sameleveldmaesp=True
             if self.debugmode==True:
                 self.optmethod="HF"      
                 self.toroptmethod="HF"         
