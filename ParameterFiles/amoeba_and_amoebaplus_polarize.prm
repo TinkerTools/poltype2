@@ -74,9 +74,9 @@
 [NX4]                      					    NX4+     0.661 # NX4+ 
 [C][NX4]                   					    Cn+      0.686 # C on NX4+ 
 [H][NX4]                   					    Hn+      0.222 # H on NX4+
-[CX3](=O)[O]               					    Coo-     1.674 # C on COO-
-[O]=[CX3](O)[C]            					    Oc-      1.642 # O on COO-
-[O][CX3](=[O])[C]          					    Oc-      1.642 # O on COO-
+[CX3](=O)[OH0]             					    Coo-     1.674 # C on COO-
+[O]=[CX3]([OH0])[C]          					    Oc-      1.642 # O on COO-
+[OH0][CX3](=[O])[C]        					    Oc-      1.642 # O on COO-
 [$([N]~[CX3](~[N])[N])]    					    Nc+      0.737 # N on guanidinium
 [CX3](~[N])(~[N])[N]       					     C+      1.302 # C on guanidinium
 [SX1][C]                   					     S-      5.537 # S on MeS- 
@@ -89,13 +89,13 @@
 [OH1][PX4](~[O])(~[O])[O]  					   O(H)P     0.672 # O(H) on PO4-
 [O](C)[PX4](~[O])(~[O])[O] 					   O(C)P     1.029 # O(C) on CPO4-
 [H][O][PX4](~[O])~[O]      					   Hop       0.336 # H on O connected to PO4-
-[CX3](~O)(~O)[O]           					   Cooo-     2.073 # C of Carbonate
-[$([O]~[CX3](~O)[O])]      					   Oc-2      2.374 # O of Carbonate
+[CX3](~[OH0])(~[OH0])[OH0]     					   Cooo-     2.073 # C of Carbonate
+[$([OH0]~[CX3](~[OH0])[OH0])] 				   Oc-2      2.374 # O of Carbonate
 [O][O][CX3](=[O])[C]       					   Oo-       1.806 # Oo- 
 [O](O)[CX3](=[O])[C]       					   Oo-       1.806 # Oo-
 [$([N]1~[N]~[N]~[N]~[C]1)] 					   Nar-      1.657 # N- in aromatic 
 [$([N]1~[N]~[C]~[N]~[N]1)]   		       Nar-      1.657 # N- in aromatic 
 [N]1~[C]~[N]~[N]~[N]1   					     Nar-      1.657 # N- in aromatic 
 [C]1~[N]~[N]~[N]~[N]1      					   Car-      2.311 # C- in aromatic
-[O]~[#6]1~[#6]~[#6]~[#6]~[#6]~[#6]1    O-        2.689 # O in Phenol anion
-[#6](~O)1~[#6]~[#6]~[#6]~[#6]~[#6]1    Co-       2.413 # C in Phenol anion
+[OH0]~[CH0]1~[CH1]~[CH1]~[CH1]~[CH1]~[CH1]1  O-        2.689 # O in Phenol anion
+[CH0](~[OH0])1~[CH1]~[CH1]~[CH1]~[CH1]~[CH1]1  Co-       2.413 # C in Phenol anion
