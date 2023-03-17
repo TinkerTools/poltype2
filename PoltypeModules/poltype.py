@@ -3951,7 +3951,7 @@ class PolarizableTyper():
             return indextocoordslist
 
 
-        def GenerateExtendedConformer(self,rdkitmol,mol):
+        def GenerateExtendedConformer(self):
             """
             Intent: When deriving multipoles, dont want to have folded conformation where densities from other parts of the molecule overlap. So instead try to find most extended conformor and then will freeze dihedrals during QM opt.
             Input: Rdkit mol and openbabel mol
@@ -3965,59 +3965,18 @@ class PolarizableTyper():
             5. If user input wants multiple confomors for multipole parameterization then use the next lowest energy confomors (not necearrily maximaly extended conformation) as well.
             6. Save coordinates of conformations in dictionary for later use in QM optimzation  
             """
-            numconf=100 # just try this
-            # STEP 1
-            AllChem.EmbedMultipleConfs(rdkitmol, numConfs=numconf,useExpTorsionAnglePrefs=True,useBasicKnowledge=True)
-            # STEP 2
-            energies = AllChem.MMFFOptimizeMoleculeConfs(rdkitmol,maxIters=2000, nonBondedThresh=100.0)
-            confs=rdkitmol.GetConformers()
-            disttoconf={}
-            energytoconf={}
-            # STEP 3
-            for i in range(len(confs)):
-                conf=confs[i]
-                energy=energies[i][1]
-                name="conftest.mol"
-                rdmolfiles.MolToMolFile(rdkitmol,name,confId=i)
-                mol=rdmolfiles.MolFromMolFile(name,removeHs=False)
-                maxdist=self.FindLongestDistanceInMolecule(mol)
-                disttoconf[maxdist]=i
-                energytoconf[energy]=i
-            distances=list(disttoconf.keys())
-            if len(distances)!=0:
-                maxdist=max(distances)
-                confindex=disttoconf[maxdist]
-            else:
-                confindex=0
-            minenergy=min(energytoconf.keys())
-            newenergytoconf={}
-            for e,conf in energytoconf.items():
-                newe=e-minenergy
-                newenergytoconf[newe]=conf 
-            sortedenergy=sorted(newenergytoconf)
-            sortedconf=[newenergytoconf[i] for i in sortedenergy]
-            sortedenergytoconf=dict(zip(sortedenergy,sortedconf))
-            # STEP 4 
-            confslist=[confindex]
-            numextraconfs=self.numespconfs-1
-            count=1
-            # STEP 5
-            for energy,idx in sortedenergytoconf.items():
-                if idx not in confslist:
-                    if count>numextraconfs:
-                        break
-                    confslist.append(idx)
-                    count+=1
+            cmdstr = f"python {os.path.join(os.path.abspath(os.path.split(__file__)[0]), 'lConformerGenerator.py')} {self.molstructfname}"
+            print('Calling: '+cmdstr) 
+            os.system(cmdstr)
+            name = "conftest.mol" 
             indextocoordslist=[]
-            for confindex in confslist:
-                indextocoordinates={}
-                rdmolfiles.MolToMolFile(rdkitmol,name,confId=confindex)
-                mol=rdmolfiles.MolFromMolFile(name,removeHs=False)
-                for i in range(len(mol.GetAtoms())):
-                    pos = mol.GetConformer().GetAtomPosition(i) 
-                    vec=np.array([float(pos.x),float(pos.y),float(pos.z)])
-                    indextocoordinates[i]=vec
-                indextocoordslist.append(indextocoordinates)
+            indextocoordinates={}
+            mol=rdmolfiles.MolFromMolFile(name,removeHs=False)
+            for i in range(len(mol.GetAtoms())):
+                pos = mol.GetConformer().GetAtomPosition(i) 
+                vec=np.array([float(pos.x),float(pos.y),float(pos.z)])
+                indextocoordinates[i]=vec
+            indextocoordslist.append(indextocoordinates)
             # STEP 6
             if len(self.espextraconflist)!=0:
                 curdir=os.getcwd()
@@ -4637,7 +4596,7 @@ class PolarizableTyper():
             (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,mol,[],[],allmissing=True) # need to call this to get self.rotbndlist to generate restraints for N-dimensional scan in GenerateMaxSymmetryConformer
             # STEP 16
             if self.firstoptfinished==False and self.isfragjob==False and self.generateextendedconf==True:
-                indextocoordslist=self.GenerateExtendedConformer(m,mol)
+                indextocoordslist=self.GenerateExtendedConformer()
                 indextocoordinates=indextocoordslist[0]
             if self.isfragjob==True and self.generate_symm_frag_conf and len(self.onlyrotbndslist)!=0:
                 self.WriteToLog("Generating Max Symmetry Conformer")
