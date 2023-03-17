@@ -41,9 +41,7 @@ if __name__ == "__main__":
   
   sdffile = sys.argv[1]
 
-  
-  m = Chem.MolFromMolFile(sdffile,removeHs=False)
-  m1 = Chem.AddHs(m)
+  m1 = Chem.MolFromMolFile(sdffile,removeHs=False)
   AllChem.EmbedMolecule(m1)
   radii = rdFreeSASA.classifyAtoms(m1)
   m2 = AllChem.EmbedMultipleConfs(m1, numConfs=500, useExpTorsionAnglePrefs=True,useBasicKnowledge=True, randomSeed=123456789)
