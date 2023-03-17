@@ -42,8 +42,7 @@ if __name__ == "__main__":
   sdffile = sys.argv[1]
 
   m1 = Chem.MolFromMolFile(sdffile,removeHs=False)
-  AllChem.EmbedMolecule(m1)
-  radii = rdFreeSASA.classifyAtoms(m1)
+  #AllChem.EmbedMolecule(m1)
   m2 = AllChem.EmbedMultipleConfs(m1, numConfs=500, useExpTorsionAnglePrefs=True,useBasicKnowledge=True, randomSeed=123456789)
   
   # find all ihb
@@ -80,6 +79,7 @@ if __name__ == "__main__":
   sasas = []
   num_ihbs = []
 
+  radii = rdFreeSASA.classifyAtoms(m1)
   for i in range(m1.GetNumConformers()):
     rg = 0.0
     ihb = range(999)
