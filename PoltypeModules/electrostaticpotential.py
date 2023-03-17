@@ -97,7 +97,7 @@ def gen_esp_grid(poltype,mol,gridnamelist,espnamelist,fchknamelist,cubenamelist)
                 fckfname = os.path.splitext(fckfname)[0]
 
             assert os.path.isfile(fckfname), "Error: " + fckfname + " does not exist."+' '+os.getcwd()
-            if poltype.espmethod=='MP2':
+            if poltype.espmethod.upper() =='MP2':
                 densitystring='MP2'
             else:
                 densitystring='SCF'
@@ -147,14 +147,15 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
     tempread.close()
     inputname=comfilename.replace('.com','.psi4')
     temp=open(inputname,'w')
-    temp.write('molecule { '+'\n')
-    temp.write('%d %d\n' % (charge, mol.GetTotalSpinMultiplicity()))
-    for lineidx in range(len(results)):
-        line=results[lineidx]
-        linesplit=line.split()
-        if len(linesplit)==4 and '#' not in line:
-            temp.write(line)
-    temp.write('}'+'\n')
+    if not poltype.sameleveldmaesp:
+      temp.write('molecule { '+'\n')
+      temp.write('%d %d\n' % (charge, mol.GetTotalSpinMultiplicity()))
+      for lineidx in range(len(results)):
+          line=results[lineidx]
+          linesplit=line.split()
+          if len(linesplit)==4 and '#' not in line:
+              temp.write(line)
+      temp.write('}'+'\n')
     temp.write('memory '+maxmem+'\n')
     temp.write('set_num_threads(%s)'%(numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
@@ -162,24 +163,28 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
     temp.write('set freeze_core True'+'\n')
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
     temp.write("set cubeprop_tasks ['esp']"+'\n')
-    temp.write('set basis %s '%(poltype.espbasisset)+'\n')
-    if poltype.allowradicals==True:
-        temp.write('set reference uhf '+'\n')
-        temp.write("G, wfn = gradient('%s', return_wfn=True)" % (poltype.espmethod.lower())+'\n')
-    else:
-        spacedformulastr=mol.GetSpacedFormula()
-        if ('I ' in spacedformulastr):
-            temp.write('basis {'+'\n')
-            temp.write('assign '+poltype.espbasisset+'\n')
-            temp.write('assign I '+poltype.iodineespbasisset+'\n')
-            temp.write('}'+'\n')
-        if makecube==True:
-            temp.write("E, wfn = properties('%s',properties=['dipole','GRID_ESP','WIBERG_LOWDIN_INDICES','MULLIKEN_CHARGES'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
-        else:
-            temp.write("E, wfn = properties('%s',properties=['dipole','WIBERG_LOWDIN_INDICES','MULLIKEN_CHARGES'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
+    if not poltype.sameleveldmaesp:
+      temp.write('set basis %s '%(poltype.espbasisset)+'\n')
+      if poltype.allowradicals==True:
+          temp.write('set reference uhf '+'\n')
+          temp.write("G, wfn = gradient('%s', return_wfn=True)" % (poltype.espmethod.lower())+'\n')
+      else:
+          spacedformulastr=mol.GetSpacedFormula()
+          if ('I ' in spacedformulastr):
+              temp.write('basis {'+'\n')
+              temp.write('assign '+poltype.espbasisset+'\n')
+              temp.write('assign I '+poltype.iodineespbasisset+'\n')
+              temp.write('}'+'\n')
+          if makecube==True:
+              temp.write("E, wfn = properties('%s',properties=['dipole','GRID_ESP','WIBERG_LOWDIN_INDICES','MULLIKEN_CHARGES'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
+          else:
+              temp.write("E, wfn = properties('%s',properties=['dipole','WIBERG_LOWDIN_INDICES','MULLIKEN_CHARGES'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
 
-    temp.write('cubeprop(wfn)'+'\n')
-    temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
+      temp.write('cubeprop(wfn)'+'\n')
+    temp.write("wfn = psi4.core.Wavefunction.from_file('dma.wfn.npy')\n")
+    temp.write('oeprop(wfn,"GRID_ESP","WIBERG_LOWDIN_INDICES","MULLIKEN_CHARGES")\n')
+    if not poltype.sameleveldmaesp:
+      temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
 
     temp.write('clean()'+'\n')
     temp.close()
@@ -228,12 +233,17 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
             temp.write('assign I '+poltype.iodinedmabasisset+'\n')
             temp.write('}'+'\n')
             temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower())+'\n')
-
+        
         else:
-
+        
             temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower())+'\n')
+              
+    temp.write("wfn.to_file('dma.wfn')\n")
     temp.write('cubeprop(wfn)'+'\n')
     temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
+    if poltype.sameleveldmaesp:
+        temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com','').replace('-dma', '-esp'))+'\n')
+      
     header=poltype.molstructfname.split('.')[0]
     temp.write('clean()'+'\n')
     temp.close()
@@ -377,7 +387,7 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
             iodinebasissetfile=poltype.iodinedmabasissetfile 
             basissetfile=poltype.dmabasissetfile 
             #poltype.dmamethod='wB97XD'
-        if poltype.dmamethod=='MP2':
+        if poltype.dmamethod.upper() == 'MP2':
             densitystring='MP2'
         else:
             densitystring='SCF'
@@ -394,7 +404,7 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
             #poltype.espmethod='wB97XD'
 
 
-        if poltype.espmethod=='MP2':
+        if poltype.espmethod.upper() =='MP2':
             densitystring='MP2'
         else:
             densitystring='SCF'
@@ -682,6 +692,12 @@ def SPForESP(poltype,optmolist,molist,xyzfnamelist,keyfnamelist):
                 poltype.WriteToLog("Gas Phase High Level Single Point for Multipole Refinement")
                 gen_comfile(poltype,comespfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,chkespfname,poltype.comtmp,optmol)
                 cmdstr = poltype.gausexe + " " + comespfname
+                if poltype.sameleveldmaesp:
+                  comdmafname = comespfname.replace('-esp', '-dma')
+                  logdmafname = logespfname.replace('-esp', '-dma')
+                  fckdmafname = fckespfname.replace('-esp', '-dma')
+                  chkdmafname = chkespfname.replace('-esp', '-dma')
+                  cmdstr = f"ln -sf {comdmafname}  {comespfname}; ln -sf {logdmafname}  {logespfname}; ln -sf {fckdmafname} {fckespfname}; ln -sf {chkdmafname} {chkespfname}"
                 jobtooutputlog={cmdstr:os.getcwd()+r'/'+logespfname}
                 jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
                 scratchdir=poltype.scrtmpdirgau
@@ -783,6 +799,8 @@ def CheckDipoleMoments(poltype,optmol):
     Description: 
     """
     logname=poltype.logespfname
+    if poltype.sameleveldmaesp:
+      logname = poltype.logdmafname
     if not os.path.exists(logname):
         return
     dipole=GrabQMDipoles(poltype,optmol,logname)

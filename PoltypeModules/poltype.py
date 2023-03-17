@@ -43,7 +43,7 @@ import fragmenter as frag
 import rings
 from packaging import version
 from rdkit import Chem
-from rdkit.Chem import rdmolfiles,AllChem,rdmolops
+from rdkit.Chem import rdmolfiles,AllChem,rdmolops,Descriptors
 from rdkit.Geometry import Point3D
 import vdwfit
 import numpy as np
@@ -418,6 +418,8 @@ class PolarizableTyper():
         cubegenexe:str='cubegen'
         gdmaexe:str='gdma'
         new_gdma:bool=False
+        sameleveldmaesp:bool=False
+        adaptiveespbasisset:bool=False
         avgmpolesexe:str=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/PoltypeModules/avgmpoles.pl"
         peditexe:str='poledit.x'
         potentialexe:str='potential.x'
@@ -1028,6 +1030,10 @@ class PolarizableTyper():
                             self.dmamethod =a
                         elif 'new_gdma' in newline:
                             self.new_gdma=self.SetDefaultBool(line,a,True)
+                        elif 'sameleveldmaesp' in newline:
+                            self.sameleveldmaesp=self.SetDefaultBool(line,a,True)
+                        elif 'adaptiveespbasisset' in newline:
+                            self.adaptiveespbasisset=self.SetDefaultBool(line,a,True)
                         elif "bashrcpath" in newline and a!='None':
                             self.bashrcpath = a
                         elif "structure" in newline:
@@ -1171,6 +1177,12 @@ class PolarizableTyper():
                         else:
                             print('Unrecognized '+line)
                             sys.exit()
+            
+            if self.adaptiveespbasisset:
+                m = Chem.MolFromMolFile(self.molstructfname,removeHs=False)
+                num_of_heavy_atoms = Descriptors.HeavyAtomCount(m)
+                if (num_of_heavy_atoms >= 20) and (self.espbasisset.upper() == "AUG-CC-PVTZ"):
+                  self.espbasisset = "AUG-CC-PVDZ"
 
             files=os.listdir()
             foundfinal=False
@@ -1229,6 +1241,11 @@ class PolarizableTyper():
                self.tempnumproc=self.numproc
                self.partition=False
             self.firsterror=False
+            if self.sameleveldmaesp==True:
+                self.dmamethod=self.espmethod
+                self.dmabasisset=self.espbasisset
+            if (self.dmamethod.upper() == self.espmethod.upper()) and (self.dmabasisset.upper() == self.espbasisset.upper()):
+                self.sameleveldmaesp=True
             if self.debugmode==True:
                 self.optmethod="HF"      
                 self.toroptmethod="HF"         

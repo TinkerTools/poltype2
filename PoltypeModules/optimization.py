@@ -94,7 +94,7 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
         temp.write('  RMS_DISP_G_CONVERGENCE 6.7e-2'+'\n')
 
 
-        temp.write('  scf_type pk'+'\n')
+        temp.write('  scf_type df'+'\n')
         temp.write('  pcm true'+'\n')
         temp.write('  pcm_scf_type total '+'\n')
         temp.write('  geom_maxiter '+str(poltype.optmaxcycle)+'\n')
