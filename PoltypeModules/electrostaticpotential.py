@@ -181,7 +181,8 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
               temp.write("E, wfn = properties('%s',properties=['dipole','WIBERG_LOWDIN_INDICES','MULLIKEN_CHARGES'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
 
       temp.write('cubeprop(wfn)'+'\n')
-    temp.write("wfn = psi4.core.Wavefunction.from_file('dma.wfn.npy')\n")
+    if poltype.sameleveldmaesp:
+      temp.write("wfn = psi4.core.Wavefunction.from_file('dma.wfn.npy')\n")
     temp.write('oeprop(wfn,"GRID_ESP","WIBERG_LOWDIN_INDICES","MULLIKEN_CHARGES")\n')
     if not poltype.sameleveldmaesp:
       temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
@@ -238,7 +239,8 @@ def CreatePsi4DMAInputFile(poltype,comfilecoords,comfilename,mol):
         
             temp.write("E, wfn = properties('%s',properties=['dipole'],return_wfn=True)" % (poltype.dmamethod.lower())+'\n')
               
-    temp.write("wfn.to_file('dma.wfn')\n")
+    if poltype.sameleveldmaesp:
+        temp.write("wfn.to_file('dma.wfn')\n")
     temp.write('cubeprop(wfn)'+'\n')
     temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
     if poltype.sameleveldmaesp:
