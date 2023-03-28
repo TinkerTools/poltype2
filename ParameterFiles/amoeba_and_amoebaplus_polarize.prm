@@ -3,6 +3,7 @@
 [N]                        					      N*     1.315 # N*, wild matching Nitrogen
 [O]                        					      O*     0.866 # O*, wild matching Oxygen
 [S]                        					      S*     3.202 # S*, wild matching Sulfur
+[P]                        					      P*     1.432 # P*, wild matching Phosphate
 [H][C]                     					 Hnonpol     0.480 # H on non-aromatic carbon
 [H][O]                     					  Hpolar     0.457 # H on non-aromatic oxygen
 [H][N]                     					  Hpolar     0.457 # H on non-aromatic nitrogen
@@ -70,7 +71,6 @@
 [Br][a]                    					    Brar     4.132 # Br connected to aromatic atom
 [I][A]                     					  Inonar     5.424 # I connected to non-aromatic atom
 [I][a]                     					     Iar     5.482 # I connected to aromatic atom
-[P]                        					     P       1.432 # P 
 [NX4]                      					    NX4+     0.661 # NX4+ 
 [C][NX4]                   					    Cn+      0.686 # C on NX4+ 
 [H][NX4]                   					    Hn+      0.222 # H on NX4+
@@ -83,7 +83,7 @@
 [C][SX1]                   					    Cs-      2.361 # C connected to S-
 [SX4](~[O])(~[O])[O]       					   So3-      2.100 # S on SO3-
 [$([O]~[SX4](~[O])[O])]    					    Os-      1.343 # O on SO3-
-[PX4](~[O])(~[O])[O]       					   Po4       1.217 # P on PO4
+[PX4](~[O])(~[O])[O]       					   Po4       1.217 # P on PO4 no matter charged or not
 [OX1]~[PX4]([O])([O])[O]   					   Op-       1.999 # O on (Hn)PO4- 
 [OX1][PX4](~[O])~[O]       					   Op-       1.999 # O on (Hn)PO4- 
 [OH1][PX4](~[O])(~[O])[O]  					   O(H)P     0.672 # O(H) on PO4-
@@ -99,5 +99,3 @@
 [C]1~[N]~[N]~[N]~[N]1      					   Car-      2.311 # C- in aromatic
 [O-]c1ccc(cc1)                         O-        2.689 # O in Phenol anion
 c1([O-])ccc(cc1)                       Co-       2.413 # C in Phenol anion connected to O-
-[O-]c1ccncc1                           O-        2.689 # O in pyridin-4-olate 
-c1([O-])ccncc1                         Co-       2.413 # C in pyridin-4-olate connected to O-
