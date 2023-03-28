@@ -74,9 +74,9 @@
 [NX4]                      					    NX4+     0.661 # NX4+ 
 [C][NX4]                   					    Cn+      0.686 # C on NX4+ 
 [H][NX4]                   					    Hn+      0.222 # H on NX4+
-[CX3](=O)[OH0]             					    Coo-     1.674 # C on COO-
-[O]=[CX3]([OH0])[C]          					    Oc-      1.642 # O on COO-
-[OH0][CX3](=[O])[C]        					    Oc-      1.642 # O on COO-
+[CX3](=O)[OH0X1]           					    Coo-     1.674 # C on COO-
+[O]=[CX3]([OH0X1])[C]        					    Oc-      1.642 # O on COO-
+[OH0X1][CX3](=[O])[C]        					    Oc-      1.642 # O on COO-
 [$([N]~[CX3](~[N])[N])]    					    Nc+      0.737 # N on guanidinium
 [CX3](~[N])(~[N])[N]       					     C+      1.302 # C on guanidinium
 [SX1][C]                   					     S-      5.537 # S on MeS- 
@@ -97,5 +97,7 @@
 [$([N]1~[N]~[C]~[N]~[N]1)]   		       Nar-      1.657 # N- in aromatic 
 [N]1~[C]~[N]~[N]~[N]1   					     Nar-      1.657 # N- in aromatic 
 [C]1~[N]~[N]~[N]~[N]1      					   Car-      2.311 # C- in aromatic
-[OH0]~[CH0]1~[CH1]~[CH1]~[CH1]~[CH1]~[CH1]1  O-        2.689 # O in Phenol anion
-[CH0](~[OH0])1~[CH1]~[CH1]~[CH1]~[CH1]~[CH1]1  Co-       2.413 # C in Phenol anion
+[O-]c1ccc(cc1)                         O-        2.689 # O in Phenol anion
+c1([O-])ccc(cc1)                       Co-       2.413 # C in Phenol anion connected to O-
+[O-]c1ccncc1                           O-        2.689 # O in pyridin-4-olate 
+c1([O-])ccncc1                         Co-       2.413 # C in pyridin-4-olate connected to O-
