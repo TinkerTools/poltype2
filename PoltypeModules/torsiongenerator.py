@@ -1095,9 +1095,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
 
         elif poltype.isfragjob==False and poltype.toroptmethod=='xtb':
             poltype.jobsatsametime=1
-            poltype.maxmem=poltype.tempmaxmem
-            poltype.maxdisk=poltype.tempmaxdisk
-            poltype.numproc=poltype.tempnumproc
             poltype.partition=False
 
         if poltype.toroptmethod=='ANI' or poltype.toroptmethod=='xtb':

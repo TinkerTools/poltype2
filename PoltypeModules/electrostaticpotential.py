@@ -147,15 +147,15 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
     tempread.close()
     inputname=comfilename.replace('.com','.psi4')
     temp=open(inputname,'w')
-    if not poltype.sameleveldmaesp:
-      temp.write('molecule { '+'\n')
-      temp.write('%d %d\n' % (charge, mol.GetTotalSpinMultiplicity()))
-      for lineidx in range(len(results)):
-          line=results[lineidx]
-          linesplit=line.split()
-          if len(linesplit)==4 and '#' not in line:
-              temp.write(line)
-      temp.write('}'+'\n')
+    if not (poltype.sameleveldmaesp and makecube):
+        temp.write('molecule { '+'\n')
+        temp.write('%d %d\n' % (charge, mol.GetTotalSpinMultiplicity()))
+        for lineidx in range(len(results)):
+            line=results[lineidx]
+            linesplit=line.split()
+            if len(linesplit)==4 and '#' not in line:
+                temp.write(line)
+        temp.write('}'+'\n')
     temp.write('memory '+maxmem+'\n')
     temp.write('set_num_threads(%s)'%(numproc)+'\n')
     temp.write('psi4_io.set_default_path("%s")'%(poltype.scrtmpdirpsi4)+'\n')
@@ -163,29 +163,28 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
     temp.write('set freeze_core True'+'\n')
     temp.write('set PROPERTIES_ORIGIN ["COM"]'+'\n')
     temp.write("set cubeprop_tasks ['esp']"+'\n')
-    if not poltype.sameleveldmaesp:
-      temp.write('set basis %s '%(poltype.espbasisset)+'\n')
-      if poltype.allowradicals==True:
-          temp.write('set reference uhf '+'\n')
-          temp.write("G, wfn = gradient('%s', return_wfn=True)" % (poltype.espmethod.lower())+'\n')
-      else:
-          spacedformulastr=mol.GetSpacedFormula()
-          if ('I ' in spacedformulastr):
-              temp.write('basis {'+'\n')
-              temp.write('assign '+poltype.espbasisset+'\n')
-              temp.write('assign I '+poltype.iodineespbasisset+'\n')
-              temp.write('}'+'\n')
-          if makecube==True:
-              temp.write("E, wfn = properties('%s',properties=['dipole','GRID_ESP','WIBERG_LOWDIN_INDICES','MULLIKEN_CHARGES'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
-          else:
-              temp.write("E, wfn = properties('%s',properties=['dipole','WIBERG_LOWDIN_INDICES','MULLIKEN_CHARGES'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
+    if not (poltype.sameleveldmaesp and makecube):
+        temp.write('set basis %s '%(poltype.espbasisset)+'\n')
+        if poltype.allowradicals:
+            temp.write('set reference uhf '+'\n')
+            temp.write("G, wfn = gradient('%s', return_wfn=True)" % (poltype.espmethod.lower())+'\n')
+        else:
+            spacedformulastr=mol.GetSpacedFormula()
+            if ('I ' in spacedformulastr):
+                temp.write('basis {'+'\n')
+                temp.write('assign '+poltype.espbasisset+'\n')
+                temp.write('assign I '+poltype.iodineespbasisset+'\n')
+                temp.write('}'+'\n')
+            if makecube:
+                temp.write("E, wfn = properties('%s',properties=['dipole','GRID_ESP','WIBERG_LOWDIN_INDICES','MULLIKEN_CHARGES'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
+            else:
+                temp.write("E, wfn = properties('%s',properties=['dipole','WIBERG_LOWDIN_INDICES','MULLIKEN_CHARGES'],return_wfn=True)" % (poltype.espmethod.lower())+'\n')
 
-      temp.write('cubeprop(wfn)'+'\n')
-    if poltype.sameleveldmaesp:
-      temp.write("wfn = psi4.core.Wavefunction.from_file('dma.wfn.npy')\n")
-    temp.write('oeprop(wfn,"GRID_ESP","WIBERG_LOWDIN_INDICES","MULLIKEN_CHARGES")\n')
-    if not poltype.sameleveldmaesp:
-      temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
+        temp.write('cubeprop(wfn)'+'\n')
+        temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
+    else:
+        temp.write("wfn = psi4.core.Wavefunction.from_file('dma.wfn.npy')\n")
+        temp.write('oeprop(wfn,"GRID_ESP","WIBERG_LOWDIN_INDICES","MULLIKEN_CHARGES")\n')
 
     temp.write('clean()'+'\n')
     temp.close()
