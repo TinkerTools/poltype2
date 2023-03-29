@@ -79,7 +79,8 @@ if __name__ == "__main__":
   sasas = []
   num_ihbs = []
 
-  radii = rdFreeSASA.classifyAtoms(m1)
+  ptable = Chem.GetPeriodicTable()
+  radii = [float(ptable.GetRvdw(atom.GetAtomicNum())) for atom in m1.GetAtoms()]
   for i in range(m1.GetNumConformers()):
     rg = 0.0
     ihb = range(999)
