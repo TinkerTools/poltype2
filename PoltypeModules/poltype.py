@@ -483,6 +483,7 @@ class PolarizableTyper():
         inputlastNVTequiltime:bool=False
         indicestorestrain:list=field(default_factory=lambda : [])
         hetatmindices:list=field(default_factory=lambda : [])
+        userconformation:bool=False
         def __post_init__(self): 
             """
             Intent: Post initialization variables (things you want internal variables but not necesarrily user input). Also for reading input poltype.ini file and changing variable defaults.
@@ -910,6 +911,9 @@ class PolarizableTyper():
                             self.usepoleditframes=self.SetDefaultBool(line,a,True)
                         elif "generateextendedconf" in newline:
                             self.generateextendedconf=self.SetDefaultBool(line,a,True)
+                        elif "userconformation" in newline:
+                            # for those who would like to use the conf in the input file direcly with torsion constrianed during opt 
+                            self.userconformation=self.SetDefaultBool(line,a,True)
                         elif "generate_symm_frag_conf" in newline:
                             self.generate_symm_frag_conf=self.SetDefaultBool(line,a,True)
                         elif "addhydrogens" in newline:
