@@ -386,8 +386,11 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
     if ('dma' in comfname):
         if ('I ' in poltype.mol.GetSpacedFormula()):
             iodinebasissetfile=poltype.iodinedmabasissetfile 
-            basissetfile=poltype.dmabasissetfile 
-            #poltype.dmamethod='wB97XD'
+            basissetfile=poltype.dmabasissetfile
+            if poltype.sameleveldmaesp:
+              poltype.dmabasisset='gen'
+              iodinebasissetfile=poltype.iodineespbasissetfile 
+              basissetfile=poltype.espbasissetfile
         if poltype.dmamethod.upper() == 'MP2':
             densitystring='MP2'
         else:

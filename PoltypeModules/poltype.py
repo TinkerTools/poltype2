@@ -1178,12 +1178,22 @@ class PolarizableTyper():
                             print('Unrecognized '+line)
                             sys.exit()
             
+            # Downgrad ESP basis set for molecules of 20 or more heavy atoms 
             if self.adaptiveespbasisset:
                 m = Chem.MolFromMolFile(self.molstructfname,removeHs=False)
                 num_of_heavy_atoms = Descriptors.HeavyAtomCount(m)
                 if (num_of_heavy_atoms >= 20) and (self.espbasisset.upper() == "AUG-CC-PVTZ"):
                   self.espbasisset = "AUG-CC-PVDZ"
-
+        
+            # For iodine-containing molecule, keep using different level of DMA and ESP
+            # for use with psi4
+            if self.sameleveldmaesp and (not self.use_gaus):
+                m = Chem.MolFromMolFile(self.molstructfname,removeHs=False)
+                for i in range(m.GetNumAtoms()):
+                  atomi = m.GetAtomWithIdx(i)
+                  if atomi.GetAtomicNum() == 53:
+                    self.sameleveldmaesp=False
+                    
             files=os.listdir()
             foundfinal=False
             foundfinaltor=False
@@ -1244,6 +1254,8 @@ class PolarizableTyper():
             if self.sameleveldmaesp==True:
                 self.dmamethod=self.espmethod
                 self.dmabasisset=self.espbasisset
+                self.iodinedmabasissetfile=self.iodineespbasissetfile
+                self.iodinedmabasisset=self.iodineespbasisset
             if (self.dmamethod.upper() == self.espmethod.upper()) and (self.dmabasisset.upper() == self.espbasisset.upper()):
                 self.sameleveldmaesp=True
             if self.debugmode==True:
@@ -2453,7 +2465,6 @@ class PolarizableTyper():
                         method=method.replace('D','-D')
                     if not (self.use_gaus) and optmethodbool==False:
                         method=method.replace('D','-D')
-
             return method
  
 
@@ -4647,6 +4658,7 @@ class PolarizableTyper():
             # STEP 20
             if ('I ' in self.mol.GetSpacedFormula()):
                 self.optmethod='wB97X-D'
+                self.optmethod=self.SanitizeQMMethod(self.optmethod,True)
             # STEP 21
             if ('Br ' in self.mol.GetSpacedFormula()):
                 self.torspbasisset=self.torspbasissethalogen

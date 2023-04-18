@@ -375,6 +375,7 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
     for atm in iteratombab:
         tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (an.getElSymbol(atm.GetAtomicNum()), atm.x(), atm.y(), atm.z()))
     tmpfh.write('\n')
+    tmpfh.write('\n')
     
     if ('I ' in spacedformulastr):
         formulalist=spacedformulastr.lstrip().rstrip().split()
