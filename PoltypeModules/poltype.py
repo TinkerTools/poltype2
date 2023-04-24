@@ -4774,7 +4774,7 @@ class PolarizableTyper():
             
                 if (not os.path.isfile(self.xyzfname) or not os.path.isfile(self.keyfname)):
                     # STEP 31
-                    cmdstr = self.peditexe + " 1 " + self.gdmafname +' '+self.paramhead+ " < " + self.peditinfile
+                    cmdstr = self.peditexe + " 1 " + self.gdmafname +' "'+self.paramhead+ "\" < " + self.peditinfile
                     self.call_subsystem([cmdstr],True)
                     # Add header to the key file output by poledit
                     while not os.path.isfile(self.keyfnamefrompoledit):
@@ -6420,7 +6420,10 @@ class PolarizableTyper():
             head,tail=os.path.split(self.prmfilepath)
             if head=='':
                 self.prmfilepath=os.path.join(os.getcwd(),self.prmfilepath)
-            string='parameters '+self.prmfilepath+'\n'
+            if len(self.prmfilepath.split()) > 1:
+                string='parameters "'+self.prmfilepath+'"\n'
+            else:
+                string='parameters '+self.prmfilepath+'\n'
             keymods.AddKeyWord(self,self.originalkeyfilename,string)
             if self.receptorligandxyzfilename!=None and self.ligandxyzfilenamelist!=None:
                 for xyz in self.ligandxyzfilenamelist:

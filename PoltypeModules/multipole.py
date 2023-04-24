@@ -708,7 +708,10 @@ def prepend_keyfile(poltype,keyfilename,optmol,dipole=False):
     tmpfname = keyfilename + "_tmp"
     tmpfh = open(tmpfname, "w")
     keyfh = open(keyfilename, "r")
-    tmpfh.write("parameters " + poltype.paramhead + "\n")
+    if len(poltype.paramhead.split()) > 1:
+        tmpfh.write("parameters \"" + poltype.paramhead + "\"\n")
+    else:
+        tmpfh.write("parameters " + poltype.paramhead + "\n")
     tmpfh.write('OPENMP-THREADS '+str(poltype.numproc)+'\n')
     tmpfh.write("bondterm none\n")
     tmpfh.write("angleterm none\n")
@@ -822,7 +825,7 @@ def AverageMultipoles(poltype,optmol):
     Description: 
     """
     gen_avgmpole_groups_file(poltype)
-    avgmpolecmdstr = poltype.avgmpolesexe + " " + poltype.keyfname + " " + poltype.xyzfname + " " + poltype.grpfname + " " + poltype.key2fnamefromavg + " " + poltype.xyzoutfile + " " + str(poltype.prmstartidx)
+    avgmpolecmdstr = '"' + poltype.avgmpolesexe + "\" " + poltype.keyfname + " " + poltype.xyzfname + " " + poltype.grpfname + " " + poltype.key2fnamefromavg + " " + poltype.xyzoutfile + " " + str(poltype.prmstartidx)
     poltype.call_subsystem([avgmpolecmdstr],True)    
     prepend_keyfile(poltype,poltype.key2fnamefromavg,optmol,True)
     statexyzatominfo,oldindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=poltype.GrabXYZInfo(poltype.xyzoutfile)
