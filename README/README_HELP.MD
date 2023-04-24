@@ -118,7 +118,6 @@
 ``optbasisset`` specifies basis set for geometry optimization. Default is 6-31G*.
 
 ``optmethod`` specifies quantum method for geometry optimziation. Default is MP2.
-   
 
 ``optpcm`` specifies to use PCM for geometry optimization. Default is True if zwitterion is detected, False if not.
 
@@ -131,6 +130,10 @@
 ``optloose`` specifies to use GAU_LOOSE optimization convergence criteria for psi4 optimization (both first geometry optimzation and for torsion geometry optimization)
 
 #### Distributed Multipole Analysis and Electrostatic Single Point
+
+``new_gdma`` specifies to use the new grid-based DMA algorithm. Default is False.
+
+``gdmacommand_*`` add/modify GDMA commands. For example, `gdmacommand_Radius_S=0.80` will add the command `Radius S 0.80` to GDMA input file.
 
 ``usepoleditframes`` specifies to use POLEDIT frames rather than poltype frame detection. Default is True.
 
@@ -168,6 +171,8 @@
 ``writeouttorsion`` specifies to write out torsion terms in pre-fit vdw key (from database matches). Default is True.
 
 ``inputkeyfile`` specifies a keyfile to append parameters to pre-fit vdw key (from database matches). Default is None.
+
+``prmmodfile`` specifies parameter modification patch file. See `ParameterFiles/dma4_nonbonded.mod` for example.
 
 #### Torsion Parameterization
 

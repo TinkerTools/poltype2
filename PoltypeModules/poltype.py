@@ -39,6 +39,8 @@ import torsionfit as torfit
 import optimization as opt
 import electrostaticpotential as esp
 import multipole as mpole
+from distributed_multipole import get_dma_default
+from parmmod import modify_key
 import fragmenter as frag
 import rings
 from packaging import version
@@ -341,6 +343,8 @@ class PolarizableTyper():
         homodimers:bool=False
         tortormissingfilename:str='tortormissing.txt'
         tordebugmode:bool=False
+        parameterfilespath:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir, 'ParameterFiles'))
+        prmmodlist:list=field(default_factory=lambda : [])
         amoebapluscfsmartstocommentmap:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoebapluscfsmartstocomment.txt'
         amoebapluscfprmlib:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'cfprmlib.txt'
         amoebaplusnonbondedprmlib:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoebaplusnonbonded.prm'
@@ -510,6 +514,7 @@ class PolarizableTyper():
             
             
             
+            self.PRMMOD_DMA4 = os.path.join(self.parameterfilespath, 'dma4_nonbonded.mod')
             self.nfoldlist =  list(range(1,self.foldnum+1))
             self.parentdir=os.getcwd()
             if self.torlist==None:
@@ -524,6 +529,7 @@ class PolarizableTyper():
             self.torsettooptqmtime={}
             self.torsettospqmtime={}
             self.torsettonumpoints={}
+            gdma_kws = []
                     
             opts, xargs = getopt.getopt(sys.argv[1:],'h',["help"])
 
@@ -1034,6 +1040,8 @@ class PolarizableTyper():
                             self.dmamethod =a
                         elif 'new_gdma' in newline:
                             self.new_gdma=self.SetDefaultBool(line,a,True)
+                        elif newline.startswith("gdmacommand_"):
+                            gdma_kws.append((newline[len('gdmacommand_'):], a))
                         elif 'sameleveldmaesp' in newline:
                             self.sameleveldmaesp=self.SetDefaultBool(line,a,True)
                         elif 'adaptiveespbasisset' in newline:
@@ -1122,6 +1130,16 @@ class PolarizableTyper():
                             self.onlyfittorstogether=templist
                             self.onlyfittorstogether=[tuple(i) for i in self.onlyfittorstogether]
 
+                        elif newline.startswith('prmmodfile'):
+                            fpath_exists = False
+                            for fpath in (a, os.path.join(self.parameterfilespath, a)):
+                                if os.path.isfile(fpath):
+                                    fpath1 = (os.path.abspath(fpath))
+                                    self.prmmodlist.append(fpath1)
+                                    fpath_exists = True
+                                    break
+                            if not fpath_exists:
+                                warnings.warn(f"Could not locate prmmod file '{a}'")
                         elif "optmethod" in newline and 'tor' not in newline:
                             self.optmethod = a
                         elif "espmethod" in newline and 'tor' not in newline:
@@ -1182,6 +1200,15 @@ class PolarizableTyper():
                             print('Unrecognized '+line)
                             sys.exit()
             
+            if self.new_gdma:
+                self.gdmainp = get_dma_default('dma4')
+            else:
+                self.gdmainp = get_dma_default('dma0')
+            self.gdmainp.update(gdma_kws)
+
+            if self.new_gdma:
+                self.prmmodlist = [self.PRMMOD_DMA4] + self.prmmodlist
+
             # Downgrad ESP basis set for molecules of 20 or more heavy atoms 
             if self.adaptiveespbasisset:
                 m = Chem.MolFromMolFile(self.molstructfname,removeHs=False)
@@ -2683,6 +2710,7 @@ class PolarizableTyper():
             self.key3fnamefrompot = self.assign_filenames ( "key3fname" , ".key_3")
             self.key3fname = self.assign_filenames ( "key3fname" , "_postfitmultipole.key")
             self.key4fname = self.assign_filenames ( "key4fname" , "_prefitvdw.key")
+            self.key4bfname = self.assign_filenames ( "key4fname" , "_prefitvdw.keyb")
             self.key5fname = self.assign_filenames ( "key5fname" , "_postfitvdw.key")
             self.key6fname= self.assign_filenames ( "key6fname" , "_prefittorsion.key")
             self.key7fname= self.assign_filenames ( "key7fname" , "_postfittorsion.key")
@@ -4806,6 +4834,12 @@ class PolarizableTyper():
                 self.AddIndicesToKey(self.key4fname)
                 if self.databasematchonly==True:
                     sys.exit()
+            if len(self.prmmodlist) > 0:
+                # make copy of key file before patches
+                shutil.copy(self.key4fname,self.key4bfname)
+                # Apply prmmod patches
+                self.WriteToLog('Apply prm patches\n%s'%('\n'.join(self.prmmodlist)))
+                modify_key(self.xyzoutfile, self.key4fname, self.key4fname, sdffile=self.molstructfname, inpfile=self.prmmodlist)
             # STEP 41
             (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,optmol,torsionsmissing,self.onlyrotbndslist)
             torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules

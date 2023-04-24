@@ -773,58 +773,18 @@ def gen_gdmain(poltype,gdmainfname,molecprefix,fname,dmamethod,new_gdma):
         except Exception as e:
             print(e)
 
-
-
+    gdmainp = poltype.gdmainp
     #punfname = os.path.splitext(fname)[0] + ".punch"
     punfname = "dma.punch"
 
-    try:
-        tmpfh = open(gdmainfname, "w")
-    except IOError as e:
-        print("I/O error({0}): {1}".format(e.errno, e.strerror))
-        sys.exit(e.errno)
-
-    tmpfh.write("Title " + molecprefix + " gdmain\n")
-    tmpfh.write("\n")
-    if poltype.dmamethod=='MP2':
-        densitystring='MP2'
-    else:
-        densitystring='SCF'
     if poltype.dmamethod=='MP2':
         densitystring=CheckFileForString(poltype,fnamesym)
-    tmpfh.write("File " + fnamesym  + " density %s\n"%(densitystring))
-    tmpfh.write("Angstrom\n")
-    tmpfh.write("AU\n")
-    tmpfh.write("Multipoles\n")
-    if not new_gdma:
-      tmpfh.write("Switch 0\n") # v1.3, comment out for v2.2
-      tmpfh.write("Limit 2\n")
-      tmpfh.write("Punch " + punfname + "\n")
-      tmpfh.write("Radius H 0.65\n")
-      tmpfh.write("Radius S 0.80\n")
-      tmpfh.write("Radius P 0.75\n")
-      tmpfh.write("Radius Cl 1.0\n")
-      tmpfh.write("Radius Br 1.1\n")
-      tmpfh.write("Radius I 1.3\n")
     else:
-      tmpfh.write("Switch 4\n") 
-      tmpfh.write("Limit 2\n")
-      tmpfh.write("Punch " + punfname + "\n")
-      tmpfh.write("Radius H   0.325\n") # GDMA suggested
-      tmpfh.write("Radius C   0.65\n")  # GDMA suggested
-      tmpfh.write("Radius N   0.65\n")  # GDMA suggested
-      tmpfh.write("Radius O   0.65\n")  # GDMA suggested
-      tmpfh.write("Radius F   0.65\n")  # GDMA suggested
-      tmpfh.write("Radius Cl  1.00\n")  # GDMA suggested
-      tmpfh.write("Radius Br  1.05\n")  # Scaled based on Cl, vdw-radii
-      tmpfh.write("Radius I   1.10\n")  # Scaled based on Cl, vdw-radii
-      tmpfh.write("Radius S   0.90\n")  # Scaled based on Cl, vdw-radii
-      tmpfh.write("Radius P   0.90\n")  # Scaled based on Cl, vdw-radii
-    tmpfh.write("\n")
-    tmpfh.write("Start\n")
-    tmpfh.write("\n")
-    tmpfh.write("Finish\n")
-    tmpfh.close()
+        densitystring='SCF'
+    gdmainp.update(Title="%s gdmain"%molecprefix, File="%s density %s"%(fnamesym, densitystring), Punch=punfname)
+    gdmainp.write_file(gdmainfname)
+    if not os.path.isfile(gdmainfname):
+        raise ValueError("Unable to write GDMA input file")
 
 def run_gdma(poltype):
     """
