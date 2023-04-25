@@ -778,7 +778,7 @@ def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog
         poltypeinput['onlyfittorstogether']=string 
 
     inifilepath=poltype.WritePoltypeInitializationFile(poltypeinput)
-    cmdstr='python'+' '+poltype.poltypepath+r'/'+'poltype.py'
+    cmdstr='python'+' '+shlex.quote(os.path.join(poltype.poltypepath, 'poltype.py'))
     cmdstr='cd '+shlex.quote(os.getcwd())+' && '+cmdstr
     
     jobtoinputfilepaths[cmdstr]=inifilepath
