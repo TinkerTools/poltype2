@@ -17,6 +17,7 @@ from os.path import dirname, abspath
 from itertools import combinations
 import json
 from collections import Counter
+from collections import OrderedDict
 from rdkit.Geometry import Point3D
 import sys # used for terminaing job after fragmenter finishes and troubleshooting
 import symmetry as symm
@@ -752,12 +753,41 @@ def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog
     Description: 
     """
     tempmaxmem,tempmaxdisk,tempnumproc=poltype.PartitionResources()
-    inherited_keywords = ['maxtorresnitrogen','xtbtorresconstant','deleteallnonqmfiles','debugmode','parentname','use_gau_vdw','use_qmopt_vdw','onlyvdwatomindex','tordebugmode','dovdwscan','refinenonaroringtors','tortor','maxgrowthcycles','toroptmethod','torspmethod','espmethod','dmamethod','optmethod','toroptbasisset','torspbasisset','espbasisset','dmabasisset','optbasisset','optmaxcycle','bashrcpath','externalapi','use_gaus','use_gausoptonly','use_psi4_geometric_opt', 'poltypepath']
-    inherited_keywords += ['foldnum', 'new_gdma', 'torsionprmrestraintfactor', 'sameleveldmaesp', 'adaptiveespbasisset']
-    frag_keywords = {'atmidx':poltype.prmstartidx,'suppressdipoleerr':'True','isfragjob':True,'structure':tail,'numproc':tempnumproc,'maxmem':tempmaxmem,'maxdisk':tempmaxdisk,'printoutput':True,'toroptmethodlist':','.join(poltype.toroptmethodlist),'torspmethodlist':','.join(poltype.torspmethodlist)}
-    poltypeinput = {_key:poltype.__dict__[_key] for _key in inherited_keywords if (_key in poltype.__dict__)}
+    # keywords to be written to poltype ini file
+    init_keywords = ['poltypepath', 'bashrcpath', 'externalapi']
+    init_keywords += ['prmmodlist']
+    init_keywords += ['deleteallnonqmfiles', 'suppressdipoleerr', 'printoutput']
+    init_keywords += ['numproc', 'maxmem', 'maxdisk']
+    init_keywords += ['structure', 'prmstartidx', 'isfragjob', 'parentname', 'maxgrowthcycles']
+    init_keywords += ['debugmode']
+    init_keywords += ['use_gaus', 'use_gausoptonly', 'use_psi4_geometric_opt', 'dontusepcm']
+    init_keywords += ['optmethod', 'optbasisset', 'optmaxcycle', 'optloose']
+    init_keywords += ['dmamethod', 'dmabasisset', 'new_gdma']
+    init_keywords += [_key for _key in poltype.__dict__ if _key.startswith('gdmacommand_')]
+    init_keywords += ['espmethod', 'espbasisset', 'sameleveldmaesp', 'adaptiveespbasisset']
+    init_keywords += ['dovdwscan', 'onlyvdwatomindex', 'use_qmopt_vdw', 'use_gau_vdw']
+    init_keywords += ['refinenonaroringtors', 'tortor', 'tordebugmode']
+    init_keywords += ['toroptmethod', 'toroptmethodlist', 'toroptbasisset', 'torspmethodlist', 'torspmethod', 'torspbasisset']
+    init_keywords += ['foldnum', 'torsionprmrestraintfactor', 'maxtorresnitrogen', 'xtbtorresconstant', 'torsionrestraint']
+
+    # map from poltype variable to keyword in poltype init file
+    keyword_alias = {'prmstartidx':'atmidx', 'prmmodlist':'prmmodfile'}
+
+    # keywords specific to fragment job
+    frag_keywords = OrderedDict({'suppressdipoleerr':True,'isfragjob':True,'printoutput':True,'structure':tail,
+        'numproc':tempnumproc,'maxmem':tempmaxmem,'maxdisk':tempmaxdisk})
+    poltypeinput = OrderedDict()
+    for _key in init_keywords:
+        kw = keyword_alias.get(_key, _key)
+        if _key not in poltype.__dict__:
+            continue
+        _val = poltype.__dict__[_key]
+        if hasattr(_val, '__iter__') and not isinstance(_val, str):
+            poltypeinput[kw] = ','.join([str(_) for _ in _val])
+        else:
+            poltypeinput[kw] = _val
     poltypeinput.update(frag_keywords)
-    #poltypeinput={'maxtorresnitrogen':poltype.maxtorresnitrogen,'xtbtorresconstant':poltype.xtbtorresconstant,'deleteallnonqmfiles':poltype.deleteallnonqmfiles,'debugmode':poltype.debugmode,'atmidx':poltype.prmstartidx,'parentname':poltype.parentname,'use_gau_vdw':poltype.use_gau_vdw,'use_qmopt_vdw':poltype.use_qmopt_vdw,'onlyvdwatomindex':poltype.onlyvdwatomindex,'tordebugmode':poltype.tordebugmode,'dovdwscan':poltype.dovdwscan,'refinenonaroringtors':poltype.refinenonaroringtors,'tortor':poltype.tortor,'maxgrowthcycles':poltype.maxgrowthcycles,'suppressdipoleerr':'True','toroptmethod':poltype.toroptmethod,'espmethod':poltype.espmethod,'torspmethod':poltype.torspmethod,'dmamethod':poltype.dmamethod,'torspbasisset':poltype.torspbasisset,'espbasisset':poltype.espbasisset,'dmabasisset':poltype.dmabasisset,'toroptbasisset':poltype.toroptbasisset,'optbasisset':poltype.optbasisset,'bashrcpath':poltype.bashrcpath,'externalapi':poltype.externalapi,'use_gaus':poltype.use_gaus,'use_gausoptonly':poltype.use_gausoptonly,'isfragjob':True,'poltypepath':poltype.poltypepath,'structure':tail,'numproc':tempnumproc,'maxmem':tempmaxmem,'maxdisk':tempmaxdisk,'printoutput':True,'toroptmethodlist':','.join(poltype.toroptmethodlist),'torspmethodlist':','.join(poltype.torspmethodlist)}
+
     if strfragrotbndindexes!=None:
         poltypeinput['onlyrotbndslist']=strfragrotbndindexes
         rotbnds=strfragrotbndindexes.split(',')

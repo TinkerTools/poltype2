@@ -30,6 +30,7 @@ import shutil
 import time
 import copy
 import getopt
+from collections import OrderedDict
 import databaseparser
 import dimorphite_dl
 import torsiongenerator as torgen
@@ -511,10 +512,6 @@ class PolarizableTyper():
                 self.equiltimeNPT=1
                 self.lastNVTequiltime=.5
 
-            
-            
-            
-            self.PRMMOD_DMA4 = os.path.join(self.parameterfilespath, 'dma4_nonbonded.mod')
             self.nfoldlist =  list(range(1,self.foldnum+1))
             self.parentdir=os.getcwd()
             if self.torlist==None:
@@ -1041,6 +1038,7 @@ class PolarizableTyper():
                         elif 'new_gdma' in newline:
                             self.new_gdma=self.SetDefaultBool(line,a,True)
                         elif newline.startswith("gdmacommand_"):
+                            self.__dict__[newline] = a
                             gdma_kws.append((newline[len('gdmacommand_'):], a))
                         elif 'sameleveldmaesp' in newline:
                             self.sameleveldmaesp=self.SetDefaultBool(line,a,True)
@@ -1131,15 +1129,17 @@ class PolarizableTyper():
                             self.onlyfittorstogether=[tuple(i) for i in self.onlyfittorstogether]
 
                         elif newline.startswith('prmmodfile'):
-                            fpath_exists = False
-                            for fpath in (a, os.path.join(self.parameterfilespath, a)):
-                                if os.path.isfile(fpath):
-                                    fpath1 = (os.path.abspath(fpath))
-                                    self.prmmodlist.append(fpath1)
-                                    fpath_exists = True
-                                    break
-                            if not fpath_exists:
-                                warnings.warn(f"Could not locate prmmod file '{a}'")
+                            self.prmmodlist = []
+                            for fpath1 in a.split(','):
+                                fpath2list = (fpath1, os.path.join(self.parameterfilespath, fpath1),
+                                    fpath1+'.mod', os.path.join(self.parameterfilespath, fpath1+'.mod'))
+                                fpath3list = list(OrderedDict.fromkeys([os.path.abspath(fpath2) for fpath2 in fpath2list if os.path.isfile(fpath2)]))
+                                if len(fpath3list) > 0:
+                                    if len(fpath3list) > 1:
+                                        warnings.warn(f"Multiple paths found ({len(fpath3list)}) for prmmod file '{fpath1}'; Using '{fpath3list[0]}'")
+                                    self.prmmodlist.append(fpath3list[0])
+                                else:
+                                    warnings.warn(f"Could not locate prmmod file '{fpath1}'")
                         elif "optmethod" in newline and 'tor' not in newline:
                             self.optmethod = a
                         elif "espmethod" in newline and 'tor' not in newline:
@@ -1205,9 +1205,6 @@ class PolarizableTyper():
             else:
                 self.gdmainp = get_dma_default('dma0')
             self.gdmainp.update(gdma_kws)
-
-            if self.new_gdma:
-                self.prmmodlist = [self.PRMMOD_DMA4] + self.prmmodlist
 
             # Downgrad ESP basis set for molecules of 20 or more heavy atoms 
             if self.adaptiveespbasisset:
@@ -4834,12 +4831,12 @@ class PolarizableTyper():
                 self.AddIndicesToKey(self.key4fname)
                 if self.databasematchonly==True:
                     sys.exit()
-            if len(self.prmmodlist) > 0:
                 # make copy of key file before patches
                 shutil.copy(self.key4fname,self.key4bfname)
-                # Apply prmmod patches
-                self.WriteToLog('Apply prm patches\n%s'%('\n'.join(self.prmmodlist)))
-                modify_key(self.xyzoutfile, self.key4fname, self.key4fname, sdffile=self.molstructfname, inpfile=self.prmmodlist)
+                if len(self.prmmodlist) > 0:
+                    # Apply prmmod patches
+                    self.WriteToLog('Apply prm patches\n%s'%('\n'.join(self.prmmodlist)))
+                    modify_key(self.xyzoutfile, self.key4fname, self.key4fname, sdffile=self.molstructfname, inpfile=self.prmmodlist)
             # STEP 41
             (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,optmol,torsionsmissing,self.onlyrotbndslist)
             torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules

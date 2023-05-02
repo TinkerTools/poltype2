@@ -172,7 +172,7 @@
 
 ``inputkeyfile`` specifies a keyfile to append parameters to pre-fit vdw key (from database matches). Default is None.
 
-``prmmodfile`` specifies parameter modification patch file. See `ParameterFiles/dma4_nonbonded.mod` for example.
+``prmmodfile`` specifies (comma-separated list of) parameter modification patch file(s). See `ParameterFiles/dma4_hfe2023.mod` for example.
 
 #### Torsion Parameterization
 

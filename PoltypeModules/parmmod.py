@@ -298,7 +298,7 @@ class ParmMod(object):
 def modify_key(xyzfile, keyfile, keyout, sdffile=None, inpfile=None, sm_list=None, x_list=None, term=''):
     pm = ParmMod()
     if inpfile is not None:
-        if hasattr(inpfile, '__iter__'):
+        if hasattr(inpfile, '__iter__') and not isinstance(inpfile, str):
             inplist = inpfile
         else:
             inplist = [inpfile]
