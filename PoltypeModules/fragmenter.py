@@ -761,7 +761,7 @@ def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog
     init_keywords += ['structure', 'prmstartidx', 'isfragjob', 'parentname', 'maxgrowthcycles']
     init_keywords += ['debugmode']
     init_keywords += ['use_gaus', 'use_gausoptonly', 'use_psi4_geometric_opt', 'dontusepcm']
-    init_keywords += ['optmethod', 'optbasisset', 'optmaxcycle', 'optloose']
+    init_keywords += ['optmethod', 'optbasisset', 'optmaxcycle', 'optconvergence']
     init_keywords += ['dmamethod', 'dmabasisset', 'new_gdma']
     init_keywords += [_key for _key in poltype.__dict__ if _key.startswith('gdmacommand_')]
     init_keywords += ['espmethod', 'espbasisset', 'sameleveldmaesp', 'adaptiveespbasisset']

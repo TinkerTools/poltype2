@@ -129,6 +129,8 @@
 
 ``optloose`` specifies to use GAU_LOOSE optimization convergence criteria for psi4 optimization (both first geometry optimzation and for torsion geometry optimization)
 
+``optconvergence`` specifies optimization convergence. LOOSE, GAU_LOOSE criteria (identical to the keyword ``optloose``); VERYLOOSE, only using gradient thresholds from GAU_LOOSE criteria. Default is LOOSE. 
+
 #### Distributed Multipole Analysis and Electrostatic Single Point
 
 ``new_gdma`` specifies to use the new grid-based DMA algorithm. Default is False.

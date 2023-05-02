@@ -116,7 +116,16 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     else:
         temp.write('set {'+'\n')
         temp.write('  geom_maxiter '+str(poltype.optmaxcycle)+'\n')
-        if poltype.optloose==True:
+        if poltype.optconvergence == 'NULL':
+            temp.write('  g_convergence CFOUR'+'\n')
+            temp.write('  rms_force_g_convergence 1e0'+'\n')
+        elif poltype.optconvergence == 'VERYLOOSE':
+            temp.write('  MAX_ENERGY_G_CONVERGENCE 2e-4'+'\n')
+            temp.write('  RMS_FORCE_G_CONVERGENCE 1.7e-3'+'\n')
+            temp.write('  MAX_FORCE_G_CONVERGENCE 2.5e-3'+'\n')
+            temp.write('  RMS_DISP_G_CONVERGENCE 1e-1'+'\n')
+            temp.write('  MAX_DISP_G_CONVERGENCE 2e-1'+'\n')
+        elif poltype.optconvergence == 'LOOSE':
             temp.write('  g_convergence GAU_LOOSE'+'\n')
         else:
             temp.write('  g_convergence GAU'+'\n')
@@ -151,7 +160,23 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     temp.write('geometric_keywords = {'+'\n')
     temp.write(" 'coordsys' : 'tric',"+'\n')
     temp.write(" 'convergence_cmax' : 1e0,"+'\n')
-    if poltype.optloose:
+
+    if poltype.optconvergence == 'NULL':
+        poltype.WriteToLog('Warning: optconvergence=NULL is not supported by GeomeTRIC. Please set use_psi4_geometric_opt=False to use OPTKING.')
+        temp.write(" 'convergence_set' : 'GAU_LOOSE',"+'\n')
+        temp.write(" 'convergence_energy' : 2e-4,"+'\n')
+        temp.write(" 'convergence_grms' : 1.0e0,"+'\n')
+        temp.write(" 'convergence_gmax' : 1.0e0,"+'\n')
+        temp.write(" 'convergence_drms' : 1.0e-1,"+'\n')
+        temp.write(" 'convergence_dmax' : 2.0e-1,"+'\n')
+    elif poltype.optconvergence == 'VERYLOOSE':
+        temp.write(" 'convergence_set' : 'GAU_LOOSE',"+'\n')
+        temp.write(" 'convergence_energy' : 2e-4,"+'\n')
+        temp.write(" 'convergence_grms' : 1.7e-3,"+'\n')
+        temp.write(" 'convergence_gmax' : 2.5e-3,"+'\n')
+        temp.write(" 'convergence_drms' : 1.0e-1,"+'\n')
+        temp.write(" 'convergence_dmax' : 2.0e-1,"+'\n')
+    elif poltype.optconvergence == 'LOOSE':
         temp.write(" 'convergence_set' : 'GAU_LOOSE',"+'\n')
         temp.write(" 'convergence_energy' : 1e-4,"+'\n')
 

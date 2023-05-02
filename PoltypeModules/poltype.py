@@ -125,6 +125,7 @@ class PolarizableTyper():
         covalentdock:bool=False
         xtbmethod:int=2
         optloose:bool=True
+        optconvergence:str="LOOSE"
         inputkeyfile:None=None
         writeoutmultipole:bool=True
         writeoutbond:bool=True
@@ -662,6 +663,10 @@ class PolarizableTyper():
                             self.writeoutangle=self.SetDefaultBool(line,a,True)
                         elif "optloose" in newline:
                             self.optloose=self.SetDefaultBool(line,a,True)
+                            if self.optloose:
+                                self.optconvergence = "LOOSE"
+                        elif newline.startswith("optconvergence"):
+                            self.optconvergence = a.upper()
                         elif "writeoutstrbnd" in newline:
                             self.writeoutstrbnd=self.SetDefaultBool(line,a,True)
                         elif "writeoutopbend" in newline:
