@@ -75,7 +75,7 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 [Minimum Example Usage Parameterization](#minimum-example-usage-parameterization)
 
-[Recommended-Poltype-inputs] (#recommended-poltype-inputs)
+[Recommended-Poltype-inputs](#recommended-poltype-inputs)
 
 [Default Resource Consumption](#default-resource-consumption)
 
