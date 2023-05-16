@@ -67,7 +67,7 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 [💻 Program Installation](README/README_INSTALL.MD)
 
 
-### Automated AMOEBA Ligand Parameterization 
+### Automated AMOEBA Ligand Parameterization (Main function of Poltype)
 
 [Parameterization Input Preparation](#parameterization-input-preparation)
 
@@ -97,7 +97,7 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 [Automated AMOEBA Ligand Parameterization How It Works](README/README_PROTOCOL.MD)
 
-### Automated AMOEBA Molecular Dynamics and Free Energy Prediction
+### Automated AMOEBA Molecular Dynamics and Free Energy Prediction (addon features)
 
 <img src="https://florentbarbault.files.wordpress.com/2010/09/mova1.gif" width="20%">
 
