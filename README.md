@@ -167,6 +167,22 @@ nohup python /path_to_poltype/poltype.py &
 ```final.xyz``` and ```final.key``` are the resulting structure and parameter files you will need.
 * After poltype finishes, check the ``OPENME`` folder for torsion fitting and ESP fitting results. 
 
+### Recommended Poltype inputs
+
+By default, Poltype uses the old GDMA algorithm with non-bonded parameters mostly from amoeba09.
+
+To use the new GDMA algorithm and non-bonded parameters adjusted to reproduce hydration free energies:
+```
+new_gdma=True
+gdmacommand_Radius_S=0.80
+prmmodfile=dma4_hfe2023
+```
+
+To use the new GDMA algorithm with default GDMA radius, no scaling of multipole or vdW parameters:
+```
+new_gdma=True
+```
+
 ### Default Resource Consumption
 * By default, Poltype computes the number of fragment poltype jobs (or any QM job if fragmenter is not being used) to run in parallel as the floor function of the input number of cores divided by the number of cores per job (default of 2). 
 * RAM, cores, and disk space can all be detected and a consumption ratio of 80% is used by default. Fragment RAM, disk, and cores are divided evenly by the number of Poltype jobs in parallel. 
