@@ -75,6 +75,8 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 [Minimum Example Usage Parameterization](#minimum-example-usage-parameterization)
 
+[Recommended-Poltype-inputs] (#recommended-poltype-inputs)
+
 [Default Resource Consumption](#default-resource-consumption)
 
 [💻 Advanced Program Usage](README/README_HELP.MD)
@@ -99,7 +101,7 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 <img src="https://florentbarbault.files.wordpress.com/2010/09/mova1.gif" width="20%">
 
-* [1](#citations)
+Reference [1](#citations)
 
 [Protein Ligand Interaction Visualization](#protein-ligand-interaction-visualization)
 
