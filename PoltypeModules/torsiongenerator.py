@@ -751,6 +751,23 @@ def CheckIfQMOptReachedTargetDihedral(poltype,cartxyz,initialtinkerstructure,tor
     newarray=[]
     newarray.extend(rottors)
     newarray.extend(frotors)
+    
+    # ignore X#X-X-X torsions
+    # because these torsions CANNOT be restrained duing tinker optimization,
+    
+    torsmarts = '[*][*][*]#[*]'
+    rdkitmol = Chem.MolFromMolFile('../' + poltype.molstructfname,removeHs=False)
+    pattern = Chem.MolFromSmarts(torsmarts)
+    matches = rdkitmol.GetSubstructMatches(pattern)
+    for match in matches:
+      t1, t2, t3, t4 = list(match)
+      tt = [t1+1, t2+1, t3+1, t4+1]
+      tt_r = [t4+1, t3+1, t2+1, t1+1]
+      if (tt in newarray):
+        newarray.remove(tt)
+      if (tt_r in newarray):
+        newarray.remove(tt_r)
+
     for thetor in newarray:
         a,b,c,d=thetor[:]
         iniang = inioptmol.GetTorsion(a,b,c,d)
@@ -2032,17 +2049,6 @@ def FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotb
                 frotors.append([rta,rtb,rtc,rtd])
                 rotbndtorescount[rotbnd]+=1
 
-    # add *-*-C#N to frotors
-    torsmarts = '[*;!#1][*;!#1][C]#[N]'
-    rdkitmol = Chem.MolFromMolFile('../' + poltype.molstructfname,removeHs=False)
-    pattern = Chem.MolFromSmarts(torsmarts)
-    matches = rdkitmol.GetSubstructMatches(pattern)
-    for match in matches:
-      t1, t2, t3, t4 = list(match)
-      tt = [t1+1, t2+1, t3+1, t4+1]
-      tt_r = [t4+1, t3+1, t2+1, t1+1]
-      if (tt not in frotors) and (tt_r not in frotors):
-        frotors.append(tt)
 
     return frotors,rotbndtorescount,restlist,torsiontophaseangle,torsiontomaintor
 
