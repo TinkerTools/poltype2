@@ -179,6 +179,7 @@ new_gdma=True
 gdmacommand_Radius_S=0.80
 prmmodfile=dma4_hfe2023
 ```
+[Adjustments inlcude multipole and vdw scaling](ParameterFiles/dma4_hfe2023.mod)
 
 To use the new GDMA algorithm with default GDMA radius, no scaling of multipole or vdW parameters:
 ```
