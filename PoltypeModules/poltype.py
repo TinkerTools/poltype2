@@ -4155,6 +4155,17 @@ class PolarizableTyper():
                 for atomindex,chg in atomindextoformalcharge.items():
                     if chg!=0:
                         chargedindices.append(atomindex)
+                # ignore nitro group(s) 
+                nitro = '[N+]([O-])=[O]'
+                rdkitmol = Chem.MolFromMolFile('../' + self.molstructfname,removeHs=False)
+                pattern = Chem.MolFromSmarts(nitro)
+                matches = rdkitmol.GetSubstructMatches(pattern)
+                for match in matches:
+                  nitrogen, oxygen, _ = match
+                  if set([nitrogen, oxygen]).issubset(set(chargedindices)):
+                    chargedindices.remove(nitrogen)
+                    chargedindices.remove(oxygen)
+
                 # STEP 3
                 for atomindex in chargedindices:
                     atom=m.GetAtomWithIdx(atomindex)
