@@ -4157,7 +4157,10 @@ class PolarizableTyper():
                         chargedindices.append(atomindex)
                 # ignore nitro group(s) 
                 nitro = '[N+]([O-])=[O]'
-                rdkitmol = Chem.MolFromMolFile('../' + self.molstructfname,removeHs=False)
+                if self.isfragjob:
+                  rdkitmol = Chem.MolFromMolFile(self.molstructfname,removeHs=False)
+                else:
+                  rdkitmol = Chem.MolFromMolFile('../' + self.molstructfname,removeHs=False)
                 pattern = Chem.MolFromSmarts(nitro)
                 matches = rdkitmol.GetSubstructMatches(pattern)
                 for match in matches:
