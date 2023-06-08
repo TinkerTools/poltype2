@@ -119,7 +119,11 @@
 
 ``optmethod`` specifies quantum method for geometry optimziation. Default is MP2.
 
-``optpcm`` specifies to use PCM for geometry optimization. Default is True if zwitterion is detected, False if not.
+``optpcm`` specifies to use PCM for geometry optimization. [True|False|auto] If set to auto, PCM will be used for zwitterion. Default is auto.
+
+``pcm_auto`` specifies to automatically activate PCM for zwitterions. If False, PCM will not be automatically activated. Default is True.
+
+``dontusepcm`` equivalent to `pcm_auto=False`.
 
 ``use_gausoptonly``  specifies to only use gaussian for initial geometry optimization and Psi4 for all other QM steps. Default is False. 
 
@@ -182,10 +186,9 @@
 
 ``rotalltors``  specifies poltype to spin all rotatable bonds instead of transferring torsion parameters if found in database. Default is False.
                   
-``torsppcm``    specifies poltype to use PCM for torsion SP. Default is True if zwitterion is detecter, False otherwise
+``torsppcm``    specifies poltype to use PCM for torsion SP. [True|False|auto] If set to auto, PCM will be used for zwitterion. Default is auto. 
 
-
-``toroptpcm``   specifies poltype to use PCM for torsion optimization. Default is True if zwitterion is detecter, False otherwise.
+``toroptpcm``   specifies poltype to use PCM for torsion optimization. [True|False|auto] If set to auto, PCM will be used for zwitterion. Default is auto. 
                   
 ``dontdotor``   specifies poltype to skip torsion parameterization. Default is False.
                   

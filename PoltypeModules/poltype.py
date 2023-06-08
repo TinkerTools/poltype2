@@ -338,7 +338,8 @@ class PolarizableTyper():
         onlyvdwatomindex:None=None
         use_qmopt_vdw:bool=False
         use_gau_vdw:bool=False
-        dontusepcm:bool=False
+        #dontusepcm:bool=False
+        pcm_auto:bool=True
         deleteallnonqmfiles:bool=False
         totalcharge:None=None
         torspbasissethalogen:str="6-311G*"
@@ -464,9 +465,9 @@ class PolarizableTyper():
         rotalltors:bool=False
         dontdotor:bool=False
         dontdotorfit:bool=False
-        toroptpcm:bool=False
-        optpcm:bool=False
-        torsppcm:bool=False
+        toroptpcm:int=-1
+        optpcm:int=-1
+        torsppcm:int=-1
         use_gaus:bool=False
         use_gausoptonly:bool=False
         use_psi4_geometric_opt:bool=True
@@ -1054,15 +1055,17 @@ class PolarizableTyper():
                         elif "structure" in newline:
                             self.molstructfname = a
                         elif "dontusepcm" in newline:
-                            self.dontusepcm=self.SetDefaultBool(line,a,True)
-                        elif "torsppcm" in newline:
-                            self.torsppcm=self.SetDefaultBool(line,a,True)
+                            self.pcm_auto= (not self.SetDefaultBool(line,a,True))
+                        elif "pcm_auto" in newline:
+                            self.pcm_auto=self.SetDefaultBool(line,a,True)
                         elif "freq" in newline:
                             self.freq=self.SetDefaultBool(line,a,True)
-                        elif "optpcm" in newline and 'tor' not in line:
-                            self.optpcm=self.SetDefaultBool(line,a,True)
-                        elif "toroptpcm" in newline:
-                            self.toroptpcm=self.SetDefaultBool(line,a,True)
+                        elif newline.startswith("optpcm"):
+                            self.optpcm=self.GrabSwitchValue(a, 1)
+                        elif newline.startswith("toroptpcm"):
+                            self.toroptpcm=self.GrabSwitchValue(a, 1)
+                        elif newline.startswith("torsppcm"):
+                            self.torsppcm=self.GrabSwitchValue(a, 1)
                         elif "use_gaus" in newline and 'opt' not in newline:
                             self.use_gaus=self.SetDefaultBool(line,a,True)
                         elif "use_gausoptonly" in newline:
@@ -1275,14 +1278,14 @@ class PolarizableTyper():
                 cpu=str(int(int(cpu*self.consumptionratio)/self.parentjobsatsametime))
                 self.numproc=cpu
             if self.maximizejobsatsametime==True and self.isfragjob==False:
-               self.jobsatsametime=math.floor(int(self.numproc)/self.coresperjob)
-               if self.jobsatsametime>self.maxjobsatsametime:
-                   self.jobsatsametime=self.maxjobsatsametime
-               self.tempjobsatsametime=self.jobsatsametime
-               self.tempmaxmem=self.maxmem
-               self.tempmaxdisk=self.maxdisk
-               self.tempnumproc=self.numproc
-               self.partition=False
+                self.jobsatsametime=math.floor(int(self.numproc)/self.coresperjob)
+                if self.jobsatsametime>self.maxjobsatsametime:
+                    self.jobsatsametime=self.maxjobsatsametime
+            self.partition=False
+            self.tempjobsatsametime=self.jobsatsametime
+            self.tempmaxmem=self.maxmem
+            self.tempmaxdisk=self.maxdisk
+            self.tempnumproc=self.numproc
             self.firsterror=False
             if self.sameleveldmaesp==True:
                 self.dmamethod=self.espmethod
@@ -2450,6 +2453,29 @@ class PolarizableTyper():
             if value.lower() == 'false':
                 return False
             raise ValueError('Could not convert "{}" into a boolean!'.format(value))
+
+        @staticmethod
+        def GrabSwitchValue(value, default=1):
+            """ Convert switch option into integer
+
+            0 <- False, no, off
+            1 <- True, yes, on
+            -1 <- auto
+            default <- None
+            """
+            if isinstance(value, str):
+                if value.lower() in ('false', 'no', 'off', '0'):
+                    return 0
+                elif value.lower() in ('true', 'yes', 'on', '1'):
+                    return 1
+                elif value.lower() in ('auto', '-1'):
+                    return -1
+                else:
+                    return default
+            elif isinstance(value, int) or isinstance(value, bool):
+                return int(value)
+            else:
+                return default
 
         def SetDefaultBool(self,line,a,truthvalue):
             """
@@ -4614,13 +4640,7 @@ class PolarizableTyper():
                 raise ValueError('Multiple fragments detectected in input molecule')
             # STEP 10
             charge_state=self.CheckForConcentratedFormalCharges(m,atomindextoformalcharge)
-            pcm = (charge_state == 2)
-            self.pcm=False
-            if pcm==True and self.dontusepcm==False:
-                self.pcm=True
-                self.toroptpcm=True
-                self.optpcm=True
-                self.torsppcm=True
+            self.pcm = (charge_state==2) and (self.pcm_auto)
 
             self.temptorsppcm=self.torsppcm
             self.temptoroptpcm=self.toroptpcm

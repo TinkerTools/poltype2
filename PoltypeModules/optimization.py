@@ -86,7 +86,7 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     temp.write('}'+'\n')
 
     spacedformulastr=mol.GetSpacedFormula()
-    if poltype.optpcm==True:
+    if poltype.optpcm==True or (poltype.optpcm==-1 and poltype.pcm):
         temp.write('set {'+'\n')
         temp.write('  MAX_FORCE_G_CONVERGENCE 2.5e-2'+'\n')
         temp.write('  RMS_FORCE_G_CONVERGENCE 1.7e-2'+'\n')
@@ -375,12 +375,12 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
         if (poltype.use_gaus==True or poltype.use_gausoptonly==True):
             poltype.optbasisset='gen'
     if poltype.freq==True:
-        if poltype.optpcm==True:
+        if poltype.optpcm==True or (poltype.optpcm==-1 and poltype.pcm):
             optstring= "%s %s/%s freq SCRF=(PCM)" % (optstr,poltype.optmethod,poltype.optbasisset)
         else:
             optstring= "%s %s/%s freq" % (optstr,poltype.optmethod,poltype.optbasisset)
     else:
-        if poltype.optpcm==True:
+        if poltype.optpcm==True or (poltype.optpcm==-1 and poltype.pcm):
             optstring= "%s %s/%s SCRF=(PCM)" % (optstr,poltype.optmethod,poltype.optbasisset)
         else:
             optstring= "%s %s/%s" % (optstr,poltype.optmethod,poltype.optbasisset)

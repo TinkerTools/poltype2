@@ -612,7 +612,7 @@ def tinker_analyze(poltype,torxyzfname,keyfname,toralzfname):
     Referenced By: 
     Description: 
     """
-    if poltype.torsppcm==True:
+    if poltype.torsppcm==True or (poltype.torsppcm==-1 and poltype.pcm):
         PrependStringToKeyfile(poltype,keyfname,'solvate GK')
     else:
         RemoveStringFromKeyfile(poltype,keyfname,'solvate GK')
@@ -654,7 +654,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
     save_structfile(poltype,prevstruct,torxyzfname)
     shutil.copy(keybasepath+keybase, tmpkeyfname)
     RemoveStringFromKeyfile(poltype,tmpkeyfname,'restrain-torsion')
-    if poltype.toroptpcm==True:
+    if poltype.toroptpcm==True or (poltype.toroptpcm==-1 and poltype.pcm):
         PrependStringToKeyfile(poltype,tmpkeyfname,'solvate GK')
     else:
         RemoveStringFromKeyfile(poltype,tmpkeyfname,'solvate GK')
@@ -1112,9 +1112,12 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
 
         elif poltype.isfragjob==False and poltype.toroptmethod=='xtb':
             poltype.jobsatsametime=1
+            poltype.maxmem=poltype.tempmaxmem
+            poltype.maxdisk=poltype.tempmaxdisk
+            poltype.numproc=poltype.tempnumproc
             poltype.partition=False
 
-        if poltype.toroptmethod=='ANI' or poltype.toroptmethod=='xtb':
+        if poltype.toroptmethod=='ANI':
             poltype.toroptpcm=False
             poltype.torsppcm=False
         else:
@@ -2131,7 +2134,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     optkingarray.append("""  ")\n}\n""")
     temp.write(''.join(optkingarray))
  
-    if poltype.toroptpcm==True:
+    if poltype.toroptpcm==True or (poltype.toroptpcm==-1 and poltype.pcm):
         temp.write('set {'+'\n')
         temp.write('  MAX_FORCE_G_CONVERGENCE 2.5e-2'+'\n')
         temp.write('  RMS_FORCE_G_CONVERGENCE 1.7e-2'+'\n')
@@ -2235,7 +2238,7 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
             iodinebasissetfile=poltype.iodinetoroptbasissetfile
             basissetfile=poltype.toroptbasissetfile
 
-        if poltype.toroptpcm==True:
+        if poltype.toroptpcm==True or (poltype.toroptpcm==-1 and poltype.pcm):
             operationstr = "%s %s/%s SCRF=(PCM)" % (optstr,poltype.toroptmethod,poltype.toroptbasisset)
         else:
             operationstr = "%s %s/%s" % (optstr,poltype.toroptmethod,poltype.toroptbasisset)
@@ -2247,7 +2250,7 @@ def gen_torcomfile (poltype,comfname,numproc,maxmem,maxdisk,prevstruct,xyzf,mol)
             iodinebasissetfile=poltype.iodinetorspbasissetfile
             basissetfile=poltype.torspbasissetfile
 
-        if poltype.torsppcm==True:
+        if poltype.torsppcm==True or (poltype.torsppcm==-1 and poltype.pcm):
             operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) SCRF=(PCM) Pop=NBORead" % (poltype.torspmethod,poltype.torspbasisset)
         else:       
             operationstr = "#P %s/%s SP SCF=(qc,maxcycle=800) Pop=NBORead" % (poltype.torspmethod,poltype.torspbasisset)
@@ -2496,7 +2499,7 @@ def CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,m
         atomicnum=rdkitatom.GetAtomicNum()
         temp.write('%2s %11.6f %11.6f %11.6f\n' % (an.getElSymbol(atomicnum),atm.GetX(),atm.GetY(),atm.GetZ()))
     temp.write('}'+'\n')
-    if poltype.torsppcm==True:
+    if poltype.torsppcm==True or (poltype.torsppcm==-1 and poltype.pcm):
         temp.write('set {'+'\n')
         temp.write(' scf_type df'+'\n')
         temp.write(' pcm true'+'\n')
@@ -2885,7 +2888,11 @@ def OptimizeXTB(poltype,inputstruct,resfilename,xtbmethod,outputname,charge,uhf)
     pythonpath=os.path.join(xtbenvpath,'bin')
     xtbpath=os.path.join(pythonpath,'xtb')
 
-    cmdstr=xtbpath +' '+'--gfn'+' '+str(xtbmethod)+' '+'--chrg'+' '+str(charge)+' '+'--uhf'+' '+str(uhf)+' '+inputstruct+' '+'--opt'+' '+'--input'+' '+resfilename+' > '+outputname
+    #cmdstr=xtbpath +' '+'--gfn'+' '+str(xtbmethod)+' '+'--chrg'+' '+str(charge)+' '+'--uhf'+' '+str(uhf)+' '+inputstruct+' '+'--opt'+' '+'--input'+' '+resfilename+' > '+outputname
+    if poltype.toroptpcm==True or (poltype.toroptpcm==-1 and poltype.pcm):
+        cmdstr = f"{xtbpath} --gfn {xtbmethod} --alpb water --chrg {charge} --uhf {uhf} {inputstruct} --opt --input {resfilename} > {outputname}"
+    else:
+        cmdstr = f"{xtbpath} --gfn {xtbmethod} --chrg {charge} --uhf {uhf} {inputstruct} --opt --input {resfilename} > {outputname}"
     optxyz='xtbopt.xyz'
     return optxyz,cmdstr
 
@@ -2908,7 +2915,11 @@ def RunXTBSPEnergy(poltype,optxyz,uhf,charge,xtbmethod,outputname):
     pythonpath=os.path.join(xtbenvpath,'bin')
     xtbpath=os.path.join(pythonpath,'xtb')
 
-    cmdstr=xtbpath+' '+'--gfn'+' '+str(xtbmethod)+' '+optxyz+' '+'--chrg'+' '+str(charge)+' '+'--uhf'+' '+str(uhf)+' > '+outputname
+    #cmdstr=xtbpath+' '+'--gfn'+' '+str(xtbmethod)+' '+optxyz+' '+'--chrg'+' '+str(charge)+' '+'--uhf'+' '+str(uhf)+' > '+outputname
+    if poltype.torsppcm==True or (poltype.torsppcm==-1 and poltype.pcm):
+        cmdstr = f"{xtbpath} --gfn {xtbmethod} --alpb water --chrg {charge} --uhf {uhf} {optxyz}  > {outputname}"
+    else:
+        cmdstr = f"{xtbpath} --gfn {xtbmethod} --chrg {charge} --uhf {uhf} {optxyz} > {outputname}"
     return cmdstr
 
 
