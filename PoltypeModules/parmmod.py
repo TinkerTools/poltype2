@@ -111,7 +111,7 @@ class ParmMod(object):
         self._terms = defaultdict(list)
         # force field terms that use atom type; by default atom class is used
         self.ATOM_TYPE_TERMS = ('polarize', 'quadrupole-scale', 'multipole')
-        self.IMPLEMENTED_TERMS = ('quadrupole-scale', 'vdw', 'vdw-scale')
+        self.IMPLEMENTED_TERMS = ('quadrupole-scale', 'vdw', 'vdw-scale', 'polarize')
         self.PRM_FORMAT = {}
         self.PRM_FORMAT['vdw'] = ('%11d', '%20.4f', '%10.4f', '%10.4f')
         self.PRM_FORMAT['vdwpair'] = ('%7d', '%4d', '%15.4f', '%10.4f', '10.4f')
@@ -259,17 +259,27 @@ class ParmMod(object):
                         iline_mpole = iline
                         qpole_prm = []
                         qpole_fmt = []
-                elif line.startswith('vdw'):
+                elif line.startswith('vdw '):
                     curr_type = (int(words[1]), )
                     if curr_type in prm_types['vdw']:
                         curr_prm = prm_types['vdw'][curr_type]
                         newline = self.format_prm_line('vdw', curr_type, curr_prm)
                     elif curr_type in prm_types['vdw-scale']:
                         curr_prm = prm_types['vdw-scale'][curr_type]
+                        if len(curr_prm) == 1:
+                            curr_prm = (curr_prm[0], 1)
                         old_prm = tuple(float(_) for _ in words[2:])
                         # scale the first parameter, duplicate the rest
-                        new_prm = (old_prm[0]*curr_prm[0],) + tuple(old_prm[1:])
+                        new_prm = (old_prm[0]*curr_prm[0],old_prm[1]*curr_prm[1]) + tuple(old_prm[2:])
                         newline = self.format_prm_line('vdw', curr_type, new_prm)
+                elif line.startswith('polarize'):
+                    curr_type = (int(words[1]), )
+                    if curr_type in prm_types['polarize']:
+                        curr_prm = prm_types['polarize'][curr_type]
+                        #old_prm = tuple(float(_) for _ in words[2:])
+                        #new_prm = (curr_prm[0],) + tuple(old_prm[1:])
+                        polarize_fmt = line[:(len('polarize'+w[0]))] + '%' + str(len(w[1])) + '.3f' + line[(len('polarize'+w[0]+w[1])):] + '\n'
+                        newline = polarize_fmt%(curr_prm[0])
                 elif iline <= iline_mpole + 4 and iline > iline_mpole + 1:
                     # number of of qpole parameters
                     n_pole = iline - iline_mpole - 1
