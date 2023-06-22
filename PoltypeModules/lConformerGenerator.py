@@ -3,7 +3,7 @@
 # - takes the .sdf input structure
 # - uses RDKit to generate 500 conformers
 # - optimizes the conformers with distance constraints
-# - selects the extended conformer with Rg, SASA and number of Intramolecular HB criteria
+# - selects the extended conformer with Rg, SASA, number of Intramolecular HB, and steric interaction criteria
 # - generates "testconf.mol" which poltype wants
 
 # Author: Chengwen Liu
@@ -36,13 +36,68 @@ def find_intramolecular_hbonds(mol, confId = -1, donorAtoms = [7,8,9], distTol =
           res.append((i,j,dist))
   return res
 
+def get_pairAtoms(mol):
+  pair_1234 = []
+  for bond in mol.GetBonds():
+    t1 = bond.GetBeginAtomIdx()
+    t2 = bond.GetEndAtomIdx()
+    comb = [t1, t2]
+    # 1-2 connected
+    if sorted(comb) not in pair_1234:
+      pair_1234.append(sorted(comb))
+    
+    for neigh in mol.GetAtomWithIdx(t1).GetNeighbors():
+      neig_idx = neigh.GetIdx()
+      if neig_idx != t2:
+        comb = [neig_idx, t2]
+        # 1-3 connected
+        if sorted(comb) not in pair_1234:
+          pair_1234.append(sorted(comb))
+        for neigh_neigh in mol.GetAtomWithIdx(neig_idx).GetNeighbors():
+          neig_neig_idx = neigh_neigh.GetIdx()
+          comb = [neig_neig_idx, t2]
+          # 1-4 connected
+          if sorted(comb) not in pair_1234:
+            pair_1234.append(sorted(comb))
+           
+    for neigh in mol.GetAtomWithIdx(t2).GetNeighbors():
+      neig_idx = neigh.GetIdx()
+      if neig_idx != t1:
+        comb = [neig_idx, t1]
+        # 1-3 connected
+        if sorted(comb) not in pair_1234:
+          pair_1234.append(sorted(comb))
+        for neigh_neigh in mol.GetAtomWithIdx(neig_idx).GetNeighbors():
+          neig_neig_idx = neigh_neigh.GetIdx()
+          # 1-4 connected
+          comb = [neig_neig_idx, t1]
+          if sorted(comb) not in pair_1234:
+            pair_1234.append(sorted(comb))
+  
+  # get 1-5 and beyond connected
+  pair_15beyond = []
+  natoms = len(mol.GetAtoms())
+  for n in range(0, natoms-1):
+    for m in range(n+1, natoms):
+      if [n, m] not in pair_1234:
+        pair_15beyond.append([n, m])
+  return pair_15beyond
+
+def no_close_contact(conf, atom_pairs, threshold=2.0):
+  res = True
+  for pair in atom_pairs:
+    i, j = pair
+    dist = (conf.GetAtomPosition(i)- conf.GetAtomPosition(j)).Length()
+    if dist < threshold:
+      res = False
+      break
+  return res
 
 if __name__ == "__main__":
-  
+ 
   sdffile = sys.argv[1]
 
   m1 = Chem.MolFromMolFile(sdffile,removeHs=False)
-  #AllChem.EmbedMolecule(m1)
   m2 = AllChem.EmbedMultipleConfs(m1, numConfs=500, useExpTorsionAnglePrefs=True,useBasicKnowledge=True, randomSeed=123456789)
   
   # find all ihb
@@ -78,13 +133,16 @@ if __name__ == "__main__":
   rgs = []
   sasas = []
   num_ihbs = []
-
+  no_steric = []
+  pair_15beyond = get_pairAtoms(m1) 
   ptable = Chem.GetPeriodicTable()
   radii = [float(ptable.GetRvdw(atom.GetAtomicNum())) for atom in m1.GetAtoms()]
   for i in range(m1.GetNumConformers()):
     rg = 0.0
     ihb = range(999)
     sasa = 0.0
+    conf = m1.GetConformer(i)
+    no_steric.append(no_close_contact(conf, pair_15beyond))
     if converged[i] == 0:
       rg = Descriptors3D.RadiusOfGyration(m1, confId=i)
       ihb = find_intramolecular_hbonds(m1, confId=i)
@@ -106,8 +164,13 @@ if __name__ == "__main__":
     fifty_per = 1
   rgs_sel = [rgs[idx] for idx in num_ihbs_deg_idx] 
   top_fifty_per = list(np.argsort(rgs_sel)[-fifty_per:])
+
+  # 3. filter out conformers with steric interactions
+  for idx in top_fifty_per:
+    if not no_steric[idx]:
+      top_fifty_per.remove(idx)
   
-  # 3. use the one with the highest SASA 
+  # 4. use the one with the highest SASA 
   highest_sasa = 0.0
   extended_conf = -1
   for i in top_fifty_per:
