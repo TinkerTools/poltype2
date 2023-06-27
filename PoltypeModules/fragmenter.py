@@ -966,7 +966,6 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
         strparentrotbndindexes=strparentrotbndindexes[:-1]
         rotbndindextoparentrotbndindexes[equivalentrotbndindex]=strparentrotbndindexes   
         parentindextofragindex=rotbndindextoparentindextofragindex[equivalentrotbndindex]
-        print("INDEX", fragmentfilepath, fragidxtosymclass.keys(), parentindextofragindex.keys())
         fragindextoparentindex={v: k for k, v in parentindextofragindex.items()}
         for parentindex,fragindex in parentindextofragindex.items():
             parentsymclass=poltype.idxtosymclass[parentindex+1]
@@ -976,7 +975,6 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
             if fragsymclass not in parentsymclasstofragsymclasses[parentsymclass]: 
                 parentsymclasstofragsymclasses[parentsymclass].append(fragsymclass)
         fragmentfilepath=rotbndindextofragmentfilepath[equivalentrotbndindex]
-        
 
         head,tail=os.path.split(fragmentfilepath)
         os.chdir(head)
