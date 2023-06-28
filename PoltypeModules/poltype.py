@@ -4054,7 +4054,7 @@ class PolarizableTyper():
             6. Save coordinates of conformations in dictionary for later use in QM optimzation  
             """
             cmdstr = f"python \"{os.path.join(os.path.abspath(os.path.split(__file__)[0]), 'lConformerGenerator.py')}\" {self.molstructfname}"
-            poltype.WriteToLog('Calling: '+cmdstr) 
+            self.WriteToLog('Calling: '+cmdstr) 
             os.system(cmdstr)
             name = "conftest.mol" 
             indextocoordslist=[]
