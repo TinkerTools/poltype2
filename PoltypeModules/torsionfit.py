@@ -125,8 +125,8 @@ def fitfunc (poltype,parms, x,torset, torprmdict,keyonlylist=None,nfoldonlylist=
                         tor_energy += tor_func_term (poltype,prm, ang, nfold, clscnt, torgen.rads(poltype,clsangle),torgen.rads(poltype,offset))
             tor_energy_array[j]+=tor_energy
 
-    if type(parms)==str and 'offset' in torprm:
-        offset = torprm['offset']
+    if type(parms)==str and 'offset' in torprmdict.keys():
+        offset = torprmdict['offset']
     if type(parms)!=str:
         offset = parms[-1]
     if type(offset)==list:
