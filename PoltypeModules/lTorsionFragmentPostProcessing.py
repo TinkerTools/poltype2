@@ -7,6 +7,18 @@
 # NOTE: 
 # 1. the precessed file (.mol) can be the same as the original file (.sdf)
 
+# KEY RULES IMPLEMENTED IN THIS PROGRAM:
+# 1. Bond breaking only happens at single bonds
+# 2. Special single bond (aromatic nitrogen) is not cut
+# 3. Fused rings are treated as single rings if the fused two atoms are carbon
+# 4. Long alkane chain such as propyl and ethyl are replaced with CH3-
+# 5. Charged fragments (COO-) is neutralized
+# 6. Substituents on a ring
+#   -- 1,3- and 1,4- substituents are removed (meta- and para- )
+#   -- 1,2- substituents are kept if they are polar groups
+#   -- 1,2- substituents are removed if they are alkane
+
+
 # Author: Chengwen Liu
 # Date: Jun. 2023
 
@@ -21,14 +33,14 @@ fname = sdffile.split('.sdf')[0]
 
 mol = Chem.MolFromMolFile(sdffile,removeHs=False)
 
-# all single bonds
+# all single bonds are eligible to cut,
 single_bonds = []
 pattern = Chem.MolFromSmarts('[*;!#1][*;!#1]')
 matches = mol.GetSubstructMatches(pattern)
 for match in matches:
   single_bonds.append(list(match))
 
-# n-*
+# except aromatic nitrogen (n-*)
 aromatic_nitrogen = []
 pattern = Chem.MolFromSmarts('[n][*]')
 matches = mol.GetSubstructMatches(pattern)
