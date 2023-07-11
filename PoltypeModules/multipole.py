@@ -10,6 +10,7 @@ from collections import deque
 from itertools import product,permutations
 import numpy as np
 import re
+from rdkit import Chem
 
 def AddPolarizeCommentsToKey(poltype,keyfilename,polartypetotransferinfo):
     """
@@ -517,39 +518,25 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
     else:
        f.write('A\n')
 
-    #Find aromatic carbon, halogens, and bonded hydrogens to correct polarizability
-    #iteratom = openbabel.OBMolAtomIter(mol)
-    #writesection=True
-    #lines=[]
-    #sortedpolarindexkeys=sorted(polarindextopolarizeprm)
-    #for index in sortedpolarindexkeys:
-    #   prm=polarindextopolarizeprm[index]
-    #   line=str(index)+' '+str(prm)+'\n'
-    #   lines.append(line) 
-    #
-    #if writesection:
-    #    for line in lines:
-    #        f.write(line)
-    
-    # this is to fix the issue that poltype only use part of the new polarizability
-    # which led to mixing of both the old and new sets of parameters
-
+    # pybel is not robust, it will add hydrogens for some charged/zwitter-ion molecules
+    # use rdkit instead!
     # Chengwen Liu
-    # Feb, 2023
-    for mol in pybel.readfile('sdf', poltype.molstructfname):
-      natoms = len(mol.atoms)
-      atoms = list(range(1, natoms+1)) 
-      polarDict = dict.fromkeys(atoms, 0)
+    # July 2023
+
+    mol = Chem.MolFromMolFile(poltype.molstructfname,removeHs=False)
+    atoms = range(1, len(mol.GetAtoms()) + 1)
+    polarDict = dict.fromkeys(atoms, 0)
+    for atom in atoms: 
       lines = open(poltype.updatedsmallmoleculepolarizeprmlib).readlines()
       for line in lines:
         d = line.split()
         smt = d[0]
         pol = d[2]
-        smarts = pybel.Smarts(smt)
-        match = smarts.findall(mol)
+        pattern = Chem.MolFromSmarts(smt)
+        match = mol.GetSubstructMatches(pattern)
         if match:
           for i in range(len(match)):	
-            polarDict[match[i][0]] = pol
+            polarDict[match[i][0]+1] = pol
     for k,v in polarDict.items():  
       f.write(f"{k} {v}\n")
     
