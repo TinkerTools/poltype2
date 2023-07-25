@@ -95,9 +95,15 @@ def no_close_contact(conf, atom_pairs, threshold=2.0):
 
 if __name__ == "__main__":
  
-  sdffile = sys.argv[1]
+  inputfile = sys.argv[1]
+  fileformat = sys.argv[2].upper()
 
-  m1 = Chem.MolFromMolFile(sdffile,removeHs=False)
+  if fileformat == 'SDF':
+    m1 = Chem.MolFromMolFile(inputfile,removeHs=False)
+  elif fileformat == 'MOL2':
+    m1 = Chem.MolFromMol2File(inputfile,removeHs=False)
+  else:
+    sys.exit(f'Error: {fileformat} file is not supported!')
   m2 = AllChem.EmbedMultipleConfs(m1, numConfs=500, useExpTorsionAnglePrefs=True,useBasicKnowledge=True, randomSeed=123456789)
   
   # find all ihb
