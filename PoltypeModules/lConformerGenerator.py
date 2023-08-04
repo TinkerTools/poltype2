@@ -10,6 +10,7 @@
 # Date: Mar. 2023
 
 import sys
+import argparse
 import numpy as np
 from rdkit import Chem
 from rdkit.Chem import AllChem,Descriptors3D,rdFreeSASA,rdmolfiles,ChemicalForceFields
@@ -95,15 +96,21 @@ def no_close_contact(conf, atom_pairs, threshold=2.0):
 
 if __name__ == "__main__":
  
-  inputfile = sys.argv[1]
-  fileformat = sys.argv[2].upper()
+  parser = argparse.ArgumentParser()
+  parser.add_argument('-i', dest = 'inputfile', help = "Input file name", required=True)  
+  parser.add_argument('-o', dest = 'outputfile', help = "Output file name. Default: conftest.mol", default='conftest.mol')  
+  parser.add_argument('-f', dest = 'inputformat', help = "Input file format. Default: SDF", choices = ['SDF', 'MOL2'], type=str.upper, default='SDF')  
+  
+  args = vars(parser.parse_args())
+  
+  inputfile = args['inputfile']
+  outputfile = args['outputfile']
+  inputformat = args['inputformat']
 
-  if fileformat == 'SDF':
-    m1 = Chem.MolFromMolFile(inputfile,removeHs=False)
-  elif fileformat == 'MOL2':
+  if inputformat == 'MOL2':
     m1 = Chem.MolFromMol2File(inputfile,removeHs=False)
-  else:
-    sys.exit(f'Error: {fileformat} file is not supported!')
+  else: 
+    m1 = Chem.MolFromMolFile(inputfile,removeHs=False)
   m2 = AllChem.EmbedMultipleConfs(m1, numConfs=500, useExpTorsionAnglePrefs=True,useBasicKnowledge=True, randomSeed=123456789)
   
   # find all ihb
@@ -185,4 +192,4 @@ if __name__ == "__main__":
     if sasa > highest_sasa:
       highest_sasa = sasa
       extended_conf = idx
-  rdmolfiles.MolToMolFile(m1, 'conftest.mol', confId=extended_conf) 
+  rdmolfiles.MolToMolFile(m1, outputfile, confId=extended_conf) 
