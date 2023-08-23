@@ -155,6 +155,22 @@ for match in matches:
     if atomic == 7:
       xatom.SetNumExplicitHs(xatom.GetTotalNumHs() + 1)
 
+# Replace NH3+ with H 
+pattern = Chem.MolFromSmarts('[*][N+]([H])([H])[H]')
+matches = mol.GetSubstructMatches(pattern)
+for match in matches:
+  x, n, h1, h2, h3 = match
+  if n not in torsion_idx_list:
+    atomsToRemove += [n, h1, h2, h3] 
+
+# Replace NH2 with H 
+pattern = Chem.MolFromSmarts('[*][N]([H])[H]')
+matches = mol.GetSubstructMatches(pattern)
+for match in matches:
+  x, n, h1, h2 = match
+  if n not in torsion_idx_list:
+    atomsToRemove += [n, h1, h2] 
+
 # Remove atoms on distant fused rings
 ring_info = mol.GetRingInfo()
 atomsInRing = []
