@@ -934,7 +934,8 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
         bypassrmsd=False
         maxiter=5
         count=0
-        restraint_factor = poltype.torsionprmrestraintfactor
+        L1_restraint_factor = poltype.torsionprmrestraintfactorL1
+        L2_restraint_factor = poltype.torsionprmrestraintfactorL2
         while not parm_sanitized:
             if count>=maxiter:
                 break
@@ -948,16 +949,13 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             # y: tor_energy_list
             
             ### add parameter restraint in fitfunc
-            ### commented out lines correspond to the L2 regulariation form
-            ### we think L1 is better for this purpose, since this gives sparse parameters
+            ### here we use L1+L2 regularization approach
 
             if useweights==True: 
-                #errfunc = lambda p, x, z, torprmdict, y: numpy.array(list(fitfunc(poltype,p, x,z, torprmdict) - weightlist*y) + list(numpy.array(p) * restraint_factor))
-                errfunc = lambda p, x, z, torprmdict, y: numpy.array(list(fitfunc(poltype,p, x,z, torprmdict) - weightlist*y) + list(numpy.sqrt(numpy.absolute(numpy.array(p))) * restraint_factor))
+                errfunc = lambda p, x, z, torprmdict, y: numpy.array(list(fitfunc(poltype,p, x,z, torprmdict) - weightlist*y) + list(numpy.sqrt(numpy.absolute(numpy.array(p))) * L1_restraint_factor) + list(numpy.array(p) * L2_restraint_factor))
 
             else:
-                #errfunc = lambda p, x, z, torprmdict, y: numpy.array(list(fitfunc(poltype,p, x,z, torprmdict) - y) + list(numpy.array(p) * restraint_factor))
-                errfunc = lambda p, x, z, torprmdict, y: numpy.array(list(fitfunc(poltype,p, x,z, torprmdict) - y) + list(numpy.sqrt(numpy.absolute(numpy.array(p))) * restraint_factor))
+                errfunc = lambda p, x, z, torprmdict, y: numpy.array(list(fitfunc(poltype,p, x,z, torprmdict) - y) + list(numpy.sqrt(numpy.absolute(numpy.array(p))) * L1_restraint_factor) + list(numpy.array(p) * L2_restraint_factor))
             
 
             array=optimize.least_squares(errfunc, pzero,jac='2-point', bounds=boundstup,verbose=0,args=(torgen.rads(poltype,numpy.array(angle_list)),torset,torprmdict, tor_energy_list))
