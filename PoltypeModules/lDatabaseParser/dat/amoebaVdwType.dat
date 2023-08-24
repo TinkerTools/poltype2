@@ -1,0 +1,22 @@
+
+# smartsString 																	typeName     			# comments
+[H]                           					          H*              # H*, wild matching Hydrogen
+[C]                           					          C*              # C*, wild matching Carbon
+[N]                           					          N*              # N*, wild matching Nitrogen
+[O]                           					          O*              # O*, wild matching Oxygen
+[S]                           					          S*              # S*, wild matching Sulfur
+[P]                           					          P*              # P*, wild matching Phosphorus
+[Cl]                          					          Cl*             # Cl*, wild matching Chloride 
+[F]                           					          F*              # F*, wilde matching Floride
+[Br]                          					          Br*             # F*, wilde matching Br 
+[I]                           					          I*              # F*, wilde matching I 
+
+# Hydrogen
+[H][OH2]                        					        HW              # H of water
+[H][CH4]                        					        HCH4            # H of methane
+
+# Carbon
+[CH4]                   					          			CH4         		# C of methane
+
+# Oxygen
+[OH2]                                             OW              # O of water

@@ -1,0 +1,339 @@
+# smartsString classNumber className # comments
+# Format:
+#   smarts_line    general_index   atom_type_index  atom_type_shortname # description
+# e.g.  [H]*              1               1                H*            # H*, wild matching Hydrogen
+#   [H][NX4]             26              26                H+            # H+, H on NH4+, R-NH3+, R2-NH2+, R3-NH+
+#   [H][N]=[C](N)[N]     27              26                H+            # H+, H on Guandinium, Imidazolium
+#   [H][N]-[C](=N)[N]    28              26                H+            # H+, H on Guandinium, Imidazolium
+#
+#
+# The last matching type will be assigned to the atom in the molecule.
+#
+
+# Wild matching
+[H]*                                                   1     1         H* #          H*, wild matching Hydrogen
+[C]*                                                   2     2         C* #          C*, wild matching Carbon
+[c]*                                                   3     3         c* #          c*, wild matching Carbon (aromatic)
+[N]*                                                   4     4         N* #          N*, wild matching Nitrogen
+[n]*                                                   5     5         n* #          N*, wild matching Nitrogen (aromatic)
+[O]*                                                   6     6         O* #          O*, wild matching Oxygen
+[o]*                                                   7     7         o* #          o*, wild matching oxygen (aromatic)
+[P]*                                                   8     8         P* #          P*, wild matching Phosphor
+[S]*                                                   9     9         S* #          S*, wild matching Sulphur 
+[s]*                                                  10    10         s* #          s*, wild matching sulphur (aromatic)
+[F]*                                                  11    11          F #          F*, wild matching Fluorine
+[Cl]*                                                 12    12         Cl #         Cl*, wild matching Chlorine
+[Br]*                                                 13    13         Br #         Br*, wild matching Bromine
+[I]*                                                  14    14          I #         I*, wild matching Iodine
+
+# Water(reserved)
+[OH2]                                                 15    15         OW #         OW: O on Water 
+[H][OH2]                                              16    16         HW #         HW: H on Water
+
+# Hydrogen
+# Hydrogen types for 16-19 are detailed classifications of HC (16), for valence parameters, the parameters are combined 
+# into the 20.
+[H][OH1]                                              17    17         HO #                   HO, H on Oxygen 
+[H][C]                                                18    18         HC #                   HC, H on carbon 
+[H][CH]                                               19    19        HCH #                  HCH, H on sp3 carbon, -CH-
+[H][CH2]                                              20    20       HCH2 #                 HCH2, H on sp3 carbon, -CH2-
+[H][CH3]                                              21    21       HCH3 #                 HCH3, H on sp3 carbon, -CH3
+[H][C]=[C,N,O]                                        22    22        HC2 #                  HC2, H on sp2 carbon
+[H][c]                                                23    23         Hc #                   HC, H on aromatic carbon 
+[H][N]                                                24    24         HN #                   HN, H on Nitrogen 
+[H][S]                                                25    25         HS #                   HS, H on Sulfur
+[H][P]                                                26    26         HP #                   HP, H on Phosphor 
+[H][NX4]                                              27    27         H+ #                   H+, H on NH4+, R-NH3+, R2-NH2+, R3-NH+
+[H][N]=[C](N)[N]                                      28    27         H+ #                   H+, H on Guandinium, Imidazolium
+[H][N]-[C](=N)[N]                                     29    27         H+ #                   H+, H on Guandinium, Imidazolium
+[H][n]                                                30    28         Hn #                   Hn, H on aromatic N
+ 
+# Carbon
+[c]                                                   31    29        car #                  car, aromatic carbon 
+[CH]1C=CC=CC1=O                                       32    29        car #                  car,
+[C]1=CC=CC(=O)[CH]1                                   33    29        car #                  car,
+[C]1=C[CH]C(=O)C=C1                                   34    29        car #                  car,
+[C]1=CC(=O)[CH]C=C1                                   35    29        car #                  car,
+[C]1=CC=C[CH]C1(=O)                                   36    29        car #                  car,
+[C]1(=O)[CH]C=CC=C1                                   37    29        car #                  car,
+[cr5H0]                                               38    30       c0r5 #                 c0r5, aromatic carbon in 5-membered cycle without H
+[c]([c])([c])[c]                                      39    31       car0 #                  car, aromatic carbon without H
+[CX4H0]                                               40    32        C30 #                  C30, sp3 carbon with 0 Hydrogen
+[CX4H1]                                               41    33        C31 #                  C31, sp3 carbon with 1 Hydrogen
+[CX4H2]                                               42    34        C32 #                  C32, sp3 carbon with 2 Hydrogens
+[CX4H3]                                               43    35        C33 #                  C33, sp3 carbon with 3 Hydrogens
+[CX4H4]                                               44    36        C34 #                  C34, sp3 carbon with 4 Hydrogens, methane
+[CX4]([O])[O]                                         45    37       C3O2 #                 C3O2, sp3 carbon with 2 oxygens
+[CX4r]                                                46    38        C3R #                  C3R, sp3 carbon on the cycle
+[CX4r5]                                               47    39       C3R5 #                 C3R5, sp3 carbon on 5-membered cycle
+[CX3R5]                                               48    40       C2R5 #                 C2R5, sp2 carbon on cycle
+[CX4r5]([Or5])                                        49    41     C3O1R5 #               C3O1R5, sp3 carbon on 5-membered cycle bonded to 1 O on cycle
+[CX4r5]([Or5])[Or5]                                   50    42     C3O2R5 #               C3O2R5, sp3 carbon on 5-membered cycle bonded to 2 O on cycle
+[CX4r6]                                               51    43       C3R6 #                 C3R6, sp3 carbon on 6-membered cycle
+[CX4r3]                                               52    44       C3R3 #                 C3R3, sp3 carbon on 3-membered cycle
+[CX4r4]                                               53    45       C3R4 #                 C3R4, sp3 carbon on 4-membered cycle
+[C]1(CCO1)                                            54    46     C3R4O1 #               C3R4O1,  sp3 C in oxetane ring closer to O
+[CX4r7]                                               55    47       C3R7 #                 C3R7,  sp3 carbon in 7-membered ring
+[CX3r7](=[O])                                         56    48      C=OR7 #                C=OR7,  C=O in 7-membered ring (after CNN)
+[CX4r6]([Or6])                                        57    49      C3O1R #                C3O1R, sp3 carbon on 6-membered cycle bonded to 1 O on cycle
+[CX4r5]([NH1])                                        58    50     C3N1R5 #               C3N1R5, sp3 carbon on 5-membered cycle bonded to 1 NH
+[CX4r5]([NH1])([NH1])                                 59    51     C3N2R5 #               C3N2R5, sp3 carbon on 5-membered cycle bonded to 2 NH
+[CX4]([C](=O))([C](=O))                               60    52     C-Bket #               C-Bket, sp3 carbon with 2 C=O
+[$([#6](-[#7])(-[#6](=[#8])(-[#8])))]                 61    53         CA #                  CA, sp3 carbon on alanine C chain
+[C]([cr6])[cr6]                                       62    54     C3c6c6 #               C3c6c6,  sp3 C connected with 2 benzene rings
+[CX4]([F])[F]                                         63    55        CF2 #                  CF2, sp3 carbon with 2 F
+[CX4]([F])([F])[F]                                    64    56        CF3 #                  CF3, sp3 carbon with 3 F
+[CX4]([F])([F])([F])[F]                               65    57        CF4 #                  CF4, sp3 carbon with 4 F
+[CX4][Cl]                                             66    58       CCl1 #                 CCl1, sp3 carbon with 1 Cl
+[CX4]([Cl])[Cl]                                       67    59       CCl2 #                 CCl2, sp3 carbon with 2 Cl
+[CX4]([Cl])([Cl])[Cl]                                 68    60       CCl3 #                 CCl3, sp3 carbon with 3 Cl
+[CX4]([Cl])([Cl])([Cl])[Cl]                           69    61       CCl4 #                 CCl4, sp3 carbon with 4 Cl
+[CX4][Br]                                             70    62       CBr1 #                 CBr1, sp3 carbon with 1 Br
+[CX4]([Br])[Br]                                       71    63       CBr2 #                 CBr2, sp3 carbon with 2 Br
+[CX4]([Br])([Br])[Br]                                 72    64       CBr3 #                 CBr3, sp3 carbon with 3 Br
+[CX4]([Br])([Br])([Br])[Br]                           73    65       CBr4 #                 CBr4, sp3 carbon with 4 Br
+[$([CX3]=[CX3])]                                      74    66        C2C #                  C2C, sp2 carbon, CH2=CH2 
+[$([#6](=[#6])-[#6]=[#6])]                            75    67      C2C2C #                C2C2C, sp2 carbon, interior C of CH2=CH-CH=CH2
+[$([#6](=[#6])-[#6]=[#8])]                            76    68      C2C2O #                C2C2O, sp2 carbon, interior C of CH2=CH-C=O
+[CX3H1](=O)                                           77    69        CHO #                  C=O, sp2 carbon, aldehyde
+[CX3H2](=O)                                           78    70       CH2O #                  C=O, sp2 carbon, formaldehyde
+[CX3H1](=O)([CX3]([H])(=O))                           79    71      CHO-2 #                  C=O, sp2 carbon, glyoxal
+[$([#6](=[#8])-[#6]=[#6])]                            80    72     CHOC2C #               CHOC2C, sp2 carbon, CHO of CHO-CH=CH2
+[$([#6](=[#8])([H])([cccccc]))]                       81    73     CHOben #               CHOben, sp2 carbon, CHO of CHO-Ph
+[CX3H0](=O)                                           82    74      C-Ket #                  C=O, sp2 carbon, ketone
+[CX3H0](=O)([C](=O)([O]))                             83    75      C-PRV #                  C=O, sp2 carbon, pyruvate
+[CX3](=O)([OH0])                                      84    76      CO=O- #                  C=O, sp2 carbon, carboxylate
+[CX3](=O)([OH0])(-[#6]=[#6])                          85    77    COOC2C- #                  C=O, sp2 carbon, carboxylate bonded to C=C
+[CX3](=O)([OH0])[cccccc]                              86    78    COOben- #                  C=O, sp2 carbon, carboxylate on benzene
+[$([#6](-[#6](-[#8])=[#8])(=[#8])(-[OH0]))]           87    79     C-Oxa- #                  C=O, sp2 carbon, oxalate
+[CX3](=O)([OH1])                                      88    80       CO=O #                  C=O, sp2 carbon, carboxylic acid
+[$([CX3](=O)([O]([C])))]                              89    80       CO=O #                  C=O, sp2 carbon, carboxylic ester
+[CX3]1(=[O])(OCCCC1)                                  90    81      COOR6 #                COOR6,
+[CX3]1(=[O])(OCCC1)                                   91    82      COOR5 #                COOR5,
+[CX3](=O)([SH1])                                      92    83       CS=O #                  C=O, sp2 carbon, thioate acid
+[$([CX3](=O)([S]([C])))]                              93    83       CS=O #                  C=O, sp2 carbon, thioate ester
+[CX3](=O)([OH1,OC1])(-[#6]=[#6])                      94    84     COOC2C #                  C=O, sp2 carbon, carboxylic acid bonded to C=C
+[$([CX3](=O)([O]([C]))(-[#6]=[#6]))]                  95    84     COOC2C #                  C=O, sp2 carbon, carboxylic ester bonded to C=C
+[CX3](=O)([OH1])[cccccc]                              96    85     COOben #                  C=O, sp2 carbon, carboxylic acid on benzene
+[$([CX3](=O)([O]([C]))[cccccc])]                      97    85     COOben #                  C=O, sp2 carbon, carboxylic ester on benzene
+[$([#6](-[#6](-[#8])=[#8])(=[#8])(-[OH]))]            98    86      C-Oxa #                  C=O, sp2 carbon, oxalic acid
+[CX3](=[OX1])[OX2][CX3](=[OX1])                       99    87      CO=OC #                  C=O, sp2 carbon, anhydride
+[CX3](=O)([OH0])[OH0]                                100    88      CO3-- #                  C=O, sp2 carbon, carbonate
+[CX3](=O)([OH1])[OH0]                                101    89       CO3- #                  C=O, sp2 carbon, bicarbonate
+[CX3](=O)(O[C])(O[C])                                102    90        CO3 #                  C=O, sp2 carbon, carbonic ester
+[CX3](=O)(O[C])(O[H])                                103    91       CO3H #                  C=O, sp2 carbon, bicarbonate ester
+[CX3](=O)([NX3])                                     104    92        CON #                  CON, sp2 carbon, peptide bond (amide) 
+[Cr5](=O)[Nr5]                                       105    93      CONR5 #                CONR5,  CON in 5-membered ring
+[CX3]1(=[O])(NCCCC1)                                 106    94      CONR6 #                CONR6,  lactam
+[C](=O)([NX3])([cccccc])                             107    95     CONben #               CONben,  CON connected to benzene ring
+[CX3](=O)([O])([NX3])                                108    96     C-carb #               C-carb, sp2 carbon, carbamic acid 
+[CX3](=O)([F])                                       109    97        COF #                  COF, sp2 carbon, acyl fluoride
+[CX3](=O)([Cl])                                      110    98       COCl #                 COCl, sp2 carbon, acyl chloride
+[CX3](=O)([Br])                                      111    99       COBr #                 COBr, sp2 carbon, acyl bromide
+[C](=O)([O]([OH0]))                                  112   100      COOO- #                COOO-,  C=O in peracetate ion
+[C](=O)([O]([OH1,OC1]))                              113   101      COOOH #                COOOH,  C=O in peracetic acid or ester
+[C]=[N]                                              114   102        C=N #                  C=N, sp2 carbon, formimidamide 
+[CX3R]=[N]                                           115   103       C=NR #                  C=N, sp2 carbon, connected to Nitrogen in a ring 
+[CH0]([c])([N])[NH2]                                 116   104       C-A6 #                 C-A6, 6'-C in Adenine
+[C](=O)([cr6])[cr6]                                  117   105    C=Oc6c6 #              C=Oc6c6,  C=O connected with 2 benzene rings
+[CH1R](=[N])([N]([c]))                               118   106       C-A2 #                 C-A2, 2'-C in Adenine
+[C](=[NH2])(N)[N]                                    119   107         C+ #                   C+, positively charged carbon, C+(NH2)3 and C+(NH2)2(NHCH3) 
+[$([CX2]#[CX2])]                                     120   108        C1C #                  C1C, sp carbon, triple bond 
+[$([CX2](#[CX2])-[CX2]#[CX2])]                       121   109      C1C1C #                C1C1C, sp carbon, triple bond bonded with another triple bond
+[CX2]#[N]                                            122   110        C1N #                  C1N, sp carbon, nitrile 
+[$([CX3N1]=[CX3N1])]                                 123   111        CCN #                  CCN, sp2 carbon, C=C in imidazole with positive charge
+[CX3N2H1]                                            124   112        CNN #                  CNN, sp2 carbon, C between Ns in imidazole with positive charge
+[CX3]=[S]                                            125   113        C=S #              C=S, Carbon of C=S bond
+[CX2](#[NX1])[SX2]                                   126   114      C-SCN #       
+[C]1([O,S]C=CC=C1)                                   127   115   C3-pyran #             C3-pyran,  sp3 C in pyran ring
+[$([C]1(=CC=C[O,S]C1)),$([C]1(=CC[O,S]C=C1)),$([C]1(=CC=CC[O,S]1)),$([C]1(=C[O,S]CC=C1))]   128   116   C2-pyran #             C2-pyran,  sp2 C in pyran ring
+[c]([c])[n]                                          129   117        ccn #                  ccn, aromatic carbon bonded to aromatic nitrogen
+[cr5]([cr5])[nH0r5]                                  130   118      ccnr5 #                ccnr5, aromatic carbon bonded to aromatic nitrogen in 5-membered cycle
+[c]([c]([c](=O)))([c])                               131   119     c-PryO #               c-PryO, side sp2-C in 2-Prydone close to aromatic C=O
+[cH1]([c]([nH1]))([c])                               132   120     c-PryN #               c-PryN, side sp2-C in 2-Prydone close to aromatic NH
+[c]([c])([c])[n]                                     133   121       cccn #                 cccn, aromatic carbon bonded to aromatic nitrogen without H
+[cH0]([c])[nH1]                                      134   122      c0cn1 #                c0cn1, aromatic carbon bonded to aromatic NH and no H
+[cH1]([c])[nH1]                                      135   123      c1cn1 #                c1cn1, aromatic carbon bonded to aromatic NH and 1 H
+[cH1r5]([cr5])[nH1r5]                                136   124    c1cn1r5 #              c1cn1r5, aromatic carbon bonded to aromatic NH and 1 H in 5-membered cycle
+[c]([c])([C]([NH2]))[n]                              137   125       c-A5 #                 c-A5, 5'-C in Adenine
+[c]([n])[NH2]                                        138   126       cnN2 #                 cnN2, aromatic carbon bonded to 1 aromatic nitrogens and aliphatic NH2
+[c]([c])([nH0])[NH2]                                 139   127      ccnN2 #                ccnN2, aromatic carbon bonded to aromatic nitrogen and aliphatic NH2 without H
+[c]([c])([nH1])[NH2]                                 140   128     ccn1N2 #               ccn1N2, aromatic carbon bonded to aromatic NH and aliphatic NH2 without H
+[c]([c]([n]))([n])[NH0]                              141   129       c-A4 #                 c-A4, 4'-C in Adenine
+[c]([n])[n]                                          142   130        cnn #                  cnn, aromatic carbon bonded to 2 aromatic nitrogens
+[c]([n])[nH1]                                        143   131       cnn1 #                 cnn1, aromatic carbon bonded to 2 aromatic nitrogens and H
+[cr5]([nr5])[nH1r5]                                  144   132     cnn1r5 #               cnn1r5, aromatic carbon bonded to 2 aromatic nitrogens and H in 5-membered cycle
+[c]([n])([n])[c]([n])                                145   133       c-G4 #                 c-G4, 4'-C in Guanine and C in similar structure
+[c]([n])([n])[N]                                     146   134       cnnN #                 cnnN, aromatic carbon bonded to 2 aromatic nitrogens and aliphatic N
+[c]([c])[c](=O)                                      147   135       ccco #                 ccco, aromatic carbon bonded to aromatic C=O
+[c]([c](=O))([c]([n])([n]))[n]                       148   136       c-G5 #                 c-G5, 5'-C in Guanine and C in similar structure
+[c](=O)([c])[nH1]                                    149   137      c=On1 #                c=On1, aromatic C=O bonded to aromatic NH and carbon
+[c](=O)([n])[nH1]                                    150   138     c=Onn1 #               c=Onn1, aromatic C=O bonded to aromatic N and NH
+[c](=O)([nH1])[nH1]                                  151   139    c=On1n1 #              c=On1n1, aromatic C=O bonded to 2 aromatic NH
+[c](=O)([c]([n]))[nH1]                               152   140       c-G6 #                 c-G6, 6'-C in Guanine and C in similar structure
+[c]1(ccco1)                                          153   141    c-Fur-1 #              c-Fur-1,  c in Furan ring closer to O
+[c]1(cocc1)                                          154   142    c-Fur-2 #              c-Fur-2,  c in Furan ring not near O
+[c]1(cccs1)                                          155   143    c-Thp-1 #              c-Thp-1,  c in Thiophene ring closer to S
+[c]1(cscc1)                                          156   144    c-Thp-2 #              c-Thp-2,  c in Thiophene ring not near S
+[c]1(ccnn1)                                          157   145    c-Prz-1 #              c-Prz-1,  c in Pyrazole ring closer to n
+[c]1(cnnc1)                                          158   146    c-Prz-2 #              c-Prz-2,  c in Pyrazole ring which is not near n
+[c]1(ncco1)                                          159   147    c-Oxz-1 #              c-Oxz-1,  c in Oxazole ring between n and o
+[c]1(ncoc1)                                          160   148    c-Oxz-n #              c-Oxz-n,  c in Oxazole ring closer to n
+[c]1(ocnc1)                                          161   149    c-Oxz-o #              c-Oxz-o,  c in Oxazole ring closer to o
+[c]1(nccs1)                                          162   150    c-Thz-1 #              c-Thz-1,  c in Thiazole ring between n and s
+[c]1(ncsc1)                                          163   151    c-Thz-n #              c-Thz-n,  c in Thiazole ring closer to n
+[c]1(scnc1)                                          164   152    c-Thz-o #              c-Thz-o,  c in Thiazole ring closer to s
+[c]1(ccccc1)([c]2(ccccc2))                           165   153       c6-6 #                 c6-6,  The connecting C between 2 benzene rings
+[c]1(ccccc1)([c]2(nccc2))                            166   154     c6-cn5 #               c6-cn5,  connecting c between 6-ring and 5-ring with n
+[c]1(nccc1)([c]2(ccccc2))                            167   155     cn5-c6 #               cn5-c6,  connecting c between 5-ring with n and 6-ring
+[c]1(ncccc1)([c]2(nccn2))                            168   156   cn6-cnn5 #             cn6-cnn5,  connecting c between 6-ring with n and 5-ring with 2 n
+[c]1(nccn1)([c]2(ncccc2))                            169   157   cnn5-cn6 #             cnn5-cn6,  connecting c between 5-ring with 2 n and 6-ring with n
+[c]1(ncccn1)([c]2(nccn2))                            170   158  cnn6-cnn5 #            cnn6-cnn5,  connecting c between 6-ring with 2 n and 5-ring with 2 n
+[c]1(nccn1)([c]2(ncccn2))                            171   159  cnn5-cnn6 #            cnn5-cnn6,  connecting c between 5-ring with 2 n and 6-ring with 2 n
+[c]1(ncccc1)([n]2(nccc2))                            172   160   cn6-nnc5 #             cn6-nnc5,  connecting c to n between 6-ring with n and 5-ring with 2 n
+[c]1(ncccn1)([n]2(nccc2))                            173   161  cnn6-nnc5 #            cnn6-nnc5,  connecting c to n between 6-ring with 2 n and 5-ring with 2 n
+[c]1(ncccc1)([c]2(nccs2))                            174   162   cn6-cns5 #             cn6-cns5,  connecting c between 6-ring with n and 5-ring with n & s
+[c]1(nccs1)([c]2(ncccc2))                            175   163   cns5-cn6 #             cns5-cn6,  connecting c between 5-ring with n & s and 6-ring with n 
+[c]1(ncccc1)([c]2(ccco2))                            176   164    cn6-co5 #              cn6-co5,  connecting c between 6-ring with n and 5-ring with o
+[c]1(ccco1)([c]2(ncccc2))                            177   165    co5-cn6 #              co5-cn6,  connecting c between 5-ring with o and 6-ring with n 
+[c]1(ccccc1)([c]2(ccccn2))                           178   166     c6-cn6 #               c6-cn5,  connecting c between 6-ring and 6-ring with n
+[c]1(ccccn1)([c]2(ccccc2))                           179   167     cn6-c6 #               cn6-c6,  connecting c between 6-ring with n and 6-ring
+[c]1(ccco1)([c]2(ncccc2))                            180   165    co5-cn6 #              co5-cn6,  connecting c between 6-ring with n and 6-ring with o
+[c]1(nnnn1)                                          181   168     cnnnnr #               cnnnnr,
+
+
+# Nitrogen
+[n]                                                  182   169        nar #                  nar, Aromatic Nitrogen in a ring
+[NX4]                                                183   170         N4 #                   N4, Nitrogen in Ammonium
+[NX3]                                                184   171         N3 #                   N3, sp3 Nitrogen
+[NX3r5]                                              185   172       N3R5 #                 N3R5, sp3 Nitrogen on 5-membered cycle
+[NX4r5]                                              186   173       N4R5 #                 N4R5,  sp3 N with charge in 5-membered ring
+[NX3r6]                                              187   174       N3R6 #                 N3R6,  sp3 N in 6-membered ring
+[NX4r6]                                              188   175       N4R6 #                 N4R6,  sp3 N in 6-membered ring with charge
+[Nr7]                                                189   176       N3R7 #                 N3R7,  sp3 N in 7-membered ring
+[NX3H3]                                              190   177       N3H3 #                 N3H3, ammonia N
+[NX3H2]([C](=[N]))                                   191   178      N3C=N #                N3C=N,
+[NX3;!r]([CX3](=O))                                  192   179       NC=O #                 NC=O, sp3 Nitrogen in amide
+[NX3H2]([C](=O)([O]))                                193   180    N-carbH #              N-carbH, sp3 Nitrogen in carbamic acid with H
+[NX3H1]([C](=O)([O]))                                194   180    N-carbH #              N-carbH, sp3 Nitrogen in carbamic acid with H
+[NX3H0]([C](=O)([O]))                                195   181     N-carb #               N-carb, sp3 Nitrogen in carbamic acid with no H
+[NX3]([CX3](=O))([CX3](=O))                          196   182      N-Imi #                N-Imi, sp3 Nitrogen in imide
+[NX3](=[O])[C]                                       197   183        NO2 #                  NO2, nitryl
+[NX3](=[O])[cccccc]                                  198   184     NO2ben #               NO2ben, nitryl on benzene
+[NX3](-[O])[O]                                       199   185        NOO #                  NOO, nitrite
+[NX3H0]([NX3H0c0])[cccccc]                           200   186        N2N #                  N2N, N in azobenzene
+[NX1]                                                201   187         NT #       , Triple bond Nitrogen 
+[NX1](#[CX2]([SX2]))                                 202   188      N-SCN #                N-SCN
+[NX3H0]([N])[cccccc]                                 203   189       N1Ni #       N, Triple bond Nitrogen in diazonium (bond to other atoms) 
+[NX3H0]([N])[C]                                      204   189       N1Ni #       N, Triple bond Nitrogen in diazonium (bond to other atoms) 
+[NX3]([NH0][cccccc])                                 205   190       N1No #       N, Triple bond Nitrogen in diazonium (outer side)
+[NH0]([NH0][cccccc])[cccccc]                         206   191      N-Azo #                N-Azo, N in Azobenzene
+[NX2]=[C]                                            207   192        N=C #                  N=C, Double bond N=C
+[NH2]=[C]                                            208   193       N=C+ #                 N=C+, Double bond N+
+[NH2]-[C](=[NH2])                                    209   193       N=C+ #                 N=C+, Double bond N+
+[NH1]-[C](=[NH2])                                    210   193       N=C+ #                 N=C+, Double bond N+
+[NH1]([C])([C](=[NH2]))                              211   194      N=CC+ #                 N=C+, Double bond N+ with 2 C
+[NX2]([C]([NH2]))(=[CH1])                            212   195       N-A1 #                 N-A1, 1'-N in Adenine
+[NH0]([c]([c]))([CH])                                213   196       N-A3 #                 N-A3, 3'-N in Adenine
+[NH2]([cccccc])                                      214   197     NH2ben #                  NH2, Aniline N
+[NH3]([cccccc])                                      215   198     NH3ben #                  NH3, Phenylazanium N
+[NX3]([cr6])[cr6]                                    216   199     N3c6c6 #               N3c6c6,  sp3 N connected with 2 benzene rings
+[nX2H0]                                              217   200         n0 #                   n0, sp2 aromatic nitrogen with no H
+[nX2H0]([c]([NH2]))([cH0])                           218   201       n-G3 #                 n-G3, 3'-G in Guanine
+[nX3H1]                                              219   202         n1 #                   n1, sp3 aromatic nitrogen with H
+[nX3]([c](=O))                                       220   203       nc=O #                 nc=O, sp3 aromatic nitrogen bonded to aromatic C=O
+[nX3]([c](=O))([c](=O))                              221   204      n2c=O #                n2c=O, sp3 aromatic nitrogen bonded to 2 aromatic C=O
+[n]1(nccc1)([c]2(ncccc2))                            222   205   nnc5-cn6 #             nnc5-cn6,  connecting n to c between 5-ring with 2 n and 6-ring with n
+[n]1(nccc1)([c]2(ncccn2))                            223   206  nnc5-cnn6 #            nnc5-cnn6,  connecting n to c between 5-ring with 2 n and 6-ring with 2 n
+[n]1(cccn1)                                          224   207      n-Prz #                n-Prz,  n in Pyrazole
+[n]1(cocc1)                                          225   208      n-Oxz #                n-Oxz,  n in Oxazole
+[n]1(cscc1)                                          226   209      n-Thz #                n-Thz,  n in Thiazole
+[n]1(ncnn1)                                          227   210     nncnnr #               nncnnr,
+[n]1(nnnc1)                                          228   211     nnnncr #               nnnncr,
+
+# Oxygen
+[OX2H1]                                              229   212         OH #                   OH, Oxygen of Hydroxyl group 
+[OX2H1]([C](=O))                                     230   213        OCO #                  OCO, Oxygen of Carboxylic acid (protonated)
+[OX2H1]([P])                                         231   214        O-P #                  O-P, Oxygen of phosphate, with H
+[OX2H0]([P])                                         232   215       O-P- #                  O-P, Oxygen of phosphate, ionic state
+[O]([N])(-[C])                                       233   216        O-N #                  O-N, Oxygen of nitrite 
+[OX2H1]([SX4])                                       234   217        O-S #                  O-S, Oxygen of Sulfoxide
+[OX2]([N]([O]([C])))                                 235   218        O=N #                  O=N, Oxygen of nitrite
+[OX1](=N)                                            236   218        O=N #                  O=N, Oxygen of nitryl
+[OX1]=[CX3][OH1]                                     237   219        O=C #                  O=C, Oxygen of carbonyl group, Acetic Acid 
+[OX1]=[CX3]                                          238   219        O=C #                  O=C, Oxygen of carbonyl group
+[$([OX1]=[CX3][H])]                                  239   219        O=C #                  O=C, Oxygen of carbonyl group, O=C-H 
+[OX1]=[CX3][N]                                       240   219        O=C #                  O=C, Oxygen of carbonyl group, Amide, Formamide 
+[OX1](=[P])                                          241   220        O=P #                  O=P, Oxygen of phosphate
+[OX2H0]([P])[C]                                      242   221     OP-est #               OP-est, Oxygen in phosphate (bonded to C)
+[OX2]([P])[P]                                        243   222        O2P #                  O2P, Oxygen to connect 2 P
+[OX2H0]([C])[C]                                      244   223        OR2 #                  OR2, Oxygen of ether
+[OX2r6]([C])[C]                                      245   224        OR6 #                  OR6, Oxygen in 6-membered cycle
+[$([OH0]=[C]([C,N])[OH0]),$([OH0][C]([C,N])=[OH0])]   246   225         O- #                   O-, Oxygen of carboxinate
+[$([OH0]([CX3H1](=[O]))),$([OH0](=[CX3H1]([OH0]))),$([OH0]([CX3H0](=O)([OH0,OH1])))]   247   225         O- #                  O-, Oxygen of carboxinate
+[$([OH0]=[C]([cccccc])[OH0]),$([OH0][C]([cccccc])=[OH0])]   248   225         O- #                   O-, Oxygen of carboxinate on benzene
+[O]=[c]                                              249   226        Oar #                  Oar, sp2 Oxygen connected to aromatic ring 
+[OX2H0]([C](=O))[C]                                  250   227      O-est #                O-est, Oxygen of ester 
+[$([OH0]=[C]([O]([C])))]                             251   219        O=C #                  O=C, Oxygen of carbonyl group (correct the O=C in ester)
+[OH0]c1ccccc1                                        252   228     O-Phe- #                      O on Phenol minus
+[OH1]([cccccc])                                      253   229      O-Phe #                      O on Phenol
+[O;!r]([cccccc])([C])                                254   230  O-Phe-est #                      O on Phenol
+[OX2H0]([SX4])                                       255   231       O-S- #                 O-S-: Oxygen of sulfonate
+[O]=[SX3]                                            256   232        O=S #                  O=S, Oxygen of DMSO
+[O]=[SX4]                                            257   233      O=S=O #                O=S=O, Oxygen of sulfone
+[$([O]([S]([O])([O][C])))]                           258   234       OSO2 #                 OSO2, oxygen of EMsulfonate 
+[OH0]([S]([cccccc]))                                 259   235    O-Sben- #              O-Sben-, Oxygen of benzene sulfonate
+[OH1]([S]([cccccc]))                                 260   236     O-Sben #               O-Sben, Oxygen of benzene sulfonic acid
+[OX2H0]([SX4]([OH1]))                                261   237      O=SO2 #                O=SO2: Oxygen of Sulfonic acid
+[OX2H0]([SX4]([O]([C])))([OH0])                      262   237      O=SO2 #                O=SO2: Oxygen of Sulfonic acid
+[O]([S]([O])([O]))([C])                              263   238     OS-est #               OS-est, oxygen of EMsulfonate  
+[OX2r5]([CX4r5]([OH0r5]))                            264   239        Oxo #                  Oxo, example: benzodioxole
+[OX2r5]([CX4r5]([OH0r5]))[cccccc]                    265   239        Oxo #                  Oxo, example: benzodioxole    
+[O][C](=[O])([NH2])                                  266   225         O- #                   O-, example: carbamate 
+[o]1cccc1                                            267   240      O-fur #                O-fur, O on furan ring
+[O](=[C]([O]([OH0])))                                268   241     O=COO- #               O=COO-,  O=C in peracetate ion
+[O](=[C]([O]([OH1])))                                269   242     O=COOH #               O=COOH,  O=C in peracetic acid or ester
+[O]([C](=[O]))([OH0])                                270   243     OCO-1- #               OCO-1-,  O in the middle of (C=O)-O-O-
+[OH0]([O]([C](=[O])))                                271   244     OCO-2- #               OCO-2-,  O in the side of (C=O)-O-O-
+[O]([C](=[O]))([OH1,OC1])                            272   245      OCO-1 #                OCO-1,  O in the middle of peracetic acid or ester
+[OH1]([O]([C](=[O])))                                273   246      OCO-2 #                OCO-2,  O in the side of peracetic acid
+[OC1]([O]([C](=[O])))([C])                           274   247    OCO-est #              OCO-est,  O in the side of peracetic ester
+[O]1(CC=CC=C1)                                       275   248    O-pyran #              O-pyran,  O in pyran ring
+[o]1(cncc1)                                          276   249      o-Oxz #                o-Oxz,  o in Oxazole
+
+# Sulphur
+[SX2H2]                                              277   250        SH2 #                  SH2, Sulphur in H2S 
+[SX2H0]                                              278   251        S3- #                  S3-, Sulphur in thiolate
+[SX2H0]([C])[C]                                      279   252        SC2 #                  SC2, Sulphur in SC2 
+[SX2H1]                                              280   253         S3 #                   S3, Sulphur in thiol
+[SX2H1]([C](=O))                                     281   254        SCO #                  SCO, Sulfur of thioate acid (protonated)
+[SX2H0]([C](=O))[C]                                  282   255      S-est #                S-est, Sulfur of thioate ester 
+[SX2]([S])[C]                                        283   256         SS #                   SS, Sulphur in disulfide
+[SX3]=[O]                                            284   257        S=O #                  S=O, Sulphur in DMSO 
+[SX4](=[O])(=[O])                                    285   258        SO2 #                  SO2, Sulphur in sulfone
+[SX4]([OH0])([OH0])[OH0]                             286   259       SO3- #                 SO3-, Sulphur in sulfonate
+[SX4]([OH1])([OH0])([OH0])                           287   260        SO3 #                  SO3, Sulphur in sulfonic acid
+[SX4]([O]([C]))([OH0])([OH0])                        288   260        SO3 #                  SO3, Sulphur in sulfonic ester
+[SX4]([OH0])([OH0])([OH0])[cccccc]                   289   261    SO3ben- #              SO3ben-, Sulphur in sulfonate on benzene
+[SX4]([OH1])([OH0])([OH0])[cccccc]                   290   262     SO3ben #               SO3ben, Sulphur in sulfonic acid on benzene
+[SX4]([O]([C]))([OH0])([OH0])[cccccc]                291   262     SO3ben #               SO3ben, Sulphur in sulfonic acid on benzene
+[SX2]([CX2](#[NX1]))                                 292   263      S-SCN #                S-SCN,  
+[SX2]([CX2](#[NX1]))[cccccc]                         293   264   S-SCNben #             S-SCNben,  
+[S](=O)(=O)([c])                                     294   265     SO2ben #               SO2ben,  S in sulfone bonded to the benzene ring
+[S](=O)(=O)([c])([NX3])                              295   266    SO2Nben #              SO2Nben,  S in sulfone bonded to the benzene ring and sp3 N
+[S]1(CC=CC=C1)                                       296   267    S-pyran #              S-pyran,  S in pyran ring
+[s]1(cccc1)                                          297   268      s-Thp #                s-Thp,  s in Thiophene
+[s]1(cncc1)                                          298   269      s-Oxz #                s-Oxz,  s in Thiazole
+
+# Phosphor
+[PH3]                                                299   270        PH3 #                  PH3, Phosphor in PH3
+[PX4](=[O])([OH0])([OH0])[OH0]                       300   271        PO4 #                  PO4, Phosphor in Phosphate
+[PX4](=[O])([OH1])([OH0])[OH0]                       301   272      PO4H1 #                PO4H1, Phosphor in Phosphate
+[PX4](=[O])([OH1])([OH1])[OH0]                       302   273      PO4H2 #                PO4H2, Phosphor in Phosphate
+[PX4](=[O])([OH1])([OH1])[OH1]                       303   274      PO4H3 #                PO4H3, Phosphor in Phosphate
+[PX4](=[O])([O][C])([O])[O]                          304   275      PO4C1 #                PO4C1, Phosphor in Phosphate
+[PX4](=[O])([O][C])([O][C])[O]                       305   276      PO4C2 #                PO4C2, Phosphor in Phosphate
+[PX4](=[O])([O][C])([O][C])([O][C])                  306   277      PO4C3 #                PO4C3, Phosphor in Phosphate
+[PX4](=[O])([O]([P]))([OH0])[OH0]                    307   278     P-pyro #               P-pyro, Phosphor in Pyrophosphate
+[PX4](=[O])([O]([P]))([O]([P]))[OH0]                 308   279      P-tri #                P-tri, Phosphor in the middle of Triphosphate
+

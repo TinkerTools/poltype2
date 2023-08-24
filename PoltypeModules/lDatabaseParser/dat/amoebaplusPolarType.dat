@@ -1,0 +1,94 @@
+
+# smartsString 																	typeName     			# comments
+[H]                           					          H*              # H*, wild matching Hydrogen
+[C]                           					          C*              # C*, wild matching Carbon
+[N]                           					          N*              # N*, wild matching Nitrogen
+[O]                           					          O*              # O*, wild matching Oxygen
+[S]                           					          S*              # S*, wild matching Sulfur
+[P]                           					          P*              # P*, wild matching Phosphorus
+[Cl]                          					          Cl*             # Cl*, wild matching Chloride 
+[F]                           					          F*              # F*, wilde matching Floride
+[Br]                          					          Br*             # F*, wilde matching Br 
+[I]                           					          I*              # F*, wilde matching I 
+
+# Hydrogen
+[H][C]                        					          Hnonpol         # H on non-aromatic carbon
+[H][O] 					              					          Hpolar          # H on non-aromatic oxygen 
+[H][N] 		                    					          Hpolar          # H on non-aromatic nitrogen 
+[H][S] 		                    					          Hpolar          # H on non-aromatic sulfur 
+[H][NH3]                      					          Hpolar          # H on ammonia
+[H][F]                        					          Hpolar          # H on HF 
+[H][Cl]                       					          Hpolar          # H on HCl 
+[H][Br]                       					          Hpolar          # H on HBr 
+[H][I]                        					          Hpolar          # H on HI 
+[H][c] 		                    					          Har             # H on aromatic carbon
+[H][n]                        					          Har             # H on aromatic nitrogen
+[H][o]                        					          Har             # H on aromatic oxygen 
+[H][C]=[C]                    					          Har             # H on C=C system 
+[H][OH2] 			                					          HW	            # H on Water
+
+# Carbon
+[$([C][C])]                   					          Cnonpol         # C on non-aromatic carbon
+[C][c]                        					          Cnonpol         # C connected to aromatic carbon
+[C][O]                        					          Cpolar          # C on non-aromatic oxygen 
+[C][o]                        					          Cpolar          # C on aromatic oxygen 
+[C][N]                        					          Cpolar          # C on non-aromatic nitrogen 
+[C][n]                        					          Cpolar          # C on aromatic nitrogen 
+[C][F,Cl,Br,I]                 					          Cpolar          # C connected to F,Cl,Br,I
+[C]=[N]                       					          Cpolar          # C connected to nitrogen via double bond
+[C][S]                        					          Cpolar          # C on sulfur 
+[c]                           					          Car             # C on aromatic system
+[CX3](=O)                     					          Car             # C on carbonyl O
+[$([CX3]=[CX3])]              					          Car	            # C on C=C    
+[C]([C]=[*])([C]=[*])         					          Car	            # C on conjugated systems 
+[CH4]                         					          Cch4            # C on methane
+[$([C]#[*])]                  										Csp             # C of tripole bond, C#C, C#N, etc
+
+# Nitrogen
+[N][C]                        										Nnonpol         # N on non-aromatic carbon 
+[N][c]                        										Nnonpol         # N connected to aromatic carbon via single bond
+[N]=[c]                       										Nnonpol         # N connected to aromatic carbon via double bond
+[N][S]                        										Npolar          # N connected to sulfur 
+[$([N][N])]                   										Npolar          # N connected to non-aromatic nitrogen via single bond
+[N]=[N]                       										Npolar          # N connected to non-aromatic nitrogen via double bond
+[N][n]                        										Npolar          # N connected to aromatic nitrogen via single bond
+[n]                           										Nar             # N on aromatic system
+[N]=[C]                       										Nar             # N on double bond N=C 
+[NX3]([CX3](=O))              										Nsp2            # N on amide 
+[N]#[*]                       										Nsp             # N of tripole bond, N#N, N#C, etc
+[NX3H3]                       										Nnh3            # N on ammonia
+
+# Oxygen
+[O][CX4]                      										Ononpol         # O on non-polar carbon 
+[O][c]                        										Ononpol         # O connected to aromatic carbon via single bond 
+[O]=[c]                       										Ononpol         # O connected to aromatic carbon via double bond
+[O][N]                        										Opolar          # O connected to non-aromatic nitrogen 
+[O][n]                        										Opolar          # O connected to aromatic nitrogen 
+[o]                           										Oar             # O on aromatic system
+[OX2][CX3]                    										Oar             # O connected to carbonyl group
+[OX1]=[CX3]                   										Osp2c           # O on carbonyl group	
+[OX2][S]                      										O-sulf          # O on O-S bond 
+[OX1]=[S]                     										O=sulf          # O on O=S bond 
+[OX2H2]		                    										OW              # O on Water
+[$([OH1][C]=[O])]             										Ohacid          # O of acid with H
+
+# Sulfur
+[S][C]                        										Snonpol         # S on non-polar carbon via single bond
+[S]=[C]                       										Snonpol         # S on non-polar carbon via double bond
+[S][N]                        										Spolar          # S connected to nitrogen 
+[S][O]                        										Spolar          # S connected to oxygen 
+[S]=[O]                       										Spolar          # S connected to oxygen via double bond
+[s]                           										Sar             # S on aromatic system
+
+# Phosphorus
+[P](=[O])(O)([O])[O]          										Po4             # P on PO4
+
+# Halogens
+[F][A]                        										Fnonar          # F connected to non-aromatic atom 
+[F][a]                        										Far             # F connected to aromatic atom
+[Cl][A]                       										Clnonar         # Cl connected to non-aromatic atom 
+[Cl][a]                       										Clar            # Cl connected to aromatic atom
+[Br][A]                       										Brnonar         # Br connected to non-aromatic atom 
+[Br][a]                       										Brar            # Br connected to aromatic atom
+[I][A]                        										Inonar    	    # I connected to non-aromatic atom 
+[I][a]                        										Iar       	 	  # I connected to aromatic atom

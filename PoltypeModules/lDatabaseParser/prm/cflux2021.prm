@@ -1,0 +1,2716 @@
+# updated CFlux parameters
+# based on a larger molecular set than the original publication in Yang-JCP paper
+bndcflux        15        16          0.0
+bndcflux        18        36          0.0015609179
+bndcflux       177        24          -0.0002725677
+bndcflux       171        24          -0.0179779352
+bndcflux       171        35          0.0621493766
+bndcflux        21        35          0.125242121
+bndcflux       212        17          -0.0085117982
+bndcflux       212        35          -0.0994042775
+bndcflux        35        92          0.0525184631
+bndcflux        92       219          -0.1382660115
+bndcflux        92       179         -0.1606387867
+bndcflux        92       172         -0.0323677309
+bndcflux       179        24         0.0248491858
+bndcflux       179        35         0.0109191936
+bndcflux        80       219         -0.1146809009
+bndcflux        80       213         -0.120735647
+bndcflux        80        35         0.0448338377
+bndcflux       213        17         -0.0043950194
+bndcflux       204        28         0.0041856793
+bndcflux       204       137         0.0384318421
+bndcflux       204       139         0.0015401284
+bndcflux       137       226         -0.0831465821
+bndcflux       137       135         -0.0327538663
+bndcflux       135        23         0.0001955083
+bndcflux       135       123         0.003035049
+bndcflux       123        23         0.0018360926
+bndcflux       123       203         -0.014976766
+bndcflux       203        28         -0.0106836663
+bndcflux       203       139         0.0044750018
+bndcflux       139       226         -0.0172075013
+bndcflux       200       117         -0.0020964055
+bndcflux       117        23         -0.0069860254
+bndcflux       117        29         -0.0960317952
+bndcflux        29        23         -0.0291468082
+bndcflux        29        29         0.0
+bndcflux        22        66         0.0306173827
+bndcflux        66        66         0.0
+bndcflux        35        34         0.0220766606
+bndcflux        20        34         0.122512968
+bndcflux        34        34         0.0220766606
+bndcflux        32        35         0.0220766606
+bndcflux        19        39         0.0724681457
+bndcflux        20        39         0.0724681457
+bndcflux        39        39         0.0
+bndcflux        35       253         -0.0278598757
+bndcflux       253        25         -0.0116845664
+bndcflux        35       257         0.0183118295
+bndcflux       232       257         0.0219453602
+bndcflux        11        29         0.0280700912
+bndcflux        12        29         0.0350140693
+bndcflux        13        29         0.0592967353
+bndcflux        35       252         -0.002037037
+bndcflux       118       124         0.0046348118
+bndcflux       118       200         -0.0007639328
+bndcflux       118        23         -0.0030979494
+bndcflux       124       202         -0.0196648212
+bndcflux       124        23         0.0025974916
+bndcflux       202       132         -0.0031248438
+bndcflux       202        28         0.0399258901
+bndcflux       132       200         0.0078273985
+bndcflux       132        23         0.001305755
+bndcflux       172        50         0.005507771
+bndcflux       172        24         -0.000496512
+bndcflux        50        39         -0.0012350459
+bndcflux        19        50         0.0034968022
+bndcflux        20        50         0.0034968022
+bndcflux        29       229         -0.0823949296
+bndcflux       229        17         -0.0002696035
+bndcflux       202       122         0.0091201095
+bndcflux        29        31         -0.0040408413
+bndcflux        29       120         0.0022298689
+bndcflux       120       122         0.0017478443
+bndcflux       120        23         -0.0055830949
+bndcflux       122        31         -0.0012051842
+bndcflux        31       120         -0.0010289506
+bndcflux       120       124         0.0104701261
+bndcflux        11        55         0.0127452972
+bndcflux        19        55         0.0013982746
+bndcflux        20        55         0.0013982746
+bndcflux        12        59         0.0173190579
+bndcflux        19        59         0.0006519718
+bndcflux        20        59         0.0006519718
+bndcflux        13        63         0.017851834
+bndcflux        19        63         0.0005717947
+bndcflux        20        63         0.0005717947
+bndcflux        11        35         0.0360638515
+bndcflux        12        58         0.0461042601
+bndcflux        19        58         0.0043050357
+bndcflux        20        58         0.0043050357
+bndcflux        21        58         0.0020286901
+bndcflux        13        62         0.0411463023
+bndcflux        19        62         0.0028944837
+bndcflux        20        62         0.0028944837
+bndcflux        21        62         0.0015927021
+bndcflux       272       214         0.0
+bndcflux       272       215         0.0
+bndcflux       272       220         0.0
+bndcflux       214        17         0.0146806638
+bndcflux       273       215         0.0
+bndcflux       273       214         0.0
+bndcflux       273       220         0.0
+bndcflux       274       214         -0.0145918795
+bndcflux       274       220         -0.0077313051
+bndcflux       170        27         0.0
+bndcflux       170        35         0.0
+bndcflux        66       172         0.0
+bndcflux       172        51         0.0
+bndcflux        19        51         0.0
+bndcflux        20        51         0.0
+bndcflux       107       193         -0.0059761516
+bndcflux       193        27        -0.0001544502
+bndcflux        35        76        0.0
+bndcflux        76       225        0.0
+bndcflux        22       102        0.0142085601
+bndcflux       102       193        -0.0599107293
+bndcflux       193        24        0.0112166426
+bndcflux        22        92        -0.0001077069
+bndcflux        22        80        -0.0026618796
+bndcflux        35        35         0.0220766606
+bndcflux        34       212          -0.0994042775
+bndcflux        35        30        0.0050257966
+bndcflux        31        30        -0.0025569992
+bndcflux        30       124        -0.0142238184
+bndcflux        35       194        -7.4075e-06
+bndcflux       107       194        -0.0005975841
+bndcflux       194        27        0.0002060909
+bndcflux        35       118        0.0069072968
+bndcflux        33        35         0.0220766606
+bndcflux        33       212          -0.0994042775
+bndcflux        19        33         0.122512968
+bndcflux        19       108        -0.0025557125
+bndcflux       108       108        0.0
+bndcflux       200       127        -0.001240408
+bndcflux       127        29        -0.0269920473
+bndcflux       127       197        -0.0926724829
+bndcflux       197        24        -0.0118973221
+bndcflux       203       137        0.0209290849
+bndcflux       119       120        1.96641e-05
+bndcflux       119       135        -0.0062133878
+bndcflux       119        23        -0.0025506272
+bndcflux       120       123        0.0063243737
+bndcflux       250        25        -0.0014112828
+bndcflux       117       117        0.0
+bndcflux       135        35        -0.0027871334
+bndcflux       195       104        0.0068003106
+bndcflux       195       106        0.0012205155
+bndcflux       104       125        -0.0077227858
+bndcflux       104       171        -0.03329954
+bndcflux       125       129        0.0048124426
+bndcflux       125       200        -0.0003018619
+bndcflux       129       196        0.00016052
+bndcflux       129       202        -0.0034104735
+bndcflux       196       106        0.0012713031
+bndcflux        22       106        0.000819625
+bndcflux        70       219        -0.0025855168
+bndcflux        22        70        0.001928791
+bndcflux       187       110        0.0068825157
+bndcflux        35       110        -0.0285495084
+bndcflux        34       253         -0.0278598757
+bndcflux        35        29        -0.0008774771
+bndcflux       219        74        0.0174685764
+bndcflux        74        35        0.0256827304
+bndcflux        43        43        0.0
+bndcflux        19        43        0.0784529919
+bndcflux        20        43        0.0784529919
+bndcflux       223        35        0.0694341002
+bndcflux        31        31        0.0
+bndcflux       226       140        0.0248601969
+bndcflux       140       203        -0.0113649764
+bndcflux       140       136        -0.0331071815
+bndcflux       203       134        -0.016284773
+bndcflux       134       201        -0.0216607912
+bndcflux       134       197        -0.0290668156
+bndcflux       201       133        0.0597883547
+bndcflux       133       136        0.0157669832
+bndcflux       133       202        -0.0035159544
+bndcflux       136       200        0.0024695759
+bndcflux       223        34        0.0694341002
+bndcflux       219        69        0.0135774165
+bndcflux        35        69        0.0177320409
+bndcflux        22        69        0.0137554243
+bndcflux       226       138        0.0753229079
+bndcflux       203       128        0.0187288525
+bndcflux       203       138        0.0622771722
+bndcflux       197       128        0.0502018746
+bndcflux       200       138        0.0103572202
+bndcflux       128       120        -0.0208243616
+bndcflux       120       117        -0.0066543779
+bndcflux        29       228        0.0173004184
+bndcflux       197        29        0.107463633
+bndcflux        11        57        0.0129655156
+bndcflux        12        61        0.0171293452
+bndcflux        11        56        0.0614654621
+bndcflux        19        56        0.0006795058
+bndcflux        12        60        0.0578355341
+bndcflux        19        60        0.0004701849
+bndcflux        13        64        0.0391606013
+bndcflux        19        64        0.0003267375
+bndcflux       227        87        0.0016292977
+bndcflux       227        80        0.1730375624
+bndcflux       219        87        0.0013009659
+bndcflux        87        35        0.0082900752
+bndcflux       225        96        0.031426039
+bndcflux       225        17        0.0059637994
+bndcflux       219        96        0.0338276732
+bndcflux       180        96        0.0188504767
+bndcflux       180        24        0.0047362709
+bndcflux       171        34          0.0621493766
+bndcflux       122        35        -0.0003575734
+bndcflux       122       118        -0.000102793
+bndcflux       252        34         -0.002037037
+bndcflux        34       194        -7.4075e-06
+bndcflux        34        92          0.0525184631
+bndcflux        34        80         0.0448338377
+bndcflux       258       232        -1e-07
+bndcflux       258       233        -0.0365342862
+bndcflux       258        34        -0.0028168776
+bndcflux       256       256        0.0
+bndcflux       256        34        0.0083276834
+bndcflux        22        76        0.0
+bndcflux        12        98        0.0545501122
+bndcflux       219        98        0.0160416933
+bndcflux        34        98        0.0097133902
+bndcflux        11        97        0.0442705277
+bndcflux       219        97        0.0309295483
+bndcflux        34        97        0.0151574444
+bndcflux        13        99        0.085868787
+bndcflux       219        99        0.0260529852
+bndcflux        34        99        0.0065197618
+bndcflux       227        34        0.1139455221
+bndcflux       227        90        0.0560139597
+bndcflux       219        90        0.0179504731
+bndcflux       227        91        0.0464646811
+bndcflux       213        91        0.0183564407
+bndcflux       219        91        0.0218233527
+bndcflux       223        37        0.0217752273
+bndcflux        19        37        0.0008524255
+bndcflux        20        37        0.0008524255
+bndcflux        29       110        -0.0301900186
+bndcflux       270        26        -0.0027469694
+bndcflux        34        76        0.0
+bndcflux        34        69        0.0177320409
+bndcflux        34        74        0.0256827304
+bndcflux       179        34         0.0109191936
+bndcflux       172        34        0.0129226035
+bndcflux       239        30        0.0432366964
+bndcflux       239        42        0.0107637331
+bndcflux        30        30        0.0
+bndcflux        30        29        -0.0067300805
+bndcflux        19        42        0.0190723026
+bndcflux        20        42        0.0190723026
+bndcflux       239        41        0.0
+bndcflux       223        41        0.09050771
+bndcflux       223        42        0.011675497
+bndcflux        41        41        0.0
+bndcflux        19        41        0.0227342803
+bndcflux        20        41        0.0227342803
+bndcflux       192       102        0.0080317274
+bndcflux       192       103        -0.0001854652
+bndcflux       192        34        0.0001362726
+bndcflux       102        34        0.0135923476
+bndcflux       192        24        -0.005208895
+bndcflux        35       102        0.0135923476
+bndcflux       192        35        0.0001362726
+bndcflux        52        80        0.0213061497
+bndcflux        52        74        0.0217194019
+bndcflux        19        52        0.0109455216
+bndcflux        20        52        0.0109455216
+bndcflux       213        86        0.0169765142
+bndcflux       219        86        0.0092464233
+bndcflux        86        86        0.0
+bndcflux       225        79        0.0
+bndcflux        86        79        0.0
+bndcflux        79        79        0.0
+bndcflux        52        76        0.0
+bndcflux       219        75        0.002115201
+bndcflux        34        75        0.0085088113
+bndcflux        75        80        -0.0012745131
+bndcflux        75        76        0.0
+bndcflux       182        92        0.0140341949
+bndcflux       182        24        0.0004617095
+bndcflux       218       183        0.0412618628
+bndcflux       183        34        0.002929936
+bndcflux       218       184        0.056592253
+bndcflux       184        29        -0.0168765094
+bndcflux       227        96        0.0070852353
+bndcflux       181        34        -0.0012059148
+bndcflux       181        35        -0.0012059148
+bndcflux       181        96        0.0051857732
+bndcflux       213        96        -1.66832e-05
+bndcflux       180        35        -1.63383e-05
+bndcflux       216       185        0.0393545777
+bndcflux       216        34        0.0314004829
+bndcflux       218       185        0.0359169086
+bndcflux       189       190        0.0
+bndcflux       189        29        0.0
+bndcflux       190       190        0.0
+bndcflux       191        29        0.0
+bndcflux       190        29        -0.0091437675
+bndcflux       257        34         0.0183118295
+bndcflux       260       217        -0.0259985394
+bndcflux       260       237        -0.0236763786
+bndcflux       260       234        -0.0052372101
+bndcflux       260        34        -0.0066792967
+bndcflux       236        17        0.0041043026
+bndcflux       217        17        0.0029568562
+bndcflux       259       231        0.0
+bndcflux       259        34        0.0
+bndcflux       262       236        -0.0109953433
+bndcflux       262       237        -0.0288256479
+bndcflux       262        29        0.0003538467
+bndcflux       261       235        0.0
+bndcflux       261        29        0.0
+bndcflux       260       238        -0.0492117944
+bndcflux       260        35        -0.0066792967
+bndcflux       238        34        0.0330660377
+bndcflux       263        34        0.0006385802
+bndcflux       263       114        0.012233252
+bndcflux       188       114        0.0092040551
+bndcflux       264        29        -0.0018716094
+bndcflux       264       114        0.002876319
+bndcflux        67        67        0.0
+bndcflux        68        68        0.0
+bndcflux        67        66        0.0013126862
+bndcflux        68        66        0.0140484685
+bndcflux        22        67        0.0080282789
+bndcflux        22        68        0.0189462952
+bndcflux       219        72        0.0239308281
+bndcflux        67        72        0.0
+bndcflux        68        72        0.0369336992
+bndcflux        22        72        0.0078586909
+bndcflux       218       192        0.0391777294
+bndcflux       218        17        0.0015157562
+bndcflux        29        34        -0.0008774771
+bndcflux       219        73        0.0189693652
+bndcflux        29        73        0.0265634413
+bndcflux        22        73        0.0058543691
+bndcflux       213        85        0.0369241162
+bndcflux       219        85        0.0306571538
+bndcflux        29        85        0.0152321261
+bndcflux       225        78        0.0
+bndcflux        29        78        0.0
+bndcflux       213        84        0.0899807677
+bndcflux       219        84        0.0416938075
+bndcflux        68        84        0.0576343191
+bndcflux       225        77        0.0
+bndcflux        68        77        0.0
+bndcflux       171        53        0.0254271252
+bndcflux        53        35        -0.0050181285
+bndcflux        53        80        0.0029798744
+bndcflux        19        53        0.0070192131
+bndcflux        20        53        0.0070192131
+bndcflux       278       222        0.0
+bndcflux       278       220        0.0
+bndcflux       278       215        0.0
+bndcflux       198        29        0.0
+bndcflux       198        27        0.0
+bndcflux       224        49        0.0650085088
+bndcflux       212        43        0.0753775701
+bndcflux       212        49        0.0228350446
+bndcflux        43        49        0.0068067408
+bndcflux        49        34        -0.0025247032
+bndcflux        19        49        0.0195831066
+bndcflux        20        49        0.0195831066
+bndcflux       275       221        -0.0279185548
+bndcflux       275       214        -0.0168898294
+bndcflux       275       220        -0.0125594169
+bndcflux       212        39        0.0599552441
+bndcflux       212        41        0.0117669422
+bndcflux       221        34        0.0675587079
+bndcflux        39        41        0.027087628
+bndcflux        41        34        -0.0070299857
+bndcflux       219        71        0.0037766129
+bndcflux        71        71        0.0
+bndcflux        22        71        0.0041897428
+bndcflux        34        66        -0.0046970784
+bndcflux        66        35        -0.0046970784
+bndcflux        52        69        0.0003548729
+bndcflux        11        34         0.0360638515
+bndcflux        58        35        3.26423e-05
+bndcflux        62        35        0.009586943
+bndcflux        33        33         0.0220766606
+bndcflux        32        34         0.0220766606
+bndcflux        33        34         0.0220766606
+bndcflux        32        32         0.0220766606
+bndcflux        11        33         0.0360638515
+bndcflux        58        58        0.0
+bndcflux        62        62        0.0
+bndcflux        34        58        3.26423e-05
+bndcflux       170        34         0.0
+bndcflux       223        33        0.0694341002
+bndcflux       252        33         -0.002037037
+bndcflux       212        32          -0.0994042775
+bndcflux        32        80         0.0448338377
+bndcflux        33        80         0.0448338377
+bndcflux        53        34        -0.0050181285
+bndcflux       178       102        0.0165487385
+bndcflux       178        27        -0.0005504483
+bndcflux       257        33         0.0183118295
+bndcflux       258        33        -0.0028168776
+bndcflux       258        34        -0.0028168776
+bndcflux        33        87        0.0082900752
+bndcflux       227        33        0.1139455221
+bndcflux        35       108        0.0188835441
+bndcflux        34       110        -0.0285495084
+bndcflux        33        29        -0.0008774771
+bndcflux        49        49        0.0
+bndcflux       226       130        0.0437404872
+bndcflux       203       117        0.1369199138
+bndcflux       203       130        0.0183442053
+bndcflux       203        35        0.0445990714
+bndcflux       201       130        0.018985081
+bndcflux       201       127        0.0173594052
+bndcflux       204       138        0.0256862884
+bndcflux       135       117        0.0726827926
+bndcflux       169       133        0.047928782
+bndcflux       169       130        0.0384746212
+bndcflux       169        35        0.0480950509
+bndcflux       200       121        -0.0088923761
+bndcflux       200       130        0.0449497593
+bndcflux       200       133        0.0048118494
+bndcflux       133       121        -0.0110115944
+bndcflux       121       127        0.01001341
+bndcflux       130        23        0.0068431963
+bndcflux       203        41        -0.0163989347
+bndcflux       276       221        -0.0571918139
+bndcflux       276       214        -0.0240257665
+bndcflux       276       220        -0.0110447146
+bndcflux       221        35        0.0675587079
+bndcflux       275       215        0.0
+bndcflux       277       221        -0.0312834175
+bndcflux       277       220        -0.0042287541
+bndcflux       171        33          0.0621493766
+bndcflux        56        35        0.0052689756
+bndcflux        33        69        0.0177320409
+bndcflux       227        35        0.1139455221
+bndcflux        34       108        0.0188835441
+bndcflux        33        74        0.0256827304
+bndcflux        33        66        -0.0046970784
+bndcflux       223        66        0.0166025042
+bndcflux       255        34        0.0043259
+bndcflux       255        83        0.0588295801
+bndcflux       219        83        0.0428763907
+bndcflux        34        83        0.0079528263
+bndcflux       179        33         0.0109191936
+bndcflux        33        92          0.0525184631
+bndcflux        74        68        -0.0421594524
+bndcflux       108       109        -0.0347277078
+bndcflux       109       109        0.0
+bndcflux       179        53        -0.0136399137
+bndcflux        52        83        0.0174640296
+bndcflux       240        30        0.0147752332
+bndcflux        30        34        0.0050257966
+bndcflux       221        43        0.0164717158
+bndcflux        44        44        0.0
+bndcflux        19        44        0.0198860947
+bndcflux        20        44        0.0198860947
+bndcflux        45        45        0.0
+bndcflux        19        45        0.0336653367
+bndcflux        20        45        0.0336653367
+bndcflux       278       221        0.0
+bndcflux       279       222        0.0
+bndcflux       279       220        0.0
+bndcflux       279       215        0.0
+bndcflux        53        76        0.0
+bndcflux       170        53        0.0
+bndcflux        33        76        0.0
+bndcflux       276       215        0.0
+bndcflux       251        35        0.0
+bndcflux       251        34        0.0
+bndcflux       251        33        0.0
+bndcflux       258       171        -0.0146948246
+bndcflux       258        35        -0.0028168776
+bndcflux       170        33         0.0
+bndcflux       191       190        0.0
+bndcflux       240       141        0.0419465872
+bndcflux       142        30        0.0
+bndcflux       142       141        0.0133641318
+bndcflux       142        35        -0.0037498329
+bndcflux       141        34        0.0
+bndcflux        14        35        0.0867130082
+bndcflux        14        34        0.0867130082
+bndcflux        14        33        0.0867130082
+bndcflux        14        32        0.0867130082
+bndcflux        13        65        0.0118838659
+bndcflux        29        56        0.0011537837
+bndcflux        29        60        0.0051209208
+bndcflux        34        60        0.0016810703
+bndcflux        34        56        0.0052689756
+bndcflux        34        64        0.0004655881
+bndcflux        14        29        0.0380117317
+bndcflux        29        64        0.000352884
+bndcflux       153        31        -0.0024238151
+bndcflux       153        29        -0.0024485881
+bndcflux        54        29        0.0098658775
+bndcflux        19        54        0.0051843983
+bndcflux        20        54        0.0051843983
+bndcflux        54        35        0.0017114033
+bndcflux       228       117        0.0158026656
+bndcflux       199        29        0.0914843694
+bndcflux       199       117        0.0446865103
+bndcflux       199        24        0.0023981694
+bndcflux       199        35        0.0188881466
+bndcflux       219        48        0.0
+bndcflux       176        47        0.0237494452
+bndcflux       192        47        0.0010507311
+bndcflux       176        48        0.0
+bndcflux       176        92        0.0971991232
+bndcflux       176        24        0.0068649652
+bndcflux        47        47        0.0
+bndcflux        19        47        0.0636284543
+bndcflux        20        47        0.0636284543
+bndcflux        47        48        0.0
+bndcflux        47        92        0.0201271698
+bndcflux       176        35        0.0151443859
+bndcflux       176        29        0.0499641829
+bndcflux        47        29        0.006228896
+bndcflux       219        95        0.0613560533
+bndcflux       176        95        0.0350659122
+bndcflux        29        95        0.051082638
+bndcflux       176       103        0.0
+bndcflux        29       103        0.0116091991
+bndcflux       103        35        -0.0036511586
+bndcflux       179        95        0.0803701326
+bndcflux       174        43        0.0576930213
+bndcflux       174        95        0.058210409
+bndcflux        43        35        -0.0007513574
+bndcflux       169       159        0.0033046179
+bndcflux       169       118        0.0008579963
+bndcflux       200       159        -0.0132955581
+bndcflux       200       158        -0.007580435
+bndcflux       159       158        0.0355527748
+bndcflux       118       118        0.0
+bndcflux       206       200        0.0
+bndcflux       206       145        0.0
+bndcflux       206       161        0.0
+bndcflux       207       161        0.0438013772
+bndcflux       200       161        -0.0089972674
+bndcflux       145       146        -0.0275820873
+bndcflux       145        35        0.0009308615
+bndcflux       146       118        0.0085944249
+bndcflux       146        23        -0.0024725955
+bndcflux       240        29        0.027571247
+bndcflux       142       121        0.0164276204
+bndcflux       142        29        -0.0042576884
+bndcflux       121        29        -0.0097343433
+bndcflux       141        23        0.001294072
+bndcflux       269       163        0.0487541012
+bndcflux       269       152        0.0429502676
+bndcflux       200       162        -0.006879446
+bndcflux       209       163        -0.007094552
+bndcflux       209       151        -0.0289287386
+bndcflux       162       163        -0.0217474845
+bndcflux       162        29        -0.0001540459
+bndcflux       152       151        -0.0135831701
+bndcflux       152        23        -0.0063658362
+bndcflux       151        23        -0.0028842343
+bndcflux       230        29        0.0526425658
+bndcflux       230        34        0.053330339
+bndcflux       169       155        0.0075953249
+bndcflux       155       154        0.023646312
+bndcflux       155        29        0.0041881496
+bndcflux       154        29        -0.0158820007
+bndcflux       118        29        -0.0017826484
+bndcflux       202       155        0.0011429222
+bndcflux       155       120        0.0040163043
+bndcflux       120       120        0.0
+bndcflux       207       200        0.0336702142
+bndcflux       207       121        0.0333950087
+bndcflux       207       145        0.0416122548
+bndcflux       145        23        0.0039561541
+bndcflux       227        85        0.0187090048
+bndcflux       171        29        0.0714474948
+bndcflux       219       105        0.0020248877
+bndcflux        29       105        0.1177841381
+bndcflux       200       167        -0.0078458798
+bndcflux       166       167        0.0281999103
+bndcflux       166        29        0.0047067231
+bndcflux       167        29        -0.0067551805
+bndcflux        44        34        0.0027107313
+bndcflux       212        44        0.0054272237
+bndcflux       179        44        0.0069340946
+bndcflux        44        92        0.0139813788
+bndcflux        44        80        0.0139973817
+bndcflux       227        44        0.0061938442
+bndcflux        11        44        0.0134863228
+bndcflux        45        34        -0.0094341874
+bndcflux       223        46        0.0
+bndcflux       223        45        0.0259142442
+bndcflux        45        46        0.0
+bndcflux        45        35        -0.0094341874
+bndcflux        19        46        0.0
+bndcflux        20        46        0.0
+bndcflux       212        45        0.0079294627
+bndcflux       252        45        0.0212313692
+bndcflux        39        34        0.0024645184
+bndcflux       252        39        0.0094744597
+bndcflux       132        95        0.0321928623
+bndcflux       130        95        0.0434775886
+bndcflux       249       149        0.0266335705
+bndcflux       249       147        0.0411543018
+bndcflux       208       148        -0.0105264104
+bndcflux       208       147        -0.0034833965
+bndcflux       149       148        0.0009023403
+bndcflux       149        23        -0.0032728325
+bndcflux       148        23        -0.0071960093
+bndcflux       147        23        0.0023168671
+bndcflux       147        95        0.0240892965
+bndcflux       269       150        0.0934967521
+bndcflux       209       150        0.0083652765
+bndcflux       150        23        0.0014682466
+bndcflux       150        95        0.0213432677
+bndcflux       268       143        0.0439102273
+bndcflux       268        29        0.0754665125
+bndcflux       144        29        0.0025087053
+bndcflux       144       143        0.0103534296
+bndcflux       144        23        0.0011582888
+bndcflux       143        23        0.0
+bndcflux       143        95        0.0270638519
+bndcflux       143        74        0.0192650492
+bndcflux       141        95        0.0210498234
+bndcflux       142        23        0.0005070035
+bndcflux       179       143        0.0290229591
+bndcflux       179       141        0.0282640008
+bndcflux       207        28        0.0102635567
+bndcflux       230       145        0.0321841085
+bndcflux       230        35        0.053330339
+bndcflux       207        35        0.0206114471
+bndcflux       118        95        0.0211206678
+bndcflux       229        30        0.0095904531
+bndcflux        30       120        -0.0135082589
+bndcflux       230        30        0.0104438477
+bndcflux       197        30        0.0217342043
+bndcflux        11        30        0.0108296692
+bndcflux        12        30        0.007263076
+bndcflux       230       117        0.0318600224
+bndcflux       230        56        0.012427399
+bndcflux       230        60        0.0117872736
+bndcflux       226       117        0.0091856798
+bndcflux       203        34        0.0445990714
+bndcflux        29       119        0.0152245413
+bndcflux       203        44        0.0033938335
+bndcflux       203       122        -0.0001437901
+bndcflux       122        34        -0.0003575734
+bndcflux       135        34        -0.0027871334
+bndcflux        34       147        -0.0006805835
+bndcflux        34       150        -0.0058400756
+bndcflux        44        29        0.0048516223
+bndcflux        44       117        0.0110413455
+bndcflux        44       130        0.0091721524
+bndcflux        39        29        0.0051932467
+bndcflux       179        29        0.0242508372
+bndcflux       266       232        0.0
+bndcflux       266       233        -0.0265242884
+bndcflux       266       171        -0.0316571676
+bndcflux       266        29        -0.009456703
+bndcflux       265       232        0.0
+bndcflux       265       233        -0.0405045673
+bndcflux       265        34        -0.0016725272
+bndcflux       265        29        -0.0324007087
+bndcflux       266       132        -0.0281734908
+bndcflux       266       143        -0.0089250157
+bndcflux       265        56        0.0091580257
+bndcflux       265        60        1.0373e-06
+bndcflux       267       115        0.0186716036
+bndcflux       267       116        0.0341085104
+bndcflux       115       116        0.002455464
+bndcflux        19       115        0.0349610129
+bndcflux        20       115        0.0349610129
+bndcflux       116       116        0.0
+bndcflux        22       116        0.009132592
+bndcflux       248       115        0.0153021508
+bndcflux       248       116        0.023245565
+bndcflux        83        35        0.0079528263
+bndcflux       254        83        0.0399474231
+bndcflux       254        25        -0.0109146284
+bndcflux       251        74        0.0
+bndcflux       202       200        0.0
+bndcflux       200       200        0.0
+bndcflux       200       169        0.0
+bndcflux       244       243        0.0
+bndcflux       244        34        0.0
+bndcflux       243       100        0.0
+bndcflux       241       100        0.0
+bndcflux       100        35        0.0
+bndcflux       245       246        -0.0043482662
+bndcflux       245       101        0.0283859791
+bndcflux       242       101        0.0114352075
+bndcflux       246        17        -0.0004375903
+bndcflux        35       101        0.0104921074
+bndcflux       179        39        0.0
+bndcflux       172        39        0.0195962118
+bndcflux        39        92        0.006848279
+bndcflux       173        39        0.0
+bndcflux       173        27        0.0
+bndcflux       173        50        0.0
+bndcflux       173        34        0.0
+bndcflux       210       211        0.0074880205
+bndcflux       210       200        0.0067293704
+bndcflux       210        28        0.0072219333
+bndcflux       211       168        -0.0074463999
+bndcflux       200       168        -0.0019743618
+bndcflux       168        23        0.0007939212
+bndcflux       210       210        0.0
+bndcflux       175        43        0.0
+bndcflux       175        27        0.0
+bndcflux       174        29        0.0
+bndcflux       175        34        0.0
+bndcflux       175        35        0.0
+bndcflux       219        88        0.0
+bndcflux       225        88        0.0
+bndcflux       213        89        0.0
+bndcflux       219        89        0.0
+bndcflux       225        89        0.0
+bndcflux       219        81        0.0231449974
+bndcflux        43        81        0.0161976825
+bndcflux       219        94        0.0131050547
+bndcflux       174        94        0.0171221181
+bndcflux       174        24        0.0014248579
+bndcflux        43        94        0.0077715305
+bndcflux       227        41        0.0123139121
+bndcflux       227        82        0.0225308876
+bndcflux       219        82        0.0123067608
+bndcflux        39        82        0.0036213968
+bndcflux       227        49        0.0164232728
+bndcflux       227        81        0.0384733053
+bndcflux        34        62        0.009586943
+bndcflux       171        43        -1.24803e-05
+bndcflux        52        34        0.0003890138
+bndcflux        80        80        0.0
+bndcflux        68        35        -0.0088332539
+bndcflux        33        83        0.0079528263
+bndcflux        34        87        0.0082900752
+bndcflux       170        43        0.0
+bndcflux       174        35        0.0181110302
+bndcflux       221        33        0.0675587079
+bndcflux       225        34        0.0121743088
+bndcflux        29        74        0.0144699906
+bndcflux       203        33        0.0445990714
+bndcflux       119        35        -0.0006060908
+bndcflux        29       123        0.0024047182
+bndcflux       202       157        0.0012882106
+bndcflux       200       157        0.0007212837
+bndcflux       200       156        -0.0059019137
+bndcflux       157       156        0.0094539085
+bndcflux       156        29        0.0020172632
+bndcflux       207       160        -1.06373e-05
+bndcflux       207       118        6.0804e-06
+bndcflux       200       145        -0.0003520707
+bndcflux       200       160        -6.72e-07
+bndcflux       160        29        -6.219e-06
+bndcflux        33       147        -0.0006805835
+bndcflux        33       150        -0.0058400756
+bndcflux       240       165        0.0031918748
+bndcflux       200       164        -0.0009339827
+bndcflux       164       165        -0.0067005251
+bndcflux       164        29        -0.0038884253
+bndcflux       165       142        8.96855e-05
+bndcflux        39        35        0.0024645184
+bndcflux        39       117        0.0039266984
+bndcflux       141        29        -0.0014803662
+bndcflux       144        35        -0.0024830305
+bndcflux       143        29        -0.0056774455
+bndcflux       143        73        0.0134648183
+bndcflux       116        35        -0.0024092595
+bndcflux        33       101        0.0104921074
+bndcflux        34       100        0.0
+bndcflux       173        35        0.0
+angcflux   16   15   16   0.0   0.0   0.0   0.0
+angcflux   18   36   18   0.0001694804   0.0001694804   0.0014996547   0.0014996547
+angcflux   24   177   24   0.0003337792   0.0003337792   -0.0003245472   -0.0003245472
+angcflux   24   171   24   -0.0156406731   -0.0156406731   0.0129216111   0.0129216111
+angcflux   24   171   35   -0.1235022905   -0.0724597152   -0.0042352694   -0.033099263
+angcflux   21   35   171   -0.1570685666   -0.0647202648   0.0559020909   0.027420173
+angcflux   21   35   21   0.0535153113   0.0535153113   -0.0115340793   -0.0115340793
+angcflux   17   212   35   -0.0316174421   -0.0570778939   0.0058386802   -0.0581945762
+angcflux   21   35   212   0.02161645   -0.0066079256   0.008852125   0.0073958676
+angcflux   21   35   92   -0.0097665974   -0.0627148578   -0.0144851793   -0.0037321951
+angcflux   35   92   219   0.0397088572   -0.0002201757   0.0084220927   -0.0326595196
+angcflux   35   92   179   0.0273190231   -0.0097532181   0.0193698799   0.0361540337
+angcflux   179   92   219   -0.0471336052   -0.0232507891   0.1067260647   0.1119216799
+angcflux   172   92   219   0.0094270668   9.36248e-05   0.0204401095   0.0207403531
+angcflux   24   179   92   -0.0119134777   -0.0239800944   -0.0529090808   -0.0438513774
+angcflux   35   179   92   -0.0538140223   -0.0225801529   -0.0157676617   -0.0385999452
+angcflux   24   179   35   0.0002034667   0.003567689   -0.0063177857   -0.014130411
+angcflux   21   35   179   0.0711115761   -0.0012391141   0.022428213   0.0096938413
+angcflux   213   80   219   0.0966237871   -0.0213025827   0.0921447267   0.0825813466
+angcflux   35   80   219   0.0739213927   0.0968744994   0.0306762169   -0.0158316346
+angcflux   35   80   213   0.0397721071   0.0283200304   -0.0044711999   0.0114884299
+angcflux   17   213   80   -0.0346114882   -0.0062663267   -0.0256649215   -0.0088717975
+angcflux   21   35   80   -0.0080013386   -0.0256279216   -0.0029479312   -0.0126890345
+angcflux   24   179   24   -0.0201819251   -0.0201819251   0.0051025451   0.0051025451
+angcflux   28   204   137   -0.0196705371   -0.0168614846   -0.0047599791   -0.0016151372
+angcflux   28   204   139   9.15886e-05   -0.0043678685   -0.0004869876   0.0010127137
+angcflux   137   204   139   0.002828675   -0.0059634309   -0.001728701   -0.0089791659
+angcflux   204   137   226   0.0170285054   0.0058571378   0.0409424675   0.0344718384
+angcflux   135   137   204   0.04240269   0.0301234944   -0.0135809698   -0.0061724978
+angcflux   135   137   226   0.0495847846   -0.0243345337   0.0486794053   0.0481791446
+angcflux   23   135   137   -0.0135116121   -0.0248860191   -0.0006404545   0.0153414247
+angcflux   123   135   137   -0.0020529643   -0.0006347817   -0.0044897727   -0.0096765015
+angcflux   23   135   123   0.0016880916   -0.003127792   -0.0008545028   0.0014022761
+angcflux   23   123   135   0.0035211168   0.0001028063   0.0003775932   0.0031298
+angcflux   135   123   203   0.007775042   -0.0015099745   -0.0013597415   0.0093692933
+angcflux   23   123   203   0.0040384021   0.0181505288   0.0070234826   -0.0126631334
+angcflux   28   203   123   -0.0109011485   -0.0032623668   -0.0002518801   -0.0203182398
+angcflux   123   203   139   0.0001214219   -0.0088652906   -0.0033079191   0.0002722669
+angcflux   28   203   139   0.0006404118   -0.0046517509   -0.0066268111   -0.0016348763
+angcflux   203   139   204   -0.0009789698   0.0043069036   5.25895e-05   0.0003379346
+angcflux   204   139   226   -0.0018644797   0.001406001   0.0120988516   0.0014863027
+angcflux   203   139   226   0.0028852078   0.0012521303   0.0099523232   0.0028617303
+angcflux   117   200   117   -0.1153361085   -0.1153361085   -0.0597986242   -0.0597986242
+angcflux   23   117   200   -0.0520521647   -0.0023088026   0.0421196984   -0.0146028535
+angcflux   29   117   200   0.0553982205   0.1235624413   -0.0139226928   -0.0607108754
+angcflux   23   117   29   -0.0208509486   -0.0277366329   -0.0415562769   0.0172161068
+angcflux   23   29   117   0.0008027043   -0.037475958   -0.0100198674   0.0816476041
+angcflux   29   29   117   0.0639461906   -0.1660902499   -0.0404569562   -0.1063945191
+angcflux   23   29   29   0.0071222987   -0.0028663293   -0.0025476914   -0.0618289016
+angcflux   29   29   29   0.0280490949   0.0280490949   -0.0848482887   -0.0848482887
+angcflux   22   66   22   0.0082069971   0.0082069971   0.0008397546   0.0008397546
+angcflux   22   66   66   0.0419133212   -0.008363751   -0.0031547699   -0.0152541637
+angcflux   21   35   34   0.0090836035   0.0262341321   0.0343924896   -0.0437575063
+angcflux   20   34   35   0.0815727586   0.0266705354   -0.0376987747   -0.0352713244
+angcflux   34   34   35   0.0075737647   0.0075737647   -0.0424538238   -0.0424538238
+angcflux   20   34   20   0.0657907668   0.0657907668   -0.0017744249   -0.0017744249
+angcflux   20   34   34   0.0815727586   0.0266705354   -0.0376987747   -0.0352713244
+angcflux   34   34   34   0.0075737647   0.0075737647   -0.0424538238   -0.0424538238
+angcflux   35   32   35   0.0075737647   0.0075737647   -0.0424538238   -0.0424538238
+angcflux   21   35   32   0.0090836035   0.0262341321   0.0343924896   -0.0437575063
+angcflux   20   39   20   0.0432907448   0.0432907448   0.0077943195   0.0077943195
+angcflux   19   39   39   0.0296240706   0.0591226044   0.0156408463   -0.0005301731
+angcflux   20   39   39   0.0296240706   0.0591226044   0.0156408463   -0.0005301731
+angcflux   39   39   39   -0.0088314173   -0.0088314173   0.0013219241   0.0013219241
+angcflux   21   35   253   -3.11897e-05   -0.0015114757   0.0002377473   -0.0006175359
+angcflux   25   253   35   0.0058994534   0.0017323971   -0.0013353966   -0.0014710344
+angcflux   21   35   257   -0.0001928205   -0.0023607477   0.0002442008   -0.0079020751
+angcflux   35   257   232   0.0037760894   -0.0021430955   0.019807303   0.0235342242
+angcflux   35   257   35   0.0130699225   0.0130699225   -0.0089319462   -0.0089319462
+angcflux   11   29   29   0.0374114333   -0.0129389121   0.0279011114   0.0285209263
+angcflux   12   29   29   0.0457093917   -0.0246901582   0.0329067512   0.0257984831
+angcflux   13   29   29   0.0801494176   -0.0240337898   0.0593931389   0.039694397
+angcflux   21   35   252   -6.2614e-06   0.0013743289   0.0001117291   0.0015062093
+angcflux   35   252   35   -0.0025992805   -0.0025992805   0.0007513509   0.0007513509
+angcflux   124   118   200   0.0212731452   0.005704613   0.005662018   -0.0029212299
+angcflux   23   118   124   0.0081397881   -0.0017072836   0.0020517317   -0.0089799002
+angcflux   23   118   200   -0.0590879862   0.0392526588   -0.007405752   -0.0080153964
+angcflux   118   124   202   -0.0004144802   -0.0003466121   0.0190881609   0.0137315982
+angcflux   23   124   118   0.0149339772   -0.0048384535   -0.0002717888   -0.0012645458
+angcflux   23   124   202   0.0735283323   0.0007512609   -0.0054532662   -0.0302234564
+angcflux   124   202   132   -0.0241063579   0.029342275   0.0047670728   0.0403229198
+angcflux   28   202   124   -0.1057344222   -0.0089961439   -0.037430922   -0.0610023635
+angcflux   28   202   132   -0.0276314578   -0.0483295244   -0.0130408635   -0.0189559385
+angcflux   200   132   202   -0.0320136827   -0.0261017848   0.0076504128   0.0326211928
+angcflux   23   132   202   0.0079862787   -0.0053843419   -0.0021549544   -0.0001196651
+angcflux   23   132   200   0.0104868611   -0.0062229101   -0.0003174805   -0.0039524117
+angcflux   118   200   132   -0.0340082596   0.0332742953   -0.003636265   0.0142773876
+angcflux   50   172   50   -0.0022453873   -0.0022453873   -0.0011611417   -0.0011611417
+angcflux   24   172   50   0.0004274935   -0.0002634369   0.0005839844   -0.001116608
+angcflux   39   50   172   0.002817119   0.0001732162   0.0020853748   0.001092714
+angcflux   19   50   172   0.0099529976   -0.0017730282   0.0034588792   0.0038371731
+angcflux   20   50   172   0.0099529976   -0.0017730282   0.0034588792   0.0038371731
+angcflux   19   50   39   0.0028405271   0.0051443176   8.26401e-05   -0.0008615473
+angcflux   20   50   39   0.0028405271   0.0051443176   8.26401e-05   -0.0008615473
+angcflux   20   50   20   0.0039395948   0.0039395948   -1.04209e-05   -1.04209e-05
+angcflux   39   39   50   -0.0001139698   -0.0027709667   -3.39998e-05   0.0006700057
+angcflux   19   39   50   9.64112e-05   -0.0033034488   2.52428e-05   -0.0012448211
+angcflux   20   39   50   9.64112e-05   -0.0033034488   2.52428e-05   -0.0012448211
+angcflux   29   29   229   0.0643078826   -0.0166493934   0.0848402877   0.0655741449
+angcflux   17   229   29   -0.0244445779   0.0098782945   -0.0162295095   -0.0333461705
+angcflux   122   202   124   -0.009258187   0.0045355482   0.0026137548   -0.0041036316
+angcflux   28   202   122   0.0081416085   -0.0055538905   -0.008359996   -0.0042421637
+angcflux   29   29   31   0.0147892983   -0.0129654429   -0.0006194398   -0.0061194375
+angcflux   23   29   31   -0.0184444267   -0.0029827803   0.0035817341   0.0067494686
+angcflux   29   29   120   -0.0016336402   0.0009989352   -0.0013164861   9.67152e-05
+angcflux   23   29   120   -0.0003131679   -9.18819e-05   0.0002745804   -0.0007974689
+angcflux   29   120   122   0.0032133493   4.033e-06   7.50089e-05   -0.0017209366
+angcflux   23   120   29   0.0006927213   3.86874e-05   0.0027761927   0.0010087021
+angcflux   23   120   122   -0.0061241528   0.0015755588   0.0008600724   0.0048590468
+angcflux   120   122   202   -0.0006858761   -0.0006635793   0.0051863889   0.004753919
+angcflux   31   122   202   -0.0023416895   -0.0016532577   0.0102481139   0.0097531524
+angcflux   31   122   120   0.0003424452   0.0059748157   -0.0081131435   -0.0095824163
+angcflux   29   31   122   0.000550367   0.0005263073   -0.0082289209   -0.010766192
+angcflux   29   31   120   -0.0090747819   0.0058340158   0.0013313229   -0.0037657231
+angcflux   120   31   122   -0.0034315026   -0.0040767289   -0.0004880089   0.0085153544
+angcflux   31   120   124   -0.0033527233   0.0036847992   -1.16165e-05   -0.0010724768
+angcflux   23   120   31   0.0033529698   0.0002745347   0.000538832   1.65653e-05
+angcflux   23   120   124   0.0189442787   -0.0037700699   -0.0037334665   -0.0056179487
+angcflux   120   124   202   -0.0006059756   0.0387496984   0.0014405129   0.0429587371
+angcflux   23   124   120   0.0006227611   -0.0034748388   -0.0012112409   0.0037201689
+angcflux   11   55   11   0.0027929817   0.0027929817   0.0100146418   0.0100146418
+angcflux   11   55   19   0.0277253098   0.0003517757   0.0021932099   0.0021349252
+angcflux   11   55   20   0.0277253098   0.0003517757   0.0021932099   0.0021349252
+angcflux   20   55   20   0.0032637569   0.0032637569   -0.0013982746   -0.0013982746
+angcflux   12   59   12   0.0002892246   0.0002892246   0.0158745962   0.0158745962
+angcflux   12   59   19   0.0384436154   5.90308e-05   0.0008886469   0.0006912404
+angcflux   12   59   20   0.0384436154   5.90308e-05   0.0008886469   0.0006912404
+angcflux   20   59   20   0.0013728681   0.0013728681   -0.0006519718   -0.0006519718
+angcflux   13   63   13   -8.1083e-06   -8.1083e-06   0.0166517354   0.0166517354
+angcflux   13   63   19   0.0395666504   5.29164e-05   0.000864092   0.0005432695
+angcflux   13   63   20   0.0395666504   5.29164e-05   0.000864092   0.0005432695
+angcflux   20   63   20   0.0012176129   0.0012176129   -0.0005717947   -0.0005717947
+angcflux   11   35   21   0.0013632955   -0.0088364951   0.0025053473   0.010130116
+angcflux   12   58   19   0.0511990521   -0.0013465645   0.0218873312   0.0005236642
+angcflux   12   58   20   0.0511990521   -0.0013465645   0.0218873312   0.0005236642
+angcflux   12   58   21   0.0240236604   -0.005022957   0.0089688261   0.0058676075
+angcflux   20   58   20   0.0005138598   0.0005138598   5.94214e-05   5.94214e-05
+angcflux   21   58   21   0.0095749437   0.0095749437   -0.0040782675   -0.0040782675
+angcflux   13   62   19   0.0567919009   0.0003413001   0.0086218491   0.0016504724
+angcflux   13   62   20   0.0567919009   0.0003413001   0.0086218491   0.0016504724
+angcflux   13   62   21   0.0280163722   -0.0049496207   0.0080315941   0.0050866363
+angcflux   20   62   20   0.0042939777   0.0042939777   -0.0014419777   -0.0014419777
+angcflux   21   62   21   0.0073480413   0.0073480413   -0.0031608163   -0.0031608163
+angcflux   214   272   215   0.0   0.0   0.0   0.0
+angcflux   214   272   220   0.0   0.0   0.0   0.0
+angcflux   215   272   215   0.0   0.0   0.0   0.0
+angcflux   215   272   220   0.0   0.0   0.0   0.0
+angcflux   220   272   220   0.0   0.0   0.0   0.0
+angcflux   17   214   272   0.0   0.0   0.0   0.0
+angcflux   214   273   215   0.0   0.0   0.0   0.0
+angcflux   215   273   220   0.0   0.0   0.0   0.0
+angcflux   220   273   220   0.0   0.0   0.0   0.0
+angcflux   214   273   220   0.0   0.0   0.0   0.0
+angcflux   214   273   214   0.0   0.0   0.0   0.0
+angcflux   17   214   273   0.0   0.0   0.0   0.0
+angcflux   214   274   214   0.0092749258   0.0092749258   0.0038791702   0.0038791702
+angcflux   214   274   220   0.0032898657   0.0029539282   0.0104433345   0.0079979769
+angcflux   17   214   274   -0.0103907624   -8.52136e-05   -0.0057611846   -0.0034162249
+angcflux   27   170   27   0.0   0.0   0.0   0.0
+angcflux   27   170   35   0.0   0.0   0.0   0.0
+angcflux   21   35   170   0.0   0.0   0.0   0.0
+angcflux   66   66   172   0.0   0.0   0.0   0.0
+angcflux   22   66   172   0.0   0.0   0.0   0.0
+angcflux   51   172   66   0.0   0.0   0.0   0.0
+angcflux   24   172   66   0.0   0.0   0.0   0.0
+angcflux   24   172   51   0.0   0.0   0.0   0.0
+angcflux   172   51   172   0.0   0.0   0.0   0.0
+angcflux   19   51   172   0.0   0.0   0.0   0.0
+angcflux   20   51   172   0.0   0.0   0.0   0.0
+angcflux   193   107   193   0.0002416791   0.0002416791   0.0059483229   0.0059483229
+angcflux   27   193   107   -0.0060429619   0.0039155784   -0.0001554468   -0.0018369966
+angcflux   27   193   27   0.0033649977   0.0033649977   -0.0001187986   -0.0001187986
+angcflux   21   35   76   0.0   0.0   0.0   0.0
+angcflux   35   76   225   0.0   0.0   0.0   0.0
+angcflux   225   76   225   0.0   0.0   0.0   0.0
+angcflux   22   102   193   -0.0012035183   0.1122649088   -0.0021153468   0.0023790761
+angcflux   193   102   193   -0.0016734511   -0.0016734511   0.0615870863   0.0615870863
+angcflux   24   193   102   0.114101324   -0.0627999637   -0.0232317522   -0.0555458174
+angcflux   24   193   24   -0.0376378546   -0.0376378546   0.0060319968   0.0060319968
+angcflux   22   92   219   0.0034491474   -0.0008478913   -0.0063118918   0.001144708
+angcflux   22   92   179   0.0007813075   0.0011244685   -0.0015690761   -0.0004178377
+angcflux   22   80   219   -0.0242173222   0.025527074   0.0008845466   -0.0079533332
+angcflux   22   80   213   0.0652665937   0.0073777649   0.0057409326   -0.0005181485
+angcflux   21   35   35   0.0090836035   0.0262341321   0.0343924896   -0.0437575063
+angcflux   35   34   212   0.0727756966   -0.0103347593   0.072635027   0.0147928497
+angcflux   20   34   212   0.0708220643   -0.0391608949   0.0343589104   0.0117838161
+angcflux   17   212   34   -0.0316174421   -0.0570778939   0.0058386802   -0.0581945762
+angcflux   21   35   30   0.014108396   0.0013651377   0.0058502088   -0.0042293911
+angcflux   30   31   122   -0.0025462189   -0.0052995799   0.0062785408   -0.0049467249
+angcflux   29   31   30   0.003910921   -0.0086645642   -0.0002271187   0.0073338681
+angcflux   31   30   35   0.0046973362   -0.0011402128   0.002685248   0.0014323751
+angcflux   35   30   124   0.005022344   -0.0065055104   0.0021934309   0.0063092216
+angcflux   31   30   124   -0.0013698912   0.0090287191   -0.0012222151   -0.007982248
+angcflux   30   124   202   -0.0471550104   0.0011840254   -0.0131005361   -0.0002009377
+angcflux   23   124   30   -0.0064548246   -0.0041088006   -0.0019963749   0.0047477807
+angcflux   21   35   194   0.0   0.0   0.0   0.0
+angcflux   193   107   194   0.0011598548   0.0059125592   -0.000209531   -1.51645e-05
+angcflux   35   194   107   -9.55717e-05   -0.000465578   -0.0002110945   8.40356e-05
+angcflux   27   194   35   -0.0001003014   -0.0013264129   -2.93547e-05   0.0002408343
+angcflux   27   194   107   -0.0018439422   -0.0043149004   9.33128e-05   0.0013619274
+angcflux   21   35   118   -9.3869e-06   0.0017259737   6.43551e-05   -0.0053613159
+angcflux   35   118   124   0.0040144025   -0.0031409461   0.0017269888   0.0040028971
+angcflux   35   118   200   0.0045881407   -0.0028004247   -4.59685e-05   0.0031589239
+angcflux   35   33   35   0.0075737647   0.0075737647   -0.0424538238   -0.0424538238
+angcflux   35   33   212   0.0727756966   -0.0103347593   0.072635027   0.0147928497
+angcflux   19   33   35   0.0815727586   0.0266705354   -0.0376987747   -0.0352713244
+angcflux   19   33   212   0.0708220643   -0.0391608949   0.0343589104   0.0117838161
+angcflux   21   35   33   0.0090836035   0.0262341321   0.0343924896   -0.0437575063
+angcflux   17   212   33   -0.0316174421   -0.0570778939   0.0058386802   -0.0581945762
+angcflux   19   108   108   0.0   0.0   -0.0002401896   -0.0027347046
+angcflux   117   200   127   0.0022281313   -0.0059487142   0.0011087648   -0.0049255806
+angcflux   29   127   200   0.0019212856   0.0088604439   -0.005811481   -0.0084853656
+angcflux   197   127   200   0.0180363102   0.0010842284   0.0047935992   0.0203676786
+angcflux   29   127   197   0.0551878622   -0.0105572354   0.0451104575   0.0314935326
+angcflux   29   29   127   0.0058131846   -0.0056948996   3.76948e-05   -0.0032123469
+angcflux   23   29   127   -0.0336482191   -0.0445056   0.0003521575   0.0157273825
+angcflux   24   197   127   0.0147955214   -0.0694093844   -0.0025759676   -0.0590995039
+angcflux   24   197   24   0.22406984   0.22406984   -0.0044621871   -0.0044621871
+angcflux   123   203   137   0.0030542325   -0.0084111267   -0.0095946385   -0.0091144212
+angcflux   28   203   137   -0.0143316146   -0.0052151954   -0.0108957098   0.0118161319
+angcflux   120   119   135   -0.001545403   0.0017290616   0.002430474   0.0009055858
+angcflux   23   119   120   0.0001197421   0.0001146113   -3.9468e-05   -6.4966e-06
+angcflux   23   119   135   0.0183907154   -0.0021300827   -0.0004779397   -0.003815362
+angcflux   119   120   123   0.003361525   -0.0069856887   -0.0035364219   1.31882e-05
+angcflux   23   120   119   6.0783e-05   5.93395e-05   -7.67771e-05   6.7004e-06
+angcflux   23   120   123   0.0070703191   -0.0030653509   -6.64324e-05   -0.0022945398
+angcflux   120   123   203   0.0067601206   -0.0055402979   0.0029248854   0.0117653431
+angcflux   23   123   120   0.0164663217   -0.0076881734   -0.0047156321   0.0032107859
+angcflux   203   137   226   0.0075694829   -0.0113898635   0.0285305331   0.02244829
+angcflux   135   137   203   0.0230583686   0.0208319005   -0.0189048763   -0.0173070549
+angcflux   119   135   137   -0.0115826602   0.0050883972   -0.0066436001   -0.0122158857
+angcflux   23   135   119   -0.0081932152   0.0078622019   -0.0028862333   -0.0086821861
+angcflux   25   250   25   0.0009382411   0.0009382411   -1.43532e-05   -1.43532e-05
+angcflux   117   117   200   -0.0013234947   0.0002805428   -0.0003837174   -0.0016537917
+angcflux   23   117   117   -7.06294e-05   -0.0002929943   0.0002130736   0.0015142689
+angcflux   35   135   123   0.0023096274   -0.0032300907   -0.000228971   0.0014313261
+angcflux   35   135   137   -0.0183018504   -0.0046692021   0.0076898566   0.0027560699
+angcflux   21   35   135   0.004823921   0.0016052699   0.0041783376   -0.0028363151
+angcflux   104   195   106   0.0045244827   -0.0119467539   -0.0005656784   -0.0175327119
+angcflux   125   104   195   0.0108154832   0.0194459049   -0.0045726157   -0.0113277069
+angcflux   171   104   195   -0.0034944441   0.0092273578   0.0125411943   0.0176219005
+angcflux   125   104   171   -0.0135239502   0.0205187599   0.0226892502   0.0115514999
+angcflux   104   125   129   0.0081362184   -0.0140177628   -0.0071964565   -0.0117861585
+angcflux   104   125   200   -0.0130209469   -0.0027598917   -0.0019615883   0.0021239987
+angcflux   129   125   200   -0.0055576675   -0.0003615013   0.0028972845   0.00341617
+angcflux   125   129   196   0.0045383209   0.0022817928   0.0008295951   -0.001563358
+angcflux   125   129   202   -0.001498697   -0.0002358578   0.000680156   0.0065350992
+angcflux   196   129   202   -0.0038238745   0.0076173395   0.0021335745   -0.0009972887
+angcflux   106   196   129   0.0025635183   -0.0049430793   -0.0004899497   0.0010789918
+angcflux   195   106   196   0.0014509922   -0.0011201734   0.0008320471   0.000804568
+angcflux   22   106   195   -0.0011218767   0.0003321403   0.0005381682   0.0003947854
+angcflux   22   106   196   0.0003746508   -0.0001471144   0.0003647232   0.0004663024
+angcflux   125   200   132   0.0008426275   0.0017657225   3.62852e-05   0.0026315458
+angcflux   129   202   132   -0.0027871583   0.0003394819   -3.38929e-05   -0.0011056975
+angcflux   28   202   129   0.0027531518   -0.0015496893   -0.0012455965   -0.0013239576
+angcflux   24   171   104   -0.0170310892   0.0091124154   -0.0127396186   -0.025700333
+angcflux   22   70   219   0.0001195847   0.0005453802   0.0013795442   0.0028776183
+angcflux   22   70   22   0.0001155548   0.0001155548   0.0005093509   0.0005093509
+angcflux   21   35   110   1.7122e-06   0.002210384   -0.0002886702   0.0091077513
+angcflux   35   110   187   -0.0015547026   -0.0002564463   -0.0223847711   -0.0285250811
+angcflux   35   171   35   -0.2039206513   -0.2039206513   -0.0585506052   -0.0585506052
+angcflux   35   170   35   0.0   0.0   0.0   0.0
+angcflux   35   34   253   0.0065598561   -0.0014647929   0.0098837949   7.02306e-05
+angcflux   20   34   253   0.0515916962   0.0033528444   0.0086535147   -0.0061561437
+angcflux   25   253   34   0.0058994534   0.0017323971   -0.0013353966   -0.0014710344
+angcflux   21   35   29   -0.0449154229   -0.0139994091   0.0375640912   0.0117182462
+angcflux   29   29   35   0.0256379489   -0.0714718972   -0.0075283104   -0.0149926054
+angcflux   35   74   219   0.0263640585   0.0532897621   0.0137820596   0.0130864839
+angcflux   35   74   35   0.0220935272   0.0220935272   0.0153820867   0.0153820867
+angcflux   21   35   74   -0.0185101849   -0.0145536328   -0.0038766475   -0.0174489226
+angcflux   43   43   43   -0.0100863717   -0.0100863717   -0.0251698845   -0.0251698845
+angcflux   19   43   43   -0.0079585004   -0.0022523958   0.0055886887   -0.0344089004
+angcflux   20   43   43   -0.0079585004   -0.0022523958   0.0055886887   -0.0344089004
+angcflux   20   43   20   0.0152812307   0.0152812307   0.0226862977   0.0226862977
+angcflux   35   223   35   -0.012614463   -0.012614463   -0.0349849444   -0.0349849444
+angcflux   21   35   223   0.0357089039   -0.0061001858   0.0149221862   0.0174110148
+angcflux   29   31   29   0.0375764043   0.0375764043   -0.0024286874   -0.0024286874
+angcflux   29   31   31   0.0073252338   -0.004259458   0.0062555321   -0.001930497
+angcflux   203   140   226   0.0365627806   -0.0262478268   0.0149088159   0.003152148
+angcflux   136   140   226   0.0259706404   -0.0316120097   0.0336495296   0.0453214024
+angcflux   136   140   203   0.0683789368   0.0460996437   -0.0086652583   -0.0336853369
+angcflux   134   203   140   0.0530987138   -0.0621892312   0.0279981224   -0.023578953
+angcflux   28   203   140   -0.0527803139   -0.0102496214   0.0661361673   0.0193542978
+angcflux   28   203   134   0.0022154905   0.0061228764   -0.0449222021   -0.0133326786
+angcflux   201   134   203   0.0040623036   -0.0043859626   -0.0211970607   0.0183446953
+angcflux   197   134   203   -0.0340115108   0.0632880484   -0.0010071736   -0.0246995121
+angcflux   197   134   201   0.0243167533   -0.0460232778   0.0092967857   0.052653488
+angcflux   133   201   134   -0.0477323678   0.0007242077   -0.0361230096   -0.0289926001
+angcflux   136   133   201   -0.0006081145   0.026827238   -0.011831785   0.0322791671
+angcflux   201   133   202   -0.0042512295   0.0055316933   0.0035156087   0.0066889965
+angcflux   136   133   202   0.0025838359   0.0057531401   -0.0013698392   0.0022227348
+angcflux   133   136   140   0.0084836681   -0.0041015907   -0.014180456   -0.0395684032
+angcflux   140   136   200   -0.0174518384   -0.0293499887   -0.0168094988   0.0078914595
+angcflux   133   136   200   -0.0298628428   0.0037651403   0.0218854274   0.0125819397
+angcflux   132   200   136   0.0035241909   0.0008951316   0.0045881154   0.0094701121
+angcflux   132   202   133   0.0023866645   -0.008112764   0.0001440857   -0.0030126316
+angcflux   28   202   133   -0.0009735956   -0.0034508272   -0.0039672585   -0.0001328667
+angcflux   24   197   134   0.2112349214   0.2178672063   0.0035049568   -0.0190637667
+angcflux   34   223   34   -0.012614463   -0.012614463   -0.0349849444   -0.0349849444
+angcflux   35   34   223   0.021885893   -0.0008651471   0.0187043637   0.0393600552
+angcflux   20   34   223   0.0623109433   -0.0022828333   0.0228896327   0.0144830662
+angcflux   21   35   69   4.10407e-05   -0.0005114187   -3.3704e-05   -0.0069405665
+angcflux   35   69   219   -0.0049855877   0.0006074606   0.0143913359   0.0157635807
+angcflux   22   69   219   0.0206511182   -0.0038012338   0.0047641333   0.007441063
+angcflux   22   69   35   0.0240923236   0.0022143241   0.0051504766   -0.0032014997
+angcflux   128   203   138   -0.006076918   -0.0119730451   -0.0216041594   -0.0270804771
+angcflux   28   203   128   -0.0336655647   -0.0244666045   0.0033006537   0.0042124529
+angcflux   28   203   138   -0.0623159603   0.010528571   -0.0044842903   -0.0013330967
+angcflux   24   197   128   -0.0894149938   0.0175249219   -0.0010291164   -0.0366988437
+angcflux   117   200   138   0.0001677696   -0.0132956448   0.0086116305   -0.0340082092
+angcflux   197   128   203   -0.029813207   0.0697364822   0.028468074   0.0255915908
+angcflux   120   128   203   0.0321198825   0.0237271169   -0.0128445584   -0.0067251306
+angcflux   120   128   197   -0.0208011275   0.0161833827   0.0257633954   0.0263397018
+angcflux   117   120   128   0.0012449377   -0.0189868988   0.0097688426   -0.0276355481
+angcflux   23   120   128   -0.0024290982   -0.0073621784   -0.0049783891   0.0075627499
+angcflux   23   120   117   0.0102504646   -0.0058521622   0.0090564667   -0.0056137525
+angcflux   203   138   226   0.0418444021   0.0069505919   0.048740501   0.0579165728
+angcflux   200   138   226   0.0156447836   0.012063269   0.0304186567   0.0128564888
+angcflux   200   138   203   0.0438677327   0.004805024   -0.0278783908   0.0019054165
+angcflux   120   117   200   0.0095009511   -0.0064738165   0.0068501152   0.0357300272
+angcflux   23   117   120   -0.0068072944   0.014155698   -0.0026870654   -0.0088961218
+angcflux   29   29   228   -0.0303884598   0.0181515644   0.0317155383   -0.0260133551
+angcflux   24   197   29   -0.0735953927   0.077937326   -0.000688035   -0.0780603846
+angcflux   29   29   197   0.0652718684   -0.1678618651   0.1425711823   0.0995921186
+angcflux   11   57   11   0.0270832337   0.0270832337   0.0120022024   0.0120022024
+angcflux   12   61   12   0.0271390928   0.0271390928   0.0164504413   0.0164504413
+angcflux   11   56   11   0.0982027924   0.0982027924   0.0172117597   0.0172117597
+angcflux   11   56   19   0.0148451176   0.0005235587   0.0004124399   3.39195e-05
+angcflux   12   60   12   0.0443721898   0.0443721898   0.0413356697   0.0413356697
+angcflux   12   60   19   0.0201012834   -0.0005122642   0.0001771444   -0.0002013723
+angcflux   13   64   13   0.0304069266   0.0304069266   0.0347915976   0.0347915976
+angcflux   13   64   19   0.0209210445   -0.0007407064   5.2749e-05   -0.0003289637
+angcflux   80   227   87   0.0083791094   -0.0052762674   -0.0052937431   -0.0044287632
+angcflux   219   87   227   0.0099275379   0.0049294443   -0.0032364892   -0.0017997596
+angcflux   35   87   227   -0.0078328928   0.0086831589   0.0045420686   0.0038760164
+angcflux   35   87   219   -0.0021466244   0.0056311367   0.0027021214   0.0049160425
+angcflux   219   80   227   0.0852297032   0.0275046059   0.0985746137   0.050436925
+angcflux   35   80   227   0.0857467408   0.0003720795   0.0206412177   0.0997832244
+angcflux   21   35   87   0.0   0.0   0.0   0.0
+angcflux   17   225   96   -0.002992303   -0.0121848936   -0.0022925915   -0.0024271286
+angcflux   24   180   96   0.0363514341   -0.0294423456   -0.0093418715   -0.0197337255
+angcflux   24   180   24   -0.0001758402   -0.0001758402   -0.0008562847   -0.0008562847
+angcflux   219   96   225   0.0037732961   0.0252371375   0.0258372631   0.0272262492
+angcflux   180   96   225   0.0289900484   0.0395123836   -0.0045207501   -0.0167812078
+angcflux   180   96   219   0.0176728631   0.0148634016   0.0223397986   0.0186926166
+angcflux   24   171   34   -0.1235022905   -0.0724597152   -0.0042352694   -0.033099263
+angcflux   34   34   171   0.0111967485   0.0026334719   0.0155483448   0.0304159943
+angcflux   20   34   171   0.0749216857   -0.0068872902   0.0166056374   0.0168014023
+angcflux   122   202   132   -0.0006097583   -0.0022090723   0.0005693485   0.0002493003
+angcflux   35   122   202   -0.00194016   0.0034714092   -0.0023888893   -0.0032166455
+angcflux   118   122   202   0.0005260612   0.0017415189   -0.0023847445   0.0005166242
+angcflux   35   122   118   -0.0003581365   -0.0012882454   -0.0001550652   -1.66701e-05
+angcflux   21   35   122   0.007253783   -0.0002693469   0.0028511504   0.003413087
+angcflux   122   118   200   -0.000796152   -0.0002799392   -0.0025562754   2.50887e-05
+angcflux   23   118   122   -2.09098e-05   -0.0025538712   0.0001209721   0.0016310378
+angcflux   34   252   35   -0.0025992805   -0.0025992805   0.0007513509   0.0007513509
+angcflux   35   34   252   0.0006207764   0.0007779338   0.0001480563   0.0021664778
+angcflux   20   34   252   0.0001915438   0.0001352013   0.000107991   -0.0005144649
+angcflux   34   34   194   0.0002674078   -0.000609449   3.05931e-05   -1.65563e-05
+angcflux   20   34   194   1.81803e-05   0.0013124468   3.08268e-05   -0.0003509106
+angcflux   34   194   107   -9.55717e-05   -0.000465578   -0.0002110945   8.40356e-05
+angcflux   27   194   34   -0.0001003014   -0.0013264129   -2.93547e-05   0.0002408343
+angcflux   35   34   92   0.0671685507   -0.0272028355   -0.0017846619   -0.0257173988
+angcflux   20   34   92   -0.0133388697   -0.0466195287   0.0038846111   -0.0017154948
+angcflux   34   92   219   0.0397088572   -0.0002201757   0.0084220927   -0.0326595196
+angcflux   34   92   179   0.0273190231   -0.0097532181   0.0193698799   0.0361540337
+angcflux   35   34   80   -0.0079393086   -0.0383688735   -0.0212263351   -0.0256583266
+angcflux   20   34   80   -0.0536869373   -0.0298737496   -0.0127605456   -0.0111663338
+angcflux   34   80   213   0.0397721071   0.0283200304   -0.0044711999   0.0114884299
+angcflux   34   80   219   0.0739213927   0.0968744994   0.0306762169   -0.0158316346
+angcflux   232   258   232   0.0   0.0   0.0   0.0
+angcflux   233   258   233   0.0075858254   0.0075858254   0.0185678618   0.0185678618
+angcflux   34   258   232   0.0   0.0   0.0   0.0
+angcflux   34   258   233   0.0269909521   0.0044057196   0.0045329016   0.016746373
+angcflux   34   258   34   -0.0003842138   -0.0003842138   0.0040106018   0.0040106018
+angcflux   35   34   258   -0.001624636   -0.0113391674   -0.0053889872   -0.0202533937
+angcflux   20   34   258   0.0005154176   -0.0083998636   -0.0027300745   -0.0068197647
+angcflux   34   256   256   -0.0010474046   0.0013881761   -0.0068272639   -0.0005235529
+angcflux   35   34   256   0.0063210499   -0.0032461413   0.0019964384   0.0066803254
+angcflux   20   34   256   0.014031254   -0.001257088   0.0056146965   0.0041931681
+angcflux   22   76   225   0.0   0.0   0.0   0.0
+angcflux   35   34   98   -0.0309263406   0.0084539374   -0.0082931036   -3.69899e-05
+angcflux   20   34   98   -0.0100083307   -0.0061311679   -0.0015953726   -0.0002681907
+angcflux   12   98   219   0.0303348471   -0.0080860016   0.0379180733   0.0184691344
+angcflux   12   98   34   0.0425053495   -0.0096976845   0.0092703567   0.0168072516
+angcflux   34   98   219   0.0231099482   0.0228532913   0.0004696526   -0.0063315829
+angcflux   35   34   97   -0.0093384823   -0.0017202602   -0.012641798   0.0004629548
+angcflux   20   34   97   0.0006235605   -0.0281607561   -0.0011952606   -0.0010237372
+angcflux   11   97   219   0.0080687257   0.0097262086   0.0391891418   0.024917053
+angcflux   11   97   34   0.0445965091   0.0111275693   -0.0049840296   0.0064711836
+angcflux   34   97   219   0.026737529   0.0113808519   0.012506213   0.0078781713
+angcflux   35   34   99   -0.0477204144   0.0138424196   9.90082e-05   -1.50021e-05
+angcflux   20   34   99   -0.0158039898   -0.0109602053   -0.0005299764   -0.0043981596
+angcflux   13   99   219   0.0352530229   -0.009036931   0.0723103677   0.027490043
+angcflux   13   99   34   0.077245068   -0.0179220187   -0.0008281439   0.0231067048
+angcflux   34   99   219   0.0338968854   0.0300947842   0.0035918241   -0.0142980689
+angcflux   34   227   90   -0.0279242396   -0.0119151339   -0.0312546804   -0.016343817
+angcflux   35   34   227   0.0256726688   0.0149426594   0.0264453185   0.0726453496
+angcflux   20   34   227   0.113506075   0.0186744664   0.0246673948   0.0001641282
+angcflux   227   90   227   0.0328063235   0.0328063235   0.0225519324   0.0225519324
+angcflux   219   90   227   0.0296984366   0.0250094884   0.0230262995   0.0256036598
+angcflux   34   227   91   -0.0081039248   -0.0141924016   -0.0276196152   -0.0146618343
+angcflux   17   213   91   0.0093764156   -0.0199654876   -0.0028011419   -0.0038313752
+angcflux   213   91   227   0.0340484613   0.0026467456   0.0057043364   0.0210508083
+angcflux   219   91   227   0.0153533922   0.0105372423   0.0267343185   0.0208057822
+angcflux   213   91   219   0.026573369   0.018151865   0.0003467627   0.0086512932
+angcflux   34   223   37   0.0056671127   -0.0114364823   -0.0108681035   -0.003623836
+angcflux   223   37   223   0.0017814565   0.0017814565   0.0169972613   0.0169972613
+angcflux   19   37   223   0.0318803243   2.81367e-05   0.0010501867   0.0041159564
+angcflux   20   37   223   0.0318803243   2.81367e-05   0.0010501867   0.0041159564
+angcflux   20   37   20   0.0022831353   0.0022831353   -0.001124596   -0.001124596
+angcflux   29   29   110   -3.10558e-05   5.67249e-05   0.0144588589   -0.0407209233
+angcflux   29   110   187   0.1422906191   -0.1681063551   0.0038108259   -0.0015510188
+angcflux   26   270   26   0.0009073564   0.0009073564   0.000624651   0.000624651
+angcflux   35   34   76   0.0   0.0   0.0   0.0
+angcflux   20   34   76   0.0   0.0   0.0   0.0
+angcflux   34   76   225   0.0   0.0   0.0   0.0
+angcflux   35   34   69   0.0021498131   -0.0087489651   0.0008323692   0.0030260347
+angcflux   20   34   69   0.0059688869   0.0041437336   -0.0070170188   -0.00599613
+angcflux   34   69   219   -0.0049855877   0.0006074606   0.0143913359   0.0157635807
+angcflux   19   69   34   0.0   0.0   0.0   0.0
+angcflux   22   69   34   0.0240923236   0.0022143241   0.0051504766   -0.0032014997
+angcflux   35   34   74   0.0101840681   -0.0191945586   -0.011251682   -0.0191023836
+angcflux   20   34   74   -0.0073999155   0.0158832375   -0.0011420517   -0.0095252164
+angcflux   34   74   219   0.0263640585   0.0532897621   0.0137820596   0.0130864839
+angcflux   34   74   35   0.0220935272   0.0220935272   0.0153820867   0.0153820867
+angcflux   34   179   92   -0.0538140223   -0.0225801529   -0.0157676617   -0.0385999452
+angcflux   34   172   92   -0.012599371   -0.0037918884   -0.0103394792   -0.0123181321
+angcflux   24   179   34   0.0002034667   0.003567689   -0.0063177857   -0.014130411
+angcflux   35   34   179   -0.0036695697   -0.0183696643   -0.0007146342   0.0206976165
+angcflux   35   34   172   0.0003497728   0.00580684   0.0017443246   0.0079328761
+angcflux   20   34   179   -0.0060018204   0.0097072539   -0.0063280067   0.0113621871
+angcflux   20   34   172   0.0144528272   0.0038580814   0.003839635   0.0034775258
+angcflux   35   179   35   0.0068409577   0.0068409577   -0.0007004374   -0.0007004374
+angcflux   30   239   42   -0.0246850647   0.0148526054   -0.0032690724   -0.0232879626
+angcflux   30   30   239   -0.0038289211   -0.0081697349   0.038595347   0.0070389455
+angcflux   29   30   239   0.0218200913   -0.0190707265   0.0132720354   0.034786781
+angcflux   29   30   30   0.0079417979   0.0087282304   -0.0068738733   -0.0358515228
+angcflux   239   42   239   0.016271928   0.016271928   0.0087126683   0.0087126683
+angcflux   19   42   239   0.0131835179   0.0073796464   0.0115391865   0.002452352
+angcflux   20   42   239   0.0131835179   0.0073796464   0.0115391865   0.002452352
+angcflux   20   42   20   0.0027932005   0.0027932005   0.0048181869   0.0048181869
+angcflux   29   29   30   0.0209270574   -0.0219946942   -0.0130381343   -0.0089267569
+angcflux   23   29   30   -0.0112049571   -0.0013597486   -1.0303e-06   0.0051397465
+angcflux   41   239   42   0.0   0.0   0.0   0.0
+angcflux   41   223   42   -0.005059922   -0.0072568292   -0.0001561291   -0.0019213088
+angcflux   41   41   239   0.0   0.0   0.0   0.0
+angcflux   19   41   239   0.0   0.0   0.0   0.0
+angcflux   20   41   239   0.0   0.0   0.0   0.0
+angcflux   19   41   41   0.0048782416   0.0006588926   0.002450434   -0.0017782839
+angcflux   20   41   41   0.0048782416   0.0006588926   0.002450434   -0.0017782839
+angcflux   20   41   20   0.0174583187   0.0174583187   -0.005520553   -0.005520553
+angcflux   41   41   223   0.0009254343   0.005129703   0.0024338576   0.0019912442
+angcflux   19   41   223   0.1115486699   0.0245149026   0.0213594023   0.0080950825
+angcflux   20   41   223   0.1115486699   0.0245149026   0.0213594023   0.0080950825
+angcflux   223   42   239   0.0   0.0   0.0   0.0
+angcflux   19   42   223   0.0191617677   0.0003713343   0.0025397623   0.0038346363
+angcflux   20   42   223   0.0191617677   0.0003713343   0.0025397623   0.0038346363
+angcflux   34   192   102   -0.0205599866   -0.0161069882   0.0120556263   -0.0073734266
+angcflux   34   192   103   0.0   0.0   0.0   0.0
+angcflux   34   102   192   0.0050752988   0.0093366628   0.0107055907   0.0041465664
+angcflux   34   102   34   -0.0042581851   -0.0042581851   0.0107272596   0.0107272596
+angcflux   35   34   102   -0.0046632116   0.0172873153   -0.0013894765   -0.012045923
+angcflux   20   34   102   -0.001052067   0.0022926271   -0.0021938752   -0.008122298
+angcflux   35   34   192   0.0003051802   0.0047386427   -0.0006554031   0.0009796016
+angcflux   20   34   192   -0.000488619   0.0011947752   0.000843151   0.0015388882
+angcflux   24   192   102   -0.0004933474   -0.0019719055   0.0024189946   -0.0059673502
+angcflux   21   35   102   0.0052305654   0.0113222175   0.0004734275   -0.0180433101
+angcflux   35   102   192   0.0050752988   0.0093366628   0.0107055907   0.0041465664
+angcflux   35   103   192   0.0152559541   0.00160725   -0.0023209379   -0.0013766494
+angcflux   22   102   192   -0.0127848057   0.0129364739   -0.0001674983   0.0044700901
+angcflux   22   102   35   0.024200394   -0.0001893633   0.0069841457   0.0098682705
+angcflux   35   192   102   -0.0205599866   -0.0161069882   0.0120556263   -0.0073734266
+angcflux   21   35   192   0.0013402694   -0.0028084425   0.0198180458   0.0048332046
+angcflux   35   102   35   -0.0042581851   -0.0042581851   0.0107272596   0.0107272596
+angcflux   34   227   80   0.0051920773   -0.05470286   -0.075159244   -0.0676398051
+angcflux   74   52   80   -0.0038569883   0.0124168387   -0.0129133874   -0.0084651914
+angcflux   19   52   80   -0.0078906736   0.0037678136   0.0023389407   -0.0028544453
+angcflux   20   52   80   -0.0078906736   0.0037678136   0.0023389407   -0.0028544453
+angcflux   19   52   74   0.017112252   0.0038246005   0.0012586146   -0.0004632205
+angcflux   20   52   74   0.017112252   0.0038246005   0.0012586146   -0.0004632205
+angcflux   20   52   20   0.015884793   0.015884793   0.0029327951   0.0029327951
+angcflux   52   80   227   0.0017995231   0.0032253431   0.0031084894   0.0046167141
+angcflux   52   80   219   0.004832286   0.0248088639   0.0042617136   0.0037950715
+angcflux   52   74   219   -0.0049062308   0.0266580743   0.0068482007   0.0132302638
+angcflux   35   74   52   0.0016192848   0.0090123084   0.0107622365   0.0089050924
+angcflux   17   213   86   -0.002028561   -0.0011389627   -0.0031006864   -0.002072795
+angcflux   213   86   219   0.0060282424   -0.0022259459   0.0144951413   0.010095708
+angcflux   86   86   213   0.0030241451   0.0022347534   -0.0008568505   0.0044090686
+angcflux   86   86   219   0.0037379536   0.0053820903   -0.0008566386   -0.0006098768
+angcflux   79   86   213   0.0   0.0   0.0   0.0
+angcflux   79   86   219   0.0   0.0   0.0   0.0
+angcflux   225   79   225   0.0   0.0   0.0   0.0
+angcflux   86   79   225   0.0   0.0   0.0   0.0
+angcflux   79   79   225   0.0   0.0   0.0   0.0
+angcflux   80   52   80   -0.0033693156   -0.0033693156   -0.0047130526   -0.0047130526
+angcflux   52   80   213   0.0080847237   0.0019716625   0.0089022945   0.0116683298
+angcflux   76   52   80   0.0   0.0   0.0   0.0
+angcflux   19   52   76   0.0   0.0   0.0   0.0
+angcflux   20   52   76   0.0   0.0   0.0   0.0
+angcflux   52   76   225   0.0   0.0   0.0   0.0
+angcflux   76   52   76   0.0   0.0   0.0   0.0
+angcflux   35   34   75   0.0019946946   -0.0046846902   -0.0035355284   0.0020346189
+angcflux   20   34   75   0.0039204539   0.0016088346   -0.0023652038   -0.0033404618
+angcflux   34   75   219   -0.0027506129   0.0036138403   0.0031546577   0.0066002511
+angcflux   80   75   219   0.0039272133   0.0057006627   0.0013261881   -0.0025306488
+angcflux   34   75   80   0.0085937723   -0.003264984   -0.0008467617   0.0035693011
+angcflux   75   80   213   -0.0065891588   0.0027700604   0.0003020597   0.0004497941
+angcflux   75   80   219   -0.0008911336   -0.0016606812   -0.001829853   -0.0001579395
+angcflux   76   75   219   0.0   0.0   0.0   0.0
+angcflux   34   75   76   0.0   0.0   0.0   0.0
+angcflux   75   76   225   0.0   0.0   0.0   0.0
+angcflux   92   182   92   -0.0005435623   -0.0005435623   -0.0116236333   -0.0116236333
+angcflux   24   182   92   -0.0010061594   -0.0003495696   -0.0005213465   -0.0018348192
+angcflux   182   92   219   -0.0019076524   0.0114699045   0.0034542317   0.0080167815
+angcflux   34   92   182   0.0073147843   -0.0036503184   0.0061385188   0.0095714028
+angcflux   218   183   218   0.0006570708   0.0006570708   0.0406441092   0.0406441092
+angcflux   34   183   218   0.0459298395   -0.0002567974   -0.0018572825   -0.0002429571
+angcflux   35   34   183   -0.0009556909   -0.0090665132   0.0018324118   -0.0042869457
+angcflux   20   34   183   0.0096235727   -0.0115153313   0.0006285364   0.0013113279
+angcflux   218   184   218   0.0166848435   0.0166848435   0.0476916959   0.0476916959
+angcflux   29   184   218   0.0488146851   0.0215643935   0.0131775279   0.0116625141
+angcflux   29   29   184   -0.0023810461   -0.0355345828   -0.0147107289   -0.0186553362
+angcflux   34   227   96   -0.0075671497   0.0063024772   -3.73508e-05   -0.0057910559
+angcflux   34   181   35   0.0007017263   0.0007017263   0.0005790186   0.0005790186
+angcflux   34   181   96   5.33429e-05   -0.0089196079   0.0009039938   -0.0032830763
+angcflux   35   181   96   5.33429e-05   -0.0089196079   0.0009039938   -0.0032830763
+angcflux   35   34   181   -0.0016321036   0.0007394526   -3.1668e-06   0.0005487123
+angcflux   20   34   181   0.0017745626   0.0036832989   8.5821e-06   0.002422527
+angcflux   21   35   181   9.7325e-06   0.0071564779   4.33674e-05   -6.72e-05
+angcflux   219   96   227   -0.0022575032   0.000824617   -6.16273e-05   0.002481486
+angcflux   181   96   227   0.0018955328   0.0004563632   0.0013559317   0.0033071235
+angcflux   181   96   219   0.0009551544   -0.0014139178   0.0033939925   0.0001084605
+angcflux   17   213   96   3.8437e-06   -1.635e-06   8.20184e-05   1.6301e-06
+angcflux   35   180   96   0.0033952045   -0.0074404322   -0.0014858752   1.54015e-05
+angcflux   24   180   35   -0.0035887857   -0.0034876208   0.0025941714   -4.0622e-06
+angcflux   21   35   180   5.967e-05   0.0046934719   -9.48005e-05   -1.31018e-05
+angcflux   213   96   219   -2.7621e-06   5.6697e-06   1.75381e-05   -3.7462e-06
+angcflux   180   96   213   -0.0006009989   0.0026400377   0.0002303853   -1.53066e-05
+angcflux   225   96   225   0.0   0.0   0.0   0.0
+angcflux   34   216   185   -0.0101939714   0.0093491265   -0.0158299643   -0.0453142256
+angcflux   216   185   218   -0.0067406246   0.0082788015   0.0293754046   0.042626214
+angcflux   35   34   216   0.2036823362   -0.2105125127   0.0470820177   0.0117375503
+angcflux   20   34   216   -0.2093019838   -0.0245244096   0.0183288387   -0.0100261739
+angcflux   29   29   189   0.0   0.0   0.0   0.0
+angcflux   29   189   190   0.0   0.0   0.0   0.0
+angcflux   29   190   190   0.0015784858   0.0010852578   0.0046630254   -0.0001321499
+angcflux   29   191   190   0.0   0.0   0.0   0.0
+angcflux   29   190   191   0.0   0.0   0.0   0.0
+angcflux   29   29   191   0.0   0.0   0.0   0.0
+angcflux   29   29   190   -0.0053818327   -0.0012148456   -0.0043257302   -0.009476529
+angcflux   34   257   232   0.0037760894   -0.0021430955   0.019807303   0.0235342242
+angcflux   34   257   35   0.0130699225   0.0130699225   -0.0089319462   -0.0089319462
+angcflux   35   34   257   0.0004098834   0.0003950609   -0.0002635941   -0.0036892206
+angcflux   20   34   257   0.0108742813   -0.0015001447   0.0003432123   -0.0011205486
+angcflux   217   260   237   0.0191934678   0.0110103535   0.0123162603   0.0074245076
+angcflux   34   260   217   0.008323281   0.0018992582   0.0029306412   -0.004665403
+angcflux   237   260   237   0.0063631026   0.0063631026   0.015913687   0.015913687
+angcflux   234   260   234   0.0026898846   0.0026898846   -0.0001784786   -0.0001784786
+angcflux   34   260   237   0.0156033354   -0.0017482656   0.0033350275   0.0026492229
+angcflux   17   234   260   0.0   0.0   0.0   0.0
+angcflux   17   217   260   -0.006211207   -0.0001792242   -0.007153876   -0.0109358533
+angcflux   35   34   260   -0.0013596569   -0.0052246197   -0.0004064797   -0.007238799
+angcflux   20   34   260   0.002862513   -0.0025889415   -0.0009682371   -0.0033079634
+angcflux   231   259   231   0.0   0.0   0.0   0.0
+angcflux   34   259   231   0.0   0.0   0.0   0.0
+angcflux   35   34   259   0.0   0.0   0.0   0.0
+angcflux   20   34   259   0.0   0.0   0.0   0.0
+angcflux   236   262   237   0.0032341292   0.0221617376   0.0004043819   0.0007117109
+angcflux   29   262   236   -0.0031445531   0.0011377274   0.0045884937   -0.0016858685
+angcflux   237   262   237   0.0021741028   0.0021741028   0.0243025446   0.0243025446
+angcflux   29   262   237   0.0162724248   0.0030855869   0.010093503   0.0013969449
+angcflux   17   236   262   -0.0065748685   -0.0039890912   -0.0087957166   -0.0045906433
+angcflux   29   29   262   0.0031662676   -0.0102472286   0.0028653258   -0.0137561276
+angcflux   235   261   235   0.0   0.0   0.0   0.0
+angcflux   29   261   235   0.0   0.0   0.0   0.0
+angcflux   29   29   261   0.0   0.0   0.0   0.0
+angcflux   234   260   238   -0.0012829666   0.000736209   0.0015217388   0.0165929967
+angcflux   35   260   238   0.0028857719   0.0074425372   -0.000151258   0.026765039
+angcflux   35   260   234   -0.0031339858   0.0079998978   0.0041059798   0.0067716034
+angcflux   34   238   260   -0.0352449559   0.0166564991   -0.0324035168   -0.0340434081
+angcflux   35   34   238   -0.0099824453   0.020029248   0.0048649443   0.0268887577
+angcflux   20   34   238   0.0502784923   0.0012364921   0.0114304734   0.0027290737
+angcflux   21   35   260   1.48436e-05   -0.0006409239   -0.000287784   -0.0021428018
+angcflux   34   263   114   -0.0004938434   -0.0041738344   0.0030106073   -0.0045588117
+angcflux   35   34   263   0.0007200795   0.0030506699   0.0011741426   0.0052780907
+angcflux   20   34   263   0.0013183928   -0.0025765543   -0.0005750801   0.0026545016
+angcflux   188   114   263   0.0009225733   -0.0005739396   0.0040362163   0.0116713871
+angcflux   29   264   114   0.0007686456   0.0024055001   0.001765498   -0.0047543497
+angcflux   29   29   264   -0.0010376282   -0.0004414426   -0.0010239959   0.0034369826
+angcflux   188   114   264   0.0012317208   -0.0012133843   0.0023919326   0.0042353005
+angcflux   66   67   67   -0.0009221192   -0.0021728847   0.0130644353   -0.0136720964
+angcflux   66   68   68   0.0   0.0   0.0   0.0
+angcflux   22   67   67   -0.0011561886   -0.0014210521   0.0032603186   -0.0006322702
+angcflux   22   68   68   -0.0026160965   -0.0073970568   0.0139795727   0.0099918891
+angcflux   22   67   66   0.0102738708   -0.0015926983   -0.0054834065   0.003522528
+angcflux   22   68   66   0.0098170745   -0.0042090562   0.0043648542   0.0064209637
+angcflux   22   66   67   0.0169495021   0.0099899608   -0.004037576   -0.0055185073
+angcflux   22   66   68   0.0416813252   0.0073859062   -0.0037213903   -0.0045509377
+angcflux   66   68   72   0.0003122553   0.0062558695   -0.0213097743   -0.0159314081
+angcflux   22   68   72   -0.0151603954   0.0042270006   0.0008810113   0.0063256258
+angcflux   68   72   219   -0.0130775923   0.0083106899   0.0304024778   0.0288234534
+angcflux   22   72   219   0.0391738837   -0.0131951934   0.0015377364   0.0097825575
+angcflux   22   72   68   0.0372603524   0.0086392259   0.003273915   -0.0081779824
+angcflux   17   218   192   0.0001652802   -0.0008355967   -0.0035804852   -0.0214709235
+angcflux   102   192   218   0.0298876068   -0.0251060847   0.0163960098   0.0351867812
+angcflux   22   102   34   0.024200394   -0.0001893633   0.0069841457   0.0098682705
+angcflux   29   29   34   0.0256379489   -0.0714718972   -0.0075283104   -0.0149926054
+angcflux   29   34   212   -0.002894412   0.0023490063   0.0055069931   0.0054067801
+angcflux   20   34   29   -0.0071008365   0.00866654   -0.0076194993   -0.0005276976
+angcflux   29   34   35   0.0005219604   0.0053318351   -0.0012490008   -0.000941513
+angcflux   29   34   171   -0.0007583845   -0.000606199   -2.00873e-05   1.00359e-05
+angcflux   29   29   73   -0.0007847708   -0.0002924643   -0.0242799357   -0.000166803
+angcflux   29   73   219   -0.0090494259   0.0125979629   0.0173025033   0.0221970392
+angcflux   22   73   219   0.0374334941   0.0044328156   -0.0033637839   -0.0010963563
+angcflux   22   73   29   0.0280341485   -5.0199e-06   0.0039322278   0.0012842518
+angcflux   17   213   85   0.0078223924   -0.0059859775   -0.0001368622   -0.0124331759
+angcflux   29   29   85   -0.0482336841   -0.0130423565   -0.0382278258   -0.0024735719
+angcflux   213   85   219   0.0095981704   0.0130038102   0.0229127326   0.0103772432
+angcflux   29   85   213   0.0350727679   -0.0054587643   0.008305593   -0.0073020822
+angcflux   29   85   219   0.007666302   0.0079065447   0.0176433294   0.0034656518
+angcflux   29   29   78   0.0   0.0   0.0   0.0
+angcflux   225   78   225   0.0   0.0   0.0   0.0
+angcflux   29   78   225   0.0   0.0   0.0   0.0
+angcflux   17   213   84   0.0264925355   -0.0134605622   -0.0115505583   -0.0251845346
+angcflux   66   68   84   0.0211861103   -0.0234670249   -0.0247085515   -0.0176212355
+angcflux   22   68   84   -0.013309549   -0.0205207115   0.0038169399   0.0086727898
+angcflux   213   84   219   0.0772147224   0.0169882068   0.0407781967   0.034532954
+angcflux   68   84   213   0.06326016   0.0346720465   0.0485577747   0.0455019856
+angcflux   68   84   219   0.0573897038   0.0639594808   0.0039352938   0.0174360982
+angcflux   66   68   77   0.0   0.0   0.0   0.0
+angcflux   22   68   77   0.0   0.0   0.0   0.0
+angcflux   225   77   225   0.0   0.0   0.0   0.0
+angcflux   68   77   225   0.0   0.0   0.0   0.0
+angcflux   24   171   53   -0.0099447869   0.0189437956   0.0017100178   -0.0101245385
+angcflux   35   53   171   0.0116130142   -0.0117044317   0.0031547984   0.0053918121
+angcflux   80   53   171   0.0029788216   0.0022415904   0.0039369943   0.0072591633
+angcflux   19   53   171   0.0341035519   0.0193034839   0.0126389605   0.0038170774
+angcflux   20   53   171   0.0341035519   0.0193034839   0.0126389605   0.0038170774
+angcflux   35   53   80   -0.0081197314   -0.0116075437   -0.0258295058   -0.0130017552
+angcflux   19   53   35   0.000950978   0.0008736392   -0.0094719441   -0.0039674071
+angcflux   20   53   35   0.000950978   0.0008736392   -0.0094719441   -0.0039674071
+angcflux   19   53   80   0.039213728   -0.0021789867   -0.0216863034   -0.0112246297
+angcflux   20   53   80   0.039213728   -0.0021789867   -0.0216863034   -0.0112246297
+angcflux   21   35   53   0.033794375   0.011183725   0.0078814812   -0.0034167211
+angcflux   53   80   213   -0.0159547073   -0.049790651   -0.0021494761   -0.0114589561
+angcflux   53   80   219   -0.0332608416   0.0536264624   -0.0041824726   0.0093104982
+angcflux   220   278   222   0.0   0.0   0.0   0.0
+angcflux   215   278   222   0.0   0.0   0.0   0.0
+angcflux   215   278   220   0.0   0.0   0.0   0.0
+angcflux   220   278   220   0.0   0.0   0.0   0.0
+angcflux   215   278   215   0.0   0.0   0.0   0.0
+angcflux   278   222   278   0.0   0.0   0.0   0.0
+angcflux   27   198   29   0.0   0.0   0.0   0.0
+angcflux   27   198   27   0.0   0.0   0.0   0.0
+angcflux   29   29   198   0.0   0.0   0.0   0.0
+angcflux   49   224   49   -0.019449738   -0.019449738   -0.0323107047   -0.0323107047
+angcflux   17   212   43   -0.0250880596   -0.0046601877   -0.0013751057   -0.02091937
+angcflux   17   212   49   -0.001791797   -0.0029145805   -0.001037984   -0.004412714
+angcflux   43   43   212   0.041067835   0.030496763   0.0536716632   0.0554628215
+angcflux   49   43   212   -0.0002447624   -0.0166804982   0.0039999356   0.0167749174
+angcflux   19   43   212   0.0477237482   -0.005893682   0.0319575005   0.0197731695
+angcflux   20   43   212   0.0477237482   -0.005893682   0.0319575005   0.0197731695
+angcflux   43   43   49   -0.0024059003   -0.001095125   -0.0053280755   -0.0218002419
+angcflux   19   43   49   0.008619455   -0.0112774589   -0.0029650119   -0.0054001524
+angcflux   20   43   49   0.008619455   -0.0112774589   -0.0029650119   -0.0054001524
+angcflux   43   49   224   0.0030319672   0.0169705503   -0.0003507729   0.0197143186
+angcflux   34   49   224   0.0043951143   -0.0016345968   0.0022657389   -1.03897e-05
+angcflux   19   49   224   0.0629368431   0.0106311694   0.0135502238   0.0217769421
+angcflux   20   49   224   0.0629368431   0.0106311694   0.0135502238   0.0217769421
+angcflux   34   49   43   -0.0004674812   -0.0114268672   -0.0117449886   -0.0010351365
+angcflux   19   49   43   0.0201485544   0.0060570727   0.0031245667   -0.0043941515
+angcflux   20   49   43   0.0201485544   0.0060570727   0.0031245667   -0.0043941515
+angcflux   19   49   34   0.0075616515   0.0024238091   0.0025576725   -0.0021601859
+angcflux   20   49   34   0.0075616515   0.0024238091   0.0025576725   -0.0021601859
+angcflux   212   49   224   0.0088642644   0.0132002743   0.0242283659   0.0172818336
+angcflux   43   49   212   0.0076994786   0.0053854615   0.0081796653   0.004188151
+angcflux   19   49   212   0.0268014999   0.0004980742   0.0059955855   -0.0036187988
+angcflux   20   49   212   0.0268014999   0.0004980742   0.0059955855   -0.0036187988
+angcflux   49   34   212   -0.0053339596   -0.008725815   0.0114061414   0.0011496089
+angcflux   20   34   49   -0.0013563131   -0.0135904187   -0.0030254129   -0.0003073262
+angcflux   214   275   221   0.0024187079   -0.0272804803   -0.0001063932   0.0216253782
+angcflux   220   275   221   0.0116344727   0.0147801137   -0.0001904409   0.0080604954
+angcflux   214   275   214   0.0074866254   0.0074866254   0.0076658138   0.0076658138
+angcflux   214   275   220   0.0331959751   0.0079352435   0.0196393053   0.0076599153
+angcflux   41   223   41   -0.0108306329   -0.0108306329   -0.0565282647   -0.0565282647
+angcflux   17   212   39   0.095462232   0.0178204354   -0.0268088076   -0.0041343405
+angcflux   17   212   41   0.0067122719   -0.0039724027   -0.0004690364   -0.0032243129
+angcflux   34   221   275   -0.0162868764   0.0062037479   -0.0298062233   -0.0162851038
+angcflux   17   214   275   -0.0131319695   -0.0004895154   -0.0096351378   -0.0054981511
+angcflux   41   39   212   -0.0160073347   -0.0017634549   0.0035226381   0.0298057787
+angcflux   39   39   212   -0.0771152298   -0.037385048   -0.0149591263   0.0222990471
+angcflux   19   39   212   0.0766935769   -0.0032200602   0.0495922866   0.0152632854
+angcflux   20   39   212   0.0766935769   -0.0032200602   0.0495922866   0.0152632854
+angcflux   39   39   41   -0.0428558177   0.0212500228   0.0148465083   0.0208199521
+angcflux   19   39   41   0.0271792831   0.0580739143   -0.0104445757   -0.035981154
+angcflux   20   39   41   0.0271792831   0.0580739143   -0.0104445757   -0.035981154
+angcflux   39   41   223   0.063833421   0.0624985513   0.0138058384   0.0028568271
+angcflux   34   41   223   0.0356333139   -0.0021712156   0.0139428429   0.0064418386
+angcflux   34   41   39   0.0307768549   -0.0040708071   -0.0201924321   0.0008745423
+angcflux   19   41   39   -0.0650092928   -0.0727564107   0.0026148182   0.0027303536
+angcflux   20   41   39   -0.0650092928   -0.0727564107   0.0026148182   0.0027303536
+angcflux   19   41   34   0.0009458577   -0.0038318181   0.0026086736   -0.0074742741
+angcflux   20   41   34   0.0009458577   -0.0038318181   0.0026086736   -0.0074742741
+angcflux   212   41   223   0.0061868604   0.0021674295   0.0097467775   0.0121792986
+angcflux   39   41   212   0.0026349405   0.0067479033   0.0092082811   0.0067625105
+angcflux   19   41   212   0.0126787507   0.0052248413   -4.79885e-05   -0.0029799245
+angcflux   20   41   212   0.0126787507   0.0052248413   -4.79885e-05   -0.0029799245
+angcflux   41   34   221   0.0006354621   0.0003568377   0.009889738   -0.0081032677
+angcflux   20   34   221   0.0866063829   0.0115505879   0.0193891567   -0.0044501641
+angcflux   20   34   41   -0.0241595491   -0.0284070875   0.0020814801   -0.0011262929
+angcflux   71   71   219   5.05156e-05   0.0004218214   -0.0002871478   0.0024476874
+angcflux   22   71   219   0.0017513304   -0.0010973877   0.0035084525   0.0037175352
+angcflux   22   71   71   0.0015632782   0.0025275818   -0.0008123899   -0.0002884142
+angcflux   35   34   66   0.0002020859   -0.0100939799   -0.0089823185   -0.036906751
+angcflux   20   34   66   -0.0031440579   0.0069413935   0.0046344663   -0.0400224188
+angcflux   34   66   35   -0.0032068501   -0.0032068501   0.001456892   0.001456892
+angcflux   34   66   66   0.0026317411   0.0078208754   0.0236953656   0.0064930201
+angcflux   35   66   66   0.0026317411   0.0078208754   0.0236953656   0.0064930201
+angcflux   21   35   66   0.0034690896   -0.0407002003   0.006682839   -0.0003835018
+angcflux   22   66   35   -0.0084712446   -0.028900237   -0.0001228027   0.0226490241
+angcflux   80   34   212   -0.0142725279   -0.0054410225   0.0023914116   -0.0045858625
+angcflux   76   34   212   0.0   0.0   0.0   0.0
+angcflux   69   52   69   0.0144968112   0.0144968112   0.0003555492   0.0003555492
+angcflux   19   52   69   -0.0073915066   0.0044391602   0.0015162925   -0.0006800316
+angcflux   20   52   69   -0.0073915066   0.0044391602   0.0015162925   -0.0006800316
+angcflux   52   69   219   0.0104640219   -0.0040531335   0.0006181862   -0.0020929461
+angcflux   22   69   52   0.0021612323   0.0082643815   0.0020470424   -0.0003080186
+angcflux   179   92   179   0.0026511748   0.0026511748   0.0081691749   0.0081691749
+angcflux   11   34   35   0.0147541902   0.0012033313   0.0186311528   0.012572938
+angcflux   11   34   20   0.0621914976   -0.00431033   0.0133885542   0.006837819
+angcflux   12   58   35   0.0161268114   -0.0034233281   0.008426777   0.005449809
+angcflux   19   58   35   0.0051069762   0.0018232999   -0.0006646697   -0.0022422184
+angcflux   20   58   35   0.0051069762   0.0018232999   -0.0006646697   -0.0022422184
+angcflux   21   58   35   0.0   0.0   0.0   0.0
+angcflux   21   35   58   0.0044013091   -0.0067646007   0.0015104356   -0.0002082636
+angcflux   13   62   35   0.0044573664   8.70669e-05   0.0127342499   0.0075565303
+angcflux   19   62   35   0.0176956326   0.0007876383   0.0026771062   -0.0006238889
+angcflux   20   62   35   0.0176956326   0.0007876383   0.0026771062   -0.0006238889
+angcflux   21   62   35   0.0   0.0   0.0   0.0
+angcflux   21   35   62   0.0038058405   -0.0006423558   0.00136677   0.000885953
+angcflux   33   33   35   0.0075737647   0.0075737647   -0.0424538238   -0.0424538238
+angcflux   19   33   33   0.0815727586   0.0266705354   -0.0376987747   -0.0352713244
+angcflux   34   32   35   0.0075737647   0.0075737647   -0.0424538238   -0.0424538238
+angcflux   32   34   35   0.0075737647   0.0075737647   -0.0424538238   -0.0424538238
+angcflux   20   34   32   0.0815727586   0.0266705354   -0.0376987747   -0.0352713244
+angcflux   34   33   34   0.0075737647   0.0075737647   -0.0424538238   -0.0424538238
+angcflux   19   33   34   0.0815727586   0.0266705354   -0.0376987747   -0.0352713244
+angcflux   33   34   35   0.0075737647   0.0075737647   -0.0424538238   -0.0424538238
+angcflux   20   34   33   0.0815727586   0.0266705354   -0.0376987747   -0.0352713244
+angcflux   32   32   35   0.0075737647   0.0075737647   -0.0424538238   -0.0424538238
+angcflux   35   34   35   0.0075737647   0.0075737647   -0.0424538238   -0.0424538238
+angcflux   34   33   212   0.0727756966   -0.0103347593   0.072635027   0.0147928497
+angcflux   33   34   212   0.0727756966   -0.0103347593   0.072635027   0.0147928497
+angcflux   34   34   253   0.0065598561   -0.0014647929   0.0098837949   7.02306e-05
+angcflux   11   33   34   0.0147541902   0.0012033313   0.0186311528   0.012572938
+angcflux   11   33   19   0.0621914976   -0.00431033   0.0133885542   0.006837819
+angcflux   11   34   33   0.0147541902   0.0012033313   0.0186311528   0.012572938
+angcflux   12   58   58   -0.0040596158   -0.002853761   0.0029646542   -0.0069170783
+angcflux   58   58   58   -0.0013631173   -0.0013631173   0.000613488   0.000613488
+angcflux   19   58   58   -0.0077267413   -0.0065026874   0.0031416821   0.0001894183
+angcflux   20   58   58   -0.0077267413   -0.0065026874   0.0031416821   0.0001894183
+angcflux   21   58   58   0.0   0.0   0.0   0.0
+angcflux   13   62   62   0.0084217327   0.0011434486   0.0071847489   -0.0021799769
+angcflux   62   62   62   -0.0018793079   -0.0018793079   0.0005246893   0.0005246893
+angcflux   19   62   62   -0.0021815009   -0.0048781773   0.000474008   -0.0008294317
+angcflux   20   62   62   -0.0021815009   -0.0048781773   0.000474008   -0.0008294317
+angcflux   21   62   62   0.0   0.0   0.0   0.0
+angcflux   34   34   212   0.0727756966   -0.0103347593   0.072635027   0.0147928497
+angcflux   11   34   34   0.0147541902   0.0012033313   0.0186311528   0.012572938
+angcflux   34   34   58   0.0006336826   -0.0023168023   -9.42719e-05   -0.000601952
+angcflux   20   34   58   0.0009594426   -0.004893472   0.0005463768   -0.0015891844
+angcflux   12   58   34   0.0161268114   -0.0034233281   0.008426777   0.005449809
+angcflux   19   58   34   0.0051069762   0.0018232999   -0.0006646697   -0.0022422184
+angcflux   20   58   34   0.0051069762   0.0018232999   -0.0006646697   -0.0022422184
+angcflux   21   58   34   0.0   0.0   0.0   0.0
+angcflux   34   170   34   0.0   0.0   0.0   0.0
+angcflux   27   170   34   0.0   0.0   0.0   0.0
+angcflux   35   34   170   0.0   0.0   0.0   0.0
+angcflux   20   34   170   0.0   0.0   0.0   0.0
+angcflux   34   171   34   -0.2039206513   -0.2039206513   -0.0585506052   -0.0585506052
+angcflux   35   34   171   0.0111967485   0.0026334719   0.0155483448   0.0304159943
+angcflux   33   223   33   -0.012614463   -0.012614463   -0.0349849444   -0.0349849444
+angcflux   35   33   223   0.021885893   -0.0008651471   0.0187043637   0.0393600552
+angcflux   19   33   223   0.0623109433   -0.0022828333   0.0228896327   0.0144830662
+angcflux   33   252   33   -0.0025992805   -0.0025992805   0.0007513509   0.0007513509
+angcflux   35   33   252   0.0006207764   0.0007779338   0.0001480563   0.0021664778
+angcflux   19   33   252   0.0001915438   0.0001352013   0.000107991   -0.0005144649
+angcflux   34   34   256   0.0063210499   -0.0032461413   0.0019964384   0.0066803254
+angcflux   17   212   32   -0.0316174421   -0.0570778939   0.0058386802   -0.0581945762
+angcflux   34   32   212   0.0727756966   -0.0103347593   0.072635027   0.0147928497
+angcflux   80   32   212   -0.0142725279   -0.0054410225   0.0023914116   -0.0045858625
+angcflux   34   32   34   0.0075737647   0.0075737647   -0.0424538238   -0.0424538238
+angcflux   34   32   80   -0.0079393086   -0.0383688735   -0.0212263351   -0.0256583266
+angcflux   32   34   80   -0.0079393086   -0.0383688735   -0.0212263351   -0.0256583266
+angcflux   32   80   213   0.0397721071   0.0283200304   -0.0044711999   0.0114884299
+angcflux   32   80   219   0.0739213927   0.0968744994   0.0306762169   -0.0158316346
+angcflux   34   34   75   0.0019946946   -0.0046846902   -0.0035355284   0.0020346189
+angcflux   34   34   76   0.0   0.0   0.0   0.0
+angcflux   80   33   212   -0.0142725279   -0.0054410225   0.0023914116   -0.0045858625
+angcflux   34   33   80   -0.0079393086   -0.0383688735   -0.0212263351   -0.0256583266
+angcflux   19   33   80   -0.0536869373   -0.0298737496   -0.0127605456   -0.0111663338
+angcflux   33   34   80   -0.0079393086   -0.0383688735   -0.0212263351   -0.0256583266
+angcflux   33   80   213   0.0397721071   0.0283200304   -0.0044711999   0.0114884299
+angcflux   33   80   219   0.0739213927   0.0968744994   0.0306762169   -0.0158316346
+angcflux   34   53   171   0.0116130142   -0.0117044317   0.0031547984   0.0053918121
+angcflux   34   53   80   -0.0081197314   -0.0116075437   -0.0258295058   -0.0130017552
+angcflux   19   53   34   0.000950978   0.0008736392   -0.0094719441   -0.0039674071
+angcflux   20   53   34   0.000950978   0.0008736392   -0.0094719441   -0.0039674071
+angcflux   21   53   34   0.0   0.0   0.0   0.0
+angcflux   53   34   253   -0.0014201738   -0.0002241385   0.0059126532   -0.0045319034
+angcflux   20   34   53   -0.0080822468   -0.009092957   0.0012865641   0.0057758512
+angcflux   34   80   227   0.0857467408   0.0003720795   0.0206412177   0.0997832244
+angcflux   27   178   102   0.0108540638   -0.0457539768   9.84494e-05   -0.0099045113
+angcflux   27   178   27   -0.0090297011   -0.0090297011   0.0009760245   0.0009760245
+angcflux   34   34   53   -0.0011276463   0.0007661697   -0.0008896888   -7.43638e-05
+angcflux   34   34   192   0.0003051802   0.0047386427   -0.0006554031   0.0009796016
+angcflux   178   102   192   0.0045628262   0.0023152819   0.0113507656   0.0262528824
+angcflux   178   102   178   0.0114049275   0.0114049275   -0.0014872945   -0.0014872945
+angcflux   34   34   92   0.0671685507   -0.0272028355   -0.0017846619   -0.0257173988
+angcflux   33   257   232   0.0037760894   -0.0021430955   0.019807303   0.0235342242
+angcflux   33   257   33   0.0130699225   0.0130699225   -0.0089319462   -0.0089319462
+angcflux   35   33   257   0.0004098834   0.0003950609   -0.0002635941   -0.0036892206
+angcflux   19   33   257   0.0108742813   -0.0015001447   0.0003432123   -0.0011205486
+angcflux   33   258   232   0.0   0.0   0.0   0.0
+angcflux   33   258   233   0.0269909521   0.0044057196   0.0045329016   0.016746373
+angcflux   33   258   33   -0.0003842138   -0.0003842138   0.0040106018   0.0040106018
+angcflux   35   33   258   -0.001624636   -0.0113391674   -0.0053889872   -0.0202533937
+angcflux   19   33   258   0.0005154176   -0.0083998636   -0.0027300745   -0.0068197647
+angcflux   35   33   87   -0.0003874403   0.000657955   -0.0036863814   -0.0053542384
+angcflux   19   33   87   -0.0009343289   0.0067508496   -0.0001244219   -0.0033879232
+angcflux   35   33   80   -0.0079393086   -0.0383688735   -0.0212263351   -0.0256583266
+angcflux   33   87   227   -0.0078328928   0.0086831589   0.0045420686   0.0038760164
+angcflux   33   87   219   -0.0021466244   0.0056311367   0.0027021214   0.0049160425
+angcflux   33   80   227   0.0857467408   0.0003720795   0.0206412177   0.0997832244
+angcflux   33   227   90   -0.0279242396   -0.0119151339   -0.0312546804   -0.016343817
+angcflux   35   33   227   0.0256726688   0.0149426594   0.0264453185   0.0726453496
+angcflux   19   33   227   0.113506075   0.0186744664   0.0246673948   0.0001641282
+angcflux   34   34   102   -0.0046632116   0.0172873153   -0.0013894765   -0.012045923
+angcflux   34   33   35   0.0075737647   0.0075737647   -0.0424538238   -0.0424538238
+angcflux   33   34   183   -0.0009556909   -0.0090665132   0.0018324118   -0.0042869457
+angcflux   68   68   84   -0.024255409   0.0099438151   -0.0267801978   -0.0060651457
+angcflux   67   67   67   0.0006027001   0.0006027001   -0.0008446227   -0.0008446227
+angcflux   34   74   34   0.0220935272   0.0220935272   0.0153820867   0.0153820867
+angcflux   34   34   69   0.0021498131   -0.0087489651   0.0008323692   0.0030260347
+angcflux   21   35   108   -8.904e-06   0.0028587596   3.64572e-05   0.0004376262
+angcflux   35   108   108   0.0001229609   -0.0005253615   -0.0008185123   0.0022758318
+angcflux   34   34   110   -2.15619e-05   -0.0012717756   -0.0053850325   0.0003358641
+angcflux   20   34   110   0.0005354948   0.0018227999   1.16246e-05   2.53572e-05
+angcflux   34   110   187   -0.0015547026   -0.0002564463   -0.0223847711   -0.0285250811
+angcflux   29   33   35   0.0005219604   0.0053318351   -0.0012490008   -0.000941513
+angcflux   19   33   29   -0.0071008365   0.00866654   -0.0076194993   -0.0005276976
+angcflux   29   29   33   0.0256379489   -0.0714718972   -0.0075283104   -0.0149926054
+angcflux   49   49   224   0.0084373507   -0.0033091616   0.0037342813   0.0058397856
+angcflux   19   49   49   0.0079093091   -0.0001811618   0.0012932776   -0.0046385953
+angcflux   20   49   49   0.0079093091   -0.0001811618   0.0012932776   -0.0046385953
+angcflux   20   49   20   0.0156391934   0.0156391934   -0.0015365532   -0.0015365532
+angcflux   117   203   130   -0.0560746025   0.0018938595   -0.0125701103   0.0291247864
+angcflux   35   203   117   -0.0207377425   -0.1364713067   0.0154244675   -0.0595125183
+angcflux   35   203   130   -0.009668807   -0.021709471   -0.0079911476   0.0006284555
+angcflux   127   201   130   -0.0318697323   0.0051375821   -0.0354539125   -0.0408762615
+angcflux   29   117   203   0.0238892195   -0.0160736414   -0.0608157151   0.0956296598
+angcflux   23   117   203   0.0513394672   0.0360238204   0.0043190923   -0.0416575417
+angcflux   117   29   127   -0.0519405808   0.0199445711   -0.0431731258   -0.0048984935
+angcflux   203   130   226   0.0486018974   -0.0137935876   0.0108672235   0.0254495523
+angcflux   201   130   226   0.0033013466   -0.0029696669   0.0344403619   0.0302866382
+angcflux   201   130   203   0.0157850997   0.0502711921   -0.0251733522   0.0024130406
+angcflux   21   35   203   0.0573352528   0.0048629887   0.0267087809   0.0279582418
+angcflux   197   127   201   -0.0344583612   0.0527770367   0.0324994008   0.0326981821
+angcflux   29   127   201   0.0507996371   0.0326204458   -0.011977157   -0.0117681756
+angcflux   117   203   138   -0.0172602381   -0.0126568337   -0.0154177515   -0.0151269255
+angcflux   35   203   138   -0.003696053   -0.0417373577   -0.0130521868   0.0024995574
+angcflux   137   204   138   -0.0083329795   -0.0255098624   -0.0304587129   -0.029229687
+angcflux   28   204   138   -0.0203157052   -0.0205861684   0.0020989978   0.0043747028
+angcflux   117   135   137   -0.0374896947   0.0106401501   -0.0259087854   -0.0010765834
+angcflux   35   135   117   0.0038149302   -0.0056149342   0.0013037057   -0.0135100391
+angcflux   135   117   203   0.1811072357   0.112832339   -0.0961477554   -0.0161124158
+angcflux   23   117   135   0.0402952439   -0.009247912   -0.0086987435   0.0016568431
+angcflux   204   138   226   0.0371250952   -0.0122720242   0.0241112547   0.0281024826
+angcflux   203   138   204   0.0397350709   0.0414050753   -0.0073371386   -0.006724848
+angcflux   23   135   117   -0.0674508116   -0.0921857353   0.0044754011   0.0800258975
+angcflux   130   169   133   -0.0063255356   0.0055726287   -0.0032058365   -0.0802755214
+angcflux   35   169   133   -0.0113985444   -0.0105406269   0.0003004161   0.0287648589
+angcflux   35   169   130   -0.0073789116   0.0093216057   -0.0308979666   -0.0345372465
+angcflux   121   200   130   0.0026264482   0.0033452051   -0.0127384846   -0.0028083676
+angcflux   130   200   133   0.0066083924   -0.0067628727   -0.0037878676   -0.0082391845
+angcflux   127   200   130   0.010165704   -0.0168166921   -0.0246860546   -0.0141642366
+angcflux   169   133   200   0.0043435195   -0.0020916608   0.0097171469   0.0148123438
+angcflux   121   133   169   0.0107443342   -0.0005756241   0.0032237241   -0.0020066273
+angcflux   121   133   200   0.0073805952   0.0034953723   0.004690648   -0.0011840143
+angcflux   133   121   200   -0.0053954608   -0.008701223   -0.0024300153   -0.0003445224
+angcflux   127   121   200   -0.0018933373   -0.018111672   0.0074131245   0.0042048727
+angcflux   127   121   133   -0.0194527388   0.0059339267   -0.0205627503   -0.0047646795
+angcflux   169   130   200   0.0888601309   -0.0510904687   0.1547718978   0.0228014176
+angcflux   23   130   169   -0.0110810676   0.0214413025   0.0179060723   0.0051476497
+angcflux   23   130   200   0.3293001747   0.2044740441   -0.0128310543   -0.0532792488
+angcflux   121   127   200   0.0143927523   0.0241083078   -0.0118795885   -0.0103850444
+angcflux   121   127   197   0.0173880757   -0.0175258638   0.0196872774   0.0206105405
+angcflux   21   35   169   0.0838289487   -0.2271261693   -0.0707766218   0.0432334506
+angcflux   200   130   200   0.0936103429   0.0936103429   -0.0560932482   -0.0560932482
+angcflux   130   200   136   0.0348199955   0.0144240648   0.1408550378   0.0030001095
+angcflux   169   133   201   0.0015542589   0.0131138515   0.0152045109   0.0744310819
+angcflux   136   133   169   -0.0020222915   -0.0127766368   0.0139282566   -0.0492010448
+angcflux   41   203   117   -0.00055685   -0.0106277915   0.0448289715   -0.005618824
+angcflux   41   203   130   0.0149058441   -0.0120464511   0.0013612002   -0.0212392984
+angcflux   203   41   223   -0.0072572974   -0.0467795715   0.0184644026   -0.0598733728
+angcflux   39   41   203   0.0248242592   0.0248939115   0.0037713306   0.0134719943
+angcflux   19   41   203   -0.029888309   -0.0062000662   -0.0023809653   -0.0017544164
+angcflux   20   41   203   -0.029888309   -0.0062000662   -0.0023809653   -0.0017544164
+angcflux   41   34   212   0.0093040183   0.0014159709   0.0066747383   -0.0057120895
+angcflux   221   276   221   -0.0038585509   -0.0038585509   0.0208804513   0.0208804513
+angcflux   214   276   221   -0.0365427606   -0.0046285485   0.0246802099   0.0237930993
+angcflux   220   276   221   -0.0173194921   0.041397763   0.0163381372   0.0129165039
+angcflux   214   276   220   0.0016592065   -0.0021914405   -0.0001395572   -0.0008138788
+angcflux   35   221   276   -0.0189670783   0.0073860594   -0.0545258611   -0.0369609902
+angcflux   17   214   276   -0.022556167   0.0054932721   -0.0130929593   -0.0133528356
+angcflux   21   35   221   -0.0040706663   0.0835352204   0.0003498989   0.0114681933
+angcflux   215   275   221   0.0   0.0   0.0   0.0
+angcflux   215   275   215   0.0   0.0   0.0   0.0
+angcflux   215   275   220   0.0   0.0   0.0   0.0
+angcflux   220   275   220   0.0   0.0   0.0   0.0
+angcflux   35   221   275   -0.0162868764   0.0062037479   -0.0298062233   -0.0162851038
+angcflux   221   277   221   0.0118344097   0.0118344097   0.0401668656   0.0401668656
+angcflux   220   277   221   -0.0066328522   0.0032554099   0.0085566092   -0.0069130004
+angcflux   35   221   277   -0.0805555158   -0.0468114246   0.0282309477   0.006825148
+angcflux   24   171   33   -0.1235022905   -0.0724597152   -0.0042352694   -0.033099263
+angcflux   35   33   171   0.0111967485   0.0026334719   0.0155483448   0.0304159943
+angcflux   19   33   171   0.0749216857   -0.0068872902   0.0166056374   0.0168014023
+angcflux   35   58   35   0.0022682498   0.0022682498   -0.0013732328   -0.0013732328
+angcflux   35   32   212   0.0727756966   -0.0103347593   0.072635027   0.0147928497
+angcflux   33   223   35   -0.012614463   -0.012614463   -0.0349849444   -0.0349849444
+angcflux   11   56   35   0.0278998782   0.0164017729   0.010562365   0.0073856649
+angcflux   21   35   56   -0.0007753855   -0.0029136474   -0.0007844254   -0.0015272276
+angcflux   35   33   69   0.0021498131   -0.0087489651   0.0008323692   0.0030260347
+angcflux   19   33   69   0.0059688869   0.0041437336   -0.0070170188   -0.00599613
+angcflux   33   69   219   -0.0049855877   0.0006074606   0.0143913359   0.0157635807
+angcflux   22   69   33   0.0240923236   0.0022143241   0.0051504766   -0.0032014997
+angcflux   34   170   35   0.0   0.0   0.0   0.0
+angcflux   35   227   80   0.0051920773   -0.05470286   -0.075159244   -0.0676398051
+angcflux   21   35   227   0.0448549499   -0.0075964703   0.0152451514   0.0200445171
+angcflux   35   34   108   0.0042246783   -0.002229231   -0.0078813225   -0.0034163605
+angcflux   20   34   108   0.0024810495   0.0021804133   0.0008182433   -0.0106939166
+angcflux   34   108   108   0.0001229609   -0.0005253615   -0.0008185123   0.0022758318
+angcflux   33   223   34   -0.012614463   -0.012614463   -0.0349849444   -0.0349849444
+angcflux   35   33   74   0.0101840681   -0.0191945586   -0.011251682   -0.0191023836
+angcflux   19   33   74   -0.0073999155   0.0158832375   -0.0011420517   -0.0095252164
+angcflux   33   74   219   0.0263640585   0.0532897621   0.0137820596   0.0130864839
+angcflux   33   74   35   0.0220935272   0.0220935272   0.0153820867   0.0153820867
+angcflux   34   66   67   -0.000290842   -0.0083174732   0.0006198919   0.0234630301
+angcflux   34   66   68   -0.0081250261   0.0003465177   -0.0066130962   0.0253097048
+angcflux   22   66   34   -0.0084712446   -0.028900237   -0.0001228027   0.0226490241
+angcflux   66   33   212   0.0185587287   -0.0018581066   0.0011587919   -1.93271e-05
+angcflux   35   33   66   0.0002020859   -0.0100939799   -0.0089823185   -0.036906751
+angcflux   19   33   66   -0.0031440579   0.0069413935   0.0046344663   -0.0400224188
+angcflux   33   66   35   -0.0032068501   -0.0032068501   0.001456892   0.001456892
+angcflux   33   66   66   0.0026317411   0.0078208754   0.0236953656   0.0064930201
+angcflux   22   66   33   -0.0084712446   -0.028900237   -0.0001228027   0.0226490241
+angcflux   35   34   221   -0.0183804226   0.012630166   -0.0007384615   0.0411072772
+angcflux   34   223   66   0.0041796031   0.0005931931   -0.0130609821   -0.0059355249
+angcflux   66   66   223   0.0049785472   -0.0108707372   0.0127902033   0.0120393217
+angcflux   22   66   223   0.014982788   -0.0067390562   0.0033890363   0.001713605
+angcflux   34   255   83   0.007378268   -0.0265565169   -0.0153285722   0.0011762724
+angcflux   35   34   83   0.0056518885   -0.0216118013   -0.0027731554   -0.007011933
+angcflux   20   34   83   -0.0103488877   -0.0060640446   -0.0042134457   -0.004295357
+angcflux   35   34   255   -0.0024428879   0.0178980272   0.0036026364   0.0024481454
+angcflux   20   34   255   0.0174834996   0.0019502391   0.0037518794   0.0020144955
+angcflux   219   83   255   0.0017679693   -0.0103693558   0.0399027957   0.0402655611
+angcflux   34   83   255   0.0437009273   -0.022393587   0.0013251325   0.0394726676
+angcflux   34   83   219   0.0434440083   0.0498917999   0.0059574161   -0.0254061296
+angcflux   33   227   80   0.0051920773   -0.05470286   -0.075159244   -0.0676398051
+angcflux   33   74   34   0.0220935272   0.0220935272   0.0153820867   0.0153820867
+angcflux   33   179   92   -0.0538140223   -0.0225801529   -0.0157676617   -0.0385999452
+angcflux   24   179   33   0.0002034667   0.003567689   -0.0063177857   -0.014130411
+angcflux   35   33   179   -0.0036695697   -0.0183696643   -0.0007146342   0.0206976165
+angcflux   19   33   179   -0.0060018204   0.0097072539   -0.0063280067   0.0113621871
+angcflux   92   33   212   0.0039940261   -0.0106013041   -0.0022598867   -0.0149883568
+angcflux   35   33   92   0.0671685507   -0.0272028355   -0.0017846619   -0.0257173988
+angcflux   19   33   92   -0.0133388697   -0.0466195287   0.0038846111   -0.0017154948
+angcflux   33   92   219   0.0397088572   -0.0002201757   0.0084220927   -0.0326595196
+angcflux   33   92   179   0.0273190231   -0.0097532181   0.0193698799   0.0361540337
+angcflux   68   74   219   -0.0063666669   0.0263375833   0.0045841354   0.0092857968
+angcflux   34   74   68   0.0037789432   -0.0038765657   0.0148028671   0.0095597174
+angcflux   68   68   74   0.0021488833   0.0066985875   -0.010850859   -0.0255268325
+angcflux   22   68   74   -0.0196954984   0.0044883946   0.0008355839   -0.0070125545
+angcflux   68   68   72   -0.0002459389   -0.0001056325   -0.0071114109   -0.0045115964
+angcflux   34   74   52   0.0016192848   0.0090123084   0.0107622365   0.0089050924
+angcflux   108   109   109   0.0010129069   3.67637e-05   0.0003408787   -0.0391341309
+angcflux   34   108   109   -0.0004036736   -0.0018110949   0.0407596461   0.0162113266
+angcflux   66   34   80   -0.0018308745   -0.0046347142   0.000771111   -0.0057939462
+angcflux   34   221   276   -0.0189670783   0.0073860594   -0.0545258611   -0.0369609902
+angcflux   33   66   67   -0.000290842   -0.0083174732   0.0006198919   0.0234630301
+angcflux   53   179   92   0.0639769588   0.0547010002   0.0026547396   -0.0220953839
+angcflux   24   179   53   -0.0815165148   -0.0198576168   -0.0058598481   -0.0129524629
+angcflux   80   53   179   -0.0003153885   0.0028970788   -0.0094363677   0.0185898854
+angcflux   19   53   179   -0.0522800829   0.0029687247   -0.0124299971   0.01039773
+angcflux   20   53   179   -0.0522800829   0.0029687247   -0.0124299971   0.01039773
+angcflux   20   53   20   0.0164090578   0.0164090578   -0.0073215747   -0.0073215747
+angcflux   35   53   179   -0.0075286166   -0.0056014009   -0.0010250228   0.0160897908
+angcflux   74   52   83   -0.0196621527   0.018880007   -0.0144736095   0.0007762473
+angcflux   19   52   83   -0.0083374988   0.003645829   0.0041612674   -0.004670754
+angcflux   20   52   83   -0.0083374988   0.003645829   0.0041612674   -0.004670754
+angcflux   52   83   255   0.0018065894   -0.0032695265   -0.0033464732   0.0182711885
+angcflux   52   83   219   0.013977478   0.0276252336   -0.0017484851   0.0022057767
+angcflux   30   240   30   -0.0087277365   -0.0087277365   -0.0063337644   -0.0063337644
+angcflux   30   30   30   -0.0027625648   -0.0027625648   0.0003007919   0.0003007919
+angcflux   30   30   35   -0.0098046472   0.0126297039   0.0038934041   -0.008529052
+angcflux   30   30   240   -0.0035095443   0.0104052495   0.0118760311   0.0029501801
+angcflux   34   30   240   0.016449773   -0.0062674978   -0.0014408997   0.009023486
+angcflux   30   30   34   -0.0098046472   0.0126297039   0.0038934041   -0.008529052
+angcflux   30   34   35   0.0007002899   0.0033200992   0.0006691301   -0.000880043
+angcflux   20   34   30   0.0045507091   -0.0074593404   0.0012908135   -0.0004196507
+angcflux   66   34   227   0.0021893861   0.0010072656   0.0060480778   -0.0063517113
+angcflux   43   221   276   -0.0113242958   0.0048283392   -0.017443034   -0.0137543695
+angcflux   43   43   221   0.0057774002   0.0040364735   0.0061325052   0.0190063334
+angcflux   19   43   221   0.0142107314   0.006616556   0.0041155985   -0.0020244173
+angcflux   20   43   221   0.0142107314   0.006616556   0.0041155985   -0.0020244173
+angcflux   19   44   44   0.1152553894   0.0299109708   0.0027197548   0.0073209351
+angcflux   20   44   44   0.1152553894   0.0299109708   0.0027197548   0.0073209351
+angcflux   20   44   20   0.0417773348   0.0417773348   0.0178740552   0.0178740552
+angcflux   44   44   44   -0.0260384287   -0.0260384287   0.0233894168   0.0233894168
+angcflux   45   45   45   -0.0155252015   -0.0155252015   -0.0101947707   -0.0101947707
+angcflux   19   45   45   0.008468783   0.0134391652   0.0176662052   0.0065825586
+angcflux   20   45   45   0.008468783   0.0134391652   0.0176662052   0.0065825586
+angcflux   20   45   20   0.0189163896   0.0189163896   0.0053883196   0.0053883196
+angcflux   221   278   222   0.0   0.0   0.0   0.0
+angcflux   220   278   221   0.0   0.0   0.0   0.0
+angcflux   215   278   221   0.0   0.0   0.0   0.0
+angcflux   35   221   278   0.0   0.0   0.0   0.0
+angcflux   222   279   222   0.0   0.0   0.0   0.0
+angcflux   220   279   222   0.0   0.0   0.0   0.0
+angcflux   215   279   222   0.0   0.0   0.0   0.0
+angcflux   215   279   220   0.0   0.0   0.0   0.0
+angcflux   215   279   215   0.0   0.0   0.0   0.0
+angcflux   278   222   279   0.0   0.0   0.0   0.0
+angcflux   76   53   171   0.0   0.0   0.0   0.0
+angcflux   35   53   76   0.0   0.0   0.0   0.0
+angcflux   19   53   76   0.0   0.0   0.0   0.0
+angcflux   20   53   76   0.0   0.0   0.0   0.0
+angcflux   53   76   225   0.0   0.0   0.0   0.0
+angcflux   27   170   53   0.0   0.0   0.0   0.0
+angcflux   35   53   170   0.0   0.0   0.0   0.0
+angcflux   80   53   170   0.0   0.0   0.0   0.0
+angcflux   19   53   170   0.0   0.0   0.0   0.0
+angcflux   20   53   170   0.0   0.0   0.0   0.0
+angcflux   76   53   170   0.0   0.0   0.0   0.0
+angcflux   35   33   76   0.0   0.0   0.0   0.0
+angcflux   19   33   76   0.0   0.0   0.0   0.0
+angcflux   33   76   225   0.0   0.0   0.0   0.0
+angcflux   76   33   212   0.0   0.0   0.0   0.0
+angcflux   214   275   215   0.0   0.0   0.0   0.0
+angcflux   74   52   76   0.0   0.0   0.0   0.0
+angcflux   66   34   76   0.0   0.0   0.0   0.0
+angcflux   215   276   221   0.0   0.0   0.0   0.0
+angcflux   215   276   220   0.0   0.0   0.0   0.0
+angcflux   215   276   215   0.0   0.0   0.0   0.0
+angcflux   76   53   179   0.0   0.0   0.0   0.0
+angcflux   21   35   251   0.0   0.0   0.0   0.0
+angcflux   35   34   251   0.0   0.0   0.0   0.0
+angcflux   20   34   251   0.0   0.0   0.0   0.0
+angcflux   35   33   251   0.0   0.0   0.0   0.0
+angcflux   19   33   251   0.0   0.0   0.0   0.0
+angcflux   171   258   232   0.0   0.0   0.0   0.0
+angcflux   171   258   233   -0.0006925749   0.0013457457   0.0128015271   0.0033537248
+angcflux   34   258   171   -0.0023311275   0.0026911682   0.0008830219   0.0051711176
+angcflux   34   171   258   -0.0108114072   -0.0003885166   -0.0107784097   -0.0024466068
+angcflux   35   258   232   0.0   0.0   0.0   0.0
+angcflux   35   258   233   0.0269909521   0.0044057196   0.0045329016   0.016746373
+angcflux   35   258   171   -0.0023311275   0.0026911682   0.0008830219   0.0051711176
+angcflux   24   171   258   -0.0054197071   0.001583939   -0.0048448997   -0.0035132465
+angcflux   21   35   258   0.0003563372   -0.0019474107   -0.0038789291   -0.0003668616
+angcflux   27   170   33   0.0   0.0   0.0   0.0
+angcflux   35   33   170   0.0   0.0   0.0   0.0
+angcflux   19   33   170   0.0   0.0   0.0   0.0
+angcflux   80   227   80   -0.0116725593   -0.0116725593   -0.0555529299   -0.0555529299
+angcflux   223   42   223   0.0031473897   0.0031473897   0.0071461834   0.0071461834
+angcflux   30   240   141   0.0   0.0   0.0   0.0
+angcflux   30   142   141   0.0   0.0   0.0   0.0
+angcflux   30   142   35   0.0   0.0   0.0   0.0
+angcflux   35   142   141   0.0   0.0   0.0   0.0
+angcflux   30   30   142   0.0   0.0   0.0   0.0
+angcflux   35   30   142   0.0   0.0   0.0   0.0
+angcflux   142   141   240   0.0078366389   0.0305846544   0.0054364455   0.011043724
+angcflux   34   141   240   0.0   0.0   0.0   0.0
+angcflux   34   141   142   0.0   0.0   0.0   0.0
+angcflux   35   34   141   0.0   0.0   0.0   0.0
+angcflux   20   34   141   0.0   0.0   0.0   0.0
+angcflux   21   35   142   0.0053233805   -0.0016892714   0.0026896316   -0.0031543882
+angcflux   14   35   21   0.0132595837   -0.0018392363   0.0044958536   0.0021401584
+angcflux   14   34   14   0.0299924254   0.0299924254   0.0521813993   0.0521813993
+angcflux   14   34   20   0.0992514825   0.0074469146   0.0087101001   -0.0063875798
+angcflux   14   33   14   0.0299924254   0.0299924254   0.0521813993   0.0521813993
+angcflux   14   33   19   0.0992514825   0.0074469146   0.0087101001   -0.0063875798
+angcflux   14   32   14   0.0299924254   0.0299924254   0.0521813993   0.0521813993
+angcflux   13   65   13   0.0163511304   0.0163511304   0.0114356693   0.0114356693
+angcflux   29   29   56   0.0003360134   -0.0017420491   -0.0089646915   -0.0031260168
+angcflux   11   56   29   -0.002920289   -0.0001569769   0.0119780308   -0.0006311557
+angcflux   29   29   60   -0.0008851632   8.87312e-05   -0.0075751502   -0.0047137628
+angcflux   12   60   29   -0.0039808831   0.0080473786   0.0124490629   0.0113601067
+angcflux   35   34   60   -0.0005625515   -0.003051402   -5.8568e-06   0.0021522601
+angcflux   20   34   60   0.0013024891   -0.0097321842   -0.0002227609   0.0010747198
+angcflux   12   60   34   0.0421596398   0.001882658   -0.0021781321   -0.0007558754
+angcflux   35   34   56   -0.0011029621   -0.0054813363   3.05115e-05   -0.0019177238
+angcflux   20   34   56   0.0007381028   -0.0100212123   -9.72216e-05   -0.0024823196
+angcflux   11   56   34   0.0278998782   0.0164017729   0.010562365   0.0073856649
+angcflux   29   34   56   -0.0012308224   0.0018765364   9.4983e-06   1.35311e-05
+angcflux   29   34   60   -0.0017074393   0.0017094747   -1.8206e-06   -6.21286e-05
+angcflux   29   34   64   -0.0021098977   0.0024140686   0.0001376217   -8.45435e-05
+angcflux   20   34   64   0.0007184934   -0.0056139367   3.529e-05   -0.0002824756
+angcflux   13   64   34   0.0210391386   -0.000543542   0.0017290522   -0.0007465294
+angcflux   14   34   29   0.0106050549   -0.000506637   0.0047298359   0.0033627106
+angcflux   14   29   29   0.0528367923   -0.019538723   0.0354052696   0.0235507096
+angcflux   35   34   64   -0.0007121729   -0.0030517823   -1.46106e-05   -0.0004435247
+angcflux   56   34   56   -0.0027230409   -0.0027230409   -0.0041192691   -0.0041192691
+angcflux   60   34   60   -0.0035614972   -0.0035614972   -0.0011371109   -0.0011371109
+angcflux   29   29   64   1.24109e-05   0.0003896776   -0.0003363143   -8.74334e-05
+angcflux   13   64   29   3.38568e-05   0.0005077424   0.0005198301   0.0011620421
+angcflux   29   153   31   0.0067887289   -0.0239858053   0.0056533318   0.0005053936
+angcflux   29   153   29   0.0034134539   0.0034134539   -0.0018246283   -0.0018246283
+angcflux   29   31   153   0.0045578787   -0.0112601083   -0.0012448199   -0.0005164794
+angcflux   29   29   153   -0.0106347278   -0.0060370092   0.0009855904   -0.0045677177
+angcflux   23   29   153   0.0048391652   -0.0071066452   -0.0009096072   0.0031754021
+angcflux   29   54   29   0.0042521593   0.0042521593   -0.0098384666   -0.0098384666
+angcflux   19   54   29   0.0016812271   0.0057900273   0.0028058446   -0.0005783684
+angcflux   20   54   29   0.0016812271   0.0057900273   0.0028058446   -0.0005783684
+angcflux   20   54   20   0.0008189694   0.0008189694   0.0041218965   0.0041218965
+angcflux   29   29   54   0.0123630552   -0.0115528957   0.0047485004   0.0087707941
+angcflux   29   54   35   0.0009422652   -0.001571514   -0.001175348   0.0011816416
+angcflux   19   54   35   0.001785118   -0.000683678   -0.0019579832   -0.0005480791
+angcflux   20   54   35   0.001785118   -0.000683678   -0.0019579832   -0.0005480791
+angcflux   21   35   54   0.0041684459   -0.0001241179   0.0017947074   0.0014671896
+angcflux   29   228   117   0.0021526614   -0.0043140874   0.0308319793   -0.0338818005
+angcflux   200   117   228   0.0042296813   -0.0021612363   0.0197878311   -0.0002633561
+angcflux   29   117   228   0.011010748   -0.0114245541   -0.003279998   0.015004556
+angcflux   29   199   117   0.0311785246   0.2060964294   -0.0509630338   -0.0910904184
+angcflux   24   199   29   -0.0129117824   -0.0006893867   0.0034685982   -0.0004504514
+angcflux   24   199   117   -0.0010746039   0.0050093823   -0.0075202998   -0.0023883052
+angcflux   29   29   199   0.0938588219   0.0064115371   0.0677486514   0.096256976
+angcflux   199   117   200   0.0378604898   -0.0181456914   0.0267865661   0.0280870082
+angcflux   29   117   199   0.0261462876   -0.0111729816   0.0963204894   0.0155316921
+angcflux   29   199   35   -0.0168156253   -0.1529959825   -0.0026338381   0.0504905731
+angcflux   35   199   117   0.0375095653   -0.0410377615   -0.0135205595   0.0132580755
+angcflux   21   35   199   0.0274835956   -0.0068695521   0.0140735006   0.0153110244
+angcflux   29   199   29   -0.0052678868   -0.0052678868   -0.0351734682   -0.0351734682
+angcflux   47   176   48   0.0   0.0   0.0   0.0
+angcflux   47   176   92   -0.0079474644   -0.0100239059   -0.0332201176   -0.0061850836
+angcflux   24   176   47   -0.0066519649   -0.0075698965   0.0061251978   -0.0075904911
+angcflux   24   176   48   0.0   0.0   0.0   0.0
+angcflux   24   176   92   -0.0052447516   -0.0108720725   -0.0188704809   0.0037913895
+angcflux   47   47   47   -0.0189007544   -0.0189007544   -0.0058786675   -0.0058786675
+angcflux   19   47   47   0.0505267139   0.0276026995   0.0357514966   -0.0066594704
+angcflux   20   47   47   0.0505267139   0.0276026995   0.0357514966   -0.0066594704
+angcflux   20   47   20   0.0299924333   0.0299924333   0.0187496223   0.0187496223
+angcflux   47   47   176   0.0006505116   0.0077416676   0.0193134773   0.0173994853
+angcflux   19   47   176   0.0380703222   0.015325075   0.0059179871   0.0059632123
+angcflux   20   47   176   0.0380703222   0.015325075   0.0059179871   0.0059632123
+angcflux   20   47   192   0.005943442   0.0053220366   0.0023403574   0.0020859746
+angcflux   47   47   48   0.0   0.0   0.0   0.0
+angcflux   47   47   92   -0.018369176   -0.0084342528   -0.0121375481   0.0002019917
+angcflux   19   47   48   0.0   0.0   0.0   0.0
+angcflux   19   47   92   -0.0041849496   -0.0590807159   0.0013766326   -0.0033678858
+angcflux   20   47   48   0.0   0.0   0.0   0.0
+angcflux   20   47   92   -0.0041849496   -0.0590807159   0.0013766326   -0.0033678858
+angcflux   176   48   219   0.0   0.0   0.0   0.0
+angcflux   47   48   219   0.0   0.0   0.0   0.0
+angcflux   47   48   176   0.0   0.0   0.0   0.0
+angcflux   176   92   219   -0.0031582847   0.0280145795   0.0729274278   0.0731503664
+angcflux   47   92   219   0.066454156   0.0154794703   0.0079029028   0.0117468503
+angcflux   47   92   176   0.0702555286   0.0150333366   0.0029584833   0.0080572078
+angcflux   35   176   47   -0.0012323969   -0.0037132705   -0.0008940778   -0.0059430716
+angcflux   35   176   48   0.0   0.0   0.0   0.0
+angcflux   35   176   92   -0.007243514   -0.0048599558   -0.0103273508   -0.0117149115
+angcflux   21   35   176   0.0273385149   -0.0059131559   0.0110045214   0.0116442023
+angcflux   29   176   48   0.0   0.0   0.0   0.0
+angcflux   29   176   92   0.0001353248   -0.0117940732   -0.06044794   -0.0371958809
+angcflux   24   176   29   -0.010607508   -0.0035122439   0.0099844916   -0.0097557677
+angcflux   29   47   47   -0.005671179   0.0031857574   -0.0059198571   -0.0012757786
+angcflux   19   47   29   -0.0003163956   0.0077351555   0.0009876242   -0.0002721429
+angcflux   20   47   29   -0.0003163956   0.0077351555   0.0009876242   -0.0002721429
+angcflux   29   29   47   -0.0055433468   -0.0282830573   0.0037242993   0.0056200062
+angcflux   29   29   176   0.0584004018   -0.0323048385   0.0380190091   0.050028889
+angcflux   47   176   95   -0.004928869   -0.0112113914   -0.0243584267   -0.0024771284
+angcflux   24   176   95   0.0081747041   -0.0086764509   -0.007288501   -0.007794065
+angcflux   29   29   95   -0.0401326856   -0.0739946935   -0.0502139328   -0.0532048875
+angcflux   176   95   219   -0.0061080689   0.0320908952   0.0191366909   0.0144394501
+angcflux   29   95   219   0.0273585756   0.0341923538   0.0010468547   0.0059799198
+angcflux   29   95   176   0.0119933213   0.0096834222   0.0160503232   0.0116045246
+angcflux   29   176   35   -0.0002156619   -0.0002314873   -0.0025089207   -0.0023781149
+angcflux   47   176   103   0.0   0.0   0.0   0.0
+angcflux   47   192   103   -0.006678172   -0.0007563276   0.0020369734   0.0017882455
+angcflux   29   29   103   -0.0069752935   -0.0043287155   -0.0127811008   -0.0075608698
+angcflux   29   103   176   0.0   0.0   0.0   0.0
+angcflux   29   103   192   -0.0077450507   0.0102262254   0.0031351471   0.0026268198
+angcflux   35   103   176   0.0   0.0   0.0   0.0
+angcflux   29   103   35   -0.0005717438   -0.0013542796   0.0057557576   0.0075234301
+angcflux   48   47   176   0.0   0.0   0.0   0.0
+angcflux   92   47   192   -0.0004221045   0.0004679492   -0.0020955524   -0.0011882469
+angcflux   21   35   103   -0.0021437074   0.0101174412   -0.0010106165   -0.003104976
+angcflux   24   179   95   -0.0363165059   -0.0131645082   -0.0183227305   -0.0036252252
+angcflux   179   95   219   0.0460122213   0.0957883642   0.0189543678   0.0101289488
+angcflux   29   95   179   -0.0396960697   0.0521077623   0.0221089703   0.0097247513
+angcflux   43   174   43   -0.0185890578   -0.0185890578   0.0083646717   0.0083646717
+angcflux   43   174   95   0.0074727495   0.0027501606   -0.0624086278   -0.0376604955
+angcflux   43   43   174   0.0068055522   0.0149355894   0.024024879   0.0386045912
+angcflux   19   43   174   0.0626177387   -0.0013049166   0.0214113051   0.0163082077
+angcflux   20   43   174   0.0626177387   -0.0013049166   0.0214113051   0.0163082077
+angcflux   174   95   219   0.0031549858   0.0150614223   0.0215026671   0.0334029636
+angcflux   29   95   174   0.0496835492   -0.0238520747   0.0055237737   0.0313331392
+angcflux   35   43   174   0.0056245799   -0.0023533682   0.0019378248   0.0097206127
+angcflux   35   43   43   0.0042652141   0.0013069981   -0.0022417824   0.0020925856
+angcflux   19   43   35   0.0024392555   -0.0009466476   -0.0036346683   0.0003773755
+angcflux   20   43   35   0.0024392555   -0.0009466476   -0.0036346683   0.0003773755
+angcflux   21   35   43   0.0001660814   -0.020667473   0.0006130659   -0.0003622926
+angcflux   118   169   159   -0.0130269238   0.0146041448   0.0090107504   0.0084796795
+angcflux   35   169   159   0.0092399028   0.0067515345   -0.0047112682   -0.0093989224
+angcflux   35   169   118   0.0042190153   -0.0078079444   -0.0163349451   -0.0293640892
+angcflux   118   200   159   -0.0082957731   0.0064588975   -0.0006291034   0.0194345172
+angcflux   117   200   158   0.0097957769   -0.0167007331   0.0031478383   -0.0108866393
+angcflux   169   159   200   -0.0114079051   -0.0175663458   0.0111527361   0.009157446
+angcflux   158   159   169   0.015215155   -0.0207342719   -0.0159597504   -0.0070448133
+angcflux   158   159   200   0.0099253454   -0.0081353251   -0.0206180092   -0.0224662275
+angcflux   200   158   200   0.0140524833   0.0140524833   -0.0166980851   -0.0166980851
+angcflux   159   158   200   -0.020379391   0.0189727416   0.0285511675   0.0119408664
+angcflux   118   118   169   -0.0035210926   0.0055033079   -0.0073426593   0.0177938519
+angcflux   23   118   169   0.0223994498   0.0088887096   -0.0047097173   -0.0216193635
+angcflux   23   118   118   0.0320293368   -0.0219732054   0.0008883634   0.0110789789
+angcflux   118   118   200   0.0022999424   -0.0012341   -0.0108459319   0.0034249456
+angcflux   117   29   117   -0.0369417146   -0.0369417146   0.0076261036   0.0076261036
+angcflux   145   206   200   0.0   0.0   0.0   0.0
+angcflux   161   206   200   0.0   0.0   0.0   0.0
+angcflux   161   207   200   0.0118402298   -0.010219868   -0.0202407586   -0.0214072963
+angcflux   145   206   161   0.0   0.0   0.0   0.0
+angcflux   145   207   161   0.0115513717   -0.0133666086   -0.0271173777   -0.0156991029
+angcflux   118   200   206   0.0   0.0   0.0   0.0
+angcflux   117   200   161   0.022803189   -0.0230848503   -7.68202e-05   -0.0311644968
+angcflux   146   145   206   0.0   0.0   0.0   0.0
+angcflux   35   145   206   0.0   0.0   0.0   0.0
+angcflux   35   145   207   0.0103585911   0.0069832737   0.0063846244   -0.0071837305
+angcflux   35   145   146   0.0126607734   -0.0025432772   -0.0068069677   0.0041453543
+angcflux   118   146   145   0.0024474934   -0.0217709415   -0.0151944768   -0.0175022782
+angcflux   23   146   145   -0.0046155169   -0.0066426699   -0.0015287568   -0.0057768049
+angcflux   23   146   118   0.0056007392   -0.0030726602   0.0026601901   0.0055518427
+angcflux   200   161   206   0.0   0.0   0.0   0.0
+angcflux   200   161   207   0.0333915006   -0.0327089563   0.0323406003   0.0365807515
+angcflux   200   161   200   0.0269701102   0.0269701102   -0.03569373   -0.03569373
+angcflux   21   35   145   0.0031943632   0.0037629277   0.0007482859   0.0003413917
+angcflux   146   118   200   -0.0378065223   0.0124071731   -0.0115282063   0.0238466426
+angcflux   23   118   146   0.0100052351   -0.0204417518   0.0063954538   0.0117730612
+angcflux   29   240   141   -0.0270580739   -0.0300734177   0.0106978959   -0.0138859829
+angcflux   117   200   121   0.0047647688   -0.0107318257   0.00023847   0.001546815
+angcflux   29   142   121   -0.0107062585   0.0137270535   -0.0004119465   -0.0048160894
+angcflux   121   142   141   0.0056847265   0.0063088084   -0.0103288153   -0.0140440869
+angcflux   29   142   141   0.0046548578   -0.0234340241   0.008013121   -0.0122211731
+angcflux   142   121   200   -0.0165289895   0.0199873505   0.0006394625   -0.0008434213
+angcflux   29   121   200   -0.0005741211   0.0161245299   -0.0161350352   -0.0124046134
+angcflux   29   121   142   -0.001598516   -0.0139019458   0.0174185962   0.0137360652
+angcflux   29   29   142   -0.0042930691   -0.0026907867   0.0008659583   0.0008474051
+angcflux   23   29   142   0.0020551487   0.0064392081   0.0010296071   -0.0037599777
+angcflux   29   29   121   0.0209228693   -0.0293456901   0.0033309713   -0.0384701388
+angcflux   23   29   121   -0.0196418558   -0.0012261914   0.0007200285   0.0212542397
+angcflux   23   141   240   0.0125584075   -0.0016779312   -0.0004125597   0.0021125749
+angcflux   23   141   142   0.0069927203   -0.0004804634   -0.0018378805   -0.0024783143
+angcflux   29   29   240   -0.0002598241   0.0194358048   0.009317475   0.0271435171
+angcflux   23   29   240   0.0192166383   0.0187988685   0.0037181824   -0.0057795791
+angcflux   152   269   163   -0.0319573868   0.0178096559   0.0245567706   -0.0005153511
+angcflux   117   200   162   0.0006773119   -0.0027498918   -0.0001607707   -0.0002959269
+angcflux   151   209   163   -0.0138288399   -0.0034845972   0.0044987052   0.0355423204
+angcflux   163   162   200   -0.0109634099   -0.0136971492   0.0119677057   0.0006566796
+angcflux   29   162   200   -0.0014724917   0.0087525961   -0.0083932952   -0.0068520534
+angcflux   29   162   163   -0.0006049261   -0.0092263278   0.0088066467   0.0082850992
+angcflux   209   163   269   -0.0072130326   -0.0171515962   0.0394051361   0.0138044287
+angcflux   162   163   269   0.0534780336   -0.0381073794   -0.0101086796   0.0212505095
+angcflux   162   163   209   0.0166711489   0.0154073222   -0.0144864362   -0.0341559829
+angcflux   29   29   162   -0.0005971371   0.0041959972   -0.0022039683   -0.0094964798
+angcflux   23   29   162   -0.0092137818   -0.0016335508   0.0011987935   0.0070492983
+angcflux   151   152   269   0.0383913983   0.0228889618   0.0002123347   0.056325502
+angcflux   23   152   269   0.0212847219   0.0220696479   0.0232826821   -0.0198055823
+angcflux   23   152   151   0.0217450227   0.0147335393   -0.0090297897   0.0103026863
+angcflux   152   151   209   -0.0245154774   0.0087537625   -0.0115790966   -0.0148704262
+angcflux   23   151   209   -0.0154300564   0.0089498593   -0.0037303034   -0.0075901321
+angcflux   23   151   152   -0.0064587469   -0.0202499866   0.0075933069   -0.0040802289
+angcflux   29   230   34   -0.0207506635   -0.0097211516   -0.0234583783   -0.0154589874
+angcflux   29   29   230   0.0400878293   -0.0736555361   0.0542568275   0.0525809019
+angcflux   35   34   230   0.0014270169   0.0023196343   0.0025169775   0.0091882531
+angcflux   20   34   230   0.0208865038   -0.001855913   0.0105743307   0.0029889637
+angcflux   118   169   155   -0.0082555448   -0.0055587515   0.0052661961   0.0044414645
+angcflux   35   169   155   0.0023771871   -0.002105824   -0.0093029833   -0.0118434757
+angcflux   154   155   169   0.0056947304   0.002814021   -0.003885381   -0.0015110774
+angcflux   29   155   169   -0.0023405016   -0.0011648444   0.0069967147   0.0104683649
+angcflux   29   155   154   -0.001158573   0.0059898403   -0.0071247325   -0.0060952254
+angcflux   29   154   155   0.0261649477   -0.0335693969   0.0273970427   0.0278164936
+angcflux   29   154   29   0.0314130099   0.0314130099   -0.0162328898   -0.0162328898
+angcflux   29   29   155   -0.0022644544   -0.0025211089   -0.0181360623   0.0070139899
+angcflux   23   29   155   0.0058546899   -0.0003410878   0.005587253   -0.0044814874
+angcflux   29   118   169   -0.0136334384   0.0033484195   0.0161501181   0.0155278848
+angcflux   23   118   29   0.0071527395   -0.0039516242   -0.0004319413   -0.0022670109
+angcflux   29   29   118   -0.0038948325   0.0031316931   0.0092387998   0.0027893531
+angcflux   23   29   118   0.0093493418   -0.0023422242   0.0007564195   -0.0112730857
+angcflux   29   29   154   0.0153410989   -0.0267379618   -0.0037363474   -0.0273179912
+angcflux   23   29   154   -0.0127490525   -0.0188273303   0.0020221707   0.0114717761
+angcflux   124   202   155   -0.0084110098   -0.0028260531   0.0085092796   0.0090751998
+angcflux   28   202   155   0.0089820874   -0.0023045565   -0.0057179856   -0.0063091377
+angcflux   154   155   202   0.009723027   -0.004842731   -0.0093094853   -0.0087972423
+angcflux   120   155   202   -0.0069819281   -0.0009968452   0.0068142455   0.0094824107
+angcflux   120   155   154   -0.0022697248   0.0033867665   -0.0085860553   -0.0124091058
+angcflux   120   120   155   -0.0015747772   -0.0011271713   0.0027271752   0.0087055243
+angcflux   23   120   155   0.0050084735   0.000467218   0.0022030497   -0.0036402346
+angcflux   23   120   120   0.0138224743   -0.0048826807   -0.0019342133   -0.0038171397
+angcflux   120   120   124   -0.0052907269   -0.000919401   0.0026949742   0.0053914493
+angcflux   121   207   200   0.0044561567   -0.0109975646   -0.0168870032   -0.0138082142
+angcflux   145   207   200   -0.0560210285   -0.0137729026   0.0040971687   0.0330813428
+angcflux   121   207   145   -0.0044940976   -0.0009044224   -0.0048298252   -0.0163483268
+angcflux   118   200   207   -0.0180465621   0.0034857487   0.0176667009   0.0534584811
+angcflux   29   121   207   0.0272924044   -0.0047523393   0.0228403141   0.0289025274
+angcflux   29   121   29   0.0218112517   0.0218112517   -0.0101727643   -0.0101727643
+angcflux   146   145   207   0.0186781349   0.0348834572   -0.001950948   0.0331649705
+angcflux   23   145   207   0.0102732903   0.0098794903   0.0047438682   -0.0080766638
+angcflux   23   145   146   0.0303072545   -0.0116771459   -0.0109699436   -0.0008034905
+angcflux   35   227   85   0.0080455917   -0.0156950403   -0.0085154174   -0.01667463
+angcflux   29   171   35   -0.0514205633   0.0351632998   -0.0144964439   -0.0602691575
+angcflux   24   171   29   0.0040257006   -0.0005032056   -0.00983097   -0.0003111276
+angcflux   29   29   171   0.0440485556   -0.0080116552   0.0490162136   0.0566771615
+angcflux   219   85   227   0.0238071926   0.0074564967   -0.0012874199   0.0014964821
+angcflux   29   85   227   -0.0003360156   0.0111588212   0.0158621083   0.0164264778
+angcflux   29   29   105   -0.0103765679   0.1010627404   -0.1065142449   -0.0950162496
+angcflux   29   105   219   0.0069362659   0.2625152161   0.0088505987   0.0096419168
+angcflux   29   105   29   0.0198596447   0.0198596447   0.101936697   0.101936697
+angcflux   153   29   197   0.006657956   -0.0038842025   -0.0017704092   0.007113892
+angcflux   117   200   167   0.0072317955   -0.0181598165   0.0007878519   -0.0104759273
+angcflux   29   166   167   -0.042880443   0.010634197   -0.0097275049   -0.0155298079
+angcflux   29   166   29   -0.0020391789   -0.0020391789   -0.0061366238   -0.0061366238
+angcflux   166   167   200   -0.0129858751   0.0197634668   0.0025367761   0.0118541834
+angcflux   29   167   200   0.0051529373   0.0278756966   -0.0172526113   -0.0182172821
+angcflux   29   167   166   0.0172578079   -0.0220191115   0.0250455825   0.0233643076
+angcflux   166   29   197   0.0122186781   -0.0127497108   0.007153594   0.0162743974
+angcflux   29   29   166   0.0111969436   0.0098672696   -0.0301614297   -0.0035129469
+angcflux   23   29   166   0.001183106   0.0005451461   -0.0004167641   -0.0032154589
+angcflux   29   29   167   0.0155979641   -0.0090699451   0.00075467   -0.024145079
+angcflux   23   29   167   -0.017769942   -0.0038400095   -0.0007297522   0.0140269277
+angcflux   166   29   171   0.0239423517   -0.0115515502   0.0023412352   0.0200780512
+angcflux   34   44   44   0.0017808805   -0.0031150557   -0.0114209301   0.0038807084
+angcflux   19   44   34   3.84519e-05   -0.0006591197   0.0003666191   0.0001906365
+angcflux   20   44   34   3.84519e-05   -0.0006591197   0.0003666191   0.0001906365
+angcflux   35   34   44   -0.0008085621   0.0032507811   2.74358e-05   -0.0006378935
+angcflux   20   34   44   0.011295508   -0.0007570482   0.0028709351   -0.0007139143
+angcflux   17   212   44   -0.0008816189   0.002858773   9.74004e-05   -0.0025635324
+angcflux   44   44   212   0.0039406281   -0.0100109129   0.0035290553   0.0090308567
+angcflux   34   44   212   0.0043815278   -0.0006856643   0.0033130207   0.0008843477
+angcflux   44   34   212   -0.0025307766   0.0018604929   0.0061864977   0.0036686578
+angcflux   44   179   92   0.0041977602   -0.0034811195   -0.0030059156   -0.0060709753
+angcflux   24   179   44   -0.0022361787   0.0054440229   0.0011255764   -8.46495e-05
+angcflux   44   44   179   0.0008775223   -0.0063416616   0.0069529018   0.0075950282
+angcflux   19   44   179   0.0102206582   -0.003558045   0.0025378208   0.0018064987
+angcflux   20   44   179   0.0102206582   -0.003558045   0.0025378208   0.0018064987
+angcflux   44   44   92   -0.0076744532   0.0088570945   -0.0296965665   -0.0029115549
+angcflux   19   44   92   -0.0020811233   -0.0018459901   -9.94053e-05   -1.00425e-05
+angcflux   20   44   92   -0.0020811233   -0.0018459901   -9.94053e-05   -1.00425e-05
+angcflux   44   92   219   0.0003324801   0.0172758012   -0.0022997465   0.0050061908
+angcflux   44   92   179   -0.0071039837   0.0082182644   0.0147157325   0.0089050685
+angcflux   44   44   80   0.0032523316   0.0070016687   -0.0287372338   -0.001548006
+angcflux   19   44   80   -0.0030098171   -0.0017634282   3.15116e-05   -0.000117779
+angcflux   20   44   80   -0.0030098171   -0.0017634282   3.15116e-05   -0.000117779
+angcflux   44   80   227   -0.006192383   0.0081140789   0.0135913169   0.0093735934
+angcflux   44   80   219   -0.0030042918   0.0168657296   -0.001126781   0.0047739001
+angcflux   44   227   80   0.0025919616   -0.0022794291   -0.0015702395   -0.0058072729
+angcflux   44   44   227   0.0021501419   -0.0034173825   0.006146098   0.0107040496
+angcflux   19   44   227   0.0084803212   -0.0002432044   0.0019258839   -4.954e-05
+angcflux   20   44   227   0.0084803212   -0.0002432044   0.0019258839   -4.954e-05
+angcflux   11   44   44   0.0152726933   -0.0074464309   0.0107645071   0.0162440649
+angcflux   11   44   80   0.005000633   -0.0010161823   0.0034359273   0.0030609874
+angcflux   11   44   92   0.0044643517   -0.0002389653   0.0038052259   0.0022340599
+angcflux   34   45   45   -0.0034291713   -0.0007023082   -0.0006644709   0.0004238681
+angcflux   19   45   34   0.0077294344   -0.0004833228   -0.001839463   0.0009750089
+angcflux   20   45   34   0.0077294344   -0.0004833228   -0.001839463   0.0009750089
+angcflux   35   34   45   -0.0047770849   -0.0004361026   -0.0033827692   -0.0116125913
+angcflux   20   34   45   -0.0026285111   -0.0031541719   -0.0050896065   -0.0023429897
+angcflux   45   223   46   0.0   0.0   0.0   0.0
+angcflux   45   223   45   -0.0117417501   -0.0117417501   -0.008756827   -0.008756827
+angcflux   45   45   46   0.0   0.0   0.0   0.0
+angcflux   34   45   46   0.0   0.0   0.0   0.0
+angcflux   35   45   46   0.0   0.0   0.0   0.0
+angcflux   35   45   45   -0.0034291713   -0.0007023082   -0.0006644709   0.0004238681
+angcflux   34   45   35   -0.000215405   -0.000215405   0.0006740653   0.0006740653
+angcflux   45   46   223   0.0   0.0   0.0   0.0
+angcflux   19   46   223   0.0   0.0   0.0   0.0
+angcflux   20   46   223   0.0   0.0   0.0   0.0
+angcflux   19   46   45   0.0   0.0   0.0   0.0
+angcflux   20   46   45   0.0   0.0   0.0   0.0
+angcflux   20   46   20   0.0   0.0   0.0   0.0
+angcflux   45   45   223   0.0063992586   0.0201346572   -0.0075684641   -0.0080147713
+angcflux   19   45   223   0.019004682   -0.0041463396   0.0149593116   0.0154852211
+angcflux   20   45   223   0.019004682   -0.0041463396   0.0149593116   0.0154852211
+angcflux   21   35   45   9.7219e-06   0.0036709133   -6.00283e-05   -0.0002597083
+angcflux   17   212   45   8.23358e-05   -0.00040615   1.26311e-05   -0.0026759615
+angcflux   46   45   212   0.0   0.0   0.0   0.0
+angcflux   45   45   212   0.0083944857   -0.0054990018   0.0063129269   0.0107202254
+angcflux   34   45   212   0.0047308296   -0.0010955993   0.0046555676   0.0010915708
+angcflux   45   34   212   -0.0022944202   -0.0010493784   0.0051926127   0.0036843617
+angcflux   45   252   45   -0.0035133363   -0.0035133363   0.0086306716   0.0086306716
+angcflux   45   45   252   0.0108278322   0.0013380497   0.0011745837   0.0043304991
+angcflux   19   45   252   0.0265037573   0.0018088317   0.0094312317   0.0040388495
+angcflux   20   45   252   0.0265037573   0.0018088317   0.0094312317   0.0040388495
+angcflux   34   45   252   0.0074119562   -0.0026149648   0.0038496613   0.0043372501
+angcflux   34   39   39   -0.0117302745   0.0052453381   -0.0053016235   -0.0010044492
+angcflux   19   39   34   0.0041812871   0.0012192458   -0.0027703053   0.001642763
+angcflux   20   39   34   0.0041812871   0.0012192458   -0.0027703053   0.001642763
+angcflux   35   34   39   -0.0011144538   0.0004203298   -0.0003666264   -0.0011881831
+angcflux   20   34   39   0.0112013262   -0.0023737886   -0.0013060794   -0.001669399
+angcflux   39   252   39   -0.0050732783   -0.0050732783   0.0026484601   0.0026484601
+angcflux   39   39   252   0.0015584918   0.0008891328   0.0041240933   0.004518417
+angcflux   19   39   252   0.0149442931   -0.0010187262   0.0032631234   0.0018892525
+angcflux   20   39   252   0.0149442931   -0.0010187262   0.0032631234   0.0018892525
+angcflux   124   202   124   -0.0185305766   -0.0185305766   0.0251980281   0.0251980281
+angcflux   35   179   95   -0.0218904308   -0.0502486514   -0.0043289138   -0.0785607411
+angcflux   95   132   202   0.0120335569   -0.0189210782   -0.0110051049   -0.0081435932
+angcflux   95   132   200   0.0067823039   -0.0067330781   -0.0220010958   -0.0198160707
+angcflux   132   95   219   -0.0025636135   0.0053423829   0.0175235985   0.009724257
+angcflux   132   95   179   -0.0036511508   0.0155861384   0.0072287683   0.0016407628
+angcflux   118   169   130   -0.0179566538   0.0185690925   0.0133883336   0.0134428158
+angcflux   118   200   130   -0.0150606002   0.0155319733   0.0057146478   0.018277745
+angcflux   95   130   169   0.0167988671   -0.0205003011   -0.0229881409   -0.013210508
+angcflux   95   130   200   0.0172612286   -0.0204604642   -0.0226975422   -0.0222788755
+angcflux   130   95   219   0.0025995636   0.0050364612   0.017256617   0.0066318905
+angcflux   130   95   179   -0.0125143112   0.0226352951   0.0182945516   0.007532644
+angcflux   147   249   149   -0.0441782154   -0.0065975201   0.0152808554   0.0025277573
+angcflux   147   208   148   -0.0090125483   0.008283662   0.0104328291   0.0226269404
+angcflux   148   149   249   0.0146588794   0.0191309796   -0.0054743605   0.0348350632
+angcflux   23   149   249   0.0123520555   0.0189561219   0.0102721757   -0.0110098096
+angcflux   23   149   148   0.0151379155   0.0040195304   -0.0042767535   0.0029812571
+angcflux   149   148   208   -0.0019782037   -0.0012822331   -0.0059874669   -0.0008247916
+angcflux   23   148   208   -0.0114552956   0.009215109   0.006789702   -0.0051063544
+angcflux   23   148   149   0.0075232884   -0.0118881261   0.0045785995   0.0029376523
+angcflux   208   147   249   -0.0387597865   0.0032079631   0.0271789317   0.0210860999
+angcflux   23   147   249   0.0171482281   -0.0033153163   -0.0031307674   0.0016824213
+angcflux   23   147   208   0.006451651   -0.0008042323   -0.0006574176   -0.0028191461
+angcflux   95   147   249   0.0205438042   -0.0066285464   -0.0164757334   0.0049445028
+angcflux   95   147   208   0.0152382327   -0.0142705927   -0.0082881019   -0.0199591765
+angcflux   147   95   219   0.0070702229   0.0026825636   0.0049475998   -0.0049649601
+angcflux   147   95   179   -0.0016294015   0.0167256021   0.0135382111   0.0133812307
+angcflux   150   269   152   -0.046828443   -0.005983033   0.0303972719   0.0140637629
+angcflux   150   209   151   -0.0241134874   -0.0091534078   0.0109926792   0.0385932988
+angcflux   209   150   269   -0.0145408305   -0.018989319   0.068901428   0.0317007918
+angcflux   23   150   269   0.0248840638   -0.0056239248   -0.0010817895   0.0077298541
+angcflux   23   150   209   0.0112694736   0.0021788727   -0.0014054   -0.0047278886
+angcflux   95   150   269   0.0274688727   -0.018889246   -0.0129217596   0.0094824409
+angcflux   95   150   209   0.0105421682   0.0011673792   -0.0101337089   -0.0179506735
+angcflux   150   95   219   -0.0043152749   -0.001377292   0.0082225101   0.0034760205
+angcflux   150   95   179   -0.0118697134   0.0133486581   0.0080162087   0.0030584592
+angcflux   29   268   143   -0.0371274451   -0.022234671   0.0468058619   0.0189585143
+angcflux   29   268   29   -0.0129844333   -0.0129844333   0.0066158487   0.0066158487
+angcflux   29   144   143   -0.0144217062   -0.010890909   -8.50773e-05   0.019726832
+angcflux   23   144   29   0.0207099376   -0.0165754153   -0.0001345999   0.0007382561
+angcflux   23   144   143   0.0103251626   0.0004886168   -0.0020103434   -0.0210617486
+angcflux   29   29   144   -0.012064077   0.0048566319   0.0300188256   -0.0008366111
+angcflux   23   29   144   0.0190849586   -0.0020387871   -0.0016051353   0.0020158547
+angcflux   144   143   268   -0.0115651395   0.0027448429   0.0339947677   0.0222947859
+angcflux   23   143   268   0.0   0.0   0.0   0.0
+angcflux   23   143   144   0.0   0.0   0.0   0.0
+angcflux   29   29   268   0.0080724297   0.0086470222   0.0239419654   0.0404440096
+angcflux   23   29   268   0.0472740205   0.0118712744   0.0158148883   -0.0069274454
+angcflux   95   143   268   0.0191816016   -0.0024541303   -0.0099447233   0.0017901761
+angcflux   95   143   144   -0.0048879124   0.0106220981   -0.0072928758   -0.0108917725
+angcflux   143   95   219   -0.0102803339   0.0189088343   0.0145681801   0.0067300925
+angcflux   143   95   179   -0.0056830229   0.0084754304   0.0067689607   0.0158016301
+angcflux   74   143   268   0.019380745   -0.0057160832   -0.0133293157   -0.0003473122
+angcflux   74   143   144   0.0090149888   -0.0008105594   -0.0094632077   -0.008686175
+angcflux   143   74   219   -0.0072952852   0.0075690504   0.0060775511   0.0059607998
+angcflux   35   74   143   0.0097793548   -0.0125300258   0.0055070161   0.0111302691
+angcflux   95   141   240   0.0046815984   -0.005500632   -0.0053660271   -0.0035072359
+angcflux   95   141   142   -0.0023348265   0.0035802888   -0.0041092919   -0.0106444247
+angcflux   141   95   219   0.0015901314   0.0208995429   0.0050262748   -0.0002279818
+angcflux   141   95   179   0.0075982059   0.0034566744   0.0120290964   0.0144416885
+angcflux   23   142   141   -0.0064628865   -0.0059440361   -0.0007933842   0.0007786032
+angcflux   23   142   29   0.0052985466   -0.0035851506   0.000538769   -0.0001869101
+angcflux   35   179   143   -0.0010016334   0.0033252367   0.0169320694   -0.0050157941
+angcflux   92   179   143   0.0194003799   -0.0202173072   0.027518096   -0.0168455022
+angcflux   179   143   268   -0.0097436057   0.0162768979   0.0268189485   0.0038883767
+angcflux   144   143   179   0.0240152635   0.0008489759   0.0082808904   0.0019338476
+angcflux   35   179   141   -0.0054238053   0.0006395016   6.44033e-05   -0.006981917
+angcflux   92   179   141   0.0274683453   -0.0310905894   -0.0056631701   -0.0173284353
+angcflux   179   141   240   0.0009203337   0.012586738   0.0136686256   0.0217928501
+angcflux   142   141   179   0.0327973469   -0.0184156288   0.0163151019   0.0176584241
+angcflux   24   179   141   -0.0085394879   0.00102206   0.0028873231   -0.0022786837
+angcflux   28   207   200   0.0073596831   -0.0065841709   -0.0069792545   -0.0140102159
+angcflux   28   207   145   -0.0011141848   -0.0094146408   -0.008408871   -0.0091680457
+angcflux   35   230   145   0.0101183978   -0.0186785095   -0.0058009251   -0.0258843948
+angcflux   207   145   230   0.0127814843   0.0041537391   0.0191595655   0.0268727446
+angcflux   146   145   230   0.0268434004   -0.0031456344   0.0218310089   0.0149481482
+angcflux   21   35   230   0.0454744142   -0.0035298213   0.0178724799   0.0328112934
+angcflux   35   207   200   0.0039025167   -0.0089076797   -0.008349615   -0.0079430986
+angcflux   35   207   145   -0.0042169071   -0.0063677956   -0.0131382864   -0.0114351482
+angcflux   21   35   207   0.0308347727   -0.0054022093   0.0139243742   0.0155574443
+angcflux   118   169   118   -0.0047188839   -0.0047188839   0.0063825947   0.0063825947
+angcflux   95   118   169   0.0091777506   -0.0058097307   -0.0131452547   -0.0039259418
+angcflux   29   118   95   0.0058349325   -0.006640687   -0.0102038561   -0.0079821954
+angcflux   118   95   219   -0.0036746055   0.008164104   0.006852552   0.0051901234
+angcflux   118   95   179   -0.0041406304   0.0075920053   0.0110171461   0.0028814473
+angcflux   17   229   30   0.0004532315   0.0012261277   -0.0004073855   -0.0028438246
+angcflux   124   30   229   0.0048886035   -0.0038823331   0.0057149745   0.0065697224
+angcflux   120   30   229   0.0055513815   -0.0044255956   0.0059970731   0.0055979931
+angcflux   120   30   124   0.0231931897   0.0277297097   -0.0137444365   -0.0142796006
+angcflux   30   120   124   0.0153015437   -0.0012916779   0.0048002061   -0.0166918985
+angcflux   23   120   30   -0.013336144   -0.0022634144   -0.0019503945   0.0048562065
+angcflux   30   230   35   0.0004730299   -0.003359314   -0.00096709   -0.0071541015
+angcflux   124   30   230   0.0065775023   -0.0034349196   0.005288987   0.0084264565
+angcflux   120   30   230   0.0053491725   -0.0007172012   0.0073478913   0.0051037191
+angcflux   24   197   30   0.0074475787   -0.0067853822   0.0373156975   -0.0096172241
+angcflux   124   30   197   0.0118876587   0.004610222   -0.0314158308   -0.0057045124
+angcflux   120   30   197   0.0109141251   0.0065493034   -0.0125826062   -0.0061605523
+angcflux   11   30   124   0.0069377436   -0.0038723736   0.0061878286   0.0064031916
+angcflux   11   30   120   0.0059479057   -0.003602545   0.0062388454   0.00698836
+angcflux   12   30   124   0.0049994912   -0.0021810043   0.0040957233   0.002747721
+angcflux   12   30   120   0.0036358329   -0.0021691804   0.0041808453   0.0037972424
+angcflux   29   230   35   -0.0207506635   -0.0097211516   -0.0234583783   -0.0154589874
+angcflux   35   230   117   -0.0146550348   0.0100178488   -0.0018551227   -0.0256798629
+angcflux   200   117   230   0.0033105447   -0.0020757199   0.0189327093   0.0063201229
+angcflux   29   117   230   0.0224697511   -0.022873807   0.0096832279   0.025818438
+angcflux   29   230   56   0.0002895601   0.0007014149   -0.0132070364   -0.0053966582
+angcflux   11   56   230   -0.0015922537   0.0257368773   0.0137448135   0.0132079578
+angcflux   29   230   60   -0.0005495132   0.001097502   -0.0104186173   -0.0081641935
+angcflux   12   60   230   -0.0115733805   0.018130932   0.0179690579   0.0132705872
+angcflux   34   203   117   -0.0207377425   -0.1364713067   0.0154244675   -0.0595125183
+angcflux   117   203   117   -0.00443744   -0.00443744   -0.070100871   -0.070100871
+angcflux   35   34   203   0.0016277455   0.0004195939   0.0024226761   0.0035507434
+angcflux   20   34   203   0.0118499392   -0.0231941761   0.0082708702   0.001651483
+angcflux   203   117   226   -0.027177504   0.019780562   0.0812065766   0.005364174
+angcflux   135   117   226   0.0366671175   -0.0320541706   0.1218219916   0.0140793655
+angcflux   117   135   119   0.0149214905   -0.0125347325   0.0056973011   -0.1359791566
+angcflux   117   29   119   -0.0199980096   0.0084854765   -0.0045850333   -0.0285462607
+angcflux   23   29   119   -0.0008221749   -0.002098221   -0.00285661   -0.0073099268
+angcflux   29   119   135   -0.0028797277   0.0035913896   0.0069474507   0.0116207581
+angcflux   23   119   29   0.0172546208   -0.0001034012   0.003550745   0.0035574362
+angcflux   44   203   117   -0.0001738038   0.0413458789   -0.0119784616   -0.0033852913
+angcflux   44   44   203   0.0005541007   -0.0058256511   0.0030215731   0.0048660814
+angcflux   19   44   203   0.004571584   -0.0018461776   0.0018152263   0.0006422039
+angcflux   20   44   203   0.004571584   -0.0018461776   0.0018152263   0.0006422039
+angcflux   122   203   137   0.0032304717   -0.0063815026   -0.0035923314   0.0013254676
+angcflux   28   203   122   -0.0078321821   -0.0011956059   0.00401431   -0.0009213092
+angcflux   34   122   203   -0.0067709881   0.0108994024   0.0026915104   -0.0015094494
+angcflux   120   122   203   0.0066278966   0.0021643185   -0.0025250457   0.0012585929
+angcflux   34   122   120   -0.0016206826   0.0013341136   0.0060055542   0.0020709886
+angcflux   35   34   122   -1.46165e-05   0.0030380298   -0.000184195   -0.0032078584
+angcflux   20   34   122   0.0006644691   0.0007802679   -0.0001133613   -0.0019750399
+angcflux   119   120   122   0.0002540466   -0.0012934312   -2.3994e-06   -0.0056000159
+angcflux   34   135   137   -0.0183018504   -0.0046692021   0.0076898566   0.0027560699
+angcflux   34   135   119   0.0012188778   -0.0003513819   0.000686178   -0.0021208326
+angcflux   35   34   135   -0.0001824305   -0.002534825   -0.0004883602   6.21006e-05
+angcflux   20   34   135   0.0001806322   -0.0021692821   9.77471e-05   -1.745e-07
+angcflux   35   34   147   0.0009743334   -0.0026375994   -0.0004489427   0.001755384
+angcflux   20   34   147   -0.0010312234   0.0022614701   0.0002535974   -0.0008156517
+angcflux   34   147   249   0.0125945138   -0.0009613021   -0.0017453808   0.0054377689
+angcflux   34   147   208   0.0030201443   -0.0020302957   0.0005718032   -0.0003226845
+angcflux   35   34   150   0.0031626779   0.0058343115   -0.0003605701   0.0015170979
+angcflux   20   34   150   -0.0061890361   -0.0101303643   -0.0026992008   0.0032536477
+angcflux   34   150   269   0.036346507   -0.0206586154   0.0003066838   0.0199110785
+angcflux   34   150   209   0.0117399996   0.0109857443   -0.0062220407   -0.0181358247
+angcflux   29   44   44   0.0019068736   -0.0042681   -0.0067845066   0.0008609616
+angcflux   19   44   29   0.0008058007   0.0009396298   0.0006113851   -0.0006419752
+angcflux   20   44   29   0.0008058007   0.0009396298   0.0006113851   -0.0006419752
+angcflux   29   29   44   0.0062411745   0.0022324455   0.0051183813   0.0047395358
+angcflux   44   44   117   0.0104474503   -0.0027913022   -0.0173058401   -0.015358571
+angcflux   19   44   117   -0.0014503715   0.0043984744   -0.0044522982   -0.0013831496
+angcflux   20   44   117   -0.0014503715   0.0043984744   -0.0044522982   -0.0013831496
+angcflux   44   117   200   -0.0107624639   0.0092221339   0.0025560373   0.0074780112
+angcflux   29   117   44   0.0068109846   -0.0134822447   0.0276415373   0.0094914402
+angcflux   117   200   130   0.0103255362   -0.0089690361   0.0016766776   -0.0558512734
+angcflux   44   44   130   0.0101841901   -0.0033600128   -0.0212501956   -0.0379149991
+angcflux   19   44   130   0.0014778534   0.0043079598   -0.001751717   0.0018153441
+angcflux   20   44   130   0.0014778534   0.0043079598   -0.001751717   0.0018153441
+angcflux   44   130   200   -0.0216312325   0.0191386058   0.0119841979   0.0593848578
+angcflux   29   39   39   -0.0040962924   0.0031539323   -0.0069118922   -0.0050222916
+angcflux   19   39   29   -0.0017877309   0.0031841134   0.0032918946   0.000442091
+angcflux   20   39   29   -0.0017877309   0.0031841134   0.0032918946   0.000442091
+angcflux   29   29   39   0.0062961364   -0.0070671616   0.0050823421   0.0051738236
+angcflux   34   223   35   -0.012614463   -0.012614463   -0.0349849444   -0.0349849444
+angcflux   29   34   223   -0.000530691   0.0038610444   -0.000280178   0.0007105208
+angcflux   29   179   35   -0.0005428972   -0.001396778   0.000966136   -0.0024401582
+angcflux   29   179   92   0.0256565773   -0.029675128   -0.0210807021   -0.0191212797
+angcflux   29   29   179   0.0257763921   -0.0145304715   0.0261455168   0.0245311686
+angcflux   24   179   29   -0.0058399498   -0.0019994525   0.0063477634   -0.0018149599
+angcflux   232   266   232   0.0   0.0   0.0   0.0
+angcflux   233   266   233   -0.0465415066   -0.0465415066   0.0361711184   0.0361711184
+angcflux   171   266   232   0.0   0.0   0.0   0.0
+angcflux   171   266   233   0.0421197434   -0.039795263   -0.0093415732   -0.0056810385
+angcflux   29   266   232   0.0   0.0   0.0   0.0
+angcflux   29   266   233   0.006337364   0.0033858334   0.0051182529   0.0022727917
+angcflux   29   266   171   -0.000222136   0.0080156957   -0.001683542   0.0071983042
+angcflux   35   171   266   -0.0263673027   -0.0010184511   0.0470722956   0.0067829189
+angcflux   24   171   266   -0.0164234033   0.0006613331   -0.0040328433   -0.0036242666
+angcflux   29   29   266   -0.0055643826   -0.0046758984   6.59138e-05   -0.004584551
+angcflux   232   265   232   0.0   0.0   0.0   0.0
+angcflux   233   265   233   0.0101475737   0.0101475737   0.0250155451   0.0250155451
+angcflux   34   265   232   0.0   0.0   0.0   0.0
+angcflux   34   265   233   0.0065271056   -0.0009968475   0.000888731   -0.0014354012
+angcflux   29   265   232   0.0   0.0   0.0   0.0
+angcflux   29   265   233   0.0187394274   0.0250708873   0.0198295623   0.021737043
+angcflux   29   265   34   0.0002649388   0.0121619349   0.0005615627   0.0005249994
+angcflux   35   34   265   -0.0017365575   -0.0087109389   0.0010102931   -0.0008653166
+angcflux   20   34   265   -0.0019370603   -0.0041900257   -0.0029728915   -0.0010847694
+angcflux   29   29   265   -0.0088330632   -0.0140008553   -0.0225529126   -0.0279377209
+angcflux   132   266   232   0.0   0.0   0.0   0.0
+angcflux   132   266   233   0.1553829532   0.001833596   0.0136412937   -0.0072784513
+angcflux   132   266   171   0.0042163018   0.0086577342   0.0019340113   0.0308491657
+angcflux   202   132   266   -0.0138325128   -0.0029970224   -0.0317809063   -0.0083322992
+angcflux   200   132   266   -0.0102184436   -0.0031583755   0.002609074   -0.0084305635
+angcflux   143   266   232   0.0   0.0   0.0   0.0
+angcflux   143   266   233   -0.0104186281   0.0016512399   0.0040941336   0.0013618832
+angcflux   143   266   171   7.503e-07   0.0045749577   0.0028122728   0.0083796108
+angcflux   266   143   268   -0.0073722847   0.0163366201   -0.0008249337   -0.0077968139
+angcflux   144   143   266   0.0006640888   0.0052823523   -0.0075019496   -0.0023435444
+angcflux   56   265   232   0.0   0.0   0.0   0.0
+angcflux   56   265   233   0.0244444004   -0.0011892566   -0.0006466993   0.0014513158
+angcflux   29   265   56   0.0089682405   0.0001600619   -0.006736096   0.0025018512
+angcflux   11   56   265   0.0194692289   -0.0214580841   0.0081536065   0.005667673
+angcflux   60   265   232   0.0   0.0   0.0   0.0
+angcflux   60   265   233   -0.0006562682   -0.0003383787   -5.34581e-05   0.0001844808
+angcflux   29   265   60   0.0006336201   0.000973149   8.63847e-05   0.0014778903
+angcflux   12   60   265   0.0009671032   5.71958e-05   -1.13032e-05   -0.0003228166
+angcflux   115   267   116   -0.0005290672   -0.0117058787   0.0081725924   0.0009953999
+angcflux   116   115   267   0.0092250669   0.0008206453   0.0005252544   0.0060864713
+angcflux   19   115   267   0.0240667486   -0.0017331076   0.0124068458   0.005941214
+angcflux   20   115   267   0.0240667486   -0.0017331076   0.0124068458   0.005941214
+angcflux   19   115   116   0.0150267872   0.0427718563   0.0088544137   -0.0042968892
+angcflux   20   115   116   0.0150267872   0.0427718563   0.0088544137   -0.0042968892
+angcflux   20   115   20   0.0114419459   0.0114419459   0.0042598049   0.0042598049
+angcflux   115   116   116   0.0262032988   -0.0321505313   0.0323262169   -0.0018914539
+angcflux   22   116   115   -0.0198926137   -0.0119447896   0.0052974914   -0.0003580596
+angcflux   22   116   116   0.0618081714   0.0182596714   0.0010023993   -0.0127317871
+angcflux   116   116   116   0.011863634   0.011863634   -0.0283932842   -0.0283932842
+angcflux   116   116   267   0.0117108266   -0.0085032271   0.0175718514   0.0233749063
+angcflux   22   116   267   0.0328612269   -0.0005274162   0.0096572608   0.0010871681
+angcflux   115   248   116   -0.0027508266   -0.020780089   -0.0016829612   -0.013411379
+angcflux   116   115   248   0.0061162888   -0.0008333628   0.0016073027   0.0003240796
+angcflux   19   115   248   0.0197316192   -0.0406852756   0.0161906111   0.0144299178
+angcflux   20   115   248   0.0197316192   -0.0406852756   0.0161906111   0.0144299178
+angcflux   116   116   248   0.0043006248   -0.0005874421   0.0263399255   0.021278766
+angcflux   22   116   248   0.0230966965   0.0037970954   0.0005242083   -0.0011871706
+angcflux   68   74   68   0.0092993655   0.0092993655   0.0111169639   0.0111169639
+angcflux   35   83   255   0.0437009273   -0.022393587   0.0013251325   0.0394726676
+angcflux   35   83   219   0.0434440083   0.0498917999   0.0059574161   -0.0254061296
+angcflux   21   35   83   -0.0065041548   -0.0335119118   -0.0032494483   -0.0041274801
+angcflux   25   254   83   -0.0075317552   0.0040195545   -0.0061871006   -0.0019448045
+angcflux   219   83   254   0.0151642794   -0.006854383   0.0355708765   0.0137329307
+angcflux   35   83   254   0.0343534223   -0.0111038229   0.0004359471   0.0127075186
+angcflux   219   74   251   0.0   0.0   0.0   0.0
+angcflux   35   74   251   0.0   0.0   0.0   0.0
+angcflux   200   202   200   0.0   0.0   0.0   0.0
+angcflux   28   202   200   0.0   0.0   0.0   0.0
+angcflux   130   200   202   0.0   0.0   0.0   0.0
+angcflux   200   200   202   0.0   0.0   0.0   0.0
+angcflux   130   200   200   0.0   0.0   0.0   0.0
+angcflux   130   200   169   0.0   0.0   0.0   0.0
+angcflux   200   169   200   0.0   0.0   0.0   0.0
+angcflux   169   200   200   0.0   0.0   0.0   0.0
+angcflux   34   244   243   0.0   0.0   0.0   0.0
+angcflux   100   243   244   0.0   0.0   0.0   0.0
+angcflux   35   34   244   0.0   0.0   0.0   0.0
+angcflux   20   34   244   0.0   0.0   0.0   0.0
+angcflux   241   100   243   0.0   0.0   0.0   0.0
+angcflux   35   100   243   0.0   0.0   0.0   0.0
+angcflux   35   100   241   0.0   0.0   0.0   0.0
+angcflux   21   35   100   0.0   0.0   0.0   0.0
+angcflux   101   245   246   -0.0005396862   -0.0117993351   -0.0126664413   0.0034057818
+angcflux   17   246   245   -0.0016959955   0.003077663   0.0011441215   0.0011837825
+angcflux   21   35   101   0.0001820378   -0.0145932371   -0.0001741889   -0.0062893784
+angcflux   242   101   245   0.0071845857   0.0039930802   0.0171860613   0.0121377091
+angcflux   35   101   245   0.0219229765   -0.0021152179   0.0034811341   0.0126623055
+angcflux   35   101   242   0.0109803091   0.0150775492   0.0043876857   -0.0018176341
+angcflux   39   179   92   0.0   0.0   0.0   0.0
+angcflux   39   172   92   -0.0078142989   -0.0022863428   -0.0191197431   -0.0088019418
+angcflux   34   179   39   0.0   0.0   0.0   0.0
+angcflux   34   172   39   -0.0048426324   -0.0086527269   -0.0027220151   -0.0101740874
+angcflux   39   39   179   0.0   0.0   0.0   0.0
+angcflux   39   39   172   0.0099646085   0.0073216456   0.0010609618   0.0040254271
+angcflux   19   39   179   0.0   0.0   0.0   0.0
+angcflux   20   39   179   0.0   0.0   0.0   0.0
+angcflux   20   39   172   0.0235106398   0.0076478044   0.0141117839   0.0120068247
+angcflux   39   39   92   -0.0112064995   -0.0029881118   -0.0057903578   -0.0003816134
+angcflux   19   39   92   -0.0003475746   -0.0062240038   -0.001045982   0.0002224503
+angcflux   20   39   92   -0.0003475746   -0.0062240038   -0.001045982   0.0002224503
+angcflux   39   92   219   0.0138905086   0.0049814465   0.0053468224   0.0024427393
+angcflux   39   92   179   0.0   0.0   0.0   0.0
+angcflux   39   92   172   0.020853026   0.0062334131   -0.003157814   0.0037570176
+angcflux   39   173   39   0.0   0.0   0.0   0.0
+angcflux   27   173   39   0.0   0.0   0.0   0.0
+angcflux   27   173   27   0.0   0.0   0.0   0.0
+angcflux   39   39   173   0.0   0.0   0.0   0.0
+angcflux   19   39   173   0.0   0.0   0.0   0.0
+angcflux   20   39   173   0.0   0.0   0.0   0.0
+angcflux   50   173   50   0.0   0.0   0.0   0.0
+angcflux   34   173   50   0.0   0.0   0.0   0.0
+angcflux   27   173   50   0.0   0.0   0.0   0.0
+angcflux   27   173   34   0.0   0.0   0.0   0.0
+angcflux   39   50   173   0.0   0.0   0.0   0.0
+angcflux   19   50   173   0.0   0.0   0.0   0.0
+angcflux   20   50   173   0.0   0.0   0.0   0.0
+angcflux   35   34   173   0.0   0.0   0.0   0.0
+angcflux   20   34   173   0.0   0.0   0.0   0.0
+angcflux   200   210   211   -0.000314732   -0.0100994564   0.005960043   0.0055105182
+angcflux   28   210   211   0.0015238018   -0.0056923811   -0.0033047122   -0.0094559639
+angcflux   28   210   200   0.005165126   -0.0033024775   -0.0069912761   -0.008756961
+angcflux   168   211   210   0.0039260444   0.0029225987   0.002040221   0.0110303095
+angcflux   200   200   210   -0.0018542989   -0.0028378111   0.0070156091   0.0106844665
+angcflux   168   200   200   -0.004223821   -0.0015876008   -0.0007696035   0.0061952547
+angcflux   200   168   211   -0.0044106863   -0.0042988866   -0.0017906896   -0.0024594879
+angcflux   23   168   211   0.0028296226   -0.0039762163   -0.0009670323   -0.0039395824
+angcflux   23   168   200   0.001197671   -0.0025434036   -0.0001460517   0.0003111798
+angcflux   210   210   211   0.0   0.0   0.0   0.0
+angcflux   211   168   211   0.0   0.0   0.0   0.0
+angcflux   43   175   43   0.0   0.0   0.0   0.0
+angcflux   27   175   43   0.0   0.0   0.0   0.0
+angcflux   27   175   27   0.0   0.0   0.0   0.0
+angcflux   29   174   43   0.0   0.0   0.0   0.0
+angcflux   43   43   175   0.0   0.0   0.0   0.0
+angcflux   19   43   175   0.0   0.0   0.0   0.0
+angcflux   20   43   175   0.0   0.0   0.0   0.0
+angcflux   34   175   43   0.0   0.0   0.0   0.0
+angcflux   35   175   43   0.0   0.0   0.0   0.0
+angcflux   34   175   35   0.0   0.0   0.0   0.0
+angcflux   35   34   175   0.0   0.0   0.0   0.0
+angcflux   20   34   175   0.0   0.0   0.0   0.0
+angcflux   21   35   175   0.0   0.0   0.0   0.0
+angcflux   219   88   225   0.0   0.0   0.0   0.0
+angcflux   225   88   225   0.0   0.0   0.0   0.0
+angcflux   225   89   225   0.0   0.0   0.0   0.0
+angcflux   17   213   89   0.0   0.0   0.0   0.0
+angcflux   213   89   219   0.0   0.0   0.0   0.0
+angcflux   213   89   225   0.0   0.0   0.0   0.0
+angcflux   219   89   225   0.0   0.0   0.0   0.0
+angcflux   49   227   81   0.0143425911   -0.0282127679   -0.0326397076   -0.006963753
+angcflux   81   43   212   -0.0144365747   -0.0072677761   -0.0164978856   -0.0013920422
+angcflux   43   43   81   0.0291354722   0.0156887037   0.0097052311   -0.001895144
+angcflux   19   43   81   -0.0061963478   0.0113908313   8.3207e-06   -0.0058051139
+angcflux   20   43   81   -0.0061963478   0.0113908313   8.3207e-06   -0.0058051139
+angcflux   43   49   227   0.0097232809   0.0066272789   0.0040392764   0.0059645352
+angcflux   19   49   227   -0.0033053115   0.0094912167   0.0051849908   0.0054866115
+angcflux   20   49   227   -0.0033053115   0.0094912167   0.0051849908   0.0054866115
+angcflux   219   81   227   0.0163378375   -0.001082266   0.0203154981   0.0305849947
+angcflux   43   81   227   0.0409803066   0.0074774604   0.0190958276   0.0023745246
+angcflux   43   81   219   0.046803373   0.0109904214   -0.0081216479   0.0088920965
+angcflux   43   174   94   -0.0065409279   -7.52757e-05   -0.0157286734   -0.0024075965
+angcflux   24   174   43   0.0001173761   -0.0009367441   3.28206e-05   -0.0021734027
+angcflux   24   174   94   -0.0009459602   -0.0048669638   -0.0019169706   -0.0005809622
+angcflux   43   43   94   -0.0111005912   -0.0015887072   -0.0016062886   -0.0008587084
+angcflux   19   43   94   -0.0009436613   -0.0069392119   3.4599e-05   -0.0043428913
+angcflux   20   43   94   -0.0009436613   -0.0069392119   3.4599e-05   -0.0043428913
+angcflux   174   94   219   0.0009525467   0.0087389224   0.0122196779   0.0118433286
+angcflux   43   94   219   0.0141312232   0.0038523309   0.0017721724   0.0052879801
+angcflux   43   94   174   0.0126778924   0.0075983053   0.0039053189   0.0018539207
+angcflux   41   227   82   -0.0054776374   -0.0069370189   -0.0192078214   -0.0027120366
+angcflux   82   39   212   -0.0007458376   -0.0059017804   0.0009726571   0.0032239849
+angcflux   39   39   82   -0.0081355446   0.0043667866   -0.0008587732   -0.0019666571
+angcflux   19   39   82   0.0023363628   0.0048287121   -0.0018984077   -0.0027668667
+angcflux   20   39   82   0.0023363628   0.0048287121   -0.0018984077   -0.0027668667
+angcflux   39   41   227   0.0068052946   0.0061342404   0.0023933259   0.0048470947
+angcflux   19   41   227   0.0123417706   -0.0012257326   0.0042457881   0.0050749758
+angcflux   20   41   227   0.0123417706   -0.0012257326   0.0042457881   0.0050749758
+angcflux   219   82   227   0.0105518893   -0.0035301347   0.0111342647   0.019406012
+angcflux   39   82   227   0.00624965   0.013259152   -0.0005677241   -0.0037438789
+angcflux   39   82   219   0.0162971776   -0.0057850465   0.0020223723   0.0067408501
+angcflux   29   29   174   0.0   0.0   0.0   0.0
+angcflux   33   34   171   0.0111967485   0.0026334719   0.0155483448   0.0304159943
+angcflux   34   33   171   0.0111967485   0.0026334719   0.0155483448   0.0304159943
+angcflux   58   34   62   0.0016955713   -0.0051203239   -5.23376e-05   -0.0061719748
+angcflux   20   34   62   -0.0033300857   -0.0009273686   0.0001240307   0.0013431758
+angcflux   13   62   34   0.0044573664   8.70669e-05   0.0127342499   0.0075565303
+angcflux   20   62   34   0.0176956326   0.0007876383   0.0026771062   -0.0006238889
+angcflux   34   34   62   0.0009064909   -0.0039425991   5.22655e-05   -0.0041232834
+angcflux   14   34   34   0.0236505   -0.0003290064   0.017037748   -0.0014745148
+angcflux   34   34   170   0.0   0.0   0.0   0.0
+angcflux   24   171   43   0.0003599574   0.0018669344   0.0010988634   1.6e-07
+angcflux   43   43   171   -0.0001709369   -0.0023249165   -0.00327842   5.2652e-06
+angcflux   19   43   171   0.0001901451   -0.0004265661   0.0009948   -7.557e-07
+angcflux   39   34   212   0.0030264956   -0.0026784304   0.0024169652   0.0043411706
+angcflux   39   34   171   -0.0018240698   0.0017982439   0.0032030164   0.0009655632
+angcflux   34   45   223   0.0036859625   -0.0024405449   0.0007416507   0.0080016826
+angcflux   33   34   256   0.0063210499   -0.0032461413   0.0019964384   0.0066803254
+angcflux   34   34   223   0.021885893   -0.0008651471   0.0187043637   0.0393600552
+angcflux   33   34   251   0.0   0.0   0.0   0.0
+angcflux   35   66   67   -0.000290842   -0.0083174732   0.0006198919   0.0234630301
+angcflux   35   66   35   -0.0032068501   -0.0032068501   0.001456892   0.001456892
+angcflux   35   66   68   -0.0081250261   0.0003465177   -0.0066130962   0.0253097048
+angcflux   34   52   74   5.24546e-05   -0.0003029317   -0.0052890829   -0.0016807873
+angcflux   19   52   34   -0.0006671006   -0.0004261899   -0.0001982774   0.0011168912
+angcflux   74   52   74   -0.0010316027   -0.0010316027   -0.0064077187   -0.0064077187
+angcflux   35   34   52   -0.0010578709   0.0001962824   0.0010817073   0.0026328827
+angcflux   20   34   52   0.0010587119   -0.0004080293   -0.0006221988   -0.0018098281
+angcflux   34   34   74   0.0101840681   -0.0191945586   -0.011251682   -0.0191023836
+angcflux   80   80   227   0.0079790222   -0.0026869601   -0.000861464   0.0104501442
+angcflux   80   80   219   0.0004493922   0.0024326019   -0.0008601577   -0.0074777451
+angcflux   34   34   97   -0.0093384823   -0.0017202602   -0.012641798   0.0004629548
+angcflux   34   34   98   -0.0309263406   0.0084539374   -0.0082931036   -3.69899e-05
+angcflux   34   34   99   -0.0477204144   0.0138424196   9.90082e-05   -1.50021e-05
+angcflux   33   34   110   -2.15619e-05   -0.0012717756   -0.0053850325   0.0003358641
+angcflux   34   102   35   -0.0042581851   -0.0042581851   0.0107272596   0.0107272596
+angcflux   34   34   80   -0.0079393086   -0.0383688735   -0.0212263351   -0.0256583266
+angcflux   35   66   68   -0.0081250261   0.0003465177   -0.0066130962   0.0253097048
+angcflux   35   68   66   0.0003813677   -0.0001777236   0.0081918547   -0.007933195
+angcflux   35   68   84   -0.0057415995   0.0009840642   -0.0024958413   -0.00419401
+angcflux   21   35   68   0.0033538289   0.0169710703   4.7815e-05   -0.0075166415
+angcflux   35   33   83   0.0056518885   -0.0216118013   -0.0027731554   -0.007011933
+angcflux   19   33   83   -0.0103488877   -0.0060640446   -0.0042134457   -0.004295357
+angcflux   33   83   254   0.0343534223   -0.0111038229   0.0004359471   0.0127075186
+angcflux   33   83   219   0.0434440083   0.0498917999   0.0059574161   -0.0254061296
+angcflux   33   74   251   0.0   0.0   0.0   0.0
+angcflux   33   34   87   -0.0003874403   0.000657955   -0.0036863814   -0.0053542384
+angcflux   20   34   87   -0.0009343289   0.0067508496   -0.0001244219   -0.0033879232
+angcflux   34   87   227   -0.0078328928   0.0086831589   0.0045420686   0.0038760164
+angcflux   34   87   219   -0.0021466244   0.0056311367   0.0027021214   0.0049160425
+angcflux   34   179   35   0.0068409577   0.0068409577   -0.0007004374   -0.0007004374
+angcflux   27   170   43   0.0   0.0   0.0   0.0
+angcflux   43   43   170   0.0   0.0   0.0   0.0
+angcflux   19   43   170   0.0   0.0   0.0   0.0
+angcflux   35   174   43   -0.0049999723   -0.0063675119   -0.0120237328   -0.0105176663
+angcflux   21   35   174   0.0328666047   -0.0021723371   0.0157388785   0.015953226
+angcflux   34   257   34   0.0130699225   0.0130699225   -0.0089319462   -0.0089319462
+angcflux   33   34   257   0.0004098834   0.0003950609   -0.0002635941   -0.0036892206
+angcflux   34   34   257   0.0004098834   0.0003950609   -0.0002635941   -0.0036892206
+angcflux   33   34   258   -0.001624636   -0.0113391674   -0.0053889872   -0.0202533937
+angcflux   34   34   258   -0.001624636   -0.0113391674   -0.0053889872   -0.0202533937
+angcflux   34   260   238   0.0028857719   0.0074425372   -0.000151258   0.026765039
+angcflux   34   260   234   -0.0031339858   0.0079998978   0.0041059798   0.0067716034
+angcflux   33   34   260   -0.0013596569   -0.0052246197   -0.0004064797   -0.007238799
+angcflux   33   34   259   0.0   0.0   0.0   0.0
+angcflux   33   221   275   -0.0162868764   0.0062037479   -0.0298062233   -0.0162851038
+angcflux   35   33   221   -0.0183804226   0.012630166   -0.0007384615   0.0411072772
+angcflux   19   33   221   0.0866063829   0.0115505879   0.0193891567   -0.0044501641
+angcflux   34   225   96   0.0063134671   -0.0148234204   0.0163767901   -0.0094729786
+angcflux   35   34   225   0.003877767   0.0008375441   0.0061627318   0.0088533797
+angcflux   20   34   225   0.0246175039   2.15339e-05   0.0101243704   0.0005203316
+angcflux   33   227   91   -0.0081039248   -0.0141924016   -0.0276196152   -0.0146618343
+angcflux   33   33   212   0.0727756966   -0.0103347593   0.072635027   0.0147928497
+angcflux   33   33   33   0.0075737647   0.0075737647   -0.0424538238   -0.0424538238
+angcflux   33   33   34   0.0075737647   0.0075737647   -0.0424538238   -0.0424538238
+angcflux   33   33   80   -0.0079393086   -0.0383688735   -0.0212263351   -0.0256583266
+angcflux   34   49   227   0.0004788167   -0.0009352382   0.000230808   0.0025502862
+angcflux   29   29   74   -0.0045075799   -0.0034403637   -0.0129045989   0.0002295926
+angcflux   29   74   219   -0.0014249112   0.0019967217   0.0039035179   0.0114059085
+angcflux   29   74   35   0.0116929901   -0.0064913006   -0.0007875494   0.0074304319
+angcflux   29   34   80   0.0008109156   -0.001940054   0.0027550936   0.0027958247
+angcflux   29   34   76   0.0   0.0   0.0   0.0
+angcflux   35   29   117   0.0151831403   -0.0371070513   -0.0220832756   -0.0372906113
+angcflux   33   203   117   -0.0207377425   -0.1364713067   0.0154244675   -0.0595125183
+angcflux   35   33   203   0.0016277455   0.0004195939   0.0024226761   0.0035507434
+angcflux   19   33   203   0.0118499392   -0.0231941761   0.0082708702   0.001651483
+angcflux   35   119   135   0.0   7.52e-08   0.0003463011   -0.0006930588
+angcflux   29   119   35   -0.0014235281   -0.0004523967   0.0002100914   7.38306e-05
+angcflux   35   135   119   0.0012188778   -0.0003513819   0.000686178   -0.0021208326
+angcflux   119   29   123   0.0054113723   -0.0035266377   -0.0042908763   -7.34187e-05
+angcflux   35   29   119   -0.0024965372   0.0026188607   0.0020982289   0.0022403559
+angcflux   35   29   123   0.0036536672   -0.0011290775   0.0007830347   0.0017318474
+angcflux   29   123   203   0.0007347338   -0.0047892296   -0.0014947722   0.0073319613
+angcflux   23   123   29   0.0090797228   -0.0067791154   -0.0042000091   0.0033369649
+angcflux   21   35   119   -0.001515418   -0.0013506211   0.001918823   -0.0005109477
+angcflux   122   202   157   -0.0004663739   0.0005285728   0.0020596841   0.0026624324
+angcflux   28   202   157   0.0004663739   6.77153e-05   1.15687e-05   -0.0023764045
+angcflux   118   200   157   -0.002131708   0.0008181919   0.0026921844   0.000373253
+angcflux   117   200   156   -0.0034920367   -0.0023919219   0.0020107155   -0.0064254664
+angcflux   200   157   202   0.0003390824   -0.0023805076   0.001037424   0.0028931392
+angcflux   156   157   202   0.0078228327   -0.0032521662   -0.0092900767   -0.0026573967
+angcflux   156   157   200   0.005439734   0.0007326987   -0.0010101912   0.0002285609
+angcflux   157   156   200   -0.0028584731   0.0010644646   -0.0019116489   0.008012108
+angcflux   29   156   200   -0.0061548203   0.0147938942   -0.0026180356   -0.0122544419
+angcflux   29   156   157   0.0096064552   -0.0165868504   0.0003642336   0.0099301801
+angcflux   29   29   156   0.00937455   -0.0054742877   -0.0002333894   -0.0007320253
+angcflux   35   29   156   -0.0096416874   0.0036933399   9.10422e-05   0.0028305002
+angcflux   160   207   200   0.0   0.0   2.7041e-06   -8.78896e-05
+angcflux   118   207   200   0.0   0.0   1.5502e-06   4.62494e-05
+angcflux   118   207   160   0.0   0.0   -9.0417e-06   8.3153e-06
+angcflux   145   200   207   0.0   0.0   6.06947e-05   7.45566e-05
+angcflux   117   200   160   0.0   0.0   2.73476e-05   -8.9778e-06
+angcflux   200   160   207   0.0   0.0   9.2349e-06   -1.0224e-06
+angcflux   29   160   207   0.0   0.0   9.0417e-06   -8.1575e-06
+angcflux   29   160   200   0.0   0.0   5.191e-07   -6.0002e-06
+angcflux   146   145   200   -0.0002379151   0.0001118692   -0.0012783195   -0.0001717134
+angcflux   35   145   200   -0.000209417   0.0001029954   -0.0002640463   -0.0001737315
+angcflux   146   118   207   -0.0001429317   0.0001798905   0.0006258813   8.682e-06
+angcflux   23   118   207   0.0   0.0   4.87448e-05   8.355e-07
+angcflux   29   29   160   0.0   0.0   -0.0001581547   -8.9994e-06
+angcflux   23   29   160   0.0   0.0   -7.32889e-05   -5.324e-07
+angcflux   35   33   147   0.0009743334   -0.0026375994   -0.0004489427   0.001755384
+angcflux   19   33   147   -0.0010312234   0.0022614701   0.0002535974   -0.0008156517
+angcflux   33   147   249   0.0125945138   -0.0009613021   -0.0017453808   0.0054377689
+angcflux   33   147   208   0.0030201443   -0.0020302957   0.0005718032   -0.0003226845
+angcflux   35   33   150   0.0031626779   0.0058343115   -0.0003605701   0.0015170979
+angcflux   19   33   150   -0.0061890361   -0.0101303643   -0.0026992008   0.0032536477
+angcflux   33   150   269   0.036346507   -0.0206586154   0.0003066838   0.0199110785
+angcflux   33   150   209   0.0117399996   0.0109857443   -0.0062220407   -0.0181358247
+angcflux   29   240   165   -0.0050880011   -0.0002294294   0.0016971567   0.0006552044
+angcflux   117   200   164   0.0008661212   -0.0025380719   -0.0009369357   0.0010529322
+angcflux   165   164   200   -0.0021958782   0.0048995604   0.0026013448   -0.0011879591
+angcflux   29   164   200   0.0018002027   0.002694993   -0.0041451852   5.6376e-06
+angcflux   29   164   165   0.0001563365   -0.0003896565   0.0087603534   0.0033751854
+angcflux   164   165   240   0.0013184798   0.0002263242   -0.0033225677   -6.58289e-05
+angcflux   142   165   240   -0.0017320385   -0.0004659472   0.0008187327   0.0026341159
+angcflux   142   165   164   -0.0022620462   0.0017164489   -0.0007746051   -0.0038297866
+angcflux   29   29   164   -0.0006886209   0.0008573975   -0.0055685358   -0.0083605729
+angcflux   23   29   164   -0.0024481036   -0.002667234   -0.0009140683   0.003561764
+angcflux   29   142   165   -0.0005216621   0.0005938198   0.0011512233   0.0009674205
+angcflux   23   142   165   0.000679096   0.000173044   4.20065e-05   -0.0005101968
+angcflux   29   34   230   0.002542774   -0.0031540724   -0.0027292042   0.0004096844
+angcflux   35   39   39   -0.0117302745   0.0052453381   -0.0053016235   -0.0010044492
+angcflux   19   39   35   0.0041812871   0.0012192458   -0.0027703053   0.001642763
+angcflux   21   35   39   0.0011652086   -0.0009511461   0.0044098218   0.0004373161
+angcflux   39   39   117   0.001541465   -0.0001522556   -0.0041031522   0.0060229384
+angcflux   19   39   117   -0.0026068628   0.0019473768   0.0015752489   -2.86739e-05
+angcflux   39   117   200   -0.0034953828   0.0027536166   0.0003972323   -0.001259633
+angcflux   29   117   39   8.38042e-05   -0.0024498517   -0.0018457892   0.0027618779
+angcflux   29   142   29   0.0063073561   0.0063073561   0.0045151339   0.0045151339
+angcflux   29   142   35   -0.0015460469   0.0053603672   0.0043727368   -0.0001781294
+angcflux   29   141   240   0.0005588278   0.0002708569   0.0003789814   0.0026799439
+angcflux   29   141   95   -0.0064956368   0.0038358382   -0.0057664889   -0.0003192105
+angcflux   141   29   142   0.0014229947   -0.0044172529   -0.0009851684   -0.0021585011
+angcflux   23   29   141   -0.0004187188   0.0004627309   -0.00123286   -0.0008747668
+angcflux   142   29   240   -0.0013360798   0.0029276873   0.0043831264   0.0018357637
+angcflux   29   144   29   -0.0041106771   -0.0041106771   0.0005528955   0.0005528955
+angcflux   29   144   35   0.008753504   -0.004524853   0.0027674029   -0.0048992077
+angcflux   29   143   268   0.0096360343   0.0019825456   0.0013558341   0.0088672977
+angcflux   29   143   95   0.0074330595   -0.0021662167   -0.009031519   -0.000957337
+angcflux   143   29   144   -0.0049656155   -0.0074190913   -0.0032805001   -0.0019327717
+angcflux   23   29   143   0.0004333424   -0.0037458381   -0.0004221464   -0.0017895687
+angcflux   144   29   268   0.0076998847   -0.0013486456   0.0084285419   0.022275996
+angcflux   21   35   144   0.0049766944   -0.0016979538   0.0040777314   -0.002174123
+angcflux   73   143   268   7.74e-08   -5.4e-08   -0.0107606096   0.0001107909
+angcflux   29   143   73   0.0002582784   0.0002456942   -0.0056265711   -0.0006802772
+angcflux   143   73   219   -0.0052262032   0.0094365774   0.0075856636   0.0071167039
+angcflux   22   73   143   0.0110810226   -0.001890779   0.0056620499   0.0024531536
+angcflux   29   141   179   -0.0004121948   0.000362683   0.0016824385   -0.0001278788
+angcflux   24   179   143   0.0   0.0   0.0001030327   -0.0006140891
+angcflux   29   143   179   0.0047904908   -0.0014522913   0.0059555473   0.0025606734
+angcflux   35   116   116   0.0076002741   0.0027434969   0.0023754481   -0.0012506644
+angcflux   21   35   116   -4.73929e-05   -0.0018009827   0.0045491423   -0.0018211502
+angcflux   35   33   101   0.0013727949   -0.0043763891   -0.001407351   0.002960904
+angcflux   19   33   101   0.0009490098   -0.0003473264   -0.0031452413   -0.0002180755
+angcflux   33   101   245   0.0219229765   -0.0021152179   0.0034811341   0.0126623055
+angcflux   33   101   242   0.0109803091   0.0150775492   0.0043876857   -0.0018176341
+angcflux   35   34   100   0.0   0.0   0.0   0.0
+angcflux   20   34   100   0.0   0.0   0.0   0.0
+angcflux   34   100   243   0.0   0.0   0.0   0.0
+angcflux   34   100   241   0.0   0.0   0.0   0.0
+angcflux   35   173   50   0.0   0.0   0.0   0.0
+angcflux   27   173   35   0.0   0.0   0.0   0.0
+angcflux   35   39   50   0.0   0.0   0.0   0.0
+angcflux   21   35   173   0.0   0.0   0.0   0.0
+angcflux   35   68   74   0.0013117867   -0.0003829816   -0.0007951581   -0.0017805696
+angcflux   35   68   68   -0.0030828853   0.0027368358   0.0034783733   0.0040355937
+angcflux   14   32   34   0.0236505   -0.0003290064   0.017037748   -0.0014745148
