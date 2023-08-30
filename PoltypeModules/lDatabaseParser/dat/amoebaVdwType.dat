@@ -13,6 +13,7 @@
 
 # Hydrogen
 [H][OH2]                        					        HW              # H of water
+[H][NH3]                        					        HNH3            # H of ammonia
 [H][CH4]                        					        HCH4            # H of methane
 
 # Carbon
@@ -20,3 +21,6 @@
 
 # Oxygen
 [OH2]                                             OW              # O of water
+
+# Nitrogen
+[NH3]                                             NH3              # N of ammonia

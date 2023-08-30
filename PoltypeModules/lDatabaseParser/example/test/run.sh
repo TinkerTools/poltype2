@@ -1,1 +1,1 @@
-python ../../lAssignAMOEBAplusPRM.py -xyz Me.xyz -key Me.prm -potent VDW BONDED 
+python ../../lAssignAMOEBAplusPRM.py -xyz Me.xyz -key Me.prm -potent VDW BONDED CF 

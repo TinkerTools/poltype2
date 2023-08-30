@@ -1,0 +1,123 @@
+[H][OX2H2]   		                          HW          # H in Water
+[O][OX2H2]   		                          OW          # O in Water
+
+# Alkane
+[H][Cv4H4]                                H4C         		# H in CH4
+[Cv4H4]                                   CH4         		# C in CH4
+[H][Cv4H3]                                H3C         		# H in CH3
+[Cv4H3]                                   CH3         		# C in CH3
+[H][Cv4H2]                                H2C         		# H in CH2
+[Cv4H2]                                   CH2         		# C in CH2
+[H][Cv4H1]                                H1C         		# H in CH1
+[Cv4H1]                                   CH1         		# C in CH1
+[Cv4H0](C)(C)(C)[C]                       CH0         		# C in CC4
+[CH2;R]                                   rCH2            # C in a Ring
+# Alcohol shares some types with Ether
+[H][OX2H1][C]                             HOC      			  # H in alcohol
+[H][OX2H1][CH1]                           i-HOC      			# H in iso- alcohol 
+[OX2H1][C]                                OHC      		    # O in n-alcohol
+[OX2H1][CH1]                              i-OHC      		  # O in iso- alcohol 
+[OX2H1][CH3]                              OHCH3    		    # O in methanol 
+[C][O][H]                                 COH     		  	# C connecting OH 
+[C][O][C]                                 COC     		  	# C connecting OC 
+[C](C)[OX2]                             	C(C)O     		  # C connecting 1O & 1C 
+[C](C)(C)[OX2]                          	C(C)(C)O  		  # C connecting 1O & 2C 
+[C](C)(C)(C)[OX2]                       	C(C)(C)(C)O    	# C connecting 1O & 3C
+#[H][C][O][H]                              HCOH     		  	# H connecting to COH 
+
+# Ether shares some types with Alcohol
+[O](C)[C]                                 O(C)C       		# O connecting 2C 
+
+# Amine
+[H][NH3]                             			H3N        			# H in amonia 
+[H][NH2]                             			H2N        			# H in primary amine
+[H][NH1]                             			H1N        			# H in secondary amine
+[NX3H3]                              	    NH3        			# N in ammonia 
+[NX3H2][C]                                NH2        			# N of amine with 2H
+[NX3H1](C)[C]                             NH1      			  # N of amine with 1H 
+[NX3H0](C)(C)[C]                          NH0     		    # N of amine with 0H 
+[C][NX3]                              	  CNHx      			# C of amine, connected to N 
+[C][NX3H2]                                CNH2        		# C of methyl amine 
+
+# Aldehyde
+#[CH2]=[O]                                C(H2)=O         # C of HCHO 
+#[CH1]=[O]                                C(H1)=O         # C of R-CHO 
+[C]=[O]                                   C=O             # C of carbonyl 
+#[O]=[CH1]                                O=CH1           # O of R-CHO 
+#[O]=[CH2]                                O=CH2           # O of HCHO 
+[O]=[C]                                	 O=C             # O of carbonyl 
+#[H][CH2]=[O]                             HCHO            # H of HCHO
+#[H][CH1]=[O]                             HC=O            # H of aldehyde 
+[H][C]=[O]                             		HC=O            # H of aldehyde 
+[C][CX3H1]=[O]                         		C-CHO           # alpha-C of aldehyde 
+
+# Amide
+[H][NH2][C]=[O]                           H2N-Amide       # H of amide nitrogen
+[H][NH1][C]=[O]                           H1N-Amide       # H of amide nitrogen
+[NH2][C]=[O]                           		NH2-Amide       # N of amide nitrogen, two attached hydrogen
+[NH1][C]=[O]                           		NH1-Amide       # N of amide nitrogen, one attached hydrogen
+[NH0][C]=[O]                           		NH0-Amide       # N of amide nitrogen, no attached hydrogen
+[CX3](N)=[O]                              C=O(N)          # C of amide
+[O]=[C][N]                             	  O=CN            # O of amide
+
+# Halogen
+[C][F]                                    CF              # C connecting 1F
+[C](C)[F]                                 C(C)F           # C connecting 1F & 1C
+[F][C]                                    FC              # F connecting C
+[C][Cl]                                   CCl             # C connecting 1Cl
+[C](C)[Cl]                                C(C)Cl          # C connecting 1Cl & 1C
+[Cl][C]                                   ClC             # Cl connecting C
+[C][Br]                                   CBr             # C connecting 1Br
+[C](C)[Br]                                C(C)Br          # C connecting 1Br & 1C
+[Br][C]                                   BrC             # Br connecting C
+
+# Sulfur
+[S][C]                                    SC              # S connecting 1C
+[S](C)[C]                                 S(C)C           # S connecting 2C
+[S]=[O]                                   S=O             # S connecting O via double bond
+[C][S]                                    CS              # C connecting 1S
+[O]=[S]                                   O=S             # O connecting S via double bond
+[H][S]                                    HS              # H connecting S
+
+
+
+# Aromatic
+[c]                                       Car             # C of aromatic systems
+[c][o]                                    CarOar          # C of aromatic systems connected with aromatic O
+[H][c]                                    Har             # H connecting aromatic Carbon
+[C][c]                                    CCar            # C connecting aromatic Carbon
+[O][c]                                    OCar            # O connecting aromatic Carbon
+[N][c]                                    NCar            # N connecting aromatic Carbon
+[H][OX2H1][c]                             HOCar     			# H in phenol 
+[H][NX3H2][c]                             HNCar       		# H in aniline
+[nH0]                                     Nar             # N of aromatic systems without Hydrogen
+[o]                                       Oar             # O of aromatic systems
+[s]                                       Sar             # S of aromatic systems
+[H][n]                                    HarN            # H connecting aromatic Nitrogen
+[n][H]                                    NarH            # N of aromatic systems with Hydrogen
+# Ketone
+#[C](C)(C)=[O]                             C(C2)=O         # C connecting 1O (double) and 2C
+#[C](c)(C)=[O]                             C(C2)=O         # C connecting 1O (double) and 2C (one aromatic)
+#[O]=[C](C)[C]                             O=C<            # O of ketone
+#[O]=[C](c)[C]                             O=C<            # O of ketone one aromatic C
+[$([C][C](C)=[O])]                        CC=O            # alpha-C of ketone
+
+# Acid
+[C](=O)[O][H]                             COOH            # C of acid
+[O]=[C][O][H]                             O=C(O)H         # double bonded O of acid
+[OH1][C]=[O]                              O(H)C=O         # O of acid
+[H][O][C]=[O]                             HO-C=O          # H of acid
+[H][C](=[O])[OH]                          HCOOH           # H of formic acid
+
+# Ester
+[C](=O)[O][C]                             COOC            # C=O of ester
+[O]=[C][O][C]                             O=C(O)C         # O=C of ester
+[O](C)[C]=[O]                             O(C)C=O         # O of ester
+[C][O][C]=[O]                             COC=O           # C connecting C=O(O) 
+[H][C](=O)[O]                             HCOO            # H or formic acid or ester
+
+# Phosphor
+[P](O)(O)(O)=[O]                          PO4             # P of Phosphate
+[O]=[P]                                   O=P             # O of Phosphate double bonded
+[O](C)[P]                                 O-P             # O of Phosphate single bonded
+[CX4][O][P]                               C-OP            # C of TMP,TEP

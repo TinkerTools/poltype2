@@ -165,33 +165,14 @@ def genAtomType(txyz, key, potent):
     matchDict = dict.fromkeys(matchList, 0)
     commentsDict = dict.fromkeys(matchList, 0)
     classesDict = dict.fromkeys(matchList, 0)
-    potent_typefile_dict = {    "CF": "amoebaplusCFluxType.dat",  \
-                               "VDW": "amoebaVdwType.dat",  \
-                             "POLAR": "amoebaplusPolarType.dat",  \
-                            "BONDED": "amoebaplusBondedType.dat", \
-                         "NONBONDED": "amoebaplusNonbondedType.dat"}
-    lines = open(os.path.join(datfiledir, potent_typefile_dict[potent])).readlines()
-    for line in lines:
-      if ("#" not in line[0]) and (len(line) > 10):
-        data = line.split()
-        myStr = data[0]
-        classNum = data[2]
-        className = line.split("# ")[0].split()[-1] 
-        comment = line.split("# ")[1][0:-1]
-        smarts = pybel.Smarts(myStr)
-        match = smarts.findall(mol)
-        if match:
-          for i in range(len(match)):
-            matchDict[match[i][0]] = className
-            commentsDict[match[i][0]] = comment
-            classesDict[match[i][0]] = classNum
-    with open(f"{fname}.type.{potent.lower()}", "w") as f:
-      for atom in range(1, natoms+1, 1):
-        atomtype = types[atom-1]
-        atomclass = type_class_dict[atomtype]
-        f.write("%5s %5s %5s %5s %5s #%s\n"%(atom, atomtype, atomclass, matchDict[atom], classesDict[atom], commentsDict[atom]))
-    if(potent == "CF"):
-      lines = open(os.path.join(datfiledir, "amoebaplusCFluxType_general.dat")).readlines()
+    potent_typefile_dict = {    "CF": ["amoebaplusCFluxType.dat", "amoebaplusCFluxType_general.dat"], \
+                               "VDW": ["amoebaVdwType.dat"],  \
+                             "POLAR": ["amoebaplusPolarType.dat"],  \
+                            "BONDED": ["amoebaplusBondedType.dat"], \
+                         "NONBONDED": ["amoebaplusNonbondedType.dat"]}
+    type_files = potent_typefile_dict[potent]
+    for type_file in type_files:
+      lines = open(os.path.join(datfiledir, type_file)).readlines()
       for line in lines:
         if ("#" not in line[0]) and (len(line) > 10):
           data = line.split()
@@ -206,7 +187,11 @@ def genAtomType(txyz, key, potent):
               matchDict[match[i][0]] = className
               commentsDict[match[i][0]] = comment
               classesDict[match[i][0]] = classNum
-      with open(f"{fname}.type.cf_gen", "w") as f:
+      out_type_file = f"{fname}.type.{potent.lower()}"
+      if type_file == "amoebaplusCFluxType_general.dat":
+        out_type_file = f"{fname}.type.{potent.lower()}_gen"
+        
+      with open(out_type_file, "w") as f:
         for atom in range(1, natoms+1, 1):
           atomtype = types[atom-1]
           atomclass = type_class_dict[atomtype]
@@ -291,13 +276,11 @@ def assignNonbondedAMOEBAplus():
     f.write("# charge penetration parameters assigned from database\n")
     for t in tinkerCPDict:
       ''' the commented out line is for old tinker 8.2 '''
-      #line = "cp  %5s%10.5f%10.5f\n"%(t, tinkerCPDict[t][0], tinkerCPDict[t][1])
       line = "chgpen  %5s%10.5f%10.5f\n"%(t, tinkerCPDict[t][1], tinkerCPDict[t][0])
       f.write(line)
     print(GREEN + "charge penetration parameters assigned from database"+ ENDC)
     f.write("# charge transfer parameters assigned from database\n")
     for t in tinkerCTDict:
-      #line = "ct  %5s%10.5f%10.5f\n"%(t, tinkerCTDict[t][0], tinkerCTDict[t][1])
       line = "chgtrn  %5s%10.5f%10.5f\n"%(t, tinkerCTDict[t][0]*3.01147, tinkerCTDict[t][1])
       f.write(line)
     print(GREEN + "charge transfer parameters assigned from database" + ENDC)
@@ -325,18 +308,18 @@ def assignCFlux_general():
     s = line.split()
     #bndcflux
     if len(s) == 2: 
-      key0, value0 = s[0], f"{float(s[1])*cfscale:10.5f}"
+      key0, value0 = s[0], f"{float(s[1]):10.4f}"
       k = key0.split("_")
       key1 = '_'.join([k[1], k[0]])
-      value1 = "%10.5f"%(-float(s[1])*cfscale)
+      value1 = "%10.4f"%(-float(s[1]))
       stype2param[key0] = value0
       stype2param[key1] = value1
     #angcflux
     if len(s) == 5: 
-      key0, value0 = s[0], f"{float(s[1])*cfscale:10.5f}{float(s[2])*cfscale:10.5f}{float(s[3])*cfscale:10.5f}{float(s[4])*cfscale:10.5f}"
+      key0, value0 = s[0], f"{float(s[1]):10.4f}{float(s[2]):10.4f}{float(s[3]):10.4f}{float(s[4]):10.4f}"
       k = key0.split("_")
       key1 = '_'.join([k[2], k[1], k[0]])
-      value1 = f"{float(s[2])*cfscale:10.5f}{float(s[1])*cfscale:10.5f}{float(s[4])*cfscale:10.5f}{float(s[3])*cfscale:10.5f}"
+      value1 = f"{float(s[2]):10.4f}{float(s[1]):10.4f}{float(s[4]):10.4f}{float(s[3]):10.4f}"
       stype2param[key0] = value0
       stype2param[key1] = value1
   
@@ -372,7 +355,7 @@ def assignCFlux_general():
                 if (combn in stype2param):
                   p = stype2param[combn].split()
                   jb.append(float(p[0]))
-            jb = "%10.5f"%np.array(jb).mean()
+            jb = "%10.4f"%np.array(jb).mean()
             f.write("bndcflux %s %s %s\n"%(d[1], d[2], jb))
             print(YELLOW + f"CFlux parameter GENERATED for bond %s-%s"%(d[1], d[2]) + ENDC)
       
@@ -415,10 +398,10 @@ def assignCFlux_general():
                     jb1.append(float(p[2]))
                     jb2.append(float(p[3]))
             if jt1 != []:
-              jt1 = "%10.5f"%np.array(jt1).mean()
-              jt2 = "%10.5f"%np.array(jt2).mean()
-              jb1 = "%10.5f"%np.array(jb1).mean()
-              jb2 = "%10.5f"%np.array(jb2).mean()
+              jt1 = "%10.4f"%np.array(jt1).mean()
+              jt2 = "%10.4f"%np.array(jt2).mean()
+              jb1 = "%10.4f"%np.array(jb1).mean()
+              jb2 = "%10.4f"%np.array(jb2).mean()
             else:
               print(RED + "No similar angle found in database. Please assign by yourself" + ENDC)
               f.write("# Please assign the following ZEROS by yourself \n")
@@ -444,17 +427,17 @@ def assignCFlux(fname, key):
     s = line.split()
     #bndcflux
     if len(s) == 4: 
-      value0 = f"{float(s[3])*cfscale:10.4f}"
+      value0 = f"{float(s[3]):10.4f}"
       k0 = '_'.join([s[1], s[2]])
-      value1 = "%10.4f"%(-float(s[3])*cfscale)
+      value1 = "%10.4f"%(-float(s[3]))
       k1 = '_'.join([s[2], s[1]])
       cftype2param[k0] = value0
       cftype2param[k1] = value1
     #angcflux
     if len(s) == 8: 
-      value0 = f"{float(s[4])*cfscale:10.4f}{float(s[5])*cfscale:10.4f}{float(s[6])*cfscale:10.4f}{float(s[7])*cfscale:10.4f}"
+      value0 = f"{float(s[4]):10.4f}{float(s[5]):10.4f}{float(s[6]):10.4f}{float(s[7]):10.4f}"
       k0 = '_'.join([s[1], s[2], s[3]])
-      value1 = f"{float(s[5])*cfscale:10.4f}{float(s[4])*cfscale:10.4f}{float(s[7])*cfscale:10.4f}{float(s[6])*cfscale:10.4f}"
+      value1 = f"{float(s[5]):10.4f}{float(s[4]):10.4f}{float(s[7]):10.4f}{float(s[6]):10.4f}"
       k1 = '_'.join([s[3], s[2], s[1]])
       cftype2param[k0] = value0
       cftype2param[k1] = value1
