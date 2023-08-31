@@ -706,7 +706,7 @@ def prepend_keyfile(poltype,keyfilename,optmol,dipole=False):
     tmpfh.write("vdwterm none\n")
     tmpfh.write("fix-monopole\n")
     tmpfh.write("digits 8\n")
-    tmpfh.write("potential-offset 1.0\n")
+    tmpfh.write(f"potential-offset {poltype.potentialoffset}\n")
     tmpfh.write("RESP-WEIGHT "+str(poltype.esprestweight)+"\n\n")
 
 

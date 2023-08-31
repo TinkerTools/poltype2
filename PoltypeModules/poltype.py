@@ -156,6 +156,7 @@ class PolarizableTyper():
         prepdockscript:str=os.path.join(os.path.split(__file__)[0],'preparedockingfiles.py')
         indextompoleframefile:None=None
         qmrelativeweight:float=1
+        potentialoffset:float=1.0
         liqrelativeweight:float=1.5
         enthalpyrelativeweight:float=1
         densityrelativeweight:float=.01
@@ -605,6 +606,8 @@ class PolarizableTyper():
                             self.targetdensityerror=float(a)
                         elif 'liqrelativeweight' in newline:
                             self.liqrelativeweight=float(a)
+                        elif 'potentialoffset' in newline:
+                            self.potentialoffset=float(a)
                         elif 'enthalpyrelativeweight' in newline:
                             self.enthalpyrelativeweight=float(a)
                         elif 'densityrelativeweight' in newline:
