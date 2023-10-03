@@ -1,0 +1,13 @@
+    1   401   401   Car     # #aromatic C
+    2   403   403   Car     # #aromatic C
+    3   402   402   Car     # #aromatic C
+    4   403   403   Car     # #aromatic C
+    5   401   401   Car     # #aromatic C
+    6   404   404   Car     # #aromatic C
+    7   405   405 Oother     # #Other    O 
+    8   408   408   Har     # #Aromatic H 
+    9   406   406   Har     # #Aromatic H 
+   10   407   407   Har     # #Aromatic H 
+   11   406   406   Har     # #Aromatic H 
+   12   408   408   Har     # #Aromatic H 
+   13   409   409 Hother     # #Other H 

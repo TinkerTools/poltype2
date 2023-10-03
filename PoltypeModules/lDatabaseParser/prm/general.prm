@@ -1,0 +1,328 @@
+bond       O3        H     514.0633     0.9753
+bond        H       C3     359.9910     1.0926
+bond       N3        H     463.4054     1.0160
+bond       N3       C3     242.5056     1.4610
+bond       O3       C3     240.1889     1.4281
+bond       C3       C2     245.6310     1.5130
+bond       C2       O2     614.7478     1.2521
+bond       C2       N3     350.5617     1.3714
+bond       O2        H     504.2729     0.9762
+bond      Nar        H     471.9329     1.0142
+bond      Nar      Car     343.2513     1.3674
+bond      Car      Oar     536.0199     1.2640
+bond      Car      Car     348.6264     1.4070
+bond      Car        H     383.4124     1.0826
+bond        H       C2     355.8169     1.1007
+bond       C2       C2     317.0451     1.4678
+bond       C3       C3     222.2336     1.5244
+bond       C3       S3     167.2173     1.8217
+bond       S3        H     304.3242     1.3400
+bond       C3       S2     176.5493     1.8111
+bond       O2       S2     611.3460     1.4695
+bond        F      Car     342.1319     1.3556
+bond       Cl      Car     205.2978     1.7315
+bond       Br      Car     152.9728     1.9053
+bond      Car       O3     302.4083     1.3723
+bond        F       C3     312.7420     1.3735
+bond       Cl       C3     217.8689     1.7729
+bond       Br       C3     160.7872     1.9452
+bond      PX4       O3     280.6031     1.6539
+bond      PX4       O-     514.1787     1.5236
+bond      PX4       O2     555.7665     1.5050
+bond       N+        H     435.7006     1.0286
+bond       N+       C3     185.1644     1.5124
+bond       C+       N2     384.8238     1.3514
+bond       N2        H     463.2813     1.0178
+bond       C2       O-     431.3124     1.2934
+bond       C2       N2     444.1660     1.3223
+bond       C3      Car     243.4978     1.4983
+bond       C3       N2     244.1255     1.4654
+bond        H       C1     403.7090     1.0658
+bond       C1       C1     734.4309     1.2735
+bond      Car       N3     308.6043     1.4018
+bond       C2      Car     251.2073     1.4802
+bond      Car       N2     300.9076     1.4065
+bond       N1       C1     996.9348     1.1810
+bond       C3       C1     447.5242     1.4638
+bond      Car       O-     361.2867     1.3302
+bond       O3       C2     294.1863     1.3622
+bond       O-        H     237.1758     1.2978
+bond       S3       S3     167.7960     2.0555
+bond       Cl       C2     103.0364     1.8017
+bond        F       C2     290.4403     1.3723
+bond       Br       C2      55.8133     2.0085
+bond      Car       C1     465.3003     1.4358
+bond       P3        H     260.4308     1.4141
+bond       O2       N2     503.8640     1.2760
+bond       O3       N2     240.9638     1.4170
+bond       N1       N1     702.9295     1.2306
+bond       N1      Car     265.6876     1.4113
+bond       S2       O3     339.0174     1.5964
+bond       S2       O-     509.9616     1.4909
+bond       S2      Car     194.1156     1.7733
+bond       S3       C2     279.0965     1.7445
+bond       N1       C2     982.4552     1.1858
+bond       S3      Car     180.5793     1.7930
+bond       N+      Car     224.1369     1.4767
+bond      Nar       C3     240.0497     1.4615
+bond       S-       C3     136.8102     1.8320
+bond       S2       N3     278.6737     1.6637
+bond        I       C3      94.8967     2.1617
+bond        I      Car     111.3917     2.1111
+bond      Nar      Nar     373.9637     1.3478
+bond      Sar      Car     186.2385     1.7232
+bond       S-       C2     192.5239     1.7305
+bond       O-       O-     203.8834     1.4579
+bond       O-       C3     223.1391     1.4422
+angle       H       O3        H      22.6665   103.9749
+angle       H       C3        H      33.0567   109.3787
+angle       H       N3        H      44.9315   110.5252
+angle       H       N3       C3      44.0366   113.6471
+angle       H       C3       N3      57.2494   110.4880
+angle       H       O3       C3      43.3250   106.3353
+angle       H       C3       O3      53.9153   109.4199
+angle       H       C3       C2      51.5422   109.2650
+angle      C3       C2       O2      56.5976   122.5879
+angle      C3       C2       N3      67.7499   113.9026
+angle      O2       C2       N3      72.5283   122.1030
+angle      C2       N3        H      42.7806   115.4453
+angle      C2       N3       C3      77.1155   120.0440
+angle      O2       C2       O2      84.9284   122.1361
+angle      C2       O2        H      54.1318   105.0036
+angle       H      Nar      Car      36.9504   120.3259
+angle     Car      Nar      Car      65.3522   112.6796
+angle     Nar      Car      Oar      64.8147   121.1521
+angle     Nar      Car      Car      63.1128   116.4999
+angle     Oar      Car      Car      53.9758   122.7592
+angle     Car      Car        H      37.7207   124.0117
+angle     Car      Car      Car      69.7654   117.1155
+angle       H      Car      Nar      37.8447   121.2428
+angle     Nar      Car      Nar      66.3845   118.4869
+angle       H       C2        H      37.4364   116.2756
+angle       H       C2       C2      47.3555   118.5369
+angle       H       C3       C3      46.9534   110.3771
+angle      C3       C3       C3      80.7536   110.7119
+angle       H       C3       S3      40.7321   109.2080
+angle      C3       S3        H      41.3791    96.5001
+angle       H       C3       S2      47.8300   107.1616
+angle      C3       S2       O2      93.9208   106.9204
+angle      C3       S2       C3     119.5988    99.9232
+angle       F      Car      Car      49.6887   122.9976
+angle      Cl      Car      Car      46.1104   123.4084
+angle      Br      Car      Car      46.8215   119.0841
+angle      C3       S3       C3      69.4019    94.1629
+angle      C3       N3       C3      83.7121   114.3305
+angle      N3       C3       C3      90.1508   110.2141
+angle     Car      Car       O3      68.1428   118.2621
+angle     Car       O3        H      43.4152   107.8092
+angle       F       C3        F      74.6594   108.7162
+angle       H       C3        F      54.6628   108.8289
+angle      Cl       C3       Cl      51.4304   111.2363
+angle       H       C3       Cl      41.8113   107.7426
+angle      Br       C3       Br      40.3568   111.0719
+angle       H       C3       Br      41.2561   107.2536
+angle      O3      PX4       O-      84.8603   106.6982
+angle      O3      PX4       O2      85.3541   110.8682
+angle      O-      PX4       O-      89.1385   117.4670
+angle      O-      PX4       O2      81.7452   118.6416
+angle      O2      PX4       O2      86.3119   117.3813
+angle     PX4       O3        H      36.8539   108.1213
+angle      O3      PX4       O3      88.4050   100.5752
+angle       H       N+        H      37.0760   106.8995
+angle       H       N+       C3      52.7705   110.1605
+angle       H       C3       N+      59.6839   106.4316
+angle      C2       C2       N3      71.9894   106.3878
+angle       H       C2       N3      40.6761   117.3729
+angle      N3       C3       N3      53.7998   106.6966
+angle      N2       C+       N2      71.9289   119.9249
+angle      C+       N2        H      44.8255   115.5311
+angle       H       N2        H      33.4779   114.8849
+angle      C3       C2       O-      55.4946   113.2246
+angle      O-       C2       O-      65.3680   126.0182
+angle       H       C2       N2      42.5014   118.0443
+angle      N2       C2       N2      70.5479   125.1193
+angle      C2       N2        H      57.4590   111.3650
+angle       H       C2       O2      45.9300   120.9785
+angle      C3       C3       O3      85.0397   108.2590
+angle       H       C3      Car      44.4908   110.3303
+angle      C3      Car      Car      63.2137   123.6806
+angle       H       C3       N2      52.2310   109.2792
+angle      C3       N2       C+      83.2973   121.2541
+angle      C3       N2        H      42.6431   114.8791
+angle      C3      Car      Nar      58.1951   121.9045
+angle       H       C1       C1      59.3248   180.0000
+angle     Nar      Car       N3      78.6718   117.8609
+angle     Car      Car       N3      75.7890   123.7424
+angle     Car       N3        H      41.2983   114.8008
+angle       H       S3        H      45.2818    93.3565
+angle      C2       N2       C2      69.3300   118.3092
+angle      N2       C2      Car      66.5639   122.0242
+angle      N2       C2       N3      71.4322   121.5735
+angle     Car       C2       N3      73.5076   116.0650
+angle      C2      Car      Car      70.2676   124.5274
+angle      C2      Car      Nar      56.8480   125.3605
+angle     Car      Car       N2      65.2200   122.8313
+angle      N2      Car      Nar      73.1533   128.6215
+angle     Car       N2       C2      61.9744   110.7622
+angle       H       C3       C1      39.0267   109.7367
+angle      N1       C1       C3      24.6811   179.3715
+angle      C3       N+       C3     101.2226   110.6276
+angle      C3       C3       S3      67.9980   109.7841
+angle      C3       C2       C3      74.7719   116.5792
+angle      C3       O3       C3      74.0122   107.7269
+angle       H       C2       C3      41.0678   116.4298
+angle     Car      Car       O-      61.8509   119.5164
+angle      C2       O3       C2      95.3195   119.1888
+angle      O3       C2       O2      66.6161   122.0590
+angle      O3       C2       C3      66.1139   110.8522
+angle      C2       O-        H      41.1401   104.7407
+angle      O-       C2       O2      61.8795   123.0955
+angle      O-       C2       N3      87.6785   112.8868
+angle      C3       C3       N2      90.2234   110.3147
+angle      C3       C3       C2      88.6898   111.2373
+angle      O2       S2       O2      87.8524   122.1089
+angle      S2       C3       C3      84.6311   110.7976
+angle      S3       S3       C3      69.3433   102.1960
+angle       H       C2       O-      44.4882   115.3544
+angle      Cl       C2       O2      40.0764   120.5711
+angle      Cl       C2       C3      44.3641   112.2069
+angle       F       C2       O2      71.0994   120.3413
+angle       F       C2       C3      57.6955   110.2562
+angle      Br       C2       O2      37.2417   120.3867
+angle      Br       C2       C3      36.5287   110.9231
+angle      C3       O3       C2      76.8116   113.9306
+angle      O3       C2       O3      54.4693   107.3217
+angle      O3       C3       O3      92.8546   109.9102
+angle     Car      Car       C1      53.4729   119.7038
+angle      N1       C1      Car      51.6249   179.9999
+angle       H       P3        H      50.5452    94.6461
+angle     Car       O3       C3      63.7427   114.1789
+angle      C2       N2       C3      65.4614   118.2385
+angle      N2       C2       C3      79.2187   121.0960
+angle      C2       C3       C2     100.4392   110.5367
+angle      O2       C2       C2      60.9218   119.8187
+angle      O-       C2       C2      56.1869   115.7459
+angle      C3       C2       C2      60.8872   121.2186
+angle      C2       N3       C2     121.3514   127.3024
+angle      O2       N2       O2      67.2309   124.9486
+angle      O2       N2       C3      42.5367   117.3367
+angle      O2       N2      Car      41.9524   117.6925
+angle      O3       C2       N3      60.4059   110.6393
+angle      N2       O3       C3     106.3851   109.0391
+angle      O3       N2       O2      78.5551   110.6852
+angle      N1      Car      Car      78.4964   118.9000
+angle      N1       N1      Car      66.3956   130.1553
+angle      O3       S2       O2      97.1998   107.1822
+angle      O3       S2       C3      96.2238   102.2676
+angle      O3       S2       O3      92.2105   114.8782
+angle      S2       O3        H      34.0137   106.1695
+angle      O-       S2       O-      89.4881   113.3207
+angle      O-       S2       C3     101.2614   105.4004
+angle      O3       S2      Car      94.7926   101.2118
+angle      O2       S2      Car      99.6657   107.4032
+angle      S2      Car      Car      67.7015   120.5517
+angle      O-       S2      Car      97.4840   105.1503
+angle      S2       O3       C3      77.4617   113.5854
+angle      C3       S3       C2      66.2652    98.1502
+angle      S3       C2       N1      14.0899   178.0378
+angle     Car       S3       C2      60.0442    98.8325
+angle      S3      Car      Car      55.0652   119.4957
+angle      C2       C2       C2      74.2720   121.7602
+angle      N2       O2        H      49.2772   101.4161
+angle      O2       N2       C2      80.5105   110.0661
+angle      O3       C3      Car      80.4044   109.7202
+angle     Car       C3       C3      72.4611   113.5109
+angle      N3       C3      Car      99.1468   110.5853
+angle      O2       C2      Car      60.5535   121.2625
+angle       H       C2      Car      53.7759   115.7153
+angle      O-       C2      Car      48.7809   116.2156
+angle      N3       C3       C2      87.3742   110.6825
+angle     PX4       O3      PX4      50.0801   129.3938
+angle     Car       N+        H      46.1116   111.8963
+angle      N+      Car      Car      66.7518   118.4568
+angle     PX4       O3       C3      65.1488   115.4000
+angle      O3       C3       C2      87.0927   109.3887
+angle      N3       C2       N3      85.6208   112.4528
+angle       F       C3       C3      72.1141   110.8822
+angle      Cl       C3       C3      63.2084   110.6658
+angle      Br       C3       C3      58.2652   110.7249
+angle      N+       C3       C3      99.1046   110.8199
+angle      C3       C1       C1      43.6460   178.3273
+angle      C3       C3       C1      62.0102   112.3435
+angle     Car      Nar       C3      66.6159   122.0235
+angle       H       C3      Nar      51.2104   108.8812
+angle      O3       C3      Nar      84.3898   109.2902
+angle     Nar       C3       C3      79.7572   113.1596
+angle      O3       C2       C2      62.9456   118.1984
+angle       H       C2       O3      38.6819   113.7185
+angle      S3       C2       O2      51.0100   122.5767
+angle      S3       C2       C3      71.7676   113.9603
+angle      C1       C1       C1      21.1031   178.1855
+angle     Car       O3      Car      72.3908   107.1369
+angle      O3      Car       C3      66.2905   115.4865
+angle      N+       C3       C2      62.2405   105.8591
+angle       H       C3       S-      27.5374   110.2315
+angle      S-       C3       C3      75.4689   113.4019
+angle      O2       S2       N3      89.6389   106.5605
+angle      N3       S2       C3      88.9992   106.4983
+angle      S2       N3       C3      82.1494   116.7145
+angle      S2       N3        H      41.8718   112.4144
+angle       H       C3        I      33.9272   106.8937
+angle       I       C3        I      32.2223   112.7459
+angle       F       C3      Car      80.0321   111.8224
+angle      Cl       C3      Car      61.6780   110.7796
+angle       I       C3      Car      38.5720   111.9539
+angle       I      Car      Car      36.6474   119.5359
+angle      Br       C3      Car      53.6685   111.4132
+angle     Car       C3      Car      74.1125   111.2106
+angle     Car       O-      Car      54.6300   116.4162
+angle      O-      Car      Nar      61.8291   119.2874
+angle     Car       N3      Car      65.8870   124.6818
+angle     Car       N3       C3      65.7664   117.2468
+angle     Car       N3       C2      74.0198   123.2730
+angle     Car       C2       C3      79.0260   117.4718
+angle      N2       C3       C2      78.4320   109.7084
+angle     Nar      Nar      Car      67.4977   109.5348
+angle      O3      Car        H      42.5757   116.0091
+angle     Car      Sar      Car      35.3460    90.4787
+angle     Sar      Car      Nar      46.3751   114.9645
+angle     Sar      Car      Car      59.6555   113.1115
+angle     Sar      Car        H      33.3156   120.6744
+angle      O3       C2      Car      70.1109   112.7298
+angle     Car       C2      Car      86.5781   119.2082
+angle       F       C3       C2      46.6746   114.5635
+angle     Car      Oar      Car      64.0114   104.2770
+angle     Oar      Car        H      37.2703   116.5315
+angle     Oar      Car       C2      54.3604   117.9962
+angle     Sar      Car       C2      59.7715   119.7908
+angle      O3      Car       C2      66.8231   118.8972
+angle     Sar      Car       N3      43.9720   121.6564
+angle      O3      Car       N3      65.6491   113.3273
+angle     Nar      Nar        H      33.6514   121.3141
+angle      O3      Car      Nar      67.2489   118.7353
+angle     Nar      Nar       C3      70.1576   120.5135
+angle       F       C3       O3      67.3283   110.8707
+angle      Cl       C3       O3      55.4093   109.9689
+angle     Oar      Car       C3      52.3372   117.2290
+angle     Sar      Car       C3      53.5864   122.6874
+angle      N3       S2      Car      88.6452   105.9946
+angle      C3       S2      Car      79.8050   102.7191
+angle      S2      Car      Nar      50.5695   123.8124
+angle      S2      Car      Sar      52.7401   121.7254
+angle      S2       C3        F      58.8061   109.6682
+angle      Cl       C3       S2      53.0386   108.0108
+angle      S3       C3       C2      77.6409   110.4818
+angle      S3       C2       C2      60.1769   123.2385
+angle       H       C2       S3      27.2046   114.9295
+angle      C2       S3        H      35.9467    93.5310
+angle      S-       C2       O2      42.6886   127.6664
+angle      S-       C2       C3      51.5010   116.2640
+angle     Nar      Nar      Nar      85.3242   109.7794
+angle      O-       O-       C3      74.6031   106.3982
+angle      O-       O-       C2      72.1586   111.5414
+angle      O-       C3       C3      80.7171   105.7246
+angle       H       C3       O-      57.6882   109.1932
+angle      O-       O-        H      68.9847    99.6864
+angle       I       C3       C3      73.3971   110.7695
+angle      C3       O-       C2      63.1593   113.9633
+angle     Car       C3       C2      71.8895   111.1383

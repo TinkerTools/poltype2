@@ -28,7 +28,7 @@
 [C]=[N]                    					  Cpolar     1.620 # C connected to nitrogen via double bond
 [C][S]                     					  Cpolar     1.620 # C on sulfur
 [c]                        					     Car     2.065 # C on aromatic system
-[CX3](=O)                  					     Car     2.065 # C on carbonyl O
+[CX3](=O)                  					     C=O     1.600 # C on carbonyl O
 [$([CX3]=[CX3])]           					     Car     2.065 # C on C=C
 [C]([C]=[*])([C]=[*])      					     Car     2.065 # C on conjugated systems
 [CH4]                      					    Cch4     1.341 # C on methane

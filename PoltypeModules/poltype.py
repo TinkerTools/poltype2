@@ -84,6 +84,7 @@ from rdkit.Chem import rdDistGeom
 from itertools import product,combinations
 import random
 import productiondynamics as prod
+import ldatabaseparser
 
 @dataclass
 class PolarizableTyper():
@@ -155,6 +156,7 @@ class PolarizableTyper():
         prepdockscript:str=os.path.join(os.path.split(__file__)[0],'preparedockingfiles.py')
         indextompoleframefile:None=None
         qmrelativeweight:float=1
+        potentialoffset:float=1.0
         liqrelativeweight:float=1.5
         enthalpyrelativeweight:float=1
         densityrelativeweight:float=.01
@@ -174,6 +176,7 @@ class PolarizableTyper():
         density:None=None
         neatliquidsim:bool=False
         amoeba09prmfilepath:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoeba09.prm"
+        ldatabaseparserpath:str=os.path.join(os.path.abspath(os.path.split(__file__)[0]), 'lDatabaseParser', 'lAssignAMOEBAplusPRM.py')
         endstatestructurefile:None=None
         redobar:bool=False
         rotateframes:bool=False
@@ -603,6 +606,8 @@ class PolarizableTyper():
                             self.targetdensityerror=float(a)
                         elif 'liqrelativeweight' in newline:
                             self.liqrelativeweight=float(a)
+                        elif 'potentialoffset' in newline:
+                            self.potentialoffset=float(a)
                         elif 'enthalpyrelativeweight' in newline:
                             self.enthalpyrelativeweight=float(a)
                         elif 'densityrelativeweight' in newline:
@@ -4858,6 +4863,11 @@ class PolarizableTyper():
                     # Apply prmmod patches
                     self.WriteToLog('Apply prm patches\n%s'%('\n'.join(self.prmmodlist)))
                     modify_key(self.xyzoutfile, self.key4fname, self.key4fname, sdffile=self.molstructfname, inpfile=self.prmmodlist)
+                # make copy of key file before patches
+                shutil.copy(self.key4fname,self.key4bfname+"_2")
+                ## replace parameters in key4
+                self.WriteToLog('Assign Vdw and bonded parameters using DatabaseParser')
+                ldatabaseparser.assign_vdw_and_bonded(self) 
             # STEP 41
             (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,optmol,torsionsmissing,self.onlyrotbndslist)
             torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules
