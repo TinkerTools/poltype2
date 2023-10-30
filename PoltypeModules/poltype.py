@@ -85,6 +85,7 @@ from itertools import product,combinations
 import random
 import productiondynamics as prod
 import ldatabaseparser
+import lmodifytinkerkey
 
 @dataclass
 class PolarizableTyper():
@@ -428,6 +429,7 @@ class PolarizableTyper():
         cubegenexe:str='cubegen'
         gdmaexe:str='gdma'
         new_gdma:bool=False
+        scaleandfixdipole=False
         sameleveldmaesp:bool=False
         adaptiveespbasisset:bool=False
         avgmpolesexe:str=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/PoltypeModules/avgmpoles.pl"
@@ -1049,6 +1051,8 @@ class PolarizableTyper():
                             self.dmamethod =a
                         elif 'new_gdma' in newline:
                             self.new_gdma=self.SetDefaultBool(line,a,True)
+                        elif 'scaleandfixdipole' in newline:
+                            self.scaleandfixdipole=self.SetDefaultBool(line,a,True)
                         elif newline.startswith("gdmacommand_"):
                             self.__dict__[newline] = a
                             gdma_kws.append((newline[len('gdmacommand_'):], a))
@@ -4832,6 +4836,8 @@ class PolarizableTyper():
                     mpole.AverageMultipoles(self,optmol)
                     # STEP 37
                     mpole.AddPolarizeCommentsToKey(self,self.key2fnamefromavg,polartypetotransferinfo)
+                    if self.scaleandfixdipole:
+                      lmodifytinkerkey.modkey2(self)
                 # STEP 38
                 fit=False
                 if self.espfit and not os.path.isfile(self.key3fname) and self.atomnum!=1:
