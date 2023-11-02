@@ -237,10 +237,20 @@ Chem.SanitizeMol(mol2h)
 
 # neutralize COO- to COOH
 pattern = Chem.MolFromSmarts('[O-][C](=O)')
-matches = mol2.GetSubstructMatches(pattern)
+matches_1 = mol2.GetSubstructMatches(pattern)
+# neutralize NH- to NH2
+pattern = Chem.MolFromSmarts('[N-][H]')
+matches_2 = mol2.GetSubstructMatches(pattern)
 updated_mol = mol2
-if len(matches) != 0:
-  for match in matches:
+if len(matches_1) != 0:
+  for match in matches_1:
+    idx = match[0]
+    mol2.GetAtomWithIdx(idx).SetFormalCharge(0)
+    Chem.SanitizeMol(mol2)
+    updated_mol = Chem.AddHs(updated_mol, addCoords=True)
+  rdmolfiles.MolToMolFile(updated_mol, f'{fname}.mol')
+elif len(matches_2) != 0:
+  for match in matches_2:
     idx = match[0]
     mol2.GetAtomWithIdx(idx).SetFormalCharge(0)
     Chem.SanitizeMol(mol2)
