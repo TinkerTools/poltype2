@@ -1176,6 +1176,8 @@ class PolarizableTyper():
                             self.maxdisk = a
                         elif "prmstartidx" in newline:
                             self.prmstartidx = int(a)
+                        elif "atmidx" in newline:
+                            self.prmstartidx = int(a)
                         elif 'defaultmaxtorsiongridpoints' in newline:
                             self.defaultmaxtorsiongridpoints=int(a)
                         elif "optbasisset" in newline and 'tor' not in newline:
