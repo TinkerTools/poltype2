@@ -1224,6 +1224,9 @@ class PolarizableTyper():
             
             if self.new_gdma:
                 self.gdmainp = get_dma_default('dma4')
+                # automatically turn on special treatment if dma4 is used
+                # this is the treatment applied to COO atoms
+                self.scaleandfixdipole=True
             else:
                 self.gdmainp = get_dma_default('dma0')
             self.gdmainp.update(gdma_kws)
@@ -4838,12 +4841,13 @@ class PolarizableTyper():
                     mpole.AverageMultipoles(self,optmol)
                     # STEP 37
                     mpole.AddPolarizeCommentsToKey(self,self.key2fnamefromavg,polartypetotransferinfo)
-                    if self.scaleandfixdipole:
-                      lmodifytinkerkey.modkey2(self)
                 # STEP 38
                 fit=False
                 if self.espfit and not os.path.isfile(self.key3fname) and self.atomnum!=1:
                     xyzfnamelist,keyfnamelist=self.GenerateDuplicateXYZsFromOPTs(self.xyzoutfile,self.key2fnamefromavg,optmolist)   
+                    if self.scaleandfixdipole:
+                      lmodifytinkerkey.modkey2(self)
+                      self.WriteToLog("Special Treatment for COO Functional Group ")
                     self.WriteToLog("Electrostatic Potential Optimization")
                     combinedxyz,combinedpot=esp.ElectrostaticPotentialFitting(self,xyzfnamelist,keyfnamelist,potnamelist) 
                     shutil.copy(self.key3fnamefrompot,self.key3fname)
