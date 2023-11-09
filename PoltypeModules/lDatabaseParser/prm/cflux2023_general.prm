@@ -22,6 +22,7 @@ Osp2_S=X      0.170
 Fother_Car      0.126
 Clother_Car      0.068
 Brother_Car      0.115
+Brar_Car         0.115
 Fother_Cother      0.277
 Clother_Cother      0.250
 Brother_Cother      0.203
@@ -98,6 +99,7 @@ Cother_S=X_Cother      0.023      0.023      0.010      0.010
 Fother_Car_Car      0.126      0.019      0.062      0.322
 Clother_Car_Car      0.191     -0.004      0.017     -0.001
 Brother_Car_Car      0.227     -0.000      0.050     -0.026
+Brar_Car_Car      0.227     -0.000      0.050     -0.026
 Cother_Sother_Cother     -0.048     -0.048     -0.032     -0.032
 Cother_Nother_Cother      0.072      0.072      0.057      0.057
 Cother_Cother_Nother     -0.001     -0.052      0.107      0.004
