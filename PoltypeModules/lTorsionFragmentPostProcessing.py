@@ -243,6 +243,7 @@ pattern = Chem.MolFromSmarts('[N-][H]')
 matches_2 = mol2.GetSubstructMatches(pattern)
 updated_mol = mol2
 if len(matches_1) != 0:
+  print('COO- group detected. Neutralizing!')
   for match in matches_1:
     idx = match[0]
     mol2.GetAtomWithIdx(idx).SetFormalCharge(0)
@@ -250,6 +251,7 @@ if len(matches_1) != 0:
     updated_mol = Chem.AddHs(updated_mol, addCoords=True)
   rdmolfiles.MolToMolFile(updated_mol, f'{fname}.mol')
 elif len(matches_2) != 0:
+  print('NH- group detected. Neutralizing!')
   for match in matches_2:
     idx = match[0]
     mol2.GetAtomWithIdx(idx).SetFormalCharge(0)
