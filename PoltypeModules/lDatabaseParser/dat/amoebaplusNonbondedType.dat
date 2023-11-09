@@ -49,7 +49,7 @@
 #[H][CH2]=[O]                             HCHO            # H of HCHO
 #[H][CH1]=[O]                             HC=O            # H of aldehyde 
 [H][C]=[O]                             		HC=O            # H of aldehyde 
-[C][CX3H1]=[O]                         		C-CHO           # alpha-C of aldehyde 
+#[C][CX3H1]=[O]                         		C-CHO           # alpha-C of aldehyde 
 
 # Amide
 [H][NH2][C]=[O]                           H2N-Amide       # H of amide nitrogen
@@ -100,7 +100,7 @@
 #[C](c)(C)=[O]                             C(C2)=O         # C connecting 1O (double) and 2C (one aromatic)
 #[O]=[C](C)[C]                             O=C<            # O of ketone
 #[O]=[C](c)[C]                             O=C<            # O of ketone one aromatic C
-[$([C][C](C)=[O])]                        CC=O            # alpha-C of ketone
+#[$([C][C](C)=[O])]                        CC=O            # alpha-C of ketone
 
 # Acid
 [C](=O)[O][H]                             COOH            # C of acid
@@ -121,3 +121,13 @@
 [O]=[P]                                   O=P             # O of Phosphate double bonded
 [O](C)[P]                                 O-P             # O of Phosphate single bonded
 [CX4][O][P]                               C-OP            # C of TMP,TEP
+
+# Indole
+[c](a)(a)[a]                                 Car2            # Car shared with two aromatic rings
+
+# Halogon connected to aromatic
+[F][a]                                   F-ar             # F connects to Aromatic system
+[Cl][a]                                  Cl-ar             # Cl connects to Aromatic system
+[Br][a]                                  Br-ar             # Br connects to Aromatic system
+[I][a]                                   I-ar             # I connects to Aromatic system
+

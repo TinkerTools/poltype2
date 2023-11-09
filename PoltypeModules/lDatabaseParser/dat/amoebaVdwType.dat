@@ -182,7 +182,10 @@
 [CX4;H1]				CX4H1			# Alkane >CH-
 [CX4;H2]                                CX4H2			# Alkane -CH2-
 [CX4;H3]				CX4H3			# Alkane CH3-
-
+[#6;r5;r6]      C-r5r6     # Carbon in both 5 and 6 member aromatic rings, Changsheng's paper
+[$([c;r6][#6;r5;r6][#6;r5;r6])]    Cr6-r5r6     # Polar 6-ring carbon (&indole), Changsheng's paper
+[$([c;r6][c;r6][#6;r5;r6][#6;r5;r6])]    Cr6-r5r6     # Polar 6-ring carbon (&indole), Changsheng's paper
+[$([#6;r5][#7;r5][#6;r5;r6])]    Cr5-r5r6     # Polar 5-ring carbon (&indole), Changsheng's paper
 
 # Fluorine
 [F][B-](F)(F)F				F4B-			# Tetrafluoroborate F
@@ -328,7 +331,9 @@
 [H][C][C][C][S](=O)(=O)[O-]		CCCSO3-_H3C		# Propyl Sulfonate H3C
 [H][c][c][c][c][CX3]([N])[N]		benzamidine_H4		# Benzamidine H4
 [H][C]([C])[C][S](=O)(=O)[O-]		CCCSO3-_Me-H2C		# Propyl Sulfonate Me-H2C
-
+[H][#7;R]                       H-Nring           # Hydrogen linked with nitrogen on ring (Changsheng Paper) 
+[$([H][c;r6][#6;r5;r6][#6;r5;r6])]    HCr6-r5r6     # Hydrogen of Polar 6-ring carbon (&indole), Changsheng's paper
+[$([H][c;r6][c;r6][#6;r5;r6][#6;r5;r6])]    HCr6-r5r6     # Hydrogen of Polar 6-ring carbon (&indole), Changsheng's paper
 
 # Nitrogen
 [n]1cncc1[C]				4ethyl_imidazole_ND	# 4-Ethylimidazole ND general
@@ -359,7 +364,7 @@
 [nx2]1cncc1				imidazole_[N]=C		# Imidazole N=C- general
 [nx3]1cncc1				imidazole_NH		# Imidazole NH general
 [N+X4]					NH4+			# Ammonium Ion N+
-
+[$([#7]1[#6][#7][#6]2ccccc12)] N-Benzimidazole # N of Benzimidazole from Changsheng's paper 
 
 # Oxygen
 [O][c]					phenol_OH		# Phenol OH
