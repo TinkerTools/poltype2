@@ -16,6 +16,7 @@ from valenceModule.fitting import *
 from valenceModule.typing_tree import *
 from valenceModule.typing_tree_assign import *
 from valenceModule.modified_Seminario import *
+from valenceModule.valence_utils import *
 
 # color
 RED = '\033[91m'
@@ -231,7 +232,7 @@ def assignVdwAMOEBA():
   smartsvdwDict = dict(zip(types, vdws))
   ttypes, stypes = np.loadtxt(f"{fname}.type.vdw", usecols=(1,3), unpack=True, dtype="str")
   tinkervdwDict = {}
-  for t,s in zip(ttypes, stypes): 
+  for t,s in zip(ttypes, stypes):
     if t not in tinkervdwDict:
       tinkervdwDict[t] = smartsvdwDict[s]
   lines = open(key).readlines()
@@ -555,6 +556,9 @@ def assignBonded(new_para_method, fitting = "NO"):
               fitting_list.append(para)
 
   #angle bending
+
+   ## find sp2 atoms
+  sp2AtomTypes = findSp2AtomTypes(xyz) 
   class1, class2, class3  = np.loadtxt(os.path.join(prmfiledir, "angle.prm"), usecols=(1, 2, 3), unpack=True, dtype="str",skiprows=1)
   angleKs, angleTs  = np.loadtxt(os.path.join(prmfiledir, "angle.prm"), usecols=(4,5), unpack=True, dtype="float",skiprows=1)
   classes = []
@@ -575,7 +579,7 @@ def assignBonded(new_para_method, fitting = "NO"):
   with open(key) as f:
     for line in lines[idx:]:
       d = line.split()
-      if ("angle " in line or "anglep " in line):
+      if ("angle " in line or "anglep " in line) and (len(d) > 4):
         angletype1 = d[1]
         angletype2 = d[2]
         angletype3 = d[3]
@@ -585,6 +589,9 @@ def assignBonded(new_para_method, fitting = "NO"):
           c3 = tinker2database[angletype3]
           comb1 = c1 + "_" + c2 + "_" + c3
           comb2 = c3 + "_" + c2 + "_" + c1
+          # change to anglep if angletype2 is sp2
+          if angletype2 in sp2AtomTypes:
+            d[0] = 'anglep'
           if (comb1 in classAngleParameterDict):
             para_strings_k.append("%s %s %s %s %10.5f %s\n"%(d[0], angletype1, angletype2, angletype3, classAngleParameterDict[comb1][0], d[5]))
             para_strings_kbt.append("%s %s %s %s %10.5f %10.5f\n"%(d[0], angletype1, angletype2, angletype3, classAngleParameterDict[comb1][0], classAngleParameterDict[comb1][1]))
@@ -629,7 +636,7 @@ def assignBonded(new_para_method, fitting = "NO"):
       #if "strbnd " in line:
       # try to find strbnd parameters for every angle
       d = line.split()
-      if ("strbnd " in line):
+      if ("strbnd " in line) and (len(d) > 4):
         angletype1 = d[1]
         angletype2 = d[2]
         angletype3 = d[3]
