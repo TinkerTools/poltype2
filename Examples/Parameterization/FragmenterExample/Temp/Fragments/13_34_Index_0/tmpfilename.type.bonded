@@ -1,0 +1,15 @@
+    1   401   401   car    29 #                 car, aromatic carbon 
+    2   402   402   car    29 #                 car, aromatic carbon 
+    3   403   403 COOben    85 #                 C=O, sp2 carbon, carboxylic acid on benzene
+    4   404   404   OCO   213 #                 OCO, Oxygen of Carboxylic acid (protonated)
+    5   401   401   car    29 #                 car, aromatic carbon 
+    6   405   405   O=C   219 #                 O=C, Oxygen of carbonyl group
+    7   406   406   car    29 #                 car, aromatic carbon 
+    8   407   407   car    29 #                 car, aromatic carbon 
+    9   408   408    Hc    23 #                  HC, H on aromatic carbon 
+   10   406   406   car    29 #                 car, aromatic carbon 
+   11   408   408    Hc    23 #                  HC, H on aromatic carbon 
+   12   409   409    Hc    23 #                  HC, H on aromatic carbon 
+   13   410   410    HO    17 #                  HO, H on Oxygen 
+   14   409   409    Hc    23 #                  HC, H on aromatic carbon 
+   15   411   411    Hc    23 #                  HC, H on aromatic carbon 

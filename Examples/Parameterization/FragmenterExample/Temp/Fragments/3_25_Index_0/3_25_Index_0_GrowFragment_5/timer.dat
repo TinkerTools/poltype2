@@ -1,0 +1,60 @@
+
+Host: node165.bme.utexas.edu
+
+Timers On : Sat Nov 18 08:02:37 2023
+Timers Off: Sat Nov 18 08:02:46 2023
+
+Wall Time:        8.77 seconds
+
+                                                       Time (seconds)
+Module                                       User      System        Wall        Calls
+DFH: sparsity prep                  :      0.033u      0.000s      0.024w      1 calls
+Libint2ERI::Libint2ERI              :      3.050u      0.067s      0.788w    105 calls
+DFH: initialize()                   :     27.133u      1.000s      0.401w      1 calls
+DFH: AO Construction                :      4.417u      0.100s      0.056w      1 calls
+DFH: AO-Met. Contraction            :      1.500u      0.083s      0.019w      1 calls
+HF: Form core H                     :      2.300u      0.050s      0.028w      1 calls
+HF: Form S/X                        :      0.183u      0.000s      0.002w      1 calls
+HF: Guess                           :     14.783u      0.717s      0.185w      1 calls
+SAD Guess                           :     14.667u      0.717s      0.184w      1 calls
+HF: Form G                          :      7.167u      0.300s      0.088w     10 calls
+JK: D                               :      0.050u      0.000s      0.000w     10 calls
+JK: USO2AO                          :      0.000u      0.000s      0.000w     10 calls
+JK: JK                              :      7.000u      0.300s      0.086w     10 calls
+DFH: compute_JK()                   :      6.950u      0.300s      0.086w     10 calls
+DFH: Grabbing AOs                   :      0.033u      0.000s      0.000w     10 calls
+DFH: compute_J                      :      0.767u      0.017s      0.010w     10 calls
+DFH: compute_K                      :      2.383u      0.150s      0.031w     10 calls
+JK: AO2USO                          :      0.000u      0.000s      0.000w     10 calls
+HF: Form F                          :      0.167u      0.000s      0.002w     10 calls
+HF: Form D                          :      0.000u      0.000s      0.000w     10 calls
+HF: DIIS                            :     12.050u      0.333s      0.146w      9 calls
+HF: Form C                          :      1.300u      0.050s      0.016w      9 calls
+
+--------------------------------------------------------------------------------------
+DFH: sparsity prep                  :      0.033u      0.000s      0.024w      1 calls
+| Libint2ERI::Libint2ERI            :      0.017u      0.000s      0.016w      1 calls
+DFH: initialize()                   :     27.133u      1.000s      0.401w      1 calls
+| Libint2ERI::Libint2ERI            :      1.800u      0.067s      0.050w     52 calls
+| DFH: AO Construction              :      4.417u      0.100s      0.056w      1 calls
+| DFH: AO-Met. Contraction          :      1.500u      0.083s      0.019w      1 calls
+HF: Form core H                     :      2.300u      0.050s      0.028w      1 calls
+HF: Form S/X                        :      0.183u      0.000s      0.002w      1 calls
+HF: Guess                           :     14.783u      0.717s      0.185w      1 calls
+| SAD Guess                         :     14.667u      0.717s      0.184w      1 calls
+HF: Form G                          :      7.167u      0.300s      0.088w     10 calls
+| JK: D                             :      0.050u      0.000s      0.000w     10 calls
+| JK: USO2AO                        :      0.000u      0.000s      0.000w     10 calls
+| JK: JK                            :      7.000u      0.300s      0.086w     10 calls
+| | DFH: compute_JK()               :      6.950u      0.300s      0.086w     10 calls
+| | | DFH: Grabbing AOs             :      0.033u      0.000s      0.000w     10 calls
+| | | DFH: compute_J                :      0.767u      0.017s      0.010w     10 calls
+| | | DFH: compute_K                :      2.383u      0.150s      0.031w     10 calls
+| JK: AO2USO                        :      0.000u      0.000s      0.000w     10 calls
+HF: Form F                          :      0.167u      0.000s      0.002w     10 calls
+HF: Form D                          :      0.000u      0.000s      0.000w     10 calls
+HF: DIIS                            :     12.050u      0.333s      0.146w      9 calls
+HF: Form C                          :      1.300u      0.050s      0.016w      9 calls
+Libint2ERI::Libint2ERI              :      1.233u      0.000s      0.723w     52 calls
+
+**************************************************************************************

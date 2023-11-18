@@ -1,0 +1,23 @@
+molecule { 
+0 1
+H -1.774028277812 -0.182574908928 -0.44331609055
+C -1.36544692021 0.208925140954 0.488792538913
+O -0.094718792765 0.8478234895 0.248962265254
+C 0.841552936258 0.028644219458 -0.26251607168
+H -1.249778537572 -0.607472228568 1.202356669216
+H -2.003908419981 0.990089379105 0.893912600117
+O 0.690808176686 -1.148917701955 -0.519122080011
+H 1.770459436424 0.593575639468 -0.411809452167
+}
+memory 20GB
+set_num_threads(5)
+psi4_io.set_default_path("/scratch/liuchw/Psi4-35_38_Index_0-farH_in17")
+set maxiter 500
+set freeze_core True
+set PROPERTIES_ORIGIN ["COM"]
+set cubeprop_tasks ['esp']
+set basis aug-cc-pVTZ 
+E, wfn = properties('mp2',properties=['dipole','GRID_ESP','WIBERG_LOWDIN_INDICES','MULLIKEN_CHARGES'],return_wfn=True)
+cubeprop(wfn)
+fchk(wfn, "35_38_Index_0-esp.fchk")
+clean()

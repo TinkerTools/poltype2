@@ -1,0 +1,74 @@
+    1   401   401    N3   171 #                  N3, sp3 Nitrogen
+    2   402   402  N3R5   172 #                N3R5, sp3 Nitrogen on 5-membered cycle
+    3   403   403  NC=O   179 #                NC=O, sp3 Nitrogen in amide
+    4   404   404  N3R6   174 #                N3R6,  sp3 N in 6-membered ring
+    5   405   405    C*     2 #         C*, wild matching Carbon
+    6   406   406  c0r5    30 #                c0r5, aromatic carbon in 5-membered cycle without H
+    7   407   407   C=N   102 #                 C=N, sp2 carbon, formimidamide 
+    8   408   408   CON    92 #                 CON, sp2 carbon, peptide bond (amide) 
+    9   409   409  c0r5    30 #                c0r5, aromatic carbon in 5-membered cycle without H
+   10   410   410   car    29 #                 car, aromatic carbon 
+   11   411   411   car    29 #                 car, aromatic carbon 
+   12   412   412   car    29 #                 car, aromatic carbon 
+   13   413   413   car    29 #                 car, aromatic carbon 
+   14   414   414   car    29 #                 car, aromatic carbon 
+   15   414   414   car    29 #                 car, aromatic carbon 
+   16   415   415   car    29 #                 car, aromatic carbon 
+   17   416   416   car    29 #                 car, aromatic carbon 
+   18   416   416   car    29 #                 car, aromatic carbon 
+   19   417   417   car    29 #                 car, aromatic carbon 
+   20   417   417   car    29 #                 car, aromatic carbon 
+   21   418   418   car    29 #                 car, aromatic carbon 
+   22   419   419   car    29 #                 car, aromatic carbon 
+   23   419   419   car    29 #                 car, aromatic carbon 
+   24   420   420   car    29 #                 car, aromatic carbon 
+   25   421   421   CON    92 #                 CON, sp2 carbon, peptide bond (amide) 
+   26   422   422   C33    35 #                 C33, sp3 carbon with 3 Hydrogens
+   27   423   423   C32    34 #                 C32, sp3 carbon with 2 Hydrogens
+   28   424   424  C3R6    43 #                C3R6, sp3 carbon on 6-membered cycle
+   29   424   424  C3R6    43 #                C3R6, sp3 carbon on 6-membered cycle
+   30   425   425  C3R6    43 #                C3R6, sp3 carbon on 6-membered cycle
+   31   425   425  C3R6    43 #                C3R6, sp3 carbon on 6-membered cycle
+   32   426   426   C33    35 #                 C33, sp3 carbon with 3 Hydrogens
+   33   427   427   car    29 #                 car, aromatic carbon 
+   34   428   428 COOben    85 #                 C=O, sp2 carbon, carboxylic ester on benzene
+   35   429   429   C33    35 #                 C33, sp3 carbon with 3 Hydrogens
+   36   430   430   O=C   219 #                 O=C, Oxygen of carbonyl group, Amide, Formamide 
+   37   431   431   O=C   219 #                 O=C, Oxygen of carbonyl group, Amide, Formamide 
+   38   432   432 O-est   227 #               O-est, Oxygen of ester 
+   39   433   433   O=C   219 #                 O=C, Oxygen of carbonyl group (correct the O=C in ester)
+   40   434   434  N4R6   175 #                N4R6,  sp3 N in 6-membered ring with charge
+   41   435   435  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   42   436   436    Hc    23 #                  HC, H on aromatic carbon 
+   43   437   437    HN    24 #                  HN, H on Nitrogen 
+   44   438   438    HN    24 #                  HN, H on Nitrogen 
+   45   439   439    Hc    23 #                  HC, H on aromatic carbon 
+   46   440   440    Hc    23 #                  HC, H on aromatic carbon 
+   47   440   440    Hc    23 #                  HC, H on aromatic carbon 
+   48   441   441    Hc    23 #                  HC, H on aromatic carbon 
+   49   441   441    Hc    23 #                  HC, H on aromatic carbon 
+   50   442   442    Hc    23 #                  HC, H on aromatic carbon 
+   51   442   442    Hc    23 #                  HC, H on aromatic carbon 
+   52   443   443    Hc    23 #                  HC, H on aromatic carbon 
+   53   444   444    Hc    23 #                  HC, H on aromatic carbon 
+   54   444   444    Hc    23 #                  HC, H on aromatic carbon 
+   55   445   445  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   56   446   446  HCH2    20 #                HCH2, H on sp3 carbon, -CH2-
+   57   447   447  HCH2    20 #                HCH2, H on sp3 carbon, -CH2-
+   58   447   447  HCH2    20 #                HCH2, H on sp3 carbon, -CH2-
+   59   448   448  HCH2    20 #                HCH2, H on sp3 carbon, -CH2-
+   60   448   448  HCH2    20 #                HCH2, H on sp3 carbon, -CH2-
+   61   435   435  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   62   445   445  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   63   446   446  HCH2    20 #                HCH2, H on sp3 carbon, -CH2-
+   64   447   447  HCH2    20 #                HCH2, H on sp3 carbon, -CH2-
+   65   447   447  HCH2    20 #                HCH2, H on sp3 carbon, -CH2-
+   66   448   448  HCH2    20 #                HCH2, H on sp3 carbon, -CH2-
+   67   448   448  HCH2    20 #                HCH2, H on sp3 carbon, -CH2-
+   68   435   435  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   69   445   445  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   70   449   449    Hc    23 #                  HC, H on aromatic carbon 
+   71   450   450  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   72   450   450  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   73   450   450  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   74   451   451    H+    27 #                  H+, H on NH4+, R-NH3+, R2-NH2+, R3-NH+

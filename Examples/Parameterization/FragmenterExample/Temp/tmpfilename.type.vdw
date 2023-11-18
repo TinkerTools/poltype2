@@ -1,0 +1,74 @@
+    1   401   401    N*     # #N*, wild aliphatic Nitrogen
+    2   402   402 Nr5-C_N     # #NMePyrrolidine N
+    3   403   403    N*     # #N*, wild aliphatic Nitrogen
+    4   404   404 3Me-N_N     # #Trimethyl Amine N
+    5   405   405 ethylbenz_CH2     # #Ethylbenzene CH2
+    6   406   406 C-r5r6     # #Carbon in both 5 and 6 member aromatic rings, Changsheng's paper
+    7   407   407 ethylbenz_CH2     # #Ethylbenzene CH2
+    8   408   408 Cr5-r5r6     # #Polar 5-ring carbon (&indole), Changsheng's paper
+    9   409   409 C-r5r6     # #Carbon in both 5 and 6 member aromatic rings, Changsheng's paper
+   10   410   410 Cr6-r5r6     # #Polar 6-ring carbon (&indole), Changsheng's paper
+   11   411   411 ethylbenz_C1-CH2     # #Ethylbenzene C1-CH2
+   12   412   412 Cr6-r5r6     # #Polar 6-ring carbon (&indole), Changsheng's paper
+   13   413   413 Cr6-r5r6     # #Polar 6-ring carbon (&indole), Changsheng's paper
+   14   414   414 ethylbenz_C2     # #Ethylbenzene C2
+   15   414   414 ethylbenz_C2     # #Ethylbenzene C2
+   16   415   415 benz_C     # #Benzene C
+   17   416   416 ethylbenz_C3     # #Ethylbenzene C3
+   18   416   416 ethylbenz_C3     # #Ethylbenzene C3
+   19   417   417 benz_C     # #Benzene C
+   20   417   417 benz_C     # #Benzene C
+   21   418   418 ethylbenz_C4     # #Ethylbenzene C4
+   22   419   419 benz_C     # #Benzene C
+   23   419   419 benz_C     # #Benzene C
+   24   420   420 benz_C     # #Benzene C
+   25   421   421 C(=O)C_C=O     # #Acetaldehyde C=O
+   26   422   422 CX4H3     # #Alkane CH3-
+   27   423   423 CX4H2     # #Alkane -CH2-
+   28   424   424 CX4H2     # #Alkane -CH2-
+   29   424   424 CX4H2     # #Alkane -CH2-
+   30   425   425 CX4H2     # #Alkane -CH2-
+   31   425   425 CX4H2     # #Alkane -CH2-
+   32   426   426 CX4H3     # #Alkane CH3-
+   33   427   427 Cr6-r5r6     # #Polar 6-ring carbon (&indole), Changsheng's paper
+   34   428   428 Me-Ether_C     # #Methyl Ether CH3
+   35   429   429 CX4H3     # #Alkane CH3-
+   36   430   430 C(=O)C_O=C     # #Acetaldehyde O=C
+   37   431   431 C(=O)C_O=C     # #Acetaldehyde O=C
+   38   432   432 Me-Ether_O     # #Methyl Ether O
+   39   433   433 C(=O)_O=C     # #Formaldehyde O=C
+   40   434   434 CNC_NH     # #Dimethyl Amine N
+   41   435   435 3Me-N_H3C     # #Trimethyl Amine H3C
+   42   436   436 HCr6-r5r6     # #Hydrogen of Polar 6-ring carbon (&indole), Changsheng's paper
+   43   437   437   HN*     # #H*, wild matching Hydrogen
+   44   438   438 H-Nring     # #Hydrogen linked with nitrogen on ring (Changsheng Paper) 
+   45   439   439 HCr6-r5r6     # #Hydrogen of Polar 6-ring carbon (&indole), Changsheng's paper
+   46   440   440 ethylbenz_H2     # #Ethylbenzene H2
+   47   440   440 ethylbenz_H2     # #Ethylbenzene H2
+   48   441   441 ethylbenz_H3     # #Ethylbenzene H3
+   49   441   441 ethylbenz_H3     # #Ethylbenzene H3
+   50   442   442 benz_HC     # #Benzene HC
+   51   442   442 benz_HC     # #Benzene HC
+   52   443   443 ethylbenz_H4     # #Ethylbenzene H4
+   53   444   444 benz_HC     # #Benzene HC
+   54   444   444 benz_HC     # #Benzene HC
+   55   445   445  HCH3     # #Methane H4C
+   56   446   446 3Me-N_H3C     # #Trimethyl Amine H3C
+   57   447   447 3Me-N_H3C     # #Trimethyl Amine H3C
+   58   447   447 3Me-N_H3C     # #Trimethyl Amine H3C
+   59   448   448 3Me-N_H3C     # #Trimethyl Amine H3C
+   60   448   448 3Me-N_H3C     # #Trimethyl Amine H3C
+   61   435   435 3Me-N_H3C     # #Trimethyl Amine H3C
+   62   445   445  HCH3     # #Methane H4C
+   63   446   446 3Me-N_H3C     # #Trimethyl Amine H3C
+   64   447   447 3Me-N_H3C     # #Trimethyl Amine H3C
+   65   447   447 3Me-N_H3C     # #Trimethyl Amine H3C
+   66   448   448 3Me-N_H3C     # #Trimethyl Amine H3C
+   67   448   448 3Me-N_H3C     # #Trimethyl Amine H3C
+   68   435   435 3Me-N_H3C     # #Trimethyl Amine H3C
+   69   445   445  HCH3     # #Methane H4C
+   70   449   449 HCr6-r5r6     # #Hydrogen of Polar 6-ring carbon (&indole), Changsheng's paper
+   71   450   450 Me-Ether_HC     # #Methyl Ether H3C
+   72   450   450 Me-Ether_HC     # #Methyl Ether H3C
+   73   450   450 Me-Ether_HC     # #Methyl Ether H3C
+   74   451   451 H-Nring     # #Hydrogen linked with nitrogen on ring (Changsheng Paper) 

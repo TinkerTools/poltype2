@@ -1,0 +1,111 @@
+parameters /home/liuchw/poltype-latest/ParameterFiles/amoebabio18_header.prm
+OPENMP-THREADS 5
+bondterm none
+angleterm none
+torsionterm none
+vdwterm none
+fix-monopole
+digits 8
+potential-offset 1.0
+RESP-WEIGHT 1
+
+atom          401    401    C     "3_24_Index_0        "         6    12.011    3
+atom          402    402    N     "3_24_Index_0        "         7    14.007    3
+atom          403    403    C     "3_24_Index_0        "         6    12.011    3
+atom          404    404    C     "3_24_Index_0        "         6    12.011    3
+atom          405    405    C     "3_24_Index_0        "         6    12.011    4
+atom          407    407    C     "3_24_Index_0        "         6    12.011    3
+atom          406    406    C     "3_24_Index_0        "         6    12.011    3
+atom         409   409    H     "3_24_Index_0        "         1     1.008    1
+atom         408   408    O     "3_24_Index_0        "         8    15.999    1
+atom         410   410    H     "3_24_Index_0        "         1     1.008    1
+atom         411   411    H     "3_24_Index_0        "         1     1.008    1
+atom         412   412    H     "3_24_Index_0        "         1     1.008    1
+atom         413   413    H     "3_24_Index_0        "         1     1.008    1
+
+multipole    401    408    402              0.58639
+                                      0.40603    0.00000    0.27832
+                                     -0.05519
+                                      0.00000   -0.03668
+                                      0.00300    0.00000    0.09187
+multipole    402    405    403             -0.15776
+                                     -0.07240    0.00000    0.12482
+                                      0.21962
+                                      0.00000   -0.80399
+                                      0.00548    0.00000    0.58437
+multipole    403   -404   -404              0.04387
+                                      0.00000    0.00000   -0.28269
+                                     -0.33588
+                                      0.00000   -0.05634
+                                      0.00000    0.00000    0.39222
+multipole    404    403    406             -0.08843
+                                     -0.04818    0.00000   -0.06814
+                                     -0.02992
+                                      0.00000   -0.04734
+                                     -0.14361    0.00000    0.07726
+multipole    405    402    403             -0.01227
+                                     -0.02367    0.00000    0.30561
+                                     -0.49361
+                                      0.00000   -0.27903
+                                     -0.00785    0.00000    0.77264
+multipole    406    404    407              0.09571
+                                      0.27172    0.00000    0.12230
+                                      0.58737
+                                      0.00000   -0.43860
+                                      0.46303    0.00000   -0.14877
+multipole    407   -406   -406             -0.04367
+                                      0.00000    0.00000   -0.06963
+                                      0.23897
+                                      0.00000   -0.14401
+                                      0.00000    0.00000   -0.09496
+multipole    408    401    402             -0.61717
+                                     -0.16092    0.00000   -0.03325
+                                     -0.40001
+                                      0.00000    0.15915
+                                     -0.29780    0.00000    0.24086
+multipole    409    404    403              0.03873
+                                      0.02761    0.00000   -0.17308
+                                      0.08556
+                                      0.00000   -0.01273
+                                      0.03540    0.00000   -0.07283
+multipole    410    405    402              0.05231
+                                     -0.00213    0.00000   -0.11217
+                                      0.00501
+                                      0.00000   -0.00491
+                                     -0.00526    0.00000   -0.00010
+multipole    411    406    404              0.00671
+                                      0.00103    0.00000   -0.18859
+                                      0.02755
+                                      0.00000    0.00988
+                                      0.00246    0.00000   -0.03743
+multipole    412    407    406              0.00441
+                                      0.00030    0.00000   -0.19133
+                                      0.02889
+                                      0.00000    0.01116
+                                     -0.00051    0.00000   -0.04005
+multipole    413    401    408             -0.06616
+                                      0.03961    0.00000   -0.18736
+                                      0.04558
+                                      0.00000    0.02786
+                                      0.02497    0.00000   -0.07344
+
+# amoeba21 comments=C on carbonyl O SMARTS match = [CX3](=O)
+polarize           401          1.6000     0.3900 402 408 413
+# amoeba21 comments=N on amide SMARTS match = [NX3]([CX3](=O))
+polarize           402          1.2430     0.3900 401
+polarize           403          1.6000     0.3900 404
+polarize           404          1.6000     0.3900 403 406 409
+# amoeba21 comments=C on non-aromatic nitrogen SMARTS match = [C][N]
+polarize           405          1.6200     0.3900 410
+polarize           407          1.6000     0.3900 406 412
+# amoeba21 comments=C on carbonyl O SMARTS match = [CX3](=O)
+polarize           406          1.6000     0.3900 404 407 411
+polarize          409          0.4320     0.3900 404
+# amoeba21 comments=O on carbonyl group SMARTS match = [OX1]=[CX3]
+polarize          408          0.9140     0.3900 401
+polarize          410          0.4800     0.3900 405
+polarize          411          0.4320     0.3900 406
+# amoeba21 comments=H on aromatic carbon SMARTS match = [H][c]
+polarize          412          0.4320     0.3900 407
+# amoeba21 comments=H on non-aromatic carbon SMARTS match = [H][C]
+polarize          413          0.4800     0.3900 401

@@ -1,0 +1,8 @@
+    1   405   405  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+    2   401   401   C33    35 #                 C33, sp3 carbon with 3 Hydrogens
+    3   402   402 O-est   227 #               O-est, Oxygen of ester 
+    4   403   403  CO=O    80 #                 C=O, sp2 carbon, carboxylic ester
+    5   405   405  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+    6   405   405  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+    7   404   404   O=C   219 #                 O=C, Oxygen of carbonyl group (correct the O=C in ester)
+    8   406   406   HC2    22 #                 HC2, H on sp2 carbon

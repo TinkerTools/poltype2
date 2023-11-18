@@ -1,0 +1,1014 @@
+Sat Nov 18 08:03:45 2023 Atom Type Classification
+Sat Nov 18 08:03:45 2023 Running on host: node165.bme.utexas.edu
+Sat Nov 18 08:03:45 2023 QM Geometry Optimization
+Sat Nov 18 08:03:45 2023 Submitting: psi4   --loglevel 30  35_38_Index_0-opt_1.psi4 35_38_Index_0-opt_1.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+Sat Nov 18 08:03:57 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/35_38_Index_0-opt_1.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+Sat Nov 18 08:03:57 2023 Searching Database
+Sat Nov 18 08:04:03 2023 # amoeba09 matching SMARTS from molecule  [['[H]-[#6](-[H])-[H]', [2]]] to SMARTS from parameter file [['[#8](-[#6](-[H])(-[H])-[H])-[H]', [2]]] with tinker type descriptions [[('C', '"Methanol CH3"')]]
+# Missing vdw parameters
+
+Sat Nov 18 08:04:03 2023 # amoeba09 matching SMARTS from molecule  [['[H]-[#6](-[H])-[H]', [3]]] to SMARTS from parameter file [['[#8](-[#6](-[H])(-[H])-[H])-[H]', [4]]] with tinker type descriptions [[('H', '"Methanol H3C"')]]
+# Missing vdw parameters
+
+Sat Nov 18 08:04:03 2023 # amoeba09 matching SMARTS from molecule  [['[#6](-[#8])=[#8]', [2]]] to SMARTS from parameter file [['[#8](-[#6](=[#8])-[#6](-[H])(-[H])-[H])-[H]', [1]]] with tinker type descriptions [[('O', '"Acetic Acid OH"')]]
+# Missing vdw parameters
+
+Sat Nov 18 08:04:03 2023 # Missing angle parameters, assigning default parameters via element and valence
+
+Sat Nov 18 08:04:03 2023 # Missing angle parameters, assigning default parameters via element and valence
+
+Sat Nov 18 08:04:03 2023 # Missing angle parameters, assigning default parameters via element and valence
+
+Sat Nov 18 08:04:03 2023 # Missing angle parameters, assigning default parameters via element and valence
+
+Sat Nov 18 08:04:03 2023 # Missing angle parameters, assigning default parameters via element and valence
+
+Sat Nov 18 08:04:03 2023 # Missing strbnd parameters, zeroing out parameters
+
+Sat Nov 18 08:04:03 2023 # Missing strbnd parameters, zeroing out parameters
+
+Sat Nov 18 08:04:03 2023 Gas Phase Single Point for GDMA
+Sat Nov 18 08:04:03 2023 Submitting: psi4   --loglevel 30  35_38_Index_0-dma.psi4 35_38_Index_0-dma.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+Sat Nov 18 08:04:09 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/35_38_Index_0-dma.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+Sat Nov 18 08:04:09 2023 Gaussian Distributed Multipole Analysis (GDMA)
+Sat Nov 18 08:04:09 2023 Submitting: /home/liuchw/Softwares/gdma-2.3.3/bin/gdma < 35_38_Index_0.gdmain > 35_38_Index_0.gdmaout path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+Sat Nov 18 08:04:09 2023 Local Frame Symmetry Detection
+Sat Nov 18 08:04:09 2023 Define Polarization Groups and Polarization Parameters
+Sat Nov 18 08:04:09 2023 Submitting: poledit.x 1 35_38_Index_0.gdmaout "/home/liuchw/poltype-latest/ParameterFiles/amoebabio18_header.prm" < 35_38_Index_0-peditin.txt path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.10.5   February 2023                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2023               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Global Frame Cartesian Multipole Moments :
+
+ Site:       1         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.773444      -0.163160      -0.437401
+
+ Charge:                  0.05327
+ Dipole:                 -0.05162       -0.06452       -0.11348
+ Quadrupole:              0.00585
+                         -0.01039       -0.01021
+                         -0.00777       -0.01202        0.00436
+
+ Site:       2         Name:   C         Atomic Number:       6
+
+ Coordinates:           -1.364863       0.228340       0.494707
+
+ Charge:                  0.04717
+ Dipole:                  0.29946        0.19333       -0.04544
+ Quadrupole:              0.52785
+                          0.55636       -0.14772
+                         -0.15167       -0.11220       -0.38013
+
+ Site:       3         Name:   O         Atomic Number:       8
+
+ Coordinates:           -0.094134       0.867239       0.254877
+
+ Charge:                 -0.30951
+ Dipole:                 -0.13642       -0.27848       -0.02869
+ Quadrupole:              0.48075
+                          0.18515       -0.10061
+                         -0.25601        0.03735       -0.38014
+
+ Site:       4         Name:   C         Atomic Number:       6
+
+ Coordinates:            0.842137       0.048059      -0.256601
+
+ Charge:                  0.65561
+ Dipole:                 -0.39136       -0.20902        0.07087
+ Quadrupole:             -0.10217
+                         -0.14218        0.08883
+                         -0.00710        0.06990        0.01334
+
+ Site:       5         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.249194      -0.588057       1.208271
+
+ Charge:                  0.05327
+ Dipole:                  0.01013       -0.11456        0.08045
+ Quadrupole:              0.01150
+                         -0.00665       -0.01999
+                          0.00180        0.00644        0.00849
+
+ Site:       6         Name:   H         Atomic Number:       1
+
+ Coordinates:           -2.003324       1.009504       0.899827
+
+ Charge:                  0.06834
+ Dipole:                 -0.08440        0.08655        0.04923
+ Quadrupole:             -0.00965
+                         -0.00231        0.01404
+                          0.00065        0.00584       -0.00440
+
+ Site:       7         Name:   O         Atomic Number:       8
+
+ Coordinates:            0.691393      -1.129503      -0.513207
+
+ Charge:                 -0.56268
+ Dipole:                  0.14496       -0.04045       -0.05667
+ Quadrupole:             -0.28263
+                          0.28232        0.20987
+                          0.21492       -0.07767        0.07276
+
+ Site:       8         Name:   H         Atomic Number:       1
+
+ Coordinates:            1.771044       0.612991      -0.405895
+
+ Charge:                 -0.00547
+ Dipole:                  0.18290        0.09751       -0.03288
+ Quadrupole:             -0.04720
+                         -0.04248        0.01798
+                          0.01383        0.01013        0.02922
+
+ Local Frame Definition for Multipole Sites :
+
+     Atom     Name      Axis Type     Z Axis  X Axis  Y Axis
+
+       1      H         Z-then-X         2       3       0
+       2      C         Z-then-X         3       4       0
+       3      O         Z-then-X         4       2       0
+       4      C         Z-then-X         7       3       0
+       5      H         Z-then-X         2       3       0
+       6      H         Z-then-X         2       3       0
+       7      O         Z-then-X         4       3       0
+       8      H         Z-then-X         4       7       0
+
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Choose Either the AMOEBA or HIPPO Polarization Model [A] :  
+ Polarizability Parameters for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      H            0.4960         0.3900
+       2      C            1.3340         0.3900
+       3      O            0.8370         0.3900
+       4      C            1.3340         0.3900
+       5      H            0.4960         0.3900
+       6      H            0.4960         0.3900
+       7      O            0.8370         0.3900
+       8      H            0.4940         0.3900
+
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Atomic Polarizabilities for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      H            0.4800         0.3900
+       2      C            1.6200         0.3900
+       3      O            0.8320         0.3900
+       4      C            1.6000         0.3900
+       5      H            0.4800         0.3900
+       6      H            0.4800         0.3900
+       7      O            0.9140         0.3900
+       8      H            0.4800         0.3900
+
+ Choose Method for Division into Polarization Groups :
+
+    (1) Put All Atoms in One Polarization Group
+    (2) Separate into Groups at Rotatable Bonds
+    (3) Manual Entry of Bonds Separating Groups
+
+ Enter the Number of the Desired Choice [1] :  
+ Polarization Groups for Multipole Sites :
+
+     Atom     Name       Polarization Group Definition
+
+       1      H               2
+       2      C               1     5     6
+       3      O               4
+       4      C               3     7     8
+       5      H               2
+       6      H               2
+       7      O               4
+       8      H               4
+
+ Electrostatic and Polarization Scale Factors :
+
+                    1-2         1-3         1-4         1-5
+
+ M-Scale:         0.0000      0.0000      0.4000      0.8000
+ P-Inter:         0.0000      0.0000      1.0000      1.0000
+ P-Intra:         0.0000      0.0000      0.5000      1.0000
+ W-Scale:         1.0000      1.0000      1.0000      1.0000
+
+                    1-1         1-2         1-3         1-4
+
+ D-Scale:         0.0000      1.0000      1.0000      1.0000
+ U-Scale:         1.0000      1.0000      1.0000      1.0000
+
+ Use Thole Damping:           True
+ Charge Penetration:          False
+ Set D Equal to P:            False
+
+ Determination of Intergroup Induced Dipoles :
+
+    Iter        RMS Change (Debye)
+
+       1           0.0140607555
+       2           0.0048291395
+       3           0.0005527459
+       4           0.0001532231
+       5           0.0000422680
+       6           0.0000022950
+       7           0.0000006601
+
+ Local Frame Intergroup Induced Dipole Moments (Debye) :
+
+    Atom              X           Y           Z         Total
+
+       1          -0.0316     -0.0458     -0.0379      0.0673
+       2          -0.1109     -0.0000      0.3338      0.3517
+       3           0.0244     -0.0000      0.0489      0.0546
+       4          -0.2805     -0.0001      0.1005      0.2980
+       5          -0.0316      0.0457     -0.0377      0.0672
+       6           0.0018     -0.0000      0.0017      0.0025
+       7          -0.0167      0.0000     -0.0743      0.0761
+       8          -0.0073      0.0000     -0.0413      0.0420
+
+ Condense Symmetric Atoms to Equivalent Types [Y] :  
+ Remove Multipole Components Zeroed by Symmetry [Y] :  
+ Final Atomic Multipole Moments after Regularization :
+
+ Atom:       1         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             2       3       0
+
+ Charge:                  0.05327
+ Dipole:                  0.00521        0.00000       -0.12461
+ Quadrupole:              0.00816
+                          0.00000        0.00431
+                         -0.01088        0.00000       -0.01247
+
+ Atom:       2         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X             3       4       0
+
+ Charge:                  0.04717
+ Dipole:                  0.00289        0.00000        0.22571
+ Quadrupole:             -0.46593
+                          0.00000       -0.39945
+                         -0.06952        0.00000        0.86538
+
+ Atom:       3         Name:   O         Atomic Number:       8
+
+ Local Frame:            Z-then-X             4       2       0
+
+ Charge:                 -0.30951
+ Dipole:                  0.28986        0.00000        0.06631
+ Quadrupole:              0.33513
+                          0.00000       -0.47162
+                         -0.34265        0.00000        0.13649
+
+ Atom:       4         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X             7       3       0
+
+ Charge:                  0.65561
+ Dipole:                  0.49254        0.00000        0.19671
+ Quadrupole:             -0.06943
+                          0.00000       -0.00714
+                         -0.17040        0.00000        0.07657
+
+ Atom:       5         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             2       3       0
+
+ Charge:                  0.05327
+ Dipole:                  0.00519        0.00000       -0.12465
+ Quadrupole:              0.00814
+                          0.00000        0.00430
+                         -0.01089        0.00000       -0.01244
+
+ Atom:       6         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             2       3       0
+
+ Charge:                  0.06834
+ Dipole:                 -0.01132        0.00000       -0.13076
+ Quadrupole:             -0.00241
+                          0.00000       -0.00571
+                         -0.01194        0.00000        0.00812
+
+ Atom:       7         Name:   O         Atomic Number:       8
+
+ Local Frame:            Z-then-X             4       3       0
+
+ Charge:                 -0.56268
+ Dipole:                 -0.15078        0.00000       -0.00398
+ Quadrupole:             -0.40507
+                          0.00000        0.16151
+                         -0.26795        0.00000        0.24356
+
+ Atom:       8         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             4       7       0
+
+ Charge:                 -0.00547
+ Dipole:                  0.01542        0.00000       -0.19323
+ Quadrupole:              0.03915
+                          0.00000        0.03099
+                          0.00974        0.00000       -0.07014
+Sat Nov 18 08:04:10 2023 Submitting: potential.x 1 35_38_Index_0.xyz -k 35_38_Index_0_prefitmultipole.key path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.10.5   February 2023                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2023               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+        1     1     H     35_38_Index_0                1      1.008     1
+        2     2     C     35_38_Index_0                6     12.011     4
+        3     3     O     35_38_Index_0                8     15.999     2
+        4     4     C     35_38_Index_0                6     12.011     3
+        5     5     H     35_38_Index_0                1      1.008     1
+        6     6     H     35_38_Index_0                1      1.008     1
+        7     7     O     35_38_Index_0                8     15.999     1
+        8     8     H     35_38_Index_0                1      1.008     1
+
+ Electrostatic Potential Grid Points :                  7048
+
+ Gaussian CUBEGEN Input Written To :   35_38_Index_0.grid
+
+ Next, run the Gaussian CUBEGEN program; for example:
+
+ cubegen 0 potential=MP2 FILE.fchk FILE.cube -5 h < FILE.grid
+
+ Replace FILE with base file name and MP2 with density label;
+ After CUBEGEN, rerun Tinker POTENTIAL program using Option 2
+Sat Nov 18 08:04:10 2023 Gas Phase High Level Single Point for Multipole Refinement
+Sat Nov 18 08:04:10 2023 Submitting: psi4   --loglevel 30  35_38_Index_0-esp.psi4 35_38_Index_0-esp.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+Sat Nov 18 08:04:46 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/35_38_Index_0-esp.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+Sat Nov 18 08:04:46 2023 Calling: Generating CUBE File from PSI4
+Sat Nov 18 08:04:46 2023 Submitting: potential.x 2 35_38_Index_0_fortinker.cube path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.10.5   February 2023                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2023               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Electrostatic Potential Written To :  35_38_Index_0_fortinker.pot
+Sat Nov 18 08:04:46 2023 Average Multipoles Via Symmetry
+Sat Nov 18 08:04:46 2023 Submitting: "/home/liuchw/poltype-latest/PoltypeModules/avgmpoles.pl" 35_38_Index_0_prefitmultipole.key 35_38_Index_0.xyz 35_38_Index_0-groups.txt 35_38_Index_0.key_2 35_38_Index_0.xyz_2 401 path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+Sat Nov 18 08:04:48 2023 Electrostatic Potential Optimization
+Sat Nov 18 08:04:48 2023 Submitting: potential.x 6 combined.xyz -k 35_38_Index_0.key_2 combined.pot N 0.1 path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.10.5   February 2023                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2023               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      405   405     H     35_38_Index_0                1      1.008     1
+      401   401     C     35_38_Index_0                6     12.011     4
+      402   402     O     35_38_Index_0                8     15.999     2
+      403   403     C     35_38_Index_0                6     12.011     3
+      404   404     O     35_38_Index_0                8     15.999     1
+      406   406     H     35_38_Index_0                1      1.008     1
+
+ Electrostatic Potential Grid Points :                  7048
+
+ Electrostatic Parameter Restraint Value :            1.0000
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      405   405     H     35_38_Index_0                1      1.008     1
+      401   401     C     35_38_Index_0                6     12.011     4
+      402   402     O     35_38_Index_0                8     15.999     2
+      403   403     C     35_38_Index_0                6     12.011     3
+      404   404     O     35_38_Index_0                8     15.999     1
+      406   406     H     35_38_Index_0                1      1.008     1
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         401      402    403      0   Z-then-X     0.04717
+                                                   0.00289  0.00000  0.22571
+                                                  -0.46593
+                                                   0.00000 -0.39945
+                                                  -0.06952  0.00000  0.86538
+
+         402      403    401      0   Z-then-X    -0.30951
+                                                   0.28986  0.00000  0.06631
+                                                   0.33513
+                                                   0.00000 -0.47162
+                                                  -0.34265  0.00000  0.13649
+
+         403      404    402      0   Z-then-X     0.65561
+                                                   0.49254  0.00000  0.19671
+                                                  -0.06943
+                                                   0.00000 -0.00714
+                                                  -0.17040  0.00000  0.07657
+
+         404      403    402      0   Z-then-X    -0.56268
+                                                  -0.15078  0.00000 -0.00398
+                                                  -0.40507
+                                                   0.00000  0.16151
+                                                  -0.26795  0.00000  0.24356
+
+         405      401    402      0   Z-then-X     0.05829
+                                                  -0.00031  0.00000 -0.12667
+                                                   0.00463
+                                                   0.00000  0.00097
+                                                  -0.01124  0.00000 -0.00560
+
+         406      403    404      0   Z-then-X    -0.00547
+                                                   0.01542  0.00000 -0.19323
+                                                   0.03915
+                                                   0.00000  0.03099
+                                                   0.00974  0.00000 -0.07014
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         405             0.480       0.390         401
+         401             1.620       0.390         405
+         402             0.832       0.390         403
+         403             1.600       0.390         402  404  406
+         404             0.914       0.390         403
+         406             0.480       0.390         403
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1         748         2.3878         2.0851         0.5495
+        1        2         670         3.5715         4.2154         0.8609
+        1        3         706        -1.5823        -0.9721         0.6757
+        1        4         893         0.0540         0.0061         0.4127
+        1        5         751         2.3528         2.0503         0.5519
+        1        6         923         4.1699         4.9542         0.8239
+        1        7        1411        -8.6562        -9.5027         0.8662
+        1        8         946         2.8817         3.1655         0.3230
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.1081
+ Average Potential Magnitude for Model :              4.0698
+ Average Potential Value for Target :                -0.0849
+ Average Potential Magnitude for Target :             4.4378
+
+ Average Signed Potential Difference :               -0.0232
+ Average Unsigned Potential Difference :              0.5837
+ Root Mean Square Potential Difference :              0.6748
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter     Atom Type/Class      Category          Value         Fixed
+
+    --            405 Type          Monopole         0.05829          X
+     1            405 Type          X-Dipole        -0.00031
+    --            405 Type          Y-Dipole         0.00000          X
+     2            405 Type          Z-Dipole        -0.12667
+     3            405 Type          XX-Quad          0.00463
+    --            405 Type          XY-Quad          0.00000          X
+     4            405 Type          XZ-Quad         -0.01124
+     5            405 Type          YY-Quad          0.00097
+    --            405 Type          YZ-Quad          0.00000          X
+    --            405 Type          ZZ-Quad         -0.00560
+    --            401 Type          Monopole         0.04717          X
+     6            401 Type          X-Dipole         0.00289
+    --            401 Type          Y-Dipole         0.00000          X
+     7            401 Type          Z-Dipole         0.22571
+     8            401 Type          XX-Quad         -0.46593
+    --            401 Type          XY-Quad          0.00000          X
+     9            401 Type          XZ-Quad         -0.06952
+    10            401 Type          YY-Quad         -0.39945
+    --            401 Type          YZ-Quad          0.00000          X
+    --            401 Type          ZZ-Quad          0.86538
+    --            402 Type          Monopole        -0.30951          X
+    11            402 Type          X-Dipole         0.28986
+    --            402 Type          Y-Dipole         0.00000          X
+    12            402 Type          Z-Dipole         0.06631
+    13            402 Type          XX-Quad          0.33513
+    --            402 Type          XY-Quad          0.00000          X
+    14            402 Type          XZ-Quad         -0.34265
+    15            402 Type          YY-Quad         -0.47162
+    --            402 Type          YZ-Quad          0.00000          X
+    --            402 Type          ZZ-Quad          0.13649
+    --            403 Type          Monopole         0.65561          X
+    16            403 Type          X-Dipole         0.49254
+    --            403 Type          Y-Dipole         0.00000          X
+    17            403 Type          Z-Dipole         0.19671
+    18            403 Type          XX-Quad         -0.06943
+    --            403 Type          XY-Quad          0.00000          X
+    19            403 Type          XZ-Quad         -0.17040
+    20            403 Type          YY-Quad         -0.00714
+    --            403 Type          YZ-Quad          0.00000          X
+    --            403 Type          ZZ-Quad          0.07657
+    --            404 Type          Monopole        -0.56268          X
+    21            404 Type          X-Dipole        -0.15078
+    --            404 Type          Y-Dipole         0.00000          X
+    22            404 Type          Z-Dipole        -0.00398
+    23            404 Type          XX-Quad         -0.40507
+    --            404 Type          XY-Quad          0.00000          X
+    24            404 Type          XZ-Quad         -0.26795
+    25            404 Type          YY-Quad          0.16151
+    --            404 Type          YZ-Quad          0.00000          X
+    --            404 Type          ZZ-Quad          0.24356
+    --            406 Type          Monopole        -0.00547          X
+    26            406 Type          X-Dipole         0.01542
+    --            406 Type          Y-Dipole         0.00000          X
+    27            406 Type          Z-Dipole        -0.19323
+    28            406 Type          XX-Quad          0.03915
+    --            406 Type          XY-Quad          0.00000          X
+    29            406 Type          XZ-Quad          0.00974
+    30            406 Type          YY-Quad          0.03099
+    --            406 Type          YZ-Quad          0.00000          X
+    --            406 Type          ZZ-Quad         -0.07014
+
+ Levenberg-Marquardt Nonlinear Least Squares :
+
+ LS Iter     F Value      Total G     Active G    N Active   F Calls
+
+     0     1604.7377    1370.4375    1370.4375        30        31
+     1       61.1964      77.0680      77.0680        30        62
+     2       33.9912       6.4091       6.4091        30        93
+     3       30.6069       0.0001       0.0001        30       124
+
+ SQUARE  --  Normal Termination of Least Squares
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter     Atom Type/Class      Category          Value         Fixed
+
+    --            405 Type          Monopole         0.05829          X
+     1            405 Type          X-Dipole         0.00761
+    --            405 Type          Y-Dipole         0.00000          X
+     2            405 Type          Z-Dipole        -0.10326
+     3            405 Type          XX-Quad          0.01699
+    --            405 Type          XY-Quad          0.00000          X
+     4            405 Type          XZ-Quad         -0.02655
+     5            405 Type          YY-Quad          0.02727
+    --            405 Type          YZ-Quad          0.00000          X
+    --            405 Type          ZZ-Quad         -0.04426
+    --            401 Type          Monopole         0.04717          X
+     6            401 Type          X-Dipole        -0.04938
+    --            401 Type          Y-Dipole         0.00000          X
+     7            401 Type          Z-Dipole         0.21356
+     8            401 Type          XX-Quad         -0.45900
+    --            401 Type          XY-Quad          0.00000          X
+     9            401 Type          XZ-Quad         -0.06308
+    10            401 Type          YY-Quad         -0.39333
+    --            401 Type          YZ-Quad          0.00000          X
+    --            401 Type          ZZ-Quad          0.85233
+    --            402 Type          Monopole        -0.30951          X
+    11            402 Type          X-Dipole         0.33651
+    --            402 Type          Y-Dipole         0.00000          X
+    12            402 Type          Z-Dipole         0.03407
+    13            402 Type          XX-Quad          0.31999
+    --            402 Type          XY-Quad          0.00000          X
+    14            402 Type          XZ-Quad         -0.36745
+    15            402 Type          YY-Quad         -0.47765
+    --            402 Type          YZ-Quad          0.00000          X
+    --            402 Type          ZZ-Quad          0.15766
+    --            403 Type          Monopole         0.65561          X
+    16            403 Type          X-Dipole         0.48187
+    --            403 Type          Y-Dipole         0.00000          X
+    17            403 Type          Z-Dipole         0.13827
+    18            403 Type          XX-Quad         -0.05031
+    --            403 Type          XY-Quad          0.00000          X
+    19            403 Type          XZ-Quad         -0.15726
+    20            403 Type          YY-Quad         -0.00716
+    --            403 Type          YZ-Quad          0.00000          X
+    --            403 Type          ZZ-Quad          0.05747
+    --            404 Type          Monopole        -0.56268          X
+    21            404 Type          X-Dipole        -0.13406
+    --            404 Type          Y-Dipole         0.00000          X
+    22            404 Type          Z-Dipole         0.00452
+    23            404 Type          XX-Quad         -0.41348
+    --            404 Type          XY-Quad          0.00000          X
+    24            404 Type          XZ-Quad         -0.25031
+    25            404 Type          YY-Quad          0.11628
+    --            404 Type          YZ-Quad          0.00000          X
+    --            404 Type          ZZ-Quad          0.29720
+    --            406 Type          Monopole        -0.00547          X
+    26            406 Type          X-Dipole         0.02389
+    --            406 Type          Y-Dipole         0.00000          X
+    27            406 Type          Z-Dipole        -0.21373
+    28            406 Type          XX-Quad          0.07326
+    --            406 Type          XY-Quad          0.00000          X
+    29            406 Type          XZ-Quad         -0.00160
+    30            406 Type          YY-Quad          0.07671
+    --            406 Type          YZ-Quad          0.00000          X
+    --            406 Type          ZZ-Quad         -0.14997
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1         748         2.0647         2.0851         0.0560
+        1        2         670         4.1566         4.2154         0.1106
+        1        3         706        -0.9715        -0.9721         0.0642
+        1        4         893        -0.0322         0.0061         0.0923
+        1        5         751         2.0298         2.0503         0.0557
+        1        6         923         4.9254         4.9542         0.0692
+        1        7        1411        -9.5160        -9.5027         0.0774
+        1        8         946         3.1395         3.1655         0.0510
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.1095
+ Average Potential Magnitude for Model :              4.4238
+ Average Potential Value for Target :                -0.0849
+ Average Potential Magnitude for Target :             4.4378
+
+ Average Signed Potential Difference :               -0.0247
+ Average Unsigned Potential Difference :              0.0477
+ Root Mean Square Potential Difference :              0.0741
+Sat Nov 18 08:04:48 2023 Submitting: minimize.x testbondangleequilvalues.xyz -k testbondangleequilvalues.key 0.1 > testbondangleequilvalues.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+Sat Nov 18 08:04:49 2023 Submitting: analyze.x testbondangleequilvalues.xyz_2 -k testbondangleequilvalues.key  d > testbondangleequilvaluesalz.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+Sat Nov 18 08:04:49 2023 Assign Vdw and bonded parameters using DatabaseParser
+Sat Nov 18 08:04:49 2023 Submitting: python /home/liuchw/poltype-latest/PoltypeModules/lDatabaseParser/lAssignAMOEBAplusPRM.py -xyz tmpfilename.xyz -key tmpfilename.key -potent BONDED VDW path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+[92mBOND stretching parameter assigned for bond 401-405[0m
+[92mBOND stretching parameter assigned for bond 405-401[0m
+[92mBOND stretching parameter assigned for bond 402-401[0m
+[92mBOND stretching parameter assigned for bond 403-402[0m
+[92mBOND stretching parameter assigned for bond 404-403[0m
+[92mBOND stretching parameter assigned for bond 406-403[0m
+[92mANGLE bending parameter found for angle 402-403-404[0m
+[92mANGLE bending parameter (newly generated) assigned for angle 406-403-402[0m
+[92mANGLE bending parameter found for angle 405-401-405[0m
+[92mANGLE bending parameter found for angle 402-401-405[0m
+[92mANGLE bending parameter found for angle 403-402-401[0m
+[92mANGLE bending parameter found for angle 405-401-402[0m
+[92mANGLE bending parameter found for angle 406-403-404[0m
+[92mSTRBND coupling parameter found for angle 402-403-404[0m
+[92mSTRBND coupling parameter (newly generated) assigned for angle 406-403-402[0m
+[92mSTRBND coupling parameter found for angle 405-401-405[0m
+[92mSTRBND coupling parameter found for angle 402-401-405[0m
+[92mSTRBND coupling parameter found for angle 403-402-401[0m
+[92mSTRBND coupling parameter found for angle 405-401-402[0m
+[92mSTRBND coupling parameter found for angle 406-403-404[0m
+[92mOPBEND parameter assigned for bond 402-403-0-0[0m
+[92mOPBEND parameter assigned for bond 404-403-0-0[0m
+[92mOPBEND parameter assigned for bond 406-403-0-0[0m
+[92mVdW parameters found for 406[0m
+[92mVdW parameters found for 401[0m
+[92mVdW parameters found for 405[0m
+[92mVdW parameters found for 403[0m
+[92mVdW parameters found for 402[0m
+[92mVdW parameters found for 404[0m
+Sat Nov 18 08:04:49 2023 Relaxed Torsion Scan and Fitting
+Sat Nov 18 08:04:49 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-300_preQMOPTprefit.xyz -k tmp-2-3-300_preQMOPTprefit.key 0.1 >35_38_Index_0-opt-2-3-300_preQMOPTprefit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:04:50 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-300_preQMOPTprefit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:04:51 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-300_preQMOPTprefit.out']
+Sat Nov 18 08:04:51 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-300_preQMOPTprefit.xyz_2 -k tmp-2-3-300_preQMOPTprefit.key ed > 35_38_Index_0-opt-2-3-300_preQMOPTprefit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:04:52 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-300_preQMOPTprefit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:04:52 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-300_preQMOPTprefit.alz']
+Sat Nov 18 08:04:52 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-330_preQMOPTprefit.xyz -k tmp-2-3-330_preQMOPTprefit.key 0.1 >35_38_Index_0-opt-2-3-330_preQMOPTprefit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:04:53 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-330_preQMOPTprefit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:04:53 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-330_preQMOPTprefit.out']
+Sat Nov 18 08:04:53 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-330_preQMOPTprefit.xyz_2 -k tmp-2-3-330_preQMOPTprefit.key ed > 35_38_Index_0-opt-2-3-330_preQMOPTprefit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:04:54 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-330_preQMOPTprefit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:04:54 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-330_preQMOPTprefit.alz']
+Sat Nov 18 08:04:54 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-360_preQMOPTprefit.xyz -k tmp-2-3-360_preQMOPTprefit.key 0.1 >35_38_Index_0-opt-2-3-360_preQMOPTprefit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:04:55 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-360_preQMOPTprefit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:04:55 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-360_preQMOPTprefit.out']
+Sat Nov 18 08:04:55 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-360_preQMOPTprefit.xyz_2 -k tmp-2-3-360_preQMOPTprefit.key ed > 35_38_Index_0-opt-2-3-360_preQMOPTprefit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:04:56 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-360_preQMOPTprefit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:04:56 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-360_preQMOPTprefit.alz']
+Sat Nov 18 08:04:56 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-030_preQMOPTprefit.xyz -k tmp-2-3-030_preQMOPTprefit.key 0.1 >35_38_Index_0-opt-2-3-030_preQMOPTprefit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:04:57 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-030_preQMOPTprefit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:04:57 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-030_preQMOPTprefit.out']
+Sat Nov 18 08:04:57 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-030_preQMOPTprefit.xyz_2 -k tmp-2-3-030_preQMOPTprefit.key ed > 35_38_Index_0-opt-2-3-030_preQMOPTprefit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:04:58 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-030_preQMOPTprefit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:04:58 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-030_preQMOPTprefit.alz']
+Sat Nov 18 08:04:58 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-060_preQMOPTprefit.xyz -k tmp-2-3-060_preQMOPTprefit.key 0.1 >35_38_Index_0-opt-2-3-060_preQMOPTprefit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:04:59 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-060_preQMOPTprefit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:04:59 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-060_preQMOPTprefit.out']
+Sat Nov 18 08:04:59 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-060_preQMOPTprefit.xyz_2 -k tmp-2-3-060_preQMOPTprefit.key ed > 35_38_Index_0-opt-2-3-060_preQMOPTprefit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:00 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-060_preQMOPTprefit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:01 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-060_preQMOPTprefit.alz']
+Sat Nov 18 08:05:01 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-090_preQMOPTprefit.xyz -k tmp-2-3-090_preQMOPTprefit.key 0.1 >35_38_Index_0-opt-2-3-090_preQMOPTprefit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:02 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-090_preQMOPTprefit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:02 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-090_preQMOPTprefit.out']
+Sat Nov 18 08:05:02 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-090_preQMOPTprefit.xyz_2 -k tmp-2-3-090_preQMOPTprefit.key ed > 35_38_Index_0-opt-2-3-090_preQMOPTprefit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:03 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-090_preQMOPTprefit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:03 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-090_preQMOPTprefit.alz']
+Sat Nov 18 08:05:03 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-120_preQMOPTprefit.xyz -k tmp-2-3-120_preQMOPTprefit.key 0.1 >35_38_Index_0-opt-2-3-120_preQMOPTprefit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:04 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-120_preQMOPTprefit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:04 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-120_preQMOPTprefit.out']
+Sat Nov 18 08:05:04 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-120_preQMOPTprefit.xyz_2 -k tmp-2-3-120_preQMOPTprefit.key ed > 35_38_Index_0-opt-2-3-120_preQMOPTprefit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:05 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-120_preQMOPTprefit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:05 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-120_preQMOPTprefit.alz']
+Sat Nov 18 08:05:05 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-270_preQMOPTprefit.xyz -k tmp-2-3-270_preQMOPTprefit.key 0.1 >35_38_Index_0-opt-2-3-270_preQMOPTprefit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:06 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-270_preQMOPTprefit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:06 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-270_preQMOPTprefit.out']
+Sat Nov 18 08:05:06 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-270_preQMOPTprefit.xyz_2 -k tmp-2-3-270_preQMOPTprefit.key ed > 35_38_Index_0-opt-2-3-270_preQMOPTprefit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:07 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-270_preQMOPTprefit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:07 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-270_preQMOPTprefit.alz']
+Sat Nov 18 08:05:07 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-240_preQMOPTprefit.xyz -k tmp-2-3-240_preQMOPTprefit.key 0.1 >35_38_Index_0-opt-2-3-240_preQMOPTprefit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:08 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-240_preQMOPTprefit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:08 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-240_preQMOPTprefit.out']
+Sat Nov 18 08:05:08 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-240_preQMOPTprefit.xyz_2 -k tmp-2-3-240_preQMOPTprefit.key ed > 35_38_Index_0-opt-2-3-240_preQMOPTprefit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:09 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-240_preQMOPTprefit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:10 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-240_preQMOPTprefit.alz']
+Sat Nov 18 08:05:10 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-210_preQMOPTprefit.xyz -k tmp-2-3-210_preQMOPTprefit.key 0.1 >35_38_Index_0-opt-2-3-210_preQMOPTprefit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:11 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-210_preQMOPTprefit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:11 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-210_preQMOPTprefit.out']
+Sat Nov 18 08:05:11 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-210_preQMOPTprefit.xyz_2 -k tmp-2-3-210_preQMOPTprefit.key ed > 35_38_Index_0-opt-2-3-210_preQMOPTprefit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:12 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-210_preQMOPTprefit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:12 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-210_preQMOPTprefit.alz']
+Sat Nov 18 08:05:12 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-180_preQMOPTprefit.xyz -k tmp-2-3-180_preQMOPTprefit.key 0.1 >35_38_Index_0-opt-2-3-180_preQMOPTprefit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:13 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-180_preQMOPTprefit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:13 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-180_preQMOPTprefit.out']
+Sat Nov 18 08:05:13 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-180_preQMOPTprefit.xyz_2 -k tmp-2-3-180_preQMOPTprefit.key ed > 35_38_Index_0-opt-2-3-180_preQMOPTprefit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:14 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-180_preQMOPTprefit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:14 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-180_preQMOPTprefit.alz']
+Sat Nov 18 08:05:14 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-150_preQMOPTprefit.xyz -k tmp-2-3-150_preQMOPTprefit.key 0.1 >35_38_Index_0-opt-2-3-150_preQMOPTprefit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:15 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-150_preQMOPTprefit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:15 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-150_preQMOPTprefit.out']
+Sat Nov 18 08:05:15 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-150_preQMOPTprefit.xyz_2 -k tmp-2-3-150_preQMOPTprefit.key ed > 35_38_Index_0-opt-2-3-150_preQMOPTprefit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:16 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-150_preQMOPTprefit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:16 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-150_preQMOPTprefit.alz']
+Sat Nov 18 08:05:16 2023 Percent of jobs finished 0.0, jobs left = 12
+Sat Nov 18 08:05:16 2023 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 35_38_Index_0-opt-2-3-300_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-300_constr.txt > xtb-opt-2-3-300.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Sat Nov 18 08:05:28 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-opt-2-3-300.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:28 2023 Percent of jobs finished 8.33, jobs left = 11
+Sat Nov 18 08:05:28 2023 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 35_38_Index_0-opt-2-3-330_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-330_constr.txt > xtb-opt-2-3-330.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_UNDERFLOW_FLAG IEEE_DENORMAL
+normal termination of xtb
+Sat Nov 18 08:05:40 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-opt-2-3-330.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:40 2023 Percent of jobs finished 16.67, jobs left = 10
+Sat Nov 18 08:05:40 2023 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 35_38_Index_0-opt-2-3-360_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-360_constr.txt > xtb-opt-2-3-360.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_UNDERFLOW_FLAG IEEE_DENORMAL
+normal termination of xtb
+Sat Nov 18 08:05:52 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-opt-2-3-360.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:05:52 2023 Percent of jobs finished 25.0, jobs left = 9
+Sat Nov 18 08:05:52 2023 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 35_38_Index_0-opt-2-3-030_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-030_constr.txt > xtb-opt-2-3-030.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Sat Nov 18 08:06:06 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-opt-2-3-030.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:06:06 2023 Percent of jobs finished 33.33, jobs left = 8
+Sat Nov 18 08:06:06 2023 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 35_38_Index_0-opt-2-3-060_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-060_constr.txt > xtb-opt-2-3-060.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Sat Nov 18 08:06:16 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-opt-2-3-060.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:06:16 2023 Percent of jobs finished 41.67, jobs left = 7
+Sat Nov 18 08:06:16 2023 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 35_38_Index_0-opt-2-3-090_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-090_constr.txt > xtb-opt-2-3-090.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Sat Nov 18 08:06:27 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-opt-2-3-090.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:06:27 2023 Percent of jobs finished 50.0, jobs left = 6
+Sat Nov 18 08:06:27 2023 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 35_38_Index_0-opt-2-3-120_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-120_constr.txt > xtb-opt-2-3-120.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Sat Nov 18 08:06:41 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-opt-2-3-120.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:06:41 2023 Percent of jobs finished 58.33, jobs left = 5
+Sat Nov 18 08:06:41 2023 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 35_38_Index_0-opt-2-3-270_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-270_constr.txt > xtb-opt-2-3-270.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_UNDERFLOW_FLAG IEEE_DENORMAL
+normal termination of xtb
+Sat Nov 18 08:06:57 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-opt-2-3-270.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:06:57 2023 Percent of jobs finished 66.67, jobs left = 4
+Sat Nov 18 08:06:57 2023 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 35_38_Index_0-opt-2-3-240_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-240_constr.txt > xtb-opt-2-3-240.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_UNDERFLOW_FLAG IEEE_DENORMAL
+normal termination of xtb
+Sat Nov 18 08:07:15 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-opt-2-3-240.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:07:15 2023 Percent of jobs finished 75.0, jobs left = 3
+Sat Nov 18 08:07:15 2023 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 35_38_Index_0-opt-2-3-210_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-210_constr.txt > xtb-opt-2-3-210.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Sat Nov 18 08:07:35 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-opt-2-3-210.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:07:35 2023 Percent of jobs finished 83.33, jobs left = 2
+Sat Nov 18 08:07:35 2023 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 35_38_Index_0-opt-2-3-180_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-180_constr.txt > xtb-opt-2-3-180.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Sat Nov 18 08:07:57 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-opt-2-3-180.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:07:57 2023 Percent of jobs finished 91.67, jobs left = 1
+Sat Nov 18 08:07:57 2023 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 35_38_Index_0-opt-2-3-150_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-150_constr.txt > xtb-opt-2-3-150.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Sat Nov 18 08:08:21 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-opt-2-3-150.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:08:34 2023 Percent of jobs finished 0.0, jobs left = 12
+Sat Nov 18 08:08:34 2023 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-300.psi4 xtb-wB97X-D-sp-2-3-300.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:08:45 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-wB97X-D-sp-2-3-300.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:08:45 2023 Percent of jobs finished 8.33, jobs left = 11
+Sat Nov 18 08:08:45 2023 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-330.psi4 xtb-wB97X-D-sp-2-3-330.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:08:57 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-wB97X-D-sp-2-3-330.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:08:57 2023 Percent of jobs finished 16.67, jobs left = 10
+Sat Nov 18 08:08:57 2023 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-360.psi4 xtb-wB97X-D-sp-2-3-360.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:09:05 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-wB97X-D-sp-2-3-360.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:09:05 2023 Percent of jobs finished 25.0, jobs left = 9
+Sat Nov 18 08:09:05 2023 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-030.psi4 xtb-wB97X-D-sp-2-3-030.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:09:15 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-wB97X-D-sp-2-3-030.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:09:15 2023 Percent of jobs finished 33.33, jobs left = 8
+Sat Nov 18 08:09:15 2023 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-060.psi4 xtb-wB97X-D-sp-2-3-060.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:09:26 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-wB97X-D-sp-2-3-060.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:09:26 2023 Percent of jobs finished 41.67, jobs left = 7
+Sat Nov 18 08:09:26 2023 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-090.psi4 xtb-wB97X-D-sp-2-3-090.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:09:37 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-wB97X-D-sp-2-3-090.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:09:37 2023 Percent of jobs finished 50.0, jobs left = 6
+Sat Nov 18 08:09:37 2023 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-120.psi4 xtb-wB97X-D-sp-2-3-120.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:09:44 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-wB97X-D-sp-2-3-120.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:09:44 2023 Percent of jobs finished 58.33, jobs left = 5
+Sat Nov 18 08:09:44 2023 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-270.psi4 xtb-wB97X-D-sp-2-3-270.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:09:51 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-wB97X-D-sp-2-3-270.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:09:51 2023 Percent of jobs finished 66.67, jobs left = 4
+Sat Nov 18 08:09:51 2023 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-240.psi4 xtb-wB97X-D-sp-2-3-240.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:01 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-wB97X-D-sp-2-3-240.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:01 2023 Percent of jobs finished 75.0, jobs left = 3
+Sat Nov 18 08:10:01 2023 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-210.psi4 xtb-wB97X-D-sp-2-3-210.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:11 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-wB97X-D-sp-2-3-210.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:11 2023 Percent of jobs finished 83.33, jobs left = 2
+Sat Nov 18 08:10:11 2023 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-180.psi4 xtb-wB97X-D-sp-2-3-180.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:18 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-wB97X-D-sp-2-3-180.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:18 2023 Percent of jobs finished 91.67, jobs left = 1
+Sat Nov 18 08:10:18 2023 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-150.psi4 xtb-wB97X-D-sp-2-3-150.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:23 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion/xtb-wB97X-D-sp-2-3-150.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:24 2023 Torsions being fit 405 401 402 403 RMSD(QM-MM1)0.02116090215471154
+Sat Nov 18 08:10:24 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-300_postQMOPTpostfit.xyz -k tmp-2-3-300_postQMOPTpostfit.key 0.1 >35_38_Index_0-opt-2-3-300_postQMOPTpostfit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:25 2023 Waiting on 35_38_Index_0-opt-2-3-300_postQMOPTpostfit.out for termination 
+Sat Nov 18 08:10:26 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-300_postQMOPTpostfit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:26 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-300_postQMOPTpostfit.out']
+Sat Nov 18 08:10:26 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-300_postQMOPTpostfit.xyz_2 -k tmp-2-3-300_postQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-300_postQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:27 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-300_postQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:27 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-300_postQMOPTpostfit.alz']
+Sat Nov 18 08:10:27 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-300_preQMOPTpostfit.xyz -k tmp-2-3-300_preQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-300_preQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:28 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-300_preQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:28 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-300_preQMOPTpostfit.alz']
+Sat Nov 18 08:10:28 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-330_postQMOPTpostfit.xyz -k tmp-2-3-330_postQMOPTpostfit.key 0.1 >35_38_Index_0-opt-2-3-330_postQMOPTpostfit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:30 2023 Waiting on 35_38_Index_0-opt-2-3-330_postQMOPTpostfit.out for termination 
+Sat Nov 18 08:10:31 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-330_postQMOPTpostfit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:31 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-330_postQMOPTpostfit.out']
+Sat Nov 18 08:10:31 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-330_postQMOPTpostfit.xyz_2 -k tmp-2-3-330_postQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-330_postQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:32 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-330_postQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:32 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-330_postQMOPTpostfit.alz']
+Sat Nov 18 08:10:32 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-330_preQMOPTpostfit.xyz -k tmp-2-3-330_preQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-330_preQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:33 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-330_preQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:33 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-330_preQMOPTpostfit.alz']
+Sat Nov 18 08:10:33 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-360_postQMOPTpostfit.xyz -k tmp-2-3-360_postQMOPTpostfit.key 0.1 >35_38_Index_0-opt-2-3-360_postQMOPTpostfit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:34 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-360_postQMOPTpostfit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:34 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-360_postQMOPTpostfit.out']
+Sat Nov 18 08:10:34 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-360_postQMOPTpostfit.xyz_2 -k tmp-2-3-360_postQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-360_postQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:35 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-360_postQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:35 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-360_postQMOPTpostfit.alz']
+Sat Nov 18 08:10:36 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-360_preQMOPTpostfit.xyz -k tmp-2-3-360_preQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-360_preQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:37 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-360_preQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:37 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-360_preQMOPTpostfit.alz']
+Sat Nov 18 08:10:37 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-030_postQMOPTpostfit.xyz -k tmp-2-3-030_postQMOPTpostfit.key 0.1 >35_38_Index_0-opt-2-3-030_postQMOPTpostfit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:38 2023 Waiting on 35_38_Index_0-opt-2-3-030_postQMOPTpostfit.out for termination 
+Sat Nov 18 08:10:39 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-030_postQMOPTpostfit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:39 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-030_postQMOPTpostfit.out']
+Sat Nov 18 08:10:39 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-030_postQMOPTpostfit.xyz_2 -k tmp-2-3-030_postQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-030_postQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:40 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-030_postQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:41 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-030_postQMOPTpostfit.alz']
+Sat Nov 18 08:10:41 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-030_preQMOPTpostfit.xyz -k tmp-2-3-030_preQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-030_preQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:42 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-030_preQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:42 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-030_preQMOPTpostfit.alz']
+Sat Nov 18 08:10:42 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-060_postQMOPTpostfit.xyz -k tmp-2-3-060_postQMOPTpostfit.key 0.1 >35_38_Index_0-opt-2-3-060_postQMOPTpostfit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:43 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-060_postQMOPTpostfit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:43 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-060_postQMOPTpostfit.out']
+Sat Nov 18 08:10:43 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-060_postQMOPTpostfit.xyz_2 -k tmp-2-3-060_postQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-060_postQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:44 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-060_postQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:44 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-060_postQMOPTpostfit.alz']
+Sat Nov 18 08:10:45 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-060_preQMOPTpostfit.xyz -k tmp-2-3-060_preQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-060_preQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:46 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-060_preQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:46 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-060_preQMOPTpostfit.alz']
+Sat Nov 18 08:10:46 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-090_postQMOPTpostfit.xyz -k tmp-2-3-090_postQMOPTpostfit.key 0.1 >35_38_Index_0-opt-2-3-090_postQMOPTpostfit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:47 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-090_postQMOPTpostfit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:47 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-090_postQMOPTpostfit.out']
+Sat Nov 18 08:10:47 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-090_postQMOPTpostfit.xyz_2 -k tmp-2-3-090_postQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-090_postQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:48 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-090_postQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:48 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-090_postQMOPTpostfit.alz']
+Sat Nov 18 08:10:48 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-090_preQMOPTpostfit.xyz -k tmp-2-3-090_preQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-090_preQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:49 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-090_preQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:49 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-090_preQMOPTpostfit.alz']
+Sat Nov 18 08:10:50 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-120_postQMOPTpostfit.xyz -k tmp-2-3-120_postQMOPTpostfit.key 0.1 >35_38_Index_0-opt-2-3-120_postQMOPTpostfit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:51 2023 Waiting on 35_38_Index_0-opt-2-3-120_postQMOPTpostfit.out for termination 
+Sat Nov 18 08:10:51 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-120_postQMOPTpostfit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:51 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-120_postQMOPTpostfit.out']
+Sat Nov 18 08:10:51 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-120_postQMOPTpostfit.xyz_2 -k tmp-2-3-120_postQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-120_postQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:53 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-120_postQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:53 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-120_postQMOPTpostfit.alz']
+Sat Nov 18 08:10:53 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-120_preQMOPTpostfit.xyz -k tmp-2-3-120_preQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-120_preQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:54 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-120_preQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:54 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-120_preQMOPTpostfit.alz']
+Sat Nov 18 08:10:54 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-270_postQMOPTpostfit.xyz -k tmp-2-3-270_postQMOPTpostfit.key 0.1 >35_38_Index_0-opt-2-3-270_postQMOPTpostfit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:55 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-270_postQMOPTpostfit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:55 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-270_postQMOPTpostfit.out']
+Sat Nov 18 08:10:55 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-270_postQMOPTpostfit.xyz_2 -k tmp-2-3-270_postQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-270_postQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:56 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-270_postQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:56 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-270_postQMOPTpostfit.alz']
+Sat Nov 18 08:10:56 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-270_preQMOPTpostfit.xyz -k tmp-2-3-270_preQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-270_preQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:57 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-270_preQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:57 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-270_preQMOPTpostfit.alz']
+Sat Nov 18 08:10:57 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-240_postQMOPTpostfit.xyz -k tmp-2-3-240_postQMOPTpostfit.key 0.1 >35_38_Index_0-opt-2-3-240_postQMOPTpostfit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:59 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-240_postQMOPTpostfit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:10:59 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-240_postQMOPTpostfit.out']
+Sat Nov 18 08:10:59 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-240_postQMOPTpostfit.xyz_2 -k tmp-2-3-240_postQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-240_postQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:00 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-240_postQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:00 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-240_postQMOPTpostfit.alz']
+Sat Nov 18 08:11:00 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-240_preQMOPTpostfit.xyz -k tmp-2-3-240_preQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-240_preQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:01 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-240_preQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:01 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-240_preQMOPTpostfit.alz']
+Sat Nov 18 08:11:01 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-210_postQMOPTpostfit.xyz -k tmp-2-3-210_postQMOPTpostfit.key 0.1 >35_38_Index_0-opt-2-3-210_postQMOPTpostfit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:02 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-210_postQMOPTpostfit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:02 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-210_postQMOPTpostfit.out']
+Sat Nov 18 08:11:02 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-210_postQMOPTpostfit.xyz_2 -k tmp-2-3-210_postQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-210_postQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:03 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-210_postQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:04 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-210_postQMOPTpostfit.alz']
+Sat Nov 18 08:11:04 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-210_preQMOPTpostfit.xyz -k tmp-2-3-210_preQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-210_preQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:05 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-210_preQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:05 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-210_preQMOPTpostfit.alz']
+Sat Nov 18 08:11:05 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-180_postQMOPTpostfit.xyz -k tmp-2-3-180_postQMOPTpostfit.key 0.1 >35_38_Index_0-opt-2-3-180_postQMOPTpostfit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:06 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-180_postQMOPTpostfit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:06 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-180_postQMOPTpostfit.out']
+Sat Nov 18 08:11:06 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-180_postQMOPTpostfit.xyz_2 -k tmp-2-3-180_postQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-180_postQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:07 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-180_postQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:07 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-180_postQMOPTpostfit.alz']
+Sat Nov 18 08:11:07 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-180_preQMOPTpostfit.xyz -k tmp-2-3-180_preQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-180_preQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:08 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-180_preQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:08 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-180_preQMOPTpostfit.alz']
+Sat Nov 18 08:11:08 2023 Submitting: minimize.x 35_38_Index_0-opt-2-3-150_postQMOPTpostfit.xyz -k tmp-2-3-150_postQMOPTpostfit.key 0.1 >35_38_Index_0-opt-2-3-150_postQMOPTpostfit.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:09 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-150_postQMOPTpostfit.out path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:10 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-150_postQMOPTpostfit.out']
+Sat Nov 18 08:11:10 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-150_postQMOPTpostfit.xyz_2 -k tmp-2-3-150_postQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-150_postQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:11 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-150_postQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:11 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-150_postQMOPTpostfit.alz']
+Sat Nov 18 08:11:11 2023 Submitting: analyze.x 35_38_Index_0-opt-2-3-150_preQMOPTpostfit.xyz -k tmp-2-3-150_preQMOPTpostfit.key ed > 35_38_Index_0-opt-2-3-150_preQMOPTpostfit.alz path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:12 2023 Normal termination: logfile=35_38_Index_0-opt-2-3-150_preQMOPTpostfit.alz path=/home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0/qm-torsion
+Sat Nov 18 08:11:12 2023 All jobs have terminated ['35_38_Index_0-opt-2-3-150_preQMOPTpostfit.alz']
+Sat Nov 18 08:11:12 2023 Torsion 405 401 402 403 RMSD(MM2,QM) 0.022114045784873648 RelativeRMSD(MM2,QM) 0.013747046378461095 
+
+Sat Nov 18 08:11:13 2023 
+Sat Nov 18 08:11:13 2023 =========================================================
+Sat Nov 18 08:11:13 2023 Minimizing structure
+
+Sat Nov 18 08:11:13 2023 Submitting: minimize.x -k final.key final.xyz 0.1 > Minimized_final.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+Sat Nov 18 08:11:14 2023 
+
+Sat Nov 18 08:11:14 2023 =========================================================
+
+Sat Nov 18 08:11:14 2023 Structure RMSD Comparison
+
+
+Sat Nov 18 08:11:14 2023 Submitting: superpose.x 35_38_Index_0.xyz_2 final.xyz_2 1 N M N 0  > 35_38_Index_0-superin.txt path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+Sat Nov 18 08:11:14 2023 RMSD = 0.032030 Tolerance is 1
+Sat Nov 18 08:11:14 2023 Submitting: analyze.x 35_38_Index_0.xyz_2 -k final.key em | grep -A11 Charge>MMDipole.txt path = /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+Sat Nov 18 08:11:15 2023 Relative error of 0.0010964912280701765 for QMDipole 1.824 and 1.822 for MMDipole  tolerance = 0.5 /home/liuchw/poltype-latest/Examples/Parameterization/r2/Temp/Fragments/35_38_Index_0
+Sat Nov 18 08:11:15 2023 Total torsion QM time for ((1, 2, 3, 4),) is 0.095 hours and 36 conformations
+Sat Nov 18 08:11:15 2023 OPT torsion QM time for ((1, 2, 3, 4),) is 0.073 hours and 36 conformations
+Sat Nov 18 08:11:15 2023 SP torsion QM time for ((1, 2, 3, 4),) is 0.023 hours and 36 conformations
+Sat Nov 18 08:11:15 2023 Poltype Job Finished
+

@@ -1,0 +1,25 @@
+ Additional Charge Penetration Parameters :
+
+     Atom Class           Core Chg           Damp
+
+         403                 0.000         0.0000
+         401                 0.000         0.0000
+         402                 0.000         0.0000
+         404                 0.000         0.0000
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+--
+ Total Electric Charge :                  1.00000 Electrons
+
+ Dipole Moment Magnitude :                  0.815 Debye
+
+ Dipole X,Y,Z-Components :                 -0.108       -0.551       -0.592
+
+ Quadrupole Moment Tensor :                 1.157       -0.322       -0.350
+      (Buckinghams)                        -0.322       -0.444       -1.785
+                                           -0.350       -1.785       -0.713
+
+ Principal Axes Quadrupole :               -2.431        1.211        1.220
+

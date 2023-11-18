@@ -1,0 +1,18 @@
+molecule { 
+0 1
+ H   -1.501106   -0.607939   -0.167338
+ C   -1.340606    0.165992    0.585142
+ O    0.013544    0.612072    0.540801
+ C    0.815191    0.054900   -0.348353
+ H   -1.537066   -0.229175    1.581505
+ H   -1.987805    1.021123    0.391723
+ O    0.538072   -0.797165   -1.138763
+ H    1.814716    0.510285   -0.247454
+}
+memory 20GB
+set_num_threads(5)
+psi4_io.set_default_path("/scratch/liuchw/Psi4-35_38_Index_0-farH_in17")
+set freeze_core True
+E, wfn = energy('wb97x-d/6-311+G*',return_wfn=True)
+oeprop(wfn,"WIBERG_LOWDIN_INDICES")
+clean()

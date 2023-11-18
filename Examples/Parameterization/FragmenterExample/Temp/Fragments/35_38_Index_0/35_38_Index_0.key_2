@@ -1,0 +1,59 @@
+parameters /home/liuchw/poltype-latest/ParameterFiles/amoebabio18_header.prm
+OPENMP-THREADS 5
+bondterm none
+angleterm none
+torsionterm none
+vdwterm none
+fix-monopole
+digits 8
+potential-offset 1.0
+RESP-WEIGHT 1
+
+atom          405    405    H     "35_38_Index_0       "         1     1.008    1
+atom          401    401    C     "35_38_Index_0       "         6    12.011    4
+atom          402    402    O     "35_38_Index_0       "         8    15.999    2
+atom          403    403    C     "35_38_Index_0       "         6    12.011    3
+atom          404    404    O     "35_38_Index_0       "         8    15.999    1
+atom          406    406    H     "35_38_Index_0       "         1     1.008    1
+
+multipole    401    402    403              0.04717
+                                      0.00289    0.00000    0.22571
+                                     -0.46593
+                                      0.00000   -0.39945
+                                     -0.06952    0.00000    0.86538
+multipole    402    403    401             -0.30951
+                                      0.28986    0.00000    0.06631
+                                      0.33513
+                                      0.00000   -0.47162
+                                     -0.34265    0.00000    0.13649
+multipole    403    404    402              0.65561
+                                      0.49254    0.00000    0.19671
+                                     -0.06943
+                                      0.00000   -0.00714
+                                     -0.17040    0.00000    0.07657
+multipole    404    403    402             -0.56268
+                                     -0.15078    0.00000   -0.00398
+                                     -0.40507
+                                      0.00000    0.16151
+                                     -0.26795    0.00000    0.24356
+multipole    405    401    402              0.05829
+                                     -0.00031    0.00000   -0.12667
+                                      0.00463
+                                      0.00000    0.00097
+                                     -0.01124    0.00000   -0.00560
+multipole    406    403    404             -0.00547
+                                      0.01542    0.00000   -0.19323
+                                      0.03915
+                                      0.00000    0.03099
+                                      0.00974    0.00000   -0.07014
+
+polarize           405          0.4800     0.3900 401
+polarize           401          1.6200     0.3900 405
+# amoeba21 comments=O connected to carbonyl group SMARTS match = [OX2][CX3]
+polarize           402          0.8320     0.3900 403
+# amoeba21 comments=C on carbonyl O SMARTS match = [CX3](=O)
+polarize           403          1.6000     0.3900 402 404 406
+# amoeba21 comments=O on carbonyl group SMARTS match = [OX1]=[CX3]
+polarize           404          0.9140     0.3900 403
+# amoeba21 comments=H on non-aromatic carbon SMARTS match = [H][C]
+polarize           406          0.4800     0.3900 403

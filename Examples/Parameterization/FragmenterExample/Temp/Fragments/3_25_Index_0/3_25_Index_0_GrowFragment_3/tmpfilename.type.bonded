@@ -1,0 +1,24 @@
+    1   401   401   car    29 #                 car, aromatic carbon 
+    2   402   402  NC=O   179 #                NC=O, sp3 Nitrogen in amide
+    3   403   403   CON    92 #                 CON, sp2 carbon, peptide bond (amide) 
+    4   404   404   C32    34 #                 C32, sp3 carbon with 2 Hydrogens
+    5   405   405   C33    35 #                 C33, sp3 carbon with 3 Hydrogens
+    6   406   406   O=C   219 #                 O=C, Oxygen of carbonyl group, Amide, Formamide 
+    7   407   407   car    29 #                 car, aromatic carbon 
+    8   408   408   car    29 #                 car, aromatic carbon 
+    9   409   409   car    29 #                 car, aromatic carbon 
+   10   409   409   car    29 #                 car, aromatic carbon 
+   11   407   407   car    29 #                 car, aromatic carbon 
+   12   411   411  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   13   411   411  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   14   411   411  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   15   410   410    N3   171 #                  N3, sp3 Nitrogen
+   16   412   412  HCH2    20 #                HCH2, H on sp3 carbon, -CH2-
+   17   412   412  HCH2    20 #                HCH2, H on sp3 carbon, -CH2-
+   18   413   413    Hc    23 #                  HC, H on aromatic carbon 
+   19   414   414    Hc    23 #                  HC, H on aromatic carbon 
+   20   414   414    Hc    23 #                  HC, H on aromatic carbon 
+   21   413   413    Hc    23 #                  HC, H on aromatic carbon 
+   22   415   415    HN    24 #                  HN, H on Nitrogen 
+   23   416   416    Hc    23 #                  HC, H on aromatic carbon 
+   24   415   415    HN    24 #                  HN, H on Nitrogen 

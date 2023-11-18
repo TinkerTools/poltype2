@@ -1,0 +1,15 @@
+    1   401   401 CX4H3     # #Alkane CH3-
+    2   402   402 3Me-N_N     # #Trimethyl Amine N
+    3   403   403 CX4H2     # #Alkane -CH2-
+    4   404   404 C(=O)C_C=O     # #Acetaldehyde C=O
+    5   401   401 CX4H3     # #Alkane CH3-
+    6   406   406 3Me-N_H3C     # #Trimethyl Amine H3C
+    7   406   406 3Me-N_H3C     # #Trimethyl Amine H3C
+    8   405   405 C(=O)C_O=C     # #Acetaldehyde O=C
+    9   407   407 3Me-N_H3C     # #Trimethyl Amine H3C
+   10   407   407 3Me-N_H3C     # #Trimethyl Amine H3C
+   11   407   407 3Me-N_H3C     # #Trimethyl Amine H3C
+   12   407   407 3Me-N_H3C     # #Trimethyl Amine H3C
+   13   407   407 3Me-N_H3C     # #Trimethyl Amine H3C
+   14   408   408 C(=O)C_HC=O     # #Acetaldehyde HC=O
+   15   407   407 3Me-N_H3C     # #Trimethyl Amine H3C

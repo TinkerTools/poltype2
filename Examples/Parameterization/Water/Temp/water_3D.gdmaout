@@ -1,0 +1,51 @@
+                                     G D M A
+                                 by Anthony Stone
+
+               Distributed Multipoles from Gaussian wavefunctions
+
+                             version 2.3.3 (b'ce9c35b')
+              Compiled with gfortran on 31 August 2023 at 14:58:33
+
+Starting at 17:45:42 on 17 Nov 2023 
+
+water_3D
+
+
+
+Using MP2 density matrix from file dma.fchk
+
+
+                         Distributed Multipole Analysis
+
+Standard DMA
+
+Positions and radii in angstrom
+Multipole moments in atomic units, ea_0^k for rank k
+
+O          x =  0.000974  y =  0.066737  z =  0.000000 angstrom
+           Maximum rank =  2   Radius =  0.650 angstrom
+                   Q00  =  -0.382782
+|Q1| =   0.343797  Q11c =  -0.005019  Q11s =  -0.343760
+|Q2| =   0.672344  Q20  =  -0.630355  Q22c =   0.233777  Q22s =  -0.006829
+
+H          x =  0.755425  y = -0.540729  z =  0.000000 angstrom
+           Maximum rank =  2   Radius =  0.650 angstrom
+                   Q00  =   0.191391
+|Q1| =   0.088799  Q11c =   0.085443  Q11s =  -0.024183
+|Q2| =   0.144514  Q20  =  -0.077786  Q22c =  -0.006996  Q22s =  -0.121592
+
+H          x = -0.770891  y = -0.518442  z =  0.000000 angstrom
+           Maximum rank =  2   Radius =  0.650 angstrom
+                   Q00  =   0.191391
+|Q1| =   0.088800  Q11c =  -0.086113  Q11s =  -0.021678
+|Q2| =   0.144514  Q20  =  -0.077786  Q22c =   0.000113  Q22s =   0.121793
+
+Total multipoles referred to origin at
+           x =   0.000000,  y =    0.000000,  z =    0.000000 angstrom
+                   Q00  =  -0.000000
+|Q1| =   0.821060  Q11c =  -0.011988  Q11s =  -0.820973
+|Q2| =   1.913522  Q20  =  -1.622762  Q22c =   1.013574  Q22s =  -0.029606
+
+CPU time used:      0m 0.001s          Total:      0m 0.001s
+
+Finished at 17:45:42 on 17 Nov 2023 

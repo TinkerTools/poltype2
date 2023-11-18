@@ -1,0 +1,140 @@
+# Warning! This bond involves wild type. Please check your structure
+bond 404 405   262.6072 1.37
+bond 407 409   485.3892 1.36
+bond 420 404   369.3098 1.09
+bond 418 409   365.1617 1.08
+bond 412 408   558.7947 1.25
+bond 401 404   349.1162 1.35
+bond 401 402   312.6977 1.4
+bond 417 407   365.1617 1.08
+# Warning! This bond involves wild type. Please check your structure
+bond 405 407   250.0654 1.44
+# Warning! This bond involves wild type. Please check your structure
+bond 405 408   271.0732 1.46
+bond 413 401   451.4284 1.03
+bond 403 402   379.0943 1.4
+bond 411 410   379.0943 1.4
+bond 414 403   368.0934 1.09
+bond 416 410   368.0934 1.09
+bond 410 403   379.0943 1.39
+bond 408 406   363.1569 1.38
+bond 409 406   316.0614 1.4
+bond 415 406   470.1877 1.01
+bond 419 411   368.0934 1.09
+# Warning! This angle involves wild type. Please check your structure
+anglep 401 404 405   71.73625 120.4214
+anglep 401 402 403   78.02300 120.17
+anglep 402 401 404   51.85966 126.72
+# Warning! This angle involves wild type. Please check your structure
+angle 404 405 407   79.05410 130.64
+# Warning! This angle involves wild type. Please check your structure
+angle 404 405 408   79.05410 121.54
+# Warning! This angle involves wild type. Please check your structure
+anglep 405 407 409   61.87283 107.03
+# Warning! This angle involves wild type. Please check your structure
+anglep 405 404 420   52.68710 121.32
+# Warning! This angle involves wild type. Please check your structure
+anglep 405 408 406   57.88766 104.58
+anglep 406 409 407   71.98940 109.58
+# Warning! This angle involves wild type. Please check your structure
+angle 407 405 408   83.61340 107.78
+anglep 407 409 418   57.30070 130.01
+anglep 408 406 409   47.79874 111.02
+anglep 409 407 417   57.30070 126.03
+anglep 401 404 420   63.21720 116.89
+anglep 406 409 418   33.50780 120.41
+anglep 406 408 412  109.44840 126.33
+# Warning! This angle involves wild type. Please check your structure
+anglep 405 407 417   29.47160 126.93
+# Warning! This angle involves wild type. Please check your structure
+anglep 412 408 405   51.79782 129.08
+anglep 413 401 404   51.54066 111.53670000000001
+anglep 413 401 402   40.04590 122.33849999999998
+anglep 419 411 410   36.77020 120.3
+anglep 410 403 402   74.63070 119.9
+anglep 403 402 403   74.63070 119.65
+anglep 411 410 403   74.63070 120.57
+anglep 410 411 410   74.63070 119.39
+anglep 414 403 402   36.77020 119.94
+anglep 414 403 410   36.77020 120.14
+anglep 416 410 411   36.77020 120.13
+anglep 403 410 416   36.77020 119.29
+anglep 415 406 408   47.17874 122.68
+anglep 415 406 409   37.40890 126.3
+# Warning! This strbnd involves wild type. Please check your structure
+strbnd 401 404 405   33.39420   33.39420
+strbnd 401 402 403   20.45280  20.45280
+strbnd 402 401 404   11.14120   11.14120
+# Warning! This strbnd involves wild type. Please check your structure
+strbnd 404 405 407   20.45280   20.45280
+# Warning! This strbnd involves wild type. Please check your structure
+strbnd 404 405 408   20.45280   20.45280
+# Warning! This strbnd involves wild type. Please check your structure
+strbnd 405 407 409   34.20020   34.20020
+# Warning! This strbnd involves wild type. Please check your structure
+strbnd 405 404 420   33.39420   33.39420
+# Warning! This strbnd involves wild type. Please check your structure
+strbnd 405 408 406    8.17500    8.17500
+strbnd 406 409 407   34.20020  34.20020
+# Warning! This strbnd involves wild type. Please check your structure
+strbnd 407 405 408   20.45280   20.45280
+strbnd 407 409 418   34.20020  34.20020
+strbnd 408 406 409   10.26796   10.26796
+strbnd 409 407 417   34.20020  34.20020
+strbnd 401 404 420    7.62890    7.62890
+strbnd 406 409 418   34.20020  34.20020
+strbnd 406 408 412   25.98850  25.98850
+# Warning! This strbnd involves wild type. Please check your structure
+strbnd 405 407 417   34.20020   34.20020
+# Warning! This strbnd involves wild type. Please check your structure
+strbnd 412 408 405    8.17500    8.17500
+strbnd 413 401 404   10.88012   10.88012
+strbnd 413 401 402   22.68770  22.68770
+strbnd 419 411 410   20.45280  20.45280
+strbnd 410 403 402   20.45280  20.45280
+strbnd 403 402 403   20.45280  20.45280
+strbnd 411 410 403   20.45280  20.45280
+strbnd 410 411 410   20.45280  20.45280
+strbnd 414 403 402   20.45280  20.45280
+strbnd 414 403 410   20.45280  20.45280
+strbnd 416 410 411   20.45280  20.45280
+strbnd 403 410 416   20.45280  20.45280
+strbnd 415 406 408    9.93198    9.93198
+strbnd 415 406 409   11.08490  11.08490
+opbend 420 404    0    0 14.0
+opbend 418 409    0    0 14.0
+opbend 401 404    0    0 42.81446614522
+opbend 401 402    0    0 47.7090282675
+opbend 417 407    0    0 14.0
+# Warning! This opbend involves wild type. Please check your structure
+opbend 405 407    0    0 14.0
+# Warning! This opbend involves wild type. Please check your structure
+opbend 405 408    0    0 57.06437861905
+opbend 404 401    0    0 42.81446614522
+opbend 402 401    0    0 45.400946145220004
+opbend 413 401    0    0 47.7090282675
+opbend 402 403    0    0 92.0232665715
+opbend 403 402    0    0 92.0232665715
+opbend 410 411    0    0 92.0232665715
+opbend 411 410    0    0 92.0232665715
+opbend 414 403    0    0 79.0288815004
+opbend 416 410    0    0 79.0288815004
+# Warning! This opbend involves wild type. Please check your structure
+opbend 407 405    0    0 14.0
+# Warning! This opbend involves wild type. Please check your structure
+opbend 408 405    0    0 57.06437861905
+opbend 403 410    0    0 92.0232665715
+opbend 410 403    0    0 92.0232665715
+opbend 408 406    0    0 14.0
+opbend 406 408    0    0 57.2503
+opbend 409 406    0    0 38.816
+opbend 406 409    0    0 14.0
+opbend 415 406    0    0 38.816
+opbend 412 408    0    0 92.5365148581
+opbend 419 411    0    0 79.0288815004
+# Warning! This opbend involves wild type. Please check your structure
+opbend 405 404    0    0 14.894549999999999
+opbend 409 407    0    0 14.0
+# Warning! This opbend involves wild type. Please check your structure
+opbend 404 405    0    0 14.894549999999999
+opbend 407 409    0    0 14.0

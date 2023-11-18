@@ -1,0 +1,676 @@
+
+    -----------------------------------------------------------------------
+          Psi4: An Open-Source Ab Initio Electronic Structure Package
+                               Psi4 1.6 release
+
+                         Git: Rev {HEAD} 77475b5 
+
+
+    D. G. A. Smith, L. A. Burns, A. C. Simmonett, R. M. Parrish,
+    M. C. Schieber, R. Galvelis, P. Kraus, H. Kruse, R. Di Remigio,
+    A. Alenaizan, A. M. James, S. Lehtola, J. P. Misiewicz, M. Scheurer,
+    R. A. Shaw, J. B. Schriber, Y. Xie, Z. L. Glick, D. A. Sirianni,
+    J. S. O'Brien, J. M. Waldrop, A. Kumar, E. G. Hohenstein,
+    B. P. Pritchard, B. R. Brooks, H. F. Schaefer III, A. Yu. Sokolov,
+    K. Patkowski, A. E. DePrince III, U. Bozkaya, R. A. King,
+    F. A. Evangelista, J. M. Turney, T. D. Crawford, C. D. Sherrill,
+    J. Chem. Phys. 152(18) 184108 (2020). https://doi.org/10.1063/5.0006002
+
+                            Additional Code Authors
+    E. T. Seidl, C. L. Janssen, E. F. Valeev, M. L. Leininger,
+    J. F. Gonthier, R. M. Richard, H. R. McAlexander, M. Saitow, X. Wang,
+    P. Verma, M. H. Lechner, and A. Jiang
+
+             Previous Authors, Complete List of Code Contributors,
+                       and Citations for Specific Modules
+    https://github.com/psi4/psi4/blob/master/codemeta.json
+    https://github.com/psi4/psi4/graphs/contributors
+    http://psicode.org/psi4manual/master/introduction.html#citing-psifour
+
+    -----------------------------------------------------------------------
+
+
+    Psi4 started on: Friday, 17 November 2023 05:45PM
+
+    Process ID: 991584
+    Host:       node165.bme.utexas.edu
+    PSIDATADIR: /home/liuchw/anaconda3/envs/poltype2022/share/psi4
+    Memory:     500.0 MiB
+    Threads:    1
+    
+  ==> Input File <==
+
+--------------------------------------------------------------------------
+molecule { 
+0 1
+O 0.000978601539 0.066556122324 0.0
+H 0.755429558873 -0.540910345372 0.0
+H -0.770887182219 -0.51862374951 0.0
+}
+memory 209GB
+set_num_threads(51)
+psi4_io.set_default_path("/scratch/liuchw/Psi4-water_3D")
+set maxiter 500
+set freeze_core True
+set PROPERTIES_ORIGIN ["COM"]
+set cubeprop_tasks ['esp']
+set basis aug-cc-pVTZ 
+E, wfn = properties('mp2',properties=['dipole','GRID_ESP','WIBERG_LOWDIN_INDICES','MULLIKEN_CHARGES'],return_wfn=True)
+cubeprop(wfn)
+fchk(wfn, "water_3D-esp.fchk")
+clean()
+--------------------------------------------------------------------------
+
+  Memory set to 194.646 GiB by Python driver.
+  Threads set to 51 by Python driver.
+    SCF Algorithm Type (re)set to DF.
+
+*** tstart() called on node165.bme.utexas.edu
+*** at Fri Nov 17 17:45:43 2023
+
+   => Loading Basis Set <=
+
+    Name: AUG-CC-PVTZ
+    Role: ORBITAL
+    Keyword: BASIS
+    atoms 1   entry O          line   331 file /home/liuchw/anaconda3/envs/poltype2022/share/psi4/basis/aug-cc-pvtz.gbs 
+    atoms 2-3 entry H          line    40 file /home/liuchw/anaconda3/envs/poltype2022/share/psi4/basis/aug-cc-pvtz.gbs 
+
+
+         ---------------------------------------------------------
+                                   SCF
+               by Justin Turney, Rob Parrish, Andy Simmonett
+                          and Daniel G. A. Smith
+                              RHF Reference
+                       51 Threads, 199317 MiB Core
+         ---------------------------------------------------------
+
+  ==> Geometry <==
+
+    Molecular point group: cs
+    Full point group: Cs
+
+    Geometry (in Angstrom), charge = 0, multiplicity = 1:
+
+       Center              X                  Y                   Z               Mass       
+    ------------   -----------------  -----------------  -----------------  -----------------
+         O            0.000974489046     0.066737431983     0.000000000000    15.994914619570
+         H            0.755425446380    -0.540729035713     0.000000000000     1.007825032230
+         H           -0.770891294712    -0.518442439851     0.000000000000     1.007825032230
+
+  Running in cs symmetry.
+
+  Rotational constants: A =     26.47712  B =     14.35686  C =      9.30912 [cm^-1]
+  Rotational constants: A = 793764.20497  B = 430407.80124  C = 279080.31259 [MHz]
+  Nuclear repulsion =    9.087856355936454
+
+  Charge       = 0
+  Multiplicity = 1
+  Electrons    = 10
+  Nalpha       = 5
+  Nbeta        = 5
+
+  ==> Algorithm <==
+
+  SCF Algorithm Type is DF.
+  DIIS enabled.
+  MOM disabled.
+  Fractional occupation disabled.
+  Guess Type is SAD.
+  Energy threshold   = 1.00e-10
+  Density threshold  = 1.00e-10
+  Integral threshold = 1.00e-12
+
+  ==> Primary Basis <==
+
+  Basis Set: AUG-CC-PVTZ
+    Blend: AUG-CC-PVTZ
+    Number of shells: 32
+    Number of basis functions: 92
+    Number of Cartesian functions: 105
+    Spherical Harmonics?: true
+    Max angular momentum: 3
+
+   => Loading Basis Set <=
+
+    Name: (AUG-CC-PVTZ AUX)
+    Role: JKFIT
+    Keyword: DF_BASIS_SCF
+    atoms 1   entry O          line   286 file /home/liuchw/anaconda3/envs/poltype2022/share/psi4/basis/aug-cc-pvtz-jkfit.gbs 
+    atoms 2-3 entry H          line    70 file /home/liuchw/anaconda3/envs/poltype2022/share/psi4/basis/aug-cc-pvtz-jkfit.gbs 
+
+  ==> Integral Setup <==
+
+  DFHelper Memory: AOs need 0.018 GiB; user supplied 145.985 GiB. Using in-core AOs.
+
+  ==> MemDFJK: Density-Fitted J/K Matrices <==
+
+    J tasked:                   Yes
+    K tasked:                   Yes
+    wK tasked:                   No
+    OpenMP threads:              51
+    Memory [MiB]:            149488
+    Algorithm:                 Core
+    Schwarz Cutoff:           1E-12
+    Mask sparsity (%):       0.0000
+    Fitting Condition:        1E-10
+
+   => Auxiliary Basis Set <=
+
+  Basis Set: (AUG-CC-PVTZ AUX)
+    Blend: AUG-CC-PVTZ-JKFIT
+    Number of shells: 58
+    Number of basis functions: 196
+    Number of Cartesian functions: 241
+    Spherical Harmonics?: true
+    Max angular momentum: 4
+
+  Minimum eigenvalue in the overlap matrix is 3.9538589308E-04.
+  Reciprocal condition number of the overlap matrix is 5.7935208637E-05.
+    Using symmetric orthogonalization.
+
+  ==> Pre-Iterations <==
+
+  SCF Guess: Superposition of Atomic Densities via on-the-fly atomic UHF (no occupation information).
+
+   -------------------------
+    Irrep   Nso     Nmo    
+   -------------------------
+     A'        62      62 
+     A"        30      30 
+   -------------------------
+    Total      92      92
+   -------------------------
+
+  ==> Iterations <==
+
+                           Total Energy        Delta E     RMS |[F,P]|
+
+   @DF-RHF iter SAD:   -75.46542381661584   -7.54654e+01   0.00000e+00 
+   @DF-RHF iter   1:   -75.97480588854246   -5.09382e-01   6.78976e-03 DIIS/ADIIS
+   @DF-RHF iter   2:   -76.02699925039944   -5.21934e-02   4.67779e-03 DIIS/ADIIS
+   @DF-RHF iter   3:   -76.05914303327725   -3.21438e-02   3.30004e-04 DIIS/ADIIS
+   @DF-RHF iter   4:   -76.05955801134775   -4.14978e-04   7.71896e-05 DIIS
+   @DF-RHF iter   5:   -76.05958427101825   -2.62597e-05   1.78640e-05 DIIS
+   @DF-RHF iter   6:   -76.05958647068427   -2.19967e-06   3.90639e-06 DIIS
+   @DF-RHF iter   7:   -76.05958658555940   -1.14875e-07   6.91350e-07 DIIS
+   @DF-RHF iter   8:   -76.05958658866892   -3.10952e-09   1.15074e-07 DIIS
+   @DF-RHF iter   9:   -76.05958658873874   -6.98179e-11   2.91838e-08 DIIS
+   @DF-RHF iter  10:   -76.05958658874307   -4.33431e-12   4.30139e-09 DIIS
+   @DF-RHF iter  11:   -76.05958658874323   -1.56319e-13   6.50685e-10 DIIS
+   @DF-RHF iter  12:   -76.05958658874331   -8.52651e-14   1.12141e-10 DIIS
+   @DF-RHF iter  13:   -76.05958658874329    2.84217e-14   1.64360e-11 DIIS
+  Energy and wave function converged.
+
+
+  ==> Post-Iterations <==
+
+    Orbital Energies [Eh]
+    ---------------------
+
+    Doubly Occupied:                                                      
+
+       1Ap   -20.569431     2Ap    -1.348166     3Ap    -0.710653  
+       4Ap    -0.583780     1App   -0.509586  
+
+    Virtual:                                                              
+
+       5Ap     0.029259     6Ap     0.047671     7Ap     0.135829  
+       2App    0.159163     8Ap     0.174936     9Ap     0.183116  
+      10Ap     0.226393    11Ap     0.244603     3App    0.265399  
+       4App    0.299540    12Ap     0.309802    13Ap     0.365535  
+      14Ap     0.435825    15Ap     0.464626    16Ap     0.598695  
+      17Ap     0.657865    18Ap     0.707596     5App    0.722913  
+       6App    0.731996    19Ap     0.828288     7App    0.845721  
+      20Ap     0.893694    21Ap     0.910951     8App    0.919061  
+       9App    0.921622    22Ap     0.930139    23Ap     0.960534  
+      24Ap     1.017893    25Ap     1.040569    10App    1.081490  
+      26Ap     1.106719    11App    1.174595    27Ap     1.179556  
+      28Ap     1.263760    12App    1.507583    29Ap     1.535519  
+      13App    1.578065    30Ap     1.809198    31Ap     1.815074  
+      32Ap     1.974349    33Ap     2.110385    14App    2.262087  
+      15App    2.314070    34Ap     2.328470    35Ap     2.416950  
+      16App    2.419430    36Ap     2.443562    37Ap     2.480549  
+      38Ap     2.682320    17App    2.699929    39Ap     2.763621  
+      40Ap     2.812759    18App    2.880146    41Ap     3.640670  
+      42Ap     3.729824    19App    4.012579    20App    4.074512  
+      43Ap     4.158574    44Ap     4.236789    21App    4.282457  
+      22App    4.373719    45Ap     4.374190    23App    4.398406  
+      46Ap     4.511602    47Ap     4.715496    48Ap     4.821902  
+      24App    5.128962    49Ap     5.133906    50Ap     5.236697  
+      51Ap     5.293359    25App    5.499367    52Ap     5.649071  
+      53Ap     6.168107    54Ap     6.517633    26App    6.711991  
+      55Ap     6.888684    27App    7.127414    28App    7.252017  
+      56Ap     7.283028    29App    7.298668    57Ap     7.334398  
+      30App    7.359181    58Ap     7.511897    59Ap     7.888480  
+      60Ap     7.901733    61Ap     8.767250    62Ap    15.482856  
+
+    Final Occupation by Irrep:
+             Ap   App 
+    DOCC [     4,    1 ]
+
+  @DF-RHF Final Energy:   -76.05958658874329
+
+   => Energetics <=
+
+    Nuclear Repulsion Energy =              9.0878563559364540
+    One-Electron Energy =                -122.8516538111479406
+    Two-Electron Energy =                  37.7042108664681948
+    Total Energy =                        -76.0595865887432865
+
+Computation Completed
+
+*** tstop() called on node165.bme.utexas.edu at Fri Nov 17 17:45:47 2023
+Module time:
+	user time   =     159.39 seconds =       2.66 minutes
+	system time =       5.35 seconds =       0.09 minutes
+	total time  =          4 seconds =       0.07 minutes
+Total time:
+	user time   =     159.39 seconds =       2.66 minutes
+	system time =       5.35 seconds =       0.09 minutes
+	total time  =          4 seconds =       0.07 minutes
+
+  A requested method does not make use of molecular symmetry: further calculations in C1 point group.
+
+   => Loading Basis Set <=
+
+    Name: (AUG-CC-PVTZ AUX)
+    Role: RIFIT
+    Keyword: DF_BASIS_MP2
+    atoms 1   entry O          line   264 file /home/liuchw/anaconda3/envs/poltype2022/share/psi4/basis/aug-cc-pvtz-ri.gbs 
+    atoms 2-3 entry H          line    30 file /home/liuchw/anaconda3/envs/poltype2022/share/psi4/basis/aug-cc-pvtz-ri.gbs 
+
+
+*** tstart() called on node165.bme.utexas.edu
+*** at Fri Nov 17 17:45:48 2023
+
+
+  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//
+  //               DFMP2               //
+  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<//
+
+	 --------------------------------------------------------
+	                          DF-MP2                         
+	      2nd-Order Density-Fitted Moller-Plesset Theory     
+	              RMP2 Wavefunction,  51 Threads             
+	                                                         
+	        Rob Parrish, Justin Turney, Andy Simmonett,      
+	           Ed Hohenstein, and C. David Sherrill          
+	 --------------------------------------------------------
+
+   => Auxiliary Basis Set <=
+
+  Basis Set: (AUG-CC-PVTZ AUX)
+    Blend: AUG-CC-PVTZ-RI
+    Number of shells: 56
+    Number of basis functions: 198
+    Number of Cartesian functions: 246
+    Spherical Harmonics?: true
+    Max angular momentum: 4
+
+	 --------------------------------------------------------
+	                 NBF =    92, NAUX =   198
+	 --------------------------------------------------------
+	   CLASS    FOCC     OCC    AOCC    AVIR     VIR    FVIR
+	   PAIRS       1       5       4      87      87       0
+	 --------------------------------------------------------
+
+  DFHelper Memory: AOs need 0.018 GiB; user supplied 145.985 GiB. Using in-core AOs.
+
+
+         ------------------------------------------------------------
+                                     CPHF                           
+                                  Rob Parrish                       
+         ------------------------------------------------------------
+
+  ==> Geometry <==
+
+    Molecular point group: c1
+    Full point group: Cs
+
+    Geometry (in Angstrom), charge = 0, multiplicity = 1:
+
+       Center              X                  Y                   Z               Mass       
+    ------------   -----------------  -----------------  -----------------  -----------------
+         O            0.000974489046     0.066737431983     0.000000000000    15.994914619570
+         H            0.755425446380    -0.540729035713     0.000000000000     1.007825032230
+         H           -0.770891294712    -0.518442439851     0.000000000000     1.007825032230
+
+  Nuclear repulsion =    9.087856355936454
+  Reference energy  =  -76.059586588743286
+
+  ==> Basis Set <==
+
+  Basis Set: AUG-CC-PVTZ
+    Blend: AUG-CC-PVTZ
+    Number of shells: 32
+    Number of basis functions: 92
+    Number of Cartesian functions: 105
+    Spherical Harmonics?: true
+    Max angular momentum: 3
+
+  ==> CGRSolver (by Rob Parrish) <==
+
+   Number of roots    =         1
+   Preconditioning    =    JACOBI
+   Convergence cutoff =     1E-06
+   Maximum iterations =       100
+
+  ==> CPHFRHamiltonian (by Rob Parrish) <== 
+
+  ==> MemDFJK: Density-Fitted J/K Matrices <==
+
+    J tasked:                   Yes
+    K tasked:                   Yes
+    wK tasked:                   No
+    OpenMP threads:              51
+    Memory [MiB]:            149488
+    Algorithm:                 Core
+    Schwarz Cutoff:           1E-12
+    Mask sparsity (%):       0.0000
+    Fitting Condition:        1E-10
+
+   => Auxiliary Basis Set <=
+
+  Basis Set: (AUG-CC-PVTZ AUX)
+    Blend: AUG-CC-PVTZ-JKFIT
+    Number of shells: 58
+    Number of basis functions: 196
+    Number of Cartesian functions: 241
+    Spherical Harmonics?: true
+    Max angular momentum: 4
+
+  ==> CPHF Iterations <==
+
+  => Iterations <=
+
+             Iter  Converged  Remaining    Residual
+  CGR           1          0          1   5.221E-02
+  CGR           2          0          1   2.179E-02
+  CGR           3          0          1   3.446E-03
+  CGR           4          0          1   6.683E-04
+  CGR           5          0          1   1.487E-04
+  CGR           6          0          1   2.543E-05
+  CGR           7          0          1   3.453E-06
+  CGR           8          1          0   7.970E-07
+
+    CGRSolver converged.
+
+	-----------------------------------------------------------
+	 ==================> DF-MP2 Energies <==================== 
+	-----------------------------------------------------------
+	 Reference Energy          =     -76.0595865887432865 [Eh]
+	 Singles Energy            =      -0.0000000000000000 [Eh]
+	 Same-Spin Energy          =      -0.0653697897296790 [Eh]
+	 Opposite-Spin Energy      =      -0.2038846786463114 [Eh]
+	 Correlation Energy        =      -0.2692544683759904 [Eh]
+	 Total Energy              =     -76.3288410571192770 [Eh]
+	-----------------------------------------------------------
+	 ================> DF-SCS-MP2 Energies <================== 
+	-----------------------------------------------------------
+	 SCS Same-Spin Scale       =       0.3333333333333333 [-]
+	 SCS Opposite-Spin Scale   =       1.2000000000000000 [-]
+	 SCS Same-Spin Energy      =      -0.0217899299098930 [Eh]
+	 SCS Opposite-Spin Energy  =      -0.2446616143755737 [Eh]
+	 SCS Correlation Energy    =      -0.2664515442854667 [Eh]
+	 SCS Total Energy          =     -76.3260381330287601 [Eh]
+	-----------------------------------------------------------
+
+
+
+Properties will be evaluated at   0.000000,   0.000000,   0.000000 [a0]
+
+Properties computed using the MP2 density matrix
+
+
+ Multipole Moments:
+
+ ------------------------------------------------------------------------------------
+     Multipole            Electronic (a.u.)      Nuclear  (a.u.)        Total (a.u.)
+ ------------------------------------------------------------------------------------
+
+ L = 1.  Multiply by 2.5417464519 to convert [e a0] to [Debye]
+ Dipole X            :          0.0037821           -0.0144941           -0.0107120
+ Dipole Y            :          0.2590107           -0.9926203           -0.7336095
+ Dipole Z            :         -0.0000000            0.0000000           -0.0000000
+ Magnitude           :                                                    0.7336877
+
+ ------------------------------------------------------------------------------------
+  Mulliken Charges: (a.u.)
+   Center  Symbol    Alpha    Beta     Spin     Total
+       1     O     4.21976  4.21976  0.00000 -0.43952
+       2     H     0.39012  0.39012  0.00000  0.21976
+       3     H     0.39012  0.39012  0.00000  0.21976
+
+   Total alpha =  5.00000, Total beta =  5.00000, Total charge =  0.00000
+
+
+
+  Wiberg Bond Indices using Orthogonal Lowdin Orbitals:
+
+  Irrep: 1 Size: 3 x 3
+
+                 1                   2                   3
+
+    1     0.00000000000000     1.74570716394817     1.74570647621731
+    2     1.74570716394817     0.00000000000000     0.50871975757055
+    3     1.74570647621731     0.50871975757055     0.00000000000000
+
+
+
+  Atomic Valences: 
+
+ #  #
+ Irrep: 1
+      1:    3.491413640165483
+      2:    2.254426921518721
+      3:    2.254426233787864
+
+
+ Electrostatic potential computed on the grid and written to grid_esp.dat
+
+*** tstop() called on node165.bme.utexas.edu at Fri Nov 17 17:45:50 2023
+Module time:
+	user time   =      63.31 seconds =       1.06 minutes
+	system time =       2.36 seconds =       0.04 minutes
+	total time  =          2 seconds =       0.03 minutes
+Total time:
+	user time   =     235.21 seconds =       3.92 minutes
+	system time =       8.07 seconds =       0.13 minutes
+	total time  =          7 seconds =       0.12 minutes
+  ==> One Electron Grid Properties (v2.0) <==
+
+  ==> CubicScalarGrid <==
+
+    Filepath     = .
+    Total Points =           107912
+    XYZ Blocking =               10
+    X Points     =               56
+    Y Points     =               47
+    Z Points     =               41
+    X Spacing    =        2.000E-01
+    Y Spacing    =        2.000E-01
+    Z Spacing    =        2.000E-01
+    X Minimum    =       -5.515E+00
+    Y Minimum    =       -5.048E+00
+    Z Minimum    =       -4.000E+00
+    X Maximum    =        5.485E+00
+    Y Maximum    =        4.152E+00
+    Z Maximum    =        4.000E+00
+
+  Basis Set: AUG-CC-PVTZ
+    Blend: AUG-CC-PVTZ
+    Number of shells: 32
+    Number of basis functions: 92
+    Number of Cartesian functions: 105
+    Spherical Harmonics?: true
+    Max angular momentum: 3
+
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+*********************************************************************************************************************
+When computing potential integrals with different bra and ket basis, the atom definition is taken from the bra basis.
+*********************************************************************************************************************
+   => Loading Basis Set <=
+
+    Name: AUG-CC-PVTZ
+    Role: ORBITAL
+    Keyword: BASIS
+    atoms 1   entry O          line   331 file /home/liuchw/anaconda3/envs/poltype2022/share/psi4/basis/aug-cc-pvtz.gbs 
+    atoms 2-3 entry H          line    40 file /home/liuchw/anaconda3/envs/poltype2022/share/psi4/basis/aug-cc-pvtz.gbs 
+
+FCHKWriter: !WARNING! method 'MP2'' renamed to label 'MP2'.
+FCHKWriter: Writing water_3D-esp.fchk with label ' MP2 Density'.
+
+    Psi4 stopped on: Friday, 17 November 2023 05:45PM
+    Psi4 wall time for execution: 0:00:08.37
+
+*** Psi4 exiting successfully. Buy a developer a beer!

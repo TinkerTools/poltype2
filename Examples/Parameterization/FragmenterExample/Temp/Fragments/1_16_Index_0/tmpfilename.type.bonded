@@ -1,0 +1,24 @@
+    1   413   413    HN    24 #                  HN, H on Nitrogen 
+    2   401   401    N3   171 #                  N3, sp3 Nitrogen
+    3   402   402   car    29 #                 car, aromatic carbon 
+    4   403   403   car    29 #                 car, aromatic carbon 
+    5   404   404   C=N   102 #                 C=N, sp2 carbon, formimidamide 
+    6   403   403   car    29 #                 car, aromatic carbon 
+    7   405   405    C*     2 #         C*, wild matching Carbon
+    8   406   406  N3R5   172 #                N3R5, sp3 Nitrogen on 5-membered cycle
+    9   407   407   C2C    66 #                 C2C, sp2 carbon, CH2=CH2 
+   10   408   408   CON    92 #                 CON, sp2 carbon, peptide bond (amide) 
+   11   409   409   C2C    66 #                 C2C, sp2 carbon, CH2=CH2 
+   12   410   410   car    29 #                 car, aromatic carbon 
+   13   410   410   car    29 #                 car, aromatic carbon 
+   14   411   411   car    29 #                 car, aromatic carbon 
+   15   414   414    Hc    23 #                  HC, H on aromatic carbon 
+   16   414   414    Hc    23 #                  HC, H on aromatic carbon 
+   17   415   415    HN    24 #                  HN, H on Nitrogen 
+   18   412   412   O=C   219 #                 O=C, Oxygen of carbonyl group, Amide, Formamide 
+   19   416   416    Hc    23 #                  HC, H on aromatic carbon 
+   20   416   416    Hc    23 #                  HC, H on aromatic carbon 
+   21   417   417   HC2    22 #                 HC2, H on sp2 carbon
+   22   418   418   HC2    22 #                 HC2, H on sp2 carbon
+   23   419   419    Hc    23 #                  HC, H on aromatic carbon 
+   24   420   420   HC2    22 #                 HC2, H on sp2 carbon

@@ -1,0 +1,15 @@
+    1   401   401   C33    35 #                 C33, sp3 carbon with 3 Hydrogens
+    2   402   402    N3   171 #                  N3, sp3 Nitrogen
+    3   403   403   C32    34 #                 C32, sp3 carbon with 2 Hydrogens
+    4   404   404   CHO    69 #                 C=O, sp2 carbon, aldehyde
+    5   401   401   C33    35 #                 C33, sp3 carbon with 3 Hydrogens
+    6   406   406  HCH2    20 #                HCH2, H on sp3 carbon, -CH2-
+    7   406   406  HCH2    20 #                HCH2, H on sp3 carbon, -CH2-
+    8   405   405   O=C   219 #                 O=C, Oxygen of carbonyl group, O=C-H 
+    9   407   407  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   10   407   407  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   11   407   407  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   12   407   407  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   13   407   407  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   14   408   408   HC2    22 #                 HC2, H on sp2 carbon
+   15   407   407  HCH3    21 #                HCH3, H on sp3 carbon, -CH3

@@ -1,0 +1,19 @@
+    1   401   401   CON    92 #                 CON, sp2 carbon, peptide bond (amide) 
+    2   402   402  N-A3   196 #                N-A3, 3'-N in Adenine
+    3   403   403   car    29 #                 car, aromatic carbon 
+    4   404   404   car    29 #                 car, aromatic carbon 
+    5   405   405   C33    35 #                 C33, sp3 carbon with 3 Hydrogens
+    6   404   404   car    29 #                 car, aromatic carbon 
+    7   406   406   car    29 #                 car, aromatic carbon 
+    8   407   407   car    29 #                 car, aromatic carbon 
+    9   406   406   car    29 #                 car, aromatic carbon 
+   10   409   409    Hc    23 #                  HC, H on aromatic carbon 
+   11   409   409    Hc    23 #                  HC, H on aromatic carbon 
+   12   408   408   O=C   219 #                 O=C, Oxygen of carbonyl group, Amide, Formamide 
+   13   410   410  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   14   410   410  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   15   410   410  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+   16   411   411    Hc    23 #                  HC, H on aromatic carbon 
+   17   411   411    Hc    23 #                  HC, H on aromatic carbon 
+   18   412   412    Hc    23 #                  HC, H on aromatic carbon 
+   19   413   413   HC2    22 #                 HC2, H on sp2 carbon

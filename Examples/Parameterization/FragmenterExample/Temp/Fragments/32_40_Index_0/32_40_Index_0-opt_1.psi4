@@ -1,0 +1,51 @@
+molecule { 
+1 1
+ H   10.925500    1.350500   -0.390400
+ C   10.063400    2.007500   -0.249000
+ N    8.877000    1.153900    0.067600
+ H    8.771100    0.509800   -0.732200
+ H    9.852300    2.551900   -1.173100
+ H   10.231500    2.697000    0.582500
+ C    7.579700    1.964000    0.134000
+ C    9.073600    0.297700    1.305400
+ H    7.817300    2.944100    0.561500
+ H    7.252900    2.084900   -0.904200
+ H    9.994300   -0.278300    1.166400
+ H    9.195000    0.989200    2.147000
+ H    6.802300    1.480900    0.744100
+ H    8.231700   -0.387300    1.484200
+}
+set {
+  geom_maxiter 400
+  g_convergence GAU_LOOSE
+  dynamic_level 1
+}
+geometric_keywords = {
+ 'coordsys' : 'tric',
+ 'convergence_cmax' : 1e0,
+ 'convergence_set' : 'GAU_LOOSE',
+ 'convergence_energy' : 1e-4,
+}
+memory 20GB
+set_num_threads(5)
+psi4_io.set_default_path("/scratch/liuchw/Psi4-32_40_Index_0-farH_in17")
+basis {
+assign 6-31G*
+}
+opt_finished = False
+if not opt_finished:
+    try:
+        ener, opt_hist = optimize('mp2',engine='geometric',optimizer_keywords=geometric_keywords, return_history=True)
+        opt_finished = len(opt_hist['energy']) < 400
+    except Exception as e:
+        core.print_out('Exception: %s'%(e))
+if not opt_finished:
+    try:
+        optimize('mp2')
+    except:
+        set opt_coordinates both
+        optimize('mp2')
+    opt_finished = True
+clean()
+assert opt_finished
+

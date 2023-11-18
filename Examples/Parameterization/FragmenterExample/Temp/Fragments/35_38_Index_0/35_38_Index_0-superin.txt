@@ -1,0 +1,60 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.10.5   February 2023                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2023               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      405   405     H     35_38_Index_0                1      1.008     1
+      401   401     C     35_38_Index_0                6     12.011     4
+      402   402     O     35_38_Index_0                8     15.999     2
+      403   403     C     35_38_Index_0                6     12.011     3
+      404   404     O     35_38_Index_0                8     15.999     1
+      406   406     H     35_38_Index_0                1      1.008     1
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      405   405     H     35_38_Index_0                1      1.008     1
+      401   401     C     35_38_Index_0                6     12.011     4
+      402   402     O     35_38_Index_0                8     15.999     2
+      403   403     C     35_38_Index_0                6     12.011     3
+      404   404     O     35_38_Index_0                8     15.999     1
+      406   406     H     35_38_Index_0                1      1.008     1
+
+ Structure File 1 :  35_38_Index_0.xyz_2
+
+ Structure File 2 :  final.xyz_2
+
+ File 1 Frame :     1             File 2 Frame :     1
+
+ Summary of Results from Structural Superposition :
+
+ IMPOSE  --  Input Coordinates                0.038129
+ IMPOSE  --  After Translation                0.032669
+ IMPOSE  --  After Rotation                   0.032030
+
+ Root Mean Square Distance :                  0.032030        1      1
+
+   Atom in the         Atom in the            Distance          Weight
+ First Structure     Second Structure        Separated          in Fit
+
+         2-C                 2-C              0.052336         12.0110
+         3-O                 3-O              0.009648         15.9990
+         4-C                 4-C              0.019782         12.0110
+         7-O                 7-O              0.033898         15.9990
+
+ Root Mean Square Distance :                  0.032030

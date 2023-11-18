@@ -1,0 +1,5 @@
+$constrain
+ force constant=5.0
+  dihedral: 1,2,3,4,150.01186192016215
+  dihedral: 2,3,4,7,359.9972247104197
+$end

@@ -1,0 +1,18 @@
+molecule { 
+0 1
+O 0.000978601539 0.066556122324 0.0
+H 0.755429558873 -0.540910345372 0.0
+H -0.770887182219 -0.51862374951 0.0
+no_reorient
+}
+memory 209GB
+set_num_threads(51)
+psi4_io.set_default_path("/scratch/liuchw/Psi4-water_3D")
+set freeze_core True
+set PROPERTIES_ORIGIN ["COM"]
+set cubeprop_tasks ['esp']
+set basis 6-311G** 
+E, wfn = properties('mp2',properties=['dipole'],return_wfn=True)
+cubeprop(wfn)
+fchk(wfn, "water_3D-dma.fchk")
+clean()

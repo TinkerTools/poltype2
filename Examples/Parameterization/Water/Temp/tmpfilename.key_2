@@ -1,0 +1,68 @@
+parameters /home/liuchw/poltype-latest/ParameterFiles/amoebabio18_header.prm
+OPENMP-THREADS 51
+digits 8
+RESP-WEIGHT 1
+
+atom          401    401    O     "water_3D            "         8    15.999    2
+atom          402    402    H     "water_3D            "         1     1.008    1
+
+# amoeba09 matching SMARTS from molecule  [['[#8](-[H])-[H]', [1]]] to SMARTS from parameter file [['[#8](-[H])(-[H])', [1]]] with tinker type descriptions [[('O', '"Water O"')]]
+# [401] = [[1]]
+vdw   401   3.4050   0.1100
+
+# amoeba09 matching SMARTS from molecule  [['[#8](-[H])-[H]', [3]]] to SMARTS from parameter file [['[#8](-[H])(-[H])', [3]]] with tinker type descriptions [[('H', '"Water H"')]]
+# [402] = [[2, 3]]
+vdw   402   2.6550   0.0135   0.9100
+
+# amoeba21 comments=HW: H on Water OW: O on Water SMARTS match = [H][OH2] [OH2]
+# [402, 401] = [[2, 3], [1]]
+bond   402   401   368.2827   0.97
+
+# amoeba21 comments=HW: H on Water OW: O on Water HW: H on Water SMARTS match = [H][OH2] [OH2] [H][OH2]
+# [402, 401, 402] = [[2, 3], [1], [2, 3]]
+angle   402   401   402   43.46810   103.99
+
+
+# amoeba21 comments=HW: H on Water OW: O on Water HW: H on Water SMARTS match = [H][OH2] [OH2] [H][OH2]
+# [402, 401, 402] = [[2, 3], [1], [2, 3]]
+strbnd   402   401   402   20.45280   20.45280
+
+#SOLUTE-SMARTS 402 [#1]([O;D2;H2])
+
+SOLUTE 402 2.574 2.758 2.9054
+
+#SOLUTE-SMARTS 401 [O;D2;H2]
+
+SOLUTE 401 3.1243 2.906 2.7947
+
+
+# amoeba21 comments=O on Water SMARTS match = [OX2H2]
+# [401] = [[1]]
+polarize           401          0.9760     0.3900 402
+# amoeba21 comments=H on Water SMARTS match = [H][OH2]
+# [402] = [[2, 3]]
+polarize           402          0.4280     0.3900 401
+
+#
+# Multipoles from Electrostatic Potential Fitting
+#
+
+# [401] = [[1]]
+multipole   401 -402 -402              -0.38278
+                                        0.00000    0.00000    0.28438
+                                        0.50511
+                                        0.00000   -0.68982
+                                        0.00000    0.00000    0.18471
+# [402] = [[2, 3]]
+multipole   402  401  402               0.19139
+                                       -0.07352    0.00000   -0.10879
+                                       -0.00722
+                                        0.00000   -0.10044
+                                       -0.04021    0.00000    0.10766
+
+#
+# Charge Penetration from Electrostatic Potential Fitting
+#
+
+chgpen           401          0.0000    0.00000
+chgpen           402          0.0000    0.00000

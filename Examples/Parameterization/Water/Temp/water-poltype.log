@@ -1,0 +1,413 @@
+Fri Nov 17 17:45:20 2023 Atom Type Classification
+Fri Nov 17 17:45:20 2023 Calling: python "/home/liuchw/poltype-latest/PoltypeModules/lConformerGenerator.py" -i water_3D.mol 
+Fri Nov 17 17:45:21 2023 Running on host: node165.bme.utexas.edu
+Fri Nov 17 17:45:21 2023 QM Geometry Optimization
+Fri Nov 17 17:45:21 2023 Submitting: psi4   --loglevel 30  water_3D-opt_1.psi4 water_3D-opt_1.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+Fri Nov 17 17:45:37 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp/water_3D-opt_1.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+Fri Nov 17 17:45:37 2023 Searching Database
+Fri Nov 17 17:45:38 2023 Gas Phase Single Point for GDMA
+Fri Nov 17 17:45:38 2023 Submitting: psi4   --loglevel 30  water_3D-dma.psi4 water_3D-dma.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+Fri Nov 17 17:45:42 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp/water_3D-dma.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+Fri Nov 17 17:45:42 2023 Gaussian Distributed Multipole Analysis (GDMA)
+Fri Nov 17 17:45:42 2023 Submitting: /home/liuchw/Softwares/gdma-2.3.3/bin/gdma < water_3D.gdmain > water_3D.gdmaout path = /home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+Fri Nov 17 17:45:42 2023 Local Frame Symmetry Detection
+Fri Nov 17 17:45:42 2023 Define Polarization Groups and Polarization Parameters
+Fri Nov 17 17:45:42 2023 Submitting: poledit.x 1 water_3D.gdmaout "/home/liuchw/poltype-latest/ParameterFiles/amoebabio18_header.prm" < water_3D-peditin.txt path = /home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.10.5   February 2023                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2023               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Global Frame Cartesian Multipole Moments :
+
+ Site:       1         Name:   O         Atomic Number:       8
+
+ Coordinates:            0.000974       0.066737       0.000000
+
+ Charge:                 -0.38278
+ Dipole:                 -0.00502       -0.34376        0.00000
+ Quadrupole:              0.51763
+                         -0.00591        0.11272
+                          0.00000        0.00000       -0.63035
+
+ Site:       2         Name:   H         Atomic Number:       1
+
+ Coordinates:            0.755425      -0.540729       0.000000
+
+ Charge:                  0.19139
+ Dipole:                  0.08544       -0.02418        0.00000
+ Quadrupole:              0.03283
+                         -0.10530        0.04495
+                          0.00000        0.00000       -0.07779
+
+ Site:       3         Name:   H         Atomic Number:       1
+
+ Coordinates:           -0.770891      -0.518442       0.000000
+
+ Charge:                  0.19139
+ Dipole:                 -0.08611       -0.02168        0.00000
+ Quadrupole:              0.03899
+                          0.10548        0.03880
+                          0.00000        0.00000       -0.07779
+
+ Local Frame Definition for Multipole Sites :
+
+     Atom     Name      Axis Type     Z Axis  X Axis  Y Axis
+
+       1      O         Bisector         2       3       0
+       2      H         Z-then-X         1       3       0
+       3      H         Z-then-X         1       2       0
+
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Choose Either the AMOEBA or HIPPO Polarization Model [A] :  
+ Polarizability Parameters for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      O            0.8370         0.3900
+       2      H            0.4960         0.3900
+       3      H            0.4960         0.3900
+
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Atomic Polarizabilities for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      O            0.9760         0.3900
+       2      H            0.4280         0.3900
+       3      H            0.4280         0.3900
+
+ Choose Method for Division into Polarization Groups :
+
+    (1) Put All Atoms in One Polarization Group
+    (2) Separate into Groups at Rotatable Bonds
+    (3) Manual Entry of Bonds Separating Groups
+
+ Enter the Number of the Desired Choice [1] :  
+ Polarization Groups for Multipole Sites :
+
+     Atom     Name       Polarization Group Definition
+
+       1      O               2     3
+       2      H               1
+       3      H               1
+
+ Electrostatic and Polarization Scale Factors :
+
+                    1-2         1-3         1-4         1-5
+
+ M-Scale:         0.0000      0.0000      0.4000      0.8000
+ P-Inter:         0.0000      0.0000      1.0000      1.0000
+ P-Intra:         0.0000      0.0000      0.5000      1.0000
+ W-Scale:         1.0000      1.0000      1.0000      1.0000
+
+                    1-1         1-2         1-3         1-4
+
+ D-Scale:         0.0000      1.0000      1.0000      1.0000
+ U-Scale:         1.0000      1.0000      1.0000      1.0000
+
+ Use Thole Damping:           True
+ Charge Penetration:          False
+ Set D Equal to P:            False
+
+ Determination of Intergroup Induced Dipoles :
+
+    Iter        RMS Change (Debye)
+
+       1           0.0000000000
+
+ Local Frame Intergroup Induced Dipole Moments (Debye) :
+
+    Atom              X           Y           Z         Total
+
+       1           0.0000      0.0000     -0.0000      0.0000
+       2          -0.0000      0.0000      0.0000      0.0000
+       3           0.0000      0.0000      0.0000      0.0000
+
+ Condense Symmetric Atoms to Equivalent Types [Y] :  
+ Remove Multipole Components Zeroed by Symmetry [Y] :  
+ Final Atomic Multipole Moments after Regularization :
+
+ Atom:       1         Name:   O         Atomic Number:       8
+
+ Local Frame:            Bisector             2       3       0
+
+ Charge:                 -0.38278
+ Dipole:                  0.00000        0.00000        0.34380
+ Quadrupole:              0.51772
+                          0.00000       -0.63035
+                          0.00000        0.00000        0.11263
+
+ Atom:       2         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             1       3       0
+
+ Charge:                  0.19139
+ Dipole:                 -0.03475        0.00000       -0.08172
+ Quadrupole:             -0.06269
+                          0.00000       -0.07779
+                         -0.02839        0.00000        0.14048
+
+ Atom:       3         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             1       2       0
+
+ Charge:                  0.19139
+ Dipole:                 -0.03475        0.00000       -0.08172
+ Quadrupole:             -0.06269
+                          0.00000       -0.07779
+                         -0.02839        0.00000        0.14048
+Fri Nov 17 17:45:42 2023 Submitting: potential.x 1 water_3D.xyz -k water_3D_prefitmultipole.key path = /home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.10.5   February 2023                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2023               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+        1     1     O     water_3D                     8     15.999     2
+        2     2     H     water_3D                     1      1.008     1
+        3     3     H     water_3D                     1      1.008     1
+
+ Electrostatic Potential Grid Points :                  4348
+
+ Gaussian CUBEGEN Input Written To :   water_3D.grid
+
+ Next, run the Gaussian CUBEGEN program; for example:
+
+ cubegen 0 potential=MP2 FILE.fchk FILE.cube -5 h < FILE.grid
+
+ Replace FILE with base file name and MP2 with density label;
+ After CUBEGEN, rerun Tinker POTENTIAL program using Option 2
+Fri Nov 17 17:45:42 2023 Gas Phase High Level Single Point for Multipole Refinement
+Fri Nov 17 17:45:42 2023 Submitting: psi4   --loglevel 30  water_3D-esp.psi4 water_3D-esp.log path = /home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+Fri Nov 17 17:45:51 2023 Normal termination: logfile=/home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp/water_3D-esp.log path=/home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+Fri Nov 17 17:45:52 2023 Calling: Generating CUBE File from PSI4
+Fri Nov 17 17:45:52 2023 Submitting: potential.x 2 water_3D_fortinker.cube path = /home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.10.5   February 2023                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2023               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Electrostatic Potential Written To :  water_3D_fortinker.pot
+Fri Nov 17 17:45:52 2023 Average Multipoles Via Symmetry
+Fri Nov 17 17:45:52 2023 Submitting: "/home/liuchw/poltype-latest/PoltypeModules/avgmpoles.pl" water_3D_prefitmultipole.key water_3D.xyz water_3D-groups.txt water_3D.key_2 water_3D.xyz_2 401 path = /home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+Fri Nov 17 17:45:54 2023 Electrostatic Potential Optimization
+Fri Nov 17 17:45:54 2023 Submitting: potential.x 6 combined.xyz -k water_3D.key_2 combined.pot N 0.1 path = /home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.10.5   February 2023                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2023               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      401   401     O     water_3D                     8     15.999     2
+      402   402     H     water_3D                     1      1.008     1
+
+ Electrostatic Potential Grid Points :                  4348
+
+ Electrostatic Parameter Restraint Value :            1.0000
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      401   401     O     water_3D                     8     15.999     2
+      402   402     H     water_3D                     1      1.008     1
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         401      402    402      0   Bisector    -0.38278
+                                                   0.00000  0.00000  0.34380
+                                                   0.51772
+                                                   0.00000 -0.63035
+                                                   0.00000  0.00000  0.11263
+
+         402      401    402      0   Z-then-X     0.19139
+                                                  -0.03475  0.00000 -0.08172
+                                                  -0.06269
+                                                   0.00000 -0.07779
+                                                  -0.02839  0.00000  0.14048
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         401             0.976       0.390         402
+         402             0.428       0.390         401
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1        1848        -8.2108        -7.6597         1.0945
+        1        2        1251         5.9535         5.5643         0.8716
+        1        3        1249         5.9547         5.5672         0.8724
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.0663
+ Average Potential Magnitude for Model :              7.2231
+ Average Potential Value for Target :                -0.0554
+ Average Potential Magnitude for Target :             6.6483
+
+ Average Signed Potential Difference :               -0.0109
+ Average Unsigned Potential Difference :              0.8210
+ Root Mean Square Potential Difference :              0.9728
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter     Atom Type/Class      Category          Value         Fixed
+
+    --            401 Type          Monopole        -0.38278          X
+    --            401 Type          X-Dipole         0.00000          X
+    --            401 Type          Y-Dipole         0.00000          X
+     1            401 Type          Z-Dipole         0.34380
+     2            401 Type          XX-Quad          0.51772
+    --            401 Type          XY-Quad          0.00000          X
+    --            401 Type          XZ-Quad          0.00000          X
+     3            401 Type          YY-Quad         -0.63035
+    --            401 Type          YZ-Quad          0.00000          X
+    --            401 Type          ZZ-Quad          0.11263
+    --            402 Type          Monopole         0.19139          X
+     4            402 Type          X-Dipole        -0.03475
+    --            402 Type          Y-Dipole         0.00000          X
+     5            402 Type          Z-Dipole        -0.08172
+     6            402 Type          XX-Quad         -0.06269
+    --            402 Type          XY-Quad          0.00000          X
+     7            402 Type          XZ-Quad         -0.02839
+     8            402 Type          YY-Quad         -0.07779
+    --            402 Type          YZ-Quad          0.00000          X
+    --            402 Type          ZZ-Quad          0.14048
+
+ Levenberg-Marquardt Nonlinear Least Squares :
+
+ LS Iter     F Value      Total G     Active G    N Active   F Calls
+
+     0     2057.4944    4967.6160    4967.6160         8         9
+     1       98.2712     647.4516     647.4516         8        18
+     2       29.0732       0.0000       0.0000         8        27
+
+ SQUARE  --  Normal Termination of Least Squares
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter     Atom Type/Class      Category          Value         Fixed
+
+    --            401 Type          Monopole        -0.38278          X
+    --            401 Type          X-Dipole         0.00000          X
+    --            401 Type          Y-Dipole         0.00000          X
+     1            401 Type          Z-Dipole         0.28438
+     2            401 Type          XX-Quad          0.50511
+    --            401 Type          XY-Quad          0.00000          X
+    --            401 Type          XZ-Quad          0.00000          X
+     3            401 Type          YY-Quad         -0.68982
+    --            401 Type          YZ-Quad          0.00000          X
+    --            401 Type          ZZ-Quad          0.18471
+    --            402 Type          Monopole         0.19139          X
+     4            402 Type          X-Dipole        -0.07352
+    --            402 Type          Y-Dipole         0.00000          X
+     5            402 Type          Z-Dipole        -0.10879
+     6            402 Type          XX-Quad         -0.00722
+    --            402 Type          XY-Quad          0.00000          X
+     7            402 Type          XZ-Quad         -0.04021
+     8            402 Type          YY-Quad         -0.10044
+    --            402 Type          YZ-Quad          0.00000          X
+    --            402 Type          ZZ-Quad          0.10766
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1        1848        -7.6700        -7.6597         0.0691
+        1        2        1251         5.5212         5.5643         0.0765
+        1        3        1249         5.5240         5.5672         0.0765
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.0846
+ Average Potential Magnitude for Model :              6.6344
+ Average Potential Value for Target :                -0.0554
+ Average Potential Magnitude for Target :             6.6483
+
+ Average Signed Potential Difference :               -0.0292
+ Average Unsigned Potential Difference :              0.0516
+ Root Mean Square Potential Difference :              0.0734
+Fri Nov 17 17:45:54 2023 Submitting: minimize.x testbondangleequilvalues.xyz -k testbondangleequilvalues.key 0.1 > testbondangleequilvalues.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+Fri Nov 17 17:45:55 2023 Submitting: analyze.x testbondangleequilvalues.xyz_2 -k testbondangleequilvalues.key  d > testbondangleequilvaluesalz.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+Fri Nov 17 17:45:55 2023 Assign Vdw and bonded parameters using DatabaseParser
+Fri Nov 17 17:45:55 2023 Submitting: python /home/liuchw/poltype-latest/PoltypeModules/lDatabaseParser/lAssignAMOEBAplusPRM.py -xyz tmpfilename.xyz -key tmpfilename.key -potent BONDED VDW path = /home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+[92mBOND stretching parameter (newly generated) assigned for bond 402-401[0m
+[92mANGLE bending parameter (newly generated) assigned for angle 402-401-402[0m
+[92mSTRBND coupling parameter (newly generated) assigned for angle 402-401-402[0m
+[92mVdW parameters found for 401[0m
+[92mVdW parameters found for 402[0m
+Fri Nov 17 17:45:56 2023 
+Fri Nov 17 17:45:56 2023 =========================================================
+Fri Nov 17 17:45:56 2023 Minimizing structure
+
+Fri Nov 17 17:45:56 2023 Submitting: minimize.x -k final.key final.xyz 0.1 > Minimized_final.out path = /home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+Fri Nov 17 17:45:56 2023 
+
+Fri Nov 17 17:45:56 2023 =========================================================
+
+Fri Nov 17 17:45:56 2023 Structure RMSD Comparison
+
+
+Fri Nov 17 17:45:56 2023 Submitting: superpose.x water_3D.xyz_2 final.xyz_2 1 N M N 0  > water_3D-superin.txt path = /home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+Fri Nov 17 17:45:57 2023 RMSD = 0.000000 Tolerance is 1
+Fri Nov 17 17:45:57 2023 Submitting: analyze.x water_3D.xyz_2 -k final.key em | grep -A11 Charge>MMDipole.txt path = /home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+Fri Nov 17 17:45:57 2023 Relative error of 0.0 for QMDipole 1.865 and 1.865 for MMDipole  tolerance = 0.5 /home/liuchw/poltype-latest/Examples/Parameterization/r1/Temp
+Fri Nov 17 17:45:57 2023 Poltype Job Finished
+

@@ -1,0 +1,19 @@
+    1   401   401 C(=O)_C=O     # #Formaldehyde C=O
+    2   402   402    N*     # #N*, wild aliphatic Nitrogen
+    3   403   403 benz_C     # #Benzene C
+    4   404   404 benz_C     # #Benzene C
+    5   405   405 CX4H3     # #Alkane CH3-
+    6   404   404 benz_C     # #Benzene C
+    7   406   406 benz_C     # #Benzene C
+    8   407   407 benz_C     # #Benzene C
+    9   406   406 benz_C     # #Benzene C
+   10   409   409 benz_HC     # #Benzene HC
+   11   409   409 benz_HC     # #Benzene HC
+   12   408   408 C(=O)_O=C     # #Formaldehyde O=C
+   13   410   410  HCH3     # #Methane H4C
+   14   410   410  HCH3     # #Methane H4C
+   15   410   410  HCH3     # #Methane H4C
+   16   411   411 benz_HC     # #Benzene HC
+   17   411   411 benz_HC     # #Benzene HC
+   18   412   412 benz_HC     # #Benzene HC
+   19   413   413 C(=O)_HC=O     # #Formaldehyde HC=O

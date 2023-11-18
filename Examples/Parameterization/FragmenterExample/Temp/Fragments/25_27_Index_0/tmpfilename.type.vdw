@@ -1,0 +1,11 @@
+    1   401   401 CC(=O)N_N     # #Acetamide N
+    2   402   402 CC(=O)N_C=O     # #Acetamide C=O
+    3   403   403 CX4H2     # #Alkane -CH2-
+    4   404   404 CCNH2_N     # #Ethyl Amine N
+    5   405   405 CC(=O)N_O     # #Acetamide O
+    6   406   406 CC(=O)N_H3C     # #Acetamide H3C
+    7   406   406 CC(=O)N_H3C     # #Acetamide H3C
+    8   407   407   H3N     # #Ammonia H3N
+    9   407   407   H3N     # #Ammonia H3N
+   10   408   408   H3N     # #Ammonia H3N
+   11   408   408   H3N     # #Ammonia H3N

@@ -1,0 +1,24 @@
+    1   401   401 benzamidine_N     # #Benzamidine N
+    2   402   402 toluene_CH3     # #Toluene CH3
+    3   403   403 toluene_C1-CH3     # #Toluene C1-CH3
+    4   404   404 toluene_C2     # #Toluene C2
+    5   405   405 CC(=O)NC_CH3-C     # #NMeAcetamide CH3-C
+    6   404   404 toluene_C2     # #Toluene C2
+    7   413   413 benzamidine_HN     # #Benzamidine HN
+    8   406   406    C*     # #C*, wild matching Carbon
+    9   407   407 Nr5-C_N     # #NMePyrrolidine N
+   10   408   408 CC(=O)NC_C=O     # #NMeAcetamide C=O
+   11   409   409 CC(=O)NC_CH3-N     # #NMeAcetamide CH3-N
+   12   410   410 toluene_C3     # #Toluene C3
+   13   410   410 toluene_C3     # #Toluene C3
+   14   411   411 toluene_C4     # #Toluene C4
+   15   414   414 toluene_H2     # #Toluene H2
+   16   414   414 toluene_H2     # #Toluene H2
+   17   415   415 H-Nring     # #Hydrogen linked with nitrogen on ring (Changsheng Paper) 
+   18   412   412 CC(=O)NC_O     # #NMeAcetamide O
+   19   416   416 toluene_H3     # #Toluene H3
+   20   416   416 toluene_H3     # #Toluene H3
+   21   417   417 toluene_H4     # #Toluene H4
+   22   418   418   HC*     # #H*, wild matching Hydrogen
+   23   419   419 CC(=O)NC_H3C-N     # #NMeAcetamide H3C-N
+   24   413   413 benzamidine_HN     # #Benzamidine HN

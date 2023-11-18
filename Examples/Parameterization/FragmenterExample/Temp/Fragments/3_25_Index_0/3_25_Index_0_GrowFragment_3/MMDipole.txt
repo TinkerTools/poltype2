@@ -1,0 +1,25 @@
+ Additional Charge Penetration Parameters :
+
+     Atom Class           Core Chg           Damp
+
+         401                 0.000         0.0000
+         402                 0.000         0.0000
+         403                 0.000         0.0000
+         404                 0.000         0.0000
+         405                 0.000         0.0000
+         406                 0.000         0.0000
+         407                 0.000         0.0000
+         408                 0.000         0.0000
+--
+ Total Electric Charge :                 -0.00000 Electrons
+
+ Dipole Moment Magnitude :                  3.248 Debye
+
+ Dipole X,Y,Z-Components :                 -1.971       -1.776        1.874
+
+ Quadrupole Moment Tensor :                -8.055       -5.489       -1.770
+      (Buckinghams)                        -5.489       -1.529        0.820
+                                           -1.770        0.820        9.585
+
+ Principal Axes Quadrupole :              -11.240        1.293        9.947
+

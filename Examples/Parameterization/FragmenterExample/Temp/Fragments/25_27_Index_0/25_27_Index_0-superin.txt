@@ -1,0 +1,65 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.10.5   February 2023                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2023               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      401   401     N     25_27_Index_0                7     14.007     3
+      402   402     C     25_27_Index_0                6     12.011     3
+      403   403     C     25_27_Index_0                6     12.011     4
+      404   404     N     25_27_Index_0                7     14.007     3
+      405   405     O     25_27_Index_0                8     15.999     1
+      406   406     H     25_27_Index_0                1      1.008     1
+      407   407     H     25_27_Index_0                1      1.008     1
+      408   408     H     25_27_Index_0                1      1.008     1
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      401   401     N     25_27_Index_0                7     14.007     3
+      402   402     C     25_27_Index_0                6     12.011     3
+      403   403     C     25_27_Index_0                6     12.011     4
+      404   404     N     25_27_Index_0                7     14.007     3
+      405   405     O     25_27_Index_0                8     15.999     1
+      406   406     H     25_27_Index_0                1      1.008     1
+      407   407     H     25_27_Index_0                1      1.008     1
+      408   408     H     25_27_Index_0                1      1.008     1
+
+ Structure File 1 :  25_27_Index_0.xyz_2
+
+ Structure File 2 :  final.xyz_2
+
+ File 1 Frame :     1             File 2 Frame :     1
+
+ Summary of Results from Structural Superposition :
+
+ IMPOSE  --  Input Coordinates                0.120611
+ IMPOSE  --  After Translation                0.107799
+ IMPOSE  --  After Rotation                   0.077577
+
+ Root Mean Square Distance :                  0.077577        1      1
+
+   Atom in the         Atom in the            Distance          Weight
+ First Structure     Second Structure        Separated          in Fit
+
+         1-N                 1-N              0.078871         14.0070
+         2-C                 2-C              0.028978         12.0110
+         3-C                 3-C              0.115387         12.0110
+         4-N                 4-N              0.096927         14.0070
+         5-O                 5-O              0.035983         15.9990
+
+ Root Mean Square Distance :                  0.077577
