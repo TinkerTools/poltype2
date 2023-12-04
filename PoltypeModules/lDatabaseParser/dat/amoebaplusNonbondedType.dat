@@ -61,15 +61,18 @@
 [O]=[C][N]                             	  O=CN            # O of amide
 
 # Halogen
-[C][F]                                    CF              # C connecting 1F
-[C](C)[F]                                 C(C)F           # C connecting 1F & 1C
 [F][C]                                    FC              # F connecting C
-[C][Cl]                                   CCl             # C connecting 1Cl
-[C](C)[Cl]                                C(C)Cl          # C connecting 1Cl & 1C
+[C][F]                                    CF              # C connecting F
+[H][C][F]                                 HCF             # H connecting CF
 [Cl][C]                                   ClC             # Cl connecting C
-[C][Br]                                   CBr             # C connecting 1Br
-[C](C)[Br]                                C(C)Br          # C connecting 1Br & 1C
+[C][Cl]                                   CCl             # C connecting Cl
+[H][C][Cl]                                HCCl            # H connecting CCl
 [Br][C]                                   BrC             # Br connecting C
+[C][Br]                                   CBr             # C connecting Br
+[H][C][Br]                                HCBr            # H connecting CBr
+[I][C]                                    IC              # I connecting C
+[C][I]                                    CI              # C connecting I
+[H][C][I]                                 HCI             # H connecting CI
 
 # Sulfur
 [S][C]                                    SC              # S connecting 1C
