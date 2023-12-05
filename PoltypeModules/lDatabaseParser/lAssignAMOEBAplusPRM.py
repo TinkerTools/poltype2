@@ -201,8 +201,14 @@ def genAtomType(txyz, key, potent):
 
 def assignPolar():
   genAtomType(xyz, key, 'POLAR')
-  types, polars = np.loadtxt(os.path.join(prmfiledir,"polarize.prm"), usecols=(0,1), unpack=True, dtype="str")
+  types, polars = [], []
+  lines = open(os.path.join(prmfiledir,"amoeba_and_amoebaplus_polarize.prm")).readlines()
+  for line in lines:
+    dd = line.split()
+    types.append(dd[1])
+    polars.append(dd[2])
   smartspolarDict = dict(zip(types, polars))
+  
   ttypes, stypes = np.loadtxt(f"{fname}.type.polar", usecols=(1,3), unpack=True, dtype="str")
   tinkerpolarDict = {}
   for t,s in zip(ttypes, stypes): 

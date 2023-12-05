@@ -1,27 +1,27 @@
 # smartsString 																	                                                 typeName     		 # comments
-[C]                        					                                                             Cother            # Other    C
-[C]#[X]                                                                                          Csp               # sp       C 
+[$([C])]                                  					                                                             Cother            # Other    C
+[$([C]#[X])]                                                                                                    Csp               # sp       C 
 [$([cX3](:*):*),$([cX2+](:*):*),$([CX3]=*),$([CX2+]=*)]                                          Csp2              # sp2      C
-[c]                                                                                              Car               # aromatic C
-[N]                        					                                                             Nother            # Other    N 
-[NX1]                        					                                                           Nsp               # sp       N
+[$([c])]                                                                                                        Car               # aromatic C
+[$([N])]                                  					                                                             Nother            # Other    N 
+[$([NX1])]                                  					                                                           Nsp               # sp       N
 [$([nX3](:*):*),$([nX2](:*):*),$([#7X2]=*),$([NX3](=*)=*),$([#7X3+](-*)=*),$([#7X3+H]=*)]        Nsp2              # sp2      N 
-[n]                                                                                              Nar               # aromatic N 
-[O]                        					            																					       Oother            # Other    O 
-[O]=[C,P,S,N]                                                                                    Osp2              # sp2      O 
-[o]                        					            																					       Oar               # aromatic O 
-[S]                                           																							     Sother            # Other S 
-[S]=[O,C]                                        																							   S=X               # S double bond 
-[s]                                                                                              Sar               # aromatic S
-[H][A]                        																																	 Hother            # Other H 
-[F][A]                        																																	 Fother            # Other F 
-[Cl][A]                       																																	 Clother           # Other Cl
-[Br][A]                       																																	 Brother           # Other Br
-[I][A]                        																																	 Iother    	       # Other I 
-[H][a]                        																																	 Har               # Aromatic H 
-[F][a]                        																																	 Far               # Aromatic F 
-[Cl][a]                       																																	 Clar              # Aromatic Cl
-[Br][a]                       																																	 Brar              # Aromatic Br
-[I][a]                        																																	 Iar       	 	     # Aromatic I 
-[P]                                           																							     PwH               # P with H 
-[PH0]                                           																							   PwoH              # P with heavy atoms
+[$([n])]                                                                                                        Nar               # aromatic N 
+[$([O])]                                  					            																					       Oother            # Other    O 
+[$([O]=[C,P,S,N])]                                                                                              Osp2              # sp2      O 
+[$([o])]                                  					            																					       Oar               # aromatic O 
+[$([S])]                                                     																							     Sother            # Other S 
+[$([S]=[O,C])]                                                  																							   S=X               # S double bond 
+[$([s])]                                                                                                        Sar               # aromatic S
+[$([H][A])]                                  																																	 Hother            # Other H 
+[$([F][A])]                                  																																	 Fother            # Other F 
+[$([Cl][A])]                                 																																	 Clother           # Other Cl
+[$([Br][A])]                                 																																	 Brother           # Other Br
+[$([I][A])]                                  																																	 Iother    	       # Other I 
+[$([H][a])]                                  																																	 Har               # Aromatic H 
+[$([F][a])]                                  																																	 Far               # Aromatic F 
+[$([Cl][a])]                                 																																	 Clar              # Aromatic Cl
+[$([Br][a])]                                 																																	 Brar              # Aromatic Br
+[$([I][a])]                                  																																	 Iar       	 	     # Aromatic I 
+[$([P])]                                                     																							     PwH               # P with H 
+[$([PH0])]                                                     																							   PwoH              # P with heavy atoms
