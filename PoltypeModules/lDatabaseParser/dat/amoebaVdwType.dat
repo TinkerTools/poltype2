@@ -106,6 +106,22 @@
 [$([C][SH1])]          				CSH_CH3			# Methyl Sulfide CH3
 [$([C][C][c])]          				ethylbenz_CH3		# Ethylbenzene CH3
 [$([C][O][C])]          				Me-Ether_C		# Methyl Ether CH3
+[$([C]([F])([F])([F])([F]))]     			 CF4    # Carbon on CF4 
+[$([C]([Cl])([Cl])([Cl])([Cl]))] 			 CCl4   # Carbon on CCl4 
+[$([C]([Br])([Br])([Br])([Br]))] 			 CBr4   # Carbon on CBr4 
+[$([C]([I])([I])([I])([I]))]     			 CI4    # Carbon on CI4 
+[$([C]([F])([F])([F])([#1]))] 	 			 CF3    # Carbon on CHF3 
+[$([C]([Cl])([Cl])([Cl])([#1]))] 			 CCl3   # Carbon on CHCl3 
+[$([C]([Br])([Br])([Br])([#1]))] 			 CBr3   # Carbon on CHBr3 
+[$([C]([I])([I])([I])([#1]))]    			 CI3    # Carbon on CHI3 
+[$([C]([F])([F])([#1])([#1]))] 	 			 CF2    # Carbon on CH2F2 
+[$([C]([Cl])([Cl])([#1])([#1]))] 			 CCl2   # Carbon on CH2Cl2 
+[$([C]([Br])([Br])([#1])([#1]))] 			 CBr2   # Carbon on CH2Br2 
+[$([C]([I])([I])([#1])([#1]))]   			 CI2    # Carbon on CH2I2 
+[$([C]([F])([#1])([#1])([#1]))]  			 CF1    # Carbon on CH3F 
+[$([C]([Cl])([#1])([#1])([#1]))] 			 CCl1   # Carbon on CH3Cl 
+[$([C]([Br])([#1])([#1])([#1]))] 			 CBr1   # Carbon on CH3Br 
+[$([C]([I])([#1])([#1])([#1]))]  			 CI1    # Carbon on CH3I 
 [$([C][S][C])]          				CSC_CH3			# Dimethyl Sulfide CH3
 [$([C]c1ncnc1)]          				4ethyl_imidazole_CH2	# 4-Ethylimidazole CH2 general
 [$([C][C]#[N])]          				CCN_CH3			# Acetonitrile CH3
