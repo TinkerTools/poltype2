@@ -213,7 +213,6 @@ for idx in allAtomsInFusedRing:
             atomsToRemove.append(neig_h) 
 
 atomsToRemove = list(set(atomsToRemove))
-
 # clean up the isolated atoms
 for atom in atomsToRemove:
   if atom in g.nodes:
@@ -223,6 +222,12 @@ frags = nx.connected_components(g)
 for m in frags:
   if not set(torsion_idx_list).issubset(list(m)):
     atomsToRemove += list(m)
+
+# final safety check
+for idx in torsion_idx_list:
+  if idx in atomsToRemove:
+    atomsToRemove = []
+    break
 
 emol = Chem.EditableMol(mol)
 atomsToRemove.sort(reverse=True)
@@ -234,7 +239,6 @@ Chem.SanitizeMol(mol2)
 mol2h = Chem.AddHs(mol2,addCoords=True)
 Chem.Kekulize(mol2h)
 Chem.SanitizeMol(mol2h)
-
 # neutralize COO- to COOH
 pattern = Chem.MolFromSmarts('[O-][C](=O)')
 matches_1 = mol2.GetSubstructMatches(pattern)
