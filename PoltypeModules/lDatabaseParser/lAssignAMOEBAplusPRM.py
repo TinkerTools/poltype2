@@ -155,7 +155,15 @@ def genAtomType(txyz, key, potent):
         type_class_dict[d[1]] = d[2]
   for a,t in zip(atomnumbers, types):
     atom_class_dict[a] = type_class_dict[t]
-  for mol in pybel.readfile('txyz',txyz):
+  if sdf != None:
+    inpfile = sdf
+    inpformat = 'sdf'
+    print(f"{YELLOW}Using SDF file to determine SMARTS types {ENDC}")
+  else:
+    inpfile = txyz
+    inpformat = 'txyz'
+    print(f"{YELLOW}Using tinker XYZ file to determine SMARTS types {ENDC}")
+  for mol in pybel.readfile(inpformat,inpfile):
     matchDict = {}
     matchList = []
     commentsDict = {} 
@@ -724,14 +732,16 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument('-xyz', dest = 'xyz', help = "tinker xyz file", required=True)  
   parser.add_argument('-key', dest = 'key', help = "tinker prm file", default=None)  
+  parser.add_argument('-sdf', dest = 'sdf', help = "sdf file [optional]", default=None)  
   parser.add_argument('-potent', dest = 'potent', help = "potential energy terms", nargs='+', type=str.upper, default=[])  
   parser.add_argument('-fitting', dest = 'fitting', help = "fit the frequencies if new parameters are needed", default="NO", type=str.upper, choices=["YES", "NO"])
   parser.add_argument('-new_para', dest = 'new_para', help = "method to generate the new valence parameters", default="DATABASE", type=str.upper, choices=["HESSIAN", "DATABASE"])  
   parser.add_argument('-konly', dest = 'konly', help = "assign force constant only for valence parameters", default="YES", type=str.upper, choices=["YES", "NO"])  
   args = vars(parser.parse_args())
-  global xyz, key
+  global xyz, key, sdf
   xyz = args["xyz"]
   key = args["key"]
+  sdf = args["sdf"]
   if key == None:
     write_tmp_key(xyz)
     key = xyz.split('.')[0] + '.key'

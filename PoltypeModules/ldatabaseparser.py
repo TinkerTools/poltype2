@@ -11,7 +11,7 @@ def assign_vdw_and_bonded(poltype):
     tmpkey = 'tmpfilename.key'
     shutil.copy(poltype.key4fname, tmpkey)
     shutil.copy(poltype.xyzoutfile, tmpxyz)
-    cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -potent BONDED VDW'
+    cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent BONDED VDW'
     poltype.call_subsystem([cmd], True)
     
     tmpkey_b = 'tmpfilename.key_bonded'
