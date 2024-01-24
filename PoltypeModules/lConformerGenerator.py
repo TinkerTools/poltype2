@@ -107,6 +107,17 @@ if __name__ == "__main__":
   outputfile = args['outputfile']
   inputformat = args['inputformat']
 
+  # check if molecule is 2D
+  if inputformat == "SDF":
+    coords_z = []
+    lines = open(inputfile).readlines()
+    for line in lines:
+      ss = line.split()
+      if len(ss) == 16:
+        coords_z.append(float(ss[2]))
+    if (all(coords_z) == 0):
+      os.system(f"obabel {inputfile} -O {inputfile} --gen3d")
+
   if inputformat == 'MOL2':
     m1 = Chem.MolFromMol2File(inputfile,removeHs=False)
   else: 
@@ -193,3 +204,13 @@ if __name__ == "__main__":
       highest_sasa = sasa
       extended_conf = idx
   rdmolfiles.MolToMolFile(m1, outputfile, confId=extended_conf) 
+# check if molecule is 2D
+if inputformat == "SDF":
+  coords_z = []
+  lines = open(outputfile).readlines()
+  for line in lines:
+    ss = line.split()
+    if len(ss) == 16:
+      coords_z.append(float(ss[2]))
+  if (all(coords_z) == 0):
+    os.system(f"obabel {outputfile} -O {outputfile} --gen3d")
