@@ -11,20 +11,20 @@
 #
 
 # Wild matching
-[$([H][*])]                                                   1     1         H* #          H*, wild matching Hydrogen
-[$([C][*])]                                                   2     2         C* #          C*, wild matching Carbon
-[$([c][*])]                                                   3     3         c* #          c*, wild matching Carbon (aromatic)
-[$([N][*])]                                                   4     4         N* #          N*, wild matching Nitrogen
-[$([n][*])]                                                   5     5         n* #          N*, wild matching Nitrogen (aromatic)
-[$([O][*])]                                                   6     6         O* #          O*, wild matching Oxygen
-[$([o][*])]                                                   7     7         o* #          o*, wild matching oxygen (aromatic)
-[$([P][*])]                                                   8     8         P* #          P*, wild matching Phosphor
-[$([S][*])]                                                   9     9         S* #          S*, wild matching Sulphur 
-[$([s][*])]                                                  10    10         s* #          s*, wild matching sulphur (aromatic)
-[$([F][*])]                                                  11    11          F #          F*, wild matching Fluorine
-[$([Cl][*])]                                                 12    12         Cl #         Cl*, wild matching Chlorine
-[$([Br][*])]                                                 13    13         Br #         Br*, wild matching Bromine
-[$([I][*])]                                                  14    14          I #         I*, wild matching Iodine
+[$([H])]                                                   1     1         H* #          H*, wild matching Hydrogen
+[$([C])]                                                   2     2         C* #          C*, wild matching Carbon
+[$([c])]                                                   3     3         c* #          c*, wild matching Carbon (aromatic)
+[$([N])]                                                   4     4         N* #          N*, wild matching Nitrogen
+[$([n])]                                                   5     5         n* #          N*, wild matching Nitrogen (aromatic)
+[$([O])]                                                   6     6         O* #          O*, wild matching Oxygen
+[$([o])]                                                   7     7         o* #          o*, wild matching oxygen (aromatic)
+[$([P])]                                                   8     8         P* #          P*, wild matching Phosphor
+[$([S])]                                                  9     9         S* #          S*, wild matching Sulphur 
+[$([s])]                                                  10    10         s* #          s*, wild matching sulphur (aromatic)
+[$([F])]                                                  11    11          F #          F*, wild matching Fluorine
+[$([Cl])]                                                 12    12         Cl #         Cl*, wild matching Chlorine
+[$([Br])]                                                 13    13         Br #         Br*, wild matching Bromine
+[$([I])]                                                  14    14          I #         I*, wild matching Iodine
 
 # Water(reserved)
 [$([OH2])]                                                           15    15         OW #         OW: O on Water 

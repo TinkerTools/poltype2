@@ -265,10 +265,10 @@ def assignVdwAMOEBA():
 
 def assignNonbondedAMOEBAplus():
   genAtomType(xyz, key, 'NONBONDED')
-  types = np.loadtxt(os.path.join(prmfiledir,"nonbonded.prm"), usecols=(0,), unpack=True, dtype="str",skiprows=2)
-  cpalphas, cpnucs = np.loadtxt(os.path.join(prmfiledir,"nonbonded.prm"), usecols=(1,2), unpack=True, dtype="float",skiprows=2)
-  ctas, ctbs = np.loadtxt(os.path.join(prmfiledir,"nonbonded.prm"), usecols=(3,4), unpack=True, dtype="float",skiprows=2)
-  vdwrs, vdwes, vdwreds = np.loadtxt(os.path.join(prmfiledir,"nonbonded.prm"), usecols=(5,6,7), unpack=True, dtype="float",skiprows=2)
+  types = np.loadtxt(os.path.join(prmfiledir,"amoebaplusNonbonded.prm"), usecols=(0,), unpack=True, dtype="str",skiprows=2)
+  cpalphas, cpnucs = np.loadtxt(os.path.join(prmfiledir,"amoebaplusNonbonded.prm"), usecols=(1,2), unpack=True, dtype="float",skiprows=2)
+  ctas, ctbs = np.loadtxt(os.path.join(prmfiledir,"amoebaplusNonbonded.prm"), usecols=(3,4), unpack=True, dtype="float",skiprows=2)
+  vdwrs, vdwes, vdwreds = np.loadtxt(os.path.join(prmfiledir,"amoebaplusNonbonded.prm"), usecols=(5,6,7), unpack=True, dtype="float",skiprows=2)
   CP = [[i,j] for i,j in zip(cpalphas, cpnucs)]
   CT = [[i,j] for i,j in zip(ctas, ctbs)]
   VDW = [[i,j,k] for i,j,k in zip(vdwrs, vdwes, vdwreds)]
@@ -277,7 +277,7 @@ def assignNonbondedAMOEBAplus():
   smartsVDWDict = dict(zip(types, VDW))
   # !!! attention, vdw/cp/ct may use atom type/atom class, depending on the tinker code
   # it's correct if atom type == atom class, which is the case for a new molecule derived by poltype
-  ttypes, stypes = np.loadtxt(f"{fname}.type.nonbonded", usecols=(2,3), unpack=True, dtype="str")
+  ttypes, stypes = np.loadtxt(f"{fname}.type.amoebaplusNonbonded", usecols=(2,3), unpack=True, dtype="str")
   tinkerCPDict = {}
   tinkerCTDict = {}
   tinkerVDWDict = {}

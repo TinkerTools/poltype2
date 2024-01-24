@@ -7,6 +7,7 @@
 
 
 forcefield              AMOEBA-PLUS
+
 bond-cubic              -2.55
 bond-quartic            3.793125
 angle-cubic             -0.014
@@ -25,9 +26,12 @@ radiustype              R-MIN
 radiussize              DIAMETER
 epsilonrule             W-H 
 dielectric              1.0
+penetration             GORDON2
+chargetransfer          COMBINED
+d-equals-p
 vdw-12-scale            0.0
 vdw-13-scale            0.0
-vdw-14-scale            0.5 
+vdw-14-scale            0.5
 vdw-15-scale            1.0
 mpole-12-scale          0.0
 mpole-13-scale          0.0
@@ -35,16 +39,29 @@ mpole-14-scale          0.5
 mpole-15-scale          1.0
 polar-12-scale          0.0
 polar-13-scale          0.0
-polar-14-scale          0.5
-polar-15-scale          0.5
+polar-14-scale          1.0
+polar-15-scale          1.0
 polar-12-intra          0.0
 polar-13-intra          0.0
-polar-14-intra          0.0
-polar-15-intra          0.0
+polar-14-intra          0.5
+polar-15-intra          1.0
 mutual-11-scale         1.0
 mutual-12-scale         1.0
 mutual-13-scale         1.0
 mutual-14-scale         1.0
-PENETRATION             GORDON2
-CHARGETRANSFER          COMBINED
-D-EQUALS-P
+
+
+      #############################
+      ##                         ##
+      ##  Literature References  ##
+      ##                         ##
+      #############################
+
+
+C. Liu, J.-P. Piquemal and P. Ren, "AMOEBA+ Classical Potential for
+Modeling Molecular Interactions", J. Chem. Theory Comput., 15, 4122-4139
+(2019)
+
+C. Liu, J.-P. Piquemal and P. Ren, Implementation of Geometry-Dependent
+Charge Flux into the Polarizable AMOEBA+ Potential, J. Phys. Chem. Lett.,
+11, 419-426 (2020)
