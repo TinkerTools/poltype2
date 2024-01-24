@@ -117,6 +117,7 @@ if __name__ == "__main__":
         coords_z.append(float(ss[2]))
     if (all(coords_z) == 0):
       os.system(f"obabel {inputfile} -O {inputfile} --gen3d")
+      print(f" Converting {inputfile} to 3D")
 
   if inputformat == 'MOL2':
     m1 = Chem.MolFromMol2File(inputfile,removeHs=False)
@@ -214,3 +215,4 @@ if inputformat == "SDF":
       coords_z.append(float(ss[2]))
   if (all(coords_z) == 0):
     os.system(f"obabel {outputfile} -O {outputfile} --gen3d")
+    print(f" Converting {outputfile} to 3D")

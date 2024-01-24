@@ -29,6 +29,18 @@ from rdkit.Chem import AllChem,rdmolfiles,EditableMol,RingInfo
 
 
 sdffile = sys.argv[1]
+
+# check if molecule is 2D
+coords_z = []
+lines = open(sdffile).readlines()
+for line in lines:
+  ss = line.split()
+  if len(ss) == 16:
+    coords_z.append(float(ss[2]))
+if (all(coords_z) == 0):
+  os.system(f"obabel {sdffile} -O {sdffile} --gen3d")
+  print(f" Converting {sdffile} to 3D")
+
 fname = sdffile.split('.sdf')[0]
 
 mol = Chem.MolFromMolFile(sdffile,removeHs=False)

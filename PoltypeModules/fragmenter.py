@@ -2259,6 +2259,19 @@ def GrowFragmentOut(poltype,mol,parentWBOmatrix,indexes,WBOdifference,torset,fra
                 growfragmoltofragfoldername[fragmol]=basename
                 filename=basename+'.mol'
                 WriteRdkitMolToMolFile(poltype,fragmol,filename)
+                
+                # for special fragment that has 2D structure
+                # Chengwen Liu
+                coords_z = []
+                lines = open(filename).readlines()
+                for line in lines:
+                  ss = line.split()
+                  if len(ss) == 16:
+                    coords_z.append(float(ss[2]))
+                if (all(coords_z) == 0):
+                  os.system(f"obabel {filename} -O {filename} --gen3d")
+                  print(f" Converting {filename} to 3D")
+                
                 fragmolbabel=ReadMolFileToOBMol(poltype,filename)
                 WriteOBMolToXYZ(poltype,fragmolbabel,filename.replace('.mol','_xyzformat.xyz'))
                 WriteOBMolToSDF(poltype,fragmolbabel,filename.replace('.mol','.sdf'))
