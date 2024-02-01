@@ -89,7 +89,7 @@ def write_tmp_key(txyz):
             and ([atom2type[y], atom2type[a2], atom2type[a1], atom2type[x]] not in torsions) :
               torsions.append([atom2type[x], atom2type[a1], atom2type[a2], atom2type[y]])
   
-  # find the tri- center
+  # find the tri- center and opbend quad_atoms
   tricentertypes = []
   for mol in pybel.readfile("txyz", txyz):
     natoms = len(mol.atoms)
@@ -724,8 +724,56 @@ def assignBonded(new_para_method, fitting = "NO"):
       for line in fitting_list:
         f.write(line)
     fitting(fname)
+
+  if os.path.isfile(key + "_bonded"):
+    writeExplicitOpbend(key + "_bonded", xyz)
   return True
- 
+
+""" A helper function to write explicit opbend """
+def writeExplicitOpbend(key, xyz):
+  opbend_center = []
+  opbend_params = {}
+  
+  prmlines = open(key).readlines()
+  for line in prmlines:
+    ss = line.split()
+    if len(ss) == 6:
+      if ("opbend " in line) and (ss[3] == '0') and (ss[4] == '0'):
+        opbend_center.append(ss[2])
+        opbend_params[f"{ss[1]}-{ss[2]}"] = f"{float(ss[5]):10.4f}"
+  
+  lines = open(xyz).readlines()
+  atom2type = {}
+  for line in lines[1:]:
+    ss = line.split()
+    atom2type[ss[0]] = ss[5]
+  
+  new_opbend_prmstrings = []
+  for line in lines[1:]:
+    ss = line.split()
+    if (ss[5] in opbend_center) and (len(ss) == 9):
+      atype1 = atom2type[ss[6]] 
+      atype2 = atom2type[ss[7]] 
+      atype3 = atom2type[ss[8]] 
+      comb = atype1 + '-' + ss[5]
+      prmstr = f"opbend {atype1} {ss[5]} {atype2} {atype3} {opbend_params[comb]}"
+      new_opbend_prmstrings.append(prmstr)
+      comb = atype2 + '-' + ss[5]
+      prmstr = f"opbend {atype2} {ss[5]} {atype1} {atype3} {opbend_params[comb]}"
+      new_opbend_prmstrings.append(prmstr)
+      comb = atype3 + '-' + ss[5]
+      prmstr = f"opbend {atype3} {ss[5]} {atype1} {atype2} {opbend_params[comb]}"
+      new_opbend_prmstrings.append(prmstr)
+  
+  # this will be in-place replacement
+  with open(key, 'w') as f:
+    for line in prmlines:
+      if "opbend " not in line:
+        f.write(line)
+    for line in new_opbend_prmstrings:
+      f.write(line + "\n")
+  return
+
 if __name__ == "__main__":
   if len(sys.argv) == 1:
     sys.exit(RED + "please use '-h' option to see usage" + ENDC)
