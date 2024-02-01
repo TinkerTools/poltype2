@@ -89,7 +89,7 @@ def write_tmp_key(txyz):
             and ([atom2type[y], atom2type[a2], atom2type[a1], atom2type[x]] not in torsions) :
               torsions.append([atom2type[x], atom2type[a1], atom2type[a2], atom2type[y]])
   
-  # find the tri- center and opbend quad_atoms
+  # find the tri- center
   tricentertypes = []
   for mol in pybel.readfile("txyz", txyz):
     natoms = len(mol.atoms)
@@ -757,13 +757,16 @@ def writeExplicitOpbend(key, xyz):
       atype3 = atom2type[ss[8]] 
       comb = atype1 + '-' + ss[5]
       prmstr = f"opbend {atype1} {ss[5]} {atype2} {atype3} {opbend_params[comb]}"
-      new_opbend_prmstrings.append(prmstr)
+      if prmstr not in new_opbend_prmstrings:
+        new_opbend_prmstrings.append(prmstr)
       comb = atype2 + '-' + ss[5]
       prmstr = f"opbend {atype2} {ss[5]} {atype1} {atype3} {opbend_params[comb]}"
-      new_opbend_prmstrings.append(prmstr)
+      if prmstr not in new_opbend_prmstrings:
+        new_opbend_prmstrings.append(prmstr)
       comb = atype3 + '-' + ss[5]
       prmstr = f"opbend {atype3} {ss[5]} {atype1} {atype2} {opbend_params[comb]}"
-      new_opbend_prmstrings.append(prmstr)
+      if prmstr not in new_opbend_prmstrings:
+        new_opbend_prmstrings.append(prmstr)
   
   # this will be in-place replacement
   with open(key, 'w') as f:
