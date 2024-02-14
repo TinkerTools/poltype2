@@ -265,46 +265,62 @@ def assignVdwAMOEBA():
 
 def assignNonbondedAMOEBAplus():
   genAtomType(xyz, key, 'NONBONDED')
-  types = np.loadtxt(os.path.join(prmfiledir,"amoebaplusNonbonded.prm"), usecols=(0,), unpack=True, dtype="str",skiprows=2)
-  cpalphas, cpnucs = np.loadtxt(os.path.join(prmfiledir,"amoebaplusNonbonded.prm"), usecols=(1,2), unpack=True, dtype="float",skiprows=2)
-  ctas, ctbs = np.loadtxt(os.path.join(prmfiledir,"amoebaplusNonbonded.prm"), usecols=(3,4), unpack=True, dtype="float",skiprows=2)
-  vdwrs, vdwes, vdwreds = np.loadtxt(os.path.join(prmfiledir,"amoebaplusNonbonded.prm"), usecols=(5,6,7), unpack=True, dtype="float",skiprows=2)
-  CP = [[i,j] for i,j in zip(cpalphas, cpnucs)]
-  CT = [[i,j] for i,j in zip(ctas, ctbs)]
-  VDW = [[i,j,k] for i,j,k in zip(vdwrs, vdwes, vdwreds)]
-  smartsCPDict = dict(zip(types, CP))
-  smartsCTDict = dict(zip(types, CT))
-  smartsVDWDict = dict(zip(types, VDW))
-  # !!! attention, vdw/cp/ct may use atom type/atom class, depending on the tinker code
-  # it's correct if atom type == atom class, which is the case for a new molecule derived by poltype
-  ttypes, stypes = np.loadtxt(f"{fname}.type.amoebaplusNonbonded", usecols=(2,3), unpack=True, dtype="str")
+
+  chgtrn_params = {}
+  chgpen_params = {}
+  vdw_params = {}
+
+  lines = open(os.path.join(prmfiledir,"amoebaplusNonbonded.prm")).readlines()
+  for line in lines:
+    dd = line.split()
+    if (len(dd) > 0) and ("CHGPEN" == dd[0].upper()):
+      smt_type = dd[1]
+      prm_str = '  '.join(dd[2:])
+      if smt_type not in chgpen_params.keys():
+        chgpen_params[smt_type] = prm_str
+      else:
+        print("Warning: there are two sets of chgpen parameters in the database")
+        print(f"One is {prm_str}, and the other is {chgpen_params[smt_type]}")
+    
+    if (len(dd) > 0) and ("CHGTRN" == dd[0].upper()):
+      smt_type = dd[1]
+      prm_str = '  '.join(dd[2:])
+      if smt_type not in chgtrn_params.keys():
+        chgtrn_params[smt_type] = prm_str
+      else:
+        print("Warning: there are two sets of chgtrn parameters in the database")
+        print(f"One is {prm_str}, and the other is {chgtrn_params[smt_type]}")
+    
+    if (len(dd) > 0) and ("VDW" == dd[0].upper()):
+      smt_type = dd[1]
+      prm_str = '  '.join(dd[2:])
+      if smt_type not in vdw_params.keys():
+        vdw_params[smt_type] = prm_str
+      else:
+        print("Warning: there are two sets of vdw parameters in the database")
+        print(f"One is {prm_str}, and the other is {vdw_params[smt_type]}")
+
+  ttypes, stypes = np.loadtxt(f"{fname}.type.nonbonded", usecols=(2,3), unpack=True, dtype="str")
   tinkerCPDict = {}
   tinkerCTDict = {}
   tinkerVDWDict = {}
   for t,s in zip(ttypes, stypes): 
     if t not in tinkerCPDict:
-      tinkerCPDict[t] = smartsCPDict[s]
-      tinkerCTDict[t] = smartsCTDict[s]
-      tinkerVDWDict[t] = smartsVDWDict[s]
+      tinkerCPDict[t] = chgpen_params[s]
+      tinkerCTDict[t] = chgtrn_params[s]
+      tinkerVDWDict[t] = vdw_params[s]
   lines = open(key).readlines()
-  with open(key, "a") as f:
-    f.write("# charge penetration parameters assigned from database\n")
+  with open(key + "_nonbonded", "w") as f:
     for t in tinkerCPDict:
-      ''' the commented out line is for old tinker 8.2 '''
-      line = "chgpen  %5s%10.5f%10.5f\n"%(t, tinkerCPDict[t][1], tinkerCPDict[t][0])
+      line = "chgpen  %5s %s\n"%(t, tinkerCPDict[t])
       f.write(line)
     print(GREEN + "charge penetration parameters assigned from database"+ ENDC)
-    f.write("# charge transfer parameters assigned from database\n")
     for t in tinkerCTDict:
-      line = "chgtrn  %5s%10.5f%10.5f\n"%(t, tinkerCTDict[t][0]*3.01147, tinkerCTDict[t][1])
+      line = "chgtrn  %5s %s\n"%(t, tinkerCTDict[t])
       f.write(line)
     print(GREEN + "charge transfer parameters assigned from database" + ENDC)
-    f.write("# van der Waals parameters assigned from database\n")
     for t in tinkerVDWDict:
-      if tinkerVDWDict[t][2] != 1.0:
-        line = "vdw  %5s%10.5f%10.5f%10.5f\n"%(t, tinkerVDWDict[t][0], tinkerVDWDict[t][1], tinkerVDWDict[t][2])
-      else:
-        line = "vdw  %5s%10.5f%10.5f\n"%(t, tinkerVDWDict[t][0], tinkerVDWDict[t][1])
+      line = "vdw  %5s %s\n"%(t, tinkerVDWDict[t])
       f.write(line)
     print(GREEN+"van der Waals parameters assigned from database"+ENDC)
   return True

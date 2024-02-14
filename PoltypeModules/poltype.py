@@ -2655,7 +2655,8 @@ class PolarizableTyper():
                         break
 
             if not latestversion:
-                raise ValueError("Notice: Not latest working version of tinker (8.10.2)"+' '+os.getcwd())
+                #raise ValueError("Notice: Not latest working version of tinker (8.10.2)"+' '+os.getcwd())
+                print("Notice: Not latest working version of tinker (8.10.2)"+' '+os.getcwd())
            
             # STEP 4
             if self.forcefield.upper() in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:

@@ -11,7 +11,10 @@ def assign_vdw_and_bonded(poltype):
     tmpkey = 'tmpfilename.key'
     shutil.copy(poltype.key4fname, tmpkey)
     shutil.copy(poltype.xyzoutfile, tmpxyz)
-    cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent BONDED VDW'
+    if poltype.forcefield.upper() in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
+      cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent BONDED NONBONDED CF'
+    else:
+      cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent BONDED VDW'
     poltype.call_subsystem([cmd], True)
     
     tmpkey_b = 'tmpfilename.key_bonded'
@@ -21,10 +24,13 @@ def assign_vdw_and_bonded(poltype):
     angleparams = {}
     strbndparams = {}
     opbendparams = {}
-    for line in open(tmpkey_v).readlines():
-      if "#" not in line[0:10]:
-        ss = line.split()
-        vdwparams[ss[1]] = '   '.join(ss)
+    
+    # vdw parameters of AMOEBAplus model is in nonbonded
+    if poltype.forcefield.upper() not in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
+      for line in open(tmpkey_v).readlines():
+        if "#" not in line[0:10]:
+          ss = line.split()
+          vdwparams[ss[1]] = '   '.join(ss)
     
     for line in open(tmpkey_b).readlines():
       if "#" not in line[0:10]:
@@ -49,7 +55,11 @@ def assign_vdw_and_bonded(poltype):
         ss = line.split()
         if len(ss) > 3:
           if (ss[0].lower() == 'vdw') and (ss[1] in vdwparams.keys()):
-            line = vdwparams[ss[1]] + '\n'
+            # vdw parameters of AMOEBAplus model is in nonbonded
+            if poltype.forcefield.upper() not in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
+              line = vdwparams[ss[1]] + '\n'
+            else:
+              line = '\n'
           if (ss[0].lower() == 'bond'):
             comb = '-'.join(ss[1:3])
             if comb in bondparams.keys():
@@ -68,7 +78,23 @@ def assign_vdw_and_bonded(poltype):
               line = opbendparams[comb] + '\n'
         
         f.write(line)
-   
+    
+    if poltype.forcefield.upper() in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
+      lines = open(tmpkey_2).readlines()
+      # vdws that already exist are commented out
+      with open(tmpkey_2, 'w') as f:
+        for line in lines:
+          if (len(line.split()) > 3) and (line.split()[0].lower() == 'vdw'):
+            line = '# ' + line
+          f.write(line)
+
+      tmpkey_cflux = 'tmpfilename.key_cf'
+      tmpkey_nonbonded = 'tmpfilename.key_nonbonded'
+      cflux_lines = open(tmpkey_cflux).readlines()
+      nonbonded_lines = open(tmpkey_nonbonded).readlines()
+      with open(tmpkey_2, 'a') as f:
+        for line in cflux_lines + nonbonded_lines:
+          f.write(line)
     # replace key4 with the file we wanted
     # key4fname will be changed globally 
     # so we are good to go forward
