@@ -359,6 +359,8 @@ class PolarizableTyper():
         smartstosoluteradiimap:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'SMARTsToSoluteRadiiMap.txt'
         latestsmallmoleculepolarizeprmlib:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21polarize.prm'
         updatedsmallmoleculepolarizeprmlib:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] ))+'/lDatabaseParser/prm/'+'amoeba_and_amoebaplus_polarize.prm'
+        amoebaplussmallmoleculenonbonded_prm:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] ))+'/lDatabaseParser/prm/'+'amoebaplusNonbonded.prm'
+        amoebaplussmallmoleculenonbonded_dat:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] ))+'/lDatabaseParser/dat/'+'amoebaplusNonbondedType.dat'
         latestsmallmoleculesmartstotypespolarize:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21polarcommenttoparameters.txt'
         latestsmallmoleculesmartstotinkerclass:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21smartstoclass.txt'
         latestsmallmoleculeprmlib:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21.prm'
@@ -4841,7 +4843,12 @@ class PolarizableTyper():
                     self.WriteToLog("Average Multipoles Via Symmetry")
                     mpole.AverageMultipoles(self,optmol)
                     # STEP 37
-                    mpole.AddPolarizeCommentsToKey(self,self.key2fnamefromavg,polartypetotransferinfo)
+                    # the comments and polarize params do not match anymore
+                    # so we comment out this line
+                    #mpole.AddPolarizeCommentsToKey(self,self.key2fnamefromavg,polartypetotransferinfo)
+                    if self.forcefield.upper() in ['APLUS', 'AMOEBA+', 'AMOEBAPLUS']: 
+                      self.WriteToLog("Assign Charge Penetration Parameters")
+                      ldatabaseparser.assign_chgpen_params(self) 
                 # STEP 38
                 fit=False
                 if self.espfit and not os.path.isfile(self.key3fname) and self.atomnum!=1:
@@ -4879,8 +4886,11 @@ class PolarizableTyper():
                 # make copy of key file before patches
                 shutil.copy(self.key4fname,self.key4bfname+"_2")
                 ## replace parameters in key4
-                self.WriteToLog('Assign Vdw and bonded parameters using DatabaseParser')
-                ldatabaseparser.assign_vdw_and_bonded(self) 
+                if self.forcefield.upper() in ['APLUS', 'AMOEBA+', 'AMOEBAPLUS']:
+                  self.WriteToLog('Assign chgflux, nonbonded, and bonded parameters using DatabaseParser')
+                else:
+                  self.WriteToLog('Assign Vdw and bonded parameters using DatabaseParser')
+                ldatabaseparser.assign_nonbonded_and_bonded(self) 
             # STEP 41
             (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,optmol,torsionsmissing,self.onlyrotbndslist)
             torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules
