@@ -4,7 +4,7 @@ from rdkit import Chem
 def assign_chgpen_params(poltype):
   # same as assigning polarizability parameters,
   # charge penetration parameters are assigned on-the-fly
-  # the parameters are used for next-step ESP fitting 
+  # because the parameters are used for next-step ESP fitting 
   # Chengwen Liu
   # Feb 2024
   xyzfile = poltype.xyzoutfile
@@ -30,8 +30,8 @@ def assign_chgpen_params(poltype):
         name2chgpen[d[1]] = '  '.join(d[2:4])
   
   for key, name in rawsmarts2name.items():
-    # it is possible that we have more smarts type 
-    # than the parameters
+    # it is possible that we have more smarts
+    # defined but the parameters are not ready yet
     if name in name2chgpen.keys():
       rawsmarts2chgpen[key] = name2chgpen[name]
   atom2chgpen = {}
@@ -70,11 +70,10 @@ def assign_chgpen_params(poltype):
   return 
 
 def assign_nonbonded_and_bonded(poltype):
-    
-    ## here we simply hack poltype to use BONDED and VDW parameters from DatabaseParser
-    ## use lDatabaseParser to assign BONDED and VDW parameters
-    ## Chengwen Liu
-    ## Aug. 2023
+    # Here we simply replace the existing bonded and nonbonded 
+    # parameters in the key_4 file by using assignment script
+    # Chengwen Liu
+    # Aug. 2023
 
     tmpxyz = 'tmpfilename.xyz'
     tmpkey = 'tmpfilename.key'
@@ -169,7 +168,5 @@ def assign_nonbonded_and_bonded(poltype):
           if "chgpen " not in line:
             f.write(line)
     # replace key4 with the file we wanted
-    # key4fname will be changed globally 
-    # so we are good to go forward
     shutil.copy(tmpkey_2,poltype.key4fname)
     return 
