@@ -362,8 +362,9 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
     write_com_header(poltype,comfname,chkname,maxdisk,maxmem,numproc)
     tmpfh = open(comfname, "a")
     spacedformulastr=molecule.GetSpacedFormula()
+    optconvergence = poltype.optconvergence
     if modred==True:
-        optimizeoptlist = ["ModRedundant","maxcycles=%s"%(str(poltype.optmaxcycle)),'Loose']
+        optimizeoptlist = ["ModRedundant","maxcycles=%s"%(str(poltype.optmaxcycle)), optconvergence]
     else:
         optimizeoptlist = ["Cartesian","maxcycles=%s"%(str(poltype.optmaxcycle))]
 
