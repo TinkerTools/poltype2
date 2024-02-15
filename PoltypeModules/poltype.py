@@ -2662,7 +2662,7 @@ class PolarizableTyper():
            
             # STEP 4
             if self.forcefield.upper() in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
-                self.paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebaplus21_header.prm"
+                self.paramhead=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebaplus24_header.prm"
             # STEP 5
             if ("TINKERDIR" in os.environ):
                 self.tinkerdir = os.environ["TINKERDIR"]
