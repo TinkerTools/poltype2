@@ -1162,9 +1162,9 @@ class PolarizableTyper():
                                     self.prmmodlist.append(fpath3list[0])
                                 else:
                                     warnings.warn(f"Could not locate prmmod file '{fpath1}'")
-                        elif "optmethod" in newline and 'tor' not in newline:
+                        elif newline.strip().startswith("optmethod"):
                             self.optmethod = a
-                        elif "espmethod" in newline and 'tor' not in newline:
+                        elif newline.strip().startswith("espmethod"):
                             self.espmethod = a
                         elif "torspmethod" in newline:
                             self.torspmethod = a
@@ -1182,7 +1182,7 @@ class PolarizableTyper():
                             self.prmstartidx = int(a)
                         elif 'defaultmaxtorsiongridpoints' in newline:
                             self.defaultmaxtorsiongridpoints=int(a)
-                        elif "optbasisset" in newline and 'tor' not in newline:
+                        elif newline.strip().startswith("optbasisset"):
                             self.optbasisset = a
                         elif "dmabasisset" in newline:
                             self.dmabasisset = a
@@ -4724,7 +4724,7 @@ class PolarizableTyper():
                 sys.exit()
             # STEP 20
             if ('I ' in self.mol.GetSpacedFormula()):
-                self.optmethod='wB97X-D'
+                #self.optmethod='wB97X-D'
                 self.optmethod=self.SanitizeQMMethod(self.optmethod,True)
             # STEP 21
             if ('Br ' in self.mol.GetSpacedFormula()):

@@ -387,8 +387,8 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
         if ('I ' in poltype.mol.GetSpacedFormula()):
             iodinebasissetfile=poltype.iodinedmabasissetfile 
             basissetfile=poltype.dmabasissetfile
+            poltype.dmabasisset='gen'
             if poltype.sameleveldmaesp:
-              poltype.dmabasisset='gen'
               iodinebasissetfile=poltype.iodineespbasissetfile 
               basissetfile=poltype.espbasissetfile
         if poltype.dmamethod.upper() == 'MP2':
@@ -405,7 +405,6 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
             poltype.espbasisset='gen'
             iodinebasissetfile=poltype.iodineespbasissetfile 
             basissetfile=poltype.espbasissetfile 
-            #poltype.espmethod='wB97XD'
 
 
         if poltype.espmethod.upper() =='MP2':
