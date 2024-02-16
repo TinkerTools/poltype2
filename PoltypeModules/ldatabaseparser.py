@@ -15,12 +15,14 @@ def assign_chgpen_params(poltype):
   rawsmarts2chgpen = {}
   rawsmarts2name = {}
   name2chgpen = {}
-
+  
+  ordered_smarts = []
   lines = open(datfile).readlines()
   for line in lines:
     if (line[0] != '#') and len(line.strip()) > 10:
       d = line.split()
       rawsmarts2name[d[0]] = d[1]
+      ordered_smarts.append(d[0])
   
   lines = open(prmfile).readlines()
   for line in lines:
@@ -37,14 +39,16 @@ def assign_chgpen_params(poltype):
   atom2chgpen = {}
   rdkitmol = Chem.MolFromMolFile(sdffile,removeHs=False)
   atoms = range(1, len(rdkitmol.GetAtoms()) + 1)
-  polarDict = dict.fromkeys(atoms, 0)
+  
   for atom in atoms:
-    for smt, chgpen in rawsmarts2chgpen.items():
-      pattern = Chem.MolFromSmarts(smt)
-      match = rdkitmol.GetSubstructMatches(pattern)
-      if match:
-        for i in range(len(match)):	
-          atom2chgpen[match[i][0]+1] = chgpen 
+    for smt in ordered_smarts:
+      if smt in rawsmarts2chgpen.keys():
+        chgpen = rawsmarts2chgpen[smt]
+        pattern = Chem.MolFromSmarts(smt)
+        match = rdkitmol.GetSubstructMatches(pattern)
+        if match:
+          for i in range(len(match)):	
+            atom2chgpen[match[i][0]+1] = chgpen 
 
   lines = open(xyzfile).readlines()
   atom2type = {}
