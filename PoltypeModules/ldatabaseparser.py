@@ -40,15 +40,14 @@ def assign_chgpen_params(poltype):
   rdkitmol = Chem.MolFromMolFile(sdffile,removeHs=False)
   atoms = range(1, len(rdkitmol.GetAtoms()) + 1)
   
-  for atom in atoms:
-    for smt in ordered_smarts:
-      if smt in rawsmarts2chgpen.keys():
-        chgpen = rawsmarts2chgpen[smt]
-        pattern = Chem.MolFromSmarts(smt)
-        match = rdkitmol.GetSubstructMatches(pattern)
-        if match:
-          for i in range(len(match)):	
-            atom2chgpen[match[i][0]+1] = chgpen 
+  for smt in ordered_smarts:
+    if smt in rawsmarts2chgpen.keys():
+      chgpen = rawsmarts2chgpen[smt]
+      pattern = Chem.MolFromSmarts(smt)
+      match = rdkitmol.GetSubstructMatches(pattern)
+      if match:
+        for i in range(len(match)):	
+          atom2chgpen[match[i][0]+1] = chgpen 
 
   lines = open(xyzfile).readlines()
   atom2type = {}

@@ -526,17 +526,16 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
     rdkitmol = Chem.MolFromMolFile(poltype.molstructfname,removeHs=False)
     atoms = range(1, len(rdkitmol.GetAtoms()) + 1)
     polarDict = dict.fromkeys(atoms, 0)
-    for atom in atoms: 
-      lines = open(poltype.updatedsmallmoleculepolarizeprmlib).readlines()
-      for line in lines:
-        d = line.split()
-        smt = d[0]
-        pol = d[2]
-        pattern = Chem.MolFromSmarts(smt)
-        match = rdkitmol.GetSubstructMatches(pattern)
-        if match:
-          for i in range(len(match)):	
-            polarDict[match[i][0]+1] = pol
+    lines = open(poltype.updatedsmallmoleculepolarizeprmlib).readlines()
+    for line in lines:
+      d = line.split()
+      smt = d[0]
+      pol = d[2]
+      pattern = Chem.MolFromSmarts(smt)
+      match = rdkitmol.GetSubstructMatches(pattern)
+      if match:
+        for i in range(len(match)):	
+          polarDict[match[i][0]+1] = pol
     for k,v in polarDict.items():  
       f.write(f"{k} {v}\n")
     
