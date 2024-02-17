@@ -103,7 +103,7 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
                 wroteout=True
                 f.write('\n')
                 # STEP 4
-                if poltype.writeoutvdw==True:
+                if (poltype.writeoutvdw==True) and (poltype.forcefield.upper() == 'AMOEBA'):
                     for line in vdwprmstotransferinfo.keys():
                          f.write(line)
                          f.write('\n')
@@ -135,9 +135,10 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
                         f.write(line)
                         f.write('\n')
                 # STEP 10
-                for line in soluteprms:
-                    f.write(line)
-                    f.write('\n')
+                if poltype.forcefield.upper() == 'AMOEBA':
+                    for line in soluteprms:
+                        f.write(line)
+                        f.write('\n')
                 # STEP 11
                 for line,transferinfo in tortorprmstotransferinfo.items():
                     if 'tortors' in line:
