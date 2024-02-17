@@ -352,10 +352,6 @@ class PolarizableTyper():
         tordebugmode:bool=False
         parameterfilespath:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir, 'ParameterFiles'))
         prmmodlist:list=field(default_factory=lambda : [])
-        amoebapluscfsmartstocommentmap:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoebapluscfsmartstocomment.txt'
-        amoebapluscfprmlib:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'cfprmlib.txt'
-        amoebaplusnonbondedprmlib:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoebaplusnonbonded.prm'
-        amoebaplusnonbondedsmartstocommentmap:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoebaplusnonbonded.txt'
         smartstosoluteradiimap:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'SMARTsToSoluteRadiiMap.txt'
         latestsmallmoleculepolarizeprmlib:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21polarize.prm'
         updatedsmallmoleculepolarizeprmlib:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] ))+'/lDatabaseParser/prm/'+'amoeba_and_amoebaplus_polarize.prm'
@@ -4724,7 +4720,6 @@ class PolarizableTyper():
                 sys.exit()
             # STEP 20
             if ('I ' in self.mol.GetSpacedFormula()):
-                #self.optmethod='wB97X-D'
                 self.optmethod=self.SanitizeQMMethod(self.optmethod,True)
             # STEP 21
             if ('Br ' in self.mol.GetSpacedFormula()):
@@ -4781,7 +4776,7 @@ class PolarizableTyper():
             # STEP 26
             if not os.path.isfile(self.key4fname) or not os.path.isfile(self.torsionsmissingfilename) or not os.path.isfile(self.torsionprmguessfilename):
                 self.WriteToLog('Searching Database')
-                bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,missingvdwatomindextoneighbors,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo,tortorsmissing=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
+                bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,missingvdwatomindextoneighbors,soluteprms,tortorprmstotransferinfo,tortorsmissing=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
             if os.path.isfile(self.torsionsmissingfilename):
                 torsionsmissing=databaseparser.ReadTorsionList(self,self.torsionsmissingfilename)
             if os.path.isfile(self.torsionprmguessfilename):
@@ -4870,7 +4865,7 @@ class PolarizableTyper():
                         esp.ElectrostaticPotentialComparison(self,combinedxyz,combinedpot)
             # STEP 40
             if not os.path.exists(self.key4fname):
-                databaseparser.appendtofile(self,self.key3fname,self.key4fname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,amoebaplusvdwprmstotransferinfo,ctprmstotransferinfo,cpprmstotransferinfo,bondcfprmstotransferinfo,anglecfprmstotransferinfo,tortorprmstotransferinfo)
+                databaseparser.appendtofile(self,self.key3fname,self.key4fname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,tortorprmstotransferinfo)
                 if self.writeoutangle==True:
                     databaseparser.StiffenZThenBisectorAngleConstants(self,self.key4fname)
                     databaseparser.TestBondAngleEquilValues(self)
