@@ -4,7 +4,7 @@ from openbabel import openbabel
 from rdkit import Chem
 import numpy as np
 from openbabel import pybel
-import databaseparser
+import torsiondatabaseparser
 import networkx as nx
 import networkx.algorithms.isomorphism as iso
 
@@ -143,7 +143,7 @@ def ComputeSymmetryTypes_v1(poltype,distmat,rdkitmol,mol,usesym):
     indextomatchingindices={}
     indextoGI={}
     if usesym==True:
-        atomindices=databaseparser.RingAtomicIndices(poltype,mol)
+        atomindices=torsiondatabaseparser.RingAtomicIndices(poltype,mol)
         # STEP 1
         for atom in rdkitmol.GetAtoms():
             atomidx=atom.GetIdx()
@@ -323,9 +323,9 @@ def ComputeGIVector(poltype,atom,rdkitmol,distmat,mol,atomindices):
     if numneighbs==1:
        neighb=neighbs[0]
        natomidx=neighb.GetIdx()
-       rings=databaseparser.GrabAllRingsContainingIndices(poltype,atomindices,[natomidx+1])
+       rings=torsiondatabaseparser.GrabAllRingsContainingIndices(poltype,atomindices,[natomidx+1])
     else:
-       rings=databaseparser.GrabAllRingsContainingIndices(poltype,atomindices,[atomidx+1])
+       rings=torsiondatabaseparser.GrabAllRingsContainingIndices(poltype,atomindices,[atomidx+1])
     if len(rings)>0:
         for ring in rings:
             if len(ring)<=7: # openbabel doesnt count all ring memership right someitmes when whole molecule is giant ring

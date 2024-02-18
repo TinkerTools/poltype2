@@ -31,7 +31,7 @@ import time
 import copy
 import getopt
 from collections import OrderedDict
-import databaseparser
+import torsiondatabaseparser
 import dimorphite_dl
 import torsiongenerator as torgen
 import symmetry as symm
@@ -4776,17 +4776,17 @@ class PolarizableTyper():
             # STEP 26
             if not os.path.isfile(self.key4fname) or not os.path.isfile(self.torsionsmissingfilename) or not os.path.isfile(self.torsionprmguessfilename):
                 self.WriteToLog('Searching Database')
-                bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,missingvdwatomindextoneighbors,soluteprms,tortorprmstotransferinfo,tortorsmissing=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
+                bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,missingvdwatomindextoneighbors,soluteprms,tortorprmstotransferinfo,tortorsmissing=torsiondatabaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
             if os.path.isfile(self.torsionsmissingfilename):
-                torsionsmissing=databaseparser.ReadTorsionList(self,self.torsionsmissingfilename)
+                torsionsmissing=torsiondatabaseparser.ReadTorsionList(self,self.torsionsmissingfilename)
             if os.path.isfile(self.torsionprmguessfilename):
-                classkeytotorsionparametersguess=databaseparser.ReadDictionaryFromFile(self,self.torsionprmguessfilename)
+                classkeytotorsionparametersguess=torsiondatabaseparser.ReadDictionaryFromFile(self,self.torsionprmguessfilename)
             if os.path.isfile(self.vdwmissingfilename):
-                missingvdwatomindices=databaseparser.ReadVdwList(self,self.vdwmissingfilename)
+                missingvdwatomindices=torsiondatabaseparser.ReadVdwList(self,self.vdwmissingfilename)
             if self.onlyvdwatomlist!=None:
                 missingvdwatomindices=self.onlyvdwatomlist[:]
             if os.path.isfile(self.tortormissingfilename):
-                tortorsmissing=databaseparser.ReadTorTorList(self,self.tortormissingfilename)
+                tortorsmissing=torsiondatabaseparser.ReadTorTorList(self,self.tortormissingfilename)
 
             # STEP 27
             if (self.writeoutpolarize==True and self.writeoutmultipole==True):
@@ -4798,7 +4798,7 @@ class PolarizableTyper():
                     mpole.run_gdma(self)
         
                 # STEP 29
-                polarindextopolarizeprm,polartypetotransferinfo=databaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m,polarize=True)
+                polarindextopolarizeprm,polartypetotransferinfo=torsiondatabaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m,polarize=True)
                 # STEP 30
                 lfzerox=mpole.gen_peditinfile(self,mol,polarindextopolarizeprm)
             
@@ -4865,10 +4865,10 @@ class PolarizableTyper():
                         esp.ElectrostaticPotentialComparison(self,combinedxyz,combinedpot)
             # STEP 40
             if not os.path.exists(self.key4fname):
-                databaseparser.appendtofile(self,self.key3fname,self.key4fname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,tortorprmstotransferinfo)
+                torsiondatabaseparser.appendtofile(self,self.key3fname,self.key4fname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,tortorprmstotransferinfo)
                 if self.writeoutangle==True:
-                    databaseparser.StiffenZThenBisectorAngleConstants(self,self.key4fname)
-                    databaseparser.TestBondAngleEquilValues(self)
+                    torsiondatabaseparser.StiffenZThenBisectorAngleConstants(self,self.key4fname)
+                    torsiondatabaseparser.TestBondAngleEquilValues(self)
                 self.AddIndicesToKey(self.key4fname)
                 if self.databasematchonly==True:
                     sys.exit()
@@ -7108,7 +7108,7 @@ class PolarizableTyper():
             """
             iswholemoleculering=False
             # STEP 1
-            atomindices=databaseparser.RingAtomicIndices(self,mol)
+            atomindices=torsiondatabaseparser.RingAtomicIndices(self,mol)
             # STEP 2
             lengthtoring={}
             for ring in atomindices:

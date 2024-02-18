@@ -15,10 +15,9 @@ import pylab as plt
 import time
 from itertools import product,combinations
 from scipy.interpolate import interp1d
-import databaseparser as db
 from copy import deepcopy
 from rdkit import Chem
-import databaseparser
+import torsiondatabaseparser
 from matplotlib.pyplot import cm
 import pandas as pd
 
@@ -622,7 +621,7 @@ def insert_torphasedict (poltype,mol, toraboutbnd, torprmdict, initangle,write_p
     aatomicnum=obaa.GetAtomicNum()
     datomicnum=obad.GetAtomicNum()
     babelindices=[a2,b2,c2,d2]
-    torsionsmissing=databaseparser.ReadTorsionList(poltype,os.path.join(os.path.abspath('..'),poltype.torsionsmissingfilename))
+    torsionsmissing=torsiondatabaseparser.ReadTorsionList(poltype,os.path.join(os.path.abspath('..'),poltype.torsionsmissingfilename))
     classes=[poltype.idxtosymclass[i] for i in babelindices]
     if classes not in torsionsmissing and classes[::-1] not in torsionsmissing: # then probably H torsions transferred
         return

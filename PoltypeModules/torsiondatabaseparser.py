@@ -3136,40 +3136,6 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
                 warn=True
                 extraline+='# Missing vdw parameters'+'\n'
 
-        if 'angle' in line:
-            linesplit=line.split()
-            a=int(linesplit[1])
-            b=int(linesplit[2])
-            c=int(linesplit[3])
-            ls=[a,b,c]
-            if ls in missinganglepoltypeclasses or ls[::-1] in missinganglepoltypeclasses:
-                extraline+='# Missing angle parameters, assigning default parameters via element and valence'+'\n'
-                warn=True
-                showtransferinfo=False
-
-
-        if 'strbnd' in line:
-            linesplit=line.split()
-            a=int(linesplit[1])
-            b=int(linesplit[2])
-            c=int(linesplit[3])
-            ls=[a,b,c]
-            if ls in missinganglepoltypeclasses or ls[::-1] in missinganglepoltypeclasses:
-                extraline+='# Missing strbnd parameters, zeroing out parameters'+'\n'
-                warn=True
-                showtransferinfo=False
-
-        if 'bond' in line:
-            linesplit=line.split()
-            a=int(linesplit[1])
-            b=int(linesplit[2])
-            ls=[a,b]
-            if ls in missingbondpoltypeclasses or ls[::-1] in missingbondpoltypeclasses:
-                extraline+='# Missing bond parameters, assigning default parameters via element and valence'+'\n'
-                warn=True
-                showtransferinfo=False
-
-
         if 'torsion' in line:
             linesplit=line.split()
             a=int(linesplit[1])

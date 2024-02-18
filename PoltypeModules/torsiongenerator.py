@@ -1,7 +1,7 @@
 import symmetry as symm
 import optimization as opt
 import electrostaticpotential as esp
-import databaseparser
+import torsiondatabaseparser
 import torsionfit as torfit
 import apicall as call
 import os
@@ -1475,8 +1475,8 @@ def get_torlist(poltype,mol,missed_torsions,onlyrotbndslist,allmissing=False):
         
         t1atomicnum=t1.GetAtomicNum()
         t4atomicnum=t4.GetAtomicNum()
-        allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
-        allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol)
+        allhydtors=torsiondatabaseparser.CheckIfAllTorsionsAreHydrogen(poltype,babelindices,mol)
+        allhydtorsoneside=torsiondatabaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,babelindices,mol)
         unq=get_uniq_rotbnd(poltype,t1.GetIdx(),t2.GetIdx(),t3.GetIdx(),t4.GetIdx())
         if ringbond==True and willrefinenonarotor==False and len(onlyrotbndslist)==0 and poltype.dontfrag==False and foundmissing==True:
             nonaroringtorlist.append(unq)
@@ -1486,7 +1486,7 @@ def get_torlist(poltype,mol,missed_torsions,onlyrotbndslist,allmissing=False):
             skiptorsion=True
         rotbndkey = '%d %d' % (unq[1],unq[2])
         if ringbond==True:
-            atomindices=databaseparser.RingAtomicIndices(poltype,mol)
+            atomindices=torsiondatabaseparser.RingAtomicIndices(poltype,mol)
             therings=GrabAllRingsContainingMostIndices(poltype,atomindices,babelindices,2)
             if (len(therings)>0) and poltype.dontfrag==False:
                 if len(therings[0])>7: # special case where whole molecule is a ring then dont consider ring bond
@@ -1649,7 +1649,7 @@ def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndli
             aatomicnum=obaa.GetAtomicNum()
             datomicnum=obad.GetAtomicNum()
             babelindices=[a2,b2,c2,d2]
-            torsionsmissing=databaseparser.ReadTorsionList(poltype,os.path.join(os.path.abspath(os.getcwd()),poltype.torsionsmissingfilename))
+            torsionsmissing=torsiondatabaseparser.ReadTorsionList(poltype,os.path.join(os.path.abspath(os.getcwd()),poltype.torsionsmissingfilename))
             classes=[poltype.idxtosymclass[i] for i in babelindices]
             if classes not in torsionsmissing and classes[::-1] not in torsionsmissing: # then probably H torsions transferred
                 continue
@@ -1843,8 +1843,8 @@ def RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxr
            for resttors in newtorsions:
                rta,rtb,rtc,rtd = resttors
                indices=[rta,rtb,rtc,rtd]
-               allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,inputmol)
-               allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,inputmol)
+               allhydtors=torsiondatabaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,inputmol)
+               allhydtorsoneside=torsiondatabaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,inputmol)
                aatom=inputmol.GetAtom(rta)
                datom=inputmol.GetAtom(rtd)
                batom=inputmol.GetAtom(rtb)
@@ -1962,8 +1962,8 @@ def FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotb
         for resttors in newtorsions:
             rta,rtb,rtc,rtd = resttors
             indices=[rta,rtb,rtc,rtd]
-            allhydtors=databaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,inputmol)
-            allhydtorsoneside=databaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,inputmol)
+            allhydtors=torsiondatabaseparser.CheckIfAllTorsionsAreHydrogen(poltype,indices,inputmol)
+            allhydtorsoneside=torsiondatabaseparser.CheckIfAllTorsionsAreHydrogenOneSide(poltype,indices,inputmol)
             aatom=inputmol.GetAtom(rta)
             datom=inputmol.GetAtom(rtd)
             batom=inputmol.GetAtom(rtb)

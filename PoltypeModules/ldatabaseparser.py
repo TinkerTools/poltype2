@@ -1,3 +1,13 @@
+
+
+""" 
+  This program is used to assign valence and non-bonded interactions for AMOEBA and AMOEBA+ model
+  The torsion parameters, are assigned by another program called torsiondatabaseparser.py
+  In the long run, we will merge torsion assignment into this program too.
+  - Chengwen Liu
+  - Feb 2024
+"""
+
 import shutil
 from rdkit import Chem
 
