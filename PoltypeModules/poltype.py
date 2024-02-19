@@ -570,7 +570,7 @@ class PolarizableTyper():
                             commalist=a.split(',')
                             commalist=[k.strip() for k in commalist]
                         else:
-                            newline=line
+                            newline=line.strip()
 
                         if 'uncomplexedproteinpdbname' in newline:
                             self.uncomplexedproteinpdbname=a
@@ -672,7 +672,7 @@ class PolarizableTyper():
                             self.optloose=self.SetDefaultBool(line,a,True)
                             if self.optloose:
                                 self.optconvergence = "LOOSE"
-                        elif newline.strip().startswith("optconvergence"):
+                        elif newline.startswith("optconvergence"):
                             self.optconvergence = a.upper()
                         elif "writeoutstrbnd" in newline:
                             self.writeoutstrbnd=self.SetDefaultBool(line,a,True)
@@ -1051,7 +1051,7 @@ class PolarizableTyper():
                             self.new_gdma=self.SetDefaultBool(line,a,True)
                         elif 'scaleandfixdipole' in newline:
                             self.scaleandfixdipole=self.SetDefaultBool(line,a,True)
-                        elif newline.strip().startswith("gdmacommand_"):
+                        elif newline.startswith("gdmacommand_"):
                             self.__dict__[newline] = a
                             gdma_kws.append((newline[len('gdmacommand_'):], a))
                         elif 'sameleveldmaesp' in newline:
@@ -1068,11 +1068,11 @@ class PolarizableTyper():
                             self.pcm_auto=self.SetDefaultBool(line,a,True)
                         elif "freq" in newline:
                             self.freq=self.SetDefaultBool(line,a,True)
-                        elif newline.strip().startswith("optpcm"):
+                        elif newline.startswith("optpcm"):
                             self.optpcm=self.GrabSwitchValue(a, 1)
-                        elif newline.strip().startswith("toroptpcm"):
+                        elif newline.startswith("toroptpcm"):
                             self.toroptpcm=self.GrabSwitchValue(a, 1)
-                        elif newline.strip().startswith("torsppcm"):
+                        elif newline.startswith("torsppcm"):
                             self.torsppcm=self.GrabSwitchValue(a, 1)
                         elif "use_gaus" in newline and 'opt' not in newline:
                             self.use_gaus=self.SetDefaultBool(line,a,True)
@@ -1146,7 +1146,7 @@ class PolarizableTyper():
                             self.onlyfittorstogether=templist
                             self.onlyfittorstogether=[tuple(i) for i in self.onlyfittorstogether]
 
-                        elif newline.strip().startswith('prmmodfile'):
+                        elif newline.startswith('prmmodfile'):
                             self.prmmodlist = []
                             for fpath1 in a.split(','):
                                 fpath2list = (fpath1, os.path.join(self.parameterfilespath, fpath1),
@@ -1158,9 +1158,9 @@ class PolarizableTyper():
                                     self.prmmodlist.append(fpath3list[0])
                                 else:
                                     warnings.warn(f"Could not locate prmmod file '{fpath1}'")
-                        elif newline.strip().startswith("optmethod"):
+                        elif newline.startswith("optmethod"):
                             self.optmethod = a
-                        elif newline.strip().startswith("espmethod"):
+                        elif newline.startswith("espmethod"):
                             self.espmethod = a
                         elif "torspmethod" in newline:
                             self.torspmethod = a
@@ -1178,7 +1178,7 @@ class PolarizableTyper():
                             self.prmstartidx = int(a)
                         elif 'defaultmaxtorsiongridpoints' in newline:
                             self.defaultmaxtorsiongridpoints=int(a)
-                        elif newline.strip().startswith("optbasisset"):
+                        elif newline.startswith("optbasisset"):
                             self.optbasisset = a
                         elif "dmabasisset" in newline:
                             self.dmabasisset = a
