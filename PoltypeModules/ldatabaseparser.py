@@ -9,6 +9,7 @@
 """
 
 import shutil
+import numpy as np
 from rdkit import Chem
 
 def assign_chgpen_params(poltype):
@@ -90,6 +91,7 @@ def assign_nonbonded_and_bonded(poltype):
 
     tmpxyz = 'tmpfilename.xyz'
     tmpkey = 'tmpfilename.key'
+    sdffile = poltype.molstructfname
     shutil.copy(poltype.key4fname, tmpkey)
     shutil.copy(poltype.xyzoutfile, tmpxyz)
     if poltype.forcefield.upper() in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
@@ -180,6 +182,53 @@ def assign_nonbonded_and_bonded(poltype):
           # since chgpen parameters have been assigned to key_2
           if "chgpen " not in line:
             f.write(line)
+    
+    # patch: treat amine angle constant
+    special_treatment_for_amine(sdffile, tmpkey_2, tmpxyz)
     # replace key4 with the file we wanted
     shutil.copy(tmpkey_2,poltype.key4fname)
     return 
+  
+def special_treatment_for_amine(sdffile, keyfile, xyzfile):
+  atoms, types = np.loadtxt(xyzfile, usecols=(0,5), dtype='int', skiprows=1, unpack=True)
+  atom2type = dict(zip(atoms, types))
+  angle_types = []
+  mol = Chem.MolFromMolFile(sdffile,removeHs=False)
+  pattern = Chem.MolFromSmarts('[H][NX3][CX4]')
+  matches = mol.GetSubstructMatches(pattern)
+  for match in matches:
+    h,n,c = match
+    h += 1
+    n += 1
+    c += 1
+    t1 = [atom2type[h], atom2type[n], atom2type[c]]
+    t2 = [atom2type[c], atom2type[n], atom2type[h]]
+    if t1 not in angle_types:
+      angle_types.append(t1)
+      angle_types.append(t2)
+    
+  if matches != []:
+    smt = '[H][NX3]([CX4])[H]'
+    pattern = Chem.MolFromSmarts(smt)
+    matches = mol.GetSubstructMatches(pattern)
+    for m in matches:
+      a,b,_, c = m
+      a += 1
+      b += 1
+      c += 1
+      t1 = [atom2type[a], atom2type[b], atom2type[c]]
+      t2 = [atom2type[c], atom2type[b], atom2type[a]]
+      if t1 not in angle_types:
+        angle_types.append(t1)
+        angle_types.append(t2)
+  
+  if angle_types != []:
+    lines = open(keyfile).readlines()
+    with open(keyfile, 'w') as f:
+      for line in lines:
+        if (line.strip().startswith('angle')):
+          ss = line.split()
+          if [int(ss[1]), int(ss[2]), int(ss[3])] in angle_types:
+            line = f'angle {ss[1]}  {ss[2]}  {ss[3]} 100.0 {ss[5]}\n'
+        f.write(line)
+  return
