@@ -103,10 +103,10 @@ def gen_esp_grid(poltype,mol,gridnamelist,espnamelist,fchknamelist,cubenamelist)
                 densitystring='SCF'
             gencubecmd = poltype.cubegenexe + " 0 potential=%s "%(densitystring) + fckfname + " " + cubename + " -5 h < " + gridname
             poltype.call_subsystem([gencubecmd],True)
-    # Run potential
-            if not os.path.isfile(potfile):
-                genqmpotcmd = poltype.potentialexe + " 2 " + cubename
-                poltype.call_subsystem([genqmpotcmd],True)
+        # Run potential
+        if not os.path.isfile(potfile):
+            genqmpotcmd = poltype.potentialexe + " 2 " + cubename
+            poltype.call_subsystem([genqmpotcmd],True)
             potnamelist.append(potfile)
     return potnamelist
        
