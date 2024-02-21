@@ -491,6 +491,7 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
     f = open (poltype.peditinfile, 'w')
 
 
+    rdkitmol = Chem.MolFromMolFile(poltype.molstructfname,removeHs=False)
     if poltype.indextompoleframefile==None:
         if poltype.usepoleditframes==False:
             for a in iteratom:
@@ -502,15 +503,56 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
                 else:
                     trisecidxs=idxtotrisectidxs[a.GetIdx()]
                     f.write(str(a.GetIdx()) + " -" + str(trisecidxs[0])+ " -" + str(trisecidxs[1]) + " -" + str(trisecidxs[2])+ "\n")
-    else:
-        temp=open(poltype.indextompoleframefile,'r')
-        results=temp.readlines()
-        temp.close()
-        for line in results:
-            linesplit=line.split()
-            if len(linesplit)>0:
-                f.write(line)
-
+        else:
+            # Tinker poledit frame is mostly fine
+            # here we add a patch to deal with some molecules
+            # Chengwen Liu
+            frames = []
+            # NH3
+            pattern = Chem.MolFromSmarts('[NH3]([H])([H])[H]')
+            matches = rdkitmol.GetSubstructMatches(pattern)
+            for match in matches:
+              n,h1,h2,h3 = match
+              frames.append(f'{n+1} -{h1+1} -{h2+1} -{h3+1}')
+            # NC3
+            pattern = Chem.MolFromSmarts('[NX3]([CX4])([CX4])[CX4]')
+            matches = rdkitmol.GetSubstructMatches(pattern)
+            for match in matches:
+              n,c1,c2,c3 = match
+              frames.append(f'{n+1} -{c1+1} -{c2+1} -{c3+1}')
+            # NHC2
+            pattern = Chem.MolFromSmarts('[NX3H1]([H])([CX4])[CX4]')
+            matches = rdkitmol.GetSubstructMatches(pattern)
+            for match in matches:
+              n,h,c1,c2 = match
+              frames.append(f'{n+1} {h+1} -{c1+1} -{c2+1}')
+            # NH2-C
+            pattern = Chem.MolFromSmarts('[NH2]([H])([H])[CX4]')
+            matches = rdkitmol.GetSubstructMatches(pattern)
+            for match in matches:
+              n,h1,h2,c = match
+              frames.append(f'{n+1} {c+1} -{h1+1} -{h2+1}')
+              frames.append(f'{c+1} {n+1} -{h1+1} -{h2+1}')
+            # NH2-C=O
+            pattern = Chem.MolFromSmarts('[NH2]([H])([H])[CX3]=O')
+            matches = rdkitmol.GetSubstructMatches(pattern)
+            for match in matches:
+              n,h1,h2,_,_ = match
+              frames.append(f'{h1+1} {n+1} {h2+1}')
+              frames.append(f'{h2+1} {n+1} {h1+1}')
+              # this is the RIGHT way but this lead to worse ESP
+              #frames.append(f'{n+1} -{h1+1} -{h2+1}')
+            # NH2-c
+            pattern = Chem.MolFromSmarts('[NH2]([H])([H])[c]')
+            matches = rdkitmol.GetSubstructMatches(pattern)
+            for match in matches:
+              n,h1,h2,_ = match
+              frames.append(f'{h1+1} {n+1} {h2+1}')
+              frames.append(f'{h2+1} {n+1} {h1+1}')
+            
+            if frames != []:
+              for frame in frames:
+                f.write(f'{frame}\n')
 
     f.write("\n")
     if poltype.forcefield.upper() in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
@@ -523,7 +565,6 @@ def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
     # Chengwen Liu
     # July 2023
 
-    rdkitmol = Chem.MolFromMolFile(poltype.molstructfname,removeHs=False)
     atoms = range(1, len(rdkitmol.GetAtoms()) + 1)
     polarDict = dict.fromkeys(atoms, 0)
     lines = open(poltype.updatedsmallmoleculepolarizeprmlib).readlines()
