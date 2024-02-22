@@ -1709,7 +1709,7 @@ def AddOptimizedBondLengths(poltype,optmol,bondprms,bondlistbabel):
             pass 
         else:
             # STEP 7
-            avgbondlength=round(tot/len(allbonds),2)
+            avgbondlength=round(tot/len(allbonds),4)
             linesplit=re.split(r'(\s+)', line)   
             # STEP 8
             linesplit[8]=str(avgbondlength)
@@ -1763,7 +1763,7 @@ def AddOptimizedAngleLengths(poltype,optmol,angleprms,anglelistbabel):
             pass
         else:
             # STEP 7
-            avganglelength=round(tot/len(allangles),2)
+            avganglelength=round(tot/len(allangles),3)
             linesplit=re.split(r'(\s+)', line)
             linesplit=linesplit[:11]
             linesplit.append('\n')
@@ -5802,7 +5802,7 @@ def ChangeBondAngleEquilValues(poltype,bondtypeindicestonewbondequilvalues,angle
                     linesplit=re.split(r'(\s+)', line)
                     linesplit=linesplit[:11]
                     linesplit.append('\n')
-                    linesplit[10]=str(equilvalue)
+                    linesplit[10]=str(f"{float(equilvalue):.3f}")
                     line=''.join(linesplit)
                 
             if 'bond' in line and poltype.writeoutbond==True:
@@ -5817,7 +5817,7 @@ def ChangeBondAngleEquilValues(poltype,bondtypeindicestonewbondequilvalues,angle
                     linesplit=re.split(r'(\s+)', line)
                     linesplit=linesplit[:11]
                     linesplit.append('\n')
-                    linesplit[8]=str(equilvalue)
+                    linesplit[8]=str(f"{float(equilvalue):.4f}")
                     line=''.join(linesplit)
         temp.write(line)
     temp.close()
