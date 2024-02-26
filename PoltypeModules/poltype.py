@@ -4776,7 +4776,7 @@ class PolarizableTyper():
             # STEP 26
             if not os.path.isfile(self.key4fname) or not os.path.isfile(self.torsionsmissingfilename) or not os.path.isfile(self.torsionprmguessfilename):
                 self.WriteToLog('Searching Database')
-                bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,missingvdwatomindextoneighbors,soluteprms,tortorprmstotransferinfo,tortorsmissing=torsiondatabaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
+                torsionprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,soluteprms,tortorprmstotransferinfo,tortorsmissing=torsiondatabaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
             if os.path.isfile(self.torsionsmissingfilename):
                 torsionsmissing=torsiondatabaseparser.ReadTorsionList(self,self.torsionsmissingfilename)
             if os.path.isfile(self.torsionprmguessfilename):
@@ -4842,7 +4842,7 @@ class PolarizableTyper():
                     # so we comment out this line
                     #mpole.AddPolarizeCommentsToKey(self,self.key2fnamefromavg,polartypetotransferinfo)
                     if self.forcefield.upper() in ['APLUS', 'AMOEBA+', 'AMOEBAPLUS']: 
-                      self.WriteToLog("Assign Charge Penetration Parameters")
+                      self.WriteToLog("Assign Charge Penetration Parameters using DatabaseParser")
                       ldatabaseparser.assign_chgpen_params(self) 
                 # STEP 38
                 fit=False
@@ -4865,8 +4865,18 @@ class PolarizableTyper():
                         esp.ElectrostaticPotentialComparison(self,combinedxyz,combinedpot)
             # STEP 40
             if not os.path.exists(self.key4fname):
-                torsiondatabaseparser.appendtofile(self,self.key3fname,self.key4fname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,tortorprmstotransferinfo)
+                torsiondatabaseparser.appendtofile(self,self.key3fname,self.key4fname, torsionprmstotransferinfo,soluteprms,tortorprmstotransferinfo)
                 if self.writeoutangle==True:
+                    # assign valence term here using new script
+                    # Chengwen Liu
+                    # Feb 2024
+                    self.WriteToLog('Assign bonded parameters using DatabaseParser')
+                    ldatabaseparser.assign_bonded_params(self)
+                    if self.forcefield.upper() in ['APLUS', 'AMOEBA+', 'AMOEBAPLUS']:
+                      self.WriteToLog('Assign Charge flux, Charge transfer, and Van der Waals parameters using DatabaseParser')
+                    else:
+                      self.WriteToLog('Assign Van der Waals parameters using DatabaseParser')
+                    ldatabaseparser.assign_nonbonded_params(self) 
                     torsiondatabaseparser.StiffenZThenBisectorAngleConstants(self,self.key4fname)
                     torsiondatabaseparser.TestBondAngleEquilValues(self)
                 self.AddIndicesToKey(self.key4fname)
@@ -4880,12 +4890,6 @@ class PolarizableTyper():
                     modify_key(self.xyzoutfile, self.key4fname, self.key4fname, sdffile=self.molstructfname, inpfile=self.prmmodlist)
                 # make copy of key file before patches
                 shutil.copy(self.key4fname,self.key4bfname+"_2")
-                ## replace parameters in key4
-                if self.forcefield.upper() in ['APLUS', 'AMOEBA+', 'AMOEBAPLUS']:
-                  self.WriteToLog('Assign chgflux, nonbonded, and bonded parameters using DatabaseParser')
-                else:
-                  self.WriteToLog('Assign Vdw and bonded parameters using DatabaseParser')
-                ldatabaseparser.assign_nonbonded_and_bonded(self) 
             # STEP 41
             (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,optmol,torsionsmissing,self.onlyrotbndslist)
             torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules
