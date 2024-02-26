@@ -239,28 +239,26 @@ def assignPolar():
 def assignVdwAMOEBA():
   genAtomType(xyz, key, 'VDW')
   types = np.loadtxt(os.path.join(prmfiledir,"amoebaVdw.prm"), usecols=(0), unpack=True, dtype="str")
+  
+  ttypes, classs, stypes = np.loadtxt(f"{fname}.type.vdw", usecols=(1,2,3), unpack=True, dtype="str")
+  ttype2class = dict(zip(ttypes, classs))
+  
   vdws = []
   for line in open(os.path.join(prmfiledir,"amoebaVdw.prm")).readlines():
     ss = line.split()
     vdws.append('  '.join(ss[1:]))
   smartsvdwDict = dict(zip(types, vdws))
-  ttypes, stypes = np.loadtxt(f"{fname}.type.vdw", usecols=(1,3), unpack=True, dtype="str")
   tinkervdwDict = {}
   for t,s in zip(ttypes, stypes):
     if t not in tinkervdwDict:
       tinkervdwDict[t] = smartsvdwDict[s]
   lines = open(key).readlines()
   with open(key + "_vdw", "w") as f:
-    for line in lines:
-      if "vdw " in line:
-        dd = line.split()
-        if dd[1] in ttypes:
-          dd[2] = tinkervdwDict[dd[1]]
-          newline = "    ".join(dd[:3]) + "\n"
-          oldline = "#" + line
-          print(GREEN + "VdW parameters found for %s"%dd[1] + ENDC)
-          f.write(oldline)
-          f.write(newline)
+    for ttype in ttypes:
+      prmstr = tinkervdwDict[ttype]
+      print(GREEN + "VdW parameters found for %s"%ttype + ENDC)
+      newline = f"vdw {ttype2class[ttype]} {prmstr}\n"
+      f.write(newline)
   return True
 
 def assignNonbondedAMOEBAplus():
