@@ -47,7 +47,7 @@ def CheckIfStringIsFloat(string):
     return isfloat
 
 
-def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,soluteprms,tortorprmstotransferinfo):
+def appendtofile(poltype, vf,newname, torsionprmstotransferinfo,soluteprms,tortorprmstotransferinfo):
     """
     Intent: Append the parameters found from database search to key file
     Input: Original key file, new name of updated key file, various dictionaries of parameters to comments about 
@@ -102,33 +102,8 @@ def appendtofile(poltype, vf,newname, bondprmstotransferinfo,angleprmstotransfer
             if foundatomblock==True and atomline==False and wroteout==False:
                 wroteout=True
                 f.write('\n')
-                # STEP 4
-                if (poltype.writeoutvdw==True) and (poltype.forcefield.upper() == 'AMOEBA'):
-                    for line in vdwprmstotransferinfo.keys():
-                         f.write(line)
-                         f.write('\n')
                 
                 # STEP 5
-                if poltype.writeoutbond==True:
-                    for line in bondprmstotransferinfo.keys():
-                        f.write(line)
-                        f.write('\n')
-                # STEP 6 
-                if poltype.writeoutangle==True:
-                    for line in angleprmstotransferinfo.keys():
-                        f.write(line)
-                        f.write('\n')
-                # STEP 7
-                if poltype.writeoutstrbnd==True:
-                    for line in strbndprmstotransferinfo.keys():
-                        f.write(line)
-                        f.write('\n')
-                # STEP 8
-                if poltype.writeoutopbend==True:
-                    for line in opbendprmstotransferinfo.keys():
-                        f.write(line)
-                        f.write('\n')
-                # STEP 9
                 if poltype.writeouttorsion==True:
                     for line,transferinfo in torsionprmstotransferinfo.items():
                         f.write(transferinfo)
@@ -5984,7 +5959,7 @@ def StiffenZThenBisectorAngleConstants(poltype,keyfilename):
                     value=str(2*value)
                     linesplit[4]=value
                     string='# Doubling angle force constant because z-then-bisector frame '+'\n'
-                    line=string+' '.join(linesplit)
+                    line=string+' '.join(linesplit) + '\n'
         temp.write(line)
                     
                     
@@ -6452,4 +6427,4 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol,polarize=False
         WriteDictionaryToFile(poltype,torsionkeystringtoparameters,poltype.torsionprmguessfilename)
         WriteOutList(poltype,missingvdwatomindices,poltype.vdwmissingfilename)
         WriteOutList(poltype,tortorsmissing,poltype.tortormissingfilename)
-        return bondprmstotransferinfo,angleprmstotransferinfo,torsionprmstotransferinfo,strbndprmstotransferinfo,opbendprmstotransferinfo,vdwprmstotransferinfo,polarprmstotransferinfo,torsionsmissing,torsionkeystringtoparameters,missingvdwatomindices,soluteprms,tortorprmstotransferinfo,tortorsmissing
+        return torsionprmstotransferinfo,torsionsmissing,torsionkeystringtoparameters,soluteprms,tortorprmstotransferinfo,tortorsmissing

@@ -7,10 +7,12 @@
   - Chengwen Liu
   - Feb 2024
 """
-
+import os
 import shutil
 import numpy as np
+import networkx as nx
 from rdkit import Chem
+from openbabel import pybel 
 
 def assign_chgpen_params(poltype):
   # same as assigning polarizability parameters,
@@ -83,37 +85,143 @@ def assign_chgpen_params(poltype):
       f.write(prm + '\n')
   return 
 
-def assign_nonbonded_and_bonded(poltype):
-    # Here we simply replace the existing bonded and nonbonded 
-    # parameters in the key_4 file by using assignment script
-    # Chengwen Liu
-    # Aug. 2023
+# Print the zero parameters for bond/angle/strbnd/opbend
+# Given the tinker xyz file
+# Assumption: atom type == atom class
+# helper function
+def calc_bond_angle(coords):
+  
+  # bond
+  # coords = [[x1,y1,z1], [x2,y2,z2]]
+  result = 0
+  ndata = len(coords)
+  if ndata == 2:
+    coord1 = np.array(coords[0])
+    coord2 = np.array(coords[1])
+    result = np.sqrt(np.square(coord1-coord2).sum())
+  
+  # angle
+  # coords = [[x1,y1,z1], [x2,y2,z2], [x3,y3,z3]]
+  if ndata == 3:
+    coord1 = np.array(coords[0])
+    coord2 = np.array(coords[1])
+    coord3 = np.array(coords[2])
+    vec21 = coord1 - coord2 
+    vec23 = coord3 - coord2
+    dot = np.dot(vec21, vec23)
+    vec21norm = np.linalg.norm(vec21) 
+    vec23norm = np.linalg.norm(vec23) 
+    result = 180.0/np.pi * (np.arccos(dot/(vec21norm*vec23norm)))
+  return result
 
-    tmpxyz = 'tmpfilename.xyz'
-    tmpkey = 'tmpfilename.key'
+def write_initial_parameters(txyz):
+  atom2type = {}
+  g = nx.Graph()
+  nodes = []
+  edges = []
+  lines = open(txyz).readlines()
+  coords = []
+  if len(lines[0].split()) == 1:
+    os.system(f"sed '1 s/$/ xxx/g' -i {txyz}")
+  for line in lines[1:]:
+    d = line.split()
+    coords.append([float(d[2]), float(d[3]), float(d[4])])
+    if int(d[0]) not in atom2type:
+      atom2type[int(d[0])] = int(d[5])
+    if d[0] not in nodes: 
+      nodes.append(int(d[0]))
+    for c in d[6:]:
+      s = sorted([int(d[0]), int(c)])
+      if s not in edges:
+        edges.append(s)
+  g.add_nodes_from(nodes)
+  g.add_edges_from(edges)
+
+  # find bonds and angles
+  bonds = {} 
+  angles = {} 
+  for edge in g.edges:
+    (n1, n2) = edge
+    t1, t2 = atom2type[n1], atom2type[n2]
+    comb = '-'.join([str(s) for s in sorted([t1,t2])])
+    b = calc_bond_angle([coords[n1-1], coords[n2-1]])
+    if comb not in bonds:
+      bonds[comb] = [b]
+    else:
+      bonds[comb] += [b]
+  
+  for node in g.nodes:
+    adjs = list(g.adj[node])
+    if len(adjs) > 1:
+      for i in range(len(adjs)-1):
+        for j in range(i+1, len(adjs)):
+          n1, n2, n3 = adjs[i], node, adjs[j]
+          t1, t2, t3 = atom2type[n1], atom2type[n2], atom2type[n3]
+          if t1 > t3:
+            t1, t3 = t3, t1
+            n1, n3 = n3, n1
+          a = calc_bond_angle([coords[n1-1], coords[n2-1], coords[n3-1]])
+          comb = '-'.join([str(s) for s in [t1,t2,t3]])
+          if comb not in angles:
+            angles[comb] = [a]
+          else:
+            angles[comb] += [a]
+  
+  # find the tri- center
+  tricentertypes = []
+  for mol in pybel.readfile("txyz", txyz):
+    natoms = len(mol.atoms)
+    for i in range(natoms):
+      hyb = mol.atoms[i].hyb
+      if (hyb == 2) and (g.degree[i+1] == 3):
+        if atom2type[i+1] not in tricentertypes:
+          tricentertypes.append(str(atom2type[i+1]))
+  
+  with open("valence_init.dat", 'w') as f:
+    for bond in bonds:
+      b = bond.split('-') 
+      comb = '-'.join([str(s) for s in b])
+      val = np.array(bonds[comb]).mean()
+      f.write(f"bond   {b[0]}  {b[1]}  0.00 {val:10.4f}\n") 
+    for angle in angles:
+      a = angle.split('-')
+      comb = '-'.join([str(s) for s in a])
+      val = np.array(angles[comb]).mean()
+      if a[1] in tricentertypes:
+        f.write(f"anglep {a[0]}  {a[1]}  {a[2]}  0.00 {val:10.4f}\n")
+      else:
+        f.write(f"angle  {a[0]}  {a[1]}  {a[2]}  0.00 {val:10.4f}\n")
+    
+    for angle in angles:
+      a = angle.split('-')
+      f.write(f"strbnd {a[0]}  {a[1]}  {a[2]}  0.00 0.00\n") 
+    tmp = []
+    for bond in bonds:
+      b = bond.split('-')
+      if (b[0] in tricentertypes) and ([b[1], b[0]] not in tmp):
+        f.write(f"opbend {b[1]}  {b[0]}  0  0  0.00  0.00\n")
+        tmp.append([b[1], b[0]])
+      if b[1] in tricentertypes and ([b[0], b[1]] not in tmp):
+        f.write(f"opbend {b[0]}  {b[1]}  0  0  0.00  0.00\n")
+        tmp.append([b[0], b[1]])
+  return
+
+def assign_bonded_params(poltype):
+    tmpxyz = poltype.xyzoutfile
+    write_initial_parameters(tmpxyz)
+    tmpkey = 'tmpbonded.key'
     sdffile = poltype.molstructfname
     shutil.copy(poltype.key4fname, tmpkey)
-    shutil.copy(poltype.xyzoutfile, tmpxyz)
-    if poltype.forcefield.upper() in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
-      cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent BONDED NONBONDED CF'
-    else:
-      cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent BONDED VDW'
+    catcmd = f"cat valence_init.dat >> {tmpkey}"
+    poltype.call_subsystem([catcmd], True)
+    cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent BONDED'
     poltype.call_subsystem([cmd], True)
     
-    tmpkey_b = 'tmpfilename.key_bonded'
-    tmpkey_v = 'tmpfilename.key_vdw'
-    vdwparams = {}
+    tmpkey_b =  tmpkey + '_bonded'
     bondparams = {}
     angleparams = {}
     strbndparams = {}
     opbendparams = {}
-    
-    # vdw parameters of AMOEBAplus model is in nonbonded
-    if poltype.forcefield.upper() not in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
-      for line in open(tmpkey_v).readlines():
-        if "#" not in line[0:10]:
-          ss = line.split()
-          vdwparams[ss[1]] = '   '.join(ss)
     
     for line in open(tmpkey_b).readlines():
       if "#" not in line[0:10]:
@@ -132,17 +240,11 @@ def assign_nonbonded_and_bonded(poltype):
           opbendparams[comb] = '   '.join(ss)
     
     lines = open(tmpkey).readlines()
-    tmpkey_2 = 'tmpfilename.key_2'
+    tmpkey_2 = 'tmpbonded.key_2'
     with open(tmpkey_2, 'w') as f:
       for line in lines:
         ss = line.split()
         if len(ss) > 3:
-          if (ss[0].lower() == 'vdw') and (ss[1] in vdwparams.keys()):
-            # vdw parameters of AMOEBAplus model is in nonbonded
-            if poltype.forcefield.upper() not in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
-              line = vdwparams[ss[1]] + '\n'
-            else:
-              line = '\n'
           if (ss[0].lower() == 'bond'):
             comb = '-'.join(ss[1:3])
             if comb in bondparams.keys():
@@ -159,20 +261,48 @@ def assign_nonbonded_and_bonded(poltype):
             comb = '-'.join(ss[1:5])
             if comb in opbendparams.keys():
               line = opbendparams[comb] + '\n'
-        
+        f.write(line)
+    shutil.copy(tmpkey_2,poltype.key4fname)
+    return 
+
+def assign_nonbonded_params(poltype):
+    tmpxyz = poltype.xyzoutfile 
+    tmpkey = 'tmpnonbonded.key'
+    sdffile = poltype.molstructfname
+    shutil.copy(poltype.key4fname, tmpkey)
+    if poltype.forcefield.upper() in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
+      cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent NONBONDED CF'
+    else:
+      cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent VDW'
+    poltype.call_subsystem([cmd], True)
+    
+    tmpkey_v = f'{tmpkey}_vdw'
+    vdwparams = {}
+    
+    # vdw parameters of AMOEBAplus model is in nonbonded
+    if poltype.forcefield.upper() not in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
+      for line in open(tmpkey_v).readlines():
+        if "#" not in line[0:10]:
+          ss = line.split()
+          vdwparams[ss[1]] = '   '.join(ss)
+    
+    lines = open(tmpkey).readlines()
+    tmpkey_2 = f'{tmpkey}_2'
+    with open(tmpkey_2, 'w') as f:
+      for line in lines:
+        ss = line.split()
+        if len(ss) > 3:
+          if (ss[0].lower() == 'vdw') and (ss[1] in vdwparams.keys()):
+            # vdw parameters of AMOEBAplus model is in nonbonded
+            if poltype.forcefield.upper() not in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
+              line = vdwparams[ss[1]] + '\n'
+            else:
+              line = '\n'
         f.write(line)
     
     if poltype.forcefield.upper() in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
-      lines = open(tmpkey_2).readlines()
-      # vdws that already exist are commented out
-      with open(tmpkey_2, 'w') as f:
-        for line in lines:
-          if (len(line.split()) > 3) and (line.split()[0].lower() == 'vdw'):
-            line = '# ' + line
-          f.write(line)
-
-      tmpkey_cflux = 'tmpfilename.key_cf'
-      tmpkey_nonbonded = 'tmpfilename.key_nonbonded'
+      tmpkey_cflux = f'{tmpkey}_cf'
+      tmpkey_nonbonded = f'{tmpkey}_nonbonded'
       cflux_lines = open(tmpkey_cflux).readlines()
       nonbonded_lines = open(tmpkey_nonbonded).readlines()
       with open(tmpkey_2, 'a') as f:
@@ -183,52 +313,14 @@ def assign_nonbonded_and_bonded(poltype):
           if "chgpen " not in line:
             f.write(line)
     
-    # patch: treat amine angle constant
-    special_treatment_for_amine(sdffile, tmpkey_2, tmpxyz)
+    # for AMOEBA model, only vdw term exists
+    else:
+      tmpkey_vdw = f'{tmpkey}_vdw'
+      vdw_lines = open(tmpkey_vdw).readlines()
+      with open(tmpkey_2, 'a') as f:
+        for line in vdw_lines: 
+          f.write(line)
+    
     # replace key4 with the file we wanted
     shutil.copy(tmpkey_2,poltype.key4fname)
     return 
-  
-def special_treatment_for_amine(sdffile, keyfile, xyzfile):
-  atoms, types = np.loadtxt(xyzfile, usecols=(0,5), dtype='int', skiprows=1, unpack=True)
-  atom2type = dict(zip(atoms, types))
-  angle_types = []
-  mol = Chem.MolFromMolFile(sdffile,removeHs=False)
-  pattern = Chem.MolFromSmarts('[H][NX3][CX4]')
-  matches = mol.GetSubstructMatches(pattern)
-  for match in matches:
-    h,n,c = match
-    h += 1
-    n += 1
-    c += 1
-    t1 = [atom2type[h], atom2type[n], atom2type[c]]
-    t2 = [atom2type[c], atom2type[n], atom2type[h]]
-    if t1 not in angle_types:
-      angle_types.append(t1)
-      angle_types.append(t2)
-    
-  if matches != []:
-    smt = '[H][NX3]([CX4])[H]'
-    pattern = Chem.MolFromSmarts(smt)
-    matches = mol.GetSubstructMatches(pattern)
-    for m in matches:
-      a,b,_, c = m
-      a += 1
-      b += 1
-      c += 1
-      t1 = [atom2type[a], atom2type[b], atom2type[c]]
-      t2 = [atom2type[c], atom2type[b], atom2type[a]]
-      if t1 not in angle_types:
-        angle_types.append(t1)
-        angle_types.append(t2)
-  
-  if angle_types != []:
-    lines = open(keyfile).readlines()
-    with open(keyfile, 'w') as f:
-      for line in lines:
-        if (line.strip().startswith('angle')):
-          ss = line.split()
-          if [int(ss[1]), int(ss[2]), int(ss[3])] in angle_types:
-            line = f'angle {ss[1]}  {ss[2]}  {ss[3]} 100.0 {ss[5]}\n'
-        f.write(line)
-  return
