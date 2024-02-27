@@ -237,7 +237,7 @@ def GrabNumberOfConnectedHydrogens(poltype,highestsymneighbnorepeat):
     return hydnum
 
    
-def gen_peditinfile(poltype,mol,polarindextopolarizeprm):
+def gen_peditinfile(poltype,mol):
     """
     Intent:
     Input:

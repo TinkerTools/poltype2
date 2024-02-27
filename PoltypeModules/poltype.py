@@ -4796,11 +4796,8 @@ class PolarizableTyper():
                 # STEP 28 
                 if not os.path.isfile(self.gdmafname):
                     mpole.run_gdma(self)
-        
-                # STEP 29
-                polarindextopolarizeprm,polartypetotransferinfo=torsiondatabaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m,polarize=True)
                 # STEP 30
-                lfzerox=mpole.gen_peditinfile(self,mol,polarindextopolarizeprm)
+                lfzerox=mpole.gen_peditinfile(self,mol)
             
                 if (not os.path.isfile(self.xyzfname) or not os.path.isfile(self.keyfname)):
                     # STEP 31
