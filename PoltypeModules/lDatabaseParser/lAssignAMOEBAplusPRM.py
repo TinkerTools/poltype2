@@ -253,12 +253,16 @@ def assignVdwAMOEBA():
     if t not in tinkervdwDict:
       tinkervdwDict[t] = smartsvdwDict[s]
   lines = open(key).readlines()
+  tmp = []
   with open(key + "_vdw", "w") as f:
     for ttype in ttypes:
-      prmstr = tinkervdwDict[ttype]
-      print(GREEN + "VdW parameters found for %s"%ttype + ENDC)
-      newline = f"vdw {ttype2class[ttype]} {prmstr}\n"
-      f.write(newline)
+      tclass = ttype2class[ttype]
+      if tclass not in tmp:
+        tmp.append(tclass)
+        prmstr = tinkervdwDict[ttype]
+        print(GREEN + "VdW parameters found for %s"%ttype + ENDC)
+        newline = f"vdw {ttype2class[ttype]} {prmstr}\n"
+        f.write(newline)
   return True
 
 def assignNonbondedAMOEBAplus():
