@@ -257,11 +257,12 @@ def assign_bonded_params(poltype):
             comb = '-'.join(ss[1:4])
             if comb in strbndparams.keys():
               line = strbndparams[comb] + '\n'
-          if (ss[0].lower() == 'opbend'):
-            comb = '-'.join(ss[1:5])
-            if comb in opbendparams.keys():
-              line = opbendparams[comb] + '\n'
-        f.write(line)
+        # opbend x y 0 0
+        if 'opbend ' not in line:
+          f.write(line)
+      # opbend x y z w
+      for opbprm in opbendparams.values():
+        f.write(opbprm + '\n')
     shutil.copy(tmpkey_2,poltype.key4fname)
     return 
 
