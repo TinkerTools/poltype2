@@ -625,12 +625,12 @@ def assignBonded(new_para_method, fitting = "NO"):
           if angletype2 in sp2AtomTypes:
             d[0] = 'anglep'
           if (comb1 in classAngleParameterDict):
-            para_strings_k.append("%s %s %s %s %10.5f %s\n"%(d[0], angletype1, angletype2, angletype3, classAngleParameterDict[comb1][0], d[5]))
-            para_strings_kbt.append("%s %s %s %s %10.5f %10.5f\n"%(d[0], angletype1, angletype2, angletype3, classAngleParameterDict[comb1][0], classAngleParameterDict[comb1][1]))
+            para_strings_k.append("%s %s %s %s %10.4f %s\n"%(d[0], angletype1, angletype2, angletype3, classAngleParameterDict[comb1][0], d[5]))
+            para_strings_kbt.append("%s %s %s %s %10.4f %10.4f\n"%(d[0], angletype1, angletype2, angletype3, classAngleParameterDict[comb1][0], classAngleParameterDict[comb1][1]))
             print(GREEN + "ANGLE bending parameter found for angle %s-%s-%s"%(angletype1, angletype2, angletype3) + ENDC)
           elif (comb2 in classAngleParameterDict):
-            para_strings_k.append("%s %s %s %s %10.5f %s\n"%(d[0], angletype3, angletype2, angletype1, classAngleParameterDict[comb2][0], d[5]))
-            para_strings_kbt.append("%s %s %s %s %10.5f %10.5f\n"%(d[0],angletype3, angletype2, angletype1, classAngleParameterDict[comb2][0], classAngleParameterDict[comb2][1]))
+            para_strings_k.append("%s %s %s %s %10.4f %s\n"%(d[0], angletype3, angletype2, angletype1, classAngleParameterDict[comb2][0], d[5]))
+            para_strings_kbt.append("%s %s %s %s %10.4f %10.4f\n"%(d[0],angletype3, angletype2, angletype1, classAngleParameterDict[comb2][0], classAngleParameterDict[comb2][1]))
             print(GREEN + "ANGLE bending parameter found for angle %s-%s-%s"%(angletype1, angletype2, angletype3) + ENDC)
           else: 
             is_wild = False
@@ -642,8 +642,8 @@ def assignBonded(new_para_method, fitting = "NO"):
             if(fitting == 'NO'):
               if(is_wild):
                 para_strings_k.append("# Warning! This angle involves wild type. Please check your structure\n")
-              para_strings_k.append("%s %s %s %s %10.5f %s\n"%(d[0], angletype1, angletype2, angletype3, para[0], d[5]))
-              para_strings_kbt.append("%s %s %s %s %10.5f %s\n"%(d[0], angletype1, angletype2, angletype3, para[0], para[1]))
+              para_strings_k.append("%s %s %s %s %10.4f %s\n"%(d[0], angletype1, angletype2, angletype3, para[0], d[5]))
+              para_strings_kbt.append("%s %s %s %s %10.4f %s\n"%(d[0], angletype1, angletype2, angletype3, para[0], para[1]))
               print(GREEN + "ANGLE bending parameter (newly generated) assigned for angle %s-%s-%s"%(d[1], d[2], d[3]) + ENDC)
             else:
               para_strings_k.append("%s %s %s %s PRM%d_ %s\n"%(d[0], d[1], d[2], d[3], len(fitting_list), d[5]))
@@ -679,12 +679,12 @@ def assignBonded(new_para_method, fitting = "NO"):
           comb1 = c1 + "_" + c2 + "_" + c3
           comb2 = c3 + "_" + c2 + "_" + c1
           if (comb1 in classStrbndKconstantDict):
-            tmp = "%10.5f%10.5f"%(classStrbndKconstantDict[comb1][0], classStrbndKconstantDict[comb1][1])
+            tmp = "%10.4f%10.4f"%(classStrbndKconstantDict[comb1][0], classStrbndKconstantDict[comb1][1])
             para_strings_k.append("strbnd %s %s %s %s\n"%(angletype1, angletype2, angletype3, tmp))
             para_strings_kbt.append("strbnd %s %s %s %s\n"%(angletype1, angletype2, angletype3, tmp))
             print(GREEN + "STRBND coupling parameter found for angle %s-%s-%s"%(angletype1, angletype2, angletype3) + ENDC)
           elif (comb2 in classStrbndKconstantDict):
-            tmp = "%10.5f%10.5f"%(classStrbndKconstantDict[comb2][0], classStrbndKconstantDict[comb2][1])
+            tmp = "%10.4f%10.4f"%(classStrbndKconstantDict[comb2][0], classStrbndKconstantDict[comb2][1])
             para_strings_k.append("strbnd %s %s %s %s\n"%(angletype3, angletype2, angletype1, tmp))
             para_strings_kbt.append("strbnd %s %s %s %s\n"%(angletype3, angletype2, angletype1, tmp))
             print(GREEN + "STRBND coupling parameter found for angle %s-%s-%s"%(angletype1, angletype2, angletype3) + ENDC)
@@ -693,8 +693,8 @@ def assignBonded(new_para_method, fitting = "NO"):
             if(fitting == 'NO'):
               if(is_wild):
                 para_strings_k.append("# Warning! This strbnd involves wild type. Please check your structure\n")
-              p0 = "%10.5f"%para[0] 
-              p1 = "%10.5f"%para[1] 
+              p0 = "%10.4f"%para[0] 
+              p1 = "%10.4f"%para[1] 
               para_strings_k.append("strbnd %s %s %s %s %s\n"%(angletype1, angletype2, angletype3, p0, p1))
               para_strings_kbt.append("strbnd %s %s %s %s %s\n"%(angletype1, angletype2, angletype3, p0, p1))
               print(GREEN + "STRBND coupling parameter (newly generated) assigned for angle %s-%s-%s"%(d[1], d[2], d[3]) + ENDC)
