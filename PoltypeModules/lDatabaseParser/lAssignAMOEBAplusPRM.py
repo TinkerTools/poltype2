@@ -188,7 +188,7 @@ def genAtomType(txyz, key, potent):
           myStr = data[0]
           classNum = data[2]
           className = line.split("# ")[0].split()[-1] 
-          comment = line.split("# ")[1][0:-1]
+          comment = line.split("# ")[-1][0:-1]
           smarts = pybel.Smarts(myStr)
           match = smarts.findall(mol)
           if match:
