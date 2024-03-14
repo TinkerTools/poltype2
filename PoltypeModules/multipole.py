@@ -538,10 +538,11 @@ def gen_peditinfile(poltype,mol):
             matches = rdkitmol.GetSubstructMatches(pattern)
             for match in matches:
               n,h1,h2,_,_ = match
-              frames.append(f'{h1+1} {n+1} {h2+1}')
-              frames.append(f'{h2+1} {n+1} {h1+1}')
+              # this is not the right way
+              #frames.append(f'{h1+1} {n+1} {h2+1}')
+              #frames.append(f'{h2+1} {n+1} {h1+1}')
               # this is the RIGHT way but this lead to worse ESP
-              #frames.append(f'{n+1} -{h1+1} -{h2+1}')
+              frames.append(f'{n+1} -{h1+1} -{h2+1}')
             # NH2-c
             pattern = Chem.MolFromSmarts('[NH2]([H])([H])[c]')
             matches = rdkitmol.GetSubstructMatches(pattern)
@@ -549,6 +550,7 @@ def gen_peditinfile(poltype,mol):
               n,h1,h2,_ = match
               frames.append(f'{h1+1} {n+1} {h2+1}')
               frames.append(f'{h2+1} {n+1} {h1+1}')
+              frames.append(f'{n+1} -{h1+1} -{h2+1}')
             
             if frames != []:
               for frame in frames:
