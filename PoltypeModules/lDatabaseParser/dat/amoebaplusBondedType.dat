@@ -288,6 +288,7 @@
 [$([OX2H0]([SX4]([O]([C])))([OH0]))]                                262   237      O=SO2 #                O=SO2: Oxygen of Sulfonic acid
 [$([O]([S]([O])([O]))([C]))]                                        263   238     OS-est #               OS-est, oxygen of EMsulfonate  
 [$([or5])]                                                          265   239        or5 #                  general type aromatic O in 5 member ring
+[$([or6])]                                                          265   239        or6 #                  general type aromatic O in 6 member ring
 [$([OX2r5]([CX4r5]([OH0r5])))]                                      264   239        Oxo #                  Oxo, example: benzodioxole
 [$([OX2r5]([CX4r5]([OH0r5]))[cccccc])]                              265   239        Oxo #                  Oxo, example: benzodioxole    
 [$([O][C](=[O])([NH2]))]                                            266   225         O- #                   O-, example: carbamate 
