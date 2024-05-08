@@ -428,6 +428,7 @@ class PolarizableTyper():
         gdmaexe:str='gdma'
         new_gdma:bool=False
         scaleandfixdipole=False
+        scalebigmultipole=False
         sameleveldmaesp:bool=False
         adaptiveespbasisset:bool=False
         avgmpolesexe:str=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/PoltypeModules/avgmpoles.pl"
@@ -1051,6 +1052,8 @@ class PolarizableTyper():
                             self.new_gdma=self.SetDefaultBool(line,a,True)
                         elif 'scaleandfixdipole' in newline:
                             self.scaleandfixdipole=self.SetDefaultBool(line,a,True)
+                        elif 'scalebigmultipole' in newline:
+                            self.scalebigmultipole=self.SetDefaultBool(line,a,True)
                         elif newline.startswith("gdmacommand_"):
                             self.__dict__[newline] = a
                             gdma_kws.append((newline[len('gdmacommand_'):], a))
@@ -4848,6 +4851,8 @@ class PolarizableTyper():
                     if self.scaleandfixdipole:
                       lmodifytinkerkey.modkey2(self)
                       self.WriteToLog("Special Treatment for COO Functional Group ")
+                    if self.scalebigmultipole:
+                      lmodifytinkerkey.modkey2_mpole(self)
                     self.WriteToLog("Electrostatic Potential Optimization")
                     combinedxyz,combinedpot=esp.ElectrostaticPotentialFitting(self,xyzfnamelist,keyfnamelist,potnamelist) 
                     shutil.copy(self.key3fnamefrompot,self.key3fname)
