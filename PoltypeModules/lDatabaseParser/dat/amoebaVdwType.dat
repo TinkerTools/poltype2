@@ -425,7 +425,7 @@
 [$([SH2])]          					SH2_S			# Hydrogen Sulfide S
 
 # Heterocylic ring systems, probed using water 
-[$([#7H0X2;R])]                                         R-NH0               # ring Nitrogen without H
-[$([#7H0X2;R][#6;R][Cl])]                               R-NH0C-Cl           # ring Nitrogen without H and connected to ortho-Cl
-[$([H][NH2][#6;R]([#7;R])[#6;R])]                       H2N<NC              # H of H2N then connected to N and C of the ring
-[$([H][NH2][#6;R]([#7;R])[#7;R])]                       H2N<NN              # H of H2N then connected to N and N of the ring
+#[$([#7H0X2;R])]                                         R-NH0               # ring Nitrogen without H
+#[$([#7H0X2;R][#6;R][Cl])]                               R-NH0C-Cl           # ring Nitrogen without H and connected to ortho-Cl
+#[$([H][NH2][#6;R]([#7;R])[#6;R])]                       H2N<NC              # H of H2N then connected to N and C of the ring
+#[$([H][NH2][#6;R]([#7;R])[#7;R])]                       H2N<NN              # H of H2N then connected to N and N of the ring
