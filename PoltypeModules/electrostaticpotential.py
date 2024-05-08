@@ -184,7 +184,7 @@ def CreatePsi4ESPInputFile(poltype,comfilecoords,comfilename,mol,maxdisk,maxmem,
         temp.write('fchk(wfn, "%s.fchk")'%(comfilename.replace('.com',''))+'\n')
     else:
         temp.write("wfn = psi4.core.Wavefunction.from_file('dma.wfn.npy')\n")
-        temp.write('oeprop(wfn,"DIPOLE", "QUADRUPOLE", "GRID_ESP","WIBERG_LOWDIN_INDICES","MULLIKEN_CHARGES")\n')
+        temp.write('oeprop(wfn, "GRID_ESP","WIBERG_LOWDIN_INDICES","MULLIKEN_CHARGES")\n')
 
     temp.write('clean()'+'\n')
     temp.close()

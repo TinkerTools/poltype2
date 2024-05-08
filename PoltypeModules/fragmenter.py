@@ -2068,7 +2068,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets,non
         # below we directly use the lTorsionFragmentPostProcessing.py program
         # on the .sdf file to generate the .mol file
 
-        cmdstr = f"python \"{os.path.join(os.path.abspath(os.path.split(__file__)[0]), 'lTorsionFragmentPostProcessing.py')}\" {structfname}"
+        cmdstr = f"python \"{os.path.join(os.path.abspath(os.path.split(__file__)[0]), 'lTorsionFragmentPostProcessing.py')}\" {structfname} ../../extendedconf.mol"
         poltype.WriteToLog('Calling: '+cmdstr) 
         os.system(cmdstr)
         fragmol=rdmolfiles.MolFromMolFile(structfnamemol,removeHs=False)
