@@ -543,7 +543,9 @@ def gen_peditinfile(poltype,mol):
               #frames.append(f'{h2+1} {n+1} {h1+1}')
               # this is the RIGHT way but this lead to worse ESP
               frames.append(f'{n+1} -{h1+1} -{h2+1}')
-            # NH2-c
+            # NH2-c 
+            # this will give better quality of the ESP
+            # comparing to poledit.x frame (Z-bisec)
             pattern = Chem.MolFromSmarts('[NH2]([H])([H])[c]')
             matches = rdkitmol.GetSubstructMatches(pattern)
             for match in matches:

@@ -590,7 +590,7 @@ def assignBonded(new_para_method, fitting = "NO"):
   #angle bending
 
    ## find sp2 atoms
-  sp2AtomTypes = findSp2AtomTypes(xyz) 
+  sp2AtomTypes = findSp2AtomTypes(xyz, sdf) 
   class1, class2, class3  = np.loadtxt(os.path.join(prmfiledir, "angle.prm"), usecols=(1, 2, 3), unpack=True, dtype="str",skiprows=1)
   angleKs, angleTs  = np.loadtxt(os.path.join(prmfiledir, "angle.prm"), usecols=(4,5), unpack=True, dtype="float",skiprows=1)
   classes = []

@@ -114,7 +114,7 @@ def calc_bond_angle(coords):
     result = 180.0/np.pi * (np.arccos(dot/(vec21norm*vec23norm)))
   return result
 
-def write_initial_parameters(txyz):
+def write_initial_parameters(sdffile, txyz):
   atom2type = {}
   g = nx.Graph()
   nodes = []
@@ -169,13 +169,21 @@ def write_initial_parameters(txyz):
   
   # find the tri- center
   tricentertypes = []
-  for mol in pybel.readfile("txyz", txyz):
-    natoms = len(mol.atoms)
-    for i in range(natoms):
-      hyb = mol.atoms[i].hyb
-      if (hyb == 2) and (g.degree[i+1] == 3):
-        if atom2type[i+1] not in tricentertypes:
-          tricentertypes.append(str(atom2type[i+1]))
+  # rdkit is more robust
+  aniline_nitrogens = []
+  rdkitmol = Chem.MolFromMolFile(sdffile,removeHs=False)
+  pattern = Chem.MolFromSmarts('[NX3][a]')
+  matches = rdkitmol.GetSubstructMatches(pattern)
+  for match in matches:
+    nitrogen = str(match[0] + 1)
+    aniline_nitrogens.append(nitrogen)
+
+  num_atoms = rdkitmol.GetNumAtoms() 
+  for i in range(num_atoms):
+    atom = rdkitmol.GetAtomWithIdx(i)
+    if (atom.GetHybridization() == Chem.HybridizationType.SP2) and (g.degree[i+1] == 3) and (str(i+1) not in aniline_nitrogens):
+      if str(atom2type[i+1]) not in tricentertypes: 
+        tricentertypes.append(str(atom2type[i+1]))
   
   with open("valence_init.dat", 'w') as f:
     for bond in bonds:
@@ -208,7 +216,8 @@ def write_initial_parameters(txyz):
 
 def assign_bonded_params(poltype):
     tmpxyz = poltype.xyzoutfile
-    write_initial_parameters(tmpxyz)
+    sdffile = poltype.molstructfname
+    write_initial_parameters(sdffile, tmpxyz)
     tmpkey = 'tmpbonded.key'
     sdffile = poltype.molstructfname
     shutil.copy(poltype.key4fname, tmpkey)
