@@ -177,11 +177,21 @@ def write_initial_parameters(sdffile, txyz):
   for match in matches:
     nitrogen = str(match[0] + 1)
     aniline_nitrogens.append(nitrogen)
-
+  
+  amide_nitrogens = []
+  pattern = Chem.MolFromSmarts('[NX3][C]=[O]')
+  matches = rdkitmol.GetSubstructMatches(pattern)
+  for match in matches:
+    nitrogen = str(match[0] + 1)
+    amide_nitrogens.append(nitrogen)
+  
+  #!! dont forget to add this to valence_utils.py 
+  
+  excluded_nitrogens = aniline_nitrogens + amide_nitrogens
   num_atoms = rdkitmol.GetNumAtoms() 
   for i in range(num_atoms):
     atom = rdkitmol.GetAtomWithIdx(i)
-    if (atom.GetHybridization() == Chem.HybridizationType.SP2) and (g.degree[i+1] == 3) and (str(i+1) not in aniline_nitrogens):
+    if (atom.GetHybridization() == Chem.HybridizationType.SP2) and (g.degree[i+1] == 3) and (str(i+1) not in excluded_nitrogens):
       if str(atom2type[i+1]) not in tricentertypes: 
         tricentertypes.append(str(atom2type[i+1]))
   
