@@ -9,7 +9,7 @@
 
 # KEY RULES IMPLEMENTED IN THIS PROGRAM:
 # 1. Bond breaking only happens at single bonds
-# 2. Special single bond (aromatic nitrogen) is not cut
+# 2. Special bond involving nitrogen is not cut
 # 3. Fused rings are treated as single rings if the fused two atoms are carbon
 # 4. Long alkane chain such as propyl and ethyl are replaced with CH3-
 # 5. Charged fragments (COO-) is neutralized
@@ -154,13 +154,20 @@ def main():
   for match in matches:
     single_bonds.append(list(match))
   
-  # except aromatic nitrogen (n-*)
-  aromatic_nitrogen = []
+  # except aromatic nitrogen (n-*),
+  special_nitrogen = []
   pattern = Chem.MolFromSmarts('[n][*]')
   matches = mol.GetSubstructMatches(pattern)
   for match in matches:
-    aromatic_nitrogen.append([match[0], match[1]])
-    aromatic_nitrogen.append([match[1], match[0]])
+    special_nitrogen.append([match[0], match[1]])
+    special_nitrogen.append([match[1], match[0]])
+  
+  # or non-trivalence nitrogen 
+  pattern = Chem.MolFromSmarts('[#7X2][*]')
+  matches = mol.GetSubstructMatches(pattern)
+  for match in matches:
+    special_nitrogen.append([match[0], match[1]])
+    special_nitrogen.append([match[1], match[0]])
   
   # do not cut two groups on ortho- sites (1-4)
   # unless the connected atom is carbon
@@ -228,7 +235,7 @@ def main():
         if (not sameRing) and (atomNum != 1):
           pair = [idx, neig_idx]
           pair_r = [neig_idx, idx]
-          if not set(pair).issubset(set(torsion_idx_list)) and (pair in single_bonds or pair_r in single_bonds) and (pair not in aromatic_nitrogen): 
+          if not set(pair).issubset(set(torsion_idx_list)) and (pair in single_bonds or pair_r in single_bonds) and (pair not in special_nitrogen): 
             spair = sorted([idx, neig_idx])
             if spair not in sub_bonds:
               sub_bonds.append(spair)
