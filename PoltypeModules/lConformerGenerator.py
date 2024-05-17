@@ -85,7 +85,8 @@ def get_pairAtoms(mol):
         pair_15beyond.append([n, m])
   return pair_15beyond
 
-def no_close_contact(conf, atom_pairs, threshold=2.0):
+# change to 2.5 so this is consistent with HB definition above
+def no_close_contact(conf, atom_pairs, threshold=2.5):
   res = True
   for pair in atom_pairs:
     i, j = pair
