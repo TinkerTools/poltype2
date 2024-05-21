@@ -1,11 +1,9 @@
 
 # This program is used by fragmenter.py 
-# - takes the {fname}.sdf file of poltype torsion fragment job 
+# - takes the {fname}.sdf file of poltype torsion fragment job
+# - write a new file {fname}-post.mol to fix possible broken aromaticity
 # - further trimming on the fragments based on several predefined chemical rules
 # - generates a {fname}.mol file for using with afterwards torsion fitting
-
-# NOTE: 
-# 1. the precessed file (.mol) can be the same as the original file (.sdf)
 
 # KEY RULES IMPLEMENTED IN THIS PROGRAM:
 # 1. Bond breaking only happens at single bonds
@@ -49,7 +47,7 @@ def saveFragment(mol, atomsToKeep,output):
   rdmolfiles.MolToMolFile(mol2h, output)
   return
 
-def main(): 
+if __name__ == '__main__':
   sdffile = sys.argv[1]
   parent_mol_file = sys.argv[2]
  
@@ -129,23 +127,18 @@ def main():
       if xyzstr == rotbond_coords[1]:
         second_idx = atom_idx
         
-    old_order = list(range(len(tmp_mol.GetAtoms())))
-    new_order = []
-    for order in old_order:
-      if order == 1:
-        new_order.append(first_idx)
-      elif order == 2:
-        new_order.append(second_idx)
-      elif order == first_idx:
-        new_order.append(1)
-      elif order == second_idx:
-        new_order.append(2)
-      else:
-        new_order.append(order)
+    new_order = list(range(len(tmp_mol.GetAtoms())))
+    new_order.remove(first_idx)
+    new_order.remove(second_idx)
+    new_order.insert(1, first_idx)
+    new_order.insert(2, second_idx)
     tmp_mol = Chem.RenumberAtoms(tmp_mol, new_order) 
     rdmolfiles.MolToMolFile(tmp_mol, f'{fname}_post.mol')
     sdffile = f"{fname}_post.mol" 
     mol = Chem.MolFromMolFile(sdffile,removeHs=False)
+
+  # we have the "correct" fragment to work on
+  # below we focus on trimming the fragment
 
   # all single bonds are eligible to cut,
   single_bonds = []
@@ -371,20 +364,41 @@ def main():
     print('COO- group detected. Neutralizing!')
     for match in matches_1:
       idx = match[0]
-      mol2.GetAtomWithIdx(idx).SetFormalCharge(0)
-      Chem.SanitizeMol(mol2)
+      oxygen = mol2.GetAtomWithIdx(idx)
+      oxygen.SetFormalCharge(0)
+      oxygen.SetNumExplicitHs(1)
+      oxygen.UpdatePropertyCache()
       updated_mol = Chem.AddHs(updated_mol, addCoords=True)
     rdmolfiles.MolToMolFile(updated_mol, f'{fname}.mol')
   elif len(matches_2) != 0:
     print('NH- group detected. Neutralizing!')
     for match in matches_2:
       idx = match[0]
-      mol2.GetAtomWithIdx(idx).SetFormalCharge(0)
-      Chem.SanitizeMol(mol2)
+      notrogen = mol2.GetAtomWithIdx(idx)
+      nitrogen.SetFormalCharge(0)
+      oxygen.SetNumExplicitHs(2)
+      nitrogen.UpdatePropertyCache()
       updated_mol = Chem.AddHs(updated_mol, addCoords=True)
     rdmolfiles.MolToMolFile(updated_mol, f'{fname}.mol')
   else:
     rdmolfiles.MolToMolFile(mol2h, f'{fname}.mol')
-
-if __name__ == '__main__':
-  main()
+    
+  # re-order the atoms so that 1-2 is the rotbond
+  # which is required by poltype torsion fragment job
+  final_mol = Chem.MolFromMolFile(f'{fname}.mol',removeHs=False)
+  for atom in final_mol.GetAtoms():
+    atom_idx = atom.GetIdx()
+    coord = final_mol.GetConformer().GetAtomPosition(atom_idx) 
+    x, y, z = f"{coord.x:10.4f}", f"{coord.y:10.4f}", f"{coord.z:10.4f}"
+    xyzstr = ''.join([x,y,z])
+    if xyzstr == rotbond_coords[0]:
+      first_idx = atom_idx
+    if xyzstr == rotbond_coords[1]:
+      second_idx = atom_idx
+  new_order = list(range(len(final_mol.GetAtoms())))
+  new_order.remove(first_idx)
+  new_order.remove(second_idx)
+  new_order.insert(1, first_idx)
+  new_order.insert(2, second_idx)
+  final_mol = Chem.RenumberAtoms(final_mol, new_order) 
+  rdmolfiles.MolToMolFile(final_mol, f'{fname}.mol')
