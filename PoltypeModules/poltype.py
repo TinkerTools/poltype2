@@ -429,6 +429,7 @@ class PolarizableTyper():
         new_gdma:bool=False
         scaleandfixdipole=False
         scalebigmultipole=False
+        fragbigmultipole=False
         sameleveldmaesp:bool=False
         adaptiveespbasisset:bool=False
         avgmpolesexe:str=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/PoltypeModules/avgmpoles.pl"
@@ -1054,6 +1055,8 @@ class PolarizableTyper():
                             self.scaleandfixdipole=self.SetDefaultBool(line,a,True)
                         elif 'scalebigmultipole' in newline:
                             self.scalebigmultipole=self.SetDefaultBool(line,a,True)
+                        elif 'fragbigmultipole' in newline:
+                            self.fragbigmultipole=self.SetDefaultBool(line,a,True)
                         elif newline.startswith("gdmacommand_"):
                             self.__dict__[newline] = a
                             gdma_kws.append((newline[len('gdmacommand_'):], a))
@@ -4849,10 +4852,12 @@ class PolarizableTyper():
                 if self.espfit and not os.path.isfile(self.key3fname) and self.atomnum!=1:
                     xyzfnamelist,keyfnamelist=self.GenerateDuplicateXYZsFromOPTs(self.xyzoutfile,self.key2fnamefromavg,optmolist)   
                     if self.scaleandfixdipole:
-                      lmodifytinkerkey.modkey2(self)
+                      lmodifytinkerkey.modkey2_COO(self)
                       self.WriteToLog("Special Treatment for COO Functional Group ")
                     if self.scalebigmultipole:
-                      lmodifytinkerkey.modkey2_mpole(self)
+                      lmodifytinkerkey.modkey2_scalempole(self)
+                    if self.fragbigmultipole:
+                      lmodifytinkerkey.modkey2_fragmpole(self)
                     self.WriteToLog("Electrostatic Potential Optimization")
                     combinedxyz,combinedpot=esp.ElectrostaticPotentialFitting(self,xyzfnamelist,keyfnamelist,potnamelist) 
                     shutil.copy(self.key3fnamefrompot,self.key3fname)
