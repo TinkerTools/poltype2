@@ -4873,6 +4873,8 @@ class PolarizableTyper():
             # STEP 40
             if not os.path.exists(self.key4fname):
                 torsiondatabaseparser.appendtofile(self,self.key3fname,self.key4fname, torsionprmstotransferinfo,soluteprms,tortorprmstotransferinfo)
+                # Write Zero parameters for special torsion
+                ldatabaseparser.zero_special_torsions(self)
                 if self.writeoutangle==True:
                     # assign valence term here using new script
                     # Chengwen Liu

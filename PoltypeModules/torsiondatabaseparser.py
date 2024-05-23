@@ -3087,7 +3087,7 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
                    parametersmartsatomorders=poltypeclassestoparametersmartsatomorders[poltypeclasses]
                    smartsatomorders=poltypeclassestosmartsatomorders[poltypeclasses]
                    elementtinkerdescrips=poltypeclassestoelementtinkerdescrips[poltypeclasses]
-                   transferinfoline='# amoeba09'+' '+'matching SMARTS from molecule '+' '+str(smartsatomorders)+' '+'to SMARTS from parameter file'+' '+str(parametersmartsatomorders)+' '+'with tinker type descriptions '+str(elementtinkerdescrips)+'\n'
+                   transferinfoline=''
                    # STEP 7
                    if defaultvalues!=None:
                        for value in defaultvalues:

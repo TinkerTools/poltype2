@@ -642,6 +642,20 @@ def tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseangl
     torminlogfname=torxyzfname.replace('.xyz','.out')
     return torxyzfname,tmpkeyfname,torminlogfname 
 
+def get_triple_bond_torsion(poltype):
+    torsmarts = '[*]~[*]~[*]#[*]'
+    rdkitmol = Chem.MolFromMolFile('../' + poltype.molstructfname,removeHs=False)
+    pattern = Chem.MolFromSmarts(torsmarts)
+    matches = rdkitmol.GetSubstructMatches(pattern)
+    torsions = []
+    for match in matches:
+      t1, t2, t3, t4 = list(match)
+      tt = [t1+1, t2+1, t3+1, t4+1]
+      tt_r = [t4+1, t3+1, t2+1, t1+1]
+      torsions.append(tt)
+      torsions.append(tt_r)
+    return torsions
+
        
 def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsionrestraint,prevstruct,designatexyz,keybase,keybasepath,torxyzfname,tmpkeyfname,torminlogfname):
     """
@@ -667,6 +681,8 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
     torsiontomaintor={}
     rottors,rotbndtorescount,restlist,rotphases,torsiontophaseangle,torsiontomaintor=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,optmol,restlist,phaseanglelist,torsiontophaseangle,torsiontomaintor)
     frotors,rotbndtorescount,restlist,torsiontophaseangle,torsiontomaintor=FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,optmol,restlist,phaseanglelist,torsiontophaseangle,torsiontomaintor)
+
+    TripleBondTorsions = get_triple_bond_torsion(poltype)
     for i in range(len(rottors)):
         tor=rottors[i]
         rta,rtb,rtc,rtd=tor[:]
@@ -683,7 +699,8 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
         torang = optmol.GetTorsion(rta,rtb,rtc,rtd)
         if torang<0:
             torang=torang+360
-        tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (rta,rtb,rtc,rtd,torsionrestraint,round((torang)%360),round((torang)%360)))
+        if [rta, rtb,rtc,rtd] not in TripleBondTorsions:
+            tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (rta,rtb,rtc,rtd,torsionrestraint,round((torang)%360),round((torang)%360)))
 
     tmpkeyfh.close()
     mincmdstr = poltype.minimizeexe+' '+torxyzfname+' -k '+tmpkeyfname+' 0.1'+' '+'>'+torminlogfname
@@ -752,22 +769,12 @@ def CheckIfQMOptReachedTargetDihedral(poltype,cartxyz,initialtinkerstructure,tor
     newarray.extend(rottors)
     newarray.extend(frotors)
     
-    # ignore X#X-X-X torsions
-    # because these torsions CANNOT be restrained duing tinker optimization,
-    
-    torsmarts = '[*][*][*]#[*]'
-    rdkitmol = Chem.MolFromMolFile('../' + poltype.molstructfname,removeHs=False)
-    pattern = Chem.MolFromSmarts(torsmarts)
-    matches = rdkitmol.GetSubstructMatches(pattern)
-    for match in matches:
-      t1, t2, t3, t4 = list(match)
-      tt = [t1+1, t2+1, t3+1, t4+1]
-      tt_r = [t4+1, t3+1, t2+1, t1+1]
+    TripleBondTorsions = get_triple_bond_torsion(poltype)
+    for tt in TripleBondTorsions: 
       if (tt in newarray):
         newarray.remove(tt)
       if (tt_r in newarray):
         newarray.remove(tt_r)
-
     for thetor in newarray:
         a,b,c,d=thetor[:]
         iniang = inioptmol.GetTorsion(a,b,c,d)
@@ -1634,6 +1641,36 @@ def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndli
     """
     poltype.rotbndtoanginc={}
     poltype.torsionsettonumptsneeded={}
+    # get triple bond torsions
+    TripleBondTorsions = get_triple_bond_torsion(poltype)
+    zero_out_torsions = []
+    atom2type = {}
+    xyzfile = poltype.xyzoutfile
+    lines = open(xyzfile).readlines()[1:]
+    for line in lines:
+      s = line.split()
+      atom2type[s[0]] = s[5]
+    for tor in TripleBondTorsions:
+        a, b, c, d = tor
+        a_type = atom2type[str(a)]
+        b_type = atom2type[str(b)]
+        c_type = atom2type[str(c)]
+        d_type = atom2type[str(d)]
+  
+        zero_out_torsions.append('-'.join([a_type,b_type,c_type,d_type]))
+        zero_out_torsions.append('-'.join([d_type,c_type,b_type,a_type]))
+    
+    # re-write torsionsmissing.txt
+    if os.path.isfile(poltype.torsionsmissingfilename):
+      lines = open(poltype.torsionsmissingfilename).readlines()
+      if len(lines) > 0:
+        with open(poltype.torsionsmissingfilename, 'w') as f:
+          for line in lines:
+            torstr = line.split('\n')[0][1:-1].split(',')
+            torstr = [tor.strip() for tor in torstr] 
+            tstr = '-'.join(torstr)
+            if tstr not in zero_out_torsions:
+              f.write(line)
     # if here are multiple torsions to fit per rotatable bond, make sure there are enough angles for QM profile to do fitting
     for key in rotbndlist:
         keylist=rotbndlist[key]
@@ -2828,18 +2865,22 @@ def CreateConstraintsFileXTB(poltype,torlist,toranglelist,pre):
     Referenced By: 
     Description: 
     """
+
+    TripleBondTorsions = get_triple_bond_torsion(poltype)
+    
     filename=pre+'_constr.txt'
     temp=open(filename,'w')
     temp.write('$constrain'+'\n')
     temp.write(' force constant='+str(poltype.xtbtorresconstant)+'\n')
     for i in range(len(torlist)):
         tor=torlist[i]
-        angle=toranglelist[i]
-        string='  dihedral: ' 
-        for index in tor:
-            string+=str(index)+','
-        string+=str(angle)+'\n'
-        temp.write(string)
+        if tor not in TripleBondTorsions:
+            angle=toranglelist[i]
+            string='  dihedral: ' 
+            for index in tor:
+                string+=str(index)+','
+            string+=str(angle)+'\n'
+            temp.write(string)
     temp.write('$end'+'\n')
     return filename
 

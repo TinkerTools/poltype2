@@ -224,6 +224,68 @@ def write_initial_parameters(sdffile, txyz):
         tmp.append([b[0], b[1]])
   return
 
+def zero_special_torsions(poltype):
+  xyzfile = poltype.xyzoutfile
+  sdffile = poltype.molstructfname
+  rdkitmol = Chem.MolFromMolFile(sdffile,removeHs=False)
+  
+  atom2type = {}
+  lines = open(xyzfile).readlines()[1:]
+  for line in lines:
+    s = line.split()
+    atom2type[s[0]] = s[5]
+  
+  zero_out_torsions = []
+  smt = "[*]#[*]~[*]~[*]"
+  pattern = Chem.MolFromSmarts(smt)
+  matches = rdkitmol.GetSubstructMatches(pattern)
+  for match in matches:
+    a, b, c, d = match
+    a = str(a + 1)
+    b = str(b + 1)
+    c = str(c + 1)
+    d = str(d + 1)
+  
+    a_type = atom2type[a]
+    b_type = atom2type[b]
+    c_type = atom2type[c]
+    d_type = atom2type[d]
+  
+    zero_out_torsions.append('-'.join([a_type,b_type,c_type,d_type]))
+    zero_out_torsions.append('-'.join([d_type,c_type,b_type,a_type]))
+
+  smt = "[*]~[*]#[*]~[*]"
+  pattern = Chem.MolFromSmarts(smt)
+  matches = rdkitmol.GetSubstructMatches(pattern)
+  for match in matches:
+    a, b, c, d = match
+    a = str(a + 1)
+    b = str(b + 1)
+    c = str(c + 1)
+    d = str(d + 1)
+  
+    a_type = atom2type[a]
+    b_type = atom2type[b]
+    c_type = atom2type[c]
+    d_type = atom2type[d]
+  
+    zero_out_torsions.append('-'.join([a_type,b_type,c_type,d_type]))
+    zero_out_torsions.append('-'.join([d_type,c_type,b_type,a_type]))
+    
+  if zero_out_torsions != []:  
+    poltype.WriteToLog("Zeroing Torsion Parameters Involving Triple Bond")
+    # write ZERO parameters in key4fname
+    lines = open(poltype.key4fname).readlines()
+    with open(poltype.key4fname, 'w') as f:
+      for line in lines:
+        if ('torsion ' in line) and (len(line.split()) > 5):
+          s = line.split()
+          if '-'.join(s[1:5]) in zero_out_torsions:
+            line = f'torsion {" ".join(s[1:5])} 0.000 0.0 1 0.000 180.0 2 0.000 0.0 3\n' 
+        f.write(line)
+    
+  return 
+
 def assign_bonded_params(poltype):
     tmpxyz = poltype.xyzoutfile
     sdffile = poltype.molstructfname
