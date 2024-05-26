@@ -42,9 +42,20 @@ def findSp2AtomTypes(txyz, sdffile):
   for match in matches:
     nitrogen = str(match[0] + 1)
     amide_nitrogens.append(nitrogen)
+  
+  nitroben_nitrogens = []
+  pattern = Chem.MolFromSmarts('[NX3](~[O])(~[O])[a]')
+  matches = rdkitmol.GetSubstructMatches(pattern)
+  for match in matches:
+    nitrogen = str(match[0] + 1)
+    nitroben_nitrogens.append(nitrogen)
 
   #!! dont forget to add this to ldatabaseparser.py
   excluded_nitrogens = aniline_nitrogens + amide_nitrogens
+  for nitrogen in excluded_nitrogens:
+    if nitrogen in nitroben_nitrogens:
+      excluded_nitrogens.remove(nitrogen)
+  
   num_atoms = rdkitmol.GetNumAtoms() 
   for i in range(num_atoms):
     atom = rdkitmol.GetAtomWithIdx(i)

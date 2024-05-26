@@ -185,9 +185,20 @@ def write_initial_parameters(sdffile, txyz):
     nitrogen = str(match[0] + 1)
     amide_nitrogens.append(nitrogen)
   
+  nitroben_nitrogens = []
+  pattern = Chem.MolFromSmarts('[NX3](~[O])(~[O])[a]')
+  matches = rdkitmol.GetSubstructMatches(pattern)
+  for match in matches:
+    nitrogen = str(match[0] + 1)
+    nitroben_nitrogens.append(nitrogen)
+  
   #!! dont forget to add this to valence_utils.py 
   
   excluded_nitrogens = aniline_nitrogens + amide_nitrogens
+  for nitrogen in excluded_nitrogens:
+    if nitrogen in nitroben_nitrogens:
+      excluded_nitrogens.remove(nitrogen)
+  
   num_atoms = rdkitmol.GetNumAtoms() 
   for i in range(num_atoms):
     atom = rdkitmol.GetAtomWithIdx(i)
@@ -254,24 +265,6 @@ def zero_special_torsions(poltype):
     zero_out_torsions.append('-'.join([a_type,b_type,c_type,d_type]))
     zero_out_torsions.append('-'.join([d_type,c_type,b_type,a_type]))
 
-  smt = "[*]~[*]#[*]~[*]"
-  pattern = Chem.MolFromSmarts(smt)
-  matches = rdkitmol.GetSubstructMatches(pattern)
-  for match in matches:
-    a, b, c, d = match
-    a = str(a + 1)
-    b = str(b + 1)
-    c = str(c + 1)
-    d = str(d + 1)
-  
-    a_type = atom2type[a]
-    b_type = atom2type[b]
-    c_type = atom2type[c]
-    d_type = atom2type[d]
-  
-    zero_out_torsions.append('-'.join([a_type,b_type,c_type,d_type]))
-    zero_out_torsions.append('-'.join([d_type,c_type,b_type,a_type]))
-    
   if zero_out_torsions != []:  
     poltype.WriteToLog("Zeroing Torsion Parameters Involving Triple Bond")
     # write ZERO parameters in key4fname
