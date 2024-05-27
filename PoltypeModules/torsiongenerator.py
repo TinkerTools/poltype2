@@ -774,7 +774,8 @@ def CheckIfQMOptReachedTargetDihedral(poltype,cartxyz,initialtinkerstructure,tor
     newarray.extend(frotors)
     
     TripleBondTorsions = get_triple_bond_torsion(poltype)
-    for tt in TripleBondTorsions: 
+    for tt in TripleBondTorsions:
+      tt_r = tt[3:-1:-1]
       if (tt in newarray):
         newarray.remove(tt)
       if (tt_r in newarray):
