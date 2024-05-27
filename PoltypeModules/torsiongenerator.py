@@ -644,7 +644,11 @@ def tinker_minimize_filenameprep(poltype,torset,optmol,variabletorlist,phaseangl
 
 def get_triple_bond_torsion(poltype):
     torsmarts = '[*]~[*]~[*]#[*]'
-    rdkitmol = Chem.MolFromMolFile('../' + poltype.molstructfname,removeHs=False)
+    try:
+      rdkitmol = Chem.MolFromMolFile(poltype.molstructfname,removeHs=False)
+    # in the case cwd = qm-torsion
+    except:
+      rdkitmol = Chem.MolFromMolFile('../' + poltype.molstructfname,removeHs=False)
     pattern = Chem.MolFromSmarts(torsmarts)
     matches = rdkitmol.GetSubstructMatches(pattern)
     torsions = []
