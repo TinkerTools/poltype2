@@ -27,10 +27,10 @@
 [$([C][F,Cl,Br,I])]                       					  Cpolar     1.620 # C connected to F,Cl,Br,I
 [$([C]=[N])]                              					  Cpolar     1.620 # C connected to nitrogen via double bond
 [$([C][S])]                               					  Cpolar     1.620 # C on sulfur
-[$([c])]                                  					     Car     1.600 # C on aromatic system
-[$([CX3](=O))]                            					     C=O     1.600 # C on carbonyl O
-[$([CX3]=[CX3])]           					     								 Car     2.065 # C on C=C
-[$([C]([C]=[*])([C]=[*]))]                					     Car     2.065 # C on conjugated systems
+[$([c])]                                  					     Car     1.600 # C on aromatic system, original 2.065
+[$([CX3](=O))]                            					     C=O     1.600 # C on carbonyl O, original 2.065
+[$([CX3]=[CX3])]           					     								 Car     1.600 # C on C=C, original 2.065
+[$([C]([C]=[*])([C]=[*]))]                					     Car     1.600 # C on conjugated systems, original 2.065
 [$([CH4])]                                					    Cch4     1.341 # C on methane
 [$([C]#[*])]               					     								 Csp     2.202 # C of tripole bond, C#C, C#N, etc
 [$([N][C])]                               					 Nnonpol     1.185 # N on non-aromatic carbon
@@ -97,5 +97,5 @@
 [$([N]1~[N]~[C]~[N]~[N]1)]   		       							   Nar-      1.657 # N- in aromatic 
 [$([N]1~[C]~[N]~[N]~[N]1)]              					     Nar-      1.657 # N- in aromatic 
 [$([C]1~[N]~[N]~[N]~[N]1)]                					   Car-      2.311 # C- in aromatic
-[$([O-]c1ccc(cc1))]                                    O-        2.689 # O in Phenol anion
-[$(c1([O-])ccc(cc1))]                                  Co-       2.413 # C in Phenol anion connected to O-
+[$([O-][a])]                                           O-        1.700 # O- connecting an aromatic atom, original 2.689, scale down ~30% 
+[$(c[O-])]                                             Co-       1.600 # Aromatic C connecting O-, original 2.413, scale to the same as Car 
