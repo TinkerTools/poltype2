@@ -694,7 +694,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
         phaseangle=rotphases[i]
         if torang<0:
             torang=torang+360
-        tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (rta,rtb,rtc,rtd,torsionrestraint,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
+        tmpkeyfh.write('restrain-torsion %d %d %d %d %f %12.4f %12.4f\n' % (rta,rtb,rtc,rtd,torsionrestraint,(torang+phaseangle)%360,(torang+phaseangle)%360))
 
 
     for i in range(len(frotors)):
@@ -704,7 +704,7 @@ def tinker_minimize(poltype,torset,optmol,variabletorlist,phaseanglelist,torsion
         if torang<0:
             torang=torang+360
         if [rta, rtb,rtc,rtd] not in TripleBondTorsions:
-            tmpkeyfh.write('restrain-torsion %d %d %d %d %f %6.2f %6.2f\n' % (rta,rtb,rtc,rtd,torsionrestraint,round((torang)%360),round((torang)%360)))
+            tmpkeyfh.write('restrain-torsion %d %d %d %d %f %12.4f %12.4f\n' % (rta,rtb,rtc,rtd,torsionrestraint,(torang)%360,(torang)%360))
 
     tmpkeyfh.close()
     mincmdstr = poltype.minimizeexe+' '+torxyzfname+' -k '+tmpkeyfname+' 0.1'+' '+'>'+torminlogfname
@@ -2169,7 +2169,7 @@ def CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,vari
     optking_list = []
     for tor in list(rottors) + list(frotors):
         rtang = inputmol.GetTorsion(tor[0],tor[1],tor[2],tor[3]) % 360
-        geometric_list.append("{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], "%tuple([_-1 for _ in tor[0:4]]) + "'value' : %.0f }\n"%(rtang))
+        geometric_list.append("{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], "%tuple([_-1 for _ in tor[0:4]]) + "'value' : %12.4f }\n"%(rtang))
         optking_list.append("   %d %d %d %d\n"%tuple(tor))
     temp.write("       " + "     , ".join(geometric_list) + "    ]\n  }\n}\n")
     optkingarray.append(''.join(optking_list))
@@ -2884,7 +2884,7 @@ def CreateConstraintsFileXTB(poltype,torlist,toranglelist,pre):
             string='  dihedral: ' 
             for index in tor:
                 string+=str(index)+','
-            string+=str(angle)+'\n'
+            string+=str(f"{float(angle):12.4f}")+'\n'
             temp.write(string)
     temp.write('$end'+'\n')
     return filename

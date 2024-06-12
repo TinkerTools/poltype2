@@ -186,7 +186,7 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
         for res in torsionrestraints:
             angle = mol.GetTorsion(res[0], res[1], res[2], res[3]) % 360
             _str = "{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], "%tuple([_-1 for _ in res[0:4]]) \
-               + "'value' : %.4f } \n"%(angle)
+               + "'value' : %12.4f } \n"%(angle)
             geometric_list.append(_str)
         temp.write("       " + "     , ".join(geometric_list) + "    ]\n  }\n")
     temp.write("}"+'\n')
