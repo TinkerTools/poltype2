@@ -1,0 +1,8 @@
+#
+# Torsional parameters for AMOEBA force field
+#
+# Format: SMARTS string 		  	% Four indices     % 3-fold parameters              % Comments for source of parameters
+[*;!#1][#6](=[#8])[#7][*;!#1] 	% 1,2,4,5          % -1.000,  2.000,  2.050 				% Amide X-C-N-X taken from amoeba09 Acetamide
+[*;!#1][#6](=[#8])[#7][#1] 			% 1,2,4,5          %  0.000,  1.200,  0.800 				% Amide X-C-N-H taken from amoeba09 Acetamide
+[#8]=[#6][#7][*;!#1] 						% 1,2,3,4          %  1.000,  2.250, -2.250 				% Amide O=C-N-X taken from amoeba09 Acetamide
+[#8]=[#6][#7][#1] 							% 1,2,3,4          %  0.000, -0.664, -0.357 				% Amide O=C-N-H taken from amoeba09 Acetamide
