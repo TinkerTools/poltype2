@@ -407,7 +407,8 @@
 [$([OH2])]          					OW			# O of water
 [$([OX1][SX4]([OX1])([OX1])[C])]          		CSO3-_O3S-		# Methyl Sulfonate O3S-
 [$([OX1][SX4]([OX1])([OX1])[C][C])]          		CCSO3-_O3S-		# Ethyl Sulfonate O3S-
-
+[$([O-][C]=[O])]                          (O-)C=O             # O- of COO-
+[$([O]=[C][O-])]                          (O-)C=O             # O- of COO-
 
 # Phosphorous
 [$([P-](F)(F)(F)(F)(F)F)]          			PF6-			# Hexafluorophosphate P
