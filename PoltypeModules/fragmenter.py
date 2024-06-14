@@ -2074,7 +2074,7 @@ def GenerateFragments(poltype,mol,torlist,parentWBOmatrix,missingvdwatomsets,non
         if not poltype.generateextendedconf:
           parentmolfile = poltype.parentname + '.sdf'
         else:
-          parentmolfile = "extendedconf.mol" 
+          parentmolfile = "conftest.mol" 
           
         cmdstr = f"python \"{os.path.join(os.path.abspath(os.path.split(__file__)[0]), 'lTorsionFragmentPostProcessing.py')}\" {structfname} {parentdir}/{parentmolfile}"
         poltype.WriteToLog('Calling: '+cmdstr) 
