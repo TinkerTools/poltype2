@@ -4784,6 +4784,7 @@ class PolarizableTyper():
                 self.WriteToLog('Searching Database')
                 torsionprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,soluteprms,tortorprmstotransferinfo,tortorsmissing=torsiondatabaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
             if os.path.isfile(self.torsionsmissingfilename):
+                # Read missing torsions
                 torsionsmissing=torsiondatabaseparser.ReadTorsionList(self,self.torsionsmissingfilename)
             if os.path.isfile(self.torsionprmguessfilename):
                 classkeytotorsionparametersguess=torsiondatabaseparser.ReadDictionaryFromFile(self,self.torsionprmguessfilename)
@@ -4899,6 +4900,61 @@ class PolarizableTyper():
                     modify_key(self.xyzoutfile, self.key4fname, self.key4fname, sdffile=self.molstructfname, inpfile=self.prmmodlist)
                 # make copy of key file before patches
                 shutil.copy(self.key4fname,self.key4bfname+"_2")
+            
+            # STEP 40-41
+            # Try to match torsions with lAssignAMOEBAplusPRM.py
+            # here it can be thought as a patch to the current torsion database
+            # only the missing torsions are replaced in key4 and beyond
+            # Chengwen Liu
+            # June 2024
+
+            tmpkey = self.key4fname
+            tmpsdf = self.molstructfname
+            tmpxyz = self.xyzoutfile 
+            # only match for AMOEBA FF
+            if self.forcefield.upper() == 'AMOEBA':
+              cmd = f'python {self.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {tmpsdf} -potent TORSION'
+              self.call_subsystem([cmd], True)  
+            # find torsions to be added
+            torsions_toadd = {}
+            if os.path.isfile(tmpkey + '_torsion'):
+              tmplines = open(tmpkey + '_torsion').readlines()
+              for line in tmplines:
+                if (line[0] != '#') and (line.split()[0].upper() == 'TORSION'):
+                  s = line.split()
+                  tor = [int(ss) for ss in s[1:5]]
+                  tor_r = [int(ss) for ss in s[4:0:-1]] 
+                  if (tor in torsionsmissing):
+                    torsionsmissing.remove(tor)
+                    torsions_toadd['-'.join([str(i) for i in tor])] = line
+                  if tor_r in torsionsmissing:
+                    torsionsmissing.remove(tor_r)
+                    torsions_toadd['-'.join([str(i) for i in tor_r])] = line
+            # remove matched torsion indicies from torsionsmissing.txt
+            if torsions_toadd != {}:
+              shutil.move(self.torsionsmissingfilename, self.torsionsmissingfilename + '.back')
+              with open(self.torsionsmissingfilename, 'w') as f:
+               for torsionmiss in torsionsmissing:
+                f.write(str(torsionmiss) + '\n')
+
+              # write the matched torsions to key4 
+              keylines = open(tmpkey).readlines()
+              shutil.move(tmpkey, tmpkey+'b')
+              with open(tmpkey, 'w') as f:
+                for keyline in keylines:
+                  if ('torsion ' in keyline) and len(keyline.split()) > 5:
+                    s = keyline.split()
+                    tor_str = '-'.join(s[1:5])
+                    tor_str_r = '-'.join(s[4:0:-1])
+                    if tor_str in torsions_toadd.keys():
+                      f.write(torsions_toadd[tor_str] + '\n')
+                    elif tor_str_r in torsions_toadd.keys():
+                      f.write(torsions_toadd[tor_str_r] + '\n')
+                    else:
+                      f.write(keyline)
+                  else:
+                    f.write(keyline)
+
             # STEP 41
             (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,optmol,torsionsmissing,self.onlyrotbndslist)
             torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules
