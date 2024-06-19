@@ -1,0 +1,19 @@
+#
+# Torsional parameters for AMOEBAplus force field
+#
+# Format: SMARTS string 		  	    % Four indices     % 3-fold parameters              % Comments for source of parameters
+[O]=[C][NH1][CH1]([CH3])[C]=[O] 			% 2,3,4,6          %  0.877,-0.456, 0.001 				% A: C-N-C-C 
+[O]=[C][NH1][CH1]([CH3])[C]=[O] 			% 2,3,4,5          % -2.110, 1.517, 0.190				% B: C-N-C-Cb 
+[NH1][CH1]([CH3])[C](=[O])[NH1] 			% 1,2,4,6          % -1.064, 0.000, 0.000				% C: N-C-C-N 
+[NH1][CH1]([CH3])[C](=[O])[NH1] 			% 3,2,4,6          %  0.579, 0.535, 0.000				% D: Cb-C-C-N 
+[O]=[C][NH1][H] 			                % 1,2,3,4          %  -0.661, 6.471, -0.555 				% Amide: O-C-N-H
+[O]=[C][NH1][Cv4] 		                % 1,2,3,4          %  -1.573, 7.297, -1.143 				% Amide: O-C-N-Ca
+[H][NH1][Cv4][H] 		                  % 1,2,3,4          %  -0.005,-0.057,  0.127				  % Amide: H-N-CH3-H
+[O]=[C][Cv4][H] 		                  % 1,2,3,4          %  -0.005, -0.057, 0.127 				% Amide: O-C-CH3-H
+[Cv4][C](=O)[NH1][Cv4] 	              % 1,2,4,5          %   0.000, 7.297, -0.160 				% Amide: C-C-N-C
+[Cv4][C](=O)[NH1][H] 	                % 1,2,4,5          %   -0.642, 6.471, -0.748 				% Amide: C-C-N-H
+
+[NH1][CH1][CH3][H]                    % 1,2,3,4          % 0,0,0.337                      % Amide: N-C-Cb-H
+[O]=[C][CH1][CH3][H]                  % 2,3,4,5          % 0,0,0.208                      % Amide: C-C-Cb-H
+[H][CH1][CH3][H]                      % 1,2,3,4          % 0,0,0.208                      % Amide: H-C-Cb-H
+[O]=[C][NH1][CH3][H] 	                % 2,3,4,5          % 0,0,-0.126 				% Amide: C-N-C-H
