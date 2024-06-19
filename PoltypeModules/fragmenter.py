@@ -769,7 +769,7 @@ def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog
     init_keywords += ['dovdwscan', 'onlyvdwatomindex', 'use_qmopt_vdw', 'use_gau_vdw']
     init_keywords += ['refinenonaroringtors', 'tortor', 'tordebugmode']
     init_keywords += ['toroptmethod', 'toroptmethodlist', 'toroptbasisset', 'torspmethodlist', 'torspmethod', 'torspbasisset']
-    init_keywords += ['foldnum', 'torsionprmrestraintfactorL1', 'torsionprmrestraintfactorL2', 'maxtorresnitrogen', 'xtbtorresconstant', 'torsionrestraint']
+    init_keywords += ['foldnum', 'torsionprmrestraintfactorL1', 'torsionprmrestraintfactorL2', 'maxtorresnitrogen', 'xtbtorresconstant', 'torsionrestraint', 'generateextendedconf']
 
     # map from poltype variable to keyword in poltype init file
     keyword_alias = {'prmstartidx':'atmidx', 'prmmodlist':'prmmodfile'}
