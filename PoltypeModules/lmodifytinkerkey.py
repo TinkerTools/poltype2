@@ -62,6 +62,7 @@ def modkey2_COO(poltype):
   shutil.move(poltype.key2fnamefromavg + '_tmp', poltype.key2fnamefromavg)
   return
 
+""" this will be invoked when scalebigmultipole=True """
 def modkey2_scalempole(poltype):
   key2 = poltype.key2fnamefromavg
   type2element = {}
@@ -132,6 +133,7 @@ def modkey2_scalempole(poltype):
   shutil.move('tmp_key_2', poltype.key2fnamefromavg)
   return
 
+""" this will be invoked when fragbigmultipole=True """
 def modkey2_fragmpole(poltype):
   key2 = poltype.key2fnamefromavg
   xyz2 = poltype.xyzoutfile
