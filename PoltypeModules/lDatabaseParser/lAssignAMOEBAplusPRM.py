@@ -869,6 +869,80 @@ def assignTorsionAMOEBA():
         f.write(f"{p}\n")
   return
 
+def assignTorsionAMOEBAplus():
+  database_prm = os.path.join(prmfiledir,"amoebaplusTorsion.prm")
+  prmlines = open(database_prm).readlines()
+  
+  # deal with txyz file so openbabel can read
+  lines = open(xyz).readlines()
+  if len(lines[0].split()) == 1:
+    with open(xyz, "w") as f:
+      f.write(lines[0].split("\n")[0] + " comments\n")
+      for i in range(1,len(lines)):
+        f.write(lines[i])
+  atomnumbers, types = np.loadtxt(xyz, usecols=(0, 5,), unpack=True, dtype="str", skiprows=1)
+
+  # construct atom2class dictionary
+  atom_class_dict = {}
+  type_class_dict = {}
+  for line in open(key).readlines():
+    if "atom " in line:
+      d = line.split()
+      if d[1] in types:
+        type_class_dict[d[1]] = d[2]
+  for a,t in zip(atomnumbers, types):
+    atom_class_dict[int(a)] = type_class_dict[t]
+  
+  # SDF is more info-rich 
+  if sdf != None:
+    inpfile = sdf
+    inpformat = 'sdf'
+    print(f"{YELLOW}Using SDF file to determine SMARTS types {ENDC}")
+  else:
+    inpfile = xyz
+    inpformat = 'txyz'
+    print(f"{YELLOW}Using tinker XYZ file to determine SMARTS types {ENDC}")
+  
+  # try to match line-by-line
+  matched_torsions = []
+  comments = []
+  tmp = []
+  for mol in pybel.readfile(inpformat,inpfile):
+    for line in prmlines:
+      if ("#" not in line[0]) and (len(line) > 10):
+        s = line.split('%')
+        smt = s[0]
+        tor_indices = s[1].split(',')
+        tor_params = s[2].strip().split(',')
+        tor_comment = s[3].strip()
+
+        smarts = pybel.Smarts(smt)
+        matches = smarts.findall(mol)
+        if matches != []:
+          for match in matches:
+            a1 = match[int(tor_indices[0]) - 1] 
+            a2 = match[int(tor_indices[1]) - 1] 
+            a3 = match[int(tor_indices[2]) - 1] 
+            a4 = match[int(tor_indices[3]) - 1]
+            tor_types = ' '.join([atom_class_dict[a] for a in [a1, a2, a3, a4]])
+            tor_types_r = ' '.join([atom_class_dict[a] for a in [a4, a3, a2, a1]])
+            if (tor_types not in tmp):
+              tmp.append(tor_types)
+              tmp.append(tor_types_r)
+              tor_prm_str = f"{tor_params[0]} 0.0 1 {tor_params[1]} 180.0 2 {tor_params[2]} 0.0 3"
+              matched_torsions.append(f"torsion {tor_types} {tor_prm_str}")
+              comments.append(tor_comment)
+  
+  # write the matched torsion
+  with open(key + "_torsion", 'w') as f:
+    if matched_torsions == []:
+      f.write('# no torsion parameters matched from database\n')
+    else:
+      for c, p in zip(comments, matched_torsions):
+        f.write(f"# Matched by lAssignAMOEBAplusPRM.py: {c}\n")
+        f.write(f"{p}\n")
+  return
+
 if __name__ == "__main__":
   if len(sys.argv) == 1:
     sys.exit(RED + "please use '-h' option to see usage" + ENDC)
@@ -915,5 +989,7 @@ if __name__ == "__main__":
       assignNonbondedAMOEBAplus() 
     elif (p == "TORSION"):
       assignTorsionAMOEBA() 
+    elif (p == "TORSION+"):
+      assignTorsionAMOEBAplus() 
     else:
       print(RED + f"{p} term not supported!" + ENDC)
