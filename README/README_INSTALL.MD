@@ -25,7 +25,7 @@ cd source
 
 
 ## Optional Tinker GPU Installation
-* Install tinker CPU first. *** Not required for parameterization purpose. ***
+* Install tinker CPU first.  **Not required for parameterization purpose.**
 ```
 git clone git@github.com:TinkerTools/tinker9.git
 cd tinker9
