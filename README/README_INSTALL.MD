@@ -91,8 +91,6 @@ dependencies:
 * Note do not put source in your default .bashrc profile
 * Note do not keep multiple sources for different purposes (unless necessary) in the same .bashrc source file, this can cause internal conflicts to arise
 
-### Environment var for running POLTYPE:
- Create environments for Tinker,Gaussian 09,and GDMA. Put these in a file and source it before running POLTYPE so that programs such as "analyze.x" "gdma" "g16" can be found. You can use "which" to verify.
 
 ### Optional explicit Conda Installation
 * Only do this if the above .yml file doesnt work
@@ -133,6 +131,8 @@ conda install -c conda-forge openbabel --yes
 ```
 * Install via ani.yml file
 
+### Environment var for running POLTYPE:
+ Create environments for Tinker,Gaussian 09,and GDMA. Put these in a file and source it before running POLTYPE so that programs such as "analyze.x" "gdma" "g16" can be found. You can use "which" to verify.
 * Example bashrc that you should source before running poltype
 ```shell
 export myusername=`whoami`
