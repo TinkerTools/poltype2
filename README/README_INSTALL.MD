@@ -7,7 +7,7 @@
 * PSI4 (or Gaussian 09/16)
 
 
-### Tinker CPU Installation
+### Required Tinker CPU Installation
 ```
 git clone git@github.com:TinkerTools/Tinker.git tinker
 cd tinker
@@ -24,8 +24,8 @@ cd source
 * Keep the RENAME line commented out
 
 
-## Tinker GPU Installation
-* Install tinker CPU first 
+## Optional Tinker GPU Installation
+* Install tinker CPU first. *** Not required for parameterization purpose. ***
 ```
 git clone git@github.com:TinkerTools/tinker9.git
 cd tinker9
