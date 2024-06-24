@@ -56,7 +56,35 @@ git clone https://github.com/TinkerTools/poltype2.git master
 ```
 
 * Install anaconda
-* You can use the provided `environment.yml` file (under Environments folder) to create a conda environment named "poltype" with `conda env create -f environment.yml`
+* Use the following environment.yml file with `conda env create -f environment.yml` Source: https://github.com/TinkerTools/poltype2/issues/45#issuecomment-2137669523 
+* Alternatively, you may use the provided `environment.yml` file (under Environments folder) to create a conda environment named "poltype"
+* environment.yml:
+  name: mypoltype2
+  channels:
+  - conda-forge
+  - rdkit
+  - salilab
+  dependencies:
+  - micromamba
+  - psi4
+  - geometric
+  - mdanalysis
+  - openbabel
+  - svgutils
+  - cairosvg
+  - psutil
+  - mdtraj
+  - openpyxl
+  - pdb2pqr
+  - pdbfixer
+  - rdkit
+  - modeller
+  - gdma
+  - pip
+  - pip:
+    - pymbar
+    - PyAstronomy
+
 
 * Download GDMA-2.3 and greater
 * Note do not put source in your default .bashrc profile
@@ -65,59 +93,8 @@ git clone https://github.com/TinkerTools/poltype2.git master
 ### Environment var for running POLTYPE:
  Create environments for Tinker,Gaussian 09,and GDMA. Put these in a file and source it before running POLTYPE so that programs such as "analyze.x" "gdma" "g16" can be found. You can use "which" to verify.
 
-* Example bashrc
-```shell
-OSVERSION=`cat /etc/system-release`
-place="${OSVERSION//[!0-9]/}"
-OSVERSION=${place::1}
-VAL=`nvidia-smi &> /dev/null; echo $?`
-
-if [ $VAL != 0 ]; then
-  echo -e "\e[101mCUDA utility not installed on `hostname`\e[0m"
-  declare -i VALUE=0
-else
-
-  for dir in /usr/local/*;
-  do
-      SUB='cuda'
-      if [[ "$dir" == *"$SUB"* ]]; then
-        VALUE=`echo $dir | tr -dc '0-9'`
-      fi
-       
-  done
-
-  
-  if [ $VALUE == 112 ] ; then
-
-       export PATH=/home/liuchw/Softwares/tinkers/Tinker9/2206/build_cuda11:$PATH
-       export CUDA_DEVICE_ORDER=PCI_BUS_ID
-       export CUDA_VISIBLE_DEVICES=0
-
-  fi
-fi
-
-if [ $OSVERSION == 8 ] ; then
-    export PATH=/home/bdw2292/NewestTinkerOS8/bin/:$PATH
-     
-else
-    export PATH=/home/bdw2292/NewestTinker/bin/:$PATH
-
-fi
-
-export PATH=/opt/CCDC/CCDC2020/Discovery_2020/bin/:$PATH # for GOLD Docking
-export myusername=`whoami`
-conda activate amoebamdpoltype
-export g09root=/opt/g09gh/gaussian
-source $g09root/g09/bsd/g09.profile
-export GAUSS_SCRDIR=/scratch/$myusername/
-export GDMADIR=/opt/gdma/gdma-2.3.3/bin/
-export PATH=/opt/gdma/gdma-2.3.3/bin/:$PATH
-export PSI_SCRATCH=/scratch/$myusername/
-```
-
-
-### Explicit Conda Installation
-* Only do this if .yml file doesnt work
+### Optional explicit Conda Installation
+* Only do this if the above .yml file doesnt work
 ```
 conda create --name amoebamdpoltype -c psi4 psi4 --yes
 conda install -c conda-forge geometric --yes
@@ -138,7 +115,7 @@ conda install -c conda-forge pdb2pqr --yes
 conda install -c conda-forge pdbfixer --yes
 ```
 
-### Explicit Conda Installation - XTB
+### Required explicit Conda Installation - XTB
 ```
 conda create --name xtbenv
 conda activate xtbenv
@@ -154,3 +131,16 @@ conda install -c conda-forge torchani --yes
 conda install -c conda-forge openbabel --yes
 ```
 * Install via ani.yml file
+
+* Example bashrc that you should source before running poltype
+```shell
+export myusername=`whoami`
+conda activate mypoltype2
+export g09root=/opt/g09gh/gaussian
+source $g09root/g09/bsd/g09.profile
+export GAUSS_SCRDIR=/scratch/$myusername/
+export GDMADIR=/opt/gdma/gdma-2.3.3/bin/
+export PATH=/opt/gdma/gdma-2.3.3/bin/:$PATH
+export PSI_SCRATCH=/scratch/$myusername/
+# add tinker exe to path
+```
