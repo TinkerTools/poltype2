@@ -59,32 +59,31 @@ git clone https://github.com/TinkerTools/poltype2.git master
 * Use the following environment.yml file with `conda env create -f environment.yml` Source: https://github.com/TinkerTools/poltype2/issues/45#issuecomment-2137669523 
 * Alternatively, you may use the provided `environment.yml` file (under Environments folder) to create a conda environment named "poltype"
 * environment.yml:
-  name: mypoltype2
-  channels:
-  - conda-forge
-  - rdkit
-  - salilab
-  dependencies:
-  - micromamba
-  - psi4
-  - geometric
-  - mdanalysis
-  - openbabel
-  - svgutils
-  - cairosvg
-  - psutil
-  - mdtraj
-  - openpyxl
-  - pdb2pqr
-  - pdbfixer
-  - rdkit
-  - modeller
-  - gdma
-  - pip
-  - pip:
-    - pymbar
-    - PyAstronomy
-
+name: poltype2
+channels:
+  \- conda-forge
+  \- rdkit
+  \- salilab
+dependencies:
+  \- micromamba
+  \- psi4
+  \- geometric
+  \- mdanalysis
+  \- openbabel
+  \- svgutils
+  \- cairosvg
+  \- psutil
+  \- mdtraj
+  \- openpyxl
+  \- pdb2pqr
+  \- pdbfixer
+  \- rdkit
+  \- modeller
+  \- gdma
+  \- pip
+  \- pip:
+    \- pymbar
+    \- PyAstronomy
 
 * Download GDMA-2.3 and greater
 * Note do not put source in your default .bashrc profile
