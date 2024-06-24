@@ -129,7 +129,7 @@ conda install -c conda-forge ase --yes
 conda install -c conda-forge torchani --yes
 conda install -c conda-forge openbabel --yes
 ```
-* Install via ani.yml file
+* Install via ani.yml file (under `Environments`)
 
 ### Environment var for running POLTYPE:
  Create environments for Tinker,Gaussian 09,and GDMA. Put these in a file and source it before running POLTYPE so that programs such as "analyze.x" "gdma" "g16" can be found. You can use "which" to verify.
