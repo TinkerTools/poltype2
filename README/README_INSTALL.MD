@@ -25,7 +25,8 @@ cd source
 
 
 ## Optional Tinker GPU Installation
-* Install tinker CPU first.  **Not required for parameterization purpose.**
+* **Not required for parameterization purpose.**
+* Install tinker CPU first. 
 ```
 git clone git@github.com:TinkerTools/tinker9.git
 cd tinker9
@@ -57,12 +58,12 @@ git clone https://github.com/TinkerTools/poltype2.git master
 * Install anaconda
 * You can use the provided `environment.yml` file (under Environments folder) to create a conda environment named "poltype" with `conda env create -f environment.yml`
 
-### Environment var for running POLTYPE:
- Create environments for Tinker,Gaussian 09,and GDMA. Put these in a file and source it before running POLTYPE
-
 * Download GDMA-2.3 and greater
 * Note do not put source in your default .bashrc profile
 * Note do not keep multiple sources for different purposes (unless necessary) in the same .bashrc source file, this can cause internal conflicts to arise
+
+### Environment var for running POLTYPE:
+ Create environments for Tinker,Gaussian 09,and GDMA. Put these in a file and source it before running POLTYPE so that programs such as "analyze.x" "gdma" "g16" can be found. You can use "which" to verify.
 
 * Example bashrc
 ```shell
