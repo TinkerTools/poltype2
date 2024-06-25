@@ -362,11 +362,11 @@ VDW Oar                4.24078   0.04563
 VDW CarOar             4.32639   0.05757
 VDW NH2CH=O            3.82143   0.12000
 VDW H2N-Amide          2.96466   0.01000   0.98000
-VDW O=CN               3.54225   0.11000
+VDW O=CN               4.05172   0.04171
+VDW NH1-Amide          4.09102   0.12000
+VDW H1N-Amide          2.72735   0.01000   0.98000
 VDW NH2-Amide          3.72518   0.12000
 VDW NH0-Amide          3.72518   0.12000
-VDW NH1-Amide          3.75676   0.12000
-VDW H1N-Amide          2.91629   0.01000   0.98000
 VDW O=CH2              3.99223   0.05474
 VDW CH2=O              3.47147   0.08163
 VDW HC=O               3.29753   0.03069   0.98000
