@@ -179,8 +179,8 @@ def growFragment(atomidx, sdffile):
       if sameRing: 
         atomsToAdd.append(ring_atom)
     
-    atomsToAdd += connectedAtoms
     connectedAtoms = findConnectedAtoms(mol, atomsToAdd, atomsInRing)
+    atomsToAdd += connectedAtoms
     saveFragment(mol, atomsToAdd, f"Frag_Atom{atomidx:03d}_0.mol")
     atomsToAdd += connectedAtoms
     saveFragment(mol, atomsToAdd, f"Frag_Atom{atomidx:03d}.mol")
