@@ -302,9 +302,9 @@ def transferMultipoleToParent(poltype, frag_sdf, frag_xyz, frag_key, parent_sdf,
   par_heavyatoms = [str(fragment2parentatom[int(a)-1] + 1) for a in frag_heavyatoms]
 
   # run analyze to get multipoles
-  cmdstr = f"analyze.x {frag_xyz} -k {frag_key} EP > frag_ana.log; wait"
+  cmdstr = f"{poltype.analyzeexe} {frag_xyz} -k {frag_key} EP > frag_ana.log; wait"
   os.system(cmdstr)
-  cmdstr = f"analyze.x {parent_xyz} -k {parent_key} EP > parent_ana.log; wait"
+  cmdstr = f"{poltype.analyzeexe} {parent_xyz} -k {parent_key} EP > parent_ana.log; wait"
   os.system(cmdstr)
 
   # read frag_ana.log
