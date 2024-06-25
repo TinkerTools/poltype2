@@ -8,12 +8,13 @@
 
 import os
 import sys
+import shutil
 import networkx as nx
 from rdkit import Chem
 from rdkit.Chem import AllChem,rdmolfiles,EditableMol,RingInfo,ChemicalForceFields
 
 # helper function to save required fragment
-def saveFragment(mol, atomsToKeep, fragname):
+def saveFragment(mol, atomsToKeep, fragname, bondsToDelete=[]):
   # add attached Hydrogen atoms
   for idx in atomsToKeep:
     a = mol.GetAtomWithIdx(idx)
@@ -29,6 +30,13 @@ def saveFragment(mol, atomsToKeep, fragname):
       atomsToRemove.append(idx)
   
   emol = Chem.EditableMol(mol)
+  
+  if bondsToDelete != []:
+    for i in range(0, len(bondsToDelete), 2):
+      idx1, idx2 = bondsToDelete[i], bondsToDelete[i+1]
+      bond_index = mol.GetBondBetweenAtoms(idx1, idx2).GetIdx()
+      emol.RemoveBond(idx1, idx2)
+  
   atomsToRemove.sort(reverse=True)
   for atom in atomsToRemove:
       emol.RemoveAtom(atom)
@@ -39,9 +47,9 @@ def saveFragment(mol, atomsToKeep, fragname):
   Chem.Kekulize(mol2h)
   Chem.SanitizeMol(mol2h)
   # using MMFF to optimize the structure
-  ffps = ChemicalForceFields.MMFFGetMoleculeProperties(mol2h)
-  ff = ChemicalForceFields.MMFFGetMoleculeForceField(mol2h, ffps, confId=-1, ignoreInterfragInteractions=False)
-  ff.Minimize(maxIts=500)
+  #ffps = ChemicalForceFields.MMFFGetMoleculeProperties(mol2h)
+  #ff = ChemicalForceFields.MMFFGetMoleculeForceField(mol2h, ffps, confId=-1, ignoreInterfragInteractions=False)
+  #ff.Minimize(maxIts=500)
   rdmolfiles.MolToMolFile(mol2h, fragname)
   return
 
@@ -51,7 +59,7 @@ def growFragment(atomidx, sdffile):
   # 1. Atom in three rings
   # 2. Atom in two rings
   # 3. Atom in one ring
-  # 4. Atom not in ring
+  # 4. Atom not in ring: not considered here
   
   atomsInThreeRing = []
   pattern = Chem.MolFromSmarts('[*;R3]')
@@ -114,8 +122,20 @@ def growFragment(atomidx, sdffile):
         atomsToAdd.append(ring_atom)
 
     atomsOfTwoRings = list(set(atomsToAdd + atomsToKeep))
+    connectedAtoms = findConnectedAtoms(mol, atomsOfTwoRings, atomsInRing)
+    saveFragment(mol, atomsOfTwoRings, f"Frag_Atom{atomidx:03d}_0.mol")
+    atomsOfTwoRings += connectedAtoms
     saveFragment(mol, atomsOfTwoRings, f"Frag_Atom{atomidx:03d}.mol")
-  
+    
+    testmol = Chem.MolFromMolFile(f"Frag_Atom{atomidx:03d}.mol",removeHs=False)
+    if len(testmol.GetAtoms()) == len(mol.GetAtoms()):
+      shutil.move(f"Frag_Atom{atomidx:03d}_0.mol", f"Frag_Atom{atomidx:03d}.mol")
+    else:
+      os.system(f"rm -f Frag_Atom{atomidx:03d}_0.mol")
+    
+    ## special case detection
+    specialCaseSixFusedFiveMemRing(f"Frag_Atom{atomidx:03d}.mol")
+    
   # Case 2: the atom is in two rings
   ## in this case it is a conjugated aromatic system
   ## need to break the conjugation and only have two rings
@@ -135,8 +155,20 @@ def growFragment(atomidx, sdffile):
         if sameRing1 and sameRing2:
           atomsToAdd.append(ring_atom)
     atomsOfTwoRings = list(set(atomsToAdd + atomsToKeep))
+    connectedAtoms = findConnectedAtoms(mol, atomsOfTwoRings, atomsInRing)
+    saveFragment(mol, atomsOfTwoRings, f"Frag_Atom{atomidx:03d}_0.mol")
+    atomsOfTwoRings += connectedAtoms
     saveFragment(mol, atomsOfTwoRings, f"Frag_Atom{atomidx:03d}.mol")
-  
+    
+    testmol = Chem.MolFromMolFile(f"Frag_Atom{atomidx:03d}.mol",removeHs=False)
+    if len(testmol.GetAtoms()) == len(mol.GetAtoms()):
+      shutil.move(f"Frag_Atom{atomidx:03d}_0.mol", f"Frag_Atom{atomidx:03d}.mol")
+    else:
+      os.system(f"rm -f Frag_Atom{atomidx:03d}_0.mol")
+    
+    ## special case detection
+    specialCaseSixFusedFiveMemRing(f"Frag_Atom{atomidx:03d}.mol")
+      
   ## Case: the atom is in one ring 
   ### in this case it is a conjugated aromatic system
   ### need to break the conjugation and only have the ring
@@ -146,12 +178,73 @@ def growFragment(atomidx, sdffile):
       sameRing = RingInfo.AreAtomsInSameRing(mol.GetRingInfo(), atomidx-1, ring_atom)
       if sameRing: 
         atomsToAdd.append(ring_atom)
+    
+    atomsToAdd += connectedAtoms
+    connectedAtoms = findConnectedAtoms(mol, atomsToAdd, atomsInRing)
+    saveFragment(mol, atomsToAdd, f"Frag_Atom{atomidx:03d}_0.mol")
+    atomsToAdd += connectedAtoms
     saveFragment(mol, atomsToAdd, f"Frag_Atom{atomidx:03d}.mol")
+    
+    testmol = Chem.MolFromMolFile(f"Frag_Atom{atomidx:03d}.mol",removeHs=False)
+    if len(testmol.GetAtoms()) == len(mol.GetAtoms()):
+      shutil.move(f"Frag_Atom{atomidx:03d}_0.mol", f"Frag_Atom{atomidx:03d}.mol")
+    else:
+      os.system(f"rm -f Frag_Atom{atomidx:03d}_0.mol")
   
   return 
 
-# need a helper function to determine where to cut
-# need another function to match the 6+5 special case to cut the bond
+# helper function to determine where to cut
+def findConnectedAtoms(rdkitmol, atomList, atomsInRing):
+  # C-C single bond 
+  eligibleBondsToCut = []
+  connectedAtoms = []
+  pattern = Chem.MolFromSmarts('[#6]-[#6]')
+  matches = rdkitmol.GetSubstructMatches(pattern)
+  for match in matches:
+    eligibleBondsToCut.append(list(match))
+  
+  for idx in atomList:
+    a = rdkitmol.GetAtomWithIdx(idx)
+    for neig in a.GetNeighbors():
+      atomNum = neig.GetAtomicNum()
+      neig_idx = neig.GetIdx()
+      if ([idx, neig_idx] not in eligibleBondsToCut) and ([neig_idx, idx] not in eligibleBondsToCut):
+        if (neig_idx not in connectedAtoms) and (neig_idx not in atomList):
+          connectedAtoms.append(neig_idx)
+  while True:
+    preLength = len(connectedAtoms)
+    for idx in connectedAtoms:
+      a = rdkitmol.GetAtomWithIdx(idx)
+      for neig in a.GetNeighbors():
+        atomNum = neig.GetAtomicNum()
+        neig_idx = neig.GetIdx()
+        if [idx, neig_idx] not in eligibleBondsToCut:
+          if (neig_idx not in connectedAtoms) and (neig_idx not in atomList):
+            connectedAtoms.append(neig_idx)
+    
+    postLength = len(connectedAtoms)
+    if preLength == postLength:
+      break
+
+  return connectedAtoms
+
+#
+# helper function to deal with special case: 6+5 member rings
+# if match, break the 5 member ring
+#
+def specialCaseSixFusedFiveMemRing(fragmol):
+  bondToDelete = []
+  mol = Chem.MolFromMolFile(fragmol,removeHs=False)
+  pattern = Chem.MolFromSmarts('c2ccc1OCCc1c2')
+  matches = mol.GetSubstructMatches(pattern)
+  for match in matches:
+    bondToDelete = [match[-3], match[-4]]
+  
+  atomsToKeep = list(range(len(mol.GetAtoms())))
+  if bondToDelete != []:
+    saveFragment(mol, atomsToKeep, fragmol, bondToDelete)
+  return 
+
 
 if __name__ == '__main__':
   
