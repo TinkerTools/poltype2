@@ -4107,7 +4107,7 @@ class PolarizableTyper():
             Input: .mol filename
             Output: Dictionary of atomic index to coordinates
             Referenced By: GenerateExtendedConformer
-            Description: 
+            Description:
             1. Read in .mol file to openbabel mol object
             2. Iterate over mol object atoms
             3. Save atom index and coordinates in dictionary
@@ -4116,9 +4116,9 @@ class PolarizableTyper():
             indextocoordinates={}
             obConversion = openbabel.OBConversion()
             mol = openbabel.OBMol()
-            inFormat = obConversion.FormatFromExt(self.molstructfname)
+            inFormat = obConversion.FormatFromExt(filename) # self.molstructfname)
             obConversion.SetInFormat(inFormat)
-            obConversion.ReadFile(mol, self.molstructfname)
+            obConversion.ReadFile(mol, filename) # self.molstructfname)
             # STEP 2
             iteratombab = openbabel.OBMolAtomIter(mol)
             for atm in iteratombab:
