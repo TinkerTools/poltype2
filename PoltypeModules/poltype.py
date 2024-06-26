@@ -4804,7 +4804,9 @@ class PolarizableTyper():
                 if not os.path.isfile(self.gdmafname):
                     mpole.run_gdma(self)
                 # STEP 30
-                lfzerox=mpole.gen_peditinfile(self,mol)
+                lfzerox = [ False ] * mol.NumAtoms()
+                if not os.path.isfile(self.peditinfile):
+                    lfzerox=mpole.gen_peditinfile(self,mol)
             
                 if (not os.path.isfile(self.xyzfname) or not os.path.isfile(self.keyfname)):
                     # STEP 31
