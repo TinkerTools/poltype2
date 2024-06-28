@@ -4913,9 +4913,13 @@ class PolarizableTyper():
             tmpkey = self.key4fname
             tmpsdf = self.molstructfname
             tmpxyz = self.xyzoutfile 
-            # only match for AMOEBA FF
+            # Match for AMOEBA FF
             if self.forcefield.upper() == 'AMOEBA':
               cmd = f'python {self.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {tmpsdf} -potent TORSION'
+              self.call_subsystem([cmd], True)  
+            # Match for AMOEBAplus FF
+            if self.forcefield.upper() in ['AMOEBA+', 'AMOEBAPLUS']:
+              cmd = f'python {self.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {tmpsdf} -potent TORSION+'
               self.call_subsystem([cmd], True)  
             # find torsions to be added
             torsions_toadd = {}
@@ -4957,6 +4961,8 @@ class PolarizableTyper():
                   else:
                     f.write(keyline)
 
+            # Read missing torsions again since we modify the file
+            torsionsmissing=torsiondatabaseparser.ReadTorsionList(self,self.torsionsmissingfilename)
             # STEP 41
             (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,optmol,torsionsmissing,self.onlyrotbndslist)
             torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules
