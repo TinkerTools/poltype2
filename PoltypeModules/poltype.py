@@ -245,6 +245,8 @@ class PolarizableTyper():
         equilibriatescheme:list=field(default_factory=lambda : [50,100,150,200,300,300])
         equilibriaterestscheme:list=field(default_factory=lambda : [5,2,1,.5,.1,0])
         prmfilepath:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebabio18.prm"
+        fennixmodeldir:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir, 'FennixModels'))
+        fennixmodelname:str='ani2x_model0'
         keyfilenamelist:None=None
         xyzfilename:None=None
         restrainatomsduringminimization:bool=True
@@ -622,6 +624,8 @@ class PolarizableTyper():
                             self.maxtorresnitrogen=int(a)
                         elif 'xtbmethod' in newline:
                             self.xtbmethod=int(a)
+                        elif 'fennixmodelname' in newline:
+                            self.fennixmodelname=str(a)
                         elif 'templateligandfilename' in newline:
                             self.templateligandfilename=a
                         elif 'prmfilepath' in newline:
@@ -4276,7 +4280,7 @@ class PolarizableTyper():
                     fsplit=f.split('.')
                     if len(fsplit)>1:
                         end=fsplit[1]
-                        if 'AMOEBA-opt' not in f and 'ANI-opt' not in f and 'xtb-opt' not in f and 'log' not in end and 'sdf' not in end and 'ini' not in end and 'chk' not in end and 'dat' not in end and 'mol' not in end and 'txt' not in end and f not in filestonotdelete:
+                        if 'AMOEBA-opt' not in f and 'ANI-opt' not in f and 'xtb-opt' not in f and 'FENNIX-opt' not in f and 'log' not in end and 'sdf' not in end and 'ini' not in end and 'chk' not in end and 'dat' not in end and 'mol' not in end and 'txt' not in end and f not in filestonotdelete:
                             deletearray.append(f)
             # STEP 4
             for f in deletearray:
@@ -4329,6 +4333,30 @@ class PolarizableTyper():
                     if atomicnum not in listofallowedatoms:
                         raise ValueError('Element not allowed for ANI! '+str(atomicnum)) 
 
+
+        def CheckIfFENNIXCanBeUsed(self,m):
+            """
+            Currently the NN model in FENNIX can only be used on elements: H,C,N,O,F,S,Cl and neutral molecules
+            Modify the method to default ones if this is the case
+            """
+            atomsAreCovered = True
+            if self.toroptmethod=='FENNIX' or self.torspmethod=='FENNIX':
+              listofallowedatoms=[1,6,7,8,9,17,16]
+              for atom in m.GetAtoms():
+                atomicnum=atom.GetAtomicNum()
+                if atomicnum not in listofallowedatoms:
+                  self.WriteToLog('Element not allowed for FENNIX! '+str(atomicnum)) 
+                  atomsAreCovered = False
+            
+            if not atomsAreCovered:
+              raise ValueError('Not All Elements are allowed for FENNIX! ') 
+
+            isNeutral = True
+            chg = Chem.GetFormalCharge(m) 
+            if chg != 0:
+              isNeutral = False
+              self.WriteToLog(f'Total Charge of the Molecule is not Zero: {chg}') 
+              raise ValueError('Total Charge of the Molecule is not Zero') 
 
 
         def CheckForHydrogens(self,m):
@@ -4645,6 +4673,7 @@ class PolarizableTyper():
             # STEP 7
             self.CheckIfAtomsAreAllowed(m)
             self.CheckIfAtomsAreAllowedANI(m)
+            self.CheckIfFENNIXCanBeUsed(m)
             self.CheckForHydrogens(m)
             # STEP 8
             m,atomindextoformalcharge=self.CheckInputCharge(m,verbose=True)

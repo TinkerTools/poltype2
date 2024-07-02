@@ -85,12 +85,21 @@ dependencies:
   - pip:
     - pymbar
     - PyAstronomy
+    - ase 
+    - jax
 ```
 
 * Download GDMA-2.3 and greater
 * Note do not put source in your default .bashrc profile
 * Note do not keep multiple sources for different purposes (unless necessary) in the same .bashrc source file, this can cause internal conflicts to arise
 
+### Install fennol
+
+```
+git clone https://github.com/thomasple/FeNNol.git
+cd FeNNol
+pip install .
+```
 
 ### Optional explicit Conda Installation
 * Only do this if the above .yml file doesnt work

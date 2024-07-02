@@ -6,7 +6,9 @@ from ase.io import read
 from fennol.ase import FENNIXCalculator
 
 def FENNIX_OPT(poltype,inputstruct,resfilename):
-    cmdstr = f"geometric-optimize --ase-class=fennol.ase.FENNIXCalculator --ase-kwargs=$CONFIG --engine=ase {inputstruct} {resfilename}"
+    fennixmodelpath = os.path.join(poltype.fennixmodeldir, f'{poltype.fennixmodelname}.fnx')
+    CONFIG_STR = "{" + '\\"model\\":'  + '\\"' + fennixmodelpath + '\\"' + "}"
+    cmdstr = f"geometric-optimize --ase-class=fennol.ase.FENNIXCalculator --ase-kwargs={CONFIG_STR} --engine=ase {inputstruct} {resfilename}"
     poltype.call_subsystem([cmdstr], True)
     opted_xyz = inputstruct.replace('.xyz', '_optim.xyz') 
     if os.path.isfile(opted_xyz):
@@ -34,8 +36,8 @@ def FENNIX_SP(poltype,optxyz,output):
       positions=positions_2Darray
       )
   
-  #calc = FENNIXCalculator(model='$FENNIX_MODEL_PATH')
-  calc = FENNIXCalculator(model='/home/liuchw/TryOtherSoftware/FENNIX/ani2x_model0.fnx')
+  fennixmodelpath = os.path.join(poltype.fennixmodeldir, f'{poltype.fennixmodelname}.fnx')
+  calc = FENNIXCalculator(model=fennixmodelpath)
   molecule.calc = calc
   
   # ASE returns energies in eV (can be converted using units from ase.units module)
