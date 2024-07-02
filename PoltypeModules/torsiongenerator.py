@@ -23,7 +23,7 @@ import warnings
 import rings
 from PyAstronomy import pyasl
 from pathlib import Path
-
+import fennix4poltype
 
 def __init__(poltype):
     """
@@ -213,7 +213,7 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
     for i in range(len(optoutputlogs)):
         outputlog=optoutputlogs[i]
         phaseangles=optlogtophaseangle[outputlog]
-        if poltype.torspmethod!='xtb' and poltype.torspmethod!='ANI':
+        if poltype.torspmethod!='xtb' and poltype.torspmethod!='ANI' and poltype.torspmethod != 'FENNIX':
             if not poltype.use_gaus:
                 prevstrctfname=outputlog.replace('.log','.xyz')
                 inputname,outputname=CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,mol)
@@ -241,6 +241,16 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
             inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
             outputname=inputname.replace(postfix,'.log')
             cmdstr=ANISPCommand(poltype,prevstrctfname,poltype.anipath,outputname)
+        
+        elif poltype.torspmethod=='FENNIX':
+            prevstrctfname=outputlog.replace('.log','.xyz')
+            executable='FENNIX'
+            prefix='%s-%s-sp-' % (poltype.toroptmethod,poltype.torspmethod)
+            postfix='.input'  
+            inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
+            outputname=inputname.replace(postfix,'.log')
+            fennix4poltype.FENNIX_SP(poltype, prevstrctfname, outputname) 
+
 
         finished,error=poltype.CheckNormalTermination(outputname,errormessages=None,skiperrors=True)
         inputfilepath=os.path.join(os.getcwd(),inputname)
@@ -344,20 +354,22 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
     Referenced By: 
     Description: 
     """
-    if poltype.toroptmethod!='xtb' and poltype.toroptmethod!='ANI' and poltype.toroptmethod!='AMOEBA':
-        if  poltype.use_gaus==False and poltype.use_gausoptonly==False:
-            inputname,outputname=CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt)
-            cmdstr=' '.join(['psi4 ',poltype.psi4_args,inputname,outputname])
-            executable='psi4'
-        else:
-            inputname,outputname=CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt)
-            cmdstr='GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
-            executable=poltype.gausexe
-        if poltype.use_gaus==False and poltype.use_gausoptonly==False:
-            return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4,executable
+    # Case: AMOEBA
+    if poltype.toroptmethod=='AMOEBA':
+        inputstruct=ConvertTinktoXYZ(poltype,torxyzfname,torxyzfname.replace('.xyz','_cart.xyz'))
+        inputmol= opt.load_structfile(poltype,inputstruct)
+        prefix=poltype.toroptmethod+'-opt-'
+        postfix='.input'  
+        inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
+        outputname=inputname.replace(postfix,'.log')
+        GenerateAMOEBAOptLog(poltype,outputname)
+        shutil.copy(inputstruct,outputname.replace('.log','.xyz'))
+        cmdstr=''
+        executable=poltype.minimizeexe
 
-        else:
-            return inputname,outputname,cmdstr,poltype.scrtmpdirgau,executable
+        return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4,executable
+    
+    # Case: xtb
     elif poltype.toroptmethod=='xtb':
         inputstruct=ConvertTinktoXYZ(poltype,torxyzfname,torxyzfname.replace('.xyz','_cart.xyz'))
         inputmol= opt.load_structfile(poltype,inputstruct)
@@ -386,6 +398,8 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
         executable='xtb'
 
         return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4,executable
+    
+    # Case: ANI
     elif poltype.toroptmethod=='ANI':
 
         inputstruct=ConvertTinktoXYZ(poltype,torxyzfname,torxyzfname.replace('.xyz','_cart.xyz'))
@@ -416,19 +430,53 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
         executable=poltype.anipath
         cmdstr=ANIOptimizeCommand(poltype,resfilename,torxyzfname.replace('.xyz','_cart.xyz'),poltype.anifmax,poltype.anipath,outputname)
         return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4,executable
-    elif poltype.toroptmethod=='AMOEBA':
+    
+    # Case: FENNIX
+    elif poltype.toroptmethod=='FENNIX':
         inputstruct=ConvertTinktoXYZ(poltype,torxyzfname,torxyzfname.replace('.xyz','_cart.xyz'))
         inputmol= opt.load_structfile(poltype,inputstruct)
         prefix=poltype.toroptmethod+'-opt-'
         postfix='.input'  
         inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
+        pre=inputname.replace(postfix,'')
+        newtorset=[]
+        rotbndtorescount={}
+        maxrotbnds=1
+        restlist=[]
+        torsiontophaseangle={}
+        torsiontomaintor={}
+
+        rottors,rotbndtorescount,restlist,rotphases,torsiontophaseangle,torsiontomaintor=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor)
+        frotors,rotbndtorescount,restlist,torsiontophaseangle,torsiontomaintor=FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor)
+        
+        for tor in rottors:
+            newtorset.append(tor)
+        for tor in frotors:
+            newtorset.append(tor)
+        toranglelist=GrabTorsionAngles(poltype,newtorset,inputmol)
+        resfilename=CreateConstraintsFileFENNIX(poltype,newtorset,toranglelist,pre)
         outputname=inputname.replace(postfix,'.log')
-        GenerateAMOEBAOptLog(poltype,outputname)
-        shutil.copy(inputstruct,outputname.replace('.log','.xyz'))
-        cmdstr=''
-        executable=poltype.minimizeexe
+        optxyz,cmdstr=fennix4poltype.FENNIX_OPT(poltype,inputstruct,resfilename)
+        executable='echo'
 
         return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4,executable
+    
+    
+    # In this case we are using either psi4 or Gaussian
+    else: 
+        if  poltype.use_gaus==False and poltype.use_gausoptonly==False:
+            inputname,outputname=CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt)
+            cmdstr=' '.join(['psi4 ',poltype.psi4_args,inputname,outputname])
+            executable='psi4'
+        else:
+            inputname,outputname=CreateGausTorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt)
+            cmdstr='GAUSS_SCRDIR='+poltype.scrtmpdirgau+' '+poltype.gausexe+' '+inputname
+            executable=poltype.gausexe
+        if poltype.use_gaus==False and poltype.use_gausoptonly==False:
+            return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4,executable
+
+        else:
+            return inputname,outputname,cmdstr,poltype.scrtmpdirgau,executable
 
 
 def GenerateAMOEBAOptLog(poltype,outputname):
@@ -2914,6 +2962,30 @@ def CreateConstraintsFileANI(poltype,finaltorset,pre):
 
 
 
+def CreateConstraintsFileFENNIX(poltype,torlist,toranglelist,pre):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
+    TripleBondTorsions = get_triple_bond_torsion(poltype)
+    
+    filename=pre+'_constr.txt'
+    with open(filename, 'w') as f:
+      f.write('$set'+'\n')
+      for i in range(len(torlist)):
+        tor=torlist[i]
+        if tor not in TripleBondTorsions:
+          angle=toranglelist[i]
+          f.write(f"dihedral {' '.join([str(t) for t in tor])} {float(angle):.4f}\n")
+    return filename
+
+
+
+
 
 
 def OptimizeXTB(poltype,inputstruct,resfilename,xtbmethod,outputname,charge,uhf):
@@ -2934,7 +3006,6 @@ def OptimizeXTB(poltype,inputstruct,resfilename,xtbmethod,outputname,charge,uhf)
     pythonpath=os.path.join(xtbenvpath,'bin')
     xtbpath=os.path.join(pythonpath,'xtb')
 
-    #cmdstr=xtbpath +' '+'--gfn'+' '+str(xtbmethod)+' '+'--chrg'+' '+str(charge)+' '+'--uhf'+' '+str(uhf)+' '+inputstruct+' '+'--opt'+' '+'--input'+' '+resfilename+' > '+outputname
     if poltype.toroptpcm==True or (poltype.toroptpcm==-1 and poltype.pcm):
         cmdstr = f"{xtbpath} --gfn {xtbmethod} --alpb water --chrg {charge} --uhf {uhf} {inputstruct} --opt --input {resfilename} > {outputname}"
     else:

@@ -186,7 +186,7 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
             WBOvalues=None
         else:
             WBOvalues=[]
-            if poltype.torspmethod!='xtb' and poltype.torspmethod!='ANI':
+            if poltype.torspmethod!='xtb' and poltype.torspmethod!='ANI' and poltype.torspmethod!='FENNIX':
                 use_gaus=False
                 use_gaus=CheckIfLogFileUsingGaussian(poltype,minstrctfname)
                 if use_gaus:
@@ -226,6 +226,8 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
                 tor_energy=ParseXTBEnergyLog(poltype,minstrctfname)
             elif poltype.torspmethod=='ANI':
                 tor_energy=ParseANIEnergyLog(poltype,minstrctfname)
+            elif poltype.torspmethod=='FENNIX':
+                tor_energy=ParseFENNIXEnergyLog(poltype,minstrctfname)
 
         WBOarray.append(WBOvalues)
         energy_list.append(tor_energy)
@@ -2198,5 +2200,18 @@ def ParseANIEnergyLog(poltype,outputname):
         if 'Energy' in line:
             linesplit=line.split()
             energy=float(linesplit[-2])
+    return energy
+
+def ParseFENNIXEnergyLog(poltype,outputname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    for line in open(outputname).readlines():
+      if 'Total Energy: ' in line:
+        energy=float(line.split()[-2])
     return energy
 

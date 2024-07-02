@@ -1235,7 +1235,7 @@ class PolarizableTyper():
                 self.gdmainp = get_dma_default('dma0')
             self.gdmainp.update(gdma_kws)
 
-            # Downgrad ESP basis set for molecules of 20 or more heavy atoms 
+            # Downgrade ESP basis set for molecules of 20 or more heavy atoms 
             if self.adaptiveespbasisset:
                 m = Chem.MolFromMolFile(self.molstructfname,removeHs=False)
                 num_of_heavy_atoms = Descriptors.HeavyAtomCount(m)
@@ -3387,7 +3387,7 @@ class PolarizableTyper():
                         elif 'Poltype has crashed!' in line:
                             error=True
                     else:
-                        if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line or "LBFGS  --  Normal Termination due to SmallGrad" in line or "Normal termination" in line or 'Normal Termination' in line or 'Total Potential Energy' in line or 'Psi4 stopped on' in line or 'finished run' in line:
+                        if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line or "LBFGS  --  Normal Termination due to SmallGrad" in line or "Normal termination" in line or 'Normal Termination' in line or 'Total Potential Energy' in line or 'Psi4 stopped on' in line or 'finished run' in line or ('Converged! =D' in line):
                             term=True
                         if ('Tinker is Unable to Continue' in line or 'error' in line or ' Error ' in line or ' ERROR ' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line or 'Optimization failed to converge!' in line) and 'DIIS' not in line and 'mpi' not in line and 'RMS Error' not in line:
                             error=True
