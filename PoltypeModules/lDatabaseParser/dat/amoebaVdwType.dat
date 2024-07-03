@@ -427,7 +427,9 @@
 [$([SH2])]          					SH2_S			# Hydrogen Sulfide S
 
 # Heterocylic ring systems, probed using water 
-#[$([#7H0X2;R])]                                         R-NH0               # ring Nitrogen without H
-#[$([#7H0X2;R][#6;R][Cl])]                               R-NH0C-Cl           # ring Nitrogen without H and connected to ortho-Cl
-#[$([H][NH2][#6;R]([#7;R])[#6;R])]                       H2N<NC              # H of H2N then connected to N and C of the ring
-#[$([H][NH2][#6;R]([#7;R])[#7;R])]                       H2N<NN              # H of H2N then connected to N and N of the ring
+[$([Cl][a])]                                            Cl-ar               # Cl connected to aromatic atom
+[$([#7H0;r5])]                                          NH0r5               # N (witt 0H) in 5-member rings 
+[$([#7H1;r5])]                                          NH1r5               # N (with 1H) in 5-member rings 
+[$([n;r6])]                                             nr6                 # Aromatic N in 6-member rings 
+[$([H][#7H1;r5])]                                       H-NH1r5             # H on N (with 1H) in 5-member rings 
+[$([n]1[c][n][c][n][c]1)]                               n-azine             # N of Azine (3N+3C) ring 
