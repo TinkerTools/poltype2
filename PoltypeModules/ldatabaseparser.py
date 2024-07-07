@@ -179,7 +179,7 @@ def write_initial_parameters(sdffile, txyz):
     aniline_nitrogens.append(nitrogen)
   
   amide_nitrogens = []
-  pattern = Chem.MolFromSmarts('[NX3H1][C]=[O]')
+  pattern = Chem.MolFromSmarts('[NX3!H1][C]=[O]')
   matches = rdkitmol.GetSubstructMatches(pattern)
   for match in matches:
     nitrogen = str(match[0] + 1)
