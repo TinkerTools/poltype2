@@ -156,7 +156,7 @@ def modkey2_fragmpole(poltype):
   # this is something we need to decide later
   # plan: do some statistics element wise
   # so every element has its threshold
-  # currently only Carbon is detected
+  # currently only Carbon and Nitrogen is detected
 
   charge_threshold = 1.5
   dipole_threshold = 1.5
@@ -165,7 +165,18 @@ def modkey2_fragmpole(poltype):
   max_charge = 0.0
   max_dipole = 0.0
   max_qdpole = 0.0
-
+  
+  rdkitmol = Chem.MolFromMolFile(sdf, removeHs=False)
+  
+  # only Carbon and Nitrogen
+  allowed_elements = [6, 7]
+  allowed_atomids = []
+  for atom in rdkitmol.GetAtoms():
+    atom_num = atom.GetAtomicNum()
+    atom_id = atom.GetIdx()
+    if atom_num in allowed_elements:
+      allowed_atomids.append(atom_id + 1)
+      
   lines = open(key2).readlines()
   for line in lines:
     if "multipole " in line:
@@ -176,14 +187,14 @@ def modkey2_fragmpole(poltype):
       if abs(charge) > max_charge:
         max_charge = abs(charge)
       if abs(charge) > charge_threshold:
-        if atom_id not in atomsWithBigMultipole:
+        if (atom_id not in atomsWithBigMultipole) and (atom_id in allowed_atomids):
           atomsWithBigMultipole.append(atom_id)
       for dipole in lines[idx+1].split():
         if abs(float(dipole)) > max_dipole:
           max_dipole = abs(float(dipole))
 
         if abs(float(dipole)) > dipole_threshold:
-          if atom_id not in atomsWithBigMultipole:
+          if (atom_id not in atomsWithBigMultipole) and (atom_id in allowed_atomids):
             atomsWithBigMultipole.append(atom_id)
       for qpline in lines[idx+2:idx+5]:
         quadrupoles = qpline.split()
@@ -192,7 +203,7 @@ def modkey2_fragmpole(poltype):
             max_qdpole =  abs(float(quadrupole))
 
           if abs(float(quadrupole)) > quadrupole_threshold:
-            if atom_id not in atomsWithBigMultipole:
+            if (atom_id not in atomsWithBigMultipole) and (atom_id in allowed_atomids):
               atomsWithBigMultipole.append(atom_id)
   
   # Step 2: generate the "best" fragment and run poltype job
