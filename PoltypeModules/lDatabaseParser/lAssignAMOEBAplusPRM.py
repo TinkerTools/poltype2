@@ -234,6 +234,52 @@ def assignPolar():
           print(GREEN + "polarizability parameter found for %s"%dd[1] + ENDC)
           f.write(oldline)
           f.write(newline)
+  
+  
+  # Match special polpair values
+  # these are usually tough cases
+  atomnumbers, types = np.loadtxt(xyz, usecols=(0, 5,), unpack=True, dtype="str", skiprows=1)
+  atomnumbers = [int(a) for a in atomnumbers]
+  atom_type_dict = dict(zip(atomnumbers, types)) 
+  prmlines = open(os.path.join(prmfiledir,"amoebaPolarPair.prm")).readlines()
+  # SDF is more info-rich 
+  if sdf != None:
+    inpfile = sdf
+    inpformat = 'sdf'
+  else:
+    inpfile = xyz
+    inpformat = 'txyz'
+  
+  # try to match line-by-line
+  matched_polpairs = []
+  comments = []
+  tmp = []
+  for mol in pybel.readfile(inpformat,inpfile):
+    for line in prmlines:
+      if ("#" not in line[0]) and (len(line) > 10):
+        s = line.split()
+        smt = s[0]
+        polpair_params = '   '.join(s[2:5])
+        polpair_comment = ' '.join(s[6:])
+        smarts = pybel.Smarts(smt)
+        matches = smarts.findall(mol)
+        if matches != []:
+          for match in matches:
+            a = match[0] 
+            polpair_type = atom_type_dict[a] 
+            if (polpair_type not in tmp):
+              tmp.append(polpair_type)
+              polpair_prm_str = f"polpair {polpair_type} {polpair_params}"
+              matched_polpairs.append(polpair_prm_str)
+              comments.append(polpair_comment)
+  
+  # write the matched polpair parameters 
+  with open(key + "_polar", "a") as f:
+    if matched_polpairs != []:
+      for c, p in zip(comments, matched_polpairs):
+        f.write(f"# {c}\n")
+        f.write(f"{p}\n")
+
   return True
 
 def assignVdwAMOEBA():
