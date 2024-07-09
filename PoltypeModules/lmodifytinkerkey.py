@@ -242,25 +242,25 @@ def modkey2_fragmpole(poltype):
         poltype.call_subsystem([cmdstr], True)
         fragment_jobs.append(fname)
 
-  # Step 3: transfer the multipoles back to parent molecules
-  os.chdir(homedir)
-  
-  # make a copy of the parent key to work on
-  os.system(f'cp {key2} tmpkeyforfrag.key')
-
-  parent_key = "tmpkeyforfrag.key"
-  parent_sdf = sdf
-  parent_xyz = xyz2
-  for fragment_job in fragment_jobs:
-    frag_dir = os.path.join(homedir, 'Fragments_DMA', fragment_job)
-    frag_sdf = os.path.join(frag_dir, f'{fragment_job}.mol')
-    frag_xyz = os.path.join(frag_dir, 'final.xyz')
-    frag_key = os.path.join(frag_dir, 'final.key')
+    # Step 3: transfer the multipoles back to parent molecules
+    os.chdir(homedir)
     
-    transferMultipoleToParent(poltype, frag_sdf, frag_xyz, frag_key, parent_sdf, parent_xyz, parent_key)
-  
-  shutil.move(key2, key2+'_noFrag')
-  shutil.move('tmpkeyforfrag.key', key2)
+    # make a copy of the parent key to work on
+    os.system(f'cp {key2} tmpkeyforfrag.key')
+
+    parent_key = "tmpkeyforfrag.key"
+    parent_sdf = sdf
+    parent_xyz = xyz2
+    for fragment_job in fragment_jobs:
+      frag_dir = os.path.join(homedir, 'Fragments_DMA', fragment_job)
+      frag_sdf = os.path.join(frag_dir, f'{fragment_job}.mol')
+      frag_xyz = os.path.join(frag_dir, 'final.xyz')
+      frag_key = os.path.join(frag_dir, 'final.key')
+      
+      transferMultipoleToParent(poltype, frag_sdf, frag_xyz, frag_key, parent_sdf, parent_xyz, parent_key)
+    
+    shutil.move(key2, key2+'_noFrag')
+    shutil.move('tmpkeyforfrag.key', key2)
   return
 
 # helper function to transfer multipole back to parent
