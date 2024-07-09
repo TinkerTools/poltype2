@@ -98,4 +98,5 @@
 [$([N]1~[C]~[N]~[N]~[N]1)]              					     Nar-      1.657 # N- in aromatic 
 [$([C]1~[N]~[N]~[N]~[N]1)]                					   Car-      2.311 # C- in aromatic
 [$([O-][a])]                                           O-        1.700 # O- connecting an aromatic atom, original 2.689, scale down ~30% 
+[$([O-][a])]                                           O-        1.200 # O- connecting an aromatic atom, suggested value by Jay Ponder
 [$(c[O-])]                                             Co-       1.600 # Aromatic C connecting O-, original 2.413, scale to the same as Car 
