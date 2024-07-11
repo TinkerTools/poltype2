@@ -6,9 +6,19 @@ from ase.io import read
 from fennol.ase import FENNIXCalculator
 
 def FENNIX_OPT(poltype,inputstruct,resfilename):
+    optconvergence = poltype.optconvergence
+    if optconvergence.upper() == 'LOOSE':
+      optconvergence = 'GAU_LOOSE'
+    elif optconvergence.upper() == 'GAU': 
+      optconvergence = 'GAU'
+    elif optconvergence.upper() == 'TIGHT': 
+      optconvergence = 'GAU_TIGHT'
+    else:
+      raise ValueError('optconvergence not supported: '+str(optconvergence)) 
+
     fennixmodelpath = os.path.join(poltype.fennixmodeldir, f'{poltype.fennixmodelname}.fnx')
     CONFIG_STR = "{" + '\\"model\\":'  + '\\"' + fennixmodelpath + '\\"' + "}"
-    cmdstr = f"geometric-optimize --ase-class=fennol.ase.FENNIXCalculator --ase-kwargs={CONFIG_STR} --engine=ase {inputstruct} {resfilename}"
+    cmdstr = f"geometric-optimize --ase-class=fennol.ase.FENNIXCalculator --ase-kwargs={CONFIG_STR} --converge set {optconvergence} --engine=ase {inputstruct} {resfilename}"
     poltype.call_subsystem([cmdstr], True)
     opted_xyz = inputstruct.replace('.xyz', '_optim.xyz') 
     if os.path.isfile(opted_xyz):
