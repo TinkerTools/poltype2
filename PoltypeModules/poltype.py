@@ -178,6 +178,7 @@ class PolarizableTyper():
         neatliquidsim:bool=False
         amoeba09prmfilepath:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoeba09.prm"
         ldatabaseparserpath:str=os.path.join(os.path.abspath(os.path.split(__file__)[0]), 'lDatabaseParser', 'lAssignAMOEBAplusPRM.py')
+        ldatabaseparserprmdir:str=os.path.join(os.path.abspath(os.path.split(__file__)[0]), 'lDatabaseParser', 'prm')
         endstatestructurefile:None=None
         redobar:bool=False
         rotateframes:bool=False
@@ -4341,6 +4342,14 @@ class PolarizableTyper():
             """
             atomsAreCovered = True
             if self.toroptmethod=='FENNIX' or self.torspmethod=='FENNIX':
+              # FENNIX requires total charge must be ZERO 
+              isNeutral = True
+              chg = Chem.GetFormalCharge(m) 
+              if chg != 0:
+                isNeutral = False
+                self.WriteToLog(f'Total Charge of the Molecule is not Zero: {chg}') 
+                raise ValueError('Total Charge of the Molecule is not Zero') 
+              
               listofallowedatoms=[1,6,7,8,9,17,16]
               for atom in m.GetAtoms():
                 atomicnum=atom.GetAtomicNum()
@@ -4351,13 +4360,7 @@ class PolarizableTyper():
             if not atomsAreCovered:
               raise ValueError('Not All Elements are allowed for FENNIX! ') 
 
-            isNeutral = True
-            chg = Chem.GetFormalCharge(m) 
-            if chg != 0:
-              isNeutral = False
-              self.WriteToLog(f'Total Charge of the Molecule is not Zero: {chg}') 
-              raise ValueError('Total Charge of the Molecule is not Zero') 
-
+            
 
         def CheckForHydrogens(self,m):
             """
@@ -4630,6 +4633,7 @@ class PolarizableTyper():
             56. Delete scratch files used during QM calculations
             57. If user specifies to send email about job being finished, then send email
             58. Copy final XYZ and key files to top directory, where user submits jobs. Also copy torsion plots to OPENME folder.
+            59. Apply any modifications or FLAG to the final.key file 
             """
             # STEP 1 
             self.molstructfname=self.ConvertInputStructureToSDFFormat(self.molstructfname)
@@ -5155,6 +5159,12 @@ class PolarizableTyper():
                      shutil.copy(self.tmpkeyfile,os.path.join(previousdir,self.tmpkeyfile))
             self.CopyFitPlots()
             os.chdir('..')
+
+            # STEP 59
+            # apply any modifications to the final.key
+            lmodifytinkerkey.mod_final_key(self)
+
+
             
 
 
