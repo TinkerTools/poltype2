@@ -60,7 +60,7 @@ git clone https://github.com/TinkerTools/poltype2.git master
 * Alternatively, you may use the provided `environment.yml` file (under Environments folder) to create a conda environment named "poltype"
 * environment.yml:
 ```yaml
-name: poltype2
+name: mypoltype2
 channels:
   - conda-forge
   - rdkit
@@ -142,7 +142,7 @@ conda install -c conda-forge openbabel --yes
 
 ### Environment var for running POLTYPE:
  Create environments for Tinker,Gaussian 09,and GDMA. Put these in a file and source it before running POLTYPE so that programs such as "analyze.x" "gdma" "g16" can be found. You can use "which" to verify.
-* Example bashrc that you should source before running poltype
+* Example bashrc that you should source before running poltype. Note "mypoltype2" matches the conda env above
 ```shell
 export myusername=`whoami`
 conda activate mypoltype2
