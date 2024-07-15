@@ -539,7 +539,6 @@ def mod_final_key(poltype):
               matched_polpairs.append(polpair_prm_str)
               comments.append(polpair_comment)
 
-  print(comments)
   idx = -1 
   keylines = open(key).readlines()
   for line in keylines:
