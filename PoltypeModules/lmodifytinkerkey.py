@@ -224,6 +224,7 @@ def modkey2_fragmpole(poltype):
     fragment_jobs = [] 
     files = os.listdir()
     for f in files:
+      os.chdir(os.path.join(homedir, 'Fragments_DMA'))
       if f.startswith('Frag_Atom') and os.path.isfile(f):
         fname = f.split('.mol')[0]
         os.system(f'mkdir -p {fname}')
