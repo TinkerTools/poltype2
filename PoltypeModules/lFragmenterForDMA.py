@@ -218,7 +218,7 @@ def findConnectedAtoms(rdkitmol, atomList, atomsInRing):
       for neig in a.GetNeighbors():
         atomNum = neig.GetAtomicNum()
         neig_idx = neig.GetIdx()
-        if [idx, neig_idx] not in eligibleBondsToCut:
+        if ([idx, neig_idx] not in eligibleBondsToCut) and ([neig_idx, idx] not in eligibleBondsToCut):
           if (neig_idx not in connectedAtoms) and (neig_idx not in atomList):
             connectedAtoms.append(neig_idx)
     
