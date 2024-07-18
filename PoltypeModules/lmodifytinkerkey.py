@@ -155,14 +155,12 @@ def modkey2_fragmpole(poltype):
     if atomType not in atomType2atomIndex.keys():
       atomType2atomIndex[atomType] = int(atomIndex)
       
-  # this is something we need to decide later
-  # plan: do some statistics element wise
-  # so every element has its threshold
-  # currently only Carbon and Nitrogen is detected
+  # there are default threshold values for c/d/q 
+  # users can modify the keywords in poltype.ini
 
-  charge_threshold = 1.5
-  dipole_threshold = 1.5
-  quadrupole_threshold = 2.4
+  charge_threshold = poltype.chargethreshold
+  dipole_threshold = poltype.dipolethreshold
+  quadrupole_threshold = poltype.quadrupolethreshold 
   
   max_charge = 0.0
   max_dipole = 0.0
@@ -211,6 +209,11 @@ def modkey2_fragmpole(poltype):
   # Step 2: generate the "best" fragment and run poltype job
   # use an external program, lFragmenterForDMA.py, to do this
   # it can be run directly without involking poltype job
+  
+  if poltype.atomidsfordmafrag != []:
+    poltype.WriteToLog(f"User Inputed Atoms for Fragmentation: {' '.join([str(i) for i in poltype.atomidsfordmafrag])}")
+    poltype.WriteToLog("!!! Poltype will NOT Detect BIG Multipoles !!!")
+    atomsWithBigMultipole = poltype.atomidsfordmafrag
 
   if atomsWithBigMultipole != []:
     poltype.WriteToLog(f"Atoms with BIG multipole: {' '.join([str(i) for i in atomsWithBigMultipole])}")

@@ -430,9 +430,13 @@ class PolarizableTyper():
         cubegenexe:str='cubegen'
         gdmaexe:str='gdma'
         new_gdma:bool=False
-        scaleandfixdipole=False
-        scalebigmultipole=False
-        fragbigmultipole=False
+        scaleandfixdipole:bool=False
+        scalebigmultipole:bool=False
+        fragbigmultipole:bool=False
+        chargethreshold:float=1.5
+        dipolethreshold:float=1.5
+        quadrupolethreshold:float=2.4
+        atomidsfordmafrag:list=field(default_factory=lambda : [])
         sameleveldmaesp:bool=False
         adaptiveespbasisset:bool=False
         avgmpolesexe:str=os.path.abspath(os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), os.pardir)) + "/PoltypeModules/avgmpoles.pl"
@@ -1103,6 +1107,12 @@ class PolarizableTyper():
                             self.torsionrestraint=float(a)
                         elif "torsionprmrestraintfactorL1" in newline:
                             self.torsionprmrestraintfactorL1=float(a)
+                        elif "chargethreshold" in newline:
+                            self.chargethreshold=float(a)
+                        elif "dipolethreshold" in newline:
+                            self.dipolethreshold=float(a)
+                        elif "quadrupolethreshold" in newline:
+                            self.quadrupolethreshold=float(a)
                         elif "torsionprmrestraintfactorL2" in newline:
                             self.torsionprmrestraintfactorL2=float(a)
                         elif 'maxtorRMSPDRel' in newline:
@@ -1123,6 +1133,8 @@ class PolarizableTyper():
                                     temp.append(int(e))
                                 templist.append(temp)
                             self.onlyrotbndslist=templist
+                        elif "atomidsfordmafrag" in newline:
+                            self.atomidsfordmafrag=a.split(',')
                         elif "dontrotbndslist" in newline:
                             self.dontrotbndslist=a.split(',')
                             templist=[]
