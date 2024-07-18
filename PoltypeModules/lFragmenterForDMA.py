@@ -123,15 +123,20 @@ def growFragment(atomidx, sdffile):
 
     atomsOfTwoRings = list(set(atomsToAdd + atomsToKeep))
     connectedAtoms = findConnectedAtoms(mol, atomsOfTwoRings, atomsInRing)
-    saveFragment(mol, atomsOfTwoRings, f"Frag_Atom{atomidx:03d}_0.mol")
+    try:
+      saveFragment(mol, atomsOfTwoRings, f"Frag_Atom{atomidx:03d}_0.mol")
+    except:
+      pass
+
     atomsOfTwoRings += connectedAtoms
     saveFragment(mol, atomsOfTwoRings, f"Frag_Atom{atomidx:03d}.mol")
     
-    testmol = Chem.MolFromMolFile(f"Frag_Atom{atomidx:03d}.mol",removeHs=False)
-    if len(testmol.GetAtoms()) == len(mol.GetAtoms()):
-      shutil.move(f"Frag_Atom{atomidx:03d}_0.mol", f"Frag_Atom{atomidx:03d}.mol")
-    else:
-      os.system(f"rm -f Frag_Atom{atomidx:03d}_0.mol")
+    if os.path.isfile(f"Frag_Atom{atomidx:03d}_0.mol"):
+      testmol = Chem.MolFromMolFile(f"Frag_Atom{atomidx:03d}.mol",removeHs=False)
+      if len(testmol.GetAtoms()) == len(mol.GetAtoms()):
+        shutil.move(f"Frag_Atom{atomidx:03d}_0.mol", f"Frag_Atom{atomidx:03d}.mol")
+      else:
+        os.system(f"rm -f Frag_Atom{atomidx:03d}_0.mol")
     
     ## special case detection
     specialCaseSixFusedFiveMemRing(f"Frag_Atom{atomidx:03d}.mol")
@@ -156,15 +161,22 @@ def growFragment(atomidx, sdffile):
           atomsToAdd.append(ring_atom)
     atomsOfTwoRings = list(set(atomsToAdd + atomsToKeep))
     connectedAtoms = findConnectedAtoms(mol, atomsOfTwoRings, atomsInRing)
-    saveFragment(mol, atomsOfTwoRings, f"Frag_Atom{atomidx:03d}_0.mol")
+    
+    # rear cases that the kekulization fail 
+    try:
+      saveFragment(mol, atomsOfTwoRings, f"Frag_Atom{atomidx:03d}_0.mol")
+    except:
+      pass
+
     atomsOfTwoRings += connectedAtoms
     saveFragment(mol, atomsOfTwoRings, f"Frag_Atom{atomidx:03d}.mol")
     
-    testmol = Chem.MolFromMolFile(f"Frag_Atom{atomidx:03d}.mol",removeHs=False)
-    if len(testmol.GetAtoms()) == len(mol.GetAtoms()):
-      shutil.move(f"Frag_Atom{atomidx:03d}_0.mol", f"Frag_Atom{atomidx:03d}.mol")
-    else:
-      os.system(f"rm -f Frag_Atom{atomidx:03d}_0.mol")
+    if os.path.isfile(f"Frag_Atom{atomidx:03d}_0.mol"):
+      testmol = Chem.MolFromMolFile(f"Frag_Atom{atomidx:03d}.mol",removeHs=False)
+      if len(testmol.GetAtoms()) == len(mol.GetAtoms()):
+        shutil.move(f"Frag_Atom{atomidx:03d}_0.mol", f"Frag_Atom{atomidx:03d}.mol")
+      else:
+        os.system(f"rm -f Frag_Atom{atomidx:03d}_0.mol")
     
     ## special case detection
     specialCaseSixFusedFiveMemRing(f"Frag_Atom{atomidx:03d}.mol")
@@ -181,15 +193,20 @@ def growFragment(atomidx, sdffile):
     
     connectedAtoms = findConnectedAtoms(mol, atomsToAdd, atomsInRing)
     atomsToAdd += connectedAtoms
-    saveFragment(mol, atomsToAdd, f"Frag_Atom{atomidx:03d}_0.mol")
+    try:
+      saveFragment(mol, atomsToAdd, f"Frag_Atom{atomidx:03d}_0.mol")
+    except:
+      pass
+
     atomsToAdd += connectedAtoms
     saveFragment(mol, atomsToAdd, f"Frag_Atom{atomidx:03d}.mol")
     
-    testmol = Chem.MolFromMolFile(f"Frag_Atom{atomidx:03d}.mol",removeHs=False)
-    if len(testmol.GetAtoms()) == len(mol.GetAtoms()):
-      shutil.move(f"Frag_Atom{atomidx:03d}_0.mol", f"Frag_Atom{atomidx:03d}.mol")
-    else:
-      os.system(f"rm -f Frag_Atom{atomidx:03d}_0.mol")
+    if os.path.isfile(f"Frag_Atom{atomidx:03d}_0.mol"):
+      testmol = Chem.MolFromMolFile(f"Frag_Atom{atomidx:03d}.mol",removeHs=False)
+      if len(testmol.GetAtoms()) == len(mol.GetAtoms()):
+        shutil.move(f"Frag_Atom{atomidx:03d}_0.mol", f"Frag_Atom{atomidx:03d}.mol")
+      else:
+        os.system(f"rm -f Frag_Atom{atomidx:03d}_0.mol")
   
   return 
 
