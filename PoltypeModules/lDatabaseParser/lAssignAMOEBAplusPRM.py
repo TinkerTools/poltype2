@@ -840,7 +840,9 @@ def assignOpbendA09(atom2class, keyfile):
           s = line.split()
           current_v = float(s[-1])
           k = ' '.join(s[1:3])
-          if k in matched_opbs.keys():
+          if k not in matched_opbs.keys():
+            f.write(line)
+          else:
             v = float(matched_opbs[k].split()[-1])
             if v > current_v:
               f.write(matched_opbs[k] + '\n')
