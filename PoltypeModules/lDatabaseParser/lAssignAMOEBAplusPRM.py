@@ -210,7 +210,7 @@ def genAtomType(txyz, key, potent):
 def assignPolar():
   genAtomType(xyz, key, 'POLAR')
   types, polars = [], []
-  lines = open(os.path.join(prmfiledir,"amoeba_and_amoebaplus_polarize.prm")).readlines()
+  lines = open(os.path.join(prmfiledir,"polarize.prm")).readlines()
   for line in lines:
     dd = line.split()
     types.append(dd[1])
@@ -565,7 +565,7 @@ def assignCFlux(fname, key):
   return True
 
 def assignBonded(new_para_method, fitting = "NO"):
-  genAtomType(xyz, key, 'BONDED')
+  atom2class = genAtomType(xyz, key, 'BONDED')
   # 2 methods to generate the new parameters: modified Seminario (Hessian); average by ranking tree (DATABASE)
   # you can choose to fit the new parameters to the given frequencies to improve the accuracy
   atomclasses, databaseclasses = np.loadtxt(f"{fname}.type.bonded", usecols=(2,4), unpack=True, dtype="str")
@@ -596,9 +596,6 @@ def assignBonded(new_para_method, fitting = "NO"):
   classBondParameterDict = dict(zip(classes, zip(bondKs, bondLs)))
   lines = open(key).readlines()
   idx = 0
-  for line in lines:
-    if "ASSIGN" in line:
-      idx = lines.index(line)
   with open(key) as f:
     for line in lines[idx:]:
       d = line.split()
@@ -790,8 +787,66 @@ def assignBonded(new_para_method, fitting = "NO"):
     fitting(fname)
 
   if os.path.isfile(key + "_bonded"):
+    assignOpbendA09(atom2class, key+"_bonded")
     writeExplicitOpbend(key + "_bonded", xyz)
   return True
+
+""" Assign amoeba09 opbend as a patch """
+def assignOpbendA09(atom2class, keyfile):
+  database_prm = os.path.join(prmfiledir,"opbend_a09.prm")
+  prmlines = open(database_prm).readlines()
+  
+  # SDF is more info-rich 
+  if sdf != None:
+    inpfile = sdf
+    inpformat = 'sdf'
+    print(f"{YELLOW}Using SDF file to determine SMARTS types {ENDC}")
+  else:
+    inpfile = xyz
+    inpformat = 'txyz'
+    print(f"{YELLOW}Using tinker XYZ file to determine SMARTS types {ENDC}")
+  
+  # try to match line-by-line
+  matched_opbs = {} 
+  tmp = []
+  for mol in pybel.readfile(inpformat,inpfile):
+    for line in prmlines:
+      if ("#" not in line[0]) and (len(line) > 10):
+        s = line.split()
+        smt = s[0]
+        opb_params = s[1]
+        opb_comment = line.split('%')[1]
+
+        smarts = pybel.Smarts(smt)
+        matches = smarts.findall(mol)
+        if matches != []:
+          for match in matches:
+            a1 = str(match[0])
+            a2 = str(match[1])
+            opb_classes = ' '.join([atom2class[a] for a in [a1, a2]])
+            if (opb_classes not in tmp):
+              tmp.append(opb_classes)
+              opb_prm_str = f"opbend {opb_classes} 0  0  {opb_params}"
+              matched_opbs[opb_classes] = opb_prm_str
+  
+  # write the matched opbend from amoeba09.prm
+  if matched_opbs != {}:
+    lines = open(keyfile).readlines()
+    with open(keyfile, 'w') as f:
+      for line in lines:
+        if not 'opbend ' in line:
+          f.write(line)
+        else:
+          s = line.split()
+          current_v = float(s[-1])
+          k = ' '.join(s[1:3])
+          if k in matched_opbs.keys():
+            v = float(matched_opbs[k].split()[-1])
+            if v > current_v:
+              f.write(matched_opbs[k] + '\n')
+            else:
+              f.write(line)
+  return
 
 """ A helper function to write explicit opbend """
 def writeExplicitOpbend(key, xyz):
