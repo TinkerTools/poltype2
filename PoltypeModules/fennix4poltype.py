@@ -18,8 +18,25 @@ def FENNIX_OPT(poltype,inputstruct,resfilename):
 
     fennixmodelpath = os.path.join(poltype.fennixmodeldir, f'{poltype.fennixmodelname}.fnx')
     CONFIG_STR = "{" + '\\"model\\":'  + '\\"' + fennixmodelpath + '\\"' + "}"
-    cmdstr = f"geometric-optimize --ase-class=fennol.ase.FENNIXCalculator --ase-kwargs={CONFIG_STR} --converge set {optconvergence} --engine=ase {inputstruct} {resfilename}"
-    poltype.call_subsystem([cmdstr], True)
+
+    try:
+        cmdstr = f"geometric-optimize --ase-class=fennol.ase.FENNIXCalculator --ase-kwargs={CONFIG_STR} --converge set {optconvergence} --engine=ase {inputstruct} {resfilename}"
+        poltype.call_subsystem([cmdstr], True)
+        poltype.WriteToLog(f'geomeTRIC optimization: "{cmdstr}" was succesful')
+    except:
+        try:
+            cmdstr1 = f"geometric-optimize --ase-class=fennol.ase.FENNIXCalculator --ase-kwargs={CONFIG_STR} --converge set {optconvergence} --conmethod 1 --engine=ase {inputstruct} {resfilename}"
+            poltype.call_subsystem([cmdstr1], True)
+            poltype.WriteToLog(f'geomeTRIC optimization: "{cmdstr1}" was succesful')
+        except:
+            poltype.WriteToLog('')
+            poltype.WriteToLog('')
+            poltype.WriteToLog('')
+            poltype.WriteToLog('======================================')
+            poltype.WriteToLog('Both run failed')
+            raise ValueError(f'geomeTRIC failed to optimize with the following command:\n {cmdstr} \n {cmdstr1}')
+
+
     opted_xyz = inputstruct.replace('.xyz', '_optim.xyz') 
     if os.path.isfile(opted_xyz):
       lines = open(opted_xyz).readlines()
