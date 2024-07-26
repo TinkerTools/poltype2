@@ -21,27 +21,20 @@ def FENNIX_OPT(poltype,inputstruct,resfilename):
 
     try:
         cmdstr = f"geometric-optimize --ase-class=fennol.ase.FENNIXCalculator --ase-kwargs={CONFIG_STR} --converge set {optconvergence} --engine=ase {inputstruct} {resfilename}"
-        #cmdstr = f"geometric-optimize --ase-class=fennol.ase.FENNIXCalculator --ase-kwargs={CONFIG_STR} --converge set {optconvergence} {inputstruct} {resfilename}"
-
         poltype.call_subsystem([cmdstr], True)
         poltype.WriteToLog(f'geomeTRIC optimization: "{cmdstr}" was succesful')
-        #print(f'{cmdstr}')
-        #print('was succesful')
     except:
         try:
             cmdstr1 = f"geometric-optimize --ase-class=fennol.ase.FENNIXCalculator --ase-kwargs={CONFIG_STR} --converge set {optconvergence} --conmethod 1 --engine=ase {inputstruct} {resfilename}"
-            #cmdstr1 = f"geometric-optimize --ase-class=fennol.ase.FENNIXCalculator --ase-kwargs={CONFIG_STR} --converge set {optconvergence} --conmethod 1 {inputstruct} {resfilename}"
             poltype.call_subsystem([cmdstr1], True)
             poltype.WriteToLog(f'geomeTRIC optimization: "{cmdstr1}" was succesful')
-            #print(f'{cmdstr1}')
-            #print('was succesful')
         except:
+            poltype.WriteToLog('')
+            poltype.WriteToLog('')
+            poltype.WriteToLog('')
+            poltype.WriteToLog('======================================')
+            poltype.WriteToLog('Both run failed')
             raise ValueError(f'geomeTRIC failed to optimize with the following command:\n {cmdstr} \n {cmdstr1}')
-            print('')
-            print('')
-            print('')
-            print('======================================')
-            print('Both run failed')
 
 
     opted_xyz = inputstruct.replace('.xyz', '_optim.xyz') 
