@@ -838,8 +838,8 @@ def assignOpbendA09(atom2class, keyfile):
           f.write(line)
         else:
           s = line.split()
-          # Make sure that lines is not a comment 
-          if s[0] != '#':
+          # Make sure that line is not a comment 
+          if (s[0] != '#') and (len(s) == 6):
             current_v = float(s[-1])
             k = ' '.join(s[1:3])
             if k not in matched_opbs.keys():
