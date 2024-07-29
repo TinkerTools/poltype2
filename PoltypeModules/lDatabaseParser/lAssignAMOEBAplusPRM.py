@@ -832,12 +832,14 @@ def assignOpbendA09(atom2class, keyfile):
   # write the matched opbend from amoeba09.prm
   if matched_opbs != {}:
     lines = open(keyfile).readlines()
+    print(lines)
     with open(keyfile, 'w') as f:
       for line in lines:
         if not 'opbend ' in line:
           f.write(line)
         else:
           s = line.split()
+          print(s)
           current_v = float(s[-1])
           k = ' '.join(s[1:3])
           if k not in matched_opbs.keys():
