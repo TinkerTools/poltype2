@@ -838,16 +838,18 @@ def assignOpbendA09(atom2class, keyfile):
           f.write(line)
         else:
           s = line.split()
-          current_v = float(s[-1])
-          k = ' '.join(s[1:3])
-          if k not in matched_opbs.keys():
-            f.write(line)
-          else:
-            v = float(matched_opbs[k].split()[-1])
-            if v > current_v:
-              f.write(matched_opbs[k] + '\n')
-            else:
+          # Make sure that line is not a comment 
+          if (s[0] != '#') and (len(s) == 6):
+            current_v = float(s[-1])
+            k = ' '.join(s[1:3])
+            if k not in matched_opbs.keys():
               f.write(line)
+            else:
+              v = float(matched_opbs[k].split()[-1])
+              if v > current_v:
+                f.write(matched_opbs[k] + '\n')
+              else:
+                f.write(line)
   return
 
 """ A helper function to write explicit opbend """
