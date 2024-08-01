@@ -178,13 +178,6 @@ def write_initial_parameters(sdffile, txyz):
     nitrogen = str(match[0] + 1)
     aniline_nitrogens.append(nitrogen)
   
-  amide_nitrogens = []
-  pattern = Chem.MolFromSmarts('[NX3!H1][C]=[O]')
-  matches = rdkitmol.GetSubstructMatches(pattern)
-  for match in matches:
-    nitrogen = str(match[0] + 1)
-    amide_nitrogens.append(nitrogen)
-  
   nitroben_nitrogens = []
   pattern = Chem.MolFromSmarts('[NX3](~[O])(~[O])[a]')
   matches = rdkitmol.GetSubstructMatches(pattern)
@@ -194,7 +187,7 @@ def write_initial_parameters(sdffile, txyz):
   
   #!! dont forget to add this to valence_utils.py 
   
-  excluded_nitrogens = aniline_nitrogens + amide_nitrogens
+  excluded_nitrogens = aniline_nitrogens
   for nitrogen in excluded_nitrogens:
     if nitrogen in nitroben_nitrogens:
       excluded_nitrogens.remove(nitrogen)

@@ -791,9 +791,9 @@ def assignBonded(new_para_method, fitting = "NO"):
     writeExplicitOpbend(key + "_bonded", xyz)
   return True
 
-""" Assign amoeba09 opbend as a patch """
+""" Assign amoeba18 opbend as a patch """
 def assignOpbendA09(atom2class, keyfile):
-  database_prm = os.path.join(prmfiledir,"opbend_a09.prm")
+  database_prm = os.path.join(prmfiledir,"opbend_a18.prm")
   prmlines = open(database_prm).readlines()
   
   # SDF is more info-rich 
@@ -815,21 +815,22 @@ def assignOpbendA09(atom2class, keyfile):
         s = line.split()
         smt = s[0]
         opb_params = s[1]
-        opb_comment = line.split('%')[1]
-
+        opb_comment = line.split('%')[-1]
+        idxs = line.split('%')[-2].split(',')
         smarts = pybel.Smarts(smt)
         matches = smarts.findall(mol)
         if matches != []:
           for match in matches:
-            a1 = str(match[0])
-            a2 = str(match[1])
+            a1 = str(match[int(idxs[0])])
+            a2 = str(match[int(idxs[1])])
             opb_classes = ' '.join([atom2class[a] for a in [a1, a2]])
             if (opb_classes not in tmp):
               tmp.append(opb_classes)
               opb_prm_str = f"opbend {opb_classes} 0  0  {opb_params}"
               matched_opbs[opb_classes] = opb_prm_str
   
-  # write the matched opbend from amoeba09.prm
+  # replace opbend parameters if they 
+  # have been matched from amoebabio18.prm
   if matched_opbs != {}:
     lines = open(keyfile).readlines()
     with open(keyfile, 'w') as f:
@@ -840,16 +841,11 @@ def assignOpbendA09(atom2class, keyfile):
           s = line.split()
           # Make sure that line is not a comment 
           if (s[0] != '#') and (len(s) == 6):
-            current_v = float(s[-1])
             k = ' '.join(s[1:3])
             if k not in matched_opbs.keys():
               f.write(line)
             else:
-              v = float(matched_opbs[k].split()[-1])
-              if v > current_v:
-                f.write(matched_opbs[k] + '\n')
-              else:
-                f.write(line)
+              f.write(matched_opbs[k] + '\n')
   return
 
 """ A helper function to write explicit opbend """

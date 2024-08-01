@@ -1,7 +1,0 @@
-# opbend parameters in amoeba09.prm
-# only big ones are recorded
-# to replace QM-derived values (opbend.prm)
-[#6][C](=O)[*]   			  42.40 		% C connecting C=O
-[#1][C](=O)[*]  			 140.30 		% H connecting C=O
-[O]=[C]([*])[*]  		    46.80 		% O connecting C=O
-[#7,#8][C](=O)[*]      107.90 		% N or O connecting C=O
