@@ -180,18 +180,6 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
         temp.write(" 'convergence_set' : 'GAU_LOOSE',"+'\n')
         temp.write(" 'convergence_energy' : 1e-4,"+'\n')
 
-    # to keep four atoms connecting amide nitrogen in plane
-    amide_atoms = MatchAmide(poltype)
-    
-    if amide_atoms != [] and len(torsionrestraints)==0:
-        geometric_list = []
-        temp.write(" 'constraints' : {\n 'set' : [\n")
-        for amide in amide_atoms:
-            _str = "{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], "%tuple(amide) \
-               + "'value' : 0.0 } \n"
-            geometric_list.append(_str)
-        temp.write("       " + "     , ".join(geometric_list) + "    ]\n  }\n")
-    
     if len(torsionrestraints)!=0:
         temp.write(" 'constraints' : {\n 'set' : [\n")
         geometric_list = []
@@ -199,10 +187,6 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
             angle = mol.GetTorsion(res[0], res[1], res[2], res[3]) % 360
             _str = "{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], "%tuple([_-1 for _ in res[0:4]]) \
                + "'value' : %.4f } \n"%(angle)
-            geometric_list.append(_str)
-        for amide in amide_atoms:
-            _str = "{'type'    : 'dihedral', 'indices' : [ %d , %d , %d , %d ], "%tuple(amide) \
-               + "'value' : 0.0 } \n"
             geometric_list.append(_str)
         temp.write("       " + "     , ".join(geometric_list) + "    ]\n  }\n")
     temp.write("}"+'\n')
@@ -289,16 +273,6 @@ def CheckIfPsi4Log(poltype,outputlog):
             check=True
             break 
     return check 
-
-def MatchAmide(poltype):
-  mol = Chem.MolFromMolFile(poltype.molstructfname,removeHs=False)
-  amide_atoms = []
-  pattern = Chem.MolFromSmarts('[*][N]([*])[C]=[O]')
-  matches = mol.GetSubstructMatches(pattern)
-  for match in matches:
-    x1, n, x2, c, _ = match
-    amide_atoms.append([n, c, x1, x2]) 
-  return amide_atoms
 
 
 def GrabFinalXYZStructure(poltype,logname,filename,mol):
@@ -427,16 +401,7 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
     for atm in iteratombab:
         tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (an.getElSymbol(atm.GetAtomicNum()), atm.x(), atm.y(), atm.z()))
     tmpfh.write('\n')
-    
-    # to keep four atoms connecting amide nitrogen in plane
-    amide_atoms = MatchAmide(poltype)
-    if amide_atoms != [] and len(torsionrestraints) ==0:
-      for amide in amide_atoms:
-        n,c,x1,x2 = amide
-        tmpfh.write(f'{n+1} {c+1} {x1+1} {x2+1} =0.0 B\n')
-        tmpfh.write(f'{n+1} {c+1} {x1+1} {x2+1} F\n')
-      tmpfh.write('\n')
-    
+    tmpfh.write('\n')
     
     if ('I ' in spacedformulastr):
         formulalist=spacedformulastr.lstrip().rstrip().split()
@@ -453,10 +418,12 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
         for line in results:
             if '!' not in line:
                 tmpfh.write(line)
+
+
         
         tmpfh.write('\n')
+        tmpfh.write('\n')
     tmpfh.close()
-    
     if len(torsionrestraints)!=0:
         tempname=comfname.replace('.com','_temp.com')
         temp=open(comfname,'r')
@@ -476,21 +443,17 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
                 for res in torsionrestraints:
                     rta,rtb,rtc,rtd=res[:]
                     tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
-                if amide_atoms != []:
-                    for amide in amide_atoms:
-                        n,c,x1,x2 = amide
-                        tmpfh.write(f'{n+1} {c+1} {x1+1} {x2+1} =0.0 B\n')
-                        tmpfh.write(f'{n+1} {c+1} {x1+1} {x2+1} F\n')
                 tmpfh.write("\n")
             else:
                 tmpfh.write(line)
 
-        tmpfh.write("\n")
         tmpfh.close()
         os.remove(comfname)
         shutil.copy(tempname,comfname)
-    
-          
+
+
+
+
 
 def GenerateElementToBasisSetLines(poltype,basissetfile):
     """
