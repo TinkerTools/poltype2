@@ -145,6 +145,14 @@ if __name__ == "__main__":
           ihb_dist[u] = dist
         else:
           continue
+  
+  # match Amide atoms
+  pattern = Chem.MolFromSmarts('[C](=[O])[N]([H])[H]')
+  matches = m1.GetSubstructMatches(pattern)
+  amide_torsions = [] 
+  for match in matches:
+    c, o, n, h1, h2 = match
+    amide_torsions.append([n,c,h1,h2])
 
   ffps = ChemicalForceFields.MMFFGetMoleculeProperties(m1)
   converged = []
@@ -154,6 +162,12 @@ if __name__ == "__main__":
       idx1, idx2 = k.split('-')
       # atom1, atom2, relative=False, minDist=3.0, maxDist=10.0, forceConstant=50.0 
       ff.MMFFAddDistanceConstraint(int(idx1), int(idx2), False, 3.0, 10.0, 50.0)
+    # add torsion restraint for Amide Nitrogen
+    if amide_torsions != []:
+      for amide_torsion in amide_torsions:
+        t1,t2,t3,t4 = amide_torsion
+        ff.MMFFAddTorsionConstraint(t1, t2, t3, t4, True, 0, 0, 1000.0)
+
     res=ff.Minimize(maxIts=500)
     converged.append(res) 
 
