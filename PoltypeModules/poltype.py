@@ -4314,7 +4314,7 @@ class PolarizableTyper():
             3. If the atomic number is not in list of allowed atomic numbers, then raise error and crash the program.
             """
             # STEP 1
-            listofallowedatoms=[1,6,7,8,15,16,17,35,53,9]
+            listofallowedatoms=[1,5,6,7,8,15,16,17,35,53,9]
             # STEP 2
             for atom in m.GetAtoms():
                 atomicnum=atom.GetAtomicNum()

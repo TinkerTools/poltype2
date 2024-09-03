@@ -1,5 +1,6 @@
 # Single atom or wildcard fallback parameters
 [$([Ar])]          					Ar			# Argon Atom Ar
+[$([B])]          					B*			# B*, wild matching Boron
 [$([Br])]          					Br*                     # Br*, wild matching Br 
 [$([c])]          					benz_C			# Benzene C
 [$([C])]          					C*                      # C*, wild matching Carbon
