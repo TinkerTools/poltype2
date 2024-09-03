@@ -143,30 +143,24 @@ if __name__ == '__main__':
   # all single bonds are eligible to cut,
   single_bonds = []
   pattern = Chem.MolFromSmarts('[*;!#1][*;!#1]')
-  matches = mol.GetSubstructMatches(pattern)
+  matches = mol.GetSubstructMatches(pattern, uniquify=False)
   for match in matches:
     single_bonds.append(list(match))
   
-  # except aromatic nitrogen (n-*),
+  
+  # except non-trivalence nitrogen 
   special_nitrogen = []
-  pattern = Chem.MolFromSmarts('[n][*]')
-  matches = mol.GetSubstructMatches(pattern)
-  for match in matches:
-    special_nitrogen.append([match[0], match[1]])
-    special_nitrogen.append([match[1], match[0]])
-  
-  # or non-trivalence nitrogen 
   pattern = Chem.MolFromSmarts('[#7X2][*]')
-  matches = mol.GetSubstructMatches(pattern)
+  matches = mol.GetSubstructMatches(pattern, uniquify=False)
   for match in matches:
     special_nitrogen.append([match[0], match[1]])
     special_nitrogen.append([match[1], match[0]])
-  
+ 
   # do not cut two groups on ortho- sites (1-4)
   # unless the connected atom is carbon
   
   pattern = Chem.MolFromSmarts('[*;!R;!#1][R][R][*;!R;!#1]')
-  matches = mol.GetSubstructMatches(pattern)
+  matches = mol.GetSubstructMatches(pattern, uniquify=False)
   for match in matches:
     mat1 = [match[0], match[1]] 
     mat1_r = [match[1], match[0]] 
@@ -183,6 +177,17 @@ if __name__ == '__main__':
       if mat1_r in single_bonds:
         single_bonds.remove(mat1_r)
   
+  # record the aromatic nitrogen (n-*),
+  aromatic_nitrogen = {}
+  pattern = Chem.MolFromSmarts('[n][*]')
+  matches = mol.GetSubstructMatches(pattern, uniquify=False)
+  for match in matches:
+    n, x = match
+    if n not in aromatic_nitrogen.keys():
+      aromatic_nitrogen[n] = [x]
+    else:
+      aromatic_nitrogen[n] += [x]
+ 
   # get the atom indices of torsion
   torsion_idx_list = []
   for idx in range(len(mol.GetAtoms())):
@@ -246,7 +251,7 @@ if __name__ == '__main__':
   
   # Replace CH3 with H 
   pattern = Chem.MolFromSmarts('[*][CH3]([H])([H])[H]')
-  matches = mol.GetSubstructMatches(pattern)
+  matches = mol.GetSubstructMatches(pattern, uniquify=False)
   for match in matches:
     x, c, h1, h2, h3 = match
     if c not in torsion_idx_list:
@@ -259,7 +264,7 @@ if __name__ == '__main__':
   
   # Replace CH2CH3 with H 
   pattern = Chem.MolFromSmarts('[*][CH2]([H])([H])[CH3]([H])([H])[H]')
-  matches = mol.GetSubstructMatches(pattern)
+  matches = mol.GetSubstructMatches(pattern, uniquify=False)
   for match in matches:
     x, c1, h11, h12, c2, h21, h22, h23 = match
     if c1 not in torsion_idx_list:
@@ -271,7 +276,7 @@ if __name__ == '__main__':
   
   # Replace NH3+ with H 
   pattern = Chem.MolFromSmarts('[*][N+]([H])([H])[H]')
-  matches = mol.GetSubstructMatches(pattern)
+  matches = mol.GetSubstructMatches(pattern, uniquify=False)
   for match in matches:
     x, n, h1, h2, h3 = match
     if n not in torsion_idx_list:
@@ -279,7 +284,7 @@ if __name__ == '__main__':
   
   # Replace NH2 with H 
   pattern = Chem.MolFromSmarts('[*][N]([H])[H]')
-  matches = mol.GetSubstructMatches(pattern)
+  matches = mol.GetSubstructMatches(pattern, uniquify=False)
   for match in matches:
     x, n, h1, h2 = match
     if n not in torsion_idx_list:
@@ -349,16 +354,26 @@ if __name__ == '__main__':
       emol.RemoveAtom(atom)
   
   mol2 = emol.GetMol()
+  
+  # if aromatic nitrogen misses connections
+  # after cut, add one hydrogen atom
+  for idx, connected_atoms in aromatic_nitrogen.items():
+    for atm in connected_atoms:
+      if atm in atomsToRemove:
+        nitrogen = mol2.GetAtomWithIdx(idx)
+        nitrogen.SetNumExplicitHs(1)
+        break
+
   Chem.SanitizeMol(mol2)
   mol2h = Chem.AddHs(mol2,addCoords=True)
   Chem.Kekulize(mol2h)
   Chem.SanitizeMol(mol2h)
   # neutralize COO- to COOH
   pattern = Chem.MolFromSmarts('[O-][C](=O)')
-  matches_1 = mol2.GetSubstructMatches(pattern)
+  matches_1 = mol2.GetSubstructMatches(pattern, uniquify=False)
   # neutralize NH- to NH2
   pattern = Chem.MolFromSmarts('[N-][H]')
-  matches_2 = mol2.GetSubstructMatches(pattern)
+  matches_2 = mol2.GetSubstructMatches(pattern, uniquify=False)
   updated_mol = mol2
   if len(matches_1) != 0:
     print('COO- group detected. Neutralizing!')
