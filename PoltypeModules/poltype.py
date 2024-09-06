@@ -4827,7 +4827,7 @@ class PolarizableTyper():
             # STEP 26
             if not os.path.isfile(self.key4fname) or not os.path.isfile(self.torsionsmissingfilename) or not os.path.isfile(self.torsionprmguessfilename):
                 self.WriteToLog('Searching Database')
-                torsionprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,soluteprms,tortorprmstotransferinfo,tortorsmissing=torsiondatabaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
+                torsionprmstotransferinfo,torsionsmissing,classkeytotorsionparametersguess,tortorprmstotransferinfo,tortorsmissing=torsiondatabaseparser.GrabSmallMoleculeAMOEBAParameters(self,optmol,mol,m)
             if os.path.isfile(self.torsionsmissingfilename):
                 # Read missing torsions
                 torsionsmissing=torsiondatabaseparser.ReadTorsionList(self,self.torsionsmissingfilename)
@@ -4920,7 +4920,7 @@ class PolarizableTyper():
                         esp.ElectrostaticPotentialComparison(self,combinedxyz,combinedpot)
             # STEP 40
             if not os.path.exists(self.key4fname):
-                torsiondatabaseparser.appendtofile(self,self.key3fname,self.key4fname, torsionprmstotransferinfo,soluteprms,tortorprmstotransferinfo)
+                torsiondatabaseparser.appendtofile(self,self.key3fname,self.key4fname, torsionprmstotransferinfo,tortorprmstotransferinfo)
                 # Write Zero parameters for special torsion
                 ldatabaseparser.zero_special_torsions(self)
                 if self.writeoutangle==True:
@@ -4932,7 +4932,7 @@ class PolarizableTyper():
                     if self.forcefield.upper() in ['APLUS', 'AMOEBA+', 'AMOEBAPLUS']:
                       self.WriteToLog('Assign Charge flux, Charge transfer, and Van der Waals parameters using DatabaseParser')
                     else:
-                      self.WriteToLog('Assign Van der Waals parameters using DatabaseParser')
+                      self.WriteToLog('Assign Van der Waals and GK parameters using DatabaseParser')
                     ldatabaseparser.assign_nonbonded_params(self) 
                     torsiondatabaseparser.StiffenZThenBisectorAngleConstants(self,self.key4fname)
                     torsiondatabaseparser.TestBondAngleEquilValues(self)

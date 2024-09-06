@@ -47,7 +47,7 @@ def CheckIfStringIsFloat(string):
     return isfloat
 
 
-def appendtofile(poltype, vf,newname, torsionprmstotransferinfo,soluteprms,tortorprmstotransferinfo):
+def appendtofile(poltype, vf,newname, torsionprmstotransferinfo, tortorprmstotransferinfo):
     """
     Intent: Append the parameters found from database search to key file
     Input: Original key file, new name of updated key file, various dictionaries of parameters to comments about 
@@ -110,10 +110,6 @@ def appendtofile(poltype, vf,newname, torsionprmstotransferinfo,soluteprms,torto
                         f.write(line)
                         f.write('\n')
                 # STEP 10
-                if poltype.forcefield.upper() == 'AMOEBA':
-                    for line in soluteprms:
-                        f.write(line)
-                        f.write('\n')
                 # STEP 11
                 for line,transferinfo in tortorprmstotransferinfo.items():
                     if 'tortors' in line:
@@ -6397,4 +6393,4 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     WriteDictionaryToFile(poltype,torsionkeystringtoparameters,poltype.torsionprmguessfilename)
     WriteOutList(poltype,missingvdwatomindices,poltype.vdwmissingfilename)
     WriteOutList(poltype,tortorsmissing,poltype.tortormissingfilename)
-    return torsionprmstotransferinfo,torsionsmissing,torsionkeystringtoparameters,soluteprms,tortorprmstotransferinfo,tortorsmissing
+    return torsionprmstotransferinfo,torsionsmissing,torsionkeystringtoparameters,tortorprmstotransferinfo,tortorsmissing

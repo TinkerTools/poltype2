@@ -319,7 +319,7 @@ def assign_nonbonded_params(poltype):
     if poltype.forcefield.upper() in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
       cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent NONBONDED CF'
     else:
-      cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent VDW'
+      cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent VDW GK'
     poltype.call_subsystem([cmd], True)
     
     tmpkey_v = f'{tmpkey}_vdw'
@@ -359,12 +359,18 @@ def assign_nonbonded_params(poltype):
           if "chgpen " not in line:
             f.write(line)
     
-    # for AMOEBA model, only vdw term exists
+    # AMOEBA model: vdw and gk parameters 
     else:
       tmpkey_vdw = f'{tmpkey}_vdw'
       vdw_lines = open(tmpkey_vdw).readlines()
       with open(tmpkey_2, 'a') as f:
         for line in vdw_lines: 
+          f.write(line)
+      
+      tmpkey_gk = f'{tmpkey}_gk'
+      gk_lines = open(tmpkey_gk).readlines()
+      with open(tmpkey_2, 'a') as f:
+        for line in gk_lines: 
           f.write(line)
     
     # replace key4 with the file we wanted

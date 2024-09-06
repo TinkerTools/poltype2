@@ -311,6 +311,57 @@ def assignVdwAMOEBA():
         f.write(newline)
   return True
 
+def assignGKAMOEBA():
+  database_prm = os.path.join(prmfiledir,"amoebaGK.prm")
+  prmlines = open(database_prm).readlines()
+  
+  # deal with txyz file so openbabel can read
+  lines = open(xyz).readlines()
+  if len(lines[0].split()) == 1:
+    with open(xyz, "w") as f:
+      f.write(lines[0].split("\n")[0] + " comments\n")
+      for i in range(1,len(lines)):
+        f.write(lines[i])
+  atomnumbers, types = np.loadtxt(xyz, usecols=(0, 5,), unpack=True, dtype="str", skiprows=1)
+  atom2types = dict(zip(atomnumbers, types))
+  
+  # SDF is more info-rich 
+  if sdf != None:
+    inpfile = sdf
+    inpformat = 'sdf'
+    print(f"{YELLOW}Using SDF file to determine SMARTS types {ENDC}")
+  else:
+    inpfile = xyz
+    inpformat = 'txyz'
+    print(f"{YELLOW}Using tinker XYZ file to determine SMARTS types {ENDC}")
+  
+  # try to match line-by-line
+  type2prms = {} 
+  type2comments = {} 
+  tmp = []
+  for mol in pybel.readfile(inpformat,inpfile):
+    for line in prmlines:
+      if ("#" not in line[0]) and (len(line) > 10):
+        s = line.split()
+        smt = s[0]
+        prm = '   '.join(s[1:])
+
+        smarts = pybel.Smarts(smt)
+        matches = smarts.findall(mol)
+        if matches != []:
+          for match in matches:
+            idx = str(match[0])
+            typ = atom2types[idx]
+            type2prms[typ] = prm
+            type2comments[typ] = smt
+  
+  with open(key + '_gk', 'w') as f:
+    for t,p in type2prms.items():
+      comment = type2comments[t]
+      f.write(f"# AMOEBA GK parameter matched from {comment}\n")
+      f.write(f'solute {t} {p}\n')
+  return
+
 def assignNonbondedAMOEBAplus():
   genAtomType(xyz, key, 'NONBONDED')
 
@@ -1084,6 +1135,8 @@ if __name__ == "__main__":
       assignCFlux_general() 
     elif (p == "VDW"):
       assignVdwAMOEBA() 
+    elif (p == "GK"):
+      assignGKAMOEBA() 
     elif (p == "BONDED"):
       assignBonded(new_para, fitting)
     elif (p == "NONBONDED"):
