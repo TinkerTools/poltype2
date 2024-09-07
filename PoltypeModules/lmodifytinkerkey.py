@@ -524,7 +524,7 @@ def mod_final_key(poltype):
   matched_polpairs = []
   comments = []
   tmp = []
-  for mol in pybel.readfile(inpformat,inpfile):
+  for mol in pybel.readfile(inpformat,os.path.join(os.getcwd(), 'Temp', inpfile)):
     for line in prmlines:
       if ("#" not in line[0]) and (len(line) > 10):
         s = line.split()
