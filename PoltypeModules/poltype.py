@@ -382,6 +382,8 @@ class PolarizableTyper():
         smallmoleculemm3prmlib:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'mm3.prm'
         smallmoleculesmartstomm3descrip:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'smartstomm3typedescrip.txt'
         absdipoletol:float=.5
+        mmbondtol:float=.5
+        mmangletol:float=.5
         transferanyhydrogentor:bool=True
         smallmoleculesmartstotinkerdescrip:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'smartstoamoebatypedescrip.txt'
         smallmoleculeprmlib:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba09.prm'
@@ -1020,6 +1022,10 @@ class PolarizableTyper():
                             self.boltzmantemp=float(a)
                         elif 'absdipoletol' in newline:
                             self.absdipoletol=float(a)
+                        elif 'mmbondtol' in newline:
+                            self.mmbondtol=float(a)
+                        elif 'mmangletol' in newline:
+                            self.mmangletol=float(a)
                         elif 'dipoletol' in newline:
                             self.dipoletol=float(a)
                         elif 'maxRMSD' in newline:

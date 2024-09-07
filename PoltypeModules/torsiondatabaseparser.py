@@ -5838,14 +5838,16 @@ def CheckBondAngleDeviationsFromQM(poltype,alzout):
             indexlist=[1,2,3]
             equilindices=[4,5]
             indices,qmequil,currentequil=GrabIndicesAndEquilValues(linesplit,indexlist,equilindices)
-            tol=1
+            # 110*0.5% = 0.55 degree
+            tol=poltype.mmangletol
             keyword='angle'
     
         if 'Bond' in line:
             indexlist=[1,2]
             equilindices=[3,4]
             indices,qmequil,currentequil=GrabIndicesAndEquilValues(linesplit,indexlist,equilindices)
-            tol=2
+            # 1.34 * 0.5% < 0.007 ang
+            tol=poltype.mmbondtol
             keyword='bond'
             
         if tol!=None:
