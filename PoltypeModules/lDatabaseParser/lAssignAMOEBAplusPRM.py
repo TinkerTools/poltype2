@@ -353,13 +353,15 @@ def assignGKAMOEBA():
             idx = str(match[0])
             typ = atom2types[idx]
             type2prms[typ] = prm
-            type2comments[typ] = smt
+            type2comments[typ] = s[0]
   
   with open(key + '_gk', 'w') as f:
     for t,p in type2prms.items():
       comment = type2comments[t]
       f.write(f"# AMOEBA GK parameter matched from {comment}\n")
       f.write(f'solute {t} {p}\n')
+      print(f"# AMOEBA GK parameter matched from {comment}")
+      print(GREEN + f'solute {t} {p}\n' + ENDC)
   return
 
 def assignNonbondedAMOEBAplus():
