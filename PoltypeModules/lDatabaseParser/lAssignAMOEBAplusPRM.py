@@ -434,7 +434,10 @@ def assignCFlux_general():
   
   # read in the database CFlux parameters
   # store two sets of parameters
-  lines = open(os.path.join(prmfiledir,"cflux2023_general.prm")).readlines()
+  if cf4amoebaplus:
+    lines = open(os.path.join(prmfiledir,"cflux2024_general.prm")).readlines()
+  else:
+    lines = open(os.path.join(prmfiledir,"cflux2023_general.prm")).readlines()
   stype2param = {}
   for line in lines:
     s = line.split()
@@ -1026,75 +1029,63 @@ def assignTorsionAMOEBA():
 def assignTorsionAMOEBAplus():
   database_prm = os.path.join(prmfiledir,"amoebaplusTorsion.prm")
   prmlines = open(database_prm).readlines()
+ 
+  stype2prm = {}
+  stype2comment = {}
+  for prmline in prmlines:
+    if (prmline[0] != '#') and ('%' in prmline):
+      s = prmline.split('%')
+      stype = '-'.join(s[0].strip().split())
+      prm = s[1].strip().split(',')
+      comment = s[2].strip()
+      stype2prm[stype] = prm
+      stype2comment[stype] = comment 
   
-  # deal with txyz file so openbabel can read
-  lines = open(xyz).readlines()
-  if len(lines[0].split()) == 1:
-    with open(xyz, "w") as f:
-      f.write(lines[0].split("\n")[0] + " comments\n")
-      for i in range(1,len(lines)):
-        f.write(lines[i])
-  atomnumbers, types = np.loadtxt(xyz, usecols=(0, 5,), unpack=True, dtype="str", skiprows=1)
+  # read the key file to find atom types of torsion
+  torsion_types = []
+  keylines = open(key).readlines()
+  for keyline in keylines:
+    if ('torsion ' in keyline) and (keyline.split()[0].lower() == 'torsion'):
+      s = keyline.split()
+      if s[1:5] not in torsion_types:
+        torsion_types.append(s[1:5])
 
-  # construct atom2class dictionary
-  atom_class_dict = {}
-  type_class_dict = {}
-  for line in open(key).readlines():
-    if "atom " in line:
-      d = line.split()
-      if d[1] in types:
-        type_class_dict[d[1]] = d[2]
-  for a,t in zip(atomnumbers, types):
-    atom_class_dict[int(a)] = type_class_dict[t]
+  # read the non-bonded type file
+  # this is pre-generated when running Poltype,
+  # to assign nonbonded parameters
+  typefile = xyz.split('.xyz')[0] + '.type.nonbonded'
+  if not os.path.isfile(typefile):
+    sys.exit(f'Error: {typefile} does not exist in {os.getcwd()}!')
   
-  # SDF is more info-rich 
-  if sdf != None:
-    inpfile = sdf
-    inpformat = 'sdf'
-    print(f"{YELLOW}Using SDF file to determine SMARTS types {ENDC}")
-  else:
-    inpfile = xyz
-    inpformat = 'txyz'
-    print(f"{YELLOW}Using tinker XYZ file to determine SMARTS types {ENDC}")
-  
-  # try to match line-by-line
-  matched_torsions = []
-  comments = []
-  tmp = []
-  for mol in pybel.readfile(inpformat,inpfile):
-    for line in prmlines:
-      if ("#" not in line[0]) and (len(line) > 10):
-        s = line.split('%')
-        smt = s[0]
-        tor_indices = s[1].split(',')
-        tor_params = s[2].strip().split(',')
-        tor_comment = s[3].strip()
+  ttype2stype = {}
+  lines = open(typefile).readlines()
+  for line in lines:
+    s = line.split()
+    ttype = s[1]
+    stype = s[3]
+    if ttype not in ttype2stype.keys():
+      ttype2stype[ttype] = stype
 
-        smarts = pybel.Smarts(smt)
-        matches = smarts.findall(mol)
-        if matches != []:
-          for match in matches:
-            a1 = match[int(tor_indices[0]) - 1] 
-            a2 = match[int(tor_indices[1]) - 1] 
-            a3 = match[int(tor_indices[2]) - 1] 
-            a4 = match[int(tor_indices[3]) - 1]
-            tor_types = ' '.join([atom_class_dict[a] for a in [a1, a2, a3, a4]])
-            tor_types_r = ' '.join([atom_class_dict[a] for a in [a4, a3, a2, a1]])
-            if (tor_types not in tmp):
-              tmp.append(tor_types)
-              tmp.append(tor_types_r)
-              tor_prm_str = f"{tor_params[0]} 0.0 1 {tor_params[1]} 180.0 2 {tor_params[2]} 0.0 3"
-              matched_torsions.append(f"torsion {tor_types} {tor_prm_str}")
-              comments.append(tor_comment)
-  
-  # write the matched torsion
   with open(key + "_torsion", 'w') as f:
-    if matched_torsions == []:
-      f.write('# no torsion parameters matched from database\n')
-    else:
-      for c, p in zip(comments, matched_torsions):
-        f.write(f"# Matched by lAssignAMOEBAplusPRM.py: {c}\n")
-        f.write(f"{p}\n")
+    for torsion_type in torsion_types:
+      t1, t2, t3, t4 = torsion_type
+      st1 = ttype2stype[t1]
+      st2 = ttype2stype[t2]
+      st3 = ttype2stype[t3]
+      st4 = ttype2stype[t4]
+      comb = '-'.join([st1, st2, st3, st4])
+      comb_r = '-'.join([st4, st3, st2, st1])
+
+      if comb in stype2prm.keys():
+        prm = stype2prm[comb]
+        comment = stype2prm[comb]
+        f.write(f'# {comment}\n')
+        f.write(f'torsion {t1} {t2} {t3} {t4} {prm[0]} 0.0 1 {prm[1]} 180.0 2 {prm[2]} 0.0 3\n')
+      elif comb_r in stype2prm.keys():
+        comment = stype2prm[comb_r]
+        f.write(f'# {comment}\n')
+        prm = stype2prm[comb_r]
+        f.write(f'torsion {t1} {t2} {t3} {t4} {prm[0]} 0.0 1 {prm[1]} 180.0 2 {prm[2]} 0.0 3\n')
   return
 
 if __name__ == "__main__":
@@ -1108,11 +1099,13 @@ if __name__ == "__main__":
   parser.add_argument('-fitting', dest = 'fitting', help = "fit the frequencies if new parameters are needed", default="NO", type=str.upper, choices=["YES", "NO"])
   parser.add_argument('-new_para', dest = 'new_para', help = "method to generate the new valence parameters", default="DATABASE", type=str.upper, choices=["HESSIAN", "DATABASE"])  
   parser.add_argument('-konly', dest = 'konly', help = "assign force constant only for valence parameters", default="YES", type=str.upper, choices=["YES", "NO"])  
+  parser.add_argument('-cf4amoebaplus', dest = 'cf4amoebaplus', help = "apply special treatment of CF parms. for amoebaplus", default=False, type=bool)  
   args = vars(parser.parse_args())
-  global xyz, key, sdf
+  global xyz, key, sdf, cf4amoebaplus 
   xyz = args["xyz"]
   key = args["key"]
   sdf = args["sdf"]
+  cf4amoebaplus = args["cf4amoebaplus"]
   if key == None:
     write_tmp_key(xyz)
     key = xyz.split('.')[0] + '.key'

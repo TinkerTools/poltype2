@@ -50,6 +50,8 @@
 
 # Ketone
 [$([CH0](=[O])(C)[C])]                                   C(=O)<           #  C of ketone 
+[$([CH0](=[O])(C)[c])]                                   C(=O)<           #  C of ketone  
+[$([CH0](=[O])(c)[c])]                                   C(=O)<           #  C of ketone 
 [$([O]=[CH0]([C])[C])]                                   O=C<             #  O of ketone 
 [$([O]=[CH0]([C])[c])]                                   O=C<             #  O of ketone 
 
@@ -62,14 +64,10 @@
 [$([O]=[C](a)[O][H])]                                    O=C-ar          #  O of acid O=C
 
 # Amide
-[$([H][NH2][C]=[O])]                                      H2N-Amide       #  H of amide nitrogen
-[$([H][NH1][C]=[O])]                                      H1N-Amide       #  H of amide nitrogen
+[$([H][NX3][C]=[O])]                                      HxN-Amide       #  H of amide nitrogen
 [$([NH2][C]=[O])]                                     		NH2-Amide       #  N of amide nitrogen, two attached hydrogen
-[$([NH2][CH1]=[O])]                                   		NH2CH=O         #  N of formamide
-[$([NH2][C]([NH1])=[O])]                                  NH2C(=O)NH1     #  N of N-methyl-urea 
 [$([NH1][C]=[O])]                                     		NH1-Amide       #  N of amide nitrogen, one attached hydrogen
 [$([NH0][C]=[O])]                                     		NH0-Amide       #  N of amide nitrogen, no attached hydrogen
-[$([CX3](N)=[O])]                                         C=O(N)          #  C of amide
 [$([CX3](N)=[O])]                                         C(=O)<          #  C of amide
 [$([O]=[C][N])]                                       	  O=CN            #  O of amide
 

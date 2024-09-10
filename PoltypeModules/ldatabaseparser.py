@@ -317,7 +317,7 @@ def assign_nonbonded_params(poltype):
     sdffile = poltype.molstructfname
     shutil.copy(poltype.key4fname, tmpkey)
     if poltype.forcefield.upper() in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
-      cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent NONBONDED CF'
+      cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent NONBONDED CF -cf4amoebaplus True'
     else:
       cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent VDW GK'
     poltype.call_subsystem([cmd], True)
