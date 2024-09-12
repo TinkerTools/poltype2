@@ -1078,11 +1078,11 @@ def assignTorsionAMOEBAplus():
 
       if comb in stype2prm.keys():
         prm = stype2prm[comb]
-        comment = stype2prm[comb]
+        comment = stype2comment[comb]
         f.write(f'# {comment}\n')
         f.write(f'torsion {t1} {t2} {t3} {t4} {prm[0]} 0.0 1 {prm[1]} 180.0 2 {prm[2]} 0.0 3\n')
       elif comb_r in stype2prm.keys():
-        comment = stype2prm[comb_r]
+        comment = stype2comment[comb_r]
         f.write(f'# {comment}\n')
         prm = stype2prm[comb_r]
         f.write(f'torsion {t1} {t2} {t3} {t4} {prm[0]} 0.0 1 {prm[1]} 180.0 2 {prm[2]} 0.0 3\n')

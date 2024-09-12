@@ -4974,6 +4974,7 @@ class PolarizableTyper():
               self.call_subsystem([cmd], True)  
             # find torsions to be added
             torsions_toadd = {}
+            matched_torlist = []
             if os.path.isfile(tmpkey + '_torsion'):
               tmplines = open(tmpkey + '_torsion').readlines()
               for line in tmplines:
@@ -4981,15 +4982,19 @@ class PolarizableTyper():
                   s = line.split()
                   tor = [int(ss) for ss in s[1:5]]
                   tor_r = [int(ss) for ss in s[4:0:-1]] 
-                  if (tor in torsionsmissing):
-                    torsionsmissing.remove(tor)
-                    torsions_toadd['-'.join([str(i) for i in tor])] = line
-                  if tor_r in torsionsmissing:
-                    torsionsmissing.remove(tor_r)
-                    torsions_toadd['-'.join([str(i) for i in tor_r])] = line
-            # remove matched torsion indicies from torsionsmissing.txt
-            if torsions_toadd != {}:
+                  torsions_toadd['-'.join([str(i) for i in tor])] = line
+                  torsions_toadd['-'.join([str(i) for i in tor_r])] = line
+                  matched_torlist.append(tor)
+                  matched_torlist.append(tor_r)
+
+            # remove matched torsion types from torsionsmissing.txt
+            if matched_torlist != []:
               shutil.move(self.torsionsmissingfilename, self.torsionsmissingfilename + '.back')
+              tmp = []
+              for tor in torsionsmissing:
+                if tor not in matched_torlist:
+                  tmp.append(tor)
+              torsionsmissing = tmp
               with open(self.torsionsmissingfilename, 'w') as f:
                for torsionmiss in torsionsmissing:
                 f.write(str(torsionmiss) + '\n')
@@ -5011,12 +5016,32 @@ class PolarizableTyper():
                       f.write(keyline)
                   else:
                     f.write(keyline)
-
-            # Read missing torsions again since we modify the file
-            torsionsmissing=torsiondatabaseparser.ReadTorsionList(self,self.torsionsmissingfilename)
             # STEP 41
             (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,optmol,torsionsmissing,self.onlyrotbndslist)
             torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules
+            
+            # STEP 41-42
+            # remove matched torsion indices from torlist
+            atom2type = {}
+            xyzlines = open(tmpxyz).readlines()
+            for line in xyzlines[1:]:
+              s = line.split()
+              atom2type[int(s[0])] = s[5]
+            
+            tmptorlist = []
+            for tor in torlist:
+              print('TOR', tor)
+              (a1, a2, a3, a4) = tor
+              t1 = atom2type[a1]
+              t2 = atom2type[a2]
+              t3 = atom2type[a3]
+              t4 = atom2type[a4]
+              comb = '-'.join([t1,t2,t3,t4])
+              comb_r = '-'.join([t4,t3,t2,t1])
+              if not ((comb in torsions_toadd.keys()) or (comb_r in torsions_toadd.keys())):
+                tmptorlist.append(tor)
+            torlist = tmptorlist
+            
             torlist=[tuple(i) for i in torlist]
             torlist=[tuple([i]) for i in torlist]
             self.torsettovariabletorlist={}
@@ -5027,6 +5052,8 @@ class PolarizableTyper():
             self.rotbndtoanginc=torgen.DetermineAngleIncrementAndPointsNeededForEachTorsionSet(self,mol,self.rotbndlist)
             if self.dontdotor==True:
                 torlist=[]
+            
+              
             self.torsettofilenametorset={}
             self.torsettotortorindex={}
             self.torsettotortorphaseindicestokeep={}
