@@ -147,7 +147,6 @@ if __name__ == '__main__':
   for match in matches:
     single_bonds.append(list(match))
   
-  
   # except non-trivalence nitrogen 
   special_nitrogen = []
   pattern = Chem.MolFromSmarts('[#7X2][*]')
@@ -155,27 +154,21 @@ if __name__ == '__main__':
   for match in matches:
     special_nitrogen.append([match[0], match[1]])
     special_nitrogen.append([match[1], match[0]])
- 
+  
   # do not cut two groups on ortho- sites (1-4)
   # unless the connected atom is carbon
   
-  pattern = Chem.MolFromSmarts('[*;!R;!#1][R][R][*;!R;!#1]')
+  pattern = Chem.MolFromSmarts('[*;!#1][R][R][*;!#1]')
   matches = mol.GetSubstructMatches(pattern, uniquify=False)
   for match in matches:
     mat1 = [match[0], match[1]] 
-    mat1_r = [match[1], match[0]] 
     mat2 = [match[2], match[3]] 
     mat2_r = [match[3], match[2]] 
     if set(mat1) == set([1,2]): # poltype always uses 1,2
-      if mat2 in single_bonds:
+      isCarbon = (mol.GetAtomWithIdx(match[3]).GetAtomicNum() == 6)
+      if (mat2 in single_bonds) and (not isCarbon):
         single_bonds.remove(mat2)
-      if mat2_r in single_bonds:
         single_bonds.remove(mat2_r)
-    if set(mat2) == set([1,2]): # poltype always uses 1,2
-      if mat1 in single_bonds:
-        single_bonds.remove(mat1)
-      if mat1_r in single_bonds:
-        single_bonds.remove(mat1_r)
   
   # record the aromatic nitrogen (n-*),
   aromatic_nitrogen = {}
@@ -237,7 +230,6 @@ if __name__ == '__main__':
             spair = sorted([idx, neig_idx])
             if spair not in sub_bonds:
               sub_bonds.append(spair)
-  
   for sub_bond in sub_bonds:
     a1, a2 = sub_bond
     g.remove_edge(a1, a2)  
@@ -248,7 +240,6 @@ if __name__ == '__main__':
   for m in frags:
     if not set(torsion_idx_list).issubset(list(m)):
       atomsToRemove += list(m)
-  
   # Replace CH3 with H 
   pattern = Chem.MolFromSmarts('[*][CH3]([H])([H])[H]')
   matches = mol.GetSubstructMatches(pattern, uniquify=False)
@@ -359,11 +350,10 @@ if __name__ == '__main__':
   # after cut, add one hydrogen atom
   for idx, connected_atoms in aromatic_nitrogen.items():
     for atm in connected_atoms:
-      if atm in atomsToRemove:
+      if (atm in atomsToRemove) and (idx not in atomsToRemove):
         nitrogen = mol2.GetAtomWithIdx(idx)
         nitrogen.SetNumExplicitHs(1)
         break
-
   Chem.SanitizeMol(mol2)
   mol2h = Chem.AddHs(mol2,addCoords=True)
   Chem.Kekulize(mol2h)
