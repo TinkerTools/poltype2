@@ -103,6 +103,16 @@ def growFragment(atomidx, sdffile):
     if len(match) == 1:
       atomsInSixMemRing.append(match[0])
 
+  atomsInTripleBond = []
+  pattern = Chem.MolFromSmarts('[*#*]')
+  matches = mol.GetSubstructMatches(pattern)
+  for match in matches:
+    if len(match) == 1
+      atomsInTripleBond.append(match[0])
+
+  print(atomsInTripleBond)
+
+
   # Case 1: the atom is in three rings
   if (atomidx - 1) in atomsInThreeRing:
     atomsToKeep = []
