@@ -55,7 +55,7 @@ def saveFragment(mol, atomsToKeep, fragname, bondsToDelete=[]):
 
 def growFragment(atomidx, sdffile):
   mol = Chem.MolFromMolFile(sdffile,removeHs=False)
-  
+  print(mol) 
   # 1. Atom in three rings
   # 2. Atom in two rings
   # 3. Atom in one ring
@@ -267,5 +267,7 @@ if __name__ == '__main__':
   
   global sdffile
   sdffile = sys.argv[1]
-  atom_id = int(sys.argv[2]) 
+  atom_id = int(sys.argv[2])
+  print(sdffile)
+  print(atom_id) 
   growFragment(atom_id, sdffile)
