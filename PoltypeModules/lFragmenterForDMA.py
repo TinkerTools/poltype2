@@ -104,7 +104,7 @@ def growFragment(atomidx, sdffile):
       atomsInSixMemRing.append(match[0])
 
   atomsInTripleBond = []
-  pattern = Chem.MolFromSmarts('$([*#*])')
+  pattern = Chem.MolFromSmarts('[$(*#*)]')
   matches = mol.GetSubstructMatches(pattern)
   for match in matches:
     if len(match) == 1:
@@ -217,8 +217,87 @@ def growFragment(atomidx, sdffile):
         shutil.move(f"Frag_Atom{atomidx:03d}_0.mol", f"Frag_Atom{atomidx:03d}.mol")
       else:
         os.system(f"rm -f Frag_Atom{atomidx:03d}_0.mol")
-  
+
+  # Case when atom is part of triple bond
+  if (atomidx -1) in atomsInTripleBond:
+    print('hey')
+    atomsToAdd = []
+    atomsToKeep = []
+    t1 = mol.GetAtomWithIdx(atomidx-1)
+    for neig in t1.GetNeighbors():
+      neig_idx = neig.GetIdx()
+      atomsToAdd.append(neig_idx)
+      atomsToKeep.append(neig_idx)
+    
+
+    for neig in atomsToAdd:
+      if neig in atomsInRing:
+        connectedAtoms = findConnectedAtoms(mol, atomsToAdd, atomsInRing)
+        print(connectedAtoms)
+        atomsToKeep += connectedAtoms
+      else:
+
+        connectedAtoms = findConnectedAtomsGeneral(mol, atomsToAdd, atomidx, neig)
+        print(connectedAtoms)
+        print(atomsToKeep)
+        atomsToKeep += connectedAtoms
+    saveFragment(mol, atomsToKeep, f"Frag_Atom{atomidx:03d}.mol")
+
+    if os.path.isfile(f"Frag_Atom{atomidx:03d}_0.mol"):
+      testmol = Chem.MolFromMolFile(f"Frag_Atom{atomidx:03d}.mol",removeHs=False)
+      if len(testmol.GetAtoms()) == len(mol.GetAtoms()):
+        shutil.move(f"Frag_Atom{atomidx:03d}_0.mol", f"Frag_Atom{atomidx:03d}.mol")
+      else:
+        os.system(f"rm -f Frag_Atom{atomidx:03d}_0.mol")
+
+      
+
+
   return 
+
+
+def findConnectedAtomsGeneral(mol, atomsToadd, atomidx, neig): 
+
+  print('neigh to check for', neig)
+  Break = False
+  prev_atm_idx = atomidx - 1
+  current_atm_idx = neig
+
+  Co_atoms = []
+  while not Break:
+    print('hello')
+    Neig = get_neigh_atoms(mol, current_atm_idx, prev_atm_idx)
+    print('Dict',Neig)
+
+    if len(Neig) == 1:
+        Break = False
+        print('Check dict')
+        print(Neig.keys)
+        prev_atm_idx = current_atm_idx
+        current_atm_idx = list(Neig.keys())[0]
+    else:
+        Break = True
+
+    Co_atoms += list(Neig.keys())
+
+
+  return Co_atoms
+
+
+def get_neigh_atoms(mol, Current_Idx, Prev_Idx):
+  print('CUrrent Idx',Current_Idx)
+  print('Prev Idx',Prev_Idx)
+  C_atm = mol.GetAtomWithIdx(Current_Idx)
+
+  Neighboor = {}
+
+  for neib in C_atm.GetNeighbors():
+    if neib.GetIdx() != Prev_Idx:
+      IDx = mol.GetAtomWithIdx(neib.GetIdx())
+      Neighboor[neib.GetIdx()] = IDx.GetAtomicNum()
+
+  return Neighboor
+
 
 # helper function to determine where to cut
 def findConnectedAtoms(rdkitmol, atomList, atomsInRing):
