@@ -110,7 +110,7 @@ def growFragment(atomidx, sdffile):
     if len(match) == 1:
       atomsInTripleBond.append(match[0])
 
-  print(atomsInTripleBond)
+  print('Atoms in triple bond',atomsInTripleBond)
 
 
   # Case 1: the atom is in three rings
@@ -227,21 +227,27 @@ def growFragment(atomidx, sdffile):
       neig_idx = neig.GetIdx()
       atomsToAdd.append(neig_idx)
       atomsToKeep.append(neig_idx)
-    
+    print('Atoms to add ',atomsToAdd)
+    print('Atoms in ring',atomsInRing) 
     # Loop through the atoms to add and check:
     # if the atom is in an aromatic ring
     # if not, then try to find coonected atoms with specific rules
     for neig in atomsToAdd:
 
       if neig in atomsInRing:
+        print('Found atom in ring as first neighboor')
         connectedAtoms = findConnectedAtoms(mol, atomsToAdd, atomsInRing)
         atomsToKeep += connectedAtoms
 
+      elif neig in atomsInTripleBond:
+        print(f'Neig {neig} is in atomsinTripleBond')
+        atomsToKeep += [neig]
       else:
+        print(f'Neig {neig} is neither in atomsinTripleBOnd nor in atomsinRing')
         connectedAtoms = findConnectedAtomsGeneral(mol, atomsToAdd, atomidx, neig)
         atomsToKeep += connectedAtoms
 
-
+    print('Final atoms to keep',atomsToKeep)
     saveFragment(mol, atomsToKeep, f"Frag_Atom{atomidx:03d}.mol")
     if os.path.isfile(f"Frag_Atom{atomidx:03d}_0.mol"):
       testmol = Chem.MolFromMolFile(f"Frag_Atom{atomidx:03d}.mol",removeHs=False)
@@ -317,27 +323,27 @@ def findConnectedAtomsGeneral(mol, atomsToadd, atomidx, neig):
 
     # Grab the neighboor atoms of neig
     Neig = get_neigh_atoms(mol, current_atm_idx, prev_atm_idx)
-
+    print(f'Neig of {current_atm_idx}: {Neig}')
     if len(Neig) == 1 and list(Neig.keys())[0] not in Co_atoms:
         prev_atm_idx = current_atm_idx
         current_atm_idx = list(Neig.keys())[0]
 
-        if find_patern(mol,current_atm_idx,'[*;R]')[0]:
-          atomsToAdd = list(Neig.keys())
-          connectedAtoms = findConnectedAtoms(mol, atomsToAdd, find_patern(mol,current_atm_idx,'[*;R]')[1])
-          atomsToAdd += connectedAtoms
-          Co_atoms += atomsToAdd
-          Break = True
-        else:
-          Co_atoms += list(Neig.keys())
-          Break = False
+        #if find_patern(mol,current_atm_idx,'[*;R]')[0]:
+        #  atomsToAdd = list(Neig.keys())
+        #  connectedAtoms = findConnectedAtoms(mol, atomsToAdd, find_patern(mol,current_atm_idx,'[*;R]')[1])
+        #  atomsToAdd += connectedAtoms
+        #  Co_atoms += atomsToAdd
+        #  Break = True
+        #else:
+        Co_atoms += list(Neig.keys())
+        Break = False
 
     else:
         Co_atoms += list(Neig.keys())
         Break = True
 
     cc += 1
-    if cc == 2:
+    if cc == 1:
         Break = True
 
   return Co_atoms
