@@ -241,6 +241,8 @@ def modkey2_fragmpole(poltype):
           pt.write(f"numproc={poltype.numproc}\n")
           pt.write(f"maxmem={poltype.maxmem}\n")
           pt.write(f"maxdisk={poltype.maxdisk}\n")
+          if check_if_pattern_exist(f,'[$(*#*)]'):
+            pt.write(f"new_dma=True\n")
         
         # Run Poltype Job
         os.chdir(os.path.join(homedir, 'Fragments_DMA', fname))
@@ -268,6 +270,23 @@ def modkey2_fragmpole(poltype):
     shutil.move(key2, key2+'_noFrag')
     shutil.move('tmpkeyforfrag.key', key2)
   return
+
+
+def check_if_pattern_exist(sdffile,pattern_to_check):
+
+    mol = Chem.MolFromMolFile(sdffile,removeHs=False)
+
+    atomsInPattern = []
+    pattern = Chem.MolFromSmarts(pattern_to_check)
+    matches = mol.GetSubstructMatches(pattern)
+    for match in matches:
+        if len(match) == 1:
+            atomsInPattern.append(match[0])
+   
+    if len(atomsInPattern) > 0:
+        return True
+    else:
+        return False 
 
 # helper function to transfer multipole back to parent
 def transferMultipoleToParent(poltype, frag_sdf, frag_xyz, frag_key, parent_sdf, parent_xyz, parent_key):
