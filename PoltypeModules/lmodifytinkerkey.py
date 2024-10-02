@@ -241,7 +241,7 @@ def modkey2_fragmpole(poltype):
           pt.write(f"numproc={poltype.numproc}\n")
           pt.write(f"maxmem={poltype.maxmem}\n")
           pt.write(f"maxdisk={poltype.maxdisk}\n")
-          if check_if_pattern_exist(f'./{fname}/{f},'[$(*#*)]'):
+          if check_if_pattern_exist(f'./{fname}/{f}','[$(*#*)]'):
             pt.write(f"new_dma=True\n")
         
         # Run Poltype Job
