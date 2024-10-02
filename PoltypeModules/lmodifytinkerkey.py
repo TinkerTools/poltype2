@@ -242,7 +242,7 @@ def modkey2_fragmpole(poltype):
           pt.write(f"maxmem={poltype.maxmem}\n")
           pt.write(f"maxdisk={poltype.maxdisk}\n")
           if check_if_pattern_exist(f'./{fname}/{f}','[$(*#*)]'):
-            pt.write(f"new_dma=True\n")
+            pt.write(f"new_gdma=True\n")
         
         # Run Poltype Job
         os.chdir(os.path.join(homedir, 'Fragments_DMA', fname))
