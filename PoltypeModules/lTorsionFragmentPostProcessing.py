@@ -130,7 +130,6 @@ if __name__ == '__main__':
     atom.SetNumExplicitHs(numOfH)
   
   n_heavy_atom_total = Descriptors.HeavyAtomCount(mol)
-  saveFragment(par_mol, atom_indices, f"{fname}_tmp.mol")
   if n_heavy_atom_total == n_heavy_atom_match:
     try:
       saveFragment(par_mol, atom_indices, f"{fname}_tmp.mol")
