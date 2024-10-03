@@ -28,6 +28,7 @@ from rdkit.Chem import AllChem,rdmolfiles,EditableMol,RingInfo,Descriptors
 
 # helper function to save required fragment
 def saveFragment(mol, atomsToKeep,output):
+
   atomsToRemove = []
   for idx in range(len(mol.GetAtoms())):
     if idx not in atomsToKeep:
@@ -36,7 +37,7 @@ def saveFragment(mol, atomsToKeep,output):
   emol = Chem.EditableMol(mol)
   atomsToRemove.sort(reverse=True)
   for atom in atomsToRemove:
-      emol.RemoveAtom(atom)
+    emol.RemoveAtom(atom)
   
   mol2 = emol.GetMol()
   Chem.SanitizeMol(mol2)
@@ -87,6 +88,7 @@ if __name__ == '__main__':
   
   n_heavy_atom_match = 0
   rotbond_coords = [] 
+  nitrogenMissingHs = {} 
   for i in range(len(mol.GetAtoms())):
     atom = mol.GetAtoms()[i]
     atom_idx = atom.GetIdx()
@@ -104,9 +106,31 @@ if __name__ == '__main__':
       atom_indices.append(par_xyz2index[xyzstr])
       if (atomNum != 1):
         n_heavy_atom_match += 1
-  
+    
+    if (atom.GetAtomicNum() == 7):
+      frag_neighbors = [x.GetSymbol() for x in atom.GetNeighbors()]
+      par_atom_idx = par_xyz2index[xyzstr]
+      par_neighbors = [x.GetSymbol() for x in par_mol.GetAtomWithIdx(par_atom_idx).GetNeighbors()]
+
+      # Chengwen Liu
+      # Oct 2024
+      # check the case when parent/frag mol has N+ but different hydrogens
+      if frag_neighbors.count('H') >= 2 and (atom.GetFormalCharge() == 1):
+        # here we set to 2 because tetra-valent nitrogen is not allowed in RDKit
+        # since the formal charge is 1, (as set above), so in the end it will 
+        # have the correct number of hydrogen atoms
+        nitrogenMissingHs[par_atom_idx] = 2
+      # check the case when parent/frag mol has aromatic N but different hydrogens
+      if (frag_neighbors.count('H') == 1) and (par_neighbors.count('H') == 0):
+        nitrogenMissingHs[par_atom_idx] = 1
+
+  # Set the correct number of hydrogens 
+  for idx,numOfH in nitrogenMissingHs.items():
+    atom = par_mol.GetAtomWithIdx(idx)
+    atom.SetNumExplicitHs(numOfH)
   
   n_heavy_atom_total = Descriptors.HeavyAtomCount(mol)
+  saveFragment(par_mol, atom_indices, f"{fname}_tmp.mol")
   if n_heavy_atom_total == n_heavy_atom_match:
     try:
       saveFragment(par_mol, atom_indices, f"{fname}_tmp.mol")
@@ -339,21 +363,26 @@ if __name__ == '__main__':
       atomsToRemove = []
       break
   
+  # if aromatic nitrogen misses connections
+  # after cut, add one hydrogen atom
+  # this should be done in mol (before cut)
+  # since the atom order will be different after cut
+  # Chengwen Liu
+  # Oct 2024
+
+  for idx, connected_atoms in aromatic_nitrogen.items():
+    for atm in connected_atoms:
+      if (atm in atomsToRemove) and (idx not in atomsToRemove):
+        nitrogen = mol.GetAtomWithIdx(idx)
+        print(f'Setting number of attached hydrogen to be 1 on atom {idx}')
+        nitrogen.SetNumExplicitHs(1)
+  
   emol = Chem.EditableMol(mol)
   atomsToRemove.sort(reverse=True)
   for atom in atomsToRemove:
       emol.RemoveAtom(atom)
   
   mol2 = emol.GetMol()
-  
-  # if aromatic nitrogen misses connections
-  # after cut, add one hydrogen atom
-  for idx, connected_atoms in aromatic_nitrogen.items():
-    for atm in connected_atoms:
-      if (atm in atomsToRemove) and (idx not in atomsToRemove):
-        nitrogen = mol2.GetAtomWithIdx(idx)
-        nitrogen.SetNumExplicitHs(1)
-        break
   Chem.SanitizeMol(mol2)
   mol2h = Chem.AddHs(mol2,addCoords=True)
   Chem.Kekulize(mol2h)
