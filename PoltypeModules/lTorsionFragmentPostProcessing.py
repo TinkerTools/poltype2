@@ -178,20 +178,6 @@ if __name__ == '__main__':
     special_nitrogen.append([match[0], match[1]])
     special_nitrogen.append([match[1], match[0]])
   
-  # do not cut two groups on ortho- sites (1-4)
-  # unless the connected atom is carbon
-  
-  pattern = Chem.MolFromSmarts('[*;!#1][R][R][*;!#1]')
-  matches = mol.GetSubstructMatches(pattern, uniquify=False)
-  for match in matches:
-    mat1 = [match[0], match[1]] 
-    mat2 = [match[2], match[3]] 
-    mat2_r = [match[3], match[2]] 
-    if set(mat1) == set([1,2]): # poltype always uses 1,2
-      isCarbon = (mol.GetAtomWithIdx(match[3]).GetAtomicNum() == 6)
-      if (mat2 in single_bonds) and (not isCarbon):
-        single_bonds.remove(mat2)
-        single_bonds.remove(mat2_r)
   
   # record the aromatic nitrogen (n-*),
   aromatic_nitrogen = {}
@@ -219,6 +205,53 @@ if __name__ == '__main__':
       if neig_idx not in torsion_idx_list:
         torsion_idx_list.append(neig_idx)
   
+  # Move the polar group from ortho to para position
+  # if there are two polar groups on two ortho- site,
+  # only the first-appearing one (smaller index) will
+  # be moved, and the second one will be deleted
+  # Chengwen Liu
+  # Oct 2024
+  
+  atomsInSixMemRing = []
+  pattern = Chem.MolFromSmarts('[a;r6]')
+  matches = mol.GetSubstructMatches(pattern)
+  for match in matches:
+    if len(match) == 1:
+      atomsInSixMemRing.append(match[0])
+  
+  ortho_atom = []
+  paraH = []
+  pattern = Chem.MolFromSmarts('[*;!#1][R][R][R][R][H]')
+  matches = mol.GetSubstructMatches(pattern, uniquify=False)
+  for match in matches:
+    mat = [match[0], match[1]] 
+    if mat == [1,2]: # poltype always uses 1,2
+      if (match[2] not in ortho_atom) and (match[2] in atomsInSixMemRing):
+        ortho_atom.append(match[2])
+        paraH.append(match[5])
+    if mat == [2,1]: # poltype always uses 1,2
+      if (match[2] not in ortho_atom) and (match[2] in atomsInSixMemRing):
+        ortho_atom.append(match[2])
+        paraH.append(match[5])
+  
+  ortho2paraH = dict(zip(ortho_atom, paraH))
+  
+  # match -OH,-NH2,-SH,-F,-Cl,-Br,-I
+  pattern = Chem.MolFromSmarts('[a][O,N,S,F,Cl,Br,I]')
+  matches = mol.GetSubstructMatches(pattern, uniquify=False)
+  mol_ed = Chem.EditableMol(mol)
+  tmp_add = []
+  for match in matches:
+    if match[0] in ortho_atom:
+      paraH_idx = ortho2paraH[match[0]]
+      if paraH_idx not in tmp_add:
+        atomicNum = mol.GetAtomWithIdx(match[1]).GetAtomicNum()
+        add_atom = Chem.Atom(atomicNum)
+        mol_ed.ReplaceAtom(paraH_idx, add_atom)
+        tmp_add.append(paraH_idx)
+  mol = mol_ed.GetMol()
+  Chem.SanitizeMol(mol)
+
   # construct a graph based on connectivity 
   g = nx.Graph()
   nodes = []
