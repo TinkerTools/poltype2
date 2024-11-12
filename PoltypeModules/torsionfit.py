@@ -953,7 +953,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             ### here we use L1+L2 regularization approach
 
             if useweights==True: 
-                errfunc = lambda p, x, z, torprmdict, y: numpy.array(list(fitfunc(poltype,p, x,z, torprmdict) - weightlist*y) + list(numpy.sqrt(numpy.absolute(numpy.array(p))) * L1_restraint_factor) + list(numpy.array(p) * L2_restraint_factor))
+                errfunc = lambda p, x, z, torprmdict, y: numpy.array(list((fitfunc(poltype,p, x,z, torprmdict) - y)*weightlist) + list(numpy.sqrt(numpy.absolute(numpy.array(p))) * L1_restraint_factor) + list(numpy.array(p) * L2_restraint_factor))
 
             else:
                 errfunc = lambda p, x, z, torprmdict, y: numpy.array(list(fitfunc(poltype,p, x,z, torprmdict) - y) + list(numpy.sqrt(numpy.absolute(numpy.array(p))) * L1_restraint_factor) + list(numpy.array(p) * L2_restraint_factor))
