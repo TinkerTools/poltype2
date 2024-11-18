@@ -1659,7 +1659,8 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             testkeysplit=testkey.split()
             themiddle=[testkeysplit[1],testkeysplit[2]]
             if middle==themiddle or middle==themiddle[::-1]:
-                thestring='Torsion '+str(testkey)+' RMSD(MM2,QM) '+str(minRMSD)+' '+'RelativeRMSD(MM2,QM) '+str(minRMSDRel)+' '+ostring+'\n'
+                #thestring='Torsion '+str(testkey)+' RMSD(MM2,QM) '+str(minRMSD)+' '+'RelativeRMSD(MM2,QM) '+str(minRMSDRel)+' '+ostring+'\n'
+                thestring=f'Torsion {str(testkey)} RMSD(MM2,QM) {str(minRMSD)} RelativeRMSD(MM2,QM) {str(minRMSDRel)} {ostring}\n Prm: v1={round(write_prm_dict[testkey][1],4)} v2={round(write_prm_dict[testkey][2],4)} v3={round(write_prm_dict[testkey][3],4)}'
                 poltype.WriteToLog(thestring)
                 classkeytofitresults[testkey]=thestring
         if dim==1: 
@@ -1688,7 +1689,18 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             y_smooth=f(x_new)
             ax.plot(x_new,y_smooth,color='blue')
 
-            ax.text(0.05, 1.1, 'RMSD(MM2,QM)=%s , RMSDRel(MM2,QM)=%s'%(round(minRMSD,2),round(minRMSDRel,2)), transform=ax.transAxes, fontsize=12,verticalalignment='top')
+            #ax.text(0.05, 1.1, 'RMSD(MM2,QM)=%s , RMSDRel(MM2,QM)=%s'%(round(minRMSD,2),round(minRMSDRel,2)), transform=ax.transAxes, fontsize=12,verticalalignment='top')
+
+            STR_prm = f'RMSD(MM2,QM)={round(minRMSD,2)} , RMSDRel(MM2,QM)={round(minRMSDRel,2)}\n'
+            for testkey in write_prm_dict.keys():
+                testkeysplit=testkey.split()
+                themiddle=[testkeysplit[1],testkeysplit[2]]
+                if middle==themiddle or middle==themiddle[::-1]:
+                    STR_prm += f'For TOR: {testkey} -> PRM: v1={round(write_prm_dict[testkey][1],4)} v2={round(write_prm_dict[testkey][2],4)} v3={round(write_prm_dict[testkey][3],4)}\n'
+
+
+            ax.text(0.05, 1.1, f'{STR_prm}', transform=ax.transAxes, fontsize=12,verticalalignment='top')
+
 
             # mm + fit
             line4, =ax.plot(mang_list,ff_list,'o',color='magenta',label='MM1+Fit')
