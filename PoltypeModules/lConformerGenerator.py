@@ -96,6 +96,43 @@ def no_close_contact(conf, atom_pairs, threshold=2.5):
       break
   return res
 
+
+def check_2D_mol(inputfile):
+
+  """
+  This function checks if the molecule in the initial sdf
+  is in 2D or not. 
+  If yes, then convert to 3D with openbabel
+
+  Inputs:
+     -   inputfile: name of initial sdf file
+  """
+
+  # Define number of header line in sdf file
+  header = 4
+
+  # Get total number of atoms using RDKit
+  mol = Chem.SDMolSupplier(inputfile, removeHs=False)
+  nbr_atom = mol[0].GetNumAtoms()
+  Z = []
+
+  # Read sdf file and grep only the Z coordinates
+  with open(inputfile) as f:
+    for index,lines in enumerate(f):
+      print(index,lines)
+      if index >= header and index < (header + nbr_atom):
+        Z.append(float(lines.strip('\n').split()[2]))
+
+      if 'CHG' in lines or 'END' in lines:
+        break
+
+  if (all(Z) == 0):
+    os.system(f"obabel {inputfile} -O {inputfile} --gen3d")
+    print(f" Converting {inputfile} to 3D")
+
+  return
+
+
 if __name__ == "__main__":
  
   parser = argparse.ArgumentParser()
@@ -111,6 +148,7 @@ if __name__ == "__main__":
 
   # check if molecule is 2D
   if inputformat == "SDF":
+    check_2D_mol(inputfile)
     coords_z = []
     lines = open(inputfile).readlines()
     for line in lines:
