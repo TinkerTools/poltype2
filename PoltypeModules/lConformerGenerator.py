@@ -109,22 +109,21 @@ if __name__ == "__main__":
   outputfile = args['outputfile']
   inputformat = args['inputformat']
 
-  # check if molecule is 2D
-  if inputformat == "SDF":
-    coords_z = []
-    lines = open(inputfile).readlines()
-    for line in lines:
-      ss = line.split()
-      if len(ss) == 16:
-        coords_z.append(float(ss[2]))
-    if (all(coords_z) == 0):
-      os.system(f"obabel {inputfile} -O {inputfile} --gen3d")
-      print(f" Converting {inputfile} to 3D")
-
   if inputformat == 'MOL2':
     m1 = Chem.MolFromMol2File(inputfile,removeHs=False)
   else: 
     m1 = Chem.MolFromMolFile(inputfile,removeHs=False)
+  
+  # check if molecule is 2D
+  coords_z = []
+  for atom in m1.GetAtoms():
+    atom_idx = atom.GetIdx()
+    coord = m1.GetConformer().GetAtomPosition(atom_idx) 
+    coords_z.append(coord.z)
+  if all(abs(z) < 1e-6 for z in coords_z):
+    os.system(f"obabel {inputfile} -O {inputfile} --gen3d")
+    print(f" Converting {inputfile} to 3D")
+
   m2 = AllChem.EmbedMultipleConfs(m1, numConfs=500, useExpTorsionAnglePrefs=True,useBasicKnowledge=True, randomSeed=123456789)
   
   # find all ihb
