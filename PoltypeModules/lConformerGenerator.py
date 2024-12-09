@@ -149,15 +149,6 @@ if __name__ == "__main__":
   # check if molecule is 2D
   if inputformat == "SDF":
     check_2D_mol(inputfile)
-    coords_z = []
-    lines = open(inputfile).readlines()
-    for line in lines:
-      ss = line.split()
-      if len(ss) == 16:
-        coords_z.append(float(ss[2]))
-    if (all(coords_z) == 0):
-      os.system(f"obabel {inputfile} -O {inputfile} --gen3d")
-      print(f" Converting {inputfile} to 3D")
 
   if inputformat == 'MOL2':
     m1 = Chem.MolFromMol2File(inputfile,removeHs=False)
