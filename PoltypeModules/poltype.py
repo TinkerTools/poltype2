@@ -474,8 +474,8 @@ class PolarizableTyper():
         gentorsion:bool=False
         gaustorerror:bool=False
         torsionrestraint:float=.5*3282.80354574
-        torsionprmrestraintfactorL1:float=1.0
-        torsionprmrestraintfactorL2:float=1.0
+        torsionprmrestraintfactorL1:float=0.1
+        torsionprmrestraintfactorL2:float=0.1
         onlyrotbndslist:list=field(default_factory=lambda : [])
         rotalltors:bool=False
         dontdotor:bool=False
