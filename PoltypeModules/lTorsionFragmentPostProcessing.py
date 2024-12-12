@@ -11,10 +11,11 @@
 # 3. Fused rings are treated as single rings if the fused two atoms are carbon
 # 4. Long alkane chain such as propyl and ethyl are replaced with CH3-
 # 5. Charged fragments (COO-) is neutralized
-# 6. Substituents on a ring
+# 6. Substituents on a ring (OLD decision)
 #   -- 1,3- and 1,4- substituents are removed (meta- and para- )
 #   -- 1,2- substituents are kept if they are polar groups
 #   -- 1,2- substituents are removed if they are alkane
+# 6. Substituents on a ring are removed to avoid potential HB or steric effect
 
 
 # Author: Chengwen Liu
@@ -52,21 +53,20 @@ if __name__ == '__main__':
   sdffile = sys.argv[1]
   parent_mol_file = sys.argv[2]
  
- # check if molecule is 2D
-  coords_z = []
-  lines = open(sdffile).readlines()
-  for line in lines:
-    ss = line.split()
-    if len(ss) == 16:
-      coords_z.append(float(ss[2]))
-  if (all(coords_z) == 0):
-    os.system(f"obabel {sdffile} -O {sdffile} --gen3d")
-    print(f" Converting {sdffile} to 3D")
-  
   fname = sdffile.split('.sdf')[0]
   fname = fname.split('.mol')[0]
   
   mol = Chem.MolFromMolFile(sdffile,removeHs=False)
+  
+  # check if molecule is 2D
+  coords_z = []
+  for atom in mol.GetAtoms():
+    atom_idx = atom.GetIdx()
+    coord = mol.GetConformer().GetAtomPosition(atom_idx) 
+    coords_z.append(coord.z)
+  if all(abs(z) < 1e-6 for z in coords_z):
+    os.system(f"obabel {sdffile} -O {sdffile} --gen3d")
+    print(f" Converting {sdffile} to 3D")
   
   # here we try to match the coorinates of fragment and parent molecules
   # if they match (for heavy atoms)
@@ -128,7 +128,7 @@ if __name__ == '__main__':
   for idx,numOfH in nitrogenMissingHs.items():
     atom = par_mol.GetAtomWithIdx(idx)
     atom.SetNumExplicitHs(numOfH)
-  
+  print('ATOMS', atom_indices)  
   n_heavy_atom_total = Descriptors.HeavyAtomCount(mol)
   if n_heavy_atom_total == n_heavy_atom_match:
     try:
@@ -205,6 +205,7 @@ if __name__ == '__main__':
       if neig_idx not in torsion_idx_list:
         torsion_idx_list.append(neig_idx)
   
+  # OLD decision 
   # Move the polar group from ortho to para position
   # if there are two polar groups on two ortho- site,
   # only the first-appearing one (smaller index) will
@@ -212,45 +213,45 @@ if __name__ == '__main__':
   # Chengwen Liu
   # Oct 2024
   
-  atomsInSixMemRing = []
-  pattern = Chem.MolFromSmarts('[a;r6]')
-  matches = mol.GetSubstructMatches(pattern)
-  for match in matches:
-    if len(match) == 1:
-      atomsInSixMemRing.append(match[0])
-  
-  ortho_atom = []
-  paraH = []
-  pattern = Chem.MolFromSmarts('[*;!#1][R][R][R][R][H]')
-  matches = mol.GetSubstructMatches(pattern, uniquify=False)
-  for match in matches:
-    mat = [match[0], match[1]] 
-    if mat == [1,2]: # poltype always uses 1,2
-      if (match[2] not in ortho_atom) and (match[2] in atomsInSixMemRing):
-        ortho_atom.append(match[2])
-        paraH.append(match[5])
-    if mat == [2,1]: # poltype always uses 1,2
-      if (match[2] not in ortho_atom) and (match[2] in atomsInSixMemRing):
-        ortho_atom.append(match[2])
-        paraH.append(match[5])
-  
-  ortho2paraH = dict(zip(ortho_atom, paraH))
-  
-  # match -OH,-NH2,-SH,-F,-Cl,-Br,-I
-  pattern = Chem.MolFromSmarts('[a][O,N,S,F,Cl,Br,I]')
-  matches = mol.GetSubstructMatches(pattern, uniquify=False)
-  mol_ed = Chem.EditableMol(mol)
-  tmp_add = []
-  for match in matches:
-    if match[0] in ortho_atom:
-      paraH_idx = ortho2paraH[match[0]]
-      if paraH_idx not in tmp_add:
-        atomicNum = mol.GetAtomWithIdx(match[1]).GetAtomicNum()
-        add_atom = Chem.Atom(atomicNum)
-        mol_ed.ReplaceAtom(paraH_idx, add_atom)
-        tmp_add.append(paraH_idx)
-  mol = mol_ed.GetMol()
-  Chem.SanitizeMol(mol)
+  #atomsInSixMemRing = []
+  #pattern = Chem.MolFromSmarts('[a;r6]')
+  #matches = mol.GetSubstructMatches(pattern)
+  #for match in matches:
+  #  if len(match) == 1:
+  #    atomsInSixMemRing.append(match[0])
+  #
+  #ortho_atom = []
+  #paraH = []
+  #pattern = Chem.MolFromSmarts('[*;!#1][R][R][R][R][H]')
+  #matches = mol.GetSubstructMatches(pattern, uniquify=False)
+  #for match in matches:
+  #  mat = [match[0], match[1]] 
+  #  if mat == [1,2]: # poltype always uses 1,2
+  #    if (match[2] not in ortho_atom) and (match[2] in atomsInSixMemRing):
+  #      ortho_atom.append(match[2])
+  #      paraH.append(match[5])
+  #  if mat == [2,1]: # poltype always uses 1,2
+  #    if (match[2] not in ortho_atom) and (match[2] in atomsInSixMemRing):
+  #      ortho_atom.append(match[2])
+  #      paraH.append(match[5])
+  #
+  #ortho2paraH = dict(zip(ortho_atom, paraH))
+  #
+  ## match -OH,-NH2,-SH,-F,-Cl,-Br,-I
+  #pattern = Chem.MolFromSmarts('[a][O,N,S,F,Cl,Br,I]')
+  #matches = mol.GetSubstructMatches(pattern, uniquify=False)
+  #mol_ed = Chem.EditableMol(mol)
+  #tmp_add = []
+  #for match in matches:
+  #  if match[0] in ortho_atom:
+  #    paraH_idx = ortho2paraH[match[0]]
+  #    if paraH_idx not in tmp_add:
+  #      atomicNum = mol.GetAtomWithIdx(match[1]).GetAtomicNum()
+  #      add_atom = Chem.Atom(atomicNum)
+  #      mol_ed.ReplaceAtom(paraH_idx, add_atom)
+  #      tmp_add.append(paraH_idx)
+  #mol = mol_ed.GetMol()
+  #Chem.SanitizeMol(mol)
 
   # construct a graph based on connectivity 
   g = nx.Graph()
