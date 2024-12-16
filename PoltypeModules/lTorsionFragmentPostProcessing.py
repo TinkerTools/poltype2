@@ -28,7 +28,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem,rdmolfiles,EditableMol,RingInfo,Descriptors
 
 # helper function to save required fragment
-def saveFragment(mol, atomsToKeep,output):
+def saveFragment(mol, atomsToKeep,output, xyz2index):
 
   atomsToRemove = []
   for idx in range(len(mol.GetAtoms())):
@@ -40,12 +40,34 @@ def saveFragment(mol, atomsToKeep,output):
   for atom in atomsToRemove:
     emol.RemoveAtom(atom)
   
-  mol2 = emol.GetMol()
+  mol1 = emol.GetMol()
+  rdmolfiles.MolToMolFile(mol1, 'no_h.mol')
+  
+  # so far, mol2 only has the correct coordinate of required atoms
+  # next we need put the correct bond type for each bond
+
+  mol2 = Chem.MolFromMolFile('no_h.mol',removeHs=False)
+ 
+  for bond in mol2.GetBonds():
+    idx1 = bond.GetBeginAtomIdx()
+    idx2 = bond.GetEndAtomIdx()
+    
+    coord = mol2.GetConformer().GetAtomPosition(idx1) 
+    x, y, z = f"{coord.x:10.4f}", f"{coord.y:10.4f}", f"{coord.z:10.4f}"
+    xyzstr = ''.join([x,y,z])
+    idx1_in_par = par_xyz2index[xyzstr]
+    
+    coord = mol2.GetConformer().GetAtomPosition(idx2) 
+    x, y, z = f"{coord.x:10.4f}", f"{coord.y:10.4f}", f"{coord.z:10.4f}"
+    xyzstr = ''.join([x,y,z])
+    idx2_in_par = par_xyz2index[xyzstr]
+    
+    if mol.GetAtomWithIdx(idx1_in_par).GetIsAromatic() and mol.GetAtomWithIdx(idx2_in_par).GetIsAromatic():
+      bond.SetBondType(Chem.BondType.AROMATIC)
+      print(f'Setting bond type between {idx1} and {idx2} to AROMATIC')
+
   Chem.SanitizeMol(mol2)
   mol2h = Chem.AddHs(mol2,addCoords=True)
-  Chem.Kekulize(mol2h)
-  Chem.SanitizeMol(mol2h)
-  
   rdmolfiles.MolToMolFile(mol2h, output)
   return
 
@@ -128,11 +150,11 @@ if __name__ == '__main__':
   for idx,numOfH in nitrogenMissingHs.items():
     atom = par_mol.GetAtomWithIdx(idx)
     atom.SetNumExplicitHs(numOfH)
-  print('ATOMS', atom_indices)  
+  
   n_heavy_atom_total = Descriptors.HeavyAtomCount(mol)
   if n_heavy_atom_total == n_heavy_atom_match:
     try:
-      saveFragment(par_mol, atom_indices, f"{fname}_tmp.mol")
+      saveFragment(par_mol, atom_indices, f"{fname}_tmp.mol", par_xyz2index)
     except:
       pass
 
