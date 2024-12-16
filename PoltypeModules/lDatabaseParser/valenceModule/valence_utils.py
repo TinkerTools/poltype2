@@ -28,7 +28,10 @@ def findSp2AtomTypes(txyz, sdffile):
   g.add_edges_from(edges)
  
   # rdkit is more robust
-  rdkitmol = Chem.MolFromMolFile(sdffile,removeHs=False)
+  if sdffile.endswith('mol2'):
+    rdkitmol = Chem.MolFromMol2File(sdffile,removeHs=False)
+  else:
+    rdkitmol = Chem.MolFromMolFile(sdffile,removeHs=False)
   num_atoms = rdkitmol.GetNumAtoms() 
   for i in range(num_atoms):
     atom = rdkitmol.GetAtomWithIdx(i)
