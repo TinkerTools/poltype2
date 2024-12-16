@@ -34,17 +34,19 @@ def saveFragment(mol, atomsToKeep,output, xyz2index):
   for idx in range(len(mol.GetAtoms())):
     if idx not in atomsToKeep:
       atomsToRemove.append(idx)
-  
+ 
   emol = Chem.EditableMol(mol)
   atomsToRemove.sort(reverse=True)
   for atom in atomsToRemove:
     emol.RemoveAtom(atom)
   
   mol1 = emol.GetMol()
+  Chem.SanitizeMol(mol1)
   rdmolfiles.MolToMolFile(mol1, 'no_h.mol')
   
-  # so far, mol2 only has the correct coordinate of required atoms
+  # so far, mol1 only has the correct coordinate of required atoms
   # next we need put the correct bond type for each bond
+  # Dec 2024
 
   mol2 = Chem.MolFromMolFile('no_h.mol',removeHs=False)
  
@@ -62,11 +64,13 @@ def saveFragment(mol, atomsToKeep,output, xyz2index):
     xyzstr = ''.join([x,y,z])
     idx2_in_par = par_xyz2index[xyzstr]
     
-    if mol.GetAtomWithIdx(idx1_in_par).GetIsAromatic() and mol.GetAtomWithIdx(idx2_in_par).GetIsAromatic():
-      bond.SetBondType(Chem.BondType.AROMATIC)
-      print(f'Setting bond type between {idx1} and {idx2} to AROMATIC')
+    bond_par = mol.GetBondBetweenAtoms(idx1_in_par, idx2_in_par)
+    bond_type_par = bond_par.GetBondType()
+    
+    bond.SetBondType(bond_type_par)
 
   Chem.SanitizeMol(mol2)
+  Chem.Kekulize(mol2)
   mol2h = Chem.AddHs(mol2,addCoords=True)
   rdmolfiles.MolToMolFile(mol2h, output)
   return
@@ -110,7 +114,6 @@ if __name__ == '__main__':
   
   n_heavy_atom_match = 0
   rotbond_coords = [] 
-  nitrogenMissingHs = {} 
   for i in range(len(mol.GetAtoms())):
     atom = mol.GetAtoms()[i]
     atom_idx = atom.GetIdx()
@@ -134,23 +137,6 @@ if __name__ == '__main__':
       par_atom_idx = par_xyz2index[xyzstr]
       par_neighbors = [x.GetSymbol() for x in par_mol.GetAtomWithIdx(par_atom_idx).GetNeighbors()]
 
-      # Chengwen Liu
-      # Oct 2024
-      # check the case when parent/frag mol has N+ but different hydrogens
-      if frag_neighbors.count('H') >= 2 and (atom.GetFormalCharge() == 1):
-        # here we set to 2 because tetra-valent nitrogen is not allowed in RDKit
-        # since the formal charge is 1, (as set above), so in the end it will 
-        # have the correct number of hydrogen atoms
-        nitrogenMissingHs[par_atom_idx] = 2
-      # check the case when parent/frag mol has aromatic N but different hydrogens
-      if (frag_neighbors.count('H') == 1) and (par_neighbors.count('H') == 0):
-        nitrogenMissingHs[par_atom_idx] = 1
-
-  # Set the correct number of hydrogens 
-  for idx,numOfH in nitrogenMissingHs.items():
-    atom = par_mol.GetAtomWithIdx(idx)
-    atom.SetNumExplicitHs(numOfH)
-  
   n_heavy_atom_total = Descriptors.HeavyAtomCount(mol)
   if n_heavy_atom_total == n_heavy_atom_match:
     try:
