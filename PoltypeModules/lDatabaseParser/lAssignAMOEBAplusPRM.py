@@ -157,7 +157,10 @@ def genAtomType(txyz, key, potent):
     atom_class_dict[a] = type_class_dict[t]
   if sdf != None:
     inpfile = sdf
-    inpformat = 'sdf'
+    if inpfile.endswith('mol2'):
+        inpformat = 'mol2'
+    else:
+        inpformat = 'sdf'
     print(f"{YELLOW}Using SDF file to determine SMARTS types {ENDC}")
   else:
     inpfile = txyz
