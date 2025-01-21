@@ -755,6 +755,8 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
         term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)
         modred=False
 
+        if poltype.optpcm==True or (poltype.optpcm==-1 and poltype.pcm):
+            print('###### Create_PySCF_input #######')
         inputname,outputname=CreatePsi4OPTInputFile(poltype,comoptfname,comoptfname,mol,modred,bondanglerestraints,skipscferror,charge,loose,torsionrestraints)
         if term==False or overridecheckterm==True:
             poltype.WriteToLog("QM Geometry Optimization")
