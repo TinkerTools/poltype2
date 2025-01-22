@@ -719,6 +719,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
 
 
     print('TM in GeometryOptimization:')
+    print(logoptfname)
     if not poltype.use_gaus or not poltype.use_gausoptonly:
         if poltype.optpcm==True or (poltype.optpcm==-1 and poltype.pcm):
             Soft = 'PySCF'
@@ -809,6 +810,24 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
 
         print(Opt_prep.mol_data_init)
 
+
+        cmd = f'python {Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_inp_file} > {Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'
+
+        cmd_to_run = {cmd: f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'}
+
+        if poltype.checkinputonly==True:
+            sys.exit()
+
+        if os.path.isfile(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'):
+            os.remove(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}')
+
+        print(cmd)
+
+        if poltype.externalapi==None:
+            print('Is Poltype not external API')
+            print(cmd)
+            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(cmd_to_run,skiperrors)
+
         
         #sys.exit()
 
@@ -841,6 +860,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
                 os.remove(logoptfname)
             if poltype.externalapi==None:
                 print('Is Poltype not external API')
+                print(jobtooutputlog)
                 finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,skiperrors)
             else:
                 print('It is poltype external API')

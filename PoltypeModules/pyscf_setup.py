@@ -59,6 +59,7 @@ class PySCF_init_setup():
     def write_PySCF_input(self):
 
         self.PySCF_inp_file = f"{self.init_data['COM_file'].strip('.com')}.py" 
+        self.PySCF_out_file = f"{self.init_data['COM_file'].strip('.com')}_pyscf.out" 
 
         self.write_PySCF_header()
 
