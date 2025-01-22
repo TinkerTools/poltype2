@@ -23,11 +23,6 @@ def GeometryOPTWrapper(poltype,molist):
     Referenced By: 
     Description: 
     """
-    
-    ######
-    # TM: GeometryOptimization is being called here
-    #####
-
     optmolist=[]
     errorlist=[]
     torsionrestraintslist=[]
@@ -37,6 +32,8 @@ def GeometryOPTWrapper(poltype,molist):
         mol=molist[molidx]
         suf=str(molidx+1)
         try:
+            print('TM:')
+            print('suffix:',  suf)
             optmol,error,torsionrestraints = GeometryOptimization(poltype,mol,totcharge,suffix=suf)
         except:
             redo=False
@@ -288,10 +285,6 @@ def GrabFinalXYZStructure(poltype,logname,filename,mol):
     Referenced By: 
     Description: 
     """
-    #######
-    # TM: Need to change this function to handle Psi4 or other software
-    ######
-
     checkifpsi4=CheckIfPsi4Log(poltype,logname)
     if checkifpsi4==True:
         temp=open(logname,'r')
@@ -712,9 +705,6 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
     Description: 
     """
 
-    
-
-
     NATOM_SMALL = 25
     if bondanglerestraints!=None or \
         (poltype.generateextendedconf==False and poltype.userconformation==False) or \
@@ -727,15 +717,27 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
     comoptfname=poltype.comoptfname.replace('_1','_'+suffix)
     chkoptfname=poltype.chkoptfname.replace('_1','_'+suffix)
 
-    #######
-    # TM: Need to change here to deal with other type of software
-    ######
 
-    if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt
+    print('TM in GeometryOptimization:')
+    if not poltype.use_gaus or not poltype.use_gausoptonly:
+        if poltype.optpcm==True or (poltype.optpcm==-1 and poltype.pcm):
+            Soft = 'PySCF'
+        else:
+            Soft = 'Psi4'
+    else:
+        Soft = 'Gaussian'
+
+    print('Soft', Soft)
+
+
+    #if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt
+    if Soft == 'Gaussian': # try to use gaussian for opt
         term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)
         if not term or overridecheckterm==True:
             
             poltype.WriteToLog("QM Geometry Optimization")
+            poltype.WriteToLog(f'The software {Soft} will be used to do the QM optimization')
+
             gen_optcomfile(poltype,comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,chkoptfname,mol,modred,torsionrestraints)
             cmdstr = 'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + comoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+logoptfname}
@@ -765,8 +767,53 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
         optmol =  load_structfile(poltype,logoptfname)
         optmol=rebuild_bonds(poltype,optmol,mol)
         
-           
-    else:
+    if Soft == 'PySCF':
+
+        import importlib
+            
+        try:
+            importlib.import_module('pyscf')
+            print("PySCF is installed.")
+        except ImportError:
+            print("PySCF is not installed.")
+    
+
+        gen_optcomfile(poltype,comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,chkoptfname,mol,modred,torsionrestraints)
+        term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)
+        modred=False
+
+        print('TM: Input for CreatePsi4OPTINputFile')
+        print('comoptfname',comoptfname)
+        print('mol',mol,type(mol))
+        print('mored',modred)
+        print('bondanglerestraints',bondanglerestraints)
+        print('skipscferror',skipscferror)
+        print('charge',charge)
+        print('loose',loose)
+        print('torsionrestraints',torsionrestraints)
+
+        from pyscf_setup import PySCF_init_setup
+
+
+        Opt_prep = PySCF_init_setup(poltype,os.getcwd(),comoptfname,mol,\
+                               modred,bondanglerestraints,skipscferror,\
+                               charge,loose,torsionrestraints)
+    
+        Opt_prep.read_Gauss_inp_coord()
+
+        Opt_prep.write_xyz('init')
+
+        Opt_prep.write_geometric_tor_const('init')
+
+        Opt_prep.write_PySCF_input()
+
+        print(Opt_prep.mol_data_init)
+
+        
+        #sys.exit()
+
+
+    if Soft == 'Psi4' or Soft == 'PySCF':
         gen_optcomfile(poltype,comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,chkoptfname,mol,modred,torsionrestraints)
         term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)
         modred=False
@@ -776,6 +823,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
         inputname,outputname=CreatePsi4OPTInputFile(poltype,comoptfname,comoptfname,mol,modred,bondanglerestraints,skipscferror,charge,loose,torsionrestraints)
         if term==False or overridecheckterm==True:
             poltype.WriteToLog("QM Geometry Optimization")
+            poltype.WriteToLog(f'The software {Soft} will be used to do the QM optimization')
             cmdstr=' '.join(['psi4 ',poltype.psi4_args,inputname,logoptfname])
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
@@ -792,10 +840,14 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
             if os.path.isfile(logoptfname):
                 os.remove(logoptfname)
             if poltype.externalapi==None:
+                print('Is Poltype not external API')
                 finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,skiperrors)
             else:
+                print('It is poltype external API')
                 if len(jobtooutputlog.keys())!=0:
+                    print('Calling external API')
                     call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilepathprefix)
+                print('Waiting for termination')
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
 
         term,error=poltype.CheckNormalTermination(logoptfname,None,skiperrors) # now grabs final structure when finished with QM if using Psi4

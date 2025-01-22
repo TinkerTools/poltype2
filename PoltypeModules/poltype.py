@@ -456,6 +456,9 @@ class PolarizableTyper():
         espbasisset:str="aug-cc-pVTZ"
         torspbasisset:str="6-311+G*"
         optmethod:str='MP2'
+        pyscf_opt_meth:str = 'wb97x_d3'
+        pyscf_sol_imp:str = 'IEF-PCM' # C-PCM, SS(V)PE, COSMO
+        pyscf_sol_eps:float = 78.3553 # Water
         toroptmethod:str='xtb'
         torspmethod:str='wB97X-D'
         dmamethod:str='MP2'
@@ -1189,6 +1192,12 @@ class PolarizableTyper():
                                     warnings.warn(f"Could not locate prmmod file '{fpath1}'")
                         elif newline.startswith("optmethod"):
                             self.optmethod = a
+                        elif newline.startswith("pyscf_opt_met"):
+                            self.pyscf_opt_met = a
+                        elif newline.startswith("pyscf_sol_imp"):
+                            self.pyscf_sol_imp = a
+                        elif newline.startswith("pyscf_sol_eps"):
+                            self.pyscf_sol_eps = a
                         elif newline.startswith("espmethod"):
                             self.espmethod = a
                         elif "torspmethod" in newline:
@@ -3373,11 +3382,12 @@ class PolarizableTyper():
             5. If error occured, write out line containing error to poltype log file.
             6. xtb only outputs the same filename for optimization jobs, so be sure to copy to desired filename after job finishes. 
             """
-
+            
             ###########
-            # TM: Need to add checks for proper and improper termination of 
+            # TM: Need to add checks for proper and improper termination of
             # PySCF job
             ##########
+
 
             error=False
             term=False
@@ -4743,6 +4753,9 @@ class PolarizableTyper():
             self.localframe1 = [ 0 ] * mol.NumAtoms()
             self.localframe2 = [ 0 ] * mol.NumAtoms()
             self.WriteToLog("Atom Type Classification")
+            self.WriteToLog('Poltype image build time: ')
+            self.WriteToLog('Tinker commit: c9698d2101c5f66ce1d413f4aa2d5f62e4c22df2')
+            self.WriteToLog('Poltype commit: 51b235f8f0af0975c9afae789f671d698b44d7e5')
             self.idxtosymclass,self.symmetryclass=symm.gen_canonicallabels(self,mol,None,self.usesymtypes,True)
             # STEP 15
             torgen.FindPartialDoubleBonds(self,m,mol) # need to find something to hardcode transfer for partial double amide/acid, currently will derive torsion parameters if doesnt find "good" match in torsion database
