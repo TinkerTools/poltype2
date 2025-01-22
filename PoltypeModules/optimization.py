@@ -23,6 +23,11 @@ def GeometryOPTWrapper(poltype,molist):
     Referenced By: 
     Description: 
     """
+    
+    ######
+    # TM: GeometryOptimization is being called here
+    #####
+
     optmolist=[]
     errorlist=[]
     torsionrestraintslist=[]
@@ -283,6 +288,10 @@ def GrabFinalXYZStructure(poltype,logname,filename,mol):
     Referenced By: 
     Description: 
     """
+    #######
+    # TM: Need to change this function to handle Psi4 or other software
+    ######
+
     checkifpsi4=CheckIfPsi4Log(poltype,logname)
     if checkifpsi4==True:
         temp=open(logname,'r')
@@ -703,6 +712,9 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
     Description: 
     """
 
+    
+
+
     NATOM_SMALL = 25
     if bondanglerestraints!=None or \
         (poltype.generateextendedconf==False and poltype.userconformation==False) or \
@@ -714,6 +726,10 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
     logoptfname=poltype.logoptfname.replace('_1','_'+suffix)
     comoptfname=poltype.comoptfname.replace('_1','_'+suffix)
     chkoptfname=poltype.chkoptfname.replace('_1','_'+suffix)
+
+    #######
+    # TM: Need to change here to deal with other type of software
+    ######
 
     if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt
         term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)

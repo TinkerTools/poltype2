@@ -3373,6 +3373,12 @@ class PolarizableTyper():
             5. If error occured, write out line containing error to poltype log file.
             6. xtb only outputs the same filename for optimization jobs, so be sure to copy to desired filename after job finishes. 
             """
+
+            ###########
+            # TM: Need to add checks for proper and improper termination of 
+            # PySCF job
+            ##########
+
             error=False
             term=False
             lastupdatetofilename={}
