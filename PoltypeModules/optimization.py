@@ -794,6 +794,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
         print('torsionrestraints',torsionrestraints)
         print('skiperror', skiperrors)
         from pyscf_setup import PySCF_init_setup
+        from pyscf_setup import PySCF_post_run
 
 
         Opt_prep = PySCF_init_setup(poltype,os.getcwd(),comoptfname,mol,\
@@ -843,10 +844,13 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
             print('Waiting for termination')
             finishedjobs,errorjobs=poltype.WaitForTermination(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}',False) 
 
-        #term,error=poltype.CheckNormalTermination(f'{Opt_prep.PySCF_out_file}',None,skiperrors)
-        term,error=poltype.CheckNormalTermination(f'switterion-opt_1_test_fail2.out',None,skiperrors)
+        term,error=poltype.CheckNormalTermination(f'{Opt_prep.PySCF_out_file}',None,skiperrors)
+        #term,error=poltype.CheckNormalTermination(f'switterion-opt_1_test_fail2.out',None,skiperrors)
         if error and term==False and skiperrors==False:
-            poltype.RaiseOutputFileError(f'switterion-opt_1_test_fail2.out')
+            poltype.RaiseOutputFileError(f'{Opt_prep.PySCF_out_file}')
+
+
+        Opt_post = PySCF_post_run(f'{Opt_prep.PySCF_out_file}') 
 
         sys.exit()
 
