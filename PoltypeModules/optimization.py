@@ -792,7 +792,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
         print('charge',charge)
         print('loose',loose)
         print('torsionrestraints',torsionrestraints)
-
+        print('skiperror', skiperrors)
         from pyscf_setup import PySCF_init_setup
 
 
@@ -811,25 +811,44 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
         print(Opt_prep.mol_data_init)
 
 
-        cmd = f'python {Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_inp_file} > {Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'
+        cmd = f'python {Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_inp_file} &> {Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'
 
         cmd_to_run = {cmd: f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'}
 
         if poltype.checkinputonly==True:
             sys.exit()
 
-        if os.path.isfile(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'):
-            os.remove(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}')
+        #if os.path.isfile(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'):
+        #    os.remove(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}')
 
         print(cmd)
 
         if poltype.externalapi==None:
             print('Is Poltype not external API')
             print(cmd)
-            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(cmd_to_run,skiperrors)
+            # Temporary fix to work on CheckNormalTermination
+            if os.path.isfile(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'):
+                pass
+            else:
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(cmd_to_run,skiperrors)
+        else:
+            print('PySCF for external API')
+            jobtoinputfilepaths = {cmd: [f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_inp_file}']}
+            jobtooutputfiles = {cmd: [f'{Opt_prep.PySCF_out_file}']}
+            jobtoabsolutebinpath = {cmd: poltype.which('pyscf')}
+            scratchdir = poltype.scrtmpdirpsi4
+            jobtologlistfilepathprefix = f'{Opt_prep.init_data["topdir"]}/optimization_jobtolog_{poltype.molecprefix}'
+       
+            call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilepathprefix)
+            print('Waiting for termination')
+            finishedjobs,errorjobs=poltype.WaitForTermination(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}',False) 
 
-        
-        #sys.exit()
+        #term,error=poltype.CheckNormalTermination(f'{Opt_prep.PySCF_out_file}',None,skiperrors)
+        term,error=poltype.CheckNormalTermination(f'switterion-opt_1_test_fail2.out',None,skiperrors)
+        if error and term==False and skiperrors==False:
+            poltype.RaiseOutputFileError(f'switterion-opt_1_test_fail2.out')
+
+        sys.exit()
 
 
     if Soft == 'Psi4' or Soft == 'PySCF':
@@ -852,6 +871,14 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
             jobtoinputfilepaths={cmdstr:[inputfilepath]}
             jobtooutputfiles={cmdstr:[logoptfname]}
             jobtoabsolutebinpath={cmdstr:poltype.which('psi4')}
+    
+            print('For external API')
+            print(jobtoinputfilepaths)
+            print(jobtooutputfiles)
+            print(jobtoabsolutebinpath)
+            print(scratchdir)
+            print(jobtologlistfilepathprefix)
+            print('**********')
             if poltype.checkinputonly==True:
                 sys.exit()
 

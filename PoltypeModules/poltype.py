@@ -3409,6 +3409,10 @@ class PolarizableTyper():
             os.chdir(curdir)
             # STEP 2
             htime=min(lastupdatetofilename.keys())
+            print('')
+            print('')
+            print('########')
+            print(logfname)
             if os.path.isfile(logfname):
                 head,tail=os.path.split(logfname)
                 # STEP 3
@@ -3419,6 +3423,9 @@ class PolarizableTyper():
                 foundendgau=False # sometimes gaussian comments have keyword Error, ERROR in them
                 foundhf=False
                 # STEP 4
+                print('')
+                print('')
+                print(tail)
                 for line in open(logfname):
                     if 'poltype' in tail:
                         if 'Poltype Job Finished' in line:
@@ -3427,10 +3434,13 @@ class PolarizableTyper():
                             error=True
                     else:
                         if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line or "LBFGS  --  Normal Termination due to SmallGrad" in line or "Normal termination" in line or 'Normal Termination' in line or 'Total Potential Energy' in line or 'Psi4 stopped on' in line or 'finished run' in line or ('Converged! =D' in line):
+                            print(line)
                             term=True
-                        if ('Tinker is Unable to Continue' in line or 'error' in line or ' Error ' in line or ' ERROR ' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line or 'Optimization failed to converge!' in line) and 'DIIS' not in line and 'mpi' not in line and 'RMS Error' not in line:
+                        if ('Tinker is Unable to Continue' in line or 'error' in line or ' Error ' in line or ' ERROR ' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line or 'Optimization failed to converge!' in line or 'Geometry optimization is not converged' in line or 'Error' in line) and 'DIIS' not in line and 'mpi' not in line and 'RMS Error' not in line:
                             error=True
                             errorline=line
+                            print('')
+                            print(errorline)
                         if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line or ('OptimizationConvergenceError' in line and 'except' in line) or "Error on total polarization charges" in line or 'Erroneous write' in line:
                             error=False
                             continue
@@ -3530,7 +3540,13 @@ class PolarizableTyper():
                     # STEP 1
                     self.WriteToLog("Submitting: " + cmdstr+' '+'path'+' = '+os.getcwd())
                     # STEP 2
-                    p = subprocess.Popen(cmdstr,shell=True,stdout=self.logfh, stderr=self.logfh)
+                    if 'pyscf' in cmdstr:
+                        out = cmdstr.split()[-1]
+                        out_pyscf = open(out, 'w')
+                        p = subprocess.Popen(cmdstr,shell=True,stdout=out_pyscf, stderr=out_pyscf)
+                    else:
+                        p = subprocess.Popen(cmdstr,shell=True,stdout=self.logfh, stderr=self.logfh)
+
                     procs.append(p)
                     self.cmdtopid[cmdstr]=p
 
@@ -5891,6 +5907,7 @@ class PolarizableTyper():
             else:
                 # STEP 3
                 for path in os.environ["PATH"].split(os.pathsep):
+                    print(path)
                     exe_file = os.path.join(path, program)
                     result=is_exe(exe_file)
                     if result:
