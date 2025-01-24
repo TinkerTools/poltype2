@@ -154,6 +154,7 @@ def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,varia
     executables=[]
     outputlogtoinitialxyz={}
     for i in range(len(listofstructurestorunQM)):
+        print('IN ExecuteOptJobs')
         torxyzfname=listofstructurestorunQM[i]
         phaseangles=phaselist[i]
         inputname,outputlog,cmdstr,scratchdir,executable=GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,variabletorlist,mol,currentopt)
@@ -354,6 +355,18 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
     Referenced By: 
     Description: 
     """
+    print('In GenerateTorsionOptInputFile')
+    print('')
+    print('')
+    print('')
+    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
+        if poltype.toroptpcm==True or (poltype.toroptpcm==-1 and poltype.pcm):
+            Soft = 'PySCF'
+        else:
+            Soft = 'Psi4'
+
+    print(Soft)
+
     # Case: AMOEBA
     if poltype.toroptmethod=='AMOEBA':
         inputstruct=ConvertTinktoXYZ(poltype,torxyzfname,torxyzfname.replace('.xyz','_cart.xyz'))
@@ -396,6 +409,9 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
         outputname=inputname.replace(postfix,'.log')
         optxyz,cmdstr=OptimizeXTB(poltype,inputstruct,resfilename,poltype.xtbmethod,outputname,mol.GetTotalCharge(),0)
         executable='xtb'
+
+        print(inputname,outputname,cmdstr,poltype.scrtmpdirpsi4,executable)
+
 
         return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4,executable
     
@@ -463,8 +479,46 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
     
     
     # In this case we are using either psi4 or Gaussian
-    else: 
-        if  poltype.use_gaus==False and poltype.use_gausoptonly==False:
+    else:
+        print('In here??????')
+        if Soft == 'PySCF':
+            print('PYSCF!!!!!!!!')
+            inputstruct=ConvertTinktoXYZ(poltype,torxyzfname,torxyzfname.replace('.xyz','_cart.xyz'))
+            inputmol= opt.load_structfile(poltype,inputstruct)
+            prefix=poltype.toroptmethod+'-opt-'
+            postfix='.input'
+            inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
+            pre=inputname.replace(postfix,'')
+            newtorset=[]
+            rotbndtorescount={}
+            maxrotbnds=1
+            restlist=[]
+            torsiontophaseangle={}
+            torsiontomaintor={}
+
+            rottors,rotbndtorescount,restlist,rotphases,torsiontophaseangle,torsiontomaintor=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor)
+            frotors,rotbndtorescount,restlist,torsiontophaseangle,torsiontomaintor=FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor)
+
+            for tor in rottors:
+                newtorset.append(tor)
+            for tor in frotors:
+                newtorset.append(tor)
+
+            toranglelist=GrabTorsionAngles(poltype,newtorset,inputmol)
+            print(newtorset)
+            print(toranglelist)
+            print(pre)
+            print(inputstruct)
+            from pyscf_for_frag import setup_frag_opt
+            PySCF_for_Frag = setup_frag_opt(poltype,newtorset,toranglelist,\
+                                            pre,inputmol,inputname,inputstruct)
+
+            
+
+            sys.exit()
+        elif Soft == 'Psi4':
+            print('PSI4!!!!!')
+            sys.exit()
             inputname,outputname=CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt)
             cmdstr=' '.join(['psi4 ',poltype.psi4_args,inputname,outputname])
             executable='psi4'
@@ -1183,8 +1237,18 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         else:
             poltype.toroptpcm=poltype.temptoroptpcm
             poltype.torsppcm=poltype.temptorsppcm
+        print('##########')
+        print('In gen_torsion')
+
+        print('listoftinkertorstructures',listoftinkertorstructures)
+        print('flatphaselist',flatphaselist)
+        print('torset',torset)
+        print('variabletorlist',variabletorlist)
+        print('torsionrestraint',torsionrestraint)
+        print('optlogtophaseangle',optlogtophaseangle)
 
         outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures,optlogtophaseangle,inputfilepaths,outputfilenames,executables,outputlogtoinitialxyz=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol,'1',optlogtophaseangle)
+        sys.exit()
         torsettooptoutputlogs[tuple(torset)]=outputlogs
         dictionary = dict(zip(outputlogs,initialstructures))  
         torsettooutputlogtoinitialstructure[tuple(torset)].update(dictionary)

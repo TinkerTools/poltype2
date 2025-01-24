@@ -784,8 +784,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
 
         # Instantiate the initial pyscf setup object
         Opt_prep = PySCF_init_setup(poltype,os.getcwd(),comoptfname,mol,\
-                               modred,bondanglerestraints,skipscferror,\
-                               charge,loose,torsionrestraints)
+                               skipscferror,charge)
     
         # Read the gaussian input coordinate
         Opt_prep.read_Gauss_inp_coord()
@@ -795,10 +794,10 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
 
         # Write the torsion constraints to be used 
         # during the QM optimization
-        Opt_prep.write_geometric_tor_const('init')
+        Opt_prep.write_geometric_tor_const('init',torsionrestraints)
 
         # Write the PySCF input file
-        Opt_prep.write_PySCF_input()
+        Opt_prep.write_PySCF_input(True,False)
 
         # Define the cmd to run PySCF
         cmd = f'python {Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_inp_file} &> {Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'
@@ -822,6 +821,8 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
             #    pass
             #else:
             finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(cmd_to_run,skiperrors)
+            print('Optimization for parent ligand')
+            print(finishedjobs,errorjobs)
         else:
             print('PySCF for external API')
             jobtoinputfilepaths = {cmd: [f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_inp_file}']}
@@ -914,10 +915,6 @@ def load_structfile(poltype,structfname):
     Referenced By: run_gaussian, tor_opt_sp, compute_qm_tor_energy, compute_mm_tor_energy 
     Description: -
     """
-
-    with open(structfname, 'r') as f:
-        for lines in f:
-            print(lines)
 
     strctext = os.path.splitext(structfname)[1]
     tmpconv = openbabel.OBConversion()
