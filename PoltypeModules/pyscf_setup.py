@@ -1,5 +1,5 @@
-
-
+import subprocess
+import os
 
 class PySCF_init_setup():
 
@@ -59,7 +59,7 @@ class PySCF_init_setup():
     def write_PySCF_input(self):
 
         self.PySCF_inp_file = f"{self.init_data['COM_file'].strip('.com')}.py" 
-        self.PySCF_out_file = f"{self.init_data['COM_file'].strip('.com')}_pyscf.out" 
+        self.PySCF_out_file = f"{self.init_data['COM_file'].strip('.com')}_pyscf.log" 
 
         self.write_PySCF_header()
 
@@ -116,4 +116,34 @@ class PySCF_init_setup():
 
 
     
+class PySCF_post_run():
+
+    def __init__(self,poltype_obj,cure_dir,output_file,mol_obj):
+
+        self.pol_obj = poltype_obj
+        self.topdir = cure_dir
+        self.out_file = output_file
+        self.mol_obj = mol_obj
+
+
+    def read_out(self):
+
+        val = subprocess.check_output(f"grep -A {self.mol_obj.NumAtoms()} 'Final optimized structure' {self.topdir}/{self.out_file}",shell=True)
+
+        Geom = val.decode("utf-8").split()
+        self.final_opt_xyz = f"{self.out_file.split('.log')[0]}.xyz"
+
+        cc = 0
+        start = 3
+
+
+        with open(f'{self.topdir}/{self.final_opt_xyz}', 'w') as file_1:
+            file_1.write(f'{self.mol_obj.NumAtoms()}\n\n')
+            for i in range(0,len(Geom[3:]),4):
+                end = start + 4
+                file_1.write(f'{" ".join([j for j in Geom[start:end]])}\n')
+                start = end
+        
+ 
+
 

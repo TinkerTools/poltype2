@@ -717,9 +717,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
     comoptfname=poltype.comoptfname.replace('_1','_'+suffix)
     chkoptfname=poltype.chkoptfname.replace('_1','_'+suffix)
 
-
-    print('TM in GeometryOptimization:')
-    print(logoptfname)
+    # Define which software will be used for the QM optimization
     if not poltype.use_gaus or not poltype.use_gausoptonly:
         if poltype.optpcm==True or (poltype.optpcm==-1 and poltype.pcm):
             Soft = 'PySCF'
@@ -728,10 +726,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
     else:
         Soft = 'Gaussian'
 
-    print('Soft', Soft)
 
-
-    #if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt
     if Soft == 'Gaussian': # try to use gaussian for opt
         term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)
         if not term or overridecheckterm==True:
@@ -783,55 +778,50 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
         term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)
         modred=False
 
-        print('TM: Input for CreatePsi4OPTINputFile')
-        print('comoptfname',comoptfname)
-        print('mol',mol,type(mol))
-        print('mored',modred)
-        print('bondanglerestraints',bondanglerestraints)
-        print('skipscferror',skipscferror)
-        print('charge',charge)
-        print('loose',loose)
-        print('torsionrestraints',torsionrestraints)
-        print('skiperror', skiperrors)
+        # Import both PySCF setup class
         from pyscf_setup import PySCF_init_setup
         from pyscf_setup import PySCF_post_run
 
-
+        # Instantiate the initial pyscf setup object
         Opt_prep = PySCF_init_setup(poltype,os.getcwd(),comoptfname,mol,\
                                modred,bondanglerestraints,skipscferror,\
                                charge,loose,torsionrestraints)
     
+        # Read the gaussian input coordinate
         Opt_prep.read_Gauss_inp_coord()
 
+        # Write the initial xyz file to be used by PySCF
         Opt_prep.write_xyz('init')
 
+        # Write the torsion constraints to be used 
+        # during the QM optimization
         Opt_prep.write_geometric_tor_const('init')
 
+        # Write the PySCF input file
         Opt_prep.write_PySCF_input()
 
-        print(Opt_prep.mol_data_init)
-
-
+        # Define the cmd to run PySCF
         cmd = f'python {Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_inp_file} &> {Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'
 
+        # Create the dictionnary with the commnd to be used by CallJobsSeriallyLocalHost
         cmd_to_run = {cmd: f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'}
 
+        # If the user only want to create input file
         if poltype.checkinputonly==True:
             sys.exit()
 
-        #if os.path.isfile(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'):
-        #    os.remove(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}')
+        # Make sure to delete the PySCF output file 
+        # before running it
+        if os.path.isfile(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'):
+            os.remove(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}')
 
-        print(cmd)
 
         if poltype.externalapi==None:
-            print('Is Poltype not external API')
-            print(cmd)
-            # Temporary fix to work on CheckNormalTermination
-            if os.path.isfile(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'):
-                pass
-            else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(cmd_to_run,skiperrors)
+            #Temporary fix to work on CheckNormalTermination
+            #if os.path.isfile(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'):
+            #    pass
+            #else:
+            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(cmd_to_run,skiperrors)
         else:
             print('PySCF for external API')
             jobtoinputfilepaths = {cmd: [f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_inp_file}']}
@@ -844,24 +834,36 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
             print('Waiting for termination')
             finishedjobs,errorjobs=poltype.WaitForTermination(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}',False) 
 
+        # Check normal termination of PySCF job
         term,error=poltype.CheckNormalTermination(f'{Opt_prep.PySCF_out_file}',None,skiperrors)
-        #term,error=poltype.CheckNormalTermination(f'switterion-opt_1_test_fail2.out',None,skiperrors)
+
         if error and term==False and skiperrors==False:
+            # This poltype method does not exists...
             poltype.RaiseOutputFileError(f'{Opt_prep.PySCF_out_file}')
 
+        # Instantiate the post process PySCF class
+        Opt_post = PySCF_post_run(poltype,os.getcwd(),f'{Opt_prep.PySCF_out_file}',mol)
 
-        Opt_post = PySCF_post_run(f'{Opt_prep.PySCF_out_file}') 
+        # Read the output file from PySCF
+        Opt_post.read_out()
 
-        sys.exit()
+        # Use OpenBabel to build a molecule out of the optimized structure
+        optmol =  load_structfile(poltype,Opt_post.final_opt_xyz)
+        optmol=rebuild_bonds(poltype,optmol,mol)
+    
+
+        # Here we redefine logoptfname and poltype.logoptfname
+        # to make sure that hereafter, the pyscf output is used!
+        logoptfname = Opt_prep.PySCF_out_file
+        poltype.logoptfname = Opt_prep.PySCF_out_file 
 
 
-    if Soft == 'Psi4' or Soft == 'PySCF':
+
+    if Soft == 'Psi4':
         gen_optcomfile(poltype,comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,chkoptfname,mol,modred,torsionrestraints)
         term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)
         modred=False
 
-        if poltype.optpcm==True or (poltype.optpcm==-1 and poltype.pcm):
-            print('###### Create_PySCF_input #######')
         inputname,outputname=CreatePsi4OPTInputFile(poltype,comoptfname,comoptfname,mol,modred,bondanglerestraints,skipscferror,charge,loose,torsionrestraints)
         if term==False or overridecheckterm==True:
             poltype.WriteToLog("QM Geometry Optimization")
@@ -876,29 +878,16 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
             jobtooutputfiles={cmdstr:[logoptfname]}
             jobtoabsolutebinpath={cmdstr:poltype.which('psi4')}
     
-            print('For external API')
-            print(jobtoinputfilepaths)
-            print(jobtooutputfiles)
-            print(jobtoabsolutebinpath)
-            print(scratchdir)
-            print(jobtologlistfilepathprefix)
-            print('**********')
             if poltype.checkinputonly==True:
                 sys.exit()
-
 
             if os.path.isfile(logoptfname):
                 os.remove(logoptfname)
             if poltype.externalapi==None:
-                print('Is Poltype not external API')
-                print(jobtooutputlog)
                 finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,skiperrors)
             else:
-                print('It is poltype external API')
                 if len(jobtooutputlog.keys())!=0:
-                    print('Calling external API')
                     call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilepathprefix)
-                print('Waiting for termination')
                 finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
 
         term,error=poltype.CheckNormalTermination(logoptfname,None,skiperrors) # now grabs final structure when finished with QM if using Psi4
@@ -908,7 +897,10 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
         optmol =  load_structfile(poltype,logoptfname.replace('.log','.xyz'))
         optmol=rebuild_bonds(poltype,optmol,mol)
     optmol.SetTotalCharge(totcharge)
-    GrabFinalXYZStructure(poltype,logoptfname,logoptfname.replace('.log','.xyz'),mol)
+
+    if Soft != 'PySCF':
+        GrabFinalXYZStructure(poltype,logoptfname,logoptfname.replace('.log','.xyz'),mol)
+
     return optmol,error,torsionrestraints
 
 
@@ -922,6 +914,11 @@ def load_structfile(poltype,structfname):
     Referenced By: run_gaussian, tor_opt_sp, compute_qm_tor_energy, compute_mm_tor_energy 
     Description: -
     """
+
+    with open(structfname, 'r') as f:
+        for lines in f:
+            print(lines)
+
     strctext = os.path.splitext(structfname)[1]
     tmpconv = openbabel.OBConversion()
     if strctext in '.fchk':
