@@ -205,16 +205,33 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
     Referenced By: 
     Description: 
     """
+
+    ######
+    # TM
+    ######
+
+
     jobtooutputlog={}
     listofjobs=[]
     outputnames=[]
     inputfilepaths=[]
     outputfilenames=[]
     executables=[]
+
+    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
+        if poltype.toroptpcm==True or (poltype.toroptpcm==-1 and poltype.pcm):
+            Soft = 'PySCF'
+        else:
+            Soft = 'Psi4'
+
+    print('TM: In ExecuteSPJobs')
+    print(Soft)
+
+
     for i in range(len(optoutputlogs)):
         outputlog=optoutputlogs[i]
         phaseangles=optlogtophaseangle[outputlog]
-        if poltype.torspmethod!='xtb' and poltype.torspmethod!='ANI' and poltype.torspmethod != 'FENNIX':
+        if poltype.torspmethod!='xtb' and poltype.torspmethod!='ANI' and poltype.torspmethod != 'FENNIX' and Soft != 'PySCF':
             if not poltype.use_gaus:
                 prevstrctfname=outputlog.replace('.log','.xyz')
                 inputname,outputname=CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,mol)
@@ -252,6 +269,29 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
             outputname=inputname.replace(postfix,'.log')
             fennix4poltype.FENNIX_SP(poltype, prevstrctfname, outputname) 
 
+        elif Soft == 'PySCF':
+            prevstrctfname=outputlog.replace('.log','.xyz')
+            executable='PySCF'
+            prefix='%s-%s-sp-' % (poltype.toroptmethod,poltype.torspmethod)
+            postfix='.input'
+            inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
+            outputname=inputname.replace(postfix,'.log')
+
+            print(prevstrctfname)
+            print(executable)
+            print(prefix)
+            print(postfix)
+            print(inputname,angles)
+            print(outputname)
+
+            pre=inputname.replace(postfix,'')
+            from pyscf_for_frag import setup_frag_sp
+
+            inputname,outputname,cmdstr= setup_frag_sp(poltype,optmol,prevstrctfname,pre)
+
+            print(inputname)
+            print(outputname)
+            print(cmdstr)
 
         finished,error=poltype.CheckNormalTermination(outputname,errormessages=None,skiperrors=True)
         inputfilepath=os.path.join(os.getcwd(),inputname)
@@ -267,7 +307,8 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
         outputnames.append(outputname)
         outputlogtophaseangles[outputname]=phaseangles
         optlogtosplog[outputlog]=outputname
-    if not poltype.use_gaus:
+
+    if not poltype.use_gaus or Soft == 'PySCF':
         
         return outputnames,listofjobs,poltype.scrtmpdirpsi4,jobtooutputlog,outputlogtophaseangles,optlogtosplog,inputfilepaths,outputfilenames,executables
     else:
@@ -1327,7 +1368,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                     
 
         poltype.torsettophaselist[tuple(torset)]=newphaseangles
-    sys.exit()
+    #sys.exit()
     firstfinishedjobs=finishedjobs[:]
     for job in firstfinishedjobs:
         if job not in finishedjobs:
@@ -1364,6 +1405,21 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         listofcputimesopt=poltype.TabulateCPUTimes([finishedoutputlogs])[0]
         torsettooptcputime[torset]=listofcputimesopt
         outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangles,optlogtosplog,inputfilepaths,outputfilenames,executables=ExecuteSPJobs(poltype,finishedoutputlogs,finishedflatphaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,mol,optlogtosplog,optlogtophaseangle)
+
+        print('')
+        print('')
+        print('')
+        print('After ExecuteSPJobs')
+        print('outputlogs',outputlogs)
+        print('listofjobs',listofjobs)
+        print('scratchdir',scratchdir)
+        print('jobtooutputlog',jobtooutputlog)
+        print('outputlogtophaseangles',outputlogtophaseangles)
+        print('optlogtosplog',optlogtosplog)
+        print('inputfilepaths',inputfilepaths)
+        print('outputfilenames',outputfilenames)
+        print('executables',executables)
+        #sys.exit()
         lognames=[]
         torsettospoutputlogs[tuple(torset)]=outputlogs
         for jobidx in range(len(listofjobs)):
@@ -1389,9 +1445,11 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMSPJobToLog'+'_'+poltype.molecprefix
     if poltype.externalapi!=None:
         if len(fulllistofjobs)!=0:
+            print('In CallExternalAPI')
             call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
         ofinshedjobs,oerrorjobs=poltype.WaitForTermination(fulljobtooutputlog,False)
     else:
+        print('In CallJobsSeriallyLocalHost')
         ofinishedjobs,oerrorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
 
     for torset in poltype.torlist:

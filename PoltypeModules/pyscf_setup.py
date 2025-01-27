@@ -78,15 +78,19 @@ class PySCF_init_setup():
     def write_PySCF_input(self,is_opt=True,is_frag=False):
 
         if is_frag:
-            self.PySCF_inp_file = f"{self.init_data['COM_file']}.py"
-            self.PySCF_out_file = f"{self.init_data['COM_file']}_pyscf.log" 
+            self.PySCF_inp_file = f"{self.init_data['COM_file']}_pyscf.py"
+            if is_opt:
+                self.PySCF_out_file = f"{self.init_data['COM_file']}_pyscf.log"
+            else:
+                self.PySCF_out_file = f"{self.init_data['COM_file']}.log"
         else:
-            self.PySCF_inp_file = f"{self.init_data['COM_file'].strip('.com')}.py"
+            self.PySCF_inp_file = f"{self.init_data['COM_file'].strip('.com')}_pyscf.py"
             self.PySCF_out_file = f"{self.init_data['COM_file'].strip('.com')}_pyscf.log" 
 
         self.write_PySCF_header(is_opt)
 
-        self.write_PySCF_params(is_opt)
+        if is_opt:
+            self.write_PySCF_params()
 
         self.write_PySCF_main(is_opt,is_frag)
 
@@ -102,12 +106,11 @@ class PySCF_init_setup():
 
         return
 
-    def write_PySCF_params(self,is_opt):
+    def write_PySCF_params(self):
 
         with open(f"{self.init_data['topdir']}/{self.PySCF_inp_file}", 'a+') as f:
             f.write('params = {\n')
-            if is_opt:
-                f.write(f'"constraints": "{self.PySCF_inp_const}",\n')
+            f.write(f'"constraints": "{self.PySCF_inp_const}",\n')
             if self.pol_obj.optconvergence == 'LOOSE':
                 f.write('            "convergence_energy": 1e-4,\n') 
                 f.write('            "convergence_grms": 1.7e-3,\n') 
@@ -163,7 +166,11 @@ class PySCF_init_setup():
                 f.write(f'mol_eq = optimize(mf, maxsteps={self.pol_obj.optmaxcycle}, **params)\n')
                 f.write('print(f"Final optimized structure:")\n')
                 f.write('print(mol_eq.tostring())\n\n')
+                
             else:
+                f.write('mol_sp = mf.kernel()\n')
+                f.write('print(f"Final Energy: {mol_sp}")\n')
+                f.write('print("Normal Termination")\n')
                 print('Need to add code for PySCF sp')
 
 

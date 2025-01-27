@@ -176,17 +176,28 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
     angle_list = []
     WBOarray=[]
     phaseangle_list=[]
+
+    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
+        if poltype.toroptpcm==True or (poltype.toroptpcm==-1 and poltype.pcm):
+            Soft = 'PySCF'
+        else:
+            Soft = 'Psi4'
+    
+    print('In Torsion fitting')
+    print('Soft', Soft)
+
     for phaseangles in flatphaselist:
         prefix='%s-%s-sp-' % (poltype.toroptmethod,poltype.torspmethod)
         postfix='.log' 
         minstrctfname,angles=torgen.GenerateFilename(poltype,torset,phaseangles,prefix,postfix,mol)
+        print(minstrctfname)
         if not os.path.exists(minstrctfname): # if optimization failed then SP file will not exist
             
             tor_energy=None
             WBOvalues=None
         else:
             WBOvalues=[]
-            if poltype.torspmethod!='xtb' and poltype.torspmethod!='ANI' and poltype.torspmethod!='FENNIX':
+            if poltype.torspmethod!='xtb' and poltype.torspmethod!='ANI' and poltype.torspmethod!='FENNIX' and Soft != 'PySCF':
                 use_gaus=False
                 use_gaus=CheckIfLogFileUsingGaussian(poltype,minstrctfname)
                 if use_gaus:
@@ -228,12 +239,16 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
                 tor_energy=ParseANIEnergyLog(poltype,minstrctfname)
             elif poltype.torspmethod=='FENNIX':
                 tor_energy=ParseFENNIXEnergyLog(poltype,minstrctfname)
+            elif Soft == 'PySCF':
+                tor_energy=ParsePYSCFEnergyLog(poltype,minstrctfname)
 
         WBOarray.append(WBOvalues)
         energy_list.append(tor_energy)
         
         angle_list.append(angles)
         phaseangle_list.append(phaseangles)
+
+    print(energy_list)
     nonecount=energy_list.count(None)
     normalpts=len(energy_list)-nonecount
     if torset in poltype.torsionsettonumptsneeded.keys():
@@ -2215,3 +2230,19 @@ def ParseFENNIXEnergyLog(poltype,outputname):
         energy=float(line.split()[-2])
     return energy
 
+def ParsePYSCFEnergyLog(poltype,outputname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+    print(outputname)
+
+    for line in open(outputname).readlines():
+      if 'Final Energy: ' in line:
+          L = line.rstrip('\n').split(':')[-1]
+          energy = float(L)
+
+    return energy
