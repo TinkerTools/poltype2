@@ -78,8 +78,8 @@ class PySCF_init_setup():
     def write_PySCF_input(self,is_opt=True,is_frag=False):
 
         if is_frag:
-            self.PySCF_inp_file = f"{self.init_data['COM_file'].strip('.xyz')}.py"
-            self.PySCF_out_file = f"{self.init_data['COM_file'].strip('.xyz')}_pyscf.log" 
+            self.PySCF_inp_file = f"{self.init_data['COM_file']}.py"
+            self.PySCF_out_file = f"{self.init_data['COM_file']}_pyscf.log" 
         else:
             self.PySCF_inp_file = f"{self.init_data['COM_file'].strip('.com')}.py"
             self.PySCF_out_file = f"{self.init_data['COM_file'].strip('.com')}_pyscf.log" 

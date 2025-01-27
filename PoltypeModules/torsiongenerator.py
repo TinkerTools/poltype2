@@ -510,12 +510,15 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
             print(pre)
             print(inputstruct)
             from pyscf_for_frag import setup_frag_opt
-            PySCF_for_Frag = setup_frag_opt(poltype,newtorset,toranglelist,\
+            inputname,outputname,cmdstr = setup_frag_opt(poltype,newtorset,toranglelist,\
                                             pre,inputmol,inputname,inputstruct)
 
+            executable='python'
+
+            return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4,executable
             
 
-            sys.exit()
+             #sys.exit()
         elif Soft == 'Psi4':
             print('PSI4!!!!!')
             sys.exit()
@@ -1246,9 +1249,27 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         print('variabletorlist',variabletorlist)
         print('torsionrestraint',torsionrestraint)
         print('optlogtophaseangle',optlogtophaseangle)
-
+        print('')
+        print('')
+        print('')
         outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures,optlogtophaseangle,inputfilepaths,outputfilenames,executables,outputlogtoinitialxyz=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol,'1',optlogtophaseangle)
-        sys.exit()
+
+        print('')
+        print('')
+        print('After ExecuteOptJobs')
+        print('outputlogs',outputlogs)
+        print('listofjobs',listofjobs)
+        print('scratchdir',scratchdir)
+        print('jobtooutputlog',jobtooutputlog)
+        print('initialstructures',initialstructures)
+        print('optlogtophaseangle',optlogtophaseangle)
+        print('inputfilepaths',inputfilepaths)
+        print('outputfilenames',outputfilenames)
+        print('executables',executables)
+        print('outputlogtoinitialxyz',outputlogtoinitialxyz)
+
+
+
         torsettooptoutputlogs[tuple(torset)]=outputlogs
         dictionary = dict(zip(outputlogs,initialstructures))  
         torsettooutputlogtoinitialstructure[tuple(torset)].update(dictionary)
@@ -1291,7 +1312,11 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             cartxyz=outputlog.replace('.log','.xyz')
             if finished==True:
                 if poltype.toroptmethod!='xtb' and poltype.toroptmethod!='ANI' and poltype.toroptmethod!='AMOEBA':
-                    opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
+                    if 'pyscf' in outputlog:
+                        from pyscf_for_frag import read_frag_opt
+                        read_frag_opt(poltype,outputlog,mol)
+                    else: 
+                        opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
                 CheckIfQMOptReachedTargetDihedral(poltype,cartxyz,initialtinkerstructure,torset,optmol,variabletorlist,phaseangles) # QM usually freezes dof but xtb and ANI does not freeze so need to add check now.
                 tinkerxyz=outputlog.replace('.log','_tinker.xyz')
                 ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz)
@@ -1301,7 +1326,8 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                 newphaseangles.append(phsang)
                     
 
-        poltype.torsettophaselist[tuple(torset)]=newphaseangles         
+        poltype.torsettophaselist[tuple(torset)]=newphaseangles
+    sys.exit()
     firstfinishedjobs=finishedjobs[:]
     for job in firstfinishedjobs:
         if job not in finishedjobs:
