@@ -5198,8 +5198,9 @@ class PolarizableTyper():
             # STEP 58
             if self.isfragjob==False:
                 previousdir=os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-                if os.path.exists(self.tmpxyzfile):
-                     shutil.copy(self.tmpxyzfile,os.path.join(previousdir,self.tmpxyzfile))
+                # copy the optimized xyz file
+                if os.path.exists(self.tmpxyzfile + '_2'):
+                     shutil.copy(self.tmpxyzfile + '_2',os.path.join(previousdir,self.tmpxyzfile))
                 if os.path.exists(self.tmpkeyfile):
                      shutil.copy(self.tmpkeyfile,os.path.join(previousdir,self.tmpkeyfile))
             self.CopyFitPlots()
