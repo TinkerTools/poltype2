@@ -289,7 +289,7 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
         outputlogtophaseangles[outputname]=phaseangles
         optlogtosplog[outputlog]=outputname
 
-    if not poltype.use_gaus or Soft == 'PySCF':
+    if not poltype.use_gaus and Soft == 'Psi4':
         
         return outputnames,listofjobs,poltype.scrtmpdirpsi4,jobtooutputlog,outputlogtophaseangles,optlogtosplog,inputfilepaths,outputfilenames,executables
     else:
