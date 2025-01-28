@@ -183,14 +183,10 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
         else:
             Soft = 'Psi4'
     
-    print('In Torsion fitting')
-    print('Soft', Soft)
-
     for phaseangles in flatphaselist:
         prefix='%s-%s-sp-' % (poltype.toroptmethod,poltype.torspmethod)
         postfix='.log' 
         minstrctfname,angles=torgen.GenerateFilename(poltype,torset,phaseangles,prefix,postfix,mol)
-        print(minstrctfname)
         if not os.path.exists(minstrctfname): # if optimization failed then SP file will not exist
             
             tor_energy=None
@@ -248,7 +244,6 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
         angle_list.append(angles)
         phaseangle_list.append(phaseangles)
 
-    print(energy_list)
     nonecount=energy_list.count(None)
     normalpts=len(energy_list)-nonecount
     if torset in poltype.torsionsettonumptsneeded.keys():
@@ -2238,7 +2233,6 @@ def ParsePYSCFEnergyLog(poltype,outputname):
     Referenced By: 
     Description: 
     """
-    print(outputname)
 
     for line in open(outputname).readlines():
       if 'Final Energy: ' in line:

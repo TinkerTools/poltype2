@@ -39,8 +39,6 @@ class PySCF_init_setup():
             next(f)
             for lines in f:
                 L = lines.strip('\n').split()
-                #print(L)
-                #if len(L)==4 and '#' not in L:
                 self.mol_data_init['Atoms_list'].append(L[0])
                 self.mol_data_init['Atoms_coord'].append([float(i) for i in L[1:]])
 
@@ -124,10 +122,7 @@ class PySCF_init_setup():
 
     def write_PySCF_main(self,is_opt,is_frag):
 
-        print('in PySCF main')
-
         atm_s = f'atom="{self.PySCF_inp_xyz}"'
-        print(self.PySCF_inp_file)
         if is_opt:
             if not is_frag:
                 basis_s = f'basis = "{self.pol_obj.optbasisset}"'
@@ -146,11 +141,6 @@ class PySCF_init_setup():
         else:
             chg_s = f'charge = {self.mol_data_init["charge"]}'
         unit_s = 'unit = "A"'
-
-        print(atm_s)
-        print(basis_s)
-        print(spin_s)
-        print(unit_s)
 
         with open(f"{self.init_data['topdir']}/{self.PySCF_inp_file}", 'a+') as f:
             f.write(f'mol = pyscf.M({atm_s}, {basis_s}, {spin_s}, {chg_s}, {unit_s})\n')
@@ -171,7 +161,6 @@ class PySCF_init_setup():
                 f.write('mol_sp = mf.kernel()\n')
                 f.write('print(f"Final Energy: {mol_sp}")\n')
                 f.write('print("Normal Termination")\n')
-                print('Need to add code for PySCF sp')
 
 
     

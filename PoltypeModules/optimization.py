@@ -32,8 +32,6 @@ def GeometryOPTWrapper(poltype,molist):
         mol=molist[molidx]
         suf=str(molidx+1)
         try:
-            print('TM:')
-            print('suffix:',  suf)
             optmol,error,torsionrestraints = GeometryOptimization(poltype,mol,totcharge,suffix=suf)
         except:
             redo=False
@@ -769,9 +767,10 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
             
         try:
             importlib.import_module('pyscf')
-            print("PySCF is installed.")
+            poltype.WriteToLog("PySCF is installed.\n")
         except ImportError:
-            print("PySCF is not installed.")
+            poltype.WriteToLog("PySCF is not installed.\n Make sure that pyscf version 2.7.0 is installed along with dft3, dft4 and pyscf-dispersion.\n You can install using: \n        `pip install pyscf==2.7.0 dft3 dft4 pyscf-dispersion`")
+            raise ImportError("PySCF is not installed.\n Make sure that pyscf version 2.7.0 is installed along with dft3, dft4 and pyscf-dispersion.\n You can install using: \n        `pip install pyscf==2.7.0 dft3 dft4 pyscf-dispersion`")
     
 
         gen_optcomfile(poltype,comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,chkoptfname,mol,modred,torsionrestraints)
@@ -814,17 +813,11 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
         if os.path.isfile(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'):
             os.remove(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}')
 
-
+        # Run PySCF with either external API 
+        # or SerialLocalHost
         if poltype.externalapi==None:
-            #Temporary fix to work on CheckNormalTermination
-            #if os.path.isfile(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'):
-            #    pass
-            #else:
             finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(cmd_to_run,skiperrors)
-            print('Optimization for parent ligand')
-            print(finishedjobs,errorjobs)
         else:
-            print('PySCF for external API')
             jobtoinputfilepaths = {cmd: [f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_inp_file}']}
             jobtooutputfiles = {cmd: [f'{Opt_prep.PySCF_out_file}']}
             jobtoabsolutebinpath = {cmd: poltype.which('pyscf')}
@@ -832,7 +825,6 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
             jobtologlistfilepathprefix = f'{Opt_prep.init_data["topdir"]}/optimization_jobtolog_{poltype.molecprefix}'
        
             call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilepathprefix)
-            print('Waiting for termination')
             finishedjobs,errorjobs=poltype.WaitForTermination(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}',False) 
 
         # Check normal termination of PySCF job
@@ -852,13 +844,10 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
         optmol =  load_structfile(poltype,Opt_post.final_opt_xyz)
         optmol=rebuild_bonds(poltype,optmol,mol)
     
-
         # Here we redefine logoptfname and poltype.logoptfname
         # to make sure that hereafter, the pyscf output is used!
         logoptfname = Opt_prep.PySCF_out_file
         poltype.logoptfname = Opt_prep.PySCF_out_file 
-
-
 
     if Soft == 'Psi4':
         gen_optcomfile(poltype,comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,chkoptfname,mol,modred,torsionrestraints)

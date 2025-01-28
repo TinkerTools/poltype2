@@ -5174,6 +5174,9 @@ class PolarizableTyper():
                 shutil.copy(self.xyzfname,self.xyzoutfile)
             shutil.copy(self.xyzoutfile,self.tmpxyzfile)
             shutil.copy(self.key7fname,self.tmpkeyfile)
+
+            shutil.copy(self.key7fname,'TEST_tim.key')
+            
             # STEP 51
             if self.writeoutpolarize and self.writeoutmultipole==True:
                 opt.StructureMinimization(self,torsionrestraints)
