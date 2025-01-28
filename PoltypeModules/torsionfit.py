@@ -2237,6 +2237,5 @@ def ParsePYSCFEnergyLog(poltype,outputname):
     for line in open(outputname).readlines():
       if 'Final Energy: ' in line:
           L = line.rstrip('\n').split(':')[-1]
-          energy = float(L)
-
+          energy = float(L)*poltype.Hartree2kcal_mol
     return energy
