@@ -2,13 +2,14 @@
 # This program 
 # - takes the .sdf input structure
 # - uses RDKit to generate 500 conformers
-# - optimizes the conformers with distance constraints
+# - optimizes the conformers with distance constraints with MMFF94 in RDKit
 # - selects the extended conformer with Rg, SASA, number of Intramolecular HB, and steric interaction criteria
-# - generates "testconf.mol" which poltype wants
+# - further optimize the selected extended conformer with xtb to deal with MMFF95 deficiency (puckered Nitrogen etc)
+# - generates "conftest.mol" which poltype wants
 
 # Author: Chengwen Liu
 # Date: Mar. 2023
-
+#       Feb. 2025
 import os
 import sys
 import argparse
@@ -169,7 +170,7 @@ if __name__ == "__main__":
 
     res=ff.Minimize(maxIts=500)
     converged.append(res) 
-
+  
   rgs = []
   sasas = []
   num_ihbs = []
@@ -219,7 +220,62 @@ if __name__ == "__main__":
     if sasa > highest_sasa:
       highest_sasa = sasa
       extended_conf = idx
-  rdmolfiles.MolToMolFile(m1, outputfile, confId=extended_conf) 
+  
+  # 5. optimize the geometry with xtb
+  extended_conformer = m1.GetConformer(extended_conf)
+  currdir = os.getcwd()
+  confgendir = os.path.join(currdir, 'ConfGen')
+  if not os.path.isdir(confgendir):
+    os.mkdir(confgendir)
+  conf_fname = 'extended_conformer'  
+  with open(os.path.join(confgendir, f'{conf_fname}.xyz'), 'w') as f:
+    f.write(f'{m1.GetNumAtoms()}\n\n') 
+    for atom_idx in range(m1.GetNumAtoms()):
+      atom = m1.GetAtomWithIdx(atom_idx)
+      pos = extended_conformer.GetAtomPosition(atom_idx)
+      f.write(f'{atom.GetSymbol()} {pos.x:.6f} {pos.y:.6f} {pos.z:.6f}\n')
+    
+  # Write distance constraint file used with xtb
+  with open(os.path.join(confgendir, 'constraint.inp'), 'w') as f:
+    f.write("$constrain\n")
+    f.write("  force constant=0.5\n")
+    for k,v in ihb_dist.items():
+      idx1, idx2 = k.split('-')
+      # here we set distance involving IHB
+      f.write(f"  distance: {int(idx1)+1}, {int(idx2)+1}, auto\n")
+    f.write("$end\n")
+  
+  # Get total charge and number of unpaired electrons for later use
+  total_charge = Chem.GetFormalCharge(m1)
+  spin_multiplicity = m1.GetProp('spinMultiplicity') if m1.HasProp('spinMultiplicity') else 1
+  unpaired_electrons = spin_multiplicity - 1  
+  if not m1.HasProp('spinMultiplicity'):
+    unpaired_electrons = 0
+  
+  # Do xtb optimization for each conformer
+  os.chdir(confgendir)
+  print('Running XTB optimization for extended conformer...')
+  print(f'xtb {conf_fname}.xyz --opt --input constraint.inp --chrg {total_charge} --uhf {unpaired_electrons} > xtb_run.log ') 
+  os.system(f'xtb {conf_fname}.xyz --opt --input constraint.inp --chrg {total_charge} --uhf {unpaired_electrons} > xtb_run.log ') 
+  
+  # Replace coordinates with those in optimized xyz file
+  os.chdir(currdir)
+  lines = open(os.path.join(confgendir, 'xtbopt.xyz')).readlines()[2:]
+  opted_coords = []
+  for line in lines:
+    ss = line.split()
+    opted_coords.append([float(ss[1]), float(ss[2]), float(ss[3])])
+  
+  for atom_idx in range(extended_conformer.GetNumAtoms()):
+    extended_conformer.SetAtomPosition(atom_idx, opted_coords[atom_idx])
+ 
+  # Make a copy of the m1 object
+  extended_conf_mol = Chem.Mol(m1)  
+  extended_conf_mol.RemoveAllConformers()
+  extended_conf_mol.AddConformer(extended_conformer, assignId=True)
+
+  Chem.MolToMolFile(extended_conf_mol, outputfile)
+
 # check if molecule is 2D
 if inputformat == "SDF":
   coords_z = []
