@@ -255,8 +255,8 @@ if __name__ == "__main__":
   # Do xtb optimization for each conformer
   os.chdir(confgendir)
   print('Running XTB optimization for extended conformer...')
-  print(f'xtb {conf_fname}.xyz --opt --input constraint.inp --chrg {total_charge} --uhf {unpaired_electrons} > xtb_run.log ') 
-  os.system(f'xtb {conf_fname}.xyz --opt --input constraint.inp --chrg {total_charge} --uhf {unpaired_electrons} > xtb_run.log ') 
+  cmdstr = f'xtb {conf_fname}.xyz --opt loose --input constraint.inp --chrg {total_charge} --uhf {unpaired_electrons} > xtb_run.log '
+  os.system(cmdstr)
   
   # Replace coordinates with those in optimized xyz file
   os.chdir(currdir)
