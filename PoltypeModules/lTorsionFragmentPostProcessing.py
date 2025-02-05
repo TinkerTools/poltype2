@@ -165,20 +165,23 @@ if __name__ == '__main__':
     new_order.insert(2, second_idx)
     tmp_mol = Chem.RenumberAtoms(tmp_mol, new_order) 
     rdmolfiles.MolToMolFile(tmp_mol, f'{fname}_post.mol')
-    sdffile = f"{fname}_post.mol" 
+    sdffile = f"{fname}_post.mol"
     mol = Chem.MolFromMolFile(sdffile,removeHs=False)
 
   # we have the "correct" fragment to work on
   # below we focus on trimming the fragment
-
+  
   # all single bonds are eligible to cut,
   single_bonds = []
   pattern = Chem.MolFromSmarts('[*;!#1][*;!#1]')
   matches = mol.GetSubstructMatches(pattern, uniquify=False)
   for match in matches:
-    single_bonds.append(list(match))
+    match = list(match)
+    match.sort()
+    if match not in single_bonds:
+      single_bonds.append(match)
   
-  # except non-trivalence nitrogen 
+  # record non-trivalence nitrogen 
   special_nitrogen = []
   pattern = Chem.MolFromSmarts('[#7X2][*]')
   matches = mol.GetSubstructMatches(pattern, uniquify=False)
@@ -186,17 +189,16 @@ if __name__ == '__main__':
     special_nitrogen.append([match[0], match[1]])
     special_nitrogen.append([match[1], match[0]])
   
-  
-  # record the aromatic nitrogen (n-*),
-  aromatic_nitrogen = {}
-  pattern = Chem.MolFromSmarts('[n][*]')
+  # record NSP and its connections 
+  nsp_atoms = {}
+  pattern = Chem.MolFromSmarts('[#7,#15,#16][*]')
   matches = mol.GetSubstructMatches(pattern, uniquify=False)
   for match in matches:
-    n, x = match
-    if n not in aromatic_nitrogen.keys():
-      aromatic_nitrogen[n] = [x]
+    nsp, x = match
+    if nsp not in nsp_atoms.keys():
+      nsp_atoms[nsp] = [x]
     else:
-      aromatic_nitrogen[n] += [x]
+      nsp_atoms[nsp] += [x]
  
   # get the atom indices of torsion
   torsion_idx_list = []
@@ -213,54 +215,6 @@ if __name__ == '__main__':
       if neig_idx not in torsion_idx_list:
         torsion_idx_list.append(neig_idx)
   
-  # OLD decision 
-  # Move the polar group from ortho to para position
-  # if there are two polar groups on two ortho- site,
-  # only the first-appearing one (smaller index) will
-  # be moved, and the second one will be deleted
-  # Chengwen Liu
-  # Oct 2024
-  
-  #atomsInSixMemRing = []
-  #pattern = Chem.MolFromSmarts('[a;r6]')
-  #matches = mol.GetSubstructMatches(pattern)
-  #for match in matches:
-  #  if len(match) == 1:
-  #    atomsInSixMemRing.append(match[0])
-  #
-  #ortho_atom = []
-  #paraH = []
-  #pattern = Chem.MolFromSmarts('[*;!#1][R][R][R][R][H]')
-  #matches = mol.GetSubstructMatches(pattern, uniquify=False)
-  #for match in matches:
-  #  mat = [match[0], match[1]] 
-  #  if mat == [1,2]: # poltype always uses 1,2
-  #    if (match[2] not in ortho_atom) and (match[2] in atomsInSixMemRing):
-  #      ortho_atom.append(match[2])
-  #      paraH.append(match[5])
-  #  if mat == [2,1]: # poltype always uses 1,2
-  #    if (match[2] not in ortho_atom) and (match[2] in atomsInSixMemRing):
-  #      ortho_atom.append(match[2])
-  #      paraH.append(match[5])
-  #
-  #ortho2paraH = dict(zip(ortho_atom, paraH))
-  #
-  ## match -OH,-NH2,-SH,-F,-Cl,-Br,-I
-  #pattern = Chem.MolFromSmarts('[a][O,N,S,F,Cl,Br,I]')
-  #matches = mol.GetSubstructMatches(pattern, uniquify=False)
-  #mol_ed = Chem.EditableMol(mol)
-  #tmp_add = []
-  #for match in matches:
-  #  if match[0] in ortho_atom:
-  #    paraH_idx = ortho2paraH[match[0]]
-  #    if paraH_idx not in tmp_add:
-  #      atomicNum = mol.GetAtomWithIdx(match[1]).GetAtomicNum()
-  #      add_atom = Chem.Atom(atomicNum)
-  #      mol_ed.ReplaceAtom(paraH_idx, add_atom)
-  #      tmp_add.append(paraH_idx)
-  #mol = mol_ed.GetMol()
-  #Chem.SanitizeMol(mol)
-
   # construct a graph based on connectivity 
   g = nx.Graph()
   nodes = []
@@ -290,11 +244,20 @@ if __name__ == '__main__':
         atomNum = neig.GetAtomicNum()
         if (not sameRing) and (atomNum != 1):
           pair = [idx, neig_idx]
-          pair_r = [neig_idx, idx]
-          if not set(pair).issubset(set(torsion_idx_list)) and (pair in single_bonds or pair_r in single_bonds) and (pair not in special_nitrogen): 
-            spair = sorted([idx, neig_idx])
-            if spair not in sub_bonds:
-              sub_bonds.append(spair)
+          pair.sort() 
+          if not set(pair).issubset(set(torsion_idx_list)) and (pair in single_bonds) and (pair not in special_nitrogen): 
+            if pair not in sub_bonds:
+              sub_bonds.append(pair)
+    # deal with the case when atom not in ring
+    else:
+      for neig in a.GetNeighbors():
+        neig_idx = neig.GetIdx()
+        pair = [idx, neig_idx]
+        pair.sort() 
+        if not set(pair).issubset(set(torsion_idx_list)) and (pair in single_bonds) and (pair not in special_nitrogen): 
+          if pair not in sub_bonds:
+            sub_bonds.append(pair)
+  
   for sub_bond in sub_bonds:
     a1, a2 = sub_bond
     g.remove_edge(a1, a2)  
@@ -305,46 +268,6 @@ if __name__ == '__main__':
   for m in frags:
     if not set(torsion_idx_list).issubset(list(m)):
       atomsToRemove += list(m)
-  # Replace CH3 with H 
-  pattern = Chem.MolFromSmarts('[*][CH3]([H])([H])[H]')
-  matches = mol.GetSubstructMatches(pattern, uniquify=False)
-  for match in matches:
-    x, c, h1, h2, h3 = match
-    if c not in torsion_idx_list:
-      atomsToRemove += [c, h1, h2, h3] 
-      xatom = mol.GetAtomWithIdx(x)
-      atomic = xatom.GetAtomicNum()
-      if atomic == 7:
-        xatom.SetNumExplicitHs(xatom.GetTotalNumHs() + 1)
-  
-  
-  # Replace CH2CH3 with H 
-  pattern = Chem.MolFromSmarts('[*][CH2]([H])([H])[CH3]([H])([H])[H]')
-  matches = mol.GetSubstructMatches(pattern, uniquify=False)
-  for match in matches:
-    x, c1, h11, h12, c2, h21, h22, h23 = match
-    if c1 not in torsion_idx_list:
-      atomsToRemove += [c1, h11, h12, c2, h21, h22, h23] 
-      xatom = mol.GetAtomWithIdx(x)
-      atomic = xatom.GetAtomicNum()
-      if atomic == 7:
-        xatom.SetNumExplicitHs(xatom.GetTotalNumHs() + 1)
-  
-  # Replace NH3+ with H 
-  pattern = Chem.MolFromSmarts('[*][N+]([H])([H])[H]')
-  matches = mol.GetSubstructMatches(pattern, uniquify=False)
-  for match in matches:
-    x, n, h1, h2, h3 = match
-    if n not in torsion_idx_list:
-      atomsToRemove += [n, h1, h2, h3] 
-  
-  # Replace NH2 with H 
-  pattern = Chem.MolFromSmarts('[*][N]([H])[H]')
-  matches = mol.GetSubstructMatches(pattern, uniquify=False)
-  for match in matches:
-    x, n, h1, h2 = match
-    if n not in torsion_idx_list:
-      atomsToRemove += [n, h1, h2] 
   
   # Remove atoms on distant fused rings
   ring_info = mol.GetRingInfo()
@@ -404,25 +327,32 @@ if __name__ == '__main__':
       atomsToRemove = []
       break
   
-  # if aromatic nitrogen misses connections
-  # after cut, add one hydrogen atom
+  # if NSP atoms miss connections
+  # after cut, add hydrogen atom per bond
   # this should be done in mol (before cut)
   # since the atom order will be different after cut
   # Chengwen Liu
   # Oct 2024
-
-  for idx, connected_atoms in aromatic_nitrogen.items():
+  nsp_bond = {}
+  for idx, connected_atoms in nsp_atoms.items():
     for atm in connected_atoms:
       if (atm in atomsToRemove) and (idx not in atomsToRemove):
-        nitrogen = mol.GetAtomWithIdx(idx)
-        print(f'Setting number of attached hydrogen to be 1 on atom {idx}')
-        nitrogen.SetNumExplicitHs(1)
+        if idx not in nsp_bond.keys():
+          nsp_bond[idx] = 1
+        else:
+          nsp_bond[idx] += 1
   
+  # Set correct number of hydrogen on NSP atoms
+  for idx, nbond in nsp_bond.items(): 
+    natom = mol.GetAtomWithIdx(idx)
+    print(f'Setting number of attached hydrogen to be {nbond} on atom {idx}')
+    natom.SetNumExplicitHs(nbond)
+
   emol = Chem.EditableMol(mol)
   atomsToRemove.sort(reverse=True)
   for atom in atomsToRemove:
       emol.RemoveAtom(atom)
-  
+
   mol2 = emol.GetMol()
   Chem.SanitizeMol(mol2)
   mol2h = Chem.AddHs(mol2,addCoords=True)
