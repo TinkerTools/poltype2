@@ -456,6 +456,9 @@ class PolarizableTyper():
         espbasisset:str="aug-cc-pVTZ"
         torspbasisset:str="6-311+G*"
         optmethod:str='MP2'
+        pyscf_opt_meth:str = 'wb97x_d3'
+        pyscf_sol_imp:str = 'IEF-PCM' # C-PCM, SS(V)PE, COSMO
+        pyscf_sol_eps:float = 78.3553 # Water
         toroptmethod:str='xtb'
         torspmethod:str='wB97X-D'
         dmamethod:str='MP2'
@@ -1189,6 +1192,12 @@ class PolarizableTyper():
                                     warnings.warn(f"Could not locate prmmod file '{fpath1}'")
                         elif newline.startswith("optmethod"):
                             self.optmethod = a
+                        elif newline.startswith("pyscf_opt_met"):
+                            self.pyscf_opt_met = a
+                        elif newline.startswith("pyscf_sol_imp"):
+                            self.pyscf_sol_imp = a
+                        elif newline.startswith("pyscf_sol_eps"):
+                            self.pyscf_sol_eps = a
                         elif newline.startswith("espmethod"):
                             self.espmethod = a
                         elif "torspmethod" in newline:
@@ -3373,6 +3382,7 @@ class PolarizableTyper():
             5. If error occured, write out line containing error to poltype log file.
             6. xtb only outputs the same filename for optimization jobs, so be sure to copy to desired filename after job finishes. 
             """
+            
             error=False
             term=False
             lastupdatetofilename={}
@@ -3412,7 +3422,7 @@ class PolarizableTyper():
                     else:
                         if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line or "LBFGS  --  Normal Termination due to SmallGrad" in line or "Normal termination" in line or 'Normal Termination' in line or 'Total Potential Energy' in line or 'Psi4 stopped on' in line or 'finished run' in line or ('Converged! =D' in line):
                             term=True
-                        if ('Tinker is Unable to Continue' in line or 'error' in line or ' Error ' in line or ' ERROR ' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line or 'Optimization failed to converge!' in line) and 'DIIS' not in line and 'mpi' not in line and 'RMS Error' not in line:
+                        if ('Tinker is Unable to Continue' in line or 'error' in line or ' Error ' in line or ' ERROR ' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line or 'Optimization failed to converge!' in line or 'Geometry optimization is not converged' in line or 'Error' in line) and 'DIIS' not in line and 'mpi' not in line and 'RMS Error' not in line:
                             error=True
                             errorline=line
                         if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line or ('OptimizationConvergenceError' in line and 'except' in line) or "Error on total polarization charges" in line or 'Erroneous write' in line:
@@ -3514,7 +3524,13 @@ class PolarizableTyper():
                     # STEP 1
                     self.WriteToLog("Submitting: " + cmdstr+' '+'path'+' = '+os.getcwd())
                     # STEP 2
-                    p = subprocess.Popen(cmdstr,shell=True,stdout=self.logfh, stderr=self.logfh)
+                    if 'pyscf' in cmdstr:
+                        out = cmdstr.split()[-1]
+                        out_pyscf = open(out, 'w')
+                        p = subprocess.Popen(cmdstr,shell=True,stdout=out_pyscf, stderr=out_pyscf)
+                    else:
+                        p = subprocess.Popen(cmdstr,shell=True,stdout=self.logfh, stderr=self.logfh)
+
                     procs.append(p)
                     self.cmdtopid[cmdstr]=p
 
@@ -4737,6 +4753,9 @@ class PolarizableTyper():
             self.localframe1 = [ 0 ] * mol.NumAtoms()
             self.localframe2 = [ 0 ] * mol.NumAtoms()
             self.WriteToLog("Atom Type Classification")
+            self.WriteToLog('Poltype image build time: ')
+            self.WriteToLog('Tinker commit: c9698d2101c5f66ce1d413f4aa2d5f62e4c22df2')
+            self.WriteToLog('Poltype commit: 51b235f8f0af0975c9afae789f671d698b44d7e5')
             self.idxtosymclass,self.symmetryclass=symm.gen_canonicallabels(self,mol,None,self.usesymtypes,True)
             # STEP 15
             torgen.FindPartialDoubleBonds(self,m,mol) # need to find something to hardcode transfer for partial double amide/acid, currently will derive torsion parameters if doesnt find "good" match in torsion database
@@ -5155,6 +5174,9 @@ class PolarizableTyper():
                 shutil.copy(self.xyzfname,self.xyzoutfile)
             shutil.copy(self.xyzoutfile,self.tmpxyzfile)
             shutil.copy(self.key7fname,self.tmpkeyfile)
+
+            shutil.copy(self.key7fname,'TEST_tim.key')
+            
             # STEP 51
             if self.writeoutpolarize and self.writeoutmultipole==True:
                 opt.StructureMinimization(self,torsionrestraints)
