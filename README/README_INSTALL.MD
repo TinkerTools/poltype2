@@ -81,12 +81,16 @@ dependencies:
   - rdkit
   - modeller
   - gdma
+	- dftd4
   - pip
   - pip:
     - pymbar
     - PyAstronomy
     - ase 
     - jax
+		- pyscf==2.7.0
+		- dftd3
+		- pyscf-dispersion
 ```
 
 * Download GDMA-2.3 and greater

@@ -716,15 +716,18 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
     chkoptfname=poltype.chkoptfname.replace('_1','_'+suffix)
 
     # Define which software will be used for the QM optimization
-    if not poltype.use_gaus or not poltype.use_gausoptonly:
-        if poltype.optpcm==True or (poltype.optpcm==-1 and poltype.pcm):
-            Soft = 'PySCF'
-        else:
-            Soft = 'Psi4'
+    
+    # Only use Gaussian when users require
+    if poltype.use_gaus or poltype.use_gausoptonly:
+      Soft = 'Gaussian'
+    # Otherwise use Psi4 
     else:
-        Soft = 'Gaussian'
-
-
+      Soft = 'Psi4' 
+    
+    # Replace Psi4 with PySCF when pcm is needed
+    if (poltype.optpcm==True or (poltype.optpcm==-1 and poltype.pcm)) and (Soft == 'Psi4'):
+      Soft = 'PySCF'
+    
     if Soft == 'Gaussian': # try to use gaussian for opt
         term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)
         if not term or overridecheckterm==True:

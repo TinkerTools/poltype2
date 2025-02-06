@@ -2402,7 +2402,6 @@ def VanDerWaalsOptimization(poltype,missingvdwatomindices):
             check=CheckIfFittingCompleted(poltype,prefix)
             checkarray.append(check)
             if poltype.use_qmopt_vdw==True:
-                print('HEREHEREHER')
                 poltype.comoptfname=prefix+'-opt.com'
                 poltype.chkoptfname=prefix+'-opt.chk'
                 poltype.fckoptfname=prefix+'-opt.fchk'

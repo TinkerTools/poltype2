@@ -216,9 +216,6 @@ class PySCF_init_setup():
         to pass to GeomeTRIC. 
         It gives the contraints file and the convergence criteria
 
-        @Chengwen: For now I only setup LOOSE for the convergence criteria
-        But we might want to change that!
-    
         """
 
         # Write the params to pass to GeomeTRIC
@@ -240,9 +237,6 @@ class PySCF_init_setup():
 
         """
         This function writes the main part of the PySCF script.
-
-        @Chengwen: For now I used the same function for both OPT and SP. 
-        We might want to have one variable for OPT and one for SP
 
         Inputs:
             -   is_opt: is it an optimization (bool)
