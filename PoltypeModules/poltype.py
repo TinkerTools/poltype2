@@ -3543,11 +3543,15 @@ class PolarizableTyper():
                     # STEP 4
                     if skiperrors==False:
                         if exitcode != 0:
+                            if 'pyscf' in cmdstr:
+                                out_pyscf.close()
                             self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
                             raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
                     else:
                         if exitcode != 0:
                             self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
+            if 'pyscf' in cmdstr:
+                out_pyscf.close()
 
         def WriteOutLiteratureReferences(self,keyfilename): 
             """
