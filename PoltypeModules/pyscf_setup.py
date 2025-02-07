@@ -135,7 +135,7 @@ class PySCF_init_setup():
                 if tor_angle == None:
                     angle = self.mol_obj.GetTorsion(tor[0], tor[1], tor[2], tor[3]) % 360
                 else:
-                    angme = tor_angle[i]
+                    angle = tor_angle[i]
                 f.write(f'dihedral {tor[0]} {tor[1]} {tor[2]} {tor[3]} {angle:3.4f}\n')
 
         return
