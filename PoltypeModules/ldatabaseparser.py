@@ -41,7 +41,7 @@ def assign_chgpen_params(poltype):
   for line in lines:
     if (line[0] != '#'):
       d = line.split()
-      if d[0].upper() == 'CHGPEN':
+      if (len(d) > 3) and (d[0].upper() == 'CHGPEN'):
         name2chgpen[d[1]] = '  '.join(d[2:4])
   
   for key, name in rawsmarts2name.items():
