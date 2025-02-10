@@ -4118,13 +4118,13 @@ class PolarizableTyper():
             5. If user input wants multiple confomors for multipole parameterization then use the next lowest energy confomors (not necearrily maximaly extended conformation) as well.
             6. Save coordinates of conformations in dictionary for later use in QM optimzation  
             """
-            pythonpath=poltype.which('python')
+            pythonpath=self.which('python')
             head,tail=os.path.split(pythonpath)
             pythonpath=Path(head) 
             envdir=pythonpath.parent.absolute()
             envpath=Path(envdir)
             allenvs=envpath.parent.absolute()
-            xtbenvpath=os.path.join(allenvs,poltype.xtbenvname)
+            xtbenvpath=os.path.join(allenvs,self.xtbenvname)
             pythonpath=os.path.join(xtbenvpath,'bin')
             xtbpath=os.path.join(pythonpath,'xtb')
             cmdstr = f"python \"{os.path.join(os.path.abspath(os.path.split(__file__)[0]), 'lConformerGenerator.py')}\" -i {self.molstructfname} -p {xtbpath}"
