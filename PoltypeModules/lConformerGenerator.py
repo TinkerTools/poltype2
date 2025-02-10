@@ -17,6 +17,7 @@ import numpy as np
 from rdkit import Chem
 from rdkit.Chem import AllChem,Descriptors3D,rdFreeSASA,rdmolfiles,ChemicalForceFields
 
+
 def find_intramolecular_hbonds(mol, confId = -1, donorAtoms = [7,8,9], distTol = 2.5):
   res = []
   conf = mol.GetConformer(confId)
@@ -101,6 +102,7 @@ if __name__ == "__main__":
  
   parser = argparse.ArgumentParser()
   parser.add_argument('-i', dest = 'inputfile', help = "Input file name", required=True)  
+  parser.add_argument('-p', dest = 'xtbpath', help = "Absolute path of xtb executable", required=True)  
   parser.add_argument('-o', dest = 'outputfile', help = "Output file name. Default: conftest.mol", default='conftest.mol')  
   parser.add_argument('-f', dest = 'inputformat', help = "Input file format. Default: SDF", choices = ['SDF', 'MOL2'], type=str.upper, default='SDF')  
   
@@ -109,6 +111,7 @@ if __name__ == "__main__":
   inputfile = args['inputfile']
   outputfile = args['outputfile']
   inputformat = args['inputformat']
+  xtbpath = args['xtbpath']
 
   if inputformat == 'MOL2':
     m1 = Chem.MolFromMol2File(inputfile,removeHs=False)
@@ -255,7 +258,7 @@ if __name__ == "__main__":
   # Do xtb optimization for each conformer
   os.chdir(confgendir)
   print('Running XTB optimization for extended conformer...')
-  cmdstr = f'xtb {conf_fname}.xyz --opt loose --input constraint.inp --chrg {total_charge} --uhf {unpaired_electrons} > xtb_run.log '
+  cmdstr = f'{xtbpath} {conf_fname}.xyz --opt loose --input constraint.inp --chrg {total_charge} --uhf {unpaired_electrons} > xtb_run.log '
   os.system(cmdstr)
   
   # Replace coordinates with those in optimized xyz file
