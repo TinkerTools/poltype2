@@ -4766,9 +4766,6 @@ class PolarizableTyper():
             self.localframe1 = [ 0 ] * mol.NumAtoms()
             self.localframe2 = [ 0 ] * mol.NumAtoms()
             self.WriteToLog("Atom Type Classification")
-            self.WriteToLog('Poltype image build time: ')
-            self.WriteToLog('Tinker commit: c9698d2101c5f66ce1d413f4aa2d5f62e4c22df2')
-            self.WriteToLog('Poltype commit: 51b235f8f0af0975c9afae789f671d698b44d7e5')
             self.idxtosymclass,self.symmetryclass=symm.gen_canonicallabels(self,mol,None,self.usesymtypes,True)
             # STEP 15
             torgen.FindPartialDoubleBonds(self,m,mol) # need to find something to hardcode transfer for partial double amide/acid, currently will derive torsion parameters if doesnt find "good" match in torsion database
