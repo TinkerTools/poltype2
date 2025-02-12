@@ -339,3 +339,11 @@
 [$([PX4](=[O])([O]([P]))([OH0])[OH0])]                              307   278     P-pyro #               P-pyro, Phosphor in Pyrophosphate
 [$([PX4](=[O])([O]([P]))([O]([P]))[OH0])]                           308   279      P-tri #                P-tri, Phosphor in the middle of Triphosphate
 
+# Boron 
+# Borrowed from other class (nitrogen) for valence force constants
+# Need detailed development if care about Boron
+# Chengwen Liu
+# Feb 2025
+[$([BH2][O])]                                                       400   178      BH2-O #                BH2-O, Boron connecting O, borrowed 178 atom class
+[$([H][BH2])]                                                       401    24      HB    #                HB, H connecting Boron, borrowed HN atom class
+[$([O][BH2])]                                                       402   216      O-B   #                O-B, O connecting Boron, borrowed O-N atom class
