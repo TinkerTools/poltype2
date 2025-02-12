@@ -5207,7 +5207,6 @@ class PolarizableTyper():
                 self.WriteToLog('Total torsion QM time for '+str(torset)+' is '+str(round(totaltime,3))+' hours'+' and '+str(numpoints)+' conformations')
                 self.WriteToLog('OPT torsion QM time for '+str(torset)+' is '+str(round(opttime,3))+' hours'+' and '+str(numpoints)+' conformations')
                 self.WriteToLog('SP torsion QM time for '+str(torset)+' is '+str(round(sptime,3))+' hours'+' and '+str(numpoints)+' conformations')
-            self.WriteToLog('Poltype Job Finished'+'\n')
             # STEP 55
             if self.isfragjob==False and self.dontfrag==True and len(self.torlist)!=0:
                 self.WriteOutDatabaseParameterLines()
@@ -5237,10 +5236,17 @@ class PolarizableTyper():
                      shutil.copy(self.tmpkeyfile,os.path.join(previousdir,self.tmpkeyfile))
             self.CopyFitPlots()
             os.chdir('..')
+            
+            if os.path.isfile(self.tmpxyzfile):
+              cmdstr = f"python \"{os.path.join(os.path.abspath(os.path.split(__file__)[0]), 'lFormatTXYZ.py')}\" {self.tmpxyzfile}"
+              self.WriteToLog(cmdstr)
+              os.system(cmdstr)
 
             # STEP 59
             # apply any modifications to the final.key
             lmodifytinkerkey.mod_final_key(self)
+            
+            self.WriteToLog('Poltype Job Finished'+'\n')
 
 
             
