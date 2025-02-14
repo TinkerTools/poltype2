@@ -92,8 +92,6 @@ Wu JC, Chattree G, Ren P. Automation of AMOEBA polarizable force field parameter
 
 [💻 Advanced Program Usage](README/README_HELP.MD)
 
-[Automated AMOEBA Molecular Dynamics and Free Energy Prediciton How It Works](README/README_PROTOCOL.MD)
-
 
 
 ---------------------------------------------------------------------------------------------
