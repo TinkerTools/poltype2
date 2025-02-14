@@ -23,7 +23,6 @@ import sys # used for terminaing job after fragmenter finishes and troubleshooti
 import symmetry as symm
 import shlex
 import itertools
-import apicall as call
 import math
 import re
 import networkx as nx
@@ -754,7 +753,7 @@ def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog
     """
     tempmaxmem,tempmaxdisk,tempnumproc=poltype.PartitionResources()
     # keywords to be written to poltype ini file
-    init_keywords = ['poltypepath', 'bashrcpath', 'externalapi']
+    init_keywords = ['poltypepath', 'bashrcpath']
     init_keywords += ['prmmodlist']
     init_keywords += ['deleteallnonqmfiles', 'suppressdipoleerr', 'printoutput']
     init_keywords += ['numproc', 'maxmem', 'maxdisk']
@@ -858,12 +857,7 @@ def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog,jobtoinputfilepaths,job
     """
     poltype.WriteToLog('Submitting Fragment Jobs') 
     if poltype.fragmenterdebugmode==False:
-        if poltype.externalapi is not None and poltype.fragmentjobslocal==False:
-            call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
-            finshedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
-
-        else:
-            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,True)
+        finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,True)
     else:
         finishedjobs=list(jobtooutputlog.keys())
         errorjobs=[]

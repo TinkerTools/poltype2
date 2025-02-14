@@ -166,10 +166,7 @@ def InsertKeyfileHeader(poltype,keyfilename):
     if poltype.heavyhyd==True:
        if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
            AddKeyWord(poltype,keyfilename,string)
-    if poltype.externalapi==None:
-        string='OPENMP-THREADS'+' '+str(poltype.numproc)+'\n'
-    else:
-        string='OPENMP-THREADS'+' '+str(1)+'\n'
+    string='OPENMP-THREADS'+' '+str(1)+'\n'
 
     if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
         AddKeyWord(poltype,keyfilename,string)

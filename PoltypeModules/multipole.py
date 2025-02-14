@@ -862,7 +862,7 @@ def AverageMultipoles(poltype,optmol):
     Description: 
     """
     gen_avgmpole_groups_file(poltype)
-    avgmpolecmdstr = '"' + poltype.avgmpolesexe + "\" " + poltype.keyfname + " " + poltype.xyzfname + " " + poltype.grpfname + " " + poltype.key2fnamefromavg + " " + poltype.xyzoutfile + " " + str(poltype.prmstartidx)
+    avgmpolecmdstr = 'perl ' + '"' + poltype.avgmpolesexe + "\" " + poltype.keyfname + " " + poltype.xyzfname + " " + poltype.grpfname + " " + poltype.key2fnamefromavg + " " + poltype.xyzoutfile + " " + str(poltype.prmstartidx)
     poltype.call_subsystem([avgmpolecmdstr],True)    
     prepend_keyfile(poltype,poltype.key2fnamefromavg,optmol,True)
     statexyzatominfo,oldindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=poltype.GrabXYZInfo(poltype.xyzoutfile)

@@ -3,7 +3,6 @@ import optimization as opt
 import electrostaticpotential as esp
 import torsiondatabaseparser
 import torsionfit as torfit
-import apicall as call
 import os
 import sys
 from openbabel import openbabel
@@ -1272,12 +1271,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         fulljobtolog.update(jobtolog) 
         fulljobtooutputlog.update(jobtooutputlog)
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMOptJobToLog'+'_1'+'_'+poltype.molecprefix
-    if poltype.externalapi!=None:
-        if len(optnumtofulllistofjobs['1'])!=0:
-            call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
-        finishedjobs,errorjobs=poltype.WaitForTermination(fulljobtooutputlog,False)
-    else:
-        finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
+    finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
     for torset in poltype.torlist:
         outputlogtoinitialstructure=torsettooutputlogtoinitialstructure[tuple(torset)]
         tryoutputlogs=optnumtotorsettofulloutputlogs['1'][tuple(torset)]
@@ -1361,12 +1355,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         fulljobtolog.update(jobtolog)
 
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMSPJobToLog'+'_'+poltype.molecprefix
-    if poltype.externalapi!=None:
-        if len(fulllistofjobs)!=0:
-            call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
-        ofinshedjobs,oerrorjobs=poltype.WaitForTermination(fulljobtooutputlog,False)
-    else:
-        ofinishedjobs,oerrorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
+    ofinishedjobs,oerrorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
 
     for torset in poltype.torlist:
         newphaselist=[]

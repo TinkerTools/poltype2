@@ -20,7 +20,6 @@ from scipy import optimize
 import shutil
 import copy
 import traceback
-import apicall as call
 from scipy.interpolate import interp1d
 from PyAstronomy import pyasl
 
@@ -278,7 +277,6 @@ def myFUNC(params,poltype,vdwtypes,idxtotype,count):
     for cmdidx in range(len(cmdarray)):
         cmd=cmdarray[cmdidx]
         filename=filenamearray[cmdidx]
-        poltype.call_subsystem([cmd],True)
         temp={cmd:filename} 
         finishedjobs,errorjobs=poltype.WaitForTermination(temp,False)
 
@@ -1145,12 +1143,7 @@ def ExecuteSPJobs(poltype,qmfilenamearray,prefix):
     fulljobtolog=dict(zip(listofjobs, lognames)) 
     fulljobtooutputlog.update(jobtooutputlog)
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMSPJobToLog'+'_'+prefix
-    if poltype.externalapi!=None:
-        if len(listofjobs)!=0:
-            call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
-        finshedjobs,errorjobs=poltype.WaitForTermination(fulljobtooutputlog,False)
-    else:
-        finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
+    finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
 
     return outputfilenames
 

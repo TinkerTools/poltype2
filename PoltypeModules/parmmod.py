@@ -61,10 +61,6 @@ def read_txyz_to_rdmol(ftxyz):
     logging.info("Read molecule %s"%(rdmolfiles.MolToSmiles(m1)))
     return m1
 
-    #tmpfile = "tmp_convert.pdb"
-    #txyz_to_pdb(ftxyz, tmpfile)
-    #m1 = rdmolfiles.MolFromPDBFile(tmpfile, removeHs=False)
-    #return m1
 
 def read_txyz_atomtypes(ftxyz):
     atypes = []
