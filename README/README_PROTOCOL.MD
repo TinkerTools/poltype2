@@ -35,23 +35,6 @@
 
 [Non-aromatic Ring Torsions](#non-aromatic-ring-torsions)
 
-
-### Automated AMOEBA Molecular Dynamics and Free Energy Prediciton - How It Works
-
-[Box Setup](#box-setup)
-
-[Charge Correction For Charged Ligand HFE](#charge-correction-for-charged-ligand-hfe)
-
-[Minimization](#minimization)
-
-[Equilibration](#equilibration)
-
-[Production Dynamics and Free Energy Prediction](#production-dynamics-and-free-energy-prediction)
-
-[Tinker Key Defaults](#tinker-key-defaults)
-
-
-
 [AMOEBA Publications](#amoeba-publications)
 
 [Developer Notes](#developer-notes)
@@ -245,118 +228,10 @@
 * Otherwise, they are assigned the value of zero in the prefit tinker key file, and the boundaries are defined the same as in 1D torsion fitting procedure.
 
 
-### Box Setup
-
-*	For binding free energy computation, if a PDB is provided instead of a tinker XYZ file, then the tinker program pdbxyz is used to generate the XYZ file. This may result in adding additional hydrogens if missing from the PDB file (according to the residue label). 
-*	The user can choose a preequilibrated large water box (default is to not use preequilbriated box) to be used and trimmed to the appropriate box size (determined below). This allows a default shorter total equilibration time.
-*	The box size is computed by taking the longest dimension of protein or ligand and add a buffer length. For proteins-ligand complexes the buffer length is 20 angstroms. For ligand systems, the buffer length is 2*(vdwcutoff)+6, where the vdwcutoff default is 12 angstroms. For hydration free energy of charged ligand, the box size is set to max(50,longestdim+2*(vdwcutoff)+6), this is to offset the potential shift due to PME neutralizing plasma and polarization artifacts in PBC (doi: 10.1021/ct500195p). 
-* If not using preequilibrated box then,
-  *	The total number of waters based on box volume and the density of water.
-  *	The TINKER program xyzedit is used to create solvent box based on total water number. The ligand, or protein-ligand complex is then soaked in the solvent box.
-*	For binding free energy computations, physiological counterions are added to mimic the interior of a cell. A default of 100 mM of KCl is added.
-*	Additionally for binding free energy computations, neutralizing ions are added to the box in order to ensure the net charge of the box remains 0 during alchemical free energy perturbation. The number of ions added is dependent on the net charge of the box system. 
-*	For HFE simulations, if the ligand is charged, by default a box containing counter ions (ion box) is created and will be added to the thermodynamic cycle to compute the “salt hydration free energy”, which is generally what experimentalists are able to measure. Computing the free energy changes of the counterions will cancel out the charge correction HFE effects that are typically added to obtain HFE of only the charged ligand. See charge correction section below.  
-* For neat liquid simulation, an input density (via keyword) is required, in order to determine the number of molecules based on density and box volume to add to the box. 
-
-### Charge Correction For Charged Ligand HFE
-* In decoupling simulation our solute never really crosses an interface. 
-* The surface potential has been calculated using force fields by integrating charge density from gas to solution (in the z direction for a slab of water doi: 10.1021/ct700098z).
-* This effect cancels out when computing the salt hydration free energy, where a box of counter ions is added with the same thermodynamic cycle as the water box. The salt hydration free energy is the HFE of just the water box plus HFE of the counter ion box.
-* There is also a potential shift due to PME neutralizing plasma and polarization artifacts in PBC (infinite lattice). These terms disappears when the box is large relative to the ligand. For ions, 45-50 angstroms is adequte. 
-
-### Minimization
-*	If the box is not square (should be square by default), then check if the length between any two box dimensions is > 10 angstroms. If so, then need to add restraints on two alpha carbons on protein that are on opposite sides to prevent rotation of protein within the rectangular box. 
-*	The protein, ligands and any waters/ions detected in pocket is then restrained (or only ligand for solvation) with radius of 0 angstroms (lets the solvent relax). Default restraint force constant is 5 kcal/mol/angstrom. 
-*	The system is then minimized to a default gradient of 10 kcal/mol
-
-### Equilibration
-*	For binding free energy computations, if restraint groups are not defined by user input, then automatically determine them based on minimized box structure for all ligands.
-    *	The algorithm finds the closest heavy atom to the ligand COM and determines this to be group 1. The algorithm then finds all alpha carbons (or just carbons if not protein) and iteratively computes COM between a possible group (minimum 4 carbons, maximum of 10) of carbons from host and the chosen ligand atom. If the distance between the COM of each group is less than tolerance of 1 angstroms the program determines the restraints as acceptable and uses as group 2. 
-    *	If the COM between the two restraint groups is too far, this can lead to poor convergence for equilibration. 
-*   For charged ligand HFE, the ion box equilibriation time is set to 1 ns of only NPT at the equilbrium temperature. 
-*   For water boxes, there is a default total equilibration time of 2 ns in NVT up to and including the final temperature and a final .5 ns in NVT at the last temperature (to add more time in final temperature) and a final 1 ns of NPT equilibration at the final temperature to determine the box size. Otherwise, defaults are 4 ns for NVT + .5 ns at final NVT temperature and 1 ns for final NPT.
-*   Flat bottom restraints are used by default. For each temperature, the group restraint constant approaches 0 until equilibrium temperature is reached.  
-*	Additionally, for the protein-ligand complexation box, protein atoms and waters/ions detected in pocket are restrained during equilibration (with a default radius of 2 angstroms) with a force constant that approaches 0 (and starts from 5 kcal/mol/angstrom) as the temperature reaches equilibrium.  
-*	Each simulation corresponding to each temperature, restraint-constant and ensemble (NVT or NPT) tuple are simulated. 50,100,150,200,300,300 is the default temperature scheme for NVT, with a corresponding restraint constant scheme of 5,2,1,.5,.1,0. 
-*	If NVT production dynamics is used (default is NPT production dynamics), the box size from NPT dynamics output is averaged and added to the keyfile. 
-*	Protein atom positions restraints are now removed (only the ones restraining all protein atoms, not for protein rotational restraints). 
-*	The the last frame from dynamics trajectory is used as the starting point for production dynamics. 
-
-
-### Production Dynamics and Free Energy Prediction
-*	BAR is used for alchemical free energy perturbation via electrostatic and van der Waals decoupling between the system and the environment. Typically, the system consists of the ligand, whereas the environment is the host and surrounding water and ions.  The default electrostatic, vdW is shown below, where E is for electrostatics, V for van der Waals and R for restraints (used for host-guest complexes).
-*	For host-guest complexes, there is an additional group restraint scheme (only for ligands that are being annihilated), such that at full electrostatics and vdW there are no group restraints. For the rest of the electrostatic and vdW pairs, the restraint is used at 100% (default of 10 kcal/mol/angstrom flat bottom restraint).
-*	For each set of lambda values (scaling the interaction betweem ligand and enviroemnt and inside ligand), one needs to perform one MD simulation. Then BAR is then used to analyze the dG between neighboring steps i and j, using the arc files from MD simulation i and j. The total free energy is then sum of 1-2, 2-3, ...N-1 and N. See this reference for examples: J Comput Chem. 2017 Sep 5;38(23):2047-2055.
-*	A folder for complexation and/or solvation simulations is generated. Keywords for each electrostatic, vdW, restraint force constant tuples are added to the keyfiles in each folder. The last frame from equilibration is copied to each folder as the starting point for production dynamic simulations.
-*	For binding free energy simulations, counterions charges are modified corresponding to each electrostatic lambda step (only N are modified where N is charge of ligand). This allows for the net charge of the box to reman 0 during simulation to avoid charge artifacts from ewald. 
-*	For binding free energy, in the last perturbation step with 0 electrostatics, 0 vdW and full group restraints, a correction for the free energy is added (for all ligands disappeared) since there should be no interaction between the ligand and protein in the final step. The restraint in the last step is used to improve sampling and the correction is an analytical entropic correction computed automatically (JACS v126, NO. 24, 2004). 
-*	Unlike HFE, for binding free energy there is no need for gas-phase simulation since the end states of the guest-water vs. guest-host cancels.
-*	For HFE, if the ligand is larger than 4 bonds in end-end distance, than an additional keyword is added to keyfiles to “annihilate” the intramolecular vdW interactions within the ligand during the decoupling process. Then additional folders for regrowing the intramolecular interactions in gas phase are added using the same perturbation scheme above for electrostatics and vdW.
-*	For HFE, if the ligand is charged and if the user wants to compute the salt hydration free energy (enabled by default), then additional folders are added with counterions (number depends on net charge of ligand), using the same electrostatic and vdW scheme as above. These are added to the thermodynamic cycle to cancel out charge HFE correction effects. 
-*	If the user wishes to perturb parameters by addition additional keyfiles, Poltype will interpolate (by default with 1 interpolation between each keyfile) keyfiles and add additional folders allowing perturbation in the thermodynamic cycle to other parameter sets. By default, new dynamics needs to be generated for each perturbed key file, however optionally free energy perturbation can be used instead of BAR, where the dynamics trajectory of the neighboring parameter set in the thermodynamic cycle is used instead. 
-*	By default, NPT is used for production dynamics with 5 ns total and a 2 fs time step (.1 fs for gas phase via RESPA). 
-*	Output free energy changes, enthalpy changes, entropy changes are recorded and tabulated in CSV files for user convenience. 
-
-```
- E    V    R
- 1    1    0
-.9    1    1
-.8    1    1
-.7    1    1
-.6    1    1
-.5    1    1
-.4    1    1
-.3    1    1
-.2    1    1
-.1    1    1
- 0    1    1
- 0   .95   1
- 0   .9    1
- 0   .85   1
- 0   .75   1
- 0   .7    1
- 0   .67   1
- 0   .64   1
- 0   .62   1
- 0   .6    1
- 0   .58   1
- 0   .56   1
- 0   .52   1
- 0   .45   1
- 0    0    1
-```
-
-### Tinker Key Defaults
-
-```
-c-axis 34.6
-b-axis 34.6
-a-axis 34.6
-OPENMP-THREADS 1
-polarization MUTUAL
-pme-order 5
-pme-grid 64 64 64 # If speed is a concern, set this mannually to be slightly bigger than simulation box size. E.g. use 64 is box is 62.23 (1.2x is the best but slower). 
-vdw-annihilate
-vdw-correction
-neighbor-list # this below requires your box is twice the cutoff plus 2-3 angstrom buffer (done by default)
-barostat montecarlo
-polar-predict
-polar-eps 1e-05 # the induced dipole convergence threshold
-ewald-cutoff 7 # we use such small cutoff because dipole/quadrupole die off faster than point charge.
-vdw-cutoff 12
-ewald
-thermostat BUSSI
-integrator RESPA #this multi-time step integrator allows TINKER to use 2 fs time step
-archive
-parameters amoebabio18.prm
-digits 8
-```
-
-
-
 ### AMOEBA Plus
-* All the covalent terms including bond, angle, stretch-bend, opbend and torsion will use the same protocols as AMOEBA model. 
-* The non-bonded interaction parameters including atomic polarizability, van der Waals, charge penetration, charge transfer, and geometry dependent charge flux are set to match the AMOEBA+ database parameters. * To this date these parameters are still under development for a series of organic molecules. These parameters will be deposited into Poltype 2 on GitHub on available. 
+* All the covalent terms including bond, angle, stretch-bend, opbend and torsion will use the same protocols as AMOEBA model.
+* The non-bonded interaction parameters including atomic polarizability, van der Waals, charge penetration, charge transfer, and geometry dependent charge flux are set to match the AMOEBA+ database parameters. 
+* To this date these parameters are still under development for a series of organic molecules. These parameters will be deposited into Poltype 2 on GitHub on available. 
 
 ### AMOEBA Publications
 
