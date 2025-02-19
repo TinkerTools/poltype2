@@ -78,20 +78,6 @@ import lmodifytinkerkey
 
 @dataclass
 class PolarizableTyper():
-        xyzedittranslatevalue:str=''
-        xyzeditstrayvalue:str=''
-        xyzeditappendvalue:str=''
-        xyzeditperiodicvalue:str=''
-        xyzeditsoakvalue:str=''
-        xyzeditionvalue:str=''
-        xyzedittranslatestring:str='Translate All Atoms by an X,Y,Z-Vector'
-        xyzeditstraystring:str='Move Stray Molecules into Periodic Box'
-        xyzeditappendstring:str='Append a Second XYZ File to Current One'
-        xyzeditperiodicstring:str='Create and Fill a Periodic Boundary Box'
-        xyzeditsoakstring:str='Soak Current Molecule in Box of Solvent'
-        xyzeditionstring:str='Place Monoatomic Ions around a Solute'
-        needrot:bool=False
-        heavyhyd:bool=False
         maxtorresnitrogen:int=2
         skipchargecheck:bool=False
         xtbtorresconstant:float=5
@@ -555,8 +541,6 @@ class PolarizableTyper():
                             self.nposes=int(a)
                         elif 'vinaexhaustiveness' in newline:
                             self.vinaexhaustiveness=int(a)
-                        elif "heavyhyd" in newline:
-                            self.heavyhyd=self.SetDefaultBool(line,a,True)
                         elif "skipchargecheck" in newline:
                             self.skipchargecheck=self.SetDefaultBool(line,a,True)
                         elif "useuniquefilenames" in newline:

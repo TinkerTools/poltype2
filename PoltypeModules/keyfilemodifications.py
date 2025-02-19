@@ -117,22 +117,7 @@ def InsertKeyfileHeader(poltype,keyfilename):
     string='parameters '+poltype.prmfilepath+'\n'
     if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
         AddKeyWord(poltype,keyfilename,string)
-    string='archive'+'\n'
-    if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
-        AddKeyWord(poltype,keyfilename,string)
-    string='integrator '+poltype.integrator+'\n'
-    if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
-       AddKeyWord(poltype,keyfilename,string)
-    string='thermostat '+poltype.thermostat+'\n'
-    if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
-        AddKeyWord(poltype,keyfilename,string)
-    string='ewald'+'\n'
-    if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
-        AddKeyWord(poltype,keyfilename,string)
     string='vdw-cutoff '+str(poltype.vdwcutoff)+'\n'
-    if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
-        AddKeyWord(poltype,keyfilename,string)
-    string='ewald-cutoff '+str(poltype.ewaldcutoff)+'\n'
     if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
         AddKeyWord(poltype,keyfilename,string)
     string='polar-eps '+str(poltype.polareps)+'\n'
@@ -141,31 +126,15 @@ def InsertKeyfileHeader(poltype,keyfilename):
     string='polar-predict'+'\n'
     if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
         AddKeyWord(poltype,keyfilename,string)
-    string='barostat'+' '+poltype.barostatmethod+'\n'
-    if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
-        AddKeyWord(poltype,keyfilename,string)
     string='neighbor-list'+'\n'
     if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
         AddKeyWord(poltype,keyfilename,string)
     string='vdw-correction'+'\n'
     if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
         AddKeyWord(poltype,keyfilename,string)
-    string='vdw-annihilate'+'\n'
-    if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
-        AddKeyWord(poltype,keyfilename,string)
-    string='pme-grid 64 64 64'+'\n'
-    if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
-        AddKeyWord(poltype,keyfilename,string)
-    string='pme-order 5'+'\n'
-    if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
-        AddKeyWord(poltype,keyfilename,string)
     string='polarization MUTUAL'+'\n'
     if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
         AddKeyWord(poltype,keyfilename,string)
-    string='heavy-hydrogen'+'\n'
-    if poltype.heavyhyd==True:
-       if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
-           AddKeyWord(poltype,keyfilename,string)
     string='OPENMP-THREADS'+' '+str(1)+'\n'
 
     if not CheckIfStringAlreadyInKeyfile(poltype,keyfilename,string):
