@@ -1668,47 +1668,57 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             fig = plt.figure(figsize=(10,10))
             ax = fig.add_subplot(111)
             # energy profiles: mm (pre-fit), mm (post-fit), qm
-            line1, =ax.plot(mang_list,mm_energy_list,'o',color='green',label='MM1 (prefit)')
+            #line1, =ax.plot(mang_list,mm_energy_list,'o',color='green',label='MM1 (prefit)')
+            line1, =ax.plot(mang_list,mm_energy_list,'o',color=cm.tab10(2),label='MM1 (prefit)')
             xpoints=numpy.array([mang_list[i][0] for i in range(len(mang_list))])
             x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
             f = interp1d(xpoints,numpy.array(mm_energy_list), kind='quadratic')
             y_smooth=f(x_new)
-            ax.plot(x_new,y_smooth,color='green')
+            #ax.plot(x_new,y_smooth,color='green')
+            ax.plot(x_new,y_smooth,color=cm.tab10(2))
 
-            line2, =ax.plot(m2ang_list,mm2_energy_list,'o',color='red',label='MM2 (postfit)')
+            #line2, =ax.plot(m2ang_list,mm2_energy_list,'o',color='red',label='MM2 (postfit)')
+            line2, =ax.plot(m2ang_list,mm2_energy_list,'o',color=cm.tab10(3),label='MM2 (postfit)')
             xpoints=numpy.array([m2ang_list[i][0] for i in range(len(m2ang_list))])
             x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
             f = interp1d(xpoints,numpy.array(mm2_energy_list), kind='quadratic')
             y_smooth=f(x_new)
-            ax.plot(x_new,y_smooth,color='red')
+            #ax.plot(x_new,y_smooth,color='red')
+            ax.plot(x_new,y_smooth,color=cm.tab10(3))
 
-            line3, =ax.plot(qang_list,qm_energy_list,'o',color='blue',label='QM')
+            #line3, =ax.plot(qang_list,qm_energy_list,'o',color='blue',label='QM')
+            line3, =ax.plot(qang_list,qm_energy_list,'o',color=cm.tab10(0),label='QM')
             xpoints=numpy.array([qang_list[i][0] for i in range(len(qang_list))])
             x_new = numpy.linspace(xpoints.min(),xpoints.max(),500)
             f = interp1d(xpoints,numpy.array(qm_energy_list), kind='quadratic')
             y_smooth=f(x_new)
-            ax.plot(x_new,y_smooth,color='blue')
+            #ax.plot(x_new,y_smooth,color='blue')
+            ax.plot(x_new,y_smooth,color=cm.tab10(0))
 
             #ax.text(0.05, 1.1, 'RMSD(MM2,QM)=%s , RMSDRel(MM2,QM)=%s'%(round(minRMSD,2),round(minRMSDRel,2)), transform=ax.transAxes, fontsize=12,verticalalignment='top')
 
             STR_prm = f'RMSD(MM2,QM)={round(minRMSD,2)} , RMSDRel(MM2,QM)={round(minRMSDRel,2)}\n'
+            cnt_str = 0
             for testkey in write_prm_dict.keys():
                 testkeysplit=testkey.split()
                 themiddle=[testkeysplit[1],testkeysplit[2]]
                 if middle==themiddle or middle==themiddle[::-1]:
                     STR_prm += f'For TOR: {testkey} -> PRM: v1={round(write_prm_dict[testkey][1],4)} v2={round(write_prm_dict[testkey][2],4)} v3={round(write_prm_dict[testkey][3],4)}\n'
-
-
-            ax.text(0.05, 1.1, f'{STR_prm}', transform=ax.transAxes, fontsize=12,verticalalignment='top')
+                    cnt_str += 1
+            y_pos_str = 1.0 + 0.05*cnt_str
+            print('TM: y_pos_str=',y_pos_str)
+            ax.text(0.05, y_pos_str, f'{STR_prm}', transform=ax.transAxes, fontsize=12,verticalalignment='top')
 
 
             # mm + fit
-            line4, =ax.plot(mang_list,ff_list,'o',color='magenta',label='MM1+Fit')
+            #line4, =ax.plot(mang_list,ff_list,'o',color='magenta',label='MM1+Fit')
+            line4, =ax.plot(mang_list,ff_list,'o',color=cm.tab10(6),label='MM1+Fit')
             xpoints=numpy.array([mang_list[i][0] for i in range(len(mang_list))])
             x_new = numpy.linspace(xpoints.min(), xpoints.max(),500)
             f = interp1d(xpoints,numpy.array(ff_list), kind='quadratic')
             y_smooth=f(x_new)
-            ax.plot(x_new,y_smooth,color='magenta')
+            #ax.plot(x_new,y_smooth,color='magenta')
+            ax.plot(x_new,y_smooth,color=cm.tab10(6))
             if poltype.tordebugmode==True:
                 line5, =ax.plot(prepostmang_list,prepostmm_energy_list,'o',color='black',label='MM1XYZMM2Prm')
                 xpoints=numpy.array([prepostmang_list[i][0] for i in range(len(mang_list))])
@@ -1721,10 +1731,12 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             if poltype.tordebugmode==True:
                 plt.legend(handles=[line1,line2,line3,line4,line5],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
             else:
-                plt.legend(handles=[line1,line2,line3,line4],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=4)
+                plt.legend(handles=[line1,line2,line3,line4],loc=9, bbox_to_anchor=(0.5, -0.05), ncol=4, fontsize=12)
 
-            ax.set_xlabel('Dihedral Angle (degrees)')
-            ax.set_ylabel('Energy (kcal/mol)')
+            ax.set_xlabel('Dihedral Angle (degrees)', fontsize=12)
+            ax.set_ylabel('Energy (kcal/mol)', fontsize=12)
+            ax.tick_params(axis='both', which='major', labelsize=12)
+            ax.tick_params(axis='both', which='minor', labelsize=10)
 
             fig = plt.gcf()
             plt.show()
