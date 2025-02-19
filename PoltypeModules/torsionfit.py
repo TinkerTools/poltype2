@@ -318,28 +318,6 @@ def compute_mm_tor_energy(poltype,mol,torset,designatexyz,flatphaselist,keyfile 
     return rows1,rows0,rows2
 
 
-def ReadAnglesFromOutputFile(poltype,torset,newtorxyzfname):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    cartxyz=torgen.ConvertTinktoXYZ(poltype,newtorxyzfname,newtorxyzfname.replace('.xyz','_cart.xyz'))
-    angles=[]
-    themol = opt.load_structfile(poltype,cartxyz)
-    for tor in torset:
-        a,b,c,d=tor[:]
-        torang = themol.GetTorsion(a,b,c,d)
-        if torang<0:
-            torang+=360
-        angles.append(torang)
-   
-    return angles
-
-
-
 def GrabTinkerEnergy(poltype,toralzfname):
     """
     Intent:
@@ -384,39 +362,6 @@ def find_del_list(poltype,mme_list,current_ang_list):
             del_ang_list.append(current_ang_list[listidx])
     return del_ang_list
 
-def sum_xy_list(poltype,x1,y1,x2,y2):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    for xx in x1:
-        if xx in x2:
-            idx1 = x1.index(xx)
-            idx2 = x2.index(xx)
-            y2[idx2] = y1[idx1]
-
-def find_least_connected_torsion(poltype,torprmdict,toralreadyremovedlist):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    least_connected_tor = None
-    highest_clssum = 0
-    keylist = torprmdict.keys()
-
-    for chkclskey in keylist:
-        a,b,c,d = chkclskey.split()
-        cur_clssum = int(a) + int(d)
-        if (least_connected_tor is None or cur_clssum > highest_clssum) and chkclskey not in toralreadyremovedlist:
-            least_connected_tor = chkclskey
-            highest_clssum = cur_clssum
-    return least_connected_tor
 
 def prune_mme_error(poltype,indicesremoved,*arr_list):
     """

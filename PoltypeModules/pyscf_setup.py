@@ -61,31 +61,6 @@ class PySCF_init_setup():
         return
 
 
-    def read_Tinker_inp_coord(self):
-
-        """
-        This function reads the coordinate from a Tinker xyz file.
-        This function is used when the torsion scan is being done.
-        The coordinate and atom list are saved in two lists.
-
-        """
-
-        # Initialize the atom list and coordinate
-        self.mol_data_init['Atoms_list'] = []
-        self.mol_data_init['Atoms_coord'] = []
-
-        # Loop through the tinker xyz file and grab the coordinates
-        with open(f"{self.init_data['topdir']}/{self.init_data['COM_file']}", 'r') as f:
-            next(f)
-            next(f)
-            for lines in f:
-                L = lines.strip('\n').split()
-                self.mol_data_init['Atoms_list'].append(L[0])
-                self.mol_data_init['Atoms_coord'].append([float(i) for i in L[1:]])
-
-        return
-
-
     def write_xyz(self,name):
 
         """

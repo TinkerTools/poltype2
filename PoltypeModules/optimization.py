@@ -233,28 +233,6 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     return inputname,outputname
 
 
-
-
-def NumberInLine(poltype,line):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    numinline=False
-    linesplit=line.split()
-    for e in linesplit:
-        try:
-            float(e)
-            numinline=True
-        except:
-            continue
-            
-    return numinline
-
-
 def CheckIfPsi4Log(poltype,outputlog):
     """
     Intent:

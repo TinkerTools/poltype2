@@ -1262,7 +1262,11 @@ def MatchAtomIndicesSMARTSToParameterSMARTS(poltype,listforprm,parametersmartsli
         # STEP 9 
         parametersmartstomatchlen={}
         parametersmartstosmartslist={}
-        parametersmartstosmartslist,parametersmartstofoundallneighbs=MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,parametersmartstosmartslist,ls,mol,parametersmartstordkitmol,parametersmartstosmartsmatchingtoindices,parametersmartstomolsmatchingtoindices,parametersmartstordkitmolmatchingindices,parametersmartstoprmmolmatchingindices)
+        # Only try to match torsion since bond/angle etc will be assigned using lAssign 
+        # Chengwen Liu
+        # Feb 2025
+        if len(ls) == 4:
+            parametersmartstosmartslist,parametersmartstofoundallneighbs=MatchAllPossibleSMARTSToParameterSMARTS(poltype,parametersmartslist,parametersmartstosmartslist,ls,mol,parametersmartstordkitmol,parametersmartstosmartsmatchingtoindices,parametersmartstomolsmatchingtoindices,parametersmartstordkitmolmatchingindices,parametersmartstoprmmolmatchingindices)
         # STEP 10
         if len(parametersmartstosmartslist.keys())!=0:
             parametersmartstosmartslen={}
@@ -3120,9 +3124,6 @@ def MapParameterLineToTransferInfo(poltype,prms,poltypeclassestoparametersmartsa
         transferinfoline+=extraline
         if showtransferinfo==False:
             transferinfoline=extraline
-        if warn==True:
-            poltype.WriteToLog(transferinfoline)
-            warnings.warn(transferinfoline)
         prmstotransferinfo[line]=transferinfoline
 
     return prmstotransferinfo
@@ -4883,87 +4884,6 @@ def MapIndicesToCommentsAtom(poltype,atomindextoallsmarts,smartstocomment,listof
     return atomcommentstolistofsmartslist,atomindicestolistofatomcomments
 
 
-def MapIndicesToCommentsBondAngle(poltype,atomindextoallsmarts,smartstocomment,listofbondsforprm,listofanglesforprm):
-    """
-    Intent: Using dictionaries that map to only each atom for SMARTS etc, construct dictionaries for bond and angle matches   
-    Input: Dictionary of atom index -> list of SMARTS, dicionary of SMARTS -> comment, list of all bonds in molecule, list of all angles in molecule 
-    Output: Map of array of comments for each atom in bond -> list of SMARTS , map of bond indices -> list of comments , Map of array of comments for each atom in bond -> list of SMARTS , map of bond indices -> list of comments
-    Referenced By: GrabSmallMoleculeAMOEBAParameters
-    Description: 
-    1. Iterate over list bonds in molecule
-    2. Grab the SMARTS list for each atom in the bond
-    3. Generate combination of all SMARTS for each list
-    4. For each combination of SMARTS, grab the corresponding comments and add information into dictionaries
-    5. Iterate over list angles in molecule
-    6. Grab the SMARTS list for each atom in the angle
-    7. Generate combination of all SMARTS for each list
-    8. For each combination of SMARTS, grab the corresponding comments and add information into dictionaries
-    """
-    bondcommentstolistofsmartslist={}
-    bondindicestolistofbondcomments={}
-    # STEP 1
-    for bond in listofbondsforprm:
-        aindex=bond[0] 
-        bindex=bond[1] 
-        # STEP 2
-        asmartslist=atomindextoallsmarts[aindex]
-        bsmartslist=atomindextoallsmarts[bindex]
-        # STEP 3
-        combs = list(itertools.product(asmartslist,bsmartslist)) 
-        # STEP 4
-        for comb in combs:
-            asmarts=comb[0]
-            bsmarts=comb[1]
-            acomment=smartstocomment[asmarts]
-            bcomment=smartstocomment[bsmarts]
-            comments=tuple([acomment,bcomment])
-            smartslist=[asmarts,bsmarts]
-            if comments not in bondcommentstolistofsmartslist.keys():
-                bondcommentstolistofsmartslist[comments]=[]
-            if tuple(bond) not in bondindicestolistofbondcomments.keys(): 
-                bondindicestolistofbondcomments[tuple(bond)]=[]
-            if smartslist not in bondcommentstolistofsmartslist[comments]: 
-                bondcommentstolistofsmartslist[comments].append(smartslist)   
-            if comments not in bondindicestolistofbondcomments[tuple(bond)]: 
-                bondindicestolistofbondcomments[tuple(bond)].append(comments)    
-
-    anglecommentstolistofsmartslist={}
-    angleindicestolistofanglecomments={}
-    # STEP 5
-    for angle in listofanglesforprm:
-        aindex=angle[0] 
-        bindex=angle[1] 
-        cindex=angle[2] 
-        # STEP 6
-        asmartslist=atomindextoallsmarts[aindex]
-        bsmartslist=atomindextoallsmarts[bindex]
-        csmartslist=atomindextoallsmarts[cindex]
-        # STEP 7
-        combs = list(itertools.product(asmartslist,bsmartslist,csmartslist)) 
-        # STEP 8
-        for comb in combs:
-            asmarts=comb[0]
-            bsmarts=comb[1]
-            csmarts=comb[2]
-            acomment=smartstocomment[asmarts]
-            bcomment=smartstocomment[bsmarts]
-            ccomment=smartstocomment[csmarts]
-            comments=tuple([acomment,bcomment,ccomment])
-            smartslist=[asmarts,bsmarts,csmarts]
-            if comments not in anglecommentstolistofsmartslist.keys():
-                anglecommentstolistofsmartslist[comments]=[]
-            if tuple(angle) not in angleindicestolistofanglecomments.keys(): 
-                angleindicestolistofanglecomments[tuple(angle)]=[]
-            if smartslist not in anglecommentstolistofsmartslist[comments]: 
-                anglecommentstolistofsmartslist[comments].append(smartslist)   
-            if comments not in angleindicestolistofanglecomments[tuple(angle)]: 
-                angleindicestolistofanglecomments[tuple(angle)].append(comments)    
-
-    return bondcommentstolistofsmartslist,bondindicestolistofbondcomments,anglecommentstolistofsmartslist,angleindicestolistofanglecomments
-
-
-
-
 def MapIndicesToClasses(poltype,atomindextoallsmarts,smartstoatomclass,listofbondsforprm,listofanglesforprm,planarbonds):
     """
     Intent: Convert dictionaries that have atomic indices as keys to having class numbers as keys instead (parameters map from class numbers)  
@@ -5695,28 +5615,6 @@ def MergeDictionaries(poltype,add,addto):
     return addto
 
 
-def GetPolarIndexToPolarizePrm(poltype,polarprmstotransferinfo):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    polarindextopolarizeprm={}
-    for line in polarprmstotransferinfo.keys():
-        linesplit=line.split()
-        typenum=int(linesplit[1])
-        prm=float(linesplit[2])
-        for index in poltype.idxtosymclass:
-            othertypenum=poltype.idxtosymclass[index]
-            if typenum==othertypenum:
-                polarindextopolarizeprm[index]=prm   
-         
-
-    return polarindextopolarizeprm
-
-
 def TestBondAngleEquilValues(poltype):
     """
     Intent:
@@ -5898,23 +5796,6 @@ def RemoveIndicesMatchedFromExternalDatabase(poltype,indicestosmartsatomorder,in
         else:
             missingindicestosmartsatomorders[indices]=smartsatomorder
     return missingindicestosmartsatomorders
-
-
-def ExtractTransferInfo(poltype,polarprmstotransferinfo):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    polartypetotransferinfo={}
-    for polarprms,transferinfo in polarprmstotransferinfo.items():
-        linesplit=polarprms.split()
-        polartype=linesplit[1]
-        polartypetotransferinfo[polartype]=transferinfo
-
-    return polartypetotransferinfo
 
 
 def StiffenZThenBisectorAngleConstants(poltype,keyfilename):
@@ -6137,42 +6018,6 @@ def GenerateTinkerClassesToPoltypeClasses(poltype,indices):
     return tinkerclassestopoltypeclasses
 
 
-
-def ForceSameResonanceTypesSameMatches(poltype,atomindicestocomments,atomindicestosmartslist):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-
-    for atomindices,comments in atomindicestocomments.items():
-        smartslist=atomindicestosmartslist[atomindices]
-        atomindex=atomindices[0]
-        atomtype=poltype.idxtosymclass[atomindex+1]
-        equivalentindices=[]
-        for idx,typenum in poltype.idxtosymclass.items():
-            if typenum==atomtype:
-                equivalentindices.append(idx-1)
-        equivalentindextosmartslist={}
-        for idx in equivalentindices:
-            oatomindices=tuple([idx])
-            osmartslist=atomindicestosmartslist[oatomindices]
-            equivalentindextosmartslist[oatomindices]=osmartslist
-        lentoidx={}
-        for eidx,smartslist in equivalentindextosmartslist.items():
-            length=len(smartslist[0])
-            lentoidx[length]=eidx
-        maxlen=max(lentoidx.keys())
-        maxidx=lentoidx[maxlen]
-        maxsmartslist=atomindicestosmartslist[maxidx]
-        maxcomments=atomindicestocomments[maxidx]
-        atomindicestocomments[atomindices]=maxcomments
-        atomindicestosmartslist[atomindices]=maxsmartslist
-
-
-    return atomindicestocomments,atomindicestosmartslist
 
 
 def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):

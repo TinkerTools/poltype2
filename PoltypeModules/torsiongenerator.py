@@ -110,31 +110,6 @@ def DefaultMaxRange(poltype,torsions):
             poltype.rotbndtomaxrange[key]=360
 
 
-def RemoveCommentsFromKeyFile(poltype,keyfilename):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    temp=open(keyfilename,'r')
-    results=temp.readlines()
-    temp.close()
-    passedatoms=False
-    tempname='temp.key'
-    newtemp=open(tempname,'w')
-    for line in results:
-        if 'atom' in line:
-            passedatoms=True 
-        if passedatoms==True and '#' in line:
-            continue
-        else:
-            newtemp.write(line)
-    newtemp.close()
-        
-    shutil.move(tempname, keyfilename)
-
 def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,variabletorlist,torsionrestraint,mol,currentopt,optlogtophaseangle):
     """
     Intent:
@@ -1466,22 +1441,6 @@ def FindPartialDoubleBonds(poltype,rdkitmol,mol):
             if babelbond not in poltype.partialdoublebonds:
                 poltype.partialdoublebonds.append(babelbond)
 
-def RdkitIsInRing(poltype,atom):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    isinringofsize=False
-    i=None
-    for i in range(3,13+1):
-        isinringofsize=atom.IsInRingSize(i)
-        if isinringofsize==True:
-            break
-    return isinringofsize,i
-
 
 def GrabAllRingsContainingMostIndices(poltype,atomindices,babelindices,total):
     """
@@ -1720,23 +1679,6 @@ def get_all_torsions(poltype,mol):
     return
 
 
-
-
-def get_torlist_opt_angle(poltype,optmol, torlist):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    tmplist = []
-    for tor in torlist:
-        a,b,c,d=obatom2idx(poltype,tor[0:4])
-        e = optmol.GetTorsion(a,b,c,d)
-        tmplist.append([a,b,c,d,e % 360])
-    return tmplist
-
 def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndlist):
     """
     Intent:
@@ -1876,26 +1818,6 @@ def find_tor_restraint_idx(poltype,mol,b1,b2):
         return t1,t4
     else:
         return t4,t1 
-
-
-def GrabFirstHeavyAtomIdx(poltype,indices,mol):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    atoms=[mol.GetAtom(i) for i in indices]
-    atomicnums=[a.GetAtomicNum() for a in atoms]
-    
-    heavyidx=indices[0]
-    for i in range(len(indices)):
-        idx=indices[i]
-        atomnum=atomicnums[i]
-        if atomnum!=1:
-            heavyidx=idx
-    return heavyidx
 
 
 def ConvertTinktoXYZ(poltype,filename,newfilename):
@@ -2525,18 +2447,6 @@ def save_structfile(poltype,molstruct, structfname):
         tmpconv.SetOutFormat(inFormat)
     return tmpconv.WriteFile(molstruct, structfname)
 
-def save_structfileXYZ(poltype,molstruct, structfname):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-        
-    tmpconv = openbabel.OBConversion()
-    tmpconv.SetOutFormat('xyz')
-    return tmpconv.WriteFile(molstruct, structfname)
 
 def get_class_key(poltype,a, b, c, d):
     """

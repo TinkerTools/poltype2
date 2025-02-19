@@ -104,22 +104,6 @@ def RemoveFromList(poltype,atomlist,atm):
     return newatmlist
 
 
-def AtLeastOneHeavyLf1NeighbNotAtom(poltype,lf1atom,atom):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    foundatleastoneheavy=False
-    checkneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(lf1atom)]
-    for neighb in checkneighbs:
-        if neighb.GetIdx()!=atom.GetIdx() and neighb.GetAtomicNum()!=1:
-            foundatleastoneheavy=True
-    return foundatleastoneheavy
-
-
 def AtLeastOneHeavyNeighb(poltype,atom):
     """
     Intent:
@@ -135,19 +119,6 @@ def AtLeastOneHeavyNeighb(poltype,atom):
             foundatleastoneheavy=True
     return foundatleastoneheavy
 
-
-def GrabHeavyAtomIdx(poltype,lf1atom,atom):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    checkneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(lf1atom)]
-    for neighb in checkneighbs:
-        if neighb.GetIdx()!=atom.GetIdx() and neighb.GetAtomicNum()!=1:
-            return neighb.GetIdx()
 
 def FindUniqueNonRepeatingNeighbors(poltype,nlist):
     """

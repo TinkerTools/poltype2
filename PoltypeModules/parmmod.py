@@ -42,10 +42,6 @@ def txyz_to_xyz(ftxyz, fxyz):
     traj = mdtraj.load_arc(ftxyz)
     traj.save_xyz(fxyz)
 
-def txyz_to_pdb(ftxyz, fpdb):
-    traj = mdtraj.load_arc(ftxyz)
-    traj.save_pdb(fpdb)
-
 def read_txyz_to_rdmol(ftxyz):
     xyz_str = txyz_to_xyzblock(ftxyz)
     if xyz_str is None:
@@ -146,9 +142,6 @@ class ParmMod(object):
             else:
                 prm = [x]
             self._terms[term].append((smarts, prm))
-
-    def reset_terms(self):
-        self._terms = defaultdict(list)
 
     def match_atomtypes(self, ftxyz, fsdf=None):
         """Find atom types that match prm definition

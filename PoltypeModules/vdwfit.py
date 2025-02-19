@@ -1268,22 +1268,6 @@ def GenerateReferenceDistances(indextoreferencecoordinate,indextomolecule,indext
     return indexpairtoreferencedistance,indexpairtobounds,distpairs
 
 
-def GrabPairwiseDistance(pair,indexpairtoreferencedistance):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    if pair in indexpairtoreferencedistance.keys():
-        distance=indexpairtoreferencedistance[pair]
-    elif pair[::-1] in indexpairtoreferencedistance.keys():
-        distance=indexpairtoreferencedistance[pair[::-1]]
-    return distance
-
-
-
 def GenerateInitialDictionaries(coords1,coords2,atoms1,atoms2,p1,p2):
     """
     Intent:
