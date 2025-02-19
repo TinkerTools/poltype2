@@ -1,0 +1,12 @@
+# AMOEBA GK parameter matched from [#1]([CH2]([CH3]))
+solute 404 3.0205   3.885   4.0505   0.1350
+# AMOEBA GK parameter matched from [#1][CH3]
+solute 405 3.143   3.374   4.144   0.1350
+# AMOEBA GK parameter matched from [#1][O;D2][#6]
+solute 406 2.6533   3.392   2.9044   0.1350
+# AMOEBA GK parameter matched from [#6]
+solute 402 3.3025   2.854   4.9016   0.1350
+# AMOEBA GK parameter matched from [CH3]
+solute 403 3.5062   3.309   4.536   0.1350
+# AMOEBA GK parameter matched from [O;D2][#6]
+solute 401 3.1684   3.134   3.0999   0.1350

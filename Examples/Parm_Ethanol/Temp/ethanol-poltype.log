@@ -1,0 +1,1331 @@
+Wed Feb 19 10:38:01 2025 Atom Type Classification
+Wed Feb 19 10:38:01 2025 Calling: python "/home/liuchw/poltype-dev/PoltypeModules/lConformerGenerator.py" -i ethanol.sdf -p /home/liuchw/anaconda3/envs/xtbenv/bin/xtb
+Wed Feb 19 10:38:03 2025 Running on host: bme-earth.bme.utexas.edu
+Wed Feb 19 10:38:03 2025 QM Geometry Optimization
+Wed Feb 19 10:38:03 2025 The software Psi4 will be used to do the QM optimization
+Wed Feb 19 10:38:03 2025 Submitting: psi4   --loglevel 30  ethanol-opt_1.psi4 ethanol-opt_1.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+Wed Feb 19 10:38:09 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/ethanol-opt_1.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+Wed Feb 19 10:38:09 2025 Searching Database
+Wed Feb 19 10:38:13 2025 Gas Phase Single Point for GDMA
+Wed Feb 19 10:38:13 2025 Submitting: psi4   --loglevel 30  ethanol-dma.psi4 ethanol-dma.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+Wed Feb 19 10:38:19 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/ethanol-dma.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+Wed Feb 19 10:38:19 2025 Gaussian Distributed Multipole Analysis (GDMA)
+Wed Feb 19 10:38:19 2025 Submitting: /home/liuchw/Softwares/gdma-2.3.3/bin/gdma < ethanol.gdmain > ethanol.gdmaout path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+Wed Feb 19 10:38:19 2025 Local Frame Symmetry Detection
+Wed Feb 19 10:38:19 2025 Define Polarization Groups and Polarization Parameters
+Wed Feb 19 10:38:19 2025 Submitting: poledit.x 1 ethanol.gdmaout "/home/liuchw/poltype-dev/ParameterFiles/amoebabio18_header.prm" < ethanol-peditin.txt path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                       Version 8.10.1  October 2021                       ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Global Frame Cartesian Multipole Moments :
+
+ Site:       1         Name:   O         Atomic Number:       8
+
+ Coordinates:            0.893002      -0.419957      -0.600670
+
+ Charge:                 -0.38980
+ Dipole:                  0.07757        0.23781        0.21583
+ Quadrupole:              0.51704
+                         -0.03038       -0.28351
+                         -0.28880        0.40760       -0.23353
+
+ Site:       2         Name:   C         Atomic Number:       6
+
+ Coordinates:            0.223045       0.406005       0.350453
+
+ Charge:                  0.13525
+ Dipole:                  0.02917       -0.22765       -0.22909
+ Quadrupole:              0.14787
+                         -0.30088       -0.14330
+                         -0.40797        0.30381       -0.00457
+
+ Site:       3         Name:   C         Atomic Number:       6
+
+ Coordinates:           -1.243995       0.039628       0.302726
+
+ Charge:                 -0.16790
+ Dipole:                  0.20887        0.02865       -0.01621
+ Quadrupole:              0.38481
+                          0.12078       -0.18027
+                         -0.01258        0.02456       -0.20455
+
+ Site:       4         Name:   H         Atomic Number:       1
+
+ Coordinates:            0.354397       1.470478       0.110105
+
+ Charge:                  0.01197
+ Dipole:                 -0.00587        0.11556       -0.01700
+ Quadrupole:              0.01093
+                          0.01967       -0.01174
+                         -0.00654       -0.01062        0.00081
+
+ Site:       5         Name:   H         Atomic Number:       1
+
+ Coordinates:            0.620555       0.244491       1.362421
+
+ Charge:                  0.01203
+ Dipole:                  0.02208       -0.01276        0.11417
+ Quadrupole:              0.02092
+                         -0.00438       -0.00200
+                          0.01470       -0.00600       -0.01892
+
+ Site:       6         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.639439       0.212349      -0.700344
+
+ Charge:                  0.06345
+ Dipole:                 -0.03109        0.01911       -0.10494
+ Quadrupole:              0.00515
+                          0.00320       -0.01020
+                          0.01554       -0.00267        0.00506
+
+ Site:       7         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.816257       0.640064       1.015588
+
+ Charge:                  0.05521
+ Dipole:                 -0.05613        0.06114        0.07213
+ Quadrupole:              0.00687
+                         -0.00946       -0.00579
+                         -0.01403        0.01152       -0.00108
+
+ Site:       8         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.372883      -1.016515       0.548105
+
+ Charge:                  0.06354
+ Dipole:                 -0.00337       -0.10834        0.02441
+ Quadrupole:             -0.00028
+                          0.01353        0.01117
+                          0.00097       -0.00576       -0.01089
+
+ Site:       9         Name:   H         Atomic Number:       1
+
+ Coordinates:            1.837309      -0.191923      -0.580092
+
+ Charge:                  0.21623
+ Dipole:                  0.05494       -0.01312       -0.02468
+ Quadrupole:              0.13424
+                          0.07647       -0.05550
+                          0.02537        0.02378       -0.07875
+
+ Local Frame Definition for Multipole Sites :
+
+     Atom     Name      Axis Type     Z Axis  X Axis  Y Axis
+
+       1      O         Z-then-X         2       9       0
+       2      C         Z-then-X         1       3       0
+       3      C         Z-then-X         2       1       0
+       4      H         Z-then-X         2       1       0
+       5      H         Z-then-X         2       1       0
+       6      H         Z-then-X         3       2       0
+       7      H         Z-then-X         3       2       0
+       8      H         Z-then-X         3       2       0
+       9      H         Z-then-X         1       2       0
+
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Choose Either the AMOEBA, AMOEBA+ or HIPPO Polarization Model [A] : 
+ Polarizability Parameters for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      O            0.8370         0.3900
+       2      C            1.3340         0.3900
+       3      C            1.3340         0.3900
+       4      H            0.4960         0.3900
+       5      H            0.4960         0.3900
+       6      H            0.4960         0.3900
+       7      H            0.4960         0.3900
+       8      H            0.4960         0.3900
+       9      H            0.4960         0.3900
+
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Enter Atom Number, Polarizability & Thole Values :  
+ Atomic Polarizabilities for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      O            0.8120         0.3900
+       2      C            1.6200         0.3900
+       3      C            1.4150         0.3900
+       4      H            0.4800         0.3900
+       5      H            0.4800         0.3900
+       6      H            0.4800         0.3900
+       7      H            0.4800         0.3900
+       8      H            0.4800         0.3900
+       9      H            0.4570         0.3900
+
+ Choose Method for Division into Polarization Groups :
+
+    (1) Put All Atoms in One Polarization Group
+    (2) Separate into Groups at Rotatable Bonds
+    (3) Manual Entry of Bonds Separating Groups
+
+ Enter the Number of the Desired Choice [1] :  
+ Polarization Groups for Multipole Sites :
+
+     Atom     Name       Polarization Group Definition
+
+       1      O               2     9
+       2      C               1     4     5
+       3      C               6     7     8
+       4      H               2
+       5      H               2
+       6      H               3
+       7      H               3
+       8      H               3
+       9      H               1
+
+ Electrostatic and Polarization Scale Factors :
+
+                    1-2         1-3         1-4         1-5
+
+ M-Scale:         0.0000      0.0000      0.4000      0.8000
+ P-Inter:         0.0000      0.0000      1.0000      1.0000
+ P-Intra:         0.0000      0.0000      0.5000      1.0000
+ W-Scale:         1.0000      1.0000      1.0000      1.0000
+
+                    1-1         1-2         1-3         1-4
+
+ D-Scale:         0.0000      1.0000      1.0000      1.0000
+ U-Scale:         1.0000      1.0000      1.0000      1.0000
+
+ Use Thole Damping:           True
+
+ Use Direct Damping:           False
+ Charge Penetration:          False
+ Set D Equal to P:            False
+
+ Determination of Intergroup Induced Dipoles :
+
+    Iter        RMS Change (Debye)
+
+       1           0.0123621241
+       2           0.0045123406
+       3           0.0003811714
+       4           0.0001533601
+       5           0.0000230103
+       6           0.0000058233
+       7           0.0000007166
+
+ Local Frame Intergroup Induced Dipole Moments (Debye) :
+
+    Atom              X           Y           Z         Total
+
+       1           0.0431     -0.0000     -0.0135      0.0452
+       2           0.3164      0.0000     -0.1455      0.3483
+       3           0.0815     -0.0001     -0.0537      0.0976
+       4           0.0149      0.0291     -0.0154      0.0361
+       5           0.0150     -0.0290     -0.0154      0.0361
+       6           0.0215     -0.0254     -0.0284      0.0438
+       7          -0.0268      0.0001     -0.0003      0.0268
+       8           0.0217      0.0254     -0.0286      0.0440
+       9           0.0232     -0.0000      0.0101      0.0253
+
+ Condense Symmetric Atoms to Equivalent Types [Y] :  
+ Remove Multipole Components Zeroed by Symmetry [Y] :  
+ Final Atomic Multipole Moments after Regularization :
+
+ Atom:       1         Name:   O         Atomic Number:       8
+
+ Local Frame:            Z-then-X             2       9       0
+
+ Charge:                 -0.38978
+ Dipole:                  0.20455        0.00000        0.25045
+ Quadrupole:              0.26668
+                          0.00000       -0.69380
+                         -0.29006        0.00000        0.42712
+
+ Atom:       2         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X             1       3       0
+
+ Charge:                  0.13525
+ Dipole:                  0.00293        0.00000        0.35545
+ Quadrupole:             -0.24757
+                          0.00000       -0.38845
+                         -0.24926        0.00000        0.63602
+
+ Atom:       3         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X             2       1       0
+
+ Charge:                 -0.16790
+ Dipole:                  0.00021        0.00000        0.23011
+ Quadrupole:             -0.17602
+                          0.00000       -0.23140
+                          0.03602        0.00000        0.40742
+
+ Atom:       4         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             2       1       0
+
+ Charge:                  0.01197
+ Dipole:                 -0.02417        0.00000       -0.10887
+ Quadrupole:             -0.00074
+                          0.00000        0.00216
+                         -0.02259        0.00000       -0.00142
+
+ Atom:       5         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             2       1       0
+
+ Charge:                  0.01203
+ Dipole:                 -0.02420        0.00000       -0.10892
+ Quadrupole:             -0.00066
+                          0.00000        0.00212
+                         -0.02262        0.00000       -0.00146
+
+ Atom:       6         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             3       2       0
+
+ Charge:                  0.06345
+ Dipole:                  0.00111        0.00000       -0.09951
+ Quadrupole:             -0.00247
+                          0.00000       -0.01296
+                          0.01096        0.00000        0.01543
+
+ Atom:       7         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             3       2       0
+
+ Charge:                  0.05521
+ Dipole:                  0.01220        0.00000       -0.10984
+ Quadrupole:             -0.00750
+                          0.00000       -0.01543
+                          0.00708        0.00000        0.02293
+
+ Atom:       8         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             3       2       0
+
+ Charge:                  0.06354
+ Dipole:                  0.00110        0.00000       -0.09942
+ Quadrupole:             -0.00249
+                          0.00000       -0.01295
+                          0.01106        0.00000        0.01544
+
+ Atom:       9         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             1       2       0
+
+ Charge:                  0.21623
+ Dipole:                 -0.04546        0.00000       -0.05378
+ Quadrupole:             -0.06330
+                          0.00000       -0.09656
+                         -0.03556        0.00000        0.15986
+Wed Feb 19 10:38:19 2025 Submitting: potential.x 1 ethanol.xyz -k ethanol_prefitmultipole.key path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                       Version 8.10.1  October 2021                       ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+        1     1     O     ethanol                      8     15.999     2
+        2     2     C     ethanol                      6     12.011     4
+        3     3     C     ethanol                      6     12.011     4
+        4     4     H     ethanol                      1      1.008     1
+        5     5     H     ethanol                      1      1.008     1
+        6     6     H     ethanol                      1      1.008     1
+        7     7     H     ethanol                      1      1.008     1
+        8     8     H     ethanol                      1      1.008     1
+        9     9     H     ethanol                      1      1.008     1
+
+ Electrostatic Potential Grid Points :                  6955
+
+ Gaussian CUBEGEN Input Written To :   ethanol.grid
+
+ Next, run the Gaussian CUBEGEN program; for example:
+
+ cubegen 0 potential=MP2 FILE.fchk FILE.cube -5 h < FILE.grid
+
+ Replace FILE with base file name and MP2 with density label;
+ After CUBEGEN, rerun Tinker POTENTIAL program using Option 2
+Wed Feb 19 10:38:19 2025 Gas Phase High Level Single Point for Multipole Refinement
+Wed Feb 19 10:38:19 2025 Submitting: psi4   --loglevel 30  ethanol-esp.psi4 ethanol-esp.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+Wed Feb 19 10:38:38 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/ethanol-esp.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+Wed Feb 19 10:38:38 2025 Calling: Generating CUBE File from PSI4
+Wed Feb 19 10:38:38 2025 Submitting: potential.x 2 ethanol_fortinker.cube path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                       Version 8.10.1  October 2021                       ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Electrostatic Potential Written To :  ethanol_fortinker.pot
+Wed Feb 19 10:38:38 2025 Average Multipoles Via Symmetry
+Wed Feb 19 10:38:38 2025 Submitting: perl "/home/liuchw/poltype-dev/PoltypeModules/avgmpoles.pl" ethanol_prefitmultipole.key ethanol.xyz ethanol-groups.txt ethanol.key_2 ethanol.xyz_2 401 path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+Wed Feb 19 10:38:38 2025 Electrostatic Potential Optimization
+Wed Feb 19 10:38:38 2025 Submitting: potential.x 6 combined.xyz -k ethanol.key_2 combined.pot N 0.1 path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                       Version 8.10.1  October 2021                       ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      401   401     O     ethanol                      8     15.999     2
+      402   402     C     ethanol                      6     12.011     4
+      403   403     C     ethanol                      6     12.011     4
+      404   404     H     ethanol                      1      1.008     1
+      405   405     H     ethanol                      1      1.008     1
+      406   406     H     ethanol                      1      1.008     1
+
+ Electrostatic Potential Grid Points :                  6955
+
+ Electrostatic Parameter Restraint Value :            1.0000
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      401   401     O     ethanol                      8     15.999     2
+      402   402     C     ethanol                      6     12.011     4
+      403   403     C     ethanol                      6     12.011     4
+      404   404     H     ethanol                      1      1.008     1
+      405   405     H     ethanol                      1      1.008     1
+      406   406     H     ethanol                      1      1.008     1
+
+ Additional Atomic Multipole Parameters :
+
+     Atom Type     Coordinate Frame Definition         Multipole Moments
+
+         401      402    406      0   Z-then-X    -0.38978
+                                                   0.20455  0.00000  0.25045
+                                                   0.26668
+                                                   0.00000 -0.69380
+                                                  -0.29006  0.00000  0.42712
+
+         402      401    403      0   Z-then-X     0.13525
+                                                   0.00293  0.00000  0.35545
+                                                  -0.24757
+                                                   0.00000 -0.38845
+                                                  -0.24926  0.00000  0.63602
+
+         403      402    401      0   Z-then-X    -0.16790
+                                                   0.00021  0.00000  0.23011
+                                                  -0.17602
+                                                   0.00000 -0.23140
+                                                   0.03602  0.00000  0.40742
+
+         404      402    401      0   Z-then-X     0.01200
+                                                  -0.02419  0.00000 -0.10890
+                                                  -0.00070
+                                                   0.00000  0.00214
+                                                  -0.02261  0.00000 -0.00144
+
+         405      403    402      0   Z-then-X     0.06073
+                                                   0.00480  0.00000 -0.10292
+                                                  -0.00415
+                                                   0.00000 -0.01378
+                                                   0.00970  0.00000  0.01793
+
+         406      401    402      0   Z-then-X     0.21623
+                                                  -0.04546  0.00000 -0.05378
+                                                  -0.06330
+                                                   0.00000 -0.09656
+                                                  -0.03556  0.00000  0.15986
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha       Thole     Group Atom Types
+
+         401             0.812       0.390         402  406
+         402             1.620       0.390         401  404
+         403             1.415       0.390         405
+         404             0.480       0.390         402
+         405             0.480       0.390         403
+         406             0.457       0.390         401
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1         979        -8.3265        -8.8108         0.6303
+        1        2         169         4.1024         3.9430         0.5917
+        1        3         490        -2.2886        -1.0539         1.3067
+        1        4         857         3.1399         3.0126         0.5543
+        1        5         857         3.1213         2.9989         0.5601
+        1        6         831        -3.0428        -2.4867         0.6708
+        1        7         894         1.2950         1.9374         0.7010
+        1        8         834        -3.0725        -2.5173         0.6708
+        1        9        1044         5.3012         4.3681         0.9523
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.2319
+ Average Potential Magnitude for Model :              4.0687
+ Average Potential Value for Target :                -0.1722
+ Average Potential Magnitude for Target :             3.8669
+
+ Average Signed Potential Difference :               -0.0597
+ Average Unsigned Potential Difference :              0.6442
+ Root Mean Square Potential Difference :              0.7538
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value         Fixed
+
+    --            401             Monopole          -0.38978          X
+     1            401             X-Dipole           0.20455
+    --            401             Y-Dipole           0.00000          X
+     2            401             Z-Dipole           0.25045
+     3            401             XX-Quad            0.26668
+    --            401             XY-Quad            0.00000          X
+     4            401             XZ-Quad           -0.29006
+     5            401             YY-Quad           -0.69380
+    --            401             YZ-Quad            0.00000          X
+    --            401             ZZ-Quad            0.42712
+    --            402             Monopole           0.13525          X
+     6            402             X-Dipole           0.00293
+    --            402             Y-Dipole           0.00000          X
+     7            402             Z-Dipole           0.35545
+     8            402             XX-Quad           -0.24757
+    --            402             XY-Quad            0.00000          X
+     9            402             XZ-Quad           -0.24926
+    10            402             YY-Quad           -0.38845
+    --            402             YZ-Quad            0.00000          X
+    --            402             ZZ-Quad            0.63602
+    --            403             Monopole          -0.16790          X
+    11            403             X-Dipole           0.00021
+    --            403             Y-Dipole           0.00000          X
+    12            403             Z-Dipole           0.23011
+    13            403             XX-Quad           -0.17602
+    --            403             XY-Quad            0.00000          X
+    14            403             XZ-Quad            0.03602
+    15            403             YY-Quad           -0.23140
+    --            403             YZ-Quad            0.00000          X
+    --            403             ZZ-Quad            0.40742
+    --            404             Monopole           0.01200          X
+    16            404             X-Dipole          -0.02419
+    --            404             Y-Dipole           0.00000          X
+    17            404             Z-Dipole          -0.10890
+    18            404             XX-Quad           -0.00070
+    --            404             XY-Quad            0.00000          X
+    19            404             XZ-Quad           -0.02261
+    20            404             YY-Quad            0.00214
+    --            404             YZ-Quad            0.00000          X
+    --            404             ZZ-Quad           -0.00144
+    --            405             Monopole           0.06073          X
+    21            405             X-Dipole           0.00480
+    --            405             Y-Dipole           0.00000          X
+    22            405             Z-Dipole          -0.10292
+    23            405             XX-Quad           -0.00415
+    --            405             XY-Quad            0.00000          X
+    24            405             XZ-Quad            0.00970
+    25            405             YY-Quad           -0.01378
+    --            405             YZ-Quad            0.00000          X
+    --            405             ZZ-Quad            0.01793
+    --            406             Monopole           0.21623          X
+    26            406             X-Dipole          -0.04546
+    --            406             Y-Dipole           0.00000          X
+    27            406             Z-Dipole          -0.05378
+    28            406             XX-Quad           -0.06330
+    --            406             XY-Quad            0.00000          X
+    29            406             XZ-Quad           -0.03556
+    30            406             YY-Quad           -0.09656
+    --            406             YZ-Quad            0.00000          X
+    --            406             ZZ-Quad            0.15986
+
+ Levenberg-Marquardt Nonlinear Least Squares :
+
+ LS Iter     F Value      Total G     Active G    N Active   F Calls
+
+     0     1976.1280    2600.8291    2600.8291        30        31
+     1       65.5376      74.6537      74.6537        30        62
+     2       37.8794       4.7076       4.7076        30        93
+     3       30.7347       2.3255       2.3255        30       124
+     4       26.8767       0.0003       0.0003        30       155
+
+ SQUARE  --  Normal Termination of Least Squares
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value         Fixed
+
+    --            401             Monopole          -0.38978          X
+     1            401             X-Dipole           0.17179
+    --            401             Y-Dipole           0.00000          X
+     2            401             Z-Dipole           0.31930
+     3            401             XX-Quad            0.24679
+    --            401             XY-Quad            0.00000          X
+     4            401             XZ-Quad           -0.28085
+     5            401             YY-Quad           -0.80039
+    --            401             YZ-Quad            0.00000          X
+    --            401             ZZ-Quad            0.55360
+    --            402             Monopole           0.13525          X
+     6            402             X-Dipole           0.13158
+    --            402             Y-Dipole           0.00000          X
+     7            402             Z-Dipole           0.30460
+     8            402             XX-Quad           -0.25199
+    --            402             XY-Quad            0.00000          X
+     9            402             XZ-Quad           -0.27717
+    10            402             YY-Quad           -0.32106
+    --            402             YZ-Quad            0.00000          X
+    --            402             ZZ-Quad            0.57305
+    --            403             Monopole          -0.16790          X
+    11            403             X-Dipole          -0.00826
+    --            403             Y-Dipole           0.00000          X
+    12            403             Z-Dipole           0.21114
+    13            403             XX-Quad           -0.20454
+    --            403             XY-Quad            0.00000          X
+    14            403             XZ-Quad            0.01840
+    15            403             YY-Quad           -0.19027
+    --            403             YZ-Quad            0.00000          X
+    --            403             ZZ-Quad            0.39481
+    --            404             Monopole           0.01200          X
+    16            404             X-Dipole          -0.00793
+    --            404             Y-Dipole           0.00000          X
+    17            404             Z-Dipole          -0.09499
+    18            404             XX-Quad            0.01362
+    --            404             XY-Quad            0.00000          X
+    19            404             XZ-Quad           -0.02794
+    20            404             YY-Quad            0.04529
+    --            404             YZ-Quad            0.00000          X
+    --            404             ZZ-Quad           -0.05891
+    --            405             Monopole           0.06073          X
+    21            405             X-Dipole           0.01572
+    --            405             Y-Dipole           0.00000          X
+    22            405             Z-Dipole          -0.05098
+    23            405             XX-Quad            0.01088
+    --            405             XY-Quad            0.00000          X
+    24            405             XZ-Quad            0.00772
+    25            405             YY-Quad           -0.01088
+    --            405             YZ-Quad            0.00000          X
+    --            405             ZZ-Quad            0.00000          X
+    --            406             Monopole           0.21623          X
+    26            406             X-Dipole          -0.03847
+    --            406             Y-Dipole           0.00000          X
+    27            406             Z-Dipole          -0.06837
+    28            406             XX-Quad           -0.00475
+    --            406             XY-Quad            0.00000          X
+    29            406             XZ-Quad           -0.01190
+    30            406             YY-Quad           -0.10145
+    --            406             YZ-Quad            0.00000          X
+    --            406             ZZ-Quad            0.10620
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1         979        -8.8225        -8.8108         0.0751
+        1        2         169         3.8723         3.9430         0.1119
+        1        3         490        -1.0933        -1.0539         0.0786
+        1        4         857         2.9891         3.0126         0.0541
+        1        5         857         2.9722         2.9989         0.0566
+        1        6         831        -2.5142        -2.4867         0.0563
+        1        7         894         1.9140         1.9374         0.0579
+        1        8         834        -2.5448        -2.5173         0.0570
+        1        9        1044         4.3271         4.3681         0.0645
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Potential Value for Model :                 -0.2002
+ Average Potential Magnitude for Model :              3.8610
+ Average Potential Value for Target :                -0.1722
+ Average Potential Magnitude for Target :             3.8669
+
+ Average Signed Potential Difference :               -0.0281
+ Average Unsigned Potential Difference :              0.0427
+ Root Mean Square Potential Difference :              0.0641
+Wed Feb 19 10:38:38 2025 Assign bonded parameters using DatabaseParser
+Wed Feb 19 10:38:38 2025 Submitting: cat valence_init.dat >> tmpbonded.key path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+Wed Feb 19 10:38:38 2025 Submitting: python /home/liuchw/poltype-dev/PoltypeModules/lDatabaseParser/lAssignAMOEBAplusPRM.py -xyz ethanol.xyz_2 -key tmpbonded.key -sdf ethanol.sdf -potent BONDED path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+[93mUsing SDF file to determine SMARTS types [0m
+[92mBOND stretching parameter assigned for bond 401-402[0m
+[92mBOND stretching parameter assigned for bond 401-406[0m
+[92mBOND stretching parameter assigned for bond 402-403[0m
+[92mBOND stretching parameter assigned for bond 402-404[0m
+[92mBOND stretching parameter assigned for bond 403-405[0m
+[92mANGLE bending parameter found for angle 402-401-406[0m
+[92mANGLE bending parameter found for angle 401-402-403[0m
+[92mANGLE bending parameter found for angle 401-402-404[0m
+[92mANGLE bending parameter found for angle 403-402-404[0m
+[92mANGLE bending parameter found for angle 404-402-404[0m
+[92mANGLE bending parameter found for angle 402-403-405[0m
+[92mANGLE bending parameter found for angle 405-403-405[0m
+[92mSTRBND coupling parameter found for angle 402-401-406[0m
+[92mSTRBND coupling parameter found for angle 401-402-403[0m
+[92mSTRBND coupling parameter found for angle 401-402-404[0m
+[92mSTRBND coupling parameter found for angle 403-402-404[0m
+[92mSTRBND coupling parameter found for angle 404-402-404[0m
+[92mSTRBND coupling parameter found for angle 402-403-405[0m
+[92mSTRBND coupling parameter found for angle 405-403-405[0m
+[93mUsing SDF file to determine SMARTS types [0m
+Wed Feb 19 10:38:39 2025 Assign Van der Waals and GK parameters using DatabaseParser
+Wed Feb 19 10:38:39 2025 Submitting: python /home/liuchw/poltype-dev/PoltypeModules/lDatabaseParser/lAssignAMOEBAplusPRM.py -xyz ethanol.xyz_2 -key tmpnonbonded.key -sdf ethanol.sdf -potent VDW GK path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+[93mUsing SDF file to determine SMARTS types [0m
+[92mVdW parameters found for 401[0m
+[92mVdW parameters found for 402[0m
+[92mVdW parameters found for 403[0m
+[92mVdW parameters found for 404[0m
+[92mVdW parameters found for 405[0m
+[92mVdW parameters found for 406[0m
+[93mUsing SDF file to determine SMARTS types [0m
+# AMOEBA GK parameter matched from [#1]([CH2]([CH3]))
+[92msolute 404 3.0205   3.885   4.0505   0.1350
+[0m
+# AMOEBA GK parameter matched from [#1][CH3]
+[92msolute 405 3.143   3.374   4.144   0.1350
+[0m
+# AMOEBA GK parameter matched from [#1][O;D2][#6]
+[92msolute 406 2.6533   3.392   2.9044   0.1350
+[0m
+# AMOEBA GK parameter matched from [#6]
+[92msolute 402 3.3025   2.854   4.9016   0.1350
+[0m
+# AMOEBA GK parameter matched from [CH3]
+[92msolute 403 3.5062   3.309   4.536   0.1350
+[0m
+# AMOEBA GK parameter matched from [O;D2][#6]
+[92msolute 401 3.1684   3.134   3.0999   0.1350
+[0m
+Wed Feb 19 10:38:39 2025 Submitting: minimize.x testbondangleequilvalues.xyz -k testbondangleequilvalues.key 0.1 > testbondangleequilvalues.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+Wed Feb 19 10:38:39 2025 Submitting: analyze.x testbondangleequilvalues.xyz_2 -k testbondangleequilvalues.key  d > testbondangleequilvaluesalz.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+Wed Feb 19 10:38:40 2025 Submitting: python /home/liuchw/poltype-dev/PoltypeModules/lDatabaseParser/lAssignAMOEBAplusPRM.py -xyz ethanol.xyz_2 -key ethanol_prefitvdw.key -sdf ethanol.sdf -potent TORSION path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+[93mUsing SDF file to determine SMARTS types [0m
+Wed Feb 19 10:38:40 2025 Relaxed Torsion Scan and Fitting
+Wed Feb 19 10:38:40 2025 Submitting: minimize.x ethanol-opt-1-2-060_preQMOPTprefit.xyz -k tmp-1-2-060_preQMOPTprefit.key 0.1 >ethanol-opt-1-2-060_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:41 2025 Normal termination: logfile=ethanol-opt-1-2-060_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:41 2025 All jobs have terminated ['ethanol-opt-1-2-060_preQMOPTprefit.out']
+Wed Feb 19 10:38:41 2025 Submitting: analyze.x ethanol-opt-1-2-060_preQMOPTprefit.xyz_2 -k tmp-1-2-060_preQMOPTprefit.key ed > ethanol-opt-1-2-060_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:42 2025 Normal termination: logfile=ethanol-opt-1-2-060_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:42 2025 All jobs have terminated ['ethanol-opt-1-2-060_preQMOPTprefit.alz']
+Wed Feb 19 10:38:42 2025 Submitting: minimize.x ethanol-opt-1-2-090_preQMOPTprefit.xyz -k tmp-1-2-090_preQMOPTprefit.key 0.1 >ethanol-opt-1-2-090_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:43 2025 Normal termination: logfile=ethanol-opt-1-2-090_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:43 2025 All jobs have terminated ['ethanol-opt-1-2-090_preQMOPTprefit.out']
+Wed Feb 19 10:38:43 2025 Submitting: analyze.x ethanol-opt-1-2-090_preQMOPTprefit.xyz_2 -k tmp-1-2-090_preQMOPTprefit.key ed > ethanol-opt-1-2-090_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:44 2025 Normal termination: logfile=ethanol-opt-1-2-090_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:45 2025 All jobs have terminated ['ethanol-opt-1-2-090_preQMOPTprefit.alz']
+Wed Feb 19 10:38:45 2025 Submitting: minimize.x ethanol-opt-1-2-120_preQMOPTprefit.xyz -k tmp-1-2-120_preQMOPTprefit.key 0.1 >ethanol-opt-1-2-120_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:46 2025 Normal termination: logfile=ethanol-opt-1-2-120_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:46 2025 All jobs have terminated ['ethanol-opt-1-2-120_preQMOPTprefit.out']
+Wed Feb 19 10:38:46 2025 Submitting: analyze.x ethanol-opt-1-2-120_preQMOPTprefit.xyz_2 -k tmp-1-2-120_preQMOPTprefit.key ed > ethanol-opt-1-2-120_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:47 2025 Normal termination: logfile=ethanol-opt-1-2-120_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:47 2025 All jobs have terminated ['ethanol-opt-1-2-120_preQMOPTprefit.alz']
+Wed Feb 19 10:38:47 2025 Submitting: minimize.x ethanol-opt-1-2-150_preQMOPTprefit.xyz -k tmp-1-2-150_preQMOPTprefit.key 0.1 >ethanol-opt-1-2-150_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:48 2025 Normal termination: logfile=ethanol-opt-1-2-150_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:48 2025 All jobs have terminated ['ethanol-opt-1-2-150_preQMOPTprefit.out']
+Wed Feb 19 10:38:48 2025 Submitting: analyze.x ethanol-opt-1-2-150_preQMOPTprefit.xyz_2 -k tmp-1-2-150_preQMOPTprefit.key ed > ethanol-opt-1-2-150_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:49 2025 Normal termination: logfile=ethanol-opt-1-2-150_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:49 2025 All jobs have terminated ['ethanol-opt-1-2-150_preQMOPTprefit.alz']
+Wed Feb 19 10:38:49 2025 Submitting: minimize.x ethanol-opt-1-2-180_preQMOPTprefit.xyz -k tmp-1-2-180_preQMOPTprefit.key 0.1 >ethanol-opt-1-2-180_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:50 2025 Normal termination: logfile=ethanol-opt-1-2-180_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:50 2025 All jobs have terminated ['ethanol-opt-1-2-180_preQMOPTprefit.out']
+Wed Feb 19 10:38:50 2025 Submitting: analyze.x ethanol-opt-1-2-180_preQMOPTprefit.xyz_2 -k tmp-1-2-180_preQMOPTprefit.key ed > ethanol-opt-1-2-180_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:51 2025 Normal termination: logfile=ethanol-opt-1-2-180_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:51 2025 All jobs have terminated ['ethanol-opt-1-2-180_preQMOPTprefit.alz']
+Wed Feb 19 10:38:51 2025 Submitting: minimize.x ethanol-opt-1-2-210_preQMOPTprefit.xyz -k tmp-1-2-210_preQMOPTprefit.key 0.1 >ethanol-opt-1-2-210_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:52 2025 Normal termination: logfile=ethanol-opt-1-2-210_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:52 2025 All jobs have terminated ['ethanol-opt-1-2-210_preQMOPTprefit.out']
+Wed Feb 19 10:38:52 2025 Submitting: analyze.x ethanol-opt-1-2-210_preQMOPTprefit.xyz_2 -k tmp-1-2-210_preQMOPTprefit.key ed > ethanol-opt-1-2-210_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:53 2025 Normal termination: logfile=ethanol-opt-1-2-210_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:54 2025 All jobs have terminated ['ethanol-opt-1-2-210_preQMOPTprefit.alz']
+Wed Feb 19 10:38:54 2025 Submitting: minimize.x ethanol-opt-1-2-240_preQMOPTprefit.xyz -k tmp-1-2-240_preQMOPTprefit.key 0.1 >ethanol-opt-1-2-240_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:55 2025 Normal termination: logfile=ethanol-opt-1-2-240_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:55 2025 All jobs have terminated ['ethanol-opt-1-2-240_preQMOPTprefit.out']
+Wed Feb 19 10:38:55 2025 Submitting: analyze.x ethanol-opt-1-2-240_preQMOPTprefit.xyz_2 -k tmp-1-2-240_preQMOPTprefit.key ed > ethanol-opt-1-2-240_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:56 2025 Normal termination: logfile=ethanol-opt-1-2-240_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:56 2025 All jobs have terminated ['ethanol-opt-1-2-240_preQMOPTprefit.alz']
+Wed Feb 19 10:38:56 2025 Submitting: minimize.x ethanol-opt-1-2-030_preQMOPTprefit.xyz -k tmp-1-2-030_preQMOPTprefit.key 0.1 >ethanol-opt-1-2-030_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:57 2025 Normal termination: logfile=ethanol-opt-1-2-030_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:57 2025 All jobs have terminated ['ethanol-opt-1-2-030_preQMOPTprefit.out']
+Wed Feb 19 10:38:57 2025 Submitting: analyze.x ethanol-opt-1-2-030_preQMOPTprefit.xyz_2 -k tmp-1-2-030_preQMOPTprefit.key ed > ethanol-opt-1-2-030_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:58 2025 Normal termination: logfile=ethanol-opt-1-2-030_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:58 2025 All jobs have terminated ['ethanol-opt-1-2-030_preQMOPTprefit.alz']
+Wed Feb 19 10:38:58 2025 Submitting: minimize.x ethanol-opt-1-2-360_preQMOPTprefit.xyz -k tmp-1-2-360_preQMOPTprefit.key 0.1 >ethanol-opt-1-2-360_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:59 2025 Normal termination: logfile=ethanol-opt-1-2-360_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:38:59 2025 All jobs have terminated ['ethanol-opt-1-2-360_preQMOPTprefit.out']
+Wed Feb 19 10:38:59 2025 Submitting: analyze.x ethanol-opt-1-2-360_preQMOPTprefit.xyz_2 -k tmp-1-2-360_preQMOPTprefit.key ed > ethanol-opt-1-2-360_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:00 2025 Normal termination: logfile=ethanol-opt-1-2-360_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:00 2025 All jobs have terminated ['ethanol-opt-1-2-360_preQMOPTprefit.alz']
+Wed Feb 19 10:39:00 2025 Submitting: minimize.x ethanol-opt-1-2-330_preQMOPTprefit.xyz -k tmp-1-2-330_preQMOPTprefit.key 0.1 >ethanol-opt-1-2-330_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:01 2025 Normal termination: logfile=ethanol-opt-1-2-330_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:01 2025 All jobs have terminated ['ethanol-opt-1-2-330_preQMOPTprefit.out']
+Wed Feb 19 10:39:01 2025 Submitting: analyze.x ethanol-opt-1-2-330_preQMOPTprefit.xyz_2 -k tmp-1-2-330_preQMOPTprefit.key ed > ethanol-opt-1-2-330_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:02 2025 Normal termination: logfile=ethanol-opt-1-2-330_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:02 2025 All jobs have terminated ['ethanol-opt-1-2-330_preQMOPTprefit.alz']
+Wed Feb 19 10:39:02 2025 Submitting: minimize.x ethanol-opt-1-2-300_preQMOPTprefit.xyz -k tmp-1-2-300_preQMOPTprefit.key 0.1 >ethanol-opt-1-2-300_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:04 2025 Normal termination: logfile=ethanol-opt-1-2-300_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:04 2025 All jobs have terminated ['ethanol-opt-1-2-300_preQMOPTprefit.out']
+Wed Feb 19 10:39:04 2025 Submitting: analyze.x ethanol-opt-1-2-300_preQMOPTprefit.xyz_2 -k tmp-1-2-300_preQMOPTprefit.key ed > ethanol-opt-1-2-300_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:05 2025 Normal termination: logfile=ethanol-opt-1-2-300_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:05 2025 All jobs have terminated ['ethanol-opt-1-2-300_preQMOPTprefit.alz']
+Wed Feb 19 10:39:05 2025 Submitting: minimize.x ethanol-opt-1-2-270_preQMOPTprefit.xyz -k tmp-1-2-270_preQMOPTprefit.key 0.1 >ethanol-opt-1-2-270_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:06 2025 Normal termination: logfile=ethanol-opt-1-2-270_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:06 2025 All jobs have terminated ['ethanol-opt-1-2-270_preQMOPTprefit.out']
+Wed Feb 19 10:39:06 2025 Submitting: analyze.x ethanol-opt-1-2-270_preQMOPTprefit.xyz_2 -k tmp-1-2-270_preQMOPTprefit.key ed > ethanol-opt-1-2-270_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:07 2025 Normal termination: logfile=ethanol-opt-1-2-270_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:07 2025 All jobs have terminated ['ethanol-opt-1-2-270_preQMOPTprefit.alz']
+Wed Feb 19 10:39:07 2025 Submitting: minimize.x ethanol-opt-2-3-061_preQMOPTprefit.xyz -k tmp-2-3-061_preQMOPTprefit.key 0.1 >ethanol-opt-2-3-061_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:08 2025 Normal termination: logfile=ethanol-opt-2-3-061_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:08 2025 All jobs have terminated ['ethanol-opt-2-3-061_preQMOPTprefit.out']
+Wed Feb 19 10:39:08 2025 Submitting: analyze.x ethanol-opt-2-3-061_preQMOPTprefit.xyz_2 -k tmp-2-3-061_preQMOPTprefit.key ed > ethanol-opt-2-3-061_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:09 2025 Normal termination: logfile=ethanol-opt-2-3-061_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:09 2025 All jobs have terminated ['ethanol-opt-2-3-061_preQMOPTprefit.alz']
+Wed Feb 19 10:39:09 2025 Submitting: minimize.x ethanol-opt-2-3-091_preQMOPTprefit.xyz -k tmp-2-3-091_preQMOPTprefit.key 0.1 >ethanol-opt-2-3-091_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:10 2025 Normal termination: logfile=ethanol-opt-2-3-091_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:10 2025 All jobs have terminated ['ethanol-opt-2-3-091_preQMOPTprefit.out']
+Wed Feb 19 10:39:10 2025 Submitting: analyze.x ethanol-opt-2-3-091_preQMOPTprefit.xyz_2 -k tmp-2-3-091_preQMOPTprefit.key ed > ethanol-opt-2-3-091_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:11 2025 Normal termination: logfile=ethanol-opt-2-3-091_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:12 2025 All jobs have terminated ['ethanol-opt-2-3-091_preQMOPTprefit.alz']
+Wed Feb 19 10:39:12 2025 Submitting: minimize.x ethanol-opt-2-3-121_preQMOPTprefit.xyz -k tmp-2-3-121_preQMOPTprefit.key 0.1 >ethanol-opt-2-3-121_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:13 2025 Normal termination: logfile=ethanol-opt-2-3-121_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:13 2025 All jobs have terminated ['ethanol-opt-2-3-121_preQMOPTprefit.out']
+Wed Feb 19 10:39:13 2025 Submitting: analyze.x ethanol-opt-2-3-121_preQMOPTprefit.xyz_2 -k tmp-2-3-121_preQMOPTprefit.key ed > ethanol-opt-2-3-121_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:14 2025 Normal termination: logfile=ethanol-opt-2-3-121_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:14 2025 All jobs have terminated ['ethanol-opt-2-3-121_preQMOPTprefit.alz']
+Wed Feb 19 10:39:14 2025 Submitting: minimize.x ethanol-opt-2-3-151_preQMOPTprefit.xyz -k tmp-2-3-151_preQMOPTprefit.key 0.1 >ethanol-opt-2-3-151_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:15 2025 Normal termination: logfile=ethanol-opt-2-3-151_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:15 2025 All jobs have terminated ['ethanol-opt-2-3-151_preQMOPTprefit.out']
+Wed Feb 19 10:39:15 2025 Submitting: analyze.x ethanol-opt-2-3-151_preQMOPTprefit.xyz_2 -k tmp-2-3-151_preQMOPTprefit.key ed > ethanol-opt-2-3-151_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:16 2025 Normal termination: logfile=ethanol-opt-2-3-151_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:16 2025 All jobs have terminated ['ethanol-opt-2-3-151_preQMOPTprefit.alz']
+Wed Feb 19 10:39:16 2025 Submitting: minimize.x ethanol-opt-2-3-181_preQMOPTprefit.xyz -k tmp-2-3-181_preQMOPTprefit.key 0.1 >ethanol-opt-2-3-181_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:17 2025 Normal termination: logfile=ethanol-opt-2-3-181_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:17 2025 All jobs have terminated ['ethanol-opt-2-3-181_preQMOPTprefit.out']
+Wed Feb 19 10:39:17 2025 Submitting: analyze.x ethanol-opt-2-3-181_preQMOPTprefit.xyz_2 -k tmp-2-3-181_preQMOPTprefit.key ed > ethanol-opt-2-3-181_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:18 2025 Normal termination: logfile=ethanol-opt-2-3-181_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:18 2025 All jobs have terminated ['ethanol-opt-2-3-181_preQMOPTprefit.alz']
+Wed Feb 19 10:39:18 2025 Submitting: minimize.x ethanol-opt-2-3-211_preQMOPTprefit.xyz -k tmp-2-3-211_preQMOPTprefit.key 0.1 >ethanol-opt-2-3-211_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:19 2025 Normal termination: logfile=ethanol-opt-2-3-211_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:19 2025 All jobs have terminated ['ethanol-opt-2-3-211_preQMOPTprefit.out']
+Wed Feb 19 10:39:19 2025 Submitting: analyze.x ethanol-opt-2-3-211_preQMOPTprefit.xyz_2 -k tmp-2-3-211_preQMOPTprefit.key ed > ethanol-opt-2-3-211_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:20 2025 Normal termination: logfile=ethanol-opt-2-3-211_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:20 2025 All jobs have terminated ['ethanol-opt-2-3-211_preQMOPTprefit.alz']
+Wed Feb 19 10:39:20 2025 Submitting: minimize.x ethanol-opt-2-3-241_preQMOPTprefit.xyz -k tmp-2-3-241_preQMOPTprefit.key 0.1 >ethanol-opt-2-3-241_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:21 2025 Normal termination: logfile=ethanol-opt-2-3-241_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:22 2025 All jobs have terminated ['ethanol-opt-2-3-241_preQMOPTprefit.out']
+Wed Feb 19 10:39:22 2025 Submitting: analyze.x ethanol-opt-2-3-241_preQMOPTprefit.xyz_2 -k tmp-2-3-241_preQMOPTprefit.key ed > ethanol-opt-2-3-241_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:23 2025 Normal termination: logfile=ethanol-opt-2-3-241_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:23 2025 All jobs have terminated ['ethanol-opt-2-3-241_preQMOPTprefit.alz']
+Wed Feb 19 10:39:23 2025 Submitting: minimize.x ethanol-opt-2-3-031_preQMOPTprefit.xyz -k tmp-2-3-031_preQMOPTprefit.key 0.1 >ethanol-opt-2-3-031_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:24 2025 Normal termination: logfile=ethanol-opt-2-3-031_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:24 2025 All jobs have terminated ['ethanol-opt-2-3-031_preQMOPTprefit.out']
+Wed Feb 19 10:39:24 2025 Submitting: analyze.x ethanol-opt-2-3-031_preQMOPTprefit.xyz_2 -k tmp-2-3-031_preQMOPTprefit.key ed > ethanol-opt-2-3-031_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:25 2025 Normal termination: logfile=ethanol-opt-2-3-031_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:25 2025 All jobs have terminated ['ethanol-opt-2-3-031_preQMOPTprefit.alz']
+Wed Feb 19 10:39:25 2025 Submitting: minimize.x ethanol-opt-2-3-001_preQMOPTprefit.xyz -k tmp-2-3-001_preQMOPTprefit.key 0.1 >ethanol-opt-2-3-001_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:26 2025 Normal termination: logfile=ethanol-opt-2-3-001_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:26 2025 All jobs have terminated ['ethanol-opt-2-3-001_preQMOPTprefit.out']
+Wed Feb 19 10:39:26 2025 Submitting: analyze.x ethanol-opt-2-3-001_preQMOPTprefit.xyz_2 -k tmp-2-3-001_preQMOPTprefit.key ed > ethanol-opt-2-3-001_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:27 2025 Normal termination: logfile=ethanol-opt-2-3-001_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:27 2025 All jobs have terminated ['ethanol-opt-2-3-001_preQMOPTprefit.alz']
+Wed Feb 19 10:39:27 2025 Submitting: minimize.x ethanol-opt-2-3-331_preQMOPTprefit.xyz -k tmp-2-3-331_preQMOPTprefit.key 0.1 >ethanol-opt-2-3-331_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:28 2025 Normal termination: logfile=ethanol-opt-2-3-331_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:28 2025 All jobs have terminated ['ethanol-opt-2-3-331_preQMOPTprefit.out']
+Wed Feb 19 10:39:28 2025 Submitting: analyze.x ethanol-opt-2-3-331_preQMOPTprefit.xyz_2 -k tmp-2-3-331_preQMOPTprefit.key ed > ethanol-opt-2-3-331_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:29 2025 Normal termination: logfile=ethanol-opt-2-3-331_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:29 2025 All jobs have terminated ['ethanol-opt-2-3-331_preQMOPTprefit.alz']
+Wed Feb 19 10:39:29 2025 Submitting: minimize.x ethanol-opt-2-3-301_preQMOPTprefit.xyz -k tmp-2-3-301_preQMOPTprefit.key 0.1 >ethanol-opt-2-3-301_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:30 2025 Normal termination: logfile=ethanol-opt-2-3-301_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:31 2025 All jobs have terminated ['ethanol-opt-2-3-301_preQMOPTprefit.out']
+Wed Feb 19 10:39:31 2025 Submitting: analyze.x ethanol-opt-2-3-301_preQMOPTprefit.xyz_2 -k tmp-2-3-301_preQMOPTprefit.key ed > ethanol-opt-2-3-301_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:32 2025 Normal termination: logfile=ethanol-opt-2-3-301_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:32 2025 All jobs have terminated ['ethanol-opt-2-3-301_preQMOPTprefit.alz']
+Wed Feb 19 10:39:32 2025 Submitting: minimize.x ethanol-opt-2-3-271_preQMOPTprefit.xyz -k tmp-2-3-271_preQMOPTprefit.key 0.1 >ethanol-opt-2-3-271_preQMOPTprefit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:33 2025 Normal termination: logfile=ethanol-opt-2-3-271_preQMOPTprefit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:33 2025 All jobs have terminated ['ethanol-opt-2-3-271_preQMOPTprefit.out']
+Wed Feb 19 10:39:33 2025 Submitting: analyze.x ethanol-opt-2-3-271_preQMOPTprefit.xyz_2 -k tmp-2-3-271_preQMOPTprefit.key ed > ethanol-opt-2-3-271_preQMOPTprefit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:34 2025 Normal termination: logfile=ethanol-opt-2-3-271_preQMOPTprefit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:34 2025 All jobs have terminated ['ethanol-opt-2-3-271_preQMOPTprefit.alz']
+Wed Feb 19 10:39:34 2025 Percent of jobs finished 0.0, jobs left = 24
+Wed Feb 19 10:39:34 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-1-2-060_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-1-2-060_constr.txt > xtb-opt-1-2-060.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:39:37 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-1-2-060.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:37 2025 Percent of jobs finished 4.17, jobs left = 23
+Wed Feb 19 10:39:37 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-1-2-090_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-1-2-090_constr.txt > xtb-opt-1-2-090.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:39:41 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-1-2-090.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:41 2025 Percent of jobs finished 8.33, jobs left = 22
+Wed Feb 19 10:39:41 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-1-2-120_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-1-2-120_constr.txt > xtb-opt-1-2-120.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_UNDERFLOW_FLAG IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:39:44 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-1-2-120.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:44 2025 Percent of jobs finished 12.5, jobs left = 21
+Wed Feb 19 10:39:44 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-1-2-150_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-1-2-150_constr.txt > xtb-opt-1-2-150.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:39:48 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-1-2-150.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:48 2025 Percent of jobs finished 16.67, jobs left = 20
+Wed Feb 19 10:39:48 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-1-2-180_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-1-2-180_constr.txt > xtb-opt-1-2-180.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:39:53 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-1-2-180.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:53 2025 Percent of jobs finished 20.83, jobs left = 19
+Wed Feb 19 10:39:53 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-1-2-210_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-1-2-210_constr.txt > xtb-opt-1-2-210.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:39:59 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-1-2-210.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:39:59 2025 Percent of jobs finished 25.0, jobs left = 18
+Wed Feb 19 10:39:59 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-1-2-240_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-1-2-240_constr.txt > xtb-opt-1-2-240.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:40:06 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-1-2-240.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:40:06 2025 Percent of jobs finished 29.17, jobs left = 17
+Wed Feb 19 10:40:06 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-1-2-030_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-1-2-030_constr.txt > xtb-opt-1-2-030.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:40:15 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-1-2-030.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:40:15 2025 Percent of jobs finished 33.33, jobs left = 16
+Wed Feb 19 10:40:15 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-1-2-360_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-1-2-360_constr.txt > xtb-opt-1-2-360.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_UNDERFLOW_FLAG IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:40:24 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-1-2-360.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:40:24 2025 Percent of jobs finished 37.5, jobs left = 15
+Wed Feb 19 10:40:24 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-1-2-330_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-1-2-330_constr.txt > xtb-opt-1-2-330.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:40:34 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-1-2-330.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:40:34 2025 Percent of jobs finished 41.67, jobs left = 14
+Wed Feb 19 10:40:34 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-1-2-300_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-1-2-300_constr.txt > xtb-opt-1-2-300.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:40:45 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-1-2-300.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:40:45 2025 Percent of jobs finished 45.83, jobs left = 13
+Wed Feb 19 10:40:45 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-1-2-270_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-1-2-270_constr.txt > xtb-opt-1-2-270.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:40:57 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-1-2-270.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:40:57 2025 Percent of jobs finished 50.0, jobs left = 12
+Wed Feb 19 10:40:57 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-2-3-061_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-061_constr.txt > xtb-opt-2-3-061.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:41:11 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-2-3-061.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:41:11 2025 Percent of jobs finished 54.17, jobs left = 11
+Wed Feb 19 10:41:11 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-2-3-091_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-091_constr.txt > xtb-opt-2-3-091.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:41:25 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-2-3-091.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:41:25 2025 Percent of jobs finished 58.33, jobs left = 10
+Wed Feb 19 10:41:25 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-2-3-121_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-121_constr.txt > xtb-opt-2-3-121.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_UNDERFLOW_FLAG IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:41:40 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-2-3-121.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:41:40 2025 Percent of jobs finished 62.5, jobs left = 9
+Wed Feb 19 10:41:40 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-2-3-151_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-151_constr.txt > xtb-opt-2-3-151.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:41:56 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-2-3-151.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:41:56 2025 Percent of jobs finished 66.67, jobs left = 8
+Wed Feb 19 10:41:56 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-2-3-181_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-181_constr.txt > xtb-opt-2-3-181.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:42:13 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-2-3-181.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:42:13 2025 Percent of jobs finished 70.83, jobs left = 7
+Wed Feb 19 10:42:13 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-2-3-211_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-211_constr.txt > xtb-opt-2-3-211.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:42:32 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-2-3-211.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:42:32 2025 Percent of jobs finished 75.0, jobs left = 6
+Wed Feb 19 10:42:32 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-2-3-241_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-241_constr.txt > xtb-opt-2-3-241.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_UNDERFLOW_FLAG IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:42:51 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-2-3-241.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:42:51 2025 Percent of jobs finished 79.17, jobs left = 5
+Wed Feb 19 10:42:51 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-2-3-031_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-031_constr.txt > xtb-opt-2-3-031.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:43:11 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-2-3-031.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:43:11 2025 Percent of jobs finished 83.33, jobs left = 4
+Wed Feb 19 10:43:11 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-2-3-001_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-001_constr.txt > xtb-opt-2-3-001.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_UNDERFLOW_FLAG IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:43:32 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-2-3-001.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:43:32 2025 Percent of jobs finished 87.5, jobs left = 3
+Wed Feb 19 10:43:32 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-2-3-331_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-331_constr.txt > xtb-opt-2-3-331.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:43:55 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-2-3-331.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:43:55 2025 Percent of jobs finished 91.67, jobs left = 2
+Wed Feb 19 10:43:55 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-2-3-301_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-301_constr.txt > xtb-opt-2-3-301.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:44:18 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-2-3-301.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:44:18 2025 Percent of jobs finished 95.83, jobs left = 1
+Wed Feb 19 10:44:18 2025 Submitting: /home/liuchw/anaconda3/envs/xtbenv/bin/xtb --gfn 2 --chrg 0 --uhf 0 ethanol-opt-2-3-271_preQMOPTprefit_xyzformat.xyz --opt --input xtb-opt-2-3-271_constr.txt > xtb-opt-2-3-271.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Wed Feb 19 10:44:42 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-opt-2-3-271.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:07 2025 Percent of jobs finished 0.0, jobs left = 24
+Wed Feb 19 10:45:07 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-1-2-060.psi4 xtb-wB97X-D-sp-1-2-060.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:07 2025 Percent of jobs finished 0.0, jobs left = 24
+Wed Feb 19 10:45:07 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-1-2-090.psi4 xtb-wB97X-D-sp-1-2-090.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:07 2025 Percent of jobs finished 0.0, jobs left = 24
+Wed Feb 19 10:45:07 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-1-2-120.psi4 xtb-wB97X-D-sp-1-2-120.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:07 2025 Percent of jobs finished 0.0, jobs left = 24
+Wed Feb 19 10:45:07 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-1-2-150.psi4 xtb-wB97X-D-sp-1-2-150.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:14 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-1-2-060.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:14 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-1-2-090.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:14 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-1-2-120.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:14 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-1-2-150.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:14 2025 Percent of jobs finished 16.67, jobs left = 20
+Wed Feb 19 10:45:14 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-1-2-180.psi4 xtb-wB97X-D-sp-1-2-180.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:14 2025 Percent of jobs finished 16.67, jobs left = 20
+Wed Feb 19 10:45:14 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-1-2-210.psi4 xtb-wB97X-D-sp-1-2-210.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:14 2025 Percent of jobs finished 16.67, jobs left = 20
+Wed Feb 19 10:45:14 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-1-2-240.psi4 xtb-wB97X-D-sp-1-2-240.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:14 2025 Percent of jobs finished 16.67, jobs left = 20
+Wed Feb 19 10:45:14 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-1-2-030.psi4 xtb-wB97X-D-sp-1-2-030.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:22 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-1-2-180.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:22 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-1-2-210.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:22 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-1-2-240.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:22 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-1-2-030.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:22 2025 Percent of jobs finished 33.33, jobs left = 16
+Wed Feb 19 10:45:22 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-1-2-360.psi4 xtb-wB97X-D-sp-1-2-360.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:22 2025 Percent of jobs finished 33.33, jobs left = 16
+Wed Feb 19 10:45:22 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-1-2-330.psi4 xtb-wB97X-D-sp-1-2-330.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:22 2025 Percent of jobs finished 33.33, jobs left = 16
+Wed Feb 19 10:45:22 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-1-2-300.psi4 xtb-wB97X-D-sp-1-2-300.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:22 2025 Percent of jobs finished 33.33, jobs left = 16
+Wed Feb 19 10:45:22 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-1-2-270.psi4 xtb-wB97X-D-sp-1-2-270.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:29 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-1-2-360.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:29 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-1-2-300.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:29 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-1-2-270.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:29 2025 Percent of jobs finished 45.83, jobs left = 13
+Wed Feb 19 10:45:29 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-061.psi4 xtb-wB97X-D-sp-2-3-061.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:29 2025 Percent of jobs finished 45.83, jobs left = 13
+Wed Feb 19 10:45:29 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-091.psi4 xtb-wB97X-D-sp-2-3-091.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:29 2025 Percent of jobs finished 45.83, jobs left = 13
+Wed Feb 19 10:45:29 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-121.psi4 xtb-wB97X-D-sp-2-3-121.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:29 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-1-2-330.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:29 2025 Percent of jobs finished 50.0, jobs left = 12
+Wed Feb 19 10:45:29 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-151.psi4 xtb-wB97X-D-sp-2-3-151.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:36 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-2-3-061.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:36 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-2-3-091.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:36 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-2-3-121.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:36 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-2-3-151.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:36 2025 Percent of jobs finished 66.67, jobs left = 8
+Wed Feb 19 10:45:36 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-181.psi4 xtb-wB97X-D-sp-2-3-181.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:36 2025 Percent of jobs finished 66.67, jobs left = 8
+Wed Feb 19 10:45:36 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-211.psi4 xtb-wB97X-D-sp-2-3-211.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:36 2025 Percent of jobs finished 66.67, jobs left = 8
+Wed Feb 19 10:45:36 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-241.psi4 xtb-wB97X-D-sp-2-3-241.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:36 2025 Percent of jobs finished 66.67, jobs left = 8
+Wed Feb 19 10:45:36 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-031.psi4 xtb-wB97X-D-sp-2-3-031.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:44 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-2-3-181.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:44 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-2-3-211.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:44 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-2-3-241.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:44 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-2-3-031.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:44 2025 Percent of jobs finished 83.33, jobs left = 4
+Wed Feb 19 10:45:44 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-001.psi4 xtb-wB97X-D-sp-2-3-001.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:44 2025 Percent of jobs finished 83.33, jobs left = 4
+Wed Feb 19 10:45:44 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-331.psi4 xtb-wB97X-D-sp-2-3-331.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:44 2025 Percent of jobs finished 83.33, jobs left = 4
+Wed Feb 19 10:45:44 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-301.psi4 xtb-wB97X-D-sp-2-3-301.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:44 2025 Percent of jobs finished 83.33, jobs left = 4
+Wed Feb 19 10:45:44 2025 Submitting: psi4   --loglevel 30  xtb-wB97X-D-sp-2-3-271.psi4 xtb-wB97X-D-sp-2-3-271.log path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:51 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-2-3-331.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:51 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-2-3-301.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:51 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-2-3-271.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:51 2025 Normal termination: logfile=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion/xtb-wB97X-D-sp-2-3-001.log path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:52 2025 Torsions being fit 406 401 402 403 , 406 401 402 404 RMSD(QM-MM1)0.05588261666686831
+Wed Feb 19 10:45:52 2025 Torsions being fit 401 402 403 405 , 404 402 403 405 RMSD(QM-MM1)0.05251065581299152
+Wed Feb 19 10:45:52 2025 Submitting: minimize.x ethanol-opt-1-2-060_postQMOPTpostfit.xyz -k tmp-1-2-060_postQMOPTpostfit.key 0.1 >ethanol-opt-1-2-060_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:53 2025 Normal termination: logfile=ethanol-opt-1-2-060_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:53 2025 All jobs have terminated ['ethanol-opt-1-2-060_postQMOPTpostfit.out']
+Wed Feb 19 10:45:53 2025 Submitting: analyze.x ethanol-opt-1-2-060_postQMOPTpostfit.xyz_2 -k tmp-1-2-060_postQMOPTpostfit.key ed > ethanol-opt-1-2-060_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:54 2025 Normal termination: logfile=ethanol-opt-1-2-060_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:54 2025 All jobs have terminated ['ethanol-opt-1-2-060_postQMOPTpostfit.alz']
+Wed Feb 19 10:45:54 2025 Submitting: analyze.x ethanol-opt-1-2-060_preQMOPTpostfit.xyz -k tmp-1-2-060_preQMOPTpostfit.key ed > ethanol-opt-1-2-060_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:55 2025 Normal termination: logfile=ethanol-opt-1-2-060_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:55 2025 All jobs have terminated ['ethanol-opt-1-2-060_preQMOPTpostfit.alz']
+Wed Feb 19 10:45:55 2025 Submitting: minimize.x ethanol-opt-1-2-090_postQMOPTpostfit.xyz -k tmp-1-2-090_postQMOPTpostfit.key 0.1 >ethanol-opt-1-2-090_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:56 2025 Normal termination: logfile=ethanol-opt-1-2-090_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:56 2025 All jobs have terminated ['ethanol-opt-1-2-090_postQMOPTpostfit.out']
+Wed Feb 19 10:45:56 2025 Submitting: analyze.x ethanol-opt-1-2-090_postQMOPTpostfit.xyz_2 -k tmp-1-2-090_postQMOPTpostfit.key ed > ethanol-opt-1-2-090_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:57 2025 Normal termination: logfile=ethanol-opt-1-2-090_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:58 2025 All jobs have terminated ['ethanol-opt-1-2-090_postQMOPTpostfit.alz']
+Wed Feb 19 10:45:58 2025 Submitting: analyze.x ethanol-opt-1-2-090_preQMOPTpostfit.xyz -k tmp-1-2-090_preQMOPTpostfit.key ed > ethanol-opt-1-2-090_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:59 2025 Normal termination: logfile=ethanol-opt-1-2-090_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:45:59 2025 All jobs have terminated ['ethanol-opt-1-2-090_preQMOPTpostfit.alz']
+Wed Feb 19 10:45:59 2025 Submitting: minimize.x ethanol-opt-1-2-120_postQMOPTpostfit.xyz -k tmp-1-2-120_postQMOPTpostfit.key 0.1 >ethanol-opt-1-2-120_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:00 2025 Normal termination: logfile=ethanol-opt-1-2-120_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:00 2025 All jobs have terminated ['ethanol-opt-1-2-120_postQMOPTpostfit.out']
+Wed Feb 19 10:46:00 2025 Submitting: analyze.x ethanol-opt-1-2-120_postQMOPTpostfit.xyz_2 -k tmp-1-2-120_postQMOPTpostfit.key ed > ethanol-opt-1-2-120_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:01 2025 Normal termination: logfile=ethanol-opt-1-2-120_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:01 2025 All jobs have terminated ['ethanol-opt-1-2-120_postQMOPTpostfit.alz']
+Wed Feb 19 10:46:01 2025 Submitting: analyze.x ethanol-opt-1-2-120_preQMOPTpostfit.xyz -k tmp-1-2-120_preQMOPTpostfit.key ed > ethanol-opt-1-2-120_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:02 2025 Normal termination: logfile=ethanol-opt-1-2-120_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:02 2025 All jobs have terminated ['ethanol-opt-1-2-120_preQMOPTpostfit.alz']
+Wed Feb 19 10:46:02 2025 Submitting: minimize.x ethanol-opt-1-2-150_postQMOPTpostfit.xyz -k tmp-1-2-150_postQMOPTpostfit.key 0.1 >ethanol-opt-1-2-150_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:03 2025 Normal termination: logfile=ethanol-opt-1-2-150_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:03 2025 All jobs have terminated ['ethanol-opt-1-2-150_postQMOPTpostfit.out']
+Wed Feb 19 10:46:03 2025 Submitting: analyze.x ethanol-opt-1-2-150_postQMOPTpostfit.xyz_2 -k tmp-1-2-150_postQMOPTpostfit.key ed > ethanol-opt-1-2-150_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:04 2025 Normal termination: logfile=ethanol-opt-1-2-150_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:04 2025 All jobs have terminated ['ethanol-opt-1-2-150_postQMOPTpostfit.alz']
+Wed Feb 19 10:46:04 2025 Submitting: analyze.x ethanol-opt-1-2-150_preQMOPTpostfit.xyz -k tmp-1-2-150_preQMOPTpostfit.key ed > ethanol-opt-1-2-150_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:05 2025 Normal termination: logfile=ethanol-opt-1-2-150_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:05 2025 All jobs have terminated ['ethanol-opt-1-2-150_preQMOPTpostfit.alz']
+Wed Feb 19 10:46:05 2025 Submitting: minimize.x ethanol-opt-1-2-180_postQMOPTpostfit.xyz -k tmp-1-2-180_postQMOPTpostfit.key 0.1 >ethanol-opt-1-2-180_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:06 2025 Normal termination: logfile=ethanol-opt-1-2-180_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:07 2025 All jobs have terminated ['ethanol-opt-1-2-180_postQMOPTpostfit.out']
+Wed Feb 19 10:46:07 2025 Submitting: analyze.x ethanol-opt-1-2-180_postQMOPTpostfit.xyz_2 -k tmp-1-2-180_postQMOPTpostfit.key ed > ethanol-opt-1-2-180_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:08 2025 Normal termination: logfile=ethanol-opt-1-2-180_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:08 2025 All jobs have terminated ['ethanol-opt-1-2-180_postQMOPTpostfit.alz']
+Wed Feb 19 10:46:08 2025 Submitting: analyze.x ethanol-opt-1-2-180_preQMOPTpostfit.xyz -k tmp-1-2-180_preQMOPTpostfit.key ed > ethanol-opt-1-2-180_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:09 2025 Normal termination: logfile=ethanol-opt-1-2-180_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:09 2025 All jobs have terminated ['ethanol-opt-1-2-180_preQMOPTpostfit.alz']
+Wed Feb 19 10:46:09 2025 Submitting: minimize.x ethanol-opt-1-2-210_postQMOPTpostfit.xyz -k tmp-1-2-210_postQMOPTpostfit.key 0.1 >ethanol-opt-1-2-210_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:10 2025 Normal termination: logfile=ethanol-opt-1-2-210_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:10 2025 All jobs have terminated ['ethanol-opt-1-2-210_postQMOPTpostfit.out']
+Wed Feb 19 10:46:10 2025 Submitting: analyze.x ethanol-opt-1-2-210_postQMOPTpostfit.xyz_2 -k tmp-1-2-210_postQMOPTpostfit.key ed > ethanol-opt-1-2-210_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:11 2025 Normal termination: logfile=ethanol-opt-1-2-210_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:11 2025 All jobs have terminated ['ethanol-opt-1-2-210_postQMOPTpostfit.alz']
+Wed Feb 19 10:46:11 2025 Submitting: analyze.x ethanol-opt-1-2-210_preQMOPTpostfit.xyz -k tmp-1-2-210_preQMOPTpostfit.key ed > ethanol-opt-1-2-210_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:12 2025 Normal termination: logfile=ethanol-opt-1-2-210_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:12 2025 All jobs have terminated ['ethanol-opt-1-2-210_preQMOPTpostfit.alz']
+Wed Feb 19 10:46:12 2025 Submitting: minimize.x ethanol-opt-1-2-240_postQMOPTpostfit.xyz -k tmp-1-2-240_postQMOPTpostfit.key 0.1 >ethanol-opt-1-2-240_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:13 2025 Normal termination: logfile=ethanol-opt-1-2-240_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:13 2025 All jobs have terminated ['ethanol-opt-1-2-240_postQMOPTpostfit.out']
+Wed Feb 19 10:46:13 2025 Submitting: analyze.x ethanol-opt-1-2-240_postQMOPTpostfit.xyz_2 -k tmp-1-2-240_postQMOPTpostfit.key ed > ethanol-opt-1-2-240_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:14 2025 Normal termination: logfile=ethanol-opt-1-2-240_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:14 2025 All jobs have terminated ['ethanol-opt-1-2-240_postQMOPTpostfit.alz']
+Wed Feb 19 10:46:14 2025 Submitting: analyze.x ethanol-opt-1-2-240_preQMOPTpostfit.xyz -k tmp-1-2-240_preQMOPTpostfit.key ed > ethanol-opt-1-2-240_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:15 2025 Normal termination: logfile=ethanol-opt-1-2-240_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:16 2025 All jobs have terminated ['ethanol-opt-1-2-240_preQMOPTpostfit.alz']
+Wed Feb 19 10:46:16 2025 Submitting: minimize.x ethanol-opt-1-2-030_postQMOPTpostfit.xyz -k tmp-1-2-030_postQMOPTpostfit.key 0.1 >ethanol-opt-1-2-030_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:17 2025 Normal termination: logfile=ethanol-opt-1-2-030_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:17 2025 All jobs have terminated ['ethanol-opt-1-2-030_postQMOPTpostfit.out']
+Wed Feb 19 10:46:17 2025 Submitting: analyze.x ethanol-opt-1-2-030_postQMOPTpostfit.xyz_2 -k tmp-1-2-030_postQMOPTpostfit.key ed > ethanol-opt-1-2-030_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:18 2025 Normal termination: logfile=ethanol-opt-1-2-030_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:18 2025 All jobs have terminated ['ethanol-opt-1-2-030_postQMOPTpostfit.alz']
+Wed Feb 19 10:46:18 2025 Submitting: analyze.x ethanol-opt-1-2-030_preQMOPTpostfit.xyz -k tmp-1-2-030_preQMOPTpostfit.key ed > ethanol-opt-1-2-030_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:19 2025 Normal termination: logfile=ethanol-opt-1-2-030_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:19 2025 All jobs have terminated ['ethanol-opt-1-2-030_preQMOPTpostfit.alz']
+Wed Feb 19 10:46:19 2025 Submitting: minimize.x ethanol-opt-1-2-360_postQMOPTpostfit.xyz -k tmp-1-2-360_postQMOPTpostfit.key 0.1 >ethanol-opt-1-2-360_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:20 2025 Normal termination: logfile=ethanol-opt-1-2-360_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:20 2025 All jobs have terminated ['ethanol-opt-1-2-360_postQMOPTpostfit.out']
+Wed Feb 19 10:46:20 2025 Submitting: analyze.x ethanol-opt-1-2-360_postQMOPTpostfit.xyz_2 -k tmp-1-2-360_postQMOPTpostfit.key ed > ethanol-opt-1-2-360_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:21 2025 Normal termination: logfile=ethanol-opt-1-2-360_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:21 2025 All jobs have terminated ['ethanol-opt-1-2-360_postQMOPTpostfit.alz']
+Wed Feb 19 10:46:21 2025 Submitting: analyze.x ethanol-opt-1-2-360_preQMOPTpostfit.xyz -k tmp-1-2-360_preQMOPTpostfit.key ed > ethanol-opt-1-2-360_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:22 2025 Normal termination: logfile=ethanol-opt-1-2-360_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:22 2025 All jobs have terminated ['ethanol-opt-1-2-360_preQMOPTpostfit.alz']
+Wed Feb 19 10:46:22 2025 Submitting: minimize.x ethanol-opt-1-2-330_postQMOPTpostfit.xyz -k tmp-1-2-330_postQMOPTpostfit.key 0.1 >ethanol-opt-1-2-330_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:23 2025 Normal termination: logfile=ethanol-opt-1-2-330_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:23 2025 All jobs have terminated ['ethanol-opt-1-2-330_postQMOPTpostfit.out']
+Wed Feb 19 10:46:23 2025 Submitting: analyze.x ethanol-opt-1-2-330_postQMOPTpostfit.xyz_2 -k tmp-1-2-330_postQMOPTpostfit.key ed > ethanol-opt-1-2-330_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:25 2025 Normal termination: logfile=ethanol-opt-1-2-330_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:25 2025 All jobs have terminated ['ethanol-opt-1-2-330_postQMOPTpostfit.alz']
+Wed Feb 19 10:46:25 2025 Submitting: analyze.x ethanol-opt-1-2-330_preQMOPTpostfit.xyz -k tmp-1-2-330_preQMOPTpostfit.key ed > ethanol-opt-1-2-330_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:26 2025 Normal termination: logfile=ethanol-opt-1-2-330_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:26 2025 All jobs have terminated ['ethanol-opt-1-2-330_preQMOPTpostfit.alz']
+Wed Feb 19 10:46:26 2025 Submitting: minimize.x ethanol-opt-1-2-300_postQMOPTpostfit.xyz -k tmp-1-2-300_postQMOPTpostfit.key 0.1 >ethanol-opt-1-2-300_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:27 2025 Normal termination: logfile=ethanol-opt-1-2-300_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:27 2025 All jobs have terminated ['ethanol-opt-1-2-300_postQMOPTpostfit.out']
+Wed Feb 19 10:46:27 2025 Submitting: analyze.x ethanol-opt-1-2-300_postQMOPTpostfit.xyz_2 -k tmp-1-2-300_postQMOPTpostfit.key ed > ethanol-opt-1-2-300_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:28 2025 Normal termination: logfile=ethanol-opt-1-2-300_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:28 2025 All jobs have terminated ['ethanol-opt-1-2-300_postQMOPTpostfit.alz']
+Wed Feb 19 10:46:28 2025 Submitting: analyze.x ethanol-opt-1-2-300_preQMOPTpostfit.xyz -k tmp-1-2-300_preQMOPTpostfit.key ed > ethanol-opt-1-2-300_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:29 2025 Normal termination: logfile=ethanol-opt-1-2-300_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:29 2025 All jobs have terminated ['ethanol-opt-1-2-300_preQMOPTpostfit.alz']
+Wed Feb 19 10:46:29 2025 Submitting: minimize.x ethanol-opt-1-2-270_postQMOPTpostfit.xyz -k tmp-1-2-270_postQMOPTpostfit.key 0.1 >ethanol-opt-1-2-270_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:30 2025 Normal termination: logfile=ethanol-opt-1-2-270_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:30 2025 All jobs have terminated ['ethanol-opt-1-2-270_postQMOPTpostfit.out']
+Wed Feb 19 10:46:30 2025 Submitting: analyze.x ethanol-opt-1-2-270_postQMOPTpostfit.xyz_2 -k tmp-1-2-270_postQMOPTpostfit.key ed > ethanol-opt-1-2-270_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:31 2025 Normal termination: logfile=ethanol-opt-1-2-270_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:31 2025 All jobs have terminated ['ethanol-opt-1-2-270_postQMOPTpostfit.alz']
+Wed Feb 19 10:46:31 2025 Submitting: analyze.x ethanol-opt-1-2-270_preQMOPTpostfit.xyz -k tmp-1-2-270_preQMOPTpostfit.key ed > ethanol-opt-1-2-270_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:32 2025 Normal termination: logfile=ethanol-opt-1-2-270_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:33 2025 All jobs have terminated ['ethanol-opt-1-2-270_preQMOPTpostfit.alz']
+Wed Feb 19 10:46:33 2025 Submitting: minimize.x ethanol-opt-2-3-061_postQMOPTpostfit.xyz -k tmp-2-3-061_postQMOPTpostfit.key 0.1 >ethanol-opt-2-3-061_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:34 2025 Normal termination: logfile=ethanol-opt-2-3-061_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:34 2025 All jobs have terminated ['ethanol-opt-2-3-061_postQMOPTpostfit.out']
+Wed Feb 19 10:46:34 2025 Submitting: analyze.x ethanol-opt-2-3-061_postQMOPTpostfit.xyz_2 -k tmp-2-3-061_postQMOPTpostfit.key ed > ethanol-opt-2-3-061_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:35 2025 Normal termination: logfile=ethanol-opt-2-3-061_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:35 2025 All jobs have terminated ['ethanol-opt-2-3-061_postQMOPTpostfit.alz']
+Wed Feb 19 10:46:35 2025 Submitting: analyze.x ethanol-opt-2-3-061_preQMOPTpostfit.xyz -k tmp-2-3-061_preQMOPTpostfit.key ed > ethanol-opt-2-3-061_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:36 2025 Normal termination: logfile=ethanol-opt-2-3-061_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:36 2025 All jobs have terminated ['ethanol-opt-2-3-061_preQMOPTpostfit.alz']
+Wed Feb 19 10:46:36 2025 Submitting: minimize.x ethanol-opt-2-3-091_postQMOPTpostfit.xyz -k tmp-2-3-091_postQMOPTpostfit.key 0.1 >ethanol-opt-2-3-091_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:37 2025 Normal termination: logfile=ethanol-opt-2-3-091_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:37 2025 All jobs have terminated ['ethanol-opt-2-3-091_postQMOPTpostfit.out']
+Wed Feb 19 10:46:37 2025 Submitting: analyze.x ethanol-opt-2-3-091_postQMOPTpostfit.xyz_2 -k tmp-2-3-091_postQMOPTpostfit.key ed > ethanol-opt-2-3-091_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:38 2025 Normal termination: logfile=ethanol-opt-2-3-091_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:38 2025 All jobs have terminated ['ethanol-opt-2-3-091_postQMOPTpostfit.alz']
+Wed Feb 19 10:46:38 2025 Submitting: analyze.x ethanol-opt-2-3-091_preQMOPTpostfit.xyz -k tmp-2-3-091_preQMOPTpostfit.key ed > ethanol-opt-2-3-091_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:39 2025 Normal termination: logfile=ethanol-opt-2-3-091_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:39 2025 All jobs have terminated ['ethanol-opt-2-3-091_preQMOPTpostfit.alz']
+Wed Feb 19 10:46:39 2025 Submitting: minimize.x ethanol-opt-2-3-121_postQMOPTpostfit.xyz -k tmp-2-3-121_postQMOPTpostfit.key 0.1 >ethanol-opt-2-3-121_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:40 2025 Normal termination: logfile=ethanol-opt-2-3-121_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:40 2025 All jobs have terminated ['ethanol-opt-2-3-121_postQMOPTpostfit.out']
+Wed Feb 19 10:46:40 2025 Submitting: analyze.x ethanol-opt-2-3-121_postQMOPTpostfit.xyz_2 -k tmp-2-3-121_postQMOPTpostfit.key ed > ethanol-opt-2-3-121_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:41 2025 Normal termination: logfile=ethanol-opt-2-3-121_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:42 2025 All jobs have terminated ['ethanol-opt-2-3-121_postQMOPTpostfit.alz']
+Wed Feb 19 10:46:42 2025 Submitting: analyze.x ethanol-opt-2-3-121_preQMOPTpostfit.xyz -k tmp-2-3-121_preQMOPTpostfit.key ed > ethanol-opt-2-3-121_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:43 2025 Normal termination: logfile=ethanol-opt-2-3-121_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:43 2025 All jobs have terminated ['ethanol-opt-2-3-121_preQMOPTpostfit.alz']
+Wed Feb 19 10:46:43 2025 Submitting: minimize.x ethanol-opt-2-3-151_postQMOPTpostfit.xyz -k tmp-2-3-151_postQMOPTpostfit.key 0.1 >ethanol-opt-2-3-151_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:44 2025 Normal termination: logfile=ethanol-opt-2-3-151_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:44 2025 All jobs have terminated ['ethanol-opt-2-3-151_postQMOPTpostfit.out']
+Wed Feb 19 10:46:44 2025 Submitting: analyze.x ethanol-opt-2-3-151_postQMOPTpostfit.xyz_2 -k tmp-2-3-151_postQMOPTpostfit.key ed > ethanol-opt-2-3-151_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:45 2025 Normal termination: logfile=ethanol-opt-2-3-151_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:45 2025 All jobs have terminated ['ethanol-opt-2-3-151_postQMOPTpostfit.alz']
+Wed Feb 19 10:46:45 2025 Submitting: analyze.x ethanol-opt-2-3-151_preQMOPTpostfit.xyz -k tmp-2-3-151_preQMOPTpostfit.key ed > ethanol-opt-2-3-151_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:46 2025 Normal termination: logfile=ethanol-opt-2-3-151_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:46 2025 All jobs have terminated ['ethanol-opt-2-3-151_preQMOPTpostfit.alz']
+Wed Feb 19 10:46:46 2025 Submitting: minimize.x ethanol-opt-2-3-181_postQMOPTpostfit.xyz -k tmp-2-3-181_postQMOPTpostfit.key 0.1 >ethanol-opt-2-3-181_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:47 2025 Normal termination: logfile=ethanol-opt-2-3-181_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:47 2025 All jobs have terminated ['ethanol-opt-2-3-181_postQMOPTpostfit.out']
+Wed Feb 19 10:46:47 2025 Submitting: analyze.x ethanol-opt-2-3-181_postQMOPTpostfit.xyz_2 -k tmp-2-3-181_postQMOPTpostfit.key ed > ethanol-opt-2-3-181_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:48 2025 Normal termination: logfile=ethanol-opt-2-3-181_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:48 2025 All jobs have terminated ['ethanol-opt-2-3-181_postQMOPTpostfit.alz']
+Wed Feb 19 10:46:48 2025 Submitting: analyze.x ethanol-opt-2-3-181_preQMOPTpostfit.xyz -k tmp-2-3-181_preQMOPTpostfit.key ed > ethanol-opt-2-3-181_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:49 2025 Normal termination: logfile=ethanol-opt-2-3-181_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:50 2025 All jobs have terminated ['ethanol-opt-2-3-181_preQMOPTpostfit.alz']
+Wed Feb 19 10:46:50 2025 Submitting: minimize.x ethanol-opt-2-3-211_postQMOPTpostfit.xyz -k tmp-2-3-211_postQMOPTpostfit.key 0.1 >ethanol-opt-2-3-211_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:51 2025 Normal termination: logfile=ethanol-opt-2-3-211_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:51 2025 All jobs have terminated ['ethanol-opt-2-3-211_postQMOPTpostfit.out']
+Wed Feb 19 10:46:51 2025 Submitting: analyze.x ethanol-opt-2-3-211_postQMOPTpostfit.xyz_2 -k tmp-2-3-211_postQMOPTpostfit.key ed > ethanol-opt-2-3-211_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:52 2025 Normal termination: logfile=ethanol-opt-2-3-211_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:52 2025 All jobs have terminated ['ethanol-opt-2-3-211_postQMOPTpostfit.alz']
+Wed Feb 19 10:46:52 2025 Submitting: analyze.x ethanol-opt-2-3-211_preQMOPTpostfit.xyz -k tmp-2-3-211_preQMOPTpostfit.key ed > ethanol-opt-2-3-211_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:53 2025 Normal termination: logfile=ethanol-opt-2-3-211_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:53 2025 All jobs have terminated ['ethanol-opt-2-3-211_preQMOPTpostfit.alz']
+Wed Feb 19 10:46:53 2025 Submitting: minimize.x ethanol-opt-2-3-241_postQMOPTpostfit.xyz -k tmp-2-3-241_postQMOPTpostfit.key 0.1 >ethanol-opt-2-3-241_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:54 2025 Normal termination: logfile=ethanol-opt-2-3-241_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:54 2025 All jobs have terminated ['ethanol-opt-2-3-241_postQMOPTpostfit.out']
+Wed Feb 19 10:46:54 2025 Submitting: analyze.x ethanol-opt-2-3-241_postQMOPTpostfit.xyz_2 -k tmp-2-3-241_postQMOPTpostfit.key ed > ethanol-opt-2-3-241_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:55 2025 Normal termination: logfile=ethanol-opt-2-3-241_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:55 2025 All jobs have terminated ['ethanol-opt-2-3-241_postQMOPTpostfit.alz']
+Wed Feb 19 10:46:55 2025 Submitting: analyze.x ethanol-opt-2-3-241_preQMOPTpostfit.xyz -k tmp-2-3-241_preQMOPTpostfit.key ed > ethanol-opt-2-3-241_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:56 2025 Normal termination: logfile=ethanol-opt-2-3-241_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:56 2025 All jobs have terminated ['ethanol-opt-2-3-241_preQMOPTpostfit.alz']
+Wed Feb 19 10:46:56 2025 Submitting: minimize.x ethanol-opt-2-3-031_postQMOPTpostfit.xyz -k tmp-2-3-031_postQMOPTpostfit.key 0.1 >ethanol-opt-2-3-031_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:57 2025 Normal termination: logfile=ethanol-opt-2-3-031_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:57 2025 All jobs have terminated ['ethanol-opt-2-3-031_postQMOPTpostfit.out']
+Wed Feb 19 10:46:57 2025 Submitting: analyze.x ethanol-opt-2-3-031_postQMOPTpostfit.xyz_2 -k tmp-2-3-031_postQMOPTpostfit.key ed > ethanol-opt-2-3-031_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:58 2025 Normal termination: logfile=ethanol-opt-2-3-031_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:46:59 2025 All jobs have terminated ['ethanol-opt-2-3-031_postQMOPTpostfit.alz']
+Wed Feb 19 10:46:59 2025 Submitting: analyze.x ethanol-opt-2-3-031_preQMOPTpostfit.xyz -k tmp-2-3-031_preQMOPTpostfit.key ed > ethanol-opt-2-3-031_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:00 2025 Normal termination: logfile=ethanol-opt-2-3-031_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:00 2025 All jobs have terminated ['ethanol-opt-2-3-031_preQMOPTpostfit.alz']
+Wed Feb 19 10:47:00 2025 Submitting: minimize.x ethanol-opt-2-3-001_postQMOPTpostfit.xyz -k tmp-2-3-001_postQMOPTpostfit.key 0.1 >ethanol-opt-2-3-001_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:01 2025 Normal termination: logfile=ethanol-opt-2-3-001_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:01 2025 All jobs have terminated ['ethanol-opt-2-3-001_postQMOPTpostfit.out']
+Wed Feb 19 10:47:01 2025 Submitting: analyze.x ethanol-opt-2-3-001_postQMOPTpostfit.xyz_2 -k tmp-2-3-001_postQMOPTpostfit.key ed > ethanol-opt-2-3-001_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:02 2025 Normal termination: logfile=ethanol-opt-2-3-001_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:02 2025 All jobs have terminated ['ethanol-opt-2-3-001_postQMOPTpostfit.alz']
+Wed Feb 19 10:47:02 2025 Submitting: analyze.x ethanol-opt-2-3-001_preQMOPTpostfit.xyz -k tmp-2-3-001_preQMOPTpostfit.key ed > ethanol-opt-2-3-001_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:03 2025 Normal termination: logfile=ethanol-opt-2-3-001_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:03 2025 All jobs have terminated ['ethanol-opt-2-3-001_preQMOPTpostfit.alz']
+Wed Feb 19 10:47:03 2025 Submitting: minimize.x ethanol-opt-2-3-331_postQMOPTpostfit.xyz -k tmp-2-3-331_postQMOPTpostfit.key 0.1 >ethanol-opt-2-3-331_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:04 2025 Normal termination: logfile=ethanol-opt-2-3-331_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:04 2025 All jobs have terminated ['ethanol-opt-2-3-331_postQMOPTpostfit.out']
+Wed Feb 19 10:47:04 2025 Submitting: analyze.x ethanol-opt-2-3-331_postQMOPTpostfit.xyz_2 -k tmp-2-3-331_postQMOPTpostfit.key ed > ethanol-opt-2-3-331_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:05 2025 Normal termination: logfile=ethanol-opt-2-3-331_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:05 2025 All jobs have terminated ['ethanol-opt-2-3-331_postQMOPTpostfit.alz']
+Wed Feb 19 10:47:05 2025 Submitting: analyze.x ethanol-opt-2-3-331_preQMOPTpostfit.xyz -k tmp-2-3-331_preQMOPTpostfit.key ed > ethanol-opt-2-3-331_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:06 2025 Normal termination: logfile=ethanol-opt-2-3-331_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:07 2025 All jobs have terminated ['ethanol-opt-2-3-331_preQMOPTpostfit.alz']
+Wed Feb 19 10:47:07 2025 Submitting: minimize.x ethanol-opt-2-3-301_postQMOPTpostfit.xyz -k tmp-2-3-301_postQMOPTpostfit.key 0.1 >ethanol-opt-2-3-301_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:08 2025 Normal termination: logfile=ethanol-opt-2-3-301_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:08 2025 All jobs have terminated ['ethanol-opt-2-3-301_postQMOPTpostfit.out']
+Wed Feb 19 10:47:08 2025 Submitting: analyze.x ethanol-opt-2-3-301_postQMOPTpostfit.xyz_2 -k tmp-2-3-301_postQMOPTpostfit.key ed > ethanol-opt-2-3-301_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:09 2025 Normal termination: logfile=ethanol-opt-2-3-301_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:09 2025 All jobs have terminated ['ethanol-opt-2-3-301_postQMOPTpostfit.alz']
+Wed Feb 19 10:47:09 2025 Submitting: analyze.x ethanol-opt-2-3-301_preQMOPTpostfit.xyz -k tmp-2-3-301_preQMOPTpostfit.key ed > ethanol-opt-2-3-301_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:10 2025 Normal termination: logfile=ethanol-opt-2-3-301_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:10 2025 All jobs have terminated ['ethanol-opt-2-3-301_preQMOPTpostfit.alz']
+Wed Feb 19 10:47:10 2025 Submitting: minimize.x ethanol-opt-2-3-271_postQMOPTpostfit.xyz -k tmp-2-3-271_postQMOPTpostfit.key 0.1 >ethanol-opt-2-3-271_postQMOPTpostfit.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:11 2025 Normal termination: logfile=ethanol-opt-2-3-271_postQMOPTpostfit.out path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:11 2025 All jobs have terminated ['ethanol-opt-2-3-271_postQMOPTpostfit.out']
+Wed Feb 19 10:47:11 2025 Submitting: analyze.x ethanol-opt-2-3-271_postQMOPTpostfit.xyz_2 -k tmp-2-3-271_postQMOPTpostfit.key ed > ethanol-opt-2-3-271_postQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:12 2025 Normal termination: logfile=ethanol-opt-2-3-271_postQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:12 2025 All jobs have terminated ['ethanol-opt-2-3-271_postQMOPTpostfit.alz']
+Wed Feb 19 10:47:12 2025 Submitting: analyze.x ethanol-opt-2-3-271_preQMOPTpostfit.xyz -k tmp-2-3-271_preQMOPTpostfit.key ed > ethanol-opt-2-3-271_preQMOPTpostfit.alz path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:13 2025 Normal termination: logfile=ethanol-opt-2-3-271_preQMOPTpostfit.alz path=/home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp/qm-torsion
+Wed Feb 19 10:47:13 2025 All jobs have terminated ['ethanol-opt-2-3-271_preQMOPTpostfit.alz']
+Wed Feb 19 10:47:13 2025 Torsion 406 401 402 403 RMSD(MM2,QM) 0.05267297895846801 RelativeRMSD(MM2,QM) 0.03140504757083453 
+
+Wed Feb 19 10:47:13 2025 Torsion 406 401 402 404 RMSD(MM2,QM) 0.05267297895846801 RelativeRMSD(MM2,QM) 0.03140504757083453 
+
+Wed Feb 19 10:47:13 2025 Torsion 401 402 403 405 RMSD(MM2,QM) 0.04407599061904585 RelativeRMSD(MM2,QM) 0.016612870379001343 
+
+Wed Feb 19 10:47:13 2025 Torsion 404 402 403 405 RMSD(MM2,QM) 0.04407599061904585 RelativeRMSD(MM2,QM) 0.016612870379001343 
+
+Wed Feb 19 10:47:14 2025 
+Wed Feb 19 10:47:14 2025 =========================================================
+Wed Feb 19 10:47:14 2025 Minimizing structure
+
+Wed Feb 19 10:47:14 2025 Submitting: minimize.x -k final.key final.xyz 0.1 > Minimized_final.out path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+Wed Feb 19 10:47:14 2025 
+
+Wed Feb 19 10:47:14 2025 =========================================================
+
+Wed Feb 19 10:47:14 2025 Structure RMSD Comparison
+
+
+Wed Feb 19 10:47:14 2025 Submitting: superpose.x ethanol.xyz_2 final.xyz_2 1 N M N 0  > ethanol-superin.txt path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+Wed Feb 19 10:47:14 2025 RMSD = 0.003754 Tolerance is 1
+Wed Feb 19 10:47:14 2025 Submitting: analyze.x ethanol.xyz_2 -k final.key em | grep -A11 Charge>MMDipole.txt path = /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+Wed Feb 19 10:47:15 2025 Relative error of 0.0003633415995040261 for QMDipole 1.613 and 1.61241393 for MMDipole  tolerance = 0.5 /home/liuchw/poltype-dev/Examples/Parm_Ethanol/Temp
+Wed Feb 19 10:47:15 2025 Total torsion QM time for ((9, 1, 2, 4),) is 0.023 hours and 36 conformations
+Wed Feb 19 10:47:15 2025 OPT torsion QM time for ((9, 1, 2, 4),) is 0.014 hours and 36 conformations
+Wed Feb 19 10:47:15 2025 SP torsion QM time for ((9, 1, 2, 4),) is 0.009 hours and 36 conformations
+Wed Feb 19 10:47:15 2025 Total torsion QM time for ((4, 2, 3, 6),) is 0.023 hours and 36 conformations
+Wed Feb 19 10:47:15 2025 OPT torsion QM time for ((4, 2, 3, 6),) is 0.014 hours and 36 conformations
+Wed Feb 19 10:47:15 2025 SP torsion QM time for ((4, 2, 3, 6),) is 0.009 hours and 36 conformations
+Wed Feb 19 10:47:15 2025 python "/home/liuchw/poltype-dev/PoltypeModules/lFormatTXYZ.py" final.xyz
+Wed Feb 19 10:47:15 2025 Poltype Job Finished
+

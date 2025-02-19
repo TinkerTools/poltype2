@@ -1,0 +1,58 @@
+molecule { 
+0 1
+ O    1.144800   -0.560000   -0.793100
+ C    0.459900    0.246900    0.144500
+ C   -1.016300   -0.115200    0.103100
+ H    0.591200    1.311100   -0.101800
+ H    0.858700    0.076900    1.155700
+ H   -1.407400    0.055400   -0.895600
+ H   -1.569000    0.490600    0.815200
+ H   -1.142800   -1.165600    0.348500
+ H    2.080900   -0.340100   -0.776400
+}
+set {
+  geom_maxiter 400
+  g_convergence GAU_LOOSE
+  dynamic_level 1
+}
+geometric_keywords = {
+ 'coordsys' : 'tric',
+ 'convergence_cmax' : 1e0,
+ 'convergence_set' : 'GAU_LOOSE',
+ 'convergence_energy' : 1e-4,
+ 'constraints' : {
+ 'set' : [
+       {'type'    : 'dihedral', 'indices' : [ 8 , 0 , 1 , 3 ], 'value' : 59.6714 } 
+     , {'type'    : 'dihedral', 'indices' : [ 3 , 1 , 2 , 5 ], 'value' : 60.9745 } 
+    ]
+  }
+}
+set optking { 
+  frozen_dihedral = ("
+   9 1 2 4
+   4 2 3 6
+  ")
+}
+memory 16GB
+set_num_threads(8)
+psi4_io.set_default_path("/scratch/liuchw/Psi4-ethanol")
+basis {
+assign 6-31G*
+}
+opt_finished = False
+if not opt_finished:
+    try:
+        ener, opt_hist = optimize('mp2',engine='geometric',optimizer_keywords=geometric_keywords, return_history=True)
+        opt_finished = len(opt_hist['energy']) < 400
+    except Exception as e:
+        core.print_out('Exception: %s'%(e))
+if not opt_finished:
+    try:
+        optimize('mp2')
+    except:
+        set opt_coordinates both
+        optimize('mp2')
+    opt_finished = True
+clean()
+assert opt_finished
+
