@@ -526,6 +526,12 @@ def gen_peditinfile(poltype,mol):
             for match in matches:
               n,h,c1,c2 = match
               frames.append(f'{n+1} {h+1} -{c1+1} -{c2+1}')
+            # nHc2
+            pattern = Chem.MolFromSmarts('[#7X3H1;R]([H])([#6;R])[#6;R]')
+            matches = rdkitmol.GetSubstructMatches(pattern)
+            for match in matches:
+              n,h,c1,_ = match
+              frames.append(f'{h+1} {n+1} {c1+1}')
             # NH2-C
             pattern = Chem.MolFromSmarts('[NH2]([H])([H])[CX4]')
             matches = rdkitmol.GetSubstructMatches(pattern)
@@ -537,11 +543,11 @@ def gen_peditinfile(poltype,mol):
             pattern = Chem.MolFromSmarts('[NH2]([H])([H])[CX3]=O')
             matches = rdkitmol.GetSubstructMatches(pattern)
             for match in matches:
-              n,h1,h2,_,_ = match
-              # this is not the right way
-              #frames.append(f'{h1+1} {n+1} {h2+1}')
-              #frames.append(f'{h2+1} {n+1} {h1+1}')
-              # this is the RIGHT way but this lead to worse ESP
+              n,h1,h2,c,_ = match
+              # z-then-x
+              frames.append(f'{h1+1} {n+1} {c+1}')
+              frames.append(f'{h2+1} {n+1} {c+1}')
+              # bisect 
               frames.append(f'{n+1} -{h1+1} -{h2+1}')
             # NH2-c 
             # this will give better quality of the ESP

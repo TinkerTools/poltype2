@@ -176,6 +176,13 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
     angle_list = []
     WBOarray=[]
     phaseangle_list=[]
+
+    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
+        if poltype.toroptpcm==True or (poltype.toroptpcm==-1 and poltype.pcm):
+            Soft = 'PySCF'
+        else:
+            Soft = 'Psi4'
+    
     for phaseangles in flatphaselist:
         prefix='%s-%s-sp-' % (poltype.toroptmethod,poltype.torspmethod)
         postfix='.log' 
@@ -186,7 +193,7 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
             WBOvalues=None
         else:
             WBOvalues=[]
-            if poltype.torspmethod!='xtb' and poltype.torspmethod!='ANI' and poltype.torspmethod!='FENNIX':
+            if poltype.torspmethod!='xtb' and poltype.torspmethod!='ANI' and poltype.torspmethod!='FENNIX' and Soft != 'PySCF':
                 use_gaus=False
                 use_gaus=CheckIfLogFileUsingGaussian(poltype,minstrctfname)
                 if use_gaus:
@@ -228,12 +235,15 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
                 tor_energy=ParseANIEnergyLog(poltype,minstrctfname)
             elif poltype.torspmethod=='FENNIX':
                 tor_energy=ParseFENNIXEnergyLog(poltype,minstrctfname)
+            elif Soft == 'PySCF':
+                tor_energy=ParsePYSCFEnergyLog(poltype,minstrctfname)
 
         WBOarray.append(WBOvalues)
         energy_list.append(tor_energy)
         
         angle_list.append(angles)
         phaseangle_list.append(phaseangles)
+
     nonecount=energy_list.count(None)
     normalpts=len(energy_list)-nonecount
     if torset in poltype.torsionsettonumptsneeded.keys():
@@ -953,7 +963,7 @@ def fit_rot_bond_tors(poltype,mol,cls_mm_engy_dict,cls_qm_engy_dict,cls_angle_di
             ### here we use L1+L2 regularization approach
 
             if useweights==True: 
-                errfunc = lambda p, x, z, torprmdict, y: numpy.array(list(fitfunc(poltype,p, x,z, torprmdict) - weightlist*y) + list(numpy.sqrt(numpy.absolute(numpy.array(p))) * L1_restraint_factor) + list(numpy.array(p) * L2_restraint_factor))
+                errfunc = lambda p, x, z, torprmdict, y: numpy.array(list((fitfunc(poltype,p, x,z, torprmdict) - y)*weightlist) + list(numpy.sqrt(numpy.absolute(numpy.array(p))) * L1_restraint_factor) + list(numpy.array(p) * L2_restraint_factor))
 
             else:
                 errfunc = lambda p, x, z, torprmdict, y: numpy.array(list(fitfunc(poltype,p, x,z, torprmdict) - y) + list(numpy.sqrt(numpy.absolute(numpy.array(p))) * L1_restraint_factor) + list(numpy.array(p) * L2_restraint_factor))
@@ -2227,3 +2237,17 @@ def ParseFENNIXEnergyLog(poltype,outputname):
         energy=float(line.split()[-2])
     return energy
 
+def ParsePYSCFEnergyLog(poltype,outputname):
+    """
+    Intent:
+    Input:
+    Output:
+    Referenced By: 
+    Description: 
+    """
+
+    for line in open(outputname).readlines():
+      if 'Final Energy: ' in line:
+          L = line.rstrip('\n').split(':')[-1]
+          energy = float(L)*poltype.Hartree2kcal_mol
+    return energy

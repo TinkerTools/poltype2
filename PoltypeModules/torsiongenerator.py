@@ -204,16 +204,26 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
     Referenced By: 
     Description: 
     """
+
     jobtooutputlog={}
     listofjobs=[]
     outputnames=[]
     inputfilepaths=[]
     outputfilenames=[]
     executables=[]
+
+    # Check if PySCF is needed or not
+    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
+        if poltype.toroptpcm==True or (poltype.toroptpcm==-1 and poltype.pcm):
+            Soft = 'PySCF'
+        else:
+            Soft = 'Psi4'
+
+
     for i in range(len(optoutputlogs)):
         outputlog=optoutputlogs[i]
         phaseangles=optlogtophaseangle[outputlog]
-        if poltype.torspmethod!='xtb' and poltype.torspmethod!='ANI' and poltype.torspmethod != 'FENNIX':
+        if poltype.torspmethod!='xtb' and poltype.torspmethod!='ANI' and poltype.torspmethod != 'FENNIX' and Soft != 'PySCF':
             if not poltype.use_gaus:
                 prevstrctfname=outputlog.replace('.log','.xyz')
                 inputname,outputname=CreatePsi4TorESPInputFile(poltype,prevstrctfname,optmol,torset,phaseangles,mol)
@@ -251,6 +261,18 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
             outputname=inputname.replace(postfix,'.log')
             fennix4poltype.FENNIX_SP(poltype, prevstrctfname, outputname) 
 
+        elif Soft == 'PySCF':
+            prevstrctfname=outputlog.replace('.log','.xyz')
+            executable='PySCF'
+            prefix='%s-%s-sp-' % (poltype.toroptmethod,poltype.torspmethod)
+            postfix='.input'
+            inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
+            outputname=inputname.replace(postfix,'.log')
+            pre=inputname.replace(postfix,'')
+
+            from pyscf_for_frag import setup_frag_sp
+
+            inputname,outputname,cmdstr= setup_frag_sp(poltype,optmol,prevstrctfname,pre)
 
         finished,error=poltype.CheckNormalTermination(outputname,errormessages=None,skiperrors=True)
         inputfilepath=os.path.join(os.getcwd(),inputname)
@@ -266,7 +288,8 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
         outputnames.append(outputname)
         outputlogtophaseangles[outputname]=phaseangles
         optlogtosplog[outputlog]=outputname
-    if not poltype.use_gaus:
+
+    if not poltype.use_gaus and Soft == 'Psi4':
         
         return outputnames,listofjobs,poltype.scrtmpdirpsi4,jobtooutputlog,outputlogtophaseangles,optlogtosplog,inputfilepaths,outputfilenames,executables
     else:
@@ -354,6 +377,13 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
     Referenced By: 
     Description: 
     """
+
+    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
+        if poltype.toroptpcm==True or (poltype.toroptpcm==-1 and poltype.pcm):
+            Soft = 'PySCF'
+        else:
+            Soft = 'Psi4'
+
     # Case: AMOEBA
     if poltype.toroptmethod=='AMOEBA':
         inputstruct=ConvertTinktoXYZ(poltype,torxyzfname,torxyzfname.replace('.xyz','_cart.xyz'))
@@ -462,9 +492,42 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
         return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4,executable
     
     
-    # In this case we are using either psi4 or Gaussian
-    else: 
-        if  poltype.use_gaus==False and poltype.use_gausoptonly==False:
+    # In this case we are using either psi4, PySCF or Gaussian
+    else:
+        if Soft == 'PySCF':
+            inputstruct=ConvertTinktoXYZ(poltype,torxyzfname,torxyzfname.replace('.xyz','_cart.xyz'))
+            inputmol= opt.load_structfile(poltype,inputstruct)
+            prefix=poltype.toroptmethod+'-opt-'
+            postfix='.input'
+            inputname,angles=GenerateFilename(poltype,torset,phaseangles,prefix,postfix,optmol)
+            pre=inputname.replace(postfix,'')
+            newtorset=[]
+            rotbndtorescount={}
+            maxrotbnds=1
+            restlist=[]
+            torsiontophaseangle={}
+            torsiontomaintor={}
+
+            rottors,rotbndtorescount,restlist,rotphases,torsiontophaseangle,torsiontomaintor=RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor)
+            frotors,rotbndtorescount,restlist,torsiontophaseangle,torsiontomaintor=FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,inputmol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor)
+
+            for tor in rottors:
+                newtorset.append(tor)
+            for tor in frotors:
+                newtorset.append(tor)
+
+            toranglelist=GrabTorsionAngles(poltype,newtorset,inputmol)
+
+            from pyscf_for_frag import setup_frag_opt
+            inputname,outputname,cmdstr = setup_frag_opt(poltype,newtorset,toranglelist,\
+                                            pre,inputmol,inputname,inputstruct)
+
+            executable='python'
+
+            return inputname,outputname,cmdstr,poltype.scrtmpdirpsi4,executable
+            
+
+        elif Soft == 'Psi4':
             inputname,outputname=CreatePsi4TorOPTInputFile(poltype,torset,phaseangles,optmol,torxyzfname,variabletorlist,mol,currentopt)
             cmdstr=' '.join(['psi4 ',poltype.psi4_args,inputname,outputname])
             executable='psi4'
@@ -1183,8 +1246,8 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         else:
             poltype.toroptpcm=poltype.temptoroptpcm
             poltype.torsppcm=poltype.temptorsppcm
-
         outputlogs,listofjobs,scratchdir,jobtooutputlog,initialstructures,optlogtophaseangle,inputfilepaths,outputfilenames,executables,outputlogtoinitialxyz=ExecuteOptJobs(poltype,listoftinkertorstructures,flatphaselist,optmol,torset,variabletorlist,torsionrestraint,mol,'1',optlogtophaseangle)
+
         torsettooptoutputlogs[tuple(torset)]=outputlogs
         dictionary = dict(zip(outputlogs,initialstructures))  
         torsettooutputlogtoinitialstructure[tuple(torset)].update(dictionary)
@@ -1227,7 +1290,11 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
             cartxyz=outputlog.replace('.log','.xyz')
             if finished==True:
                 if poltype.toroptmethod!='xtb' and poltype.toroptmethod!='ANI' and poltype.toroptmethod!='AMOEBA':
-                    opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
+                    if 'pyscf' in outputlog:
+                        from pyscf_for_frag import read_frag_opt
+                        read_frag_opt(poltype,outputlog,mol)
+                    else: 
+                        opt.GrabFinalXYZStructure(poltype,outputlog,cartxyz,mol)
                 CheckIfQMOptReachedTargetDihedral(poltype,cartxyz,initialtinkerstructure,torset,optmol,variabletorlist,phaseangles) # QM usually freezes dof but xtb and ANI does not freeze so need to add check now.
                 tinkerxyz=outputlog.replace('.log','_tinker.xyz')
                 ConvertCartesianXYZToTinkerXYZ(poltype,cartxyz,tinkerxyz)
@@ -1237,7 +1304,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
                 newphaseangles.append(phsang)
                     
 
-        poltype.torsettophaselist[tuple(torset)]=newphaseangles         
+        poltype.torsettophaselist[tuple(torset)]=newphaseangles
     firstfinishedjobs=finishedjobs[:]
     for job in firstfinishedjobs:
         if job not in finishedjobs:
@@ -1274,6 +1341,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         listofcputimesopt=poltype.TabulateCPUTimes([finishedoutputlogs])[0]
         torsettooptcputime[torset]=listofcputimesopt
         outputlogs,listofjobs,scratchdir,jobtooutputlog,outputlogtophaseangles,optlogtosplog,inputfilepaths,outputfilenames,executables=ExecuteSPJobs(poltype,finishedoutputlogs,finishedflatphaselist,optmol,torset,variabletorlist,torsionrestraint,outputlogtophaseangles,mol,optlogtosplog,optlogtophaseangle)
+
         lognames=[]
         torsettospoutputlogs[tuple(torset)]=outputlogs
         for jobidx in range(len(listofjobs)):
@@ -1291,10 +1359,6 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         fulljobtooutputlog.update(jobtooutputlog)
         fulllistofjobs.extend(listofjobs)
         fulljobtolog.update(jobtolog)
-
-
-    
-
 
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMSPJobToLog'+'_'+poltype.molecprefix
     if poltype.externalapi!=None:

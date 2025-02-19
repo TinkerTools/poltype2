@@ -456,6 +456,9 @@ class PolarizableTyper():
         espbasisset:str="aug-cc-pVTZ"
         torspbasisset:str="6-311+G*"
         optmethod:str='MP2'
+        pyscf_opt_meth:str = 'wb97x_d3'
+        pyscf_sol_imp:str = 'IEF-PCM' # C-PCM, SS(V)PE, COSMO
+        pyscf_sol_eps:float = 78.3553 # Water
         toroptmethod:str='xtb'
         torspmethod:str='wB97X-D'
         dmamethod:str='MP2'
@@ -474,8 +477,8 @@ class PolarizableTyper():
         gentorsion:bool=False
         gaustorerror:bool=False
         torsionrestraint:float=.5*3282.80354574
-        torsionprmrestraintfactorL1:float=1.0
-        torsionprmrestraintfactorL2:float=1.0
+        torsionprmrestraintfactorL1:float=0.1
+        torsionprmrestraintfactorL2:float=0.1
         onlyrotbndslist:list=field(default_factory=lambda : [])
         rotalltors:bool=False
         dontdotor:bool=False
@@ -1189,6 +1192,12 @@ class PolarizableTyper():
                                     warnings.warn(f"Could not locate prmmod file '{fpath1}'")
                         elif newline.startswith("optmethod"):
                             self.optmethod = a
+                        elif newline.startswith("pyscf_opt_met"):
+                            self.pyscf_opt_met = a
+                        elif newline.startswith("pyscf_sol_imp"):
+                            self.pyscf_sol_imp = a
+                        elif newline.startswith("pyscf_sol_eps"):
+                            self.pyscf_sol_eps = a
                         elif newline.startswith("espmethod"):
                             self.espmethod = a
                         elif "torspmethod" in newline:
@@ -3373,6 +3382,7 @@ class PolarizableTyper():
             5. If error occured, write out line containing error to poltype log file.
             6. xtb only outputs the same filename for optimization jobs, so be sure to copy to desired filename after job finishes. 
             """
+            
             error=False
             term=False
             lastupdatetofilename={}
@@ -3412,7 +3422,7 @@ class PolarizableTyper():
                     else:
                         if "Final optimized geometry" in line or "Electrostatic potential computed" in line or 'Psi4 exiting successfully' in line or "LBFGS  --  Normal Termination due to SmallGrad" in line or "Normal termination" in line or 'Normal Termination' in line or 'Total Potential Energy' in line or 'Psi4 stopped on' in line or 'finished run' in line or ('Converged! =D' in line):
                             term=True
-                        if ('Tinker is Unable to Continue' in line or 'error' in line or ' Error ' in line or ' ERROR ' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line or 'Optimization failed to converge!' in line) and 'DIIS' not in line and 'mpi' not in line and 'RMS Error' not in line:
+                        if ('Tinker is Unable to Continue' in line or 'error' in line or ' Error ' in line or ' ERROR ' in line or 'impossible' in line or 'software termination' in line or 'segmentation violation, address not mapped to object' in line or 'galloc:  could not allocate memory' in line or 'Erroneous write.' in line or 'Optimization failed to converge!' in line or 'Geometry optimization is not converged' in line or 'Error' in line) and 'DIIS' not in line and 'mpi' not in line and 'RMS Error' not in line:
                             error=True
                             errorline=line
                         if 'segmentation violation' in line and 'address not mapped to object' not in line or 'Waiting' in line or ('OptimizationConvergenceError' in line and 'except' in line) or "Error on total polarization charges" in line or 'Erroneous write' in line:
@@ -3514,7 +3524,13 @@ class PolarizableTyper():
                     # STEP 1
                     self.WriteToLog("Submitting: " + cmdstr+' '+'path'+' = '+os.getcwd())
                     # STEP 2
-                    p = subprocess.Popen(cmdstr,shell=True,stdout=self.logfh, stderr=self.logfh)
+                    if 'pyscf' in cmdstr:
+                        out = cmdstr.split()[-1]
+                        out_pyscf = open(out, 'w')
+                        p = subprocess.Popen(cmdstr,shell=True,stdout=out_pyscf, stderr=out_pyscf)
+                    else:
+                        p = subprocess.Popen(cmdstr,shell=True,stdout=self.logfh, stderr=self.logfh)
+
                     procs.append(p)
                     self.cmdtopid[cmdstr]=p
 
@@ -3527,11 +3543,15 @@ class PolarizableTyper():
                     # STEP 4
                     if skiperrors==False:
                         if exitcode != 0:
+                            if 'pyscf' in cmdstr:
+                                out_pyscf.close()
                             self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
                             raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
                     else:
                         if exitcode != 0:
                             self.WriteToLog("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())
+            if 'pyscf' in cmdstr:
+                out_pyscf.close()
 
         def WriteOutLiteratureReferences(self,keyfilename): 
             """
@@ -4098,7 +4118,16 @@ class PolarizableTyper():
             5. If user input wants multiple confomors for multipole parameterization then use the next lowest energy confomors (not necearrily maximaly extended conformation) as well.
             6. Save coordinates of conformations in dictionary for later use in QM optimzation  
             """
-            cmdstr = f"python \"{os.path.join(os.path.abspath(os.path.split(__file__)[0]), 'lConformerGenerator.py')}\" -i {self.molstructfname} "
+            pythonpath=self.which('python')
+            head,tail=os.path.split(pythonpath)
+            pythonpath=Path(head) 
+            envdir=pythonpath.parent.absolute()
+            envpath=Path(envdir)
+            allenvs=envpath.parent.absolute()
+            xtbenvpath=os.path.join(allenvs,self.xtbenvname)
+            pythonpath=os.path.join(xtbenvpath,'bin')
+            xtbpath=os.path.join(pythonpath,'xtb')
+            cmdstr = f"python \"{os.path.join(os.path.abspath(os.path.split(__file__)[0]), 'lConformerGenerator.py')}\" -i {self.molstructfname} -p {xtbpath}"
             self.WriteToLog('Calling: '+cmdstr) 
             os.system(cmdstr)
             name = "conftest.mol" 
@@ -5155,6 +5184,9 @@ class PolarizableTyper():
                 shutil.copy(self.xyzfname,self.xyzoutfile)
             shutil.copy(self.xyzoutfile,self.tmpxyzfile)
             shutil.copy(self.key7fname,self.tmpkeyfile)
+
+            shutil.copy(self.key7fname,'TEST_tim.key')
+            
             # STEP 51
             if self.writeoutpolarize and self.writeoutmultipole==True:
                 opt.StructureMinimization(self,torsionrestraints)
@@ -5175,7 +5207,6 @@ class PolarizableTyper():
                 self.WriteToLog('Total torsion QM time for '+str(torset)+' is '+str(round(totaltime,3))+' hours'+' and '+str(numpoints)+' conformations')
                 self.WriteToLog('OPT torsion QM time for '+str(torset)+' is '+str(round(opttime,3))+' hours'+' and '+str(numpoints)+' conformations')
                 self.WriteToLog('SP torsion QM time for '+str(torset)+' is '+str(round(sptime,3))+' hours'+' and '+str(numpoints)+' conformations')
-            self.WriteToLog('Poltype Job Finished'+'\n')
             # STEP 55
             if self.isfragjob==False and self.dontfrag==True and len(self.torlist)!=0:
                 self.WriteOutDatabaseParameterLines()
@@ -5198,16 +5229,24 @@ class PolarizableTyper():
             # STEP 58
             if self.isfragjob==False:
                 previousdir=os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-                if os.path.exists(self.tmpxyzfile):
-                     shutil.copy(self.tmpxyzfile,os.path.join(previousdir,self.tmpxyzfile))
+                # copy the optimized xyz file
+                if os.path.exists(self.tmpxyzfile + '_2'):
+                     shutil.copy(self.tmpxyzfile + '_2',os.path.join(previousdir,self.tmpxyzfile))
                 if os.path.exists(self.tmpkeyfile):
                      shutil.copy(self.tmpkeyfile,os.path.join(previousdir,self.tmpkeyfile))
             self.CopyFitPlots()
             os.chdir('..')
+            
+            if os.path.isfile(self.tmpxyzfile):
+              cmdstr = f"python \"{os.path.join(os.path.abspath(os.path.split(__file__)[0]), 'lFormatTXYZ.py')}\" {self.tmpxyzfile}"
+              self.WriteToLog(cmdstr)
+              os.system(cmdstr)
 
             # STEP 59
             # apply any modifications to the final.key
             lmodifytinkerkey.mod_final_key(self)
+            
+            self.WriteToLog('Poltype Job Finished'+'\n')
 
 
             
