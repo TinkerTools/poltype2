@@ -715,11 +715,26 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
     comoptfname=poltype.comoptfname.replace('_1','_'+suffix)
     chkoptfname=poltype.chkoptfname.replace('_1','_'+suffix)
 
-    if (poltype.use_gaus==True or poltype.use_gausoptonly==True): # try to use gaussian for opt
+    # Define which software will be used for the QM optimization
+    
+    # Only use Gaussian when users require
+    if poltype.use_gaus or poltype.use_gausoptonly:
+      Soft = 'Gaussian'
+    # Otherwise use Psi4 
+    else:
+      Soft = 'Psi4' 
+    
+    # Replace Psi4 with PySCF when pcm is needed
+    if (poltype.optpcm==True or (poltype.optpcm==-1 and poltype.pcm)) and (Soft == 'Psi4'):
+      Soft = 'PySCF'
+    
+    if Soft == 'Gaussian': # try to use gaussian for opt
         term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)
         if not term or overridecheckterm==True:
             
             poltype.WriteToLog("QM Geometry Optimization")
+            poltype.WriteToLog(f'The software {Soft} will be used to do the QM optimization')
+
             gen_optcomfile(poltype,comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,chkoptfname,mol,modred,torsionrestraints)
             cmdstr = 'GAUSS_SCRDIR=' + poltype.scrtmpdirgau + ' ' + poltype.gausexe + " " + comoptfname
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+logoptfname}
@@ -749,8 +764,95 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
         optmol =  load_structfile(poltype,logoptfname)
         optmol=rebuild_bonds(poltype,optmol,mol)
         
-           
-    else:
+    if Soft == 'PySCF':
+
+        import importlib
+            
+        try:
+            importlib.import_module('pyscf')
+            poltype.WriteToLog("PySCF is installed.\n")
+        except ImportError:
+            poltype.WriteToLog("PySCF is not installed.\n Make sure that pyscf version 2.7.0 is installed along with dft3, dft4 and pyscf-dispersion.\n You can install using: \n        `pip install pyscf==2.7.0 dft3 dft4 pyscf-dispersion`")
+            raise ImportError("PySCF is not installed.\n Make sure that pyscf version 2.7.0 is installed along with dft3, dft4 and pyscf-dispersion.\n You can install using: \n        `pip install pyscf==2.7.0 dft3 dft4 pyscf-dispersion`")
+    
+
+        gen_optcomfile(poltype,comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,chkoptfname,mol,modred,torsionrestraints)
+        term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)
+        modred=False
+
+        # Import both PySCF setup class
+        from pyscf_setup import PySCF_init_setup
+        from pyscf_setup import PySCF_post_run
+
+        # Instantiate the initial pyscf setup object
+        Opt_prep = PySCF_init_setup(poltype,os.getcwd(),comoptfname,mol,\
+                               skipscferror,charge)
+    
+        # Read the gaussian input coordinate
+        Opt_prep.read_Gauss_inp_coord()
+
+        # Write the initial xyz file to be used by PySCF
+        Opt_prep.write_xyz('init')
+
+        # Write the torsion constraints to be used 
+        # during the QM optimization
+        Opt_prep.write_geometric_tor_const('init',torsionrestraints)
+
+        # Write the PySCF input file
+        Opt_prep.write_PySCF_input(True,False)
+
+        # Define the cmd to run PySCF
+        cmd = f'python {Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_inp_file} &> {Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'
+
+        # Create the dictionnary with the commnd to be used by CallJobsSeriallyLocalHost
+        cmd_to_run = {cmd: f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'}
+
+        # If the user only want to create input file
+        if poltype.checkinputonly==True:
+            sys.exit()
+
+        # Make sure to delete the PySCF output file 
+        # before running it
+        if os.path.isfile(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'):
+            os.remove(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}')
+
+        # Run PySCF with either external API 
+        # or SerialLocalHost
+        if poltype.externalapi==None:
+            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(cmd_to_run,skiperrors)
+        else:
+            jobtoinputfilepaths = {cmd: [f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_inp_file}']}
+            jobtooutputfiles = {cmd: [f'{Opt_prep.PySCF_out_file}']}
+            jobtoabsolutebinpath = {cmd: poltype.which('pyscf')}
+            scratchdir = poltype.scrtmpdirpsi4
+            jobtologlistfilepathprefix = f'{Opt_prep.init_data["topdir"]}/optimization_jobtolog_{poltype.molecprefix}'
+       
+            call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilepathprefix)
+            finishedjobs,errorjobs=poltype.WaitForTermination(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}',False) 
+
+        # Check normal termination of PySCF job
+        term,error=poltype.CheckNormalTermination(f'{Opt_prep.PySCF_out_file}',None,skiperrors)
+
+        if error and term==False and skiperrors==False:
+            # This poltype method does not exists...
+            poltype.RaiseOutputFileError(f'{Opt_prep.PySCF_out_file}')
+
+        # Instantiate the post process PySCF class
+        Opt_post = PySCF_post_run(poltype,os.getcwd(),f'{Opt_prep.PySCF_out_file}',mol)
+
+        # Read the output file from PySCF
+        Opt_post.read_out()
+
+        # Use OpenBabel to build a molecule out of the optimized structure
+        optmol =  load_structfile(poltype,Opt_post.final_opt_xyz)
+        optmol=rebuild_bonds(poltype,optmol,mol)
+    
+        # Here we redefine logoptfname and poltype.logoptfname
+        # to make sure that hereafter, the pyscf output is used!
+        logoptfname = Opt_prep.PySCF_out_file
+        poltype.logoptfname = Opt_prep.PySCF_out_file 
+
+    if Soft == 'Psi4':
         gen_optcomfile(poltype,comoptfname,poltype.numproc,poltype.maxmem,poltype.maxdisk,chkoptfname,mol,modred,torsionrestraints)
         term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)
         modred=False
@@ -758,6 +860,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
         inputname,outputname=CreatePsi4OPTInputFile(poltype,comoptfname,comoptfname,mol,modred,bondanglerestraints,skipscferror,charge,loose,torsionrestraints)
         if term==False or overridecheckterm==True:
             poltype.WriteToLog("QM Geometry Optimization")
+            poltype.WriteToLog(f'The software {Soft} will be used to do the QM optimization')
             cmdstr=' '.join(['psi4 ',poltype.psi4_args,inputname,logoptfname])
             jobtooutputlog={cmdstr:os.getcwd()+r'/'+logoptfname}
             jobtolog={cmdstr:os.getcwd()+r'/'+poltype.logfname}
@@ -767,9 +870,9 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
             jobtoinputfilepaths={cmdstr:[inputfilepath]}
             jobtooutputfiles={cmdstr:[logoptfname]}
             jobtoabsolutebinpath={cmdstr:poltype.which('psi4')}
+    
             if poltype.checkinputonly==True:
                 sys.exit()
-
 
             if os.path.isfile(logoptfname):
                 os.remove(logoptfname)
@@ -787,7 +890,10 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
         optmol =  load_structfile(poltype,logoptfname.replace('.log','.xyz'))
         optmol=rebuild_bonds(poltype,optmol,mol)
     optmol.SetTotalCharge(totcharge)
-    GrabFinalXYZStructure(poltype,logoptfname,logoptfname.replace('.log','.xyz'),mol)
+
+    if Soft != 'PySCF':
+        GrabFinalXYZStructure(poltype,logoptfname,logoptfname.replace('.log','.xyz'),mol)
+
     return optmol,error,torsionrestraints
 
 
@@ -801,6 +907,7 @@ def load_structfile(poltype,structfname):
     Referenced By: run_gaussian, tor_opt_sp, compute_qm_tor_energy, compute_mm_tor_energy 
     Description: -
     """
+
     strctext = os.path.splitext(structfname)[1]
     tmpconv = openbabel.OBConversion()
     if strctext in '.fchk':

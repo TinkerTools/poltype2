@@ -11,10 +11,11 @@
 # 3. Fused rings are treated as single rings if the fused two atoms are carbon
 # 4. Long alkane chain such as propyl and ethyl are replaced with CH3-
 # 5. Charged fragments (COO-) is neutralized
-# 6. Substituents on a ring
+# 6. Substituents on a ring (OLD decision)
 #   -- 1,3- and 1,4- substituents are removed (meta- and para- )
 #   -- 1,2- substituents are kept if they are polar groups
 #   -- 1,2- substituents are removed if they are alkane
+# 6. Substituents on a ring are removed to avoid potential HB or steric effect
 
 
 # Author: Chengwen Liu
@@ -27,23 +28,50 @@ from rdkit import Chem
 from rdkit.Chem import AllChem,rdmolfiles,EditableMol,RingInfo,Descriptors
 
 # helper function to save required fragment
-def saveFragment(mol, atomsToKeep,output):
+def saveFragment(mol, atomsToKeep,output, xyz2index):
+
   atomsToRemove = []
   for idx in range(len(mol.GetAtoms())):
     if idx not in atomsToKeep:
       atomsToRemove.append(idx)
-  
+ 
   emol = Chem.EditableMol(mol)
   atomsToRemove.sort(reverse=True)
   for atom in atomsToRemove:
-      emol.RemoveAtom(atom)
+    emol.RemoveAtom(atom)
   
-  mol2 = emol.GetMol()
+  mol1 = emol.GetMol()
+  Chem.SanitizeMol(mol1)
+  rdmolfiles.MolToMolFile(mol1, 'no_h.mol')
+  
+  # so far, mol1 only has the correct coordinate of required atoms
+  # next we need put the correct bond type for each bond
+  # Dec 2024
+
+  mol2 = Chem.MolFromMolFile('no_h.mol',removeHs=False)
+ 
+  for bond in mol2.GetBonds():
+    idx1 = bond.GetBeginAtomIdx()
+    idx2 = bond.GetEndAtomIdx()
+    
+    coord = mol2.GetConformer().GetAtomPosition(idx1) 
+    x, y, z = f"{coord.x:10.4f}", f"{coord.y:10.4f}", f"{coord.z:10.4f}"
+    xyzstr = ''.join([x,y,z])
+    idx1_in_par = par_xyz2index[xyzstr]
+    
+    coord = mol2.GetConformer().GetAtomPosition(idx2) 
+    x, y, z = f"{coord.x:10.4f}", f"{coord.y:10.4f}", f"{coord.z:10.4f}"
+    xyzstr = ''.join([x,y,z])
+    idx2_in_par = par_xyz2index[xyzstr]
+    
+    bond_par = mol.GetBondBetweenAtoms(idx1_in_par, idx2_in_par)
+    bond_type_par = bond_par.GetBondType()
+    
+    bond.SetBondType(bond_type_par)
+
   Chem.SanitizeMol(mol2)
+  Chem.Kekulize(mol2)
   mol2h = Chem.AddHs(mol2,addCoords=True)
-  Chem.Kekulize(mol2h)
-  Chem.SanitizeMol(mol2h)
-  
   rdmolfiles.MolToMolFile(mol2h, output)
   return
 
@@ -51,21 +79,20 @@ if __name__ == '__main__':
   sdffile = sys.argv[1]
   parent_mol_file = sys.argv[2]
  
- # check if molecule is 2D
-  coords_z = []
-  lines = open(sdffile).readlines()
-  for line in lines:
-    ss = line.split()
-    if len(ss) == 16:
-      coords_z.append(float(ss[2]))
-  if (all(coords_z) == 0):
-    os.system(f"obabel {sdffile} -O {sdffile} --gen3d")
-    print(f" Converting {sdffile} to 3D")
-  
   fname = sdffile.split('.sdf')[0]
   fname = fname.split('.mol')[0]
   
   mol = Chem.MolFromMolFile(sdffile,removeHs=False)
+  
+  # check if molecule is 2D
+  coords_z = []
+  for atom in mol.GetAtoms():
+    atom_idx = atom.GetIdx()
+    coord = mol.GetConformer().GetAtomPosition(atom_idx) 
+    coords_z.append(coord.z)
+  if all(abs(z) < 1e-6 for z in coords_z):
+    os.system(f"obabel {sdffile} -O {sdffile} --gen3d")
+    print(f" Converting {sdffile} to 3D")
   
   # here we try to match the coorinates of fragment and parent molecules
   # if they match (for heavy atoms)
@@ -104,12 +131,16 @@ if __name__ == '__main__':
       atom_indices.append(par_xyz2index[xyzstr])
       if (atomNum != 1):
         n_heavy_atom_match += 1
-  
-  
+    
+    if (atom.GetAtomicNum() == 7):
+      frag_neighbors = [x.GetSymbol() for x in atom.GetNeighbors()]
+      par_atom_idx = par_xyz2index[xyzstr]
+      par_neighbors = [x.GetSymbol() for x in par_mol.GetAtomWithIdx(par_atom_idx).GetNeighbors()]
+
   n_heavy_atom_total = Descriptors.HeavyAtomCount(mol)
   if n_heavy_atom_total == n_heavy_atom_match:
     try:
-      saveFragment(par_mol, atom_indices, f"{fname}_tmp.mol")
+      saveFragment(par_mol, atom_indices, f"{fname}_tmp.mol", par_xyz2index)
     except:
       pass
 
@@ -134,20 +165,23 @@ if __name__ == '__main__':
     new_order.insert(2, second_idx)
     tmp_mol = Chem.RenumberAtoms(tmp_mol, new_order) 
     rdmolfiles.MolToMolFile(tmp_mol, f'{fname}_post.mol')
-    sdffile = f"{fname}_post.mol" 
+    sdffile = f"{fname}_post.mol"
     mol = Chem.MolFromMolFile(sdffile,removeHs=False)
 
   # we have the "correct" fragment to work on
   # below we focus on trimming the fragment
-
+  
   # all single bonds are eligible to cut,
   single_bonds = []
   pattern = Chem.MolFromSmarts('[*;!#1][*;!#1]')
   matches = mol.GetSubstructMatches(pattern, uniquify=False)
   for match in matches:
-    single_bonds.append(list(match))
+    match = list(match)
+    match.sort()
+    if match not in single_bonds:
+      single_bonds.append(match)
   
-  # except non-trivalence nitrogen 
+  # record non-trivalence nitrogen 
   special_nitrogen = []
   pattern = Chem.MolFromSmarts('[#7X2][*]')
   matches = mol.GetSubstructMatches(pattern, uniquify=False)
@@ -155,31 +189,16 @@ if __name__ == '__main__':
     special_nitrogen.append([match[0], match[1]])
     special_nitrogen.append([match[1], match[0]])
   
-  # do not cut two groups on ortho- sites (1-4)
-  # unless the connected atom is carbon
-  
-  pattern = Chem.MolFromSmarts('[*;!#1][R][R][*;!#1]')
+  # record NSP and its connections 
+  nsp_atoms = {}
+  pattern = Chem.MolFromSmarts('[#7,#15,#16][*]')
   matches = mol.GetSubstructMatches(pattern, uniquify=False)
   for match in matches:
-    mat1 = [match[0], match[1]] 
-    mat2 = [match[2], match[3]] 
-    mat2_r = [match[3], match[2]] 
-    if set(mat1) == set([1,2]): # poltype always uses 1,2
-      isCarbon = (mol.GetAtomWithIdx(match[3]).GetAtomicNum() == 6)
-      if (mat2 in single_bonds) and (not isCarbon):
-        single_bonds.remove(mat2)
-        single_bonds.remove(mat2_r)
-  
-  # record the aromatic nitrogen (n-*),
-  aromatic_nitrogen = {}
-  pattern = Chem.MolFromSmarts('[n][*]')
-  matches = mol.GetSubstructMatches(pattern, uniquify=False)
-  for match in matches:
-    n, x = match
-    if n not in aromatic_nitrogen.keys():
-      aromatic_nitrogen[n] = [x]
+    nsp, x = match
+    if nsp not in nsp_atoms.keys():
+      nsp_atoms[nsp] = [x]
     else:
-      aromatic_nitrogen[n] += [x]
+      nsp_atoms[nsp] += [x]
  
   # get the atom indices of torsion
   torsion_idx_list = []
@@ -225,11 +244,20 @@ if __name__ == '__main__':
         atomNum = neig.GetAtomicNum()
         if (not sameRing) and (atomNum != 1):
           pair = [idx, neig_idx]
-          pair_r = [neig_idx, idx]
-          if not set(pair).issubset(set(torsion_idx_list)) and (pair in single_bonds or pair_r in single_bonds) and (pair not in special_nitrogen): 
-            spair = sorted([idx, neig_idx])
-            if spair not in sub_bonds:
-              sub_bonds.append(spair)
+          pair.sort() 
+          if not set(pair).issubset(set(torsion_idx_list)) and (pair in single_bonds) and (pair not in special_nitrogen): 
+            if pair not in sub_bonds:
+              sub_bonds.append(pair)
+    # deal with the case when atom not in ring
+    else:
+      for neig in a.GetNeighbors():
+        neig_idx = neig.GetIdx()
+        pair = [idx, neig_idx]
+        pair.sort() 
+        if not set(pair).issubset(set(torsion_idx_list)) and (pair in single_bonds) and (pair not in special_nitrogen): 
+          if pair not in sub_bonds:
+            sub_bonds.append(pair)
+  
   for sub_bond in sub_bonds:
     a1, a2 = sub_bond
     g.remove_edge(a1, a2)  
@@ -240,46 +268,6 @@ if __name__ == '__main__':
   for m in frags:
     if not set(torsion_idx_list).issubset(list(m)):
       atomsToRemove += list(m)
-  # Replace CH3 with H 
-  pattern = Chem.MolFromSmarts('[*][CH3]([H])([H])[H]')
-  matches = mol.GetSubstructMatches(pattern, uniquify=False)
-  for match in matches:
-    x, c, h1, h2, h3 = match
-    if c not in torsion_idx_list:
-      atomsToRemove += [c, h1, h2, h3] 
-      xatom = mol.GetAtomWithIdx(x)
-      atomic = xatom.GetAtomicNum()
-      if atomic == 7:
-        xatom.SetNumExplicitHs(xatom.GetTotalNumHs() + 1)
-  
-  
-  # Replace CH2CH3 with H 
-  pattern = Chem.MolFromSmarts('[*][CH2]([H])([H])[CH3]([H])([H])[H]')
-  matches = mol.GetSubstructMatches(pattern, uniquify=False)
-  for match in matches:
-    x, c1, h11, h12, c2, h21, h22, h23 = match
-    if c1 not in torsion_idx_list:
-      atomsToRemove += [c1, h11, h12, c2, h21, h22, h23] 
-      xatom = mol.GetAtomWithIdx(x)
-      atomic = xatom.GetAtomicNum()
-      if atomic == 7:
-        xatom.SetNumExplicitHs(xatom.GetTotalNumHs() + 1)
-  
-  # Replace NH3+ with H 
-  pattern = Chem.MolFromSmarts('[*][N+]([H])([H])[H]')
-  matches = mol.GetSubstructMatches(pattern, uniquify=False)
-  for match in matches:
-    x, n, h1, h2, h3 = match
-    if n not in torsion_idx_list:
-      atomsToRemove += [n, h1, h2, h3] 
-  
-  # Replace NH2 with H 
-  pattern = Chem.MolFromSmarts('[*][N]([H])[H]')
-  matches = mol.GetSubstructMatches(pattern, uniquify=False)
-  for match in matches:
-    x, n, h1, h2 = match
-    if n not in torsion_idx_list:
-      atomsToRemove += [n, h1, h2] 
   
   # Remove atoms on distant fused rings
   ring_info = mol.GetRingInfo()
@@ -339,21 +327,33 @@ if __name__ == '__main__':
       atomsToRemove = []
       break
   
+  # if NSP atoms miss connections
+  # after cut, add hydrogen atom per bond
+  # this should be done in mol (before cut)
+  # since the atom order will be different after cut
+  # Chengwen Liu
+  # Oct 2024
+  nsp_bond = {}
+  for idx, connected_atoms in nsp_atoms.items():
+    for atm in connected_atoms:
+      if (atm in atomsToRemove) and (idx not in atomsToRemove):
+        if idx not in nsp_bond.keys():
+          nsp_bond[idx] = 1
+        else:
+          nsp_bond[idx] += 1
+  
+  # Set correct number of hydrogen on NSP atoms
+  for idx, nbond in nsp_bond.items(): 
+    natom = mol.GetAtomWithIdx(idx)
+    print(f'Setting number of attached hydrogen to be {nbond} on atom {idx}')
+    natom.SetNumExplicitHs(nbond)
+
   emol = Chem.EditableMol(mol)
   atomsToRemove.sort(reverse=True)
   for atom in atomsToRemove:
       emol.RemoveAtom(atom)
-  
+
   mol2 = emol.GetMol()
-  
-  # if aromatic nitrogen misses connections
-  # after cut, add one hydrogen atom
-  for idx, connected_atoms in aromatic_nitrogen.items():
-    for atm in connected_atoms:
-      if (atm in atomsToRemove) and (idx not in atomsToRemove):
-        nitrogen = mol2.GetAtomWithIdx(idx)
-        nitrogen.SetNumExplicitHs(1)
-        break
   Chem.SanitizeMol(mol2)
   mol2h = Chem.AddHs(mol2,addCoords=True)
   Chem.Kekulize(mol2h)

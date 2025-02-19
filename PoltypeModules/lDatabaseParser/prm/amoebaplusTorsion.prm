@@ -32,3 +32,45 @@ CH2   	CH2   CH2   CH2 		% 0.262,0.000,0.165 % Borrowed
 CH2   	CH2   CH2   CH1 		% 0.262,0.000,0.165 % Borrowed 
 CH2   	CH2   CH2   CH0 		% 0.262,0.000,0.165 % Borrowed 
 rCH2   rCH2   rCH2 rCH2     % 0.262,0.000,0.165 % Borrowed 
+## Derived from Alcohol
+H3C   CH3   OHCH3   n-HOC 	% 0.000,0.000,0.354 % Derived from MeOH
+H3C   CH3   CH2     n-OHC   % 0.000,0.000,0.340 % Borrowed from H3C-CH3-C-C
+H2C   CH2   n-OHC   n-HOC 	% 0.000,0.000,0.300 % Derived from EtOH
+## Derived from Amine
+H3C   CH3   NH2CH3   H2NCH3 % 0.040,0.000,0.330 % Derived from MeNH2
+NH2   CH2   CH3   H3C 			% 0.000,0.000,0.340 % Borrowed 
+H2N   NH2   CH2   CH3 			% 0.000,0.000,0.300 % Borrowed 
+H2C   CH2   NH2   H2N 			% 0.363,-0.410,0.293 % Derived from EtNH2
+NH2   CH2   CH2   H2C 			% 0.000,0.000,0.340 % Borrowed 
+NH2   CH2   CH2   CH3 			% 0.000,0.000,0.310 % Derived from PrNH2
+H2N   NH2   CH2   CH2 			% 0.000,0.000,0.000 % Derived from PrNH2
+H3C   CH3   NH1   CH3 			% 0.000,0.000,0.479 % Derived from NHMe2
+H3C   CH3   NH0   CH3 			% 0.000,0.000,0.479 % Borrowed 
+H3C   CH3   NH1   H1N 			% 0.000,0.000,0.479 % Derived from NHMe2
+NH1R   rCH2   rCH2 rCH2     % 0.262,0.000,0.165 % Borrowed 
+H2C   rCH2   rCH2   NH1R 		% 0.000,0.000,0.340 % Borrowed 
+rCH2   NH1R   rCH2   rCH2   % 0.000,0.000,0.479 % Borrowed
+H1NR   NH1R   rCH2   rCH2   % 0.000,0.000,0.479 % Borrowed
+H2C   rCH2   NH1R   rCH2    % 0.000,0.000,0.479 % Borrowed
+H2C   rCH2   NH1R   H1NR    % 0.000,0.000,0.479 % Borrowed
+## Derived from Ether
+H3C   CH3   O(Me)Me   CH3   % 0.000,0.000,0.749 % Derived from MeOMe
+H3C   CH3   O(C)C   CH2 		% 0.000,0.000,0.749 % Borrowed from MeOMe 
+H3C   CH3   CH2   O(C)C 		% 0.000,0.000,0.340 % Borrowed 
+H3C   CH3   CH2   O(CH2)Me 	% 0.000,0.000,0.340 % Borrowed 
+H3C   CH3   O(CH2)Me   CH2  % 0.000,0.000,0.749 % Borrowed 
+CH3   O(CH2)Me   CH2   CH3  % -1.917,0.260,0.000 % Derived from EtOMe
+H2C   CH2   O(CH2)Me   CH3  % 0.020,0.000,1.103 % Derived from EtOMe
+CH3   CH2   O(C)C   CH2 		% -1.374,0.104,0.000 % Derived from EtOEt
+H2C   CH2   O(C)C   CH2 		% 0.015,0.000,1.081 % Derived from EtOEt
+H2C   rCH2  O(C)C   rCH2 		% 0.015,0.000,1.081 % Borrowed 
+rCH2   O(C)C   rCH2   rCH2  % -1.374,0.104,0.000 % Borrowed 
+rCH2   rCH2   rCH2   O(C)C  % 0.262,0.000,0.165 % Borrowed 
+H2C   rCH2   rCH2   O(C)C   % 0.000,0.000,0.340 % Borrowed 
+H3C   CH3   O(C)C   Car %  0.000,0.000,0.749 % Borrowed 
+CH3   O(C)C   Car   Car % -1.917,0.260,0.000 % Borrowed 
+Car   Car   Car   O(C)C % -0.67,6.287,0.000 % Keep AMOEBA 
+Har   Car   Car   O(C)C % 0.550,6.187,-0.550 % Keep AMOEBA 
+Car   Car   Car   Car % -0.670,6.287,0.000 % Keep AMOEBA
+Har   Car   Car   Car % 0.550,6.817,-0.550 % Keep AMOEBA
+Har   Car   Car   Har % 0.000,6.355,0.000  % Keep AMOEBA

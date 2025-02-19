@@ -40,6 +40,7 @@
 [$([NX3H1;R](C)[C])]                                      NH1R     			  #  N of amine with 1H in a ring
 [$([NX3H0](C)(C)[C])]                                     NH0     		    #  N of amine with 0H 
 [$([NX3H2][CH3])]                                         NH2CH3     			#  N of MeNH2
+[$([CX4][NX3])]                                           CX4NX3          #  C connecting Amine
 
 # Aldehyde
 [$([CH1]=[O])]                                           CH1=O           #  C of aldehyde 
