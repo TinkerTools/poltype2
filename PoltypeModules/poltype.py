@@ -266,7 +266,7 @@ class PolarizableTyper():
         latestsmallmoleculeprmlib:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21.prm'
         boltzmantemp:float=8
         dovdwscan:bool=False
-        vdwprobepathname:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/VdwProbes/'
+        vdwprobepathname:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/Examples/Assets/'
         vdwprobenames:list=field(default_factory=lambda : ['water'])
         maxtorRMSPDRel:float=.1
         vdwmissingfilename:str='missingvdw.txt'
@@ -397,7 +397,6 @@ class PolarizableTyper():
         gausoptcoords:str=''
         forcefield:str="AMOEBA"
         helpfile:str='README.md'
-        versionfile:str=os.path.join('VersionFiles','version.md')
         sleeptime:float=.1
         structure:None=None
         espextraconflist:list=field(default_factory=lambda : [])
@@ -1542,7 +1541,7 @@ class PolarizableTyper():
                 self.formchkexe = os.path.join(self.gausdir,self.formchkexe)
 
             # STEP 3
-            cmdstr=self.analyzeexe+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/VersionFiles/'+'water.xyz'+' '+'-k'+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/VersionFiles/'+'water.key'+' '+'e'+'>'+' '+'version.out'
+            cmdstr=self.analyzeexe+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/Examples/Assets/'+'water.xyz'+' '+'-k'+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/Examples/Assets/'+'water.key'+' '+'e'+'>'+' '+'version.out'
             try:
                 print('Calling: '+cmdstr) 
                 returned_value = subprocess.call(cmdstr, shell=True)
@@ -1716,32 +1715,18 @@ class PolarizableTyper():
             else:
                 return self.molecprefix + suffix
         
-        def printfile(self,filename):
-            """
-            Intent: Print filename contents
-            Input: filename
-            Output: filename contents written to standard output.
-            Referenced By: copyright 
-            Description:
-            1. Open filename and print file contents
-            """
-            # STEP 1
-            with open(os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+filename,'r') as f:
-                print(f.read(), end='')
-       
-
         def copyright(self):
             """
-            Intent: Print version file and copyright info
-            Input: Self object
-            Output: Contents of version file printed to standard output.
-            Referenced By: GenerateParameters() 
-            Description: 
-            1. Call printfile on poltype version file
+            Intent: Print software version and copyright info
             """
-            # STEP 1
-            self.printfile(self.versionfile)
-        
+            print("Poltype -- Polarizable atom typer of small molecules for the AMOEBA polarizable force field")
+            print("Please cite:")
+            print("B. Walker, C. Liu, E. Wait, P. Ren, J. Comput. Chem. 2022, 43(23), 1530")
+            print("Version 2.3.1 Feb 2025")
+            print("Copyright (c)  Johnny Wu, Gaurav Chattree, Brandon Walker, Matthew Harger and Pengyu Ren 2019-2025")
+            print("All Rights Reserved")
+            print("##############################################################################################################")
+             
             
         def CheckIsInput2D(self,mol,obConversion,rdkitmol):
             """
