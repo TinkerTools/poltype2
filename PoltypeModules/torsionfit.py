@@ -1670,7 +1670,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             themiddle=[testkeysplit[1],testkeysplit[2]]
             if middle==themiddle or middle==themiddle[::-1]:
                 #thestring='Torsion '+str(testkey)+' RMSD(MM2,QM) '+str(minRMSD)+' '+'RelativeRMSD(MM2,QM) '+str(minRMSDRel)+' '+ostring+'\n'
-                thestring=f'Torsion {str(testkey)} RMSD(MM2,QM) {str(minRMSD)} RelativeRMSD(MM2,QM) {str(minRMSDRel)} {ostring}\n Prm: v1={round(write_prm_dict[testkey][1],4)} v2={round(write_prm_dict[testkey][2],4)} v3={round(write_prm_dict[testkey][3],4)}'
+                thestring=f'Torsion {str(testkey)} RMSD(MM2,QM) {str(minRMSD)} RelativeRMSD(MM2,QM) {str(minRMSDRel)} {ostring}'
                 poltype.WriteToLog(thestring)
                 classkeytofitresults[testkey]=thestring
         if dim==1: 
