@@ -1752,7 +1752,8 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             ax.tick_params(axis='both', which='major', labelsize=12)
             ax.tick_params(axis='both', which='minor', labelsize=10)
 
-            plt.subplots_adjust(top=0.05*cnt_str,bottom=0.1)
+            if cnt_str > 3:
+                plt.subplots_adjust(top=0.05*cnt_str,bottom=0.1)
             fig = plt.gcf()
             plt.show()
             fig.savefig(figfname)
