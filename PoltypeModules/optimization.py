@@ -726,10 +726,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
                 sys.exit()
             if os.path.isfile(chkoptfname) and os.path.isfile(logoptfname):
                 os.remove(logoptfname) # if chk point exists just remove logfile, there could be error in it and we dont want WaitForTermination to catch error before job is resubmitted by daemon 
-            if len(jobtooutputlog.keys())!=0:
-                call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilepathprefix)
-            finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
-
+            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,True) # have to skip errors because setting optmaxcycle to low number in gaussian causes it to crash
             cmdstr = poltype.formchkexe + " " + chkoptfname
             poltype.call_subsystem([cmdstr],True)
         term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)

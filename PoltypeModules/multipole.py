@@ -535,6 +535,7 @@ def gen_peditinfile(poltype,mol):
               for frame in frames:
                 f.write(f'{frame}\n')
 
+    f.write(f'{poltype.paramhead}\n')
     f.write("\n")
     if poltype.forcefield.upper() in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
        f.write('P\n')
