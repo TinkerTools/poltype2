@@ -185,13 +185,17 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
     inputfilepaths=[]
     outputfilenames=[]
     executables=[]
-
-    # Check if PySCF is needed or not
-    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
-        if poltype.toroptpcm==True or (poltype.toroptpcm==-1 and poltype.pcm):
-            Soft = 'PySCF'
-        else:
-            Soft = 'Psi4'
+    
+    # Only use Gaussian when users require
+    if poltype.use_gaus or poltype.use_gausoptonly:
+      Soft = 'Gaussian'
+    # Otherwise use Psi4 
+    else:
+      Soft = 'Psi4' 
+    
+    # Replace Psi4 with PySCF when pcm is needed
+    if (poltype.optpcm==True or (poltype.optpcm==-1 and poltype.pcm)) and (Soft == 'Psi4'):
+      Soft = 'PySCF'
 
 
     for i in range(len(optoutputlogs)):

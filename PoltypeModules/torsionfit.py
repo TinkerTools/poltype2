@@ -176,12 +176,18 @@ def compute_qm_tor_energy(poltype,torset,mol,flatphaselist):
     angle_list = []
     WBOarray=[]
     phaseangle_list=[]
+    
+    # Only use Gaussian when users require
+    if poltype.use_gaus or poltype.use_gausoptonly:
+      Soft = 'Gaussian'
+    # Otherwise use Psi4 
+    else:
+      Soft = 'Psi4' 
+    
+    # Replace Psi4 with PySCF when pcm is needed
+    if (poltype.optpcm==True or (poltype.optpcm==-1 and poltype.pcm)) and (Soft == 'Psi4'):
+      Soft = 'PySCF'
 
-    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
-        if poltype.toroptpcm==True or (poltype.toroptpcm==-1 and poltype.pcm):
-            Soft = 'PySCF'
-        else:
-            Soft = 'Psi4'
     
     for phaseangles in flatphaselist:
         prefix='%s-%s-sp-' % (poltype.toroptmethod,poltype.torspmethod)
