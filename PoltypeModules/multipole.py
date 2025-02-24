@@ -460,7 +460,7 @@ def gen_peditinfile(poltype,mol):
     # write out the local frames
     iteratom = openbabel.OBMolAtomIter(mol)
     f = open (poltype.peditinfile, 'w')
-
+    f.write(f'{poltype.paramhead}\n')
 
     rdkitmol = Chem.MolFromMolFile(poltype.molstructfname,removeHs=False)
     if poltype.indextompoleframefile==None:
@@ -535,7 +535,6 @@ def gen_peditinfile(poltype,mol):
               for frame in frames:
                 f.write(f'{frame}\n')
 
-    f.write(f'{poltype.paramhead}\n')
     f.write("\n")
     if poltype.forcefield.upper() in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
        f.write('P\n')
