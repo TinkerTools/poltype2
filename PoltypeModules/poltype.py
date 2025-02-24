@@ -3709,7 +3709,8 @@ class PolarizableTyper():
 
             # STEP 59
             # apply any modifications to the final.key
-            lmodifytinkerkey.mod_final_key(self)
+            if self.isfragjob==False:
+              lmodifytinkerkey.mod_final_key(self)
             
             self.WriteToLog('Poltype Job Finished'+'\n')
 
