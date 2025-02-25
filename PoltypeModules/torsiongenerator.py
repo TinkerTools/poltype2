@@ -3,7 +3,6 @@ import optimization as opt
 import electrostaticpotential as esp
 import torsiondatabaseparser
 import torsionfit as torfit
-import apicall as call
 import os
 import sys
 from openbabel import openbabel
@@ -111,31 +110,6 @@ def DefaultMaxRange(poltype,torsions):
             poltype.rotbndtomaxrange[key]=360
 
 
-def RemoveCommentsFromKeyFile(poltype,keyfilename):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    temp=open(keyfilename,'r')
-    results=temp.readlines()
-    temp.close()
-    passedatoms=False
-    tempname='temp.key'
-    newtemp=open(tempname,'w')
-    for line in results:
-        if 'atom' in line:
-            passedatoms=True 
-        if passedatoms==True and '#' in line:
-            continue
-        else:
-            newtemp.write(line)
-    newtemp.close()
-        
-    shutil.move(tempname, keyfilename)
-
 def ExecuteOptJobs(poltype,listofstructurestorunQM,phaselist,optmol,torset,variabletorlist,torsionrestraint,mol,currentopt,optlogtophaseangle):
     """
     Intent:
@@ -211,13 +185,17 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
     inputfilepaths=[]
     outputfilenames=[]
     executables=[]
-
-    # Check if PySCF is needed or not
-    if poltype.use_gaus==False and poltype.use_gausoptonly==False:
-        if poltype.toroptpcm==True or (poltype.toroptpcm==-1 and poltype.pcm):
-            Soft = 'PySCF'
-        else:
-            Soft = 'Psi4'
+    
+    # Only use Gaussian when users require
+    if poltype.use_gaus or poltype.use_gausoptonly:
+      Soft = 'Gaussian'
+    # Otherwise use Psi4 
+    else:
+      Soft = 'Psi4' 
+    
+    # Replace Psi4 with PySCF when pcm is needed
+    if (poltype.optpcm==True or (poltype.optpcm==-1 and poltype.pcm)) and (Soft == 'Psi4'):
+      Soft = 'PySCF'
 
 
     for i in range(len(optoutputlogs)):
@@ -1272,12 +1250,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         fulljobtolog.update(jobtolog) 
         fulljobtooutputlog.update(jobtooutputlog)
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMOptJobToLog'+'_1'+'_'+poltype.molecprefix
-    if poltype.externalapi!=None:
-        if len(optnumtofulllistofjobs['1'])!=0:
-            call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
-        finishedjobs,errorjobs=poltype.WaitForTermination(fulljobtooutputlog,False)
-    else:
-        finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
+    finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
     for torset in poltype.torlist:
         outputlogtoinitialstructure=torsettooutputlogtoinitialstructure[tuple(torset)]
         tryoutputlogs=optnumtotorsettofulloutputlogs['1'][tuple(torset)]
@@ -1361,12 +1334,7 @@ def gen_torsion(poltype,optmol,torsionrestraint,mol):
         fulljobtolog.update(jobtolog)
 
     jobtologlistfilenameprefix=os.getcwd()+r'/'+'QMSPJobToLog'+'_'+poltype.molecprefix
-    if poltype.externalapi!=None:
-        if len(fulllistofjobs)!=0:
-            call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
-        ofinshedjobs,oerrorjobs=poltype.WaitForTermination(fulljobtooutputlog,False)
-    else:
-        ofinishedjobs,oerrorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
+    ofinishedjobs,oerrorjobs=poltype.CallJobsSeriallyLocalHost(fulljobtooutputlog,True)
 
     for torset in poltype.torlist:
         newphaselist=[]
@@ -1476,22 +1444,6 @@ def FindPartialDoubleBonds(poltype,rdkitmol,mol):
                 babelbond=[match[0],match[1]]
             if babelbond not in poltype.partialdoublebonds:
                 poltype.partialdoublebonds.append(babelbond)
-
-def RdkitIsInRing(poltype,atom):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    isinringofsize=False
-    i=None
-    for i in range(3,13+1):
-        isinringofsize=atom.IsInRingSize(i)
-        if isinringofsize==True:
-            break
-    return isinringofsize,i
 
 
 def GrabAllRingsContainingMostIndices(poltype,atomindices,babelindices,total):
@@ -1731,23 +1683,6 @@ def get_all_torsions(poltype,mol):
     return
 
 
-
-
-def get_torlist_opt_angle(poltype,optmol, torlist):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    tmplist = []
-    for tor in torlist:
-        a,b,c,d=obatom2idx(poltype,tor[0:4])
-        e = optmol.GetTorsion(a,b,c,d)
-        tmplist.append([a,b,c,d,e % 360])
-    return tmplist
-
 def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndlist):
     """
     Intent:
@@ -1887,26 +1822,6 @@ def find_tor_restraint_idx(poltype,mol,b1,b2):
         return t1,t4
     else:
         return t4,t1 
-
-
-def GrabFirstHeavyAtomIdx(poltype,indices,mol):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    atoms=[mol.GetAtom(i) for i in indices]
-    atomicnums=[a.GetAtomicNum() for a in atoms]
-    
-    heavyidx=indices[0]
-    for i in range(len(indices)):
-        idx=indices[i]
-        atomnum=atomicnums[i]
-        if atomnum!=1:
-            heavyidx=idx
-    return heavyidx
 
 
 def ConvertTinktoXYZ(poltype,filename,newfilename):
@@ -2536,18 +2451,6 @@ def save_structfile(poltype,molstruct, structfname):
         tmpconv.SetOutFormat(inFormat)
     return tmpconv.WriteFile(molstruct, structfname)
 
-def save_structfileXYZ(poltype,molstruct, structfname):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-        
-    tmpconv = openbabel.OBConversion()
-    tmpconv.SetOutFormat('xyz')
-    return tmpconv.WriteFile(molstruct, structfname)
 
 def get_class_key(poltype,a, b, c, d):
     """

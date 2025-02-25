@@ -1,7 +1,6 @@
 import optimization as opt
 import electrostaticpotential as esp
 import torsiongenerator as torgen
-import apicall as call
 import os
 import sys
 from socket import gethostname
@@ -575,12 +574,7 @@ def SPForDMA(poltype,optmol,mol):
             jobtologlistfilenameprefix=os.getcwd()+r'/'+'dma_jobtolog_'+poltype.molecprefix
 
 
-            if poltype.externalapi!=None:
-                if len(jobtooutputlog.keys())!=0:
-                    call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
-                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
-            else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
+            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
 
             term,error=poltype.CheckNormalTermination(poltype.logdmafname)
             if error:
@@ -603,12 +597,7 @@ def SPForDMA(poltype,optmol,mol):
             jobtooutputfiles={cmdstr:[poltype.logdmafname,poltype.chkdmafname]}
             jobtoabsolutebinpath={cmdstr:poltype.which(poltype.gausexe)}
 
-            if poltype.externalapi!=None:
-                if len(jobtooutputlog.keys())!=0:
-                    call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
-                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
-            else:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
+            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False)
 
             poltype.call_subsystem([cmdstr],True)
             cmdstr = poltype.formchkexe + " " + poltype.chkdmafname
@@ -675,12 +664,7 @@ def SPForESP(poltype,optmolist,molist,xyzfnamelist,keyfnamelist):
                 jobtoabsolutebinpath={cmdstr:poltype.which('psi4')}
 
 
-                if poltype.externalapi!=None:
-                    if len(jobtooutputlog.keys())!=0:
-                        call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
-                    finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
-                else:
-                    finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False,wait=True)
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False,wait=True)
 
                 term,error=poltype.CheckNormalTermination(outputname)
                 if error:
@@ -711,12 +695,7 @@ def SPForESP(poltype,optmolist,molist,xyzfnamelist,keyfnamelist):
                 jobtoabsolutebinpath={cmdstr:poltype.which(poltype.gausexe)}
 
 
-                if poltype.externalapi!=None:
-                    if len(jobtooutputlog.keys())!=0:
-                        call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
-                    finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
-                else:
-                    finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False,wait=True)
+                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,False,wait=True)
 
                 cmdstr = poltype.formchkexe + " " + chkespfname
                 poltype.call_subsystem([cmdstr],True)

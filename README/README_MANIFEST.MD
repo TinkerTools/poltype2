@@ -169,7 +169,6 @@ b_c_* = the middle two atoms involved in all torsions for a given torsion scan s
 * rings.py                   Handles set up for non-aromatic ring torsion puckering that is used by torsiongenerator                              and torsionfit.
 * vdwfit.py                  Handles van der waals paramterization with water dimers.
 * fragmenter.py              Handles fragmenting parent molecule, paramterizing torsion and transfering                                           paramters to parent.
-* test_poltype.py            Handles unittesting for POLTYPE modules.
 
 ### Poltype Examples
 

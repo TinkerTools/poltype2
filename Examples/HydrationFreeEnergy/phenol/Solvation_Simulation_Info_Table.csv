@@ -1,2 +1,0 @@
-Name,Total Atom Number,Average Box Size,Prod MD Ensemb,Prod MD Time,Prod MD Steps,Prod MD Arc File Space,Dynamic Writeout Frequency (ps),Dynamic Time Step (fs),Equil Time NPT,Equil Time NVT,Physio Counterions,Neut Counterions,Ligand Charge,Receptor Charge,Ligand Name,Receptor Name
-,4573.0,,4.0,5.0,2500000.0,0.011,2.0,2.0,1.0,2.0,0.0,0.0,0.0,,final,

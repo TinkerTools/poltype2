@@ -17,7 +17,6 @@
 # GNU General Public License for more details.
 #
 ##################################################################
-import csv
 import warnings
 import math
 import traceback
@@ -35,7 +34,6 @@ import torsiondatabaseparser
 import dimorphite_dl
 import torsiongenerator as torgen
 import symmetry as symm
-import docking
 import torsionfit as torfit
 import optimization as opt
 import electrostaticpotential as esp
@@ -52,79 +50,33 @@ import vdwfit
 import numpy as np
 import itertools
 from rdkit.Chem import rdMolTransforms
-import smtplib
-import textwrap
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
 import psutil
 import multiprocessing
-import annihilation as ann
-import tables 
-import boxsetup as box
 import time
-import pdbxyz
-import restraints
-import plots
-import submitjobs as submit
-import keyfilemodifications as keymods
 import re
-from scipy.optimize import fmin
-import pylab as plt
-from scipy.interpolate import interp1d
 from rdkit.Chem import AllChem, rdMolAlign
 from rdkit.Chem import rdFMCS
 from PyAstronomy import pyasl
 from dataclasses import dataclass,field
 from pathlib import Path
 from rdkit.Chem.MolStandardize import rdMolStandardize
-from itertools import groupby
-from operator import itemgetter
 from rdkit.Chem import rdDistGeom
 from itertools import product,combinations
 import random
-import productiondynamics as prod
 import ldatabaseparser
 import lmodifytinkerkey
 
 @dataclass
 class PolarizableTyper():
-        numbergpus:int=1 # for estimating ETA for dynamics
-        estimatedynamictimeonly:bool=False
-        etafilename:str='ETA.csv'
-        estimatedynamictime:bool=True
-        xyzedittranslatevalue:str=''
-        xyzeditstrayvalue:str=''
-        xyzeditappendvalue:str=''
-        xyzeditperiodicvalue:str=''
-        xyzeditsoakvalue:str=''
-        xyzeditionvalue:str=''
-        xyzedittranslatestring:str='Translate All Atoms by an X,Y,Z-Vector'
-        xyzeditstraystring:str='Move Stray Molecules into Periodic Box'
-        xyzeditappendstring:str='Append a Second XYZ File to Current One'
-        xyzeditperiodicstring:str='Create and Fill a Periodic Boundary Box'
-        xyzeditsoakstring:str='Soak Current Molecule in Box of Solvent'
-        xyzeditionstring:str='Place Monoatomic Ions around a Solute'
-        needrot:bool=False
-        heavyhyd:bool=False
         maxtorresnitrogen:int=2
-        skipchargecheck:bool=False
-        useuniquefilenames:bool=False # if users want to have unique filenames for molecular dynamics/BAR otherwise keep same filename to make copying easier from folder to folder
         xtbtorresconstant:float=5
-        alignPDB:bool=False
         torfit:bool=True
-        makexyzonly:bool=False
         toroptmethodlist:list=field(default_factory=lambda : [])
         torspmethodlist:list=field(default_factory=lambda : [])
         anienvname:str='ani'
         xtbenvname:str='xtbenv'
-        anifmax=.05
+        anifmax:float=.05
         anipath:str=os.path.join(os.path.abspath(os.path.split(__file__)[0]),'ani.py')
-        complexationonly:bool=False
-        removesolventpdbtraj:bool=True
-        generatepdbtrajs:bool=True
-        alchemical:bool=True
-        covalentdock:bool=False
         xtbmethod:int=2
         optloose:bool=True
         optconvergence:str="LOOSE"
@@ -132,176 +84,25 @@ class PolarizableTyper():
         writeoutmultipole:bool=True
         writeoutbond:bool=True
         writeoutangle:bool=True
-        writeoutstrbnd:bool=True
-        writeoutopbend:bool=True
-        writeoutvdw:bool=True
         writeoutpolarize:bool=True
         writeouttorsion:bool=True
         dontrotbndslist:list=field(default_factory=lambda : [])
-        relaxFBbox:bool=False
-        ecrexpect:float=10
-        listofligands:list=field(default_factory=lambda : [])
-        targetenthalpyerror:float=.24 # kcal/mol
-        targetdensityerror:float=10 # kg/m^3
-        gridspacing:float=.4
-        nposes:int=10
-        vinaexhaustiveness:int=32
-        dockgridsize:list=field(default_factory=lambda : [20, 20, 20])
-        dockgridcenter:None=None
-        usead4:bool=False
-        usegold:bool=False
-        usevina:bool=False
-        usevinardo:bool=False
-        goldbin:str='gold_auto'
-        dockingenvname:str='dockingprep'
-        prepdockscript:str=os.path.join(os.path.split(__file__)[0],'preparedockingfiles.py')
         indextompoleframefile:None=None
-        qmrelativeweight:float=1
         potentialoffset:float=1.0
-        liqrelativeweight:float=1.5
-        enthalpyrelativeweight:float=1
-        densityrelativeweight:float=.01
         indextotypefile:None=None
-        pdbcode:None=None
         usesymtypes: bool = True
-        barinterval: int =5
-        visfolder: str ='VisualizationFiles'
-        xyzpdbpath: str ='xyzpdb'
-        extractinterforbinding: bool =False
-        equiltimeionNPT: float =1
-        templateligandxyzfilename: None =None
-        templateligandfilename: None=None
-        salthfe:bool=False
-        runjobslocally:bool=True
-        gpucardnumber:int=0
-        density:None=None
-        neatliquidsim:bool=False
-        amoeba09prmfilepath:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoeba09.prm"
         ldatabaseparserpath:str=os.path.join(os.path.abspath(os.path.split(__file__)[0]), 'lDatabaseParser', 'lAssignAMOEBAplusPRM.py')
         ldatabaseparserprmdir:str=os.path.join(os.path.abspath(os.path.split(__file__)[0]), 'lDatabaseParser', 'prm')
-        endstatestructurefile:None=None
-        redobar:bool=False
-        rotateframes:bool=False
-        perturbedkeyfilename:None=None
-        writeinputfiles:bool=False
-        printjobsleft:bool=False
-        cpujobsonly:bool=False
-        minfinished:bool=False
-        fep:bool=False
-        submitlocally:None=None
-        didinputsubmitlocally:bool=False
-        numinterpolsforperturbkeyfiles:None=None
-        checktraj:bool=False
-        expfreeenergy:None=None
-        pathtosims:None=None
-        simulationstostopfolderpath:None=None
-        equilfinished:bool=False
-        barfilesfinished:bool=False
-        perturbkeyfilelist:None=None
-        boxonly:bool=False
-        preequilboxpath:str=os.path.join(os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir)),os.path.join('PreEquilibriatedBoxes','waterhuge.xyz'))
-        usepreequilibriatedbox:bool=False
-        lastNVTequiltime:float=.5
-        norotrestrainsphereradius:float=2
-        aaxis:None=None
-        baxis:None=None
-        caxis:None=None
-        prodmdfinished:bool=False
         numproc:None=None
-        usetinkerforthermoprops:bool=False
-        productiondynamicsNVT:bool=False
-        generateinputfilesonly:bool=False
-        annihilatorpath:str=os.path.abspath(os.path.split(__file__)[0])
-        changegasphaseintegrator:bool=False
-        annihilatevdw:bool=True
-        endstatekey:None=None
-        bgnstatekey:None=None
-        endstatexyz:None=None
-        bgnstatexyz:None=None
-        restrainreceptorligand:bool=True
-        minonly:bool=False
-        usegpu:bool=False
-        truedynamicpath:None=None
-        truebarpath:None=None
-        equilonly:bool=False
-        binding:bool=False
-        proddyngrprests:bool=True
-        equilrestrainsphereradius:float=2
-        restrainpositionconstant:float=5.0
-        ligandfilename:None=None
-        tightmincriteria:float=1
-        loosemincriteria:float=10
-        rescorrection:float=0
-        anglerestraintconstant:float=0.003046
-        pdbxyzpath:str='pdbxyz'
-        distancerestraintconstant:float=10.0
-        poleditpath:str='poledit'
-        minimizepath:str='minimize'
         analyzepath:str='analyze'
-        potentialpath:str='potential'
-        averageenergies:bool=False
-        complexedproteinpdbname:None=None
-        uncomplexedproteinpdbname:None=None
-        addphysioions:bool=True
-        equilibriatescheme:list=field(default_factory=lambda : [50,100,150,200,300,300])
-        equilibriaterestscheme:list=field(default_factory=lambda : [5,2,1,.5,.1,0])
         prmfilepath:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+ "/ParameterFiles/amoebabio18.prm"
         fennixmodeldir:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir, 'FennixModels'))
         fennixmodelname:str='ani2x_model0'
-        keyfilenamelist:None=None
-        xyzfilename:None=None
-        restrainatomsduringminimization:bool=True
-        restrainatomgroup1:None=None
-        restrainatomgroup2:None=None
-        ligandxyzfilenamelist:None=None
-        annihilateligandxyzfilenamelist:None=None
-        receptorligandxyzfilename:None=None
-        xyzeditpath:str='xyzedit'
-        lowerperf:float=7
-        upperperf:float=12
-        torsionrestlist:None=None
-        estatlambdascheme:list=field(default_factory=lambda : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1])
-        vdwlambdascheme:list=field(default_factory=lambda : [0,.45,.52,.56,.58,.6,.62,.64,.67,.7,.75,.8,.85,.9,.95,1,1,1,1,1,1,1,1,1,1,1])
-        restlambdascheme:list=field(default_factory=lambda : [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0])
-        torsionrestscheme:list=field(default_factory=lambda : [.1,.95,.09,.08,.075,.07,.06,.055,.05,.04,.035,.03,.02,.015,.01,0,0,0,0,0,0,0,0,0,0,0])
-        waitingtime:float=5
-        receptorcharge:float=0
-        ligandcharge:None=None
-        barpath:str='bar'
-        dynamicpath:str='dynamic'
-        analyzeommpath:str='analyze9'
-        barommpath:str='bar9'
-        dynamicommpath:str='dynamic9'
-        minimizeommpath:str='minimize9'
-        complexation:bool=False
-        solvation:bool=False
-        flatbotrest:bool=True
-        logname:str='TINKER.log'
-        equilwritefreq:float=100
-        proddynwritefreq:float=2
-        equiltimeNVT:int=4
-        equiltimeNPT:float=1
-        equiltimestep:float=2
-        proddyntimestep:float=2
-        proddyntime:float=5
-        compproddyntime:float=10
-        solvproddyntime:float=5
-        pressure:float=1
-        NVTensem:int=2
-        NPTensem:int=4
-        vdwcutoff:float=12
-        ewaldcutoff:float=7
-        polareps:float=0.00001
-        barostatmethod:str='montecarlo'
-        integrator:str='RESPA'
-        thermostat:str='BUSSI'
-        listofsaltcons:str='[KCl]=100'
         fixvdwtyperadii:list=field(default_factory=lambda : [])
         maxjobsatsametime:float=10
         onlyrottortorlist:list=field(default_factory=lambda : [])
         numespconfs:int=1
         fitred:bool=False
-        vdwtypestoeval:list=field(default_factory=lambda : [])
         vdwprmtypestofit:list=field(default_factory=lambda : ['S','T'])
         lastlogfileupdatetime:float=1
         addlonepairvdwsites:bool=False
@@ -320,7 +121,6 @@ class PolarizableTyper():
         vdwmaxqmstartingpointspertype:int=1
         vdwmaxtinkergridpoints:int=50
         smallmoleculefragmenter:bool=False
-        fragmentjobslocal:bool=False
         psi4_args:str=" --loglevel 30 "
         toroptdebugmode:bool=False
         debugmode:bool=False
@@ -339,13 +139,11 @@ class PolarizableTyper():
         parentname:None=None
         addhydrogentocharged:bool=True
         accuratevdwsp:bool=False
-        email:None=None
         firstoptfinished:bool=False
         optonly:bool=False
         onlyvdwatomindex:None=None
         use_qmopt_vdw:bool=False
         use_gau_vdw:bool=False
-        #dontusepcm:bool=False
         pcm_auto:bool=True
         deleteallnonqmfiles:bool=False
         totalcharge:None=None
@@ -365,7 +163,7 @@ class PolarizableTyper():
         latestsmallmoleculeprmlib:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/ParameterFiles/'+'amoeba21.prm'
         boltzmantemp:float=8
         dovdwscan:bool=False
-        vdwprobepathname:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/VdwProbes/'
+        vdwprobepathname:str=os.path.abspath(os.path.join(os.path.split(__file__)[0] , os.pardir))+'/Examples/Assets/'
         vdwprobenames:list=field(default_factory=lambda : ['water'])
         maxtorRMSPDRel:float=.1
         vdwmissingfilename:str='missingvdw.txt'
@@ -415,7 +213,6 @@ class PolarizableTyper():
         dontfrag:bool=False
         isfragjob:bool=False
         dipoletol:float=.5
-        externalapi:None=None
         printoutput:bool=False
         poltypeini:bool=True
         structure:None=None
@@ -465,7 +262,6 @@ class PolarizableTyper():
         espmethod:str='MP2'
         qmonly:bool = False
         espfit:bool = True
-        parmtors:bool = True
         foldnum:int=3
         foldoffsetlist:list = field(default_factory=lambda : [ 0.0, 180.0, 0.0, 180.0, 0.0, 180.0 ])
         torlist:None = None
@@ -474,8 +270,6 @@ class PolarizableTyper():
         maxRMSPD:float=1
         maxtorRMSPD:float=1
         tordatapointsnum:None=None
-        gentorsion:bool=False
-        gaustorerror:bool=False
         torsionrestraint:float=.5*3282.80354574
         torsionprmrestraintfactorL1:float=0.1
         torsionprmrestraintfactorL2:float=0.1
@@ -493,21 +287,11 @@ class PolarizableTyper():
         postfit:bool=False
         bashrcpath:None=None
         optmaxcycle:int=400
-        torkeyfname:None=None
         gausoptcoords:str=''
         forcefield:str="AMOEBA"
-        helpfile:str='README.md'
-        versionfile:str=os.path.join('VersionFiles','version.md')
         sleeptime:float=.1
         structure:None=None
         espextraconflist:list=field(default_factory=lambda : [])
-        usepdb2pqr:bool=False
-        inputproddyntime:bool=False
-        inputequiltimeNVT:bool=False
-        inputequiltimeNPT:bool=False
-        inputlastNVTequiltime:bool=False
-        indicestorestrain:list=field(default_factory=lambda : [])
-        hetatmindices:list=field(default_factory=lambda : [])
         userconformation:bool=False
         def __post_init__(self): 
             """
@@ -519,19 +303,6 @@ class PolarizableTyper():
             1. Initialize some internal variables not used by user input
             2. Read input poltype.ini file and change variable defaults
             """
-            self.knownresiduesymbs=['A', 'G', 'U', 'A3', 'A5','DA', 'DC', 'DG', 'DT', 'G3', 'G5', 'U3', 'U5','DA3', 'DA5', 'DC3', 'DC5', 'DG3', 'DG5', 'DT3', 'DT5','ALA', 'ARG', 'ASH', 'ASN', 'ASP', 'GLH', 'GLN', 'GLU', 'GLY', 'HID', 'HIE', 'HIS','ILE', 'LEU', 'LYD', 'LYS', 'MET','PHE', 'PRO', 'SER', 'THR', 'TRP', 'TYD', 'TYR', 'VAL', 'CYD', 'CYS']
-            self.molstructfname=self.structure 
-            self.simpath=os.getcwd()        
-            self.estatlambdascheme=self.estatlambdascheme[::-1]
-            self.vdwlambdascheme=self.vdwlambdascheme[::-1]
-            self.restlambdascheme=self.restlambdascheme[::-1]
-            self.elementsymtocharge={'K':1,'Cl':-1,'Mg':2,'Li':1,'Na':1,'Rb':1,'Cs':1,'Be':2,'Ca':2,'Zn':2}
-            self.elementsymtomass={'H':1.00794,'HN':1.00794,'HO':1.00794,'O':15.9994,'OH':15.9994,'N':14.0067,'C':12.0107,'CA':12.0107,'F':18.9984032,'Cl':35.453,'Cl-':35.453,'S':32.065,'P':30.9737,'Na':22.98976,'K':39.0983,'Ca':40.078,'Mg':24.305,'Mg+':24.305,'K+':39.0983}
-            if self.usepreequilibriatedbox==True:
-                self.equiltimeNVT=2
-                self.equiltimeNPT=1
-                self.lastNVTequiltime=.5
-
             self.nfoldlist =  list(range(1,self.foldnum+1))
             self.parentdir=os.getcwd()
             if self.torlist==None:
@@ -602,24 +373,16 @@ class PolarizableTyper():
                         elif 'torspmethodlist' in newline:
                             self.torspmethodlist=a.split(',')
                             self.torspmethodlist=[i.strip() for i in self.torspmethodlist]
-                        elif 'pdbcode' in newline:
-                            self.pdbcode=a
                         elif 'indextotypefile' in newline:
                             self.indextotypefile=a
                         elif 'indextompoleframefile' in newline:
                             self.indextompoleframefile=a
                         elif 'xtbtorresconstant' in newline:
                             self.xtbtorresconstant=float(a)
-                        elif 'qmrelativeweight' in newline:
-                            self.qmrelativeweight=float(a)
-                        elif 'ecrexpect' in newline:
-                            self.ecrexpect=float(a)
                         elif 'targetenthalpyerror' in newline:
                             self.targetenthalpyerror=float(a)
                         elif 'targetdensityerror' in newline:
                             self.targetdensityerror=float(a)
-                        elif 'liqrelativeweight' in newline:
-                            self.liqrelativeweight=float(a)
                         elif 'potentialoffset' in newline:
                             self.potentialoffset=float(a)
                         elif 'enthalpyrelativeweight' in newline:
@@ -640,46 +403,10 @@ class PolarizableTyper():
                             self.templateligandfilename=a
                         elif 'prmfilepath' in newline:
                             self.prmfilepath=a
-                        elif 'gpucardnumber' in newline:
-                            self.gpucardnumber=int(a)
-                        elif 'dockgridsize' in newline:
-                            self.dockgridsize=a.split(',')
-                            self.dockgridsize=[i.strip() for i in self.dockgridsize]
-                        elif 'dockgridcenter' in newline:
-                            self.dockgridcenter=a.split(',')
-                            self.dockgridcenter=[i.strip() for i in self.dockgridcenter]
-                        elif 'gridspacing' in newline:
-                            self.gridspacing=int(a)
-                        elif 'nposes' in newline:
-                            self.nposes=int(a)
-                        elif 'vinaexhaustiveness' in newline:
-                            self.vinaexhaustiveness=int(a)
-                        elif 'dockingenvname' in newline:
-                            self.dockingenvname=a
-                        elif "estimatedynamictime" in newline and 'estimatedynamictimeonly' not in newline:
-                            self.estimatedynamictime=self.SetDefaultBool(line,a,True)
-                        elif "estimatedynamictimeonly" in newline:
-                            self.estimatedynamictimeonly=self.SetDefaultBool(line,a,True)
-                        elif "heavyhyd" in newline:
-                            self.heavyhyd=self.SetDefaultBool(line,a,True)
-                        elif "skipchargecheck" in newline:
-                            self.skipchargecheck=self.SetDefaultBool(line,a,True)
                         elif "useuniquefilenames" in newline:
                             self.useuniquefilenames=self.SetDefaultBool(line,a,True)
-                        elif "makexyzonly" in newline:
-                            self.makexyzonly=self.SetDefaultBool(line,a,True)
-                        elif "complexationonly" in newline:
-                            self.complexationonly=self.SetDefaultBool(line,a,True)
-                        elif "generatepdbtrajs" in newline:
-                            self.generatepdbtrajs=self.SetDefaultBool(line,a,True)
-                        elif "removesolventpdbtraj" in newline:
-                            self.removesolventpdbtraj=self.SetDefaultBool(line,a,True)
                         elif "writeoutmultipole" in newline:
                             self.writeoutmultipole=self.SetDefaultBool(line,a,True)
-                        elif "alchemical" in newline:
-                            self.alchemical=self.SetDefaultBool(line,a,True)
-                        elif "covalentdock" in newline:
-                            self.covalentdock=self.SetDefaultBool(line,a,True)
                         elif "writeoutbond" in newline:
                             self.writeoutbond=self.SetDefaultBool(line,a,True)
                         elif "writeoutangle" in newline:
@@ -690,226 +417,23 @@ class PolarizableTyper():
                                 self.optconvergence = "LOOSE"
                         elif newline.startswith("optconvergence"):
                             self.optconvergence = a.upper()
-                        elif "writeoutstrbnd" in newline:
-                            self.writeoutstrbnd=self.SetDefaultBool(line,a,True)
-                        elif "writeoutopbend" in newline:
-                            self.writeoutopbend=self.SetDefaultBool(line,a,True)
-                        elif "writeoutvdw" in newline:
-                            self.writeoutvdw=self.SetDefaultBool(line,a,True)
                         elif "writeoutpolarize" in newline:
                             self.writeoutpolarize=self.SetDefaultBool(line,a,True)
                         elif "writeouttorsion" in newline:
                             self.writeouttorsion=self.SetDefaultBool(line,a,True)
-                        elif "usevinardo" in newline:
-                            self.usevinardo=self.SetDefaultBool(line,a,True)
-                        elif "usevina" in newline:
-                            self.usevina=self.SetDefaultBool(line,a,True)
-                        elif "usegold" in newline:
-                            self.usegold=self.SetDefaultBool(line,a,True)
-                        elif "usead4" in newline:
-                            self.usead4=self.SetDefaultBool(line,a,True)
-                        elif "addphysioions" in newline:
-                            self.addphysioions=self.SetDefaultBool(line,a,True)
-                        elif "submitlocally" in newline:
-                            self.didinputsubmitlocally=True
-                            self.submitlocally=self.SetDefaultBool(line,a,True)
                         elif "usesymtypes" in newline:
                             self.usesymtypes=self.SetDefaultBool(line,a,True)
-                        elif "printjobsleft" in newline:
-                            self.printjobsleft=self.SetDefaultBool(line,a,True)
-                        elif "salthfe" in newline:
-                            self.salthfe=self.SetDefaultBool(line,a,True)
-                        elif "relaxFBbox" in newline:
-                            self.relaxFBbox=self.SetDefaultBool(line,a,True)
-                        elif "extractinterforbinding" in newline:
-                            self.extractinterforbinding=self.SetDefaultBool(line,a,True)
-                        elif "redobar" in newline:
-                            self.redobar=self.SetDefaultBool(line,a,True)
-                        elif "rotateframes" in newline:
-                            self.rotateframes=self.SetDefaultBool(line,a,True)
                         elif "checktraj" in newline:
                             self.checktraj=self.SetDefaultBool(line,a,True)
-                        elif "cpujobsonly" in newline:
-                            self.cpujobsonly=self.SetDefaultBool(line,a,True)
-                        elif "writeinputfiles" in newline:
-                            self.writeinputfiles=self.SetDefaultBool(line,a,True)
-                        elif 'expfreeenergy' in newline:
-                            self.expfreeenergy=a
-                        elif 'pathtosims' in newline:
-                            self.pathtosims=a
-                        elif 'perturbedkeyfilename' in newline:
-                            self.perturbedkeyfilename=a
-                        elif 'simulationstostopfolderpath' in newline:
-                            self.simulationstostopfolderpath=a
-                        elif 'aaxis' in newline:
-                            self.aaxis=float(a)
-                        elif 'energycutoff' in newline:
-                            self.energycutoff=float(a)
-                        elif 'baxis' in newline:
-                            self.baxis=float(a)
-                        elif 'caxis' in newline:
-                            self.caxis=float(a)
-                        elif 'density' in newline:
-                            self.density=float(a)
-                        elif "usepreequilibriatedbox" in newline:
-                            self.usepreequilibriatedbox=self.SetDefaultBool(line,a,True)
-                        elif "equilfinished" in newline:
-                            self.equilfinished=self.SetDefaultBool(line,a,True)
-                        elif "barfilesfinished" in newline:
-                            self.barfilesfinished=self.SetDefaultBool(line,a,True)
-                        elif "minfinished" in newline:
-                            self.minfinished=self.SetDefaultBool(line,a,True)
-                        elif "boxonly" in newline:
-                            self.boxonly=self.SetDefaultBool(line,a,True)
-                        elif "fep" in newline:
-                            self.fep=self.SetDefaultBool(line,a,True)
                         elif "generateinputfilesonly" in newline:
                             self.generateinputfilesonly=self.SetDefaultBool(line,a,True)
-                        elif "productiondynamicsNVT" in newline:
-                            self.productiondynamicsNVT=self.SetDefaultBool(line,a,True)
-                        elif "usetinkerforthermoprops" in newline:
-                            self.usetinkerforthermoprops=self.SetDefaultBool(line,a,True)
-                        elif "changegasphaseintegrator" in newline:
-                            self.changegasphaseintegrator=self.SetDefaultBool(line,a,True)
-                        elif "prodmdfinished" in newline:
-                            self.prodmdfinished=self.SetDefaultBool(line,a,True)
-                        elif 'complexedproteinpdbname' in newline:
-                            self.complexedproteinpdbname=a
-                        elif 'dynamicpath' in newline:
-                            self.dynamicpath=a
-                        elif 'dynamicommpath' in newline:
-                            self.dynamicommpath=a
-                        elif 'externalapi' in newline:
-                            self.externalapi=a
                         elif 'bashrcpath' in newline:
                             self.bashrcpath=a
-                        elif 'restrainatomgroup1' in newline:
-                            self.restrainatomgroup1=[int(i) for i in commalist]
                         elif 'espextraconflist' in newline:
                             self.espextraconflist=a.split(',')
                             self.espextraconflist=[i.strip() for i in self.espextraconflist]
-                        elif 'perturbkeyfilelist' in newline:
-                            self.perturbkeyfilelist=commalist
-                        elif 'numinterpolsforperturbkeyfiles' in newline:
-                            self.numinterpolsforperturbkeyfiles=commalist
-                        elif 'restrainatomgroup2' in newline:
-                            self.restrainatomgroup2=[int(i) for i in commalist]
-                        elif 'torsionrestlist' in newline:
-                            self.torsionrestlist=commalist
-                            templist=[]
-                            for ele in self.torsionrestlist:
-                                paths=ele.lstrip().rstrip().split()
-                                temp=[]
-                                for e in paths:
-                                    temp.append(e)
-                                templist.append(temp)
-                            self.torsionrestlist=templist
-                        elif "flatbotrest" in newline:
-                            self.flatbotrest=self.SetDefaultBool(line,a,True)
-                        elif "useproddyngrprests" in newline:
-                            self.useproddyngrprests=self.SetDefaultBool(line,a,True)
-                        elif "restrainreceptorligand" in newline:
-                            self.restrainreceptorligand=self.SetDefaultBool(line,a,True)
-                        elif "annihilatevdw" in newline:
-                            self.annihilatevdw=self.SetDefaultBool(line,a,True)
-                        elif "proddynensem" in newline:
-                            self.proddynensem = a
-                        elif ("keyfilenamelist") in newline:
-                            self.keyfilenamelist=commalist
-                        elif ("ligandcharge") in newline:
-                            self.ligandcharge = int(a)
-                        elif ("tightmincriteria") in newline:
-                            self.tightmincriteria = float(a)
-                        elif ("restrainpositionconstant") in newline:
-                            self.restrainpositionconstant = float(a)
-                        elif ("loosemincriteria") in newline:
-                            self.loosemincriteria = float(a)
-                        elif ("equilrestrainsphereradius") in newline:
-                            self.equilrestrainsphereradius = float(a)
-                        elif ("barostatmethod") in newline:
-                            self.barostatmethod = a
-                        elif ("receptorcharge") in newline:
-                            self.receptorcharge = float(a)
-                        elif ("waitingtime") in newline:
-                            self.waitingtime = float(a)
-                        elif ("listofsaltcons") in newline:
-                            self.listofsaltcons = a
-                        elif ("ligandxyzfilenamelist") in newline and "receptor" not in newline and 'annihilate' not in newline:
-                            self.ligandxyzfilenamelist=commalist
-                        elif ("annihilateligandxyzfilenamelist") in newline and "receptor" not in newline:
-                            self.annihilateligandxyzfilenamelist=commalist
-                        elif ("ligandfilename") in newline:
-                            self.ligandfilename = a
-                        elif ("receptorligandxyzfilename") in newline:
-                            self.receptorligandxyzfilename = a
-                        elif ("integrator") in newline:
-                            self.integrator = a
-                        elif ("thermostat") in newline:
-                            self.thermostat = a
-                        elif ("vdwcutoff") in newline:
-                            self.vdwcutoff = a
-                        elif ("ewaldcutoff") in newline:
-                            self.ewaldcutoff = a
                         elif ("polareps") in newline:
                             self.polareps = a
-                        elif ("bgnstatexyz") in newline:
-                            self.bgnstatexyz = a
-                        elif ("endstatexyz") in newline:
-                            self.endstatexyz = a
-                        elif ("bgnstatekey") in newline:
-                            self.bgnstatekey = a
-                        elif ("endstatekey") in newline:
-                            self.endstatekey = a
-                        elif ("distancerestraintconstant") in newline:
-                            self.distancerestraintconstant= float(a)
-                        elif ("anglerestraintconstant") in newline:
-                            self.anglerestraintconstant= float(a)
-                        elif ("equilibriatescheme") in newline:
-                            self.equilibriatescheme=commalist
-                        elif ("restlambdascheme") in newline:
-                            self.restlambdascheme=commalist
-                        elif ("vdwlambdascheme") in newline:
-                            self.vdwlambdascheme=commalist
-                        elif ("estatlambdascheme") in newline:
-                            self.estatlambdascheme=commalist
-                        elif ("torsionrestscheme") in newline:
-                            self.torsionrestscheme=commalist
-                        elif ("equilwritefreq") in newline:
-                            self.equilwritefreq= a
-                        elif ("equiltimestep") in newline:
-                            self.equiltimestep= int(a)
-                        elif ("proddyntimestep") in newline:
-                            self.proddyntimestep= int(a)
-                        elif ("numbergpus") in newline:
-                            self.numbergpus= int(a)
-                        elif ("equiltimeNPT") in newline:
-                            self.equiltimeNPT= float(a)
-                            self.inputequiltimeNPT=True
-                        elif ("equiltimeionNPT") in newline:
-                            self.equiltimeionNPT= float(a)
-                        elif ("proddynwritefreq") in newline:
-                            self.proddynwritefreq= a
-                        elif ("proddyntime") in newline and 'comp' not in newline and 'solv' not in newline:
-                            self.proddyntime= float(a)
-                            self.inputproddyntime=True
-                        elif ("compproddyntime") in newline:
-                            self.compproddyntime= float(a)
-                        elif ("solvproddyntime") in newline:
-                            self.solvproddyntime= float(a)
-                        elif ("complexation") in newline:
-                            self.complexation=True
-                        elif ("equiltimeNVT") in newline:
-                            self.equiltimeNVT= float(a)
-                            self.inputequiltimeNVT=True
-                        elif ("lastNVTequiltime") in newline:
-                            self.lastNVTequiltime= float(a)
-                            self.lastNVTequiltime=True
-                        elif ("equilonly") in newline:
-                            self.equilonly=True
-                        elif ("minonly") in newline:
-                            self.minonly=True
-                        elif ("equilrestlambdascheme") in newline:
-                            self.equilrestlambdascheme=commalist
 
                         elif "rotalltors" in newline:
                             self.rotalltors=self.SetDefaultBool(line,a,True)
@@ -922,9 +446,6 @@ class PolarizableTyper():
                             self.fixvdwtyperadii=a.split(',')
                             self.fixvdwtyperadii=[i.strip() for i in self.fixvdwtyperadii]
 
-                        elif "vdwtypestoeval" in newline:
-                            self.vdwtypestoeval=a.split(',')
-                            self.vdwtypestoeval=[i.strip() for i in self.vdwtypestoeval]
                         elif "addlonepairvdwsites" in newline:
                             self.addlonepairvdwsites=self.SetDefaultBool(line,a,True)
                         elif "genprotstatesonly" in newline:
@@ -955,8 +476,6 @@ class PolarizableTyper():
                             self.fragmenterdebugmode=self.SetDefaultBool(line,a,True)
                         elif "skipespfiterror" in newline:
                             self.skipespfiterror=self.SetDefaultBool(line,a,True)
-                        elif "fragmentjobslocal" in newline:
-                            self.fragmentjobslocal=self.SetDefaultBool(line,a,True)
                         elif "smallmoleculefragmenter" in newline:
                             self.smallmoleculefragmenter=self.SetDefaultBool(line,a,True)
                         elif "debugmode" in newline and 'fragmenterdebugmode' not in line and 'tordebugmode' not in line and 'toroptdebugmode' not in line:
@@ -1009,8 +528,6 @@ class PolarizableTyper():
                             self.tortor=self.SetDefaultBool(line,a,True)
                         elif "tordebugmode" in newline:
                             self.tordebugmode=self.SetDefaultBool(line,a,True)
-                        elif "email" in newline:
-                            self.email=a
                         elif "refinenonaroringtors" in newline:
                             self.refinenonaroringtors=self.SetDefaultBool(line,a,True)
                         elif "fitfirsttorsionfoldphase" in newline:
@@ -1057,8 +574,6 @@ class PolarizableTyper():
                             self.isfragjob=self.SetDefaultBool(line,a,True)
                         elif "dontfrag" in newline:
                             self.dontfrag=self.SetDefaultBool(line,a,True)
-                        elif "externalapi" in newline and a!='None':
-                            self.externalapi=a
                         elif "gausoptcoords" in newline:
                             self.gausoptcoords = a
                         elif "suppresstorfiterr" in newline:
@@ -1246,8 +761,6 @@ class PolarizableTyper():
                             self.fname = a
                         elif "gdmaout" in newline:
                             self.gdmafname = a
-                        elif "gbindir" in newline:
-                            self.gausdir = a
                         elif "forcefield" in newline:
                             self.forcefield = a
                         elif "qmonly" in newline:
@@ -1360,36 +873,6 @@ class PolarizableTyper():
                 self.torspbasisset = 'MINIX'
 
             self.cmdtopid={} # for killing pids that have jobs stalled too long
-            if self.covalentdock==True:
-                self.usevina=False # doesnt have covalent
-                self.usevinardo=False # doesnt have covalent
-                self.usead4=False
-            if (self.usead4==True or self.usegold==True or self.usevina==True or self.usevinardo==True):
-                self.docking=True
-            else:
-                self.docking=False
-            if (self.complexedproteinpdbname!=None or self.receptorligandxyzfilename!=None) and self.docking==False:
-                self.binding=True
-                self.solvation=True
-                self.complexation=True
-
-            if self.binding==False:
-                if self.density!=None:
-                    self.neatliquidsim=True
-            if self.binding==False and self.neatliquidsim==False and self.docking==False and self.molstructfname==None:
-                self.solvation=True
-            if self.uncomplexedproteinpdbname!=None and self.complexedproteinpdbname==None:
-                self.usepdb2pqr=True
-            if self.uncomplexedproteinpdbname!=None and self.complexedproteinpdbname!=None:
-                self.alignPDB=True
-
-            
-            if self.ligandxyzfilenamelist!=None and (self.binding==True or self.solvation==True or self.neatliquidsim==True) or self.pdbcode!=None or self.usepdb2pqr!=False or self.alignPDB==True:
-                self.MolecularDynamics()
-                sys.exit()
-            if (self.docking==True) and self.complexedproteinpdbname!=None:
-                docking.DockingWrapper(self,self.complexedproteinpdbname,self.dockgridcenter,self.dockgridsize,self.vinaexhaustiveness,self.nposes,self.goldbin,self.usevina,self.usead4,self.usevinardo,self.usegold,self.dockingenvname,self.prepdockscript,self.gridspacing,self.listofligands,self.ecrexpect,self.covalentdock,self.knownresiduesymbs)
-                sys.exit()
             
             if self.isfragjob==False:
                 self.parentname=self.molecprefix
@@ -1405,954 +888,6 @@ class PolarizableTyper():
             if not __name__ == '__main__':
                 params=self.main()
 
-
-        def MolecularDynamics(self):
-            """
-            Intent: Handles initializing more variables for MD simulations/FEP
-            Input: Variables from poltype.ini file and other default variables
-            Output: Variables needed for molecular dynamics/FEP then calls functions for molecular dynamics/FEP
-            Referenced By: __post_init__ 
-            Description:
-            0. Determine xyzedit options, numbers keep changing but the string doesnt so parse the text to get options.
-            1. Change default production dynamics time if no previous input was given and running binding free energy simulations.
-            2. Copy prmfilepath (default amoebabio18) to current directory (so dont have to have full path in tinker key file for parameters).
-            3. If user inputs for stopping simulations, then call function to stop simulations (generates .end files in appropriate folders) then quit poltype.
-            4. Copy ligandxyzfilenamelist to annihilateligandxyzfilenamelist if annihilateligandxyzfilenamelist is not specified by default.
-            5. Read in tinker XYZ files in ligandxyzfilenamelist and convert to SMILES strings to be later used for detection in input PDB files.
-            6. Create log file for simulations/FEP
-            7. Change tinker executable names to reflect what is in the PATH (sometimes people use analyze.x vs analyze etc)
-            8. Determine if should use GPU executable names (rather than CPU executables) based on if GPU executable is in PATH.
-            9. Determine whether to submit jobs locally or not based on if keywords are enabled such as submitlocally and externalapi.
-            10. Remove old intermediate files from previous run such as *.xyz_* etc..)
-            11. Check if using a tinker version that is up to date enough to be consistent with poltype
-            12. If the appropriate inputs are given for aligning a ligand to template ligand, then perform alignment in pocket and quit poltype. 
-            13. Initialize variables to be filled in later in the program stack. Read water/Ions parameter type numbers from prmfilepath.
-            14. If receptorligandxyzfilename is given as input, determine ligand indices for complexation box from input file ( and what the indices should be for solvation box as well).
-            15. If there are overlapping types in input ligandxyzfilenamelist/keyfilenamelist then shift the types so that they are no longer overlapping. Do the same for receptorligandxyzfilename if this is provided as input.
-            16. If pdbcode for crystal is given, download and fill in missing residues via Modeller and quit program.
-            17. If user has inputs to use pdb2pqr to protonate protein (via proPka) then call pdb2pqr and quit program.
-            18. Append all keys from keyfilenamelist into one key file. Check to ensure net charge is an integer, if not then pick some multipoles on host (protein) and add residual charge onto the protein multipole to ensure net charge is an integer.  
-            19. If inputs for host-guest tinker XYZ are not given, then generate from complexed PDB.
-            20. If alchemical=False (user doesnt wasnt to run FEP, just dynamics) then set internal lambda schedules to only include one step.
-            21. If user wants neat liquid simulation, adjust defaults for equilibriation and production dynamics length. Only incllude dynamics for 100% electrostatics and 100% vdW.
-            22. Check if need solvation gas phase regrowth for hydration free energy computations. Some molecules are small enough so that the vdW interactions dont exist. If small enough dont need gas phase vdW regrowth step.
-            23. If user gives complexed host-guest tinker XYZ file and box info is on the top of the file, remove the box info.
-            24. Ensure no undefined parameters for all key files, and make sure net charge of receptor is an integer, if not add residual charge to one of receptor multipoles and will append modified multipoles to complexation tinker key file. 
-            25. If need to add gas phase vdW regrowth, adjust variables for electrostatic and vdW lambda schedules. 
-            26. Set up variables such as system total charge, number of ions needed, filenames, variables used for free energy, enthalpy, entropy computations.
-            27. If pathtosims is specified, then combine simulation table data from other simulation output tables (different simulation folders) and add into combined table. Generate combined plots as well.
-            28. If perturbkeyfilelist is specified, then set up variables for determining filenames, folders and number of interpolations needed later.
-            29. Append all keys from keyfilenamelist into keys for solvation/complexation. Append any additional modified multipoles needed to ensure net charge of receptor is an integer. 
-            30. Setup keyfile names to be used later on.
-            31. Compute step number for dynamics based on dynamic time and time step. Setup box filenames and output files for each dynamic step.
-            32. Setup folder names for production dynamics and production dynamics outputfile names. 
-            33. Setup production dynamic ARC file paths (for BAR input) and BAR output filepath names.
-            34. Rotate into inertial frame. This will make it easier to compute longest length for determining box size later.
-            35. Write relevant variables to internal dictionary to be later printed out in CSV files.
-            36. Grab properties of ligand XYZ files to later be used when writing out PDB trajectories for equilbriated ARC and production dynamics ARC.
-            37. Call annihilator.py (which calls minimization, equilbritation, production dynamics and BAR etc..)
-            """
-            # STEP 0
-            self.DetermineXYZEditOptions()
-            # STEP 1
-            if self.neatliquidsim==True: 
-                self.usepreequilibriatedbox=False # then make new neat liquid box from scratch
-            if self.inputproddyntime==True:
-                self.compproddyntime=self.proddyntime
-                self.solvproddyntime=self.proddyntime
-
-           
-            # STEP 2
-
-            head,tail=os.path.split(self.prmfilepath)
-            newpath=os.path.join(os.getcwd(),tail)
-            if self.prmfilepath!=newpath or head!=None:
-                checkpath=os.path.join(os.getcwd(),self.prmfilepath)
-                if checkpath!=newpath:
-                    shutil.copy(self.prmfilepath,newpath)
-            self.prmfilepath=tail
-            # STEP 3
-
-            if self.simulationstostopfolderpath!=None:
-                self.StopSimulations(self.simulationstostopfolderpath)
-                sys.exit()
-            # STEP 4
-
-            if self.annihilateligandxyzfilenamelist==None and self.ligandxyzfilenamelist!=None:
-                self.annihilateligandxyzfilenamelist=self.ligandxyzfilenamelist.copy()
-            if int(self.estatlambdascheme[0])!=1 or int(self.vdwlambdascheme[0])!=1 and self.solvation==True:
-                raise ValueError('Please start with 1 on left side of lambdascheme and 0 on right. This way for solvation can add extra steps correctly')
-            # STEP 5
-
-            obConversion = openbabel.OBConversion()
-            self.ligandsmileslist=[]
-            self.annihilateligandsmileslist=[]
-            self.ligandxyztosmiles={}
-            if self.ligandxyzfilenamelist!=None:
-                for xyz in self.ligandxyzfilenamelist:
-                    ligmol = openbabel.OBMol()
-                    obConversion.SetInFormat('xyz')
-                    newname=self.ConvertTinkerXYZToCartesianXYZ(xyz)
-                    obConversion.ReadFile(ligmol, newname)
-                    obConversion.SetOutFormat('mol')
-                    molname=xyz.replace('.xyz','.mol')
-                    obConversion.WriteFile(ligmol,molname)
-                    ligm=Chem.MolFromMolFile(molname,removeHs=False,sanitize=False)
-                    smi=Chem.MolToSmarts(ligm)
-                    smi=smi.replace('@','')
-                    self.ligandsmileslist.append(smi)
-                    self.ligandxyztosmiles[xyz]=smi
-                    if xyz in self.annihilateligandxyzfilenamelist:
-                        self.annihilateligandsmileslist.append(smi)
-
-            # STEP 6
-
-            self.logname=os.path.basename(os.getcwd())+'_'+self.logname 
-            self.outputpath=os.path.join(os.getcwd(),'')
-            self.logfh=open(self.outputpath+self.logname,'a+')
-            # STEP 7
-
-            self.SanitizeMMExecutables()
-            # STEP 8
-
-            foundgpukey=False
-            if (self.which(self.dynamicommpath)):
-                self.usegpu=True
-                foundgpukey=True
-            if self.externalapi!=None:
-                self.runjobslocally=False 
-            # STEP 9
-
-            if self.externalapi==None and self.submitlocally==None:
-                self.submitlocally=True
-            if self.submitlocally!=True:
-                self.submitlocally=False
-            if not (self.which(self.dynamicommpath)) and foundgpukey==False:
-                self.localdynamicpath=self.dynamicpath
-                self.localbarpath=self.barpath
-            else:
-                self.localdynamicpath=self.dynamicommpath
-                self.localbarpath=self.barommpath
-            if self.usegpu==True:
-                self.truedynamicpath=self.dynamicommpath
-                self.truebarpath=self.barommpath
-                self.trueanalyzepath=self.analyzeommpath
-                self.trueminimizepath=self.minimizeommpath
-            else:
-                self.truedynamicpath=self.dynamicpath
-                self.truebarpath=self.barpath
-                self.trueanalyzepath=self.analyzepath
-                self.trueminimizepath=self.minimizepath
-            # STEP 10
-
-            self.CleanUpFiles()
-            # STEP 11
-
-            self.CheckTinkerVersion()
-
-
-            # STEP 13
-
-            if self.ligandxyzfilenamelist!=None and self.templateligandxyzfilename!=None:
-                self.AlignLigandXYZToTemplateXYZ()
-                sys.exit()
-
-            if self.alignPDB==True:
-                self.AlignComplexedPDBToUnComplexedPDB()
-                sys.exit()
-
-
-            # STEP 14
-
-            self.simfoldname=''
-            self.boxfilename='box.xyz'
-            self.masterdict={}
-            self.masterdict['energy']={}
-            self.masterdict['freeenergy']={}
-            self.masterdict['summary']={}
-            self.masterdict['lambda']={}
-
-            if self.complexation==True and self.solvation==False:
-                self.ligandindices=[[]]
-                self.allligandindices=[[]]
-            elif self.solvation==True and self.complexation==False:
-                self.ligandindices=[[]]
-                self.allligandindices=[[]]
-            elif self.solvation==True and self.complexation==True:
-                self.ligandindices=[[],[]]
-                self.allligandindices=[[],[]]
-            elif self.solvation==False and self.complexation==False and self.neatliquidsim==True:
-                self.ligandindices=[[]]
-                self.allligandindices=[[]]
-
-            self.elementsymtotinktype={'K':box.GrabTypeNumber(self,'Potassium Ion K+'),'Cl':box.GrabTypeNumber(self,'Chloride Ion Cl-'),'Mg':box.GrabTypeNumber(self,'Magnesium Ion Mg+2'),'Li':box.GrabTypeNumber(self,'Lithium Ion Li+'),'Na':box.GrabTypeNumber(self,'Sodium Ion Na+'),'Rb':box.GrabTypeNumber(self,'Rubidium Ion Rb+'),'Cs':box.GrabTypeNumber(self,'Cesium Ion Cs+'),'Be':box.GrabTypeNumber(self,'Beryllium Ion Be+2'),'Ca':box.GrabTypeNumber(self,'Calcium Ion Ca+2'),'Zn':box.GrabTypeNumber(self,'Zinc Ion Zn+2'),'Mg+':box.GrabTypeNumber(self,'Magnesium Ion Mg+2')}
-            self.ReadWaterFromPRMFile()
-
-            # STEP 15
-
-
-            if self.receptorligandxyzfilename!=None:
-                oldtypelist,ligatomnums=self.GrabLigandTypesInfoForIndicesExtraction(self.ligandxyzfilenamelist)
-                indextooldtype,complexligands,solvligands=self.ExtractLigandIndicesFromComplexXYZ(self.receptorligandxyzfilename,oldtypelist,ligatomnums)
-                self.allligands=[]
-                self.allligands.extend(complexligands)
-                self.allligands.extend(solvligands)
-                oldtypelist,ligatomnums=self.GrabLigandTypesInfoForIndicesExtraction(self.annihilateligandxyzfilenamelist)
-                indextooldtype,complexligands,solvligands=self.ExtractLigandIndicesFromComplexXYZ(self.receptorligandxyzfilename,oldtypelist,ligatomnums)
-                self.ligands=[]
-                self.ligands.extend(complexligands)
-                self.ligands.extend(solvligands)
-
-
-            # STEP 16
-
-
-            needtoshifttypes=self.CheckIfNeedToShiftTypes(self.keyfilenamelist)
-            if needtoshifttypes==True:
-                oldtypetonewtypelist=self.GenerateTypeMaps(self.keyfilenamelist)
-                for i in range(len(oldtypetonewtypelist)):
-                    oldindextonewindex=oldtypetonewtypelist[i]
-                    key=self.keyfilenamelist[i]
-                    xyz=self.ligandxyzfilenamelist[i]
-                    self.ShiftParameterTypes(key,oldindextonewindex)
-                    self.ShiftParameterTypes(xyz,oldindextonewindex)
-                    
-                if self.receptorligandxyzfilename!=None:
-                    indextonewtype,complexligands,solvligands=self.ExtractLigandIndicesFromComplexXYZ(self.receptorligandxyzfilename,oldtypetonewtypelist,ligatomnums)
-                    self.ShiftParameterTypesComplexXYZ(self.receptorligandxyzfilename,indextonewtype)
-
-            # STEP 17
-              
-
-            if self.pdbcode!=None:
-                pdbxyz.FillInMissingResidues(self,self.pdbcode)
-                sys.exit()
-
-            # STEP 18
-
-
-            if self.usepdb2pqr==True and self.uncomplexedproteinpdbname!=None:
-                pdbxyz.CallPDB2PQR(self,self.uncomplexedproteinpdbname)
-                sys.exit()
-
-
-            # STEP 19
-
-            self.originalkeyfilename=self.AppendKeys(self.keyfilenamelist,'ligands.key')
-            mpolearrays=self.CheckInputXYZKeyFiles(ligandonly=True) # check xyz/keys of ligands before making complex XYZ
-
-
-            # STEP 20
-
-            if self.complexation==True and self.complexedproteinpdbname!=None: 
-
-                pdbxyz.GenerateProteinTinkerXYZFile(self)
-
-            elif self.complexation==True  and self.complexedproteinpdbname==None and self.receptorligandxyzfilename==None: 
-                raise ValueError('Missing complexedproteinpdbname, need ligand in complex')
-
-
-            # STEP 21
-
-
-            if self.alchemical==False:
-                self.estatlambdascheme=[1]
-                self.vdwlambdascheme=[1]
-                self.restlambdascheme=[0]
-
-
-            # STEP 22
-
-            self.addgas=False
-            if self.neatliquidsim==True:
-                self.estatlambdascheme=[1]
-                self.vdwlambdascheme=[1]
-                self.restlambdascheme=[0]
-                self.restrainatomsduringminimization=False
-                if self.inputproddyntime==False:
-                    self.proddyntime=3
-                if self.inputequiltimeNVT==False:
-                    self.equiltimeNVT=2
-                if self.inputequiltimeNPT==False:
-                    self.equiltimeNPT=.5
-                if self.inputlastNVTequiltime==False:
-                    self.lastNVTequiltime=.5
-                self.addgas=True
-            self.originalestatlambdascheme=self.estatlambdascheme[:]
-            self.originalvdwlambdascheme=self.vdwlambdascheme[:]
-            self.originalrestlambdascheme=self.restlambdascheme[:]
-            self.originaltorsionrestscheme=self.torsionrestscheme[:]
-
-            
-
-            # STEP 23
-
-
-            self.checkneedregrow=self.CheckIfNeedRegrowForSolvation()
-
-            # STEP 24
-
-            self.CheckReceptorLigandXYZFile() # sometimes user have box info on top
-            
-            # STEP 25
-            mpolearrays=self.CheckInputXYZKeyFiles()
-
-            # STEP 26
-
-            if (self.extractinterforbinding==True and self.binding==True) or self.checkneedregrow==True:
-                self.addgas=True
-            if self.addgas:
-                regrowelelambdascheme=self.estatlambdascheme[::-1]
-                regrowvdwlambdascheme=self.vdwlambdascheme[::-1]
-                regrowrestlambdascheme=self.restlambdascheme[::-1]
-                self.estatlambdascheme=[self.estatlambdascheme,regrowelelambdascheme]
-                self.vdwlambdascheme=[self.vdwlambdascheme,regrowvdwlambdascheme]
-                self.restlambdascheme=[self.restlambdascheme,regrowrestlambdascheme]
-                self.torsionrestscheme=[self.torsionrestscheme,self.torsionrestscheme]
-            else:
-                self.estatlambdascheme=[self.estatlambdascheme]
-                self.vdwlambdascheme=[self.vdwlambdascheme]
-                self.restlambdascheme=[self.restlambdascheme]
-                self.torsionrestscheme=[self.torsionrestscheme]
-
-            if self.complexationonly==True:
-                self.solvation=False
-
-            # STEP 27 
-            if self.useuniquefilenames==True:
-                head,self.foldername=os.path.split(os.getcwd())
-            else:
-                self.foldername='MD'
-            if self.complexation==True and self.solvation==False:
-                self.bufferlen=[20]
-
-                self.proddynsteps=[str(int((self.compproddyntime*1000000)/self.proddyntimestep))]
-                self.proddynframenum=[str(int(float(self.compproddyntime)/(float(self.proddynwritefreq)*0.001)))]
-                self.proddyntimearray=[self.compproddyntime]
-                self.systemcharge=[self.receptorcharge+self.ligandcharge+self.otherligcharge]
-                self.ligandchargelist=[self.ligandcharge]
-                self.xyzfilename=[[self.receptorligandxyzfilename]]
-                self.iontypetoionnumberneut=[{}]
-                self.iontypetoionnumberphysio=[{}]
-                self.lambdafolderlist=[[]] 
-                self.proddynoutfilepath=[[]]
-                self.baroutputfilepath=[[]]
-                self.barfilepath=[[]]
-                self.thermooutputfilepath=[[]]
-                self.secondarcpaths=[[]]
-                self.firstarcpaths=[[]]
-                self.tabledictkeysused=[[]]
-                self.tabledict=[{}]
-                self.simfoldname=['Comp'+self.simfoldname]
-                self.boxfilename=[self.foldername+'_comp'+self.boxfilename]
-                self.newkeyfilename=[self.foldername+'_comp'+'.key']
-                self.WriteToLog('Complexation job')
-                self.tightminoutput=[self.foldername+'_comp'+'tightmin.out']
-                self.looseminoutput=[self.foldername+'_comp'+'loosemin.out']
-                self.freeenergy=[[]]
-                self.freeenergylist=[[]]
-                self.overlaplist=[[]]
-                self.freeenergyerrorlist=[[]]
-                self.freeenergyfwd=[[]]
-                self.freeenergylistfwd=[[]]
-                self.freeenergyerrorlistfwd=[[]]
-                self.freeenergybwd=[[]]
-                self.freeenergylistbwd=[[]]
-                self.freeenergyerrorlistbwd=[[]]
-                self.freeenergyviabariter=[[]]
-                self.freeenergylistviabariter=[[]]
-                self.freeenergyerrorlistviabariter=[[]]
-                self.freeenergyviabootstrap=[[]]
-                self.freeenergylistviabootstrap=[[]]
-                self.freeenergyerrorlistviabootstrap=[[]]
-                self.enthalpy=[[]]
-                self.enthalpylist=[[]]
-                self.enthalpyerrorlist=[[]]
-                self.enthalpyerrorlisttotal=[[]]
-                self.entropy=[[]]
-                self.entropylist=[[]]
-                self.entropyerrorlist=[[]]
-                self.entropyerrorlisttotal=[[]]
-                self.freeenergyerror=[[]]
-                self.enthalpyerror=[[]]
-                self.entropyerror=[[]]
-                self.masterdict['boxinfo']=[{}]
-
-            elif self.solvation==True and self.complexation==False:
-                self.proddynsteps=[str(int((self.solvproddyntime*1000000)/self.proddyntimestep))]
-                self.proddynframenum=[str(int(float(self.solvproddyntime)/(float(self.proddynwritefreq)*0.001)))]
-                self.proddyntimearray=[self.solvproddyntime]
-                self.bufferlen=[2*float(self.vdwcutoff)+6]
-                self.systemcharge=[self.ligandcharge]
-                self.ligandchargelist=[self.ligandcharge]
-                self.xyzfilename=[self.annihilateligandxyzfilenamelist]
-                self.iontypetoionnumberneut=[{}]
-                self.iontypetoionnumberphysio=[{}]
-                self.lambdafolderlist=[[]]
-                self.proddynoutfilepath=[[]]
-                self.baroutputfilepath=[[]]
-                self.barfilepath=[[]]
-                self.thermooutputfilepath=[[]]
-                self.secondarcpaths=[[]]
-                self.firstarcpaths=[[]]
-                self.tabledictkeysused=[[]]
-                self.tabledict=[{}]
-                self.simfoldname=['Solv'+self.simfoldname]
-                self.boxfilename=[self.foldername+'_solv'+self.boxfilename]
-                self.newkeyfilename=[self.foldername+'_solv'+'.key']
-                self.WriteToLog('Solvation job')
-                self.tightminoutput=[self.foldername+'_solv'+'tightmin.out']
-                self.looseminoutput=[self.foldername+'_solv'+'loosemin.out']
-                self.freeenergy=[[]]
-                self.freeenergylist=[[]]
-                self.overlaplist=[[]]
-                self.freeenergyerrorlist=[[]]
-                self.freeenergyfwd=[[]]
-                self.freeenergylistfwd=[[]]
-                self.freeenergyerrorlistfwd=[[]]
-                self.freeenergybwd=[[]]
-                self.freeenergylistbwd=[[]]
-                self.freeenergyerrorlistbwd=[[]]
-                self.freeenergyviabariter=[[]]
-                self.freeenergylistviabariter=[[]]
-                self.freeenergyerrorlistviabariter=[[]]
-                self.freeenergyviabootstrap=[[]]
-                self.freeenergylistviabootstrap=[[]]
-                self.freeenergyerrorlistviabootstrap=[[]]
-                self.enthalpy=[[]]
-                self.enthalpylist=[[]]
-                self.enthalpyerrorlist=[[]]
-                self.enthalpyerrorlisttotal=[[]]
-                self.entropy=[[]]
-                self.entropylist=[[]]
-                self.entropyerrorlist=[[]]
-                self.entropyerrorlisttotal=[[]]
-                self.freeenergyerror=[[]]
-                self.enthalpyerror=[[]]
-                self.entropyerror=[[]]
-                self.masterdict['boxinfo']=[{}]
-
-
-            elif self.solvation==False and self.complexation==False and self.neatliquidsim==True:
-                self.proddynsteps=[str(int((self.proddyntime*1000000)/self.proddyntimestep))]
-                self.proddynframenum=[str(int(float(self.proddyntime)/(float(self.proddynwritefreq)*0.001)))]
-                self.proddyntimearray=[self.proddyntime]
-                self.bufferlen=[2*float(self.vdwcutoff)+6]
-                self.systemcharge=[self.ligandcharge]
-                self.xyzfilename=[self.annihilateligandxyzfilenamelist]
-                self.iontypetoionnumberneut=[{}]
-                self.iontypetoionnumberphysio=[{}]
-                self.lambdafolderlist=[[]]
-                self.proddynoutfilepath=[[]]
-                self.baroutputfilepath=[[]]
-                self.barfilepath=[[]]
-                self.thermooutputfilepath=[[]]
-                self.secondarcpaths=[[]]
-                self.firstarcpaths=[[]]
-                self.tabledictkeysused=[[]]
-                self.tabledict=[{}]
-                self.simfoldname=['NeatLiq'+self.simfoldname]
-                self.boxfilename=[self.foldername+'_neatliq'+self.boxfilename]
-                self.newkeyfilename=[self.foldername+'_neatliq'+'.key']
-                self.WriteToLog('Neat Liquid job')
-                self.tightminoutput=[self.foldername+'_neatliq'+'tightmin.out']
-                self.looseminoutput=[self.foldername+'_neatliq'+'loosemin.out']
-                self.masterdict['boxinfo']=[{}]
-
-            elif self.solvation==True and self.complexation==True:
-                self.proddynsteps=[str(int((self.compproddyntime*1000000)/self.proddyntimestep)),str(int((self.solvproddyntime*1000000)/self.proddyntimestep))]
-                self.proddynframenum=[str(int(float(self.compproddyntime)/(float(self.proddynwritefreq)*0.001))),str(int(float(self.solvproddyntime)/(float(self.proddynwritefreq)*0.001)))]
-                self.proddyntimearray=[self.compproddyntime,self.solvproddyntime]
-                self.bufferlen=[20,2*float(self.vdwcutoff)+6]
-                self.systemcharge=[self.receptorcharge+self.ligandcharge+self.otherligcharge,self.ligandcharge]
-                self.ligandchargelist=[self.ligandcharge,self.ligandcharge]
-                self.xyzfilename=[[self.receptorligandxyzfilename],self.annihilateligandxyzfilenamelist]
-                self.iontypetoionnumberneut=[{},{}]
-                self.iontypetoionnumberphysio=[{},{}]
-                self.lambdafolderlist=[[],[]]
-                self.proddynoutfilepath=[[],[]]
-                self.baroutputfilepath=[[],[]]
-                self.barfilepath=[[],[]]
-                self.thermooutputfilepath=[[],[]]
-                self.secondarcpaths=[[],[]]
-                self.firstarcpaths=[[],[]]
-                self.tabledictkeysused=[[],[]]
-                self.tabledict=[{},{}]
-                self.simfoldname=['Comp'+self.simfoldname,'Solv'+self.simfoldname]
-                self.boxfilename=[self.foldername+'_comp'+self.boxfilename,self.foldername+'_solv'+self.boxfilename]
-                self.newkeyfilename=[self.foldername+'_comp'+'.key',self.foldername+'_solv'+'.key']
-                self.WriteToLog('Binding job')
-                self.tightminoutput=[self.foldername+'_comp'+'tightmin.out',self.foldername+'_solv'+'tightmin.out']
-                self.looseminoutput=[self.foldername+'_comp'+'loosemin.out',self.foldername+'_solv'+'loosemin.out']
-                self.freeenergy=[[],[]]
-                self.freeenergylist=[[],[]]
-                self.overlaplist=[[],[]]
-                self.freeenergyerrorlist=[[],[]]
-                self.freeenergyfwd=[[],[]]
-                self.freeenergylistfwd=[[],[]]
-                self.freeenergyerrorlistfwd=[[],[]]
-                self.freeenergybwd=[[],[]]
-                self.freeenergylistbwd=[[],[]]
-                self.freeenergyerrorlistbwd=[[],[]]
-                self.freeenergyviabariter=[[],[]]
-                self.freeenergylistviabariter=[[],[]]
-                self.freeenergyerrorlistviabariter=[[],[]]
-                self.freeenergyviabootstrap=[[],[]]
-                self.freeenergylistviabootstrap=[[],[]]
-                self.freeenergyerrorlistviabootstrap=[[],[]]
-                self.enthalpy=[[],[]]
-                self.enthalpylist=[[],[]]
-                self.enthalpyerrorlist=[[],[]]
-                self.enthalpyerrorlisttotal=[[],[]]
-                self.entropy=[[],[]]
-                self.entropylist=[[],[]]
-                self.entropyerrorlist=[[],[]]
-                self.entropyerrorlisttotal=[[],[]]
-                self.freeenergyerror=[[],[]]
-                self.enthalpyerror=[[],[]]
-                self.entropyerror=[[],[]]
-                self.masterdict['boxinfo']=[{},{}]
-
-            # STEP 28
-
-            if self.pathtosims!=None:
-                tables.GrabSimDataFromPathList(self)
-                plots.PlotEnergyData(self)
-                sys.exit()
-
-            # STEP 29
-
-            if self.perturbkeyfilelist!=None:
-                ls=[i+1 for i in range(len(self.perturbkeyfilelist))]
-                self.perturbkeyfilelisttokeyindex=dict(zip(self.perturbkeyfilelist,ls)) 
-                if self.numinterpolsforperturbkeyfiles==None:
-                    self.numinterpolsforperturbkeyfiles=[1 for i in range(len(self.perturbkeyfilelist))]
-                else:
-                    self.numinterpolsforperturbkeyfiles=[int(i) for i in self.numinterpolsforperturbkeyfiles]
-                self.perturbkeyfilelisttointerpolations=dict(zip(self.perturbkeyfilelist,self.numinterpolsforperturbkeyfiles))
-                if self.fep==True: # if fep keyword is used then dont need to run dynamics only BAR, so submit jobs on current node
-                    self.submitlocally=True
-
-            # STEP 30
-
-            for i in range(len(self.newkeyfilename)):
-                newkeyfilename=self.newkeyfilename[i]
-                self.AppendKeys(self.keyfilenamelist,newkeyfilename)
-                if i==0:
-                    self.ModifyCharge(newkeyfilename,mpolearrays)
-
-            # STEP 31
-
-            if self.complexation==True and self.solvation==False:
-                self.keyfilename=[[self.foldername+'_comp'+'.key']]
-                if self.perturbkeyfilelist!=None:
-                    for keyname,index in self.perturbkeyfilelisttokeyindex.items():
-                        numinterpols=self.perturbkeyfilelisttointerpolations[keyname]
-                        for k in range(numinterpols):
-                            newkeyname=self.foldername+'_'+str(k)+'_comp'+'.key'
-                            shutil.copy(keyname,newkeyname)
-                            self.keyfilename[0].append(newkeyname)
-                confignamelist=[i.replace('.key','_config.key') for i in self.keyfilename[0]]
-                lambdanamelist=[i.replace('.key','_lambda.key') for i in self.keyfilename[0]]
-                self.configkeyfilename=[confignamelist]
-                self.lambdakeyfilename=[lambdanamelist]
-
-            elif self.solvation==True and self.complexation==False:
-                self.keyfilename=[[self.foldername+'_solv'+'.key']]
-                if self.perturbkeyfilelist!=None:
-                    for keyname,index in self.perturbkeyfilelisttokeyindex.items():
-                        numinterpols=self.perturbkeyfilelisttointerpolations[keyname]
-                        for k in range(numinterpols):
-                            newkeyname=self.foldername+'_'+str(k)+'_solv'+'.key'
-                            shutil.copy(keyname,newkeyname)
-                            self.keyfilename[0].append(newkeyname)
-                confignamelist=[i.replace('.key','_config.key') for i in self.keyfilename[0]]
-                lambdanamelist=[i.replace('.key','_lambda.key') for i in self.keyfilename[0]]
-                self.configkeyfilename=[confignamelist]
-                self.lambdakeyfilename=[lambdanamelist]
-
-
-            elif self.solvation==False and self.complexation==False and self.neatliquidsim==True:
-                self.keyfilename=[[self.foldername+'_neatliq'+'.key']]
-                if self.perturbkeyfilelist!=None:
-                    for keyname,index in self.perturbkeyfilelisttokeyindex.items():
-                        numinterpols=self.perturbkeyfilelisttointerpolations[keyname]
-                        for k in range(numinterpols):
-                            newkeyname=self.foldername+'_'+str(k)+'_neatliq'+'.key'
-                            shutil.copy(keyname,newkeyname)
-                            self.keyfilename[0].append(newkeyname)
-                confignamelist=[i.replace('.key','_config.key') for i in self.keyfilename[0]]
-                lambdanamelist=[i.replace('.key','_lambda.key') for i in self.keyfilename[0]]
-                self.configkeyfilename=[confignamelist]
-                self.lambdakeyfilename=[lambdanamelist]
-
-
-            elif self.solvation==True and self.complexation==True:
-                self.keyfilename=[[self.foldername+'_comp'+'.key'],[self.foldername+'_solv'+'.key']]
-                if self.perturbkeyfilelist!=None:
-                    for keyname,index in self.perturbkeyfilelisttokeyindex.items():
-                        numinterpols=self.perturbkeyfilelisttointerpolations[keyname]
-                        for k in range(numinterpols):
-                            newkeyname=self.foldername+'_'+str(k)+'_comp'+'.key'
-                            shutil.copy(keyname,newkeyname)
-                            self.keyfilename[0].append(newkeyname)
-                            newkeyname=self.foldername+'_solv'+'.key'
-                            shutil.copy(keyname,newkeyname)
-                            self.keyfilename[1].append(newkeyname)
-                confignamelistcomp=[i.replace('.key','_config.key') for i in self.keyfilename[0]]
-                lambdanamelistcomp=[i.replace('.key','_lambda.key') for i in self.keyfilename[0]]
-                confignamelistsolv=[i.replace('.key','_config.key') for i in self.keyfilename[1]]
-                lambdanamelistsolv=[i.replace('.key','_lambda.key') for i in self.keyfilename[1]]
-                self.configkeyfilename=[confignamelistcomp,confignamelistsolv]
-                self.lambdakeyfilename=[lambdanamelistcomp,lambdanamelistsolv]
-
-            # STEP 32 
-            
-            self.equilstepsNVT=str(int((self.equiltimeNVT*1000000)/self.equiltimestep/len(self.equilibriatescheme)-1)) # convert ns to fs divide by the length of temperature scheme
-            self.lastequilstepsNVT=str(int((self.lastNVTequiltime*1000000)/self.equiltimestep))
-            self.equilstepsNPT=str(int((self.equiltimeNPT*1000000)/self.equiltimestep))
-            self.equilstepsionNPT=str(int((self.equiltimeionNPT*1000000)/self.equiltimestep))
-            self.equilframenumNPT=int((float(self.equiltimeNPT))/(float(self.equilwritefreq)*0.001))
-            self.equilframenumNVT=int((float(self.equiltimeNVT+self.lastNVTequiltime))/(float(self.equilwritefreq)*0.001))
-            self.equilframenum=self.equilframenumNPT+self.equilframenumNVT
-            self.minboxfilename=[i.replace('.xyz','min.xyz') for i in self.boxfilename]
-            self.minboxfilenamepymol=[i.replace('.xyz','_pymol.xyz') for i in self.minboxfilename]
-            self.equilboxfilename=[i.replace('.xyz','equil.xyz') for i in self.boxfilename]
-            self.proddynboxfilename=[i.replace('.xyz','proddyn.xyz') for i in self.boxfilename]
-            self.proddynboxfilenamepymol=[i.replace('.xyz','_pymol.xyz') for i in self.proddynboxfilename]
-            self.equilarcboxfilename=[i.replace('.xyz','.arc') for i in self.equilboxfilename]
-            self.proddynarcboxfilename=[i.replace('.xyz','.arc') for i in self.proddynboxfilename]
-            self.proddynboxkeyfilename=[i.replace('.xyz','.key') for i in self.proddynboxfilename]
-            self.equiljobsfilename=self.foldername+'_equiljobs.txt'
-            self.proddynjobsfilename=self.foldername+'_proddynamicsjobs.txt'
-            self.barjobsfilename=self.foldername+'_barjobs.txt'
-            self.freeenergyjobsfilename=self.foldername+'_freeenergyjobs.txt'
-            self.tightminjobsfilename=self.foldername+'_tightboxminjobs.txt'
-            self.looseminjobsfilename=self.foldername+'_looseboxminjobs.txt'
-            self.analyzejobsfilename=self.foldername+'_analyzejobs.txt'
-            self.solviontocount=self.DetermineIonsForChargedSolvation()
-            if len(self.solviontocount.keys())!=0 and self.salthfe==True: # then need to add counter ions free energy sims
-                self.estatlambdascheme.append(self.originalestatlambdascheme)
-                self.vdwlambdascheme.append(self.originalvdwlambdascheme)
-                self.restlambdascheme.append(self.originalrestlambdascheme)
-                self.ionboxfilename='ionbox.xyz'
-                self.ionequilboxfilename='ionequilbox.xyz'
-                self.ionproddynboxfilename='ionproddynbox.xyz'
-                self.ionequilarcfilename=self.ionequilboxfilename.replace('.xyz','.arc')
-                self.ionkeyfilename='ion'+self.configkeyfilename[0][0]
-                self.systemcharge.append(self.ligandcharge)
-
-            self.equiloutputarray=[]
-            self.equiloutputstepsarray=[]
-            for i in range(len(self.simfoldname)):
-                simfold=self.simfoldname[i]
-                templist=[]
-                tempsteps=[]
-                for temp in self.equilibriatescheme:
-                    templist.append(self.outputpath+self.foldername+'_'+simfold+'_'+str(temp)+'_'+self.equilstepsNVT+'_NVT.out')
-                    tempsteps.append(self.equilstepsNVT)
-
-                templist.append(self.outputpath+self.foldername+'_'+simfold+'_'+str(temp)+'_'+self.equilstepsNPT+'_NPT.out')
-                tempsteps.append(self.equilstepsNPT)
-
-                if i==0 and self.solvation==True and self.addsolvionwindows==True:
-                    templist.append(self.outputpath+'SolvIon'+'_'+simfold+'_'+str(temp)+'_'+self.equilstepsionNPT+'_NPT.out')
-                    tempsteps.append(self.equilstepsionNPT)
-                self.equiloutputarray.append(templist)
-                self.equiloutputstepsarray.append(tempsteps)
-
-
-            # STEP 33
-
-
-            self.nextfiletofinish=self.equiloutputarray[0]
-            if self.productiondynamicsNVT==True:
-                self.proddynensem=self.NPVTensem
-            else:
-                self.proddynensem=self.NPTensem
-            self.foldernametolambdakeyfilename={}
-            self.foldernametonuminterpols={}
-            self.foldernametointerpolindex={}
-            for simfoldidx in range(len(self.simfoldname)):
-                simfold=self.simfoldname[simfoldidx]
-                templambdafolderlistoflist=[]
-                tempproddynoutfilepathlistoflist=[]
-                lambdakeyfilelist=self.lambdakeyfilename[simfoldidx]
-                for k in range(len(self.vdwlambdascheme)):
-                    vdwlambdascheme=self.vdwlambdascheme[k]
-                    estatlambdascheme=self.estatlambdascheme[k]
-                    restlambdascheme=self.restlambdascheme[k]
-                    tempproddynoutfilepath=[]
-                    templambdafolderlist=[]
-                    for i in range(len(vdwlambdascheme)):
-                        elelamb=estatlambdascheme[i]
-                        vdwlamb=vdwlambdascheme[i]
-                        rest=restlambdascheme[i]
-                        lambdakeyfilename=lambdakeyfilelist[0]
-                        if 'Comp' in simfold:
-                            if k==0:
-                                fold=simfold+"E%s_V%s_R%s"%(elelamb,vdwlamb,rest)
-                            elif k==1 and self.addgas==True:
-                                fold=simfold+"E%s_V%s_R%s_Gas"%(elelamb,vdwlamb,rest)
-                        else:
-                            if k==0:
-                                fold=simfold+"E%s_V%s"%(elelamb,vdwlamb)
-                            elif k==1 and self.addgas==True:
-                                fold=simfold+"E%s_V%s_Gas"%(elelamb,vdwlamb)
-                            elif k==2 and self.addgas==True:
-                                fold=simfold+"E%s_V%s_Ion"%(elelamb,vdwlamb)
-                            elif k==1 and self.addgas==False:
-                                fold=simfold+"E%s_V%s_Ion"%(elelamb,vdwlamb)
-
-                        self.foldernametolambdakeyfilename[fold]=lambdakeyfilename
-                        templambdafolderlist.append(fold)
-                        outputfilepath=os.getcwd()+'/'+simfold+'/'+fold+'/'
-                        outputfilepath+=self.foldername+'_'+fold+'.out'
-                        if k==1 and (self.extractinterforbinding==True and self.binding==True):
-                            pass
-                        else:
-                            tempproddynoutfilepath.append(outputfilepath)
-                    
-                    if self.perturbkeyfilelist!=None:
-                        if k==0:
-                            elelamb=estatlambdascheme[0]
-                            vdwlamb=vdwlambdascheme[0]
-                            rest=restlambdascheme[0]
-                        elif k==1 and self.addgas==True:
-                            elelamb=estatlambdascheme[-1]
-                            vdwlamb=vdwlambdascheme[-1]
-                            rest=restlambdascheme[-1]
-                        elif k==1 and self.addgas==False:
-                            elelamb=estatlambdascheme[0]
-                            vdwlamb=vdwlambdascheme[0]
-                            rest=restlambdascheme[0]
-                        elif k==2 and self.addgas==True:
-                            elelamb=estatlambdascheme[0]
-                            vdwlamb=vdwlambdascheme[0]
-                            rest=restlambdascheme[0]
-
-                        count=1
-                        for keyfilename,index in self.perturbkeyfilelisttokeyindex.items():
-                            numinterpols=self.perturbkeyfilelisttointerpolations[keyfilename]
-                            for r in range(numinterpols):
-                                lambdakeyfilename=lambdakeyfilelist[count]
-                                split=keyfilename.split('.')
-                                keyprefix=split[0]
-                                count+=1
-                                interpolindex=r+1
-                                interpolrate=int(((interpolindex/numinterpols)*100))
-                                if 'Comp' in simfold:
-                                   fold=simfold+"E%s_V%s_R%s_Key_%s_Ipl%s"%(elelamb,vdwlamb,rest,str(keyprefix),str(interpolrate))
-                                else:
-                                   if k==0:
-                                       fold=simfold+"E%s_V%s_Key_%s_Ipl%s"%(elelamb,vdwlamb,str(keyprefix),str(interpolrate))
-                                   elif k==1:
-                                       fold=simfold+"E%s_V%s_Gas_Key_%s_Ipl%s"%(elelamb,vdwlamb,str(keyprefix),str(interpolrate))
-                                   else:
-                                       continue
-                                self.foldernametolambdakeyfilename[fold]=lambdakeyfilename
-                                self.foldernametonuminterpols[fold]=numinterpols
-                                self.foldernametointerpolindex[fold]=interpolindex
-                                if k==0:
-                                    self.estatlambdascheme[k].insert(0,elelamb)
-                                    self.vdwlambdascheme[k].insert(0,vdwlamb)
-                                    self.restlambdascheme[k].insert(0,rest)
-                                    templambdafolderlist.insert(0,fold) 
-                                elif k==1 and self.addgas==True:
-                                    self.estatlambdascheme[k].append(elelamb)
-                                    self.vdwlambdascheme[k].append(vdwlamb)
-                                    self.restlambdascheme[k].append(rest)
-                                    templambdafolderlist.append(fold) 
-                                elif k==1 and self.addgas==False:
-                                    self.estatlambdascheme[k].insert(0,elelamb)
-                                    self.vdwlambdascheme[k].insert(0,vdwlamb)
-                                    self.restlambdascheme[k].insert(0,rest)
-                                    templambdafolderlist.insert(0,fold) 
-                                elif k==2 and self.addgas==True:
-                                    self.estatlambdascheme[k].insert(0,elelamb)
-                                    self.vdwlambdascheme[k].insert(0,vdwlamb)
-                                    self.restlambdascheme[k].insert(0,rest)
-                                    templambdafolderlist.insert(0,fold) 
-
-
-                                if self.fep==False:
-                                    outputfilepath=os.getcwd()+'/'+simfold+'/'+fold+'/'
-                                    outputfilepath+=self.foldername+'_'+fold+'.out'
-                                    tempproddynoutfilepath.append(outputfilepath)
-
-
-                    templambdafolderlistoflist.append(templambdafolderlist)
-                    tempproddynoutfilepathlistoflist.append(tempproddynoutfilepath)
-                self.proddynoutfilepath[simfoldidx]=tempproddynoutfilepathlistoflist
-                self.lambdafolderlist[simfoldidx]=templambdafolderlistoflist
-                
-            
-           
-            # STEP 34
-
-            
- 
-            for k in range(len(self.lambdafolderlist)): # stop before last one because using i+1 for grabbing next index
-                listoffolderlist=self.lambdafolderlist[k]
-                foldname=self.simfoldname[k]
-                proddynarcboxfilename=self.proddynarcboxfilename[k]
-                secondarcpathslistoflist=[] 
-                firstarcpathslistoflist=[] 
-                barfilepathlistoflist=[]
-                baroutputfilepathlistoflist=[]
-                thermooutputfilepathlistoflist=[]
-                for j in range(len(listoffolderlist)):
-                    folderlist=listoffolderlist[j]
-                    secondarcpathslist=[] 
-                    firstarcpathslist=[] 
-                    barfilepathlist=[]
-                    baroutputfilepathlist=[]
-                    thermooutputfilepathlist=[]
-
-                    for i in range(len(folderlist)-1):
-                        firstfoldname=folderlist[i]
-                        secondfoldname=folderlist[i+1]
-
-                        firstarcpath=self.outputpath+foldname+r'/'+firstfoldname+'/'+proddynarcboxfilename.replace(self.foldername+'_',self.foldername+'_'+firstfoldname+'_').replace('0.','0-')
-
-
-                        secondarcpath=self.outputpath+foldname+r'/'+secondfoldname+'/'+proddynarcboxfilename.replace(self.foldername+'_',self.foldername+'_'+secondfoldname+'_').replace('0.','0-')
-
-
-                        secondarcpathslist.append(secondarcpath)
-                        firstarcpathslist.append(firstarcpath)
-
-
-                        baroutputfilepath=self.outputpath+foldname+r'/'+secondfoldname+'/'+self.foldername+'_'+firstfoldname+secondfoldname+'BAR1.out'
-                        thermooutputfilepath=baroutputfilepath.replace('BAR1.out','BAR2.out')
-                        barfilepath=baroutputfilepath.replace('BAR1.out','.bar')
-                        barfilepathlist.append(barfilepath)
-                        baroutputfilepathlist.append(baroutputfilepath)
-                        thermooutputfilepathlist.append(thermooutputfilepath)
-                    secondarcpathslistoflist.append(secondarcpathslist)
-                    firstarcpathslistoflist.append(firstarcpathslist)
-                    barfilepathlistoflist.append(barfilepathlist)
-                    baroutputfilepathlistoflist.append(baroutputfilepathlist)
-                    thermooutputfilepathlistoflist.append(thermooutputfilepathlist)
-                self.secondarcpaths[k]=secondarcpathslistoflist
-                self.firstarcpaths[k]=firstarcpathslistoflist
-                self.barfilepath[k]=barfilepathlistoflist
-                self.baroutputfilepath[k]=baroutputfilepathlistoflist
-                self.thermooutputfilepath[k]=thermooutputfilepathlistoflist
-            
-            # STEP 35
-
-            self.RotateTranslateInertialFrame()
-
-            # STEP 36
-
-            for i in range(len(self.tabledict)):
-                self.tabledict[i]['Prod MD Ensemb']=self.proddynensem
-                self.tabledict[i]['Solv Prod MD Time']=self.solvproddyntime
-                self.tabledict[i]['Dynamic Writeout Frequency (ps)']=self.proddynwritefreq
-                self.tabledict[i]['Dynamic Time Step (fs)']=self.equiltimestep
-                self.tabledict[i]['Equil Time NPT']=self.equiltimeNPT
-                self.tabledict[i]['Equil Time NVT']=self.equiltimeNVT
-                self.tabledict[i]['Ligand Charge']=self.ligandcharge
-                for idx in range(len(self.annihilateligandxyzfilenamelist)):
-                    xyz=self.annihilateligandxyzfilenamelist[idx]
-                    self.tabledict[i]['Ligand Name '+str(idx+1)]=xyz.replace('.xyz','')
-                if self.expfreeenergy!=None:
-                    self.tabledict[i][u'ΔGᵉˣᵖ']=self.expfreeenergy
-                if self.complexation==True:
-                    self.tabledict[i]['Comp Prod MD Time']=self.compproddyntime
-                    self.tabledict[i]['Comp Prod MD Steps']=self.proddynsteps[0]
-                    if self.complexationonly==False: 
-                        self.tabledict[i]['Solv Prod MD Steps']=self.proddynsteps[1]
-                    self.tabledict[i]['Receptor Charge']=self.receptorcharge
-                    if self.uncomplexedproteinpdbname!=None:
-                        self.tabledict[i]['Receptor Name']=self.uncomplexedproteinpdbname.replace('.pdb','')
-                    elif self.receptorligandxyzfilename!=None and self.uncomplexedproteinpdbname==None: 
-                        self.tabledict[i]['Receptor Name']=self.receptorligandxyzfilename.replace('.xyz','')
-                else:
-                    self.tabledict[i]['Solv Prod MD Steps']=self.proddynsteps[0]
-
-            
-            tables.WriteTableUpdateToLog(self)
-
-            # STEP 37
-
-            self.ligandindextoneighbslist=[]
-            self.ligandindextosymlist=[]
-            self.ligandindextotypenumlist=[]
-
-            for xyz in self.annihilateligandxyzfilenamelist:
-                statexyzatominfo,stateindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=self.GrabXYZInfo(xyz)
-                self.ligandindextoneighbslist.append(indextoneighbs)
-                self.ligandindextosymlist.append(indextosym)
-                self.ligandindextotypenumlist.append(stateindextotypeindex)
-
-            # STEP 38
-            ann.main(self)
-
-
-
-
-
-        def CheckIfNeedToShiftTypes(self,keyfilenamelist):
-            """
-            Intent: Sometimes keyfiles may have overlapping types but user wants to treat two ligands differently (dissapear only one etc). So then need to check if type numbers are overlapping and change them if so.
-            Input: List of keyfile names
-            Output: Boolean determining if need to shift type numbers or not.
-            Referenced By: MolecularDynamics 
-            Description:
-            1. If keyfilenamelist is given as input.
-            2. Iterate over list of keyfilenames and determine the max and min type number.
-            3. Determine the range of types for the max and min type numbers. 
-            4. Iterate over the types and save new types to an array. If encounter existing type already in array then need to shift type numbers.  
-            """
-
-            needtoshifttypes=False
-            # STEP 1
-            if keyfilenamelist!=None: 
-                newlist=keyfilenamelist.copy()
-                #newlist.append(self.prmfilepath) can only go to 1000 for atom classes in tinker so for now dont shift by max of prm file
-                alltypes=[]
-                # STEP 2
-                for keyfilename in newlist:
-                    maxnumberfromkey=self.GrabMaxTypeNumber(keyfilename)
-                    minnumberfromkey=self.GrabMinTypeNumber(keyfilename)
-                    # STEP 3
-                    types=list(range(minnumberfromkey,maxnumberfromkey+1))
-                    # STEP 4
-                    for typenum in types:
-                        if typenum in alltypes:
-                            needtoshifttypes=True
-                            break
-                        alltypes.append(typenum)
-
-
-            return needtoshifttypes
-
-
-
-        def AppendKeys(self,keyfilenamelist,thekey):
-            """
-            Intent: Append all keys from keyfilenamelist into a single key file.
-            Input: List of key files and output keyfilename.
-            Output: Final appended keyfile.
-            Referenced By: MolecularDynamics 
-            Description: 
-            1. For each key in keyfilenamelist, read the lines into an array. 
-            2. For each line in array, append to final keyfile.
-            """
-            temp=open(thekey,'w')
-            # STEP 1
-            for key in keyfilenamelist:
-                othertemp=open(key,'r')
-                results=othertemp.readlines()
-                othertemp.close()
-                # STEP 2
-                for line in results:
-                    temp.write(line)
-
-            temp.close()
-            return thekey
 
         def GrabIonizationStates(self,m):
             """
@@ -2442,37 +977,6 @@ class PolarizableTyper():
                 obConversion.ReadFile(mol,name)
                 obConversion.SetOutFormat('sdf')
                 obConversion.WriteFile(mol,sdfmol)
-
-
-
-
-        def ReturnListOfList(self,string):
-            """
-            Intent: Some input keywords require a list of list datatype. Example onlyrottortorlist=b1 c1 d1 , b2 c2 d2 . Outer list is comma seperated and inner list is space seperated.
-            Input: String from reading poltype.ini
-            Output: List of list
-            Referenced By: _post_init
-            Description:
-            1. Split string by comma into a list.
-            2. For each item in list, strip front and end extra spaces. Then split by space.
-            3. For each item in spaced list, append to inner list.
-            4. Append inner list to outerlist.
-            """
-            # STEP 1
-            newlist=string.split(',')
-            templist=[]
-            for ele in newlist:
-                # STEP 2
-                nums=ele.lstrip().rstrip().split()
-                temp=[]
-                # STEP 3
-                for e in nums:
-                    temp.append(int(e))
-                # STEP 4
-                templist.append(temp)
-            newlist=templist
-            return newlist
-
 
 
         def SanitizeAllQMMethods(self):
@@ -2609,7 +1113,7 @@ class PolarizableTyper():
             Intent: Sometimes tinker installations have .x in tinker binary executable (analyze vs analyze.x), so detect which one is needed.
             Input: Self object variables (containing executable names).
             Output: Updated self object variables with new executable names. 
-            Referenced By: _post_init, MolecularDynamics 
+            Referenced By: _post_init
             Description:
             1. Call SanitizeMMExecutable for all tinker executables used. 
             """
@@ -2618,16 +1122,7 @@ class PolarizableTyper():
             self.minimizeexe=self.SanitizeMMExecutable(self.minimizeexe)
             self.analyzeexe=self.SanitizeMMExecutable(self.analyzeexe)
             self.superposeexe=self.SanitizeMMExecutable(self.superposeexe)
-            self.xyzeditpath=self.SanitizeMMExecutable(self.xyzeditpath)
-            self.barpath=self.SanitizeMMExecutable(self.barpath)
-            self.dynamicpath=self.SanitizeMMExecutable(self.dynamicpath)
-            self.minimizepath=self.SanitizeMMExecutable(self.minimizepath)
-            self.pdbxyzpath=self.SanitizeMMExecutable(self.pdbxyzpath)
             self.analyzepath=self.SanitizeMMExecutable(self.analyzepath)
-            self.potentialpath=self.SanitizeMMExecutable(self.potentialpath)
-            self.poleditpath=self.SanitizeMMExecutable(self.poleditpath)
-
-        
 
         
 
@@ -2672,7 +1167,7 @@ class PolarizableTyper():
                 self.formchkexe = os.path.join(self.gausdir,self.formchkexe)
 
             # STEP 3
-            cmdstr=self.analyzeexe+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/VersionFiles/'+'water.xyz'+' '+'-k'+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/VersionFiles/'+'water.key'+' '+'e'+'>'+' '+'version.out'
+            cmdstr=self.analyzeexe+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/Examples/Assets/'+'water.xyz'+' '+'-k'+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/Examples/Assets/'+'water.key'+' '+'e'+'>'+' '+'version.out'
             try:
                 print('Calling: '+cmdstr) 
                 returned_value = subprocess.call(cmdstr, shell=True)
@@ -2846,32 +1341,18 @@ class PolarizableTyper():
             else:
                 return self.molecprefix + suffix
         
-        def printfile(self,filename):
-            """
-            Intent: Print filename contents
-            Input: filename
-            Output: filename contents written to standard output.
-            Referenced By: copyright 
-            Description:
-            1. Open filename and print file contents
-            """
-            # STEP 1
-            with open(os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/'+filename,'r') as f:
-                print(f.read(), end='')
-       
-
         def copyright(self):
             """
-            Intent: Print version file and copyright info
-            Input: Self object
-            Output: Contents of version file printed to standard output.
-            Referenced By: GenerateParameters() 
-            Description: 
-            1. Call printfile on poltype version file
+            Intent: Print software version and copyright info
             """
-            # STEP 1
-            self.printfile(self.versionfile)
-        
+            print("Poltype -- Polarizable atom typer of small molecules for the AMOEBA polarizable force field")
+            print("Please cite:")
+            print("B. Walker, C. Liu, E. Wait, P. Ren, J. Comput. Chem. 2022, 43(23), 1530")
+            print("Version 2.3.1 Feb 2025")
+            print("Copyright (c)  Johnny Wu, Gaurav Chattree, Brandon Walker, Matthew Harger and Pengyu Ren 2019-2025")
+            print("All Rights Reserved")
+            print("##############################################################################################################")
+             
             
         def CheckIsInput2D(self,mol,obConversion,rdkitmol):
             """
@@ -4678,9 +3159,8 @@ class PolarizableTyper():
             54. Log how much time torsion opt and SP jobs took in poltype log file.
             55. If the fragmenter was not used but torsion parameters were derived, write out database.prm file of parameters in format needed to be added to database.
             56. Delete scratch files used during QM calculations
-            57. If user specifies to send email about job being finished, then send email
-            58. Copy final XYZ and key files to top directory, where user submits jobs. Also copy torsion plots to OPENME folder.
-            59. Apply any modifications or FLAG to the final.key file 
+            57. Copy final XYZ and key files to top directory, where user submits jobs. Also copy torsion plots to OPENME folder.
+            58. Apply any modifications or FLAG to the final.key file 
             """
             # STEP 1 
             self.molstructfname=self.ConvertInputStructureToSDFFormat(self.molstructfname)
@@ -4890,7 +3370,7 @@ class PolarizableTyper():
             
                 if (not os.path.isfile(self.xyzfname) or not os.path.isfile(self.keyfname)):
                     # STEP 31
-                    cmdstr = self.peditexe + " 1 " + self.gdmafname +' "'+self.paramhead+ "\" < " + self.peditinfile
+                    cmdstr = self.peditexe + " 1 " + self.gdmafname + " < " + self.peditinfile
                     self.call_subsystem([cmdstr],True)
                     # Add header to the key file output by poledit
                     while not os.path.isfile(self.keyfnamefrompoledit):
@@ -5059,7 +3539,6 @@ class PolarizableTyper():
             
             tmptorlist = []
             for tor in torlist:
-              print('TOR', tor)
               (a1, a2, a3, a4) = tor
               t1 = atom2type[a1]
               t2 = atom2type[a2]
@@ -5184,7 +3663,7 @@ class PolarizableTyper():
                 shutil.copy(self.xyzfname,self.xyzoutfile)
             shutil.copy(self.xyzoutfile,self.tmpxyzfile)
             shutil.copy(self.key7fname,self.tmpkeyfile)
-
+            
             # STEP 51
             if self.writeoutpolarize and self.writeoutmultipole==True:
                 opt.StructureMinimization(self,torsionrestraints)
@@ -5213,17 +3692,6 @@ class PolarizableTyper():
                 shutil.rmtree(self.scrtmpdirgau)
             if os.path.exists(self.scrtmpdirpsi4):
                 shutil.rmtree(self.scrtmpdirpsi4)
-            # STEP 57
-            if self.email!=None:
-                moleculename=self.molstructfname.replace('.sdf','')
-                password='amoebaisbest'
-                fromaddr = 'poltypecrashreportnoreply@gmail.com'
-                toaddr = self.email
-                TEXT='Molecule has finished parameterization'
-                try: 
-                    self.SendReportEmail(TEXT,fromaddr,toaddr,password,moleculename,'Poltype Finished Report ')
-                except:
-                    pass
             # STEP 58
             if self.isfragjob==False:
                 previousdir=os.path.abspath(os.path.join(os.getcwd(), os.pardir))
@@ -5242,7 +3710,8 @@ class PolarizableTyper():
 
             # STEP 59
             # apply any modifications to the final.key
-            lmodifytinkerkey.mod_final_key(self)
+            if self.isfragjob==False:
+              lmodifytinkerkey.mod_final_key(self)
             
             self.WriteToLog('Poltype Job Finished'+'\n')
 
@@ -5536,36 +4005,6 @@ class PolarizableTyper():
             return keylist
 
         
-        def SendReportEmail(self,TEXT,fromaddr,toaddr,password,filename,subject):
-            """
-            Intent: If user gives email as input and poltype crashes, then send email report that crashed. 
-            Input: Email text, from address, to address, password and filename that has error.
-            Output: -
-            Referenced By: RunPoltype
-            Description:
-            1. Initialize email object
-            2. Enter from address, to address, subject and message into email object 
-            3. Initialize server object that contacts gmail, enter from address and password, then login
-            4. Send message and close server object
-            """
-            # STEP 1
-            msg = MIMEMultipart()
-            # STEP 2
-            msg['From'] = fromaddr
-            msg['To'] = toaddr
-            msg['Subject'] = subject+filename
-            message = TEXT
-            msg.attach(MIMEText(message, 'plain'))
-            # STEP 3
-            s = smtplib.SMTP_SSL('smtp.gmail.com')
-            s.ehlo()
-            s.login(fromaddr,password)
-            text = msg.as_string()
-            # STEP 4
-            s.sendmail(fromaddr, [toaddr],text)
-            s.quit()
-
-
         def CollectElectrostaticDipoleFitLines(self):
             """
             Intent: Users are too lazy to read poltype log file for information about electrostatic fitting etc.., so copy relevent information to a textfile and put in the OPENME folder, in the hope that they will read it there.
@@ -5674,109 +4113,6 @@ class PolarizableTyper():
             temp.close()
             os.chdir(thecurdir)
 
-        def StopSimulations(self,simulationstostopfolderpath):
-            """
-            Intent: If user wants to stop all simulations, then go into each folder and add a *.end file, tinker will then terminate dynamics safely without corrupting arc or dyn files accidentally. 
-            Input: Folder path with subdirectories containing simulation folders (with arcs etc...)
-            Output: - 
-            Referenced By: MolecularDynamics
-            Description: 
-            1. Walk over all subdirectories from input filepath
-            2. If .arc file is detected within current folder or subfolder, add a file with .end into the folder 
-            """
-            # STEP 1
-            for root, subdirs, files in os.walk(simulationstostopfolderpath):
-                for d in subdirs:
-                    curdir=os.getcwd()
-                    path=os.path.join(root, d)
-                    os.chdir(path)
-                    files=os.listdir()
-                    for f in files:
-                        # STEP 2
-                        if '.arc' in f:
-                            split=f.split('.')
-                            prefix=split[0]
-                            endname=prefix+'.end'
-                            endname=os.path.join(path,endname)
-                            with open(endname, 'w') as fp:
-                                pass
-                        # STEP 2
-                        if os.path.isdir(f):
-                            os.chdir(f)
-                            newfiles=os.listdir()
-                            for newf in newfiles:
-                                if '.arc' in newf:
-                                    split=newf.split('.')
-                                    prefix=split[0]
-                                    endname=prefix+'.end'
-                                    with open(endname, 'w') as fp:
-                                        pass
-                        os.chdir('..')
-                    os.chdir(curdir)
-
-
-        def ReadWaterFromPRMFile(self):
-            """
-            Intent: Grab water parameters from prmfile, if user specifices older prmfile, the type numbers may be different, so need to parse via tinker type description rather than hard coded type numbers.
-            Input: -
-            Output: -
-            Referenced By: MolecularDynamics 
-            Description: 
-            1. Read lines of prmfilepath into an array
-            2. Iterate over lines in array and if detect line with water hydrogen or water oxygen description, then save the type numbers to variable names for later use
-            """
-            # STEP 1
-            temp=open(self.prmfilepath,'r')
-            results=temp.readlines()
-            temp.close()
-            for line in results:
-                # STEP 2
-                if 'atom' in line:
-                    linesplit=line.split()
-                    oxygen='"AMOEBA Water O"'
-                    hydrogen='"AMOEBA Water H"'
-                    typenum=int(linesplit[1])
-                    if oxygen in line:
-                        self.waterOtypenum=typenum
-                    elif hydrogen in line:
-                        self.waterHtypenum=typenum
-
-        def RotateTranslateInertialFrame(self):
-            """
-            Intent: Rotate into inertial frame to make it easier to compute appropriate dimensions for box based on max length of the molecule. 
-            Input: - 
-            Output: - 
-            Referenced By: MolecularDynamics 
-            Description: 
-            1. Create filename with inputs for xyzedit program
-            2. Call xyzedit with input file created
-            3. Rename output filename (which may have _2 etc) after to the original intended filename  
-            """
-            if self.receptorligandxyzfilename!=None:
-                # STEP 1
-                filename='xyzedit.in'
-                temp=open(filename,'w')
-                temp.write('14'+'\n')
-                temp.write('\n')
-                temp.close()
-                cmdstr=self.xyzeditpath+' '+self.receptorligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'<'+' '+filename
-                # STEP 2 
-                submit.call_subsystem(self,cmdstr,wait=True)   
-                # STEP 3 
-                endsplit=self.receptorligandxyzfilename.split('.')
-                end=endsplit[1]
-                if '_' in end:
-                    newsplit=end.split('_')
-                    count=int(newsplit[1])
-                else:
-                    count=1
-                newcount=str(count+1)
-                filename=self.receptorligandxyzfilename
-                if filename[-2]=='_':
-                    filename=filename[:-2]
-                newfilename=filename+'_'+newcount
-                os.rename(newfilename,self.receptorligandxyzfilename)
-
 
         def CheckFloat(self,string):
             """
@@ -5794,70 +4130,6 @@ class PolarizableTyper():
             except:
                 return False
 
-        def CheckReceptorLigandXYZFile(self):
-            """
-            Intent: If user has box information on the top in input file (copied from some arc etc), then remove it.
-            Input: -
-            Output: -
-            Referenced By: MolecularDynamics 
-            Description:
-            1. Read lines of xyz file into array
-            2. Iterate over lines of array, then check if there is any box information (6 items, all floats)
-            3. Skip over box information and write all other lines to new file, then rename to original filename 
-            """
-            if self.receptorligandxyzfilename!=None:
-                # STEP 1
-                temp=open(self.receptorligandxyzfilename,'r')
-                results=temp.readlines()
-                temp.close()
-                tempname=self.receptorligandxyzfilename.replace('.xyz','-t.xyz')
-                temp=open(tempname,'w')
-                for line in results:
-                    linesplit=line.split() 
-                    isboxline=True
-                    # STEP 2
-                    if len(linesplit)==6:
-                        for e in linesplit:
-                            if self.CheckFloat(e)==False:
-                                isboxline=False
-                    else:
-                        isboxline=False
-                    # STEP 3
-                    if isboxline==True:
-                        continue
-                    else:
-                        temp.write(line)
-                temp.close()
-                os.remove(self.receptorligandxyzfilename)
-                os.rename(tempname,self.receptorligandxyzfilename)
-                        
-                         
-
- 
-        def CleanUpFiles(self):
-            """
-            Intent: Remove intermediate files from tinker computations (usually the last one is copied and/or renamed to desired filename)
-            Input: - 
-            Output: -
-            Referenced By: MolecularDynamics
-            Description: 
-            1. Iterate over all files in directory, remove any .xyz_ files or key_ files 
-            """
-            files=os.listdir()
-            # STEP 1
-            for f in files:
-                if self.ligandxyzfilenamelist!=None:
-                    for xyz in self.ligandxyzfilenamelist:
-                        if xyz+'_' in f:
-                            os.remove(f)
-                if 'water.xyz_' in f or 'key_' in f or 'uncomplexed.' in f:
-                    os.remove(f)
-                if self.receptorligandxyzfilename!=None:
-                    if self.receptorligandxyzfilename+'_' in f:
-                        os.remove(f)
-
-        
- 
             
         def SanitizeMMExecutable(self, executable):
             """
@@ -5916,371 +4188,6 @@ class PolarizableTyper():
         
             return None
 
-        
-
-        def ReadLigandOBMol(self,structfname):
-            """
-            Intent: Convert xyz->mol object to easily probe molecular properties. For example when converting tinker XYZ-> cartesian xyz, then want to convert cartesian xyz to openbabel mol object. 
-            Input: Filename
-            Output: openbabel mol object
-            Referenced By: ReadLigandRdkitMol
-            Description:
-            1. Initialize openbabel conversion object
-            2. Set input format based on file extension
-            3. Create new openbabel mol object and read in filename to mol object 
-            """
-            # STEP 1
-            tmpconv = openbabel.OBConversion()
-            # STEP 2
-            inFormat = openbabel.OBConversion.FormatFromExt(structfname)
-            tmpconv.SetInFormat(inFormat)
-            # STEP 3
-            tmpmol = openbabel.OBMol()
-            tmpconv.ReadFile(tmpmol, structfname)
-            return tmpmol
-
-        def ReadLigandRdkitMol(self,ligandfilename):
-            """
-            Intent: Convert xyz->mol object to easily probe molecular properties. For example when converting tinker XYZ-> cartesian xyz, then want to convert cartesian xyz to rdkit mol object. 
-            Input: Filename
-            Output: rdkit mol object
-            Referenced By: Parameter comparison module 
-            Description:
-            1. First generate openbabel object
-            2. Convert openbabel object to .mol file
-            3. Read .mol file into rdkit object (they have more limited ways of reading in filetypes than openbabel) 
-            """
-            # STEP 1
-            tmpmol=self.ReadLigandOBMol(ligandfilename)
-            # STEP 2
-            tmpconv = openbabel.OBConversion()
-            tmpconv.SetOutFormat('mol')
-            temp=ligandfilename.replace('.sdf','.mol')
-            tmpconv.WriteFile(tmpmol, temp)
-            # STEP 3
-            mol=rdmolfiles.MolFromMolFile(temp,removeHs=False,sanitize=False)
-
-            return mol
-
-
-        def PDBCoordinate(self,coords,index):
-            """
-            Intent: Need to format PDB files very strictly based on correct column number. This formats coordinate string for PDB files exactly. 
-            Input: Input coordinates, Index for coordinates (for x,y, or z coord)
-            Output: String formatted for coordinate to be added to PDB file
-            Referenced By: GeneratePDBFromARC
-            Description: 
-            1. Extract coordinate via index
-            2. Convert coordinate to string
-            3. Split string via decimal place
-            4. Save the string after the decimal
-            5. Determine the number of 0's that need to be appended after words based on length of the string after decimal
-            6. Append the appropriate number of 0's after decimal place
-            7. Determine the number of empty spaces that need to be appended to front of string based on the current total length of string (only 8 characters allowed max). 
-            8. Append empty spaces to front of string based on length determined in last step. 
-            9. Return string 
-            """
-            # STEP 1
-            x=round(float(coords[index]),3)
-            # STEP 2
-            xstring=str(x)
-            # STEP 3
-            xstringsplit=xstring.split('.')
-            # STEP 4
-            xtail=xstringsplit[1]
-            # STEP 5
-            diff = 3-len(xtail)
-            # STEP 6
-            for i in range(1,diff+1):
-                xstring+='0'
-            # STEP 7
-            odiff=8-len(xstring)
-            # STEP 8
-            space=''
-            for i in range(1,odiff+1):
-                space+=' '
-            xstring=space+xstring
-            # STEP 9
-            return xstring
-       
- 
-        def WritePDBString(self,string,line,firstindex,lastindex):
-            """
-            Intent: Need to input string exactly in right columns for line that will go into PDB file.
-            Input: String to add to line, original line, first and last indices of where string will go into line
-            Output: Modified line
-            Referenced By: GeneratePDBFromARC
-            Description: 
-            1. Iterate over indices in between firstindex and last index
-            2. For each character in input string, assign charcter to index in line 
-            """
-            # STEP 1
-            for i in range(firstindex,lastindex+1):
-                # STEP 2
-                xitem=string[i-firstindex]
-                line[i]=xitem
-
-            return line
-
-
-        def GrabPDBLines(self):
-            """
-            Intent: Generate dictionary of pdbindex to pdb line, for use in generating PDB trajectory from tinker ARC
-            Input: -
-            Output:
-            Referenced By: GeneratePDBFromARC
-            Description: 
-            1. Iterate over lines of PDB file
-            2. If ATOM or HETATM in line, grab index
-            3. Store index and line into dictionary 
-            """
-            # STEP 1
-            temp=open(self.complexedproteinpdbname,'r')
-            results=temp.readlines()
-            temp.close()
-            pdbindextopdbline={}
-            # STEP 2
-            for line in results:
-                if 'ATOM' in line or 'HETATM' in line:
-                    index=int(line[6:10+1].strip())
-                    # STEP 3
-                    pdbindextopdbline[index]=line
-            return pdbindextopdbline
-
-        def WritePDBCONECTRecord(self,temp,indextoconn):
-            """
-            Intent: Add CONECT records to PDB file 
-            Input: filehandle, dictionary of atomindex to connected atom indices
-            Output: - 
-            Referenced By: GeneratePDBFromARC
-            Description: 
-            1. Iterate over dictionary of index to connected indices
-            2. Generate string by calling CONECTRecord
-            3. Write line to filehandle 
-            """
-            # STEP 1
-            for index,conns in indextoconn.items():
-                if len(conns)!=0:
-                    # STEP 2
-                    string=self.CONECTRecord(conns,index)
-                    # STEP 3
-                    temp.write(string)
-            temp.write('ENDMDL'+'\n')
-
-        def CONECTRecord(self,conns,index):
-            """
-            Intent: Add CONECT records to PDB file 
-            Input: filehandle, dictionary of atomindex to connected atom indices
-            Output: - 
-            Referenced By: GeneratePDBFromARC
-            Description: 
-            1. For each index, create a string and append empty spaces in front of string such that the total length is 5
-            2. Write the index string to the CONECT line string
-            3. For all connected indices, do the same, create string of length 5 and add in write place to CONECT string
-            """
-
-            shift=0
-            string='CONECT                                                                       '
-            string=list(string)
-            # STEP 1
-            indexstring=str(index)
-            odiff=5-len(indexstring)
-            space=''
-            for i in range(1,odiff+1):
-                space+=' '
-            indexstring=space+indexstring
-            # STEP 2
-            self.WritePDBString(indexstring,string,6+shift,10+shift)
-            shift+=5
-            # STEP 3
-            for idx in conns:
-                indexstring=str(idx)
-                odiff=5-len(indexstring)
-                space=''
-                for i in range(1,odiff+1):
-                    space+=' '
-                indexstring=space+indexstring
-                self.WritePDBString(indexstring,string,6+shift,10+shift)
-                shift+=5
-            string=''.join(string)+'\n'
-            return string
-
-
-        def GeneratePDBFromARC(self,tinkerxyzfilename,pdbfilename):
-            """
-            Intent: Convert tinker XYZ or tinker ARC into PDB trajectory
-            Input: tinker file, desired pdbfilename
-            Output: -
-            Referenced By: PymolReadableFile
-            Description: 
-            1. Iterate over lines of tinker file and save in array
-            2. Grab dictionary of PDB index to pdb line from pdbfilename
-            3. Save generic HETATM string for use in converting lines in tinker XYZ that were not originally in the input PDB (such as waters or ions etc).
-            4. Create dictionary of tinker XYZ index to PDB index
-            5. Append current model number to top of PDB file
-            6. Iterate over tinker XYZ lines 
-            7. Extact current element, XYZ index, and connected XYZ indices and pdbline from dictionary of tinker xyz index to PDB line
-            8. Save connected indices in dictionry for later
-            9. Add index formatted corectly to PDB line
-            10. Add element, formatted correctly to PDB line
-            11. Add residue, formatted correctly to PDB line 
-            12. Add tinker coordinates, formatted correctly to PDB line
-            13. Write connect record and then update model number and write model line to PDB file everytime box information is detected in tinker file
-            14. Write final connect record and ENDMDL after looping over all tinker XYZs in ARC  
-            """
-            # STEP 1
-            temp=open(tinkerxyzfilename,'r')
-            results=temp.readlines()
-            temp.close()
-            # STEP 2
-            pdbindextopdbline=self.GrabPDBLines()
-            temp=open(pdbfilename,'w')
-            # STEP 3 
-            hetatmstring='HETATM22011  H   UNK  1334      -6.447 -12.617  22.452'+'\n'
-            # STEP 4
-            xyzindextopdbindex={v: k for k, v in self.pdbindextoxyzindex.items()}
-            indextoconn={}
-            # STEP 5
-            first=True
-            modelnum=1
-            modelstring='MODEL                                            '+'\n'
-            modelstring=list(modelstring)
-            modelnumstring=str(modelnum)
-            odiff=4-len(modelnumstring)
-            space=''
-            for i in range(1,odiff+1):
-                space+=' '
-            modelnumstring=space+modelnumstring
-            self.WritePDBString(modelnumstring,modelstring,10,13)
-            modelstring=''.join(modelstring)
-            temp.write(modelstring)
-            # STEP 6
-            for line in results:
-                linesplit=line.split()
-                cont=False
-                if '90.000' not in line and len(linesplit)>1:
-                    first=False
-                    # STEP 7
-                    xyzindex=int(linesplit[0])
-                    element=linesplit[1]
-                    conns=linesplit[6:]
-                    conns=[int(i) for i in conns]
-                    if xyzindex in xyzindextopdbindex.keys():
-                        pdbindex=xyzindextopdbindex[xyzindex]
-                        pdbline=pdbindextopdbline[pdbindex]
-                        residuenum=int(pdbline[22:25+1].strip())
-                        lastres=residuenum
-                    else:
-                        if self.removesolventpdbtraj==True:
-                            cont=True
-                            continue
-                        pdbline=hetatmstring
-                        residuenum=lastres+1
-                    if cont==False:
-                        # STEP 8
-                        indextoconn[xyzindex]=conns
-                        # STEP 9
-                        fullsplit=re.split(r'(\s+)', pdbline)
-                        pdbline=list(pdbline)
-                        indexstring=str(xyzindex)
-                        odiff=5-len(indexstring)
-                        space=''
-                        for i in range(1,odiff+1):
-                            space+=' '
-                        indexstring=space+indexstring
-                        self.WritePDBString(indexstring,pdbline,6,10)
-                        # STEP 10
-                        elementstring=str(element)
-                        odiff=4-len(elementstring)
-                        space=''
-                        for i in range(1,odiff+1):
-                            space+=' '
-                        elementstring=elementstring+space
-                        self.WritePDBString(elementstring,pdbline,12,15)
-                        # STEP 11
-                        residuestring=str(residuenum)
-                        odiff=4-len(residuestring)
-                        space=''
-                        for i in range(1,odiff+1):
-                            space+=' '
-                        residuestring=space+residuestring
-                        self.WritePDBString(residuestring,pdbline,22,25)
-                        # STEP 12
-                        coords=[float(linesplit[2]),float(linesplit[3]),float(linesplit[4])]        
-                        xstring=self.PDBCoordinate(coords,0)
-                        ystring=self.PDBCoordinate(coords,1)
-                        zstring=self.PDBCoordinate(coords,2)
-                        self.WritePDBString(xstring,pdbline,30,37)
-                        self.WritePDBString(ystring,pdbline,38,45)
-                        self.WritePDBString(zstring,pdbline,46,53)
-                        pdbline=''.join(pdbline)
-                        temp.write(pdbline)
-                elif '90.000' in line and first==False:
-                    # STEP 13
-                    modelnum+=1
-                    self.WritePDBCONECTRecord(temp,indextoconn)
-                    modelstring='MODEL                                            '+'\n'
-                    modelstring=list(modelstring)
-                    modelnumstring=str(modelnum)
-                    odiff=4-len(modelnumstring)
-                    space=''
-                    for i in range(1,odiff+1):
-                        space+=' '
-                    modelnumstring=space+modelnumstring
-                    self.WritePDBString(modelnumstring,modelstring,10,13)
-                    modelstring=''.join(modelstring)
-                    temp.write(modelstring)
-            # STEP 14
-            self.WritePDBCONECTRecord(temp,indextoconn)
-            temp.write('ENDMDL'+'\n')
-            temp.close()
-
-
-        def PymolReadableFile(self,tinkerxyzfilename,outputname):
-            """
-            Intent: Convert tinker XYZ/ARC -> PDB trajectory, so can visualize in popular visualization software
-            Input: Tinker xyz filename, output name for pymol readable file
-            Output:
-            Referenced By: Various python modules for when converting tinker XYZ-> PDB, such as minimized XYZ, final frame of equilibriated XYZ and even ARC for production dynamics with full electrostatics and van der waals interactions.  
-            Description: 
-            1. Convert tinker XYZ to cartesian XYZ
-            2. If complexed XYZ/ARC file then generate PDB trajectory
-            """
-            # STEP 1
-            xyzfilename=self.ConvertTinkerXYZToCartesianXYZ(tinkerxyzfilename)
-            os.rename(xyzfilename,outputname)
-            pdbfilename=outputname.replace('.xyz','.pdb')
-            # STEP 2
-            if self.complexedproteinpdbname!=None and 'comp' in tinkerxyzfilename:
-                self.GeneratePDBFromARC(tinkerxyzfilename,pdbfilename)   
-
-
-        def GrabIndexToCoordinatesPymol(self,mol):
-            """
-            Intent: Grab coordinates from mol object
-            Input: rdkit mol object
-            Output: Dictionary of atom index to coordinates
-            Referenced By: pdbxyz module
-            Description:
-            1. Iterate over atoms in mol object
-            2. Grab atom position from default conformer
-            3. Save the coordinates into dictionary
-            """
-            indextocoords={}
-            # STEP 1
-            for atom in mol.GetAtoms():
-                atomidx=atom.GetIdx()
-                # STEP 2
-                pos = mol.GetConformer(0).GetAtomPosition(atomidx)
-                X=pos.x
-                Y=pos.y
-                Z=pos.z
-                atomindex=atomidx+1 
-                # STEP 3
-                indextocoords[atomindex]=[X,Y,Z]
-        
-            return indextocoords
-
             
         def ConvertTinkerXYZToCartesianXYZ(self,tinkerxyzfilename):
             """
@@ -6322,701 +4229,6 @@ class PolarizableTyper():
             return xyzfilename
 
 
-        def CheckIfNeedRegrowForSolvation(self):
-            """
-            Intent: If molecule is small enough, vdw interactions will not be needed (need at least 4 atoms across to feel vdw interactions). If small enough, then for hydration free energy, dont need to use vdw-annihilate or regrow vdw with gas phase. 
-            Input: - 
-            Output: Boolean to see if need to regrow vdw interactions in gas phase for HFE
-            Referenced By: MolecularDynamics
-            Description: 
-            1. Assume do not need to regrow
-            2. Iterate over neighors
-            3. Iterate over neighbors of neighbors
-            4. Iterate over neighbors of neighbors of neighbors
-            5. Iterate over neighbors of previous neighbors again...
-            6. If atom index is not repeated, then molecule is big enough to require gas phase vdw regrowth for HFE  
-            """
-            # STEP 1
-            needregrow=False
-            if self.solvation==True:
-                if self.binding==False and self.annihilatevdw==True:
-                    for xyz in self.ligandxyzfilenamelist:
-                        xyzfilename=self.ConvertTinkerXYZToCartesianXYZ(xyz)
-                        tmpmol=self.ReadLigandOBMol(xyzfilename)
-                        # STEP 2
-                        atomiter=openbabel.OBMolAtomIter(tmpmol)
-                        for atom in atomiter:
-                            atomidx=atom.GetIdx()
-                            iteratomatom = openbabel.OBAtomAtomIter(atom)
-                            # STEP 3
-                            for natom in iteratomatom:
-                                natomidx=natom.GetIdx()
-                                iteratomatomatom = openbabel.OBAtomAtomIter(natom)
-                                # STEP 4
-                                for nnatom in iteratomatomatom:
-                                    nnatomidx=nnatom.GetIdx()
-                                    if nnatomidx!=atomidx: 
-                                        # STEP 5
-                                        iteratomatomatomatom = openbabel.OBAtomAtomIter(nnatom)
-                                        for nnnatom in iteratomatomatomatom:
-                                            nnnatomidx=nnnatom.GetIdx()
-                                            # STEP 6
-                                            if nnnatomidx!=natomidx:
-                                                needregrow=True
-
-
-            return needregrow 
-
-
-        def CheckTinkerVersion(self):
-            """
-            Intent: Need to ensure user doesnt have a tinker version that is too old and incompatible with poltype
-            Input: -
-            Output: -
-            Referenced By: MolecularDynamics
-            Description: 
-            1. Use water.xyz and water.key in VersionFiles folder to construct a command for the analyze program
-            2. Call analyze with command
-            3. Read output file and parse for version number
-            4. If the version number is less than required value, then just crash poltype 
-            """
-            # STEP 1
-            cmdstr=self.analyzepath+' '+os.path.abspath(os.path.join(self.annihilatorpath, os.pardir))+r'/VersionFiles/'+'water.xyz'+' '+'-k'+' '+os.path.abspath(os.path.join(self.annihilatorpath, os.pardir))+r'/VersionFiles/'+'water.key'+' '+'e'+'>'+' '+'version.out'
-            
-            self.WriteToLog(cmdstr)
-            # STEP 2
-            try:
-                returned_value = subprocess.call(cmdstr, shell=True)
-            except:
-                raise ValueError("ERROR: " + cmdstr+' '+'path'+' = '+os.getcwd())      
-            # STEP 3
-            temp=open('version.out','r')
-            results=temp.readlines()
-            temp.close()
-            latestversion = False
-            for line in results:
-                if "Version" in line:
-                    linesplit = line.split()
-                    self.versionnum = linesplit[2]
-                    if version.parse(self.versionnum) >= version.parse("8.9.4"):
-                        latestversion = True
-                        break
-            # STEP 4
-            if not latestversion:
-                raise ValueError("Notice: Not latest working version of tinker (8.9.4)"+' '+os.getcwd())
-          
-
-        def GrabIndicesWithTypeNumber(self,xyzfilename,ligandtypes):
-            """
-            Intent: Find all atom indices corresponding to input type numbers, used when comparing types between input ligand tinker XYZ files as well as receptor-ligand tinker XYZ files (type numbers may be inconsistent or out of order etc). 
-            Input: Tinker xyz filename, array of type numbers
-            Output: array of atomic indices
-            Referenced By: CheckInputXYZKeyFiles
-            Description:
-            1. Iterate over lines of tinker XYZ file
-            2. Determine if line contains box information
-            3. If not a box line, extract type number and index, if type number is in input array of type numbers then append index to array of indices. 
-            """
-            indices=[]
-            temp=open(xyzfilename,'r')
-            results=temp.readlines()
-            temp.close()
-            # STEP 1
-            for line in results:
-                linesplit=line.split()
-                # STEP 2
-                isboxline=True
-                if len(linesplit)==6:
-                    for e in linesplit:
-                        if self.CheckFloat(e)==False:
-                            isboxline=False
-                else:
-                    isboxline=False
-                if len(linesplit)>1 and isboxline==False:
-                    # STEP 3
-                    typenum=int(linesplit[5])
-                    index=int(linesplit[0])
-                    if typenum in ligandtypes:
-                        indices.append(index)
-            return indices
-            
-        def GrabTypeNumbers(self,xyzfilename,indices=None):  
-            """
-            Intent: Grab all type numbers from tinker XYZ file
-            Input: tinker xyz filename
-            Output: array of type numbers
-            Referenced By: CheckInputXYZKeyFiles
-            Description: 
-            1. Iterate over lines of tinker XYZ file
-            2. If line does not contain box information
-            3. Extract type number and append to array
-            """
-            temp=open(xyzfilename,'r')
-            results=temp.readlines()
-            temp.close()
-            typenums=[]
-            # STEP 1
-            for line in results:
-                linesplit=line.split()
-                isboxline=True
-                if len(linesplit)==6:
-                    for e in linesplit:
-                        if self.CheckFloat(e)==False:
-                            isboxline=False
-                else:
-                    isboxline=False
-                # STEP 2
-                if len(linesplit)>1 and isboxline==False:
-                    # STEP 3
-                    typenum=int(linesplit[5])
-                    index=int(linesplit[0])
-                    if indices!=None:
-                        if index in indices:
-                            typenums.append(typenum)
-                    else:
-                        typenums.append(typenum)
-            return typenums 
-
-        def GrabCoordinates(self,xyzfilename,indices=None):
-            """
-            Intent: Want to grab coordinates from complexed XYZ, want to make sure solvation XYZ has same initial coordinates.
-            Input: Tinker xyz filename, optionally input array of indices
-            Output: Array of coordinates
-            Referenced By: CheckInputXYZKeyFiles, minimization module - FindTwoAtomsForRestrainingRotation
-            Description:
-            1. Iterate over tinker XYZ
-            2. If not box line, then grab coordinates
-            3. Append coordinates to array of coordinates
-            """
-            temp=open(xyzfilename,'r')
-            results=temp.readlines()
-            temp.close()
-            coords=[]
-            # STEP 1
-            for line in results:
-                linesplit=line.split()
-                isboxline=True
-                if len(linesplit)==6:
-                    for e in linesplit:
-                        if self.CheckFloat(e)==False:
-                            isboxline=False
-                else:
-                    isboxline=False
-                # STEP 2
-                if len(linesplit)>1 and isboxline==False:
-                    typenum=int(linesplit[5])
-                    index=int(linesplit[0])
-                    # STEP 3
-                    coord=[float(linesplit[2]),float(linesplit[3]),float(linesplit[4])]
-                    try:
-                        if index in indices:
-                            coords.append(coord)
-                    except:
-                        coords.append(coord)
-            return coords
-
-
-        def CompareTypes(self,receptorligandtypes,ligandtypes):
-            """
-            Intent: Ensure type numbers in receptor-ligand XYZ are same as from input ligand tinker XYZ file.
-            Input: Array of receptorligand types, array of ligand types
-            Output: -
-            Referenced By: CheckInputXYZKeyFiles
-            Description:
-            1. Iterate over ligandtypes
-            2. Extract corresponding receptorligand type
-            3. If the types are not the same, raise error and crash program
-            """
-            for i in range(len(ligandtypes)):
-                receptorligandtype=receptorligandtypes[i]
-                ligandtype=ligandtypes[i]
-                if receptorligandtype!=ligandtype:
-                    raise ValueError('Ligand XYZ and Receptor-Ligand XYZ dont have the same type number order!')
-
-        def RewriteCoordinates(self,xyzfilename,coords):
-            """
-            Intent: Update coordinates in tinker XYZ with new coordinates, for example if want solvation XYZ to have same coordinates as ligand in complexed-ligand tinker XYZ
-            Input: Tinker xyz filename, array of coordinates
-            Output:
-            Referenced By: CheckInputXYZKeyFiles
-            Description: 
-            1. Iterate over tinker XYZ
-            2. If not box line, then grab coordinates from input array of coordinates
-            3. Add coordinates to line
-            4. Write out new line with updated coordinates
-            """
-            temp=open(xyzfilename,'r')
-            results=temp.readlines()
-            temp.close()
-            tempname=xyzfilename.replace('.xyz','-t.xyz')
-            temp=open(tempname,'w')
-            count=0
-            # STEP 1
-            for line in results:
-                linesplit=line.split()
-                # STEP 2
-                isboxline=True
-                if len(linesplit)==6:
-                    for e in linesplit:
-                        if self.CheckFloat(e)==False:
-                            isboxline=False
-                else:
-                    isboxline=False
-                # STEP 3
-                if len(linesplit)>1 and isboxline==False:
-                    coord=coords[count]
-                    count+=1
-                    linesplit[2]=str(coord[0])
-                    linesplit[3]=str(coord[1])
-                    linesplit[4]=str(coord[2])
-                    line=' '.join(linesplit)+'\n'
-                if isboxline==False:
-                    # STEP 4
-                    temp.write(line)
-            temp.close()
-            os.remove(xyzfilename)
-            os.rename(tempname,xyzfilename)
-
-
-        def ReadCharge(self,output,checkresid=True):
-            """
-            Intent: Read charge from output using tinker analyze. For example, want to ensure total charge is integer or for some systems need to ensure net charge is 0.
-            Input: Output from tinker analyze, boolean specifying to check for residual charge and crash if not integer
-            Output: Total charge and residual charge (left over from nearest integer).
-            Referenced By: CheckNetChargeIsZero,CheckInputXYZKeyFiles
-            Description: 
-            1. If boolean specifies to skip checking charge, then dont crash program (for debugging purposes) 
-            2. Read in results from analyze output
-            3. Iterate over results and extract total charge 
-            4. Check for residual charge
-            5. If boolean specifies to crash for residual charge and there is residual charge, crash program
-            """
-            # STEP 1
-            if self.skipchargecheck==True:
-                checkresid=False
-            # STEP 2
-            temp=open(output,'r')
-            results=temp.readlines()
-            temp.close()
-            chg=0
-            # STEP 3
-            for line in results:
-                if 'Total Electric Charge :' in line:
-                    linesplit=line.split()
-                    chg=float(linesplit[-2])
-            # STEP 4
-            resid=int(round(chg))-chg
-            # STEP 5
-            if checkresid==True:
-                if resid!=0:
-                    raise ValueError('Charge is not integer! '+output+' '+str(chg)+' '+'residual charge is '+str(resid))
-
-            return chg,resid
-
-
-        def CheckEnergies(self,output):
-            """
-            Intent: Used after minimizing box to determine if box setup or minimization did not perform well (bond energy per bond is too high)
-            Input: Outputfile from Tinker analyze
-            Output: -
-            Referenced By: minimization.py - CheapMinimizationProtocol
-            Description: 
-            1. Define tolerance of 5 kcal/mol/bond
-            2. Iterate over results of tinker analyze output
-            3. Extract Bond Stretching Energies
-            4. Divide Bond energies by total number of bonds
-            5. If bond energy per bond is greater than tolerance, then something is definitely wrong with setup.  
-            """
-            temp=open(output,'r')
-            results=temp.readlines()
-            temp.close()
-            # STEP 1
-            tol=5
-            # STEP 2
-            for line in results:
-                if 'Bond Stretching' in line and 'Parameters' not in line:
-                    linesplit=line.split()
-                    intnum=int(linesplit[-1])
-                    # STEP 3
-                    energy=float(linesplit[-2])
-                    # STEP 4
-                    energyperbond=energy/intnum
-                    # STEP 5
-                    if energyperbond>tol:
-                        raise ValueError('Bad starting box structure, bond energy per bond is way to high '+str(energyperbond)+' kcal/mol')
-
-
-
-
-
-        def CheckInputXYZKeyFiles(self,ligandonly=False):
-            """
-            Intent: Append all keys from keyfilenamelist into one key file. Check to ensure net charge is an integer, if not then pick some multipoles on host (protein) and add residual charge onto the protein multipole to ensure net charge is an integer.
-            Input: Boolean to only check ligand XYZs/keys (want to check ligand tinker files before making complex XYZ and key) 
-            Output: Array of multipole parameters that may need to be added if there is residual charge (not integer net charge) 
-            Referenced By: MolecularDynamics 
-            Description: 
-            1. Remove typical header keywords from keyfile input. Sometimes users copy from other source with header information.
-            2. Add parameter file key word to header 
-            3. Iterate over all input ligand XYZ/keys 
-            """
-            keymods.RemoveKeyWords(self,self.originalkeyfilename,['parameters','axis','ewald','pme-grid','pme-order','cutoff','thermostat','integrator','ligand','verbose','archive','neighbor-list','polar-eps','polar-predict','heavy-hydrogen','omp-threads','OPENMP-THREADS'])
-            head,tail=os.path.split(self.prmfilepath)
-            if head=='':
-                self.prmfilepath=os.path.join(os.getcwd(),self.prmfilepath)
-            if len(self.prmfilepath.split()) > 1:
-                string='parameters "'+self.prmfilepath+'"\n'
-            else:
-                string='parameters '+self.prmfilepath+'\n'
-            keymods.AddKeyWord(self,self.originalkeyfilename,string)
-            if self.receptorligandxyzfilename!=None and self.ligandxyzfilenamelist!=None:
-                for xyz in self.ligandxyzfilenamelist:
-                    ligandtypes=self.GrabTypeNumbers(xyz) 
-                    indices=self.GrabIndicesWithTypeNumber(self.receptorligandxyzfilename,ligandtypes)
-                    receptorligandtypes=self.GrabTypeNumbers(self.receptorligandxyzfilename,indices=indices)
-                    self.CompareTypes(receptorligandtypes,ligandtypes)
-                receptortypes=list(range(1,348+1))
-                receptorindices=self.GrabIndicesWithTypeNumber(self.receptorligandxyzfilename,receptortypes)
-                self.totalreceptornumber=len(receptorindices)
-                self.receptorindices=list(range(1,self.totalreceptornumber+1))
-            if self.ligandxyzfilenamelist!=None and self.originalkeyfilename!=None: 
-                self.otherligcharge=0
-                self.ligandcharge=0
-                for xyz in self.ligandxyzfilenamelist:
-                    if xyz not in self.annihilateligandxyzfilenamelist: # more background charge
-                        cmdstr=self.trueanalyzepath+' '+xyz+' '+'-k'+' '+self.originalkeyfilename+' '+'e'
-                        submit.call_subsystem(self,cmdstr,wait=True)    
-                        cmdstr=self.trueanalyzepath+' '+xyz+' '+'-k'+' '+self.originalkeyfilename+' '+'m'+'> alz.out'
-                        submit.call_subsystem(self,cmdstr,wait=True)    
-                        chg,resid=self.ReadCharge('alz.out')
-                        self.otherligcharge+=chg
-                for xyz in self.annihilateligandxyzfilenamelist:
-                    cmdstr=self.trueanalyzepath+' '+xyz+' '+'-k'+' '+self.originalkeyfilename+' '+'e'
-                    submit.call_subsystem(self,cmdstr,wait=True)    
-                    cmdstr=self.trueanalyzepath+' '+xyz+' '+'-k'+' '+self.originalkeyfilename+' '+'m'+'> alz.out'
-                    submit.call_subsystem(self,cmdstr,wait=True)    
-                    chg,resid=self.ReadCharge('alz.out')
-                    self.ligandcharge+=chg
-
-            if ligandonly==True:
-                return []
-            mpolearrays=[]
-
-            if self.receptorligandxyzfilename!=None and self.originalkeyfilename!=None: 
-                
-                cmdstr=self.trueanalyzepath+' '+self.receptorligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'e'
-                submit.call_subsystem(self,cmdstr,wait=True)    
-                cmdstr=self.trueanalyzepath+' '+self.receptorligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'m'+'> alz.out'
-                submit.call_subsystem(self,cmdstr,wait=True)    
-                self.complexcharge,resid=self.ReadCharge('alz.out',checkresid=False)
-                if resid!=0:
-                    index,typenum=self.GrabFirstReceptorIndexAndType(self.receptorligandxyzfilename)
-                    mpolearrays=self.GrabMultipoleParameters(self.prmfilepath,typenum)
-                    mpolearrays=self.ModifyIndexAndChargeMultipole(mpolearrays,resid,index)
-                    self.ModifyCharge(self.originalkeyfilename,mpolearrays)
-                    cmdstr=self.trueanalyzepath+' '+self.receptorligandxyzfilename+' '+'-k'+' '+self.originalkeyfilename+' '+'m'+'> alz.out'
-                    submit.call_subsystem(self,cmdstr,wait=True)    
-                    self.complexcharge,resid=self.ReadCharge('alz.out')
-                else:
-                    mpolearrays=[]
-
-            
-
-            if self.receptorligandxyzfilename!=None:
-                self.receptorcharge=self.complexcharge-self.ligandcharge-self.otherligcharge # this includes the charges from ions in pocket initially
-            if self.receptorligandxyzfilename!=None and self.ligandxyzfilenamelist!=None:
-                for xyz in self.ligandxyzfilenamelist:
-                    ligandtypes=self.GrabTypeNumbers(xyz)
-                    indices=self.GrabIndicesWithTypeNumber(self.receptorligandxyzfilename,ligandtypes)
-                    coords=self.GrabCoordinates(self.receptorligandxyzfilename,indices)
-                    self.RewriteCoordinates(xyz,coords)
-            return mpolearrays
-
-
-        def GrabFirstReceptorIndexAndType(self,xyzfilename):
-            """
-            Intent: When want to deposit residual charge on protein to ensure net charge is an integer. Just pick an atom (hydrogen) on protein and then grab that multipole later on for adding residual charge. This funciton only grabs index and type number.
-            Input: Tinker XYZ 
-            Output: index and type number of atom to deposit residual charge on
-            Referenced By: CheckInputXYZKeyFiles
-            Description: 
-            1. Iterate over results of tinker XYZ file.
-            2. If encounter a hydrogen atom return index and type number 
-            """
-            temp=open(xyzfilename,'r')
-            results=temp.readlines()
-            temp.close()
-            # STEP 1
-            for line in results:
-                linesplit=line.split()
-                if len(linesplit)>1 and '90.0' not in line:
-                    index=int(linesplit[0])
-                    element=linesplit[1]
-                    typenum=int(linesplit[5])
-                    # STEP 2
-                    if element=='H':
-                        return index,typenum
-
-
-
-        def GrabMultipoleParameters(self,prmfilepath,typenum):
-            """
-            Intent: Grab the multipole parameters that will be modified to deposit residual charge upon.
-            Input: Tinker parameter file, type number specifying which multipole parameters to grab.
-            Output: Array of multipole parameters
-            Referenced By: CheckInputXYZKeyFiles
-            Description: 
-            1. Iterate over parameter file
-            2. If multipole keyword is detected and the desired type number corresponds to that multipole parameter
-            3. Grab all the associated lines then append to an array
-            """
-            mpolearrays=[]
-            temp=open(prmfilepath,'r')
-            results=temp.readlines()
-            temp.close()
-            # STEP 1
-            for lineidx in range(len(results)):
-                line=results[lineidx]
-                # STEP 2
-                if 'multipole' in line:
-                    linesplit=line.split()
-                    if linesplit[1]==str(typenum):
-                        # STEP 3
-                        mpolearrays.append(line)
-                        dip=results[lineidx+1]
-                        firstquad=results[lineidx+2]
-                        secondquad=results[lineidx+3]
-                        thirdquad=results[lineidx+4]
-                        mpolearrays.append(dip)
-                        mpolearrays.append(firstquad)
-                        mpolearrays.append(secondquad)
-                        mpolearrays.append(thirdquad)
-
-            return mpolearrays
-
-
-        def ModifyIndexAndChargeMultipole(self,mpolearrays,resid,index):
-            """
-            Intent: Modify multipole parameters to ensure there is no net residual charge (net charge is integer).
-            Input: Array of multipole parameters, residual charge to add, atom index of atom that is being modified (tinker allows putting two copies of mlutipole parameters but if you specify atom index instead of type only affects that atom).
-            Output: Modifed array of multipole parameters.
-            Referenced By: CheckInputXYZKeyFiles
-            Description:
-            1. Iterate over array of multipole parameters
-            2. If line contains multipole keyword (also has charge in that line)
-            3. Then modify charge by adding residual and add atom index instead of type number
-            4. Append back to array
-            """
-            # STEP 1
-            for idx in range(len(mpolearrays)):
-                line=mpolearrays[idx]
-                # STEP 2
-                if 'multipole' in line:
-                    chargelinesplit=line.split()
-                    # STEP 3
-                    chargelinesplit[1]='-'+str(index)
-                    charge=float(chargelinesplit[-1])
-                    charge=str(charge+resid)
-                    chargelinesplit[-1]=charge
-                    chargeline=' '.join(chargelinesplit)+'\n'
-                    # STEP 4
-                    mpolearrays[idx]=chargeline 
-
-            return mpolearrays
-
-
-        def ModifyCharge(self,keyfilename,mpolearrays):
-            """
-            Intent: Append array of modified multipole parameters to keyfile.
-            Input: Tinker key file, array of modified multipole parameters
-            Output: -
-            Referenced By: CheckInputXYZKeyFiles , MolecularDynamics
-            Description:
-            1. Iterate over lines in array of multipole parameters 
-            2. Append line to key file
-            """
-            temp=open(keyfilename,'a')
-            # STEP 1
-            for line in mpolearrays:
-                # STEP 2
-                temp.write(line)
-            temp.close()
-
-
-        def DetermineIonsForChargedSolvation(self):
-            """
-            Intent: If user specifies to compute the "salt" hydration free energy, charged HFE + HFE of ions with that net charge, then this function computes the ions that need to be added for the HFE of ions box. 
-            Input: - 
-            Output: Dictionary of ion type number to number of ions needed to be added to box  
-            Referenced By: MolecularDynamics 
-            Description:
-            1. If user wants to compute the salt hydration free energy
-            2. If there is a positive net charge, grab Cl type number, negative net charge, grab K type number.
-            3. Store type number in dictionary along with magnitude of charge (represents number of ions needed to be added).  
-            """
-            solviontocount={}
-            self.addsolvionwindows=False
-            # STEP 1
-            if self.binding==False and self.solvation==True and self.salthfe==True:
-                for i in range(len(self.systemcharge)):
-                    chg=int(self.systemcharge[i])
-                    # STEP 2
-                    if chg>0:
-                        iontypenumber=self.elementsymtotinktype['Cl']
-                    elif chg<0:
-                        iontypenumber=self.elementsymtotinktype['K']
-                    else:
-                        continue
-                    count=np.abs(chg)
-                    # STEP 3
-                    solviontocount[iontypenumber]=count
-                    self.addsolvionwindows=True
-            return solviontocount    
-
-        def ChangeTypeNumbers(self,xyzfile,elementtotype):
-            """
-            Intent: Preequilbriated box may be using water type numbers from another parameter file, so need to change type numbers to ensure its consistent with input parameter file.
-            Input: Tinker XYZ file, dictionary of element to tinker type number
-            Output: Updated XYZ filename
-            Referenced By: TrimPreEquilibriatedBox
-            Description: 
-            1. Iterate over XYZ file
-            2. If line is not a line containing boxinformation and its not the first line (atom number)
-            3. Extract the element from the line
-            4. Determine type number from the input dictionary and extracted element
-            5. Insert new type number into new line and write to file
-            """
-            temp=open(xyzfile,'r')
-            results=temp.readlines()
-            temp.close()
-            tempname=xyzfile.replace('.xyz','_new.xyz')
-            temp=open(tempname,'w')
-            # STEP 1
-            for lineidx in range(len(results)):
-                line=results[lineidx]
-                linesplit=line.split()
-                isboxline=True
-                # STEP 2
-                if len(linesplit)==6:
-                    for e in linesplit:
-                        if self.CheckFloat(e)==False:
-                            isboxline=False
-                else:
-                    isboxline=False
-                if isboxline==False and lineidx!=0:
-                    # STEP 3
-                    element=linesplit[1] 
-                    # STEP 4
-                    typenum=elementtotype[element]
-                    linesplit[5]=str(typenum)
-                    # STEP 5
-                    line=' '.join(linesplit)+'\n'
-                temp.write(line)
-            temp.close()
-            return tempname
-        
-        def ModifyBoxSizeInXYZFile(self,xyzfile,boxsize):
-            """
-            Intent: Change the box size dimensions, needed for when trimming the pre-equilibriated box.
-            Input: Tinker XYZ box file, new box size
-            Output: -
-            Referenced By: TrimPreEquilibriatedBox
-            Description: 
-            1. Iterate over box file
-            2. If line contains box information
-            3. Modify the line to contain new box size information
-            4. Write new line to file
-            """
-            temp=open(xyzfile,'r')
-            results=temp.readlines()
-            temp.close()
-            tempname=xyzfile.replace('.xyz','_new.xyz')
-            temp=open(tempname,'w')
-            # STEP 1
-            for lineidx in range(len(results)):
-                line=results[lineidx]
-                linesplit=line.split()
-                # STEP 2
-                isboxline=True
-                if len(linesplit)==6:
-                    for e in linesplit:
-                        if self.CheckFloat(e)==False:
-                            isboxline=False
-                else:
-                    isboxline=False
-                if isboxline==True:
-                    # STEP 3
-                    linesplit[0]=str(boxsize[0])
-                    linesplit[1]=str(boxsize[1])
-                    linesplit[2]=str(boxsize[2])
-                    line=' '.join(linesplit)+'\n'
-                # STEP 4
-                temp.write(line)
-            temp.close()
-            os.remove(xyzfile)
-            os.rename(tempname,xyzfile)
-
-        def TrimPreEquilibriatedBox(self,boxsize):
-            """
-            Intent: Instead of minimizing new box and equilbriating for long period, it is sometimes easier to trim a larger pre-equibriated box to new box sixe and equilbriate for a shorter time.
-            Input: New desired box size
-            Output: - 
-            Referenced By: BoxSetupProtocol in boxsetup.py
-            Description:
-            1. Copy pre-equilbriated box from poltype source to current directory 
-            2. Change type numbers of water to refelect current parameter file
-            3. Change the size of the boxfile to desired box size
-            4. Increase box size slightly to accomdate water that will be removed outside of input box size (some may be across original boundary) 
-            5. Remove waters outside of original box size
-            6. Modify box file to new box size again
-            """
-            xyzfile=self.preequilboxpath
-            split=os.path.split(xyzfile)
-            xyzfilename=split[1]
-            # STEP 1
-            shutil.copy(xyzfile,os.path.join(self.simpath,xyzfilename))    
-            elementtotype={'O':self.waterOtypenum,'H':self.waterHtypenum}
-            # STEP 2
-            filename=self.ChangeTypeNumbers(xyzfilename,elementtotype)
-            # STEP 3
-            self.ModifyBoxSizeInXYZFile(filename,boxsize)
-            # STEP 4
-            newboxsize=[2+i for i in boxsize]
-            # STEP 5
-            self.RemoveWaterOutsideBox(filename,boxsize)
-            # STEP 6
-            self.ModifyBoxSizeInXYZFile(filename,newboxsize)
-            os.rename(filename,'water.xyz_2') # for xyzedit lib
-
-        def RemoveWaterOutsideBox(self,xyzfilename,boxsize):
-            """
-            Intent: Needed when trimming pre-equilbriated box. Remove waters outside of desired box size. 
-            Input: XYZ box file, desired box size.
-            Output: -
-            Referenced By: TrimPreEquilibriatedBox
-            Description:
-            1. Create input file to call xyzedit
-            2. Write the appropriate options for removing water outside box size
-            3. Generate command string to call xyzedit with filename generated as input
-            4. Submit command to system
-            5. Rename the new filename to original input filename
-            """
-            # STEP 1
-            tempfile=open('xyzedit.in','w')
-            # STEP 2
-            tempfile.write('17'+'\n')
-            tempfile.write(str(boxsize[0])+','+str(boxsize[1])+','+str(boxsize[2])+'\n')
-            tempfile.write('\n')
-            tempfile.close()
-            # STEP 3
-            cmdstr=self.xyzeditpath +' '+xyzfilename+' '+self.prmfilepath+' '+' < xyzedit.in '
-            # STEP 4
-            submit.call_subsystem(self,cmdstr,wait=True)   
-            # STEP 5
-            newname=xyzfilename+'_2'
-            os.rename(newname,xyzfilename)
-
-
         def ConvertTinktoXYZ(self,filename,newfilename):
             """
             Intent: For when user wants to align a new ligand tinker XYZ to a template tinker XYZ. Need to convert tinker XYZ to cartesian XYZ as an intermediate for processing with toolkits such as rdkit.
@@ -7053,199 +4265,7 @@ class PolarizableTyper():
             tempwrite.close()
             return newfilename
        
-
-        def AlignComplexedPDBToUnComplexedPDB(self):
-            """
-            Intent: After adding missing residues and assigning protonation state, may need to add ligands back in original PDB. So this requires an allignment procedure.
-            Input: -
-            Output: -
-            Referenced By: MolecularDynamics 
-            Description:
-            1. Initialize a reference and current mol object
-            2. Read in complexed protein PDB to current mol and uncomplexed PDB to reference mol object
-            3. Call openbabel aligment object and set the reference and target mol objects
-            4. Align the mol objects
-            5. Update coordiantes in target mol file
-            6. Grab HETATM indices from mol object
-            7. Add those indices along with coordinates from mol object (that was aligned to ref) to the uncomplexed PDB
-            8. Write out new PDB with uncomplex structure that has aligned ligand from complexed structure.
-            """
-            # STEP 1
-            obConversion = openbabel.OBConversion()
-            ref = openbabel.OBMol()
-            mol = openbabel.OBMol()
-            # STEP 2
-            inFormat = obConversion.FormatFromExt(self.uncomplexedproteinpdbname)
-            obConversion.SetInFormat(inFormat)
-            obConversion.ReadFile(mol, self.complexedproteinpdbname)
-            obConversion.ReadFile(ref, self.uncomplexedproteinpdbname)
-            # STEP 3
-            aligner = openbabel.OBAlign(False, False)
-            aligner.SetRefMol(ref)
-            aligner.SetTargetMol(mol)
-            # STEP 4
-            aligner.Align()
-            # STEP 5
-            aligner.UpdateCoords(mol)
-            # STEP 6
-            hetatmids=self.GrabHETATMS(mol)
-            # STEP 7
-            ref=self.AddHETATMSToPDB(ref,mol,hetatmids)
-            # STEP 8
-            obConversion.SetOutFormat('pdb')
-            newmolfile=self.uncomplexedproteinpdbname.replace('.pdb','_aligned.pdb')
-            obConversion.WriteFile(ref,newmolfile)
-
-
-        def AddHETATMSToPDB(self,ref,mol,hetatmids):
-            """
-            Intent: Grab atoms from one mol and add to another (when adding aligned ligand in complexed PDB to uncomplexed PDB)
-            Input: reference and current mol objects, array of ligand atom indices
-            Output: updated reference mol object
-            Referenced By: AlignComplexedPDBToUnComplexedPDB
-            Description: 
-            1. Iterate over array of ligand atom indices 
-            2. Grab atom from current mol object with given atom index in array
-            3. Add that atom to reference mol object
-            """
-            for atomindex in hetatmids:
-                atom=mol.GetAtom(atomindex)
-                ref.AddAtom(atom)
-
-
-            return ref
-
-
-        def GrabHETATMS(self,mol):
-            """
-            Intent: Determine ligand indices from PDB mol object, needed for when adding aligned ligand to complexed PDB to uncomplexed PDB
-            Input: mol object
-            Output: Array of PDB ligand indices
-            Referenced By: AlignComplexedPDBToUnComplexedPDB
-            Description:
-            1. Iterate over atoms of mol object
-            2. Grab residue information
-            3. If residue is not in canoncical residue symbols, then it must be ligand
-            4. Append atom index to array
-            """
-            hetatmids=[]
-            iteratom = openbabel.OBMolAtomIter(mol)
-            # STEP 1
-            for atm in iteratom:
-                atmindex=atm.GetIdx()
-                # STEP 2
-                res=atm.GetResidue()
-                reskey=res.GetName()
-                # STEP 3
-                if reskey not in self.knownresiduesymbs:
-                    # STEP 4
-                    hetatmids.append(atmindex)
-
-
-            return hetatmids
-
-            
-        def AlignLigandXYZToTemplateXYZ(self):
-            """
-            Intent: User may wish to align a ligand XYZ to a template ligand XYZ in protein pocket for example.
-            Input: -
-            Output: -
-            Referenced By: MolecularDynamics 
-            Description: 
-            1. Convert input ligand XYZ and template ligand XYZ into cartesian XYZ files ( to be processed by chemoinformatic tookkits)
-            2. Generate reference and current mol objects
-            3. Read in cartesian XYZs into mol objects
-            4. Convert cartesian XYZs into MOL format with babel (to be read in by rdkit, rdkit doesnt read cartesian) 
-            5. Read in MOL files into rdkit mol objects
-            6. Remove bond topology information to make matching easier (sometimes cartesian->MOL creates wrong bond information that doesnt match so remove)
-            7. Sanitize the rdkit mol objects (assign formal charges otherwise rdkit complain)
-            8. Embed many conformations into target mol object (this will allow finding best conformation that matches to other mol)
-            9. Compute RMSD between template XYZ and each conformor of input XYZ, then choose conformer with minimum RMSD 
-            10.Update XYZ coordinates in tinker files with conformer coordinates
-            11.Convert tinker XYZ coordaintes to cartesian XYZ  
-            """
-            # STEP 1
-            ligandcartxyz=self.ConvertTinktoXYZ(self.ligandxyzfilenamelist[0],self.ligandxyzfilenamelist[0].replace('.xyz','_cart.xyz'))
-            templateligandcartxyz=self.ConvertTinktoXYZ(self.templateligandxyzfilename,self.templateligandxyzfilename.replace('.xyz','_cart.xyz'))
-            # STEP 2
-            obConversion = openbabel.OBConversion()
-            ref = openbabel.OBMol()
-            mol = openbabel.OBMol()
-            # STEP 3
-            inFormat = obConversion.FormatFromExt(ligandcartxyz)
-            obConversion.SetInFormat(inFormat)
-            obConversion.ReadFile(mol, ligandcartxyz)
-            obConversion.ReadFile(ref, templateligandcartxyz)
-            # STEP 4
-            obConversion.SetOutFormat('mol')
-            molfile=ligandcartxyz.replace('_cart.xyz','.mol')
-            reffile=templateligandcartxyz.replace('_cart.xyz','.mol')
-            obConversion.WriteFile(mol,molfile)
-            obConversion.WriteFile(ref,reffile)
-            # STEP 5
-            mol=Chem.MolFromMolFile(molfile,removeHs=False,sanitize=False)
-            ref=Chem.MolFromMolFile(reffile,removeHs=False,sanitize=False)
-            # STEP 6
-            for bond in mol.GetBonds():
-                if bond.IsInRing()==False:
-                    bond.SetBondType(Chem.BondType.SINGLE)
-            for bond in ref.GetBonds():
-                if bond.IsInRing()==False:
-                    bond.SetBondType(Chem.BondType.SINGLE)
-            # STEP 7
-            self.ligandcharge=None
-            mol,atomindextoformalcharge=self.CheckInputCharge(mol)
-            self.ligandcharge=None
-            ref,atomindextoformalcharge=self.CheckInputCharge(ref)
-            self.ligandcharge=None
-            Chem.SanitizeMol(mol)
-            Chem.SanitizeMol(ref)
-            # STEP 8
-            confnum=1000
-            AllChem.EmbedMultipleConfs(mol, confnum)
-            mcs = rdFMCS.FindMCS([ref,mol])
-            patt = Chem.MolFromSmarts(mcs.smartsString)
-            atomnum=mcs.numAtoms
-            refMatch = ref.GetSubstructMatch(patt)
-            mv = mol.GetSubstructMatch(patt)
-            # STEP 9
-            rmstocid={}
-            for cid in range(confnum):
-                rms = AllChem.AlignMol(mol,ref,prbCid=cid,atomMap=list(zip(mv,refMatch)))
-                rmstocid[rms]=cid
-            minrms=min(rmstocid.keys())
-            mincid=rmstocid[minrms]
-            # STEP 10
-            indextocoords={}
-            for atom in mol.GetAtoms():
-                atomidx=atom.GetIdx()
-                pos = mol.GetConformer(mincid).GetAtomPosition(atomidx)
-                X=pos.x
-                Y=pos.y
-                Z=pos.z
-                atomindex=atomidx+1 
-                indextocoords[atomindex]=[X,Y,Z]
-            name=self.ligandxyzfilenamelist[0].replace('.xyz','_aligned.xyz')
-            self.ReplaceXYZCoords(self.ligandxyzfilenamelist[0],indextocoords,name,replace=False)
-            # STEP 11
-            alignedligandcartxyz=self.ConvertTinktoXYZ(name,name.replace('.xyz','_cart.xyz'))
- 
         
-        def CallAnalyze(self,statexyz,statekey,alzout,analyzepath,option):
-            """
-            Intent: Call analyze for many purposes, checking parameters are defined, checking energy components or total charge.
-            Input: XYZ file, key file, analyze output file, analyze bin path, analyze option
-            Output: - 
-            Referenced By: Many functions 
-            Description: 
-            1. Construct command string for analyze
-            2. Submit command to call_subsystem  
-            """
-            # STEP 1
-            cmdstr=analyzepath+' '+statexyz+' '+'-k'+' '+statekey+' '+option+' > '+alzout
-            # STEP 2
-            submit.call_subsystem(self,cmdstr,True,False,alzout) 
-
         def ExtractResource(self,string):
             """
             Intent: Exract resource value from string (if need to change or convert units) 
@@ -7320,188 +4340,6 @@ class PolarizableTyper():
             return iswholemoleculering
 
 
-        def ExtractLigand(self,ligandreceptorfilename,coordinates=None,indicestokeep=[]):
-            """
-            Intent: Used for docking module and pdbxyz module to extract the ligand from PDB into seperate files.
-            Input: ligand-receptor PDB file name, optional coordinates
-            Output: ligand only PDB, receptor only PDB
-            Referenced By:  docking.py - DockingWrapper , pdbxyz.py - DeterminePocketGrid
-            Description:
-            1. Call ExtractMOLObject for receptor, using known residue symbols only
-            2. Call ExtractMOLObject for ligand, grabbing any atoms with unknown residues
-            3. Convert residue name UNL to LIG, for other parts of program to read ligand easier in PDB
-            """
-            ligandpdbfilename='ligand.pdb'
-            receptorpdbfilename=ligandreceptorfilename.replace('.pdb','_receptoronly.pdb')
-            # STEP 1
-            receptormol=self.ExtractMOLObject(ligandreceptorfilename,receptorpdbfilename,None,True,indicestokeep)
-            # STEP 2
-            ligandmol=self.ExtractMOLObject(ligandreceptorfilename,ligandpdbfilename,coordinates,False,indicestokeep)
-            # STEP 3
-            self.ConvertUNLToLIG(ligandpdbfilename)
-            return ligandpdbfilename,receptorpdbfilename
-
-
-        def ExtractMOLObject(self,ligandreceptorfilename,newpdbfilename,coordinates,receptor,indicestokeep):
-            """
-            Intent: Extract either ligand or receptor from PDB file, then create new PDB file.
-            Input: ligand-receptor PDB filename, new PDB filename, array of coordinates to only include certain atoms, boolean if grabbing receptor or ligand, array of indices to keep 
-            Output: Extracted mol object
-            Referenced By: ExtractLigand
-            Description:
-            1. Define common HETATM symbols such as water
-            2. Generate mol object from ligand-receptor PDB
-            3. Iterate over atoms
-            4. Grab residue information from atom
-            5. If not in known residue symbols and trying to extract receptor, then add atom to array of atoms to remove
-            6. If extracting ligand, if coordinates array is given, delete any atoms not in coordinates array. Otherwise if residue is a known residue symbol or common HETATM symbol, then append atoms to array to delete. 
-            7. Remove atoms that should be deleted
-            8. Write out new PDB file
-            """
-            # STEP 1
-            commonhetatmsymbs=['HOH']
-            # STEP 2
-            pdbmol=self.GenerateMOLObject(ligandreceptorfilename)
-            iteratom = openbabel.OBMolAtomIter(pdbmol)
-            obConversion = openbabel.OBConversion()
-            obConversion.SetOutFormat('pdb')
-            atmindicestodelete=[]
-            # STEP 3
-            for atm in iteratom:
-                atmindex=atm.GetIdx()
-                # STEP 4
-                res=atm.GetResidue()
-                reskey=res.GetName()
-                coords=[atm.GetX(),atm.GetY(),atm.GetZ()]
-                # STEP 5
-                if reskey not in self.knownresiduesymbs and receptor==True:
-                    atmindicestodelete.append(atmindex)
-                elif receptor==False:
-                    # STEP 6
-                    if coordinates!=None:
-                        if coords not in coordinates:
-                            atmindicestodelete.append(atmindex)
-                    else:
-                        if (reskey in self.knownresiduesymbs or reskey in commonhetatmsymbs) and atmindex not in indicestokeep:
-                            atmindicestodelete.append(atmindex)
-            # STEP 7
-            atmindicestodelete.sort(reverse=True)
-            for atmindex in atmindicestodelete:
-                atm=pdbmol.GetAtom(atmindex)
-                pdbmol.DeleteAtom(atm)
-            # STEP 8
-            obConversion.WriteFile(pdbmol,newpdbfilename)
-            return pdbmol
-
-        def GenerateMOLObject(self,pdbfilename):
-            """
-            Intent: Convert PDB file into mol object
-            Input: PDB filename
-            Output: PDB mol object
-            Referenced By: GrabLigandCentroid,ExtractMOLObject
-            Description:
-            1. Call conversion object from openbabel
-            2. Create empty mol object
-            3. Set input format for converter
-            4. Read in PDB file into mol file via converter
-            """
-            # STEP 1
-            obConversion = openbabel.OBConversion()
-            # STEP 2
-            pdbmol = openbabel.OBMol()
-            # STEP 3
-            obConversion.SetInFormat('pdb')
-            # STEP 4
-            obConversion.ReadFile(pdbmol,pdbfilename)
-            return pdbmol
-
-
-        def ConvertUNLToLIG(self,filename):
-            """
-            Intent: Make it more clear in PDB file what is ligand by changing residue name to LIG
-            Input: PDB filename
-            Output: Modified PDB filename
-            Referenced By: ExtractLigand
-            Description: 
-            1. Iterate over results of PDB filename
-            2. If UNL detected in spot for residue name or UNK detected, then replace with LIG
-            """
-            temp=open(filename,'r')
-            results=temp.readlines()
-            temp.close()
-            tempname=filename.replace('.pdb','_TEMP.pdb')
-            temp=open(tempname,'w')
-            # STEP 1
-            for line in results:
-                linesplit=re.split(r'(\s+)', line)
-                # STEP 2
-                if 'UNL' in line:
-                    lineindex=linesplit.index('UNL')
-                    linesplit[lineindex]='LIG'
-                    line=''.join(linesplit)
-                if 'UNK' in line:
-                    lineindex=linesplit.index('UNK')
-                    linesplit[lineindex]='LIG'
-                    line=''.join(linesplit)
-        
-                temp.write(line)
-            temp.close()
-            os.rename(tempname,filename)
-
-
-        def GrabLigandCentroid(self,ligandpdbfilename):
-            """
-            Intent: Grab centroid of ligand, used for defining a pocket grid to detect any ions/waters near ligand that should be kept when running simulations.  
-            Input: Ligand PDB filename
-            Output: Coordinates of ligand centroid
-            Referenced By: pdbxyz.py - DeterminePocketGrid , docking.py - DockingWrapper 
-            Description:
-            1. Call GenerateMOLObject to grab mol from ligand PDB
-            2. Call GrabAtomPositions to determine atomic coordinates
-            3. Compute centroid of atomic positions
-            """
-            # STEP 1
-            pdbmol=self.GenerateMOLObject(ligandpdbfilename)
-            # STEP 2
-            atomvecls=self.GrabAtomPositions(pdbmol)
-            # STEP 3
-            centroid=np.array([0.0,0.0,0.0])
-            for vec in atomvecls:
-                centroid+=np.array(vec)
-            if len(atomvecls)==0:
-                raise ValueError('Ligand in PDB file is not labeled as LIG')
-            centroid=centroid/len(atomvecls)
-        
-            return centroid
-
-
-        def GrabAtomPositions(self,pdbmol):
-            """
-            Intent: Grab atomic coordinates from mol object
-            Input: mol object
-            Output: Array of atomic coordinates
-            Referenced By: GrabLigandCentroid
-            Description:
-            1. Iterate over atoms in mol object
-            2. Grab atom coordinates
-            3. Append to array of atomic coordinates
-            """
-            atomvecls=[]
-            iteratombab = openbabel.OBMolAtomIter(pdbmol)
-            # STEP 1
-            for atm in iteratombab:
-                atmindex=atm.GetIdx()
-                # STEP 2
-                coords=[atm.GetX(),atm.GetY(),atm.GetZ()]
-                # STEP 3
-                atomvecls.append(coords)
-        
-         
-            return atomvecls
-
-
-        
-
         def RepresentsInt(self,s):
             """
             Intent: Detect integers in tinker XYZ/keys for modification purposes
@@ -7519,327 +4357,6 @@ class PolarizableTyper():
             # STEP 2
             except ValueError:
                 return False
-
-
-        def ExtractLigandIndicesFromComplexXYZ(self,receptorligandxyzfilename,oldtypetonewtypelist,ligatomnums):
-            """
-            Intent: Need indices of ligands that will be annihilated and indices of ligands that will not be annihilated. Need to keep track of indices for restraints of knowing which atoms to define with "ligand" keyword. Also used for shifting type numbers if any types are overlapping in input ligand keys (generating index->new type dictionary)  
-            Input: receptor-ligand tinker XYZ, array of old type to new type dictionaries.
-            Output: dictionary of atom index to new type number, ligand indices in receptor-ligand complex, ligand indices not in complex 
-            Referenced By: MolecularDynamics 
-            Description: 
-            1. Extract old index to type index from input tinker XYZ
-            2. Define list of index to old types to keep track of previous indices used to assist with only adding correct ligand indices for each ligand into seperate arrays (reading all ligand indices from one complexed XYZ file) 
-            3. Iterate over array of dictionaries old type -> new type (one for each ligand)
-            4. Grab current old type -> new type dictionary
-            5. Grab atom number of current ligand
-            6. Define empty dictionary indextooldtypenum to keep track of number of atoms adding (stop when reach atom number of current ligand)
-            7. Get array of previous atom indices used to assist in making sure only correct atom indices are added for each seperate ligand in their own arrays.
-            8. Iterate over dictionary of old index -> type index (from tinker XYZ)
-            9. If type index in current ligand dictionary of old type -> new type and current length of indextooldtypenum hasnt reached current atom number for current ligand and indices havent been previously used then add information to indextooldtypenum (contains information of ligand indices seperated into individual dictionaries for each ligand) and indextonewtype for shifting paramteer types later.
-            10. Extract ligand indices from indextooldtypenum into seperate arrays and save in complexligands array
-            11. Generate the equivalent ligand indices from in complex but for solvation phase (assume indices are on top of box file and solvent after) 
-            """
-            # STEP 1
-            statexyzatominfo,oldindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=self.GrabXYZInfo(receptorligandxyzfilename)
-            # STEP 2
-            listofindextooldtypes=[]
-            indextonewtype={}
-            complexligands=[]
-            # STEP 3
-            for oldtypetonewtypeidx in range(len(oldtypetonewtypelist)):
-                # STEP 4
-                oldtypetonewtype=oldtypetonewtypelist[oldtypetonewtypeidx]
-                # STEP 5
-                atomnum=ligatomnums[oldtypetonewtypeidx]
-                # STEP 6
-                indextooldtypenum={}
-                # STEP 7
-                if oldtypetonewtypeidx!=0:
-                    previousindextooldtypes=listofindextooldtypes[:oldtypetonewtypeidx-1+1]
-                else:
-                    previousindextooldtypes=[]
-                previousindices=[]
-                for oindextooldtypenum in previousindextooldtypes:
-                    previousindices.extend(oindextooldtypenum.keys()) 
-                # STEP 8
-                for oldindex,typeindex in oldindextotypeindex.items():
-                    # STEP 9
-                    if typeindex in oldtypetonewtype.keys() and len(indextooldtypenum.keys())<atomnum and oldindex not in previousindices:
-                        indextooldtypenum[oldindex]=typeindex
-                        newtype=oldtypetonewtype[typeindex]
-                        indextonewtype[oldindex]=newtype
-                # STEP 10
-                listofindextooldtypes.append(indextooldtypenum)
-                complexligands.append(list(indextooldtypenum.keys()))
-            # STEP 11
-            solvligands=[]
-            count=1
-            for ligand in complexligands:
-                lig=[]
-                for i in range(len(ligand)):
-                    lig.append(count)
-                    count+=1
-                solvligands.append(lig)
-            
-
-            return indextonewtype,complexligands,solvligands
-
-
-        def GrabLigandTypesInfoForIndicesExtraction(self,ligandxyzfilenamelist):
-            """
-            Intent: Grab type numbers and atom numbers for each ligand in input tinker XYZ list. This will be used for generating list of complexed ligand indices and solvation ligand indices. Need to keep track of indices for restraints of knowing which atoms to define with "ligand" keyword. 
-            Input: List of tinker XYZs for each ligand
-            Output: List of type numbers, list of atom numbers
-            Referenced By: MolecularDynamics 
-            Description: 
-            1. Iterate over list of tinker XYZ
-            2. Call GrabTypeNumbers to grab type numbers
-            3. Append information about type numbers to array
-            4. Call GrabXYZInfo to extract total atom number
-            5. Save atom number information to array 
-            """
-            oldtypelist=[]
-            ligatomnums=[]
-            # STEP 1
-            for xyz in ligandxyzfilenamelist:
-                # STEP 2
-                ligandtypes=self.GrabTypeNumbers(xyz) 
-                oldtypetooldtype=dict(zip(ligandtypes,ligandtypes))
-                # STEP 3
-                oldtypelist.append(oldtypetooldtype)
-                # STEP 4
-                statexyzatominfo,oldindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=self.GrabXYZInfo(xyz)
-                # STEP 5
-                ligatomnums.append(stateatomnum)
-
-
-            return oldtypelist,ligatomnums
-
-
-        def ShiftParameterTypesComplexXYZ(self,receptorligandxyzfilename,indextonewtype):
-            """
-            Intent: If duplicate ligands have overlapping types, then shift them to be different (in case users wants to only annihilate one and not a duplicate). So need to shift types in tinker XYZ also. 
-            Input: Receptor-ligand XYZ file, dictionary of index to new type (replaces old type) 
-            Output: - 
-            Referenced By: MolecularDynamics
-            Description: 
-            1. Iterate over lines of tinker XYZ
-            2. Iterate over strings in each line
-            3. If string is integer, grab atom index
-            4. Grab new type number from dicionary indextonewtype
-            5. Replace new type in line
-            """
-            tempname=receptorligandxyzfilename+"_TEMP"
-            temp=open(receptorligandxyzfilename,'r')
-            results=temp.readlines()
-            temp.close()
-            temp=open(tempname,'w')
-            # STEP 1
-            for line in results:
-                linesplitall=re.split(r'(\s+)', line)
-                linesplit=line.split()
-                # STEP 2
-                for i in range(len(linesplitall)):
-                    element=linesplitall[i]
-                    if '.xyz' in receptorligandxyzfilename and (i!=12):
-                        continue
-                    if self.RepresentsInt(element):
-                        oldtypenum=np.abs(int(element))
-                        # STEP 3
-                        index=int(linesplit[0])
-                        if index in indextonewtype.keys():
-                            # STEP 4
-                            typenum=indextonewtype[index]
-                            # STEP 5
-                            linesplitall[i]=str(typenum)
-                line=''.join(linesplitall)
-                temp.write(line)
-            temp.close()
-            os.rename(tempname,receptorligandxyzfilename)
-
-
-
-        def ShiftParameterTypes(self,filename,oldtypetonewtype):
-            """
-            Intent: Shift key/XYZ types if overlapping (only for ligand XYZ/keys not complex)
-            Input: Tinker key or XYZ, dictionary of old type to new type
-            Output: - 
-            Referenced By: MolecularDynamics 
-            Description: 
-            1. Iterate over lines of tinker XYZ
-            2. Iterate over strings in each line
-            3. If string is integer, grab type from line
-            4. Grab new type number from dicionary oldtypetonewtype
-            5. If - in front of type (multipoles), then add back in front of new type
-            6. Update line with new type number 
-            """
-            tempname=filename+"_TEMP"
-            temp=open(filename,'r')
-            results=temp.readlines()
-            temp.close()
-            temp=open(tempname,'w')
-            # STEP 1
-            for line in results:
-                linesplitall=re.split(r'(\s+)', line)
-                # STEP 2
-                for i in range(len(linesplitall)):
-                    element=linesplitall[i]
-                    if '.xyz' in filename and (i!=12):
-                        continue
-                    if self.RepresentsInt(element):
-                        # STEP 3
-                        oldtypenum=np.abs(int(element))
-                        if oldtypenum in oldtypetonewtype.keys():
-                            # STEP 4
-                            newtypenum=oldtypetonewtype[oldtypenum]
-                            typenum=newtypenum
-                        else:
-                            typenum=oldtypenum
-                        # STEP 5
-                        if '-' in element:
-                            typenum=-typenum
-                        # STEP 6
-                        linesplitall[i]=str(typenum)
-                line=''.join(linesplitall)
-                temp.write(line)
-            temp.close()
-            os.rename(tempname,filename)
-
-
-        def GrabMaxTypeNumber(self,parameterfile):
-            """
-            Intent: Need max type number for shifting type numbers (dont want overlapping types for same duplicate ligands if want to disappear one and not the duplicate etc). 
-            Input: parameter or key file
-            Output: max type number
-            Referenced By: CheckIfNeedToShiftTypes, GenerateTypeMaps
-            Description: 
-            1. Assume max type number is 1
-            2. Iterate over lines of file
-            3. If atom keyword in line and its not a comment, then grab atom type number
-            4. If atom type is greater than current max, update the max type 
-            """
-            # STEP 1
-            maxnumberfromprm=1
-            temp=open(parameterfile,'r')
-            results=temp.readlines()
-            temp.close()
-            # STEP 2
-            for line in results:
-                # STEP 3
-                if 'atom' in line and '#' not in line:
-                    linesplit=line.split()
-                    atomtype=int(linesplit[1])
-                    # STEP 4
-                    if atomtype>maxnumberfromprm:
-                        maxnumberfromprm=atomtype
-            return maxnumberfromprm
-        
-        def GrabMinTypeNumber(self,parameterfile):
-            """
-            Intent: Need min type number for shifting type numbers (dont want overlapping types for same duplicate ligands if want to disappear one and not the duplicate etc). 
-            Input: parameter or key file
-            Output: min type number
-            Referenced By: CheckIfNeedToShiftTypes, GenerateTypeMaps
-            Description: 
-            1. Assume min type number is 10000
-            2. Iterate over lines of file
-            3. If atom keyword in line and its not a comment, then grab atom type number
-            4. If atom type is smaller than current min, update the min type 
-            """
-            minnumberfromprm=10000
-            temp=open(parameterfile,'r')
-            results=temp.readlines()
-            temp.close()
-            for line in results:
-                if 'atom' in line and '#' not in line:
-                    linesplit=line.split()
-                    atomtype=int(linesplit[1])
-                    if atomtype<minnumberfromprm:
-                        minnumberfromprm=atomtype
-            return minnumberfromprm
-
-        def GenerateTypeMaps(self,keyfilelist):
-            """
-            Intent: This creates old type -> new type dictionaries for each ligand, for shifting parameter types. 
-            Input: List of ligand key files
-            Output: List of old type -> new type dictionaries for each ligand. 
-            Referenced By: MolecularDynamics
-            Description: 
-            1. Iterate over array of key files
-            2. Grab min and max type number from key file
-            3. Define shift as previous max type - previous min type + 1
-            4. If min from key is smaller than current min, then update current min. 
-            5. If max from key is greater than current max, then update current max. 
-            6. Generate all types from min type from key and max type from key
-            7. Shift all the types by the shift value defined earlier
-            8. Create dictionary of old types -> shifted types
-            9. Append dictionary to list of dictionaries
-            10.Update previousmaxnumberfromkey and previousminnumberfromkey 
-            """
-            newkeyfilelist=keyfilelist.copy()
-            oldtypetonewtypelist=[]
-            currentmin=100000
-            currentmax=0
-            shift=0
-            prevmaxnumberfromkey=0
-            prevminnumberfromkey=0
-            #originalshift=self.GrabMaxTypeNumber(self.prmfilepath)
-            originalshift=0 # cant shift because max 1000 for atom classes in tinker
-            # STEP 1
-            for keyfilename in newkeyfilelist:
-                # STEP 2
-                maxnumberfromkey=self.GrabMaxTypeNumber(keyfilename)
-                minnumberfromkey=self.GrabMinTypeNumber(keyfilename)
-                # STEP 3
-                shift+=prevmaxnumberfromkey-prevminnumberfromkey+1+originalshift
-                # STEP 4
-                if minnumberfromkey<currentmin:
-                    currentmin=minnumberfromkey
-                # STEP 5
-                if maxnumberfromkey>currentmax:
-                    currentmax=maxnumberfromkey
-                # STEP 6
-                types=np.arange(minnumberfromkey,maxnumberfromkey+1,1)
-                # STEP 7
-                shiftedtypes=types+shift
-                maxtype=max(shiftedtypes)
-                currentmax=maxtype
-                # STEP 8
-                oldtypetonewtype=dict(zip(types,shiftedtypes))
-                temp={}
-                for oldtype,newtype in oldtypetonewtype.items():
-                    negold=-oldtype # for when multipoles have - in front of type number
-                    negnew=-newtype
-                    temp[negold]=negnew
-                oldtypetonewtype.update(temp)
-                # STEP 9
-                oldtypetonewtypelist.append(oldtypetonewtype)
-                # STEP 10
-                prevmaxnumberfromkey=maxnumberfromkey
-                prevminnumberfromkey=minnumberfromkey
-                
-            return oldtypetonewtypelist
-
-
-        def CheckNetChargeIsZero(self,xyzpath,keypath,alzout):
-            """
-            Intent: Binding simulations require net charge to be 0, otherwise ewald artifcacts. Just use this as sanity check.  
-            Input: Tinker XYZ, tinker key, name for tinker analyze output
-            Output: - 
-            Referenced By: boxsetup.py - BoxSetUpProtocol , productiondynamics.py - SetupProductionDynamics 
-            Description:
-            1. Call CallAnalyze with xyz,key and name of analyze output. Use option m for checking net charge. 
-            2. Read the charge and any residual charge by calling ReadCharge
-            3. If the charge is not 0, then raise error
-            """
-            # STEP 1
-            self.CallAnalyze(xyzpath,keypath,alzout,self.trueanalyzepath,'m')
-            # STEP 2
-            charge,resid=self.ReadCharge(alzout)
-            if charge!=0:
-                # STEP 3
-                raise ValueError('Net charge is not zero! Net Charge = '+str(charge)+' '+keypath)
 
 
         def GrabXYZInfo(self,xyzfile):
@@ -8053,200 +4570,6 @@ class PolarizableTyper():
             if len(self.torlist)!=0:
                 frag.WriteOutDatabaseLines(self,valenceprmlist,valkeytosmarts,smartstovdwlinelist)
 
-        def DetermineXYZEditOptions(self):
-            """
-            Intent: Parse xyzedit options via hardcoded text to determine which values to use for xyzedit
-            Input: -
-            Output: -
-            Referenced By:  MolecularDynamics
-            Description: 
-            1. Call xyzedit
-            2. Parse output for keywords and save options
-            """
-            xyzout='xyzout.txt'
-            blanktxt='blankxyzeditinput.txt'
-            temp=open(blanktxt,'w')
-            temp.write('\n')
-            temp.close()
-            cmdstr=self.xyzeditpath+' '+os.path.abspath(os.path.join(self.poltypepath, os.pardir))+r'/VersionFiles/'+'water.xyz'+' '+'<'+' '+blanktxt+' '+'>'+' '+xyzout
-            returned_value = subprocess.call(cmdstr, shell=True)
-            temp=open(xyzout,'r')
-            results=temp.readlines()
-            temp.close()
-            for line in results:
-                if self.xyzedittranslatestring in line:
-                    self.xyzedittranslatevalue=line.split()[0].replace('(','').replace(')','')
-                if self.xyzeditstraystring in line:
-                    self.xyzeditstrayvalue=line.split()[0].replace('(','').replace(')','')
-                if self.xyzeditappendstring in line:
-                    self.xyzeditappendvalue=line.split()[0].replace('(','').replace(')','')
-                if self.xyzeditperiodicstring in line:
-                    self.xyzeditperiodicvalue=line.split()[0].replace('(','').replace(')','')
-                if self.xyzeditsoakstring in line:
-                    self.xyzeditsoakvalue=line.split()[0].replace('(','').replace(')','')
-                if self.xyzeditionstring in line:
-                    self.xyzeditionvalue=line.split()[0].replace('(','').replace(')','')
-
-
-        def ReadGPUPerformance(self,outputpath):
-            temp=open(outputpath,'r')
-            results=temp.readlines()
-            temp.close()
-            for line in results:
-                if 'Performance' in line:
-                    linesplit=line.split()
-                    return float(linesplit[-1])
-
-        def ETAString(self,ETA):
-            day = ETA // (24 * 3600)
-            ETA = ETA % (24 * 3600)
-            hour = ETA // 3600
-            ETA %= 3600
-            minutes = ETA // 60
-            ETA %= 60
-            seconds = ETA
-            ETA_string="d:h:m:s-> %d:%d:%d:%d" % (day, hour, minutes, seconds)
-            return ETA_string
-
-
-        def GrabOutputFileTypeAndTime(self,filename,jobtype,index,outputlist):
-            if '_NVT.out' in filename:
-                if index==len(outputlist)-2: # last NVT
-                    totaltime=self.lastNVTequiltime
-                    outputfiletype=jobtype+'_'+'LastNVTEquilibriation'
-                    freq=1
-                    serial='True'
-                else:
-                    totaltime=self.equiltimeNVT
-                    outputfiletype=jobtype+'_'+'InitialNVTEquilibriation'
-                    freq=1
-                    serial='True'
-
-            elif '_NPT.out' in filename:
-                totaltime=self.equiltimeNPT
-                outputfiletype=jobtype+'_'+'NPTEquilibriation'
-                freq=1
-                serial='True'
-
-            elif 'E' in filename and 'V' in filename and 'Gas' not in filename:
-                totaltime=self.proddyntime
-                outputfiletype=jobtype+'_'+'ProductionDynamics'
-                freq=len(self.estatlambdascheme[0])+len(self.vdwlambdascheme[0])
-                serial='False'
-
-            else:
-                totaltime=None
-                outputfiletype=None
-                freq=None
-                serial=None
-
-
-            return totaltime,outputfiletype,freq,serial
-
-
-        def ReportETA(self):
-            if os.path.isfile(self.etafilename):
-                with open(self.etafilename) as csv_file:
-                    csv_reader = csv.reader(csv_file, delimiter=',')
-                    line_count = 0
-                    totaleta=0
-                    for row in csv_reader:
-                        if line_count == 0:
-                            pass
-                        else:
-                            jobtype,eta,freq,serial=row
-                            tempeta=float(eta)*int(freq)
-                            if serial=='False':
-                                tempeta=tempeta/self.numbergpus
-                            ETA_string=self.ETAString(tempeta)
-                            self.WriteToLog('JobType: '+jobtype+' ETA: '+ETA_string)
-                            totaleta+=tempeta
-                        line_count += 1
-                ETA_string=self.ETAString(totaleta)
-                self.WriteToLog('Number of GPUs '+str(self.numbergpus))
-                self.WriteToLog('Total ETA: '+ETA_string)
-
-
-        def EstimateDynamicTime(self):
-            if self.externalapi!=None:
-                dynamicpath=self.dynamicommpath
-            else:
-                dynamicpath=self.truedynamicpath
-            nvt=self.productiondynamicsNVT
-            ensemble=self.proddynensem
-            proddyntimestep=self.proddyntimestep # fs
-            totaltime=.01 * 1000000 # fs
-            self.proddynwritefreq=(totaltime*.001) / 10
-            steps=int(totaltime/proddyntimestep)
-            outputpaths=[]
-            for i in range(len(self.minboxfilename)):
-                minboxfilename=self.minboxfilename[i]
-                key=self.configkeyfilename[i][0]
-                outputpath='QuickMD_'+str(i)+'.out'
-                outputpaths.append(outputpath)
-                if not os.path.isfile(outputpath):
-                    cmdstr=prod.ProductionDynamicsCommand(self,minboxfilename,key,steps,ensemble,outputpath,dynamicpath,proddyntimestep,nvt)
-                    submit.call_subsystem(self,cmdstr,wait=True)
-            jobtypetoperf={}
-            for i,outputpath in enumerate(outputpaths):
-                if i==0 and self.binding is True:
-                    jobtype='Comp'
-                elif i==1 and self.binding is True:
-                    jobtype='Solv'
-                else: # solvation
-                    jobtype='Solv'
-                perf=self.ReadGPUPerformance(outputpath)
-                jobtypetoperf[jobtype]=perf
-
-            fields=['JobType','ETA','Occurance','Serial']
-            with open(self.etafilename, 'w') as csvfile:  
-                csvwriter = csv.writer(csvfile)  
-                csvwriter.writerow(fields)
-                for i,outputlist in enumerate(self.equiloutputarray):
-                    if i==0 and self.binding is True:
-                        jobtype='Comp'
-                    elif i==1 and self.binding is True:
-                        jobtype='Solv'
-                    else: # solvation
-                        jobtype='Solv'
-                    perf=jobtypetoperf[jobtype]
-                    outputfiletypetoeta={}
-                    outputfiletypetofreq={}
-                    outputfiletypetoserial={}
-                    for j,outputfile in enumerate(outputlist):
-                        head,tail=os.path.split(outputfile)
-                        totaltime,outputfiletype,freq,serial=self.GrabOutputFileTypeAndTime(tail,jobtype,j,outputlist)
-                        ETA=(totaltime/perf)*86400 # seconds
-                        ETA_string=self.ETAString(ETA)
-                        outputfiletypetoeta[outputfiletype]=ETA
-                        outputfiletypetofreq[outputfiletype]=freq
-                        outputfiletypetoserial[outputfiletype]=serial
-                for j in range(len(self.simfoldname)):
-                    simfoldname=self.simfoldname[j]
-                    perf=jobtypetoperf[simfoldname]
-                    proddynoutfilepathlistoflist=self.proddynoutfilepath[j]
-                    for k in range(len(proddynoutfilepathlistoflist)):
-                        proddynoutfilepath=proddynoutfilepathlistoflist[k]
-                        for i in range(len(proddynoutfilepath)):
-                            outputfilepath=proddynoutfilepath[i]
-                            head,tail=os.path.split(outputfilepath)
-                            totaltime,outputfiletype,freq,serial=self.GrabOutputFileTypeAndTime(tail,jobtype,i,proddynoutfilepath)
-                            if totaltime!=None:
-                                ETA=(totaltime/perf)*86400 # seconds
-                                ETA_string=self.ETAString(ETA)
-                                outputfiletypetoeta[outputfiletype]=ETA
-                                outputfiletypetofreq[outputfiletype]=freq
-                                outputfiletypetoserial[outputfiletype]=serial
-                
-                for outputfiletype,ETA in outputfiletypetoeta.items():
-                    freq=outputfiletypetofreq[outputfiletype]
-                    serial=outputfiletypetoserial[outputfiletype]
-                    row=[outputfiletype,ETA,freq,serial]
-                    csvwriter.writerow(row)
-            
-            
-
-
 
 if __name__ == '__main__':
     def RunPoltype():
@@ -8259,7 +4582,6 @@ if __name__ == '__main__':
         1. Try to run poltype
         2. If program crashes
         3. If scratch directories exist, remove them
-        4. If email is given as input send email report of crash 
         """
         poltype=PolarizableTyper() 
         # STEP 1
@@ -8275,17 +4597,5 @@ if __name__ == '__main__':
                 shutil.rmtree(poltype.scrtmpdirgau)
             if os.path.exists(poltype.scrtmpdirpsi4):
                 shutil.rmtree(poltype.scrtmpdirpsi4)
-            # STEP 4
-            if poltype.email!=None:
-                password='amoebaisbest'
-                fromaddr = 'poltypecrashreportnoreply@gmail.com'
-                toaddr = poltype.email
-                filename=poltype.logfname
-                poltype.WriteToLog(text)
-                poltype.WriteToLog('Poltype has crashed!')
-                try:
-                    poltype.SendReportEmail(text,fromaddr,toaddr,password,filename,'Poltype Crash Report ')
-                except:
-                    pass
             raise ValueError('Houston, we have a problem. Buy a developer some coffee!')
     RunPoltype()

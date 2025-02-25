@@ -23,7 +23,6 @@ import sys # used for terminaing job after fragmenter finishes and troubleshooti
 import symmetry as symm
 import shlex
 import itertools
-import apicall as call
 import math
 import re
 import networkx as nx
@@ -703,19 +702,6 @@ def FindEquivalentFragments(poltype,fragmentarray,namearray,parentindextofragind
     return newequivalentnamesarray
 
 
-def FindRotatableBond(poltype,fragmol,rotbndindextofragment,temp):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    for rotbndindex in rotbndindextofragment.keys():
-        m=rotbndindextofragment[rotbndindex]
-        if len(m.GetAtoms())==len(fragmol.GetAtoms()) and rotbndindex not in temp:
-            return rotbndindex
-
 def CopyAllQMDataAndRename(poltype,molecprefix,parentdir):
     """
     Intent:
@@ -754,7 +740,7 @@ def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog
     """
     tempmaxmem,tempmaxdisk,tempnumproc=poltype.PartitionResources()
     # keywords to be written to poltype ini file
-    init_keywords = ['poltypepath', 'bashrcpath', 'externalapi']
+    init_keywords = ['poltypepath', 'bashrcpath']
     init_keywords += ['prmmodlist']
     init_keywords += ['deleteallnonqmfiles', 'suppressdipoleerr', 'printoutput']
     init_keywords += ['numproc', 'maxmem', 'maxdisk']
@@ -858,12 +844,7 @@ def SubmitFragmentJobs(poltype,listofjobs,jobtooutputlog,jobtoinputfilepaths,job
     """
     poltype.WriteToLog('Submitting Fragment Jobs') 
     if poltype.fragmenterdebugmode==False:
-        if poltype.externalapi is not None and poltype.fragmentjobslocal==False:
-            call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilenameprefix)
-            finshedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
-
-        else:
-            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,True)
+        finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,True)
     else:
         finishedjobs=list(jobtooutputlog.keys())
         errorjobs=[]
@@ -1103,27 +1084,6 @@ def SpawnPoltypeJobsForFragments(poltype,rotbndindextoparentindextofragindex,rot
     return equivalentrotbndindexarrays,rotbndindextoringtor,rotbndindextoparentrotbndindexes,rotbndindextosmartsindexarray
 
 
-def MatchOBMolsBySubstruct(molstruct,equivalentmolstruct):
-    """
-    Intent: Map equivalent structures by RDKit substruct matching
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    indextoreferenceindex={}
-    newmol = OBMolToRDMol(ResetOBMolBond(equivalentmolstruct), tmpFormat='pdb', removeHs=False)
-    molstructrdkit = OBMolToRDMol(ResetOBMolBond(molstruct), tmpFormat='pdb', removeHs=False)
-    if newmol is None or molstructrdkit is None:
-        return indextoreferenceindex
-    p = newmol
-    matches = molstructrdkit.GetSubstructMatches(p, useChirality=False)
-    matches_new = newmol.GetSubstructMatches(p, useChirality=False)
-    if len(matches) == 0 or len(matches_new) == 0:
-        return indextoreferenceindex
-    indextoreferenceindex=dict(zip(matches[0], matches_new[0]))
-    return indextoreferenceindex
-
 def MatchOBMolsByOB(mol1, mol2):
     """
     Intent: Map equivalent structures by OpenBabel IsomorphismMapper
@@ -1322,20 +1282,6 @@ def GrabParentTorsions(poltype,rotbndindextoringtor,array,strparentrotbndindexes
     
     return tors,maintortors,tortor,nonaroringfrag,rotbndindextotors
 
-
-def CountUnderscores(poltype,string):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    count=0
-    for e in string:
-        if e=='_':
-            count+=1
-    return count
 
 def MakeFileName(poltype,string,filename):
     """
@@ -1719,17 +1665,6 @@ def WriteRdkitMolToMolFile(poltype,mol,outputname):
     rdmolfiles.MolToMolFile(mol,outputname,kekulize=False)
 
 
-def ReadRdkitMolFromMolFile(poltype,inputname):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    rdkitmol=rdmolfiles.MolFromMolFile(inputname,sanitize=False)
-    return rdkitmol
-
 def ReadMolFileToOBMol(poltype,filename):
     """
     Intent:
@@ -1759,24 +1694,6 @@ def ReadToOBMol(poltype,filename):
     tmpconv.ReadFile(fragmolbabel,filename)
     return fragmolbabel
 
-def ReadCoordToOBMol(filename):
-    """
-    Intent: Read coordinates and infer bond order using OB
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    conv1 = openbabel.OBConversion()
-    inFormat = conv1.FormatFromExt(filename)
-    conv1.SetInFormat(inFormat)
-
-    mol1=openbabel.OBMol()
-    conv1.ReadFile(mol1,filename)
-
-    mol2 = ResetOBMolBond(mol1)
-
-    return mol2
 
 def ResetOBMolBond(obmol):
     """

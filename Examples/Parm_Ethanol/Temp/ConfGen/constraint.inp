@@ -1,0 +1,3 @@
+$constrain
+  force constant=0.5
+$end

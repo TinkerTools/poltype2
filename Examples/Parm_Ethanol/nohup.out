@@ -1,0 +1,44 @@
+Running XTB optimization for extended conformer...
+Poltype -- Polarizable atom typer of small molecules for the AMOEBA polarizable force field
+Please cite:
+B. Walker, C. Liu, E. Wait, P. Ren, J. Comput. Chem. 2022, 43(23), 1530
+Version 2.3.1 Feb 2025
+Copyright (c)  Johnny Wu, Gaurav Chattree, Brandon Walker, Matthew Harger and Pengyu Ren 2019-2025
+All Rights Reserved
+##############################################################################################################
+Calling: analyze.x /home/liuchw/poltype-dev/Examples/Assets/water.xyz -k /home/liuchw/poltype-dev/Examples/Assets/water.key e> version.out
+Notice: Not latest working version of tinker (8.10.2) /home/liuchw/poltype-dev/Examples/Parm_Ethanol
+
+For help, use: python dimorphite_dl.py --help
+
+If you use Dimorphite-DL in your research, please cite:
+Ropp PJ, Kaminsky JC, Yablonski S, Durrant JD (2019) Dimorphite-DL: An
+open-source program for enumerating the ionization states of drug-like small
+molecules. J Cheminform 11:14. doi:10.1186/s13321-019-0336-9.
+
+TOR [9, 1, 2, 4]
+TOR [4, 2, 3, 6]
+Optimization terminated successfully.
+         Current function value: 0.055883
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.052511
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.052673
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.031405
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.044076
+         Iterations: 16
+         Function evaluations: 32
+Optimization terminated successfully.
+         Current function value: 0.016613
+         Iterations: 16
+         Function evaluations: 32

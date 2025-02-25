@@ -1,0 +1,59 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                       Version 8.10.1  October 2021                       ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      401   401     O     ethanol                      8     15.999     2
+      402   402     C     ethanol                      6     12.011     4
+      403   403     C     ethanol                      6     12.011     4
+      404   404     H     ethanol                      1      1.008     1
+      405   405     H     ethanol                      1      1.008     1
+      406   406     H     ethanol                      1      1.008     1
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+      401   401     O     ethanol                      8     15.999     2
+      402   402     C     ethanol                      6     12.011     4
+      403   403     C     ethanol                      6     12.011     4
+      404   404     H     ethanol                      1      1.008     1
+      405   405     H     ethanol                      1      1.008     1
+      406   406     H     ethanol                      1      1.008     1
+
+ Structure File 1 :  ethanol.xyz_2
+
+ Structure File 2 :  final.xyz_2
+
+ File 1 Frame :     1             File 2 Frame :     1
+
+ Summary of Results from Structural Superposition :
+
+ IMPOSE  --  Input Coordinates                0.006910
+ IMPOSE  --  After Translation                0.004275
+ IMPOSE  --  After Rotation                   0.003754
+
+ Root Mean Square Distance :                  0.003754        1      1
+
+   Atom in the         Atom in the            Distance          Weight
+ First Structure     Second Structure        Separated          in Fit
+
+         1-O                 1-O              0.004541         15.9990
+         2-C                 2-C              0.002353         12.0110
+         3-C                 3-C              0.003735         12.0110
+
+ Root Mean Square Distance :                  0.003754
