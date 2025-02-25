@@ -42,10 +42,6 @@ def txyz_to_xyz(ftxyz, fxyz):
     traj = mdtraj.load_arc(ftxyz)
     traj.save_xyz(fxyz)
 
-def txyz_to_pdb(ftxyz, fpdb):
-    traj = mdtraj.load_arc(ftxyz)
-    traj.save_pdb(fpdb)
-
 def read_txyz_to_rdmol(ftxyz):
     xyz_str = txyz_to_xyzblock(ftxyz)
     if xyz_str is None:
@@ -61,10 +57,6 @@ def read_txyz_to_rdmol(ftxyz):
     logging.info("Read molecule %s"%(rdmolfiles.MolToSmiles(m1)))
     return m1
 
-    #tmpfile = "tmp_convert.pdb"
-    #txyz_to_pdb(ftxyz, tmpfile)
-    #m1 = rdmolfiles.MolFromPDBFile(tmpfile, removeHs=False)
-    #return m1
 
 def read_txyz_atomtypes(ftxyz):
     atypes = []
@@ -150,9 +142,6 @@ class ParmMod(object):
             else:
                 prm = [x]
             self._terms[term].append((smarts, prm))
-
-    def reset_terms(self):
-        self._terms = defaultdict(list)
 
     def match_atomtypes(self, ftxyz, fsdf=None):
         """Find atom types that match prm definition

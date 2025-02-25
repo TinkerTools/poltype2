@@ -1,0 +1,97 @@
+nohup: appending output to 'nohup.out'
+/home/liuchw/poltype-dev/PoltypeModules/poltype.py:2177: SyntaxWarning: invalid escape sequence '\s'
+  patt_list.append(('psi4', 'header', re.compile('^\s+Psi4\: An Open-Source Ab Initio Electronic Structure Package')))
+/home/liuchw/poltype-dev/PoltypeModules/poltype.py:2178: SyntaxWarning: invalid escape sequence '\s'
+  patt_list.append(('psi4', 'date', re.compile('^\s+Psi4 (started|stopped) on: ')))
+/home/liuchw/poltype-dev/PoltypeModules/poltype.py:2179: SyntaxWarning: invalid escape sequence '\*'
+  patt_list.append(('psi4', 'tstart', re.compile('^\*\*\* (tstart|tstop)\(\) called on')))
+/home/liuchw/poltype-dev/PoltypeModules/poltype.py:2180: SyntaxWarning: invalid escape sequence '\s'
+  patt_list.append(('psi4', 'time', re.compile('^\s+total time  =\s+\S+ seconds =\s+\S+ minutes')))
+/home/liuchw/poltype-dev/PoltypeModules/poltype.py:2181: SyntaxWarning: invalid escape sequence '\s'
+  patt_list.append(('psi4', 'basis', re.compile('^\s+=> Loading Basis Set <=')))
+/home/liuchw/poltype-dev/PoltypeModules/poltype.py:2182: SyntaxWarning: invalid escape sequence '\*'
+  patt_list.append(('psi4', 'normal_term', re.compile('^\*\*\* Psi4 exiting successfully.')))
+/home/liuchw/poltype-dev/PoltypeModules/poltype.py:2183: SyntaxWarning: invalid escape sequence '\*'
+  patt_list.append(('psi4', 'error_term', re.compile('^\*\*\* Psi4 encountered an error.')))
+/home/liuchw/poltype-dev/PoltypeModules/poltype.py:2208: SyntaxWarning: invalid escape sequence '\*'
+  patt_map['psi4'].append(('normal_term', True, re.compile('^\*\*\* Psi4 exiting successfully.')))
+/home/liuchw/poltype-dev/PoltypeModules/poltype.py:2209: SyntaxWarning: invalid escape sequence '\*'
+  patt_map['psi4'].append(('error_term', True, re.compile('^\*\*\* Psi4 encountered an error.')))
+/home/liuchw/poltype-dev/PoltypeModules/poltype.py:2210: SyntaxWarning: invalid escape sequence '\('
+  patt_map['psi4'].append(('error_term', True, re.compile('^Traceback \(most recent call last\):')))
+/home/liuchw/poltype-dev/PoltypeModules/poltype.py:2211: SyntaxWarning: invalid escape sequence '\s'
+  patt_map['psi4'].append(('opt', 'error', re.compile('(^\s+Optimization failed to converge!\s+~|Could not converge geometry optimization in \d+ iterations.)')))
+/home/liuchw/poltype-dev/PoltypeModules/poltype.py:2212: SyntaxWarning: invalid escape sequence '\s'
+  patt_map['psi4'].append(('opt', 'success', re.compile('(^\s+Optimization converged!\s+~|^\s+Final optimized geometry)')))
+/home/liuchw/poltype-dev/PoltypeModules/fragmenter.py:2591: SyntaxWarning: invalid escape sequence '\['
+  smarts=smarts.replace('@','').replace('/[H]','').replace('\[H]','').replace('H3','').replace('H2','').replace('H','')
+/home/liuchw/poltype-dev/PoltypeModules/parmmod.py:246: SyntaxWarning: invalid escape sequence '\s'
+  w = re.findall('(\s+\S+)', line1)
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+normal termination of xtb
+Searching SMARTS database: 0it [00:00, ?it/s]Searching SMARTS database: 0it [00:00, ?it/s]
+Searching SMARTS database: 0it [00:00, ?it/s]Searching SMARTS database: 0it [00:00, ?it/s]
+Searching SMARTS database: 0it [00:00, ?it/s]Searching SMARTS database: 0it [00:00, ?it/s]
+Searching SMARTS database: 0it [00:00, ?it/s]Searching SMARTS database: 0it [00:00, ?it/s]
+Searching SMARTS database: 0it [00:00, ?it/s]Searching SMARTS database: 0it [00:00, ?it/s]
+Searching SMARTS database: 0it [00:00, ?it/s]Searching SMARTS database: 0it [00:00, ?it/s]
+Searching SMARTS database: 0it [00:00, ?it/s]Searching SMARTS database: 0it [00:00, ?it/s]
+amoeba09 search for [0]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [0]: 100%|██████████| 59/59 [00:00<00:00, 3412.21it/s]
+amoeba09 search for [1]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [1]: 100%|██████████| 59/59 [00:00<00:00, 1268.95it/s]
+amoeba09 search for [2]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [2]: 100%|██████████| 59/59 [00:00<00:00, 1185.52it/s]
+amoeba09 search for [3]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [3]: 100%|██████████| 59/59 [00:00<00:00, 1688.94it/s]
+amoeba09 search for [4]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [4]: 100%|██████████| 59/59 [00:00<00:00, 1636.45it/s]
+amoeba09 search for [5]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [5]: 100%|██████████| 59/59 [00:00<00:00, 1349.63it/s]
+amoeba09 search for [6]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [6]: 100%|██████████| 59/59 [00:00<00:00, 1343.36it/s]
+amoeba09 search for [7]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [7]: 100%|██████████| 59/59 [00:00<00:00, 1313.92it/s]
+amoeba09 search for [8]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [8]: 100%|██████████| 59/59 [00:00<00:00, 4000.52it/s]
+amoeba09 search for [1, 0]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [1, 0]: 100%|██████████| 59/59 [00:00<00:00, 2105.56it/s]
+amoeba09 search for [8, 0]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [8, 0]: 100%|██████████| 59/59 [00:00<00:00, 4056.25it/s]
+amoeba09 search for [2, 1]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [2, 1]: 100%|██████████| 59/59 [00:00<00:00, 1063.21it/s]
+amoeba09 search for [3, 1]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [3, 1]: 100%|██████████| 59/59 [00:00<00:00, 1170.66it/s]
+amoeba09 search for [4, 1]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [4, 1]: 100%|██████████| 59/59 [00:00<00:00, 1144.07it/s]
+amoeba09 search for [5, 2]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [5, 2]: 100%|██████████| 59/59 [00:00<00:00, 1018.97it/s]
+amoeba09 search for [6, 2]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [6, 2]: 100%|██████████| 59/59 [00:00<00:00, 1024.15it/s]
+amoeba09 search for [7, 2]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [7, 2]: 100%|██████████| 59/59 [00:00<00:00, 998.11it/s]
+amoeba09 search for [2, 1, 0]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [2, 1, 0]: 100%|██████████| 59/59 [00:00<00:00, 1269.54it/s]
+amoeba09 search for [3, 1, 0]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [3, 1, 0]: 100%|██████████| 59/59 [00:00<00:00, 1543.49it/s]
+amoeba09 search for [4, 1, 0]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [4, 1, 0]: 100%|██████████| 59/59 [00:00<00:00, 1528.98it/s]
+amoeba09 search for [8, 0, 1]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [8, 0, 1]: 100%|██████████| 59/59 [00:00<00:00, 2122.51it/s]
+amoeba09 search for [5, 2, 1]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [5, 2, 1]: 100%|██████████| 59/59 [00:00<00:00, 616.91it/s]
+amoeba09 search for [6, 2, 1]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [6, 2, 1]: 100%|██████████| 59/59 [00:00<00:00, 612.56it/s]
+amoeba09 search for [7, 2, 1]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [7, 2, 1]: 100%|██████████| 59/59 [00:00<00:00, 599.66it/s]
+amoeba09 search for [3, 1, 2]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [3, 1, 2]: 100%|██████████| 59/59 [00:00<00:00, 712.66it/s]
+amoeba09 search for [4, 1, 2]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [4, 1, 2]: 100%|██████████| 59/59 [00:00<00:00, 697.88it/s]
+amoeba09 search for [4, 1, 3]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [4, 1, 3]: 100%|██████████| 59/59 [00:00<00:00, 995.61it/s]
+amoeba09 search for [6, 2, 5]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [6, 2, 5]: 100%|██████████| 59/59 [00:00<00:00, 676.90it/s]
+amoeba09 search for [7, 2, 5]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [7, 2, 5]: 100%|██████████| 59/59 [00:00<00:00, 667.48it/s]
+amoeba09 search for [7, 2, 6]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [7, 2, 6]: 100%|██████████| 59/59 [00:00<00:00, 653.15it/s]
+amoeba09 search for [2, 1, 0]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [2, 1, 0]: 100%|██████████| 59/59 [00:00<00:00, 1275.17it/s]
+amoeba09 search for [3, 1, 0]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [3, 1, 0]: 100%|██████████| 59/59 [00:00<00:00, 1542.12it/s]
+amoeba09 search for [4, 1, 0]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [4, 1, 0]: 100%|██████████| 59/59 [00:00<00:00, 1532.20it/s]
+amoeba09 search for [8, 0, 1]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [8, 0, 1]: 100%|██████████| 59/59 [00:00<00:00, 2122.30it/s]
+amoeba09 search for [5, 2, 1]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [5, 2, 1]: 100%|██████████| 59/59 [00:00<00:00, 615.94it/s]
+amoeba09 search for [6, 2, 1]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [6, 2, 1]: 100%|██████████| 59/59 [00:00<00:00, 610.65it/s]
+amoeba09 search for [7, 2, 1]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [7, 2, 1]: 100%|██████████| 59/59 [00:00<00:00, 597.72it/s]
+amoeba09 search for [3, 1, 2]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [3, 1, 2]: 100%|██████████| 59/59 [00:00<00:00, 713.71it/s]
+amoeba09 search for [4, 1, 2]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [4, 1, 2]: 100%|██████████| 59/59 [00:00<00:00, 692.00it/s]
+amoeba09 search for [4, 1, 3]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [4, 1, 3]: 100%|██████████| 59/59 [00:00<00:00, 988.98it/s]
+amoeba09 search for [6, 2, 5]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [6, 2, 5]: 100%|██████████| 59/59 [00:00<00:00, 670.85it/s]
+amoeba09 search for [7, 2, 5]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [7, 2, 5]: 100%|██████████| 59/59 [00:00<00:00, 659.47it/s]
+amoeba09 search for [7, 2, 6]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [7, 2, 6]: 100%|██████████| 59/59 [00:00<00:00, 645.71it/s]
+amoeba09 search for [5, 2, 1, 0]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [5, 2, 1, 0]: 100%|██████████| 59/59 [00:00<00:00, 1684.09it/s]
+amoeba09 search for [6, 2, 1, 0]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [6, 2, 1, 0]: 100%|██████████| 59/59 [00:00<00:00, 1678.55it/s]
+amoeba09 search for [7, 2, 1, 0]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [7, 2, 1, 0]: 100%|██████████| 59/59 [00:00<00:00, 1616.31it/s]
+amoeba09 search for [8, 0, 1, 2]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [8, 0, 1, 2]: 100%|██████████| 59/59 [00:00<00:00, 2114.32it/s]
+amoeba09 search for [8, 0, 1, 3]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [8, 0, 1, 3]: 100%|██████████| 59/59 [00:00<00:00, 2713.48it/s]
+amoeba09 search for [5, 2, 1, 3]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [5, 2, 1, 3]: 100%|██████████| 59/59 [00:00<00:00, 1017.63it/s]
+amoeba09 search for [6, 2, 1, 3]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [6, 2, 1, 3]: 100%|██████████| 59/59 [00:00<00:00, 1002.91it/s]
+amoeba09 search for [7, 2, 1, 3]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [7, 2, 1, 3]: 100%|██████████| 59/59 [00:00<00:00, 969.68it/s]
+amoeba09 search for [8, 0, 1, 4]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [8, 0, 1, 4]: 100%|██████████| 59/59 [00:00<00:00, 2677.72it/s]
+amoeba09 search for [5, 2, 1, 4]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [5, 2, 1, 4]: 100%|██████████| 59/59 [00:00<00:00, 976.07it/s]
+amoeba09 search for [6, 2, 1, 4]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [6, 2, 1, 4]: 100%|██████████| 59/59 [00:00<00:00, 968.68it/s]
+amoeba09 search for [7, 2, 1, 4]:   0%|          | 0/59 [00:00<?, ?it/s]amoeba09 search for [7, 2, 1, 4]: 100%|██████████| 59/59 [00:00<00:00, 940.87it/s]
+/home/liuchw/poltype-dev/PoltypeModules/torsionfit.py:1102: UserWarning: color is redundantly defined by the 'color' keyword argument and the fmt string "ro" (-> color='r'). The keyword argument will take precedence.
+  l1, = ax.plot(Sx,fitfunc_dict[clskey],'ro',color='red',label='Fit')
+/home/liuchw/poltype-dev/PoltypeModules/torsionfit.py:1108: UserWarning: color is redundantly defined by the 'color' keyword argument and the fmt string "bo" (-> color='b'). The keyword argument will take precedence.
+  l2, = ax.plot(Sx,tor_energy_list,'bo',color='blue',label='QM-MM1')

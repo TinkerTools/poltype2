@@ -1,0 +1,9 @@
+    1   401   401    OH   212 #                  OH, Oxygen of Hydroxyl group 
+    2   402   402   C32    34 #                 C32, sp3 carbon with 2 Hydrogens
+    3   403   403   C33    35 #                 C33, sp3 carbon with 3 Hydrogens
+    4   404   404  HCH2    20 #                HCH2, H on sp3 carbon, -CH2-
+    5   404   404  HCH2    20 #                HCH2, H on sp3 carbon, -CH2-
+    6   405   405  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+    7   405   405  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+    8   405   405  HCH3    21 #                HCH3, H on sp3 carbon, -CH3
+    9   406   406    HO    17 #                  HO, H on Oxygen 

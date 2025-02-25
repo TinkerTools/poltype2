@@ -1,2 +1,0 @@
-Based on 2M30. PDB files (no hydrogens). Includes metal coordination and salt
-bride with metal.

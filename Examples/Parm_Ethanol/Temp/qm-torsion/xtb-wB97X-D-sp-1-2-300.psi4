@@ -1,0 +1,19 @@
+molecule { 
+0 1
+ O    1.205954   -0.393448   -0.193769
+ C    0.293534    0.405026    0.523270
+ C   -1.160048    0.040341    0.234269
+ H    0.456788    1.469733    0.300021
+ H    0.524501    0.231809    1.576579
+ H   -1.393058    0.206294   -0.816661
+ H   -1.824641    0.650646    0.839349
+ H   -1.334249   -1.007691    0.465116
+ H    1.072952   -0.245119   -1.136651
+}
+memory 4GB
+set_num_threads(2)
+psi4_io.set_default_path("/scratch/liuchw/Psi4-ethanol")
+set freeze_core True
+E, wfn = energy('wb97x-d/6-311+G*',return_wfn=True)
+oeprop(wfn,"WIBERG_LOWDIN_INDICES")
+clean()

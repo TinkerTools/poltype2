@@ -104,22 +104,6 @@ def RemoveFromList(poltype,atomlist,atm):
     return newatmlist
 
 
-def AtLeastOneHeavyLf1NeighbNotAtom(poltype,lf1atom,atom):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    foundatleastoneheavy=False
-    checkneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(lf1atom)]
-    for neighb in checkneighbs:
-        if neighb.GetIdx()!=atom.GetIdx() and neighb.GetAtomicNum()!=1:
-            foundatleastoneheavy=True
-    return foundatleastoneheavy
-
-
 def AtLeastOneHeavyNeighb(poltype,atom):
     """
     Intent:
@@ -135,19 +119,6 @@ def AtLeastOneHeavyNeighb(poltype,atom):
             foundatleastoneheavy=True
     return foundatleastoneheavy
 
-
-def GrabHeavyAtomIdx(poltype,lf1atom,atom):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    checkneighbs=[neighb for neighb in openbabel.OBAtomAtomIter(lf1atom)]
-    for neighb in checkneighbs:
-        if neighb.GetIdx()!=atom.GetIdx() and neighb.GetAtomicNum()!=1:
-            return neighb.GetIdx()
 
 def FindUniqueNonRepeatingNeighbors(poltype,nlist):
     """
@@ -489,7 +460,7 @@ def gen_peditinfile(poltype,mol):
     # write out the local frames
     iteratom = openbabel.OBMolAtomIter(mol)
     f = open (poltype.peditinfile, 'w')
-
+    f.write(f'{poltype.paramhead}\n')
 
     rdkitmol = Chem.MolFromMolFile(poltype.molstructfname,removeHs=False)
     if poltype.indextompoleframefile==None:
@@ -560,6 +531,13 @@ def gen_peditinfile(poltype,mol):
               frames.append(f'{h2+1} {n+1} {h1+1}')
               frames.append(f'{n+1} -{h1+1} -{h2+1}')
             
+            # general SP2 N with 2H
+            pattern = Chem.MolFromSmarts('[#7^2]([#1])[#1]')
+            matches = rdkitmol.GetSubstructMatches(pattern)
+            for match in matches:
+              n,h1,h2 = match
+              frames.append(f'{n+1} -{h1+1} -{h2+1}')
+
             if frames != []:
               for frame in frames:
                 f.write(f'{frame}\n')
@@ -862,7 +840,7 @@ def AverageMultipoles(poltype,optmol):
     Description: 
     """
     gen_avgmpole_groups_file(poltype)
-    avgmpolecmdstr = '"' + poltype.avgmpolesexe + "\" " + poltype.keyfname + " " + poltype.xyzfname + " " + poltype.grpfname + " " + poltype.key2fnamefromavg + " " + poltype.xyzoutfile + " " + str(poltype.prmstartidx)
+    avgmpolecmdstr = 'perl ' + '"' + poltype.avgmpolesexe + "\" " + poltype.keyfname + " " + poltype.xyzfname + " " + poltype.grpfname + " " + poltype.key2fnamefromavg + " " + poltype.xyzoutfile + " " + str(poltype.prmstartidx)
     poltype.call_subsystem([avgmpolecmdstr],True)    
     prepend_keyfile(poltype,poltype.key2fnamefromavg,optmol,True)
     statexyzatominfo,oldindextotypeindex,stateatomnum,indextocoords,indextoneighbs,indextosym=poltype.GrabXYZInfo(poltype.xyzoutfile)

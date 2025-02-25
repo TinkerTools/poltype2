@@ -4,7 +4,6 @@ from socket import gethostname
 from openbabel import openbabel
 import re
 import time
-import apicall as call
 import shlex
 import numpy as np
 import shutil
@@ -232,28 +231,6 @@ def CreatePsi4OPTInputFile(poltype,comfilecoords,comfilename,mol,modred,bondangl
     temp.close()
     outputname=os.path.splitext(inputname)[0] + '.log'
     return inputname,outputname
-
-
-
-
-def NumberInLine(poltype,line):
-    """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
-    """
-    numinline=False
-    linesplit=line.split()
-    for e in linesplit:
-        try:
-            float(e)
-            numinline=True
-        except:
-            continue
-            
-    return numinline
 
 
 def CheckIfPsi4Log(poltype,outputlog):
@@ -749,13 +726,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
                 sys.exit()
             if os.path.isfile(chkoptfname) and os.path.isfile(logoptfname):
                 os.remove(logoptfname) # if chk point exists just remove logfile, there could be error in it and we dont want WaitForTermination to catch error before job is resubmitted by daemon 
-            if poltype.externalapi==None:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,True) # have to skip errors because setting optmaxcycle to low number in gaussian causes it to crash
-            else:
-                if len(jobtooutputlog.keys())!=0:
-                    call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilepathprefix)
-                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
-
+            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,True) # have to skip errors because setting optmaxcycle to low number in gaussian causes it to crash
             cmdstr = poltype.formchkexe + " " + chkoptfname
             poltype.call_subsystem([cmdstr],True)
         term,error=poltype.CheckNormalTermination(logoptfname,errormessages=None,skiperrors=True)
@@ -816,19 +787,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
         if os.path.isfile(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}'):
             os.remove(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}')
 
-        # Run PySCF with either external API 
-        # or SerialLocalHost
-        if poltype.externalapi==None:
-            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(cmd_to_run,skiperrors)
-        else:
-            jobtoinputfilepaths = {cmd: [f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_inp_file}']}
-            jobtooutputfiles = {cmd: [f'{Opt_prep.PySCF_out_file}']}
-            jobtoabsolutebinpath = {cmd: poltype.which('pyscf')}
-            scratchdir = poltype.scrtmpdirpsi4
-            jobtologlistfilepathprefix = f'{Opt_prep.init_data["topdir"]}/optimization_jobtolog_{poltype.molecprefix}'
-       
-            call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilepathprefix)
-            finishedjobs,errorjobs=poltype.WaitForTermination(f'{Opt_prep.init_data["topdir"]}/{Opt_prep.PySCF_out_file}',False) 
+        finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(cmd_to_run,skiperrors)
 
         # Check normal termination of PySCF job
         term,error=poltype.CheckNormalTermination(f'{Opt_prep.PySCF_out_file}',None,skiperrors)
@@ -876,12 +835,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
 
             if os.path.isfile(logoptfname):
                 os.remove(logoptfname)
-            if poltype.externalapi==None:
-                finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,skiperrors)
-            else:
-                if len(jobtooutputlog.keys())!=0:
-                    call.CallExternalAPI(poltype,jobtoinputfilepaths,jobtooutputfiles,jobtoabsolutebinpath,scratchdir,jobtologlistfilepathprefix)
-                finishedjobs,errorjobs=poltype.WaitForTermination(jobtooutputlog,False)
+            finishedjobs,errorjobs=poltype.CallJobsSeriallyLocalHost(jobtooutputlog,True) # have to skip errors because setting optmaxcycle to low number in gaussian causes it to crash
 
         term,error=poltype.CheckNormalTermination(logoptfname,None,skiperrors) # now grabs final structure when finished with QM if using Psi4
         if error and term==False and skiperrors==False:
