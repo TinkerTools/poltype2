@@ -434,3 +434,6 @@
 [$([n;r6])]                                             nr6                 # Aromatic N in 6-member rings 
 [$([H][#7H1;r5])]                                       H-NH1r5             # H on N (with 1H) in 5-member rings 
 [$([n]1[c][n][c][n][c]1)]                               n-azine             # N of Azine (3N+3C) ring 
+
+# C+(NH2)2, probed using water
+[$([H][NH2]=[CX3])]                                     H-NH2C+             # H connected to NH2C+
