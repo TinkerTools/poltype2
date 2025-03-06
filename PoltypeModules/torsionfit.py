@@ -1670,8 +1670,8 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
                 if middle==themiddle or middle==themiddle[::-1]:
                     STR_prm += f'For TOR: {testkey} -> PRM: v1={round(write_prm_dict[testkey][1],4)} v2={round(write_prm_dict[testkey][2],4)} v3={round(write_prm_dict[testkey][3],4)}\n'
                     cnt_str += 1
-            y_pos_str = 1.0 + 0.05*cnt_str
-            ax.text(0.05, y_pos_str, f'{STR_prm}', transform=ax.transAxes, fontsize=12,verticalalignment='top')
+            y_pos_str = 1.0 - 0.01*cnt_str
+            ax.text(0.1, y_pos_str, f'{STR_prm}', transform=plt.gcf().transFigure, fontsize=13,verticalalignment='top')
             
 
 
@@ -1696,7 +1696,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             if poltype.tordebugmode==True:
                 plt.legend(handles=[line1,line2,line3,line4,line5],loc=9, bbox_to_anchor=(0.5, -0.1), ncol=5)
             else:
-                plt.legend(handles=[line1,line2,line3,line4],loc=9, bbox_to_anchor=(0.5, -0.05), ncol=4, fontsize=12)
+                plt.legend(handles=[line1,line2,line3,line4],loc=9, bbox_to_anchor=(0.5, -0.07), ncol=4, fontsize=12)
 
             ax.set_xlabel('Dihedral Angle (degrees)', fontsize=12)
             ax.set_ylabel('Energy (kcal/mol)', fontsize=12)
@@ -1704,7 +1704,7 @@ def eval_rot_bond_parms(poltype,mol,fitfunc_dict,tmpkey1basename,tmpkey2basename
             ax.tick_params(axis='both', which='minor', labelsize=10)
 
             if cnt_str > 3:
-                plt.subplots_adjust(top=0.05*cnt_str,bottom=0.1)
+                plt.subplots_adjust(top=1.0-0.035*cnt_str,bottom=0.1)
             fig = plt.gcf()
             plt.show()
             fig.savefig(figfname)
