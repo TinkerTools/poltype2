@@ -146,7 +146,7 @@
 #torsion      59   40   56   57      0.000 0.0 1   0.000 180.0 2   0.000 0.0 3
 [#1][CX4;H2,H3][NX3]([H])[CX3](=O) % 1,2,3,4 % 0.000, 0.000, 0.000 % Nmethylacetamide H-CH3-NX3(-CX3(=O))-H
 #torsion      64   40   62   55     -0.154 0.0 1   0.044 180.0 2  -0.086 0.0 3
-[#1][CH3][CH](=O) % 1,2,3,4 % -0.154, 0.044, -0.086 % Acetaldyhe H-CH3-CH=O
+[#1][CH3][C](=O)[OH,H] % 1,2,3,4 % -0.154, 0.044, -0.086 % Acetaldyhe H-CH3-CH=O
 #torsion      64   40   62   60      0.250 0.0 1   0.850 180.0 2   0.000 0.0 3
 [#1][CH3][C](=O)[OH] % 1,2,3,5 % 0.250, 0.850, 0.000 % Acetic acid % H-CH3-C(=O)-OH
 #torsion      64   40   62   63      0.115 0.0 1   0.027 180.0 2   0.285 0.0 3
@@ -190,7 +190,8 @@
 #torsion      61   60   62   40      0.000 0.0 1   5.390 180.0 2   1.230 0.0 3
 [H][O][C](=O)[#6X4;H2,H3] % 1,2,3,5 % 0.000, 5.390, 1.230 % Acetic acide H-O-C(=O)-CX4
 #torsion      61   60   62   55     -1.200 0.0 1   5.390 180.0 2   0.400 0.0 3
-[H][O][C](=O)[#6X4;H2,H3] % 1,2,3,4 % -1.200, 5.390, 0.400 % Acetic acide H-O-C=O(-CX4)
+[H][O][C](=O)[H] % 1,2,3,4 % -1.200, 5.390, 0.400 % Acetic acide H-O-C=O(-CX4)
+[H][O][C](=O)[#6X4,H2,H3] % 1,2,3,4 % -1.200, 5.390, 0.400 % Acetic acide H-O-C=O(-CX4)
 #torsion      61   60   62   63     -0.300 0.0 1   5.390 180.0 2   0.000 0.0 3
 [H][O][C](=O)[H] % 1,2,3,5 % -0.300, 5.390, 0.000 % Formic acid H-O-C(=O)-H
 #torsion      69   62   67   62      0.000 0.0 1   0.000 180.0 2   0.660 0.0 3
@@ -245,9 +246,13 @@
 #torsion      40   89   89   90      0.000 0.0 1   6.104 180.0 2   0.000 0.0 3
 [CX4;H2,H3][c]1[c]([H])[c][c][c][c]1 % 1,2,3,4 % 0.000, 6.104, 0.000 % Toluene CX4-c-c-H TM: Need to add pitor
 #torsion      89   89   89   89     -0.670 0.0 1   4.004 180.0 2   0.000 0.0 3
-[c]1([CX3,CX3,OH])[c][c][c][c][c]1 % 1,3,4,5 % -0.670, 4.004, 0.000 %p-cresol, phenol, toluene with c1 CX4 and/or OH and c4 CX4 or OH or H TM: NEed to add pitor
+[c]1([CX3,CX4,OH])[c][c][c][c][c]1 % 1,3,4,5 % -0.670, 4.004, 0.000 %p-cresol, phenol, toluene with c1 CX4 and/or OH and c4 CX4 or OH or H TM: NEed to add pitor
+[c]1([CX3,CX4,OH])[c][c][c][c][c]1 % 3,1,7,6 % -0.670, 4.004, 0.000 %p-cresol, phenol, toluene with c1 CX4 and/or OH and c4 CX4 or OH or H TM: NEed to add pitor
+[c]1([CX3,CX4,OH])[c][c][c][c][c]1 % 4,5,6,7 % -0.670, 4.004, 0.000 %p-cresol, phenol, toluene with c1 CX4 and/or OH and c4 CX4 or OH or H TM: NEed to add pitor
 #torsion      89   89   89   90      0.550 0.0 1   4.534 180.0 2  -0.550 0.0 3
-[c]1([CX3,CX4,OH])[c][c]([H])[c][c][c]1 % 1,3,4,5 % 0.550, 4.534, -0.550 % p-cresol, Phenol, toluene c-c-c-H TM: Need to add pitor
+[c]1[c][c]([H])[c]([CX3,CX4,OH])[c][c]1 % 1,2,3,4 % 0.550, 4.534, -0.550 % p-cresol, Phenol, toluene c-c-c-H TM: Need to add pitor
+[c]1[c][c]([H])[c][c]([CX3,CX4,OH])[c]1 % 1,2,3,4 % 0.550, 4.534, -0.550 % p-cresol, Phenol, toluene c-c-c-H TM: Need to add pitor
+[c]1[c][c]([H])[c][c][c]1([CX3,CX4,OH]) % 1,2,3,4 % 0.550, 4.534, -0.550 % p-cresol, Phenol, toluene c-c-c-H TM: Need to add pitor
 #torsion      89   89   89   99     -0.610 0.0 1   4.212 180.0 2   0.000 0.0 3
 [c]1([CX3](=[NH])[NX3])[c][c][c][c][c]1 % 2,1,5,6 % -0.610, 4.212, 0.000 % Benzamidine CN2-c-c-c TM: Need to add pitor
 #torsion      90   89   89   90      0.000 0.0 1   4.072 180.0 2   0.000 0.0 3
@@ -260,10 +265,13 @@
 [CX4;H2,H3][c]1[c][n][c][n]1[H] % 7,6,2,1 % 0.000, 4.104, 0.000 % 4-Ethylimidazole H-n-c-CX4
 #torsion      46   91   92   91     -2.744 0.0 1  15.000 180.0 2   0.000 0.0 3
 [CX4;H2,H3][c]1[c][n][c][n]1[H] % 7,6,5,4 % -2.744, 15.000, 0.000 % 4-Ethylimidazole H-n-c-n
+[H][c]1[c][n][c][n]1[H] % 7,6,5,4 % -2.744, 15.000, 0.000 % 4-Ethylimidazole H-n-c-n
 #torsion      46   91   92   92     -3.150 0.0 1   8.000 180.0 2   0.000 0.0 3
 [CX4;H2,H3][c]1[c][n][c][n]1[H] % 7,6,2,3 % -3.150, 8.000, 0.000 % 4-Ethylimidazole H-n-c-c
+[H][c]1[c][n][c][n]1[H] % 7,6,2,3 % -3.150, 8.000, 0.000 % imidazole H-n-c-c
 #torsion      46   91   92   93     -0.530 0.0 1   3.000 180.0 2   0.000 0.0 3
 [CX4;H2,H3][c]1[c][n][c]([H])[n]1[H] % 8,7,5,6 % -0.530, 3.000, 0.000 % 4-Ethylimidazole H-n-c-H
+[H][c]1[c][n][c]([H])[n]1[H] % 8,7,5,6 % -0.530, 3.000, 0.000 % imidazole H-n-c-H
 #torsion      92   91   92   40      0.000 0.0 1   4.212 180.0 2   0.000 0.0 3
 [CX4;H2,H3][c]1[c][n][c][n]1 % 5,6,2,1 % 0.000, 4.212, 0.000 % 4-Ethylimidazole c-n-c-CX4
 #torsion      92   91   92   91      0.000 0.0 1  15.000 180.0 2   0.000 0.0 3
