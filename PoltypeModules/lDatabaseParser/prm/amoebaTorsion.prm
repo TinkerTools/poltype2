@@ -431,3 +431,8 @@
 [#1][#6H2][#6H2][#1]           % 1,2,3,4  % 0.000, 0.000, 0.299  % Butane H-CH2-CH2-H from amoeba09
 
 
+#########################################
+#        Drug-like molecules            #
+#########################################
+[H][NH2]=[C][NH2]           % 1,2,3,4  % 0.000, 1.200, 0.800  % Parameters for Benzimidazole
+[H][NH2][C]=[NH2]           % 1,2,3,4  % 0.000, 1.200, 0.800  % Parameters for Benzimidazole
