@@ -279,9 +279,24 @@
 #torsion      52   40   40   52      0.000 0.0 1   0.000 180.0 2   0.299 0.0 3
 [#1][CH2]1[CH2]([H])[CH2][NX3][CH2]1 % 1,2,3,4 % 0.000, 0.000, 0.299 % Pyrolidine H-CH-CH-H
 #torsion      29   29   29   29      0.854 0.0 1  -0.374 180.0 2   0.108 0.0 3
-[A]1[C,A][C][C][C,A][C]1 % 2,3,4,5 % 0.854, -0.374, 0.108 % General A-C-C-A cycle
+[A]1[A][A][A][A][A]1 % 1,2,3,4 % 0.854, -0.374, 0.108 % General A-A-A-A cycle for non aromatic bond ring
+[A]1[A][A][A][A][A]1 % 2,3,4,5 % 0.854, -0.374, 0.108 % General A-A-A-A cycle for non aromatic bond ring
+[A]1[A][A][A][A][A]1 % 3,4,5,6 % 0.854, -0.374, 0.108 % General A-A-A-A cycle for non aromatic bond ring
+[A]1[A][A][A][A][A]1 % 4,5,6,1 % 0.854, -0.374, 0.108 % General A-A-A-A cycle for non aromatic bond ring
+[A]1[A][A][A][A][A]1 % 5,6,1,2 % 0.854, -0.374, 0.108 % General A-A-A-A cycle for non aromatic bond ring
+[A]1[A][A][A][A][A]1 % 6,1,2,3 % 0.854, -0.374, 0.108 % General A-A-A-A cycle for non aromatic bond ring
+#torsion      29   29   29   29      0.854 0.0 1  -0.374 180.0 2   0.108 0.0 3
+[A]1([*;!#1])[A][A][A][A][A]1 % 2,1,3,4 % 0.854, -0.374, 0.108 % General X-A-A-A cycle for non aromatic bond ring
+[A]1([*;!#1])[A][A][A][A][A]1 % 2,1,7,6 % 0.854, -0.374, 0.108 % General X-A-A-A cycle for non aromatic bond ring
+[A]1[A]([*;!#1])[A][A][A][A]1 % 3,2,1,7 % 0.854, -0.374, 0.108 % General X-A-A-A cycle for non aromatic bond ring
+[A]1[A]([*;!#1])[A][A][A][A]1 % 3,2,4,5 % 0.854, -0.374, 0.108 % General X-A-A-A cycle for non aromatic bond ring
+[A]1[A][A]([*;!#1])[A][A][A]1 % 4,3,2,1 % 0.854, -0.374, 0.108 % General X-A-A-A cycle for non aromatic bond ring
+[A]1[A][A]([*;!#1])[A][A][A]1 % 4,3,5,6 % 0.854, -0.374, 0.108 % General X-A-A-A cycle for non aromatic bond ring
+
 #torsion      29   29   29   30      0.000 0.0 1   0.000 180.0 2   0.108 0.0 3
-[H][C]1[C,A][C][C][C,A][C]1 % 1,2,3,4 % 0.000, 0.000, 0.108 % General H-C-A-C cycle
+[H][A]1[A][A][A][A][A]1 % 1,2,3,4 % 0.000, 0.000, 0.108 % General H-C-A-C cycle or non aromatic bond r
+ing
+
 
 #########################################
 #             Amide groups              #
