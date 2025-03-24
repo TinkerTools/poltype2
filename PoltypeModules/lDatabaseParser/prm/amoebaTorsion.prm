@@ -260,7 +260,12 @@
 [c]1([H])[c]([H])[c][c][a][c]1 % 2,1,3,4 %0.000, 6.355, 0.000 % Benzene H-c-c-H
 [c]1([H])[c]([H])[c][a][c][c]1 % 2,1,3,4 %0.000, 6.355, 0.000 % Benzene H-c-c-H
 [c]1([H])[c]([H])[c][c][c][a]1 % 2,1,3,4 %0.000, 6.355, 0.000 % Benzene H-c-c-H
-
+#torsion      89   89   89   89     -0.670 0.0 1   4.004 180.0 2   0.000 0.0 3
+[*;!#1][c;R][c;R][*!#1;!R] % 1,2,3,4 % -0.670, 6.287, 0.000 % General *-c-c-*1 *1 is anything but not a H and not in Ring and * is anything but not a H
+[*;!#1][c;R][c;R]([*!#1;!R])[*;!#1] % 1,2,3,5 % -0.670, 6.287, 0.000 % General *-c-c-*1 *1 is anything but not a H and not in Ring and * is anything but not a H
+#torsion      89   89   89   90      0.550 0.0 1   4.534 180.0 2  -0.550 0.0 3
+[H][c;R][c;R][*!#1;!R] % 1,2,3,4 % 0.550, 6.187, -0.550 % General H-c-c-*1 *1 is anything but not a H and not in Ring and * is anything but not a H
+[H][c;R][c;R]([*!#1;!R])[*;!#1] % 1,2,3,5 % 0.550, 11.384, -0.550 % General *-c-c-*1 *1 is anything but not a H and not in Ring and * is anything but not a H
 
 #########################################
 #         Non-Aromatic cycles           #
