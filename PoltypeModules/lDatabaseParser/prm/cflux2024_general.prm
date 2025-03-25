@@ -1,277 +1,277 @@
-Hother_Cother           0.015                   
-Hother_Nother           -0.077                  
-Cother_Nother           0.0                     
-Hother_Oother           0.015                   
-Cother_Oother           0.0                     
-Cother_Csp2             0.0                     
-Csp2_Osp2               0.0                     
-Csp2_Nother             0.0                     
-Csp2_Oother             0.0                     
-Har_Nar                 0.0                     
-Car_Nar                 0.0                     
-Car_Oother              0.0                     
-Car_Car                 0.0                     
-Har_Car                 0.0                     
-Hother_Csp2             0.139                   
-Csp2_Csp2               0.0                     
-Cother_Cother           0.0                     
-Cother_Sother           0.0                     
-Hother_Sother           0.079                   
-Cother_S=X              0.0                     
-Osp2_S=X                0.0                     
-Fother_Car              0.0                     
-Clother_Car             0.0                     
-Brother_Car             0.0                     
-Brar_Car                0.0                     
-Fother_Cother           0.0                     
-Clother_Cother          0.0                     
-Brother_Cother          0.0                     
-Oother_PwoH             0.0                     
-Osp2_PwoH               0.0                     
-Car_Cother              0.0                     
-Cother_Car              0.0                     
-Car_Nother              0.0                     
-Cother_Nsp2             0.0                     
-Csp2_Nsp2               0.0                     
-Csp_Nsp                 0.0                     
-Cother_Csp              0.0                     
-Sother_Sother           0.0                     
-Clother_Csp2            0.0                     
-Fother_Csp2             0.0                     
-Brother_Csp2            0.0                     
-Car_Csp                 0.0                     
-Hother_PwH              0.0                  
-Hother_Nsp2             0.181                   
-Nsp2_Osp2               0.0                     
-Car_Nsp2                0.0                     
-Nother_Oother           0.0                     
-Nother_Osp2             0.0                     
-Nother_Nother           0.0                     
-Oother_Sother           0.0                     
-Car_Sother              0.0                     
-Csp_Sother              0.0                     
-Hother_Osp2             0.0                   
-Car_Csp2                0.0                     
-Cother_Nar              0.0                     
-Csp2_Sother             0.0                     
-Car_Oar                 0.0                     
-Nother_S=X              0.0                     
-Iother_Cother           0.0                     
-Iother_Car              0.0                     
-Car_Sar                 0.0                     
-Nar_Nar                 0.0                     
-Csp2_Car                0.0                     
-Car_S=X                 0.0                     
-Oother_Oother           0.0                     
-Hother_Cother_Hother    -0.010  -0.010  -0.015  -0.015
-Hother_Nother_Hother    0.301   0.301   0.031   0.031
-Hother_Nother_Cother    0.068   0.059   0.005   0.005
-Hother_Cother_Nother    0.071   0.070   0.002   0.002
-Hother_Oother_Cother    0.065   -0.083  -0.020  -0.020
-Hother_Cother_Oother    -0.076  0.146   0.051   0.051
-Hother_Cother_Csp2      0.123   0.046   -0.024  -0.024
-Cother_Csp2_Osp2        0.0     0.0     0.0     0.0
-Cother_Csp2_Nother      0.112      0.059      0.124      0.057
-Nother_Csp2_Osp2     -0.019     -0.173      0.400      0.394
-Hother_Nother_Csp2      0.060   0.014   -0.049  -0.049
-Cother_Nother_Csp2      0.0     0.0     0.0     0.0
-Oother_Csp2_Osp2        0.0     0.0     0.0     0.0
-Cother_Csp2_Oother      0.148      0.104      0.237      0.059
-Hother_Oother_Csp2      0.088   0.008   -0.063  -0.063
-Har_Nar_Car             0.0     0.0     0.0     0.0
-Car_Nar_Car             0.0     0.0     0.0     0.0
-Nar_Car_Oother          0.0     0.0     0.0     0.0
-Car_Car_Nar             0.0     0.0     0.0     0.0
-Car_Car_Oother          0.0     0.0     0.0     0.0
-Har_Car_Car             0.0     0.0     0.0     0.0
-Car_Car_Car             0.0     0.0     0.0     0.0
-Har_Car_Nar             0.0     0.0     0.0     0.0
-Nar_Car_Nar             0.0     0.0     0.0     0.0
-Hother_Csp2_Hother      0.064   0.064   -0.067  -0.067
-Hother_Csp2_Csp2        0.005   0.028   -0.043  -0.043
-Hother_Cother_Cother    -0.012  0.046   -0.019  -0.019
-Cother_Cother_Cother    0.0     0.0     0.0     0.0
-Hother_Cother_Sother    -0.002  0.092   -0.016  -0.016
-Hother_Sother_Cother    -0.098  0.063   0.002   0.002
-Hother_Cother_S=X       0.067   0.108   -0.041  -0.041
-Cother_S=X_Osp2         0.0     0.0     0.0     0.0
-Cother_S=X_Cother       0.0     0.0     0.0     0.0
-Fother_Car_Car          0.0     0.0     0.0     0.0
-Clother_Car_Car         0.0     0.0     0.0     0.0
-Brother_Car_Car         0.0     0.0     0.0     0.0
-Brar_Car_Car            0.0     0.0     0.0     0.0
-Cother_Sother_Cother    0.0     0.0     0.0     0.0
-Cother_Nother_Cother    0.0     0.0     0.0     0.0
-Cother_Cother_Nother    0.0     0.0     0.0     0.0
-Hother_Oother_Car       0.153   0.006   -0.075  -0.075
-Fother_Cother_Fother    0.0     0.0     0.0     0.0
-Fother_Cother_Hother    0.088   0.025   0.085   0.085
-Clother_Cother_Clother  0.0     0.0     0.0     0.0
-Clother_Cother_Hother   0.077   -0.017  -0.084  -0.084
-Brother_Cother_Brother  0.0     0.0     0.0     0.0
-Brother_Cother_Hother   0.065   -0.006  -0.031  -0.031
-Oother_PwoH_Oother      0.0     0.0     0.0     0.0
-Oother_PwoH_Osp2        0.0     0.0     0.0     0.0
-Hother_Oother_PwoH      -0.005  0.015   -0.071  -0.071
-Csp2_Csp2_Nother        0.0     0.0     0.0     0.0
-Hother_Csp2_Nother      0.009   -0.007  -0.009  -0.009
-Nother_Csp2_Nother      0.0     0.0     0.0     0.0
-Hother_Csp2_Osp2        -0.001  -0.103  0.008   0.008
-Hother_Csp2_Oother      -0.364  -0.023  0.006   0.006
-Cother_Cother_Oother    0.0     0.0     0.0     0.0
-Hother_Cother_Car       0.086   0.073   0.023   0.023
-Car_Car_Cother          0.0     0.0     0.0     0.0
-Cother_Car_Car          0.0     0.0     0.0     0.0
-Cother_Car_Nar          0.0     0.0     0.0     0.0
-Nother_Car_Nar          0.0     0.0     0.0     0.0
-Car_Car_Nother          0.0     0.0     0.0     0.0
-Hother_Nother_Car       0.354   0.229   -0.033  -0.033
-Hother_Sother_Hother    0.067   0.067   0.000   0.000
-Cother_Nsp2_Csp2        0.0     0.0     0.0     0.0
-Car_Cother_Nsp2         0.0     0.0     0.0     0.0
-Nother_Cother_Nsp2      0.0     0.0     0.0     0.0
-Car_Cother_Nother       0.0     0.0     0.0     0.0
-Csp2_Nother_Car         0.0     0.0     0.0     0.0
-Nsp2_Csp2_Nother        0.0     0.0     0.0     0.0
-Hother_Csp2_Nsp2        0.006   0.000   0.019   0.019
-Hother_Cother_Csp       0.166   0.055   0.000   0.000
-Cother_Csp_Nsp          0.0     0.0     0.0     0.0
-Cother_Cother_Sother    0.0     0.0     0.0     0.0
-Cother_Csp2_Cother      0.0     0.0     0.0     0.0
-Cother_Oother_Cother    0.0     0.0     0.0     0.0
-Hother_Csp2_Cother      0.040   0.062   -0.008  -0.008
-Csp2_Oother_Csp2        0.0     0.0     0.0     0.0
-Osp2_Csp2_Oother        0.0     0.0     0.0     0.0
-Nother_Csp2_Oother      0.0     0.0     0.0     0.0
-Cother_Cother_Csp2      0.0     0.0     0.0     0.0
-Osp2_S=X_Osp2           0.0     0.0     0.0     0.0
-Cother_Cother_S=X       0.0     0.0     0.0     0.0
-Cother_Sother_Sother    0.0     0.0     0.0     0.0
-Clother_Csp2_Osp2       0.0     0.0     0.0     0.0
-Clother_Csp2_Cother     0.0     0.0     0.0     0.0
-Fother_Csp2_Osp2        0.0     0.0     0.0     0.0
-Fother_Csp2_Cother      0.0     0.0     0.0     0.0
-Brother_Csp2_Osp2       0.0     0.0     0.0     0.0
-Brother_Csp2_Cother     0.0     0.0     0.0     0.0
-Cother_Oother_Csp2      0.0     0.0     0.0     0.0
-Oother_Csp2_Oother      0.0     0.0     0.0     0.0
-Oother_Cother_Oother    0.0     0.0     0.0     0.0
-Car_Car_Csp             0.0     0.0     0.0     0.0
-Car_Csp_Nsp             0.0     0.0     0.0     0.0
-Hother_PwH_Hother       0.000   0.000   0.000   0.000
-Car_Oother_Cother       0.0     0.0     0.0     0.0
-Cother_Csp2_Nsp2        0.0     0.0     0.0     0.0
-Cother_Cother_Nsp2      0.0     0.0     0.0     0.0
-Hother_Cother_Nsp2      -0.194  0.019   0.032   0.032
-Hother_Nsp2_Csp2        0.049   0.020   0.002   0.002
-Csp2_Cother_Csp2        0.0     0.0     0.0     0.0
-Csp2_Csp2_Oother        0.0     0.0     0.0     0.0
-Csp2_Csp2_Osp2          0.0     0.0     0.0     0.0
-Cother_Csp2_Csp2        0.0     0.0     0.0     0.0
-Csp2_Nother_Csp2        0.0     0.0     0.0     0.0
-Osp2_Nsp2_Osp2          0.0     0.0     0.0     0.0
-Cother_Nsp2_Osp2        0.0     0.0     0.0     0.0
-Car_Nsp2_Osp2           0.0     0.0     0.0     0.0
-Car_Car_Nsp2            0.0     0.0     0.0     0.0
-Cother_Oother_Nother    0.0     0.0     0.0     0.0
-Oother_Nother_Osp2      0.0     0.0     0.0     0.0
-Car_Nother_Nother       0.0     0.0     0.0     0.0
-Oother_Sother_Oother    0.0     0.0     0.0     0.0
-Cother_Sother_Oother    0.0     0.0     0.0     0.0
-Hother_Oother_Sother    0.013   -0.038  -0.103  -0.103
-Car_Sother_Oother       0.0     0.0     0.0     0.0
-Car_Car_Sother          0.0     0.0     0.0     0.0
-Cother_Oother_Sother    0.0     0.0     0.0     0.0
-Cother_Sother_Csp       0.0     0.0     0.0     0.0
-Nsp_Csp_Sother          0.0     0.0     0.0     0.0
-Car_Sother_Csp          0.0     0.0     0.0     0.0
-Csp2_Csp2_Csp2          0.0     0.0     0.0     0.0
-Hother_Osp2_Nsp2        -0.060  0.052   -0.039  -0.039
-Csp2_Nsp2_Osp2          0.0     0.0     0.0     0.0
-Car_Cother_Oother       0.0     0.0     0.0     0.0
-Car_Cother_Cother       0.0     0.0     0.0     0.0
-Car_Car_Csp2            0.0     0.0     0.0     0.0
-Car_Csp2_Osp2           0.0     0.0     0.0     0.0
-Hother_Csp2_Car         0.096   0.103   0.049   0.049
-Car_Csp2_Oother         0.0     0.0     0.0     0.0
-Csp2_Cother_Nother      0.0     0.0     0.0     0.0
-Osp2_PwoH_Oother        0.0     0.0     0.0     0.0
-Cother_Oother_PwoH      0.0     0.0     0.0     0.0
-Csp2_Cother_Oother      0.0     0.0     0.0     0.0
-Fother_Cother_Cother    0.0     0.0     0.0     0.0
-Clother_Cother_Cother   0.0     0.0     0.0     0.0
-Brother_Cother_Cother   0.0     0.0     0.0     0.0
-Nother_Csp2_Nsp2        0.0     0.0     0.0     0.0
-Cother_Cother_Csp       0.0     0.0     0.0     0.0
-Cother_Nar_Car          0.0     0.0     0.0     0.0
-Hother_Cother_Nar       -0.029  0.093   0.027   0.027
-Nar_Cother_Oother       0.0     0.0     0.0     0.0
-Cother_Cother_Nar       0.0     0.0     0.0     0.0
-Osp2_PwoH_Osp2          0.0     0.0     0.0     0.0
-Cother_Sother_Csp2      0.0     0.0     0.0     0.0
-Osp2_Csp2_Sother        0.0     0.0     0.0     0.0
-Cother_Csp2_Sother      0.0     0.0     0.0     0.0
-Car_Oar_Car             0.0     0.0     0.0     0.0
-Car_Car_Oar             0.0     0.0     0.0     0.0
-Cother_Car_Oar          0.0     0.0     0.0     0.0
-Nother_S=X_Osp2         0.0     0.0     0.0     0.0
-Cother_S=X_Nother       0.0     0.0     0.0     0.0
-Cother_Nother_S=X       0.0     0.0     0.0     0.0
-Hother_Nother_S=X       0.252   -0.040  -0.054  -0.054
-Cother_Cother_Car       0.0     0.0     0.0     0.0
-Iother_Cother_Hother    0.085   0.000   -0.136  -0.136
-Iother_Cother_Iother    0.0     0.0     0.0     0.0
-Fother_Cother_Car       0.0     0.0     0.0     0.0
-Clother_Cother_Car      0.0     0.0     0.0     0.0
-Iother_Cother_Car       0.0     0.0     0.0     0.0
-Iother_Car_Car          0.0     0.0     0.0     0.0
-Brother_Cother_Car      0.0     0.0     0.0     0.0
-Car_Cother_Car          0.0     0.0     0.0     0.0
-Car_Oother_Car          0.0     0.0     0.0     0.0
-Car_Nother_Car          0.0     0.0     0.0     0.0
-Car_Nother_Cother       0.0     0.0     0.0     0.0
-Cother_Nother_Car       0.0     0.0     0.0     0.0
-Car_Nother_Csp2         0.0     0.0     0.0     0.0
-Car_Csp2_Nother         0.0     0.0     0.0     0.0
-Car_Csp2_Nsp2           0.0     0.0     0.0     0.0
-Car_Csp2_Cother         0.0     0.0     0.0     0.0
-Csp2_Cother_Nsp2        0.0     0.0     0.0     0.0
-Car_Nar_Nar             0.0     0.0     0.0     0.0
-Har_Car_Oar             0.0     0.0     0.0     0.0
-Car_Sar_Car             0.0     0.0     0.0     0.0
-Nar_Car_Sar             0.0     0.0     0.0     0.0
-Car_Car_Sar             0.0     0.0     0.0     0.0
-Har_Car_Sar             0.0     0.0     0.0     0.0
-Car_Csp2_Car            0.0     0.0     0.0     0.0
-Fother_Cother_Csp2      0.0     0.0     0.0     0.0
-Csp2_Car_Nar            0.0     0.0     0.0     0.0
-Nar_Car_Oar             0.0     0.0     0.0     0.0
-Csp2_Car_Oar            0.0     0.0     0.0     0.0
-Csp2_Car_Sar            0.0     0.0     0.0     0.0
-Csp2_Car_Car            0.0     0.0     0.0     0.0
-Cother_Csp2_Car         0.0     0.0     0.0     0.0
-Nother_Car_Sar          0.0     0.0     0.0     0.0
-Nother_Car_Oar          0.0     0.0     0.0     0.0
-Har_Nar_Nar             0.0     0.0     0.0     0.0
-Cother_Oother_Car       0.0     0.0     0.0     0.0
-Cother_Nar_Nar          0.0     0.0     0.0     0.0
-Fother_Cother_Oother    0.0     0.0     0.0     0.0
-Clother_Cother_Oother   0.0     0.0     0.0     0.0
-Cother_Car_Sar          0.0     0.0     0.0     0.0
-Car_S=X_Osp2            0.0     0.0     0.0     0.0
-Car_S=X_Nother          0.0     0.0     0.0     0.0
-Car_Car_S=X             0.0     0.0     0.0     0.0
-Car_S=X_Cother          0.0     0.0     0.0     0.0
-Nar_Car_S=X             0.0     0.0     0.0     0.0
-S=X_Car_Sar             0.0     0.0     0.0     0.0
-Fother_Cother_S=X       0.0     0.0     0.0     0.0
-Clother_Cother_S=X      0.0     0.0     0.0     0.0
-Csp2_Cother_Sother      0.0     0.0     0.0     0.0
-Csp2_Csp2_Sother        0.0     0.0     0.0     0.0
-Hother_Csp2_Sother      0.122   0.105   -0.035  -0.035
-Hother_Sother_Csp2      0.169   0.065   -0.020  -0.020
-Nar_Nar_Nar             0.0     0.0     0.0     0.0
-Csp2_Oother_Oother      0.0     0.0     0.0     0.0
-Hother_Oother_Oother    -0.009  -0.015  0.013   0.013
-Iother_Cother_Cother    0.0     0.0     0.0     0.0
-Car_Cother_Csp2         0.0     0.0     0.0     0.0
+Hother_Cother   0.0303
+Hother_Nother   -0.0303
+Cother_Nother   0.0 
+Hother_Oother   0.001
+Cother_Oother   0.0 
+Cother_Csp2   0.0 
+Csp2_Osp2   0.0 
+Csp2_Nother   0.0 
+Csp2_Oother   0.0 
+Har_Nar   0.0303
+Car_Nar   0.0 
+Car_Oother   0.0 
+Car_Car   0.0 
+Har_Car   0.0303
+Hother_Csp2   0.0303
+Csp2_Csp2   0.0 
+Cother_Cother   0.0 
+Cother_Sother   0.0 
+Hother_Sother   0.0303
+Cother_S=X   0.0 
+Osp2_S=X   0.0 
+Fother_Car   0.0 
+Clother_Car   0.0 
+Brother_Car   0.0 
+Brar_Car   0.0 
+Fother_Cother   0.0 
+Clother_Cother   0.0 
+Brother_Cother   0.0 
+Oother_PwoH   0.0 
+Osp2_PwoH   0.0 
+Car_Cother   0.0 
+Cother_Car   0.0 
+Car_Nother   0.0 
+Cother_Nsp2   0.0 
+Csp2_Nsp2   0.0 
+Csp_Nsp   0.0 
+Cother_Csp   0.0 
+Sother_Sother   0.0 
+Clother_Csp2   0.0 
+Fother_Csp2   0.0 
+Brother_Csp2   0.0 
+Car_Csp   0.0 
+Hother_PwH   -0.000
+Hother_Nsp2   0.0303
+Nsp2_Osp2   0.0 
+Car_Nsp2   0.0 
+Nother_Oother   0.0 
+Nother_Osp2   0.0 
+Nother_Nother   0.0 
+Oother_Sother   0.0 
+Car_Sother   0.0 
+Csp_Sother   0.0 
+Hother_Osp2   0.000
+Car_Csp2   0.0 
+Cother_Nar   0.0 
+Csp2_Sother   0.0 
+Car_Oar   0.0 
+Nother_S=X   0.0 
+Iother_Cother   0.0 
+Iother_Car   0.0 
+Car_Sar   0.0 
+Nar_Nar   0.0 
+Csp2_Car   0.0 
+Car_S=X   0.0 
+Oother_Oother   0.0 
+Hother_Cother_Hother   -0.010   -0.010   -0.0453   -0.0453
+Hother_Nother_Hother   0.1146   0.1146   0.031   0.031
+Hother_Nother_Cother   0.068   0.059   0.0453   0.005
+Hother_Cother_Nother   0.071   0.070   0.0453   0.002
+Hother_Oother_Cother   0.065   -0.083   -0.030   -0.020
+Hother_Cother_Oother   -0.076   0.1146   0.0453   0.0453
+Hother_Cother_Csp2   0.1146   0.046   -0.006   -0.024
+Cother_Csp2_Osp2   0.0    0.0    0.0    0.0 
+Cother_Csp2_Nother   0.0    0.0    0.0    0.0 
+Nother_Csp2_Osp2   0.0    0.0    0.0    0.0 
+Hother_Nother_Csp2   0.060   0.014   -0.010   -0.0453
+Cother_Nother_Csp2   0.0    0.0    0.0    0.0 
+Oother_Csp2_Osp2   0.0    0.0    0.0    0.0 
+Cother_Csp2_Oother   0.0    0.0    0.0    0.0 
+Hother_Oother_Csp2   0.088   0.008   -0.0453   -0.0453
+Har_Nar_Car   0.075   0.073   -0.0453   -0.0453
+Car_Nar_Car   0.0    0.0    0.0    0.0 
+Nar_Car_Oother   0.0    0.0    0.0    0.0 
+Car_Car_Nar   0.0    0.0    0.0    0.0 
+Car_Car_Oother   0.0    0.0    0.0    0.0 
+Har_Car_Car   0.011   0.052   -0.003   -0.0453
+Car_Car_Car   0.0    0.0    0.0    0.0 
+Har_Car_Nar   -0.005   0.064   -0.0453   -0.023
+Nar_Car_Nar   0.0    0.0    0.0    0.0 
+Hother_Csp2_Hother   0.064   0.064   -0.0453   -0.0453
+Hother_Csp2_Csp2   0.005   0.028   -0.0453   -0.043
+Hother_Cother_Cother   -0.012   0.046   -0.007   -0.019
+Cother_Cother_Cother   0.0    0.0    0.0    0.0 
+Hother_Cother_Sother   -0.002   0.092   -0.0453   -0.016
+Hother_Sother_Cother   -0.098   0.063   0.001   0.002
+Hother_Cother_S=X   0.067   0.108   -0.0453   -0.041
+Cother_S=X_Osp2   0.0    0.0    0.0    0.0 
+Cother_S=X_Cother   0.0    0.0    0.0    0.0 
+Fother_Car_Car   0.0    0.0    0.0    0.0 
+Clother_Car_Car   0.0    0.0    0.0    0.0 
+Brother_Car_Car   0.0    0.0    0.0    0.0 
+Brar_Car_Car   0.0    0.0    0.0    0.0 
+Cother_Sother_Cother   0.0    0.0    0.0    0.0 
+Cother_Nother_Cother   0.0    0.0    0.0    0.0 
+Cother_Cother_Nother   0.0    0.0    0.0    0.0 
+Hother_Oother_Car   0.1146   0.006   -0.0453   -0.0453
+Fother_Cother_Fother   0.0    0.0    0.0    0.0 
+Fother_Cother_Hother   0.088   0.025   -0.016   0.0453
+Clother_Cother_Clother   0.0    0.0    0.0    0.0 
+Clother_Cother_Hother   0.077   -0.017   -0.032   -0.0453
+Brother_Cother_Brother   0.0    0.0    0.0    0.0 
+Brother_Cother_Hother   0.065   -0.006   -0.0453   -0.031
+Oother_PwoH_Oother   0.0    0.0    0.0    0.0 
+Oother_PwoH_Osp2   0.0    0.0    0.0    0.0 
+Hother_Oother_PwoH   -0.005   0.015   -0.0453   -0.0453
+Csp2_Csp2_Nother   0.0    0.0    0.0    0.0 
+Hother_Csp2_Nother   0.009   -0.007   -0.0453   -0.009
+Nother_Csp2_Nother   0.0    0.0    0.0    0.0 
+Hother_Csp2_Osp2   -0.001   -0.103   0.0453   0.008
+Hother_Csp2_Oother   -0.1146   -0.023   -0.0453   0.006
+Cother_Cother_Oother   0.0    0.0    0.0    0.0 
+Hother_Cother_Car   0.086   0.073   0.001   0.023
+Car_Car_Cother   0.0    0.0    0.0    0.0 
+Cother_Car_Car   0.0    0.0    0.0    0.0 
+Cother_Car_Nar   0.0    0.0    0.0    0.0 
+Nother_Car_Nar   0.0    0.0    0.0    0.0 
+Car_Car_Nother   0.0    0.0    0.0    0.0 
+Hother_Nother_Car   0.1146   0.1146   0.031   -0.033
+Hother_Sother_Hother   0.067   0.067   0.000   0.000
+Cother_Nsp2_Csp2   0.0    0.0    0.0    0.0 
+Car_Cother_Nsp2   0.0    0.0    0.0    0.0 
+Nother_Cother_Nsp2   0.0    0.0    0.0    0.0 
+Car_Cother_Nother   0.0    0.0    0.0    0.0 
+Csp2_Nother_Car   0.0    0.0    0.0    0.0 
+Nsp2_Csp2_Nother   0.0    0.0    0.0    0.0 
+Hother_Csp2_Nsp2   0.006   0.000   0.0453   0.019
+Hother_Cother_Csp   0.1146   0.055   0.044   0.000
+Cother_Csp_Nsp   0.0    0.0    0.0    0.0 
+Cother_Cother_Sother   0.0    0.0    0.0    0.0 
+Cother_Csp2_Cother   0.0    0.0    0.0    0.0 
+Cother_Oother_Cother   0.0    0.0    0.0    0.0 
+Hother_Csp2_Cother   0.040   0.062   0.0453   -0.008
+Csp2_Oother_Csp2   0.0    0.0    0.0    0.0 
+Osp2_Csp2_Oother   0.0    0.0    0.0    0.0 
+Nother_Csp2_Oother   0.0    0.0    0.0    0.0 
+Cother_Cother_Csp2   0.0    0.0    0.0    0.0 
+Osp2_S=X_Osp2   0.0    0.0    0.0    0.0 
+Cother_Cother_S=X   0.0    0.0    0.0    0.0 
+Cother_Sother_Sother   0.0    0.0    0.0    0.0 
+Clother_Csp2_Osp2   0.0    0.0    0.0    0.0 
+Clother_Csp2_Cother   0.0    0.0    0.0    0.0 
+Fother_Csp2_Osp2   0.0    0.0    0.0    0.0 
+Fother_Csp2_Cother   0.0    0.0    0.0    0.0 
+Brother_Csp2_Osp2   0.0    0.0    0.0    0.0 
+Brother_Csp2_Cother   0.0    0.0    0.0    0.0 
+Cother_Oother_Csp2   0.0    0.0    0.0    0.0 
+Oother_Csp2_Oother   0.0    0.0    0.0    0.0 
+Oother_Cother_Oother   0.0    0.0    0.0    0.0 
+Car_Car_Csp   0.0    0.0    0.0    0.0 
+Car_Csp_Nsp   0.0    0.0    0.0    0.0 
+Hother_PwH_Hother   0.000   0.000   0.000   0.000
+Car_Oother_Cother   0.0    0.0    0.0    0.0 
+Cother_Csp2_Nsp2   0.0    0.0    0.0    0.0 
+Cother_Cother_Nsp2   0.0    0.0    0.0    0.0 
+Hother_Cother_Nsp2   -0.1146   0.019   -0.0453   0.032
+Hother_Nsp2_Csp2   0.049   0.020   -0.0453   0.002
+Csp2_Cother_Csp2   0.0    0.0    0.0    0.0 
+Csp2_Csp2_Oother   0.0    0.0    0.0    0.0 
+Csp2_Csp2_Osp2   0.0    0.0    0.0    0.0 
+Cother_Csp2_Csp2   0.0    0.0    0.0    0.0 
+Csp2_Nother_Csp2   0.0    0.0    0.0    0.0 
+Osp2_Nsp2_Osp2   0.0    0.0    0.0    0.0 
+Cother_Nsp2_Osp2   0.0    0.0    0.0    0.0 
+Car_Nsp2_Osp2   0.0    0.0    0.0    0.0 
+Car_Car_Nsp2   0.0    0.0    0.0    0.0 
+Cother_Oother_Nother   0.0    0.0    0.0    0.0 
+Oother_Nother_Osp2   0.0    0.0    0.0    0.0 
+Car_Nother_Nother   0.0    0.0    0.0    0.0 
+Oother_Sother_Oother   0.0    0.0    0.0    0.0 
+Cother_Sother_Oother   0.0    0.0    0.0    0.0 
+Hother_Oother_Sother   0.013   -0.038   -0.0453   -0.0453
+Car_Sother_Oother   0.0    0.0    0.0    0.0 
+Car_Car_Sother   0.0    0.0    0.0    0.0 
+Cother_Oother_Sother   0.0    0.0    0.0    0.0 
+Cother_Sother_Csp   0.0    0.0    0.0    0.0 
+Nsp_Csp_Sother   0.0    0.0    0.0    0.0 
+Car_Sother_Csp   0.0    0.0    0.0    0.0 
+Csp2_Csp2_Csp2   0.0    0.0    0.0    0.0 
+Hother_Osp2_Nsp2   -0.060   0.052   -0.0453   -0.039
+Csp2_Nsp2_Osp2   0.0    0.0    0.0    0.0 
+Car_Cother_Oother   0.0    0.0    0.0    0.0 
+Car_Cother_Cother   0.0    0.0    0.0    0.0 
+Car_Car_Csp2   0.0    0.0    0.0    0.0 
+Car_Csp2_Osp2   0.0    0.0    0.0    0.0 
+Hother_Csp2_Car   0.096   0.103   0.0453   0.0453
+Car_Csp2_Oother   0.0    0.0    0.0    0.0 
+Csp2_Cother_Nother   0.0    0.0    0.0    0.0 
+Osp2_PwoH_Oother   0.0    0.0    0.0    0.0 
+Cother_Oother_PwoH   0.0    0.0    0.0    0.0 
+Csp2_Cother_Oother   0.0    0.0    0.0    0.0 
+Fother_Cother_Cother   0.0    0.0    0.0    0.0 
+Clother_Cother_Cother   0.0    0.0    0.0    0.0 
+Brother_Cother_Cother   0.0    0.0    0.0    0.0 
+Nother_Csp2_Nsp2   0.0    0.0    0.0    0.0 
+Cother_Cother_Csp   0.0    0.0    0.0    0.0 
+Cother_Nar_Car   0.0    0.0    0.0    0.0 
+Hother_Cother_Nar   -0.029   0.093   -0.015   0.027
+Nar_Cother_Oother   0.0    0.0    0.0    0.0 
+Cother_Cother_Nar   0.0    0.0    0.0    0.0 
+Osp2_PwoH_Osp2   0.0    0.0    0.0    0.0 
+Cother_Sother_Csp2   0.0    0.0    0.0    0.0 
+Osp2_Csp2_Sother   0.0    0.0    0.0    0.0 
+Cother_Csp2_Sother   0.0    0.0    0.0    0.0 
+Car_Oar_Car   0.0    0.0    0.0    0.0 
+Car_Car_Oar   0.0    0.0    0.0    0.0 
+Cother_Car_Oar   0.0    0.0    0.0    0.0 
+Nother_S=X_Osp2   0.0    0.0    0.0    0.0 
+Cother_S=X_Nother   0.0    0.0    0.0    0.0 
+Cother_Nother_S=X   0.0    0.0    0.0    0.0 
+Hother_Nother_S=X   0.1146   -0.040   -0.0453   -0.0453
+Cother_Cother_Car   0.0    0.0    0.0    0.0 
+Iother_Cother_Hother   0.085   0.000   -0.040   -0.0453
+Iother_Cother_Iother   0.0    0.0    0.0    0.0 
+Fother_Cother_Car   0.0    0.0    0.0    0.0 
+Clother_Cother_Car   0.0    0.0    0.0    0.0 
+Iother_Cother_Car   0.0    0.0    0.0    0.0 
+Iother_Car_Car   0.0    0.0    0.0    0.0 
+Brother_Cother_Car   0.0    0.0    0.0    0.0 
+Car_Cother_Car   0.0    0.0    0.0    0.0 
+Car_Oother_Car   0.0    0.0    0.0    0.0 
+Car_Nother_Car   0.0    0.0    0.0    0.0 
+Car_Nother_Cother   0.0    0.0    0.0    0.0 
+Cother_Nother_Car   0.0    0.0    0.0    0.0 
+Car_Nother_Csp2   0.0    0.0    0.0    0.0 
+Car_Csp2_Nother   0.0    0.0    0.0    0.0 
+Car_Csp2_Nsp2   0.0    0.0    0.0    0.0 
+Car_Csp2_Cother   0.0    0.0    0.0    0.0 
+Csp2_Cother_Nsp2   0.0    0.0    0.0    0.0 
+Car_Nar_Nar   0.0    0.0    0.0    0.0 
+Har_Car_Oar   0.055   0.056   -0.018   -0.0453
+Car_Sar_Car   0.0    0.0    0.0    0.0 
+Nar_Car_Sar   0.0    0.0    0.0    0.0 
+Car_Car_Sar   0.0    0.0    0.0    0.0 
+Har_Car_Sar   0.054   0.084   -0.0453   -0.0453
+Car_Csp2_Car   0.0    0.0    0.0    0.0 
+Fother_Cother_Csp2   0.0    0.0    0.0    0.0 
+Csp2_Car_Nar   0.0    0.0    0.0    0.0 
+Nar_Car_Oar   0.0    0.0    0.0    0.0 
+Csp2_Car_Oar   0.0    0.0    0.0    0.0 
+Csp2_Car_Sar   0.0    0.0    0.0    0.0 
+Csp2_Car_Car   0.0    0.0    0.0    0.0 
+Cother_Csp2_Car   0.0    0.0    0.0    0.0 
+Nother_Car_Sar   0.0    0.0    0.0    0.0 
+Nother_Car_Oar   0.0    0.0    0.0    0.0 
+Har_Nar_Nar   -0.1146   0.001   -0.0453   -0.0453
+Cother_Oother_Car   0.0    0.0    0.0    0.0 
+Cother_Nar_Nar   0.0    0.0    0.0    0.0 
+Fother_Cother_Oother   0.0    0.0    0.0    0.0 
+Clother_Cother_Oother   0.0    0.0    0.0    0.0 
+Cother_Car_Sar   0.0    0.0    0.0    0.0 
+Car_S=X_Osp2   0.0    0.0    0.0    0.0 
+Car_S=X_Nother   0.0    0.0    0.0    0.0 
+Car_Car_S=X   0.0    0.0    0.0    0.0 
+Car_S=X_Cother   0.0    0.0    0.0    0.0 
+Nar_Car_S=X   0.0    0.0    0.0    0.0 
+S=X_Car_Sar   0.0    0.0    0.0    0.0 
+Fother_Cother_S=X   0.0    0.0    0.0    0.0 
+Clother_Cother_S=X   0.0    0.0    0.0    0.0 
+Csp2_Cother_Sother   0.0    0.0    0.0    0.0 
+Csp2_Csp2_Sother   0.0    0.0    0.0    0.0 
+Hother_Csp2_Sother   0.1146   0.105   -0.0453   -0.035
+Hother_Sother_Csp2   0.1146   0.065   0.018   -0.020
+Nar_Nar_Nar   0.0    0.0    0.0    0.0 
+Csp2_Oother_Oother   0.0    0.0    0.0    0.0 
+Hother_Oother_Oother   -0.009   -0.015   0.0453   0.013
+Iother_Cother_Cother   0.0    0.0    0.0    0.0 
+Car_Cother_Csp2   0.0    0.0    0.0    0.0 
