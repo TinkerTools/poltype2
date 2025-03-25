@@ -3210,7 +3210,11 @@ class PolarizableTyper():
             m,atomindextoformalcharge=self.CheckInputCharge(m,verbose=True)
             if self.allowradicals==True:
                 self.dontfrag=True # Psi4 doesnt allow UHF and properties (like compute WBO) for fragmenter, so need to turn of fragmenter if radical detected
-            m.UpdatePropertyCache()
+            try:
+                m.UpdatePropertyCache()
+            except Chem.rdchem.AtomValenceException:
+                self.WriteToLog('There is an AtomValenceException catched')
+                
             if self.addhydrogentocharged==True and self.isfragjob==False:
                 m = Chem.AddHs(m)
                 AllChem.EmbedMolecule(m)
