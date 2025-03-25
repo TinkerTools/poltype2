@@ -262,8 +262,8 @@ def assignPolar():
       if ("#" not in line[0]) and (len(line) > 10):
         s = line.split()
         smt = s[0]
-        polpair_params = '   '.join(s[2:5])
-        polpair_comment = ' '.join(s[6:])
+        polpair_params = '   '.join(s[2:4])
+        polpair_comment = ' '.join(s[5:])
         smarts = pybel.Smarts(smt)
         matches = smarts.findall(mol)
         if matches != []:
@@ -280,6 +280,7 @@ def assignPolar():
   with open(key + "_polar", "a") as f:
     if matched_polpairs != []:
       for c, p in zip(comments, matched_polpairs):
+        print(GREEN + f"POLPAIR: {c}" + ENDC)
         f.write(f"# {c}\n")
         f.write(f"{p}\n")
 
@@ -312,7 +313,53 @@ def assignVdwAMOEBA():
         print(GREEN + "VdW parameters found for %s"%ttype + ENDC)
         newline = f"vdw {ttype2class[ttype]} {prmstr}\n"
         f.write(newline)
+  
+  # Match special vdwpair values
+  # these are usually tough cases (Zn,Mg)
+  atomnumbers, types = np.loadtxt(xyz, usecols=(0, 5,), unpack=True, dtype="str", skiprows=1)
+  atomnumbers = [int(a) for a in atomnumbers]
+  atom_type_dict = dict(zip(atomnumbers, types)) 
+  prmlines = open(os.path.join(prmfiledir,"amoebaVdwPair.prm")).readlines()
+  # SDF is more info-rich 
+  if sdf != None:
+    inpfile = sdf
+    inpformat = 'sdf'
+  else:
+    inpfile = xyz
+    inpformat = 'txyz'
+  
+  # try to match line-by-line
+  matched_vdwpairs = []
+  comments = []
+  tmp = []
+  for mol in pybel.readfile(inpformat,inpfile):
+    for line in prmlines:
+      if ("#" not in line[0]) and (len(line) > 10):
+        s = line.split()
+        smt = s[0]
+        vdwpair_params = '   '.join(s[2:5])
+        vdwpair_comment = ' '.join(s[6:])
+        smarts = pybel.Smarts(smt)
+        matches = smarts.findall(mol)
+        if matches != []:
+          for match in matches:
+            a = match[0] 
+            vdwpair_type = atom_type_dict[a] 
+            if (vdwpair_type not in tmp):
+              tmp.append(vdwpair_type)
+              vdwpair_prm_str = f"vdwpair {vdwpair_type} {vdwpair_params}"
+              matched_vdwpairs.append(vdwpair_prm_str)
+              comments.append(vdwpair_comment)
+  
+  # write the matched vdwpair parameters 
+  with open(key + "_vdw", "a") as f:
+    if matched_vdwpairs != []:
+      for c, p in zip(comments, matched_vdwpairs):
+        print(GREEN + f"VdWPAIR: {c}" + ENDC)
+        f.write(f"# {c}\n")
+        f.write(f"{p}\n")
   return True
+
 
 def assignGKAMOEBA():
   database_prm = os.path.join(prmfiledir,"amoebaGK.prm")

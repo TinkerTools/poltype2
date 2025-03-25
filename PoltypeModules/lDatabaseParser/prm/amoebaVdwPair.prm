@@ -1,0 +1,4 @@
+[$([O-][a])]               O-     361  2.792 0.133  # VDWPAIR: O- on Phenolate(-like) molecules interacting with Zn+2 (atom type: 361), derived by Chengwen Liu 
+[$([O-][C]=[O])]           O-     361  2.519 0.133  # VDWPAIR: O- on COO- interacting with Zn+2 (atom type: 361), derived by Chengwen Liu 
+[$([S-][#6])]              S-     361  3.881 0.133  # VDWPAIR: S- on CS- interacting with Zn+2 (atom type: 361), derived by Chengwen Liu 
+[$([NX4])]                 N+     361  2.612 0.133  # VDWPAIR: N+ on N+X4 interacting with Zn+2 (atom type: 361), derived by Chengwen Liu 

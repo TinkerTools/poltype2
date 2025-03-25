@@ -1,1 +1,5 @@
-[$([O-][a])]                                        O-     357  0.0630    0.0000 # O- connecting an aromatic atom with Mg+2 (atom type: 357), suggested value by Jay Ponder
+[$([O-][a])]               O-     357  0.063 # POLPAIR: O- on Phenolate(-like) molecules interacting with Mg+2 (atom type: 357), suggested value by Jay Ponder
+[$([O-][a])]               O-     361  0.208 # POLPAIR: O- on Phenolate(-like) molecules interacting with Zn+2 (atom type: 361), derived by Chengwen Liu 
+[$([O-][C]=[O])]           O-     361  0.247 # POLPAIR: O- on COO- interacting with Zn+2 (atom type: 361), derived by Chengwen Liu 
+[$([S-][#6])]              S-     361  0.284 # POLPAIR: S- on CS- interacting with Zn+2 (atom type: 361), derived by Chengwen Liu 
+[$([NX4])]                 N+     361  0.201 # POLPAIR: N+ on N+X4 interacting with Zn+2 (atom type: 361), derived by Chengwen Liu 

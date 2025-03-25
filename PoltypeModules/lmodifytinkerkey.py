@@ -506,59 +506,16 @@ def transferMultipoleToParent(poltype, frag_sdf, frag_xyz, frag_key, parent_sdf,
 
 # here we write any modifications to the final.key
 def mod_final_key(poltype):
-  xyz = poltype.tmpxyzfile
+  polarkey = 'tmpnonbonded.key_polar' 
+  
+  if not os.path.isfile(f'Temp/{polarkey}'):
+    sys.exit(f'{polarkey} does not exist!')
+  
+  polarlines = open(f'Temp/{polarkey}').readlines()
+  
   key = poltype.tmpkeyfile
-  sdf = poltype.molstructfname
-  prmfiledir = poltype.ldatabaseparserprmdir
-  # Match special polpair values
-  # these are usually tough cases
-  atomnumbers, types = np.loadtxt(xyz, usecols=(0, 5,), unpack=True, dtype="str", skiprows=1)
-  atomnumbers = [int(a) for a in atomnumbers]
-  atom_type_dict = dict(zip(atomnumbers, types)) 
-  prmlines = open(os.path.join(prmfiledir,"amoebaPolarPair.prm")).readlines()
-  # SDF is more info-rich 
-  inpfile = sdf
-  inpformat = 'sdf'
-  
-  # try to match line-by-line
-  matched_polpairs = []
-  comments = []
-  tmp = []
-  for mol in pybel.readfile(inpformat,os.path.join(os.getcwd(), 'Temp', inpfile)):
-    for line in prmlines:
-      if ("#" not in line[0]) and (len(line) > 10):
-        s = line.split()
-        smt = s[0]
-        polpair_params = '   '.join(s[2:5])
-        polpair_comment = ' '.join(s[6:])
-        smarts = pybel.Smarts(smt)
-        matches = smarts.findall(mol)
-        if matches != []:
-          for match in matches:
-            a = match[0] 
-            polpair_type = atom_type_dict[a] 
-            if (polpair_type not in tmp):
-              tmp.append(polpair_type)
-              polpair_prm_str = f"polpair {polpair_type} {polpair_params}"
-              matched_polpairs.append(polpair_prm_str)
-              comments.append(polpair_comment)
-
-  idx = -1 
-  keylines = open(key).readlines()
-  for line in keylines:
-    if 'polarize ' in line:
-      idx = keylines.index(line)
-  
-  # write the matched polpair parameters 
-  with open(key, "w") as f:
-    for i in range(len(keylines)):
-      line = keylines[i]
-      if i != idx:
+  with open(key, 'a') as f:
+    for line in polarlines:
+      if ('POLPAIR' in line.upper()):
         f.write(line)
-      else:
-        f.write(line)
-        if matched_polpairs != []:
-          for c, p in zip(comments, matched_polpairs):
-            f.write(f"# {c}\n")
-            f.write(f"{p}\n")
   return

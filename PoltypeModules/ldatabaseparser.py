@@ -358,7 +358,7 @@ def assign_nonbonded_params(poltype):
     if poltype.forcefield.upper() in ["AMOEBAPLUS", "APLUS", "AMOEBA+"]:
       cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent NONBONDED CF -cf4amoebaplus True'
     else:
-      cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent VDW GK'
+      cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent VDW GK POLAR'
     poltype.call_subsystem([cmd], True)
     
     tmpkey_v = f'{tmpkey}_vdw'
