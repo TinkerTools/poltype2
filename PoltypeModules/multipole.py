@@ -537,6 +537,13 @@ def gen_peditinfile(poltype,mol):
             for match in matches:
               n,h1,h2 = match
               frames.append(f'{n+1} -{h1+1} -{h2+1}')
+            
+            # general SP2 B with 2H
+            pattern = Chem.MolFromSmarts('[#5^2]([#1])[#1]')
+            matches = rdkitmol.GetSubstructMatches(pattern)
+            for match in matches:
+              b,h1,h2 = match
+              frames.append(f'{b+1} -{h1+1} -{h2+1}')
 
             if frames != []:
               for frame in frames:
