@@ -3714,7 +3714,7 @@ class PolarizableTyper():
 
             # STEP 59
             # apply any modifications to the final.key
-            if self.isfragjob==False:
+            if (self.isfragjob==False) and (self.forcefield=='AMOEBA'):
               lmodifytinkerkey.mod_final_key(self)
             
             self.WriteToLog('Poltype Job Finished'+'\n')

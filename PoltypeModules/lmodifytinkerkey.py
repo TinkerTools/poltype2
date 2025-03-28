@@ -1,4 +1,5 @@
 import os
+import sys 
 import shutil
 import numpy as np
 from rdkit import Chem
