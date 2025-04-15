@@ -231,7 +231,7 @@ class PolarizableTyper():
         new_gdma:bool=False
         scaleandfixdipole:bool=False
         scalebigmultipole:bool=False
-        fragbigmultipole:bool=False
+        fragbigmultipole:bool=True
         chargethreshold:float=1.5
         dipolethreshold:float=1.5
         quadrupolethreshold:float=2.4
