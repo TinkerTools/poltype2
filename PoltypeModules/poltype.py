@@ -294,6 +294,7 @@ class PolarizableTyper():
         structure:None=None
         espextraconflist:list=field(default_factory=lambda : [])
         userconformation:bool=False
+        userxyzgeometry:str=''
         def __post_init__(self): 
             """
             Intent: Post initialization variables (things you want internal variables but not necesarrily user input). Also for reading input poltype.ini file and changing variable defaults.
@@ -766,6 +767,8 @@ class PolarizableTyper():
                             self.gdmafname = a
                         elif "forcefield" in newline:
                             self.forcefield = a
+                        elif "userxyzgeometry" in newline:
+                            self.userxyzgeometry = a
                         elif "qmonly" in newline:
                             self.qmonly=self.SetDefaultBool(line,a,True)
                         elif "sleeptime" in newline:
@@ -3174,7 +3177,6 @@ class PolarizableTyper():
                     os.mkdir(foldername)
                 shutil.copy(self.molstructfname,os.path.join(foldername,self.molstructfname))
                 shutil.copy('poltype.ini',os.path.join(foldername,'poltype.ini'))
-
                 if self.indextotypefile!=None:
                     shutil.copy(self.indextotypefile,os.path.join(foldername,self.indextotypefile))
                 if self.indextompoleframefile!=None:
