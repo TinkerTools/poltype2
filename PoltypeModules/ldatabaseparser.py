@@ -296,6 +296,35 @@ def assign_bonded_params(poltype):
     tmpkey = 'tmpbonded.key'
     sdffile = poltype.molstructfname
     shutil.copy(poltype.key4fname, tmpkey)
+    
+    if not poltype.sp2aniline:
+      atom2type = {}
+      for line in open(tmpxyz).readlines()[1:]: 
+        s = line.split()
+        atom2type[int(s[0])] = s[5]
+      # if user requires sp3 aniline
+      # 1. use angle instead of anglep on N
+      # 2. remove opbend on N
+      rdkitmol = Chem.MolFromMolFile(poltype.molstructfname,removeHs=False)
+      pattern = Chem.MolFromSmarts('[NH2]([H])([H])[a]')
+      matches = rdkitmol.GetSubstructMatches(pattern)
+      aniline_nitrogens = []
+      for match in matches:
+        n,h1,h2,x = match
+        aniline_nitrogens.append(atom2type[n+1])
+      
+      # modify valence_init.dat
+      lines = open('valence_init.dat').readlines()
+      if aniline_nitrogens != []:
+        with open('valence_init.dat', 'w') as f:
+          for line in lines:
+            if ('anglep ' in line) and (line.split()[2] in aniline_nitrogens):
+              line = line.replace('anglep', 'angle')
+              f.write(line)
+            elif ('opbend ' in line) and (line.split()[2] in aniline_nitrogens):
+              pass
+            else:
+              f.write(line)
     catcmd = f"cat valence_init.dat >> {tmpkey}"
     poltype.call_subsystem([catcmd], True)
     cmd = f'python {poltype.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {poltype.molstructfname} -potent BONDED'
