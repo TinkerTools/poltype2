@@ -232,6 +232,7 @@ class PolarizableTyper():
         scaleandfixdipole:bool=False
         scalebigmultipole:bool=False
         fragbigmultipole:bool=True
+        sp2aniline:bool=True
         chargethreshold:float=1.5
         dipolethreshold:float=1.5
         quadrupolethreshold:float=2.4
@@ -590,6 +591,8 @@ class PolarizableTyper():
                             self.scalebigmultipole=self.SetDefaultBool(line,a,True)
                         elif 'fragbigmultipole' in newline:
                             self.fragbigmultipole=self.SetDefaultBool(line,a,True)
+                        elif 'sp2aniline' in newline:
+                            self.sp2aniline=self.SetDefaultBool(line,a,True)
                         elif newline.startswith("gdmacommand_"):
                             self.__dict__[newline] = a
                             gdma_kws.append((newline[len('gdmacommand_'):], a))

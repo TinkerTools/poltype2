@@ -529,7 +529,8 @@ def gen_peditinfile(poltype,mol):
               n,h1,h2,_ = match
               frames.append(f'{h1+1} {n+1} {h2+1}')
               frames.append(f'{h2+1} {n+1} {h1+1}')
-              frames.append(f'{n+1} -{h1+1} -{h2+1}')
+              # included in general SP2 N case below
+              #frames.append(f'{n+1} -{h1+1} -{h2+1}')
             
             # general SP2 N with 2H
             pattern = Chem.MolFromSmarts('[#7^2]([#1])[#1]')

@@ -378,6 +378,19 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
     for atm in iteratombab:
         tmpfh.write('%2s %11.6f %11.6f %11.6f\n' % (an.getElSymbol(atm.GetAtomicNum()), atm.x(), atm.y(), atm.z()))
     tmpfh.write('\n')
+
+    # Add a torsion restraint for Aniline(-like) molecules
+    # Chengwen Liu
+    # Apr. 2025
+    if poltype.sp2aniline: 
+      rdkitmol = Chem.MolFromMolFile(poltype.molstructfname,removeHs=False)
+      pattern = Chem.MolFromSmarts('[NH2]([H])([H])[a]')
+      matches = rdkitmol.GetSubstructMatches(pattern)
+      for match in matches:
+        n,h1,h2,x = match
+        tmpfh.write(f"{n+1} {x+1} {h1+1} {h2+1}   =0.0       B\n")
+        tmpfh.write(f"{n+1} {x+1} {h1+1} {h2+1}   F\n")
+    
     tmpfh.write('\n')
     
     if ('I ' in spacedformulastr):
