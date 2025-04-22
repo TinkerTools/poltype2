@@ -258,7 +258,10 @@ if __name__ == "__main__":
   # Do xtb optimization for each conformer
   os.chdir(confgendir)
   print('Running XTB optimization for extended conformer...')
-  if abs(total_charge) > 1:
+  
+  # Use implicit solvent for optimization if there are more than one charged atoms
+  charged_atoms = [a for a in m1.GetAtoms() if a.GetFormalCharge() != 0]
+  if len(charged_atoms) > 1:
     cmdstr = f'{xtbpath} {conf_fname}.xyz --opt loose --input constraint.inp --chrg {total_charge} --uhf {unpaired_electrons} --alpb water > xtb_run.log '
   else:
     cmdstr = f'{xtbpath} {conf_fname}.xyz --opt loose --input constraint.inp --chrg {total_charge} --uhf {unpaired_electrons} > xtb_run.log '
