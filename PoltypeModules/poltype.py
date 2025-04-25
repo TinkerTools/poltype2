@@ -2719,43 +2719,6 @@ class PolarizableTyper():
                 atom.SetVector(x,y,z)
             return mol
 
-        def CheckForConcentratedFormalCharges(self,m,atomindextoformalcharge):
-            """
-            Intent: Often if a zwitterion is present or highly concentrated charge like phosphate group is present with nearby hydrogens, the hydrogens can migrate to the highly charged regions during QM optimization. So need to determine when there is concentrated formal charge and then turn on PCM for qm geometry optimization. 
-            Input: Rdkit mol object, dictionary of atomic index to formal charge 
-            Output: 0, no charge; 1, at least one charged atom; 2, postively and negatively charged atoms are close to each other
-            Referenced By: GenerateParameters 
-            Description: 
-            1. If the molecule contains hydrogens, then continue, else dont use PCM
-            2. Iterate over dictionary of atomic index to formal charges and save atomic indices that have formal charges to an array.
-            3. check the bond distance between charged atoms
-
-            """
-            distmat=Chem.rdmolops.GetDistanceMatrix(m) # bond distance matrix
-            positive_indices = []
-            negative_indices = []
-            charge_state = 0
-            BOND_DIST_UPPER = 4 # upper bound for bond distance for determining zwitterion
-            BOND_DIST_LOWER = 2
-            # STEP 1
-            if self.hashyd==True:
-                # STEP 2
-                for atomindex,chg in atomindextoformalcharge.items():
-                    if chg > 0:
-                        positive_indices.append(atomindex)
-                        charge_state = 1
-                    elif chg < 0:
-                        negative_indices.append(atomindex)
-                        charge_state = 1
-                # STEP 3
-                for atomi in positive_indices:
-                    for atomj in negative_indices:
-                        if distmat[atomi][atomj] <= BOND_DIST_UPPER and \
-                            distmat[atomi][atomj] >= BOND_DIST_LOWER:
-                            charge_state = 2
-                            return charge_state
-            return charge_state 
-                    
                         
         def DeleteAllNonQMFiles(self,folderpath=None):
             """
@@ -3230,8 +3193,8 @@ class PolarizableTyper():
             if '.' in smarts:
                 raise ValueError('Multiple fragments detectected in input molecule')
             # STEP 10
-            charge_state=self.CheckForConcentratedFormalCharges(m,atomindextoformalcharge)
-            self.pcm = (charge_state==2) and (self.pcm_auto)
+            charged_atoms = [a for a in m.GetAtoms() if a.GetFormalCharge() != 0]
+            self.pcm = (len(charged_atoms) > 1) and (self.pcm_auto)
 
             self.temptorsppcm=self.torsppcm
             self.temptoroptpcm=self.toroptpcm
@@ -3261,7 +3224,7 @@ class PolarizableTyper():
             torgen.get_all_torsions(self,mol)
             (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,mol,[],[],allmissing=True) # need to call this to get self.rotbndlist to generate restraints for N-dimensional scan in GenerateMaxSymmetryConformer
             # STEP 16
-            if self.firstoptfinished==False and self.isfragjob==False and self.generateextendedconf==True and self.userxyzgeometry != '':
+            if self.firstoptfinished==False and self.isfragjob==False and self.generateextendedconf==True and self.userxyzgeometry == '':
                 indextocoordslist=self.GenerateExtendedConformer()
                 indextocoordinates=indextocoordslist[0]
             if self.isfragjob==True and self.generate_symm_frag_conf and len(self.onlyrotbndslist)!=0:
