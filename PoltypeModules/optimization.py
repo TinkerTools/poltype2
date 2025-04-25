@@ -590,98 +590,105 @@ def AddTorsionRestraints(poltype,keyname,torsionrestraints):
         tmpfh.write('restrain-torsion %d %d %d %d %f\n' % (a,b,c,d,poltype.torsionrestraint))
     tmpfh.close()
 
-def FindTorsionRestraints(poltype,mol):
+def FindTorsionRestraints(poltype):
     """
-    Intent:
-    Input:
-    Output:
-    Referenced By: 
-    Description: 
+    Intent: find non-aromatic torsion
+    Input: poltype object
+    Output: torsion restraint list
+    Referenced By: GeometryOptimization 
+    Description: Find the torsion atoms we want to restraint during geometry optimization.
+    1. Only rotatable bond torsion
+    2. Four atoms must be heavy atoms
+    3. Two torsions MAX on one rotatable bond
+       a. Heaviest two atoms on one side (a,b)
+       b. Heaviest two atoms on the other side (c,d)
+       c. Two torsions will be (a,x,y,d) and (b,x,y,c)
     """
 
     torsionrestraints=[]
-    atomiter=openbabel.OBMolAtomIter(mol)
-    atomnum=0
-    for atom in atomiter:
-        atomnum+=1
-    bondnum=0
-    for b in openbabel.OBMolBondIter(mol):
-        t2 = b.GetBeginAtom()
-        t3 = b.GetEndAtom()
-        t2val=len([neighb for neighb in openbabel.OBAtomAtomIter(t2)])
-        t3val=len([neighb for neighb in openbabel.OBAtomAtomIter(t3)])
-        if t2val<2 or t3val<2:
-            continue 
-        ringbond=b.IsInRing()
-        if ringbond==True:
-            continue
-        ls=[t2.GetIdx(),t3.GetIdx()]
-        if ls in poltype.partialdoublebonds or ls[::-1] in poltype.partialdoublebonds:
-            continue
-        bondnum+=1
+    mol = Chem.MolFromMolFile(poltype.molstructfname,removeHs=False)
+
+    # find aromatic atoms for later use
+    aromatics = []
+    pattern = Chem.MolFromSmarts('[a]')
+    matches = mol.GetSubstructMatches(pattern, uniquify=True)
+    for match in matches:
+      if len(match) == 1:
+        aromatics.append(match[0])
+   
+    # find all diherals in the molecule
+    rotbond_torsions = {}
+    pattern = Chem.MolFromSmarts('[*]~[*]~[*]~[*]')
+    matches = mol.GetSubstructMatches(pattern, uniquify=True)
+    for match in matches:
+      match = list(match)
+      a, x, y, b = match
+      if not (x in aromatics and y in aromatics):
+        if x < y:
+          comb = f"{x}-{y}"
+          tor = match
+        else:
+          comb = f"{y}-{x}"
+          tor = [b,y,x,a]
         
+        if comb not in rotbond_torsions.keys():
+          rotbond_torsions[comb] = [tor]
+        else:
+          rotbond_torsions[comb].append(tor)
+    
+    # record atomic numbers of each atom
+    atomic_numbers = [atom.GetAtomicNum() for atom in mol.GetAtoms()]
+    torsionrestraints_1 = [] 
+    for key, tors in rotbond_torsions.items():
+      first_atoms = []
+      last_atoms = []
+      for tor in tors:
+        a, x, y, b = tor
+        if a not in first_atoms:
+          first_atoms.append(a)
+        if b not in last_atoms:
+          last_atoms.append(b)
+      
+      first_atoms_atomic = [atomic_numbers[a] for a in first_atoms]
+      last_atoms_atomic = [atomic_numbers[a] for a in last_atoms]
+      
+      # sort atoms based on their atomic numbers
+      first = [val for _, val in sorted(zip(first_atoms_atomic, first_atoms), reverse=True)]
+      last = [val for _, val in sorted(zip(last_atoms_atomic, last_atoms), reverse=True)]
+     
+      # select top2 atoms and excluding hydrogens
+      tmp = []
+      for f in first:
+        if len(tmp) < 2 and (f not in tmp) and (atomic_numbers[f] > 1):
+          tmp.append(f)
+      first = tmp
+      
+      # select top2 atoms and excluding hydrogens
+      tmp = []
+      for f in last:
+        if len(tmp) < 2 and (f not in tmp) and (atomic_numbers[f] > 1):
+          tmp.append(f)
+      last = tmp
+    
+      # add torsion to torsionrestraints_1
+      if (len(first) == 2) and (len(last) == 2):
+        torsionrestraints_1.append([first[0], x, y, last[1]])
+        torsionrestraints_1.append([first[1], x, y, last[0]])
+      elif (len(first) == 2) and (len(last) == 1):
+        torsionrestraints_1.append([first[0], x, y, last[0]])
+        torsionrestraints_1.append([first[1], x, y, last[0]])
+      elif (len(first) == 1) and (len(last) == 2):
+        torsionrestraints_1.append([first[0], x, y, last[0]])
+        torsionrestraints_1.append([first[0], x, y, last[1]])
+      elif (len(first) == 1) and (len(last) == 1):
+        torsionrestraints_1.append([first[0], x, y, last[0]])
+      else:
+        continue
 
-    if bondnum>=2:
-        for b in openbabel.OBMolBondIter(mol):
-            BO=b.GetBondOrder()
-            if BO>1: # dont restrain double bonds
-                continue
-            isrot=b.IsRotor()
-            t2 = b.GetBeginAtom()
-            t3 = b.GetEndAtom()
-            t2val=len([neighb for neighb in openbabel.OBAtomAtomIter(t2)])
-            t3val=len([neighb for neighb in openbabel.OBAtomAtomIter(t3)])
-            if t2val<2 or t3val<2:
-                continue 
-            ringbond=b.IsInRing()
-            if ringbond==True:
-                continue
-            t2idx=t2.GetIdx()
-            t3idx=t3.GetIdx()
-            t2 = b.GetBeginAtom()
-            t3 = b.GetEndAtom()
-            t1,t4 = torgen.find_tor_restraint_idx(poltype,mol,t2,t3)
-
-            firstangle=mol.GetAngle(t1,t2,t3)
-            secondangle=mol.GetAngle(t2,t3,t4)
-            atoms=[t1,t2,t3,t4]
-            indices=[i.GetIdx() for i in atoms]
-            if firstangle<0:
-                firstangle=firstangle+360
-            if secondangle<0:
-                secondangle=secondangle+360
-            angletol=2
-            if np.abs(180-firstangle)<=3.5 or np.abs(180-secondangle)<=3.5:
-                continue
-            rtaatomicnum=t1.GetAtomicNum()
-            rtbatomicnum=t2.GetAtomicNum()
-            rtcatomicnum=t3.GetAtomicNum()
-            rtdatomicnum=t4.GetAtomicNum()
-            if (rtaatomicnum==7 and rtbatomicnum==7 and rtcatomicnum==7) or (rtbatomicnum==7 and rtcatomicnum==7 and rtdatomicnum==7):
-                continue # sometimes nitrogens in chain very stiff double bonds then become linear during opt
-            
-            t2idx=t2.GetIdx()
-            t3idx=t3.GetIdx()
-            babelfirst=[t2idx,t3idx]
-            if (babelfirst in poltype.partialdoublebonds or babelfirst[::-1] in poltype.partialdoublebonds):
-                continue
-            t1idx=t1.GetIdx()
-            t4idx=t4.GetIdx()
-            torset=tuple([[t1idx,t2idx,t3idx,t4idx]])
-            phaseangles=[0]
-            rotbndtorescount={}
-            maxrotbnds=1
-            restlist=[]
-            variabletorlist=[]
-            newtorset=[]
-            torsiontophaseangle={}
-            torsiontomaintor={}
-            rottors,rotbndtorescount,restlist,rotphases,torsiontophaseangle,torsiontomaintor=torgen.RotatableBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,mol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor,crash=False)
-            frotors,rotbndtorescount,restlist,torsiontophaseangle,torsiontomaintor=torgen.FrozenBondRestraints(poltype,torset,variabletorlist,rotbndtorescount,maxrotbnds,mol,restlist,phaseangles,torsiontophaseangle,torsiontomaintor)
-            for rottor in rottors:
-                torsionrestraints.append(rottor)
-
-
+    # change to 1-Indexed, required by Poltype
+    for tor in torsionrestraints_1:
+      tor_plus_1 = [i+1 for i in tor]
+      torsionrestraints.append(tor_plus_1)
     return torsionrestraints
 
 def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds=True,modred=True,bondanglerestraints=None,skipscferror=False,charge=None,skiperrors=False,overridecheckterm=False): # specify charge instead of reading from mol if charge!=None
@@ -699,7 +706,7 @@ def GeometryOptimization(poltype,mol,totcharge,suffix='1',loose=False,checkbonds
         (poltype.isfragjob and mol.NumAtoms() < NATOM_SMALL and not poltype.generate_symm_frag_conf): # then vdw opt
         torsionrestraints=[]
     else: # see if need to restrain torsion in extended conformation
-        torsionrestraints=FindTorsionRestraints(poltype,mol)
+        torsionrestraints=FindTorsionRestraints(poltype)
 
     logoptfname=poltype.logoptfname.replace('_1','_'+suffix)
     comoptfname=poltype.comoptfname.replace('_1','_'+suffix)
