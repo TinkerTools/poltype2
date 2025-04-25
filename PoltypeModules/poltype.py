@@ -3261,7 +3261,7 @@ class PolarizableTyper():
             torgen.get_all_torsions(self,mol)
             (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,mol,[],[],allmissing=True) # need to call this to get self.rotbndlist to generate restraints for N-dimensional scan in GenerateMaxSymmetryConformer
             # STEP 16
-            if self.firstoptfinished==False and self.isfragjob==False and self.generateextendedconf==True and self.userxyzgeometry != '':
+            if self.firstoptfinished==False and self.isfragjob==False and self.generateextendedconf==True and self.userxyzgeometry == '':
                 indextocoordslist=self.GenerateExtendedConformer()
                 indextocoordinates=indextocoordslist[0]
             if self.isfragjob==True and self.generate_symm_frag_conf and len(self.onlyrotbndslist)!=0:
@@ -3278,6 +3278,7 @@ class PolarizableTyper():
             if self.generateextendedconf==True:
                 rdmolfiles.MolToMolFile(m,'extendedconf.mol')
             mol=self.SetDefaultCoordinatesBabel(mol,indextocoordinates)
+
             # STEP 18 
             if not os.path.exists(self.scrtmpdirpsi4):
                 os.mkdir(self.scrtmpdirpsi4)
