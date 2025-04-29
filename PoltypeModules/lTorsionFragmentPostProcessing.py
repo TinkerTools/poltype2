@@ -6,7 +6,8 @@
 # - generates a {fname}.mol file for using with afterwards torsion fitting
 
 # KEY RULES IMPLEMENTED IN THIS PROGRAM:
-# 1. Bond breaking only happens at single bonds
+# 1. Bond breaking happens only at single bonds (OLD decision) 
+# 1. Bond breaking happens at all bonds except those being explicitly excluded
 # 2. Special bond involving nitrogen is not cut
 # 3. Fused rings are treated as single rings if the fused two atoms are carbon
 # 4. Long alkane chain such as propyl and ethyl are replaced with CH3-
@@ -69,8 +70,9 @@ def saveFragment(mol, atomsToKeep,output, xyz2index):
     
     bond.SetBondType(bond_type_par)
 
-  Chem.SanitizeMol(mol2)
+
   Chem.Kekulize(mol2)
+  Chem.SanitizeMol(mol2)
   mol2h = Chem.AddHs(mol2,addCoords=True)
   rdmolfiles.MolToMolFile(mol2h, output)
   return
@@ -137,6 +139,15 @@ if __name__ == '__main__':
       par_atom_idx = par_xyz2index[xyzstr]
       par_neighbors = [x.GetSymbol() for x in par_mol.GetAtomWithIdx(par_atom_idx).GetNeighbors()]
 
+  # set correct hydrogen for aromatic nitrogen 
+  pattern = Chem.MolFromSmarts('[n]-[*;!#1]')
+  matches = par_mol.GetSubstructMatches(pattern, uniquify=False)
+  for match in matches:
+    match = list(match)
+    if (match[0] in atom_indices) and (match[1] not in atom_indices):
+      natom = par_mol.GetAtomWithIdx(match[0])
+      natom.SetNumExplicitHs(1)
+
   n_heavy_atom_total = Descriptors.HeavyAtomCount(mol)
   if n_heavy_atom_total == n_heavy_atom_match:
     try:
@@ -172,14 +183,14 @@ if __name__ == '__main__':
   # below we focus on trimming the fragment
   
   # all single bonds are eligible to cut,
-  single_bonds = []
-  pattern = Chem.MolFromSmarts('[*;!#1][*;!#1]')
+  eligible_bonds = []
+  pattern = Chem.MolFromSmarts('[*;!#1]~[*;!#1]')
   matches = mol.GetSubstructMatches(pattern, uniquify=False)
   for match in matches:
     match = list(match)
     match.sort()
-    if match not in single_bonds:
-      single_bonds.append(match)
+    if match not in eligible_bonds:
+      eligible_bonds.append(match)
   
   # record non-trivalence nitrogen 
   special_nitrogen = []
@@ -245,7 +256,7 @@ if __name__ == '__main__':
         if (not sameRing) and (atomNum != 1):
           pair = [idx, neig_idx]
           pair.sort() 
-          if not set(pair).issubset(set(torsion_idx_list)) and (pair in single_bonds) and (pair not in special_nitrogen): 
+          if not set(pair).issubset(set(torsion_idx_list)) and (pair in eligible_bonds) and (pair not in special_nitrogen): 
             if pair not in sub_bonds:
               sub_bonds.append(pair)
     # deal with the case when atom not in ring
@@ -254,7 +265,7 @@ if __name__ == '__main__':
         neig_idx = neig.GetIdx()
         pair = [idx, neig_idx]
         pair.sort() 
-        if not set(pair).issubset(set(torsion_idx_list)) and (pair in single_bonds) and (pair not in special_nitrogen): 
+        if not set(pair).issubset(set(torsion_idx_list)) and (pair in eligible_bonds) and (pair not in special_nitrogen): 
           if pair not in sub_bonds:
             sub_bonds.append(pair)
   
