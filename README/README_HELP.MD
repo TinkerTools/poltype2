@@ -99,17 +99,20 @@
 
 ``userxyzgeometry`` specifies an xyz file to use user input geometry (usually already optimized), Poltype will skip QM opt and continue with DMA step. Default is ''.
 
+``sp2aniline`` specifies to generate flat geometry of c-NH2 (only works with `use_gaus` keyword). If True, poltype will also assign `anglep` and `opbend` parameters. Default is True.
+
 ``optloose`` specifies to use GAU_LOOSE optimization convergence criteria for psi4 optimization (both first geometry optimzation and for torsion geometry optimization)
 
 ``optconvergence`` specifies optimization convergence. LOOSE, GAU_LOOSE criteria (identical to the keyword ``optloose``); VERYLOOSE, only using gradient thresholds from GAU_LOOSE criteria. Default is LOOSE. 
 
 #### Distributed Multipole Analysis and Electrostatic Single Point
 
-``new_gdma`` specifies to use the new grid-based DMA algorithm. Default is False.
+``new_gdma`` specifies to use the new grid-based DMA algorithm (experimental feature). Default is False.
 
 ``gdmacommand_*`` add/modify GDMA commands. For example, `gdmacommand_Radius_S=0.80` will add the command `Radius S 0.80` to GDMA input file.
 
 ``usepoleditframes`` specifies to use POLEDIT frames rather than poltype frame detection. Default is True.
+
 
 ``dmamethod``  specifies which quantum method to use for distributed multipole analysis (DMA). Default is MP2.
                   
@@ -119,11 +122,21 @@
 
 ``espbasisset`` specifies basis set to use for electrostatic fitting. Default is aug-cc-pvtz.
 
+``sameleveldmaesp`` specifies to use only do QM once (DMA) and copy files for ESP. Default is False.
+
+``adaptiveespbasisset`` specifies to downgrade ESP basis set from aug-cc-pvtz to aug-cc-pvdz when molecule have >=20 atoms. Default is False.
+
 ``numespconfs`` specifies number of conformations to be used for ESP potential fitting. Rdkit conformors are evaluated via MMFF94 energies and numespconfs-1 most favorable conformations are picked to add to fitting (with first being most extended conformation). Default is 1.
 
 ``espextraconflist`` specifies list of conformors to add to extended conformation for ESP fitting. Default is to just use extended conformation for ESP fitting. Files can be SDF or any format as long as atom order is same as input molecule atom order.
 
 ``indextompoleframefile`` specifies file of multipole frame definitions for each line (exactly how frames are defined in first key file). This will be used instead of poltype frame detection if specified.
+
+``scalebigmultipole``   when big multipoles seen in DMA, specifies to scale down, then to fit high level ESP. Default is False.
+
+``fragbigmultipole``   when big multipoles seen in DMA, specifies to use a smaller fragment to derive multipole, then to fit high level ESP. Default is True.
+
+``atomidsfordmafrag``   specifies a list of atoms to be thought as "BID multipole atoms" to use `fragbigmultipole`. Default is [].
 
 
 #### Database Matching
