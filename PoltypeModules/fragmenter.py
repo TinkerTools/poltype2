@@ -741,6 +741,7 @@ def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog
     tempmaxmem,tempmaxdisk,tempnumproc=poltype.PartitionResources()
     # keywords to be written to poltype ini file
     init_keywords = ['poltypepath', 'bashrcpath']
+    init_keywords += ['forcefield']
     init_keywords += ['prmmodlist']
     init_keywords += ['deleteallnonqmfiles', 'suppressdipoleerr', 'printoutput']
     init_keywords += ['numproc', 'maxmem', 'maxdisk']
