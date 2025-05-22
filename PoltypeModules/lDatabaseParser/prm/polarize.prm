@@ -67,7 +67,7 @@
 [$([F][A])]                               					  Fnonar     0.348 # F connected to non-aromatic atom
 [$([F][a])]                               					     Far     0.309 # F connected to aromatic atom
 [$([Cl][A])]                              					 Clnonar     2.337 # Cl connected to non-aromatic atom
-[$([Cl][a])]                              					    Clar     2.567 # Cl connected to aromatic atom
+[$([Cl][a])]                              					    Clar     2.452 # Cl connected to aromatic atom
 [$([Br][A])]                              					 Brnonar     3.526 # Br connected to non-aromatic atom
 [$([Br][a])]                              					    Brar     4.132 # Br connected to aromatic atom
 [$([I][A])]                               					  Inonar     5.424 # I connected to non-aromatic atom
