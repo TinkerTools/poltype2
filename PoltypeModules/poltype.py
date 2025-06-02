@@ -3446,11 +3446,11 @@ class PolarizableTyper():
             tmpsdf = self.molstructfname
             tmpxyz = self.xyzoutfile 
             # Match for AMOEBA FF
-            if self.forcefield.upper() == 'AMOEBA':
+            if not self.rotalltors and self.forcefield.upper() == 'AMOEBA':
               cmd = f'python {self.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {tmpsdf} -potent TORSION'
               self.call_subsystem([cmd], True)  
             # Match for AMOEBAplus FF
-            if self.forcefield.upper() in ['AMOEBA+', 'AMOEBAPLUS']:
+            if not self.rotalltors and self.forcefield.upper() in ['AMOEBA+', 'AMOEBAPLUS']:
               cmd = f'python {self.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {tmpsdf} -potent TORSION+'
               self.call_subsystem([cmd], True)  
             # find torsions to be added
