@@ -54,7 +54,7 @@ def findSp2AtomTypes(txyz, sdffile):
 
   # Detect Nitrogen of Aniline-like molecule
   aniline_like_nitrogens = [] 
-  pattern = Chem.MolFromSmarts('[a][#7X3]')
+  pattern = Chem.MolFromSmarts('[a][#7X3;h3]')
   matches = rdkitmol.GetSubstructMatches(pattern, uniquify=False)
   for match in matches:
     aniline_like_nitrogens.append(match[1])
@@ -76,6 +76,5 @@ def findSp2AtomTypes(txyz, sdffile):
     if str(n) not in sp2AtomTypes:
       sp2AtomTypes.append(str(n))
       print(f'Adding type {str(n)} to SP2 atoms since it is an amide_nitrogen')
-
   return sp2AtomTypes
 

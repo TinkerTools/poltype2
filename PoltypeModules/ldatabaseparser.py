@@ -162,7 +162,7 @@ def write_initial_parameters(sdffile, txyz):
 
   # Detect Nitrogen of Aniline-like molecule
   aniline_like_nitrogens = [] 
-  pattern = Chem.MolFromSmarts('[a][#7X3]')
+  pattern = Chem.MolFromSmarts('[a][#7X3;h3]')
   matches = rdkitmol.GetSubstructMatches(pattern, uniquify=False)
   for match in matches:
     aniline_like_nitrogens.append(match[1])
