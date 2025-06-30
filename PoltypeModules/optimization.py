@@ -10,8 +10,8 @@ import shutil
 import torsiongenerator as torgen
 import traceback
 import warnings
-from rdkit.Chem import rdmolfiles
 from rdkit import Chem
+from rdkit.Chem import rdmolfiles,RingInfo
 from PyAstronomy import pyasl
 
 def GeometryOPTWrapper(poltype,molist):
@@ -597,7 +597,7 @@ def FindTorsionRestraints(poltype):
     Output: torsion restraint list
     Referenced By: GeometryOptimization 
     Description: Find the torsion atoms we want to restraint during geometry optimization.
-    1. Only rotatable bond torsion
+    1. Only non-cyclic rotatable bond torsion
     2. Four atoms must be heavy atoms
     3. Two torsions MAX on one rotatable bond
        a. Heaviest two atoms on one side (a,b)
@@ -608,22 +608,15 @@ def FindTorsionRestraints(poltype):
     torsionrestraints=[]
     mol = Chem.MolFromMolFile(poltype.molstructfname,removeHs=False)
 
-    # find aromatic atoms for later use
-    aromatics = []
-    pattern = Chem.MolFromSmarts('[a]')
-    matches = mol.GetSubstructMatches(pattern, uniquify=True)
-    for match in matches:
-      if len(match) == 1:
-        aromatics.append(match[0])
-   
     # find all diherals in the molecule
     rotbond_torsions = {}
-    pattern = Chem.MolFromSmarts('[*]~[*]~[*]~[*]')
+    pattern = Chem.MolFromSmarts('[*]~[*]~!#[*]~[*]')
     matches = mol.GetSubstructMatches(pattern, uniquify=True)
     for match in matches:
       match = list(match)
       a, x, y, b = match
-      if not (x in aromatics and y in aromatics):
+      sameRing = RingInfo.AreAtomsInSameRing(mol.GetRingInfo(), x, y)
+      if not sameRing:
         if x < y:
           comb = f"{x}-{y}"
           tor = match
