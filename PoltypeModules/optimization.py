@@ -433,7 +433,6 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
                 for res in torsionrestraints:
                     rta,rtb,rtc,rtd=res[:]
                     tmpfh.write('%d %d %d %d F\n' % (rta,rtb,rtc,rtd))
-                tmpfh.write("\n")
             else:
                 tmpfh.write(line)
 
