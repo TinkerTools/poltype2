@@ -76,6 +76,24 @@ def modkey2_scalempole(poltype):
       s = line.split()
       type2element[s[1]] = s[3].upper()
   
+  # detect triple bond atoms
+  sdffile = poltype.molstructfname
+  rdkitmol = Chem.MolFromMolFile(sdffile,removeHs=False)
+  pattern = Chem.MolFromSmarts('[#6]#[#6]')
+  matches = rdkitmol.GetSubstructMatches(pattern)
+  triple_bonded_atoms = []
+  for match in matches:
+    if len(match) == 2:
+      triple_bonded_atoms.append(match[0] + 1)
+      triple_bonded_atoms.append(match[1] + 1)
+  
+  atom2type = {}
+  xyzlines = open(poltype.xyzoutfile).readlines()[1:]
+  for line in xyzlines:
+    s = line.split()
+    atom2type[int(s[0])] = s[5]
+  triple_bond_types = [atom2type[a] for a in triple_bonded_atoms]
+  
   # detect the big dipole and quadrupole and rewrite a keyfile
   blank = 34*' '
   mpole_lines = []
@@ -89,10 +107,16 @@ def modkey2_scalempole(poltype):
         dy = float(lines[i+1].split()[-2])
         dz = float(lines[i+1].split()[-1])
         
-        # modify dipole on-the-fly
-        if (abs(dx) > 1.0 or abs(dy) > 1.0 or abs(dz) > 1.0) and (type2element[current_type] == 'C'):
+        # modify dipole on-the-fly, for C#C bond, use a smaller threshold 
+        if ((abs(dx) > 1.0 or abs(dy) > 1.0 or abs(dz) > 1.0) and (type2element[current_type] == 'C')) or \
+        ((abs(dx) > 0.5 or abs(dy) > 0.5 or abs(dz) > 0.5) and (current_type in triple_bond_types)):
           biggest = max([abs(dx), abs(dy), abs(dz)])
-          ratio = biggest/0.5
+          if current_type in triple_bond_types:
+            target_dipole = 0.1
+          else:
+            target_dipole = 0.5
+          
+          ratio = biggest/target_dipole
 
           dx /= ratio
           dy /= ratio
@@ -239,6 +263,7 @@ def modkey2_fragmpole(poltype):
           pt.write("espbasisset=6-311G**\n")
           pt.write("sameleveldmaesp=True\n")
           pt.write("scalebigmultipole=True\n")
+          pt.write("fragbigmultipole=False\n")
           pt.write(f"numproc={poltype.numproc}\n")
           pt.write(f"maxmem={poltype.maxmem}\n")
           pt.write(f"maxdisk={poltype.maxdisk}\n")
