@@ -609,7 +609,7 @@ def FindTorsionRestraints(poltype):
 
     # find all diherals in the molecule
     rotbond_torsions = {}
-    pattern = Chem.MolFromSmarts('[*]~[*]~!#[*]~[*]')
+    pattern = Chem.MolFromSmarts('[*]~!#[*]~!#[*]~!#[*]')
     matches = mol.GetSubstructMatches(pattern, uniquify=True)
     for match in matches:
       match = list(match)
