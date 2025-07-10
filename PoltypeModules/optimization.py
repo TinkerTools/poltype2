@@ -648,17 +648,17 @@ def FindTorsionRestraints(poltype):
       first = [val for _, val in sorted(zip(first_atoms_atomic, first_atoms), reverse=True)]
       last = [val for _, val in sorted(zip(last_atoms_atomic, last_atoms), reverse=True)]
      
-      # select top2 atoms and excluding hydrogens
+      # select top2 atoms
       tmp = []
       for f in first:
-        if len(tmp) < 2 and (f not in tmp) and (atomic_numbers[f] > 1):
+        if len(tmp) < 2 and (f not in tmp):
           tmp.append(f)
       first = tmp
       
-      # select top2 atoms and excluding hydrogens
+      # select top2 atoms
       tmp = []
       for f in last:
-        if len(tmp) < 2 and (f not in tmp) and (atomic_numbers[f] > 1):
+        if len(tmp) < 2 and (f not in tmp):
           tmp.append(f)
       last = tmp
     
