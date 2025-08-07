@@ -541,6 +541,8 @@ def assignCFlux_general():
                   p = stype2param[combn].split()
                   jb.append(float(p[0]))
             jb = "%10.4f"%np.array(jb).mean()
+            if 'nan' in jb: 
+              jb = '    0.0000'
             f.write("bndcflux %s %s %s\n"%(d[1], d[2], jb))
             print(YELLOW + f"CFlux parameter GENERATED for bond %s-%s"%(d[1], d[2]) + ENDC)
       
