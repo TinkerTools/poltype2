@@ -156,6 +156,30 @@ if __name__ == "__main__":
   for match in matches:
     c, o, n, h1, h2 = match
     amide_torsions.append([n,c,h1,h2])
+  
+  # match phenol-like atoms
+  phenol_like_torsions = [] 
+  pattern = Chem.MolFromSmarts('[H][O,S][a][a]')
+  matches = m1.GetSubstructMatches(pattern)
+  for i in range(0,len(matches),2):
+    match = matches[i]
+    x, y, a1, a2 = match
+    phenol_like_torsions.append([x, y, a1, a2])
+  
+  pattern = Chem.MolFromSmarts('[CH3][O,S][a][a]')
+  matches = m1.GetSubstructMatches(pattern)
+  for i in range(0,len(matches),2):
+    match = matches[i]
+    x, y, a1, a2 = match
+    phenol_like_torsions.append([x, y, a1, a2])
+  
+  aniline_like_torsions = [] 
+  pattern = Chem.MolFromSmarts('[H][NH2][a][a]')
+  matches = m1.GetSubstructMatches(pattern)
+  for i in range(0,len(matches),4):
+    match = matches[i]
+    x, y, a1, a2 = match
+    aniline_like_torsions.append([x, y, a1, a2])
 
   ffps = ChemicalForceFields.MMFFGetMoleculeProperties(m1)
   converged = []
@@ -169,7 +193,19 @@ if __name__ == "__main__":
     if amide_torsions != []:
       for amide_torsion in amide_torsions:
         t1,t2,t3,t4 = amide_torsion
-        ff.MMFFAddTorsionConstraint(t1, t2, t3, t4, True, 0, 0, 1000.0)
+        ff.MMFFAddTorsionConstraint(t1, t2, t3, t4, False, 0.0, 0.0, 100.0)
+    
+    # add torsion restraint for phenol-like torsion
+    if phenol_like_torsions != []:
+      for torsion in phenol_like_torsions:
+        t1,t2,t3,t4 = torsion
+        ff.MMFFAddTorsionConstraint(t1, t2, t3, t4, False, 90.0, 90.0, 100.0)
+    
+    # add torsion restraint for aniline-like torsion
+    if aniline_like_torsions != []:
+      for torsion in aniline_like_torsions:
+        t1,t2,t3,t4 = torsion
+        ff.MMFFAddTorsionConstraint(t1, t2, t3, t4, False, 90.0, 90.0, 100.0)
 
     res=ff.Minimize(maxIts=500)
     converged.append(res) 
@@ -241,11 +277,22 @@ if __name__ == "__main__":
   # Write distance constraint file used with xtb
   with open(os.path.join(confgendir, 'constraint.inp'), 'w') as f:
     f.write("$constrain\n")
-    f.write("  force constant=0.5\n")
+    f.write("  force constant=0.05\n")
     for k,v in ihb_dist.items():
       idx1, idx2 = k.split('-')
       # here we set distance involving IHB
       f.write(f"  distance: {int(idx1)+1}, {int(idx2)+1}, auto\n")
+    if len(phenol_like_torsions) != 0:
+      # here we set dihedral involving phenol-like molecules
+      for tor in phenol_like_torsions:
+        a, b, c, d = tor
+        f.write(f"  dihedral: {a+1},{b+1},{c+1},{d+1},90.0\n")
+    
+    if len(aniline_like_torsions) != 0:
+      # here we set dihedral involving aniline-like molecules
+      for tor in aniline_like_torsions:
+        a, b, c, d = tor
+        f.write(f"  dihedral: {a+1},{b+1},{c+1},{d+1},90.0\n")
     f.write("$end\n")
   
   # Get total charge and number of unpaired electrons for later use
