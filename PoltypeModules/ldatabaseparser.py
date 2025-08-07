@@ -114,7 +114,7 @@ def calc_bond_angle(coords):
     result = 180.0/np.pi * (np.arccos(dot/(vec21norm*vec23norm)))
   return result
 
-def write_initial_parameters(sdffile, txyz):
+def write_initial_parameters(sp2aniline, sdffile, txyz):
   atom2type = {}
   g = nx.Graph()
   nodes = []
@@ -162,7 +162,9 @@ def write_initial_parameters(sdffile, txyz):
 
   # Detect Nitrogen of Aniline-like molecule
   aniline_like_nitrogens = [] 
-  pattern = Chem.MolFromSmarts('[a][#7X3;h3]')
+
+  # when sp2aniline is True, exclude NH0-a
+  pattern = Chem.MolFromSmarts('[a][#7X3!H0]')
   matches = rdkitmol.GetSubstructMatches(pattern, uniquify=False)
   for match in matches:
     aniline_like_nitrogens.append(match[1])
@@ -173,11 +175,17 @@ def write_initial_parameters(sdffile, txyz):
     if atype not in aniline_like_nitrogen_types:
       aniline_like_nitrogen_types.append(atype)
   
-  # N of Aniline-like molecule DONOT need opbend/anglep
-  for n in aniline_like_nitrogen_types:
-    if str(n) in tricentertypes:
-      tricentertypes.remove(str(n))
-      print(f'Removing type {str(n)} from SP2 atoms since it is an aniline_like_nitrogen')
+  if not sp2aniline:
+    for n in aniline_like_nitrogen_types:
+      if str(n) in tricentertypes:
+        tricentertypes.remove(str(n))
+        print(f'Removing type {str(n)} aniline_like_nitrogen from SP2 atoms per user request')
+  else:
+    for n in aniline_like_nitrogen_types:
+      if str(n) not in tricentertypes:
+        tricentertypes.append(str(n))
+        print(f'Adding type {str(n)} to SP2 atoms since it is an aniline_like_nitrogen')
+    
   
   # N of Amide DO need opbend/anglep
   for n in amide_nitrogen_types:
@@ -292,7 +300,8 @@ def zero_special_torsions(poltype):
 def assign_bonded_params(poltype):
     tmpxyz = poltype.xyzoutfile
     sdffile = poltype.molstructfname
-    write_initial_parameters(sdffile, tmpxyz)
+    sp2aniline = poltype.sp2aniline
+    write_initial_parameters(sp2aniline, sdffile, tmpxyz)
     tmpkey = 'tmpbonded.key'
     sdffile = poltype.molstructfname
     shutil.copy(poltype.key4fname, tmpkey)
