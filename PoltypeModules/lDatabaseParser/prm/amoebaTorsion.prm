@@ -451,3 +451,4 @@
 #########################################
 [#1][NH2]=[C][NH2]           % 1,2,3,4  % 0.000, 1.200, 0.800  % Parameters for Benzimidazole
 [#1][NH2][C]=[NH2]           % 1,2,3,4  % 0.000, 1.200, 0.800  % Parameters for Benzimidazole
+[#8]=[#16][#7X3][#1] 		% 1,2,3,4 %  0.000, 2.2, -0.20  % Sulfonamide O=S-N-H borrowed from Acetamide after adjustment 
