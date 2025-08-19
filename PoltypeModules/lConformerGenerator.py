@@ -105,6 +105,7 @@ if __name__ == "__main__":
   parser.add_argument('-p', dest = 'xtbpath', help = "Absolute path of xtb executable", required=True)  
   parser.add_argument('-o', dest = 'outputfile', help = "Output file name. Default: conftest.mol", default='conftest.mol')  
   parser.add_argument('-f', dest = 'inputformat', help = "Input file format. Default: SDF", choices = ['SDF', 'MOL2'], type=str.upper, default='SDF')  
+  parser.add_argument('--npp', dest = 'nonplanarphenol', help = "Flag to generate nonplanar phenol. Default: False", default=False, action='store_true')  
   
   args = vars(parser.parse_args())
   
@@ -112,6 +113,10 @@ if __name__ == "__main__":
   outputfile = args['outputfile']
   inputformat = args['inputformat']
   xtbpath = args['xtbpath']
+  nonplanarphenol = args['nonplanarphenol']
+
+  if nonplanarphenol:
+    print('User is requesting nonplanar OH/SH/NH for phenol-like molecules')
 
   if inputformat == 'MOL2':
     m1 = Chem.MolFromMol2File(inputfile,removeHs=False)
@@ -195,17 +200,18 @@ if __name__ == "__main__":
         t1,t2,t3,t4 = amide_torsion
         ff.MMFFAddTorsionConstraint(t1, t2, t3, t4, False, 0.0, 0.0, 100.0)
     
-    # add torsion restraint for phenol-like torsion
-    if phenol_like_torsions != []:
-      for torsion in phenol_like_torsions:
-        t1,t2,t3,t4 = torsion
-        ff.MMFFAddTorsionConstraint(t1, t2, t3, t4, False, 90.0, 90.0, 100.0)
-    
-    # add torsion restraint for aniline-like torsion
-    if aniline_like_torsions != []:
-      for torsion in aniline_like_torsions:
-        t1,t2,t3,t4 = torsion
-        ff.MMFFAddTorsionConstraint(t1, t2, t3, t4, False, 90.0, 90.0, 100.0)
+    if nonplanarphenol:
+      # add torsion restraint for phenol-like torsion
+      if phenol_like_torsions != []:
+        for torsion in phenol_like_torsions:
+          t1,t2,t3,t4 = torsion
+          ff.MMFFAddTorsionConstraint(t1, t2, t3, t4, False, 90.0, 90.0, 100.0)
+      
+      # add torsion restraint for aniline-like torsion
+      if aniline_like_torsions != []:
+        for torsion in aniline_like_torsions:
+          t1,t2,t3,t4 = torsion
+          ff.MMFFAddTorsionConstraint(t1, t2, t3, t4, False, 90.0, 90.0, 100.0)
 
     res=ff.Minimize(maxIts=500)
     converged.append(res) 
@@ -282,17 +288,19 @@ if __name__ == "__main__":
       idx1, idx2 = k.split('-')
       # here we set distance involving IHB
       f.write(f"  distance: {int(idx1)+1}, {int(idx2)+1}, auto\n")
-    if len(phenol_like_torsions) != 0:
-      # here we set dihedral involving phenol-like molecules
-      for tor in phenol_like_torsions:
-        a, b, c, d = tor
-        f.write(f"  dihedral: {a+1},{b+1},{c+1},{d+1},90.0\n")
     
-    if len(aniline_like_torsions) != 0:
-      # here we set dihedral involving aniline-like molecules
-      for tor in aniline_like_torsions:
-        a, b, c, d = tor
-        f.write(f"  dihedral: {a+1},{b+1},{c+1},{d+1},90.0\n")
+    if nonplanarphenol:
+      if len(phenol_like_torsions) != 0:
+        # here we set dihedral involving phenol-like molecules
+        for tor in phenol_like_torsions:
+          a, b, c, d = tor
+          f.write(f"  dihedral: {a+1},{b+1},{c+1},{d+1},90.0\n")
+      
+      if len(aniline_like_torsions) != 0:
+        # here we set dihedral involving aniline-like molecules
+        for tor in aniline_like_torsions:
+          a, b, c, d = tor
+          f.write(f"  dihedral: {a+1},{b+1},{c+1},{d+1},90.0\n")
     f.write("$end\n")
   
   # Get total charge and number of unpaired electrons for later use

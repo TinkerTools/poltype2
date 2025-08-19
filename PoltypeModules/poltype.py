@@ -233,6 +233,7 @@ class PolarizableTyper():
         scalebigmultipole:bool=False
         fragbigmultipole:bool=True
         sp2aniline:bool=True
+        nonplanarphenol:bool=False
         chargethreshold:float=1.5
         dipolethreshold:float=1.5
         quadrupolethreshold:float=2.4
@@ -594,6 +595,8 @@ class PolarizableTyper():
                             self.fragbigmultipole=self.SetDefaultBool(line,a,True)
                         elif 'sp2aniline' in newline:
                             self.sp2aniline=self.SetDefaultBool(line,a,True)
+                        elif 'nonplanarphenol' in newline:
+                            self.nonplanarphenol=self.SetDefaultBool(line,a,True)
                         elif newline.startswith("gdmacommand_"):
                             self.__dict__[newline] = a
                             gdma_kws.append((newline[len('gdmacommand_'):], a))
@@ -2614,7 +2617,12 @@ class PolarizableTyper():
             xtbenvpath=os.path.join(allenvs,self.xtbenvname)
             pythonpath=os.path.join(xtbenvpath,'bin')
             xtbpath=os.path.join(pythonpath,'xtb')
-            cmdstr = f"python \"{os.path.join(os.path.abspath(os.path.split(__file__)[0]), 'lConformerGenerator.py')}\" -i {self.molstructfname} -p {xtbpath}"
+            nonplanarphenol = self.nonplanarphenol
+            if nonplanarphenol:
+              cmdstr = f"python \"{os.path.join(os.path.abspath(os.path.split(__file__)[0]), 'lConformerGenerator.py')}\" -i {self.molstructfname} -p {xtbpath} --npp"
+            else:
+              cmdstr = f"python \"{os.path.join(os.path.abspath(os.path.split(__file__)[0]), 'lConformerGenerator.py')}\" -i {self.molstructfname} -p {xtbpath}"
+              
             self.WriteToLog('Calling: '+cmdstr) 
             os.system(cmdstr)
             name = "conftest.mol" 
