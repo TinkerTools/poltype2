@@ -445,3 +445,9 @@
 [$([O-][Cl](=[O])(=[O])=[O])]                          O-Perchlorate        # O of Perchlorate
 [$([S-][C]#[N])]                                       S-Thiocyanate        # S of Thiocyanate
 [$([N]#[C][S-])]                                       N-Thiocyanate        # N of Thiocyanate
+
+# Reparametrized Phenol (pCresol etc)
+# Used SAPT2+dMP2 as QM reference and liquid properties to fit vdw
+[$([OH][c])]                                 OH-c           # O of phenol-like molecules
+[$([H][O][c])]                               HO-c           # H of phenol-like molecules
+[$([c][O][H])]                               c-OH           # c of phenol-like molecules
