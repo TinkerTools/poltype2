@@ -207,7 +207,7 @@ def genAtomType(txyz, key, potent):
         for atom in range(1, natoms+1, 1):
           atomtype = types[atom-1]
           atomclass = type_class_dict[atomtype]
-          f.write("%5s %5s %5s %5s %5s #%s\n"%(atom, atomtype, atomclass, matchDict[atom], classesDict[atom], commentsDict[atom]))
+          f.write("%5s %5s %5s %5s %5s %s\n"%(atom, atomtype, atomclass, matchDict[atom], classesDict[atom], commentsDict[atom]))
   return atom_class_dict
 
 def assignPolar():
