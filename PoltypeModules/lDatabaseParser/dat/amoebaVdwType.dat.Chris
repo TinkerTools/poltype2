@@ -1,0 +1,453 @@
+# Single atom or wildcard fallback parameters
+[$([Ar])]          					Ar			# Argon Atom Ar
+[$([B])]          					B*			# B*, wild matching Boron
+[$([Br])]          					Br*                     # Br*, wild matching Br 
+[$([c])]          					benz_C			# Benzene C
+[$([C])]          					C*                      # C*, wild matching Carbon
+[$([Cl])]          					Cl*                     # Cl*, wild matching Chloride 
+[$([F])]          					F*                      # F*, wild matching Floride
+[$([H])]          					H*			# H*, wild matching Hydrogen
+[$([H][C,c])]          				HC*			# H*, wild matching Hydrogen
+[$([H][O])]          					HO*			# H*, wild matching Hydrogen
+[$([H][N,n])]          				HN*			# H*, wild matching Hydrogen
+[$([He])]          					He			# Helium Atom He
+[$([I])]          					I*			# I*, wild matching I 
+[$([Kr])]          					Kr			# Krypton Atom Kr
+[$([N])]          					N*			# N*, wild aliphatic Nitrogen
+[$([n])]          					n*			# N*, wild aromatic Nitrogen
+[$([Ne])]          					Ne			# Neon Atom Ne
+[$([O])]          					O*			# O*, aliphatic matching Oxygen
+[$([o])]          					o*			# O*, aromatic matching Oxygen
+[$([OX2][C,N,S,P])]          				OX2*			# OX2*, wild divalent Oxygen
+[$([OX1][C,N,S])]          				OX1*			# OX1*, wild CO*, NO*, SO* Oxygen
+[$([OX1][P])]          				OX1P*			# OX1P*, wild PO* Oxygen
+[$([OX1]=[C,N,S])]          				OX1=*			# OX1=*, wild sp2 Oxygen
+[$([P])]          					P*			# P*, wild matching Phosphorus
+[$([S])]          					S*			# S*, aliphatic matching Sulfur
+[$([s])]          					s*			# S*, aromatic matching Sulfur
+[$([SX2])]          					SX2*			# SX2*, wild divalent Sulfur
+[$([S]=[C,O])]          				S=[C,O]*		# S=C or S=O, wild Sulfur
+[$([Xe])]          					Xe			# Xenon Atom Xe
+
+
+# Single ionic species
+[$([Br-])]          					Br-			# Bromide Ion Br-
+[$([Cl-])]          					Cl-			# Chloride Ion Cl-
+[$([Cs+])]          					Cs+			# Cesium Ion Cs+
+[$([F-])]          					F-			# Fluoride Ion F-
+[$([I-])]          					I-			# Iodide Ion I-
+[$([K+])]          					K+			# Potassium Ion K+
+[$([Li+])]          					Li+			# Lithium Ion Li+
+[$([Mg++])]          					Mg++			# Magnesium Ion Mg+2
+[$([Na+])]          					Na+			# Sodium Ion Na+
+[$([Rb+])]          					Rb+			# Rubidium Ion Rb+
+[$([Zn++])]          					Zn++			# Zinc Ion Zn+2
+
+
+# Boron
+[$([B-](F)(F)(F)F)]          				BF4-			# Tetrafluoroborate B
+
+
+# Carbon
+[$([c][C])]          					toluene_C1-CH3		# Toluene C1-CH3
+[$([c][O])]          					phenol_C1-OH		# Phenol C1-OH
+[$([c][n+])]          					pyridinium_C2		# Pyridinium C2
+[$([c]1nccn1)]          				imidazole_N[C]N		# Imidazole N-C-N general
+[$([c][C][C])]          				ethylbenz_C1-CH2	# Ethylbenzene C1-CH2
+[$([c][c][C])]          				toluene_C2		# Toluene C2
+[$([c][c][O])]          				phenol_C2		# Phenol C2
+[$([c][c][n+])]          				pyridinium_C3		# Pyridinium C3
+[$([c]1ncnc1[C])]          				4ethyl_imidazole_CD	# 4-Ethylimidazole CD general
+[$([c][c][C][C])]          				ethylbenz_C2		# Ethylbenzene C2
+[$([c][c][c][C])]          				toluene_C3		# Toluene C3
+[$([c][c][c][O])]          				phenol_C3		# Phenol C3
+[$([c]1[nx2]cnc1)]          				imidazole_[C]-N=C	# Imidazole C-N=C general
+[$([c]1[nx3]cnc1)]          				imidzaole_[C]-NH	# Imidazole C-NH- general
+[$([c][c][c][n+])]          				pyridinium_C4		# Pyridinium C4
+[$([c]1([C])ncnc1)]          				4ethyl_imidazole_CG	# 4-Ethylimidazole CG general
+[$([c]1ncc([C])n1)]          				4ethyl_imidazole_CE	# 4-Ethylimidazole CE general
+[$([c]12ccccc2ncc1)]          				indole_C3a		# Indole C3a
+[$([c]12nccc2cccc1)]          				indole_C7a		# Indole C7a
+[$([c]1c2ccccc2nc1)]          				indole_C3		# Indole C3
+[$([c]1c2nccc2ccc1)]          				indole_C7		# Indole C7
+[$([c]1cc2ccccc2n1)]          				indole_C2		# Indole C2
+[$([c]1cc2nccc2cc1)]          				indole_C6		# Indole C6
+[$([c]1ccc2nccc2c1)]          				indole_C5		# Indole C5
+[$([c]1cccc2nccc12)]          				indole_C4		# Indole C4
+[$([c][c][c][C][C])]          				ethylbenz_C3		# Ethylbenzene C3
+[$([c][c][c][c][C])]          				toluene_C4		# Toluene C4
+[$([c][c][c][c][O])]          				phenol_C4		# Phenol C4
+[$([c][CX3]([N])[N])]          			benzamidine_C1-CN2	# Benzamidine C1-CN2
+[$([c]12ccccc2ncc1[C])]          			3ethyl_indole_C3a	# 3-Ethylindole C3a
+[$([c][c][c][c][C][C])]          			ethylbenz_C4		# Ethylbenzene C4
+[$([c][c][CX3]([N])[N])]          			benzamidine_C2		# Benzamidine C2
+[$([c]12ncc([C])c2cccc1)]          			3ethyl_indole_C7a	# 3-Ethylindole C7a
+[$([c]1c2ncc([C])c2ccc1)]          			3ethyl_indole_C7	# 3-Ethylindole C7
+[$([c]1([C])c2ccccc2nc1)]          			3ethyl_indole_C3	# 3-Ethylindole C3
+[$([c]1cc2ncc([C])c2cc1)]          			3ethyl_indole_C6	# 3-Ethylindole C6
+[$([c]1c([C])c2ccccc2n1)]          			3ethyl_indole_C2	# 3-Ethylindole C2
+[$([c]1ccc2ncc([C])c2c1)]          			3ethyl_indole_C5	# 3-Ethylindole C5
+[$([c]1cccc2ncc([C])c12)]          			3ethyl_indole_C4	# 3-Ethylindole C4
+[$([c]([C])[c][c][c][O])]          			p-cresol_C4		# p-Cresol C4-CH3
+[$([c]([c][c][O])[c][C])]          			p-cresol_C3		# p-Cresol C3
+[$([c]([c][O])[c][c][C])]          			p-cresol_C2		# p-Cresol C2
+[$([c]([O])[c][c][c][C])]          			p-cresol_C1-OH		# p-Cresol C1-OH
+[$([c]12ccccc2ncc1[C]=[O])]          			3formyl_indole_C3a	# 3-Formylindole C3a
+[$([c][c][c][CX3]([N])[N])]          			benzamidine_C3		# Benzamidine C3
+[$([c]12ncc([C]=[O])c2cccc1)]          		3formyl_indole_C7a	# 3-Formylindole C7a
+[$([c]1c2ncc([C]=[O])c2ccc1)]          		3formyl_indole_C7	# 3-Formylindole C7
+[$([c]1cc2ncc([C]=[O])c2cc1)]          		3formyl_indole_C6	# 3-Formylindole C6
+[$([c]1ccc2ncc([C]=[O])c2c1)]          		3formyl_indole_C5	# 3-Formylindole C5
+[$([c]1cccc2ncc([C]=[O])c12)]          		3formyl_indole_C4	# 3-Formylindole C4
+[$([c]1c([C]=[O])c2ccccc2n1)]          		3formyl_indole_C2	# 3-Formylindole C2
+[$([c]1([C]=[O])c2ccccc2nc1)]          		3formyl_indole_C3	# 3-Formylindole C3
+[$([c][c][c][c][CX3]([N])[N])]          		benzamidine_C4		# Benzamidine C4
+[$([C][c])]          					toluene_CH3		# Toluene CH3
+[$([C]=[O])]          					C(=O)_C=O		# Formaldehyde C=O
+[$([C][SH1])]          				CSH_CH3			# Methyl Sulfide CH3
+[$([C][C][c])]          				ethylbenz_CH3		# Ethylbenzene CH3
+[$([C][O][C])]          				Me-Ether_C		# Methyl Ether CH3
+[$([C]([F])([F])([F])([F]))]     			 CF4    # Carbon on CF4 
+[$([C]([Cl])([Cl])([Cl])([Cl]))] 			 CCl4   # Carbon on CCl4 
+[$([C]([Br])([Br])([Br])([Br]))] 			 CBr4   # Carbon on CBr4 
+[$([C]([I])([I])([I])([I]))]     			 CI4    # Carbon on CI4 
+[$([C]([F])([F])([F])([#1]))] 	 			 CF3    # Carbon on CHF3 
+[$([C]([Cl])([Cl])([Cl])([#1]))] 			 CCl3   # Carbon on CHCl3 
+[$([C]([Br])([Br])([Br])([#1]))] 			 CBr3   # Carbon on CHBr3 
+[$([C]([I])([I])([I])([#1]))]    			 CI3    # Carbon on CHI3 
+[$([C]([F])([F])([#1])([#1]))] 	 			 CF2    # Carbon on CH2F2 
+[$([C]([Cl])([Cl])([#1])([#1]))] 			 CCl2   # Carbon on CH2Cl2 
+[$([C]([Br])([Br])([#1])([#1]))] 			 CBr2   # Carbon on CH2Br2 
+[$([C]([I])([I])([#1])([#1]))]   			 CI2    # Carbon on CH2I2 
+[$([C]([F])([#1])([#1])([#1]))]  			 CF1    # Carbon on CH3F 
+[$([C]([Cl])([#1])([#1])([#1]))] 			 CCl1   # Carbon on CH3Cl 
+[$([C]([Br])([#1])([#1])([#1]))] 			 CBr1   # Carbon on CH3Br 
+[$([C]([I])([#1])([#1])([#1]))]  			 CI1    # Carbon on CH3I 
+[$([C][S][C])]          				CSC_CH3			# Dimethyl Sulfide CH3
+[$([C]c1ncnc1)]          				4ethyl_imidazole_CH2	# 4-Ethylimidazole CH2 general
+[$([C][C]#[N])]          				CCN_CH3			# Acetonitrile CH3
+[$([C][C]=[O])]          				C(=O)C_CH3		# Acetaldehyde CH3
+[$([C][C][OH])]          				EtOH_CH3		# Ethanol CH3
+[$([C][NH][C])]          				CNC_CH3			# Dimethyl Amine CH3
+[$([C](=O)[C])]          				C(=O)C_C=O		# Acetaldehyde C=O
+[$([C]([C])[c])]          				ethylbenz_CH2		# Ethylbenzene CH2
+[$([C][C][NH2])]          				CCNH2_CH3		# Ethyl Amine CH3
+[$([C][C][SH1])]          				CCS_CH3			# Ethyl Sulfide CH3
+[$([C]([C])#[N])]          				CCN_CN			# Acetonitrile CN
+[$([C][C][S][C])]          				CCSC_CH3-C		# MeEt Sulfide CH3-C
+[$([C]([OH])[C])]          				EtOH_CH2		# Ethanol CH2
+[$([C](=O)[NH2])]          				C(=O)N_C=O		# Formamide C=O
+[$([C](=O)[OH1])]          				C(=O)OH_C=O		# Formic Acid C=O
+[$([C][S][C][C])]          				CCSC_CH3-S		# MeEt Sulfide CH3-S
+[$([C][S][S][C])]          				CSSC_CH3		# Dimethyl Disulfide CH3
+[$([C][C]c1ncnc1)]          				4ethyl_imidazole_CH3	# 4-Ethylimidazole CH3 general
+[$([C][C][C][OH])]          				ProOH_CH3		# Propanol CH3
+[$([C]([C])[SH1])]          				CCS_CH2			# Ethyl Sulfide CH2
+[$([C][S](=O)[C])]          				CS(=O)C_CH3		# Dimethyl Sulfoxide CH3
+[$([C][C][C][NH2])]          				CCCNH2_CH3		# Propyl Amine CH3
+[$([C]([C])[S][C])]          				CCSC_CH2-S		# MeEt Sulfide CH2-S
+[$([C][N]([C])[C])]          				3Me-N_CH3		# Trimethyl Amine CH3
+[$([C][NH][C]=[O])]          				C(=O)NC_CH3		# NMeFormamide CH3
+[$([C](=O)[NH][C])]          				C(=O)NC_C=O		# NMeFormamide C=O
+[$([C][C]([C])[OH])]          				isoPro_CH3		# isoPropanol CH3
+[$([C]([C])[C][OH])]          				ProOH_CH2		# Propanol Me-CH2
+[$([C][C](=O)[NH2])]          				CC(=O)N_CH3		# Acetamide CH3
+[$([C][C](=O)[OH1])]          				CC(=O)OH_CH3		# Acetic Acid CH3
+[$([C]c1c2ccccc2nc1)]          			3ethyl_indole_CH2	# 3-Ethylindole CH2
+[$([C]([C])([C])[OH])]          			isoPro_CH		# isoPropanol >CH-
+[$([C][C][NH][C]=[O])]          			C(=O)NCC_CH3		# NEtFormamide CH3-
+[$([C]([C])(=O)[NH2])]          			CC(=O)N_C=O		# Acetamide C=O
+[$([C][C](=O)[NH][C])]          			CC(=O)NC_CH3-C		# NMeAcetamide CH3-C
+[$([C][NH][C](=O)[C])]          			CC(=O)NC_CH3-N		# NMeAcetamide CH3-N
+[$([C](=O)([C])[OH1])]          			CC(=O)OH_C=O		# Acetic Acid C=O
+[$([C][c][c][c][c][O])]          			p-cresol_CH3		# p-Cresol CH3
+[$([C][C][C](=O)[NH2])]          			CCC(=O)N_CH3		# Propamide CH3
+[$([C][N]([C])[C]=[O])]          			C(=O)N(C)C_CH3		# DiMeFormamide CH3
+[$([C](=O)[N]([C])[C])]          			C(=O)N(C)C_C=O		# DiMeFormamide C=O
+[$([C][S](=O)(=O)[O-])]          			CSO3-_CH3		# Methyl Sulfonate CH3
+[$([C][C]c1c2ccccc2nc1)]          			3ethyl_indole_CH3	# 3-Ethylindole CH3
+[$([C]([C])[NH][C](=O))]          			C(=O)NCC_CH2		# NEtFormamide CH2-N
+[$([C]([C])(=O)[NH][C])]          			CC(=O)NC_C=O		# NMeAcetamide C=O
+[$([C][N]1[C][C][C][C]1)]          			Nr5-C_CH3-N		# NMePyrrolidine CH3-N
+[$([C](=O)c1c2ccccc2nc1)]          			3formyl_indole_C=O	# 3-Formylindole C=O
+[$([C][C](=O)[N]([C])[C])]          			CC(=O)N(C)C_CH3-C	# DiMeAcetamide CH3-C
+[$([C][C][S](=O)(=O)[O-])]          			CCSO3-_CH3		# Ethyl Sulfonate CH3
+[$([C][N]([C])[C](=O)[C])]          			CC(=O)N(C)C_CH3-N	# DiMeAcetamide CH3-N
+[$([C]([C])[S](=O)(=O)[O-])]          			CCSO3-_CH2		# Ethyl Sulfonate CH2
+[$([C](=O)([C])[N]([C])[C])]          			CC(=O)N(C)C_C=O		# DiMeAcetamide C=O
+[$([C][C][C][S](=O)(=O)[O-])]          		CCCSO3-_CH3		# Propyl Sulfonate CH3
+[$([C]([C])[C][S](=O)(=O)[O-])]          		CCCSO3-_Me-CH2		# Propyl Sulfonate Me-CH2
+[$([C](#[N])[C-]([C]#[N])[C]#[N])]          		3CN_Me-_CN		# Tricyanomethide CN
+[$([C-]#N)]          					C-#N			# Cyanide Ion C
+[$([C-]([C]#[N])([C]#[N])[C]#[N])]          		3CN_Me-_>C-		# Tricyanomethide >C-
+[$([Ca++])]          					Ca++			# Calcium Ion Ca+2
+[$([CH1]#[N])]          				HCN_C			# Hydrogen Cyanide CN
+[$([CH2]([C])[NH2])]          				CCNH2_CH2		# Ethyl Amine CH2
+[$([CH2]([C])[C][NH2])]          			CCCNH2_CH2		# Propyl Amine Me-CH2
+[$([CH2]1[C][NH][C][C]1)]          			NH1r5_CH2		# Pyrrolidine C-CH2-C
+[$([CH2]1[NH][C][C][C]1)]          			NH1r5_CH2-N		# Pyrrolidine CH2-N
+[$([CH2]([C])[C](=O)[NH2])]          			CCC(=O)N_CH2		# Propamide Me-CH2
+[$([CH2]1[C][N]([C])[C][C]1)]          		Nr5-C_CH2<		# NMePyrrolidine CH2<
+[$([CH2]1[N]([C])[C][C][C]1)]          		Nr5-C_CH2-N		# NMePyrrolidine CH2-N
+[$([CH3][O])]          				MeOH_C			# Methanol CH3
+[$([CH3][CH3])]          				CH3CH3			# Ethane CH3
+[$([CH3][NH2])]          				CH3NH2_C		# Methyl Amine CH3
+[$([CH4])]          					CH4			# C of methane
+[$([CH4])]          					CH4			# Methane CH4
+[$([CX3]([N])([N])[c])]          			benzamidine_N-C-N	# Benzamidine N-C-N
+[$([CX4;H0])]          				CX4H0			# Alkane >C<
+[$([CX4;H1])]          				CX4H1			# Alkane >CH-
+[$([CX4;H2])]                                          CX4H2			# Alkane -CH2-
+[$([CX4;H3])]          				CX4H3			# Alkane CH3-
+[$([#6;r5;r6])]                C-r5r6     # Carbon in both 5 and 6 member aromatic rings, Changsheng's paper
+[$([c;r6][#6;r5;r6][#6;r5;r6])]    Cr6-r5r6     # Polar 6-ring carbon (&indole), Changsheng's paper
+[$([c;r6][c;r6][#6;r5;r6][#6;r5;r6])]    Cr6-r5r6     # Polar 6-ring carbon (&indole), Changsheng's paper
+[$([#6;r5][#7;r5][#6;r5;r6])]    Cr5-r5r6     # Polar 5-ring carbon (&indole), Changsheng's paper
+
+# Fluorine
+[$([F][B-](F)(F)F)]          				F4B-			# Tetrafluoroborate F
+[$([F][P-](F)(F)(F)(F)F)]          			F6P-			# Hexafluorophosphate F
+
+
+# Hydrogen
+[$([H][c])]          					benz_HC			# Benzene HC
+[$([H][n+])]          					pyridinium_HN		# Pyridinium HN
+[$([H][CH3])]          				HCH3			# Methane H4C
+[$([H][CH4])]          				HCH4			# H of methane
+[$([H][NH2])]          				H3N			# Ammonia H3N
+[$([H][Nr5])]          				NH1r5_HN		# Pyrrolidine HN
+[$([H][OH2])]          				HW			# H of water
+[$([H][SH1])]          				SH2_H			# Hydrogen Sulfide H2S
+[$([H][C][c])]          				toluene_H3C		# Toluene H3C
+[$([H][N+X4])]          				H4N+			# Ammonium Ion H4N+
+[$([H][O][c])]          				phenol_HO		# Phenol HO
+[$([H][O][H])]          				H2O_H			# Water H
+[$([H][S][C])]          				CSH_HS			# Methyl Sulfide HS
+[$([H]c1nccn1)]          				imidazole_NC[H]N	# Imidazole N-C[H]-N general
+[$([H][C]#[N])]          				HCN_H			# Hydrogen Cyanide HCN
+[$([H][c][n+])]          				pyridinium_H2		# Pyridinium H2
+[$([H][C]=[O])]          				C(=O)_HC=O		# Formaldehyde HC=O
+[$([H]n1cncc1)]          				imidazole_HN		# Imidazole HN general
+[$([H]Cc1ncnc1)]           				4ethyl_imidazole_H2C	# 4-Ethylimidazole H2C general
+[$([H][CH2][O])]          				MeOH_HC			# Methanol H3C
+[$([H][C][SH1])]          				CSH_H3C			# Methyl Sulfide H3C
+[$([H][CX4;H0])]          				HCX4H0			# Alkane -HC<
+[$([H][CX4;H1])]                                       HCX4H1			# Alkane -H2C-
+[$([H][CX4;H2])]          				HCX4H2			# Alkane H3C-
+[$([H][O][CH3])]          				MeOH_HO			# Methanol HO
+[$([H][c]1ncnc1)]          				imidazole_[H]C-NH	# Imidazole HC-NH general
+[$([H][C][C][c])]          				ethylbenz_H3C		# Ethylbenzene H3C
+[$([H][c][c][C])]          				toluene_H2		# Toluene H2
+[$([H][c][c][O])]          				phenol_H2		# Phenol H2
+[$([H][C][O][C])]          				Me-Ether_HC		# Methyl Ether H3C
+[$([H][C][S][C])]          				CSC_H3C			# Dimethyl Sulfide H3C
+[$([H][NH][CH3])]          				CH3NH2_HN		# Methyl Amine H2N
+[$([H][O][C][C])]          				EtOH_HO			# Ethanol HO
+[$([H][S][C][C])]          				CCS_HS			# Ethyl Sulfide HS
+[$([H]c1ncnc1[C])]          				4ethyl_imidazole_HCD	# 4-Ethylimidazole HCD general
+[$([H][C][C]#[N])]          				CCN_H3C			# Acetonitrile H3C
+[$([H][c][c][n+])]          				pyridinium_H3		# Pyridinium H3
+[$([H][C][C]=[O])]          				C(=O)C_H3C		# Acetaldehyde H3C
+[$([H][C][C][OH])]          				EtOH_H3C		# Ethanol H3C
+[$([H][CH2][CH3])]          				HCH2CH3			# Ethane H3C
+[$([H][CH2][NH2])]          				CH3NH2_HC		# Methyl Amine H3C
+[$([H][C][NH][C])]          				CNC_H3C			# Dimethyl Amine H3C
+[$([H][C](=O)[C])]          				C(=O)C_HC=O		# Acetaldehyde HC=O
+[$([H]n1cncc1[C])]          				4ethyl_imidazole_HND	# 4-Ethylimidazole HND general
+[$([H][NH][C][C])]          				CCNH2_HN		# Ethyl Amine H2N
+[$([H][O][C]=[O])]          				C(=O)OH_HO		# Formic Acid HO
+[$([H][C]([C])[c])]          				ethylbenz_H2C		# Ethylbenzene H2C
+[$([H][C][C][NH2])]          				CCNH2_H3C		# Ethyl Amine H3C
+[$([H][C][C][SH1])]          				CCS_H3C			# Ethyl Sulfide H3C
+[$([H][C]([O])[C])]          				EtOH_H2C		# Ethanol H2C
+[$([H][N][CX3][c])]          				benzamidine_HN		# Benzamidine HN
+[$([H][NH][C]=[O])]          				C(=O)N_H2N		# Formamide H2N
+[$([H]c1ncc([C])n1)]          				4ethyl_imidazole_HCE	# 4-Ethylimidazole HCE general
+[$([H][c][c][C][C])]          				ethylbenz_H2		# Ethylbenzene H2
+[$([H][c][c][c][C])]          				toluene_H3		# Toluene H3
+[$([H][c][c][c][O])]          				phenol_H3		# Phenol H3
+[$([H][C][C][S][C])]          				CCSC_H3C-C		# MeEt Sulfide H3C-C
+[$([H][C](=O)[NH2])]          				C(=O)N_HCO		# Formamide HCO
+[$([H][C](=O)[OH1])]          				C(=O)OH_HC=O		# Formic Acid HC=O
+[$([H][C][S][C][C])]          				CCSC_H3C-S		# MeEt Sulfide H3C-S
+[$([H][C][S][S][C])]          				CSSC_H3C		# Dimethyl Disulfide H3C
+[$([H]n1cnc([C])c1)]          				4ethyl_imidazole_HNE	# 4-Ethylimidazole HNE general
+[$([H]c1c2ccccc2nc1)]          			indole_HC3		# Indole HC3
+[$([H]c1c2nccc2ccc1)]          			indole_HC7		# Indole HC7
+[$([H]c1cc2ccccc2n1)]          			indole_HC2		# Indole HC2
+[$([H]c1cc2nccc2cc1)]          			indole_HC6		# Indole HC6
+[$([H]c1ccc2nccc2c1)]          			indole_HC5		# Indole HC5
+[$([H]c1cccc2nccc12)]          			indole_HC4		# Indole HC4
+[$([H][c]1[nx2]cnc1)]          			imidazole_[H]C-N=C	# Imidazole HC general
+[$([H][C][C]c1ncnc1)]          			4ethyl_imidazole_H3C	# 4-Ethylimidazole H3C general
+[$([H][c][c][c][n+])]          			pyridinium_H4		# Pyridinium H4
+[$([H][C][C][C][OH])]          			ProOH_H3C		# Propanol H3C
+[$([H][C]([C])[SH1])]          			CCS_H2C			# Ethyl Sulfide H2C
+[$([H][C][S](=O)[C])]          			CS(=O)C_H3C		# Dimethyl Sulfoxide H3C
+[$([H]n1ccc2ccccc12)]          			indole_HN		# Indole HN
+[$([H][NX3]([C])[C])]          		        CNC_HN			# Dimethyl Amine HN
+[$([H][O][C](=O)[C])]          			CC(=O)OH_HO		# Acetic Acid HO
+[$([H][C][C][C][NH2])]          			CCCNH2_H3C		# Propyl Amine H3C
+[$([H][C]([C])[S][C])]          			CCSC_H2C-S		# MeEt Sulfide H2C-S
+[$([H][CH]([C])[NH2])]          			CCNH2_H2C		# Ethyl Amine H2C
+[$([H][C][N]([C])[C])]          			3Me-N_H3C		# Trimethyl Amine H3C
+[$([H][C][NH][C]=[O])]          			C(=O)NC_H3C		# NMeFormamide H3C
+[$([H][C](=O)[NH][C])]          			C(=O)NC_HCO		# NMeFormamide HCO
+[$([H][NH][C](=O)[C])]          			CC(=O)N_H2N		# Acetamide H2N
+[$([H][O][C]([C])[C])]          			isoPro_HO		# isoPropanol HO
+[$([H][c][c][c][C][C])]          			ethylbenz_H3		# Ethylbenzene H3
+[$([H][c][c][c][c][C])]          			toluene_H4		# Toluene H4
+[$([H][c][c][c][c][O])]          			phenol_H4		# Phenol H4
+[$([H][C][C]([C])[OH])]          			isoPro_H3C		# isoPropanol H3C
+[$([H][C]([C])[C][OH])]          			ProOH_H2C		# Propanol Me-CH2
+[$([H][C][C](=O)[NH2])]          			CC(=O)N_H3C		# Acetamide H3C
+[$([H][C][C](=O)[OH1])]          			CC(=O)OH_H3C		# Acetic Acid H3C
+[$([H][N]([C])[C]=[O])]          			C(=O)NC_HN		# NMeFormamide HN
+[$([H][C]c1c2ccccc2nc1)]          			3ethyl_indole_H2C	# 3-Ethylindole H2C
+[$([H][C]([C])([C])[OH])]          			isoPro_HC		# isoPropanol >CH-
+[$([H][C][C][NH][C]=[O])]          			C(=O)NCC_H3C		# NEtFormamide H3C
+[$([H][C][C](=O)[NH][C])]          			CC(=O)NC_H3C-C		# NMeAcetamide H3C-C
+[$([H][CH]([C])[C][NH2])]          			CCCNH2_H2C		# Propyl Amine Me-H2C
+[$([H][C][NH][C](=O)[C])]          			CC(=O)NC_H3C-N		# NMeAcetamide H3C-N
+[$([H]c1c2ncc([C])c2ccc1)]          			3ethyl_indole_HC7	# 3-Ethylindole HC7
+[$([H]c1cc2ncc([C])c2cc1)]          			3ethyl_indole_HC6	# 3-Ethylindole HC6
+[$([H]c1c([C])c2ccccc2n1)]          			3ethyl_indole_HC2	# 3-Ethylindole HC2
+[$([H]c1ccc2ncc([C])c2c1)]          			3ethyl_indole_HC5	# 3-Ethylindole HC5
+[$([H]c1cccc2ncc([C])c12)]          			3ethyl_indole_HC4	# 3-Ethylindole HC4
+[$([H][c][c][c][c][C][C])]          			ethylbenz_H4		# Ethylbenzene H4
+[$([H][C][c][c][c][c][O])]          			p-cresol-H3C		# p-Cresol H3C
+[$([H][C][C][C](=O)[NH2])]          			CCC(=O)N_H3C		# Propamide H3C
+[$([H][C][N]([C])[C]=[O])]          			C(=O)N(C)C_H3C		# DiMeFormamide H3C
+[$([H][C](=O)[N]([C])[C])]          			C(=O)N(C)C_HCO		# DiMeFormamide HCO
+[$([H][C][S](=O)(=O)[O-])]          			CSO3-_H3C		# Methyl Sulfonate H3C
+[$([H]n1cc([C])c2ccccc12)]          			3ethyl_indole_HN	# 3-Ethylindole HN
+[$([H][N]([C])[C](=O)[C])]          			CC(=O)NC_HN		# NMeAcetamide HN
+[$([H][O][c][c][c][c][C])]          			p-cresol_HO		# p-Cresol HO
+[$([H][C][C]c1c2ccccc2nc1)]          			3ethyl_indole_H3C	# 3-Ethylindole H3C
+[$([H][c][c][CX3]([N])[N])]          			benzamidine_H2		# Benzamidine H2
+[$([H][CH]1[C][NH][C][C]1)]          			NH1r5_H2C		# Pyrrolidine C-CH2-H
+[$([H][CH]1[NH][C][C][C]1)]          			NH1r5_H2C-N		# Pyrrolidine H2C-N
+[$([H][c]([c][c][O])[c][C])]          			p-cresol_H3		# p-Cresol H3
+[$([H][c]([c][O])[c][c][C])]          			p-cresol_H2		# p-Cresol H2
+[$([H][C][N]1[C][C][C][C]1)]          			Nr5-C_H3C-N		# NMePyrrolidine H3C-N
+[$([H][C](=O)c1c2ccccc2nc1)]          			3formyl_indole_HC=O	# 3-Formylindole HC=O
+[$([H][C][C](=O)[N]([C])[C])]          		CC(=O)N(C)C_H3C-C	# DiMeAcetamide H3C-C
+[$([H][C][C][S](=O)(=O)[O-])]          		CCSO3-_H3C		# Ethyl Sulfonate H3C
+[$([H][CH]([C])[C](=O)[NH2])]          		CCC(=O)N_H2C		# Propamide Me-H2C
+[$([H][C][N]([C])[C](=O)[C])]          		CC(=O)N(C)C_H3C-N	# DiMeAcetamide H3C-N
+[$([H]c1c2ncc([C]=[O])c2ccc1)]          		3formyl_indole_HC7	# 3-Formylindole HC7
+[$([H]c1cc2ncc([C]=[O])c2cc1)]          		3formyl_indole_HC6	# 3-Formylindole HC6
+[$([H]c1ccc2ncc([C]=[O])c2c1)]          		3formyl_indole_HC5	# 3-Formylindole HC5
+[$([H]c1cccc2ncc([C]=[O])c12)]          		3formyl_indole_HC4	# 3-Formylindole HC4
+[$([H]c1c([C]=[O])c2ccccc2n1)]          		3formyl_indole_HC2	# 3-Formylindole HC2
+[$([H][c][c][c][CX3]([N])[N])]          		benzamidine_H3		# Benzamidine H3
+[$([H]n1cc([C]=[O])c2ccccc12)]          		3formyl_indole_HN	# 3-Formylindole HN
+[$([H][C]([C])[S](=O)(=O)[O-])]          		CCSO3-_H2C		# Ethyl Sulfonate H2C
+[$([H][CH]1[C][N]([C])[C][C]1)]          		Nr5-C_H2C<		# NMePyrrolidine H2C<
+[$([H][CH]1[N]([C])[C][C][C]1)]          		Nr5-C_H2C-N		# NMePyrrolidine H2C-N
+[$([H][C][C][C][S](=O)(=O)[O-])]          		CCCSO3-_H3C		# Propyl Sulfonate H3C
+[$([H][c][c][c][c][CX3]([N])[N])]          		benzamidine_H4		# Benzamidine H4
+[$([H][C]([C])[C][S](=O)(=O)[O-])]          		CCCSO3-_Me-H2C		# Propyl Sulfonate Me-H2C
+[$([H][#7;R])]                                 H-Nring           # Hydrogen linked with nitrogen on ring (Changsheng Paper) 
+[$([H][c;r6][#6;r5;r6][#6;r5;r6])]    HCr6-r5r6     # Hydrogen of Polar 6-ring carbon (&indole), Changsheng's paper
+[$([H][c;r6][c;r6][#6;r5;r6][#6;r5;r6])]    HCr6-r5r6     # Hydrogen of Polar 6-ring carbon (&indole), Changsheng's paper
+
+# Nitrogen
+[$([n]1cncc1[C])]          				4ethyl_imidazole_ND	# 4-Ethylimidazole ND general
+[$([n]1cnc([C])c1)]          				4ethyl_imidazole_NE	# 4-Ethylimidazole NE general
+[$([n]1ccc2ccccc12)]          				indole_N		# Indole N
+[$([n]1cc([C])c2ccccc12)]          			3ethyl_indole_N		# 3-Ethylindole N
+[$([n]1cc([C]=[O])c2ccccc12)]          		3formyl_indole_N	# 3-Formylindole N
+[$([n+])]          					pyridinium_N		# Pyridinium N
+[$([N]#N)]          					N#N			# Dinitrogen N2
+[$([N]#[CH])]          				HCN_N			# Hydrogen Cyanide NC
+[$([N]#[C-])]          				N#C-			# Cyanide Ion N
+[$([N]#[C][C])]          				CCN_NC			# Acetonitrile NC
+[$([N][CX3][c])]          				benzamidine_N		# Benzamidine N
+[$([N]([C])([C])[C])]          			3Me-N_N			# Trimethyl Amine N
+[$([N]([C])([C])[C]=[O])]          			C(=O)N(C)C_N		# DiMeFormamide N
+[$([N]([C])([C])[C](=O)[C])]          			CC(=O)N(C)C_N		# DiMeAcetamide N
+[$([N]#[C][C-]([C]#[N])[C]#[N])]          		3CN_Me-_NC		# Tricyanomethide NC
+[$([NH]([C])[C])]          				CNC_NH			# Dimethyl Amine N
+[$([NH]([C])[C]=[O])]          			C(=O)NC_N		# NMeFormamide N
+[$([NH]([C])[C](=O)[C])]          			CC(=O)NC_N		# NMeAcetamide N
+[$([NH1r5])]          					NH1r5_N			# Pyrrolidine N
+[$([NH2][CH3])]          				CH3NH2_N		# Methyl Amine N
+[$([NH2][C][C])]          				CCNH2_N			# Ethyl Amine N
+[$([NH2][C]=[O])]          				C(=O)N_N		# Formamide N
+[$([NH2][C](=O)[C])]          				CC(=O)N_N		# Acetamide N
+[$([NH3])]          					NH3			# Ammonia N
+[$([Nr5][C])]          				Nr5-C_N			# NMePyrrolidine N
+[$([nx2]1cncc1)]          				imidazole_[N]=C		# Imidazole N=C- general
+[$([nx3]1cncc1)]          				imidazole_NH		# Imidazole NH general
+[$([N+X4])]          					NH4+			# Ammonium Ion N+
+[$([#7]1[#6][#7][#6]2ccccc12)] N-Benzimidazole # N of Benzimidazole from Changsheng's paper 
+
+# Oxygen
+[$([O][c])]          					phenol_OH		# Phenol OH
+[$([O]=[C])]          					C(=O)_O=C		# Formaldehyde O=C
+[$([O][CH3])]          				MeOH_O			# Methanol O
+[$([O][C][C])]          				EtOH_O			# Ethanol O
+[$([O]=[C][C])]          				C(=O)C_O=C		# Acetaldehyde O=C
+[$([O]([C])[C])]          				Me-Ether_O		# Methyl Ether O
+[$([O]([H])[H])]          				H2O_O			# Water O
+[$([O]=[C][NH2])]          				C(=O)N_O		# Formamide O
+[$([O]=[C][OH1])]          				C(=O)OH_O=C		# Formic Acid O=C
+[$([O]=[C][NH][C])]          				C(=O)NC_O		# NMeFormamide O
+[$([O]=[S]([C])[C])]          				CS(=O)C_O=S		# Dimethyl Sulfoxide O=S
+[$([O]=[C]([C])[NH2])]          			CC(=O)N_O		# Acetamide O
+[$([O]=[C]([C])[OH1])]          			CC(=O)OH_O=C		# Acetic Acid O=C
+[$([O]([H])[C]([C])C)]          			isoPro_OH		# isoPropanol O
+[$([O][c][c][c][c][C])]          			p-cresol_OH		# p-Cresol OH
+[$([O]=[C][N]([C])[C])]          			C(=O)N(C)C_O		# DiMeFormamide O
+[$([O]=[C]([C])[NH][C])]          			CC(=O)NC_O		# NMeAcetamide O
+[$([O]=[C]c1c2ccccc2nc1)]          			3formyl_indole_O=C	# 3-Formylindole O=C
+[$([O]=[C]([C])[N]([C])[C])]          			CC(=O)N(C)C_O		# DiMeAcetamide O
+[$([OH1][C]=[O])]          				C(=O)OH_OH		# Formic Acid OH
+[$([OH1][C](=O)[C])]          				CC(=O)OH_OH		# Acetic Acid OH
+[$([OH2])]          					OW			# O of water
+[$([OX1][SX4]([OX1])([OX1])[C])]          		CSO3-_O3S-		# Methyl Sulfonate O3S-
+[$([OX1][SX4]([OX1])([OX1])[C][C])]          		CCSO3-_O3S-		# Ethyl Sulfonate O3S-
+[$([O-][C]=[O])]                          (O-)C=O             # O- of COO-
+[$([O]=[C][O-])]                          (O-)C=O             # O- of COO-
+[$([O-][a])]                          (O-)ar                  # O- connecting an aromatic atom
+
+# Phosphorous
+[$([P-](F)(F)(F)(F)(F)F)]          			PF6-			# Hexafluorophosphate P
+
+
+# Sulfur
+[$([S]([C])[C])]          				CSC_S			# Dimethyl Sulfide S
+[$([S]([C])[C][C])]          				CCSC_S			# MeEt Sulfide S
+[$([S]([C])[S][C])]          				CSSC_S			# Dimethyl Disulfide S
+[$([S](=O)([C])[C])]          				CS(=O)C_S=O		# Dimethyl Sulfoxide S=O
+[$([S](=O)(=O)([C])[O-])]          			CSO3-_SO3-		# Methyl Sulfonate SO3-
+[$([S](=O)(=O)([C][C])[O-])]          			CCSO3-_SO3-		# Ethyl Sulfonate SO3-
+[$([SH1][C])]          				CSH_S			# Methyl Sulfide S
+[$([SH1][C][C])]          				CCS_S			# Ethyl Sulfide S
+[$([SH2])]          					SH2_S			# Hydrogen Sulfide S
+
+# Heterocylic ring systems, probed using water 
+[$([Cl][a])]                                            Cl-ar               # Cl connected to aromatic atom
+[$([#7H0;r5])]                                          NH0r5               # N (witt 0H) in 5-member rings 
+[$([#7H1;r5])]                                          NH1r5               # N (with 1H) in 5-member rings 
+[$([n;r6])]                                             nr6                 # Aromatic N in 6-member rings 
+[$([H][#7H1;r5])]                                       H-NH1r5             # H on N (with 1H) in 5-member rings 
+[$([n]1[c][n][c][n][c]1)]                               n-azine             # N of Azine (3N+3C) ring 
+
+# C+(NH2)2, probed using water
+[$([H][NH2]=[CX3])]                                     H-NH2C+             # H connected to NH2C+
+
+# Organic ions derived 2025 -Chengwen Liu
+# Used SAPT2+dMP2 as QM reference to fit vdw
+[$([O-][C]([O-])=[O])]                                 O-Cabonate           # O of Carbonate
+[$([O-][S]([O-])(=[O])=[O])]                           O-Sulfate            # O of Sulfate
+[$([O-][Cl](=[O])(=[O])=[O])]                          O-Perchlorate        # O of Perchlorate
+[$([S-][C]#[N])]                                       S-Thiocyanate        # S of Thiocyanate
+[$([N]#[C][S-])]                                       N-Thiocyanate        # N of Thiocyanate
+
+# Reparametrized Phenol (pCresol etc)
+# Used SAPT2+dMP2 as QM reference and liquid properties to fit vdw
+[$([OH][c])]                                 OH-c           # O of phenol-like molecules
+[$([H][O][c])]                               HO-c           # H of phenol-like molecules
+[$([c][O][H])]                               c-OH           # c of phenol-like molecules
