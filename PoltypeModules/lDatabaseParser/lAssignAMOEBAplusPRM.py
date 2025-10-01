@@ -1020,11 +1020,16 @@ def assignTorsionAMOEBA():
   # construct atom2class dictionary
   atom_class_dict = {}
   type_class_dict = {}
+  torsion_class = []
   for line in open(key).readlines():
     if "atom " in line:
       d = line.split()
       if d[1] in types:
         type_class_dict[d[1]] = d[2]
+    
+    if (len(line.split()) > 10) and ('torsion' in line.split()[0].strip()):
+      d = line.split()
+      torsion_class.append(' '.join(d[1:5]))
   for a,t in zip(atomnumbers, types):
     atom_class_dict[int(a)] = type_class_dict[t]
   
@@ -1039,9 +1044,8 @@ def assignTorsionAMOEBA():
     print(f"{YELLOW}Using tinker XYZ file to determine SMARTS types {ENDC}")
   
   # try to match line-by-line
-  matched_torsions = []
-  comments = []
-  tmp = []
+  matched_torsions = {} 
+  comments = {}
   for mol in pybel.readfile(inpformat,inpfile):
     for line in prmlines:
       if ("#" not in line[0]) and (len(line) > 10):
@@ -1061,21 +1065,32 @@ def assignTorsionAMOEBA():
             a4 = match[int(tor_indices[3]) - 1]
             tor_types = ' '.join([atom_class_dict[a] for a in [a1, a2, a3, a4]])
             tor_types_r = ' '.join([atom_class_dict[a] for a in [a4, a3, a2, a1]])
-            if (tor_types not in tmp):
-              tmp.append(tor_types)
-              tmp.append(tor_types_r)
-              tor_prm_str = f"{tor_params[0]} 0.0 1 {tor_params[1]} 180.0 2 {tor_params[2]} 0.0 3"
-              matched_torsions.append(f"torsion {tor_types} {tor_prm_str}")
-              comments.append(tor_comment)
+            tor_prm_str = f"torsion {tor_types} {tor_params[0]} 0.0 1 {tor_params[1]} 180.0 2 {tor_params[2]} 0.0 3"
+            tor_prm_str_r = f"torsion {tor_types_r} {tor_params[0]} 0.0 1 {tor_params[1]} 180.0 2 {tor_params[2]} 0.0 3"
+            if tor_types not in matched_torsions.keys():
+              matched_torsions[tor_types] = [tor_prm_str]
+              comments[tor_types] = [tor_comment]
+            else:
+              matched_torsions[tor_types] += [tor_prm_str]
+              comments[tor_types] += [tor_comment]
+            
+            # make a copy for reverse order
+            if tor_types_r not in matched_torsions.keys():
+              matched_torsions[tor_types_r] = [tor_prm_str_r]
+              comments[tor_types_r] = [tor_comment]
+            else:
+              matched_torsions[tor_types_r] += [tor_prm_str_r]
+              comments[tor_types] += [tor_comment]
   
   # write the matched torsion
   with open(key + "_torsion", 'w') as f:
-    if matched_torsions == []:
-      f.write('# no torsion parameters matched from database\n')
-    else:
-      for c, p in zip(comments, matched_torsions):
-        f.write(f"# Matched by lAssignAMOEBAplusPRM.py: {c}\n")
-        f.write(f"{p}\n")
+    for tor in torsion_class: 
+      if tor in matched_torsions.keys():
+        # use the last matched torsion
+        prm = matched_torsions[tor][-1]
+        cmt = comments[tor][-1]
+        f.write(f"# Matched by lAssignAMOEBAplusPRM.py: {cmt}\n")
+        f.write(f"{prm}\n")
   return
 
 def assignTorsionAMOEBAplus():
