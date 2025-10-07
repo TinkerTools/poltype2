@@ -63,6 +63,7 @@ Nar_Nar   0.0
 Csp2_Car   0.0 
 Car_S=X   0.0 
 Oother_Oother   0.0 
+HF_FH   0.0303
 Hother_Cother_Hother   -0.010   -0.010   -0.0453   -0.0453
 Hother_Nother_Hother   0.1146   0.1146   0.031   0.031
 Hother_Nother_Cother   0.068   0.059   0.0453   0.005

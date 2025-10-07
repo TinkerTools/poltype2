@@ -25,3 +25,5 @@
 [$([I][a])]                                                                                Iar           #         Aromatic  I                     
 [$([P])]                                                                                   PwH           #         P         with        H         
 [$([PH0])]                                                                                 PwoH          #         P         with        heavy     atoms
+[$([F][H])]                                                                                FH            #         F of HF 
+[$([H][F])]                                                                                HF            #         H of HF 
