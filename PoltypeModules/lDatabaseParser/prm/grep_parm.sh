@@ -1,7 +1,11 @@
 for term in 'CHGPEN ' 'CHGTRN ' 'VDW '
 do
-	grep $term amoebaplusNonbonded.prm  | grep ' C' 
-	grep $term amoebaplusNonbonded.prm  | grep ' rC' 
+	grep $term amoebaplusNonbonded.prm  | grep -P ' C(?!l)' 
+	grep $term amoebaplusNonbonded.prm  | grep ' r3' 
+	grep $term amoebaplusNonbonded.prm  | grep ' r4' 
+	grep $term amoebaplusNonbonded.prm  | grep ' r5' 
+	grep $term amoebaplusNonbonded.prm  | grep ' r6' 
+	grep $term amoebaplusNonbonded.prm  | grep ' r7' 
 	grep $term amoebaplusNonbonded.prm  | grep ' H' 
 	grep $term amoebaplusNonbonded.prm  | grep ' n-H' 
 	grep $term amoebaplusNonbonded.prm  | grep ' i-H' 

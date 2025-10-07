@@ -2,16 +2,34 @@
 [$([OX2H2])]             		                              OW          # 	O in Water
 
 # Alkane
-[$([H][Cv4H4])]                                          H4C         		#  H in CH4
 [$([Cv4H4])]                                             CH4         		#  C in CH4
-[$([H][Cv4H3])]                                          H3C         		#  H in CH3
 [$([Cv4H3])]                                             CH3         		#  C in CH3
-[$([H][Cv4H2])]                                          H2C         		#  H in CH2
 [$([Cv4H2])]                                             CH2         		#  C in CH2
-[$([H][Cv4H1])]                                          H1C         		#  H in CH1
 [$([Cv4H1])]                                             CH1         		#  C in CH1
 [$([Cv4H0])]                                             CH0         		#  C in CH0
-[$([CH2;R])]                                             rCH2           #  C in a Ring
+[$([H][Cv4H4])]                                          H4C         		#  H in CH4
+[$([H][Cv4H3])]                                          H3C         		#  H in CH3
+[$([H][Cv4H2])]                                          H2C         		#  H in CH2
+[$([H][Cv4H1])]                                          H1C         		#  H in CH1
+[$([CH2;r3])]                                            r3CH2          #  C in a 3-member Ring
+[$([CH2;r4])]                                            r4CH2          #  C in a 4-member Ring
+[$([CH2;r5])]                                            r5CH2          #  C in a 5-member Ring
+[$([CH2;r6])]                                            r6CH2          #  C in a 6-member Ring
+[$([CH2;r7])]                                            r7CH2          #  C in a 7-member Ring
+
+# Alkene
+[$([C]=[C])]                                             C=C         		#  C in C=C
+[$([H][CH2]=[C])]                                        H2C=C      		#  H2C in C=C
+[$([H][CH1]=[C])]                                        H1C=C      		#  H1C in C=C
+
+# Alkyne
+[$([C]#[C])]                                             CtbC         	#  C in C#C
+[$([H][CH1]#[C])]                                        H1CtbC      		#  H1C in C#C
+
+# Nitrile 
+[$([C]#[N])]                                             CtbN         	#  C in C#N
+[$([N]#[C])]                                             NtbC         	#  N in C#N
+[$([H][CH1]#[N])]                                        H1CtbN      		#  H1C in C#N
 
 # Alcohol
 [$([H][OX2H1][C])]                                       n-HOC      			#  H in alcohol
@@ -33,17 +51,20 @@
 [$([H][NH3])]                                       			H3N        			#  H in amonia 
 [$([H][NH2])]                                       			H2N        			#  H in primary amine
 [$([H][NH1])]                                       			H1N        			#  H in secondary amine
-[$([H][NH2][CH3])]                                   			H2NCH3     			#  H in NH2CH3
+[$([H][NH2][CH3])]                                   			H2NCH3     			#  H in NH2-CH3
+[$([H][NH2][NH2])]                                   			H2NNH2     			#  H in NH2-NH2
 [$([NX3H3])]                                        	    NH3        			#  N in ammonia 
 [$([NX3H2][C])]                                           NH2        			#  N of amine with 2H
 [$([NX3H1](C)[C])]                                        NH1      			  #  N of amine with 1H 
 [$([NX3H1;R](C)[C])]                                      NH1R     			  #  N of amine with 1H in a ring
 [$([NX3H0](C)(C)[C])]                                     NH0     		    #  N of amine with 0H 
 [$([NX3H2][CH3])]                                         NH2CH3     			#  N of MeNH2
-[$([CX4][NH2])]                                           CX4NH2          #  C connecting Amine
-[$([CX4][NH1])]                                           CX4NH1          #  C connecting Amine
-[$([CX4][NH0])]                                           CX4NH0          #  C connecting Amine
-[$([CX4][NH1;R])]                                         CX4NH1R         #  C connecting Amine
+[$([NX3H2][NX3H2])]                                       NH2NH2     			#  N of Hyrazine
+[$([CX4][NX3H2])]                                         CX4NH2          #  C connecting Amine
+[$([CX4][NX3H1])]                                         CX4NH1          #  C connecting Amine
+[$([CX4][NX3H0])]                                         CX4NH0          #  C connecting Amine
+[$([CX4][NX3H1;R])]                                       CX4NH1R         #  C connecting Amine
+
 
 # Aldehyde
 [$([CH1]=[O])]                                           CH1=O           #  C of aldehyde 
@@ -60,7 +81,7 @@
 [$([O]=[CH0]([C])[c])]                                   O=C<             #  O of ketone 
 
 # Amide
-[$([O]=[C][N])]                                       	  O=CN            #  O of amide
+[$([O]=[#6][#7])]                                     	  O=CN            #  O of amide
 [$([H][NX3][C]=[O])]                                      HxN-Amide       #  H of amide nitrogen
 [$([NH2][C]=[O])]                                     		NH2-Amide       #  N of amide nitrogen, two attached hydrogen
 [$([NH1][C]=[O])]                                     		NH1-Amide       #  N of amide nitrogen, one attached hydrogen
@@ -70,7 +91,6 @@
 [$([CH3][NX3H0][C]=[O])]                                  CH3-NH0-Amide   #  C connecting N of amide 
 [$([CH3][NX3H1][C]=[O])]                                  CH3-NH1-Amide   #  C connecting N of amide 
 [$([CX4][CX3]=[O])]                                       Cv4-C=O         #  C connecting C=O bond 
-
 
 # Acid
 [$([C](=O)[O][H])]                                       C(=O)OH         #  C of acid
@@ -84,90 +104,106 @@
 [$([C](=O)[O][C])]                                       C(=O)OC         #  C=O of ester
 [$([O]=[C][O][C])]                                       O=C(O)C         #  O=C of ester
 [$([O](C)[C]=[O])]                                       O(C)C=O         #  O of ester
+[$([OH0](C)[CH1]=[O])]                                   O(C)CH1=O       #  O of formate 
 
+# Halomethane  
+[$([F][H])]                                               FH               #  F of HF 
+[$([H][F])]                                               HF               #  H of HF 
+[$([F][CH3])]                                             F-CH3            #  F connecting CH3 
+[$([F][CH2])]                                          		F-CH2            #  F connecting CH2
+[$([F][CH2][F])]                                          F-CH2F           #  F connecting CH2F 
+[$([F][CH1]([F])[F])]                                     F-CHF2           #  F connecting CHF2 
+[$([F][CH0]([F])([F])[F])]                                F-CF3            #  F connecting CF3
+[$([CH3][F])]                                             CH3-F1           #  CH3 with 1F
+[$([CH2]([F]))]                                           CH2-F            #  CH2 with F
+[$([CH2]([F])[F])]                                        CH2-F2           #  CH2 with 2F
+[$([CH1]([F])([F])[F])]                                   CH1-F3           #  CH1 with 3F
+[$([CH0]([F])([F])([F])[F])]                              CH0-F4           #  CH0 with 4F
 
-# Halogen
-# F
-[$([F][CH3])]                                            F1C              #  F of CH3F
-[$([F][CH2][F])]                                         F2C              #  F of CH2F2
-[$([F][CH1]([F])[F])]                                    F3C              #  F of CHF3
-[$([F][CH0]([F])([F])[F])]                               F4C              #  F of CF4
-[$([C][F])]                                              CF1              #  C with 1F
-[$([C]([F])[F])]                                         CF2              #  C with 2F
-[$([C]([F])([F])[F])]                                    CF3              #  C with 3F
-[$([C]([F])([F])([F])[F])]                               CF4              #  C with 4F
-# Cl
-[$([Cl][CH3])]                                           Cl1C              #  Cl of CH3Cl
-[$([Cl][CH2][Cl])]                                       Cl2C              #  Cl of CH2Cl2
-[$([Cl][CH1]([Cl])[Cl])]                                 Cl3C              #  Cl of CHCl3
-[$([Cl][CH0]([Cl])([Cl])[Cl])]                           Cl4C              #  Cl of CCl4
-[$([C][Cl])]                                             CCl1              #  C with 1Cl
-[$([C]([Cl])[Cl])]                                       CCl2              #  C with 2Cl
-[$([C]([Cl])([Cl])[Cl])]                                 CCl3              #  C with 3Cl
-[$([C]([Cl])([Cl])([Cl])[Cl])]                           CCl4              #  C with 4Cl
-#[$([H][C][Cl])]                                          HCCl              #  H connecting CCl
-# Br
-[$([Br][CH3])]                                           Br1C              #  Br of CH3Br
-[$([Br][CH2][Br])]                                       Br2C              #  Br of CH2Br2
-[$([Br][CH1]([Br])[Br])]                                 Br3C              #  Br of CHBr3
-[$([Br][CH0]([Br])([Br])[Br])]                           Br4C              #  Br of CBr4
-#[$([C][Br])]                                             CBr1              #  C with 1Br
-#[$([C]([Br])[Br])]                                       CBr2              #  C with 2Br
-#[$([C]([Br])([Br])[Br])]                                 CBr3              #  C with 3Br
-#[$([C]([Br])([Br])([Br])[Br])]                           CBr4              #  C with 4Br
-#[$([H][C][Br])]                                          HCBr              #  H connecting CBr
-# I
-[$([I][CH3])]                                            I1C              #  I of CH3I
-[$([I][CH2][I])]                                         I2C              #  I of CH2I2
-[$([I][CH1]([I])[I])]                                    I3C              #  I of CHI3
-[$([I][CH0]([I])([I])[I])]                               I4C              #  I of CI4
-#[$([C][I])]                                              CI1              #  C with 1I
-#[$([C]([I])[I])]                                         CI2              #  C with 2I
-#[$([C]([I])([I])[I])]                                    CI3              #  C with 3I
-#[$([C]([I])([I])([I])[I])]                               CI4              #  C with 4I
-#[$([H][C][I])]                                           HCI              #  H connecting CI
+[$([Cl][CH3])]                                            Cl-CH3           #  Cl connecting CH3 
+[$([Cl][CH2][Cl])]                                        Cl-CH2Cl         #  Cl connecting CH2Cl 
+[$([Cl][CH1]([Cl])[Cl])]                                  Cl-CHCl2         #  Cl connecting CHCl2 
+[$([Cl][CH0]([Cl])([Cl])[Cl])]                            Cl-CCl3          #  Cl connecting CCl3
+[$([CH3][Cl])]                                            CH3-Cl1          #  CH3 with 1Cl
+[$([CH2]([Cl])[Cl])]                                      CH2-Cl2          #  CH2 with 2Cl
+[$([CH1]([Cl])([Cl])[Cl])]                                CH1-Cl3          #  CH1 with 3Cl
+[$([CH0]([Cl])([Cl])([Cl])[Cl])]                          CH0-Cl4          #  CH0 with 4Cl
+[$([Cl][SX4H0])]                                          Cl-SX4           #  Cl connecting S(IV)
+
+[$([Br][CH3])]                                            Br-CH3           #  Br connecting CH3 
+[$([Br][CH2][Br])]                                        Br-CH2Br         #  Br connecting CH2Br 
+[$([Br][CH1])]                                            Br-CH1            #  Br connecting CH1
+[$([Br][CH1]([Br])[Br])]                                  Br-CHBr2         #  Br connecting CHBr2 
+[$([Br][CH0]([Br])([Br])[Br])]                            Br-CBr3          #  Br connecting CBr3
+[$([CH3][Br])]                                            CH3-Br1          #  CH3 with 1Br
+[$([CH2]([Br])[Br])]                                      CH2-Br2          #  CH2 with 2Br
+[$([CH1]([Br]))]                                          CH1-Br           #  CH1 with Br
+[$([CH1]([Br])([Br])[Br])]                                CH1-Br3          #  CH1 with 3Br
+[$([CH0]([Br])([Br])([Br])[Br])]                          CH0-Br4          #  CH0 with 4Br
+
+[$([I][CH3])]                                             I-CH3            #  I connecting CH3 
+[$([I][CH2][I])]                                          I-CH2I           #  I connecting CH2I 
+[$([I][CH1]([I])[I])]                                     I-CHI2           #  I connecting CHI2 
+[$([I][CH0]([I])([I])[I])]                                I-CI3            #  I connecting CI3
+[$([CH3][I])]                                             CH3-I1           #  CH3 with 1I
+[$([CH2]([I])[I])]                                        CH2-I2           #  CH2 with 2I
+[$([CH1]([I])([I])[I])]                                   CH1-I3           #  CH1 with 3I
+[$([CH0]([I])([I])([I])[I])]                              CH0-I4           #  CH0 with 4I
 
 # Sulfur
+[$([SH2])]                                               SH2             #  S connecting 2H
 [$([SH1][C])]                                            SHC             #  S connecting 1H and 1C
+[$([SH1][c])]                                            SHc             #  S connecting 1H and 1 aromatic C
 [$([SH0][C])]                                            SC              #  S connecting 0H and 1C
 [$([SH0]([SH0])[C])]                                     SSC             #  S connecting SC 
-[$([S]=[O])]                                             S=O             #  S connecting O via double bond
+[$([SX3H0]=[O])]                                         S=O             #  S connecting O via double bond
+[$([SX4H0](=[O])=[O])]                                   S(=O)2          #  S connecting two O via double bond
 [$([O]=[S])]                                             O=S             #  O connecting S via double bond
 [$([H][S])]                                              HS              #  H connecting S
 [$([s])]                                                 Sar             #  S of aromatic systems
 
-# Aromatic
+
+# Aromatic systems
+
+## Benzene,Toluene,EtBenzene
 [$([c])]                                                 Car             #  C of aromatic systems
-[$([c][s])]                                              CarSar          #  Aromatic C connecting to aromatic S
-[$([c][OH])]                                             CarOH           #  Aromatic C connecting to OH
 [$([H][c])]                                              Har             #  H connecting aromatic Carbon
+
+## Phenol, {o,m,p}Cresol
 [$([OH][c])]                                             O(H)Car         #  O connecting aromatic Carbon
+[$([H][OX2H1][c])]                                       HOCar     			 #  H in phenol Oxygen 
 [$([OH][c][c][C])]                                       O(H)Car-oC      #  O connecting aromatic Carbon with C on ortho-
 [$([OH][c][c][c][C])]                                    O(H)Car-mC      #  O connecting aromatic Carbon with C on meta-
 [$([OH][c][c][c][c][C])]                                 O(H)Car-pC      #  O connecting aromatic Carbon with C on para-
 [$([OH][c][c][Cl])]                                      O(H)Car-oCl     #  O connecting aromatic Carbon with Cl on ortho-
 [$([OH][c][c][c][Cl])]                                   O(H)Car-mCl     #  O connecting aromatic Carbon with Cl on meta-
 [$([OH][c][c][c][c][Cl])]                                O(H)Car-pCl     #  O connecting aromatic Carbon with Cl on para-
-[$([OH][c][c](F)[c](F)[c][F])]                           O(H)Car-ompF    #  O connecting aromatic Carbon with F on ortho-, meta- and para-
+
+## Aniline, {o,m,p}NH2-Aniline, NMe-Aniline, NMe2-Aniline
+[$([H][NX3][c])]                                         HNCar       	   #  H in aniline Nitrogen
 [$([NH2][c])]                                            NH2Car          #  N connecting aromatic Carbon and 2H
-[$([NH2][c][c][C])]                                      NH2Car-oC       #  N connecting aromatic Carbon with C on ortho-
-[$([NH2][c][c][c][C])]                                   NH2Car-mC       #  N connecting aromatic Carbon with C on meta-
-[$([NH2][c][c][c][c][C])]                                NH2Car-pC       #  N connecting aromatic Carbon with C on para-
 [$([NH1][c])]                                            NH1Car          #  N connecting aromatic Carbon and 1H
 [$([NH0][c])]                                            NH0Car          #  N connecting aromatic Carbon and 0H
-[$([H][OX2H1][c])]                                       HOCar     			 #  H in phenol 
-[$([H][NX3H2][c])]                                       H2NCar       	 #  H in aniline
-[$([H][NX3H1][c])]                                       H1NCar       	 #  H in N-Methylaniline
-[$([nH0;r6])]                                            Nar-r6          #  N of aromatic systems without Hydrogen in 6-member ring
-[$([nH0;r5])]                                            Nar-r5          #  N of aromatic systems without Hydrogen in 5-member ring
-[$([o])]                                                 Oar             #  O of aromatic systems
-[$([H][n])]                                              HarN            #  H connecting aromatic Nitrogen
-[$([n][H])]                                              NarH            #  N of aromatic systems with Hydrogen
-[$([c][NH2])]                                            CarNH2          #  C of aromatic systems with NH2
+[$([c][NH2])]                                            CarNHx          #  C connecting nitrogen with 2H
+[$([c][NH1])]                                            CarNHx          #  C connecting nitrogen with 1H
+[$([c][NH0])]                                            CarNHx          #  C connecting nitrogen with 0H
+[$([CH3][N][c])]                                         CH3-Nc          #  CH3 connecting Aniline nitrogen 
+
+[$([nH0;r5])]                                            NarH0r5          #  N of aromatic systems without Hydrogen in 5-member ring
+[$([nH0;r5][CX4])]                                       NarH0r5-Cx4      #  N of aromatic systems without Hydrogen in 5-member ring connecting Cx4
+[$([nH0;r6])]                                            NarH0r6          #  N of aromatic systems without Hydrogen in 6-member ring
+[$([H][n])]                                              H-Nar            #  H connecting aromatic Nitrogen
+[$([nH1])]                                               NarH1           #  N of aromatic systems with Hydrogen
+
 [$([c][C]=[O])]                                          CarC=O          #  C of aromatic systems with C=O
-[$([N](~[O])(~[O])[c])]                                  NO2Car          #  N of NO2 connected to Aromatic C
-[$([O]~[N](~[O])[c])]                                    O2NCar          #  O of NO2 connected to Aromatic C
-[$([c][N](~[O])~[O])]                                    CarNO2          #  Aromatic C connecting NO2
+# BenNO2
+#[$([N](~[O])(~[O])[c])]                                  NO2Car          #  N of NO2 connected to Aromatic C
+#[$([O]~[N](~[O])[c])]                                    O2NCar          #  O of NO2 connected to Aromatic C
+#[$([c][N](~[O])~[O])]                                    CarNO2          #  Aromatic C connecting NO2
+
+# aromatic O and S 
+[$([oH0;r5])]                                            OarH0r5          #  O of aromatic systems without Hydrogen in 5-member ring; Furan
+[$([sH0;r5])]                                            SarH0r5          #  S of aromatic systems without Hydrogen in 5-member ring; Thiophene
 
 
 # Phosphor
@@ -180,14 +216,22 @@
 [$([c](a)(a)[a])]                                        Car2            #  Car shared with two aromatic rings
 
 # Halogon connected to aromatic
-[$([F][a])]                                             F-ar              #  F connects to Aromatic system
-[$([Cl][a])]                                            Cl-ar             #  Cl connects to Aromatic system
-[$([Br][a])]                                            Br-ar             #  Br connects to Aromatic system
-[$([I][a])]                                             I-ar              #  I connects to Aromatic system
+[$([F][c])]                                             F-Car              #  F connects to Aromatic system
+[$([Cl][c])]                                            Cl-Car             #  Cl connects to Aromatic system
+[$([Br][c])]                                            Br-Car             #  Br connects to Aromatic system
+[$([I][c])]                                             I-Car              #  I connects to Aromatic system
 [$([c][F])]                                             CarF              #  C of aromatic systems with Florine
 [$([c][Cl])]                                            CarCl             #  C of aromatic systems with Chlorine
 [$([c][Br])]                                            CarBr             #  C of aromatic systems with Bromine
 [$([c][I])]                                             CarI              #  C of aromatic systems with Iodine
+
+# Nitro
+[$([N+](=[O])[O-])]                                  	    NO2      			  #  N in nitro group 
+[$([O]=[N+][O-])]                                  	      O-NO2    			  #  O in nitro group 
+[$([O-][N+]=[O])]                                  	      O-NO2    			  #  O in nitro group 
+# for openbabel with txyz
+[$([NX3](~[O])~[O])]                                 	    NO2      			  #  N in nitro group 
+[$([OX1]~[N]~[O])]                                	      O-NO2    			  #  O in nitro group 
 
 # test heterocyclic N
 #[$([#7H0X2;R])]                                         R-NH0               # ring Nitrogen without H
