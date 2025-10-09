@@ -160,6 +160,7 @@
 [$([SX4H0](=[O])=[O])]                                   S(=O)2          #  S connecting two O via double bond
 [$([O]=[S])]                                             O=S             #  O connecting S via double bond
 [$([H][S])]                                              HS              #  H connecting S
+[$([H][S][c])]                                           HSc             #  H connecting Sc
 [$([s])]                                                 Sar             #  S of aromatic systems
 
 

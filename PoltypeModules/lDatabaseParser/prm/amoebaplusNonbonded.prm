@@ -78,6 +78,7 @@ CHGPEN  H2NNH2         1.00000   3.12824
 CHGPEN  H2N            1.00000   3.12824  
 CHGPEN  H1N            1.00000   3.24892  
 CHGPEN  HS             1.00000   3.21322  
+CHGPEN  HSc            1.00000   3.21322  
 CHGPEN  HOCar          1.00000   3.01100  
 CHGPEN  n-HOC          1.00000   3.17080  
 CHGPEN  i-HOC          1.00000   3.17080  
@@ -89,12 +90,12 @@ CHGPEN  O=CH1          8.00000   4.60808
 CHGPEN  O=CH2          8.00000   4.55956  
 CHGPEN  O=C<           8.00000   4.44805  
 CHGPEN  O=CN           8.00000   4.04785  
-CHGPEN  O(H)C=O        8.00000   4.76200  
+CHGPEN  O(H)C=O        8.00000   4.76200
 CHGPEN  O(H)CH1=O      8.00000   4.76200  
-CHGPEN  O(C)CH1=O      8.00000   4.76200  
-CHGPEN  O(C)C=O        8.00000   4.76200  
+CHGPEN  O(C)CH1=O      8.00000   4.77699 
+CHGPEN  O(C)C=O        8.00000   4.77699 
 CHGPEN  O=C(O)H        8.00000   4.04785  
-CHGPEN  O=C(O)C        8.00000   4.04785  
+CHGPEN  O=C(O)C        8.00000   4.29432 
 CHGPEN  O=S            8.00000   3.22620  
 CHGPEN  O-NO2          8.00000   4.04785  
 CHGPEN  O-P            8.00000   3.22620  
@@ -237,14 +238,15 @@ CHGTRN  Har            8.61710   5.41745
 CHGTRN  HxN-Amide      9.50196   3.94496  
 CHGTRN  HNCar          9.37396   4.30565  
 CHGTRN  H-Nar          9.37396   4.30565  
-CHGTRN  HO-C=O         8.97859   4.73466  
-CHGTRN  HO-CH1=O       8.97859   4.73466  
+CHGTRN  HO-C=O         9.05069   4.73466  
+CHGTRN  HO-CH1=O       9.05069   4.73466  
 CHGTRN  H3N            9.89818   4.79908  
 CHGTRN  H2NCH3         9.90461   4.79477  
 CHGTRN  H2NNH2         9.90461   4.79477  
 CHGTRN  H2N            9.90461   4.79477  
 CHGTRN  H1N            9.90647   4.79365  
 CHGTRN  HS             9.87349   4.19551  
+CHGTRN  HSc            9.87349   4.19551  
 CHGTRN  HOCar          7.93600   4.41900  
 CHGTRN  n-HOC          9.61979   4.45392  
 CHGTRN  i-HOC          9.61979   4.45392  
@@ -256,12 +258,12 @@ CHGTRN  O=CH1          11.36869  4.14299
 CHGTRN  O=CH2          11.37034  4.14299  
 CHGTRN  O=C<           11.37034  4.14299  
 CHGTRN  O=CN           11.50524  3.59274  
-CHGTRN  O(H)C=O        11.36780  3.59850  
+CHGTRN  O(H)C=O        11.36780  3.59850
 CHGTRN  O(H)CH1=O      11.36780  3.59850  
-CHGTRN  O(C)CH1=O      11.36780  3.59850  
-CHGTRN  O(C)C=O        11.36780  3.59850  
+CHGTRN  O(C)CH1=O      11.35582  3.67858 
+CHGTRN  O(C)C=O        11.36740  3.67858  
 CHGTRN  O=C(O)H        11.50524  3.59274  
-CHGTRN  O=C(O)C        11.50524  3.59274  
+CHGTRN  O=C(O)C        11.44613  3.59274 
 CHGTRN  O-NO2          11.50524  3.59274  
 CHGTRN  O=S            11.87783  3.62946  
 CHGTRN  O=P            11.87783  3.62946  
@@ -403,15 +405,16 @@ VDW     H2C=O          3.33000   0.01000  0.98000
 VDW     Har            3.20000   0.01000  0.98000
 VDW     HxN-Amide      2.73402   0.01803  0.98000
 VDW     HNCar          2.66234   0.01441  0.98000
-VDW     H-Nar          2.94797   0.01440  0.98000
-VDW     HO-C=O         2.96470   0.01000  0.90000
-VDW     HO-CH1=O       2.91360   0.01000  0.90000
+VDW     H-Nar          2.93454   0.01440  0.98000
+VDW     HO-C=O         2.92920   0.01000  0.90000
+VDW     HO-CH1=O       2.88486   0.01000  0.90000
 VDW     H3N            2.71755   0.01570  0.98000
 VDW     H2NCH3         2.64499   0.02169  0.98000
 VDW     H2NNH2         2.64499   0.02169  0.98000
 VDW     H2N            2.72645   0.02900  0.98000
 VDW     H1N            2.64095   0.02647  0.98000
 VDW     HS             3.33556   0.01050  0.98000
+VDW     HSc            3.22009   0.01050  0.98000
 VDW     HOCar          2.70750   0.01000  0.98000
 VDW     n-HOC          2.86844   0.01000  0.98000
 VDW     i-HOC          2.76859   0.01000  0.98000
@@ -423,12 +426,12 @@ VDW     O=CH1          3.55759   0.09040
 VDW     O=CH2          3.41898   0.09040  
 VDW     O=C<           3.51276   0.14066  
 VDW     O=CN           3.67090   0.11293  
-VDW     O(H)C=O        4.00758   0.09005  
-VDW     O(H)CH1=O      4.04658   0.10146  
-VDW     O(C)CH1=O      4.04658   0.10146  
-VDW     O(C)C=O        3.95839   0.10146  
+VDW     O(H)C=O        3.88879   0.18870
+VDW     O(H)CH1=O      3.97661   0.18870  
+VDW     O(C)CH1=O      3.97527   0.08778 
+VDW     O(C)C=O        3.59335   0.08778 
 VDW     O=C(O)H        3.77866   0.08574  
-VDW     O=C(O)C        3.77866   0.08574  
+VDW     O=C(O)C        3.82390   0.08570 
 VDW     O-NO2          3.77866   0.08574  
 VDW     O=S            3.82369   0.10429  
 VDW     O-P            3.82369   0.10429  
@@ -453,8 +456,8 @@ VDW     NH0-Amide      4.33500   0.11647
 VDW     NH2Car         4.13574   0.12719  
 VDW     NH1Car         4.13574   0.12719  
 VDW     NH0Car         4.13574   0.12719  
-VDW     NarH1          4.13951   0.12719  
-VDW     NarH0r5        3.78023   0.12719  
+VDW     NarH1          4.40120   0.12719  
+VDW     NarH0r5        3.78606   0.12719  
 VDW     NarH0r5-Cx4    3.40000   0.12719  
 VDW     NarH0r6        4.07157   0.12719  
 VDW     NH3            4.22294   0.10035  
@@ -468,7 +471,7 @@ VDW     NO2            4.13951   0.12719
 VDW     NtbC           4.13574   0.12719  
 VDW     SH2            4.84687   0.15162  
 VDW     SHC            4.63890   0.19710  
-VDW     SHc            4.63890   0.19710  
+VDW     SHc            4.69672   0.19710  
 VDW     SC             4.57759   0.23630  
 VDW     SSC            4.57632   0.23630  
 VDW     S=O            4.57632   0.23630  
@@ -498,4 +501,4 @@ VDW     I-Car          5.19608   0.19381
 VDW     I-CH3          4.95216   0.28649
 VDW     I-CH2I         5.00348   0.27462
 VDW     I-CHI2         5.19323   0.16453
-VDW     I-CI3          5.20922   0.16976
+VDW     I-CI3          5.17365   0.18012
