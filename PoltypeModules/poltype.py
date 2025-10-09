@@ -232,7 +232,7 @@ class PolarizableTyper():
         scaleandfixdipole:bool=False
         scalebigmultipole:bool=False
         fragbigmultipole:bool=True
-        sp2aniline:bool=True
+        sp2aniline:bool=False
         nonplanarphenol:bool=False
         chargethreshold:float=1.5
         dipolethreshold:float=1.5
