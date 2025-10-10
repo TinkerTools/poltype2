@@ -2276,7 +2276,7 @@ class PolarizableTyper():
             totchg=0
             atomindextoformalcharge={}
             # STEP 1
-            atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
+            atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1,6:-1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
             for atom in molecule.GetAtoms():
                 # STEP 2
                 atomidx=atom.GetIdx()
