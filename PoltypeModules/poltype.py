@@ -3550,7 +3550,7 @@ class PolarizableTyper():
             self.classkeytoinitialprmguess={}
             self.nonarotortotorsbeingfit={}
             # STEP 42
-            if self.atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False and self.totalcharge == 0: 
+            if self.atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False:
                 self.dontfrag=True
             if self.dontfrag==True and self.toroptmethod!='xtb' and 'xtb' not in self.toroptmethodlist: # if fragmenter is turned off, parition resources by jobs at sametime for parent,cant parralelize xtb since coords always written to same filename
                 self.maxmem,self.maxdisk,self.numproc=self.PartitionResources()
