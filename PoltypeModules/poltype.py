@@ -232,7 +232,7 @@ class PolarizableTyper():
         scaleandfixdipole:bool=False
         scalebigmultipole:bool=False
         fragbigmultipole:bool=True
-        sp2aniline:bool=True
+        sp2aniline:bool=False
         nonplanarphenol:bool=False
         chargethreshold:float=1.5
         dipolethreshold:float=1.5
@@ -2276,7 +2276,7 @@ class PolarizableTyper():
             totchg=0
             atomindextoformalcharge={}
             # STEP 1
-            atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
+            atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1,6:-1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
             for atom in molecule.GetAtoms():
                 # STEP 2
                 atomidx=atom.GetIdx()
@@ -3550,7 +3550,7 @@ class PolarizableTyper():
             self.classkeytoinitialprmguess={}
             self.nonarotortotorsbeingfit={}
             # STEP 42
-            if self.atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False and self.totalcharge == 0: 
+            if self.atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False:
                 self.dontfrag=True
             if self.dontfrag==True and self.toroptmethod!='xtb' and 'xtb' not in self.toroptmethodlist: # if fragmenter is turned off, parition resources by jobs at sametime for parent,cant parralelize xtb since coords always written to same filename
                 self.maxmem,self.maxdisk,self.numproc=self.PartitionResources()

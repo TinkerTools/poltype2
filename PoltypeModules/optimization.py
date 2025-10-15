@@ -382,6 +382,10 @@ def gen_optcomfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,molecule,modr
     # Add a torsion restraint for Aniline(-like) molecules
     # Chengwen Liu
     # Apr. 2025
+    # this is to add a restraint for improper torsion
+    # it sometimes does not lead to the geometry we wanted
+    # use with caution!!
+
     if poltype.sp2aniline: 
       rdkitmol = Chem.MolFromMolFile(poltype.molstructfname,removeHs=False)
       pattern = Chem.MolFromSmarts('[NH2]([H])([H])[a]')

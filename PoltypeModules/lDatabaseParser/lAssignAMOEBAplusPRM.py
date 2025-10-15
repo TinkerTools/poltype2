@@ -863,7 +863,7 @@ def assignBonded(new_para_method, fitting = "NO"):
   with open(key) as f:
     for line in lines[idx:]:
       d = line.split()
-      if ("opbend " in line):
+      if ("opbend " in line) and (d[2] in sp2AtomTypes):
         if (d[1] in atomclasses) and (d[2] in atomclasses):
           c1 = tinker2database[d[1]]
           c2 = tinker2database[d[2]]

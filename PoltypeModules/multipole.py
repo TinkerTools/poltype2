@@ -545,6 +545,18 @@ def gen_peditinfile(poltype,mol):
             for match in matches:
               b,h1,h2 = match
               frames.append(f'{b+1} -{h1+1} -{h2+1}')
+            
+            # special case PF6- 
+            pattern = Chem.MolFromSmarts('[P-](F)(F)(F)(F)(F)[F]')
+            matches = rdkitmol.GetSubstructMatches(pattern)
+            for match in matches:
+              p,f1,f2,f3,f4,f5,f6 = match
+              frames.append(f'{f1+1} {p+1}')
+              frames.append(f'{f2+1} {p+1}')
+              frames.append(f'{f3+1} {p+1}')
+              frames.append(f'{f4+1} {p+1}')
+              frames.append(f'{f5+1} {p+1}')
+              frames.append(f'{f6+1} {p+1}')
 
             if frames != []:
               for frame in frames:
