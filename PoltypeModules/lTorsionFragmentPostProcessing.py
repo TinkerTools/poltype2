@@ -6,18 +6,12 @@
 # - generates a {fname}.mol file for using with afterwards torsion fitting
 
 # KEY RULES IMPLEMENTED IN THIS PROGRAM:
-# 1. Bond breaking happens only at single bonds (OLD decision) 
-# 1. Bond breaking happens at all bonds except those being explicitly excluded
+# 1. Bond breaking happens at all single + C~C bonds, except explicit exclusions
 # 2. Special bond involving nitrogen is not cut
 # 3. Fused rings are treated as single rings if the fused two atoms are carbon
 # 4. Long alkane chain such as propyl and ethyl are replaced with CH3-
 # 5. Charged fragments (COO-) is neutralized
-# 6. Substituents on a ring (OLD decision)
-#   -- 1,3- and 1,4- substituents are removed (meta- and para- )
-#   -- 1,2- substituents are kept if they are polar groups
-#   -- 1,2- substituents are removed if they are alkane
-# 6. Substituents on a ring are removed to avoid potential HB or steric effect
-
+# 6. Substituents on an aromatic ring are removed to avoid potential HB or steric effect
 
 # Author: Chengwen Liu
 # Date: Jun. 2023
@@ -184,7 +178,16 @@ if __name__ == '__main__':
   
   # all single bonds are eligible to cut,
   eligible_bonds = []
-  pattern = Chem.MolFromSmarts('[*;!#1]~[*;!#1]')
+  pattern = Chem.MolFromSmarts('[*;!#1][*;!#1]')
+  matches = mol.GetSubstructMatches(pattern, uniquify=False)
+  for match in matches:
+    match = list(match)
+    match.sort()
+    if match not in eligible_bonds:
+      eligible_bonds.append(match)
+  
+  # C~C double bonds are also eligible to cut,
+  pattern = Chem.MolFromSmarts('[#6]~[#6]')
   matches = mol.GetSubstructMatches(pattern, uniquify=False)
   for match in matches:
     match = list(match)
@@ -248,7 +251,8 @@ if __name__ == '__main__':
   for idx in range(len(mol.GetAtoms())):
     a = mol.GetAtomWithIdx(idx)
     inRing = a.IsInRing()
-    if inRing:
+    isAromatic = a.GetIsAromatic()
+    if inRing and isAromatic:
       for neig in a.GetNeighbors():
         neig_idx = neig.GetIdx()
         sameRing = RingInfo.AreAtomsInSameRing(mol.GetRingInfo(), idx, neig_idx)
