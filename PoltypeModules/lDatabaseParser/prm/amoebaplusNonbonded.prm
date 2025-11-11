@@ -151,10 +151,10 @@ CHGPEN  F-CHF2         5.10000   3.96150
 CHGPEN  F-CF3          5.10000   3.96150  
 CHGPEN  Cl-SX4         6.10000   2.63140  
 CHGPEN  Cl-Car         6.10000   2.63140  
-CHGPEN  Cl-CH3         6.10000   2.63140  
-CHGPEN  Cl-CH2Cl       6.10000   2.63140  
-CHGPEN  Cl-CHCl2       6.10000   2.63140  
-CHGPEN  Cl-CCl3        6.10000   2.63140  
+CHGPEN  Cl-CH3         6.10000   2.63750
+CHGPEN  Cl-CH2Cl       6.10000   2.63750
+CHGPEN  Cl-CHCl2       6.10000   2.63750
+CHGPEN  Cl-CCl3        6.10000   2.63750
 CHGPEN  Br-Car         9.00000   2.80912  
 CHGPEN  Br-CH3         9.00000   2.65970  
 CHGPEN  Br-CH2Br       9.00000   2.65970  
@@ -319,10 +319,10 @@ CHGTRN  F-CHF2         9.87849   4.96176
 CHGTRN  F-CF3          9.87849   4.96176  
 CHGTRN  Cl-SX4         13.51840  2.78720  
 CHGTRN  Cl-Car         13.51840  2.78720  
-CHGTRN  Cl-CH3         13.51840  2.78720  
-CHGTRN  Cl-CH2Cl       13.51840  2.78720  
-CHGTRN  Cl-CHCl2       13.51840  2.78720  
-CHGTRN  Cl-CCl3        13.51840  2.78720  
+CHGTRN  Cl-CH3         12.56217   3.70913
+CHGTRN  Cl-CH2Cl       12.56217   3.70913
+CHGTRN  Cl-CHCl2       12.56217   3.70913
+CHGTRN  Cl-CCl3        12.56217   3.70913  
 CHGTRN  Br-Car         11.70356  3.56810  
 CHGTRN  Br-CH3         11.66200  3.56806  
 CHGTRN  Br-CH2Br       11.66200  3.56806  
@@ -366,7 +366,7 @@ VDW     CH0-F4         3.47150   0.11467
 VDW     CH3-Cl1        3.99220   0.10352  
 VDW     CH2-Cl2        3.77840   0.07035  
 VDW     CH1-Cl3        3.55200   0.07614  
-VDW     CH0-Cl4        3.47150   0.06899  
+VDW     CH0-Cl4        3.40993   0.07368 
 VDW     CH3-Br1        3.99216   0.09757  
 VDW     CH2-Br2        3.77841   0.07844  
 VDW     CH1-Br         3.55199   0.05075  
@@ -487,10 +487,10 @@ VDW     F-CHF2         3.57558   0.04841
 VDW     F-CF3          3.60428   0.04841  
 VDW     Cl-SX4         4.52499   0.11310  
 VDW     Cl-Car         4.52499   0.11310  
-VDW     Cl-CH3         4.46420   0.11523  
-VDW     Cl-CH2Cl       4.55121   0.11523  
-VDW     Cl-CHCl2       4.60271   0.11523  
-VDW     Cl-CCl3        4.63525   0.11523  
+VDW     Cl-CH3         4.14389   0.24013 
+VDW     Cl-CH2Cl       4.14389   0.24013 
+VDW     Cl-CHCl2       4.14389   0.24013 
+VDW     Cl-CCl3        4.14389   0.24013  
 VDW     Br-Car         4.45251   0.22360  
 VDW     Br-CH3         4.51474   0.22362  
 VDW     Br-CH2Br       4.58570   0.22362  
@@ -502,3 +502,6 @@ VDW     I-CH3          4.95216   0.28649
 VDW     I-CH2I         5.00348   0.27462
 VDW     I-CHI2         5.19323   0.16453
 VDW     I-CI3          5.17365   0.18012
+###VDWPAIR
+#Cl4 ... H
+#vdwpair   805    2   3.86146   0.07529
