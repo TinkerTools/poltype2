@@ -521,8 +521,8 @@ def gen_peditinfile(poltype,mol):
               # bisect 
               frames.append(f'{n+1} -{h1+1} -{h2+1}')
             # NH2-c 
-            # this will give better quality of the ESP
-            # comparing to poledit.x frame (Z-bisec)
+            # poledit.x frame (Z-bisec)
+            # not correct when Z and bisec are the same
             pattern = Chem.MolFromSmarts('[NH2]([H])([H])[c]')
             matches = rdkitmol.GetSubstructMatches(pattern)
             for match in matches:
