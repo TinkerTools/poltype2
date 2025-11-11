@@ -6,7 +6,7 @@
 # - generates a {fname}.mol file for using with afterwards torsion fitting
 
 # KEY RULES IMPLEMENTED IN THIS PROGRAM:
-# 1. Bond breaking happens at all single + C=C double bonds, except explicit exclusions
+# 1. Bond breaking happens at all single + C~C bonds, except explicit exclusions
 # 2. Special bond involving nitrogen is not cut
 # 3. Fused rings are treated as single rings if the fused two atoms are carbon
 # 4. Long alkane chain such as propyl and ethyl are replaced with CH3-
@@ -186,7 +186,7 @@ if __name__ == '__main__':
     if match not in eligible_bonds:
       eligible_bonds.append(match)
   
-  # C=C double bonds are also eligible to cut,
+  # C~C double bonds are also eligible to cut,
   pattern = Chem.MolFromSmarts('[#6]~[#6]')
   matches = mol.GetSubstructMatches(pattern, uniquify=False)
   for match in matches:

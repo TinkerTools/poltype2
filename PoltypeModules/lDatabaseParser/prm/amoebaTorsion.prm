@@ -291,6 +291,7 @@
 [#1][CH2]1[CH2]([#1])[CH2][NX3][CH2]1 % 1,2,3,4 % 0.000, 0.000, 0.299 % Pyrolidine H-CH-CH-H
 #torsion      29   29   29   29      0.854 0.0 1  -0.374 180.0 2   0.108 0.0 3
 [*;!#1][A;R]@[A;R][*;!#1] % 1,2,3,4 % 0.854, -0.374, 0.108 % General A-A-A-A cycle for non aromatic bond ring
+[*;!#1]~[A;R]@[A;R][A;R] % 1,2,3,4 % 0.854, -0.374, 0.108 % General X~A-A-A cycle for non aromatic bond ring
 #torsion      29   29   29   30      0.000 0.0 1   0.000 180.0 2   0.108 0.0 3
 [*;!#1][A;R]@[A;R]([#1])[*;!#1] % 1,2,3,4 % 0.000, 0.000, 0.108 % General H-C-A-C cycle or non aromatic bond ring
 #torsion      30   29   29   30      0.000 0.0 1   0.000 180.0 2   0.299 0.0 3

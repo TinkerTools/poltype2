@@ -1,4 +1,4 @@
-# Automation of AMOEBA Polarizable Force Field for Small Molecules - Poltype 2
+# Poltype2: Automation of AMOEBA Polarizable Force Field for Small Molecules
 
 ## Obejective
 Given an input chemical structure, all parameters can be automatically assigned from a database or derived via fitting to ab initio data generated on the fly.

@@ -232,7 +232,7 @@ class PolarizableTyper():
         scaleandfixdipole:bool=False
         scalebigmultipole:bool=False
         fragbigmultipole:bool=True
-        sp2aniline:bool=True
+        sp2aniline:bool=False
         nonplanarphenol:bool=False
         chargethreshold:float=1.5
         dipolethreshold:float=1.5
@@ -2276,7 +2276,7 @@ class PolarizableTyper():
             totchg=0
             atomindextoformalcharge={}
             # STEP 1
-            atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
+            atomicnumtoformalchg={1:{2:1},5:{4:1},6:{3:-1},7:{2:-1,4:1},8:{1:-1,3:1},15:{4:1,6:-1},16:{1:-1,3:1,5:-1},17:{0:-1,4:3},9:{0:-1},35:{0:-1},53:{0:-1}}
             for atom in molecule.GetAtoms():
                 # STEP 2
                 atomidx=atom.GetIdx()
@@ -3454,27 +3454,60 @@ class PolarizableTyper():
             tmpsdf = self.molstructfname
             tmpxyz = self.xyzoutfile 
             # Match for AMOEBA FF
-            if not self.rotalltors and self.forcefield.upper() == 'AMOEBA':
+            if self.forcefield.upper() == 'AMOEBA':
               cmd = f'python {self.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {tmpsdf} -potent TORSION'
               self.call_subsystem([cmd], True)  
             # Match for AMOEBAplus FF
-            if not self.rotalltors and self.forcefield.upper() in ['AMOEBA+', 'AMOEBAPLUS']:
+            if self.forcefield.upper() in ['AMOEBA+', 'AMOEBAPLUS']:
               cmd = f'python {self.ldatabaseparserpath} -xyz {tmpxyz} -key {tmpkey} -sdf {tmpsdf} -potent TORSION+'
               self.call_subsystem([cmd], True)  
-            # find torsions to be added
+            
+            # Find atom2type mapping 
+            atom2type = {}
+            lines = open(tmpxyz).readlines()[1:]
+            for line in lines:
+              s = line.split()
+              atom2type[int(s[0])] = s[5]
+            
+            # Find the ring bond atom types
+            rdkitmol = Chem.MolFromMolFile(tmpsdf,removeHs=False)
+            ring_bond_smt = "[R]@[R]"
+            pattern = Chem.MolFromSmarts(ring_bond_smt)
+            matches = rdkitmol.GetSubstructMatches(pattern)
+            ring_bond_type = [] 
+            for match in matches:
+              b1, b2 = match
+              type1 = atom2type[b1+1]
+              type2 = atom2type[b2+1]
+              ring_bond_type.append([type1, type2])
+            
             torsions_toadd = {}
             matched_torlist = []
             if os.path.isfile(tmpkey + '_torsion'):
               tmplines = open(tmpkey + '_torsion').readlines()
-              for line in tmplines:
+              for i in range(len(tmplines)):
+                line = tmplines[i]
                 if (line[0] != '#') and (line.split()[0].upper() == 'TORSION'):
                   s = line.split()
-                  tor = [int(ss) for ss in s[1:5]]
-                  tor_r = [int(ss) for ss in s[4:0:-1]] 
-                  torsions_toadd['-'.join([str(i) for i in tor])] = line
-                  torsions_toadd['-'.join([str(i) for i in tor_r])] = line
-                  matched_torlist.append(tor)
-                  matched_torlist.append(tor_r)
+                  if not self.rotalltors:
+                    # By default pick all matched torsions
+                    tor = [int(ss) for ss in s[1:5]]
+                    tor_r = [int(ss) for ss in s[4:0:-1]] 
+                    torsions_toadd['-'.join([str(i) for i in tor])] = [line, tmplines[i-1]]
+                    torsions_toadd['-'.join([str(i) for i in tor_r])] = [line, tmplines[i-1]]
+                    matched_torlist.append(tor)
+                    matched_torlist.append(tor_r)
+                  else: 
+                    # IF rotalltors, just pick ring torsions
+                    t2 = s[2]
+                    t3 = s[3]
+                    if ([t2, t3] in ring_bond_type) or ([t3, t2] in ring_bond_type):
+                      tor = [int(ss) for ss in s[1:5]]
+                      tor_r = [int(ss) for ss in s[4:0:-1]] 
+                      torsions_toadd['-'.join([str(i) for i in tor])] = [line, tmplines[i-1]]
+                      torsions_toadd['-'.join([str(i) for i in tor_r])] = [line, tmplines[i-1]]
+                      matched_torlist.append(tor)
+                      matched_torlist.append(tor_r)
 
             # remove matched torsion types from torsionsmissing.txt
             if matched_torlist != []:
@@ -3498,9 +3531,11 @@ class PolarizableTyper():
                     tor_str = '-'.join(s[1:5])
                     tor_str_r = '-'.join(s[4:0:-1])
                     if tor_str in torsions_toadd.keys():
-                      f.write(torsions_toadd[tor_str] + '\n')
+                      f.write(torsions_toadd[tor_str][1] + '\n')
+                      f.write(torsions_toadd[tor_str][0] + '\n')
                     elif tor_str_r in torsions_toadd.keys():
-                      f.write(torsions_toadd[tor_str_r] + '\n')
+                      f.write(torsions_toadd[tor_str_r][1] + '\n')
+                      f.write(torsions_toadd[tor_str_r][0] + '\n')
                     else:
                       f.write(keyline)
                   else:
@@ -3550,7 +3585,7 @@ class PolarizableTyper():
             self.classkeytoinitialprmguess={}
             self.nonarotortotorsbeingfit={}
             # STEP 42
-            if self.atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False and self.totalcharge == 0: 
+            if self.atomnum<25 and len(nonaroringtorlist)==0 and self.smallmoleculefragmenter==False:
                 self.dontfrag=True
             if self.dontfrag==True and self.toroptmethod!='xtb' and 'xtb' not in self.toroptmethodlist: # if fragmenter is turned off, parition resources by jobs at sametime for parent,cant parralelize xtb since coords always written to same filename
                 self.maxmem,self.maxdisk,self.numproc=self.PartitionResources()

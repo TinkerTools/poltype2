@@ -2097,7 +2097,7 @@ def RingAtomicIndices(poltype,mol):
     Intent: Grab all rings in input molecule
     Input: mol object
     Output: List of list of ring atomic indices
-    Referenced By: FindMissingTorsions , DefaultAromaticMissingTorsions
+    Referenced By: FindMissingTorsions 
     Description: 
     1. Call SSSR method
     2. Iterate over ring objects
@@ -2385,7 +2385,7 @@ def GrabAllRingsContainingIndices(poltype,atomindices,babelindices):
     Intent: Needed to check if whole molecule is one big ring or not.   
     Input: Array of rings, array of atomic indices corresponding to torsion 
     Output: Array of rings containing atomic indices from torsion
-    Referenced By: DefaultAromaticMissingTorsions, FindMissingTorsions
+    Referenced By:FindMissingTorsions
     Description:
     1. Iterate over rings in array of rings
     2. Assume all atomic indices exist in ring
@@ -2677,130 +2677,6 @@ def ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,
         newtorsionprms.append(line)
 
     return newtorsionprms
-
-
-
-def DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopoltypeclasses,partialarotorsionsmissingtinkerclassestopoltypeclasses,torsionprms,mol): # transfer bezene aromatic torsion paramerers from amoeba09
-    """
-    Intent: Some torsions parameters need to transfer from alkane or from benezne, this function hardcodes that torsion transfer
-    Input: Dictionary of torsions that need benzene transfer tinker classes -> poltype types, dictionary of torsion tinker classes that need alkane transfer -> poltype types , array of torsion parameter lines, mol object
-    Output: Modified torsion parameter line array
-    Referenced By: GrabSmallMoleculeAMOEBAParameters
-    Description: 
-    1. Define hardcoded parameters and tinker type descriptions (for adding helpful comments to parameter transfer in key file)
-    2. Find all hydrogens types there are in the molecule, will help with counting how many hydrogen classes in torsion
-    3. Iterate over lines of torsion parameter array
-    4. Extract torsion classes from parameter line
-    5. Determine possible corresponding atomic indices from classes
-    6. Determine hybridization of atoms in torsion and if a ring bond or not
-    7. Count how many hydrogens in current torsion 
-    8. Check if curren torsion is in either dictionary for benzene transfers or alkane transfers, if so determine which parameters to transfer and which comments to add based on number of hydrogens
-    9. Update current torsion line with new parameters
-    10. If torsion is on ring bond and depending on bond order (if double/triple etc), then add extra comment about bond order to key file 
-    11. Append modified torsion to array of modified torsion parameter lines
-    """
-    # STEP 1
-    newtorsionprms=[]
-    poorarohydcounttoprms={0:[-.67,6.287,0],1:[.55,6.187,-.55],2:[0,6.355,0]}
-    poorpartialarohydcounttoprms={0:[.854,-.374,.108],1:[0,0,.108],2:[0,0,.299]}
-    poorarohydcounttodescrips={0:["Benzene C","Benzene C","Benzene C","Benzene C"],1:["Benzene HC","Benzene C","Benzene C","Benzene C"],2:["Benzene HC","Benzene C","Benzene C","Benzene HC"]}
-    poorpartialarohydcounttodescrips={0:["Alkane -CH2-","Alkane -CH2-","Alkane -CH2-","Alkane -CH2-"],1:["Alkane -H2C-","Alkane -CH2-","Alkane -CH2-","Alkane -CH2-"],2:["Alkane -H2C-","Alkane -CH2-","Alkane -CH2-","Alkane -H2C-"]}
-    ringextra='# Ring bond detected for missing torsion'+'\n'
-    doubleextra='# Double bond detected for missing torsion'+'\n'
-    singleextra='# Single bond detected for missing torsion'+'\n'
-    hydextra='# Transferring hydrogen torsion to reduce fit parameters'+'\n'
-    arotorsionlinetodescrips={} 
-    # STEP 2
-    hydclasses=[]
-    for atom in poltype.rdkitmol.GetAtoms():
-        atomicnum=atom.GetAtomicNum()
-        babelindex=atom.GetIdx()+1
-        symclass=poltype.idxtosymclass[babelindex]
-        if atomicnum==1:
-            hydclasses.append(symclass)
-    # STEP 3 
-    for line in torsionprms:
-        # STEP 4
-        linesplit=line.split()
-        a=int(linesplit[1])
-        b=int(linesplit[2])
-        c=int(linesplit[3])
-        d=int(linesplit[4])
-        allcombs=[]
-        ls=[a,b,c,d]
-        # STEP 5
-        for typenum in ls: 
-            indices=GrabKeysFromValue(poltype,poltype.idxtosymclass,typenum)
-            allcombs.append(indices)
-        combs=list(itertools.product(*allcombs))
-        for comb in combs:
-            aindex=comb[0]
-            bindex=comb[1]
-            cindex=comb[2]
-            dindex=comb[3]
-            firstbond=mol.GetBond(aindex,bindex)
-            midbond=mol.GetBond(bindex,cindex)
-            lastbond=mol.GetBond(cindex,dindex)
-            if midbond!=None and firstbond!=None and lastbond!=None:
-                break 
-        # STEP 6
-        babelindices=list(comb)
-        babelatoms=[mol.GetAtom(i) for i in babelindices]
-        hybs=[a.GetHyb() for a in babelatoms]
-        ringbond=midbond.IsInRing()
-        if ringbond==True:
-            atomindices=RingAtomicIndices(poltype,mol)
-            therings=torgen.GrabAllRingsContainingMostIndices(poltype,atomindices,babelindices,2)
-            if (len(therings)>0) and poltype.dontfrag==False:
-                if len(therings[0])>7: # special case where whole molecule is a ring then dont consider ring bond
-                    if hybs[1]!=2 and hybs[2]!=2:
-                        ringbond=False
-
-        bondorder=midbond.GetBondOrder()      
-        classes=tuple([a,b,c,d])
-        # STEP 7
-        hydcount=0
-        if a in hydclasses:
-            hydcount+=1
-        if d in hydclasses:
-            hydcount+=1
-        # STEP 8
-        found=False
-        for sublist in arotorsionsmissingtinkerclassestopoltypeclasses.values():
-            if classes in sublist or classes[::-1] in sublist: 
-                found=True
-                prms=poorarohydcounttoprms[hydcount]
-                descrips=poorarohydcounttodescrips[hydcount]
-                break
-        for sublist in partialarotorsionsmissingtinkerclassestopoltypeclasses.values():
-            if classes in sublist or classes[::-1] in sublist: 
-                found=True
-                prms=poorpartialarohydcounttoprms[hydcount]
-                descrips=poorpartialarohydcounttodescrips[hydcount]
-                break
-        # STEP 9
-        if found==True:
-            newlinesplit=re.split(r'(\s+)', line)
-            splitafter=newlinesplit[10:]
-            splitafter[0]=str(prms[0])
-            splitafter[6]=str(prms[1])
-            splitafter[12]=str(prms[2])
-            newlinesplit=newlinesplit[:10]+splitafter
-            line=''.join(newlinesplit)
-            # STEP 10 
-            if ringbond==True:
-                extra=ringextra
-            elif ringbond==False and bondorder!=1:
-                extra=doubleextra
-            else:
-                extra=singleextra
-            if hydcount>0 and ringbond==False:
-                extra+=hydextra
-            arotorsionlinetodescrips[line]=[extra,descrips]
-        # STEP 11
-        newtorsionprms.append(line)
-
-    return newtorsionprms,arotorsionlinetodescrips
 
 
 def GrabTorsionParameterCoefficients(poltype,torsionprms):
@@ -6210,7 +6086,7 @@ def GrabSmallMoleculeAMOEBAParameters(poltype,optmol,mol,rdkitmol):
     torsionsmissingtinkerclassestopoltypeclasses=MergeDictionaries(poltype,extratormissingtinkerclassestopoltypeclasses,torsionsmissingtinkerclassestopoltypeclasses)
 
     torsionprms=ZeroOutMissingTorsions(poltype,torsionsmissingtinkerclassestopoltypeclasses,torsionprms)
-    torsionprms,arotorsionlinetodescrips=DefaultAromaticMissingTorsions(poltype,arotorsionsmissingtinkerclassestopoltypeclasses,partialarotorsionsmissingtinkerclassestopoltypeclasses,torsionprms,mol)
+    arotorsionlinetodescrips={}
     torsionkeystringtoparameters=GrabTorsionParameterCoefficients(poltype,torsionprms)
     potentialmissingopbendprmtypes=FindPotentialMissingParameterTypes(poltype,opbendprms,planarbondtinkerclassestopoltypeclasses)
     potentialmissingopbendprmindices=ConvertPoltypeClassesToIndices(poltype,potentialmissingopbendprmtypes)
