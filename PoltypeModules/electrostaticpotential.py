@@ -386,7 +386,7 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
         if ('I ' in poltype.mol.GetSpacedFormula()):
             iodinebasissetfile=poltype.iodinedmabasissetfile 
             basissetfile=poltype.dmabasissetfile
-            poltype.dmabasisset='gen'
+            dmabasisset_local='gen'
             if poltype.sameleveldmaesp:
               iodinebasissetfile=poltype.iodineespbasissetfile 
               basissetfile=poltype.espbasissetfile
@@ -396,7 +396,7 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
             densitystring='SCF'
 
 
-        opstr="#P %s/%s Sp Density=%s" % (poltype.dmamethod,poltype.dmabasisset, densitystring)
+        opstr="#P %s/%s Sp Density=%s" % (poltype.dmamethod,dmabasisset_local, densitystring)
     elif ('pop' in comfname):
         opstr="#P HF/%s MaxDisk=%s Pop=SaveMixed" % (poltype.popbasisset)
     else:
