@@ -390,6 +390,8 @@ def gen_comfile(poltype,comfname,numproc,maxmem,maxdisk,chkname,tailfname,mol):
             if poltype.sameleveldmaesp:
               iodinebasissetfile=poltype.iodineespbasissetfile 
               basissetfile=poltype.espbasissetfile
+        else:
+            dmabasisset_local=poltype.dmabasisset
         if poltype.dmamethod.upper() == 'MP2':
             densitystring='MP2'
         else:
