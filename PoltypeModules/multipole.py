@@ -558,6 +558,14 @@ def gen_peditinfile(poltype,mol):
               frames.append(f'{f5+1} {p+1}')
               frames.append(f'{f6+1} {p+1}')
 
+            # general case N with one H 
+            pattern = Chem.MolFromSmarts('[H][#7X3H1]([*])[*]')
+            matches = rdkitmol.GetSubstructMatches(pattern)
+            for match in matches:
+              h,n,x1,x2 = match
+              frames.append(f'{h+1} {n+1} {x1+1}')
+
+
             if frames != []:
               for frame in frames:
                 f.write(f'{frame}\n')
