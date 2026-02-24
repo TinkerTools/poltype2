@@ -3430,7 +3430,6 @@ class PolarizableTyper():
                       self.WriteToLog('Assign Van der Waals and GK parameters using DatabaseParser')
                     ldatabaseparser.assign_nonbonded_params(self) 
                     torsiondatabaseparser.StiffenZThenBisectorAngleConstants(self,self.key4fname)
-                    torsiondatabaseparser.TestBondAngleEquilValues(self)
                 self.AddIndicesToKey(self.key4fname)
                 if self.databasematchonly==True:
                     sys.exit()
@@ -3540,6 +3539,10 @@ class PolarizableTyper():
                       f.write(keyline)
                   else:
                     f.write(keyline)
+            
+            # bond/angle adjustment based on MM-opted geometry
+            torsiondatabaseparser.TestBondAngleEquilValues(self)
+
             # STEP 41
             (torlist, self.rotbndlist,nonaroringtorlist,self.nonrotbndlist) = torgen.get_torlist(self,optmol,torsionsmissing,self.onlyrotbndslist)
             torlist,self.rotbndlist=torgen.RemoveDuplicateRotatableBondTypes(self,torlist) # this only happens in very symmetrical molecules
