@@ -1760,69 +1760,74 @@ def DetermineAngleIncrementAndPointsNeededForEachTorsionSet(poltype,mol,rotbndli
         poltype.rotbndtoanginc[key]=ang
     return poltype.rotbndtoanginc
 
-def find_tor_restraint_idx(poltype,mol,b1,b2):
+
+def find_tor_restraint_idx(poltype, mol, b1, b2):
     """
-    Intent: Find the atoms 1 and 4 about which torsion angles are restrained
-    Given b1, b2, finds the torsion: t1 b1 b2 t4
-    Input:
+    Find atoms t1 and t4 to define the torsion t1-b1-b2-t4 for restraints.
+
+    Given the rotatable bond b1--b2, selects the neighbor of b1 (excluding b2)
+    with the lowest symmetry class as t1, and the neighbor of b2 (excluding b1,
+    and preferably excluding t1) with the lowest symmetry class as t4.
+
+    Handles small rings (3-membered, 4-membered) where the neighbor pools of
+    b1 and b2 overlap, potentially leaving no distinct candidate for t4.
+
+    Args:
+        poltype: Poltype object (provides idxtosymclass mapping)
         mol: OBMol object
-        b1: first atom of the rotatable bond (t2 in the torsion)
-        b2: second atom of the rotatable bond (t3 in the torsion)
-    Output:
-        t1: atom 1 in the torsion
-        t4: atom 4 in the torsion
-    Referenced By: get_torlist
-    Description:
-    1. Find the heaviest (heaviest meaning of highest sym class) 
-       atom bound to atom b1 (that is not b2)
-    2. Find the heaviest atom bound to atom b2 (that is not b1)
-    3. These two atoms are returned as atoms 1 and 4 for the torsion
+        b1: OBAtom, first atom of the rotatable bond
+        b2: OBAtom, second atom of the rotatable bond
+
+    Returns:
+        (t1, t4): tuple of OBAtom objects defining the torsion endpoints
     """
     b1idx = b1.GetIdx()
     b2idx = b2.GetIdx()
-    iteratomatom1 = openbabel.OBAtomAtomIter(b1)
-    b1nbridx=[]
-    for natom in iteratomatom1:
-        natomidx=natom.GetIdx()
-        b1nbridx.append(natomidx)
-    iteratomatom2 = openbabel.OBAtomAtomIter(b2)
-    b2nbridx=[]
-    for nnatom in iteratomatom2:
-        nnatomidx=nnatom.GetIdx()
-        b2nbridx.append(nnatomidx)
 
+    # Gather neighbor indices for each bond atom, excluding the bond partner
+    b1_neighbors = [
+        a.GetIdx() for a in openbabel.OBAtomAtomIter(b1) if a.GetIdx() != b2idx
+    ]
+    b2_neighbors = [
+        a.GetIdx() for a in openbabel.OBAtomAtomIter(b2) if a.GetIdx() != b1idx
+    ]
 
-    b1len=len(b1nbridx)
-    b2len=len(b2nbridx)
-    shift=False
-    if b1len<=b2len:
-        pass
-    else: # weird case of torsion on three atom ring need to fix, let b1 be one with fewest neighbors
-        shift=True
-        b1idx=b2.GetIdx()
-        b2idx=b1.GetIdx()  
-        b1=mol.GetAtom(b1idx)
-        b2=mol.GetAtom(b2idx)
-    iteratomatomb1 = openbabel.OBAtomAtomIter(b1)
+    # --- Defensive checks ---
+    if not b1_neighbors:
+        raise ValueError(
+            f"Atom b1 (idx={b1idx}) has no neighbors besides b2 (idx={b2idx}). "
+            f"Cannot define a torsion restraint for a terminal bond."
+        )
+    if not b2_neighbors:
+        raise ValueError(
+            f"Atom b2 (idx={b2idx}) has no neighbors besides b1 (idx={b1idx}). "
+            f"Cannot define a torsion restraint for a terminal bond."
+        )
 
-    b1nbridx = list(map(lambda x: x.GetIdx(), iteratomatomb1))
-    del b1nbridx[b1nbridx.index(b2idx)]    # Remove b2 from list
-    assert(b1nbridx is not [])
-    minb1class = min(b1nbridx,key=lambda x: poltype.idxtosymclass[x])
-    iteratomatomb2 = openbabel.OBAtomAtomIter(b2)
-    b2nbridx = list(map(lambda x: x.GetIdx(), iteratomatomb2))
-    del b2nbridx[b2nbridx.index(b1idx)]    # Remove b1 from list
-    assert(b2nbridx is not [])
-    if minb1class in b2nbridx:
-        b2nbridx.remove(minb1class)
-    minb2class = min(b2nbridx, key= lambda x:poltype.idxtosymclass[x])
-    t1 = mol.GetAtom(minb1class)
-    t4 = mol.GetAtom(minb2class)
-    if shift==False:
-        return t1,t4
+    # --- Select t1: lowest symmetry class neighbor of b1 ---
+    t1idx = min(b1_neighbors, key=lambda x: poltype.idxtosymclass[x])
+
+    # --- Select t4: lowest symmetry class neighbor of b2, preferring t4 != t1 ---
+    # Remove t1 from b2's candidates if possible (to get a proper dihedral)
+    b2_candidates = [idx for idx in b2_neighbors if idx != t1idx]
+
+    if b2_candidates:
+        # Normal case: we have at least one candidate distinct from t1
+        t4idx = min(b2_candidates, key=lambda x: poltype.idxtosymclass[x])
     else:
-        return t4,t1 
+        # Small-ring case (e.g., 3-membered ring): the only candidate for t4
+        # is the same atom as t1. This gives a degenerate torsion t1-b1-b2-t1,
+        # which is topologically valid for restraint purposes.
+        t4idx = min(b2_neighbors, key=lambda x: poltype.idxtosymclass[x])
+        poltype.WriteToLog(
+            f"Warning: 3-membered (or small) ring detected at bond "
+            f"{b1idx}-{b2idx}. Torsion restraint atoms t1 and t4 are the "
+            f"same atom (idx={t4idx}). Torsion will be near-degenerate."
+        )
 
+    t1 = mol.GetAtom(t1idx)
+    t4 = mol.GetAtom(t4idx)
+    return t1, t4
 
 def ConvertTinktoXYZ(poltype,filename,newfilename):
     """
