@@ -285,6 +285,7 @@ class PolarizableTyper():
         use_gaus:bool=False
         use_gausoptonly:bool=False
         use_psi4_geometric_opt:bool=True
+        dont_use_pyscf:bool=False
         freq:bool=False
         postfit:bool=False
         bashrcpath:None=None
@@ -626,6 +627,8 @@ class PolarizableTyper():
                             self.use_gausoptonly=self.SetDefaultBool(line,a,True)
                         elif "use_psi4_geometric_opt" in newline:
                             self.use_psi4_geometric_opt=self.SetDefaultBool(line,a,True)
+                        elif "dont_use_pyscf" in newline:
+                            self.dont_use_pyscf=self.SetDefaultBool(line,a,True)
                         elif "dontdotor" in newline:
                             self.dontdotor=self.SetDefaultBool(line,a,True)
                         elif "dovdwscan" in newline:

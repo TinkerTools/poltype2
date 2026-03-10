@@ -194,7 +194,7 @@ def ExecuteSPJobs(poltype,optoutputlogs,phaselist,optmol,torset,variabletorlist,
       Soft = 'Psi4' 
     
     # Replace Psi4 with PySCF when pcm is needed
-    if (poltype.optpcm==True or (poltype.optpcm==-1 and poltype.pcm)) and (Soft == 'Psi4'):
+    if (poltype.optpcm==True or (poltype.optpcm==-1 and poltype.pcm)) and (Soft == 'Psi4') and (poltype.dont_use_pyscf==False):
       Soft = 'PySCF'
 
 
@@ -357,7 +357,7 @@ def GenerateTorsionOptInputFile(poltype,torxyzfname,torset,phaseangles,optmol,va
     """
 
     if poltype.use_gaus==False and poltype.use_gausoptonly==False:
-        if poltype.toroptpcm==True or (poltype.toroptpcm==-1 and poltype.pcm):
+        if (poltype.toroptpcm==True or (poltype.toroptpcm==-1 and poltype.pcm)) and (poltype.dont_use_pyscf==False):
             Soft = 'PySCF'
         else:
             Soft = 'Psi4'
