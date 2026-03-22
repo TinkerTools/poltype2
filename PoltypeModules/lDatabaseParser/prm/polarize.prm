@@ -89,6 +89,7 @@
 [$([OX1][PX4](~[O])~[O])]                 					   Op-       1.724 # O on (Hn)PO4-, original 1.999
 [$([OH1][PX4](~[O])(~[O])[O])]            					   O(H)P     0.837 # O(H) on PO4-, previoys 0.6
 [$([O](C)[PX4](~[O])(~[O])[O])]           					   O(C)P     0.837 # O(C) on CPO4-, previouly 1.029
+[$([OX1]=[PX4]([OX2H0])([OX2H0])[OX2H0])]              O=P       0.892 # O=P in PO4 neutral, e.g., TMP, TEP
 [$([H][O][PX4](~[O])~[O])]                					   Hop       0.336 # H on O connected to PO4-
 [$([CX3](~[OH0])(~[OH0])[OH0])]               				 Cooo-     2.073 # C of Carbonate
 [$([OH0]~[CX3](~[OH0])[OH0])] 				                 Oc-2      1.662 # O of Carbonate, original 2.374, scale down ~30%
