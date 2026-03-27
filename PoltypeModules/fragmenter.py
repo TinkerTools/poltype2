@@ -747,7 +747,7 @@ def FragmentJobSetup(poltype,strfragrotbndindexes,tail,listofjobs,jobtooutputlog
     init_keywords += ['numproc', 'maxmem', 'maxdisk']
     init_keywords += ['structure', 'prmstartidx', 'isfragjob', 'parentname', 'maxgrowthcycles']
     init_keywords += ['debugmode']
-    init_keywords += ['use_gaus', 'use_gausoptonly', 'use_psi4_geometric_opt', 'pcm_auto']
+    init_keywords += ['use_gaus', 'use_gausoptonly', 'use_psi4_geometric_opt', 'dont_use_pyscf','pcm_auto']
     init_keywords += ['optpcm', 'toroptpcm', 'torsppcm']
     init_keywords += ['optmethod', 'optbasisset', 'optmaxcycle', 'optconvergence']
     init_keywords += ['dmamethod', 'dmabasisset', 'new_gdma']
