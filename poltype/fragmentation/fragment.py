@@ -5,8 +5,7 @@ A :class:`Fragment` represents a chemically meaningful sub-structure
 extracted from a parent molecule.  The :class:`FragmentResult`
 collects all fragments produced by a single fragmentation run.
 
-These dataclasses are plain containers with **no dependency on
-PoltypeModules** and can be unit-tested in isolation.
+These dataclasses are plain containers that can be unit-tested in isolation.
 """
 
 from __future__ import annotations

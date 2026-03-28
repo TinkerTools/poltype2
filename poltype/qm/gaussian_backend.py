@@ -3,8 +3,7 @@ poltype.qm.gaussian_backend – Gaussian QM backend adapter (stub).
 
 Phase 1 status: **stub adapter** – the class satisfies the
 :class:`~poltype.qm.backend.QMBackend` interface.  The legacy
-``use_gaus`` / ``use_gausoptonly`` code paths in
-``PoltypeModules/optimization.py`` and related modules remain the
+``use_gaus`` / ``use_gausoptonly`` code paths remain the
 active implementation until Phase 4.
 """
 
@@ -66,7 +65,7 @@ class GaussianBackend(QMBackend):
         """Geometry optimisation via Gaussian.  Phase 1 stub."""
         raise NotImplementedError(
             "GaussianBackend.optimize_geometry is a Phase 1 stub. "
-            "Use PoltypeModules/optimization.py (use_gaus=True) directly."
+            "Not yet implemented."
         )
 
     def compute_esp_grid(
@@ -79,7 +78,7 @@ class GaussianBackend(QMBackend):
         """ESP grid calculation via Gaussian.  Phase 1 stub."""
         raise NotImplementedError(
             "GaussianBackend.compute_esp_grid is a Phase 1 stub. "
-            "Use PoltypeModules/electrostaticpotential.py directly."
+            "Not yet implemented."
         )
 
     def torsion_scan(
@@ -94,7 +93,7 @@ class GaussianBackend(QMBackend):
         """Relaxed torsion scan via Gaussian.  Phase 1 stub."""
         raise NotImplementedError(
             "GaussianBackend.torsion_scan is a Phase 1 stub. "
-            "Use PoltypeModules/torsiongenerator.py directly."
+            "Not yet implemented."
         )
 
     def compute_wbo_matrix(
@@ -107,5 +106,5 @@ class GaussianBackend(QMBackend):
         """Wiberg bond order matrix via Gaussian.  Phase 1 stub."""
         raise NotImplementedError(
             "GaussianBackend.compute_wbo_matrix is a Phase 1 stub. "
-            "Use PoltypeModules/fragmenter.py directly."
+            "Not yet implemented."
         )

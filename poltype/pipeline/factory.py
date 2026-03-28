@@ -11,9 +11,6 @@ Usage::
 
     runner = build_default_pipeline()
     ctx = runner.run(context)
-
-This module has **no dependency on PoltypeModules** and can be
-unit-tested in isolation.
 """
 
 from __future__ import annotations

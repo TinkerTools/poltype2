@@ -10,9 +10,6 @@ Usage::
     from poltype.logging_config import setup_logging
 
     setup_logging(verbose=True)
-
-This module has **no dependency on PoltypeModules** and can be
-unit-tested in isolation.
 """
 
 from __future__ import annotations

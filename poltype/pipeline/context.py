@@ -10,9 +10,6 @@ pipeline run and flows through every stage.  It carries:
 * the selected :class:`QMBackend`,
 * an ``artifacts`` dict for inter-stage data exchange, and
 * a ``stage_results`` dict that records the outcome of each stage.
-
-This module has **no dependency on PoltypeModules** and can be
-unit-tested in isolation.
 """
 
 from __future__ import annotations

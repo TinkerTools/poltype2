@@ -17,9 +17,6 @@ Example::
     [H][C]   16  HC   # HC, H on carbon
 
 Lines starting with ``#`` are ignored.  Inline ``#`` starts a comment.
-
-This module has **no dependency on PoltypeModules** and can be
-unit-tested in isolation.
 """
 
 from __future__ import annotations

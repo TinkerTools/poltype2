@@ -10,9 +10,6 @@ Optionally, an :class:`EventBus` can be attached to broadcast
 :class:`PipelineEvent` notifications, and a :class:`CheckpointManager`
 can be provided to persist progress and enable resume.
 
-This module has **no dependency on PoltypeModules** and can be
-unit-tested in isolation.
-
 Example::
 
     from poltype.pipeline import PipelineRunner, PipelineContext

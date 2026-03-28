@@ -3,8 +3,7 @@ poltype.qm.pyscf_backend – PySCF QM backend adapter (stub).
 
 Phase 1 status: **stub adapter** – the class satisfies the
 :class:`~poltype.qm.backend.QMBackend` interface.  The existing PySCF
-code paths in ``PoltypeModules/pyscf_setup.py`` remain active until
-Phase 4.
+code paths remain active until Phase 4.
 """
 
 from __future__ import annotations
@@ -61,7 +60,7 @@ class PySCFBackend(QMBackend):
         """Geometry optimisation via PySCF.  Phase 1 stub."""
         raise NotImplementedError(
             "PySCFBackend.optimize_geometry is a Phase 1 stub. "
-            "Use PoltypeModules/pyscf_setup.py directly."
+            "Not yet implemented."
         )
 
     def compute_esp_grid(
@@ -74,7 +73,7 @@ class PySCFBackend(QMBackend):
         """ESP grid calculation via PySCF.  Phase 1 stub."""
         raise NotImplementedError(
             "PySCFBackend.compute_esp_grid is a Phase 1 stub. "
-            "Use PoltypeModules/electrostaticpotential.py directly."
+            "Not yet implemented."
         )
 
     def torsion_scan(
@@ -89,7 +88,7 @@ class PySCFBackend(QMBackend):
         """Relaxed torsion scan via PySCF.  Phase 1 stub."""
         raise NotImplementedError(
             "PySCFBackend.torsion_scan is a Phase 1 stub. "
-            "Use PoltypeModules/torsiongenerator.py directly."
+            "Not yet implemented."
         )
 
     def compute_wbo_matrix(
@@ -102,5 +101,5 @@ class PySCFBackend(QMBackend):
         """Wiberg bond order matrix via PySCF.  Phase 1 stub."""
         raise NotImplementedError(
             "PySCFBackend.compute_wbo_matrix is a Phase 1 stub. "
-            "Use PoltypeModules/fragmenter.py directly."
+            "Not yet implemented."
         )

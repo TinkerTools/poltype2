@@ -8,12 +8,8 @@ smaller fragments for efficient torsion scanning.
   orders when WBO data is unavailable) to decide where to cut and
   how far to grow each fragment from the target rotatable bond.
 * :class:`RuleBasedFragmenter` uses predefined chemical rules
-  (similar to the post-processing script
-  ``PoltypeModules/lTorsionFragmentPostProcessing.py``) to trim
-  fragments without requiring WBO data.
+  to trim fragments without requiring WBO data.
 
-This module has **no dependency on PoltypeModules** and can be
-unit-tested in isolation.
 """
 
 from __future__ import annotations

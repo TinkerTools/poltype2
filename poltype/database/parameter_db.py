@@ -4,9 +4,6 @@ poltype.database.parameter_db – parameter database loading & lookup.
 :class:`ParameterDatabase` is the abstract interface.
 :class:`SmallMoleculeDB` loads the AMOEBA SMARTS→type mapping shipped
 with Poltype2 and reports which atoms have existing parameters.
-
-This module has **no dependency on PoltypeModules** and can be
-unit-tested in isolation.
 """
 
 from __future__ import annotations
