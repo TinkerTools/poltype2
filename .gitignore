@@ -1,2 +1,6 @@
 __pycache__/
 __init__.py
+*.egg-info/
+__pycache__/
+.pytest_cache/
+poltype2.egg-info/
