@@ -21,11 +21,14 @@ Example::
 
 from __future__ import annotations
 
+import logging
 import time
 from typing import List, Optional
 
 from poltype.pipeline.context import PipelineContext
 from poltype.pipeline.stage import Stage, StageResult, StageStatus
+
+logger = logging.getLogger("poltype.pipeline.runner")
 
 
 class PipelineRunner:
@@ -81,9 +84,13 @@ class PipelineRunner:
                     message=f"Stage '{stage.name}' skipped by should_skip()",
                 )
                 context.stage_results[stage.name] = result
+                logger.info(
+                    "Stage '%s' skipped", stage.name,
+                )
                 continue
 
             # -- execute --
+            logger.info("Stage '%s' starting", stage.name)
             t0 = time.monotonic()
             result = stage.execute(context)
             result.elapsed_seconds = time.monotonic() - t0
@@ -92,10 +99,21 @@ class PipelineRunner:
 
             # -- stop on failure --
             if result.status is StageStatus.FAILED:
+                logger.error(
+                    "Stage '%s' failed (%.2fs): %s",
+                    stage.name,
+                    result.elapsed_seconds,
+                    result.message,
+                )
                 break
 
             # -- merge artifacts --
             context.artifacts.update(result.artifacts)
+            logger.info(
+                "Stage '%s' completed (%.2fs)",
+                stage.name,
+                result.elapsed_seconds,
+            )
 
         return context
 
