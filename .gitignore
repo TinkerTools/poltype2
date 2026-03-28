@@ -3,3 +3,9 @@ __init__.py
 *.egg-info/
 .pytest_cache/
 poltype2.egg-info/
+
+# Pipeline output files (generated at runtime)
+final.xyz
+final.key
+poltype_summary.txt
+poltype_checkpoint.json
