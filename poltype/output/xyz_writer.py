@@ -86,8 +86,12 @@ class XYZFileWriter(OutputWriter):
                 n.GetIdx() + 1 for n in atom.GetNeighbors()
             )
             neighbour_str = "  ".join(str(n) for n in neighbours)
-            # Type placeholder: use atom index as type until real typing
-            atom_type = tinker_idx
+            # Use real atom type from type_records if available
+            type_records = context.get_artifact("type_records")
+            if type_records is not None and i < len(type_records):
+                atom_type = type_records[i].atom_type or tinker_idx
+            else:
+                atom_type = tinker_idx
             lines.append(
                 f" {tinker_idx:>5d}  {symbol:<2s}"
                 f"  {x:12.6f}{y:12.6f}{z:12.6f}"

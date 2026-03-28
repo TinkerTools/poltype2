@@ -760,9 +760,9 @@ class TestDryRunMode:
         assert ctx.stage_results["input_preparation"].status is StageStatus.COMPLETED
         assert ctx.stage_results["finalization"].status is StageStatus.COMPLETED
 
-        # QM stages should have been skipped
+        # QM stages and typing/database stages should have been skipped
         for name in ("geometry_optimization", "esp_fitting", "multipole",
-                      "torsion_fitting"):
+                      "atom_typing", "database_match", "torsion_fitting"):
             assert ctx.stage_results[name].status is StageStatus.SKIPPED
 
     def test_dry_run_still_writes_output_files(self, tmp_path):
@@ -869,7 +869,7 @@ class TestBuildDefaultPipeline:
 
     def test_has_six_stages(self):
         runner = build_default_pipeline()
-        assert len(runner._stages) == 6
+        assert len(runner._stages) == 8
 
     def test_finalization_has_writers(self):
         runner = build_default_pipeline()
@@ -912,7 +912,8 @@ class TestBuildDefaultPipeline:
         ctx = runner.run(ctx)
 
         for name in ("input_preparation", "geometry_optimization",
-                      "esp_fitting", "multipole", "torsion_fitting",
+                      "esp_fitting", "multipole", "atom_typing",
+                      "database_match", "torsion_fitting",
                       "finalization"):
             assert ctx.stage_results[name].status is StageStatus.COMPLETED
 

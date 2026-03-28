@@ -92,6 +92,7 @@ class KeyFileWriter(OutputWriter):
         # Atom definitions
         lines.append("# Atom definitions")
         rdmol = mol.rdmol
+        type_records = context.get_artifact("type_records")
         for i in range(mol.num_atoms):
             atom = rdmol.GetAtomWithIdx(i)
             symbol = atom.GetSymbol()
@@ -99,10 +100,18 @@ class KeyFileWriter(OutputWriter):
             atomic_num = atom.GetAtomicNum()
             mass = atom.GetMass()
             valence = atom.GetTotalDegree()
-            # Use index-based type/class until real type assignment
+            # Use real type/class from type_records if available
+            if type_records is not None and i < len(type_records):
+                atype = type_records[i].atom_type or tinker_idx
+                aclass = type_records[i].atom_class or tinker_idx
+                desc = type_records[i].description or f"{mol.name} {symbol}{tinker_idx}"
+            else:
+                atype = tinker_idx
+                aclass = tinker_idx
+                desc = f"{mol.name} {symbol}{tinker_idx}"
             lines.append(
-                f"atom  {tinker_idx:>5d}  {tinker_idx:>5d}  {symbol:<2s}"
-                f'  "{mol.name} {symbol}{tinker_idx}"'
+                f"atom  {atype:>5d}  {aclass:>5d}  {symbol:<2s}"
+                f'  "{desc}"'
                 f"  {atomic_num:>5d}  {mass:>10.3f}  {valence:>3d}"
             )
         lines.append("")
