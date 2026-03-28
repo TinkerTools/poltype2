@@ -17,7 +17,11 @@ import logging
 from typing import TYPE_CHECKING, Optional
 
 from poltype.fragmentation.fragment import FragmentResult
-from poltype.fragmentation.fragmenter import Fragmenter, WBOFragmenter
+from poltype.fragmentation.fragmenter import (
+    Fragmenter,
+    RuleBasedFragmenter,
+    WBOFragmenter,
+)
 from poltype.pipeline.stage import Stage, StageResult, StageStatus
 
 if TYPE_CHECKING:
@@ -33,8 +37,7 @@ class FragmentationStage(Stage):
     ----------
     fragmenter:
         A :class:`Fragmenter` instance.  If ``None``, a
-        :class:`WBOFragmenter` is built from config values during
-        execution.
+        :class:`RuleBasedFragmenter` is built during execution.
     """
 
     def __init__(self, fragmenter: Optional[Fragmenter] = None) -> None:
@@ -91,19 +94,11 @@ class FragmentationStage(Stage):
         # Build fragmenter lazily from config if not injected.
         fragmenter = self._fragmenter
         if fragmenter is None:
-            cfg = context.config
-            fragmenter = WBOFragmenter(
-                wbo_threshold=1.0 - cfg.wbo_tolerance,
-                max_growth_cycles=cfg.max_growth_cycles,
-            )
-
-        # Use QM WBO matrix if available.
-        wbo_matrix = context.get_artifact("wbo_matrix")
+            fragmenter = RuleBasedFragmenter()
 
         frag_result: FragmentResult = fragmenter.fragment(
             mol,
             needs_scan,
-            wbo_matrix=wbo_matrix,
         )
         context.set_artifact("fragment_result", frag_result)
 

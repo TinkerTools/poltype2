@@ -25,7 +25,7 @@ import pytest
 from poltype.config.schema import PoltypeConfig, QMConfig
 from poltype.database.match_result import DatabaseMatchResult
 from poltype.fragmentation.fragment import Fragment, FragmentResult
-from poltype.fragmentation.fragmenter import Fragmenter, WBOFragmenter
+from poltype.fragmentation.fragmenter import Fragmenter, RuleBasedFragmenter, WBOFragmenter
 from poltype.molecule.molecule import Molecule
 from poltype.pipeline.context import PipelineContext
 from poltype.pipeline.factory import build_default_pipeline
@@ -433,6 +433,159 @@ class TestWBOFragmenter:
 
 
 # ===================================================================
+# D2. RuleBasedFragmenter tests
+# ===================================================================
+
+
+def _make_toluene() -> Molecule:
+    """Toluene – aromatic ring with substituent."""
+    return Molecule.from_smiles("Cc1ccccc1", name="toluene")
+
+
+def _make_naphthalene_chain() -> Molecule:
+    """2-ethylnaphthalene – fused ring with chain."""
+    return Molecule.from_smiles("CCc1ccc2ccccc2c1", name="ethylnaphthalene")
+
+
+def _make_aniline() -> Molecule:
+    """Aniline – aromatic ring with nitrogen substituent."""
+    return Molecule.from_smiles("Nc1ccccc1", name="aniline")
+
+
+class TestRuleBasedFragmenter:
+    def test_default_params(self):
+        f = RuleBasedFragmenter()
+        assert f.max_fragment_atoms == 50
+
+    def test_custom_params(self):
+        f = RuleBasedFragmenter(max_fragment_atoms=30)
+        assert f.max_fragment_atoms == 30
+
+    def test_repr(self):
+        f = RuleBasedFragmenter(max_fragment_atoms=40)
+        r = repr(f)
+        assert "RuleBasedFragmenter" in r
+        assert "40" in r
+
+    def test_name(self):
+        f = RuleBasedFragmenter()
+        assert f.name == "RuleBasedFragmenter"
+
+    def test_fragment_no_bonds(self):
+        f = RuleBasedFragmenter()
+        mol = _make_methane()
+        result = f.fragment(mol, [])
+        assert result.num_fragments == 0
+        assert result.fragmentation_method == "rule_based"
+        assert result.parent_molecule_name == "methane"
+
+    def test_fragment_ethanol(self):
+        """Ethanol has rotatable bonds; should produce fragments."""
+        f = RuleBasedFragmenter()
+        mol = _make_ethanol()
+        bonds = mol.rotatable_bonds
+        if not bonds:
+            pytest.skip("Ethanol embedding may not produce rotatable bonds")
+        result = f.fragment(mol, bonds)
+        assert result.num_fragments == len(bonds)
+        for frag in result.fragments:
+            assert frag.num_atoms >= 2
+
+    def test_fragment_butane(self):
+        """Butane has multiple rotatable bonds."""
+        f = RuleBasedFragmenter()
+        mol = _make_butane()
+        bonds = mol.rotatable_bonds
+        if not bonds:
+            pytest.skip("Butane embedding may not produce rotatable bonds")
+        result = f.fragment(mol, bonds)
+        assert result.num_fragments == len(bonds)
+
+    def test_fragment_ignores_wbo_matrix(self):
+        """WBO matrix is accepted but ignored."""
+        f = RuleBasedFragmenter()
+        mol = _make_ethanol()
+        bonds = mol.rotatable_bonds
+        if not bonds:
+            pytest.skip("No rotatable bonds")
+        n = mol.num_atoms
+        wbo = np.eye(n)
+        result = f.fragment(mol, bonds, wbo_matrix=wbo)
+        assert result.fragmentation_method == "rule_based"
+        assert "used_qm_wbo" not in result.metadata
+
+    def test_fragment_result_metadata(self):
+        f = RuleBasedFragmenter(max_fragment_atoms=30)
+        mol = _make_ethanol()
+        result = f.fragment(mol, [])
+        assert result.metadata["max_fragment_atoms"] == 30
+
+    def test_growth_includes_central_bond_atoms(self):
+        """Fragment always includes both atoms of the central bond."""
+        f = RuleBasedFragmenter()
+        mol = _make_ethanol()
+        bonds = mol.rotatable_bonds
+        if not bonds:
+            pytest.skip("No rotatable bonds")
+        result = f.fragment(mol, bonds)
+        for i, frag in enumerate(result.fragments):
+            bond = bonds[i]
+            parent_indices = set(frag.atom_map.values())
+            assert bond[0] in parent_indices
+            assert bond[1] in parent_indices
+
+    def test_torsion_region_always_kept(self):
+        """Torsion region (bond atoms + neighbours) is never removed."""
+        f = RuleBasedFragmenter()
+        mol = _make_butane()
+        bonds = mol.rotatable_bonds
+        if not bonds:
+            pytest.skip("No rotatable bonds")
+        result = f.fragment(mol, bonds)
+        rdmol = mol.rdmol
+        for i, frag in enumerate(result.fragments):
+            bond = bonds[i]
+            parent_indices = set(frag.atom_map.values())
+            # Both bond atoms must be present.
+            assert bond[0] in parent_indices
+            assert bond[1] in parent_indices
+            # All neighbours of bond atoms must be present.
+            for center in bond:
+                atom = rdmol.GetAtomWithIdx(center)
+                for neig in atom.GetNeighbors():
+                    assert neig.GetIdx() in parent_indices
+
+    def test_fragment_ids_are_sequential(self):
+        """Fragment IDs should be 0, 1, 2, ..."""
+        f = RuleBasedFragmenter()
+        mol = _make_butane()
+        bonds = mol.rotatable_bonds
+        if not bonds:
+            pytest.skip("No rotatable bonds")
+        result = f.fragment(mol, bonds)
+        for i, frag in enumerate(result.fragments):
+            assert frag.fragment_id == i
+
+    def test_fragment_names_contain_bond_info(self):
+        f = RuleBasedFragmenter()
+        mol = _make_ethanol()
+        bonds = mol.rotatable_bonds
+        if not bonds:
+            pytest.skip("No rotatable bonds")
+        result = f.fragment(mol, bonds)
+        for frag in result.fragments:
+            assert "frag_" in frag.name
+            assert "bond_" in frag.name
+
+    def test_methane_no_rotatable_bonds(self):
+        """Methane has no rotatable bonds; no fragments produced."""
+        f = RuleBasedFragmenter()
+        mol = _make_methane()
+        result = f.fragment(mol, [])
+        assert result.num_fragments == 0
+
+
+# ===================================================================
 # E. FragmentationStage tests
 # ===================================================================
 
@@ -527,8 +680,8 @@ class TestFragmentationStage:
         # Should have fragments for all unmatched bonds
         assert frag_result.num_fragments == len(bonds) - 1
 
-    def test_execute_uses_wbo_artifact(self, tmp_path):
-        """Stage picks up wbo_matrix from context artifacts."""
+    def test_execute_uses_rule_based_by_default(self, tmp_path):
+        """Default stage uses RuleBasedFragmenter, ignoring wbo_matrix."""
         mol = _make_ethanol()
         stage = FragmentationStage()
         ctx = _make_context(tmp_path, molecule=mol)
@@ -539,14 +692,11 @@ class TestFragmentationStage:
         ctx.set_artifact("wbo_matrix", wbo)
         result = stage.execute(ctx)
         frag_result = result.artifacts["fragment_result"]
-        assert frag_result.metadata.get("used_qm_wbo") is True
+        assert frag_result.fragmentation_method == "rule_based"
 
     def test_execute_config_driven_fragmenter(self, tmp_path):
-        """When no fragmenter injected, builds from config."""
-        config = PoltypeConfig(
-            wbo_tolerance=0.1,
-            max_growth_cycles=3,
-        )
+        """When no fragmenter injected, builds a RuleBasedFragmenter."""
+        config = PoltypeConfig()
         mol = _make_ethanol()
         ctx = PipelineContext(
             config=config,
@@ -557,6 +707,9 @@ class TestFragmentationStage:
         stage = FragmentationStage()  # No injected fragmenter
         result = stage.execute(ctx)
         assert result.status is StageStatus.COMPLETED
+        frag_result = result.artifacts.get("fragment_result")
+        if frag_result and frag_result.num_fragments > 0:
+            assert frag_result.fragmentation_method == "rule_based"
 
     def test_should_skip_dry_run(self, tmp_path):
         stage = FragmentationStage()
@@ -759,11 +912,12 @@ class TestTorsionCovered:
 class TestModuleImports:
     def test_import_fragmentation_module(self):
         from poltype.fragmentation import Fragment, FragmentResult
-        from poltype.fragmentation import Fragmenter, WBOFragmenter
+        from poltype.fragmentation import Fragmenter, RuleBasedFragmenter, WBOFragmenter
         assert Fragment is not None
         assert FragmentResult is not None
         assert Fragmenter is not None
         assert WBOFragmenter is not None
+        assert RuleBasedFragmenter is not None
 
     def test_import_stage_from_stages_init(self):
         from poltype.pipeline.stages import FragmentationStage
