@@ -15,6 +15,7 @@ from __future__ import annotations
 
 from poltype.pipeline.stages.esp import ESPFittingStage
 from poltype.pipeline.stages.finalization import FinalizationStage
+from poltype.pipeline.stages.fragmentation import FragmentationStage
 from poltype.pipeline.stages.geometry_opt import GeometryOptimizationStage
 from poltype.pipeline.stages.input_prep import InputPreparationStage
 from poltype.pipeline.stages.multipole import MultipoleStage
@@ -25,6 +26,7 @@ __all__ = [
     "GeometryOptimizationStage",
     "ESPFittingStage",
     "MultipoleStage",
+    "FragmentationStage",
     "TorsionFittingStage",
     "FinalizationStage",
 ]

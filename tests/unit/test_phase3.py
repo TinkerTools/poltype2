@@ -142,7 +142,7 @@ class TestBuildDefaultPipeline:
 
     def test_has_six_stages(self):
         runner = build_default_pipeline()
-        assert repr(runner) == "PipelineRunner(stages=8)"
+        assert repr(runner) == "PipelineRunner(stages=9)"
 
     def test_stage_order(self):
         runner = build_default_pipeline()
@@ -154,6 +154,7 @@ class TestBuildDefaultPipeline:
             "multipole",
             "atom_typing",
             "database_match",
+            "fragmentation",
             "torsion_fitting",
             "finalization",
         ]
