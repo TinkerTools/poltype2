@@ -592,7 +592,7 @@ class TestDatabaseMatchStage:
 class TestBuildDefaultPipelinePhase7:
     def test_has_eight_stages(self):
         runner = build_default_pipeline()
-        assert len(runner._stages) == 8
+        assert len(runner._stages) == 9
 
     def test_stage_order(self):
         runner = build_default_pipeline()
@@ -604,6 +604,7 @@ class TestBuildDefaultPipelinePhase7:
             "multipole",
             "atom_typing",
             "database_match",
+            "fragmentation",
             "torsion_fitting",
             "finalization",
         ]
@@ -789,7 +790,7 @@ class TestFullPipelineWithTyping:
         )
         runner = build_default_pipeline()
         ctx = runner.run(ctx)
-        assert len(ctx.stage_results) == 8
+        assert len(ctx.stage_results) == 9
         for sr in ctx.stage_results.values():
             assert sr.status is StageStatus.COMPLETED
 

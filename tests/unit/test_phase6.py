@@ -869,7 +869,7 @@ class TestBuildDefaultPipeline:
 
     def test_has_six_stages(self):
         runner = build_default_pipeline()
-        assert len(runner._stages) == 8
+        assert len(runner._stages) == 9
 
     def test_finalization_has_writers(self):
         runner = build_default_pipeline()
