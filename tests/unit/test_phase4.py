@@ -466,8 +466,8 @@ class TestFullPipelineWithMockBackend:
             backend=mock_backend,
         )
         result = runner.run(ctx)
-        # All 9 stages should complete
-        assert len(result.stage_results) == 9
+        # All 10 stages should complete
+        assert len(result.stage_results) == 10
         for sr in result.stage_results.values():
             assert sr.status is StageStatus.COMPLETED
 

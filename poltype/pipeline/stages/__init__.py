@@ -20,6 +20,7 @@ from poltype.pipeline.stages.geometry_opt import GeometryOptimizationStage
 from poltype.pipeline.stages.input_prep import InputPreparationStage
 from poltype.pipeline.stages.multipole import MultipoleStage
 from poltype.pipeline.stages.torsion import TorsionFittingStage
+from poltype.pipeline.stages.validation import ValidationStage
 
 __all__ = [
     "InputPreparationStage",
@@ -28,5 +29,6 @@ __all__ = [
     "MultipoleStage",
     "FragmentationStage",
     "TorsionFittingStage",
+    "ValidationStage",
     "FinalizationStage",
 ]
