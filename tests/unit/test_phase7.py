@@ -871,7 +871,6 @@ class TestSMARTSFileEdgeCases:
 
     def test_real_amoeba_file_parseable(self):
         """The actual amoeba21smartstoclass.txt file should parse."""
-        import os
         repo_root = Path(__file__).resolve().parents[2]
         smarts_file = repo_root / "ParameterFiles" / "amoeba21smartstoclass.txt"
         if smarts_file.exists():

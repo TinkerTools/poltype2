@@ -3,7 +3,7 @@ poltype.typing.atom_typer – atom type assignment strategies.
 
 :class:`AtomTyper` is the abstract interface.  Concrete implementations
 match atoms to Tinker atom types.  :class:`SMARTSAtomTyper` reads an
-ordered SMARTS→class mapping file and assigns types by first-match.
+ordered SMARTS→class mapping file and assigns types by last-match-wins.
 
 Mapping file format (``amoeba21smartstoclass.txt``)
 ---------------------------------------------------
