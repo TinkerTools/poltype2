@@ -15,12 +15,15 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Set, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Set, Tuple
 
 from rdkit import Chem
 
 from poltype.fragmentation.fragment import Fragment, FragmentResult
 from poltype.molecule.molecule import Molecule
+
+if TYPE_CHECKING:
+    import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +42,7 @@ class Fragmenter(ABC):
         molecule: Molecule,
         rotatable_bonds: List[Tuple[int, int]],
         *,
-        wbo_matrix: Optional["np.ndarray"] = None,
+        wbo_matrix: Optional[np.ndarray] = None,
     ) -> FragmentResult:
         """Decompose *molecule* into fragments for torsion fitting.
 
@@ -109,7 +112,7 @@ class WBOFragmenter(Fragmenter):
         molecule: Molecule,
         rotatable_bonds: List[Tuple[int, int]],
         *,
-        wbo_matrix: Optional["np.ndarray"] = None,
+        wbo_matrix: Optional[np.ndarray] = None,
     ) -> FragmentResult:
         """Decompose *molecule* into fragments around rotatable bonds.
 
@@ -222,7 +225,7 @@ class WBOFragmenter(Fragmenter):
     @staticmethod
     def _build_bond_order_matrix(
         rdmol: Chem.Mol,
-        wbo_matrix: Optional["np.ndarray"] = None,
+        wbo_matrix: Optional[np.ndarray] = None,
     ) -> Dict[Tuple[int, int], float]:
         """Build a ``(i, j) → bond_order`` dict.
 
