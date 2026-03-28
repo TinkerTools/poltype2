@@ -2,8 +2,9 @@
 poltype.pipeline.stages – concrete pipeline stage implementations.
 
 Each stage maps to a major phase of the monolithic
-``GenerateParameters()`` method in the legacy code.  Phase 2 provides
-**stubs** that will be filled in during Phase 4.
+``GenerateParameters()`` method in the legacy code.  Stages delegate
+to the :class:`~poltype.qm.backend.QMBackend` interface for QM
+computations.
 
 Re-exports all concrete stages for convenience::
 
