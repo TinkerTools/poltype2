@@ -391,11 +391,17 @@ class TestGeometryOptimizationStage:
     def test_name(self):
         assert GeometryOptimizationStage().name == "geometry_optimization"
 
-    def test_execute_returns_completed(self, context):
+    def test_execute_fails_when_no_molecule(self, context):
         stage = GeometryOptimizationStage()
         result = stage.execute(context)
-        assert result.status is StageStatus.COMPLETED
-        assert "stub" in result.message
+        assert result.status is StageStatus.FAILED
+        assert "No molecule" in result.message
+
+    def test_execute_fails_when_no_backend(self, context_with_molecule):
+        stage = GeometryOptimizationStage()
+        result = stage.execute(context_with_molecule)
+        assert result.status is StageStatus.FAILED
+        assert "No QM backend" in result.message
 
     def test_should_skip_when_database_match_only(self, default_config):
         default_config.database_match_only = True
@@ -412,11 +418,17 @@ class TestESPFittingStage:
     def test_name(self):
         assert ESPFittingStage().name == "esp_fitting"
 
-    def test_execute_returns_completed(self, context):
+    def test_execute_fails_when_no_molecule(self, context):
         stage = ESPFittingStage()
         result = stage.execute(context)
-        assert result.status is StageStatus.COMPLETED
-        assert "stub" in result.message
+        assert result.status is StageStatus.FAILED
+        assert "No molecule" in result.message
+
+    def test_execute_fails_when_no_backend(self, context_with_molecule):
+        stage = ESPFittingStage()
+        result = stage.execute(context_with_molecule)
+        assert result.status is StageStatus.FAILED
+        assert "No QM backend" in result.message
 
     def test_should_skip_when_database_match_only(self, default_config):
         default_config.database_match_only = True
@@ -433,11 +445,17 @@ class TestMultipoleStage:
     def test_name(self):
         assert MultipoleStage().name == "multipole"
 
-    def test_execute_returns_completed(self, context):
+    def test_execute_fails_when_no_molecule(self, context):
         stage = MultipoleStage()
         result = stage.execute(context)
+        assert result.status is StageStatus.FAILED
+        assert "No molecule" in result.message
+
+    def test_execute_completes_without_esp_data(self, context_with_molecule):
+        stage = MultipoleStage()
+        result = stage.execute(context_with_molecule)
         assert result.status is StageStatus.COMPLETED
-        assert "stub" in result.message
+        assert "No ESP data" in result.message
 
     def test_should_skip_when_database_match_only(self, default_config):
         default_config.database_match_only = True
@@ -454,11 +472,17 @@ class TestTorsionFittingStage:
     def test_name(self):
         assert TorsionFittingStage().name == "torsion_fitting"
 
-    def test_execute_returns_completed(self, context):
+    def test_execute_fails_when_no_molecule(self, context):
         stage = TorsionFittingStage()
         result = stage.execute(context)
-        assert result.status is StageStatus.COMPLETED
-        assert "stub" in result.message
+        assert result.status is StageStatus.FAILED
+        assert "No molecule" in result.message
+
+    def test_execute_fails_when_no_backend(self, context_with_molecule):
+        stage = TorsionFittingStage()
+        result = stage.execute(context_with_molecule)
+        assert result.status is StageStatus.FAILED
+        assert "No QM backend" in result.message
 
     def test_should_skip_when_do_torsion_fit_false(self, default_config):
         default_config.do_torsion_fit = False
@@ -485,4 +509,12 @@ class TestFinalizationStage:
         stage = FinalizationStage()
         result = stage.execute(context)
         assert result.status is StageStatus.COMPLETED
-        assert "stub" in result.message
+        assert "final_summary" in result.artifacts
+
+    def test_execute_collects_molecule_info(self, context_with_molecule):
+        stage = FinalizationStage()
+        result = stage.execute(context_with_molecule)
+        assert result.status is StageStatus.COMPLETED
+        summary = result.artifacts["final_summary"]
+        assert summary["has_molecule"] is True
+        assert summary["molecule_name"] == "methane"

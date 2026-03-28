@@ -156,8 +156,8 @@ class TestBuildDefaultPipeline:
             "finalization",
         ]
 
-    def test_runs_with_molecule_context(self):
-        """The default pipeline should run to completion with a molecule."""
+    def test_runs_with_molecule_context_no_backend(self):
+        """Without a backend the pipeline fails at geometry_optimization."""
         from poltype.molecule.molecule import Molecule
 
         runner = build_default_pipeline()
@@ -165,10 +165,17 @@ class TestBuildDefaultPipeline:
         cfg = PoltypeConfig()
         ctx = PipelineContext(config=cfg, molecule=mol)
         result = runner.run(ctx)
-        # All 6 stages should have recorded a result
-        assert len(result.stage_results) == 6
-        for sr in result.stage_results.values():
-            assert sr.status is StageStatus.COMPLETED
+        # input_preparation succeeds; geometry_optimization fails (no backend)
+        assert "input_preparation" in result.stage_results
+        assert (
+            result.stage_results["input_preparation"].status
+            is StageStatus.COMPLETED
+        )
+        assert "geometry_optimization" in result.stage_results
+        assert (
+            result.stage_results["geometry_optimization"].status
+            is StageStatus.FAILED
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -237,11 +244,11 @@ class TestCLI:
         assert code == 2
 
     def test_successful_run(self, tmp_path):
-        """End-to-end: config → pipeline → success exit code."""
+        """End-to-end: config with database_match_only skips QM stages."""
         from poltype.__main__ import main
 
         ini = tmp_path / "poltype.ini"
-        ini.write_text("structure = dummy.sdf\n")
+        ini.write_text("structure = dummy.sdf\ndatabasematchonly = True\n")
 
         # Create a minimal SDF file for the molecule loader
         sdf = tmp_path / "dummy.sdf"
@@ -260,11 +267,34 @@ class TestCLI:
         ])
         assert code == 0
 
-    def test_verbose_flag_accepted(self, tmp_path):
+    def test_run_fails_without_backend(self, tmp_path):
+        """End-to-end: pipeline fails when backend raises NotImplementedError."""
         from poltype.__main__ import main
 
         ini = tmp_path / "poltype.ini"
         ini.write_text("structure = dummy.sdf\n")
+
+        sdf = tmp_path / "dummy.sdf"
+        from rdkit import Chem
+
+        mol = Chem.MolFromSmiles("C")
+        mol = Chem.AddHs(mol)
+        writer = Chem.SDWriter(str(sdf))
+        writer.write(mol)
+        writer.close()
+
+        code = main([
+            "--config", str(ini),
+            "--work-dir", str(tmp_path),
+            "--quiet",
+        ])
+        assert code == 1
+
+    def test_verbose_flag_accepted(self, tmp_path):
+        from poltype.__main__ import main
+
+        ini = tmp_path / "poltype.ini"
+        ini.write_text("structure = dummy.sdf\ndatabasematchonly = True\n")
 
         sdf = tmp_path / "dummy.sdf"
         from rdkit import Chem
